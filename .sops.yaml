@@ -1,0 +1,7 @@
+keys:
+  - &alpha age1qcnp7cmyaxa86ey04e2cwd8mgem5wakarmtmn7wp2n2uv86slp4qmpgszn
+creation_rules:
+  - path_regex: hosts/alpha/secrets\.yaml$
+    key_groups:
+      - age:
+        - *alpha

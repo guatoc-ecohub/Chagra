@@ -1,0 +1,57 @@
+# modules/ai/piper.nix
+# =============================================================================
+# WYOMING PIPER — Text-to-Speech
+# Port: 10200
+# =============================================================================
+
+{ config, pkgs, lib, ... }:
+
+let
+  cfg = config.guatoc.ai.piper;
+  aiCfg = config.guatoc.ai;
+  registry = import ../../lib/registry.nix { inherit lib; };
+in
+{
+  options.guatoc.ai.piper = {
+    enable = lib.mkEnableOption "Wyoming Piper - Text-to-Speech" // {
+      default = false;
+    };
+    
+    voice = lib.mkOption {
+      type = lib.types.str;
+      default = "en_US-lessac-medium";
+      description = "Piper voice to use";
+    };
+  };
+
+  config = lib.mkIf (aiCfg.enable && cfg.enable) {
+    systemd.services.podman-wyoming-piper = {
+      after = [ "zfs.target" "network-online.target" "podman-create-ai-net.service" ];
+      requires = [ "zfs.target" "podman-create-ai-net.service" ];
+      serviceConfig = {
+        RequiresMountsFor = [ "/mnt/fast/appdata" ];
+        ExecStartPre = [
+          "${pkgs.coreutils}/bin/install -d -m 0755 /mnt/fast/appdata/wyoming-piper"
+        ];
+      };
+    };
+
+    virtualisation.oci-containers.containers.wyoming-piper = {
+      image = "rhasspy/wyoming-piper:latest";
+      ports = [ "10200:10200" ];
+      volumes = [
+        "/mnt/fast/appdata/wyoming-piper:/data"
+      ];
+      cmd = [
+        "--voice" cfg.voice
+        "--data-dir" "/data"
+        "--uri" "tcp://0.0.0.0:10200"
+        "--download-dir" "/data/voices"
+      ];
+      extraOptions = [
+        "--network=ai-net"
+        "--name=wyoming-piper"
+      ];
+    };
+  };
+}

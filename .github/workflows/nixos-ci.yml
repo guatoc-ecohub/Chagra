@@ -1,0 +1,95 @@
+name: NixOS CI/CD
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+jobs:
+  # Validate all NixOS configurations
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: cachix/install-nix-action@v26
+        with:
+          install-options: "--option sandbox false"
+          nix-path: "nixpkgs=https://github.com/NixOS/nixpkgs/archive/nixos-24.11.tar.gz"
+      
+      - name: Evaluate STG
+        run: |
+          nix eval .#nixosConfigurations.stg.pkgs.system
+          
+      - name: Evaluate Alpha
+        run: |
+          nix eval .#nixosConfigurations.alpha.pkgs.system
+          
+      - name: Evaluate Beta
+        run: |
+          nix eval .#nixosConfigurations.beta.pkgs.system
+
+  # Build STG (auto-deploy on merge)
+  build-stg:
+    needs: validate
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: cachix/install-nix-action@v26
+        with:
+          install-options: "--option sandbox false"
+          nix-path: "nixpkgs=https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz"
+      
+      - name: Build STG
+        run: |
+          nix build .#nixosConfigurations.stg.config.system.build.toplevel --out-link result-stg
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh-agent.sock
+          
+      - name: Deploy to STG
+        run: |
+          echo "STG built successfully. Manual deployment required to STG host."
+          echo "Run on STG: sudo nixos-rebuild switch --flake .#stg"
+        shell: bash
+
+  # Build Alpha (manual via tag)
+  build-alpha:
+    needs: validate
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: cachix/install-nix-action@v26
+        with:
+          install-options: "--option sandbox false"
+          nix-path: "nixpkgs=https://github.com/NixOS/nixpkgs/archive/nixos-24.11.tar.gz"
+      
+      - name: Build Alpha
+        run: |
+          nix build .#nixosConfigurations.alpha.config.system.build.toplevel --out-link result-alpha
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh-agent.sock
+
+  # Build Beta (manual via tag)
+  build-beta:
+    needs: validate
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: cachix/install-nix-action@v26
+        with:
+          install-options: "--option sandbox false"
+          nix-path: "nixpkgs=https://github.com/NixOS/nixpkgs/archive/nixos-24.11.tar.gz"
+      
+      - name: Build Beta
+        run: |
+          nix build .#nixosConfigurations.beta.config.system.build.toplevel --out-link result-beta
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh-agent.sock
