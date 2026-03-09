@@ -25,8 +25,12 @@
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
+      # Use bash to find chattr in PATH and apply immutable attribute
       ExecStart = ''
-        ${pkgs.e2fsprogs}/bin/chattr +i /home/kortux/.config/sops/age/keys.txt 2>/dev/null || true
+        KEYFILE="/home/kortux/.config/sops/age/keys.txt"
+        if [ -f "$KEYFILE" ]; then
+          chattr +i "$KEYFILE" 2>/dev/null || true
+        fi
       '';
     };
   };
@@ -308,6 +312,12 @@
   # incluyendo Mosquitto, Home Assistant, Node-RED, InfluxDB y Grafana
 
   # --- TELEGRAF (for InfluxDB telemetry) ---
+  # NOTE: Requires influxdb_admin_token secret to be decrypted first
+  systemd.services.telegraf = {
+    description = "Telegraf Agent";
+    after = [ "sops-install-secrets.service" ];  # Wait for secrets to be decrypted
+    wantedBy = [ "multi-user.target" ];
+  };
   services.telegraf = {
     enable = true;
     extraConfig = {
