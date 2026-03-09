@@ -318,10 +318,10 @@
       inputs = {
         cpu = [ { percpu = false; totalcpu = true; } ];
         mem = {};
-        disk = [];
-        diskio = [];
-        net = [];
-        system = [];
+        disk = {};
+        diskio = {};
+        net = {};
+        system = {};
       };
       outputs = {
         influxdb_v2 = [
