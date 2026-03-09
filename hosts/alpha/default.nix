@@ -312,12 +312,6 @@
   # incluyendo Mosquitto, Home Assistant, Node-RED, InfluxDB y Grafana
 
   # --- TELEGRAF (for InfluxDB telemetry) ---
-  # NOTE: Requires influxdb_admin_token secret to be decrypted first
-  systemd.services.telegraf = {
-    description = "Telegraf Agent";
-    after = [ "sops-install-secrets.service" ];  # Wait for secrets to be decrypted
-    wantedBy = [ "multi-user.target" ];
-  };
   services.telegraf = {
     enable = true;
     extraConfig = {
