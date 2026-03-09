@@ -12,6 +12,10 @@
   # Los contenedores pueden montar /etc/zoneinfo para acceder a zoneinfo completo
   time.timeZone = "America/Bogota";
 
+  # Workaround for sphinx/docutils bug in nixos-unstable
+  # Skip building Python documentation
+  documentation.doc.enable = lib.mkDefault false;
+
   # --- SOPS: Gestión de Secretos ---
   sops = {
     defaultSopsFile = ./secrets.yaml;
