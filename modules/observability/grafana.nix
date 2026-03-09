@@ -55,9 +55,9 @@ in
       after = [ "podman-grafana.service" ];
       serviceConfig.Type = "oneshot";
       script = ''
-        # Leer el token de InfluxDB del secreto sops
-        INFLUX_TOKEN=$(cat ${config.sops.secrets."influxdb_admin_token".path})
-        cat > /mnt/fast/appdata/grafana/provisioning/datasources/influxdb.yml << EOF
+        # Grafana InfluxDB datasource provisioning
+        # Token will be added once influxdb_admin_token is in secrets.yaml
+        cat > /mnt/fast/appdata/grafana/provisioning/datasources/influxdb.yml << 'EOF'
 apiVersion: 1
 
 datasources:
@@ -73,10 +73,7 @@ datasources:
     jsonData:
       timeInterval: "10s"
       httpMode: GET
-      httpHeaderName1: "Authorization"
-      httpHeaderValue1: "Token $INFLUX_TOKEN"
-    secureJsonData:
-      token: "$INFLUX_TOKEN"
+    # secureJsonData.token will be added when token is available
 EOF
         chmod 644 /mnt/fast/appdata/grafana/provisioning/datasources/influxdb.yml
       '';

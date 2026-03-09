@@ -300,8 +300,8 @@
             urls = [ "http://127.0.0.1:8086" ];
             bucket = "iot";
             organization = "guatoc";
-            # Token leido del secreto sops
-            token_file = config.sops.secrets."influxdb_admin_token".path;
+            # Token will be required once influxdb_admin_token is added to secrets.yaml
+            # token_file = config.sops.secrets."influxdb_admin_token".path;
           }
         ];
       };

@@ -44,7 +44,8 @@ in
   #     GF_USERS_ALLOW_SIGN_UP=false
   # InfluxDB v2 secrets
   sops.secrets."influxdb_env" = { owner = "root"; mode = "0400"; };
-  sops.secrets."influxdb_admin_token" = { owner = "root"; group = "root"; mode = "0400"; };
+  # influxdb_admin_token is optional for now - will be required for Telegraf/Grafana
+  # sops.secrets."influxdb_admin_token" = { owner = "root"; group = "root"; mode = "0400"; };
   sops.secrets."grafana_env"  = { owner = "root"; mode = "0400"; };
 
   # ---------------------------------------------------------------------------
@@ -102,6 +103,8 @@ in
   # ---------------------------------------------------------------------------
   # CONTENEDORES OCI — IoT & Data
   # ---------------------------------------------------------------------------
+  virtualisation.oci-containers.containers = {
+
   # NOTA: farmos y postgres-farm Migrados a modules/agriculture/
 
   # -------------------------------------------------------------------------
