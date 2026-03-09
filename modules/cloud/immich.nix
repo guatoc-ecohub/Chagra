@@ -21,8 +21,8 @@ in
   config = lib.mkIf (cloudCfg.enable && cfg.enable) {
     # Immich PostgreSQL
     systemd.services.podman-immich-postgres = {
-      after = [ "zfs.target" "network-online.target" ];
-      requires = [ "zfs.target" ];
+      after = [ "zfs.target" "network-online.target" "create-container-networks.service" ];  # Wait for networks
+      requires = [ "zfs.target" "create-container-networks.service" ];
       serviceConfig = {
         RequiresMountsFor = [ "/mnt/fast/apps" ];
         ExecStartPre = [
@@ -50,8 +50,8 @@ in
 
     # Immich Server
     systemd.services.podman-immich-server = {
-      after = [ "zfs.target" "network-online.target" "podman-immich-postgres.service" ];
-      requires = [ "zfs.target" "podman-immich-postgres.service" ];
+      after = [ "zfs.target" "network-online.target" "podman-immich-postgres.service" "create-container-networks.service" ];
+      requires = [ "zfs.target" "podman-immich-postgres.service" "create-container-networks.service" ];
       serviceConfig = {
         RequiresMountsFor = [ "/mnt/data" ];
       };

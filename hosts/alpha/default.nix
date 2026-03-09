@@ -26,7 +26,6 @@
       Type = "oneshot";
       RemainAfterExit = true;
       ExecStart = ''
-        ${pkgs.util-linux}/bin/chattr +i /home/kortux/.config/sops/age/keys.txt 2>/dev/null || true
         ${pkgs.e2fsprogs}/bin/chattr +i /home/kortux/.config/sops/age/keys.txt 2>/dev/null || true
       '';
     };
@@ -63,6 +62,12 @@
       syncthing-alpha-device-id = {};
       syncthing-beta-device-id = {};
       syncthing-api-key = {};
+      # InfluxDB admin token for Telegraf
+      influxdb_admin_token = {
+        owner = "root";
+        group = "root";
+        mode = "0400";
+      };
     };
   };
 
@@ -320,7 +325,6 @@
             urls = [ "http://127.0.0.1:8086" ];
             bucket = "telegraf";
             organization = "guatoc";
-            # Token from sops - uncomment once user adds influxdb_admin_token to secrets.yaml
             token_file = config.sops.secrets."influxdb_admin_token".path;
           }
         ];
