@@ -49,5 +49,16 @@ in
     };
 
     networking.firewall.allowedTCPPorts = [ registry.ports.influxdb ];
+
+    # --- DECLARATIVE INFLUXDB CLEANUP (Safe) ---
+    # This replaces any manual rm -rf scripts
+    # The R scope ensures files older than 7 days in /var/lib/influxdb2/engine/data are cleaned
+    # Using systemd-tmpfiles is safer than rm -rf because if the path doesn't exist, it does nothing
+    systemd.tmpfiles.rules = [
+      # Clean InfluxDB engine temporary files (older than 7 days)
+      "R /mnt/fast/appdata/influxdb/data/engine/data 7d - - -"
+      # Clean InfluxDB wal (write-ahead log) files older than 3 days
+      "R /mnt/fast/appdata/influxdb/data/wal 3d - - -"
+    ];
   };
 }

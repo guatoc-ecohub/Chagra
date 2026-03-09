@@ -16,6 +16,22 @@
   # Skip building Python documentation
   documentation.doc.enable = lib.mkDefault false;
 
+  # --- SECURITY HARDENING: Electric Fences ---
+  # 1. Make sops age key immutable (cannot be deleted without removing attribute first)
+  systemd.services.sops-key-protection = {
+    description = "Protect SOPS age key with immutable attribute";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "local-fs.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = ''
+        ${pkgs.util-linux}/bin/chattr +i /home/kortux/.config/sops/age/keys.txt 2>/dev/null || true
+        ${pkgs.e2fsprogs}/bin/chattr +i /home/kortux/.config/sops/age/keys.txt 2>/dev/null || true
+      '';
+    };
+  };
+
   # --- SOPS: Gestión de Secretos ---
   sops = {
     defaultSopsFile = ./secrets.yaml;
@@ -302,10 +318,10 @@
         influxdb_v2 = [
           {
             urls = [ "http://127.0.0.1:8086" ];
-            bucket = "iot";
+            bucket = "telegraf";
             organization = "guatoc";
-            # Token will be required once influxdb_admin_token is added to secrets.yaml
-            # token_file = config.sops.secrets."influxdb_admin_token".path;
+            # Token from sops - uncomment once user adds influxdb_admin_token to secrets.yaml
+            token_file = config.sops.secrets."influxdb_admin_token".path;
           }
         ];
       };

@@ -33,5 +33,34 @@ in
   config = lib.mkIf cfg.enable {
     # Note: Telegraf se configura directamente en hosts/alpha/default.nix
     # Note: User/group creation and directories are handled by the legacy modules
+
+    # --- SANOID: ZFS Snapshots ---
+    services.sanoid = {
+      enable = true;
+      settings = {
+        # Policy for data datasets
+        "tank-fast/appdata" = {
+          hour = "24";
+          day = "7";
+          month = "3";
+          yearly = "0";
+          recursive = true;
+        };
+        "tank/media" = {
+          hour = "24";
+          day = "7";
+          month = "3";
+          yearly = "0";
+          recursive = true;
+        };
+        "tank" = {
+          # Root dataset - less frequent
+          day = "7";
+          month = "3";
+          yearly = "1";
+          recursive = false;
+        };
+      };
+    };
   };
 }
