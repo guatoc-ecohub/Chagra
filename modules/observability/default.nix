@@ -85,7 +85,7 @@ in
             
             chmod 644 /etc/sanoid/sanoid.conf
           '';
-        in "${script}/bin/sanoid-gen-config";
+        in script;
       };
     };
 
