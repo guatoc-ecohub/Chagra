@@ -39,10 +39,18 @@ in
       ];
       environment = {
         TZ = config.time.timeZone;
+        # PostgreSQL external database connection
+        DRUPAL_DB_DRIVER = "pgsql";
+        DRUPAL_DB_HOST = "postgres-farm";
+        DRUPAL_DB_PORT = "5432";
+        DRUPAL_DB_NAME = "farmos";
+        DRUPAL_DB_USER = "farmos";
+        DRUPAL_DB_PASSWORD = "changeme";  # TODO: migrate to sops-nix
       };
       extraOptions = [
         "--network=iot-net"
         "--name=farmos"
+        "--hostname=farmos"
       ];
     };
 
