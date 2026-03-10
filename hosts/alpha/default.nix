@@ -5,6 +5,7 @@
 {
   imports = [ 
     ./hardware-configuration.nix
+    ../../modules/iot.nix
   ];
 
   # --- TIMEZONE ---
