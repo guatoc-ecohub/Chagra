@@ -155,29 +155,6 @@ in
         };
       };
 
-      # -----------------------------------------------------------------------
-      # STREAMRIP — Descargador de Tidal/Spotify (Opcional)
-      # Volumen unificado: /mnt/data/media:/data
-      # Descarga en: /data/downloads/streamrip
-      # Requiere configurar credentials en /mnt/fast/appdata/streamrip/config.toml
-      # Uso: podman exec -it streamrip sh -c "cd /data/downloads/streamrip && streamrip url <URL>"
-      # -----------------------------------------------------------------------
-      streamrip = {
-        image = "christianalau/streamrip:latest";
-        # No expone puertos — se ejecuta vía 'podman exec' manualmente
-        volumes = [
-          "/mnt/fast/appdata/streamrip:/root/.config/streamrip"  # Config
-          "/mnt/data/media:/data"                                 # Descargas
-        ];
-        environment = {
-          PUID = "3000";
-          PGID = "3000";
-          HOME = "/root";
-        };
-        # FIX: Mantener contenedor vivo sin entrypoint personalizado
-        # Usar cmd con shell inline en lugar de entrypoint+cmd separados
-        cmd = [ "sh" "-c" "while true; do sleep 3600; done" ];
-      };
 
       # -----------------------------------------------------------------------
       # FIN FARMOS — Migrado a modules/agriculture/farmos.nix
@@ -215,12 +192,10 @@ in
     serviceConfig.RequiresMountsFor = [ "/mnt/fast/appdata" "/mnt/data/media" ];
   };
   
-  systemd.services.podman-streamrip = {
-    after = [ "zfs.target" "network-online.target" ];
-    requires = [ "zfs.target" ];
-    serviceConfig.RequiresMountsFor = [ "/mnt/fast/appdata" "/mnt/data/media" ];
-  };
-  
+  # ---------------------------------------------------------------------------
+  # STREAMRIP NIXPKGS (native installation)
+  # ---------------------------------------------------------------------------
+  environment.systemPackages = [ pkgs.streamrip ];
   # FARMOS systemd services migrated to modules/agriculture/farmos.nix
   # Forzar que todos esperen el desbloqueo de ZFS
   systemd.services.podman-base-dep = {
