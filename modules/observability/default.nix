@@ -41,7 +41,7 @@ in
     services.sanoid = {
       enable = true;
       settings = {
-        # Policy for data datasets
+        # Policy for fast storage datasets
         "tank-fast/appdata" = {
           hour = "24";
           day = "7";
@@ -57,7 +57,7 @@ in
           recursive = true;
         };
         "tank" = {
-          # Root dataset - less frequent
+          # Root dataset - less frequent snapshots
           day = "7";
           month = "3";
           yearly = "1";
