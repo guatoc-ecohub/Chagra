@@ -59,6 +59,7 @@
           # Nuevos dominios modulares
           ./modules/agriculture/default.nix  # Agriculture: FarmOS, PostgreSQL
           ./modules/cloud/default.nix        # Cloud: Nextcloud, Immich
+          ./modules/observability/default.nix  # Observability: InfluxDB, Grafana, Sanoid
         ];
       };
 

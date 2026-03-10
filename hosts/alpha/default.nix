@@ -363,6 +363,11 @@
     immich.enable = true;
   };
 
+  # --- OBSERVABILITY DOMAIN (Sanoid, InfluxDB, Grafana) ---
+  guatoc.observability = {
+    enable = true;
+  };
+
   # --- SSH ---
   services.openssh = {
     enable = true;
