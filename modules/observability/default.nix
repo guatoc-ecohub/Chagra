@@ -34,6 +34,9 @@ in
     # Note: Telegraf se configura directamente en hosts/alpha/default.nix
     # Note: User/group creation and directories are handled by the legacy modules
 
+    # Ensure sanoid package is installed
+    environment.systemPackages = [ pkgs.sanoid ];
+
     # --- SANOID: ZFS Snapshots ---
     services.sanoid = {
       enable = true;
