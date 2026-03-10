@@ -314,6 +314,7 @@
   # --- TELEGRAF (for InfluxDB telemetry) ---
   services.telegraf = {
     enable = true;
+    environmentFiles = [ config.sops.secrets.influxdb_admin_token.path ];
     extraConfig = {
       inputs = {
         cpu = [ { percpu = false; totalcpu = true; } ];
@@ -329,7 +330,7 @@
             urls = [ "http://127.0.0.1:8086" ];
             bucket = "telegraf";
             organization = "guatoc";
-            token_file = config.sops.secrets."influxdb_admin_token".path;
+            token = "$INFLUXDB_ADMIN_TOKEN";  # Read from env var in environmentFile
           }
         ];
       };
