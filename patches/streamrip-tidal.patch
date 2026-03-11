@@ -1,0 +1,13 @@
+--- a/streamrip/client/tidal.py
++++ b/streamrip/client/tidal.py
+@@ -4,8 +4,8 @@ import aiohttp
+ from tidalapi import Quality
+
+ # Tidal API credentials (replace with your own for personal use)
+-CLIENT_ID = ""
+-CLIENT_SECRET = ""
++CLIENT_ID = "zU4XHVVkc2tDPo4t"
++CLIENT_SECRET = "VJKhDFqJPqvsPVNBV6ukXTJmwlvbttP7wlMlrc72se4"
+
+ class TidalClient:
+     def __init__(self, config: Config, quality: Quality = Quality.best):
