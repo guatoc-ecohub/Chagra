@@ -42,6 +42,7 @@ in
         "/var/log/journal:/var/log/journal:ro"
         "/run/podman/podman.sock:/run/podman/podman.sock:ro"
       ];
+      user = "root";
       dependsOn = [ "loki" ];
     };
 
