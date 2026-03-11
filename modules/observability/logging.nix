@@ -24,7 +24,7 @@ in
   config = lib.mkIf (obsCfg.enable && cfg.enable) {
     # Loki container
     virtualisation.oci-containers.containers.loki = {
-      image = "grafana/loki:2.9";
+      image = "grafana/loki:3.2.0";
       ports = [
         "${toString registry.ports.loki}:3100"
       ];
@@ -44,7 +44,7 @@ in
 
     # Promtail container - reads journal and podman logs
     virtualisation.oci-containers.containers.promtail = {
-      image = "grafana/promtail:2.9";
+      image = "grafana/promtail:3.2.0";
       volumes = [
         "/mnt/fast/appdata/promtail:/etc/promtail"
         "/var/log/journal:/var/log/journal:ro"
