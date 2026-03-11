@@ -29,11 +29,7 @@ in
         "${toString registry.ports.loki}:3100"
       ];
       volumes = [
-        "/mnt/fast/appdata/loki:/etc/loki"
-        "/var/log:/var/log"
-      ];
-      cmd = [
-        "-config.file=/etc/loki/loki-config.yml"
+        "/mnt/fast/appdata/loki:/loki"
       ];
     };
 
@@ -44,9 +40,6 @@ in
         "/mnt/fast/appdata/promtail:/etc/promtail"
         "/var/log/journal:/var/log/journal:ro"
         "/run/podman/podman.sock:/run/podman/podman.sock:ro"
-      ];
-      cmd = [
-        "-config.file=/etc/promtail/promtail-config.yml"
       ];
       dependsOn = [ "loki" ];
     };
