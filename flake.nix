@@ -60,6 +60,8 @@
           ./modules/agriculture/default.nix  # Agriculture: FarmOS, PostgreSQL
           ./modules/cloud/default.nix        # Cloud: Nextcloud, Immich
           ./modules/observability/default.nix  # Observability: InfluxDB, Grafana, Sanoid
+          ./modules/gaming/default.nix       # Gaming: RomM
+          ./modules/security/default.nix     # Security: Tailscale VPN
         ];
       };
 

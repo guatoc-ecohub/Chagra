@@ -34,6 +34,8 @@ rec {
     # --- 3xxx: Observability & Data ---
     grafana     = 3000;  # Dashboards
     influxdb    = 8086;  # Base de datos temporal
+    loki        = 3100;  # Log aggregation
+    uptimeKuma  = 3001;  # Uptime monitoring
     
     # --- 8xxx-alt: Smart Home & IoT ---
     homeassistant = 8123;  # Home Assistant Core
@@ -61,6 +63,9 @@ rec {
     nextcloud    = 8082;  # Nextcloud WebDAV/CalDAV
     immich       = 2283;  # Immich servidor
     immichML     = 3003;  # Immich Machine Learning
+
+    # --- Gaming ---
+    romm         = 8087;  # RomM - Retro Game ROM Manager
   };
   
   # =============================================================================

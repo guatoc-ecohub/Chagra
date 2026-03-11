@@ -324,6 +324,27 @@
         diskio = {};
         net = {};
         system = {};
+        
+        # ZFS pool metrics
+        zfs = [ 
+          { 
+            kstatPath = "/proc/spl/kstat";
+            poolNames = [ "tank" "tank-fast" ];
+          }
+        ];
+        
+        # SMART metrics for NVMe/SATA disks
+        smart = [{
+          path = "/dev/nvme*";
+          useSudo = true;
+        }];
+        
+        # Podman container metrics
+        docker = [{
+          endpoint = "unix:///run/podman/podman.sock";
+          container_names = [];
+          container_states_include = ["running"];
+        }];
       };
       outputs = {
         influxdb_v2 = [
@@ -337,6 +358,9 @@
       };
     };
   };
+
+  # Allow Telegraf to access smartmontools (for SMART monitoring)
+  users.users.telegraf.extraGroups = [ "disk" ];
 
   # --- HOME ASSISTANT CONFIG ---
   # Nota: Ahora migrado a guatoc.smarthome.*
@@ -363,9 +387,31 @@
     immich.enable = true;
   };
 
-  # --- OBSERVABILITY DOMAIN (Sanoid, InfluxDB, Grafana) ---
+  # --- OBSERVABILITY DOMAIN (Sanoid, InfluxDB, Grafana, Loki, Uptime Kuma) ---
   guatoc.observability = {
     enable = true;
+    logging = {
+      enable = true;
+      uptimeKuma = true;
+    };
+  };
+
+  # --- STREAMRIP (Tidal/Qobuz/Deezer Downloader) ---
+  guatoc.media.streamrip = {
+    enable = true;
+  };
+
+  # --- GAMING DOMAIN (RomM) ---
+  guatoc.gaming = {
+    enable = true;
+    romm.enable = true;
+  };
+
+  # --- SECURITY (Tailscale VPN) ---
+  guatoc.security = {
+    enable = true;
+    tailscale.enable = true;
+    #tailscale.exitNode = true;  # Uncomment to enable as exit node
   };
 
   # --- SSH ---

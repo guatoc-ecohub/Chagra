@@ -14,6 +14,7 @@ in
   imports = [
     ./influxdb.nix
     ./grafana.nix
+    ./logging.nix
   ];
 
   # ============================================
@@ -24,7 +25,7 @@ in
       default = false;
     };
     
-    # Submodules handle their own enable options
+    # Submodules (logging, influxdb, grafana) handle their own enable options
   };
 
   # ============================================

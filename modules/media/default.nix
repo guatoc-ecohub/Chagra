@@ -19,6 +19,7 @@ in
     ./qbittorrent.nix
     ./navidrome.nix
     ./slskd.nix
+    ./streamrip.nix
   ];
 
   # ============================================
@@ -59,6 +60,8 @@ in
       default = "${registry.storage.data}/tv";
       description = "Directorio para biblioteca de series";
     };
+    
+    # streamrip option is defined in ./streamrip.nix
   };
 
   # ============================================
