@@ -26,11 +26,6 @@
         # Derivación local en pkgs/antigravity/default.nix
         # URL: https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/...
         antigravity = final.callPackage ./pkgs/antigravity/default.nix {};
-
-        # Streamrip override con credenciales Tidal personalizadas
-        streamrip = prev.streamrip.overrideAttrs (oldAttrs: {
-          patches = [ ./patches/streamrip-tidal.patch ];
-        });
       };
 
     in {
