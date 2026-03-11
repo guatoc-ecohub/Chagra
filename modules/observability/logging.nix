@@ -35,11 +35,6 @@ in
       cmd = [
         "-config.file=/etc/loki/loki-config.yml"
       ];
-      extraOptions = [
-        "--network=observability-net"
-        "--name=loki"
-        "--restart=unless-stopped"
-      ];
     };
 
     # Promtail container - reads journal and podman logs
@@ -52,11 +47,6 @@ in
       ];
       cmd = [
         "-config.file=/etc/promtail/promtail-config.yml"
-      ];
-      extraOptions = [
-        "--network=observability-net"
-        "--name=promtail"
-        "--restart=unless-stopped"
       ];
       dependsOn = [ "loki" ];
     };
@@ -173,11 +163,6 @@ EOF
       ];
       volumes = [
         "/mnt/fast/appdata/uptime-kuma:/app/data"
-      ];
-      extraOptions = [
-        "--network=observability-net"
-        "--name=uptime-kuma"
-        "--restart=unless-stopped"
       ];
     };
 
