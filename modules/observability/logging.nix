@@ -22,7 +22,7 @@ in
   };
 
   config = lib.mkIf (obsCfg.enable && cfg.enable) {
-    # Loki container
+    # Loki container (run as root to avoid permission issues)
     virtualisation.oci-containers.containers.loki = {
       image = "grafana/loki:3.2.0";
       ports = [
@@ -31,6 +31,7 @@ in
       volumes = [
         "/mnt/fast/appdata/loki:/loki"
       ];
+      user = "root";
     };
 
     # Promtail container - reads journal and podman logs
@@ -47,6 +48,8 @@ in
     # Create directories and config
     systemd.tmpfiles.rules = [
       "d /mnt/fast/appdata/loki      0755 root root -"
+      "d /mnt/fast/appdata/loki/rules 0777 root root -"
+      "d /mnt/fast/appdata/loki/chunks 0777 root root -"
       "d /mnt/fast/appdata/promtail 0755 root root -"
     ] ++ lib.optionals cfg.uptimeKuma [
       "d /mnt/fast/appdata/uptime-kuma 0755 root root -"
