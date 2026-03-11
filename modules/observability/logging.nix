@@ -11,8 +11,7 @@ let
   registry = import ../../lib/registry.nix { inherit lib; };
   
   # Promtail configuration - declarative (journal only for now)
-  promtailConfig = pkgs.writeText "promtail-config.yml'';
-  ''
+  promtailConfig = pkgs.writeText "promtail-config.yml" ''
 server:
   http_listen_port: 9080
   grpc_listen_port: 9081
