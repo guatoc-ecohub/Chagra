@@ -15,6 +15,7 @@ in
     ./ollama.nix
     ./whisper.nix
     ./piper.nix
+    ./clawbots.nix
   ];
 
   # ============================================

@@ -48,6 +48,14 @@ rec {
     
     # --- 1xxxx: AI Services ---
     ollama      = 11434; # LLM local API
+    whisper     = 10300; # Wyoming Whisper STT
+    piper       = 10200; # Wyoming Piper TTS
+    
+    # --- ClawBots: Multi-tenant AI Agents (dynamic allocation) ---
+    clawbots = {
+      base = 8090;  # Base port for first instance
+      # Additional ports allocated dynamically: 8091, 8092, etc.
+    };
     
     # --- External Services ---
     picoclaw    = 18790; # Agente IA Telegram

@@ -38,14 +38,14 @@ in
 
     virtualisation.oci-containers.containers.wyoming-piper = {
       image = "rhasspy/wyoming-piper:latest";
-      ports = [ "10200:10200" ];
+      ports = [ "${toString registry.ports.piper}:${toString registry.ports.piper}" ];
       volumes = [
         "/mnt/fast/appdata/wyoming-piper:/data"
       ];
       cmd = [
         "--voice" cfg.voice
         "--data-dir" "/data"
-        "--uri" "tcp://0.0.0.0:10200"
+        "--uri" "tcp://0.0.0.0:${toString registry.ports.piper}"
         "--download-dir" "/data/voices"
       ];
       extraOptions = [

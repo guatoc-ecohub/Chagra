@@ -38,7 +38,7 @@ in
 
     virtualisation.oci-containers.containers.wyoming-whisper = {
       image = "rhasspy/wyoming-whisper:latest";
-      ports = [ "10300:10300" ];
+      ports = [ "${toString registry.ports.whisper}:${toString registry.ports.whisper}" ];
       volumes = [
         "/mnt/fast/appdata/wyoming-whisper:/data"
       ];

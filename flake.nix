@@ -48,7 +48,7 @@
           ./modules/iot-energy.nix
           ./modules/iot.nix          # IoT: Mosquitto, Home Assistant, Node-RED, InfluxDB, Grafana
           ./modules/media/default.nix  # Multimedia: Radarr, Sonarr, Lidarr, Prowlarr, qBittorrent, Navidrome (refactorizado)
-          ./modules/ai.nix           # IA Local: Ollama, wyoming-piper, wyoming-whisper
+          # ./modules/ai.nix           # IA Local: Ollama, wyoming-piper, wyoming-whisper (REEMPLAZADO por modules/ai/)
           ./modules/music-pipeline.nix  # Music: Beets, YouTube, Nextcloud
           ./modules/experimental-agents.nix  # Picoclaw
           ./modules/homeassistant-config.nix  # Configuración de infraestructura Home Assistant

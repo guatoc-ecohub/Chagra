@@ -5,6 +5,7 @@
 {
   imports = [ 
     ./hardware-configuration.nix
+    ../../modules/ai
     ../../modules/iot.nix
   ];
 
@@ -306,6 +307,23 @@
     qbittorrent.enable = true;   # Descargas (puerto 8083)
     navidrome.enable = true;     # Streaming (puerto 4533)
     slskd.enable = true;         # Soulseek P2P (puertos 5030, 5031)
+  };
+
+  # --- AI DOMAIN (Hub & Spoke Architecture) ---
+  # Ollama (LLM), Whisper (STT), Piper (TTS), ClawBots (Multi-tenant agents)
+  guatoc.ai = {
+    enable = true;
+    
+    # Hub services
+    ollama.enable = true;        # LLM inference (puerto 11434)
+    whisper.enable = true;       # Speech-to-text (puerto 10300)
+    piper.enable = true;         # Text-to-speech (puerto 10200)
+    
+    # Spoke agents - multi-tenant
+    clawbots.enable = true;
+    clawbots.instances = {
+      andres = { port = 8090; };
+    };
   };
 
   # --- HOME ASSISTANT & IOT (Legacy modules) ---
