@@ -9,6 +9,28 @@ let
   cfg = config.guatoc.observability.logging;
   obsCfg = config.guatoc.observability;
   registry = import ../../lib/registry.nix { inherit lib; };
+  
+  # Promtail configuration - declarative (journal only for now)
+  promtailConfig = pkgs.writeText "promtail-config.yml'';
+  ''
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 9081
+
+clients:
+  - url: http://localhost:${toString registry.ports.loki}/loki/api/v1/push
+
+scrape_configs:
+  # Read systemd journal
+  - job_name: journal
+    journal:
+      path: /var/log/journal
+      labels:
+        job: system-journal
+    relabel_configs:
+      - source_labels: ['__journal_unit']
+        target_label: unit
+'';
 in
 {
   options.guatoc.observability.logging = {
@@ -43,49 +65,10 @@ in
       "d /mnt/fast/appdata/uptime-kuma 0755 root root -"
     ];
 
-    # Native Promtail service - reads from journald and Podman
-    # Uses native NixOS module for declarative configuration
+    # Native Promtail service - uses configFile for declarative config
     services.promtail = {
       enable = true;
-      settings = {
-        server = {
-          http_listen_port = 9080;
-          grpc_listen_port = 9081;
-        };
-        
-        clients = [{
-          url = "http://localhost:${toString registry.ports.loki}/loki/api/v1/push";
-        }];
-        
-        scrape_configs = [
-          # Read systemd journal
-          {
-            job_name = "journal";
-            journal = {
-              path = "/var/log/journal";
-              labels = {
-                job = "system-journal";
-              };
-            };
-            relabel_configs = [
-              {
-                source_labels = ["__journal_unit"];
-                target_label = "unit";
-              }
-            ];
-          }
-          # Read Podman container logs
-          {
-            job_name = "podman";
-            docker = {
-              host = "unix:///run/podman/podman.sock";
-            };
-            labels = {
-              job = "podman";
-            };
-          }
-        ];
-      };
+      configFile = promtailConfig;
     };
 
     # Allow promtail user to read journal and podman socket
