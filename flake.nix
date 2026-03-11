@@ -32,7 +32,7 @@
           postPatch = ''
             substituteInPlace rip/client/tidal.py \
               --replace-fail 'CLIENT_ID = "' 'CLIENT_ID = "zU4XHVVkc2tDPo4t"' \
-              --replace-fail 'CLIENT_SECRET = "' 'CLIENT_SECRET = "VJKhDFqJPqvsPVNBV6ukXTJmwlvbttP7wlMlrc72se4="
+              --replace-fail 'CLIENT_SECRET = "' 'CLIENT_SECRET = "VJKhDFqJPqvsPVNBV6ukXTJmwlvbttP7wlMlrc72se4"
           '';
         });
       };
