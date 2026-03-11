@@ -16,6 +16,10 @@ server:
   http_listen_port: 9080
   grpc_listen_port: 9081
 
+# Write positions to writable directory
+positions:
+  filename: /mnt/fast/appdata/promtail/positions.yaml
+
 clients:
   - url: http://localhost:${toString registry.ports.loki}/loki/api/v1/push
 
@@ -60,6 +64,7 @@ in
       "d /mnt/fast/appdata/loki      0755 root root -"
       "d /mnt/fast/appdata/loki/rules 0777 root root -"
       "d /mnt/fast/appdata/loki/chunks 0777 root root -"
+      "d /mnt/fast/appdata/promtail 0755 promtail root -"
     ] ++ lib.optionals cfg.uptimeKuma [
       "d /mnt/fast/appdata/uptime-kuma 0755 root root -"
     ];
