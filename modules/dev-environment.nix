@@ -1,9 +1,10 @@
 # PROPOSITO: Desarrollo IA Local (Ollama), Ingeniería IoT y Editores Pro.
 # guatoc-nixos/modules/dev-environment.nix
-{ pkgs, lib, ... }: {
+{ config, pkgs, lib, ... }: {
 
-  # --- IA LOCAL (Ollama) ---
-  services.ollama = {
+  # --- IA LOCAL (Ollama) --- 
+  # Solo habilitar servicio nativo si NO se usa el contenedor guatoc.ai.ollama
+  services.ollama = lib.mkIf (!(config.guatoc ? ai && config.guatoc.ai ? ollama && config.guatoc.ai.ollama.enable or false)) {
     enable = true;
     host = "0.0.0.0";
     # Descargar modelo por defecto al arrancar
