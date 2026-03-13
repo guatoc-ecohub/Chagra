@@ -90,7 +90,6 @@ in
         extraOptions = [
           "--network=ai-net"
           "--name=clawbot-${name}"
-          "--restart=unless-stopped"
         ];
       }
     ) cfg.instances;
