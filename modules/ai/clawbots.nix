@@ -70,7 +70,7 @@ in
                else registry.ports.clawbots.base + idx;
       in
       lib.nameValuePair "clawbot-${name}" {
-        image = "ghcr.io/openwebui/webui:latest";
+        image = "ghcr.io/open-webui/open-webui:main";
         ports = [
           "${toString port}:8080"
         ];

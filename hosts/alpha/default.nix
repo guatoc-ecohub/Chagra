@@ -322,7 +322,9 @@
     # Spoke agents - multi-tenant
     clawbots.enable = true;
     clawbots.instances = {
-      andres = { port = 8090; };
+      guatoc = { port = 8090; };
+      # Xperiencia = { port = 8091; };  # Disabled - enable when needed
+      # camilo = { port = 8092; };     # Disabled - enable when needed
     };
   };
 
@@ -387,7 +389,7 @@
   # --- PICOCLAW (Experimental Agents) ---
   services.experimental-agents = {
     enable = true;
-    enablePicoclaw = true;
+    enablePicoclaw = false;  # Disabled - use ClawBots instead
     enableOpenclaw = false;
   };
 
