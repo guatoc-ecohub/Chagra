@@ -8,13 +8,12 @@
   # [NUEVO] Inyectar las reglas UDEV específicas del paquete OpenRGB
   services.udev.packages = [ pkgs.openrgb ];
 
-# [NUEVO] Cargar el módulo uinput para teclados/ratones USB
-boot.kernelModules = [ "i2c-dev" "uinput" ];
+
   
   # --- RENDIMIENTO Y ENERGÍA ---
   powerManagement.cpuFreqGovernor = "performance";
   users.groups.i2c.members = [ "kortux" "openrgb" ];
-users.groups.input.members = [ "kortux" "openrgb" ];
+  users.groups.input.members = [ "kortux" "openrgb" ];
   # --- SPINDOWN PARA DISCOS HDD (Tier 2 ZFS) ---
   systemd.services.hdparm-spindown = {
     description = "Ahorro energético y Spin-down para HDD ZFS (Tier 2)";
@@ -29,7 +28,7 @@ users.groups.input.members = [ "kortux" "openrgb" ];
   };
 
   # --- KERNEL Y VIRTUALIZACIÓN ---
-  boot.kernelModules = [ "kvm-amd" "i2c-dev" "i2c-piix4" ];
+  boot.kernelModules = [ "kvm-amd" "i2c-dev" "i2c-piix4" "uinput" ];
   boot.extraModprobeConfig = ''
     options kvm_amd nested=1
   '';
