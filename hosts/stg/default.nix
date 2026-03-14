@@ -74,7 +74,13 @@
   };
   
   # Experimental Agents (Picoclaw + OpenClaw)
-  # TODO: Fix dynamic linking issue - for now, install manually
+  services.tailscale = {
+    enable = true;
+    useRoutingFeatures = "client";
+    extraUpFlags = [ "--ssh" ];
+  };
+  
+  # Experimental Agents (Picoclaw + OpenClaw)
   # services.experimental-agents = {
   #   enable = true;
   #   enablePicoclaw = true;

@@ -95,6 +95,11 @@
   # 1. GOVERNADOR CPU: Cambiar de powersave a performance
   powerManagement.cpuFreqGovernor = "performance";
 
+  # Spindown configuration for HDD (Tier 2) after 30 minutes of inactivity
+  powerManagement.powerUpCommands = ''
+    ${pkgs.hdparm}/sbin/hdparm -S 240 /dev/sda
+  '';
+
   # 2. KVM: Habilitar virtualización AMD (SVM ya disponible en hardware)
   # 3. OpenRGB / I2C: Soporte para LEDs RGB de placa base y SMBus
   boot.kernelModules = [ "kvm-amd" "i2c-dev" "i2c-piix4" ];
@@ -181,18 +186,18 @@
   #   - /mnt/data/backups: Backups
   #   - /mnt/fast/*: Disponible para uso futuro
   systemd.tmpfiles.rules = [
-    # === HDD (tank) - APPDATA ===
-    "d /mnt/data/appdata 0755 root root -"
-    "d /mnt/data/appdata/frigate 0755 root root -"
-    "d /mnt/data/appdata/frigate/config 0755 root root -"
-    "d /mnt/data/appdata/homeassistant 0755 root root -"
-    "d /mnt/data/appdata/mosquitto 0755 root root -"
-    "d /mnt/data/appdata/influxdb 0755 root root -"
-    "d /mnt/data/appdata/grafana 0755 root root -"
-    "d /mnt/data/appdata/nodered 0755 root root -"
-    "d /mnt/data/appdata/slskd 0755 root root -"
-    "d /mnt/data/appdata/z2m 0755 root root -"
-    "d /mnt/data/appdata/immich 0755 root root -"
+    # === SSD (tank-fast) - APPDATA ===
+    "d /mnt/fast/appdata 0755 root root -"
+    "d /mnt/fast/appdata/frigate 0755 root root -"
+    "d /mnt/fast/appdata/frigate/config 0755 root root -"
+    "d /mnt/fast/appdata/homeassistant 0755 root root -"
+    "d /mnt/fast/appdata/mosquitto 0755 root root -"
+    "d /mnt/fast/appdata/influxdb 0755 root root -"
+    "d /mnt/fast/appdata/grafana 0755 root root -"
+    "d /mnt/fast/appdata/nodered 0755 root root -"
+    "d /mnt/fast/appdata/slskd 0755 root root -"
+    "d /mnt/fast/appdata/z2m 0755 root root -"
+    "d /mnt/fast/appdata/immich 0755 root root -"
     
     # === HDD (tank) - MEDIA Y BACKUPS ===
     "d /mnt/data/media 0755 root root -"
@@ -202,8 +207,7 @@
     "d /mnt/data/immich 0755 root root -"
     "d /mnt/data/backups 0755 root root -"
     
-    # === SSD (tank-fast) - Uso futuro ===
-    "d /mnt/fast/appdata 0755 root root -"
+    # === SSD (tank-fast) - Uso general ===
     "d /mnt/fast/apps 0755 root root -"
     "d /mnt/fast/soulseek 0755 root root -"
     

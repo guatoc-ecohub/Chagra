@@ -4,7 +4,13 @@
 
   # --- IA LOCAL (Ollama) --- 
   # Solo habilitar servicio nativo si NO se usa el contenedor guatoc.ai.ollama
-  services.ollama = lib.mkIf (!(config.guatoc ? ai && config.guatoc.ai ? ollama && config.guatoc.ai.ollama.enable or false)) {
+  # Check if guatoc.ai module is loaded before accessing its options
+  services.ollama = let
+    # Use config ? to check if option exists before accessing
+    ollamaContainerEnabled = if config ? guatoc && config.guatoc ? ai && config.guatoc.ai ? ollama 
+      then config.guatoc.ai.ollama.enable or false 
+      else false;
+  in lib.mkIf (!ollamaContainerEnabled) {
     enable = true;
     host = "0.0.0.0";
     # Descargar modelo por defecto al arrancar
