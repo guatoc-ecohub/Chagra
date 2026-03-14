@@ -28,7 +28,9 @@
   };
 
   # --- KERNEL Y VIRTUALIZACIÓN ---
-  boot.kernelModules = [ "kvm-amd" "i2c-dev" "i2c-piix4" "uinput" ];
+  # Nota: kvm-amd ya se carga en hardware-configuration.nix
+  # i2c-dev se carga automáticamente mediante hardware.i2c.enable = true
+  boot.kernelModules = [ "uinput" ];
   boot.extraModprobeConfig = ''
     options kvm_amd nested=1
   '';
