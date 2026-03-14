@@ -24,10 +24,5 @@
     "d /mnt/fast/apps 0755 root root -"
     "d /mnt/fast/soulseek 0755 root root -"
     
-    # Directorios base del sistema y redes
-    "d /var/lib/syncthing 0755 kortux users -"
-    "d /var/lib/syncthing/.config 0755 kortux users -"
-    "d /var/lib/syncthing/.config/syncthing 0755 kortux users -"
-    "d /var/lib/cloudflared 0700 root root -"
   ];
 }
