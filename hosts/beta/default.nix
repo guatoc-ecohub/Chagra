@@ -17,14 +17,12 @@
     borgbackup
     # Script utilitario para despertar a Alpha fácilmente vía WOL
     (pkgs.writeShellScriptBin "wake-alpha" ''
-      # Reemplace con la MAC Address de la interfaz enp3s0 de Alpha
-      ALPHA_MAC="XX:XX:XX:XX:XX:XX"
-      if [ "$ALPHA_MAC" = "XX:XX:XX:XX:XX:XX" ]; then
-        echo "Por favor asigne la MAC Address de Alpha en hosts/beta/default.nix"
-        exit 1
-      fi
+      # MAC Address de la interfaz enp3s0 de Alpha
+      ALPHA_MAC="18:31:bf:df:f4:ba"
+      
+      echo "Enviando Paquete Mágico..."
       ${pkgs.wakeonlan}/bin/wakeonlan $ALPHA_MAC
-      echo "Paquete mágico enviado a Alpha ($ALPHA_MAC)"
+      echo "Comando a Alpha ($ALPHA_MAC) ejecutado"
     '')
   ];
 

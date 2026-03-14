@@ -5,8 +5,12 @@
 {
   imports = [ 
     ./hardware-configuration.nix
+    ./network.nix
+    ./hardware.nix
+    ./containers.nix
     ../../modules/ai
     ../../modules/iot.nix
+    ../../modules/farmos.nix
   ];
 
   # --- TIMEZONE ---
@@ -88,184 +92,10 @@
     bitwarden-desktop  # Administrador de contraseñas (GUI)
   ];
 
-  # ============================================================================
-  # AJUSTES DE RENDIMIENTO POST-AUDITORÍA
-  # ============================================================================
-  
-  # 1. GOVERNADOR CPU: Cambiar de powersave a performance
-  powerManagement.cpuFreqGovernor = "performance";
+  # --- HARDWARE & KERNEL (Imported via hardware.nix) ---
+  # --- LOGICA DE CONTENEDORES (Imported via containers.nix) ---
 
-  # Spindown configuration for HDD (Tier 2) after 30 minutes of inactivity
-  powerManagement.powerUpCommands = ''
-    ${pkgs.hdparm}/sbin/hdparm -S 240 /dev/sda
-  '';
-
-  # 2. KVM: Habilitar virtualización AMD (SVM ya disponible en hardware)
-  # 3. OpenRGB / I2C: Soporte para LEDs RGB de placa base y SMBus
-  boot.kernelModules = [ "kvm-amd" "i2c-dev" "i2c-piix4" ];
-
-  # --- HARDWARE: OpenRGB e I2C ---
-  # Habilita control de LEDs RGB de placa base
-  services.hardware.openrgb.enable = true;
-  hardware.i2c.enable = true;
-  boot.extraModprobeConfig = ''
-    options kvm_amd nested=1
-  '';
-  
-  # Nota: ZFS params ya configurados arriba en boot.kernelParams
-
-  # --- KERNEL: ZFS + ACPI ---
-  boot.kernelParams = [
-    "acpi=force"
-    "zfs.zfs_arc_max=4294967296"       # Limita ARC a 4GB (Protege Ollama de OOM)
-    "zfs.zfs_arc_min=1073741824"        # Mínimo 1GB
-    "zfs.zfs_arc_meta_limit=1073741824" # Límite de metadatos en RAM
-    "zfs.zfs_txg_timeout=10"           # Agrupa escrituras cada 10s (reduce ruido HDD)
-  ];
-
-  boot.supportedFilesystems = [ "zfs" ];
-
-  # --- FILESYSTEMS ---
-  # FIX: Deshabilitar zfs-mount.service para evitar conflicto con fstab
-  # Las entradas fstab (generadas automáticamente por los pools ZFS) manejarán los montajes
-  systemd.services.zfs-mount.enable = false;
-
-  # OOM Killer tuning
-  boot.kernel.sysctl = {
-    "vm.swappiness" = 10;
-    "vm.vfs_cache_pressure" = 50;
-    "vm.overcommit_memory" = 2;
-    "vm.overcommit_ratio" = 80;
-  };
-
-  # Docker limits
-  systemd.services.docker.serviceConfig = {
-    MemoryMax = "10G";
-    CPUQuota = "800%";
-    MemorySwapMax = "2G";
-  };
-
-  # Swap gestionado por disko.nix con randomEncryption
-
-  # --- LIMPIEZA DE PUNTOS DE MONTAJE ---
-  # NOTA: Deshabilitado - Es mejor limpiar manualmente una vez:
-  #   sudo umount /mnt/data /mnt/fast
-  #   sudo rm -rf /mnt/data/* /mnt/fast/*
-  #   sudo zfs mount -a
-  # Que tener un script automático borrando cosas en el arranque.
-  # systemd.services.zfs-mount-cleaner = { ... };
-
-  # ZFS unlock service - Usa rutas Nix explícitas
-  systemd.services.zfs-unlock = {
-    description = "Unlock ZFS pools with age key";
-    wantedBy = [ "multi-user.target" ];
-    path = [ config.boot.zfs.package ];
-    after = [ "zfs-import.target" "sops-nix.service" ];
-    requires = [ "zfs-import.target" ];
-    wants = [ "sops-nix.service" ];
-    serviceConfig.Type = "oneshot";
-    script = ''
-      if [ -f /etc/zfs/zpool.key ]; then
-        chmod 600 /etc/zfs/zpool.key
-        ${config.boot.zfs.package}/bin/zfs load-key -a
-        ${config.boot.zfs.package}/bin/zfs mount -a
-      else
-        echo "WARNING: ZFS key not found at /etc/zfs/zpool.key"
-        exit 1
-      fi
-    '';
-  };
-
-  # --- AUTO-CREACIÓN DE DIRECTORIOS ---
-  # NOTA: Estos directorios se crean DESPUÉS del montaje de ZFS
-  # Los directorios base (/mnt/data, /mnt/fast) son manejados por ZFS mountpoint
-  # 
-  # ARQUITECTURA ACTUAL: Todo en HDD (tank)
-  #   - /mnt/data/appdata/*: Configs de contenedores
-  #   - /mnt/data/media/*: Media files
-  #   - /mnt/data/backups: Backups
-  #   - /mnt/fast/*: Disponible para uso futuro
-  systemd.tmpfiles.rules = [
-    # === SSD (tank-fast) - APPDATA ===
-    "d /mnt/fast/appdata 0755 root root -"
-    "d /mnt/fast/appdata/frigate 0755 root root -"
-    "d /mnt/fast/appdata/frigate/config 0755 root root -"
-    "d /mnt/fast/appdata/homeassistant 0755 root root -"
-    "d /mnt/fast/appdata/mosquitto 0755 root root -"
-    "d /mnt/fast/appdata/influxdb 0755 root root -"
-    "d /mnt/fast/appdata/grafana 0755 root root -"
-    "d /mnt/fast/appdata/nodered 0755 root root -"
-    "d /mnt/fast/appdata/slskd 0755 root root -"
-    "d /mnt/fast/appdata/z2m 0755 root root -"
-    "d /mnt/fast/appdata/immich 0755 root root -"
-    
-    # === HDD (tank) - MEDIA Y BACKUPS ===
-    "d /mnt/data/media 0755 root root -"
-    "d /mnt/data/media/frigate 0755 root root -"
-    "d /mnt/data/media/music 0755 root root -"
-    "d /mnt/data/media/immich 0755 root root -"
-    "d /mnt/data/immich 0755 root root -"
-    "d /mnt/data/backups 0755 root root -"
-    
-    # === SSD (tank-fast) - Uso general ===
-    "d /mnt/fast/apps 0755 root root -"
-    "d /mnt/fast/soulseek 0755 root root -"
-    
-    # Directorios para Home Assistant y Mosquitto (legacy paths)
-    "d /var/lib/hass 0755 root root -"
-    "d /var/lib/mosquitto 0755 root root -"
-    
-    # Directorio para syncthing
-    "d /var/lib/syncthing 0755 kortux users -"
-    "d /var/lib/syncthing/.config 0755 kortux users -"
-    "d /var/lib/syncthing/.config/syncthing 0755 kortux users -"
-    
-    # Directorio para cloudflared credentials
-    "d /var/lib/cloudflared 0700 root root -"
-  ];
-
-  # --- RED ---
-  networking = {
-    hostName = "alpha";
-    hostId = "8425e349";
-    networkmanager.enable = true;
-    nameservers = [ "1.1.1.1" "8.8.8.8" ];
-    defaultGateway = "192.168.1.1";
-    # useDHCP lo maneja NetworkManager
-    firewall = {
-      enable = true;
-      allowedTCPPorts = [
-        22      # SSH
-        8123    # Home Assistant
-        1883    # Mosquitto MQTT
-        5000    # Frigate
-        8554    # Frigate RTSP
-        8555    # Frigate WebRTC
-        5030    # Soulseek (slskd WebUI)
-        5031    # Soulseek (transferencias P2P)
-        8086    # InfluxDB
-        1880    # Node-RED
-        3000    # Grafana
-        # NOTA: 4533 Navidrome - ACCESO EXCLUSIVO vía Tailscale (trustedInterfaces)
-        8081    # FarmOS (gestión agrícola)
-        # TODO: 8080 - Zigbee2MQTT WebUI (habilitar cuando se conecte el dongle Zigbee)
-      ];
-      allowedUDPPorts = [
-        5353     # mDNS (descubrimiento Home Assistant)
-        8555     # Frigate WebRTC
-        41641    # Tailscale VPN (relay/bootstrap)
-      ];
-      
-      # Permitir todo el tráfico en la interfaz Tailscale (túnel VPN seguro)
-      trustedInterfaces = [ "tailscale0" ];
-      # Permitir tráfico desde la red local
-      # NOTA: Navidrome (4533) NO está listado aquí - acceso exclusivo vía Tailscale
-      interfaces.enp3s0 = {
-        allowedTCPPorts = [ 8123 1883 5000 8554 8555 5030 5031 8086 1880 3000 8081 ];
-        allowedUDPPorts = [ 5353 8555 ];
-      };
-    };
-  };
+  # --- RED (Imported via network.nix) ---
 
   # --- CLOUDFLARE TUNNEL ---
   # Usar systemd service personalizado con token
@@ -397,14 +227,9 @@
     enableOpenclaw = false;
   };
 
-  # --- AGRICULTURE DOMAIN (FarmOS, PostgreSQL) ---
-  guatoc.agriculture = {
-    enable = true;
-    postgresFarm.enable = true;
-    farmos.enable = true;
-  };
-
-  # --- CLOUD DOMAIN (Nextcloud, Immich) ---
+  # --- MODULES DEL MODO ---
+  # Agriculture Delegate a modules/farmos.nix
+  # Cloud Delegate a modules/cloud/default.nix
   guatoc.cloud = {
     enable = true;
     nextcloud.enable = true;
@@ -534,13 +359,7 @@
   #   extraPackages = with pkgs; [ nix git curl jq cachix ];
   # };
 
-  # --- TAILSCALE VPN (Acceso remoto privado) ---
-  # Mesh VPN para acceso seguro sin abrir puertos en el router
-  services.tailscale = {
-    enable = true;
-    useRoutingFeatures = "client";  # Permite usar la red Tailscale
-    extraUpFlags = [ "--ssh" ];     # Habilita Tailscale SSH
-  };
+  # --- NOTA: TAILSCALE migracion a network.nix ---
 
   # NOTA: Navidrome ahora corre como contenedor Podman en server-services.nix
   # para integrarse con la estructura unificada de volúmenes (hardlinks)

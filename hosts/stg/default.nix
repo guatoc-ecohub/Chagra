@@ -9,6 +9,9 @@
     ../../modules/audio-hifi.nix  # Audio Hi-Fi para IEMs
   ];
 
+  # --- Workaround para bug known en sphinx/docutils de nixos-unstable ---
+  documentation.doc.enable = lib.mkDefault false;
+
   # --- SOPS: Gestión de Secretos para STG ---
   sops = {
     defaultSopsFile = ./secrets.yaml;
@@ -120,8 +123,9 @@
     # Expuesto via overlay en flake.nix → pkgs.antigravity
     antigravity
 
-    # Firefox + Bitwarden (gestor de contraseñas)
+    # Firefox, Chrome + Bitwarden (gestor de contraseñas)
     firefox
+    google-chrome
     bitwarden-desktop
   ];
   
