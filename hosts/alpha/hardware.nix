@@ -5,10 +5,16 @@
   # --- HARDWARE: OpenRGB y Control de Sensores/LEDs ---
   services.hardware.openrgb.enable = true;
   hardware.i2c.enable = true;
+  # [NUEVO] Inyectar las reglas UDEV específicas del paquete OpenRGB
+  services.udev.packages = [ pkgs.openrgb ];
+
+# [NUEVO] Cargar el módulo uinput para teclados/ratones USB
+boot.kernelModules = [ "i2c-dev" "uinput" ];
   
   # --- RENDIMIENTO Y ENERGÍA ---
   powerManagement.cpuFreqGovernor = "performance";
-  
+  users.groups.i2c.members = [ "kortux" "openrgb" ];
+users.groups.input.members = [ "kortux" "openrgb" ];
   # --- SPINDOWN PARA DISCOS HDD (Tier 2 ZFS) ---
   systemd.services.hdparm-spindown = {
     description = "Ahorro energético y Spin-down para HDD ZFS (Tier 2)";
