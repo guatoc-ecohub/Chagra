@@ -182,8 +182,8 @@
         # ZFS pool metrics
         zfs = [ 
           { 
-            kstatPath = "/proc/spl/kstat";
-            poolNames = [ "tank" "tank-fast" ];
+            kstat_path = "/proc/spl/kstat";
+            pool_names = [ "tank" "tank-fast" ];
           }
         ];
         
