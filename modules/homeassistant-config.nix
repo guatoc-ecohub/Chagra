@@ -183,14 +183,14 @@ in
   trigger:
     - platform: numeric_state
       entity_id: 
-        - sensor.sensor_tabaco_humidity
-        - sensor.sensor_pruebas_1_humidity
+        - sensor.hobeian_zg_303z_humidity
+        - sensor.arteco_zs_304z_humidity
       below: 30
       id: "alerta_critica"
     - platform: numeric_state
       entity_id: 
-        - sensor.sensor_tabaco_humidity
-        - sensor.sensor_pruebas_1_humidity
+        - sensor.hobeian_zg_303z_humidity
+        - sensor.arteco_zs_304z_humidity
       above: 40
       id: "recuperacion_suelo"
   action:
@@ -209,10 +209,10 @@ in
             - condition: trigger
               id: "recuperacion_suelo"
             - condition: numeric_state
-              entity_id: sensor.sensor_tabaco_humidity
+              entity_id: sensor.hobeian_zg_303z_humidity
               above: 40
             - condition: numeric_state
-              entity_id: sensor.sensor_pruebas_1_humidity
+              entity_id: sensor.arteco_zs_304z_humidity
               above: 40
           sequence:
             - service: light.turn_on
