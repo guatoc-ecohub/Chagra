@@ -209,8 +209,8 @@
   };
 
   # Allow Telegraf to access smartmontools (for SMART monitoring)
-  users.users.telegraf.extraGroups = [ "disk" ];
-  systemd.services.telegraf.path = [ pkgs.smartmontools ];
+  users.users.telegraf.extraGroups = [ "disk" "podman" ];
+  systemd.services.telegraf.path = [ pkgs.smartmontools pkgs.nvme-cli ];
 
   # --- HOME ASSISTANT CONFIG ---
   # Nota: Ahora migrado a guatoc.smarthome.*
