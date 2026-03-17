@@ -175,7 +175,8 @@ in
         fi
         
         # Crear archivos vacíos para HA si no existen (evita errores de parseo)
-        if [ ! -s "$HA_DIR/automations.yaml" ]; then
+        # Si el archivo está vacío o tiene [], inyectamos la de Agro
+        if [ ! -s "$HA_DIR/automations.yaml" ] || [ "$(cat "$HA_DIR/automations.yaml" 2>/dev/null)" = "[]" ]; then
           cat > "$HA_DIR/automations.yaml" << 'EOF'
 - id: rgb_agro_soil_watchdog
   alias: "[Agro] Monitoreo Humedad de Suelo (Tabaco y Pruebas)"
