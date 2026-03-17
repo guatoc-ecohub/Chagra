@@ -174,9 +174,9 @@ in
           chmod 600 "$HA_DIR/secrets.yaml"
         fi
         
-        # Crear archivos vacíos para HA si no existen (evita errores de parseo)
-        # Si el archivo está vacío o tiene [], inyectamos la de Agro
-        if [ ! -s "$HA_DIR/automations.yaml" ] || [ "$(cat "$HA_DIR/automations.yaml" 2>/dev/null)" = "[]" ]; then
+        # Si el archivo está vacío, tiene [], o contiene las entidades viejas (desconocidas), lo regeneramos
+        if [ ! -s "$HA_DIR/automations.yaml" ] || [ "$(cat "$HA_DIR/automations.yaml" 2>/dev/null)" = "[]" ] || grep -q "sensor.sensor_tabaco_humidity" "$HA_DIR/automations.yaml"; then
+          echo "Regenerando automations.yaml con IDs correctos..."
           cat > "$HA_DIR/automations.yaml" << 'EOF'
 - id: rgb_agro_soil_watchdog
   alias: "[Agro] Monitoreo Humedad de Suelo (Tabaco y Pruebas)"
@@ -240,9 +240,8 @@ EOF
     systemd.services.podman-homeassistant = {
       requires = [ "homeassistant-setup.service" ];
       after = [ "homeassistant-setup.service" ];
-      serviceConfig = {
-        RequiresMountsFor = [ "/mnt/fast/appdata" ];
-      };
+      # RequiresMountsFor debe estar a nivel de unidad, no en serviceConfig
+      unitConfig.RequiresMountsFor = [ "/mnt/fast/appdata" ];
     };
 
     # =============================================================================

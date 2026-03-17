@@ -180,12 +180,7 @@
         system = {};
         
         # ZFS pool metrics
-        zfs = [ 
-          { 
-            kstat_path = "/proc/spl/kstat";
-            pool_names = [ "tank" "tank-fast" ];
-          }
-        ];
+        zfs = {};
         
         # SMART metrics for NVMe/SATA disks
         smart = [{
