@@ -240,7 +240,6 @@ EOF
     # Asegurar orden de servicios
     systemd.services.podman-homeassistant = {
       requires = [ "homeassistant-setup.service" ];
-      after = [ "homeassistant-setup.service" ];
       after = [ "homeassistant-setup.service" "mnt-fast.mount" ];
       wants = [ "mnt-fast.mount" ];
     };
