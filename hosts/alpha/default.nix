@@ -184,8 +184,7 @@
         
         # SMART metrics for NVMe/SATA disks
         smart = [{
-          devices = [ "/dev/nvme*" ];
-          use_sudo = true;
+          devices = [ "/dev/nvme0" "/dev/sda" ];
         }];
         
         # Podman container metrics
@@ -210,7 +209,7 @@
 
   # Allow Telegraf to access smartmontools (for SMART monitoring)
   users.users.telegraf.extraGroups = [ "disk" "podman" ];
-  systemd.services.telegraf.path = [ pkgs.smartmontools pkgs.nvme-cli ];
+  systemd.services.telegraf.path = [ pkgs.smartmontools pkgs.nvme-cli pkgs.sudo ];
 
   # --- HOME ASSISTANT CONFIG ---
   # Nota: Ahora migrado a guatoc.smarthome.*
