@@ -169,6 +169,7 @@
   # --- TELEGRAF (for InfluxDB telemetry) ---
   services.telegraf = {
     enable = true;
+    path = [ pkgs.smartmontools ];
     environmentFiles = [ config.sops.secrets.influxdb_admin_token.path ];
     extraConfig = {
       inputs = {

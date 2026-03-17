@@ -155,6 +155,7 @@ in
         RemainAfterExit = true;
         User = "root";
       };
+      path = [ pkgs.coreutils pkgs.findutils pkgs.gnugrep ];
       
       script = ''
         HA_DIR="/mnt/fast/appdata/homeassistant"
@@ -240,8 +241,7 @@ EOF
     systemd.services.podman-homeassistant = {
       requires = [ "homeassistant-setup.service" ];
       after = [ "homeassistant-setup.service" ];
-      # RequiresMountsFor debe estar a nivel de unidad, no en serviceConfig
-      unitConfig.RequiresMountsFor = [ "/mnt/fast/appdata" ];
+      requiresMountsFor = [ "/mnt/fast/appdata" ];
     };
 
     # =============================================================================
