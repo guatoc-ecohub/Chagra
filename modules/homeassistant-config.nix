@@ -241,7 +241,8 @@ EOF
     systemd.services.podman-homeassistant = {
       requires = [ "homeassistant-setup.service" ];
       after = [ "homeassistant-setup.service" ];
-      requiresMountsFor = [ "/mnt/fast/appdata" ];
+      after = [ "homeassistant-setup.service" "mnt-fast.mount" ];
+      wants = [ "mnt-fast.mount" ];
     };
 
     # =============================================================================

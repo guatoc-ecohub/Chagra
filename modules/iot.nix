@@ -296,7 +296,8 @@ EOF
     };
   };
 
-  systemd.services.podman-homeassistant.requiresMountsFor = [ "/mnt/fast/appdata" ];
+  systemd.services.podman-homeassistant.after = [ "mnt-fast.mount" ];
+  systemd.services.podman-homeassistant.wants = [ "mnt-fast.mount" ];
 
   # ---------------------------------------------------------------------------
   # FIREWALL — Puertos IoT
