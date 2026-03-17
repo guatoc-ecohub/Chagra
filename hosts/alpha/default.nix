@@ -236,6 +236,14 @@
     immich.enable = true;
   };
 
+  # --- DOMOTICA & IOT ---
+  guatoc.iot = {
+    enable = true;
+  };
+
+  # Activar infraestructura base de HA (YAML setup)
+  services.homeassistant-config.enable = true;
+  
   # --- OBSERVABILITY DOMAIN (Sanoid, InfluxDB, Grafana, Loki, Uptime Kuma) ---
   guatoc.observability = {
     enable = true;
