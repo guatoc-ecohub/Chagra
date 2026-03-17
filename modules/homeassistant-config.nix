@@ -175,7 +175,54 @@ in
         fi
         
         # Crear archivos vacíos para HA si no existen (evita errores de parseo)
-        touch "$HA_DIR/automations.yaml"
+        if [ ! -s "$HA_DIR/automations.yaml" ]; then
+          cat > "$HA_DIR/automations.yaml" << 'EOF'
+- id: rgb_agro_soil_watchdog
+  alias: "[Agro] Monitoreo Humedad de Suelo (Tabaco y Pruebas)"
+  trigger:
+    - platform: numeric_state
+      entity_id: 
+        - sensor.sensor_tabaco_humidity
+        - sensor.sensor_pruebas_1_humidity
+      below: 30
+      id: "alerta_critica"
+    - platform: numeric_state
+      entity_id: 
+        - sensor.sensor_tabaco_humidity
+        - sensor.sensor_pruebas_1_humidity
+      above: 40
+      id: "recuperacion_suelo"
+  action:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: "alerta_critica"
+          sequence:
+            - service: light.turn_on
+              target:
+                entity_id: [light.motherboard, light.keyboard]
+              data:
+                color_name: red
+                brightness_pct: 100
+        - conditions:
+            - condition: trigger
+              id: "recuperacion_suelo"
+            - condition: numeric_state
+              entity_id: sensor.sensor_tabaco_humidity
+              above: 40
+            - condition: numeric_state
+              entity_id: sensor.sensor_pruebas_1_humidity
+              above: 40
+          sequence:
+            - service: light.turn_on
+              target:
+                entity_id: [light.motherboard, light.keyboard]
+              data:
+                color_name: green
+                brightness_pct: 20
+  mode: restart
+EOF
+        fi
         touch "$HA_DIR/scripts.yaml"
         touch "$HA_DIR/scenes.yaml"
         

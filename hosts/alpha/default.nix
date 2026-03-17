@@ -189,15 +189,15 @@
         
         # SMART metrics for NVMe/SATA disks
         smart = [{
-          path = "/dev/nvme*";
-          useSudo = true;
+          devices = [ "/dev/nvme*" ];
+          use_sudo = true;
         }];
         
         # Podman container metrics
         docker = [{
           endpoint = "unix:///run/podman/podman.sock";
-          container_names = [];
-          container_states_include = ["running"];
+          container_name_include = [];
+          container_state_include = ["running"];
         }];
       };
       outputs = {
