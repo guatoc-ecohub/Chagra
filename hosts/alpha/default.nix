@@ -364,7 +364,7 @@
 
   nixpkgs.config.allowUnfree = true;
   system.stateVersion = "24.11";
-}
+
   # --- SUDO NOPASSWD FOR KORTUX ---
   security.sudo.extraRules = [
     {
