@@ -14,6 +14,8 @@
       enable = true;
       allowedTCPPorts = [
         22      # SSH
+        80      # HTTP (PWA)
+        443     # HTTPS (PWA)
         8123    # Home Assistant
         1883    # Mosquitto MQTT
         5000    # Frigate
@@ -36,8 +38,47 @@
       trustedInterfaces = [ "tailscale0" ];
       
       interfaces.enp3s0 = {
-        allowedTCPPorts = [ 8123 1883 5000 8554 8555 5030 5031 8086 1880 3000 8081 ];
+        allowedTCPPorts = [ 80 443 8123 1883 5000 8554 8555 5030 5031 8086 1880 3000 8081 ];
         allowedUDPPorts = [ 5353 8555 ];
+      };
+    };
+  };
+
+  # --- PWA DEPLOYMENT (NGINX) ---
+  services.nginx = {
+    enable = true;
+    virtualHosts."farmos.guatoc.co" = {
+      root = "/mnt/fast/appdata/farmos-pwa";
+      locations."/" = {
+        tryFiles = "$uri $uri/ /index.html";
+      };
+      locations."/oauth/" = {
+        proxyPass = "http://127.0.0.1:8081";
+        extraConfig = ''
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+        '';
+      };
+      locations."/api/" = {
+        proxyPass = "http://127.0.0.1:8081";
+        extraConfig = ''
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+        '';
+      };
+      # Necesario para el contexto de inicio de sesión de Drupal si se requiere
+      locations."/user/" = {
+        proxyPass = "http://127.0.0.1:8081";
+        extraConfig = ''
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+        '';
       };
     };
   };
