@@ -61,26 +61,24 @@ in
     # Backend FarmOS (Drupal): Contenedor Podman en puerto 8081 (NO exponer públicamente)
     services.nginx.virtualHosts."farmos.guatoc.co" = {
       root = "/mnt/fast/appdata/farmos-pwa";
-      extraConfig = ''
-        # CORS headers globales para todos los métodos
-        add_header Access-Control-Allow-Origin "*" always;
-        add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS" always;
-        add_header Access-Control-Allow-Headers "Origin, Content-Type, Accept, Authorization, X-Requested-With" always;
-      '';
       locations = {
         "/" = {
           tryFiles = "$uri $uri/ /index.html";
           extraConfig = ''
-            # Permitir todos los métodos HTTP necesarios para la PWA
-            # Nginx por defecto solo permite GET/HEAD para archivos estáticos
-            limit_except GET HEAD POST PUT DELETE PATCH OPTIONS {
-              deny all;
-            }
-
             # Headers de seguridad
             add_header X-Frame-Options "SAMEORIGIN" always;
             add_header X-Content-Type-Options "nosniff" always;
             add_header X-XSS-Protection "1; mode=block" always;
+
+            # CORS headers dentro del bloque location
+            add_header Access-Control-Allow-Origin "*" always;
+            add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS" always;
+            add_header Access-Control-Allow-Headers "Origin, Content-Type, Accept, Authorization, X-Requested-With" always;
+
+            # Permitir todos los métodos HTTP necesarios
+            if ($request_method = 'OPTIONS') {
+              return 204;
+            }
           '';
         };
         "~ \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$" = {
