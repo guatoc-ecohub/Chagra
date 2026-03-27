@@ -97,29 +97,47 @@
 
   # --- RED (Imported via network.nix) ---
 
-  services.nginx.enable = true;
-  services.nginx.recommendedProxySettings = true;
-  services.nginx.recommendedTlsSettings = true;
-
-  services.nginx.virtualHosts."farmos.guatoc.co" = {
-    root = "/mnt/fast/appdata/farmos-pwa-v1.1";
-    forceSSL = true;
-    enableACME = true;
-    locations."/" = {
-      tryFiles = "$uri $uri/ /index.html";
-      extraConfig = ''
-        if ($request_uri ~* "^/$" ) {
-          add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
-        }
-      '';
-    };
-    locations."/index.html" = {
-      extraConfig = ''
-        add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
-      '';
+  # --- CLOUDFLARE TUNNEL ---
+  # Usar systemd service personalizado con token
+  # El secreto contiene solo el JWT token (sin TUNNEL_TOKEN= prefix)
+  systemd.services.cloudflared-tunnel-alpha = {
+    description = "Cloudflare Tunnel for Alpha";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" "sops-nix.service" ];
+    requires = [ "network.target" ];
+    serviceConfig = {
+      Type = "simple";
+      # Usar tr para eliminar newlines y pasar el token limpio
+      ExecStart = "${pkgs.bash}/bin/bash -c 'token=$(tr -d \"\\n\" < ${config.sops.secrets.cloudflared-token.path}) && exec ${pkgs.cloudflared}/bin/cloudflared tunnel --no-autoupdate run --token \"$token\"'";
+      Restart = "on-failure";
+      RestartSec = "5s";
+      User = "root";
     };
   };
 
+  # --- MUSIC PIPELINE ---
+  services.music-pipeline = {
+    enable = true;
+    downloadsDir = "/mnt/data/media/downloads";
+    musicDir = "/mnt/data/media/musica";
+  };
+
+  # --- MEDIA STACK (*arr applications) ---
+  # REFACTOR 2024-03: Migrado a estructura guatoc.media.* con registry central
+  guatoc.media = {
+    enable = true;
+    # Rutas compartidas del dominio media
+    dataDir = "/mnt/data/media";
+    downloadsDir = "/mnt/data/media/downloads";
+    musicDir = "/mnt/data/media/music";
+    moviesDir = "/mnt/data/media/movies";
+    tvDir = "/mnt/data/media/tv";
+    
+    # Feature toggles individuales
+    lidarr.enable = true;        # Música (puerto 8686)
+    radarr.enable = true;        # Películas (puerto 7878)
+    sonarr.enable = true;        # Series (puerto 8989)
+    prowlarr.enable = true;      # Indexadores (puerto 9696)
     qbittorrent.enable = true;   # Descargas (puerto 8083)
     navidrome.enable = true;     # Streaming (puerto 4533)
     slskd.enable = true;         # Soulseek P2P (puertos 5030, 5031)
@@ -162,18 +180,24 @@
         system = {};
         
         # ZFS pool metrics
-        zfs = {};
+        zfs = [ 
+          { 
+            kstatPath = "/proc/spl/kstat";
+            poolNames = [ "tank" "tank-fast" ];
+          }
+        ];
         
         # SMART metrics for NVMe/SATA disks
         smart = [{
-          devices = [ "/dev/nvme0" "/dev/sda" ];
+          path = "/dev/nvme*";
+          useSudo = true;
         }];
         
         # Podman container metrics
         docker = [{
           endpoint = "unix:///run/podman/podman.sock";
-          container_name_include = [];
-          container_state_include = ["running"];
+          container_names = [];
+          container_states_include = ["running"];
         }];
       };
       outputs = {
@@ -190,8 +214,7 @@
   };
 
   # Allow Telegraf to access smartmontools (for SMART monitoring)
-  users.users.telegraf.extraGroups = [ "disk" "podman" ];
-  systemd.services.telegraf.path = [ pkgs.smartmontools pkgs.nvme-cli pkgs.sudo ];
+  users.users.telegraf.extraGroups = [ "disk" ];
 
   # --- HOME ASSISTANT CONFIG ---
   # Nota: Ahora migrado a guatoc.smarthome.*
@@ -213,9 +236,6 @@
     immich.enable = true;
   };
 
-  # Activar infraestructura base de HA (YAML setup)
-  services.homeassistant-config.enable = true;
-  
   # --- OBSERVABILITY DOMAIN (Sanoid, InfluxDB, Grafana, Loki, Uptime Kuma) ---
   guatoc.observability = {
     enable = true;
@@ -346,14 +366,4 @@
 
   nixpkgs.config.allowUnfree = true;
   system.stateVersion = "24.11";
-
-  # --- SUDO NOPASSWD FOR KORTUX ---
-  security.sudo.extraRules = [
-    {
-      users = [ "kortux" ];
-      commands = [
-        { command = "ALL"; options = [ "NOPASSWD" ]; }
-      ];
-    }
-  ];
 }

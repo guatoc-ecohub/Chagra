@@ -5,15 +5,10 @@
   # --- HARDWARE: OpenRGB y Control de Sensores/LEDs ---
   services.hardware.openrgb.enable = true;
   hardware.i2c.enable = true;
-  # [NUEVO] Inyectar las reglas UDEV específicas del paquete OpenRGB
-  services.udev.packages = [ pkgs.openrgb ];
-
-
   
   # --- RENDIMIENTO Y ENERGÍA ---
   powerManagement.cpuFreqGovernor = "performance";
-  users.groups.i2c.members = [ "kortux" "openrgb" ];
-  users.groups.input.members = [ "kortux" "openrgb" ];
+  
   # --- SPINDOWN PARA DISCOS HDD (Tier 2 ZFS) ---
   systemd.services.hdparm-spindown = {
     description = "Ahorro energético y Spin-down para HDD ZFS (Tier 2)";
@@ -28,9 +23,7 @@
   };
 
   # --- KERNEL Y VIRTUALIZACIÓN ---
-  # Nota: kvm-amd ya se carga en hardware-configuration.nix
-  # i2c-dev se carga automáticamente mediante hardware.i2c.enable = true
-  boot.kernelModules = [ "uinput" ];
+  boot.kernelModules = [ "kvm-amd" "i2c-dev" "i2c-piix4" ];
   boot.extraModprobeConfig = ''
     options kvm_amd nested=1
   '';

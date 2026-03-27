@@ -43,9 +43,7 @@ let
       use_x_forwarded_for: true
       trusted_proxies:
         - 127.0.0.1
-        - ::1
         - 192.168.1.0/24
-        - 100.64.0.0/10
 
     # Descubrimiento de dispositivos
     discovery:
@@ -157,7 +155,6 @@ in
         RemainAfterExit = true;
         User = "root";
       };
-      path = [ pkgs.coreutils pkgs.findutils pkgs.gnugrep ];
       
       script = ''
         HA_DIR="/mnt/fast/appdata/homeassistant"
@@ -177,130 +174,8 @@ in
           chmod 600 "$HA_DIR/secrets.yaml"
         fi
         
-        # Regenerar automations.yaml si está vacío, es [], o tiene IDs obsoletos
-        if [ ! -s "$HA_DIR/automations.yaml" ] || [ "$(cat "$HA_DIR/automations.yaml" 2>/dev/null)" = "[]" ] || grep -q "sensor.sensor_tabaco_humidity\|rgb_agro_soil_watchdog" "$HA_DIR/automations.yaml"; then
-          echo "Generando motor de alertas RGB (4 estados)..."
-          cat > "$HA_DIR/automations.yaml" << 'EOF'
-# =============================================================================
-# MOTOR DE ALERTAS RGB — Árbol de Decisión 4 Estados
-# P1 ROJO    → Servicio/ZFS caído (Uptime Kuma)
-# P2 AZUL    → Sensor de suelo desconectado (unavailable/unknown)
-# P3 AMARILLO → Humedad < 30%
-# P4 VERDE   → Todo nominal (>40% humedad, servicios OK)
-# =============================================================================
-
-- id: rgb_alert_service_down
-  alias: "[RGB-P1] Crítico: Servicio Caído (Rojo)"
-  trigger:
-    - platform: state
-      entity_id:
-        - binary_sensor.farmos_monitor
-        - binary_sensor.home_assistant_monitor
-        - binary_sensor.postgresql_farmos_monitor
-      from: "on"
-      to: "off"
-  mode: single
-  max_exceeded: silent
-  action:
-    - service: light.turn_on
-      target:
-        entity_id: [light.motherboard, light.keyboard]
-      data:
-        rgb_color: [255, 0, 0]
-        brightness_pct: 100
-
-- id: rgb_alert_sensor_lost
-  alias: "[RGB-P2] Sensor de Suelo Desconectado (Azul Parpadeante)"
-  trigger:
-    - platform: state
-      entity_id:
-        - sensor.hobeian_zg_303z_humidity
-        - sensor.arteco_zs_304z_humidity
-      to:
-        - "unavailable"
-        - "unknown"
-  mode: restart
-  action:
-    - repeat:
-        count: 15
-        sequence:
-          - service: light.turn_on
-            target:
-              entity_id: [light.motherboard, light.keyboard]
-            data:
-              rgb_color: [0, 50, 255]
-              brightness_pct: 100
-          - delay: "00:00:01"
-          - service: light.turn_off
-            target:
-              entity_id: [light.motherboard, light.keyboard]
-          - delay: "00:00:01"
-
-- id: rgb_alert_warning
-  alias: "[RGB-P3] Advertencia: Humedad de Suelo Baja (Amarillo)"
-  trigger:
-    - platform: numeric_state
-      entity_id:
-        - sensor.hobeian_zg_303z_humidity
-        - sensor.arteco_zs_304z_humidity
-      below: 30
-  condition:
-    - condition: not
-      conditions:
-        - condition: state
-          entity_id: sensor.hobeian_zg_303z_humidity
-          state: "unavailable"
-        - condition: state
-          entity_id: sensor.arteco_zs_304z_humidity
-          state: "unavailable"
-  mode: restart
-  action:
-    - service: light.turn_on
-      target:
-        entity_id: [light.motherboard, light.keyboard]
-      data:
-        rgb_color: [255, 180, 0]
-        brightness_pct: 50
-
-- id: rgb_nominal
-  alias: "[RGB-P4] Nominal: Sistema Saludable (Verde)"
-  trigger:
-    - platform: numeric_state
-      entity_id:
-        - sensor.hobeian_zg_303z_humidity
-        - sensor.arteco_zs_304z_humidity
-      above: 40
-    - platform: state
-      entity_id:
-        - binary_sensor.farmos_monitor
-        - binary_sensor.home_assistant_monitor
-        - binary_sensor.postgresql_farmos_monitor
-      to: "on"
-  condition:
-    - condition: numeric_state
-      entity_id: sensor.hobeian_zg_303z_humidity
-      above: 40
-    - condition: numeric_state
-      entity_id: sensor.arteco_zs_304z_humidity
-      above: 40
-    - condition: not
-      conditions:
-        - condition: state
-          entity_id: sensor.hobeian_zg_303z_humidity
-          state: "unavailable"
-        - condition: state
-          entity_id: sensor.arteco_zs_304z_humidity
-          state: "unavailable"
-  mode: restart
-  action:
-    - service: light.turn_on
-      target:
-        entity_id: [light.motherboard, light.keyboard]
-      data:
-        rgb_color: [0, 255, 80]
-        brightness_pct: 15
-EOF
-        fi
+        # Crear archivos vacíos para HA si no existen (evita errores de parseo)
+        touch "$HA_DIR/automations.yaml"
         touch "$HA_DIR/scripts.yaml"
         touch "$HA_DIR/scenes.yaml"
         
@@ -316,8 +191,10 @@ EOF
     # Asegurar orden de servicios
     systemd.services.podman-homeassistant = {
       requires = [ "homeassistant-setup.service" ];
-      after = [ "homeassistant-setup.service" "mnt-fast.mount" ];
-      wants = [ "mnt-fast.mount" ];
+      after = [ "homeassistant-setup.service" ];
+      serviceConfig = {
+        RequiresMountsFor = [ "/mnt/fast/appdata" ];
+      };
     };
 
     # =============================================================================
