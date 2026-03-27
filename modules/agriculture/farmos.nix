@@ -59,39 +59,29 @@ in
     # === NGINX CONFIGURATION FOR FARMOS PWA ===
     # Frontend PWA: Archivos estáticos servidos por Nginx desde /mnt/fast/appdata/farmos-pwa/
     # Backend FarmOS (Drupal): Contenedor Podman en puerto 8081 (NO exponer públicamente)
-    services.nginx = {
-      enable = true;
-      virtualHosts = {
-        "farmos.guatoc.co" = {
-          root = "/mnt/fast/appdata/farmos-pwa";
-          locations = {
-            "/" = {
-              tryFiles = "$uri $uri/ /index.html";
-              extraConfig = ''
-                # Permitir todos los métodos HTTP necesarios para la PWA
-                # (GET, POST, PUT, DELETE, PATCH, OPTIONS)
-                if ($request_method !~ ^(GET|HEAD|POST|PUT|DELETE|PATCH|OPTIONS)$ ) {
-                  return 405;
-                }
-
-                # Headers de seguridad
-                add_header X-Frame-Options "SAMEORIGIN" always;
-                add_header X-Content-Type-Options "nosniff" always;
-                add_header X-XSS-Protection "1; mode=block" always;
-
-                # CORS headers si es necesario
-                add_header Access-Control-Allow-Origin "*" always;
-                add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS" always;
-                add_header Access-Control-Allow-Headers "Origin, Content-Type, Accept, Authorization, X-Requested-With" always;
-              '';
-            };
-            "~ \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$" = {
-              extraConfig = ''
-                expires 1y;
-                add_header Cache-Control "public, immutable";
-              '';
-            };
-          };
+    services.nginx.virtualHosts."farmos.guatoc.co" = {
+      root = "/mnt/fast/appdata/farmos-pwa";
+      extraConfig = ''
+        # CORS headers globales para todos los métodos
+        add_header Access-Control-Allow-Origin "*" always;
+        add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Origin, Content-Type, Accept, Authorization, X-Requested-With" always;
+      '';
+      locations = {
+        "/" = {
+          tryFiles = "$uri $uri/ /index.html";
+          extraConfig = ''
+            # Headers de seguridad
+            add_header X-Frame-Options "SAMEORIGIN" always;
+            add_header X-Content-Type-Options "nosniff" always;
+            add_header X-XSS-Protection "1; mode=block" always;
+          '';
+        };
+        "~ \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$" = {
+          extraConfig = ''
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+          '';
         };
       };
     };
