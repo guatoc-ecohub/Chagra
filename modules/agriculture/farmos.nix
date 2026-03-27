@@ -55,5 +55,39 @@ in
     };
 
     networking.firewall.allowedTCPPorts = [ registry.ports.farmos ];
+
+    # === NGINX CONFIGURATION FOR FARMOS PWA ===
+    # Frontend PWA: Archivos estáticos servidos por Nginx desde /mnt/fast/appdata/farmos-pwa/
+    # Backend FarmOS (Drupal): Contenedor Podman en puerto 8081 (NO exponer públicamente)
+    services.nginx = {
+      enable = true;
+      virtualHosts = {
+        "farmos.guatoc.co" = {
+          root = "/mnt/fast/appdata/farmos-pwa";
+          locations = {
+            "/" = {
+              tryFiles = "$uri $uri/ /index.html";
+              extraConfig = ''
+                # Headers de seguridad
+                add_header X-Frame-Options "SAMEORIGIN" always;
+                add_header X-Content-Type-Options "nosniff" always;
+                add_header X-XSS-Protection "1; mode=block" always;
+              '';
+            };
+            "~ \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$" = {
+              extraConfig = ''
+                expires 1y;
+                add_header Cache-Control "public, immutable";
+              '';
+            };
+          };
+        };
+      };
+    };
+
+    # Crear directorio para la PWA si no existe
+    systemd.tmpfiles.rules = [
+      "d /mnt/fast/appdata/farmos-pwa 0755 kortux users -"
+    ];
   };
 }
