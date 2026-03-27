@@ -58,10 +58,12 @@ in
 
     # === NGINX CONFIGURATION FOR FARMOS PWA ===
     # Frontend PWA: Archivos estáticos servidos por Nginx desde /mnt/fast/appdata/farmos-pwa/
-    # Backend FarmOS (Drupal): Contenedor Podman en puerto 8081 (NO exponer públicamente)
+    # Backend FarmOS (Drupal): Contenedor Podman en puerto 8081
+    # PWA necesita archivos estáticos (GET) + API backend (POST/PUT/DELETE)
     services.nginx.virtualHosts."farmos.guatoc.co" = {
       root = "/mnt/fast/appdata/farmos-pwa";
       locations = {
+        # Archivos estáticos de la PWA (solo GET)
         "/" = {
           tryFiles = "$uri $uri/ /index.html";
           extraConfig = ''
@@ -69,22 +71,43 @@ in
             add_header X-Frame-Options "SAMEORIGIN" always;
             add_header X-Content-Type-Options "nosniff" always;
             add_header X-XSS-Protection "1; mode=block" always;
-
-            # CORS headers dentro del bloque location
-            add_header Access-Control-Allow-Origin "*" always;
-            add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS" always;
-            add_header Access-Control-Allow-Headers "Origin, Content-Type, Accept, Authorization, X-Requested-With" always;
-
-            # Permitir todos los métodos HTTP necesarios
-            if ($request_method = 'OPTIONS') {
-              return 204;
-            }
           '';
         };
         "~ \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$" = {
           extraConfig = ''
             expires 1y;
             add_header Cache-Control "public, immutable";
+          '';
+        };
+        # Proxy de API al backend Drupal (POST/PUT/DELETE)
+        "/api/" = {
+          proxyPass = "http://127.0.0.1:8081";
+          extraConfig = ''
+            # CORS headers para API
+            add_header Access-Control-Allow-Origin "*" always;
+            add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS" always;
+            add_header Access-Control-Allow-Headers "Origin, Content-Type, Accept, Authorization, X-Requested-With" always;
+
+            # Proxy headers
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            # Manejo de OPTIONS
+            if ($request_method = 'OPTIONS') {
+              return 204;
+            }
+          '';
+        };
+        # Proxy de otras rutas de Drupal
+        "~ ^/(user|admin|node|taxonomy|farm|asset|log|plan|quantity|unit|season|inventory)" = {
+          proxyPass = "http://127.0.0.1:8081";
+          extraConfig = ''
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
           '';
         };
       };
