@@ -68,10 +68,21 @@ in
             "/" = {
               tryFiles = "$uri $uri/ /index.html";
               extraConfig = ''
+                # Permitir todos los métodos HTTP necesarios para la PWA
+                # (GET, POST, PUT, DELETE, PATCH, OPTIONS)
+                if ($request_method !~ ^(GET|HEAD|POST|PUT|DELETE|PATCH|OPTIONS)$ ) {
+                  return 405;
+                }
+
                 # Headers de seguridad
                 add_header X-Frame-Options "SAMEORIGIN" always;
                 add_header X-Content-Type-Options "nosniff" always;
                 add_header X-XSS-Protection "1; mode=block" always;
+
+                # CORS headers si es necesario
+                add_header Access-Control-Allow-Origin "*" always;
+                add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS" always;
+                add_header Access-Control-Allow-Headers "Origin, Content-Type, Accept, Authorization, X-Requested-With" always;
               '';
             };
             "~ \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$" = {
