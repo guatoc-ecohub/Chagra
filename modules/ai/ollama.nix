@@ -1,10 +1,4 @@
-# modules/ai/ollama.nix
-# =============================================================================
-# OLLAMA — Local LLM inference engine
-# Port: 11434
-# =============================================================================
-
-{ config, pkgs, lib, ... }:
+{ config, lib, pkgs, ... }:
 
 let
   cfg = config.guatoc.ai.ollama;
@@ -19,27 +13,12 @@ in
   };
 
   config = lib.mkIf (aiCfg.enable && cfg.enable) {
-    systemd.services.podman-ollama = {
-      after = [ "zfs.target" "network-online.target" "podman-create-ai-net.service" ];
-      requires = [ "zfs.target" "podman-create-ai-net.service" ];
-      serviceConfig = {
-        RequiresMountsFor = [ "/mnt/fast/appdata" ];
-        ExecStartPre = [
-          "${pkgs.coreutils}/bin/install -d -m 0755 /mnt/fast/appdata/ollama"
-        ];
+    services.ollama = {
+      enable = true;
+      host = "0.0.0.0";
+      environmentVariables = {
+        OLLAMA_ORIGINS = "https://farmos.guatoc.co,http://192.168.1.100:8081,http://localhost:8081";
       };
-    };
-
-    virtualisation.oci-containers.containers.ollama = {
-      image = "ollama/ollama:latest";
-      ports = [ "${toString registry.ports.ollama}:${toString registry.ports.ollama}" ];
-      volumes = [
-        "/mnt/fast/appdata/ollama:/root/.ollama"
-      ];
-      extraOptions = [
-        "--network=ai-net"
-        "--name=ollama"
-      ];
     };
 
     networking.firewall.allowedTCPPorts = [ registry.ports.ollama ];
