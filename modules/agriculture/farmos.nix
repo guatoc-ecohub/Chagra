@@ -71,6 +71,12 @@ in
         "/" = {
           tryFiles = "$uri $uri/ /index.html";
           extraConfig = ''
+            # Permitir todos los métodos HTTP necesarios para la PWA
+            # Nginx por defecto solo permite GET/HEAD para archivos estáticos
+            limit_except GET HEAD POST PUT DELETE PATCH OPTIONS {
+              deny all;
+            }
+
             # Headers de seguridad
             add_header X-Frame-Options "SAMEORIGIN" always;
             add_header X-Content-Type-Options "nosniff" always;
