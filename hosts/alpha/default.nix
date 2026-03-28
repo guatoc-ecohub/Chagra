@@ -168,9 +168,8 @@
 
   # --- WYOMING PIPER TTS INTEGRATION ---
   # Integración de Piper TTS vía protocolo Wyoming para Home Assistant
-  services.wyoming.piper = {
+  services.wyoming.piper.servers.default = {
     enable = true;
-    package = pkgs.wyoming-piper;
     voice = "es_ES-davefx-medium";
     uri = "tcp://127.0.0.1:10200";
   };
