@@ -434,11 +434,28 @@
       listen = [ { addr = "127.0.0.1"; port = 8080; } ];
       root = "/mnt/fast/appdata/farmos-pwa";
 
+      # 1. Enrutamiento Frontend (SPA)
       locations."/" = {
-        # Enrutamiento estricto para Single Page Applications (React)
         tryFiles = "$uri $uri/ /index.html";
         extraConfig = ''
           add_header Cache-Control "no-store, no-cache, must-revalidate";
+        '';
+      };
+
+      # 2. Enrutamiento Backend (CORS Bypass / API Gateway)
+      locations."/api/" = {
+        proxyPass = "https://farmos.guatoc.co/api/";
+        extraConfig = ''
+          proxy_ssl_server_name on;
+          proxy_set_header Host farmos.guatoc.co;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+
+          # Inyección de cabeceras de control de acceso
+          add_header 'Access-Control-Allow-Origin' '*';
+          add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PATCH, DELETE';
+          add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Accept';
         '';
       };
     };
