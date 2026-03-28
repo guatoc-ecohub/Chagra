@@ -14,7 +14,7 @@ in
 {
   options.guatoc.media.navidrome = {
     enable = lib.mkEnableOption "Navidrome - Servidor de streaming musical" // {
-      default = false;
+      default = false;  # Deshabilitado por defecto para evitar fallos
     };
   };
 
