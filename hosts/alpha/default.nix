@@ -380,7 +380,7 @@
     enable = true;
     # Ajuste de VirtualHost para la PWA de Guatoc
     virtualHosts."pwa.guatoc.co" = {
-      root = "/var/www/guatoc-pwa";
+      root = "/mnt/fast/appdata/farmos-pwa";
 
       # Directiva estricta para enrutamiento SPA (React/Vite)
       locations."/" = {
