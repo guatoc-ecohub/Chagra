@@ -429,21 +429,17 @@
       };
     };
 
-    # VIRTUAL HOST: PWA GUATOC.CO
-    virtualHosts."pwa.guatoc.co" = {
+    # VIRTUAL HOST: PWA SIMPLIFICADO (PUERTO 8080)
+    virtualHosts."pwa_guatoc" = {
+      listen = [ { addr = "127.0.0.1"; port = 8080; } ];
       root = "/mnt/fast/appdata/farmos-pwa";
-      locations = {
-        "/" = {
-          tryFiles = "$uri $uri/ /index.html";
-          extraConfig = ''
-            add_header X-Frame-Options "SAMEORIGIN" always;
-            add_header X-Content-Type-Options "nosniff" always;
-            add_header X-XSS-Protection "1; mode=block" always;
-          '';
-        };
-        "~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$" = {
-          extraConfig = "expires 30d; add_header Cache-Control \"public, no-transform\";";
-        };
+
+      locations."/" = {
+        # Enrutamiento estricto para Single Page Applications (React)
+        tryFiles = "$uri $uri/ /index.html";
+        extraConfig = ''
+          add_header Cache-Control "no-store, no-cache, must-revalidate";
+        '';
       };
     };
   };
