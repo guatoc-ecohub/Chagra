@@ -112,21 +112,9 @@ scrub:
     # NEXTCLOUD container migrated to modules/cloud/nextcloud.nix
 
     # === NGINX REVERSE PROXY ===
-
-    # === NGINX REVERSE PROXY ===
-    services.nginx = {
-      enable = true;
-      virtualHosts = {
-        "localhost" = {
-          locations."/navidrome" = {
-            proxyPass = "http://127.0.0.1:4533";
-            proxyWebsockets = true;
-          };
-          
-          # /nextcloud proxy migrated to modules/cloud/nextcloud.nix
-        };
-      };
-    };
+    # NOTA: Nginx ahora está consolidado en hosts/alpha/default.nix
+    # Esta configuración ha sido removida para evitar conflictos
+    # La configuración completa incluye farmos.guatoc.co, localhost, y pwa.guatoc.co
 
     # === DIRECTORIES ===
     systemd.tmpfiles.rules = [

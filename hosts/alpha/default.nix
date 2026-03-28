@@ -375,27 +375,75 @@
   nixpkgs.config.allowUnfree = true;
   system.stateVersion = "24.11";
 
-  # --- PWA HOSTING (Static Files Server) ---
+  # --- NGINX CONSOLIDADO PARA GUATOC ---
   services.nginx = {
     enable = true;
-    # Ajuste de VirtualHost para la PWA de Guatoc
+
+    # VIRTUAL HOST: FARMOS GUATOC.CO
+    virtualHosts."farmos.guatoc.co" = {
+      root = "/mnt/fast/appdata/farmos-pwa";
+      locations = {
+        "/" = {
+          tryFiles = "$uri $uri/ /index.html";
+          extraConfig = ''
+            add_header X-Frame-Options "SAMEORIGIN" always;
+            add_header X-Content-Type-Options "nosniff" always;
+            add_header X-XSS-Protection "1; mode=block" always;
+          '';
+        };
+        "~ \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$" = {
+          extraConfig = "expires 1y; add_header Cache-Control \"public, immutable\";";
+        };
+        "/api/" = {
+          proxyPass = "http://127.0.0.1:8081";
+          extraConfig = ''
+            add_header Access-Control-Allow-Origin "*" always;
+            add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS" always;
+            add_header Access-Control-Allow-Headers "Origin, Content-Type, Accept, Authorization, X-Requested-With" always;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            if ($request_method = 'OPTIONS') {
+              return 204;
+            }
+          '';
+        };
+        "~ ^/(user|admin|node|taxonomy|farm|asset|log|plan|quantity|unit|season|inventory)" = {
+          proxyPass = "http://127.0.0.1:8081";
+          extraConfig = ''
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+          '';
+        };
+      };
+    };
+
+    # VIRTUAL HOST: LOCALHOST (Navidrome)
+    virtualHosts."localhost" = {
+      locations."/navidrome" = {
+        proxyPass = "http://127.0.0.1:4533";
+        proxyWebsockets = true;
+      };
+    };
+
+    # VIRTUAL HOST: PWA GUATOC.CO
     virtualHosts."pwa.guatoc.co" = {
       root = "/mnt/fast/appdata/farmos-pwa";
-
-      # Directiva estricta para enrutamiento SPA (React/Vite)
-      locations."/" = {
-        tryFiles = "$uri $uri/ /index.html";
-        extraConfig = ''
-          # Headers de seguridad
-          add_header X-Frame-Options "SAMEORIGIN" always;
-          add_header X-Content-Type-Options "nosniff" always;
-          add_header X-XSS-Protection "1; mode=block" always;
-        '';
-      };
-
-      # Caché para assets estáticos
-      locations."~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$" = {
-        extraConfig = "expires 30d; add_header Cache-Control \"public, no-transform\";";
+      locations = {
+        "/" = {
+          tryFiles = "$uri $uri/ /index.html";
+          extraConfig = ''
+            add_header X-Frame-Options "SAMEORIGIN" always;
+            add_header X-Content-Type-Options "nosniff" always;
+            add_header X-XSS-Protection "1; mode=block" always;
+          '';
+        };
+        "~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$" = {
+          extraConfig = "expires 30d; add_header Cache-Control \"public, no-transform\";";
+        };
       };
     };
   };
