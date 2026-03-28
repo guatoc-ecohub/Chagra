@@ -127,6 +127,19 @@
     firefox
     google-chrome
     bitwarden-desktop
+
+    # PlatformIO FHS Environment
+    (pkgs.buildFHSUserEnv {
+      name = "platformio-fhs-env";
+      targetPkgs = pkgs: (with pkgs; [
+        platformio-core
+        python3
+        zlib
+        ncurses
+        libusb1
+      ]);
+      runScript = "bash";
+    })
   ];
   
   nixpkgs.config.allowUnfree = true;

@@ -166,6 +166,15 @@
   # Los servicios IoT ya están configurados en modules/iot.nix
   # incluyendo Mosquitto, Home Assistant, Node-RED, InfluxDB y Grafana
 
+  # --- WYOMING PIPER TTS INTEGRATION ---
+  # Integración de Piper TTS vía protocolo Wyoming para Home Assistant
+  services.wyoming.piper = {
+    enable = true;
+    package = pkgs.wyoming-piper;
+    voice = "es_ES-davefx-medium";
+    uri = "tcp://127.0.0.1:10200";
+  };
+
   # --- TELEGRAF (for InfluxDB telemetry) ---
   services.telegraf = {
     enable = true;

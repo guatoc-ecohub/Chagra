@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -r \"nginx\\\\|farmos.guatoc\" . --include=*.nix)",
+      "Bash(ssh:*)",
+      "Bash(rsync:*)"
+    ]
+  }
+}
