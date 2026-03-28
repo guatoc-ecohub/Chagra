@@ -3,7 +3,10 @@
     "allow": [
       "Bash(grep -r \"nginx\\\\|farmos.guatoc\" . --include=*.nix)",
       "Bash(ssh:*)",
-      "Bash(rsync:*)"
+      "Bash(rsync:*)",
+      "Bash(npx eslint:*)",
+      "Bash(node:*)",
+      "Bash(npm run:*)"
     ]
   }
 }
