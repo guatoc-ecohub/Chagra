@@ -13,6 +13,7 @@
     firewall = {
       enable = true;
       allowedTCPPorts = [
+        80      # HTTP (Nginx - PWA + API Gateway + Cloudflare Tunnel)
         22      # SSH
         8123    # Home Assistant
         1883    # Mosquitto MQTT
@@ -36,7 +37,7 @@
       trustedInterfaces = [ "tailscale0" ];
       
       interfaces.enp3s0 = {
-        allowedTCPPorts = [ 8123 1883 5000 8554 8555 5030 5031 8086 1880 3000 8081 ];
+        allowedTCPPorts = [ 80 8123 1883 5000 8554 8555 5030 5031 8086 1880 3000 8081 ];
         allowedUDPPorts = [ 5353 8555 ];
       };
     };

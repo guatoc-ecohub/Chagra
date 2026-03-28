@@ -17,7 +17,7 @@ in
     ./sonarr.nix
     ./prowlarr.nix
     ./qbittorrent.nix
-    ./navidrome.nix
+    ./navidrome_temp.nix  # Versión temporal con contenedor comentado para diagnosticar errores
     ./slskd.nix
     ./streamrip.nix
   ];
