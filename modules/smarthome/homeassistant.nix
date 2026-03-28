@@ -71,6 +71,12 @@ in
 
         # Create comprehensive Home Assistant configuration
         cat >> /mnt/fast/appdata/homeassistant/configuration.yaml << 'EOF'
+homeassistant:
+  name: Guatoc Alpha
+  time_zone: America/Bogota
+  # --- BLOQUE CRÍTICO DE ENRUTAMIENTO ---
+  internal_url: "http://192.168.1.100:8123"
+  external_url: "https://ha.guatoc.co"
 
 # RGB Control via Picoclaw API
 rest:

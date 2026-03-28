@@ -374,4 +374,29 @@
 
   nixpkgs.config.allowUnfree = true;
   system.stateVersion = "24.11";
+
+  # --- PWA HOSTING (Static Files Server) ---
+  services.nginx = {
+    enable = true;
+    # Ajuste de VirtualHost para la PWA de Guatoc
+    virtualHosts."pwa.guatoc.co" = {
+      root = "/var/www/guatoc-pwa";
+
+      # Directiva estricta para enrutamiento SPA (React/Vite)
+      locations."/" = {
+        tryFiles = "$uri $uri/ /index.html";
+        extraConfig = ''
+          # Headers de seguridad
+          add_header X-Frame-Options "SAMEORIGIN" always;
+          add_header X-Content-Type-Options "nosniff" always;
+          add_header X-XSS-Protection "1; mode=block" always;
+        '';
+      };
+
+      # Caché para assets estáticos
+      locations."~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$" = {
+        extraConfig = "expires 30d; add_header Cache-Control \"public, no-transform\";";
+      };
+    };
+  };
 }
