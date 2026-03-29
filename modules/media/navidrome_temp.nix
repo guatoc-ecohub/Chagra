@@ -21,7 +21,8 @@ in
   config = lib.mkIf (mediaCfg.enable && cfg.enable) {
     # Dependencias ZFS para asegurar que los datasets estén montados
     # Contenedor Navidrome comentado temporalmente
-    # systemd.services.podman-navidrome = {
+    /*
+    systemd.services.podman-navidrome = {
       after = [ "zfs.target" "network-online.target" "podman-create-media-net.service" ];
       requires = [ "zfs.target" "podman-create-media-net.service" ];
       serviceConfig = {
@@ -34,25 +35,31 @@ in
       };
     };
 
-    # virtualisation.oci-containers.containers.navidrome = {
-      # Comentar temporalmente para diagnosticar errores de inicio
-      # virtualisation.oci-containers.containers.navidrome = {
-        #   image = "deluan/navidrome:latest";
-        #   ports = [ "${toString registry.ports.navidrome}:${toString registry.ports.navidrome}" ];
-        #   volumes = [
-        #     "/mnt/fast/appdata/navidrome:/data"
-        #     "${mediaCfg.musicDir}:/music:ro"  # Solo lectura
-        #   ];
-        #   environment = {
-        #     ND_SCANTYPES = "all";
-        #     ND_LOGLEVEL = "info";
-        #     ND_BASEURL = "";
-        #   };
-        #   extraOptions = [
-        #     "--network=media-net"
-        #     "--name=navidrome"
-        #   ];
-      # };
+    virtualisation.oci-containers.containers.navidrome = {
+      image = "deluan/navidrome:latest";
+      ports = [ "${toString registry.ports.navidrome}:${toString registry.ports.navidrome}" ];
+      volumes = [
+        "/mnt/fast/appdata/navidrome:/data"
+        "${mediaCfg.musicDir}:/music:ro"  # Solo lectura
+      ];
+      environment = {
+        ND_SCANTYPES = "all";
+        ND_LOGLEVEL = "info";
+        ND_BASEURL = "";
+      };
+      extraOptions = [
+        "--network=media-net"
+        "--name=navidrome"
+      ];
     };
+    */
+
+    # Nota: Puerto 4533 NO se abre en firewall público
+    # Acceso solo vía Tailscale (trustedInterfaces) o localhost
+    /*
+    networking.firewall = {
+      interfaces.lo.allowedTCPPorts = [ registry.ports.navidrome ];
+    };
+    */
   };
 }
