@@ -271,8 +271,8 @@
 
     # VIRTUAL HOST: PWA CON API GATEWAY
     virtualHosts."pwa_guatoc" = {
-      listen = [ { addr = "0.0.0.0"; port = 80; } ];
-      root = "/mnt/fast/appdata/farmos-pwa";
+      listen = [ { addr = "127.0.0.1"; port = 80; } ];
+      root = "/var/www/guatoc-pwa";
 
       # 1. Enrutamiento Frontend (SPA)
       locations."/" = {
