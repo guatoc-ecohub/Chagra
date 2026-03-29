@@ -174,42 +174,42 @@
     tailscale.enable = true;
   };
 
-  # --- TELEGRAF ---
-  services.telegraf = {
-    enable = true;
-    environmentFiles = [ config.sops.secrets.influxdb_admin_token.path ];
-    extraConfig = {
-      inputs = {
-        cpu = [ { percpu = false; totalcpu = true; } ];
-        mem = {};
-        zfs = [{
-          kstatPath = "/proc/spl/kstat";
-          poolNames = [ "tank" "tank-fast" ];
-        }];
-        smart = [{
-          path = "/dev/nvme*";
-          useSudo = true;
-        }];
-        docker = [{
-          endpoint = "unix:///run/podman/podman.sock";
-          container_names = [];
-          container_states_include = ["running"];
-        }];
-      };
-      outputs = {
-        influxdb_v2 = [
-          {
-            urls = [ "http://127.0.0.1:8086" ];
-            bucket = "telegraf";
-            organization = "guatoc";
-            token = "$INFLUXDB_ADMIN_TOKEN";
-          }
-        ];
-      };
-    };
-  };
+  # --- TELEGRAF (DESHABILITADO TEMPORALMENTE) ---
+  # services.telegraf = {
+  #   enable = true;
+  #   environmentFiles = [ config.sops.secrets.influxdb_admin_token.path ];
+  #   extraConfig = {
+  #     inputs = {
+  #       cpu = [ { percpu = false; totalcpu = true; } ];
+  #       mem = {};
+  #       zfs = [{
+  #         kstatPath = "/proc/spl/kstat";
+  #         poolNames = [ "tank" "tank-fast" ];
+  #       }];
+  #       smart = [{
+  #         path = "/dev/nvme*";
+  #         useSudo = true;
+  #       }];
+  #       docker = [{
+  #         endpoint = "unix:///run/podman/podman.sock";
+  #         container_names = [];
+  #         container_states_include = ["running"];
+  #       }];
+  #     };
+  #     outputs = {
+  #       influxdb_v2 = [
+  #         {
+  #           urls = [ "http://127.0.0.1:8086" ];
+  #           bucket = "telegraf";
+  #           organization = "guatoc";
+  #           token = "$INFLUXDB_ADMIN_TOKEN";
+  #         }
+  #       ];
+  #     };
+  #   };
+  # };
 
-  users.users.telegraf.extraGroups = [ "disk" ];
+  # users.users.telegraf.extraGroups = [ "disk" ];
 
   # --- OPENSSSH ---
   services.openssh = {
