@@ -272,7 +272,7 @@
     # VIRTUAL HOST: PWA CON API GATEWAY
     virtualHosts."pwa_guatoc" = {
       listen = [ { addr = "127.0.0.1"; port = 80; } ];
-      root = "/var/www/guatoc-pwa";
+      root = "/mnt/fast/appdata/farmos-pwa";
 
       # 1. Enrutamiento Frontend (SPA)
       locations."/" = {
@@ -284,18 +284,28 @@
 
       # 2. Enrutamiento Backend (CORS Bypass / API Gateway)
       locations."/api/" = {
-        proxyPass = "https://farmos.guatoc.co/api/";
-        extraConfig = ''
-          proxy_ssl_server_name on;
-          proxy_set_header Host farmos.guatoc.co;
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $scheme;
+        # ENRUTAMIENTO DIRECTO: Nginx habla con el contenedor FarmOS en su puerto nativo
+        proxyPass = "http://127.0.0.1:8081/api/";
 
-          # Inyección de cabeceras de control de acceso
-          add_header 'Access-Control-Allow-Origin' '*';
-          add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PATCH, DELETE';
-          add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Accept';
+        extraConfig = ''
+          # Mantenemos el Host header para que Drupal (FarmOS) no rechace la petición
+          proxy_set_header Host farmos.guatoc.co;
+
+          # Inyección de cabeceras de evasión CORS
+          add_header 'Access-Control-Allow-Origin' '*' always;
+          add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PATCH, DELETE' always;
+          add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Accept' always;
+
+          # Manejo de peticiones Preflight (OPTIONS)
+          if ($request_method = 'OPTIONS') {
+              add_header 'Access-Control-Allow-Origin' '*';
+              add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PATCH, DELETE';
+              add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Accept';
+              add_header 'Access-Control-Max-Age' 1728000;
+              add_header 'Content-Type' 'text/plain; charset=utf-8';
+              add_header 'Content-Length' 0;
+              return 204;
+          }
         '';
       };
     };
