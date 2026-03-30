@@ -78,6 +78,10 @@
     nmap
     arp-scan
     bitwarden-desktop
+
+    # --- Herramientas de monitoreo de sistema ---
+    htop       # Monitor de procesos
+    nvtop       # Monitor de GPU NVIDIA
   ];
 
   # --- HOME ASSISTANT & IOT (Legacy modules) ---

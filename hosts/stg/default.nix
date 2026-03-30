@@ -107,7 +107,7 @@
   environment.systemPackages = with pkgs; [
     opencode
     nmap       # Escaneo de red
-    arp-scan   # Descubrimiento de dispositivos en red local  
+    arp-scan   # Descubrimiento de dispositivos en red local
     bitwarden-desktop  # Administrador de contraseñas (GUI)
 
     # --- Herramientas de música / descarga ---
@@ -122,6 +122,10 @@
     # Derivación local en pkgs/antigravity/default.nix (no disponible en nixpkgs)
     # Expuesto via overlay en flake.nix → pkgs.antigravity
     antigravity
+
+    # --- Herramientas de monitoreo de sistema ---
+    htop       # Monitor de procesos
+    nvtop       # Monitor de GPU NVIDIA
 
     # Firefox, Chrome + Bitwarden (gestor de contraseñas)
     firefox
