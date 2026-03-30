@@ -9,7 +9,9 @@
       "Bash(npm run:*)",
       "Bash(nix eval:*)",
       "Bash(sudo journalctl:*)",
-      "Bash(find /home/kortux/guatoc-nixos-stable -name package.json -o -name vite.config.* -o -name .env*)"
+      "Bash(find /home/kortux/guatoc-nixos-stable -name package.json -o -name vite.config.* -o -name .env*)",
+      "Bash(curl:*)",
+      "Bash(grep -r \"nginx\\\\|home.*assistant\\\\|ollama\" hosts/alpha/*.nix modules/network/*.nix)"
     ]
   }
 }
