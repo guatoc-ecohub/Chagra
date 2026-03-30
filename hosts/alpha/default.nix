@@ -81,7 +81,7 @@
 
     # --- Herramientas de monitoreo de sistema ---
     htop       # Monitor de procesos
-    nvtop       # Monitor de GPU NVIDIA
+    # nvtop     # Monitor de GPU NVIDIA (comentado temporalmente)
   ];
 
   # --- HOME ASSISTANT & IOT (Legacy modules) ---

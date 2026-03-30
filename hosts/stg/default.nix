@@ -125,7 +125,7 @@
 
     # --- Herramientas de monitoreo de sistema ---
     htop       # Monitor de procesos
-    nvtop       # Monitor de GPU NVIDIA
+    # nvtop     # Monitor de GPU NVIDIA (comentado temporalmente)
 
     # Firefox, Chrome + Bitwarden (gestor de contraseñas)
     firefox
