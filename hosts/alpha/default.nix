@@ -10,7 +10,6 @@
     ../../modules/ai
     ../../modules/iot.nix
     ../../modules/farmos.nix
-    ../../modules/tunnel-connectivity.nix
   ];
 
   # --- TIMEZONE ---
@@ -175,11 +174,26 @@
     tailscale.enable = true;
   };
 
-  # --- CLOUDFLARE TUNNEL ---
-  # Módulo nativo de NixOS usando token de SOPS
-  services.cloudflared = {
-    enable = true;
-    tunnelToken = config.sops.secrets.cloudflared-token.path;
+  # --- CLOUDFLARE ZERO TRUST CONNECTOR (MANAGED TUNNEL) ---
+  systemd.services.cloudflared-tunnel = {
+    description = "Cloudflare Zero Trust Managed Tunnel";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
+
+    # Inyección de binarios en el PATH del servicio
+    path = [ pkgs.cloudflared pkgs.bash ];
+
+    serviceConfig = {
+      Type = "simple";
+      # Ejecución mediante shell para evaluar el secreto almacenado por SOPS
+      ExecStart = "${pkgs.bash}/bin/bash -c 'cloudflared tunnel --no-autoupdate run --token $(cat /run/secrets/cloudflared-token)'";
+      Restart = "always";
+      RestartSec = "10s";
+
+      # Nota: Se asume que el archivo /run/secrets/cloudflared-token contiene
+      # exclusivamente la cadena del token (eyJh...) sin saltos de línea ni comillas.
+    };
   };
 
   # --- TELEGRAF (DESHABILITADO TEMPORALMENTE) ---
