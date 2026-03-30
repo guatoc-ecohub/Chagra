@@ -269,12 +269,12 @@
   services.nginx = {
     enable = true;
 
-    # VIRTUAL HOST: PWA CON API GATEWAY
-    virtualHosts."pwa_guatoc" = {
-      listen = [ { addr = "127.0.0.1"; port = 80; } ];
+    # 1. El VirtualHost DEBE llamarse exactamente como el dominio público
+    virtualHosts."app.guatoc.co" = {
+      # 2. Binding universal para permitir tráfico desde la IP física de la LAN
+      listen = [ { addr = "0.0.0.0"; port = 80; } ];
       root = "/mnt/fast/appdata/farmos-pwa";
 
-      # 1. Enrutamiento Frontend (SPA)
       locations."/" = {
         tryFiles = "$uri $uri/ /index.html";
         extraConfig = ''
@@ -282,21 +282,17 @@
         '';
       };
 
-      # 2. Enrutamiento Backend (CORS Bypass / API Gateway)
       locations."/api/" = {
-        # ENRUTAMIENTO DIRECTO: Nginx habla con el contenedor FarmOS en su puerto nativo
+        # Enrutamiento interno directo al contenedor FarmOS
         proxyPass = "http://127.0.0.1:8081/api/";
-
         extraConfig = ''
-          # Mantenemos el Host header para que Drupal (FarmOS) no rechace la petición
           proxy_set_header Host farmos.guatoc.co;
 
-          # Inyección de cabeceras de evasión CORS
+          # Inyección de cabeceras CORS
           add_header 'Access-Control-Allow-Origin' '*' always;
           add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PATCH, DELETE' always;
           add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Accept' always;
 
-          # Manejo de peticiones Preflight (OPTIONS)
           if ($request_method = 'OPTIONS') {
               add_header 'Access-Control-Allow-Origin' '*';
               add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PATCH, DELETE';
