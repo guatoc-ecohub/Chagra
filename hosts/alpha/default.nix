@@ -10,6 +10,7 @@
     ../../modules/ai
     ../../modules/iot.nix
     ../../modules/farmos.nix
+    ../../modules/tunnel-connectivity.nix
   ];
 
   # --- TIMEZONE ---
@@ -172,6 +173,13 @@
   guatoc.security = {
     enable = true;
     tailscale.enable = true;
+  };
+
+  # --- CLOUDFLARE TUNNEL ---
+  # Módulo nativo de NixOS usando token de SOPS
+  services.cloudflared = {
+    enable = true;
+    tunnelToken = config.sops.secrets.cloudflared-token.path;
   };
 
   # --- TELEGRAF (DESHABILITADO TEMPORALMENTE) ---
