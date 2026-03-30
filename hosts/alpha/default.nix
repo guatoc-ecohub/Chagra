@@ -330,6 +330,29 @@
           }
         '';
       };
+
+      # 3. Enrutamiento de Autenticación (OAuth FarmOS)
+      locations."/oauth/" = {
+        proxyPass = "http://127.0.0.1:8081/oauth/";
+        extraConfig = ''
+          proxy_set_header Host farmos.guatoc.co;
+
+          # Inyección de cabeceras CORS para negociación de token
+          add_header 'Access-Control-Allow-Origin' '*' always;
+          add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PATCH, DELETE' always;
+          add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Accept' always;
+
+          if ($request_method = 'OPTIONS') {
+              add_header 'Access-Control-Allow-Origin' '*';
+              add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PATCH, DELETE';
+              add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Accept';
+              add_header 'Access-Control-Max-Age' 1728000;
+              add_header 'Content-Type' 'text/plain; charset=utf-8';
+              add_header 'Content-Length' 0;
+              return 204;
+          }
+        '';
+      };
     };
   };
 }
