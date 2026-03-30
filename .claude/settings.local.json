@@ -11,7 +11,8 @@
       "Bash(sudo journalctl:*)",
       "Bash(find /home/kortux/guatoc-nixos-stable -name package.json -o -name vite.config.* -o -name .env*)",
       "Bash(curl:*)",
-      "Bash(grep -r \"nginx\\\\|home.*assistant\\\\|ollama\" hosts/alpha/*.nix modules/network/*.nix)"
+      "Bash(grep -r \"nginx\\\\|home.*assistant\\\\|ollama\" hosts/alpha/*.nix modules/network/*.nix)",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJlNmNmMjE0ZTFiZWE0YTU0OTFmNTEwZjc5OGM5MDY1ZSIsImlhdCI6MTc3NDU2NzQzNywiZXhwIjoyMDg5OTI3NDM3fQ.-vaKlN8NXu1PuOPPW2K-NL8OQXTh--LW2kX5Z_GqQuo\")"
     ]
   }
 }

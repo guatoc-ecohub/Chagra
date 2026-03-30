@@ -383,6 +383,11 @@
         extraConfig = ''
           proxy_set_header Host ai.guatoc.co;
 
+          # Timeouts extendidos para inferencias de IA (pueden tardar 60+ segundos)
+          proxy_connect_timeout 120s;
+          proxy_send_timeout 120s;
+          proxy_read_timeout 120s;
+
           # Inyección de cabeceras CORS para inferencia cognitiva
           add_header 'Access-Control-Allow-Origin' '*' always;
           add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
