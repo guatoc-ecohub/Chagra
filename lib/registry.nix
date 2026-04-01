@@ -57,9 +57,6 @@ rec {
       # Additional ports allocated dynamically: 8091, 8092, etc.
     };
     
-    # --- External Services ---
-    picoclaw    = 18790; # Agente IA Telegram
-    
     # --- 5xx: Protocolos industriales (reservados) ---
     modbus-tcp  = 502;   # Telemetría de energía
     

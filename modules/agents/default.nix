@@ -1,28 +1,15 @@
 # modules/agents/default.nix
 # =============================================================================
-# AGENTS DOMAIN — IA Agents for automation
-# Includes: Picoclaw
+# AGENTS DOMAIN — Reservado para futuros agentes autónomos
+# Picoclaw eliminado 2026-03-31 (consolidado en ClawBots)
 # =============================================================================
 
 { config, pkgs, lib, ... }:
 
-let
-  cfg = config.guatoc.agents;
-  registry = import ../../lib/registry.nix { inherit lib; };
-in
 {
-  imports = [
-    ./picoclaw.nix
-  ];
-
-  # ============================================
-  # OPTIONS: Feature toggles for the domain
-  # ============================================
   options.guatoc.agents = {
     enable = lib.mkEnableOption "Agents - IA automation agents" // {
       default = false;
     };
-    
-    # Submodules handle their own enable options
   };
 }

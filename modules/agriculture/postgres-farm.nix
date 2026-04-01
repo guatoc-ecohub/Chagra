@@ -38,9 +38,15 @@ in
       environment = {
         POSTGRES_DB = "farmos";
         POSTGRES_USER = "farmos";
-        POSTGRES_PASSWORD = "changeme";  # TODO: usar sops-nix
       };
+      environmentFiles = [ config.sops.secrets."postgres-farm-env".path ];
       extraOptions = [ "--network=iot-net" "--name=postgres-farm" ];
+    };
+
+    sops.secrets."postgres-farm-env" = {
+      owner = "root";
+      group = "root";
+      mode = "0400";
     };
 
     networking.firewall.allowedTCPPorts = [ registry.ports.postgresFarm ];

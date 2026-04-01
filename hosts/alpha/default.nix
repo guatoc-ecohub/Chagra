@@ -78,6 +78,7 @@
     nmap
     arp-scan
     bitwarden-desktop
+    openssl
 
     # --- Herramientas de monitoreo de sistema ---
     htop       # Monitor de procesos
@@ -136,13 +137,6 @@
   # --- HOME ASSISTANT CONFIG ---
   services.homeassistant-config = {
     enable = false;
-  };
-
-  # --- PICOCLAW (Experimental Agents) ---
-  services.experimental-agents = {
-    enable = true;
-    enablePicoclaw = false;
-    enableOpenclaw = false;
   };
 
   # --- CLOUD ---
@@ -381,14 +375,12 @@
       locations."/api/ollama/" = {
         proxyPass = "http://127.0.0.1:11434/api/";
         extraConfig = ''
-          proxy_set_header Host ai.guatoc.co;
-
           # Timeouts extendidos para inferencias de IA (pueden tardar 60+ segundos)
           proxy_connect_timeout 120s;
           proxy_send_timeout 120s;
           proxy_read_timeout 120s;
 
-          # Inyección de cabeceras CORS para inferencia cognitiva
+          # CORS para permitir llamadas desde la PWA
           add_header 'Access-Control-Allow-Origin' '*' always;
           add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
           add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Accept' always;

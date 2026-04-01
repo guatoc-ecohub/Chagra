@@ -216,15 +216,7 @@
   # Nota: Ahora migrado a guatoc.smarthome.*
   # services.homeassistant-config = { enable = false; };
 
-  # --- PICOCLAW (Experimental Agents) ---
-  services.experimental-agents = {
-    enable = true;
-    enablePicoclaw = false;  # Disabled - use ClawBots instead
-    enableOpenclaw = false;
-  };
-
   # --- MODULES DEL MODO ---
-  # Agriculture Delegate a modules/farmos.nix
   # Cloud Delegate a modules/cloud/default.nix
   guatoc.cloud = {
     enable = true;

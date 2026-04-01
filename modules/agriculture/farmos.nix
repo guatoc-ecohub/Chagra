@@ -45,13 +45,19 @@ in
         DRUPAL_DB_PORT = "5432";
         DRUPAL_DB_NAME = "farmos";
         DRUPAL_DB_USER = "farmos";
-        DRUPAL_DB_PASSWORD = "changeme";  # TODO: migrate to sops-nix
       };
+      environmentFiles = [ config.sops.secrets."farmos-env".path ];
       extraOptions = [
         "--network=iot-net"
         "--name=farmos"
         "--hostname=farmos"
       ];
+    };
+
+    sops.secrets."farmos-env" = {
+      owner = "root";
+      group = "root";
+      mode = "0400";
     };
 
     networking.firewall.allowedTCPPorts = [ registry.ports.farmos ];
