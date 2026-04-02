@@ -60,23 +60,33 @@ in
       };
     };
 
-    # Generate Home Assistant configuration with RGB, FarmOS, and TTS integration
-    systemd.services.podman-homeassistant-config = lib.mkIf cfg.enableRGB {
-      description = "Configure Home Assistant with RGB, FarmOS, and TTS";
+    # Generate Home Assistant configuration (cast, dashboard, FarmOS, TTS, RGB)
+    systemd.services.podman-homeassistant-config = {
+      description = "Configure Home Assistant — Declarative YAML generation";
       after = [ "podman-homeassistant.service" ];
       serviceConfig.Type = "oneshot";
       script = ''
         # Create Lovelace directory structure
         install -d -m 0755 /mnt/fast/appdata/homeassistant/lovelace
 
-        # Create comprehensive Home Assistant configuration
-        cat >> /mnt/fast/appdata/homeassistant/configuration.yaml << 'EOF'
+        # Overwrite — idempotent on every rebuild
+        cat > /mnt/fast/appdata/homeassistant/configuration.yaml << 'EOF'
 homeassistant:
   name: Guatoc Alpha
   time_zone: America/Bogota
   # --- BLOQUE CRÍTICO DE ENRUTAMIENTO ---
   internal_url: "http://192.168.1.100:8123"
   external_url: "https://ha.guatoc.co"
+
+# HTTP — Proxies confiables para Cast y Nginx
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 127.0.0.1
+    - 192.168.1.0/24
+
+# Integración Cast (descubrimiento mDNS habilitado por default_config)
+cast:
 
 # RGB Control via Picoclaw API
 rest:
@@ -90,7 +100,7 @@ rest:
           - color
           - mode
 
-# FarmOS API Integration (CORRECTED ROUTING)
+# FarmOS API Integration
   - resource: "https://farmos.guatoc.co/api/log/task?filter[status]=pending&sort=-timestamp"
     scan_interval: 300
     timeout: 30
@@ -118,10 +128,27 @@ wyoming:
     port: 10200
     platform: "piper"
 
-# Media Player Nest Hub
+# Media Player Nest Hub (Cast)
 media_player:
   - platform: cast
     host: 192.168.1.105
+
+# Conmutador de control para rotación del screensaver
+input_boolean:
+  nest_screensaver_active:
+    name: "Nest Hub Screensaver Activo"
+    icon: mdi:monitor-shimmer
+
+# Lovelace dashboards — referencia al panel kiosk
+lovelace:
+  mode: yaml
+  dashboards:
+    nest-hub:
+      mode: yaml
+      title: "Nest Hub Kiosk"
+      icon: mdi:cast
+      show_in_sidebar: false
+      filename: lovelace/nest_hub.yaml
 
 # RGB Light entities using MQTT
 light:
@@ -174,24 +201,66 @@ script:
           message: "Sí pa, ¿pa qué soy bueno?"
 
 automation:
-  - id: "nest_hub_screensaver_observability"
-    alias: "Nest Hub Screensaver - Observability Dashboard"
-    description: "Activar dashboard de observabilidad en Nest Hub cuando entre en inactividad"
+  # =====================================================================
+  # Fase 9 — Rotación continua de vistas en Google Nest Hub
+  # =====================================================================
+  - id: "nest_hub_kiosk_rotation"
+    alias: "Nest Hub Kiosk - Rotación de Vistas"
+    description: "Proyecta cíclicamente las 3 vistas del dashboard en el Nest Hub mientras el conmutador esté activo"
     trigger:
+      - platform: homeassistant
+        event: start
       - platform: state
-        entity_id: sensor.nest_hub_idle_time
-        to: "idle"
-        for:
-          minutes: 5
+        entity_id: input_boolean.nest_screensaver_active
+        to: "on"
     condition:
       - condition: state
-        entity_id: media_player.nest_hub
-        state: "idle"
+        entity_id: input_boolean.nest_screensaver_active
+        state: "on"
     action:
-      - service: cast.show_lovelace_view
-        data:
-          entity_id: media_player.nest_hub
-          view_path: "/lovelace/screensaver"
+      - repeat:
+          while:
+            - condition: state
+              entity_id: input_boolean.nest_screensaver_active
+              state: "on"
+          sequence:
+            # Vista 1: Hardware del Nodo Alpha
+            - service: cast.show_lovelace_view
+              data:
+                entity_id: media_player.google_nest
+                dashboard_path: nest-hub
+                view_path: view_hw
+            - delay:
+                seconds: 20
+            # Vista 2: Sensores IoT del Invernadero
+            - service: cast.show_lovelace_view
+              data:
+                entity_id: media_player.google_nest
+                dashboard_path: nest-hub
+                view_path: view_iot
+            - delay:
+                seconds: 20
+            # Vista 3: Bitácora FarmOS
+            - service: cast.show_lovelace_view
+              data:
+                entity_id: media_player.google_nest
+                dashboard_path: nest-hub
+                view_path: view_farm
+            - delay:
+                seconds: 20
+
+  - id: "nest_hub_kiosk_stop"
+    alias: "Nest Hub Kiosk - Detener Rotación"
+    description: "Detiene la proyección cuando el conmutador se desactiva"
+    trigger:
+      - platform: state
+        entity_id: input_boolean.nest_screensaver_active
+        to: "off"
+    action:
+      - service: media_player.turn_off
+        target:
+          entity_id: media_player.google_nest
+
   - id: "guatoc_active_watchdog"
     alias: "Guatoc Watchdog - Alertas Proactivas Nest Hub"
     description: "Monitoreo de umbrales críticos de infraestructura y agroecología"
@@ -213,7 +282,7 @@ automation:
         target:
           entity_id: tts.piper
         data:
-          media_player_entity_id: media_player.nest_hub
+          media_player_entity_id: media_player.google_nest
           message: >
             {% if trigger.id == 'alerta_hidrica' %}
               En la buena pa, el invernadero presenta estrés hídrico crítico. Intervención requerida.
@@ -225,57 +294,150 @@ automation:
       - delay: "00:00:08"
       - service: cast.show_lovelace_view
         data:
-          entity_id: media_player.nest_hub
-          view_path: "/lovelace/screensaver"
+          entity_id: media_player.google_nest
+          dashboard_path: nest-hub
+          view_path: view_hw
 EOF
 
-        # Create Lovelace dashboard for screensaver
-        cat > /mnt/fast/appdata/homeassistant/lovelace/screensaver.yaml << 'LOVELACEEOF'
+        # Create Lovelace kiosk dashboard — 3 vistas rotativas para Nest Hub
+        cat > /mnt/fast/appdata/homeassistant/lovelace/nest_hub.yaml << 'LOVELACEEOF'
 title: "Guatoc Centro de Operaciones"
-theme: "dark"
+kiosk_mode:
+  hide_sidebar: true
+  hide_header: true
+
 views:
-  - id: overview_dynamic
-    title: "Telemetría Global"
-    path: "screensaver"
-    panel: true
+  # =================================================================
+  # Vista 1 — Infraestructura del Nodo Alpha
+  # =================================================================
+  - title: "Hardware"
+    path: view_hw
+    icon: mdi:server
+    panel: false
+    theme: Backend-slate
     cards:
-      - type: custom:layout-card
-        layout_type: custom:grid-layout
-        layout:
-          grid-template-columns: 33% 33% 33%
-          grid-template-rows: auto
-          grid-template-areas: |
-            "infra agroecologia bitacora"
+      - type: vertical-stack
         cards:
+          - type: markdown
+            content: "## Nodo Alpha — Infraestructura"
+          - type: gauge
+            entity: sensor.alpha_cpu_usage
+            name: "CPU"
+            min: 0
+            max: 100
+            severity:
+              green: 0
+              yellow: 60
+              red: 85
+          - type: gauge
+            entity: sensor.alpha_memory_usage
+            name: "Memoria RAM"
+            min: 0
+            max: 100
+            severity:
+              green: 0
+              yellow: 70
+              red: 90
+          - type: sensor
+            entity: sensor.alpha_cpu_temperature
+            name: "Temperatura CPU"
+            graph: line
+            hours_to_show: 6
+          - type: entities
+            title: "Estado del Sistema"
+            entities:
+              - entity: sensor.zfs_tank_status
+                name: "ZFS Pool"
+              - entity: sensor.alpha_disk_usage
+                name: "Disco"
+              - entity: sensor.alpha_uptime
+                name: "Uptime"
+
+  # =================================================================
+  # Vista 2 — Sensores IoT del Invernadero
+  # =================================================================
+  - title: "Invernadero"
+    path: view_iot
+    icon: mdi:sprout
+    panel: false
+    theme: Backend-slate
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: "## Invernadero 1 — Sensores Agroecológicos"
           - type: custom:auto-entities
-            view_layout:
-              grid-area: infra
             card:
-              type: entities
-              title: "Nodo Alpha (Hardware)"
-            filter:
-              include:
-                - entity_id: "sensor.alpha_*"
-                - entity_id: "sensor.zfs_*"
-              exclude:
-                - state: "unavailable"
-          - type: custom:auto-entities
-            view_layout:
-              grid-area: agroecologia
-            card:
-              type: entities
-              title: "Red Zigbee (Cultivos)"
+              type: glance
+              title: "Humedad del Suelo"
+              columns: 3
             filter:
               include:
                 - entity_id: "sensor.soil_moisture_*"
+              exclude:
+                - state: "unavailable"
+          - type: custom:auto-entities
+            card:
+              type: glance
+              title: "Temperatura Ambiente"
+              columns: 3
+            filter:
+              include:
                 - entity_id: "sensor.temperature_*"
+              exclude:
+                - state: "unavailable"
+          - type: history-graph
+            title: "Tendencia Hídrica (24h)"
+            hours_to_show: 24
+            entities:
+              - entity: sensor.soil_moisture_greenhouse
+                name: "Humedad Invernadero"
+          - type: entities
+            title: "Conectividad Zigbee"
+            entities:
+              - entity: sensor.zigbee2mqtt_bridge_state
+                name: "Bridge Zigbee"
+
+  # =================================================================
+  # Vista 3 — Bitácora FarmOS (Tareas Orgánicas)
+  # =================================================================
+  - title: "Bitácora"
+    path: view_farm
+    icon: mdi:book-open-page-variant
+    panel: false
+    theme: Backend-slate
+    cards:
+      - type: vertical-stack
+        cards:
           - type: markdown
-            view_layout:
-              grid-area: bitacora
-            title: "Operaciones (FarmOS)"
-            content: |
-              ### Tareas Pendientes: {{ states('sensor.farmos_pending_tasks') }}
-              **Última:** {{ state_attr('sensor.farmos_latest_task', 'tasks') }}
+            content: "## Bitácora Agroecológica — FarmOS"
+          - type: entity
+            entity: sensor.farmos_pending_tasks
+            name: "Tareas Pendientes"
+            icon: mdi:clipboard-list
+          - type: markdown
+            title: "Última Tarea Registrada"
+            content: >
+              **{{ states('sensor.farmos_latest_task') }}**
+
+
+              {% if state_attr('sensor.farmos_pending_tasks', 'data') %}
+              {% for task in state_attr('sensor.farmos_pending_tasks', 'data')[:5] %}
+              - {{ task.attributes.name }}
+              {% endfor %}
+              {% else %}
+              Sin tareas pendientes en la cola.
+              {% endif %}
+          - type: conditional
+            conditions:
+              - entity: sensor.farmos_pending_tasks
+                state_not: "0"
+            card:
+              type: markdown
+              content: >
+                ### Acción Requerida
+
+                Hay **{{ states('sensor.farmos_pending_tasks') }}** tareas orgánicas pendientes de ejecución.
 LOVELACEEOF
         echo "Home Assistant and Lovelace configuration created"
       '';
