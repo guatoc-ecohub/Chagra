@@ -82,11 +82,11 @@ in
           OLLAMA_API_BASE_URL = "http://127.0.0.1:${toString registry.ports.ollama}";
           WHISPER_API_URL = "http://127.0.0.1:${toString registry.ports.whisper}";
           PIPER_API_URL = "http://127.0.0.1:${toString registry.ports.piper}";
-
+          
           # WebUI configuration
+          WEBUI_SECRET_KEY = "changeme-${name}";  # Should use SOPS in production
           DEFAULT_MODEL = instanceConfig.model or "llama3.2";
         };
-        environmentFiles = [ config.sops.secrets."clawbot-${name}-env".path ];
         extraOptions = [
           "--network=ai-net"
           "--name=clawbot-${name}"
@@ -94,15 +94,6 @@ in
       }
     ) cfg.instances;
     
-    # SOPS secrets: one env file per ClawBot instance (contains WEBUI_SECRET_KEY)
-    sops.secrets = lib.mapAttrs' (name: _:
-      lib.nameValuePair "clawbot-${name}-env" {
-        owner = "root";
-        group = "root";
-        mode = "0400";
-      }
-    ) cfg.instances;
-
     # Firewall: Allow access to clawbot ports from local network
     networking.firewall.allowedTCPPorts = lib.mapAttrsToList (name: instanceConfig:
       let

@@ -50,6 +50,7 @@
           ./modules/media/default.nix  # Multimedia: Radarr, Sonarr, Lidarr, Prowlarr, qBittorrent, Navidrome (refactorizado)
           # ./modules/ai.nix           # IA Local: Ollama, wyoming-piper, wyoming-whisper (REEMPLAZADO por modules/ai/)
           ./modules/music-pipeline.nix  # Music: Beets, YouTube, Nextcloud
+          ./modules/experimental-agents.nix  # Picoclaw
           ./modules/homeassistant-config.nix  # Configuración de infraestructura Home Assistant
           ./modules/dev-environment.nix
           ./modules/syncthing.nix

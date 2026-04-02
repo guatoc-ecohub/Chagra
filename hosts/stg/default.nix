@@ -5,6 +5,7 @@
     ../../modules/dev-environment.nix
     ../../modules/desktop-gaming.nix
     ../../modules/tunnel-connectivity.nix
+    ../../modules/experimental-agents.nix
     ../../modules/audio-hifi.nix  # Audio Hi-Fi para IEMs
   ];
 
@@ -18,6 +19,13 @@
     age.keyFile = "/home/kortux/.config/sops/age/keys.txt";
   };
 
+  # Experimental Agents (Picoclaw + OpenClaw)
+  services.experimental-agents = {
+    enable = true;
+    enablePicoclaw = true;  # glm-4.7 con API key
+    enableOpenclaw = false;  # Por ahora deshabilitado
+  };
+  
   # --- 1. FIX DE GPU AMD (Vital para tu Acer) ---
   # "amdgpu.sg_display=0" arregla el error "Secure display: Generic Failure"
   # que ves en las letras rojas y evita que la gráfica congele el arranque.
@@ -75,6 +83,13 @@
     extraUpFlags = [ "--ssh" ];
   };
   
+  # Experimental Agents (Picoclaw + OpenClaw)
+  # services.experimental-agents = {
+  #   enable = true;
+  #   enablePicoclaw = true;
+  #   enableOpenclaw = false;
+  # };
+  
   networking = {
     hostName = "stg";
     networkmanager.enable = true; 
@@ -118,7 +133,7 @@
     bitwarden-desktop
 
     # PlatformIO FHS Environment
-    (pkgs.buildFHSUserEnv {
+    (pkgs.buildFHSEnv {
       name = "platformio-fhs-env";
       targetPkgs = pkgs: (with pkgs; [
         platformio-core
