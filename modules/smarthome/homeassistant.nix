@@ -85,6 +85,7 @@ http:
   use_x_forwarded_for: true
   trusted_proxies:
     - 127.0.0.1
+    - "::1"
     - 192.168.1.0/24
     - 172.16.0.0/12
 
