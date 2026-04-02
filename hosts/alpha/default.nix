@@ -89,13 +89,9 @@
   # Los servicios IoT ya están configurados en modules/iot.nix
   # incluyendo Mosquitto, Home Assistant, Node-RED, InfluxDB y Grafana
 
-  # --- WYOMING PIPER TTS INTEGRATION ---
-  # Integración de Piper TTS vía protocolo Wyoming para Home Assistant
-  services.wyoming.piper.servers.default = {
-    enable = true;
-    voice = "es_ES-davefx-medium";
-    uri = "tcp://127.0.0.1:10200";
-  };
+  # --- WYOMING PIPER TTS ---
+  # Servicio Piper proporcionado por guatoc.ai.piper (Podman container en puerto 10200)
+  # NO habilitar services.wyoming.piper nativo — conflicto de puerto con el contenedor
 
   # --- MUSIC PIPELINE ---
   services.music-pipeline = {
@@ -128,6 +124,7 @@
     ollama.enable = true;
     whisper.enable = true;
     piper.enable = true;
+    piper.voice = "es_ES-davefx-medium";
     clawbots.enable = true;
     clawbots.instances = {
       guatoc = { port = 8090; };
@@ -293,12 +290,16 @@
     virtualHosts."app.guatoc.co" = {
       # 2. Binding universal para permitir tráfico desde la IP física de la LAN
       listen = [ { addr = "0.0.0.0"; port = 80; } ];
+      # Fase 11: Aceptar requests por IP además de dominio (Nest Hub iframe)
+      default = true;
       root = "/mnt/fast/appdata/farmos-pwa";
 
       locations."/" = {
         tryFiles = "$uri $uri/ /index.html";
         extraConfig = ''
           add_header Cache-Control "no-store, no-cache, must-revalidate";
+          # Fase 11: Permitir incrustar la PWA en iframe desde HA (Nest Hub Cast)
+          add_header Content-Security-Policy "frame-ancestors 'self' http://192.168.1.100:8123 https://ha.guatoc.co https://cast.home-assistant.io" always;
         '';
       };
 

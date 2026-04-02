@@ -20,7 +20,9 @@
       "Bash(git reset:*)",
       "Bash(grep:*)",
       "Bash(grep -o '<[A-Z][a-zA-Z]*' src/App.jsx src/components/*.jsx)",
-      "Bash(nix-instantiate --parse modules/smarthome/homeassistant.nix)"
+      "Bash(nix-instantiate --parse modules/smarthome/homeassistant.nix)",
+      "Bash(sudo systemctl:*)",
+      "Bash(nix flake:*)"
     ]
   }
 }

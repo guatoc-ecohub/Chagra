@@ -92,19 +92,8 @@ http:
 # Integración Cast (requiere external_url HTTPS)
 cast:
 
-# RGB Control via Picoclaw API
-rest:
-  - resource: "http://127.0.0.1:18791/lights/status"
-    method: GET
-    scan_interval: 30
-    sensor:
-      - name: "RGB Status"
-        value_template: '{{ value_json.status }}'
-        json_attributes:
-          - color
-          - mode
-
 # FarmOS API Integration
+rest:
   - resource: "https://farmos.guatoc.co/api/log/task?filter[status]=pending&sort=-timestamp"
     scan_interval: 300
     timeout: 30
@@ -126,16 +115,74 @@ rest:
             None
           {% endif %}
 
-# Wyoming Piper TTS Integration
-wyoming:
-  - host: "127.0.0.1"
-    port: 10200
-    platform: "piper"
+# Wyoming Piper TTS — contenedor en 127.0.0.1:10200 (HA usa --network=host)
+# Requiere: Agregar integración Wyoming via HA UI si no está configurada
+# Settings → Integrations → Add → Wyoming Protocol → host: 127.0.0.1, port: 10200
 
 # Media Player Nest Hub (Cast)
 media_player:
   - platform: cast
     host: 192.168.1.107
+
+# =============================================================================
+# Fase 10 — Sensores de Contenedores Críticos (TCP port check)
+# Ejecutados dentro del contenedor HA (--network=host → acceso a localhost)
+# =============================================================================
+command_line:
+  - binary_sensor:
+      name: "Contenedor FarmOS"
+      unique_id: container_farmos
+      command: >-
+        python3 -c "import socket; s=socket.create_connection(('127.0.0.1', 8081), 5); s.close(); print('ON')" 2>/dev/null || echo "OFF"
+      payload_on: "ON"
+      payload_off: "OFF"
+      device_class: connectivity
+      scan_interval: 60
+  - binary_sensor:
+      name: "Contenedor PostgreSQL"
+      unique_id: container_postgres
+      command: >-
+        python3 -c "import socket; s=socket.create_connection(('127.0.0.1', 5432), 5); s.close(); print('ON')" 2>/dev/null || echo "OFF"
+      payload_on: "ON"
+      payload_off: "OFF"
+      device_class: connectivity
+      scan_interval: 60
+  - binary_sensor:
+      name: "Contenedor Mosquitto"
+      unique_id: container_mosquitto
+      command: >-
+        python3 -c "import socket; s=socket.create_connection(('127.0.0.1', 1883), 5); s.close(); print('ON')" 2>/dev/null || echo "OFF"
+      payload_on: "ON"
+      payload_off: "OFF"
+      device_class: connectivity
+      scan_interval: 60
+  - binary_sensor:
+      name: "Contenedor Node-RED"
+      unique_id: container_nodered
+      command: >-
+        python3 -c "import socket; s=socket.create_connection(('127.0.0.1', 1880), 5); s.close(); print('ON')" 2>/dev/null || echo "OFF"
+      payload_on: "ON"
+      payload_off: "OFF"
+      device_class: connectivity
+      scan_interval: 60
+  - binary_sensor:
+      name: "Contenedor Ollama"
+      unique_id: container_ollama
+      command: >-
+        python3 -c "import socket; s=socket.create_connection(('127.0.0.1', 11434), 5); s.close(); print('ON')" 2>/dev/null || echo "OFF"
+      payload_on: "ON"
+      payload_off: "OFF"
+      device_class: connectivity
+      scan_interval: 60
+  - binary_sensor:
+      name: "Contenedor Piper TTS"
+      unique_id: container_piper
+      command: >-
+        python3 -c "import socket; s=socket.create_connection(('127.0.0.1', 10200), 5); s.close(); print('ON')" 2>/dev/null || echo "OFF"
+      payload_on: "ON"
+      payload_off: "OFF"
+      device_class: connectivity
+      scan_interval: 60
 
 # Conmutador de control para rotación del screensaver
 input_boolean:
@@ -154,47 +201,7 @@ lovelace:
       show_in_sidebar: false
       filename: lovelace/nest_hub.yaml
 
-# RGB Light entities using MQTT
-light:
-  - platform: mqtt
-    name: "Server RGB"
-    command_topic: "homeassistant/light/server_rgb/set"
-    state_topic: "homeassistant/light/server_rgb/state"
-    brightness_command_topic: "homeassistant/light/server_rgb/brightness/set"
-    brightness_state_topic: "homeassistant/light/server_rgb/brightness/state"
-    payload_on: "ON"
-    payload_off: "OFF"
-    qos: 1
-    retain: true
-
-# RGB Switch for common colors
-switch:
-  - platform: template
-    switches:
-      rgb_red:
-        value_template: "{{ states.light.server_rgb.state }}"
-        turn_on:
-          service: rest_command.set_rgb_color
-          data:
-            color: "FF0000"
-        turn_off:
-          service: rest_command.set_rgb_color
-          data:
-            color: "000000"
-
-# REST Commands for RGB control
-rest_command:
-  set_rgb_color:
-    url: "http://127.0.0.1:18791/lights/{{ color }}"
-    method: GET
-  rgb_off:
-    url: "http://127.0.0.1:18791/lights/off"
-    method: GET
-  rgb_default:
-    url: "http://127.0.0.1:18791/lights/default"
-    method: GET
-
-# Google Assistant Voice Interception
+# Script de voz
 script:
   intercept_voice_command:
     alias: "Procesar Comando de Voz con Ollama"
@@ -301,6 +308,63 @@ automation:
           entity_id: media_player.oficina
           dashboard_path: nest-hub
           view_path: view_hw
+
+  # =====================================================================
+  # Fase 10 — Watchdog de Contenedores Críticos
+  # Trigger: cualquier binary_sensor de contenedor OFF por >1 minuto
+  # Actions: Interrumpe Nest Hub con vista de alertas + TTS Piper
+  # =====================================================================
+  - id: "container_critical_watchdog"
+    alias: "Fase 10 - Watchdog Contenedores Críticos"
+    description: "Alerta reactiva cuando un contenedor crítico cae por más de 1 minuto"
+    trigger:
+      - platform: state
+        entity_id:
+          - binary_sensor.contenedor_farmos
+          - binary_sensor.contenedor_postgresql
+          - binary_sensor.contenedor_mosquitto
+          - binary_sensor.contenedor_node_red
+          - binary_sensor.contenedor_ollama
+          - binary_sensor.contenedor_piper_tts
+        to: "off"
+        for:
+          minutes: 1
+    action:
+      # Paso 1: Interrumpir rotación del screensaver
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.nest_screensaver_active
+      # Paso 2: Proyectar vista de alertas en Nest Hub
+      - service: cast.show_lovelace_view
+        data:
+          entity_id: media_player.oficina
+          dashboard_path: nest-hub
+          view_path: alert_view
+      - delay: "00:00:02"
+      # Paso 3: Alerta de voz via Wyoming Piper
+      - service: tts.speak
+        target:
+          entity_id: tts.piper
+        data:
+          media_player_entity_id: media_player.oficina
+          message: >-
+            Alerta crítica en el Nodo Alfa. El servicio {{ trigger.to_state.name }} está inactivo. Requiere revisión inmediata.
+      # Paso 4: Esperar recuperación y restaurar rotación
+      - wait_for_trigger:
+          - platform: state
+            entity_id:
+              - binary_sensor.contenedor_farmos
+              - binary_sensor.contenedor_postgresql
+              - binary_sensor.contenedor_mosquitto
+              - binary_sensor.contenedor_node_red
+              - binary_sensor.contenedor_ollama
+              - binary_sensor.contenedor_piper_tts
+            to: "on"
+        timeout: "01:00:00"
+        continue_on_timeout: true
+      - service: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.nest_screensaver_active
 EOF
 
         # Create Lovelace kiosk dashboard — 3 vistas rotativas para Nest Hub
@@ -395,45 +459,91 @@ views:
                 name: "Bridge Zigbee"
 
   # =================================================================
-  # Vista 3 — Bitácora FarmOS (Tareas Orgánicas)
+  # Vista 3 — PWA Chagra (iframe fullscreen) — Fase 11
+  # Requiere: Nginx CSP frame-ancestors permite http://192.168.1.100:8123
   # =================================================================
-  - title: "Bitácora"
+  - title: "Chagra"
     path: view_farm
     icon: mdi:book-open-page-variant
-    panel: false
-    # theme: Backend-slate
+    panel: true
     cards:
-      - type: vertical-stack
-        cards:
-          - type: markdown
-            content: "## Bitácora Agroecológica — FarmOS"
-          - type: entity
-            entity: sensor.farmos_pending_tasks
-            name: "Tareas Pendientes"
-            icon: mdi:clipboard-list
-          - type: markdown
-            title: "Última Tarea Registrada"
-            content: >
-              **{{ states('sensor.farmos_latest_task') }}**
+      - type: iframe
+        url: "http://192.168.1.100/#dashboard"
+        aspect_ratio: "100%"
+
+  # =================================================================
+  # Vista 4 — Alertas de Contenedores (Fase 10)
+  # Solo muestra servicios caídos. Proyectada por automatización.
+  # =================================================================
+  - title: "Alertas"
+    path: alert_view
+    icon: mdi:alert-octagon
+    panel: false
+    cards:
+      - type: markdown
+        content: "## ALERTA — Servicios Críticos Inactivos"
+        style: |
+          ha-card { background-color: #b71c1c; color: white; }
+      - type: conditional
+        conditions:
+          - entity: binary_sensor.contenedor_farmos
+            state: "off"
+        card:
+          type: entity
+          entity: binary_sensor.contenedor_farmos
+          name: "FarmOS (puerto 8081)"
+          icon: mdi:server-off
+      - type: conditional
+        conditions:
+          - entity: binary_sensor.contenedor_postgresql
+            state: "off"
+        card:
+          type: entity
+          entity: binary_sensor.contenedor_postgresql
+          name: "PostgreSQL (puerto 5432)"
+          icon: mdi:database-off
+      - type: conditional
+        conditions:
+          - entity: binary_sensor.contenedor_mosquitto
+            state: "off"
+        card:
+          type: entity
+          entity: binary_sensor.contenedor_mosquitto
+          name: "Mosquitto MQTT (puerto 1883)"
+          icon: mdi:access-point-off
+      - type: conditional
+        conditions:
+          - entity: binary_sensor.contenedor_node_red
+            state: "off"
+        card:
+          type: entity
+          entity: binary_sensor.contenedor_node_red
+          name: "Node-RED (puerto 1880)"
+          icon: mdi:pipe-disconnected
+      - type: conditional
+        conditions:
+          - entity: binary_sensor.contenedor_ollama
+            state: "off"
+        card:
+          type: entity
+          entity: binary_sensor.contenedor_ollama
+          name: "Ollama LLM (puerto 11434)"
+          icon: mdi:brain
+      - type: conditional
+        conditions:
+          - entity: binary_sensor.contenedor_piper_tts
+            state: "off"
+        card:
+          type: entity
+          entity: binary_sensor.contenedor_piper_tts
+          name: "Piper TTS (puerto 10200)"
+          icon: mdi:microphone-off
+      - type: markdown
+        content: >
+          **Timestamp:** {{ now().strftime('%Y-%m-%d %H:%M:%S') }}
 
 
-              {% if state_attr('sensor.farmos_pending_tasks', 'data') %}
-              {% for task in state_attr('sensor.farmos_pending_tasks', 'data')[:5] %}
-              - {{ task.attributes.name }}
-              {% endfor %}
-              {% else %}
-              Sin tareas pendientes en la cola.
-              {% endif %}
-          - type: conditional
-            conditions:
-              - entity: sensor.farmos_pending_tasks
-                state_not: "0"
-            card:
-              type: markdown
-              content: >
-                ### Acción Requerida
-
-                Hay **{{ states('sensor.farmos_pending_tasks') }}** tareas orgánicas pendientes de ejecución.
+          La rotación del screensaver se reanudará automáticamente cuando los servicios se recuperen.
 LOVELACEEOF
         echo "Home Assistant and Lovelace configuration created"
       '';
