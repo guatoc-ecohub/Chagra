@@ -71,6 +71,8 @@ in
 
         # Overwrite — idempotent on every rebuild
         cat > /mnt/fast/appdata/homeassistant/configuration.yaml << 'EOF'
+default_config:
+
 homeassistant:
   name: Guatoc Alpha
   time_zone: America/Bogota
@@ -78,14 +80,15 @@ homeassistant:
   internal_url: "http://192.168.1.100:8123"
   external_url: "https://ha.guatoc.co"
 
-# HTTP — Proxies confiables para Cast y Nginx
+# HTTP — Proxies confiables para Cast y Nginx/Cloudflare Tunnel
 http:
   use_x_forwarded_for: true
   trusted_proxies:
     - 127.0.0.1
     - 192.168.1.0/24
+    - 172.16.0.0/12
 
-# Integración Cast (descubrimiento mDNS habilitado por default_config)
+# Integración Cast (requiere external_url HTTPS)
 cast:
 
 # RGB Control via Picoclaw API
@@ -131,7 +134,7 @@ wyoming:
 # Media Player Nest Hub (Cast)
 media_player:
   - platform: cast
-    host: 192.168.1.117
+    host: 192.168.1.107
 
 # Conmutador de control para rotación del screensaver
 input_boolean:
