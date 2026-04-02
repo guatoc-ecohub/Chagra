@@ -131,7 +131,7 @@ wyoming:
 # Media Player Nest Hub (Cast)
 media_player:
   - platform: cast
-    host: 192.168.1.105
+    host: 192.168.1.117
 
 # Conmutador de control para rotación del screensaver
 input_boolean:
@@ -197,7 +197,7 @@ script:
     sequence:
       - service: tts.google_translate_say
         data:
-          entity_id: media_player.nest_hub
+          entity_id: media_player.oficina
           message: "Sí pa, ¿pa qué soy bueno?"
 
 automation:
@@ -227,7 +227,7 @@ automation:
             # Vista 1: Hardware del Nodo Alpha
             - service: cast.show_lovelace_view
               data:
-                entity_id: media_player.google_nest
+                entity_id: media_player.oficina
                 dashboard_path: nest-hub
                 view_path: view_hw
             - delay:
@@ -235,7 +235,7 @@ automation:
             # Vista 2: Sensores IoT del Invernadero
             - service: cast.show_lovelace_view
               data:
-                entity_id: media_player.google_nest
+                entity_id: media_player.oficina
                 dashboard_path: nest-hub
                 view_path: view_iot
             - delay:
@@ -243,7 +243,7 @@ automation:
             # Vista 3: Bitácora FarmOS
             - service: cast.show_lovelace_view
               data:
-                entity_id: media_player.google_nest
+                entity_id: media_player.oficina
                 dashboard_path: nest-hub
                 view_path: view_farm
             - delay:
@@ -259,7 +259,7 @@ automation:
     action:
       - service: media_player.turn_off
         target:
-          entity_id: media_player.google_nest
+          entity_id: media_player.oficina
 
   - id: "guatoc_active_watchdog"
     alias: "Guatoc Watchdog - Alertas Proactivas Nest Hub"
@@ -282,7 +282,7 @@ automation:
         target:
           entity_id: tts.piper
         data:
-          media_player_entity_id: media_player.google_nest
+          media_player_entity_id: media_player.oficina
           message: >
             {% if trigger.id == 'alerta_hidrica' %}
               En la buena pa, el invernadero presenta estrés hídrico crítico. Intervención requerida.
@@ -294,7 +294,7 @@ automation:
       - delay: "00:00:08"
       - service: cast.show_lovelace_view
         data:
-          entity_id: media_player.google_nest
+          entity_id: media_player.oficina
           dashboard_path: nest-hub
           view_path: view_hw
 EOF
@@ -314,7 +314,7 @@ views:
     path: view_hw
     icon: mdi:server
     panel: false
-    theme: Backend-slate
+    # theme: Backend-slate
     cards:
       - type: vertical-stack
         cards:
@@ -360,32 +360,24 @@ views:
     path: view_iot
     icon: mdi:sprout
     panel: false
-    theme: Backend-slate
+    # theme: Backend-slate
     cards:
       - type: vertical-stack
         cards:
           - type: markdown
             content: "## Invernadero 1 — Sensores Agroecológicos"
-          - type: custom:auto-entities
-            card:
-              type: glance
-              title: "Humedad del Suelo"
-              columns: 3
-            filter:
-              include:
-                - entity_id: "sensor.soil_moisture_*"
-              exclude:
-                - state: "unavailable"
-          - type: custom:auto-entities
-            card:
-              type: glance
-              title: "Temperatura Ambiente"
-              columns: 3
-            filter:
-              include:
-                - entity_id: "sensor.temperature_*"
-              exclude:
-                - state: "unavailable"
+          - type: glance
+            title: "Humedad del Suelo"
+            columns: 3
+            entities:
+              - entity: sensor.soil_moisture_greenhouse
+                name: "Invernadero"
+          - type: glance
+            title: "Temperatura Ambiente"
+            columns: 3
+            entities:
+              - entity: sensor.temperature_greenhouse
+                name: "Invernadero"
           - type: history-graph
             title: "Tendencia Hídrica (24h)"
             hours_to_show: 24
@@ -405,7 +397,7 @@ views:
     path: view_farm
     icon: mdi:book-open-page-variant
     panel: false
-    theme: Backend-slate
+    # theme: Backend-slate
     cards:
       - type: vertical-stack
         cards:
