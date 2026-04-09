@@ -19,7 +19,14 @@
       "Bash(npm install:*)",
       "Bash(git reset:*)",
       "Bash(grep:*)",
-      "Bash(grep -o '<[A-Z][a-zA-Z]*' src/App.jsx src/components/*.jsx)"
+      "Bash(grep -o '<[A-Z][a-zA-Z]*' src/App.jsx src/components/*.jsx)",
+      "Bash(sudo systemctl:*)",
+      "Bash(sudo nixos-rebuild:*)",
+      "Bash(systemctl is-active:*)",
+      "Bash(systemctl is-enabled:*)",
+      "Bash(systemctl --user --machine=kortux@ list-units --failed --all)",
+      "Bash(systemctl list-units:*)",
+      "Bash(podman ps:*)"
     ]
   }
 }

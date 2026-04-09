@@ -36,10 +36,37 @@ in
       volumes = [
         "/mnt/fast/appdata/ollama:/root/.ollama"
       ];
+      environment = {
+        OLLAMA_HOST = "0.0.0.0:11434";
+        OLLAMA_ORIGINS = "https://app.guatoc.co,http://app.guatoc.co,http://192.168.1.100,http://localhost";
+      };
       extraOptions = [
         "--network=ai-net"
         "--name=ollama"
       ];
+    };
+
+    # Provisionamiento declarativo de modelos: pull post-arranque (idempotente)
+    systemd.services.ollama-model-pull = {
+      description = "Pull Ollama models declared for Guatoc";
+      after = [ "podman-ollama.service" ];
+      requires = [ "podman-ollama.service" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+      };
+      script = ''
+        # Espera a que el daemon de Ollama esté disponible
+        for i in $(seq 1 30); do
+          if ${pkgs.curl}/bin/curl -sf http://127.0.0.1:11434/api/tags >/dev/null; then
+            break
+          fi
+          sleep 2
+        done
+        # Pull idempotente: Ollama detecta si el modelo ya existe
+        ${pkgs.podman}/bin/podman exec ollama ollama pull gemma4:e4b || true
+      '';
     };
 
     networking.firewall.allowedTCPPorts = [ registry.ports.ollama ];

@@ -169,7 +169,7 @@
   # --- GAMING ---
   guatoc.gaming = {
     enable = true;
-    romm.enable = true;
+    romm.enable = false;
   };
 
   # --- SECURITY ---
@@ -379,7 +379,7 @@
 
       # 5. Enrutamiento de Ollama (Inferencia de IA)
       locations."/api/ollama/" = {
-        proxyPass = "http://127.0.0.1:11434/api/";
+        proxyPass = "http://127.0.0.1:11434/";
         extraConfig = ''
           # Timeouts extendidos para inferencias de IA (pueden tardar 60+ segundos)
           proxy_connect_timeout 120s;
