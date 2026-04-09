@@ -1,0 +1,116 @@
+# DevOps Hand - Agente de Infraestructura (Nodo Alpha)
+# Modelo: GLM-5. Aislamiento estricto de repositorios.
+
+[hand]
+name         = "devops"
+display_name = "Guatoc DevOps Hand"
+model        = "glm-5"
+temperature  = 0.1
+max_tokens   = 8192
+
+[authorization]
+allowed_users = ["<@KortuxAdmin>"]
+deny_default  = true
+
+# ---------------------------------------------------------------
+# WORKSPACES — Aislamiento criptográfico y de filesystem
+# Cada workspace tiene su propio directorio, token GitHub y
+# configuración git. El agente NO puede cruzar entre ellos.
+# ---------------------------------------------------------------
+
+[[workspaces]]
+name        = "nixos-private"
+path        = "/var/lib/openfang/workspace/nixos-private"
+repository  = "git@github.com:kortux/guatoc-nixos-stable.git"
+branch      = "master"
+visibility  = "private"
+github_token_env = "GH_TOKEN_NIXOS_PRIVATE"   # token con scope repo (privado)
+ssh_key     = "/var/lib/openfang/keys/nixos_id_ed25519"
+git_user    = "OpenFang DevOps"
+git_email   = "devops@guatoc.co"
+allow_push  = true
+allow_pr    = true
+
+[[workspaces]]
+name        = "chagra-public"
+path        = "/var/lib/openfang/workspace/chagra-public"
+repository  = "https://github.com/kortux/FarmOS-NewFace.git"
+branch      = "main"
+visibility  = "public"
+github_token_env = "GH_TOKEN_CHAGRA_PUBLIC"   # token con scope public_repo + PR
+git_user    = "OpenFang DevOps"
+git_email   = "devops@guatoc.co"
+allow_push  = false   # solo PRs desde fork/branch
+allow_pr    = true
+
+# ---------------------------------------------------------------
+# SANDBOX — el proceso del agente se ejecuta encerrado vía
+# systemd (BindPaths) en el workspace activo de la solicitud.
+# ---------------------------------------------------------------
+[sandbox]
+mode               = "strict"
+filesystem_jail    = true
+forbid_cross_workspace = true
+network_allowlist  = [
+  "github.com",
+  "api.github.com",
+  "objects.githubusercontent.com",
+  "cache.nixos.org",
+]
+
+[tools]
+enabled = [
+  "fs.read",
+  "fs.write",
+  "fs.list",
+  "git.status",
+  "git.diff",
+  "git.commit",
+  "git.push",
+  "github.pr_create",
+  "shell.exec",
+  "nix.flake_check",
+]
+
+[tools.shell]
+allowed_binaries = [
+  "git", "nix", "nixos-rebuild", "rsync", "ssh", "cat", "ls",
+  "grep", "find", "jq", "node", "npm", "vite",
+]
+
+# ---------------------------------------------------------------
+# SYSTEM PROMPT
+# ---------------------------------------------------------------
+[prompt]
+system = """
+Eres el DevOps Hand de Guatoc, ejecutándote sobre GLM-5 dentro del nodo Alpha
+(NixOS, declarativo, inmutable). Tu rol es Arquitecto de Infraestructura y
+DevOps Senior. Tono: impersonal, analítico, determinista.
+
+REGLA DE AISLAMIENTO ABSOLUTA — NO NEGOCIABLE:
+Bajo ninguna circunstancia puedes mover, copiar o referenciar archivos entre
+el workspace `nixos-private` y el workspace `chagra-public`. Cada operación
+de git (status, diff, commit, push, pull-request) debe limitarse
+exclusivamente al directorio del workspace correspondiente a la solicitud
+del usuario. Si una solicitud requiere tocar ambos repositorios, DETENTE,
+divídela en dos operaciones independientes y solicita confirmación
+explícita antes de ejecutar cada una. Cualquier intento de symlink, cp, mv,
+git submodule, git worktree o include cruzado entre ambos workspaces debe
+ser rechazado y reportado al admin.
+
+Workspaces disponibles:
+  - nixos-private  → infraestructura NixOS (privado, push directo permitido)
+  - chagra-public  → PWA Chagra / FarmOS-NewFace (público, solo PRs)
+
+Antes de cualquier acción declara explícitamente: `workspace=<nombre>`.
+Las rutas que escribas o leas deben estar contenidas en ese workspace; si
+detectas una ruta fuera, aborta.
+
+Para despliegues NixOS sigue el protocolo del CLAUDE.md del repo: edita
+módulos, valida sintaxis, y emite el comando `sudo nixos-rebuild switch
+--flake .#alpha` para que el admin lo ejecute manualmente. No intentes
+ejecutar sudo remoto.
+
+Para la PWA sigue el pipeline stg→alpha (npm run build → rsync → verificación
+remota). Reporta exit codes.
+"""

@@ -251,6 +251,7 @@
     extraGroups = [ "wheel" "docker" "networkmanager" "audio" "dialout" ];
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFslJYY5DIarB0VYAP1FZ/Xt03OQufL8Q85fKlIRyIPj kortux@nixos"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB2ynuWyVqvLJF6juhwLKjoSQuxaLc8Sl6I6v+HoyfnY kortux@stg"
     ];
   };
 
@@ -280,8 +281,7 @@
         port = 2222;
         authorizedKeys = [
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFslJYY5DIarB0VYAP1FZ/Xt03OQufL8Q85fKlIRyIPj kortux@nixos"
-          # Agregar llave pública del Acer (STG) aquí cuando esté disponible
-          # "ssh-ed25519 AAAA... stg@acer"
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB2ynuWyVqvLJF6juhwLKjoSQuxaLc8Sl6I6v+HoyfnY kortux@stg"
         ];
         hostKeys = [ "/boot/initrd_ssh_host_ed25519_key" ];
       };

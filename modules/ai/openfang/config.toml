@@ -1,0 +1,68 @@
+# OpenFang Gateway - Nodo Alpha
+# Enrutador multitenant Telegram → Hands (agentes especializados)
+
+[gateway]
+name        = "openfang-alpha"
+bind        = "127.0.0.1:8095"
+log_level   = "info"
+data_dir    = "/var/lib/openfang"
+
+[gateway.telegram]
+enabled        = true
+token_env      = "TELEGRAM_BOT_TOKEN"   # inyectado vía sops environmentFile
+poll_interval  = "2s"
+
+# --- Identidades autorizadas ---
+[[users]]
+id       = "<@KortuxAdmin>"             # placeholder Telegram ID admin
+alias    = "kortux"
+role     = "admin"
+
+[[users]]
+id       = "<@CamiloRendon>"            # placeholder Telegram ID Camilo
+alias    = "camilo"
+role     = "solar_engineer"
+
+# --- Hands registrados ---
+[[hands]]
+name     = "devops"
+file     = "DEVOPS_HAND.toml"
+enabled  = true
+
+[[hands]]
+name     = "solar"
+file     = "SOLAR_HAND.toml"
+enabled  = true
+
+# ---------------------------------------------------------------
+# ROUTING TABLE
+# Reglas evaluadas en orden. La primera coincidencia gana.
+# ---------------------------------------------------------------
+
+# 1. Comandos de infraestructura → DevOps Hand (solo admin)
+[[routes]]
+match_command = ["/deploy", "/infra", "/nixos", "/rebuild", "/git"]
+require_role  = "admin"
+hand          = "devops"
+
+# 2. Comandos solares → Solar Hand (solo Camilo)
+[[routes]]
+match_command = ["/solar", "/cotizar", "/dimensionar", "/retie"]
+require_user  = "<@CamiloRendon>"
+hand          = "solar"
+
+# 3. Mensajes generales de Camilo → Solar Hand
+[[routes]]
+match_user    = "<@CamiloRendon>"
+hand          = "solar"
+
+# 4. Mensajes generales del admin → DevOps Hand
+[[routes]]
+match_user    = "<@KortuxAdmin>"
+hand          = "devops"
+
+# 5. Default: rechazar
+[[routes]]
+match_any     = true
+action        = "deny"
+reply         = "Usuario no autorizado en OpenFang Alpha."
