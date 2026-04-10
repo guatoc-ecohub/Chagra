@@ -1,0 +1,31 @@
+name: Deploy Chagra PWA
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, alpha]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Deploy to production
+        run: rsync -avz --delete dist/ /mnt/fast/appdata/farmos-pwa/
+
+      - name: Verify deployment
+        run: |
+          test -f /mnt/fast/appdata/farmos-pwa/index.html || exit 1
+          echo "Deploy OK: $(date -Iseconds)"
