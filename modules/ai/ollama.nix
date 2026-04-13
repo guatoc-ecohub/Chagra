@@ -38,7 +38,7 @@ in
       ];
       environment = {
         OLLAMA_HOST = "0.0.0.0:11434";
-        OLLAMA_ORIGINS = "https://app.guatoc.co,http://app.guatoc.co,http://192.168.1.100,http://localhost";
+        OLLAMA_ORIGINS = "https://chagra.guatoc.co,http://chagra.guatoc.co,http://192.168.1.100,http://localhost";
       };
       extraOptions = [
         "--network=ai-net"
@@ -66,6 +66,7 @@ in
         done
         # Pull idempotente: Ollama detecta si el modelo ya existe
         ${pkgs.podman}/bin/podman exec ollama ollama pull gemma4:e4b || true
+        ${pkgs.podman}/bin/podman exec ollama ollama pull jyan1/paligemma-mix-224 || true
       '';
     };
 

@@ -26,7 +26,22 @@
       "Bash(systemctl is-enabled:*)",
       "Bash(systemctl --user --machine=kortux@ list-units --failed --all)",
       "Bash(systemctl list-units:*)",
-      "Bash(podman ps:*)"
+      "Bash(podman ps:*)",
+      "WebFetch(domain:ollama.com)",
+      "Bash(nix flake:*)",
+      "Bash(nix-instantiate hosts/alpha/default.nix -E \"\\(import <nixpkgs> { system = \\\\\"x86_64-linux\\\\\"; }\\).callPackage ./hosts/alpha/default.nix {}\" --strict)",
+      "Bash(find /home/kortux/guatoc-nixos-stable -name \"*.nix\" -exec grep -l \"registry\\\\.ports\\\\.\" {} \\\\;)",
+      "Bash(ip addr:*)",
+      "Bash(ip route:*)",
+      "Bash(ping -c 2 -W 3 192.168.1.1)",
+      "Bash(ping -c 2 -W 3 1.1.1.1)",
+      "Bash(journalctl -b -u NetworkManager --no-pager -n 40)",
+      "Bash(journalctl -b -u systemd-networkd --no-pager -n 20)",
+      "Bash(journalctl -b -u cloudflared-tunnel --no-pager -n 30)",
+      "Bash(journalctl -b -u tailscaled --no-pager -n 20)",
+      "Bash(journalctl -u sshd -n 30 --no-pager)",
+      "Bash(journalctl --user -n 30 --no-pager -g ssh)",
+      "Bash(ssh-keygen:*)"
     ]
   }
 }

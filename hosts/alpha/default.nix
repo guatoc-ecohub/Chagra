@@ -10,6 +10,7 @@
     ../../modules/ai
     ../../modules/iot.nix
     ../../modules/farmos.nix
+    ../../modules/cicd-runner.nix
   ];
 
   # --- TIMEZONE ---
@@ -43,8 +44,8 @@
 
     secrets = {
       github-runner-token = {
-        owner = "root";
-        group = "root";
+        owner = "runner";
+        group = "runner";
         mode = "0400";
       };
       zpool-key = {
@@ -296,7 +297,7 @@
     enable = true;
 
     # 1. El VirtualHost DEBE llamarse exactamente como el dominio público
-    virtualHosts."app.guatoc.co" = {
+    virtualHosts."chagra.guatoc.co" = {
       # 2. Binding universal para permitir tráfico desde la IP física de la LAN
       listen = [ { addr = "0.0.0.0"; port = 80; } ];
       root = "/mnt/fast/appdata/farmos-pwa";
@@ -381,10 +382,30 @@
       locations."/api/ollama/" = {
         proxyPass = "http://127.0.0.1:11434/";
         extraConfig = ''
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+
           # Timeouts extendidos para inferencias de IA (pueden tardar 60+ segundos)
           proxy_connect_timeout 120s;
           proxy_send_timeout 120s;
           proxy_read_timeout 120s;
+
+          # CORS para peticiones desde la PWA
+          add_header 'Access-Control-Allow-Origin' '*' always;
+          add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
+          add_header 'Access-Control-Allow-Headers' 'Authorization,Content-Type,Accept,Origin,User-Agent,DNT,Cache-Control,X-Mx-ReqToken,Keep-Alive,X-Requested-With,If-Modified-Since' always;
+
+          if ($request_method = 'OPTIONS') {
+              add_header 'Access-Control-Allow-Origin' '*';
+              add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+              add_header 'Access-Control-Allow-Headers' 'Authorization,Content-Type,Accept,Origin,User-Agent,DNT,Cache-Control,X-Mx-ReqToken,Keep-Alive,X-Requested-With,If-Modified-Since';
+              add_header 'Access-Control-Max-Age' 1728000;
+              add_header 'Content-Type' 'text/plain; charset=utf-8';
+              add_header 'Content-Length' 0;
+              return 204;
+          }
         '';
       };
     };

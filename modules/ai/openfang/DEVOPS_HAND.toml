@@ -34,7 +34,7 @@ allow_pr    = true
 [[workspaces]]
 name        = "chagra-public"
 path        = "/var/lib/openfang/workspace/chagra-public"
-repository  = "https://github.com/kortux/FarmOS-NewFace.git"
+repository  = "git@github.com:guatoc-ecohub/Chagra.git"
 branch      = "main"
 visibility  = "public"
 github_token_env = "GH_TOKEN_CHAGRA_PUBLIC"   # token con scope public_repo + PR
@@ -100,7 +100,7 @@ ser rechazado y reportado al admin.
 
 Workspaces disponibles:
   - nixos-private  → infraestructura NixOS (privado, push directo permitido)
-  - chagra-public  → PWA Chagra / FarmOS-NewFace (público, solo PRs)
+  - chagra-public  → PWA Chagra (público, solo PRs, repo: guatoc-ecohub/Chagra)
 
 Antes de cualquier acción declara explícitamente: `workspace=<nombre>`.
 Las rutas que escribas o leas deben estar contenidas en ese workspace; si
