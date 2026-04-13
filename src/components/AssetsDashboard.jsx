@@ -631,8 +631,8 @@ export default function AssetsDashboard({ onBack }) {
     <div className="h-[100dvh] w-full bg-slate-950 text-slate-100 flex flex-col overflow-hidden">
       {/* Header */}
       <header className="p-4 bg-slate-950 border-b border-slate-800 flex items-center gap-4 shrink-0 shadow-md">
-        <button onClick={onBack} className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[48px] min-w-[48px] flex justify-center items-center shrink-0">
-          <ArrowLeft size={24} />
+        <button onClick={onBack} aria-label="Volver al panel principal" className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[48px] min-w-[48px] flex justify-center items-center shrink-0">
+          <ArrowLeft size={24} aria-hidden="true" />
         </button>
         <h2 className="text-2xl font-black flex-1">Activos</h2>
         <div className="flex items-center gap-2">
@@ -665,20 +665,23 @@ export default function AssetsDashboard({ onBack }) {
               {new Date(lastSync).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}
             </span>
           )}
-          <button onClick={handleRefresh} disabled={isLoading} className="p-2 bg-slate-800 rounded-lg active:bg-slate-700 disabled:opacity-50 min-h-[40px] min-w-[40px] flex items-center justify-center">
-            <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
+          <button onClick={handleRefresh} disabled={isLoading} aria-label="Sincronizar activos" className="p-2 bg-slate-800 rounded-lg active:bg-slate-700 disabled:opacity-50 min-h-[40px] min-w-[40px] flex items-center justify-center">
+            <RefreshCw size={16} aria-hidden="true" className={isLoading ? 'motion-safe:animate-spin' : ''} />
           </button>
         </div>
       </header>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-800 shrink-0 overflow-x-auto">
+      <div role="tablist" aria-label="Tipos de activos" className="flex border-b border-slate-800 shrink-0 overflow-x-auto">
         {ASSET_TABS.map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
+              role="tab"
+              aria-selected={isActive}
+              aria-controls={`tabpanel-${tab.id}`}
               onClick={() => { setActiveTab(tab.id); setShowForm(false); resetForm(); }}
               className={`flex-1 p-3 flex items-center justify-center gap-1.5 font-bold text-xs whitespace-nowrap transition-all min-h-[48px] ${
                 isActive
@@ -686,7 +689,7 @@ export default function AssetsDashboard({ onBack }) {
                   : 'text-slate-500 hover:text-slate-300'
               }`}
             >
-              <Icon size={16} />
+              <Icon size={16} aria-hidden="true" />
               <span>{tab.label}</span>
             </button>
           );
@@ -696,12 +699,13 @@ export default function AssetsDashboard({ onBack }) {
       {/* Barra de búsqueda */}
       <div className="p-3 shrink-0">
         <div className="relative">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" aria-hidden="true" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar activo..."
+            aria-label="Buscar activo"
             className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm min-h-[44px]"
           />
         </div>

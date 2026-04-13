@@ -127,7 +127,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
           onClick={handleRiegoAction}
           className="mt-3 w-full p-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold flex items-center justify-center gap-2 transition-all"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9m-6 6h12" />
           </svg>
           Ejecutar Riego
@@ -159,7 +159,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
           onClick={handleTemperatureAction}
           className="mt-3 w-full p-3 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-bold flex items-center justify-center gap-2 transition-all"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
           Control Climático
@@ -211,7 +211,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
           onClick={handleFungicidalAction}
           className="mt-3 w-full p-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold flex items-center justify-center gap-2 transition-all"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.932-3.131L13.068 4.632c-.667 1.239-2.003 1.239l3.035 14.872c-.57 1.464.391 3.131h13.866z" />
           </svg>
           Aplicar Fitosanitario
@@ -356,7 +356,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
       let aiAnalysis = '';
       try {
         const ollamaCtrl = new AbortController();
-        const ollamaTimeout = setTimeout(() => ollamaCtrl.abort(), 90000);
+        const ollamaTimeout = setTimeout(() => ollamaCtrl.abort(), 180000);
         const ollamaResponse = await fetch(`${OLLAMA_URL}/api/generate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -364,15 +364,28 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
           body: JSON.stringify({
             model: 'qwen3.5:4b',
             prompt: promptContext,
-            stream: false,
+            stream: true,
             options: { num_predict: 150 }
           })
         });
         clearTimeout(ollamaTimeout);
 
         if (ollamaResponse.ok) {
-          const ollamaData = await ollamaResponse.json();
-          aiAnalysis = ollamaData.response || ollamaData.message || 'Inferencia completada';
+          const reader = ollamaResponse.body.getReader();
+          const decoder = new TextDecoder();
+          let fullText = '';
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value, { stream: true });
+            for (const line of chunk.split('\n').filter(Boolean)) {
+              try {
+                const obj = JSON.parse(line);
+                if (obj.response) fullText += obj.response;
+              } catch { /* skip */ }
+            }
+          }
+          aiAnalysis = fullText || 'Inferencia completada';
         } else {
           const detail = await ollamaResponse.text().catch(() => '');
           console.warn(`[Telemetry] Ollama ${ollamaResponse.status}. Body: ${detail.slice(0, 200)}`);
@@ -443,13 +456,19 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
   };
 
   useEffect(() => {
-    fetchTelemetryAndAnalyze();
+    let cancelled = false;
+    const run = async () => {
+      if (cancelled) return;
+      await fetchTelemetryAndAnalyze();
+    };
+    run();
+    return () => { cancelled = true; };
   }, []);
 
   return (
     <div className="p-6 rounded-3xl bg-slate-900 border border-slate-700 shadow-2xl mb-8">
       <h3 className="text-2xl font-black mb-4 flex items-center gap-2">
-        <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+        <span className="w-3 h-3 bg-green-500 rounded-full motion-safe:animate-pulse"></span>
         Observabilidad Agronómica (Alpha)
       </h3>
 
@@ -527,9 +546,9 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         </div>
         {loading ? (
           <div className="flex gap-2 items-center">
-            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
-            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-75"></div>
-            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-150"></div>
+            <div className="w-2 h-2 bg-blue-400 rounded-full motion-safe:animate-bounce"></div>
+            <div className="w-2 h-2 bg-blue-400 rounded-full motion-safe:animate-bounce delay-75"></div>
+            <div className="w-2 h-2 bg-blue-400 rounded-full motion-safe:animate-bounce delay-150"></div>
             <span className="text-slate-400 text-sm italic font-medium">Analizando datos agronómicos...</span>
           </div>
         ) : (

@@ -251,21 +251,31 @@ En `src/` los puertos se consumen vía `VITE_FARMOS_URL`, lo cual es correcto. *
 
 ## Resumen ejecutivo
 
-| Categoría | Severidad | Cantidad |
-|-----------|-----------|----------|
-| Secretos en repo (tokens, client IDs) | 🔴 Crítica | 3 entradas / 2 archivos |
-| UUID de ubicación hardcoded | 🔴 Crítica | 7 ocurrencias |
-| IPs / hosts internos en docs | 🔴 Crítica | 4 ocurrencias |
-| Branding "Guatoc" filtrado a `src/` | 🔴 Crítica | 1 ocurrencia (`App.jsx:645`) |
-| Falta `.env.example` | 🟡 Alta | — |
-| Manejo cola HTTP 4xx bloqueante | 🟡 Alta | `syncManager.js:156–171` |
-| Sin `ErrorBoundary` ni timeout fetch | 🟡 Media | App.jsx, apiService.js |
+| Categoría | Severidad | Estado |
+|-----------|-----------|--------|
+| Secretos en repo (tokens, client IDs) | 🔴 Crítica | ✅ Mitigado — `.gitignore` cubre `.env`/`.env.local`, nunca commiteados |
+| UUID de ubicación hardcoded | 🔴 Crítica | ✅ Resuelto — `FARM_CONFIG.LOCATION_ID` vía envvar (2026-04-08) |
+| IPs / hosts internos en docs | 🔴 Crítica | ✅ Resuelto — `deployment_report_input_log.md` eliminado |
+| Branding "Guatoc" filtrado a `src/` | 🔴 Crítica | ✅ Resuelto — 0 ocurrencias en `src/` (2026-04-13) |
+| Falta `.env.example` | 🟡 Alta | ✅ Resuelto — incluye 5 variables (+ `VITE_HA_ACCESS_TOKEN`) |
+| Manejo cola HTTP 4xx bloqueante | 🟡 Alta | ✅ Resuelto — 4xx descarta, 5xx reintenta con backoff exponencial |
+| Sin `ErrorBoundary` ni timeout fetch | 🟡 Media | ✅ Resuelto — `ErrorBoundary.jsx` + `fetchWithTimeout` 10s |
+| App.jsx monolítico (>1000 LOC) | 🟡 Media | ✅ Resuelto — componentes extraídos, lazy loading (2026-04-13) |
+| Chunk bundle >500kB | 🟡 Media | ✅ Resuelto — vendor splitting, chunk principal 55kB (2026-04-13) |
+| Sin backoff exponencial en sync | 🟡 Media | ✅ Resuelto — `BASE_BACKOFF_MS * 2^(retries-1)` (2026-04-13) |
 | Marcadores TODO/FIXME explícitos | 🟢 Limpio | 0 |
 
-**Prerequisitos mínimos para publicar:**
-1. Revocar y eliminar tokens (`.env`, `.env.local`); auditar git history.
-2. Crear `.env.example` y `src/config/defaults.js` consumiendo `import.meta.env`.
-3. Externalizar `DEFAULT_LOCATION_ID` y eliminar literal `'Guatoc (Principal)'` de `App.jsx:645`.
-4. Mover/eliminar `CLAUDE.md` y `deployment_report_input_log.md`.
-5. Endurecer `syncManager` ante 4xx (descartar transacción, no reintentar indefinidamente).
-6. Añadir `ErrorBoundary` y `AbortController` con timeout en `apiService`.
+**Prerequisitos mínimos para publicar — Estado:**
+1. ~~Revocar y eliminar tokens~~ → `.gitignore` activo, nunca en history.
+2. ~~Crear `.env.example` y `src/config/defaults.js`~~ → Implementados.
+3. ~~Externalizar `DEFAULT_LOCATION_ID` y branding~~ → `FARM_CONFIG` centralizado.
+4. ~~Mover/eliminar docs internos~~ → `deployment_report_input_log.md` eliminado.
+5. ~~Endurecer `syncManager` ante 4xx~~ → Descarte + backoff exponencial.
+6. ~~`ErrorBoundary` y `AbortController`~~ → Implementados y wired.
+
+**Mejoras Fase 0 (2026-04-13):**
+- Code-splitting: `LoginScreen`, `HarvestLog`, `SeedingLog`, `InputLog`, `PlantAssetLog` extraídos de `App.jsx`.
+- `savePayload` extraído a `src/services/payloadService.js`.
+- Lazy loading con `React.lazy` + `Suspense` en todas las rutas.
+- Vendor splitting: `vendor-react` (182kB), `vendor-icons` (18kB), `vendor-state` (29kB).
+- Chunk principal reducido de **602kB → 55kB** (gzip 171kB → 16kB).

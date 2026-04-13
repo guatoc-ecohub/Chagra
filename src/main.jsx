@@ -1,3 +1,4 @@
+import './config/env'; // Validación de env vars al startup
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
@@ -15,12 +16,12 @@ syncManager.initDB().then(async () => {
   syncManager.startNetworkMonitoring();
 
   // Migración de identidad: ejecución única, solo si hay sesión activa.
-  if (navigator.onLine && !localStorage.getItem('chagra_rename_done')) {
+  if (navigator.onLine && !localStorage.getItem('chagra:v1:rename_done')) {
     getAccessToken().then((token) => {
       if (!token) return; // Sin sesión — no intentar PATCH sin auth
       renameWorker('Jimmy', PRIMARY_WORKER_NAME).then((result) => {
         if (result.success || result.error === 'not_found') {
-          localStorage.setItem('chagra_rename_done', '1');
+          localStorage.setItem('chagra:v1:rename_done', '1');
           console.info('[Migration] Renombrado completado o innecesario.');
         }
       }).catch((e) => console.warn('[Migration] Error renombrando:', e));

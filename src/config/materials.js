@@ -1,4 +1,4 @@
-// Single Source of Truth para insumos y unidades de la biofábrica Guatoc.
+// Single Source of Truth para insumos y unidades de la biofábrica.
 // Cada preset declara:
 //   - name:     nombre canónico (coincide con log.attributes.name tras strip del prefijo)
 //   - desc:     descripción corta para tooltip

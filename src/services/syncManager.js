@@ -5,6 +5,7 @@ const STORE_NAME = 'pending_transactions';
 const TASKS_STORE_NAME = 'pending_tasks';
 
 const MAX_RETRIES = 3;
+const BASE_BACKOFF_MS = 1000;
 
 class SyncManager {
   constructor() {
@@ -106,9 +107,16 @@ class SyncManager {
 
       for (const transaction of pendingTransactions) {
         // Saltar transacciones que superaron el máximo de reintentos
-        if ((transaction.retries || 0) >= MAX_RETRIES) {
+        const currentRetries = transaction.retries || 0;
+        if (currentRetries >= MAX_RETRIES) {
           failed++;
           continue;
+        }
+
+        // Backoff exponencial: esperar antes de reintentar transacciones fallidas
+        if (currentRetries > 0) {
+          const backoffMs = BASE_BACKOFF_MS * Math.pow(2, currentRetries - 1);
+          await new Promise((r) => setTimeout(r, backoffMs));
         }
 
         try {

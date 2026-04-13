@@ -38,7 +38,7 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
   // Para recursos estáticos: Cache First
-  if (ASSETS_TO_CACHE.some(path => url.pathname.includes(path))) {
+  if (ASSETS_TO_CACHE.some(path => url.pathname === path)) {
     event.respondWith(
       caches.match(event.request)
         .then(cachedResponse => {

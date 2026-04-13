@@ -63,13 +63,14 @@ const useAssetStore = create((set, get) => ({
       land: 'lands',
     };
     try {
-      const partialUpdate = {};
-      for (const t of targets) {
+      const results = await Promise.all(targets.map(async (t) => {
         const res = await fetchFn(`/api/asset/${t}`);
         const list = res.data || [];
         await assetCache.bulkPut(t, list);
-        partialUpdate[typeToKey[t]] = await assetCache.getByType(t);
-      }
+        return { key: typeToKey[t], data: await assetCache.getByType(t) };
+      }));
+      const partialUpdate = {};
+      for (const r of results) partialUpdate[r.key] = r.data;
       await assetCache.setLastSync(Date.now());
       set({
         ...partialUpdate,

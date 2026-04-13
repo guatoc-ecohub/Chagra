@@ -41,7 +41,7 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
   const defaults = SPECIES_DEFAULTS[speciesId];
   const speciesName = ALL_SPECIES.find((sp) => sp.id === speciesId)?.name || speciesId;
 
-  // Capa 3: Consulta cognitiva
+  // Capa 3: Consulta cognitiva (streaming para evitar timeout de Cloudflare)
   const handleAiQuery = async () => {
     setAiLoading(true);
     setAiError(null);
@@ -50,18 +50,33 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
       const res = await fetch('/api/ollama/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'qwen3.5:4b', prompt, stream: false }),
+        body: JSON.stringify({ model: 'qwen3.5:4b', prompt, stream: true }),
       });
       if (!res.ok) {
         const detail = await res.text().catch(() => '');
         console.warn(`[GuildAI] Ollama ${res.status}. Body: ${detail.slice(0, 200)}`);
         throw new Error(`Ollama ${res.status}`);
       }
-      const data = await res.json();
-      const text = data.response || '';
 
-      // Parsear JSON del response (Gemma puede envolver en markdown ```json ...```)
-      const cleaned = text.replace(/```json\s*/g, '').replace(/```/g, '').trim();
+      // Leer stream NDJSON línea por línea
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let fullText = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        for (const line of chunk.split('\n').filter(Boolean)) {
+          try {
+            const obj = JSON.parse(line);
+            if (obj.response) fullText += obj.response;
+          } catch { /* skip malformed lines */ }
+        }
+      }
+
+      // Parsear JSON del response acumulado
+      const cleaned = fullText.replace(/```json\s*/g, '').replace(/```/g, '').trim();
       const parsed = JSON.parse(cleaned);
       if (Array.isArray(parsed)) {
         setAiSuggestions(parsed.slice(0, 5));

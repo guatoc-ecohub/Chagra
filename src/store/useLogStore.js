@@ -43,9 +43,8 @@ export const useLogStore = create((set, get) => ({
     const types = ['log--seeding', 'log--planting', 'log--harvest', 'log--input'];
 
     try {
-      for (const type of types) {
+      await Promise.all(types.map(async (type) => {
         const suffix = type.split('--')[1];
-        // Filtro JSON:API verbose (patrón validado en syncManager)
         const endpoint =
           `/api/log/${suffix}?` +
           'include=quantity&' +
@@ -58,7 +57,7 @@ export const useLogStore = create((set, get) => ({
         } catch (err) {
           console.warn(`[LogStore] Fallo en pull de ${type}:`, err.message || err);
         }
-      }
+      }));
 
       // Rehidratar los assets actualmente visibles en el estado (si los hay)
       const currentKeys = Object.keys(get().logsByAsset);

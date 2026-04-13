@@ -22,10 +22,10 @@ import { FARM_CONFIG } from '../config/defaults';
  *   - initial:    GeoJSON geometry opcional para pre-cargar
  *   - onSave:     callback(geoJsonGeometry)
  *   - onCancel:   callback()
- *   - center:     [lat, lng] opcional, default Finca Guatoc aproximado
+ *   - center:     [lat, lng] opcional, default finca principal aproximado
  */
 
-// Centro por defecto: Choachí, Cundinamarca (área aproximada Finca Guatoc).
+// Centro por defecto: Choachí, Cundinamarca (área aproximada finca principal).
 // Se sobreescribe por `center` prop o por la primera geolocalización.
 const DEFAULT_CENTER = [4.5306, -73.9247];
 const DEFAULT_ZOOM = 17;

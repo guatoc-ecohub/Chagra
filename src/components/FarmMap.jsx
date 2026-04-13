@@ -24,7 +24,7 @@ import { logCache } from '../db/logCache';
 
 const DEFAULT_CENTER = [4.5306, -73.9247]; // Choachí, Cundinamarca
 const DEFAULT_ZOOM = 15;
-const MAP_STATE_KEY = 'chagra_map_state';
+const MAP_STATE_KEY = 'chagra:v1:map_state';
 
 // Estilos por tipo (Fase 17.2 — estilizado por asset_type).
 const STYLES = {

@@ -20,7 +20,7 @@ export default function NetworkStatusBar() {
   const refreshStats = useCallback(async () => {
     try {
       const stats = await syncManager.getSyncStats();
-      setPendingCount(stats.pendingCount);
+      setPendingCount((prev) => prev !== stats.pendingCount ? stats.pendingCount : prev);
 
       if (stats.isSyncing) {
         setStatus(STATUS.SYNCING);
@@ -30,7 +30,7 @@ export default function NetworkStatusBar() {
         setVisible(true);
       } else if (stats.pendingCount === 0 && status === STATUS.SYNCING) {
         // Transición de syncing a synced
-        setSyncedCount(syncedCount || 1);
+        setSyncedCount((prev) => prev || 1);
         setStatus(STATUS.SYNCED);
         setVisible(true);
         setTimeout(() => setVisible(false), 3000);
@@ -139,7 +139,7 @@ export default function NetworkStatusBar() {
   const config = configs[status] || configs[STATUS.ONLINE];
 
   return (
-    <div className={`fixed top-0 left-0 right-0 z-[100] ${config.bg} ${config.border} border-b px-4 py-2 flex items-center gap-2 text-white text-sm font-medium backdrop-blur-md transition-all`}>
+    <div role="status" aria-live="polite" className={`fixed top-0 left-0 right-0 z-[100] ${config.bg} ${config.border} border-b px-4 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] flex items-center gap-2 text-white text-sm font-medium backdrop-blur-md transition-all`}>
       {config.icon}
       <span className="flex-1 truncate">{config.text}</span>
       {status === STATUS.OFFLINE && (
