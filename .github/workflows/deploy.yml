@@ -13,20 +13,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
       - name: Install dependencies
-        run: npm ci
+        run: nix-shell -p nodejs_22 --run "npm ci"
 
       - name: Lint
-        run: npm run lint -- --max-warnings 20
+        run: nix-shell -p nodejs_22 --run "npm run lint -- --max-warnings 20"
         continue-on-error: true
 
       - name: Build
-        run: npm run build
+        run: nix-shell -p nodejs_22 --run "npm run build"
 
       - name: Deploy to production
         run: rsync -avz --delete dist/ /mnt/fast/appdata/farmos-pwa/
@@ -42,6 +37,6 @@ jobs:
           SW_FILE=/mnt/fast/appdata/farmos-pwa/sw.js
           if [ -f "$SW_FILE" ]; then
             COMMIT_SHORT=$(git rev-parse --short HEAD)
-            sed -i "s/chagra-v[0-9]*/chagra-${COMMIT_SHORT}/" "$SW_FILE"
+            sed -i "s/chagra-v[0-9a-z]*/chagra-${COMMIT_SHORT}/" "$SW_FILE"
             echo "SW cache bumped to chagra-${COMMIT_SHORT}"
           fi
