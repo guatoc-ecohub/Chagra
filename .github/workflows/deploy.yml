@@ -7,29 +7,24 @@ on:
       - '**.md'
       - 'LICENSE'
 
-env:
-  NIX_NODE: nix shell nixpkgs#nodejs_22 --command
-
 jobs:
   build-and-deploy:
     runs-on: [self-hosted, alpha]
     steps:
       - uses: actions/checkout@v4
-        env:
-          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
       - name: Install dependencies
-        run: $NIX_NODE npm ci
+        run: npm ci
 
       - name: Lint
-        run: $NIX_NODE npm run lint -- --max-warnings 20
+        run: npm run lint -- --max-warnings 20
         continue-on-error: true
 
       - name: Build
-        run: $NIX_NODE npm run build
+        run: npm run build
 
       - name: Deploy to production
-        run: rsync -avz --delete dist/ /mnt/fast/appdata/farmos-pwa/
+        run: rsync -avz --delete --no-group dist/ /mnt/fast/appdata/farmos-pwa/
 
       - name: Verify deployment
         run: |
