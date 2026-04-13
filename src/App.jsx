@@ -1,9 +1,10 @@
-import React, { lazy, Suspense, useState, useEffect } from 'react';
+import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback } from 'react';
 import { Warehouse, MapPin, Eye, Package, Clock, ClipboardList, CheckCircle, WifiOff } from 'lucide-react';
 import localforage from 'localforage';
 
 import { isAuthenticated, logoutUser } from './services/authService';
 import useAssetStore from './store/useAssetStore';
+import { fetchFromFarmOS } from './services/apiService';
 import { PRIMARY_WORKER_NAME } from './config/workerConfig';
 import { version as APP_VERSION } from '../package.json';
 import NetworkStatusBar from './components/NetworkStatusBar';
@@ -46,12 +47,113 @@ const NAV_TILES = [
   { id: 'historial', label: 'Historial', icon: ClipboardList, color: 'bg-indigo-700', desc: 'Trazabilidad de operaciones' },
 ];
 
+// T2: Dashboard como componente propio con suscripción reactiva al store.
+// useAssetStore() (hook) dispara re-render cuando hydrate()/syncFromServer() actualizan
+// el estado, a diferencia de useAssetStore.getState() que es una lectura snapshot.
+const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, lastLogMessage }) {
+  // Selectores shallow: solo re-renderiza cuando las longitudes cambian
+  const plantsCount = useAssetStore((s) => s.plants.length);
+  const landsCount = useAssetStore((s) => s.lands.length);
+  const structuresCount = useAssetStore((s) => s.structures.length);
+  const materialsCount = useAssetStore((s) => s.materials.length);
+  const plants = useAssetStore((s) => s.plants);
+  const structures = useAssetStore((s) => s.structures);
+  const lands = useAssetStore((s) => s.lands);
+  const hydrate = useAssetStore((s) => s.hydrate);
+  const syncFromServer = useAssetStore((s) => s.syncFromServer);
+
+  // T2: Hidratación al montar — llena contadores desde IndexedDB inmediatamente
+  useEffect(() => {
+    hydrate().then(() => {
+      if (navigator.onLine) syncFromServer(fetchFromFarmOS);
+    });
+  }, [hydrate, syncFromServer]);
+
+  const noGeoCount = useMemo(() => {
+    const allAssets = [...plants, ...structures, ...lands];
+    return allAssets.filter((a) => {
+      const geo = a.attributes?.intrinsic_geometry;
+      return !geo || !(typeof geo === 'object' ? geo.value : geo);
+    }).length;
+  }, [plants, structures, lands]);
+
+  const assetCounts = useMemo(() => [
+    { label: 'Cultivos', count: plantsCount, color: 'text-lime-400' },
+    { label: 'Zonas', count: landsCount, color: 'text-amber-400' },
+    { label: 'Infraestructura', count: structuresCount, color: 'text-emerald-400' },
+    { label: 'Insumos', count: materialsCount, color: 'text-sky-400' },
+  ], [plantsCount, landsCount, structuresCount, materialsCount]);
+
+  return (
+    <div className="h-[100dvh] w-full bg-slate-950 text-white flex flex-col overflow-hidden">
+      <header className="p-4 border-b border-slate-800 shrink-0 flex justify-between items-center bg-slate-900/50 backdrop-blur-md sticky top-0 z-50 pt-[env(safe-area-inset-top)]">
+        <div className="flex flex-col gap-1">
+          <h1 className="font-bold text-2xl flex items-center gap-2">
+            <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+            Chagra
+          </h1>
+          <span className="text-xs text-slate-500 font-mono">v{APP_VERSION}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button onClick={onLogout} aria-label="Cerrar sesión" className="text-slate-400 hover:text-white px-4 py-3 min-h-[44px] bg-slate-800 rounded">Salir</button>
+        </div>
+      </header>
+      <main className="flex-1 p-4 flex flex-col overflow-y-auto gap-4">
+        <TelemetryAlerts lastFarmOsLog={lastLogMessage} />
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {assetCounts.map((ac) => (
+            <button
+              key={ac.label}
+              onClick={() => onNavigate('activos')}
+              aria-label={`Ver ${ac.label}: ${ac.count}`}
+              className="bg-slate-900 border border-slate-800 rounded-xl p-3 text-center hover:bg-slate-800 transition-colors"
+            >
+              <p className={`text-2xl font-black tabular-nums ${ac.color}`}>{ac.count}</p>
+              <p className="text-2xs text-slate-500 uppercase font-bold">{ac.label}</p>
+            </button>
+          ))}
+        </div>
+
+        {noGeoCount > 0 && (
+          <button
+            onClick={() => onNavigate('activos')}
+            className="w-full p-3 rounded-xl bg-amber-900/20 border border-amber-800/50 flex items-center justify-between hover:bg-amber-900/30 transition-colors"
+          >
+            <span className="text-xs text-amber-400 font-bold flex items-center gap-2">
+              <MapPin size={14} aria-hidden="true" />
+              {noGeoCount} activo{noGeoCount > 1 ? 's' : ''} sin ubicación registrada
+            </span>
+            <span className="text-2xs text-amber-400/60">Tocar para corregir</span>
+          </button>
+        )}
+
+        <PendingTasksWidget />
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {NAV_TILES.map((tile) => (
+            <button
+              key={tile.id}
+              onClick={() => onNavigate(tile.id)}
+              aria-label={`${tile.label}: ${tile.desc}`}
+              className={`${tile.color} active:brightness-75 transition-all rounded-xl p-4 shadow-lg text-left min-h-[80px]`}
+            >
+              <tile.icon size={28} strokeWidth={2} className="mb-2" aria-hidden="true" />
+              <span className="text-lg font-black block">{tile.label}</span>
+              <span className="text-2xs text-white/60">{tile.desc}</span>
+            </button>
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+});
+
 export default function App() {
   const [currentView, setCurrentView] = useState('loading');
   const [toast, setToast] = useState(null);
   const [lastLogMessage, setLastLogMessage] = useState('');
 
-  // H1: Escuchar evento de log en lugar de exponer setState global
   useEffect(() => {
     const handler = (e) => setLastLogMessage(e.detail);
     window.addEventListener('farmosLog', handler);
@@ -64,94 +166,15 @@ export default function App() {
     });
   }, []);
 
-  const showToast = (message, isError = false) => {
+  const showToast = useCallback((message, isError = false) => {
     setToast({ message, isError });
     setTimeout(() => setToast(null), 4000);
-  };
+  }, []);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     await logoutUser();
     setCurrentView('login');
-  };
-
-  const renderDashboard = () => {
-    const { plants, structures, materials, lands } = useAssetStore.getState();
-    const allAssets = [...plants, ...structures, ...lands];
-    const noGeoCount = allAssets.filter((a) => {
-      const geo = a.attributes?.intrinsic_geometry;
-      return !geo || !(typeof geo === 'object' ? geo.value : geo);
-    }).length;
-    const assetCounts = [
-      { label: 'Cultivos', count: plants.length, color: 'text-lime-400' },
-      { label: 'Zonas', count: lands.length, color: 'text-amber-400' },
-      { label: 'Infraestructura', count: structures.length, color: 'text-emerald-400' },
-      { label: 'Insumos', count: materials.length, color: 'text-sky-400' },
-    ];
-
-    return (
-      <div className="h-[100dvh] w-full bg-slate-950 text-white flex flex-col overflow-hidden">
-        <header className="p-4 border-b border-slate-800 shrink-0 flex justify-between items-center bg-slate-900/50 backdrop-blur-md sticky top-0 z-50 pt-[env(safe-area-inset-top)]">
-          <div className="flex flex-col gap-1">
-            <h1 className="font-bold text-2xl flex items-center gap-2">
-              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-              Chagra
-            </h1>
-            <span className="text-xs text-slate-500 font-mono">v{APP_VERSION}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <button onClick={handleLogout} aria-label="Cerrar sesión" className="text-slate-400 hover:text-white px-4 py-3 min-h-[44px] bg-slate-800 rounded">Salir</button>
-          </div>
-        </header>
-        <main className="flex-1 p-4 flex flex-col overflow-y-auto gap-4">
-          <TelemetryAlerts lastFarmOsLog={lastLogMessage} />
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {assetCounts.map((ac) => (
-              <button
-                key={ac.label}
-                onClick={() => setCurrentView('activos')}
-                aria-label={`Ver ${ac.label}: ${ac.count}`}
-                className="bg-slate-900 border border-slate-800 rounded-xl p-3 text-center hover:bg-slate-800 transition-colors"
-              >
-                <p className={`text-2xl font-black tabular-nums ${ac.color}`}>{ac.count}</p>
-                <p className="text-2xs text-slate-500 uppercase font-bold">{ac.label}</p>
-              </button>
-            ))}
-          </div>
-
-          {noGeoCount > 0 && (
-            <button
-              onClick={() => setCurrentView('activos')}
-              className="w-full p-3 rounded-xl bg-amber-900/20 border border-amber-800/50 flex items-center justify-between hover:bg-amber-900/30 transition-colors"
-            >
-              <span className="text-xs text-amber-400 font-bold flex items-center gap-2">
-                <MapPin size={14} aria-hidden="true" />
-                {noGeoCount} activo{noGeoCount > 1 ? 's' : ''} sin ubicación registrada
-              </span>
-              <span className="text-2xs text-amber-400/60">Tocar para corregir</span>
-            </button>
-          )}
-
-          <PendingTasksWidget />
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {NAV_TILES.map((tile) => (
-              <button
-                key={tile.id}
-                onClick={() => setCurrentView(tile.id)}
-                aria-label={`${tile.label}: ${tile.desc}`}
-                className={`${tile.color} active:brightness-75 transition-all rounded-xl p-4 shadow-lg text-left min-h-[80px]`}
-              >
-                <tile.icon size={28} strokeWidth={2} className="mb-2" aria-hidden="true" />
-                <span className="text-lg font-black block">{tile.label}</span>
-                <span className="text-2xs text-white/60">{tile.desc}</span>
-              </button>
-            ))}
-          </div>
-        </main>
-      </div>
-    );
-  };
+  }, []);
 
   const renderView = () => {
     switch (currentView) {
@@ -160,7 +183,7 @@ export default function App() {
       case 'login':
         return <LoginScreen onLoginSuccess={() => setCurrentView('dashboard')} onSave={showToast} />;
       case 'dashboard':
-        return renderDashboard();
+        return <DashboardView onNavigate={setCurrentView} onLogout={handleLogout} lastLogMessage={lastLogMessage} />;
       case 'sembrar':
         return <SeedingLog onBack={() => setCurrentView('dashboard')} onSave={showToast} />;
       case 'cosechar':

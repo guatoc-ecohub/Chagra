@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { X, Calendar, Tag, Activity, MapPin } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import AssetTimeline from './AssetTimeline';
@@ -7,7 +7,6 @@ import MapPicker from './MapPicker';
 import { useAssetPerformance } from '../hooks/useAssetPerformance';
 import { MATERIAL_CATEGORIES } from '../config/materials';
 import { geoJsonToWkt, wktToGeoJson } from '../utils/geo';
-import { assetCache } from '../db/assetCache';
 import { proximityCheck, findNearestLand, checkInvasiveProximity, getCoords } from '../utils/spatialAnalysis';
 
 // Panel de bio-eficiencia (Fase 15.3 / extendido 16.3).
@@ -134,12 +133,15 @@ export const AssetDetailView = () => {
   const [showGeoPicker, setShowGeoPicker] = useState(false);
   const [geoSaving, setGeoSaving] = useState(false);
 
-  if (!selectedAssetId) return null;
+  // T4: useMemo para evitar recrear el spread de arrays en cada render
+  const asset = useMemo(() => {
+    if (!selectedAssetId) return null;
+    return [...plants, ...structures, ...equipment, ...materials, ...lands].find(
+      (a) => a.id === selectedAssetId
+    );
+  }, [selectedAssetId, plants, structures, equipment, materials, lands]);
 
-  const asset = [...plants, ...structures, ...equipment, ...materials, ...lands].find(
-    (a) => a.id === selectedAssetId
-  );
-  if (!asset) return null;
+  if (!selectedAssetId || !asset) return null;
 
   // Normalización de campos JSON:API vs shape optimista local
   const name = asset.attributes?.name || asset.name || 'Sin nombre';

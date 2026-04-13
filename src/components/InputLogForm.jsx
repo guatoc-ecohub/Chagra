@@ -24,13 +24,16 @@ export const InputLogForm = ({ assetId, onComplete }) => {
     notes: '',
   });
 
-  // Auto-ajuste de unidad al cambiar el material seleccionado
+  // Auto-ajuste de unidad al cambiar el material seleccionado.
+  // Se aísla la dependencia a la string `material` para evitar ciclos
+  // con setFormData (React Error #185).
+  const currentMaterial = formData.material;
   useEffect(() => {
-    const selected = MATERIAL_PRESETS.find((m) => m.name === formData.material);
+    const selected = MATERIAL_PRESETS.find((m) => m.name === currentMaterial);
     if (selected) {
-      setFormData((prev) => ({ ...prev, unit: selected.unit }));
+      setFormData((prev) => prev.unit === selected.unit ? prev : { ...prev, unit: selected.unit });
     }
-  }, [formData.material]);
+  }, [currentMaterial]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

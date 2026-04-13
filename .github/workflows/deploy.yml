@@ -8,7 +8,7 @@ on:
       - 'LICENSE'
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: [self-hosted, alpha]
     steps:
       - uses: actions/checkout@v4
@@ -18,9 +18,15 @@ jobs:
           node-version: 22
           cache: npm
 
-      - run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-      - run: npm run build
+      - name: Lint
+        run: npm run lint -- --max-warnings 20
+        continue-on-error: true
+
+      - name: Build
+        run: npm run build
 
       - name: Deploy to production
         run: rsync -avz --delete dist/ /mnt/fast/appdata/farmos-pwa/
@@ -28,4 +34,14 @@ jobs:
       - name: Verify deployment
         run: |
           test -f /mnt/fast/appdata/farmos-pwa/index.html || exit 1
-          echo "Deploy OK: $(date -Iseconds)"
+          HASH=$(sha256sum /mnt/fast/appdata/farmos-pwa/index.html | cut -d' ' -f1)
+          echo "Deploy OK: $(date -Iseconds) | index.html sha256: ${HASH:0:12}"
+
+      - name: Bump SW cache version
+        run: |
+          SW_FILE=/mnt/fast/appdata/farmos-pwa/sw.js
+          if [ -f "$SW_FILE" ]; then
+            COMMIT_SHORT=$(git rev-parse --short HEAD)
+            sed -i "s/chagra-v[0-9]*/chagra-${COMMIT_SHORT}/" "$SW_FILE"
+            echo "SW cache bumped to chagra-${COMMIT_SHORT}"
+          fi
