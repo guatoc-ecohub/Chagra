@@ -32,8 +32,9 @@
   # ═══════════════════════════════════════════════
   # RUNNER 2: NixOS infra (repo privado)
   # ═══════════════════════════════════════════════
+  # TODO: Habilitar cuando se registre un token válido para el repo privado
   services.github-runners.nixos-deploy = {
-    enable = true;
+    enable = false;
     url = "https://github.com/kortux/guatoc-nixos-stable";
     tokenFile = "/run/secrets/nixos-runner-token";
     name = "alpha-nixos";

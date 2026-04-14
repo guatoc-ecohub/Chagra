@@ -49,7 +49,7 @@ let
       }
       {
         model_name = "openrouter-gemini";
-        model = "google/gemini-2.0-flash-001";
+        model = "openrouter/google/gemini-2.0-flash-001";
         base_url = "https://openrouter.ai/api/v1";
         api_key = "$OPENROUTER_API_KEY";
       }
