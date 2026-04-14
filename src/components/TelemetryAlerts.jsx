@@ -384,7 +384,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
       // Usa /api/chat con think:false para desactivar chain-of-thought de Qwen3.5
       try {
         const ollamaCtrl = new AbortController();
-        const ollamaTimeout = setTimeout(() => ollamaCtrl.abort(), 20000);
+        const ollamaTimeout = setTimeout(() => ollamaCtrl.abort(), 45000);
         const ollamaResponse = await fetch(`${OLLAMA_URL}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
