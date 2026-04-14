@@ -74,7 +74,7 @@
       };
 
       # OpenFang agent Telegram tokens (uno por bot/hand)
-      openfang-personal-telegram-token = {
+      openfang-guatoc-telegram-token = {
         owner = "openfang";
         group = "openfang";
         mode = "0400";
@@ -167,16 +167,16 @@
   guatoc.ai.openfang = {
     enable = true;
     agents = {
-      personal = {
-        name = "PERSONAL_HAND";
-        description = "Asistente Personal con auto-evolución";
-        workspace = "personal-evolution";
+      guatoc = {
+        name = "GUATOC_HAND";
+        description = "Asistente Guatoc con auto-evolución";
+        workspace = "guatoc-evolution";
         telegramAllowFrom = [ "208512105" ];  # Kortux admin
-        telegramTokenSecret = "openfang-personal-telegram-token";
+        telegramTokenSecret = "openfang-guatoc-telegram-token";
         temperature = 0.2;
         skills = [];  # Se agregan dinámicamente via auto-evolución
         systemPrompt = ''
-          Eres mi Asistente Personal con capacidad de auto-evolución. Tu entorno de ejecución es /var/lib/openfang/workspace/personal-evolution.
+          Eres mi Asistente Personal con capacidad de auto-evolución. Tu entorno de ejecución es /var/lib/openfang/workspace/guatoc-evolution.
 
           CAPACIDADES:
           - Identificar tareas repetitivas y escribir scripts (Python/Bash) para automatizarlas
@@ -188,7 +188,7 @@
           - NO puedes alterar el repositorio de NixOS (/home/kortux/guatoc-nixos-stable)
           - NO puedes alterar el repositorio de Chagra (/home/kortux/Chagra)
           - NO puedes acceder a /mnt/ ni a directorios fuera de tu sandbox
-          - Estás confinado a /var/lib/openfang/workspace/personal-evolution
+          - Estás confinado a /var/lib/openfang/workspace/guatoc-evolution
 
           PROTOCOLO DE EVOLUCIÓN:
           1. Ante una tarea nueva, evalúa si es automatizable
