@@ -125,9 +125,11 @@ in
 
     systemd.tmpfiles.rules = [
       "d /var/lib/openfang 0750 openfang openfang -"
-    ] ++ (lib.mapAttrsToList (name: agent:
+    ] ++ (lib.concatMap (name: [
       "d /var/lib/openfang/agent-${name} 0700 openfang openfang -"
-    ) cfg.agents);
+      "d /var/lib/openfang/agent-${name}/.openfang 0700 openfang openfang -"
+      "d /var/lib/openfang/agent-${name}/data 0700 openfang openfang -"
+    ]) (lib.attrNames cfg.agents));
 
     systemd.services = lib.mapAttrs' (name: agent:
       lib.nameValuePair "openfang-${name}" {
