@@ -22,6 +22,9 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          VITE_FARMOS_URL: ""
+          VITE_FARMOS_CLIENT_ID: farm
 
       - name: Deploy to production
         run: rsync -avz --delete --no-group --chmod=D755,F644 dist/ /mnt/fast/appdata/farmos-pwa/

@@ -1,7 +1,10 @@
-const required = ['VITE_FARMOS_URL', 'VITE_FARMOS_CLIENT_ID'];
+// Validación de env vars al startup.
+// VITE_FARMOS_URL puede ser vacío (proxy relativo via Nginx), así que
+// solo validamos que la variable EXISTA (haya sido definida en build-time).
+const required = ['VITE_FARMOS_CLIENT_ID'];
 
 for (const key of required) {
-  if (!import.meta.env[key]) {
+  if (import.meta.env[key] === undefined) {
     console.error(`[Config] Variable de entorno requerida no definida: ${key}. Revise .env o .env.local.`);
   }
 }
