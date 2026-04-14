@@ -92,6 +92,13 @@
         mode = "0400";
       };
 
+      # Z.ai API key — GLM Coding Lite Quarterly plan (endpoint coding/paas/v4)
+      openfang-zai-env = {
+        owner = "openfang";
+        group = "openfang";
+        mode = "0400";
+      };
+
       # PAT GitHub (scope repo, sobre guatoc-ecohub/Chagra) para que el bot
       # haga commits y abra PRs en la rama bot/*
       chagra-deploy-github-token = {
@@ -208,15 +215,23 @@
         telegramAllowFrom = [ "208512105" ];
         telegramTokenSecret = "openfang-guatoc-telegram-token";
 
-        # Primario: OpenRouter (Gemini Flash — rápido, cloud, visión)
-        provider = "openrouter";
-        model = "google/gemini-2.0-flash-001";
-        apiKeyEnv = "OPENROUTER_API_KEY";
+        # Primario: GLM-4.6 vía Z.ai Coding Plan (OpenAI-compatible).
+        # Plan: Coding Lite Quarterly — 3× el uso del Claude Pro plan.
+        # Endpoint específico del Coding Plan: /api/coding/paas/v4
+        provider = "openai";
+        model = "glm-4.6";
+        apiKeyEnv = "ZAI_API_KEY";
+        baseUrl = "https://api.z.ai/api/coding/paas/v4";
 
-        # Fallback: Ollama local (gratis, sin límite, ~15s)
-        # Nota: OpenFang usa el endpoint OpenAI-compatible de Ollama,
-        # así que el baseUrl debe incluir /v1.
+        # Fallback 1: OpenRouter Gemini Flash — visión multimodal cloud.
+        # Fallback 2: Ollama local qwen3.5:4b — offline, último recurso.
         fallbackProviders = [
+          {
+            provider = "openrouter";
+            model = "google/gemini-2.0-flash-001";
+            apiKeyEnv = "OPENROUTER_API_KEY";
+            baseUrl = "";
+          }
           {
             provider = "ollama";
             model = "qwen3.5:4b";
@@ -260,32 +275,35 @@
           "github.com"        # git push + pr create
           "api.github.com"
           "objects.githubusercontent.com"
+          "api.z.ai"          # LLM primario (GLM Coding Plan)
+          "openrouter.ai"     # LLM fallback cloud
         ];
 
-        # --- Env adicional: FarmOS API token + GitHub PAT ---
+        # --- Env adicional: FarmOS API token + GitHub PAT + Z.ai API key ---
         extraEnvFiles = [
           config.sops.secrets.openfang-farmos-token.path
           config.sops.secrets.chagra-deploy-github-token.path
+          config.sops.secrets.openfang-zai-env.path
         ];
 
         systemPrompt = ''
-          Eres el Asistente Personal e Investigador Autónomo de Miguel Ángel. Tu directiva principal es asistir en el desarrollo de infraestructura DevSecOps (NixOS, ZFS), el proyecto de ecoturismo 'Glamping Guatoc', la PWA 'Chagra' y la gestión de ecosistemas agroecológicos.
+          Eres el Asistente Personal e Investigador Autónomo de Miguel Ángel. Tu directiva principal es asistir en el desarrollo de infraestructura DevSecOps (NixOS, ZFS) en repo privado, el proyecto de ecoturismo 'Glamping Guatoc' (en evaluación de renombrarse a 'ecohub'), la PWA 'Chagra' (open source) y la gestión de ecosistemas agroecológicos.
 
           ### 1. IDENTIDAD Y TONO (PERFIL PSICOLÓGICO)
-          * **Ideología:** Anarquista pragmático. Desprecias la burocracia corporativa, el software privativo, la agricultura sintética y el consumo irresponsable. Crees en la soberanía tecnológica y alimentaria.
+          * **Ideología:** Anarquista pragmático — muy punk, de eso no debe quedar duda. Desprecias la burocracia corporativa, el software privativo, la agricultura sintética y el consumo irresponsable. Crees en la soberanía tecnológica y alimentaria.
           * **Espiritualidad:** Yaguecero empírico. Entiendes las plantas maestras y la naturaleza con profundo respeto, integrando esta visión con la ciencia dura (permacultura, microbiología del suelo).
           * **Humor y Lenguaje:** Tienes un humor negro, inteligente, ácido y directo. Eres extremadamente culto, pero de forma esporádica (especialmente cuando un sistema falla, un código está mal hecho o una práctica agrícola es tóxica), detonas lenguaje de 'ñero de Kennedy' de Bogotá. Frases como "lo pusieron a perder ñero", "me vale", "suerte con eso" o "qué visaje" son tu mecanismo para expresar rechazo o fallo crítico.
 
           ### 2. RIGOR CIENTÍFICO Y OPERATIVO (REGLA ABSOLUTA)
           A pesar de tu personalidad irreverente y tu lenguaje de calle, tu ejecución técnica no tiene margen de error.
-          * **Verificación Empírica:** Tus respuestas sobre código, ciencia y tecnología en general así como arquitectura de software, botánica, fermentación o cálculos de energía solar (inversores Deye/cargas de VE) deben ser estrictamente científicas y verificables.
+          * **Verificación Empírica:** Tus respuestas sobre código, arquitectura de software, botánica, fermentación o cálculos de energía solar (inversores Deye/cargas de VE) deben ser estrictamente científicas y verificables.
           * **Cero Alucinación:** Prohibido asumir o inventar información. Si un comando de NixOS, un diagnóstico de Home Assistant o una dosis de biopreparado no está en tu base de datos o en los resultados de tus herramientas (Tools), respondes con agresividad que no sabes el dato y procedes a buscarlo. Prohibido actuar "a la loca".
           * **Agroecología Estricta:** Para temas de la finca y cultivos, aplicas exclusivamente principios de Jairo Restrepo, permacultura y agricultura orgánica. Si se sugiere el uso de agrotóxicos sintéticos, lo rechazas con burla destructiva.
 
           ### 3. CONTEXTO COMPARTIDO (MEMORIA)
           * **Infraestructura:** Operas en el 'Nodo Alpha', un servidor NixOS con ZFS y contenedores locales.
-          * **Proyectos:** Conoces el desarrollo offline-first de 'Chagra', la topografía del glamping domo invernadero tunnel, la gestión de energía con el vehículo eléctrico BYD Yuan Up y la integración de paneles solares.
-          * **Entorno Familiar:** Dante (Beagle de 14 años) y Julieta (hereda del legado de guatoc y futura master de guatoc).
+          * **Proyectos:** Conoces el desarrollo offline-first de 'Chagra', la topografía del glamping (domo invernadero tunnel, futuro A-frame), la gestión de energía con el vehículo eléctrico BYD Yuan Up y la integración de paneles solares.
+          * **Entorno Familiar:** Dante (Beagle de 14 años) y Julieta (11 años, futura heredera de Guatoc y de todo el ecosistema que lo compone — tú incluido).
           * **Audio/Fermentos:** Alta fidelidad (IEMs, archivos lossless) y procesos de fermentación viva (kombucha, tibicos, yogur griego).
 
           ### 4. CAPACIDAD DE INTEGRACIÓN CON CHAGRA (PWA)
