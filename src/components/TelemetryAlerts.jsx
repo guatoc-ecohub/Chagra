@@ -374,17 +374,15 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         ? alerts.join('\n')
         : `✅ Condiciones estables. Inv1: ${inv1Hum}%H/${inv1Temp}°C. Tab: ${tabHum}%H/${tabTemp}°C.`;
 
-      // 3. Enriquecimiento con IA (opcional, no bloquea)
-      let aiEnrichment = '';
-      try {
-        const promptContext = `Datos de sensores Zigbee en finca agroecológica andina (Choachí, 2400msnm):
-Invernadero 1: ${inv1Hum}% humedad, ${inv1Temp}°C.
-Tabaco: ${tabHum}% humedad, ${tabTemp}°C.
-${alerts.length > 0 ? 'ALERTAS ACTIVAS: ' + alerts.join(' | ') : 'Sin alertas.'}
-Responde en 2 líneas en español: diagnóstico + acción concreta. Sin tags XML.`;
+      // Mostrar reglas INMEDIATAMENTE — sin esperar IA
+      setAiAlert(ruleAnalysis);
+      setLoading(false);
 
+      // 3. Enriquecimiento con IA en background (no bloquea UI)
+      try {
+        const promptContext = `Sensores Zigbee, finca andina (2400msnm). Inv1: ${inv1Hum}%H ${inv1Temp}°C. Tab: ${tabHum}%H ${tabTemp}°C. ${alerts.length > 0 ? 'ALERTAS: ' + alerts.map(a => a.replace(/[^\w\s%°.]/g, '')).join('. ') : 'Sin alertas.'} Diagnóstico y acción concreta en 2 líneas. Sin XML.`;
         const ollamaCtrl = new AbortController();
-        const ollamaTimeout = setTimeout(() => ollamaCtrl.abort(), 30000);
+        const ollamaTimeout = setTimeout(() => ollamaCtrl.abort(), 15000);
         const ollamaResponse = await fetch(`${OLLAMA_URL}/api/generate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -393,7 +391,7 @@ Responde en 2 líneas en español: diagnóstico + acción concreta. Sin tags XML
             model: 'qwen3.5:4b',
             prompt: promptContext,
             stream: true,
-            options: { num_predict: 200, temperature: 0.3 }
+            options: { num_predict: 150, temperature: 0.3 }
           })
         });
         clearTimeout(ollamaTimeout);
@@ -410,26 +408,17 @@ Responde en 2 líneas en español: diagnóstico + acción concreta. Sin tags XML
               try {
                 const obj = JSON.parse(line);
                 if (obj.response) fullText += obj.response;
-              } catch { /* skip malformed NDJSON */ }
+              } catch { /* skip */ }
             }
           }
-          // Limpiar tags de pensamiento internos del modelo (Qwen3.5 chain-of-thought)
-          const cleaned = fullText
-            .replace(/<think>[\s\S]*?<\/think>/g, '')
-            .replace(/<[^>]+>/g, '')
-            .trim();
-          if (cleaned.length > 10) aiEnrichment = cleaned;
+          const cleaned = fullText.replace(/<think>[\s\S]*?<\/think>/g, '').replace(/<[^>]+>/g, '').trim();
+          if (cleaned.length > 10) {
+            setAiAlert(`${ruleAnalysis}\n\n🤖 IA: ${cleaned}`);
+          }
         }
       } catch (llmErr) {
-        console.warn('[Telemetry] IA no disponible, usando solo reglas:', llmErr.message);
+        console.warn('[Telemetry] IA no disponible:', llmErr.message);
       }
-
-      // Combinar: reglas siempre + IA si aporta
-      const finalAnalysis = aiEnrichment
-        ? `${ruleAnalysis}\n\n🤖 IA: ${aiEnrichment}`
-        : ruleAnalysis;
-
-      setAiAlert(finalAnalysis);
 
     } catch (err) {
       setError(err.message);
