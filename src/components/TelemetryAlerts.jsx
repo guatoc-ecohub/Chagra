@@ -223,7 +223,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
     return null;
   };
 
-  const fetchTelemetryAndAnalyze = async () => {
+  const fetchTelemetryAndAnalyze = async (parentSignal) => {
     if (!navigator.onLine) {
       setError('Dispositivo sin conexión. Análisis suspendido para conservar energía.');
       return;
@@ -239,23 +239,13 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
 
     try {
       // 1. Ingesta de Datos Domóticos (Home Assistant) - IDs Zigbee físicos
+      const haHeaders = { 'Authorization': `Bearer ${HA_TOKEN}`, 'Content-Type': 'application/json' };
+      const haOpts = { method: 'GET', headers: haHeaders, signal: parentSignal };
       const [invernaderoHum, invernaderoTemp, tabacoHum, tabacoTemp] = await Promise.all([
-        fetch(`${HA_URL}/states/sensor.arteco_zs_304z_humidity`, {
-          method: 'GET',
-          headers: { 'Authorization': `Bearer ${HA_TOKEN}`, 'Content-Type': 'application/json' }
-        }),
-        fetch(`${HA_URL}/states/sensor.arteco_zs_304z_temperature`, {
-          method: 'GET',
-          headers: { 'Authorization': `Bearer ${HA_TOKEN}`, 'Content-Type': 'application/json' }
-        }),
-        fetch(`${HA_URL}/states/sensor.hobeian_zg_303z_humidity`, {
-          method: 'GET',
-          headers: { 'Authorization': `Bearer ${HA_TOKEN}`, 'Content-Type': 'application/json' }
-        }),
-        fetch(`${HA_URL}/states/sensor.hobeian_zg_303z_temperature`, {
-          method: 'GET',
-          headers: { 'Authorization': `Bearer ${HA_TOKEN}`, 'Content-Type': 'application/json' }
-        })
+        fetch(`${HA_URL}/states/sensor.arteco_zs_304z_humidity`, haOpts),
+        fetch(`${HA_URL}/states/sensor.arteco_zs_304z_temperature`, haOpts),
+        fetch(`${HA_URL}/states/sensor.hobeian_zg_303z_humidity`, haOpts),
+        fetch(`${HA_URL}/states/sensor.hobeian_zg_303z_temperature`, haOpts)
       ]);
 
       if (!invernaderoHum.ok || !invernaderoTemp.ok || !tabacoHum.ok || !tabacoTemp.ok) {
@@ -376,6 +366,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         : `✅ Condiciones estables. Inv1: ${inv1Hum}%H/${inv1Temp}°C. Tab: ${tabHum}%H/${tabTemp}°C.`;
 
       // Mostrar reglas INMEDIATAMENTE — sin esperar IA
+      if (parentSignal?.aborted) return;
       setAiAlert(ruleAnalysis);
       setLoading(false);
       setAiStatus('thinking');
@@ -383,12 +374,11 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
       // 3. Enriquecimiento con IA en background (no bloquea UI)
       // Usa /api/chat con think:false para desactivar chain-of-thought de Qwen3.5
       try {
-        const ollamaCtrl = new AbortController();
-        const ollamaTimeout = setTimeout(() => ollamaCtrl.abort(), 45000);
+        const ollamaTimeout = setTimeout(() => { if (!parentSignal?.aborted) setAiStatus('error'); }, 45000);
         const ollamaResponse = await fetch(`${OLLAMA_URL}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          signal: ollamaCtrl.signal,
+          signal: parentSignal,
           body: JSON.stringify({
             model: 'qwen3.5:4b',
             think: false,
@@ -401,10 +391,12 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
           })
         });
         clearTimeout(ollamaTimeout);
+        if (parentSignal?.aborted) return;
 
         if (ollamaResponse.ok) {
           const data = await ollamaResponse.json();
           const content = (data.message?.content || '').trim();
+          if (parentSignal?.aborted) return;
           if (content.length > 10) {
             setAiAlert(`${ruleAnalysis}\n\n🤖 IA: ${content}`);
             setAiStatus('done');
@@ -416,6 +408,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
           setAiStatus('error');
         }
       } catch (llmErr) {
+        if (parentSignal?.aborted) return;
         console.warn('[Telemetry] IA no disponible:', llmErr.message);
         setAiStatus('error');
       }
@@ -467,13 +460,9 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
   };
 
   useEffect(() => {
-    let cancelled = false;
-    const run = async () => {
-      if (cancelled) return;
-      await fetchTelemetryAndAnalyze();
-    };
-    run();
-    return () => { cancelled = true; };
+    const ctrl = new AbortController();
+    fetchTelemetryAndAnalyze(ctrl.signal);
+    return () => ctrl.abort();
   }, []);
 
   return (
@@ -599,7 +588,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
       </div>
 
       <button
-        onClick={fetchTelemetryAndAnalyze}
+        onClick={() => fetchTelemetryAndAnalyze()}
         disabled={loading}
         className="mt-6 w-full p-4 rounded-2xl bg-slate-800 hover:bg-slate-700 active:bg-slate-600 transition-all border border-slate-600 font-bold text-slate-300 flex items-center justify-center gap-3 disabled:opacity-50"
       >
