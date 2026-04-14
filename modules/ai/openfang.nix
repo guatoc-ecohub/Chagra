@@ -38,7 +38,7 @@ let
     home_dir = "/var/lib/openfang/agent-${name}"
     data_dir = "/var/lib/openfang/agent-${name}/data"
     log_level = "info"
-    api_listen = "127.0.0.1:${toString (50051 + agent.portOffset)}"
+    api_listen = "0.0.0.0:${toString (4200 + agent.portOffset)}"
     mode = "stable"
     language = "es"
     usage_footer = "off"
@@ -181,7 +181,7 @@ in
         script = ''
           export HOME="/var/lib/openfang/agent-${name}"
           export OPENFANG_HOME="$HOME"
-          exec ${openfang-pkg}/bin/openfang
+          exec ${openfang-pkg}/bin/openfang daemon
         '';
       }
     ) cfg.agents;
