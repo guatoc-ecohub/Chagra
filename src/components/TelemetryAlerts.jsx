@@ -349,14 +349,42 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         tabacoTemperature: tabacoTempData.state
       });
 
-      // 2. Ensamblaje del Contexto Agronómico
-      const promptContext = `Inv1: ${invernaderoHumData.state}%H ${invernaderoTempData.state}°C. Tab: ${tabacoHumData.state}%H ${tabacoTempData.state}°C. ¿Riesgo hídrico o térmico? Responde en 2 líneas en español con acción concreta.`;
+      // 2. Análisis determinista por reglas (siempre se ejecuta)
+      const inv1Hum = parseFloat(invernaderoHumData.state);
+      const inv1Temp = parseFloat(invernaderoTempData.state);
+      const tabHum = parseFloat(tabacoHumData.state);
+      const tabTemp = parseFloat(tabacoTempData.state);
 
-      // 3. Inferencia Cognitiva Local (Ollama) con fallback
-      let aiAnalysis = '';
+      const alerts = [];
+
+      // Invernadero 1
+      if (inv1Hum < 40) alerts.push(`🚨 ALERTA: Humedad crítica en Invernadero 1 (${inv1Hum}%). Riego inmediato requerido.`);
+      if (inv1Hum > 80) alerts.push(`💧 Exceso de humedad en Invernadero 1 (${inv1Hum}%). Riesgo de hongos patógenos. Ventilar.`);
+      if (inv1Temp > 30) alerts.push(`🔥 Temperatura elevada en Invernadero 1 (${inv1Temp}°C). Activar ventilación.`);
+      if (inv1Temp < 5) alerts.push(`❄️ Temperatura baja en Invernadero 1 (${inv1Temp}°C). Riesgo de helada. Proteger cultivos.`);
+
+      // Tabaco
+      if (tabHum < 40) alerts.push(`🚨 ALERTA: Humedad crítica en Tabaco (${tabHum}%). Riego inmediato requerido.`);
+      if (tabHum > 80) alerts.push(`💧 Exceso de humedad en Tabaco (${tabHum}%). Riesgo de hongos. Monitorear.`);
+      if (tabTemp > 30) alerts.push(`🔥 Temperatura elevada en Tabaco (${tabTemp}°C). Activar ventilación.`);
+      if (tabTemp < 5) alerts.push(`❄️ Temperatura baja en Tabaco (${tabTemp}°C). Riesgo de helada.`);
+
+      // Baseline si todo está en rango
+      const ruleAnalysis = alerts.length > 0
+        ? alerts.join('\n')
+        : `✅ Condiciones estables. Inv1: ${inv1Hum}%H/${inv1Temp}°C. Tab: ${tabHum}%H/${tabTemp}°C.`;
+
+      // 3. Enriquecimiento con IA (opcional, no bloquea)
+      let aiEnrichment = '';
       try {
+        const promptContext = `Datos de sensores Zigbee en finca agroecológica andina (Choachí, 2400msnm):
+Invernadero 1: ${inv1Hum}% humedad, ${inv1Temp}°C.
+Tabaco: ${tabHum}% humedad, ${tabTemp}°C.
+${alerts.length > 0 ? 'ALERTAS ACTIVAS: ' + alerts.join(' | ') : 'Sin alertas.'}
+Responde en 2 líneas en español: diagnóstico + acción concreta. Sin tags XML.`;
+
         const ollamaCtrl = new AbortController();
-        const ollamaTimeout = setTimeout(() => ollamaCtrl.abort(), 180000);
+        const ollamaTimeout = setTimeout(() => ollamaCtrl.abort(), 30000);
         const ollamaResponse = await fetch(`${OLLAMA_URL}/api/generate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -365,7 +393,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
             model: 'qwen3.5:4b',
             prompt: promptContext,
             stream: true,
-            options: { num_predict: 150 }
+            options: { num_predict: 200, temperature: 0.3 }
           })
         });
         clearTimeout(ollamaTimeout);
@@ -382,32 +410,26 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
               try {
                 const obj = JSON.parse(line);
                 if (obj.response) fullText += obj.response;
-              } catch { /* skip */ }
+              } catch { /* skip malformed NDJSON */ }
             }
           }
-          aiAnalysis = fullText || 'Inferencia completada';
-        } else {
-          const detail = await ollamaResponse.text().catch(() => '');
-          console.warn(`[Telemetry] Ollama ${ollamaResponse.status}. Body: ${detail.slice(0, 200)}`);
-          throw new Error('Motor LLM no disponible');
+          // Limpiar tags de pensamiento internos del modelo (Qwen3.5 chain-of-thought)
+          const cleaned = fullText
+            .replace(/<think>[\s\S]*?<\/think>/g, '')
+            .replace(/<[^>]+>/g, '')
+            .trim();
+          if (cleaned.length > 10) aiEnrichment = cleaned;
         }
-      } catch (llmError) {
-        console.error('Error en inferencia LLM:', llmError);
-        // Fallback: Análisis basado en reglas simples
-        const invernaderoHum = parseFloat(invernaderoHumData.state);
-        const invernaderoTemp = parseFloat(invernaderoTempData.state);
-
-        if (invernaderoHum < 40) {
-          aiAnalysis = '⚠️ Riesgo de estrés hídrico en Invernadero 1. Humedad crítica (<40%). Recomiendo riego inmediato.';
-        } else if (invernaderoTemp > 30) {
-          aiAnalysis = '🔥 Alerta térmica en Invernadero 1. Temperatura elevada (>30°C). Active ventilación si está disponible.';
-        } else if (invernaderoHum > 80) {
-          aiAnalysis = '💧 Exceso de humedad en Invernadero 1. (>80%). Monitoree desarrollo de hongos patógenos.';
-        } else {
-          aiAnalysis = '✅ Condiciones agroecológicas estables. Mantenga monitoreo constante de sensores.';
-        }
+      } catch (llmErr) {
+        console.warn('[Telemetry] IA no disponible, usando solo reglas:', llmErr.message);
       }
-      setAiAlert(aiAnalysis);
+
+      // Combinar: reglas siempre + IA si aporta
+      const finalAnalysis = aiEnrichment
+        ? `${ruleAnalysis}\n\n🤖 IA: ${aiEnrichment}`
+        : ruleAnalysis;
+
+      setAiAlert(finalAnalysis);
 
     } catch (err) {
       setError(err.message);
@@ -539,7 +561,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
           <Info size={64} className="text-blue-400" />
         </div>
         <div className="flex justify-between items-start mb-2">
-          <span className="font-black text-blue-400 block text-xs uppercase tracking-widest">Inferencia de IA</span>
+          <span className="font-black text-blue-400 block text-xs uppercase tracking-widest">Analisis Agronomico</span>
           {!loading && aiAlert && (
             <span className="text-green-400 text-xs font-bold bg-green-900/30 px-2 py-1 rounded">● ACTIVO</span>
           )}
@@ -555,7 +577,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
           <div className="space-y-2">
             {aiAlert ? (
               <div>
-                <p className="text-lg leading-relaxed text-slate-200">
+                <p className="text-sm leading-relaxed text-slate-200 whitespace-pre-line">
                   {aiAlert}
                 </p>
                 {renderActionButton()}
