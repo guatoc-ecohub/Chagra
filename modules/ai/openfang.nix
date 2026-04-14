@@ -141,19 +141,19 @@ in
         serviceConfig = {
           User = "openfang";
           Group = "openfang";
+          StateDirectory = "openfang/agent-${name}";
+          StateDirectoryMode = "0700";
           WorkingDirectory = "/var/lib/openfang/agent-${name}";
           EnvironmentFile = [
             config.sops.secrets.${agent.telegramTokenSecret}.path
             config.sops.secrets.${agent.openrouterKeySecret}.path
           ] ++ agent.extraEnvFiles;
 
-          ProtectSystem = "strict";
           ProtectHome = true;
           PrivateTmp = true;
           ProtectKernelTunables = true;
           ProtectKernelModules = true;
           ProtectControlGroups = true;
-          ReadWritePaths = [ "/var/lib/openfang/agent-${name}" ];
 
           Restart = "on-failure";
           RestartSec = "10s";
