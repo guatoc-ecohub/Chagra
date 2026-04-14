@@ -123,13 +123,11 @@ in
     };
     users.groups.openfang = { gid = 2010; };
 
+    # Solo crear el directorio raíz via tmpfiles — subdirectorios
+    # los crea el preStart como usuario openfang (evita mismatch de ownership)
     systemd.tmpfiles.rules = [
       "d /var/lib/openfang 0750 openfang openfang -"
-    ] ++ (lib.concatMap (name: [
-      "d /var/lib/openfang/agent-${name} 0700 openfang openfang -"
-      "d /var/lib/openfang/agent-${name}/.openfang 0700 openfang openfang -"
-      "d /var/lib/openfang/agent-${name}/data 0700 openfang openfang -"
-    ]) (lib.attrNames cfg.agents));
+    ];
 
     systemd.services = lib.mapAttrs' (name: agent:
       lib.nameValuePair "openfang-${name}" {
