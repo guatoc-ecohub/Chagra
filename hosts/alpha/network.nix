@@ -31,6 +31,7 @@
         1880    # Node-RED
         3000    # Grafana
         8081    # FarmOS (gestión agrícola)
+        4200    # OpenFang Dashboard / WebChat
       ];
       allowedUDPPorts = [
         5353     # mDNS (descubrimiento Home Assistant)
