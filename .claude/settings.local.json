@@ -41,7 +41,20 @@
       "Bash(journalctl -b -u tailscaled --no-pager -n 20)",
       "Bash(journalctl -u sshd -n 30 --no-pager)",
       "Bash(journalctl --user -n 30 --no-pager -g ssh)",
-      "Bash(ssh-keygen:*)"
+      "Bash(ssh-keygen:*)",
+      "Bash(nix-instantiate --parse modules/ai/openfang.nix)",
+      "Bash(nix-instantiate --parse hosts/alpha/default.nix)",
+      "Bash(sudo rsync:*)",
+      "Bash(ls /mnt/fast/appdata/farmos-pwa/assets/BiodiversidadView*)",
+      "Bash(nix-instantiate --parse modules/agents/chagra-deploy.nix)",
+      "Bash(python3 -c 'import json,sys; d=json.load\\(sys.stdin\\); print\\(\"Models disponibles:\"\\); [print\\(f\"  - {m[\\\\\"name\\\\\"]}\"\\) for m in d.get\\(\"models\",[]\\)]')",
+      "Bash(python3 -c 'import json,sys; d=json.load\\(sys.stdin\\); [print\\(\"  -\", m[\"name\"]\\) for m in d.get\\(\"models\",[]\\)]')",
+      "Bash(python3 -c 'import json,sys; d=json.load\\(sys.stdin\\); print\\(\"text:\", d.get\\(\"response\",\"\"\\)[:100]\\); print\\(\"done:\", d.get\\(\"done\"\\)\\)')",
+      "Bash(python3 -c 'import base64; print\\(base64.b64encode\\(bytes.fromhex\\(\"89504e470d0a1a0a0000000d494844520000000100000001010300000025db56ca00000003504c5445ffffffa7c41bc80000000a49444154789c6300010000050001a2d1b77f0000000049454e44ae426082\"\\)\\).decode\\(\\)\\)')",
+      "Bash(python3 -c 'import json,sys; d=json.load\\(sys.stdin\\); print\\(\"text:\", d.get\\(\"response\",\"\"\\)[:200]\\)')",
+      "Bash(python3 -m json.tool)",
+      "Bash(python3 -c 'import json,sys; d=json.load\\(sys.stdin\\); [print\\(\"  -\", m[\"name\"], m.get\\(\"size\",0\\)//1024//1024, \"MB\"\\) for m in d.get\\(\"models\",[]\\)]')",
+      "Bash(sudo podman:*)"
     ]
   }
 }

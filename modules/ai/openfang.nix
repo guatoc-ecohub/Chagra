@@ -66,6 +66,14 @@ let
     dm_policy = "allowed_only"
     output_format = "markdown"
 
+    ${lib.optionalString agent.mediaEnabled ''
+    [channels.telegram.media]
+    enabled = true
+    allowed_types = ["photo", "document", "sticker"]
+    max_size_mb = ${toString agent.mediaMaxSizeMb}
+    download_dir = "/var/lib/openfang/agent-${name}/data/media"
+    ''}
+
     [[users]]
     name = "${name}"
     role = "owner"
@@ -76,6 +84,29 @@ let
     [memory]
     consolidation_threshold = 5000
     decay_rate = 0.1
+
+    ${lib.optionalString (agent.workspacePath != "") ''
+    [workspace]
+    name = "${name}-workspace"
+    path = "${agent.workspacePath}"
+    ''}
+
+    ${lib.optionalString (agent.tools != []) ''
+    [tools]
+    enabled = [${lib.concatMapStringsSep ", " (t: ''"${t}"'') agent.tools}]
+    ''}
+
+    ${lib.optionalString (agent.networkAllowlist != []) ''
+    [sandbox]
+    mode = "strict"
+    filesystem_jail = true
+    network_allowlist = [${lib.concatMapStringsSep ", " (h: ''"${h}"'') agent.networkAllowlist}]
+    ''}
+
+    [prompt]
+    system = """
+    ${agent.systemPrompt}
+    """
   '';
 
 in
@@ -101,6 +132,30 @@ in
             default = [];
           };
           systemPrompt = lib.mkOption { type = lib.types.str; };
+          tools = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [];
+            description = "Lista de tools habilitados (ej. http.request, fs.read)";
+          };
+          workspacePath = lib.mkOption {
+            type = lib.types.str;
+            default = "";
+            description = "Ruta del workspace del agente";
+          };
+          networkAllowlist = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [];
+            description = "Hosts permitidos en el sandbox de red";
+          };
+          mediaEnabled = lib.mkOption {
+            type = lib.types.bool;
+            default = false;
+            description = "Habilitar recepción de media (fotos, documentos) en Telegram";
+          };
+          mediaMaxSizeMb = lib.mkOption {
+            type = lib.types.int;
+            default = 10;
+          };
           extraEnvFiles = lib.mkOption {
             type = lib.types.listOf lib.types.str;
             default = [];
@@ -174,8 +229,8 @@ in
           export OPENFANG_HOME="$HOME"
           export OPENFANG_CONFIG="/var/lib/openfang/agent-${name}/config.toml"
 
-          # Crear .openfang si OpenFang lo necesita (como usuario openfang)
-          mkdir -p "$HOME/.openfang" "$HOME/data"
+          # Crear .openfang y subdirectorios como usuario openfang
+          mkdir -p "$HOME/.openfang" "$HOME/data" "$HOME/data/media" "$HOME/workspace"
 
           # Copiar config donde OpenFang la busca
           cp -f "$HOME/config.toml" "$HOME/.openfang/config.toml"
