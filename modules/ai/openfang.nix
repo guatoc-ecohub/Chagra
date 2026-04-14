@@ -157,7 +157,7 @@ in
 
         path = with pkgs; [
           coreutils gnugrep findutils gawk gnused
-          curl jq
+          curl jq gettext
           (python3.withPackages (ps: with ps; [ requests pyyaml ]))
         ] ++ agent.extraPackages;
 
@@ -194,29 +194,19 @@ in
         preStart = let
           configFile = mkAgentConfig name agent;
         in ''
-          WS="/var/lib/openfang/workspace/${agent.workspace}"
-          mkdir -p "$WS/scripts" "$WS/skills" "$WS/data"
+          export HOME="/var/lib/openfang/agent-${name}"
+          mkdir -p "$HOME/.picoclaw/workspace"
+          mkdir -p "/var/lib/openfang/workspace/${agent.workspace}/scripts"
+          mkdir -p "/var/lib/openfang/workspace/${agent.workspace}/data"
 
-          # Copiar skills
-          ${lib.concatMapStringsSep "\n" (skill: ''
-            install -m 644 ${skill} "$WS/skills/$(basename ${skill})"
-          '') agent.skills}
-
-          # Generar config (con sustitución de env vars en runtime)
-          envsubst < ${configFile} > "/var/lib/openfang/.openfang-${name}-config.json" || \
-            cp ${configFile} "/var/lib/openfang/.openfang-${name}-config.json"
+          # Generar config con sustitución de env vars
+          ${pkgs.gettext}/bin/envsubst < ${configFile} > "$HOME/.picoclaw/config.json" || \
+            cp ${configFile} "$HOME/.picoclaw/config.json"
         '';
 
         script = ''
-          export HOME=/var/lib/openfang
-          CONFIG="/var/lib/openfang/.openfang-${name}-config.json"
-
-          # Sustituir variables de entorno en la config
-          if command -v envsubst > /dev/null; then
-            envsubst < "$CONFIG" > "$CONFIG.tmp" && mv "$CONFIG.tmp" "$CONFIG"
-          fi
-
-          exec ${picoclaw-pkg}/bin/picoclaw gateway --config "$CONFIG"
+          export HOME="/var/lib/openfang/agent-${name}"
+          exec ${picoclaw-pkg}/bin/picoclaw gateway
         '';
       }
     ) cfg.agents;
