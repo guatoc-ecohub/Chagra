@@ -3,8 +3,15 @@ import { syncManager } from './syncManager';
 
 const isUUID = (uuid) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uuid);
 
+const resolveEndpoint = (type) =>
+  type === 'plant_asset' ? '/api/asset/plant' :
+  type === 'input' ? '/api/log/input' :
+  type === 'harvest' ? '/api/log/harvest' :
+  '/api/log/seeding';
+
 export const savePayload = async (type, payload) => {
   console.log(`Payload Chagra (${type}):`, JSON.stringify(payload, null, 2));
+  const endpoint = resolveEndpoint(type);
   if (navigator.onLine) {
     try {
       // Fase 1.5: Resolver entidades anidadas y limpiar mock IDs
@@ -54,11 +61,6 @@ export const savePayload = async (type, payload) => {
           }
         }
       }
-
-      const endpoint = type === 'plant_asset' ? '/api/asset/plant' :
-        type === 'input' ? '/api/log/input' :
-          type === 'harvest' ? '/api/log/harvest' :
-            '/api/log/seeding';
 
       if (payload._multipartFile) delete payload._multipartFile;
       if (payload.data.attributes) {
