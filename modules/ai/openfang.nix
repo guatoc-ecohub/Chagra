@@ -179,7 +179,7 @@ in
           ProtectKernelModules = true;
           ProtectControlGroups = true;
 
-          ReadWritePaths = [ "/var/lib/openfang/workspace/${agent.workspace}" ];
+          ReadWritePaths = [ "/var/lib/openfang" ];
           ReadOnlyPaths = [ "/etc/os-release" "/run/current-system" ];
 
           Restart = "on-failure";

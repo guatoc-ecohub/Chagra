@@ -72,6 +72,12 @@
     extraGroups = [ "users" ];
   };
 
+  # Crear directorios de trabajo para los runners
+  systemd.tmpfiles.rules = [
+    "d /var/lib/nixos-runner 0750 nixos-deployer nixos-deployer -"
+    "d /var/lib/nixos-runner/work 0750 nixos-deployer nixos-deployer -"
+  ];
+
   users.users.nixos-deployer = {
     isSystemUser = true;
     group = "nixos-deployer";
