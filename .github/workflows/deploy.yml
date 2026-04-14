@@ -24,7 +24,7 @@ jobs:
         run: npm run build
 
       - name: Deploy to production
-        run: rsync -avz --delete --no-group dist/ /mnt/fast/appdata/farmos-pwa/
+        run: rsync -avz --delete --no-group --chmod=D755,F644 dist/ /mnt/fast/appdata/farmos-pwa/
 
       - name: Verify deployment
         run: |
