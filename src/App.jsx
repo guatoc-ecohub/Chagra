@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback } from 'react';
-import { Warehouse, MapPin, Eye, Package, Clock, ClipboardList, CheckCircle, WifiOff } from 'lucide-react';
+import { Warehouse, MapPin, Eye, Package, Clock, ClipboardList, CheckCircle, WifiOff, Leaf } from 'lucide-react';
 import localforage from 'localforage';
 
 import { isAuthenticated, logoutUser } from './services/authService';
@@ -26,6 +26,7 @@ const WorkerHistory = lazy(() => import('./components/WorkerHistory'));
 const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').then(m => ({ default: m.InventoryDashboard })));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
+const BiodiversidadView = lazy(() => import('./components/BiodiversidadView'));
 
 localforage.config({
   name: 'Chagra',
@@ -45,6 +46,7 @@ const NAV_TILES = [
   { id: 'bodega', label: 'Bodega', icon: Package, color: 'bg-sky-800', desc: 'Stock de biopreparados' },
   { id: 'task_log', label: 'Tareas', icon: Clock, color: 'bg-red-700', desc: 'Cola de pendientes' },
   { id: 'historial', label: 'Historial', icon: ClipboardList, color: 'bg-indigo-700', desc: 'Trazabilidad de operaciones' },
+  { id: 'biodiversidad', label: 'Biodiversidad', icon: Leaf, color: 'bg-emerald-700', desc: 'Ecosistema, estratos y gremios' },
 ];
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
@@ -223,6 +225,8 @@ export default function App() {
         );
       case 'historial':
         return <WorkerHistory onBack={() => setCurrentView('dashboard')} />;
+      case 'biodiversidad':
+        return <BiodiversidadView onBack={() => setCurrentView('dashboard')} />;
       default:
         return <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>;
     }
