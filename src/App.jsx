@@ -98,7 +98,7 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
           <button onClick={onLogout} aria-label="Cerrar sesión" className="text-slate-400 hover:text-white px-4 py-3 min-h-[44px] bg-slate-800 rounded">Salir</button>
         </div>
       </header>
-      <main className="flex-1 p-4 flex flex-col overflow-y-auto gap-4">
+      <main className="flex-1 p-4 flex flex-col overflow-y-auto gap-4 bg-biopunk-pattern">
         <TelemetryAlerts lastFarmOsLog={lastLogMessage} />
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">

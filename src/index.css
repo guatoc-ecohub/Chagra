@@ -16,7 +16,6 @@
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
 
-  /* M6: Focus visible global para todos los interactivos */
   button,
   [role="button"],
   a,
@@ -26,12 +25,26 @@
     @apply focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 outline-none;
   }
 
-  /* H7: Respetar preferencias de movimiento reducido */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
     }
+  }
+}
+
+@layer utilities {
+  /*
+   * Bio-Punk Choachí Pattern
+   * Line-art a 3% opacidad en morpho cyan (rgba 6,182,212)
+   * Fauna: Oso Andino, Borugo, Pava Andina, Morpho Butterfly, Escarabajo Hércules, Mazorca
+   * Circuitos: líneas PCB estilizadas conectando las siluetas
+   * Tile: 400x400, repeat seamless
+   */
+  .bg-biopunk-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Cg fill='none' stroke='rgba(6,182,212,0.03)' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'%3E%3C!-- Circuitos PCB --%3E%3Cpath d='M0 200h45m0 0l5-5v-30l5-5h20m0 0l5 5v15l5 5h15'/%3E%3Cpath d='M200 0v40m0 0l-5 5h-25l-5 5v20'/%3E%3Cpath d='M400 180h-40m0 0l-5 5v25l-5 5h-20'/%3E%3Cpath d='M180 400v-35m0 0l5-5h30l5-5v-15'/%3E%3Ccircle cx='50' cy='200' r='2'/%3E%3Ccircle cx='200' cy='45' r='2'/%3E%3Ccircle cx='355' cy='185' r='2'/%3E%3Ccircle cx='185' cy='360' r='2'/%3E%3Ccircle cx='100' cy='165' r='1.5'/%3E%3Ccircle cx='325' cy='215' r='1.5'/%3E%3C!-- Oso Andino (Tremarctos ornatus) - centro izq --%3E%3Cpath d='M60 85c-3-8 2-16 8-18s14 3 16 10c1 4 0 8-2 11m-22-3c-4 2-8 8-7 14s5 12 12 14c5 1 10-1 14-4m3-7c2-5 1-11-2-15m-20 15c0 6 3 12 8 15s12 2 16-2'/%3E%3Ccircle cx='67' cy='82' r='1.2'/%3E%3Ccircle cx='77' cy='82' r='1.2'/%3E%3C!-- Mazorca de maíz - arriba der --%3E%3Cpath d='M290 50c0-12 4-22 10-25s10 2 10 15c0 10-3 22-8 28m-12-18c-1 5 0 12 3 18m17-20c1 5 0 13-4 19m-14-5l-4 8m7-9l-3 10m7-11l-2 10m7-9l-4 8'/%3E%3Cpath d='M290 40c-4-3-6-8-4-12m28 10c3-4 4-9 2-13'/%3E%3C!-- Borugo (Cuniculus paca) - abajo izq --%3E%3Cpath d='M80 310c-5-2-8 3-6 8l4 10c2 4 7 6 12 5l18-3c5-1 9-5 10-10l2-10c0-5-3-9-8-10l-14-2c-6 0-12 3-14 8z'/%3E%3Ccircle cx='85' cy='312' r='1'/%3E%3Cpath d='M76 306c-3-2-5-6-3-9m40 8c2-3 1-7-1-10'/%3E%3Cpath d='M90 318l-2 2m4-1l-1 3m4-2l-1 2'/%3E%3C!-- Pava Andina (Penelope montagnii) - der medio --%3E%3Cpath d='M320 120c-3-5 0-12 5-14l8-2c4 0 7 3 8 7l2 12c-1 5-4 9-8 10l-6 1m-9-14l-10 6c-3 2-5 6-4 10l3 12 6 8m14-22l5 15c1 4-1 8-4 10l-8 4'/%3E%3Ccircle cx='328' cy='117' r='1'/%3E%3Cpath d='M335 108c2-4 6-6 10-5m-10 5l3-8'/%3E%3C!-- Morpho Butterfly (Morpho menelaus) - centro --%3E%3Cpath d='M195 195v20m-15-12c-8-6-18-6-22 0s0 16 8 20c5 2 10 1 14-2m15-18c8-6 18-6 22 0s0 16-8 20c-5 2-10 1-14-2'/%3E%3Cpath d='M180 191c-5 3-6 10-2 14m40-14c5 3 6 10 2 14'/%3E%3C!-- Escarabajo Hércules (Dynastes hercules) - abajo der --%3E%3Cpath d='M310 330c-3-1-5 1-5 4v8c0 3 2 6 5 7h10c3-1 5-4 5-7v-8c0-3-2-5-5-4h-10z'/%3E%3Cpath d='M315 330v-8c0-3 2-5 5-5m0 0c2 0 4-2 4-5v-4'/%3E%3Cpath d='M308 338h-5m22 0h5m-20 6l-3 5m16-5l3 5m-14-18l-4-3m12 3l4-3'/%3E%3C!-- Circuitos secundarios --%3E%3Cpath d='M130 150h20l5 5v20m85-25h-20l-5-5v-15'/%3E%3Cpath d='M250 280v-20l5-5h15m-120 25v20l-5 5h-20'/%3E%3Cpath d='M160 100l30 30m50-30l-30 30'/%3E%3Cpath d='M160 300l25-25m55 25l-25-25'/%3E%3Ccircle cx='155' cy='150' r='1.5'/%3E%3Ccircle cx='255' cy='280' r='1.5'/%3E%3Ccircle cx='130' cy='305' r='1.5'/%3E%3Ccircle cx='270' cy='100' r='1.5'/%3E%3C/g%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 400px 400px;
   }
 }

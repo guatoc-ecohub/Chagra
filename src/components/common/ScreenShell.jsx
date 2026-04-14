@@ -35,7 +35,7 @@ export const ScreenShell = ({ title, onBack, icon: Icon, children, actions }) =>
       </div>
       {actions && <div className="flex gap-2 shrink-0">{actions}</div>}
     </header>
-    <main className="flex-1 overflow-y-auto bg-slate-950">{children}</main>
+    <main className="flex-1 overflow-y-auto bg-slate-950 bg-biopunk-pattern">{children}</main>
   </div>
 );
 

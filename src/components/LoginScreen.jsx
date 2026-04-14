@@ -26,7 +26,7 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
   };
 
   return (
-    <div className="h-[100dvh] w-full bg-slate-950 flex flex-col justify-center items-center p-6 text-slate-100">
+    <div className="h-[100dvh] w-full bg-slate-950 bg-biopunk-pattern flex flex-col justify-center items-center p-6 text-slate-100">
       <div className="w-full max-w-sm flex flex-col items-center gap-8">
         <div className="w-32 h-32 bg-muzo/20 rounded-full flex items-center justify-center shadow-neon-muzo">
           <Sprout size={72} className="text-muzo-glow" />
