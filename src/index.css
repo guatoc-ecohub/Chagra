@@ -44,6 +44,6 @@
   .bg-biopunk-pattern {
     background-image: url("/biopunk-pattern.svg");
     background-repeat: repeat;
-    background-size: 600px 600px;
+    background-size: 800px 800px;
   }
 }

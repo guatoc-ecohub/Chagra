@@ -1,146 +1,225 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">
   <defs>
     <style>
-      .circuit { fill: none; stroke: rgba(6,182,212,0.07); stroke-width: 1; stroke-linecap: round; }
-      .fauna { fill: none; stroke: rgba(6,182,212,0.08); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-      .node { fill: rgba(6,182,212,0.06); stroke: none; }
+      .c { fill: none; stroke: rgba(6,182,212,0.06); stroke-width: 0.8; stroke-linecap: round; }
+      .f { fill: none; stroke: rgba(6,182,212,0.12); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+      .d { fill: rgba(6,182,212,0.04); stroke: none; }
+      .e { fill: rgba(6,182,212,0.08); stroke: none; }
     </style>
   </defs>
 
-  <!-- === CIRCUITOS PCB === -->
-  <g class="circuit">
-    <path d="M0 300h60l8-8v-50l8-8h40l8 8v30l8 8h25"/>
-    <path d="M300 0v55l-8 8h-40l-8 8v35"/>
-    <path d="M600 280h-55l-8 8v45l-8 8h-35"/>
-    <path d="M280 600v-50l8-8h45l8-8v-30"/>
-    <path d="M150 150h40l8 8v40"/>
-    <path d="M450 420h-35l-8-8v-35"/>
-    <path d="M100 450l8-8h30l8-8v-25"/>
-    <path d="M480 150l-8 8v30l-8 8h-30"/>
+  <!-- ═══ CIRCUITOS PCB ═══ -->
+  <g class="c">
+    <path d="M0 400h80l6-6v-70l6-6h50l6 6v40l6 6h30"/>
+    <path d="M400 0v75l-6 6h-55l-6 6v45"/>
+    <path d="M800 370h-70l-6 6v60l-6 6h-45"/>
+    <path d="M370 800v-65l6-6h50l6-6v-40"/>
+    <path d="M200 200h50l6 6v50"/>
+    <path d="M600 580h-45l-6-6v-45"/>
+    <path d="M140 600l6-6h40l6-6v-35"/>
+    <path d="M650 200l-6 6v40l-6 6h-40"/>
+    <!-- Diagonales tech -->
+    <path d="M250 130l40 40m60-40l-40 40"/>
+    <path d="M500 650l35-35m50 35l-35-35"/>
   </g>
-  <g class="node">
-    <circle cx="60" cy="300" r="3"/>
-    <circle cx="300" cy="55" r="3"/>
-    <circle cx="545" cy="288" r="3"/>
-    <circle cx="288" cy="550" r="3"/>
-    <circle cx="155" cy="155" r="2.5"/>
-    <circle cx="450" cy="420" r="2.5"/>
-    <circle cx="105" cy="450" r="2.5"/>
-    <circle cx="480" cy="155" r="2.5"/>
-    <circle cx="198" cy="198" r="2"/>
-    <circle cx="415" cy="377" r="2"/>
+  <g class="d">
+    <circle cx="80" cy="400" r="4"/><circle cx="400" cy="75" r="4"/>
+    <circle cx="730" cy="376" r="4"/><circle cx="376" cy="735" r="4"/>
+    <circle cx="200" cy="200" r="3"/><circle cx="600" cy="580" r="3"/>
+    <circle cx="146" cy="600" r="3"/><circle cx="650" cy="200" r="3"/>
+    <circle cx="256" cy="256" r="2.5"/><circle cx="555" cy="535" r="2.5"/>
   </g>
 
-  <!-- === OSO ANDINO (Tremarctos ornatus) — arriba izq === -->
-  <g class="fauna" transform="translate(55,60) scale(1.8)">
-    <!-- Cabeza redonda con hocico corto -->
-    <ellipse cx="30" cy="22" rx="18" ry="16"/>
-    <!-- Orejas redondas -->
-    <circle cx="15" cy="10" r="7"/>
-    <circle cx="45" cy="10" r="7"/>
-    <!-- Ojos con anteojos (marca facial característica) -->
-    <circle cx="23" cy="20" r="4"/>
-    <circle cx="37" cy="20" r="4"/>
-    <path d="M19 20c-3-6 0-12 4-12m18 12c3-6 0-12-4-12"/>
+  <!-- ═══ OSO ANDINO (Tremarctos ornatus) ═══ arriba-izq -->
+  <g class="f" transform="translate(65,55)">
+    <!-- Cuerpo sentado -->
+    <path d="M50 110c-18-2-32-15-36-35c-3-14 0-28 8-38"/>
+    <path d="M100 110c18-2 32-15 36-35c3-14 0-28-8-38"/>
+    <!-- Torso -->
+    <path d="M22 37c-2 12 0 28 6 42c4 10 12 22 22 31"/>
+    <path d="M128 37c2 12 0 28-6 42c-4 10-12 22-22 31"/>
+    <!-- Cabeza grande y redonda -->
+    <path d="M22 37c2-12 10-22 20-27c8-4 18-6 28-4c10 2 20 8 26 18c5 8 7 18 5 28"/>
+    <!-- Orejas redondas pequeñas -->
+    <path d="M35 12c-4-8-2-16 5-19c7-3 14 1 15 8"/>
+    <path d="M115 12c4-8 2-16-5-19c-7-3-14 1-15 8"/>
+    <!-- Anteojos — marca facial del oso de anteojos -->
+    <path d="M45 30c-6-2-12 2-13 8c-1 6 3 11 9 12c4 1 8-1 10-4"/>
+    <path d="M105 30c6-2 12 2 13 8c1 6-3 11-9 12c-4 1-8-1-10-4"/>
     <!-- Hocico -->
-    <ellipse cx="30" cy="30" rx="6" ry="4"/>
-    <!-- Cuerpo robusto -->
-    <path d="M12 36c-4 8-6 20-4 30s8 18 22 18 20-8 22-18 0-22-4-30"/>
-    <!-- Patas -->
-    <path d="M16 82c-2 6-1 12 3 14m22-14c2 6 1 12-3 14"/>
+    <path d="M60 48c-4 2-6 6-5 10c1 5 6 8 12 8c6 0 11-3 12-8c1-4-1-8-5-10"/>
+    <!-- Nariz -->
+    <ellipse cx="75" cy="52" rx="4" ry="3" class="e"/>
+    <!-- Ojos dentro de los anteojos -->
+    <circle cx="50" cy="36" r="2.5" class="e"/>
+    <circle cx="100" cy="36" r="2.5" class="e"/>
+    <!-- Garras delanteras -->
+    <path d="M38 108c-3 4-2 10 2 13c3 2 7 1 9-2"/>
+    <path d="M112 108c3 4 2 10-2 13c-3 2-7 1-9-2"/>
+    <!-- Patas traseras -->
+    <path d="M50 110c-2 6 0 12 5 14l8 2"/>
+    <path d="M100 110c2 6 0 12-5 14l-8 2"/>
   </g>
 
-  <!-- === MAZORCA DE MAÍZ — arriba der === -->
-  <g class="fauna" transform="translate(420,40) scale(1.6)">
+  <!-- ═══ MAZORCA DE MAÍZ ═══ arriba-der -->
+  <g class="f" transform="translate(560,50)">
     <!-- Forma de la mazorca -->
-    <path d="M30 10c-8 0-14 8-14 20v35c0 12 6 20 14 20s14-8 14-20V30c0-12-6-20-14-20z"/>
-    <!-- Granos (filas) -->
-    <path d="M20 25h20m-20 8h20m-20 8h20m-20 8h20m-20 8h20m-20 8h20"/>
-    <!-- Líneas verticales de granos -->
-    <path d="M25 20v50m10-50v50"/>
+    <path d="M40 25c-12-2-20 10-22 28c-2 20 0 45 5 60c4 12 12 20 22 22c10-2 18-10 22-22c5-15 7-40 5-60c-2-18-10-30-22-28z"/>
+    <!-- Granos — filas curvas -->
+    <path d="M22 40c10-3 25-3 36 0"/>
+    <path d="M20 52c12-3 28-3 40 0"/>
+    <path d="M19 64c12-3 30-3 42 0"/>
+    <path d="M20 76c12-3 28-3 40 0"/>
+    <path d="M22 88c10-3 25-3 36 0"/>
+    <path d="M25 100c8-2 20-2 30 0"/>
+    <!-- Costillas verticales -->
+    <path d="M32 30c-1 20 0 55 3 80"/>
+    <path d="M48 28c1 20 0 55-3 80"/>
     <!-- Hojas de la tusa -->
-    <path d="M16 15c-8-5-15-3-18 5m32-5c8-5 15-3 18 5"/>
-    <path d="M14 10c-10-8-18-5-20 2m32-2c10-8 18-5 20 2"/>
+    <path d="M18 28c-10-8-22-10-28-2c-4 6-2 14 5 18"/>
+    <path d="M62 28c10-8 22-10 28-2c4 6 2 14-5 18"/>
+    <path d="M15 20c-14-12-26-10-30 0c-3 6 0 14 8 18"/>
+    <path d="M65 20c14-12 26-10 30 0c3 6 0 14-8 18"/>
+    <!-- Pelos del maíz arriba -->
+    <path d="M35 22c-2-10-6-18-12-22"/>
+    <path d="M40 20c0-12 2-20 0-28"/>
+    <path d="M45 22c2-10 6-18 12-22"/>
   </g>
 
-  <!-- === BORUGO (Cuniculus paca) — abajo izq === -->
-  <g class="fauna" transform="translate(60,410) scale(1.6)">
-    <!-- Cuerpo ovalado robusto -->
-    <ellipse cx="45" cy="35" rx="35" ry="22"/>
+  <!-- ═══ BORUGO (Cuniculus paca) ═══ abajo-izq -->
+  <g class="f" transform="translate(55,530)">
+    <!-- Cuerpo ovalado grande -->
+    <path d="M40 50c-6-18 4-38 25-44c16-4 40-2 55 8c14 10 22 25 20 42c-2 16-14 28-30 32c-18 5-40 2-55-8c-12-8-18-18-15-30z"/>
     <!-- Cabeza -->
-    <ellipse cx="8" cy="30" rx="12" ry="10"/>
-    <!-- Ojo -->
-    <circle cx="5" cy="27" r="2"/>
-    <!-- Oreja pequeña -->
-    <path d="M12 20c2-5 6-7 9-5"/>
-    <!-- Patas cortas -->
-    <path d="M25 55v10m15 0v-10m20 10v-10m12 0v-10"/>
-    <!-- Manchas laterales (franjas) -->
-    <path d="M30 25c5 3 10 3 15 0m-17 8c6 4 12 4 18 0m-19 8c7 4 13 4 20 0"/>
-    <!-- Cola corta -->
-    <path d="M78 32c4 0 6 2 5 5"/>
+    <path d="M28 40c-8-4-18-2-24 6c-5 7-5 16 0 22c4 5 12 8 20 6"/>
+    <!-- Ojo grande -->
+    <circle cx="12" cy="48" r="4" class="e"/>
+    <!-- Oreja redondeada -->
+    <path d="M18 32c-2-6 2-12 8-14c5-2 10 0 12 5"/>
+    <!-- Bigotes -->
+    <path d="M4 54l-12-2m12 5l-14 1m12 4l-12 4"/>
+    <!-- Hocico -->
+    <path d="M2 56c-3 0-5-3-4-6c1-2 3-3 5-2"/>
+    <!-- Manchas laterales (patrón de puntos/franjas) -->
+    <circle cx="55" cy="35" r="2" class="d"/>
+    <circle cx="65" cy="30" r="2" class="d"/>
+    <circle cx="75" cy="33" r="2" class="d"/>
+    <circle cx="85" cy="38" r="2" class="d"/>
+    <circle cx="58" cy="48" r="2" class="d"/>
+    <circle cx="68" cy="45" r="2" class="d"/>
+    <circle cx="78" cy="48" r="2" class="d"/>
+    <circle cx="88" cy="52" r="2" class="d"/>
+    <circle cx="62" cy="60" r="2" class="d"/>
+    <circle cx="72" cy="58" r="2" class="d"/>
+    <circle cx="82" cy="62" r="2" class="d"/>
+    <!-- Patas cortas y fuertes -->
+    <path d="M45 82c-2 8 0 14 5 16l6-1"/>
+    <path d="M65 86c-1 8 1 14 6 15l6-2"/>
+    <path d="M90 84c1 8-1 14-5 16l-6-1"/>
+    <path d="M110 78c2 7 0 14-4 16l-6-1"/>
+    <!-- Cola casi inexistente -->
+    <path d="M118 58c4 1 7 0 8-3"/>
   </g>
 
-  <!-- === PAVA ANDINA (Penelope montagnii) — der medio === -->
-  <g class="fauna" transform="translate(430,195) scale(1.7)">
-    <!-- Cuerpo -->
-    <ellipse cx="40" cy="40" rx="25" ry="18"/>
-    <!-- Cuello largo -->
-    <path d="M18 30c-6-8-8-20-5-30"/>
+  <!-- ═══ PAVA ANDINA (Penelope montagnii) ═══ der-medio -->
+  <g class="f" transform="translate(560,280)">
+    <!-- Cuerpo robusto -->
+    <path d="M30 65c-8-15-4-35 10-45c12-8 30-8 45 0c12 7 18 22 14 38c-3 14-14 25-30 28c-14 2-28-4-39-21z"/>
+    <!-- Cuello largo y elegante -->
+    <path d="M30 35c-6-10-10-25-8-40c1-10 5-18 12-22"/>
+    <path d="M42 35c-4-10-6-25-4-38c1-8 4-16 10-20"/>
+    <!-- Cabeza pequeña -->
+    <path d="M34-27c-2-6 2-12 8-14c7-2 14 2 16 9c1 5-1 10-5 13c-5 3-11 3-16 0"/>
+    <!-- Ojo -->
+    <circle cx="42" cy="-25" r="2.5" class="e"/>
+    <!-- Pico curvo -->
+    <path d="M32-28c-4-1-8 0-10 3c-2 3 0 6 3 7l7-2"/>
+    <!-- Copete / Cresta -->
+    <path d="M44-40c3-6 8-10 14-10c4 0 7 3 6 7"/>
+    <path d="M48-38c2-8 6-14 12-14"/>
+    <!-- Papada roja (gular) -->
+    <path d="M36-14c-4 4-5 10-2 14c2 3 5 4 8 2"/>
+    <!-- Cola larga abanico -->
+    <path d="M85 62c12 8 22 22 26 38"/>
+    <path d="M82 68c10 10 18 26 20 42"/>
+    <path d="M78 72c8 12 14 28 14 44"/>
+    <!-- Plumas de la cola -->
+    <path d="M95 80c4 2 6 8 5 14m-10 0c4 4 5 10 3 16m-10 2c3 5 3 12 0 18"/>
+    <!-- Patas robustas -->
+    <path d="M48 85v22c0 3-1 5-3 6l-6 3l8 0l5-3"/>
+    <path d="M65 82v24c0 3 1 5 3 6l6 3l-8 0l-5-3"/>
+    <!-- Garras -->
+    <path d="M39 116l-5 4m5-4l0 5m5-5l4 4"/>
+    <path d="M61 118l-4 4m4-4l1 5m4-5l5 4"/>
+  </g>
+
+  <!-- ═══ MORPHO (Morpho menelaus) ═══ centro -->
+  <g class="f" transform="translate(320,340)">
+    <!-- Abdomen -->
+    <path d="M80 55c-1 10-2 25-1 40c1 8 3 12 6 12c3 0 5-4 6-12c1-15 0-30-1-40"/>
+    <!-- Tórax -->
+    <ellipse cx="85" cy="52" rx="8" ry="10"/>
     <!-- Cabeza -->
-    <circle cx="10" cy="-2" r="8"/>
-    <!-- Ojo -->
-    <circle cx="7" cy="-3" r="2"/>
-    <!-- Pico -->
-    <path d="M2 -2l-8 2l8 3"/>
-    <!-- Cresta/copete -->
-    <path d="M12 -10c2-5 6-8 10-7"/>
-    <!-- Cola larga -->
-    <path d="M62 35c10 5 18 15 20 25m-20-28c8 8 14 20 14 30"/>
-    <!-- Patas -->
-    <path d="M30 56v16m-3 0h6m10-16v16m-3 0h6"/>
-    <!-- Papada (barbilla roja) -->
-    <path d="M8 6c-3 3-3 7 0 8"/>
-  </g>
-
-  <!-- === MORPHO BUTTERFLY (Morpho menelaus) — centro === -->
-  <g class="fauna" transform="translate(240,250) scale(2)">
-    <!-- Cuerpo central -->
-    <line x1="30" y1="10" x2="30" y2="50"/>
-    <!-- Antenas -->
-    <path d="M30 10c-5-8-12-10-15-8m15 8c5-8 12-10 15-8"/>
+    <circle cx="85" cy="38" r="7"/>
+    <!-- Ojos compuestos -->
+    <circle cx="80" cy="36" r="3" class="e"/>
+    <circle cx="90" cy="36" r="3" class="e"/>
+    <!-- Antenas elegantes curvas -->
+    <path d="M82 32c-8-14-18-24-25-28c-3-2-4 0-3 3"/>
+    <path d="M88 32c8-14 18-24 25-28c3-2 4 0 3 3"/>
     <!-- Ala superior izquierda -->
-    <path d="M30 18c-8-5-22-8-28-2s-4 16 4 22c5 4 14 5 20 1"/>
+    <path d="M77 50c-10-5-25-15-38-12c-14 3-24 14-26 28c-2 12 4 24 16 30c10 5 22 4 32-2c8-5 14-14 18-25"/>
     <!-- Ala superior derecha -->
-    <path d="M30 18c8-5 22-8 28-2s4 16-4 22c-5 4-14 5-20 1"/>
+    <path d="M93 50c10-5 25-15 38-12c14 3 24 14 26 28c2 12-4 24-16 30c-10 5-22 4-32-2c-8-5-14-14-18-25"/>
     <!-- Ala inferior izquierda -->
-    <path d="M30 35c-6 2-16 8-18 16s2 14 10 14c5 0 10-4 12-10"/>
+    <path d="M78 70c-8 4-20 14-24 28c-4 12 0 24 10 28c8 4 18 0 24-8c5-7 8-16 8-25"/>
     <!-- Ala inferior derecha -->
-    <path d="M30 35c6 2 16 8 18 16s-2 14-10 14c-5 0-10-4-12-10"/>
-    <!-- Venas de las alas -->
-    <path d="M30 22l-15-2m15 8l-18 8m15-6l18 8m-15-14l15-2"/>
+    <path d="M92 70c8 4 20 14 24 28c4 12 0 24-10 28c-8 4-18 0-24-8c-5-7-8-16-8-25"/>
+    <!-- Venas del ala izquierda -->
+    <path d="M77 52l-22-6m20 14l-28 10m24 4l-20 16"/>
+    <!-- Venas del ala derecha -->
+    <path d="M93 52l22-6m-20 14l28 10m-24 4l20 16"/>
+    <!-- Venas inferiores -->
+    <path d="M80 75l-14 18m30-18l14 18"/>
+    <!-- Brillo de las alas (iridiscencia) -->
+    <path d="M40 65c5 5 8 15 6 22" style="stroke:rgba(6,182,212,0.06)"/>
+    <path d="M130 65c-5 5-8 15-6 22" style="stroke:rgba(6,182,212,0.06)"/>
   </g>
 
-  <!-- === ESCARABAJO HÉRCULES (Dynastes hercules) — abajo der === -->
-  <g class="fauna" transform="translate(410,430) scale(1.8)">
-    <!-- Cuerpo (élitros) -->
-    <ellipse cx="30" cy="35" rx="18" ry="22"/>
+  <!-- ═══ ESCARABAJO HÉRCULES (Dynastes hercules) ═══ abajo-der -->
+  <g class="f" transform="translate(545,540)">
+    <!-- Élitros (caparazón) -->
+    <path d="M30 50c-14 0-24 10-26 25c-2 18 2 40 10 52c6 10 14 14 22 14c8 0 16-4 22-14c8-12 12-34 10-52c-2-15-12-25-26-25z"/>
     <!-- Línea media de los élitros -->
-    <line x1="30" y1="15" x2="30" y2="55"/>
-    <!-- Protórax -->
-    <path d="M18 15h24c3 0 5-2 5-5v-2H13v2c0 3 2 5 5 5z"/>
-    <!-- Cuerno superior (macho) — largo y curvo -->
-    <path d="M30 8c0-8 2-18 5-25s6-10 8-10"/>
-    <!-- Cuerno inferior (del protórax) -->
-    <path d="M30 8c-2-6-1-15 3-20"/>
+    <path d="M42 52v86"/>
+    <!-- Protórax (escudo frontal) -->
+    <path d="M20 52c-2-8 2-16 10-20h24c8 4 12 12 10 20"/>
     <!-- Cabeza -->
-    <rect x="22" y="5" width="16" height="10" rx="4"/>
-    <!-- Patas (3 pares) -->
-    <path d="M14 25l-10-5m-1 1l-4 6"/>
-    <path d="M12 35l-12 0m0 1l-3 6"/>
-    <path d="M14 45l-10 5m0 1l-2 7"/>
-    <path d="M46 25l10-5m1 1l4 6"/>
-    <path d="M48 35l12 0m0 1l3 6"/>
-    <path d="M46 45l10 5m0 1l2 7"/>
+    <path d="M28 32h28c3 0 5-3 5-6v-4H23v4c0 3 2 6 5 6z"/>
+    <!-- CUERNO SUPERIOR — largo, curvo hacia arriba -->
+    <path d="M42 22c-1-10 0-22 4-32c3-8 8-14 14-16c4-1 6 1 5 4c-2 5-6 10-10 16"/>
+    <!-- Cuerno inferior (del protórax) más corto -->
+    <path d="M42 32c-3-8-2-20 2-28c2-5 5-8 8-8"/>
+    <!-- Dientes del cuerno superior -->
+    <path d="M52-10c2-2 5-2 6 0m-14 8c2-2 5-3 7-1"/>
+    <!-- Mandíbulas -->
+    <path d="M34 24l-4-4m20 4l4-4"/>
+    <!-- Patas — 3 pares con articulaciones -->
+    <!-- Par 1 (delantero) -->
+    <path d="M20 55l-14-8l-6 2l-4 8"/>
+    <path d="M64 55l14-8l6 2l4 8"/>
+    <!-- Par 2 (medio) -->
+    <path d="M16 75l-16 0l-4 4l-2 10"/>
+    <path d="M68 75l16 0l4 4l2 10"/>
+    <!-- Par 3 (trasero) -->
+    <path d="M20 95l-14 8l-4 4l0 10"/>
+    <path d="M64 95l14 8l4 4l0 10"/>
+    <!-- Segmentos de las patas -->
+    <circle cx="6" cy="47" r="1.5" class="d"/>
+    <circle cx="78" cy="47" r="1.5" class="d"/>
+    <circle cx="0" cy="75" r="1.5" class="d"/>
+    <circle cx="84" cy="75" r="1.5" class="d"/>
+    <!-- Textura de los élitros -->
+    <path d="M30 65c4-1 10-1 24 0m-26 15c6-1 14-1 28 0m-26 15c5-1 12-1 24 0" style="stroke:rgba(6,182,212,0.05)"/>
   </g>
 </svg>
