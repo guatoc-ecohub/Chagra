@@ -9,7 +9,9 @@
 // Ruta final: /api/ollama/api/generate → http://localhost:11434/api/generate
 const OLLAMA_BASE = '/api/ollama';
 const OLLAMA_URL = `${OLLAMA_BASE}/api/generate`;
-const MODEL = 'jyan1/paligemma-mix-224';
+// Gemma 3 4B (oficial Google, multimodal nativo). Reemplaza paligemma
+// porque el runner Llama de Ollama crashea con arquitectura PaliGemma.
+const MODEL = 'gemma3:4b';
 
 const DIAGNOSIS_PROMPT = 'detect disease, nutrient deficiency, and overall plant health. Output JSON: {"score": 0-100, "issues": [], "treatment": ""}';
 
