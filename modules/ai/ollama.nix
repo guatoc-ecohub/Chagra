@@ -64,9 +64,13 @@ in
           fi
           sleep 2
         done
-        # Pull idempotente: Ollama detecta si el modelo ya existe
-        ${pkgs.podman}/bin/podman exec ollama ollama pull gemma4:e4b || true
-        ${pkgs.podman}/bin/podman exec ollama ollama pull jyan1/paligemma-mix-224 || true
+        # Pull idempotente: Ollama detecta si el modelo ya existe.
+        # gemma3:4b — visión multimodal (reemplaza paligemma que crashea el runner)
+        # qwen3.5:4b — chat/tool-use para OpenFang fallback
+        # nomic-embed-text — embeddings para memoria semantica de OpenFang
+        ${pkgs.podman}/bin/podman exec ollama ollama pull gemma3:4b || true
+        ${pkgs.podman}/bin/podman exec ollama ollama pull qwen3.5:4b || true
+        ${pkgs.podman}/bin/podman exec ollama ollama pull nomic-embed-text || true
       '';
     };
 

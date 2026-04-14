@@ -214,12 +214,14 @@
         apiKeyEnv = "OPENROUTER_API_KEY";
 
         # Fallback: Ollama local (gratis, sin límite, ~15s)
+        # Nota: OpenFang usa el endpoint OpenAI-compatible de Ollama,
+        # así que el baseUrl debe incluir /v1.
         fallbackProviders = [
           {
             provider = "ollama";
             model = "qwen3.5:4b";
             apiKeyEnv = "";
-            baseUrl = "http://127.0.0.1:11434";
+            baseUrl = "http://127.0.0.1:11434/v1";
           }
         ];
 

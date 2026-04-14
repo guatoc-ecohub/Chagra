@@ -29,6 +29,9 @@ let
   stateDir = "/var/lib/chagra-deploy";
   lockFile = "${stateDir}/deploy.lock";
   logFile  = "${stateDir}/deploy.log";
+  # Template .env persistente que se copia al repo antes de cada build.
+  # El build de Vite inlinea VITE_* al bundle, por eso el .env es crítico.
+  envTemplate = "${stateDir}/.env.chagra";
 
   # Script principal de despliegue. Idempotente y atómico.
   chagra-deploy = pkgs.writeShellApplication {
@@ -59,7 +62,16 @@ let
       log "git fetch + reset to origin/main"
       git fetch --prune origin main
       git reset --hard origin/main
-      git clean -fdx -e node_modules
+      git clean -fdx -e node_modules -e .env
+
+      # Inyectar .env desde el template persistente. Si no existe, el build
+      # continúa (Vite hará fallback) pero Chagra fallará auth en runtime.
+      if [[ -f "${envTemplate}" ]]; then
+        log "cp .env template → repo/.env"
+        install -m 0640 "${envTemplate}" "${repoDir}/.env"
+      else
+        log "WARNING: ${envTemplate} no existe — build sin VITE_FARMOS_CLIENT_ID"
+      fi
 
       log "npm ci --no-audit --no-fund"
       npm ci --no-audit --no-fund --no-progress
