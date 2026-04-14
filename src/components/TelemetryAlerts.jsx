@@ -39,6 +39,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
   const [aiAlert, setAiAlert] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [aiStatus, setAiStatus] = useState('idle'); // idle | thinking | done | error
 
   // Variables de Entorno (Requeridas en el archivo .env)
   const HA_TOKEN = import.meta.env.VITE_HA_ACCESS_TOKEN;
@@ -377,6 +378,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
       // Mostrar reglas INMEDIATAMENTE — sin esperar IA
       setAiAlert(ruleAnalysis);
       setLoading(false);
+      setAiStatus('thinking');
 
       // 3. Enriquecimiento con IA en background (no bloquea UI)
       try {
@@ -414,10 +416,16 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
           const cleaned = fullText.replace(/<think>[\s\S]*?<\/think>/g, '').replace(/<[^>]+>/g, '').trim();
           if (cleaned.length > 10) {
             setAiAlert(`${ruleAnalysis}\n\n🤖 IA: ${cleaned}`);
+            setAiStatus('done');
+          } else {
+            setAiStatus('done');
           }
+        } else {
+          setAiStatus('error');
         }
       } catch (llmErr) {
         console.warn('[Telemetry] IA no disponible:', llmErr.message);
+        setAiStatus('error');
       }
 
     } catch (err) {
@@ -551,9 +559,23 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         </div>
         <div className="flex justify-between items-start mb-2">
           <span className="font-black text-blue-400 block text-xs uppercase tracking-widest">Analisis Agronomico</span>
-          {!loading && aiAlert && (
-            <span className="text-green-400 text-xs font-bold bg-green-900/30 px-2 py-1 rounded">● ACTIVO</span>
-          )}
+          <div className="flex items-center gap-2">
+            {aiStatus === 'thinking' && (
+              <span className="text-blue-400 text-2xs font-bold bg-blue-900/30 px-2 py-1 rounded flex items-center gap-1">
+                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full motion-safe:animate-pulse"></div>
+                IA analizando...
+              </span>
+            )}
+            {aiStatus === 'done' && (
+              <span className="text-green-400 text-2xs font-bold bg-green-900/30 px-2 py-1 rounded">● IA completada</span>
+            )}
+            {aiStatus === 'error' && (
+              <span className="text-amber-400 text-2xs font-bold bg-amber-900/30 px-2 py-1 rounded">IA no disponible</span>
+            )}
+            {!loading && aiAlert && (
+              <span className="text-green-400 text-2xs font-bold bg-green-900/30 px-2 py-1 rounded">Reglas activas</span>
+            )}
+          </div>
         </div>
         {loading ? (
           <div className="flex gap-2 items-center">
