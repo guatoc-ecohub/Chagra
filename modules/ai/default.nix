@@ -16,6 +16,7 @@ in
     ./whisper.nix
     ./piper.nix
     ./clawbots.nix
+    ./openfang.nix
   ];
 
   # ============================================

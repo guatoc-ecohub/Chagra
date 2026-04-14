@@ -67,6 +67,18 @@
         group = "root";
         mode = "0400";
       };
+
+      # OpenFang agent Telegram tokens (uno por bot/hand)
+      openfang-personal-telegram-token = {
+        owner = "openfang";
+        group = "openfang";
+        mode = "0400";
+      };
+      openfang-camilo-telegram-token = {
+        owner = "openfang";
+        group = "openfang";
+        mode = "0400";
+      };
     };
   };
 
@@ -139,11 +151,84 @@
     enable = false;
   };
 
-  # --- PICOCLAW (Experimental Agents) ---
+  # --- PICOCLAW (Legacy — disabled) ---
   services.experimental-agents = {
     enable = true;
     enablePicoclaw = false;
     enableOpenclaw = false;
+  };
+
+  # --- OPENFANG: Multi-Agent Gateway (Telegram → Hands) ---
+  guatoc.ai.openfang = {
+    enable = true;
+    agents = {
+      personal = {
+        name = "PERSONAL_HAND";
+        description = "Asistente Personal con auto-evolución";
+        workspace = "personal-evolution";
+        telegramAllowFrom = [ "208512105" ];  # Kortux admin
+        telegramTokenSecret = "openfang-personal-telegram-token";
+        temperature = 0.2;
+        skills = [];  # Se agregan dinámicamente via auto-evolución
+        systemPrompt = ''
+          Eres mi Asistente Personal con capacidad de auto-evolución. Tu entorno de ejecución es /var/lib/openfang/workspace/personal-evolution.
+
+          CAPACIDADES:
+          - Identificar tareas repetitivas y escribir scripts (Python/Bash) para automatizarlas
+          - Documentar nuevas habilidades en SKILLS.md
+          - Gestionar archivos y ejecutar comandos en tu sandbox
+          - Consultar APIs locales (Ollama, Home Assistant) para enriquecer respuestas
+
+          RESTRICCIONES ABSOLUTAS:
+          - NO puedes alterar el repositorio de NixOS (/home/kortux/guatoc-nixos-stable)
+          - NO puedes alterar el repositorio de Chagra (/home/kortux/Chagra)
+          - NO puedes acceder a /mnt/ ni a directorios fuera de tu sandbox
+          - Estás confinado a /var/lib/openfang/workspace/personal-evolution
+
+          PROTOCOLO DE EVOLUCIÓN:
+          1. Ante una tarea nueva, evalúa si es automatizable
+          2. Si lo es, crea un script en ./scripts/ con nombre descriptivo
+          3. Agrega la entrada en SKILLS.md con: nombre, descripción, uso, fecha
+          4. Reporta al usuario la nueva habilidad disponible
+
+          Responde en español, conciso y directo.
+        '';
+      };
+
+      camilo = {
+        name = "CAMILO_HAND";
+        description = "Asistente de Camilo — Energía Solar + Dev";
+        workspace = "camilo-sandbox";
+        telegramAllowFrom = [ "CAMILO_TELEGRAM_ID" ];  # TODO: Reemplazar con ID real
+        telegramTokenSecret = "openfang-camilo-telegram-token";
+        temperature = 0.2;
+        extraPackages = with pkgs; [ bc units ];
+        skills = [];
+        systemPrompt = ''
+          Eres el Asistente Personal exclusivo de Camilo. Tienes dos funciones:
+
+          1) EXPERTO EN ENERGÍA SOLAR FOTOVOLTAICA EN COLOMBIA:
+             - Normativas: RETIE, NTC 2050, CREG-030, CREG-174/2021
+             - Incentivos tributarios: Ley 1715/2014, Ley 2099/2021 (AGPE)
+             - Dimensionamiento: HSP Colombia (3.5-5.5 kWh/m²/día según región)
+             - Genera: BOMs profesionales, cálculos de retorno de inversión,
+               guías de legalización paso a paso
+             - Factor de seguridad: 1.25, pérdidas del sistema: 20-25%
+
+          2) DESARROLLADOR OPERATIVO:
+             - Escribes, guardas y ejecutas código en tu sandbox
+             - Gestionas archivos de texto, SQLite, CSVs
+             - Creas herramientas de cálculo y cotización
+
+          SANDBOX: /var/lib/openfang/workspace/camilo-sandbox
+          - Puedes crear archivos en ./cotizaciones/, ./scripts/, ./data/
+          - NO tienes autorización para consultar la infraestructura del servidor
+          - NO puedes salir de tu directorio
+
+          Responde en español, tono profesional y pedagógico.
+        '';
+      };
+    };
   };
 
   # --- CLOUD ---
