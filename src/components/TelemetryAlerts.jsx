@@ -275,6 +275,9 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         !s.data.state || s.data.state === 'unavailable' || s.data.state === 'unknown'
       );
 
+      // Nota prependible al análisis cuando hay sensores offline parciales.
+      let offlineNotice = '';
+
       if (unavailableSensors.length > 0) {
         // Idempotencia persistente por (sensor.key, 'conectividad') vía sync_meta.
         let dispatched = 0;
@@ -319,8 +322,11 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
           window.dispatchEvent(new CustomEvent('taskAdded'));
         }
 
-        const names = unavailableSensors.map(s => s.name).join(', ');
-        setAiAlert(`Alerta de Telemetría: ${unavailableSensors.length} sensor(es) no disponible(s) (${names}). Tarea de revisión despachada con prioridad ALTA.`);
+        // Persistimos el aviso de conectividad pero no hacemos early-return:
+        // si al menos un sensor responde, seguimos al análisis + IA para no
+        // perder visibilidad agronómica sobre la parte operativa.
+        const namesOffline = unavailableSensors.map(s => s.name).join(', ');
+        offlineNotice = `⚠️ ${unavailableSensors.length} sensor(es) offline (${namesOffline}). Tarea de revisión despachada.\n`;
 
         setSensors({
           invernaderoHumidity: invernaderoHumData.state !== 'unavailable' ? invernaderoHumData.state : null,
@@ -329,8 +335,13 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
           tabacoTemperature: tabacoTempData.state !== 'unavailable' ? tabacoTempData.state : null,
         });
 
-        setLoading(false);
-        return;
+        // Si TODOS los sensores están caídos, sí hacemos early return — no hay
+        // datos agronómicos que analizar.
+        if (unavailableSensors.length === sensorReadings.length) {
+          setAiAlert(offlineNotice);
+          setLoading(false);
+          return;
+        }
       }
 
       setSensors({
@@ -365,9 +376,11 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         ? alerts.join('\n')
         : `✅ Condiciones estables. Inv1: ${inv1Hum}%H/${inv1Temp}°C. Tab: ${tabHum}%H/${tabTemp}°C.`;
 
-      // Mostrar reglas INMEDIATAMENTE — sin esperar IA
+      // Mostrar reglas INMEDIATAMENTE — sin esperar IA. Prepeende aviso de
+      // sensores offline (si hay alguno) para que quede visible incluso si la
+      // IA después falla o tarda.
       if (parentSignal?.aborted) return;
-      setAiAlert(ruleAnalysis);
+      setAiAlert(`${offlineNotice}${ruleAnalysis}`);
       setLoading(false);
       setAiStatus('thinking');
 
@@ -385,7 +398,16 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
             stream: false,
             messages: [
               { role: 'system', content: 'Asistente agronómico para finca agroecológica andina (2400msnm). PROHIBIDO recomendar agroquímicos sintéticos. Solo biopreparados orgánicos (biol, caldo sulfocálcico, caldo bordelés, purín de ortiga, compost tea, microorganismos de montaña, Trichoderma). Responde conciso en español, 2 líneas máximo.' },
-              { role: 'user', content: `Datos actuales de sensores:\n- Invernadero 1: ${inv1Hum}% humedad, ${inv1Temp}°C\n- Tabaco: ${tabHum}% humedad, ${tabTemp}°C\n${alerts.length > 0 ? 'Alertas: ' + alerts.map(a => a.replace(/[^\w\s%°.,()/áéíóú]/g, '')).join('. ') : 'Sin alertas.'}\nDiagnóstico y acción en 2 líneas.` }
+              { role: 'user', content: (() => {
+                const fmt = (h, t) => isNaN(h) && isNaN(t) ? 'sin datos (sensor offline)'
+                  : isNaN(h) ? `${t}°C (humedad sin dato)`
+                  : isNaN(t) ? `${h}% humedad (temp sin dato)`
+                  : `${h}% humedad, ${t}°C`;
+                const alertsLine = alerts.length > 0
+                  ? 'Alertas: ' + alerts.map(a => a.replace(/[^\w\s%°.,()/áéíóú]/g, '')).join('. ')
+                  : 'Sin alertas.';
+                return `Datos actuales de sensores:\n- Invernadero 1: ${fmt(inv1Hum, inv1Temp)}\n- Tabaco: ${fmt(tabHum, tabTemp)}\n${offlineNotice ? offlineNotice.trim() + '\n' : ''}${alertsLine}\nDiagnóstico y acción en 2 líneas.`;
+              })() }
             ],
             options: { num_predict: 200, temperature: 0.3 }
           })
@@ -398,7 +420,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
           const content = (data.message?.content || '').trim();
           if (parentSignal?.aborted) return;
           if (content.length > 10) {
-            setAiAlert(`${ruleAnalysis}\n\n🤖 IA: ${content}`);
+            setAiAlert(`${offlineNotice}${ruleAnalysis}\n\n🤖 IA: ${content}`);
             setAiStatus('done');
           } else {
             console.warn('[Telemetry] IA sin contenido. Response:', JSON.stringify(data).slice(0, 300));
