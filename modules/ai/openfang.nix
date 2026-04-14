@@ -35,7 +35,7 @@ let
       defaults = {
         workspace = "/var/lib/openfang/workspace/${agent.workspace}";
         model_name = "openrouter-gemini";
-        max_tokens = 8192;
+        max_tokens = 4096;
         temperature = agent.temperature or 0.2;
         max_tool_iterations = 15;
       };
