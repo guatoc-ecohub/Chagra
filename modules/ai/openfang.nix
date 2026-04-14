@@ -14,11 +14,23 @@ let
     sha256 = "sha256-ZDaGfTb3o9opWpitRTew0wbNwrusALxB+gK8wtqQZxI=";
   };
 
-  openfang-pkg = pkgs.runCommand "openfang-0.5.9" { nativeBuildInputs = [ pkgs.gnutar ]; } ''
-    mkdir -p $out/bin
-    tar -xzf ${openfang-src} -C $out/bin
-    chmod +x $out/bin/openfang
-  '';
+  openfang-pkg = pkgs.stdenv.mkDerivation {
+    pname = "openfang";
+    version = "0.5.9";
+    src = openfang-src;
+    sourceRoot = ".";
+    nativeBuildInputs = [ pkgs.autoPatchelfHook pkgs.gnutar ];
+    buildInputs = [ pkgs.stdenv.cc.cc.lib pkgs.openssl ];
+    unpackPhase = ''
+      mkdir -p src
+      tar -xzf $src -C src
+    '';
+    installPhase = ''
+      mkdir -p $out/bin
+      cp src/openfang $out/bin/openfang
+      chmod +x $out/bin/openfang
+    '';
+  };
 
   # Genera config.toml para un agente
   mkAgentConfig = name: agent: pkgs.writeText "openfang-${name}-config.toml" ''
