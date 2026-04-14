@@ -110,17 +110,22 @@ export const EvidenceCapture = ({
 
       console.info(`[Evidence] Foto ${mediaId} guardada (${(optimized.size / 1024).toFixed(0)} KB).`);
 
-      // Diagnóstico IA async (no bloquea)
-      if (navigator.onLine) {
+      // Diagnóstico IA async — solo si no existe diagnóstico cacheado
+      if (navigator.onLine && !diagnosis) {
         setDiagnosing(true);
-        const result = await analyzeFoliage(optimized);
-        if (result) {
-          setDiagnosis(result);
-          await mediaCache.updateDiagnosis(mediaId, result);
-          onDiagnosis?.(result);
-          console.info(`[Evidence] Diagnóstico IA: score=${result.score}, issues=${result.issues.length}.`);
+        try {
+          const result = await analyzeFoliage(optimized);
+          if (result) {
+            setDiagnosis(result);
+            await mediaCache.updateDiagnosis(mediaId, result);
+            onDiagnosis?.(result);
+            console.info(`[Evidence] Diagnóstico IA: score=${result.score}, issues=${result.issues.length}.`);
+          }
+        } finally {
+          setDiagnosing(false);
         }
-        setDiagnosing(false);
+      } else if (diagnosis) {
+        console.info('[Evidence] Diagnóstico cacheado, omitiendo inferencia.');
       }
     } catch (err) {
       console.error('[EvidenceCapture] Error procesando imagen:', err);
@@ -232,9 +237,9 @@ export const EvidenceCapture = ({
       )}
 
       {diagnosing && (
-        <div className="flex items-center gap-2 text-xs text-purple-400">
+        <div className="flex items-center gap-2 text-xs text-orchid">
           <Loader2 size={14} className="animate-spin" />
-          Analizando follaje con Gemma 4…
+          Analizando follaje…
         </div>
       )}
 

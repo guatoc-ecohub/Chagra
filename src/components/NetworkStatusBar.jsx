@@ -105,21 +105,21 @@ export default function NetworkStatusBar() {
 
   const configs = {
     [STATUS.OFFLINE]: {
-      bg: 'bg-amber-900/90',
-      border: 'border-amber-700',
-      icon: <WifiOff size={16} className="shrink-0" />,
+      bg: 'bg-frog/10',
+      border: 'border-frog/50',
+      icon: <WifiOff size={16} className="shrink-0 text-frog" />,
       text: `Sin conexion. ${pendingCount > 0 ? `${pendingCount} registro${pendingCount > 1 ? 's' : ''} guardado${pendingCount > 1 ? 's' : ''} localmente.` : 'Datos guardados localmente.'}`,
     },
     [STATUS.SYNCING]: {
-      bg: 'bg-blue-900/90',
-      border: 'border-blue-700',
-      icon: <RefreshCw size={16} className="animate-spin shrink-0" />,
+      bg: 'bg-morpho/10',
+      border: 'border-morpho/50',
+      icon: <RefreshCw size={16} className="animate-spin shrink-0 text-morpho" />,
       text: `Sincronizando ${pendingCount} registro${pendingCount !== 1 ? 's' : ''}...`,
     },
     [STATUS.SYNCED]: {
-      bg: 'bg-green-900/90',
-      border: 'border-green-700',
-      icon: <CheckCircle size={16} className="shrink-0" />,
+      bg: 'bg-muzo/10',
+      border: 'border-muzo/50',
+      icon: <CheckCircle size={16} className="shrink-0 text-muzo" />,
       text: `${syncedCount > 0 ? syncedCount : ''} registro${syncedCount !== 1 ? 's' : ''} sincronizado${syncedCount !== 1 ? 's' : ''}.`,
     },
     [STATUS.ERROR]: {
@@ -129,9 +129,9 @@ export default function NetworkStatusBar() {
       text: errorMessage || 'Error al sincronizar.',
     },
     [STATUS.ONLINE]: {
-      bg: 'bg-green-900/90',
-      border: 'border-green-700',
-      icon: <Wifi size={16} className="shrink-0" />,
+      bg: 'bg-muzo/10',
+      border: 'border-muzo/50',
+      icon: <Wifi size={16} className="shrink-0 text-muzo" />,
       text: 'Conectado.',
     },
   };

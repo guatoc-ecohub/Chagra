@@ -466,10 +466,10 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
   }, []);
 
   return (
-    <div className="p-6 rounded-3xl bg-slate-900 border border-slate-700 shadow-2xl mb-8">
+    <div className="p-6 rounded-3xl bg-slate-900 border border-morpho/30 shadow-neon-morpho mb-8">
       <h3 className="text-2xl font-black mb-4 flex items-center gap-2">
-        <span className="w-3 h-3 bg-green-500 rounded-full motion-safe:animate-pulse"></span>
-        Observabilidad Agronómica (Alpha)
+        <span className="w-3 h-3 bg-muzo rounded-full motion-safe:animate-pulse"></span>
+        Observabilidad Agronómica
       </h3>
 
       {error && (
@@ -534,38 +534,38 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         </div>
       </div>
 
-      <div className={`p-5 rounded-xl relative overflow-hidden border-l-8 ${loading ? 'bg-blue-900/20 border-blue-500' : 'bg-purple-900/20 border-purple-500'}`}>
+      <div className={`p-5 rounded-xl relative overflow-hidden border-l-8 shadow-neon-morpho ${loading ? 'bg-morpho/5 border-morpho' : 'bg-orchid/5 border-orchid'}`}>
         <div className="absolute top-0 right-0 p-2 opacity-10">
-          <Info size={64} className="text-blue-400" />
+          <Info size={64} className="text-morpho" />
         </div>
         <div className="flex justify-between items-start mb-2">
-          <span className="font-black text-blue-400 block text-xs uppercase tracking-widest">Analisis Agronomico</span>
+          <span className="font-black text-morpho block text-xs uppercase tracking-widest">Analisis Agronomico</span>
           <div className="flex items-center gap-2">
             {aiStatus === 'thinking' && (
-              <span className="text-blue-400 text-2xs font-bold bg-blue-900/30 px-2 py-1 rounded flex items-center gap-1">
-                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full motion-safe:animate-pulse"></div>
+              <span className="text-orchid text-2xs font-bold bg-orchid/10 px-2 py-1 rounded flex items-center gap-1 border border-orchid/30">
+                <div className="w-1.5 h-1.5 bg-orchid rounded-full motion-safe:animate-pulse"></div>
                 IA analizando...
               </span>
             )}
             {aiStatus === 'done' && (
-              <span className="text-green-400 text-2xs font-bold bg-green-900/30 px-2 py-1 rounded">● IA completada</span>
+              <span className="text-muzo text-2xs font-bold bg-muzo/10 px-2 py-1 rounded border border-muzo/30">● IA completada</span>
             )}
             {aiStatus === 'error' && (
-              <span className="text-amber-400 text-2xs font-bold bg-amber-900/30 px-2 py-1 rounded">IA no disponible</span>
+              <span className="text-frog text-2xs font-bold bg-frog/10 px-2 py-1 rounded border border-frog/30">IA no disponible</span>
             )}
             {aiStatus === 'empty' && (
-              <span className="text-slate-400 text-2xs font-bold bg-slate-800 px-2 py-1 rounded">IA sin aporte</span>
+              <span className="text-slate-400 text-2xs font-bold bg-slate-800 px-2 py-1 rounded border border-slate-700">IA sin aporte</span>
             )}
             {!loading && aiAlert && (
-              <span className="text-green-400 text-2xs font-bold bg-green-900/30 px-2 py-1 rounded">Reglas activas</span>
+              <span className="text-muzo text-2xs font-bold bg-muzo/10 px-2 py-1 rounded border border-muzo/30">Reglas activas</span>
             )}
           </div>
         </div>
         {loading ? (
           <div className="flex gap-2 items-center">
-            <div className="w-2 h-2 bg-blue-400 rounded-full motion-safe:animate-bounce"></div>
-            <div className="w-2 h-2 bg-blue-400 rounded-full motion-safe:animate-bounce delay-75"></div>
-            <div className="w-2 h-2 bg-blue-400 rounded-full motion-safe:animate-bounce delay-150"></div>
+            <div className="w-2 h-2 bg-morpho rounded-full motion-safe:animate-bounce"></div>
+            <div className="w-2 h-2 bg-morpho rounded-full motion-safe:animate-bounce delay-75"></div>
+            <div className="w-2 h-2 bg-morpho rounded-full motion-safe:animate-bounce delay-150"></div>
             <span className="text-slate-400 text-sm italic font-medium">Analizando datos agronómicos...</span>
           </div>
         ) : (

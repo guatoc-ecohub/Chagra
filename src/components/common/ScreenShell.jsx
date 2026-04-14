@@ -29,7 +29,7 @@ export const ScreenShell = ({ title, onBack, icon: Icon, children, actions }) =>
           </button>
         )}
         <h1 className="text-xl font-bold text-white flex items-center gap-2 truncate">
-          {Icon && <Icon className="text-blue-400 shrink-0" size={20} />}
+          {Icon && <Icon className="text-morpho shrink-0" size={20} />}
           {title}
         </h1>
       </div>

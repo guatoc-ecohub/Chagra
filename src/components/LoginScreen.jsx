@@ -28,11 +28,11 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
   return (
     <div className="h-[100dvh] w-full bg-slate-950 flex flex-col justify-center items-center p-6 text-slate-100">
       <div className="w-full max-w-sm flex flex-col items-center gap-8">
-        <div className="w-32 h-32 bg-green-900 rounded-full flex items-center justify-center shadow-lg shadow-green-900/50">
-          <Sprout size={72} className="text-green-400" />
+        <div className="w-32 h-32 bg-muzo/20 rounded-full flex items-center justify-center shadow-neon-muzo">
+          <Sprout size={72} className="text-muzo-glow" />
         </div>
         <div className="text-center">
-          <h1 className="text-4xl font-black text-green-400 animate-bounce">Chagra</h1>
+          <h1 className="text-4xl font-black text-muzo animate-bounce">Chagra</h1>
           <span className="text-sm text-slate-500 font-mono mt-2">v{APP_VERSION}</span>
         </div>
 

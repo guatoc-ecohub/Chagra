@@ -89,7 +89,7 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
       <header className="p-4 border-b border-slate-800 shrink-0 flex justify-between items-center bg-slate-900/50 backdrop-blur-md sticky top-0 z-50 pt-[env(safe-area-inset-top)]">
         <div className="flex flex-col gap-1">
           <h1 className="font-bold text-2xl flex items-center gap-2">
-            <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+            <span className="w-2 h-2 bg-muzo rounded-full shadow-neon-muzo"></span>
             Chagra
           </h1>
           <span className="text-xs text-slate-500 font-mono">v{APP_VERSION}</span>
