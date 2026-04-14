@@ -164,21 +164,22 @@ in
 
         preStart = let
           configFile = mkAgentConfig name agent;
-          promptFile = pkgs.writeText "openfang-${name}-prompt.txt" agent.systemPrompt;
         in ''
-          HOME="/var/lib/openfang/agent-${name}"
-          mkdir -p "$HOME/data" "$HOME/.openfang"
-
-          # Copiar config TOML
-          cp ${configFile} "$HOME/.openfang/config.toml"
-
-          # System prompt como archivo (OpenFang lo lee de config o prompt file)
-          cp ${promptFile} "$HOME/.openfang/system_prompt.txt"
+          # Copiar config al StateDirectory (propiedad de openfang)
+          cp -f ${configFile} /var/lib/openfang/agent-${name}/config.toml
         '';
 
         script = ''
           export HOME="/var/lib/openfang/agent-${name}"
           export OPENFANG_HOME="$HOME"
+          export OPENFANG_CONFIG="/var/lib/openfang/agent-${name}/config.toml"
+
+          # Crear .openfang si OpenFang lo necesita (como usuario openfang)
+          mkdir -p "$HOME/.openfang" "$HOME/data"
+
+          # Copiar config donde OpenFang la busca
+          cp -f "$HOME/config.toml" "$HOME/.openfang/config.toml"
+
           exec ${openfang-pkg}/bin/openfang daemon
         '';
       }
