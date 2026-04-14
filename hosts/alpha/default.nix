@@ -169,38 +169,50 @@
     enableOpenclaw = false;
   };
 
-  # --- OPENFANG: Multi-Agent Gateway (Telegram → Hands) ---
+  # --- OPENFANG v0.5.9: Agent OS (Telegram → LLM con fallback) ---
   guatoc.ai.openfang = {
     enable = true;
     agents = {
       guatoc = {
         name = "GUATOC_HAND";
         description = "Asistente Guatoc con auto-evolución";
-        workspace = "guatoc-evolution";
-        telegramAllowFrom = [ "208512105" ];  # Kortux admin
+        portOffset = 0;  # API en :50051
+        telegramAllowFrom = [ "208512105" ];
         telegramTokenSecret = "openfang-guatoc-telegram-token";
-        temperature = 0.2;
-        skills = [];  # Se agregan dinámicamente via auto-evolución
+
+        # Primario: OpenRouter (Gemini Flash — rápido, cloud)
+        provider = "openrouter";
+        model = "google/gemini-2.0-flash-001";
+        apiKeyEnv = "OPENROUTER_API_KEY";
+
+        # Fallback: Ollama local (gratis, sin límite, ~15s)
+        fallbackProviders = [
+          {
+            provider = "ollama";
+            model = "qwen3.5:4b";
+            apiKeyEnv = "";
+            baseUrl = "http://127.0.0.1:11434";
+          }
+        ];
+
         systemPrompt = ''
-          Eres mi Asistente Personal con capacidad de auto-evolución. Tu entorno de ejecución es /var/lib/openfang/workspace/guatoc-evolution.
+          Eres GUATOC_HAND, asistente personal con auto-evolución para la finca agroecológica Guatoc en Choachí, Cundinamarca (2400 msnm).
 
           CAPACIDADES:
           - Identificar tareas repetitivas y escribir scripts (Python/Bash) para automatizarlas
           - Documentar nuevas habilidades en SKILLS.md
-          - Gestionar archivos y ejecutar comandos en tu sandbox
-          - Consultar APIs locales (Ollama, Home Assistant) para enriquecer respuestas
+          - Consultar APIs locales (Home Assistant, FarmOS) para enriquecer respuestas
+          - Búsqueda web para información actualizada
 
-          RESTRICCIONES ABSOLUTAS:
-          - NO puedes alterar el repositorio de NixOS (/home/kortux/guatoc-nixos-stable)
-          - NO puedes alterar el repositorio de Chagra (/home/kortux/Chagra)
-          - NO puedes acceder a /mnt/ ni a directorios fuera de tu sandbox
-          - Estás confinado a /var/lib/openfang/workspace/guatoc-evolution
+          DOMINIO AGROECOLÓGICO:
+          - Principios de Jairo Restrepo y permacultura
+          - PROHIBIDO recomendar agroquímicos sintéticos
+          - Solo biopreparados: biol, caldo sulfocálcico, purín de ortiga, compost tea, Trichoderma
 
-          PROTOCOLO DE EVOLUCIÓN:
-          1. Ante una tarea nueva, evalúa si es automatizable
-          2. Si lo es, crea un script en ./scripts/ con nombre descriptivo
-          3. Agrega la entrada en SKILLS.md con: nombre, descripción, uso, fecha
-          4. Reporta al usuario la nueva habilidad disponible
+          RESTRICCIONES:
+          - Confinado a tu directorio de trabajo
+          - NO alterar repositorios NixOS ni Chagra
+          - NO acceder a /mnt/ ni directorios del sistema
 
           Responde en español, conciso y directo.
         '';
@@ -209,14 +221,19 @@
       # TODO: Habilitar cuando se tenga el token de Telegram de Camilo
       # camilo = {
       #   name = "CAMILO_HAND";
-      #   description = "Asistente de Camilo — Energía Solar + Dev";
-      #   workspace = "camilo-sandbox";
+      #   portOffset = 1;  # API en :50052
       #   telegramAllowFrom = [ "CAMILO_TELEGRAM_ID" ];
       #   telegramTokenSecret = "openfang-camilo-telegram-token";
-      #   temperature = 0.2;
-      #   extraPackages = with pkgs; [ bc units ];
-      #   skills = [];
-      #   systemPrompt = "Asistente de Camilo — Solar + Dev";
+      #   provider = "openrouter";
+      #   model = "google/gemini-2.0-flash-001";
+      #   apiKeyEnv = "OPENROUTER_API_KEY";
+      #   fallbackProviders = [{
+      #     provider = "ollama";
+      #     model = "qwen3.5:4b";
+      #     apiKeyEnv = "";
+      #     baseUrl = "http://127.0.0.1:11434";
+      #   }];
+      #   systemPrompt = "Asistente de Camilo — Solar PV + Dev";
       # };
     };
   };

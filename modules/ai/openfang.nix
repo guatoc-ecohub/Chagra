@@ -1,117 +1,96 @@
 # modules/ai/openfang.nix
-# OpenFang — Gateway multitenant de agentes IA via Telegram
-# Runtime: Picoclaw v0.2.0 (una instancia por agente)
-# Aislamiento: Sandboxes por tmpfiles + ReadWritePaths estrictos
-# Modelo: Ollama local (qwen3.5:4b, think:false) via API
+# OpenFang v0.5.9 — Agent OS con Telegram, fallback LLM, sandboxing WASM
+# Reemplaza Picoclaw como runtime de agentes autónomos
+# Docs: https://www.openfang.sh/docs/configuration
 
 { config, pkgs, lib, ... }:
 
 let
   cfg = config.guatoc.ai.openfang;
 
-  picoclaw-src = pkgs.fetchurl {
-    url = "https://github.com/sipeed/picoclaw/releases/download/v0.2.0/picoclaw_Linux_x86_64.tar.gz";
-    sha256 = "sha256-bP+RgvrQ6B4nsF8vpdK5n1KiitSAFoK0/8cqM0KyNvY=";
+  # OpenFang v0.5.9 — binario Rust estático para Linux x86_64
+  openfang-src = pkgs.fetchurl {
+    url = "https://github.com/RightNow-AI/openfang/releases/download/v0.5.9/openfang-x86_64-unknown-linux-gnu.tar.gz";
+    sha256 = "505866d949ac4b7bd32be31c46a2961fddb6d9a90bb6112da9b5b3b30794043d";
   };
 
-  picoclaw-pkg = pkgs.runCommand "picoclaw-pkg" { nativeBuildInputs = [ pkgs.gnutar ]; } ''
+  openfang-pkg = pkgs.runCommand "openfang-0.5.9" { nativeBuildInputs = [ pkgs.gnutar ]; } ''
     mkdir -p $out/bin
-    tar -xzf ${picoclaw-src} -C $out/bin
-    chmod +x $out/bin/picoclaw
+    tar -xzf ${openfang-src} -C $out/bin
+    chmod +x $out/bin/openfang
   '';
 
-  # Genera la config JSON de Picoclaw para un agente dado
-  mkAgentConfig = name: agent: pkgs.writeText "openfang-${name}-config.json" (builtins.toJSON {
-    agents = {
-      list = [{
-        id = name;
-        inherit (agent) name;
-        description = agent.description or "${name} agent";
-        model_name = "local-ollama";
-        workspace = "/var/lib/openfang/workspace/${agent.workspace}";
-        system_prompt = agent.systemPrompt;
-        skills = [];
-      }];
-      defaults = {
-        workspace = "/var/lib/openfang/workspace/${agent.workspace}";
-        model_name = "local-ollama";
-        max_tokens = 4096;
-        temperature = agent.temperature or 0.2;
-        max_tool_iterations = 15;
-      };
-    };
-    model_list = [{
-      model_name = "local-ollama";
-      model = "auto";
-      base_url = "http://127.0.0.1:11435/v1";
-      api_key = "proxy";
-    }];
-    channels = {
-      telegram = {
-        enabled = true;
-        token = "$TELEGRAM_BOT_TOKEN";
-        allow_from = agent.telegramAllowFrom;
-      };
-    };
-  });
+  # Genera config.toml para un agente
+  mkAgentConfig = name: agent: pkgs.writeText "openfang-${name}-config.toml" ''
+    # OpenFang config — Agent: ${agent.name}
+    home_dir = "/var/lib/openfang/agent-${name}"
+    data_dir = "/var/lib/openfang/agent-${name}/data"
+    log_level = "info"
+    api_listen = "127.0.0.1:${toString (50051 + agent.portOffset)}"
+    mode = "stable"
+    language = "es"
+    usage_footer = "off"
 
-  # Skills para PERSONAL_HAND
-  personalEvolutionSkill = pkgs.writeText "auto_evolution.md" ''
-    ---
-    name: AutoEvolucion
-    description: Identifica tareas repetitivas, escribe scripts para automatizarlas y documenta nuevas habilidades.
-    tools:
-      - shell
-      - fs
-    system: |
-      Cuando detectes un patrón repetitivo en las solicitudes del usuario:
-      1. Escribe un script (Python/Bash) que lo automatice
-      2. Guárdalo en /var/lib/openfang/workspace/personal-evolution/scripts/
-      3. Documenta la nueva habilidad en SKILLS.md
-      4. Informa al usuario que la automatización está disponible
-    ---
-    Automatiza patrones repetitivos. Guarda scripts en ./scripts/ y documenta en SKILLS.md.
-  '';
+    [default_model]
+    provider = "${agent.provider}"
+    model = "${agent.model}"
+    api_key_env = "${agent.apiKeyEnv}"
+    ${lib.optionalString (agent.baseUrl != "") ''base_url = "${agent.baseUrl}"''}
 
-  # Skills para CAMILO_HAND
-  solarCalcSkill = pkgs.writeText "solar_calc.md" ''
-    ---
-    name: CalculadoraSolar
-    description: Dimensiona sistemas fotovoltaicos según RETIE, NTC 2050 y CREG para Colombia.
-    tools:
-      - shell
-      - fs
-    system: |
-      Para cálculos solares, usa Python con esta fórmula base:
-      - HSP (Horas Sol Pico) Choachí: 3.5-4.5 kWh/m²/día
-      - Factor de seguridad: 1.25
-      - Pérdidas del sistema: 20-25%
-      Guarda cotizaciones en /var/lib/openfang/workspace/camilo-sandbox/cotizaciones/
-    ---
-    Calcula y dimensiona sistemas solares para Colombia. Genera BOMs y cotizaciones.
+    ${lib.concatMapStringsSep "\n" (fb: ''
+    [[fallback_providers]]
+    provider = "${fb.provider}"
+    model = "${fb.model}"
+    api_key_env = "${fb.apiKeyEnv}"
+    ${lib.optionalString (fb.baseUrl or "" != "") ''base_url = "${fb.baseUrl}"''}
+    '') agent.fallbackProviders}
+
+    [channels.telegram]
+    bot_token_env = "TELEGRAM_BOT_TOKEN"
+    allowed_users = [${lib.concatMapStringsSep ", " (id: ''"${id}"'') agent.telegramAllowFrom}]
+    poll_interval_secs = 2
+
+    [channels.telegram.overrides]
+    dm_policy = "allowed_only"
+    output_format = "markdown"
+
+    [[users]]
+    name = "${name}"
+    role = "owner"
+
+    [users.channel_bindings]
+    telegram = "${lib.head agent.telegramAllowFrom}"
+
+    [memory]
+    consolidation_threshold = 5000
+    decay_rate = 0.1
   '';
 
 in
 {
   options.guatoc.ai.openfang = {
-    enable = lib.mkEnableOption "OpenFang — Gateway multitenant de agentes IA";
+    enable = lib.mkEnableOption "OpenFang — Agent OS multitenant";
 
     agents = lib.mkOption {
       type = lib.types.attrsOf (lib.types.submodule {
         options = {
           name = lib.mkOption { type = lib.types.str; };
           description = lib.mkOption { type = lib.types.str; default = ""; };
-          workspace = lib.mkOption { type = lib.types.str; };
-          systemPrompt = lib.mkOption { type = lib.types.str; };
-          temperature = lib.mkOption { type = lib.types.float; default = 0.2; };
+          provider = lib.mkOption { type = lib.types.str; default = "openrouter"; };
+          model = lib.mkOption { type = lib.types.str; default = "google/gemini-2.0-flash-001"; };
+          apiKeyEnv = lib.mkOption { type = lib.types.str; default = "OPENROUTER_API_KEY"; };
+          baseUrl = lib.mkOption { type = lib.types.str; default = ""; };
+          portOffset = lib.mkOption { type = lib.types.int; default = 0; };
           telegramAllowFrom = lib.mkOption { type = lib.types.listOf lib.types.str; };
           telegramTokenSecret = lib.mkOption { type = lib.types.str; };
-          extraPackages = lib.mkOption {
-            type = lib.types.listOf lib.types.package;
+          openrouterKeySecret = lib.mkOption { type = lib.types.str; default = "openfang-openrouter-key"; };
+          fallbackProviders = lib.mkOption {
+            type = lib.types.listOf lib.types.attrs;
             default = [];
           };
-          skills = lib.mkOption {
-            type = lib.types.listOf lib.types.path;
+          systemPrompt = lib.mkOption { type = lib.types.str; };
+          extraEnvFiles = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
             default = [];
           };
         };
@@ -121,27 +100,8 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # Proxy LLM: OpenRouter → Ollama fallback (puerto 11435)
-    systemd.services.openfang-llm-proxy = {
-      description = "OpenFang LLM Fallback Proxy (OpenRouter → Ollama)";
-      after = [ "network-online.target" ];
-      wants = [ "network-online.target" ];
-      wantedBy = [ "multi-user.target" ];
-      serviceConfig = {
-        User = "openfang";
-        Group = "openfang";
-        EnvironmentFile = config.sops.secrets.openfang-openrouter-key.path;
-        ExecStart = "${pkgs.python3}/bin/python3 ${./openfang-proxy.py}";
-        Restart = "on-failure";
-        RestartSec = "5s";
-        ProtectSystem = "strict";
-        ProtectHome = true;
-        PrivateTmp = true;
-        ReadWritePaths = [ "/var/lib/openfang" ];
-      };
-    };
+    environment.systemPackages = [ openfang-pkg ];
 
-    # Usuario del sistema para todos los agentes OpenFang
     users.users.openfang = {
       isSystemUser = true;
       uid = 2010;
@@ -151,74 +111,63 @@ in
     };
     users.groups.openfang = { gid = 2010; };
 
-    # Directorios aislados por agente
     systemd.tmpfiles.rules = [
       "d /var/lib/openfang 0750 openfang openfang -"
-      "d /var/lib/openfang/workspace 0750 openfang openfang -"
     ] ++ (lib.mapAttrsToList (name: agent:
-      "d /var/lib/openfang/workspace/${agent.workspace} 0700 openfang openfang -"
+      "d /var/lib/openfang/agent-${name} 0700 openfang openfang -"
     ) cfg.agents);
 
-    # Instancia systemd por agente
     systemd.services = lib.mapAttrs' (name: agent:
       lib.nameValuePair "openfang-${name}" {
         description = "OpenFang Agent: ${agent.name}";
-        after = [ "network-online.target" "openfang-llm-proxy.service" ];
-        wants = [ "network-online.target" "openfang-llm-proxy.service" ];
+        after = [ "network-online.target" ];
+        wants = [ "network-online.target" ];
         wantedBy = [ "multi-user.target" ];
-
-        path = with pkgs; [
-          coreutils gnugrep findutils gawk gnused
-          curl jq gettext
-          (python3.withPackages (ps: with ps; [ requests pyyaml ]))
-        ] ++ agent.extraPackages;
 
         serviceConfig = {
           User = "openfang";
           Group = "openfang";
-          WorkingDirectory = "/var/lib/openfang/workspace/${agent.workspace}";
+          WorkingDirectory = "/var/lib/openfang/agent-${name}";
           EnvironmentFile = [
             config.sops.secrets.${agent.telegramTokenSecret}.path
-            config.sops.secrets.openfang-openrouter-key.path
-          ];
+            config.sops.secrets.${agent.openrouterKeySecret}.path
+          ] ++ agent.extraEnvFiles;
 
-          # Sandbox estricto
-          NoNewPrivileges = false;
-          PrivateTmp = true;
           ProtectSystem = "strict";
           ProtectHome = true;
+          PrivateTmp = true;
           ProtectKernelTunables = true;
           ProtectKernelModules = true;
           ProtectControlGroups = true;
-
-          ReadWritePaths = [ "/var/lib/openfang" ];
-          ReadOnlyPaths = [ "/etc/os-release" "/run/current-system" ];
+          ReadWritePaths = [ "/var/lib/openfang/agent-${name}" ];
 
           Restart = "on-failure";
           RestartSec = "10s";
         };
 
         environment = {
-          HOME = "/var/lib/openfang";
-          OLLAMA_HOST = "http://127.0.0.1:11434";
+          HOME = "/var/lib/openfang/agent-${name}";
+          OPENFANG_HOME = "/var/lib/openfang/agent-${name}";
         };
 
         preStart = let
           configFile = mkAgentConfig name agent;
+          promptFile = pkgs.writeText "openfang-${name}-prompt.txt" agent.systemPrompt;
         in ''
-          export HOME="/var/lib/openfang/agent-${name}"
-          mkdir -p "$HOME/.picoclaw/workspace"
-          mkdir -p "/var/lib/openfang/workspace/${agent.workspace}/scripts"
-          mkdir -p "/var/lib/openfang/workspace/${agent.workspace}/data"
+          HOME="/var/lib/openfang/agent-${name}"
+          mkdir -p "$HOME/data" "$HOME/.openfang"
 
-          # Generar config con sustitución de env vars
-          ${pkgs.gettext}/bin/envsubst < ${configFile} > "$HOME/.picoclaw/config.json" || \
-            cp ${configFile} "$HOME/.picoclaw/config.json"
+          # Copiar config TOML
+          cp ${configFile} "$HOME/.openfang/config.toml"
+
+          # System prompt como archivo (OpenFang lo lee de config o prompt file)
+          cp ${promptFile} "$HOME/.openfang/system_prompt.txt"
         '';
 
         script = ''
           export HOME="/var/lib/openfang/agent-${name}"
-          exec ${picoclaw-pkg}/bin/picoclaw gateway
+          export OPENFANG_HOME="$HOME"
+          exec ${openfang-pkg}/bin/openfang
         '';
       }
     ) cfg.agents;
