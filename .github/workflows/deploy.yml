@@ -20,6 +20,16 @@ jobs:
         run: npm run lint -- --max-warnings 20
         continue-on-error: true
 
+      - name: Verify secrets
+        run: |
+          if [ -z "${{ secrets.VITE_HA_ACCESS_TOKEN }}" ]; then
+            echo "::warning::VITE_HA_ACCESS_TOKEN secret is empty"
+          else
+            echo "HA token present (${#VITE_HA_ACCESS_TOKEN} chars)"
+          fi
+        env:
+          VITE_HA_ACCESS_TOKEN: ${{ secrets.VITE_HA_ACCESS_TOKEN }}
+
       - name: Build
         run: npm run build
         env:
