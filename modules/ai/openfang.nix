@@ -34,18 +34,26 @@ let
       }];
       defaults = {
         workspace = "/var/lib/openfang/workspace/${agent.workspace}";
-        model_name = "local-ollama";
+        model_name = "openrouter-gemini";
         max_tokens = 8192;
         temperature = agent.temperature or 0.2;
         max_tool_iterations = 15;
       };
     };
-    model_list = [{
-      model_name = "local-ollama";
-      model = "qwen3.5:4b";
-      base_url = "http://127.0.0.1:11434/v1";
-      api_key = "ollama";
-    }];
+    model_list = [
+      {
+        model_name = "local-ollama";
+        model = "qwen3.5:4b";
+        base_url = "http://127.0.0.1:11434/v1";
+        api_key = "ollama";
+      }
+      {
+        model_name = "openrouter-gemini";
+        model = "google/gemini-2.0-flash-001";
+        base_url = "https://openrouter.ai/api/v1";
+        api_key = "$OPENROUTER_API_KEY";
+      }
+    ];
     channels = {
       telegram = {
         enabled = true;
@@ -157,7 +165,10 @@ in
           User = "openfang";
           Group = "openfang";
           WorkingDirectory = "/var/lib/openfang/workspace/${agent.workspace}";
-          EnvironmentFile = config.sops.secrets.${agent.telegramTokenSecret}.path;
+          EnvironmentFile = [
+            config.sops.secrets.${agent.telegramTokenSecret}.path
+            config.sops.secrets.openfang-openrouter-key.path
+          ];
 
           # Sandbox estricto
           NoNewPrivileges = false;

@@ -79,6 +79,11 @@
         group = "openfang";
         mode = "0400";
       };
+      openfang-openrouter-key = {
+        owner = "openfang";
+        group = "openfang";
+        mode = "0400";
+      };
       # openfang-camilo-telegram-token: habilitar cuando se tenga el token
       # openfang-camilo-telegram-token = {
       #   owner = "openfang";
