@@ -79,11 +79,12 @@
         group = "openfang";
         mode = "0400";
       };
-      openfang-camilo-telegram-token = {
-        owner = "openfang";
-        group = "openfang";
-        mode = "0400";
-      };
+      # openfang-camilo-telegram-token: habilitar cuando se tenga el token
+      # openfang-camilo-telegram-token = {
+      #   owner = "openfang";
+      #   group = "openfang";
+      #   mode = "0400";
+      # };
     };
   };
 
@@ -200,39 +201,18 @@
         '';
       };
 
-      camilo = {
-        name = "CAMILO_HAND";
-        description = "Asistente de Camilo — Energía Solar + Dev";
-        workspace = "camilo-sandbox";
-        telegramAllowFrom = [ "CAMILO_TELEGRAM_ID" ];  # TODO: Reemplazar con ID real
-        telegramTokenSecret = "openfang-camilo-telegram-token";
-        temperature = 0.2;
-        extraPackages = with pkgs; [ bc units ];
-        skills = [];
-        systemPrompt = ''
-          Eres el Asistente Personal exclusivo de Camilo. Tienes dos funciones:
-
-          1) EXPERTO EN ENERGÍA SOLAR FOTOVOLTAICA EN COLOMBIA:
-             - Normativas: RETIE, NTC 2050, CREG-030, CREG-174/2021
-             - Incentivos tributarios: Ley 1715/2014, Ley 2099/2021 (AGPE)
-             - Dimensionamiento: HSP Colombia (3.5-5.5 kWh/m²/día según región)
-             - Genera: BOMs profesionales, cálculos de retorno de inversión,
-               guías de legalización paso a paso
-             - Factor de seguridad: 1.25, pérdidas del sistema: 20-25%
-
-          2) DESARROLLADOR OPERATIVO:
-             - Escribes, guardas y ejecutas código en tu sandbox
-             - Gestionas archivos de texto, SQLite, CSVs
-             - Creas herramientas de cálculo y cotización
-
-          SANDBOX: /var/lib/openfang/workspace/camilo-sandbox
-          - Puedes crear archivos en ./cotizaciones/, ./scripts/, ./data/
-          - NO tienes autorización para consultar la infraestructura del servidor
-          - NO puedes salir de tu directorio
-
-          Responde en español, tono profesional y pedagógico.
-        '';
-      };
+      # TODO: Habilitar cuando se tenga el token de Telegram de Camilo
+      # camilo = {
+      #   name = "CAMILO_HAND";
+      #   description = "Asistente de Camilo — Energía Solar + Dev";
+      #   workspace = "camilo-sandbox";
+      #   telegramAllowFrom = [ "CAMILO_TELEGRAM_ID" ];
+      #   telegramTokenSecret = "openfang-camilo-telegram-token";
+      #   temperature = 0.2;
+      #   extraPackages = with pkgs; [ bc units ];
+      #   skills = [];
+      #   systemPrompt = "Asistente de Camilo — Solar + Dev";
+      # };
     };
   };
 
