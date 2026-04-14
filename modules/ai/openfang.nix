@@ -160,6 +160,22 @@ in
             type = lib.types.listOf lib.types.str;
             default = [];
           };
+          bootstrapManifest = lib.mkOption {
+            type = lib.types.nullOr lib.types.path;
+            default = null;
+            description = ''
+              Ruta a un manifest TOML que define el agente (name, description,
+              module, profile, [model] con system_prompt). Si está definido, un
+              servicio systemd dedicado (openfang-<name>-bootstrap) se encarga
+              de crear/reemplazar el agente vía la HTTP API local tras cada
+              boot del daemon. Idempotente: no actúa si el hash SHA256 del
+              manifest coincide con el último aplicado.
+
+              Nota: OpenFang persiste agentes en SQLite y el [prompt] system
+              del config.toml del kernel es ignorado para agentes spawneados
+              desde manifest — esta ruta es la única forma declarativa.
+            '';
+          };
         };
       });
       default = {};
@@ -184,7 +200,84 @@ in
       "d /var/lib/openfang 0750 openfang openfang -"
     ];
 
-    systemd.services = lib.mapAttrs' (name: agent:
+    # Servicios bootstrap: un systemd unit por agente con bootstrapManifest
+    # definido. Corre después del daemon, espera que la API responda, y si el
+    # hash del manifest cambió (o el agente no existe) hace DELETE+POST contra
+    # /api/agents para aplicar el manifest. Idempotente vía state file.
+    systemd.services = (lib.mapAttrs' (name: agent:
+      lib.nameValuePair "openfang-${name}-bootstrap" (lib.mkIf (agent.bootstrapManifest != null) {
+        description = "Bootstrap OpenFang agent manifest: ${name}";
+        after = [ "openfang-${name}.service" ];
+        requires = [ "openfang-${name}.service" ];
+        wantedBy = [ "multi-user.target" ];
+
+        path = [ pkgs.curl pkgs.jq pkgs.coreutils ];
+
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          User = "openfang";
+          Group = "openfang";
+          StateDirectory = "openfang/agent-${name}";
+          StateDirectoryMode = "0700";
+        };
+
+        script = let
+          apiPort = toString (4200 + agent.portOffset);
+          manifestPath = agent.bootstrapManifest;
+        in ''
+          set -euo pipefail
+
+          API="http://127.0.0.1:${apiPort}"
+          AGENT_NAME="${name}"
+          MANIFEST="${manifestPath}"
+          STATE_FILE="/var/lib/openfang/agent-${name}/.bootstrap-hash"
+
+          echo "Bootstrap: esperando API del daemon en $API..."
+          for i in $(seq 1 60); do
+            if curl -sSf "$API/api/agents" >/dev/null 2>&1; then
+              echo "Bootstrap: API disponible tras $i intentos"
+              break
+            fi
+            sleep 1
+            if [ "$i" = "60" ]; then
+              echo "Bootstrap: API no respondió en 60s, abortando" >&2
+              exit 1
+            fi
+          done
+
+          desired_hash=$(sha256sum "$MANIFEST" | cut -d' ' -f1)
+          current_hash=""
+          [ -f "$STATE_FILE" ] && current_hash=$(cat "$STATE_FILE" || true)
+
+          if [ "$desired_hash" = "$current_hash" ]; then
+            echo "Bootstrap: manifest sin cambios (hash=$desired_hash), skip"
+            exit 0
+          fi
+
+          echo "Bootstrap: aplicando manifest nuevo (hash=$desired_hash)"
+
+          # Buscar agente existente por name (hay <= 1 porque name es único)
+          existing_id=$(curl -sSf "$API/api/agents" \
+            | jq -r --arg n "$AGENT_NAME" '.[] | select(.name == $n) | .id' \
+            | head -1)
+
+          if [ -n "$existing_id" ]; then
+            echo "Bootstrap: DELETE agente existente $existing_id"
+            curl -sSf -X DELETE "$API/api/agents/$existing_id" >/dev/null
+          fi
+
+          payload=$(jq -Rs '{manifest_toml: .}' < "$MANIFEST")
+          response=$(curl -sSf -X POST "$API/api/agents" \
+            -H "Content-Type: application/json" \
+            -d "$payload")
+          new_id=$(echo "$response" | jq -r '.agent_id')
+          echo "Bootstrap: agente $AGENT_NAME creado con id=$new_id"
+
+          echo "$desired_hash" > "$STATE_FILE"
+        '';
+      })
+    ) cfg.agents) // (lib.mapAttrs' (name: agent:
       lib.nameValuePair "openfang-${name}" {
         description = "OpenFang Agent: ${agent.name}";
         after = [ "network-online.target" ];
@@ -235,9 +328,17 @@ in
           # Copiar config donde OpenFang la busca
           cp -f "$HOME/config.toml" "$HOME/.openfang/config.toml"
 
+          # Alias para el driver "openai" de OpenFang cuando el backend real es
+          # Z.ai (GLM Coding Plan). El driver lee OPENAI_API_KEY/OPENAI_BASE_URL
+          # hardcoded; el api_key_env del manifest per-agent se ignora.
+          if [ -n "''${ZAI_API_KEY:-}" ]; then
+            export OPENAI_API_KEY="$ZAI_API_KEY"
+            export OPENAI_BASE_URL="https://api.z.ai/api/coding/paas/v4"
+          fi
+
           exec ${openfang-pkg}/bin/openfang start --config "$HOME/config.toml"
         '';
       }
-    ) cfg.agents;
+    ) cfg.agents);
   };
 }

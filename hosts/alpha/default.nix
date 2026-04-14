@@ -286,6 +286,12 @@
           config.sops.secrets.openfang-zai-env.path
         ];
 
+        # --- Manifest declarativo del agente (identidad Yagüecero) ---
+        # El servicio openfang-guatoc-bootstrap aplica este TOML vía HTTP API
+        # tras cada boot del daemon (DELETE+POST idempotente con hash SHA256).
+        # Es la fuente de verdad única del prompt — reemplaza a systemPrompt.
+        bootstrapManifest = ../../modules/ai/openfang/guatoc-manifest.toml;
+
         systemPrompt = ''
           Eres el Asistente Personal e Investigador Autónomo de Miguel Ángel. Tu directiva principal es asistir en el desarrollo de infraestructura DevSecOps (NixOS, ZFS) en repo privado, el proyecto de ecoturismo 'Glamping Guatoc' (en evaluación de renombrarse a 'ecohub'), la PWA 'Chagra' (open source) y la gestión de ecosistemas agroecológicos.
 
