@@ -381,54 +381,35 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
       setAiStatus('thinking');
 
       // 3. Enriquecimiento con IA en background (no bloquea UI)
+      // Usa /api/chat con think:false para desactivar chain-of-thought de Qwen3.5
       try {
-        // /no_think desactiva el chain-of-thought interno de Qwen3.5
-        const promptContext = `/no_think
-Eres un asistente agronómico. Datos de sensores Zigbee en finca agroecológica andina (Choachí, 2400msnm):
-- Invernadero 1: ${inv1Hum}% humedad, ${inv1Temp}°C
-- Tabaco: ${tabHum}% humedad, ${tabTemp}°C
-${alerts.length > 0 ? 'ALERTAS ACTIVAS: ' + alerts.map(a => a.replace(/[^\w\s%°.,()/]/g, '')).join('. ') : 'Sin alertas.'}
-Responde DIRECTAMENTE en 2 líneas máximo: diagnóstico + acción concreta.`;
         const ollamaCtrl = new AbortController();
-        const ollamaTimeout = setTimeout(() => ollamaCtrl.abort(), 15000);
-        const ollamaResponse = await fetch(`${OLLAMA_URL}/api/generate`, {
+        const ollamaTimeout = setTimeout(() => ollamaCtrl.abort(), 20000);
+        const ollamaResponse = await fetch(`${OLLAMA_URL}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           signal: ollamaCtrl.signal,
           body: JSON.stringify({
             model: 'qwen3.5:4b',
-            prompt: promptContext,
-            stream: true,
-            options: { num_predict: 200, temperature: 0.4 }
+            think: false,
+            stream: false,
+            messages: [
+              { role: 'system', content: 'Eres un asistente agronómico para una finca agroecológica andina a 2400msnm. Responde en español, conciso, con acción concreta.' },
+              { role: 'user', content: `Datos actuales de sensores:\n- Invernadero 1: ${inv1Hum}% humedad, ${inv1Temp}°C\n- Tabaco: ${tabHum}% humedad, ${tabTemp}°C\n${alerts.length > 0 ? 'Alertas: ' + alerts.map(a => a.replace(/[^\w\s%°.,()/áéíóú]/g, '')).join('. ') : 'Sin alertas.'}\nDiagnóstico y acción en 2 líneas.` }
+            ],
+            options: { num_predict: 200, temperature: 0.3 }
           })
         });
         clearTimeout(ollamaTimeout);
 
         if (ollamaResponse.ok) {
-          const reader = ollamaResponse.body.getReader();
-          const decoder = new TextDecoder();
-          let fullText = '';
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            const chunk = decoder.decode(value, { stream: true });
-            for (const line of chunk.split('\n').filter(Boolean)) {
-              try {
-                const obj = JSON.parse(line);
-                if (obj.response) fullText += obj.response;
-              } catch { /* skip */ }
-            }
-          }
-          // Strip residual thinking tags y HTML
-          const cleaned = fullText
-            .replace(/<think>[\s\S]*?<\/think>/g, '')
-            .replace(/<[^>]+>/g, '')
-            .trim();
-          if (cleaned.length > 10) {
-            setAiAlert(`${ruleAnalysis}\n\n🤖 IA: ${cleaned}`);
+          const data = await ollamaResponse.json();
+          const content = (data.message?.content || '').trim();
+          if (content.length > 10) {
+            setAiAlert(`${ruleAnalysis}\n\n🤖 IA: ${content}`);
             setAiStatus('done');
           } else {
-            console.warn('[Telemetry] IA respondió sin contenido útil. Raw:', fullText.slice(0, 200));
+            console.warn('[Telemetry] IA sin contenido. Response:', JSON.stringify(data).slice(0, 300));
             setAiStatus('empty');
           }
         } else {
