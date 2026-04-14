@@ -180,7 +180,7 @@ in
           # Copiar config donde OpenFang la busca
           cp -f "$HOME/config.toml" "$HOME/.openfang/config.toml"
 
-          exec ${openfang-pkg}/bin/openfang daemon
+          exec ${openfang-pkg}/bin/openfang agent
         '';
       }
     ) cfg.agents;
