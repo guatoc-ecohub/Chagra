@@ -48,6 +48,11 @@
         group = "runner";
         mode = "0400";
       };
+      nixos-runner-token = {
+        owner = "nixos-deployer";
+        group = "nixos-deployer";
+        mode = "0400";
+      };
       zpool-key = {
         path = "/etc/zfs/zpool.key";
         owner = "root";

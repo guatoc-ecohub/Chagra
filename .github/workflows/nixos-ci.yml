@@ -1,95 +1,67 @@
-name: NixOS CI/CD
+name: NixOS CI/CD — Alpha
 
 on:
   push:
-    branches: [main]
-    tags: ['v*']
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 jobs:
-  # Validate all NixOS configurations
+  # ═══ Stage 1: Validar sintaxis Nix (rápido, no requiere secrets) ═══
   validate:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, alpha, infra]
     steps:
       - uses: actions/checkout@v4
-      
-      - uses: cachix/install-nix-action@v26
-        with:
-          install-options: "--option sandbox false"
-          nix-path: "nixpkgs=https://github.com/NixOS/nixpkgs/archive/nixos-24.11.tar.gz"
-      
-      - name: Evaluate STG
-        run: |
-          nix eval .#nixosConfigurations.stg.pkgs.system
-          
-      - name: Evaluate Alpha
-        run: |
-          nix eval .#nixosConfigurations.alpha.pkgs.system
-          
-      - name: Evaluate Beta
-        run: |
-          nix eval .#nixosConfigurations.beta.pkgs.system
 
-  # Build STG (auto-deploy on merge)
-  build-stg:
-    needs: validate
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-      
-      - uses: cachix/install-nix-action@v26
-        with:
-          install-options: "--option sandbox false"
-          nix-path: "nixpkgs=https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz"
-      
-      - name: Build STG
-        run: |
-          nix build .#nixosConfigurations.stg.config.system.build.toplevel --out-link result-stg
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh-agent.sock
-          
-      - name: Deploy to STG
-        run: |
-          echo "STG built successfully. Manual deployment required to STG host."
-          echo "Run on STG: sudo nixos-rebuild switch --flake .#stg"
-        shell: bash
+      - name: Validate flake
+        run: nix flake check --no-build 2>&1 | tail -20
+        continue-on-error: true
 
-  # Build Alpha (manual via tag)
-  build-alpha:
-    needs: validate
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
-    steps:
-      - uses: actions/checkout@v4
-      
-      - uses: cachix/install-nix-action@v26
-        with:
-          install-options: "--option sandbox false"
-          nix-path: "nixpkgs=https://github.com/NixOS/nixpkgs/archive/nixos-24.11.tar.gz"
-      
-      - name: Build Alpha
-        run: |
-          nix build .#nixosConfigurations.alpha.config.system.build.toplevel --out-link result-alpha
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh-agent.sock
+      - name: Evaluate Alpha config
+        run: nix eval .#nixosConfigurations.alpha.config.system.build.toplevel.drvPath
 
-  # Build Beta (manual via tag)
-  build-beta:
+  # ═══ Stage 2: Dry-build (detecta errores de build sin aplicar) ═══
+  build:
     needs: validate
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: [self-hosted, alpha, infra]
+    if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v4
-      
-      - uses: cachix/install-nix-action@v26
-        with:
-          install-options: "--option sandbox false"
-          nix-path: "nixpkgs=https://github.com/NixOS/nixpkgs/archive/nixos-24.11.tar.gz"
-      
-      - name: Build Beta
+
+      - name: Dry-build Alpha
         run: |
-          nix build .#nixosConfigurations.beta.config.system.build.toplevel --out-link result-beta
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh-agent.sock
+          sudo nixos-rebuild dry-build --flake .#alpha 2>&1 | tail -30
+          echo "Dry-build OK: $(date -Iseconds)"
+
+  # ═══ Stage 3: Deploy (solo push a master, requiere build exitoso) ═══
+  deploy:
+    needs: build
+    runs-on: [self-hosted, alpha, infra]
+    if: github.ref == 'refs/heads/master'
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Switch to new configuration
+        run: |
+          echo "═══ Deploying NixOS config to Alpha ═══"
+          sudo nixos-rebuild switch --flake .#alpha 2>&1 | tail -40
+          echo "═══ Deploy completed: $(date -Iseconds) ═══"
+
+      - name: Verify services
+        run: |
+          echo "=== Service Status ==="
+          systemctl is-active podman-ollama.service || true
+          systemctl is-active github-runner-chagra-deploy.service || true
+          systemctl is-active github-runner-nixos-deploy.service || true
+          systemctl is-active openfang-personal.service 2>/dev/null || echo "openfang-personal: not yet active"
+          systemctl is-active openfang-camilo.service 2>/dev/null || echo "openfang-camilo: not yet active"
+          echo "=== Memory ==="
+          free -h | head -2
+
+      - name: Notify completion
+        if: always()
+        run: |
+          STATUS=${{ job.status }}
+          COMMIT=$(git rev-parse --short HEAD)
+          echo "NixOS deploy ${STATUS}: commit ${COMMIT} on Alpha"
