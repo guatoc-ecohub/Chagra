@@ -11,7 +11,7 @@ let
   # OpenFang v0.5.9 — binario Rust estático para Linux x86_64
   openfang-src = pkgs.fetchurl {
     url = "https://github.com/RightNow-AI/openfang/releases/download/v0.5.9/openfang-x86_64-unknown-linux-gnu.tar.gz";
-    sha256 = "505866d949ac4b7bd32be31c46a2961fddb6d9a90bb6112da9b5b3b30794043d";
+    sha256 = "sha256-ZDaGfTb3o9opWpitRTew0wbNwrusALxB+gK8wtqQZxI=";
   };
 
   openfang-pkg = pkgs.runCommand "openfang-0.5.9" { nativeBuildInputs = [ pkgs.gnutar ]; } ''
