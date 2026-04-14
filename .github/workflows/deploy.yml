@@ -46,6 +46,14 @@ jobs:
           HASH=$(sha256sum /mnt/fast/appdata/farmos-pwa/index.html | cut -d' ' -f1)
           echo "Deploy OK: $(date -Iseconds) | index.html sha256: ${HASH:0:12}"
 
+      - name: Notify HA to refresh Nest Hub
+        run: |
+          curl -s -X POST "http://localhost:8123/api/webhook/chagra_deployed" \
+            -H "Content-Type: application/json" \
+            -d '{"version":"'"$(node -p "require('./package.json').version")"'","commit":"'"$(git rev-parse --short HEAD)"'"}' \
+            || echo "HA webhook not reachable (non-blocking)"
+        continue-on-error: true
+
       - name: Bump SW cache version
         run: |
           SW_FILE=/mnt/fast/appdata/farmos-pwa/sw.js
