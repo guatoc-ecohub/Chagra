@@ -34,26 +34,18 @@ let
       }];
       defaults = {
         workspace = "/var/lib/openfang/workspace/${agent.workspace}";
-        model_name = "openrouter-gemini";
+        model_name = "local-ollama";
         max_tokens = 4096;
         temperature = agent.temperature or 0.2;
         max_tool_iterations = 15;
       };
     };
-    model_list = [
-      {
-        model_name = "local-ollama";
-        model = "qwen3.5:4b";
-        base_url = "http://127.0.0.1:11434/v1";
-        api_key = "ollama";
-      }
-      {
-        model_name = "openrouter-gemini";
-        model = "openrouter/google/gemini-2.0-flash-001";
-        base_url = "https://openrouter.ai/api/v1";
-        api_key = "$OPENROUTER_API_KEY";
-      }
-    ];
+    model_list = [{
+      model_name = "local-ollama";
+      model = "auto";
+      base_url = "http://127.0.0.1:11435/v1";
+      api_key = "proxy";
+    }];
     channels = {
       telegram = {
         enabled = true;
@@ -129,6 +121,26 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    # Proxy LLM: OpenRouter → Ollama fallback (puerto 11435)
+    systemd.services.openfang-llm-proxy = {
+      description = "OpenFang LLM Fallback Proxy (OpenRouter → Ollama)";
+      after = [ "network-online.target" ];
+      wants = [ "network-online.target" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        User = "openfang";
+        Group = "openfang";
+        EnvironmentFile = config.sops.secrets.openfang-openrouter-key.path;
+        ExecStart = "${pkgs.python3}/bin/python3 ${./openfang-proxy.py}";
+        Restart = "on-failure";
+        RestartSec = "5s";
+        ProtectSystem = "strict";
+        ProtectHome = true;
+        PrivateTmp = true;
+        ReadWritePaths = [ "/var/lib/openfang" ];
+      };
+    };
+
     # Usuario del sistema para todos los agentes OpenFang
     users.users.openfang = {
       isSystemUser = true;
@@ -151,8 +163,8 @@ in
     systemd.services = lib.mapAttrs' (name: agent:
       lib.nameValuePair "openfang-${name}" {
         description = "OpenFang Agent: ${agent.name}";
-        after = [ "network-online.target" ];
-        wants = [ "network-online.target" ];
+        after = [ "network-online.target" "openfang-llm-proxy.service" ];
+        wants = [ "network-online.target" "openfang-llm-proxy.service" ];
         wantedBy = [ "multi-user.target" ];
 
         path = with pkgs; [
