@@ -33,18 +33,28 @@ export default function BiodiversidadView({ onBack }) {
     const strata = new Set();
     const perStratum = Object.fromEntries(STRATA.map((s) => [s.key, 0]));
 
+    // formatNotes() en AssetsDashboard guarda así:
+    //   "Notas usuario | Estrato: Medio (2-10m) | Gremio: Productivo principal"
+    // Delimitador: " | " (NO saltos de línea). El regex debe detenerse en "|".
+    const FIELD_RE = (key) => new RegExp(`${key}:\\s*([^|]+?)\\s*(?:\\||$)`, 'i');
+
     for (const p of plants) {
       const attrs = p.attributes || {};
-      const sp = attrs.notes?.value?.match(/Especie:\s*([^\n]+)/i)?.[1]?.trim();
-      if (sp) species.add(sp.toLowerCase());
+      // Especie se guarda en attributes.name (no en notes).
+      const name = (attrs.name || '').trim();
+      if (name) species.add(name.toLowerCase());
 
-      const g = attrs.notes?.value?.match(/Gremio:\s*([^\n]+)/i)?.[1]?.trim();
-      if (g) guilds.add(g.toLowerCase());
+      const notesValue =
+        (typeof attrs.notes === 'object' ? attrs.notes?.value : attrs.notes) || '';
 
-      const stratumMatch = attrs.notes?.value?.match(/Estrato:\s*([^\n]+)/i)?.[1]?.trim().toLowerCase();
-      if (stratumMatch) {
-        strata.add(stratumMatch);
-        const key = STRATA.find((s) => stratumMatch.includes(s.key))?.key;
+      const gremio = notesValue.match(FIELD_RE('Gremio'))?.[1]?.trim();
+      if (gremio) guilds.add(gremio.toLowerCase());
+
+      const stratumRaw = notesValue.match(FIELD_RE('Estrato'))?.[1]?.trim().toLowerCase();
+      if (stratumRaw) {
+        strata.add(stratumRaw);
+        // El label guardado es "Medio (2-10m)"; comparamos por prefijo de la palabra clave.
+        const key = STRATA.find((s) => stratumRaw.startsWith(s.key) || stratumRaw.includes(` ${s.key} `))?.key;
         if (key) perStratum[key] += 1;
       }
     }
