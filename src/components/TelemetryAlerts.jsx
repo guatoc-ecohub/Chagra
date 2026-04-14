@@ -394,7 +394,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
             think: false,
             stream: false,
             messages: [
-              { role: 'system', content: 'Eres un asistente agronómico para una finca agroecológica andina a 2400msnm. Responde en español, conciso, con acción concreta.' },
+              { role: 'system', content: 'Asistente agronómico para finca agroecológica andina (2400msnm). PROHIBIDO recomendar agroquímicos sintéticos. Solo biopreparados orgánicos (biol, caldo sulfocálcico, caldo bordelés, purín de ortiga, compost tea, microorganismos de montaña, Trichoderma). Responde conciso en español, 2 líneas máximo.' },
               { role: 'user', content: `Datos actuales de sensores:\n- Invernadero 1: ${inv1Hum}% humedad, ${inv1Temp}°C\n- Tabaco: ${tabHum}% humedad, ${tabTemp}°C\n${alerts.length > 0 ? 'Alertas: ' + alerts.map(a => a.replace(/[^\w\s%°.,()/áéíóú]/g, '')).join('. ') : 'Sin alertas.'}\nDiagnóstico y acción en 2 líneas.` }
             ],
             options: { num_predict: 200, temperature: 0.3 }

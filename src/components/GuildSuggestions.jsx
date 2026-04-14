@@ -47,10 +47,19 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
     setAiError(null);
     try {
       const prompt = buildGuildPrompt(speciesName, defaults.estrato);
-      const res = await fetch('/api/ollama/api/generate', {
+      const res = await fetch('/api/ollama/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'qwen3.5:4b', prompt, stream: true }),
+        body: JSON.stringify({
+          model: 'qwen3.5:4b',
+          think: false,
+          stream: false,
+          messages: [
+            { role: 'system', content: 'Asistente de diseño de gremios agroecológicos. Responde SOLO en JSON válido, sin texto adicional.' },
+            { role: 'user', content: prompt }
+          ],
+          options: { num_predict: 300, temperature: 0.3 }
+        }),
       });
       if (!res.ok) {
         const detail = await res.text().catch(() => '');
@@ -58,24 +67,8 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
         throw new Error(`Ollama ${res.status}`);
       }
 
-      // Leer stream NDJSON línea por línea
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let fullText = '';
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
-        for (const line of chunk.split('\n').filter(Boolean)) {
-          try {
-            const obj = JSON.parse(line);
-            if (obj.response) fullText += obj.response;
-          } catch { /* skip malformed lines */ }
-        }
-      }
-
-      // Parsear JSON del response acumulado
+      const data = await res.json();
+      const fullText = data.message?.content || '';
       const cleaned = fullText.replace(/```json\s*/g, '').replace(/```/g, '').trim();
       const parsed = JSON.parse(cleaned);
       if (Array.isArray(parsed)) {
