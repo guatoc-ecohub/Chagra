@@ -382,7 +382,13 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
 
       // 3. Enriquecimiento con IA en background (no bloquea UI)
       try {
-        const promptContext = `Sensores Zigbee, finca andina (2400msnm). Inv1: ${inv1Hum}%H ${inv1Temp}°C. Tab: ${tabHum}%H ${tabTemp}°C. ${alerts.length > 0 ? 'ALERTAS: ' + alerts.map(a => a.replace(/[^\w\s%°.]/g, '')).join('. ') : 'Sin alertas.'} Diagnóstico y acción concreta en 2 líneas. Sin XML.`;
+        // /no_think desactiva el chain-of-thought interno de Qwen3.5
+        const promptContext = `/no_think
+Eres un asistente agronómico. Datos de sensores Zigbee en finca agroecológica andina (Choachí, 2400msnm):
+- Invernadero 1: ${inv1Hum}% humedad, ${inv1Temp}°C
+- Tabaco: ${tabHum}% humedad, ${tabTemp}°C
+${alerts.length > 0 ? 'ALERTAS ACTIVAS: ' + alerts.map(a => a.replace(/[^\w\s%°.,()/]/g, '')).join('. ') : 'Sin alertas.'}
+Responde DIRECTAMENTE en 2 líneas máximo: diagnóstico + acción concreta.`;
         const ollamaCtrl = new AbortController();
         const ollamaTimeout = setTimeout(() => ollamaCtrl.abort(), 15000);
         const ollamaResponse = await fetch(`${OLLAMA_URL}/api/generate`, {
@@ -393,7 +399,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
             model: 'qwen3.5:4b',
             prompt: promptContext,
             stream: true,
-            options: { num_predict: 150, temperature: 0.3 }
+            options: { num_predict: 200, temperature: 0.4 }
           })
         });
         clearTimeout(ollamaTimeout);
@@ -413,12 +419,17 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
               } catch { /* skip */ }
             }
           }
-          const cleaned = fullText.replace(/<think>[\s\S]*?<\/think>/g, '').replace(/<[^>]+>/g, '').trim();
+          // Strip residual thinking tags y HTML
+          const cleaned = fullText
+            .replace(/<think>[\s\S]*?<\/think>/g, '')
+            .replace(/<[^>]+>/g, '')
+            .trim();
           if (cleaned.length > 10) {
             setAiAlert(`${ruleAnalysis}\n\n🤖 IA: ${cleaned}`);
             setAiStatus('done');
           } else {
-            setAiStatus('done');
+            console.warn('[Telemetry] IA respondió sin contenido útil. Raw:', fullText.slice(0, 200));
+            setAiStatus('empty');
           }
         } else {
           setAiStatus('error');
@@ -571,6 +582,9 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
             )}
             {aiStatus === 'error' && (
               <span className="text-amber-400 text-2xs font-bold bg-amber-900/30 px-2 py-1 rounded">IA no disponible</span>
+            )}
+            {aiStatus === 'empty' && (
+              <span className="text-slate-400 text-2xs font-bold bg-slate-800 px-2 py-1 rounded">IA sin aporte</span>
             )}
             {!loading && aiAlert && (
               <span className="text-green-400 text-2xs font-bold bg-green-900/30 px-2 py-1 rounded">Reglas activas</span>
