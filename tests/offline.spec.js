@@ -32,11 +32,20 @@ const countPendingTransactions = async (page) =>
     { dbName: DB_NAME, storeName: PENDING_STORE }
   );
 
+const preloadPayloadService = (page) =>
+  page.evaluate(async () => {
+    // Precarga del módulo mientras hay red — tras setOffline el dev server
+    // queda inalcanzable y el dynamic import fallaria.
+    const mod = await import('/src/services/payloadService.js');
+    window.__chagraE2E = { savePayload: mod.savePayload };
+  });
+
 const triggerOfflineSeeding = (page, { crop, quantity }) =>
   page.evaluate(
     async ({ crop, quantity }) => {
-      // Usa el servicio real — no duplica lógica de persistencia.
-      const mod = await import('/src/services/payloadService.js');
+      if (!window.__chagraE2E?.savePayload) {
+        throw new Error('payloadService no fue precargado antes del offline');
+      }
       const payload = {
         data: {
           type: 'log--seeding',
@@ -61,7 +70,7 @@ const triggerOfflineSeeding = (page, { crop, quantity }) =>
           },
         },
       };
-      return mod.savePayload('seeding', payload);
+      return window.__chagraE2E.savePayload('seeding', payload);
     },
     { crop, quantity }
   );
@@ -102,6 +111,9 @@ test.describe('Offline-first — siembra pendiente y reconexión', () => {
     await expect(
       page.getByRole('button', { name: /tareas por proximidad|campo/i })
     ).toBeVisible({ timeout: 15_000 });
+
+    // Precarga del servicio mientras todavia hay red.
+    await preloadPayloadService(page);
 
     // Simula desconexión de red.
     await context.setOffline(true);
