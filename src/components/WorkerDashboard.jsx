@@ -3,8 +3,7 @@ import { MapPin, CheckCircle, Clock, Loader2, Navigation, RefreshCw, Eye, Wrench
 import useAssetStore from '../store/useAssetStore';
 import { logCache } from '../db/logCache';
 import { assetCache } from '../db/assetCache';
-import { mediaCache } from '../db/mediaCache';
-import { wktToGeoJson, geoJsonToWkt } from '../utils/geo';
+import { wktToGeoJson } from '../utils/geo';
 import { haversineDistance, getCoords } from '../utils/spatialAnalysis';
 import FarmMap from './FarmMap';
 import EvidenceCapture from './EvidenceCapture';

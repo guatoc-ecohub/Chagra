@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, MapPin, Camera } from 'lucide-react';
+import { ArrowLeft, Camera } from 'lucide-react';
 import { syncManager } from '../services/syncManager';
 
 function ObservationScreen({ onBack, onSave }) {

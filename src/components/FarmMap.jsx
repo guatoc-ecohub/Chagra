@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import useAssetStore from '../store/useAssetStore';
-import { useLogStore } from '../store/useLogStore';
 import { wktToGeoJson } from '../utils/geo';
 import { logCache } from '../db/logCache';
 

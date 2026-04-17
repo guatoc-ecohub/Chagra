@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Wrench, Camera } from 'lucide-react';
+import { ArrowLeft, Camera } from 'lucide-react';
 import { syncManager } from '../services/syncManager';
 
 function MaintenanceScreen({ onBack, onSave }) {

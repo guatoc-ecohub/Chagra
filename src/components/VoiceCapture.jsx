@@ -33,11 +33,9 @@ const STATE_DONE = 'done';
  * Blob en pending_voice_recordings para reintento posterior.
  */
 export default function VoiceCapture({ onSave }) {
-  const { isRecording, audioLevel, amplitudeHistory, durationMs, error: recorderError, start, stop, reset, hardLimitMs } = useVoiceRecorder();
+  const { audioLevel, amplitudeHistory, durationMs, error: recorderError, start, stop, reset, hardLimitMs } = useVoiceRecorder();
 
   const [view, setView] = useState(STATE_IDLE);
-  const [lastBlob, setLastBlob] = useState(null);
-  const [lastBlobDuration, setLastBlobDuration] = useState(0);
   const [transcription, setTranscription] = useState('');
   const [entities, setEntities] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
@@ -61,8 +59,6 @@ export default function VoiceCapture({ onSave }) {
 
   const resetAll = useCallback(() => {
     reset();
-    setLastBlob(null);
-    setLastBlobDuration(0);
     setTranscription('');
     setEntities([]);
     setErrorMsg('');
@@ -114,8 +110,6 @@ export default function VoiceCapture({ onSave }) {
       setView(STATE_ERROR);
       return;
     }
-    setLastBlob(result.blob);
-    setLastBlobDuration(result.durationMs);
     await runPipeline(result.blob, result.durationMs);
   }, [stop, runPipeline]);
 
