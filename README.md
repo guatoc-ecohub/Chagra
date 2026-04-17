@@ -50,7 +50,97 @@ VITE_DEFAULT_FARM_NAME=Granja Principal
 
 > **Nota de seguridad:** los archivos `.env` y `.env.local` están incluidos en `.gitignore`. Nunca los commitee al repositorio público.
 
-## Instalación y Ejecución Local
+## Entorno de Desarrollo Local (Docker)
+
+El repositorio incluye un `docker-compose.yml` que levanta la pila completa: FarmOS + PostgreSQL, Home Assistant y Ollama (LLM local para el módulo de voz). Es la forma recomendada de desarrollar sin depender de infraestructura externa.
+
+### Requisitos previos
+
+* Docker Desktop (o Docker Engine + Compose v2)
+* Node.js v18+
+
+### 1. Variables de entorno Docker
+
+Copia `.env.docker.example` a `.env.docker` y ajusta si es necesario (los valores por defecto funcionan para desarrollo):
+
+```bash
+cp .env.docker.example .env.docker
+```
+
+El archivo controla credenciales de PostgreSQL, nombre del sitio FarmOS y cuenta de administrador.
+
+### 2. Levantar los servicios
+
+```bash
+docker compose up
+```
+
+En el **primer arranque** el contenedor de FarmOS:
+
+1. Instala Drupal + farmOS con PostgreSQL
+2. Habilita todos los módulos necesarios (`farm_plant`, `farm_seeding`, `farm_land`, etc.)
+3. Genera claves RSA y configura el OAuth consumer `chagra` (password grant)
+4. Crea los activos semilla: **Parcela Principal**, **Zona Fresas**, **Zona Hortalizas**, **Invernadero 1**, **Invernadero 2**
+
+Esto tarda entre 1 y 2 minutos. Los arranques posteriores son inmediatos.
+
+| Servicio       | URL local                   |
+|----------------|-----------------------------|
+| FarmOS         | http://localhost:8081        |
+| Home Assistant | http://localhost:8123        |
+| Ollama API     | http://localhost:11434       |
+
+Credenciales FarmOS por defecto: `admin` / `admin`.
+
+### 3. Variables de entorno de la app
+
+Copia `.env.example` a `.env.local`:
+
+```bash
+cp .env.example .env.local
+```
+
+Para el entorno Docker el archivo queda así (el proxy de Vite reenvía `/api` y `/oauth` a FarmOS):
+
+```env
+VITE_FARMOS_URL=
+VITE_FARMOS_CLIENT_ID=chagra
+VITE_DEFAULT_LOCATION_ID=       # Se rellena tras el primer sync
+VITE_DEFAULT_FARM_NAME=Chagra Dev
+VITE_HA_ACCESS_TOKEN=dev_token
+VITE_STT_MODEL=base
+VITE_NLU_MODEL=qwen3.5:4b
+```
+
+> `VITE_FARMOS_URL` se deja vacío para que las peticiones vayan por el proxy de Vite (`/api → localhost:8081`). Si apuntas a una instancia remota, pon la URL completa aquí.
+
+### 4. Instalar dependencias y arrancar la app
+
+```bash
+npm install
+npm run dev
+```
+
+Abre http://localhost:5173, inicia sesión con `admin` / `admin` y luego sincroniza en el tab **Activos** (botón ↻). Las parcelas e invernaderos semilla aparecerán en los desplegables de ubicación.
+
+### Por qué los registros quedan en cola offline
+
+La app es offline-first: si `navigator.onLine` es `true` pero FarmOS no responde (o el usuario no ha iniciado sesión), los registros se guardan en IndexedDB como `pending_transactions`. Para inspeccionarlos desde DevTools:
+
+```js
+// DevTools → Console
+const req = indexedDB.open('chagra-db');
+req.onsuccess = e => {
+  const db = e.target.result;
+  db.transaction('pending_transactions', 'readonly')
+    .objectStore('pending_transactions')
+    .getAll().onsuccess = r => console.table(r.target.result);
+};
+```
+
+El sync se dispara automáticamente al recuperar conectividad o al presionar el botón de sincronización manual.
+
+## Instalación y Ejecución (sin Docker)
 
 Clonar el repositorio:
 
@@ -65,7 +155,7 @@ Instalar dependencias:
 npm install
 ```
 
-Ejecutar el servidor de desarrollo:
+Ejecutar el servidor de desarrollo (requiere una instancia de FarmOS ya configurada y la URL en `.env.local`):
 
 ```bash
 npm run dev
