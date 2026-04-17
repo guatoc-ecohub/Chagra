@@ -1,0 +1,21 @@
+# Home Assistant — configuración mínima para desarrollo
+default_config:
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 172.16.0.0/12
+    - 192.168.0.0/16
+
+# Sensor simulado de prueba (Invernadero)
+sensor:
+  - platform: template
+    sensors:
+      dev_humidity:
+        friendly_name: "Dev Humidity"
+        value_template: "65"
+        unit_of_measurement: "%"
+      dev_temperature:
+        friendly_name: "Dev Temperature"
+        value_template: "22"
+        unit_of_measurement: "°C"

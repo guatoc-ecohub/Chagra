@@ -1,0 +1,76 @@
+services:
+
+  # ── Base de datos para FarmOS ──────────────────────────────────────────────
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── FarmOS — API JSON:API + OAuth ──────────────────────────────────────────
+  farmos:
+    image: farmos/farmos:3.x
+    ports:
+      - "8081:80"
+    environment:
+      FARMOS_DB_HOST: postgres
+      FARMOS_DB_PORT: 5432
+      FARMOS_DB_USER: ${POSTGRES_USER}
+      FARMOS_DB_PASS: ${POSTGRES_PASSWORD}
+      FARMOS_DB_NAME: ${POSTGRES_DB}
+      FARMOS_SITE_NAME: ${FARMOS_SITE_NAME}
+    volumes:
+      - farmos_files:/opt/drupal/web/sites/default/files
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── Home Assistant — sensores IoT ─────────────────────────────────────────
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    ports:
+      - "8123:8123"
+    volumes:
+      - ./docker/ha-config:/config
+    environment:
+      TZ: America/Bogota
+    restart: unless-stopped
+
+  # ── Ollama — inferencia LLM local (CPU) ───────────────────────────────────
+  ollama:
+    image: ollama/ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    restart: unless-stopped
+
+  # ── Descarga el modelo al primer arranque (one-shot) ──────────────────────
+  ollama-init:
+    image: ollama/ollama
+    depends_on:
+      - ollama
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    entrypoint: >
+      /bin/sh -c "
+        echo 'Esperando a Ollama...';
+        until ollama list 2>/dev/null; do sleep 3; done;
+        echo 'Descargando qwen3.5:4b (CPU)...';
+        ollama pull qwen3.5:4b;
+        echo 'Modelo listo.'
+      "
+    restart: "no"
+
+volumes:
+  postgres_data:
+  farmos_files:
+  ollama_models:
