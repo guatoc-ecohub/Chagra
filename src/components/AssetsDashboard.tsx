@@ -13,6 +13,7 @@ import GuildSuggestions from './GuildSuggestions';
 import { geoJsonToWkt } from '../utils/geo';
 import { MapPin, LocateFixed } from 'lucide-react';
 import type { FarmOSEnrichedAsset } from '../types';
+import { bestFuzzyMatch } from '../utils/entityMatcher';
 
 // Catálogos de dominio agroecológico
 const STRUCTURE_EXAMPLES = [
@@ -177,7 +178,7 @@ export default function AssetsDashboard({ onBack }: AssetsDashboardProps) {
     plants: plantsRaw, structures: structuresRaw, equipment: equipmentRaw, materials: materialsRaw, lands: landsRaw,
     isLoading, error, lastSync,
     hydrate, syncFromServer, addAsset, removeAsset, addHarvestLog,
-    setSelectedAsset,
+    setSelectedAsset, taxonomyTerms,
   } = useAssetStore();
 
   const plants = plantsRaw as unknown as FarmOSEnrichedAsset[];
@@ -325,9 +326,17 @@ export default function AssetsDashboard({ onBack }: AssetsDashboardProps) {
         };
       }
     }
-    if (activeTab === 'plant' && formData.plantType) {
-      // plant_type is stored in notes/name — inline taxonomy creation not supported by JSON:API
-      // The variety is captured in the notes field via formatNotes()
+    if (activeTab === 'plant') {
+      const query = formData.plantType || formData.name;
+      const plantTerms = (taxonomyTerms as Array<{ id: string; type: string; name: string }>)
+        .filter((t) => t.type === 'taxonomy_term--plant_type');
+      const hit = bestFuzzyMatch(query, plantTerms, (t) => t.name, 0.65);
+      if (hit) {
+        assetPayload.data.relationships = {
+          ...assetPayload.data.relationships,
+          plant_type: { data: [{ type: 'taxonomy_term--plant_type', id: hit.match.id }] },
+        };
+      }
     }
 
     const pendingTxs: unknown[] = [{

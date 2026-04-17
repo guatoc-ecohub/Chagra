@@ -176,9 +176,17 @@ const useAssetStore = create<AssetState>()((set, get) => ({
         fetchFn('/api/taxonomy_term/material_type'),
       ]);
 
+      type RawTerm = { id: string; type: string; attributes?: { name?: string; description?: string } };
+      const normalize = (raw: RawTerm): TaxonomyTerm => ({
+        id: raw.id,
+        type: raw.type,
+        name: raw.attributes?.name ?? (raw as unknown as TaxonomyTerm).name ?? '',
+        description: raw.attributes?.description ?? null,
+      });
+
       const terms: TaxonomyTerm[] = [
-        ...(plantResult.status === 'fulfilled' ? ((plantResult.value.data as TaxonomyTerm[]) || []) : []),
-        ...(materialResult.status === 'fulfilled' ? ((materialResult.value.data as TaxonomyTerm[]) || []) : []),
+        ...(plantResult.status === 'fulfilled' ? ((plantResult.value.data as RawTerm[]) || []).map(normalize) : []),
+        ...(materialResult.status === 'fulfilled' ? ((materialResult.value.data as RawTerm[]) || []).map(normalize) : []),
       ];
 
       await assetCache.bulkPutTaxonomyTerms(terms);
