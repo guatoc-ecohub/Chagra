@@ -4,6 +4,7 @@ import useVoiceRecorder from '../hooks/useVoiceRecorder';
 import { transcribe, queueForRetry } from '../services/voiceService';
 import { extractEntities } from '../services/entityExtractor';
 import { syncManager } from '../services/syncManager';
+import { savePayload } from '../services/payloadService';
 import { ENV } from '../config/env';
 import Sparkline from './common/Sparkline';
 import VoiceConfirmation from './VoiceConfirmation';
@@ -113,47 +114,95 @@ export default function VoiceCapture({ onSave }) {
     await runPipeline(result.blob, result.durationMs);
   }, [stop, runPipeline]);
 
+  // Construye un log--seeding identico al de SeedingLog/AssetsDashboard:
+  // - Inline asset--plant en relationships.asset (payloadService crea el
+  //   asset primero y reemplaza con su UUID antes de POSTear el log).
+  // - quantity--standard inline (medida count, etiqueta "Plantulas").
+  // - location apuntando a structure o land segun resolvio el usuario.
+  // - plant_type relationship si la especie cruzo con FarmOS taxonomy.
+  const buildSeedingPayload = useCallback((entity) => {
+    const inlinePlant = {
+      type: 'asset--plant',
+      attributes: {
+        name: entity.canonical || entity.crop,
+        status: 'active',
+        notes: {
+          value: `Origen: registro por voz. Transcripcion: "${transcription}".`,
+          format: 'plain_text',
+        },
+      },
+      ...(entity.farmosTermId ? {
+        relationships: {
+          plant_type: {
+            data: [{ type: 'taxonomy_term--plant_type', id: entity.farmosTermId }],
+          },
+        },
+      } : {}),
+    };
+
+    return {
+      data: {
+        type: 'log--seeding',
+        attributes: {
+          name: `Siembra: ${entity.crop} (x${entity.quantity}) [voz]`,
+          timestamp: Math.floor(Date.now() / 1000),
+          status: 'done',
+          notes: {
+            value: `Registro por voz. Cantidad declarada: ${entity.quantity}. Transcripcion: "${transcription}".`,
+            format: 'plain_text',
+          },
+        },
+        relationships: {
+          asset: { data: [inlinePlant] },
+          location: {
+            data: [{ type: entity.location.type, id: entity.location.id }],
+          },
+          quantity: {
+            data: [{
+              type: 'quantity--standard',
+              attributes: {
+                measure: 'count',
+                value: { decimal: String(entity.quantity) },
+                label: 'Plantulas',
+              },
+            }],
+          },
+        },
+      },
+    };
+  }, [transcription]);
+
   const handleConfirmSave = useCallback(async (confirmedEntities) => {
     setIsSaving(true);
-    try {
-      for (const entity of confirmedEntities) {
-        const transaction = {
-          type: 'asset_plant',
-          endpoint: '/api/asset/plant',
-          payload: {
-            data: {
-              type: 'asset--plant',
-              attributes: {
-                name: `${entity.crop} (voz ×${entity.quantity})`,
-                status: 'active',
-                notes: {
-                  value: `Registro por voz. Transcripción: "${transcription}". Cantidad declarada: ${entity.quantity}.`,
-                  format: 'plain_text',
-                },
-              },
-              relationships: {
-                location: { data: [{ type: entity.location.type, id: entity.location.id }] },
-              },
-            },
-          },
-          _meta: {
-            source: 'voice',
-            quantity: entity.quantity,
-            transcription,
-            createdAt: new Date().toISOString(),
-          },
-        };
-        await syncManager.saveTransaction(transaction);
+    let savedCount = 0;
+    const errors = [];
+
+    for (const entity of confirmedEntities) {
+      try {
+        const payload = buildSeedingPayload(entity);
+        const result = await savePayload('seeding', payload);
+        if (result.success || (result.message || '').toLowerCase().includes('local')) {
+          savedCount++;
+        } else {
+          errors.push(`${entity.crop}: ${result.message || 'desconocido'}`);
+        }
+      } catch (err) {
+        errors.push(`${entity.crop}: ${err.message}`);
       }
-      onSave?.(`${confirmedEntities.length} registro${confirmedEntities.length > 1 ? 's' : ''} encolado${confirmedEntities.length > 1 ? 's' : ''} para sincronización.`);
-      setView(STATE_DONE);
-    } catch (err) {
-      setErrorMsg(`Error guardando transacciones: ${err.message}`);
-      setView(STATE_ERROR);
-    } finally {
-      setIsSaving(false);
     }
-  }, [transcription, onSave]);
+
+    setIsSaving(false);
+    if (savedCount > 0) {
+      const msg = errors.length > 0
+        ? `${savedCount} guardada(s), ${errors.length} con error.`
+        : `${savedCount} siembra${savedCount > 1 ? 's' : ''} registrada${savedCount > 1 ? 's' : ''} por voz.`;
+      onSave?.(msg);
+      setView(STATE_DONE);
+    } else {
+      setErrorMsg(`No se pudo guardar: ${errors.join('; ')}`);
+      setView(STATE_ERROR);
+    }
+  }, [buildSeedingPayload, onSave]);
 
   const recorderErr = recorderError;
   const remainingMs = Math.max(0, hardLimitMs - durationMs);
