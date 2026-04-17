@@ -8,7 +8,9 @@
 
 const OLLAMA_CHAT_URL = '/api/ollama/api/chat';
 const MODEL = 'qwen3.5:4b';
-const TIMEOUT_MS = 20000;
+// qwen3 puede tardar 25-35s en CPU incluso con thinking desactivado.
+// Nginx permite hasta 120s en /api/ollama/; 60s cliente es el punto medio seguro.
+const TIMEOUT_MS = 60000;
 
 const SYSTEM_PROMPT = `Eres un extractor de entidades agrícolas. Recibes una transcripción en español de un operador agroecológico. Devuelves EXCLUSIVAMENTE un array JSON válido, sin texto adicional, sin markdown, sin explicación.
 
@@ -59,11 +61,15 @@ export async function extractEntities(text) {
         model: MODEL,
         stream: false,
         format: 'json',
+        // qwen3 tiene "thinking mode" siempre activo por default; consume
+        // todos los num_predict razonando antes de emitir content y deja
+        // content="". think:false desactiva esa cadena de razonamiento.
+        think: false,
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: text },
         ],
-        options: { temperature: 0.1, num_predict: 512 },
+        options: { temperature: 0.1, num_predict: 2048 },
       }),
       signal: controller.signal,
     });
