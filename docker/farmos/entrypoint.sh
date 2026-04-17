@@ -34,8 +34,50 @@ if ! "$DRUSH" --root="$DRUPAL_ROOT" status --field=bootstrap 2>/dev/null | grep 
     --yes
   echo "[farmos-init] farmOS instalado correctamente."
 
-  "$DRUSH" --root="$DRUPAL_ROOT" pm:enable simple_oauth --yes 2>/dev/null || true
-  echo "[farmos-init] Módulos adicionales habilitados."
+  # Módulos OAuth
+  "$DRUSH" --root="$DRUPAL_ROOT" pm:enable simple_oauth simple_oauth_password_grant --yes 2>/dev/null || true
+
+  # Claves RSA para firmar tokens JWT
+  mkdir -p /opt/drupal/keys
+  "$DRUSH" --root="$DRUPAL_ROOT" simple-oauth:generate-keys /opt/drupal/keys
+  chown www-data:www-data /opt/drupal/keys/private.key /opt/drupal/keys/public.key
+  chmod 640 /opt/drupal/keys/private.key
+  chmod 644 /opt/drupal/keys/public.key
+  "$DRUSH" --root="$DRUPAL_ROOT" php:eval "
+    \$c = Drupal::configFactory()->getEditable('simple_oauth.settings');
+    \$c->set('public_key', '/opt/drupal/keys/public.key');
+    \$c->set('private_key', '/opt/drupal/keys/private.key');
+    \$c->save();
+  "
+
+  # OAuth Consumer para la app Chagra
+  "$DRUSH" --root="$DRUPAL_ROOT" php:eval "
+    \$consumer = Drupal::entityTypeManager()->getStorage('consumer')->create([
+      'label' => 'Chagra App',
+      'client_id' => '${FARMOS_CLIENT_ID:-chagra}',
+      'confidential' => FALSE,
+      'is_default' => TRUE,
+      'user_id' => 1,
+      'grant_types' => ['password', 'refresh_token'],
+      'scopes' => ['farm_manager'],
+    ]);
+    \$consumer->save();
+    echo 'OAuth consumer creado: ' . \$consumer->get('client_id')->value;
+  "
+
+  # Hosts permitidos para desarrollo local
+  SETTINGS_FILE="$DRUPAL_ROOT/sites/default/settings.php"
+  chmod u+w "$SETTINGS_FILE"
+  cat >> "$SETTINGS_FILE" <<'EOF'
+
+// Hosts permitidos para desarrollo local
+$settings['trusted_host_patterns'] = [
+  '^localhost$',
+  '^127\.0\.0\.1$',
+];
+EOF
+  chmod 444 "$SETTINGS_FILE"
+  echo "[farmos-init] Setup completo: OAuth, claves RSA, trusted hosts."
 else
   echo "[farmos-init] farmOS ya instalado, saltando setup."
 fi
