@@ -32,9 +32,8 @@ services:
       FARMOS_ADMIN_PASS: ${FARMOS_ADMIN_PASS}
       FARMOS_ADMIN_EMAIL: ${FARMOS_ADMIN_EMAIL}
     volumes:
-      - farmos_files:/opt/drupal/web/sites/default/files
+      - farmos_site:/opt/drupal/web/sites/default
       - ./docker/farmos/entrypoint.sh:/farmos-entrypoint.sh:ro
-      - ./docker/farmos/settings.php:/opt/drupal/web/sites/default/settings.php:ro
     depends_on:
       postgres:
         condition: service_healthy
@@ -78,5 +77,5 @@ services:
 
 volumes:
   postgres_data:
-  farmos_files:
+  farmos_site:
   ollama_models:
