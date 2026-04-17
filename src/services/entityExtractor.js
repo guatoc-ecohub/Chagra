@@ -12,25 +12,41 @@ const MODEL = 'qwen3.5:4b';
 // Nginx permite hasta 120s en /api/ollama/; 60s cliente es el punto medio seguro.
 const TIMEOUT_MS = 60000;
 
-const SYSTEM_PROMPT = `Eres un extractor de entidades agrícolas. Recibes una transcripción en español de un operador agroecológico. Devuelves EXCLUSIVAMENTE un array JSON válido, sin texto adicional, sin markdown, sin explicación.
+const SYSTEM_PROMPT = `Eres un extractor de entidades agricolas. Recibes una transcripcion en espanol de un operador registrando siembras. Devuelves EXCLUSIVAMENTE un array JSON valido, sin texto adicional, sin markdown.
 
-Schema estricto:
+Schema:
 [
   {
-    "crop": "<nombre del cultivo en minúsculas, singular>",
+    "crop": "<cultivo en minusculas>",
     "quantity": <entero positivo>,
-    "location": "<nombre del lugar tal como lo dice el operador>"
+    "location": "<lugar tal como lo dice el operador, o cadena vacia '' si no se menciona>"
   }
 ]
 
-Si no puedes extraer ninguna entidad válida, devuelve [].
-Nunca inventes datos. Si la cantidad no se menciona, omite la entrada.`;
+Reglas:
+- Convierte numerales en palabra a entero: "dos"=2, "tres"=3, "diez"=10, "veinte"=20.
+- Si la cantidad no se menciona, omite la entrada completa.
+- Si el lugar no se menciona, usa "" como location (NO omitas la entrada por eso).
+- Nunca inventes datos que no estan en la transcripcion.
+- Si no puedes extraer ninguna entidad valida, devuelve [].
 
+Ejemplos:
+Input: "Sembre cinco tomates en el invernadero"
+Output: [{"crop":"tomate","quantity":5,"location":"invernadero"}]
+
+Input: "Sembre tres arandanos"
+Output: [{"crop":"arandano","quantity":3,"location":""}]
+
+Input: "Hoy tuve un buen dia"
+Output: []`;
+
+// location puede venir vacia cuando el operador no menciona el lugar;
+// la UI resuelve al DEFAULT_LOCATION_ID en ese caso (ver VoiceConfirmation).
 const isValidEntity = (e) =>
   e &&
   typeof e.crop === 'string' && e.crop.trim().length > 0 &&
   Number.isInteger(e.quantity) && e.quantity > 0 &&
-  typeof e.location === 'string' && e.location.trim().length > 0;
+  typeof e.location === 'string';
 
 const parseJsonTolerant = (raw) => {
   if (typeof raw !== 'string') return null;
@@ -99,7 +115,7 @@ export async function extractEntities(text) {
       .map((e) => ({
         crop: e.crop.toLowerCase().trim(),
         quantity: Math.floor(e.quantity),
-        location: e.location.trim(),
+        location: (e.location || '').trim(),
       }));
   } catch (err) {
     if (err.name === 'AbortError') {
