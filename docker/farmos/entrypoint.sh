@@ -110,6 +110,23 @@ EOF
   " 2>/dev/null || echo "[farmos-init] Advertencia: seed de activos falló (continuando)."
   echo "[farmos-init] Datos semilla listos."
 
+  # Taxonomía plant_type: cultivos comunes de la finca (requerido por asset--plant)
+  echo "[farmos-init] Creando taxonomía plant_type..."
+  "$DRUSH" --root="$DRUPAL_ROOT" php:eval "
+    \$storage = Drupal::entityTypeManager()->getStorage('taxonomy_term');
+    \$crops = [
+      'Fresa','Lechuga','Mora','Arándano','Café','Uchuva','Gulupa',
+      'Cilantro','Tomate de Árbol','Maíz','Frijol','Arveja',
+      'Espinaca','Repollo','Kale','Apio','Quinua','Amaranto',
+    ];
+    foreach (\$crops as \$name) {
+      \$term = \$storage->create(['vid' => 'plant_type', 'name' => \$name, 'status' => TRUE]);
+      \$term->save();
+      echo '[seed] plant_type: ' . \$name . PHP_EOL;
+    }
+  " 2>/dev/null || echo "[farmos-init] Advertencia: seed de taxonomía falló (continuando)."
+  echo "[farmos-init] Taxonomía plant_type lista."
+
 else
   echo "[farmos-init] farmOS ya instalado, verificando módulos Chagra..."
   "$DRUSH" --root="$DRUPAL_ROOT" pm:enable \

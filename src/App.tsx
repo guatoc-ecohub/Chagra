@@ -98,14 +98,18 @@ const DashboardView = React.memo(function DashboardView({
   const lands = useAssetStore((s) => s.lands);
   const hydrate = useAssetStore((s) => s.hydrate);
   const syncFromServer = useAssetStore((s) => s.syncFromServer);
+  const syncTaxonomyTerms = useAssetStore((s) => s.syncTaxonomyTerms);
 
   // T2: Hidratación al montar — llena contadores desde IndexedDB inmediatamente
   useEffect(() => {
     hydrate().then(() => {
-      if (navigator.onLine)
-        syncFromServer(fetchFromFarmOS as (endpoint: string) => Promise<{ data?: unknown[] }>);
+      if (navigator.onLine) {
+        const fetchFn = fetchFromFarmOS as (endpoint: string) => Promise<{ data?: unknown[] }>;
+        syncFromServer(fetchFn);
+        syncTaxonomyTerms(fetchFn);
+      }
     });
-  }, [hydrate, syncFromServer]);
+  }, [hydrate, syncFromServer, syncTaxonomyTerms]);
 
   const noGeoCount = useMemo(() => {
     const allAssets = [...plants, ...structures, ...lands];
