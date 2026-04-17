@@ -2,7 +2,7 @@
 
 **Repositorio:** Chagra (PWA offline-first, público)
 **Última revisión:** 2026-04-16
-**Versión en producción:** 0.4.6
+**Versión en producción:** 0.5.1
 
 ---
 
@@ -109,8 +109,38 @@ git push origin main
 
 ---
 
-## 5. Referencias Cruzadas
+## 5. Merge-Gate de Seguridad y Comportamiento (QA/DevSecOps)
+
+Toda Pull Request hacia `main` debe atravesar dos merge-checks **obligatorios y bloqueantes**. Ningún PR puede fusionarse si alguno de los siguientes workflows falla, está pendiente o es omitido:
+
+### 5.1 SAST — CodeQL (`.github/workflows/codeql.yml`)
+
+- Motor: GitHub CodeQL nativo, lenguaje `javascript-typescript`.
+- Conjunto de queries: `security-extended` + `security-and-quality`.
+- Dispara en `pull_request` contra `main`, `push` a `main`, y cron semanal.
+- Falla el PR ante inyección (XSS, código, path traversal), secretos expuestos en código, uso inseguro de `eval`/`innerHTML`, y patrones de credenciales hardcodeadas.
+
+### 5.2 E2E — Playwright (`.github/workflows/playwright.yml`)
+
+- Framework: `@playwright/test` (Chromium, headless, 1 worker en CI).
+- Test canónico obligatorio: `tests/offline.spec.js` — valida el contrato offline-first:
+  1. `context.setOffline(true)` antes de guardar una siembra.
+  2. Persiste una transacción en IndexedDB store `pending_transactions` (esquema v6, ver `src/db/dbCore.js`).
+  3. `context.setOffline(false)` y verificación de transición del indicador a estado `Online` + `Sync/Pendientes`.
+- El build de Vite y el servidor dev se arrancan vía `webServer` en `playwright.config.js`.
+
+### 5.3 Regla de bloqueo
+
+> **Dictamen:** un PR con `CodeQL / Analyze` ❌ o `Playwright E2E / Offline-first E2E` ❌ **no puede** mergearse a `main`. El mantenedor debe configurar ambos checks como *Required* en las reglas de protección de rama (`Settings → Branches → main → Require status checks to pass`). El único atajo permitido es revertir el PR, no hacer bypass.
+
+Cualquier cambio sobre `src/db/dbCore.js`, `src/services/syncManager.js`, `src/services/payloadService.js` o `public/sw.js` **debe** incluir actualización del test E2E correspondiente si la superficie offline cambia.
+
+---
+
+## 6. Referencias Cruzadas
 
 - Auditoría técnica v0.4.6: `AUDIT_0.4.6.md`
 - Arquitectura de voz v0.5.0: `ARCHITECTURE_VOICE_0.5.0.md`
+- Pipeline SAST: `.github/workflows/codeql.yml`
+- Pipeline E2E: `.github/workflows/playwright.yml` + `tests/offline.spec.js`
 - Guía de contexto global: `~/.claude/CLAUDE.md`
