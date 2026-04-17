@@ -33,6 +33,7 @@ export default function HarvestLog({ onBack, onSave }) {
     unit: 'Kilogramos',
     notes: ''
   });
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleInput = (e) => {
     const { name, value } = e.target;
@@ -52,12 +53,14 @@ export default function HarvestLog({ onBack, onSave }) {
   };
 
   const handleSave = async () => {
-    try {
-      if (!formData.subArea || !formData.quantity || !formData.product) {
-        onSave('Completa Sub-área, Producto y Cantidad', true);
-        return;
-      }
+    if (isSaving) return;
+    if (!formData.subArea || !formData.quantity || !formData.product) {
+      onSave('Completa Sub-área, Producto y Cantidad', true);
+      return;
+    }
 
+    setIsSaving(true);
+    try {
       const payload = {
         data: {
           type: "log--harvest",
@@ -93,6 +96,8 @@ export default function HarvestLog({ onBack, onSave }) {
     } catch (error) {
       console.error('Error en HarvestLog handleSave:', error);
       onSave('Error al guardar registro', true);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -155,8 +160,13 @@ export default function HarvestLog({ onBack, onSave }) {
           <textarea name="notes" rows="3" value={formData.notes} onChange={handleInput} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-xl text-white min-h-[80px] placeholder-slate-500" placeholder="Ej: Fruta de tamaño pequeño o picada..." />
         </label>
 
-        <button onClick={handleSave} className="mt-4 p-6 rounded-xl bg-orange-600 active:bg-orange-500 text-2xl lg:text-3xl font-black shadow-xl min-h-[80px] border-b-4 border-orange-800">
-          Guardar Cosecha
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          aria-busy={isSaving}
+          className="mt-4 p-6 rounded-xl bg-orange-600 active:bg-orange-500 text-2xl lg:text-3xl font-black shadow-xl min-h-[80px] border-b-4 border-orange-800 disabled:opacity-60 disabled:active:bg-orange-600"
+        >
+          {isSaving ? 'Guardando…' : 'Guardar Cosecha'}
         </button>
       </div>
     </div>

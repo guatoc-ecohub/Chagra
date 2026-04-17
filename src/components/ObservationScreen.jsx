@@ -12,6 +12,7 @@ function ObservationScreen({ onBack, onSave }) {
   });
   const [photo, setPhoto] = useState(null);
   const [photoUrl, setPhotoUrl] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleInput = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -27,12 +28,14 @@ function ObservationScreen({ onBack, onSave }) {
   };
 
   const handleSave = async () => {
-    try {
-      if (!formData.description || !formData.locationId) {
-        onSave('Completa descripcion y ubicacion', true);
-        return;
-      }
+    if (isSaving) return;
+    if (!formData.description || !formData.locationId) {
+      onSave('Completa descripcion y ubicacion', true);
+      return;
+    }
 
+    setIsSaving(true);
+    try {
       const payload = {
         data: {
           type: "log--observation",
@@ -73,6 +76,8 @@ function ObservationScreen({ onBack, onSave }) {
     } catch (error) {
       console.error('Error en ObservationScreen handleSave:', error);
       onSave('Error al guardar registro', true);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -130,8 +135,13 @@ function ObservationScreen({ onBack, onSave }) {
           </button>
         </label>
 
-        <button onClick={handleSave} className="mt-4 p-6 rounded-xl bg-purple-600 active:bg-purple-500 text-2xl lg:text-3xl font-black shadow-xl min-h-[80px] border-b-4 border-purple-800">
-          Guardar Observacion
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          aria-busy={isSaving}
+          className="mt-4 p-6 rounded-xl bg-purple-600 active:bg-purple-500 text-2xl lg:text-3xl font-black shadow-xl min-h-[80px] border-b-4 border-purple-800 disabled:opacity-60 disabled:active:bg-purple-600"
+        >
+          {isSaving ? 'Guardando…' : 'Guardar Observacion'}
         </button>
       </div>
     </div>
