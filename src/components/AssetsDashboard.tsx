@@ -646,9 +646,6 @@ export default function AssetsDashboard({ onBack }: AssetsDashboardProps) {
     </>
   );
 
-  // Suppress unused variable warning for DYNAMIC_PRESETS
-  void DYNAMIC_PRESETS;
-
   return (
     <div className="h-[100dvh] w-full bg-slate-950 text-slate-100 flex flex-col overflow-hidden">
       {/* Header */}

@@ -4,32 +4,67 @@ import useAssetStore from '../store/useAssetStore';
 import { FARM_CONFIG } from '../config/defaults';
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { bestFuzzyMatch, similarity } from '../utils/entityMatcher';
+import type { ExtractedAgriEntity } from '../services/entityExtractor';
+import type { TaxonomyTerm } from '../types/asset';
+import type { ConfirmedEntity } from './VoiceCapture';
 
-/**
- * VoiceConfirmation — pantalla obligatoria de revisión humana del array de
- * entidades extraídas. Nada se persiste en pending_transactions sin paso por
- * este componente (ARCHITECTURE_VOICE_0.5.0.md §5).
- *
- * Props:
- *   - transcription: string (solo lectura)
- *   - initialEntities: Array<{crop, quantity, location}>
- *   - onConfirm(entitiesWithResolvedLocation[]): Promise<void>
- *   - onCancel(): void
- *   - isSaving: boolean
- */
+interface LocationOption {
+  id: string;
+  type: string;
+  name: string;
+  label: string;
+}
+
+interface CropSpeciesFlat {
+  id: string;
+  name: string;
+  commonName: string;
+  group: string;
+  groupKey: string;
+}
+
+interface RowState {
+  crop: string;
+  cropOriginal: string;
+  cropCanonical: string | null;
+  cropSlug: string | null;
+  farmosTermId: string | null;
+  cropScore: number | null;
+  cropGroup: string | null;
+  quantity: number | string;
+  rawLocation: string;
+  locationId: string;
+  locationType: string;
+  locationMatchedName: string | null;
+  locationScore: number | null;
+}
+
+interface VoiceConfirmationProps {
+  transcription: string;
+  initialEntities: ExtractedAgriEntity[];
+  onConfirm: (entities: ConfirmedEntity[]) => void;
+  onCancel: () => void;
+  isSaving?: boolean;
+}
+
 export default function VoiceConfirmation({
   transcription,
   initialEntities,
   onConfirm,
   onCancel,
   isSaving = false,
-}) {
-  const structures = useAssetStore((s) => s.structures);
-  const lands = useAssetStore((s) => s.lands);
-  const taxonomyTerms = useAssetStore((s) => s.taxonomyTerms);
+}: VoiceConfirmationProps) {
+  type EnrichedAsset = { id: string; attributes?: { name?: string }; [key: string]: unknown };
 
-  const locationOptions = useMemo(() => {
-    const opts = [];
+  const structuresRaw = useAssetStore((s) => s.structures);
+  const landsRaw = useAssetStore((s) => s.lands);
+  const taxonomyTerms = useAssetStore((s) => s.taxonomyTerms) as TaxonomyTerm[];
+
+  const structures = structuresRaw as unknown as EnrichedAsset[];
+  const lands = landsRaw as unknown as EnrichedAsset[];
+
+  const locationOptions = useMemo((): LocationOption[] => {
+    const opts: LocationOption[] = [];
     structures.forEach((a) => opts.push({
       id: a.id,
       type: 'asset--structure',
@@ -45,15 +80,11 @@ export default function VoiceConfirmation({
     return opts;
   }, [structures, lands]);
 
-  // Catalogo local de especies: fuente unica de verdad (CROP_TAXONOMY) +
-  // cross-reference con taxonomy_term--plant_type de FarmOS para obtener UUID.
-  const allCropSpecies = useMemo(() => {
-    const all = [];
+  const allCropSpecies = useMemo((): CropSpeciesFlat[] => {
+    const all: CropSpeciesFlat[] = [];
     Object.entries(CROP_TAXONOMY).forEach(([groupKey, group]) => {
       group.species.forEach((sp) => {
-        // sp.name viene como "Arandano (Vaccinium corymbosum)" — separamos
-        // el nombre comun del cientifico para mejorar el match.
-        const commonName = sp.name.split('(')[0].trim();
+        const commonName = (sp.name.split('(')[0] ?? sp.name).trim();
         all.push({ ...sp, commonName, group: group.label, groupKey });
       });
     });
@@ -65,8 +96,7 @@ export default function VoiceConfirmation({
     [taxonomyTerms]
   );
 
-  // Resuelve ubicacion via fuzzy match (tolerante a "invernadero 1" vs "invernadero").
-  const resolveLocation = (rawLocation) => {
+  const resolveLocation = (rawLocation: string) => {
     const hit = bestFuzzyMatch(rawLocation, locationOptions, (o) => o.name, 0.65);
     if (hit) return { id: hit.match.id, type: hit.match.type, matchedName: hit.match.name, score: hit.score };
     if (FARM_CONFIG.LOCATION_ID) {
@@ -75,32 +105,25 @@ export default function VoiceConfirmation({
     return null;
   };
 
-  // Resuelve cultivo en dos pasos:
-  //   1. fuzzy match contra CROP_TAXONOMY local (siempre disponible).
-  //   2. cross-reference del nombre canonico con taxonomyTerms de FarmOS
-  //      para obtener el UUID que se usa en plant_type relationship.
-  const resolveCrop = (rawCrop) => {
+  const resolveCrop = (rawCrop: string) => {
     const hit = bestFuzzyMatch(rawCrop, allCropSpecies, (s) => s.commonName, 0.7);
     if (!hit) {
-      return {
-        crop: rawCrop, canonical: null, cropSlug: null,
-        farmosTermId: null, score: null, group: null,
-      };
+      return { crop: rawCrop, canonical: null, cropSlug: null, farmosTermId: null, score: null, group: null };
     }
     const farmosMatch = farmosPlantTypes.find(
-      (t) => similarity(t.attributes?.name || '', hit.match.commonName) > 0.85
+      (t) => similarity(t.name || '', hit.match.commonName) > 0.85
     );
     return {
-      crop: hit.match.commonName,             // "Arandano"
-      canonical: hit.match.name,              // "Arandano (Vaccinium corymbosum)"
-      cropSlug: hit.match.id,                 // "vaccinium_corymbosum"
-      farmosTermId: farmosMatch?.id || null,  // UUID de FarmOS si existe
+      crop: hit.match.commonName,
+      canonical: hit.match.name,
+      cropSlug: hit.match.id,
+      farmosTermId: farmosMatch?.id || null,
       score: hit.score,
-      group: hit.match.group,                 // "Frutales y Perennes"
+      group: hit.match.group,
     };
   };
 
-  const [rows, setRows] = useState(() =>
+  const [rows, setRows] = useState<RowState[]>(() =>
     (initialEntities || []).map((e) => {
       const resolvedLoc = resolveLocation(e.location);
       const resolvedCrop = resolveCrop(e.crop || '');
@@ -122,16 +145,17 @@ export default function VoiceConfirmation({
     })
   );
 
-  const updateRow = (i, patch) => setRows((prev) => prev.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
-  const removeRow = (i) => setRows((prev) => prev.filter((_, idx) => idx !== i));
+  const updateRow = (i: number, patch: Partial<RowState>) =>
+    setRows((prev) => prev.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
+  const removeRow = (i: number) => setRows((prev) => prev.filter((_, idx) => idx !== i));
 
   const allValid = rows.length > 0 && rows.every(
-    (r) => r.crop.trim().length > 0 && Number.isInteger(Number(r.quantity)) && Number(r.quantity) > 0 && r.locationId
+    (r) => String(r.crop).trim().length > 0 && Number.isInteger(Number(r.quantity)) && Number(r.quantity) > 0 && r.locationId
   );
 
   const handleConfirm = () => {
     if (!allValid || isSaving) return;
-    const payload = rows.map((r) => ({
+    const payload: ConfirmedEntity[] = rows.map((r) => ({
       crop: (r.crop || '').trim(),
       canonical: r.cropCanonical || r.crop,
       cropSlug: r.cropSlug || null,
@@ -226,7 +250,9 @@ export default function VoiceConfirmation({
           <label className="flex flex-col gap-1">
             <span className="text-2xs font-bold text-slate-400 uppercase flex items-center gap-1 flex-wrap">
               Ubicación
-              {row.rawLocation && <span className="text-slate-500 normal-case font-normal">(dijo: "{row.rawLocation}")</span>}
+              {row.rawLocation && (
+                <span className="text-slate-500 normal-case font-normal">(dijo: "{row.rawLocation}")</span>
+              )}
               {row.locationScore != null && row.locationMatchedName && (
                 <span className="normal-case font-normal text-lime-400/70 inline-flex items-center gap-1">
                   <Wand2 size={10} /> → {row.locationMatchedName} ({Math.round(row.locationScore * 100)}%)
@@ -236,7 +262,7 @@ export default function VoiceConfirmation({
             <select
               value={row.locationId ? `${row.locationType}|${row.locationId}` : ''}
               onChange={(e) => {
-                const [t, id] = e.target.value.split('|');
+                const [t, id] = e.target.value.split('|') as [string, string];
                 updateRow(i, { locationId: id, locationType: t, locationScore: null, locationMatchedName: null });
               }}
               className="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white focus:border-lime-500 focus:outline-none"

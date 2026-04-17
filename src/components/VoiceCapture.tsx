@@ -3,13 +3,14 @@ import { Mic, MicOff, Loader2, AlertTriangle, Save, RotateCcw, Ear, BrainCircuit
 import useVoiceRecorder from '../hooks/useVoiceRecorder';
 import { transcribe, queueForRetry } from '../services/voiceService';
 import { extractEntities } from '../services/entityExtractor';
+import type { ExtractedAgriEntity } from '../services/entityExtractor';
 import { syncManager } from '../services/syncManager';
 import { savePayload } from '../services/payloadService';
 import { ENV } from '../config/env';
 import Sparkline from './common/Sparkline';
 import VoiceConfirmation from './VoiceConfirmation';
 
-const formatDuration = (ms) => {
+const formatDuration = (ms: number): string => {
   const s = Math.floor(ms / 1000);
   const mm = String(Math.floor(s / 60)).padStart(2, '0');
   const ss = String(s % 60).padStart(2, '0');
@@ -24,24 +25,38 @@ const STATE_REVIEW = 'review';
 const STATE_ERROR = 'error';
 const STATE_DONE = 'done';
 
-/**
- * VoiceCapture — UI principal del módulo de ingreso acústico.
- *
- * Pipeline: grabar → transcribir (Whisper) → extraer (qwen3.5:4b) → revisar
- * humano (VoiceConfirmation) → encolar en pending_transactions.
- *
- * Si transcripción o extracción fallan con error de red, ofrece encolar el
- * Blob en pending_voice_recordings para reintento posterior.
- */
-export default function VoiceCapture({ onSave }) {
+type ViewState =
+  | typeof STATE_IDLE
+  | typeof STATE_RECORDING
+  | typeof STATE_TRANSCRIBING
+  | typeof STATE_EXTRACTING
+  | typeof STATE_REVIEW
+  | typeof STATE_ERROR
+  | typeof STATE_DONE;
+
+export interface ConfirmedEntity {
+  crop: string;
+  canonical: string;
+  cropSlug: string | null;
+  farmosTermId: string | null;
+  quantity: number;
+  location: { id: string; type: string };
+  rawLocation?: string;
+}
+
+interface VoiceCaptureProps {
+  onSave?: (message: string) => void;
+}
+
+export default function VoiceCapture({ onSave }: VoiceCaptureProps) {
   const { audioLevel, amplitudeHistory, durationMs, error: recorderError, start, stop, reset, hardLimitMs } = useVoiceRecorder();
 
-  const [view, setView] = useState(STATE_IDLE);
-  const [transcription, setTranscription] = useState('');
-  const [entities, setEntities] = useState([]);
-  const [errorMsg, setErrorMsg] = useState('');
-  const [pendingCount, setPendingCount] = useState(0);
-  const [isSaving, setIsSaving] = useState(false);
+  const [view, setView] = useState<ViewState>(STATE_IDLE);
+  const [transcription, setTranscription] = useState<string>('');
+  const [entities, setEntities] = useState<ExtractedAgriEntity[]>([]);
+  const [errorMsg, setErrorMsg] = useState<string>('');
+  const [pendingCount, setPendingCount] = useState<number>(0);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const refreshPendingCount = useCallback(async () => {
     try {
@@ -66,18 +81,19 @@ export default function VoiceCapture({ onSave }) {
     setView(STATE_IDLE);
   }, [reset]);
 
-  const runPipeline = useCallback(async (blob, durMs) => {
+  const runPipeline = useCallback(async (blob: Blob, durMs: number) => {
     setView(STATE_TRANSCRIBING);
     setErrorMsg('');
-    let text;
+    let text: string;
     try {
       text = await transcribe(blob);
       setTranscription(text);
     } catch (err) {
-      try { await queueForRetry(blob, { reason: `transcribe: ${err.message}`, durationMs: durMs }); }
+      const errMsg = err instanceof Error ? err.message : String(err);
+      try { await queueForRetry(blob, { reason: `transcribe: ${errMsg}`, durationMs: durMs }); }
       catch (_) { /* noop */ }
       await refreshPendingCount();
-      setErrorMsg(`No se pudo transcribir: ${err.message}. Audio guardado para reintento.`);
+      setErrorMsg(`No se pudo transcribir: ${errMsg}. Audio guardado para reintento.`);
       setView(STATE_ERROR);
       return;
     }
@@ -88,7 +104,8 @@ export default function VoiceCapture({ onSave }) {
       setEntities(extracted);
       setView(STATE_REVIEW);
     } catch (err) {
-      setErrorMsg(`No se pudieron extraer entidades: ${err.message}. Revisa la transcripción manualmente.`);
+      const errMsg = err instanceof Error ? err.message : String(err);
+      setErrorMsg(`No se pudieron extraer entidades: ${errMsg}. Revisa la transcripción manualmente.`);
       setEntities([]);
       setView(STATE_REVIEW);
     }
@@ -99,7 +116,8 @@ export default function VoiceCapture({ onSave }) {
       await start();
       setView(STATE_RECORDING);
     } catch (err) {
-      setErrorMsg(err.message || 'No se pudo iniciar la grabación');
+      const errMsg = err instanceof Error ? err.message : 'No se pudo iniciar la grabación';
+      setErrorMsg(errMsg);
       setView(STATE_ERROR);
     }
   }, [start]);
@@ -114,20 +132,14 @@ export default function VoiceCapture({ onSave }) {
     await runPipeline(result.blob, result.durationMs);
   }, [stop, runPipeline]);
 
-  // Construye un log--seeding identico al de SeedingLog/AssetsDashboard:
-  // - Inline asset--plant en relationships.asset (payloadService crea el
-  //   asset primero y reemplaza con su UUID antes de POSTear el log).
-  // - quantity--standard inline (medida count, etiqueta "Plantulas").
-  // - location apuntando a structure o land segun resolvio el usuario.
-  // - plant_type relationship si la especie cruzo con FarmOS taxonomy.
-  const buildSeedingPayload = useCallback((entity) => {
-    const inlinePlant = {
+  const buildSeedingPayload = useCallback((entity: ConfirmedEntity) => {
+    const inlinePlant: Record<string, unknown> = {
       type: 'asset--plant',
       attributes: {
         name: entity.canonical || entity.crop,
         status: 'active',
         notes: {
-          value: `Origen: registro por voz. Transcripcion: "${transcription}".`,
+          value: `Origen: registro por voz. Transcripción: "${transcription}".`,
           format: 'plain_text',
         },
       },
@@ -148,7 +160,7 @@ export default function VoiceCapture({ onSave }) {
           timestamp: Math.floor(Date.now() / 1000),
           status: 'done',
           notes: {
-            value: `Registro por voz. Cantidad declarada: ${entity.quantity}. Transcripcion: "${transcription}".`,
+            value: `Registro por voz. Cantidad declarada: ${entity.quantity}. Transcripción: "${transcription}".`,
             format: 'plain_text',
           },
         },
@@ -163,7 +175,7 @@ export default function VoiceCapture({ onSave }) {
               attributes: {
                 measure: 'count',
                 value: { decimal: String(entity.quantity) },
-                label: 'Plantulas',
+                label: 'Plántulas',
               },
             }],
           },
@@ -172,22 +184,23 @@ export default function VoiceCapture({ onSave }) {
     };
   }, [transcription]);
 
-  const handleConfirmSave = useCallback(async (confirmedEntities) => {
+  const handleConfirmSave = useCallback(async (confirmedEntities: ConfirmedEntity[]) => {
     setIsSaving(true);
     let savedCount = 0;
-    const errors = [];
+    const errors: string[] = [];
 
     for (const entity of confirmedEntities) {
       try {
         const payload = buildSeedingPayload(entity);
-        const result = await savePayload('seeding', payload);
+        const result = await savePayload('seeding', payload as Parameters<typeof savePayload>[1]);
         if (result.success || (result.message || '').toLowerCase().includes('local')) {
           savedCount++;
         } else {
           errors.push(`${entity.crop}: ${result.message || 'desconocido'}`);
         }
       } catch (err) {
-        errors.push(`${entity.crop}: ${err.message}`);
+        const errMsg = err instanceof Error ? err.message : String(err);
+        errors.push(`${entity.crop}: ${errMsg}`);
       }
     }
 

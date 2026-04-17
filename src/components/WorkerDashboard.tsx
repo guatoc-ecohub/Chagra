@@ -7,6 +7,8 @@ import { wktToGeoJson } from '../utils/geo';
 import { haversineDistance, getCoords } from '../utils/spatialAnalysis';
 import FarmMap from './FarmMap';
 import EvidenceCapture from './EvidenceCapture';
+import type { CachedLog } from '../db/logCache';
+import type { FarmOSEnrichedAsset } from '../types';
 
 /**
  * WorkerDashboard — Vista de campo para operario (Fase 20).
@@ -16,33 +18,33 @@ import EvidenceCapture from './EvidenceCapture';
  * como Hecho" que genera un PATCH status=done encolado en pending_transactions.
  */
 
-const TYPE_ICONS = {
+const TYPE_ICONS: Record<string, React.ElementType> = {
   'log--observation': Eye,
   'log--maintenance': Wrench,
   'log--harvest': Apple,
 };
 
-const TYPE_COLORS = {
+const TYPE_COLORS: Record<string, string> = {
   'log--observation': 'text-blue-400 bg-blue-900/30',
   'log--maintenance': 'text-orange-400 bg-orange-900/30',
   'log--harvest': 'text-green-400 bg-green-900/30',
 };
 
-const formatDistance = (m) => {
+const formatDistance = (m: number): string => {
   if (m < 10) return '< 10m';
   if (m < 1000) return `${Math.round(m)}m`;
   return `${(m / 1000).toFixed(1)}km`;
 };
 
 export const WorkerDashboard = () => {
-  const plants = useAssetStore((s) => s.plants);
-  const lands = useAssetStore((s) => s.lands);
-  const [tasks, setTasks] = useState([]);
-  const [gpsCoords, setGpsCoords] = useState(null);
+  const plants = useAssetStore((s) => s.plants) as unknown as FarmOSEnrichedAsset[];
+  const lands = useAssetStore((s) => s.lands) as unknown as FarmOSEnrichedAsset[];
+  const [tasks, setTasks] = useState<CachedLog[]>([]);
+  const [gpsCoords, setGpsCoords] = useState<[number, number] | null>(null);
   const [loading, setLoading] = useState(true);
-  const [completing, setCompleting] = useState(null);
-  const [viewMode, setViewMode] = useState('list'); // 'list' | 'map'
-  const [evidenceCounts, setEvidenceCounts] = useState({}); // { logId: count }
+  const [completing, setCompleting] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [evidenceCounts, setEvidenceCounts] = useState<Record<string, number>>({});
 
   // Cargar tareas pendientes geolocalizadas
   const loadTasks = async () => {
@@ -53,7 +55,7 @@ export const WorkerDashboard = () => {
         const s = l.status || l.attributes?.status;
         if (s !== 'pending') return false;
         const geo = l.attributes?.intrinsic_geometry;
-        return !!(typeof geo === 'object' ? geo?.value : geo);
+        return !!(typeof geo === 'object' ? (geo as Record<string, unknown>)?.value : geo);
       });
       setTasks(pending);
     } catch (err) {
@@ -84,7 +86,7 @@ export const WorkerDashboard = () => {
   const sortedTasks = tasks
     .map((task) => {
       const rawGeo = task.attributes?.intrinsic_geometry;
-      const wkt = typeof rawGeo === 'object' ? rawGeo?.value : rawGeo;
+      const wkt = typeof rawGeo === 'object' ? (rawGeo as Record<string, unknown>)?.value as string | undefined : rawGeo as string | undefined;
       const geo = wkt ? wktToGeoJson(wkt) : null;
       const coords = getCoords(geo);
       const distance = gpsCoords && coords ? haversineDistance(gpsCoords, coords) : Infinity;
@@ -93,7 +95,7 @@ export const WorkerDashboard = () => {
     .sort((a, b) => a.distance - b.distance);
 
   // Marcar como completada (PATCH status=done)
-  const handleComplete = async (taskId) => {
+  const handleComplete = async (taskId: string) => {
     setCompleting(taskId);
     try {
       const task = tasks.find((t) => t.id === taskId);
@@ -136,8 +138,8 @@ export const WorkerDashboard = () => {
   };
 
   const noGeoCount = [...plants, ...lands].filter((a) => {
-    const geo = a.attributes?.intrinsic_geometry;
-    return !geo || !(typeof geo === 'object' ? geo.value : geo);
+    const geo = (a as FarmOSEnrichedAsset).attributes?.intrinsic_geometry;
+    return !geo || !(typeof geo === 'object' ? (geo as Record<string,unknown>).value : geo);
   }).length;
 
   return (
@@ -151,7 +153,7 @@ export const WorkerDashboard = () => {
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
             {gpsCoords
-              ? `GPS: ${gpsCoords[1].toFixed(5)}°N, ${gpsCoords[0].toFixed(5)}°W`
+              ? `GPS: ${gpsCoords[1]?.toFixed(5)}°N, ${gpsCoords[0]?.toFixed(5)}°W`
               : 'Obteniendo ubicación…'}
           </p>
         </div>
@@ -210,7 +212,7 @@ export const WorkerDashboard = () => {
           {sortedTasks.map((task) => {
             const Icon = TYPE_ICONS[task.type] || Clock;
             const colorClass = TYPE_COLORS[task.type] || 'text-slate-400 bg-slate-800';
-            const taskName = task.name || task.attributes?.name || 'Tarea sin título';
+            const taskName = String(task.name || task.attributes?.name || 'Tarea sin título');
             const isCompleting = completing === task.id;
             const hasEvidence = (evidenceCounts[task.id] || 0) > 0;
 
@@ -242,8 +244,8 @@ export const WorkerDashboard = () => {
                 {/* Evidencia fotográfica obligatoria con diagnóstico IA */}
                 <EvidenceCapture
                   logId={task.id}
-                  assetId={task.asset_id || task.attributes?.asset_id}
-                  assetGeometry={task.attributes?.intrinsic_geometry}
+                  assetId={(task.asset_id || task.attributes?.asset_id) as string | null}
+                  assetGeometry={task.attributes?.intrinsic_geometry as string | object | null}
                   disabled={isCompleting}
                   onCountChange={(count) => {
                     setEvidenceCounts((prev) => ({ ...prev, [task.id]: count }));
