@@ -10,6 +10,34 @@ const OLLAMA_URL = '/api/ollama';
 // Cooldown de idempotencia persistente (delegado a sync_meta vía assetCache)
 const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutos
 
+// Sparkline SVG inline — renderiza histórico 24h sin dependencias externas
+function Sparkline({ data, color = '#22d3ee', height = 32, width = 120 }) {
+  if (!data || data.length < 2) return <div className="w-[120px] h-[32px] bg-slate-700/30 rounded animate-pulse" />;
+
+  const values = data.map(d => parseFloat(d.state)).filter(v => !isNaN(v));
+  if (values.length < 2) return null;
+
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1;
+  const step = width / (values.length - 1);
+
+  const points = values.map((v, i) => `${i * step},${height - ((v - min) / range) * (height - 4) - 2}`).join(' ');
+  const lastVal = values[values.length - 1];
+  const lastX = (values.length - 1) * step;
+  const lastY = height - ((lastVal - min) / range) * (height - 4) - 2;
+
+  return (
+    <svg width={width} height={height} className="inline-block" viewBox={`0 0 ${width} ${height}`}>
+      <polyline fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" points={points} opacity="0.8" />
+      <circle cx={lastX} cy={lastY} r="2.5" fill={color} />
+      <text x={lastX - 4} y={lastY - 5} fill={color} fontSize="7" fontWeight="bold" textAnchor="end">
+        {lastVal.toFixed(1)}
+      </text>
+    </svg>
+  );
+}
+
 // Utilidades de formateo condicional
 const getHumidityColor = (humidity) => {
   const value = parseFloat(humidity);
@@ -40,6 +68,8 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [aiStatus, setAiStatus] = useState('idle'); // idle | thinking | done | error
+  const [sensorHistory, setSensorHistory] = useState({});
+  const [aiMeta, setAiMeta] = useState(null); // { model, evalDuration, totalDuration }
 
   // Variables de Entorno (Requeridas en el archivo .env)
   const HA_TOKEN = import.meta.env.VITE_HA_ACCESS_TOKEN;
@@ -351,6 +381,31 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         tabacoTemperature: tabacoTempData.state
       });
 
+      // Histórico 24h — HA History API (no bloquea análisis)
+      const historyStart = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const entityIds = [
+        'sensor.arteco_zs_304z_humidity',
+        'sensor.arteco_zs_304z_temperature',
+        'sensor.hobeian_zg_303z_humidity',
+        'sensor.hobeian_zg_303z_temperature'
+      ];
+      try {
+        const histResp = await fetch(
+          `${HA_URL}/history/period/${historyStart}?filter_entity_id=${entityIds.join(',')}&minimal_response&no_attributes`,
+          { headers: { 'Authorization': `Bearer ${HA_TOKEN}`, 'Content-Type': 'application/json' }, signal: parentSignal }
+        );
+        if (histResp.ok) {
+          const histData = await histResp.json();
+          const histMap = {};
+          for (const series of histData) {
+            if (series.length > 0) histMap[series[0].entity_id] = series;
+          }
+          setSensorHistory(histMap);
+        }
+      } catch (histErr) {
+        console.warn('[Telemetry] Histórico 24h no disponible:', histErr.message);
+      }
+
       // 2. Análisis determinista por reglas (siempre se ejecuta)
       const inv1Hum = parseFloat(invernaderoHumData.state);
       const inv1Temp = parseFloat(invernaderoTempData.state);
@@ -419,6 +474,12 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
           const data = await ollamaResponse.json();
           const content = (data.message?.content || '').trim();
           if (parentSignal?.aborted) return;
+          setAiMeta({
+            model: data.model || 'qwen3.5:4b',
+            totalDuration: data.total_duration ? (data.total_duration / 1e9).toFixed(1) : null,
+            evalCount: data.eval_count || null,
+            promptTokens: data.prompt_eval_count || null,
+          });
           if (content.length > 10) {
             setAiAlert(`${offlineNotice}${ruleAnalysis}\n\n🤖 IA: ${content}`);
             setAiStatus('done');
@@ -513,44 +574,68 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
       )}
 
       <div className="space-y-4 mb-6">
-        <div className="flex justify-between items-center p-4 bg-slate-800 rounded-2xl">
-          <div>
-            <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Invernadero 1</span>
-            <span className="text-slate-300 text-sm">Arteco ZS-304Z</span>
-          </div>
-          <div className="flex gap-4">
-            <div className="text-right">
-              <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Hum</span>
-              <span className={`text-2xl font-black ${getHumidityColor(sensors.invernaderoHumidity)}`}>
-                {sensors.invernaderoHumidity || '---'}%
-              </span>
+        <div className="p-4 bg-slate-800 rounded-2xl">
+          <div className="flex justify-between items-center">
+            <div>
+              <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Invernadero 1</span>
+              <span className="text-slate-300 text-sm">Arteco ZS-304Z</span>
             </div>
-            <div className="text-right">
-              <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Temp</span>
-              <span className={`text-2xl font-black ${getTemperatureColor(sensors.invernaderoTemperature)}`}>
-                {sensors.invernaderoTemperature || '---'}°C
-              </span>
+            <div className="flex gap-4">
+              <div className="text-right">
+                <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Hum</span>
+                <span className={`text-2xl font-black ${getHumidityColor(sensors.invernaderoHumidity)}`}>
+                  {sensors.invernaderoHumidity || '---'}%
+                </span>
+              </div>
+              <div className="text-right">
+                <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Temp</span>
+                <span className={`text-2xl font-black ${getTemperatureColor(sensors.invernaderoTemperature)}`}>
+                  {sensors.invernaderoTemperature || '---'}°C
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-3 mt-2 pt-2 border-t border-slate-700/50">
+            <div className="flex-1 flex items-center gap-2">
+              <span className="text-slate-500 text-2xs font-mono shrink-0">H%</span>
+              <Sparkline data={sensorHistory['sensor.arteco_zs_304z_humidity']} color="#3b82f6" />
+            </div>
+            <div className="flex-1 flex items-center gap-2">
+              <span className="text-slate-500 text-2xs font-mono shrink-0">T°</span>
+              <Sparkline data={sensorHistory['sensor.arteco_zs_304z_temperature']} color="#f97316" />
             </div>
           </div>
         </div>
 
-        <div className="flex justify-between items-center p-4 bg-slate-800 rounded-2xl">
-          <div>
-            <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Tabaco</span>
-            <span className="text-slate-300 text-sm">Hobeian ZG-303Z</span>
-          </div>
-          <div className="flex gap-4">
-            <div className="text-right">
-              <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Hum</span>
-              <span className={`text-2xl font-black ${getHumidityColor(sensors.tabacoHumidity)}`}>
-                {sensors.tabacoHumidity || '---'}%
-              </span>
+        <div className="p-4 bg-slate-800 rounded-2xl">
+          <div className="flex justify-between items-center">
+            <div>
+              <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Tabaco</span>
+              <span className="text-slate-300 text-sm">Hobeian ZG-303Z</span>
             </div>
-            <div className="text-right">
-              <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Temp</span>
-              <span className={`text-2xl font-black ${getTemperatureColor(sensors.tabacoTemperature)}`}>
-                {sensors.tabacoTemperature || '---'}°C
-              </span>
+            <div className="flex gap-4">
+              <div className="text-right">
+                <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Hum</span>
+                <span className={`text-2xl font-black ${getHumidityColor(sensors.tabacoHumidity)}`}>
+                  {sensors.tabacoHumidity || '---'}%
+                </span>
+              </div>
+              <div className="text-right">
+                <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Temp</span>
+                <span className={`text-2xl font-black ${getTemperatureColor(sensors.tabacoTemperature)}`}>
+                  {sensors.tabacoTemperature || '---'}°C
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-3 mt-2 pt-2 border-t border-slate-700/50">
+            <div className="flex-1 flex items-center gap-2">
+              <span className="text-slate-500 text-2xs font-mono shrink-0">H%</span>
+              <Sparkline data={sensorHistory['sensor.hobeian_zg_303z_humidity']} color="#3b82f6" />
+            </div>
+            <div className="flex-1 flex items-center gap-2">
+              <span className="text-slate-500 text-2xs font-mono shrink-0">T°</span>
+              <Sparkline data={sensorHistory['sensor.hobeian_zg_303z_temperature']} color="#f97316" />
             </div>
           </div>
         </div>
@@ -569,7 +654,15 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
                 IA analizando...
               </span>
             )}
-            {aiStatus === 'done' && (
+            {aiStatus === 'done' && aiMeta && (
+              <span className="text-muzo text-2xs font-bold bg-muzo/10 px-2 py-1 rounded border border-muzo/30 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 bg-muzo rounded-full inline-block"></span>
+                {aiMeta.model}
+                {aiMeta.totalDuration && <span className="text-slate-400 font-normal ml-1">{aiMeta.totalDuration}s</span>}
+                {aiMeta.evalCount && <span className="text-slate-500 font-normal">/{aiMeta.evalCount}tk</span>}
+              </span>
+            )}
+            {aiStatus === 'done' && !aiMeta && (
               <span className="text-muzo text-2xs font-bold bg-muzo/10 px-2 py-1 rounded border border-muzo/30">● IA completada</span>
             )}
             {aiStatus === 'error' && (
