@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Mic, MicOff, Loader2, AlertTriangle, Save, RotateCcw } from 'lucide-react';
+import { Mic, MicOff, Loader2, AlertTriangle, Save, RotateCcw, Ear, BrainCircuit } from 'lucide-react';
 import useVoiceRecorder from '../hooks/useVoiceRecorder';
 import { transcribe, queueForRetry } from '../services/voiceService';
 import { extractEntities } from '../services/entityExtractor';
 import { syncManager } from '../services/syncManager';
+import { ENV } from '../config/env';
 import Sparkline from './common/Sparkline';
 import VoiceConfirmation from './VoiceConfirmation';
 
@@ -165,6 +166,16 @@ export default function VoiceCapture({ onSave }) {
 
   return (
     <div className="p-4 flex flex-col gap-4 text-white">
+      <div className="flex items-center justify-center gap-3 text-2xs text-slate-500 font-mono">
+        <span className="inline-flex items-center gap-1" title="Modelo Speech-to-Text (Whisper)">
+          <Ear size={11} className="text-slate-400" /> STT: whisper-{ENV.STT_MODEL}
+        </span>
+        <span className="text-slate-700">•</span>
+        <span className="inline-flex items-center gap-1" title="Modelo Natural Language Understanding (Ollama)">
+          <BrainCircuit size={11} className="text-slate-400" /> NLU: {ENV.NLU_MODEL}
+        </span>
+      </div>
+
       {pendingCount > 0 && (
         <div className="bg-amber-900/20 border border-amber-800/50 rounded-xl p-3 text-xs text-amber-200 flex items-center gap-2">
           <AlertTriangle size={14} />
