@@ -1,16 +1,16 @@
 services:
 
-  # ── Base de datos para FarmOS ──────────────────────────────────────────────
+  # ── Base de datos para FarmOS (PostgreSQL) ────────────────────────────────
   postgres:
     image: postgres:16
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${FARMOS_DB_NAME}
+      POSTGRES_USER: ${FARMOS_DB_USER}
+      POSTGRES_PASSWORD: ${FARMOS_DB_PASS}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U ${FARMOS_DB_USER} -d ${FARMOS_DB_NAME}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -24,9 +24,9 @@ services:
     environment:
       FARMOS_DB_HOST: postgres
       FARMOS_DB_PORT: 5432
-      FARMOS_DB_USER: ${POSTGRES_USER}
-      FARMOS_DB_PASS: ${POSTGRES_PASSWORD}
-      FARMOS_DB_NAME: ${POSTGRES_DB}
+      FARMOS_DB_USER: ${FARMOS_DB_USER}
+      FARMOS_DB_PASS: ${FARMOS_DB_PASS}
+      FARMOS_DB_NAME: ${FARMOS_DB_NAME}
       FARMOS_SITE_NAME: ${FARMOS_SITE_NAME}
       FARMOS_ADMIN_USER: ${FARMOS_ADMIN_USER}
       FARMOS_ADMIN_PASS: ${FARMOS_ADMIN_PASS}
@@ -34,6 +34,7 @@ services:
     volumes:
       - farmos_files:/opt/drupal/web/sites/default/files
       - ./docker/farmos/entrypoint.sh:/farmos-entrypoint.sh:ro
+      - ./docker/farmos/settings.php:/opt/drupal/web/sites/default/settings.php:ro
     depends_on:
       postgres:
         condition: service_healthy

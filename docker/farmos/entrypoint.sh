@@ -5,7 +5,7 @@ set -e
 DRUSH="/opt/drupal/vendor/bin/drush"
 DRUPAL_ROOT="/opt/drupal/web"
 
-echo "[farmos-init] Esperando base de datos..."
+echo "[farmos-init] Esperando base de datos PostgreSQL..."
 until php -r "
   try {
     new PDO(
@@ -24,8 +24,9 @@ cd /opt/drupal
 
 # Solo instala si Drupal no está inicializado aún
 if ! "$DRUSH" --root="$DRUPAL_ROOT" status --field=bootstrap 2>/dev/null | grep -q "Successful"; then
-  echo "[farmos-init] Instalando farmOS (esto puede tardar 1-2 min)..."
+  echo "[farmos-init] Instalando farmOS con PostgreSQL (esto puede tardar 1-2 min)..."
   "$DRUSH" --root="$DRUPAL_ROOT" site:install farm \
+    --db-url="pgsql://${FARMOS_DB_USER}:${FARMOS_DB_PASS}@${FARMOS_DB_HOST}:${FARMOS_DB_PORT}/${FARMOS_DB_NAME}" \
     --account-name="${FARMOS_ADMIN_USER}" \
     --account-pass="${FARMOS_ADMIN_PASS}" \
     --account-mail="${FARMOS_ADMIN_EMAIL}" \
@@ -33,11 +34,10 @@ if ! "$DRUSH" --root="$DRUPAL_ROOT" status --field=bootstrap 2>/dev/null | grep 
     --yes
   echo "[farmos-init] farmOS instalado correctamente."
 
-  # Habilitar módulos requeridos por Chagra (JSON:API está siempre activo en Drupal 10)
   "$DRUSH" --root="$DRUPAL_ROOT" pm:enable simple_oauth --yes 2>/dev/null || true
   echo "[farmos-init] Módulos adicionales habilitados."
 else
-  echo "[farmos-init] farmOS ya está instalado, saltando setup."
+  echo "[farmos-init] farmOS ya instalado, saltando setup."
 fi
 
 exec apache2-foreground
