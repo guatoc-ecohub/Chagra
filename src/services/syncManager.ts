@@ -389,7 +389,7 @@ class SyncManager {
     switch (type) {
       case 'log--planting':
       case 'planting':
-        return '/api/log/planting';
+        return '/api/log/seeding';
       case 'log--seeding':
       case 'seeding':
         return '/api/log/seeding';

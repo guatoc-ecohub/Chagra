@@ -48,7 +48,7 @@ export const useLogStore = create<LogState>()((set, get) => ({
     set({ isSyncing: true });
 
     const startTime = Math.floor(Date.now() / 1000) - days * 24 * 60 * 60;
-    const types = ['log--seeding', 'log--planting', 'log--harvest', 'log--input'];
+    const types = ['log--seeding', 'log--harvest', 'log--input'];
 
     try {
       await Promise.all(
