@@ -38,7 +38,7 @@ interface MapPickerProps {
 const DEFAULT_CENTER: [number, number] = [4.5306, -73.9247];
 const DEFAULT_ZOOM = 17;
 
-void FARM_CONFIG; // used indirectly via config/defaults
+
 
 export const MapPicker: React.FC<MapPickerProps> = ({
   mode = 'point',

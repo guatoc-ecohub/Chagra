@@ -42,7 +42,11 @@ export default function ObservationScreen({ onBack, onSave }: ObservationScreenP
     }
   };
 
+  const [isSaving, setIsSaving] = useState(false);
+
   const handleSave = async () => {
+    if (isSaving) return;
+    setIsSaving(true);
     try {
       if (!formData.description || !formData.locationId) {
         onSave('Completa descripcion y ubicacion', true);
@@ -87,6 +91,8 @@ export default function ObservationScreen({ onBack, onSave }: ObservationScreenP
     } catch (error) {
       console.error('Error en ObservationScreen handleSave:', error);
       onSave('Error al guardar registro', true);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -147,8 +153,8 @@ export default function ObservationScreen({ onBack, onSave }: ObservationScreenP
           </button>
         </label>
 
-        <button onClick={handleSave} className="mt-4 p-6 rounded-xl bg-purple-600 active:bg-purple-500 text-2xl lg:text-3xl font-black shadow-xl min-h-[80px] border-b-4 border-purple-800">
-          Guardar Observacion
+        <button onClick={handleSave} disabled={isSaving} aria-busy={isSaving} className="mt-4 p-6 rounded-xl bg-purple-600 active:bg-purple-500 text-2xl lg:text-3xl font-black shadow-xl min-h-[80px] border-b-4 border-purple-800 disabled:opacity-60 disabled:active:bg-purple-600">
+          {isSaving ? 'Guardando…' : 'Guardar Observacion'}
         </button>
       </div>
     </div>

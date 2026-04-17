@@ -92,12 +92,15 @@ export default function PlantAssetLog({ onBack, onSave }: PlantAssetLogProps) {
     );
   };
 
+  const [isSaving, setIsSaving] = useState(false);
+
   const handleSave = async () => {
+    if (isSaving) return;
     if (!formData.species || !location) {
       onSave('Completa Especie/Nombre y captura la coordenada', true);
       return;
     }
-
+    setIsSaving(true);
     const payload = {
       _multipartFile: photo
         ? {
@@ -124,14 +127,20 @@ export default function PlantAssetLog({ onBack, onSave }: PlantAssetLogProps) {
       },
     };
 
-    const result = await savePayload('plant_asset', payload);
-    onSave(result.message, !result.success);
-
-    setFormData({ assetType: 'type-1', species: '', variety: '', healthStatus: 'Sano' });
-    setPhoto(null);
-    if (photoUrl) URL.revokeObjectURL(photoUrl);
-    setPhotoUrl(null);
-    setLocation(null);
+    try {
+      const result = await savePayload('plant_asset', payload);
+      onSave(result.message, !result.success);
+      setFormData({ assetType: 'type-1', species: '', variety: '', healthStatus: 'Sano' });
+      setPhoto(null);
+      if (photoUrl) URL.revokeObjectURL(photoUrl);
+      setPhotoUrl(null);
+      setLocation(null);
+    } catch (error) {
+      console.error('Error en PlantAssetLog handleSave:', error);
+      onSave('Error al guardar activo', true);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -196,8 +205,8 @@ export default function PlantAssetLog({ onBack, onSave }: PlantAssetLogProps) {
           </label>
         </div>
 
-        <button onClick={handleSave} className="mt-4 p-6 rounded-xl bg-purple-600 active:bg-purple-500 text-2xl lg:text-3xl font-black shadow-xl min-h-[80px] border-b-4 border-purple-800">
-          Guardar Activo
+        <button onClick={handleSave} disabled={isSaving} aria-busy={isSaving} className="mt-4 p-6 rounded-xl bg-purple-600 active:bg-purple-500 text-2xl lg:text-3xl font-black shadow-xl min-h-[80px] border-b-4 border-purple-800 disabled:opacity-60 disabled:active:bg-purple-600">
+          {isSaving ? 'Guardando…' : 'Guardar Activo'}
         </button>
       </div>
     </div>

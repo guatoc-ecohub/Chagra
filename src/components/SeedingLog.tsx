@@ -61,7 +61,11 @@ export default function SeedingLog({ onBack, onSave }: SeedingLogProps) {
     }
   };
 
+  const [isSaving, setIsSaving] = useState(false);
+
   const handleSave = async () => {
+    if (isSaving) return;
+    setIsSaving(true);
     try {
       if (!formData.crop || !formData.quantity) {
         onSave('Completa Cultivo y Cantidad', true);
@@ -118,6 +122,8 @@ export default function SeedingLog({ onBack, onSave }: SeedingLogProps) {
     } catch (error) {
       console.error('Error en SeedingLog handleSave:', error);
       onSave('Error al guardar registro', true);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -175,8 +181,8 @@ export default function SeedingLog({ onBack, onSave }: SeedingLogProps) {
           {isRecording && <div className="text-yellow-400 font-bold text-xl text-center animate-pulse mt-2">Grabando ruta... {coordinates.length} puntos registrados</div>}
         </div>
 
-        <button onClick={handleSave} className="mt-4 p-6 rounded-xl bg-green-600 active:bg-green-500 text-2xl lg:text-3xl font-black shadow-xl min-h-[80px] border-b-4 border-green-800">
-          Guardar Registro
+        <button onClick={handleSave} disabled={isSaving} aria-busy={isSaving} className="mt-4 p-6 rounded-xl bg-green-600 active:bg-green-500 text-2xl lg:text-3xl font-black shadow-xl min-h-[80px] border-b-4 border-green-800 disabled:opacity-60 disabled:active:bg-green-600">
+          {isSaving ? 'Guardando…' : 'Guardar Registro'}
         </button>
       </div>
     </div>
