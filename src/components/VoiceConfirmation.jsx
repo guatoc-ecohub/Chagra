@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { Check, X, Trash2, AlertTriangle } from 'lucide-react';
+import { Check, X, Trash2, AlertTriangle, Wand2 } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import { FARM_CONFIG } from '../config/defaults';
+import { bestFuzzyMatch } from '../utils/entityMatcher';
 
 /**
  * VoiceConfirmation — pantalla obligatoria de revisión humana del array de
@@ -24,6 +25,7 @@ export default function VoiceConfirmation({
 }) {
   const structures = useAssetStore((s) => s.structures);
   const lands = useAssetStore((s) => s.lands);
+  const taxonomyTerms = useAssetStore((s) => s.taxonomyTerms);
 
   const locationOptions = useMemo(() => {
     const opts = [];
@@ -42,27 +44,44 @@ export default function VoiceConfirmation({
     return opts;
   }, [structures, lands]);
 
-  const resolveDefault = (rawLocation) => {
-    const q = (rawLocation || '').toLowerCase().trim();
-    if (q) {
-      const match = locationOptions.find((o) => o.name.toLowerCase().includes(q));
-      if (match) return { id: match.id, type: match.type };
-    }
+  // Especies conocidas: taxonomy_term--plant_type del cache offline.
+  const plantTypeTerms = useMemo(
+    () => (taxonomyTerms || []).filter((t) => t.type === 'taxonomy_term--plant_type'),
+    [taxonomyTerms]
+  );
+
+  // Resuelve ubicacion via fuzzy match (tolerante a "invernadero 1" vs "invernadero").
+  const resolveLocation = (rawLocation) => {
+    const hit = bestFuzzyMatch(rawLocation, locationOptions, (o) => o.name, 0.65);
+    if (hit) return { id: hit.match.id, type: hit.match.type, matchedName: hit.match.name, score: hit.score };
     if (FARM_CONFIG.LOCATION_ID) {
-      return { id: FARM_CONFIG.LOCATION_ID, type: 'asset--land' };
+      return { id: FARM_CONFIG.LOCATION_ID, type: 'asset--land', matchedName: null, score: null };
     }
     return null;
   };
 
+  // Resuelve cultivo via fuzzy match contra taxonomia ("sarandano" -> "arandano").
+  const resolveCrop = (rawCrop) => {
+    const hit = bestFuzzyMatch(rawCrop, plantTypeTerms, (t) => t.attributes?.name || '', 0.7);
+    if (hit) return { name: hit.match.attributes?.name || rawCrop, id: hit.match.id, score: hit.score };
+    return { name: rawCrop, id: null, score: null };
+  };
+
   const [rows, setRows] = useState(() =>
     (initialEntities || []).map((e) => {
-      const resolved = resolveDefault(e.location);
+      const resolvedLoc = resolveLocation(e.location);
+      const resolvedCrop = resolveCrop(e.crop || '');
       return {
-        crop: e.crop || '',
+        crop: resolvedCrop.name,
+        cropOriginal: e.crop || '',
+        cropTermId: resolvedCrop.id,
+        cropScore: resolvedCrop.score,
         quantity: e.quantity || 1,
         rawLocation: e.location || '',
-        locationId: resolved?.id || '',
-        locationType: resolved?.type || 'asset--land',
+        locationId: resolvedLoc?.id || '',
+        locationType: resolvedLoc?.type || 'asset--land',
+        locationMatchedName: resolvedLoc?.matchedName || null,
+        locationScore: resolvedLoc?.score || null,
       };
     })
   );
@@ -78,6 +97,7 @@ export default function VoiceConfirmation({
     if (!allValid || isSaving) return;
     const payload = rows.map((r) => ({
       crop: r.crop.trim().toLowerCase(),
+      cropTermId: r.cropTermId || null,
       quantity: Math.floor(Number(r.quantity)),
       location: { id: r.locationId, type: r.locationType },
       rawLocation: r.rawLocation,
@@ -116,14 +136,26 @@ export default function VoiceConfirmation({
           </div>
 
           <label className="flex flex-col gap-1">
-            <span className="text-2xs font-bold text-slate-400 uppercase">Cultivo</span>
+            <span className="text-2xs font-bold text-slate-400 uppercase flex items-center gap-1">
+              Cultivo
+              {row.cropScore != null && (
+                <span className="normal-case font-normal text-lime-400/70 inline-flex items-center gap-1">
+                  <Wand2 size={10} /> detectado ({Math.round(row.cropScore * 100)}%)
+                </span>
+              )}
+            </span>
             <input
               type="text"
               value={row.crop}
-              onChange={(e) => updateRow(i, { crop: e.target.value })}
+              onChange={(e) => updateRow(i, { crop: e.target.value, cropTermId: null, cropScore: null })}
               className="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white focus:border-lime-500 focus:outline-none"
               disabled={isSaving}
             />
+            {row.cropOriginal && row.cropOriginal.toLowerCase() !== row.crop.toLowerCase() && (
+              <span className="text-2xs text-slate-500 normal-case font-normal">
+                Dijo: "{row.cropOriginal}" → mapeado a especie conocida.
+              </span>
+            )}
           </label>
 
           <label className="flex flex-col gap-1">
@@ -140,14 +172,20 @@ export default function VoiceConfirmation({
           </label>
 
           <label className="flex flex-col gap-1">
-            <span className="text-2xs font-bold text-slate-400 uppercase">
-              Ubicación {row.rawLocation && <span className="text-slate-500 normal-case font-normal">(dijo: "{row.rawLocation}")</span>}
+            <span className="text-2xs font-bold text-slate-400 uppercase flex items-center gap-1 flex-wrap">
+              Ubicación
+              {row.rawLocation && <span className="text-slate-500 normal-case font-normal">(dijo: "{row.rawLocation}")</span>}
+              {row.locationScore != null && row.locationMatchedName && (
+                <span className="normal-case font-normal text-lime-400/70 inline-flex items-center gap-1">
+                  <Wand2 size={10} /> → {row.locationMatchedName} ({Math.round(row.locationScore * 100)}%)
+                </span>
+              )}
             </span>
             <select
               value={row.locationId ? `${row.locationType}|${row.locationId}` : ''}
               onChange={(e) => {
                 const [t, id] = e.target.value.split('|');
-                updateRow(i, { locationId: id, locationType: t });
+                updateRow(i, { locationId: id, locationType: t, locationScore: null, locationMatchedName: null });
               }}
               className="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-white focus:border-lime-500 focus:outline-none"
               disabled={isSaving}
