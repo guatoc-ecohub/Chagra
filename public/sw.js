@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chagra-v11';
+const CACHE_NAME = 'chagra-v12';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -102,8 +102,13 @@ self.addEventListener('sync', (event) => {
   }
 });
 
-// Escuchar mensajes del cliente
+// Escuchar mensajes del cliente (solo same-origin).
 self.addEventListener('message', (event) => {
+  // Defensa en profundidad: aunque los SW solo reciben mensajes de clientes
+  // bajo su scope, verificamos origin explicitamente para cumplir el
+  // contrato de CodeQL js/missing-origin-check y bloquear cualquier
+  // mensaje cross-origin que llegue via postMessage en el futuro.
+  if (event.origin && event.origin !== self.location.origin) return;
   if (event.data && event.data.type === 'REGISTER_SYNC') {
     if (self.registration.sync) {
       self.registration.sync.register('sync-pending-transactions');

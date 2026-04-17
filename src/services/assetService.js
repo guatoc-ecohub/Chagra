@@ -40,7 +40,7 @@ export const renameWorker = async (oldName, newName) => {
       return { success: false, error: 'not_found' };
     }
 
-    const result = await sendToFarmOS(`/api/asset/person/${person.id}`, {
+    await sendToFarmOS(`/api/asset/person/${person.id}`, {
       data: {
         type: 'asset--person',
         id: person.id,

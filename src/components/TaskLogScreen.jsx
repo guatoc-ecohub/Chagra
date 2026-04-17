@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, CheckCircle, Clock, Wifi, WifiOff, RefreshCw } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Clock } from 'lucide-react';
 import { syncManager } from '../services/syncManager';
-
-// Iconos reactivos para estado de sincronización
-const SyncIcon = ({ isOnline, isSyncing }) => {
-  if (isSyncing) {
-    return <RefreshCw size={14} className="animate-spin text-blue-400" />;
-  }
-  return isOnline ? <Wifi size={14} className="text-green-400" /> : <WifiOff size={14} className="text-red-400" />;
-};
 
 function TaskLogScreen({ onBack }) {
   const [tasks, setTasks] = useState([]);
@@ -19,7 +11,7 @@ function TaskLogScreen({ onBack }) {
     try {
       // Aquí se conectaría a FarmOS para obtener tareas pendientes
       // Por ahora simulamos tareas locales
-      const localTasks = await syncManager.getSyncStats();
+      await syncManager.getSyncStats();
       setTasks([
         {
           id: 1,

@@ -3,7 +3,6 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { X, MapPin, LocateFixed, Check, Undo2 } from 'lucide-react';
 import { latLngToPoint, latLngsToPolygon } from '../utils/geo';
-import { FARM_CONFIG } from '../config/defaults';
 
 /**
  * MapPicker — Modal de selección/dibujo de geometría (Fase 17.3).

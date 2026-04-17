@@ -46,10 +46,6 @@ const QUICK_PRESET_IDS = [
   'fragaria_ananassa',
 ];
 
-const DYNAMIC_PRESETS = Object.values(CROP_TAXONOMY)
-  .flatMap((group) => group.species)
-  .filter((species) => QUICK_PRESET_IDS.includes(species.id));
-
 const ESTRATO_OPTIONS = [
   { value: 'emergente', label: 'Emergente (>25m)', desc: 'Capa superior del dosel' },
   { value: 'alto', label: 'Alto (10-25m)', desc: 'Árboles frutales, maderables' },
