@@ -28,20 +28,20 @@ export const STORES = {
   PENDING_TASKS: 'pending_tasks',
   MEDIA_CACHE: 'media_cache',
   PENDING_VOICE: 'pending_voice_recordings',
-};
+} as const;
 
-let dbInstance = null;
-let connectionPromise = null;
+let dbInstance: IDBDatabase | null = null;
+let connectionPromise: Promise<IDBDatabase> | null = null;
 
-export const openDB = async () => {
+export const openDB = async (): Promise<IDBDatabase> => {
   if (dbInstance) return dbInstance;
   if (connectionPromise) return connectionPromise;
 
-  connectionPromise = new Promise((resolve, reject) => {
+  connectionPromise = new Promise<IDBDatabase>((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onupgradeneeded = (event) => {
-      const db = event.target.result;
+      const db = (event.target as IDBOpenDBRequest).result;
       console.log(`[DB] Upgrading schema to v${DB_VERSION}…`);
 
       // pending_transactions (cola de salida — autoincrement + string uuids)
@@ -102,13 +102,13 @@ export const openDB = async () => {
     };
 
     request.onsuccess = (event) => {
-      dbInstance = event.target.result;
+      dbInstance = (event.target as IDBOpenDBRequest).result;
       connectionPromise = null;
 
       // Cerrar la conexión si otra pestaña solicita un upgrade futuro,
       // evitando bloqueos durante el onblocked de nuevas versiones.
       dbInstance.onversionchange = () => {
-        dbInstance.close();
+        dbInstance?.close();
         dbInstance = null;
         console.warn('[DB] Version change detected. Connection closed.');
       };
@@ -118,7 +118,7 @@ export const openDB = async () => {
 
     request.onerror = (event) => {
       connectionPromise = null;
-      reject(event.target.error);
+      reject((event.target as IDBOpenDBRequest).error);
     };
 
     request.onblocked = () => {

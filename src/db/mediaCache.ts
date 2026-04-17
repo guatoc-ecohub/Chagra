@@ -1,5 +1,5 @@
 /**
- * mediaCache.js — CRUD para binarios de evidencia fotográfica (Fase 20.2).
+ * mediaCache.ts — CRUD para binarios de evidencia fotográfica (Fase 20.2).
  *
  * Store: media_cache (ChagraDB v5)
  * Schema: { id (auto), logId, blob, mimeType, createdAt }
@@ -7,18 +7,31 @@
 
 import { openDB, STORES } from './dbCore';
 
+interface MediaRecord {
+  id?: number;
+  logId: string;
+  assetId: string | null;
+  blob: Blob;
+  mimeType: string;
+  ai_diagnosis: unknown;
+  createdAt: number;
+}
+
+interface SaveOptions {
+  mimeType?: string;
+  assetId?: string | null;
+  ai_diagnosis?: unknown;
+}
+
 export const mediaCache = {
   /**
    * Guarda un blob de imagen asociado a un logId y opcionalmente a un assetId.
-   * @param {string} logId
-   * @param {Blob} blob
-   * @param {object} options — { mimeType, assetId, ai_diagnosis }
-   * @returns {Promise<number>} — id autoincrement generado
    */
-  async save(logId, blob, options = {}) {
-    const { mimeType = 'image/webp', assetId = null, ai_diagnosis = null } = typeof options === 'string' ? { mimeType: options } : options;
+  async save(logId: string, blob: Blob, options: SaveOptions | string = {}): Promise<number> {
+    const opts: SaveOptions = typeof options === 'string' ? { mimeType: options } : options;
+    const { mimeType = 'image/webp', assetId = null, ai_diagnosis = null } = opts;
     const db = await openDB();
-    return new Promise((resolve, reject) => {
+    return new Promise<number>((resolve, reject) => {
       const tx = db.transaction(STORES.MEDIA_CACHE, 'readwrite');
       const request = tx.objectStore(STORES.MEDIA_CACHE).add({
         logId,
@@ -28,7 +41,7 @@ export const mediaCache = {
         ai_diagnosis,
         createdAt: Date.now(),
       });
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = () => resolve(request.result as number);
       tx.onerror = () => reject(tx.error);
     });
   },
@@ -36,14 +49,14 @@ export const mediaCache = {
   /**
    * Actualiza el diagnóstico IA de un registro existente.
    */
-  async updateDiagnosis(id, diagnosis) {
+  async updateDiagnosis(id: number, diagnosis: unknown): Promise<void> {
     const db = await openDB();
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(STORES.MEDIA_CACHE, 'readwrite');
       const store = tx.objectStore(STORES.MEDIA_CACHE);
       const getReq = store.get(id);
       getReq.onsuccess = () => {
-        const record = getReq.result;
+        const record = getReq.result as MediaRecord | undefined;
         if (record) {
           record.ai_diagnosis = diagnosis;
           store.put(record);
@@ -57,14 +70,16 @@ export const mediaCache = {
   /**
    * Obtiene medias asociadas a un assetId para evolución histórica.
    */
-  async getByAssetId(assetId) {
+  async getByAssetId(assetId: string): Promise<MediaRecord[]> {
     const db = await openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.MEDIA_CACHE, 'readonly');
       const index = tx.objectStore(STORES.MEDIA_CACHE).index('assetId');
       const request = index.getAll(IDBKeyRange.only(assetId));
       request.onsuccess = () => {
-        const sorted = (request.result || []).sort((a, b) => b.createdAt - a.createdAt);
+        const sorted = ((request.result as MediaRecord[]) || []).sort(
+          (a, b) => b.createdAt - a.createdAt
+        );
         resolve(sorted);
       };
       request.onerror = () => reject(request.error);
@@ -74,13 +89,13 @@ export const mediaCache = {
   /**
    * Obtiene todas las imágenes asociadas a un logId.
    */
-  async getByLogId(logId) {
+  async getByLogId(logId: string): Promise<MediaRecord[]> {
     const db = await openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.MEDIA_CACHE, 'readonly');
       const index = tx.objectStore(STORES.MEDIA_CACHE).index('logId');
       const request = index.getAll(IDBKeyRange.only(logId));
-      request.onsuccess = () => resolve(request.result || []);
+      request.onsuccess = () => resolve((request.result as MediaRecord[]) || []);
       request.onerror = () => reject(request.error);
     });
   },
@@ -88,7 +103,7 @@ export const mediaCache = {
   /**
    * Cuenta las imágenes asociadas a un logId.
    */
-  async countByLogId(logId) {
+  async countByLogId(logId: string): Promise<number> {
     const db = await openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.MEDIA_CACHE, 'readonly');
@@ -102,9 +117,9 @@ export const mediaCache = {
   /**
    * Elimina una imagen por su id autoincrement.
    */
-  async remove(id) {
+  async remove(id: number): Promise<void> {
     const db = await openDB();
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(STORES.MEDIA_CACHE, 'readwrite');
       tx.objectStore(STORES.MEDIA_CACHE).delete(id);
       tx.oncomplete = () => resolve();
@@ -115,15 +130,15 @@ export const mediaCache = {
   /**
    * Elimina todas las imágenes de un logId (post-sync cleanup).
    */
-  async removeByLogId(logId) {
+  async removeByLogId(logId: string): Promise<void> {
     const db = await openDB();
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(STORES.MEDIA_CACHE, 'readwrite');
       const store = tx.objectStore(STORES.MEDIA_CACHE);
       const index = store.index('logId');
       const cursorReq = index.openCursor(IDBKeyRange.only(logId));
       cursorReq.onsuccess = (event) => {
-        const cursor = event.target.result;
+        const cursor = (event.target as IDBRequest<IDBCursorWithValue | null>).result;
         if (cursor) {
           cursor.delete();
           cursor.continue();
@@ -137,10 +152,10 @@ export const mediaCache = {
   /**
    * Auto-purge: elimina medias de logs sincronizados con más de 7 días.
    */
-  async purgeStale(maxAgeMs = 7 * 24 * 60 * 60 * 1000) {
+  async purgeStale(maxAgeMs = 7 * 24 * 60 * 60 * 1000): Promise<number> {
     const db = await openDB();
     const cutoff = Date.now() - maxAgeMs;
-    return new Promise((resolve, reject) => {
+    return new Promise<number>((resolve, reject) => {
       const tx = db.transaction(STORES.MEDIA_CACHE, 'readwrite');
       const store = tx.objectStore(STORES.MEDIA_CACHE);
       const index = store.index('createdAt');
@@ -148,7 +163,7 @@ export const mediaCache = {
       const cursorReq = index.openCursor(range);
       let purged = 0;
       cursorReq.onsuccess = (event) => {
-        const cursor = event.target.result;
+        const cursor = (event.target as IDBRequest<IDBCursorWithValue | null>).result;
         if (cursor) {
           cursor.delete();
           purged++;
@@ -163,3 +178,5 @@ export const mediaCache = {
     });
   },
 };
+
+export type { MediaRecord };

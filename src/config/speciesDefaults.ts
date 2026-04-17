@@ -1,5 +1,5 @@
 /**
- * speciesDefaults.js — Mapa de correlación especie → (categoría, estrato, gremio,
+ * speciesDefaults.ts — Mapa de correlación especie → (categoría, estrato, gremio,
  * producción, compañeros y antagonistas).
  *
  * Claves (`id`) coinciden con CROP_TAXONOMY para lookup O(1).
@@ -11,7 +11,23 @@
  *   - antagonists:  [id...] especies con alelopatía negativa
  */
 
-export const SPECIES_DEFAULTS = {
+export interface SpeciesDefault {
+  category: string;
+  estrato: string;
+  gremio: string;
+  production: string;
+  cycleMonths: number | null;
+  companions: string[];
+  antagonists: string[];
+}
+
+export interface CategoryFallback {
+  estrato: string;
+  gremio: string;
+  production: string;
+}
+
+export const SPECIES_DEFAULTS: Record<string, SpeciesDefault> = {
   // --- Frutales y Perennes ---
   passiflora_edulis:       { category: 'frutales_perennes', estrato: 'medio', gremio: 'productivo_principal', production: 'fruto', cycleMonths: 8, companions: ['phaseolus_vulgaris', 'calendula_officinalis', 'tropaeolum_majus'], antagonists: [] },
   passiflora_tarminiana:   { category: 'frutales_perennes', estrato: 'medio', gremio: 'productivo_principal', production: 'fruto', cycleMonths: 10, companions: ['phaseolus_vulgaris', 'calendula_officinalis'], antagonists: [] },
@@ -103,7 +119,7 @@ export const SPECIES_DEFAULTS = {
   vicia_sativa:     { category: 'abonos_verdes_coberturas', estrato: 'bajo', gremio: 'fijador_nitrogeno', production: 'biomasa', cycleMonths: 3, companions: ['avena_sativa', 'raphanus_sativus'], antagonists: ['allium_cepa'] },
 };
 
-export const CATEGORY_FALLBACKS = {
+export const CATEGORY_FALLBACKS: Record<string, CategoryFallback> = {
   frutales_perennes:        { estrato: 'medio', gremio: 'productivo_principal', production: 'fruto' },
   leguminosas_granos:       { estrato: 'bajo', gremio: 'fijador_nitrogeno', production: 'grano' },
   hortalizas_hoja:          { estrato: 'bajo', gremio: 'productivo_principal', production: 'hoja' },
@@ -113,8 +129,14 @@ export const CATEGORY_FALLBACKS = {
   abonos_verdes_coberturas: { estrato: 'bajo', gremio: 'productor_biomasa', production: 'biomasa' },
 };
 
-export const resolveSpeciesDefaults = (speciesId, categoryId = null) => {
-  if (speciesId && SPECIES_DEFAULTS[speciesId]) return SPECIES_DEFAULTS[speciesId];
-  if (categoryId && CATEGORY_FALLBACKS[categoryId]) return { ...CATEGORY_FALLBACKS[categoryId], cycleMonths: null, companions: [], antagonists: [] };
+export const resolveSpeciesDefaults = (
+  speciesId: string | null | undefined,
+  categoryId: string | null = null
+): SpeciesDefault | null => {
+  if (speciesId && SPECIES_DEFAULTS[speciesId]) return SPECIES_DEFAULTS[speciesId] ?? null;
+  if (categoryId && CATEGORY_FALLBACKS[categoryId]) {
+    const fb = CATEGORY_FALLBACKS[categoryId]!;
+    return { category: categoryId, ...fb, cycleMonths: null, companions: [], antagonists: [] };
+  }
   return null;
 };

@@ -1,4 +1,14 @@
-export const CROP_TAXONOMY = {
+export interface CropSpecies {
+  id: string;
+  name: string;
+}
+
+export interface CropTaxonomyGroup {
+  label: string;
+  species: CropSpecies[];
+}
+
+export const CROP_TAXONOMY: Record<string, CropTaxonomyGroup> = {
   frutales_perennes: {
     label: 'Frutales y Perennes',
     species: [

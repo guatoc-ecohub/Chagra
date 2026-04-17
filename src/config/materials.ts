@@ -11,7 +11,31 @@
 //   - remineralization: minerales base y correctores de pH
 //   - biofabrica:       materias primas de producción (no aplicables directamente)
 
-export const MATERIAL_CATEGORIES = {
+export type MaterialCategoryId =
+  | 'fertilization'
+  | 'protection'
+  | 'remineralization'
+  | 'biofabrica';
+
+export interface MaterialCategory {
+  label: string;
+  color: string;
+  kpi: string;
+}
+
+export interface MaterialPreset {
+  name: string;
+  desc: string;
+  unit: string;
+  category: MaterialCategoryId;
+}
+
+export interface UnitOption {
+  label: string;
+  value: string;
+}
+
+export const MATERIAL_CATEGORIES: Record<MaterialCategoryId, MaterialCategory> = {
   fertilization: {
     label: 'Fertilización',
     color: '#22c55e', // green-500
@@ -34,7 +58,7 @@ export const MATERIAL_CATEGORIES = {
   },
 };
 
-export const MATERIAL_PRESETS = [
+export const MATERIAL_PRESETS: MaterialPreset[] = [
   // --- Abonos Orgánicos Sólidos (fertilization) ---
   { name: 'Bokashi', desc: 'Abono fermentado aeróbico rico en microorganismos', unit: 'kg', category: 'fertilization' },
   { name: 'Humus de Lombriz', desc: 'Excreta de lombriz estabilizada (Lombricompuesto)', unit: 'kg', category: 'fertilization' },
@@ -68,12 +92,13 @@ export const MATERIAL_PRESETS = [
 ];
 
 // Lookup rápido por nombre → categoría (evita .find() repetido en hooks de analítica)
-export const MATERIAL_CATEGORY_BY_NAME = MATERIAL_PRESETS.reduce((acc, preset) => {
-  acc[preset.name] = preset.category;
-  return acc;
-}, {});
+export const MATERIAL_CATEGORY_BY_NAME: Record<string, MaterialCategoryId> =
+  MATERIAL_PRESETS.reduce<Record<string, MaterialCategoryId>>((acc, preset) => {
+    acc[preset.name] = preset.category;
+    return acc;
+  }, {});
 
-export const UNIT_OPTIONS = [
+export const UNIT_OPTIONS: UnitOption[] = [
   { label: 'Mililitros', value: 'ml' },
   { label: 'Litros', value: 'l' },
   { label: 'Gramos', value: 'g' },

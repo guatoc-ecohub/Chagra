@@ -18,63 +18,99 @@
 
 import { openDB, STORES } from './dbCore';
 
+interface CachedLog {
+  id: string;
+  type: string;
+  asset_id: string | null;
+  timestamp: number;
+  name: string;
+  status: string;
+  quantity: unknown;
+  attributes: Record<string, unknown>;
+  relationships: Record<string, unknown>;
+  cached_at: number;
+  _pending: boolean;
+}
+
+interface JsonApiRelationshipRef {
+  id: string;
+  type?: string;
+}
+
+interface JsonApiRelationship {
+  data?: JsonApiRelationshipRef | JsonApiRelationshipRef[] | null;
+}
+
+interface JsonApiResource {
+  id: string;
+  type?: string;
+  attributes?: Record<string, unknown>;
+  relationships?: Record<string, JsonApiRelationship>;
+}
+
 // Extrae asset_id desde la relación JSON:API (soporta to-one y to-many)
-const extractAssetId = (log) => {
-  const rel = log.relationships?.asset?.data;
-  if (Array.isArray(rel)) return rel[0]?.id || null;
-  return rel?.id || null;
+const extractAssetId = (log: JsonApiResource): string | null => {
+  const rel = log.relationships?.['asset']?.data;
+  if (Array.isArray(rel)) return rel[0]?.id ?? null;
+  return rel?.id ?? null;
 };
 
 // Resuelve la cantidad (quantity--standard) desde el array `included` del JSON:API.
-// FarmOS devuelve las quantities como recursos separados; el log solo trae la referencia.
-const extractQuantityFromIncluded = (relationships, included) => {
-  if (!relationships?.quantity?.data || !included) return null;
-  const refs = Array.isArray(relationships.quantity.data)
-    ? relationships.quantity.data
-    : [relationships.quantity.data];
+const extractQuantityFromIncluded = (
+  relationships: Record<string, JsonApiRelationship> | undefined,
+  included: JsonApiResource[] | null
+): { value: number; unit: string | null; label: string | null; measure: string | null } | null => {
+  if (!relationships?.['quantity']?.data || !included) return null;
+  const qData = relationships['quantity'].data;
+  const refs: JsonApiRelationshipRef[] = Array.isArray(qData) ? qData : [qData];
   if (refs.length === 0) return null;
 
-  const first = refs[0];
+  const first = refs[0]!;
   const quantityObj = included.find(
     (inc) => inc.id === first.id && (inc.type === first.type || inc.type?.startsWith('quantity'))
   );
   if (!quantityObj) return null;
 
   const attrs = quantityObj.attributes || {};
-  const rawValue = attrs.value;
-  const value = typeof rawValue === 'object' && rawValue !== null
-    ? parseFloat(rawValue.decimal ?? rawValue.value ?? 0)
-    : parseFloat(rawValue ?? 0);
+  const rawValue = attrs['value'];
+  let value: number;
+  if (typeof rawValue === 'object' && rawValue !== null) {
+    const obj = rawValue as { decimal?: unknown; value?: unknown };
+    value = parseFloat(String(obj.decimal ?? obj.value ?? 0));
+  } else {
+    value = parseFloat(String(rawValue ?? 0));
+  }
 
   return {
     value: isNaN(value) ? 0 : value,
-    unit: attrs.unit || attrs.label || null,
-    label: attrs.label || null,
-    measure: attrs.measure || null,
+    unit: (attrs['unit'] as string | undefined) || (attrs['label'] as string | undefined) || null,
+    label: (attrs['label'] as string | undefined) || null,
+    measure: (attrs['measure'] as string | undefined) || null,
   };
 };
 
-// Polimórfica (Fase 15.1): agnóstica al tipo de log, resuelve quantity via
-// included y aplana campos críticos a top-level (timestamp, name, quantity,
-// asset_id) para consumo O(1) desde hooks de analítica. Mantiene attributes
-// anidado para compat con consumers que leen el shape JSON:API.
-const normalizeRemoteLog = (remote, fallbackType, included = null) => {
+// Polimórfica (Fase 15.1): agnóstica al tipo de log.
+const normalizeRemoteLog = (
+  remote: JsonApiResource,
+  fallbackType: string,
+  included: JsonApiResource[] | null = null
+): CachedLog => {
   const quantity = extractQuantityFromIncluded(remote.relationships, included);
   const baseAttrs = remote.attributes || {};
-  const resolvedQuantity = quantity || baseAttrs.quantity || null;
+  const resolvedQuantity = quantity || (baseAttrs['quantity'] as unknown) || null;
   return {
     id: remote.id,
     type: remote.type || fallbackType,
     asset_id: extractAssetId(remote),
-    timestamp: baseAttrs.timestamp || 0,
-    name: baseAttrs.name || '',
-    status: baseAttrs.status || 'done',
+    timestamp: (baseAttrs['timestamp'] as number | undefined) || 0,
+    name: (baseAttrs['name'] as string | undefined) || '',
+    status: (baseAttrs['status'] as string | undefined) || 'done',
     quantity: resolvedQuantity,
     attributes: {
       ...baseAttrs,
       quantity: resolvedQuantity,
     },
-    relationships: remote.relationships || {},
+    relationships: (remote.relationships as Record<string, unknown>) || {},
     cached_at: Date.now(),
     _pending: false,
   };
@@ -84,12 +120,12 @@ export const logCache = {
   /**
    * Obtener un log individual por id.
    */
-  async getLog(id) {
+  async getLog(id: string): Promise<CachedLog | null> {
     const db = await openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.LOGS, 'readonly');
       const request = tx.objectStore(STORES.LOGS).get(id);
-      request.onsuccess = () => resolve(request.result || null);
+      request.onsuccess = () => resolve((request.result as CachedLog | undefined) || null);
       request.onerror = () => reject(request.error);
     });
   },
@@ -97,9 +133,9 @@ export const logCache = {
   /**
    * Insertar/actualizar un log individual (usado por mutaciones locales con _pending).
    */
-  async put(log) {
+  async put(log: Partial<CachedLog> & { id: string }): Promise<void> {
     const db = await openDB();
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(STORES.LOGS, 'readwrite');
       tx.objectStore(STORES.LOGS).put({ ...log, cached_at: Date.now() });
       tx.oncomplete = () => resolve();
@@ -111,14 +147,16 @@ export const logCache = {
   /**
    * Obtener logs por asset_id, ordenados por timestamp descendente.
    */
-  async getLogsByAsset(assetId) {
+  async getLogsByAsset(assetId: string): Promise<CachedLog[]> {
     const db = await openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.LOGS, 'readonly');
       const index = tx.objectStore(STORES.LOGS).index('asset_id');
       const req = index.getAll(IDBKeyRange.only(assetId));
       req.onsuccess = () => {
-        const sorted = (req.result || []).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        const sorted = ((req.result as CachedLog[]) || []).sort(
+          (a, b) => (b.timestamp || 0) - (a.timestamp || 0)
+        );
         resolve(sorted);
       };
       req.onerror = () => reject(req.error);
@@ -128,12 +166,12 @@ export const logCache = {
   /**
    * Obtener todos los logs del store, sin filtro.
    */
-  async getAll() {
+  async getAll(): Promise<CachedLog[]> {
     const db = await openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.LOGS, 'readonly');
       const req = tx.objectStore(STORES.LOGS).getAll();
-      req.onsuccess = () => resolve(req.result || []);
+      req.onsuccess = () => resolve((req.result as CachedLog[]) || []);
       req.onerror = () => reject(req.error);
     });
   },
@@ -141,57 +179,62 @@ export const logCache = {
   /**
    * Obtener todos los logs de un tipo (p.ej. log--harvest).
    */
-  async getByType(type) {
+  async getByType(type: string): Promise<CachedLog[]> {
     const db = await openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.LOGS, 'readonly');
       const index = tx.objectStore(STORES.LOGS).index('type');
       const req = index.getAll(IDBKeyRange.only(type));
-      req.onsuccess = () => resolve(req.result || []);
+      req.onsuccess = () => resolve((req.result as CachedLog[]) || []);
       req.onerror = () => reject(req.error);
     });
   },
 
   /**
    * Merge desde el servidor con preservación de logs _pending locales.
-   * Aplica la misma regla de oro de assetCache.bulkPut (Fase 10.1) + GC.
-   * @param {string} type - p.ej. 'log--harvest'
-   * @param {Array} remoteLogs - data[] del JSON:API de FarmOS
-   * @param {Array} included - array included[] del JSON:API para resolver quantities
    */
-  async bulkPut(type, remoteLogs, included = null) {
+  async bulkPut(
+    type: string,
+    remoteLogs: unknown[],
+    included: unknown[] | null = null
+  ): Promise<void> {
     const db = await openDB();
     const tx = db.transaction(STORES.LOGS, 'readwrite');
     const store = tx.objectStore(STORES.LOGS);
 
-    const localLogs = await new Promise((res, rej) => {
+    const localLogs: CachedLog[] = await new Promise((res, rej) => {
       const req = store.index('type').getAll(IDBKeyRange.only(type));
-      req.onsuccess = () => res(req.result || []);
+      req.onsuccess = () => res((req.result as CachedLog[]) || []);
       req.onerror = () => rej(req.error);
     });
-    const localMap = new Map(localLogs.map((l) => [l.id, l]));
+    const localMap = new Map<string, CachedLog>(localLogs.map((l) => [l.id, l]));
 
-    for (const remote of remoteLogs) {
+    const remoteResources = remoteLogs as JsonApiResource[];
+    const includedResources = (included as JsonApiResource[] | null) || null;
+
+    for (const remote of remoteResources) {
       const local = localMap.get(remote.id);
       if (local && local._pending) {
         console.warn(`[LogCache] Preservando log _pending ${remote.id}.`);
         continue;
       }
-      store.put(normalizeRemoteLog(remote, type, included));
+      store.put(normalizeRemoteLog(remote, type, includedResources));
     }
 
     // GC: purgar logs confirmados de este type que el servidor ya no devuelve.
-    const remoteIds = new Set(remoteLogs.map((r) => r.id));
+    const remoteIds = new Set(remoteResources.map((r) => r.id));
     for (const local of localLogs) {
       if (!remoteIds.has(local.id) && !local._pending) {
         store.delete(local.id);
       }
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       tx.oncomplete = () => resolve();
       tx.onabort = () => reject(tx.error);
       tx.onerror = () => reject(tx.error);
     });
   },
 };
+
+export type { CachedLog };

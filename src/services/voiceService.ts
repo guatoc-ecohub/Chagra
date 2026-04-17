@@ -1,5 +1,5 @@
 /**
- * voiceService.js — Orquestador de transcripción de audio vía Whisper local.
+ * voiceService.ts — Orquestador de transcripción de audio vía Whisper local.
  *
  * Envía el Blob grabado al proxy Nginx /api/whisper/asr con AbortController
  * (timeout 15s). El backend es openai-whisper-asr-webservice; el endpoint
@@ -13,16 +13,19 @@ import { syncManager } from './syncManager';
 const WHISPER_URL = '/api/whisper/asr';
 const TIMEOUT_MS = 15000;
 
+interface TranscribeOptions {
+  language?: string;
+}
+
+interface QueueMetadata {
+  reason?: string;
+  durationMs?: number;
+}
+
 /**
  * Transcribe un Blob de audio a texto usando Whisper.
- *
- * @param {Blob} blob — audio/webm;codecs=opus (típicamente de MediaRecorder).
- * @param {Object} [options]
- * @param {string} [options.language='es']
- * @returns {Promise<string>} texto transcrito (trim).
- * @throws {Error} si la red falla, el servidor responde no-2xx o el texto está vacío.
  */
-export async function transcribe(blob, options = {}) {
+export async function transcribe(blob: Blob, options: TranscribeOptions = {}): Promise<string> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
@@ -46,16 +49,20 @@ export async function transcribe(blob, options = {}) {
 
     if (!res.ok) {
       let detail = '';
-      try { detail = await res.text(); } catch (_) { /* noop */ }
+      try {
+        detail = await res.text();
+      } catch (_) {
+        /* noop */
+      }
       throw new Error(`Whisper ${res.status}: ${detail.slice(0, 200)}`);
     }
 
-    const data = await res.json();
+    const data = (await res.json()) as { text?: string };
     const text = (data.text || '').trim();
     if (!text) throw new Error('Transcripción vacía');
     return text;
   } catch (err) {
-    if (err.name === 'AbortError') {
+    if ((err as Error).name === 'AbortError') {
       throw new Error('Tiempo agotado al transcribir audio');
     }
     throw err;
@@ -66,13 +73,11 @@ export async function transcribe(blob, options = {}) {
 
 /**
  * Encola un Blob de audio en pending_voice_recordings para reintento posterior.
- *
- * @param {Blob} blob
- * @param {Object} [metadata]
- * @param {string} [metadata.reason] — motivo del encolado (error del upstream).
- * @param {number} [metadata.durationMs]
  */
-export async function queueForRetry(blob, metadata = {}) {
+export async function queueForRetry(
+  blob: Blob,
+  metadata: QueueMetadata = {}
+): Promise<Record<string, unknown>> {
   return syncManager.saveVoiceRecording(blob, {
     status: 'pending',
     lastError: metadata.reason || null,

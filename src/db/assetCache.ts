@@ -11,17 +11,29 @@
 // assetCache re-exporta openDB/STORES para preservar la API consumida por
 // el resto de los módulos (useAssetStore, logCache).
 import { openDB, STORES } from './dbCore';
+import type { AssetType, ChagraAsset, TaxonomyTerm, TransactionRecord } from '../types';
 
 export { openDB, STORES };
+
+// Registros locales pueden tener un flag _pending durante operaciones optimistas
+interface LocalAsset extends ChagraAsset {
+  _pending?: boolean;
+  [key: string]: unknown;
+}
+
+interface LocalTaxonomy extends TaxonomyTerm {
+  cached_at?: number;
+  [key: string]: unknown;
+}
 
 export const assetCache = {
   /**
    * Almacenar un asset individual
    * Enriquece el registro JSON:API con asset_type y cached_at para indexación local
    */
-  async put(assetType, asset) {
+  async put(assetType: AssetType, asset: ChagraAsset): Promise<void> {
     const db = await openDB();
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(STORES.ASSETS, 'readwrite');
       const store = tx.objectStore(STORES.ASSETS);
       store.put({ ...asset, asset_type: assetType, cached_at: Date.now() });
@@ -34,23 +46,21 @@ export const assetCache = {
    * Inserta múltiples activos preservando aquellos que tienen cambios locales pendientes.
    * Regla: si `local._pending === true`, la versión remota se ignora.
    * Los datos del servidor siempre nacen confirmados (`_pending: false`).
-   * @param {string} assetType - Tipo de activo (plant, equipment, etc.)
-   * @param {Array} remoteAssets - Lista de activos provenientes del servidor
    */
-  async bulkPut(assetType, remoteAssets) {
+  async bulkPut(assetType: AssetType, remoteAssets: ChagraAsset[]): Promise<void> {
     const db = await openDB();
     const tx = db.transaction(STORES.ASSETS, 'readwrite');
     const store = tx.objectStore(STORES.ASSETS);
 
     // 1. Obtener todos los assets locales actuales del tipo específico
     const index = store.index('asset_type');
-    const localAssets = await new Promise((res, rej) => {
+    const localAssets: LocalAsset[] = await new Promise((res, rej) => {
       const req = index.getAll(IDBKeyRange.only(assetType));
-      req.onsuccess = () => res(req.result || []);
+      req.onsuccess = () => res((req.result as LocalAsset[]) || []);
       req.onerror = () => rej(req.error);
     });
 
-    const localMap = new Map(localAssets.map((a) => [a.id, a]));
+    const localMap = new Map<string, LocalAsset>(localAssets.map((a) => [a.id, a]));
 
     // 2. Merge lógico: remotos entran, pendings locales se preservan
     for (const remote of remoteAssets) {
@@ -78,7 +88,7 @@ export const assetCache = {
       }
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       tx.oncomplete = () => resolve();
       tx.onabort = () => reject(tx.error);
       tx.onerror = () => reject(tx.error);
@@ -88,12 +98,12 @@ export const assetCache = {
   /**
    * Obtener un asset individual por su id
    */
-  async getAsset(id) {
+  async getAsset(id: string): Promise<ChagraAsset | null> {
     const db = await openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.ASSETS, 'readonly');
       const request = tx.objectStore(STORES.ASSETS).get(id);
-      request.onsuccess = () => resolve(request.result || null);
+      request.onsuccess = () => resolve((request.result as ChagraAsset | undefined) || null);
       request.onerror = () => reject(request.error);
     });
   },
@@ -101,14 +111,14 @@ export const assetCache = {
   /**
    * Obtener todos los assets de un tipo desde IndexedDB
    */
-  async getByType(assetType) {
+  async getByType(assetType: AssetType): Promise<ChagraAsset[]> {
     const db = await openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.ASSETS, 'readonly');
       const store = tx.objectStore(STORES.ASSETS);
       const index = store.index('asset_type');
       const request = index.getAll(IDBKeyRange.only(assetType));
-      request.onsuccess = () => resolve(request.result || []);
+      request.onsuccess = () => resolve((request.result as ChagraAsset[]) || []);
       request.onerror = () => reject(request.error);
     });
   },
@@ -116,9 +126,9 @@ export const assetCache = {
   /**
    * Eliminar un asset del cache
    */
-  async remove(assetType, assetId) {
+  async remove(_assetType: AssetType, assetId: string): Promise<void> {
     const db = await openDB();
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(STORES.ASSETS, 'readwrite');
       const store = tx.objectStore(STORES.ASSETS);
       store.delete(assetId);
@@ -130,14 +140,15 @@ export const assetCache = {
   /**
    * Almacenar taxonomy terms (bulk)
    */
-  async bulkPutTaxonomyTerms(terms) {
+  async bulkPutTaxonomyTerms(terms: TaxonomyTerm[]): Promise<void> {
     const db = await openDB();
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(STORES.TAXONOMY, 'readwrite');
       const store = tx.objectStore(STORES.TAXONOMY);
       store.clear();
       for (const term of terms) {
-        store.put({ ...term, cached_at: Date.now() });
+        const enriched: LocalTaxonomy = { ...term, cached_at: Date.now() };
+        store.put(enriched);
       }
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
@@ -147,13 +158,13 @@ export const assetCache = {
   /**
    * Obtener todos los taxonomy terms desde IndexedDB
    */
-  async getAllTaxonomyTerms() {
+  async getAllTaxonomyTerms(): Promise<TaxonomyTerm[]> {
     const db = await openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.TAXONOMY, 'readonly');
       const store = tx.objectStore(STORES.TAXONOMY);
       const request = store.getAll();
-      request.onsuccess = () => resolve(request.result || []);
+      request.onsuccess = () => resolve((request.result as TaxonomyTerm[]) || []);
       request.onerror = () => reject(request.error);
     });
   },
@@ -161,9 +172,9 @@ export const assetCache = {
   /**
    * Guardar timestamp de última sincronización
    */
-  async setLastSync(timestamp) {
+  async setLastSync(timestamp: number): Promise<void> {
     const db = await openDB();
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(STORES.SYNC_META, 'readwrite');
       const store = tx.objectStore(STORES.SYNC_META);
       store.put({ key: 'lastAssetSync', value: timestamp });
@@ -175,13 +186,16 @@ export const assetCache = {
   /**
    * Obtener timestamp de última sincronización
    */
-  async getLastSync() {
+  async getLastSync(): Promise<number | null> {
     const db = await openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.SYNC_META, 'readonly');
       const store = tx.objectStore(STORES.SYNC_META);
       const request = store.get('lastAssetSync');
-      request.onsuccess = () => resolve(request.result?.value || null);
+      request.onsuccess = () => {
+        const result = request.result as { value?: number } | undefined;
+        resolve(result?.value ?? null);
+      };
       request.onerror = () => reject(request.error);
     });
   },
@@ -189,13 +203,16 @@ export const assetCache = {
   /**
    * Obtiene el timestamp de cooldown para una combinación de sensor y tipo de alerta.
    */
-  async getAlertCooldown(sensorId, alertType) {
+  async getAlertCooldown(sensorId: string, alertType: string): Promise<number> {
     const db = await openDB();
     const key = `cooldown:${sensorId}:${alertType}`;
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.SYNC_META, 'readonly');
       const request = tx.objectStore(STORES.SYNC_META).get(key);
-      request.onsuccess = () => resolve(request.result?.value || 0);
+      request.onsuccess = () => {
+        const result = request.result as { value?: number } | undefined;
+        resolve(result?.value ?? 0);
+      };
       request.onerror = () => reject(request.error);
     });
   },
@@ -204,10 +221,14 @@ export const assetCache = {
    * Registra una alerta y su cooldown de forma atómica.
    * Garantiza que pending_transactions y sync_meta queden consistentes.
    */
-  async commitAlertWithCooldown(sensorId, alertType, pendingTx) {
+  async commitAlertWithCooldown(
+    sensorId: string,
+    alertType: string,
+    pendingTx: Partial<TransactionRecord>
+  ): Promise<void> {
     const db = await openDB();
     const cooldownKey = `cooldown:${sensorId}:${alertType}`;
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const tx = db.transaction([STORES.PENDING_TX, STORES.SYNC_META], 'readwrite');
       tx.oncomplete = () => resolve();
       tx.onabort = () => reject(tx.error);
@@ -218,26 +239,27 @@ export const assetCache = {
         ...pendingTx,
         synced: false,
         retries: 0,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       // 2. Persistir cooldown
       tx.objectStore(STORES.SYNC_META).put({
         key: cooldownKey,
-        value: Date.now()
+        value: Date.now(),
       });
     });
   },
 
   /**
    * Ejecuta una mutación atómica múltiple.
-   * @param {Array} assetUpdates - Lista de { assetType, asset }
-   * @param {Array} pendingTxs - Lista de transacciones de red a encolar
    */
-  async commitOptimisticUpdate(assetUpdates = [], pendingTxs = []) {
+  async commitOptimisticUpdate(
+    assetUpdates: Array<{ assetType: AssetType; asset: ChagraAsset }> = [],
+    pendingTxs: Array<Partial<TransactionRecord>> = []
+  ): Promise<void> {
     const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const storesToLock = [STORES.PENDING_TX];
+    return new Promise<void>((resolve, reject) => {
+      const storesToLock: string[] = [STORES.PENDING_TX];
       if (assetUpdates.length > 0) storesToLock.push(STORES.ASSETS);
 
       const tx = db.transaction(storesToLock, 'readwrite');
@@ -259,7 +281,7 @@ export const assetCache = {
             ...txData,
             synced: false,
             retries: 0,
-            timestamp: txData.timestamp || Date.now()
+            timestamp: txData.timestamp || Date.now(),
           });
         });
       }

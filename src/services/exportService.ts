@@ -4,21 +4,44 @@
  * Genera un CSV offline-ready a partir del logCache de IndexedDB, cruzando
  * cada registro con MATERIAL_CATEGORIES para etiquetar el eje funcional del
  * insumo. Usa la API Blob nativa del navegador, sin dependencias externas.
- *
- * Formato:
- *   - Encoding:  UTF-8 con BOM (compatibilidad Excel ES-CO)
- *   - Separador: punto y coma (;)
- *   - Cifras decimales: punto (.)
- *   - Estado sincronización: columna explícita para advertir registros _pending
  */
 
 import { logCache } from '../db/logCache';
 import { MATERIAL_CATEGORIES, MATERIAL_CATEGORY_BY_NAME } from '../config/materials';
 
-// Conversión a unidad base decimal (kg/l). Consistente con hooks de analítica.
-const toBaseUnit = (qty) => {
+interface QuantityLike {
+  value?: number | string;
+  unit?: string;
+  [key: string]: unknown;
+}
+
+interface ExportableLog {
+  id?: string;
+  type?: string;
+  name?: string;
+  asset_id?: string | null;
+  timestamp?: number;
+  quantity?: QuantityLike | null | unknown;
+  attributes?: { name?: string; timestamp?: number; quantity?: QuantityLike | null };
+  relationships?: Record<string, { data?: unknown }>;
+  _pending?: boolean;
+  [key: string]: unknown;
+}
+
+interface ExportOptions {
+  filename?: string;
+  types?: string[];
+}
+
+interface ExportResult {
+  rowCount: number;
+  pendingCount: number;
+  filename: string;
+}
+
+const toBaseUnit = (qty: QuantityLike | null | undefined): { value: number; base: string } => {
   if (!qty) return { value: 0, base: 'kg' };
-  const value = parseFloat(qty.value) || 0;
+  const value = parseFloat(String(qty.value ?? 0)) || 0;
   const unit = (qty.unit || '').toLowerCase();
   if (unit === 'g' || unit === 'mg') return { value: value * 0.001, base: 'kg' };
   if (unit === 'ml') return { value: value * 0.001, base: 'l' };
@@ -28,43 +51,36 @@ const toBaseUnit = (qty) => {
   return { value, base: unit || 'u' };
 };
 
-// Extrae el nombre canónico del material a partir del nombre del log.
-// Formato esperado en log--input: "Aplicación de {Material}"
-// Para otros tipos de log, retorna el name completo.
-const extractMaterialName = (log) => {
+const extractMaterialName = (log: ExportableLog): string => {
   const name = log.name || log.attributes?.name || '';
   return name.replace(/^Aplicación de /, '');
 };
 
-// Resuelve la categoría del material (fertilization, protection, etc.).
-// Para logs que no sean log--input (harvest, seeding, planting), retorna '—'.
-const resolveCategory = (log) => {
+const resolveCategory = (log: ExportableLog): string => {
   if (log.type !== 'log--input') return '—';
   const material = extractMaterialName(log);
   const catId = MATERIAL_CATEGORY_BY_NAME[material];
   return catId ? MATERIAL_CATEGORIES[catId].label : 'Sin categoría';
 };
 
-// Deriva un identificador de operario desde el log si está disponible.
-// FarmOS expone relationships.owner / relationships.uid en logs sincronizados.
-const resolveOperator = (log) => {
+const resolveOperator = (log: ExportableLog): string => {
   const rel = log.relationships || {};
-  const owner = rel.owner?.data || rel.uid?.data;
-  if (Array.isArray(owner)) return owner[0]?.id?.split('-')[0] || '—';
-  return owner?.id?.split('-')[0] || '—';
+  const owner = rel['owner']?.data || rel['uid']?.data;
+  if (Array.isArray(owner)) {
+    const first = owner[0] as { id?: string } | undefined;
+    return first?.id?.split('-')[0] || '—';
+  }
+  return (owner as { id?: string } | undefined)?.id?.split('-')[0] || '—';
 };
 
-// Formatea timestamp UNIX segundos a ISO-8601 (YYYY-MM-DD HH:mm)
-const formatDate = (ts) => {
+const formatDate = (ts: number | undefined): string => {
   if (!ts) return '';
   const d = new Date(ts * 1000);
-  const pad = (n) => String(n).padStart(2, '0');
+  const pad = (n: number): string => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
 
-// Escapado de campo CSV: envuelve en comillas si contiene ; " \r o \n.
-// Las comillas internas se duplican según RFC 4180.
-const escapeCsv = (field) => {
+const escapeCsv = (field: unknown): string => {
   const value = field == null ? '' : String(field);
   if (/[;"\r\n]/.test(value)) {
     return `"${value.replace(/"/g, '""')}"`;
@@ -72,7 +88,6 @@ const escapeCsv = (field) => {
   return value;
 };
 
-// Cabecera del CSV — orden estable, referenciado por tests visuales en Excel.
 const HEADERS = [
   'Fecha',
   'Tipo_Log',
@@ -87,9 +102,8 @@ const HEADERS = [
   'Estado_Sync',
 ];
 
-// Transforma un log individual en una fila del CSV (array de strings).
-const logToRow = (log) => {
-  const qty = log.quantity || log.attributes?.quantity || {};
+const logToRow = (log: ExportableLog): string[] => {
+  const qty = (log.quantity || log.attributes?.quantity || {}) as QuantityLike;
   const originalValue = qty.value ?? '';
   const originalUnit = qty.unit ?? '';
   const { value: normalizedValue, base: normalizedUnit } = toBaseUnit(qty);
@@ -110,15 +124,12 @@ const logToRow = (log) => {
   ];
 };
 
-// Construye el string CSV completo a partir de los logs normalizados.
-const buildCsv = (logs) => {
-  const rows = [HEADERS, ...logs.map(logToRow)];
+const buildCsv = (logs: ExportableLog[]): string => {
+  const rows: string[][] = [HEADERS, ...logs.map(logToRow)];
   return rows.map((row) => row.map(escapeCsv).join(';')).join('\r\n');
 };
 
-// Dispara la descarga del archivo via Blob + anchor temporal.
-const triggerDownload = (csvContent, filename) => {
-  // BOM UTF-8 para que Excel detecte el encoding correctamente.
+const triggerDownload = (csvContent: string, filename: string): void => {
   const BOM = '\uFEFF';
   const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
@@ -131,32 +142,20 @@ const triggerDownload = (csvContent, filename) => {
   link.click();
   document.body.removeChild(link);
 
-  // Liberar el object URL tras un tick para permitir que el navegador inicie la descarga.
   setTimeout(() => URL.revokeObjectURL(url), 100);
 };
 
 /**
- * API pública del servicio.
- *
  * Ejecuta el pipeline completo: Extract(IDB) → Transform(Categories) → Load(Blob).
- *
- * @param {Object} options
- * @param {string} [options.filename] - nombre del archivo (default: chagra_trazabilidad_{fecha}.csv)
- * @param {Array<string>} [options.types] - filtrar por tipos de log (default: todos)
- * @returns {Promise<{ rowCount: number, pendingCount: number, filename: string }>}
  */
-export const exportTraceabilityCsv = async (options = {}) => {
-  const allLogs = await logCache.getAll();
+export const exportTraceabilityCsv = async (options: ExportOptions = {}): Promise<ExportResult> => {
+  const allLogs = (await logCache.getAll()) as unknown as ExportableLog[];
 
-  // Filtrado opcional por tipo de log
   const filtered = options.types
-    ? allLogs.filter((l) => options.types.includes(l.type))
+    ? allLogs.filter((l) => l.type && options.types!.includes(l.type))
     : allLogs;
 
-  // Orden cronológico descendente (registros recientes primero)
-  const sorted = [...filtered].sort(
-    (a, b) => (b.timestamp || 0) - (a.timestamp || 0)
-  );
+  const sorted = [...filtered].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
   const csv = buildCsv(sorted);
 

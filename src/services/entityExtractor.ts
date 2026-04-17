@@ -1,5 +1,5 @@
 /**
- * entityExtractor.js — Extracción de entidades agrícolas vía Ollama / qwen3.5:4b.
+ * entityExtractor.ts — Extracción de entidades agrícolas vía Ollama / qwen3.5:4b.
  *
  * Toma una transcripción en español y devuelve un array estricto de
  * { crop, quantity, location }. Aplica AbortController (timeout 20s) y
@@ -8,8 +8,6 @@
 
 const OLLAMA_CHAT_URL = '/api/ollama/api/chat';
 const MODEL = 'qwen3.5:4b';
-// qwen3 puede tardar 25-35s en CPU incluso con thinking desactivado.
-// Nginx permite hasta 120s en /api/ollama/; 60s cliente es el punto medio seguro.
 const TIMEOUT_MS = 60000;
 
 const SYSTEM_PROMPT = `Eres un extractor de entidades agricolas. Recibes una transcripcion en espanol de un operador registrando siembras. Devuelves EXCLUSIVAMENTE un array JSON valido, sin texto adicional, sin markdown.
@@ -40,30 +38,46 @@ Output: [{"crop":"arandano","quantity":3,"location":""}]
 Input: "Hoy tuve un buen dia"
 Output: []`;
 
-// location puede venir vacia cuando el operador no menciona el lugar;
-// la UI resuelve al DEFAULT_LOCATION_ID en ese caso (ver VoiceConfirmation).
-const isValidEntity = (e) =>
-  e &&
-  typeof e.crop === 'string' && e.crop.trim().length > 0 &&
-  Number.isInteger(e.quantity) && e.quantity > 0 &&
-  typeof e.location === 'string';
+export interface ExtractedAgriEntity {
+  crop: string;
+  quantity: number;
+  location: string;
+}
 
-const parseJsonTolerant = (raw) => {
+const isValidEntity = (e: unknown): e is ExtractedAgriEntity => {
+  if (!e || typeof e !== 'object') return false;
+  const obj = e as Record<string, unknown>;
+  return (
+    typeof obj['crop'] === 'string' &&
+    (obj['crop'] as string).trim().length > 0 &&
+    Number.isInteger(obj['quantity']) &&
+    (obj['quantity'] as number) > 0 &&
+    typeof obj['location'] === 'string'
+  );
+};
+
+const parseJsonTolerant = (raw: unknown): unknown => {
   if (typeof raw !== 'string') return null;
-  const direct = (() => { try { return JSON.parse(raw); } catch (_) { return null; } })();
+  const direct = (() => {
+    try {
+      return JSON.parse(raw);
+    } catch (_) {
+      return null;
+    }
+  })();
   if (direct !== null) return direct;
   const cleaned = raw.replace(/```json\s*/gi, '').replace(/```/g, '').trim();
-  try { return JSON.parse(cleaned); } catch (_) { return null; }
+  try {
+    return JSON.parse(cleaned);
+  } catch (_) {
+    return null;
+  }
 };
 
 /**
  * Extrae entidades de una transcripción.
- *
- * @param {string} text — transcripción en español.
- * @returns {Promise<Array<{crop:string, quantity:number, location:string}>>}
- * @throws {Error} si el modelo no responde, excede timeout o devuelve JSON inválido.
  */
-export async function extractEntities(text) {
+export async function extractEntities(text: string): Promise<ExtractedAgriEntity[]> {
   if (!text || typeof text !== 'string') return [];
 
   const controller = new AbortController();
@@ -77,9 +91,6 @@ export async function extractEntities(text) {
         model: MODEL,
         stream: false,
         format: 'json',
-        // qwen3 tiene "thinking mode" siempre activo por default; consume
-        // todos los num_predict razonando antes de emitir content y deja
-        // content="". think:false desactiva esa cadena de razonamiento.
         think: false,
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
@@ -92,11 +103,15 @@ export async function extractEntities(text) {
 
     if (!res.ok) {
       let detail = '';
-      try { detail = await res.text(); } catch (_) { /* noop */ }
+      try {
+        detail = await res.text();
+      } catch (_) {
+        /* noop */
+      }
       throw new Error(`Ollama ${res.status}: ${detail.slice(0, 200)}`);
     }
 
-    const data = await res.json();
+    const data = (await res.json()) as { message?: { content?: string } };
     const content = data?.message?.content ?? '';
     let parsed = parseJsonTolerant(content);
 
@@ -105,12 +120,13 @@ export async function extractEntities(text) {
     }
 
     if (!Array.isArray(parsed)) {
-      if (Array.isArray(parsed?.entities)) parsed = parsed.entities;
-      else if (Array.isArray(parsed?.data)) parsed = parsed.data;
+      const obj = parsed as Record<string, unknown>;
+      if (Array.isArray(obj?.['entities'])) parsed = obj['entities'];
+      else if (Array.isArray(obj?.['data'])) parsed = obj['data'];
       else parsed = [];
     }
 
-    return parsed
+    return (parsed as unknown[])
       .filter(isValidEntity)
       .map((e) => ({
         crop: e.crop.toLowerCase().trim(),
@@ -118,7 +134,7 @@ export async function extractEntities(text) {
         location: (e.location || '').trim(),
       }));
   } catch (err) {
-    if (err.name === 'AbortError') {
+    if ((err as Error).name === 'AbortError') {
       throw new Error('Tiempo agotado al extraer entidades');
     }
     throw err;

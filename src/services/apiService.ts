@@ -1,20 +1,33 @@
 import { getAccessToken } from './authService';
 
-const fetchWithTimeout = async (resource, options = {}) => {
-    const { timeout = 10000 } = options;
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), timeout);
-    try {
-        const response = await fetch(resource, { ...options, signal: controller.signal });
-        clearTimeout(id);
-        return response;
-    } catch (error) {
-        clearTimeout(id);
-        throw error;
-    }
+type ApiOptions = RequestInit & { timeout?: number };
+
+interface ApiError extends Error {
+  status?: number;
+  detail?: string;
+}
+
+const fetchWithTimeout = async (
+  resource: string,
+  options: ApiOptions = {}
+): Promise<Response> => {
+  const { timeout = 10000 } = options;
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  try {
+    const response = await fetch(resource, { ...options, signal: controller.signal });
+    clearTimeout(id);
+    return response;
+  } catch (error) {
+    clearTimeout(id);
+    throw error;
+  }
 };
 
-export const fetchFromFarmOS = async (endpoint, options = {}) => {
+export const fetchFromFarmOS = async (
+  endpoint: string,
+  options: ApiOptions = {}
+): Promise<unknown> => {
   const token = await getAccessToken();
   if (!token) {
     console.error('[API] Token no disponible. Redirigiendo a login.');
@@ -23,10 +36,10 @@ export const fetchFromFarmOS = async (endpoint, options = {}) => {
   }
 
   const isFormData = options.body instanceof FormData;
-  const headers = {
-    'Accept': 'application/vnd.api+json',
-    'Authorization': `Bearer ${token}`,
-    ...(options.headers || {})
+  const headers: Record<string, string> = {
+    Accept: 'application/vnd.api+json',
+    Authorization: `Bearer ${token}`,
+    ...((options.headers as Record<string, string> | undefined) || {}),
   };
 
   if (!isFormData && !headers['Content-Type']) {
@@ -39,7 +52,7 @@ export const fetchFromFarmOS = async (endpoint, options = {}) => {
     const response = await fetchWithTimeout(`${import.meta.env.VITE_FARMOS_URL}${endpoint}`, {
       ...options,
       method: options.method || 'GET',
-      headers
+      headers,
     });
 
     if (!response.ok) {
@@ -49,25 +62,32 @@ export const fetchFromFarmOS = async (endpoint, options = {}) => {
         if (typeof window !== 'undefined') window.location.hash = '#login';
       }
       const errorDetail = await response.text().catch(() => '');
-      const error = new Error(`FarmOS API Error ${response.status}: ${response.statusText} - ${errorDetail}`);
+      const error: ApiError = new Error(
+        `FarmOS API Error ${response.status}: ${response.statusText} - ${errorDetail}`
+      );
       error.status = response.status;
       error.detail = errorDetail;
       throw error;
     }
     return await response.json();
   } catch (error) {
-    if (error.name === 'AbortError') console.error('[Network] Timeout excedido en solicitud a FarmOS:', endpoint);
+    if ((error as Error).name === 'AbortError')
+      console.error('[Network] Timeout excedido en solicitud a FarmOS:', endpoint);
     throw error;
   }
 };
 
-export const sendToFarmOS = async (endpoint, payload, method = 'POST') => {
+export const sendToFarmOS = async (
+  endpoint: string,
+  payload: unknown,
+  method: string = 'POST'
+): Promise<unknown> => {
   const isFormData = payload instanceof FormData;
-  const options = { method };
+  const options: ApiOptions = { method };
 
   // Solo adjuntar body si hay payload y no es una operación DELETE
   if (payload && method !== 'DELETE') {
-    options.body = isFormData ? payload : JSON.stringify(payload);
+    options.body = isFormData ? (payload as FormData) : JSON.stringify(payload);
   }
 
   return await fetchFromFarmOS(endpoint, options);

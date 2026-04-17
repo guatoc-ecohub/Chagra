@@ -1,5 +1,5 @@
 /**
- * fuzzySearch.js — Fuzzy match ligero para el selector de especies.
+ * fuzzySearch.ts — Fuzzy match ligero para el selector de especies.
  *
  * Soporta búsqueda aproximada: "Gulpa" → "Gulupa", "pasiflo" → "Passiflora".
  * Basado en distancia de subsecuencia con scoring simple:
@@ -10,7 +10,7 @@
  * No usar para volúmenes > 5000 items; para eso se necesita un trie.
  */
 
-const normalize = (str) =>
+const normalize = (str: string | null | undefined): string =>
   (str || '')
     .toLowerCase()
     .normalize('NFD')
@@ -20,7 +20,7 @@ const normalize = (str) =>
 
 // Score de match: cuanto mayor, más relevante.
 // Retorna -1 si no hay match.
-const score = (query, target) => {
+const score = (query: string, target: string): number => {
   const q = normalize(query);
   const t = normalize(target);
   if (!q) return 0; // query vacío → todo pasa
@@ -55,13 +55,13 @@ const score = (query, target) => {
 
 /**
  * Filtra y ordena items por relevancia fuzzy contra una query.
- * @param {string} query - texto del operario
- * @param {Array} items - objetos a filtrar
- * @param {Function} accessor - función que extrae el string buscable del item
- * @param {number} limit - máximo de resultados (default 30)
- * @returns {Array} items ordenados por score descendente
  */
-export const fuzzyFilter = (query, items, accessor = (x) => x, limit = 30) => {
+export const fuzzyFilter = <T>(
+  query: string,
+  items: T[],
+  accessor: (item: T) => string = (x) => x as unknown as string,
+  limit = 30
+): T[] => {
   if (!query || !query.trim()) return items.slice(0, limit);
 
   return items

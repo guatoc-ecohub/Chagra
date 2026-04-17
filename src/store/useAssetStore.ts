@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { assetCache, openDB, STORES } from '../db/assetCache';
 import { logCache } from '../db/logCache';
 import { useLogStore } from './useLogStore';
+import type { ChagraAsset, AssetType, TaxonomyTerm } from '../types';
 
 /**
  * Store global de Activos (Zustand)
@@ -13,13 +14,85 @@ import { useLogStore } from './useLogStore';
  *   - material:  Biol, Lombricompost, Insumos orgánicos
  */
 
-const useAssetStore = create((set, get) => ({
+interface HarvestData {
+  cropName: string;
+  yield: string | number;
+  unit: string;
+  notes?: string;
+}
+
+interface InputData {
+  name?: string;
+  value: string | number;
+  unit: string;
+  label?: string;
+  notes?: string;
+}
+
+type AssetUpdateEntry = { assetType: AssetType; asset: ChagraAsset };
+
+interface AssetState {
+  plants: ChagraAsset[];
+  structures: ChagraAsset[];
+  equipment: ChagraAsset[];
+  materials: ChagraAsset[];
+  lands: ChagraAsset[];
+  taxonomyTerms: TaxonomyTerm[];
+  lastSync: number | null;
+  isLoading: boolean;
+  error: string | null;
+  selectedAssetId: string | null;
+  setSelectedAsset: (id: string) => void;
+  clearSelectedAsset: () => void;
+  hydrate: () => Promise<void>;
+  syncFromServer: (
+    fetchFn: (endpoint: string) => Promise<{ data?: unknown[] }>,
+    assetType?: AssetType | null
+  ) => Promise<void>;
+  syncTaxonomyTerms: (
+    fetchFn: (endpoint: string) => Promise<{ data?: unknown[] }>
+  ) => Promise<void>;
+  addAsset: (
+    assetType: AssetType,
+    asset: ChagraAsset,
+    pendingTxs?: unknown[]
+  ) => Promise<void>;
+  updateAsset: (
+    assetType: AssetType,
+    asset: ChagraAsset,
+    pendingTxs?: unknown[]
+  ) => Promise<void>;
+  removeAsset: (assetType: AssetType, assetId: string) => Promise<void>;
+  addHarvestLog: (assetId: string, harvestData: HarvestData) => Promise<void>;
+  addInputLog: (assetId: string, inputData: InputData) => Promise<void>;
+  refillMaterial: (
+    materialId: string,
+    amount: number | string,
+    selectedUnit?: string | null
+  ) => Promise<void>;
+  getAllAssets: () => ChagraAsset[];
+}
+
+type AssetKey = 'plants' | 'structures' | 'equipment' | 'materials' | 'lands';
+
+const assetTypeToKey = (assetType: AssetType): AssetKey =>
+  assetType === 'plant'
+    ? 'plants'
+    : assetType === 'structure'
+      ? 'structures'
+      : assetType === 'equipment'
+        ? 'equipment'
+        : assetType === 'land'
+          ? 'lands'
+          : 'materials';
+
+const useAssetStore = create<AssetState>()((set, get) => ({
   // Estado
   plants: [],
   structures: [],
   equipment: [],
   materials: [],
-  lands: [], // Fase 17: zonas (field/greenhouse/bed) para jerarquía espacial
+  lands: [],
   taxonomyTerms: [],
   lastSync: null,
   isLoading: false,
@@ -49,13 +122,12 @@ const useAssetStore = create((set, get) => ({
   },
 
   // Sincronizar desde FarmOS API → IndexedDB → Zustand.
-  // Si se pasa assetType, solo refresca ese tipo (pull dirigido tras syncCompleted).
   syncFromServer: async (fetchFn, assetType = null) => {
     set({ isLoading: true, error: null });
-    const targets = assetType
+    const targets: AssetType[] = assetType
       ? [assetType]
       : ['plant', 'structure', 'equipment', 'material', 'land'];
-    const typeToKey = {
+    const typeToKey: Record<AssetType, AssetKey> = {
       plant: 'plants',
       structure: 'structures',
       equipment: 'equipment',
@@ -63,13 +135,15 @@ const useAssetStore = create((set, get) => ({
       land: 'lands',
     };
     try {
-      const results = await Promise.all(targets.map(async (t) => {
-        const res = await fetchFn(`/api/asset/${t}`);
-        const list = res.data || [];
-        await assetCache.bulkPut(t, list);
-        return { key: typeToKey[t], data: await assetCache.getByType(t) };
-      }));
-      const partialUpdate = {};
+      const results = await Promise.all(
+        targets.map(async (t) => {
+          const res = await fetchFn(`/api/asset/${t}`);
+          const list = (res.data as ChagraAsset[]) || [];
+          await assetCache.bulkPut(t, list);
+          return { key: typeToKey[t], data: await assetCache.getByType(t) };
+        })
+      );
+      const partialUpdate: Partial<Record<AssetKey, ChagraAsset[]>> = {};
       for (const r of results) partialUpdate[r.key] = r.data;
       await assetCache.setLastSync(Date.now());
       set({
@@ -79,8 +153,7 @@ const useAssetStore = create((set, get) => ({
       });
     } catch (err) {
       console.error('Error sincronizando activos:', err);
-      set({ error: err.message, isLoading: false });
-      // Fallback: mantener datos de IndexedDB ya cargados via hydrate()
+      set({ error: (err as Error).message, isLoading: false });
     }
   },
 
@@ -92,9 +165,9 @@ const useAssetStore = create((set, get) => ({
         fetchFn('/api/taxonomy_term/material_type'),
       ]);
 
-      const terms = [
-        ...(plantTypes.data || []),
-        ...(materialTypes.data || []),
+      const terms: TaxonomyTerm[] = [
+        ...((plantTypes.data as TaxonomyTerm[]) || []),
+        ...((materialTypes.data as TaxonomyTerm[]) || []),
       ];
 
       await assetCache.bulkPutTaxonomyTerms(terms);
@@ -107,13 +180,13 @@ const useAssetStore = create((set, get) => ({
   // Crear asset con commit atómico: IDB (assets + pending_transactions) en una sola tx
   addAsset: async (assetType, asset, pendingTxs = []) => {
     try {
-      await assetCache.commitOptimisticUpdate([{ assetType, asset }], pendingTxs);
+      await assetCache.commitOptimisticUpdate(
+        [{ assetType, asset }],
+        pendingTxs as Parameters<typeof assetCache.commitOptimisticUpdate>[1]
+      );
       set((state) => {
-        const key = assetType === 'plant' ? 'plants'
-          : assetType === 'structure' ? 'structures'
-          : assetType === 'equipment' ? 'equipment'
-          : 'materials';
-        return { [key]: [...state[key], asset] };
+        const key = assetTypeToKey(assetType);
+        return { [key]: [...state[key], asset] } as Partial<AssetState>;
       });
       navigator.serviceWorker?.controller?.postMessage({ type: 'SYNC_REQUESTED' });
     } catch (error) {
@@ -125,13 +198,15 @@ const useAssetStore = create((set, get) => ({
   // Actualizar asset con commit atómico
   updateAsset: async (assetType, asset, pendingTxs = []) => {
     try {
-      await assetCache.commitOptimisticUpdate([{ assetType, asset }], pendingTxs);
+      await assetCache.commitOptimisticUpdate(
+        [{ assetType, asset }],
+        pendingTxs as Parameters<typeof assetCache.commitOptimisticUpdate>[1]
+      );
       set((state) => {
-        const key = assetType === 'plant' ? 'plants'
-          : assetType === 'structure' ? 'structures'
-          : assetType === 'equipment' ? 'equipment'
-          : 'materials';
-        return { [key]: state[key].map((a) => a.id === asset.id ? asset : a) };
+        const key = assetTypeToKey(assetType);
+        return {
+          [key]: state[key].map((a) => (a.id === asset.id ? asset : a)),
+        } as Partial<AssetState>;
       });
       navigator.serviceWorker?.controller?.postMessage({ type: 'SYNC_REQUESTED' });
     } catch (error) {
@@ -149,7 +224,7 @@ const useAssetStore = create((set, get) => ({
         type: `delete_${assetType}`,
         endpoint: `/api/asset/${assetType}/${assetId}`,
         method: 'DELETE',
-        payload: null
+        payload: null,
       };
 
       const db = await openDB();
@@ -159,21 +234,18 @@ const useAssetStore = create((set, get) => ({
         ...pendingTx,
         synced: false,
         retries: 0,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
-      await new Promise((resolve, reject) => {
-        tx.oncomplete = resolve;
+      await new Promise<void>((resolve, reject) => {
+        tx.oncomplete = () => resolve();
         tx.onabort = () => reject(tx.error);
         tx.onerror = () => reject(tx.error);
       });
 
       set((state) => {
-        const key = assetType === 'plant' ? 'plants'
-          : assetType === 'structure' ? 'structures'
-          : assetType === 'equipment' ? 'equipment'
-          : 'materials';
-        return { [key]: state[key].filter((a) => a.id !== assetId) };
+        const key = assetTypeToKey(assetType);
+        return { [key]: state[key].filter((a) => a.id !== assetId) } as Partial<AssetState>;
       });
       navigator.serviceWorker?.controller?.postMessage({ type: 'SYNC_REQUESTED' });
     } catch (error) {
@@ -187,36 +259,45 @@ const useAssetStore = create((set, get) => ({
     const logId = crypto.randomUUID();
     const payload = {
       data: {
-        type: "log--harvest",
+        type: 'log--harvest',
         id: logId,
         attributes: {
           name: `Cosecha: ${harvestData.cropName} - ${new Date().toISOString().split('T')[0]}`,
           timestamp: Math.floor(Date.now() / 1000),
-          status: "done",
-          notes: harvestData.notes || "",
+          status: 'done',
+          notes: harvestData.notes || '',
         },
         relationships: {
-          asset: { data: [{ type: "asset--plant", id: assetId }] },
+          asset: { data: [{ type: 'asset--plant', id: assetId }] },
           quantity: {
-            data: [{
-              type: "quantity--standard",
-              attributes: {
-                measure: "weight",
-                value: parseFloat(harvestData.yield) || 0,
-                label: harvestData.unit
-              }
-            }]
-          }
-        }
-      }
+            data: [
+              {
+                type: 'quantity--standard',
+                attributes: {
+                  measure: 'weight',
+                  value: parseFloat(String(harvestData.yield)) || 0,
+                  label: harvestData.unit,
+                },
+              },
+            ],
+          },
+        },
+      },
     };
 
     const currentPlant = get().plants.find((p) => p.id === assetId);
-    if (!currentPlant) throw new Error("Planta no encontrada en el store local");
+    if (!currentPlant) throw new Error('Planta no encontrada en el store local');
 
-    const updatedPlant = { ...currentPlant, latestHarvest: harvestData.yield, status: 'harvested' };
+    const updatedPlant: ChagraAsset = {
+      ...currentPlant,
+      // cast: campos extendidos no parte del tipo base
+      ...({
+        latestHarvest: harvestData.yield,
+        status: 'harvested',
+      } as unknown as Partial<ChagraAsset>),
+    };
     const harvestQuantity = {
-      value: parseFloat(harvestData.yield) || 0,
+      value: parseFloat(String(harvestData.yield)) || 0,
       unit: harvestData.unit,
       label: 'weight',
       measure: 'weight',
@@ -226,13 +307,9 @@ const useAssetStore = create((set, get) => ({
       type: 'log--harvest',
       endpoint: '/api/log/harvest',
       payload,
-      method: 'POST'
+      method: 'POST',
     };
 
-    // 0. Escritura optimista en el caché de logs (Hotfix 11.3)
-    // Pseudo-atómico respecto al commit siguiente: si el commit falla,
-    // el log optimista quedará huérfano pero será purgado por el GC de
-    // logCache.bulkPut en el próximo pull, ya que no habrá pending_tx asociada.
     const optimisticLog = {
       id: logId,
       type: 'log--harvest',
@@ -254,72 +331,68 @@ const useAssetStore = create((set, get) => ({
     }
 
     try {
-      // 1. Commit atómico estricto (IndexedDB: assets + pending_transactions en una sola tx)
       await assetCache.commitOptimisticUpdate(
         [{ assetType: 'plant', asset: updatedPlant }],
         [pendingTx]
       );
 
-      // 2. Actualización en memoria (Zustand) solo si DB confirma éxito
       set((state) => ({
-        plants: state.plants.map((plant) => plant.id === assetId ? updatedPlant : plant)
+        plants: state.plants.map((plant) => (plant.id === assetId ? updatedPlant : plant)),
       }));
 
-      // 3. Emitir evento para forzar ciclo de sync en background sin bloquear
       if (typeof window !== 'undefined') {
         navigator.serviceWorker?.controller?.postMessage({ type: 'SYNC_REQUESTED' });
       }
     } catch (error) {
       console.error('[Transaction] Fallo al aplicar mutación atómica:', error);
-      throw error; // UI debe atrapar esto y revertir estado visual de carga
+      throw error;
     }
   },
 
   // Registrar una aplicación de insumo (log--input) — Fase 11.7 / refactor 13.1.
-  // Operación atómica: crea el log + descuenta el stock del material en bodega
-  // + encola la pending_tx de red, todo en una sola transacción IDB.
   addInputLog: async (assetId, inputData) => {
     const logId = crypto.randomUUID();
     const timestamp = Math.floor(Date.now() / 1000);
 
-    // 1. Resolver el material en bodega (matching por nombre canónico)
     const materialName = inputData.name?.replace(/^Aplicación de /, '') || '';
     const { materials } = get();
     const materialAsset = materials.find(
-      (m) => (m.attributes?.name || m.name) === materialName
+      (m) => ((m as unknown as { attributes?: { name?: string } }).attributes?.name || m.name) === materialName
     );
 
-    // 2. Lógica de descuento con conversión de unidades
-    const assetUpdates = [];
-    const extraPendingTxs = [];
+    const assetUpdates: AssetUpdateEntry[] = [];
+    const extraPendingTxs: Array<Record<string, unknown>> = [];
     if (materialAsset) {
-      let deduction = parseFloat(inputData.value) || 0;
-      const invUnit = materialAsset.attributes?.inventory_unit || materialAsset.unit || inputData.unit;
+      let deduction = parseFloat(String(inputData.value)) || 0;
+      const matAttrs = (materialAsset as unknown as {
+        attributes?: { inventory_unit?: string; inventory_value?: number | string };
+        unit?: string;
+      });
+      const invUnit =
+        matAttrs.attributes?.inventory_unit || matAttrs.unit || inputData.unit;
 
-      // Conversión a la unidad del inventario
       if (inputData.unit === 'ml' && invUnit === 'l') deduction /= 1000;
       if (inputData.unit === 'g' && invUnit === 'kg') deduction /= 1000;
       if (inputData.unit === 'l' && invUnit === 'ml') deduction *= 1000;
       if (inputData.unit === 'kg' && invUnit === 'g') deduction *= 1000;
 
-      const currentStock = parseFloat(materialAsset.attributes?.inventory_value) || 0;
+      const currentStock = parseFloat(String(matAttrs.attributes?.inventory_value ?? 0)) || 0;
       const newStock = Math.max(0, currentStock - deduction);
 
-      const updatedMaterial = {
+      const updatedMaterial: ChagraAsset = {
         ...materialAsset,
-        attributes: {
-          ...materialAsset.attributes,
-          inventory_value: newStock,
-          inventory_unit: invUnit,
-        },
-        _pending: true,
+        ...({
+          attributes: {
+            ...(matAttrs.attributes || {}),
+            inventory_value: newStock,
+            inventory_unit: invUnit,
+          },
+          _pending: true,
+        } as unknown as Partial<ChagraAsset>),
       };
 
-      assetUpdates.push(updatedMaterial);
+      assetUpdates.push({ assetType: 'material', asset: updatedMaterial });
 
-      // Hotfix 13.3: propagar el nuevo stock al servidor vía PATCH idempotente.
-      // Se envía el valor absoluto para evitar doble descuento si FarmOS
-      // también auto-decrementa por el log--input (último estado PWA gana).
       extraPendingTxs.push({
         id: crypto.randomUUID(),
         type: 'asset_material',
@@ -336,7 +409,6 @@ const useAssetStore = create((set, get) => ({
       });
     }
 
-    // 3. Payload JSON:API del log (quantity se resuelve en syncManager)
     const payload = {
       data: {
         type: 'log--input',
@@ -345,9 +417,7 @@ const useAssetStore = create((set, get) => ({
           name: inputData.name || 'Aplicación de insumo',
           timestamp,
           status: 'done',
-          notes: inputData.notes
-            ? { value: inputData.notes, format: 'default' }
-            : null,
+          notes: inputData.notes ? { value: inputData.notes, format: 'default' } : null,
         },
         relationships: {
           asset: { data: [{ type: 'asset--plant', id: assetId }] },
@@ -356,7 +426,7 @@ const useAssetStore = create((set, get) => ({
     };
 
     const inputQuantity = {
-      value: parseFloat(inputData.value) || 0,
+      value: parseFloat(String(inputData.value)) || 0,
       unit: inputData.unit || 'ml',
       label: inputData.label || 'Cantidad',
       measure: null,
@@ -374,7 +444,6 @@ const useAssetStore = create((set, get) => ({
       _pending: true,
     };
 
-    // 4. Escritura optimista del log (store separado, pseudo-atómica)
     try {
       await logCache.put(optimisticLog);
       useLogStore.getState().loadLogsForAsset(assetId);
@@ -390,25 +459,22 @@ const useAssetStore = create((set, get) => ({
       method: 'POST',
       _quantityMeta: {
         label: inputData.label || 'Cantidad',
-        value: parseFloat(inputData.value) || 0,
+        value: parseFloat(String(inputData.value)) || 0,
         unit: inputData.unit || 'ml',
         measure: 'volume',
       },
     };
 
-    // 5. Commit atómico: stock descontado + pending_txs (log + PATCH material)
     try {
       await assetCache.commitOptimisticUpdate(
-        assetUpdates.map((asset) => ({ assetType: 'material', asset })),
+        assetUpdates,
         [pendingTx, ...extraPendingTxs]
       );
 
-      // 6. Reflejo inmediato en Zustand del nuevo stock
       if (assetUpdates.length > 0) {
+        const first = assetUpdates[0]!;
         set((state) => ({
-          materials: state.materials.map((m) =>
-            m.id === assetUpdates[0].id ? assetUpdates[0] : m
-          ),
+          materials: state.materials.map((m) => (m.id === first.asset.id ? first.asset : m)),
         }));
       }
 
@@ -421,16 +487,19 @@ const useAssetStore = create((set, get) => ({
     }
   },
 
-  // Abastecimiento de material (Fase 13.4 / refactor 13.6) — alineado con biofábrica Restrepo:
-  // el refill representa una cocinada/producción del insumo, no una compra.
-  // Commit atómico: actualiza stock local + encola PATCH al servidor.
-  // Soporta conversión bidireccional de unidades (l↔ml, kg↔g).
+  // Abastecimiento de material (Fase 13.4 / refactor 13.6)
   refillMaterial: async (materialId, amount, selectedUnit = null) => {
     const material = get().materials.find((m) => m.id === materialId);
     if (!material) throw new Error('Material no encontrado en bodega');
 
-    const invUnit = material.attributes?.inventory_unit || material.unit || selectedUnit;
-    let converted = parseFloat(amount) || 0;
+    const matAttrs = material as unknown as {
+      attributes?: { inventory_unit?: string; inventory_value?: number | string };
+      unit?: string;
+    };
+
+    const invUnit =
+      matAttrs.attributes?.inventory_unit || matAttrs.unit || selectedUnit;
+    let converted = parseFloat(String(amount)) || 0;
     if (selectedUnit && invUnit && selectedUnit !== invUnit) {
       if (selectedUnit === 'l' && invUnit === 'ml') converted *= 1000;
       else if (selectedUnit === 'kg' && invUnit === 'g') converted *= 1000;
@@ -438,13 +507,15 @@ const useAssetStore = create((set, get) => ({
       else if (selectedUnit === 'g' && invUnit === 'kg') converted /= 1000;
     }
 
-    const currentStock = parseFloat(material.attributes?.inventory_value) || 0;
+    const currentStock = parseFloat(String(matAttrs.attributes?.inventory_value ?? 0)) || 0;
     const newStock = currentStock + converted;
 
-    const updatedMaterial = {
+    const updatedMaterial: ChagraAsset = {
       ...material,
-      attributes: { ...material.attributes, inventory_value: newStock },
-      _pending: true,
+      ...({
+        attributes: { ...(matAttrs.attributes || {}), inventory_value: newStock },
+        _pending: true,
+      } as unknown as Partial<ChagraAsset>),
     };
 
     const pendingTx = {
@@ -492,23 +563,34 @@ const useAssetStore = create((set, get) => ({
 // liberar el flag _pending del asset y disparar un pull dirigido que lo
 // sobrescriba con el objeto oficial del servidor (Hotfix 10.3 — Opción C).
 if (typeof window !== 'undefined') {
-  window.addEventListener('syncCompleted', async (event) => {
-    const { type, id } = event.detail || {};
-    if (!type || (!type.startsWith('asset_') && !type.startsWith('delete_'))) return;
+  window.addEventListener('syncCompleted', async (event: Event) => {
+    const detail = (event as CustomEvent<{ type?: string; id?: string }>).detail || {};
+    const { type, id } = detail;
+    if (!type || !id || (!type.startsWith('asset_') && !type.startsWith('delete_'))) return;
 
     try {
-      const assetType = type.split('_')[1]; // 'asset_plant' → 'plant', 'delete_plant' → 'plant'
+      const assetTypeStr = type.split('_')[1] as AssetType | undefined;
+      if (!assetTypeStr) return;
 
       // 1. Liberación del flag _pending del asset local confirmado
       const localAsset = await assetCache.getAsset(id);
       if (localAsset) {
-        await assetCache.put(localAsset.asset_type || assetType, { ...localAsset, _pending: false });
+        const localWithMeta = localAsset as ChagraAsset & { asset_type?: AssetType };
+        await assetCache.put(
+          (localWithMeta.asset_type || assetTypeStr) as AssetType,
+          { ...localAsset, ...({ _pending: false } as unknown as Partial<ChagraAsset>) }
+        );
         console.log(`[Sync] Activo ${id} liberado para actualización oficial.`);
       }
 
       // 2. Pull dirigido al tipo afectado (no refresca los 4 tipos)
       const { fetchFromFarmOS } = await import('../services/apiService');
-      await useAssetStore.getState().syncFromServer(fetchFromFarmOS, assetType);
+      await useAssetStore
+        .getState()
+        .syncFromServer(
+          fetchFromFarmOS as (endpoint: string) => Promise<{ data?: unknown[] }>,
+          assetTypeStr
+        );
     } catch (err) {
       console.error('[Sync-Listener] Error en post-procesamiento:', err);
     }
