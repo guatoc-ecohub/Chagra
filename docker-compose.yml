@@ -20,6 +20,7 @@ services:
     image: farmos/farmos:3.x
     ports:
       - "8081:80"
+    entrypoint: ["/farmos-entrypoint.sh"]
     environment:
       FARMOS_DB_HOST: postgres
       FARMOS_DB_PORT: 5432
@@ -27,8 +28,12 @@ services:
       FARMOS_DB_PASS: ${POSTGRES_PASSWORD}
       FARMOS_DB_NAME: ${POSTGRES_DB}
       FARMOS_SITE_NAME: ${FARMOS_SITE_NAME}
+      FARMOS_ADMIN_USER: ${FARMOS_ADMIN_USER}
+      FARMOS_ADMIN_PASS: ${FARMOS_ADMIN_PASS}
+      FARMOS_ADMIN_EMAIL: ${FARMOS_ADMIN_EMAIL}
     volumes:
       - farmos_files:/opt/drupal/web/sites/default/files
+      - ./docker/farmos/entrypoint.sh:/farmos-entrypoint.sh:ro
     depends_on:
       postgres:
         condition: service_healthy
