@@ -1,7 +1,7 @@
 import localforage from 'localforage';
 
-const FARMOS_URL = import.meta.env.VITE_FARMOS_URL;
-const CLIENT_ID = import.meta.env.VITE_FARMOS_CLIENT_ID;
+const FARMOS_URL = import.meta.env.VITE_FARMOS_URL || '';
+const CLIENT_ID = import.meta.env.VITE_FARMOS_CLIENT_ID || '';
 
 interface AuthResult {
   success: boolean;
