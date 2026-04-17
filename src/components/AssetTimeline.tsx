@@ -1,20 +1,20 @@
-import React, { useEffect, useMemo } from 'react';
-import { Sprout, Droplets, Apple, Leaf, RefreshCw, Clock } from 'lucide-react';
+import { useEffect, useMemo } from 'react';
+import { Sprout, Droplets, Apple, Leaf, RefreshCw, Clock, type LucideIcon } from 'lucide-react';
 import { useLogStore } from '../store/useLogStore';
 
 /**
  * AssetTimeline — Línea de tiempo agroecológica de un activo (plant).
- *
- * Consume logs desde useLogStore (alimentado por logCache + pullRecentLogs).
- * Agrupa por mes/año para facilitar lectura secuencial. Los logs _pending
- * se muestran con opacidad reducida + badge "Sincronizando…".
- *
- * En agricultura orgánica, el orden cronológico de los eventos determina la
- * validez de periodos de carencia y la eficacia de los biopreparados (Jairo
- * Restrepo), por lo que se prioriza densidad informativa sobre decoración.
  */
 
-const TYPE_CONFIG = {
+interface TypeConfig {
+  icon: LucideIcon;
+  label: string;
+  color: string;
+  bg: string;
+  border: string;
+}
+
+const TYPE_CONFIG: Record<string, TypeConfig> = {
   'log--seeding': {
     icon: Sprout,
     label: 'Siembra',
@@ -45,7 +45,7 @@ const TYPE_CONFIG = {
   },
 };
 
-const DEFAULT_CONFIG = {
+const DEFAULT_CONFIG: TypeConfig = {
   icon: Leaf,
   label: 'Evento',
   color: 'text-slate-400',
@@ -58,35 +58,66 @@ const MONTH_NAMES = [
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
 ];
 
-const formatMonthKey = (ts) => {
+const formatMonthKey = (ts: number | undefined): string => {
   if (!ts) return 'Sin fecha';
   const d = new Date(ts * 1000);
   return `${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`;
 };
 
-const formatDayLabel = (ts) => {
+const formatDayLabel = (ts: number | undefined): string => {
   if (!ts) return '—';
   const d = new Date(ts * 1000);
   return d.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' });
 };
 
-const extractNotes = (log) => {
+interface TimelineLog {
+  id: string;
+  type?: string;
+  timestamp?: number;
+  _pending?: boolean;
+  attributes?: {
+    name?: string;
+    notes?: { value?: string } | string | null;
+    [key: string]: unknown;
+  };
+  relationships?: {
+    quantity?: {
+      data?: Array<{ attributes?: { value?: { decimal?: unknown } | unknown; label?: string } }>;
+    };
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
+
+const extractNotes = (log: TimelineLog): string => {
   const raw = log.attributes?.notes;
   if (!raw) return '';
   if (typeof raw === 'string') return raw;
   return raw.value || '';
 };
 
-const extractQuantity = (log) => {
+const extractQuantity = (log: TimelineLog): string => {
   const qty = log.relationships?.quantity?.data?.[0]?.attributes;
   if (!qty) return '';
-  const value = qty.value?.decimal ?? qty.value ?? '';
+  const rawValue = qty.value;
+  let value: unknown;
+  if (typeof rawValue === 'object' && rawValue !== null) {
+    value = (rawValue as { decimal?: unknown }).decimal ?? rawValue;
+  } else {
+    value = rawValue ?? '';
+  }
   const label = qty.label || '';
   return value ? `${value} ${label}`.trim() : '';
 };
 
-export default function AssetTimeline({ assetId }) {
-  const logs = useLogStore((state) => state.logsByAsset[assetId] || []);
+interface AssetTimelineProps {
+  assetId: string | null | undefined;
+}
+
+export default function AssetTimeline({ assetId }: AssetTimelineProps) {
+  const logs = useLogStore(
+    (state) => (state.logsByAsset[assetId ?? ''] || []) as unknown as TimelineLog[]
+  );
   const isSyncing = useLogStore((state) => state.isSyncing);
   const loadLogsForAsset = useLogStore((state) => state.loadLogsForAsset);
 
@@ -94,13 +125,16 @@ export default function AssetTimeline({ assetId }) {
     if (assetId) loadLogsForAsset(assetId);
   }, [assetId, loadLogsForAsset]);
 
-  // Agrupación por mes/año preservando el orden descendente del store
-  const groups = useMemo(() => {
-    const map = new Map();
+  const groups = useMemo<Array<[string, TimelineLog[]]>>(() => {
+    const map = new Map<string, TimelineLog[]>();
     for (const log of logs) {
       const key = formatMonthKey(log.timestamp);
-      if (!map.has(key)) map.set(key, []);
-      map.get(key).push(log);
+      const bucket = map.get(key);
+      if (bucket) {
+        bucket.push(log);
+      } else {
+        map.set(key, [log]);
+      }
     }
     return Array.from(map.entries());
   }, [logs]);
@@ -145,7 +179,7 @@ export default function AssetTimeline({ assetId }) {
               </div>
               <ul className="space-y-2 relative border-l-2 border-slate-800 ml-2 pl-4">
                 {monthLogs.map((log) => {
-                  const config = TYPE_CONFIG[log.type] || DEFAULT_CONFIG;
+                  const config = (log.type && TYPE_CONFIG[log.type]) || DEFAULT_CONFIG;
                   const Icon = config.icon;
                   const notes = extractNotes(log);
                   const qty = extractQuantity(log);
@@ -179,12 +213,8 @@ export default function AssetTimeline({ assetId }) {
                           <h4 className="text-sm text-slate-200 font-semibold truncate">
                             {log.attributes?.name || 'Evento sin nombre'}
                           </h4>
-                          {qty && (
-                            <div className="text-xs text-slate-400 mt-0.5">{qty}</div>
-                          )}
-                          {notes && (
-                            <p className="text-xs text-slate-500 mt-1 line-clamp-2">{notes}</p>
-                          )}
+                          {qty && <div className="text-xs text-slate-400 mt-0.5">{qty}</div>}
+                          {notes && <p className="text-xs text-slate-500 mt-1 line-clamp-2">{notes}</p>}
                         </div>
                         <span className="text-xs text-slate-500 shrink-0 whitespace-nowrap">
                           {formatDayLabel(log.timestamp)}

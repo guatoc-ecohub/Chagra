@@ -2,7 +2,7 @@ import './config/env'; // Validación de env vars al startup
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.jsx'
+import App from './App'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { syncManager } from './services/syncManager'
 import { useLogStore } from './store/useLogStore'
@@ -30,9 +30,10 @@ syncManager.initDB().then(async () => {
 
   // Pull preventivo inicial de logs si hay red (ventana 30 días).
   if (navigator.onLine) {
-    useLogStore.getState().pullRecentLogs(fetchFromFarmOS).catch((e) =>
-      console.warn('[LogStore] Pull inicial fallido:', e)
-    );
+    useLogStore
+      .getState()
+      .pullRecentLogs(fetchFromFarmOS as (endpoint: string) => Promise<{ data?: unknown[]; included?: unknown[] }>)
+      .catch((e) => console.warn('[LogStore] Pull inicial fallido:', e));
   }
 }).catch(error => {
   console.error('Error inicializando Sync Manager:', error);
@@ -51,8 +52,12 @@ if ('serviceWorker' in navigator) {
 
     // Esperar a que el SW esté activo antes de registrar background sync.
     navigator.serviceWorker.ready.then((registration) => {
-      if (registration.sync) {
-        registration.sync.register('sync-pending-transactions').catch((e) => {
+      // Background Sync API — no en el tipo estándar de TS todavía
+      const swReg = registration as ServiceWorkerRegistration & {
+        sync?: { register: (tag: string) => Promise<void> };
+      };
+      if (swReg.sync) {
+        swReg.sync.register('sync-pending-transactions').catch((e: Error) => {
           console.warn('Background Sync no disponible:', e.message);
         });
       }
@@ -61,14 +66,14 @@ if ('serviceWorker' in navigator) {
   });
 
   // Escuchar solicitudes de sync del SW
-  navigator.serviceWorker.addEventListener('message', (event) => {
-    if (event.data?.type === 'SYNC_REQUESTED') {
+  navigator.serviceWorker.addEventListener('message', (event: MessageEvent) => {
+    if ((event.data as { type?: string })?.type === 'SYNC_REQUESTED') {
       syncManager.syncAll();
     }
   });
 }
 
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
       <App />

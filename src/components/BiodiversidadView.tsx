@@ -1,61 +1,64 @@
 /**
  * BiodiversidadView — Vista del ecosistema y diversidad biológica de la finca.
- *
- * Fondo dinámico servido desde FarmOS: el archivo más reciente cuyo nombre
- * contenga "chagra-bg-biodiversidad" se aplica como background-image. Si no
- * existe tal archivo o el dispositivo está offline sin caché previo, se
- * muestra el patrón biopunk por defecto.
- *
- * El bot de Telegram (OpenFang "Personal_Hand_Kortux") puede actualizar
- * este fondo subiendo una foto a /api/file/upload con el filename
- * "chagra-bg-biodiversidad-<timestamp>.<ext>".
  */
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { Leaf } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import useAssetStore from '../store/useAssetStore';
 import { useBackgroundImage } from '../hooks/useBackgroundImage';
+import type { FarmOSEnrichedAsset } from '../types';
 
-const STRATA = [
+interface BiodiversidadViewProps {
+  onBack: () => void;
+}
+
+interface StratumMeta {
+  key: 'emergente' | 'alto' | 'medio' | 'bajo';
+  label: string;
+  color: string;
+}
+
+const STRATA: StratumMeta[] = [
   { key: 'emergente', label: 'Emergente', color: 'text-emerald-300' },
-  { key: 'alto',      label: 'Alto',      color: 'text-lime-300'    },
-  { key: 'medio',     label: 'Medio',     color: 'text-amber-300'   },
-  { key: 'bajo',      label: 'Bajo',      color: 'text-orange-300'  },
+  { key: 'alto', label: 'Alto', color: 'text-lime-300' },
+  { key: 'medio', label: 'Medio', color: 'text-amber-300' },
+  { key: 'bajo', label: 'Bajo', color: 'text-orange-300' },
 ];
 
-export default function BiodiversidadView({ onBack }) {
-  const plants = useAssetStore((s) => s.plants || []);
+export default function BiodiversidadView({ onBack }: BiodiversidadViewProps) {
+  const plants = useAssetStore((s) => (s.plants || []) as unknown as FarmOSEnrichedAsset[]);
   const { url: bgUrl, loading: bgLoading } = useBackgroundImage('chagra-bg-biodiversidad');
 
   const { speciesCount, strataCount, guildsCount, byStratum } = useMemo(() => {
-    const species = new Set();
-    const guilds = new Set();
-    const strata = new Set();
-    const perStratum = Object.fromEntries(STRATA.map((s) => [s.key, 0]));
+    const species = new Set<string>();
+    const guilds = new Set<string>();
+    const strata = new Set<string>();
+    const perStratum: Record<string, number> = Object.fromEntries(
+      STRATA.map((s) => [s.key, 0])
+    );
 
-    // formatNotes() en AssetsDashboard guarda así:
-    //   "Notas usuario | Estrato: Medio (2-10m) | Gremio: Productivo principal"
-    // Delimitador: " | " (NO saltos de línea). El regex debe detenerse en "|".
-    const FIELD_RE = (key) => new RegExp(`${key}:\\s*([^|]+?)\\s*(?:\\||$)`, 'i');
+    const FIELD_RE = (key: string) => new RegExp(`${key}:\\s*([^|]+?)\\s*(?:\\||$)`, 'i');
 
     for (const p of plants) {
       const attrs = p.attributes || {};
-      // Especie se guarda en attributes.name (no en notes).
       const name = (attrs.name || '').trim();
       if (name) species.add(name.toLowerCase());
 
       const notesValue =
         (typeof attrs.notes === 'object' ? attrs.notes?.value : attrs.notes) || '';
 
-      const gremio = notesValue.match(FIELD_RE('Gremio'))?.[1]?.trim();
+      const gremioMatch = notesValue.match(FIELD_RE('Gremio'));
+      const gremio = gremioMatch?.[1]?.trim();
       if (gremio) guilds.add(gremio.toLowerCase());
 
-      const stratumRaw = notesValue.match(FIELD_RE('Estrato'))?.[1]?.trim().toLowerCase();
+      const stratumMatch = notesValue.match(FIELD_RE('Estrato'));
+      const stratumRaw = stratumMatch?.[1]?.trim().toLowerCase();
       if (stratumRaw) {
         strata.add(stratumRaw);
-        // El label guardado es "Medio (2-10m)"; comparamos por prefijo de la palabra clave.
-        const key = STRATA.find((s) => stratumRaw.startsWith(s.key) || stratumRaw.includes(` ${s.key} `))?.key;
-        if (key) perStratum[key] += 1;
+        const key = STRATA.find(
+          (s) => stratumRaw.startsWith(s.key) || stratumRaw.includes(` ${s.key} `)
+        )?.key;
+        if (key) perStratum[key] = (perStratum[key] ?? 0) + 1;
       }
     }
 
@@ -67,7 +70,7 @@ export default function BiodiversidadView({ onBack }) {
     };
   }, [plants]);
 
-  const customBgStyle = bgUrl
+  const customBgStyle: React.CSSProperties | undefined = bgUrl
     ? {
         backgroundImage: `linear-gradient(rgba(2,6,23,0.72), rgba(2,6,23,0.82)), url(${bgUrl})`,
         backgroundSize: 'cover',
