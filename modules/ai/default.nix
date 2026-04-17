@@ -14,6 +14,7 @@ in
   imports = [
     ./ollama.nix
     ./whisper.nix
+    ./whisper-http.nix
     ./piper.nix
     ./clawbots.nix
     ./openfang.nix
@@ -44,6 +45,7 @@ in
       before = [
         "podman-ollama.service"
         "podman-wyoming-whisper.service"
+        "podman-whisper-http.service"
         "podman-wyoming-piper.service"
       ];
       serviceConfig = {

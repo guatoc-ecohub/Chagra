@@ -568,6 +568,44 @@
         '';
       };
 
+      # 2.bis Enrutamiento HTTP Whisper (PWA Chagra) — ^~ para ganar prioridad
+      # sobre el prefijo genérico /api/ que va a FarmOS. La PWA apunta a
+      # /api/whisper/asr con multipart/form-data (campo: audio_file).
+      locations."^~ /api/whisper/" = {
+        proxyPass = "http://127.0.0.1:10301/";
+        extraConfig = ''
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+
+          # Uploads de audio de hasta ~30s pueden superar 1MB; ampliamos
+          # por seguridad y desactivamos el buffering para respuesta rapida.
+          client_max_body_size 25m;
+          proxy_request_buffering off;
+
+          # Timeouts extendidos: transcripcion puede tardar ~10s en CPU.
+          proxy_connect_timeout 60s;
+          proxy_send_timeout 60s;
+          proxy_read_timeout 60s;
+
+          # CORS para peticiones desde la PWA
+          add_header 'Access-Control-Allow-Origin' '*' always;
+          add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
+          add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization' always;
+
+          if ($request_method = 'OPTIONS') {
+              add_header 'Access-Control-Allow-Origin' '*';
+              add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+              add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization';
+              add_header 'Access-Control-Max-Age' 1728000;
+              add_header 'Content-Type' 'text/plain; charset=utf-8';
+              add_header 'Content-Length' 0;
+              return 204;
+          }
+        '';
+      };
+
       locations."/api/" = {
         # Enrutamiento interno directo al contenedor FarmOS
         proxyPass = "http://127.0.0.1:8081/api/";

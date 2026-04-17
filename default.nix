@@ -150,7 +150,8 @@
     
     # Hub services
     ollama.enable = true;        # LLM inference (puerto 11434)
-    whisper.enable = true;       # Speech-to-text (puerto 10300)
+    whisper.enable = true;       # Speech-to-text Wyoming / HA (puerto 10300)
+    whisper-http.enable = true;  # Speech-to-text HTTP / PWA (puerto 10301)
     piper.enable = true;         # Text-to-speech (puerto 10200)
     
     # Spoke agents - multi-tenant

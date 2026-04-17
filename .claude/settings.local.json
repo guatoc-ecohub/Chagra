@@ -54,7 +54,32 @@
       "Bash(python3 -c 'import json,sys; d=json.load\\(sys.stdin\\); print\\(\"text:\", d.get\\(\"response\",\"\"\\)[:200]\\)')",
       "Bash(python3 -m json.tool)",
       "Bash(python3 -c 'import json,sys; d=json.load\\(sys.stdin\\); [print\\(\"  -\", m[\"name\"], m.get\\(\"size\",0\\)//1024//1024, \"MB\"\\) for m in d.get\\(\"models\",[]\\)]')",
-      "Bash(sudo podman:*)"
+      "Bash(sudo podman:*)",
+      "Bash(getent group:*)",
+      "Read(//var/lib/chagra-deploy/**)",
+      "Bash(chagra-deploy)",
+      "Bash(journalctl -u openfang-guatoc --since \"2 min ago\" --no-pager -o cat)",
+      "Bash(python3 -c 'import json,sys; d=json.load\\(sys.stdin\\); print\\(\"status:\", d.get\\(\"status\",\"?\"\\)\\)')",
+      "Bash(ls -la /var/lib/chagra-deploy/repo/.env*)",
+      "Bash(ls -la /home/kortux/Chagra/.env*)",
+      "Bash(cp /home/kortux/Chagra/.env /var/lib/chagra-deploy/.env.chagra)",
+      "Bash(chmod 0640 /var/lib/chagra-deploy/.env.chagra)",
+      "Bash(python3 -c 'import json,sys; d=json.load\\(sys.stdin\\); [print\\(\" -\", m[\"name\"], round\\(m.get\\(\"size\",0\\)/1024/1024\\), \"MB\"\\) for m in d.get\\(\"models\",[]\\)]')",
+      "Bash(base64 -w0 /home/kortux/Chagra/src/assets/hero.png)",
+      "Bash(python3 -c 'import json,sys; d=json.load\\(sys.stdin\\); print\\(\"response:\", \\(d.get\\(\"response\",\"\"\\)[:500] or \"<vacio>\"\\)\\); print\\(\"error:\", d.get\\(\"error\",\"-\"\\)\\)')",
+      "Bash(ls -la /mnt/fast/appdata/farmos-pwa/assets/aiService*)",
+      "Bash(journalctl -u chagra-webhook --since \"3 min ago\" --no-pager -o cat)",
+      "Bash(ls /mnt/fast/appdata/farmos-pwa/assets/aiService*.js)",
+      "Bash(python3 -c 'import json; d=json.load\\(open\\(\"/tmp/q.json\"\\)\\); print\\(\"content:\",\\(d.get\\(\"message\",{}\\).get\\(\"content\",\"\"\\) or \"<vacio>\"\\)[:300]\\); print\\(\"done:\",d.get\\(\"done\"\\)\\)')",
+      "Bash(python3 -c 'import json,sys; d=json.load\\(sys.stdin\\); [print\\(f\"{s[\\\\\"entity_id\\\\\"]}: {s[\\\\\"state\\\\\"]}\"\\) for s in d if \"invernadero\" in s[\"entity_id\"].lower\\(\\) or \"tabaco\" in s[\"entity_id\"].lower\\(\\) or \"hum\" in s[\"entity_id\"].lower\\(\\) or \"temp\" in s[\"entity_id\"].lower\\(\\)][:20]')",
+      "Bash(ls /mnt/fast/appdata/farmos-pwa/assets/TelemetryAlerts*.js)",
+      "Bash(git push:*)",
+      "Bash(npx vite *)",
+      "Bash(python3 *)",
+      "Bash(cp -r /home/kortux/Chagra/dist/* /mnt/fast/appdata/farmos-pwa/)",
+      "Read(//mnt/fast/appdata/farmos-pwa/**)",
+      "Bash(ls *)",
+      "Bash(rm -rf /mnt/fast/appdata/farmos-pwa/*)"
     ]
   }
 }

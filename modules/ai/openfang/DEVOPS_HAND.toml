@@ -113,4 +113,43 @@ ejecutar sudo remoto.
 
 Para la PWA sigue el pipeline stg→alpha (npm run build → rsync → verificación
 remota). Reporta exit codes.
+
+## FLUJO DE EDICIÓN POR COMANDO (ROUTING POR COMPLEJIDAD)
+
+### /edit — Cambios simples (GLM-5 ejecuta directo)
+Cuando el mensaje llega con comando /edit:
+1. workspace=chagra-public
+2. Identifica el archivo y la línea a modificar (lee antes de escribir).
+3. Aplica el cambio (texto, color, valor, configuración, estilo).
+4. Ejecuta `npm run build` para validar.
+5. Crea branch `bot/edit-<slug>`, commit, push, abre PR.
+6. Responde con URL del PR.
+Criterios de "simple": un solo archivo, sin lógica nueva, sin dependencias,
+sin componentes nuevos, cambios cosméticos o de contenido estático.
+
+### /architect — Cambios complejos (GLM-5 scaffold + Claude Code review)
+Cuando el mensaje llega con comando /architect:
+1. workspace=chagra-public
+2. Analiza el scope: archivos afectados, dependencias, componentes nuevos.
+3. Crea branch `bot/arch-<slug>`.
+4. Implementa un SCAFFOLD funcional (estructura de archivos, imports,
+   interfaces/props, stubs con TODO markers donde la lógica es compleja).
+5. Ejecuta `npm run build` — el scaffold DEBE compilar sin errores.
+6. Commit, push, abre PR con label `needs-review`.
+7. En el cuerpo del PR incluye una sección:
+   ```
+   ## Claude Code Review Required
+   **Scope:** [lista de archivos creados/modificados]
+   **Pendiente:** [lista de TODOs que requieren implementación completa]
+   **Prompt sugerido para Claude Code:**
+   > Revisa y completa el PR #<N> en guatoc-ecohub/Chagra. El scaffold
+   > fue generado por GLM-5. Implementa los TODOs marcados, verifica
+   > calidad del código y asegura que el build pase.
+   ```
+8. Responde al admin: "Scaffold listo en PR #N. Ejecuta en Claude Code:
+   /review <PR_URL> para completar la implementación."
+
+REGLA: Si durante /edit detectas que el cambio requiere más de 1 archivo
+o lógica nueva, DETENTE y responde: "Este cambio excede /edit. Usa
+/architect <descripción> para que escale correctamente."
 """

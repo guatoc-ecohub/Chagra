@@ -48,7 +48,8 @@ rec {
     
     # --- 1xxxx: AI Services ---
     ollama      = 11434; # LLM local API
-    whisper     = 10300; # Wyoming Whisper STT
+    whisper     = 10300; # Wyoming Whisper STT (Home Assistant)
+    whisperHttp = 10301; # HTTP Whisper ASR (PWA Chagra — openai-whisper-asr-webservice)
     piper       = 10200; # Wyoming Piper TTS
     
     # --- ClawBots: Multi-tenant AI Agents (dynamic allocation) ---

@@ -34,34 +34,57 @@ name     = "solar"
 file     = "SOLAR_HAND.toml"
 enabled  = true
 
+[[hands]]
+name     = "personal"
+file     = "PERSONAL_HAND.toml"
+enabled  = true
+
 # ---------------------------------------------------------------
 # ROUTING TABLE
 # Reglas evaluadas en orden. La primera coincidencia gana.
 # ---------------------------------------------------------------
 
-# 1. Comandos de infraestructura → DevOps Hand (solo admin)
+# 1. Ediciones simples de Chagra → DevOps Hand (GLM-5, scaffold directo)
+#    Uso: /edit <descripción del cambio sencillo>
+#    Ej:  /edit cambiar título del dashboard a "Panel Chagra v2"
+[[routes]]
+match_command = ["/edit"]
+require_role  = "admin"
+hand          = "devops"
+metadata      = { complexity = "low", workflow = "direct" }
+
+# 2. Cambios complejos → DevOps Hand (GLM-5 scaffold + escala a Claude Code)
+#    Uso: /architect <descripción de la feature compleja>
+#    Ej:  /architect agregar módulo de calendario lunar con cálculos astronómicos
+[[routes]]
+match_command = ["/architect"]
+require_role  = "admin"
+hand          = "devops"
+metadata      = { complexity = "high", workflow = "scaffold_then_review" }
+
+# 3. Comandos de infraestructura → DevOps Hand (solo admin)
 [[routes]]
 match_command = ["/deploy", "/infra", "/nixos", "/rebuild", "/git"]
 require_role  = "admin"
 hand          = "devops"
 
-# 2. Comandos solares → Solar Hand (solo Camilo)
+# 4. Comandos solares → Solar Hand (solo Camilo)
 [[routes]]
 match_command = ["/solar", "/cotizar", "/dimensionar", "/retie"]
 require_user  = "<@CamiloRendon>"
 hand          = "solar"
 
-# 3. Mensajes generales de Camilo → Solar Hand
+# 5. Mensajes generales de Camilo → Solar Hand
 [[routes]]
 match_user    = "<@CamiloRendon>"
 hand          = "solar"
 
-# 4. Mensajes generales del admin → DevOps Hand
+# 6. Mensajes generales del admin → Personal Hand
 [[routes]]
 match_user    = "<@KortuxAdmin>"
-hand          = "devops"
+hand          = "personal"
 
-# 5. Default: rechazar
+# 7. Default: rechazar
 [[routes]]
 match_any     = true
 action        = "deny"
