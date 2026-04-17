@@ -1,2 +1,2 @@
-// Domain types — populated in Fase 3
-export {};
+export * from "./farmos";
+// farmos.gen.ts is intentionally NOT re-exported — use farmos.ts instead
