@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, CheckCircle, Clock, RefreshCw, Wifi, WifiOff, CloudOff, Cloud, Sprout, Apple, TreePine, Building2, Wrench, Leaf, Droplets, Eye } from 'lucide-react';
 import { syncManager } from '../services/syncManager';
 
-const TRANSACTION_TYPE_LABELS = {
+const TRANSACTION_TYPE_LABELS: Record<string, string> = {
   asset_plant: 'Cultivo / Árbol',
   asset_structure: 'Infraestructura',
   asset_equipment: 'Herramienta',
@@ -16,7 +16,7 @@ const TRANSACTION_TYPE_LABELS = {
   activity: 'Tarea de campo',
 };
 
-const TRANSACTION_TYPE_COLORS = {
+const TRANSACTION_TYPE_COLORS: Record<string, string> = {
   asset_plant: 'text-lime-400 bg-lime-900/30',
   asset_structure: 'text-emerald-400 bg-emerald-900/30',
   asset_equipment: 'text-orange-400 bg-orange-900/30',
@@ -30,7 +30,7 @@ const TRANSACTION_TYPE_COLORS = {
   activity: 'text-cyan-400 bg-cyan-900/30',
 };
 
-const TRANSACTION_TYPE_ICONS = {
+const TRANSACTION_TYPE_ICONS: Record<string, React.ComponentType<{ size?: number }>> = {
   asset_plant: TreePine,
   asset_structure: Building2,
   asset_equipment: Wrench,
@@ -44,12 +44,53 @@ const TRANSACTION_TYPE_ICONS = {
   activity: Clock,
 };
 
-export default function WorkerHistory({ onBack }) {
-  const [activeSection, setActiveSection] = useState('recientes');
-  const [pendingTx, setPendingTx] = useState([]);
-  const [completedTasks, setCompletedTasks] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+interface PendingTransaction {
+  id?: number | string;
+  type: string;
+  timestamp?: number;
+  synced?: boolean;
+  payload?: {
+    data?: {
+      type?: string;
+      id?: string;
+      attributes?: { name?: string; [key: string]: unknown };
+      relationships?: {
+        quantity?: {
+          data?: Array<{
+            attributes?: {
+              value?: { decimal?: string };
+              label?: string;
+            };
+          }>;
+        };
+        [key: string]: unknown;
+      };
+    };
+  };
+  [key: string]: unknown;
+}
+
+interface CompletedTask {
+  id?: string;
+  type?: string;
+  title?: string;
+  status?: string;
+  timestamp?: number;
+  severity?: string;
+  attributes?: { status?: string; [key: string]: unknown };
+  [key: string]: unknown;
+}
+
+interface WorkerHistoryProps {
+  onBack: () => void;
+}
+
+export default function WorkerHistory({ onBack }: WorkerHistoryProps) {
+  const [activeSection, setActiveSection] = useState<'recientes' | 'completadas'>('recientes');
+  const [pendingTx, setPendingTx] = useState<PendingTransaction[]>([]);
+  const [completedTasks, setCompletedTasks] = useState<CompletedTask[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
 
   useEffect(() => {
     loadData();
@@ -67,6 +108,7 @@ export default function WorkerHistory({ onBack }) {
       window.removeEventListener('offline', onOffline);
       window.removeEventListener('taskAdded', onTaskAdded);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadData = async () => {
@@ -78,41 +120,37 @@ export default function WorkerHistory({ onBack }) {
   const loadPendingTransactions = async () => {
     try {
       await syncManager.initDB();
-      const all = await syncManager.getPendingTransactions();
-      // Mostrar más recientes primero
-      setPendingTx(all.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)));
+      const all = await syncManager.getPendingTransactions() as PendingTransaction[];
+      setPendingTx(all.sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0)));
     } catch (err) {
       console.error('Error cargando transacciones pendientes:', err);
     }
   };
 
   const loadCompletedTasks = async () => {
-    // Fase 8.5: consulta unificada al caché local de IndexedDB.
-    // El pull de red ya incluye tareas done (ver syncManager.fetchPendingTasksFromFarmOS).
-    // Si hay conexión, refrescamos antes de leer el store; si no, leemos directo.
     try {
       if (navigator.onLine) {
         await syncManager.fetchPendingTasksFromFarmOS();
       }
-      const allTasks = await syncManager.getPendingTasks();
+      const allTasks = await syncManager.getPendingTasks() as CompletedTask[];
       const historyData = allTasks
         .filter((t) =>
           t.status === 'done' ||
           t.attributes?.status === 'done' ||
           t.severity === 'completed'
         )
-        .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        .sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0));
       setCompletedTasks(historyData);
     } catch (err) {
       console.error('Error cargando tareas completadas:', err);
     }
   };
 
-  const formatTimestamp = (ts) => {
+  const formatTimestamp = (ts: number | undefined): string => {
     if (!ts) return '';
     const d = new Date(ts);
     const now = new Date();
-    const diffMs = now - d;
+    const diffMs = now.getTime() - d.getTime();
     const diffMin = Math.floor(diffMs / 60000);
 
     if (diffMin < 1) return 'Ahora mismo';
@@ -124,14 +162,13 @@ export default function WorkerHistory({ onBack }) {
     return d.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' });
   };
 
-  const getTransactionName = (tx) => {
+  const getTransactionName = (tx: PendingTransaction): string => {
     const name = tx.payload?.data?.attributes?.name;
-    if (!name) return TRANSACTION_TYPE_LABELS[tx.type] || tx.type || 'Registro';
+    if (!name) return TRANSACTION_TYPE_LABELS[tx.type] ?? tx.type ?? 'Registro';
 
-    // Texto descriptivo para cosecha y siembra
     if (tx.type === 'harvest') {
       const qty = tx.payload?.data?.relationships?.quantity?.data?.[0]?.attributes;
-      if (qty) return `Cosecha registrada: ${qty.value?.decimal || ''} ${qty.label || ''} de ${name}`;
+      if (qty) return `Cosecha registrada: ${qty.value?.decimal ?? ''} ${qty.label ?? ''} de ${name}`;
       return `Cosecha registrada: ${name}`;
     }
     if (tx.type === 'seeding') return `Siembra registrada: ${name.replace('Siembra: ', '')}`;
@@ -208,13 +245,13 @@ export default function WorkerHistory({ onBack }) {
               </div>
             ) : (
               pendingTx.map((tx, idx) => {
-                const typeColor = TRANSACTION_TYPE_COLORS[tx.type] || 'text-slate-400 bg-slate-700/30';
-                const typeLabel = TRANSACTION_TYPE_LABELS[tx.type] || tx.type || 'Registro';
+                const typeColor = TRANSACTION_TYPE_COLORS[tx.type] ?? 'text-slate-400 bg-slate-700/30';
+                const typeLabel = TRANSACTION_TYPE_LABELS[tx.type] ?? tx.type ?? 'Registro';
                 const name = getTransactionName(tx);
-                const TxIcon = TRANSACTION_TYPE_ICONS[tx.type] || Clock;
+                const TxIcon = TRANSACTION_TYPE_ICONS[tx.type] ?? Clock;
 
                 return (
-                  <div key={tx.id || idx} className="p-4 rounded-xl bg-slate-800 border border-dashed border-slate-600 transition-all">
+                  <div key={String(tx.id ?? idx)} className="p-4 rounded-xl bg-slate-800 border border-dashed border-slate-600 transition-all">
                     <div className="flex items-start justify-between gap-3">
                       <div className={`p-2 rounded-lg ${typeColor} shrink-0 mt-0.5`}>
                         <TxIcon size={16} />
@@ -263,7 +300,7 @@ export default function WorkerHistory({ onBack }) {
               </div>
             ) : (
               completedTasks.map((task, idx) => (
-                <div key={task.id || idx} className="p-4 rounded-xl bg-slate-800 border border-slate-700 transition-all">
+                <div key={task.id ?? idx} className="p-4 rounded-xl bg-slate-800 border border-slate-700 transition-all">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <div className="p-2 rounded-lg bg-green-900/30 shrink-0">

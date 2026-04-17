@@ -5,23 +5,23 @@ import { UNIT_OPTIONS } from '../config/materials';
 import { useConsumptionMetrics } from '../hooks/useConsumptionMetrics';
 import { Sparkline } from './charts/Sparkline';
 import { exportTraceabilityCsv } from '../services/exportService';
+import type { FarmOSEnrichedAsset } from '../types';
 
 /**
  * InventoryDashboard — Bodega de biofábrica (Fase 13.2 / refactor 13.6).
- *
- * Renderiza el stock de todos los materiales registrados como asset--material.
- * El valor de stock se descuenta reactivamente desde addInputLog cada vez que
- * el operario registra una aplicación sobre un cultivo, y se incrementa via
- * refillMaterial al registrar producción en la biofábrica.
  */
 
 const LOW_THRESHOLD = 5;
 const BAR_CAPACITY = 50;
 
-// Card individual extraída para respetar rules of hooks (useConsumptionMetrics).
-const MaterialCard = ({ item, onRefill }) => {
+interface MaterialCardProps {
+  item: FarmOSEnrichedAsset;
+  onRefill: (item: FarmOSEnrichedAsset) => void;
+}
+
+const MaterialCard = ({ item, onRefill }: MaterialCardProps) => {
   const name = item.attributes?.name || item.name || 'Insumo sin nombre';
-  const stock = parseFloat(item.attributes?.inventory_value) || 0;
+  const stock = parseFloat(String(item.attributes?.inventory_value ?? 0)) || 0;
   const unit = item.attributes?.inventory_unit || 'unidades';
   const isLow = stock < LOW_THRESHOLD;
   const progressPct = Math.min((stock / BAR_CAPACITY) * 100, 100);
@@ -94,14 +94,15 @@ const MaterialCard = ({ item, onRefill }) => {
 };
 
 export const InventoryDashboard = () => {
-  const materials = useAssetStore((s) => s.materials);
+  const materialsRaw = useAssetStore((s) => s.materials);
+  const materials = materialsRaw as unknown as FarmOSEnrichedAsset[];
   const refillMaterial = useAssetStore((s) => s.refillMaterial);
 
-  const [refillTarget, setRefillTarget] = useState(null); // material seleccionado
-  const [refillAmount, setRefillAmount] = useState('');
-  const [refillUnit, setRefillUnit] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [exporting, setExporting] = useState(false);
+  const [refillTarget, setRefillTarget] = useState<FarmOSEnrichedAsset | null>(null);
+  const [refillAmount, setRefillAmount] = useState<string>('');
+  const [refillUnit, setRefillUnit] = useState<string>('');
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [exporting, setExporting] = useState<boolean>(false);
 
   const handleExport = async () => {
     if (exporting) return;
@@ -121,10 +122,10 @@ export const InventoryDashboard = () => {
     }
   };
 
-  const openRefillModal = (material) => {
+  const openRefillModal = (material: FarmOSEnrichedAsset) => {
     setRefillTarget(material);
     setRefillAmount('');
-    setRefillUnit(material.attributes?.inventory_unit || material.unit || 'kg');
+    setRefillUnit(String(material.attributes?.inventory_unit ?? material.unit ?? 'kg'));
   };
 
   const closeRefillModal = () => {
@@ -133,7 +134,7 @@ export const InventoryDashboard = () => {
     setRefillUnit('');
   };
 
-  const submitRefill = async (e) => {
+  const submitRefill = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!refillTarget || !refillAmount) return;
     const amount = parseFloat(refillAmount);
@@ -229,7 +230,7 @@ export const InventoryDashboard = () => {
             <div className="text-xs text-slate-500 bg-slate-800/50 p-3 rounded-lg">
               Stock actual:{' '}
               <span className="text-slate-200 font-bold tabular-nums">
-                {parseFloat(refillTarget.attributes?.inventory_value) || 0}
+                {parseFloat(String(refillTarget.attributes?.inventory_value ?? 0)) || 0}
               </span>{' '}
               {refillTarget.attributes?.inventory_unit || 'unidades'}
             </div>

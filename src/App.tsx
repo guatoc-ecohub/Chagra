@@ -283,7 +283,6 @@ export default function App() {
                 useAssetStore.getState().setSelectedAsset(id);
                 setCurrentView('activos');
               }}
-              onTaskComplete={undefined}
             />
           </ScreenShell>
         );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Info } from 'lucide-react';
 import { assetCache } from '../db/assetCache';
 import { FARM_CONFIG } from '../config/defaults';
@@ -8,52 +8,71 @@ import Sparkline from './common/Sparkline';
 const HA_URL = '/api/ha';
 const OLLAMA_URL = '/api/ollama';
 
-// Cooldown de idempotencia persistente (delegado a sync_meta vía assetCache)
+// Cooldown de idempotencia persistente
 const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutos
 
 // Utilidades de formateo condicional
-const getHumidityColor = (humidity) => {
-  const value = parseFloat(humidity);
+const getHumidityColor = (humidity: string | null): string => {
+  const value = parseFloat(humidity ?? '');
   if (isNaN(value)) return 'text-slate-400';
-
-  if (value < 40) return 'text-red-500'; // Humedad crítica
-  if (value <= 70) return 'text-green-500'; // Humedad óptima
-  return 'text-blue-500'; // Humedad saturada
+  if (value < 40) return 'text-red-500';
+  if (value <= 70) return 'text-green-500';
+  return 'text-blue-500';
 };
 
-const getTemperatureColor = (temperature) => {
-  const value = parseFloat(temperature);
+const getTemperatureColor = (temperature: string | null): string => {
+  const value = parseFloat(temperature ?? '');
   if (isNaN(value)) return 'text-slate-400';
-
-  if (value < 12) return 'text-blue-400'; // Frío
-  if (value <= 28) return 'text-green-500'; // Óptimo
-  return 'text-red-500'; // Calor crítico
+  if (value < 12) return 'text-blue-400';
+  if (value <= 28) return 'text-green-500';
+  return 'text-red-500';
 };
 
-export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
-  const [sensors, setSensors] = useState({
+interface SensorState {
+  invernaderoHumidity: string | null;
+  invernaderoTemperature: string | null;
+  tabacoHumidity: string | null;
+  tabacoTemperature: string | null;
+}
+
+interface AiMeta {
+  model: string;
+  totalDuration: string | null;
+  evalCount: number | null;
+  promptTokens: number | null;
+}
+
+interface TelemetryAlertsProps {
+  lastFarmOsLog?: unknown;
+  onNavigate?: (screen: string) => void;
+}
+
+export default function TelemetryAlerts({ lastFarmOsLog: _lastFarmOsLog, onNavigate: _onNavigate }: TelemetryAlertsProps) {
+  const [sensors, setSensors] = useState<SensorState>({
     invernaderoHumidity: null,
     invernaderoTemperature: null,
     tabacoHumidity: null,
-    tabacoTemperature: null
+    tabacoTemperature: null,
   });
-  const [aiAlert, setAiAlert] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [aiStatus, setAiStatus] = useState('idle'); // idle | thinking | done | error
-  const [sensorHistory, setSensorHistory] = useState({});
-  const [aiMeta, setAiMeta] = useState(null); // { model, evalDuration, totalDuration }
+  const [aiAlert, setAiAlert] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [aiStatus, setAiStatus] = useState<'idle' | 'thinking' | 'done' | 'error' | 'empty'>('idle');
+  const [sensorHistory, setSensorHistory] = useState<Record<string, unknown[]>>({});
+  const [aiMeta, setAiMeta] = useState<AiMeta | null>(null);
 
-  // Variables de Entorno (Requeridas en el archivo .env)
-  const HA_TOKEN = import.meta.env.VITE_HA_ACCESS_TOKEN;
+  const HA_TOKEN = import.meta.env['VITE_HA_ACCESS_TOKEN'] as string | undefined;
 
-  // Enrutador genérico de acciones de telemetría con idempotencia persistente.
-  // Cooldown y encolado son atómicos (IDB transaction sobre pending_tx + sync_meta).
-  const handleTelemetryAction = async (sensorId, alertType, payloadBuilder, options = {}) => {
+  const handleTelemetryAction = async (
+    sensorId: string,
+    alertType: string,
+    payloadBuilder: () => unknown,
+    options: { endpoint?: string; type?: string; navigateTo?: string } = {}
+  ) => {
     const { endpoint = '/api/log/maintenance', type = 'maintenance', navigateTo = null } = options;
     setLoading(true);
     try {
-      const lastTrigger = await assetCache.getAlertCooldown(sensorId, alertType);
+      const lastTrigger = await assetCache.getAlertCooldown(sensorId, alertType) as number;
       const now = Date.now();
 
       if (now - lastTrigger < COOLDOWN_MS) {
@@ -67,7 +86,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         type,
         endpoint,
         payload,
-        method: 'POST'
+        method: 'POST',
       };
 
       await assetCache.commitAlertWithCooldown(sensorId, alertType, pendingTx);
@@ -75,8 +94,8 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
       window.dispatchEvent(new CustomEvent('taskAdded'));
       console.info(`[Telemetry] Alerta ${alertType} procesada y encolada.`);
       if (navigateTo) window.location.hash = navigateTo;
-    } catch (error) {
-      console.error('[Telemetry] Fallo al procesar alerta:', error);
+    } catch (err) {
+      console.error('[Telemetry] Fallo al procesar alerta:', err);
     } finally {
       setLoading(false);
     }
@@ -93,35 +112,35 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         'riego_emergencia',
         () => ({
           data: {
-            type: "log--input",
+            type: 'log--input',
             attributes: {
-              name: "Riego de emergencia (Alerta IA)",
+              name: 'Riego de emergencia (Alerta IA)',
               timestamp: new Date().toISOString().split('.')[0] + '+00:00',
-              status: "pending",
-              notes: `Ejecutado en respuesta a alerta IA: ${aiAlert}`
+              status: 'pending',
+              notes: `Ejecutado en respuesta a alerta IA: ${aiAlert}`,
             },
             relationships: {
               location: {
-                data: [{ type: "asset--land", id: FARM_CONFIG.LOCATION_ID }]
+                data: [{ type: 'asset--land', id: FARM_CONFIG.LOCATION_ID }],
               },
               category: {
                 data: [{
-                  type: "taxonomy_term--material",
-                  attributes: { name: "Riego de emergencia" }
-                }]
+                  type: 'taxonomy_term--material',
+                  attributes: { name: 'Riego de emergencia' },
+                }],
               },
               quantity: {
                 data: [{
-                  type: "quantity--standard",
+                  type: 'quantity--standard',
                   attributes: {
-                    measure: "volume",
-                    value: { decimal: "0" },
-                    label: "Caudal (L)"
-                  }
-                }]
-              }
-            }
-          }
+                    measure: 'volume',
+                    value: { decimal: '0' },
+                    label: 'Caudal (L)',
+                  },
+                }],
+              },
+            },
+          },
         }),
         { type: 'input', endpoint: '/api/log/input', navigateTo: '#insumos' }
       );
@@ -145,15 +164,15 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         'control_termico',
         () => ({
           data: {
-            type: "log--maintenance",
+            type: 'log--maintenance',
             attributes: {
-              name: "Control Climático (Alerta IA)",
+              name: 'Control Climático (Alerta IA)',
               timestamp: new Date().toISOString().split('.')[0] + '+00:00',
-              status: "pending",
+              status: 'pending',
               description: `Ejecutado en respuesta a alerta IA: ${aiAlert}`,
-              maintenanceType: "emergency"
-            }
-          }
+              maintenanceType: 'emergency',
+            },
+          },
         }),
         { type: 'maintenance', endpoint: '/api/log/maintenance', navigateTo: '#mantenimiento' }
       );
@@ -177,35 +196,35 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         'aplicacion_fitosanitaria',
         () => ({
           data: {
-            type: "log--input",
+            type: 'log--input',
             attributes: {
-              name: "Aplicación Fitosanitaria (Alerta IA)",
+              name: 'Aplicación Fitosanitaria (Alerta IA)',
               timestamp: new Date().toISOString().split('.')[0] + '+00:00',
-              status: "pending",
-              notes: `Ejecutado en respuesta a alerta IA: ${aiAlert}`
+              status: 'pending',
+              notes: `Ejecutado en respuesta a alerta IA: ${aiAlert}`,
             },
             relationships: {
               location: {
-                data: [{ type: "asset--land", id: FARM_CONFIG.LOCATION_ID }]
+                data: [{ type: 'asset--land', id: FARM_CONFIG.LOCATION_ID }],
               },
               category: {
                 data: [{
-                  type: "taxonomy_term--material",
-                  attributes: { name: "Caldo sulfocálcico" }
-                }]
+                  type: 'taxonomy_term--material',
+                  attributes: { name: 'Caldo sulfocálcico' },
+                }],
               },
               quantity: {
                 data: [{
-                  type: "quantity--standard",
+                  type: 'quantity--standard',
                   attributes: {
-                    measure: "volume",
-                    value: { decimal: "0" },
-                    label: "Concentrado (L)"
-                  }
-                }]
-              }
-            }
-          }
+                    measure: 'volume',
+                    value: { decimal: '0' },
+                    label: 'Concentrado (L)',
+                  },
+                }],
+              },
+            },
+          },
         }),
         { type: 'input', endpoint: '/api/log/input', navigateTo: '#insumos' }
       );
@@ -226,7 +245,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
     return null;
   };
 
-  const fetchTelemetryAndAnalyze = async (parentSignal) => {
+  const fetchTelemetryAndAnalyze = async (parentSignal?: AbortSignal) => {
     if (!navigator.onLine) {
       setError('Dispositivo sin conexión. Análisis suspendido para conservar energía.');
       return;
@@ -241,14 +260,13 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
     setError(null);
 
     try {
-      // 1. Ingesta de Datos Domóticos (Home Assistant) - IDs Zigbee físicos
-      const haHeaders = { 'Authorization': `Bearer ${HA_TOKEN}`, 'Content-Type': 'application/json' };
-      const haOpts = { method: 'GET', headers: haHeaders, signal: parentSignal };
+      const haHeaders: HeadersInit = { 'Authorization': `Bearer ${HA_TOKEN}`, 'Content-Type': 'application/json' };
+      const haOpts: RequestInit = { method: 'GET', headers: haHeaders, signal: parentSignal ?? null };
       const [invernaderoHum, invernaderoTemp, tabacoHum, tabacoTemp] = await Promise.all([
         fetch(`${HA_URL}/states/sensor.arteco_zs_304z_humidity`, haOpts),
         fetch(`${HA_URL}/states/sensor.arteco_zs_304z_temperature`, haOpts),
         fetch(`${HA_URL}/states/sensor.hobeian_zg_303z_humidity`, haOpts),
-        fetch(`${HA_URL}/states/sensor.hobeian_zg_303z_temperature`, haOpts)
+        fetch(`${HA_URL}/states/sensor.hobeian_zg_303z_temperature`, haOpts),
       ]);
 
       if (!invernaderoHum.ok || !invernaderoTemp.ok || !tabacoHum.ok || !tabacoTemp.ok) {
@@ -259,14 +277,14 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         throw new Error(`Fallo al conectar con sensor: ${failedSensor}. Verifique Home Assistant.`);
       }
 
+      interface SensorData { state: string; entity_id?: string; }
       const [invernaderoHumData, invernaderoTempData, tabacoHumData, tabacoTempData] = await Promise.all([
-        invernaderoHum.json(),
-        invernaderoTemp.json(),
-        tabacoHum.json(),
-        tabacoTemp.json()
+        invernaderoHum.json() as Promise<SensorData>,
+        invernaderoTemp.json() as Promise<SensorData>,
+        tabacoHum.json() as Promise<SensorData>,
+        tabacoTemp.json() as Promise<SensorData>,
       ]);
 
-      // Detección de sensores no disponibles (unavailable, null, unknown)
       const sensorReadings = [
         { name: 'Invernadero 1 Humedad', data: invernaderoHumData, key: 'Arteco ZS-304Z' },
         { name: 'Invernadero 1 Temperatura', data: invernaderoTempData, key: 'Arteco ZS-304Z' },
@@ -274,31 +292,28 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         { name: 'Tabaco Temperatura', data: tabacoTempData, key: 'Hobeian ZG-303Z' },
       ];
 
-      const unavailableSensors = sensorReadings.filter(s =>
+      const unavailableSensors = sensorReadings.filter((s) =>
         !s.data.state || s.data.state === 'unavailable' || s.data.state === 'unknown'
       );
 
-      // Nota prependible al análisis cuando hay sensores offline parciales.
       let offlineNotice = '';
 
       if (unavailableSensors.length > 0) {
-        // Idempotencia persistente por (sensor.key, 'conectividad') vía sync_meta.
         let dispatched = 0;
         for (const sensor of unavailableSensors) {
           const sensorId = sensor.key;
           const alertType = 'conectividad';
-          const lastTrigger = await assetCache.getAlertCooldown(sensorId, alertType);
+          const lastTrigger = await assetCache.getAlertCooldown(sensorId, alertType) as number;
           if (Date.now() - lastTrigger < COOLDOWN_MS) {
             console.warn(`[Telemetry] Alerta de conectividad para ${sensorId} bloqueada por cooldown.`);
             continue;
           }
 
-          const taskName = `Revisión de conectividad de sensor en ${sensor.name}`;
           const taskPayload = {
             data: {
               type: 'log--maintenance',
               attributes: {
-                name: taskName,
+                name: `Revisión de conectividad de sensor en ${sensor.name}`,
                 timestamp: Math.floor(Date.now() / 1000),
                 status: 'pending',
                 notes: { value: `Sensor ${sensor.key} reporta estado "${sensor.data.state || 'null'}". Verificar alimentación, alcance Zigbee y estado en Home Assistant.` },
@@ -325,10 +340,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
           window.dispatchEvent(new CustomEvent('taskAdded'));
         }
 
-        // Persistimos el aviso de conectividad pero no hacemos early-return:
-        // si al menos un sensor responde, seguimos al análisis + IA para no
-        // perder visibilidad agronómica sobre la parte operativa.
-        const namesOffline = unavailableSensors.map(s => s.name).join(', ');
+        const namesOffline = unavailableSensors.map((s) => s.name).join(', ');
         offlineNotice = `⚠️ ${unavailableSensors.length} sensor(es) offline (${namesOffline}). Tarea de revisión despachada.\n`;
 
         setSensors({
@@ -338,8 +350,6 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
           tabacoTemperature: tabacoTempData.state !== 'unavailable' ? tabacoTempData.state : null,
         });
 
-        // Si TODOS los sensores están caídos, sí hacemos early return — no hay
-        // datos agronómicos que analizar.
         if (unavailableSensors.length === sensorReadings.length) {
           setAiAlert(offlineNotice);
           setLoading(false);
@@ -351,107 +361,106 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         invernaderoHumidity: invernaderoHumData.state,
         invernaderoTemperature: invernaderoTempData.state,
         tabacoHumidity: tabacoHumData.state,
-        tabacoTemperature: tabacoTempData.state
+        tabacoTemperature: tabacoTempData.state,
       });
 
-      // Histórico 24h — HA History API (no bloquea análisis)
+      // Histórico 24h
       const historyStart = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
       const entityIds = [
         'sensor.arteco_zs_304z_humidity',
         'sensor.arteco_zs_304z_temperature',
         'sensor.hobeian_zg_303z_humidity',
-        'sensor.hobeian_zg_303z_temperature'
+        'sensor.hobeian_zg_303z_temperature',
       ];
       try {
         const histResp = await fetch(
           `${HA_URL}/history/period/${historyStart}?filter_entity_id=${entityIds.join(',')}&minimal_response&no_attributes`,
-          { headers: { 'Authorization': `Bearer ${HA_TOKEN}`, 'Content-Type': 'application/json' }, signal: parentSignal }
+          { headers: { 'Authorization': `Bearer ${HA_TOKEN}`, 'Content-Type': 'application/json' }, signal: parentSignal ?? null }
         );
         if (histResp.ok) {
-          const histData = await histResp.json();
-          const histMap = {};
+          const histData = await histResp.json() as Array<Array<{ entity_id: string }>>;
+          const histMap: Record<string, unknown[]> = {};
           for (const series of histData) {
-            if (series.length > 0) histMap[series[0].entity_id] = series;
+            const first = series[0];
+            if (series.length > 0 && first !== undefined) histMap[first.entity_id] = series;
           }
           setSensorHistory(histMap);
         }
       } catch (histErr) {
-        console.warn('[Telemetry] Histórico 24h no disponible:', histErr.message);
+        console.warn('[Telemetry] Histórico 24h no disponible:', (histErr as Error).message);
       }
 
-      // 2. Análisis determinista por reglas (siempre se ejecuta)
+      // Análisis determinista
       const inv1Hum = parseFloat(invernaderoHumData.state);
       const inv1Temp = parseFloat(invernaderoTempData.state);
       const tabHum = parseFloat(tabacoHumData.state);
       const tabTemp = parseFloat(tabacoTempData.state);
 
-      const alerts = [];
-
-      // Invernadero 1
+      const alerts: string[] = [];
       if (inv1Hum < 40) alerts.push(`🚨 ALERTA: Humedad crítica en Invernadero 1 (${inv1Hum}%). Riego inmediato requerido.`);
       if (inv1Hum > 80) alerts.push(`💧 Exceso de humedad en Invernadero 1 (${inv1Hum}%). Riesgo de hongos patógenos. Ventilar.`);
       if (inv1Temp > 30) alerts.push(`🔥 Temperatura elevada en Invernadero 1 (${inv1Temp}°C). Activar ventilación.`);
       if (inv1Temp < 5) alerts.push(`❄️ Temperatura baja en Invernadero 1 (${inv1Temp}°C). Riesgo de helada. Proteger cultivos.`);
-
-      // Tabaco
       if (tabHum < 40) alerts.push(`🚨 ALERTA: Humedad crítica en Tabaco (${tabHum}%). Riego inmediato requerido.`);
       if (tabHum > 80) alerts.push(`💧 Exceso de humedad en Tabaco (${tabHum}%). Riesgo de hongos. Monitorear.`);
       if (tabTemp > 30) alerts.push(`🔥 Temperatura elevada en Tabaco (${tabTemp}°C). Activar ventilación.`);
       if (tabTemp < 5) alerts.push(`❄️ Temperatura baja en Tabaco (${tabTemp}°C). Riesgo de helada.`);
 
-      // Baseline si todo está en rango
       const ruleAnalysis = alerts.length > 0
         ? alerts.join('\n')
         : `✅ Condiciones estables. Inv1: ${inv1Hum}%H/${inv1Temp}°C. Tab: ${tabHum}%H/${tabTemp}°C.`;
 
-      // Mostrar reglas INMEDIATAMENTE — sin esperar IA. Prepeende aviso de
-      // sensores offline (si hay alguno) para que quede visible incluso si la
-      // IA después falla o tarda.
       if (parentSignal?.aborted) return;
       setAiAlert(`${offlineNotice}${ruleAnalysis}`);
       setLoading(false);
       setAiStatus('thinking');
 
-      // 3. Enriquecimiento con IA en background (no bloquea UI)
-      // Usa /api/chat con think:false para desactivar chain-of-thought de Qwen3.5
+      // Enriquecimiento con IA en background
       try {
         const ollamaTimeout = setTimeout(() => { if (!parentSignal?.aborted) setAiStatus('error'); }, 45000);
+        const fmt = (h: number, t: number) => isNaN(h) && isNaN(t) ? 'sin datos (sensor offline)'
+          : isNaN(h) ? `${t}°C (humedad sin dato)`
+          : isNaN(t) ? `${h}% humedad (temp sin dato)`
+          : `${h}% humedad, ${t}°C`;
+        const alertsLine = alerts.length > 0
+          ? 'Alertas: ' + alerts.map((a) => a.replace(/[^\w\s%°.,()/áéíóú]/g, '')).join('. ')
+          : 'Sin alertas.';
+        const userContent = `Datos actuales de sensores:\n- Invernadero 1: ${fmt(inv1Hum, inv1Temp)}\n- Tabaco: ${fmt(tabHum, tabTemp)}\n${offlineNotice ? offlineNotice.trim() + '\n' : ''}${alertsLine}\nDiagnóstico y acción en 2 líneas.`;
+
         const ollamaResponse = await fetch(`${OLLAMA_URL}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          signal: parentSignal,
+          signal: parentSignal ?? null,
           body: JSON.stringify({
             model: 'qwen3.5:4b',
             think: false,
             stream: false,
             messages: [
               { role: 'system', content: 'Asistente agronómico para finca agroecológica andina (2400msnm). PROHIBIDO recomendar agroquímicos sintéticos. Solo biopreparados orgánicos (biol, caldo sulfocálcico, caldo bordelés, purín de ortiga, compost tea, microorganismos de montaña, Trichoderma). Responde conciso en español, 2 líneas máximo.' },
-              { role: 'user', content: (() => {
-                const fmt = (h, t) => isNaN(h) && isNaN(t) ? 'sin datos (sensor offline)'
-                  : isNaN(h) ? `${t}°C (humedad sin dato)`
-                  : isNaN(t) ? `${h}% humedad (temp sin dato)`
-                  : `${h}% humedad, ${t}°C`;
-                const alertsLine = alerts.length > 0
-                  ? 'Alertas: ' + alerts.map(a => a.replace(/[^\w\s%°.,()/áéíóú]/g, '')).join('. ')
-                  : 'Sin alertas.';
-                return `Datos actuales de sensores:\n- Invernadero 1: ${fmt(inv1Hum, inv1Temp)}\n- Tabaco: ${fmt(tabHum, tabTemp)}\n${offlineNotice ? offlineNotice.trim() + '\n' : ''}${alertsLine}\nDiagnóstico y acción en 2 líneas.`;
-              })() }
+              { role: 'user', content: userContent },
             ],
-            options: { num_predict: 200, temperature: 0.3 }
-          })
+            options: { num_predict: 200, temperature: 0.3 },
+          }),
         });
         clearTimeout(ollamaTimeout);
         if (parentSignal?.aborted) return;
 
         if (ollamaResponse.ok) {
-          const data = await ollamaResponse.json();
-          const content = (data.message?.content || '').trim();
+          interface OllamaResponse {
+            message?: { content?: string };
+            model?: string;
+            total_duration?: number;
+            eval_count?: number;
+            prompt_eval_count?: number;
+          }
+          const data = await ollamaResponse.json() as OllamaResponse;
+          const content = (data.message?.content ?? '').trim();
           if (parentSignal?.aborted) return;
           setAiMeta({
-            model: data.model || 'qwen3.5:4b',
+            model: data.model ?? 'qwen3.5:4b',
             totalDuration: data.total_duration ? (data.total_duration / 1e9).toFixed(1) : null,
-            evalCount: data.eval_count || null,
-            promptTokens: data.prompt_eval_count || null,
+            evalCount: data.eval_count ?? null,
+            promptTokens: data.prompt_eval_count ?? null,
           });
           if (content.length > 10) {
             setAiAlert(`${offlineNotice}${ruleAnalysis}\n\n🤖 IA: ${content}`);
@@ -465,18 +474,17 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         }
       } catch (llmErr) {
         if (parentSignal?.aborted) return;
-        console.warn('[Telemetry] IA no disponible:', llmErr.message);
+        console.warn('[Telemetry] IA no disponible:', (llmErr as Error).message);
         setAiStatus('error');
       }
 
     } catch (err) {
-      setError(err.message);
+      setError((err as Error).message);
 
-      // Inyectar tarea de revisión física con idempotencia persistente por (telemetria_global, fallo_general).
       try {
         const sensorId = 'telemetria_global';
         const alertType = 'fallo_general';
-        const lastTrigger = await assetCache.getAlertCooldown(sensorId, alertType);
+        const lastTrigger = await assetCache.getAlertCooldown(sensorId, alertType) as number;
         if (Date.now() - lastTrigger >= COOLDOWN_MS) {
           const taskPayload = {
             data: {
@@ -485,7 +493,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
                 name: 'Revisión física de sensor offline',
                 timestamp: Math.floor(Date.now() / 1000),
                 status: 'pending',
-                notes: { value: `Error de telemetría: "${err.message}". Revisar alimentación y conectividad de sensores Zigbee en Home Assistant. Verificar también disponibilidad de Ollama.` },
+                notes: { value: `Error de telemetría: "${(err as Error).message}". Revisar alimentación y conectividad de sensores Zigbee en Home Assistant.` },
               },
               relationships: {
                 location: {
@@ -505,7 +513,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
 
           window.dispatchEvent(new CustomEvent('taskAdded'));
         } else {
-          console.warn(`[Telemetry] Fallo general suprimido por cooldown.`);
+          console.warn('[Telemetry] Fallo general suprimido por cooldown.');
         }
       } catch (txErr) {
         console.error('Error inyectando tarea de revisión:', txErr);
@@ -517,8 +525,9 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
 
   useEffect(() => {
     const ctrl = new AbortController();
-    fetchTelemetryAndAnalyze(ctrl.signal);
+    void fetchTelemetryAndAnalyze(ctrl.signal);
     return () => ctrl.abort();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -571,11 +580,11 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
           <div className="flex gap-3 mt-2 pt-2 border-t border-slate-700/50">
             <div className="flex-1 flex items-center gap-2">
               <span className="text-slate-500 text-2xs font-mono shrink-0">H%</span>
-              <Sparkline data={sensorHistory['sensor.arteco_zs_304z_humidity']} color="#3b82f6" />
+              <Sparkline data={sensorHistory['sensor.arteco_zs_304z_humidity'] as { state: string | number }[] | undefined} color="#3b82f6" />
             </div>
             <div className="flex-1 flex items-center gap-2">
               <span className="text-slate-500 text-2xs font-mono shrink-0">T°</span>
-              <Sparkline data={sensorHistory['sensor.arteco_zs_304z_temperature']} color="#f97316" />
+              <Sparkline data={sensorHistory['sensor.arteco_zs_304z_temperature'] as { state: string | number }[] | undefined} color="#f97316" />
             </div>
           </div>
         </div>
@@ -604,11 +613,11 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
           <div className="flex gap-3 mt-2 pt-2 border-t border-slate-700/50">
             <div className="flex-1 flex items-center gap-2">
               <span className="text-slate-500 text-2xs font-mono shrink-0">H%</span>
-              <Sparkline data={sensorHistory['sensor.hobeian_zg_303z_humidity']} color="#3b82f6" />
+              <Sparkline data={sensorHistory['sensor.hobeian_zg_303z_humidity'] as { state: string | number }[] | undefined} color="#3b82f6" />
             </div>
             <div className="flex-1 flex items-center gap-2">
               <span className="text-slate-500 text-2xs font-mono shrink-0">T°</span>
-              <Sparkline data={sensorHistory['sensor.hobeian_zg_303z_temperature']} color="#f97316" />
+              <Sparkline data={sensorHistory['sensor.hobeian_zg_303z_temperature'] as { state: string | number }[] | undefined} color="#f97316" />
             </div>
           </div>
         </div>
@@ -676,7 +685,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
       </div>
 
       <button
-        onClick={() => fetchTelemetryAndAnalyze()}
+        onClick={() => void fetchTelemetryAndAnalyze()}
         disabled={loading}
         className="mt-6 w-full p-4 rounded-2xl bg-slate-800 hover:bg-slate-700 active:bg-slate-600 transition-all border border-slate-600 font-bold text-slate-300 flex items-center justify-center gap-3 disabled:opacity-50"
       >

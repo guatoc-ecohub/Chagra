@@ -9,8 +9,7 @@
     "exactOptionalPropertyTypes": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "outDir": "dist",
-    "allowJs": true,
-    "skipLibCheck": true,
+"skipLibCheck": true,
     "paths": { "@/*": ["./src/*"] }
   },
   "include": ["src"],

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { X, MapPin, LocateFixed, Check, Undo2 } from 'lucide-react';
@@ -7,40 +7,51 @@ import { latLngToPoint, latLngsToPolygon } from '../utils/geo';
 /**
  * MapPicker — Modal de selección/dibujo de geometría (Fase 17.3).
  *
- * Soporta dos modos:
- *   - mode="point":   click en el mapa o botón "Usar mi ubicación" → POINT.
- *   - mode="polygon": click para añadir vértices; botón "Finalizar" cierra el ring.
- *
- * Tiles se cargan desde /tiles/{z}/{x}/{y}.png (servidos por Nginx desde
- * /mnt/fast/appdata/farmos-pwa/tiles para operación offline). Si el Service
- * Worker no ha cacheado los tiles o no existen, Leaflet mostrará el layer
- * vacío — la geometría sigue siendo dibujable y persistible.
- *
  * Props:
  *   - mode:       "point" | "polygon"
  *   - initial:    GeoJSON geometry opcional para pre-cargar
  *   - onSave:     callback(geoJsonGeometry)
  *   - onCancel:   callback()
- *   - center:     [lat, lng] opcional, default finca principal aproximado
+ *   - center:     [lat, lng] opcional
  */
 
-// Centro por defecto: Choachí, Cundinamarca (área aproximada finca principal).
-// Se sobreescribe por `center` prop o por la primera geolocalización.
-const DEFAULT_CENTER = [4.5306, -73.9247];
+interface GeoPoint {
+  type: 'Point';
+  coordinates: [number, number];
+}
+
+interface GeoPolygon {
+  type: 'Polygon';
+  coordinates: [number, number][][];
+}
+
+export type GeoGeometry = GeoPoint | GeoPolygon | null;
+
+interface MapPickerProps {
+  mode?: 'point' | 'polygon';
+  initial?: GeoGeometry;
+  onSave: (geometry: GeoGeometry) => void;
+  onCancel: () => void;
+  center?: [number, number];
+}
+
+const DEFAULT_CENTER: [number, number] = [4.5306, -73.9247];
 const DEFAULT_ZOOM = 17;
 
-export const MapPicker = ({
+void FARM_CONFIG; // used indirectly via config/defaults
+
+export const MapPicker: React.FC<MapPickerProps> = ({
   mode = 'point',
   initial = null,
   onSave,
   onCancel,
   center = DEFAULT_CENTER,
 }) => {
-  const containerRef = useRef(null);
-  const mapRef = useRef(null);
-  const layerRef = useRef(null); // capa de la geometría dibujada
-  const [points, setPoints] = useState([]); // polígono en construcción
-  const [marker, setMarker] = useState(null); // punto actual
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const layerRef = useRef<L.Layer | null>(null);
+  const [points, setPoints] = useState<L.LatLng[]>([]);
+  const [marker, setMarker] = useState<L.LatLng | null>(null);
 
   // Inicializar Leaflet una sola vez al montar
   useEffect(() => {
@@ -53,7 +64,6 @@ export const MapPicker = ({
       attributionControl: false,
     });
 
-    // Tiles OSM con subdominios; fallback SVG offline para tiles no resueltos.
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       subdomains: ['a', 'b', 'c'],
       maxZoom: 19,
@@ -71,19 +81,19 @@ export const MapPicker = ({
         const [lng, lat] = initial.coordinates;
         const m = L.marker([lat, lng]).addTo(map);
         layerRef.current = m;
-        setMarker({ lat, lng });
+        setMarker(L.latLng(lat, lng));
         map.setView([lat, lng], DEFAULT_ZOOM);
       } else if (initial.type === 'Polygon') {
-        const ring = initial.coordinates[0].map(([lng, lat]) => [lat, lng]);
+        const ring = initial.coordinates[0]?.map(([lng, lat]) => [lat, lng] as L.LatLngTuple) ?? [];
         const poly = L.polygon(ring, { color: '#3b82f6' }).addTo(map);
         layerRef.current = poly;
-        setPoints(ring.map(([lat, lng]) => ({ lat, lng })));
+        setPoints(ring.map(([lat, lng]) => L.latLng(lat, lng)));
         map.fitBounds(poly.getBounds());
       }
     }
 
     // Click handler según modo
-    const onClick = (e) => {
+    const onClick = (e: L.LeafletMouseEvent) => {
       if (mode === 'point') {
         if (layerRef.current) map.removeLayer(layerRef.current);
         const m = L.marker(e.latlng).addTo(map);
@@ -114,6 +124,7 @@ export const MapPicker = ({
   const handleFinishPolygon = () => {
     if (points.length < 3) return;
     const map = mapRef.current;
+    if (!map) return;
     if (layerRef.current) map.removeLayer(layerRef.current);
     const poly = L.polygon(points, { color: '#3b82f6', fillOpacity: 0.2 }).addTo(map);
     layerRef.current = poly;
@@ -124,6 +135,7 @@ export const MapPicker = ({
     const next = points.slice(0, -1);
     setPoints(next);
     const map = mapRef.current;
+    if (!map) return;
     if (layerRef.current) {
       map.removeLayer(layerRef.current);
       layerRef.current = null;
@@ -140,9 +152,10 @@ export const MapPicker = ({
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const latlng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        const latlng = L.latLng(pos.coords.latitude, pos.coords.longitude);
         const map = mapRef.current;
-        map.setView([latlng.lat, latlng.lng], DEFAULT_ZOOM);
+        if (!map) return;
+        map.setView(latlng, DEFAULT_ZOOM);
         if (mode === 'point') {
           if (layerRef.current) map.removeLayer(layerRef.current);
           const m = L.marker(latlng).addTo(map);
@@ -160,10 +173,10 @@ export const MapPicker = ({
   const handleSave = () => {
     if (mode === 'point') {
       if (!marker) return;
-      onSave(latLngToPoint(marker));
+      onSave(latLngToPoint(marker) as GeoPoint);
     } else if (mode === 'polygon') {
       if (points.length < 3) return;
-      onSave(latLngsToPolygon(points));
+      onSave(latLngsToPolygon(points) as GeoPolygon);
     }
   };
 

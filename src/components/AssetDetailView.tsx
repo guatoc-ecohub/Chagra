@@ -1,16 +1,17 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { X, Calendar, Tag, Activity, MapPin } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import AssetTimeline from './AssetTimeline';
 import { InputLogForm } from './InputLogForm';
-import MapPicker from './MapPicker';
+import MapPicker, { type GeoGeometry } from './MapPicker';
 import { useAssetPerformance } from '../hooks/useAssetPerformance';
 import { MATERIAL_CATEGORIES } from '../config/materials';
 import { geoJsonToWkt, wktToGeoJson } from '../utils/geo';
 import { proximityCheck, findNearestLand, checkInvasiveProximity, getCoords } from '../utils/spatialAnalysis';
+import type { FarmOSEnrichedAsset, AssetType } from '../types';
 
 // Panel de bio-eficiencia (Fase 15.3 / extendido 16.3).
-const PerformancePanel = ({ assetId }) => {
+const PerformancePanel = ({ assetId }: { assetId: string }) => {
   const {
     globalRatio,
     byCategory,
@@ -43,7 +44,7 @@ const PerformancePanel = ({ assetId }) => {
         </div>
       </div>
 
-      <CategoryBreakdown byCategory={byCategory} totalHarvestWeight={totalHarvestWeight} />
+      <CategoryBreakdown byCategory={byCategory} />
 
       <p className="text-[10px] text-slate-400 leading-tight italic">
         * Ratios normalizados a kg/l base decimal. La categoría "Biofábrica" agrupa materias
@@ -53,8 +54,10 @@ const PerformancePanel = ({ assetId }) => {
   );
 };
 
+interface CategoryData { count: number; total: number; ratio: number | string; }
+
 // Desglose por categoría agroecológica (Fase 16.3).
-const CategoryBreakdown = ({ byCategory }) => {
+const CategoryBreakdown = ({ byCategory }: { byCategory: Record<string, CategoryData> }) => {
   // Máximo total entre categorías no-biofabrica para escalar las barras.
   const maxTotal = Math.max(
     ...Object.entries(byCategory)
@@ -73,7 +76,7 @@ const CategoryBreakdown = ({ byCategory }) => {
       </h4>
       <div className="space-y-2">
         {visibleCategories.map(([catId, data]) => {
-          const meta = MATERIAL_CATEGORIES[catId];
+          const meta = MATERIAL_CATEGORIES[catId as keyof typeof MATERIAL_CATEGORIES];
           const pct = catId === 'biofabrica' ? 0 : Math.min((data.total / maxTotal) * 100, 100);
           return (
             <div key={catId} className="space-y-1">
@@ -81,10 +84,10 @@ const CategoryBreakdown = ({ byCategory }) => {
                 <div className="flex items-center gap-2 min-w-0">
                   <span
                     className="w-2 h-2 rounded-full shrink-0"
-                    style={{ backgroundColor: meta?.color || '#64748b' }}
+                    style={{ backgroundColor: (meta as { color?: string } | undefined)?.color || '#64748b' }}
                     aria-hidden="true"
                   />
-                  <span className="text-xs text-slate-300 truncate">{meta?.label || catId}</span>
+                  <span className="text-xs text-slate-300 truncate">{(meta as { label?: string } | undefined)?.label || catId}</span>
                 </div>
                 <div className="flex items-center gap-3 shrink-0 text-[11px] tabular-nums">
                   <span className="text-slate-500">
@@ -99,7 +102,7 @@ const CategoryBreakdown = ({ byCategory }) => {
                 <div className="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
                   <div
                     className="h-full transition-all"
-                    style={{ width: `${pct}%`, backgroundColor: meta?.color || '#64748b' }}
+                    style={{ width: `${pct}%`, backgroundColor: (meta as { color?: string } | undefined)?.color || '#64748b' }}
                   />
                 </div>
               )}
@@ -113,12 +116,6 @@ const CategoryBreakdown = ({ byCategory }) => {
 
 /**
  * AssetDetailView — panel lateral de detalle de un activo (Fase 12.2).
- *
- * Consume `selectedAssetId` desde el store global. Busca el asset en las
- * cuatro colecciones segmentadas (plants/structures/equipment/materials)
- * y renderiza metadatos, formulario de insumo y línea de tiempo.
- *
- * Drawer full-height derecho, optimizado para operario en campo con móvil.
  */
 export const AssetDetailView = () => {
   const selectedAssetId = useAssetStore((s) => s.selectedAssetId);
@@ -130,15 +127,14 @@ export const AssetDetailView = () => {
   const clearSelectedAsset = useAssetStore((s) => s.clearSelectedAsset);
   const updateAsset = useAssetStore((s) => s.updateAsset);
 
-  const [showGeoPicker, setShowGeoPicker] = useState(false);
-  const [geoSaving, setGeoSaving] = useState(false);
+  const [showGeoPicker, setShowGeoPicker] = useState<boolean>(false);
+  const [geoSaving, setGeoSaving] = useState<boolean>(false);
 
-  // T4: useMemo para evitar recrear el spread de arrays en cada render
-  const asset = useMemo(() => {
+  const asset = useMemo((): FarmOSEnrichedAsset | null => {
     if (!selectedAssetId) return null;
-    return [...plants, ...structures, ...equipment, ...materials, ...lands].find(
+    return ([...plants, ...structures, ...equipment, ...materials, ...lands] as FarmOSEnrichedAsset[]).find(
       (a) => a.id === selectedAssetId
-    );
+    ) ?? null;
   }, [selectedAssetId, plants, structures, equipment, materials, lands]);
 
   if (!selectedAssetId || !asset) return null;
@@ -146,15 +142,15 @@ export const AssetDetailView = () => {
   // Normalización de campos JSON:API vs shape optimista local
   const name = asset.attributes?.name || asset.name || 'Sin nombre';
   const notesRaw = asset.attributes?.notes;
-  const notesText = typeof notesRaw === 'object' ? notesRaw?.value : notesRaw;
+  const notesText = typeof notesRaw === 'object' ? (notesRaw as { value?: string })?.value : notesRaw;
   const status = asset.attributes?.status || 'active';
   const createdTs = asset.attributes?.created || asset._createdAt
     ? (asset.attributes?.created
-        ? new Date(asset.attributes.created * 1000)
-        : new Date(asset._createdAt))
+        ? new Date((asset.attributes.created as number) * 1000)
+        : new Date(asset._createdAt as number))
     : null;
   const assetTypeLabel = (() => {
-    const t = asset.asset_type || asset.type || '';
+    const t = asset.asset_type || (asset.type ?? '') as string;
     if (t.includes('plant')) return 'Cultivo';
     if (t.includes('structure')) return 'Infraestructura';
     if (t.includes('equipment')) return 'Herramienta';
@@ -163,11 +159,11 @@ export const AssetDetailView = () => {
     return t || 'Activo';
   })();
 
-  const isPlantType = (asset.asset_type || asset.type || '').includes('plant');
+  const isPlantType = (asset.asset_type || (asset.type ?? '') as string).includes('plant');
 
   // Geometría actual para pre-cargar en MapPicker
   const geoRaw = asset.attributes?.intrinsic_geometry;
-  const geoWkt = typeof geoRaw === 'object' ? geoRaw?.value : geoRaw;
+  const geoWkt = typeof geoRaw === 'object' ? (geoRaw as { value?: string })?.value : geoRaw;
   const currentGeo = geoWkt ? wktToGeoJson(geoWkt) : null;
 
   return (
@@ -242,7 +238,7 @@ export const AssetDetailView = () => {
           />
 
           {/* Acción de campo: registro de insumo — solo aplica a plants */}
-          {(asset.asset_type === 'plant' || asset.type?.includes('plant')) && (
+          {(asset.asset_type === 'plant' || (asset.type as string | undefined)?.includes('plant')) && (
             <>
               <section>
                 <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4 px-1">
@@ -274,7 +270,7 @@ export const AssetDetailView = () => {
       {showGeoPicker && (
         <MapPicker
           mode={isPlantType ? 'point' : 'polygon'}
-          initial={currentGeo}
+          initial={currentGeo as GeoGeometry}
           onCancel={() => setShowGeoPicker(false)}
           onSave={async (geometry) => {
             setShowGeoPicker(false);
@@ -283,7 +279,7 @@ export const AssetDetailView = () => {
               // Proximity check via GPS
               if (navigator.geolocation) {
                 try {
-                  const gpsPos = await new Promise((res, rej) =>
+                  const gpsPos = await new Promise<GeolocationPosition>((res, rej) =>
                     navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 5000 })
                   );
                   const { distance, isClose } = proximityCheck(gpsPos, geometry);
@@ -294,16 +290,16 @@ export const AssetDetailView = () => {
                     if (!confirm) { setGeoSaving(false); return; }
                   }
                 } catch (gpsErr) {
-                  console.warn('[Geo] GPS no disponible para proximity check:', gpsErr.message);
+                  console.warn('[Geo] GPS no disponible para proximity check:', (gpsErr as Error).message);
                 }
               }
 
               // Alerta de invasoras
               const coords = getCoords(geometry);
               if (coords) {
-                const invasiveAlerts = checkInvasiveProximity(coords, plants);
+                const invasiveAlerts = checkInvasiveProximity(coords, plants as FarmOSEnrichedAsset[]);
                 if (invasiveAlerts.length > 0) {
-                  const names = invasiveAlerts.map((a) => a.asset.attributes?.name || a.asset.name).join(', ');
+                  const names = invasiveAlerts.map((a) => (a as unknown as { asset: FarmOSEnrichedAsset }).asset.attributes?.name || (a as unknown as { asset: FarmOSEnrichedAsset }).asset.name).join(', ');
                   window.alert(`⚠ Posible rebrote de especie invasora detectado a menos de 10m: ${names}`);
                 }
               }
@@ -319,19 +315,22 @@ export const AssetDetailView = () => {
 
               // Auto-fix de zona: si el asset no tiene parent, sugerir la más cercana
               const assetType = resolveAssetType(asset);
-              const hasParent = asset.relationships?.parent?.data?.length > 0 || asset.relationships?.location?.data?.length > 0;
+              const relParent = (asset.relationships?.parent as { data?: unknown[] } | undefined)?.data;
+              const relLocation = (asset.relationships?.location as { data?: unknown[] } | undefined)?.data;
+              const hasParent = (Array.isArray(relParent) && relParent.length > 0) || (Array.isArray(relLocation) && relLocation.length > 0);
               if (!hasParent && coords) {
-                const nearest = findNearestLand(wkt, lands);
-                if (nearest && nearest.distance < 200) {
-                  const zName = nearest.land.attributes?.name || nearest.land.name;
+                const nearest = findNearestLand(wkt, lands as FarmOSEnrichedAsset[]);
+                if (nearest && (nearest as unknown as { distance: number }).distance < 200) {
+                  const nearestLand = (nearest as unknown as { land: FarmOSEnrichedAsset }).land;
+                  const zName = nearestLand.attributes?.name || nearestLand.name;
                   const confirmLink = window.confirm(
-                    `Este activo no tiene zona asignada. ¿Vincularlo a "${zName}" (${nearest.distance}m)?`
+                    `Este activo no tiene zona asignada. ¿Vincularlo a "${zName}" (${(nearest as unknown as { distance: number }).distance}m)?`
                   );
                   if (confirmLink) {
-                    updatedAsset.relationships = {
-                      ...updatedAsset.relationships,
-                      parent: { data: [{ type: 'asset--land', id: nearest.land.id }] },
-                      location: { data: [{ type: 'asset--land', id: nearest.land.id }] },
+                    (updatedAsset as FarmOSEnrichedAsset).relationships = {
+                      ...asset.relationships,
+                      parent: { data: [{ type: 'asset--land', id: nearestLand.id }] },
+                      location: { data: [{ type: 'asset--land', id: nearestLand.id }] },
                     };
                   }
                 }
@@ -351,7 +350,7 @@ export const AssetDetailView = () => {
                   },
                 },
               };
-              await updateAsset(assetType, updatedAsset, [pendingTx]);
+              await updateAsset(assetType as AssetType, updatedAsset as FarmOSEnrichedAsset, [pendingTx]);
               window.dispatchEvent(new CustomEvent('syncComplete', {
                 detail: { message: 'Geometría actualizada.' },
               }));
@@ -372,14 +371,14 @@ export const AssetDetailView = () => {
 };
 
 // Subcomponente: sección de geometría con botón de edición.
-const GeometrySection = ({ asset, onEdit, saving }) => {
+const GeometrySection = ({ asset, onEdit, saving }: { asset: FarmOSEnrichedAsset; onEdit: () => void; saving: boolean }) => {
   const geoRaw = asset.attributes?.intrinsic_geometry;
-  const wkt = typeof geoRaw === 'object' ? geoRaw?.value : geoRaw;
+  const wkt = typeof geoRaw === 'object' ? (geoRaw as { value?: string })?.value : geoRaw;
   const hasGeo = !!wkt;
 
   // Preview legible del tipo de geometría
   let preview = 'Sin ubicación registrada';
-  if (hasGeo) {
+  if (hasGeo && wkt) {
     if (wkt.startsWith('POINT')) {
       const match = wkt.match(/POINT\s*\(([\d.-]+)\s+([\d.-]+)\)/);
       if (match) preview = `Punto: ${Number(match[2]).toFixed(5)}°N, ${Number(match[1]).toFixed(5)}°W`;
@@ -417,8 +416,8 @@ const GeometrySection = ({ asset, onEdit, saving }) => {
 };
 
 // Helpers locales del componente.
-const resolveAssetType = (asset) => {
-  const t = asset.asset_type || asset.type || '';
+const resolveAssetType = (asset: FarmOSEnrichedAsset): string => {
+  const t = asset.asset_type || (asset.type ?? '') as string;
   if (t.includes('plant')) return 'plant';
   if (t.includes('structure')) return 'structure';
   if (t.includes('equipment')) return 'equipment';

@@ -12,6 +12,7 @@ import SpeciesSelect from './SpeciesSelect';
 import GuildSuggestions from './GuildSuggestions';
 import { geoJsonToWkt } from '../utils/geo';
 import { MapPin, LocateFixed } from 'lucide-react';
+import type { FarmOSEnrichedAsset } from '../types';
 
 // Catálogos de dominio agroecológico
 const STRUCTURE_EXAMPLES = [
@@ -33,8 +34,6 @@ const EQUIPMENT_EXAMPLES = [
   'Rastrillo',
 ];
 
-// Accesos rápidos derivados de CROP_TAXONOMY (fuente única de verdad).
-// Ajustar la lista según frecuencia real de uso en campo.
 const QUICK_PRESET_IDS = [
   'lactuca_sativa',
   'solanum_tuberosum_pastusa',
@@ -69,7 +68,10 @@ const ASSET_TABS = [
   { id: 'structure', label: 'Infraestructura', icon: Building2, color: 'emerald' },
   { id: 'equipment', label: 'Herramientas', icon: Wrench, color: 'orange' },
   { id: 'material', label: 'Insumos', icon: Leaf, color: 'sky' },
-];
+] as const;
+
+type TabId = typeof ASSET_TABS[number]['id'];
+type TabColor = typeof ASSET_TABS[number]['color'];
 
 const LAND_TYPES = [
   { value: 'field', label: 'Lote / Campo abierto' },
@@ -81,9 +83,55 @@ const LAND_TYPES = [
 
 const DEFAULT_LOCATION_ID = FARM_CONFIG.LOCATION_ID;
 
-// Helpers puros para construcción de payloads JSON:API
-const formatNotes = (formData) => {
-  const parts = [];
+type GeoJsonGeometry = { type: string; coordinates: unknown } | null;
+
+interface FormState {
+  name: string;
+  notes: string;
+  status: string;
+  plantType: string;
+  estrato: string;
+  gremio: string;
+  quantity: string;
+  parentLandId: string;
+  geometry: GeoJsonGeometry;
+  landType: string;
+  speciesId: string | null;
+}
+
+const INITIAL_FORM_STATE: FormState = {
+  name: '', notes: '', status: 'active',
+  plantType: '', estrato: '', gremio: '', quantity: '',
+  parentLandId: '',
+  geometry: null,
+  landType: 'field',
+  speciesId: null,
+};
+
+const colorMap: Record<TabColor, { bg: string; border: string; text: string; light: string }> = {
+  lime: { bg: 'bg-lime-600', border: 'border-lime-500', text: 'text-lime-400', light: 'bg-lime-900/30' },
+  emerald: { bg: 'bg-emerald-600', border: 'border-emerald-500', text: 'text-emerald-400', light: 'bg-emerald-900/30' },
+  orange: { bg: 'bg-orange-600', border: 'border-orange-500', text: 'text-orange-400', light: 'bg-orange-900/30' },
+  sky: { bg: 'bg-sky-600', border: 'border-sky-500', text: 'text-sky-400', light: 'bg-sky-900/30' },
+  amber: { bg: 'bg-amber-700', border: 'border-amber-600', text: 'text-amber-400', light: 'bg-amber-900/30' },
+};
+
+const TAB_LABELS: Record<TabId, string> = {
+  plant: 'Siembra',
+  land: 'Zona',
+  structure: 'Infraestructura',
+  equipment: 'Herramienta',
+  material: 'Insumo',
+};
+
+interface HarvestData {
+  yield: string;
+  unit: string;
+  notes: string;
+}
+
+const formatNotes = (formData: FormState): { value: string } | null => {
+  const parts: string[] = [];
   if (formData.notes) parts.push(formData.notes);
   if (formData.estrato) {
     const label = ESTRATO_OPTIONS.find((e) => e.value === formData.estrato)?.label || formData.estrato;
@@ -96,7 +144,7 @@ const formatNotes = (formData) => {
   return parts.length > 0 ? { value: parts.join(' | ') } : null;
 };
 
-const buildSeedingPayload = (seedingId, assetUUID, formData) => {
+const buildSeedingPayload = (seedingId: string, assetUUID: string, formData: FormState) => {
   const qty = parseInt(formData.quantity, 10) || 1;
   return {
     data: {
@@ -126,66 +174,50 @@ const buildSeedingPayload = (seedingId, assetUUID, formData) => {
   };
 };
 
-const INITIAL_FORM_STATE = {
-  name: '', notes: '', status: 'active',
-  plantType: '', estrato: '', gremio: '', quantity: '',
-  parentLandId: '', // Fase 17: zona contenedora obligatoria
-  geometry: null,   // Fase 17: GeoJSON dibujado o geolocalizado
-  landType: 'field', // Fase 17.2: sub_type para asset--land
-  speciesId: null,   // Fase 18: id para motor de gremios
-};
+interface AssetsDashboardProps {
+  onBack: () => void;
+}
 
-const colorMap = {
-  lime: { bg: 'bg-lime-600', border: 'border-lime-500', text: 'text-lime-400', light: 'bg-lime-900/30' },
-  emerald: { bg: 'bg-emerald-600', border: 'border-emerald-500', text: 'text-emerald-400', light: 'bg-emerald-900/30' },
-  orange: { bg: 'bg-orange-600', border: 'border-orange-500', text: 'text-orange-400', light: 'bg-orange-900/30' },
-  sky: { bg: 'bg-sky-600', border: 'border-sky-500', text: 'text-sky-400', light: 'bg-sky-900/30' },
-  amber: { bg: 'bg-amber-700', border: 'border-amber-600', text: 'text-amber-400', light: 'bg-amber-900/30' },
-};
-
-const TAB_LABELS = {
-  plant: 'Siembra',
-  land: 'Zona',
-  structure: 'Infraestructura',
-  equipment: 'Herramienta',
-  material: 'Insumo',
-};
-
-export default function AssetsDashboard({ onBack }) {
+export default function AssetsDashboard({ onBack }: AssetsDashboardProps) {
   const {
-    plants, structures, equipment, materials, lands,
+    plants: plantsRaw, structures: structuresRaw, equipment: equipmentRaw, materials: materialsRaw, lands: landsRaw,
     isLoading, error, lastSync,
     hydrate, syncFromServer, addAsset, removeAsset, addHarvestLog,
     setSelectedAsset,
   } = useAssetStore();
 
-  const [showMapPicker, setShowMapPicker] = useState(false);
-  const [currentZoneId, setCurrentZoneId] = useState(null); // drill-down Fase 17.2
-  const [viewMode, setViewMode] = useState('list'); // 'list' | 'map' (Fase 17.3)
+  const plants = plantsRaw as unknown as FarmOSEnrichedAsset[];
+  const structures = structuresRaw as unknown as FarmOSEnrichedAsset[];
+  const equipment = equipmentRaw as unknown as FarmOSEnrichedAsset[];
+  const materials = materialsRaw as unknown as FarmOSEnrichedAsset[];
+  const lands = landsRaw as unknown as FarmOSEnrichedAsset[];
 
-  const [activeTab, setActiveTab] = useState('plant');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showForm, setShowForm] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [formData, setFormData] = useState(INITIAL_FORM_STATE);
+  const [showMapPicker, setShowMapPicker] = useState<string | false>(false);
+  const [currentZoneId, setCurrentZoneId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
-  // Estado local del formulario de cosecha scoped por asset.id
-  const [activeHarvestId, setActiveHarvestId] = useState(null);
-  const [harvestData, setHarvestData] = useState({ yield: '', unit: 'kg', notes: '' });
+  const [activeTab, setActiveTab] = useState<TabId>('plant');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [showForm, setShowForm] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [formData, setFormData] = useState<FormState>(INITIAL_FORM_STATE);
+
+  const [activeHarvestId, setActiveHarvestId] = useState<string | null>(null);
+  const [harvestData, setHarvestData] = useState<HarvestData>({ yield: '', unit: 'kg', notes: '' });
 
   const resetHarvestForm = () => {
     setActiveHarvestId(null);
     setHarvestData({ yield: '', unit: 'kg', notes: '' });
   };
 
-  const submitHarvest = async (asset) => {
+  const submitHarvest = async (asset: FarmOSEnrichedAsset) => {
     const cropName = asset.attributes?.name || asset.name || 'Cultivo';
     setIsSaving(true);
     try {
       await addHarvestLog(asset.id, { ...harvestData, cropName });
       resetHarvestForm();
-    } catch (error) {
-      console.error('[UI] Error al registrar cosecha:', error);
+    } catch (err) {
+      console.error('[UI] Error al registrar cosecha:', err);
       window.dispatchEvent(new CustomEvent('syncError', {
         detail: { message: 'Error local al guardar la cosecha. Verifique el almacenamiento de su dispositivo.' }
       }));
@@ -198,28 +230,29 @@ export default function AssetsDashboard({ onBack }) {
     const init = async () => {
       await hydrate();
       if (navigator.onLine) {
-        syncFromServer(fetchFromFarmOS);
+        syncFromServer(fetchFromFarmOS as Parameters<typeof syncFromServer>[0]);
       }
     };
     init();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Extrae el id del parent land desde las relationships JSON:API del asset.
-  const getParentLandId = (asset) => {
-    const rel = asset.relationships?.parent?.data || asset.relationships?.location?.data;
-    if (Array.isArray(rel)) return rel[0]?.id || null;
-    return rel?.id || null;
+  const getParentLandId = (asset: FarmOSEnrichedAsset): string | null => {
+    const parentRel = asset.relationships?.['parent'];
+    const locationRel = asset.relationships?.['location'];
+    const relObj = (parentRel as { data?: unknown } | undefined) || (locationRel as { data?: unknown } | undefined);
+    const rel = relObj?.data;
+    if (Array.isArray(rel)) return (rel[0] as { id?: string })?.id ?? null;
+    return (rel as { id?: string } | null | undefined)?.id ?? null;
   };
 
-  const getAssetsForTab = () => {
-    let list = activeTab === 'plant' ? plants
+  const getAssetsForTab = (): FarmOSEnrichedAsset[] => {
+    let list: FarmOSEnrichedAsset[] = activeTab === 'plant' ? plants
       : activeTab === 'land' ? lands
       : activeTab === 'structure' ? structures
       : activeTab === 'equipment' ? equipment
       : materials;
 
-    // Drill-down: para plants, si hay zona seleccionada, filtrar por parent.
-    // '__all__' = modo "ver todos" sin filtro de zona.
     if (activeTab === 'plant' && currentZoneId && currentZoneId !== '__all__') {
       list = list.filter((p) => getParentLandId(p) === currentZoneId);
     }
@@ -232,8 +265,7 @@ export default function AssetsDashboard({ onBack }) {
     });
   };
 
-  // Activos tipo land filtrados para la vista de zonas (drill-down raíz).
-  const getZonesForDrillDown = () => {
+  const getZonesForDrillDown = (): FarmOSEnrichedAsset[] => {
     if (!searchQuery) return lands;
     const q = searchQuery.toLowerCase();
     return lands.filter((l) => (l.attributes?.name || l.name || '').toLowerCase().includes(q));
@@ -252,27 +284,31 @@ export default function AssetsDashboard({ onBack }) {
     const assetUUID = crypto.randomUUID();
     const notesValue = formatNotes(formData);
 
-    // 1. Construcción del payload del asset
-    const assetAttributes = {
+    const assetAttributes: Record<string, unknown> = {
       name: formData.name,
       status: formData.status || 'active',
       ...(notesValue ? { notes: notesValue } : {}),
     };
 
-    // Fase 17: geometría opcional (WKT para FarmOS intrinsic_geometry)
     if (formData.geometry) {
-      const wkt = geoJsonToWkt(formData.geometry);
+      const wkt = geoJsonToWkt(formData.geometry as Parameters<typeof geoJsonToWkt>[0]);
       if (wkt) {
-        assetAttributes.intrinsic_geometry = { value: wkt };
+        assetAttributes['intrinsic_geometry'] = { value: wkt };
       }
     }
 
-    // Fase 17.2: sub_type para asset--land (field/bed/greenhouse/...)
     if (activeTab === 'land' && formData.landType) {
-      assetAttributes.land_type = formData.landType;
+      assetAttributes['land_type'] = formData.landType;
     }
 
-    const assetPayload = {
+    const assetPayload: {
+      data: {
+        type: string;
+        id: string;
+        attributes: Record<string, unknown>;
+        relationships?: Record<string, unknown>;
+      };
+    } = {
       data: {
         type: `asset--${activeTab}`,
         id: assetUUID,
@@ -280,7 +316,6 @@ export default function AssetsDashboard({ onBack }) {
       },
     };
 
-    // Relaciones opcionales (preservadas + Fase 17 jerarquía)
     if (activeTab !== 'material') {
       const parentLandId = formData.parentLandId || DEFAULT_LOCATION_ID;
       assetPayload.data.relationships = {
@@ -289,8 +324,8 @@ export default function AssetsDashboard({ onBack }) {
       };
     }
     if (activeTab === 'plant' && formData.plantType) {
-      assetPayload.data.relationships = assetPayload.data.relationships || {};
-      assetPayload.data.relationships.plant_type = {
+      assetPayload.data.relationships = assetPayload.data.relationships ?? {};
+      assetPayload.data.relationships['plant_type'] = {
         data: [{
           type: 'taxonomy_term--plant_type',
           attributes: { name: formData.plantType },
@@ -298,8 +333,7 @@ export default function AssetsDashboard({ onBack }) {
       };
     }
 
-    // 2. Lista de pendientes para el commit atómico del store
-    const pendingTxs = [{
+    const pendingTxs: unknown[] = [{
       id: assetUUID,
       type: `asset_${activeTab}`,
       endpoint: `/api/asset/${activeTab}`,
@@ -307,7 +341,6 @@ export default function AssetsDashboard({ onBack }) {
       method: 'POST',
     }];
 
-    // Macro-transacción: plant + log--seeding con referencia cruzada por UUID
     if (activeTab === 'plant') {
       const seedingId = crypto.randomUUID();
       pendingTxs.push({
@@ -319,25 +352,26 @@ export default function AssetsDashboard({ onBack }) {
       });
     }
 
-    // 3. Ejecución atómica vía store
     try {
-      const optimisticAsset = {
+      const optimisticAsset: FarmOSEnrichedAsset = {
         id: assetUUID,
+        name: formData.name,
+        asset_type: activeTab,
+        cached_at: Date.now(),
         type: `asset--${activeTab}`,
         attributes: assetAttributes,
         _pending: true,
         _createdAt: Date.now(),
       };
 
-      await addAsset(activeTab, optimisticAsset, pendingTxs);
+      await addAsset(activeTab, optimisticAsset as unknown as import('../types').ChagraAsset, pendingTxs);
 
       window.dispatchEvent(new CustomEvent('taskAdded'));
 
-      // Limpieza de UI solo tras éxito del commit IDB
       resetForm();
       setShowForm(false);
-    } catch (error) {
-      console.error('[UI] Error en creación de activo:', error);
+    } catch (err) {
+      console.error('[UI] Error en creación de activo:', err);
       window.dispatchEvent(new CustomEvent('syncError', {
         detail: { message: 'Fallo crítico al guardar localmente. Verifique el almacenamiento.' }
       }));
@@ -346,15 +380,15 @@ export default function AssetsDashboard({ onBack }) {
     }
   };
 
-  const handleDelete = async (assetId) => {
+  const handleDelete = async (assetId: string) => {
     if (!window.confirm('¿Confirmas la eliminación de este activo? Esta acción se sincronizará con FarmOS.')) {
       return;
     }
 
     try {
       await removeAsset(activeTab, assetId);
-    } catch (error) {
-      console.error('[UI] Error en eliminación de activo:', error);
+    } catch (err) {
+      console.error('[UI] Error en eliminación de activo:', err);
       window.dispatchEvent(new CustomEvent('syncError', {
         detail: { message: 'No se pudo eliminar el activo del almacenamiento local.' }
       }));
@@ -363,157 +397,22 @@ export default function AssetsDashboard({ onBack }) {
 
   const handleRefresh = () => {
     if (navigator.onLine) {
-      syncFromServer(fetchFromFarmOS);
+      syncFromServer(fetchFromFarmOS as Parameters<typeof syncFromServer>[0]);
     }
   };
 
-  const tabConfig = ASSET_TABS.find(t => t.id === activeTab);
+  const tabConfig = ASSET_TABS.find(t => t.id === activeTab)!;
   const currentAssets = getAssetsForTab();
   const colors = colorMap[tabConfig.color];
 
-  const getPlaceholder = () => {
+  const getPlaceholder = (): string => {
     if (activeTab === 'plant') return 'Ej: Café, Aguacate, Guanábana...';
-    if (activeTab === 'structure') return 'Ej: ' + STRUCTURE_EXAMPLES[Math.floor(Math.random() * STRUCTURE_EXAMPLES.length)];
-    if (activeTab === 'equipment') return 'Ej: ' + EQUIPMENT_EXAMPLES[Math.floor(Math.random() * EQUIPMENT_EXAMPLES.length)];
+    if (activeTab === 'structure') return 'Ej: ' + STRUCTURE_EXAMPLES[Math.floor(Math.random() * STRUCTURE_EXAMPLES.length)]!;
+    if (activeTab === 'equipment') return 'Ej: ' + EQUIPMENT_EXAMPLES[Math.floor(Math.random() * EQUIPMENT_EXAMPLES.length)]!;
     return 'Ej: Bokashi, Biol, Purín de Ortiga...';
   };
 
-  // Render del formulario específico para el tab de plantas
-  const renderPlantForm = () => (
-    <>
-      {/* Selector obligatorio de zona contenedora (Fase 17) */}
-      <div>
-        <label className="block text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">
-          Zona contenedora *
-        </label>
-        <select
-          required
-          value={formData.parentLandId || ''}
-          onChange={(e) => setFormData({ ...formData, parentLandId: e.target.value })}
-          className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white min-h-[48px] focus:ring-lime-500 focus:border-lime-500"
-        >
-          <option value="" disabled>Seleccione una zona...</option>
-          {lands.map((land) => {
-            const subType = land.attributes?.land_type || land.attributes?.sub_type || 'zona';
-            const lname = land.attributes?.name || land.name || 'Sin nombre';
-            return (
-              <option key={land.id} value={land.id}>
-                {lname} · {subType}
-              </option>
-            );
-          })}
-        </select>
-        {lands.length === 0 && (
-          <p className="mt-1 text-xs text-amber-400">
-            No hay zonas registradas. Cree primero un activo tipo "Infraestructura" (ej. invernadero) o sincronice con FarmOS.
-          </p>
-        )}
-      </div>
-
-      {/* Selector de especie con fuzzy search + autocompletado (Fase 17) */}
-      <SpeciesSelect
-        value={formData.name}
-        onChange={(name, speciesId) => setFormData({ ...formData, name, speciesId: speciesId || null })}
-        onAutoFill={(defaults) => {
-          setFormData((prev) => ({
-            ...prev,
-            estrato: defaults.estrato || prev.estrato,
-            gremio: defaults.gremio || prev.gremio,
-          }));
-        }}
-      />
-
-      {/* Motor de gremios: compañeros sugeridos (Fase 18) */}
-      {formData.speciesId && (
-        <GuildSuggestions
-          speciesId={formData.speciesId}
-          onSelectCompanion={(companionName) => {
-            // Siembra rápida: hereda zona y geometría, solo cambia especie
-            setFormData((prev) => ({ ...prev, name: companionName, speciesId: null, plantType: '', estrato: '', gremio: '', quantity: '1' }));
-          }}
-        />
-      )}
-
-      {/* Variedad */}
-      <input
-        type="text"
-        value={formData.plantType}
-        onChange={(e) => setFormData({ ...formData, plantType: e.target.value })}
-        placeholder="Variedad (Ej: Castillo, Hass, Criollo)"
-        className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white min-h-[48px]"
-      />
-
-      {/* Estrato */}
-      <div className="space-y-1.5">
-        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Estrato en el sistema</label>
-        <div className="grid grid-cols-2 gap-2">
-          {ESTRATO_OPTIONS.map(opt => (
-            <button
-              key={opt.value}
-              onClick={() => setFormData({ ...formData, estrato: formData.estrato === opt.value ? '' : opt.value })}
-              className={`p-3 rounded-xl text-left transition-all min-h-[56px] active:scale-[0.98] ${
-                formData.estrato === opt.value
-                  ? 'bg-lime-600/20 border-2 border-lime-500 text-lime-300'
-                  : 'bg-slate-800 border border-slate-700 text-slate-300'
-              }`}
-            >
-              <span className="font-bold text-sm block">{opt.label}</span>
-              <span className="text-xs text-slate-500">{opt.desc}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Gremio / Función en el sistema */}
-      <div className="space-y-1.5">
-        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Gremio / Función ecológica</label>
-        <div className="flex flex-wrap gap-1.5">
-          {GREMIO_OPTIONS.map(opt => (
-            <button
-              key={opt.value}
-              onClick={() => setFormData({ ...formData, gremio: formData.gremio === opt.value ? '' : opt.value })}
-              className={`text-xs px-3 py-2 rounded-full transition-all active:scale-95 min-h-[36px] ${
-                formData.gremio === opt.value
-                  ? 'bg-lime-600/30 text-lime-300 border border-lime-500 font-bold'
-                  : 'bg-slate-800 text-slate-400 border border-slate-700'
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Cantidad de plantas */}
-      <div className="space-y-1.5">
-        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Cantidad (plantas sembradas)</label>
-        <input
-          type="number"
-          inputMode="numeric"
-          min="1"
-          value={formData.quantity}
-          onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-          placeholder="1"
-          className="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 text-white text-2xl font-black text-center min-h-[64px]"
-        />
-      </div>
-
-      {/* Notas */}
-      <textarea
-        value={formData.notes}
-        onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-        placeholder="Notas de campo (opcional)"
-        rows="2"
-        className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm min-h-[56px]"
-      />
-
-      {/* Geometría (POINT para frutales dispersos) */}
-      {renderGeometryField('point')}
-    </>
-  );
-
-  // Campo reutilizable de captura de geometría.
-  const renderGeometryField = (mode) => (
+  const renderGeometryField = (mode: 'point' | 'polygon') => (
     <div className="space-y-1.5">
       <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
         Ubicación física {mode === 'polygon' ? '(área)' : '(punto)'}
@@ -566,7 +465,129 @@ export default function AssetsDashboard({ onBack }) {
     </div>
   );
 
-  // Render del formulario genérico (structure, equipment, material)
+  const renderPlantForm = () => (
+    <>
+      <div>
+        <label className="block text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">
+          Zona contenedora *
+        </label>
+        <select
+          required
+          value={formData.parentLandId || ''}
+          onChange={(e) => setFormData({ ...formData, parentLandId: e.target.value })}
+          className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white min-h-[48px] focus:ring-lime-500 focus:border-lime-500"
+        >
+          <option value="" disabled>Seleccione una zona...</option>
+          {lands.map((land) => {
+            const subType = land.attributes?.land_type || land.attributes?.sub_type || 'zona';
+            const lname = land.attributes?.name || land.name || 'Sin nombre';
+            return (
+              <option key={land.id} value={land.id}>
+                {lname} · {subType}
+              </option>
+            );
+          })}
+        </select>
+        {lands.length === 0 && (
+          <p className="mt-1 text-xs text-amber-400">
+            No hay zonas registradas. Cree primero un activo tipo "Infraestructura" (ej. invernadero) o sincronice con FarmOS.
+          </p>
+        )}
+      </div>
+
+      <SpeciesSelect
+        value={formData.name}
+        onChange={(name, speciesId) => setFormData({ ...formData, name, speciesId: speciesId || null })}
+        onAutoFill={(defaults) => {
+          setFormData((prev) => ({
+            ...prev,
+            estrato: defaults.estrato || prev.estrato,
+            gremio: defaults.gremio || prev.gremio,
+          }));
+        }}
+      />
+
+      {formData.speciesId && (
+        <GuildSuggestions
+          speciesId={formData.speciesId}
+          onSelectCompanion={(companionName) => {
+            setFormData((prev) => ({ ...prev, name: companionName, speciesId: null, plantType: '', estrato: '', gremio: '', quantity: '1' }));
+          }}
+        />
+      )}
+
+      <input
+        type="text"
+        value={formData.plantType}
+        onChange={(e) => setFormData({ ...formData, plantType: e.target.value })}
+        placeholder="Variedad (Ej: Castillo, Hass, Criollo)"
+        className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white min-h-[48px]"
+      />
+
+      <div className="space-y-1.5">
+        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Estrato en el sistema</label>
+        <div className="grid grid-cols-2 gap-2">
+          {ESTRATO_OPTIONS.map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => setFormData({ ...formData, estrato: formData.estrato === opt.value ? '' : opt.value })}
+              className={`p-3 rounded-xl text-left transition-all min-h-[56px] active:scale-[0.98] ${
+                formData.estrato === opt.value
+                  ? 'bg-lime-600/20 border-2 border-lime-500 text-lime-300'
+                  : 'bg-slate-800 border border-slate-700 text-slate-300'
+              }`}
+            >
+              <span className="font-bold text-sm block">{opt.label}</span>
+              <span className="text-xs text-slate-500">{opt.desc}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Gremio / Función ecológica</label>
+        <div className="flex flex-wrap gap-1.5">
+          {GREMIO_OPTIONS.map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => setFormData({ ...formData, gremio: formData.gremio === opt.value ? '' : opt.value })}
+              className={`text-xs px-3 py-2 rounded-full transition-all active:scale-95 min-h-[36px] ${
+                formData.gremio === opt.value
+                  ? 'bg-lime-600/30 text-lime-300 border border-lime-500 font-bold'
+                  : 'bg-slate-800 text-slate-400 border border-slate-700'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Cantidad (plantas sembradas)</label>
+        <input
+          type="number"
+          inputMode="numeric"
+          min="1"
+          value={formData.quantity}
+          onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+          placeholder="1"
+          className="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 text-white text-2xl font-black text-center min-h-[64px]"
+        />
+      </div>
+
+      <textarea
+        value={formData.notes}
+        onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+        placeholder="Notas de campo (opcional)"
+        rows={2}
+        className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm min-h-[56px]"
+      />
+
+      {renderGeometryField('point')}
+    </>
+  );
+
   const renderGenericForm = () => (
     <>
       <input
@@ -592,7 +613,6 @@ export default function AssetsDashboard({ onBack }) {
         </div>
       )}
 
-      {/* Selector de sub_type para asset--land */}
       {activeTab === 'land' && (
         <div className="space-y-1.5">
           <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Tipo de zona</label>
@@ -612,16 +632,18 @@ export default function AssetsDashboard({ onBack }) {
         value={formData.notes}
         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
         placeholder="Notas (opcional)"
-        rows="2"
+        rows={2}
         className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm min-h-[56px]"
       />
 
-      {/* Geometría obligatoria para land y structure (polygon); point para equipment */}
       {activeTab === 'land' && renderGeometryField('polygon')}
       {activeTab === 'structure' && renderGeometryField('polygon')}
       {activeTab === 'equipment' && renderGeometryField('point')}
     </>
   );
+
+  // Suppress unused variable warning for DYNAMIC_PRESETS
+  void DYNAMIC_PRESETS;
 
   return (
     <div className="h-[100dvh] w-full bg-slate-950 text-slate-100 flex flex-col overflow-hidden">
@@ -632,7 +654,6 @@ export default function AssetsDashboard({ onBack }) {
         </button>
         <h2 className="text-2xl font-black flex-1">Activos</h2>
         <div className="flex items-center gap-2">
-          {/* Toggle Lista / Mapa (Fase 17.3) */}
           <div className="flex bg-slate-800 rounded-lg p-1">
             <button
               type="button"
@@ -714,7 +735,7 @@ export default function AssetsDashboard({ onBack }) {
         </div>
       )}
 
-      {/* Vista de mapa global (Fase 17.3) — reemplaza la lista cuando viewMode === 'map' */}
+      {/* Vista de mapa global */}
       {viewMode === 'map' && (
         <div className="flex-1 min-h-0">
           <FarmMap
@@ -724,7 +745,7 @@ export default function AssetsDashboard({ onBack }) {
         </div>
       )}
 
-      {/* Breadcrumb de drill-down (Fase 17.2 / fix Fase 19) */}
+      {/* Breadcrumb de drill-down */}
       {viewMode === 'list' && activeTab === 'plant' && (
         <div className="px-3 py-2 border-b border-slate-800 flex items-center justify-between text-xs">
           <div className="flex items-center gap-2 min-w-0">
@@ -756,7 +777,7 @@ export default function AssetsDashboard({ onBack }) {
         </div>
       )}
 
-      {/* Lista de zonas (nivel raíz del drill-down, solo para plant) */}
+      {/* Lista de zonas */}
       {viewMode === 'list' && activeTab === 'plant' && !currentZoneId && (
         <div className="flex-1 overflow-y-auto p-3 space-y-2">
           {lands.length === 0 ? (
@@ -799,7 +820,7 @@ export default function AssetsDashboard({ onBack }) {
         </div>
       )}
 
-      {/* Lista de activos (plants filtradas por zona, u otras tabs) */}
+      {/* Lista de activos */}
       {viewMode === 'list' && !(activeTab === 'plant' && !currentZoneId) && (
       <div className="flex-1 overflow-y-auto p-3 space-y-2">
         {isLoading && currentAssets.length === 0 ? (
@@ -817,7 +838,7 @@ export default function AssetsDashboard({ onBack }) {
           currentAssets.map(asset => {
             const name = asset.attributes?.name || asset.name || 'Sin nombre';
             const notes = asset.attributes?.notes;
-            const notesText = typeof notes === 'object' ? notes?.value : notes;
+            const notesText = typeof notes === 'object' && notes !== null ? (notes as { value?: string }).value : notes;
             const isPending = asset._pending;
             const TabIcon = tabConfig.icon;
 
@@ -857,7 +878,6 @@ export default function AssetsDashboard({ onBack }) {
                   </button>
                 </div>
 
-                {/* Registro de cosecha (solo tab plant, no registros pendientes) */}
                 {activeTab === 'plant' && !isPending && (
                   <div className="mt-4 border-t border-slate-700 pt-4">
                     {activeHarvestId !== asset.id ? (
@@ -898,7 +918,7 @@ export default function AssetsDashboard({ onBack }) {
                           value={harvestData.notes}
                           onChange={(e) => setHarvestData({ ...harvestData, notes: e.target.value })}
                           className="w-full p-2 bg-slate-800 border border-slate-700 rounded text-sm text-slate-200 mb-2"
-                          rows="2"
+                          rows={2}
                         />
                         <div className="flex gap-2 justify-end">
                           <button
@@ -928,7 +948,7 @@ export default function AssetsDashboard({ onBack }) {
       </div>
       )}
 
-      {/* Formulario de creación (slide-up) */}
+      {/* Formulario de creación */}
       {showForm && (
         <div className="shrink-0 border-t border-slate-700 bg-slate-900 p-4 space-y-3 max-h-[70vh] overflow-y-auto">
           <h3 className="font-bold text-lg flex items-center gap-2">
@@ -969,14 +989,15 @@ export default function AssetsDashboard({ onBack }) {
         </div>
       )}
 
-      {/* Panel lateral de detalle de activo (Fase 12.2) */}
+      {/* Panel lateral de detalle */}
       <AssetDetailView />
 
-      {/* Map picker modal (Fase 17.3) */}
+      {/* Map picker modal */}
       {showMapPicker && (
         <MapPicker
-          mode={showMapPicker}
-          initial={formData.geometry}
+          mode={showMapPicker === 'polygon' ? 'polygon' : 'point'}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          initial={formData.geometry as any}
           onSave={(geometry) => {
             setFormData((prev) => ({ ...prev, geometry }));
             setShowMapPicker(false);

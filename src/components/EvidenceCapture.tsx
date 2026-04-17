@@ -1,10 +1,27 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Camera, Trash2, Loader2, Image as ImageIcon, Brain, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { optimizeImage, blobToDataUrl } from '../utils/imageProcessor';
 import { mediaCache } from '../db/mediaCache';
 import { analyzeFoliage } from '../services/aiService';
 import { proximityCheck } from '../utils/spatialAnalysis';
 import { wktToGeoJson } from '../utils/geo';
+
+interface DiagnosisResult {
+  score: number;
+  issues: string[];
+  treatment_suggestion?: string;
+}
+
+interface PreviewItem {
+  id: string;
+  dataUrl: string;
+  ai_diagnosis: DiagnosisResult | null;
+}
+
+interface PreviousCapture {
+  dataUrl: string;
+  diagnosis: DiagnosisResult | null;
+}
 
 /**
  * EvidenceCapture — Captura con diagnóstico IA y evolución histórica (Fase 20.2b).
@@ -17,7 +34,16 @@ import { wktToGeoJson } from '../utils/geo';
  *   - onDiagnosis:    callback(diagnosis) — para toast externo
  *   - disabled:       boolean
  */
-export const EvidenceCapture = ({
+interface EvidenceCaptureProps {
+  logId: string;
+  assetId?: string | null;
+  assetGeometry?: string | object | null;
+  onCountChange?: (count: number) => void;
+  onDiagnosis?: (diagnosis: DiagnosisResult) => void;
+  disabled?: boolean;
+}
+
+export const EvidenceCapture: React.FC<EvidenceCaptureProps> = ({
   logId,
   assetId = null,
   assetGeometry = null,
@@ -25,12 +51,12 @@ export const EvidenceCapture = ({
   onDiagnosis,
   disabled = false,
 }) => {
-  const [previews, setPreviews] = useState([]);
-  const [processing, setProcessing] = useState(false);
-  const [diagnosing, setDiagnosing] = useState(false);
-  const [diagnosis, setDiagnosis] = useState(null);
-  const [previousCapture, setPreviousCapture] = useState(null); // { dataUrl, diagnosis }
-  const inputRef = useRef(null);
+  const [previews, setPreviews] = useState<PreviewItem[]>([]);
+  const [processing, setProcessing] = useState<boolean>(false);
+  const [diagnosing, setDiagnosing] = useState<boolean>(false);
+  const [diagnosis, setDiagnosis] = useState<DiagnosisResult | null>(null);
+  const [previousCapture, setPreviousCapture] = useState<PreviousCapture | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   // Cargar evidencias existentes + historial anterior del asset
   useEffect(() => {
@@ -40,15 +66,16 @@ export const EvidenceCapture = ({
         const existing = await mediaCache.getByLogId(logId);
         const withPreviews = await Promise.all(
           existing.map(async (item) => ({
-            id: item.id,
+            id: String(item.id),
             dataUrl: await blobToDataUrl(item.blob),
-            ai_diagnosis: item.ai_diagnosis,
+            ai_diagnosis: (item.ai_diagnosis as DiagnosisResult | null) ?? null,
           }))
         );
         setPreviews(withPreviews);
         onCountChange?.(withPreviews.length);
-        if (withPreviews.length > 0 && withPreviews[0].ai_diagnosis) {
-          setDiagnosis(withPreviews[0].ai_diagnosis);
+        const first = withPreviews[0];
+        if (first !== undefined && first.ai_diagnosis) {
+          setDiagnosis(first.ai_diagnosis);
         }
       } catch (err) {
         console.error('[EvidenceCapture] Error cargando existentes:', err);
@@ -60,32 +87,31 @@ export const EvidenceCapture = ({
       (async () => {
         try {
           const history = await mediaCache.getByAssetId(assetId);
-          // Filtrar capturas de OTROS logs (no el actual)
-          const prev = history.find((h) => h.logId !== logId && h.blob);
+          const prev = (history as unknown as Record<string, unknown>[]).find((h) => h['logId'] !== logId && h['blob']);
           if (prev) {
-            const dataUrl = await blobToDataUrl(prev.blob);
-            setPreviousCapture({ dataUrl, diagnosis: prev.ai_diagnosis });
+            const dataUrl = await blobToDataUrl(prev['blob'] as Blob);
+            setPreviousCapture({ dataUrl, diagnosis: (prev['ai_diagnosis'] as DiagnosisResult | null) ?? null });
           }
         } catch (err) {
-          console.warn('[EvidenceCapture] Sin historial previo:', err.message);
+          console.warn('[EvidenceCapture] Sin historial previo:', (err as Error).message);
         }
       })();
     }
   }, [logId, assetId]);
 
-  const handleCapture = async (e) => {
+  const handleCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !logId) return;
 
     // Proximity gate: verificar que el operario esté cerca del activo
     if (assetGeometry && navigator.geolocation) {
       try {
-        const gpsPos = await new Promise((res, rej) =>
+        const gpsPos = await new Promise<GeolocationPosition>((res, rej) =>
           navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 5000 })
         );
         const rawGeo = typeof assetGeometry === 'string' ? wktToGeoJson(assetGeometry) : assetGeometry;
         if (rawGeo) {
-          const { distance, isClose } = proximityCheck(gpsPos, rawGeo);
+          const { distance, isClose } = proximityCheck(gpsPos, rawGeo as import('../utils/geo').Geometry);
           if (!isClose) {
             const ok = window.confirm(
               `Ubicación a ${distance}m del activo (>50m). ¿Confirmas captura remota?`
@@ -93,7 +119,7 @@ export const EvidenceCapture = ({
             if (!ok) { if (inputRef.current) inputRef.current.value = ''; return; }
           }
         }
-      } catch (gpsErr) {
+      } catch (_gpsErr) {
         console.warn('[EvidenceCapture] GPS no disponible para proximity gate.');
       }
     }
@@ -104,7 +130,7 @@ export const EvidenceCapture = ({
       const mediaId = await mediaCache.save(logId, optimized, { assetId });
       const dataUrl = await blobToDataUrl(optimized);
 
-      const next = [...previews, { id: mediaId, dataUrl, ai_diagnosis: null }];
+      const next = [...previews, { id: String(mediaId), dataUrl, ai_diagnosis: null }];
       setPreviews(next);
       onCountChange?.(next.length);
 
@@ -114,7 +140,7 @@ export const EvidenceCapture = ({
       if (navigator.onLine && !diagnosis) {
         setDiagnosing(true);
         try {
-          const result = await analyzeFoliage(optimized);
+          const result = await analyzeFoliage(optimized) as DiagnosisResult | null;
           if (result) {
             setDiagnosis(result);
             await mediaCache.updateDiagnosis(mediaId, result);
@@ -135,9 +161,9 @@ export const EvidenceCapture = ({
     }
   };
 
-  const handleRemove = async (mediaId) => {
+  const handleRemove = async (mediaId: string) => {
     try {
-      await mediaCache.remove(mediaId);
+      await mediaCache.remove(Number(mediaId));
       const next = previews.filter((p) => p.id !== mediaId);
       setPreviews(next);
       onCountChange?.(next.length);
@@ -152,6 +178,8 @@ export const EvidenceCapture = ({
     ? diagnosis.score - previousCapture.diagnosis.score
     : null;
 
+  const lastPreview = previews[previews.length - 1];
+
   return (
     <div className="space-y-3">
       <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
@@ -159,7 +187,7 @@ export const EvidenceCapture = ({
       </label>
 
       {/* Panel de evolución: foto anterior vs actual */}
-      {previousCapture && previews.length > 0 && (
+      {previousCapture && previews.length > 0 && lastPreview !== undefined && (
         <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700">
           <p className="text-[10px] text-slate-500 uppercase font-bold mb-2">Evolución</p>
           <div className="flex gap-2">
@@ -170,7 +198,7 @@ export const EvidenceCapture = ({
               </p>
             </div>
             <div className="flex-1">
-              <img src={previews[previews.length - 1].dataUrl} alt="Actual" className="w-full h-20 object-cover rounded" />
+              <img src={lastPreview.dataUrl} alt="Actual" className="w-full h-20 object-cover rounded" />
               <p className="text-[10px] text-slate-500 text-center mt-1">
                 Actual {diagnosis ? `(${diagnosis.score}/100)` : ''}
               </p>
