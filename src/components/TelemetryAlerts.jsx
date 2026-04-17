@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Info } from 'lucide-react';
 import { assetCache } from '../db/assetCache';
 import { FARM_CONFIG } from '../config/defaults';
+import Sparkline from './common/Sparkline';
 
 // Constantes de Infraestructura Segura (API Gateway Local)
 const HA_URL = '/api/ha';
@@ -9,34 +10,6 @@ const OLLAMA_URL = '/api/ollama';
 
 // Cooldown de idempotencia persistente (delegado a sync_meta vía assetCache)
 const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutos
-
-// Sparkline SVG inline — renderiza histórico 24h sin dependencias externas
-function Sparkline({ data, color = '#22d3ee', height = 32, width = 120 }) {
-  if (!data || data.length < 2) return <div className="w-[120px] h-[32px] bg-slate-700/30 rounded animate-pulse" />;
-
-  const values = data.map(d => parseFloat(d.state)).filter(v => !isNaN(v));
-  if (values.length < 2) return null;
-
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const range = max - min || 1;
-  const step = width / (values.length - 1);
-
-  const points = values.map((v, i) => `${i * step},${height - ((v - min) / range) * (height - 4) - 2}`).join(' ');
-  const lastVal = values[values.length - 1];
-  const lastX = (values.length - 1) * step;
-  const lastY = height - ((lastVal - min) / range) * (height - 4) - 2;
-
-  return (
-    <svg width={width} height={height} className="inline-block" viewBox={`0 0 ${width} ${height}`}>
-      <polyline fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" points={points} opacity="0.8" />
-      <circle cx={lastX} cy={lastY} r="2.5" fill={color} />
-      <text x={lastX - 4} y={lastY - 5} fill={color} fontSize="7" fontWeight="bold" textAnchor="end">
-        {lastVal.toFixed(1)}
-      </text>
-    </svg>
-  );
-}
 
 // Utilidades de formateo condicional
 const getHumidityColor = (humidity) => {

@@ -1,8 +1,9 @@
 import { sendToFarmOS, fetchFromFarmOS } from './apiService';
-import { openDB } from '../db/dbCore';
+import { openDB, STORES } from '../db/dbCore';
 
 const STORE_NAME = 'pending_transactions';
 const TASKS_STORE_NAME = 'pending_tasks';
+const VOICE_STORE_NAME = STORES.PENDING_VOICE;
 
 const MAX_RETRIES = 3;
 const BASE_BACKOFF_MS = 1000;
@@ -337,11 +338,76 @@ class SyncManager {
     window.addEventListener('online', () => {
       this.isOnline = true;
       this.syncAll();
+      this.notifyPendingVoiceRecordings();
     });
 
     window.addEventListener('offline', () => {
       this.isOnline = false;
     });
+  }
+
+  // ─── Voice recordings (v0.5.0) ─────────────────────────────────────────
+  // Persistencia de audios capturados cuando Whisper/Ollama no responden.
+  // El procesamiento (transcripción + extracción) queda delegado al módulo
+  // VoiceCapture, que obliga revisión humana antes de encolar en
+  // pending_transactions. Este manager solo notifica disponibilidad.
+
+  async saveVoiceRecording(blob, metadata = {}) {
+    if (!this.db) await this.initDB();
+
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction([VOICE_STORE_NAME], 'readwrite');
+      const store = tx.objectStore(VOICE_STORE_NAME);
+      const record = {
+        blob,
+        mimeType: blob.type || 'audio/webm',
+        size: blob.size,
+        durationMs: metadata.durationMs || 0,
+        status: metadata.status || 'pending',
+        lastError: metadata.lastError || null,
+        createdAt: Date.now(),
+      };
+      const req = store.add(record);
+      req.onsuccess = () => resolve({ ...record, id: req.result });
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async getPendingVoiceRecordings() {
+    if (!this.db) await this.initDB();
+
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction([VOICE_STORE_NAME], 'readonly');
+      const store = tx.objectStore(VOICE_STORE_NAME);
+      const req = store.getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async deleteVoiceRecording(id) {
+    if (!this.db) await this.initDB();
+
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction([VOICE_STORE_NAME], 'readwrite');
+      const store = tx.objectStore(VOICE_STORE_NAME);
+      const req = store.delete(id);
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async notifyPendingVoiceRecordings() {
+    try {
+      const pending = await this.getPendingVoiceRecordings();
+      if (pending.length > 0) {
+        window.dispatchEvent(new CustomEvent('voiceRecordingsPending', {
+          detail: { count: pending.length },
+        }));
+      }
+    } catch (err) {
+      console.warn('[SyncManager] No se pudo verificar voice recordings pendientes:', err.message);
+    }
   }
 
   // Obtener estadísticas de sincronización

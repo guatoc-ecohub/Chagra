@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback } from 'react';
-import { Warehouse, MapPin, Eye, Package, Clock, ClipboardList, CheckCircle, WifiOff, Leaf } from 'lucide-react';
+import { Warehouse, MapPin, Eye, Package, Clock, ClipboardList, CheckCircle, WifiOff, Leaf, Mic } from 'lucide-react';
 import localforage from 'localforage';
 
 import { isAuthenticated, logoutUser } from './services/authService';
@@ -27,6 +27,7 @@ const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
 const BiodiversidadView = lazy(() => import('./components/BiodiversidadView'));
+const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
 
 localforage.config({
   name: 'Chagra',
@@ -47,6 +48,7 @@ const NAV_TILES = [
   { id: 'task_log', label: 'Tareas', icon: Clock, color: 'bg-red-700', desc: 'Cola de pendientes' },
   { id: 'historial', label: 'Historial', icon: ClipboardList, color: 'bg-indigo-700', desc: 'Trazabilidad de operaciones' },
   { id: 'biodiversidad', label: 'Biodiversidad', icon: Leaf, color: 'bg-emerald-700', desc: 'Ecosistema, estratos y gremios' },
+  { id: 'voz', label: 'Voz', icon: Mic, color: 'bg-lime-700', desc: 'Registro por dictado (v0.5.0)' },
 ];
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
@@ -227,6 +229,12 @@ export default function App() {
         return <WorkerHistory onBack={() => setCurrentView('dashboard')} />;
       case 'biodiversidad':
         return <BiodiversidadView onBack={() => setCurrentView('dashboard')} />;
+      case 'voz':
+        return (
+          <ScreenShell title="Registro por voz" icon={Mic} onBack={() => setCurrentView('dashboard')}>
+            <VoiceCapture onSave={showToast} />
+          </ScreenShell>
+        );
       default:
         return <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>;
     }

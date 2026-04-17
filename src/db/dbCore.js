@@ -5,18 +5,19 @@
  * manuales previas en assetCache.js y syncManager.js, evitando race conditions
  * de `onupgradeneeded` duplicado y garantizando una sola versión activa.
  *
- * Preserva el esquema completo existente (v4):
- *   - assets             (keyPath: id; indexes: asset_type, cached_at)
- *   - taxonomy_terms     (keyPath: id; indexes: type)
- *   - sync_meta          (keyPath: key)
+ * Esquema v6:
+ *   - assets               (keyPath: id; indexes: asset_type, cached_at)
+ *   - taxonomy_terms       (keyPath: id; indexes: type)
+ *   - sync_meta            (keyPath: key)
  *   - pending_transactions (keyPath: id, autoIncrement; indexes: timestamp, type)
- *   - pending_tasks      (keyPath: id; indexes: timestamp, status)
- *   - logs               (keyPath: id; indexes: asset_id, timestamp, type)
- *   - media_cache        (keyPath: id, autoIncrement; indexes: logId, createdAt)
+ *   - pending_tasks        (keyPath: id; indexes: timestamp, status)
+ *   - logs                 (keyPath: id; indexes: asset_id, timestamp, type)
+ *   - media_cache          (keyPath: id, autoIncrement; indexes: logId, createdAt)
+ *   - pending_voice_recordings (v0.5.0: keyPath: id, autoIncrement; indexes: createdAt, status)
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 5;
+export const DB_VERSION = 6;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -26,6 +27,7 @@ export const STORES = {
   PENDING_TX: 'pending_transactions',
   PENDING_TASKS: 'pending_tasks',
   MEDIA_CACHE: 'media_cache',
+  PENDING_VOICE: 'pending_voice_recordings',
 };
 
 let dbInstance = null;
@@ -88,6 +90,14 @@ export const openDB = async () => {
         store.createIndex('logId', 'logId', { unique: false });
         store.createIndex('assetId', 'assetId', { unique: false });
         store.createIndex('createdAt', 'createdAt', { unique: false });
+      }
+
+      // v6: pending_voice_recordings — blobs de audio capturados offline o
+      // con fallo de transcripción/extracción, pendientes de reprocesamiento.
+      if (!db.objectStoreNames.contains(STORES.PENDING_VOICE)) {
+        const store = db.createObjectStore(STORES.PENDING_VOICE, { keyPath: 'id', autoIncrement: true });
+        store.createIndex('createdAt', 'createdAt', { unique: false });
+        store.createIndex('status', 'status', { unique: false });
       }
     };
 
