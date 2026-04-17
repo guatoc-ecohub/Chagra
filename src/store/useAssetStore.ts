@@ -135,7 +135,7 @@ const useAssetStore = create<AssetState>()((set, get) => ({
       land: 'lands',
     };
     try {
-      const results = await Promise.all(
+      const settled = await Promise.allSettled(
         targets.map(async (t) => {
           const res = await fetchFn(`/api/asset/${t}`);
           const list = (res.data as ChagraAsset[]) || [];
@@ -144,7 +144,18 @@ const useAssetStore = create<AssetState>()((set, get) => ({
         })
       );
       const partialUpdate: Partial<Record<AssetKey, ChagraAsset[]>> = {};
-      for (const r of results) partialUpdate[r.key] = r.data;
+      for (const result of settled) {
+        if (result.status === 'fulfilled') {
+          partialUpdate[result.value.key] = result.value.data;
+        } else {
+          const err = result.reason as { status?: number; message?: string };
+          if (err?.status === 404) {
+            console.info('[AssetStore] Tipo de activo no disponible en FarmOS (404), omitiendo.');
+          } else {
+            console.warn('[AssetStore] Error sincronizando tipo de activo:', err?.message || err);
+          }
+        }
+      }
       await assetCache.setLastSync(Date.now());
       set({
         ...partialUpdate,
@@ -160,14 +171,14 @@ const useAssetStore = create<AssetState>()((set, get) => ({
   // Sincronizar taxonomy terms desde FarmOS API
   syncTaxonomyTerms: async (fetchFn) => {
     try {
-      const [plantTypes, materialTypes] = await Promise.all([
+      const [plantResult, materialResult] = await Promise.allSettled([
         fetchFn('/api/taxonomy_term/plant_type'),
         fetchFn('/api/taxonomy_term/material_type'),
       ]);
 
       const terms: TaxonomyTerm[] = [
-        ...((plantTypes.data as TaxonomyTerm[]) || []),
-        ...((materialTypes.data as TaxonomyTerm[]) || []),
+        ...(plantResult.status === 'fulfilled' ? ((plantResult.value.data as TaxonomyTerm[]) || []) : []),
+        ...(materialResult.status === 'fulfilled' ? ((materialResult.value.data as TaxonomyTerm[]) || []) : []),
       ];
 
       await assetCache.bulkPutTaxonomyTerms(terms);

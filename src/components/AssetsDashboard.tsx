@@ -146,6 +146,13 @@ const formatNotes = (formData: FormState): { value: string } | null => {
 
 const buildSeedingPayload = (seedingId: string, assetUUID: string, formData: FormState) => {
   const qty = parseInt(formData.quantity, 10) || 1;
+  const locationId = formData.parentLandId || DEFAULT_LOCATION_ID;
+  const relationships: Record<string, unknown> = {
+    asset: { data: [{ type: 'asset--plant', id: assetUUID }] },
+  };
+  if (locationId) {
+    relationships['location'] = { data: [{ type: 'asset--land', id: locationId }] };
+  }
   return {
     data: {
       type: 'log--seeding',
@@ -156,20 +163,7 @@ const buildSeedingPayload = (seedingId: string, assetUUID: string, formData: For
         status: 'done',
         notes: formatNotes(formData) || { value: `Registro de siembra para ${formData.name}` },
       },
-      relationships: {
-        asset: { data: [{ type: 'asset--plant', id: assetUUID }] },
-        location: { data: [{ type: 'asset--land', id: DEFAULT_LOCATION_ID }] },
-        quantity: {
-          data: [{
-            type: 'quantity--standard',
-            attributes: {
-              measure: 'count',
-              value: { decimal: String(qty) },
-              label: 'Plantas sembradas',
-            },
-          }],
-        },
-      },
+      relationships,
     },
   };
 };
@@ -279,6 +273,12 @@ export default function AssetsDashboard({ onBack }: AssetsDashboardProps) {
 
   const handleSave = async () => {
     if (!formData.name.trim()) return;
+    if (activeTab === 'plant' && !formData.parentLandId) {
+      window.dispatchEvent(new CustomEvent('syncError', {
+        detail: { message: 'Selecciona una zona antes de registrar la siembra.' },
+      }));
+      return;
+    }
 
     setIsSaving(true);
     const assetUUID = crypto.randomUUID();
@@ -318,19 +318,16 @@ export default function AssetsDashboard({ onBack }: AssetsDashboardProps) {
 
     if (activeTab !== 'material') {
       const parentLandId = formData.parentLandId || DEFAULT_LOCATION_ID;
-      assetPayload.data.relationships = {
-        location: { data: [{ type: 'asset--land', id: parentLandId }] },
-        parent: { data: [{ type: 'asset--land', id: parentLandId }] },
-      };
+      if (parentLandId) {
+        assetPayload.data.relationships = {
+          location: { data: [{ type: 'asset--land', id: parentLandId }] },
+          parent: { data: [{ type: 'asset--land', id: parentLandId }] },
+        };
+      }
     }
     if (activeTab === 'plant' && formData.plantType) {
-      assetPayload.data.relationships = assetPayload.data.relationships ?? {};
-      assetPayload.data.relationships['plant_type'] = {
-        data: [{
-          type: 'taxonomy_term--plant_type',
-          attributes: { name: formData.plantType },
-        }],
-      };
+      // plant_type is stored in notes/name — inline taxonomy creation not supported by JSON:API
+      // The variety is captured in the notes field via formatNotes()
     }
 
     const pendingTxs: unknown[] = [{
@@ -343,12 +340,19 @@ export default function AssetsDashboard({ onBack }: AssetsDashboardProps) {
 
     if (activeTab === 'plant') {
       const seedingId = crypto.randomUUID();
+      const qty = parseInt(formData.quantity, 10) || 1;
       pendingTxs.push({
         id: seedingId,
         type: 'seeding',
         endpoint: '/api/log/seeding',
         payload: buildSeedingPayload(seedingId, assetUUID, formData),
         method: 'POST',
+        _quantityMeta: {
+          label: 'Plantas sembradas',
+          value: qty,
+          unit: 'plants',
+          measure: 'count',
+        },
       });
     }
 

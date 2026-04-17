@@ -34,6 +34,13 @@ if ! "$DRUSH" --root="$DRUPAL_ROOT" status --field=bootstrap 2>/dev/null | grep 
     --yes
   echo "[farmos-init] farmOS instalado correctamente."
 
+  # Módulos de farm (tipos de activo y log que usa Chagra)
+  "$DRUSH" --root="$DRUPAL_ROOT" pm:enable \
+    farm_plant farm_land farm_structure farm_equipment farm_material \
+    farm_seeding farm_harvest farm_input \
+    farm_quantity farm_location \
+    --yes 2>/dev/null || true
+
   # Módulos OAuth
   "$DRUSH" --root="$DRUPAL_ROOT" pm:enable simple_oauth simple_oauth_password_grant --yes 2>/dev/null || true
 
@@ -79,7 +86,13 @@ EOF
   chmod 444 "$SETTINGS_FILE"
   echo "[farmos-init] Setup completo: OAuth, claves RSA, trusted hosts."
 else
-  echo "[farmos-init] farmOS ya instalado, saltando setup."
+  echo "[farmos-init] farmOS ya instalado, verificando módulos Chagra..."
+  "$DRUSH" --root="$DRUPAL_ROOT" pm:enable \
+    farm_plant farm_land farm_structure farm_equipment farm_material \
+    farm_seeding farm_harvest farm_input \
+    farm_quantity farm_location \
+    simple_oauth simple_oauth_password_grant \
+    --yes 2>/dev/null || true
 fi
 
 exec apache2-foreground

@@ -276,12 +276,15 @@ export const assetCache = {
 
       if (pendingTxs.length > 0) {
         const syncStore = tx.objectStore(STORES.PENDING_TX);
-        pendingTxs.forEach((txData) => {
+        const base = Date.now();
+        pendingTxs.forEach((txData, index) => {
           syncStore.put({
             ...txData,
             synced: false,
             retries: 0,
-            timestamp: txData.timestamp || Date.now(),
+            // Offset ensures dependent transactions (e.g. seeding after plant) are
+            // processed in insertion order when sorted by timestamp.
+            timestamp: (txData.timestamp || base) + index,
           });
         });
       }

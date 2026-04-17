@@ -108,7 +108,8 @@ class SyncManager {
     });
   }
 
-  // Obtener transacciones pendientes
+  // Obtener transacciones pendientes ordenadas por timestamp (no por clave IDB).
+  // El orden importa: el asset debe sincronizarse antes que el log que lo referencia.
   async getPendingTransactions(): Promise<PendingTransactionRecord[]> {
     if (!this.db) await this.initDB();
 
@@ -119,7 +120,9 @@ class SyncManager {
 
       request.onsuccess = () => {
         const all = (request.result as PendingTransactionRecord[]) || [];
-        resolve(all.filter((r) => !r.synced));
+        const pending = all.filter((r) => !r.synced);
+        pending.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+        resolve(pending);
       };
       request.onerror = () => reject(request.error);
     });
@@ -200,7 +203,10 @@ class SyncManager {
           );
         } catch (error) {
           const err = error as { status?: number; message?: string };
-          if (err.status && err.status >= 400 && err.status < 500) {
+          // 422 = datos inválidos (no reintentable). 404 = endpoint no encontrado
+          // (puede ser módulo deshabilitado o ID incorrecto — se reintenta).
+          const isUnrecoverable = err.status === 422 || err.status === 409;
+          if (isUnrecoverable) {
             console.error(
               `[SyncManager] Error no recuperable HTTP ${err.status}. Descartando transacción ${transaction.id}.`,
               error
