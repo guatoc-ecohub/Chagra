@@ -85,6 +85,31 @@ $settings['trusted_host_patterns'] = [
 EOF
   chmod 444 "$SETTINGS_FILE"
   echo "[farmos-init] Setup completo: OAuth, claves RSA, trusted hosts."
+
+  # Datos semilla: parcelas y estructuras base para que la app tenga ubicaciones desde el primer uso
+  echo "[farmos-init] Creando datos semilla (parcelas, invernaderos)..."
+  "$DRUSH" --root="$DRUPAL_ROOT" php:eval "
+    \$storage = Drupal::entityTypeManager()->getStorage('asset');
+
+    \$items = [
+      ['type' => 'land',      'name' => 'Parcela Principal', 'land_type' => 'field'],
+      ['type' => 'land',      'name' => 'Zona Fresas',       'land_type' => 'bed'],
+      ['type' => 'land',      'name' => 'Zona Hortalizas',   'land_type' => 'bed'],
+      ['type' => 'structure', 'name' => 'Invernadero 1',     'structure_type' => 'greenhouse'],
+      ['type' => 'structure', 'name' => 'Invernadero 2',     'structure_type' => 'greenhouse'],
+    ];
+
+    foreach (\$items as \$item) {
+      \$fields = ['type' => \$item['type'], 'name' => \$item['name'], 'status' => 'active'];
+      if (isset(\$item['land_type']))      \$fields['land_type']      = \$item['land_type'];
+      if (isset(\$item['structure_type'])) \$fields['structure_type'] = \$item['structure_type'];
+      \$asset = \$storage->create(\$fields);
+      \$asset->save();
+      echo '[seed] Creado: ' . \$item['name'] . ' (' . \$item['type'] . ')' . PHP_EOL;
+    }
+  " 2>/dev/null || echo "[farmos-init] Advertencia: seed de activos falló (continuando)."
+  echo "[farmos-init] Datos semilla listos."
+
 else
   echo "[farmos-init] farmOS ya instalado, verificando módulos Chagra..."
   "$DRUSH" --root="$DRUPAL_ROOT" pm:enable \
