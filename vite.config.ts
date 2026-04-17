@@ -8,6 +8,7 @@ export default defineConfig({
       '/oauth': 'http://localhost:8081',
       '/api/ha': 'http://localhost:8123',
       '/api/ollama': 'http://localhost:11434',
+      '/api/whisper': { target: 'http://localhost:9000', rewrite: (path) => path.replace(/^\/api\/whisper/, '') },
       '/api': 'http://localhost:8081',
     },
   },
