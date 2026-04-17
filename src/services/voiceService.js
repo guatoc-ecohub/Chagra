@@ -1,14 +1,16 @@
 /**
  * voiceService.js — Orquestador de transcripción de audio vía Whisper local.
  *
- * Envía el Blob grabado al proxy Nginx /api/whisper/inference con
- * AbortController (timeout 15s). Si Whisper no responde o hay fallo de red,
- * el audio se persiste en pending_voice_recordings para reintento posterior.
+ * Envía el Blob grabado al proxy Nginx /api/whisper/asr con AbortController
+ * (timeout 15s). El backend es openai-whisper-asr-webservice; el endpoint
+ * /asr acepta task/language/output como query params y el audio como campo
+ * multipart `audio_file`. Si Whisper no responde o hay fallo de red, el
+ * audio se persiste en pending_voice_recordings para reintento posterior.
  */
 
 import { syncManager } from './syncManager';
 
-const WHISPER_URL = '/api/whisper/inference';
+const WHISPER_URL = '/api/whisper/asr';
 const TIMEOUT_MS = 15000;
 
 /**
@@ -27,11 +29,16 @@ export async function transcribe(blob, options = {}) {
   const form = new FormData();
   const filename = `recording.${blob.type.includes('mp4') ? 'mp4' : 'webm'}`;
   form.append('audio_file', blob, filename);
-  form.append('language', options.language || 'es');
-  form.append('response_format', 'json');
+
+  const params = new URLSearchParams({
+    task: 'transcribe',
+    language: options.language || 'es',
+    output: 'json',
+    encode: 'true',
+  });
 
   try {
-    const res = await fetch(WHISPER_URL, {
+    const res = await fetch(`${WHISPER_URL}?${params.toString()}`, {
       method: 'POST',
       body: form,
       signal: controller.signal,
