@@ -79,7 +79,17 @@
       "Bash(cp -r /home/kortux/Chagra/dist/* /mnt/fast/appdata/farmos-pwa/)",
       "Read(//mnt/fast/appdata/farmos-pwa/**)",
       "Bash(ls *)",
-      "Bash(rm -rf /mnt/fast/appdata/farmos-pwa/*)"
+      "Bash(rm -rf /mnt/fast/appdata/farmos-pwa/*)",
+      "Bash(sudo -n journalctl -b -p err -x --no-pager)",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(journalctl -b -p err -x --no-pager)",
+      "Bash(ssh -o BatchMode=yes -o ConnectTimeout=5 kortux@192.168.1.100 \"sudo -n journalctl -b -p err -x --no-pager 2>&1\")",
+      "Read(//tmp/**)",
+      "Bash(systemctl status *)",
+      "Bash(systemctl cat *)",
+      "Bash(systemctl show *)",
+      "Read(//etc/systemd/system/**)",
+      "Bash(systemctl list-dependencies *)"
     ]
   }
 }

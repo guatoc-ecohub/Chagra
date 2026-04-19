@@ -20,6 +20,12 @@
   # Workaround for sphinx/docutils bug in nixos-unstable
   documentation.doc.enable = lib.mkDefault false;
 
+  # --- NIX-LD: Soporte FHS para binarios dinámicos (NPM, Node nativo, etc.) ---
+  # Provee /lib64/ld-linux-x86-64.so.2 y libs compartidas estandar para
+  # ejecutar artefactos compilados fuera del sandbox Nix (pipelines npm,
+  # prebuilts de esbuild/swc, binarios de herramientas de IA, etc.).
+  programs.nix-ld.enable = true;
+
   # --- SECURITY HARDENING: Electric Fences ---
   systemd.services.sops-key-protection = {
     description = "Protect SOPS age key with immutable attribute";
