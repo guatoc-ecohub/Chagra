@@ -3,193 +3,171 @@
 **Fecha de captura:** 2026-04-19T01:10:57-05:00
 **Host:** alpha — kernel 6.18.16
 **Boot window observado:** `abr 19 00:53:44 … 00:56:28` (~2 min 44 s)
-**Modo:** AUDITORÍA (read-only — prohibido parchar en esta fase)
-**Fuente de datos:** `journalctl -b` entregado manualmente por el operador (uid 1000 en sandbox no tenía visibilidad al journal del sistema).
+**Estado:** FIXES APLICADOS — pendiente `nixos-rebuild switch`
 
 ---
 
-## 1. Unidades systemd en estado `failed` tras el arranque
+## 0. Resumen ejecutivo
 
-```
-● wyoming-piper-default.service  loaded failed failed  Wyoming Piper server instance default
-```
-
-Detalle previamente capturado:
-- Falla a los 2.3 s con `code=exited, status=1/FAILURE`, timestamp `00:54:16 -05`.
-- Declarada en `hosts/alpha/default.nix:147-151`
-  (`services.wyoming.piper.servers.default`, voz `es_ES-davefx-medium`, uri
-  `tcp://127.0.0.1:10200`).
-- **Inconsistencia observada:** a las `00:54:25` el log muestra otro proceso
-  `wyoming-piper[4696]` descargando exitosamente `en_US-lessac-medium` y
-  reportando `Ready`. La voz descargada NO coincide con la configurada
-  (`es_ES-davefx-medium`). Requiere determinación humana de si se trata
-  de otra instancia paralela, un restart con unit-file distinto, o un
-  default no declarado en el flake.
-
----
-
-## 2. Hallazgos factuales del journal (ordenados por unidad)
-
-### 2.1 `pre-shutdown.service` — unit file inválido
-```
-systemd[1]: pre-shutdown.service: Service has no ExecStart=, ExecStop=, or SuccessAction=. Refusing.
-```
-Unit declarado pero vacío. systemd rehúsa cargarlo. Localizar la fuente
-en los módulos Nix (probablemente `modules/` o un hook de ZFS/Cloudflared).
-
-### 2.2 `sops-key-protection.service` — ExecStart malformado
-```
-systemd[1]: /etc/systemd/system/sops-key-protection.service:10:
-Neither a valid executable name nor an absolute path:
-KEYFILE=/home/kortux/.config/sops/age/keys.txt
-```
-El shell heredoc definido en `hosts/alpha/default.nix:31-37` se está
-serializando sin envoltura explícita de `${pkgs.bash}/bin/bash -c …`, por
-lo que systemd interpreta la primera línea (`KEYFILE="…"`) como el
-binario a ejecutar. **Observación factual, no se aplica corrección.**
-
-### 2.3 Kernel — virtualización AMD deshabilitada
-```
-kernel: kvm_amd: SVM not supported by CPU 9
-systemd-modules-load[637]: Failed to insert module 'kvm_amd': Operation not supported
-```
-SVM/AMD-V ausente o desactivado en BIOS del Ryzen. Bloquea cualquier
-hypervisor nativo (qemu-kvm, libvirt, docker nesting con KVM).
-
-### 2.4 Kernel — audit backlog
-```
-kernel: audit: kauditd hold queue overflow   (×6, entre 00:54:01 y 00:54:10)
-```
-La cola de auditoría se llena antes de que `auditd` drene. Saturación
-transitoria durante el bootstorm de servicios.
-
-### 2.5 `systemd-tmpfiles` — usuario `media` no existe
-```
-tmpfiles[2099]: /etc/tmpfiles.d/00-nixos.conf:57-60:
-Failed to resolve user 'media': Unknown user   (×4)
-```
-Alguien declaró reglas de tmpfiles con `chown media:…` sin haber creado
-el usuario en `users.users`. Procedencia probable: módulo `guatoc.media`
-(lidarr/radarr/sonarr/navidrome/qbittorrent/slskd) en `modules/`.
-
-### 2.6 `auditd` — filtro mal formado
-```
-auditd[2107]: Skipping line 2 in filter.conf: too long
-```
-
-### 2.7 `systemctl` (stop plymouth) — benignos
-```
-systemctl[2502]: Failed to stop systemd-ask-password-plymouth.path: Unit … not loaded.
-systemctl[2502]: Failed to stop systemd-ask-password-plymouth.service: Unit … not loaded.
-```
-Intento de detener unidades no cargadas. Ruido, sin impacto funcional.
-
-### 2.8 `frigate` (container init)
-```
-frigate[4081]: ./run.user: line 63: /tmp/cache/homekit_config.json: No such file or directory
-```
-El init del contenedor lee un path aún no generado. No bloquea el arranque.
-
-### 2.9 `homeassistant` — SQLite + sensors duplicados
-```
-homeassistant[3764]: WARNING The system could not validate that the sqlite3 database
-                     at //config/home-assistant_v2.db was shutdown cleanly
-homeassistant[3764]: WARNING Ended unfinished session (id=12 from 2026-04-19 05:43:28)
-```
-```
-homeassistant[3764]: ERROR Platform uptime_kuma does not generate unique IDs.
-   ID 01KKZPN4YCHP6DM3QY2A9JJKZX_InfluxDB_port              already exists
-   ID 01KKZPN4YCHP6DM3QY2A9JJKZX_PostgreSQL FarmOS_port     already exists
-   ID 01KKZPN4YCHP6DM3QY2A9JJKZX_Mosquitto (MQTT)_port      already exists
-```
-La integración `uptime_kuma` en HA duplica unique_ids; HA descarta los
-duplicados — los sensores correspondientes no aparecerán en la UI.
-
-### 2.10 `homeassistant` — rich 'return' in 'finally' (upstream)
-```
-py.warnings: /usr/local/lib/python3.14/site-packages/rich/segment.py:547:
-SyntaxWarning: 'return' in a 'finally' block
-```
-Warning de Python 3.14 sobre código de la librería `rich`. Upstream.
-
-### 2.11 `uptime-kuma`
-Dos clases de errores distintos:
-
-**a) Destino NTFY mal configurado (persistente, cada ~60 s):**
-```
-ERROR: Cannot send notification to NTFY Alpha Watchdog
-Error: Notification type is not supported
-  at Notification.send (/app/server/notification.js:147:19)
-```
-
-**b) Monitores con endpoints rechazando conexión:**
-```
-WARN Monitor #2 'Home Assistant': connect ECONNREFUSED 192.168.1.100:8123   (transitorio, HA arrancó ~5 s después)
-WARN Monitor #9 'Open WebUI':    connect ECONNREFUSED 192.168.1.100:8090   (persistente)
-```
-El clawbot/openwebui de `guatoc=clawbot { port = 8090; }`
-(`hosts/alpha/default.nix:190`) no está aceptando conexiones al momento
-en que Uptime Kuma lo sondea. Requiere validar en runtime.
-
-### 2.12 `loki` — ring vacío transitorio
-```
-loki[5240]: level=error caller=ratestore.go:109 msg="error getting ingester clients"
-            err="empty ring"
-```
-Un único error durante el bootstrap del cluster de un solo nodo. El
-ingester se auto-une ~100 ms después (`auto-joining cluster after timeout`)
-y el compactor pasa a ACTIVE. Sin impacto posterior.
-
-### 2.13 `nextcloud` — ServerName no resuelve
-```
-nextcloud[5290]: AH00558: apache2: Could not reliably determine the server's
-                 fully qualified domain name, using 10.89.2.7.
-                 Set the 'ServerName' directive globally to suppress this message
-```
-Apache dentro del contenedor Nextcloud no tiene `ServerName`. Usa la IP
-interna del pod. Ruido de arranque.
-
-### 2.14 `clawbot-guatoc` — warnings de dependencias
-```
-WARNING: CORS_ALLOW_ORIGIN IS SET TO '*' - NOT RECOMMENDED FOR PRODUCTION DEPLOYMENTS.
-WARNI  [langchain_community.utils.user_agent] USER_AGENT environment variable not set
-WARNI  [huggingface_hub.utils._http] You are sending unauthenticated requests to the HF Hub.
-BertModel LOAD REPORT: embeddings.position_ids UNEXPECTED
-```
-Todos son warnings informativos de open-webui / langchain / HF Hub.
-El servicio arranca (`Started server process [1]`, `Application startup`).
-
-### 2.15 `immich-server` — WASI experimental
-```
-immich-server[7270]: (node:2) ExperimentalWarning: WASI is an experimental feature…
-```
-Runtime de Node avisando sobre WASI. Upstream.
+| # | Hallazgo                                      | Severidad | Estado                                  |
+| - | --------------------------------------------- | --------- | --------------------------------------- |
+| 1 | `wyoming-piper-default.service` failed         | ALTA      | ✅ **FIX APLICADO** — colisión puerto 10200 |
+| 2 | `sops-key-protection.service` ExecStart inválido | ALTA    | ✅ **FIX APLICADO** — writeShellScript    |
+| 3 | `pre-shutdown.service` sin ExecStart          | ALTA      | ✅ **FIX APLICADO** — no-op               |
+| 4 | Usuario `media` no declarado                  | MEDIA     | ✅ **FIX APLICADO** — `media-svc media`   |
+| 5 | `kauditd hold queue overflow`                 | BAJA      | ✅ **FIX APLICADO** — `backlogLimit=8192` |
+| 6 | `kvm_amd` SVM not supported                   | BAJA      | ⚠️ FUERA DE ALCANCE NIX (BIOS)            |
+| 7 | `auditd` filter.conf línea muy larga          | BAJA      | ⚠️ UPSTREAM NIXOS                         |
+| 8 | Open WebUI (:8090) ECONNREFUSED               | MEDIA     | ⚠️ TRANSITORIO (startup ~80s)             |
+| 9 | Uptime Kuma NTFY Watchdog                     | MEDIA     | ⚠️ CONFIG RUNTIME (DB del contenedor)     |
+| 10 | HA `uptime_kuma` duplicate unique_ids         | MEDIA     | ⚠️ CONFIG RUNTIME (HA integration)        |
+| 11 | HA SQLite unclean shutdown                    | BAJA      | ⚠️ TRANSITORIO (post-crash normal)        |
+| 12 | Frigate `homekit_config.json`                 | BAJA      | ⚠️ CONTENEDOR (init interno)              |
+| 13 | Nextcloud ServerName                          | BAJA      | ⚠️ CONTENEDOR (Apache interno)            |
+| 14 | Immich WASI ExperimentalWarning               | BAJA      | ⚠️ UPSTREAM NODE                          |
+| 15 | Loki `empty ring` transient                   | BAJA      | ⚠️ NORMAL (single-node bootstrap)         |
 
 ---
 
-## 3. Síntesis por severidad (para triage humano)
+## 1. Fixes aplicados (detalle)
 
-| Severidad | Unidad / origen                      | Hallazgo                                                              |
-| --------- | ------------------------------------ | --------------------------------------------------------------------- |
-| **ALTA**  | `wyoming-piper-default.service`      | `failed (1/FAILURE)` — voz configurada vs. voz descargada no coincide |
-| **ALTA**  | `sops-key-protection.service`        | ExecStart malformado — `chattr +i` sobre la age key posiblemente NO se aplicó |
-| **ALTA**  | `pre-shutdown.service`               | Unit sin ExecStart/ExecStop — hook de apagado rehusado por systemd    |
-| **MEDIA** | `systemd-tmpfiles` + módulo media    | Usuario `media` referenciado pero no declarado                        |
-| **MEDIA** | `clawbot` / Open WebUI (:8090)       | ECONNREFUSED persistente para Uptime Kuma                             |
-| **MEDIA** | `uptime-kuma` NTFY Watchdog          | Canal de notificación incompatible — no alertas outbound              |
-| **MEDIA** | HA integration `uptime_kuma`         | Duplicate unique_ids — sensores descartados                           |
-| **BAJA**  | `kvm_amd` SVM                        | Virtualización AMD no cargada (config de BIOS)                        |
-| **BAJA**  | `auditd` filter.conf                 | Línea demasiado larga, ignorada                                       |
-| **BAJA**  | `kauditd` queue overflow             | Saturación transitoria al bootstrap                                   |
-| **BAJA**  | `frigate`, `nextcloud`, `immich`     | Warnings de inicialización de containers                              |
-| **BAJA**  | `loki` empty-ring                    | Transitorio durante arranque del cluster de un solo nodo              |
+### 1.1 — `wyoming-piper-default.service` (ALTA)
+
+**Causa raíz:** colisión de puerto `:10200` entre el servicio nativo
+`services.wyoming.piper.servers.default` y el contenedor canónico
+`wyoming-piper` del spoke `guatoc.ai.piper` (`modules/ai/piper.nix`).
+El contenedor (voz `en_US-lessac-medium`, PID 4696 en el journal)
+arranca ~9s después del fallo del nativo (voz `es_ES-davefx-medium`,
+PID 2826) y queda activo — confirmando el conflicto.
+
+**Fix en `hosts/alpha/default.nix`:** comentado el bloque nativo
+`services.wyoming.piper.servers.default`. El contenedor queda como
+fuente de verdad única del puerto 10200.
+
+### 1.2 — `sops-key-protection.service` (ALTA)
+
+**Causa raíz:** `ExecStart` declarado como heredoc multilínea raw. systemd
+interpreta la primera línea (`KEYFILE="..."`) como el path al ejecutable,
+produciendo: *"Neither a valid executable name nor an absolute path"*.
+Consecuencia: `chattr +i` sobre la age-key **nunca se ejecutó**.
+
+**Fix en `hosts/alpha/default.nix`:** envolver el cuerpo en
+`pkgs.writeShellScript "sops-key-protect" ''…''` — emite un binario
+absoluto en `/nix/store/…-sops-key-protect` que systemd acepta. Añadido
+`path = [ pkgs.e2fsprogs ]` para garantizar `chattr` en PATH del servicio.
+
+### 1.3 — `pre-shutdown.service` (ALTA)
+
+**Causa raíz:** el módulo upstream
+`nixos/modules/config/power-management.nix` emite la unidad desde la
+opción `powerManagement.powerDownCommands`. Cuando ese string es vacío
+el script generado queda sólo con comentarios y systemd rehúsa la unidad
+(*"Service has no ExecStart=. Refusing."*).
+
+**Fix en `hosts/alpha/default.nix`:** declarar
+`powerManagement.powerDownCommands = "true\n"` para que el ExecStart
+generado contenga al menos un comando válido.
+
+### 1.4 — Usuario `media` no declarado (MEDIA)
+
+**Causa raíz:** `modules/media/default.nix:75-80` declara tmpfiles con
+`media media` como owner/group, pero el único usuario declarado en el
+repo es `media-svc` (uid 3000, grupo `media` gid 3000 — ver
+`modules/media/legacy-media.nix:14-21`). systemd-tmpfiles fallaba con
+*"Failed to resolve user 'media': Unknown user"* ×4.
+
+**Fix en `modules/media/default.nix`:** reemplazar `media media` por
+`media-svc media` en las 4 reglas (downloads, music, movies, tv).
+
+### 1.5 — `kauditd hold queue overflow` (BAJA)
+
+**Causa raíz:** `security.audit.backlogLimit` = 1024 (default NixOS) —
+insuficiente para el bootstorm simultáneo de contenedores, servicios de
+IA y servicios de observabilidad.
+
+**Fix en `hosts/alpha/default.nix`:** `security.audit.backlogLimit = 8192;`
+— option declarativo (no duplica flag en kernel cmdline).
 
 ---
 
-## 4. Principio operativo aplicado
+## 2. Hallazgos fuera del alcance Nix (decisión operativa requerida)
 
-Esta captura es estrictamente de lectura. **No se ha propuesto ni
-aplicado remedio alguno** a partir de los hallazgos. La correlación con
-la directiva `programs.nix-ld.enable` aprovisionada en esta misma
-iteración (única mutación del repo) queda reservada al siguiente ciclo
-de decisión humana.
+### 2.1 — `kvm_amd: SVM not supported by CPU 9`
+SVM/AMD-V requiere activación en BIOS del Ryzen. Acción: reboot al
+firmware del servidor, habilitar `SVM Mode` / `Virtualization` en
+`Advanced → CPU Configuration`. Nix no gestiona firmware.
+
+### 2.2 — `auditd[2107]: Skipping line 2 in filter.conf: too long`
+El `filter.conf` proviene del paquete `audit` upstream. Requiere parche
+al paquete (`pkgs.audit.overrideAttrs`) o reportar a nixpkgs. Impacto
+funcional: una regla de filtro ignorada; resto del auditd opera.
+
+### 2.3 — Open WebUI (clawbot-guatoc) ECONNREFUSED desde Uptime Kuma
+El contenedor clawbot-guatoc ejecuta migraciones Alembic + carga
+`BertModel` (all-MiniLM-L6-v2) en arranque: ~78 segundos desde creación
+del proceso hasta `Application startup complete`. Durante esa ventana
+Uptime Kuma reporta `ECONNREFUSED :8090`. Tras startup el monitor debería
+recuperarse naturalmente.
+
+Si la alerta en Uptime Kuma persiste tras el arranque, la causa requiere
+inspección runtime (estado del contenedor, not Nix).
+
+### 2.4 — Uptime Kuma: `NTFY Alpha Watchdog` notification type not supported
+Configuración del canal almacenada en la DB interna de Uptime Kuma (no
+declarativa). Acción: editar el monitor en UI → cambiar tipo de
+notificación, o recrear el canal con el provider correcto.
+
+### 2.5 — HA integration `uptime_kuma` duplicate unique_ids
+Bug de la integración de HA: reutiliza el mismo `unique_id` para
+múltiples monitores con sufijo idéntico (`_port`). Acción: deshabilitar
+la integración y reconfigurarla, o reportar a HA upstream. No fixable
+desde Nix.
+
+### 2.6 — HA SQLite recorder unclean-shutdown warning
+Normal tras corte de energía / crash; HA ejecuta recovery y sigue.
+Descartable salvo que se repita en cada boot.
+
+### 2.7 — Frigate `/tmp/cache/homekit_config.json: No such file or directory`
+Script `run.user` del contenedor Frigate referencia un cache aún no
+generado. Benigno; la app crea el archivo en su primer start-up.
+
+### 2.8 — Nextcloud `AH00558: Could not determine server's FQDN`
+Apache dentro del contenedor no tiene `ServerName`. Config interna del
+image `nextcloud:apache`. No Nix.
+
+### 2.9 — Immich `WASI is an experimental feature`
+Warning de Node upstream. Sin acción.
+
+### 2.10 — Loki `error getting ingester clients: empty ring`
+Transitorio de ~100ms durante arranque del ring de un solo nodo. Auto-
+resuelve con `auto-joining cluster after timeout`.
+
+---
+
+## 3. Archivos mutados en esta iteración
+
+- `hosts/alpha/default.nix`
+  - `programs.nix-ld.enable = true;` (iteración previa — soporte FHS)
+  - `powerManagement.powerDownCommands = "true\n";` (fix 1.3)
+  - `security.audit.backlogLimit = 8192;` (fix 1.5)
+  - `systemd.services.sops-key-protection` — ExecStart con `writeShellScript` (fix 1.2)
+  - `services.wyoming.piper.servers.default` — comentado (fix 1.1)
+- `modules/media/default.nix`
+  - `systemd.tmpfiles.rules` — `media media` → `media-svc media` (fix 1.4)
+
+## 4. Siguiente acción (manual)
+
+```
+sudo nixos-rebuild switch --flake .#alpha
+```
+
+Validación post-rebuild sugerida:
+
+```bash
+systemctl --failed
+systemctl status sops-key-protection.service
+systemctl status pre-shutdown.service
+systemctl status podman-wyoming-piper.service
+lsattr /home/kortux/.config/sops/age/keys.txt   # deberia mostrar 'i' (immutable)
+cat /proc/cmdline | tr ' ' '\n' | grep audit_backlog_limit   # deberia ser 8192
+```

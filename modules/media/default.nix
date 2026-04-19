@@ -71,12 +71,15 @@ in
     # Los usuarios/grupos se definen en los módulos legacy o en hosts
     # Esta configuración solo maneja los contenedores OCI
     
-    # Crear directorios base con permisos correctos
+    # Crear directorios base con permisos correctos.
+    # El usuario 'media' NO existe; el declarado es 'media-svc' (uid 3000)
+    # en modules/media/legacy-media.nix, grupo 'media' (gid 3000).
+    # Journal previo: "Failed to resolve user 'media': Unknown user" (×4).
     systemd.tmpfiles.rules = [
-      "d ${cfg.downloadsDir} 0775 media media -"
-      "d ${cfg.musicDir} 0775 media media -"
-      "d ${cfg.moviesDir} 0775 media media -"
-      "d ${cfg.tvDir} 0775 media media -"
+      "d ${cfg.downloadsDir} 0775 media-svc media -"
+      "d ${cfg.musicDir} 0775 media-svc media -"
+      "d ${cfg.moviesDir} 0775 media-svc media -"
+      "d ${cfg.tvDir} 0775 media-svc media -"
     ];
     
     # Crear red Podman para media stack

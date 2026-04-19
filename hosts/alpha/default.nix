@@ -26,15 +26,37 @@
   # prebuilts de esbuild/swc, binarios de herramientas de IA, etc.).
   programs.nix-ld.enable = true;
 
+  # --- PRE-SHUTDOWN: no-op para satisfacer systemd ---
+  # El upstream NixOS genera pre-shutdown.service desde powerManagement.
+  # powerDownCommands; vacio produce un script sin ExecStart valido y systemd
+  # rehusa la unidad ("Service has no ExecStart=. Refusing.").
+  powerManagement.powerDownCommands = ''
+    # no-op explicito (evita unit sin ExecStart tras generador NixOS)
+    true
+  '';
+
+  # --- KERNEL AUDIT BACKLOG ---
+  # Evita "kauditd hold queue overflow" durante el bootstorm de servicios.
+  # Default NixOS = 1024; 8192 cubre el arranque del stack completo.
+  # Usar el option declarativo (no boot.kernelParams crudo) evita duplicar
+  # el flag en la linea de comando del kernel.
+  security.audit.backlogLimit = 8192;
+
   # --- SECURITY HARDENING: Electric Fences ---
+  # ExecStart debe ser un binario/script absoluto. El heredoc previo era
+  # interpretado por systemd como `KEYFILE=...` (primera linea) = ejecutable,
+  # produciendo: "Neither a valid executable name nor an absolute path".
+  # Se envuelve el bloque en writeShellScript para emitir un /nix/store/... ejecutable.
   systemd.services.sops-key-protection = {
     description = "Protect SOPS age key with immutable attribute";
     wantedBy = [ "multi-user.target" ];
     after = [ "local-fs.target" ];
+    path = [ pkgs.e2fsprogs ];  # proporciona chattr
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
-      ExecStart = ''
+      ExecStart = pkgs.writeShellScript "sops-key-protect" ''
+        set -u
         KEYFILE="/home/kortux/.config/sops/age/keys.txt"
         if [ -f "$KEYFILE" ]; then
           chattr +i "$KEYFILE" 2>/dev/null || true
@@ -149,12 +171,15 @@
   # incluyendo Mosquitto, Home Assistant, Node-RED, InfluxDB y Grafana
 
   # --- WYOMING PIPER TTS INTEGRATION ---
-  # Integración de Piper TTS vía protocolo Wyoming para Home Assistant
-  services.wyoming.piper.servers.default = {
-    enable = true;
-    voice = "es_ES-davefx-medium";
-    uri = "tcp://127.0.0.1:10200";
-  };
+  # El spoke canonico es el contenedor definido en modules/ai/piper.nix,
+  # habilitado via `guatoc.ai.piper.enable`. Ambos binds a :10200 colisionaban
+  # (journal 2026-04-19 00:54:16 — status=1/FAILURE a los 2.3s del arranque).
+  # Se conserva solo el contenedor.
+  # services.wyoming.piper.servers.default = {
+  #   enable = true;
+  #   voice = "es_ES-davefx-medium";
+  #   uri = "tcp://127.0.0.1:10200";
+  # };
 
   # --- MUSIC PIPELINE ---
   services.music-pipeline = {

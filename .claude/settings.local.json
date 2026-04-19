@@ -89,7 +89,8 @@
       "Bash(systemctl cat *)",
       "Bash(systemctl show *)",
       "Read(//etc/systemd/system/**)",
-      "Bash(systemctl list-dependencies *)"
+      "Bash(systemctl list-dependencies *)",
+      "Bash(journalctl -u wyoming-piper-default.service -b --no-pager)"
     ]
   }
 }
