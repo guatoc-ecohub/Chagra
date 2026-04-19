@@ -179,7 +179,11 @@
   guatoc.ai = {
     enable = true;
     ollama.enable = true;
-    whisper.enable = true;
+    whisper.enable = true;       # Wyoming STT (puerto 10300 — HA)
+    whisper-http = {
+      enable = true;
+      model = "small";            # ~460 MB; mejor precision en espanol que "base"
+    };                            # HTTP ASR (puerto 10301 — PWA Chagra)
     piper.enable = true;
     clawbots.enable = true;
     clawbots.instances = {

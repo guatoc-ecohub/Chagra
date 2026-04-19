@@ -40,8 +40,11 @@ in
     systemd.services.podman-whisper-http = {
       after = [ "zfs.target" "network-online.target" "podman-create-ai-net.service" ];
       requires = [ "zfs.target" "podman-create-ai-net.service" ];
-      serviceConfig = {
+      # RequiresMountsFor pertenece a [Unit], no a [Service]. Usar unitConfig.
+      unitConfig = {
         RequiresMountsFor = [ "/mnt/fast/appdata" ];
+      };
+      serviceConfig = {
         ExecStartPre = [
           "${pkgs.coreutils}/bin/install -d -m 0755 /mnt/fast/appdata/whisper-http"
           "${pkgs.coreutils}/bin/install -d -m 0755 /mnt/fast/appdata/whisper-http/whisper"
