@@ -5,23 +5,26 @@ import StreamingText from './StreamingText';
 /**
  * AIStreamPanel — bloque cyberpunk de render para generaciones del LLM.
  *
- * Efectos visuales:
- *   - Entrada con "glitch-in": fade + blur + saturación reducida que se
- *     estabiliza, diferencia IA de contenidos deterministas (reglas).
- *   - Scanline: barrido horizontal CRT sobre el panel mientras `active`.
- *   - Neon-pulse: glow del borde (color según `accent`) en loop mientras
- *     sigue generando.
- *   - Cursor pulsante al final del texto (vía StreamingText).
- *   - Spark de cierre: al detectar la transición active:true → false con
- *     texto presente, dispara un rayo luminoso horizontal + burst circular
- *     en el borde derecho (~700ms), marcando el fin de la generación.
+ * Diferencia el contenido IA del contenido determinista con efectos visuales
+ * que evocan una terminal CRT + un HUD cyberpunk:
+ *
+ *   - Entrada "glitch-in": fade + blur + saturacion que se estabiliza.
+ *   - Scanline: linea de luz (color accent) desciende en loop mientras genera.
+ *   - Neon pulse: glow del borde en loop mientras active.
+ *   - Texto estilo terminal IBM / VT100: font monoespaciada verde fosforo
+ *     con text-shadow bloom + CRT flicker sutil + overlay de scanlines
+ *     horizontales fijas + block cursor parpadeante (variant="block").
+ *   - Spark de cierre (~1.4s): rayo horizontal de izquierda a derecha con
+ *     blur + burst circular expansivo en borde derecho. Marca claramente
+ *     el fin del stream.
  *
  * Props:
  *   - text    string        contenido acumulado (chunk a chunk).
  *   - active  boolean       true mientras el LLM genera.
- *   - label   string        header (ej. "IA generando", "Diagnóstico IA").
- *   - accent  string        'orchid' | 'muzo' | 'morpho' — paleta neon.
- *   - meta    ReactNode     texto pequeño a la derecha del header (modelo, duración).
+ *   - label   string        header (ej. "IA generando", "Diagnostico IA").
+ *   - accent  string        'orchid' | 'muzo' | 'morpho' — borde/glow/header.
+ *                           El TEXTO siempre es verde fosforo (look uniforme).
+ *   - meta    ReactNode     pequeno texto a la derecha del header.
  */
 export default function AIStreamPanel({
   text = '',
@@ -36,10 +39,9 @@ export default function AIStreamPanel({
   useEffect(() => {
     if (prevActive.current && !active && text) {
       setJustFinished(true);
-      const t = setTimeout(() => setJustFinished(false), 750);
-      return () => {
-        clearTimeout(t);
-      };
+      // 1400ms alineado con la duracion del keyframe spark-flash.
+      const t = setTimeout(() => setJustFinished(false), 1400);
+      return () => clearTimeout(t);
     }
     prevActive.current = active;
   }, [active, text]);
@@ -69,13 +71,32 @@ export default function AIStreamPanel({
   };
   const c = palette[accent] || palette.orchid;
 
+  // Verde fosforo estilo terminal IBM 3270 / monitor CRT antiguo.
+  // Uniforme en las 3 superficies de IA para mantener la metafora de terminal.
+  const phosphorColor = '#4ade80';
+
+  // Overlay de scanlines horizontales fijas (repeating-gradient 2px).
+  // Simulado a ~3% de opacidad para no distraer la lectura del texto.
+  const scanlinesBg = {
+    backgroundImage:
+      'repeating-linear-gradient(to bottom, rgba(74, 222, 128, 0.06) 0px, rgba(74, 222, 128, 0.06) 1px, transparent 1px, transparent 2px)',
+  };
+
+  // Text-shadow que simula el bloom del fosforo en tubo CRT.
+  const phosphorTextStyle = {
+    color: phosphorColor,
+    textShadow: '0 0 4px rgba(74, 222, 128, 0.75), 0 0 8px rgba(74, 222, 128, 0.35)',
+    fontFamily:
+      'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+  };
+
   return (
     <div
-      className={`relative overflow-hidden rounded-lg border ${c.border} bg-slate-950/70 motion-safe:animate-glitch-in ${
+      className={`relative overflow-hidden rounded-lg border ${c.border} bg-slate-950/80 motion-safe:animate-glitch-in ${
         active ? `${c.glow} motion-safe:animate-neon-pulse` : ''
       }`}
     >
-      {/* Scanline horizontal que desciende en loop, solo activa durante stream */}
+      {/* Scanline horizontal que desciende en loop (efecto barrido CRT) */}
       {active && (
         <div
           aria-hidden="true"
@@ -83,24 +104,26 @@ export default function AIStreamPanel({
         />
       )}
 
-      {/* Spark de cierre: rayo horizontal que cruza + burst al borde */}
+      {/* Spark de cierre: rayo horizontal + burst circular */}
       {justFinished && (
         <>
           <div
             aria-hidden="true"
-            className={`pointer-events-none absolute inset-y-0 left-0 w-24 ${c.fill} opacity-70 motion-safe:animate-spark-flash`}
-            style={{ filter: 'blur(12px)' }}
+            className={`pointer-events-none absolute inset-y-0 left-0 w-28 ${c.fill} opacity-75 motion-safe:animate-spark-flash`}
+            style={{ filter: 'blur(14px)' }}
           />
           <div
             aria-hidden="true"
             className={`pointer-events-none absolute top-1/2 right-2 w-3 h-3 -translate-y-1/2 rounded-full ${c.fill} motion-safe:animate-spark-burst`}
-            style={{ filter: 'blur(1px)' }}
+            style={{ filter: 'blur(1.5px)' }}
           />
         </>
       )}
 
       <div className="relative p-3">
-        <div className={`flex items-center justify-between mb-1.5 text-2xs uppercase tracking-widest font-bold ${c.text}`}>
+        <div
+          className={`flex items-center justify-between mb-2 text-2xs uppercase tracking-widest font-bold ${c.text}`}
+        >
           <div className="flex items-center gap-1.5">
             <span
               className={`inline-block w-1.5 h-1.5 rounded-full ${c.fill} ${
@@ -120,11 +143,28 @@ export default function AIStreamPanel({
               </span>
             )}
           </div>
-          {meta && <span className="text-slate-400 normal-case tracking-normal font-normal">{meta}</span>}
+          {meta && (
+            <span className="text-slate-400 normal-case tracking-normal font-normal">
+              {meta}
+            </span>
+          )}
         </div>
 
-        <div className="text-sm text-slate-100 leading-relaxed whitespace-pre-wrap min-h-[2rem]">
-          <StreamingText text={text} active={active} cursorClassName={c.text} />
+        {/* Bloque de texto tipo terminal CRT: scanlines + fosforo verde + flicker */}
+        <div
+          className="relative rounded-sm px-2 py-2 bg-black/40 overflow-hidden motion-safe:animate-crt-flicker"
+          style={scanlinesBg}
+        >
+          <div
+            className="text-sm leading-relaxed whitespace-pre-wrap break-words min-h-[1.5rem] tracking-wide"
+            style={phosphorTextStyle}
+          >
+            <StreamingText
+              text={text}
+              active={active}
+              variant="block"
+            />
+          </div>
         </div>
       </div>
     </div>
