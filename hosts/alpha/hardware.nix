@@ -44,7 +44,10 @@
     "vm.swappiness" = 10;
     "vm.vfs_cache_pressure" = 50;
     "vm.overcommit_memory" = 2;
-    "vm.overcommit_ratio" = 80;
+    # ratio=150: CommitLimit ≈ 52 GiB (swap 31 + RAM 14×1.5). Antes 80 dejaba solo
+    # ~42 GiB y con Committed_AS ~40 GiB el runner de Ollama no podía asignar los
+    # 3.7 GiB contiguos del modelo qwen3.5:4b tras un reload (2026-04-19).
+    "vm.overcommit_ratio" = 150;
   };
   
   # Las entradas fstab manejan los montajes de pool
