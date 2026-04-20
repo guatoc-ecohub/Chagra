@@ -83,6 +83,24 @@ export default {
                     '50%':      { opacity: '0.97' },
                     '80%':      { opacity: '0.99' },
                 },
+                // Flash de negativo fotografico (invert + hue-rotate). Breve,
+                // ~400ms. Usado como (a) pulso de "IA viva" cada 8s durante el
+                // stream, y (b) transicion inicial antes del rayo de cierre.
+                negativeFlash: {
+                    '0%':   { filter: 'invert(0) hue-rotate(0deg) saturate(100%)' },
+                    '15%':  { filter: 'invert(1) hue-rotate(180deg) saturate(140%)' },
+                    '55%':  { filter: 'invert(1) hue-rotate(200deg) saturate(120%)' },
+                    '80%':  { filter: 'invert(0.25) hue-rotate(60deg) saturate(110%)' },
+                    '100%': { filter: 'invert(0) hue-rotate(0deg) saturate(100%)' },
+                },
+                // Loop continuo: 95% del ciclo sin efecto; en los ultimos ~5%
+                // del ciclo (8s total), flash breve de negativo para anunciar
+                // que la IA sigue viva — una "latido" visual periodico.
+                negativeBreath: {
+                    '0%, 94%, 100%': { filter: 'invert(0) hue-rotate(0deg)' },
+                    '96%':           { filter: 'invert(1) hue-rotate(180deg) saturate(130%)' },
+                    '98%':           { filter: 'invert(0.4) hue-rotate(90deg)' },
+                },
             },
             animation: {
                 'scanline':    'scanline 2.4s linear infinite',
@@ -92,6 +110,10 @@ export default {
                 'spark-burst': 'sparkBurst 1200ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
                 'crt-blink':   'crtBlink 1.1s steps(1) infinite',
                 'crt-flicker': 'crtFlicker 4s ease-in-out infinite',
+                // "IA viva" — pulso periodico cada 8s durante el stream.
+                'negative-breath': 'negativeBreath 8s ease-in-out infinite',
+                // Transicion de cierre: flash previo al rayo (500ms).
+                'negative-flash':  'negativeFlash 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards',
             },
         },
     },

@@ -33,18 +33,38 @@ export default function AIStreamPanel({
   accent = 'orchid',
   meta = null,
 }) {
-  const [justFinished, setJustFinished] = useState(false);
+  // Fases del ciclo de vida del panel:
+  //   idle      — sin actividad, estatico.
+  //   streaming — LLM genera (active=true); texto pulsa con negative-breath
+  //               cada 8s como "latido" de IA viva.
+  //   closing   — transicion de cierre inicial: flash de negativo (500ms)
+  //               que invierte colores momentaneamente, anuncia el fin.
+  //   finished  — rayo + burst de cierre (1400/1200ms), fase final visual.
+  const [phase, setPhase] = useState(active ? 'streaming' : 'idle');
   const prevActive = useRef(active);
 
   useEffect(() => {
-    if (prevActive.current && !active && text) {
-      setJustFinished(true);
-      // 1400ms alineado con la duracion del keyframe spark-flash.
-      const t = setTimeout(() => setJustFinished(false), 1400);
-      return () => clearTimeout(t);
+    if (active) {
+      setPhase('streaming');
+    } else if (prevActive.current && !active && text) {
+      // streaming -> closing (500ms) -> finished (1400ms) -> idle
+      setPhase('closing');
+      const closingTimer = setTimeout(() => {
+        setPhase('finished');
+      }, 500);
+      const resetTimer = setTimeout(() => {
+        setPhase('idle');
+      }, 500 + 1400);
+      return () => {
+        clearTimeout(closingTimer);
+        clearTimeout(resetTimer);
+      };
     }
     prevActive.current = active;
   }, [active, text]);
+
+  const justFinished = phase === 'finished';
+  const isClosingFlash = phase === 'closing';
 
   const palette = {
     orchid: {
@@ -150,9 +170,17 @@ export default function AIStreamPanel({
           )}
         </div>
 
-        {/* Bloque de texto tipo terminal CRT: scanlines + fosforo verde + flicker */}
+        {/* Bloque de texto tipo terminal CRT: scanlines + fosforo verde + flicker.
+            Durante streaming aplica `negative-breath` (8s loop) como latido
+            periodico que invierte colores brevemente y anuncia que la IA
+            sigue viva. Al cerrar, primero `negative-flash` (500ms) como
+            transicion antes del rayo. */}
         <div
-          className="relative rounded-sm px-2 py-2 bg-black/40 overflow-hidden motion-safe:animate-crt-flicker"
+          className={`relative rounded-sm px-2 py-2 bg-black/40 overflow-hidden motion-safe:animate-crt-flicker ${
+            phase === 'streaming' ? 'motion-safe:animate-negative-breath' : ''
+          } ${
+            isClosingFlash ? 'motion-safe:animate-negative-flash' : ''
+          }`}
           style={scanlinesBg}
         >
           <div
