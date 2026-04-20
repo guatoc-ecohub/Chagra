@@ -32,7 +32,8 @@ in
     };
 
     virtualisation.oci-containers.containers.immich-postgres = {
-      image = "tensorchord/pgvecto-rs:pg14-v0.2.0";
+      # Pinned 2026-04-20 (era :pg14-v0.2.0).
+      image = "docker.io/tensorchord/pgvecto-rs@sha256:739cdd626151ff1f796dc95a6591b55a714f341c737e27f045019ceabf8e8c52";
       volumes = [ "/mnt/fast/apps/immich-db:/var/lib/postgresql/data" ];
       environment = {
         POSTGRES_PASSWORD = "immich";
@@ -44,7 +45,8 @@ in
 
     # Immich Redis
     virtualisation.oci-containers.containers.immich-redis = {
-      image = "redis:6.2-alpine";
+      # Pinned 2026-04-20 (era :6.2-alpine).
+      image = "docker.io/library/redis@sha256:46884be93652d02a96a176ccf173d1040bef365c5706aa7b6a1931caec8bfeef";
       extraOptions = [ "--network=web-network" "--name=immich-redis" ];
     };
 
@@ -58,7 +60,8 @@ in
     };
 
     virtualisation.oci-containers.containers.immich-server = {
-      image = "ghcr.io/immich-app/immich-server:release";
+      # Pinned 2026-04-20 (era :release).
+      image = "ghcr.io/immich-app/immich-server@sha256:aa163d2e1cc2b16a9515dd1fef901e6f5231befad7024f093d7be1f2da14341a";
       ports = [ "${toString registry.ports.immich}:3001" ];
       volumes = [ "/mnt/data/immich:/usr/src/app/upload" ];
       environment = {
@@ -77,7 +80,8 @@ in
 
     # Immich Machine Learning
     virtualisation.oci-containers.containers.immich-ml = {
-      image = "ghcr.io/immich-app/immich-machine-learning:release";
+      # Pinned 2026-04-20 (era :release).
+      image = "ghcr.io/immich-app/immich-machine-learning@sha256:b213fa3c82d27a21a299c46ffbb38a091f18384db1ad67d409a3b34fe0fce556";
       ports = [ "${toString registry.ports.immichML}:3003" ];
       environment = {
         DB_HOSTNAME = "immich-postgres";
