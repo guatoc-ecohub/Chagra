@@ -85,8 +85,13 @@ const extractQuantity = (log) => {
   return value ? `${value} ${label}`.trim() : '';
 };
 
+// Referencia estable para el fallback: evita que `|| []` cree un array nuevo en
+// cada llamada del selector, lo cual dispararía re-render infinito (React #185)
+// cuando el asset aún no tiene logs cargados.
+const EMPTY_LOGS = [];
+
 export default function AssetTimeline({ assetId }) {
-  const logs = useLogStore((state) => state.logsByAsset[assetId] || []);
+  const logs = useLogStore((state) => state.logsByAsset[assetId] || EMPTY_LOGS);
   const isSyncing = useLogStore((state) => state.isSyncing);
   const loadLogsForAsset = useLogStore((state) => state.loadLogsForAsset);
 

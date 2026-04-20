@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, CheckCircle, Clock } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Clock, Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { syncManager } from '../services/syncManager';
 
 function TaskLogScreen({ onBack }) {
