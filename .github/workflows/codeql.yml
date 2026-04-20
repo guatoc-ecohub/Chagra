@@ -4,7 +4,15 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    # Corre en main (post-merge) y en ramas efímeras de trabajo. Esto permite
+    # ver los hallazgos de CodeQL en la pestaña Security de cada rama antes
+    # de abrir el PR, evitando ciclos PR→revert→re-PR por alertas SAST.
+    branches:
+      - main
+      - 'feat/**'
+      - 'fix/**'
+      - 'chore/**'
+      - 'refactor/**'
   schedule:
     - cron: '23 4 * * 1'
 
