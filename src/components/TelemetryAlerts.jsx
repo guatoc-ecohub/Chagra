@@ -253,17 +253,17 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
       const haHeaders = { 'Authorization': `Bearer ${HA_TOKEN}`, 'Content-Type': 'application/json' };
       const haOpts = { method: 'GET', headers: haHeaders, signal: parentSignal };
       const [invernaderoHum, invernaderoTemp, tabacoHum, tabacoTemp] = await Promise.all([
-        fetch(`${HA_URL}/states/sensor.arteco_zs_304z_humidity`, haOpts),
-        fetch(`${HA_URL}/states/sensor.arteco_zs_304z_temperature`, haOpts),
+        fetch(`${HA_URL}/states/sensor.matera_cocina_humidity`, haOpts),
+        fetch(`${HA_URL}/states/sensor.matera_cocina_temperature`, haOpts),
         fetch(`${HA_URL}/states/sensor.hobeian_zg_303z_humidity`, haOpts),
         fetch(`${HA_URL}/states/sensor.hobeian_zg_303z_temperature`, haOpts)
       ]);
 
       if (!invernaderoHum.ok || !invernaderoTemp.ok || !tabacoHum.ok || !tabacoTemp.ok) {
-        const failedSensor = !invernaderoHum.ok ? 'Arteco ZS-304Z Humedad' :
-                          !invernaderoTemp.ok ? 'Arteco ZS-304Z Temperatura' :
-                          !tabacoHum.ok ? 'Hobeian ZG-303Z Humedad' :
-                          'Hobeian ZG-303Z Temperatura';
+        const failedSensor = !invernaderoHum.ok ? 'Zona A Humedad' :
+                          !invernaderoTemp.ok ? 'Zona A Temperatura' :
+                          !tabacoHum.ok ? 'Matera Tabaco Humedad' :
+                          'Matera Tabaco Temperatura';
         throw new Error(`Fallo al conectar con sensor: ${failedSensor}. Verifique Home Assistant.`);
       }
 
@@ -276,10 +276,10 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
 
       // Detección de sensores no disponibles (unavailable, null, unknown)
       const sensorReadings = [
-        { name: 'Invernadero 1 Humedad', data: invernaderoHumData, key: 'Arteco ZS-304Z' },
-        { name: 'Invernadero 1 Temperatura', data: invernaderoTempData, key: 'Arteco ZS-304Z' },
-        { name: 'Tabaco Humedad', data: tabacoHumData, key: 'Hobeian ZG-303Z' },
-        { name: 'Tabaco Temperatura', data: tabacoTempData, key: 'Hobeian ZG-303Z' },
+        { name: 'Zona A Humedad', data: invernaderoHumData, key: 'Matera Cocina' },
+        { name: 'Zona A Temperatura', data: invernaderoTempData, key: 'Matera Cocina' },
+        { name: 'Matera Tabaco Humedad', data: tabacoHumData, key: 'Matera Tabaco' },
+        { name: 'Matera Tabaco Temperatura', data: tabacoTempData, key: 'Matera Tabaco' },
       ];
 
       const unavailableSensors = sensorReadings.filter(s =>
@@ -365,8 +365,8 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
       // Histórico 24h — HA History API (no bloquea análisis)
       const historyStart = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
       const entityIds = [
-        'sensor.arteco_zs_304z_humidity',
-        'sensor.arteco_zs_304z_temperature',
+        'sensor.matera_cocina_humidity',
+        'sensor.matera_cocina_temperature',
         'sensor.hobeian_zg_303z_humidity',
         'sensor.hobeian_zg_303z_temperature'
       ];
@@ -395,22 +395,22 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
 
       const alerts = [];
 
-      // Invernadero 1
-      if (inv1Hum < 40) alerts.push(`🚨 ALERTA: Humedad crítica en Invernadero 1 (${inv1Hum}%). Riego inmediato requerido.`);
-      if (inv1Hum > 80) alerts.push(`💧 Exceso de humedad en Invernadero 1 (${inv1Hum}%). Riesgo de hongos patógenos. Ventilar.`);
-      if (inv1Temp > 30) alerts.push(`🔥 Temperatura elevada en Invernadero 1 (${inv1Temp}°C). Activar ventilación.`);
-      if (inv1Temp < 5) alerts.push(`❄️ Temperatura baja en Invernadero 1 (${inv1Temp}°C). Riesgo de helada. Proteger cultivos.`);
+      // Invernadero - Zona A (ex Invernadero 1; sensor renombrado a matera_cocina)
+      if (inv1Hum < 40) alerts.push(`🚨 ALERTA: Humedad crítica en Zona A (${inv1Hum}%). Riego inmediato requerido.`);
+      if (inv1Hum > 80) alerts.push(`💧 Exceso de humedad en Zona A (${inv1Hum}%). Riesgo de hongos patógenos. Ventilar.`);
+      if (inv1Temp > 30) alerts.push(`🔥 Temperatura elevada en Zona A (${inv1Temp}°C). Activar ventilación.`);
+      if (inv1Temp < 5) alerts.push(`❄️ Temperatura baja en Zona A (${inv1Temp}°C). Riesgo de helada. Proteger cultivos.`);
 
-      // Tabaco
-      if (tabHum < 40) alerts.push(`🚨 ALERTA: Humedad crítica en Tabaco (${tabHum}%). Riego inmediato requerido.`);
-      if (tabHum > 80) alerts.push(`💧 Exceso de humedad en Tabaco (${tabHum}%). Riesgo de hongos. Monitorear.`);
-      if (tabTemp > 30) alerts.push(`🔥 Temperatura elevada en Tabaco (${tabTemp}°C). Activar ventilación.`);
-      if (tabTemp < 5) alerts.push(`❄️ Temperatura baja en Tabaco (${tabTemp}°C). Riesgo de helada.`);
+      // Matera Tabaco (ubicada en cocina)
+      if (tabHum < 40) alerts.push(`🚨 ALERTA: Humedad crítica en Matera Tabaco (${tabHum}%). Riego inmediato requerido.`);
+      if (tabHum > 80) alerts.push(`💧 Exceso de humedad en Matera Tabaco (${tabHum}%). Riesgo de hongos. Monitorear.`);
+      if (tabTemp > 30) alerts.push(`🔥 Temperatura elevada en Matera Tabaco (${tabTemp}°C). Activar ventilación.`);
+      if (tabTemp < 5) alerts.push(`❄️ Temperatura baja en Matera Tabaco (${tabTemp}°C). Riesgo de helada.`);
 
       // Baseline si todo está en rango
       const ruleAnalysis = alerts.length > 0
         ? alerts.join('\n')
-        : `✅ Condiciones estables. Inv1: ${inv1Hum}%H/${inv1Temp}°C. Tab: ${tabHum}%H/${tabTemp}°C.`;
+        : `✅ Condiciones estables. Zona A: ${inv1Hum}%H/${inv1Temp}°C. Matera Tabaco: ${tabHum}%H/${tabTemp}°C.`;
 
       // Mostrar reglas INMEDIATAMENTE — sin esperar IA. Prepeende aviso de
       // sensores offline (si hay alguno) para que quede visible incluso si la
@@ -434,7 +434,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
           const alertsLine = alerts.length > 0
             ? 'Alertas: ' + alerts.map(a => a.replace(/[^\w\s%°.,()/áéíóú]/g, '')).join('. ')
             : 'Sin alertas.';
-          return `Datos actuales de sensores:\n- Invernadero 1: ${fmt(inv1Hum, inv1Temp)}\n- Tabaco: ${fmt(tabHum, tabTemp)}\n${offlineNotice ? offlineNotice.trim() + '\n' : ''}${alertsLine}\nDiagnóstico y acción en 2 líneas.`;
+          return `Datos actuales de sensores:\n- Invernadero Zona A: ${fmt(inv1Hum, inv1Temp)}\n- Matera Tabaco (cocina): ${fmt(tabHum, tabTemp)}\n${offlineNotice ? offlineNotice.trim() + '\n' : ''}${alertsLine}\nDiagnóstico y acción en 2 líneas.`;
         })();
 
         const content = await streamOllama(
@@ -562,8 +562,8 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         <div className="p-4 bg-slate-800 rounded-2xl">
           <div className="flex justify-between items-center">
             <div>
-              <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Invernadero 1</span>
-              <span className="text-slate-300 text-sm">Arteco ZS-304Z</span>
+              <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Invernadero — Zona A</span>
+              <span className="text-slate-300 text-sm">Matera Cocina</span>
             </div>
             <div className="flex gap-4">
               <div className="text-right">
@@ -583,11 +583,11 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
           <div className="flex gap-3 mt-2 pt-2 border-t border-slate-700/50">
             <div className="flex-1 flex items-center gap-2">
               <span className="text-slate-500 text-2xs font-mono shrink-0">H%</span>
-              <Sparkline data={sensorHistory['sensor.arteco_zs_304z_humidity']} color="#3b82f6" />
+              <Sparkline data={sensorHistory['sensor.matera_cocina_humidity']} color="#3b82f6" />
             </div>
             <div className="flex-1 flex items-center gap-2">
               <span className="text-slate-500 text-2xs font-mono shrink-0">T°</span>
-              <Sparkline data={sensorHistory['sensor.arteco_zs_304z_temperature']} color="#f97316" />
+              <Sparkline data={sensorHistory['sensor.matera_cocina_temperature']} color="#f97316" />
             </div>
           </div>
         </div>
@@ -595,8 +595,8 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         <div className="p-4 bg-slate-800 rounded-2xl">
           <div className="flex justify-between items-center">
             <div>
-              <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Tabaco</span>
-              <span className="text-slate-300 text-sm">Hobeian ZG-303Z</span>
+              <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Matera Tabaco</span>
+              <span className="text-slate-300 text-sm">Cocina · Hobeian ZG-303Z</span>
             </div>
             <div className="flex gap-4">
               <div className="text-right">
