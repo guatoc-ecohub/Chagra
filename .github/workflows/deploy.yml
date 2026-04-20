@@ -50,7 +50,18 @@ jobs:
         #   --no-group      no preservar grupo del source
         #   --chmod=F644    perms explicitos SOLO en archivos nuevos; dirs
         #                   nuevos heredan el setgid del padre (= chagra-deploy)
-        run: rsync -avzO --no-perms --delete --no-group --chmod=F644 dist/ /mnt/fast/appdata/farmos-pwa/
+        #
+        # `umask 022` antes del rsync: el servicio systemd del runner hereda
+        # umask 077 y rsync respeta el umask del proceso padre; sin este
+        # `umask 022`, los archivos nuevos quedaban 600 a pesar del --chmod,
+        # lo que bloqueaba a Nginx (403 Forbidden) y dejaba prod con pantalla
+        # blanca tras cada deploy. El chmod posterior es defensa en
+        # profundidad: se aplica solo a archivos cuyo owner es runner (los
+        # que creo este deploy), no toca dirs ajenos.
+        run: |
+          umask 022
+          rsync -avzO --no-perms --delete --no-group --chmod=F644 dist/ /mnt/fast/appdata/farmos-pwa/
+          find /mnt/fast/appdata/farmos-pwa -type f -user runner ! -perm 644 -exec chmod 644 {} + || true
 
       - name: Verify deployment
         run: |
