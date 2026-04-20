@@ -16,8 +16,10 @@
     enable = true;
     user = "kortux";
     group = "users";
-    dataDir = "/var/lib/syncthing";
-    configDir = "/var/lib/syncthing/.config/syncthing";
+    # mkDefault para que hosts (ej. beta) puedan overridear sin conflicto.
+    # alpha hereda estos defaults; beta los cambia en hosts/beta/default.nix.
+    dataDir = lib.mkDefault "/var/lib/syncthing";
+    configDir = lib.mkDefault "/var/lib/syncthing/.config/syncthing";
     
     # Abrir puerto en firewall para LAN
     openDefaultPorts = true;
