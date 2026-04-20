@@ -7,6 +7,7 @@ import { syncManager } from '../services/syncManager';
 import { savePayload } from '../services/payloadService';
 import { ENV } from '../config/env';
 import Sparkline from './common/Sparkline';
+import StreamingText from './common/StreamingText';
 import VoiceConfirmation from './VoiceConfirmation';
 
 const formatDuration = (ms) => {
@@ -46,6 +47,10 @@ export default function VoiceCapture({ onSave }) {
   // Cuando está seteado, el pipeline completa su ciclo consumiendo el Blob
   // ya persistido y al confirmar guardado se purga de pending_voice.
   const [reprocessingId, setReprocessingId] = useState(null);
+  // Texto acumulado del LLM durante la extracción (streaming NDJSON). Se
+  // resetea al inicio de cada pipeline y se muestra con efecto typewriter
+  // mientras el estado es STATE_EXTRACTING.
+  const [liveStream, setLiveStream] = useState('');
 
   const refreshPendingCount = useCallback(async () => {
     try {
@@ -68,6 +73,7 @@ export default function VoiceCapture({ onSave }) {
     setEntities([]);
     setErrorMsg('');
     setReprocessingId(null);
+    setLiveStream('');
     setView(STATE_IDLE);
   }, [reset]);
 
@@ -100,8 +106,11 @@ export default function VoiceCapture({ onSave }) {
       }
 
       setView(STATE_EXTRACTING);
+      setLiveStream('');
       try {
-        const extracted = await extractEntities(text);
+        const extracted = await extractEntities(text, {
+          onToken: (_chunk, full) => setLiveStream(full),
+        });
         setEntities(extracted);
         setView(STATE_REVIEW);
       } catch (err) {
@@ -146,8 +155,11 @@ export default function VoiceCapture({ onSave }) {
     }
 
     setView(STATE_EXTRACTING);
+    setLiveStream('');
     try {
-      const extracted = await extractEntities(text);
+      const extracted = await extractEntities(text, {
+        onToken: (_chunk, full) => setLiveStream(full),
+      });
       setEntities(extracted);
       setView(STATE_REVIEW);
     } catch (err) {
@@ -372,6 +384,11 @@ export default function VoiceCapture({ onSave }) {
           </p>
           {view === STATE_EXTRACTING && transcription && (
             <p className="text-xs text-slate-500 italic max-w-md text-center">"{transcription}"</p>
+          )}
+          {view === STATE_EXTRACTING && (
+            <div className="w-full max-w-md mt-1 p-3 rounded-lg bg-slate-900 border border-slate-800 text-xs font-mono text-lime-300 break-all min-h-[3.5rem] whitespace-pre-wrap">
+              <StreamingText text={liveStream} active />
+            </div>
           )}
         </div>
       )}
