@@ -163,7 +163,17 @@
 
     # --- Herramientas de monitoreo de sistema ---
     htop       # Monitor de procesos
+    iotop      # Monitor de I/O por proceso
     # nvtop     # Monitor de GPU NVIDIA (comentado temporalmente)
+
+    # --- Herramientas de disco / ZFS / hardware (auditoria y mantenimiento) ---
+    hdparm         # Standby, info y benchmarks de HDD SATA
+    smartmontools  # smartctl: SMART health + self-tests
+    gptfdisk       # sgdisk: manipulacion GPT (wipe, clone)
+    parted         # Particionado alternativo a sgdisk
+    lshw           # Inventario de hardware (buses, memoria, cpu)
+    pciutils       # lspci
+    usbutils       # lsusb
   ];
 
   # --- HOME ASSISTANT & IOT (Legacy modules) ---

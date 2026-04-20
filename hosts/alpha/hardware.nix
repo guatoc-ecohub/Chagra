@@ -10,14 +10,16 @@
   powerManagement.cpuFreqGovernor = "performance";
   
   # --- SPINDOWN PARA DISCOS HDD (Tier 2 ZFS) ---
+  # Referencia por ID estable: /dev/sdX cambia entre boots cuando se
+  # conectan/desconectan dispositivos SATA. Con el mirror 2×12 TB ambos
+  # HDD deben recibir el mismo idle timeout (240 × 5 s = 20 min).
   systemd.services.hdparm-spindown = {
     description = "Ahorro energético y Spin-down para HDD ZFS (Tier 2)";
     wantedBy = [ "multi-user.target" ];
     after = [ "zfs.target" ]; # Garantiza que ZFS ha inicializado el hardware
     serviceConfig = {
       Type = "oneshot";
-      # Actualmente solo hay un disco HDD físico conectado (/dev/sda)
-      ExecStart = "${pkgs.hdparm}/sbin/hdparm -S 240 /dev/sda";
+      ExecStart = "${pkgs.hdparm}/sbin/hdparm -S 240 /dev/disk/by-id/ata-TOSHIBA_MG07ACA12TE_2080A1GWFDUG /dev/disk/by-id/ata-TOSHIBA_MG07ACA12TE_2080A2AHFDUG";
       RemainAfterExit = true;
     };
   };
@@ -39,9 +41,15 @@
 
   boot.supportedFilesystems = [ "zfs" ];
 
-  # --- OOM KILLER (Ajustes de Sysctl) ---
+  # --- OOM KILLER + MM TUNING PARA LLM INFERENCE (Ajustes de Sysctl) ---
   boot.kernel.sysctl = {
-    "vm.swappiness" = 10;
+    # swappiness=1 (antes 10): protege al runner residente de Ollama contra
+    # swap temprano. Con 14 GiB RAM y un modelo 4B Q4_K_M que consume 5.3 GiB
+    # RSS, cualquier swap hit sobre las paginas del runner degrada drasticamente
+    # la latencia de inferencia (swap read ≈ ms vs RAM ≈ ns). El kernel sigue
+    # pudiendo swappear paginas realmente anonimas bajo presion, pero solo como
+    # ultimo recurso.
+    "vm.swappiness" = 1;
     "vm.vfs_cache_pressure" = 50;
     "vm.overcommit_memory" = 2;
     # ratio=150: CommitLimit ≈ 52 GiB (swap 31 + RAM 14×1.5). Antes 80 dejaba solo
