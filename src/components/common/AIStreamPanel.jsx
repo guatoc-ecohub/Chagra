@@ -46,7 +46,7 @@ export default function AIStreamPanel({
   useEffect(() => {
     if (active) {
       setPhase('streaming');
-    } else if (prevActive.current && !active && text) {
+    } else if (prevActive.current && text) {
       // streaming -> closing (500ms) -> finished (1400ms) -> idle
       setPhase('closing');
       const closingTimer = setTimeout(() => {
