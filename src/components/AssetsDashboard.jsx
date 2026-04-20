@@ -220,8 +220,17 @@ export default function AssetsDashboard({ onBack }) {
 
     // Drill-down: para plants, si hay zona seleccionada, filtrar por parent.
     // '__all__' = modo "ver todos" sin filtro de zona.
+    // '__orphan__' = plantas cuyo parent no resuelve a una zona existente.
     if (activeTab === 'plant' && currentZoneId && currentZoneId !== '__all__') {
-      list = list.filter((p) => getParentLandId(p) === currentZoneId);
+      if (currentZoneId === '__orphan__') {
+        const landIds = new Set(lands.map((l) => l.id));
+        list = list.filter((p) => {
+          const pid = getParentLandId(p);
+          return !pid || !landIds.has(pid);
+        });
+      } else {
+        list = list.filter((p) => getParentLandId(p) === currentZoneId);
+      }
     }
 
     if (!searchQuery) return list;
@@ -240,6 +249,18 @@ export default function AssetsDashboard({ onBack }) {
   };
 
   const selectedZone = lands.find((l) => l.id === currentZoneId);
+
+  // Plantas huérfanas: aquellas cuyo parent/location no resuelve a ninguna zona
+  // existente. Se muestran como card especial en el drill-down raíz para que el
+  // usuario las detecte y reasigne (evita el bug de "17 plantas totales pero 0
+  // en cada zona").
+  const orphanPlants = React.useMemo(() => {
+    const landIds = new Set(lands.map((l) => l.id));
+    return plants.filter((p) => {
+      const pid = getParentLandId(p);
+      return !pid || !landIds.has(pid);
+    });
+  }, [plants, lands]);
 
   const resetForm = () => {
     setFormData(INITIAL_FORM_STATE);
@@ -743,6 +764,12 @@ export default function AssetsDashboard({ onBack }) {
                 </span>
               </>
             )}
+            {currentZoneId === '__orphan__' && (
+              <>
+                <span className="text-slate-600">›</span>
+                <span className="text-amber-300 font-bold truncate">Sin zona asignada</span>
+              </>
+            )}
           </div>
           {!currentZoneId && (
             <button
@@ -759,7 +786,32 @@ export default function AssetsDashboard({ onBack }) {
       {/* Lista de zonas (nivel raíz del drill-down, solo para plant) */}
       {viewMode === 'list' && activeTab === 'plant' && !currentZoneId && (
         <div className="flex-1 overflow-y-auto p-3 space-y-2">
-          {lands.length === 0 ? (
+          {/* Card de plantas huérfanas: visibiliza cultivos sin zona asignada.
+              Aparece antes de la lista de zonas cuando hay huérfanas. */}
+          {orphanPlants.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setCurrentZoneId('__orphan__')}
+              className="w-full p-4 rounded-xl bg-amber-900/20 border border-amber-700/50 hover:bg-amber-900/30 text-left transition-colors"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="p-2.5 rounded-lg bg-amber-900/40 shrink-0">
+                    <TreePine size={20} className="text-amber-300" />
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="font-bold text-amber-100 truncate">Sin zona asignada</h4>
+                    <p className="text-xs text-amber-300/80">Reasigna estas plantas a una zona</p>
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  <span className="text-2xl font-black text-amber-300 tabular-nums">{orphanPlants.length}</span>
+                  <p className="text-[10px] text-amber-300/60 uppercase">cultivos</p>
+                </div>
+              </div>
+            </button>
+          )}
+          {lands.length === 0 && orphanPlants.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-slate-500">
               <MapPin size={48} className="mb-3 opacity-30" />
               <p className="text-lg">Sin zonas registradas</p>

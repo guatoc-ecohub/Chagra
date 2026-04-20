@@ -42,6 +42,10 @@ export default function VoiceCapture({ onSave }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [pendingCount, setPendingCount] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
+  // Id de la grabación pendiente en reproceso (null = captura en vivo normal).
+  // Cuando está seteado, el pipeline completa su ciclo consumiendo el Blob
+  // ya persistido y al confirmar guardado se purga de pending_voice.
+  const [reprocessingId, setReprocessingId] = useState(null);
 
   const refreshPendingCount = useCallback(async () => {
     try {
@@ -63,8 +67,67 @@ export default function VoiceCapture({ onSave }) {
     setTranscription('');
     setEntities([]);
     setErrorMsg('');
+    setReprocessingId(null);
     setView(STATE_IDLE);
   }, [reset]);
+
+  // Reprocesa la primera grabación encolada: reutiliza el Blob persistido y lo
+  // empuja por el pipeline de transcripción + extracción. Al confirmar en la
+  // pantalla de revisión, el handler de save borra el registro de pending_voice.
+  const reprocessPending = useCallback(async () => {
+    try {
+      const list = await syncManager.getPendingVoiceRecordings();
+      if (list.length === 0) {
+        await refreshPendingCount();
+        return;
+      }
+      const [rec] = list;
+      setReprocessingId(rec.id);
+      setView(STATE_TRANSCRIBING);
+      setErrorMsg('');
+      setTranscription('');
+      setEntities([]);
+
+      let text;
+      try {
+        text = await transcribe(rec.blob);
+        setTranscription(text);
+      } catch (err) {
+        setErrorMsg(`No se pudo transcribir la grabación pendiente: ${err.message}. Sigue en la cola.`);
+        setReprocessingId(null);
+        setView(STATE_ERROR);
+        return;
+      }
+
+      setView(STATE_EXTRACTING);
+      try {
+        const extracted = await extractEntities(text);
+        setEntities(extracted);
+        setView(STATE_REVIEW);
+      } catch (err) {
+        setErrorMsg(`No se pudieron extraer entidades: ${err.message}. Revisa la transcripción manualmente.`);
+        setEntities([]);
+        setView(STATE_REVIEW);
+      }
+    } catch (err) {
+      setErrorMsg(`No se pudo reprocesar: ${err.message}`);
+      setReprocessingId(null);
+      setView(STATE_ERROR);
+    }
+  }, [refreshPendingCount]);
+
+  // Descarta la primera grabación pendiente sin procesarla. Útil cuando el
+  // audio quedó inutilizable (ruido, vacío, falla de hardware).
+  const discardPending = useCallback(async () => {
+    try {
+      const list = await syncManager.getPendingVoiceRecordings();
+      if (list.length === 0) return;
+      await syncManager.deleteVoiceRecording(list[0].id);
+      await refreshPendingCount();
+    } catch (err) {
+      console.warn('[VoiceCapture] Error descartando pendiente:', err.message);
+    }
+  }, [refreshPendingCount]);
 
   const runPipeline = useCallback(async (blob, durMs) => {
     setView(STATE_TRANSCRIBING);
@@ -193,6 +256,15 @@ export default function VoiceCapture({ onSave }) {
 
     setIsSaving(false);
     if (savedCount > 0) {
+      // Reproceso exitoso: purgar la grabación de pending_voice para que no
+      // reaparezca en el banner en futuras sesiones.
+      if (reprocessingId != null) {
+        try {
+          await syncManager.deleteVoiceRecording(reprocessingId);
+        } catch (_) { /* noop */ }
+        setReprocessingId(null);
+        await refreshPendingCount();
+      }
       const msg = errors.length > 0
         ? `${savedCount} guardada(s), ${errors.length} con error.`
         : `${savedCount} siembra${savedCount > 1 ? 's' : ''} registrada${savedCount > 1 ? 's' : ''} por voz.`;
@@ -202,7 +274,7 @@ export default function VoiceCapture({ onSave }) {
       setErrorMsg(`No se pudo guardar: ${errors.join('; ')}`);
       setView(STATE_ERROR);
     }
-  }, [buildSeedingPayload, onSave]);
+  }, [buildSeedingPayload, onSave, reprocessingId, refreshPendingCount]);
 
   const recorderErr = recorderError;
   const remainingMs = Math.max(0, hardLimitMs - durationMs);
@@ -220,9 +292,31 @@ export default function VoiceCapture({ onSave }) {
       </div>
 
       {pendingCount > 0 && (
-        <div className="bg-amber-900/20 border border-amber-800/50 rounded-xl p-3 text-xs text-amber-200 flex items-center gap-2">
-          <AlertTriangle size={14} />
-          {pendingCount} grabación{pendingCount > 1 ? 'es' : ''} pendiente{pendingCount > 1 ? 's' : ''} de reprocesar (offline queue).
+        <div className="bg-amber-900/20 border border-amber-800/50 rounded-xl p-3 text-xs text-amber-200 flex flex-col sm:flex-row sm:items-center gap-2">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <AlertTriangle size={14} className="shrink-0" />
+            <span>
+              {pendingCount} grabación{pendingCount > 1 ? 'es' : ''} pendiente{pendingCount > 1 ? 's' : ''} de reprocesar.
+            </span>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={reprocessPending}
+              disabled={view === STATE_RECORDING || view === STATE_TRANSCRIBING || view === STATE_EXTRACTING || view === STATE_REVIEW || isSaving}
+              className="px-3 py-1.5 bg-lime-700 hover:bg-lime-600 active:bg-lime-800 disabled:bg-slate-700 disabled:text-slate-500 text-white text-xs font-bold rounded-lg min-h-[32px]"
+            >
+              Reprocesar
+            </button>
+            <button
+              type="button"
+              onClick={discardPending}
+              disabled={view === STATE_TRANSCRIBING || view === STATE_EXTRACTING || isSaving}
+              className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 text-slate-300 text-xs font-bold rounded-lg min-h-[32px]"
+            >
+              Descartar
+            </button>
+          </div>
         </div>
       )}
 

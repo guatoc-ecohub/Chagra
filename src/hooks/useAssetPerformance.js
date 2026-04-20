@@ -52,8 +52,12 @@ const extractMaterialName = (log) => {
 // Categoría por defecto para materiales no listados en MATERIAL_PRESETS
 const DEFAULT_CATEGORY = 'fertilization';
 
+// Fallback estable: evita crear un array literal nuevo en cada ejecución del
+// selector de Zustand, lo cual dispara re-render infinito (React #185).
+const EMPTY_LOGS = [];
+
 export const useAssetPerformance = (assetId) => {
-  const assetLogs = useLogStore((s) => s.logsByAsset[assetId] || []);
+  const assetLogs = useLogStore((s) => s.logsByAsset[assetId] || EMPTY_LOGS);
 
   return useMemo(() => {
     const inputs = assetLogs.filter((l) => l.type === 'log--input');
