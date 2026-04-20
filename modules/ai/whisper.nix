@@ -37,7 +37,8 @@ in
     };
 
     virtualisation.oci-containers.containers.wyoming-whisper = {
-      image = "rhasspy/wyoming-whisper:latest";
+      # Pinned 2026-04-20 (era :latest).
+      image = "docker.io/rhasspy/wyoming-whisper@sha256:9501d2659eee83b6eead98d53842193e5fed011eda6c5b1c3ad36f3146b28fed";
       ports = [ "${toString registry.ports.whisper}:${toString registry.ports.whisper}" ];
       volumes = [
         "/mnt/fast/appdata/wyoming-whisper:/data"

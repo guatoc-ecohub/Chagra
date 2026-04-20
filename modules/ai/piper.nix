@@ -37,7 +37,8 @@ in
     };
 
     virtualisation.oci-containers.containers.wyoming-piper = {
-      image = "rhasspy/wyoming-piper:latest";
+      # Pinned 2026-04-20 (era :latest).
+      image = "docker.io/rhasspy/wyoming-piper@sha256:c874e4a04657ae3381332ee5d0c8c70a310dae6722892840f530ac0890b44eb3";
       ports = [ "${toString registry.ports.piper}:${toString registry.ports.piper}" ];
       volumes = [
         "/mnt/fast/appdata/wyoming-piper:/data"

@@ -70,7 +70,8 @@ in
                else registry.ports.clawbots.base + idx;
       in
       lib.nameValuePair "clawbot-${name}" {
-        image = "ghcr.io/open-webui/open-webui:main";
+        # Pinned 2026-04-20 (era :main).
+        image = "ghcr.io/open-webui/open-webui@sha256:b80a96e14bb15ea79aec96fbdad4aeab6b3ee7b61520d83b5dbc8c4f47d433a9";
         ports = [
           "${toString port}:8080"
         ];
