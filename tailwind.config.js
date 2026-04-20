@@ -39,7 +39,7 @@ export default {
                 'neon-orchid': '0 0 15px rgba(217, 70, 239, 0.4)',
                 'neon-frog': '0 0 15px rgba(234, 179, 8, 0.3)',
             },
-            // Animaciones cyberpunk para bloques de generacion por IA (v0.6.2).
+            // Animaciones cyberpunk + CRT para bloques de generacion por IA (v0.6.2+).
             keyframes: {
                 scanline: {
                     '0%':   { transform: 'translateY(-100%)', opacity: '0' },
@@ -57,23 +57,41 @@ export default {
                     '0%,100%': { boxShadow: '0 0 8px rgba(217,70,239,0.35), inset 0 0 8px rgba(217,70,239,0.08)' },
                     '50%':     { boxShadow: '0 0 20px rgba(217,70,239,0.75), inset 0 0 14px rgba(217,70,239,0.22)' },
                 },
+                // Cierre del stream: rayo horizontal lento + burst expansivo.
+                // Duraciones extendidas (~1.4s / 1.2s) para un efecto mas
+                // satisfactorio que marque claramente el fin de la generacion.
                 sparkFlash: {
-                    '0%':   { opacity: '0', transform: 'translateX(-20%) scaleX(0.2)', filter: 'blur(10px)' },
-                    '25%':  { opacity: '1' },
-                    '100%': { opacity: '0', transform: 'translateX(120%) scaleX(1.2)', filter: 'blur(4px)' },
+                    '0%':   { opacity: '0', transform: 'translateX(-20%) scaleX(0.2)', filter: 'blur(12px)' },
+                    '15%':  { opacity: '1' },
+                    '70%':  { opacity: '0.7' },
+                    '100%': { opacity: '0', transform: 'translateX(120%) scaleX(1.4)', filter: 'blur(6px)' },
                 },
                 sparkBurst: {
-                    '0%':   { opacity: '0', transform: 'scale(0.6)' },
-                    '40%':  { opacity: '1', transform: 'scale(1.15)' },
-                    '100%': { opacity: '0', transform: 'scale(1.6)' },
+                    '0%':   { opacity: '0', transform: 'scale(0.5)' },
+                    '20%':  { opacity: '1', transform: 'scale(1.1)' },
+                    '60%':  { opacity: '0.8', transform: 'scale(1.4)' },
+                    '100%': { opacity: '0', transform: 'scale(2.2)' },
+                },
+                // Block cursor estilo terminal IBM 3270 / VT100 (parpadeo duro).
+                crtBlink: {
+                    '0%, 49%':   { opacity: '1' },
+                    '50%, 100%': { opacity: '0' },
+                },
+                // Flicker sutil del texto fosforo — tubo CRT antiguo.
+                crtFlicker: {
+                    '0%, 100%': { opacity: '1' },
+                    '50%':      { opacity: '0.97' },
+                    '80%':      { opacity: '0.99' },
                 },
             },
             animation: {
                 'scanline':    'scanline 2.4s linear infinite',
                 'glitch-in':   'glitchIn 480ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                 'neon-pulse':  'neonPulse 2.2s ease-in-out infinite',
-                'spark-flash': 'sparkFlash 750ms ease-out forwards',
-                'spark-burst': 'sparkBurst 650ms ease-out forwards',
+                'spark-flash': 'sparkFlash 1400ms cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                'spark-burst': 'sparkBurst 1200ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
+                'crt-blink':   'crtBlink 1.1s steps(1) infinite',
+                'crt-flicker': 'crtFlicker 4s ease-in-out infinite',
             },
         },
     },
