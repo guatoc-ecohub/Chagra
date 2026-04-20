@@ -7,7 +7,7 @@ import { syncManager } from '../services/syncManager';
 import { savePayload } from '../services/payloadService';
 import { ENV } from '../config/env';
 import Sparkline from './common/Sparkline';
-import StreamingText from './common/StreamingText';
+import AIStreamPanel from './common/AIStreamPanel';
 import VoiceConfirmation from './VoiceConfirmation';
 
 const formatDuration = (ms) => {
@@ -386,8 +386,14 @@ export default function VoiceCapture({ onSave }) {
             <p className="text-xs text-slate-500 italic max-w-md text-center">"{transcription}"</p>
           )}
           {view === STATE_EXTRACTING && (
-            <div className="w-full max-w-md mt-1 p-3 rounded-lg bg-slate-900 border border-slate-800 text-xs font-mono text-lime-300 break-all min-h-[3.5rem] whitespace-pre-wrap">
-              <StreamingText text={liveStream} active />
+            <div className="w-full max-w-md mt-1">
+              <AIStreamPanel
+                text={liveStream}
+                active
+                label="Extrayendo entidades"
+                accent="muzo"
+                meta={<span className="font-mono">qwen3.5:4b</span>}
+              />
             </div>
           )}
         </div>
