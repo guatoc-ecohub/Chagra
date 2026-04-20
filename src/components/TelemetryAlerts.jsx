@@ -3,7 +3,7 @@ import { Info } from 'lucide-react';
 import { assetCache } from '../db/assetCache';
 import { FARM_CONFIG } from '../config/defaults';
 import Sparkline from './common/Sparkline';
-import StreamingText from './common/StreamingText';
+import AIStreamPanel from './common/AIStreamPanel';
 import { streamOllama } from '../services/ollamaStream';
 
 // Constantes de Infraestructura Segura (API Gateway Local)
@@ -46,9 +46,12 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
   const [sensorHistory, setSensorHistory] = useState({});
   const [aiMeta, setAiMeta] = useState(null); // { model, evalDuration, totalDuration }
   // Texto acumulado del LLM durante el analisis agronomico (streaming NDJSON).
-  // Se muestra con efecto typewriter mientras aiStatus === 'thinking' y se
-  // consolida en aiAlert cuando el stream termina.
+  // Se muestra con efecto typewriter mientras aiStatus === 'thinking'.
   const [liveAnalysis, setLiveAnalysis] = useState('');
+  // Texto final consolidado de la IA tras terminar el stream. Se separa de
+  // aiAlert (que solo contiene reglas deterministas) para que el AIStreamPanel
+  // lo renderice en su propio bloque cyberpunk diferenciado.
+  const [aiFinalText, setAiFinalText] = useState('');
 
   // Variables de Entorno (Requeridas en el archivo .env)
   const HA_TOKEN = import.meta.env.VITE_HA_ACCESS_TOKEN;
@@ -246,6 +249,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
     setLoading(true);
     setError(null);
     setLiveAnalysis('');
+    setAiFinalText('');
     setAiMeta(null);
 
     try {
@@ -469,7 +473,9 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
 
         const trimmed = (content || '').trim();
         if (trimmed.length > 10) {
-          setAiAlert(`${offlineNotice}${ruleAnalysis}\n\n🤖 IA: ${trimmed}`);
+          // aiAlert queda con solo reglas; el texto de IA va a aiFinalText y
+          // se renderiza abajo en su propio panel cyberpunk (AIStreamPanel).
+          setAiFinalText(trimmed);
           setAiStatus('done');
         } else {
           console.warn('[Telemetry] IA sin contenido suficiente. Length:', trimmed.length);
@@ -669,25 +675,36 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
             <span className="text-slate-400 text-sm italic font-medium">Analizando datos agronómicos...</span>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {aiAlert ? (
-              <div>
+              <>
+                {/* Reglas deterministas (monoespaciadas, sin efectos IA) */}
                 <p className="text-sm leading-relaxed text-slate-200 whitespace-pre-line">
                   {aiAlert}
                 </p>
-                {aiStatus === 'thinking' && (
-                  <div className="mt-3 p-3 rounded-lg bg-slate-900/60 border border-orchid/30">
-                    <div className="text-2xs text-orchid uppercase tracking-widest font-bold mb-1 flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 bg-orchid rounded-full motion-safe:animate-pulse"></span>
-                      IA generando
-                    </div>
-                    <div className="text-sm text-slate-200 whitespace-pre-wrap leading-relaxed min-h-[2rem]">
-                      <StreamingText text={liveAnalysis} active />
-                    </div>
-                  </div>
+
+                {/* Bloque de IA (streaming + final) con efectos cyberpunk.
+                    Se muestra durante thinking (con liveAnalysis) y permanece
+                    visible en done (con aiFinalText consolidado). El panel
+                    dispara un spark flash al transicionar active→false. */}
+                {(aiStatus === 'thinking' || (aiStatus === 'done' && aiFinalText)) && (
+                  <AIStreamPanel
+                    text={aiStatus === 'thinking' ? liveAnalysis : aiFinalText}
+                    active={aiStatus === 'thinking'}
+                    label={aiStatus === 'thinking' ? 'IA generando' : 'Análisis IA'}
+                    accent="orchid"
+                    meta={aiMeta && (
+                      <span className="tabular-nums">
+                        {aiMeta.model}
+                        {aiMeta.totalDuration && <> · {aiMeta.totalDuration}s</>}
+                        {aiMeta.evalCount && <> · {aiMeta.evalCount}tk</>}
+                      </span>
+                    )}
+                  />
                 )}
+
                 {renderActionButton()}
-              </div>
+              </>
             ) : (
               <div className="flex items-center gap-2 text-amber-400">
                 <span className="text-xl">⚠️</span>
