@@ -36,7 +36,8 @@ in
 
     # Contenedor OCI - VOLUMEN UNIFICADO /data para compatibilidad
     virtualisation.oci-containers.containers.slskd = {
-      image = "slskd/slskd:latest";
+      # Pinned 2026-04-20 (era :latest).
+      image = "docker.io/slskd/slskd@sha256:17ef977563be206f3b5932080b1e23883b2cb39dc9010640f6f39b4eaec887e3";
       ports = [
         "${toString registry.ports.slskd}:${toString registry.ports.slskd}"  # WebUI
         "${toString registry.ports.slskdP2P}:${toString registry.ports.slskdP2P}"  # P2P

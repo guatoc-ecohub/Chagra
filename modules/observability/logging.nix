@@ -49,7 +49,8 @@ in
   config = lib.mkIf (obsCfg.enable && cfg.enable) {
     # Loki container (OCI)
     virtualisation.oci-containers.containers.loki = {
-      image = "grafana/loki:3.2.0";
+      # Pinned 2026-04-20 (era :3.2.0).
+      image = "docker.io/grafana/loki@sha256:882e30c20683a48a8b7ca123e6c19988980b4bd13d2ff221dfcbef0fdc631694";
       ports = [
         "${toString registry.ports.loki}:3100"
       ];
@@ -80,7 +81,8 @@ in
 
     # Uptime Kuma container (OCI)
     virtualisation.oci-containers.containers.uptime-kuma = lib.mkIf cfg.uptimeKuma {
-      image = "louislam/uptime-kuma:1";
+      # Pinned 2026-04-20 (era :1).
+      image = "docker.io/louislam/uptime-kuma@sha256:3d632903e6af34139a37f18055c4f1bfd9b7205ae1138f1e5e8940ddc1d176f9";
       ports = [
         "${toString registry.ports.uptimeKuma}:3001"
       ];

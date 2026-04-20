@@ -33,7 +33,8 @@ in
     };
 
     virtualisation.oci-containers.containers.prowlarr = {
-      image = "lscr.io/linuxserver/prowlarr:latest";
+      # Pinned 2026-04-20 (era :latest).
+      image = "lscr.io/linuxserver/prowlarr@sha256:a8fe7b9c502f979146b6d0f22438b825c38e068241bb8a708c473062dffdbb03";
       ports = [ "${toString registry.ports.prowlarr}:${toString registry.ports.prowlarr}" ];
       volumes = [
         "/mnt/fast/appdata/prowlarr:/config"

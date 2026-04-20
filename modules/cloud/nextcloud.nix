@@ -31,7 +31,8 @@ in
     };
 
     virtualisation.oci-containers.containers.nextcloud = {
-      image = "nextcloud:latest";
+      # Pinned 2026-04-20 (era :latest).
+      image = "docker.io/library/nextcloud@sha256:d53f6cb35b0712aa890a5e4a8ca21043d6fcd390f38c55b710816dd7cbc2edc0";
       ports = [
         "${toString registry.ports.nextcloud}:8080"
       ];

@@ -124,7 +124,8 @@ in
       # FRIGATE — NVR con detección de objetos
       # -----------------------------------------------------------------------
       frigate = {
-        image = "ghcr.io/blakeblackshear/frigate:stable";
+        # Pinned 2026-04-20 (era :stable).
+        image = "ghcr.io/blakeblackshear/frigate@sha256:5be5ce3b79f8b09a52957afea9d4a23ad62c9f077a05d9047e3404eb78c304a8";
         ports = [ "5000:5000" "8554:8554" "8555:8555" ];
         volumes = [
           "/mnt/fast/appdata/frigate/config:/config"
@@ -140,7 +141,8 @@ in
       # DB en: /data/.navidrome (recomendado separar configs de música)
       # -----------------------------------------------------------------------
       navidrome = {
-        image = "deluan/navidrome:latest";
+        # Pinned 2026-04-20 (era :latest).
+        image = "docker.io/deluan/navidrome@sha256:a5dce8f33304714dd138e870cca0dcab3d937ca236be1a9f2b97da009d1a0048";
         ports = [ "4533:4533" ];
         volumes = [
           "/mnt/fast/appdata/navidrome:/data"        # DB y config en SSD

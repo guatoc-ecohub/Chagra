@@ -54,7 +54,8 @@ in
     };
 
     virtualisation.oci-containers.containers.whisper-http = {
-      image = "onerahmet/openai-whisper-asr-webservice:latest";
+      # Pinned 2026-04-20 (era :latest).
+      image = "docker.io/onerahmet/openai-whisper-asr-webservice@sha256:03b402335881cdab2e4939b24620809df8d6ceec3bf2712217d41c8761a0f5d4";
       # 10301 (host) -> 9000 (container default de la imagen)
       ports = [ "${toString registry.ports.whisperHttp}:9000" ];
       volumes = [

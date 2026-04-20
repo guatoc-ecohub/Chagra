@@ -112,7 +112,8 @@ in
     # UID: root (--network=host requiere privilegios)
     # -------------------------------------------------------------------------
     homeassistant = {
-      image = "ghcr.io/home-assistant/home-assistant:stable";
+      # Pinned 2026-04-20 (era :stable).
+      image = "ghcr.io/home-assistant/home-assistant@sha256:0e091dfce3068339c3e1d14382e6c34141e05cd589a1972ebd4d9a8e6b5d8969";
       extraOptions = [
         "--network=host"
         "--cap-add=NET_RAW"
@@ -132,7 +133,8 @@ in
     # UID: 1883 (mosquitto)
     # -------------------------------------------------------------------------
     mosquitto = {
-      image = "eclipse-mosquitto:2";
+      # Pinned 2026-04-20 (era :2).
+      image = "docker.io/library/eclipse-mosquitto@sha256:9cfdd46ad59f3e3e5f592f6baf57ab23e1ad00605509d0f5c1e9b179c5314d87";
       ports = [ "1883:1883" ];
       volumes = [
         "${mosquittoConf}:/mosquitto/config/mosquitto.conf:ro"
@@ -148,7 +150,8 @@ in
     # Credenciales via EnvironmentFile (sops)
     # -------------------------------------------------------------------------
     influxdb = {
-      image = "influxdb:2.7-alpine";
+      # Pinned 2026-04-20 (era :2.7-alpine).
+      image = "docker.io/library/influxdb@sha256:5455e9b8bb42dcb8aa0b8a0354b5f0758d0b4a01f595b8dc03e3f850aa5829e9";
       ports = [ "8086:8086" ];
       volumes = [
         "/mnt/fast/appdata/influxdb/data:/var/lib/influxdb2"
@@ -166,7 +169,8 @@ in
     # Visibilidad DNS interna: mosquitto, influxdb, ollama
     # -------------------------------------------------------------------------
     nodered = {
-      image = "nodered/node-red:latest";
+      # Pinned 2026-04-20 (era :latest).
+      image = "docker.io/nodered/node-red@sha256:cf2d5657f12faebffaf1cea10203f277a2445434dec6a997212080ec0080f6c5";
       ports = [ "1880:1880" ];
       volumes = [ "/mnt/fast/appdata/nodered:/data" ];
       environment = { TZ = "America/Bogota"; };
@@ -179,7 +183,8 @@ in
     # Credenciales admin via EnvironmentFile (sops)
     # -------------------------------------------------------------------------
     grafana = {
-      image = "grafana/grafana-oss:latest";
+      # Pinned 2026-04-20 (era :latest).
+      image = "docker.io/grafana/grafana-oss@sha256:e932bd6ed0e026595b08483cd0141e5103e1ab7ff8604839ff899b8dc54cabcb";
       ports = [ "3000:3000" ];
       volumes = [ "/mnt/fast/appdata/grafana:/var/lib/grafana" ];
       environment = {
