@@ -111,14 +111,17 @@ let
       [[ -f dist/index.html ]] || { log "build produced no dist/index.html — abort"; exit 2; }
 
       # Reescribe CACHE_NAME en el service worker para aislar caches de PWA
-      # entre ambientes. El sufijo es vacio en PROD (no-op) y "-dev" en DEV.
-      # sw.js original: const CACHE_NAME = 'chagra-vN';
-      #   → PROD:        const CACHE_NAME = 'chagra-vN';        (sin cambio)
-      #   → DEV:         const CACHE_NAME = 'chagra-dev-vN';
-      if [[ -n "${cacheSuffix}" && -f dist/sw.js ]]; then
-        log "patch dist/sw.js CACHE_NAME con sufijo '${cacheSuffix}'"
-        sed -i "s/\\(CACHE_NAME\\s*=\\s*'\\)chagra-/\\1chagra${cacheSuffix}-/" dist/sw.js
-      fi
+      # entre ambientes. Bloque inyectado por Nix solo cuando cacheSuffix != "",
+      # asi PROD no ejecuta sed y evitamos SC2157 (tautologia de shellcheck).
+      #   sw.js original:   const CACHE_NAME = 'chagra-vN';
+      #   → PROD (no-op):   const CACHE_NAME = 'chagra-vN';
+      #   → DEV (patched):  const CACHE_NAME = 'chagra-dev-vN';
+      ${lib.optionalString (cacheSuffix != "") ''
+        if [[ -f dist/sw.js ]]; then
+          log "patch dist/sw.js CACHE_NAME con sufijo '${cacheSuffix}'"
+          sed -i "s/\\(CACHE_NAME\\s*=\\s*'\\)chagra-/\\1chagra${cacheSuffix}-/" dist/sw.js
+        fi
+      ''}
 
       log "rsync dist/ → ${webrootTarget}/"
       rsync -a --delete dist/ "${webrootTarget}/"
