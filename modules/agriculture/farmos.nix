@@ -32,7 +32,8 @@ in
     };
 
     virtualisation.oci-containers.containers.farmos = {
-      image = "farmos/farmos:3.x";
+      # Pinned 2026-04-20 (era :3.x).
+      image = "docker.io/farmos/farmos@sha256:b2c623b568b12460558601c5c79bc0235bab0b105d60ba3906c5c577319d72df";
       ports = [ "${toString registry.ports.farmos}:80" ];
       volumes = [
         "/mnt/fast/appdata/farmos:/opt/drupal/web/sites"
