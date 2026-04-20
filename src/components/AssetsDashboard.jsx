@@ -4,7 +4,6 @@ import useAssetStore from '../store/useAssetStore';
 import { fetchFromFarmOS } from '../services/apiService';
 import AssetDetailView from './AssetDetailView';
 import { FARM_CONFIG } from '../config/defaults';
-import { CROP_TAXONOMY } from '../config/taxonomy';
 import { MATERIAL_PRESETS } from '../config/materials';
 import MapPicker from './MapPicker';
 import FarmMap from './FarmMap';
@@ -31,19 +30,6 @@ const EQUIPMENT_EXAMPLES = [
   'Pala draga',
   'Machete',
   'Rastrillo',
-];
-
-// Accesos rápidos derivados de CROP_TAXONOMY (fuente única de verdad).
-// Ajustar la lista según frecuencia real de uso en campo.
-const QUICK_PRESET_IDS = [
-  'lactuca_sativa',
-  'solanum_tuberosum_pastusa',
-  'rubus_glaucus',
-  'coriandrum_sativum',
-  'passiflora_edulis',
-  'coffea_arabica',
-  'physalis_peruviana',
-  'fragaria_ananassa',
 ];
 
 const ESTRATO_OPTIONS = [

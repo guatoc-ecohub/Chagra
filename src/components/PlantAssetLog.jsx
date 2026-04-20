@@ -38,11 +38,18 @@ export default function PlantAssetLog({ onBack, onSave }) {
 
   const handlePhotoCapture = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setPhoto(file);
-      if (photoUrl) URL.revokeObjectURL(photoUrl);
-      setPhotoUrl(URL.createObjectURL(file));
+    if (!file) return;
+    // Validación explícita de MIME: el atributo `accept="image/*"` del input es
+    // solo una pista UX y puede bypassearse. Restringir a image/* antes de
+    // generar el blob URL evita que un SVG/HTML con scripts embebidos llegue a
+    // un <img src={blob:...}> y cierra la regla CodeQL js/xss-through-dom.
+    if (!file.type.startsWith('image/')) {
+      onSave('Archivo no es una imagen válida', true);
+      return;
     }
+    setPhoto(file);
+    if (photoUrl) URL.revokeObjectURL(photoUrl);
+    setPhotoUrl(URL.createObjectURL(file));
   };
 
   const captureLocation = () => {
