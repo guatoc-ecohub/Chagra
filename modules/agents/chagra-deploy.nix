@@ -1,76 +1,105 @@
 # modules/agents/chagra-deploy.nix
 #
-# Infraestructura de despliegue continuo para la PWA Chagra:
+# Infraestructura de despliegue continuo para la PWA Chagra, en dos pistas:
 #
-#   1. Grupo POSIX `chagra-deploy` compartido por humanos y bots que pueden
-#      escribir en el webroot (/mnt/fast/appdata/farmos-pwa/).
-#   2. Script `chagra-deploy` en el PATH global del sistema que hace
-#      git pull + npm ci + npm run build en un clone de trabajo bajo
-#      /var/lib/chagra-deploy/repo, y luego un swap atómico (rsync + mv)
-#      al webroot de producción. Usa flock para evitar deploys simultáneos.
-#   3. Servicio systemd `chagra-webhook` — receptor HTTP mínimo en Python
-#      (stdlib, sin dependencias) escuchando en 127.0.0.1:9000. Valida
-#      la firma HMAC `X-Hub-Signature-256` contra el secret SOPS
-#      `chagra-deploy-webhook-secret` y ejecuta `chagra-deploy` cuando
-#      recibe un pull_request.merged sobre rama main.
+#   PROD (chagra.guatoc.co)   — rsync a /mnt/fast/appdata/farmos-pwa/
+#   DEV  (chagra-dev.guatoc.co) — rsync a /mnt/fast/appdata/farmos-pwa-dev/
 #
-# Cloudflare Tunnel expone el puerto 9000 como deploy-chagra.guatoc.co
-# (config remota en dashboard, no en Nix).
+# Reglas de enrutamiento desde el webhook (GitHub → /webhook o /):
+#
+#   * release.published                       → chagra-deploy      (PROD)
+#   * push refs/heads/main                    → chagra-deploy-dev  (DEV)
+#   * pull_request.closed.merged base=main    → chagra-deploy-dev  (DEV, legacy)
+#
+# El script de deploy esta factorizado via mkDeployScript: ambos comparten
+# logica (git fetch + reset + npm ci + npm run build + rsync) y se diferencian
+# solo en webroot, state dir y un sed que reescribe CACHE_NAME del service
+# worker para que PWA prod y PWA dev no colisionen caches en el navegador.
+#
+# Cloudflare Tunnel expone el puerto 9000 via deploy-chagra.guatoc.co.
+# El routing chagra.guatoc.co / chagra-dev.guatoc.co se resuelve dentro de
+# Nginx (ver hosts/alpha/default.nix).
 
 { config, pkgs, lib, ... }:
 
 let
   cfg = config.guatoc.chagra-deploy;
 
-  # Clone de trabajo del repo público. Queda bajo /var/lib para que
-  # cualquier miembro del grupo chagra-deploy pueda operarlo.
-  repoDir = "/var/lib/chagra-deploy/repo";
-  webroot = "/mnt/fast/appdata/farmos-pwa";
-  stateDir = "/var/lib/chagra-deploy";
-  lockFile = "${stateDir}/deploy.lock";
-  logFile  = "${stateDir}/deploy.log";
-  # Template .env persistente que se copia al repo antes de cada build.
-  # El build de Vite inlinea VITE_* al bundle, por eso el .env es crítico.
+  # ---------- PROD ----------
+  repoDir   = "/var/lib/chagra-deploy/repo";
+  webroot   = "/mnt/fast/appdata/farmos-pwa";
+  stateDir  = "/var/lib/chagra-deploy";
+  lockFile  = "${stateDir}/deploy.lock";
+  logFile   = "${stateDir}/deploy.log";
   envTemplate = "${stateDir}/.env.chagra";
 
-  # Script principal de despliegue. Idempotente y atómico.
-  chagra-deploy = pkgs.writeShellApplication {
-    name = "chagra-deploy";
-    runtimeInputs = with pkgs; [ git nodejs_20 rsync coreutils util-linux gnutar findutils ];
+  # ---------- DEV ----------
+  repoDirDev    = "/var/lib/chagra-deploy-dev/repo";
+  webrootDev    = "/mnt/fast/appdata/farmos-pwa-dev";
+  stateDirDev   = "/var/lib/chagra-deploy-dev";
+  lockFileDev   = "${stateDirDev}/deploy.lock";
+  logFileDev    = "${stateDirDev}/deploy.log";
+  # El .env es el mismo archivo persistente (backends FarmOS/HA/Ollama
+  # compartidos entre ambientes). DEV hereda el template de PROD.
+  envTemplateDev = envTemplate;
+
+  # Factorizador del script de deploy. Parametrizamos todo lo que diferencia
+  # a un deploy DEV de uno PROD: ruta webroot, state dir, sufijo para
+  # CACHE_NAME del service worker y etiqueta visible en el log.
+  mkDeployScript = {
+    name,
+    label,
+    webrootTarget,
+    stateDirTarget,
+    repoDirTarget,
+    lockFileTarget,
+    logFileTarget,
+    envTemplatePath,
+    cacheSuffix,       # "" para prod, "-dev" para dev
+  }: pkgs.writeShellApplication {
+    inherit name;
+    runtimeInputs = with pkgs; [
+      git
+      nodejs_20
+      rsync
+      coreutils
+      util-linux   # flock
+      gnutar
+      findutils
+      gnused       # para el sed del CACHE_NAME
+    ];
     text = ''
       set -euo pipefail
-      export HOME="${stateDir}"
-      export NPM_CONFIG_CACHE="${stateDir}/.npm"
+      export HOME="${stateDirTarget}"
+      export NPM_CONFIG_CACHE="${stateDirTarget}/.npm"
       mkdir -p "$NPM_CONFIG_CACHE"
 
-      log() { printf '[%s] %s\n' "$(date -Iseconds)" "$*" | tee -a "${logFile}"; }
+      log() { printf '[%s] [${label}] %s\n' "$(date -Iseconds)" "$*" | tee -a "${logFileTarget}"; }
 
-      exec 9>"${lockFile}"
+      exec 9>"${lockFileTarget}"
       if ! flock -n 9; then
         log "deploy already running — abort"
         exit 42
       fi
 
-      log "=== chagra-deploy start ==="
+      log "=== ${name} start ==="
 
-      if [[ ! -d "${repoDir}/.git" ]]; then
+      if [[ ! -d "${repoDirTarget}/.git" ]]; then
         log "initial clone of Chagra repo"
-        git clone --depth=20 https://github.com/guatoc-ecohub/Chagra.git "${repoDir}"
+        git clone --depth=20 https://github.com/guatoc-ecohub/Chagra.git "${repoDirTarget}"
       fi
 
-      cd "${repoDir}"
+      cd "${repoDirTarget}"
       log "git fetch + reset to origin/main"
       git fetch --prune origin main
       git reset --hard origin/main
       git clean -fdx -e node_modules -e .env
 
-      # Inyectar .env desde el template persistente. Si no existe, el build
-      # continúa (Vite hará fallback) pero Chagra fallará auth en runtime.
-      if [[ -f "${envTemplate}" ]]; then
+      if [[ -f "${envTemplatePath}" ]]; then
         log "cp .env template → repo/.env"
-        install -m 0640 "${envTemplate}" "${repoDir}/.env"
+        install -m 0640 "${envTemplatePath}" "${repoDirTarget}/.env"
       else
-        log "WARNING: ${envTemplate} no existe — build sin VITE_FARMOS_CLIENT_ID"
+        log "WARNING: ${envTemplatePath} no existe — build sin VITE_FARMOS_CLIENT_ID"
       fi
 
       log "npm ci --no-audit --no-fund"
@@ -81,26 +110,64 @@ let
 
       [[ -f dist/index.html ]] || { log "build produced no dist/index.html — abort"; exit 2; }
 
-      log "rsync dist/ → ${webroot}/"
-      rsync -a --delete dist/ "${webroot}/"
+      # Reescribe CACHE_NAME en el service worker para aislar caches de PWA
+      # entre ambientes. El sufijo es vacio en PROD (no-op) y "-dev" en DEV.
+      # sw.js original: const CACHE_NAME = 'chagra-vN';
+      #   → PROD:        const CACHE_NAME = 'chagra-vN';        (sin cambio)
+      #   → DEV:         const CACHE_NAME = 'chagra-dev-vN';
+      if [[ -n "${cacheSuffix}" && -f dist/sw.js ]]; then
+        log "patch dist/sw.js CACHE_NAME con sufijo '${cacheSuffix}'"
+        sed -i "s/\\(CACHE_NAME\\s*=\\s*'\\)chagra-/\\1chagra${cacheSuffix}-/" dist/sw.js
+      fi
 
-      log "=== chagra-deploy done ==="
+      log "rsync dist/ → ${webrootTarget}/"
+      rsync -a --delete dist/ "${webrootTarget}/"
+
+      log "=== ${name} done ==="
     '';
   };
 
-  # Webhook receiver: script Python auto-contenido. Valida HMAC y lanza
-  # chagra-deploy. Sin dependencias externas.
+  chagra-deploy = mkDeployScript {
+    name            = "chagra-deploy";
+    label           = "prod";
+    webrootTarget   = webroot;
+    stateDirTarget  = stateDir;
+    repoDirTarget   = repoDir;
+    lockFileTarget  = lockFile;
+    logFileTarget   = logFile;
+    envTemplatePath = envTemplate;
+    cacheSuffix     = "";
+  };
+
+  chagra-deploy-dev = mkDeployScript {
+    name            = "chagra-deploy-dev";
+    label           = "dev";
+    webrootTarget   = webrootDev;
+    stateDirTarget  = stateDirDev;
+    repoDirTarget   = repoDirDev;
+    lockFileTarget  = lockFileDev;
+    logFileTarget   = logFileDev;
+    envTemplatePath = envTemplateDev;
+    cacheSuffix     = "-dev";
+  };
+
+  # Webhook receiver con decisor PROD vs DEV.
   webhookScript = pkgs.writeTextFile {
     name = "chagra-webhook.py";
     text = ''
       #!/usr/bin/env python3
-      """Receptor mínimo de webhooks de GitHub para Chagra.
+      """Receptor de webhooks GitHub para Chagra (dual: PROD + DEV).
 
-      Valida X-Hub-Signature-256, aprueba sólo pull_request merged sobre
-      rama main (y push directo sobre main), y lanza chagra-deploy en
-      background. No devuelve la salida completa del build al webhook —
-      GitHub vería timeout. Responde 202 Accepted y deja los logs en
-      ${logFile}.
+      Valida X-Hub-Signature-256 y despacha asi:
+
+          event=release, action=published  →  $DEPLOY_BIN_PROD
+          event=push, ref=refs/heads/main  →  $DEPLOY_BIN_DEV
+          event=pull_request, closed,
+              merged=true, base=main       →  $DEPLOY_BIN_DEV  (legacy, DEV)
+          otros                            →  ignorado (200)
+
+      Responde 202 Accepted al disparar el deploy y deja logs en
+      chagra-deploy/deploy.log (PROD) o chagra-deploy-dev/deploy.log (DEV).
       """
       import hashlib
       import hmac
@@ -111,7 +178,8 @@ let
       from http.server import BaseHTTPRequestHandler, HTTPServer
 
       SECRET = os.environ.get("WEBHOOK_SECRET", "").encode()
-      DEPLOY_BIN = os.environ.get("DEPLOY_BIN", "/run/current-system/sw/bin/chagra-deploy")
+      DEPLOY_BIN_PROD = os.environ.get("DEPLOY_BIN_PROD", "/run/current-system/sw/bin/chagra-deploy")
+      DEPLOY_BIN_DEV  = os.environ.get("DEPLOY_BIN_DEV",  "/run/current-system/sw/bin/chagra-deploy-dev")
       LISTEN_HOST = os.environ.get("LISTEN_HOST", "127.0.0.1")
       LISTEN_PORT = int(os.environ.get("LISTEN_PORT", "9000"))
 
@@ -159,29 +227,33 @@ let
               except json.JSONDecodeError:
                   return self._reply(400, "invalid json")
 
-              should_deploy = False
+              deploy_bin = None
               reason = ""
 
-              if event == "pull_request":
+              if event == "release":
+                  if payload.get("action") == "published":
+                      deploy_bin = DEPLOY_BIN_PROD
+                      tag = (payload.get("release") or {}).get("tag_name", "?")
+                      reason = f"release {tag} published → PROD"
+              elif event == "push":
+                  if payload.get("ref") == "refs/heads/main":
+                      deploy_bin = DEPLOY_BIN_DEV
+                      short = payload.get("after", "?")[:7]
+                      reason = f"push to main ({short}) → DEV"
+              elif event == "pull_request":
                   pr = payload.get("pull_request", {}) or {}
                   action = payload.get("action")
                   merged = pr.get("merged", False)
                   base_ref = (pr.get("base") or {}).get("ref", "")
                   if action == "closed" and merged and base_ref == "main":
-                      should_deploy = True
-                      reason = f"PR #{pr.get('number')} merged to main"
-              elif event == "push":
-                  ref = payload.get("ref", "")
-                  if ref == "refs/heads/main":
-                      should_deploy = True
-                      reason = f"push to main ({payload.get('after', '?')[:7]})"
+                      deploy_bin = DEPLOY_BIN_DEV
+                      reason = f"PR #{pr.get('number')} merged to main → DEV"
 
-              if not should_deploy:
+              if deploy_bin is None:
                   return self._reply(200, f"ignored event={event}")
 
-              # Dispara el deploy en background.
               subprocess.Popen(
-                  [DEPLOY_BIN],
+                  [deploy_bin],
                   stdout=subprocess.DEVNULL,
                   stderr=subprocess.DEVNULL,
                   start_new_session=True,
@@ -210,7 +282,7 @@ let
 in
 {
   options.guatoc.chagra-deploy = {
-    enable = lib.mkEnableOption "Chagra CI/CD: group, deploy script, webhook receiver";
+    enable = lib.mkEnableOption "Chagra CI/CD: group, deploy scripts (prod+dev), webhook receiver";
 
     extraGroupMembers = lib.mkOption {
       type = lib.types.listOf lib.types.str;
@@ -228,29 +300,37 @@ in
   config = lib.mkIf cfg.enable {
     users.groups.chagra-deploy = {};
 
-    # kortux y openfang siempre, más los que se agreguen por opción.
     users.users.kortux.extraGroups  = [ "chagra-deploy" ];
     users.users.openfang.extraGroups = [ "chagra-deploy" ];
 
-    # Exponer el script en /run/current-system/sw/bin
-    environment.systemPackages = [ chagra-deploy webhookScript pkgs.git pkgs.nodejs_20 ];
+    environment.systemPackages = [
+      chagra-deploy
+      chagra-deploy-dev
+      webhookScript
+      pkgs.git
+      pkgs.nodejs_20
+    ];
 
-    # Preparar directorios de estado con ownership al grupo
     systemd.tmpfiles.rules = [
+      # PROD
       "d ${stateDir}      2775 kortux chagra-deploy -"
       "d ${stateDir}/.npm 2775 kortux chagra-deploy -"
       "f ${logFile}       0664 kortux chagra-deploy -"
-      # El webroot ya existe; sólo aseguramos setgid y permisos.
       "Z ${webroot}       02775 kortux chagra-deploy -"
+      # DEV
+      "d ${stateDirDev}      2775 kortux chagra-deploy -"
+      "d ${stateDirDev}/.npm 2775 kortux chagra-deploy -"
+      "f ${logFileDev}       0664 kortux chagra-deploy -"
+      "d ${webrootDev}       02775 kortux chagra-deploy -"
     ];
 
     systemd.services.chagra-webhook = {
-      description = "Chagra CI/CD — GitHub webhook receiver";
+      description = "Chagra CI/CD — GitHub webhook receiver (PROD + DEV router)";
       after = [ "network-online.target" ];
       wants = [ "network-online.target" ];
       wantedBy = [ "multi-user.target" ];
 
-      path = [ chagra-deploy pkgs.git pkgs.nodejs_20 ];
+      path = [ chagra-deploy chagra-deploy-dev pkgs.git pkgs.nodejs_20 ];
 
       serviceConfig = {
         User = "kortux";
@@ -260,7 +340,6 @@ in
         Restart = "on-failure";
         RestartSec = "10s";
 
-        # Hardening razonable; necesita escribir en stateDir y webroot.
         PrivateTmp = true;
         ProtectKernelTunables = true;
         ProtectKernelModules = true;
@@ -269,7 +348,8 @@ in
       };
 
       environment = {
-        DEPLOY_BIN = "${chagra-deploy}/bin/chagra-deploy";
+        DEPLOY_BIN_PROD = "${chagra-deploy}/bin/chagra-deploy";
+        DEPLOY_BIN_DEV  = "${chagra-deploy-dev}/bin/chagra-deploy-dev";
         LISTEN_HOST = "127.0.0.1";
         LISTEN_PORT = "9000";
       };
