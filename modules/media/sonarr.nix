@@ -36,7 +36,8 @@ in
 
     # Contenedor OCI - VOLUMEN UNIFICADO /data para compatibilidad con *arr apps
     virtualisation.oci-containers.containers.sonarr = {
-      image = "lscr.io/linuxserver/sonarr:latest";
+      # Pinned 2026-04-20 (era :latest).
+      image = "lscr.io/linuxserver/sonarr@sha256:21c1c3d52248589bb064f5adafec18cad45812d7a01d317472955eef051e619b";
       ports = [ "${toString registry.ports.sonarr}:${toString registry.ports.sonarr}" ];
       volumes = [
         "/mnt/fast/appdata/sonarr:/config"

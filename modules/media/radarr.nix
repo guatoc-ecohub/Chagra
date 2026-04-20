@@ -36,7 +36,8 @@ in
 
     # Contenedor OCI - VOLUMEN UNIFICADO /data para compatibilidad con *arr apps
     virtualisation.oci-containers.containers.radarr = {
-      image = "lscr.io/linuxserver/radarr:latest";
+      # Pinned 2026-04-20 (era :latest).
+      image = "lscr.io/linuxserver/radarr@sha256:ca43905eaf2dd11425efdcfe184892e43806b1ae0a830440c825cecbc2629cfb";
       ports = [ "${toString registry.ports.radarr}:${toString registry.ports.radarr}" ];
       volumes = [
         "/mnt/fast/appdata/radarr:/config"

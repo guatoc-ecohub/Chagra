@@ -36,7 +36,8 @@ in
 
     # Contenedor OCI - VOLUMEN UNIFICADO /data para compatibilidad con *arr apps
     virtualisation.oci-containers.containers.lidarr = {
-      image = "lscr.io/linuxserver/lidarr:latest";
+      # Pinned 2026-04-20 (era :latest).
+      image = "lscr.io/linuxserver/lidarr@sha256:58f149df604246d7039a4c8b99ab1fefd1c4ae625048c76f3b956f2e0fb9774b";
       ports = [ "${toString registry.ports.lidarr}:${toString registry.ports.lidarr}" ];
       volumes = [
         "/mnt/fast/appdata/lidarr:/config"

@@ -39,7 +39,8 @@ in
 
     # Contenedor OCI - VOLUMEN UNIFICADO /data para compatibilidad con *arr apps
     virtualisation.oci-containers.containers.qbittorrent = {
-      image = "lscr.io/linuxserver/qbittorrent:latest";
+      # Pinned 2026-04-20 (era :latest).
+      image = "lscr.io/linuxserver/qbittorrent@sha256:6a7ffbfff04dd109bff37c474bfee00aa08dea5edb78c670439be3ed242b70fa";
       ports = [
         "${toString registry.ports.qbittorrent}:${toString registry.ports.qbittorrent}"
         "6881:6881"      # Puerto BitTorrent TCP
