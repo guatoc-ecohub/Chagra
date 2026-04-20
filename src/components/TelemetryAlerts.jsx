@@ -3,6 +3,8 @@ import { Info } from 'lucide-react';
 import { assetCache } from '../db/assetCache';
 import { FARM_CONFIG } from '../config/defaults';
 import Sparkline from './common/Sparkline';
+import StreamingText from './common/StreamingText';
+import { streamOllama } from '../services/ollamaStream';
 
 // Constantes de Infraestructura Segura (API Gateway Local)
 const HA_URL = '/api/ha';
@@ -43,6 +45,10 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
   const [aiStatus, setAiStatus] = useState('idle'); // idle | thinking | done | error
   const [sensorHistory, setSensorHistory] = useState({});
   const [aiMeta, setAiMeta] = useState(null); // { model, evalDuration, totalDuration }
+  // Texto acumulado del LLM durante el analisis agronomico (streaming NDJSON).
+  // Se muestra con efecto typewriter mientras aiStatus === 'thinking' y se
+  // consolida en aiAlert cuando el stream termina.
+  const [liveAnalysis, setLiveAnalysis] = useState('');
 
   // Variables de Entorno (Requeridas en el archivo .env)
   const HA_TOKEN = import.meta.env.VITE_HA_ACCESS_TOKEN;
@@ -239,6 +245,8 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
 
     setLoading(true);
     setError(null);
+    setLiveAnalysis('');
+    setAiMeta(null);
 
     try {
       // 1. Ingesta de Datos Domóticos (Home Assistant) - IDs Zigbee físicos
@@ -411,57 +419,61 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
       setAiAlert(`${offlineNotice}${ruleAnalysis}`);
       setLoading(false);
       setAiStatus('thinking');
+      setLiveAnalysis('');
 
-      // 3. Enriquecimiento con IA en background (no bloquea UI)
-      // Usa /api/chat con think:false para desactivar chain-of-thought de Qwen3.5
+      // 3. Enriquecimiento con IA en background vía streaming NDJSON (v0.6.0):
+      // cada token de qwen3 aparece en vivo en `liveAnalysis` con efecto
+      // typewriter, y el último chunk (done:true) entrega el metadata para aiMeta.
       try {
         const ollamaTimeout = setTimeout(() => { if (!parentSignal?.aborted) setAiStatus('error'); }, 45000);
-        const ollamaResponse = await fetch(`${OLLAMA_URL}/api/chat`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          signal: parentSignal,
-          body: JSON.stringify({
+        const userPrompt = (() => {
+          const fmt = (h, t) => isNaN(h) && isNaN(t) ? 'sin datos (sensor offline)'
+            : isNaN(h) ? `${t}°C (humedad sin dato)`
+            : isNaN(t) ? `${h}% humedad (temp sin dato)`
+            : `${h}% humedad, ${t}°C`;
+          const alertsLine = alerts.length > 0
+            ? 'Alertas: ' + alerts.map(a => a.replace(/[^\w\s%°.,()/áéíóú]/g, '')).join('. ')
+            : 'Sin alertas.';
+          return `Datos actuales de sensores:\n- Invernadero 1: ${fmt(inv1Hum, inv1Temp)}\n- Tabaco: ${fmt(tabHum, tabTemp)}\n${offlineNotice ? offlineNotice.trim() + '\n' : ''}${alertsLine}\nDiagnóstico y acción en 2 líneas.`;
+        })();
+
+        const content = await streamOllama(
+          `${OLLAMA_URL}/api/chat`,
+          {
             model: 'qwen3.5:4b',
             think: false,
-            stream: false,
             messages: [
               { role: 'system', content: 'Asistente agronómico para finca agroecológica andina (2400msnm). PROHIBIDO recomendar agroquímicos sintéticos. Solo biopreparados orgánicos (biol, caldo sulfocálcico, caldo bordelés, purín de ortiga, compost tea, microorganismos de montaña, Trichoderma). Responde conciso en español, 2 líneas máximo.' },
-              { role: 'user', content: (() => {
-                const fmt = (h, t) => isNaN(h) && isNaN(t) ? 'sin datos (sensor offline)'
-                  : isNaN(h) ? `${t}°C (humedad sin dato)`
-                  : isNaN(t) ? `${h}% humedad (temp sin dato)`
-                  : `${h}% humedad, ${t}°C`;
-                const alertsLine = alerts.length > 0
-                  ? 'Alertas: ' + alerts.map(a => a.replace(/[^\w\s%°.,()/áéíóú]/g, '')).join('. ')
-                  : 'Sin alertas.';
-                return `Datos actuales de sensores:\n- Invernadero 1: ${fmt(inv1Hum, inv1Temp)}\n- Tabaco: ${fmt(tabHum, tabTemp)}\n${offlineNotice ? offlineNotice.trim() + '\n' : ''}${alertsLine}\nDiagnóstico y acción en 2 líneas.`;
-              })() }
+              { role: 'user', content: userPrompt },
             ],
-            options: { num_predict: 200, temperature: 0.3 }
-          })
-        });
+            options: { num_predict: 200, temperature: 0.3 },
+          },
+          (_chunk, full) => {
+            if (!parentSignal?.aborted) setLiveAnalysis(full);
+          },
+          {
+            signal: parentSignal,
+            onDone: (parsed) => {
+              if (parentSignal?.aborted) return;
+              setAiMeta({
+                model: parsed.model || 'qwen3.5:4b',
+                totalDuration: parsed.total_duration ? (parsed.total_duration / 1e9).toFixed(1) : null,
+                evalCount: parsed.eval_count || null,
+                promptTokens: parsed.prompt_eval_count || null,
+              });
+            },
+          },
+        );
         clearTimeout(ollamaTimeout);
         if (parentSignal?.aborted) return;
 
-        if (ollamaResponse.ok) {
-          const data = await ollamaResponse.json();
-          const content = (data.message?.content || '').trim();
-          if (parentSignal?.aborted) return;
-          setAiMeta({
-            model: data.model || 'qwen3.5:4b',
-            totalDuration: data.total_duration ? (data.total_duration / 1e9).toFixed(1) : null,
-            evalCount: data.eval_count || null,
-            promptTokens: data.prompt_eval_count || null,
-          });
-          if (content.length > 10) {
-            setAiAlert(`${offlineNotice}${ruleAnalysis}\n\n🤖 IA: ${content}`);
-            setAiStatus('done');
-          } else {
-            console.warn('[Telemetry] IA sin contenido. Response:', JSON.stringify(data).slice(0, 300));
-            setAiStatus('empty');
-          }
+        const trimmed = (content || '').trim();
+        if (trimmed.length > 10) {
+          setAiAlert(`${offlineNotice}${ruleAnalysis}\n\n🤖 IA: ${trimmed}`);
+          setAiStatus('done');
         } else {
-          setAiStatus('error');
+          console.warn('[Telemetry] IA sin contenido suficiente. Length:', trimmed.length);
+          setAiStatus('empty');
         }
       } catch (llmErr) {
         if (parentSignal?.aborted) return;
@@ -663,6 +675,17 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
                 <p className="text-sm leading-relaxed text-slate-200 whitespace-pre-line">
                   {aiAlert}
                 </p>
+                {aiStatus === 'thinking' && (
+                  <div className="mt-3 p-3 rounded-lg bg-slate-900/60 border border-orchid/30">
+                    <div className="text-2xs text-orchid uppercase tracking-widest font-bold mb-1 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 bg-orchid rounded-full motion-safe:animate-pulse"></span>
+                      IA generando
+                    </div>
+                    <div className="text-sm text-slate-200 whitespace-pre-wrap leading-relaxed min-h-[2rem]">
+                      <StreamingText text={liveAnalysis} active />
+                    </div>
+                  </div>
+                )}
                 {renderActionButton()}
               </div>
             ) : (

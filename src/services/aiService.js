@@ -2,8 +2,12 @@
  * aiService.js — Inferencia de visión via Ollama / Gemma 4 (Fase 20.2b).
  *
  * Envía imágenes codificadas en Base64 al endpoint local del Nodo Alpha
- * para diagnóstico fitosanitario automatizado.
+ * para diagnóstico fitosanitario automatizado. Desde v0.6.0 consume la
+ * respuesta en streaming NDJSON via `streamOllama`, permitiendo a la UI
+ * mostrar el diagnóstico token-por-token con efecto typewriter.
  */
+
+import { streamOllama } from './ollamaStream';
 
 // Ruta relativa: Nginx proxea /api/ollama/ → http://localhost:11434/
 // Ruta final: /api/ollama/api/generate → http://localhost:11434/api/generate
@@ -32,38 +36,30 @@ const blobToBase64 = (blob) =>
   });
 
 /**
- * Analiza una imagen de follaje via Ollama (modelo multimodal).
+ * Analiza una imagen de follaje via Ollama (modelo multimodal) en streaming.
  *
  * @param {Blob} imageBlob — imagen optimizada (WebP)
+ * @param {Object} [options]
+ * @param {Function} [options.onToken] — callback (chunk, fullText) invocado
+ *        por cada token emitido por el modelo. La UI lo usa para mostrar el
+ *        diagnóstico apareciendo carácter-a-carácter.
+ * @param {AbortSignal} [options.signal] — cancelación externa.
  * @returns {Promise<{score: number, issues: string[], treatment_suggestion: string} | null>}
  *          null si el modelo no responde o no es multimodal.
  */
-export const analyzeFoliage = async (imageBlob) => {
+export const analyzeFoliage = async (imageBlob, { onToken, signal } = {}) => {
   try {
     const base64 = await blobToBase64(imageBlob);
 
-    // Fetch directo sin Bearer — Ollama local no requiere autenticación.
-    // No usar fetchFromFarmOS para evitar inyección de headers OAuth.
-    const response = await fetch(OLLAMA_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: MODEL,
-        prompt: DIAGNOSIS_PROMPT,
-        images: [base64],
-        stream: false,
-      }),
-    });
-
-    if (!response.ok) {
-      let detail = '';
-      try { detail = await response.text(); } catch (_) { /* noop */ }
-      console.warn(`[aiService] Ollama ${response.status} ${response.statusText}. Body: ${detail.slice(0, 200)}`);
-      return null;
-    }
-
-    const data = await response.json();
-    const text = (data.response || '').trim();
+    // streamOllama hace fetch con stream:true y procesa el NDJSON del body.
+    // No usa fetchFromFarmOS para evitar inyección de headers OAuth — Ollama
+    // local no requiere autenticación.
+    const text = (await streamOllama(
+      OLLAMA_URL,
+      { model: MODEL, prompt: DIAGNOSIS_PROMPT, images: [base64] },
+      onToken,
+      { signal },
+    )).trim();
 
     // Parsear JSON (Gemma puede envolver en markdown fences)
     const cleaned = text.replace(/```json\s*/g, '').replace(/```/g, '').trim();

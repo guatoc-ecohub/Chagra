@@ -5,6 +5,7 @@ import { mediaCache } from '../db/mediaCache';
 import { analyzeFoliage } from '../services/aiService';
 import { proximityCheck } from '../utils/spatialAnalysis';
 import { wktToGeoJson } from '../utils/geo';
+import StreamingText from './common/StreamingText';
 
 /**
  * EvidenceCapture — Captura con diagnóstico IA y evolución histórica (Fase 20.2b).
@@ -30,6 +31,9 @@ export const EvidenceCapture = ({
   const [diagnosing, setDiagnosing] = useState(false);
   const [diagnosis, setDiagnosis] = useState(null);
   const [previousCapture, setPreviousCapture] = useState(null); // { dataUrl, diagnosis }
+  // Texto acumulado del LLM durante el diagnóstico (streaming NDJSON). Se
+  // muestra con efecto typewriter mientras `diagnosing` es true.
+  const [liveDiagnosis, setLiveDiagnosis] = useState('');
   const inputRef = useRef(null);
 
   // Cargar evidencias existentes + historial anterior del asset
@@ -113,8 +117,11 @@ export const EvidenceCapture = ({
       // Diagnóstico IA async — solo si no existe diagnóstico cacheado
       if (navigator.onLine && !diagnosis) {
         setDiagnosing(true);
+        setLiveDiagnosis('');
         try {
-          const result = await analyzeFoliage(optimized);
+          const result = await analyzeFoliage(optimized, {
+            onToken: (_chunk, full) => setLiveDiagnosis(full),
+          });
           if (result) {
             setDiagnosis(result);
             await mediaCache.updateDiagnosis(mediaId, result);
@@ -237,9 +244,14 @@ export const EvidenceCapture = ({
       )}
 
       {diagnosing && (
-        <div className="flex items-center gap-2 text-xs text-orchid">
-          <Loader2 size={14} className="animate-spin" />
-          Analizando follaje…
+        <div className="p-3 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
+          <div className="flex items-center gap-2 text-xs text-slate-300 font-bold">
+            <Loader2 size={14} className="animate-spin text-lime-400" />
+            Analizando follaje…
+          </div>
+          <div className="text-[11px] font-mono text-lime-300 break-all min-h-[2.5rem] whitespace-pre-wrap">
+            <StreamingText text={liveDiagnosis} active />
+          </div>
         </div>
       )}
 

@@ -4,7 +4,13 @@
  * Toma una transcripción en español y devuelve un array estricto de
  * { crop, quantity, location }. Aplica AbortController (timeout 20s) y
  * system prompt inmutable definido en ARCHITECTURE_VOICE_0.5.0.md §4.
+ *
+ * Desde v0.6.0 consume la respuesta en streaming NDJSON a través de
+ * `streamOllama` y acepta `onToken` para que la UI muestre el JSON
+ * apareciendo carácter-a-carácter mientras el modelo genera.
  */
+
+import { streamOllama } from './ollamaStream';
 
 const OLLAMA_CHAT_URL = '/api/ollama/api/chat';
 const MODEL = 'qwen3.5:4b';
@@ -60,22 +66,24 @@ const parseJsonTolerant = (raw) => {
  * Extrae entidades de una transcripción.
  *
  * @param {string} text — transcripción en español.
+ * @param {Object} [options]
+ * @param {Function} [options.onToken] — callback (chunk, fullText) invocado
+ *        por cada token emitido por el modelo. La UI lo usa para mostrar la
+ *        respuesta en streaming con efecto typewriter.
  * @returns {Promise<Array<{crop:string, quantity:number, location:string}>>}
  * @throws {Error} si el modelo no responde, excede timeout o devuelve JSON inválido.
  */
-export async function extractEntities(text) {
+export async function extractEntities(text, { onToken } = {}) {
   if (!text || typeof text !== 'string') return [];
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
   try {
-    const res = await fetch(OLLAMA_CHAT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    const content = await streamOllama(
+      OLLAMA_CHAT_URL,
+      {
         model: MODEL,
-        stream: false,
         format: 'json',
         // qwen3 tiene "thinking mode" siempre activo por default; consume
         // todos los num_predict razonando antes de emitir content y deja
@@ -86,18 +94,10 @@ export async function extractEntities(text) {
           { role: 'user', content: text },
         ],
         options: { temperature: 0.1, num_predict: 2048 },
-      }),
-      signal: controller.signal,
-    });
-
-    if (!res.ok) {
-      let detail = '';
-      try { detail = await res.text(); } catch (_) { /* noop */ }
-      throw new Error(`Ollama ${res.status}: ${detail.slice(0, 200)}`);
-    }
-
-    const data = await res.json();
-    const content = data?.message?.content ?? '';
+      },
+      onToken,
+      { signal: controller.signal },
+    );
     let parsed = parseJsonTolerant(content);
 
     if (parsed === null) {
