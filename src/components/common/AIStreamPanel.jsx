@@ -47,14 +47,14 @@ export default function AIStreamPanel({
     if (active) {
       setPhase('streaming');
     } else if (prevActive.current && text) {
-      // streaming -> closing (500ms) -> finished (1400ms) -> idle
+      // streaming -> closing (700ms negative-flash) -> finished (1400ms) -> idle
       setPhase('closing');
       const closingTimer = setTimeout(() => {
         setPhase('finished');
-      }, 500);
+      }, 700);
       const resetTimer = setTimeout(() => {
         setPhase('idle');
-      }, 500 + 1400);
+      }, 700 + 1400);
       return () => {
         clearTimeout(closingTimer);
         clearTimeout(resetTimer);
@@ -122,6 +122,37 @@ export default function AIStreamPanel({
           aria-hidden="true"
           className={`pointer-events-none absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent ${c.fromVia} to-transparent opacity-60 motion-safe:animate-scanline`}
         />
+      )}
+
+      {/* Destello luminoso que recorre el perimetro del panel, sincronizado
+          con el latido de negative-breath (ambos 8s). pathLength=1 normaliza
+          el dash-offset a 0..-1 independiente del tamano real del rect. El
+          dasharray 0.12 visible / 0.88 gap crea un arco del 12% del perimetro
+          que avanza en loop. */}
+      {active && (
+        <svg
+          aria-hidden="true"
+          className={`pointer-events-none absolute inset-0 w-full h-full ${c.text}`}
+          preserveAspectRatio="none"
+          viewBox="0 0 100 100"
+        >
+          <rect
+            x="0.5"
+            y="0.5"
+            width="99"
+            height="99"
+            rx="2"
+            ry="2"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeDasharray="0.12 0.88"
+            pathLength="1"
+            vectorEffect="non-scaling-stroke"
+            className="motion-safe:animate-border-march"
+            style={{ filter: 'drop-shadow(0 0 3px currentColor) drop-shadow(0 0 6px currentColor)' }}
+          />
+        </svg>
       )}
 
       {/* Spark de cierre: rayo horizontal + burst circular */}

@@ -93,13 +93,24 @@ export default {
                     '80%':  { filter: 'invert(0.25) hue-rotate(60deg) saturate(110%)' },
                     '100%': { filter: 'invert(0) hue-rotate(0deg) saturate(100%)' },
                 },
-                // Loop continuo: 95% del ciclo sin efecto; en los ultimos ~5%
-                // del ciclo (8s total), flash breve de negativo para anunciar
-                // que la IA sigue viva — una "latido" visual periodico.
+                // Loop continuo: latido periodico de "IA viva". Ventana amplia
+                // (~18% del ciclo de 8s = 1.4s de flash) con una "S" de
+                // intensidad para que sea claramente visible: invert pico al
+                // 90%, decae gradualmente al volver al verde fosforo.
                 negativeBreath: {
-                    '0%, 94%, 100%': { filter: 'invert(0) hue-rotate(0deg)' },
-                    '96%':           { filter: 'invert(1) hue-rotate(180deg) saturate(130%)' },
-                    '98%':           { filter: 'invert(0.4) hue-rotate(90deg)' },
+                    '0%, 82%, 100%': { filter: 'invert(0) hue-rotate(0deg) saturate(100%)' },
+                    '86%':           { filter: 'invert(0.7) hue-rotate(120deg) saturate(130%)' },
+                    '90%':           { filter: 'invert(1) hue-rotate(180deg) saturate(160%)' },
+                    '94%':           { filter: 'invert(0.7) hue-rotate(120deg) saturate(130%)' },
+                    '97%':           { filter: 'invert(0.25) hue-rotate(60deg)' },
+                },
+                // Destello luminoso que recorre el perimetro del panel.
+                // Sincronizado con negativeBreath (ambos 8s). Usa pathLength=1
+                // en el SVG para normalizar el dash-offset a 0..-1 y que la
+                // animacion sea independiente de las dimensiones del rect.
+                borderMarch: {
+                    '0%':   { strokeDashoffset: '0' },
+                    '100%': { strokeDashoffset: '-1' },
                 },
             },
             animation: {
@@ -112,8 +123,11 @@ export default {
                 'crt-flicker': 'crtFlicker 4s ease-in-out infinite',
                 // "IA viva" — pulso periodico cada 8s durante el stream.
                 'negative-breath': 'negativeBreath 8s ease-in-out infinite',
-                // Transicion de cierre: flash previo al rayo (500ms).
-                'negative-flash':  'negativeFlash 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards',
+                // Transicion de cierre: flash previo al rayo (700ms).
+                'negative-flash':  'negativeFlash 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards',
+                // Destello que recorre el borde del panel, sincronizado con
+                // negative-breath: 8s linear infinite.
+                'border-march':    'borderMarch 8s linear infinite',
             },
         },
     },
