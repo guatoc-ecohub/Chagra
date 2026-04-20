@@ -79,16 +79,15 @@
 
   # Crear directorios de trabajo para los runners
   #
-  # El modulo upstream services.github-runners.* usa /var/lib/github-runner/<name>
-  # como RunnerDir para TODOS los runners declarados, independientemente del
-  # usuario. Como 'runner' tiene /var/lib/github-runner como home con mode 0700
-  # (default de createHome), nixos-deployer no puede escribir su subdir y falla
-  # al arrancar con: "mkdir: cannot create directory '/var/lib/github-runner':
-  # Permission denied" (problema recurrente desde abr-13, hasta que se habilito
-  # el segundo runner hoy).
+  # Contexto: services.github-runners.* coloca el RunnerDir de cada runner en
+  # /var/lib/github-runner/<name>/. 'runner' user tiene /var/lib/github-runner
+  # como home con createHome=true, lo que fuerza mode 0700 en cada activation
+  # de NixOS — bloqueando a nixos-deployer cuando intenta crear su subdir.
   #
-  # Solucion: abrir traversal (0755) del padre y pre-crear /nixos-deploy con
-  # ownership correcto. 'z' aplica permisos sin recrear si ya existe.
+  # Las reglas tmpfiles 'z' solo se aplican cuando systemd-tmpfiles-resetup
+  # re-ejecuta (algo que no pasa en todos los switches), por eso usamos ademas
+  # un oneshot dedicado (github-runner-perms-fix) que corre antes del runner
+  # nixos-deploy en cada start, garantizando 0755 independiente del estado.
   systemd.tmpfiles.rules = [
     "z /var/lib/github-runner                 0755 runner          runner          -"
     "d /var/lib/github-runner/nixos-deploy    0700 nixos-deployer  nixos-deployer  -"
@@ -97,6 +96,25 @@
     "d /var/lib/nixos-runner                  0750 nixos-deployer  nixos-deployer  -"
     "d /var/lib/nixos-runner/work             0750 nixos-deployer  nixos-deployer  -"
   ];
+
+  # Fix idempotente en cada arranque del runner nixos-deploy: abre perms del
+  # padre compartido. Evita la race contra users.users.runner.createHome que
+  # reasigna 0700 durante cada activation de NixOS.
+  systemd.services.github-runner-perms-fix = {
+    description = "Ensure /var/lib/github-runner traversable for multi-user runners";
+    before = [ "github-runner-nixos-deploy.service" ];
+    wantedBy = [ "github-runner-nixos-deploy.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = false;  # corre en cada arranque del runner, no cacheado
+      ExecStart = "${pkgs.coreutils}/bin/chmod 0755 /var/lib/github-runner";
+    };
+  };
+
+  systemd.services.github-runner-nixos-deploy = {
+    after = [ "github-runner-perms-fix.service" ];
+    requires = [ "github-runner-perms-fix.service" ];
+  };
 
   users.users.nixos-deployer = {
     isSystemUser = true;
