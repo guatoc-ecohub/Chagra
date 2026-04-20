@@ -41,10 +41,13 @@ const extractChunk = (parsed) => {
  * @param {Function} [onToken] callback (chunk, fullText) invocado por cada token.
  * @param {Object}   [options]
  * @param {AbortSignal} [options.signal] senal de aborto propagada al fetch.
+ * @param {Function}    [options.onDone] callback invocado con el ultimo objeto
+ *        del stream (done:true). Expone metadata de Ollama: model,
+ *        total_duration, eval_count, prompt_eval_count, etc.
  * @returns {Promise<string>} texto completo concatenado al terminar.
  * @throws {Error} si el fetch falla, el servidor responde no-2xx o el body no es streameable.
  */
-export async function streamOllama(url, body, onToken, { signal } = {}) {
+export async function streamOllama(url, body, onToken, { signal, onDone } = {}) {
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -86,6 +89,9 @@ export async function streamOllama(url, body, onToken, { signal } = {}) {
           if (onToken) onToken(chunk, fullText);
         }
         if (parsed.done) {
+          if (onDone) {
+            try { onDone(parsed); } catch (_) { /* noop */ }
+          }
           done = true;
           break;
         }
