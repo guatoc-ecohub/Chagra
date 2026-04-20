@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Camera, MapPin } from 'lucide-react';
 import { savePayload } from '../services/payloadService';
+import { sanitizeBlobUrl } from '../utils/blobUrl';
 
 const ASSET_TYPES = [
   { id: 'type-1', name: 'Árbol Frutal' },
@@ -181,8 +182,8 @@ export default function PlantAssetLog({ onBack, onSave }) {
         <div className="flex flex-col gap-2">
           <span className="text-xl font-bold">Fotografía del Activo</span>
           <label className="flex flex-col items-center justify-center gap-3 p-6 rounded-xl bg-slate-900 border-2 border-dashed border-slate-600 active:bg-slate-800 cursor-pointer min-h-[120px] overflow-hidden relative">
-            {photoUrl && photoUrl.startsWith('blob:') ? (
-              <img src={photoUrl} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+            {sanitizeBlobUrl(photoUrl) ? (
+              <img src={sanitizeBlobUrl(photoUrl)} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-60" />
             ) : null}
             <div className="z-10 flex flex-col items-center gap-2 drop-shadow-md">
               <Camera size={48} />
