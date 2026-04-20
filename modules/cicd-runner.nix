@@ -74,9 +74,24 @@
   };
 
   # Crear directorios de trabajo para los runners
+  #
+  # El modulo upstream services.github-runners.* usa /var/lib/github-runner/<name>
+  # como RunnerDir para TODOS los runners declarados, independientemente del
+  # usuario. Como 'runner' tiene /var/lib/github-runner como home con mode 0700
+  # (default de createHome), nixos-deployer no puede escribir su subdir y falla
+  # al arrancar con: "mkdir: cannot create directory '/var/lib/github-runner':
+  # Permission denied" (problema recurrente desde abr-13, hasta que se habilito
+  # el segundo runner hoy).
+  #
+  # Solucion: abrir traversal (0755) del padre y pre-crear /nixos-deploy con
+  # ownership correcto. 'z' aplica permisos sin recrear si ya existe.
   systemd.tmpfiles.rules = [
-    "d /var/lib/nixos-runner 0750 nixos-deployer nixos-deployer -"
-    "d /var/lib/nixos-runner/work 0750 nixos-deployer nixos-deployer -"
+    "z /var/lib/github-runner                 0755 runner          runner          -"
+    "d /var/lib/github-runner/nixos-deploy    0700 nixos-deployer  nixos-deployer  -"
+    "d /var/log/github-runner                 0755 root            root            -"
+    "d /var/log/github-runner/nixos-deploy    0750 nixos-deployer  nixos-deployer  -"
+    "d /var/lib/nixos-runner                  0750 nixos-deployer  nixos-deployer  -"
+    "d /var/lib/nixos-runner/work             0750 nixos-deployer  nixos-deployer  -"
   ];
 
   users.users.nixos-deployer = {
