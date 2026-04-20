@@ -31,7 +31,11 @@ in
     };
 
     virtualisation.oci-containers.containers.ollama = {
-      image = "ollama/ollama:latest";
+      # Pin por digest — inmutable. Antes "ollama/ollama:latest" causaba drift
+      # silencioso en cada pull (ver incidente 2026-04-19 sobre new-engine bug).
+      # Para bumpear: `sudo podman pull ollama/ollama:<nuevo-tag>` en staging,
+      # verificar, luego reemplazar el digest aqui.
+      image = "docker.io/ollama/ollama@sha256:0ff452f6a4c3c5bb4ab063a1db190b261d5834741a519189ed5301d50e4434d1";
       ports = [ "${toString registry.ports.ollama}:${toString registry.ports.ollama}" ];
       volumes = [
         "/mnt/fast/appdata/ollama:/root/.ollama"
