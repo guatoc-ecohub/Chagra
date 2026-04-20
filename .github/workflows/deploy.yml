@@ -38,12 +38,19 @@ jobs:
           VITE_HA_ACCESS_TOKEN: ${{ secrets.VITE_HA_ACCESS_TOKEN }}
 
       - name: Deploy to production
-        # -O (--omit-dir-times): necesario porque el destino es propiedad de
-        # 'kortux' (grupo compartido chagra-deploy con setgid 2775). El runner
-        # está en el grupo y puede escribir/renombrar, pero utime() sobre dirs
-        # ajenos requiere ser owner → sin -O rsync emite "failed to set times"
-        # y aborta con exit 23. Los times de archivos sí se preservan normal.
-        run: rsync -avzO --delete --no-group --chmod=D755,F644 dist/ /mnt/fast/appdata/farmos-pwa/
+        # El destino /mnt/fast/appdata/farmos-pwa es propiedad de 'kortux'
+        # (grupo compartido chagra-deploy con setgid 2775). El runner pertenece
+        # al grupo y puede escribir/renombrar archivos, pero utime/chmod/chown
+        # sobre dirs ajenos requiere ser owner → rsync aborta con exit 23 si
+        # intenta preservar esas propiedades.
+        #
+        # Flags defensivos para este destino multi-owner:
+        #   -O              omit-dir-times (no utime sobre dirs existentes)
+        #   --no-perms      no sync de perms con el source (dirs mantienen 2775)
+        #   --no-group      no preservar grupo del source
+        #   --chmod=F644    perms explicitos SOLO en archivos nuevos; dirs
+        #                   nuevos heredan el setgid del padre (= chagra-deploy)
+        run: rsync -avzO --no-perms --delete --no-group --chmod=F644 dist/ /mnt/fast/appdata/farmos-pwa/
 
       - name: Verify deployment
         run: |
