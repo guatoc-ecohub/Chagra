@@ -44,19 +44,17 @@ errors: No known data errors
 | 1 | Migración a IDs `/dev/disk/by-id/` en lugar de `/dev/sdX`       | `hosts/alpha/disko.nix`                    | ✅ APLICADO |
 | 2 | Añadido `hdd2` (disco nuevo) al manifiesto declarativo          | `hosts/alpha/disko.nix`                    | ✅ APLICADO |
 | 3 | `disko.devices.zpool.tank.mode = "mirror"`                      | `hosts/alpha/disko.nix`                    | ✅ APLICADO |
-| 4 | `hdparm-spindown.service` sobre ambos HDD por ID estable        | `hosts/alpha/hardware.nix`                 | ⚠ REVERTIDO (working tree limpio — requiere re-aplicar si se desea) |
+| 4 | `hdparm-spindown.service` sobre ambos HDD por ID estable        | `hosts/alpha/hardware.nix`                 | ✅ APLICADO (re-aplicado tras reversión) |
 | 5 | Wipe + `zpool attach` runtime (592 MB resilvered, 0 errores)    | runtime                                    | ✅ APLICADO (script `scripts/tank-mirror-expand.sh`) |
-| 6 | `nixos-rebuild switch` anterior aplicó hdparm sobre ambos HDD  | boot actual                                | ✅ OBSERVADO en journal — pero la declaración en `hardware.nix` fue revertida después |
-| 7 | Paquetes de auditoría (`hdparm smartmontools gptfdisk parted…`) | `hosts/alpha/default.nix`                  | ⚠ REVERTIDO (requieren re-edit si se desean) |
-| 8 | `vm.swappiness: 10 → 1`                                         | `hosts/alpha/hardware.nix`                 | ⚠ REVERTIDO |
+| 6 | `nixos-rebuild switch` aplicó hdparm sobre ambos HDD            | boot actual                                | ✅ OBSERVADO en journal |
+| 7 | Paquetes de auditoría (`hdparm smartmontools gptfdisk parted…`) | `hosts/alpha/default.nix`                  | ✅ APLICADO (re-aplicado tras reversión) |
+| 8 | `vm.swappiness: 10 → 1`                                         | `hosts/alpha/hardware.nix`                 | ✅ APLICADO (re-aplicado tras reversión) |
+| 9 | `OLLAMA_FLASH_ATTENTION=true` + `OLLAMA_KV_CACHE_TYPE=q8_0`     | `modules/ai/ollama.nix`                    | ✅ APLICADO (re-aplicado tras reversión) |
 
-**Nota:** los cambios #4, #7, #8 fueron revertidos en el working tree
-entre turnos (detectado via `git status`). El estado runtime que ya fue
-activado por el rebuild anterior (hdparm aplicado a ambos discos con IDs
-by-id) **sigue siendo el estado activo del sistema corriente**, pero la
-declaración en `hardware.nix` vuelve a apuntar a `/dev/sda` — lo que
-reintroduciría la vulnerabilidad en el próximo rebuild. Decisión
-pendiente del operador: re-aplicar estos 3 cambios o dejarlos fuera.
+**Nota historica:** los cambios #4, #7, #8, #9 fueron revertidos en el
+working tree entre turnos de este ciclo; el operador los autorizó
+explicitamente y se re-aplicaron. Persisten en el working tree y quedaron
+commiteados en `feat/post-incident-hardening`.
 
 ---
 
@@ -78,7 +76,7 @@ Todas las mediciones vienen de capturas runtime del 2026-04-20 entre
 
 | Palanca                    | Estado       | Valor actual          | Notas                                                              |
 | -------------------------- | ------------ | --------------------- | ------------------------------------------------------------------ |
-| `vm.swappiness`            | ⚠ 10 (edición revertida) | 10                    | Propuesto bajar a `1` para proteger runner de Ollama; el edit a `hardware.nix` fue revertido. Re-aplicar si se autoriza. |
+| `vm.swappiness`            | ✅ DECLARADO | 10 → **1** (activo tras rebuild) | Evita que el runner de Ollama (5.3 GB RSS del modelo 4B) sea paginado. |
 | `vm.overcommit_memory`     | ✅ OK        | 2 (estricto)          | Necesario para la asignación contigua grande del runner (fix 2026-04-19). |
 | `vm.overcommit_ratio`      | ✅ OK        | 150 (≈ 52 GiB límite) | Deja holgura para cargar múltiples modelos tras RAM upgrade.       |
 | `vm.vfs_cache_pressure`    | ✅ OK        | 50                    | Balance razonable entre page-cache y dentry/inode cache.           |
@@ -149,8 +147,9 @@ No son storage pero son las palancas de mayor impacto sin hardware nuevo:
 | Depurar `paligemma-mix-224:latest` residual | presente | remover | Libera 5.88 GB en `tank-fast`. `ollama rm jyan1/paligemma-mix-224:latest`. |
 
 Van en `modules/ai/ollama.nix → virtualisation.oci-containers.containers.ollama.environment`.
-**Edición inicial aplicada y luego revertida** entre turnos de este ciclo
-(working tree vuelto a limpio). No se re-aplica sin orden explícita — pendiente de decisión del operador.
+**Re-aplicadas tras autorización explícita del operador**. Declaradas en
+`FLASH_ATTENTION=true` + `KV_CACHE_TYPE=q8_0`. Activas tras el siguiente
+`nixos-rebuild switch` (podman recrea el contenedor con las nuevas env vars).
 
 ---
 
@@ -174,19 +173,17 @@ Van en `modules/ai/ollama.nix → virtualisation.oci-containers.containers.ollam
 
 ## 4. Archivos tocados en esta iteración
 
-**Declarativos persistentes (en working tree, listos para commit):**
+**Declarativos persistentes (en working tree, commiteados):**
 - `hosts/alpha/disko.nix` — reescrito a IDs by-id + `mode = "mirror"` + `hdd2`.
+- `hosts/alpha/hardware.nix` — `hdparm-spindown` sobre ambos HDD por ID estable + `vm.swappiness = 1`.
+- `hosts/alpha/default.nix` — `systemPackages` += `hdparm smartmontools gptfdisk parted lshw pciutils usbutils iotop`.
+- `modules/ai/ollama.nix` — env vars `OLLAMA_FLASH_ATTENTION=true` + `OLLAMA_KV_CACHE_TYPE=q8_0`.
 
-**Declarativos revertidos entre turnos (working tree vuelto al estado previo):**
-- `hosts/alpha/hardware.nix` — cambios `hdparm-spindown by-id` + `vm.swappiness = 1` — **NO persistentes**.
-- `hosts/alpha/default.nix` — `systemPackages` +paquetes de disco — **NO persistentes**.
-- `modules/ai/ollama.nix` — env vars `FLASH_ATTENTION` + `KV_CACHE_TYPE` — **NO persistentes**.
-
-**Nuevos scripts y reportes (listos para commit):**
+**Scripts y reportes:**
 - `scripts/tank-mirror-expand.sh` — detección dinámica de vdev source, wrappers `nix shell`, 4 pasos con 2 confirmaciones humanas.
 - `scripts/tank-perf-tune.sh` — 3 fases: (1) atime=off + xattr=sa, (2) dataset Ollama recordsize=1M, (3) opt-in export/import del pool tank.
-- `BOOT_DIAGNOSTICS.md` — ciclo anterior, referencia.
-- `LLM_AUDIT_REPORT.md` — ciclo anterior, referencia.
+- `BOOT_DIAGNOSTICS.md` — ciclo anterior.
+- `LLM_AUDIT_REPORT.md` — ciclo anterior (catalogo + arquitectura + matriz de upgrade).
 - `STORAGE_AUDIT_REPORT.md` — este archivo.
 
 ## 5. Principio operativo
@@ -198,8 +195,14 @@ Runtime aplicado y validado en este ciclo:
 **Palancas runtime documentadas pero aún no ejecutadas:**
 - `scripts/tank-perf-tune.sh` — correr con `sudo ./scripts/tank-perf-tune.sh` para FASE 1 (atime/xattr, zero-downtime) + FASE 2 (dataset ollama con recordsize=1M, requiere ~5 min downtime de Ollama). Pasar `--all` para incluir FASE 3 (export/import opt-in, requiere detener containers).
 
-**Palancas declarativas pendientes de decisión del operador** (todas fueron editadas durante el ciclo y luego revertidas — no se re-aplican sin orden explícita):
-1. `vm.swappiness = 1` en `hardware.nix`
-2. Paquetes de disco en `systemPackages` en `default.nix`
-3. `hdparm-spindown` declarado por IDs by-id en `hardware.nix` (hoy activo en runtime del rebuild anterior, pero la declaración volvió al default — ⚠ un rebuild sin re-aplicar esto revertiría el servicio a `/dev/sda`)
-4. `OLLAMA_FLASH_ATTENTION=true` + `OLLAMA_KV_CACHE_TYPE=q8_0` en `modules/ai/ollama.nix`
+**Siguiente rebuild recomendado (activa las palancas declarativas recien re-aplicadas):**
+
+```bash
+sudo nixos-rebuild switch --flake .#alpha
+```
+
+Esto activa simultáneamente:
+- `vm.swappiness = 1` (kernel sysctl, sin reboot).
+- `hdparm` y otros paquetes en PATH nativo (no más `nix shell`).
+- `hdparm-spindown` ejecuta sobre ambos HDD por ID estable (resistente a re-enumeración SATA).
+- Contenedor Ollama recreado con `FLASH_ATTENTION=true` + `KV_CACHE_TYPE=q8_0`.

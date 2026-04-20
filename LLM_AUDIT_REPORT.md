@@ -168,8 +168,8 @@ Resumen (detalle y plan en `STORAGE_AUDIT_REPORT.md`):
 
 | Palanca | Cambio | Ganancia esperada | Estado en el repo |
 |--------|--------|-------------------|-------------------|
-| `OLLAMA_FLASH_ATTENTION=true` | activar FA en runner | 5-15 % tok/s, KV-cache menor | ⚠ editado y revertido entre turnos — no persistente en working tree |
-| `OLLAMA_KV_CACHE_TYPE=q8_0` | cuantizar KV-cache a 8-bit | 50 % RAM del KV-cache | ⚠ editado y revertido entre turnos — no persistente |
+| `OLLAMA_FLASH_ATTENTION=true` | activar FA en runner | 5-15 % tok/s, KV-cache menor | ✅ DECLARADO en `modules/ai/ollama.nix` — activo tras próximo rebuild |
+| `OLLAMA_KV_CACHE_TYPE=q8_0` | cuantizar KV-cache a 8-bit | 50 % RAM del KV-cache | ✅ DECLARADO en `modules/ai/ollama.nix` — activo tras próximo rebuild |
 | Purgar `paligemma-mix-224` residual | `ollama rm jyan1/paligemma-mix-224` | libera 5.88 GB SSD | ⚠ runtime, no ejecutado |
 | `OLLAMA_KEEP_ALIVE=30m` (si RAM upgrade) | menos cold-starts | 8 s menos de latencia por sesión tras idle | ⚠ requiere más RAM |
 | Dataset ZFS dedicado para Ollama con `recordsize=1M` + `atime=off` + `xattr=sa` | menos overhead de indirection en GGUF grandes | 2-3 s menos en cold-start del modelo | ⚠ script listo en `scripts/tank-perf-tune.sh` — no ejecutado |

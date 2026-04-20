@@ -43,6 +43,17 @@ in
       environment = {
         OLLAMA_HOST = "0.0.0.0:11434";
         OLLAMA_ORIGINS = "https://chagra.guatoc.co,http://chagra.guatoc.co,http://192.168.1.100,http://localhost";
+
+        # --- Performance para inferencia en CPU (Ryzen 4600G, sin GPU) ---
+        # FLASH_ATTENTION: optimiza attention con menos reads del KV-cache.
+        # Gain medido en reportes upstream ~5-15% tok/s sobre CPU (AVX2).
+        OLLAMA_FLASH_ATTENTION = "true";
+
+        # KV_CACHE_TYPE=q8_0: cuantiza el KV-cache de f16 a int8. Reduce ~50%
+        # la RAM del cache → permite contextos ~2x mas largos con el mismo
+        # footprint. Degradacion de calidad minima (< 0.5% perplexity delta
+        # en benchmarks Llama/Qwen). Requiere FLASH_ATTENTION=true.
+        OLLAMA_KV_CACHE_TYPE = "q8_0";
       };
       extraOptions = [
         "--network=ai-net"
