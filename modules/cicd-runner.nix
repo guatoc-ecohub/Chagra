@@ -44,6 +44,10 @@
       git
       nix
       nixos-rebuild
+      # nodejs requerido por actions/checkout@v4 y otras actions basadas en JS.
+      # El runner de GitHub las descarga como scripts JS que necesitan un Node
+      # local (el runner bundle no incluye su propio node).
+      nodejs_22
     ];
 
     user = "nixos-deployer";

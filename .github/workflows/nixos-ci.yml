@@ -1,67 +1,79 @@
-name: NixOS CI/CD — Alpha
+name: NixOS CI — Alpha
+
+# Filosofia (alineada con AI_PIPELINE_SOP):
+#   * Infra NUNCA auto-deploya. El unlock manual de discos tras reboot implica
+#     que si un `switch` mal tumba SSH o sops-nix, el operador debe estar
+#     fisicamente en alpha para recuperar → incompatible con automatismo.
+#   * PR hacia main = gate obligatorio bloqueante (validate + build dry-run).
+#     Si falla cualquiera de los dos, el PR no puede mergearse.
+#   * Merge a main = notificacion. El operador corre `sudo nixos-rebuild test`
+#     en alpha, observa, y si OK promueve con `switch`. Nunca CI hace ese paso.
+#   * Deploy manual opcional: workflow_dispatch con environment protegido puede
+#     agregarse como bloque separado cuando haga falta — hoy no.
 
 on:
-  push:
-    branches: [master]
   pull_request:
-    branches: [master]
+    branches: [main]
+  push:
+    branches: [main]
+
+# Cancela runs previos del mismo branch en curso (ahorra tiempo del runner).
+concurrency:
+  group: nixos-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  # ═══ Stage 1: Validar sintaxis Nix (rápido, no requiere secrets) ═══
+  # ═══ Stage 1: Validar que el flake evalua sin errores ═══
   validate:
-    runs-on: [self-hosted, alpha, infra]
+    name: Flake check (eval)
+    runs-on: [self-hosted, alpha, nixos, infra]
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
-      - name: Validate flake
-        run: nix flake check --no-build 2>&1 | tail -20
-        continue-on-error: true
+      - name: nix flake check
+        # Bloqueante — cualquier fallo de eval mata el PR.
+        run: nix flake check --no-warn-dirty --show-trace --no-build
 
-      - name: Evaluate Alpha config
-        run: nix eval .#nixosConfigurations.alpha.config.system.build.toplevel.drvPath
+      - name: Evaluate alpha toplevel (drvPath)
+        run: |
+          nix eval --no-warn-dirty --raw \
+            .#nixosConfigurations.alpha.config.system.build.toplevel.drvPath
 
-  # ═══ Stage 2: Dry-build (detecta errores de build sin aplicar) ═══
+  # ═══ Stage 2: Build dry-run del toplevel (detecta fallos reales de build) ═══
   build:
+    name: Build alpha toplevel (no activation)
     needs: validate
-    runs-on: [self-hosted, alpha, infra]
-    if: github.event_name == 'push'
+    runs-on: [self-hosted, alpha, nixos, infra]
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
-      - name: Dry-build Alpha
+      - name: nix build (no activation, no link)
         run: |
-          sudo nixos-rebuild dry-build --flake .#alpha 2>&1 | tail -30
-          echo "Dry-build OK: $(date -Iseconds)"
+          nix build --no-link --print-out-paths --no-warn-dirty \
+            .#nixosConfigurations.alpha.config.system.build.toplevel
 
-  # ═══ Stage 3: Deploy (solo push a master, requiere build exitoso) ═══
-  deploy:
-    needs: build
-    runs-on: [self-hosted, alpha, infra]
-    if: github.ref == 'refs/heads/master'
-    environment: production
+  # ═══ Stage 3: Notificar cuando un merge a main queda listo para promover ═══
+  # Este job NO activa nada. Solo deja constancia en los logs de CI de que la
+  # nueva config paso el gate y esta lista para que el operador corra `test`
+  # y luego `switch` manualmente desde alpha.
+  notify-ready-to-deploy:
+    name: Ready for manual rebuild test/switch
+    needs: [validate, build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, alpha, nixos, infra]
     steps:
       - uses: actions/checkout@v4
-
-      - name: Switch to new configuration
+      - name: Emit ready marker
         run: |
-          echo "═══ Deploying NixOS config to Alpha ═══"
-          sudo nixos-rebuild switch --flake .#alpha 2>&1 | tail -40
-          echo "═══ Deploy completed: $(date -Iseconds) ═══"
-
-      - name: Verify services
-        run: |
-          echo "=== Service Status ==="
-          systemctl is-active podman-ollama.service || true
-          systemctl is-active github-runner-chagra-deploy.service || true
-          systemctl is-active github-runner-nixos-deploy.service || true
-          systemctl is-active openfang-personal.service 2>/dev/null || echo "openfang-personal: not yet active"
-          systemctl is-active openfang-camilo.service 2>/dev/null || echo "openfang-camilo: not yet active"
-          echo "=== Memory ==="
-          free -h | head -2
-
-      - name: Notify completion
-        if: always()
-        run: |
-          STATUS=${{ job.status }}
           COMMIT=$(git rev-parse --short HEAD)
-          echo "NixOS deploy ${STATUS}: commit ${COMMIT} on Alpha"
+          echo "═══════════════════════════════════════════════════════════"
+          echo " Config en main (${COMMIT}) paso validate + build."
+          echo ""
+          echo " Para promover en alpha, SSH y corre (respeta el SOP):"
+          echo "   cd /home/kortux/guatoc-nixos-stable && git pull"
+          echo "   sudo nixos-rebuild test --flake .#alpha      # efimero"
+          echo "   # observa 5-10 min; si OK:"
+          echo "   sudo nixos-rebuild switch --flake .#alpha   # persistente"
+          echo "═══════════════════════════════════════════════════════════"
