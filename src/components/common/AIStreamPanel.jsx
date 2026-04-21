@@ -65,6 +65,11 @@ export default function AIStreamPanel({
 
   const justFinished = phase === 'finished';
   const isClosingFlash = phase === 'closing';
+  // El latido "IA viva" y el destello del borde corren mientras el panel
+  // esta visible y tiene sentido mostrar pulso vital: durante streaming y
+  // despues (fase idle con texto). Se pausa en closing/finished para no
+  // competir visualmente con el flash/rayo de cierre.
+  const showBreath = phase === 'streaming' || (phase === 'idle' && text);
 
   const palette = {
     orchid: {
@@ -125,11 +130,12 @@ export default function AIStreamPanel({
       )}
 
       {/* Destello luminoso que recorre el perimetro del panel, sincronizado
-          con el latido de negative-breath (ambos 8s). pathLength=1 normaliza
-          el dash-offset a 0..-1 independiente del tamano real del rect. El
+          con el latido de negative-breath. pathLength=1 normaliza el
+          dash-offset a 0..-1 independiente del tamano real del rect. El
           dasharray 0.12 visible / 0.88 gap crea un arco del 12% del perimetro
-          que avanza en loop. */}
-      {active && (
+          que avanza en loop. Visible tanto durante streaming como en idle
+          con texto (panel estatico con resultado final visible). */}
+      {showBreath && (
         <svg
           aria-hidden="true"
           className={`pointer-events-none absolute inset-0 w-full h-full ${c.text}`}
@@ -202,13 +208,14 @@ export default function AIStreamPanel({
         </div>
 
         {/* Bloque de texto tipo terminal CRT: scanlines + fosforo verde + flicker.
-            Durante streaming aplica `negative-breath` (8s loop) como latido
-            periodico que invierte colores brevemente y anuncia que la IA
-            sigue viva. Al cerrar, primero `negative-flash` (500ms) como
-            transicion antes del rayo. */}
+            Durante streaming o en idle con texto (resultado final visible)
+            aplica `negative-breath` (30s loop) como latido periodico que
+            invierte colores brevemente y anuncia que la IA sigue presente.
+            Al cerrar, primero `negative-flash` (1s) como transicion antes
+            del rayo. */}
         <div
           className={`relative rounded-sm px-2 py-2 bg-black/40 overflow-hidden motion-safe:animate-crt-flicker ${
-            phase === 'streaming' ? 'motion-safe:animate-negative-breath' : ''
+            showBreath ? 'motion-safe:animate-negative-breath' : ''
           } ${
             isClosingFlash ? 'motion-safe:animate-negative-flash' : ''
           }`}
