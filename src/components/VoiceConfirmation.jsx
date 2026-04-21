@@ -4,6 +4,7 @@ import useAssetStore from '../store/useAssetStore';
 import { FARM_CONFIG } from '../config/defaults';
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { bestFuzzyMatch, similarity } from '../utils/entityMatcher';
+import GuildSuggestions from './GuildSuggestions';
 
 /**
  * VoiceConfirmation — pantalla obligatoria de revisión humana del array de
@@ -124,6 +125,33 @@ export default function VoiceConfirmation({
 
   const updateRow = (i, patch) => setRows((prev) => prev.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
   const removeRow = (i) => setRows((prev) => prev.filter((_, idx) => idx !== i));
+
+  // Agrega una nueva fila a partir de un "compañero sugerido" (capas de
+  // GuildSuggestions). Resuelve la especie contra CROP_TAXONOMY para
+  // obtener canonical/slug/termId y hereda la ubicacion de la fila origen
+  // para que el operario no tenga que volver a seleccionarla.
+  const addCompanionRow = (companionName, sourceIdx) => {
+    const source = rows[sourceIdx] || {};
+    const resolved = resolveCrop(companionName);
+    setRows((prev) => [
+      ...prev,
+      {
+        crop: resolved.crop || companionName,
+        cropOriginal: companionName,
+        cropCanonical: resolved.canonical,
+        cropSlug: resolved.cropSlug,
+        farmosTermId: resolved.farmosTermId,
+        cropScore: resolved.score,
+        cropGroup: resolved.group,
+        quantity: 1,
+        rawLocation: source.rawLocation || '',
+        locationId: source.locationId || '',
+        locationType: source.locationType || 'asset--land',
+        locationMatchedName: source.locationMatchedName || null,
+        locationScore: source.locationScore || null,
+      },
+    ]);
+  };
 
   const allValid = rows.length > 0 && rows.every(
     (r) => r.crop.trim().length > 0 && Number.isInteger(Number(r.quantity)) && Number(r.quantity) > 0 && r.locationId
@@ -250,6 +278,20 @@ export default function VoiceConfirmation({
               ))}
             </select>
           </label>
+
+          {/* Compañeros sugeridos (motor de gremios). Solo aparece cuando
+              la especie matcheo contra CROP_TAXONOMY (cropSlug presente),
+              igual que en el flujo manual de AssetsDashboard. Al clicar un
+              compañero se agrega una nueva entrada al array de rows con
+              la misma ubicacion heredada — siembra rapida de policultivo. */}
+          {row.cropSlug && (
+            <div className="mt-2 pt-3 border-t border-slate-800">
+              <GuildSuggestions
+                speciesId={row.cropSlug}
+                onSelectCompanion={(name) => addCompanionRow(name, i)}
+              />
+            </div>
+          )}
         </div>
       ))}
 
