@@ -138,7 +138,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
       return (
         <button
           onClick={handleRiegoAction}
-          className="mt-3 w-full p-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold flex items-center justify-center gap-2 transition-all"
+          className="mt-3 w-full p-3 rounded-xl bg-cyan-950 border border-cyan-500 text-cyan-400 font-bold flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] hover:bg-cyan-900 transition-all"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9m-6 6h12" />
@@ -170,7 +170,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
       return (
         <button
           onClick={handleTemperatureAction}
-          className="mt-3 w-full p-3 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-bold flex items-center justify-center gap-2 transition-all"
+          className="mt-3 w-full p-3 rounded-xl bg-orange-950 border border-orange-500 text-orange-400 font-bold flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:shadow-[0_0_25px_rgba(249,115,22,0.5)] hover:bg-orange-900 transition-all"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -222,7 +222,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
       return (
         <button
           onClick={handleFungicidalAction}
-          className="mt-3 w-full p-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold flex items-center justify-center gap-2 transition-all"
+          className="mt-3 w-full p-3 rounded-xl bg-rose-950 border border-rose-500 text-rose-400 font-bold flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(244,63,94,0.3)] hover:shadow-[0_0_25px_rgba(244,63,94,0.5)] hover:bg-rose-900 transition-all"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.932-3.131L13.068 4.632c-.667 1.239-2.003 1.239l3.035 14.872c-.57 1.464.391 3.131h13.866z" />
