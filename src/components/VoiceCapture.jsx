@@ -195,7 +195,34 @@ export default function VoiceCapture({ onSave }) {
   // - quantity--standard inline (medida count, etiqueta "Plantulas").
   // - location apuntando a structure o land segun resolvio el usuario.
   // - plant_type relationship si la especie cruzo con FarmOS taxonomy.
+  //
+  // Bug fix v0.6.6: la planta inline necesita SUS PROPIAS relationships
+  // location y parent (apuntando a la zona/structure resuelta), no solo el
+  // log. Sin esto FarmOS rechaza el POST inline con 422 Unprocessable
+  // Content y la voz queda registrada como exitosa pero sin persistir nada.
+  // location/parent solo se setean si entity.location es asset--land
+  // (parent es exclusivo de jerarquia land); si es asset--structure, solo
+  // location se permite.
   const buildSeedingPayload = useCallback((entity) => {
+    const locRef = { type: entity.location.type, id: entity.location.id };
+    const isLand = entity.location.type === 'asset--land';
+
+    // Relationships obligatorios de la planta inline:
+    //   - location: zona o structure donde se siembra (siempre).
+    //   - parent:   solo si la location es un land (jerarquia agronomica).
+    //   - plant_type: si el extractor cruzo con la taxonomy de FarmOS.
+    const inlineRels = {
+      location: { data: [locRef] },
+      ...(isLand ? { parent: { data: [locRef] } } : {}),
+      ...(entity.farmosTermId
+        ? {
+            plant_type: {
+              data: [{ type: 'taxonomy_term--plant_type', id: entity.farmosTermId }],
+            },
+          }
+        : {}),
+    };
+
     const inlinePlant = {
       type: 'asset--plant',
       attributes: {
@@ -206,13 +233,7 @@ export default function VoiceCapture({ onSave }) {
           format: 'plain_text',
         },
       },
-      ...(entity.farmosTermId ? {
-        relationships: {
-          plant_type: {
-            data: [{ type: 'taxonomy_term--plant_type', id: entity.farmosTermId }],
-          },
-        },
-      } : {}),
+      relationships: inlineRels,
     };
 
     return {
@@ -229,9 +250,7 @@ export default function VoiceCapture({ onSave }) {
         },
         relationships: {
           asset: { data: [inlinePlant] },
-          location: {
-            data: [{ type: entity.location.type, id: entity.location.id }],
-          },
+          location: { data: [locRef] },
           quantity: {
             data: [{
               type: 'quantity--standard',
