@@ -126,13 +126,35 @@ export default function VoiceConfirmation({
   const updateRow = (i, patch) => setRows((prev) => prev.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
   const removeRow = (i) => setRows((prev) => prev.filter((_, idx) => idx !== i));
 
+  // Resuelve un companion por id directo (capas 1/2 de GuildSuggestions
+  // tienen el id garantizado en speciesDefaults.companions). Lookup O(1)
+  // en allCropSpecies, sin pasar por fuzzy — elimina fallas cuando el
+  // nombre no matcha perfecto con commonName (ej. "Chocho / Tarwi" vs
+  // "Chocho"). Capa 3 (IA) no tiene id → fallback a resolveCrop fuzzy.
+  const resolveCropById = (id) => {
+    const sp = allCropSpecies.find((s) => s.id === id);
+    if (!sp) return null;
+    const farmosMatch = farmosPlantTypes.find(
+      (t) => similarity(t.attributes?.name || '', sp.commonName) > 0.85,
+    );
+    return {
+      crop: sp.commonName,
+      canonical: sp.name,
+      cropSlug: sp.id,
+      farmosTermId: farmosMatch?.id || null,
+      score: 1,
+      group: sp.group,
+    };
+  };
+
   // Agrega una nueva fila a partir de un "compañero sugerido" (capas de
-  // GuildSuggestions). Resuelve la especie contra CROP_TAXONOMY para
-  // obtener canonical/slug/termId y hereda la ubicacion de la fila origen
-  // para que el operario no tenga que volver a seleccionarla.
-  const addCompanionRow = (companionName, sourceIdx) => {
+  // GuildSuggestions). Si el caller pasa companionId (capas 1/2), usa
+  // lookup por id directo; si no (capa 3 IA), cae a resolveCrop fuzzy.
+  // Hereda la ubicacion de la fila origen para no re-seleccionar zona.
+  const addCompanionRow = (companionName, companionId, sourceIdx) => {
     const source = rows[sourceIdx] || {};
-    const resolved = resolveCrop(companionName);
+    const resolved =
+      (companionId && resolveCropById(companionId)) || resolveCrop(companionName);
     setRows((prev) => [
       ...prev,
       {
@@ -288,7 +310,7 @@ export default function VoiceConfirmation({
             <div className="mt-2 pt-3 border-t border-slate-800">
               <GuildSuggestions
                 speciesId={row.cropSlug}
-                onSelectCompanion={(name) => addCompanionRow(name, i)}
+                onSelectCompanion={(name, id) => addCompanionRow(name, id, i)}
               />
             </div>
           )}

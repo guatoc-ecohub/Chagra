@@ -14,7 +14,11 @@ import { CROP_TAXONOMY } from '../config/taxonomy';
  *
  * Props:
  *   - speciesId:       id de la especie seleccionada
- *   - onSelectCompanion: callback(speciesName) para siembra rápida
+ *   - onSelectCompanion: callback(speciesName, speciesId?) para siembra rápida.
+ *                        Capas 1/2 (companions de speciesDefaults) pasan id
+ *                        garantizado; capa 3 (IA) pasa solo name (free-form).
+ *                        Los callers legacy que solo usan el primer arg
+ *                        siguen funcionando (AssetsDashboard).
  */
 
 const ALL_SPECIES = Object.entries(CROP_TAXONOMY).flatMap(([, group]) => group.species);
@@ -95,7 +99,7 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
               <button
                 key={c.id}
                 type="button"
-                onClick={() => onSelectCompanion && onSelectCompanion(c.name)}
+                onClick={() => onSelectCompanion && onSelectCompanion(c.name, c.id)}
                 className="text-xs px-3 py-2 rounded-full bg-lime-900/30 text-lime-400 border border-lime-800 hover:bg-lime-800/40 transition-all active:scale-95"
                 title={c.reason}
               >
@@ -150,6 +154,7 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
                 type="button"
                 onClick={() => onSelectCompanion && onSelectCompanion(s.name)}
                 className="w-full text-left p-2 rounded-lg bg-purple-900/20 border border-purple-800/50 hover:bg-purple-900/40 transition-colors"
+                title={s.reason}
               >
                 <span className="text-xs text-purple-300 font-medium block">{s.name}</span>
                 <span className="text-[10px] text-slate-500">{s.reason}</span>
