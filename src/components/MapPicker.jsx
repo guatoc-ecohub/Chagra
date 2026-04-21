@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { X, MapPin, LocateFixed, Check, Undo2 } from 'lucide-react';
+import { X, MapPin, LocateFixed, Check, Undo2, Footprints, Square } from 'lucide-react';
 import { latLngToPoint, latLngsToPolygon } from '../utils/geo';
 
 /**
@@ -39,8 +39,13 @@ export const MapPicker = ({
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const layerRef = useRef(null); // capa de la geometría dibujada
+  const watchIdRef = useRef(null); // id del watchPosition cuando traza caminando
   const [points, setPoints] = useState([]); // polígono en construcción
   const [marker, setMarker] = useState(null); // punto actual
+  // Modo "trazar caminando": usa navigator.geolocation.watchPosition para
+  // ir sumando vertices al polígono mientras el operario recorre el
+  // perimetro del area (ej. un invernadero). Solo disponible en mode=polygon.
+  const [isWalking, setIsWalking] = useState(false);
 
   // Inicializar Leaflet una sola vez al montar
   useEffect(() => {
@@ -107,9 +112,62 @@ export const MapPicker = ({
       map.remove();
       mapRef.current = null;
       layerRef.current = null;
+      // Cleanup del watchPosition si quedo activo al desmontar
+      if (watchIdRef.current !== null && navigator.geolocation) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+        watchIdRef.current = null;
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Toggle del modo "trazar caminando": al activar, arranca un watchPosition
+  // con alta precision que va anadiendo vertices al polygon a medida que el
+  // GPS reporta nuevas coordenadas (tipicamente cada 1-3s segun el dispositivo).
+  // Desactivar detiene la captura — el polygon queda con los vertices
+  // acumulados y el usuario puede editarlo con Undo / Cerrar polígono.
+  const toggleWalkRecording = () => {
+    if (mode !== 'polygon') return;
+    if (isWalking) {
+      if (watchIdRef.current !== null && navigator.geolocation) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+        watchIdRef.current = null;
+      }
+      setIsWalking(false);
+      return;
+    }
+    if (!navigator.geolocation) {
+      console.warn('[MapPicker] Geolocalización no disponible para modo walk');
+      return;
+    }
+    // Limpia cualquier vertice previo y arranca la captura
+    setPoints([]);
+    const map = mapRef.current;
+    if (layerRef.current) {
+      map.removeLayer(layerRef.current);
+      layerRef.current = null;
+    }
+    setIsWalking(true);
+    watchIdRef.current = navigator.geolocation.watchPosition(
+      (pos) => {
+        const latlng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        setPoints((prev) => {
+          const next = [...prev, latlng];
+          if (layerRef.current) map.removeLayer(layerRef.current);
+          if (next.length >= 2) {
+            layerRef.current = L.polyline(next, { color: '#10b981', weight: 4, opacity: 0.85 }).addTo(map);
+          }
+          map.panTo([latlng.lat, latlng.lng]);
+          return next;
+        });
+      },
+      (err) => {
+        console.error('[MapPicker] Error watchPosition:', err.message);
+        setIsWalking(false);
+      },
+      { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 },
+    );
+  };
 
   const handleFinishPolygon = () => {
     if (points.length < 3) return;
@@ -178,10 +236,16 @@ export const MapPicker = ({
             {mode === 'point' ? 'Marcar ubicación' : 'Definir área'}
           </h3>
           {mode === 'polygon' && (
-            <span className="text-xs text-slate-400 ml-2">
+            <span className="text-xs text-slate-400 ml-2 flex items-center gap-1.5">
               {points.length < 3
                 ? `${points.length}/3 vértices mínimos`
                 : `${points.length} vértices`}
+              {isWalking && (
+                <span className="text-emerald-400 font-bold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 motion-safe:animate-pulse" />
+                  REC
+                </span>
+              )}
             </span>
           )}
         </div>
@@ -205,12 +269,29 @@ export const MapPicker = ({
           >
             <LocateFixed size={16} /> Mi ubicación
           </button>
+          {mode === 'polygon' && (
+            <button
+              type="button"
+              onClick={toggleWalkRecording}
+              className={`px-3 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${
+                isWalking
+                  ? 'bg-emerald-700 hover:bg-emerald-600 text-white shadow-[0_0_15px_rgba(16,185,129,0.4)] motion-safe:animate-pulse'
+                  : 'bg-slate-800 hover:bg-slate-700 text-slate-200'
+              }`}
+              aria-pressed={isWalking}
+              aria-label={isWalking ? 'Detener trazado caminando' : 'Trazar caminando'}
+            >
+              {isWalking ? <Square size={16} /> : <Footprints size={16} />}
+              {isWalking ? 'Detener' : 'Caminar'}
+            </button>
+          )}
           {mode === 'polygon' && points.length > 0 && (
             <>
               <button
                 type="button"
                 onClick={handleUndo}
-                className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-sm font-bold flex items-center gap-2"
+                disabled={isWalking}
+                className="px-3 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-200 rounded-lg text-sm font-bold flex items-center gap-2"
               >
                 <Undo2 size={16} /> Deshacer
               </button>
@@ -218,7 +299,8 @@ export const MapPicker = ({
                 <button
                   type="button"
                   onClick={handleFinishPolygon}
-                  className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-sm font-bold"
+                  disabled={isWalking}
+                  className="px-3 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-200 rounded-lg text-sm font-bold"
                 >
                   Cerrar polígono
                 </button>

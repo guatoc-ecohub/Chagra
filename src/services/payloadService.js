@@ -72,6 +72,14 @@ export const savePayload = async (type, payload) => {
       const result = await sendToFarmOS(endpoint, payload);
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('farmosLog', { detail: payload.data.attributes.name }));
+        // Bug fix v0.6.5: el path online-directo tambien debe emitir
+        // syncCompleted para que useAssetStore refresque los assets
+        // relacionados (ej. la planta inline creada durante un seeding).
+        // Sin esto, voz crea la planta en FarmOS pero el store local
+        // no se entera hasta un refresh manual.
+        window.dispatchEvent(new CustomEvent('syncCompleted', {
+          detail: { type, id: result?.data?.id },
+        }));
       }
       return { success: true, message: 'Guardado y sincronizado con servidor', data: result };
     } catch (error) {
