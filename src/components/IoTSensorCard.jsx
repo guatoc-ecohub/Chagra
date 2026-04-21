@@ -126,31 +126,38 @@ export default function IoTSensorCard({
           </div>
         </div>
 
-        {/* Sparklines con ejes legibles (envueltos en contenedor
-            `text-slate-400` para que los labels de ejes del SVG, que
-            usan currentColor, sean grises mientras el trazo mantiene
-            su color semantico). */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="text-slate-400 flex items-center gap-1.5">
-            <span className="text-[9px] text-morpho/70 font-mono shrink-0 tracking-wider">H%</span>
+        {/* Sparklines de 24h con ejes legibles. Cada grafica en su propio
+            contenedor con label del parametro en mono para que queden a
+            ancho completo y el texto no compita con el trazo. Los labels
+            internos del SVG (min/max/mid/temporal) usan currentColor →
+            heredan slate-300 del wrapper para buen contraste. */}
+        <div className="space-y-2">
+          <div className="text-slate-300">
+            <div className="flex items-baseline gap-2 mb-0.5">
+              <span className="text-[10px] text-morpho/80 font-mono tracking-widest uppercase">Humedad</span>
+              <span className="text-[9px] text-slate-500 font-mono">últimas 24h</span>
+            </div>
             <Sparkline
               data={humidityHistory}
               color="#3b82f6"
               timeLabel="24h"
               unit="%"
-              width={140}
-              height={44}
+              width={320}
+              height={72}
             />
           </div>
-          <div className="text-slate-400 flex items-center gap-1.5">
-            <span className="text-[9px] text-morpho/70 font-mono shrink-0 tracking-wider">T°</span>
+          <div className="text-slate-300">
+            <div className="flex items-baseline gap-2 mb-0.5">
+              <span className="text-[10px] text-morpho/80 font-mono tracking-widest uppercase">Temperatura</span>
+              <span className="text-[9px] text-slate-500 font-mono">últimas 24h</span>
+            </div>
             <Sparkline
               data={temperatureHistory}
               color="#f97316"
               timeLabel="24h"
               unit="°"
-              width={140}
-              height={44}
+              width={320}
+              height={72}
             />
           </div>
         </div>

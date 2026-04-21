@@ -117,25 +117,10 @@ export default function AIStreamPanel({
       'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
   };
 
-  // Texto final consolidado: se considera "lectura" (no generacion en vivo),
-  // por eso usa tipografia sans-serif y color neutro para maxima legibilidad.
-  // Las palabras clave agronomicas se resaltan en text-emerald-400.
-  const isFinalReading = !active && phase === 'idle' && !!text;
-
-  // Highlight de keywords agronomicas en el texto final. Usa split/join con
-  // regex + capture group para preservar el texto original y envolver solo
-  // los terminos relevantes en un <span> resaltado.
-  const renderWithHighlights = (raw) => {
-    const AGRO_KEYWORDS = /\b(riego|riegos|humedad|agua|sulfocalcico|sulfocálcico|biol|nitrogeno|nitrógeno|compost|compostaje|fertilizante|bordeles|bordelés|ortiga|trichoderma|microorganismos|biopreparado|biopreparados|organico|orgánico|hongos|plaga|plagas|preventivo|caldo|siembra|cosecha|riesgo|ventilar|hidrico|hídrico)\b/gi;
-    const parts = raw.split(AGRO_KEYWORDS);
-    return parts.map((part, i) =>
-      i % 2 === 1 ? (
-        <span key={i} className="text-emerald-400 font-semibold">{part}</span>
-      ) : (
-        part
-      ),
-    );
-  };
+  // Decision UX (v0.6.4+): el texto final mantiene el look terminal CRT
+  // verde fosforo — coherente con la metafora "terminal activa" y el
+  // aspecto unico del panel IA. La variante neutra sans-serif fue revertida
+  // por preferencia del usuario.
 
   return (
     <div
@@ -229,41 +214,29 @@ export default function AIStreamPanel({
           )}
         </div>
 
-        {/* Bloque de texto: dos modos segun la fase.
-            - Streaming/closing: caja CRT con fosforo verde + scanlines +
-              flicker + block cursor parpadeante (metafora "terminal").
-            - Idle con texto (lectura del resultado final): tipografia sans
-              neutra, color slate-300 para maxima legibilidad, keywords
-              agronomicas resaltadas en emerald-400. */}
-        {isFinalReading ? (
-          <div className={`relative rounded-sm px-2 py-2 bg-slate-950/40 ${
+        {/* Bloque de texto tipo terminal CRT (uniforme para todas las fases):
+            scanlines + fosforo verde + flicker + block cursor parpadeante.
+            Durante showBreath aplica negativeBreath (latido); en closing
+            aplica negativeFlash (transicion al rayo de cierre). */}
+        <div
+          className={`relative rounded-sm px-2 py-2 bg-black/40 overflow-hidden motion-safe:animate-crt-flicker ${
             showBreath ? 'motion-safe:animate-negative-breath' : ''
-          }`}>
-            <p className="text-sm text-slate-300 font-sans leading-relaxed whitespace-pre-wrap break-words">
-              {renderWithHighlights(text)}
-            </p>
-          </div>
-        ) : (
+          } ${
+            isClosingFlash ? 'motion-safe:animate-negative-flash' : ''
+          }`}
+          style={scanlinesBg}
+        >
           <div
-            className={`relative rounded-sm px-2 py-2 bg-black/40 overflow-hidden motion-safe:animate-crt-flicker ${
-              showBreath ? 'motion-safe:animate-negative-breath' : ''
-            } ${
-              isClosingFlash ? 'motion-safe:animate-negative-flash' : ''
-            }`}
-            style={scanlinesBg}
+            className="text-sm leading-relaxed whitespace-pre-wrap break-words min-h-[1.5rem] tracking-wide"
+            style={phosphorTextStyle}
           >
-            <div
-              className="text-sm leading-relaxed whitespace-pre-wrap break-words min-h-[1.5rem] tracking-wide"
-              style={phosphorTextStyle}
-            >
-              <StreamingText
-                text={text}
-                active={active}
-                variant="block"
-              />
-            </div>
+            <StreamingText
+              text={text}
+              active={active}
+              variant="block"
+            />
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
