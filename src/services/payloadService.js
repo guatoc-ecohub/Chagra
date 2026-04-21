@@ -83,7 +83,25 @@ export const savePayload = async (type, payload) => {
       }
       return { success: true, message: 'Guardado y sincronizado con servidor', data: result };
     } catch (error) {
-      console.warn("API Error, falling back to offline", error);
+      // Imprime el body del error (ya capturado como error.detail en
+      // apiService) de forma legible. Para 422 de FarmOS, el body trae un
+      // JSON:API con `errors[].detail` que indica exactamente que campo o
+      // regla fallo — imprescindible para diagnosticar inline POSTs que
+      // revientan con validaciones lejanas al codigo del cliente.
+      console.warn('[payloadService] API Error, falling back to offline:', error.message);
+      if (error.detail) {
+        try {
+          const body = JSON.parse(error.detail);
+          console.warn('[payloadService] Error body (parsed):', body);
+          if (Array.isArray(body.errors)) {
+            body.errors.forEach((e, i) =>
+              console.warn(`  [${i}] ${e.title || 'Error'}: ${e.detail || '(sin detalle)'}${e.source?.pointer ? ` @ ${e.source.pointer}` : ''}`),
+            );
+          }
+        } catch (_) {
+          console.warn('[payloadService] Error body (raw):', error.detail.slice(0, 500));
+        }
+      }
       await syncManager.saveTransaction({ type: type.replace("plant_asset", "planting"), payload: { ...payload, endpoint } });
       return { success: false, message: `Guardado local. Pendiente de sincronización (${error.message})` };
     }
