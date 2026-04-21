@@ -14,8 +14,46 @@ export const savePayload = async (type, payload) => {
   const endpoint = resolveEndpoint(type);
   if (navigator.onLine) {
     try {
-      // Fase 1.5: Resolver entidades anidadas y limpiar mock IDs
+      // Fase 1.5: Resolver entidades anidadas y limpiar mock IDs.
+      //
+      // Bug fix v0.6.8: antes, al procesar un item inline se filtraban sus
+      // relationships descartando cualquier sub-item sin id UUID. Eso hacia
+      // que un inline anidado (ej. taxonomy_term--plant_type dentro de un
+      // asset--plant inline) se perdiera → POST /api/asset/plant saltaba
+      // sin plant_type → 422 "plant_type: Este valor no puede ser nulo".
+      //
+      // Ahora resolvemos recursivamente: si una sub-relationship contiene
+      // items con attributes (sin id), se POSTean primero al endpoint de
+      // su tipo, se captura el UUID retornado, y se usa esa ref resuelta
+      // en el payload del item padre. Items con id UUID valido pasan
+      // directo; items sin id ni attributes se descartan.
       if (payload.data.relationships) {
+        const resolveInline = async (d) => {
+          if (d.id && isUUID(d.id)) return d;
+          if (d.attributes) {
+            const subParts = d.type.split('--');
+            const subEndpoint = `/api/${subParts[0]}/${subParts[1]}`;
+            const subPayload = { data: { type: d.type, attributes: d.attributes } };
+            const subResult = await sendToFarmOS(subEndpoint, subPayload);
+            return { type: d.type, id: subResult.data.id };
+          }
+          return null;
+        };
+
+        const resolveRels = async (rels) => {
+          const out = {};
+          for (const [rk, rv] of Object.entries(rels || {})) {
+            if (!rv?.data) continue;
+            const isArray = Array.isArray(rv.data);
+            const subItems = isArray ? rv.data : [rv.data];
+            const resolved = (await Promise.all(subItems.map(resolveInline))).filter(Boolean);
+            if (resolved.length > 0) {
+              out[rk] = { data: isArray ? resolved : resolved[0] };
+            }
+          }
+          return out;
+        };
+
         for (const [relName, relData] of Object.entries(payload.data.relationships)) {
           if (!relData.data) continue;
 
@@ -24,23 +62,16 @@ export const savePayload = async (type, payload) => {
               const parts = item.type.split('--');
               const inlineEndpoint = `/api/${parts[0]}/${parts[1]}`;
 
-              const safeRels = {};
-              if (item.relationships) {
-                Object.entries(item.relationships).forEach(([rk, rv]) => {
-                  if (!rv.data) return;
-                  const subItems = Array.isArray(rv.data) ? rv.data : [rv.data];
-                  const filtered = subItems.filter(d => d.id && isUUID(d.id));
-                  if (filtered.length > 0) {
-                    safeRels[rk] = { data: Array.isArray(rv.data) ? filtered : filtered[0] };
-                  }
-                });
-              }
+              // Resolve recursive: inlines anidados dentro de este item.
+              const resolvedRels = item.relationships
+                ? await resolveRels(item.relationships)
+                : {};
 
               const inlinePayload = {
                 data: {
                   type: item.type,
                   attributes: item.attributes,
-                  ...(Object.keys(safeRels).length > 0 ? { relationships: safeRels } : {})
+                  ...(Object.keys(resolvedRels).length > 0 ? { relationships: resolvedRels } : {})
                 }
               };
 
