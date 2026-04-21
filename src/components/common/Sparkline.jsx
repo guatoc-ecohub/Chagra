@@ -25,6 +25,7 @@ export default function Sparkline({
   unit = '',
   showLastValue = true,
   lastValueDecimals = 1,
+  responsive = false,
 }) {
   let series;
   if (Array.isArray(values)) {
@@ -36,7 +37,10 @@ export default function Sparkline({
   }
 
   if (series.length < 2) {
-    return <div style={{ width, height }} className="bg-slate-700/30 rounded animate-pulse" />;
+    const placeholderStyle = responsive
+      ? { width: '100%', maxWidth: width, height }
+      : { width, height };
+    return <div style={placeholderStyle} className="bg-slate-700/30 rounded animate-pulse" />;
   }
 
   const min = Math.min(...series);
@@ -87,12 +91,19 @@ export default function Sparkline({
   const chipX = width - padR - chipW;
   const chipY = padT - 2;
 
+  // Modo responsive (v0.6.12): ancho fluido capado por el viewBox; el SVG
+  // escala con el contenedor preservando aspect-ratio. Esto permite colocar
+  // dos sparklines lado a lado en desktop sin overflow en mobile.
+  const svgWidthAttr = responsive ? '100%' : width;
+  const svgStyle = responsive ? { maxWidth: width, display: 'block' } : undefined;
+
   return (
     <svg
-      width={width}
+      width={svgWidthAttr}
       height={height}
       className="inline-block"
       viewBox={`0 0 ${width} ${height}`}
+      style={svgStyle}
     >
       <defs>
         <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">

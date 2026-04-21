@@ -106,19 +106,24 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
 
   return (
     <div className="h-[100dvh] w-full bg-slate-950 text-white flex flex-col overflow-hidden">
-      <header className="p-4 border-b border-slate-800 shrink-0 flex justify-between items-center bg-slate-900/50 backdrop-blur-md sticky top-0 z-50 pt-[env(safe-area-inset-top)]">
-        <div className="flex flex-col gap-1">
-          <h1 className="font-bold text-2xl flex items-center gap-2">
-            <span className="w-2 h-2 bg-muzo rounded-full shadow-neon-muzo"></span>
-            Chagra
-          </h1>
-          <span className="text-xs text-slate-500 font-mono">v{APP_VERSION}</span>
-        </div>
+      {/* Header compacto (v0.6.12): padding vertical reducido + titulo/version
+          inline en una sola linea para ganar viewport en el home. El boton
+          Salir mantiene 44px minimo (WCAG AA 2.5.5). El top usa max() para
+          respetar safe-area-inset-top en iOS con notch. */}
+      <header
+        className="px-4 py-2 border-b border-slate-800 shrink-0 flex justify-between items-center bg-slate-900/50 backdrop-blur-md sticky top-0 z-50"
+        style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top))' }}
+      >
+        <h1 className="font-bold text-xl flex items-baseline gap-2">
+          <span className="w-2 h-2 bg-muzo rounded-full shadow-neon-muzo self-center" aria-hidden="true"></span>
+          Chagra
+          <span className="text-[10px] text-slate-500 font-mono font-normal">v{APP_VERSION}</span>
+        </h1>
         <div className="flex items-center gap-2">
-          <button onClick={onLogout} aria-label="Cerrar sesión" className="text-slate-400 hover:text-white px-4 py-3 min-h-[44px] bg-slate-800 rounded">Salir</button>
+          <button onClick={onLogout} aria-label="Cerrar sesión" className="text-slate-400 hover:text-white px-4 min-h-[44px] bg-slate-800 rounded text-sm">Salir</button>
         </div>
       </header>
-      <main className="flex-1 p-4 flex flex-col overflow-y-auto gap-4 bg-biopunk-pattern">
+      <main className="flex-1 px-4 pt-3 pb-4 flex flex-col overflow-y-auto gap-3 bg-biopunk-pattern">
         <TelemetryAlerts lastFarmOsLog={lastLogMessage} />
 
         {/* Contadores de inventario consolidados: un solo container con
