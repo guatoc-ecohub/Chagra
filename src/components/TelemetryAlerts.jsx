@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Info } from 'lucide-react';
 import { assetCache } from '../db/assetCache';
 import { FARM_CONFIG } from '../config/defaults';
-import Sparkline from './common/Sparkline';
 import AIStreamPanel from './common/AIStreamPanel';
+import IoTSensorCard from './IoTSensorCard';
 import { streamOllama } from '../services/ollamaStream';
 
 // Constantes de Infraestructura Segura (API Gateway Local)
@@ -564,72 +564,31 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         </div>
       )}
 
-      <div className="space-y-4 mb-6">
-        <div className="p-4 bg-slate-800 rounded-2xl">
-          <div className="flex justify-between items-center">
-            <div>
-              <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Invernadero — Zona A</span>
-              <span className="text-slate-300 text-sm">Matera Cocina</span>
-            </div>
-            <div className="flex gap-4">
-              <div className="text-right">
-                <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Hum</span>
-                <span className={`text-2xl font-black ${getHumidityColor(sensors.invernaderoHumidity)}`}>
-                  {sensors.invernaderoHumidity || '---'}%
-                </span>
-              </div>
-              <div className="text-right">
-                <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Temp</span>
-                <span className={`text-2xl font-black ${getTemperatureColor(sensors.invernaderoTemperature)}`}>
-                  {sensors.invernaderoTemperature || '---'}°C
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="flex gap-3 mt-2 pt-2 border-t border-slate-700/50">
-            <div className="flex-1 flex items-center gap-2">
-              <span className="text-slate-500 text-2xs font-mono shrink-0">H%</span>
-              <Sparkline data={sensorHistory['sensor.matera_cocina_humidity']} color="#3b82f6" />
-            </div>
-            <div className="flex-1 flex items-center gap-2">
-              <span className="text-slate-500 text-2xs font-mono shrink-0">T°</span>
-              <Sparkline data={sensorHistory['sensor.matera_cocina_temperature']} color="#f97316" />
-            </div>
-          </div>
-        </div>
-
-        <div className="p-4 bg-slate-800 rounded-2xl">
-          <div className="flex justify-between items-center">
-            <div>
-              <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Matera Tabaco</span>
-              <span className="text-slate-300 text-sm">Cocina · Hobeian ZG-303Z</span>
-            </div>
-            <div className="flex gap-4">
-              <div className="text-right">
-                <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Hum</span>
-                <span className={`text-2xl font-black ${getHumidityColor(sensors.tabacoHumidity)}`}>
-                  {sensors.tabacoHumidity || '---'}%
-                </span>
-              </div>
-              <div className="text-right">
-                <span className="text-slate-400 font-bold uppercase tracking-wider text-xs block">Temp</span>
-                <span className={`text-2xl font-black ${getTemperatureColor(sensors.tabacoTemperature)}`}>
-                  {sensors.tabacoTemperature || '---'}°C
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="flex gap-3 mt-2 pt-2 border-t border-slate-700/50">
-            <div className="flex-1 flex items-center gap-2">
-              <span className="text-slate-500 text-2xs font-mono shrink-0">H%</span>
-              <Sparkline data={sensorHistory['sensor.hobeian_zg_303z_humidity']} color="#3b82f6" />
-            </div>
-            <div className="flex-1 flex items-center gap-2">
-              <span className="text-slate-500 text-2xs font-mono shrink-0">T°</span>
-              <Sparkline data={sensorHistory['sensor.hobeian_zg_303z_temperature']} color="#f97316" />
-            </div>
-          </div>
-        </div>
+      {/* Telemetria IoT — estilo HUD industrial, tipografia monoespaciada,
+          borde left accent morpho (cyan) para diferenciar visualmente del
+          panel cyberpunk de IA (orchid). Status dot parpadea sutilmente
+          como signo de conexion viva al sensor. */}
+      <div className="space-y-3 mb-6">
+        <IoTSensorCard
+          title="INVERNADERO — ZONA A"
+          deviceId="matera_cocina · zigbee"
+          humidity={sensors.invernaderoHumidity}
+          temperature={sensors.invernaderoTemperature}
+          humidityHistory={sensorHistory['sensor.matera_cocina_humidity']}
+          temperatureHistory={sensorHistory['sensor.matera_cocina_temperature']}
+          getHumidityColor={getHumidityColor}
+          getTemperatureColor={getTemperatureColor}
+        />
+        <IoTSensorCard
+          title="MATERA TABACO"
+          deviceId="cocina · hobeian_zg_303z"
+          humidity={sensors.tabacoHumidity}
+          temperature={sensors.tabacoTemperature}
+          humidityHistory={sensorHistory['sensor.hobeian_zg_303z_humidity']}
+          temperatureHistory={sensorHistory['sensor.hobeian_zg_303z_temperature']}
+          getHumidityColor={getHumidityColor}
+          getTemperatureColor={getTemperatureColor}
+        />
       </div>
 
       <div className={`p-5 rounded-xl relative overflow-hidden border-l-8 shadow-neon-morpho ${loading ? 'bg-morpho/5 border-morpho' : 'bg-orchid/5 border-orchid'}`}>
