@@ -40,16 +40,32 @@ const LoadingFallback = () => (
   </div>
 );
 
+// NAV tiles rediseñados Bio-Punk (v0.6.4): fondo translucido + borde
+// lateral con el color de acento. El color vive solo en el icono y titulo;
+// el fondo y borde son uniformes (slate) para look cohesivo.
 const NAV_TILES = [
-  { id: 'activos', label: 'Activos', icon: Warehouse, color: 'bg-teal-700', desc: 'Cultivos, zonas e infraestructura' },
-  { id: 'mapa', label: 'Mapa', icon: MapPin, color: 'bg-blue-700', desc: 'Vista espacial de la finca' },
-  { id: 'javier', label: 'Campo', icon: Eye, color: 'bg-green-700', desc: `Tareas por proximidad (${PRIMARY_WORKER_NAME})` },
-  { id: 'bodega', label: 'Bodega', icon: Package, color: 'bg-sky-800', desc: 'Stock de biopreparados' },
-  { id: 'task_log', label: 'Tareas', icon: Clock, color: 'bg-red-700', desc: 'Cola de pendientes' },
-  { id: 'historial', label: 'Historial', icon: ClipboardList, color: 'bg-indigo-700', desc: 'Trazabilidad de operaciones' },
-  { id: 'biodiversidad', label: 'Biodiversidad', icon: Leaf, color: 'bg-emerald-700', desc: 'Ecosistema, estratos y gremios' },
-  { id: 'voz', label: 'Voz', icon: Mic, color: 'bg-lime-700', desc: 'Registro por dictado (v0.5.0)' },
+  { id: 'activos', label: 'Activos', icon: Warehouse, accent: 'teal', desc: 'Cultivos, zonas e infraestructura' },
+  { id: 'mapa', label: 'Mapa', icon: MapPin, accent: 'blue', desc: 'Vista espacial de la finca' },
+  { id: 'javier', label: 'Campo', icon: Eye, accent: 'green', desc: `Tareas por proximidad (${PRIMARY_WORKER_NAME})` },
+  { id: 'bodega', label: 'Bodega', icon: Package, accent: 'sky', desc: 'Stock de biopreparados' },
+  { id: 'task_log', label: 'Tareas', icon: Clock, accent: 'rose', desc: 'Cola de pendientes' },
+  { id: 'historial', label: 'Historial', icon: ClipboardList, accent: 'indigo', desc: 'Trazabilidad de operaciones' },
+  { id: 'biodiversidad', label: 'Biodiversidad', icon: Leaf, accent: 'emerald', desc: 'Ecosistema, estratos y gremios' },
+  { id: 'voz', label: 'Voz', icon: Mic, accent: 'lime', desc: 'Registro por dictado (v0.5.0)' },
 ];
+
+// Mapa de accents → clases Tailwind (para que el JIT genere los estilos).
+// Keeping static literals so Tailwind purgue funcione.
+const ACCENT_CLASSES = {
+  teal:    { border: 'border-l-teal-500',    text: 'text-teal-400' },
+  blue:    { border: 'border-l-blue-500',    text: 'text-blue-400' },
+  green:   { border: 'border-l-green-500',   text: 'text-green-400' },
+  sky:     { border: 'border-l-sky-500',     text: 'text-sky-400' },
+  rose:    { border: 'border-l-rose-500',    text: 'text-rose-400' },
+  indigo:  { border: 'border-l-indigo-500',  text: 'text-indigo-400' },
+  emerald: { border: 'border-l-emerald-500', text: 'text-emerald-400' },
+  lime:    { border: 'border-l-lime-500',    text: 'text-lime-400' },
+};
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
 // useAssetStore() (hook) dispara re-render cuando hydrate()/syncFromServer() actualizan
@@ -105,19 +121,24 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
       <main className="flex-1 p-4 flex flex-col overflow-y-auto gap-4 bg-biopunk-pattern">
         <TelemetryAlerts lastFarmOsLog={lastLogMessage} />
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {assetCounts.map((ac) => (
-            <button
-              key={ac.label}
-              onClick={() => onNavigate('activos')}
-              aria-label={`Ver ${ac.label}: ${ac.count}`}
-              className="bg-slate-900 border border-slate-800 rounded-xl p-3 text-center hover:bg-slate-800 transition-colors"
-            >
-              <p className={`text-2xl font-black tabular-nums ${ac.color}`}>{ac.count}</p>
-              <p className="text-2xs text-slate-500 uppercase font-bold">{ac.label}</p>
-            </button>
-          ))}
-        </div>
+        {/* Contadores de inventario consolidados: un solo container con
+            divisores verticales entre columnas, en vez de 4 tarjetas
+            separadas. Compacto y coherente con el resto de paneles Bio-Punk. */}
+        <button
+          type="button"
+          onClick={() => onNavigate('activos')}
+          aria-label="Ver inventario de activos"
+          className="w-full bg-slate-900 border border-slate-800 rounded-xl hover:bg-slate-800/50 transition-colors"
+        >
+          <div className="grid grid-cols-4 divide-x divide-slate-800 py-3">
+            {assetCounts.map((ac) => (
+              <div key={ac.label} className="text-center px-2">
+                <p className={`text-2xl font-black tabular-nums ${ac.color}`}>{ac.count}</p>
+                <p className="text-2xs text-slate-500 uppercase font-bold tracking-wider">{ac.label}</p>
+              </div>
+            ))}
+          </div>
+        </button>
 
         {noGeoCount > 0 && (
           <button
@@ -135,18 +156,21 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
         <PendingTasksWidget />
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {NAV_TILES.map((tile) => (
-            <button
-              key={tile.id}
-              onClick={() => onNavigate(tile.id)}
-              aria-label={`${tile.label}: ${tile.desc}`}
-              className={`${tile.color} active:brightness-75 transition-all rounded-xl p-4 shadow-lg text-left min-h-[80px]`}
-            >
-              <tile.icon size={28} strokeWidth={2} className="mb-2" aria-hidden="true" />
-              <span className="text-lg font-black block">{tile.label}</span>
-              <span className="text-2xs text-white/60">{tile.desc}</span>
-            </button>
-          ))}
+          {NAV_TILES.map((tile) => {
+            const a = ACCENT_CLASSES[tile.accent] || ACCENT_CLASSES.teal;
+            return (
+              <button
+                key={tile.id}
+                onClick={() => onNavigate(tile.id)}
+                aria-label={`${tile.label}: ${tile.desc}`}
+                className={`bg-slate-900/60 border border-slate-800 border-l-4 ${a.border} rounded-xl p-4 text-left min-h-[80px] active:bg-slate-800/70 transition-colors`}
+              >
+                <tile.icon size={28} strokeWidth={2} className={`mb-2 ${a.text}`} aria-hidden="true" />
+                <span className={`text-lg font-black block ${a.text}`}>{tile.label}</span>
+                <span className="text-2xs text-slate-500 block mt-0.5">{tile.desc}</span>
+              </button>
+            );
+          })}
         </div>
       </main>
     </div>

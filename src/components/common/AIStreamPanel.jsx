@@ -108,11 +108,33 @@ export default function AIStreamPanel({
   };
 
   // Text-shadow que simula el bloom del fosforo en tubo CRT.
+  // Solo se aplica durante streaming/closing — el texto final consolidado
+  // usa estilos neutros (font-sans, text-slate-300) para maxima legibilidad.
   const phosphorTextStyle = {
     color: phosphorColor,
     textShadow: '0 0 4px rgba(74, 222, 128, 0.75), 0 0 8px rgba(74, 222, 128, 0.35)',
     fontFamily:
       'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+  };
+
+  // Texto final consolidado: se considera "lectura" (no generacion en vivo),
+  // por eso usa tipografia sans-serif y color neutro para maxima legibilidad.
+  // Las palabras clave agronomicas se resaltan en text-emerald-400.
+  const isFinalReading = !active && phase === 'idle' && !!text;
+
+  // Highlight de keywords agronomicas en el texto final. Usa split/join con
+  // regex + capture group para preservar el texto original y envolver solo
+  // los terminos relevantes en un <span> resaltado.
+  const renderWithHighlights = (raw) => {
+    const AGRO_KEYWORDS = /\b(riego|riegos|humedad|agua|sulfocalcico|sulfocálcico|biol|nitrogeno|nitrógeno|compost|compostaje|fertilizante|bordeles|bordelés|ortiga|trichoderma|microorganismos|biopreparado|biopreparados|organico|orgánico|hongos|plaga|plagas|preventivo|caldo|siembra|cosecha|riesgo|ventilar|hidrico|hídrico)\b/gi;
+    const parts = raw.split(AGRO_KEYWORDS);
+    return parts.map((part, i) =>
+      i % 2 === 1 ? (
+        <span key={i} className="text-emerald-400 font-semibold">{part}</span>
+      ) : (
+        part
+      ),
+    );
   };
 
   return (
@@ -207,31 +229,41 @@ export default function AIStreamPanel({
           )}
         </div>
 
-        {/* Bloque de texto tipo terminal CRT: scanlines + fosforo verde + flicker.
-            Durante streaming o en idle con texto (resultado final visible)
-            aplica `negative-breath` (30s loop) como latido periodico que
-            invierte colores brevemente y anuncia que la IA sigue presente.
-            Al cerrar, primero `negative-flash` (1s) como transicion antes
-            del rayo. */}
-        <div
-          className={`relative rounded-sm px-2 py-2 bg-black/40 overflow-hidden motion-safe:animate-crt-flicker ${
+        {/* Bloque de texto: dos modos segun la fase.
+            - Streaming/closing: caja CRT con fosforo verde + scanlines +
+              flicker + block cursor parpadeante (metafora "terminal").
+            - Idle con texto (lectura del resultado final): tipografia sans
+              neutra, color slate-300 para maxima legibilidad, keywords
+              agronomicas resaltadas en emerald-400. */}
+        {isFinalReading ? (
+          <div className={`relative rounded-sm px-2 py-2 bg-slate-950/40 ${
             showBreath ? 'motion-safe:animate-negative-breath' : ''
-          } ${
-            isClosingFlash ? 'motion-safe:animate-negative-flash' : ''
-          }`}
-          style={scanlinesBg}
-        >
-          <div
-            className="text-sm leading-relaxed whitespace-pre-wrap break-words min-h-[1.5rem] tracking-wide"
-            style={phosphorTextStyle}
-          >
-            <StreamingText
-              text={text}
-              active={active}
-              variant="block"
-            />
+          }`}>
+            <p className="text-sm text-slate-300 font-sans leading-relaxed whitespace-pre-wrap break-words">
+              {renderWithHighlights(text)}
+            </p>
           </div>
-        </div>
+        ) : (
+          <div
+            className={`relative rounded-sm px-2 py-2 bg-black/40 overflow-hidden motion-safe:animate-crt-flicker ${
+              showBreath ? 'motion-safe:animate-negative-breath' : ''
+            } ${
+              isClosingFlash ? 'motion-safe:animate-negative-flash' : ''
+            }`}
+            style={scanlinesBg}
+          >
+            <div
+              className="text-sm leading-relaxed whitespace-pre-wrap break-words min-h-[1.5rem] tracking-wide"
+              style={phosphorTextStyle}
+            >
+              <StreamingText
+                text={text}
+                active={active}
+                variant="block"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

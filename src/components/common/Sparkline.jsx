@@ -69,6 +69,7 @@ export default function Sparkline({
   const midY = padT + plotH / 2;
   const topY = padT;
   const bottomY = padT + plotH;
+  const midVal = (min + max) / 2;
 
   return (
     <svg
@@ -77,14 +78,19 @@ export default function Sparkline({
       className="inline-block"
       viewBox={`0 0 ${width} ${height}`}
     >
-      {/* Guias horizontales tenues en min/mid/max */}
+      {/* Guias horizontales: min y max tenues (opacity 0.2); linea central
+          punteada mas prominente (opacity 0.4 con dash 3/3) como baseline
+          visual claro para interpretar picos vs valles de la serie. */}
       <line x1={padL} y1={topY} x2={width - padR} y2={topY} stroke="currentColor" strokeWidth="0.5" strokeDasharray="2 3" opacity="0.2" />
-      <line x1={padL} y1={midY} x2={width - padR} y2={midY} stroke="currentColor" strokeWidth="0.5" strokeDasharray="2 3" opacity="0.15" />
+      <line x1={padL} y1={midY} x2={width - padR} y2={midY} stroke="currentColor" strokeWidth="0.7" strokeDasharray="3 3" opacity="0.4" />
       <line x1={padL} y1={bottomY} x2={width - padR} y2={bottomY} stroke="currentColor" strokeWidth="0.5" strokeDasharray="2 3" opacity="0.2" />
 
-      {/* Labels Y (max arriba, min abajo) */}
+      {/* Labels Y (max arriba, mid al centro, min abajo) */}
       <text x={padL - 3} y={topY + 3} fill="currentColor" fontSize="8" textAnchor="end" opacity="0.7" className="font-mono">
         {max.toFixed(0)}
+      </text>
+      <text x={padL - 3} y={midY + 3} fill="currentColor" fontSize="7.5" textAnchor="end" opacity="0.55" className="font-mono">
+        {midVal.toFixed(0)}
       </text>
       <text x={padL - 3} y={bottomY + 1} fill="currentColor" fontSize="8" textAnchor="end" opacity="0.7" className="font-mono">
         {min.toFixed(0)}

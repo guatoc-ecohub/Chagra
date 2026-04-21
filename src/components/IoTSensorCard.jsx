@@ -1,6 +1,7 @@
 import React from 'react';
 import { Activity } from 'lucide-react';
 import Sparkline from './common/Sparkline';
+import Badge from './common/Badge';
 
 /**
  * IoTSensorCard — card de lectura de sensor IoT en estilo HUD industrial.
@@ -29,7 +30,10 @@ export default function IoTSensorCard({
   getHumidityColor,
   getTemperatureColor,
 }) {
-  const online = humidity !== null && humidity !== undefined && humidity !== 'unavailable';
+  const isMissing = (v) => v === null || v === undefined || v === 'unavailable' || v === 'unknown';
+  const humOffline = isMissing(humidity);
+  const tempOffline = isMissing(temperature);
+  const online = !humOffline;
   // Clip-path recorta la esquina superior-derecha en diagonal (~14px),
   // estetica HUD de pantalla de control industrial.
   const hudClip = {
@@ -77,33 +81,48 @@ export default function IoTSensorCard({
           </span>
         </div>
 
-        {/* Readouts numericos grandes en mono */}
+        {/* Readouts numericos grandes en mono. Si el sensor no reporta
+            (null/undefined/unavailable/unknown) se muestra un Badge OFFLINE
+            en lugar del numero+unidad — evita concatenaciones sin sentido
+            tipo "---%" o "null°C". */}
         <div className="grid grid-cols-2 gap-3 mb-3">
-          <div className="bg-slate-950/60 border border-slate-800 rounded px-2.5 py-1.5">
+          <div className="bg-slate-950/60 border border-slate-800 rounded px-2.5 py-1.5 min-h-[56px]">
             <span className="block text-[9px] text-slate-500 font-mono tracking-widest uppercase mb-0.5">
               Humedad
             </span>
-            <div className="flex items-baseline gap-1">
-              <span
-                className={`text-2xl font-black font-mono tabular-nums leading-none ${getHumidityColor(humidity)}`}
-              >
-                {humidity ?? '---'}
-              </span>
-              <span className="text-xs text-slate-500 font-mono">%</span>
-            </div>
+            {humOffline ? (
+              <Badge variant="outline" className="text-slate-500 border-slate-700">
+                OFFLINE
+              </Badge>
+            ) : (
+              <div className="flex items-baseline gap-1">
+                <span
+                  className={`text-2xl font-black font-mono tabular-nums leading-none ${getHumidityColor(humidity)}`}
+                >
+                  {humidity}
+                </span>
+                <span className="text-xs text-slate-500 font-mono">%</span>
+              </div>
+            )}
           </div>
-          <div className="bg-slate-950/60 border border-slate-800 rounded px-2.5 py-1.5">
+          <div className="bg-slate-950/60 border border-slate-800 rounded px-2.5 py-1.5 min-h-[56px]">
             <span className="block text-[9px] text-slate-500 font-mono tracking-widest uppercase mb-0.5">
               Temperatura
             </span>
-            <div className="flex items-baseline gap-1">
-              <span
-                className={`text-2xl font-black font-mono tabular-nums leading-none ${getTemperatureColor(temperature)}`}
-              >
-                {temperature ?? '---'}
-              </span>
-              <span className="text-xs text-slate-500 font-mono">°C</span>
-            </div>
+            {tempOffline ? (
+              <Badge variant="outline" className="text-slate-500 border-slate-700">
+                OFFLINE
+              </Badge>
+            ) : (
+              <div className="flex items-baseline gap-1">
+                <span
+                  className={`text-2xl font-black font-mono tabular-nums leading-none ${getTemperatureColor(temperature)}`}
+                >
+                  {temperature}
+                </span>
+                <span className="text-xs text-slate-500 font-mono">°C</span>
+              </div>
+            )}
           </div>
         </div>
 
