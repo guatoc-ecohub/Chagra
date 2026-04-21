@@ -230,7 +230,6 @@ export default function VoiceCapture({ onSave }) {
         status: 'active',
         notes: {
           value: `Origen: registro por voz. Transcripcion: "${transcription}".`,
-          format: 'plain_text',
         },
       },
       relationships: inlineRels,
@@ -245,7 +244,6 @@ export default function VoiceCapture({ onSave }) {
           status: 'done',
           notes: {
             value: `Registro por voz. Cantidad declarada: ${entity.quantity}. Transcripcion: "${transcription}".`,
-            format: 'plain_text',
           },
         },
         relationships: {
