@@ -491,19 +491,44 @@ const useAssetStore = create((set, get) => ({
 // Listener global: al recibir confirmación de sincronización exitosa,
 // liberar el flag _pending del asset y disparar un pull dirigido que lo
 // sobrescriba con el objeto oficial del servidor (Hotfix 10.3 — Opción C).
+//
+// Bug fix v0.6.5: logs que crean assets inline (seeding con asset--plant
+// anidado, planting, input con materiales inline) también deben disparar
+// pull de los assets relacionados. Sin esto, la planta creada por voz
+// existe en FarmOS pero no aparece en el store hasta un refresh manual.
 if (typeof window !== 'undefined') {
+  // Tipos de log que pueden crear assets inline como side-effect. Al
+  // completar la sync exitosa, refrescamos el store del tipo de asset
+  // asociado para que aparezca en Activos/Home sin refresh manual.
+  const LOG_TO_ASSET_TYPE = {
+    seeding: 'plant',
+    planting: 'plant',
+    harvest: 'plant',
+    input: 'plant',
+  };
+
   window.addEventListener('syncCompleted', async (event) => {
     const { type, id } = event.detail || {};
-    if (!type || (!type.startsWith('asset_') && !type.startsWith('delete_'))) return;
+    if (!type) return;
+
+    const isAssetOp = type.startsWith('asset_') || type.startsWith('delete_');
+    const logAssetType = LOG_TO_ASSET_TYPE[type];
+    if (!isAssetOp && !logAssetType) return;
 
     try {
-      const assetType = type.split('_')[1]; // 'asset_plant' → 'plant', 'delete_plant' → 'plant'
+      // 'asset_plant'/'delete_plant' → 'plant'. Para logs, mapa directo.
+      const assetType = isAssetOp ? type.split('_')[1] : logAssetType;
 
       // 1. Liberación del flag _pending del asset local confirmado
-      const localAsset = await assetCache.getAsset(id);
-      if (localAsset) {
-        await assetCache.put(localAsset.asset_type || assetType, { ...localAsset, _pending: false });
-        console.log(`[Sync] Activo ${id} liberado para actualización oficial.`);
+      // (solo aplica a asset_ / delete_ — logs no tienen asset local).
+      if (isAssetOp) {
+        const localAsset = await assetCache.getAsset(id);
+        if (localAsset) {
+          await assetCache.put(localAsset.asset_type || assetType, { ...localAsset, _pending: false });
+          console.log(`[Sync] Activo ${id} liberado para actualización oficial.`);
+        }
+      } else {
+        console.log(`[Sync] Log ${type}/${id} sincronizado — pull ${assetType} para captar inlines.`);
       }
 
       // 2. Pull dirigido al tipo afectado (no refresca los 4 tipos)
