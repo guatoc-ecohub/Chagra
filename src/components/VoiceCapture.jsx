@@ -210,17 +210,25 @@ export default function VoiceCapture({ onSave }) {
     // Relationships obligatorios de la planta inline:
     //   - location: zona o structure donde se siembra (siempre).
     //   - parent:   solo si la location es un land (jerarquia agronomica).
-    //   - plant_type: si el extractor cruzo con la taxonomy de FarmOS.
+    //   - plant_type: OBLIGATORIO para FarmOS. Si el extractor cruzo con
+    //                 la taxonomy (farmosTermId presente), usa ese term
+    //                 existente. Si no, crea inline un taxonomy_term con
+    //                 el nombre crudo del cultivo (payloadService.savePayload
+    //                 resuelve inlines con POST primero y reemplaza por UUID).
+    //                 Sin esto, FarmOS devuelve 422 "plant_type: Este
+    //                 valor no puede ser nulo".
+    const plantTypeRel = entity.farmosTermId
+      ? { data: [{ type: 'taxonomy_term--plant_type', id: entity.farmosTermId }] }
+      : {
+          data: [{
+            type: 'taxonomy_term--plant_type',
+            attributes: { name: entity.canonical || entity.crop },
+          }],
+        };
     const inlineRels = {
       location: { data: [locRef] },
       ...(isLand ? { parent: { data: [locRef] } } : {}),
-      ...(entity.farmosTermId
-        ? {
-            plant_type: {
-              data: [{ type: 'taxonomy_term--plant_type', id: entity.farmosTermId }],
-            },
-          }
-        : {}),
+      plant_type: plantTypeRel,
     };
 
     const inlinePlant = {
