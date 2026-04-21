@@ -1,13 +1,12 @@
 import React from 'react';
 
 /**
- * Sparkline SVG inline — renderiza una serie numerica (0..N) sin dependencias.
+ * Sparkline SVG inline — renderiza una serie numerica (0..N) con enfasis
+ * en legibilidad sobre fondo oscuro.
  *
- * Desde v0.6.3 incluye ejes mas legibles:
- *   - Guias horizontales sutiles en min/mid/max del rango.
- *   - Labels Y con valores min y max (fuera del area de trazo).
- *   - Label X con la ventana temporal (ej. "24h") si se pasa `timeLabel`.
- *   - Valor actual destacado sobre el ultimo punto.
+ * v0.6.4+: tamano por defecto mas grande, fuentes mayores, area bajo
+ * la curva con gradient translucido, chip destacado para el valor
+ * actual, guia central punteada visible.
  *
  * Acepta:
  *   values: number[]                           — array crudo de numeros.
@@ -20,8 +19,8 @@ export default function Sparkline({
   values,
   data,
   color = '#22d3ee',
-  height = 48,
-  width = 160,
+  height = 64,
+  width = 200,
   timeLabel = '24h',
   unit = '',
   showLastValue = true,
@@ -44,23 +43,30 @@ export default function Sparkline({
   const max = Math.max(...series);
   const range = max - min || 1;
 
-  // Padding interno: izquierda para labels Y, abajo para label X.
-  const padL = 22;
-  const padR = 4;
-  const padT = 4;
-  const padB = 12;
+  // Padding generoso: izquierda para labels Y con unidad, arriba para el
+  // chip del valor actual, abajo para el label temporal.
+  const padL = 28;
+  const padR = 8;
+  const padT = 10;
+  const padB = 16;
 
   const plotW = width - padL - padR;
   const plotH = height - padT - padB;
   const step = plotW / (series.length - 1);
 
-  const points = series
-    .map((v, i) => {
-      const x = padL + i * step;
-      const y = padT + plotH - ((v - min) / range) * plotH;
-      return `${x},${y}`;
-    })
-    .join(' ');
+  // Puntos para la polyline del trazo principal.
+  const points = series.map((v, i) => {
+    const x = padL + i * step;
+    const y = padT + plotH - ((v - min) / range) * plotH;
+    return [x, y];
+  });
+  const pointsStr = points.map((p) => `${p[0]},${p[1]}`).join(' ');
+
+  // Path del area bajo la curva: mismo trazado + close a la base.
+  const areaPath =
+    `M ${points[0][0]},${padT + plotH} ` +
+    points.map((p) => `L ${p[0]},${p[1]}`).join(' ') +
+    ` L ${points[points.length - 1][0]},${padT + plotH} Z`;
 
   const lastVal = series[series.length - 1];
   const lastX = padL + (series.length - 1) * step;
@@ -71,6 +77,16 @@ export default function Sparkline({
   const bottomY = padT + plotH;
   const midVal = (min + max) / 2;
 
+  // Gradient unico por instancia (id con hash del color para evitar colisiones).
+  const gradId = `sparkfill-${color.replace('#', '')}`;
+
+  // Chip del valor actual: anclaje a la derecha, evita choque con la curva.
+  const chipText = `${lastVal.toFixed(lastValueDecimals)}${unit}`;
+  const chipW = Math.max(32, chipText.length * 6 + 8);
+  const chipH = 14;
+  const chipX = width - padR - chipW;
+  const chipY = padT - 2;
+
   return (
     <svg
       width={width}
@@ -78,56 +94,83 @@ export default function Sparkline({
       className="inline-block"
       viewBox={`0 0 ${width} ${height}`}
     >
-      {/* Guias horizontales: min y max tenues (opacity 0.2); linea central
-          punteada mas prominente (opacity 0.4 con dash 3/3) como baseline
-          visual claro para interpretar picos vs valles de la serie. */}
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.35" />
+          <stop offset="100%" stopColor={color} stopOpacity="0.02" />
+        </linearGradient>
+      </defs>
+
+      {/* Guias horizontales: min/max tenues, linea central punteada clara */}
       <line x1={padL} y1={topY} x2={width - padR} y2={topY} stroke="currentColor" strokeWidth="0.5" strokeDasharray="2 3" opacity="0.2" />
-      <line x1={padL} y1={midY} x2={width - padR} y2={midY} stroke="currentColor" strokeWidth="0.7" strokeDasharray="3 3" opacity="0.4" />
+      <line x1={padL} y1={midY} x2={width - padR} y2={midY} stroke="currentColor" strokeWidth="0.8" strokeDasharray="4 3" opacity="0.45" />
       <line x1={padL} y1={bottomY} x2={width - padR} y2={bottomY} stroke="currentColor" strokeWidth="0.5" strokeDasharray="2 3" opacity="0.2" />
 
-      {/* Labels Y (max arriba, mid al centro, min abajo) */}
-      <text x={padL - 3} y={topY + 3} fill="currentColor" fontSize="8" textAnchor="end" opacity="0.7" className="font-mono">
-        {max.toFixed(0)}
+      {/* Labels del eje Y (con unidad para contexto inmediato) */}
+      <text x={padL - 4} y={topY + 4} fill="currentColor" fontSize="10" textAnchor="end" opacity="0.9" className="font-mono">
+        {max.toFixed(0)}{unit}
       </text>
-      <text x={padL - 3} y={midY + 3} fill="currentColor" fontSize="7.5" textAnchor="end" opacity="0.55" className="font-mono">
+      <text x={padL - 4} y={midY + 3.5} fill="currentColor" fontSize="9" textAnchor="end" opacity="0.65" className="font-mono">
         {midVal.toFixed(0)}
       </text>
-      <text x={padL - 3} y={bottomY + 1} fill="currentColor" fontSize="8" textAnchor="end" opacity="0.7" className="font-mono">
-        {min.toFixed(0)}
+      <text x={padL - 4} y={bottomY + 3.5} fill="currentColor" fontSize="10" textAnchor="end" opacity="0.9" className="font-mono">
+        {min.toFixed(0)}{unit}
       </text>
 
-      {/* Label X (ventana temporal) abajo-derecha */}
+      {/* Label temporal abajo-izquierda (inicio de la ventana) */}
       {timeLabel && (
-        <text x={width - padR} y={height - 1} fill="currentColor" fontSize="7.5" textAnchor="end" opacity="0.55" className="font-mono">
-          {timeLabel}
+        <text x={padL} y={height - 2} fill="currentColor" fontSize="9" textAnchor="start" opacity="0.7" className="font-mono">
+          -{timeLabel}
         </text>
       )}
+      <text x={width - padR} y={height - 2} fill="currentColor" fontSize="9" textAnchor="end" opacity="0.7" className="font-mono">
+        ahora
+      </text>
+
+      {/* Area bajo la curva (relleno gradient translucido) */}
+      <path d={areaPath} fill={`url(#${gradId})`} stroke="none" />
 
       {/* Serie */}
       <polyline
         fill="none"
         stroke={color}
-        strokeWidth="1.6"
+        strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        points={points}
-        opacity="0.95"
+        points={pointsStr}
+        opacity="0.98"
       />
 
-      {/* Ultimo punto + valor */}
-      <circle cx={lastX} cy={lastY} r="2.5" fill={color} />
+      {/* Ultimo punto con glow */}
+      <circle cx={lastX} cy={lastY} r="3.2" fill={color} opacity="0.25" />
+      <circle cx={lastX} cy={lastY} r="2.2" fill={color} />
+
+      {/* Chip del valor actual (recuadro contrastado arriba-derecha) */}
       {showLastValue && (
-        <text
-          x={lastX - 4}
-          y={Math.max(padT + 7, lastY - 4)}
-          fill={color}
-          fontSize="8.5"
-          fontWeight="bold"
-          textAnchor="end"
-          className="font-mono"
-        >
-          {lastVal.toFixed(lastValueDecimals)}{unit}
-        </text>
+        <g>
+          <rect
+            x={chipX}
+            y={chipY}
+            width={chipW}
+            height={chipH}
+            rx="2"
+            fill="#020617"
+            stroke={color}
+            strokeWidth="0.8"
+            opacity="0.92"
+          />
+          <text
+            x={chipX + chipW / 2}
+            y={chipY + 10}
+            fill={color}
+            fontSize="10.5"
+            fontWeight="bold"
+            textAnchor="middle"
+            className="font-mono tabular-nums"
+          >
+            {chipText}
+          </text>
+        </g>
       )}
     </svg>
   );
