@@ -264,8 +264,8 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
       ]);
 
       if (!invernaderoHum.ok || !invernaderoTemp.ok || !tabacoHum.ok || !tabacoTemp.ok) {
-        const failedSensor = !invernaderoHum.ok ? 'Zona A Humedad' :
-                          !invernaderoTemp.ok ? 'Zona A Temperatura' :
+        const failedSensor = !invernaderoHum.ok ? 'Invernadero Zona A Humedad' :
+                          !invernaderoTemp.ok ? 'Invernadero Zona A Temperatura' :
                           !tabacoHum.ok ? 'Matera Tabaco Humedad' :
                           'Matera Tabaco Temperatura';
         throw new Error(`Fallo al conectar con sensor: ${failedSensor}. Verifique Home Assistant.`);
@@ -280,8 +280,8 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
 
       // Detección de sensores no disponibles (unavailable, null, unknown)
       const sensorReadings = [
-        { name: 'Zona A Humedad', data: invernaderoHumData, key: 'Matera Cocina' },
-        { name: 'Zona A Temperatura', data: invernaderoTempData, key: 'Matera Cocina' },
+        { name: 'Invernadero Zona A Humedad', data: invernaderoHumData, key: 'Invernadero Zona A' },
+        { name: 'Invernadero Zona A Temperatura', data: invernaderoTempData, key: 'Invernadero Zona A' },
         { name: 'Matera Tabaco Humedad', data: tabacoHumData, key: 'Matera Tabaco' },
         { name: 'Matera Tabaco Temperatura', data: tabacoTempData, key: 'Matera Tabaco' },
       ];
@@ -399,11 +399,11 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
 
       const alerts = [];
 
-      // Invernadero - Zona A (ex Invernadero 1; sensor renombrado a matera_cocina)
-      if (inv1Hum < 40) alerts.push(`🚨 ALERTA: Humedad crítica en Zona A (${inv1Hum}%). Riego inmediato requerido.`);
-      if (inv1Hum > 80) alerts.push(`💧 Exceso de humedad en Zona A (${inv1Hum}%). Riesgo de hongos patógenos. Ventilar.`);
-      if (inv1Temp > 30) alerts.push(`🔥 Temperatura elevada en Zona A (${inv1Temp}°C). Activar ventilación.`);
-      if (inv1Temp < 5) alerts.push(`❄️ Temperatura baja en Zona A (${inv1Temp}°C). Riesgo de helada. Proteger cultivos.`);
+      // Invernadero Zona A (formato abierto a Zona B, Zona C… en el futuro).
+      if (inv1Hum < 40) alerts.push(`🚨 ALERTA: Humedad crítica en Invernadero Zona A (${inv1Hum}%). Riego inmediato requerido.`);
+      if (inv1Hum > 80) alerts.push(`💧 Exceso de humedad en Invernadero Zona A (${inv1Hum}%). Riesgo de hongos patógenos. Ventilar.`);
+      if (inv1Temp > 30) alerts.push(`🔥 Temperatura elevada en Invernadero Zona A (${inv1Temp}°C). Activar ventilación.`);
+      if (inv1Temp < 5) alerts.push(`❄️ Temperatura baja en Invernadero Zona A (${inv1Temp}°C). Riesgo de helada. Proteger cultivos.`);
 
       // Matera Tabaco (ubicada en cocina)
       if (tabHum < 40) alerts.push(`🚨 ALERTA: Humedad crítica en Matera Tabaco (${tabHum}%). Riego inmediato requerido.`);
@@ -414,7 +414,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
       // Baseline si todo está en rango
       const ruleAnalysis = alerts.length > 0
         ? alerts.join('\n')
-        : `✅ Condiciones estables. Zona A: ${inv1Hum}%H/${inv1Temp}°C. Matera Tabaco: ${tabHum}%H/${tabTemp}°C.`;
+        : `✅ Condiciones estables. Invernadero Zona A: ${inv1Hum}%H/${inv1Temp}°C. Matera Tabaco: ${tabHum}%H/${tabTemp}°C.`;
 
       // Mostrar reglas INMEDIATAMENTE — sin esperar IA. Prepeende aviso de
       // sensores offline (si hay alguno) para que quede visible incluso si la
@@ -540,9 +540,9 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
   }, []);
 
   return (
-    <div className="p-6 rounded-3xl bg-slate-900 border border-morpho/30 shadow-neon-morpho mb-8">
-      <h3 className="text-2xl font-black mb-4 flex items-center gap-2">
-        <span className="w-3 h-3 bg-muzo rounded-full motion-safe:animate-pulse"></span>
+    <div className="px-5 py-4 rounded-3xl bg-slate-900 border border-morpho/30 shadow-neon-morpho mb-6">
+      <h3 className="text-lg font-black mb-3 flex items-center gap-2">
+        <span className="w-2.5 h-2.5 bg-muzo rounded-full motion-safe:animate-pulse"></span>
         Observabilidad Agronómica
       </h3>
 

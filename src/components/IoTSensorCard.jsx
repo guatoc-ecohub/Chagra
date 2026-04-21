@@ -126,13 +126,13 @@ export default function IoTSensorCard({
           </div>
         </div>
 
-        {/* Sparklines de 24h con ejes legibles. Cada grafica en su propio
-            contenedor con label del parametro en mono para que queden a
-            ancho completo y el texto no compita con el trazo. Los labels
-            internos del SVG (min/max/mid/temporal) usan currentColor →
-            heredan slate-300 del wrapper para buen contraste. */}
-        <div className="space-y-2">
-          <div className="text-slate-300">
+        {/* Sparklines de 24h: en mobile apilados (grid-cols-1), en desktop
+            md+ lado a lado (grid-cols-2) para aprovechar el ancho disponible
+            y reducir la altura total de la tarjeta. Sparkline es ahora
+            fluido (width="100%" capado por viewBox) y escala con el
+            contenedor preservando aspect ratio. */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+          <div className="text-slate-300 min-w-0">
             <div className="flex items-baseline gap-2 mb-0.5">
               <span className="text-[10px] text-morpho/80 font-mono tracking-widest uppercase">Humedad</span>
               <span className="text-[9px] text-slate-500 font-mono">últimas 24h</span>
@@ -144,9 +144,10 @@ export default function IoTSensorCard({
               unit="%"
               width={320}
               height={72}
+              responsive
             />
           </div>
-          <div className="text-slate-300">
+          <div className="text-slate-300 min-w-0">
             <div className="flex items-baseline gap-2 mb-0.5">
               <span className="text-[10px] text-morpho/80 font-mono tracking-widest uppercase">Temperatura</span>
               <span className="text-[9px] text-slate-500 font-mono">últimas 24h</span>
@@ -158,6 +159,7 @@ export default function IoTSensorCard({
               unit="°"
               width={320}
               height={72}
+              responsive
             />
           </div>
         </div>
