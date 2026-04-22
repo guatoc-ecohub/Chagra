@@ -8,6 +8,34 @@
 
 ---
 
+## 0. Baseline empírico post-tuning (2026-04-20 02:30 -05)
+
+Medición inmediatamente después de aplicar:
+- `vm.swappiness = 1`
+- `OLLAMA_FLASH_ATTENTION = true`
+- `OLLAMA_KV_CACHE_TYPE = q8_0`
+- ZFS `atime=off` + `xattr=sa` en `tank` y `tank-fast`
+- Dataset dedicado `tank-fast/appdata/ollama` con `recordsize=1M`
+
+Ollama daemon reiniciado para descartar estado residual.
+
+| Modelo          | Prompt                                 | Cold/Warm | `load` | `prompt eval rate` | **`eval rate` (tok/s)** | `eval count` |
+| --------------- | -------------------------------------- | --------- | ------ | ------------------ | ----------------------- | ------------ |
+| `gemma3:4b`     | "Say 'hi' in Spanish, one word only"   | cold      | 7.61 s | 36.93 tok/s        | **19.61 tok/s** 🎯       | 5 tok        |
+| `qwen3.5:4b`    | "Di hola" (thinking ON por default)    | cold      | 7.99 s | 23.66 tok/s        | 6.33 tok/s              | 3418 tok     |
+| `qwen3.5:4b`    | "/nothink Say hola" (inline no funciona)| warm      | 0.28 s | 8.30 tok/s         | 6.17 tok/s              | 1957 tok     |
+
+**Referencia canónica:** `gemma3:4b → 19.61 tok/s` sobre Ryzen 5 4600G CPU-only con las optimizaciones activas.
+Este número es el baseline para comparar cualquier inversión de hardware
+(RAM 32-64 GiB o dGPU RTX 3060/3090) o cambios de config en iteraciones futuras.
+
+**Notas metodológicas:**
+- Qwen 3.5 genera reasoning prose por default; el `/nothink` inline **no la desactiva** en Ollama 0.17.7. Para bench limpio con Qwen 3.5 usar API JSON con `"think": false` o configurar `system` prompt explícito.
+- `load duration ≈ 7.6-8 s` es el cold-start del modelo desde SSD; `recordsize=1M` debería mejorarlo marginalmente (pendiente de remedir en próximo ciclo con "antes" conocido).
+- El `eval rate` de Qwen ≈ 6.2 tok/s no indica lentitud del runner — indica que el modelo genera más tokens (reasoning). La velocidad por-token es similar a Gemma una vez compensado el overhead del thinking.
+
+---
+
 ## 1. Inferencia — Modelos cargados en memoria (empírico)
 
 **Fuente:** `GET http://127.0.0.1:11434/api/ps`
