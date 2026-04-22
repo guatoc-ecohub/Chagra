@@ -302,6 +302,14 @@ const KEYFRAMES_CSS = `
   98%, 100% { opacity: 0; }
 }
 
+/* Defensivo: que transform-origin en px se interprete contra el viewBox del
+   SVG (80x80) y no contra el bbox del elemento. Es el default en browsers
+   modernos, pero lo declaramos explícito para evitar divergencias. */
+.cgl-svg,
+.cgl-svg * {
+  transform-box: view-box;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cgl-svg * {
     animation-duration: 0.001s !important;
@@ -326,6 +334,13 @@ function ensureStylesInjected() {
   style.textContent = KEYFRAMES_CSS;
   document.head.appendChild(style);
 }
+
+// Inyección en module-load (no en useEffect). Si esperamos al useEffect,
+// el primer pintado ocurre con los @keyframes ausentes: Chrome/Firefox/Safari
+// no reaplican la animación cuando los keyframes llegan después y el SVG
+// queda congelado en el frame 0 (opacity:0, scale:0 → invisible). El guard
+// typeof document mantiene SSR-safety.
+ensureStylesInjected();
 
 // ============================================================================
 // HELPER

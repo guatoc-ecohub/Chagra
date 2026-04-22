@@ -78,10 +78,16 @@ jobs:
         continue-on-error: true
 
       - name: Bump SW cache version
+        # Patrón ERE sin literal 'v' — el cache en prod alterna entre
+        # 'chagra-v<N>' (el que viene del repo) y 'chagra-<sha>' (el que
+        # este paso deja tras cada deploy). Un patrón que requiera 'v'
+        # solo matchearía el primer caso, y a partir del segundo deploy
+        # el cache quedaría pegado al sha del deploy inicial. Con [0-9a-z]+
+        # matchea ambas formas y el bump funciona en cada deploy.
         run: |
           SW_FILE=/mnt/fast/appdata/farmos-pwa/sw.js
           if [ -f "$SW_FILE" ]; then
             COMMIT_SHORT=$(git rev-parse --short HEAD)
-            sed -i "s/chagra-v[0-9a-z]*/chagra-${COMMIT_SHORT}/" "$SW_FILE"
+            sed -i -E "s/chagra-[0-9a-z]+/chagra-${COMMIT_SHORT}/" "$SW_FILE"
             echo "SW cache bumped to chagra-${COMMIT_SHORT}"
           fi
