@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Mic, MicOff, Loader2, AlertTriangle, Save, RotateCcw, Ear, BrainCircuit } from 'lucide-react';
+import { Mic, MicOff, AlertTriangle, Save, RotateCcw, Ear, BrainCircuit } from 'lucide-react';
 import useVoiceRecorder from '../hooks/useVoiceRecorder';
 import { transcribe, queueForRetry } from '../services/voiceService';
 import { extractEntities } from '../services/entityExtractor';
@@ -9,6 +9,7 @@ import { ENV } from '../config/env';
 import Sparkline from './common/Sparkline';
 import AIStreamPanel from './common/AIStreamPanel';
 import VoiceConfirmation from './VoiceConfirmation';
+import ChagraGrowLoader from './ChagraGrowLoader';
 
 const formatDuration = (ms) => {
   const s = Math.floor(ms / 1000);
@@ -403,7 +404,9 @@ export default function VoiceCapture({ onSave }) {
 
       {(view === STATE_TRANSCRIBING || view === STATE_EXTRACTING) && (
         <div className="flex flex-col items-center gap-4 py-12">
-          <Loader2 size={48} className="animate-spin text-lime-400" />
+          <div className="text-lime-400">
+            <ChagraGrowLoader size={64} />
+          </div>
           <p className="text-sm text-slate-400">
             {view === STATE_TRANSCRIBING ? 'Transcribiendo audio…' : 'Extrayendo entidades…'}
           </p>

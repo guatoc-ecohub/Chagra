@@ -10,6 +10,7 @@ import { version as APP_VERSION } from '../package.json';
 import NetworkStatusBar from './components/NetworkStatusBar';
 import PendingTasksWidget from './components/PendingTasksWidget';
 import { ScreenShell } from './components/common/ScreenShell';
+import ChagraGrowLoader from './components/ChagraGrowLoader';
 
 // Lazy-loaded route components
 const TelemetryAlerts = lazy(() => import('./components/TelemetryAlerts'));
@@ -35,8 +36,8 @@ localforage.config({
 });
 
 const LoadingFallback = () => (
-  <div className="h-[100dvh] bg-slate-950 flex items-center justify-center">
-    <div className="motion-safe:animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+  <div className="h-[100dvh] bg-slate-950 flex items-center justify-center text-muzo-glow">
+    <ChagraGrowLoader size={80} showLabel labelText="Chagra..." />
   </div>
 );
 

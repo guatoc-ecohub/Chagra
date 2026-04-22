@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Sprout } from 'lucide-react';
 import { authenticateUser } from '../services/authService';
 import { version as APP_VERSION } from '../../package.json';
+import ChagraGrowLoader from './ChagraGrowLoader';
 
 export default function LoginScreen({ onLoginSuccess, onSave }) {
   const [creds, setCreds] = useState({ username: '', password: '' });
@@ -62,7 +63,7 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
             disabled={loading}
             className="mt-4 p-6 rounded-xl bg-green-600 active:bg-green-500 text-2xl font-black shadow-xl min-h-[80px] border-b-4 border-green-800 disabled:opacity-50 flex justify-center items-center"
           >
-            {loading ? <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div> : 'Ingresar'}
+            {loading ? <ChagraGrowLoader size={56} /> : 'Ingresar'}
           </button>
         </form>
       </div>
