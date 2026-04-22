@@ -7,6 +7,7 @@ import { wktToGeoJson } from '../utils/geo';
 import { haversineDistance, getCoords } from '../utils/spatialAnalysis';
 import FarmMap from './FarmMap';
 import EvidenceCapture from './EvidenceCapture';
+import ChagraGrowLoader from './ChagraGrowLoader';
 
 /**
  * WorkerDashboard — Vista de campo para operario (Fase 20).
@@ -194,7 +195,7 @@ export const WorkerDashboard = () => {
         <div className="space-y-2">
           {loading && tasks.length === 0 && (
             <div className="flex items-center justify-center py-12 text-slate-500">
-              <Loader2 size={24} className="animate-spin mr-3" />
+              <ChagraGrowLoader size={32} className="mr-3" />
               Cargando tareas…
             </div>
           )}
