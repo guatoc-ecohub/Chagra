@@ -50,6 +50,7 @@
 
     # --- Herramientas de Desarrollo ---
     git
+    gh
     wget
     python311
     binutils

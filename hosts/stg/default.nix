@@ -92,8 +92,16 @@
   
   networking = {
     hostName = "stg";
-    networkmanager.enable = true; 
-    useDHCP = false; 
+    networkmanager.enable = true;
+    useDHCP = false;
+
+    # Resolución estática de alpha vía Tailscale (MagicDNS no activo en stg).
+    # Permite que `ssh alpha`, `ping alpha` y el proxy de Vite (opcional)
+    # funcionen sin depender de que tailscaled esté arriba al momento de
+    # resolver. IP obtenida con `tailscale ip -4` en alpha (2026-04-22).
+    hosts = {
+      "100.117.193.102" = [ "alpha" ];
+    };
   };
 
   # --- 6. PAQUETES ---
