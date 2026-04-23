@@ -61,7 +61,11 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
           <button
             type="submit"
             disabled={loading}
-            className="mt-4 p-6 rounded-xl bg-green-600 active:bg-green-500 text-2xl font-black shadow-xl min-h-[80px] border-b-4 border-green-800 disabled:opacity-50 flex justify-center items-center"
+            className={`mt-4 p-6 rounded-xl text-2xl font-black shadow-xl min-h-[80px] border-b-4 flex justify-center items-center ${
+              loading
+                ? 'bg-slate-800 border-slate-950 cursor-wait'
+                : 'bg-green-600 active:bg-green-500 border-green-800'
+            }`}
           >
             {loading ? <ChagraGrowLoader size={56} /> : 'Ingresar'}
           </button>
