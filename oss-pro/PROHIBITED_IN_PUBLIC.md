@@ -1,8 +1,10 @@
-# PROHIBITED_IN_PUBLIC — lista viva de símbolos y artefactos prohibidos en el repo público
+# PROHIBITED_IN_PUBLIC — lista universal de patrones prohibidos en el repo público
 
-Este archivo documenta qué **nunca** debe aparecer en `guatoc-ecohub/Chagra` (público, AGPL-3.0). El auditor de bundle (`scripts/audit-bundle.mjs`) busca estos patterns en los artefactos de `dist/` después de cada build público. Si encuentra uno, el build falla.
+Este archivo documenta los patterns genéricos (industry-standard + boundary Pro sin revelar roadmap) que **nunca** deben aparecer en `guatoc-ecohub/Chagra` (público, AGPL-3.0). El auditor (`scripts/audit-bundle.mjs`) los busca en `dist/` después de cada build.
 
-Ver ADR-015 (guatoc-ecohub/Chagra-strategy) para el contexto — incidente Anthropic 31-mar-2026, diseño leak-proof.
+La lista específica de identificadores Pro (nombres de presets, prompts, content marks propietarios) vive en `guatoc-ecohub/chagra-pro/PROHIBITED_INTERNAL.md` — no aquí, porque telegrafía roadmap comercial. El auditor la carga si está presente (dev local con Pro path-relative, o CI Pro), y solo la pública cuando no.
+
+Ver ADR-015 (guatoc-ecohub/Chagra-strategy) para contexto — incidente Anthropic 31-mar-2026.
 
 ## Strings literales
 
@@ -10,21 +12,13 @@ Ver ADR-015 (guatoc-ecohub/Chagra-strategy) para el contexto — incidente Anthr
 - `@chagra/pro-`
 - `@guatoc/pro-`
 - `@guatoc/chagra-pro`
-- `PROMPT_PRO_`
 - `PRIVATE_KEY`
 - `BEGIN RSA PRIVATE KEY`
 - `BEGIN OPENSSH PRIVATE KEY`
-- `GREMIOS_RECETA_CURADA`
-- `ECOCERT_PRESET_INTERNAL`
-- `MAYACERT_PRESET_INTERNAL`
-- `CONTROL_UNION_PRESET_INTERNAL`
 
 ## Patrones regex
 
-- `prompt[_-]?pro[_-]?[a-z]+` — cualquier nombre de prompt Pro
-- `mollison[_-]?adapted` — permacultura adaptada propietaria
-- `lawton[_-]?curated` — curaduría Geoff Lawton propietaria
-- `api[_-]?key[_-]?(chagra|guatoc|ministerio)` — claves internas
+- `api[_-]?key[_-]?(chagra|guatoc|ministerio)` — claves internas con convención de nombre
 - `passphrase[_-]?default` — configuraciones appliance sensibles
 
 ## Archivos completos prohibidos
@@ -37,7 +31,6 @@ Ver ADR-015 (guatoc-ecohub/Chagra-strategy) para el contexto — incidente Anthr
 ## Catálogos prohibidos
 
 - `catalog/pro/` — subdirectorio reservado para Pro, nunca debe materializarse en público
-- `catalog/gremios-receta-pro.json`, `catalog/gremios-receta-curada.json`
 
 ## Credenciales y tokens (regex)
 
@@ -64,9 +57,10 @@ Nombres y textos perfectamente aceptables en el público:
 
 ## Actualización
 
-Nueva entrada a esta lista cada vez que:
-- Se crea un módulo Pro con sufijo nuevo (añadir al patrón string)
-- Se descubre un leak en PR (añadir el patrón exacto)
-- Una certificadora/institución entra en Pro (añadir el identificador del preset)
+Nueva entrada a esta lista cuando:
+- Se introduce un patrón universal nuevo (credencial de un servicio cloud, rango de red, dominio operativo adicional)
+- Se descubre un leak de un secreto industry-standard en PR
 
-Auditor de bundle lee este archivo en tiempo de build. No cambiar el formato de los bullets sin actualizar `scripts/audit-bundle.mjs`.
+Entradas **específicas de Pro** (nombre de preset certificador, codename de catálogo curado, etc.) van a `chagra-pro/PROHIBITED_INTERNAL.md`, no aquí.
+
+Auditor lee este archivo en tiempo de build. No cambiar el formato de los bullets sin actualizar `scripts/audit-bundle.mjs`.

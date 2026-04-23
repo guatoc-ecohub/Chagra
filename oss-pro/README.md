@@ -2,7 +2,9 @@
 
 Este directorio documenta cómo el repo público (`guatoc-ecohub/Chagra`, AGPL-3.0) se separa del repo privado hermano (`guatoc-ecohub/chagra-pro`, comercial) para evitar el tipo de leak Anthropic (31-mar-2026).
 
-- `PROHIBITED_IN_PUBLIC.md` — lista viva de patrones que el bundle público nunca debe contener. El script `scripts/audit-bundle.mjs` consulta este archivo.
+- `PROHIBITED_IN_PUBLIC.md` — lista **universal** (patrones boilerplate + prefijos Pro genéricos + credenciales + IPs privadas) que el bundle público nunca debe contener.
+- `PROHIBITED_INTERNAL.md` (en repo privado `chagra-pro`, no aquí) — lista **Pro-específica** (nombres de presets certificadores, codenames de catálogos curados, referencias a autores licenciados). Vive en privado porque telegrafía roadmap comercial.
+- `scripts/audit-bundle.mjs` consulta siempre la lista universal; adicionalmente carga la interna si está disponible vía `../chagra-pro/PROHIBITED_INTERNAL.md` (dev path-relative) o `PROHIBITED_INTERNAL_PATH` env.
 - ADRs relacionados: ADR-002 (boundary), ADR-011 (moduleRegistry), ADR-015 (anti-leak) — viven en `guatoc-ecohub/Chagra-strategy/adrs/`.
 
 ## Mecanismos de enforcement
