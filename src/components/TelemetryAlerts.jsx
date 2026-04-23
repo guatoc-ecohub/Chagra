@@ -6,6 +6,8 @@ import AIStreamPanel from './common/AIStreamPanel';
 import IoTSensorCard from './IoTSensorCard';
 import ChagraGrowLoader from './ChagraGrowLoader';
 import { streamOllama } from '../services/ollamaStream';
+import ExternalAiButton from './common/ExternalAiButton';
+import { buildDiagnosticExternalPrompt } from '../services/externalAiPromptBuilder';
 
 // Constantes de Infraestructura Segura (API Gateway Local)
 const HA_URL = '/api/ha';
@@ -33,7 +35,7 @@ const getTemperatureColor = (temperature) => {
   return 'text-red-500'; // Calor crítico
 };
 
-export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
+export default function TelemetryAlerts() {
   const [sensors, setSensors] = useState({
     invernaderoHumidity: null,
     invernaderoTemperature: null,
@@ -266,9 +268,9 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
 
       if (!invernaderoHum.ok || !invernaderoTemp.ok || !tabacoHum.ok || !tabacoTemp.ok) {
         const failedSensor = !invernaderoHum.ok ? 'Invernadero Zona A Humedad' :
-                          !invernaderoTemp.ok ? 'Invernadero Zona A Temperatura' :
-                          !tabacoHum.ok ? 'Matera Tabaco Humedad' :
-                          'Matera Tabaco Temperatura';
+          !invernaderoTemp.ok ? 'Invernadero Zona A Temperatura' :
+            !tabacoHum.ok ? 'Matera Tabaco Humedad' :
+              'Matera Tabaco Temperatura';
         throw new Error(`Fallo al conectar con sensor: ${failedSensor}. Verifique Home Assistant.`);
       }
 
@@ -434,8 +436,8 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         const userPrompt = (() => {
           const fmt = (h, t) => isNaN(h) && isNaN(t) ? 'sin datos (sensor offline)'
             : isNaN(h) ? `${t}°C (humedad sin dato)`
-            : isNaN(t) ? `${h}% humedad (temp sin dato)`
-            : `${h}% humedad, ${t}°C`;
+              : isNaN(t) ? `${h}% humedad (temp sin dato)`
+                : `${h}% humedad, ${t}°C`;
           const alertsLine = alerts.length > 0
             ? 'Alertas: ' + alerts.map(a => a.replace(/[^\w\s%°.,()/áéíóú]/g, '')).join('. ')
             : 'Sin alertas.';
@@ -538,6 +540,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
     const ctrl = new AbortController();
     fetchTelemetryAndAnalyze(ctrl.signal);
     return () => ctrl.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -598,7 +601,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
         </div>
         <div className="flex justify-between items-start mb-2">
           <span className="font-black text-morpho block text-xs uppercase tracking-widest">Analisis Agronomico</span>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {aiStatus === 'thinking' && (
               <span className="text-orchid text-2xs font-bold bg-orchid/10 px-2 py-1 rounded flex items-center gap-1 border border-orchid/30">
                 <ChagraGrowLoader size={20} />
@@ -624,6 +627,19 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
             )}
             {!loading && aiAlert && (
               <span className="text-muzo text-2xs font-bold bg-muzo/10 px-2 py-1 rounded border border-muzo/30">Reglas activas</span>
+            )}
+            {(aiStatus === 'error' || aiStatus === 'empty' || aiStatus === 'done') && (
+              <ExternalAiButton
+                buildPrompt={buildDiagnosticExternalPrompt}
+                label="Copiar prompt para IA externa"
+                context={{
+                  speciesName: 'cultivo en monitoreo',
+                  altitudMsnm: FARM_CONFIG.ALTITUD_MSNM,
+                  municipio: FARM_CONFIG.MUNICIPIO,
+                  thermalZones: FARM_CONFIG.THERMAL_ZONES || [],
+                  sintomas: aiAlert || '',
+                }}
+              />
             )}
           </div>
         </div>
