@@ -310,6 +310,15 @@ const KEYFRAMES_CSS = `
   transform-box: view-box;
 }
 
+/* Permite al componente saltar al frame N% del ciclo vía la prop
+   initialProgress. La variable la setea el <svg> padre y cascadea a todos
+   los hijos animados. !important es necesario para vencer el animation
+   shorthand inline que resetea animation-delay a 0 por default.
+   Default 0s: sin salto, comportamiento idéntico al pre-prop. */
+.cgl-svg * {
+  animation-delay: var(--cgl-animation-delay, 0s) !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cgl-svg * {
     animation-duration: 0.001s !important;
@@ -639,6 +648,7 @@ export function ChagraGrowLoader({
   paused = false,
   className = '',
   ariaLabel,
+  initialProgress = 0,
 }) {
   useEffect(() => { ensureStylesInjected(); }, []);
 
@@ -648,6 +658,8 @@ export function ChagraGrowLoader({
 
   const duration = 4 / Math.max(0.1, speed);
   const a11y = ariaLabel || `Cargando: ${meta?.commonName || 'planta'} creciendo`;
+  const clampedProgress = Math.max(0, Math.min(0.95, initialProgress));
+  const animationDelay = clampedProgress > 0 ? `-${(duration * clampedProgress).toFixed(3)}s` : '0s';
 
   return (
     <div
@@ -665,6 +677,7 @@ export function ChagraGrowLoader({
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
         focusable="false"
+        style={{ '--cgl-animation-delay': animationDelay }}
       >
         {renderer(duration, paused)}
       </svg>
