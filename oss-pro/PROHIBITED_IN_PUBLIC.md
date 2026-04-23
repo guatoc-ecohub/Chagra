@@ -50,11 +50,10 @@ Ver ADR-015 (guatoc-ecohub/Chagra-strategy) para el contexto — incidente Anthr
 
 ## Direcciones y rangos de red interna
 
-- `\b10\.` — rango RFC 1918
-- `172\.(1[6-9]|2[0-9]|3[01])\.` — rango RFC 1918
-- `192\.168\.` — rango RFC 1918
-- `chagra\.guatoc\.co` — dominio operativo (proxy público sí, hostnames backend no)
-- `alpha\b` como hostname (el nombre está permitido en contextos narrativos)
+- `\b10\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\b` — IP completa RFC 1918 (rango 10/8)
+- `\b172\.(1[6-9]|2[0-9]|3[01])\.[0-9]{1,3}\.[0-9]{1,3}\b` — IP completa RFC 1918 (rango 172.16-31)
+- `\b192\.168\.[0-9]{1,3}\.[0-9]{1,3}\b` — IP completa RFC 1918 (rango 192.168/16)
+- `chagra\.guatoc\.co` — dominio operativo del backend (frontend público usa rutas relativas `/api/...`, nunca hostname)
 
 ## Qué NO está prohibido (pero requiere cuidado)
 

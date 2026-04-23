@@ -45,22 +45,24 @@ if (!existsSync(PROHIBITED_LIST)) die(2, `falta ${PROHIBITED_LIST}`);
 const listRaw = readFileSync(PROHIBITED_LIST, 'utf8');
 
 function extractBulletStrings(section) {
-  const re = new RegExp(`## ${section}([\\s\\S]*?)(?=\\n## |$)`, 'm');
-  const m = listRaw.match(re);
-  if (!m) return [];
-  return m[1]
+  // Split por '\n## ' para que cada chunk sea una sección H2; buscar la que
+  // arranca con el título dado.
+  const chunks = listRaw.split(/\n## /);
+  const target = chunks.find((c) => c.trimStart().startsWith(section));
+  if (!target) return [];
+  return target
     .split('\n')
     .map((l) => l.trim())
     .filter((l) => l.startsWith('- '))
     .map((l) => l.slice(2).trim())
-    .map((s) => s.replace(/^`/, '').replace(/`.*$/, '')) // toma el primer fragmento en backticks si hay
+    .map((s) => s.replace(/^`/, '').replace(/`.*$/, ''))
     .filter((s) => s && !s.startsWith('**') && !s.startsWith('Nombres y'));
 }
 
 const literalStrings = extractBulletStrings('Strings literales');
 const regexList = [
   ...extractBulletStrings('Patrones regex'),
-  ...extractBulletStrings('Credenciales y tokens \\(regex\\)'),
+  ...extractBulletStrings('Credenciales y tokens (regex)'),
   ...extractBulletStrings('Direcciones y rangos de red interna'),
 ];
 
