@@ -4,6 +4,8 @@ import { getSuggestedCompanions, buildGuildPrompt } from '../services/guildServi
 import { SPECIES_DEFAULTS } from '../config/speciesDefaults';
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { registry } from '../core/moduleRegistry';
+import ExternalAiButton from './common/ExternalAiButton';
+import { buildGuildExternalPrompt } from '../services/externalAiPromptBuilder';
 
 /**
  * GuildSuggestions — Panel de compañeros sugeridos y antagonistas (Fase 18).
@@ -154,15 +156,29 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
 
       {/* Capa 3 — Consulta IA en vivo (siempre disponible, OSS) */}
       <div>
-        <button
-          type="button"
-          onClick={handleAiQuery}
-          disabled={aiLoading || !navigator.onLine}
-          className="text-xs px-3 py-2 rounded-lg bg-purple-900/30 text-purple-400 border border-purple-800 hover:bg-purple-800/40 disabled:opacity-50 flex items-center gap-1.5 transition-colors"
-        >
-          {aiLoading ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
-          {aiLoading ? 'Consultando Gemma 4…' : 'Consultar Gremio IA'}
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={handleAiQuery}
+            disabled={aiLoading || !navigator.onLine}
+            className="text-xs px-3 py-2 rounded-lg bg-purple-900/30 text-purple-400 border border-purple-800 hover:bg-purple-800/40 disabled:opacity-50 flex items-center gap-1.5 transition-colors"
+          >
+            {aiLoading ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+            {aiLoading ? 'Consultando Gemma 4…' : 'Consultar Gremio IA'}
+          </button>
+
+          <ExternalAiButton
+            buildPrompt={buildGuildExternalPrompt}
+            context={{
+              speciesName,
+              estrato: defaults.estrato,
+              companions: companions.map((c) => c.name),
+              antagonists: antagonists.map((a) => a.name),
+              thermalZones: defaults.thermalZones || [],
+              altitudMsnm: defaults.altitud_msnm?.optimo_min,
+            }}
+          />
+        </div>
 
         {aiError && (
           <p className="text-[10px] text-red-400 mt-1">{aiError}</p>
