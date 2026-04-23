@@ -24,7 +24,7 @@
                                                                                               └───────────────────┘
 ```
 
-Todas las rutas externas se consumen a través del proxy Nginx existente (`/api/whisper/`, `/api/ollama/`) — **nunca** hardcodear `10.88.x.x` ni `alpha:10300` en el código cliente (ver `AI_PIPELINE_SOP.md §2`).
+Todas las rutas externas se consumen a través del proxy Nginx existente (`/api/whisper/`, `/api/ollama/`) — **nunca** hardcodear hostnames ni IPs de infraestructura interna en el código cliente (ver `CONTRIBUTING.md`).
 
 ---
 
@@ -65,8 +65,8 @@ const {
 
 ## 3. Middleware — Transcripción (Whisper local)
 
-**Servicio:** Whisper `:10300` en Nodo Alpha (ya desplegado vía `modules/ai/whisper.nix` del repo `guatoc-nixos-stable`).
-**Proxy Nginx:** nueva ruta `/api/whisper/` → `alpha:10300`.
+**Servicio:** Whisper HTTP en el host ASR interno (puerto `:10300`, desplegado vía módulo NixOS en repo privado de infraestructura).
+**Proxy Nginx:** nueva ruta `/api/whisper/` → host ASR interno `:10300`.
 **Endpoint cliente:** `POST /api/whisper/inference` con `multipart/form-data`.
 
 ### Request
@@ -103,9 +103,9 @@ Si la red está caída o Whisper responde 5xx:
 
 ## 4. Inferencia Local — Extracción de Entidades (qwen3.5:4b)
 
-**Servicio:** Ollama `:11434` en Nodo Alpha (ya activo).
+**Servicio:** Ollama `:11434` en el host interno (ya activo).
 **Endpoint cliente:** `POST /api/ollama/api/chat`.
-**Modelo:** `qwen3.5:4b` (pull previo requerido en el host; documentar en `guatoc-nixos-stable/modules/ai/ollama.nix` como `preload`).
+**Modelo:** `qwen3.5:4b` (pull previo requerido en el host; declarado como `preload` en el módulo NixOS de Ollama, repo privado de infraestructura).
 
 ### System prompt (inmutable, versionado)
 
@@ -231,7 +231,7 @@ La confirmación es **obligatoria** — nunca se escribe a `pending_transactions
 | `src/App.jsx` | Nueva ruta hash `#voz` y tile en dashboard. |
 | `src/db/dbCore.js` | Upgrade `ChagraDB` a v4: nuevo store `pending_voice_recordings`. |
 | `src/db/syncManager.js` | Manejo de cola `pending_voice_recordings` en evento `online`. |
-| Nginx (`hosts/alpha/default.nix` en `guatoc-nixos-stable`) | Nueva `location /api/whisper/` con proxy a `alpha:10300` + CORS idéntico al bloque de Ollama. |
+| Nginx (configuración del host principal, gestionada en repo privado de infraestructura) | Nueva `location /api/whisper/` con proxy al host ASR interno `:10300` + CORS idéntico al bloque de Ollama. |
 
 ## 8. Riesgos y Mitigaciones
 
