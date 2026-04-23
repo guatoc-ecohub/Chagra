@@ -11,6 +11,7 @@ import NetworkStatusBar from './components/NetworkStatusBar';
 import PendingTasksWidget from './components/PendingTasksWidget';
 import { ScreenShell } from './components/common/ScreenShell';
 import ChagraGrowLoader from './components/ChagraGrowLoader';
+import AltitudeBadge from './components/AltitudeBadge';
 
 // Lazy-loaded route components
 const TelemetryAlerts = lazy(() => import('./components/TelemetryAlerts'));
@@ -58,14 +59,14 @@ const NAV_TILES = [
 // Mapa de accents → clases Tailwind (para que el JIT genere los estilos).
 // Keeping static literals so Tailwind purgue funcione.
 const ACCENT_CLASSES = {
-  teal:    { border: 'border-l-teal-500',    text: 'text-teal-400' },
-  blue:    { border: 'border-l-blue-500',    text: 'text-blue-400' },
-  green:   { border: 'border-l-green-500',   text: 'text-green-400' },
-  sky:     { border: 'border-l-sky-500',     text: 'text-sky-400' },
-  rose:    { border: 'border-l-rose-500',    text: 'text-rose-400' },
-  indigo:  { border: 'border-l-indigo-500',  text: 'text-indigo-400' },
+  teal: { border: 'border-l-teal-500', text: 'text-teal-400' },
+  blue: { border: 'border-l-blue-500', text: 'text-blue-400' },
+  green: { border: 'border-l-green-500', text: 'text-green-400' },
+  sky: { border: 'border-l-sky-500', text: 'text-sky-400' },
+  rose: { border: 'border-l-rose-500', text: 'text-rose-400' },
+  indigo: { border: 'border-l-indigo-500', text: 'text-indigo-400' },
   emerald: { border: 'border-l-emerald-500', text: 'text-emerald-400' },
-  lime:    { border: 'border-l-lime-500',    text: 'text-lime-400' },
+  lime: { border: 'border-l-lime-500', text: 'text-lime-400' },
 };
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
@@ -119,6 +120,7 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
           <span className="w-2 h-2 bg-muzo rounded-full shadow-neon-muzo self-center" aria-hidden="true"></span>
           Chagra
           <span className="text-[10px] text-slate-500 font-mono font-normal">v{APP_VERSION}</span>
+          <AltitudeBadge />
         </h1>
         <div className="flex items-center gap-2">
           <button onClick={onLogout} aria-label="Cerrar sesión" className="text-slate-400 hover:text-white px-4 min-h-[44px] bg-slate-800 rounded text-sm">Salir</button>
