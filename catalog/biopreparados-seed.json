@@ -1,0 +1,188 @@
+{
+  "schema_version": "3.1",
+  "seed_version": "0.1.0",
+  "generated_at": "2026-04-23",
+  "_meta": {
+    "descripcion": "Catálogo auxiliar de biopreparados agroecológicos referenciable por species[].plan_nutricion_base.biopreparados_por_etapa[].biopreparado_id. Resuelve AMB-09 del schema v3.1.",
+    "estado": "SEMILLA — 15 ids iniciales validados por consenso. Los deep researches por piso térmico pueden proponer adiciones; las adiciones entran por PR al catálogo auxiliar, no dentro de species[].",
+    "reglas_id": "snake_case, género_especie si es microbiano; nombre_popular si es compuesto tradicional."
+  },
+  "biopreparados": [
+    {
+      "id": "bocashi",
+      "nombre": "Bocashi",
+      "tipo": "fermentado",
+      "proposito": ["fertilizacion", "estimulante_microbiano"],
+      "ingredientes": ["gallinaza", "cascarilla de arroz", "tierra de capote", "carbón vegetal triturado", "afrecho", "melaza", "levadura", "agua"],
+      "proceso_resumen": "Fermentación aeróbica 15-21 días con volteo diario hasta bajar temperatura a <40°C. Humedad 'prueba de puño': al apretar un puñado, el agua no gotea pero la mano queda húmeda.",
+      "tiempo_elaboracion_dias": 18,
+      "vida_util_dias": 180,
+      "source_ids": ["restrepo-1996-bocashi", "agrosavia-manual-biopreparados-2015"]
+    },
+    {
+      "id": "biol",
+      "nombre": "Biol",
+      "tipo": "fermentado",
+      "proposito": ["fertilizacion", "estimulante_microbiano"],
+      "ingredientes": ["estiércol fresco (vaca/cabra)", "leche o suero", "melaza", "ceniza", "agua", "roca fosfórica (opcional)"],
+      "proceso_resumen": "Fermentación anaeróbica 30-45 días en biodigestor o caneca sellada con válvula de gases. Aplicación foliar diluido 1:10.",
+      "tiempo_elaboracion_dias": 40,
+      "vida_util_dias": 180,
+      "source_ids": ["restrepo-1996-bocashi"]
+    },
+    {
+      "id": "purin_ortiga",
+      "nombre": "Purín de ortiga",
+      "tipo": "fermentado",
+      "proposito": ["fertilizacion", "repelente_insectos", "fitosanitario_preventivo"],
+      "ingredientes": ["ortiga fresca 1kg", "agua 10L"],
+      "proceso_resumen": "Fermentación anaeróbica 10-14 días (cuando deja de espumar, está listo). Rico en Fe, Si, N. Aplicación foliar 1:10.",
+      "tiempo_elaboracion_dias": 12,
+      "vida_util_dias": 60,
+      "source_ids": ["restrepo-1996-bocashi"]
+    },
+    {
+      "id": "caldo_sulfocalcico",
+      "nombre": "Caldo sulfocálcico",
+      "tipo": "caldo",
+      "proposito": ["fitosanitario_preventivo", "fitosanitario_curativo"],
+      "ingredientes": ["azufre elemental", "cal viva o hidratada", "agua"],
+      "proceso_resumen": "Cocción de azufre + cal 2:1 en 10L agua por 45-60 min hasta color ámbar. Aplicación foliar 1:100 preventivo, 1:20 curativo. Evitar en frutales durante floración.",
+      "tiempo_elaboracion_dias": 1,
+      "vida_util_dias": 180,
+      "source_ids": ["restrepo-1996-bocashi"]
+    },
+    {
+      "id": "caldo_bordeles",
+      "nombre": "Caldo bordelés",
+      "tipo": "caldo",
+      "proposito": ["fitosanitario_preventivo"],
+      "ingredientes": ["sulfato de cobre", "cal hidratada", "agua"],
+      "proceso_resumen": "100g sulfato + 100g cal en 10L agua, pH neutralizado (lámina de hierro no oxida). Aplicación foliar preventiva contra hongos (Phytophthora, mildius). No mezclar con otros.",
+      "tiempo_elaboracion_dias": 1,
+      "vida_util_dias": 1,
+      "source_ids": ["agrosavia-manual-biopreparados-2015"]
+    },
+    {
+      "id": "te_compost",
+      "nombre": "Té de compost",
+      "tipo": "extracto",
+      "proposito": ["fertilizacion", "estimulante_microbiano", "fitosanitario_preventivo"],
+      "ingredientes": ["compost maduro 1kg", "agua declorada 10L", "melaza 2 cucharadas"],
+      "proceso_resumen": "Aeración con bomba de pecera 24-36h. Uso dentro de 4h post-preparación. Aplicación foliar 1:5 o riego al pie 1:10.",
+      "tiempo_elaboracion_dias": 1,
+      "vida_util_dias": 1,
+      "source_ids": ["ingham-2000-compost-tea"]
+    },
+    {
+      "id": "humus_liquido",
+      "nombre": "Humus líquido (lixiviado de lombriz)",
+      "tipo": "extracto",
+      "proposito": ["fertilizacion", "estimulante_microbiano"],
+      "ingredientes": ["humus de lombriz", "agua"],
+      "proceso_resumen": "Lixiviado por percolación 1kg humus/5L agua durante 24h. Aplicación foliar 1:10 o riego 1:5.",
+      "tiempo_elaboracion_dias": 1,
+      "vida_util_dias": 15,
+      "source_ids": ["agrosavia-manual-biopreparados-2015"]
+    },
+    {
+      "id": "lixiviado_frutas",
+      "nombre": "Lixiviado de frutas",
+      "tipo": "fermentado",
+      "proposito": ["fertilizacion"],
+      "ingredientes": ["cáscaras y pulpas de frutas maduras", "melaza", "agua"],
+      "proceso_resumen": "Fermentación aeróbica 20-30 días con revolver semanal. Rica en K y micronutrientes. Aplicación foliar 1:20 en fase reproductiva.",
+      "tiempo_elaboracion_dias": 25,
+      "vida_util_dias": 120,
+      "source_ids": ["restrepo-1996-bocashi"]
+    },
+    {
+      "id": "supermagro",
+      "nombre": "Supermagro",
+      "tipo": "fermentado",
+      "proposito": ["fertilizacion", "estimulante_microbiano"],
+      "ingredientes": ["estiércol vaca", "leche", "melaza", "sulfatos minerales (Mg, Zn, Mn, Cu, Fe, B, Co)", "agua"],
+      "proceso_resumen": "Fermentación anaeróbica 90 días con adición escalonada de sulfatos minerales cada 7 días. Corrige micronutrientes. Aplicación foliar 1:20.",
+      "tiempo_elaboracion_dias": 90,
+      "vida_util_dias": 365,
+      "source_ids": ["restrepo-1996-bocashi"]
+    },
+    {
+      "id": "trichoderma_harzianum_suelo",
+      "nombre": "Trichoderma harzianum (aplicación al suelo)",
+      "tipo": "microbiano",
+      "proposito": ["fitosanitario_preventivo", "estimulante_microbiano"],
+      "ingredientes": ["cepa T. harzianum propagada en sustrato sólido (arroz/afrecho)"],
+      "proceso_resumen": "Aplicación 1kg/ha mezclado con compost maduro, incorporado en los primeros 10cm del suelo. Control biológico de Rhizoctonia, Fusarium, Sclerotinia.",
+      "tiempo_elaboracion_dias": 21,
+      "vida_util_dias": 90,
+      "source_ids": ["cenicafe-trichoderma-2010"]
+    },
+    {
+      "id": "bacillus_subtilis_foliar",
+      "nombre": "Bacillus subtilis (aplicación foliar)",
+      "tipo": "microbiano",
+      "proposito": ["fitosanitario_preventivo", "fitosanitario_curativo"],
+      "ingredientes": ["cepa B. subtilis en suspensión 10^9 UFC/ml"],
+      "proceso_resumen": "Aplicación foliar 1L/ha cada 7-10 días. Control de Botrytis, Alternaria, Monilia. Compatible con caldos minerales.",
+      "tiempo_elaboracion_dias": 14,
+      "vida_util_dias": 30,
+      "source_ids": ["agrosavia-bacillus-2018"]
+    },
+    {
+      "id": "cal_dolomita",
+      "nombre": "Cal dolomítica",
+      "tipo": "mineral",
+      "proposito": ["enmienda_ph", "enmienda_ca"],
+      "ingredientes": ["CaMg(CO3)2 molido"],
+      "proceso_resumen": "Aplicación directa al suelo antes de siembra, dosis según análisis (típicamente 500-2000 kg/ha para subir pH 0.5 puntos).",
+      "tiempo_elaboracion_dias": 0,
+      "vida_util_dias": 730,
+      "source_ids": ["ica-fertilizantes-2019"]
+    },
+    {
+      "id": "roca_fosforica",
+      "nombre": "Roca fosfórica",
+      "tipo": "mineral",
+      "proposito": ["enmienda_p", "fertilizacion"],
+      "ingredientes": ["apatita (Ca5(PO4)3(F,Cl,OH)) molida"],
+      "proceso_resumen": "Aplicación pre-siembra, dosis 500-1000 kg/ha. Liberación lenta de P, requiere suelos ácidos (pH<5.5) para solubilizar, o compostaje previo con ácidos orgánicos.",
+      "tiempo_elaboracion_dias": 0,
+      "vida_util_dias": 730,
+      "source_ids": ["ica-fertilizantes-2019"]
+    },
+    {
+      "id": "ceniza_madera",
+      "nombre": "Ceniza de madera",
+      "tipo": "mineral",
+      "proposito": ["fertilizacion", "enmienda_ph"],
+      "ingredientes": ["ceniza de madera dura no tratada"],
+      "proceso_resumen": "Aplicación al pie o incorporada 100-200 g/planta. Rica en K, Ca. Alcalinizante; no usar en suelos con pH>6.5 ni en cultivos acidófilos (arándano, té).",
+      "tiempo_elaboracion_dias": 0,
+      "vida_util_dias": 730,
+      "source_ids": ["restrepo-1996-bocashi"]
+    },
+    {
+      "id": "compost_maduro",
+      "nombre": "Compost maduro",
+      "tipo": "fermentado",
+      "proposito": ["fertilizacion", "estimulante_microbiano"],
+      "ingredientes": ["residuos vegetales", "estiércol maduro", "ceniza", "tierra de bosque"],
+      "proceso_resumen": "Compostaje aeróbico por pila con volteos cada 7 días durante 90-120 días. Maduro cuando baja a temperatura ambiente, color oscuro, olor a tierra fresca.",
+      "tiempo_elaboracion_dias": 100,
+      "vida_util_dias": 365,
+      "source_ids": ["restrepo-1996-bocashi", "agrosavia-manual-biopreparados-2015"]
+    },
+    {
+      "id": "biofertilizante_algas",
+      "nombre": "Biofertilizante de algas marinas",
+      "tipo": "extracto",
+      "proposito": ["fertilizacion", "estimulante_microbiano"],
+      "ingredientes": ["algas marinas secas (Ascophyllum/Sargassum/Ecklonia)"],
+      "proceso_resumen": "Extracto hidrolizado alcalino o ácido. Aplicación foliar 1:500. Fuente de citoquininas, auxinas, oligoelementos. Estimulante de enraizamiento.",
+      "tiempo_elaboracion_dias": 0,
+      "vida_util_dias": 365,
+      "source_ids": ["khan-2009-seaweed-extracts"]
+    }
+  ]
+}

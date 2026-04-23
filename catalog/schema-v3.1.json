@@ -1,0 +1,524 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://chagra.guatoc.co/schema/catalog/v3.1.json",
+  "title": "Chagra Species Catalog — Schema v3.1",
+  "description": "Schema formal para catálogo agroecológico Chagra. Consolida v3.0 con las 16 ambigüedades resueltas (ver chagra-catalog-seed-v3.0.json §ambiguedades_detectadas_en_schema_v3). Validador: scripts/validate-catalog.mjs",
+  "type": "object",
+  "required": ["schema_version", "species", "biopreparados", "sources"],
+  "properties": {
+    "schema_version": { "const": "3.1" },
+    "seed_version": { "type": "string" },
+    "generated_at": { "type": "string", "format": "date" },
+    "generated_by": { "type": "string" },
+    "_meta": { "type": "object" },
+    "species": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/species" }
+    },
+    "biopreparados": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/biopreparado" }
+    },
+    "sources": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/source" }
+    }
+  },
+  "definitions": {
+    "species": {
+      "type": "object",
+      "required": [
+        "id",
+        "nombre_comun",
+        "nombre_cientifico",
+        "familia_botanica",
+        "category",
+        "thermal_zones",
+        "roles_in_guild",
+        "cultivable",
+        "conservation_status",
+        "altitud_msnm",
+        "sources_ids"
+      ],
+      "properties": {
+        "_curation_status": {
+          "type": "string",
+          "description": "Free-form string. Convenciones sugeridas: 'VALIDADO', 'PENDIENTE_VALIDACION', 'BORRADOR_IA', 'REQUIERE_TAXONOMO'. Puede extenderse con notas post-prefijo."
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]+$",
+          "description": "snake_case estable, típicamente género_especie"
+        },
+        "nombre_comun": { "type": "string" },
+        "nombre_comunes_regionales": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "nombre_cientifico": {
+          "type": "string",
+          "description": "Género especie + autoría. Ej: 'Alnus acuminata Kunth'"
+        },
+        "familia_botanica": { "type": "string" },
+        "category": {
+          "type": "string",
+          "enum": [
+            "tuberculos_raices",
+            "hortalizas_hoja",
+            "hortalizas_fruto_flor",
+            "frutales_perennes",
+            "abonos_verdes_coberturas",
+            "cercas_vivas",
+            "medicinales_alelopaticas",
+            "atractores_polinizadores",
+            "especies_invasoras",
+            "granos_legumbres",
+            "cereales",
+            "ornamentales_nativas",
+            "arboles_sombra"
+          ]
+        },
+        "thermal_zones": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["calido", "templado", "frio", "paramo"] },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "estrato": {
+          "type": "string",
+          "enum": ["emergente", "alto", "medio", "bajo"],
+          "description": "Obligatorio en frutales_perennes/abonos_verdes_coberturas/cercas_vivas; opcional en anuales/herbáceas. Regla AMB-04 aplicada por scripts/validate-catalog.mjs."
+        },
+        "roles_in_guild": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "crop",
+              "nitrogen_fixer",
+              "dynamic_accumulator",
+              "ground_cover",
+              "pest_repellent",
+              "pollinator_attractor",
+              "biomass_producer",
+              "living_fence",
+              "invasive",
+              "windbreak",
+              "nurse_plant"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true,
+          "description": "Array ordenado. [0] = rol dominante. Reemplaza el campo legacy 'gremio' (AMB-01)."
+        },
+        "cultivable": { "type": "boolean" },
+        "conservation_status": {
+          "type": "string",
+          "enum": [
+            "cultivo_comun",
+            "nativo_silvestre",
+            "nativo_protegido",
+            "en_peligro",
+            "endemica_critica",
+            "invasor",
+            "no_evaluada"
+          ]
+        },
+        "harvest_type": {
+          "type": "string",
+          "enum": [
+            "fruto",
+            "grano",
+            "tuberculo",
+            "hoja",
+            "flor",
+            "raiz",
+            "tallo",
+            "biomasa",
+            "semilla",
+            "latex",
+            "corteza",
+            "bulbo",
+            "hongo"
+          ]
+        },
+        "cycleMonths": { "type": ["number", "null"], "minimum": 0, "description": "null para perennes/silvestres sin ciclo anual definido." },
+        "variedades_registradas_ica": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "altitud_msnm": {
+          "type": "object",
+          "required": ["min_absoluto", "optimo_min", "optimo_max", "max_absoluto"],
+          "properties": {
+            "min_absoluto": { "type": "number" },
+            "optimo_min": { "type": "number" },
+            "optimo_max": { "type": "number" },
+            "max_absoluto": { "type": "number" }
+          },
+          "additionalProperties": false
+        },
+        "temperatura_c": {
+          "type": "object",
+          "properties": {
+            "helada_letal": { "type": "number" },
+            "optimo_min": { "type": "number" },
+            "optimo_max": { "type": "number" },
+            "max_tolerable": { "type": "number" }
+          }
+        },
+        "humedad_relativa_pct": {
+          "type": "object",
+          "properties": {
+            "min": { "type": "number", "minimum": 0, "maximum": 100 },
+            "optimo": { "type": "number", "minimum": 0, "maximum": 100 },
+            "max": { "type": "number", "minimum": 0, "maximum": 100 }
+          }
+        },
+        "ph_suelo": {
+          "type": "object",
+          "properties": {
+            "min": { "type": "number" },
+            "optimo_min": { "type": "number" },
+            "optimo_max": { "type": "number" },
+            "max": { "type": "number" }
+          }
+        },
+        "radiacion": {
+          "type": "string",
+          "enum": ["sol_pleno", "sombra_parcial", "sombra_filtrada", "sombra_densa"]
+        },
+        "agua": {
+          "type": "string",
+          "enum": ["bajo", "medio", "alto", "pantanoso"]
+        },
+        "drenaje_requerido": {
+          "type": "string",
+          "enum": ["excelente", "bueno", "bueno_a_moderado", "moderado", "medio", "bajo", "pantanoso"],
+          "description": "Convención: 'medio' equivalente a 'moderado'; mantenidos por compatibilidad con v3.0."
+        },
+        "heladas_tolerancia": {
+          "type": "object",
+          "description": "Unidad explícita — resuelve AMB-06.",
+          "required": ["umbral_c", "horas_acumuladas_max"],
+          "properties": {
+            "umbral_c": { "type": "number" },
+            "horas_acumuladas_max": { "type": "number", "minimum": 0 },
+            "notas": { "type": "string" }
+          }
+        },
+        "companions": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]+$" },
+          "uniqueItems": true,
+          "description": "Refs a species.id. Simetría validada por CI (AMB-10)."
+        },
+        "antagonists": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]+$" },
+          "uniqueItems": true
+        },
+        "_nota_antagonists": { "type": "string" },
+        "recommended_covers": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]+$" }
+        },
+        "recommended_fences": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]+$" }
+        },
+        "propagation": {
+          "type": "object",
+          "properties": {
+            "methods": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "semilla",
+                  "esqueje",
+                  "acodo",
+                  "injerto",
+                  "rizoma",
+                  "tuberculo",
+                  "estolon",
+                  "division_mata",
+                  "bulbo",
+                  "espora",
+                  "micropropagacion",
+                  "pseudobulbo"
+                ]
+              },
+              "minItems": 1
+            },
+            "best_method": { "type": "string" },
+            "protocol_resumen": { "type": "string" },
+            "tiempo_a_establecimiento_dias": { "type": "number", "minimum": 0 },
+            "notas": { "type": "string" },
+            "fuente": { "type": "string" }
+          }
+        },
+        "manejo_por_escala": {
+          "type": "object",
+          "description": "Keys ∈ scale_viability vals, pueden incluir escalas no-viables con motivo (AMB-15).",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["viable"],
+            "properties": {
+              "viable": { "type": "boolean" },
+              "nota": { "type": "string" },
+              "tips": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "scale_viability": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["apartamento", "huerto_casero", "invernadero_mediano", "produccion", "restauracion"]
+          },
+          "uniqueItems": true,
+          "description": "Array rápido de escalas donde viable:true. Coherencia con manejo_por_escala validada por CI (AMB-15)."
+        },
+        "plan_nutricion_base": {
+          "type": ["object", "null"],
+          "properties": {
+            "N_ppm": { "$ref": "#/definitions/nutrient_stages" },
+            "P_ppm": { "$ref": "#/definitions/nutrient_stages" },
+            "K_ppm": { "$ref": "#/definitions/nutrient_stages" },
+            "Ca_ppm": { "$ref": "#/definitions/nutrient_range" },
+            "Mg_ppm": { "$ref": "#/definitions/nutrient_range" },
+            "micronutrientes_criticos": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "biopreparados_por_etapa": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["biopreparado_id"],
+                  "properties": {
+                    "biopreparado_id": { "type": "string" },
+                    "dosis": { "type": "string" },
+                    "frecuencia_dias": { "type": "number" },
+                    "notas": { "type": "string" },
+                    "condicion": { "type": "string" }
+                  }
+                }
+              }
+            },
+            "sintomas_deficiencia_comunes": {
+              "type": "array",
+              "items": { "type": "object" }
+            },
+            "frecuencia_cromatografia": { "type": "string" },
+            "referencias_cientificas": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "tests_suelo_recomendados": { "type": "array" },
+        "plagas_criticas": { "type": "array" },
+        "enfermedades_criticas": { "type": "array" },
+        "prompts_ia_externa": {
+          "type": "object",
+          "description": "Slots estándar. Propiedades adicionales permitidas pero desaconsejadas (AMB-12).",
+          "properties": {
+            "diagnostico_fitosanitario": { "type": "string" },
+            "cromatografia_pfeiffer": { "type": "string" },
+            "plan_siembra": { "type": "string" },
+            "diagnostico_nutricional": { "type": "string" },
+            "plan_restauracion": { "type": "string" }
+          },
+          "additionalProperties": true
+        },
+        "rol_ecologico": { "type": "string" },
+        "valor_pedagogico": { "type": "string" },
+        "saber_origen": {
+          "type": "object",
+          "properties": {
+            "pueblo": { "type": "string" },
+            "region": { "type": "string" },
+            "practica_original": { "type": "string" },
+            "validacion_cientifica_source_ids": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Refs a sources[].id (AMB-11)."
+            }
+          }
+        },
+        "nota_conservacion": { "type": ["string", "null"] },
+        "confidence_notes": { "type": "string" },
+        "sources_ids": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "description": "Refs a sources[].id — obligatorio al menos una (AMB-16). CI valida que todos existan."
+        },
+        "especies_nativas_sustitutas": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Solo aplica a category=especies_invasoras. Refs a species.id nativas."
+        },
+        "clasificacion_uicn": { "type": "string" },
+        "protocolo_post_remocion": { "type": "string" },
+        "validation_level": {
+          "type": "string",
+          "enum": ["claude_draft", "operator_reviewed", "agronomist_validated", "community_attested"],
+          "description": "Nivel de validación. Default 'claude_draft' para entradas generadas por LLM sin revisión humana. Sube cuando el operador revisa, cuando un agrónomo con identidad registrada valida, o cuando la comunidad custodio atestigua el saber ancestral. Consumido por el módulo Pro de curación (ver ADR-016)."
+        },
+        "validated_by": {
+          "type": "array",
+          "description": "Historial de validaciones humanas con trazabilidad por campo.",
+          "items": {
+            "type": "object",
+            "required": ["agronomist_id", "fecha"],
+            "properties": {
+              "agronomist_id": {
+                "type": "string",
+                "description": "Id estable. Convención: <institucion>-<area>-<apellido>-<nombre>, ej. 'unal-agronomia-gonzalez-maria'."
+              },
+              "nombre": { "type": "string" },
+              "afiliacion": { "type": "string" },
+              "registro_profesional": { "type": "string", "description": "Ej. registro COMVEZCOL, ICA, consejo profesional." },
+              "fecha": { "type": "string", "format": "date" },
+              "alcance": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Campos o áreas del objeto species validados en esta revisión (ej. 'altitud_msnm', 'plan_nutricion_base')."
+              },
+              "notas": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "validated_relations": {
+          "type": "array",
+          "description": "Validaciones de relaciones cruzadas (companions, antagonists, etc.) con trazabilidad.",
+          "items": {
+            "type": "object",
+            "required": ["tipo", "counterpart_id", "validated_by", "fecha"],
+            "properties": {
+              "tipo": { "type": "string", "enum": ["companion", "antagonist", "cover", "fence", "sustituto_nativo"] },
+              "counterpart_id": { "type": "string" },
+              "validated_by": { "type": "string", "description": "Ref a agronomist_id." },
+              "fecha": { "type": "string", "format": "date" },
+              "notas": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "conservation_status": { "const": "invasor" } } },
+          "then": {
+            "properties": {
+              "category": { "const": "especies_invasoras" },
+              "cultivable": { "const": false }
+            },
+            "required": ["category", "cultivable"]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "category": {
+                "enum": ["frutales_perennes", "abonos_verdes_coberturas", "cercas_vivas", "arboles_sombra"]
+              }
+            }
+          },
+          "then": { "required": ["estrato"] }
+        }
+      ],
+      "additionalProperties": true
+    },
+    "nutrient_range": {
+      "type": "object",
+      "required": ["min", "max", "unidad"],
+      "properties": {
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "unidad": { "type": "string", "enum": ["ppm", "mg/kg", "cmol/kg", "%"] }
+      }
+    },
+    "nutrient_stages": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/definitions/nutrient_range" }
+    },
+    "biopreparado": {
+      "type": "object",
+      "required": ["id", "nombre", "tipo", "proposito"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]+$" },
+        "nombre": { "type": "string" },
+        "tipo": {
+          "type": "string",
+          "enum": ["fermentado", "mineral", "microbiano", "extracto", "caldo", "residuo", "compuesto"]
+        },
+        "proposito": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "fertilizacion",
+              "fitosanitario_preventivo",
+              "fitosanitario_curativo",
+              "enmienda_ph",
+              "enmienda_ca",
+              "enmienda_p",
+              "estimulante_microbiano",
+              "repelente_insectos"
+            ]
+          }
+        },
+        "ingredientes": { "type": "array", "items": { "type": "string" } },
+        "proceso_resumen": { "type": "string" },
+        "tiempo_elaboracion_dias": { "type": "number", "minimum": 0 },
+        "vida_util_dias": { "type": "number", "minimum": 0 },
+        "source_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "required": ["id", "tipo", "autores", "titulo"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]+$" },
+        "tipo": {
+          "type": "string",
+          "enum": [
+            "articulo_revista",
+            "libro",
+            "manual_tecnico",
+            "tesis",
+            "resolucion_oficial",
+            "ficha_tecnica_institucional",
+            "lista_uicn",
+            "base_datos",
+            "capitulo_libro",
+            "comunicacion_personal"
+          ]
+        },
+        "autores": { "type": "string" },
+        "año": { "type": ["number", "null"] },
+        "titulo": { "type": "string" },
+        "revista_o_editorial": { "type": "string" },
+        "volumen_numero": { "type": "string" },
+        "paginas": { "type": "string" },
+        "doi": { "type": "string" },
+        "isbn": { "type": "string" },
+        "url": { "type": "string", "format": "uri" },
+        "institucion": { "type": "string" },
+        "observaciones": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

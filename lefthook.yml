@@ -1,0 +1,58 @@
+# Chagra público — lefthook config
+# Instalar: npx lefthook install (corre automáticamente vía postinstall)
+# ADR-002 + ADR-015
+
+pre-commit:
+  parallel: true
+  commands:
+    secret-scan:
+      tags: security
+      run: |
+        hits=$(git diff --cached | grep -iE "(gh[oprsu]_[A-Za-z0-9]{30,}|sk-[A-Za-z0-9]{32,}|sk-ant-[A-Za-z0-9_-]{30,}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{35}|glpat-[0-9A-Za-z_-]{20}|BEGIN (RSA|OPENSSH) PRIVATE KEY)" || true)
+        if [ -n "$hits" ]; then
+          echo "✗ Posible secreto en diff:"
+          echo "$hits" | head -5
+          exit 1
+        fi
+
+    infra-refs-scan:
+      tags: security
+      glob: "*.{md,js,jsx,ts,tsx,json,yaml,yml}"
+      run: |
+        files="{staged_files}"
+        [ -z "$files" ] && exit 0
+        hits=$(echo "$files" | xargs grep -lnE "\b10\.(?!1\.1\.1)|\b192\.168\.|\b172\.(1[6-9]|2[0-9]|3[01])\.|guatoc-nixos" 2>/dev/null || true)
+        if [ -n "$hits" ]; then
+          echo "✗ Refs a infra interna (IP privada o repo privado) en:"
+          echo "$hits"
+          echo "Ver CONTRIBUTING.md §1-§2"
+          exit 1
+        fi
+
+    pro-import-scan:
+      tags: security
+      glob: "src/**/*.{js,jsx,ts,tsx}"
+      run: |
+        files="{staged_files}"
+        [ -z "$files" ] && exit 0
+        hits=$(echo "$files" | xargs grep -lnE "from ['\"](@guatoc/chagra-pro|@chagra/pro-|\.\./chagra-pro|chagra-pro/)" 2>/dev/null || true)
+        if [ -n "$hits" ]; then
+          echo "✗ Import estático desde chagra-pro en src/ — usar moduleRegistry (ADR-002)"
+          echo "$hits"
+          exit 1
+        fi
+
+    eslint:
+      glob: "*.{js,jsx,ts,tsx}"
+      run: npx eslint {staged_files} --max-warnings=0
+
+commit-msg:
+  commands:
+    conventional:
+      run: |
+        pattern='^(feat|fix|chore|docs|refactor|test|perf|build|ci|style|revert)(\([a-z0-9-]+\))?(!)?: .+'
+        if ! grep -qE "$pattern" {1} ; then
+          echo "✗ Mensaje no sigue conventional commits."
+          echo "  Ejemplos: 'feat(voice): batch mode', 'fix(registry): load order'"
+          exit 1
+        fi
