@@ -4,6 +4,7 @@ import { assetCache } from '../db/assetCache';
 import { FARM_CONFIG } from '../config/defaults';
 import AIStreamPanel from './common/AIStreamPanel';
 import IoTSensorCard from './IoTSensorCard';
+import ChagraGrowLoader from './ChagraGrowLoader';
 import { streamOllama } from '../services/ollamaStream';
 
 // Constantes de Infraestructura Segura (API Gateway Local)
@@ -600,7 +601,7 @@ export default function TelemetryAlerts({ lastFarmOsLog, onNavigate }) {
           <div className="flex items-center gap-2">
             {aiStatus === 'thinking' && (
               <span className="text-orchid text-2xs font-bold bg-orchid/10 px-2 py-1 rounded flex items-center gap-1 border border-orchid/30">
-                <div className="w-1.5 h-1.5 bg-orchid rounded-full motion-safe:animate-pulse"></div>
+                <ChagraGrowLoader size={20} />
                 IA analizando...
               </span>
             )}
