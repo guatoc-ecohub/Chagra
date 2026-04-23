@@ -67,7 +67,7 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
                 : 'bg-green-600 active:bg-green-500 border-green-800'
             }`}
           >
-            {loading ? <ChagraGrowLoader size={56} /> : 'Ingresar'}
+            {loading ? <ChagraGrowLoader size={56} initialProgress={0.4} /> : 'Ingresar'}
           </button>
         </form>
       </div>
