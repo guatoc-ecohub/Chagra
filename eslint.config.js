@@ -24,6 +24,13 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      // ADR-002: ningún import estático desde chagra-pro en el repo público.
+      // Módulos Pro se cargan vía src/core/loadProModules.js (dynamic import).
+      'no-restricted-imports': ['error', {
+        patterns: [
+          { group: ['chagra-pro', 'chagra-pro/*', '../chagra-pro', '../chagra-pro/*', '../../chagra-pro/*', '@guatoc/chagra-pro', '@guatoc/chagra-pro/*', '@chagra/pro-*'], message: 'Imports estáticos desde chagra-pro están prohibidos. Usa moduleRegistry (ver src/core/moduleRegistry.js y ADR-002).' },
+        ],
+      }],
     },
   },
 ])

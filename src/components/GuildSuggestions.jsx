@@ -3,6 +3,7 @@ import { Sprout, AlertTriangle, Sparkles, Loader2 } from 'lucide-react';
 import { getSuggestedCompanions, buildGuildPrompt } from '../services/guildService';
 import { SPECIES_DEFAULTS } from '../config/speciesDefaults';
 import { CROP_TAXONOMY } from '../config/taxonomy';
+import { registry } from '../core/moduleRegistry';
 
 /**
  * GuildSuggestions — Panel de compañeros sugeridos y antagonistas (Fase 18).
@@ -23,6 +24,7 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
   const [aiSuggestions, setAiSuggestions] = useState([]);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState(null);
+  const [EnrichedComp, setEnrichedComp] = useState(null);
 
   // Capas 1 + 2: estáticas + estructurales
   const { companions, antagonists } = useMemo(() => {
@@ -34,6 +36,21 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
   useEffect(() => {
     setAiSuggestions([]);
     setAiError(null);
+  }, [speciesId]);
+
+  // Capa 3 enriquecida por módulo Pro si está registrado (ADR-002/011).
+  // Si no hay módulo Pro, la capa 3 cae al path OSS Ollama existente.
+  useEffect(() => {
+    let alive = true;
+    const mods = registry.byCapability('enriched-guild-suggestions');
+    if (mods.length === 0) {
+      setEnrichedComp(null);
+      return;
+    }
+    mods[0].mount().then((m) => {
+      if (alive && m && m.default) setEnrichedComp(() => m.default);
+    }).catch(() => { /* módulo no montable, seguir con OSS */ });
+    return () => { alive = false; };
   }, [speciesId]);
 
   if (!speciesId || !SPECIES_DEFAULTS[speciesId]) return null;
@@ -126,7 +143,16 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
         </div>
       )}
 
-      {/* Capa 3 — Consulta IA */}
+      {/* Capa 3 enriquecida — Pro module si está registrado */}
+      {EnrichedComp && (
+        <EnrichedComp
+          speciesId={speciesId}
+          speciesName={speciesName}
+          onSelectCompanion={onSelectCompanion}
+        />
+      )}
+
+      {/* Capa 3 — Consulta IA en vivo (siempre disponible, OSS) */}
       <div>
         <button
           type="button"

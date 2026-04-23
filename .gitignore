@@ -32,3 +32,6 @@ dist-ssr
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Build artifacts para BD estática
+public/catalog.sqlite

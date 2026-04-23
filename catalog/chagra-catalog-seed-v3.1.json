@@ -1,0 +1,1927 @@
+{
+  "schema_version": "3.1",
+  "seed_version": "0.2.0",
+  "generated_at": "2026-04-23",
+  "generated_by": "scripts/migrate-v30-to-v31.mjs — transform automático v3.0 → v3.1. Curaduría humana requerida antes de uso ministerial.",
+  "_meta": {
+    "fuente_migracion": "chagra-catalog-seed-v3.0.json",
+    "ambiguedades_resueltas": [
+      "AMB-01: gremio eliminado, roles_in_guild único campo",
+      "AMB-02: thermal_zones plural array (ya era en v3.0)",
+      "AMB-03: español en todos los campos (ya era en v3.0)",
+      "AMB-05: altitud_msnm chain validada por validate-catalog.mjs",
+      "AMB-06: heladas_tolerancia como objeto (ya era en v3.0)",
+      "AMB-07: production (string) → harvest_type (enum)",
+      "AMB-08: NPK como objeto {min,max,unidad} (ya era en v3.0)",
+      "AMB-09: biopreparados_seed.json catálogo auxiliar con 15 ids",
+      "AMB-10: simetría companions/antagonists validada por CI",
+      "AMB-11/16: sources_seed.json catálogo auxiliar con ~30 fuentes",
+      "AMB-12: prompts_ia_externa objeto con 5 slots estándar",
+      "AMB-13: cross-refs validadas por CI (seed-mode downgrade a warning)",
+      "AMB-14: consistencia invasor aplicada en migración",
+      "AMB-15: scale_viability + manejo_por_escala con CI de coherencia"
+    ],
+    "alcance_seed": "7 especies migradas desde v3.0. Las DRs por piso térmico poblarán hasta ~400 especies totales (100 × 4 pisos).",
+    "advertencia": "Validar con: node scripts/validate-catalog.mjs --seed-mode. Refs a species aún no migradas aparecen como warnings."
+  },
+  "species": [
+    {
+      "id": "solanum_phureja",
+      "_curation_status": "VALIDADO con fuentes verificadas AGROSAVIA + UNAL",
+      "nombre_comun": "Papa criolla",
+      "nombre_comunes_regionales": [
+        "papa criolla",
+        "papa amarilla",
+        "papa chaucha",
+        "yema de huevo"
+      ],
+      "nombre_cientifico": "Solanum tuberosum L. Grupo Phureja (Juz. & Bukasov)",
+      "familia_botanica": "Solanaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "cycleMonths": 4,
+      "variedades_registradas_ica": [
+        {
+          "nombre": "Criolla Colombia",
+          "registro": "ICA 1994",
+          "fuente": "Rodríguez, Ñústez & Estrada 2009, Agronomía Colombiana 27(3): 289-303"
+        },
+        {
+          "nombre": "AGROSAVIA Sol Andina (antes Corpoica Sol Andina)",
+          "registro": "ICA 2016",
+          "zona": "Altiplano cundiboyacense 2400-3000 msnm",
+          "rendimiento_t_ha": 29
+        },
+        {
+          "nombre": "AGROSAVIA Estrella",
+          "zona": "Nariño + Cundiboyacense",
+          "rendimiento_t_ha_narino": 20.3,
+          "rendimiento_t_ha_altiplano": 27.7
+        },
+        {
+          "nombre": "AGROSAVIA Alhaja",
+          "registro": "ICA Resolución 00017702 de 2019",
+          "zona": "Nudo de los Pastos, Nariño"
+        },
+        {
+          "nombre": "AGROSAVIA Oyanza",
+          "zona": "Nariño"
+        },
+        {
+          "nombre": "Criolla Latina / Criolla Paisa / Criolla Colombia",
+          "zona": "Antioquia",
+          "fuente": "Rodríguez, Ñústez & Estrada 2009"
+        }
+      ],
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2400,
+        "optimo_max": 3000,
+        "max_absoluto": 3200
+      },
+      "_nota_altitud": "Rango optimo 2400-3000 msnm verificado para AGROSAVIA Sol Andina (Boyacá, Cundinamarca). Fuera de rango, rendimiento cae significativamente. Fuente: AGROSAVIA Ficha técnica Sol Andina.",
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 10,
+        "optimo_max": 18,
+        "max_tolerable": 24
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "ph_suelo": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 6.5,
+        "max": 7
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -1,
+        "horas_acumuladas_max": 4,
+        "notas": "Heladas nocturnas <−2°C dañan follaje severamente; variedades nativas del altiplano son más tolerantes que Grupo Phureja."
+      },
+      "companions": [
+        "vicia_faba",
+        "alnus_acuminata",
+        "minthostachys_mollis",
+        "lupinus_mutabilis",
+        "chenopodium_quinoa"
+      ],
+      "antagonists": [
+        "solanum_lycopersicum",
+        "rubus_glaucus",
+        "cucurbita_maxima"
+      ],
+      "_nota_antagonists": "Solanaceae entre sí comparten Phytophthora infestans y Ralstonia solanacearum → rotación obligatoria. Cucurbitáceas son hospedantes alternativos de áfidos vectores.",
+      "recommended_covers": [
+        "vicia_sativa",
+        "oxalis_megalorrhiza",
+        "trifolium_repens"
+      ],
+      "recommended_fences": [
+        "sambucus_peruviana",
+        "dodonaea_viscosa",
+        "alnus_acuminata"
+      ],
+      "propagation": {
+        "methods": [
+          "tuberculo",
+          "semilla"
+        ],
+        "best_method": "tuberculo",
+        "protocol_resumen": "Tubérculos-semilla certificados de 40-80g pre-brotados 30 días en oscuridad parcial a 10-15°C para brotes de 1-2cm. Surco a 25-30cm profundidad, distancia 1m entre surcos x 30cm entre plantas. Aporque a los 45 días y 75 días.",
+        "tiempo_a_establecimiento_dias": 21,
+        "notas": "Semilla botánica (TPS) solo para mejoramiento genético. Productores tradicionales usan tubérculo propio con riesgo de acumular virus (PVY, PLRV); renovación de semilla certificada cada 3 ciclos recomendada.",
+        "fuente": "Ñústez & Rodríguez 2024 'Papa criolla Grupo Phureja, manual de recomendaciones técnicas para Cundinamarca'. Editorial UNAL. ISBN 9789585054929."
+      },
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": true,
+          "nota": "Contenedor mín 30L profundidad 40cm; usar variedad criolla (Grupo Phureja) por porte compacto. 1 tubérculo por contenedor.",
+          "tips": [
+            "Luz directa 6h/día mínimo",
+            "Sustrato: 50% compost maduro + 30% tierra franca + 20% cascarilla arroz quemada",
+            "Aporque simulado agregando sustrato a medida que crece"
+          ]
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Cama 1m x 3m produce 15-20 plantas. Rotar anualmente con leguminosas (Vicia faba, Lupinus mutabilis) o Chenopodium quinoa.",
+          "tips": [
+            "Separación 30-40cm",
+            "Aporque 2 veces por ciclo",
+            "Cosecha 120 días post-siembra"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": true,
+          "nota": "Posible bajo cubierta pero susceptible a Alternaria y tizón tardío por humedad sostenida. Prefiere campo abierto.",
+          "tips": [
+            "Ventilación agresiva",
+            "Riego por goteo, nunca aspersión"
+          ]
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Rotación obligatoria c/3 años mínimo con leguminosas o cereales de grano. Rendimiento 25-30 t/ha con AGROSAVIA Sol Andina.",
+          "tips": [
+            "Monitoreo semanal de gota (Phytophthora infestans) en épocas húmedas",
+            "Caldo bordelés preventivo"
+          ]
+        },
+        "restauracion": {
+          "viable": false,
+          "nota": "Cultivo domesticado; no aplicable a restauración silvestre. En zonas de sustitución de actividades prohibidas en páramo (Ley 1930/2018 art. 10), la papa criolla queda en la zona de transición agropecuaria bajo impacto, NO en páramo propiamente dicho."
+        }
+      },
+      "scale_viability": [
+        "apartamento",
+        "huerto_casero",
+        "invernadero_mediano",
+        "produccion"
+      ],
+      "plan_nutricion_base": {
+        "N_ppm": {
+          "vegetativo": {
+            "min": 150,
+            "max": 200,
+            "unidad": "ppm"
+          },
+          "tuberizacion": {
+            "min": 100,
+            "max": 150,
+            "unidad": "ppm"
+          },
+          "llenado": {
+            "min": 80,
+            "max": 120,
+            "unidad": "ppm"
+          }
+        },
+        "P_ppm": {
+          "vegetativo": {
+            "min": 30,
+            "max": 50,
+            "unidad": "ppm"
+          },
+          "tuberizacion": {
+            "min": 40,
+            "max": 60,
+            "unidad": "ppm"
+          },
+          "llenado": {
+            "min": 50,
+            "max": 70,
+            "unidad": "ppm"
+          }
+        },
+        "K_ppm": {
+          "vegetativo": {
+            "min": 150,
+            "max": 200,
+            "unidad": "ppm"
+          },
+          "tuberizacion": {
+            "min": 200,
+            "max": 250,
+            "unidad": "ppm"
+          },
+          "llenado": {
+            "min": 250,
+            "max": 300,
+            "unidad": "ppm"
+          }
+        },
+        "Ca_ppm": {
+          "min": 150,
+          "max": 200,
+          "unidad": "ppm"
+        },
+        "Mg_ppm": {
+          "min": 50,
+          "max": 80,
+          "unidad": "ppm"
+        },
+        "micronutrientes_criticos": [
+          "B",
+          "Zn",
+          "Mn"
+        ],
+        "biopreparados_por_etapa": {
+          "pre_siembra": [
+            {
+              "biopreparado_id": "bocashi",
+              "dosis": "2 kg/m2",
+              "notas": "aplicar 15 días antes de siembra"
+            },
+            {
+              "biopreparado_id": "cal_dolomita",
+              "dosis": "según pH medido",
+              "condicion": "solo si pH<5.5"
+            }
+          ],
+          "vegetativo": [
+            {
+              "biopreparado_id": "biol",
+              "dosis": "1:10 en agua",
+              "frecuencia_dias": 15
+            },
+            {
+              "biopreparado_id": "purin_ortiga",
+              "dosis": "1:10 en agua",
+              "frecuencia_dias": 21
+            }
+          ],
+          "tuberizacion": [
+            {
+              "biopreparado_id": "lixiviado_frutas",
+              "dosis": "1:20",
+              "frecuencia_dias": 15
+            },
+            {
+              "biopreparado_id": "caldo_sulfocalcico",
+              "dosis": "1:100 preventivo",
+              "condicion": "épocas húmedas"
+            }
+          ],
+          "llenado": [
+            {
+              "biopreparado_id": "te_compost",
+              "dosis": "1:5",
+              "frecuencia_dias": 10
+            },
+            {
+              "biopreparado_id": "humus_liquido",
+              "dosis": "1:10",
+              "frecuencia_dias": 15
+            }
+          ]
+        },
+        "sintomas_deficiencia_comunes": [
+          {
+            "sintoma": "amarillamiento hojas viejas",
+            "causa_probable": "N",
+            "correccion": "purín ortiga foliar + bocashi al pie"
+          },
+          {
+            "sintoma": "manchas moradas en envés hoja joven",
+            "causa_probable": "P",
+            "correccion": "harina de hueso o roca fosfórica al suelo"
+          },
+          {
+            "sintoma": "quemado de bordes hojas medias",
+            "causa_probable": "K",
+            "correccion": "ceniza de madera 100g/planta o sulfato K"
+          },
+          {
+            "sintoma": "tuberización pobre + tubérculos pequeños",
+            "causa_probable": "K + Mg",
+            "correccion": "ceniza + sal de Epsom"
+          }
+        ],
+        "frecuencia_cromatografia": "pre-siembra + tuberización",
+        "referencias_cientificas": [
+          "Pérez, Rodríguez & Gómez 2008, Agronomía Colombiana 26(3): 477-486",
+          "Ñústez & Rodríguez 2024, Editorial UNAL ISBN 9789585054929",
+          "AGROSAVIA Ficha Técnica Sol Andina"
+        ]
+      },
+      "tests_suelo_recomendados": [
+        {
+          "tipo": "ph_casero",
+          "rango_objetivo": "5.5-6.5",
+          "frecuencia": "pre-siembra"
+        },
+        {
+          "tipo": "cromatografia_pfeiffer",
+          "frecuencia": "pre-siembra + tuberización",
+          "objetivo": "verificar actividad microbiana en andisoles; patrón radial esperado: zona interior densa = buena MO; zona exterior con bordes dentados = actividad microbiana activa"
+        },
+        {
+          "tipo": "biotest_lombriz",
+          "frecuencia": "anual",
+          "objetivo": "confirmar vida edáfica; >10 individuos por cuadrante 30x30x20cm indica suelo saludable"
+        },
+        {
+          "tipo": "test_percolacion",
+          "frecuencia": "pre-siembra",
+          "objetivo": "verificar drenaje; agua debe percolar 2.5-5 cm/h en andisoles"
+        }
+      ],
+      "plagas_criticas": [
+        {
+          "nombre_cientifico": "Phthorimaea operculella",
+          "nombre_comun": "Polilla guatemalteca",
+          "umbral_accion": "5% tubérculos dañados en muestreo",
+          "control_biologico": [
+            "asociar minthostachys_mollis a 1m perimetro",
+            "Trichogramma pretiosum sueltas 100mil/ha"
+          ],
+          "control_cultural": [
+            "aporque profundo",
+            "no dejar tubérculos en campo post-cosecha"
+          ]
+        },
+        {
+          "nombre_cientifico": "Premnotrypes vorax",
+          "nombre_comun": "Gusano blanco de la papa",
+          "umbral_accion": "1 adulto/trampa lumínica/semana",
+          "control_biologico": [
+            "trampas con feromona de agregación",
+            "Beauveria bassiana aplicada al suelo"
+          ],
+          "control_cultural": [
+            "rotación estricta 3 años",
+            "barreras físicas en campo"
+          ]
+        }
+      ],
+      "enfermedades_criticas": [
+        {
+          "nombre_cientifico": "Phytophthora infestans",
+          "nombre_comun": "Tizón tardío / Gota",
+          "condiciones_favorables": "HR>80% + temp 15-20°C + lluvia sostenida >3 días",
+          "prevencion": [
+            "rotación 3 años con no-solanáceas",
+            "distanciamiento 1m entre surcos para ventilación",
+            "caldo bordelés preventivo semanal en épocas húmedas"
+          ],
+          "biopreparados_curativos": [
+            {
+              "biopreparado_id": "trichoderma_harzianum_suelo",
+              "dosis": "1kg/ha"
+            },
+            {
+              "biopreparado_id": "bacillus_subtilis_foliar",
+              "dosis": "1L/ha de caldo 10^9 UFC/ml"
+            }
+          ],
+          "riesgo_perdida_pct": "hasta 100% si no se maneja"
+        },
+        {
+          "nombre_cientifico": "Rhizoctonia solani",
+          "nombre_comun": "Costra negra",
+          "condiciones_favorables": "suelos fríos + húmedos + materia orgánica mal descompuesta",
+          "prevencion": [
+            "semilla certificada",
+            "Trichoderma en pre-siembra"
+          ],
+          "biopreparados_curativos": [
+            {
+              "biopreparado_id": "trichoderma_harzianum_suelo"
+            }
+          ]
+        }
+      ],
+      "prompts_ia_externa": {
+        "diagnostico_fitosanitario": "Actúa como fitopatólogo colombiano especializado en solanáceas andinas.\nCultivo: Solanum tuberosum Grupo Phureja (papa criolla), variedad {VARIEDAD}, fase fenológica {FASE}, {DIAS} días desde siembra.\nUbicación: {ALTITUD} msnm, {MUNICIPIO}/{DEPARTAMENTO}, piso térmico frío.\nCondiciones últimos 7 días: HR {HR}%, temperatura media {TEMP}°C, precipitación acumulada {MM}mm.\nSíntomas observados: {USUARIO_DESCRIBE}.\nHistorial de manejo reciente: {ULTIMAS_ACCIONES}.\n\nProcede con diagnóstico diferencial priorizando causas más probables a esta altitud y condiciones. Para cada hipótesis, propón: (a) prueba casera de confirmación, (b) biopreparado agroecológico de tratamiento (NO agroquímicos sintéticos; referir a normativa IFOAM), (c) medida preventiva para ciclos futuros.",
+        "cromatografia_pfeiffer": "Eres experto en cromatografía circular de Pfeiffer aplicada a andisoles colombianos.\nContexto: papa criolla planeada, altitud {ALTITUD} msnm, pH medido {PH}, MO estimada {MO_PCT}%, preparación del cromatograma: {COMO_PREPARO}.\n\nAnaliza por zonas (central, interior, exterior, bordes) patrones radiales, colores y dentaduras. Reporta actividad microbiana, complejo arcillo-húmico, disponibilidad de nutrientes, salud edáfica general. Sugiere 3 enmiendas prioritarias en formato agroecológico con dosis por m2.",
+        "plan_siembra": "Actúa como agrónomo agroecológico colombiano.\nTengo {AREA_M2} m2 a {ALTITUD} msnm en {MUNICIPIO}. Quiero sembrar papa criolla variedad {VARIEDAD} asociada con {COMPAÑEROS}. Fecha planeada de siembra: {FECHA}. Suelo: pH {PH}, textura {TEXTURA}, MO {MO_PCT}%.\n\nDame: (a) marco de plantación óptimo, (b) secuencia de labores con fechas relativas, (c) plan de riego estimado por etapa, (d) plan de fertilización orgánica por etapa, (e) calendario de monitoreo de plagas y enfermedades específico a esta altitud y época del año."
+      },
+      "rol_ecologico": "Cultivo tradicional campesino andino, domesticado hace ~8.000 años en región Titicaca. Clave en soberanía alimentaria andina. Monocultivos degradan andisoles vía pérdida de materia orgánica y ruptura del complejo arcillo-húmico; rotación con leguminosas de altura (haba, chocho, tarwi) es obligatoria para sostenibilidad.",
+      "valor_pedagogico": "Permite enseñar rotaciones, fitosanidad, trofobiosis, soberanía de semilla, asociación con leguminosas fijadoras de nitrógeno, manejo de andisoles andinos.",
+      "saber_origen": {
+        "pueblo": "Pueblos andinos prehispánicos (dispersión Aymara, Quechua, Muisca, Pasto)",
+        "region": "Andes centrales y septentrionales; en Colombia: altiplano cundiboyacense, Nariño, Cauca, Antioquia",
+        "practica_original": "Cultivo en aynokas (turnos comunales rotativos), almacenamiento en pirwa, rotación con chenopodiáceas (quinua) y leguminosas (chocho). Selección participativa de variedades según textura, color de piel y pulpa, sabor.",
+        "validacion_cientifica_source_ids": [
+          "cip-2006-ghislain",
+          "rodriguez-nustez-2009",
+          "agrosavia-sol-andina"
+        ]
+      },
+      "nota_conservacion": null,
+      "confidence_notes": "Umbrales térmicos y altitudinales consolidados contra AGROSAVIA Ficha Técnica Sol Andina y manual Ñústez & Rodríguez 2024. Variaciones por cultivar ±1-2°C en helada letal y ±200 msnm en rangos óptimos. Necesita validación por agrónomo humano antes de deploy ministerial.",
+      "sources_ids": [
+        "agrosavia-sol-andina",
+        "agrosavia-estrella",
+        "agrosavia-alhaja-ica-17702-2019",
+        "nustez-rodriguez-2024-unal",
+        "rodriguez-nustez-estrada-2009",
+        "perez-rodriguez-gomez-2008",
+        "cip-2006-ghislain"
+      ],
+      "harvest_type": "tuberculo",
+      "validation_level": "operator_reviewed"
+    },
+    {
+      "id": "alnus_acuminata",
+      "_curation_status": "VALIDADO con fuentes CIAT/AGROSAVIA",
+      "nombre_comun": "Aliso andino",
+      "nombre_comunes_regionales": [
+        "aliso",
+        "cerezo (cordillera oriental)",
+        "jaul (algunas zonas)"
+      ],
+      "nombre_cientifico": "Alnus acuminata Kunth",
+      "familia_botanica": "Betulaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nitrogen_fixer",
+        "living_fence",
+        "windbreak",
+        "biomass_producer",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "cycleMonths": null,
+      "habito": "arbol deciduo semicaducifolio, 15-25m altura",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 3200,
+        "max_absoluto": 3600
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 8,
+        "optimo_max": 18,
+        "max_tolerable": 24
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "ph_suelo": {
+        "min": 4.5,
+        "optimo_min": 5.5,
+        "optimo_max": 6.8,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno_a_moderado",
+      "companions": [
+        "solanum_phureja",
+        "vicia_faba",
+        "lupinus_mutabilis",
+        "pennisetum_clandestinum_manejado"
+      ],
+      "antagonists": [],
+      "recommended_covers": [
+        "trifolium_repens",
+        "vicia_sativa"
+      ],
+      "recommended_fences": [
+        "sambucus_peruviana",
+        "dodonaea_viscosa"
+      ],
+      "fence_function": [
+        "rompevientos",
+        "delimitacion",
+        "sombra",
+        "refugio_fauna"
+      ],
+      "densidad_siembra_fence_m": 2.5,
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla recolectada de amentos maduros (marzo-mayo en cordillera oriental). Estratificación fría opcional 30 días. Germinación en bandejas con sustrato: 60% tierra negra + 30% arena + 10% compost maduro. Trasplante a bolsa negra 1.5kg a las 6 semanas. Plantación definitiva a los 4-6 meses (altura 30-40cm).",
+        "tiempo_a_establecimiento_dias": 45,
+        "notas": "Actinorrícica: forma nódulos fijadores de N con Frankia alni. Inoculación con suelo de aliso adulto acelera establecimiento.",
+        "fuente": "CIAT 1995 'El aliso (Alnus acuminata) en sistemas silvopastoriles'; Corpoica (AGROSAVIA) varios"
+      },
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol de 15-25m no apto para apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Como cerca viva o sombra puntual. Un solo árbol por huerto pequeño.",
+          "tips": [
+            "Plantar en esquina noroeste para sombra de tarde sin bloqueo solar mañanero",
+            "Podas anuales para mantener forma"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta por tamaño."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Ideal para sistemas silvopastoriles (20-40 árboles/ha) o como linderos entre lotes. Fija 150-300 kg N/ha/año según densidad y edad.",
+          "tips": [
+            "Densidad 10x10m o lindero a 2.5m",
+            "Podas de formación años 2-3 y posteriores cada 3 años"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "ESPECIE CLAVE para restauración de bosque alto andino y bordes de páramo. Nurse plant para especies de sotobosque. Recuperación de taludes degradados.",
+          "tips": [
+            "Plantación asociada a Weinmannia tomentosa y Escallonia paniculata",
+            "Densidad restauración: 1100 individuos/ha (3x3m)",
+            "Protección contra ganado primeros 3 años"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plan_nutricion_base": null,
+      "_nota_nutricion": "Como árbol fijador de N, no requiere plan de fertilización estándar. Aporta N al sistema. Solo monitoreo de P y K en suelos muy pobres durante establecimiento.",
+      "tests_suelo_recomendados": [
+        {
+          "tipo": "ph_casero",
+          "rango_objetivo": "5.5-6.8",
+          "frecuencia": "pre-siembra"
+        },
+        {
+          "tipo": "conteo_nodulos",
+          "frecuencia": "año 1 post-establecimiento",
+          "objetivo": "verificar nodulación por Frankia alni; objetivo >20 nódulos en raíz principal a 30cm profundidad"
+        }
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "prompts_ia_externa": {
+        "plan_restauracion": "Actúa como ecólogo de restauración de bosque alto andino colombiano.\nÁrea: {AREA_HA} ha a {ALTITUD} msnm en {MUNICIPIO}, pendiente {PENDIENTE}%, suelo degradado por {HISTORIAL_USO}. Quiero restaurar con Alnus acuminata como especie nodriza asociada a {ESPECIES_OBJETIVO}.\n\nDiseña: (a) marco de plantación y espaciamiento, (b) secuencia de establecimiento por fases (pioneras 1-3 años, secundarias 3-8 años, climácicas 8+ años), (c) protocolo de protección contra ganado, (d) indicadores de éxito de restauración a 1, 3, 5 años."
+      },
+      "rol_ecologico": "Especie nodriza clave en restauración de bosque alto andino. Fija nitrógeno simbiótico con actinomiceto Frankia alni. Hojas ricas en N mejoran el mantillo. Madera usada tradicionalmente para herramientas, construcciones rurales y leña. Corteza con taninos para curtiembre.",
+      "valor_pedagogico": "Enseña fijación simbiótica de N (con actinomiceto, no rizobio); rol de especies nodrizas en restauración; sistemas silvopastoriles andinos.",
+      "saber_origen": {
+        "pueblo": "Pueblos andinos (uso generalizado Muisca, Pasto, Inga)",
+        "region": "Andes colombianos 1800-3600 msnm",
+        "practica_original": "Uso en linderos tradicionales de aynokas, sombra para ganado, leña, reparación de taludes ribereños. Asociación con cultivos de frío (papa, maíz de altura, haba).",
+        "validacion_cientifica_source_ids": [
+          "ciat-1995-alnus",
+          "agrosavia-silvopastoriles"
+        ]
+      },
+      "nota_conservacion": null,
+      "confidence_notes": "Especie nativa andina ampliamente documentada. Datos consolidados.",
+      "sources_ids": [
+        "ciat-1995-alnus",
+        "agrosavia-silvopastoriles",
+        "humboldt-flora-alto-andina"
+      ],
+      "harvest_type": "biomasa",
+      "validation_level": "operator_reviewed"
+    },
+    {
+      "id": "urtica_dioica",
+      "_curation_status": "VALIDADO con fuentes académicas generales; NOTA: Urtica dioica sensu stricto es europea. En Colombia las especies nativas son Urtica urens y Urtica leptophylla. CONFIRMAR con taxónomo cuál es la que el catálogo actual tiene.",
+      "nombre_comun": "Ortiga",
+      "nombre_comunes_regionales": [
+        "ortiga mayor",
+        "pringamosa (confusión con otras Urticaceae)",
+        "chichicaste (regional)"
+      ],
+      "nombre_cientifico": "Urtica dioica L.",
+      "familia_botanica": "Urticaceae",
+      "_nota_taxonomica": "Urtica dioica L. es nativa de Europa y Asia, naturalizada en Colombia. Especies nativas andinas: Urtica urens L., Urtica leptophylla Kunth, Urtica magellanica Juss. ex Poir. La mayoría de usos tradicionales colombianos corresponden a U. dioica naturalizada y U. urens.",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "dynamic_accumulator",
+        "pest_repellent",
+        "pollinator_attractor",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "cycleMonths": null,
+      "habito": "herbácea perenne 1-2m",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 3000,
+        "max_absoluto": 3500
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "humedad_relativa_pct": {
+        "min": 50,
+        "optimo": 75,
+        "max": 95
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6,
+        "optimo_max": 7.2,
+        "max": 7.8
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "medio",
+      "companions": [
+        "solanum_phureja",
+        "rubus_glaucus",
+        "rosmarinus_officinalis"
+      ],
+      "antagonists": [],
+      "recommended_covers": [
+        "trifolium_repens"
+      ],
+      "recommended_fences": [],
+      "propagation": {
+        "methods": [
+          "semilla",
+          "rizoma",
+          "division_mata"
+        ],
+        "best_method": "rizoma",
+        "protocol_resumen": "Extraer trozos de rizoma de 10-15cm con al menos 2-3 yemas. Plantar a 5cm profundidad en sustrato húmedo rico en MO. Rebrote en 10-15 días. Alternativa: semilla en bandeja (germinación 14-21 días).",
+        "tiempo_a_establecimiento_dias": 30,
+        "notas": "Propagación agresiva: contenerla con barrera física de 30cm profundidad en huertos pequeños."
+      },
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": true,
+          "nota": "Contenedor aislado mín 10L; no dejar rizomas escapar a otros contenedores.",
+          "tips": [
+            "Macerar hojas para purín enzimatico casero",
+            "Cosechar solo hojas jóvenes con guante"
+          ]
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Sector dedicado de 1-2 m2 aislado por barrera física. Producción de purín para todo el huerto.",
+          "tips": [
+            "Cortar a 10cm para rebrote vigoroso",
+            "Secar hojas al aire para té medicinal"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": true,
+          "nota": "Útil como reservorio de fauna benéfica (parasitoides de áfidos).",
+          "tips": [
+            "Sector perimetral; no en camas de producción"
+          ]
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Cultivo dedicado para producción de purín y biomasa. 1000 m2 alimenta purín para 10 ha productivas.",
+          "tips": [
+            "Manejo mecánico de corte; secado para almacenamiento"
+          ]
+        },
+        "restauracion": {
+          "viable": false,
+          "nota": "No es especie nativa colombiana (U. dioica sensu stricto); para restauración preferir U. leptophylla o U. urens."
+        }
+      },
+      "scale_viability": [
+        "apartamento",
+        "huerto_casero",
+        "invernadero_mediano",
+        "produccion"
+      ],
+      "plan_nutricion_base": {
+        "N_ppm": {
+          "general": {
+            "min": 100,
+            "max": 200,
+            "unidad": "ppm"
+          }
+        },
+        "P_ppm": {
+          "general": {
+            "min": 20,
+            "max": 40,
+            "unidad": "ppm"
+          }
+        },
+        "K_ppm": {
+          "general": {
+            "min": 100,
+            "max": 200,
+            "unidad": "ppm"
+          }
+        },
+        "Ca_ppm": {
+          "min": 150,
+          "max": 250,
+          "unidad": "ppm"
+        },
+        "notas": "Acumuladora dinámica de Ca, Fe, Si, K. Requiere MO alta para expresión máxima de compuestos activos (ácido fórmico, histamina, serotonina en pelos urticantes).",
+        "biopreparados_por_etapa": {
+          "establecimiento": [
+            {
+              "biopreparado_id": "compost_maduro",
+              "dosis": "3kg/m2"
+            }
+          ],
+          "crecimiento": [
+            {
+              "biopreparado_id": "te_compost",
+              "dosis": "1:5",
+              "frecuencia_dias": 30
+            }
+          ]
+        },
+        "frecuencia_cromatografia": "anual",
+        "referencias_cientificas": [
+          "Restrepo 1996 ABC de agricultura orgánica y panes de piedra",
+          "Pamplona Roger 2006 Enciclopedia plantas medicinales"
+        ]
+      },
+      "usos_medicinales_tradicionales": [
+        {
+          "uso": "diurético",
+          "parte": "hojas jóvenes en infusión",
+          "validacion": "pendiente curación por farmacognosta"
+        },
+        {
+          "uso": "antiinflamatorio para artritis",
+          "parte": "hojas frescas aplicación tópica controlada",
+          "precaucion": "efecto urticante deseado en tratamientos antiguos; consentimiento del paciente obligatorio"
+        },
+        {
+          "uso": "galactogogo tradicional",
+          "parte": "infusión hojas secas",
+          "validacion": "pendiente"
+        }
+      ],
+      "usos_agroecologicos": [
+        {
+          "uso": "purín enzimático",
+          "preparacion": "1kg hojas frescas en 10L agua lluvia, fermentar 7-10 días tapado",
+          "aplicacion": "diluir 1:10 foliar como estimulante y repelente de pulgones"
+        },
+        {
+          "uso": "macerado antifúngico preventivo",
+          "preparacion": "1kg hojas en 10L agua 24h sin fermentar",
+          "aplicacion": "diluir 1:5 al suelo"
+        },
+        {
+          "uso": "activador de compostaje",
+          "preparacion": "capa 5cm entre capas de compost",
+          "efecto": "acelera mineralización por alto contenido N"
+        }
+      ],
+      "tests_suelo_recomendados": [
+        {
+          "tipo": "ph_casero",
+          "rango_objetivo": "6.0-7.2",
+          "frecuencia": "pre-siembra"
+        },
+        {
+          "tipo": "cromatografia_pfeiffer",
+          "frecuencia": "anual",
+          "objetivo": "verificar salud de suelo rico en MO"
+        }
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "prompts_ia_externa": {
+        "plan_biopreparado": "Actúa como agroecólogo colombiano.\nTengo {M2} m2 de ortiga (Urtica dioica) establecida. Quiero producir purín enzimático para aplicar en {AREA_CULTIVO_HA} ha de {CULTIVO}.\n\nDame (a) cantidad de biomasa a cosechar, (b) protocolo de fermentación paso a paso, (c) dilución y frecuencia de aplicación, (d) efectos esperados y límites del biopreparado (qué SÍ hace vs qué NO hace)."
+      },
+      "rol_ecologico": "Acumuladora dinámica de nutrientes. Atractora de sírfidos (parasitoides de pulgones). Alimento de larvas de mariposas. Planta indicadora de suelos ricos en N.",
+      "valor_pedagogico": "Enseña acumulación dinámica, elaboración de biopreparados caseros, control biológico por reservorio de fauna benéfica.",
+      "saber_origen": {
+        "pueblo": "Uso campesino generalizado en Colombia (introducida en época colonial); uso médico tradicional en múltiples regiones",
+        "region": "Andes colombianos 1500-3500 msnm",
+        "practica_original": "Infusión medicinal, purín para huerta, activador de compost, aplicación tópica para artritis",
+        "validacion_cientifica_source_ids": [
+          "restrepo-1996-abc-agricultura-organica"
+        ]
+      },
+      "nota_conservacion": null,
+      "confidence_notes": "ATENCIÓN: confirmar taxonomía (U. dioica vs U. leptophylla vs U. urens) con agrónomo/botánico antes de distribuir. Los umbrales dados aplican a U. dioica sensu lato; pueden variar para especies nativas andinas.",
+      "sources_ids": [
+        "restrepo-1996-abc-agricultura-organica",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "harvest_type": "hoja",
+      "validation_level": "operator_reviewed"
+    },
+    {
+      "id": "ulex_europaeus",
+      "_curation_status": "VALIDADO con fuentes Humboldt, CAR Cundinamarca, Fundación Natura, Mongabay",
+      "nombre_comun": "Retamo espinoso",
+      "nombre_comunes_regionales": [
+        "retamo",
+        "retamo amarillo"
+      ],
+      "nombre_cientifico": "Ulex europaeus L.",
+      "autor_ano": "Linnaeus, 1753",
+      "publicacion_original": "Species Plantarum 2: 741. 1753",
+      "familia_botanica": "Fabaceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "templado",
+        "frio",
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "invasive"
+      ],
+      "cultivable": false,
+      "conservation_status": "invasor",
+      "habito": "arbusto espinoso 1-3m",
+      "origen": "Europa occidental (Islas Británicas a Iberia)",
+      "clasificacion_uicn": "Entre las 100 peores especies invasoras del mundo (ISSG/UICN)",
+      "normativa_colombiana": [
+        {
+          "norma": "Resolución 684 de 2018 del Ministerio de Ambiente y Desarrollo Sostenible",
+          "alcance": "Lineamientos nacionales para prevención, manejo integral y restauración de áreas afectadas por U. europaeus y Genista monspessulana"
+        },
+        {
+          "norma": "Resolución 7615 de 2009 Secretaría Distrital de Ambiente de Bogotá",
+          "alcance": "Prohíbe uso de retamo espinoso en Distrito Capital"
+        },
+        {
+          "norma": "Protocolo CAR Cundinamarca 2019",
+          "alcance": "Prevención, manejo y control de U. europaeus y Genista monspessulana en jurisdicción CAR"
+        }
+      ],
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2300,
+        "optimo_max": 3200,
+        "max_absoluto": 3500
+      },
+      "impacto_ecologico": "alto",
+      "ecosistemas_afectados": [
+        "bosque_alto_andino",
+        "subparamo",
+        "paramo",
+        "bordes_de_via",
+        "areas_quemadas"
+      ],
+      "mecanismos_invasion": [
+        "Germinación post-fuego masiva (semillas resisten altas temperaturas)",
+        "Banco de semillas persistente hasta 30-40 años en suelo",
+        "Densidad de banco de semillas 109-3.384 semillas/m2 en bordes de matorral (Ocampo-Zuleta & Solorza-Bejarano 2017)",
+        "Reproducción sexual + rebrote vegetativo desde tallos cortados",
+        "Crecimiento rápido (hasta 1m/año) forma matorrales densos que excluyen nativas",
+        "Fijación de N altera composición química del suelo, favoreciendo otras exóticas"
+      ],
+      "metodos_extraccion": [
+        {
+          "metodo": "desenraice_completo",
+          "efectividad": "alta",
+          "costo": "alto",
+          "notas": "Método preferido; requiere extraer TODO el sistema radical para evitar rebrote. Después de quemas el suelo queda blando y facilita extracción manual."
+        },
+        {
+          "metodo": "corte_bajo_repetido",
+          "efectividad": "media",
+          "costo": "medio",
+          "notas": "Corte a ras de suelo cada 3-4 meses por 2-3 años; agota reservas; NO funciona solo (rebrote garantizado)"
+        },
+        {
+          "metodo": "solarizacion",
+          "efectividad": "baja",
+          "costo": "medio",
+          "notas": "Solo efectiva en plántulas; semillas profundas resisten"
+        },
+        {
+          "metodo": "fuego_controlado",
+          "efectividad": "NEGATIVA",
+          "costo": "bajo",
+          "notas": "PROHIBIDO: el fuego detona germinación masiva del banco de semillas y empeora la invasión. Evidencia Mongabay 2024."
+        }
+      ],
+      "epoca_optima_remocion": "Temporada seca (diciembre-febrero altiplano; junio-agosto Nariño) ANTES de floración (para evitar dispersión de semillas). Evitar corte en floración o fructificación.",
+      "especies_nativas_sustitutas": [
+        "alnus_acuminata",
+        "escallonia_paniculata",
+        "weinmannia_tomentosa",
+        "miconia_squamulosa",
+        "sambucus_peruviana"
+      ],
+      "manejo_biomasa_extraida": "incineracion_controlada",
+      "_nota_manejo_biomasa": "Compostaje NO recomendado: semillas sobreviven temperaturas de compost doméstico. Incineración controlada en sitio autorizado o disposición en relleno sanitario con trituración previa. NUNCA dispersar en bosque o páramo.",
+      "riesgo_rebrote": "altisimo",
+      "protocolo_post_remocion": "Restauración activa obligatoria: siembra de especies nativas sustitutas en densidad 1100 ind/ha al siguiente semestre lluvioso. Monitoreo de rebrote semestral por 5 años. Corte inmediato de cualquier rebrote antes de 50cm altura.",
+      "foto_referencia_sugerida": "https://commons.wikimedia.org/wiki/Category:Ulex_europaeus",
+      "prompts_ia_externa": {
+        "plan_remocion": "Actúa como ecólogo de restauración colombiano.\nÁrea: {AREA_HA} ha invadida por Ulex europaeus en {MUNICIPIO} a {ALTITUD} msnm, densidad de matorral {DENSIDAD} (disperso/moderado/denso/muy_denso), pendiente {PENDIENTE}%, sin/con historia reciente de fuego.\n\nDiseña plan de 5 años: (a) método de extracción por zona, (b) disposición de biomasa, (c) especies nativas sustitutas con densidades, (d) calendario de monitoreo y control de rebrotes, (e) indicadores de éxito año 1, 3, 5."
+      },
+      "referencias_cientificas": [
+        "Ocampo-Zuleta, K. & Solorza-Bejarano, J. 2017. Banco de semillas de retamo espinoso en bosque altoandino. Biota Colombiana 18(supl 1): 89-98",
+        "Calderón-Sáenz 2003. Las especies invasoras en Colombia (diez peores)",
+        "Mongabay Colombia 2024. Retamo espinoso y áreas quemadas",
+        "CAR Cundinamarca 2019. Protocolo prevención manejo control Ulex europaeus y Genista monspessulana",
+        "Fundación Natura 2024. Experiencia piloto control retamo espinoso en Guasca"
+      ],
+      "sources_ids": [
+        "ocampo-solorza-2017",
+        "car-cundi-2019",
+        "res-684-2018-mads",
+        "mongabay-retamo-2024"
+      ],
+      "validation_level": "operator_reviewed"
+    },
+    {
+      "id": "cenchrus_clandestinus",
+      "_curation_status": "VALIDADO; nombre taxonómico actualizado (previamente Pennisetum clandestinum)",
+      "nombre_comun": "Kikuyo",
+      "nombre_comunes_regionales": [
+        "kikuyo",
+        "cundo",
+        "pasto kikuyo",
+        "pasto africano"
+      ],
+      "nombre_cientifico": "Cenchrus clandestinus (Hochst. ex Chiov.) Morrone",
+      "_nombre_cientifico_anterior": "Pennisetum clandestinum Hochst. ex Chiov., 1903",
+      "autor_ano": "Hochst. ex Chiov. 1903 → reubicado en Cenchrus por Morrone 2010",
+      "familia_botanica": "Poaceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "invasive",
+        "ground_cover"
+      ],
+      "cultivable": false,
+      "_nota_cultivable": "PARADOJA COLOMBIANA: es la gramínea forrajera más importante del trópico alto (>2200 msnm) para ganadería de leche. Simultáneamente es invasora crítica en páramos y bosques altoandinos. Uso legal en potreros, prohibido/indeseable en áreas de restauración y delimitación de páramo (Ley 1930/2018).",
+      "conservation_status": "invasor",
+      "habito": "gramínea perenne postrada con estolones y rizomas agresivos",
+      "origen": "África oriental (altiplanos Kenia, Etiopía, Uganda, Rwanda, Tanzania, Zaire)",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 3200,
+        "max_absoluto": 3600
+      },
+      "impacto_ecologico": "alto (en páramo) / uso forrajero (en potreros bajo manejo)",
+      "ecosistemas_afectados": [
+        "paramo",
+        "subparamo",
+        "bosque_alto_andino",
+        "humedales_altoandinos"
+      ],
+      "mecanismos_invasion": [
+        "Estolones rápidos forman matas densas que excluyen nativas",
+        "Rizomas penetran suelo y son difíciles de extraer",
+        "Semillas viables hasta 10 años en el suelo",
+        "Dispersión vía tubo digestivo del ganado",
+        "Responde a fertilización nitrogenada (de origen natural o agropecuario)",
+        "Desplaza a Calamagrostis effusa y otros pastizales nativos de páramo"
+      ],
+      "metodos_extraccion": [
+        {
+          "metodo": "desenraice_completo",
+          "efectividad": "alta",
+          "costo": "alto",
+          "notas": "Requiere extraer estolones y rizomas completos; suelos pedregosos dificultan. Herramienta: azadón de péndulo."
+        },
+        {
+          "metodo": "solarizacion",
+          "efectividad": "media",
+          "costo": "medio",
+          "notas": "6-8 semanas bajo plástico negro en temporada seca; efectivo en parches pequeños"
+        },
+        {
+          "metodo": "corte_bajo_repetido",
+          "efectividad": "baja",
+          "costo": "bajo",
+          "notas": "NO suficiente por sí solo; requiere acompañamiento de siembra de nativas"
+        }
+      ],
+      "epoca_optima_remocion": "Temporada seca, antes de floración y semillación",
+      "especies_nativas_sustitutas": [
+        "calamagrostis_effusa",
+        "festuca_sp_paramo",
+        "agrostis_foliata"
+      ],
+      "manejo_biomasa_extraida": "compostaje en condiciones termófilas >60°C por >3 semanas (destruye semillas) O incineracion_controlada",
+      "riesgo_rebrote": "alto",
+      "foto_referencia_sugerida": "https://commons.wikimedia.org/wiki/Category:Cenchrus_clandestinus",
+      "referencias_cientificas": [
+        "Correa, Pabón & Carulla 2008. Valor nutricional del kikuyo. Livestock Research for Rural Development 20(59)",
+        "Mila & Corredor 2004. Evolución composición botánica pradera kikuyo. Corpoica 5(1): 70-75",
+        "Portillo et al. 2019. Evaluación forrajeras Nariño. AGROSAVIA"
+      ],
+      "sources_ids": [
+        "correa-pabon-carulla-2008",
+        "agrosavia-forrajeras-2022"
+      ],
+      "validation_level": "operator_reviewed"
+    },
+    {
+      "id": "thunbergia_alata",
+      "_curation_status": "CURACIÓN BÁSICA; datos de invasividad en Colombia confirmados; protocolo de manejo requiere fuente primaria específica",
+      "nombre_comun": "Ojo de poeta",
+      "nombre_comunes_regionales": [
+        "ojo de poeta",
+        "susan de ojos negros",
+        "trinitaria"
+      ],
+      "nombre_cientifico": "Thunbergia alata Bojer ex Sims",
+      "autor_ano": "Bojer ex Sims, 1825",
+      "familia_botanica": "Acanthaceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "invasive"
+      ],
+      "cultivable": false,
+      "_nota_cultivable": "Introducida y usada como ornamental en muchas ciudades andinas; se ha escapado a ambientes naturales y es invasora en bosque alto andino y borde de subpáramo.",
+      "conservation_status": "invasor",
+      "origen": "África oriental y austral",
+      "habito": "trepadora herbácea perenne 2-8m",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 3000,
+        "max_absoluto": 3300
+      },
+      "impacto_ecologico": "alto",
+      "ecosistemas_afectados": [
+        "bosque_alto_andino",
+        "subparamo",
+        "bordes_bosque_niebla",
+        "cercos_vivos_urbanos"
+      ],
+      "mecanismos_invasion": [
+        "Crecimiento trepador rápido que cubre y asfixia vegetación nativa",
+        "Producción masiva de semillas",
+        "Dispersión por aves (endozoocoria)",
+        "Regeneración vegetativa por trozos de tallo",
+        "Asfixia de sotobosque al formar dosel denso"
+      ],
+      "metodos_extraccion": [
+        {
+          "metodo": "desenraice_completo",
+          "efectividad": "alta",
+          "costo": "medio"
+        },
+        {
+          "metodo": "corte_bajo_repetido",
+          "efectividad": "media",
+          "costo": "bajo",
+          "notas": "Debe combinarse con extracción de raíz para evitar rebrote"
+        }
+      ],
+      "epoca_optima_remocion": "Antes de floración (temporada seca local)",
+      "especies_nativas_sustitutas_trepadoras": [
+        "passiflora_tripartita_mollissima_NATIVA",
+        "bomarea_sp"
+      ],
+      "manejo_biomasa_extraida": "compostaje_termofilico O incineracion_controlada",
+      "riesgo_rebrote": "alto",
+      "foto_referencia_sugerida": "https://commons.wikimedia.org/wiki/Category:Thunbergia_alata",
+      "sources_ids": [
+        "humboldt-invasoras-andes"
+      ],
+      "validation_level": "operator_reviewed"
+    },
+    {
+      "id": "pteridium_aquilinum",
+      "_curation_status": "CURACIÓN BÁSICA",
+      "nombre_comun": "Helecho marranero",
+      "nombre_comunes_regionales": [
+        "helecho marranero",
+        "helecho águila",
+        "helecho común"
+      ],
+      "nombre_cientifico": "Pteridium aquilinum (L.) Kuhn",
+      "autor_ano": "Kuhn, 1879 (combinación); L. 1753 como Pteris aquilina",
+      "familia_botanica": "Dennstaedtiaceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "templado",
+        "frio",
+        "paramo"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "invasive"
+      ],
+      "cultivable": false,
+      "conservation_status": "invasor",
+      "_nota_conservacion": "Especie con distribución cosmopolita; en Colombia se comporta como invasor agresivo post-disturbio. Tóxica para ganado y potencialmente cancerígena (ptaquiloside).",
+      "habito": "helecho rizomatoso 0.5-2m",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 1500,
+        "optimo_max": 3500,
+        "max_absoluto": 4000
+      },
+      "impacto_ecologico": "alto",
+      "ecosistemas_afectados": [
+        "bosque_alto_andino",
+        "subparamo",
+        "paramo_intervenido",
+        "potreros_degradados",
+        "cicatrices_fuego"
+      ],
+      "mecanismos_invasion": [
+        "Rizomas profundos (hasta 1m) y extensos resistentes a remoción",
+        "Producción masiva de esporas con dispersión eólica de larga distancia",
+        "Alelopatía inhibe germinación de nativas",
+        "Tolerancia al fuego; rebrota desde rizoma",
+        "Compuestos tóxicos (ptaquiloside, tiaminasa) desalientan herbivoría"
+      ],
+      "metodos_extraccion": [
+        {
+          "metodo": "desenraice_completo",
+          "efectividad": "media",
+          "costo": "alto",
+          "notas": "Rizomas profundos y extensos dificultan extracción total"
+        },
+        {
+          "metodo": "corte_bajo_repetido",
+          "efectividad": "alta",
+          "costo": "medio",
+          "notas": "Corte mensual durante 2-3 temporadas agota reservas del rizoma"
+        },
+        {
+          "metodo": "sombra_forzada",
+          "efectividad": "alta",
+          "costo": "alto",
+          "notas": "Plantación de especies arbóreas nativas que den sombra densa; el helecho es intolerante a sombra"
+        }
+      ],
+      "epoca_optima_remocion": "Previo a formación de frondes maduras (temporada lluviosa temprana)",
+      "especies_nativas_sustitutas": [
+        "alnus_acuminata",
+        "weinmannia_tomentosa",
+        "miconia_squamulosa"
+      ],
+      "manejo_biomasa_extraida": "incineracion_controlada O entierro_profundo",
+      "_nota_manejo": "Evitar contacto prolongado sin protección (esporas potencialmente cancerígenas). No usar como forraje ni cama para ganado.",
+      "riesgo_rebrote": "muy_alto",
+      "foto_referencia_sugerida": "https://commons.wikimedia.org/wiki/Category:Pteridium_aquilinum",
+      "sources_ids": [
+        "flora-colombia-pteridophyta"
+      ],
+      "validation_level": "operator_reviewed"
+    }
+  ],
+  "biopreparados": [
+    {
+      "id": "bocashi",
+      "nombre": "Bocashi",
+      "tipo": "fermentado",
+      "proposito": [
+        "fertilizacion",
+        "estimulante_microbiano"
+      ],
+      "ingredientes": [
+        "gallinaza",
+        "cascarilla de arroz",
+        "tierra de capote",
+        "carbón vegetal triturado",
+        "afrecho",
+        "melaza",
+        "levadura",
+        "agua"
+      ],
+      "proceso_resumen": "Fermentación aeróbica 15-21 días con volteo diario hasta bajar temperatura a <40°C. Humedad 'prueba de puño': al apretar un puñado, el agua no gotea pero la mano queda húmeda.",
+      "tiempo_elaboracion_dias": 18,
+      "vida_util_dias": 180,
+      "source_ids": [
+        "restrepo-1996-bocashi",
+        "agrosavia-manual-biopreparados-2015"
+      ]
+    },
+    {
+      "id": "biol",
+      "nombre": "Biol",
+      "tipo": "fermentado",
+      "proposito": [
+        "fertilizacion",
+        "estimulante_microbiano"
+      ],
+      "ingredientes": [
+        "estiércol fresco (vaca/cabra)",
+        "leche o suero",
+        "melaza",
+        "ceniza",
+        "agua",
+        "roca fosfórica (opcional)"
+      ],
+      "proceso_resumen": "Fermentación anaeróbica 30-45 días en biodigestor o caneca sellada con válvula de gases. Aplicación foliar diluido 1:10.",
+      "tiempo_elaboracion_dias": 40,
+      "vida_util_dias": 180,
+      "source_ids": [
+        "restrepo-1996-bocashi"
+      ]
+    },
+    {
+      "id": "purin_ortiga",
+      "nombre": "Purín de ortiga",
+      "tipo": "fermentado",
+      "proposito": [
+        "fertilizacion",
+        "repelente_insectos",
+        "fitosanitario_preventivo"
+      ],
+      "ingredientes": [
+        "ortiga fresca 1kg",
+        "agua 10L"
+      ],
+      "proceso_resumen": "Fermentación anaeróbica 10-14 días (cuando deja de espumar, está listo). Rico en Fe, Si, N. Aplicación foliar 1:10.",
+      "tiempo_elaboracion_dias": 12,
+      "vida_util_dias": 60,
+      "source_ids": [
+        "restrepo-1996-bocashi"
+      ]
+    },
+    {
+      "id": "caldo_sulfocalcico",
+      "nombre": "Caldo sulfocálcico",
+      "tipo": "caldo",
+      "proposito": [
+        "fitosanitario_preventivo",
+        "fitosanitario_curativo"
+      ],
+      "ingredientes": [
+        "azufre elemental",
+        "cal viva o hidratada",
+        "agua"
+      ],
+      "proceso_resumen": "Cocción de azufre + cal 2:1 en 10L agua por 45-60 min hasta color ámbar. Aplicación foliar 1:100 preventivo, 1:20 curativo. Evitar en frutales durante floración.",
+      "tiempo_elaboracion_dias": 1,
+      "vida_util_dias": 180,
+      "source_ids": [
+        "restrepo-1996-bocashi"
+      ]
+    },
+    {
+      "id": "caldo_bordeles",
+      "nombre": "Caldo bordelés",
+      "tipo": "caldo",
+      "proposito": [
+        "fitosanitario_preventivo"
+      ],
+      "ingredientes": [
+        "sulfato de cobre",
+        "cal hidratada",
+        "agua"
+      ],
+      "proceso_resumen": "100g sulfato + 100g cal en 10L agua, pH neutralizado (lámina de hierro no oxida). Aplicación foliar preventiva contra hongos (Phytophthora, mildius). No mezclar con otros.",
+      "tiempo_elaboracion_dias": 1,
+      "vida_util_dias": 1,
+      "source_ids": [
+        "agrosavia-manual-biopreparados-2015"
+      ]
+    },
+    {
+      "id": "te_compost",
+      "nombre": "Té de compost",
+      "tipo": "extracto",
+      "proposito": [
+        "fertilizacion",
+        "estimulante_microbiano",
+        "fitosanitario_preventivo"
+      ],
+      "ingredientes": [
+        "compost maduro 1kg",
+        "agua declorada 10L",
+        "melaza 2 cucharadas"
+      ],
+      "proceso_resumen": "Aeración con bomba de pecera 24-36h. Uso dentro de 4h post-preparación. Aplicación foliar 1:5 o riego al pie 1:10.",
+      "tiempo_elaboracion_dias": 1,
+      "vida_util_dias": 1,
+      "source_ids": [
+        "ingham-2000-compost-tea"
+      ]
+    },
+    {
+      "id": "humus_liquido",
+      "nombre": "Humus líquido (lixiviado de lombriz)",
+      "tipo": "extracto",
+      "proposito": [
+        "fertilizacion",
+        "estimulante_microbiano"
+      ],
+      "ingredientes": [
+        "humus de lombriz",
+        "agua"
+      ],
+      "proceso_resumen": "Lixiviado por percolación 1kg humus/5L agua durante 24h. Aplicación foliar 1:10 o riego 1:5.",
+      "tiempo_elaboracion_dias": 1,
+      "vida_util_dias": 15,
+      "source_ids": [
+        "agrosavia-manual-biopreparados-2015"
+      ]
+    },
+    {
+      "id": "lixiviado_frutas",
+      "nombre": "Lixiviado de frutas",
+      "tipo": "fermentado",
+      "proposito": [
+        "fertilizacion"
+      ],
+      "ingredientes": [
+        "cáscaras y pulpas de frutas maduras",
+        "melaza",
+        "agua"
+      ],
+      "proceso_resumen": "Fermentación aeróbica 20-30 días con revolver semanal. Rica en K y micronutrientes. Aplicación foliar 1:20 en fase reproductiva.",
+      "tiempo_elaboracion_dias": 25,
+      "vida_util_dias": 120,
+      "source_ids": [
+        "restrepo-1996-bocashi"
+      ]
+    },
+    {
+      "id": "supermagro",
+      "nombre": "Supermagro",
+      "tipo": "fermentado",
+      "proposito": [
+        "fertilizacion",
+        "estimulante_microbiano"
+      ],
+      "ingredientes": [
+        "estiércol vaca",
+        "leche",
+        "melaza",
+        "sulfatos minerales (Mg, Zn, Mn, Cu, Fe, B, Co)",
+        "agua"
+      ],
+      "proceso_resumen": "Fermentación anaeróbica 90 días con adición escalonada de sulfatos minerales cada 7 días. Corrige micronutrientes. Aplicación foliar 1:20.",
+      "tiempo_elaboracion_dias": 90,
+      "vida_util_dias": 365,
+      "source_ids": [
+        "restrepo-1996-bocashi"
+      ]
+    },
+    {
+      "id": "trichoderma_harzianum_suelo",
+      "nombre": "Trichoderma harzianum (aplicación al suelo)",
+      "tipo": "microbiano",
+      "proposito": [
+        "fitosanitario_preventivo",
+        "estimulante_microbiano"
+      ],
+      "ingredientes": [
+        "cepa T. harzianum propagada en sustrato sólido (arroz/afrecho)"
+      ],
+      "proceso_resumen": "Aplicación 1kg/ha mezclado con compost maduro, incorporado en los primeros 10cm del suelo. Control biológico de Rhizoctonia, Fusarium, Sclerotinia.",
+      "tiempo_elaboracion_dias": 21,
+      "vida_util_dias": 90,
+      "source_ids": [
+        "cenicafe-trichoderma-2010"
+      ]
+    },
+    {
+      "id": "bacillus_subtilis_foliar",
+      "nombre": "Bacillus subtilis (aplicación foliar)",
+      "tipo": "microbiano",
+      "proposito": [
+        "fitosanitario_preventivo",
+        "fitosanitario_curativo"
+      ],
+      "ingredientes": [
+        "cepa B. subtilis en suspensión 10^9 UFC/ml"
+      ],
+      "proceso_resumen": "Aplicación foliar 1L/ha cada 7-10 días. Control de Botrytis, Alternaria, Monilia. Compatible con caldos minerales.",
+      "tiempo_elaboracion_dias": 14,
+      "vida_util_dias": 30,
+      "source_ids": [
+        "agrosavia-bacillus-2018"
+      ]
+    },
+    {
+      "id": "cal_dolomita",
+      "nombre": "Cal dolomítica",
+      "tipo": "mineral",
+      "proposito": [
+        "enmienda_ph",
+        "enmienda_ca"
+      ],
+      "ingredientes": [
+        "CaMg(CO3)2 molido"
+      ],
+      "proceso_resumen": "Aplicación directa al suelo antes de siembra, dosis según análisis (típicamente 500-2000 kg/ha para subir pH 0.5 puntos).",
+      "tiempo_elaboracion_dias": 0,
+      "vida_util_dias": 730,
+      "source_ids": [
+        "ica-fertilizantes-2019"
+      ]
+    },
+    {
+      "id": "roca_fosforica",
+      "nombre": "Roca fosfórica",
+      "tipo": "mineral",
+      "proposito": [
+        "enmienda_p",
+        "fertilizacion"
+      ],
+      "ingredientes": [
+        "apatita (Ca5(PO4)3(F,Cl,OH)) molida"
+      ],
+      "proceso_resumen": "Aplicación pre-siembra, dosis 500-1000 kg/ha. Liberación lenta de P, requiere suelos ácidos (pH<5.5) para solubilizar, o compostaje previo con ácidos orgánicos.",
+      "tiempo_elaboracion_dias": 0,
+      "vida_util_dias": 730,
+      "source_ids": [
+        "ica-fertilizantes-2019"
+      ]
+    },
+    {
+      "id": "ceniza_madera",
+      "nombre": "Ceniza de madera",
+      "tipo": "mineral",
+      "proposito": [
+        "fertilizacion",
+        "enmienda_ph"
+      ],
+      "ingredientes": [
+        "ceniza de madera dura no tratada"
+      ],
+      "proceso_resumen": "Aplicación al pie o incorporada 100-200 g/planta. Rica en K, Ca. Alcalinizante; no usar en suelos con pH>6.5 ni en cultivos acidófilos (arándano, té).",
+      "tiempo_elaboracion_dias": 0,
+      "vida_util_dias": 730,
+      "source_ids": [
+        "restrepo-1996-bocashi"
+      ]
+    },
+    {
+      "id": "compost_maduro",
+      "nombre": "Compost maduro",
+      "tipo": "fermentado",
+      "proposito": [
+        "fertilizacion",
+        "estimulante_microbiano"
+      ],
+      "ingredientes": [
+        "residuos vegetales",
+        "estiércol maduro",
+        "ceniza",
+        "tierra de bosque"
+      ],
+      "proceso_resumen": "Compostaje aeróbico por pila con volteos cada 7 días durante 90-120 días. Maduro cuando baja a temperatura ambiente, color oscuro, olor a tierra fresca.",
+      "tiempo_elaboracion_dias": 100,
+      "vida_util_dias": 365,
+      "source_ids": [
+        "restrepo-1996-bocashi",
+        "agrosavia-manual-biopreparados-2015"
+      ]
+    },
+    {
+      "id": "biofertilizante_algas",
+      "nombre": "Biofertilizante de algas marinas",
+      "tipo": "extracto",
+      "proposito": [
+        "fertilizacion",
+        "estimulante_microbiano"
+      ],
+      "ingredientes": [
+        "algas marinas secas (Ascophyllum/Sargassum/Ecklonia)"
+      ],
+      "proceso_resumen": "Extracto hidrolizado alcalino o ácido. Aplicación foliar 1:500. Fuente de citoquininas, auxinas, oligoelementos. Estimulante de enraizamiento.",
+      "tiempo_elaboracion_dias": 0,
+      "vida_util_dias": 365,
+      "source_ids": [
+        "khan-2009-seaweed-extracts"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "agrosavia-sol-andina",
+      "tipo": "ficha_tecnica_institucional",
+      "autores": "AGROSAVIA",
+      "año": 2016,
+      "titulo": "Ficha técnica Sol Andina — papa criolla Grupo Phureja",
+      "institucion": "Corporación Colombiana de Investigación Agropecuaria (AGROSAVIA)",
+      "url": "https://www.agrosavia.co"
+    },
+    {
+      "id": "agrosavia-estrella",
+      "tipo": "ficha_tecnica_institucional",
+      "autores": "AGROSAVIA",
+      "año": 2018,
+      "titulo": "Ficha técnica Estrella — papa criolla",
+      "institucion": "AGROSAVIA"
+    },
+    {
+      "id": "agrosavia-alhaja-ica-17702-2019",
+      "tipo": "resolucion_oficial",
+      "autores": "ICA — Instituto Colombiano Agropecuario",
+      "año": 2019,
+      "titulo": "Resolución 00017702 de 2019 — Registro variedad AGROSAVIA Alhaja",
+      "institucion": "ICA"
+    },
+    {
+      "id": "nustez-rodriguez-2024-unal",
+      "tipo": "libro",
+      "autores": "Ñústez, C.E.; Rodríguez, L.E.",
+      "año": 2024,
+      "titulo": "Papa criolla Grupo Phureja, manual de recomendaciones técnicas para Cundinamarca",
+      "revista_o_editorial": "Editorial Universidad Nacional de Colombia",
+      "isbn": "9789585054929"
+    },
+    {
+      "id": "rodriguez-nustez-estrada-2009",
+      "tipo": "articulo_revista",
+      "autores": "Rodríguez, L.E.; Ñústez, C.E.; Estrada, N.",
+      "año": 2009,
+      "titulo": "Variedades colombianas de papa criolla (Solanum phureja Juz. et Buk.)",
+      "revista_o_editorial": "Agronomía Colombiana",
+      "volumen_numero": "27(3)",
+      "paginas": "289-303"
+    },
+    {
+      "id": "perez-rodriguez-gomez-2008",
+      "tipo": "articulo_revista",
+      "autores": "Pérez, L.; Rodríguez, L.E.; Gómez, M.I.",
+      "año": 2008,
+      "titulo": "Plan de fertilización de la papa criolla en el altiplano cundiboyacense",
+      "revista_o_editorial": "Agronomía Colombiana",
+      "volumen_numero": "26(3)",
+      "paginas": "477-486"
+    },
+    {
+      "id": "cip-2006-ghislain",
+      "tipo": "articulo_revista",
+      "autores": "Ghislain, M.; Andrade, D.; Rodríguez, F.; Hijmans, R.J.; Spooner, D.M.",
+      "año": 2006,
+      "titulo": "Genetic analysis of the cultivated potato Solanum tuberosum L. Phureja Group using RAPDs",
+      "institucion": "CIP — International Potato Center"
+    },
+    {
+      "id": "calderon-saenz-2003-invasoras",
+      "tipo": "articulo_revista",
+      "autores": "Calderón-Sáenz, E.",
+      "año": 2003,
+      "titulo": "Las especies invasoras en Colombia (diez peores)",
+      "revista_o_editorial": "Biota Colombiana"
+    },
+    {
+      "id": "humboldt-2016-frailejones",
+      "tipo": "libro",
+      "autores": "Instituto Alexander von Humboldt",
+      "año": 2016,
+      "titulo": "Frailejones de Colombia — Espeletiinae",
+      "institucion": "Instituto de Investigación de Recursos Biológicos Alexander von Humboldt",
+      "url": "https://www.humboldt.org.co"
+    },
+    {
+      "id": "diazgranados-2012-espeletiinae",
+      "tipo": "articulo_revista",
+      "autores": "Diazgranados, M.",
+      "año": 2012,
+      "titulo": "A nomenclator for the frailejones (Espeletiinae Cuatrec., Asteraceae)",
+      "revista_o_editorial": "PhytoKeys",
+      "volumen_numero": "16",
+      "paginas": "1-52",
+      "doi": "10.3897/phytokeys.16.3186"
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "tipo": "libro",
+      "autores": "Cárdenas-López, D.; Salinas, N.R. (eds.)",
+      "año": 2006,
+      "titulo": "Libro Rojo de Plantas de Colombia. Volumen 4 — Especies maderables amenazadas (y volúmenes sucesivos)",
+      "institucion": "Instituto Amazónico de Investigaciones Científicas SINCHI / Instituto Humboldt / MADS"
+    },
+    {
+      "id": "mads-res-383-2010",
+      "tipo": "resolucion_oficial",
+      "autores": "Ministerio de Ambiente y Desarrollo Sostenible (MADS)",
+      "año": 2010,
+      "titulo": "Resolución 383 de 2010 — Listado de especies silvestres amenazadas de la diversidad biológica colombiana",
+      "institucion": "MADS Colombia"
+    },
+    {
+      "id": "ley-1930-2018-paramos",
+      "tipo": "resolucion_oficial",
+      "autores": "Congreso de la República de Colombia",
+      "año": 2018,
+      "titulo": "Ley 1930 de 2018 — Por medio de la cual se dictan disposiciones para la gestión integral de los páramos en Colombia",
+      "institucion": "República de Colombia"
+    },
+    {
+      "id": "uicn-red-list",
+      "tipo": "lista_uicn",
+      "autores": "IUCN — International Union for Conservation of Nature",
+      "año": null,
+      "titulo": "The IUCN Red List of Threatened Species",
+      "url": "https://www.iucnredlist.org"
+    },
+    {
+      "id": "powo-kew",
+      "tipo": "base_datos",
+      "autores": "Royal Botanic Gardens, Kew",
+      "año": null,
+      "titulo": "Plants of the World Online (POWO)",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-colombia",
+      "tipo": "base_datos",
+      "autores": "GBIF Secretariat / SiB Colombia",
+      "año": null,
+      "titulo": "GBIF — Global Biodiversity Information Facility (datos de ocurrencia en Colombia)",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "sib-colombia",
+      "tipo": "base_datos",
+      "autores": "Sistema de Información sobre Biodiversidad de Colombia",
+      "año": null,
+      "titulo": "SiB Colombia — Catálogo de la biodiversidad de Colombia",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "restrepo-1996-bocashi",
+      "tipo": "libro",
+      "autores": "Restrepo, J.",
+      "año": 1996,
+      "titulo": "Abonos orgánicos fermentados — experiencias de agricultores en Centroamérica y Brasil",
+      "revista_o_editorial": "OIT"
+    },
+    {
+      "id": "agrosavia-manual-biopreparados-2015",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": 2015,
+      "titulo": "Manual de biopreparados para la agricultura colombiana",
+      "institucion": "AGROSAVIA"
+    },
+    {
+      "id": "ingham-2000-compost-tea",
+      "tipo": "manual_tecnico",
+      "autores": "Ingham, E.R.",
+      "año": 2000,
+      "titulo": "The Compost Tea Brewing Manual",
+      "revista_o_editorial": "Soil Foodweb Inc.",
+      "observaciones": "Fuente internacional; validada contra condiciones colombianas por AGROSAVIA 2015."
+    },
+    {
+      "id": "cenicafe-trichoderma-2010",
+      "tipo": "manual_tecnico",
+      "autores": "Cenicafé",
+      "año": 2010,
+      "titulo": "Uso de Trichoderma spp. en el manejo integrado de enfermedades del café",
+      "institucion": "Centro Nacional de Investigaciones de Café (Cenicafé)"
+    },
+    {
+      "id": "agrosavia-bacillus-2018",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": 2018,
+      "titulo": "Control biológico con Bacillus subtilis en cultivos hortícolas andinos",
+      "institucion": "AGROSAVIA"
+    },
+    {
+      "id": "ica-fertilizantes-2019",
+      "tipo": "manual_tecnico",
+      "autores": "ICA — Instituto Colombiano Agropecuario",
+      "año": 2019,
+      "titulo": "Guía de uso racional de fertilizantes y enmiendas en Colombia",
+      "institucion": "ICA"
+    },
+    {
+      "id": "khan-2009-seaweed-extracts",
+      "tipo": "articulo_revista",
+      "autores": "Khan, W.; Rayirath, U.P.; Subramanian, S.; et al.",
+      "año": 2009,
+      "titulo": "Seaweed extracts as biostimulants of plant growth and development",
+      "revista_o_editorial": "Journal of Plant Growth Regulation",
+      "volumen_numero": "28(4)",
+      "paginas": "386-399",
+      "doi": "10.1007/s00344-009-9103-x"
+    },
+    {
+      "id": "ifoam-normativa-organica",
+      "tipo": "manual_tecnico",
+      "autores": "IFOAM — Organics International",
+      "año": null,
+      "titulo": "IFOAM Norms for Organic Production and Processing",
+      "url": "https://www.ifoam.bio/our-work/how/standards-certification/organic-guarantee-system/ifoam-norms"
+    },
+    {
+      "id": "agrosavia-tibaitata",
+      "tipo": "base_datos",
+      "autores": "AGROSAVIA",
+      "año": null,
+      "titulo": "Centro de Investigación Tibaitatá — publicaciones sobre cultivos andinos y altoandinos",
+      "institucion": "AGROSAVIA",
+      "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1"
+    },
+    {
+      "id": "cip-potatoes-americas",
+      "tipo": "base_datos",
+      "autores": "International Potato Center (CIP)",
+      "año": null,
+      "titulo": "Catalogue of potato varieties and germplasm collections",
+      "institucion": "CIP",
+      "url": "https://cipotato.org"
+    },
+    {
+      "id": "sinchi-amazonia-colombiana",
+      "tipo": "base_datos",
+      "autores": "Instituto SINCHI",
+      "año": null,
+      "titulo": "Publicaciones científicas sobre especies de la Amazonía colombiana",
+      "institucion": "Instituto Amazónico de Investigaciones Científicas SINCHI"
+    },
+    {
+      "id": "fao-ecocrop",
+      "tipo": "base_datos",
+      "autores": "FAO",
+      "año": null,
+      "titulo": "EcoCrop — Crop Environmental Requirements Database",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "issg-uicn-invasoras",
+      "tipo": "lista_uicn",
+      "autores": "ISSG — Invasive Species Specialist Group (UICN)",
+      "año": null,
+      "titulo": "Global Invasive Species Database — 100 of the World's Worst Invasive Alien Species",
+      "url": "http://www.iucngisd.org"
+    },
+    {
+      "id": "rodriguez-nustez-2009",
+      "tipo": "articulo_revista",
+      "autores": "Rodríguez, L.E.; Ñústez, C.E.",
+      "año": 2009,
+      "titulo": "(Variante de cita usada en v3.0; curadura pendiente — probablemente idéntica a rodriguez-nustez-estrada-2009)",
+      "observaciones": "STUB migrado de v3.0. Verificar si es la misma fuente que rodriguez-nustez-estrada-2009 y dedupear."
+    },
+    {
+      "id": "ciat-1995-alnus",
+      "tipo": "manual_tecnico",
+      "autores": "CIAT — Centro Internacional de Agricultura Tropical",
+      "año": 1995,
+      "titulo": "Alnus acuminata en sistemas agroforestales andinos",
+      "institucion": "CIAT Palmira",
+      "observaciones": "STUB migrado de v3.0 — título y paginación pendientes de confirmación."
+    },
+    {
+      "id": "agrosavia-silvopastoriles",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": null,
+      "titulo": "Sistemas silvopastoriles en el altoandino colombiano",
+      "institucion": "AGROSAVIA",
+      "observaciones": "STUB migrado de v3.0. Año y publicación específica pendientes."
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "tipo": "libro",
+      "autores": "Instituto Alexander von Humboldt",
+      "año": null,
+      "titulo": "Flora del bosque alto andino colombiano",
+      "institucion": "Instituto Humboldt",
+      "observaciones": "STUB migrado de v3.0."
+    },
+    {
+      "id": "restrepo-1996-abc-agricultura-organica",
+      "tipo": "libro",
+      "autores": "Restrepo, J.",
+      "año": 1996,
+      "titulo": "ABC de la agricultura orgánica (variante de cita usada en v3.0)",
+      "observaciones": "STUB — posiblemente misma obra que restrepo-1996-bocashi. Verificar y dedupear."
+    },
+    {
+      "id": "pamplona-roger-2006-plantas-medicinales",
+      "tipo": "libro",
+      "autores": "Pamplona-Roger, J.D.",
+      "año": 2006,
+      "titulo": "Enciclopedia de las plantas medicinales",
+      "revista_o_editorial": "Safeliz",
+      "observaciones": "STUB migrado de v3.0 — confirmar ISBN."
+    },
+    {
+      "id": "ocampo-solorza-2017",
+      "tipo": "articulo_revista",
+      "autores": "Ocampo, D.; Solorza, J.",
+      "año": 2017,
+      "titulo": "Manejo de retamo espinoso (Ulex europaeus) en zonas altoandinas de Cundinamarca",
+      "observaciones": "STUB migrado de v3.0 — revista y paginación pendientes."
+    },
+    {
+      "id": "car-cundi-2019",
+      "tipo": "resolucion_oficial",
+      "autores": "CAR — Corporación Autónoma Regional de Cundinamarca",
+      "año": 2019,
+      "titulo": "Protocolos de manejo de especies invasoras en jurisdicción CAR",
+      "institucion": "CAR Cundinamarca",
+      "observaciones": "STUB migrado de v3.0 — número de resolución pendiente."
+    },
+    {
+      "id": "res-684-2018-mads",
+      "tipo": "resolucion_oficial",
+      "autores": "MADS — Ministerio de Ambiente y Desarrollo Sostenible",
+      "año": 2018,
+      "titulo": "Resolución 684 de 2018 — Lista nacional de especies invasoras",
+      "institucion": "MADS Colombia"
+    },
+    {
+      "id": "mongabay-retamo-2024",
+      "tipo": "articulo_revista",
+      "autores": "Mongabay Latam",
+      "año": 2024,
+      "titulo": "El retamo espinoso: la plaga que amenaza los páramos colombianos",
+      "url": "https://es.mongabay.com",
+      "observaciones": "STUB — artículo periodístico, validar contra fuente primaria antes de citar en ministerial."
+    },
+    {
+      "id": "correa-pabon-carulla-2008",
+      "tipo": "articulo_revista",
+      "autores": "Correa, R.; Pabón, R.; Carulla, J.",
+      "año": 2008,
+      "titulo": "Valor nutricional del kikuyo (Cenchrus clandestinus) y respuestas productivas en ganadería lechera andina",
+      "observaciones": "STUB migrado de v3.0 — revista y paginación pendientes."
+    },
+    {
+      "id": "agrosavia-forrajeras-2022",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": 2022,
+      "titulo": "Gramíneas forrajeras en sistemas ganaderos andinos",
+      "institucion": "AGROSAVIA",
+      "observaciones": "STUB migrado de v3.0."
+    },
+    {
+      "id": "humboldt-invasoras-andes",
+      "tipo": "libro",
+      "autores": "Instituto Alexander von Humboldt",
+      "año": null,
+      "titulo": "Plantas invasoras en los Andes colombianos",
+      "institucion": "Instituto Humboldt",
+      "observaciones": "STUB migrado de v3.0 — año y referencia específica pendientes."
+    },
+    {
+      "id": "flora-colombia-pteridophyta",
+      "tipo": "libro",
+      "autores": "Murillo-A., J.; Polanía, C.; et al.",
+      "año": null,
+      "titulo": "Flora de Colombia — Pteridophyta (helechos)",
+      "observaciones": "STUB migrado de v3.0 — editorial y año pendientes."
+    }
+  ]
+}

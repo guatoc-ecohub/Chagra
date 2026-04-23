@@ -12,6 +12,16 @@ import { renameWorker } from './services/assetService'
 import { getAccessToken } from './services/authService'
 
 import { loadDemoSeedData } from '../scripts/seed-demo';
+import { bootstrapOssModules } from './core/bootstrap-oss';
+import { loadProModules } from './core/loadProModules';
+
+// Registro de módulos antes del primer render (ver ADR-002/ADR-011).
+bootstrapOssModules();
+loadProModules().then((r) => {
+  if (r.loaded.length && import.meta.env.DEV) {
+    console.info('[registry] módulos Pro cargados:', r.loaded);
+  }
+});
 
 // Inicializar Sync Manager para arquitectura Offline-First
 syncManager.initDB().then(async () => {
