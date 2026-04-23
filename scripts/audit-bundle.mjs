@@ -36,18 +36,23 @@ function ok(msg) { console.log(`\x1b[32m✓\x1b[0m ${msg}`); }
 if (!existsSync(DIST_DIR)) die(2, `dist/ no existe. Corre "npm run build" primero.`);
 if (!existsSync(PROHIBITED_LIST)) die(2, `falta ${PROHIBITED_LIST}`);
 
-// Parse oss-pro/PROHIBITED_IN_PUBLIC.md extrayendo:
-// - Strings literales de los bullets bajo "## Strings literales"
-// - Regex de "## Patrones regex"
-// - Archivos completos de "## Archivos completos prohibidos" y "## Catálogos prohibidos"
-// - Regex de "## Credenciales y tokens"
-// - Regex de "## Direcciones y rangos de red interna"
-const listRaw = readFileSync(PROHIBITED_LIST, 'utf8');
+// Resolución de la lista Pro-específica (opcional).
+// Orden de preferencia:
+//   1. env PROHIBITED_INTERNAL_PATH — explícito, CI Pro o Appliance.
+//   2. ../chagra-pro/PROHIBITED_INTERNAL.md — dev local path-relative.
+// Si ninguno existe, el auditor corre solo con la lista pública — válido
+// para CI del repo público puro (ADR-002: el bundle público no puede
+// contener strings Pro porque el código Pro no está ahí).
+const INTERNAL_LIST_CANDIDATE =
+  process.env.PROHIBITED_INTERNAL_PATH ||
+  resolve(ROOT, '../chagra-pro/PROHIBITED_INTERNAL.md');
+const INTERNAL_LIST = existsSync(INTERNAL_LIST_CANDIDATE) ? INTERNAL_LIST_CANDIDATE : null;
 
-function extractBulletStrings(section) {
-  // Split por '\n## ' para que cada chunk sea una sección H2; buscar la que
-  // arranca con el título dado.
-  const chunks = listRaw.split(/\n## /);
+const publicRaw = readFileSync(PROHIBITED_LIST, 'utf8');
+const internalRaw = INTERNAL_LIST ? readFileSync(INTERNAL_LIST, 'utf8') : '';
+
+function extractBulletStrings(raw, section) {
+  const chunks = raw.split(/\n## /);
   const target = chunks.find((c) => c.trimStart().startsWith(section));
   if (!target) return [];
   return target
@@ -59,12 +64,25 @@ function extractBulletStrings(section) {
     .filter((s) => s && !s.startsWith('**') && !s.startsWith('Nombres y'));
 }
 
-const literalStrings = extractBulletStrings('Strings literales');
-const regexList = [
-  ...extractBulletStrings('Patrones regex'),
-  ...extractBulletStrings('Credenciales y tokens (regex)'),
-  ...extractBulletStrings('Direcciones y rangos de red interna'),
-];
+function collectAll(raw) {
+  return {
+    literals: extractBulletStrings(raw, 'Strings literales'),
+    regex: [
+      ...extractBulletStrings(raw, 'Patrones regex'),
+      ...extractBulletStrings(raw, 'Credenciales y tokens (regex)'),
+      ...extractBulletStrings(raw, 'Direcciones y rangos de red interna'),
+    ],
+    catalogs: extractBulletStrings(raw, 'Catálogos prohibidos').concat(
+      extractBulletStrings(raw, 'Catálogos prohibidos en bundle público')
+    ),
+  };
+}
+
+const pub = collectAll(publicRaw);
+const int = internalRaw ? collectAll(internalRaw) : { literals: [], regex: [], catalogs: [] };
+
+const literalStrings = [...pub.literals, ...int.literals];
+const regexList = [...pub.regex, ...int.regex];
 
 const forbiddenRegexes = regexList
   .map((r) => {
@@ -130,8 +148,10 @@ if (sourceMaps.length > 0) {
 console.log('Chagra Bundle Auditor');
 console.log(`  dist:     ${DIST_DIR}`);
 console.log(`  archivos: ${files.length}`);
-console.log(`  literales prohibidos: ${literalStrings.length}`);
-console.log(`  regex prohibidas:     ${forbiddenRegexes.length}`);
+console.log(`  lista pública:   ${PROHIBITED_LIST}`);
+console.log(`  lista interna:   ${INTERNAL_LIST || '(no disponible — solo pública)'}`);
+console.log(`  literales prohibidos: ${literalStrings.length} (${pub.literals.length} pub + ${int.literals.length} int)`);
+console.log(`  regex prohibidas:     ${forbiddenRegexes.length} (${pub.regex.length} pub + ${int.regex.length} int)`);
 console.log('');
 
 if (hits.length === 0) {

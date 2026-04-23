@@ -8,7 +8,10 @@ pre-commit:
     secret-scan:
       tags: security
       run: |
-        hits=$(git diff --cached | grep -iE "(gh[oprsu]_[A-Za-z0-9]{30,}|sk-[A-Za-z0-9]{32,}|sk-ant-[A-Za-z0-9_-]{30,}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{35}|glpat-[0-9A-Za-z_-]{20}|BEGIN (RSA|OPENSSH) PRIVATE KEY)" || true)
+        # Excluye archivos que DEFINEN las reglas (contienen patterns como
+        # texto literal, no como secreto real): las listas anti-leak, el
+        # propio lefthook, y el CONTRIBUTING.md que las documenta.
+        hits=$(git diff --cached -- . ':!oss-pro/PROHIBITED*' ':!lefthook.yml' ':!CONTRIBUTING.md' | grep -iE "(gh[oprsu]_[A-Za-z0-9]{30,}|sk-[A-Za-z0-9]{32,}|sk-ant-[A-Za-z0-9_-]{30,}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{35}|glpat-[0-9A-Za-z_-]{20}|BEGIN (RSA|OPENSSH) PRIVATE KEY)" || true)
         if [ -n "$hits" ]; then
           echo "✗ Posible secreto en diff:"
           echo "$hits" | head -5
@@ -21,7 +24,11 @@ pre-commit:
       run: |
         files="{staged_files}"
         [ -z "$files" ] && exit 0
-        hits=$(echo "$files" | xargs grep -lnE "\b10\.(?!1\.1\.1)|\b192\.168\.|\b172\.(1[6-9]|2[0-9]|3[01])\.|guatoc-nixos" 2>/dev/null || true)
+        # Filtra archivos de reglas + docs que legítimamente discuten los
+        # patterns como texto de normativa.
+        filtered=$(echo "$files" | tr ' ' '\n' | grep -vE "^(oss-pro/PROHIBITED|lefthook\.yml|oss-pro/README\.md|CONTRIBUTING\.md)" || true)
+        [ -z "$filtered" ] && exit 0
+        hits=$(echo "$filtered" | xargs grep -lnE "\b10\.[0-9]+\.[0-9]+\.[0-9]+|\b192\.168\.[0-9]+\.[0-9]+|\b172\.(1[6-9]|2[0-9]|3[01])\.[0-9]+\.[0-9]+|guatoc-nixos" 2>/dev/null || true)
         if [ -n "$hits" ]; then
           echo "✗ Refs a infra interna (IP privada o repo privado) en:"
           echo "$hits"
