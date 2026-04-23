@@ -8,19 +8,23 @@ export async function getDeviceAltitude() {
     }
 
     let coords = null;
-    try {
-        coords = await new Promise((resolve) => {
-            navigator.geolocation.getCurrentPosition(
-                (pos) => resolve(pos.coords),
-                (err) => {
-                    console.warn('[Altitude] Geolocation error or denied:', err);
-                    resolve(null);
-                },
-                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-            );
-        });
-    } catch (e) {
-        console.warn('[Altitude] Geolocation fetch error:', e);
+    if (typeof navigator !== 'undefined' && navigator.geolocation && typeof navigator.geolocation.getCurrentPosition === 'function') {
+        try {
+            coords = await new Promise((resolve) => {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => resolve(pos.coords),
+                    (err) => {
+                        console.warn('[Altitude] Geolocation error or denied:', err);
+                        resolve(null);
+                    },
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                );
+            });
+        } catch (e) {
+            console.warn('[Altitude] Geolocation fetch error:', e);
+        }
+    } else {
+        console.warn('[Altitude] navigator.geolocation no disponible (contexto inseguro?). Saltando a fallbacks.');
     }
 
     if (coords && coords.altitude !== null && coords.altitude !== undefined) {
