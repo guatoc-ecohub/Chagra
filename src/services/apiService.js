@@ -1,20 +1,25 @@
 import { getAccessToken } from './authService';
 
 const fetchWithTimeout = async (resource, options = {}) => {
-    const { timeout = 10000 } = options;
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), timeout);
-    try {
-        const response = await fetch(resource, { ...options, signal: controller.signal });
-        clearTimeout(id);
-        return response;
-    } catch (error) {
-        clearTimeout(id);
-        throw error;
-    }
+  const { timeout = 10000 } = options;
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  try {
+    const response = await fetch(resource, { ...options, signal: controller.signal });
+    clearTimeout(id);
+    return response;
+  } catch (error) {
+    clearTimeout(id);
+    throw error;
+  }
 };
 
 export const fetchFromFarmOS = async (endpoint, options = {}) => {
+  if (import.meta.env.VITE_DEMO_MODE === 'true') {
+    console.log(`[DEMO] blocked FarmOS call to ${endpoint}`);
+    return {};
+  }
+
   const token = await getAccessToken();
   if (!token) {
     console.error('[API] Token no disponible. Redirigiendo a login.');
