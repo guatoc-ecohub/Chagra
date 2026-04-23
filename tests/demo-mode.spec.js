@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 
 test.describe('Modo Demo', () => {
     test('Seed loader renders 2 areas and 20 observations', async ({ page, context }) => {
