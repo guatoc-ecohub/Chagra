@@ -23,6 +23,42 @@ Pull requests hacia `main` requieren ambos checks en verde (obligatorios y bloqu
 
 Cambios sobre `src/db/dbCore.js`, `src/services/syncManager.js`, `src/services/payloadService.js` o `public/sw.js` **deben** incluir actualización del test E2E correspondiente si la superficie offline cambia.
 
+## Setup local
+
+Tras clonar:
+
+```bash
+npm install
+npm run hooks:install   # instala lefthook para el pre-commit anti-leak
+```
+
+Los hooks de `lefthook.yml` corren:
+- Escaneo de secretos (tokens GitHub/OpenAI/AWS/Google/GitLab, llaves privadas).
+- Escaneo de referencias a infraestructura interna (IPs RFC 1918, refs a repos privados).
+- Bloqueo de imports estáticos desde `chagra-pro` (usar `moduleRegistry` en su lugar — ADR-002/ADR-011).
+- ESLint con `--max-warnings=0`.
+- Conventional commits obligatorio en el mensaje.
+
+Auditoría post-build de bundle (`npm run audit:bundle`) consulta `oss-pro/PROHIBITED_IN_PUBLIC.md` y verifica que `dist/` no contenga strings o archivos prohibidos.
+
+## Boundary OSS/Pro
+
+Chagra tiene un repo hermano privado (`guatoc-ecohub/chagra-pro`) con módulos comerciales. Este repo público **nunca** importa estáticamente de ahí. La integración se hace vía `src/core/moduleRegistry.js`: los módulos Pro se registran en runtime si están presentes; la UI consulta `registry.byCapability(...)` y renderiza la variante enriquecida solo cuando existe.
+
+Para desarrollar con Pro presente:
+
+```bash
+VITE_PRO_MODULES_PATH=../chagra-pro/modules npm run dev
+```
+
+Sin esa variable de entorno el build arranca puro OSS y la UI degrada elegantemente.
+
+Ver:
+- `src/core/moduleRegistry.js` — interfaz ChagraModule + registry singleton.
+- `src/core/bootstrap-oss.js` — registra módulos OSS en bootstrap.
+- `src/core/loadProModules.js` — carga dinámica de módulos Pro vía env var.
+- `oss-pro/PROHIBITED_IN_PUBLIC.md` — lista viva de patterns prohibidos en el público.
+
 ## Reporte responsable de vulnerabilidades
 
 Si detectas un problema de seguridad, por favor no abras un issue público. Usa el canal privado de GitHub Security Advisories sobre este repositorio, o contacta al mantenedor directamente.
