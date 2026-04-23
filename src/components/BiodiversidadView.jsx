@@ -1,20 +1,15 @@
 /**
  * BiodiversidadView — Vista del ecosistema y diversidad biológica de la finca.
  *
- * Fondo dinámico servido desde FarmOS: el archivo más reciente cuyo nombre
- * contenga "chagra-bg-biodiversidad" se aplica como background-image. Si no
- * existe tal archivo o el dispositivo está offline sin caché previo, se
- * muestra el patrón biopunk por defecto.
- *
- * El bot de Telegram (OpenFang "Personal_Hand_Kortux") puede actualizar
- * este fondo subiendo una foto a /api/file/upload con el filename
- * "chagra-bg-biodiversidad-<timestamp>.<ext>".
+ * Fondo permanente: ilustración curada "biodiversidad-bg.jpg" con fauna y
+ * flora del bosque alto-andino colombiano (oso andino, quetzal, morpho,
+ * frailejón, maíz, armadillo, entre otros). Aplicada con gradient overlay
+ * para legibilidad de las tarjetas de estadísticas encima.
  */
 import React, { useMemo } from 'react';
 import { Leaf } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import useAssetStore from '../store/useAssetStore';
-import { useBackgroundImage } from '../hooks/useBackgroundImage';
 
 const STRATA = [
   { key: 'emergente', label: 'Emergente', color: 'text-emerald-300' },
@@ -25,7 +20,6 @@ const STRATA = [
 
 export default function BiodiversidadView({ onBack }) {
   const plants = useAssetStore((s) => s.plants || []);
-  const { url: bgUrl, loading: bgLoading } = useBackgroundImage('chagra-bg-biodiversidad');
 
   const { speciesCount, strataCount, guildsCount, byStratum } = useMemo(() => {
     const species = new Set();
@@ -67,20 +61,18 @@ export default function BiodiversidadView({ onBack }) {
     };
   }, [plants]);
 
-  const customBgStyle = bgUrl
-    ? {
-        backgroundImage: `linear-gradient(rgba(2,6,23,0.72), rgba(2,6,23,0.82)), url(${bgUrl})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed',
-      }
-    : undefined;
+  const customBgStyle = {
+    backgroundImage: 'linear-gradient(rgba(2,6,23,0.55), rgba(2,6,23,0.82)), url(/biodiversidad-bg.jpg)',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    backgroundAttachment: 'fixed',
+  };
 
   return (
     <ScreenShell title="Biodiversidad" icon={Leaf} onBack={onBack}>
       <div
-        className={`min-h-full p-4 flex flex-col gap-4 ${bgUrl ? '' : 'bg-biopunk-pattern'}`}
+        className="min-h-full p-4 flex flex-col gap-4"
         style={customBgStyle}
       >
         <section className="grid grid-cols-3 gap-2">
@@ -132,13 +124,6 @@ export default function BiodiversidadView({ onBack }) {
           )}
         </section>
 
-        <section className="bg-slate-900/70 backdrop-blur-sm border border-slate-800/60 rounded-xl p-4 mt-auto">
-          <p className="text-2xs text-slate-500 leading-relaxed">
-            El fondo de esta vista se actualiza desde Telegram enviando una foto al bot con la
-            indicación <span className="text-slate-300 font-mono">fondo biodiversidad</span>.
-            {bgLoading && !bgUrl && ' Cargando fondo…'}
-          </p>
-        </section>
       </div>
     </ScreenShell>
   );
