@@ -11,8 +11,14 @@ import { PRIMARY_WORKER_NAME } from './config/workerConfig'
 import { renameWorker } from './services/assetService'
 import { getAccessToken } from './services/authService'
 
+import { loadDemoSeedData } from '../scripts/seed-demo';
+
 // Inicializar Sync Manager para arquitectura Offline-First
 syncManager.initDB().then(async () => {
+  if (import.meta.env.VITE_DEMO_MODE === 'true') {
+    await loadDemoSeedData();
+  }
+
   syncManager.startNetworkMonitoring();
 
   // Migración de identidad: ejecución única, solo si hay sesión activa.
@@ -25,7 +31,7 @@ syncManager.initDB().then(async () => {
           console.info('[Migration] Renombrado completado o innecesario.');
         }
       }).catch((e) => console.warn('[Migration] Error renombrando:', e));
-    }).catch(() => {}); // Token expirado — skip silencioso
+    }).catch(() => { }); // Token expirado — skip silencioso
   }
 
   // Pull preventivo inicial de logs si hay red (ventana 30 días).
