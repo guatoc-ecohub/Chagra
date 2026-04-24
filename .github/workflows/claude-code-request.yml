@@ -1,0 +1,149 @@
+name: Claude Code Request
+
+# Ver ADR-018 (Chagra-strategy/adrs/ADR-018-burnout-mitigation-automation.md)
+#
+# Trigger: issue labeled "claude-code-request". Crea rama, deja stub con el
+# body del issue, abre DRAFT PR. El agente de code-generation (aider + GLM-5
+# en alpha runner futuro) consume este stub y lo reemplaza por commits reales
+# cuando se invoca manualmente (post-demo setup).
+#
+# HUMAN-IN-LOOP POR DISEÑO:
+# - PR nace siempre como draft
+# - Workflow NUNCA hace merge
+# - Label 'ready-to-generate' pendiente para disparar code-gen (futuro)
+# - Notifica al operador por Telegram al abrir el draft PR
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  bootstrap-branch:
+    if: github.event.label.name == 'claude-code-request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Parse issue metadata
+        id: parse
+        env:
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_NUM: ${{ github.event.issue.number }}
+        run: |
+          # Derivar slug compatible con git branch
+          SLUG=$(echo "$ISSUE_TITLE" \
+            | tr '[:upper:]' '[:lower:]' \
+            | sed -E 's/\[[^]]*\]//g' \
+            | tr -cd 'a-z0-9 -' \
+            | tr -s ' ' '-' \
+            | sed -E 's/^-+|-+$//g' \
+            | cut -c1-40)
+          if [ -z "$SLUG" ]; then SLUG="request"; fi
+          BRANCH="feat/issue-${ISSUE_NUM}-${SLUG}"
+          {
+            echo "issue_num=$ISSUE_NUM"
+            echo "branch=$BRANCH"
+            echo "slug=$SLUG"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create request stub branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ steps.parse.outputs.branch }}
+          ISSUE_NUM: ${{ steps.parse.outputs.issue_num }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+        run: |
+          git config user.name "claude-code-bot"
+          git config user.email "noreply-claude-code@chagra.bio"
+          git checkout -b "$BRANCH"
+          mkdir -p .requests
+          STUB=".requests/issue-${ISSUE_NUM}.md"
+          {
+            echo "# Request #${ISSUE_NUM}"
+            echo
+            echo "- Issue: ${ISSUE_URL}"
+            echo "- Title: ${ISSUE_TITLE}"
+            echo "- Author: @${ISSUE_AUTHOR}"
+            echo "- Status: awaiting code-generation"
+            echo
+            echo "## Body"
+            echo
+            echo "${ISSUE_BODY}"
+            echo
+            echo "---"
+            echo
+            echo "**Esto es un stub.** El agente de code-generation (aider + GLM-5 en alpha runner) reemplazará este archivo y/o hará los cambios solicitados cuando sea invocado con la label \`ready-to-generate\` (flujo futuro)."
+          } > "$STUB"
+          git add "$STUB"
+          git commit -m "chore(request): bootstrap branch for issue #${ISSUE_NUM}"
+          git push -u origin "$BRANCH"
+
+      - name: Open draft PR
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_URL=$(gh pr create \
+            --base main \
+            --head "${{ steps.parse.outputs.branch }}" \
+            --title "[WIP] ${{ github.event.issue.title }}" \
+            --body "Closes #${{ steps.parse.outputs.issue_num }}
+
+          **Draft PR generado automáticamente** por \`claude-code-request.yml\`. Pendiente de code-generation.
+
+          ## Siguiente paso
+
+          Cuando el agente de code-gen (aider + GLM-5) esté activo en alpha runner, añadir la label \`ready-to-generate\` a este PR para disparar la ejecución. Hasta entonces, este PR queda como stub.
+
+          ## Gates humanos
+
+          - Este PR **NO se mergea automáticamente** bajo ninguna condición.
+          - El operador revisa diff manualmente tras CI verde.
+          - Si quiere auto-merge por nominación explícita, añadir label \`squash-on-merge\`." \
+            --draft)
+          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Comment on issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue comment "${{ steps.parse.outputs.issue_num }}" --body "🤖 Solicitud recibida.
+
+          - Rama: \`${{ steps.parse.outputs.branch }}\`
+          - Draft PR: ${{ steps.pr.outputs.pr_url }}
+
+          El agente de code-generation lo recoge cuando el operador añada la label \`ready-to-generate\` al PR (flujo futuro post-demo). Gates humanos garantizan que no se mergea sin revisión."
+
+      - name: Notify Telegram (non-blocking)
+        if: always()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ISSUE_NUM: ${{ steps.parse.outputs.issue_num }}
+          BRANCH: ${{ steps.parse.outputs.branch }}
+          PR_URL: ${{ steps.pr.outputs.pr_url }}
+        run: |
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "Telegram secrets not set; skipping notification (non-blocking)"
+            exit 0
+          fi
+          MSG="🤖 *Claude Code request* #${ISSUE_NUM}
+          Repo: ${{ github.repository }}
+          Branch: \`${BRANCH}\`
+          PR: ${PR_URL}
+          Estado: draft, esperando code-gen"
+          curl -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "parse_mode=Markdown" \
+            --data-urlencode "text=${MSG}" \
+            || echo "Telegram notification failed (ignored)"

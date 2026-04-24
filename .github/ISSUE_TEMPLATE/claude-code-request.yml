@@ -1,0 +1,95 @@
+name: Claude Code Request
+description: Feature, bug fix, o tarea para ser tomada por el pipeline automático (OpenFang → GH Issue → code-gen agent → PR)
+title: "[<TIPO>] <descripción corta>"
+labels: ["claude-code-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Este issue dispara el pipeline automático `claude-code-request.yml`. El runner crea una rama, deja un stub, y abre draft PR. El agente de code-generation (aider con GLM-5, instalado en alpha runner futuro) ejecuta cuando el operador lo invoca.
+
+        Ver ADR-018 en `Chagra-strategy/adrs/` para el principio de mitigación de burnout vía automatización.
+
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: Tipo (conventional commit prefix)
+      options:
+        - feat
+        - fix
+        - chore
+        - docs
+        - refactor
+        - perf
+        - test
+        - style
+    validations:
+      required: true
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      description: Área principal afectada
+      options:
+        - ui
+        - catalog
+        - voice
+        - telemetry
+        - map
+        - auth
+        - sync
+        - build
+        - docs
+        - other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Descripción
+      description: Qué cambia y por qué. Contexto si aplica.
+      placeholder: "Ej. Añadir botón 'Exportar CSV' en vista Estadísticas que descargue observaciones filtradas por zona y rango de fechas."
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Criterios de aceptación
+      description: Lista verificable de lo que debe funcionar al terminar
+      placeholder: |
+        - [ ] Botón visible en `EstadisticasView`
+        - [ ] Click genera CSV válido con columnas: fecha, zona, especie, cantidad
+        - [ ] Funciona offline (usa IndexedDB)
+        - [ ] `npm run build` + `audit:bundle` verdes
+        - [ ] Sin modificar `dbCore.js`
+    validations:
+      required: true
+
+  - type: textarea
+    id: restrictions
+    attributes:
+      label: Restricciones / rutas prohibidas
+      description: Archivos o áreas que NO deben tocarse
+      placeholder: "No modificar src/db/dbCore.js, syncManager.js, payloadService.js, public/sw.js"
+      value: "No modificar src/db/dbCore.js, syncManager.js, payloadService.js, public/sw.js. No bumpear version ni CACHE_NAME."
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioridad
+      options:
+        - baja (puede esperar semanas)
+        - media (esta iteración)
+        - alta (blocker operativo)
+      default: 1
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto adicional
+      description: Capturas de pantalla, links, observaciones del operador. Opcional.
