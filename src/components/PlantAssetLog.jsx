@@ -2,6 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Camera, MapPin } from 'lucide-react';
 import { savePayload } from '../services/payloadService';
 import { sanitizeBlobUrl } from '../utils/blobUrl';
+import NativeSubstituteSuggestion from './NativeSubstituteSuggestion';
+
+// Mapa de nombres de entrada comunes → ID del catálogo para detección de invasoras
+// Se usa un enfoque fuzzy-simple: si el nombre incluye alguno de estos tokens.
+const INVASORAS_TOKENS = [
+  { tokens: ['retamo', 'ulex'], catalogId: 'ulex_europaeus', nombre: 'Retamo espinoso', thermalZone: 'frio' },
+  { tokens: ['ojo de poeta', 'thunbergia', 'ojo poeta'], catalogId: 'thunbergia_alata', nombre: 'Ojo de poeta', thermalZone: 'templado' },
+  { tokens: ['kikuyo', 'pennisetum', 'cenchrus', 'clandestinum'], catalogId: 'cenchrus_clandestinus', nombre: 'Kikuyo', thermalZone: 'frio' },
+  { tokens: ['helecho marranero', 'pteridium', 'helecho aguila'], catalogId: 'pteridium_aquilinum', nombre: 'Helecho marranero', thermalZone: 'frio' },
+];
+
+function detectInvasora(speciesInput) {
+  if (!speciesInput) return null;
+  const lower = speciesInput.toLowerCase();
+  return INVASORAS_TOKENS.find(({ tokens }) =>
+    tokens.some((t) => lower.includes(t))
+  ) || null;
+}
 
 const ASSET_TYPES = [
   { id: 'type-1', name: 'Árbol Frutal' },
@@ -26,6 +44,8 @@ export default function PlantAssetLog({ onBack, onSave }) {
   const [location, setLocation] = useState(null);
   const [isLocating, setIsLocating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  // R9: post-save invasoras native suggestion state
+  const [invasoraSuggestion, setInvasoraSuggestion] = useState(null); // { catalogId, nombre, thermalZone, coordinates }
 
   useEffect(() => {
     return () => {
@@ -118,6 +138,19 @@ export default function PlantAssetLog({ onBack, onSave }) {
       const result = await savePayload('plant_asset', payload);
       onSave(result.message, !result.success);
 
+      if (result.success) {
+        // R9: detectar invasoras y ofrecer sustituto nativo
+        const match = detectInvasora(formData.species);
+        if (match) {
+          setInvasoraSuggestion({
+            catalogId: match.catalogId,
+            nombre: match.nombre,
+            thermalZone: match.thermalZone,
+            coordinates: location?.wkt || null,
+          });
+        }
+      }
+
       setFormData({ assetType: 'type-1', species: '', variety: '', healthStatus: 'Sano' });
       setPhoto(null);
       if (photoUrl) URL.revokeObjectURL(photoUrl);
@@ -201,6 +234,30 @@ export default function PlantAssetLog({ onBack, onSave }) {
         >
           {isSaving ? 'Guardando…' : 'Guardar Activo'}
         </button>
+
+        {/* R9: Panel de sustituto nativo (aparece tras guardar una invasora) */}
+        {invasoraSuggestion && (
+          <NativeSubstituteSuggestion
+            invasiveSpeciesId={invasoraSuggestion.catalogId}
+            invasiveName={invasoraSuggestion.nombre}
+            coordinates={invasoraSuggestion.coordinates}
+            thermalZone={invasoraSuggestion.thermalZone}
+            onSelectNative={(native) => {
+              setInvasoraSuggestion(null);
+              // Navegar al SeedingLog precargado – emitimos el evento personalizado
+              // que App.jsx puede capturar para pre-cargar la forma
+              window.dispatchEvent(new CustomEvent('chagraSeedingPreload', {
+                detail: {
+                  crop: native.nombre_comun,
+                  notes: `Sustituto nativo sugerido tras extracción de ${invasoraSuggestion.nombre}. Especie: ${native.nombre_cientifico}.`,
+                  coordinates: invasoraSuggestion.coordinates,
+                }
+              }));
+              onBack();
+            }}
+            onDismiss={() => setInvasoraSuggestion(null)}
+          />
+        )}
       </div>
     </div>
   );

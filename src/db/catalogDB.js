@@ -78,12 +78,67 @@ export async function getSpeciesByThermalZone(zone) {
     return rows.map(r => JSON.parse(r.data));
 }
 
+/**
+ * Obtiene sustitutos nativos curados para una especie invasora.
+ * @param {string} invasiveId - ID de la especie invasora
+ * @param {Object} [options]
+ * @param {string} [options.thermalZone] - Filtrar por piso térmico
+ * @param {number} [options.limit=5] - Máximo de resultados
+ * @returns {Promise<Array<{id,nombre_comun,nombre_cientifico,estrato,thermal_zones,sources_ids}>>}
+ */
+export async function getNativeSubstitutesForInvasive(invasiveId, options = {}) {
+    if (!dbInstance) await initCatalog();
+    const { thermalZone, limit = 5 } = options;
+
+    // 1. Load invasive species data blob
+    const invasiveRows = dbInstance.exec({
+        sql: 'SELECT data FROM species WHERE id = ?',
+        bind: [invasiveId],
+        rowMode: 'object',
+    });
+    if (!invasiveRows.length) return [];
+
+    const invasive = JSON.parse(invasiveRows[0].data);
+    const substituteIds = invasive.especies_nativas_sustitutas;
+    if (!Array.isArray(substituteIds) || substituteIds.length === 0) return [];
+
+    // 2. Load each substitute species
+    const results = [];
+    for (const id of substituteIds) {
+        const rows = dbInstance.exec({
+            sql: 'SELECT data FROM species WHERE id = ?',
+            bind: [id],
+            rowMode: 'object',
+        });
+        if (!rows.length) continue;
+        const sp = JSON.parse(rows[0].data);
+
+        // 3. Optional thermal zone filter
+        if (thermalZone) {
+            const zones = sp.thermal_zones || [];
+            if (!zones.includes(thermalZone)) continue;
+        }
+
+        results.push({
+            id: sp.id,
+            nombre_comun: sp.nombre_comun,
+            nombre_cientifico: sp.nombre_cientifico,
+            estrato: sp.estrato,
+            thermal_zones: sp.thermal_zones || [],
+            sources_ids: sp.sources_ids || [],
+        });
+        if (results.length >= limit) break;
+    }
+    return results;
+}
+
 if (import.meta.env.DEV) {
     if (typeof window !== 'undefined') {
         window.__chagraCatalog = {
             initCatalog,
             getAllSpecies,
-            getSpeciesByThermalZone
+            getSpeciesByThermalZone,
+            getNativeSubstitutesForInvasive
         };
     }
 }

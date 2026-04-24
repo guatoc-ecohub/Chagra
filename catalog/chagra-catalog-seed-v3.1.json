@@ -1140,7 +1140,12 @@
       "sources_ids": [
         "humboldt-invasoras-andes"
       ],
-      "validation_level": "operator_reviewed"
+      "validation_level": "operator_reviewed",
+      "especies_nativas_sustitutas": [
+        "espeletia_grandiflora",
+        "weinmannia_tomentosa",
+        "vaccinium_meridionale"
+      ]
     },
     {
       "id": "pteridium_aquilinum",
@@ -1223,6 +1228,184 @@
         "flora-colombia-pteridophyta"
       ],
       "validation_level": "operator_reviewed"
+    },
+    {
+      "_curation_status": "BORRADOR_IA",
+      "id": "weinmannia_tomentosa",
+      "nombre_comun": "Encenillo",
+      "nombre_cientifico": "Weinmannia tomentosa L.f.",
+      "familia_botanica": "Cunoniaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nurse_plant",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2400,
+        "optimo_min": 2800,
+        "optimo_max": 3400,
+        "max_absoluto": 3800
+      },
+      "sources_ids": [
+        "humboldt-flora-alto-andina"
+      ],
+      "validation_level": "claude_draft",
+      "harvest_type": "biomasa"
+    },
+    {
+      "_curation_status": "BORRADOR_IA",
+      "id": "espeletia_grandiflora",
+      "nombre_comun": "Frailejón grande",
+      "nombre_cientifico": "Espeletia grandiflora Humb. & Bonpl.",
+      "familia_botanica": "Asteraceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "nurse_plant",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 3200,
+        "optimo_min": 3400,
+        "optimo_max": 4000,
+        "max_absoluto": 4200
+      },
+      "sources_ids": [
+        "humboldt-2016-frailejones"
+      ],
+      "validation_level": "claude_draft",
+      "harvest_type": "biomasa"
+    },
+    {
+      "_curation_status": "BORRADOR_IA",
+      "id": "vaccinium_meridionale",
+      "nombre_comun": "Agraz andino",
+      "nombre_cientifico": "Vaccinium meridionale Swartz",
+      "familia_botanica": "Ericaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "understorey_crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2500,
+        "optimo_min": 2800,
+        "optimo_max": 3500,
+        "max_absoluto": 3800
+      },
+      "sources_ids": [
+        "humboldt-flora-alto-andina"
+      ],
+      "validation_level": "claude_draft",
+      "harvest_type": "fruto"
+    },
+    {
+      "_curation_status": "BORRADOR_IA",
+      "id": "miconia_squamulosa",
+      "nombre_comun": "Tuno esmeraldo",
+      "nombre_cientifico": "Miconia squamulosa (Sm.) Triana",
+      "familia_botanica": "Melastomataceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "nurse_plant",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 3200,
+        "max_absoluto": 3400
+      },
+      "sources_ids": [
+        "humboldt-flora-alto-andina"
+      ],
+      "validation_level": "claude_draft",
+      "harvest_type": "biomasa"
+    },
+    {
+      "_curation_status": "BORRADOR_IA",
+      "id": "escallonia_paniculata",
+      "nombre_comun": "Rodamonte",
+      "nombre_cientifico": "Escallonia paniculata (Ruiz & Pav.) Roem. & Schult.",
+      "familia_botanica": "Escalloniaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "living_fence",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2400,
+        "optimo_min": 2800,
+        "optimo_max": 3500,
+        "max_absoluto": 3800
+      },
+      "sources_ids": [
+        "humboldt-flora-alto-andina"
+      ],
+      "validation_level": "claude_draft",
+      "harvest_type": "biomasa"
+    },
+    {
+      "_curation_status": "BORRADOR_IA",
+      "id": "calamagrostis_effusa",
+      "nombre_comun": "Paja de páramo",
+      "nombre_cientifico": "Calamagrostis effusa (Kunth) Steud.",
+      "familia_botanica": "Poaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "ground_cover",
+        "erosion_control"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 3000,
+        "optimo_min": 3400,
+        "optimo_max": 4200,
+        "max_absoluto": 4600
+      },
+      "sources_ids": [
+        "humboldt-flora-alto-andina"
+      ],
+      "validation_level": "claude_draft",
+      "harvest_type": "biomasa"
     }
   ],
   "biopreparados": [
