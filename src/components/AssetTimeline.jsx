@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo } from 'react';
-import { Sprout, Droplets, Apple, Leaf, RefreshCw, Clock } from 'lucide-react';
+import { Sprout, Droplets, Apple, Leaf, RefreshCw, Clock, Bot, Sparkles, Check, X } from 'lucide-react';
 import { useLogStore } from '../store/useLogStore';
+import { parseAiInference, parseAiReview } from '../utils/aiInferenceParser';
+import { savePayload } from '../services/payloadService';
+import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 
 /**
  * AssetTimeline — Línea de tiempo agroecológica de un activo (plant).
@@ -151,29 +154,93 @@ export default function AssetTimeline({ assetId }) {
               <ul className="space-y-2 relative border-l-2 border-slate-800 ml-2 pl-4">
                 {monthLogs.map((log) => {
                   const config = TYPE_CONFIG[log.type] || DEFAULT_CONFIG;
-                  const Icon = config.icon;
+
+                  // ADR-019 Phase 3: Detección y render de IA
                   const notes = extractNotes(log);
+                  const aiData = parseAiInference(notes);
+                  const isAi = !!aiData;
+
+                  // Búsqueda de review (crossing logic)
+                  const reviewLog = isAi ? monthLogs.find(l => {
+                    const r = parseAiReview(extractNotes(l));
+                    return r && r.target_log_id === log.id;
+                  }) : null;
+                  const reviewData = reviewLog ? parseAiReview(extractNotes(reviewLog)) : null;
+
+                  const Icon = isAi ? (aiData.needs_human_review ? Sparkles : Bot) : config.icon;
                   const qty = extractQuantity(log);
                   const pending = log._pending;
+
+                  const handleReview = async (verdict) => {
+                    const payload = {
+                      data: {
+                        type: 'log--observation',
+                        attributes: {
+                          name: `Revisión IA: ${verdict === 'confirmed' ? 'Confirmado' : 'Rechazado'}`,
+                          timestamp: new Date().toISOString().split('.')[0] + '+00:00',
+                          status: "done",
+                          notes: {
+                            value: [
+                              '[AI_REVIEW]',
+                              `target_log_id: ${log.id}`,
+                              `verdict: ${verdict}`,
+                              `reviewer_id: ${PRIMARY_WORKER_NAME}`, // TODO: reemplazar por auth user_id cuando ADR-016 conecte la consola de curación
+                              `reviewed_at: ${new Date().toISOString()}`,
+                              'notes: Revisión desde timeline local'
+                            ].join('\n'),
+                            format: 'plain_text'
+                          }
+                        },
+                        relationships: {
+                          asset: { data: [{ type: 'asset--plant', id: assetId }] }
+                        }
+                      }
+                    };
+                    await savePayload('observation', payload);
+                    // Recargar logs para ver el cambio
+                    useLogStore.getState().loadLogsForAsset(assetId);
+                  };
 
                   return (
                     <li
                       key={log.id}
-                      className={`relative p-3 rounded-xl border ${config.bg} ${config.border} ${
-                        pending ? 'opacity-60' : ''
-                      }`}
+                      className={`relative p-3 rounded-xl border ${isAi ? 'bg-indigo-900/10 border-indigo-500/30' : config.bg + ' ' + config.border} ${pending ? 'opacity-60' : ''
+                        } ${isAi && aiData.needs_human_review && !reviewData ? 'border-amber-500/50 shadow-[0_0_10px_rgba(245,158,11,0.1)]' : ''}`}
                     >
                       <span
-                        className={`absolute -left-[26px] top-4 w-4 h-4 rounded-full ${config.bg} border-2 ${config.border} flex items-center justify-center`}
+                        className={`absolute -left-[26px] top-4 w-4 h-4 rounded-full ${isAi ? 'bg-indigo-900 border-indigo-500' : config.bg + ' border-2 ' + config.border} flex items-center justify-center`}
                       >
-                        <Icon size={10} className={config.color} />
+                        <Icon size={10} className={isAi ? 'text-indigo-400' : config.color} />
                       </span>
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <span className={`text-xs font-bold ${config.color}`}>
-                              {config.label}
+                            <span className={`text-xs font-bold ${isAi ? 'text-indigo-400' : config.color}`}>
+                              {isAi ? 'Inferencia IA' : config.label}
                             </span>
+
+                            {isAi && (
+                              <span className="text-[10px] font-black bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-500/40">
+                                {Math.round(aiData.confidence * 100)}% Conf.
+                              </span>
+                            )}
+
+                            {reviewData && (
+                              <span className={`text-[10px] font-black px-1.5 py-0.5 rounded border flex items-center gap-1 ${reviewData.verdict === 'confirmed'
+                                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+                                  : 'bg-red-500/20 text-red-400 border-red-500/40'
+                                }`}>
+                                {reviewData.verdict === 'confirmed' ? <Check size={8} /> : <X size={8} />}
+                                {reviewData.verdict === 'confirmed' ? 'Confirmado' : 'Rechazado'}
+                              </span>
+                            )}
+
+                            {!reviewData && isAi && aiData.needs_human_review && (
+                              <span className="text-[10px] font-black bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/40 animate-pulse">
+                                Pendiente revisión
+                              </span>
+                            )}
+
                             {pending && (
                               <span className="text-[10px] font-bold text-amber-400 bg-amber-900/40 px-1.5 py-0.5 rounded-full flex items-center gap-1">
                                 <RefreshCw size={8} className="animate-spin" />
@@ -181,14 +248,51 @@ export default function AssetTimeline({ assetId }) {
                               </span>
                             )}
                           </div>
-                          <h4 className="text-sm text-slate-200 font-semibold truncate">
+                          <h4 className={`text-sm font-semibold truncate ${isAi ? 'text-indigo-100' : 'text-slate-200'}`}>
                             {log.attributes?.name || 'Evento sin nombre'}
                           </h4>
-                          {qty && (
-                            <div className="text-xs text-slate-400 mt-0.5">{qty}</div>
-                          )}
-                          {notes && (
-                            <p className="text-xs text-slate-500 mt-1 line-clamp-2">{notes}</p>
+
+                          {isAi ? (
+                            <div className="mt-2 space-y-2">
+                              {aiData.findings.length > 0 && (
+                                <div className="flex flex-wrap gap-1">
+                                  {aiData.findings.map((f, i) => (
+                                    <span key={i} className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">
+                                      {f}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                              <p className="text-xs text-slate-400 italic">
+                                {aiData.treatment}
+                              </p>
+
+                              {!reviewData && aiData.needs_human_review && (
+                                <div className="flex gap-2 pt-1">
+                                  <button
+                                    onClick={() => handleReview('confirmed')}
+                                    className="flex-1 py-1.5 rounded-lg bg-emerald-600/20 border border-emerald-500/40 text-emerald-400 text-[10px] font-bold flex items-center justify-center gap-1 active:bg-emerald-600/40 transition-colors"
+                                  >
+                                    <Check size={12} /> Confirmar
+                                  </button>
+                                  <button
+                                    onClick={() => handleReview('rejected')}
+                                    className="flex-1 py-1.5 rounded-lg bg-red-600/20 border border-red-500/40 text-red-400 text-[10px] font-bold flex items-center justify-center gap-1 active:bg-red-600/40 transition-colors"
+                                  >
+                                    <X size={12} /> Rechazar
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <>
+                              {qty && (
+                                <div className="text-xs text-slate-400 mt-0.5">{qty}</div>
+                              )}
+                              {notes && (
+                                <p className="text-xs text-slate-500 mt-1 line-clamp-2">{notes}</p>
+                              )}
+                            </>
                           )}
                         </div>
                         <span className="text-xs text-slate-500 shrink-0 whitespace-nowrap">

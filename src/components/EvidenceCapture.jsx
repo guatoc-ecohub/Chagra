@@ -6,6 +6,8 @@ import { analyzeFoliage } from '../services/aiService';
 import { proximityCheck } from '../utils/spatialAnalysis';
 import { wktToGeoJson } from '../utils/geo';
 import AIStreamPanel from './common/AIStreamPanel';
+import { savePayload } from '../services/payloadService';
+import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 
 /**
  * EvidenceCapture — Captura con diagnóstico IA y evolución histórica (Fase 20.2b).
@@ -75,7 +77,7 @@ export const EvidenceCapture = ({
         }
       })();
     }
-  }, [logId, assetId]);
+  }, [logId, assetId, onCountChange]);
 
   const handleCapture = async (e) => {
     const file = e.target.files?.[0];
@@ -97,7 +99,7 @@ export const EvidenceCapture = ({
             if (!ok) { if (inputRef.current) inputRef.current.value = ''; return; }
           }
         }
-      } catch (gpsErr) {
+      } catch {
         console.warn('[EvidenceCapture] GPS no disponible para proximity gate.');
       }
     }
@@ -124,9 +126,44 @@ export const EvidenceCapture = ({
           });
           if (result) {
             setDiagnosis(result);
-            await mediaCache.updateDiagnosis(mediaId, result);
             onDiagnosis?.(result);
             console.info(`[Evidence] Diagnóstico IA: score=${result.score}, issues=${result.issues.length}.`);
+
+            // ADR-019 Phase 3: Generar log--observation de inferencia
+            const confidence = result.score / 100;
+            const needsReview = confidence < 0.85; // Guardrail ADR-019
+
+            const aiNotes = [
+              '[AI_INFERENCE]',
+              `source: vision_model`,
+              `model_version: gemma3:4b`,
+              `confidence: ${confidence.toFixed(2)}`,
+              `needs_human_review: ${needsReview}`,
+              '',
+              '--- Findings ---',
+              ...(result.issues.map(issue => `- ${issue}`)),
+              '',
+              '--- Suggested treatment ---',
+              result.treatment_suggestion || 'Sin sugerencia específica'
+            ].join('\n');
+
+            const payload = {
+              data: {
+                type: 'log--observation',
+                attributes: {
+                  name: `Diagnóstico IA: ${result.issues[0] || 'Sin hallazgos'}`,
+                  timestamp: new Date().toISOString().split('.')[0] + '+00:00',
+                  status: "done",
+                  notes: { value: aiNotes, format: 'plain_text' }
+                },
+                relationships: {
+                  asset: { data: [{ type: 'asset--plant', id: assetId }] },
+                  file: { data: [] } // Sync manager vinculará el file post-upload
+                }
+              }
+            };
+
+            await savePayload('observation', payload);
           }
         } finally {
           setDiagnosing(false);
