@@ -48,6 +48,9 @@
       exec "${nodejs_22}/bin/npx" --yes "@anthropic-ai/claude-code" "$@"
     '')
 
+    # --- OpenAI Codex CLI (delegación de tareas Chagra, conviviendo con Claude) ---
+    codex
+
     # --- Herramientas de Desarrollo ---
     git
     gh

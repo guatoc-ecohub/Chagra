@@ -40,3 +40,21 @@ nix flake update
 - `server-services.nix`: Docker, Podman, network services
 - `dev-environment.nix`: Development tools and shell
 - `desktop-gaming.nix`: Gaming & graphics drivers (STG laptop)
+- `ai/openfang.nix`: OpenFang Agent OS — agentes con manifests TOML en `ai/openfang/`
+- `ai/whisper-http.nix`: Speech-to-text HTTP service (port 10301, container `openai-whisper-asr-webservice`)
+- `agents/chagra-deploy.nix`: Webhook + script de deploy continuo PWA Chagra
+
+## OpenFang agent flows (alpha)
+
+El agent `guatoc` (Personal_Hand_Kortux) en `:4200` tiene tres flows
+documentados en `modules/ai/openfang/guatoc-manifest.toml`:
+
+| Sección | Flow | Trigger |
+|---------|------|---------|
+| 4 + 4.bis | Imagen Telegram → log/asset/fondo en Chagra | foto/imagen recibida |
+| 6 | Cambio en Chagra → clone+commit+push+PR completo | "modifica X en Chagra" (texto) |
+| 7 | Voz Telegram → GitHub Issue ligero (workflow abre draft PR) | mensaje de voz con intent de tarea |
+
+Sección 7 requiere `mediaAllowedTypes` con `"voice"` + whisper-http en
+networkAllowlist (`127.0.0.1:10301`). Habilitado por defecto en alpha
+desde 2026-04-25.

@@ -69,7 +69,7 @@ let
     ${lib.optionalString agent.mediaEnabled ''
     [channels.telegram.media]
     enabled = true
-    allowed_types = ["photo", "document", "sticker"]
+    allowed_types = [${lib.concatMapStringsSep ", " (t: ''"${t}"'') agent.mediaAllowedTypes}]
     max_size_mb = ${toString agent.mediaMaxSizeMb}
     download_dir = "/var/lib/openfang/agent-${name}/data/media"
     ''}
@@ -150,7 +150,19 @@ in
           mediaEnabled = lib.mkOption {
             type = lib.types.bool;
             default = false;
-            description = "Habilitar recepción de media (fotos, documentos) en Telegram";
+            description = "Habilitar recepción de media en Telegram";
+          };
+          mediaAllowedTypes = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [ "photo" "document" "sticker" ];
+            description = ''
+              Tipos de media de Telegram que el agent acepta. Lista válida del
+              channel Telegram de OpenFang v0.5.9: photo, document, sticker,
+              voice, audio, video, video_note. Default: photo + document +
+              sticker (multimodal visión clásica). Para flujos de voz agregar
+              "voice".
+            '';
+            example = [ "photo" "document" "sticker" "voice" ];
           };
           mediaMaxSizeMb = lib.mkOption {
             type = lib.types.int;
