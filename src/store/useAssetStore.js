@@ -310,12 +310,17 @@ const useAssetStore = create((set, get) => ({
 
       const currentStock = parseFloat(materialAsset.attributes?.inventory_value) || 0;
       const newStock = Math.max(0, currentStock - deduction);
+      // ADR-019 Fase 4: timestamp LWW field-level para inventory_value.
+      // Permite que dos dispositivos editando offline reconcilien sin que
+      // el último PATCH ciegamente sobrescriba al primero al recuperar red.
+      const inventoryTs = Date.now();
 
       const updatedMaterial = {
         ...materialAsset,
         attributes: {
           ...materialAsset.attributes,
           inventory_value: newStock,
+          inventory_value_updated_at: inventoryTs,
           inventory_unit: invUnit,
         },
         _pending: true,
@@ -323,9 +328,9 @@ const useAssetStore = create((set, get) => ({
 
       assetUpdates.push(updatedMaterial);
 
-      // Hotfix 13.3: propagar el nuevo stock al servidor vía PATCH idempotente.
-      // Se envía el valor absoluto para evitar doble descuento si FarmOS
-      // también auto-decrementa por el log--input (último estado PWA gana).
+      // Hotfix 13.3 + ADR-019 Fase 4: PATCH idempotente con timestamp LWW.
+      // El servidor (cuando FarmOS exponga el campo) o el bulkPut local
+      // comparan timestamps al merge; si local > remote, local preserva.
       extraPendingTxs.push({
         id: crypto.randomUUID(),
         type: 'asset_material',
@@ -336,7 +341,10 @@ const useAssetStore = create((set, get) => ({
           data: {
             type: 'asset--material',
             id: materialAsset.id,
-            attributes: { inventory_value: newStock },
+            attributes: {
+              inventory_value: newStock,
+              inventory_value_updated_at: inventoryTs,
+            },
           },
         },
       });
@@ -446,10 +454,16 @@ const useAssetStore = create((set, get) => ({
 
     const currentStock = parseFloat(material.attributes?.inventory_value) || 0;
     const newStock = currentStock + converted;
+    // ADR-019 Fase 4: timestamp LWW field-level (ver addInputLog para detalle).
+    const inventoryTs = Date.now();
 
     const updatedMaterial = {
       ...material,
-      attributes: { ...material.attributes, inventory_value: newStock },
+      attributes: {
+        ...material.attributes,
+        inventory_value: newStock,
+        inventory_value_updated_at: inventoryTs,
+      },
       _pending: true,
     };
 
@@ -463,7 +477,10 @@ const useAssetStore = create((set, get) => ({
         data: {
           type: 'asset--material',
           id: material.id,
-          attributes: { inventory_value: newStock },
+          attributes: {
+            inventory_value: newStock,
+            inventory_value_updated_at: inventoryTs,
+          },
         },
       },
     };

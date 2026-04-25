@@ -51,6 +51,8 @@ export const assetCache = {
     });
 
     const localMap = new Map(localAssets.map((a) => [a.id, a]));
+    // ADR-019 Fase 4: registrar reconciliaciones LWW para emitir alerta UI.
+    const reconciliations = [];
 
     // 2. Merge lógico: remotos entran, pendings locales se preservan
     for (const remote of remoteAssets) {
@@ -59,6 +61,27 @@ export const assetCache = {
       if (local && local._pending) {
         console.warn(`[Cache] Preservando cambio local _pending para ${remote.id}.`);
         continue;
+      }
+
+      // ADR-019 Fase 4: LWW field-level para inventory_value en
+      // asset--material. Si el timestamp local es más reciente que el del
+      // servidor, preservamos local y notificamos al operador. Esto cubre el
+      // caso multi-dispositivo donde otro cliente sincronizó valores antiguos.
+      if (assetType === 'material') {
+        const localTs = local?.attributes?.inventory_value_updated_at || 0;
+        const remoteTs = remote?.attributes?.inventory_value_updated_at || 0;
+        if (localTs > 0 && localTs > remoteTs) {
+          reconciliations.push({
+            id: remote.id,
+            name: local.attributes?.name || 'material',
+            localValue: local.attributes?.inventory_value,
+            remoteValue: remote.attributes?.inventory_value,
+          });
+          console.warn(
+            `[Cache] LWW: preservando local de ${remote.id} (local ${localTs} > remote ${remoteTs}).`
+          );
+          continue;
+        }
       }
 
       store.put({
@@ -79,7 +102,21 @@ export const assetCache = {
     }
 
     return new Promise((resolve, reject) => {
-      tx.oncomplete = () => resolve();
+      tx.oncomplete = () => {
+        // ADR-019 Fase 4: emitir alerta de reconciliación para que el operador
+        // sepa que su valor local se preservó frente a un servidor más viejo.
+        // Se invoca tras tx.oncomplete para garantizar que el merge ya está
+        // persistido cuando el listener (NetworkStatusBar) recibe la señal.
+        if (typeof window !== 'undefined' && reconciliations.length > 0) {
+          const names = reconciliations.map((r) => r.name).join(', ');
+          window.dispatchEvent(
+            new CustomEvent('farmosLog', {
+              detail: `Inventario reconciliado (${reconciliations.length}): ${names} — revisar logs`,
+            })
+          );
+        }
+        resolve();
+      };
       tx.onabort = () => reject(tx.error);
       tx.onerror = () => reject(tx.error);
     });
