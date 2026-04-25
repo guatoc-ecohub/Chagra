@@ -10,9 +10,12 @@
 import React, { useRef, useCallback } from 'react';
 import { X } from 'lucide-react';
 
-const FULL_TEXT_URL = 'https://chagra.bio/legal/terminos-y-condiciones.html';
+// Cada modal apunta a su pagina publica especifica en chagra.bio/legal/.
+// Si el sitio publico no esta desplegado todavia, los modales aun muestran
+// el resumen completo inline; el link "Read full text" solo añade contexto.
+const LEGAL_BASE = 'https://chagra.bio/legal';
 
-function LegalDialog({ id, title, meta, children, dialogRef }) {
+function LegalDialog({ id, title, meta, children, dialogRef, fullTextUrl }) {
   const handleBackdropClick = (e) => {
     if (e.target === dialogRef.current) dialogRef.current.close();
   };
@@ -42,7 +45,7 @@ function LegalDialog({ id, title, meta, children, dialogRef }) {
         </div>
         <div className="mt-4 pt-3 border-t border-slate-800">
           <a
-            href={FULL_TEXT_URL}
+            href={fullTextUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="text-emerald-400 hover:text-emerald-300 font-bold text-sm"
@@ -112,6 +115,7 @@ export default function LegalLinks() {
       <LegalDialog
         id="legal-tyc"
         dialogRef={tycRef}
+        fullTextUrl={`${LEGAL_BASE}/terminos-y-condiciones.html`}
         title="Términos y condiciones"
         meta="Versión v0.1 · 2026-04-24 · borrador pendiente revisión legal."
       >
@@ -150,6 +154,7 @@ export default function LegalLinks() {
       <LegalDialog
         id="legal-priv"
         dialogRef={privRef}
+        fullTextUrl={`${LEGAL_BASE}/privacidad.html`}
         title="Política de tratamiento de datos"
         meta="Conforme a la Ley 1581 de 2012 (Habeas Data Colombia) y el Decreto 1377 de 2013."
       >
@@ -196,6 +201,7 @@ export default function LegalLinks() {
       <LegalDialog
         id="legal-comunitario"
         dialogRef={comRef}
+        fullTextUrl={`${LEGAL_BASE}/soberania-comunitaria.html`}
         title="Soberanía de saberes comunitarios"
         meta="Conforme al Convenio 169 OIT (Ley 21/1991) y los Principios CARE."
       >
@@ -229,6 +235,7 @@ export default function LegalLinks() {
       <LegalDialog
         id="legal-lic"
         dialogRef={licRef}
+        fullTextUrl={`${LEGAL_BASE}/licencias.html`}
         title="Licencias del software y catálogo"
         meta="Modelo open-core: base común, módulos comerciales separados."
       >
