@@ -17,6 +17,10 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
         locationId: initialLocationId || '',
     });
     const [speciesList, setSpeciesList] = useState([]);
+    // 'loading' | 'ready' | 'error' — refleja el estado del fetch del catálogo.
+    // Sin esto, un fallo silencioso dejaba el selector vacío sin diagnóstico
+    // y el usuario quedaba bloqueado (no podía guardar).
+    const [catalogStatus, setCatalogStatus] = useState('loading');
     const [photo, setPhoto] = useState(null);
     const [photoUrl, setPhotoUrl] = useState(null);
     const [location, setLocation] = useState(initialWkt ? { wkt: initialWkt } : null);
@@ -26,10 +30,27 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
     const [selectedInvasive, setSelectedInvasive] = useState(null);
 
     useEffect(() => {
-        // Cargar especies invasoras del catálogo
-        getAllSpecies().then(all => {
-            setSpeciesList(all.filter(s => s.category === 'especies_invasoras'));
-        });
+        // Cargar especies invasoras del catálogo. Manejo defensivo contra
+        // fallo de inicialización SQLite WASM: si /catalog.sqlite no responde
+        // o OPFS está bloqueado, la promesa rechaza y antes el usuario veía
+        // un selector vacío sin diagnóstico. Ahora exponemos el error.
+        let cancelled = false;
+        getAllSpecies()
+            .then((all) => {
+                if (cancelled) return;
+                const invasoras = all.filter((s) => s.category === 'especies_invasoras');
+                setSpeciesList(invasoras);
+                setCatalogStatus('ready');
+                if (invasoras.length === 0) {
+                    console.warn('[InvasiveObservationLog] Catálogo cargado pero sin especies invasoras (filter category=especies_invasoras devolvió 0).');
+                }
+            })
+            .catch((err) => {
+                if (cancelled) return;
+                console.error('[InvasiveObservationLog] Falló carga del catálogo:', err);
+                setCatalogStatus('error');
+            });
+        return () => { cancelled = true; };
     }, []);
 
     const handleInput = (e) => {
@@ -203,13 +224,33 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
                         name="speciesId"
                         value={formData.speciesId}
                         onChange={handleInput}
-                        className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-2xl text-white min-h-[64px] appearance-none"
+                        disabled={catalogStatus !== 'ready' || speciesList.length === 0}
+                        className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-2xl text-white min-h-[64px] appearance-none disabled:opacity-50"
                     >
-                        <option value="">Selecciona especie...</option>
-                        {speciesList.map(s => (
-                            <option key={s.id} value={s.id}>{s.nombre_comun}</option>
-                        ))}
+                        {catalogStatus === 'loading' && (
+                            <option value="">Cargando catálogo…</option>
+                        )}
+                        {catalogStatus === 'error' && (
+                            <option value="">Error cargando catálogo — recarga la app</option>
+                        )}
+                        {catalogStatus === 'ready' && speciesList.length === 0 && (
+                            <option value="">No hay especies invasoras en el catálogo</option>
+                        )}
+                        {catalogStatus === 'ready' && speciesList.length > 0 && (
+                            <>
+                                <option value="">Selecciona especie…</option>
+                                {speciesList.map((s) => (
+                                    <option key={s.id} value={s.id}>{s.nombre_comun}</option>
+                                ))}
+                            </>
+                        )}
                     </select>
+                    {catalogStatus === 'error' && (
+                        <p className="text-sm text-red-400 mt-1">
+                            No se pudo cargar el catálogo de especies. Verifica conexión y refresca.
+                            Si persiste, revisa la consola del navegador.
+                        </p>
+                    )}
                 </label>
 
                 <div className="flex flex-col gap-2">

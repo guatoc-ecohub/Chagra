@@ -6,6 +6,7 @@ import { isAuthenticated, logoutUser } from './services/authService';
 import useAssetStore from './store/useAssetStore';
 import { fetchFromFarmOS } from './services/apiService';
 import { PRIMARY_WORKER_NAME } from './config/workerConfig';
+import { initCatalog } from './db/catalogDB';
 import { version as APP_VERSION } from '../package.json';
 import NetworkStatusBar from './components/NetworkStatusBar';
 import PendingTasksWidget from './components/PendingTasksWidget';
@@ -220,6 +221,18 @@ export default function App() {
       navigate(isAuth ? 'dashboard' : 'login');
     });
   }, [navigate]);
+
+  // Preload del catálogo SQLite WASM en background (v0.8.2). Inicializa la
+  // DB cuando la app arranca para que la primera apertura de los flows que
+  // consultan el catálogo (InvasiveObservationLog, NativeSubstituteSuggestion,
+  // etc.) no espere el download del .sqlite (~135KB) ni la inicialización
+  // del WASM. Si falla, el catalogDB log lo registra y los componentes
+  // muestran su propio empty/error state.
+  useEffect(() => {
+    initCatalog().catch((err) => {
+      console.warn('[App] Catálogo no se pudo preload (los componentes lo reintentarán al usarlos):', err);
+    });
+  }, []);
 
   const showToast = useCallback((message, isError = false) => {
     setToast({ message, isError });
