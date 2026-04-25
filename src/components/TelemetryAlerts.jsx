@@ -8,6 +8,28 @@ import ChagraGrowLoader from './ChagraGrowLoader';
 import { streamOllama } from '../services/ollamaStream';
 import ExternalAiButton from './common/ExternalAiButton';
 import { buildDiagnosticExternalPrompt } from '../services/externalAiPromptBuilder';
+import { detectAndTruncateRepetition } from '../utils/repetitionGuard';
+
+/**
+ * TelemetryAlerts — análisis agronómico de telemetría IoT con asistencia LLM.
+ *
+ * Flujo:
+ *   1. Suscripción WebSocket a Home Assistant para sensores configurados.
+ *   2. Detección de valor anormal (umbral por especie/zona).
+ *   3. Streaming de análisis agronómico via Ollama (qwen3.5:4b o gemma3:4b).
+ *   4. Acción dispatched por operador → log--maintenance + cooldown idempotente.
+ *
+ * LLM constraints (v0.7.2):
+ *   - num_predict: 200, temperature: 0.3, repeat_penalty: 1.15
+ *   - prompt instruye respuesta concisa, sin superlativos, sin loops.
+ *   - post-procesamiento detecta repetición y trunca via detectAndTruncateRepetition.
+ *
+ * Telemetría observability:
+ *   - eventos farmosLog: telemetry:* (ver logTelemetryEvent helper).
+ *   - debug verbose: localStorage 'chagra:debug:telemetry'.
+ *
+ * Tests: tests/telemetry-streaming.spec.js, tests/telemetry-llm-bounds.spec.js.
+ */
 
 // Constantes de Infraestructura Segura (API Gateway Local)
 const HA_URL = '/api/ha';
@@ -59,6 +81,18 @@ export default function TelemetryAlerts() {
   // Variables de Entorno (Requeridas en el archivo .env)
   const HA_TOKEN = import.meta.env.VITE_HA_ACCESS_TOKEN;
 
+  // Helper de observabilidad (v0.7.2)
+  const logTelemetryEvent = (kind, payload = {}, level = 'info') => {
+    const isDebug = localStorage.getItem('chagra:debug:telemetry') === '1';
+    const detail = `[${kind}] ${typeof payload === 'string' ? payload : JSON.stringify(payload)}`;
+
+    if (isDebug) console[level](detail);
+
+    window.dispatchEvent(new CustomEvent('farmosLog', {
+      detail: `${kind}: ${payload.message || payload.action || 'evento general'}`
+    }));
+  };
+
   // Enrutador genérico de acciones de telemetría con idempotencia persistente.
   // Cooldown y encolado son atómicos (IDB transaction sobre pending_tx + sync_meta).
   const handleTelemetryAction = async (sensorId, alertType, payloadBuilder, options = {}) => {
@@ -83,6 +117,8 @@ export default function TelemetryAlerts() {
       };
 
       await assetCache.commitAlertWithCooldown(sensorId, alertType, pendingTx);
+
+      logTelemetryEvent('telemetry:action_dispatched', { action: alertType, sensor_id: sensorId });
 
       window.dispatchEvent(new CustomEvent('taskAdded'));
       console.info(`[Telemetry] Alerta ${alertType} procesada y encolada.`);
@@ -297,6 +333,10 @@ export default function TelemetryAlerts() {
       let offlineNotice = '';
 
       if (unavailableSensors.length > 0) {
+        logTelemetryEvent('telemetry:sensor_disconnected', {
+          message: `${unavailableSensors.length} sensores offline`,
+          sensors: unavailableSensors.map(s => s.name)
+        }, 'warn');
         // Idempotencia persistente por (sensor.key, 'conectividad') vía sync_meta.
         let dispatched = 0;
         for (const sensor of unavailableSensors) {
@@ -429,8 +469,8 @@ export default function TelemetryAlerts() {
       setLiveAnalysis('');
 
       // 3. Enriquecimiento con IA en background vía streaming NDJSON (v0.6.0):
-      // cada token de qwen3 aparece en vivo en `liveAnalysis` con efecto
-      // typewriter, y el último chunk (done:true) entrega el metadata para aiMeta.
+      logTelemetryEvent('telemetry:llm_started', { sensor_id: FARM_CONFIG.LOCATION_ID });
+
       try {
         const ollamaTimeout = setTimeout(() => { if (!parentSignal?.aborted) setAiStatus('error'); }, 45000);
         const userPrompt = (() => {
@@ -450,10 +490,10 @@ export default function TelemetryAlerts() {
             model: 'qwen3.5:4b',
             think: false,
             messages: [
-              { role: 'system', content: 'Asistente agronómico para finca agroecológica andina (2400msnm). PROHIBIDO recomendar agroquímicos sintéticos. Solo biopreparados orgánicos (biol, caldo sulfocálcico, caldo bordelés, purín de ortiga, compost tea, microorganismos de montaña, Trichoderma). Responde conciso en español, 2 líneas máximo.' },
+              { role: 'system', content: 'Asistente agronómico para finca agroecológica andina (2400msnm). PROHIBIDO recomendar agroquímicos sintéticos. Solo biopreparados orgánicos (biol, caldo sulfocálcico, caldo bordelés, purín de ortiga, compost tea, microorganismos de montaña, Trichoderma). Responde en máximo 3 frases concisas, sin superlativos, sin repetir información.' },
               { role: 'user', content: userPrompt },
             ],
-            options: { num_predict: 200, temperature: 0.3 },
+            options: { num_predict: 200, temperature: 0.3, repeat_penalty: 1.15 },
           },
           (_chunk, full) => {
             if (!parentSignal?.aborted) setLiveAnalysis(full);
@@ -468,6 +508,10 @@ export default function TelemetryAlerts() {
                 evalCount: parsed.eval_count || null,
                 promptTokens: parsed.prompt_eval_count || null,
               });
+              logTelemetryEvent('telemetry:llm_finished', {
+                duration: parsed.total_duration ? (parsed.total_duration / 1e9).toFixed(1) : '?',
+                tokens: parsed.eval_count || 0
+              });
             },
           },
         );
@@ -475,10 +519,12 @@ export default function TelemetryAlerts() {
         if (parentSignal?.aborted) return;
 
         const trimmed = (content || '').trim();
-        if (trimmed.length > 10) {
+        const sanitized = detectAndTruncateRepetition(trimmed);
+
+        if (sanitized.length > 10) {
           // aiAlert queda con solo reglas; el texto de IA va a aiFinalText y
           // se renderiza abajo en su propio panel cyberpunk (AIStreamPanel).
-          setAiFinalText(trimmed);
+          setAiFinalText(sanitized);
           setAiStatus('done');
         } else {
           console.warn('[Telemetry] IA sin contenido suficiente. Length:', trimmed.length);
@@ -488,6 +534,7 @@ export default function TelemetryAlerts() {
         if (parentSignal?.aborted) return;
         console.warn('[Telemetry] IA no disponible:', llmErr.message);
         setAiStatus('error');
+        logTelemetryEvent('telemetry:llm_failed', { message: llmErr.message }, 'error');
       }
 
     } catch (err) {
@@ -692,7 +739,10 @@ export default function TelemetryAlerts() {
       </div>
 
       <button
-        onClick={() => fetchTelemetryAndAnalyze()}
+        onClick={() => {
+          const ctrl = new AbortController();
+          fetchTelemetryAndAnalyze(ctrl.signal);
+        }}
         disabled={loading}
         className="mt-6 w-full p-4 rounded-2xl bg-slate-800 hover:bg-slate-700 active:bg-slate-600 transition-all border border-slate-600 font-bold text-slate-300 flex items-center justify-center gap-3 disabled:opacity-50"
       >
