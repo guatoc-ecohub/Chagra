@@ -51,9 +51,16 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
             onSave?.('Archivo no es una imagen válida', true);
             return;
         }
+        const objectUrl = URL.createObjectURL(file);
+        const safeObjectUrl = sanitizeBlobUrl(objectUrl);
+        if (!safeObjectUrl) {
+            URL.revokeObjectURL(objectUrl);
+            onSave?.('No se pudo procesar la imagen seleccionada', true);
+            return;
+        }
         setPhoto(file);
         if (photoUrl) URL.revokeObjectURL(photoUrl);
-        setPhotoUrl(URL.createObjectURL(file));
+        setPhotoUrl(safeObjectUrl);
     };
 
     const captureLocation = () => {
@@ -239,8 +246,8 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
                         <Camera size={32} />
                         <span>{photo ? 'Foto lista' : 'Capturar Foto'}</span>
                     </button>
-                    {sanitizeBlobUrl(photoUrl) ? (
-                        <img src={sanitizeBlobUrl(photoUrl)} className="mt-2 rounded-xl border border-slate-800 h-40 object-cover w-full" alt="Preview" />
+                    {photoUrl ? (
+                        <img src={photoUrl} className="mt-2 rounded-xl border border-slate-800 h-40 object-cover w-full" alt="Preview" />
                     ) : null}
                 </div>
 
