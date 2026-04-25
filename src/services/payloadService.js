@@ -7,6 +7,8 @@ const resolveEndpoint = (type) =>
   type === 'plant_asset' ? '/api/asset/plant' :
   type === 'input' ? '/api/log/input' :
   type === 'harvest' ? '/api/log/harvest' :
+  type === 'observation' ? '/api/log/observation' :
+  type === 'task' ? '/api/log/task' :
   '/api/log/seeding';
 
 export const savePayload = async (type, payload) => {
@@ -129,7 +131,7 @@ export const savePayload = async (type, payload) => {
               console.warn(`  [${i}] ${e.title || 'Error'}: ${e.detail || '(sin detalle)'}${e.source?.pointer ? ` @ ${e.source.pointer}` : ''}`),
             );
           }
-        } catch (_) {
+        } catch {
           console.warn('[payloadService] Error body (raw):', error.detail.slice(0, 500));
         }
       }
