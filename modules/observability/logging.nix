@@ -9,8 +9,11 @@ let
   cfg = config.guatoc.observability.logging;
   obsCfg = config.guatoc.observability;
   registry = import ../../lib/registry.nix { inherit lib; };
-  
-  # Promtail configuration - declarative (journal only for now)
+
+  # promtailConfig: dejado en place como referencia para migración a alloy/
+  # fluent-bit. No se usa actualmente porque services.promtail fue removido
+  # en nixpkgs upstream (end-of-life). Ver bloque "Promtail: REMOVED" abajo.
+  # eslint-disable-next-line — no se usa, intencional pending migration.
   promtailConfig = pkgs.writeText "promtail-config.yml" ''
 server:
   http_listen_port: 9080
@@ -70,14 +73,28 @@ in
       "d /mnt/fast/appdata/uptime-kuma 0755 root root -"
     ];
 
-    # Native Promtail service - uses configFile for declarative config
-    services.promtail = {
-      enable = true;
-      configFile = promtailConfig;
-    };
-
-    # Allow promtail user to read journal and podman socket
-    users.users.promtail.extraGroups = [ "systemd-journal" ];
+    # ─────────────────────────────────────────────────────────────────────────
+    # Promtail: REMOVED en nixpkgs upstream tras alcanzar end-of-life.
+    #
+    # El módulo `services.promtail` y `users.users.promtail` fueron eliminados
+    # en nixpkgs 2026-04. La opción `cfg.package` aún pre-existe pero forzar
+    # `services.promtail.enable = true` causa assertion error en eval.
+    #
+    # Migración pendiente (post-demo 2026-04-27):
+    #   - Opción A: `services.alloy.enable = true` con configuración de
+    #     receptores `loki.source.journal` y forwarders `loki.write` apuntando
+    #     a `localhost:${registry.ports.loki}`. Doc: grafana.com/docs/alloy.
+    #   - Opción B: `services.fluent-bit.enable = true` más liviana, output
+    #     plugin loki. Doc: docs.fluentbit.io.
+    #
+    # Mientras tanto: Loki sigue corriendo (container OCI), solo no hay shipper
+    # del journal alpha. Logs locales siguen accesibles via journalctl.
+    # ─────────────────────────────────────────────────────────────────────────
+    # services.promtail = {
+    #   enable = true;
+    #   configFile = promtailConfig;
+    # };
+    # users.users.promtail.extraGroups = [ "systemd-journal" ];
 
     # Uptime Kuma container (OCI)
     virtualisation.oci-containers.containers.uptime-kuma = lib.mkIf cfg.uptimeKuma {
