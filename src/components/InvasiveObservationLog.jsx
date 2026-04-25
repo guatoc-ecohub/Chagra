@@ -239,7 +239,9 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
                         <Camera size={32} />
                         <span>{photo ? 'Foto lista' : 'Capturar Foto'}</span>
                     </button>
-                    {sanitizeBlobUrl(photoUrl) && <img src={sanitizeBlobUrl(photoUrl)} className="mt-2 rounded-xl border border-slate-800 h-40 object-cover w-full" alt="Preview" />}
+                    {sanitizeBlobUrl(photoUrl) ? (
+                        <img src={sanitizeBlobUrl(photoUrl)} className="mt-2 rounded-xl border border-slate-800 h-40 object-cover w-full" alt="Preview" />
+                    ) : null}
                 </div>
 
                 <button
