@@ -214,7 +214,14 @@ const useAssetStore = create((set, get) => ({
     const currentPlant = get().plants.find((p) => p.id === assetId);
     if (!currentPlant) throw new Error("Planta no encontrada en el store local");
 
-    const updatedPlant = { ...currentPlant, latestHarvest: harvestData.yield, status: 'harvested' };
+    // ADR-019 Regla 2 (Fase 2): la cosecha vive SOLO como log--harvest (encolado
+    // abajo). Antes mutábamos asset.latestHarvest y asset.status='harvested',
+    // pero esos campos eran derivables y no tenían consumidores reales en el
+    // código (grep -rn confirma cero references). Violaban la regla "vistas
+    // derivadas no se almacenan como campo de Asset". El estado "cosechada"
+    // se deriva de exists(log--harvest where relationships.asset includes
+    // plant.id) — patrón ya usado por AssetTimeline.jsx que es la hoja de
+    // vida derivada de la planta.
     const harvestQuantity = {
       value: parseFloat(harvestData.yield) || 0,
       unit: harvestData.unit,
@@ -254,16 +261,15 @@ const useAssetStore = create((set, get) => ({
     }
 
     try {
-      // 1. Commit atómico estricto (IndexedDB: assets + pending_transactions en una sola tx)
+      // 1. Commit atómico — solo encola pending_tx; no mutamos el asset.
       await assetCache.commitOptimisticUpdate(
-        [{ assetType: 'plant', asset: updatedPlant }],
+        [],
         [pendingTx]
       );
 
-      // 2. Actualización en memoria (Zustand) solo si DB confirma éxito
-      set((state) => ({
-        plants: state.plants.map((plant) => plant.id === assetId ? updatedPlant : plant)
-      }));
+      // 2. Sin mutación de asset → no actualizamos plants en Zustand.
+      //    El log optimista de arriba ya alimentó useLogStore para que la
+      //    timeline (AssetTimeline.jsx) re-renderice al instante.
 
       // 3. Emitir evento para forzar ciclo de sync en background sin bloquear
       if (typeof window !== 'undefined') {
