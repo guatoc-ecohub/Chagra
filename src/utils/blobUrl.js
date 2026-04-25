@@ -24,8 +24,17 @@
 export const sanitizeBlobUrl = (url) => {
   if (typeof url !== 'string') return '';
   if (url.length === 0) return '';
-  if (!url.startsWith('blob:')) return '';
-  return url;
+
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'blob:') return '';
+    // Blob URLs should be same-origin in this app context.
+    // Some environments may expose opaque origin "null"; allow it only for blob protocol.
+    if (parsed.origin !== window.location.origin && parsed.origin !== 'null') return '';
+    return parsed.href;
+  } catch {
+    return '';
+  }
 };
 
 export default sanitizeBlobUrl;
