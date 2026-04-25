@@ -285,8 +285,12 @@
           }
         ];
 
-        # --- Telegram media: recibir fotos/documentos ---
+        # --- Telegram media: fotos/documentos + voz ---
+        # "voice" habilitado para flow de intake voz → GitHub Issue
+        # (sección 7 del manifest). El OGG se descarga a download_dir y
+        # el agent lo transcribe llamando whisper-http en :10301.
         mediaEnabled = true;
+        mediaAllowedTypes = [ "photo" "document" "sticker" "voice" ];
         mediaMaxSizeMb = 20;
 
         # --- Workspace de evolución personal ---
@@ -314,6 +318,7 @@
           "127.0.0.1:8081"    # FarmOS API
           "127.0.0.1:8123"    # Home Assistant
           "127.0.0.1:11434"   # Ollama
+          "127.0.0.1:10301"   # Whisper-HTTP ASR (voz → texto, sección 7 manifest)
           "chagra.guatoc.co"  # Nginx proxy (PWA)
           "duckduckgo.com"
           "html.duckduckgo.com"
