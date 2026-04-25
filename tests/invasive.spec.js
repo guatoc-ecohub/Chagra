@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-// TODO(adr-019-phase1): este E2E está pendiente de validación end-to-end en CI.
-// Antigravity reportó que no pudo correrlo localmente (falta libgbm.so.1) y al
+// TODO: este E2E está pendiente de validación end-to-end en CI.
+// El agente de code-gen no pudo correrlo localmente (falta libgbm.so.1) y al
 // inspeccionarlo encontramos selectores y regex que matcheaban texto inexistente.
 // Quedan arreglados los más obvios (regex de notas, sugerencia nativa); el resto
 // requiere ejecución real en runner Playwright para iterar. Marcado .skip hasta
