@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Camera, MapPin, AlertCircle, CheckCircle } from 'lucide-react';
 import { savePayload } from '../services/payloadService';
 import { getAllSpecies } from '../db/catalogDB';
+import { sanitizeBlobUrl } from '../utils/blobUrl';
 import NativeSubstituteSuggestion from './NativeSubstituteSuggestion';
 
 export default function InvasiveObservationLog({ onBack, onSave, initialLocationId = null, initialWkt = null }) {
@@ -42,11 +43,17 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
 
     const handlePhotoCapture = (e) => {
         const file = e.target.files[0];
-        if (file) {
-            setPhoto(file);
-            if (photoUrl) URL.revokeObjectURL(photoUrl);
-            setPhotoUrl(URL.createObjectURL(file));
+        if (!file) return;
+        // Validación MIME: el atributo accept="image/*" del input es UX hint,
+        // no garantía. Validar antes de crear blob URL evita XSS via SVG con
+        // scripts embebidos. Cierra CodeQL js/xss-through-dom.
+        if (!file.type.startsWith('image/')) {
+            onSave?.('Archivo no es una imagen válida', true);
+            return;
         }
+        setPhoto(file);
+        if (photoUrl) URL.revokeObjectURL(photoUrl);
+        setPhotoUrl(URL.createObjectURL(file));
     };
 
     const captureLocation = () => {
@@ -232,7 +239,7 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
                         <Camera size={32} />
                         <span>{photo ? 'Foto lista' : 'Capturar Foto'}</span>
                     </button>
-                    {photoUrl && <img src={photoUrl} className="mt-2 rounded-xl border border-slate-800 h-40 object-cover w-full" alt="Preview" />}
+                    {sanitizeBlobUrl(photoUrl) && <img src={sanitizeBlobUrl(photoUrl)} className="mt-2 rounded-xl border border-slate-800 h-40 object-cover w-full" alt="Preview" />}
                 </div>
 
                 <button
