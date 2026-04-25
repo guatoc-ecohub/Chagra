@@ -71,8 +71,24 @@ Este repo es público AGPL-3.0. NO importar estáticamente de `chagra-pro`. Inte
 ## Anti-leak
 
 - Sin URLs internas, IPs RFC1918, tokens, secretos, hostnames operativos. Ver `CONTRIBUTING.md` reglas 1-7.
-- Pre-commit `lefthook` corre escaneo + ESLint `--max-warnings=0` + bloqueo de imports estáticos a `chagra-pro`.
+- Pre-commit `lefthook` corre escaneo + ESLint `--max-warnings=0` + bloqueo de imports estáticos a `chagra-pro` + `strategic-content-scan`.
 - Post-build `npm run audit:bundle` verifica `dist/` contra `oss-pro/PROHIBITED_IN_PUBLIC.md`.
+
+## Contenido estratégico — boundary
+
+Más allá de identificadores técnicos, **no introducir contenido descriptivo de**:
+
+- **Modelo de negocio** (pricing, tiers, revenue, cap table, valuación, founding team).
+- **Estrategia / roadmap futuro** que telegrafía Pro o monetización antes de release público.
+- **Identidad personal** del operador o trabajadores (nombres reales hardcoded; usar env var `VITE_PRIMARY_WORKER_NAME` o equivalente, default genérico).
+- **Infraestructura operativa propia** (nombres de hosts internos, agentes, código-gen pipelines internos).
+- **ADRs estratégicos** por nombre o resumen: ADR-009/010/014/017/018 son privados. Las **referencias por número son OK**; añadir el título o un resumen entre paréntesis es leak.
+
+ADRs OK-públicos (técnicos/legales): ADR-002, ADR-008, ADR-011, ADR-013, ADR-015, ADR-019.
+
+Lista universal de patterns en `oss-pro/PROHIBITED_IN_PUBLIC.md`. Identificadores específicos (nombres internos de agentes, infra propia) viven en `chagra-pro/PROHIBITED_INTERNAL.md` y se cargan en lefthook si `CHAGRA_PRO_PATH` está set localmente.
+
+Cuando dudes si algo es estratégico, default privado y consulta. El leak histórico de la industria (Anthropic 2026-03-31, sourcemap) cuesta menos como precaución que como remediation.
 
 ## Merge gates obligatorios
 

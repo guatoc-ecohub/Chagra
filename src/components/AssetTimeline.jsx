@@ -184,7 +184,7 @@ export default function AssetTimeline({ assetId }) {
                               '[AI_REVIEW]',
                               `target_log_id: ${log.id}`,
                               `verdict: ${verdict}`,
-                              `reviewer_id: ${PRIMARY_WORKER_NAME}`, // TODO: reemplazar por auth user_id cuando ADR-016 conecte la consola de curación
+                              `reviewer_id: ${PRIMARY_WORKER_NAME}`, // TODO: reemplazar por auth user_id cuando el flujo de validación tenga identidades formales
                               `reviewed_at: ${new Date().toISOString()}`,
                               'notes: Revisión desde timeline local'
                             ].join('\n'),

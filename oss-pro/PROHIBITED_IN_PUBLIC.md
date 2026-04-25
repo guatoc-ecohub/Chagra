@@ -48,12 +48,30 @@ Ver ADR-015 (guatoc-ecohub/Chagra-strategy) para contexto — incidente Anthropi
 - `\b192\.168\.[0-9]{1,3}\.[0-9]{1,3}\b` — IP completa RFC 1918 (rango 192.168/16)
 - `chagra\.guatoc\.co` — dominio operativo del backend (frontend público usa rutas relativas `/api/...`, nunca hostname)
 
+## Contenido estratégico (lista universal)
+
+Patrones que describen estrategia, modelo de negocio, infraestructura
+operativa propia o identidad personal y nunca deben aparecer en el público.
+Identificadores específicos (codenames de agentes propios, infra interna)
+viven en `chagra-pro/PROHIBITED_INTERNAL.md` para no telegrafiar.
+
+- `burnout` — telegrafía contexto personal/operativo del operador
+- `cap[.-]table`, `founding[.-]team`, `valuation` — info societaria
+- `mollison[._-]?adapt`, `lawton[._-]?curated` — copyright tercero adaptado
+- `ADR-(009|010|014|017|018)\s*\(` — referencia descriptiva a ADRs
+  estratégicos (con paréntesis explicando contenido). Citar el número
+  como referencia es OK; añadir título o resumen es leak.
+- Identidad personal del operador o trabajadores hardcoded en código.
+  Usar env var `VITE_PRIMARY_WORKER_NAME` (o equivalente) con default
+  genérico tipo 'Trabajador'.
+
 ## Qué NO está prohibido (pero requiere cuidado)
 
 Nombres y textos perfectamente aceptables en el público:
 - `gremio`, `roles_in_guild`, `companions`, `antagonists` — lenguaje del dominio público del catálogo
 - `Chagra Pro` mencionado en docs (`README`, `CONTRIBUTING`, ADRs linkeados) — referencia al repo hermano
-- Variables `VITE_PRO_MODULES_PATH` — es el mecanismo declarado para dev local con chagra-pro presente
+- Variables `VITE_PRO_MODULES_PATH`, `VITE_PRIMARY_WORKER_NAME` — mecanismos declarados para configuración por deploy
+- ADR-002, ADR-008, ADR-011, ADR-013, ADR-015, ADR-019 — son técnicos/legales y pueden referenciarse en código y docs (incluso con título o resumen breve)
 
 ## Actualización
 

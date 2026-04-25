@@ -1,16 +1,15 @@
 name: Claude Code Request
 
-# Ver ADR-018 (Chagra-strategy/adrs/ADR-018-burnout-mitigation-automation.md)
+# Pipeline automatizado de intake.
 #
 # Trigger: issue labeled "claude-code-request". Crea rama, deja stub con el
-# body del issue, abre DRAFT PR. El agente de code-generation (aider + GLM-5
-# en alpha runner futuro) consume este stub y lo reemplaza por commits reales
-# cuando se invoca manualmente (post-demo setup).
+# body del issue, abre DRAFT PR. Un agente de code-generation consume este
+# stub y lo reemplaza por commits reales cuando se invoca manualmente.
 #
 # HUMAN-IN-LOOP POR DISEÑO:
 # - PR nace siempre como draft
 # - Workflow NUNCA hace merge
-# - Label 'ready-to-generate' pendiente para disparar code-gen (futuro)
+# - Label 'ready-to-generate' pendiente para disparar code-gen
 # - Notifica al operador por Telegram al abrir el draft PR
 
 on:
@@ -82,7 +81,7 @@ jobs:
             echo
             echo "---"
             echo
-            echo "**Esto es un stub.** El agente de code-generation (aider + GLM-5 en alpha runner) reemplazará este archivo y/o hará los cambios solicitados cuando sea invocado con la label \`ready-to-generate\` (flujo futuro)."
+            echo "**Esto es un stub.** El agente de code-generation reemplazará este archivo y/o hará los cambios solicitados cuando sea invocado con la label \`ready-to-generate\` (flujo futuro)."
           } > "$STUB"
           git add "$STUB"
           git commit -m "chore(request): bootstrap branch for issue #${ISSUE_NUM}"
@@ -103,7 +102,7 @@ jobs:
 
           ## Siguiente paso
 
-          Cuando el agente de code-gen (aider + GLM-5) esté activo en alpha runner, añadir la label \`ready-to-generate\` a este PR para disparar la ejecución. Hasta entonces, este PR queda como stub.
+          Cuando el agente de code-gen esté activo, añadir la label \`ready-to-generate\` a este PR para disparar la ejecución. Hasta entonces, este PR queda como stub.
 
           ## Gates humanos
 
@@ -122,7 +121,7 @@ jobs:
           - Rama: \`${{ steps.parse.outputs.branch }}\`
           - Draft PR: ${{ steps.pr.outputs.pr_url }}
 
-          El agente de code-generation lo recoge cuando el operador añada la label \`ready-to-generate\` al PR (flujo futuro post-demo). Gates humanos garantizan que no se mergea sin revisión."
+          El agente de code-generation lo recoge cuando el operador añada la label \`ready-to-generate\` al PR (flujo futuro). Gates humanos garantizan que no se mergea sin revisión."
 
       - name: Notify Telegram (non-blocking)
         if: always()

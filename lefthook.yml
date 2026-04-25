@@ -26,7 +26,7 @@ pre-commit:
         [ -z "$files" ] && exit 0
         # Filtra archivos de reglas + docs que legítimamente discuten los
         # patterns como texto de normativa.
-        filtered=$(echo "$files" | tr ' ' '\n' | grep -vE "^(oss-pro/PROHIBITED|lefthook\.yml|oss-pro/README\.md|CONTRIBUTING\.md)" || true)
+        filtered=$(echo "$files" | tr ' ' '\n' | grep -vE "^(oss-pro/PROHIBITED|lefthook\.yml|oss-pro/README\.md|CONTRIBUTING\.md|AGENTS\.md)" || true)
         [ -z "$filtered" ] && exit 0
         hits=$(echo "$filtered" | xargs grep -lnE "\b10\.[0-9]+\.[0-9]+\.[0-9]+|\b192\.168\.[0-9]+\.[0-9]+|\b172\.(1[6-9]|2[0-9]|3[01])\.[0-9]+\.[0-9]+|guatoc-nixos" 2>/dev/null || true)
         if [ -n "$hits" ]; then
@@ -34,6 +34,40 @@ pre-commit:
           echo "$hits"
           echo "Ver CONTRIBUTING.md §1-§2"
           exit 1
+        fi
+
+    strategic-content-scan:
+      tags: security
+      glob: "*.{md,js,jsx,ts,tsx,json,yaml,yml}"
+      run: |
+        files="{staged_files}"
+        [ -z "$files" ] && exit 0
+        # Filtra archivos de reglas + docs que legítimamente discuten los
+        # patterns como texto de normativa.
+        filtered=$(echo "$files" | tr ' ' '\n' | grep -vE "^(oss-pro/PROHIBITED|lefthook\.yml|oss-pro/README\.md|CONTRIBUTING\.md|AGENTS\.md)" || true)
+        [ -z "$filtered" ] && exit 0
+        # Patrones universales — identificadores específicos (codenames de
+        # agentes propios, infra interna) viven en chagra-pro/PROHIBITED_INTERNAL.md
+        # y se cargan adicionalmente si CHAGRA_PRO_PATH está set.
+        hits=$(echo "$filtered" | xargs grep -lEi "burnout|cap[.-]table|founding[.-]team|valuation|mollison[._-]?adapt|lawton[._-]?curated|ADR-(009|010|014|017|018)\s*\(" 2>/dev/null || true)
+        if [ -n "$hits" ]; then
+          echo "✗ Contenido estratégico filtrado al público en:"
+          echo "$hits"
+          echo "Ver oss-pro/PROHIBITED_IN_PUBLIC.md sección 'Contenido estratégico'"
+          exit 1
+        fi
+        # Carga PROHIBITED_INTERNAL si está disponible (dev local con Pro path)
+        if [ -n "$CHAGRA_PRO_PATH" ] && [ -f "$CHAGRA_PRO_PATH/PROHIBITED_INTERNAL.md" ]; then
+          while IFS= read -r pat; do
+            [ -z "$pat" ] && continue
+            hit=$(echo "$filtered" | xargs grep -lE "$pat" 2>/dev/null || true)
+            if [ -n "$hit" ]; then
+              echo "✗ Identifier interno en bundle público:"
+              echo "  Pattern: $pat"
+              echo "  En: $hit"
+              exit 1
+            fi
+          done < <(awk '/^- `[^`]+`/{ gsub(/^- `|`.*$/,""); print }' "$CHAGRA_PRO_PATH/PROHIBITED_INTERNAL.md")
         fi
 
     pro-import-scan:
