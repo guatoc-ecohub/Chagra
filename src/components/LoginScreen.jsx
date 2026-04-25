@@ -3,6 +3,7 @@ import { Sprout } from 'lucide-react';
 import { authenticateUser } from '../services/authService';
 import { version as APP_VERSION } from '../../package.json';
 import ChagraGrowLoader from './ChagraGrowLoader';
+import LegalLinks from './LegalLinks';
 
 export default function LoginScreen({ onLoginSuccess, onSave }) {
   const [creds, setCreds] = useState({ username: '', password: '' });
@@ -70,6 +71,8 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
             {loading ? <ChagraGrowLoader size={56} initialProgress={0.4} /> : 'Ingresar'}
           </button>
         </form>
+
+        <LegalLinks />
       </div>
     </div>
   );
