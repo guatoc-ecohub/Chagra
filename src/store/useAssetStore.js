@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { assetCache, openDB, STORES } from '../db/assetCache';
 import { logCache } from '../db/logCache';
 import { useLogStore } from './useLogStore';
+import { newId } from '../utils/id';
+import { savePayload } from '../services/payloadService';
 
 /**
  * Store global de Activos (Zustand)
@@ -502,6 +504,107 @@ const useAssetStore = create((set, get) => ({
       console.error('[Store] Fallo en refillMaterial:', error);
       throw error;
     }
+  },
+
+  // ADR-019 Fase 5: Crear una nueva tarea como log--task pendiente.
+  // El bundle log--task usa ULID conforme ADR-019 (lex-orderable, optimiza
+  // indexación IndexedDB). Reemplaza el patrón anterior de pending_tasks
+  // como snapshot del servidor — ahora las tareas son entidades de primera
+  // clase que se pueden crear offline y se sincronizan via la cola normal
+  // de pending_transactions.
+  //
+  // taskData: { name, notes, assetIds[], locationId, due }
+  // Retorna { success, message } de savePayload (encolado offline o exitoso online).
+  addTaskLog: async (taskData) => {
+    const logId = newId('log--task');
+    const ts = new Date().toISOString().split('.')[0] + '+00:00';
+
+    const relationships = {};
+    if (taskData.assetIds?.length) {
+      relationships.asset = {
+        data: taskData.assetIds.map((id) => ({ type: 'asset--plant', id })),
+      };
+    }
+    if (taskData.locationId) {
+      relationships.location = {
+        data: [{ type: 'asset--land', id: taskData.locationId }],
+      };
+    }
+
+    const payload = {
+      data: {
+        type: 'log--task',
+        id: logId,
+        attributes: {
+          name: taskData.name || 'Tarea',
+          timestamp: taskData.due || ts,
+          status: 'pending',
+          ...(taskData.notes && {
+            notes: { value: taskData.notes, format: 'plain_text' },
+          }),
+        },
+        ...(Object.keys(relationships).length > 0 && { relationships }),
+      },
+    };
+
+    // Optimistic local: el log aparece en la timeline al instante.
+    const optimisticLog = {
+      id: logId,
+      type: 'log--task',
+      asset_id: taskData.assetIds?.[0] || null,
+      timestamp: Math.floor(Date.now() / 1000),
+      name: payload.data.attributes.name,
+      status: 'pending',
+      attributes: payload.data.attributes,
+      relationships,
+      _pending: true,
+    };
+
+    try {
+      await logCache.put(optimisticLog);
+      if (taskData.assetIds?.[0]) {
+        useLogStore.getState().loadLogsForAsset(taskData.assetIds[0]);
+      }
+    } catch (logErr) {
+      console.warn('[Store] Fallo persistir log--task optimista (no bloqueante):', logErr);
+    }
+
+    return savePayload('task', payload);
+  },
+
+  // ADR-019 Fase 5: Completar una tarea sin mutar el log original (Regla 1).
+  // Crea un SEGUNDO log--task con marker [TASK_COMPLETION] en notes.value
+  // apuntando al log--task original via target_task_id. Patrón consistente
+  // con [AI_REVIEW] de Fase 3 — la timeline cruza ambos logs y muestra el
+  // estado actual sin necesidad de mutar el primero.
+  //
+  // verdict: 'completed' | 'cancelled' | 'rescheduled'
+  completeTaskLog: async (originalTaskId, verdict = 'completed', notes = '') => {
+    const logId = newId('log--task');
+    const ts = new Date().toISOString().split('.')[0] + '+00:00';
+
+    const noteLines = [
+      '[TASK_COMPLETION]',
+      `target_task_id: ${originalTaskId}`,
+      `verdict: ${verdict}`,
+      `completed_at: ${new Date().toISOString()}`,
+    ];
+    if (notes) noteLines.push('', '--- Nota ---', notes);
+
+    const payload = {
+      data: {
+        type: 'log--task',
+        id: logId,
+        attributes: {
+          name: `Tarea ${verdict === 'completed' ? 'completada' : verdict}`,
+          timestamp: ts,
+          status: 'done',
+          notes: { value: noteLines.join('\n'), format: 'plain_text' },
+        },
+      },
+    };
+
+    return savePayload('task', payload);
   },
 
   // Obtener todos los assets como lista plana
