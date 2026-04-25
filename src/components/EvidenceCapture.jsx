@@ -7,7 +7,6 @@ import { proximityCheck } from '../utils/spatialAnalysis';
 import { wktToGeoJson } from '../utils/geo';
 import AIStreamPanel from './common/AIStreamPanel';
 import { savePayload } from '../services/payloadService';
-import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 
 /**
  * EvidenceCapture — Captura con diagnóstico IA y evolución histórica (Fase 20.2b).
