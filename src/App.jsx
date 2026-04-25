@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback } from 'react';
-import { Warehouse, MapPin, Eye, Package, Clock, ClipboardList, CheckCircle, WifiOff, Leaf, Mic } from 'lucide-react';
+import { Warehouse, MapPin, Eye, Package, Clock, ClipboardList, CheckCircle, WifiOff, Leaf, Mic, AlertCircle } from 'lucide-react';
 import localforage from 'localforage';
 
 import { isAuthenticated, logoutUser } from './services/authService';
@@ -21,6 +21,7 @@ const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
 const PlantAssetLog = lazy(() => import('./components/PlantAssetLog'));
 const ObservationScreen = lazy(() => import('./components/ObservationScreen'));
+const InvasiveObservationLog = lazy(() => import('./components/InvasiveObservationLog'));
 const MaintenanceScreen = lazy(() => import('./components/MaintenanceScreen'));
 const TaskLogScreen = lazy(() => import('./components/TaskLogScreen'));
 const AssetsDashboard = lazy(() => import('./components/AssetsDashboard'));
@@ -53,6 +54,7 @@ const NAV_TILES = [
   { id: 'task_log', label: 'Tareas', icon: Clock, accent: 'rose', desc: 'Cola de pendientes' },
   { id: 'historial', label: 'Historial', icon: ClipboardList, accent: 'indigo', desc: 'Trazabilidad de operaciones' },
   { id: 'biodiversidad', label: 'Biodiversidad', icon: Leaf, accent: 'emerald', desc: 'Ecosistema, estratos y gremios' },
+  { id: 'reportar_invasora', label: 'Invasoras', icon: AlertCircle, accent: 'amber', desc: 'Reporte de especies invasoras' },
   { id: 'voz', label: 'Voz', icon: Mic, accent: 'lime', desc: 'Registro por dictado (v0.5.0)' },
 ];
 
@@ -67,6 +69,7 @@ const ACCENT_CLASSES = {
   indigo: { border: 'border-l-indigo-500', text: 'text-indigo-400' },
   emerald: { border: 'border-l-emerald-500', text: 'text-emerald-400' },
   lime: { border: 'border-l-lime-500', text: 'text-lime-400' },
+  amber: { border: 'border-l-amber-500', text: 'text-amber-400' },
 };
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
@@ -187,8 +190,24 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
 
 export default function App() {
   const [currentView, setCurrentView] = useState('loading');
+  const [currentViewData, setCurrentViewData] = useState(null);
   const [toast, setToast] = useState(null);
   const [lastLogMessage, setLastLogMessage] = useState('');
+
+  // navigate(view, data) — único entry point para cambiar vista. Limpia
+  // currentViewData salvo cuando se pasa explícitamente. Sin esto, navegar
+  // dashboard → vista_con_initialData → dashboard → misma_vista_otra_vez
+  // reusaba el initialData stale (bug latente de UX).
+  const navigate = useCallback((view, initialData = null) => {
+    setCurrentView(view);
+    setCurrentViewData(initialData);
+  }, []);
+
+  useEffect(() => {
+    const handleNavigate = (e) => navigate(e.detail.view, e.detail.initialData || null);
+    window.addEventListener('chagraNavigate', handleNavigate);
+    return () => window.removeEventListener('chagraNavigate', handleNavigate);
+  }, [navigate]);
 
   useEffect(() => {
     const handler = (e) => setLastLogMessage(e.detail);
@@ -198,9 +217,9 @@ export default function App() {
 
   useEffect(() => {
     isAuthenticated().then((isAuth) => {
-      setCurrentView(isAuth ? 'dashboard' : 'login');
+      navigate(isAuth ? 'dashboard' : 'login');
     });
-  }, []);
+  }, [navigate]);
 
   const showToast = useCallback((message, isError = false) => {
     setToast({ message, isError });
@@ -209,61 +228,70 @@ export default function App() {
 
   const handleLogout = useCallback(async () => {
     await logoutUser();
-    setCurrentView('login');
-  }, []);
+    navigate('login');
+  }, [navigate]);
 
   const renderView = () => {
     switch (currentView) {
       case 'loading':
         return <LoadingFallback />;
       case 'login':
-        return <LoginScreen onLoginSuccess={() => setCurrentView('dashboard')} onSave={showToast} />;
+        return <LoginScreen onLoginSuccess={() => navigate('dashboard')} onSave={showToast} />;
       case 'dashboard':
-        return <DashboardView onNavigate={setCurrentView} onLogout={handleLogout} lastLogMessage={lastLogMessage} />;
+        return <DashboardView onNavigate={navigate} onLogout={handleLogout} lastLogMessage={lastLogMessage} />;
       case 'sembrar':
-        return <SeedingLog onBack={() => setCurrentView('dashboard')} onSave={showToast} />;
+        return <SeedingLog onBack={() => navigate('dashboard')} onSave={showToast} initialData={currentViewData} />;
       case 'cosechar':
-        return <HarvestLog onBack={() => setCurrentView('dashboard')} onSave={showToast} />;
+        return <HarvestLog onBack={() => navigate('dashboard')} onSave={showToast} />;
       case 'insumos':
-        return <InputLog onBack={() => setCurrentView('dashboard')} onSave={showToast} />;
+        return <InputLog onBack={() => navigate('dashboard')} onSave={showToast} />;
       case 'plant_asset':
-        return <PlantAssetLog onBack={() => setCurrentView('dashboard')} onSave={showToast} />;
+        return <PlantAssetLog onBack={() => navigate('dashboard')} onSave={showToast} />;
       case 'observacion':
-        return <ObservationScreen onBack={() => setCurrentView('dashboard')} onSave={showToast} />;
+        return <ObservationScreen onBack={() => navigate('dashboard')} onSave={showToast} />;
+      case 'reportar_invasora':
+        return (
+          <InvasiveObservationLog
+            onBack={() => navigate('dashboard')}
+            onSave={showToast}
+            initialLocationId={currentViewData?.locationId}
+            initialWkt={currentViewData?.wkt}
+          />
+        );
       case 'mantenimiento':
-        return <MaintenanceScreen onBack={() => setCurrentView('dashboard')} onSave={showToast} />;
+        return <MaintenanceScreen onBack={() => navigate('dashboard')} onSave={showToast} />;
       case 'task_log':
-        return <TaskLogScreen onBack={() => setCurrentView('dashboard')} />;
+        return <TaskLogScreen onBack={() => navigate('dashboard')} />;
       case 'javier':
         return (
-          <ScreenShell title={`Campo — ${PRIMARY_WORKER_NAME}`} icon={Eye} onBack={() => setCurrentView('dashboard')}>
+          <ScreenShell title={`Campo — ${PRIMARY_WORKER_NAME}`} icon={Eye} onBack={() => navigate('dashboard')}>
             <WorkerDashboard />
           </ScreenShell>
         );
       case 'mapa':
         return (
-          <ScreenShell title="Mapa de la Finca" icon={MapPin} onBack={() => setCurrentView('dashboard')}>
+          <ScreenShell title="Mapa de la Finca" icon={MapPin} onBack={() => navigate('dashboard')}>
             <FarmMap onAssetClick={(id) => {
               useAssetStore.getState().setSelectedAsset(id);
-              setCurrentView('activos');
+              navigate('activos');
             }} />
           </ScreenShell>
         );
       case 'activos':
-        return <AssetsDashboard onBack={() => setCurrentView('dashboard')} />;
+        return <AssetsDashboard onBack={() => navigate('dashboard')} />;
       case 'bodega':
         return (
-          <ScreenShell title="Bodega" icon={Package} onBack={() => setCurrentView('dashboard')}>
+          <ScreenShell title="Bodega" icon={Package} onBack={() => navigate('dashboard')}>
             <InventoryDashboard />
           </ScreenShell>
         );
       case 'historial':
-        return <WorkerHistory onBack={() => setCurrentView('dashboard')} />;
+        return <WorkerHistory onBack={() => navigate('dashboard')} />;
       case 'biodiversidad':
-        return <BiodiversidadView onBack={() => setCurrentView('dashboard')} />;
+        return <BiodiversidadView onBack={() => navigate('dashboard')} />;
       case 'voz':
         return (
-          <ScreenShell title="Registro por voz" icon={Mic} onBack={() => setCurrentView('dashboard')}>
+          <ScreenShell title="Registro por voz" icon={Mic} onBack={() => navigate('dashboard')}>
             <VoiceCapture onSave={showToast} />
           </ScreenShell>
         );

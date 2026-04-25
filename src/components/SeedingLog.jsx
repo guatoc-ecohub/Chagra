@@ -2,16 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Camera, MapPin } from 'lucide-react';
 import { savePayload } from '../services/payloadService';
 
-export default function SeedingLog({ onBack, onSave }) {
+export default function SeedingLog({ onBack, onSave, initialData = {} }) {
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
-    crop: '',
-    variety: '',
-    quantity: ''
+    crop: initialData.crop || '', // String para UI legacy o label
+    plant_type: initialData.plant_type || null, // ADR-019: { type: 'taxonomy_term--plant_type', id: '...' }
+    variety: initialData.variety || '',
+    quantity: initialData.quantity || ''
   });
   const [photo, setPhoto] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
-  const [coordinates, setCoordinates] = useState([]);
+  const [coordinates, setCoordinates] = useState(initialData.coordinates ? [initialData.coordinates] : []);
+  const [notes, setNotes] = useState(initialData.notes || '');
   const [isSaving, setIsSaving] = useState(false);
   const watchIdRef = useRef(null);
 
@@ -81,10 +83,13 @@ export default function SeedingLog({ onBack, onSave }) {
                   label: "Plántulas"
                 }
               }]
-            }
+            },
+            plant_type: formData.plant_type ? { data: formData.plant_type } : undefined
           }
         }
       };
+
+      if (notes) payload.data.attributes.notes = { value: notes, format: 'plain_text' };
 
       const result = await savePayload('seeding', payload);
       onSave(result.message || 'Registro guardado localmente (Pendiente de sincronización)', !result.success);
@@ -124,6 +129,11 @@ export default function SeedingLog({ onBack, onSave }) {
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Variedad</span>
           <input type="text" name="variety" value={formData.variety} onChange={handleInput} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-2xl text-white min-h-[64px]" />
+        </label>
+
+        <label className="flex flex-col gap-2">
+          <span className="text-xl font-bold">Notas</span>
+          <textarea name="notes" value={notes} onChange={(e) => setNotes(e.target.value)} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-xl text-white min-h-[80px]" />
         </label>
 
         <label className="flex flex-col gap-2">

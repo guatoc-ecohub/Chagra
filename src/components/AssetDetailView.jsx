@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { X, Calendar, Tag, Activity, MapPin } from 'lucide-react';
+import { X, Calendar, Tag, Activity, MapPin, AlertCircle } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import AssetTimeline from './AssetTimeline';
 import { InputLogForm } from './InputLogForm';
@@ -150,8 +150,8 @@ export const AssetDetailView = () => {
   const status = asset.attributes?.status || 'active';
   const createdTs = asset.attributes?.created || asset._createdAt
     ? (asset.attributes?.created
-        ? new Date(asset.attributes.created * 1000)
-        : new Date(asset._createdAt))
+      ? new Date(asset.attributes.created * 1000)
+      : new Date(asset._createdAt))
     : null;
   const assetTypeLabel = (() => {
     const t = asset.asset_type || asset.type || '';
@@ -258,6 +258,27 @@ export const AssetDetailView = () => {
                 <InputLogForm assetId={asset.id} />
               </section>
             </>
+          )}
+
+          {/* Acciones para Zona/Land */}
+          {(asset.asset_type === 'land' || asset.type?.includes('land')) && (
+            <section>
+              <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4 px-1">
+                Gestión de Zona
+              </h3>
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('chagraNavigate', {
+                  detail: {
+                    view: 'reportar_invasora',
+                    initialData: { locationId: asset.id, wkt: geoWkt }
+                  }
+                }))}
+                className="w-full p-6 rounded-xl bg-amber-600/20 border border-amber-600/40 text-amber-400 font-bold flex items-center justify-center gap-3 active:bg-amber-600/30 transition-colors shadow-lg"
+              >
+                <AlertCircle size={24} />
+                <span>Reportar invasora aquí</span>
+              </button>
+            </section>
           )}
 
           {/* Historial / timeline */}
