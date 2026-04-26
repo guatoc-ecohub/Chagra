@@ -83,15 +83,10 @@ test.describe('ADR-019 Fase 5: log--task & Inmutabilidad', () => {
         expect(taskLog.type).toBe('log--task');
         expect(taskLog.status).toBe('pending');
 
-        // 4. Completar tarea desde el dashboard de operario (Javier/Campo).
-        // Volver al dashboard primero (cerrar TaskLogScreen vía botón Atrás)
-        // luego abrir el tile "Campo: Tareas por proximidad" con aria-label
-        // exacto para evitar strict-mode violation contra otros buttons.
-        await page.getByRole('button', { name: /atrás|volver/i }).first().click();
-        await page.getByLabel(/^Campo: Tareas por proximidad/).click();
-
-        // Simular que el operario ya tiene la tarea en vista (esto requiere que la tarea tenga geo, 
-        // pero para el test de inmutabilidad podemos disparar el completado vía consola si la UI es esquiva)
+        // 4. Completar tarea via store (la UI tras Programar auto-redirige a
+        // TaskLogScreen vía setTimeout(onBack, 500); no hace falta navegar a
+        // Campo. Disparamos completeTaskLog directo por consola — el assert
+        // de inmutabilidad no depende de la UI de operario).
         await page.evaluate(async (taskId) => {
             const useAssetStore = (await import('/src/store/useAssetStore.js')).default;
             await useAssetStore.getState().completeTaskLog(taskId, 'completed', 'Test finalizado');
