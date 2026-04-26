@@ -587,6 +587,14 @@
     network = {
       enable = true;
       ssh = {
+        # Initrd remote SSH unlock — requiere host key en /boot/ que initramfs
+        # pueda leer antes de montar root. Si el key no existe, generar UNA VEZ
+        # en alpha con:
+        #   sudo ssh-keygen -t ed25519 -f /boot/initrd_ssh_host_ed25519_key -N ""
+        # NixOS NO genera este key automáticamente (intencional: clave persistente
+        # para que clientes no vean "host key changed" en cada rebuild).
+        # Si genera failed install bootloader sobre stat de este archivo,
+        # corre el ssh-keygen de arriba y re-rebuild.
         enable = true;
         port = 2222;
         authorizedKeys = [
