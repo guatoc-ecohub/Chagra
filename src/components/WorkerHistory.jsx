@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, CheckCircle, Clock, RefreshCw, Wifi, WifiOff, CloudOff, Cloud, Sprout, Apple, TreePine, Building2, Wrench, Leaf, Droplets, Eye } from 'lucide-react';
 import { syncManager } from '../services/syncManager';
 
@@ -51,31 +51,7 @@ export default function WorkerHistory({ onBack }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
-  useEffect(() => {
-    loadData();
-
-    const onOnline = () => setIsOnline(true);
-    const onOffline = () => setIsOnline(false);
-    window.addEventListener('online', onOnline);
-    window.addEventListener('offline', onOffline);
-
-    const onTaskAdded = () => loadPendingTransactions();
-    window.addEventListener('taskAdded', onTaskAdded);
-
-    return () => {
-      window.removeEventListener('online', onOnline);
-      window.removeEventListener('offline', onOffline);
-      window.removeEventListener('taskAdded', onTaskAdded);
-    };
-  }, []);
-
-  const loadData = async () => {
-    setIsLoading(true);
-    await Promise.all([loadPendingTransactions(), loadCompletedTasks()]);
-    setIsLoading(false);
-  };
-
-  const loadPendingTransactions = async () => {
+  const loadPendingTransactions = useCallback(async () => {
     try {
       await syncManager.initDB();
       const all = await syncManager.getPendingTransactions();
@@ -84,9 +60,9 @@ export default function WorkerHistory({ onBack }) {
     } catch (err) {
       console.error('Error cargando transacciones pendientes:', err);
     }
-  };
+  }, []);
 
-  const loadCompletedTasks = async () => {
+  const loadCompletedTasks = useCallback(async () => {
     // Fase 8.5: consulta unificada al caché local de IndexedDB.
     // El pull de red ya incluye tareas done (ver syncManager.fetchPendingTasksFromFarmOS).
     // Si hay conexión, refrescamos antes de leer el store; si no, leemos directo.
@@ -106,7 +82,35 @@ export default function WorkerHistory({ onBack }) {
     } catch (err) {
       console.error('Error cargando tareas completadas:', err);
     }
-  };
+  }, []);
+
+  const loadData = useCallback(async () => {
+    setIsLoading(true);
+    await Promise.all([loadPendingTransactions(), loadCompletedTasks()]);
+    setIsLoading(false);
+  }, [loadPendingTransactions, loadCompletedTasks]);
+
+  useEffect(() => {
+    // Sync inicial: hidratar la vista al montar el componente.
+    // setIsLoading + setPendingTx resultantes son la sincronización
+    // legítima entre IndexedDB (sistema externo) y React state.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadData();
+
+    const onOnline = () => setIsOnline(true);
+    const onOffline = () => setIsOnline(false);
+    window.addEventListener('online', onOnline);
+    window.addEventListener('offline', onOffline);
+
+    const onTaskAdded = () => loadPendingTransactions();
+    window.addEventListener('taskAdded', onTaskAdded);
+
+    return () => {
+      window.removeEventListener('online', onOnline);
+      window.removeEventListener('offline', onOffline);
+      window.removeEventListener('taskAdded', onTaskAdded);
+    };
+  }, [loadData, loadPendingTransactions]);
 
   const formatTimestamp = (ts) => {
     if (!ts) return '';

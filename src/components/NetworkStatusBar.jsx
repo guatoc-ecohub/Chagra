@@ -35,14 +35,18 @@ export default function NetworkStatusBar() {
         setVisible(true);
         setTimeout(() => setVisible(false), 3000);
       }
-    } catch (err) {
+    } catch (_err) {
       // DB no inicializada aún, ignorar
     }
-  }, [status, syncedCount]);
+  }, [status]);
 
   useEffect(() => {
-    // Polling ligero del estado de sincronización
+    // Polling ligero del estado de sincronización. La llamada inmediata es
+    // intencional: sin ella el estado visible queda 1.5s desfasado al montar.
+    // El polling NO causa cascading renders porque cada setState dentro de
+    // refreshStats está guardado por comparación previa.
     const interval = setInterval(refreshStats, 1500);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshStats();
     return () => clearInterval(interval);
   }, [refreshStats]);
@@ -58,7 +62,7 @@ export default function NetworkStatusBar() {
         const stats = await syncManager.getSyncStats();
         const countBefore = stats.pendingCount;
         setSyncedCount(countBefore);
-      } catch (e) { /* noop */ }
+      } catch (_e) { /* noop */ }
     };
 
     const handleOffline = () => {

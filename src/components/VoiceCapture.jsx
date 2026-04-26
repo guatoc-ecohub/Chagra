@@ -60,6 +60,10 @@ export default function VoiceCapture({ onSave }) {
     } catch (_) { /* noop */ }
   }, []);
 
+  // Sync inicial de pending count en montaje + cuando cambia la callback.
+  // setState resultante es benigno: la próxima render no re-dispara este
+  // efecto (refreshPendingCount es estable por useCallback).
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { refreshPendingCount(); }, [refreshPendingCount]);
 
   useEffect(() => {

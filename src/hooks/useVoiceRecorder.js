@@ -53,7 +53,7 @@ export default function useVoiceRecorder() {
 
   useEffect(() => () => cleanup(), [cleanup]);
 
-  const sampleAmplitude = useCallback(() => {
+  const sampleAmplitude = useCallback(function sample() {
     const analyser = analyserRef.current;
     if (!analyser) return;
     const buf = new Uint8Array(analyser.fftSize);
@@ -71,7 +71,7 @@ export default function useVoiceRecorder() {
       next.push(level);
       return next;
     });
-    rafRef.current = requestAnimationFrame(sampleAmplitude);
+    rafRef.current = requestAnimationFrame(sample);
   }, []);
 
   const stop = useCallback(() => {

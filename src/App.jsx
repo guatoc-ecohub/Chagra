@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback } from 'react';
-import { Warehouse, MapPin, Eye, Package, Clock, ClipboardList, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette, User } from 'lucide-react';
+import { Warehouse, MapPin, Eye, Package, Clock, ClipboardList, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
 

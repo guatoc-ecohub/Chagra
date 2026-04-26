@@ -1,3 +1,10 @@
+/* eslint-disable react-refresh/only-export-components --
+ * Este archivo exporta el componente ChagraGrowLoader junto con sus
+ * constantes/metadata (THERMAL_ZONES, SPECIES, DEFAULT_SPECIES_BY_ZONE,
+ * SPECIES_META, thermalZoneFromAltitude). Mover esos exports a otro
+ * archivo rompería la cohesión semántica del módulo (la metadata está
+ * tightly-coupled al componente que la usa). HMR fast-refresh queda
+ * degradado en este archivo a cambio de cohesión. */
 /**
  * ChagraGrowLoader.jsx
  * ========================================================================
