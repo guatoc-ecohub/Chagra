@@ -13,7 +13,20 @@
     ../../modules/cicd-runner.nix
     ../../modules/agents/chagra-deploy.nix
     ../../modules/iot-energy/deye-byd-killswitch.nix
+    ../../modules/ai/openai-proxy.nix
   ];
+
+  # Proxy local OpenAI-compat — fix bug 2026-04-26: openfang manda
+  # embeddings al OPENAI_BASE_URL (z.ai), pero el Coding Plan sólo
+  # tiene modelos GLM (chat), no embeddings. El proxy routea
+  # /v1/embeddings → Ollama local (nomic-embed-text) y deja chat
+  # transparente a z.ai. Audio (/v1/audio/*) queda 503 hasta que
+  # speaches/whisperOpenai esté desplegado (Opción D voz).
+  guatoc.ai.openaiProxy = {
+    enable = true;
+    upstream = "https://api.z.ai/api/coding/paas/v4";
+    enableAudioRoute = false;  # 🟡 cambiar a true cuando speaches esté live
+  };
 
   # =====================
   # Kill-switch Deye/BYD — INACTIVO por defecto.
