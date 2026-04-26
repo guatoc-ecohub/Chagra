@@ -18,4 +18,12 @@ export const FARM_CONFIG = {
         .split(',')
         .map((s) => s.trim())
         .filter(Boolean),
+  // Coordenadas usadas por skyEphemeris (sunrise/sunset). Default Choachí.
+  // En prod se sobreescriben con VITE_FARM_LAT / VITE_FARM_LON.
+  LATITUDE: DEMO_MODE
+    ? 4.526
+    : (Number(import.meta.env.VITE_FARM_LAT) || 4.526),
+  LONGITUDE: DEMO_MODE
+    ? -73.922
+    : (Number(import.meta.env.VITE_FARM_LON) || -73.922),
 };

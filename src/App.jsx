@@ -13,6 +13,7 @@ import PendingTasksWidget from './components/PendingTasksWidget';
 import { ScreenShell } from './components/common/ScreenShell';
 import ChagraGrowLoader from './components/ChagraGrowLoader';
 import AltitudeBadge from './components/AltitudeBadge';
+import SkyBadge from './components/common/SkyBadge';
 
 // Lazy-loaded route components
 const TelemetryAlerts = lazy(() => import('./components/TelemetryAlerts'));
@@ -125,6 +126,7 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
           Chagra
           <span className="text-[10px] text-slate-500 font-mono font-normal">v{APP_VERSION}</span>
           <AltitudeBadge />
+          <SkyBadge />
         </h1>
         <div className="flex items-center gap-2">
           <button onClick={onLogout} aria-label="Cerrar sesión" className="text-slate-400 hover:text-white px-4 min-h-[44px] bg-slate-800 rounded text-sm">Salir</button>

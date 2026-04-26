@@ -12,6 +12,7 @@
 
 import { SPECIES_DEFAULTS } from '../config/speciesDefaults';
 import { CROP_TAXONOMY } from '../config/taxonomy';
+import { FARM_CONFIG } from '../config/defaults';
 
 // Flatten de todas las especies con su grupo para resolución rápida.
 const ALL_SPECIES = Object.entries(CROP_TAXONOMY).flatMap(([groupId, group]) =>
@@ -128,7 +129,16 @@ export const getSuggestedCompanions = (speciesId) => {
  * El caller envía esto a /api/ollama/api/generate y parsea el JSON response.
  */
 export const buildGuildPrompt = (speciesName, estrato) => {
-  return `Basado en principios de agroecología de Jairo Restrepo y permacultura (diseño de gremios), sugiere 3 plantas acompañantes para ${speciesName} en estrato ${estrato} en clima frío tropical andino (2000-2800 msnm, Cundinamarca). Responde SOLO en formato JSON array: [{"name":"Nombre común (Nombre científico)","reason":"Razón agroecológica breve"}]. No añadas texto fuera del JSON.`;
+  // Contexto geoagronómico desde FARM_CONFIG. Sin hardcode a bosque andino:
+  // el asistente debe atender el rango colombiano completo del páramo
+  // (>3000m) al nivel del mar.
+  const altitud = FARM_CONFIG.ALTITUD_MSNM;
+  const zonas = (FARM_CONFIG.THERMAL_ZONES || []).join(', ') || 'no especificada';
+  const municipio = FARM_CONFIG.MUNICIPIO || 'Colombia';
+  const ctxAltitud = altitud != null
+    ? `a ${altitud} msnm (piso térmico: ${zonas})`
+    : `(piso térmico: ${zonas})`;
+  return `Basado en principios de agroecología de Jairo Restrepo y permacultura (diseño de gremios), sugiere 3 plantas acompañantes para ${speciesName} en estrato ${estrato} en ${municipio} ${ctxAltitud}. Considera el rango colombiano completo desde el páramo (>3000m) hasta el nivel del mar al evaluar compañeros viables. Responde SOLO en formato JSON array: [{"name":"Nombre común (Nombre científico)","reason":"Razón agroecológica breve"}]. No añadas texto fuera del JSON.`;
 };
 
 export default getSuggestedCompanions;
