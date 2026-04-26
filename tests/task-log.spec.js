@@ -59,8 +59,10 @@ test.describe('ADR-019 Fase 5: log--task & Inmutabilidad', () => {
     });
 
     test('crea tarea con ULID y verifica inmutabilidad al completar', async ({ page }) => {
-        // 1. Navegar a nueva tarea
-        await page.getByRole('button', { name: /tareas/i }).click();
+        // 1. Navegar a nueva tarea — usar aria-label exacto del tile (no regex /tareas/i
+        // que matchea 3 botones: refresh, Campo, Cola). Tile dashboard "Tareas: Cola
+        // de pendientes" es el que abre TaskLogScreen donde vive el botón "+".
+        await page.getByLabel('Tareas: Cola de pendientes').click();
         await page.getByRole('button', { name: '+' }).click();
 
         // 2. Llenar formulario
@@ -77,8 +79,12 @@ test.describe('ADR-019 Fase 5: log--task & Inmutabilidad', () => {
         expect(taskLog.type).toBe('log--task');
         expect(taskLog.status).toBe('pending');
 
-        // 4. Completar tarea desde el dashboard de operario (Javier/Campo)
-        await page.getByRole('button', { name: /campo|javier/i }).click();
+        // 4. Completar tarea desde el dashboard de operario (Javier/Campo).
+        // Volver al dashboard primero (cerrar TaskLogScreen vía botón Atrás)
+        // luego abrir el tile "Campo: Tareas por proximidad" con aria-label
+        // exacto para evitar strict-mode violation contra otros buttons.
+        await page.getByRole('button', { name: /atrás|volver/i }).first().click();
+        await page.getByLabel(/^Campo: Tareas por proximidad/).click();
 
         // Simular que el operario ya tiene la tarea en vista (esto requiere que la tarea tenga geo, 
         // pero para el test de inmutabilidad podemos disparar el completado vía consola si la UI es esquiva)
