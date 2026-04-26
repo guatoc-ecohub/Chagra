@@ -12,7 +12,28 @@
     ../../modules/farmos.nix
     ../../modules/cicd-runner.nix
     ../../modules/agents/chagra-deploy.nix
+    ../../modules/iot-energy/deye-byd-killswitch.nix
   ];
+
+  # =====================
+  # Kill-switch Deye/BYD — INACTIVO por defecto.
+  # Activar SOLO cuando:
+  #   1. Integración Deye en HA esté funcional y `sensor.deye_battery_soc` exista.
+  #   2. Switch controlable del cargador EV (Shelly/Sonoff/Wallbox) esté
+  #      cableado y la entidad correspondiente exista en HA.
+  #   3. Notify service `telegram_ops` esté configurado en HA.
+  # Validar con un ciclo de descarga controlado antes de confiar en él.
+  # Ver INCIDENT-2026-04-26-byd-drain.md.
+  # =====================
+  guatoc.iot-energy.deyeBydKillswitch = {
+    enable = false;  # 🟡 cambiar a true cuando los pre-requisitos estén listos
+    # socSensorEntity = "sensor.deye_battery_soc";
+    # chargerSwitchEntity = "switch.shelly_pro_2pm_ev_charger";
+    # cutThresholdPercent = 35;
+    # warnThresholdPercent = 40;
+    # rearmThresholdPercent = 60;
+    # notifyService = "telegram_ops";
+  };
 
   # --- TIMEZONE ---
   time.timeZone = "America/Bogota";
