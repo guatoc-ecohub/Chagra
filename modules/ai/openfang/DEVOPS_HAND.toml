@@ -4,7 +4,9 @@
 [hand]
 name         = "devops"
 display_name = "Guatoc DevOps Hand"
-model        = "glm-5"
+# glm-5 no existe aún (max GLM-4.6 a 2026-04). Bumpear cuando RC esté
+# disponible; mientras tanto glm-4.6 vía z.ai Coding Plan es el bridge.
+model        = "glm-4.6"
 temperature  = 0.1
 max_tokens   = 8192
 
@@ -21,8 +23,10 @@ deny_default  = true
 [[workspaces]]
 name        = "nixos-private"
 path        = "/var/lib/openfang/workspace/nixos-private"
-repository  = "git@github.com:kortux/guatoc-nixos-stable.git"
-branch      = "master"
+# Repo correcto: guatoc-ecohub/guatoc-nixos en main. Antes apuntaba
+# erróneamente a kortux/guatoc-nixos-stable@master que NO existe.
+repository  = "git@github.com:guatoc-ecohub/guatoc-nixos.git"
+branch      = "main"
 visibility  = "private"
 github_token_env = "GH_TOKEN_NIXOS_PRIVATE"   # token con scope repo (privado)
 ssh_key     = "/var/lib/openfang/keys/nixos_id_ed25519"
@@ -111,8 +115,18 @@ módulos, valida sintaxis, y emite el comando `sudo nixos-rebuild switch
 --flake .#alpha` para que el admin lo ejecute manualmente. No intentes
 ejecutar sudo remoto.
 
-Para la PWA sigue el pipeline stg→alpha (npm run build → rsync → verificación
-remota). Reporta exit codes.
+Para la PWA NUNCA hagas rsync manual a /mnt/fast/appdata/farmos-pwa/ ni
+desde stg ni desde alpha — rompe los perms del runner (kortux:chagra-deploy
+setgid 2775) y deja Nginx en 403. El pipeline correcto es:
+  1. Tu cambio → branch en chagra-public workspace.
+  2. Push branch → abrir PR contra main.
+  3. CI (CodeQL + Playwright + lefthook) gates.
+  4. Merge manual del operador → workflow .github/workflows/deploy.yml
+     se dispara automáticamente con flags defensivos --no-perms --chmod=F644
+     que evitan corromper perms del destino multi-owner.
+Reporta el exit code del push y el URL del PR. NO ejecutes `sudo`,
+`rsync`, `ssh`, `nixos-rebuild` con destino producción — esos están
+fuera de tu superficie permitida.
 
 ## FLUJO DE EDICIÓN POR COMANDO (ROUTING POR COMPLEJIDAD)
 

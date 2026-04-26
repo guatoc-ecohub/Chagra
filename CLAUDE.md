@@ -26,16 +26,33 @@ La infraestructura como código (IaC) reside en el repositorio de configuración
 4.  **Despliegue de Infraestructura:** Dado que te ejecutas desde `stg`, NO asumas que puedes ejecutar comandos `sudo` remotos sin intervención. Debes estructurar los archivos, confirmar los cambios y **detenerte**. Imprime explícitamente el comando que el usuario debe ejecutar manualmente por SSH para aplicar el estado:
     `sudo nixos-rebuild switch --flake .#alpha` (o el comando de reconstrucción correspondiente al entorno del usuario).
 
-## 4. Pipeline de Despliegue Frontend (stg -> alpha)
-Para actualizaciones de la PWA, ejecuta estrictamente este pipeline secuencial. Se prohíben los despliegues parciales.
+## 4. Pipeline de Despliegue Frontend (stg → alpha)
+**PROHIBIDO** ejecutar `rsync` o `scp` manual a `/mnt/fast/appdata/farmos-pwa/`.
+El destino tiene perms multi-owner (kortux:chagra-deploy con setgid 2775);
+un rsync sin flags defensivos rompe `--no-perms --chmod=F644` y deja Nginx
+en 403 (pantalla blanca en producción).
+
+El despliegue lo realiza exclusivamente el workflow `.github/workflows/deploy.yml`
+del repo `guatoc-ecohub/Chagra` sobre el self-hosted runner en alpha. Se dispara
+automáticamente en cada `push` a `main`. Usa los flags correctos
+(`umask 022 + rsync --no-perms --delete --no-group --chmod=F644`) que
+preservan los perms del destino sin corromperlo.
+
+Pipeline correcto (zero ssh manual):
 1.  **Auditoría de Código:** Verifica dependencias e importaciones en `src/`.
-2.  **Compilación Local (`stg`):** Ejecuta `npm run build`.
-3.  **Verificación de Artefactos:** Inspecciona `dist/index.html` para confirmar que los cambios (ej. etiqueta `<title>`) se inyectaron correctamente en el bundle.
-4.  **Transferencia Física (rsync):** Mueve los binarios al servidor remoto garantizando la eliminación de código obsoleto:
-    `rsync -avz --delete dist/ kortux@192.168.1.100:/mnt/fast/appdata/farmos-pwa/`
-5.  **Validación de Cierre (SSH):** Ejecuta una lectura remota para verificar la recepción física del código:
-    `ssh kortux@192.168.1.100 "cat /mnt/fast/appdata/farmos-pwa/index.html | grep '<title>'"`
-6.  Reporta el estado de salida de `rsync` y el resultado de la lectura remota.
+2.  **Compilación Local (`stg`):** Ejecuta `npm run build` para validar que
+    compila sin errores antes de pushear.
+3.  **Verificación de Artefactos:** Inspecciona `dist/index.html` para confirmar
+    que los cambios (ej. etiqueta `<title>`) se inyectaron correctamente.
+4.  **Push a branch + abrir PR** contra `main` (NO push directo a main: branch
+    protection lo bloquea desde 2026-04-26).
+5.  **CI gates** (CodeQL + Playwright + lefthook) deben pasar antes del merge.
+6.  **Merge manual** del operador → workflow `deploy.yml` se dispara automáticamente.
+7.  **Verificación de cierre:** `gh run watch` o `curl http://chagra.guatoc.co/`
+    para verificar el deploy. NO hacer SSH manual.
+
+Si necesitas debugging post-deploy, lee logs con `gh run view <id> --log`,
+NO con SSH a alpha.
 
 ## 5. Prevención de Sandbox Desync (Falsos Positivos)
 -   No confirmes la resolución de un problema de red sin antes ejecutar una prueba `curl -I` o `curl -i -X POST` hacia el endpoint afectado, simulando el origen de la PWA.

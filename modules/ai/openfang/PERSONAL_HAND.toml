@@ -42,8 +42,20 @@ enabled = [
 ]
 
 [tools.shell]
+# SECURITY: removidos `bash` y `curl` del allowlist (audit 2026-04-26).
+# Combinación previa (shell.exec + bash + curl) abría vector de exfiltración
+# de FARMOS_PASSWORD (env var inyectada para grant_type=password). Un prompt
+# injection vía mensaje Telegram podía leer env y exfiltrar a duckduckgo.com
+# (en network_allowlist) usando search query como canal lateral.
+#
+# Los binarios restantes son inertes: read-only filesystem (cat/ls/grep/find),
+# JSON parser (jq), o Python 3 que no tiene curl/requests por default sin
+# import explícito (y no hay HTTP libs instaladas en el sandbox).
+#
+# Para HTTP a FarmOS API el agent usa la tool `http.request` que respeta
+# `network_allowlist`, NO shell.exec.
 allowed_binaries = [
-  "python3", "bash", "curl", "jq", "cat", "ls", "grep", "find",
+  "python3", "jq", "cat", "ls", "grep", "find",
 ]
 
 # ---------------------------------------------------------------

@@ -72,7 +72,7 @@ jobs:
           echo " Config en main (${COMMIT}) paso validate + build."
           echo ""
           echo " Para promover en alpha, SSH y corre (respeta el SOP):"
-          echo "   cd /home/kortux/guatoc-nixos-stable && git pull"
+          echo "   cd ~/Workspace/guatoc-nixos && git pull"
           echo "   sudo nixos-rebuild test --flake .#alpha      # efimero"
           echo "   # observa 5-10 min; si OK:"
           echo "   sudo nixos-rebuild switch --flake .#alpha   # persistente"

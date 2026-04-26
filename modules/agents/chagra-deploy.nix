@@ -124,7 +124,12 @@ let
       ''}
 
       log "rsync dist/ → ${webrootTarget}/"
-      rsync -a --delete dist/ "${webrootTarget}/"
+      # Flags defensivos para destino multi-owner (kortux:chagra-deploy con
+      # setgid 2775). Sin estos, rsync intenta preservar perms/group del
+      # source y aborta con exit 23 sobre dirs que no posee. Mismas reglas
+      # que .github/workflows/deploy.yml en Chagra (mantener consistente).
+      umask 022
+      rsync -avzO --no-perms --delete --no-group --chmod=F644 dist/ "${webrootTarget}/"
 
       log "=== ${name} done ==="
     '';

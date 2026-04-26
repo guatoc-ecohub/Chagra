@@ -24,15 +24,20 @@ alias    = "camilo"
 role     = "solar_engineer"
 
 # --- Hands registrados ---
+# SECURITY: devops + solar quedan disabled hasta tener Telegram IDs reales
+# (los placeholders <@KortuxAdmin> <@CamiloRendon> no matchean → todo cae en
+# default-deny route 7 → sistema rechaza a TODOS si se activan). El gateway
+# multi-tenant aún no es operacional; solo `personal` corre vía guatoc-manifest
+# con allowed_users=["208512105"] numeric ID configurado.
 [[hands]]
 name     = "devops"
 file     = "DEVOPS_HAND.toml"
-enabled  = true
+enabled  = false
 
 [[hands]]
 name     = "solar"
 file     = "SOLAR_HAND.toml"
-enabled  = true
+enabled  = false
 
 [[hands]]
 name     = "personal"
