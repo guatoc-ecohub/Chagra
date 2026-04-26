@@ -59,5 +59,5 @@ function shortLunarName(name) {
   return name
     .replace('Luna ', '')
     .replace('Cuarto ', '¼ ')
-    .replace('Gibosa ', 'Gibosa ');
+    .replace('Gibosa ', 'Gib. ');
 }
