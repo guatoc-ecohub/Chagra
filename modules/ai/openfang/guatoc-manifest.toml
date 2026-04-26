@@ -198,3 +198,16 @@ desarróllalo manualmente.
 
 Responde siempre en español.
 """
+
+[channels.telegram]
+bot_token_env = "TELEGRAM_BOT_TOKEN"
+allowed_users = ["208512105"]
+poll_interval_secs = 2
+
+[channels.telegram.overrides]
+dm_policy = "allowed_only"
+output_format = "markdown"
+
+[channels.telegram.media]
+enabled = true
+allowed_types = ["photo", "document", "sticker", "voice"]
