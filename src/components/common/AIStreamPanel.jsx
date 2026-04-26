@@ -40,21 +40,28 @@ export default function AIStreamPanel({
   //   closing   — transicion de cierre inicial: flash de negativo (500ms)
   //               que invierte colores momentaneamente, anuncia el fin.
   //   finished  — rayo + burst de cierre (1400/1200ms), fase final visual.
-  const [phase, setPhase] = useState(active ? 'streaming' : 'idle');
+  // Phase machine: cuando active=true, derivamos 'streaming' directo de la prop
+  // (evita cascading renders de setState-in-effect). Solo persistimos en state
+  // las transiciones temporizadas closing → finished → idle del cierre.
+  const [closingPhase, setClosingPhase] = useState('idle'); // 'closing' | 'finished' | 'idle'
   const prevActive = useRef(active);
+  const phase = active ? 'streaming' : closingPhase;
 
   useEffect(() => {
-    if (active) {
-      setPhase('streaming');
-    } else if (prevActive.current && text) {
-      // streaming -> closing (700ms negative-flash) -> finished (1400ms) -> idle
-      setPhase('closing');
+    if (!active && prevActive.current && text) {
+      // streaming -> closing (700ms negative-flash) -> finished (1400ms) -> idle.
+      // Set inicial sincrónico está acotado: sólo se ejecuta cuando active
+      // pasa de true→false con texto presente, y la condición prevActive
+      // garantiza que no se re-dispare en el siguiente render.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setClosingPhase('closing');
       const closingTimer = setTimeout(() => {
-        setPhase('finished');
+        setClosingPhase('finished');
       }, 700);
       const resetTimer = setTimeout(() => {
-        setPhase('idle');
+        setClosingPhase('idle');
       }, 700 + 1400);
+      prevActive.current = active;
       return () => {
         clearTimeout(closingTimer);
         clearTimeout(resetTimer);

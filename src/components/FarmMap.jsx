@@ -115,7 +115,7 @@ export const FarmMap = ({ focusZoneId = null, onAssetClick, onTaskComplete, show
           savedZoom = parsed.zoom;
         }
       }
-    } catch (e) { /* noop */ }
+    } catch (_e) { /* noop */ }
 
     const map = L.map(containerRef.current, {
       center: savedCenter,
@@ -141,7 +141,7 @@ export const FarmMap = ({ focusZoneId = null, onAssetClick, onTaskComplete, show
       try {
         const c = map.getCenter();
         localStorage.setItem(MAP_STATE_KEY, JSON.stringify({ lat: c.lat, lng: c.lng, zoom: map.getZoom() }));
-      } catch (e) { /* noop */ }
+      } catch (_e) { /* noop */ }
     };
     map.on('moveend', saveViewport);
     map.on('zoomend', saveViewport);
@@ -322,7 +322,7 @@ export const FarmMap = ({ focusZoneId = null, onAssetClick, onTaskComplete, show
         console.warn('[FarmMap] fitBounds falló:', err.message);
       }
     }
-  }, [plants, structures, lands, focusZoneId, showTasks, pendingTasks]);
+  }, [plants, structures, lands, focusZoneId, showTasks, pendingTasks, onTaskComplete]);
 
   return (
     <div className="relative w-full h-full">

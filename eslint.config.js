@@ -7,6 +7,14 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 export default defineConfig([
   globalIgnores(['dist']),
   {
+    // Configs Node (playwright/vite/etc.) — requieren globals.node.
+    files: ['*.config.{js,mjs,ts}', 'playwright.config.js', 'vite.config.js'],
+    languageOptions: {
+      globals: { ...globals.node },
+      sourceType: 'module',
+    },
+  },
+  {
     files: ['**/*.{js,jsx}'],
     extends: [
       js.configs.recommended,
@@ -23,7 +31,12 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'no-unused-vars': ['error', {
+        varsIgnorePattern: '^[A-Z_]',
+        argsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+        destructuredArrayIgnorePattern: '^_',
+      }],
       // ADR-002: ningún import estático desde chagra-pro en el repo público.
       // Módulos Pro se cargan vía src/core/loadProModules.js (dynamic import).
       'no-restricted-imports': ['error', {

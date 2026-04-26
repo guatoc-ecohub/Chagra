@@ -188,6 +188,10 @@ export default function AssetsDashboard({ onBack }) {
       }
     };
     init();
+    // hydrate y syncFromServer vienen del store Zustand (referencias estables);
+    // incluirlos dispararía init en cada render. Sync único al montar es lo
+    // correcto.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Extrae el id del parent land desde las relationships JSON:API del asset.
