@@ -74,7 +74,10 @@
     description = "GitHub Actions Runner — Chagra deploy";
     home = "/var/lib/github-runner";
     createHome = true;
-    extraGroups = [ "users" ];
+    # chagra-deploy: requerido para escribir en /mnt/fast/appdata/farmos-pwa/
+    # (dir con setgid 2775, owner kortux:chagra-deploy). Sin esta membresía
+    # rsync exit code 23 con "mkstemp ... Permission denied (13)".
+    extraGroups = [ "users" "chagra-deploy" ];
   };
 
   # Crear directorios de trabajo para los runners
