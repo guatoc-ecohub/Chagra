@@ -7,6 +7,7 @@
 
 let
   cfg = config.guatoc.ai.openfang;
+  registry = import ../../lib/registry.nix { inherit lib; };
 
   # OpenFang v0.5.10 — binario Rust estático para Linux x86_64.
   # Bump 2026-04-26 desde 0.5.9 para fixes:
@@ -94,6 +95,15 @@ let
     [memory]
     consolidation_threshold = 5000
     decay_rate = 0.1
+    # Embeddings vía proxy local (modules/ai/openai-proxy.nix) → Ollama nomic-embed-text.
+    # 2026-04-26: el openfang 0.5.10 detecta provider por env var
+    # (OPENAI_API_KEY) y lo manda al OPENAI_BASE_URL. Como el proxy local
+    # routea /v1/embeddings → Ollama, queda local-first sin tocar z.ai.
+    # Cualquier valor no vacío en OPENAI_API_KEY funciona; el proxy
+    # descarta el header Authorization antes de hablar con Ollama.
+    embedding_provider    = "openai"
+    embedding_model       = "nomic-embed-text"
+    embedding_api_key_env = "OPENAI_API_KEY"
 
     ${lib.optionalString (agent.workspacePath != "") ''
     [workspace]
@@ -353,9 +363,17 @@ in
           # Alias para el driver "openai" de OpenFang cuando el backend real es
           # Z.ai (GLM Coding Plan). El driver lee OPENAI_API_KEY/OPENAI_BASE_URL
           # hardcoded; el api_key_env del manifest per-agent se ignora.
+          #
+          # 2026-04-26: el OPENAI_BASE_URL se redirige al proxy local
+          # (modules/ai/openai-proxy.nix). El proxy decide por path:
+          #   /v1/embeddings → Ollama local (nomic-embed-text)
+          #   /v1/audio/*    → speaches local (cuando habilitado)
+          #   resto          → z.ai upstream
+          # Esto fixa el bug donde embeddings iba a z.ai con modelo no soportado
+          # (Coding Plan sólo expone GLM chat models — verificado via /v1/models).
           if [ -n "''${ZAI_API_KEY:-}" ]; then
             export OPENAI_API_KEY="$ZAI_API_KEY"
-            export OPENAI_BASE_URL="https://api.z.ai/api/coding/paas/v4"
+            export OPENAI_BASE_URL="http://127.0.0.1:${toString registry.ports.openaiProxy}/v1"
           fi
 
           exec ${openfang-pkg}/bin/openfang start --config "$HOME/config.toml"
