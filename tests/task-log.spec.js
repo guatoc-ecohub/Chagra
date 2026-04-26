@@ -65,9 +65,13 @@ test.describe('ADR-019 Fase 5: log--task & Inmutabilidad', () => {
         await page.getByLabel('Tareas: Cola de pendientes').click();
         await page.getByRole('button', { name: '+' }).click();
 
-        // 2. Llenar formulario
+        // 2. Llenar formulario — TaskScreen.jsx:83 usa placeholder
+        // "Ej: Riego fertiorgánico". El label "Título de la Operación"
+        // es un <span> dentro del <label>, no asociado vía htmlFor →
+        // getByLabel(/título/) no lo resuelve. Usamos getByRole('textbox')
+        // del primer input.
         const taskTitle = `E2E-Task-${Date.now()}`;
-        await page.getByPlaceholder(/título/i).fill(taskTitle);
+        await page.getByRole('textbox').first().fill(taskTitle);
         await page.getByRole('button', { name: /programar/i }).click();
 
         // 3. Verificar creación en IndexedDB y formato ULID (26 chars)
