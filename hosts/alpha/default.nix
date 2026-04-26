@@ -739,6 +739,15 @@
           proxy_send_timeout 120s;
           proxy_read_timeout 120s;
 
+          # Streaming NDJSON (Ollama --stream): apaga buffering/cache/gzip
+          # para que cada chunk llegue al cliente cuando Ollama lo emite.
+          # Sin esto, Nginx acumula todo y entrega al final → no hay
+          # efecto typewriter (regresión recurrente, ver TODO P1 #5).
+          proxy_buffering off;
+          proxy_cache off;
+          gzip off;
+          chunked_transfer_encoding on;
+
           # CORS para peticiones desde la PWA
           add_header 'Access-Control-Allow-Origin' '*' always;
           add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;

@@ -3,6 +3,49 @@ description = "Asistente personal e investigador autónomo de Miguel Ángel — 
 module = "builtin:chat"
 profile = "full"
 
+# exec_mode = "Full": ejecuta tools sin pedir approval. Esto es lo que tiene
+# `collector` Hand internamente (visto en logs `exec_mode=Some(Full)`). El
+# `tool_allowlist` que probamos primero no se reflejó en el runtime — los
+# logs siguieron mostrando `exec_mode=Some(Allowlist)` y `Approval request`
+# tras cada tool call. `Full` desactiva el gate completo.
+#
+# Trade-off: cualquier tool que el agent decida invocar se ejecuta sin
+# preguntarte. Aceptable porque (a) el agent solo se comunica vía Telegram
+# allowed_users=[208512105] (solo tú), (b) shell_exec respeta el
+# allowed_commands del kernel, (c) el operador validó ADR-019/ADR-020 en
+# system_prompt, (d) sec 7 del manifest restringe a `gh issue create` con
+# label `claude-code-request` en repo público Chagra solo.
+exec_mode = "Full"
+
+# tool_allowlist: tools que el agent puede ejecutar SIN pedir approval.
+# Sin esto, exec_mode=Allowlist + lista vacía → cada tool requiere approval
+# manual con timeout 60s → bloqueo silencioso (sec 7 voice→issue inutilizable).
+# La lista cubre el flow completo de la sec 7 + interacciones cotidianas.
+tool_allowlist = [
+  # voice intake pipeline (sec 7)
+  "media_transcribe",
+  "speech_to_text",
+  "media_describe",
+  "image_analyze",
+  # GitHub Issue creation via gh CLI
+  "shell_exec",
+  # research / contexto
+  "web_fetch",
+  "web_search",
+  "memory_recall",
+  "memory_store",
+  "knowledge_query",
+  # respuestas a Telegram
+  "channel_send",
+  # tiempo / cron
+  "system_time",
+  "schedule_create",
+  "schedule_list",
+  # filesystem read del workspace propio del agent
+  "file_read",
+  "file_list",
+]
+
 [model]
 provider = "openai"
 model = "glm-4.6"
@@ -115,13 +158,19 @@ Si tienes duda sobre la intención, PREGUNTA a Miguel: "¿Quieres que esto sea u
 
 #### 7.2 Pipeline interno
 
-Paso 1 — TRANSCRIPCIÓN: cuando OpenFang descarga el OGG/voice a `/var/lib/openfang/agent-guatoc/data/media/<id>.oga`, llama al servicio whisper-http local:
-- `POST http://127.0.0.1:10301/asr?language=es&output=json`
-- multipart/form-data con campo `audio_file` apuntando al OGG
-- Sin Authorization (servicio local sin auth)
-- Respuesta JSON con campo `text` — esa es la transcripción
+Paso 1 — TRANSCRIPCIÓN: cuando recibes un mensaje de Telegram con media tipo `voice`, el adapter te entrega un objeto con `file_id` (Telegram file reference). **NO intentes acceder al filesystem ni a `/var/lib/openfang/...`** — está fuera de tu workspace y vas a fallar con "no tengo acceso".
 
-Si whisper-http devuelve error o transcripción vacía: avisa a Miguel "no pude transcribir, repite por favor" y NO sigas.
+En cambio, usa la tool `media_transcribe` directamente con el `file_id`:
+
+```
+media_transcribe(file_id="<el file_id que llegó en el update>", language="es")
+```
+
+La tool internamente: (a) resuelve el download via Telegram getFile API, (b) descarga el OGG a un buffer temporal, (c) hace POST multipart a whisper-http (`http://127.0.0.1:10301/asr`), (d) te devuelve `{text, language, segments}` listo para usar.
+
+Si la tool no está disponible o falla, prueba `speech_to_text` con la misma firma. Como último fallback puedes intentar `media_describe` que también acepta media file_id.
+
+Si las 3 tools fallan o devuelven texto vacío: avisa a Miguel "no pude transcribir, repite por favor o escríbeme el texto" y NO sigas. Nunca inventes la transcripción.
 
 Paso 2 — PARSEO ESTRUCTURADO: tomas la transcripción y la mapeas a los campos del issue template `Chagra/.github/ISSUE_TEMPLATE/claude-code-request.yml`:
 

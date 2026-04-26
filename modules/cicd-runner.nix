@@ -14,8 +14,6 @@
     tokenFile = "/run/secrets/github-runner-token";
     name = "alpha-chagra";
     extraLabels = [ "alpha" "nixos" ];
-    # Mismo razonamiento que nixos-deploy: evitar zombies en cada rebuild.
-    replace = true;
 
     extraPackages = with pkgs; [
       nodejs_22
@@ -41,16 +39,15 @@
     tokenFile = "/run/secrets/nixos-runner-token";
     name = "alpha-nixos";
     extraLabels = [ "alpha" "nixos" "infra" ];
-    # `replace = true` evita que cada nixos-rebuild deje un runner zombie
-    # en GitHub. Sin esto, el unit reinicia → unconfigure.sh limpia local
-    # PERO no deregistra remotamente (limitación upstream documentada en
-    # el propio script: "The old runner will still appear in the GitHub
-    # Actions UI. You have to remove it manually."). El configure.sh
-    # subsiguiente entonces pelea contra el zombie y falla con 404.
-    # Con replace=true el runner binary recibe --replace y sobreescribe
-    # el registro existente al re-registrar.
-    # Incidente recurrente 2026-04-25: 3 zombies eliminados en una sesión.
-    replace = true;
+    # NOTA: `replace = true` se intentó 2026-04-26 para evitar zombies tras
+    # cada nixos-rebuild. Resultado: el runner binary con `--replace` y
+    # fine-grained PAT da 404 desde `/actions/runner-registration` incluso
+    # sin zombies presentes. Hipótesis: `--replace` requiere scope adicional
+    # no soportado por el PAT actual (probablemente `Workflows: Write` o un
+    # PAT classic). Hasta confirmar, manejamos zombies manualmente:
+    #   gh api -X DELETE /repos/guatoc-ecohub/guatoc-nixos/actions/runners/<id>
+    # Procedimiento documentado en Chagra-strategy/ops/calendar-tasks.md
+    # bajo "Procedimiento de rotación".
 
     extraPackages = with pkgs; [
       git

@@ -8,15 +8,25 @@
 let
   cfg = config.guatoc.ai.openfang;
 
-  # OpenFang v0.5.9 — binario Rust estático para Linux x86_64
+  # OpenFang v0.5.10 — binario Rust estático para Linux x86_64.
+  # Bump 2026-04-26 desde 0.5.9 para fixes:
+  #   - WebSocket 404 race condition (agent lookup retries 5x) — afecta
+  #     "Agent not found" del bridge cache tras bootstrap respawn.
+  #   - schedule_* tools/endpoints ahora sí ejecutan (antes escribían a
+  #     una shared memory key que ningún executor leía).
+  #   - Multimodal user_with_blocks unifica text + image — relevante para
+  #     voice/foto pipeline.
+  #   - Auth fail-closed por default (loopback sigue zero-config).
+  # No subimos a 0.6.0 todavía: cambios mayores (skill templates, command
+  # registry, fan-out cron) implican migration que evaluamos por separado.
   openfang-src = pkgs.fetchurl {
-    url = "https://github.com/RightNow-AI/openfang/releases/download/v0.5.9/openfang-x86_64-unknown-linux-gnu.tar.gz";
-    sha256 = "sha256-ZDaGfTb3o9opWpitRTew0wbNwrusALxB+gK8wtqQZxI=";
+    url = "https://github.com/RightNow-AI/openfang/releases/download/v0.5.10/openfang-x86_64-unknown-linux-gnu.tar.gz";
+    sha256 = "sha256-2wIYp7wqiUJ6HM9K24c2NESx+gE+rY9O6gKFkNrHNgU=";
   };
 
   openfang-pkg = pkgs.stdenv.mkDerivation {
     pname = "openfang";
-    version = "0.5.9";
+    version = "0.5.10";
     src = openfang-src;
     sourceRoot = ".";
     nativeBuildInputs = [ pkgs.autoPatchelfHook pkgs.gnutar ];
