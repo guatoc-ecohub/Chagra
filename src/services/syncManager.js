@@ -1,5 +1,8 @@
 import { sendToFarmOS, fetchFromFarmOS } from './apiService';
 import { openDB, STORES } from '../db/dbCore';
+import { logCache } from '../db/logCache';
+import { newId } from '../utils/id';
+import { getCompletedTaskIds } from '../utils/taskCompletionParser';
 
 const STORE_NAME = 'pending_transactions';
 const TASKS_STORE_NAME = 'pending_tasks';
@@ -19,6 +22,57 @@ class SyncManager {
   // interfaz pública initDB() para no romper callers existentes.
   async initDB() {
     this.db = await openDB();
+    // Ejecutar migración de tareas legacy si es necesario
+    await this.migrateLegacyTasks();
+  }
+
+  /**
+   * Fase 5 ADR-019: Migrar registros de pending_tasks (snapshot) a log--task (entidades).
+   */
+  async migrateLegacyTasks() {
+    if (!this.db) return;
+    const migrationFlag = 'chagra:migration:taskLogV1';
+    if (localStorage.getItem(migrationFlag)) return;
+
+    try {
+      const legacyTasks = await new Promise((resolve, reject) => {
+        const tx = this.db.transaction([TASKS_STORE_NAME], 'readonly');
+        const req = tx.objectStore(TASKS_STORE_NAME).getAll();
+        req.onsuccess = () => resolve(req.result || []);
+        req.onerror = () => reject(req.error);
+      });
+
+      if (legacyTasks.length > 0) {
+        console.info(`[Migration] Promocionando ${legacyTasks.length} tareas legacy a log--task…`);
+        for (const task of legacyTasks) {
+          const logTask = {
+            id: task.id || newId('log--task'),
+            type: 'log--task',
+            status: task.status || 'pending',
+            timestamp: task.timestamp || Math.floor(Date.now() / 1000),
+            name: task.title || task.name || 'Tarea migrada',
+            attributes: {
+              name: task.title || task.name || 'Tarea migrada',
+              status: task.status || 'pending',
+              timestamp: task.timestamp || Math.floor(Date.now() / 1000),
+              notes: {
+                value: `[MIGRATION] ${task.description || ''}`,
+                format: 'plain_text'
+              }
+            },
+            relationships: task.originalData?.relationships || { asset: { data: [] } },
+            _pending: false,
+            _migrated: true
+          };
+          await logCache.put(logTask);
+        }
+      }
+
+      localStorage.setItem(migrationFlag, 'completed');
+      console.info('[Migration] Tareas migradas con éxito.');
+    } catch (err) {
+      console.warn('[Migration] Error migrando tareas (no crítico, se reintentará FarmOS pull):', err);
+    }
   }
 
   // Guardar transacción pendiente
@@ -167,7 +221,7 @@ class SyncManager {
           mediaCache.purgeStale().catch((e) =>
             console.warn('[SyncManager] Purge de media stale fallido:', e)
           );
-        } catch (e) { /* noop */ }
+        } catch { /* noop */ }
 
         // Fase 11.2: pull preventivo de logs recientes tras tanda exitosa.
         try {
@@ -424,38 +478,38 @@ class SyncManager {
     });
   }
 
-  // Obtener tareas pendientes de IndexedDB (caché offline)
+  // Obtener tareas pendientes del store unificado (Fase 5 ADR-019)
   async getPendingTasks() {
-    if (!this.db) await this.initDB();
+    // Redirigir al store unificado filtrando por status=pending
+    const allLogs = await logCache.getByType('log--task');
+    const completedIds = getCompletedTaskIds(allLogs);
 
-    return new Promise((resolve, reject) => {
-      const transaction = this.db.transaction([TASKS_STORE_NAME], 'readonly');
-      const store = transaction.objectStore(TASKS_STORE_NAME);
-      const request = store.getAll();
-
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
+    return allLogs
+      .filter(l => l.status === 'pending' && !completedIds.has(l.id))
+      .map(l => ({
+        ...l,
+        title: l.name,
+        deadline: this.calculateDeadlineFromTimestamp(l.timestamp),
+        severity: this.calculateSeverityFromNotes(l.attributes?.notes?.value || '')
+      }));
   }
 
-  // Guardar tareas pendientes en IndexedDB mediante upsert por id.
-  // Preserva registros locales que no estén en el snapshot de red (idempotencia de lectura).
+  // Guardar tareas pendientes en IndexedDB mediante el store unificado.
   async savePendingTasks(tasks) {
-    if (!this.db) await this.initDB();
-
-    return new Promise((resolve, reject) => {
-      const transaction = this.db.transaction([TASKS_STORE_NAME], 'readwrite');
-      const store = transaction.objectStore(TASKS_STORE_NAME);
-      const now = Date.now();
-
-      for (const task of tasks) {
-        store.put({ ...task, cachedAt: now });
-      }
-
-      transaction.oncomplete = () => resolve(tasks);
-      transaction.onerror = () => reject(transaction.error);
-      transaction.onabort = () => reject(transaction.error);
-    });
+    // Wrapper para compatibilidad legacy. Mapea al nuevo bulkPut.
+    for (const task of tasks) {
+      const normalized = task.originalData || {
+        id: task.id,
+        type: 'log--task',
+        attributes: {
+          name: task.title,
+          status: task.status,
+          timestamp: task.timestamp,
+        }
+      };
+      await logCache.put(normalized);
+    }
+    return tasks;
   }
 
   // Fetch tareas pendientes desde FarmOS API
@@ -470,103 +524,59 @@ class SyncManager {
       const oneWeekAgo = Math.floor((now.getTime() - (7 * 24 * 60 * 60 * 1000)) / 1000);
       const oneWeekFuture = Math.floor((now.getTime() + (7 * 24 * 60 * 60 * 1000)) / 1000);
 
-      // FarmOS v2 filtra timestamps como UNIX seconds (enteros), no ISO 8601
       const endpoint = '/api/log/activity?' +
+        'include=quantity&' +
         'filter[date_range][condition][path]=timestamp&' +
         'filter[date_range][condition][operator]=BETWEEN&' +
         'filter[date_range][condition][value][0]=' + oneWeekAgo + '&' +
         'filter[date_range][condition][value][1]=' + oneWeekFuture;
-      console.log(`🔍 Consultando endpoint FarmOS: ${import.meta.env.VITE_FARMOS_URL}${endpoint}`);
+
       const response = await fetchFromFarmOS(endpoint);
 
-      const tasks = [];
-
       if (response.data && Array.isArray(response.data)) {
-        console.log(`📦 Respuesta de FarmOS: ${response.data.length} registros encontrados`);
-        response.data.forEach(log => {
-          const attributes = log.attributes || {};
-          const timestamp = attributes.timestamp || '';
-          const logStatus = attributes.status || 'pending';
-
-          // Fase 8.5: conservar tanto pendientes como completadas en el caché local
-          // para alimentar WorkerHistory en modo offline.
-
-          // Determinar severidad basada en el tipo de log y notas
-          // notes puede ser string, objeto { value: "..." }, o null
-          const notesRaw = attributes.notes;
-          const notesText = (typeof notesRaw === 'object' && notesRaw !== null && notesRaw.value)
-            ? notesRaw.value
-            : (typeof notesRaw === 'string' ? notesRaw : '');
-
-          let severity = 'medium';
-          if (notesText) {
-            const notesLower = notesText.toLowerCase();
-            if (notesLower.includes('emergencia') || notesLower.includes('crítico') || notesLower.includes('urgente')) {
-              severity = 'critical';
-            } else if (notesLower.includes('importante') || notesLower.includes('prioridad')) {
-              severity = 'high';
-            } else if (notesLower.includes('preventivo') || notesLower.includes('rutinario') || notesLower.includes('monitoreo')) {
-              severity = 'low';
-            }
-          }
-
-          // Calcular deadline — FarmOS v2 devuelve timestamp como UNIX seconds
-          const tsValue = typeof timestamp === 'number' ? timestamp * 1000 : Date.parse(timestamp) || 0;
-          const taskDate = new Date(tsValue);
-          const nowDate = new Date();
-          const daysDiff = Math.floor((nowDate - taskDate) / (1000 * 60 * 60 * 24));
-
-          let deadline = '';
-          if (daysDiff < 0) {
-            // Tarea futura
-            const absDaysDiff = Math.abs(daysDiff);
-            if (absDaysDiff === 0) {
-              const hours = taskDate.getHours().toString().padStart(2, '0');
-              const minutes = taskDate.getMinutes().toString().padStart(2, '0');
-              deadline = `Hoy ${hours}:${minutes}`;
-            } else if (absDaysDiff === 1) {
-              deadline = 'Mañana';
-            } else if (absDaysDiff <= 7) {
-              deadline = `En ${absDaysDiff} días`;
-            } else {
-              deadline = 'Próximamente';
-            }
-          } else if (daysDiff === 0) {
-            // Tarea para hoy
-            const hours = taskDate.getHours().toString().padStart(2, '0');
-            const minutes = taskDate.getMinutes().toString().padStart(2, '0');
-            deadline = `Hoy ${hours}:${minutes}`;
-          } else if (daysDiff === 1) {
-            deadline = 'Vencido (Ayer)';
-          } else {
-            deadline = `Vencido hace ${daysDiff} días`;
-          }
-
-          tasks.push({
-            id: log.id,
-            title: attributes.name || 'Tarea sin título',
-            deadline: deadline,
-            severity: logStatus === 'done' ? 'completed' : severity,
-            status: logStatus,
-            timestamp: typeof timestamp === 'number' ? timestamp : Math.floor(Date.parse(timestamp) / 1000) || 0,
-            originalData: log
-          });
-        });
-      } else {
-        console.log('⚠️ Respuesta de FarmOS vacía o sin data:', response);
+        // Normalizar y guardar como log--task en el store unificado
+        const normalized = response.data.map(remote => ({
+          ...remote,
+          type: 'log--task' // Forzamos el tipo para el cache local
+        }));
+        await logCache.bulkPut('log--task', normalized, response.included);
       }
 
-      // Guardar en caché
-      await this.savePendingTasks(tasks);
-
-      return tasks;
+      return this.getPendingTasks();
     } catch (error) {
       console.error('Error obteniendo tareas de FarmOS:', error);
-
-      // Fallback: usar tareas caché en IndexedDB
-      console.log('Usando tareas caché en IndexedDB');
       return this.getPendingTasks();
     }
+  }
+
+  // Helpers extraídos para limpieza del modelo (Fase 5)
+  calculateSeverityFromNotes(notesText) {
+    if (!notesText) return 'medium';
+    const notesLower = notesText.toLowerCase();
+    if (notesLower.includes('emergencia') || notesLower.includes('crítico') || notesLower.includes('urgente')) return 'critical';
+    if (notesLower.includes('importante') || notesLower.includes('prioridad')) return 'high';
+    if (notesLower.includes('preventivo') || notesLower.includes('rutinario') || notesLower.includes('monitoreo')) return 'low';
+    return 'medium';
+  }
+
+  calculateDeadlineFromTimestamp(timestamp) {
+    const tsValue = typeof timestamp === 'number' ? timestamp * 1000 : Date.parse(timestamp) || 0;
+    if (!tsValue) return 'Pendiente';
+    const taskDate = new Date(tsValue);
+    const nowDate = new Date();
+    const daysDiff = Math.floor((nowDate - taskDate) / (1000 * 60 * 60 * 24));
+
+    if (daysDiff < 0) {
+      const absDaysDiff = Math.abs(daysDiff);
+      if (absDaysDiff === 0) return `Hoy ${taskDate.getHours().toString().padStart(2, '0')}:${taskDate.getMinutes().toString().padStart(2, '0')}`;
+      if (absDaysDiff === 1) return 'Mañana';
+      return absDaysDiff <= 7 ? `En ${absDaysDiff} días` : 'Próximamente';
+    } else if (daysDiff === 0) {
+      return `Hoy ${taskDate.getHours().toString().padStart(2, '0')}:${taskDate.getMinutes().toString().padStart(2, '0')}`;
+    } else if (daysDiff === 1) {
+      return 'Vencido (Ayer)';
+    }
+    return `Vencido hace ${daysDiff} días`;
   }
 }
 

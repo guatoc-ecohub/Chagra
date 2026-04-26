@@ -14,25 +14,16 @@ export default function PendingTasksWidget() {
     setError(null);
 
     try {
-      // Obtener tareas reales de FarmOS (con caché offline)
+      // Fase 5: Obtener tareas reales del store unificado (log--task)
       const pendingTasks = await syncManager.fetchPendingTasksFromFarmOS();
-      console.log('📋 Tareas pendientes descargadas de FarmOS:', pendingTasks.length);
       setTasks(pendingTasks);
+
       // Calcular edad del caché a partir del registro más fresco
-      const freshest = pendingTasks.reduce((acc, t) => Math.max(acc, t.cachedAt || 0), 0);
+      const freshest = pendingTasks.reduce((acc, t) => Math.max(acc, t.cached_at || 0), 0);
       if (freshest > 0) setCacheAgeMinutes(Math.floor((Date.now() - freshest) / 60000));
     } catch (err) {
       console.error('Error obteniendo tareas pendientes:', err);
       setError('Error al cargar tareas');
-      // Fallback: intentar obtener del caché local
-      try {
-        const cachedTasks = await syncManager.getPendingTasks();
-        setTasks(cachedTasks);
-        const freshest = cachedTasks.reduce((acc, t) => Math.max(acc, t.cachedAt || 0), 0);
-        if (freshest > 0) setCacheAgeMinutes(Math.floor((Date.now() - freshest) / 60000));
-      } catch (cacheError) {
-        console.error('Error obteniendo tareas caché:', cacheError);
-      }
     } finally {
       setIsLoading(false);
     }

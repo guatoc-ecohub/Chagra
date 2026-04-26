@@ -25,7 +25,7 @@ export const STORES = {
   SYNC_META: 'sync_meta',
   LOGS: 'logs',
   PENDING_TX: 'pending_transactions',
-  PENDING_TASKS: 'pending_tasks',
+  PENDING_TASKS: 'pending_tasks', // @deprecated: usar LOGS con type='log--task'
   MEDIA_CACHE: 'media_cache',
   PENDING_VOICE: 'pending_voice_recordings',
 };
