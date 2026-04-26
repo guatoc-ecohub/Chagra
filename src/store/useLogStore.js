@@ -40,7 +40,7 @@ export const useLogStore = create((set, get) => ({
     set({ isSyncing: true });
 
     const startTime = Math.floor(Date.now() / 1000) - days * 24 * 60 * 60;
-    const types = ['log--seeding', 'log--planting', 'log--harvest', 'log--input'];
+    const types = ['log--seeding', 'log--planting', 'log--harvest', 'log--input', 'log--task', 'log--observation'];
 
     try {
       await Promise.all(types.map(async (type) => {
@@ -73,6 +73,20 @@ export const useLogStore = create((set, get) => ({
       set({ isSyncing: false });
     }
   },
+
+  /**
+   * Obtiene todas las tareas pendientes del store unificado.
+   */
+  getPendingTasks: async () => {
+    try {
+      const allLogs = await logCache.getByType('log--task');
+      // Filtramos por status 'pending'. Nota: el sync manager normaliza remote.status
+      return allLogs.filter(l => l.status === 'pending');
+    } catch (err) {
+      console.error('[LogStore] Error en getPendingTasks:', err);
+      return [];
+    }
+  }
 }));
 
 // Listener global: libera el flag _pending de logs confirmados por el servidor

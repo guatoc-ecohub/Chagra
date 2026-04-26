@@ -2,50 +2,40 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, CheckCircle, Clock, Wifi, WifiOff, RefreshCw } from 'lucide-react';
 import { syncManager } from '../services/syncManager';
 
-function TaskLogScreen({ onBack }) {
+function TaskLogScreen({ onBack, onNewTask }) {
   const [tasks, setTasks] = useState([]);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [isSyncing, setIsSyncing] = useState(false);
 
   const fetchPendingTasks = async () => {
     try {
-      // Aquí se conectaría a FarmOS para obtener tareas pendientes
-      // Por ahora simulamos tareas locales
-      await syncManager.getSyncStats();
-      setTasks([
-        {
-          id: 1,
-          title: 'Riego Invernadero 1',
-          description: 'Ejecutar riego programado',
-          status: 'pending',
-          priority: 'high',
-          date: new Date().toISOString()
-        },
-        {
-          id: 2,
-          title: 'Aplicación de biopreparado preventivo',
-          description: 'Aplicar caldo sulfocálcico al cultivo de tabaco',
-          status: 'pending',
-          priority: 'medium',
-          date: new Date().toISOString()
-        }
-      ]);
+      const pendingTasks = await syncManager.getPendingTasks();
+      setTasks(pendingTasks);
     } catch (error) {
       console.error('Error obteniendo tareas pendientes:', error);
     }
   };
 
   const toggleTaskStatus = async (taskId) => {
-    setTasks(prev => prev.map(task =>
-      task.id === taskId ? { ...task, status: task.status === 'completed' ? 'pending' : 'completed' } : task
-    ));
+    // Fase 5: completar tarea via useAssetStore.completeTaskLog (inmutable)
+    try {
+      const useAssetStore = (await import('../store/useAssetStore')).default;
+      await useAssetStore.getState().completeTaskLog(taskId);
+      // Refrescar lista local
+      setTasks(prev => prev.filter(t => t.id !== taskId));
+    } catch (err) {
+      console.error('Error completando tarea:', err);
+    }
   };
 
   const syncTasks = async () => {
     setIsSyncing(true);
-    await syncManager.syncAll();
-    setIsSyncing(false);
-    await fetchPendingTasks();
+    try {
+      await syncManager.syncAll();
+      await fetchPendingTasks();
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   useEffect(() => {
@@ -110,6 +100,9 @@ function TaskLogScreen({ onBack }) {
               <span className="text-sm">Offline</span>
             </div>
           )}
+          <button onClick={onNewTask} className="p-3 bg-muzo rounded-full active:bg-muzo-glow min-h-[56px] min-w-[56px] flex justify-center items-center shrink-0 border border-slate-700 shadow-neon-muzo">
+            <span className="text-3xl font-black text-slate-950">+</span>
+          </button>
           <button onClick={syncTasks} disabled={isSyncing} className="p-2 bg-slate-800 rounded-full active:bg-slate-700 min-h-[40px] min-w-[40px] flex justify-center items-center shrink-0 border border-slate-600">
             <RefreshCw size={16} className={isSyncing ? 'animate-spin' : ''} />
           </button>
@@ -124,9 +117,8 @@ function TaskLogScreen({ onBack }) {
 
         <div className="space-y-3">
           {tasks.map(task => (
-            <div key={task.id} className={`p-4 rounded-xl border-2 transition-all ${
-              task.status === 'completed' ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-900 border-slate-700'
-            }`}>
+            <div key={task.id} className={`p-4 rounded-xl border-2 transition-all ${task.status === 'completed' ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-900 border-slate-700'
+              }`}>
               <div className="flex justify-between items-start gap-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
@@ -145,11 +137,10 @@ function TaskLogScreen({ onBack }) {
                 <button
                   onClick={() => toggleTaskStatus(task.id)}
                   disabled={task.status === 'synced' || !isOnline}
-                  className={`p-2 rounded-lg flex items-center justify-center gap-2 transition-all ${
-                    task.status === 'completed'
-                      ? 'bg-green-700 text-white'
-                      : 'bg-slate-700 text-slate-300 active:bg-slate-600'
-                  } ${task.status === 'synced' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`p-2 rounded-lg flex items-center justify-center gap-2 transition-all ${task.status === 'completed'
+                    ? 'bg-green-700 text-white'
+                    : 'bg-slate-700 text-slate-300 active:bg-slate-600'
+                    } ${task.status === 'synced' ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <CheckCircle size={16} />
                 </button>

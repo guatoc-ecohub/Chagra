@@ -1,0 +1,130 @@
+/* src/styles/themes.css */
+
+/* 1. Root variables for each theme */
+
+[data-theme="dark-sober"] {
+  --color-bg-primary: #0a0a0a;
+  --color-bg-secondary: #0f172a;
+  --color-text-primary: #e5e5e5;
+  --color-text-secondary: #a3a3a3;
+  --color-accent: #475569; /* slate-600 — sin neón */
+  --color-border: #1e293b;
+  --color-card: #111827;
+}
+
+[data-theme="light"] {
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f8fafc;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-accent: #059669; /* emerald-600 */
+  --color-border: #e2e8f0;
+  --color-card: #f1f5f9;
+}
+
+/* 2. Global Overrides for Tailwind hardcoded classes */
+
+/* --- BACKGROUNDS --- */
+[data-theme="dark-sober"] .bg-slate-950,
+[data-theme="dark-sober"] .bg-slate-900 {
+  background-color: var(--color-bg-primary) !important;
+}
+
+[data-theme="light"] .bg-slate-950,
+[data-theme="light"] .bg-slate-900 {
+  background-color: var(--color-bg-primary) !important;
+}
+
+[data-theme="dark-sober"] .bg-slate-900\/50,
+[data-theme="dark-sober"] .bg-slate-900\/60 {
+  background-color: rgba(10, 10, 10, 0.6) !important;
+}
+
+[data-theme="light"] .bg-slate-900\/50,
+[data-theme="light"] .bg-slate-900\/60 {
+  background-color: rgba(248, 250, 252, 0.6) !important;
+}
+
+[data-theme] .bg-biopunk-pattern {
+  background-image: none !important;
+}
+
+/* --- TEXT COLORS --- */
+[data-theme="dark-sober"] .text-white,
+[data-theme="dark-sober"] .text-slate-100,
+[data-theme="dark-sober"] .text-slate-200 {
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="light"] .text-white,
+[data-theme="light"] .text-slate-100,
+[data-theme="light"] .text-slate-200 {
+  color: var(--color-text-primary) !important;
+}
+
+[data-theme="light"] .text-slate-400,
+[data-theme="light"] .text-slate-500 {
+  color: var(--color-text-secondary) !important;
+}
+
+/* --- ACCENTS & GLOWS --- */
+[data-theme="dark-sober"] .text-muzo-glow {
+  color: var(--color-text-primary) !important;
+  text-shadow: none !important;
+}
+
+[data-theme="light"] .text-muzo-glow {
+  color: var(--color-accent) !important;
+  text-shadow: none !important;
+}
+
+[data-theme] .shadow-neon-muzo,
+[data-theme] .shadow-neon-morpho,
+[data-theme] .shadow-neon-orchid,
+[data-theme] .shadow-neon-frog {
+  box-shadow: none !important;
+}
+
+/* --- BORDERS --- */
+[data-theme="dark-sober"] .border-slate-800,
+[data-theme="dark-sober"] .border-slate-700 {
+  border-color: var(--color-border) !important;
+}
+
+[data-theme="light"] .border-slate-800,
+[data-theme="light"] .border-slate-700 {
+  border-color: var(--color-border) !important;
+}
+
+/* --- COMPONENTS SPECIFIC OVERRIDES --- */
+
+/* Input/Select */
+[data-theme="light"] input, 
+[data-theme="light"] select, 
+[data-theme="light"] textarea {
+  background-color: white !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Action Buttons */
+[data-theme="light"] .bg-slate-800 {
+  background-color: var(--color-bg-secondary) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* ScreenShell and Header */
+[data-theme="light"] header {
+  background-color: white !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Dashboard Tiles - Adjusting for Light Theme */
+[data-theme="light"] .bg-slate-900\/60 {
+  background-color: white !important;
+  border-color: var(--color-border) !important;
+}
+
+[data-theme="light"] .divide-slate-800 > * {
+  border-color: var(--color-border) !important;
+}

@@ -1,6 +1,7 @@
 import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback } from 'react';
-import { Warehouse, MapPin, Eye, Package, Clock, ClipboardList, CheckCircle, WifiOff, Leaf, Mic, AlertCircle } from 'lucide-react';
+import { Warehouse, MapPin, Eye, Package, Clock, ClipboardList, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette, User } from 'lucide-react';
 import localforage from 'localforage';
+import { useTheme } from './hooks/useTheme';
 
 import { isAuthenticated, logoutUser } from './services/authService';
 import useAssetStore from './store/useAssetStore';
@@ -26,6 +27,7 @@ const ObservationScreen = lazy(() => import('./components/ObservationScreen'));
 const InvasiveObservationLog = lazy(() => import('./components/InvasiveObservationLog'));
 const MaintenanceScreen = lazy(() => import('./components/MaintenanceScreen'));
 const TaskLogScreen = lazy(() => import('./components/TaskLogScreen'));
+const TaskScreen = lazy(() => import('./components/TaskScreen'));
 const AssetsDashboard = lazy(() => import('./components/AssetsDashboard'));
 const WorkerHistory = lazy(() => import('./components/WorkerHistory'));
 const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').then(m => ({ default: m.InventoryDashboard })));
@@ -33,6 +35,7 @@ const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
 const BiodiversidadView = lazy(() => import('./components/BiodiversidadView'));
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
+const ProfileScreen = lazy(() => import('./components/ProfileScreen'));
 
 localforage.config({
   name: 'Chagra',
@@ -58,6 +61,7 @@ const NAV_TILES = [
   { id: 'biodiversidad', label: 'Biodiversidad', icon: Leaf, accent: 'emerald', desc: 'Ecosistema, estratos y gremios' },
   { id: 'reportar_invasora', label: 'Invasoras', icon: AlertCircle, accent: 'amber', desc: 'Reporte de especies invasoras' },
   { id: 'voz', label: 'Voz', icon: Mic, accent: 'lime', desc: 'Registro por dictado (v0.5.0)' },
+  { id: 'perfil', label: 'Perfil', icon: Palette, accent: 'indigo', desc: 'Temas y configuración' },
 ];
 
 // Mapa de accents → clases Tailwind (para que el JIT genere los estilos).
@@ -192,6 +196,7 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
 });
 
 export default function App() {
+  useTheme();
   const [currentView, setCurrentView] = useState('loading');
   const [currentViewData, setCurrentViewData] = useState(null);
   const [toast, setToast] = useState(null);
@@ -276,7 +281,9 @@ export default function App() {
       case 'mantenimiento':
         return <MaintenanceScreen onBack={() => navigate('dashboard')} onSave={showToast} />;
       case 'task_log':
-        return <TaskLogScreen onBack={() => navigate('dashboard')} />;
+        return <TaskLogScreen onBack={() => navigate('dashboard')} onNewTask={() => navigate('new_task')} />;
+      case 'new_task':
+        return <TaskScreen onBack={() => navigate('task_log')} onSave={showToast} />;
       case 'javier':
         return (
           <ScreenShell title={`Campo — ${PRIMARY_WORKER_NAME}`} icon={Eye} onBack={() => navigate('dashboard')}>
@@ -310,6 +317,8 @@ export default function App() {
             <VoiceCapture onSave={showToast} />
           </ScreenShell>
         );
+      case 'perfil':
+        return <ProfileScreen onBack={() => navigate('dashboard')} />;
       default:
         return <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>;
     }

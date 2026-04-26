@@ -604,6 +604,27 @@ const useAssetStore = create((set, get) => ({
       },
     };
 
+    // Optimistic local: igual que addTaskLog, persistir en logCache para
+    // que aparezca en timeline + selectores derivados al instante. Sin
+    // esto el log de completado queda solo en pending_transactions hasta
+    // sync, y la UI sigue mostrando la tarea como pending.
+    const optimisticLog = {
+      id: logId,
+      type: 'log--task',
+      asset_id: null,
+      timestamp: Math.floor(Date.now() / 1000),
+      name: payload.data.attributes.name,
+      status: 'done',
+      attributes: payload.data.attributes,
+      _pending: true,
+    };
+
+    try {
+      await logCache.put(optimisticLog);
+    } catch (logErr) {
+      console.warn('[Store] Fallo persistir completion log optimista:', logErr);
+    }
+
     return savePayload('task', payload);
   },
 

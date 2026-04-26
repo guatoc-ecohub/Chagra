@@ -2,6 +2,7 @@ import './config/env'; // Validación de env vars al startup
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
+import './styles/themes.css'
 import App from './App.jsx'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { syncManager } from './services/syncManager'

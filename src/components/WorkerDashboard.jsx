@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, CheckCircle, Clock, Loader2, Navigation, RefreshCw, Eye, Wrench, Apple } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
-import { logCache } from '../db/logCache';
-import { assetCache } from '../db/assetCache';
+import { syncManager } from '../services/syncManager';
 import { wktToGeoJson } from '../utils/geo';
 import { haversineDistance, getCoords } from '../utils/spatialAnalysis';
 import FarmMap from './FarmMap';
@@ -49,14 +48,16 @@ export const WorkerDashboard = () => {
   const loadTasks = async () => {
     setLoading(true);
     try {
-      const allLogs = await logCache.getAll();
-      const pending = allLogs.filter((l) => {
-        const s = l.status || l.attributes?.status;
-        if (s !== 'pending') return false;
+      // Fase 5 ADR-019: Usar el selector unificado que ya filtra completados
+      const pending = await syncManager.getPendingTasks();
+
+      // Filtrar por las que tienen geometría (prioridad WorkerDashboard)
+      const geoTasks = pending.filter(l => {
         const geo = l.attributes?.intrinsic_geometry;
         return !!(typeof geo === 'object' ? geo?.value : geo);
       });
-      setTasks(pending);
+
+      setTasks(geoTasks);
     } catch (err) {
       console.error('[WorkerDashboard] Error cargando tareas:', err);
     } finally {
@@ -93,44 +94,23 @@ export const WorkerDashboard = () => {
     })
     .sort((a, b) => a.distance - b.distance);
 
-  // Marcar como completada (PATCH status=done)
+  // Marcar como completada (Fase 5: Append-only [TASK_COMPLETION] log)
   const handleComplete = async (taskId) => {
     setCompleting(taskId);
     try {
-      const task = tasks.find((t) => t.id === taskId);
-      if (!task) return;
+      // 1. Crear log de completado (inmutable)
+      await useAssetStore.getState().completeTaskLog(taskId, 'completed');
 
-      const logType = task.type || 'log--activity';
-      const suffix = logType.split('--')[1] || 'activity';
-
-      // Actualizar en logCache local
-      await logCache.put({ ...task, status: 'done', attributes: { ...task.attributes, status: 'done' } });
-
-      // Encolar PATCH al servidor
-      const pendingTx = {
-        id: crypto.randomUUID(),
-        remoteId: taskId,
-        type: `asset_${suffix}`, // usa prefijo para activar el listener syncCompleted
-        endpoint: `/api/log/${suffix}/${taskId}`,
-        method: 'PATCH',
-        payload: {
-          data: {
-            type: logType,
-            id: taskId,
-            attributes: { status: 'done', timestamp: Math.floor(Date.now() / 1000) },
-          },
-        },
-      };
-
-      await assetCache.commitOptimisticUpdate([], [pendingTx]);
-      navigator.serviceWorker?.controller?.postMessage({ type: 'SYNC_REQUESTED' });
-
-      // Refrescar lista
+      // 2. Refrescar lista local (quitando la tarea)
       setTasks((prev) => prev.filter((t) => t.id !== taskId));
-      window.dispatchEvent(new CustomEvent('syncComplete', { detail: { message: 'Tarea completada.' } }));
+
+      window.dispatchEvent(new CustomEvent('syncComplete', { detail: { message: 'Tarea finalizada.' } }));
+
+      // Forzar sync
+      navigator.serviceWorker?.controller?.postMessage({ type: 'SYNC_REQUESTED' });
     } catch (err) {
       console.error('[WorkerDashboard] Error completando tarea:', err);
-      window.dispatchEvent(new CustomEvent('syncError', { detail: { message: 'No se pudo marcar la tarea.' } }));
+      window.dispatchEvent(new CustomEvent('syncError', { detail: { message: 'No se pudo registrar el completado.' } }));
     } finally {
       setCompleting(null);
     }
