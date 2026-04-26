@@ -21,10 +21,21 @@ permissions:
   pull-requests: write
   issues: write
 
+# Concurrency: serializar requests para el MISMO issue, no entre issues distintos.
+# Evita race condition cuando un labeling rápido (label + unlabel + label) crea
+# branches duplicados o intenta `git checkout -b` sobre branch ya existente.
+concurrency:
+  group: claude-code-request-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
 jobs:
   bootstrap-branch:
     if: github.event.label.name == 'claude-code-request'
     runs-on: ubuntu-latest
+    # Cap defensivo: el job solo crea branch + draft PR + 1 curl. Debe terminar
+    # en <60s. 5min es suficiente buffer + evita runners colgados consumiendo
+    # minutos billables si gh CLI o Telegram API quedan suspendidos.
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
@@ -91,12 +102,17 @@ jobs:
         id: pr
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # SECURITY: bind issue title via env (NOT directly in run: shell).
+          # Interpolación de `${{ github.event.issue.title }}` directo en bash
+          # es template injection — un issue malicioso con `"; cmd #` ejecuta
+          # comandos arbitrarios con GITHUB_TOKEN. Bind a env y referenciar
+          # como "$VAR" es seguro (bash NO re-evalúa command substitution
+          # dentro de variables expandidas).
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          BRANCH: ${{ steps.parse.outputs.branch }}
+          ISSUE_NUM: ${{ steps.parse.outputs.issue_num }}
         run: |
-          PR_URL=$(gh pr create \
-            --base main \
-            --head "${{ steps.parse.outputs.branch }}" \
-            --title "[WIP] ${{ github.event.issue.title }}" \
-            --body "Closes #${{ steps.parse.outputs.issue_num }}
+          BODY="Closes #${ISSUE_NUM}
 
           **Draft PR generado automáticamente** por \`claude-code-request.yml\`. Pendiente de code-generation.
 
@@ -108,7 +124,12 @@ jobs:
 
           - Este PR **NO se mergea automáticamente** bajo ninguna condición.
           - El operador revisa diff manualmente tras CI verde.
-          - Si quiere auto-merge por nominación explícita, añadir label \`squash-on-merge\`." \
+          - Si quiere auto-merge por nominación explícita, añadir label \`squash-on-merge\`."
+          PR_URL=$(gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "[WIP] $ISSUE_TITLE" \
+            --body "$BODY" \
             --draft)
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
 
