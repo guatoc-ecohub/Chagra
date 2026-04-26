@@ -33,5 +33,9 @@ dist-ssr
 /blob-report/
 /playwright/.cache/
 
-# Build artifacts para BD estática
-public/catalog.sqlite
+# Catálogo SQLite tracked desde 2026-04-25:
+# se genera con scripts/build-catalog-sqlite.mjs desde seeds en
+# Chagra-strategy (privado). El binario derivado se commitea aquí porque
+# CI no tiene acceso al repo privado para regenerarlo durante el build.
+# Cuando se actualicen los seeds, regenerar local + commit del .sqlite.
+# public/catalog.sqlite
