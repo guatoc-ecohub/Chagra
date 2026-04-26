@@ -7,9 +7,20 @@ on:
       - '**.md'
       - 'LICENSE'
 
+# Concurrency: serializa deploys del mismo branch — evita 2 pushes a main en
+# paralelo corrompiendo /mnt/fast/appdata/farmos-pwa/ a mitad del rsync.
+# cancel-in-progress: false porque queremos que cada deploy termine, no
+# perder uno de los dos.
+concurrency:
+  group: deploy-chagra-prod
+  cancel-in-progress: false
+
 jobs:
   build-and-deploy:
     runs-on: [self-hosted, alpha]
+    # Cap defensivo: build + rsync + verify típicamente <2min. 30min cubre
+    # picos de npm install lento o caché HA HTTP timeout.
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
@@ -17,8 +28,9 @@ jobs:
         run: npm ci
 
       - name: Lint
+        # max-warnings 20 ya es el cap; si excede, debe BLOQUEAR el deploy.
+        # Removido continue-on-error: true que silenciaba errores fatales.
         run: npm run lint -- --max-warnings 20
-        continue-on-error: true
 
       - name: Verify secrets
         run: |
@@ -70,10 +82,16 @@ jobs:
           echo "Deploy OK: $(date -Iseconds) | index.html sha256: ${HASH:0:12}"
 
       - name: Notify HA to refresh Nest Hub
+        # `jq -r` reemplaza `node -p "require('./package.json').version"` —
+        # node -p evalúa JS arbitrario; jq solo parsea JSON. Defensa contra
+        # supply-chain compromise donde package.json sea modificado para
+        # ejecutar código durante el deploy.
         run: |
+          VERSION=$(jq -r .version package.json)
+          COMMIT=$(git rev-parse --short HEAD)
           curl -s -X POST "http://localhost:8123/api/webhook/chagra_deployed" \
             -H "Content-Type: application/json" \
-            -d '{"version":"'"$(node -p "require('./package.json').version")"'","commit":"'"$(git rev-parse --short HEAD)"'"}' \
+            -d "{\"version\":\"$VERSION\",\"commit\":\"$COMMIT\"}" \
             || echo "HA webhook not reachable (non-blocking)"
         continue-on-error: true
 
