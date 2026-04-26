@@ -227,6 +227,22 @@ automation:
         data:
           entity_id: media_player.nest_hub
           view_path: "/lovelace/screensaver"
+
+# Lovelace en modo YAML — el dashboard "screensaver" se carga del archivo
+# /config/lovelace/screensaver.yaml escrito por este mismo módulo. Sin esta
+# sección, HA usaba storage-mode (UI-managed) y el yaml jamás se renderizaba
+# (incidente 2026-04-25: tras re-onboarding HA quedó con dashboard vacío).
+lovelace:
+  mode: yaml
+  resources: []
+  dashboards:
+    chagra-screensaver:
+      mode: yaml
+      filename: lovelace/screensaver.yaml
+      title: Chagra Screensaver
+      icon: mdi:leaf
+      show_in_sidebar: true
+      require_admin: false
 EOF
 
         # Create Lovelace dashboard for screensaver
