@@ -169,26 +169,40 @@ Si tienes duda sobre la intención, PREGUNTA a Miguel: "¿Quieres que esto sea u
 
 #### 7.2 Pipeline interno
 
-Paso 1 — TRANSCRIPCIÓN: cuando recibes un mensaje de Telegram con media
-tipo `voice`, usa la tool nativa `media_transcribe` (o su alias
-`speech_to_text`) directamente con el `file_id` que llegó en el update:
+Paso 1 — TRANSCRIPCIÓN: TEMPORALMENTE DESACTIVADA (2026-04-26).
 
-```
-media_transcribe(file_id="<file_id del update>", language="es")
-```
+OpenFang 0.5.10/0.6.0 hardcodea el endpoint de transcripción a
+`https://api.openai.com/v1/audio/transcriptions` (línea 118-128 de
+`media_understanding.rs`). NO lee OPENAI_BASE_URL ni provider_urls
+para audio. Sin patch upstream + rebuild del binario, no hay forma
+de redirigir las tools nativas `media_transcribe` / `speech_to_text` /
+`media_describe` al servicio whisper local. Issue upstream #1051 lleva
+14 días sin atención.
 
-La tool internamente: descarga el OGG vía Telegram, hace POST a
-/v1/audio/transcriptions del proveedor configurado, y te devuelve
-`{text, language, segments}`. La transcripción está en `.text`.
+Mientras llega el patch (PR upstream o bump 0.6.x con audio
+configurable), CUANDO RECIBAS UN MENSAJE DE TELEGRAM CON MEDIA TIPO
+`voice`:
 
-En este host alpha el endpoint está routeado por nginx local
-(`http://127.0.0.1:10303/v1/audio/transcriptions`) → speaches container
-local con faster-whisper-small. Por eso NO necesitas tocar URLs ni
-construir curl: la tool ya pega al endpoint correcto.
+1. NO intentes invocar `media_transcribe`, `speech_to_text`, ni
+   `media_describe` con el voice. Las tools fallarán contra OpenAI con
+   401 (la zai key no es válida ahí), generarán crash loop del agente
+   cada 3 minutos.
+2. NO intentes descargar el OGG con shell_exec ni curl. El sandbox
+   bloquea el approval y el LLM trunca URLs largas.
+3. Responde inmediatamente al usuario, en una sola pasada (sin tools):
 
-Si la tool falla o devuelve texto vacío: avísale a Miguel "no pude
-transcribir, repite por favor o escríbeme el texto" y NO sigas. Nunca
-inventes la transcripción.
+   "Voice transcription está fuera de servicio temporalmente
+   (limitación upstream openfang 0.5.10 — issue #1051). Por favor
+   escríbeme el mensaje en texto. Si era una solicitud de tarea para
+   Chagra, dímela en texto y la proceso al toque."
+
+4. Si la duración es <2s (mensajes accidentales), responde solo:
+   "voice corto, ¿quisiste mandar texto? avísame."
+
+Cuando openfang 0.5.11+ incluya el campo `[media] audio_base_url`,
+este Paso vuelve a usar `media_transcribe(file_id="...", language="es")`
+directamente. La infraestructura local ya está lista: speaches
+container en `127.0.0.1:10303/v1/audio/*` espera ese cambio.
 
 Si el helper devuelve exit code != 0 o JSON con campo "error":
 1. Avísale a Miguel "no pude transcribir: <mensaje del error>".
