@@ -95,15 +95,19 @@ let
     [memory]
     consolidation_threshold = 5000
     decay_rate = 0.1
-    # Embeddings vía proxy local (modules/ai/openai-proxy.nix) → Ollama nomic-embed-text.
-    # 2026-04-26: el openfang 0.5.10 detecta provider por env var
-    # (OPENAI_API_KEY) y lo manda al OPENAI_BASE_URL. Como el proxy local
-    # routea /v1/embeddings → Ollama, queda local-first sin tocar z.ai.
-    # Cualquier valor no vacío en OPENAI_API_KEY funciona; el proxy
-    # descarta el header Authorization antes de hablar con Ollama.
-    embedding_provider    = "openai"
+    # Embeddings vía driver nativo Ollama de OpenFang 0.5.10.
+    # 2026-04-26: investigación del binario + repo upstream confirmó que
+    # OpenFang IGNORA OPENAI_BASE_URL para embeddings (sólo lo respeta
+    # chat completions). El cliente embedding.rs construye URL desde la
+    # constante interna del provider catalog. Para "openai" la constante
+    # es https://api.openai.com/v1 hardcoded → 401 con la zai key.
+    # Solución: usar provider "ollama" nativo, cuya constante interna
+    # apunta a http://localhost:11434/v1. Salta el proxy, sin TLS
+    # spoofing, sin overrides /etc/hosts, sin parchar binario.
+    # nomic-embed-text:latest ya está en `ollama list`.
+    embedding_provider    = "ollama"
     embedding_model       = "nomic-embed-text"
-    embedding_api_key_env = "OPENAI_API_KEY"
+    embedding_api_key_env = "OLLAMA_API_KEY"
 
     ${lib.optionalString (agent.workspacePath != "") ''
     [workspace]
@@ -375,6 +379,12 @@ in
             export OPENAI_API_KEY="$ZAI_API_KEY"
             export OPENAI_BASE_URL="http://127.0.0.1:${toString registry.ports.openaiProxy}/v1"
           fi
+
+          # OLLAMA_API_KEY requerido por la lectura std::env::var del kernel
+          # (embedding_api_key_env="OLLAMA_API_KEY" en config.toml). Ollama
+          # NO valida el valor; cualquier string no-vacío sirve. Si no
+          # existe la var, openfang aborta el setup del embedding driver.
+          export OLLAMA_API_KEY="ollama-local-no-auth"
 
           exec ${openfang-pkg}/bin/openfang start --config "$HOME/config.toml"
         '';
