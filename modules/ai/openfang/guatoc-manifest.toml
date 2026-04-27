@@ -3,11 +3,20 @@ description = "Asistente personal e investigador autónomo de Miguel Ángel — 
 module = "builtin:chat"
 profile = "full"
 
-# exec_mode = "Full": ejecuta tools sin pedir approval. Esto es lo que tiene
-# `collector` Hand internamente (visto en logs `exec_mode=Some(Full)`). El
-# `tool_allowlist` que probamos primero no se reflejó en el runtime — los
-# logs siguieron mostrando `exec_mode=Some(Allowlist)` y `Approval request`
-# tras cada tool call. `Full` desactiva el gate completo.
+# exec_policy = "full": ejecuta tools sin pedir approval (incluyendo
+# shell_exec — verificado en openfang upstream issue #772 y test
+# test_issue_772_full_mode_bypasses_approval del repo).
+#
+# 2026-04-26: AVISO — el campo TOML correcto es `exec_policy`, NO
+# `exec_mode`. Los logs IMPRIMEN "exec_mode=Some(Full)" como alias
+# estético del valor RESUELTO, lo que confunde. Pero el campo TOML que
+# se serializa es `exec_policy`. Si declaras `exec_mode = "Full"` (con
+# nombre incorrecto), serde lo IGNORA silenciosamente, cae al default,
+# y approval gate sigue bloqueando shell_exec. Test empírico antes de
+# este fix: con `exec_mode = "Full"` el bot timeout 60s y deniega
+# shell_exec; tras renombrar a `exec_policy = "full"` lowercase,
+# bypass funciona. Aliases válidos: "full" | "allow" | "all" |
+# "unrestricted" (case-insensitive).
 #
 # Trade-off: cualquier tool que el agent decida invocar se ejecuta sin
 # preguntarte. Aceptable porque (a) el agent solo se comunica vía Telegram
@@ -15,12 +24,14 @@ profile = "full"
 # allowed_commands del kernel, (c) el operador validó ADR-019/ADR-020 en
 # system_prompt, (d) sec 7 del manifest restringe a `gh issue create` con
 # label `claude-code-request` en repo público Chagra solo.
-exec_mode = "Full"
+exec_policy = "full"
 
 # tool_allowlist: tools que el agent puede ejecutar SIN pedir approval.
-# Sin esto, exec_mode=Allowlist + lista vacía → cada tool requiere approval
-# manual con timeout 60s → bloqueo silencioso (sec 7 voice→issue inutilizable).
-# La lista cubre el flow completo de la sec 7 + interacciones cotidianas.
+# Nota: tool_allowlist NO exonera del approval gate por sí solo (verificado
+# upstream — sólo afecta capability check). El bypass real viene de
+# exec_policy = "full" arriba. Mantenemos esta lista como documentación
+# de qué tools usa el agente y para defense-in-depth si exec_policy
+# cambia en el futuro.
 tool_allowlist = [
   # voice intake pipeline (sec 7)
   "media_transcribe",
