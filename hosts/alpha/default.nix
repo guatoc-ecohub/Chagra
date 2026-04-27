@@ -18,14 +18,27 @@
 
   # Proxy local OpenAI-compat — fix bug 2026-04-26: openfang manda
   # embeddings al OPENAI_BASE_URL (z.ai), pero el Coding Plan sólo
-  # tiene modelos GLM (chat), no embeddings. El proxy routea
-  # /v1/embeddings → Ollama local (nomic-embed-text) y deja chat
-  # transparente a z.ai. Audio (/v1/audio/*) queda 503 hasta que
-  # speaches/whisperOpenai esté desplegado (Opción D voz).
+  # tiene modelos GLM (chat), no embeddings. El proxy routea:
+  #   /v1/embeddings → Ollama local (nomic-embed-text)
+  #   /v1/audio/*    → speaches local (whisperOpenai) — drop-in
+  #                    OpenAI-compat para tools nativas media_transcribe
+  #                    y speech_to_text de openfang 0.5.10.
+  #   resto          → z.ai upstream (chat completions GLM-4.6)
   guatoc.ai.openaiProxy = {
     enable = true;
     upstream = "https://api.z.ai/api/coding/paas/v4";
-    enableAudioRoute = false;  # 🟡 cambiar a true cuando speaches esté live
+    enableAudioRoute = true;
+  };
+
+  # Speaches container (Whisper OpenAI-compat) en :10302 — backend del
+  # routing /v1/audio/* del proxy. Modelo Systran/faster-whisper-small
+  # (~244MB) balance precisión/tamaño para español. Si latencia es alta
+  # o WER >15% en español finca, escalar a faster-whisper-medium.
+  guatoc.ai.whisperOpenai = {
+    enable = true;
+    model = "Systran/faster-whisper-small";
+    inferenceDevice = "cpu";
+    computeType = "int8";
   };
 
   # =====================

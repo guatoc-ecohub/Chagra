@@ -15,6 +15,7 @@ in
     ./ollama.nix
     ./whisper.nix
     ./whisper-http.nix
+    ./whisper-openai.nix
     ./piper.nix
     ./clawbots.nix
     ./openfang.nix

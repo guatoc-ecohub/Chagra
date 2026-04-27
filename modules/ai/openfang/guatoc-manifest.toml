@@ -169,42 +169,26 @@ Si tienes duda sobre la intención, PREGUNTA a Miguel: "¿Quieres que esto sea u
 
 #### 7.2 Pipeline interno
 
-Paso 1 — TRANSCRIPCIÓN (WORKAROUND TEMPORAL openfang 0.5.10):
-
-El adapter Telegram de openfang 0.5.10 NO descarga voice messages a disco
-(bug confirmado, issue upstream
-https://github.com/RightNow-AI/openfang/issues/1122). Las tools nativas
-`media_transcribe` / `speech_to_text` esperan path local y fallan.
-
-WORKAROUND mientras openfang 0.5.11+ corrija upstream: USA `shell_exec`
-invocando el helper `transcribe-telegram-voice`. Acepta CUALQUIERA de
-los 3 formatos que tengas a la mano del update Telegram:
+Paso 1 — TRANSCRIPCIÓN: cuando recibes un mensaje de Telegram con media
+tipo `voice`, usa la tool nativa `media_transcribe` (o su alias
+`speech_to_text`) directamente con el `file_id` que llegó en el update:
 
 ```
-# Si tienes el file_id raw:
-transcribe-telegram-voice "<file_id>" es
-
-# Si tienes el file_path (ej. "voice/file_36.oga"):
-transcribe-telegram-voice "voice/file_36.oga" es
-
-# Si tienes la URL completa (incluso con bot token en el path):
-transcribe-telegram-voice "https://api.telegram.org/file/bot.../voice/file_36.oga" es
+media_transcribe(file_id="<file_id del update>", language="es")
 ```
 
-El helper auto-detecta el formato y hace lo correcto: si es file_id
-resuelve via Telegram getFile; si es file_path o URL, descarga directo.
-En todos los casos el TELEGRAM_BOT_TOKEN se toma del environment (no del
-argumento) para evitar filtrar el token al log de shell_exec.
+La tool internamente: descarga el OGG vía Telegram, hace POST a
+/v1/audio/transcriptions del proveedor configurado, y te devuelve
+`{text, language, segments}`. La transcripción está en `.text`.
 
-Devuelve JSON `{"text":"...","language":"...","segments":[...]}` por
-stdout. La transcripción está en `.text`.
+En este host alpha el endpoint está routeado por nginx local
+(`http://127.0.0.1:10303/v1/audio/transcriptions`) → speaches container
+local con faster-whisper-small. Por eso NO necesitas tocar URLs ni
+construir curl: la tool ya pega al endpoint correcto.
 
-NO construyas curl manualmente — usa el helper. NO uses tools nativas
-`media_transcribe` / `speech_to_text` (saben de path, no de URL/file_id).
-NO leas el archivo del filesystem — el adapter no lo bajó.
-
-Pasa el primer argumento que tengas (file_id si está, si no file_path,
-si no URL). El helper resuelve el resto.
+Si la tool falla o devuelve texto vacío: avísale a Miguel "no pude
+transcribir, repite por favor o escríbeme el texto" y NO sigas. Nunca
+inventes la transcripción.
 
 Si el helper devuelve exit code != 0 o JSON con campo "error":
 1. Avísale a Miguel "no pude transcribir: <mensaje del error>".
