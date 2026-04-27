@@ -43,6 +43,87 @@ let
     '';
   };
 
+  # Helper: descarga voice OGG de Telegram + transcribe via whisper-http.
+  # 2026-04-26: workaround del bug openfang 0.5.10 issue upstream #1122
+  # (adapter Telegram NO descarga voice messages a download_dir). El agente
+  # invoca este script con un file_id; aquí se hace todo el flujo:
+  #   1. getFile via Telegram bot API → resolver file_path
+  #   2. download del OGG a /tmp privado del proceso
+  #   3. POST multipart al whisper-http en :10301/asr
+  #   4. devolver JSON con la transcripción
+  # Beneficios vs construir el comando en el LLM:
+  #   - Sin escape hell de comillas dentro de tool_call JSON.
+  #   - Sin filtrar TELEGRAM_BOT_TOKEN al contexto del modelo.
+  #   - Determinístico: si openfang 0.5.11 corrige el adapter, basta
+  #     revertir 1 línea del prompt.
+  transcribeTelegramVoice = pkgs.writeShellScriptBin "transcribe-telegram-voice" ''
+    #!${pkgs.bash}/bin/bash
+    set -euo pipefail
+
+    # Uso: transcribe-telegram-voice <file_id> [language]
+    # Env: TELEGRAM_BOT_TOKEN (requerido)
+    # Stdout: JSON {"text": "...", "language": "..."} de whisper-http o error.
+    # Exit: 0 OK · 1 input inválido · 2 error Telegram · 3 error whisper.
+
+    FILE_ID="''${1:-}"
+    LANG_PARAM="''${2:-es}"
+
+    if [ -z "$FILE_ID" ]; then
+      echo '{"error":"missing file_id; uso: transcribe-telegram-voice <file_id> [lang]"}' >&2
+      exit 1
+    fi
+
+    if [ -z "''${TELEGRAM_BOT_TOKEN:-}" ]; then
+      echo '{"error":"TELEGRAM_BOT_TOKEN no está en el environment"}' >&2
+      exit 1
+    fi
+
+    WHISPER_URL="''${WHISPER_HTTP_URL:-http://127.0.0.1:10301/asr}"
+
+    # 1. getFile
+    META=$(${pkgs.curl}/bin/curl -fsS --max-time 10 \
+      "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getFile?file_id=$FILE_ID" \
+      || { echo '{"error":"getFile request failed"}' >&2; exit 2; })
+
+    FILE_PATH=$(echo "$META" | ${pkgs.jq}/bin/jq -r '.result.file_path // empty')
+
+    if [ -z "$FILE_PATH" ]; then
+      echo "{\"error\":\"getFile no devolvió file_path\",\"telegram_response\":$META}" >&2
+      exit 2
+    fi
+
+    # 2. download OGG a tmp
+    TMP=$(${pkgs.coreutils}/bin/mktemp --suffix=.oga)
+    trap "${pkgs.coreutils}/bin/rm -f '$TMP'" EXIT INT TERM
+
+    ${pkgs.curl}/bin/curl -fsS --max-time 60 -o "$TMP" \
+      "https://api.telegram.org/file/bot$TELEGRAM_BOT_TOKEN/$FILE_PATH" \
+      || { echo '{"error":"download OGG failed"}' >&2; exit 2; }
+
+    if [ ! -s "$TMP" ]; then
+      echo '{"error":"OGG download produjo archivo vacío"}' >&2
+      exit 2
+    fi
+
+    # 3. POST a whisper-http
+    RESULT=$(${pkgs.curl}/bin/curl -fsS --max-time 120 \
+      -X POST \
+      -F "audio_file=@$TMP" \
+      -F "language=$LANG_PARAM" \
+      -F "task=transcribe" \
+      -F "output=json" \
+      "$WHISPER_URL" \
+      || { echo '{"error":"whisper-http request failed"}' >&2; exit 3; })
+
+    if [ -z "$RESULT" ]; then
+      echo '{"error":"whisper-http devolvió respuesta vacía"}' >&2
+      exit 3
+    fi
+
+    # 4. devolver JSON tal cual lo dio whisper-http
+    echo "$RESULT"
+  '';
+
   # Genera config.toml para un agente
   mkAgentConfig = name: agent: pkgs.writeText "openfang-${name}-config.toml" ''
     # OpenFang config — Agent: ${agent.name}
@@ -219,7 +300,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages = [ openfang-pkg ];
+    environment.systemPackages = [ openfang-pkg transcribeTelegramVoice ];
 
     users.users.openfang = {
       isSystemUser = true;
