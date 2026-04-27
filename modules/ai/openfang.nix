@@ -60,16 +60,26 @@ let
     #!${pkgs.bash}/bin/bash
     set -euo pipefail
 
-    # Uso: transcribe-telegram-voice <file_id> [language]
+    # Uso: transcribe-telegram-voice <input> [language]
+    #
+    # <input> acepta CUALQUIERA de los 3 formatos que el LLM tenga a la mano:
+    #   1. file_id puro de Telegram (ej. "AwACAgIAAxk...")
+    #      → resuelve via getFile API + download.
+    #   2. file_path de Telegram (ej. "voice/file_36.oga")
+    #      → download directo (saltea getFile).
+    #   3. URL completa (ej. "https://api.telegram.org/file/bot.../voice/file_36.oga")
+    #      → extrae file_path y descarga con TOKEN del env (no del input).
+    #      Esto evita que el bot token quede loguead en argv si el LLM copia la URL.
+    #
     # Env: TELEGRAM_BOT_TOKEN (requerido)
-    # Stdout: JSON {"text": "...", "language": "..."} de whisper-http o error.
+    # Stdout: JSON respuesta de whisper-http (campo .text trae la transcripción).
     # Exit: 0 OK · 1 input inválido · 2 error Telegram · 3 error whisper.
 
-    FILE_ID="''${1:-}"
+    INPUT="''${1:-}"
     LANG_PARAM="''${2:-es}"
 
-    if [ -z "$FILE_ID" ]; then
-      echo '{"error":"missing file_id; uso: transcribe-telegram-voice <file_id> [lang]"}' >&2
+    if [ -z "$INPUT" ]; then
+      echo '{"error":"missing input; uso: transcribe-telegram-voice <file_id|file_path|url> [lang]"}' >&2
       exit 1
     fi
 
@@ -80,47 +90,68 @@ let
 
     WHISPER_URL="''${WHISPER_HTTP_URL:-http://127.0.0.1:10301/asr}"
 
-    # 1. getFile
-    META=$(${pkgs.curl}/bin/curl -fsS --max-time 10 \
-      "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getFile?file_id=$FILE_ID" \
-      || { echo '{"error":"getFile request failed"}' >&2; exit 2; })
-
-    FILE_PATH=$(echo "$META" | ${pkgs.jq}/bin/jq -r '.result.file_path // empty')
-
-    if [ -z "$FILE_PATH" ]; then
-      echo "{\"error\":\"getFile no devolvió file_path\",\"telegram_response\":$META}" >&2
-      exit 2
+    # Auto-detect tipo de input.
+    FILE_PATH=""
+    if [[ "$INPUT" == https://api.telegram.org/file/bot* ]]; then
+      # URL completa: extraer todo después de "/bot<TOKEN>/".
+      # Pattern: https://api.telegram.org/file/bot<TOKEN>/<file_path>
+      WITHOUT_PREFIX="''${INPUT#https://api.telegram.org/file/bot}"
+      FILE_PATH="''${WITHOUT_PREFIX#*/}"
+      if [ -z "$FILE_PATH" ] || [ "$FILE_PATH" = "$WITHOUT_PREFIX" ]; then
+        echo '{"error":"URL Telegram malformada — no se pudo extraer file_path"}' >&2
+        exit 1
+      fi
+    elif [[ "$INPUT" == */* ]]; then
+      # Contiene slash pero no es URL → es file_path directo.
+      FILE_PATH="$INPUT"
+    else
+      # Sin slash → es file_id raw, resolver via getFile.
+      META=$(${pkgs.curl}/bin/curl -fsS --max-time 10 \
+        "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getFile?file_id=$INPUT") || {
+        echo '{"error":"getFile request failed"}' >&2
+        exit 2
+      }
+      FILE_PATH=$(echo "$META" | ${pkgs.jq}/bin/jq -r '.result.file_path // empty')
+      if [ -z "$FILE_PATH" ]; then
+        echo "{\"error\":\"getFile no devolvió file_path\",\"telegram_response\":$META}" >&2
+        exit 2
+      fi
     fi
 
-    # 2. download OGG a tmp
+    # Download usando TOKEN del environment — el TOKEN nunca aparece en argv
+    # del shell_exec, queda solo en el process env.
     TMP=$(${pkgs.coreutils}/bin/mktemp --suffix=.oga)
     trap "${pkgs.coreutils}/bin/rm -f '$TMP'" EXIT INT TERM
 
     ${pkgs.curl}/bin/curl -fsS --max-time 60 -o "$TMP" \
-      "https://api.telegram.org/file/bot$TELEGRAM_BOT_TOKEN/$FILE_PATH" \
-      || { echo '{"error":"download OGG failed"}' >&2; exit 2; }
+      "https://api.telegram.org/file/bot$TELEGRAM_BOT_TOKEN/$FILE_PATH" || {
+      echo '{"error":"download OGG failed"}' >&2
+      exit 2
+    }
 
     if [ ! -s "$TMP" ]; then
       echo '{"error":"OGG download produjo archivo vacío"}' >&2
       exit 2
     fi
 
-    # 3. POST a whisper-http
+    # POST multipart a whisper-http
     RESULT=$(${pkgs.curl}/bin/curl -fsS --max-time 120 \
       -X POST \
       -F "audio_file=@$TMP" \
       -F "language=$LANG_PARAM" \
       -F "task=transcribe" \
       -F "output=json" \
-      "$WHISPER_URL" \
-      || { echo '{"error":"whisper-http request failed"}' >&2; exit 3; })
+      "$WHISPER_URL") || {
+      echo '{"error":"whisper-http request failed"}' >&2
+      exit 3
+    }
 
     if [ -z "$RESULT" ]; then
       echo '{"error":"whisper-http devolvió respuesta vacía"}' >&2
       exit 3
     fi
 
-    # 4. devolver JSON tal cual lo dio whisper-http
+    # Devolver JSON tal cual lo dio whisper-http (campo .text es la transcripción).
     echo "$RESULT"
   '';
 
