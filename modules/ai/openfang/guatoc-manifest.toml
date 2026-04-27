@@ -158,19 +158,44 @@ Si tienes duda sobre la intención, PREGUNTA a Miguel: "¿Quieres que esto sea u
 
 #### 7.2 Pipeline interno
 
-Paso 1 — TRANSCRIPCIÓN: cuando recibes un mensaje de Telegram con media tipo `voice`, el adapter te entrega un objeto con `file_id` (Telegram file reference). **NO intentes acceder al filesystem ni a `/var/lib/openfang/...`** — está fuera de tu workspace y vas a fallar con "no tengo acceso".
+Paso 1 — TRANSCRIPCIÓN (WORKAROUND TEMPORAL openfang 0.5.10):
 
-En cambio, usa la tool `media_transcribe` directamente con el `file_id`:
+El adapter Telegram de openfang 0.5.10 NO descarga voice messages a disco
+aunque `[channels.telegram.media] enabled=true` y `download_dir` estén
+configurados (bug confirmado 2026-04-26, issue upstream
+https://github.com/RightNow-AI/openfang/issues/1122). Te llega una URL
+directa tipo `https://api.telegram.org/file/bot<TOKEN>/voice/file_xyz.oga`
+(que ya incluye el bot token en el path). Las tools `media_transcribe` y
+`speech_to_text` esperan un PATH local, no un URL → fallan con "no tengo
+acceso al filesystem" o equivalente.
+
+WORKAROUND mientras openfang 0.5.11+ corrija upstream:
+USA `shell_exec` con la URL Telegram que recibiste. Descarga el OGG a
+/tmp y luego POST directo a whisper-http en `127.0.0.1:10301/asr`:
 
 ```
-media_transcribe(file_id="<el file_id que llegó en el update>", language="es")
+TMP=$(mktemp --suffix=.oga)
+curl -fsS -o "$TMP" "<URL_TELEGRAM_QUE_RECIBISTE>"
+curl -fsS -X POST -F "audio_file=@$TMP" -F "language=es" -F "task=transcribe" -F "output=json" "http://127.0.0.1:10301/asr"
+rm -f "$TMP"
 ```
 
-La tool internamente: (a) resuelve el download via Telegram getFile API, (b) descarga el OGG a un buffer temporal, (c) hace POST multipart a whisper-http (`http://127.0.0.1:10301/asr`), (d) te devuelve `{text, language, segments}` listo para usar.
+Whisper-http devuelve JSON con la transcripción. Parséala (campo `text`
+o similar según la versión del servicio) y sigue con el flujo normal
+(Paso 2 en adelante).
 
-Si la tool no está disponible o falla, prueba `speech_to_text` con la misma firma. Como último fallback puedes intentar `media_describe` que también acepta media file_id.
+Notas:
+- Si te llegó un `file_id` en lugar de URL completa: primero resuelve
+  via `curl -fsS "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getFile?file_id=<ID>" | jq -r .result.file_path`
+  y luego construye la URL `https://api.telegram.org/file/bot$TELEGRAM_BOT_TOKEN/<file_path>`.
+- Cuando openfang 0.5.11+ arregle el adapter, vuelve al método nativo
+  con `media_transcribe(file_id="<ID>", language="es")`. Avisa a Miguel
+  cuando notes que la tool ya descarga sola — eliminamos este workaround.
 
-Si las 3 tools fallan o devuelven texto vacío: avisa a Miguel "no pude transcribir, repite por favor o escríbeme el texto" y NO sigas. Nunca inventes la transcripción.
+Si shell_exec falla o curl da error de red:
+1. Avísale a Miguel "no pude transcribir, repite por favor o escríbeme el texto".
+2. NO inventes la transcripción.
+3. NO sigas con el flujo del Issue.
 
 Paso 2 — PARSEO ESTRUCTURADO: tomas la transcripción y la mapeas a los campos del issue template `Chagra/.github/ISSUE_TEMPLATE/claude-code-request.yml`:
 
