@@ -177,24 +177,34 @@ https://github.com/RightNow-AI/openfang/issues/1122). Las tools nativas
 `media_transcribe` / `speech_to_text` esperan path local y fallan.
 
 WORKAROUND mientras openfang 0.5.11+ corrija upstream: USA `shell_exec`
-invocando el helper `transcribe-telegram-voice` con el `file_id` que
-llegó en el update Telegram. UN SOLO comando, nada de construir URLs:
+invocando el helper `transcribe-telegram-voice`. Acepta CUALQUIERA de
+los 3 formatos que tengas a la mano del update Telegram:
 
 ```
+# Si tienes el file_id raw:
 transcribe-telegram-voice "<file_id>" es
+
+# Si tienes el file_path (ej. "voice/file_36.oga"):
+transcribe-telegram-voice "voice/file_36.oga" es
+
+# Si tienes la URL completa (incluso con bot token en el path):
+transcribe-telegram-voice "https://api.telegram.org/file/bot.../voice/file_36.oga" es
 ```
 
-El helper hace todo internamente: resuelve via Telegram getFile, descarga
-el OGG, hace POST multipart al whisper-http (`127.0.0.1:10301/asr`), y
-devuelve JSON `{"text":"...","language":"...","segments":[...]}` por
+El helper auto-detecta el formato y hace lo correcto: si es file_id
+resuelve via Telegram getFile; si es file_path o URL, descarga directo.
+En todos los casos el TELEGRAM_BOT_TOKEN se toma del environment (no del
+argumento) para evitar filtrar el token al log de shell_exec.
+
+Devuelve JSON `{"text":"...","language":"...","segments":[...]}` por
 stdout. La transcripción está en `.text`.
 
-NO construyas tú la URL de Telegram — el LLM trunca tokens y rompe
-escapes de comillas. NO uses curl directo. NO leas el archivo del
-filesystem. SOLO `transcribe-telegram-voice <file_id> [lang]`.
+NO construyas curl manualmente — usa el helper. NO uses tools nativas
+`media_transcribe` / `speech_to_text` (saben de path, no de URL/file_id).
+NO leas el archivo del filesystem — el adapter no lo bajó.
 
-El `TELEGRAM_BOT_TOKEN` ya está inyectado en el environment del helper
-desde SOPS — no lo pases tú, no lo loguees, no lo menciones en respuestas.
+Pasa el primer argumento que tengas (file_id si está, si no file_path,
+si no URL). El helper resuelve el resto.
 
 Si el helper devuelve exit code != 0 o JSON con campo "error":
 1. Avísale a Miguel "no pude transcribir: <mensaje del error>".
