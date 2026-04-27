@@ -498,6 +498,15 @@ in
           # existe la var, openfang aborta el setup del embedding driver.
           export OLLAMA_API_KEY="ollama-local-no-auth"
 
+          # PATH explícito con el helper transcribe-telegram-voice + utilidades
+          # base. El subprocess_sandbox de openfang 0.5.10 hereda el PATH del
+          # service systemd; sin este export, /run/current-system/sw/bin queda
+          # fuera de PATH y `transcribe-telegram-voice` aparece "no instalado"
+          # al shell_exec aunque `which` desde kortux sí lo encuentre.
+          # Garantizamos los nix-store paths absolutos para no depender de
+          # /run/current-system mutaciones.
+          export PATH="${transcribeTelegramVoice}/bin:${pkgs.curl}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gnused}/bin:${pkgs.bash}/bin:$PATH"
+
           exec ${openfang-pkg}/bin/openfang start --config "$HOME/config.toml"
         '';
       }
