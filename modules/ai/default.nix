@@ -19,6 +19,7 @@ in
     ./piper.nix
     ./clawbots.nix
     ./openfang.nix
+    ./claude-code-runner.nix
   ];
 
   # ============================================
