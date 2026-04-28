@@ -80,10 +80,10 @@
       "agua": "alto",
       "drenaje_requerido": "bueno_a_moderado",
       "companions": [
-        "solanum_phureja",
-        "vicia_faba",
         "lupinus_mutabilis",
-        "pennisetum_clandestinum_manejado"
+        "pennisetum_clandestinum_manejado",
+        "solanum_phureja",
+        "vicia_faba"
       ],
       "antagonists": [],
       "recommended_covers": [
@@ -193,6 +193,324 @@
       ]
     },
     {
+      "id": "beta_vulgaris_cicla_amarilla",
+      "nombre_comun": "Acelga amarilla",
+      "nombre_cientifico": "Beta vulgaris L. subsp. vulgaris (Cicla Group)",
+      "nombre_comunes_regionales": [
+        "Acelga dorada",
+        "Acelga de penca amarilla"
+      ],
+      "familia_botanica": "Amaranthaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 3,
+      "estrato": "bajo",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 10,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "ph_suelo": {
+        "min": 6.0,
+        "optimo_min": 6.5,
+        "optimo_max": 7.5,
+        "max": 8.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -3,
+        "horas_acumuladas_max": 6,
+        "notas": "Tolerancia similar a las otras acelgas; pencas amarillas pueden ser menos vigorosas que la blanca."
+      },
+      "companions": [
+        "lactuca_sativa_crispa_verde",
+        "raphanus_sativus"
+      ],
+      "antagonists": [
+        "beta_vulgaris_conditiva",
+        "foeniculum_vulgare"
+      ],
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "La 'semilla' es un glomérulo con 2-4 semillas: aclareo obligatorio a 25 cm entre plantas. Suele ofrecerse en mezclas tipo 'arcoiris' junto con variedades roja y blanca."
+      },
+      "valor_pedagogico": "La pigmentación amarilla por betaxantinas, junto a la roja (betacianinas) y la blanca, ilustra variabilidad genética dentro de una misma especie y enseña diversidad nutricional.",
+      "plagas_criticas": [
+        "pulgones (Aphidoidea)",
+        "minador de la hoja (Liriomyza spp.)"
+      ],
+      "enfermedades_criticas": [
+        "Cercospora beticola",
+        "Phoma betae"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015",
+        "restrepo-1996-abc-agricultura-organica"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "beta_vulgaris_cicla_blanca",
+      "nombre_comun": "Acelga blanca",
+      "nombre_cientifico": "Beta vulgaris L. subsp. vulgaris (Cicla Group)",
+      "nombre_comunes_regionales": [
+        "Acelga suiza",
+        "Acelga de penca blanca",
+        "Acelga común"
+      ],
+      "familia_botanica": "Amaranthaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 3,
+      "estrato": "bajo",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 10,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "ph_suelo": {
+        "min": 6.0,
+        "optimo_min": 6.5,
+        "optimo_max": 7.5,
+        "max": 8.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -3,
+        "horas_acumuladas_max": 6,
+        "notas": "Tolera heladas leves; el meristemo basal rebrota tras quemaduras foliares."
+      },
+      "companions": [
+        "lactuca_sativa_crispa_verde",
+        "lactuca_sativa_longifolia_morada",
+        "lactuca_sativa_longifolia_verde",
+        "lactuca_sativa_roble_morada",
+        "lactuca_sativa_roble_verde",
+        "raphanus_sativus"
+      ],
+      "antagonists": [
+        "beta_vulgaris_conditiva",
+        "foeniculum_vulgare"
+      ],
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "La 'semilla' es un glomérulo con 2-4 semillas: aclareo obligatorio a 25 cm entre plantas. Cultivar más rústico de los tres colores; mejor productor de biomasa foliar."
+      },
+      "valor_pedagogico": "Variedad de mayor productividad y vida útil. Ideal como primera hortaliza de hoja en finca-escuela por su tolerancia a manejo amateur y cosecha repetida.",
+      "plagas_criticas": [
+        "pulgones (Aphidoidea)",
+        "minador de la hoja (Liriomyza spp.)"
+      ],
+      "enfermedades_criticas": [
+        "Cercospora beticola",
+        "Phoma betae"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015",
+        "restrepo-1996-abc-agricultura-organica"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "beta_vulgaris_cicla_roja",
+      "nombre_comun": "Acelga roja",
+      "nombre_cientifico": "Beta vulgaris L. subsp. vulgaris (Cicla Group)",
+      "nombre_comunes_regionales": [
+        "Acelga rubí",
+        "Acelga ruibarbo",
+        "Acelga de penca roja"
+      ],
+      "familia_botanica": "Amaranthaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 3,
+      "estrato": "bajo",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 10,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "ph_suelo": {
+        "min": 6.0,
+        "optimo_min": 6.5,
+        "optimo_max": 7.5,
+        "max": 8.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -3,
+        "horas_acumuladas_max": 6,
+        "notas": "Tolera heladas leves; el meristemo basal rebrota tras quemaduras foliares."
+      },
+      "companions": [
+        "lactuca_sativa_crispa_verde",
+        "raphanus_sativus"
+      ],
+      "antagonists": [
+        "beta_vulgaris_conditiva",
+        "foeniculum_vulgare"
+      ],
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "La 'semilla' es un glomérulo con 2-4 semillas: aclareo obligatorio a 25 cm entre plantas. Siembra directa o trasplante con cepellón."
+      },
+      "valor_pedagogico": "Cosecha de corte y rebrote: enseña manejo sostenido de hortalizas de hoja. Las betalainas en pencas y nervaduras permiten explicar pigmentos vegetales sin antocianinas.",
+      "plagas_criticas": [
+        "pulgones (Aphidoidea)",
+        "minador de la hoja (Liriomyza spp.)"
+      ],
+      "enfermedades_criticas": [
+        "Cercospora beticola",
+        "Phoma betae"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015",
+        "restrepo-1996-abc-agricultura-organica"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "beta_vulgaris_conditiva",
+      "nombre_comun": "Remolacha",
+      "nombre_cientifico": "Beta vulgaris L. subsp. vulgaris (Conditiva Group)",
+      "nombre_comunes_regionales": [
+        "Betabel",
+        "Betarraga",
+        "Beterraga"
+      ],
+      "familia_botanica": "Amaranthaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "raiz",
+      "cycleMonths": 3,
+      "estrato": "bajo",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 10,
+        "optimo_max": 21,
+        "max_tolerable": 28
+      },
+      "ph_suelo": {
+        "min": 6.0,
+        "optimo_min": 6.5,
+        "optimo_max": 7.5,
+        "max": 8.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -3,
+        "horas_acumuladas_max": 8,
+        "notas": "La raíz almacenada protege contra heladas leves; las hojas pueden quemarse y rebrotar."
+      },
+      "companions": [
+        "lactuca_sativa_crispa_verde",
+        "raphanus_sativus"
+      ],
+      "antagonists": [
+        "beta_vulgaris_cicla_amarilla",
+        "beta_vulgaris_cicla_blanca",
+        "beta_vulgaris_cicla_roja",
+        "foeniculum_vulgare"
+      ],
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa preferible para evitar bifurcación de raíz. Glomérulos con 2-4 semillas: aclareo a 8-12 cm entre plantas. Cosecha entre los 70-90 días según tamaño."
+      },
+      "valor_pedagogico": "Cultivo de raíz con doble cosecha: hojas tiernas como verdura y raíz madura. Enseña aprovechamiento integral, almacenamiento poscosecha y la quimica de las betalainas.",
+      "plagas_criticas": [
+        "pulgones (Aphidoidea)",
+        "minador de la hoja (Liriomyza spp.)"
+      ],
+      "enfermedades_criticas": [
+        "Cercospora beticola",
+        "Rhizoctonia solani",
+        "Phoma betae"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015",
+        "restrepo-1996-abc-agricultura-organica"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
       "id": "cenchrus_clandestinus",
       "_curation_status": "VALIDADO; nombre taxonómico actualizado (previamente Pennisetum clandestinum)",
       "nombre_comun": "Kikuyo",
@@ -283,6 +601,555 @@
       ]
     },
     {
+      "id": "foeniculum_vulgare",
+      "nombre_comun": "Hinojo",
+      "nombre_cientifico": "Foeniculum vulgare Mill.",
+      "nombre_comunes_regionales": [
+        "Hinojo dulce",
+        "Anís de Florencia"
+      ],
+      "familia_botanica": "Apiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 4,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1500,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 30
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6.0,
+        "optimo_max": 7.5,
+        "max": 8.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -3,
+        "horas_acumuladas_max": 6,
+        "notas": "Parte aérea sensible a heladas fuertes; rebrota desde la base si la corona no se congela."
+      },
+      "antagonists": [
+        "beta_vulgaris_cicla_amarilla",
+        "beta_vulgaris_cicla_blanca",
+        "beta_vulgaris_cicla_roja",
+        "beta_vulgaris_conditiva",
+        "lactuca_sativa_crispa_verde",
+        "lactuca_sativa_longifolia_morada",
+        "lactuca_sativa_longifolia_verde",
+        "lactuca_sativa_roble_morada",
+        "lactuca_sativa_roble_verde",
+        "petroselinum_crispum",
+        "raphanus_sativus"
+      ],
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa de aquenios (mal llamados 'semillas'). Trasplantar joven: tap-root profundo se daña con manipulación tardía."
+      },
+      "valor_pedagogico": "Caso de estudio principal en alelopatía: sus exudados radiculares y volátiles inhiben germinación y desarrollo de la mayoría de hortalizas vecinas. Enseña la necesidad de aislamiento en el diseño del huerto.",
+      "plagas_criticas": [
+        "pulgones (Aphidoidea)"
+      ],
+      "enfermedades_criticas": [
+        "Cercospora foeniculi",
+        "Erysiphe heraclei (oídio)"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "pamplona-roger-2006-plantas-medicinales",
+        "restrepo-2007-biopreparados"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "lactuca_sativa_crispa_verde",
+      "nombre_comun": "Lechuga crespa verde",
+      "nombre_cientifico": "Lactuca sativa L. var. crispa L.",
+      "nombre_comunes_regionales": [
+        "Lechuga rizada",
+        "Lechuga Salad Bowl",
+        "Lechuga Lollo Bionda"
+      ],
+      "familia_botanica": "Asteraceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 2,
+      "estrato": "bajo",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "ph_suelo": {
+        "min": 5.8,
+        "optimo_min": 6.0,
+        "optimo_max": 7.0,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -2,
+        "horas_acumuladas_max": 6,
+        "notas": "Sistema radicular superficial; heladas fuertes provocan acame y bordes necróticos."
+      },
+      "companions": [
+        "beta_vulgaris_cicla_amarilla",
+        "beta_vulgaris_cicla_blanca",
+        "beta_vulgaris_cicla_roja",
+        "beta_vulgaris_conditiva",
+        "raphanus_sativus"
+      ],
+      "antagonists": [
+        "foeniculum_vulgare"
+      ],
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Trasplante a los 25-30 días. Termodormancia: semillas no germinan sobre 25 °C; sembrar en horas frescas o en sombra parcial. Cosecha por hojas externas o planta entera."
+      },
+      "valor_pedagogico": "Hortaliza emblemática de huertos urbanos por su rápido ciclo, rebrote tras corte y bajo requerimiento de espacio. Excelente para enseñar siembra escalonada y manejo del fotoperíodo.",
+      "plagas_criticas": [
+        "pulgones (Aphidoidea)",
+        "babosas (Deroceras spp.)",
+        "trips (Frankliniella spp.)"
+      ],
+      "enfermedades_criticas": [
+        "Bremia lactucae (mildiu)",
+        "Sclerotinia sclerotiorum",
+        "Botrytis cinerea"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015",
+        "restrepo-1996-abc-agricultura-organica"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "lactuca_sativa_longifolia_morada",
+      "nombre_comun": "Lechuga romana morada",
+      "nombre_cientifico": "Lactuca sativa L. var. longifolia Lam.",
+      "nombre_comunes_regionales": [
+        "Romana roja",
+        "Red Cos",
+        "Romaine roja"
+      ],
+      "familia_botanica": "Asteraceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 3,
+      "estrato": "bajo",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "ph_suelo": {
+        "min": 5.8,
+        "optimo_min": 6.0,
+        "optimo_max": 7.0,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -2,
+        "horas_acumuladas_max": 8,
+        "notas": "La pigmentación por antocianinas se intensifica con noches frescas; correlaciona con mayor concentración de antioxidantes en la cosecha."
+      },
+      "companions": [
+        "beta_vulgaris_cicla_blanca",
+        "raphanus_sativus"
+      ],
+      "antagonists": [
+        "foeniculum_vulgare"
+      ],
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Trasplante a los 25-35 días. Distancia 30 cm entre plantas. Variedades pigmentadas son levemente más sensibles a calor: priorizar siembra en periodos de menor radiación directa."
+      },
+      "valor_pedagogico": "Combina la morfología acogollada de la romana con pigmentación púrpura. Útil para enseñar acumulación de antocianinas como respuesta a estrés lumínico y térmico controlado.",
+      "plagas_criticas": [
+        "pulgones (Aphidoidea)",
+        "babosas (Deroceras spp.)",
+        "trips (Frankliniella spp.)"
+      ],
+      "enfermedades_criticas": [
+        "Bremia lactucae (mildiu)",
+        "Sclerotinia sclerotiorum",
+        "Botrytis cinerea"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015",
+        "restrepo-1996-abc-agricultura-organica"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "lactuca_sativa_longifolia_verde",
+      "nombre_comun": "Lechuga romana verde",
+      "nombre_cientifico": "Lactuca sativa L. var. longifolia Lam.",
+      "nombre_comunes_regionales": [
+        "Lechuga Cos",
+        "Romana",
+        "Romaine verde"
+      ],
+      "familia_botanica": "Asteraceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 3,
+      "estrato": "bajo",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "ph_suelo": {
+        "min": 5.8,
+        "optimo_min": 6.0,
+        "optimo_max": 7.0,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -2,
+        "horas_acumuladas_max": 8,
+        "notas": "La cabeza alargada protege las hojas internas; tolera marginalmente más frío que las crespas."
+      },
+      "companions": [
+        "beta_vulgaris_cicla_blanca",
+        "raphanus_sativus"
+      ],
+      "antagonists": [
+        "foeniculum_vulgare"
+      ],
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Trasplante a los 25-35 días. Distancia 30 cm entre plantas. Cosecha de planta entera entre los 65-80 días, cuando la cabeza está firme y las hojas internas blanqueadas."
+      },
+      "valor_pedagogico": "Variedad acogollada permite enseñar el blanqueamiento natural por autosombreado de hojas internas. Cultivo emblemático en huertos escolares de tierra fría colombiana.",
+      "plagas_criticas": [
+        "pulgones (Aphidoidea)",
+        "babosas (Deroceras spp.)",
+        "trips (Frankliniella spp.)"
+      ],
+      "enfermedades_criticas": [
+        "Bremia lactucae (mildiu)",
+        "Sclerotinia sclerotiorum",
+        "Botrytis cinerea"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015",
+        "restrepo-1996-abc-agricultura-organica"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "lactuca_sativa_roble_morada",
+      "nombre_comun": "Lechuga hoja de roble morada",
+      "nombre_cientifico": "Lactuca sativa L.",
+      "nombre_comunes_regionales": [
+        "Oakleaf rojo",
+        "Red oakleaf",
+        "Lechuga roble púrpura"
+      ],
+      "familia_botanica": "Asteraceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 2,
+      "estrato": "bajo",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "ph_suelo": {
+        "min": 5.8,
+        "optimo_min": 6.0,
+        "optimo_max": 7.0,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -2,
+        "horas_acumuladas_max": 6,
+        "notas": "La pigmentación por antocianinas se intensifica con noches frescas (5-12 °C); el color es indicador del estrés térmico tolerado."
+      },
+      "companions": [
+        "beta_vulgaris_cicla_blanca",
+        "raphanus_sativus"
+      ],
+      "antagonists": [
+        "foeniculum_vulgare"
+      ],
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Trasplante a los 25-30 días. Variedades pigmentadas suelen tener termodormancia más marcada: sembrar en lotes con buena ventilación nocturna."
+      },
+      "valor_pedagogico": "Las antocianinas responden al fotoperíodo y la temperatura: ideal para enseñar respuestas fisiológicas al ambiente. La intensidad del morado se vuelve un indicador visual del manejo del cultivo.",
+      "plagas_criticas": [
+        "pulgones (Aphidoidea)",
+        "babosas (Deroceras spp.)",
+        "trips (Frankliniella spp.)"
+      ],
+      "enfermedades_criticas": [
+        "Bremia lactucae (mildiu)",
+        "Sclerotinia sclerotiorum",
+        "Botrytis cinerea"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015",
+        "restrepo-1996-abc-agricultura-organica"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "lactuca_sativa_roble_verde",
+      "nombre_comun": "Lechuga hoja de roble verde",
+      "nombre_cientifico": "Lactuca sativa L.",
+      "nombre_comunes_regionales": [
+        "Oakleaf verde",
+        "Lechuga roble"
+      ],
+      "familia_botanica": "Asteraceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 2,
+      "estrato": "bajo",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "ph_suelo": {
+        "min": 5.8,
+        "optimo_min": 6.0,
+        "optimo_max": 7.0,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -2,
+        "horas_acumuladas_max": 6,
+        "notas": "Hoja lobulada presenta menor superficie a heladas radiativas que las crespas; tolera marginalmente mejor."
+      },
+      "companions": [
+        "beta_vulgaris_cicla_blanca",
+        "raphanus_sativus"
+      ],
+      "antagonists": [
+        "foeniculum_vulgare"
+      ],
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Trasplante a los 25-30 días. Cultivar de hoja suelta tipo loose-leaf con lóbulos profundos. Cosecha repetida por hojas externas tolerada hasta floración."
+      },
+      "valor_pedagogico": "Variedad de hoja lobulada útil para enseñar diversidad morfológica dentro de Lactuca sativa. Su textura tierna la hace introducción amigable a los gourmet salads en escuelas culinarias.",
+      "plagas_criticas": [
+        "pulgones (Aphidoidea)",
+        "babosas (Deroceras spp.)",
+        "trips (Frankliniella spp.)"
+      ],
+      "enfermedades_criticas": [
+        "Bremia lactucae (mildiu)",
+        "Sclerotinia sclerotiorum",
+        "Botrytis cinerea"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015",
+        "restrepo-1996-abc-agricultura-organica"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "petroselinum_crispum",
+      "nombre_comun": "Perejil crespo",
+      "nombre_cientifico": "Petroselinum crispum (Mill.) Fuss",
+      "nombre_comunes_regionales": [
+        "Perejil rizado",
+        "Perejil de hoja crespa"
+      ],
+      "familia_botanica": "Apiaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 3,
+      "estrato": "bajo",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -7,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6.0,
+        "optimo_max": 7.0,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -3,
+        "horas_acumuladas_max": 8,
+        "notas": "Especie bienal: tolera heladas leves. Al florecer en su segundo año atrae sírfidos, avispas parasitoides y abejas nativas."
+      },
+      "antagonists": [
+        "foeniculum_vulgare"
+      ],
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinación lenta (14-28 días). Remojo previo en agua tibia por 24 h mejora la emergencia."
+      },
+      "valor_pedagogico": "Útil para enseñar paciencia en germinación lenta, manejo de aromáticas y atracción de fauna benéfica durante la floración del segundo año.",
+      "plagas_criticas": [
+        "pulgones (Aphidoidea)",
+        "minador de la hoja (Liriomyza spp.)"
+      ],
+      "enfermedades_criticas": [
+        "Septoria petroselini",
+        "Alternaria spp."
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "pamplona-roger-2006-plantas-medicinales",
+        "restrepo-1996-abc-agricultura-organica"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
       "id": "pteridium_aquilinum",
       "_curation_status": "CURACIÓN BÁSICA",
       "nombre_comun": "Helecho marranero",
@@ -363,6 +1230,91 @@
       "source_ids": [
         "flora-colombia-pteridophyta"
       ]
+    },
+    {
+      "id": "raphanus_sativus",
+      "nombre_comun": "Rábano",
+      "nombre_cientifico": "Raphanus sativus L.",
+      "nombre_comunes_regionales": [
+        "Rabanito",
+        "Rábano rojo"
+      ],
+      "familia_botanica": "Brassicaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "raiz",
+      "cycleMonths": 1,
+      "estrato": "bajo",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6.0,
+        "optimo_max": 7.0,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "heladas_tolerancia": {
+        "umbral_c": -2,
+        "horas_acumuladas_max": 4,
+        "notas": "Cultivo corto: helada fuerte ablanda raíz y dispara floración prematura."
+      },
+      "companions": [
+        "beta_vulgaris_cicla_amarilla",
+        "beta_vulgaris_cicla_blanca",
+        "beta_vulgaris_cicla_roja",
+        "beta_vulgaris_conditiva",
+        "lactuca_sativa_crispa_verde",
+        "lactuca_sativa_longifolia_morada",
+        "lactuca_sativa_longifolia_verde",
+        "lactuca_sativa_roble_morada",
+        "lactuca_sativa_roble_verde"
+      ],
+      "antagonists": [
+        "foeniculum_vulgare"
+      ],
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa siempre; el rábano no tolera trasplante. Distancia 5-8 cm entre plantas, 20 cm entre surcos. Cosecha en 25-35 días en variedades de mesa."
+      },
+      "valor_pedagogico": "Ciclo más corto del huerto (3-5 semanas): ideal como primer cultivo para niños y aprendices. Sirve como cultivo trampa para alticas (Phyllotreta spp.) y como indicador de compactación del suelo.",
+      "plagas_criticas": [
+        "alticas (Phyllotreta spp.)",
+        "mosca del rábano (Delia radicum)",
+        "pulgones (Aphidoidea)"
+      ],
+      "enfermedades_criticas": [
+        "Plasmodiophora brassicae (hernia de la col)",
+        "Alternaria raphani"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015",
+        "restrepo-1996-abc-agricultura-organica"
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "solanum_phureja",
@@ -453,16 +1405,17 @@
         "notas": "Heladas nocturnas <−2°C dañan follaje severamente; variedades nativas del altiplano son más tolerantes que Grupo Phureja."
       },
       "companions": [
-        "vicia_faba",
         "alnus_acuminata",
-        "minthostachys_mollis",
+        "chenopodium_quinoa",
         "lupinus_mutabilis",
-        "chenopodium_quinoa"
+        "minthostachys_mollis",
+        "urtica_dioica",
+        "vicia_faba"
       ],
       "antagonists": [
-        "solanum_lycopersicum",
+        "cucurbita_maxima",
         "rubus_glaucus",
-        "cucurbita_maxima"
+        "solanum_lycopersicum"
       ],
       "_nota_antagonists": "Solanaceae entre sí comparten Phytophthora infestans y Ralstonia solanacearum → rotación obligatoria. Cucurbitáceas son hospedantes alternativos de áfidos vectores.",
       "recommended_covers": [
@@ -1043,9 +1996,9 @@
       "agua": "alto",
       "drenaje_requerido": "medio",
       "companions": [
-        "solanum_phureja",
+        "rosmarinus_officinalis",
         "rubus_glaucus",
-        "rosmarinus_officinalis"
+        "solanum_phureja"
       ],
       "antagonists": [],
       "recommended_covers": [
@@ -1548,13 +2501,20 @@
   ],
   "sources": [
     {
-      "id": "agrosavia-sol-andina",
-      "tipo": "ficha_tecnica_institucional",
+      "id": "agrosavia-alhaja-ica-17702-2019",
+      "tipo": "resolucion_oficial",
+      "autores": "ICA — Instituto Colombiano Agropecuario",
+      "año": 2019,
+      "titulo": "Resolución 00017702 de 2019 — Registro variedad AGROSAVIA Alhaja",
+      "institucion": "ICA"
+    },
+    {
+      "id": "agrosavia-bacillus-2018",
+      "tipo": "manual_tecnico",
       "autores": "AGROSAVIA",
-      "año": 2016,
-      "titulo": "Ficha técnica Sol Andina — papa criolla Grupo Phureja",
-      "institucion": "Corporación Colombiana de Investigación Agropecuaria (AGROSAVIA)",
-      "url": "https://www.agrosavia.co"
+      "año": 2018,
+      "titulo": "Control biológico con Bacillus subtilis en cultivos hortícolas andinos",
+      "institucion": "AGROSAVIA"
     },
     {
       "id": "agrosavia-estrella",
@@ -1565,49 +2525,48 @@
       "institucion": "AGROSAVIA"
     },
     {
-      "id": "agrosavia-alhaja-ica-17702-2019",
-      "tipo": "resolucion_oficial",
-      "autores": "ICA — Instituto Colombiano Agropecuario",
-      "año": 2019,
-      "titulo": "Resolución 00017702 de 2019 — Registro variedad AGROSAVIA Alhaja",
-      "institucion": "ICA"
+      "id": "agrosavia-forrajeras-2022",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": 2022,
+      "titulo": "Gramíneas forrajeras en sistemas ganaderos andinos",
+      "institucion": "AGROSAVIA",
+      "observaciones": "STUB migrado de v3.0."
     },
     {
-      "id": "nustez-rodriguez-2024-unal",
-      "tipo": "libro",
-      "autores": "Ñústez, C.E.; Rodríguez, L.E.",
-      "año": 2024,
-      "titulo": "Papa criolla Grupo Phureja, manual de recomendaciones técnicas para Cundinamarca",
-      "revista_o_editorial": "Editorial Universidad Nacional de Colombia",
-      "isbn": "9789585054929"
+      "id": "agrosavia-manual-biopreparados-2015",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": 2015,
+      "titulo": "Manual de biopreparados para la agricultura colombiana",
+      "institucion": "AGROSAVIA"
     },
     {
-      "id": "rodriguez-nustez-estrada-2009",
-      "tipo": "articulo_revista",
-      "autores": "Rodríguez, L.E.; Ñústez, C.E.; Estrada, N.",
-      "año": 2009,
-      "titulo": "Variedades colombianas de papa criolla (Solanum phureja Juz. et Buk.)",
-      "revista_o_editorial": "Agronomía Colombiana",
-      "volumen_numero": "27(3)",
-      "paginas": "289-303"
+      "id": "agrosavia-silvopastoriles",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": null,
+      "titulo": "Sistemas silvopastoriles en el altoandino colombiano",
+      "institucion": "AGROSAVIA",
+      "observaciones": "STUB migrado de v3.0. Año y publicación específica pendientes."
     },
     {
-      "id": "perez-rodriguez-gomez-2008",
-      "tipo": "articulo_revista",
-      "autores": "Pérez, L.; Rodríguez, L.E.; Gómez, M.I.",
-      "año": 2008,
-      "titulo": "Plan de fertilización de la papa criolla en el altiplano cundiboyacense",
-      "revista_o_editorial": "Agronomía Colombiana",
-      "volumen_numero": "26(3)",
-      "paginas": "477-486"
+      "id": "agrosavia-sol-andina",
+      "tipo": "ficha_tecnica_institucional",
+      "autores": "AGROSAVIA",
+      "año": 2016,
+      "titulo": "Ficha técnica Sol Andina — papa criolla Grupo Phureja",
+      "institucion": "Corporación Colombiana de Investigación Agropecuaria (AGROSAVIA)",
+      "url": "https://www.agrosavia.co"
     },
     {
-      "id": "cip-2006-ghislain",
-      "tipo": "articulo_revista",
-      "autores": "Ghislain, M.; Andrade, D.; Rodríguez, F.; Hijmans, R.J.; Spooner, D.M.",
-      "año": 2006,
-      "titulo": "Genetic analysis of the cultivated potato Solanum tuberosum L. Phureja Group using RAPDs",
-      "institucion": "CIP — International Potato Center"
+      "id": "agrosavia-tibaitata",
+      "tipo": "base_datos",
+      "autores": "AGROSAVIA",
+      "año": null,
+      "titulo": "Centro de Investigación Tibaitatá — publicaciones sobre cultivos andinos y altoandinos",
+      "institucion": "AGROSAVIA",
+      "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1"
     },
     {
       "id": "calderon-saenz-2003-invasoras",
@@ -1618,13 +2577,55 @@
       "revista_o_editorial": "Biota Colombiana"
     },
     {
-      "id": "humboldt-2016-frailejones",
-      "tipo": "libro",
-      "autores": "Instituto Alexander von Humboldt",
-      "año": 2016,
-      "titulo": "Frailejones de Colombia — Espeletiinae",
-      "institucion": "Instituto de Investigación de Recursos Biológicos Alexander von Humboldt",
-      "url": "https://www.humboldt.org.co"
+      "id": "car-cundi-2019",
+      "tipo": "resolucion_oficial",
+      "autores": "CAR — Corporación Autónoma Regional de Cundinamarca",
+      "año": 2019,
+      "titulo": "Protocolos de manejo de especies invasoras en jurisdicción CAR",
+      "institucion": "CAR Cundinamarca",
+      "observaciones": "STUB migrado de v3.0 — número de resolución pendiente."
+    },
+    {
+      "id": "cenicafe-trichoderma-2010",
+      "tipo": "manual_tecnico",
+      "autores": "Cenicafé",
+      "año": 2010,
+      "titulo": "Uso de Trichoderma spp. en el manejo integrado de enfermedades del café",
+      "institucion": "Centro Nacional de Investigaciones de Café (Cenicafé)"
+    },
+    {
+      "id": "ciat-1995-alnus",
+      "tipo": "manual_tecnico",
+      "autores": "CIAT — Centro Internacional de Agricultura Tropical",
+      "año": 1995,
+      "titulo": "Alnus acuminata en sistemas agroforestales andinos",
+      "institucion": "CIAT Palmira",
+      "observaciones": "STUB migrado de v3.0 — título y paginación pendientes de confirmación."
+    },
+    {
+      "id": "cip-2006-ghislain",
+      "tipo": "articulo_revista",
+      "autores": "Ghislain, M.; Andrade, D.; Rodríguez, F.; Hijmans, R.J.; Spooner, D.M.",
+      "año": 2006,
+      "titulo": "Genetic analysis of the cultivated potato Solanum tuberosum L. Phureja Group using RAPDs",
+      "institucion": "CIP — International Potato Center"
+    },
+    {
+      "id": "cip-potatoes-americas",
+      "tipo": "base_datos",
+      "autores": "International Potato Center (CIP)",
+      "año": null,
+      "titulo": "Catalogue of potato varieties and germplasm collections",
+      "institucion": "CIP",
+      "url": "https://cipotato.org"
+    },
+    {
+      "id": "correa-pabon-carulla-2008",
+      "tipo": "articulo_revista",
+      "autores": "Correa, R.; Pabón, R.; Carulla, J.",
+      "año": 2008,
+      "titulo": "Valor nutricional del kikuyo (Cenchrus clandestinus) y respuestas productivas en ganadería lechera andina",
+      "observaciones": "STUB migrado de v3.0 — revista y paginación pendientes."
     },
     {
       "id": "diazgranados-2012-espeletiinae",
@@ -1636,6 +2637,126 @@
       "volumen_numero": "16",
       "paginas": "1-52",
       "doi": "10.3897/phytokeys.16.3186"
+    },
+    {
+      "id": "fao-ecocrop",
+      "tipo": "base_datos",
+      "autores": "FAO",
+      "año": null,
+      "titulo": "EcoCrop — Crop Environmental Requirements Database",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "flora-colombia-pteridophyta",
+      "tipo": "libro",
+      "autores": "Murillo-A., J.; Polanía, C.; et al.",
+      "año": null,
+      "titulo": "Flora de Colombia — Pteridophyta (helechos)",
+      "observaciones": "STUB migrado de v3.0 — editorial y año pendientes."
+    },
+    {
+      "id": "gbif-colombia",
+      "tipo": "base_datos",
+      "autores": "GBIF Secretariat / SiB Colombia",
+      "año": null,
+      "titulo": "GBIF — Global Biodiversity Information Facility (datos de ocurrencia en Colombia)",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "tipo": "base_datos",
+      "autores": "GBIF Secretariat",
+      "año": 2024,
+      "titulo": "GBIF Backbone Taxonomy",
+      "institucion": "Global Biodiversity Information Facility",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "humboldt-2016-frailejones",
+      "tipo": "libro",
+      "autores": "Instituto Alexander von Humboldt",
+      "año": 2016,
+      "titulo": "Frailejones de Colombia — Espeletiinae",
+      "institucion": "Instituto de Investigación de Recursos Biológicos Alexander von Humboldt",
+      "url": "https://www.humboldt.org.co"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "tipo": "libro",
+      "autores": "Instituto Alexander von Humboldt",
+      "año": null,
+      "titulo": "Flora del bosque alto andino colombiano",
+      "institucion": "Instituto Humboldt",
+      "observaciones": "STUB migrado de v3.0."
+    },
+    {
+      "id": "humboldt-invasoras-andes",
+      "tipo": "libro",
+      "autores": "Instituto Alexander von Humboldt",
+      "año": null,
+      "titulo": "Plantas invasoras en los Andes colombianos",
+      "institucion": "Instituto Humboldt",
+      "observaciones": "STUB migrado de v3.0 — año y referencia específica pendientes."
+    },
+    {
+      "id": "ica-fertilizantes-2019",
+      "tipo": "manual_tecnico",
+      "autores": "ICA — Instituto Colombiano Agropecuario",
+      "año": 2019,
+      "titulo": "Guía de uso racional de fertilizantes y enmiendas en Colombia",
+      "institucion": "ICA"
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "tipo": "resolucion_oficial",
+      "autores": "ICA",
+      "año": 2015,
+      "titulo": "Resolución 3168 de 2015 — Reglamenta la producción, importación y exportación de semillas",
+      "institucion": "Instituto Colombiano Agropecuario (ICA)"
+    },
+    {
+      "id": "ifoam-normativa-organica",
+      "tipo": "manual_tecnico",
+      "autores": "IFOAM — Organics International",
+      "año": null,
+      "titulo": "IFOAM Norms for Organic Production and Processing",
+      "url": "https://www.ifoam.bio/our-work/how/standards-certification/organic-guarantee-system/ifoam-norms"
+    },
+    {
+      "id": "ingham-2000-compost-tea",
+      "tipo": "manual_tecnico",
+      "autores": "Ingham, E.R.",
+      "año": 2000,
+      "titulo": "The Compost Tea Brewing Manual",
+      "revista_o_editorial": "Soil Foodweb Inc.",
+      "observaciones": "Fuente internacional; validada contra condiciones colombianas por AGROSAVIA 2015."
+    },
+    {
+      "id": "issg-uicn-invasoras",
+      "tipo": "lista_uicn",
+      "autores": "ISSG — Invasive Species Specialist Group (UICN)",
+      "año": null,
+      "titulo": "Global Invasive Species Database — 100 of the World's Worst Invasive Alien Species",
+      "url": "http://www.iucngisd.org"
+    },
+    {
+      "id": "khan-2009-seaweed-extracts",
+      "tipo": "articulo_revista",
+      "autores": "Khan, W.; Rayirath, U.P.; Subramanian, S.; et al.",
+      "año": 2009,
+      "titulo": "Seaweed extracts as biostimulants of plant growth and development",
+      "revista_o_editorial": "Journal of Plant Growth Regulation",
+      "volumen_numero": "28(4)",
+      "paginas": "386-399",
+      "doi": "10.1007/s00344-009-9103-x"
+    },
+    {
+      "id": "ley-1930-2018-paramos",
+      "tipo": "resolucion_oficial",
+      "autores": "Congreso de la República de Colombia",
+      "año": 2018,
+      "titulo": "Ley 1930 de 2018 — Por medio de la cual se dictan disposiciones para la gestión integral de los páramos en Colombia",
+      "institucion": "República de Colombia"
     },
     {
       "id": "libro-rojo-plantas-colombia",
@@ -1654,197 +2775,30 @@
       "institucion": "MADS Colombia"
     },
     {
-      "id": "ley-1930-2018-paramos",
-      "tipo": "resolucion_oficial",
-      "autores": "Congreso de la República de Colombia",
-      "año": 2018,
-      "titulo": "Ley 1930 de 2018 — Por medio de la cual se dictan disposiciones para la gestión integral de los páramos en Colombia",
-      "institucion": "República de Colombia"
-    },
-    {
-      "id": "uicn-red-list",
-      "tipo": "lista_uicn",
-      "autores": "IUCN — International Union for Conservation of Nature",
-      "año": null,
-      "titulo": "The IUCN Red List of Threatened Species",
-      "url": "https://www.iucnredlist.org"
-    },
-    {
-      "id": "powo-kew",
-      "tipo": "base_datos",
-      "autores": "Royal Botanic Gardens, Kew",
-      "año": null,
-      "titulo": "Plants of the World Online (POWO)",
-      "url": "https://powo.science.kew.org"
-    },
-    {
-      "id": "gbif-colombia",
-      "tipo": "base_datos",
-      "autores": "GBIF Secretariat / SiB Colombia",
-      "año": null,
-      "titulo": "GBIF — Global Biodiversity Information Facility (datos de ocurrencia en Colombia)",
-      "url": "https://www.gbif.org/country/CO"
-    },
-    {
-      "id": "sib-colombia",
-      "tipo": "base_datos",
-      "autores": "Sistema de Información sobre Biodiversidad de Colombia",
-      "año": null,
-      "titulo": "SiB Colombia — Catálogo de la biodiversidad de Colombia",
-      "url": "https://sibcolombia.net"
-    },
-    {
-      "id": "restrepo-1996-bocashi",
-      "tipo": "libro",
-      "autores": "Restrepo, J.",
-      "año": 1996,
-      "titulo": "Abonos orgánicos fermentados — experiencias de agricultores en Centroamérica y Brasil",
-      "revista_o_editorial": "OIT"
-    },
-    {
-      "id": "agrosavia-manual-biopreparados-2015",
-      "tipo": "manual_tecnico",
-      "autores": "AGROSAVIA",
-      "año": 2015,
-      "titulo": "Manual de biopreparados para la agricultura colombiana",
-      "institucion": "AGROSAVIA"
-    },
-    {
-      "id": "ingham-2000-compost-tea",
-      "tipo": "manual_tecnico",
-      "autores": "Ingham, E.R.",
-      "año": 2000,
-      "titulo": "The Compost Tea Brewing Manual",
-      "revista_o_editorial": "Soil Foodweb Inc.",
-      "observaciones": "Fuente internacional; validada contra condiciones colombianas por AGROSAVIA 2015."
-    },
-    {
-      "id": "cenicafe-trichoderma-2010",
-      "tipo": "manual_tecnico",
-      "autores": "Cenicafé",
-      "año": 2010,
-      "titulo": "Uso de Trichoderma spp. en el manejo integrado de enfermedades del café",
-      "institucion": "Centro Nacional de Investigaciones de Café (Cenicafé)"
-    },
-    {
-      "id": "agrosavia-bacillus-2018",
-      "tipo": "manual_tecnico",
-      "autores": "AGROSAVIA",
-      "año": 2018,
-      "titulo": "Control biológico con Bacillus subtilis en cultivos hortícolas andinos",
-      "institucion": "AGROSAVIA"
-    },
-    {
-      "id": "ica-fertilizantes-2019",
-      "tipo": "manual_tecnico",
-      "autores": "ICA — Instituto Colombiano Agropecuario",
-      "año": 2019,
-      "titulo": "Guía de uso racional de fertilizantes y enmiendas en Colombia",
-      "institucion": "ICA"
-    },
-    {
-      "id": "khan-2009-seaweed-extracts",
+      "id": "mongabay-retamo-2024",
       "tipo": "articulo_revista",
-      "autores": "Khan, W.; Rayirath, U.P.; Subramanian, S.; et al.",
-      "año": 2009,
-      "titulo": "Seaweed extracts as biostimulants of plant growth and development",
-      "revista_o_editorial": "Journal of Plant Growth Regulation",
-      "volumen_numero": "28(4)",
-      "paginas": "386-399",
-      "doi": "10.1007/s00344-009-9103-x"
+      "autores": "Mongabay Latam",
+      "año": 2024,
+      "titulo": "El retamo espinoso: la plaga que amenaza los páramos colombianos",
+      "url": "https://es.mongabay.com",
+      "observaciones": "STUB — artículo periodístico, validar contra fuente primaria antes de citar en ministerial."
     },
     {
-      "id": "ifoam-normativa-organica",
-      "tipo": "manual_tecnico",
-      "autores": "IFOAM — Organics International",
-      "año": null,
-      "titulo": "IFOAM Norms for Organic Production and Processing",
-      "url": "https://www.ifoam.bio/our-work/how/standards-certification/organic-guarantee-system/ifoam-norms"
+      "id": "nustez-rodriguez-2024-unal",
+      "tipo": "libro",
+      "autores": "Ñústez, C.E.; Rodríguez, L.E.",
+      "año": 2024,
+      "titulo": "Papa criolla Grupo Phureja, manual de recomendaciones técnicas para Cundinamarca",
+      "revista_o_editorial": "Editorial Universidad Nacional de Colombia",
+      "isbn": "9789585054929"
     },
     {
-      "id": "agrosavia-tibaitata",
-      "tipo": "base_datos",
-      "autores": "AGROSAVIA",
-      "año": null,
-      "titulo": "Centro de Investigación Tibaitatá — publicaciones sobre cultivos andinos y altoandinos",
-      "institucion": "AGROSAVIA",
-      "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1"
-    },
-    {
-      "id": "cip-potatoes-americas",
-      "tipo": "base_datos",
-      "autores": "International Potato Center (CIP)",
-      "año": null,
-      "titulo": "Catalogue of potato varieties and germplasm collections",
-      "institucion": "CIP",
-      "url": "https://cipotato.org"
-    },
-    {
-      "id": "sinchi-amazonia-colombiana",
-      "tipo": "base_datos",
-      "autores": "Instituto SINCHI",
-      "año": null,
-      "titulo": "Publicaciones científicas sobre especies de la Amazonía colombiana",
-      "institucion": "Instituto Amazónico de Investigaciones Científicas SINCHI"
-    },
-    {
-      "id": "fao-ecocrop",
-      "tipo": "base_datos",
-      "autores": "FAO",
-      "año": null,
-      "titulo": "EcoCrop — Crop Environmental Requirements Database",
-      "url": "https://gaez.fao.org/pages/ecocrop"
-    },
-    {
-      "id": "issg-uicn-invasoras",
-      "tipo": "lista_uicn",
-      "autores": "ISSG — Invasive Species Specialist Group (UICN)",
-      "año": null,
-      "titulo": "Global Invasive Species Database — 100 of the World's Worst Invasive Alien Species",
-      "url": "http://www.iucngisd.org"
-    },
-    {
-      "id": "rodriguez-nustez-2009",
+      "id": "ocampo-solorza-2017",
       "tipo": "articulo_revista",
-      "autores": "Rodríguez, L.E.; Ñústez, C.E.",
-      "año": 2009,
-      "titulo": "(Variante de cita usada en v3.0; curadura pendiente — probablemente idéntica a rodriguez-nustez-estrada-2009)",
-      "observaciones": "STUB migrado de v3.0. Verificar si es la misma fuente que rodriguez-nustez-estrada-2009 y dedupear."
-    },
-    {
-      "id": "ciat-1995-alnus",
-      "tipo": "manual_tecnico",
-      "autores": "CIAT — Centro Internacional de Agricultura Tropical",
-      "año": 1995,
-      "titulo": "Alnus acuminata en sistemas agroforestales andinos",
-      "institucion": "CIAT Palmira",
-      "observaciones": "STUB migrado de v3.0 — título y paginación pendientes de confirmación."
-    },
-    {
-      "id": "agrosavia-silvopastoriles",
-      "tipo": "manual_tecnico",
-      "autores": "AGROSAVIA",
-      "año": null,
-      "titulo": "Sistemas silvopastoriles en el altoandino colombiano",
-      "institucion": "AGROSAVIA",
-      "observaciones": "STUB migrado de v3.0. Año y publicación específica pendientes."
-    },
-    {
-      "id": "humboldt-flora-alto-andina",
-      "tipo": "libro",
-      "autores": "Instituto Alexander von Humboldt",
-      "año": null,
-      "titulo": "Flora del bosque alto andino colombiano",
-      "institucion": "Instituto Humboldt",
-      "observaciones": "STUB migrado de v3.0."
-    },
-    {
-      "id": "restrepo-1996-abc-agricultura-organica",
-      "tipo": "libro",
-      "autores": "Restrepo, J.",
-      "año": 1996,
-      "titulo": "ABC de la agricultura orgánica (variante de cita usada en v3.0)",
-      "observaciones": "STUB — posiblemente misma obra que restrepo-1996-bocashi. Verificar y dedupear."
+      "autores": "Ocampo, D.; Solorza, J.",
+      "año": 2017,
+      "titulo": "Manejo de retamo espinoso (Ulex europaeus) en zonas altoandinas de Cundinamarca",
+      "observaciones": "STUB migrado de v3.0 — revista y paginación pendientes."
     },
     {
       "id": "pamplona-roger-2006-plantas-medicinales",
@@ -1856,21 +2810,22 @@
       "observaciones": "STUB migrado de v3.0 — confirmar ISBN."
     },
     {
-      "id": "ocampo-solorza-2017",
+      "id": "perez-rodriguez-gomez-2008",
       "tipo": "articulo_revista",
-      "autores": "Ocampo, D.; Solorza, J.",
-      "año": 2017,
-      "titulo": "Manejo de retamo espinoso (Ulex europaeus) en zonas altoandinas de Cundinamarca",
-      "observaciones": "STUB migrado de v3.0 — revista y paginación pendientes."
+      "autores": "Pérez, L.; Rodríguez, L.E.; Gómez, M.I.",
+      "año": 2008,
+      "titulo": "Plan de fertilización de la papa criolla en el altiplano cundiboyacense",
+      "revista_o_editorial": "Agronomía Colombiana",
+      "volumen_numero": "26(3)",
+      "paginas": "477-486"
     },
     {
-      "id": "car-cundi-2019",
-      "tipo": "resolucion_oficial",
-      "autores": "CAR — Corporación Autónoma Regional de Cundinamarca",
-      "año": 2019,
-      "titulo": "Protocolos de manejo de especies invasoras en jurisdicción CAR",
-      "institucion": "CAR Cundinamarca",
-      "observaciones": "STUB migrado de v3.0 — número de resolución pendiente."
+      "id": "powo-kew",
+      "tipo": "base_datos",
+      "autores": "Royal Botanic Gardens, Kew",
+      "año": null,
+      "titulo": "Plants of the World Online (POWO)",
+      "url": "https://powo.science.kew.org"
     },
     {
       "id": "res-684-2018-mads",
@@ -1881,47 +2836,70 @@
       "institucion": "MADS Colombia"
     },
     {
-      "id": "mongabay-retamo-2024",
-      "tipo": "articulo_revista",
-      "autores": "Mongabay Latam",
-      "año": 2024,
-      "titulo": "El retamo espinoso: la plaga que amenaza los páramos colombianos",
-      "url": "https://es.mongabay.com",
-      "observaciones": "STUB — artículo periodístico, validar contra fuente primaria antes de citar en ministerial."
+      "id": "restrepo-1996-abc-agricultura-organica",
+      "tipo": "libro",
+      "autores": "Restrepo, J.",
+      "año": 1996,
+      "titulo": "ABC de la agricultura orgánica (variante de cita usada en v3.0)",
+      "observaciones": "STUB — posiblemente misma obra que restrepo-1996-bocashi. Verificar y dedupear."
     },
     {
-      "id": "correa-pabon-carulla-2008",
-      "tipo": "articulo_revista",
-      "autores": "Correa, R.; Pabón, R.; Carulla, J.",
-      "año": 2008,
-      "titulo": "Valor nutricional del kikuyo (Cenchrus clandestinus) y respuestas productivas en ganadería lechera andina",
-      "observaciones": "STUB migrado de v3.0 — revista y paginación pendientes."
+      "id": "restrepo-1996-bocashi",
+      "tipo": "libro",
+      "autores": "Restrepo, J.",
+      "año": 1996,
+      "titulo": "Abonos orgánicos fermentados — experiencias de agricultores en Centroamérica y Brasil",
+      "revista_o_editorial": "OIT"
     },
     {
-      "id": "agrosavia-forrajeras-2022",
+      "id": "restrepo-2007-biopreparados",
       "tipo": "manual_tecnico",
-      "autores": "AGROSAVIA",
-      "año": 2022,
-      "titulo": "Gramíneas forrajeras en sistemas ganaderos andinos",
-      "institucion": "AGROSAVIA",
-      "observaciones": "STUB migrado de v3.0."
+      "autores": "Jairo Restrepo Rivera",
+      "año": 2007,
+      "titulo": "Manual práctico de biopreparados aplicados a la agricultura orgánica",
+      "institucion": "Fundación Juquira Candiru"
     },
     {
-      "id": "humboldt-invasoras-andes",
-      "tipo": "libro",
-      "autores": "Instituto Alexander von Humboldt",
-      "año": null,
-      "titulo": "Plantas invasoras en los Andes colombianos",
-      "institucion": "Instituto Humboldt",
-      "observaciones": "STUB migrado de v3.0 — año y referencia específica pendientes."
+      "id": "rodriguez-nustez-2009",
+      "tipo": "articulo_revista",
+      "autores": "Rodríguez, L.E.; Ñústez, C.E.",
+      "año": 2009,
+      "titulo": "(Variante de cita usada en v3.0; curadura pendiente — probablemente idéntica a rodriguez-nustez-estrada-2009)",
+      "observaciones": "STUB migrado de v3.0. Verificar si es la misma fuente que rodriguez-nustez-estrada-2009 y dedupear."
     },
     {
-      "id": "flora-colombia-pteridophyta",
-      "tipo": "libro",
-      "autores": "Murillo-A., J.; Polanía, C.; et al.",
+      "id": "rodriguez-nustez-estrada-2009",
+      "tipo": "articulo_revista",
+      "autores": "Rodríguez, L.E.; Ñústez, C.E.; Estrada, N.",
+      "año": 2009,
+      "titulo": "Variedades colombianas de papa criolla (Solanum phureja Juz. et Buk.)",
+      "revista_o_editorial": "Agronomía Colombiana",
+      "volumen_numero": "27(3)",
+      "paginas": "289-303"
+    },
+    {
+      "id": "sib-colombia",
+      "tipo": "base_datos",
+      "autores": "Sistema de Información sobre Biodiversidad de Colombia",
       "año": null,
-      "titulo": "Flora de Colombia — Pteridophyta (helechos)",
-      "observaciones": "STUB migrado de v3.0 — editorial y año pendientes."
+      "titulo": "SiB Colombia — Catálogo de la biodiversidad de Colombia",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "sinchi-amazonia-colombiana",
+      "tipo": "base_datos",
+      "autores": "Instituto SINCHI",
+      "año": null,
+      "titulo": "Publicaciones científicas sobre especies de la Amazonía colombiana",
+      "institucion": "Instituto Amazónico de Investigaciones Científicas SINCHI"
+    },
+    {
+      "id": "uicn-red-list",
+      "tipo": "lista_uicn",
+      "autores": "IUCN — International Union for Conservation of Nature",
+      "año": null,
+      "titulo": "The IUCN Red List of Threatened Species",
+      "url": "https://www.iucnredlist.org"
     }
   ]
 }
