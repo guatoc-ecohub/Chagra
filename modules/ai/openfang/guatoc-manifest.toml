@@ -170,27 +170,34 @@ Si tienes duda sobre la intención, PREGUNTA a Miguel: "¿Quieres que esto sea u
 #### 7.2 Pipeline interno
 
 Paso 1 — TRANSCRIPCIÓN: cuando recibas un mensaje de Telegram con media
-tipo `voice`, invoca directamente la tool nativa:
+tipo `voice`, invoca el helper instalado en el sistema vía `shell_exec`:
 
 ```
-media_transcribe(file_id="<file_id del update>", language="es")
+shell_exec("transcribe-telegram-voice <file_id> es")
 ```
 
-Internamente la tool: descarga el OGG vía Telegram, hace POST a
-`/v1/audio/transcriptions` del proveedor configurado, y devuelve
-`{text, language, segments}`. La transcripción está en `.text`.
+NO uses `media_transcribe` nativo: openfang 0.6.0 todavía no descarga
+voice OGGs de Telegram a download_dir (issue upstream #1122 abierto)
+aunque sí redirige el endpoint de transcripción (issue #1051 cerrado
+por nuestro fork).
 
-En este host (alpha) el endpoint está routeado a través del openai-proxy
-local (`http://127.0.0.1:10303/v1/audio/transcriptions`), que reenvía
-`/v1/audio/*` al container speaches con `Systran/faster-whisper-small`.
-Esto requiere OpenFang ≥ 0.6.0 con el patch `audio_base_url` (cierra
-issue #1051) — verificado y deployado en alpha 2026-04-27.
+NO uses `curl` directo desde shell_exec con la URL de Telegram: el bot
+token va en argv y queda en plano en los logs systemd (incidente
+2026-04-28). El helper recibe sólo el file_id, lee el token de su env
+TELEGRAM_BOT_TOKEN, y nunca lo imprime.
 
-NO necesitas tocar URLs ni construir curl ni descargar OGG manualmente.
-La tool ya pega al endpoint correcto.
+El helper acepta tres formatos de input (orden de preferencia):
+1. **`file_id` puro** del update Telegram (ej. `AwACAgIAAxk...`) ← úsalo siempre que puedas
+2. `file_path` de Telegram (ej. `voice/file_36.oga`)
+3. URL completa Telegram (sólo si el LLM ya la tiene a la mano)
 
-Si `media_transcribe` falla o devuelve texto vacío:
-1. Avísale a Miguel: "no pude transcribir: <mensaje del error>".
+El helper internamente: getFile API → download OGG a /tmp privado →
+POST multipart a `http://127.0.0.1:10303/v1/audio/transcriptions`
+(openai-proxy → speaches container) → devuelve JSON OpenAI-compat
+`{"text": "<transcripción>"}`. Extrae `.text` para usar la transcripción.
+
+Si el helper devuelve exit code != 0 o el JSON tiene campo `"error"`:
+1. Avísale a Miguel: "no pude transcribir: <error.message>".
 2. NO inventes la transcripción.
 3. NO sigas con el flujo del Issue.
 

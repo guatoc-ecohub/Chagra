@@ -39,6 +39,105 @@ let
     OPENSSL_NO_VENDOR = "1";
   };
 
+  # Helper: descarga voice OGG de Telegram + transcribe via speaches OpenAI-compat.
+  #
+  # Por qué existe (post-mortem 2026-04-28):
+  #   El bump 0.6.0 + audio_base_url (PR #23) sólo redirige el endpoint de
+  #   transcripción al openai-proxy local; pero openfang 0.6.0 todavía no
+  #   descarga voice OGGs de Telegram a download_dir (issue upstream #1122).
+  #   Cuando el agente invoca `media_transcribe(file_id)` el binario falla
+  #   silenciosamente porque no encuentra el archivo en disco. Sin
+  #   instrucciones explícitas, el LLM cae a `shell_exec("curl ...")` con
+  #   el bot token plano en argv — incidente de seguridad confirmado en
+  #   logs alpha 2026-04-28 (token quedó en journalctl: rotación pendiente).
+  #
+  # Diseño:
+  #   - Bot token leído de TELEGRAM_BOT_TOKEN env (NUNCA argv).
+  #   - getFile + download Telegram + POST multipart a speaches via openai-proxy.
+  #   - Tres formatos de input: file_id puro, file_path Telegram, URL completa.
+  #   - Stdout JSON OpenAI-compat: {"text": "<transcripción>"} → bot extrae .text.
+  transcribeTelegramVoice = pkgs.writeShellScriptBin "transcribe-telegram-voice" ''
+    #!${pkgs.bash}/bin/bash
+    set -euo pipefail
+
+    INPUT="''${1:-}"
+    LANG_PARAM="''${2:-es}"
+
+    if [ -z "$INPUT" ]; then
+      echo '{"error":"missing input; uso: transcribe-telegram-voice <file_id|file_path|url> [lang]"}' >&2
+      exit 1
+    fi
+
+    if [ -z "''${TELEGRAM_BOT_TOKEN:-}" ]; then
+      echo '{"error":"TELEGRAM_BOT_TOKEN no está en el environment"}' >&2
+      exit 1
+    fi
+
+    # Default: openai-proxy local en :10303 que routea /v1/audio/* → speaches:10302
+    # con modelo Systran/faster-whisper-small (validado end-to-end 2026-04-28).
+    WHISPER_URL="''${WHISPER_HTTP_URL:-http://127.0.0.1:10303/v1/audio/transcriptions}"
+    WHISPER_MODEL="''${WHISPER_MODEL:-Systran/faster-whisper-small}"
+
+    # Auto-detect tipo de input.
+    FILE_PATH=""
+    if [[ "$INPUT" == https://api.telegram.org/file/bot* ]]; then
+      WITHOUT_PREFIX="''${INPUT#https://api.telegram.org/file/bot}"
+      FILE_PATH="''${WITHOUT_PREFIX#*/}"
+      if [ -z "$FILE_PATH" ] || [ "$FILE_PATH" = "$WITHOUT_PREFIX" ]; then
+        echo '{"error":"URL Telegram malformada — no se pudo extraer file_path"}' >&2
+        exit 1
+      fi
+    elif [[ "$INPUT" == */* ]]; then
+      FILE_PATH="$INPUT"
+    else
+      META=$(${pkgs.curl}/bin/curl -fsS --max-time 10 \
+        "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/getFile?file_id=$INPUT") || {
+        echo '{"error":"getFile request failed"}' >&2
+        exit 2
+      }
+      FILE_PATH=$(echo "$META" | ${pkgs.jq}/bin/jq -r '.result.file_path // empty')
+      if [ -z "$FILE_PATH" ]; then
+        echo "{\"error\":\"getFile no devolvió file_path\",\"telegram_response\":$META}" >&2
+        exit 2
+      fi
+    fi
+
+    # Download — token desde env, nunca en argv.
+    TMP=$(${pkgs.coreutils}/bin/mktemp --suffix=.oga)
+    trap "${pkgs.coreutils}/bin/rm -f '$TMP'" EXIT INT TERM
+
+    ${pkgs.curl}/bin/curl -fsS --max-time 60 -o "$TMP" \
+      "https://api.telegram.org/file/bot$TELEGRAM_BOT_TOKEN/$FILE_PATH" || {
+      echo '{"error":"download OGG failed"}' >&2
+      exit 2
+    }
+
+    if [ ! -s "$TMP" ]; then
+      echo '{"error":"OGG download produjo archivo vacío"}' >&2
+      exit 2
+    fi
+
+    # POST OpenAI-compat a speaches via openai-proxy.
+    RESULT=$(${pkgs.curl}/bin/curl -fsS --max-time 120 \
+      -X POST \
+      -F "file=@$TMP" \
+      -F "model=$WHISPER_MODEL" \
+      -F "language=$LANG_PARAM" \
+      -F "response_format=json" \
+      "$WHISPER_URL") || {
+      echo '{"error":"speaches request failed"}' >&2
+      exit 3
+    }
+
+    if [ -z "$RESULT" ]; then
+      echo '{"error":"speaches devolvió respuesta vacía"}' >&2
+      exit 3
+    fi
+
+    # JSON OpenAI-compat: {"text": "..."}
+    echo "$RESULT"
+  '';
+
   # Genera config.toml para un agente
   mkAgentConfig = name: agent: pkgs.writeText "openfang-${name}-config.toml" ''
     # OpenFang config — Agent: ${agent.name}
@@ -243,7 +342,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages = [ openfang-pkg ];
+    environment.systemPackages = [ openfang-pkg transcribeTelegramVoice ];
 
     users.users.openfang = {
       isSystemUser = true;
@@ -409,6 +508,14 @@ in
           # NO valida el valor; cualquier string no-vacío sirve. Si no
           # existe la var, openfang aborta el setup del embedding driver.
           export OLLAMA_API_KEY="ollama-local-no-auth"
+
+          # PATH explícito con el helper transcribe-telegram-voice + utilidades
+          # base. El subprocess_sandbox de openfang hereda PATH del service
+          # systemd; sin este export, /run/current-system/sw/bin queda fuera y
+          # `transcribe-telegram-voice` aparece "no instalado" desde shell_exec.
+          # Incidente 2026-04-28: sin esto el LLM cae a curl directo con
+          # bot token plano en argv → leak en journalctl.
+          export PATH="${transcribeTelegramVoice}/bin:${pkgs.curl}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gnused}/bin:${pkgs.bash}/bin:$PATH"
 
           exec ${openfang-pkg}/bin/openfang start --config "$HOME/config.toml"
         '';
