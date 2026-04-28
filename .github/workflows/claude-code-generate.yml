@@ -1,0 +1,268 @@
+name: Claude Code Generate
+
+# Pipeline de generación autónoma — segunda etapa del flujo voice→tarea→código.
+#
+# Flujo completo:
+#   1. claude-code-request.yml (issue labeled "claude-code-request") →
+#      crea branch feat/issue-N-slug + abre draft PR con stub.
+#   2. Operador revisa el draft PR. Si el alcance está claro, agrega label
+#      "ready-to-generate" al PR. ESE GATE HUMANO ES OBLIGATORIO.
+#   3. Este workflow dispara: corre Claude Code en self-hosted runner,
+#      reemplaza el stub por la implementación real, hace push.
+#   4. CI gates corren (codeql + playwright + lefthook).
+#   5. Operador revisa el diff manualmente y mergea si OK.
+#
+# Aislación crítica:
+#   - Runner self-hosted con label "claude-runner" (separado del runner
+#     público ubuntu-latest y del runner de deploy). Provisionado
+#     declarativamente fuera de este repo.
+#   - User Linux dedicado claude-runner — sin acceso a otros secrets del
+#     nodo, solo lee la API key vía EnvironmentFile del systemd service.
+#   - Anthropic API key separada del plan personal del operador, vía
+#     EnvironmentFile (NO via secrets de workflow → no aparece en logs ni
+#     puede ser exfiltrada vía dump del context).
+#   - Actor whitelist explícita: solo el operador o el bot pueden disparar.
+#   - Tool whitelist explícita en claude CLI — bloquea WebFetch/WebSearch.
+
+on:
+  pull_request:
+    types: [labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: read
+
+# Concurrency: serializa runs para el MISMO PR. Si el operador agrega y quita
+# y vuelve a agregar la label rápido, no hay race con git push.
+concurrency:
+  group: claude-code-generate-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    # Triple gate: label correcta + actor whitelisted + PR sigue draft.
+    if: |
+      github.event.label.name == 'ready-to-generate'
+      && (github.event.sender.login == github.repository_owner
+          || github.event.sender.login == vars.CLAUDE_BOT_LOGIN)
+      && github.event.pull_request.draft == true
+    runs-on: [self-hosted, alpha, claude-runner]
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+          token: ${{ secrets.CLAUDE_BOT_PAT }}
+
+      - name: Resolve linked issue
+        id: issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_NUM: ${{ github.event.pull_request.number }}
+        run: |
+          # SECURITY: bind PR body via env (no template injection en bash).
+          # Buscar "Closes #N" o "Fixes #N" en el body para resolver el issue.
+          ISSUE_NUM=$(echo "$PR_BODY" | grep -oE '(Closes|Fixes|Resolves) #[0-9]+' | head -1 | grep -oE '[0-9]+' || true)
+          if [ -z "$ISSUE_NUM" ]; then
+            echo "ERROR: No issue linkeado en el body del PR (esperaba 'Closes #N')." >&2
+            exit 1
+          fi
+          ISSUE_BODY=$(gh issue view "$ISSUE_NUM" --json body --jq '.body')
+          ISSUE_TITLE=$(gh issue view "$ISSUE_NUM" --json title --jq '.title')
+          {
+            echo "num=$ISSUE_NUM"
+            echo "title<<EOF_TITLE"
+            echo "$ISSUE_TITLE"
+            echo "EOF_TITLE"
+            echo "body<<EOF_BODY"
+            echo "$ISSUE_BODY"
+            echo "EOF_BODY"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build Claude Code prompt
+        id: prompt
+        env:
+          ISSUE_NUM: ${{ steps.issue.outputs.num }}
+          ISSUE_TITLE: ${{ steps.issue.outputs.title }}
+          ISSUE_BODY: ${{ steps.issue.outputs.body }}
+          PR_NUM: ${{ github.event.pull_request.number }}
+        run: |
+          PROMPT_FILE="${RUNNER_TEMP}/claude-prompt.md"
+          {
+            echo "# Implementa el cambio descrito en el GitHub Issue #${ISSUE_NUM}"
+            echo
+            echo "## Título"
+            echo
+            echo "${ISSUE_TITLE}"
+            echo
+            echo "## Body completo del issue"
+            echo
+            echo "${ISSUE_BODY}"
+            echo
+            echo "## Reglas inviolables"
+            echo
+            echo "1. **NO modifiques** \`src/db/dbCore.js\`, \`src/services/syncManager.js\`, \`src/services/payloadService.js\`, ni \`public/sw.js\` salvo que el issue lo solicite explícitamente."
+            echo "2. **NO bumpees** \`package.json\` version ni \`public/sw.js\` CACHE_NAME — eso lo hace el operador en el commit de release."
+            echo "3. **Respeta el modelo de datos Asset+Log append-only** documentado en CONTRIBUTING.md y AGENTS.md: cualquier nuevo log debe usar la estructura existente, no inventar un schema nuevo."
+            echo "4. **Respeta el boundary anti-leak**: opera SOLO en este repo. NO referencies recursos de repos privados, infra interna, ni hostnames LAN. Lo que documenta CONTRIBUTING.md §1-§2."
+            echo "5. **Cero hardcoding** de URLs, IPs, tokens. Toda config externa via \`import.meta.env.VITE_*\` y proxy Nginx."
+            echo "6. Si después de leer el código no tienes claridad sobre cómo implementar, EXIT 1 con mensaje en stdout que diga 'CLARIFICATION_NEEDED: <pregunta concreta>'. NO inventes."
+            echo
+            echo "## Tu tarea"
+            echo
+            echo "1. Lee el código relevante para entender el contexto."
+            echo "2. Si existe el stub \`.requests/issue-${ISSUE_NUM}.md\`, BÓRRALO al final."
+            echo "3. Implementa el cambio mínimo que cierra el issue."
+            echo "4. Si el cambio toca componentes con tests, corre \`npm test\` y verifica que pasa."
+            echo "5. Si el cambio es de UI, valida con \`npm run build\` que el bundle compila."
+            echo "6. Cuando termines, deja un resumen de 3-5 líneas de qué cambiaste y por qué — eso queda en el commit message."
+          } > "$PROMPT_FILE"
+          echo "file=$PROMPT_FILE" >> "$GITHUB_OUTPUT"
+          echo "Prompt construido en $PROMPT_FILE ($(wc -l < $PROMPT_FILE) líneas)"
+
+      - name: Run Claude Code
+        id: claude
+        env:
+          # ANTHROPIC_API_KEY viene del EnvironmentFile del systemd service del
+          # runner (claude-code-runner.nix) — NO se pasa por secrets de workflow
+          # ni queda en logs.
+          PROMPT_FILE: ${{ steps.prompt.outputs.file }}
+          OUTPUT_FILE: ${{ runner.temp }}/claude-output.json
+        run: |
+          set -o pipefail
+          # claude --print: modo no-interactivo, exit cuando termina.
+          # --permission-mode acceptEdits: edita sin pedir approval (no hay humano).
+          # --allowed-tools: whitelist explícita de tools permitidos.
+          # --output-format json: log estructurado para audit.
+          claude \
+            --print \
+            --permission-mode acceptEdits \
+            --allowed-tools "Read,Edit,Write,Bash(npm:*),Bash(git:*),Bash(gh:*),Bash(node:*),Bash(jq:*),Glob,Grep" \
+            --disallowed-tools "WebFetch,WebSearch" \
+            --output-format json \
+            < "$PROMPT_FILE" \
+            > "$OUTPUT_FILE"
+          echo "output=$OUTPUT_FILE" >> "$GITHUB_OUTPUT"
+          # Detectar pedido explícito de clarificación.
+          if grep -q "CLARIFICATION_NEEDED:" "$OUTPUT_FILE"; then
+            echo "CLAUDE_NEEDS_CLARIFICATION=true" >> "$GITHUB_ENV"
+            echo "Claude pidió clarificación; no se hace push." >&2
+            exit 0
+          fi
+
+      - name: Commit and push changes
+        if: env.CLAUDE_NEEDS_CLARIFICATION != 'true'
+        env:
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+          ISSUE_NUM: ${{ steps.issue.outputs.num }}
+          RUN_ID: ${{ github.run_id }}
+          OUTPUT_FILE: ${{ steps.claude.outputs.output }}
+        run: |
+          git config user.name "Claude Code Bot"
+          git config user.email "noreply-claude-code@chagra.bio"
+
+          # Si no hay cambios, Claude no editó nada — abortar.
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "ERROR: Claude no produjo cambios; abortando push." >&2
+            exit 1
+          fi
+
+          # Extraer summary del output JSON de Claude (último mensaje).
+          SUMMARY=$(jq -r '.messages[-1].content // "Implementación generada por Claude Code."' "$OUTPUT_FILE" 2>/dev/null | head -c 500)
+
+          git add -A
+          git commit -m "$(cat <<EOF
+feat(issue-${ISSUE_NUM}): implementación auto-generada por Claude Code
+
+${SUMMARY}
+
+[claude-code-run #${RUN_ID}]
+EOF
+)"
+          git push origin "$BRANCH"
+
+      - name: Upload audit transcript
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: claude-code-output-${{ github.run_id }}
+          path: ${{ steps.claude.outputs.output }}
+          retention-days: 90
+
+      - name: Comment on PR (audit chain)
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUM: ${{ github.event.pull_request.number }}
+          RUN_ID: ${{ github.run_id }}
+          ISSUE_NUM: ${{ steps.issue.outputs.num }}
+          REPO: ${{ github.repository }}
+        run: |
+          ARTIFACT_URL="https://github.com/${REPO}/actions/runs/${RUN_ID}"
+          if [ "${CLAUDE_NEEDS_CLARIFICATION:-false}" = "true" ]; then
+            STATUS="⚠️ Claude pidió clarificación — no hay cambios pusheados."
+          elif [ "${{ job.status }}" = "success" ]; then
+            STATUS="✅ Cambios pusheados al branch del PR."
+          else
+            STATUS="❌ Generación falló. Ver logs."
+          fi
+          gh pr comment "$PR_NUM" --body "$(cat <<EOF
+🤖 Claude Code Generate ejecutado.
+
+- Run ID: [\`${RUN_ID}\`](${ARTIFACT_URL})
+- Issue: #${ISSUE_NUM}
+- Estado: ${STATUS}
+- Transcript: ver artifact \`claude-code-output-${RUN_ID}\` (retención 90d)
+
+**Próximo paso humano**: revisar el diff. Si OK, marcar el PR como ready-for-review (\`gh pr ready ${PR_NUM}\`).
+
+Re-disparar este workflow: re-aplicar la label \`ready-to-generate\`.
+EOF
+)"
+
+      - name: Remove ready-to-generate label
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUM: ${{ github.event.pull_request.number }}
+        run: |
+          # La label se elimina automáticamente al fin (success o fail). Re-disparar
+          # requiere re-aplicarla manualmente. Esto evita loops + obliga gate humano
+          # entre cada intento.
+          gh pr edit "$PR_NUM" --remove-label "ready-to-generate" || true
+
+      - name: Notify Telegram (non-blocking)
+        if: always()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          PR_NUM: ${{ github.event.pull_request.number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          RUN_ID: ${{ github.run_id }}
+          ISSUE_NUM: ${{ steps.issue.outputs.num }}
+        run: |
+          if [ -z "${TELEGRAM_BOT_TOKEN:-}" ] || [ -z "${TELEGRAM_CHAT_ID:-}" ]; then
+            echo "Telegram secrets not set; skipping (non-blocking)"
+            exit 0
+          fi
+          if [ "${CLAUDE_NEEDS_CLARIFICATION:-false}" = "true" ]; then
+            STATUS="⚠️ pidió clarificación"
+          elif [ "${{ job.status }}" = "success" ]; then
+            STATUS="✅ push OK"
+          else
+            STATUS="❌ falló"
+          fi
+          MSG="🤖 *Claude Code Generate* PR #${PR_NUM} (issue #${ISSUE_NUM})
+          Estado: ${STATUS}
+          Run: ${RUN_ID}
+          PR: ${PR_URL}"
+          curl -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "parse_mode=Markdown" \
+            --data-urlencode "text=${MSG}" \
+            || echo "Telegram notification failed (ignored)"
