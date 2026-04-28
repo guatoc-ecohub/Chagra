@@ -26,6 +26,173 @@
   },
   "species": [
     {
+      "id": "allium_ampeloprasum",
+      "nombre_comun": "Cebolla puerro",
+      "nombre_cientifico": "Allium ampeloprasum var. porrum (L.) J. Gay",
+      "nombre_comunes_regionales": [
+        "Puerro",
+        "Ajopuerro"
+      ],
+      "familia_botanica": "Amaryllidaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 6,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 500,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3400
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 13,
+        "optimo_max": 18,
+        "max_tolerable": 25
+      },
+      "ph_suelo": {
+        "min": 6.0,
+        "optimo_min": 6.5,
+        "optimo_max": 7.5,
+        "max": 8.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -4,
+        "horas_acumuladas_max": 12,
+        "notas": "Excelente resistencia a heladas una vez establecido."
+      },
+      "companions": [
+        "apium_graveolens",
+        "brassica_oleracea_acephala_curly",
+        "brassica_oleracea_acephala_lacinato",
+        "brassica_oleracea_acephala_red_russian",
+        "brassica_oleracea_capitata_alba",
+        "brassica_oleracea_capitata_rubra",
+        "brassica_oleracea_sabauda",
+        "lactuca_sativa_capitata",
+        "petroselinum_crispum"
+      ],
+      "antagonists": [
+        "beta_vulgaris_conditiva"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Requiere trasplante profundo para favorecer el 'blanqueado' del tallo."
+      },
+      "valor_pedagogico": "Lección de aporque: enseña cómo el manejo del suelo (blanqueo) afecta las propiedades culinarias del tallo.",
+      "plagas_criticas": [
+        "Trips"
+      ],
+      "enfermedades_criticas": [
+        "Mildiu"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "allium_fistulosum",
+      "nombre_comun": "Cebollín / cebolla larga",
+      "nombre_cientifico": "Allium fistulosum L.",
+      "nombre_comunes_regionales": [
+        "Cebolla de rama",
+        "Cebolla junca"
+      ],
+      "familia_botanica": "Amaryllidaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 5,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3500
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6.2,
+        "optimo_max": 7.0,
+        "max": 8.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno_a_moderado",
+      "heladas_tolerancia": {
+        "umbral_c": -3,
+        "horas_acumuladas_max": 8,
+        "notas": "Tolerante a heladas recurrentes en la sabana cundiboyacense."
+      },
+      "companions": [
+        "apium_graveolens",
+        "brassica_oleracea_acephala_curly",
+        "brassica_oleracea_acephala_lacinato",
+        "brassica_oleracea_acephala_red_russian",
+        "brassica_oleracea_capitata_alba",
+        "brassica_oleracea_capitata_rubra",
+        "brassica_oleracea_sabauda",
+        "lactuca_sativa_capitata",
+        "petroselinum_crispum",
+        "rosmarinus_officinalis"
+      ],
+      "antagonists": [
+        "beta_vulgaris_conditiva"
+      ],
+      "propagation": {
+        "methods": [
+          "division_mata"
+        ],
+        "best_method": "hijuelos",
+        "notas": "Se dividen los macollos para una propagación rápida y perenne."
+      },
+      "valor_pedagogico": "Lección de sostenibilidad: su capacidad de rebrote la convierte en el ejemplo ideal de 'cosecha perpetua'.",
+      "plagas_criticas": [
+        "Trips"
+      ],
+      "enfermedades_criticas": [
+        "Mortero"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
       "id": "alnus_acuminata",
       "_curation_status": "VALIDADO con fuentes CIAT/AGROSAVIA",
       "nombre_comun": "Aliso andino",
@@ -193,6 +360,91 @@
       ]
     },
     {
+      "id": "apium_graveolens",
+      "nombre_comun": "Apio",
+      "nombre_cientifico": "Apio graveolens L.",
+      "nombre_comunes_regionales": [
+        "Apio de España",
+        "Celery"
+      ],
+      "familia_botanica": "Apiaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 4,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 15,
+        "optimo_max": 21,
+        "max_tolerable": 28
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6.0,
+        "optimo_max": 7.0,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": 0,
+        "horas_acumuladas_max": 4,
+        "notas": "Tolerancia moderada a heladas ligeras en estado adulto."
+      },
+      "companions": [
+        "allium_ampeloprasum",
+        "allium_fistulosum",
+        "brassica_oleracea_acephala_curly",
+        "brassica_oleracea_acephala_lacinato",
+        "brassica_oleracea_acephala_red_russian",
+        "brassica_oleracea_capitata_alba",
+        "brassica_oleracea_capitata_rubra",
+        "brassica_oleracea_sabauda",
+        "lactuca_sativa_capitata",
+        "petroselinum_crispum"
+      ],
+      "antagonists": [
+        "foeniculum_vulgare"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Requiere semillero y trasplante cuidadoso por raíz sensible."
+      },
+      "valor_pedagogico": "Lección de nutrición hídrica: el apio demuestra la importancia de la humedad constante para evitar tallos fibrosos.",
+      "plagas_criticas": [
+        "Minador de la hoja",
+        "Pulgones"
+      ],
+      "enfermedades_criticas": [
+        "Mancha foliar"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
       "id": "beta_vulgaris_cicla_amarilla",
       "nombre_comun": "Acelga amarilla",
       "nombre_cientifico": "Beta vulgaris L. subsp. vulgaris (Cicla Group)",
@@ -242,6 +494,7 @@
         "notas": "Tolerancia similar a las otras acelgas; pencas amarillas pueden ser menos vigorosas que la blanca."
       },
       "companions": [
+        "brassica_oleracea_capitata_alba",
         "lactuca_sativa_crispa_verde",
         "raphanus_sativus"
       ],
@@ -320,6 +573,7 @@
         "notas": "Tolera heladas leves; el meristemo basal rebrota tras quemaduras foliares."
       },
       "companions": [
+        "brassica_oleracea_capitata_alba",
         "lactuca_sativa_crispa_verde",
         "lactuca_sativa_longifolia_morada",
         "lactuca_sativa_longifolia_verde",
@@ -402,6 +656,9 @@
         "notas": "Tolera heladas leves; el meristemo basal rebrota tras quemaduras foliares."
       },
       "companions": [
+        "brassica_oleracea_acephala_red_russian",
+        "brassica_oleracea_capitata_alba",
+        "brassica_oleracea_capitata_rubra",
         "lactuca_sativa_crispa_verde",
         "raphanus_sativus"
       ],
@@ -484,6 +741,8 @@
         "raphanus_sativus"
       ],
       "antagonists": [
+        "allium_ampeloprasum",
+        "allium_fistulosum",
         "beta_vulgaris_cicla_amarilla",
         "beta_vulgaris_cicla_blanca",
         "beta_vulgaris_cicla_roja",
@@ -507,6 +766,508 @@
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015",
         "restrepo-1996-abc-agricultura-organica"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "brassica_oleracea_acephala_curly",
+      "nombre_comun": "Kale rizado verde",
+      "nombre_cientifico": "Brassica oleracea var. acephala 'Curly'",
+      "nombre_comunes_regionales": [
+        "Col rizada",
+        "Curly kale"
+      ],
+      "familia_botanica": "Brassicaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 18,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3500
+      },
+      "temperatura_c": {
+        "helada_letal": -12,
+        "optimo_min": 10,
+        "optimo_max": 18,
+        "max_tolerable": 28
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6.5,
+        "optimo_max": 7.5,
+        "max": 8.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno_a_moderado",
+      "heladas_tolerancia": {
+        "umbral_c": -8,
+        "horas_acumuladas_max": 48,
+        "notas": "Extremadamente rústico; sobrevive a cubiertas de nieve o escarcha persistente."
+      },
+      "companions": [
+        "allium_ampeloprasum",
+        "allium_fistulosum",
+        "apium_graveolens",
+        "lactuca_sativa_capitata",
+        "petroselinum_crispum"
+      ],
+      "antagonists": [
+        "solanum_lycopersicum_cerasiforme",
+        "solanum_lycopersicum_cerasiforme_uvalina",
+        "solanum_lycopersicum_san_marzano",
+        "solanum_lycopersicum_sungold"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Se recomienda sembrar escalonadamente para cosecha continua."
+      },
+      "valor_pedagogico": "Lección de hortaliza perenne: permite entender el concepto de plantas multianuales en el huerto doméstico.",
+      "plagas_criticas": [
+        "Alticas (Phyllotreta spp.)",
+        "Pulgón ceniciento"
+      ],
+      "enfermedades_criticas": [
+        "Hernia de la col"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "brassica_oleracea_acephala_lacinato",
+      "nombre_comun": "Kale toscano / Cavolo nero",
+      "nombre_cientifico": "Brassica oleracea var. acephala 'Lacinato'",
+      "nombre_comunes_regionales": [
+        "Kale dinosaurio",
+        "Col de hoja negra"
+      ],
+      "familia_botanica": "Brassicaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 18,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3400
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 30
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6.2,
+        "optimo_max": 7.0,
+        "max": 8.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -6,
+        "horas_acumuladas_max": 24,
+        "notas": "El sabor mejora notablemente después de una helada ligera."
+      },
+      "companions": [
+        "allium_ampeloprasum",
+        "allium_fistulosum",
+        "apium_graveolens",
+        "lactuca_sativa_capitata",
+        "petroselinum_crispum",
+        "raphanus_sativus"
+      ],
+      "antagonists": [
+        "solanum_lycopersicum_cerasiforme",
+        "solanum_lycopersicum_cerasiforme_uvalina",
+        "solanum_lycopersicum_san_marzano",
+        "solanum_lycopersicum_sungold"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Planta semi-perenne; se puede cosechar hoja por hoja durante meses."
+      },
+      "valor_pedagogico": "Lección de arquitectura: a diferencia del repollo, sus hojas crecen abiertas sobre un tallo central persistente.",
+      "plagas_criticas": [
+        "Palomilla dorso de diamante",
+        "Pulgones"
+      ],
+      "enfermedades_criticas": [
+        "Bacteriosis"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "brassica_oleracea_acephala_red_russian",
+      "nombre_comun": "Kale morado / Red Russian",
+      "nombre_cientifico": "Brassica oleracea var. acephala 'Red Russian'",
+      "nombre_comunes_regionales": [
+        "Kale ruso",
+        "Col de hoja roja"
+      ],
+      "familia_botanica": "Brassicaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 12,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 2000,
+        "optimo_max": 3000,
+        "max_absoluto": 3600
+      },
+      "temperatura_c": {
+        "helada_letal": -15,
+        "optimo_min": 8,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "ph_suelo": {
+        "min": 5.0,
+        "optimo_min": 6.0,
+        "optimo_max": 7.0,
+        "max": 8.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -10,
+        "horas_acumuladas_max": 72,
+        "notas": "Desarrolla colores púrpuras intensos como respuesta defensiva al frío."
+      },
+      "companions": [
+        "allium_ampeloprasum",
+        "allium_fistulosum",
+        "apium_graveolens",
+        "beta_vulgaris_cicla_roja",
+        "lactuca_sativa_capitata",
+        "petroselinum_crispum"
+      ],
+      "antagonists": [
+        "solanum_lycopersicum_cerasiforme",
+        "solanum_lycopersicum_cerasiforme_uvalina",
+        "solanum_lycopersicum_san_marzano",
+        "solanum_lycopersicum_sungold"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Sus hojas son más tiernas que las del kale rizado."
+      },
+      "valor_pedagogico": "Lección de respuesta lumínica: muestra cómo la planta produce pigmentos para gestionar la radiación UV en altura.",
+      "plagas_criticas": [
+        "Gusanos de la col",
+        "Pulgones"
+      ],
+      "enfermedades_criticas": [
+        "Mildiu"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "brassica_oleracea_capitata_alba",
+      "nombre_comun": "Repollo blanco",
+      "nombre_cientifico": "Brassica oleracea var. capitata L.",
+      "nombre_comunes_regionales": [
+        "Col repollo",
+        "Repollo de corazón"
+      ],
+      "familia_botanica": "Brassicaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 4,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1800,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 15,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6.0,
+        "optimo_max": 7.0,
+        "max": 7.8
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -2,
+        "horas_acumuladas_max": 6,
+        "notas": "Tolerante a heladas ligeras; el frío intenso puede inducir floración prematura."
+      },
+      "companions": [
+        "allium_ampeloprasum",
+        "allium_fistulosum",
+        "apium_graveolens",
+        "beta_vulgaris_cicla_amarilla",
+        "beta_vulgaris_cicla_blanca",
+        "beta_vulgaris_cicla_roja",
+        "lactuca_sativa_capitata",
+        "petroselinum_crispum",
+        "raphanus_sativus"
+      ],
+      "antagonists": [
+        "solanum_lycopersicum_cerasiforme",
+        "solanum_lycopersicum_cerasiforme_uvalina",
+        "solanum_lycopersicum_san_marzano",
+        "solanum_lycopersicum_sungold"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Requiere semillero. El trasplante debe ser profundo."
+      },
+      "valor_pedagogico": "Lección de morfología: muestra cómo las hojas se envuelven y compactan para formar una 'cabeza'.",
+      "plagas_criticas": [
+        "Plutella xylostella",
+        "Brevicoryne brassicae"
+      ],
+      "enfermedades_criticas": [
+        "Plasmodiophora brassicae"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "brassica_oleracea_capitata_rubra",
+      "nombre_comun": "Repollo morado",
+      "nombre_cientifico": "Brassica oleracea var. capitata f. rubra",
+      "nombre_comunes_regionales": [
+        "Lombarda",
+        "Repollo colorado"
+      ],
+      "familia_botanica": "Brassicaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 5,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 14,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "ph_suelo": {
+        "min": 6.0,
+        "optimo_min": 6.5,
+        "optimo_max": 7.5,
+        "max": 8.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -3,
+        "horas_acumuladas_max": 8,
+        "notas": "Resiste mejor el frío que el repollo blanco debido a sus antocianinas."
+      },
+      "companions": [
+        "allium_ampeloprasum",
+        "allium_fistulosum",
+        "apium_graveolens",
+        "beta_vulgaris_cicla_roja",
+        "lactuca_sativa_capitata",
+        "petroselinum_crispum",
+        "raphanus_sativus"
+      ],
+      "antagonists": [
+        "solanum_lycopersicum_cerasiforme",
+        "solanum_lycopersicum_cerasiforme_uvalina",
+        "solanum_lycopersicum_san_marzano",
+        "solanum_lycopersicum_sungold"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Requiere suelos ricos en materia orgánica para un color intenso."
+      },
+      "valor_pedagogico": "Lección de pigmentos: las antocianinas actúan como protector solar y anticongelante natural.",
+      "plagas_criticas": [
+        "Plutella xylostella",
+        "Pulgón ceniciento"
+      ],
+      "enfermedades_criticas": [
+        "Hernia de la col"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "brassica_oleracea_sabauda",
+      "nombre_comun": "Repollo rizado / Savoy",
+      "nombre_cientifico": "Brassica oleracea var. sabauda L.",
+      "nombre_comunes_regionales": [
+        "Col de Milán",
+        "Repollo crespo"
+      ],
+      "familia_botanica": "Brassicaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 5,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 12,
+        "optimo_max": 18,
+        "max_tolerable": 25
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6.5,
+        "optimo_max": 7.5,
+        "max": 8.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -5,
+        "horas_acumuladas_max": 12,
+        "notas": "Excelente resistencia al frío; las hojas rizadas atrapan aire que actúa como aislante."
+      },
+      "companions": [
+        "allium_ampeloprasum",
+        "allium_fistulosum",
+        "apium_graveolens",
+        "lactuca_sativa_capitata",
+        "petroselinum_crispum",
+        "raphanus_sativus"
+      ],
+      "antagonists": [
+        "solanum_lycopersicum_cerasiforme",
+        "solanum_lycopersicum_cerasiforme_uvalina",
+        "solanum_lycopersicum_san_marzano",
+        "solanum_lycopersicum_sungold"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Ciclo más largo que el repollo liso."
+      },
+      "valor_pedagogico": "Lección de selección varietal: su textura rugosa es producto de siglos de selección en climas fríos europeos.",
+      "plagas_criticas": [
+        "Pieris rapae",
+        "Brevicoryne brassicae"
+      ],
+      "enfermedades_criticas": [
+        "Plasmodiophora brassicae"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
       ],
       "validation_level": "claude_draft"
     },
@@ -601,6 +1362,85 @@
       ]
     },
     {
+      "id": "cymbopogon_citratus",
+      "nombre_comun": "Limonaria",
+      "nombre_cientifico": "Cymbopogon citratus (DC.) Stapf",
+      "nombre_comunes_regionales": [
+        "Limón pasto",
+        "Lemongrass",
+        "Limoncillo"
+      ],
+      "familia_botanica": "Poaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "pest_repellent",
+        "biomass_producer",
+        "windbreak"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 12,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 2400,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 18,
+        "optimo_max": 30,
+        "max_tolerable": 38
+      },
+      "ph_suelo": {
+        "min": 5.0,
+        "optimo_min": 5.5,
+        "optimo_max": 7.0,
+        "max": 8.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": 1,
+        "horas_acumuladas_max": 2,
+        "notas": "Sensible a heladas, en zonas frías requiere ubicación protegida."
+      },
+      "companions": [
+        "solanum_lycopersicum_cerasiforme",
+        "solanum_lycopersicum_cerasiforme_uvalina",
+        "solanum_lycopersicum_san_marzano",
+        "solanum_lycopersicum_sungold"
+      ],
+      "antagonists": [],
+      "propagation": {
+        "methods": [
+          "rizoma"
+        ],
+        "best_method": "división de rizomas",
+        "notas": "Se propaga mediante el trasplante de 'hijos' de la corona."
+      },
+      "valor_pedagogico": "Lección de diseño microclimático: su uso como barrera contra el viento protege cultivos más delicados.",
+      "plagas_criticas": [
+        "Cochinillas"
+      ],
+      "enfermedades_criticas": [
+        "Roya de la limonaria"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
       "id": "foeniculum_vulgare",
       "nombre_comun": "Hinojo",
       "nombre_cientifico": "Foeniculum vulgare Mill.",
@@ -651,6 +1491,7 @@
         "notas": "Parte aérea sensible a heladas fuertes; rebrota desde la base si la corona no se congela."
       },
       "antagonists": [
+        "apium_graveolens",
         "beta_vulgaris_cicla_amarilla",
         "beta_vulgaris_cicla_blanca",
         "beta_vulgaris_cicla_roja",
@@ -661,7 +1502,11 @@
         "lactuca_sativa_roble_morada",
         "lactuca_sativa_roble_verde",
         "petroselinum_crispum",
-        "raphanus_sativus"
+        "raphanus_sativus",
+        "solanum_lycopersicum_cerasiforme",
+        "solanum_lycopersicum_cerasiforme_uvalina",
+        "solanum_lycopersicum_san_marzano",
+        "solanum_lycopersicum_sungold"
       ],
       "propagation": {
         "metodo_principal": "semilla",
@@ -679,6 +1524,95 @@
         "gbif-taxonomic-backbone",
         "pamplona-roger-2006-plantas-medicinales",
         "restrepo-2007-biopreparados"
+      ],
+      "validation_level": "claude_draft",
+      "companions": [
+        "pimpinella_anisum"
+      ]
+    },
+    {
+      "id": "lactuca_sativa_capitata",
+      "nombre_comun": "Lechuga cogollo morada",
+      "nombre_cientifico": "Lactuca sativa var. capitata L.",
+      "nombre_comunes_regionales": [
+        "Lechuga repollada morada"
+      ],
+      "familia_botanica": "Asteraceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 3,
+      "estrato": "bajo",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1800,
+        "optimo_max": 2700,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 14,
+        "optimo_max": 18,
+        "max_tolerable": 24
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6.0,
+        "optimo_max": 7.0,
+        "max": 8.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -1,
+        "horas_acumuladas_max": 4,
+        "notas": "Las variedades pigmentadas suelen resistir mejor el frío que las verdes."
+      },
+      "companions": [
+        "allium_ampeloprasum",
+        "allium_fistulosum",
+        "apium_graveolens",
+        "brassica_oleracea_acephala_curly",
+        "brassica_oleracea_acephala_lacinato",
+        "brassica_oleracea_acephala_red_russian",
+        "brassica_oleracea_capitata_alba",
+        "brassica_oleracea_capitata_rubra",
+        "brassica_oleracea_sabauda",
+        "solanum_lycopersicum_cerasiforme",
+        "solanum_lycopersicum_cerasiforme_uvalina",
+        "solanum_lycopersicum_san_marzano",
+        "solanum_lycopersicum_sungold"
+      ],
+      "antagonists": [
+        "petroselinum_crispum"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Requiere sustrato fino y riego por nebulización en etapas tempranas."
+      },
+      "valor_pedagogico": "Lección de pigmentación: muestra cómo las antocianinas (color morado) protegen a la planta contra el estrés climático.",
+      "plagas_criticas": [
+        "Babosas"
+      ],
+      "enfermedades_criticas": [
+        "Bremia"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
       ],
       "validation_level": "claude_draft"
     },
@@ -1078,18 +2012,172 @@
       "validation_level": "claude_draft"
     },
     {
+      "id": "melissa_officinalis",
+      "nombre_comun": "Toronjil",
+      "nombre_cientifico": "Melissa officinalis L.",
+      "nombre_comunes_regionales": [
+        "Melisa",
+        "Hoja de limón"
+      ],
+      "familia_botanica": "Lamiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 12,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2700,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -15,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 27
+      },
+      "ph_suelo": {
+        "min": 5.0,
+        "optimo_min": 6.0,
+        "optimo_max": 7.5,
+        "max": 8.0
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno_a_moderado",
+      "heladas_tolerancia": {
+        "umbral_c": -10,
+        "horas_acumuladas_max": 24,
+        "notas": "Altamente resistente a bajas temperaturas invernales."
+      },
+      "companions": [
+        "mentha_spicata",
+        "solanum_lycopersicum_cerasiforme",
+        "solanum_lycopersicum_cerasiforme_uvalina",
+        "solanum_lycopersicum_san_marzano",
+        "solanum_lycopersicum_sungold"
+      ],
+      "antagonists": [],
+      "propagation": {
+        "methods": [
+          "division_mata"
+        ],
+        "best_method": "división de mata",
+        "notas": "Fácil propagación vegetativa en primavera u otoño."
+      },
+      "valor_pedagogico": "Lección de alelopatía positiva: su aroma cítrico confunde plagas de hortalizas vecinas.",
+      "plagas_criticas": [
+        "Pulgones"
+      ],
+      "enfermedades_criticas": [
+        "Oidio"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "mentha_spicata",
+      "nombre_comun": "Menta",
+      "nombre_cientifico": "Mentha spicata L.",
+      "nombre_comunes_regionales": [
+        "Hierbabuena",
+        "Menta verde"
+      ],
+      "familia_botanica": "Lamiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 12,
+      "estrato": "bajo",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 500,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6.0,
+        "optimo_max": 7.0,
+        "max": 8.0
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "medio",
+      "heladas_tolerancia": {
+        "umbral_c": -5,
+        "horas_acumuladas_max": 12,
+        "notas": "Las hojas pueden quemarse, pero el rizoma sobrevive fácilmente."
+      },
+      "companions": [
+        "melissa_officinalis",
+        "salvia_officinalis"
+      ],
+      "antagonists": [],
+      "propagation": {
+        "methods": [
+          "estolon"
+        ],
+        "best_method": "estolones",
+        "notas": "Muy invasiva si no se controla el crecimiento radicular."
+      },
+      "valor_pedagogico": "Lección de expansión: muestra cómo las plantas colonizan espacio mediante sistemas radiculares horizontales.",
+      "plagas_criticas": [
+        "Pulgones"
+      ],
+      "enfermedades_criticas": [
+        "Roya de la menta"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
       "id": "petroselinum_crispum",
-      "nombre_comun": "Perejil crespo",
+      "nombre_comun": "Perejil liso",
       "nombre_cientifico": "Petroselinum crispum (Mill.) Fuss",
       "nombre_comunes_regionales": [
-        "Perejil rizado",
-        "Perejil de hoja crespa"
+        "Perejil de hoja plana"
       ],
       "familia_botanica": "Apiaceae",
       "category": "hortalizas_hoja",
       "thermal_zones": [
+        "frio",
         "templado",
-        "frio"
+        "calido"
       ],
       "roles_in_guild": [
         "crop",
@@ -1101,51 +2189,143 @@
       "cycleMonths": 3,
       "estrato": "bajo",
       "altitud_msnm": {
-        "min_absoluto": 800,
+        "min_absoluto": 0,
         "optimo_min": 1500,
         "optimo_max": 2800,
-        "max_absoluto": 3000
+        "max_absoluto": 3200
       },
       "temperatura_c": {
-        "helada_letal": -7,
-        "optimo_min": 12,
-        "optimo_max": 22,
-        "max_tolerable": 28
+        "helada_letal": -5,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 30
       },
       "ph_suelo": {
         "min": 5.5,
-        "optimo_min": 6.0,
+        "optimo_min": 6.2,
         "optimo_max": 7.0,
-        "max": 7.5
+        "max": 8.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno_a_moderado",
+      "heladas_tolerancia": {
+        "umbral_c": -2,
+        "horas_acumuladas_max": 8,
+        "notas": "Muy resistente a heladas en climas altoandinos."
+      },
+      "companions": [
+        "allium_ampeloprasum",
+        "allium_fistulosum",
+        "apium_graveolens",
+        "brassica_oleracea_acephala_curly",
+        "brassica_oleracea_acephala_lacinato",
+        "brassica_oleracea_acephala_red_russian",
+        "brassica_oleracea_capitata_alba",
+        "brassica_oleracea_capitata_rubra",
+        "brassica_oleracea_sabauda",
+        "solanum_lycopersicum_cerasiforme",
+        "solanum_lycopersicum_cerasiforme_uvalina",
+        "solanum_lycopersicum_san_marzano",
+        "solanum_lycopersicum_sungold"
+      ],
+      "antagonists": [
+        "foeniculum_vulgare",
+        "lactuca_sativa_capitata"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Germinación lenta, se recomienda remojo previo de la semilla."
+      },
+      "valor_pedagogico": "Lección de paciencia: su lenta germinación enseña los tiempos biológicos diferenciados en el huerto.",
+      "plagas_criticas": [
+        "Pulgones",
+        "Gusanos trozadores"
+      ],
+      "enfermedades_criticas": [
+        "Mildiu polvoso"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "pimpinella_anisum",
+      "nombre_comun": "Anís",
+      "nombre_cientifico": "Pimpinella anisum L.",
+      "nombre_comunes_regionales": [
+        "Anís verde",
+        "Matalahúva"
+      ],
+      "familia_botanica": "Apiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "semilla",
+      "cycleMonths": 5,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2400,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 15,
+        "optimo_max": 25,
+        "max_tolerable": 30
+      },
+      "ph_suelo": {
+        "min": 6.0,
+        "optimo_min": 6.5,
+        "optimo_max": 7.5,
+        "max": 8.5
       },
       "radiacion": "sol_pleno",
       "agua": "medio",
       "drenaje_requerido": "bueno",
       "heladas_tolerancia": {
-        "umbral_c": -3,
-        "horas_acumuladas_max": 8,
-        "notas": "Especie bienal: tolera heladas leves. Al florecer en su segundo año atrae sírfidos, avispas parasitoides y abejas nativas."
+        "umbral_c": 2,
+        "horas_acumuladas_max": 2,
+        "notas": "Sensible a heladas fuertes durante la floración."
       },
-      "antagonists": [
+      "companions": [
         "foeniculum_vulgare"
       ],
+      "antagonists": [],
       "propagation": {
-        "metodo_principal": "semilla",
-        "notas": "Germinación lenta (14-28 días). Remojo previo en agua tibia por 24 h mejora la emergencia."
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Siembra directa preferible para evitar estrés radicular."
       },
-      "valor_pedagogico": "Útil para enseñar paciencia en germinación lenta, manejo de aromáticas y atracción de fauna benéfica durante la floración del segundo año.",
+      "valor_pedagogico": "Lección de aromaterapia viva: permite identificar cómo las plantas atraen polinizadores mediante aceites volátiles.",
       "plagas_criticas": [
-        "pulgones (Aphidoidea)",
-        "minador de la hoja (Liriomyza spp.)"
+        "Pulgones",
+        "Ácaros"
       ],
       "enfermedades_criticas": [
-        "Septoria petroselini",
-        "Alternaria spp."
+        "Rizoctonia"
       ],
       "source_ids": [
         "gbif-taxonomic-backbone",
-        "pamplona-roger-2006-plantas-medicinales",
-        "restrepo-1996-abc-agricultura-organica"
+        "pamplona-roger-2006-plantas-medicinales"
       ],
       "validation_level": "claude_draft"
     },
@@ -1286,11 +2466,16 @@
         "beta_vulgaris_cicla_blanca",
         "beta_vulgaris_cicla_roja",
         "beta_vulgaris_conditiva",
+        "brassica_oleracea_acephala_lacinato",
+        "brassica_oleracea_capitata_alba",
+        "brassica_oleracea_capitata_rubra",
+        "brassica_oleracea_sabauda",
         "lactuca_sativa_crispa_verde",
         "lactuca_sativa_longifolia_morada",
         "lactuca_sativa_longifolia_verde",
         "lactuca_sativa_roble_morada",
-        "lactuca_sativa_roble_verde"
+        "lactuca_sativa_roble_verde",
+        "solanum_lycopersicum_cerasiforme"
       ],
       "antagonists": [
         "foeniculum_vulgare"
@@ -1313,6 +2498,501 @@
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015",
         "restrepo-1996-abc-agricultura-organica"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "rosmarinus_officinalis",
+      "nombre_comun": "Romero",
+      "nombre_cientifico": "Salvia rosmarinus Spenn. (syn. Rosmarinus officinalis L.)",
+      "nombre_comunes_regionales": [
+        "Romero de Castilla"
+      ],
+      "familia_botanica": "Lamiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 24,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 1000,
+        "optimo_max": 2800,
+        "max_absoluto": 3500
+      },
+      "temperatura_c": {
+        "helada_letal": -15,
+        "optimo_min": 12,
+        "optimo_max": 24,
+        "max_tolerable": 35
+      },
+      "ph_suelo": {
+        "min": 5.0,
+        "optimo_min": 6.0,
+        "optimo_max": 7.5,
+        "max": 8.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "heladas_tolerancia": {
+        "umbral_c": -10,
+        "horas_acumuladas_max": 24,
+        "notas": "Muy resistente; los suelos encharcados en heladas son su principal enemigo."
+      },
+      "companions": [
+        "allium_fistulosum",
+        "salvia_officinalis",
+        "urtica_dioica"
+      ],
+      "antagonists": [],
+      "propagation": {
+        "methods": [
+          "esqueje"
+        ],
+        "best_method": "esqueje",
+        "notas": "Se recomienda usar hormonas de enraizamiento naturales."
+      },
+      "valor_pedagogico": "Lección de rusticidad: ejemplifica la capacidad de algunas especies para prosperar en suelos pobres y climas extremos.",
+      "plagas_criticas": [
+        "Ácaros"
+      ],
+      "enfermedades_criticas": [
+        "Podredumbre de cuello"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "salvia_officinalis",
+      "nombre_comun": "Salvia",
+      "nombre_cientifico": "Salvia officinalis L.",
+      "nombre_comunes_regionales": [
+        "Salvia real"
+      ],
+      "familia_botanica": "Lamiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "hoja",
+      "cycleMonths": 12,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -12,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 30
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6.5,
+        "optimo_max": 7.5,
+        "max": 8.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "heladas_tolerancia": {
+        "umbral_c": -8,
+        "horas_acumuladas_max": 12,
+        "notas": "Tolerante, pero prefiere suelos secos en invierno para evitar pudrición."
+      },
+      "companions": [
+        "mentha_spicata",
+        "rosmarinus_officinalis"
+      ],
+      "antagonists": [],
+      "propagation": {
+        "methods": [
+          "esqueje"
+        ],
+        "best_method": "esqueje",
+        "notas": "Los esquejes semileñosos enraízan con facilidad."
+      },
+      "valor_pedagogico": "Lección de adaptación hídrica: sus hojas vellosas muestran una estrategia para reducir la transpiración.",
+      "plagas_criticas": [
+        "Mosca blanca"
+      ],
+      "enfermedades_criticas": [
+        "Mildiu"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "solanum_lycopersicum_cerasiforme",
+      "nombre_comun": "Tomate cherry estándar",
+      "nombre_cientifico": "Solanum lycopersicum var. cerasiforme (Dunal) A.Gray",
+      "nombre_comunes_regionales": [
+        "Tomate de árbol (error común)",
+        "Tomate redondo pequeño"
+      ],
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 6,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 1500,
+        "optimo_max": 2400,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 18,
+        "optimo_max": 26,
+        "max_tolerable": 32
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6.0,
+        "optimo_max": 6.8,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "heladas_tolerancia": {
+        "umbral_c": 5,
+        "horas_acumuladas_max": 0,
+        "notas": "No tolera heladas. En la sabana requiere invernadero o muros térmicos."
+      },
+      "companions": [
+        "cymbopogon_citratus",
+        "lactuca_sativa_capitata",
+        "melissa_officinalis",
+        "petroselinum_crispum",
+        "raphanus_sativus",
+        "urtica_dioica"
+      ],
+      "antagonists": [
+        "brassica_oleracea_acephala_curly",
+        "brassica_oleracea_acephala_lacinato",
+        "brassica_oleracea_acephala_red_russian",
+        "brassica_oleracea_capitata_alba",
+        "brassica_oleracea_capitata_rubra",
+        "brassica_oleracea_sabauda",
+        "foeniculum_vulgare",
+        "solanum_phureja"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Crecimiento indeterminado; requiere tutorado y podas de chupones."
+      },
+      "valor_pedagogico": "Lección de cosecha escalonada: los frutos maduran en racimos de forma secuencial permitiendo cosecha continua.",
+      "plagas_criticas": [
+        "Tuta absoluta",
+        "Mosca blanca"
+      ],
+      "enfermedades_criticas": [
+        "Phytophthora infestans"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "restrepo-1996-abc-agricultura-organica"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "solanum_lycopersicum_cerasiforme_uvalina",
+      "nombre_comun": "Tomate cherry uvalina / Grape",
+      "nombre_cientifico": "Solanum lycopersicum var. cerasiforme 'Uvalina'",
+      "nombre_comunes_regionales": [
+        "Tomate uva",
+        "Grape tomato"
+      ],
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 7,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 1500,
+        "optimo_max": 2400,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 18,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6.2,
+        "optimo_max": 6.8,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "heladas_tolerancia": {
+        "umbral_c": 5,
+        "horas_acumuladas_max": 0,
+        "notas": "Requiere protección nocturna en zonas de helada."
+      },
+      "companions": [
+        "cymbopogon_citratus",
+        "lactuca_sativa_capitata",
+        "melissa_officinalis",
+        "petroselinum_crispum",
+        "urtica_dioica"
+      ],
+      "antagonists": [
+        "brassica_oleracea_acephala_curly",
+        "brassica_oleracea_acephala_lacinato",
+        "brassica_oleracea_acephala_red_russian",
+        "brassica_oleracea_capitata_alba",
+        "brassica_oleracea_capitata_rubra",
+        "brassica_oleracea_sabauda",
+        "foeniculum_vulgare",
+        "solanum_phureja"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Hábito indeterminado. Piel más resistente que el cherry redondo."
+      },
+      "valor_pedagogico": "Lección de textura: su forma elongada y piel firme lo hacen ideal para transporte y conservación prolongada.",
+      "plagas_criticas": [
+        "Tuta absoluta"
+      ],
+      "enfermedades_criticas": [
+        "Fulvia fulva"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "agrosavia-manual-biopreparados-2015"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "solanum_lycopersicum_san_marzano",
+      "nombre_comun": "Tomate San Marzano",
+      "nombre_cientifico": "Solanum lycopersicum 'San Marzano'",
+      "nombre_comunes_regionales": [
+        "Tomate de pera",
+        "Tomate para pasta"
+      ],
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 5,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 1500,
+        "optimo_max": 2400,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 35
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6.5,
+        "optimo_max": 7.2,
+        "max": 8.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": 5,
+        "horas_acumuladas_max": 0,
+        "notas": "Más tolerante al calor que el cherry, pero igualmente sensible al frío."
+      },
+      "companions": [
+        "cymbopogon_citratus",
+        "lactuca_sativa_capitata",
+        "melissa_officinalis",
+        "petroselinum_crispum",
+        "urtica_dioica"
+      ],
+      "antagonists": [
+        "brassica_oleracea_acephala_curly",
+        "brassica_oleracea_acephala_lacinato",
+        "brassica_oleracea_acephala_red_russian",
+        "brassica_oleracea_capitata_alba",
+        "brassica_oleracea_capitata_rubra",
+        "brassica_oleracea_sabauda",
+        "foeniculum_vulgare",
+        "solanum_phureja"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Crecimiento determinado; cosecha concentrada en un periodo corto."
+      },
+      "valor_pedagogico": "Lección de procesamiento: su bajo contenido de agua y pulpa densa lo hacen el estándar para conservas y salsas.",
+      "plagas_criticas": [
+        "Trps",
+        "Heliothis"
+      ],
+      "enfermedades_criticas": [
+        "Podredumbre apical (Blossom end rot)"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "restrepo-1996-abc-agricultura-organica"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "solanum_lycopersicum_sungold",
+      "nombre_comun": "Tomate cherry amarillo / Sungold",
+      "nombre_cientifico": "Solanum lycopersicum 'Sungold'",
+      "nombre_comunes_regionales": [
+        "Tomate cherry naranja",
+        "Cherry golosina"
+      ],
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 6,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 500,
+        "optimo_min": 1800,
+        "optimo_max": 2500,
+        "max_absoluto": 2900
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 16,
+        "optimo_max": 22,
+        "max_tolerable": 30
+      },
+      "ph_suelo": {
+        "min": 5.8,
+        "optimo_min": 6.2,
+        "optimo_max": 6.8,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "heladas_tolerancia": {
+        "umbral_c": 6,
+        "horas_acumuladas_max": 0,
+        "notas": "Sensible al rajado de frutos si hay cambios bruscos de temperatura o humedad."
+      },
+      "companions": [
+        "cymbopogon_citratus",
+        "lactuca_sativa_capitata",
+        "melissa_officinalis",
+        "petroselinum_crispum",
+        "urtica_dioica"
+      ],
+      "antagonists": [
+        "brassica_oleracea_acephala_curly",
+        "brassica_oleracea_acephala_lacinato",
+        "brassica_oleracea_acephala_red_russian",
+        "brassica_oleracea_capitata_alba",
+        "brassica_oleracea_capitata_rubra",
+        "brassica_oleracea_sabauda",
+        "foeniculum_vulgare",
+        "solanum_phureja"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Indeterminado. Muy vigoroso y productivo."
+      },
+      "valor_pedagogico": "Lección de sabor y color: el color amarillo/naranja indica altos niveles de azúcares y betacarotenos.",
+      "plagas_criticas": [
+        "Mosca blanca"
+      ],
+      "enfermedades_criticas": [
+        "Moho de la hoja"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "agrosavia-manual-biopreparados-2015"
       ],
       "validation_level": "claude_draft"
     },
@@ -1415,7 +3095,11 @@
       "antagonists": [
         "cucurbita_maxima",
         "rubus_glaucus",
-        "solanum_lycopersicum"
+        "solanum_lycopersicum",
+        "solanum_lycopersicum_cerasiforme",
+        "solanum_lycopersicum_cerasiforme_uvalina",
+        "solanum_lycopersicum_san_marzano",
+        "solanum_lycopersicum_sungold"
       ],
       "_nota_antagonists": "Solanaceae entre sí comparten Phytophthora infestans y Ralstonia solanacearum → rotación obligatoria. Cucurbitáceas son hospedantes alternativos de áfidos vectores.",
       "recommended_covers": [
@@ -1998,6 +3682,10 @@
       "companions": [
         "rosmarinus_officinalis",
         "rubus_glaucus",
+        "solanum_lycopersicum_cerasiforme",
+        "solanum_lycopersicum_cerasiforme_uvalina",
+        "solanum_lycopersicum_san_marzano",
+        "solanum_lycopersicum_sungold",
         "solanum_phureja"
       ],
       "antagonists": [],
