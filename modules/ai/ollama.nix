@@ -39,14 +39,41 @@ in
   };
 
   config = lib.mkIf (aiCfg.enable && cfg.enable) {
-    # Reclamar ownership del data dir heredado del container para el user nativo.
-    # `services.ollama` crea el user `ollama:ollama`. Los modelos existentes en
-    # `/mnt/fast/appdata/ollama/models/*` venían siendo de root:root (podman).
-    # Sin chown, ollama nativo no puede leerlos y los re-descarga (~8GB).
-    systemd.tmpfiles.rules = [
-      "d /mnt/fast/appdata/ollama 0750 ollama ollama -"
-      "Z /mnt/fast/appdata/ollama - ollama ollama - -"
-    ];
+    # NixOS 26.05 `services.ollama` usa DynamicUser=true por defecto — no
+    # crea un user estático en /etc/passwd. Eso rompe nuestro caso porque:
+    #   1. `chown ollama:ollama` desde sudo falla con "invalid user".
+    #   2. El UID alocado es transient → cambia entre reboots → archivos
+    #      en disco quedan con uid huérfano tras restart.
+    #   3. Hereencia desde container podman (root:root) en /mnt/fast/appdata/ollama
+    #      queda inaccesible para el user dynamic.
+    # Solución: forzar user estático "ollama" que vive en /etc/passwd, y
+    # hacer chown idempotente en ExecStartPre (post-mount ZFS, garantizado
+    # por RequiresMountsFor).
+    users.users.ollama = {
+      isSystemUser = true;
+      group = "ollama";
+      description = "Ollama service user (static, NOT DynamicUser)";
+      home = "/mnt/fast/appdata/ollama";
+    };
+    users.groups.ollama = {};
+
+    systemd.services.ollama.serviceConfig = {
+      DynamicUser = lib.mkForce false;
+      User = lib.mkForce "ollama";
+      Group = lib.mkForce "ollama";
+      RequiresMountsFor = [ "/mnt/fast/appdata" ];
+      # `+` prefix → corre como root (necesario para chown del dir heredado
+      # de root:root del container previo). Idempotente: tras el primer run
+      # ya está bien, los siguientes son no-op.
+      # NO usar systemd.tmpfiles.rules: tmpfiles-setup.service corre ANTES
+      # del mount de ZFS /mnt/fast (verificado alpha 2026-04-28: chown se
+      # aplica al dir vacío en rootfs, luego ZFS monta encima ocultándolo,
+      # y el dir real queda con ownership original).
+      ExecStartPre = [
+        "+${pkgs.coreutils}/bin/install -d -m 0750 -o ollama -g ollama /mnt/fast/appdata/ollama"
+        "+${pkgs.coreutils}/bin/chown -R ollama:ollama /mnt/fast/appdata/ollama"
+      ];
+    };
 
     services.ollama = {
       enable = true;
