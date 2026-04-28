@@ -33,7 +33,18 @@ jobs:
 
       - name: nix flake check
         # Bloqueante — cualquier fallo de eval mata el PR.
-        run: nix flake check --no-warn-dirty --show-trace --no-build
+        #
+        # NOTA: NO usamos --no-build porque el módulo upstream
+        # nixos/modules/services/security/opensnitch.nix:198 hace
+        # `builtins.readFile "${cfg.package}/etc/opensnitchd/default-config.json"`,
+        # que requiere realizar el path del paquete en el /nix/store.
+        # Con --no-build el realise está prohibido por diseño y el
+        # check explota con "is not valid" / "realising the context of
+        # path" (verificado runs 24975... → 25031... 2026-04-27/28).
+        # El runner es self-hosted en alpha — opensnitch ya está en
+        # /nix/store por uso productivo, así que la "build" se reduce
+        # a un substitute desde caché local. Costo marginal despreciable.
+        run: nix flake check --no-warn-dirty --show-trace
 
       - name: Evaluate alpha toplevel (drvPath)
         run: |
