@@ -9,38 +9,34 @@ let
   cfg = config.guatoc.ai.openfang;
   registry = import ../../lib/registry.nix { inherit lib; };
 
-  # OpenFang v0.5.10 — binario Rust estático para Linux x86_64.
-  # Bump 2026-04-26 desde 0.5.9 para fixes:
-  #   - WebSocket 404 race condition (agent lookup retries 5x) — afecta
-  #     "Agent not found" del bridge cache tras bootstrap respawn.
-  #   - schedule_* tools/endpoints ahora sí ejecutan (antes escribían a
-  #     una shared memory key que ningún executor leía).
-  #   - Multimodal user_with_blocks unifica text + image — relevante para
-  #     voice/foto pipeline.
-  #   - Auth fail-closed por default (loopback sigue zero-config).
-  # No subimos a 0.6.0 todavía: cambios mayores (skill templates, command
-  # registry, fan-out cron) implican migration que evaluamos por separado.
-  openfang-src = pkgs.fetchurl {
-    url = "https://github.com/RightNow-AI/openfang/releases/download/v0.5.10/openfang-x86_64-unknown-linux-gnu.tar.gz";
-    sha256 = "sha256-2wIYp7wqiUJ6HM9K24c2NESx+gE+rY9O6gKFkNrHNgU=";
-  };
-
-  openfang-pkg = pkgs.stdenv.mkDerivation {
+  # OpenFang v0.6.0 — build desde fork guatoc-ecohub/openfang.
+  # Bump 2026-04-27 desde 0.5.10 con patch crítico:
+  #   - feat(media): audio_base_url override para Whisper local OpenAI-compat.
+  #     Cierra #1051: las URLs de audio estaban hardcodeadas (api.openai.com /
+  #     api.groq.com) e ignoraban OPENAI_BASE_URL. Ahora [media] audio_base_url
+  #     en config.toml redirige a speaches local vía openai-proxy sin cambiar
+  #     el wire format ni el env var de auth.
+  #   Rama: feat/audio-base-url-config — commit e0310d3.
+  openfang-pkg = pkgs.rustPlatform.buildRustPackage {
     pname = "openfang";
-    version = "0.5.10";
-    src = openfang-src;
-    sourceRoot = ".";
-    nativeBuildInputs = [ pkgs.autoPatchelfHook pkgs.gnutar ];
-    buildInputs = [ pkgs.stdenv.cc.cc.lib pkgs.openssl ];
-    unpackPhase = ''
-      mkdir -p src
-      tar -xzf $src -C src
-    '';
-    installPhase = ''
-      mkdir -p $out/bin
-      cp src/openfang $out/bin/openfang
-      chmod +x $out/bin/openfang
-    '';
+    version = "0.6.0";
+
+    src = pkgs.fetchFromGitHub {
+      owner = "guatoc-ecohub";
+      repo = "openfang";
+      rev = "e0310d33615f1f45d34478f39824f5303a5c7176";
+      hash = "sha256-seSSy7LQIlNKr8ZR9w61G/gOlTeKpkxJrWZkfXionkE=";
+    };
+
+    cargoHash = "sha256-SdotDLlmpDpBZCvG9j1mDLLynXxBrEVXpQ6SWWmGsK4=";
+
+    cargoBuildFlags = [ "--package" "openfang-cli" ];
+    doCheck = false;
+
+    nativeBuildInputs = [ pkgs.pkg-config ];
+    buildInputs = [ pkgs.openssl pkgs.sqlite ];
+
+    OPENSSL_NO_VENDOR = "1";
   };
 
   # Genera config.toml para un agente
@@ -92,6 +88,16 @@ let
     [users.channel_bindings]
     telegram = "${lib.head agent.telegramAllowFrom}"
 
+    # Heartbeat timeout extendido — el default 180s asume agentes activos
+    # con tráfico constante. Nuestro `guatoc` es reactivo a Telegram y
+    # pasa horas idle. Sin esto, el kernel marca crashed cada ~3 min,
+    # auto-recovery en 30s, ciclo infinito (verificado 2026-04-27 logs).
+    # 86400s = 24h: máximo 1 ventana de 30s de downtime por día.
+    # Comentario del propio openfang-types/config.rs:1187 confirma:
+    # "Set higher to prevent idle hands from being marked as crashed."
+    [heartbeat]
+    default_timeout_secs = 86400
+
     [memory]
     consolidation_threshold = 5000
     decay_rate = 0.1
@@ -108,6 +114,12 @@ let
     embedding_provider    = "ollama"
     embedding_model       = "nomic-embed-text"
     embedding_api_key_env = "OLLAMA_API_KEY"
+
+    ${lib.optionalString (agent.audioBaseUrl != "") ''
+    [media]
+    audio_provider = "openai"
+    audio_base_url = "${agent.audioBaseUrl}"
+    ''}
 
     ${lib.optionalString (agent.workspacePath != "") ''
     [workspace]
@@ -191,6 +203,18 @@ in
           mediaMaxSizeMb = lib.mkOption {
             type = lib.types.int;
             default = 10;
+          };
+          audioBaseUrl = lib.mkOption {
+            type = lib.types.str;
+            default = "";
+            description = ''
+              Override base URL para transcripción de audio (OpenAI-compat).
+              Cuando está definido, OpenFang envía el audio a
+              <audioBaseUrl>/v1/audio/transcriptions en lugar de las URLs
+              hardcodeadas de openai.com / groq.com.
+              Ejemplo: "http://127.0.0.1:10303" (openai-proxy local → speaches).
+              Requiere OpenFang >= 0.6.0 (patch feat/audio-base-url-config).
+            '';
           };
           extraEnvFiles = lib.mkOption {
             type = lib.types.listOf lib.types.str;

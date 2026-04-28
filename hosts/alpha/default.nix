@@ -360,12 +360,18 @@
           "github.pr_create"
         ];
 
+        # --- Audio transcripción local (Opción D) ---
+        # Patch 0.6.0: audio_base_url redirige voz al openai-proxy local
+        # (puerto 10303) que reenvía /v1/audio/* a speaches:10302.
+        audioBaseUrl = "http://127.0.0.1:10303";
+
         # --- Sandbox: acceso a APIs locales + GitHub para PRs ---
         networkAllowlist = [
           "127.0.0.1:8081"    # FarmOS API
           "127.0.0.1:8123"    # Home Assistant
           "127.0.0.1:11434"   # Ollama
           "127.0.0.1:10301"   # Whisper-HTTP ASR (voz → texto, sección 7 manifest)
+          "127.0.0.1:10303"   # openai-proxy (audio → speaches Opción D)
           "chagra.guatoc.co"  # Nginx proxy (PWA)
           "duckduckgo.com"
           "html.duckduckgo.com"
