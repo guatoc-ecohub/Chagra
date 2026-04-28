@@ -247,7 +247,9 @@
       "agua": "alto",
       "drenaje_requerido": "bueno_a_moderado",
       "companions": [
+        "coffea_arabica",
         "lupinus_mutabilis",
+        "passiflora_tripartita_mollissima",
         "pennisetum_clandestinum_manejado",
         "solanum_phureja",
         "vicia_faba"
@@ -829,7 +831,8 @@
         "solanum_lycopersicum_cerasiforme",
         "solanum_lycopersicum_cerasiforme_uvalina",
         "solanum_lycopersicum_san_marzano",
-        "solanum_lycopersicum_sungold"
+        "solanum_lycopersicum_sungold",
+        "vaccinium_corymbosum_emerald"
       ],
       "propagation": {
         "methods": [
@@ -913,7 +916,8 @@
         "solanum_lycopersicum_cerasiforme",
         "solanum_lycopersicum_cerasiforme_uvalina",
         "solanum_lycopersicum_san_marzano",
-        "solanum_lycopersicum_sungold"
+        "solanum_lycopersicum_sungold",
+        "vaccinium_corymbosum_emerald"
       ],
       "propagation": {
         "methods": [
@@ -996,7 +1000,8 @@
         "solanum_lycopersicum_cerasiforme",
         "solanum_lycopersicum_cerasiforme_uvalina",
         "solanum_lycopersicum_san_marzano",
-        "solanum_lycopersicum_sungold"
+        "solanum_lycopersicum_sungold",
+        "vaccinium_corymbosum_emerald"
       ],
       "propagation": {
         "methods": [
@@ -1082,7 +1087,8 @@
         "solanum_lycopersicum_cerasiforme",
         "solanum_lycopersicum_cerasiforme_uvalina",
         "solanum_lycopersicum_san_marzano",
-        "solanum_lycopersicum_sungold"
+        "solanum_lycopersicum_sungold",
+        "vaccinium_corymbosum_biloxi"
       ],
       "propagation": {
         "methods": [
@@ -1166,7 +1172,8 @@
         "solanum_lycopersicum_cerasiforme",
         "solanum_lycopersicum_cerasiforme_uvalina",
         "solanum_lycopersicum_san_marzano",
-        "solanum_lycopersicum_sungold"
+        "solanum_lycopersicum_sungold",
+        "vaccinium_corymbosum_biloxi"
       ],
       "propagation": {
         "methods": [
@@ -1248,7 +1255,8 @@
         "solanum_lycopersicum_cerasiforme",
         "solanum_lycopersicum_cerasiforme_uvalina",
         "solanum_lycopersicum_san_marzano",
-        "solanum_lycopersicum_sungold"
+        "solanum_lycopersicum_sungold",
+        "vaccinium_corymbosum_biloxi"
       ],
       "propagation": {
         "methods": [
@@ -1360,6 +1368,83 @@
         "correa-pabon-carulla-2008",
         "agrosavia-forrajeras-2022"
       ]
+    },
+    {
+      "id": "coffea_arabica",
+      "nombre_comun": "Café caturra / Castillo / Cenicafé 1",
+      "nombre_cientifico": "Coffea arabica L.",
+      "nombre_comunes_regionales": [
+        "Café Supremo (categoría comercial)",
+        "Café Arábigo"
+      ],
+      "familia_botanica": "Rubiaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 180,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1500,
+        "optimo_max": 2000,
+        "max_absoluto": 2200
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 18,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "ph_suelo": {
+        "min": 4.5,
+        "optimo_min": 5.0,
+        "optimo_max": 6.0,
+        "max": 6.5
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": 2,
+        "horas_acumuladas_max": 0,
+        "notas": "Altamente sensible a heladas; las bajas temperaturas afectan la calidad del grano."
+      },
+      "companions": [
+        "alnus_acuminata"
+      ],
+      "antagonists": [
+        "foeniculum_vulgare"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla sexual (chapolas)",
+        "notas": "Requiere germinador en arena y posterior embolsado."
+      },
+      "notas_taxonomicas": "Las variedades Castillo y Cenicafé 1 son las más recomendadas por su resistencia a la roya. El término 'Supremo' refiere a una clasificación granulométrica por tamaño de malla y no a una variedad botánica.",
+      "valor_pedagogico": "Lección de selección varietal: comparación de resistencia a Hemileia vastatrix entre variedades tradicionales y mejoradas.",
+      "plagas_criticas": [
+        "Hypothenemus hampei (broca)",
+        "Hemileia vastatrix (roya)",
+        "Mycena citricolor"
+      ],
+      "enfermedades_criticas": [
+        "Cercospora coffeicola"
+      ],
+      "source_ids": [
+        "cenicafe-manual-cafetero-2013",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "cymbopogon_citratus",
@@ -1496,12 +1581,14 @@
         "beta_vulgaris_cicla_blanca",
         "beta_vulgaris_cicla_roja",
         "beta_vulgaris_conditiva",
+        "coffea_arabica",
         "lactuca_sativa_crispa_verde",
         "lactuca_sativa_longifolia_morada",
         "lactuca_sativa_longifolia_verde",
         "lactuca_sativa_roble_morada",
         "lactuca_sativa_roble_verde",
         "petroselinum_crispum",
+        "physalis_peruviana",
         "raphanus_sativus",
         "solanum_lycopersicum_cerasiforme",
         "solanum_lycopersicum_cerasiforme_uvalina",
@@ -1529,6 +1616,81 @@
       "companions": [
         "pimpinella_anisum"
       ]
+    },
+    {
+      "id": "fragaria_ananassa_monterrey",
+      "nombre_comun": "Fresa Monterrey",
+      "nombre_cientifico": "Fragaria × ananassa 'Monterrey'",
+      "nombre_comunes_regionales": [
+        "Fresa day-neutral"
+      ],
+      "familia_botanica": "Rosaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 18,
+      "estrato": "bajo",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 14,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "ph_suelo": {
+        "min": 5.0,
+        "optimo_min": 5.5,
+        "optimo_max": 6.5,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "heladas_tolerancia": {
+        "umbral_c": -2,
+        "horas_acumuladas_max": 6,
+        "notas": "La flor se quema con la helada, pero la planta es perenne y rebrota."
+      },
+      "companions": [
+        "lactuca_sativa_capitata",
+        "petroselinum_crispum"
+      ],
+      "antagonists": [],
+      "propagation": {
+        "methods": [
+          "estolon"
+        ],
+        "best_method": "estolones",
+        "notas": "Requiere 'mulch' o plástico para evitar que el fruto toque el suelo."
+      },
+      "valor_pedagogico": "Lección de fotoperiodo: variedad de día neutro que permite cosecha continua sin importar la duración del día.",
+      "plagas_criticas": [
+        "Tetranychus urticae (ácaro rojo)",
+        "Trips"
+      ],
+      "enfermedades_criticas": [
+        "Botrytis cinerea",
+        "Oídio"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "agrosavia-manual-biopreparados-2015"
+      ],
+      "validation_level": "claude_draft"
     },
     {
       "id": "lactuca_sativa_capitata",
@@ -1588,6 +1750,7 @@
         "brassica_oleracea_capitata_alba",
         "brassica_oleracea_capitata_rubra",
         "brassica_oleracea_sabauda",
+        "fragaria_ananassa_monterrey",
         "solanum_lycopersicum_cerasiforme",
         "solanum_lycopersicum_cerasiforme_uvalina",
         "solanum_lycopersicum_san_marzano",
@@ -2166,6 +2329,318 @@
       "validation_level": "claude_draft"
     },
     {
+      "id": "passiflora_edulis_flavicarpa",
+      "nombre_comun": "Maracuyá",
+      "nombre_cientifico": "Passiflora edulis f. flavicarpa Deg.",
+      "nombre_comunes_regionales": [
+        "Fruta de la pasión amarilla",
+        "Maracuyá ácido"
+      ],
+      "familia_botanica": "Passifloraceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 36,
+      "estrato": "emergente",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1300,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 1,
+        "optimo_min": 24,
+        "optimo_max": 28,
+        "max_tolerable": 35
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6.0,
+        "optimo_max": 7.0,
+        "max": 8.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "heladas_tolerancia": {
+        "umbral_c": 5,
+        "horas_acumuladas_max": 0,
+        "notas": "Extremadamente sensible al frío; detiene crecimiento por debajo de 15°C."
+      },
+      "companions": [
+        "petroselinum_crispum"
+      ],
+      "antagonists": [
+        "passiflora_edulis_morada"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Polinización manual a menudo necesaria para alta producción."
+      },
+      "valor_pedagogico": "Lección de gradiente térmico: contraste de requerimientos calurosos frente a sus parientes andinos (gulupa/curuba).",
+      "plagas_criticas": [
+        "Dione juno",
+        "Áfidos"
+      ],
+      "enfermedades_criticas": [
+        "Virosis (SMV)",
+        "Fusarium"
+      ],
+      "source_ids": [
+        "powo-kew",
+        "sib-colombia",
+        "gbif-taxonomic-backbone"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "passiflora_edulis_morada",
+      "nombre_comun": "Gulupa",
+      "nombre_cientifico": "Passiflora edulis f. edulis Sims",
+      "nombre_comunes_regionales": [
+        "Passion fruit morado",
+        "Curuba redonda"
+      ],
+      "familia_botanica": "Passifloraceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 48,
+      "estrato": "emergente",
+      "altitud_msnm": {
+        "min_absoluto": 1600,
+        "optimo_min": 1800,
+        "optimo_max": 2300,
+        "max_absoluto": 2600
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 15,
+        "optimo_max": 20,
+        "max_tolerable": 25
+      },
+      "ph_suelo": {
+        "min": 5.0,
+        "optimo_min": 5.5,
+        "optimo_max": 6.5,
+        "max": 7.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "heladas_tolerancia": {
+        "umbral_c": 0,
+        "horas_acumuladas_max": 3,
+        "notas": "Resiste ligeramente mejor que la granadilla, pero las flores son muy sensibles."
+      },
+      "companions": [
+        "petroselinum_crispum",
+        "urtica_dioica"
+      ],
+      "antagonists": [
+        "passiflora_edulis_flavicarpa"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Se recomienda el uso de microrrizas en el trasplante."
+      },
+      "valor_pedagogico": "Lección de hibridación: riesgo de cruce con maracuyá que degrada la calidad comercial de la pulpa.",
+      "plagas_criticas": [
+        "Gusano de la pasionaria",
+        "Ácaros"
+      ],
+      "enfermedades_criticas": [
+        "Phytophthora spp.",
+        "Fusarium"
+      ],
+      "source_ids": [
+        "powo-kew",
+        "sib-colombia",
+        "gbif-taxonomic-backbone"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "passiflora_ligularis",
+      "nombre_comun": "Granadilla",
+      "nombre_cientifico": "Passiflora ligularis Juss.",
+      "nombre_comunes_regionales": [
+        "Granada de moco",
+        "Granadilla dulce"
+      ],
+      "familia_botanica": "Passifloraceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 60,
+      "estrato": "emergente",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1800,
+        "optimo_max": 2400,
+        "max_absoluto": 2600
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 14,
+        "optimo_max": 18,
+        "max_tolerable": 24
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6.0,
+        "optimo_max": 7.0,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "heladas_tolerancia": {
+        "umbral_c": 0,
+        "horas_acumuladas_max": 2,
+        "notas": "Tolerancia muy baja; las heladas queman los brotes terminales y flores."
+      },
+      "companions": [
+        "petroselinum_crispum",
+        "raphanus_sativus"
+      ],
+      "antagonists": [],
+      "propagation": {
+        "methods": [
+          "semilla",
+          "injerto"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Requiere estructuras de soporte (espalderas o emparrillados)."
+      },
+      "valor_pedagogico": "Lección de entomología: importancia de los abejorros (Xylocopa spp.) para la polinización efectiva.",
+      "plagas_criticas": [
+        "Dasiops spp. (mosca del botón floral)",
+        "Dione juno juno"
+      ],
+      "enfermedades_criticas": [
+        "Fusarium oxysporum f.sp. passiflorae"
+      ],
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "fao-ecocrop",
+        "powo-kew"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "passiflora_tripartita_mollissima",
+      "nombre_comun": "Curuba de Castilla",
+      "nombre_cientifico": "Passiflora tripartita var. mollissima (Kunth) Holm-Niels. & Jørg.",
+      "nombre_comunes_regionales": [
+        "Taxo",
+        "Puru-puru"
+      ],
+      "familia_botanica": "Passifloraceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 72,
+      "estrato": "emergente",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 12,
+        "optimo_max": 16,
+        "max_tolerable": 22
+      },
+      "ph_suelo": {
+        "min": 5.0,
+        "optimo_min": 5.5,
+        "optimo_max": 6.5,
+        "max": 7.5
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -1,
+        "horas_acumuladas_max": 6,
+        "notas": "Es la pasiflora más resistente al frío altoandino."
+      },
+      "companions": [
+        "alnus_acuminata",
+        "urtica_dioica"
+      ],
+      "antagonists": [],
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Requiere poda de formación constante para evitar enmarañamiento."
+      },
+      "valor_pedagogico": "Lección de adaptación altitudinal: es la única pasiflora comercial que prospera por encima de los 2500 msnm.",
+      "plagas_criticas": [
+        "Mosca del ovario",
+        "Trips"
+      ],
+      "enfermedades_criticas": [
+        "Antracnosis"
+      ],
+      "source_ids": [
+        "powo-kew",
+        "sib-colombia",
+        "gbif-taxonomic-backbone"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
       "id": "petroselinum_crispum",
       "nombre_comun": "Perejil liso",
       "nombre_cientifico": "Petroselinum crispum (Mill.) Fuss",
@@ -2224,6 +2699,11 @@
         "brassica_oleracea_capitata_alba",
         "brassica_oleracea_capitata_rubra",
         "brassica_oleracea_sabauda",
+        "fragaria_ananassa_monterrey",
+        "passiflora_edulis_flavicarpa",
+        "passiflora_edulis_morada",
+        "passiflora_ligularis",
+        "physalis_peruviana",
         "solanum_lycopersicum_cerasiforme",
         "solanum_lycopersicum_cerasiforme_uvalina",
         "solanum_lycopersicum_san_marzano",
@@ -2251,6 +2731,88 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "physalis_peruviana",
+      "nombre_comun": "Uchuva",
+      "nombre_cientifico": "Physalis peruviana L.",
+      "nombre_comunes_regionales": [
+        "Aguaymanto",
+        "Cape gooseberry",
+        "Amor en bolsa"
+      ],
+      "familia_botanica": "Solanaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 24,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 13,
+        "optimo_max": 18,
+        "max_tolerable": 25
+      },
+      "ph_suelo": {
+        "min": 5.0,
+        "optimo_min": 5.5,
+        "optimo_max": 7.0,
+        "max": 8.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "heladas_tolerancia": {
+        "umbral_c": 0,
+        "horas_acumuladas_max": 4,
+        "notas": "El cáliz (capacho) protege el fruto de heladas ligeras."
+      },
+      "companions": [
+        "petroselinum_crispum",
+        "solanum_lycopersicum_cerasiforme"
+      ],
+      "antagonists": [
+        "foeniculum_vulgare",
+        "vaccinium_corymbosum_biloxi",
+        "vaccinium_corymbosum_emerald"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Requiere tutorado para evitar que las ramas toquen el suelo."
+      },
+      "valor_pedagogico": "Lección de empaque natural: el cáliz persistente como estrategia evolutiva de protección y dispersión.",
+      "plagas_criticas": [
+        "Tecia solanivora",
+        "Heliothis spp."
+      ],
+      "enfermedades_criticas": [
+        "Phytophthora infestans",
+        "Fusarium oxysporum"
+      ],
+      "source_ids": [
+        "agrosavia-manual-uchuva-2015",
+        "gbif-taxonomic-backbone",
+        "sib-colombia"
       ],
       "validation_level": "claude_draft"
     },
@@ -2326,6 +2888,84 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "psidium_guajava_manzana",
+      "nombre_comun": "Guayaba manzana",
+      "nombre_cientifico": "Psidium guajava 'Manzana'",
+      "nombre_comunes_regionales": [
+        "Guayaba criolla dulce",
+        "Redonda"
+      ],
+      "familia_botanica": "Myrtaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 240,
+      "estrato": "emergente",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 1200,
+        "optimo_max": 2000,
+        "max_absoluto": 2400
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 18,
+        "optimo_max": 25,
+        "max_tolerable": 35
+      },
+      "ph_suelo": {
+        "min": 4.5,
+        "optimo_min": 5.0,
+        "optimo_max": 7.0,
+        "max": 8.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno_a_moderado",
+      "heladas_tolerancia": {
+        "umbral_c": 5,
+        "horas_acumuladas_max": 0,
+        "notas": "Sensible al frío; detiene crecimiento en noches altoandinas."
+      },
+      "companions": [],
+      "antagonists": [
+        "vaccinium_corymbosum_biloxi",
+        "vaccinium_corymbosum_emerald"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla",
+          "injerto"
+        ],
+        "best_method": "injerto",
+        "notas": "Muy rústica; tolera amplios rangos de suelo si hay buen drenaje."
+      },
+      "valor_pedagogico": "Lección de rusticidad: planta adaptada a suelos marginales que provee alta nutrición con poco manejo.",
+      "plagas_criticas": [
+        "Anastrepha spp. (mosca de la fruta)",
+        "Conotrachelus psidii"
+      ],
+      "enfermedades_criticas": [
+        "Antracnosis",
+        "Roya de la guayaba"
+      ],
+      "source_ids": [
+        "fao-ecocrop",
+        "gbif-taxonomic-backbone",
+        "restrepo-1996-abc-agricultura-organica"
       ],
       "validation_level": "claude_draft"
     },
@@ -2475,6 +3115,7 @@
         "lactuca_sativa_longifolia_verde",
         "lactuca_sativa_roble_morada",
         "lactuca_sativa_roble_verde",
+        "passiflora_ligularis",
         "solanum_lycopersicum_cerasiforme"
       ],
       "antagonists": [
@@ -2573,6 +3214,237 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "rubus_glaucus_sin_espinas",
+      "nombre_comun": "Mora andina sin espinas",
+      "nombre_cientifico": "Rubus glaucus Benth. 'Sin Espinas'",
+      "nombre_comunes_regionales": [
+        "Mora de Castilla mejorada",
+        "Thornless mora"
+      ],
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 120,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1800,
+        "optimo_max": 2600,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 13,
+        "optimo_max": 18,
+        "max_tolerable": 22
+      },
+      "ph_suelo": {
+        "min": 5.0,
+        "optimo_min": 5.2,
+        "optimo_max": 6.2,
+        "max": 6.8
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": 0,
+        "horas_acumuladas_max": 4,
+        "notas": "Sensible a heladas fuertes; prefiere laderas con drenaje de aire frío."
+      },
+      "companions": [
+        "rubus_idaeus_golden",
+        "rubus_idaeus_heritage"
+      ],
+      "antagonists": [
+        "solanum_phureja"
+      ],
+      "propagation": {
+        "methods": [
+          "acodo",
+          "esqueje"
+        ],
+        "best_method": "acodo de punta",
+        "notas": "Variedad seleccionada para facilitar la poda y cosecha sin espinas."
+      },
+      "valor_pedagogico": "Lección de mejoramiento varietal: caso de estudio sobre las ventajas del manejo ergonómico en la agricultura familiar.",
+      "plagas_criticas": [
+        "Drosophila suzukii",
+        "Perla de la tierra"
+      ],
+      "enfermedades_criticas": [
+        "Antracnosis (Elsinoe veneta)",
+        "Mildeo polvoso"
+      ],
+      "source_ids": [
+        "sib-colombia",
+        "ica-resolucion-3168-2015",
+        "gbif-taxonomic-backbone"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "rubus_idaeus_golden",
+      "nombre_comun": "Frambuesa amarilla",
+      "nombre_cientifico": "Rubus idaeus 'Golden Queen' o similar",
+      "nombre_comunes_regionales": [
+        "Frambuesa de oro",
+        "Yellow raspberry"
+      ],
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 60,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 2600,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 12,
+        "optimo_max": 18,
+        "max_tolerable": 24
+      },
+      "ph_suelo": {
+        "min": 5.0,
+        "optimo_min": 5.5,
+        "optimo_max": 6.2,
+        "max": 6.8
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -5,
+        "horas_acumuladas_max": 12,
+        "notas": "Excelente resistencia al frío."
+      },
+      "companions": [
+        "rubus_glaucus_sin_espinas",
+        "rubus_idaeus_heritage"
+      ],
+      "antagonists": [],
+      "propagation": {
+        "methods": [
+          "division_mata"
+        ],
+        "best_method": "hijuelos",
+        "notas": "Crecimiento menos vigoroso que la roja pero frutos más dulces."
+      },
+      "valor_pedagogico": "Lección de pigmentos: comparación entre antocianinas y su ausencia, y su impacto en el sabor y nutrición.",
+      "plagas_criticas": [
+        "Áfidos",
+        "Drosophila suzukii"
+      ],
+      "enfermedades_criticas": [
+        "Botrytis cinerea"
+      ],
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "rubus_idaeus_heritage",
+      "nombre_comun": "Frambuesa roja",
+      "nombre_cientifico": "Rubus idaeus 'Heritage'",
+      "nombre_comunes_regionales": [
+        "Frambuesa remonta",
+        "Red raspberry"
+      ],
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 60,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 2600,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 12,
+        "optimo_max": 18,
+        "max_tolerable": 25
+      },
+      "ph_suelo": {
+        "min": 5.0,
+        "optimo_min": 5.5,
+        "optimo_max": 6.5,
+        "max": 7.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": -5,
+        "horas_acumuladas_max": 12,
+        "notas": "Altamente resistente al frío; la helada puede favorecer la parada vegetativa necesaria."
+      },
+      "companions": [
+        "rubus_glaucus_sin_espinas",
+        "rubus_idaeus_golden"
+      ],
+      "antagonists": [],
+      "propagation": {
+        "methods": [
+          "division_mata",
+          "esqueje"
+        ],
+        "best_method": "hijuelos de raíz",
+        "notas": "Planta remonta (produce en tallos de primer y segundo año)."
+      },
+      "valor_pedagogico": "Lección de ciclo de tallo: enseña la diferencia entre floricanes y primocanes en plantas arbustivas.",
+      "plagas_criticas": [
+        "Drosophila suzukii",
+        "Ácaros"
+      ],
+      "enfermedades_criticas": [
+        "Antracnosis",
+        "Oídio"
+      ],
+      "source_ids": [
+        "powo-kew",
+        "ica-resolucion-3168-2015"
       ],
       "validation_level": "claude_draft"
     },
@@ -2704,6 +3576,7 @@
         "lactuca_sativa_capitata",
         "melissa_officinalis",
         "petroselinum_crispum",
+        "physalis_peruviana",
         "raphanus_sativus",
         "urtica_dioica"
       ],
@@ -3095,6 +3968,7 @@
       "antagonists": [
         "cucurbita_maxima",
         "rubus_glaucus",
+        "rubus_glaucus_sin_espinas",
         "solanum_lycopersicum",
         "solanum_lycopersicum_cerasiforme",
         "solanum_lycopersicum_cerasiforme_uvalina",
@@ -3680,6 +4554,8 @@
       "agua": "alto",
       "drenaje_requerido": "medio",
       "companions": [
+        "passiflora_edulis_morada",
+        "passiflora_tripartita_mollissima",
         "rosmarinus_officinalis",
         "rubus_glaucus",
         "solanum_lycopersicum_cerasiforme",
@@ -3864,6 +4740,168 @@
         "restrepo-1996-abc-agricultura-organica",
         "pamplona-roger-2006-plantas-medicinales"
       ]
+    },
+    {
+      "id": "vaccinium_corymbosum_biloxi",
+      "nombre_comun": "Arándano Biloxi",
+      "nombre_cientifico": "Vaccinium corymbosum 'Biloxi'",
+      "nombre_comunes_regionales": [
+        "Blueberry Biloxi"
+      ],
+      "familia_botanica": "Ericaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 120,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1700,
+        "optimo_max": 2400,
+        "max_absoluto": 2600
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "ph_suelo": {
+        "min": 4.0,
+        "optimo_min": 4.5,
+        "optimo_max": 5.2,
+        "max": 5.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "heladas_tolerancia": {
+        "umbral_c": -2,
+        "horas_acumuladas_max": 4,
+        "notas": "Requiere algunas horas frío pero 'Biloxi' es tolerante a calor tropical."
+      },
+      "companions": [
+        "vaccinium_corymbosum_emerald"
+      ],
+      "antagonists": [
+        "brassica_oleracea_capitata_alba",
+        "brassica_oleracea_capitata_rubra",
+        "brassica_oleracea_sabauda",
+        "physalis_peruviana",
+        "psidium_guajava_manzana"
+      ],
+      "propagation": {
+        "methods": [
+          "esqueje",
+          "micropropagacion"
+        ],
+        "best_method": "esqueje semileñoso",
+        "notas": "Suelo debe ser muy ácido y rico en materia orgánica leñosa."
+      },
+      "valor_pedagogico": "Lección de cultivares 'low-chill': explica cómo variedades seleccionadas florecen sin inviernos marcados.",
+      "plagas_criticas": [
+        "Drosophila suzukii",
+        "Pulgones"
+      ],
+      "enfermedades_criticas": [
+        "Phytophthora cinnamomi",
+        "Botrytis cinerea"
+      ],
+      "source_ids": [
+        "agrosavia-manual-arandano-2018",
+        "gbif-taxonomic-backbone"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "vaccinium_corymbosum_emerald",
+      "nombre_comun": "Arándano Emerald",
+      "nombre_cientifico": "Vaccinium corymbosum 'Emerald'",
+      "nombre_comunes_regionales": [
+        "Blueberry temprano"
+      ],
+      "familia_botanica": "Ericaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 120,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1700,
+        "optimo_max": 2400,
+        "max_absoluto": 2600
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 15,
+        "optimo_max": 25,
+        "max_tolerable": 30
+      },
+      "ph_suelo": {
+        "min": 4.0,
+        "optimo_min": 4.5,
+        "optimo_max": 5.2,
+        "max": 5.8
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "heladas_tolerancia": {
+        "umbral_c": -1,
+        "horas_acumuladas_max": 3,
+        "notas": "Variedad vigorosa con baja necesidad de frío (low-chill)."
+      },
+      "companions": [
+        "vaccinium_corymbosum_biloxi"
+      ],
+      "antagonists": [
+        "brassica_oleracea_acephala_curly",
+        "brassica_oleracea_acephala_lacinato",
+        "brassica_oleracea_acephala_red_russian",
+        "physalis_peruviana",
+        "psidium_guajava_manzana"
+      ],
+      "propagation": {
+        "methods": [
+          "esqueje",
+          "micropropagacion"
+        ],
+        "best_method": "esqueje",
+        "notas": "Sensible a la salinidad en el agua de riego."
+      },
+      "valor_pedagogico": "Lección de precocidad: variedad que permite entender la importancia de la ventana de cosecha temprana.",
+      "plagas_criticas": [
+        "Mosquita de la agalla",
+        "Pájaros"
+      ],
+      "enfermedades_criticas": [
+        "Botrytis cinerea",
+        "Roya del arándano"
+      ],
+      "source_ids": [
+        "agrosavia-manual-arandano-2018",
+        "powo-kew"
+      ],
+      "validation_level": "claude_draft"
     }
   ],
   "biopreparados": [
@@ -4222,11 +5260,27 @@
       "observaciones": "STUB migrado de v3.0."
     },
     {
+      "id": "agrosavia-manual-arandano-2018",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": 2018,
+      "titulo": "Manual técnico para el cultivo de arándano (Vaccinium corymbosum) en Colombia",
+      "institucion": "AGROSAVIA"
+    },
+    {
       "id": "agrosavia-manual-biopreparados-2015",
       "tipo": "manual_tecnico",
       "autores": "AGROSAVIA",
       "año": 2015,
       "titulo": "Manual de biopreparados para la agricultura colombiana",
+      "institucion": "AGROSAVIA"
+    },
+    {
+      "id": "agrosavia-manual-uchuva-2015",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": 2015,
+      "titulo": "Manual técnico para el cultivo de uchuva (Physalis peruviana) bajo condiciones colombianas",
       "institucion": "AGROSAVIA"
     },
     {
@@ -4272,6 +5326,15 @@
       "titulo": "Protocolos de manejo de especies invasoras en jurisdicción CAR",
       "institucion": "CAR Cundinamarca",
       "observaciones": "STUB migrado de v3.0 — número de resolución pendiente."
+    },
+    {
+      "id": "cenicafe-manual-cafetero-2013",
+      "tipo": "manual_tecnico",
+      "autores": "Cenicafé",
+      "año": 2013,
+      "titulo": "Manual del Cafetero Colombiano — Investigación y tecnología para la sostenibilidad de la caficultura",
+      "institucion": "Centro Nacional de Investigaciones de Café (Cenicafé)",
+      "url": "https://www.cenicafe.org/es/index.php/nuestras_publicaciones"
     },
     {
       "id": "cenicafe-trichoderma-2010",
