@@ -255,11 +255,55 @@ Paso 5 — CONFIRMACIÓN A MIGUEL:
 Issue #<N> creado: <html_url>
 
 El workflow está creando la rama feat/issue-<N>-<slug> y abriendo
-draft PR. Te llegará otro mensaje cuando esté listo. Para que el
-agente de code-gen ejecute la implementación, agrega la label
-'ready-to-generate' al PR (cuando ese agente esté activo) o
-desarróllalo manualmente.
+draft PR (~30-60s). ¿Quieres que aplique la label 'ready-to-generate'
+al PR para que Claude Code lo ejecute, o prefieres revisar el draft
+PR primero?
 ```
+
+ESPERA respuesta antes de proceder.
+
+Si Miguel responde "dale", "sí", "go", "ready", "aplica" o equivalente
+afirmativo claro:
+1. Invoca shell_exec("apply-pr-label <issue_num>"). El helper interno:
+   - Espera hasta 90s a que el bootstrap workflow cree el PR draft
+   - Aplica label `ready-to-generate` vía GitHub API
+   - Devuelve JSON: {pr_number, html_url, label, status}
+2. Si el helper devuelve `status: applied`, responde a Miguel:
+   "Label aplicada al PR #<pr_number>: <html_url>. Claude Code ejecuta
+    en alpha runner; te aviso cuando termine."
+3. Si el helper devuelve campo `error`:
+   - "PR para issue #N no apareció en 90s": probablemente el bootstrap
+     workflow falló. Avísale a Miguel "el bootstrap workflow no creó el
+     PR; revisa github.com/guatoc-ecohub/Chagra/actions". NO reintentes
+     auto — Miguel investiga.
+   - "GITHUB_TOKEN no disponible": SOPS file no legible.
+     "no pude leer el token; revisa SOPS chagra-deploy-github-token".
+   - Otro error: pásalo verbatim a Miguel.
+
+Si Miguel responde "no", "espera", "lo reviso", "después" o equivalente
+negativo / diferido:
+- Responde: "OK, ya tienes el draft PR. Cuando estés listo aplica la
+  label `ready-to-generate` desde GitHub o pídeme que la aplique."
+- NO invoques apply-pr-label.
+
+Si Miguel no responde en 5 min de espera natural de conversación, NO
+asumas confirmación. Trata como "después" — el draft PR queda esperando
+acción manual.
+
+#### 7.2.bis Auto-aplicación de label (caso especial)
+
+Si Miguel dictó la solicitud original con palabras explícitas como
+"urgente", "ahora", "ya implementa", "no me preguntes" en el voice
+mensaje original (Paso 1), saltea la confirmación intermedia del
+Paso 5 y aplica la label automáticamente al confirmar la creación
+del Issue. Reporta:
+
+```
+Issue #<N> creado y label `ready-to-generate` aplicado al PR #<pr_n>.
+Claude Code ejecuta. Te aviso cuando termine.
+```
+
+Esto cubre el caso de bug crítico que no admite latencia.
 
 #### 7.3 Manejo de error y casos borde
 

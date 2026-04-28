@@ -153,6 +153,88 @@ let
     echo "$RESULT"
   '';
 
+  # Helper: aplica una label a un PR de Chagra desde shell_exec.
+  #
+  # Por qué existe:
+  #   El bot guatoc, tras crear un Issue con label `claude-code-request`
+  #   (sec 7 manifest), debe poder aplicar la label `ready-to-generate`
+  #   al draft PR que el workflow bootstrap crea automáticamente.
+  #   Sin esto, el operador tiene que ir manualmente al PR y aplicar
+  #   la label — interrumpe el flujo voice-first.
+  #
+  # Diseño paralelo a transcribeTelegramVoice:
+  #   - Token de chagra-deploy-github-token leído del SOPS file
+  #     (NO env, porque subprocess_sandbox hace env_clear()).
+  #   - Polling con timeout: el bootstrap workflow tarda 20-60s en
+  #     crear el PR. Polling cada 5s hasta 90s antes de abortar.
+  #   - Stdout JSON: {pr_number, html_url, status} para que el LLM
+  #     pueda extraer datos sin parsear texto libre.
+  applyPRLabel = pkgs.writeShellScriptBin "apply-pr-label" ''
+    #!${pkgs.bash}/bin/bash
+    set -euo pipefail
+
+    ISSUE_NUM="''${1:-}"
+    LABEL="''${2:-ready-to-generate}"
+    REPO="''${3:-guatoc-ecohub/Chagra}"
+
+    if [ -z "$ISSUE_NUM" ]; then
+      echo '{"error":"missing issue number; uso: apply-pr-label <issue_num> [label] [repo]"}' >&2
+      exit 1
+    fi
+
+    # Leer token desde SOPS file (subprocess_sandbox strip env vars).
+    TOKEN_FILE="''${GITHUB_TOKEN_FILE:-/run/secrets/chagra-deploy-github-token}"
+    if [ -z "''${GITHUB_TOKEN:-}" ] && [ -r "$TOKEN_FILE" ]; then
+      GITHUB_TOKEN=$(${pkgs.gawk}/bin/awk -F= '/^(CHAGRA_DEPLOY_GITHUB_TOKEN|GITHUB_TOKEN)=/{sub(/^[^=]+=/,""); print; exit}' "$TOKEN_FILE")
+    fi
+    if [ -z "''${GITHUB_TOKEN:-}" ]; then
+      echo '{"error":"GITHUB_TOKEN no disponible (env vacío + secret file no legible)"}' >&2
+      exit 1
+    fi
+
+    BRANCH="feat/issue-$ISSUE_NUM-"
+    API="https://api.github.com/repos/$REPO"
+
+    # Polling: el bootstrap workflow tarda 20-60s en crear el PR.
+    # Buscar un PR cuya rama empiece con feat/issue-N-* (head=...).
+    PR_NUM=""
+    for attempt in $(seq 1 18); do
+      RESPONSE=$(${pkgs.curl}/bin/curl -fsS \
+        -H "Authorization: Bearer $GITHUB_TOKEN" \
+        -H "Accept: application/vnd.github+json" \
+        "$API/pulls?state=open&per_page=50" 2>/dev/null) || true
+
+      PR_NUM=$(echo "$RESPONSE" | ${pkgs.jq}/bin/jq -r --arg br "$BRANCH" \
+        '[.[] | select(.head.ref | startswith($br))][0].number // empty')
+
+      if [ -n "$PR_NUM" ] && [ "$PR_NUM" != "null" ]; then
+        break
+      fi
+      sleep 5
+    done
+
+    if [ -z "$PR_NUM" ] || [ "$PR_NUM" = "null" ]; then
+      echo "{\"error\":\"PR para issue #$ISSUE_NUM no apareció en 90s; el bootstrap workflow puede haber fallado\"}" >&2
+      exit 2
+    fi
+
+    # Aplicar label.
+    LABEL_RESULT=$(${pkgs.curl}/bin/curl -fsS \
+      -X POST \
+      -H "Authorization: Bearer $GITHUB_TOKEN" \
+      -H "Accept: application/vnd.github+json" \
+      "$API/issues/$PR_NUM/labels" \
+      -d "{\"labels\":[\"$LABEL\"]}") || {
+      echo "{\"error\":\"falló POST de label\",\"pr_number\":$PR_NUM}" >&2
+      exit 3
+    }
+
+    HTML_URL=$(echo "$RESPONSE" | ${pkgs.jq}/bin/jq -r --arg br "$BRANCH" \
+      '[.[] | select(.head.ref | startswith($br))][0].html_url // empty')
+
+    echo "{\"pr_number\":$PR_NUM,\"html_url\":\"$HTML_URL\",\"label\":\"$LABEL\",\"status\":\"applied\"}"
+  '';
+
   # Genera config.toml para un agente
   mkAgentConfig = name: agent: pkgs.writeText "openfang-${name}-config.toml" ''
     # OpenFang config — Agent: ${agent.name}
@@ -357,7 +439,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages = [ openfang-pkg transcribeTelegramVoice ];
+    environment.systemPackages = [ openfang-pkg transcribeTelegramVoice applyPRLabel ];
 
     users.users.openfang = {
       isSystemUser = true;
@@ -530,7 +612,7 @@ in
           # `transcribe-telegram-voice` aparece "no instalado" desde shell_exec.
           # Incidente 2026-04-28: sin esto el LLM cae a curl directo con
           # bot token plano en argv → leak en journalctl.
-          export PATH="${transcribeTelegramVoice}/bin:${pkgs.curl}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gnused}/bin:${pkgs.bash}/bin:$PATH"
+          export PATH="${transcribeTelegramVoice}/bin:${applyPRLabel}/bin:${pkgs.curl}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gnused}/bin:${pkgs.bash}/bin:$PATH"
 
           exec ${openfang-pkg}/bin/openfang start --config "$HOME/config.toml"
         '';
