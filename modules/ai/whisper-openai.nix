@@ -70,6 +70,12 @@ in
         ExecStartPre = [
           "${pkgs.coreutils}/bin/install -d -m 0755 /mnt/fast/appdata/whisper-openai"
           "${pkgs.coreutils}/bin/install -d -m 0755 /mnt/fast/appdata/whisper-openai/cache"
+          # HF_HUB requiere subdir `hub/` dentro del cache mount; sin él,
+          # speaches lanza huggingface_hub.errors.CacheNotFound al primer
+          # POST /v1/audio/transcriptions (verificado 2026-04-27 logs alpha).
+          # Ownership 1000:1000 = usuario `ubuntu` dentro del container speaches.
+          "${pkgs.coreutils}/bin/install -d -m 0755 -o 1000 -g 1000 /mnt/fast/appdata/whisper-openai/cache/hub"
+          "${pkgs.coreutils}/bin/chown -R 1000:1000 /mnt/fast/appdata/whisper-openai/cache"
         ];
       };
     };

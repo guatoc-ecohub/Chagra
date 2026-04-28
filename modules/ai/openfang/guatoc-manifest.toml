@@ -169,49 +169,33 @@ Si tienes duda sobre la intención, PREGUNTA a Miguel: "¿Quieres que esto sea u
 
 #### 7.2 Pipeline interno
 
-Paso 1 — TRANSCRIPCIÓN: TEMPORALMENTE DESACTIVADA (2026-04-26).
+Paso 1 — TRANSCRIPCIÓN: cuando recibas un mensaje de Telegram con media
+tipo `voice`, invoca directamente la tool nativa:
 
-OpenFang 0.5.10/0.6.0 hardcodea el endpoint de transcripción a
-`https://api.openai.com/v1/audio/transcriptions` (línea 118-128 de
-`media_understanding.rs`). NO lee OPENAI_BASE_URL ni provider_urls
-para audio. Sin patch upstream + rebuild del binario, no hay forma
-de redirigir las tools nativas `media_transcribe` / `speech_to_text` /
-`media_describe` al servicio whisper local. Issue upstream #1051 lleva
-14 días sin atención.
+```
+media_transcribe(file_id="<file_id del update>", language="es")
+```
 
-Mientras llega el patch (PR upstream o bump 0.6.x con audio
-configurable), CUANDO RECIBAS UN MENSAJE DE TELEGRAM CON MEDIA TIPO
-`voice`:
+Internamente la tool: descarga el OGG vía Telegram, hace POST a
+`/v1/audio/transcriptions` del proveedor configurado, y devuelve
+`{text, language, segments}`. La transcripción está en `.text`.
 
-1. NO intentes invocar `media_transcribe`, `speech_to_text`, ni
-   `media_describe` con el voice. Las tools fallarán contra OpenAI con
-   401 (la zai key no es válida ahí), generarán crash loop del agente
-   cada 3 minutos.
-2. NO intentes descargar el OGG con shell_exec ni curl. El sandbox
-   bloquea el approval y el LLM trunca URLs largas.
-3. Responde inmediatamente al usuario, en una sola pasada (sin tools):
+En este host (alpha) el endpoint está routeado a través del openai-proxy
+local (`http://127.0.0.1:10303/v1/audio/transcriptions`), que reenvía
+`/v1/audio/*` al container speaches con `Systran/faster-whisper-small`.
+Esto requiere OpenFang ≥ 0.6.0 con el patch `audio_base_url` (cierra
+issue #1051) — verificado y deployado en alpha 2026-04-27.
 
-   "Voice transcription está fuera de servicio temporalmente
-   (limitación upstream openfang 0.5.10 — issue #1051). Por favor
-   escríbeme el mensaje en texto. Si era una solicitud de tarea para
-   Chagra, dímela en texto y la proceso al toque."
+NO necesitas tocar URLs ni construir curl ni descargar OGG manualmente.
+La tool ya pega al endpoint correcto.
 
-4. Si la duración es <2s (mensajes accidentales), responde solo:
-   "voice corto, ¿quisiste mandar texto? avísame."
-
-Cuando openfang 0.5.11+ incluya el campo `[media] audio_base_url`,
-este Paso vuelve a usar `media_transcribe(file_id="...", language="es")`
-directamente. La infraestructura local ya está lista: speaches
-container en `127.0.0.1:10303/v1/audio/*` espera ese cambio.
-
-Si el helper devuelve exit code != 0 o JSON con campo "error":
-1. Avísale a Miguel "no pude transcribir: <mensaje del error>".
+Si `media_transcribe` falla o devuelve texto vacío:
+1. Avísale a Miguel: "no pude transcribir: <mensaje del error>".
 2. NO inventes la transcripción.
 3. NO sigas con el flujo del Issue.
 
-Cuando openfang 0.5.11+ arregle el adapter, este Paso vuelve a usar
-`media_transcribe(file_id="<ID>", language="es")` nativo. Avisa a Miguel
-cuando notes que la tool ya descarga sola.
+Si la duración del audio es <2s (accidentales), responde solo:
+"voice corto, ¿quisiste mandar texto? avísame."
 
 Paso 2 — PARSEO ESTRUCTURADO: tomas la transcripción y la mapeas a los campos del issue template `Chagra/.github/ISSUE_TEMPLATE/claude-code-request.yml`:
 
