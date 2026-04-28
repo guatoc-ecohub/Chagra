@@ -68,8 +68,23 @@ let
       exit 1
     fi
 
+    # OpenFang subprocess_sandbox hace env_clear() y solo re-añade SAFE_ENV_VARS
+    # (verificado en crates/openfang-runtime/src/subprocess_sandbox.rs:41).
+    # TELEGRAM_BOT_TOKEN nunca llega al helper aunque openfang lo tenga.
+    # Fallback: leer del SOPS secret file directamente. El helper corre como
+    # subprocess del service openfang-guatoc (user `openfang`), y el secret
+    # está montado con owner openfang:openfang mode 0400 → accesible.
+    # Formato del file: KEY=VALUE (EnvironmentFile-compatible de systemd).
     if [ -z "''${TELEGRAM_BOT_TOKEN:-}" ]; then
-      echo '{"error":"TELEGRAM_BOT_TOKEN no está en el environment"}' >&2
+      SECRET_FILE="''${TELEGRAM_BOT_TOKEN_FILE:-/run/secrets/openfang-guatoc-telegram-token}"
+      if [ -r "$SECRET_FILE" ]; then
+        # awk evita source/eval injection; toma sólo la línea TELEGRAM_BOT_TOKEN=
+        TELEGRAM_BOT_TOKEN=$(${pkgs.gawk}/bin/awk -F= '/^TELEGRAM_BOT_TOKEN=/{sub(/^TELEGRAM_BOT_TOKEN=/,""); print; exit}' "$SECRET_FILE")
+      fi
+    fi
+
+    if [ -z "''${TELEGRAM_BOT_TOKEN:-}" ]; then
+      echo '{"error":"TELEGRAM_BOT_TOKEN no disponible (env vacío + secret file no legible o sin la clave)"}' >&2
       exit 1
     fi
 
