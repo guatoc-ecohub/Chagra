@@ -1,8 +1,8 @@
 {
   "schema_version": "3.1",
   "seed_version": "0.2.0",
-  "generated_at": "2026-04-23",
-  "generated_by": "scripts/migrate-v30-to-v31.mjs — transform automático v3.0 → v3.1. Curaduría humana requerida antes de uso ministerial.",
+  "generated_at": "2026-04-28",
+  "generated_by": "md-fichas-to-catalog-json.mjs",
   "_meta": {
     "fuente_migracion": "chagra-catalog-seed-v3.0.json",
     "ambiguedades_resueltas": [
@@ -25,6 +25,345 @@
     "advertencia": "Validar con: node scripts/validate-catalog.mjs --seed-mode. Refs a species aún no migradas aparecen como warnings."
   },
   "species": [
+    {
+      "id": "alnus_acuminata",
+      "_curation_status": "VALIDADO con fuentes CIAT/AGROSAVIA",
+      "nombre_comun": "Aliso andino",
+      "nombre_comunes_regionales": [
+        "aliso",
+        "cerezo (cordillera oriental)",
+        "jaul (algunas zonas)"
+      ],
+      "nombre_cientifico": "Alnus acuminata Kunth",
+      "familia_botanica": "Betulaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nitrogen_fixer",
+        "living_fence",
+        "windbreak",
+        "biomass_producer",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "cycleMonths": null,
+      "habito": "arbol deciduo semicaducifolio, 15-25m altura",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 3200,
+        "max_absoluto": 3600
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 8,
+        "optimo_max": 18,
+        "max_tolerable": 24
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "ph_suelo": {
+        "min": 4.5,
+        "optimo_min": 5.5,
+        "optimo_max": 6.8,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno_a_moderado",
+      "companions": [
+        "solanum_phureja",
+        "vicia_faba",
+        "lupinus_mutabilis",
+        "pennisetum_clandestinum_manejado"
+      ],
+      "antagonists": [],
+      "recommended_covers": [
+        "trifolium_repens",
+        "vicia_sativa"
+      ],
+      "recommended_fences": [
+        "sambucus_peruviana",
+        "dodonaea_viscosa"
+      ],
+      "fence_function": [
+        "rompevientos",
+        "delimitacion",
+        "sombra",
+        "refugio_fauna"
+      ],
+      "densidad_siembra_fence_m": 2.5,
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla recolectada de amentos maduros (marzo-mayo en cordillera oriental). Estratificación fría opcional 30 días. Germinación en bandejas con sustrato: 60% tierra negra + 30% arena + 10% compost maduro. Trasplante a bolsa negra 1.5kg a las 6 semanas. Plantación definitiva a los 4-6 meses (altura 30-40cm).",
+        "tiempo_a_establecimiento_dias": 45,
+        "notas": "Actinorrícica: forma nódulos fijadores de N con Frankia alni. Inoculación con suelo de aliso adulto acelera establecimiento.",
+        "fuente": "CIAT 1995 'El aliso (Alnus acuminata) en sistemas silvopastoriles'; Corpoica (AGROSAVIA) varios"
+      },
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol de 15-25m no apto para apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Como cerca viva o sombra puntual. Un solo árbol por huerto pequeño.",
+          "tips": [
+            "Plantar en esquina noroeste para sombra de tarde sin bloqueo solar mañanero",
+            "Podas anuales para mantener forma"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta por tamaño."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Ideal para sistemas silvopastoriles (20-40 árboles/ha) o como linderos entre lotes. Fija 150-300 kg N/ha/año según densidad y edad.",
+          "tips": [
+            "Densidad 10x10m o lindero a 2.5m",
+            "Podas de formación años 2-3 y posteriores cada 3 años"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "ESPECIE CLAVE para restauración de bosque alto andino y bordes de páramo. Nurse plant para especies de sotobosque. Recuperación de taludes degradados.",
+          "tips": [
+            "Plantación asociada a Weinmannia tomentosa y Escallonia paniculata",
+            "Densidad restauración: 1100 individuos/ha (3x3m)",
+            "Protección contra ganado primeros 3 años"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plan_nutricion_base": null,
+      "_nota_nutricion": "Como árbol fijador de N, no requiere plan de fertilización estándar. Aporta N al sistema. Solo monitoreo de P y K en suelos muy pobres durante establecimiento.",
+      "tests_suelo_recomendados": [
+        {
+          "tipo": "ph_casero",
+          "rango_objetivo": "5.5-6.8",
+          "frecuencia": "pre-siembra"
+        },
+        {
+          "tipo": "conteo_nodulos",
+          "frecuencia": "año 1 post-establecimiento",
+          "objetivo": "verificar nodulación por Frankia alni; objetivo >20 nódulos en raíz principal a 30cm profundidad"
+        }
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "prompts_ia_externa": {
+        "plan_restauracion": "Actúa como ecólogo de restauración de bosque alto andino colombiano.\nÁrea: {AREA_HA} ha a {ALTITUD} msnm en {MUNICIPIO}, pendiente {PENDIENTE}%, suelo degradado por {HISTORIAL_USO}. Quiero restaurar con Alnus acuminata como especie nodriza asociada a {ESPECIES_OBJETIVO}.\n\nDiseña: (a) marco de plantación y espaciamiento, (b) secuencia de establecimiento por fases (pioneras 1-3 años, secundarias 3-8 años, climácicas 8+ años), (c) protocolo de protección contra ganado, (d) indicadores de éxito de restauración a 1, 3, 5 años."
+      },
+      "rol_ecologico": "Especie nodriza clave en restauración de bosque alto andino. Fija nitrógeno simbiótico con actinomiceto Frankia alni. Hojas ricas en N mejoran el mantillo. Madera usada tradicionalmente para herramientas, construcciones rurales y leña. Corteza con taninos para curtiembre.",
+      "valor_pedagogico": "Enseña fijación simbiótica de N (con actinomiceto, no rizobio); rol de especies nodrizas en restauración; sistemas silvopastoriles andinos.",
+      "saber_origen": {
+        "pueblo": "Pueblos andinos (uso generalizado Muisca, Pasto, Inga)",
+        "region": "Andes colombianos 1800-3600 msnm",
+        "practica_original": "Uso en linderos tradicionales de aynokas, sombra para ganado, leña, reparación de taludes ribereños. Asociación con cultivos de frío (papa, maíz de altura, haba).",
+        "validacion_cientifica_source_ids": [
+          "ciat-1995-alnus",
+          "agrosavia-silvopastoriles"
+        ]
+      },
+      "nota_conservacion": null,
+      "confidence_notes": "Especie nativa andina ampliamente documentada. Datos consolidados.",
+      "harvest_type": "biomasa",
+      "validation_level": "operator_reviewed",
+      "source_ids": [
+        "ciat-1995-alnus",
+        "agrosavia-silvopastoriles",
+        "humboldt-flora-alto-andina"
+      ]
+    },
+    {
+      "id": "cenchrus_clandestinus",
+      "_curation_status": "VALIDADO; nombre taxonómico actualizado (previamente Pennisetum clandestinum)",
+      "nombre_comun": "Kikuyo",
+      "nombre_comunes_regionales": [
+        "kikuyo",
+        "cundo",
+        "pasto kikuyo",
+        "pasto africano"
+      ],
+      "nombre_cientifico": "Cenchrus clandestinus (Hochst. ex Chiov.) Morrone",
+      "_nombre_cientifico_anterior": "Pennisetum clandestinum Hochst. ex Chiov., 1903",
+      "autor_ano": "Hochst. ex Chiov. 1903 → reubicado en Cenchrus por Morrone 2010",
+      "familia_botanica": "Poaceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "invasive",
+        "ground_cover"
+      ],
+      "cultivable": false,
+      "_nota_cultivable": "PARADOJA COLOMBIANA: es la gramínea forrajera más importante del trópico alto (>2200 msnm) para ganadería de leche. Simultáneamente es invasora crítica en páramos y bosques altoandinos. Uso legal en potreros, prohibido/indeseable en áreas de restauración y delimitación de páramo (Ley 1930/2018).",
+      "conservation_status": "invasor",
+      "habito": "gramínea perenne postrada con estolones y rizomas agresivos",
+      "origen": "África oriental (altiplanos Kenia, Etiopía, Uganda, Rwanda, Tanzania, Zaire)",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 3200,
+        "max_absoluto": 3600
+      },
+      "impacto_ecologico": "alto (en páramo) / uso forrajero (en potreros bajo manejo)",
+      "ecosistemas_afectados": [
+        "paramo",
+        "subparamo",
+        "bosque_alto_andino",
+        "humedales_altoandinos"
+      ],
+      "mecanismos_invasion": [
+        "Estolones rápidos forman matas densas que excluyen nativas",
+        "Rizomas penetran suelo y son difíciles de extraer",
+        "Semillas viables hasta 10 años en el suelo",
+        "Dispersión vía tubo digestivo del ganado",
+        "Responde a fertilización nitrogenada (de origen natural o agropecuario)",
+        "Desplaza a Calamagrostis effusa y otros pastizales nativos de páramo"
+      ],
+      "metodos_extraccion": [
+        {
+          "metodo": "desenraice_completo",
+          "efectividad": "alta",
+          "costo": "alto",
+          "notas": "Requiere extraer estolones y rizomas completos; suelos pedregosos dificultan. Herramienta: azadón de péndulo."
+        },
+        {
+          "metodo": "solarizacion",
+          "efectividad": "media",
+          "costo": "medio",
+          "notas": "6-8 semanas bajo plástico negro en temporada seca; efectivo en parches pequeños"
+        },
+        {
+          "metodo": "corte_bajo_repetido",
+          "efectividad": "baja",
+          "costo": "bajo",
+          "notas": "NO suficiente por sí solo; requiere acompañamiento de siembra de nativas"
+        }
+      ],
+      "epoca_optima_remocion": "Temporada seca, antes de floración y semillación",
+      "especies_nativas_sustitutas": [
+        "calamagrostis_effusa",
+        "festuca_sp_paramo",
+        "agrostis_foliata"
+      ],
+      "manejo_biomasa_extraida": "compostaje en condiciones termófilas >60°C por >3 semanas (destruye semillas) O incineracion_controlada",
+      "riesgo_rebrote": "alto",
+      "foto_referencia_sugerida": "https://commons.wikimedia.org/wiki/Category:Cenchrus_clandestinus",
+      "referencias_cientificas": [
+        "Correa, Pabón & Carulla 2008. Valor nutricional del kikuyo. Livestock Research for Rural Development 20(59)",
+        "Mila & Corredor 2004. Evolución composición botánica pradera kikuyo. Corpoica 5(1): 70-75",
+        "Portillo et al. 2019. Evaluación forrajeras Nariño. AGROSAVIA"
+      ],
+      "validation_level": "operator_reviewed",
+      "source_ids": [
+        "correa-pabon-carulla-2008",
+        "agrosavia-forrajeras-2022"
+      ]
+    },
+    {
+      "id": "pteridium_aquilinum",
+      "_curation_status": "CURACIÓN BÁSICA",
+      "nombre_comun": "Helecho marranero",
+      "nombre_comunes_regionales": [
+        "helecho marranero",
+        "helecho águila",
+        "helecho común"
+      ],
+      "nombre_cientifico": "Pteridium aquilinum (L.) Kuhn",
+      "autor_ano": "Kuhn, 1879 (combinación); L. 1753 como Pteris aquilina",
+      "familia_botanica": "Dennstaedtiaceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "templado",
+        "frio",
+        "paramo"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "invasive"
+      ],
+      "cultivable": false,
+      "conservation_status": "invasor",
+      "_nota_conservacion": "Especie con distribución cosmopolita; en Colombia se comporta como invasor agresivo post-disturbio. Tóxica para ganado y potencialmente cancerígena (ptaquiloside).",
+      "habito": "helecho rizomatoso 0.5-2m",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 1500,
+        "optimo_max": 3500,
+        "max_absoluto": 4000
+      },
+      "impacto_ecologico": "alto",
+      "ecosistemas_afectados": [
+        "bosque_alto_andino",
+        "subparamo",
+        "paramo_intervenido",
+        "potreros_degradados",
+        "cicatrices_fuego"
+      ],
+      "mecanismos_invasion": [
+        "Rizomas profundos (hasta 1m) y extensos resistentes a remoción",
+        "Producción masiva de esporas con dispersión eólica de larga distancia",
+        "Alelopatía inhibe germinación de nativas",
+        "Tolerancia al fuego; rebrota desde rizoma",
+        "Compuestos tóxicos (ptaquiloside, tiaminasa) desalientan herbivoría"
+      ],
+      "metodos_extraccion": [
+        {
+          "metodo": "desenraice_completo",
+          "efectividad": "media",
+          "costo": "alto",
+          "notas": "Rizomas profundos y extensos dificultan extracción total"
+        },
+        {
+          "metodo": "corte_bajo_repetido",
+          "efectividad": "alta",
+          "costo": "medio",
+          "notas": "Corte mensual durante 2-3 temporadas agota reservas del rizoma"
+        },
+        {
+          "metodo": "sombra_forzada",
+          "efectividad": "alta",
+          "costo": "alto",
+          "notas": "Plantación de especies arbóreas nativas que den sombra densa; el helecho es intolerante a sombra"
+        }
+      ],
+      "epoca_optima_remocion": "Previo a formación de frondes maduras (temporada lluviosa temprana)",
+      "especies_nativas_sustitutas": [
+        "alnus_acuminata",
+        "weinmannia_tomentosa",
+        "miconia_squamulosa"
+      ],
+      "manejo_biomasa_extraida": "incineracion_controlada O entierro_profundo",
+      "_nota_manejo": "Evitar contacto prolongado sin protección (esporas potencialmente cancerígenas). No usar como forraje ni cama para ganado.",
+      "riesgo_rebrote": "muy_alto",
+      "foto_referencia_sugerida": "https://commons.wikimedia.org/wiki/Category:Pteridium_aquilinum",
+      "validation_level": "operator_reviewed",
+      "source_ids": [
+        "flora-colombia-pteridophyta"
+      ]
+    },
     {
       "id": "solanum_phureja",
       "_curation_status": "VALIDADO con fuentes verificadas AGROSAVIA + UNAL",
@@ -445,7 +784,9 @@
       },
       "nota_conservacion": null,
       "confidence_notes": "Umbrales térmicos y altitudinales consolidados contra AGROSAVIA Ficha Técnica Sol Andina y manual Ñústez & Rodríguez 2024. Variaciones por cultivar ±1-2°C en helada letal y ±200 msnm en rangos óptimos. Necesita validación por agrónomo humano antes de deploy ministerial.",
-      "sources_ids": [
+      "harvest_type": "tuberculo",
+      "validation_level": "operator_reviewed",
+      "source_ids": [
         "agrosavia-sol-andina",
         "agrosavia-estrella",
         "agrosavia-alhaja-ica-17702-2019",
@@ -453,176 +794,199 @@
         "rodriguez-nustez-estrada-2009",
         "perez-rodriguez-gomez-2008",
         "cip-2006-ghislain"
-      ],
-      "harvest_type": "tuberculo",
-      "validation_level": "operator_reviewed"
+      ]
     },
     {
-      "id": "alnus_acuminata",
-      "_curation_status": "VALIDADO con fuentes CIAT/AGROSAVIA",
-      "nombre_comun": "Aliso andino",
+      "id": "thunbergia_alata",
+      "_curation_status": "CURACIÓN BÁSICA; datos de invasividad en Colombia confirmados; protocolo de manejo requiere fuente primaria específica",
+      "nombre_comun": "Ojo de poeta",
       "nombre_comunes_regionales": [
-        "aliso",
-        "cerezo (cordillera oriental)",
-        "jaul (algunas zonas)"
+        "ojo de poeta",
+        "susan de ojos negros",
+        "trinitaria"
       ],
-      "nombre_cientifico": "Alnus acuminata Kunth",
-      "familia_botanica": "Betulaceae",
-      "category": "abonos_verdes_coberturas",
+      "nombre_cientifico": "Thunbergia alata Bojer ex Sims",
+      "autor_ano": "Bojer ex Sims, 1825",
+      "familia_botanica": "Acanthaceae",
+      "category": "especies_invasoras",
       "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "invasive"
+      ],
+      "cultivable": false,
+      "_nota_cultivable": "Introducida y usada como ornamental en muchas ciudades andinas; se ha escapado a ambientes naturales y es invasora en bosque alto andino y borde de subpáramo.",
+      "conservation_status": "invasor",
+      "origen": "África oriental y austral",
+      "habito": "trepadora herbácea perenne 2-8m",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 3000,
+        "max_absoluto": 3300
+      },
+      "impacto_ecologico": "alto",
+      "ecosistemas_afectados": [
+        "bosque_alto_andino",
+        "subparamo",
+        "bordes_bosque_niebla",
+        "cercos_vivos_urbanos"
+      ],
+      "mecanismos_invasion": [
+        "Crecimiento trepador rápido que cubre y asfixia vegetación nativa",
+        "Producción masiva de semillas",
+        "Dispersión por aves (endozoocoria)",
+        "Regeneración vegetativa por trozos de tallo",
+        "Asfixia de sotobosque al formar dosel denso"
+      ],
+      "metodos_extraccion": [
+        {
+          "metodo": "desenraice_completo",
+          "efectividad": "alta",
+          "costo": "medio"
+        },
+        {
+          "metodo": "corte_bajo_repetido",
+          "efectividad": "media",
+          "costo": "bajo",
+          "notas": "Debe combinarse con extracción de raíz para evitar rebrote"
+        }
+      ],
+      "epoca_optima_remocion": "Antes de floración (temporada seca local)",
+      "especies_nativas_sustitutas_trepadoras": [
+        "passiflora_tripartita_mollissima_NATIVA",
+        "bomarea_sp"
+      ],
+      "manejo_biomasa_extraida": "compostaje_termofilico O incineracion_controlada",
+      "riesgo_rebrote": "alto",
+      "foto_referencia_sugerida": "https://commons.wikimedia.org/wiki/Category:Thunbergia_alata",
+      "validation_level": "operator_reviewed",
+      "source_ids": [
+        "humboldt-invasoras-andes"
+      ]
+    },
+    {
+      "id": "ulex_europaeus",
+      "_curation_status": "VALIDADO con fuentes Humboldt, CAR Cundinamarca, Fundación Natura, Mongabay",
+      "nombre_comun": "Retamo espinoso",
+      "nombre_comunes_regionales": [
+        "retamo",
+        "retamo amarillo"
+      ],
+      "nombre_cientifico": "Ulex europaeus L.",
+      "autor_ano": "Linnaeus, 1753",
+      "publicacion_original": "Species Plantarum 2: 741. 1753",
+      "familia_botanica": "Fabaceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "templado",
         "frio",
         "paramo"
       ],
-      "estrato": "alto",
+      "estrato": "medio",
       "roles_in_guild": [
-        "nitrogen_fixer",
-        "living_fence",
-        "windbreak",
-        "biomass_producer",
-        "nurse_plant"
+        "invasive"
       ],
-      "cultivable": true,
-      "conservation_status": "nativo_silvestre",
-      "cycleMonths": null,
-      "habito": "arbol deciduo semicaducifolio, 15-25m altura",
+      "cultivable": false,
+      "conservation_status": "invasor",
+      "habito": "arbusto espinoso 1-3m",
+      "origen": "Europa occidental (Islas Británicas a Iberia)",
+      "clasificacion_uicn": "Entre las 100 peores especies invasoras del mundo (ISSG/UICN)",
+      "normativa_colombiana": [
+        {
+          "norma": "Resolución 684 de 2018 del Ministerio de Ambiente y Desarrollo Sostenible",
+          "alcance": "Lineamientos nacionales para prevención, manejo integral y restauración de áreas afectadas por U. europaeus y Genista monspessulana"
+        },
+        {
+          "norma": "Resolución 7615 de 2009 Secretaría Distrital de Ambiente de Bogotá",
+          "alcance": "Prohíbe uso de retamo espinoso en Distrito Capital"
+        },
+        {
+          "norma": "Protocolo CAR Cundinamarca 2019",
+          "alcance": "Prevención, manejo y control de U. europaeus y Genista monspessulana en jurisdicción CAR"
+        }
+      ],
       "altitud_msnm": {
-        "min_absoluto": 1800,
-        "optimo_min": 2200,
+        "min_absoluto": 2000,
+        "optimo_min": 2300,
         "optimo_max": 3200,
-        "max_absoluto": 3600
+        "max_absoluto": 3500
       },
-      "temperatura_c": {
-        "helada_letal": -6,
-        "optimo_min": 8,
-        "optimo_max": 18,
-        "max_tolerable": 24
-      },
-      "humedad_relativa_pct": {
-        "min": 60,
-        "optimo": 80,
-        "max": 95
-      },
-      "ph_suelo": {
-        "min": 4.5,
-        "optimo_min": 5.5,
-        "optimo_max": 6.8,
-        "max": 7.5
-      },
-      "radiacion": "sol_pleno",
-      "agua": "alto",
-      "drenaje_requerido": "bueno_a_moderado",
-      "companions": [
-        "solanum_phureja",
-        "vicia_faba",
-        "lupinus_mutabilis",
-        "pennisetum_clandestinum_manejado"
+      "impacto_ecologico": "alto",
+      "ecosistemas_afectados": [
+        "bosque_alto_andino",
+        "subparamo",
+        "paramo",
+        "bordes_de_via",
+        "areas_quemadas"
       ],
-      "antagonists": [],
-      "recommended_covers": [
-        "trifolium_repens",
-        "vicia_sativa"
+      "mecanismos_invasion": [
+        "Germinación post-fuego masiva (semillas resisten altas temperaturas)",
+        "Banco de semillas persistente hasta 30-40 años en suelo",
+        "Densidad de banco de semillas 109-3.384 semillas/m2 en bordes de matorral (Ocampo-Zuleta & Solorza-Bejarano 2017)",
+        "Reproducción sexual + rebrote vegetativo desde tallos cortados",
+        "Crecimiento rápido (hasta 1m/año) forma matorrales densos que excluyen nativas",
+        "Fijación de N altera composición química del suelo, favoreciendo otras exóticas"
       ],
-      "recommended_fences": [
-        "sambucus_peruviana",
-        "dodonaea_viscosa"
-      ],
-      "fence_function": [
-        "rompevientos",
-        "delimitacion",
-        "sombra",
-        "refugio_fauna"
-      ],
-      "densidad_siembra_fence_m": 2.5,
-      "propagation": {
-        "methods": [
-          "semilla",
-          "esqueje"
-        ],
-        "best_method": "semilla",
-        "protocol_resumen": "Semilla recolectada de amentos maduros (marzo-mayo en cordillera oriental). Estratificación fría opcional 30 días. Germinación en bandejas con sustrato: 60% tierra negra + 30% arena + 10% compost maduro. Trasplante a bolsa negra 1.5kg a las 6 semanas. Plantación definitiva a los 4-6 meses (altura 30-40cm).",
-        "tiempo_a_establecimiento_dias": 45,
-        "notas": "Actinorrícica: forma nódulos fijadores de N con Frankia alni. Inoculación con suelo de aliso adulto acelera establecimiento.",
-        "fuente": "CIAT 1995 'El aliso (Alnus acuminata) en sistemas silvopastoriles'; Corpoica (AGROSAVIA) varios"
-      },
-      "manejo_por_escala": {
-        "apartamento": {
-          "viable": false,
-          "nota": "Árbol de 15-25m no apto para apartamento."
-        },
-        "huerto_casero": {
-          "viable": true,
-          "nota": "Como cerca viva o sombra puntual. Un solo árbol por huerto pequeño.",
-          "tips": [
-            "Plantar en esquina noroeste para sombra de tarde sin bloqueo solar mañanero",
-            "Podas anuales para mantener forma"
-          ]
-        },
-        "invernadero_mediano": {
-          "viable": false,
-          "nota": "Inviable bajo cubierta por tamaño."
-        },
-        "produccion": {
-          "viable": true,
-          "nota": "Ideal para sistemas silvopastoriles (20-40 árboles/ha) o como linderos entre lotes. Fija 150-300 kg N/ha/año según densidad y edad.",
-          "tips": [
-            "Densidad 10x10m o lindero a 2.5m",
-            "Podas de formación años 2-3 y posteriores cada 3 años"
-          ]
-        },
-        "restauracion": {
-          "viable": true,
-          "nota": "ESPECIE CLAVE para restauración de bosque alto andino y bordes de páramo. Nurse plant para especies de sotobosque. Recuperación de taludes degradados.",
-          "tips": [
-            "Plantación asociada a Weinmannia tomentosa y Escallonia paniculata",
-            "Densidad restauración: 1100 individuos/ha (3x3m)",
-            "Protección contra ganado primeros 3 años"
-          ]
-        }
-      },
-      "scale_viability": [
-        "huerto_casero",
-        "produccion",
-        "restauracion"
-      ],
-      "plan_nutricion_base": null,
-      "_nota_nutricion": "Como árbol fijador de N, no requiere plan de fertilización estándar. Aporta N al sistema. Solo monitoreo de P y K en suelos muy pobres durante establecimiento.",
-      "tests_suelo_recomendados": [
+      "metodos_extraccion": [
         {
-          "tipo": "ph_casero",
-          "rango_objetivo": "5.5-6.8",
-          "frecuencia": "pre-siembra"
+          "metodo": "desenraice_completo",
+          "efectividad": "alta",
+          "costo": "alto",
+          "notas": "Método preferido; requiere extraer TODO el sistema radical para evitar rebrote. Después de quemas el suelo queda blando y facilita extracción manual."
         },
         {
-          "tipo": "conteo_nodulos",
-          "frecuencia": "año 1 post-establecimiento",
-          "objetivo": "verificar nodulación por Frankia alni; objetivo >20 nódulos en raíz principal a 30cm profundidad"
+          "metodo": "corte_bajo_repetido",
+          "efectividad": "media",
+          "costo": "medio",
+          "notas": "Corte a ras de suelo cada 3-4 meses por 2-3 años; agota reservas; NO funciona solo (rebrote garantizado)"
+        },
+        {
+          "metodo": "solarizacion",
+          "efectividad": "baja",
+          "costo": "medio",
+          "notas": "Solo efectiva en plántulas; semillas profundas resisten"
+        },
+        {
+          "metodo": "fuego_controlado",
+          "efectividad": "NEGATIVA",
+          "costo": "bajo",
+          "notas": "PROHIBIDO: el fuego detona germinación masiva del banco de semillas y empeora la invasión. Evidencia Mongabay 2024."
         }
       ],
-      "plagas_criticas": [],
-      "enfermedades_criticas": [],
+      "epoca_optima_remocion": "Temporada seca (diciembre-febrero altiplano; junio-agosto Nariño) ANTES de floración (para evitar dispersión de semillas). Evitar corte en floración o fructificación.",
+      "especies_nativas_sustitutas": [
+        "alnus_acuminata",
+        "escallonia_paniculata",
+        "weinmannia_tomentosa",
+        "miconia_squamulosa",
+        "sambucus_peruviana"
+      ],
+      "manejo_biomasa_extraida": "incineracion_controlada",
+      "_nota_manejo_biomasa": "Compostaje NO recomendado: semillas sobreviven temperaturas de compost doméstico. Incineración controlada en sitio autorizado o disposición en relleno sanitario con trituración previa. NUNCA dispersar en bosque o páramo.",
+      "riesgo_rebrote": "altisimo",
+      "protocolo_post_remocion": "Restauración activa obligatoria: siembra de especies nativas sustitutas en densidad 1100 ind/ha al siguiente semestre lluvioso. Monitoreo de rebrote semestral por 5 años. Corte inmediato de cualquier rebrote antes de 50cm altura.",
+      "foto_referencia_sugerida": "https://commons.wikimedia.org/wiki/Category:Ulex_europaeus",
       "prompts_ia_externa": {
-        "plan_restauracion": "Actúa como ecólogo de restauración de bosque alto andino colombiano.\nÁrea: {AREA_HA} ha a {ALTITUD} msnm en {MUNICIPIO}, pendiente {PENDIENTE}%, suelo degradado por {HISTORIAL_USO}. Quiero restaurar con Alnus acuminata como especie nodriza asociada a {ESPECIES_OBJETIVO}.\n\nDiseña: (a) marco de plantación y espaciamiento, (b) secuencia de establecimiento por fases (pioneras 1-3 años, secundarias 3-8 años, climácicas 8+ años), (c) protocolo de protección contra ganado, (d) indicadores de éxito de restauración a 1, 3, 5 años."
+        "plan_remocion": "Actúa como ecólogo de restauración colombiano.\nÁrea: {AREA_HA} ha invadida por Ulex europaeus en {MUNICIPIO} a {ALTITUD} msnm, densidad de matorral {DENSIDAD} (disperso/moderado/denso/muy_denso), pendiente {PENDIENTE}%, sin/con historia reciente de fuego.\n\nDiseña plan de 5 años: (a) método de extracción por zona, (b) disposición de biomasa, (c) especies nativas sustitutas con densidades, (d) calendario de monitoreo y control de rebrotes, (e) indicadores de éxito año 1, 3, 5."
       },
-      "rol_ecologico": "Especie nodriza clave en restauración de bosque alto andino. Fija nitrógeno simbiótico con actinomiceto Frankia alni. Hojas ricas en N mejoran el mantillo. Madera usada tradicionalmente para herramientas, construcciones rurales y leña. Corteza con taninos para curtiembre.",
-      "valor_pedagogico": "Enseña fijación simbiótica de N (con actinomiceto, no rizobio); rol de especies nodrizas en restauración; sistemas silvopastoriles andinos.",
-      "saber_origen": {
-        "pueblo": "Pueblos andinos (uso generalizado Muisca, Pasto, Inga)",
-        "region": "Andes colombianos 1800-3600 msnm",
-        "practica_original": "Uso en linderos tradicionales de aynokas, sombra para ganado, leña, reparación de taludes ribereños. Asociación con cultivos de frío (papa, maíz de altura, haba).",
-        "validacion_cientifica_source_ids": [
-          "ciat-1995-alnus",
-          "agrosavia-silvopastoriles"
-        ]
-      },
-      "nota_conservacion": null,
-      "confidence_notes": "Especie nativa andina ampliamente documentada. Datos consolidados.",
-      "sources_ids": [
-        "ciat-1995-alnus",
-        "agrosavia-silvopastoriles",
-        "humboldt-flora-alto-andina"
+      "referencias_cientificas": [
+        "Ocampo-Zuleta, K. & Solorza-Bejarano, J. 2017. Banco de semillas de retamo espinoso en bosque altoandino. Biota Colombiana 18(supl 1): 89-98",
+        "Calderón-Sáenz 2003. Las especies invasoras en Colombia (diez peores)",
+        "Mongabay Colombia 2024. Retamo espinoso y áreas quemadas",
+        "CAR Cundinamarca 2019. Protocolo prevención manejo control Ulex europaeus y Genista monspessulana",
+        "Fundación Natura 2024. Experiencia piloto control retamo espinoso en Guasca"
       ],
-      "harvest_type": "biomasa",
-      "validation_level": "operator_reviewed"
+      "validation_level": "operator_reviewed",
+      "source_ids": [
+        "ocampo-solorza-2017",
+        "car-cundi-2019",
+        "res-684-2018-mads",
+        "mongabay-retamo-2024"
+      ]
     },
     {
       "id": "urtica_dioica",
@@ -853,559 +1217,12 @@
       },
       "nota_conservacion": null,
       "confidence_notes": "ATENCIÓN: confirmar taxonomía (U. dioica vs U. leptophylla vs U. urens) con agrónomo/botánico antes de distribuir. Los umbrales dados aplican a U. dioica sensu lato; pueden variar para especies nativas andinas.",
-      "sources_ids": [
+      "harvest_type": "hoja",
+      "validation_level": "operator_reviewed",
+      "source_ids": [
         "restrepo-1996-abc-agricultura-organica",
         "pamplona-roger-2006-plantas-medicinales"
-      ],
-      "harvest_type": "hoja",
-      "validation_level": "operator_reviewed"
-    },
-    {
-      "id": "ulex_europaeus",
-      "_curation_status": "VALIDADO con fuentes Humboldt, CAR Cundinamarca, Fundación Natura, Mongabay",
-      "nombre_comun": "Retamo espinoso",
-      "nombre_comunes_regionales": [
-        "retamo",
-        "retamo amarillo"
-      ],
-      "nombre_cientifico": "Ulex europaeus L.",
-      "autor_ano": "Linnaeus, 1753",
-      "publicacion_original": "Species Plantarum 2: 741. 1753",
-      "familia_botanica": "Fabaceae",
-      "category": "especies_invasoras",
-      "thermal_zones": [
-        "templado",
-        "frio",
-        "paramo"
-      ],
-      "estrato": "medio",
-      "roles_in_guild": [
-        "invasive"
-      ],
-      "cultivable": false,
-      "conservation_status": "invasor",
-      "habito": "arbusto espinoso 1-3m",
-      "origen": "Europa occidental (Islas Británicas a Iberia)",
-      "clasificacion_uicn": "Entre las 100 peores especies invasoras del mundo (ISSG/UICN)",
-      "normativa_colombiana": [
-        {
-          "norma": "Resolución 684 de 2018 del Ministerio de Ambiente y Desarrollo Sostenible",
-          "alcance": "Lineamientos nacionales para prevención, manejo integral y restauración de áreas afectadas por U. europaeus y Genista monspessulana"
-        },
-        {
-          "norma": "Resolución 7615 de 2009 Secretaría Distrital de Ambiente de Bogotá",
-          "alcance": "Prohíbe uso de retamo espinoso en Distrito Capital"
-        },
-        {
-          "norma": "Protocolo CAR Cundinamarca 2019",
-          "alcance": "Prevención, manejo y control de U. europaeus y Genista monspessulana en jurisdicción CAR"
-        }
-      ],
-      "altitud_msnm": {
-        "min_absoluto": 2000,
-        "optimo_min": 2300,
-        "optimo_max": 3200,
-        "max_absoluto": 3500
-      },
-      "impacto_ecologico": "alto",
-      "ecosistemas_afectados": [
-        "bosque_alto_andino",
-        "subparamo",
-        "paramo",
-        "bordes_de_via",
-        "areas_quemadas"
-      ],
-      "mecanismos_invasion": [
-        "Germinación post-fuego masiva (semillas resisten altas temperaturas)",
-        "Banco de semillas persistente hasta 30-40 años en suelo",
-        "Densidad de banco de semillas 109-3.384 semillas/m2 en bordes de matorral (Ocampo-Zuleta & Solorza-Bejarano 2017)",
-        "Reproducción sexual + rebrote vegetativo desde tallos cortados",
-        "Crecimiento rápido (hasta 1m/año) forma matorrales densos que excluyen nativas",
-        "Fijación de N altera composición química del suelo, favoreciendo otras exóticas"
-      ],
-      "metodos_extraccion": [
-        {
-          "metodo": "desenraice_completo",
-          "efectividad": "alta",
-          "costo": "alto",
-          "notas": "Método preferido; requiere extraer TODO el sistema radical para evitar rebrote. Después de quemas el suelo queda blando y facilita extracción manual."
-        },
-        {
-          "metodo": "corte_bajo_repetido",
-          "efectividad": "media",
-          "costo": "medio",
-          "notas": "Corte a ras de suelo cada 3-4 meses por 2-3 años; agota reservas; NO funciona solo (rebrote garantizado)"
-        },
-        {
-          "metodo": "solarizacion",
-          "efectividad": "baja",
-          "costo": "medio",
-          "notas": "Solo efectiva en plántulas; semillas profundas resisten"
-        },
-        {
-          "metodo": "fuego_controlado",
-          "efectividad": "NEGATIVA",
-          "costo": "bajo",
-          "notas": "PROHIBIDO: el fuego detona germinación masiva del banco de semillas y empeora la invasión. Evidencia Mongabay 2024."
-        }
-      ],
-      "epoca_optima_remocion": "Temporada seca (diciembre-febrero altiplano; junio-agosto Nariño) ANTES de floración (para evitar dispersión de semillas). Evitar corte en floración o fructificación.",
-      "especies_nativas_sustitutas": [
-        "alnus_acuminata",
-        "escallonia_paniculata",
-        "weinmannia_tomentosa",
-        "miconia_squamulosa",
-        "sambucus_peruviana"
-      ],
-      "manejo_biomasa_extraida": "incineracion_controlada",
-      "_nota_manejo_biomasa": "Compostaje NO recomendado: semillas sobreviven temperaturas de compost doméstico. Incineración controlada en sitio autorizado o disposición en relleno sanitario con trituración previa. NUNCA dispersar en bosque o páramo.",
-      "riesgo_rebrote": "altisimo",
-      "protocolo_post_remocion": "Restauración activa obligatoria: siembra de especies nativas sustitutas en densidad 1100 ind/ha al siguiente semestre lluvioso. Monitoreo de rebrote semestral por 5 años. Corte inmediato de cualquier rebrote antes de 50cm altura.",
-      "foto_referencia_sugerida": "https://commons.wikimedia.org/wiki/Category:Ulex_europaeus",
-      "prompts_ia_externa": {
-        "plan_remocion": "Actúa como ecólogo de restauración colombiano.\nÁrea: {AREA_HA} ha invadida por Ulex europaeus en {MUNICIPIO} a {ALTITUD} msnm, densidad de matorral {DENSIDAD} (disperso/moderado/denso/muy_denso), pendiente {PENDIENTE}%, sin/con historia reciente de fuego.\n\nDiseña plan de 5 años: (a) método de extracción por zona, (b) disposición de biomasa, (c) especies nativas sustitutas con densidades, (d) calendario de monitoreo y control de rebrotes, (e) indicadores de éxito año 1, 3, 5."
-      },
-      "referencias_cientificas": [
-        "Ocampo-Zuleta, K. & Solorza-Bejarano, J. 2017. Banco de semillas de retamo espinoso en bosque altoandino. Biota Colombiana 18(supl 1): 89-98",
-        "Calderón-Sáenz 2003. Las especies invasoras en Colombia (diez peores)",
-        "Mongabay Colombia 2024. Retamo espinoso y áreas quemadas",
-        "CAR Cundinamarca 2019. Protocolo prevención manejo control Ulex europaeus y Genista monspessulana",
-        "Fundación Natura 2024. Experiencia piloto control retamo espinoso en Guasca"
-      ],
-      "sources_ids": [
-        "ocampo-solorza-2017",
-        "car-cundi-2019",
-        "res-684-2018-mads",
-        "mongabay-retamo-2024"
-      ],
-      "validation_level": "operator_reviewed"
-    },
-    {
-      "id": "cenchrus_clandestinus",
-      "_curation_status": "VALIDADO; nombre taxonómico actualizado (previamente Pennisetum clandestinum)",
-      "nombre_comun": "Kikuyo",
-      "nombre_comunes_regionales": [
-        "kikuyo",
-        "cundo",
-        "pasto kikuyo",
-        "pasto africano"
-      ],
-      "nombre_cientifico": "Cenchrus clandestinus (Hochst. ex Chiov.) Morrone",
-      "_nombre_cientifico_anterior": "Pennisetum clandestinum Hochst. ex Chiov., 1903",
-      "autor_ano": "Hochst. ex Chiov. 1903 → reubicado en Cenchrus por Morrone 2010",
-      "familia_botanica": "Poaceae",
-      "category": "especies_invasoras",
-      "thermal_zones": [
-        "frio",
-        "paramo"
-      ],
-      "estrato": "bajo",
-      "roles_in_guild": [
-        "invasive",
-        "ground_cover"
-      ],
-      "cultivable": false,
-      "_nota_cultivable": "PARADOJA COLOMBIANA: es la gramínea forrajera más importante del trópico alto (>2200 msnm) para ganadería de leche. Simultáneamente es invasora crítica en páramos y bosques altoandinos. Uso legal en potreros, prohibido/indeseable en áreas de restauración y delimitación de páramo (Ley 1930/2018).",
-      "conservation_status": "invasor",
-      "habito": "gramínea perenne postrada con estolones y rizomas agresivos",
-      "origen": "África oriental (altiplanos Kenia, Etiopía, Uganda, Rwanda, Tanzania, Zaire)",
-      "altitud_msnm": {
-        "min_absoluto": 1800,
-        "optimo_min": 2200,
-        "optimo_max": 3200,
-        "max_absoluto": 3600
-      },
-      "impacto_ecologico": "alto (en páramo) / uso forrajero (en potreros bajo manejo)",
-      "ecosistemas_afectados": [
-        "paramo",
-        "subparamo",
-        "bosque_alto_andino",
-        "humedales_altoandinos"
-      ],
-      "mecanismos_invasion": [
-        "Estolones rápidos forman matas densas que excluyen nativas",
-        "Rizomas penetran suelo y son difíciles de extraer",
-        "Semillas viables hasta 10 años en el suelo",
-        "Dispersión vía tubo digestivo del ganado",
-        "Responde a fertilización nitrogenada (de origen natural o agropecuario)",
-        "Desplaza a Calamagrostis effusa y otros pastizales nativos de páramo"
-      ],
-      "metodos_extraccion": [
-        {
-          "metodo": "desenraice_completo",
-          "efectividad": "alta",
-          "costo": "alto",
-          "notas": "Requiere extraer estolones y rizomas completos; suelos pedregosos dificultan. Herramienta: azadón de péndulo."
-        },
-        {
-          "metodo": "solarizacion",
-          "efectividad": "media",
-          "costo": "medio",
-          "notas": "6-8 semanas bajo plástico negro en temporada seca; efectivo en parches pequeños"
-        },
-        {
-          "metodo": "corte_bajo_repetido",
-          "efectividad": "baja",
-          "costo": "bajo",
-          "notas": "NO suficiente por sí solo; requiere acompañamiento de siembra de nativas"
-        }
-      ],
-      "epoca_optima_remocion": "Temporada seca, antes de floración y semillación",
-      "especies_nativas_sustitutas": [
-        "calamagrostis_effusa",
-        "festuca_sp_paramo",
-        "agrostis_foliata"
-      ],
-      "manejo_biomasa_extraida": "compostaje en condiciones termófilas >60°C por >3 semanas (destruye semillas) O incineracion_controlada",
-      "riesgo_rebrote": "alto",
-      "foto_referencia_sugerida": "https://commons.wikimedia.org/wiki/Category:Cenchrus_clandestinus",
-      "referencias_cientificas": [
-        "Correa, Pabón & Carulla 2008. Valor nutricional del kikuyo. Livestock Research for Rural Development 20(59)",
-        "Mila & Corredor 2004. Evolución composición botánica pradera kikuyo. Corpoica 5(1): 70-75",
-        "Portillo et al. 2019. Evaluación forrajeras Nariño. AGROSAVIA"
-      ],
-      "sources_ids": [
-        "correa-pabon-carulla-2008",
-        "agrosavia-forrajeras-2022"
-      ],
-      "validation_level": "operator_reviewed"
-    },
-    {
-      "id": "thunbergia_alata",
-      "_curation_status": "CURACIÓN BÁSICA; datos de invasividad en Colombia confirmados; protocolo de manejo requiere fuente primaria específica",
-      "nombre_comun": "Ojo de poeta",
-      "nombre_comunes_regionales": [
-        "ojo de poeta",
-        "susan de ojos negros",
-        "trinitaria"
-      ],
-      "nombre_cientifico": "Thunbergia alata Bojer ex Sims",
-      "autor_ano": "Bojer ex Sims, 1825",
-      "familia_botanica": "Acanthaceae",
-      "category": "especies_invasoras",
-      "thermal_zones": [
-        "templado",
-        "frio"
-      ],
-      "estrato": "bajo",
-      "roles_in_guild": [
-        "invasive"
-      ],
-      "cultivable": false,
-      "_nota_cultivable": "Introducida y usada como ornamental en muchas ciudades andinas; se ha escapado a ambientes naturales y es invasora en bosque alto andino y borde de subpáramo.",
-      "conservation_status": "invasor",
-      "origen": "África oriental y austral",
-      "habito": "trepadora herbácea perenne 2-8m",
-      "altitud_msnm": {
-        "min_absoluto": 1500,
-        "optimo_min": 2000,
-        "optimo_max": 3000,
-        "max_absoluto": 3300
-      },
-      "impacto_ecologico": "alto",
-      "ecosistemas_afectados": [
-        "bosque_alto_andino",
-        "subparamo",
-        "bordes_bosque_niebla",
-        "cercos_vivos_urbanos"
-      ],
-      "mecanismos_invasion": [
-        "Crecimiento trepador rápido que cubre y asfixia vegetación nativa",
-        "Producción masiva de semillas",
-        "Dispersión por aves (endozoocoria)",
-        "Regeneración vegetativa por trozos de tallo",
-        "Asfixia de sotobosque al formar dosel denso"
-      ],
-      "metodos_extraccion": [
-        {
-          "metodo": "desenraice_completo",
-          "efectividad": "alta",
-          "costo": "medio"
-        },
-        {
-          "metodo": "corte_bajo_repetido",
-          "efectividad": "media",
-          "costo": "bajo",
-          "notas": "Debe combinarse con extracción de raíz para evitar rebrote"
-        }
-      ],
-      "epoca_optima_remocion": "Antes de floración (temporada seca local)",
-      "especies_nativas_sustitutas_trepadoras": [
-        "passiflora_tripartita_mollissima_NATIVA",
-        "bomarea_sp"
-      ],
-      "manejo_biomasa_extraida": "compostaje_termofilico O incineracion_controlada",
-      "riesgo_rebrote": "alto",
-      "foto_referencia_sugerida": "https://commons.wikimedia.org/wiki/Category:Thunbergia_alata",
-      "sources_ids": [
-        "humboldt-invasoras-andes"
-      ],
-      "validation_level": "operator_reviewed",
-      "especies_nativas_sustitutas": [
-        "espeletia_grandiflora",
-        "weinmannia_tomentosa",
-        "vaccinium_meridionale"
       ]
-    },
-    {
-      "id": "pteridium_aquilinum",
-      "_curation_status": "CURACIÓN BÁSICA",
-      "nombre_comun": "Helecho marranero",
-      "nombre_comunes_regionales": [
-        "helecho marranero",
-        "helecho águila",
-        "helecho común"
-      ],
-      "nombre_cientifico": "Pteridium aquilinum (L.) Kuhn",
-      "autor_ano": "Kuhn, 1879 (combinación); L. 1753 como Pteris aquilina",
-      "familia_botanica": "Dennstaedtiaceae",
-      "category": "especies_invasoras",
-      "thermal_zones": [
-        "templado",
-        "frio",
-        "paramo"
-      ],
-      "estrato": "bajo",
-      "roles_in_guild": [
-        "invasive"
-      ],
-      "cultivable": false,
-      "conservation_status": "invasor",
-      "_nota_conservacion": "Especie con distribución cosmopolita; en Colombia se comporta como invasor agresivo post-disturbio. Tóxica para ganado y potencialmente cancerígena (ptaquiloside).",
-      "habito": "helecho rizomatoso 0.5-2m",
-      "altitud_msnm": {
-        "min_absoluto": 0,
-        "optimo_min": 1500,
-        "optimo_max": 3500,
-        "max_absoluto": 4000
-      },
-      "impacto_ecologico": "alto",
-      "ecosistemas_afectados": [
-        "bosque_alto_andino",
-        "subparamo",
-        "paramo_intervenido",
-        "potreros_degradados",
-        "cicatrices_fuego"
-      ],
-      "mecanismos_invasion": [
-        "Rizomas profundos (hasta 1m) y extensos resistentes a remoción",
-        "Producción masiva de esporas con dispersión eólica de larga distancia",
-        "Alelopatía inhibe germinación de nativas",
-        "Tolerancia al fuego; rebrota desde rizoma",
-        "Compuestos tóxicos (ptaquiloside, tiaminasa) desalientan herbivoría"
-      ],
-      "metodos_extraccion": [
-        {
-          "metodo": "desenraice_completo",
-          "efectividad": "media",
-          "costo": "alto",
-          "notas": "Rizomas profundos y extensos dificultan extracción total"
-        },
-        {
-          "metodo": "corte_bajo_repetido",
-          "efectividad": "alta",
-          "costo": "medio",
-          "notas": "Corte mensual durante 2-3 temporadas agota reservas del rizoma"
-        },
-        {
-          "metodo": "sombra_forzada",
-          "efectividad": "alta",
-          "costo": "alto",
-          "notas": "Plantación de especies arbóreas nativas que den sombra densa; el helecho es intolerante a sombra"
-        }
-      ],
-      "epoca_optima_remocion": "Previo a formación de frondes maduras (temporada lluviosa temprana)",
-      "especies_nativas_sustitutas": [
-        "alnus_acuminata",
-        "weinmannia_tomentosa",
-        "miconia_squamulosa"
-      ],
-      "manejo_biomasa_extraida": "incineracion_controlada O entierro_profundo",
-      "_nota_manejo": "Evitar contacto prolongado sin protección (esporas potencialmente cancerígenas). No usar como forraje ni cama para ganado.",
-      "riesgo_rebrote": "muy_alto",
-      "foto_referencia_sugerida": "https://commons.wikimedia.org/wiki/Category:Pteridium_aquilinum",
-      "sources_ids": [
-        "flora-colombia-pteridophyta"
-      ],
-      "validation_level": "operator_reviewed"
-    },
-    {
-      "_curation_status": "BORRADOR_IA",
-      "id": "weinmannia_tomentosa",
-      "nombre_comun": "Encenillo",
-      "nombre_cientifico": "Weinmannia tomentosa L.f.",
-      "familia_botanica": "Cunoniaceae",
-      "category": "abonos_verdes_coberturas",
-      "thermal_zones": [
-        "frio",
-        "paramo"
-      ],
-      "estrato": "alto",
-      "roles_in_guild": [
-        "nurse_plant",
-        "biomass_producer"
-      ],
-      "cultivable": true,
-      "conservation_status": "nativo_silvestre",
-      "altitud_msnm": {
-        "min_absoluto": 2400,
-        "optimo_min": 2800,
-        "optimo_max": 3400,
-        "max_absoluto": 3800
-      },
-      "sources_ids": [
-        "humboldt-flora-alto-andina"
-      ],
-      "validation_level": "claude_draft",
-      "harvest_type": "biomasa"
-    },
-    {
-      "_curation_status": "BORRADOR_IA",
-      "id": "espeletia_grandiflora",
-      "nombre_comun": "Frailejón grande",
-      "nombre_cientifico": "Espeletia grandiflora Humb. & Bonpl.",
-      "familia_botanica": "Asteraceae",
-      "category": "arboles_sombra",
-      "thermal_zones": [
-        "paramo"
-      ],
-      "estrato": "medio",
-      "roles_in_guild": [
-        "nurse_plant",
-        "biomass_producer"
-      ],
-      "cultivable": true,
-      "conservation_status": "nativo_silvestre",
-      "altitud_msnm": {
-        "min_absoluto": 3200,
-        "optimo_min": 3400,
-        "optimo_max": 4000,
-        "max_absoluto": 4200
-      },
-      "sources_ids": [
-        "humboldt-2016-frailejones"
-      ],
-      "validation_level": "claude_draft",
-      "harvest_type": "biomasa"
-    },
-    {
-      "_curation_status": "BORRADOR_IA",
-      "id": "vaccinium_meridionale",
-      "nombre_comun": "Agraz andino",
-      "nombre_cientifico": "Vaccinium meridionale Swartz",
-      "familia_botanica": "Ericaceae",
-      "category": "frutales_perennes",
-      "thermal_zones": [
-        "frio",
-        "paramo"
-      ],
-      "estrato": "bajo",
-      "roles_in_guild": [
-        "understorey_crop",
-        "pollinator_attractor"
-      ],
-      "cultivable": true,
-      "conservation_status": "nativo_silvestre",
-      "altitud_msnm": {
-        "min_absoluto": 2500,
-        "optimo_min": 2800,
-        "optimo_max": 3500,
-        "max_absoluto": 3800
-      },
-      "sources_ids": [
-        "humboldt-flora-alto-andina"
-      ],
-      "validation_level": "claude_draft",
-      "harvest_type": "fruto"
-    },
-    {
-      "_curation_status": "BORRADOR_IA",
-      "id": "miconia_squamulosa",
-      "nombre_comun": "Tuno esmeraldo",
-      "nombre_cientifico": "Miconia squamulosa (Sm.) Triana",
-      "familia_botanica": "Melastomataceae",
-      "category": "arboles_sombra",
-      "thermal_zones": [
-        "templado",
-        "frio"
-      ],
-      "estrato": "medio",
-      "roles_in_guild": [
-        "nurse_plant",
-        "biomass_producer"
-      ],
-      "cultivable": true,
-      "conservation_status": "nativo_silvestre",
-      "altitud_msnm": {
-        "min_absoluto": 1800,
-        "optimo_min": 2200,
-        "optimo_max": 3200,
-        "max_absoluto": 3400
-      },
-      "sources_ids": [
-        "humboldt-flora-alto-andina"
-      ],
-      "validation_level": "claude_draft",
-      "harvest_type": "biomasa"
-    },
-    {
-      "_curation_status": "BORRADOR_IA",
-      "id": "escallonia_paniculata",
-      "nombre_comun": "Rodamonte",
-      "nombre_cientifico": "Escallonia paniculata (Ruiz & Pav.) Roem. & Schult.",
-      "familia_botanica": "Escalloniaceae",
-      "category": "abonos_verdes_coberturas",
-      "thermal_zones": [
-        "frio",
-        "paramo"
-      ],
-      "estrato": "medio",
-      "roles_in_guild": [
-        "living_fence",
-        "nurse_plant"
-      ],
-      "cultivable": true,
-      "conservation_status": "nativo_silvestre",
-      "altitud_msnm": {
-        "min_absoluto": 2400,
-        "optimo_min": 2800,
-        "optimo_max": 3500,
-        "max_absoluto": 3800
-      },
-      "sources_ids": [
-        "humboldt-flora-alto-andina"
-      ],
-      "validation_level": "claude_draft",
-      "harvest_type": "biomasa"
-    },
-    {
-      "_curation_status": "BORRADOR_IA",
-      "id": "calamagrostis_effusa",
-      "nombre_comun": "Paja de páramo",
-      "nombre_cientifico": "Calamagrostis effusa (Kunth) Steud.",
-      "familia_botanica": "Poaceae",
-      "category": "abonos_verdes_coberturas",
-      "thermal_zones": [
-        "paramo"
-      ],
-      "estrato": "bajo",
-      "roles_in_guild": [
-        "ground_cover",
-        "erosion_control"
-      ],
-      "cultivable": true,
-      "conservation_status": "nativo_silvestre",
-      "altitud_msnm": {
-        "min_absoluto": 3000,
-        "optimo_min": 3400,
-        "optimo_max": 4200,
-        "max_absoluto": 4600
-      },
-      "sources_ids": [
-        "humboldt-flora-alto-andina"
-      ],
-      "validation_level": "claude_draft",
-      "harvest_type": "biomasa"
     }
   ],
   "biopreparados": [

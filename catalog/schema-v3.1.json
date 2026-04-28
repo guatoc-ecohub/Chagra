@@ -38,7 +38,7 @@
         "cultivable",
         "conservation_status",
         "altitud_msnm",
-        "sources_ids"
+        "source_ids"
       ],
       "properties": {
         "_curation_status": {
@@ -86,8 +86,8 @@
         },
         "estrato": {
           "type": "string",
-          "enum": ["emergente", "alto", "medio", "bajo"],
-          "description": "Obligatorio en frutales_perennes/abonos_verdes_coberturas/cercas_vivas; opcional en anuales/herbáceas. Regla AMB-04 aplicada por scripts/validate-catalog.mjs."
+          "enum": ["emergente", "alto", "medio", "bajo", "rastrero"],
+          "description": "Obligatorio en frutales_perennes/abonos_verdes_coberturas/cercas_vivas; opcional en anuales/herbáceas. AMB-05: 'rastrero' para anuales <20cm (cobertura, mulching vivo). Regla aplicada por scripts/validate-catalog.mjs."
         },
         "roles_in_guild": {
           "type": "array",
@@ -352,11 +352,11 @@
         },
         "nota_conservacion": { "type": ["string", "null"] },
         "confidence_notes": { "type": "string" },
-        "sources_ids": {
+        "source_ids": {
           "type": "array",
           "items": { "type": "string" },
           "minItems": 1,
-          "description": "Refs a sources[].id — obligatorio al menos una (AMB-16). CI valida que todos existan."
+          "description": "Refs a sources[].id — obligatorio al menos una (AMB-11 master plan §3). CI valida que todos existan en sources-seed.json."
         },
         "especies_nativas_sustitutas": {
           "type": "array",
