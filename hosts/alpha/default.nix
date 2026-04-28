@@ -296,6 +296,13 @@
     enable = true;
   };
 
+  # --- CLAUDE CODE RUNNER: agente autónomo de code-gen para repo público Chagra ---
+  # Provisionado en modules/ai/claude-code-runner.nix (PR #29).
+  # Aislado en user `claude-runner`; secrets vía SOPS (claude-code-anthropic-key
+  # + github-runner-claude-token). Workflow disparador en Chagra/.github/workflows/
+  # claude-code-generate.yml, label `ready-to-generate` (gate humano obligatorio).
+  guatoc.ai.claudeCodeRunner.enable = true;
+
   # --- OPENFANG v0.5.9: Agent OS (Telegram → LLM con fallback) ---
   guatoc.ai.openfang = {
     enable = true;
