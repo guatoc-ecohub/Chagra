@@ -86,7 +86,8 @@
         "petroselinum_crispum"
       ],
       "antagonists": [
-        "beta_vulgaris_conditiva"
+        "beta_vulgaris_conditiva",
+        "phaseolus_vulgaris"
       ],
       "propagation": {
         "methods": [
@@ -170,7 +171,8 @@
         "rosmarinus_officinalis"
       ],
       "antagonists": [
-        "beta_vulgaris_conditiva"
+        "beta_vulgaris_conditiva",
+        "phaseolus_vulgaris"
       ],
       "propagation": {
         "methods": [
@@ -248,6 +250,7 @@
       "drenaje_requerido": "bueno_a_moderado",
       "companions": [
         "coffea_arabica",
+        "erythrina_edulis",
         "lupinus_mutabilis",
         "passiflora_tripartita_mollissima",
         "pennisetum_clandestinum_manejado",
@@ -1417,7 +1420,8 @@
         "notas": "Altamente sensible a heladas; las bajas temperaturas afectan la calidad del grano."
       },
       "companions": [
-        "alnus_acuminata"
+        "alnus_acuminata",
+        "erythrina_edulis"
       ],
       "antagonists": [
         "foeniculum_vulgare"
@@ -1526,6 +1530,88 @@
       "validation_level": "claude_draft"
     },
     {
+      "id": "erythrina_edulis",
+      "nombre_comun": "Chachafruto / Balú",
+      "nombre_cientifico": "Erythrina edulis Triana ex Micheli",
+      "nombre_comunes_regionales": [
+        "Poroto andino",
+        "Fríjol de árbol",
+        "Pajuro"
+      ],
+      "familia_botanica": "Fabaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer",
+        "nurse_plant",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 120,
+      "estrato": "alto",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1600,
+        "optimo_max": 2400,
+        "max_absoluto": 2700
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 14,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "ph_suelo": {
+        "min": 5.0,
+        "optimo_min": 5.5,
+        "optimo_max": 7.0,
+        "max": 8.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": 0,
+        "horas_acumuladas_max": 4,
+        "notas": "Tolerancia moderada; los brotes jóvenes pueden verse afectados por heladas nocturnas."
+      },
+      "companions": [
+        "alnus_acuminata",
+        "coffea_arabica"
+      ],
+      "antagonists": [
+        "ulex_europaeus"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Germina rápidamente; el esqueje se usa principalmente para cercas vivas."
+      },
+      "valor_pedagogico": "Lección de seguridad alimentaria: árbol multi-servicio que provee proteína vegetal de alta calidad en zonas de ladera.",
+      "plagas_criticas": [
+        "Scolytidae",
+        "Cerotoma spp."
+      ],
+      "enfermedades_criticas": [
+        "Antracnosis foliar"
+      ],
+      "source_ids": [
+        "agrosavia-manual-chachafruto-2015",
+        "humboldt-flora-alto-andina",
+        "gbif-taxonomic-backbone"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
       "id": "foeniculum_vulgare",
       "nombre_comun": "Hinojo",
       "nombre_cientifico": "Foeniculum vulgare Mill.",
@@ -1588,12 +1674,14 @@
         "lactuca_sativa_roble_morada",
         "lactuca_sativa_roble_verde",
         "petroselinum_crispum",
+        "phaseolus_vulgaris",
         "physalis_peruviana",
         "raphanus_sativus",
         "solanum_lycopersicum_cerasiforme",
         "solanum_lycopersicum_cerasiforme_uvalina",
         "solanum_lycopersicum_san_marzano",
-        "solanum_lycopersicum_sungold"
+        "solanum_lycopersicum_sungold",
+        "zea_mays"
       ],
       "propagation": {
         "metodo_principal": "semilla",
@@ -1751,6 +1839,7 @@
         "brassica_oleracea_capitata_rubra",
         "brassica_oleracea_sabauda",
         "fragaria_ananassa_monterrey",
+        "phaseolus_vulgaris",
         "solanum_lycopersicum_cerasiforme",
         "solanum_lycopersicum_cerasiforme_uvalina",
         "solanum_lycopersicum_san_marzano",
@@ -2731,6 +2820,90 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "phaseolus_vulgaris",
+      "nombre_comun": "Frijol arbustivo / voluble",
+      "nombre_cientifico": "Phaseolus vulgaris L.",
+      "nombre_comunes_regionales": [
+        "Frijol cargamanto",
+        "Bola roja",
+        "Frijol recal"
+      ],
+      "familia_botanica": "Fabaceae",
+      "category": "granos_legumbres",
+      "thermal_zones": [
+        "frio",
+        "templado",
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 4,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 1500,
+        "optimo_max": 2400,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 16,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6.0,
+        "optimo_max": 7.0,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": 5,
+        "horas_acumuladas_max": 0,
+        "notas": "Altamente sensible a heladas; requiere protección o siembra en épocas seguras."
+      },
+      "companions": [
+        "lactuca_sativa_capitata",
+        "zea_mays"
+      ],
+      "antagonists": [
+        "allium_ampeloprasum",
+        "allium_fistulosum",
+        "foeniculum_vulgare"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Inocular con Rhizobium para optimizar la fijación de nitrógeno."
+      },
+      "valor_pedagogico": "Lección de biología de suelo: estudio de los nódulos radiculares y la simbiosis con Rhizobium leguminosarum.",
+      "plagas_criticas": [
+        "Empoasca kraemeri",
+        "Apion godmani",
+        "Bemisia tabaci"
+      ],
+      "enfermedades_criticas": [
+        "Colletotrichum lindemuthianum (antracnosis)",
+        "Uromyces appendiculatus"
+      ],
+      "source_ids": [
+        "agrosavia-manual-biopreparados-2015",
+        "gbif-taxonomic-backbone",
+        "restrepo-1996-abc-agricultura-organica"
       ],
       "validation_level": "claude_draft"
     },
@@ -3963,7 +4136,8 @@
         "lupinus_mutabilis",
         "minthostachys_mollis",
         "urtica_dioica",
-        "vicia_faba"
+        "vicia_faba",
+        "zea_mays"
       ],
       "antagonists": [
         "cucurbita_maxima",
@@ -4497,6 +4671,9 @@
         "car-cundi-2019",
         "res-684-2018-mads",
         "mongabay-retamo-2024"
+      ],
+      "antagonists": [
+        "erythrina_edulis"
       ]
     },
     {
@@ -4902,6 +5079,89 @@
         "powo-kew"
       ],
       "validation_level": "claude_draft"
+    },
+    {
+      "id": "zea_mays",
+      "nombre_comun": "Maíz criollo",
+      "nombre_cientifico": "Zea mays L.",
+      "nombre_comunes_regionales": [
+        "Maíz capio",
+        "Maíz pira",
+        "Maíz de montaña"
+      ],
+      "familia_botanica": "Poaceae",
+      "category": "cereales",
+      "thermal_zones": [
+        "frio",
+        "templado",
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 6,
+      "estrato": "alto",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 15,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6.0,
+        "optimo_max": 7.0,
+        "max": 8.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "heladas_tolerancia": {
+        "umbral_c": 0,
+        "horas_acumuladas_max": 2,
+        "notas": "Sensible en etapas tempranas; variedades altoandinas como 'Capio' tienen mejor comportamiento ante el frío."
+      },
+      "companions": [
+        "phaseolus_vulgaris",
+        "solanum_phureja"
+      ],
+      "antagonists": [
+        "foeniculum_vulgare"
+      ],
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla sexual",
+        "notas": "Siembra directa en sitio definitivo."
+      },
+      "notas_taxonomicas": "Las razas locales colombianas como 'Capio' (blanco harinoso), 'Cusco' (morado) y 'Pira' son fundamentales para la soberanía alimentaria de la zona altoandina. El sistema Milpa integra maíz con frijol y calabaza.",
+      "valor_pedagogico": "Lección de Milpa: enseña el sistema de 'las tres hermanas' y la importancia de la diversidad genética en razas criollas.",
+      "plagas_criticas": [
+        "Spodoptera frugiperda (cogollero)",
+        "Helicoverpa zea",
+        "Diabrotica balteata"
+      ],
+      "enfermedades_criticas": [
+        "Puccinia sorghi (roya)",
+        "Fusarium spp."
+      ],
+      "source_ids": [
+        "agrosavia-manual-biopreparados-2015",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "validation_level": "claude_draft"
     }
   ],
   "biopreparados": [
@@ -5273,6 +5533,14 @@
       "autores": "AGROSAVIA",
       "año": 2015,
       "titulo": "Manual de biopreparados para la agricultura colombiana",
+      "institucion": "AGROSAVIA"
+    },
+    {
+      "id": "agrosavia-manual-chachafruto-2015",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": 2015,
+      "titulo": "Manual técnico para el cultivo de chachafruto (Erythrina edulis) en sistemas agroforestales andinos",
       "institucion": "AGROSAVIA"
     },
     {
