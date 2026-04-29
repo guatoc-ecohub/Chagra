@@ -14,7 +14,7 @@ thermal_zones:
 roles_in_guild:
   - crop
   - nitrogen_fixer
-  - shade_provider
+  - nurse_plant
   - biomass_producer
 cultivable: true
 conservation_status: cultivo_comun
@@ -49,10 +49,7 @@ companions:
 antagonists:
   - ulex_europaeus
 propagation:
-  methods:
-    - semilla
-    - esqueje
-  best_method: semilla sexual
+  metodo_principal: semilla
   notas: Germina rápidamente; el esqueje se usa principalmente para cercas vivas.
 valor_pedagogico: Lección de seguridad alimentaria: árbol multi-servicio que provee proteína vegetal de alta calidad en zonas de ladera.
 plagas_criticas:

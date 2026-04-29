@@ -50,9 +50,7 @@ antagonists:
   - allium_ampeloprasum
   - allium_fistulosum
 propagation:
-  methods:
-    - semilla
-  best_method: semilla sexual
+  metodo_principal: semilla
   notas: Inocular con Rhizobium para optimizar la fijación de nitrógeno.
 valor_pedagogico: Lección de biología de suelo: estudio de los nódulos radiculares y la simbiosis con Rhizobium leguminosarum.
 plagas_criticas:

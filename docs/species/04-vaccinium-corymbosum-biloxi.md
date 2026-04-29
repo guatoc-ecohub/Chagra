@@ -5,7 +5,7 @@ nombre_cientifico: Vaccinium corymbosum 'Biloxi'
 nombre_comunes_regionales:
   - Blueberry Biloxi
 familia_botanica: Ericaceae
-category: frutales_arbustivos
+category: frutales_perennes
 thermal_zones:
   - templado
   - frio
@@ -47,10 +47,7 @@ antagonists:
   - brassica_oleracea_sabauda
   - brassica_oleracea_capitata_rubra
 propagation:
-  methods:
-    - esqueje
-    - micropropagacion
-  best_method: esqueje semileñoso
+  metodo_principal: esqueje
   notas: Suelo debe ser muy ácido y rico en materia orgánica leñosa.
 valor_pedagogico: Lección de cultivares 'low-chill': explica cómo variedades seleccionadas florecen sin inviernos marcados.
 plagas_criticas:

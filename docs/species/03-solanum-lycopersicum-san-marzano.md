@@ -55,9 +55,7 @@ antagonists:
   - brassica_oleracea_acephala_curly
   - brassica_oleracea_acephala_red_russian
 propagation:
-  methods:
-    - semilla
-  best_method: semilla sexual
+  metodo_principal: semilla
   notas: Crecimiento determinado; cosecha concentrada en un periodo corto.
 valor_pedagogico: Lección de procesamiento: su bajo contenido de agua y pulpa densa lo hacen el estándar para conservas y salsas.
 plagas_criticas:

@@ -6,7 +6,7 @@ nombre_comunes_regionales:
   - Café Supremo (categoría comercial)
   - Café Arábigo
 familia_botanica: Rubiaceae
-category: otros
+category: medicinales_alelopaticas
 thermal_zones:
   - templado
 roles_in_guild:
@@ -43,9 +43,7 @@ companions:
 antagonists:
   - foeniculum_vulgare
 propagation:
-  methods:
-    - semilla
-  best_method: semilla sexual (chapolas)
+  metodo_principal: semilla
   notas: Requiere germinador en arena y posterior embolsado.
 valor_pedagogico: Lección de selección varietal: comparación de resistencia a Hemileia vastatrix entre variedades tradicionales y mejoradas.
 plagas_criticas:
