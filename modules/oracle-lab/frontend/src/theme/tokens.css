@@ -1,0 +1,54 @@
+/* tokens.css — paleta provisional Oracle Guatoc */
+/* TODO post identidad firmada Liliana 2026: revisar todos los tokens */
+
+:root {
+  /* Base layer — heredado del sistema oficial Guatoc */
+  --color-bg-base: #1A3A4A;        /* navy oscuro signature */
+  --color-bg-mint: #B5D9D2;        /* mint pastel signature */
+
+  /* 4to eje (provisional) — cyan oficial Live Sessions extendida */
+  --color-accent-primary: #0E92A6; /* cyan/teal oficial */
+  --color-accent-glow: #4ED4E5;    /* lightened version para glow effects */
+
+  /* Energía solar / vitalidad — verde lima oficial */
+  --color-accent-secondary: #7BB541;
+
+  /* Ejes existentes (referenciables solo si la audiencia es interna) */
+  --color-eje-tibame: #F2C94C;     /* amarillo TIBAME */
+  --color-eje-chihiza: #58C2A8;    /* mint sat CHIHIZA */
+  --color-eje-apa: #E85D2C;        /* naranja APA */
+
+  /* Estados / feedback */
+  --color-status-ok: #22c55e;
+  --color-status-warn: #f59e0b;
+  --color-status-err: #ef4444;
+  --color-status-info: var(--color-accent-primary);
+
+  /* Surfaces */
+  --color-surface: rgba(255, 255, 255, 0.05);
+  --color-surface-hover: rgba(255, 255, 255, 0.08);
+  --color-border: rgba(255, 255, 255, 0.1);
+
+  /* Type */
+  --font-display: "Inter Display", "Söhne", -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Spacing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 4rem;
+
+  /* Glassmorphism */
+  --glass-blur: 12px;
+  --glass-bg: rgba(26, 58, 74, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+  /* Animations */
+  --transition-fast: 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-medium: 240ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 480ms cubic-bezier(0.4, 0, 0.2, 1);
+}

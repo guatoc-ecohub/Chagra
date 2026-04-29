@@ -14,6 +14,7 @@
     ../../modules/agents/chagra-deploy.nix
     ../../modules/iot-energy/deye-byd-killswitch.nix
     ../../modules/ai/openai-proxy.nix
+    ../../modules/oracle-lab
   ];
 
   # Proxy local OpenAI-compat — fix bug 2026-04-26: openfang manda
@@ -167,6 +168,14 @@
         mode = "0400";
       };
 
+      # Oracle Lab dashboard MVP — naming provisional hasta DR-029
+      # Vars: AI_STATS_URL + FARMOS_BASE + FARMOS_CLIENT_ID/SECRET/USERNAME/PASSWORD
+      oracle-lab-env = {
+        owner = "oracle-lab";
+        group = "oracle-lab";
+        mode = "0440";
+      };
+
       # Z.ai API key — GLM Coding Lite Quarterly plan (endpoint coding/paas/v4)
       openfang-zai-env = {
         owner = "openfang";
@@ -289,6 +298,16 @@
     enable = true;
     enablePicoclaw = false;
     enableOpenclaw = false;
+  };
+
+  # --- ORACLE LAB DASHBOARD MVP (Tailscale-only, naming TBD via DR-029) ---
+  # Backend FastAPI :9090 con 3 collectors fase 1: ai_stats + farmos + openmeteo.
+  # Frontend HTML vanilla con dark theme + cyan glow. Path neutro hasta cierre
+  # DR-029 (HYTA / BAKATÁ / MYCELIUM).
+  services.oracle-lab = {
+    enable = true;
+    port = 9090;
+    secretsFile = config.sops.secrets.oracle-lab-env.path;
   };
 
   # --- CHAGRA CI/CD: script de deploy + webhook receiver + grupo de escritura ---

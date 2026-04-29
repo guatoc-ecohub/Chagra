@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oracle Guatoc · MVP v0.1</title>
+  <style>
+    :root {
+      --bg-base: #0a0e14;
+      --bg-card: #111824;
+      --border: #1a3a4a;
+      --fg: #e6edf3;
+      --fg-dim: #8b9cab;
+      --accent-cyan: #0E92A6;
+      --accent-glow: #4ED4E5;
+      --accent-mint: #B5D9D2;
+      --accent-lima: #7BB541;
+      --status-ok: #22c55e;
+      --status-warn: #f59e0b;
+      --status-err: #ef4444;
+      --status-info: var(--accent-cyan);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-base);
+      color: var(--fg);
+      min-height: 100vh;
+      background-image: radial-gradient(circle at 20% 0%, rgba(14, 146, 166, 0.08), transparent 60%),
+                        radial-gradient(circle at 80% 100%, rgba(123, 181, 65, 0.05), transparent 50%);
+    }
+    header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      backdrop-filter: blur(12px);
+    }
+    header h1 {
+      font-size: 1.1rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin: 0;
+      color: var(--accent-cyan);
+    }
+    header h1::before {
+      content: '⬢';
+      margin-right: 0.5rem;
+      font-size: 1.3em;
+    }
+    .stamp {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 0.75rem;
+      color: var(--fg-dim);
+    }
+    .pulse {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent-glow);
+      box-shadow: 0 0 8px var(--accent-glow);
+      animation: pulse 2s ease-in-out infinite;
+      margin-right: 0.5rem;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+    main {
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 1.5rem;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .card:hover { border-color: var(--accent-cyan); transform: translateY(-2px); }
+    .card:hover::before { opacity: 1; }
+    .card h2 {
+      margin: 0 0 1rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--fg-dim);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .badge {
+      font-size: 0.65rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+    }
+    .badge-ok { background: rgba(34, 197, 94, 0.15); color: var(--status-ok); }
+    .badge-error { background: rgba(239, 68, 68, 0.15); color: var(--status-err); }
+    .badge-no_data { background: rgba(139, 156, 171, 0.15); color: var(--fg-dim); }
+    .metric {
+      font-size: 2.4rem;
+      font-weight: 200;
+      line-height: 1;
+      margin-bottom: 0.25rem;
+      background: linear-gradient(135deg, var(--accent-mint), var(--accent-cyan));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .metric-label {
+      font-size: 0.75rem;
+      color: var(--fg-dim);
+      letter-spacing: 0.05em;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.85rem;
+    }
+    .row:last-child { border-bottom: none; }
+    .row-key { color: var(--fg-dim); }
+    .row-val { font-family: 'JetBrains Mono', ui-monospace, monospace; color: var(--fg); }
+    pre {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 0.7rem;
+      color: var(--fg-dim);
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 200px;
+      overflow: auto;
+      margin: 0;
+      padding: 0.5rem;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 6px;
+    }
+    .weather-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+    .weather-cell {
+      text-align: center;
+      padding: 0.75rem;
+      background: rgba(14, 146, 166, 0.05);
+      border-radius: 8px;
+    }
+    .weather-cell .v {
+      font-size: 1.6rem;
+      font-weight: 300;
+      color: var(--accent-mint);
+    }
+    .weather-cell .l {
+      font-size: 0.65rem;
+      color: var(--fg-dim);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    button {
+      background: transparent;
+      border: 1px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    button:hover { background: rgba(14, 146, 166, 0.1); box-shadow: 0 0 12px rgba(14, 146, 166, 0.4); }
+    .footer-note {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.7rem;
+      color: var(--fg-dim);
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Oracle · Guatoc <span style="color: var(--fg-dim); font-weight: 300;">·</span> v0.1</h1>
+    <div>
+      <span class="stamp"><span class="pulse"></span><span id="stamp">conectando…</span></span>
+      &nbsp;<button onclick="refresh()">REFRESCAR</button>
+    </div>
+  </header>
+  <main id="root">
+    <div class="card"><div style="color: var(--fg-dim);">Cargando datos en vivo…</div></div>
+  </main>
+  <div class="footer-note">
+    Naming provisional · DR-029 pending · Tailscale-only · Iteración tech-only sin identidad final firmada
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
