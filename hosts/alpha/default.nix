@@ -308,6 +308,12 @@
     enable = true;
     port = 9090;
     secretsFile = config.sops.secrets.oracle-lab-env.path;
+
+    # Hot deploy: code en path mutable + script `oracle-lab-redeploy`
+    # → git pull + systemctl restart sin nixos-rebuild (~15s vs ~5min).
+    # Setup inicial post-rebuild documentado en
+    # chagra-pro/modules/oracle-lab/docs/hot-deploy.md
+    liveReloadPath = "/var/lib/oracle-lab/code";
   };
 
   # --- CHAGRA CI/CD: script de deploy + webhook receiver + grupo de escritura ---

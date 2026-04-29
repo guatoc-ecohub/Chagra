@@ -3,15 +3,72 @@
 let
   cfg = config.services.oracle-lab;
 
-  pythonEnv = pkgs.python3.withPackages (ps: with ps; [
+  basePythonPkgs = ps: with ps; [
     fastapi
     uvicorn
     httpx
     pydantic
     websockets
-  ]);
+    matplotlib  # fase 3 — render PNG server-side
+  ];
 
-  backendDir = ./backend;
+  pythonEnv = pkgs.python3.withPackages (ps:
+    (basePythonPkgs ps) ++ lib.optional cfg.enableHotReload ps.watchfiles
+  );
+
+  # backendDir: si liveReloadPath está set, el WorkingDirectory apunta a un
+  # path mutable persistente (permite git pull + restart sin nixos-rebuild).
+  # Si está null, usa el path inmutable nix store (estable, requiere rebuild).
+  backendDir =
+    if cfg.liveReloadPath != null
+    then "${cfg.liveReloadPath}/backend"
+    else "${./backend}";
+
+  uvicornArgs = lib.concatStringsSep " " (
+    [ "server:app"
+      "--host" cfg.bindAddress
+      "--port" (toString cfg.port)
+    ]
+    ++ lib.optional cfg.enableHotReload "--reload"
+    ++ lib.optionals cfg.enableHotReload [ "--reload-dir" backendDir ]
+  );
+
+  # Script de redeploy — git pull + systemctl restart
+  redeployScript = pkgs.writeShellApplication {
+    name = "oracle-lab-redeploy";
+    runtimeInputs = [ pkgs.git pkgs.systemd pkgs.coreutils ];
+    text = ''
+      set -euo pipefail
+
+      LIVE_PATH="${if cfg.liveReloadPath != null then cfg.liveReloadPath else ""}"
+      if [ -z "$LIVE_PATH" ]; then
+        echo "✗ services.oracle-lab.liveReloadPath no está configurado." >&2
+        echo "  Para usar redeploy, configurá en alpha config:" >&2
+        echo "    services.oracle-lab.liveReloadPath = \"/var/lib/oracle-lab/code\";" >&2
+        echo "  Y clonar chagra-pro ahí inicialmente." >&2
+        exit 1
+      fi
+
+      if [ ! -d "$LIVE_PATH/.git" ]; then
+        echo "✗ $LIVE_PATH no es un git repo. Inicializar primero:" >&2
+        echo "  sudo -u oracle-lab git clone --depth 1 https://github.com/guatoc-ecohub/chagra-pro.git /tmp/_clone" >&2
+        echo "  sudo cp -r /tmp/_clone/. \"$LIVE_PATH/\"" >&2
+        echo "  sudo chown -R oracle-lab:oracle-lab \"$LIVE_PATH\"" >&2
+        exit 1
+      fi
+
+      echo "→ git pull en $LIVE_PATH"
+      cd "$LIVE_PATH"
+      sudo -u oracle-lab git pull --ff-only
+
+      echo "→ systemctl restart oracle-lab"
+      systemctl restart oracle-lab
+
+      sleep 1
+      echo "→ status:"
+      systemctl status oracle-lab --no-pager -n 5
+    '';
+  };
 in {
   options.services.oracle-lab = {
     enable = lib.mkEnableOption "Oracle Guatoc dashboard MVP (provisional naming, DR-029 pending)";
@@ -30,6 +87,45 @@ in {
     dataDir = lib.mkOption {
       type = lib.types.path;
       default = "/var/lib/oracle-lab";
+    };
+
+    liveReloadPath = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      example = "/var/lib/oracle-lab/code";
+      description = ''
+        Si se setea, el systemd service usa este path mutable como
+        WorkingDirectory en lugar del store inmutable. Permite hacer
+        `git pull + systemctl restart oracle-lab` sin nixos-rebuild.
+
+        Setup inicial (una sola vez después de habilitar):
+          sudo mkdir -p /var/lib/oracle-lab/code
+          sudo chown oracle-lab:oracle-lab /var/lib/oracle-lab/code
+          sudo -u oracle-lab git clone https://github.com/guatoc-ecohub/chagra-pro.git \
+            /tmp/_oracle-clone
+          sudo cp -r /tmp/_oracle-clone/modules/oracle-lab/* /var/lib/oracle-lab/code/
+          sudo chown -R oracle-lab:oracle-lab /var/lib/oracle-lab/code
+
+        Después: usar `oracle-lab-redeploy` para git pull + restart sin
+        rebuild.
+
+        TRADEOFF: si el código que hagas pull rompe, el service falla.
+        Recovery via `git checkout HEAD~1 + oracle-lab-redeploy`.
+
+        Para producción crítica, dejar null (path inmutable nix store).
+      '';
+    };
+
+    enableHotReload = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Si true, agrega --reload + watchfiles a uvicorn. El service
+        se reinicia auto cuando cambian los .py en backendDir.
+
+        Solo útil con liveReloadPath != null. Para dev intensivo.
+        En prod estable, dejar false (mejor performance).
+      '';
     };
 
     secretsFile = lib.mkOption {
@@ -59,14 +155,13 @@ in {
           # whisper / speaches
           SPEACHES_HOST=http://localhost:10302
 
-          # cloudflared (metrics endpoint)
+          # cloudflared (metrics endpoint — requiere cloudflared.metrics activado)
           CLOUDFLARED_METRICS=http://localhost:2000/metrics
 
-          # git_activity
-          ORACLE_REPOS_BASE=/home/kortux/Workspace
+          # git_activity (default ORACLE_REPOS_BASE=/var/lib/oracle-lab/repos)
           ORACLE_REPOS=Chagra,chagra-pro,Chagra-strategy,guatoc-nixos
           GITHUB_OWNER=guatoc-ecohub
-          GITHUB_PAT=...   # opcional, mejora rate limit
+          GITHUB_PAT=...   # opcional, fallback a API si local no accesible
       '';
     };
   };
@@ -82,6 +177,9 @@ in {
 
     systemd.tmpfiles.rules = [
       "d ${cfg.dataDir} 0750 oracle-lab oracle-lab -"
+    ] ++ lib.optionals (cfg.liveReloadPath != null) [
+      "d ${cfg.liveReloadPath} 0755 oracle-lab oracle-lab -"
+      "d ${cfg.liveReloadPath}/backend 0755 oracle-lab oracle-lab -"
     ];
 
     systemd.services.oracle-lab = {
@@ -100,22 +198,45 @@ in {
         User = "oracle-lab";
         Group = "oracle-lab";
         EnvironmentFile = cfg.secretsFile;
-        ExecStart = "${pythonEnv}/bin/python3 -m uvicorn server:app --host ${cfg.bindAddress} --port ${toString cfg.port}";
-        WorkingDirectory = "${backendDir}";
+        ExecStart = "${pythonEnv}/bin/python3 -m uvicorn ${uvicornArgs}";
+        WorkingDirectory = backendDir;
         Restart = "on-failure";
         RestartSec = "10s";
 
         # Hardening
         NoNewPrivileges = true;
         PrivateTmp = true;
-        ProtectSystem = "strict";
+        # Si liveReloadPath está set, ProtectSystem debe ser menos estricto
+        # para permitir lectura del path mutable
+        ProtectSystem = if cfg.liveReloadPath != null then "full" else "strict";
         ProtectHome = true;
         ReadWritePaths = [ cfg.dataDir ];
+        ReadOnlyPaths = lib.optional (cfg.liveReloadPath != null) cfg.liveReloadPath;
         RestrictAddressFamilies = [ "AF_INET" "AF_INET6" "AF_UNIX" ];
         SystemCallFilter = [ "@system-service" ];
         CapabilityBoundingSet = [];
         AmbientCapabilities = [];
       };
+    };
+
+    # Instala el script `oracle-lab-redeploy` en /run/current-system/sw/bin
+    # solo si liveReloadPath está configurado.
+    environment.systemPackages = lib.optional (cfg.liveReloadPath != null) redeployScript;
+
+    # Sudoers entry: permite a kortux ejecutar oracle-lab-redeploy sin password.
+    # Solo activo si liveReloadPath está set.
+    security.sudo.extraRules = lib.optional (cfg.liveReloadPath != null) {
+      users = [ "kortux" ];
+      commands = [
+        {
+          command = "${redeployScript}/bin/oracle-lab-redeploy";
+          options = [ "NOPASSWD" ];
+        }
+        {
+          command = "${pkgs.systemd}/bin/systemctl restart oracle-lab";
+          options = [ "NOPASSWD" ];
+        }
+      ];
     };
 
     # Firewall NO abre el puerto — Tailscale ACL gestiona acceso.

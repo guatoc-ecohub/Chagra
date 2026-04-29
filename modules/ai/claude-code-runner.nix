@@ -134,7 +134,16 @@ in
     # ─────────────────────────────────────────────
     # Permisos del workspace (defensa idempotente)
     # ─────────────────────────────────────────────
+    # FIX 2026-04-29: el módulo upstream services.github-runners usa
+    # StateDirectory=github-runner/claude-code que requiere /var/lib/github-runner
+    # exista como dir padre. cicd-runner.nix tiene una regla `z` (zeroes perms
+    # de un dir EXISTENTE) — pero `z` NO crea el dir si falta, y como esto es
+    # un módulo distinto que se monta antes/después de cicd-runner, hay race.
+    # Agregamos `d` aquí para garantizar que el padre exista antes que el sub.
+    # `d` es idempotente y no rompe la regla `z` de cicd-runner (tmpfiles
+    # acepta múltiples rules sobre el mismo path en orden).
     systemd.tmpfiles.rules = [
+      "d /var/lib/github-runner          0755 root          root          -"
       "d /var/lib/claude-runner          0700 claude-runner claude-runner -"
       "d /var/lib/claude-runner/work     0700 claude-runner claude-runner -"
       "d /var/log/claude-runner          0755 root          root          -"
