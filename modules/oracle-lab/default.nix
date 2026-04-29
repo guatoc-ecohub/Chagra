@@ -198,6 +198,26 @@ in {
         User = "oracle-lab";
         Group = "oracle-lab";
         EnvironmentFile = cfg.secretsFile;
+
+        # Bootstrap automático: si el live path está vacío (primer boot
+        # post-rebuild con liveReloadPath habilitado), copia los archivos
+        # del nix store inmutable al path mutable. Después el user puede
+        # hacer git pull desde ahí sin perder este snapshot inicial.
+        # Idempotente — si ya hay archivos, NO sobrescribe.
+        ExecStartPre = lib.optional (cfg.liveReloadPath != null) (
+          pkgs.writeShellScript "oracle-lab-bootstrap" ''
+            set -eu
+            LIVE="${cfg.liveReloadPath}/backend"
+            STORE="${./backend}"
+            if [ ! -f "$LIVE/server.py" ]; then
+              echo "[oracle-lab] live path vacío — bootstrap desde nix store"
+              cp -r "$STORE/." "$LIVE/"
+              chmod -R u+rw "$LIVE"
+              echo "[oracle-lab] bootstrap completado: $(ls -1 "$LIVE" | wc -l) archivos"
+            fi
+          ''
+        );
+
         ExecStart = "${pythonEnv}/bin/python3 -m uvicorn ${uvicornArgs}";
         WorkingDirectory = backendDir;
         Restart = "on-failure";
@@ -210,8 +230,7 @@ in {
         # para permitir lectura del path mutable
         ProtectSystem = if cfg.liveReloadPath != null then "full" else "strict";
         ProtectHome = true;
-        ReadWritePaths = [ cfg.dataDir ];
-        ReadOnlyPaths = lib.optional (cfg.liveReloadPath != null) cfg.liveReloadPath;
+        ReadWritePaths = [ cfg.dataDir ] ++ lib.optional (cfg.liveReloadPath != null) cfg.liveReloadPath;
         RestrictAddressFamilies = [ "AF_INET" "AF_INET6" "AF_UNIX" ];
         SystemCallFilter = [ "@system-service" ];
         CapabilityBoundingSet = [];
