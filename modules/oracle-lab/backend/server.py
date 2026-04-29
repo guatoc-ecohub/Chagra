@@ -1,21 +1,23 @@
-"""oracle-lab backend — placeholder scaffold.
+"""oracle-lab backend — fase 2 con WebSocket pub/sub real-time.
 
 Naming provisional hasta DR-029.
 
 Endpoints:
-  GET  /                       → static index.html (cuando frontend exista)
-  GET  /api/oracle/snapshot    → estado completo agregado
+  GET  /                       → static index.html
+  GET  /api/oracle/snapshot    → estado completo (cache 30s)
   GET  /api/oracle/farm/state  → solo finca (Nest Hub lite)
   GET  /api/oracle/timeline    → eventos últimas 24h
-  GET  /api/oracle/render/png  → PNG snapshot para bot Telegram
+  GET  /api/oracle/render/png  → PNG snapshot para bot Telegram (TODO fase 3)
   POST /api/oracle/event       → push manual (operador captura observación)
-  WS   /ws/oracle/stream       → push real-time eventos
+  WS   /ws/oracle/stream       → push real-time eventos (snapshots + alerts)
 """
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import os
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -26,19 +28,88 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from collectors import collect_all
-# from render import generate_snapshot_png  # implementar en fase 3
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger(__name__)
 
 DATA_DIR = Path(os.environ.get("ORACLE_DATA_DIR", "/var/lib/oracle-lab"))
-STATIC_DIR = Path(__file__).parent / "static"  # MVP vanilla JS — TODO migrar a frontend/dist post identidad final
+STATIC_DIR = Path(__file__).parent / "static"
+REFRESH_INTERVAL_SECONDS = int(os.environ.get("ORACLE_REFRESH_INTERVAL", "30"))
+
+
+# ----------------------------------------------------------------------
+# Pub/sub state — in-memory para MVP. Para Pro multi-instance: Redis pubsub.
+# ----------------------------------------------------------------------
+
+class OracleState:
+    """Estado compartido del oracle: último snapshot + lista de WS subscribers."""
+
+    def __init__(self):
+        self.latest_snapshot: dict[str, Any] | None = None
+        self.subscribers: set[asyncio.Queue] = set()
+        self._refresh_task: asyncio.Task | None = None
+
+    async def refresh_loop(self):
+        """Background task — corre collect_all() cada N segundos y publica."""
+        while True:
+            try:
+                snapshot = await collect_all()
+                snapshot["timestamp"] = datetime.now(timezone.utc).isoformat()
+                snapshot["status"] = "ok"
+                self.latest_snapshot = snapshot
+                event = {"type": "snapshot", "payload": snapshot}
+                # Fan-out a todos los subscribers
+                for queue in list(self.subscribers):
+                    try:
+                        queue.put_nowait(event)
+                    except asyncio.QueueFull:
+                        log.warning("Subscriber queue full, dropping event")
+            except Exception as exc:
+                log.exception("refresh_loop error: %s", exc)
+            await asyncio.sleep(REFRESH_INTERVAL_SECONDS)
+
+    async def get_snapshot(self) -> dict[str, Any]:
+        """Retorna último snapshot cacheado, o computa uno fresh si no existe."""
+        if self.latest_snapshot is None:
+            snapshot = await collect_all()
+            snapshot["timestamp"] = datetime.now(timezone.utc).isoformat()
+            snapshot["status"] = "ok"
+            self.latest_snapshot = snapshot
+        return self.latest_snapshot
+
+    def subscribe(self) -> asyncio.Queue:
+        queue = asyncio.Queue(maxsize=10)
+        self.subscribers.add(queue)
+        return queue
+
+    def unsubscribe(self, queue: asyncio.Queue):
+        self.subscribers.discard(queue)
+
+
+state = OracleState()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifecycle hook — arranca el refresh loop al inicio, lo cancela al apagar."""
+    state._refresh_task = asyncio.create_task(state.refresh_loop())
+    log.info("Oracle refresh loop started (interval=%ds)", REFRESH_INTERVAL_SECONDS)
+    yield
+    if state._refresh_task:
+        state._refresh_task.cancel()
+        try:
+            await state._refresh_task
+        except asyncio.CancelledError:
+            pass
+    log.info("Oracle refresh loop stopped")
+
 
 app = FastAPI(
     title="Oracle Guatoc (provisional)",
-    description="Naming TBD — DR-029 pending",
+    description="Naming TBD — DR-029 pending. Fase 2: WebSocket real-time.",
     docs_url=None,
     redoc_url=None,
+    lifespan=lifespan,
 )
 
 
@@ -49,30 +120,30 @@ class ManualEvent(BaseModel):
 
 
 # ----------------------------------------------------------------------
-# REST endpoints (placeholders)
+# REST endpoints
 # ----------------------------------------------------------------------
 
 @app.get("/api/oracle/snapshot")
 async def snapshot() -> dict[str, Any]:
-    """Snapshot agregado en tiempo real desde 3 collectors fase 1.
+    """Snapshot agregado — usa cache del refresh loop (TTL 30s).
 
-    Fan-out asyncio: ai_stats + farmos + openmeteo en paralelo,
-    cada uno con timeout independiente. Falla aislada por collector.
+    Beneficio vs fetch fresh cada call: si 10 clientes preguntan en 1s,
+    no disparamos 10 collect_all en paralelo.
     """
-    payload = await collect_all()
-    payload["timestamp"] = datetime.now(timezone.utc).isoformat()
-    payload["status"] = "ok"
-    return payload
+    return await state.get_snapshot()
 
 
 @app.get("/api/oracle/farm/state")
 async def farm_state() -> dict[str, Any]:
-    """Vista lite finca (Nest Hub via HA Lovelace)."""
+    """Vista lite finca (Nest Hub via HA Lovelace card)."""
+    snap = await state.get_snapshot()
+    providers = snap.get("providers", {})
     return {
-        "status": "scaffold",
-        "weather": None,
-        "active_alerts": [],
-        "next_lunar_window": None,
+        "status": "ok",
+        "timestamp": snap.get("timestamp"),
+        "weather": providers.get("openmeteo", {}).get("data", {}).get("current"),
+        "farm_assets": providers.get("farmos", {}).get("data", {}).get("assets_active", 0),
+        "ha_sensors": providers.get("home_assistant", {}).get("data", {}).get("matched_sensors", 0),
     }
 
 
@@ -84,41 +155,69 @@ async def timeline(hours: int = 24) -> dict[str, Any]:
 
 @app.get("/api/oracle/render/png")
 async def render_png():
-    """PNG snapshot para bot Telegram. TODO: matplotlib server-side fase 3."""
+    """PNG snapshot para bot Telegram. TODO fase 3: matplotlib server-side."""
     raise HTTPException(501, "Not implemented yet — fase 3")
 
 
 @app.post("/api/oracle/event")
 async def push_event(event: ManualEvent) -> dict[str, Any]:
-    """Operador empuja evento manual (observación capturada)."""
+    """Operador empuja evento manual (observación capturada).
+
+    Publica al pub/sub para que clientes WS lo reciban inmediatamente.
+    """
     log.info("Manual event: type=%s source=%s", event.type, event.source)
-    # TODO: persistir a logs append-only ADR-019
-    return {"ok": True, "received_at": datetime.now(timezone.utc).isoformat()}
+    received_at = datetime.now(timezone.utc).isoformat()
+    out_event = {
+        "type": "manual_event",
+        "payload": {
+            "event_type": event.type,
+            "data": event.payload,
+            "source": event.source,
+            "received_at": received_at,
+        },
+    }
+    for queue in list(state.subscribers):
+        try:
+            queue.put_nowait(out_event)
+        except asyncio.QueueFull:
+            pass
+    return {"ok": True, "received_at": received_at}
 
 
 # ----------------------------------------------------------------------
-# WebSocket stream (placeholder)
+# WebSocket stream — pub/sub real-time
 # ----------------------------------------------------------------------
 
 @app.websocket("/ws/oracle/stream")
 async def stream(ws: WebSocket):
-    """Push real-time. TODO: pub/sub implementation fase 2."""
+    """WebSocket pub/sub:
+    1. Acepta la conexión.
+    2. Envía el último snapshot inmediatamente.
+    3. Subscribe el cliente a la queue del state.
+    4. Loop: drena queue → envía cada event al cliente.
+    5. Cleanup al desconectar.
+    """
     await ws.accept()
+    queue = state.subscribe()
     try:
-        await ws.send_json({
-            "type": "scaffold",
-            "message": "WebSocket placeholder — pub/sub stack en fase 2",
-        })
+        # Bootstrap: envía último snapshot al conectar
+        if state.latest_snapshot:
+            await ws.send_json({"type": "snapshot", "payload": state.latest_snapshot})
+
+        # Pub/sub loop
         while True:
-            # Echo loop hasta que el cliente cierre
-            data = await ws.receive_text()
-            await ws.send_json({"echo": data})
+            event = await queue.get()
+            await ws.send_json(event)
     except WebSocketDisconnect:
         log.info("WebSocket client disconnected")
+    except Exception as exc:
+        log.warning("WebSocket error: %s", exc)
+    finally:
+        state.unsubscribe(queue)
 
 
 # ----------------------------------------------------------------------
-# Static frontend (cuando exista)
+# Static frontend
 # ----------------------------------------------------------------------
 
 @app.get("/")

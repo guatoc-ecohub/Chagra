@@ -38,9 +38,35 @@ in {
       description = ''
         EnvironmentFile con tokens. SOPS-decrypted. Vars opcionales (cada
         collector se reporta como no_data si la suya no está):
+
+          # ai_stats (deshabilitado por default — gate ENABLE_AI_STATS_COLLECTOR=1)
           AI_STATS_URL=http://localhost:9292/api/snapshot
+
+          # farmos (OAuth2 password grant)
           FARMOS_BASE=http://localhost:8081
-          FARMOS_TOKEN=...
+          FARMOS_CLIENT_ID=openfang
+          FARMOS_CLIENT_SECRET=...
+          FARMOS_USERNAME=admin
+          FARMOS_PASSWORD=...
+
+          # home_assistant (sensores IoT)
+          HA_BASE_URL=http://localhost:8123
+          HA_LONG_LIVED_TOKEN=...
+
+          # ollama (modelos locales)
+          OLLAMA_HOST=http://localhost:11434
+
+          # whisper / speaches
+          SPEACHES_HOST=http://localhost:10302
+
+          # cloudflared (metrics endpoint)
+          CLOUDFLARED_METRICS=http://localhost:2000/metrics
+
+          # git_activity
+          ORACLE_REPOS_BASE=/home/kortux/Workspace
+          ORACLE_REPOS=Chagra,chagra-pro,Chagra-strategy,guatoc-nixos
+          GITHUB_OWNER=guatoc-ecohub
+          GITHUB_PAT=...   # opcional, mejora rate limit
       '';
     };
   };
