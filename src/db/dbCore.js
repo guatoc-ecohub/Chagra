@@ -5,7 +5,7 @@
  * manuales previas en assetCache.js y syncManager.js, evitando race conditions
  * de `onupgradeneeded` duplicado y garantizando una sola versión activa.
  *
- * Esquema v6:
+ * Esquema v7 (2026-04-29):
  *   - assets               (keyPath: id; indexes: asset_type, cached_at)
  *   - taxonomy_terms       (keyPath: id; indexes: type)
  *   - sync_meta            (keyPath: key)
@@ -13,11 +13,14 @@
  *   - pending_tasks        (keyPath: id; indexes: timestamp, status)
  *   - logs                 (keyPath: id; indexes: asset_id, timestamp, type)
  *   - media_cache          (keyPath: id, autoIncrement; indexes: logId, createdAt)
- *   - pending_voice_recordings (v0.5.0: keyPath: id, autoIncrement; indexes: createdAt, status)
+ *   - pending_voice_recordings (v0.5.0: keyPath: id, autoIncrement)
+ *   - inventory_events     (v7 ADR-027.i+ii: keyPath: id ULID; indexes:
+ *                           item_id, timestamp, event_type, idempotency_key)
+ *   - inventory_stock_snapshot (v7: materialized view, keyPath: item_id)
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 6;
+export const DB_VERSION = 7;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -28,6 +31,8 @@ export const STORES = {
   PENDING_TASKS: 'pending_tasks', // @deprecated: usar LOGS con type='log--task'
   MEDIA_CACHE: 'media_cache',
   PENDING_VOICE: 'pending_voice_recordings',
+  INVENTORY_EVENTS: 'inventory_events',
+  INVENTORY_STOCK: 'inventory_stock_snapshot',
 };
 
 let dbInstance = null;
@@ -98,6 +103,24 @@ export const openDB = async () => {
         const store = db.createObjectStore(STORES.PENDING_VOICE, { keyPath: 'id', autoIncrement: true });
         store.createIndex('createdAt', 'createdAt', { unique: false });
         store.createIndex('status', 'status', { unique: false });
+      }
+
+      // v7: inventory_events — log append-only ADR-019 + ADR-027.i+ii.
+      // Append-only inmutable. Reconciliación post-sync por timestamp +
+      // device_id_lex_hash + sequence_number.
+      if (!db.objectStoreNames.contains(STORES.INVENTORY_EVENTS)) {
+        const store = db.createObjectStore(STORES.INVENTORY_EVENTS, { keyPath: 'id' });
+        store.createIndex('item_id', 'payload.item_id', { unique: false });
+        store.createIndex('timestamp', 'timestamp', { unique: false });
+        store.createIndex('event_type', 'event_type', { unique: false });
+        store.createIndex('idempotency_key', 'idempotency_key', { unique: false });
+      }
+
+      // v7: inventory_stock_snapshot — materialized view derivada de
+      // inventory_events. Reconstruible desde scratch en cualquier momento
+      // (cumple ADR-019 — log es source of truth, esto es solo cache O(1)).
+      if (!db.objectStoreNames.contains(STORES.INVENTORY_STOCK)) {
+        db.createObjectStore(STORES.INVENTORY_STOCK, { keyPath: 'item_id' });
       }
     };
 
