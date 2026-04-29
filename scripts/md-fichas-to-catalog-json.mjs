@@ -40,7 +40,7 @@
  */
 
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
-import { resolve, dirname, join, basename } from 'node:path';
+import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
