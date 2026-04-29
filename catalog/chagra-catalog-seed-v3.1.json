@@ -1111,9 +1111,6 @@
       "id": "chenopodium_quinoa",
       "nombre_comun": "Quinua",
       "nombre_cientifico": "Chenopodium quinoa Willd.",
-      "nombre_comunes_regionales": [
-        "Pashca"
-      ],
       "familia_botanica": "Amaranthaceae",
       "category": "cereales",
       "thermal_zones": [
@@ -1143,21 +1140,13 @@
       "drenaje_requerido": "excelente",
       "propagation": {
         "metodo_principal": "semilla",
-        "notas": "Cosechar cuando el tallo cambia de color y el grano no se deja rayar con la uña."
+        "notas": "Cosechar cuando el tallo cambie de color y el grano esté duro (no se deje rayar con la uña)."
       },
-      "companions": [
-        "lupinus_mutabilis",
-        "solanum_phureja",
-        "vicia_sativa",
-        "zea_mays"
-      ],
-      "antagonists": [],
-      "valor_pedagogico": "Superalimento andino. Parte de la 'Milpa Andina' que entrega proteína de alta calidad sin depender de importaciones.",
       "source_ids": [
         "fao-ecocrop",
         "sib-colombia"
       ],
-      "validation_level": "claude_draft",
+      "valor_pedagogico": "Superalimento andino. Parte de la 'Milpa Andina'; enseña cómo obtener proteína de alta calidad sin depender de mercados externos.",
       "estrato": "medio"
     },
     {
@@ -1537,11 +1526,8 @@
       "id": "fragaria_ananassa_monterrey",
       "nombre_comun": "Fresa Monterrey",
       "nombre_cientifico": "Fragaria × ananassa 'Monterrey'",
-      "nombre_comunes_regionales": [
-        "Fresa day-neutral"
-      ],
       "familia_botanica": "Rosaceae",
-      "category": "hortalizas_fruto_flor",
+      "category": "frutales_perennes",
       "thermal_zones": [
         "templado",
         "frio"
@@ -1552,9 +1538,6 @@
       ],
       "cultivable": true,
       "conservation_status": "cultivo_comun",
-      "harvest_type": "fruto",
-      "cycleMonths": 18,
-      "estrato": "bajo",
       "altitud_msnm": {
         "min_absoluto": 1000,
         "optimo_min": 1800,
@@ -1567,46 +1550,19 @@
         "optimo_max": 20,
         "max_tolerable": 26
       },
-      "ph_suelo": {
-        "min": 5,
-        "optimo_min": 5.5,
-        "optimo_max": 6.5,
-        "max": 7.5
-      },
       "radiacion": "sol_pleno",
       "agua": "medio",
       "drenaje_requerido": "excelente",
-      "heladas_tolerancia": {
-        "umbral_c": -2,
-        "horas_acumuladas_max": 6,
-        "notas": "La flor se quema con la helada, pero la planta es perenne y rebrota."
-      },
-      "companions": [
-        "lactuca_sativa_capitata",
-        "petroselinum_crispum"
-      ],
-      "antagonists": [],
       "propagation": {
-        "methods": [
-          "estolon"
-        ],
-        "best_method": "estolones",
-        "notas": "Requiere 'mulch' o plástico para evitar que el fruto toque el suelo."
+        "metodo_principal": "estolon",
+        "notas": "Variedad de día neutro; requiere acolchado (mulch) de paja o plástico para evitar que el fruto toque el suelo y se pudra."
       },
-      "valor_pedagogico": "Lección de fotoperiodo: variedad de día neutro que permite cosecha continua sin importar la duración del día.",
-      "plagas_criticas": [
-        "Tetranychus urticae (ácaro rojo)",
-        "Trips"
-      ],
-      "enfermedades_criticas": [
-        "Botrytis cinerea",
-        "Oídio"
-      ],
       "source_ids": [
         "gbif-taxonomic-backbone",
         "agrosavia-manual-biopreparados-2015"
       ],
-      "validation_level": "claude_draft"
+      "valor_pedagogico": "Lección de fotoperiodo: variedad que permite entender cómo la planta produce flores y frutos independientemente de la duración del día.",
+      "estrato": "alto"
     },
     {
       "id": "hedychium_coronarium",
@@ -1650,6 +1606,48 @@
       ],
       "valor_pedagogico": "SE BUSCA: La 'Invasora de Quebradas'. Sus flores huelen bien pero sus raíces matan el río. Si ves una mariposa blanca en la orilla, ¡es una alarma ecológica!",
       "estrato": "medio"
+    },
+    {
+      "id": "ipomoea_batatas",
+      "nombre_comun": "Batata / Camote",
+      "nombre_cientifico": "Ipomoea batatas (L.) Lam.",
+      "familia_botanica": "Convolvulaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 1200,
+        "optimo_max": 2000,
+        "max_absoluto": 2400
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "esqueje (bejuco)",
+        "notas": "Planta trepadora o rastrera de rápido crecimiento; requiere climas templados para desarrollar dulzor."
+      },
+      "source_ids": [
+        "powo-kew",
+        "restrepo-1996-abc-agricultura-organica"
+      ],
+      "valor_pedagogico": "Lección de raíces reservantes: enseña cómo una planta rastrera puede concentrar energía solar en forma de carbohidratos dulces bajo la tierra.",
+      "estrato": "bajo"
     },
     {
       "id": "ipomoea_purpurea",
@@ -2002,9 +2000,6 @@
       "id": "lupinus_mutabilis",
       "nombre_comun": "Chocho / Tarwi",
       "nombre_cientifico": "Lupinus mutabilis Sweet",
-      "nombre_comunes_regionales": [
-        "Altramuz andino"
-      ],
       "familia_botanica": "Fabaceae",
       "category": "granos_legumbres",
       "thermal_zones": [
@@ -2036,22 +2031,11 @@
         "metodo_principal": "semilla",
         "notas": "Sus raíces son fijadoras masivas de nitrógeno; excelente abono verde si se incorpora antes de florecer."
       },
-      "companions": [
-        "alnus_acuminata",
-        "chenopodium_quinoa",
-        "solanum_phureja",
-        "zea_mays"
-      ],
-      "antagonists": [
-        "solanum_lycopersicum_san_marzano",
-        "solanum_phureja"
-      ],
-      "valor_pedagogico": "Leguminosa de alta montaña. Sus alcaloides actúan como repelentes naturales en la chagra. No sembrar cerca de tomates.",
       "source_ids": [
         "agrosavia-manual-biopreparados-2015",
         "cip-2006-ghislain"
       ],
-      "validation_level": "claude_draft",
+      "valor_pedagogico": "Leguminosa de alta montaña. Sus alcaloides actúan como repelentes naturales en la chagra; enseña el valor de los cultivos de ciclo cerrado.",
       "estrato": "medio"
     },
     {
@@ -2188,10 +2172,6 @@
       "id": "oxalis_tuberosa",
       "nombre_comun": "Oca / Hibia",
       "nombre_cientifico": "Oxalis tuberosa Molina",
-      "nombre_comunes_regionales": [
-        "Ibia roja",
-        "Papa oca"
-      ],
       "familia_botanica": "Oxalidaceae",
       "category": "tuberculos_raices",
       "thermal_zones": [
@@ -2222,18 +2202,11 @@
         "metodo_principal": "tuberculo",
         "notas": "Asoliar los tubérculos antes de consumirlos para reducir el contenido de ácido oxálico y aumentar el dulzor."
       },
-      "companions": [
-        "solanum_phureja",
-        "tropaeolum_tuberosum",
-        "ullucus_tuberosus"
-      ],
-      "antagonists": [],
-      "valor_pedagogico": "Lección de biodiversidad andina. Es la 'hermana del frío' que acompaña a la papa en la chagra alta chiguana.",
       "source_ids": [
         "agrosavia-manual-tuberculos-andinos-2017",
         "cip-2006-ghislain"
       ],
-      "validation_level": "claude_draft",
+      "valor_pedagogico": "Lección de biodiversidad andina. Es la 'hermana del frío' que acompaña a la papa en la chagra alta chiguana.",
       "estrato": "bajo"
     },
     {
@@ -2623,11 +2596,6 @@
       "id": "physalis_peruviana",
       "nombre_comun": "Uchuva",
       "nombre_cientifico": "Physalis peruviana L.",
-      "nombre_comunes_regionales": [
-        "Aguaymanto",
-        "Cape gooseberry",
-        "Amor en bolsa"
-      ],
       "familia_botanica": "Solanaceae",
       "category": "frutales_perennes",
       "thermal_zones": [
@@ -2640,9 +2608,6 @@
       ],
       "cultivable": true,
       "conservation_status": "cultivo_comun",
-      "harvest_type": "fruto",
-      "cycleMonths": 24,
-      "estrato": "medio",
       "altitud_msnm": {
         "min_absoluto": 1200,
         "optimo_min": 1800,
@@ -2655,51 +2620,19 @@
         "optimo_max": 18,
         "max_tolerable": 25
       },
-      "ph_suelo": {
-        "min": 5,
-        "optimo_min": 5.5,
-        "optimo_max": 7,
-        "max": 8
-      },
       "radiacion": "sol_pleno",
       "agua": "medio",
       "drenaje_requerido": "excelente",
-      "heladas_tolerancia": {
-        "umbral_c": 0,
-        "horas_acumuladas_max": 4,
-        "notas": "El cáliz (capacho) protege el fruto de heladas ligeras."
-      },
-      "companions": [
-        "petroselinum_crispum",
-        "solanum_lycopersicum_cerasiforme"
-      ],
-      "antagonists": [
-        "foeniculum_vulgare",
-        "vaccinium_corymbosum_biloxi",
-        "vaccinium_corymbosum_emerald"
-      ],
       "propagation": {
-        "methods": [
-          "semilla"
-        ],
-        "best_method": "semilla sexual",
-        "notas": "Requiere tutorado para evitar que las ramas toquen el suelo."
+        "metodo_principal": "semilla",
+        "notas": "Planta perenne de corta vida (2-3 años productivos); requiere tutorado para facilitar la cosecha y evitar hongos por humedad."
       },
-      "valor_pedagogico": "Lección de empaque natural: el cáliz persistente como estrategia evolutiva de protección y dispersión.",
-      "plagas_criticas": [
-        "Tecia solanivora",
-        "Heliothis spp."
-      ],
-      "enfermedades_criticas": [
-        "Phytophthora infestans",
-        "Fusarium oxysporum"
-      ],
       "source_ids": [
         "agrosavia-manual-uchuva-2015",
-        "gbif-taxonomic-backbone",
-        "sib-colombia"
+        "powo-kew"
       ],
-      "validation_level": "claude_draft"
+      "valor_pedagogico": "La joya protegida: su capacho natural enseña la importancia de la protección post-cosecha y la conservación del valor nutritivo.",
+      "estrato": "alto"
     },
     {
       "id": "pimpinella_anisum",
@@ -2835,10 +2768,6 @@
       "id": "psidium_guajava_manzana",
       "nombre_comun": "Guayaba manzana",
       "nombre_cientifico": "Psidium guajava 'Manzana'",
-      "nombre_comunes_regionales": [
-        "Guayaba criolla dulce",
-        "Redonda"
-      ],
       "familia_botanica": "Myrtaceae",
       "category": "frutales_perennes",
       "thermal_zones": [
@@ -2851,9 +2780,6 @@
       ],
       "cultivable": true,
       "conservation_status": "cultivo_comun",
-      "harvest_type": "fruto",
-      "cycleMonths": 240,
-      "estrato": "emergente",
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 1200,
@@ -2866,48 +2792,20 @@
         "optimo_max": 25,
         "max_tolerable": 35
       },
-      "ph_suelo": {
-        "min": 4.5,
-        "optimo_min": 5,
-        "optimo_max": 7,
-        "max": 8
-      },
       "radiacion": "sol_pleno",
       "agua": "medio",
       "drenaje_requerido": "bueno_a_moderado",
-      "heladas_tolerancia": {
-        "umbral_c": 5,
-        "horas_acumuladas_max": 0,
-        "notas": "Sensible al frío; detiene crecimiento en noches altoandinas."
-      },
-      "companions": [],
-      "antagonists": [
-        "vaccinium_corymbosum_biloxi",
-        "vaccinium_corymbosum_emerald"
-      ],
       "propagation": {
-        "methods": [
-          "semilla",
-          "injerto"
-        ],
-        "best_method": "injerto",
-        "notas": "Muy rústica; tolera amplios rangos de suelo si hay buen drenaje."
+        "metodo_principal": "injerto",
+        "notas": "Variedad seleccionada por su menor contenido de semillas y mayor tamaño; muy rústica pero sensible a las heladas directas del páramo."
       },
-      "valor_pedagogico": "Lección de rusticidad: planta adaptada a suelos marginales que provee alta nutrición con poco manejo.",
-      "plagas_criticas": [
-        "Anastrepha spp. (mosca de la fruta)",
-        "Conotrachelus psidii"
-      ],
-      "enfermedades_criticas": [
-        "Antracnosis",
-        "Roya de la guayaba"
-      ],
       "source_ids": [
         "fao-ecocrop",
         "gbif-taxonomic-backbone",
         "restrepo-1996-abc-agricultura-organica"
       ],
-      "validation_level": "claude_draft"
+      "valor_pedagogico": "Lección de rusticidad: planta adaptada a suelos marginales que provee altísima nutrición (Vitamina C) con mínimo manejo externo.",
+      "estrato": "alto"
     },
     {
       "id": "pteridium_aquilinum",
@@ -3184,15 +3082,11 @@
       "id": "rubus_glaucus_sin_espinas",
       "nombre_comun": "Mora andina sin espinas",
       "nombre_cientifico": "Rubus glaucus Benth. 'Sin Espinas'",
-      "nombre_comunes_regionales": [
-        "Mora de Castilla mejorada",
-        "Thornless mora"
-      ],
       "familia_botanica": "Rosaceae",
       "category": "frutales_perennes",
       "thermal_zones": [
-        "templado",
-        "frio"
+        "frio",
+        "templado"
       ],
       "roles_in_guild": [
         "crop",
@@ -3200,9 +3094,6 @@
       ],
       "cultivable": true,
       "conservation_status": "cultivo_comun",
-      "harvest_type": "fruto",
-      "cycleMonths": 120,
-      "estrato": "medio",
       "altitud_msnm": {
         "min_absoluto": 1500,
         "optimo_min": 1800,
@@ -3215,59 +3106,24 @@
         "optimo_max": 18,
         "max_tolerable": 22
       },
-      "ph_suelo": {
-        "min": 5,
-        "optimo_min": 5.2,
-        "optimo_max": 6.2,
-        "max": 6.8
-      },
       "radiacion": "sol_pleno",
       "agua": "medio",
       "drenaje_requerido": "bueno",
-      "heladas_tolerancia": {
-        "umbral_c": 0,
-        "horas_acumuladas_max": 4,
-        "notas": "Sensible a heladas fuertes; prefiere laderas con drenaje de aire frío."
-      },
-      "companions": [
-        "rubus_idaeus_golden",
-        "rubus_idaeus_heritage"
-      ],
-      "antagonists": [
-        "solanum_phureja"
-      ],
       "propagation": {
-        "methods": [
-          "acodo",
-          "esqueje"
-        ],
-        "best_method": "acodo de punta",
-        "notas": "Variedad seleccionada para facilitar la poda y cosecha sin espinas."
+        "metodo_principal": "acodo",
+        "notas": "Variedad seleccionada para facilitar la poda y cosecha sin las espinas tradicionales; requiere tutorado en espaldera."
       },
-      "valor_pedagogico": "Lección de mejoramiento varietal: caso de estudio sobre las ventajas del manejo ergonómico en la agricultura familiar.",
-      "plagas_criticas": [
-        "Drosophila suzukii",
-        "Perla de la tierra"
-      ],
-      "enfermedades_criticas": [
-        "Antracnosis (Elsinoe veneta)",
-        "Mildeo polvoso"
-      ],
       "source_ids": [
         "sib-colombia",
-        "ica-resolucion-3168-2015",
-        "gbif-taxonomic-backbone"
+        "ica-resolucion-3168-2015"
       ],
-      "validation_level": "claude_draft"
+      "valor_pedagogico": "Lección de domesticación: muestra las ventajas de la selección varietal para mejorar la ergonomía y la seguridad en la agricultura familiar.",
+      "estrato": "alto"
     },
     {
       "id": "rubus_idaeus_golden",
       "nombre_comun": "Frambuesa amarilla",
       "nombre_cientifico": "Rubus idaeus 'Golden Queen' o similar",
-      "nombre_comunes_regionales": [
-        "Frambuesa de oro",
-        "Yellow raspberry"
-      ],
       "familia_botanica": "Rosaceae",
       "category": "frutales_perennes",
       "thermal_zones": [
@@ -3279,9 +3135,6 @@
       ],
       "cultivable": true,
       "conservation_status": "cultivo_comun",
-      "harvest_type": "fruto",
-      "cycleMonths": 60,
-      "estrato": "medio",
       "altitud_msnm": {
         "min_absoluto": 1500,
         "optimo_min": 2000,
@@ -3294,54 +3147,24 @@
         "optimo_max": 18,
         "max_tolerable": 24
       },
-      "ph_suelo": {
-        "min": 5,
-        "optimo_min": 5.5,
-        "optimo_max": 6.2,
-        "max": 6.8
-      },
       "radiacion": "sol_pleno",
       "agua": "medio",
       "drenaje_requerido": "bueno",
-      "heladas_tolerancia": {
-        "umbral_c": -5,
-        "horas_acumuladas_max": 12,
-        "notas": "Excelente resistencia al frío."
-      },
-      "companions": [
-        "rubus_glaucus_sin_espinas",
-        "rubus_idaeus_heritage"
-      ],
-      "antagonists": [],
       "propagation": {
-        "methods": [
-          "division_mata"
-        ],
-        "best_method": "hijuelos",
-        "notas": "Crecimiento menos vigoroso que la roja pero frutos más dulces."
+        "metodo_principal": "hijuelos",
+        "notas": "Crecimiento menos vigoroso que la roja pero frutos notablemente más dulces; requiere suelos muy bien drenados y ricos en potasio."
       },
-      "valor_pedagogico": "Lección de pigmentos: comparación entre antocianinas y su ausencia, y su impacto en el sabor y nutrición.",
-      "plagas_criticas": [
-        "Áfidos",
-        "Drosophila suzukii"
-      ],
-      "enfermedades_criticas": [
-        "Botrytis cinerea"
-      ],
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone"
       ],
-      "validation_level": "claude_draft"
+      "valor_pedagogico": "Lección de pigmentos: comparación entre antocianinas y su ausencia, y su impacto en el sabor y las propiedades organolépticas.",
+      "estrato": "alto"
     },
     {
       "id": "rubus_idaeus_heritage",
       "nombre_comun": "Frambuesa roja",
       "nombre_cientifico": "Rubus idaeus 'Heritage'",
-      "nombre_comunes_regionales": [
-        "Frambuesa remonta",
-        "Red raspberry"
-      ],
       "familia_botanica": "Rosaceae",
       "category": "frutales_perennes",
       "thermal_zones": [
@@ -3354,9 +3177,6 @@
       ],
       "cultivable": true,
       "conservation_status": "cultivo_comun",
-      "harvest_type": "fruto",
-      "cycleMonths": 60,
-      "estrato": "medio",
       "altitud_msnm": {
         "min_absoluto": 1500,
         "optimo_min": 2000,
@@ -3369,47 +3189,19 @@
         "optimo_max": 18,
         "max_tolerable": 25
       },
-      "ph_suelo": {
-        "min": 5,
-        "optimo_min": 5.5,
-        "optimo_max": 6.5,
-        "max": 7
-      },
       "radiacion": "sol_pleno",
       "agua": "medio",
       "drenaje_requerido": "bueno",
-      "heladas_tolerancia": {
-        "umbral_c": -5,
-        "horas_acumuladas_max": 12,
-        "notas": "Altamente resistente al frío; la helada puede favorecer la parada vegetativa necesaria."
-      },
-      "companions": [
-        "rubus_glaucus_sin_espinas",
-        "rubus_idaeus_golden"
-      ],
-      "antagonists": [],
       "propagation": {
-        "methods": [
-          "division_mata",
-          "esqueje"
-        ],
-        "best_method": "hijuelos de raíz",
-        "notas": "Planta remonta (produce en tallos de primer y segundo año)."
+        "metodo_principal": "hijuelos",
+        "notas": "Planta remonta (produce en tallos de primer y segundo año); requiere podas de renovación para mantener el vigor."
       },
-      "valor_pedagogico": "Lección de ciclo de tallo: enseña la diferencia entre floricanes y primocanes en plantas arbustivas.",
-      "plagas_criticas": [
-        "Drosophila suzukii",
-        "Ácaros"
-      ],
-      "enfermedades_criticas": [
-        "Antracnosis",
-        "Oídio"
-      ],
       "source_ids": [
         "powo-kew",
         "ica-resolucion-3168-2015"
       ],
-      "validation_level": "claude_draft"
+      "valor_pedagogico": "Lección de ciclo de tallo: enseña la diferencia entre floricanes y primocanes en plantas arbustivas y su manejo ergonómico.",
+      "estrato": "alto"
     },
     {
       "id": "salvia_officinalis",
@@ -3787,13 +3579,13 @@
       "drenaje_requerido": "bueno",
       "propagation": {
         "metodo_principal": "tuberculo (semilla asexual)",
-        "notas": "No tiene periodo de dormancia (latencia); se puede resembrar inmediatamente después de la cosecha."
+        "notas": "No tiene periodo de dormancia (latencia); su ciclo rápido exige una renovación constante de la semilla en la finca."
       },
       "source_ids": [
         "powo-kew",
         "sib-colombia"
       ],
-      "valor_pedagogico": "Lección de inmediatez: a diferencia de las papas de año, la criolla no duerme; su ciclo rápido enseña la dinámica de renovación constante en la chagra.",
+      "valor_pedagogico": "Lección de inmediatez: a diferencia de las papas de año, la criolla no duerme; su ciclo rápido enseña la dinámica de renovación constante en la chagra chiguana.",
       "estrato": "bajo"
     },
     {
@@ -3974,10 +3766,6 @@
       "id": "tropaeolum_tuberosum",
       "nombre_comun": "Mashua / Cubio",
       "nombre_cientifico": "Tropaeolum tuberosum Ruiz & Pav.",
-      "nombre_comunes_regionales": [
-        "Anua",
-        "Isafio"
-      ],
       "familia_botanica": "Tropaeolaceae",
       "category": "tuberculos_raices",
       "thermal_zones": [
@@ -4007,19 +3795,13 @@
       "drenaje_requerido": "bueno",
       "propagation": {
         "metodo_principal": "tuberculo",
-        "notas": "Posee propiedades nematicidas naturales; excelente para rotar terrenos cansados de papa."
+        "notas": "Posee propiedades nematicidas naturales; excelente para rotar terrenos tras la siembra de papa."
       },
-      "companions": [
-        "oxalis_tuberosa",
-        "solanum_phureja"
-      ],
-      "antagonists": [],
-      "valor_pedagogico": "Soberanía alimentaria chiguana. Un tubérculo ultra-resistente que limpia el suelo de nematodos para las futuras siembras.",
       "source_ids": [
         "agrosavia-manual-tuberculos-andinos-2017",
         "cip-potatoes-americas"
       ],
-      "validation_level": "claude_draft",
+      "valor_pedagogico": "Soberanía alimentaria chiguana. Un tubérculo ultra-resistente que limpia el suelo de nematodos para las futuras siembras.",
       "estrato": "medio"
     },
     {
@@ -4149,10 +3931,6 @@
       "id": "ullucus_tuberosus",
       "nombre_comun": "Ulluco / Chugua",
       "nombre_cientifico": "Ullucus tuberosus Caldas",
-      "nombre_comunes_regionales": [
-        "Melloco",
-        "Ruba"
-      ],
       "familia_botanica": "Basellaceae",
       "category": "tuberculos_raices",
       "thermal_zones": [
@@ -4181,19 +3959,13 @@
       "drenaje_requerido": "bueno",
       "propagation": {
         "metodo_principal": "tuberculo",
-        "notas": "Variedades de colores vibrantes; requiere suelos con alto contenido de materia orgánica."
+        "notas": "Variedades de colores vibrantes; requiere suelos con alto contenido de materia orgánica para un desarrollo óptimo."
       },
-      "companions": [
-        "oxalis_tuberosa",
-        "solanum_phureja"
-      ],
-      "antagonists": [],
-      "valor_pedagogico": "La joya polícroma del altiplano. Resistente a heladas que quemarían otros cultivos; esencial para el chiguano de páramo.",
       "source_ids": [
         "agrosavia-manual-tuberculos-andinos-2017",
         "gbif-taxonomic-backbone"
       ],
-      "validation_level": "claude_draft",
+      "valor_pedagogico": "La joya polícroma del altiplano. Resistente a heladas que quemarían otros cultivos; esencial para el chiguano de páramo.",
       "estrato": "bajo"
     },
     {
@@ -4518,9 +4290,6 @@
       "id": "vaccinium_corymbosum_emerald",
       "nombre_comun": "Arándano Emerald",
       "nombre_cientifico": "Vaccinium corymbosum 'Emerald'",
-      "nombre_comunes_regionales": [
-        "Blueberry temprano"
-      ],
       "familia_botanica": "Ericaceae",
       "category": "frutales_perennes",
       "thermal_zones": [
@@ -4533,9 +4302,6 @@
       ],
       "cultivable": true,
       "conservation_status": "cultivo_comun",
-      "harvest_type": "fruto",
-      "cycleMonths": 120,
-      "estrato": "medio",
       "altitud_msnm": {
         "min_absoluto": 1200,
         "optimo_min": 1700,
@@ -4548,52 +4314,19 @@
         "optimo_max": 25,
         "max_tolerable": 30
       },
-      "ph_suelo": {
-        "min": 4,
-        "optimo_min": 4.5,
-        "optimo_max": 5.2,
-        "max": 5.8
-      },
       "radiacion": "sol_pleno",
       "agua": "medio",
       "drenaje_requerido": "excelente",
-      "heladas_tolerancia": {
-        "umbral_c": -1,
-        "horas_acumuladas_max": 3,
-        "notas": "Variedad vigorosa con baja necesidad de frío (low-chill)."
-      },
-      "companions": [
-        "vaccinium_corymbosum_biloxi"
-      ],
-      "antagonists": [
-        "brassica_oleracea_acephala_curly",
-        "brassica_oleracea_acephala_lacinato",
-        "brassica_oleracea_acephala_red_russian",
-        "physalis_peruviana",
-        "psidium_guajava_manzana"
-      ],
       "propagation": {
-        "methods": [
-          "esqueje",
-          "micropropagacion"
-        ],
-        "best_method": "esqueje",
-        "notas": "Sensible a la salinidad en el agua de riego."
+        "metodo_principal": "esqueje",
+        "notas": "Variedad vigorosa con baja necesidad de frío (low-chill); ideal para las etapas de transición climática en Choachí."
       },
-      "valor_pedagogico": "Lección de precocidad: variedad que permite entender la importancia de la ventana de cosecha temprana.",
-      "plagas_criticas": [
-        "Mosquita de la agalla",
-        "Pájaros"
-      ],
-      "enfermedades_criticas": [
-        "Botrytis cinerea",
-        "Roya del arándano"
-      ],
       "source_ids": [
         "agrosavia-manual-arandano-2018",
         "powo-kew"
       ],
-      "validation_level": "claude_draft"
+      "valor_pedagogico": "Lección de precocidad: variedad que permite entender la importancia de la adaptación climática y la ventana de cosecha temprana.",
+      "estrato": "alto"
     },
     {
       "id": "viburnum_triphyllum",
