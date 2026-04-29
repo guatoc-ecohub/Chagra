@@ -26,6 +26,59 @@
   },
   "species": [
     {
+      "id": "acacia_melanoxylon",
+      "nombre_comun": "Acacia negra",
+      "nombre_cientifico": "Acacia melanoxylon R. Br.",
+      "nombre_comunes_regionales": [
+        "Acacia australiana"
+      ],
+      "familia_botanica": "Fabaceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "invasive",
+        "nitrogen_fixer"
+      ],
+      "cultivable": false,
+      "conservation_status": "invasor",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2200,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "impacto_ecologico": {
+        "tipo": "desplazamiento_competitivo",
+        "severidad": "alto",
+        "mecanismo_principal": "Rebrote agresivo desde la raíz post-tala y banco de semillas persistente en el suelo.",
+        "cobertura_actual_andes_co": "Ampliamente distribuida en zonas de reforestación antigua en Cundinamarca y Boyacá."
+      },
+      "erradicacion_protocolo": {
+        "metodo_principal": "tala_anillado",
+        "epoca_optima": "Cualquier época, preferiblemente antes de floración.",
+        "cuidados": "El anillado debe ser profundo para cortar el flujo de savia y evitar el rebrote basal."
+      },
+      "especies_nativas_sustitutas": [
+        "alnus_acuminata"
+      ],
+      "radiacion": "sol_pleno",
+      "source_ids": [
+        "calderon-saenz-2003-invasoras",
+        "res-684-2018-mads"
+      ],
+      "valor_pedagogico": "SE BUSCA: El 'Rebrotador Invencible'. Un error histórico de reforestación que asfixia los bordes de bosque. Se sustituye por el Aliso, que sí pertenece aquí.",
+      "validation_level": "claude_draft"
+    },
+    {
       "id": "allium_ampeloprasum",
       "nombre_comun": "Cebolla puerro",
       "nombre_cientifico": "Allium ampeloprasum var. porrum (L.) J. Gay",
@@ -1530,6 +1583,61 @@
       "validation_level": "claude_draft"
     },
     {
+      "id": "cytisus_monspessulanus",
+      "nombre_comun": "Retamo liso",
+      "nombre_cientifico": "Cytisus monspessulanus L.",
+      "nombre_comunes_regionales": [
+        "Genista monspessulana",
+        "Escobilla"
+      ],
+      "familia_botanica": "Fabaceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "roles_in_guild": [
+        "invasive",
+        "nitrogen_fixer"
+      ],
+      "cultivable": false,
+      "conservation_status": "invasor",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2400,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 10,
+        "optimo_max": 18,
+        "max_tolerable": 24
+      },
+      "impacto_ecologico": {
+        "tipo": "desplazamiento_competitivo",
+        "severidad": "critico",
+        "mecanismo_principal": "Fijación masiva de nitrógeno que altera suelos de páramo (naturalmente pobres en N), facilitando su colonización y asfixiando flora nativa.",
+        "cobertura_actual_andes_co": "Crítica en Cerros Orientales de Bogotá y municipios aledaños como Choachí y La Calera."
+      },
+      "erradicacion_protocolo": {
+        "metodo_principal": "arrancado_manual",
+        "epoca_optima": "Antes de la fructificación (marzo-mayo y septiembre-octubre).",
+        "cuidados": "Evitar la dispersión de semillas; la biomasa debe ser dispuesta en celdas de manejo seguro para evitar rebrote."
+      },
+      "especies_nativas_sustitutas": [
+        "erythrina_edulis"
+      ],
+      "radiacion": "sol_pleno",
+      "source_ids": [
+        "humboldt-invasoras-andes",
+        "mongabay-retamo-2024",
+        "res-684-2018-mads"
+      ],
+      "valor_pedagogico": "SE BUSCA: El 'Falso Nativo'. Engaña con flores amarillas bonitas pero destruye el equilibrio químico del páramo. Su erradicación es un acto de soberanía hídrica.",
+      "validation_level": "claude_draft"
+    },
+    {
       "id": "erythrina_edulis",
       "nombre_comun": "Chachafruto / Balú",
       "nombre_cientifico": "Erythrina edulis Triana ex Micheli",
@@ -1609,6 +1717,60 @@
         "humboldt-flora-alto-andina",
         "gbif-taxonomic-backbone"
       ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "eucalyptus_globulus",
+      "nombre_comun": "Eucalipto blanco",
+      "nombre_cientifico": "Eucalyptus globulus Labill.",
+      "nombre_comunes_regionales": [
+        "Eucalipto común"
+      ],
+      "familia_botanica": "Myrtaceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "invasive",
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "invasor",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 2600,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 14,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "impacto_ecologico": {
+        "tipo": "alelopatia",
+        "severidad": "alto",
+        "mecanismo_principal": "Sus aceites esenciales y hojarasca impiden el crecimiento de sotobosque nativo y consumen volúmenes masivos de agua.",
+        "cobertura_actual_andes_co": "Masiva en zonas rurales y periurbanas de la Cordillera Oriental."
+      },
+      "erradicacion_protocolo": {
+        "metodo_principal": "tala_anillado",
+        "epoca_optima": "Inicio de temporada seca.",
+        "cuidados": "Control de rebrote de cepa es crítico; requiere monitoreo por al menos 2 años."
+      },
+      "especies_nativas_sustitutas": [
+        "alnus_acuminata"
+      ],
+      "radiacion": "sol_pleno",
+      "source_ids": [
+        "humboldt-invasoras-andes",
+        "issg-uicn-invasoras",
+        "res-684-2018-mads"
+      ],
+      "valor_pedagogico": "SE BUSCA: El 'Sediento de los Andes'. Seca las quebradas y envenena el suelo para que nada más crezca. Su sombra no es vida, es desierto verde.",
       "validation_level": "claude_draft"
     },
     {
@@ -1778,6 +1940,112 @@
         "gbif-taxonomic-backbone",
         "agrosavia-manual-biopreparados-2015"
       ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "hedychium_coronarium",
+      "nombre_comun": "Matandrea",
+      "nombre_cientifico": "Hedychium coronarium J. König",
+      "nombre_comunes_regionales": [
+        "Mariposa blanca",
+        "Lirio de río"
+      ],
+      "familia_botanica": "Zingiberaceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "invasive"
+      ],
+      "cultivable": false,
+      "conservation_status": "invasor",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2400,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 16,
+        "optimo_max": 24,
+        "max_tolerable": 32
+      },
+      "impacto_ecologico": {
+        "tipo": "alteracion_hidrologica",
+        "severidad": "critico",
+        "mecanismo_principal": "Coloniza orillas de ríos y humedales, formando rizomas densos que desplazan la vegetación de ribera y pueden desviar flujos de agua.",
+        "cobertura_actual_andes_co": "Especie crítica en la cuenca del río Curí y quebradas altoandinas."
+      },
+      "erradicacion_protocolo": {
+        "metodo_principal": "arrancado_manual",
+        "epoca_optima": "Temporada de aguas bajas.",
+        "cuidados": "Extracción TOTAL del rizoma; cualquier fragmento que viaje río abajo iniciará una nueva invasión."
+      },
+      "especies_nativas_sustitutas": [],
+      "radiacion": "sombra_parcial",
+      "source_ids": [
+        "humboldt-invasoras-andes",
+        "res-684-2018-mads",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "SE BUSCA: La 'Invasora de Quebradas'. Sus flores huelen bien pero sus raíces matan el río. Si ves una mariposa blanca en la orilla, ¡es una alarma ecológica!",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "ipomoea_purpurea",
+      "nombre_comun": "Campanilla morada",
+      "nombre_cientifico": "Ipomoea purpurea (L.) Roth",
+      "nombre_comunes_regionales": [
+        "Batatilla",
+        "Glory morning"
+      ],
+      "familia_botanica": "Convolvulaceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "invasive"
+      ],
+      "cultivable": false,
+      "conservation_status": "invasor",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 1000,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 16,
+        "optimo_max": 24,
+        "max_tolerable": 32
+      },
+      "impacto_ecologico": {
+        "tipo": "desplazamiento_competitivo",
+        "severidad": "medio",
+        "mecanismo_principal": "Especie trepadora que sofoca árboles jóvenes en regeneración y cultivos.",
+        "cobertura_actual_andes_co": "Común en cercas y bordes de bosque disturbados."
+      },
+      "erradicacion_protocolo": {
+        "metodo_principal": "arrancado_manual",
+        "epoca_optima": "Antes de la dispersión de semillas.",
+        "cuidados": "Garantizar que no queden fragmentos de tallo con nudos en contacto con el suelo."
+      },
+      "especies_nativas_sustitutas": [
+        "passiflora_tripartita_mollissima"
+      ],
+      "radiacion": "sol_pleno",
+      "source_ids": [
+        "powo-kew",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "SE BUSCA: La 'Estranguladora'. Se trepa sobre los árboles recién sembrados para robarles el sol. Cámbiala por una Pasiflora nativa.",
       "validation_level": "claude_draft"
     },
     {
@@ -2264,6 +2532,63 @@
       "validation_level": "claude_draft"
     },
     {
+      "id": "lantana_camara",
+      "nombre_comun": "Camaroncillo",
+      "nombre_cientifico": "Lantana camara L.",
+      "nombre_comunes_regionales": [
+        "Verbena",
+        "Siete colores",
+        "Carraquillo"
+      ],
+      "familia_botanica": "Verbenaceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "invasive",
+        "pollinator_attractor"
+      ],
+      "cultivable": false,
+      "conservation_status": "invasor",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 1200,
+        "optimo_max": 2400,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 15,
+        "optimo_max": 25,
+        "max_tolerable": 35
+      },
+      "impacto_ecologico": {
+        "tipo": "desplazamiento_competitivo",
+        "severidad": "medio",
+        "mecanismo_principal": "Forma matorrales densos impenetrables; además sus frutos son atractivos para aves que dispersan la invasión.",
+        "cobertura_actual_andes_co": "Muy alta en zonas disturbadas y bordes de camino bajo los 2500m."
+      },
+      "erradicacion_protocolo": {
+        "metodo_principal": "arrancado_manual",
+        "epoca_optima": "Antes de la maduración de frutos negros.",
+        "cuidados": "Cuidado con la toxicidad de las hojas para el ganado; requiere remoción completa de raíz."
+      },
+      "especies_nativas_sustitutas": [
+        "viburnum_triphyllum"
+      ],
+      "radiacion": "sol_pleno",
+      "source_ids": [
+        "issg-uicn-invasoras",
+        "res-684-2018-mads",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "SE BUSCA: La 'Trampa de Colores'. Sus flores atraen mariposas pero sus raíces secuestran el espacio de los arbustos criollos.",
+      "validation_level": "claude_draft"
+    },
+    {
       "id": "melissa_officinalis",
       "nombre_comun": "Toronjil",
       "nombre_cientifico": "Melissa officinalis L.",
@@ -2730,6 +3055,60 @@
       "validation_level": "claude_draft"
     },
     {
+      "id": "pennisetum_setaceum",
+      "nombre_comun": "Pasto fuente",
+      "nombre_cientifico": "Pennisetum setaceum (Forssk.) Chiov.",
+      "nombre_comunes_regionales": [
+        "Cenchrus setaceus",
+        "Plumacho ornamental"
+      ],
+      "familia_botanica": "Poaceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "invasive"
+      ],
+      "cultivable": false,
+      "conservation_status": "invasor",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 1000,
+        "optimo_max": 2400,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 16,
+        "optimo_max": 26,
+        "max_tolerable": 38
+      },
+      "impacto_ecologico": {
+        "tipo": "reduccion_biodiversidad",
+        "severidad": "alto",
+        "mecanismo_principal": "Coloniza taludes y zonas secas, compitiendo agresivamente por espacio y alterando regímenes de fuego accidental (biomasa seca altamente inflamable).",
+        "cobertura_actual_andes_co": "En expansión rápida por bordes de carreteras nacionales."
+      },
+      "erradicacion_protocolo": {
+        "metodo_principal": "arrancado_manual",
+        "epoca_optima": "Permanente (crítico antes de emitir plumachos).",
+        "cuidados": "Cubrir las inflorescencias con bolsas antes de arrancar para evitar que el viento transporte las semillas ya maduras."
+      },
+      "especies_nativas_sustitutas": [
+        "calamagrostis_effusa"
+      ],
+      "radiacion": "sol_pleno",
+      "source_ids": [
+        "res-684-2018-mads",
+        "issg-uicn-invasoras"
+      ],
+      "valor_pedagogico": "SE BUSCA: El 'Plumacho Pirómano'. Una belleza ornamental que se convierte en combustible para incendios y destierra a nuestros pastos nativos.",
+      "validation_level": "claude_draft"
+    },
+    {
       "id": "petroselinum_crispum",
       "nombre_comun": "Perejil liso",
       "nombre_cientifico": "Petroselinum crispum (Mill.) Fuss",
@@ -3065,6 +3444,60 @@
       "validation_level": "claude_draft"
     },
     {
+      "id": "pinus_patula",
+      "nombre_comun": "Pino pátula",
+      "nombre_cientifico": "Pinus patula Schiede ex Schltdl. & Cham.",
+      "nombre_comunes_regionales": [
+        "Pino mexicano",
+        "Pino llorón"
+      ],
+      "familia_botanica": "Pinaceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "roles_in_guild": [
+        "invasive"
+      ],
+      "cultivable": false,
+      "conservation_status": "invasor",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 3000,
+        "max_absoluto": 3400
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 10,
+        "optimo_max": 18,
+        "max_tolerable": 24
+      },
+      "impacto_ecologico": {
+        "tipo": "modificacion_suelo",
+        "severidad": "alto",
+        "mecanismo_principal": "La acumulación de acículas acidifica el suelo e impide la regeneración de la flora nativa del bosque de niebla.",
+        "cobertura_actual_andes_co": "Frecuente en plantaciones forestales masivas que se han naturalizado en bordes de páramo."
+      },
+      "erradicacion_protocolo": {
+        "metodo_principal": "tala_anillado",
+        "epoca_optima": "Permanente.",
+        "cuidados": "Retirar la capa de acículas acumulada para permitir que la luz llegue al suelo y las semillas nativas germinen."
+      },
+      "especies_nativas_sustitutas": [
+        "quercus_humboldtii",
+        "weinmannia_tomentosa"
+      ],
+      "radiacion": "sol_pleno",
+      "source_ids": [
+        "calderon-saenz-2003-invasoras",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "SE BUSCA: El 'Acidificador'. Alfombra el suelo con sus agujas para que el roble andino no pueda nacer. Su lugar debe ser devuelto al bosque de niebla.",
+      "validation_level": "claude_draft"
+    },
+    {
       "id": "psidium_guajava_manzana",
       "nombre_comun": "Guayaba manzana",
       "nombre_cientifico": "Psidium guajava 'Manzana'",
@@ -3388,6 +3821,58 @@
         "gbif-taxonomic-backbone",
         "pamplona-roger-2006-plantas-medicinales"
       ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "rubus_alceifolius",
+      "nombre_comun": "Mora silvestre asiática",
+      "nombre_cientifico": "Rubus alceifolius Poir.",
+      "nombre_comunes_regionales": [
+        "Mora gigante invasora"
+      ],
+      "familia_botanica": "Rosaceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "invasive"
+      ],
+      "cultivable": false,
+      "conservation_status": "invasor",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1600,
+        "optimo_max": 2500,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 14,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "impacto_ecologico": {
+        "tipo": "desplazamiento_competitivo",
+        "severidad": "alto",
+        "mecanismo_principal": "Crecimiento extremadamente vigoroso que forma túneles que entierran a las especies nativas.",
+        "cobertura_actual_andes_co": "Reportada en laderas disturbadas del Valle del Cauca y Cundinamarca."
+      },
+      "erradicacion_protocolo": {
+        "metodo_principal": "arrancado_manual",
+        "epoca_optima": "Permanente.",
+        "cuidados": "Usar equipo de protección por las espinas; extraer sistema radicular completo."
+      },
+      "especies_nativas_sustitutas": [
+        "rubus_glaucus_sin_espinas"
+      ],
+      "radiacion": "sol_pleno",
+      "source_ids": [
+        "issg-uicn-invasoras",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "SE BUSCA: La 'Mora Impostora'. No la confundas con nuestra mora de castilla. Esta es un monstruo que devora laderas enteras.",
       "validation_level": "claude_draft"
     },
     {
