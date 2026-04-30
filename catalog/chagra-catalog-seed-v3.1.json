@@ -1,7 +1,7 @@
 {
   "schema_version": "3.1",
   "seed_version": "0.2.0",
-  "generated_at": "2026-04-29",
+  "generated_at": "2026-04-30",
   "generated_by": "md-fichas-to-catalog-json.mjs",
   "_meta": {
     "fuente_migracion": "chagra-catalog-seed-v3.0.json",
@@ -67,8 +67,7 @@
         "calderon-saenz-2003-invasoras",
         "res-684-2018-mads"
       ],
-      "valor_pedagogico": "SE BUSCA: El 'Rebrotador Invencible'. Un error histórico de reforestación que asfixia los bordes de bosque. Se sustituye por el Aliso, que sí pertenece aquí.",
-      "estrato": "medio"
+      "valor_pedagogico": "SE BUSCA: El 'Rebrotador Invencible'. Un error histórico de reforestación que asfixia los bordes de bosque. Se sustituye por el Aliso, que sí pertenece aquí."
     },
     {
       "id": "allium_ampeloprasum",
@@ -109,8 +108,7 @@
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de aporque: enseña cómo el manejo del suelo (blanqueo) afecta las propiedades culinarias del tallo en la chagra.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de aporque: enseña cómo el manejo del suelo (blanqueo) afecta las propiedades culinarias del tallo en la chagra."
     },
     {
       "id": "allium_cepa",
@@ -152,8 +150,7 @@
         "ica-resolucion-3168-2015",
         "restrepo-1996-abc-agricultura-organica"
       ],
-      "valor_pedagogico": "Lección de estratificación: enseña cómo la planta acumula reservas en capas (túnicas) para sobrevivir a periodos adversos.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de estratificación: enseña cómo la planta acumula reservas en capas (túnicas) para sobrevivir a periodos adversos."
     },
     {
       "id": "allium_fistulosum",
@@ -194,8 +191,7 @@
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de sostenibilidad: su capacidad de rebrote la convierte en el ejemplo ideal de 'cosecha perpetua' en la chagra.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de sostenibilidad: su capacidad de rebrote la convierte en el ejemplo ideal de 'cosecha perpetua' en la chagra."
     },
     {
       "id": "allium_sativum",
@@ -237,8 +233,7 @@
         "ica-resolucion-3168-2015",
         "restrepo-1996-abc-agricultura-organica"
       ],
-      "valor_pedagogico": "El antibiótico natural del huerto: su azufre orgánico es la base de los caldos preventivos de plagas en la chagra chiguana.",
-      "estrato": "medio"
+      "valor_pedagogico": "El antibiótico natural del huerto: su azufre orgánico es la base de los caldos preventivos de plagas en la chagra chiguana."
     },
     {
       "id": "alnus_acuminata",
@@ -452,8 +447,7 @@
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de nutrición hídrica: el apio demuestra la importancia de la humedad constante para evitar tallos fibrosos en la montaña.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de nutrición hídrica: el apio demuestra la importancia de la humedad constante para evitar tallos fibrosos en la montaña."
     },
     {
       "id": "beta_vulgaris_cicla_amarilla",
@@ -495,8 +489,7 @@
         "ica-resolucion-3168-2015",
         "restrepo-1996-abc-agricultura-organica"
       ],
-      "valor_pedagogico": "Lección de color y nutrición: la variedad amarilla destaca por su contenido de carotenoides y su vistosidad en la huerta arcoíris.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de color y nutrición: la variedad amarilla destaca por su contenido de carotenoides y su vistosidad en la huerta arcoíris."
     },
     {
       "id": "beta_vulgaris_cicla_blanca",
@@ -538,8 +531,7 @@
         "ica-resolucion-3168-2015",
         "restrepo-1996-abc-agricultura-organica"
       ],
-      "valor_pedagogico": "La variedad estándar de mayor productividad; ideal para enseñar el manejo de biomasa foliar y cortes sostenibles.",
-      "estrato": "medio"
+      "valor_pedagogico": "La variedad estándar de mayor productividad; ideal para enseñar el manejo de biomasa foliar y cortes sostenibles."
     },
     {
       "id": "beta_vulgaris_cicla_roja",
@@ -581,8 +573,7 @@
         "ica-resolucion-3168-2015",
         "restrepo-1996-abc-agricultura-organica"
       ],
-      "valor_pedagogico": "Ejemplo de fitoquímica: muestra cómo las betalaínas (pigmentos rojos) actúan como potentes antioxidantes en la dieta chiguana.",
-      "estrato": "medio"
+      "valor_pedagogico": "Ejemplo de fitoquímica: muestra cómo las betalaínas (pigmentos rojos) actúan como potentes antioxidantes en la dieta chiguana."
     },
     {
       "id": "beta_vulgaris_conditiva",
@@ -624,8 +615,7 @@
         "ica-resolucion-3168-2015",
         "restrepo-1996-abc-agricultura-organica"
       ],
-      "valor_pedagogico": "Lección sobre almacenamiento de energía: muestra cómo la planta guarda azúcares y nutrientes en su raíz hipocotila para sobrevivir al invierno (o épocas secas).",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección sobre almacenamiento de energía: muestra cómo la planta guarda azúcares y nutrientes en su raíz hipocotila para sobrevivir al invierno (o épocas secas)."
     },
     {
       "id": "brassica_oleracea_acephala_curly",
@@ -666,8 +656,7 @@
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de hortaliza perenne: permite entender el concepto de plantas multianuales y su resistencia a la escarcha en el huerto.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de hortaliza perenne: permite entender el concepto de plantas multianuales y su resistencia a la escarcha en el huerto."
     },
     {
       "id": "brassica_oleracea_acephala_lacinato",
@@ -708,8 +697,7 @@
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de arquitectura: a diferencia del repollo, sus hojas crecen abiertas sobre un tallo central persistente, permitiendo la 'cosecha de abajo hacia arriba'.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de arquitectura: a diferencia del repollo, sus hojas crecen abiertas sobre un tallo central persistente, permitiendo la 'cosecha de abajo hacia arriba'."
     },
     {
       "id": "brassica_oleracea_acephala_red_russian",
@@ -749,8 +737,7 @@
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de respuesta lumínica: muestra cómo la planta produce pigmentos púrpuras para gestionar la radiación UV en altura.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de respuesta lumínica: muestra cómo la planta produce pigmentos púrpuras para gestionar la radiación UV en altura."
     },
     {
       "id": "brassica_oleracea_capitata_alba",
@@ -790,8 +777,7 @@
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de morfología: muestra cómo las hojas se envuelven y compactan para formar una 'cabeza' protegida en la chagra.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de morfología: muestra cómo las hojas se envuelven y compactan para formar una 'cabeza' protegida en la chagra."
     },
     {
       "id": "brassica_oleracea_capitata_rubra",
@@ -831,8 +817,7 @@
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de pigmentos: las antocianinas actúan como protector solar y anticongelante natural en la alta montaña.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de pigmentos: las antocianinas actúan como protector solar y anticongelante natural en la alta montaña."
     },
     {
       "id": "brassica_oleracea_italica",
@@ -872,8 +857,7 @@
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de floración: enseña cómo lo que consumimos como 'cabeza' son en realidad miles de botones florales inmaduros.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de floración: enseña cómo lo que consumimos como 'cabeza' son en realidad miles de botones florales inmaduros."
     },
     {
       "id": "brassica_oleracea_sabauda",
@@ -912,8 +896,7 @@
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de selección varietal: su textura rugosa es un aislante térmico natural que le permite resistir inviernos intensos en la montaña.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de selección varietal: su textura rugosa es un aislante térmico natural que le permite resistir inviernos intensos en la montaña."
     },
     {
       "id": "calamagrostis_effusa",
@@ -1146,8 +1129,7 @@
         "fao-ecocrop",
         "sib-colombia"
       ],
-      "valor_pedagogico": "Superalimento andino. Parte de la 'Milpa Andina'; enseña cómo obtener proteína de alta calidad sin depender de mercados externos.",
-      "estrato": "medio"
+      "valor_pedagogico": "Superalimento andino. Parte de la 'Milpa Andina'; enseña cómo obtener proteína de alta calidad sin depender de mercados externos."
     },
     {
       "id": "coffea_arabica",
@@ -1261,8 +1243,7 @@
         "fao-ecocrop",
         "restrepo-1996-abc-agricultura-organica"
       ],
-      "valor_pedagogico": "Básico de la cocina chiguana. Sus flores atraen sírfidos que controlan pulgones de forma natural en el huerto.",
-      "estrato": "medio"
+      "valor_pedagogico": "Básico de la cocina chiguana. Sus flores atraen sírfidos que controlan pulgones de forma natural en el huerto."
     },
     {
       "id": "cymbopogon_citratus",
@@ -1305,8 +1286,7 @@
         "gbif-taxonomic-backbone",
         "pamplona-roger-2006-plantas-medicinales"
       ],
-      "valor_pedagogico": "Lección de diseño microclimático: su uso como barrera contra el viento protege cultivos más delicados en la zona fría.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de diseño microclimático: su uso como barrera contra el viento protege cultivos más delicados en la zona fría."
     },
     {
       "id": "cytisus_monspessulanus",
@@ -1351,8 +1331,7 @@
         "mongabay-retamo-2024",
         "res-684-2018-mads"
       ],
-      "valor_pedagogico": "SE BUSCA: El 'Falso Nativo'. Engaña con flores amarillas bonitas pero destruye el equilibrio químico del páramo. Su erradicación es un acto de soberanía hídrica.",
-      "estrato": "medio"
+      "valor_pedagogico": "SE BUSCA: El 'Falso Nativo'. Engaña con flores amarillas bonitas pero destruye el equilibrio químico del páramo. Su erradicación es un acto de soberanía hídrica."
     },
     {
       "id": "erythrina_edulis",
@@ -1475,8 +1454,7 @@
         "issg-uicn-invasoras",
         "res-684-2018-mads"
       ],
-      "valor_pedagogico": "SE BUSCA: El 'Sediento de los Andes'. Seca las quebradas y envenena el suelo para que nada más crezca. Su sombra no es vida, es desierto verde.",
-      "estrato": "medio"
+      "valor_pedagogico": "SE BUSCA: El 'Sediento de los Andes'. Seca las quebradas y envenena el suelo para que nada más crezca. Su sombra no es vida, es desierto verde."
     },
     {
       "id": "foeniculum_vulgare",
@@ -1519,8 +1497,7 @@
         "pamplona-roger-2006-plantas-medicinales",
         "restrepo-2007-biopreparados"
       ],
-      "valor_pedagogico": "Caso de estudio principal en alelopatía: sus exudados inhiben a la mayoría de vecinos. Enseña la necesidad de aislamiento en el diseño del huerto.",
-      "estrato": "medio"
+      "valor_pedagogico": "Caso de estudio principal en alelopatía: sus exudados inhiben a la mayoría de vecinos. Enseña la necesidad de aislamiento en el diseño del huerto."
     },
     {
       "id": "fragaria_ananassa_monterrey",
@@ -1561,8 +1538,7 @@
         "gbif-taxonomic-backbone",
         "agrosavia-manual-biopreparados-2015"
       ],
-      "valor_pedagogico": "Lección de fotoperiodo: variedad que permite entender cómo la planta produce flores y frutos independientemente de la duración del día.",
-      "estrato": "alto"
+      "valor_pedagogico": "Lección de fotoperiodo: variedad que permite entender cómo la planta produce flores y frutos independientemente de la duración del día."
     },
     {
       "id": "hedychium_coronarium",
@@ -1604,8 +1580,7 @@
         "res-684-2018-mads",
         "powo-kew"
       ],
-      "valor_pedagogico": "SE BUSCA: La 'Invasora de Quebradas'. Sus flores huelen bien pero sus raíces matan el río. Si ves una mariposa blanca en la orilla, ¡es una alarma ecológica!",
-      "estrato": "medio"
+      "valor_pedagogico": "SE BUSCA: La 'Invasora de Quebradas'. Sus flores huelen bien pero sus raíces matan el río. Si ves una mariposa blanca en la orilla, ¡es una alarma ecológica!"
     },
     {
       "id": "ipomoea_batatas",
@@ -1646,8 +1621,7 @@
         "powo-kew",
         "restrepo-1996-abc-agricultura-organica"
       ],
-      "valor_pedagogico": "Lección de raíces reservantes: enseña cómo una planta rastrera puede concentrar energía solar en forma de carbohidratos dulces bajo la tierra.",
-      "estrato": "bajo"
+      "valor_pedagogico": "Lección de raíces reservantes: enseña cómo una planta rastrera puede concentrar energía solar en forma de carbohidratos dulces bajo la tierra."
     },
     {
       "id": "ipomoea_purpurea",
@@ -1691,8 +1665,7 @@
         "powo-kew",
         "sib-colombia"
       ],
-      "valor_pedagogico": "SE BUSCA: La 'Estranguladora'. Se trepa sobre los árboles recién sembrados para robarles el sol. Cámbiala por una Pasiflora nativa.",
-      "estrato": "medio"
+      "valor_pedagogico": "SE BUSCA: La 'Estranguladora'. Se trepa sobre los árboles recién sembrados para robarles el sol. Cámbiala por una Pasiflora nativa."
     },
     {
       "id": "lactuca_sativa_capitata",
@@ -1733,8 +1706,7 @@
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de pigmentación: muestra cómo las antocianinas (color morado) protegen a la planta contra el estrés lumínico y térmico.",
-      "estrato": "bajo"
+      "valor_pedagogico": "Lección de pigmentación: muestra cómo las antocianinas (color morado) protegen a la planta contra el estrés lumínico y térmico."
     },
     {
       "id": "lactuca_sativa_crispa_verde",
@@ -1776,8 +1748,7 @@
         "ica-resolucion-3168-2015",
         "restrepo-1996-abc-agricultura-organica"
       ],
-      "valor_pedagogico": "Hortaliza emblemática de huertos urbanos y rurales por su rápido ciclo, rebrote tras corte y bajo requerimiento de espacio.",
-      "estrato": "bajo"
+      "valor_pedagogico": "Hortaliza emblemática de huertos urbanos y rurales por su rápido ciclo, rebrote tras corte y bajo requerimiento de espacio."
     },
     {
       "id": "lactuca_sativa_longifolia_morada",
@@ -1818,8 +1789,7 @@
         "ica-resolucion-3168-2015",
         "restrepo-1996-abc-agricultura-organica"
       ],
-      "valor_pedagogico": "Combina la morfología acogollada con pigmentación púrpura: ideal para enseñar respuestas fisiológicas al ambiente andino.",
-      "estrato": "medio"
+      "valor_pedagogico": "Combina la morfología acogollada con pigmentación púrpura: ideal para enseñar respuestas fisiológicas al ambiente andino."
     },
     {
       "id": "lactuca_sativa_longifolia_verde",
@@ -1860,8 +1830,7 @@
         "ica-resolucion-3168-2015",
         "restrepo-1996-abc-agricultura-organica"
       ],
-      "valor_pedagogico": "Variedad acogollada permite enseñar el blanqueamiento natural por autosombreado de hojas internas.",
-      "estrato": "medio"
+      "valor_pedagogico": "Variedad acogollada permite enseñar el blanqueamiento natural por autosombreado de hojas internas."
     },
     {
       "id": "lactuca_sativa_roble_morada",
@@ -1903,8 +1872,7 @@
         "ica-resolucion-3168-2015",
         "restrepo-1996-abc-agricultura-organica"
       ],
-      "valor_pedagogico": "Las antocianinas responden al fotoperíodo y la temperatura: ideal para enseñar respuestas fisiológicas al ambiente andino.",
-      "estrato": "bajo"
+      "valor_pedagogico": "Las antocianinas responden al fotoperíodo y la temperatura: ideal para enseñar respuestas fisiológicas al ambiente andino."
     },
     {
       "id": "lactuca_sativa_roble_verde",
@@ -1946,8 +1914,7 @@
         "ica-resolucion-3168-2015",
         "restrepo-1996-abc-agricultura-organica"
       ],
-      "valor_pedagogico": "Hortaliza de ciclo rápido e ideal para enseñar el concepto de roseta y crecimiento centrífugo en el huerto.",
-      "estrato": "bajo"
+      "valor_pedagogico": "Hortaliza de ciclo rápido e ideal para enseñar el concepto de roseta y crecimiento centrífugo en el huerto."
     },
     {
       "id": "lantana_camara",
@@ -1993,8 +1960,7 @@
         "res-684-2018-mads",
         "sib-colombia"
       ],
-      "valor_pedagogico": "SE BUSCA: La 'Trampa de Colores'. Sus flores atraen mariposas pero sus raíces secuestran el espacio de los arbustos criollos.",
-      "estrato": "medio"
+      "valor_pedagogico": "SE BUSCA: La 'Trampa de Colores'. Sus flores atraen mariposas pero sus raíces secuestran el espacio de los arbustos criollos."
     },
     {
       "id": "lupinus_mutabilis",
@@ -2035,8 +2001,7 @@
         "agrosavia-manual-biopreparados-2015",
         "cip-2006-ghislain"
       ],
-      "valor_pedagogico": "Leguminosa de alta montaña. Sus alcaloides actúan como repelentes naturales en la chagra; enseña el valor de los cultivos de ciclo cerrado.",
-      "estrato": "medio"
+      "valor_pedagogico": "Leguminosa de alta montaña. Sus alcaloides actúan como repelentes naturales en la chagra; enseña el valor de los cultivos de ciclo cerrado."
     },
     {
       "id": "melissa_officinalis",
@@ -2078,8 +2043,7 @@
         "gbif-taxonomic-backbone",
         "pamplona-roger-2006-plantas-medicinales"
       ],
-      "valor_pedagogico": "Lección de alelopatía positiva: su aroma cítrico confunde plagas de hortalizas vecinas (especialmente tomates).",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de alelopatía positiva: su aroma cítrico confunde plagas de hortalizas vecinas (especialmente tomates)."
     },
     {
       "id": "mentha_spicata",
@@ -2122,8 +2086,7 @@
         "gbif-taxonomic-backbone",
         "pamplona-roger-2006-plantas-medicinales"
       ],
-      "valor_pedagogico": "Lección de expansión: muestra cómo las plantas colonizan espacio mediante sistemas radiculares horizontales (estolones).",
-      "estrato": "bajo"
+      "valor_pedagogico": "Lección de expansión: muestra cómo las plantas colonizan espacio mediante sistemas radiculares horizontales (estolones)."
     },
     {
       "id": "origanum_vulgare",
@@ -2165,8 +2128,7 @@
         "gbif-taxonomic-backbone",
         "pamplona-roger-2006-plantas-medicinales"
       ],
-      "valor_pedagogico": "Lección de rusticidad y sabor mediterráneo adaptado: muestra cómo una planta puede ser cobertura de suelo y botica al mismo tiempo.",
-      "estrato": "bajo"
+      "valor_pedagogico": "Lección de rusticidad y sabor mediterráneo adaptado: muestra cómo una planta puede ser cobertura de suelo y botica al mismo tiempo."
     },
     {
       "id": "oxalis_tuberosa",
@@ -2206,8 +2168,7 @@
         "agrosavia-manual-tuberculos-andinos-2017",
         "cip-2006-ghislain"
       ],
-      "valor_pedagogico": "Lección de biodiversidad andina. Es la 'hermana del frío' que acompaña a la papa en la chagra alta chiguana.",
-      "estrato": "bajo"
+      "valor_pedagogico": "Lección de biodiversidad andina. Es la 'hermana del frío' que acompaña a la papa en la chagra alta chiguana."
     },
     {
       "id": "passiflora_edulis_flavicarpa",
@@ -2249,8 +2210,7 @@
         "sib-colombia",
         "gbif-taxonomic-backbone"
       ],
-      "valor_pedagogico": "Lección de gradiente térmico: contraste de requerimientos calurosos frente a sus parientes andinos (gulupa/curuba).",
-      "estrato": "alto"
+      "valor_pedagogico": "Lección de gradiente térmico: contraste de requerimientos calurosos frente a sus parientes andinos (gulupa/curuba)."
     },
     {
       "id": "passiflora_edulis_morada",
@@ -2293,7 +2253,17 @@
         "gbif-taxonomic-backbone"
       ],
       "valor_pedagogico": "Lección de hibridación: riesgo de cruce con maracuyá que degrada la calidad comercial; manejo de exportación local.",
-      "estrato": "alto"
+      "feeding_plan_template": {
+        "source": "Agrosavia - Manual de Gulupa",
+        "primary_steps": [
+          "offset_days: 0"
+        ],
+        "action": "compost",
+        "biofertilizer_slug": "humus-lombriz",
+        "dose_ml": 500,
+        "notes": "Establecimiento",
+        "- offset_days": 30
+      }
     },
     {
       "id": "passiflora_ligularis",
@@ -2335,8 +2305,7 @@
         "fao-ecocrop",
         "powo-kew"
       ],
-      "valor_pedagogico": "Lección de entomología: importancia de los abejorros (Xylocopa spp.) para la polinización efectiva y el éxito de la cosecha.",
-      "estrato": "alto"
+      "valor_pedagogico": "Lección de entomología: importancia de los abejorros (Xylocopa spp.) para la polinización efectiva y el éxito de la cosecha."
     },
     {
       "id": "passiflora_tripartita_mollissima",
@@ -2377,8 +2346,7 @@
         "sib-colombia",
         "gbif-taxonomic-backbone"
       ],
-      "valor_pedagogico": "Lección de adaptación altitudinal: es la única pasiflora comercial que prospera por encima de los 2500 msnm.",
-      "estrato": "alto"
+      "valor_pedagogico": "Lección de adaptación altitudinal: es la única pasiflora comercial que prospera por encima de los 2500 msnm."
     },
     {
       "id": "pennisetum_setaceum",
@@ -2422,8 +2390,7 @@
         "res-684-2018-mads",
         "issg-uicn-invasoras"
       ],
-      "valor_pedagogico": "SE BUSCA: El 'Plumacho Pirómano'. Una belleza ornamental que se convierte en combustible para incendios y destierra a nuestros pastos nativos.",
-      "estrato": "medio"
+      "valor_pedagogico": "SE BUSCA: El 'Plumacho Pirómano'. Una belleza ornamental que se convierte en combustible para incendios y destierra a nuestros pastos nativos."
     },
     {
       "id": "petroselinum_crispum",
@@ -2465,8 +2432,7 @@
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de paciencia: su lenta germinación enseña los tiempos biológicos diferenciados en el huerto andino.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de paciencia: su lenta germinación enseña los tiempos biológicos diferenciados en el huerto andino."
     },
     {
       "id": "petroselinum_crispum_neapolitanum",
@@ -2508,8 +2474,7 @@
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de diversidad varietal: comparación de perfiles aromáticos y resistencia climática entre variedades de una misma especie.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de diversidad varietal: comparación de perfiles aromáticos y resistencia climática entre variedades de una misma especie."
     },
     {
       "id": "phaseolus_vulgaris",
@@ -2631,8 +2596,7 @@
         "agrosavia-manual-uchuva-2015",
         "powo-kew"
       ],
-      "valor_pedagogico": "La joya protegida: su capacho natural enseña la importancia de la protección post-cosecha y la conservación del valor nutritivo.",
-      "estrato": "alto"
+      "valor_pedagogico": "La joya protegida: su capacho natural enseña la importancia de la protección post-cosecha y la conservación del valor nutritivo."
     },
     {
       "id": "pimpinella_anisum",
@@ -2674,8 +2638,7 @@
         "gbif-taxonomic-backbone",
         "pamplona-roger-2006-plantas-medicinales"
       ],
-      "valor_pedagogico": "Lección de aromaterapia viva: permite identificar cómo las plantas atraen polinizadores y repelen plagas mediante aceites volátiles.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de aromaterapia viva: permite identificar cómo las plantas atraen polinizadores y repelen plagas mediante aceites volátiles."
     },
     {
       "id": "pinus_patula",
@@ -2719,8 +2682,7 @@
         "calderon-saenz-2003-invasoras",
         "gbif-taxonomic-backbone"
       ],
-      "valor_pedagogico": "SE BUSCA: El 'Acidificador'. Alfombra el suelo con sus agujas para que el roble andino no pueda nacer. Su lugar debe ser devuelto al bosque de niebla.",
-      "estrato": "medio"
+      "valor_pedagogico": "SE BUSCA: El 'Acidificador'. Alfombra el suelo con sus agujas para que el roble andino no pueda nacer. Su lugar debe ser devuelto al bosque de niebla."
     },
     {
       "id": "prunus_serotina_capuli",
@@ -2761,8 +2723,7 @@
         "powo-kew",
         "sib-colombia"
       ],
-      "valor_pedagogico": "El cerezo de los Andes. Esencial en el paisaje chiguano por su valor cultural, su madera fina y su rol como rompevientos natural.",
-      "estrato": "alto"
+      "valor_pedagogico": "El cerezo de los Andes. Esencial en el paisaje chiguano por su valor cultural, su madera fina y su rol como rompevientos natural."
     },
     {
       "id": "psidium_guajava_manzana",
@@ -2804,8 +2765,7 @@
         "gbif-taxonomic-backbone",
         "restrepo-1996-abc-agricultura-organica"
       ],
-      "valor_pedagogico": "Lección de rusticidad: planta adaptada a suelos marginales que provee altísima nutrición (Vitamina C) con mínimo manejo externo.",
-      "estrato": "alto"
+      "valor_pedagogico": "Lección de rusticidad: planta adaptada a suelos marginales que provee altísima nutrición (Vitamina C) con mínimo manejo externo."
     },
     {
       "id": "pteridium_aquilinum",
@@ -2987,8 +2947,7 @@
         "ica-resolucion-3168-2015",
         "restrepo-1996-abc-agricultura-organica"
       ],
-      "valor_pedagogico": "Ciclo más corto del huerto (3-5 semanas): ideal como primer cultivo para niños y como indicador de compactación del suelo.",
-      "estrato": "medio"
+      "valor_pedagogico": "Ciclo más corto del huerto (3-5 semanas): ideal como primer cultivo para niños y como indicador de compactación del suelo."
     },
     {
       "id": "rosmarinus_officinalis",
@@ -3030,8 +2989,7 @@
         "gbif-taxonomic-backbone",
         "pamplona-roger-2006-plantas-medicinales"
       ],
-      "valor_pedagogico": "Lección de rusticidad: ejemplifica la capacidad de algunas especies para prosperar en suelos pobres y climas extremos de la cordillera.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de rusticidad: ejemplifica la capacidad de algunas especies para prosperar en suelos pobres y climas extremos de la cordillera."
     },
     {
       "id": "rubus_alceifolius",
@@ -3075,8 +3033,7 @@
         "res-684-2018-mads",
         "sib-colombia"
       ],
-      "valor_pedagogico": "SE BUSCA: El 'Matorral Asfixiante'. Una mora gigante de Asia que no permite el paso ni de la luz ni de los chiguanos. Se cambia por nuestra Mora de Castilla.",
-      "estrato": "medio"
+      "valor_pedagogico": "SE BUSCA: El 'Matorral Asfixiante'. Una mora gigante de Asia que no permite el paso ni de la luz ni de los chiguanos. Se cambia por nuestra Mora de Castilla."
     },
     {
       "id": "rubus_glaucus_sin_espinas",
@@ -3117,8 +3074,7 @@
         "sib-colombia",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de domesticación: muestra las ventajas de la selección varietal para mejorar la ergonomía y la seguridad en la agricultura familiar.",
-      "estrato": "alto"
+      "valor_pedagogico": "Lección de domesticación: muestra las ventajas de la selección varietal para mejorar la ergonomía y la seguridad en la agricultura familiar."
     },
     {
       "id": "rubus_idaeus_golden",
@@ -3158,8 +3114,7 @@
         "powo-kew",
         "gbif-taxonomic-backbone"
       ],
-      "valor_pedagogico": "Lección de pigmentos: comparación entre antocianinas y su ausencia, y su impacto en el sabor y las propiedades organolépticas.",
-      "estrato": "alto"
+      "valor_pedagogico": "Lección de pigmentos: comparación entre antocianinas y su ausencia, y su impacto en el sabor y las propiedades organolépticas."
     },
     {
       "id": "rubus_idaeus_heritage",
@@ -3200,8 +3155,7 @@
         "powo-kew",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de ciclo de tallo: enseña la diferencia entre floricanes y primocanes en plantas arbustivas y su manejo ergonómico.",
-      "estrato": "alto"
+      "valor_pedagogico": "Lección de ciclo de tallo: enseña la diferencia entre floricanes y primocanes en plantas arbustivas y su manejo ergonómico."
     },
     {
       "id": "salvia_officinalis",
@@ -3243,8 +3197,7 @@
         "gbif-taxonomic-backbone",
         "pamplona-roger-2006-plantas-medicinales"
       ],
-      "valor_pedagogico": "Lección de adaptación hídrica: sus hojas vellosas muestran una estrategia para reducir la transpiración en climas secos.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de adaptación hídrica: sus hojas vellosas muestran una estrategia para reducir la transpiración en climas secos."
     },
     {
       "id": "sambucus_nigra_peruviana",
@@ -3334,8 +3287,7 @@
         "agrosavia-manual-uchuva-2015",
         "gbif-taxonomic-backbone"
       ],
-      "valor_pedagogico": "Frutal andino por excelencia. Su sombra ligera puede servir como nodriza para cultivos de estrato bajo en la chagra chiguana.",
-      "estrato": "alto"
+      "valor_pedagogico": "Frutal andino por excelencia. Su sombra ligera puede servir como nodriza para cultivos de estrato bajo en la chagra chiguana."
     },
     {
       "id": "solanum_lycopersicum_cerasiforme",
@@ -3376,8 +3328,7 @@
         "gbif-taxonomic-backbone",
         "restrepo-1996-abc-agricultura-organica"
       ],
-      "valor_pedagogico": "Lección de cosecha escalonada: enseña cómo los frutos maduran en racimos de forma secuencial, permitiendo una provisión constante.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de cosecha escalonada: enseña cómo los frutos maduran en racimos de forma secuencial, permitiendo una provisión constante."
     },
     {
       "id": "solanum_lycopersicum_cerasiforme_uvalina",
@@ -3418,8 +3369,7 @@
         "gbif-taxonomic-backbone",
         "agrosavia-manual-biopreparados-2015"
       ],
-      "valor_pedagogico": "Lección de textura y conservación: enseña cómo la forma elongada y la piel firme reducen el rajado de los frutos en la montaña.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de textura y conservación: enseña cómo la forma elongada y la piel firme reducen el rajado de los frutos en la montaña."
     },
     {
       "id": "solanum_lycopersicum_san_marzano",
@@ -3543,8 +3493,7 @@
         "gbif-taxonomic-backbone",
         "agrosavia-manual-biopreparados-2015"
       ],
-      "valor_pedagogico": "Lección de sabor y color: enseña cómo el color naranja intenso indica altos niveles de azúcares y betacarotenos, siendo el referente mundial de dulzor en tomates.",
-      "estrato": "medio"
+      "valor_pedagogico": "Lección de sabor y color: enseña cómo el color naranja intenso indica altos niveles de azúcares y betacarotenos, siendo el referente mundial de dulzor en tomates."
     },
     {
       "id": "solanum_phureja",
@@ -3585,8 +3534,7 @@
         "powo-kew",
         "sib-colombia"
       ],
-      "valor_pedagogico": "Lección de inmediatez: a diferencia de las papas de año, la criolla no duerme; su ciclo rápido enseña la dinámica de renovación constante en la chagra chiguana.",
-      "estrato": "bajo"
+      "valor_pedagogico": "Lección de inmediatez: a diferencia de las papas de año, la criolla no duerme; su ciclo rápido enseña la dinámica de renovación constante en la chagra chiguana."
     },
     {
       "id": "thunbergia_alata",
@@ -3801,8 +3749,7 @@
         "agrosavia-manual-tuberculos-andinos-2017",
         "cip-potatoes-americas"
       ],
-      "valor_pedagogico": "Soberanía alimentaria chiguana. Un tubérculo ultra-resistente que limpia el suelo de nematodos para las futuras siembras.",
-      "estrato": "medio"
+      "valor_pedagogico": "Soberanía alimentaria chiguana. Un tubérculo ultra-resistente que limpia el suelo de nematodos para las futuras siembras."
     },
     {
       "id": "ulex_europaeus",
@@ -3965,8 +3912,7 @@
         "agrosavia-manual-tuberculos-andinos-2017",
         "gbif-taxonomic-backbone"
       ],
-      "valor_pedagogico": "La joya polícroma del altiplano. Resistente a heladas que quemarían otros cultivos; esencial para el chiguano de páramo.",
-      "estrato": "bajo"
+      "valor_pedagogico": "La joya polícroma del altiplano. Resistente a heladas que quemarían otros cultivos; esencial para el chiguano de páramo."
     },
     {
       "id": "urtica_dioica",
@@ -4325,8 +4271,7 @@
         "agrosavia-manual-arandano-2018",
         "powo-kew"
       ],
-      "valor_pedagogico": "Lección de precocidad: variedad que permite entender la importancia de la adaptación climática y la ventana de cosecha temprana.",
-      "estrato": "alto"
+      "valor_pedagogico": "Lección de precocidad: variedad que permite entender la importancia de la adaptación climática y la ventana de cosecha temprana."
     },
     {
       "id": "viburnum_triphyllum",

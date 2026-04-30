@@ -20,7 +20,7 @@
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 7;
+export const DB_VERSION = 8;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -33,6 +33,7 @@ export const STORES = {
   PENDING_VOICE: 'pending_voice_recordings',
   INVENTORY_EVENTS: 'inventory_events',
   INVENTORY_STOCK: 'inventory_stock_snapshot',
+  PLANS: 'plans',
 };
 
 let dbInstance = null;
@@ -121,6 +122,13 @@ export const openDB = async () => {
       // (cumple ADR-019 — log es source of truth, esto es solo cache O(1)).
       if (!db.objectStoreNames.contains(STORES.INVENTORY_STOCK)) {
         db.createObjectStore(STORES.INVENTORY_STOCK, { keyPath: 'item_id' });
+      }
+
+      // v8: plans — generated feeding plans
+      if (!db.objectStoreNames.contains(STORES.PLANS)) {
+        const store = db.createObjectStore(STORES.PLANS, { keyPath: 'id' });
+        store.createIndex('asset_id', 'asset_id', { unique: false });
+        store.createIndex('species_slug', 'species_slug', { unique: false });
       }
     };
 
