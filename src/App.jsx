@@ -37,6 +37,7 @@ const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m
 const BiodiversidadView = lazy(() => import('./components/BiodiversidadView'));
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
 const ProfileScreen = lazy(() => import('./components/ProfileScreen'));
+const OnboardingHero = lazy(() => import('./components/OnboardingHero'));
 
 localforage.config({
   name: 'Chagra',
@@ -138,7 +139,16 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
         </div>
       </header>
       <main className="flex-1 px-4 pt-3 pb-4 flex flex-col overflow-y-auto gap-3 bg-biopunk-pattern">
-        <TelemetryAlerts lastFarmOsLog={lastLogMessage} />
+        {/* DR-030 QW5: cold-start empty-state.
+            plantsCount === 0 → OnboardingHero con 3 CTA hero (📸/🎤/✍).
+            Sin plantas registradas, la telemetría densa es ruido informacional;
+            la suprimimos a favor del onboarding directo. Cuando hay ≥1 planta
+            registrada, vuelve el dashboard normal con TelemetryAlerts. */}
+        {plantsCount === 0 ? (
+          <OnboardingHero onNavigate={onNavigate} />
+        ) : (
+          <TelemetryAlerts lastFarmOsLog={lastLogMessage} />
+        )}
 
         {/* Contadores de inventario consolidados: un solo container con
             divisores verticales entre columnas, en vez de 4 tarjetas
