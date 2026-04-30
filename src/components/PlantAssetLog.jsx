@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Camera, MapPin } from 'lucide-react';
 import { savePayload } from '../services/payloadService';
+import { captureAndCompress, savePhoto } from '../services/photoService';
 import { sanitizeBlobUrl } from '../utils/blobUrl';
 
 const ASSET_TYPES = [
@@ -37,20 +38,23 @@ export default function PlantAssetLog({ onBack, onSave }) {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handlePhotoCapture = (e) => {
+  const handlePhotoCapture = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    // Validación explícita de MIME: el atributo `accept="image/*"` del input es
-    // solo una pista UX y puede bypassearse. Restringir a image/* antes de
-    // generar el blob URL evita que un SVG/HTML con scripts embebidos llegue a
-    // un <img src={blob:...}> y cierra la regla CodeQL js/xss-through-dom.
+    // Validación MIME (cierra CodeQL js/xss-through-dom).
     if (!file.type.startsWith('image/')) {
       onSave('Archivo no es una imagen válida', true);
       return;
     }
-    setPhoto(file);
-    if (photoUrl) URL.revokeObjectURL(photoUrl);
-    setPhotoUrl(URL.createObjectURL(file));
+    try {
+      const { blob } = await captureAndCompress(file);
+      setPhoto(blob);
+      if (photoUrl) URL.revokeObjectURL(photoUrl);
+      setPhotoUrl(URL.createObjectURL(blob));
+    } catch (err) {
+      console.error('Error comprimir foto:', err);
+      onSave('Error procesando foto', true);
+    }
   };
 
   const captureLocation = () => {
@@ -91,13 +95,29 @@ export default function PlantAssetLog({ onBack, onSave }) {
 
     setIsSaving(true);
     try {
+      let photoRefId = null;
+      if (photo) {
+        try {
+          photoRefId = await savePhoto({
+            blob: photo,
+            speciesSlug: formData.species
+              ? formData.species.toLowerCase().replace(/\s+/g, '_')
+              : null,
+            meta: {
+              capturedAt: new Date().toISOString(),
+              gps: location ? { lat: location.lat, lon: location.lon } : null,
+            },
+          });
+        } catch (err) {
+          console.error('Error guardar foto en media_cache:', err);
+          onSave('Foto no se pudo guardar localmente', true);
+          setIsSaving(false);
+          return;
+        }
+      }
+
       const payload = {
-        _multipartFile: photo ? {
-          name: photo.name,
-          type: photo.type,
-          size: photo.size,
-          file: photo
-        } : null,
+        _photoRefId: photoRefId,
 
         data: {
           type: "asset--plant",
@@ -141,6 +161,21 @@ export default function PlantAssetLog({ onBack, onSave }) {
       </header>
 
       <div className="flex-1 p-5 flex flex-col gap-6 pb-24">
+        {/* Hero foto — primer paso del flujo (DR-030 QW3) */}
+        <div className="flex flex-col gap-2">
+          <span className="text-xl font-bold">Foto de la planta</span>
+          <label className="flex flex-col items-center justify-center gap-3 p-6 rounded-xl bg-slate-900 border-2 border-dashed border-slate-600 active:bg-slate-800 cursor-pointer min-h-[140px] overflow-hidden relative">
+            {sanitizeBlobUrl(photoUrl) ? (
+              <img src={sanitizeBlobUrl(photoUrl)} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+            ) : null}
+            <div className="z-10 flex flex-col items-center gap-2 drop-shadow-md">
+              <Camera size={48} />
+              <span className="text-xl font-bold">{photo ? '📸 Cambiar foto' : '📸 Foto de la planta'}</span>
+            </div>
+            <input type="file" accept="image/*" capture="environment" onChange={handlePhotoCapture} className="hidden" />
+          </label>
+        </div>
+
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Tipo de Activo</span>
           <select name="assetType" value={formData.assetType} onChange={handleInput} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-2xl text-white min-h-[64px] appearance-none">
@@ -177,20 +212,6 @@ export default function PlantAssetLog({ onBack, onSave }) {
               <p className="font-mono mt-1 whitespace-nowrap">{location.wkt}</p>
             </div>
           )}
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <span className="text-xl font-bold">Fotografía del Activo</span>
-          <label className="flex flex-col items-center justify-center gap-3 p-6 rounded-xl bg-slate-900 border-2 border-dashed border-slate-600 active:bg-slate-800 cursor-pointer min-h-[120px] overflow-hidden relative">
-            {sanitizeBlobUrl(photoUrl) ? (
-              <img src={sanitizeBlobUrl(photoUrl)} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-60" />
-            ) : null}
-            <div className="z-10 flex flex-col items-center gap-2 drop-shadow-md">
-              <Camera size={48} />
-              <span className="text-xl font-bold">{photo ? 'Cambiar Foto' : 'Tomar Foto'}</span>
-            </div>
-            <input type="file" accept="image/*" capture="environment" onChange={handlePhotoCapture} className="hidden" />
-          </label>
         </div>
 
         <button
