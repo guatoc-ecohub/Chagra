@@ -5,6 +5,8 @@ import { UNIT_OPTIONS } from '../config/materials';
 import { useConsumptionMetrics } from '../hooks/useConsumptionMetrics';
 import { Sparkline } from './charts/Sparkline';
 import { exportTraceabilityCsv } from '../services/exportService';
+import { getAllPlans, markStepExecuted } from '../services/planGeneratorService';
+import { getCurrentOperatorHash } from '../services/operatorIdentityService';
 
 /**
  * InventoryDashboard — Bodega de biofábrica (Fase 13.2 / refactor 13.6).
@@ -31,9 +33,8 @@ const MaterialCard = ({ item, onRefill }) => {
 
   return (
     <div
-      className={`bg-slate-900 border rounded-2xl p-5 space-y-4 transition-all ${
-        isPending ? 'border-dashed border-slate-600 opacity-80' : 'border-slate-800'
-      }`}
+      className={`bg-slate-900 border rounded-2xl p-5 space-y-4 transition-all ${isPending ? 'border-dashed border-slate-600 opacity-80' : 'border-slate-800'
+        }`}
     >
       <div className="flex justify-between items-start gap-2">
         <h3 className="font-bold text-slate-200 truncate flex-1">{name}</h3>
@@ -102,6 +103,43 @@ export const InventoryDashboard = () => {
   const [refillUnit, setRefillUnit] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [exporting, setExporting] = useState(false);
+
+  const [upcomingSteps, setUpcomingSteps] = useState([]);
+
+  const loadUpcomingSteps = async () => {
+    try {
+      const plans = await getAllPlans();
+      const next7Days = Date.now() + 7 * 86400000;
+      let steps = [];
+
+      plans.forEach(p => {
+        p.steps.forEach(s => {
+          if (s.status !== 'completed' && s.scheduled_date <= next7Days) {
+            steps.push({ ...s, planId: p.id, species: p.species_slug });
+          }
+        });
+      });
+
+      steps.sort((a, b) => a.scheduled_date - b.scheduled_date);
+      setUpcomingSteps(steps);
+    } catch (e) {
+      console.warn("Failed to load plans", e);
+    }
+  };
+
+  React.useEffect(() => {
+    loadUpcomingSteps();
+  }, []);
+
+  const handleMarkExecuted = async (planId, stepId) => {
+    try {
+      const hash = getCurrentOperatorHash() || 'default-hash-00000000000000000000000000000000000000000000000000000';
+      await markStepExecuted(planId, stepId, hash);
+      loadUpcomingSteps();
+    } catch (e) {
+      alert("Error: " + e.message);
+    }
+  };
 
   const handleExport = async () => {
     if (exporting) return;
@@ -181,6 +219,40 @@ export const InventoryDashboard = () => {
           </button>
         </div>
       </header>
+
+      {/* Upcoming Plans Section */}
+      {upcomingSteps.length > 0 && (
+        <section className="bg-slate-900 border border-slate-700 rounded-2xl p-5 mb-6">
+          <h2 className="text-xl font-bold text-white mb-4">Próximos Pasos (7 días)</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {upcomingSteps.map(step => {
+              const isPast = step.scheduled_date < Date.now();
+              return (
+                <div key={step.id} className={`p-3 rounded-xl border ${isPast ? 'border-red-500/50 bg-red-500/10' : 'border-cyan-500/50 bg-cyan-500/10'}`}>
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h4 className="font-bold text-white">{new Date(step.scheduled_date).toLocaleDateString()}</h4>
+                      <p className="text-xs text-slate-300">{step.species} - {step.action_type.replace('_', ' ')}</p>
+                    </div>
+                    <span className={`text-[10px] px-2 py-1 rounded font-bold uppercase ${isPast ? 'bg-red-500/20 text-red-300' : 'bg-cyan-500/20 text-cyan-300'}`}>
+                      {isPast ? 'Atrasado' : 'Próximo'}
+                    </span>
+                  </div>
+                  <div className="text-sm text-slate-300 mb-3">
+                    <span className="font-bold">{step.dose_ml}ml</span> de {step.biofertilizer_slug}
+                  </div>
+                  <button
+                    onClick={() => handleMarkExecuted(step.planId, step.id)}
+                    className="w-full py-1.5 bg-green-600/80 hover:bg-green-600 text-white rounded text-sm font-bold transition-all"
+                  >
+                    ✓ Ejecutar
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {materials.length === 0 ? (
         <div className="py-12 text-center text-slate-500">

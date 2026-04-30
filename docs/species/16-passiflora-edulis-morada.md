@@ -26,6 +26,22 @@ propagation:
   notas: Se recomienda el uso de micorrizas en el trasplante; evitar cercanía con maracuyá.
 source_ids: [powo-kew, sib-colombia, gbif-taxonomic-backbone]
 valor_pedagogico: Lección de hibridación: riesgo de cruce con maracuyá que degrada la calidad comercial; manejo de exportación local.
+feeding_plan_template:
+  source: "Agrosavia - Manual de Gulupa"
+  primary_steps:
+    - offset_days: 0
+      action: "apply_biofertilizer"
+      biofertilizer_slug: "purin-ortiga"
+      dose_ml: 250
+      notes: "Establecimiento"
+    - offset_days: 14
+      action: "foliar_spray"
+      biofertilizer_slug: "te-compost"
+      dose_ml: 100
+    - offset_days: 30
+      action: "compost"
+      biofertilizer_slug: "humus-lombriz"
+      dose_ml: 500
 ---
 
 # 16 - Gulupa: La Pasión Púrpura de las Alturas
