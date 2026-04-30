@@ -11,6 +11,7 @@ import { initCatalog } from './db/catalogDB';
 import { version as APP_VERSION } from '../package.json';
 import NetworkStatusBar from './components/NetworkStatusBar';
 import PendingTasksWidget from './components/PendingTasksWidget';
+import FieldFeedback from './components/FieldFeedback';
 import { ScreenShell } from './components/common/ScreenShell';
 import ChagraGrowLoader from './components/ChagraGrowLoader';
 import AltitudeBadge from './components/AltitudeBadge';
@@ -330,6 +331,8 @@ export default function App() {
       <Suspense fallback={<LoadingFallback />}>
         {renderView()}
       </Suspense>
+      {/* FAB feedback inline para field testing — siempre visible salvo loading */}
+      {currentView !== 'loading' && currentView !== 'login' && <FieldFeedback />}
       {toast && (
         <div
           role={toast.isError ? 'alert' : 'status'}
