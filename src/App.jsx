@@ -12,6 +12,7 @@ import { version as APP_VERSION } from '../package.json';
 import NetworkStatusBar from './components/NetworkStatusBar';
 import PendingTasksWidget from './components/PendingTasksWidget';
 import FieldFeedback from './components/FieldFeedback';
+import MicFab from './components/MicFab';
 import { ScreenShell } from './components/common/ScreenShell';
 import ChagraGrowLoader from './components/ChagraGrowLoader';
 import AltitudeBadge from './components/AltitudeBadge';
@@ -343,6 +344,7 @@ export default function App() {
       </Suspense>
       {/* FAB feedback inline para field testing — siempre visible salvo loading */}
       {currentView !== 'loading' && currentView !== 'login' && <FieldFeedback />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'voz' && <MicFab onNavigate={navigate} />}
       {toast && (
         <div
           role={toast.isError ? 'alert' : 'status'}
