@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Camera, MapPin } from 'lucide-react';
 import { savePayload } from '../services/payloadService';
+import { captureAndCompress, savePhoto } from '../services/photoService';
+import { sanitizeBlobUrl } from '../utils/blobUrl';
 
 export default function SeedingLog({ onBack, onSave, initialData = {} }) {
   const [formData, setFormData] = useState({
@@ -11,6 +13,7 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
     quantity: initialData.quantity || ''
   });
   const [photo, setPhoto] = useState(null);
+  const [photoUrl, setPhotoUrl] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const [coordinates, setCoordinates] = useState(initialData.coordinates ? [initialData.coordinates] : []);
   const [notes, setNotes] = useState(initialData.notes || '');
@@ -22,11 +25,30 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
       if (watchIdRef.current !== null) {
         navigator.geolocation.clearWatch(watchIdRef.current);
       }
+      if (photoUrl) URL.revokeObjectURL(photoUrl);
     };
-  }, []);
+  }, [photoUrl]);
 
   const handleInput = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handlePhotoCapture = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      onSave('Archivo no es una imagen válida', true);
+      return;
+    }
+    try {
+      const { blob } = await captureAndCompress(file);
+      setPhoto(blob);
+      if (photoUrl) URL.revokeObjectURL(photoUrl);
+      setPhotoUrl(URL.createObjectURL(blob));
+    } catch (err) {
+      console.error('Error comprimir foto:', err);
+      onSave('Error procesando foto', true);
+    }
   };
 
   const toggleRecording = () => {
@@ -58,14 +80,37 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
 
     setIsSaving(true);
     try {
+      let photoRefId = null;
+      if (photo) {
+        try {
+          photoRefId = await savePhoto({
+            blob: photo,
+            speciesSlug: formData.crop
+              ? formData.crop.toLowerCase().replace(/\s+/g, '_')
+              : null,
+            meta: {
+              capturedAt: new Date().toISOString(),
+              gps: coordinates.length > 0
+                ? { lat: coordinates[0][1], lon: coordinates[0][0] }
+                : null,
+            },
+          });
+        } catch (err) {
+          console.error('Error guardar foto en media_cache:', err);
+          onSave('Foto no se pudo guardar localmente', true);
+          setIsSaving(false);
+          return;
+        }
+      }
+
       const payload = {
+        _photoRefId: photoRefId,
         data: {
           type: "log--seeding",
           attributes: {
             name: `Siembra de ${formData.crop} - ${formData.variety || 'N/A'}`,
             timestamp: new Date(formData.date).toISOString().split('.')[0] + '+00:00',
             status: "done",
-            _localPhotoName: photo ? photo.name : null,
             ...(coordinates.length >= 3 ? {
               geometry: {
                 type: "Polygon",
@@ -96,6 +141,8 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
 
       setFormData({ date: new Date().toISOString().split('T')[0], crop: '', variety: '', quantity: '' });
       setPhoto(null);
+      if (photoUrl) URL.revokeObjectURL(photoUrl);
+      setPhotoUrl(null);
       setCoordinates([]);
       setTimeout(() => onBack(), 500);
     } catch (error) {
@@ -116,6 +163,21 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
       </header>
 
       <div className="flex-1 p-5 flex flex-col gap-6 pb-24">
+        {/* Hero foto — primer paso del flujo (DR-030 QW3) */}
+        <div className="flex flex-col gap-2">
+          <span className="text-xl font-bold">Foto de la planta</span>
+          <label className="flex flex-col items-center justify-center gap-3 p-6 rounded-xl bg-slate-900 border-2 border-dashed border-slate-600 active:bg-slate-800 cursor-pointer min-h-[140px] overflow-hidden relative">
+            {sanitizeBlobUrl(photoUrl) ? (
+              <img src={sanitizeBlobUrl(photoUrl)} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+            ) : null}
+            <div className="z-10 flex flex-col items-center gap-2 drop-shadow-md">
+              <Camera size={48} />
+              <span className="text-xl font-bold">{photo ? '📸 Cambiar foto' : '📸 Foto de la planta'}</span>
+            </div>
+            <input type="file" accept="image/*" capture="environment" onChange={handlePhotoCapture} className="hidden" />
+          </label>
+        </div>
+
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Fecha</span>
           <input type="date" name="date" value={formData.date} onChange={handleInput} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-2xl text-white min-h-[64px]" />
@@ -140,15 +202,6 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
           <span className="text-xl font-bold">Cantidad de Plántulas</span>
           <input type="number" name="quantity" min="1" value={formData.quantity} onChange={handleInput} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-2xl text-white min-h-[64px]" />
         </label>
-
-        <div className="flex flex-col gap-2">
-          <span className="text-xl font-bold">Evidencia Fotográfica</span>
-          <label className="flex items-center justify-center gap-3 p-6 rounded-xl bg-slate-900 border-2 border-dashed border-slate-600 active:bg-slate-800 text-2xl cursor-pointer min-h-[80px]">
-            <Camera size={36} />
-            <span className="truncate">{photo ? photo.name : 'Tomar Foto'}</span>
-            <input type="file" accept="image/*" capture="environment" onChange={e => setPhoto(e.target.files[0])} className="hidden" />
-          </label>
-        </div>
 
         <div className="flex flex-col gap-2">
           <span className="text-xl font-bold">Mapeo Geoespacial</span>
