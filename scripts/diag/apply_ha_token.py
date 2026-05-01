@@ -35,7 +35,20 @@ def main():
     if not os.path.exists(SECRETS):
         sys.exit(
             f"ERROR: {SECRETS} no existe en cwd ({os.getcwd()}). "
-            "Ejecutá desde el root del repo: cd ~/guatoc-nixos-stable && sudo python3 scripts/diag/apply_ha_token.py"
+            "Ejecutá desde el root del repo: cd ~/guatoc-nixos-stable && python3 scripts/diag/apply_ha_token.py"
+        )
+
+    # Detectar sudo y abortar — SOPS necesita la age key del USER, no de root.
+    # Si corremos bajo sudo, HOME cambia a /root y SOPS no encuentra la key
+    # en /home/$USER/.config/sops/age/keys.txt → "Failed to get the data key".
+    if os.geteuid() == 0:
+        sys.exit(
+            "ERROR: este script NO debe correrse con sudo. SOPS necesita tu age key "
+            "personal (en /home/$USER/.config/sops/age/keys.txt), que sudo no puede leer "
+            "porque HOME cambia a /root. Ejecutá sin sudo:\n\n"
+            "    python3 scripts/diag/apply_ha_token.py\n\n"
+            "Los pasos siguientes (nixos-rebuild + systemctl restart oracle-lab + check_ha.py) "
+            "SÍ usan sudo — solo este script va sin sudo."
         )
 
     # 1. Leer JWT (sin echo)
