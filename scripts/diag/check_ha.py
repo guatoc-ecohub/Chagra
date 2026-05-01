@@ -70,13 +70,26 @@ def main():
     sensors = sorted(
         e["entity_id"] for e in data if e["entity_id"].startswith("sensor.")
     )
-    print(f"Total entities: {len(data)} | Sensors: {len(sensors)}")
-    print(f"--- primeros {SHOW_FIRST_N} sensores ---")
-    for s in sensors[:SHOW_FIRST_N]:
-        print(f"  {s}")
+    # Aplica el mismo filtro que el collector del oracle (default + override env).
+    import re
 
-    if len(sensors) > SHOW_FIRST_N:
-        print(f"... +{len(sensors) - SHOW_FIRST_N} más (ver con `python3 scripts/diag/check_ha.py | less`)")
+    default_filter = (
+        r"^sensor\.(matera|hobeian|airgradient|deye|byd|dome|invernadero"
+        r"|suelo|solar|energia|co2|pm25)"
+    )
+    pattern = re.compile(env.get("HA_SENSOR_FILTER", default_filter), re.IGNORECASE)
+    matched = [s for s in sensors if pattern.match(s)]
+
+    print(f"Total entities: {len(data)} | Sensors: {len(sensors)} | Matched filter: {len(matched)}")
+    print(f"--- {len(matched)} sensores que el oracle CONSUMIRÁ (filter aplicado) ---")
+    for s in matched:
+        print(f"  ✅ {s}")
+    print(f"--- otros {len(sensors) - len(matched)} sensores DISPONIBLES (no matched) — primeros {SHOW_FIRST_N - len(matched)} ---")
+    rest = [s for s in sensors if s not in matched]
+    for s in rest[:max(0, SHOW_FIRST_N - len(matched))]:
+        print(f"     {s}")
+    if len(rest) > SHOW_FIRST_N - len(matched):
+        print(f"... +{len(rest) - (SHOW_FIRST_N - len(matched))} más")
 
 
 if __name__ == "__main__":
