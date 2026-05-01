@@ -26,13 +26,17 @@ import subprocess
 import sys
 from getpass import getpass
 
-REPO = os.path.expanduser("~/guatoc-nixos-stable")
-SECRETS = os.path.join(REPO, "hosts", "alpha", "secrets.yaml")
+# Path relativo al cwd: el script asume que se ejecuta desde el root del
+# repo guatoc-nixos. Usar ~/... no funciona bajo sudo (expande a /root).
+SECRETS = "hosts/alpha/secrets.yaml"
 
 
 def main():
     if not os.path.exists(SECRETS):
-        sys.exit(f"ERROR: {SECRETS} no existe — ¿estás en alpha con el repo clonado?")
+        sys.exit(
+            f"ERROR: {SECRETS} no existe en cwd ({os.getcwd()}). "
+            "Ejecutá desde el root del repo: cd ~/guatoc-nixos-stable && sudo python3 scripts/diag/apply_ha_token.py"
+        )
 
     # 1. Leer JWT (sin echo)
     print("Pegá el JWT de Home Assistant y presioná Enter (no se muestra):")
