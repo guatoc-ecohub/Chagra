@@ -17,10 +17,16 @@ from typing import Any
 import httpx
 
 HA_BASE = os.environ.get("HA_BASE_URL", "http://localhost:8123").rstrip("/")
-HA_TOKEN = os.environ.get("HA_LONG_LIVED_TOKEN", "")
+HA_TOKEN = os.environ.get("HA_LONG_LIVED_TOKEN", "").strip()
 HA_FILTER = os.environ.get(
     "HA_SENSOR_FILTER",
-    r"^sensor\.(temperatura|humedad|suelo|solar|energia|deye|byd|airgradient|co2|pm25)",
+    # Sensores agronómicos reales en Guatoc (2026-04-30):
+    #   matera_cocina_*       (invernadero Zona A, Zigbee)
+    #   hobeian_zg_303z_*     (matera tabaco, Zigbee)
+    # Pendientes hardware (blocker queue/001): dome_*, airgradient_*, deye_*, byd_*.
+    # Excluimos uptime monitors (farmos_v2, grafana_dashboards, etc) que matchean
+    # "temperature"/"humidity" por accidente al filtrar genérico.
+    r"^sensor\.(matera|hobeian|airgradient|deye|byd|dome|invernadero|suelo|solar|energia|co2|pm25)",
 )
 
 
