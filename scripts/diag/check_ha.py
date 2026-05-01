@@ -45,7 +45,7 @@ def main():
     except FileNotFoundError:
         sys.exit(f"ERROR: {ENVFILE} no existe — corré nixos-rebuild switch primero")
 
-    token = env.get("HA_LONG_LIVED_TOKEN", "")
+    token = env.get("HA_LONG_LIVED_TOKEN", "").strip()
     if not token:
         sys.exit("ERROR: HA_LONG_LIVED_TOKEN no aparece en envfile")
 
