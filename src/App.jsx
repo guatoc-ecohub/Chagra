@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback } from 'react';
-import { Warehouse, MapPin, Eye, Package, Clock, ClipboardList, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette } from 'lucide-react';
+import { Sprout, MapPin, Eye, Package, Clock, NotebookPen, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
 
@@ -49,19 +49,21 @@ const LoadingFallback = () => (
   </div>
 );
 
-// NAV tiles rediseñados Bio-Punk (v0.6.4): fondo translucido + borde
-// lateral con el color de acento. El color vive solo en el icono y titulo;
-// el fondo y borde son uniformes (slate) para look cohesivo.
+// NAV tiles — vocabulario user-facing post DR-030 QW2 (decisión D3+D4 del DR).
+// Tile "Voz" eliminada: ya está accesible global vía MicFab abajo-izquierda
+// (QW4). Iconos canónicos: Sprout para plantas, NotebookPen para bitácora.
+// Card-sort n>=5 con usuarios 0-contexto colombianos pendiente para
+// validar empíricamente — esta release ships con hipótesis cultural
+// (lenguaje agronómico colombiano) y se itera post-feedback.
 const NAV_TILES = [
-  { id: 'activos', label: 'Activos', icon: Warehouse, accent: 'teal', desc: 'Cultivos, zonas e infraestructura' },
+  { id: 'activos', label: 'Plantas', icon: Sprout, accent: 'teal', desc: 'Cultivos, zonas e infraestructura' },
   { id: 'mapa', label: 'Mapa', icon: MapPin, accent: 'blue', desc: 'Vista espacial de la finca' },
-  { id: 'javier', label: 'Campo', icon: Eye, accent: 'green', desc: `Tareas por proximidad (${PRIMARY_WORKER_NAME})` },
-  { id: 'bodega', label: 'Bodega', icon: Package, accent: 'sky', desc: 'Stock de biopreparados' },
+  { id: 'javier', label: 'Hoy en finca', icon: Eye, accent: 'green', desc: `Tareas por proximidad (${PRIMARY_WORKER_NAME})` },
+  { id: 'bodega', label: 'Insumos', icon: Package, accent: 'sky', desc: 'Stock de biopreparados' },
   { id: 'task_log', label: 'Tareas', icon: Clock, accent: 'rose', desc: 'Cola de pendientes' },
-  { id: 'historial', label: 'Historial', icon: ClipboardList, accent: 'indigo', desc: 'Trazabilidad de operaciones' },
-  { id: 'biodiversidad', label: 'Biodiversidad', icon: Leaf, accent: 'emerald', desc: 'Ecosistema, estratos y gremios' },
-  { id: 'reportar_invasora', label: 'Invasoras', icon: AlertCircle, accent: 'amber', desc: 'Reporte de especies invasoras' },
-  { id: 'voz', label: 'Voz', icon: Mic, accent: 'lime', desc: 'Registro por dictado (v0.5.0)' },
+  { id: 'historial', label: 'Bitácora', icon: NotebookPen, accent: 'indigo', desc: 'Trazabilidad de operaciones' },
+  { id: 'biodiversidad', label: 'Flora y fauna', icon: Leaf, accent: 'emerald', desc: 'Ecosistema, estratos y gremios' },
+  { id: 'reportar_invasora', label: 'Plagas', icon: AlertCircle, accent: 'amber', desc: 'Reporte de plagas y malezas' },
   { id: 'perfil', label: 'Perfil', icon: Palette, accent: 'indigo', desc: 'Temas y configuración' },
 ];
 
