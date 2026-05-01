@@ -32,12 +32,16 @@ if [ ! -d "$LIVE_PATH/backend" ]; then
   exit 2
 fi
 
-TMP=$(mktemp -d)
+# chagra-pro es repo PRIVADO. El user oracle-lab no tiene creds GitHub —
+# entonces clonamos como el user que invocó sudo (SUDO_USER, típicamente
+# kortux en alpha) que SÍ tiene acceso. El TMP queda owned por SUDO_USER
+# y rsync corre como root así que copia sin issue.
+INVOKING_USER="${SUDO_USER:-kortux}"
+TMP=$(sudo -u "$INVOKING_USER" mktemp -d)
 trap "rm -rf $TMP" EXIT
-chown oracle-lab:oracle-lab $TMP
 
-echo "→ git clone --depth 1 chagra-pro a $TMP"
-sudo -u oracle-lab git clone --depth 1 "$REPO_URL" "$TMP" 2>&1 | tail -3
+echo "→ git clone --depth 1 chagra-pro a $TMP (como $INVOKING_USER)"
+sudo -u "$INVOKING_USER" git clone --depth 1 "$REPO_URL" "$TMP" 2>&1 | tail -3
 
 echo "→ rsync static (frontend bundle + VERSION.json + iconos)"
 rsync -a --delete "$TMP/modules/oracle-lab/backend/static/" "$LIVE_PATH/backend/static/"
