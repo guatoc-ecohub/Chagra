@@ -52,9 +52,12 @@ export default function FieldFeedback() {
       });
       setSubmitted(true);
       setText('');
+      // No auto-cierre: Lili reportó 2026-05-01 que el modal cerraba
+      // antes de que pudiera leer "Guardado", se sentía como bug. Ahora
+      // el botón vuelve a "Enviar" pero el modal persiste hasta que el
+      // user cierre con × o tap fuera (permite enviar feedback en cadena).
       setTimeout(() => {
         setSubmitted(false);
-        setOpen(false);
       }, 1400);
     } catch (err) {
       // Fallback: persistir en localStorage si IndexedDB falla
@@ -69,7 +72,7 @@ export default function FieldFeedback() {
         localStorage.setItem('field_feedback_fallback', JSON.stringify(stored));
         setSubmitted(true);
         setText('');
-        setTimeout(() => { setSubmitted(false); setOpen(false); }, 1400);
+        setTimeout(() => { setSubmitted(false); }, 1400);
       } catch {
         alert('No se pudo guardar el feedback (storage lleno?). Anotalo manual y reportá.');
       }
