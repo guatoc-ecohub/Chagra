@@ -47,6 +47,14 @@ export async function generatePlanForPlant({ assetId, speciesSlug, plantingDate,
     const generatedAt = Date.now();
     const pDate = new Date(plantingDate).getTime();
 
+    // Default to 'huerto_casero' or whichever has notes
+    let scaleNotes = '';
+    if (speciesData.manejo_por_escala) {
+        // Try getting specific notes or first available
+        scaleNotes = speciesData.manejo_por_escala.huerto_casero?.nota ||
+            speciesData.manejo_por_escala.produccion?.nota || '';
+    }
+
     const steps = await Promise.all(template.primary_steps.map(async (stepTpl) => {
         const stepId = ulid();
         let offset = stepTpl.offset_days || 0;
@@ -58,6 +66,8 @@ export async function generatePlanForPlant({ assetId, speciesSlug, plantingDate,
         // Considera lunarPhase (ejemplo: add 1-2 days based on phase)
         if (lunarPhase === 'creciente' || lunarPhase === 'llena') offset += 1;
 
+        // Limita offsets inmensos
+        // Para árboles de largo ciclo (D6), un offset puede exceder 3650 días
         const scheduledDate = pDate + offset * 86400000;
 
         // Consulta inventory_stock_snapshot
@@ -90,6 +100,9 @@ export async function generatePlanForPlant({ assetId, speciesSlug, plantingDate,
         asset_id: assetId,
         species_slug: speciesSlug,
         generated_at: generatedAt,
+        scale_notes: scaleNotes,
+        companions: speciesData.companions || [],
+        antagonists: speciesData.antagonists || [],
         steps,
     });
 }

@@ -95,6 +95,30 @@ export default function PlanEditor({ assetId, speciesSlug, plantingDate, climate
                 </button>
             </div>
 
+            {plan.scale_notes && (
+                <div className="mb-4 text-sm bg-blue-50 border-l-4 border-blue-500 text-blue-800 p-3 rounded">
+                    <span className="font-bold">📝 Sugerencia Agronómica / Biopreparado: </span>
+                    {plan.scale_notes}
+                </div>
+            )}
+
+            {(plan.companions?.length > 0 || plan.antagonists?.length > 0) && (
+                <div className="mb-4 text-xs flex flex-col md:flex-row gap-2 md:gap-4 bg-gray-50 border border-gray-200 p-2 rounded">
+                    {plan.companions?.length > 0 && (
+                        <div className="flex-1">
+                            <span className="font-bold text-green-700">🌱 Asociar preferiblemente con: </span>
+                            <span className="text-gray-600">{plan.companions.join(', ')}</span>
+                        </div>
+                    )}
+                    {plan.antagonists?.length > 0 && (
+                        <div className="flex-1">
+                            <span className="font-bold text-red-700">🚫 Alelopatía (MANTENER LEJOS): </span>
+                            <span className="text-gray-600">{plan.antagonists.join(', ')}</span>
+                        </div>
+                    )}
+                </div>
+            )}
+
             <div className="space-y-4">
                 {plan.steps.map(step => {
                     const isAdvisor = user?.role === 'asesor';
