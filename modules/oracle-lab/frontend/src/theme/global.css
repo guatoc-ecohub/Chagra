@@ -1,0 +1,136 @@
+/* global.css — Oracle Guatoc tema visual provisional
+ * Naming TBD via DR-029. Paleta cyan #0E92A6 oficial Live Sessions extendida.
+ * Cuando lleguen logos finales 2026 de Liliana, solo cambian estas vars.
+ */
+
+:root {
+  /* Base — heredada del sistema oficial Guatoc */
+  --bg-base:        #0a0e14;
+  --bg-deep:        #050810;
+  --bg-card:        #111824;
+  --bg-mint:        #B5D9D2;
+  --border:         #1a3a4a;
+  --border-soft:    rgba(255, 255, 255, 0.08);
+
+  /* Foreground */
+  --fg:             #e6edf3;
+  --fg-dim:         #8b9cab;
+  --fg-mute:        #4a5664;
+
+  /* Acentos del 4to eje IA — cyan oficial Live Sessions */
+  --accent:         #0E92A6;
+  --accent-glow:    #4ED4E5;
+  --accent-bright:  #5dd6e8;
+  --accent-deep:    #075f6e;
+
+  /* Acento solar / vitalidad — verde lima oficial */
+  --accent-sun:     #7BB541;
+  --accent-sun-deep:#4d7a26;
+
+  /* Status semántico */
+  --status-ok:      #22c55e;
+  --status-warn:    #f59e0b;
+  --status-err:     #ef4444;
+  --status-info:    var(--accent);
+
+  /* Glassmorphism */
+  --glass-bg:       rgba(17, 24, 36, 0.55);
+  --glass-blur:     14px;
+  --glass-border:   rgba(255, 255, 255, 0.1);
+  --glass-shadow:   0 8px 32px rgba(0, 0, 0, 0.4);
+
+  /* Tipografía */
+  --font-display:   'Inter Display', 'Söhne', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:      'JetBrains Mono', 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', monospace;
+  --font-body:      'Inter', -apple-system, sans-serif;
+
+  /* Spacing scale */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Animation curves */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 150ms;
+  --duration-med:  300ms;
+  --duration-slow: 600ms;
+
+  /* Z-index stack */
+  --z-canvas:  0;
+  --z-hud:     10;
+  --z-modal:   100;
+  --z-toast:   200;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--bg-base);
+  color: var(--fg);
+  font-family: var(--font-body);
+  overflow: hidden;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  font-family: inherit;
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+button:hover {
+  background: rgba(14, 146, 166, 0.1);
+  box-shadow: 0 0 20px rgba(14, 146, 166, 0.3);
+  color: var(--accent-glow);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-glow); text-shadow: 0 0 8px var(--accent-glow); }
+
+/* Glassmorphism utility class */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Scanline overlay para Jarvis effect */
+.scanlines::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: var(--z-hud);
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(14, 146, 166, 0) 0px,
+    rgba(14, 146, 166, 0) 2px,
+    rgba(14, 146, 166, 0.015) 3px,
+    rgba(14, 146, 166, 0) 4px
+  );
+}

@@ -1,0 +1,131 @@
+# Home Assistant — integración Oracle Guatoc para Nest Hub
+# ===========================================================
+#
+# Esta configuración hace 2 cosas:
+# 1. Define rest_sensor que consume /api/oracle/snapshot cada 30 min
+# 2. Define un dashboard Lovelace "Oracle" con cards optimizadas para
+#    casting al Nest Hub (1024×600 / 1280×800)
+#
+# IMPORTANTE: Asume que alpha es accesible desde HA. Si HA está en otro
+# host fuera de la red Tailscale, ajustar la URL.
+#
+# === PASO 1 — agregar a configuration.yaml ===
+
+rest:
+  - resource: http://alpha:9090/api/oracle/farm/state
+    scan_interval: 1800  # 30 min — el oracle ya cachea internamente cada 30s
+    sensor:
+      - name: oracle_weather_temperature
+        value_template: "{{ value_json.weather.temperature_2m | default('?') }}"
+        unit_of_measurement: "°C"
+        device_class: temperature
+
+      - name: oracle_weather_humidity
+        value_template: "{{ value_json.weather.relative_humidity_2m | default('?') }}"
+        unit_of_measurement: "%"
+        device_class: humidity
+
+      - name: oracle_weather_precipitation
+        value_template: "{{ value_json.weather.precipitation | default(0) }}"
+        unit_of_measurement: "mm"
+
+      - name: oracle_farm_assets
+        value_template: "{{ value_json.farm_assets | default(0) }}"
+        unit_of_measurement: "assets"
+
+      - name: oracle_ha_sensors
+        value_template: "{{ value_json.ha_sensors | default(0) }}"
+
+      - name: oracle_last_update
+        value_template: "{{ value_json.timestamp | default(now().isoformat()) }}"
+        device_class: timestamp
+
+# === PASO 2 — crear dashboard Lovelace ===
+# Settings → Dashboards → Create dashboard → Add new view
+# Pegar este YAML en raw editor de la view:
+
+views:
+  - title: Oracle Guatoc
+    icon: mdi:eye
+    theme: dark
+    panel: false
+    background: "#0a0e14"
+    cards:
+      # ─── Card 1: Hero con render PNG del oracle ───
+      - type: picture
+        image: http://alpha:9090/api/oracle/render/png?width=1024&height=512
+        # Auto-refresh visual cada 60s
+        # Ojo: HA no soporta auto-refresh nativo de pictures, ver workarounds
+        # con custom:auto-entities o automation que cycle el image_url
+
+      # ─── Card 2: Métricas clima en grid ───
+      - type: glance
+        title: Clima Choachí — 1923 msnm
+        state_color: false
+        entities:
+          - entity: sensor.oracle_weather_temperature
+            name: Temp
+          - entity: sensor.oracle_weather_humidity
+            name: Humedad
+          - entity: sensor.oracle_weather_precipitation
+            name: Lluvia
+
+      # ─── Card 3: Métricas finca ───
+      - type: entities
+        title: Finca Guatoc
+        show_header_toggle: false
+        entities:
+          - entity: sensor.oracle_farm_assets
+            name: Assets activos
+            icon: mdi:sprout
+          - entity: sensor.oracle_ha_sensors
+            name: Sensores IoT
+            icon: mdi:home-assistant
+          - entity: sensor.oracle_last_update
+            name: Última sincronización
+
+      # ─── Card 4: Markdown con copy directo ───
+      - type: markdown
+        content: |
+          ### Guardianes de Bakatá
+          Clima en vivo. Sensores IoT activos. Finca documentada.
+
+          *Sincronizado desde Tailscale interno cada 30 minutos.*
+
+# === PASO 3 — auto-refresh del PNG cada 60s ===
+# El picture card de HA no soporta refresh automático nativo.
+# Workaround: automation que actualiza el image_url periodically con cache buster.
+# En automations.yaml:
+
+automation:
+  - alias: "Oracle PNG refresh"
+    trigger:
+      - platform: time_pattern
+        seconds: "/60"
+    action:
+      - service: input_text.set_value
+        target:
+          entity_id: input_text.oracle_png_cachebuster
+        data:
+          value: "{{ now().timestamp() | int }}"
+
+# Y la card cambia a:
+#   image: "http://alpha:9090/api/oracle/render/png?width=1024&height=512&_={{ states('input_text.oracle_png_cachebuster') }}"
+
+# === PASO 4 — Cast al Nest Hub ===
+# Settings → Devices & services → Google Cast → configurar Nest Hub Guatoc
+# Después en cualquier dashboard hay un botón "Cast" en la esquina superior derecha
+# Service: cast.show_lovelace_view
+#   target: { entity_id: media_player.nest_hub_guatoc }
+#   data: { dashboard_path: oracle-guatoc, view_path: oracle-guatoc }
+#
+# Para auto-cast a horas específicas (ej: solo 8am-8pm):
+#   Crear automation que llame cast.show_lovelace_view en time_pattern
+
+# === Notas operativas ===
+# - El oracle.guatoc.co Cloudflare tunnel NO es necesario para esto: HA y oracle
+#   conviven en alpha, ambos accesibles via localhost interno o Tailscale.
+# - Si HA está fuera de alpha (otro host LAN o cloud), reemplazar
+#   "alpha" por su IP Tailscale (100.x.y.z).
+# - Resolución óptima Nest Hub: 1024×600 (Hub original) o 1280×800 (Hub Max).
+#   El render endpoint acepta width/height query params.
