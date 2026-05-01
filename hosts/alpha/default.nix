@@ -216,6 +216,7 @@
     nmap
     arp-scan
     bitwarden-desktop
+    jq         # JSON parsing — usado en scripts/diag y diagnósticos manuales
 
     # --- Herramientas de monitoreo de sistema ---
     htop       # Monitor de procesos

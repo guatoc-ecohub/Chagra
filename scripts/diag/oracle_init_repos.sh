@@ -43,7 +43,7 @@ for repo in "${REPOS[@]}"; do
     # como ese user) tenga write en su propio dir, pese a que el parent es oracle-lab.
     # Sin este paso: "fatal: no se pudo crear directorios principales: Permiso denegado"
     mkdir -p "$REPO_PATH"
-    chown "$INVOKING_USER:$INVOKING_USER" "$REPO_PATH"
+    chown "$INVOKING_USER" "$REPO_PATH"
     # git clone con destino existente y vacío funciona (no exige dir nuevo)
     sudo -u "$INVOKING_USER" git clone --depth 1 "$REPO_URL" "$REPO_PATH" 2>&1 | tail -2
   fi
