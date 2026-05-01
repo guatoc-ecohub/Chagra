@@ -109,13 +109,24 @@
     "d /var/lib/nixos-runner/work             0750 nixos-deployer  nixos-deployer  -"
   ];
 
-  # Fix idempotente en cada arranque del runner nixos-deploy: abre perms del
-  # padre compartido. Evita la race contra users.users.runner.createHome que
-  # reasigna 0700 durante cada activation de NixOS.
+  # Fix idempotente en cada arranque de los runners multi-user: abre perms
+  # del padre compartido /var/lib/github-runner. Evita la race contra
+  # users.users.runner.createHome que reasigna 0700 durante cada activation
+  # de NixOS.
+  #
+  # 2026-05-01: extendido para incluir github-runner-claude-code (era opt-in
+  # silencioso en claude-code-runner.nix con regla 'd' tmpfiles que NO corrige
+  # perms si el dir existe; el bug se manifestó después del rebuild post #75).
   systemd.services.github-runner-perms-fix = {
     description = "Ensure /var/lib/github-runner traversable for multi-user runners";
-    before = [ "github-runner-nixos-deploy.service" ];
-    wantedBy = [ "github-runner-nixos-deploy.service" ];
+    before = [
+      "github-runner-nixos-deploy.service"
+      "github-runner-claude-code.service"
+    ];
+    wantedBy = [
+      "github-runner-nixos-deploy.service"
+      "github-runner-claude-code.service"
+    ];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = false;  # corre en cada arranque del runner, no cacheado
@@ -124,6 +135,11 @@
   };
 
   systemd.services.github-runner-nixos-deploy = {
+    after = [ "github-runner-perms-fix.service" ];
+    requires = [ "github-runner-perms-fix.service" ];
+  };
+
+  systemd.services.github-runner-claude-code = lib.mkIf (config.services.github-runners.claude-code or null != null) {
     after = [ "github-runner-perms-fix.service" ];
     requires = [ "github-runner-perms-fix.service" ];
   };
