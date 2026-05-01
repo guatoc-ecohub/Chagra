@@ -33,6 +33,50 @@ let
     ++ lib.optionals cfg.enableHotReload [ "--reload-dir" backendDir ]
   );
 
+  # Script de promote — toma archivos de /tmp/oracle-static-update y
+  # /tmp/openmeteo-update.py (rsync'eados desde stg) y los promueve al live
+  # path. Pensado para deploys autónomos desde Claude Code stg sin
+  # depender de auth GitHub (chagra-pro es privado).
+  promoteScript = pkgs.writeShellApplication {
+    name = "oracle-lab-promote";
+    runtimeInputs = [ pkgs.rsync pkgs.systemd pkgs.coreutils pkgs.curl ];
+    text = ''
+      set -euo pipefail
+
+      LIVE_PATH="${if cfg.liveReloadPath != null then cfg.liveReloadPath else "/var/lib/oracle-lab/code"}"
+      STATIC_SRC="/tmp/oracle-static-update"
+      BACKEND_SRC="/tmp/oracle-backend-update"
+      COLLECTOR_SRC="/tmp/openmeteo-update.py"
+
+      if [ -d "$STATIC_SRC" ]; then
+        echo "→ promote static (R3F build) → $LIVE_PATH/backend/static/"
+        rsync -a --delete "$STATIC_SRC/" "$LIVE_PATH/backend/static/"
+      fi
+
+      if [ -d "$BACKEND_SRC" ]; then
+        echo "→ promote backend completo → $LIVE_PATH/backend/"
+        rsync -a --delete --exclude '__pycache__' --exclude 'static' \
+          "$BACKEND_SRC/" "$LIVE_PATH/backend/"
+      fi
+
+      if [ -f "$COLLECTOR_SRC" ]; then
+        echo "→ promote collector openmeteo.py"
+        cp "$COLLECTOR_SRC" "$LIVE_PATH/backend/collectors/openmeteo.py"
+      fi
+
+      chown -R oracle-lab:oracle-lab "$LIVE_PATH/backend"
+      systemctl restart oracle-lab
+
+      sleep 2
+      if curl -fsS http://localhost:9090/api/oracle/snapshot >/dev/null 2>&1; then
+        echo "✓ oracle-lab promoted + healthy"
+      else
+        echo "✗ unhealthy post-restart, check journalctl -u oracle-lab" >&2
+        exit 2
+      fi
+    '';
+  };
+
   # Script de redeploy — git pull + systemctl restart
   redeployScript = pkgs.writeShellApplication {
     name = "oracle-lab-redeploy";
@@ -238,17 +282,26 @@ in {
       };
     };
 
-    # Instala el script `oracle-lab-redeploy` en /run/current-system/sw/bin
-    # solo si liveReloadPath está configurado.
-    environment.systemPackages = lib.optional (cfg.liveReloadPath != null) redeployScript;
+    # Scripts en /run/current-system/sw/bin:
+    #   - oracle-lab-redeploy (git pull + restart)
+    #   - oracle-lab-promote  (rsync /tmp/ → live + restart, autónomo desde stg)
+    environment.systemPackages = lib.optionals (cfg.liveReloadPath != null) [
+      redeployScript
+      promoteScript
+    ];
 
-    # Sudoers entry: permite a kortux ejecutar oracle-lab-redeploy sin password.
-    # Solo activo si liveReloadPath está set.
+    # Sudoers NOPASSWD: permite a kortux ejecutar deploys sin password —
+    # crítico para que Claude Code stg pueda promover cambios autónomamente
+    # vía rsync a /tmp/oracle-static-update + sudo oracle-lab-promote.
     security.sudo.extraRules = lib.optional (cfg.liveReloadPath != null) {
       users = [ "kortux" ];
       commands = [
         {
           command = "${redeployScript}/bin/oracle-lab-redeploy";
+          options = [ "NOPASSWD" ];
+        }
+        {
+          command = "${promoteScript}/bin/oracle-lab-promote";
           options = [ "NOPASSWD" ];
         }
         {

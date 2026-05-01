@@ -17,17 +17,36 @@ import os
 from datetime import datetime, timezone
 from typing import Any
 
-from . import ai_stats, farmos, openmeteo
+from . import (
+    ai_stats,
+    cloudflare_tunnels,
+    farmos,
+    git_activity,
+    home_assistant,
+    lunar,
+    ollama,
+    openmeteo,
+    system_health,
+    whisper,
+)
 
 log = logging.getLogger(__name__)
 
-# ai_stats deshabilitado por default hasta que ai-stats-panel.service se
-# importe en alpha config (PR pendiente). Activar con
-# ENABLE_AI_STATS_COLLECTOR=1 cuando esté arriba.
-COLLECTORS = {
-    "farmos": farmos.fetch,
+# Orden importa para el frontend (orden visual de las cards).
+COLLECTORS: dict[str, Any] = {
     "openmeteo": openmeteo.fetch,
+    "farmos": farmos.fetch,
+    "home_assistant": home_assistant.fetch,
+    "ollama": ollama.fetch,
+    "whisper": whisper.fetch,
+    "lunar": lunar.fetch,
+    "cloudflare_tunnels": cloudflare_tunnels.fetch,
+    "git_activity": git_activity.fetch,
+    "system_health": system_health.fetch,
 }
+
+# ai_stats deshabilitado por default hasta que ai-stats-panel.service se
+# importe en alpha config. Activar con ENABLE_AI_STATS_COLLECTOR=1.
 if os.environ.get("ENABLE_AI_STATS_COLLECTOR", "0") == "1":
     COLLECTORS["ai_stats"] = ai_stats.fetch
 
@@ -36,11 +55,11 @@ async def collect_all() -> dict[str, Any]:
     """Run all collectors in parallel with per-collector timeout protection.
 
     A failing collector does NOT poison the snapshot — its slot just shows
-    status=error with the message.
+    status=error con el message.
     """
     async def _safe(name: str, fn) -> tuple[str, dict[str, Any]]:
         try:
-            result = await asyncio.wait_for(fn(), timeout=10.0)
+            result = await asyncio.wait_for(fn(), timeout=12.0)
             if "fetched_at" not in result:
                 result["fetched_at"] = datetime.now(timezone.utc).isoformat()
             if "source" not in result:
@@ -49,7 +68,7 @@ async def collect_all() -> dict[str, Any]:
         except asyncio.TimeoutError:
             return name, {
                 "status": "error",
-                "error": f"Timeout >10s for {name}",
+                "error": f"Timeout >12s for {name}",
                 "source": name,
                 "fetched_at": datetime.now(timezone.utc).isoformat(),
             }
