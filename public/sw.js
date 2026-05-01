@@ -1,10 +1,13 @@
-const CACHE_NAME = 'chagra-v34';
+const CACHE_NAME = 'chagra-v36';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/manifest.json',
   '/icons.svg',
-  '/favicon.svg'
+  '/favicon.svg',
+  '/icon-180.png',
+  '/icon-192.png',
+  '/icon-512.png'
 ];
 
 // Instalación del Service Worker
