@@ -22,9 +22,11 @@ if [ "${EUID}" -ne 0 ]; then
   exit 1
 fi
 
-echo "→ asegurar dir $REPOS_BASE existe"
+echo "→ asegurar dir $REPOS_BASE existe (root crea, oracle-lab owner final)"
 mkdir -p "$REPOS_BASE"
+# Mode 0755 (no 0750) para que kortux pueda atravesarlo sin estar en grupo oracle-lab
 chown oracle-lab:oracle-lab "$REPOS_BASE"
+chmod 0755 "$REPOS_BASE"
 
 for repo in "${REPOS[@]}"; do
   REPO_PATH="$REPOS_BASE/$repo"
@@ -32,14 +34,22 @@ for repo in "${REPOS[@]}"; do
 
   if [ -d "$REPO_PATH/.git" ]; then
     echo "→ $repo ya existe, git pull (como $INVOKING_USER)"
+    # Garantizar que el invoking user tenga write durante el pull
+    chown -R "$INVOKING_USER:$INVOKING_USER" "$REPO_PATH"
     sudo -u "$INVOKING_USER" git -C "$REPO_PATH" pull --ff-only --depth 1 2>&1 | tail -2
   else
     echo "→ clone --depth 1 $repo (como $INVOKING_USER)"
+    # Pre-crear el subdir con owner = invoking user para que git clone (que corre
+    # como ese user) tenga write en su propio dir, pese a que el parent es oracle-lab.
+    # Sin este paso: "fatal: no se pudo crear directorios principales: Permiso denegado"
+    mkdir -p "$REPO_PATH"
+    chown "$INVOKING_USER:$INVOKING_USER" "$REPO_PATH"
+    # git clone con destino existente y vacío funciona (no exige dir nuevo)
     sudo -u "$INVOKING_USER" git clone --depth 1 "$REPO_URL" "$REPO_PATH" 2>&1 | tail -2
   fi
 done
 
-echo "→ chown todos los repos a oracle-lab:oracle-lab (read-only suficiente)"
+echo "→ chown final a oracle-lab:oracle-lab (read-only suficiente para collector)"
 chown -R oracle-lab:oracle-lab "$REPOS_BASE"
 
 echo "→ systemctl restart oracle-lab para que collector relea repos"
