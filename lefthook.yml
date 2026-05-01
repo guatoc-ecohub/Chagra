@@ -87,6 +87,14 @@ pre-commit:
       glob: "*.{js,jsx,ts,tsx}"
       run: npx eslint {staged_files} --max-warnings=0
 
+    auto-bump-version:
+      # Auto-bumpea package.json version + sw.js CACHE_NAME en patch si
+      # cambian archivos críticos (src/**, public/**) y el dev olvidó
+      # hacerlo manual. Evita conflicts en PRs paralelos (sesión 2026-04-30/05-01
+      # tuvo ~6 conflicts repetidos en estos 2 archivos).
+      # Convención: el dev NO bumpea, el hook sí.
+      run: node scripts/auto-bump-version.mjs
+
 commit-msg:
   commands:
     conventional:
