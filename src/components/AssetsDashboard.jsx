@@ -12,6 +12,31 @@ import GuildSuggestions from './GuildSuggestions';
 import { geoJsonToWkt } from '../utils/geo';
 import { MapPin, LocateFixed } from 'lucide-react';
 import { useGeolocation } from '../hooks/useGeolocation';
+import { usePhotoUrl } from '../hooks/usePhotoUrl';
+
+// Thumb foto de planta para cards. Sub-componente porque usePhotoUrl no
+// puede llamarse dentro de un map() condicional (regla de hooks).
+// Si no hay foto de usuario para este asset, cae al placeholder (Fase 1
+// — Fase 3 hidratará /catalog-photos/<slug>.jpg con fotos GBIF top-uso).
+// eslint-disable-next-line no-unused-vars -- FallbackIcon SE USA en JSX, eslint react-jsx detection falla en este config
+function PlantCardThumb({ asset, colors, FallbackIcon }) {
+  const photo = usePhotoUrl({ assetId: asset?.id });
+  if (photo.loading || !photo.url) {
+    return (
+      <div className={`p-2.5 rounded-lg ${colors.light} shrink-0`}>
+        <FallbackIcon size={20} className={colors.text} />
+      </div>
+    );
+  }
+  return (
+    <img
+      src={photo.url}
+      alt={asset?.attributes?.name || 'Planta'}
+      className="w-12 h-12 rounded-lg object-cover bg-slate-900 shrink-0 border border-slate-700"
+      loading="lazy"
+    />
+  );
+}
 
 // Catálogos de dominio agroecológico
 const STRUCTURE_EXAMPLES = [
@@ -890,9 +915,13 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
                       onClick={() => setSelectedAsset(asset.id)}
                       className="flex items-center gap-3 flex-1 min-w-0 text-left hover:opacity-80 transition-opacity"
                     >
-                      <div className={`p-2.5 rounded-lg ${colors.light} shrink-0`}>
-                        <TabIcon size={20} className={colors.text} />
-                      </div>
+                      {activeTab === 'plant' ? (
+                        <PlantCardThumb asset={asset} colors={colors} FallbackIcon={TabIcon} />
+                      ) : (
+                        <div className={`p-2.5 rounded-lg ${colors.light} shrink-0`}>
+                          <TabIcon size={20} className={colors.text} />
+                        </div>
+                      )}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <h4 className="font-bold text-slate-200 truncate text-base">{name}</h4>

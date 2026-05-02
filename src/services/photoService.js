@@ -26,7 +26,7 @@ import { openDB, STORES } from '../db/dbCore';
 const MAX_DIMENSION = 1600;       // px en el lado mayor
 const TARGET_QUALITY = 0.82;      // JPEG quality
 const MAX_BYTES = 500 * 1024;     // 500 KB target después de compress
-const PLACEHOLDER_URL = '/placeholder-species.jpg';
+const PLACEHOLDER_URL = '/placeholder-species.svg';
 const CATALOG_PHOTOS_BASE = '/catalog-photos';
 
 /**
@@ -188,6 +188,36 @@ export async function listUserPhotosBySpecies(speciesSlug) {
       resolve(all.filter((p) => p.speciesSlug === speciesSlug));
     };
     req.onerror = () => resolve([]);
+  });
+}
+
+/**
+ * Lee una foto específica de media_cache por su id.
+ * Usado por AssetTimeline para renderizar PHOTO_ATTACHMENT markers
+ * (cada [PHOTO_ATTACHMENT] log apunta a un media_cache.id vía photo_ref).
+ *
+ * @param {number} photoId
+ * @returns {Promise<{url: string, revoke: () => void} | null>}
+ */
+export async function getPhotoById(photoId) {
+  if (photoId == null) return null;
+  const numericId = typeof photoId === 'string' ? Number(photoId) : photoId;
+  if (Number.isNaN(numericId)) return null;
+  const db = await openDB();
+  const tx = db.transaction(STORES.MEDIA_CACHE, 'readonly');
+  const store = tx.objectStore(STORES.MEDIA_CACHE);
+  return new Promise((resolve) => {
+    const req = store.get(numericId);
+    req.onsuccess = () => {
+      const rec = req.result;
+      if (!rec || !rec.blob) {
+        resolve(null);
+        return;
+      }
+      const url = URL.createObjectURL(rec.blob);
+      resolve({ url, revoke: () => URL.revokeObjectURL(url) });
+    };
+    req.onerror = () => resolve(null);
   });
 }
 
