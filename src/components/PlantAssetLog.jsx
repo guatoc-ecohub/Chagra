@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Camera, MapPin } from 'lucide-react';
 import { savePayload } from '../services/payloadService';
-import { captureAndCompress, savePhoto } from '../services/photoService';
-import { sanitizeBlobUrl } from '../utils/blobUrl';
+import { savePhoto } from '../services/photoService';
 import GeolocationButton from './GeolocationButton';
+import PhotoCaptureField from './PhotoCaptureField';
 
 const ASSET_TYPES = [
   { id: 'type-1', name: 'Árbol Frutal' },
@@ -24,38 +24,18 @@ export default function PlantAssetLog({ onBack, onSave }) {
     healthStatus: 'Sano'
   });
   const [photo, setPhoto] = useState(null);
-  const [photoUrl, setPhotoUrl] = useState(null);
   const [location, setLocation] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    return () => {
-      if (photoUrl) URL.revokeObjectURL(photoUrl);
-    };
-  }, [photoUrl]);
+    // No-op cleanup as PhotoCaptureField handles its own previews
+  }, []);
 
   const handleInput = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handlePhotoCapture = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    // Validación MIME (cierra CodeQL js/xss-through-dom).
-    if (!file.type.startsWith('image/')) {
-      onSave('Archivo no es una imagen válida', true);
-      return;
-    }
-    try {
-      const { blob } = await captureAndCompress(file);
-      setPhoto(blob);
-      if (photoUrl) URL.revokeObjectURL(photoUrl);
-      setPhotoUrl(URL.createObjectURL(blob));
-    } catch (err) {
-      console.error('Error comprimir foto:', err);
-      onSave('Error procesando foto', true);
-    }
-  };
+  // handlePhotoCapture removed in favor of PhotoCaptureField
 
   const handleLocationCapture = (lat, lon) => {
     setLocation({
@@ -122,8 +102,6 @@ export default function PlantAssetLog({ onBack, onSave }) {
 
       setFormData({ assetType: 'type-1', species: '', variety: '', healthStatus: 'Sano' });
       setPhoto(null);
-      if (photoUrl) URL.revokeObjectURL(photoUrl);
-      setPhotoUrl(null);
       setLocation(null);
     } catch (error) {
       console.error('Error en PlantAssetLog handleSave:', error);
@@ -144,19 +122,12 @@ export default function PlantAssetLog({ onBack, onSave }) {
 
       <div className="flex-1 p-5 flex flex-col gap-6 pb-24">
         {/* Hero foto — primer paso del flujo (DR-030 QW3) */}
-        <div className="flex flex-col gap-2">
-          <span className="text-xl font-bold">Foto de la planta</span>
-          <label className="flex flex-col items-center justify-center gap-3 p-6 rounded-xl bg-slate-900 border-2 border-dashed border-slate-600 active:bg-slate-800 cursor-pointer min-h-[140px] overflow-hidden relative">
-            {sanitizeBlobUrl(photoUrl) ? (
-              <img src={sanitizeBlobUrl(photoUrl)} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-60" />
-            ) : null}
-            <div className="z-10 flex flex-col items-center gap-2 drop-shadow-md">
-              <Camera size={48} />
-              <span className="text-xl font-bold">{photo ? '📸 Cambiar foto' : '📸 Foto de la planta'}</span>
-            </div>
-            <input type="file" accept="image/*" capture="environment" onChange={handlePhotoCapture} className="hidden" />
-          </label>
-        </div>
+        <PhotoCaptureField
+          label="Foto de la planta"
+          value={photo}
+          onPhoto={(blob) => setPhoto(blob)}
+          onRemove={() => setPhoto(null)}
+        />
 
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Tipo de Activo</span>

@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Camera, MapPin, AlertCircle, CheckCircle } from 'lucide-react';
 import { savePayload } from '../services/payloadService';
 import { getAllSpecies } from '../db/catalogDB';
-import { sanitizeBlobUrl } from '../utils/blobUrl';
+import PhotoCaptureField from './PhotoCaptureField';
 import NativeSubstituteSuggestion from './NativeSubstituteSuggestion';
 import GeolocationButton from './GeolocationButton';
 
@@ -23,7 +23,6 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
     // y el usuario quedaba bloqueado (no podía guardar).
     const [catalogStatus, setCatalogStatus] = useState('loading');
     const [photo, setPhoto] = useState(null);
-    const [photoUrl, setPhotoUrl] = useState(null);
     const [location, setLocation] = useState(initialWkt ? { wkt: initialWkt } : null);
     const [isSaving, setIsSaving] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
@@ -62,27 +61,7 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
         }
     };
 
-    const handlePhotoCapture = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        // Validación MIME: el atributo accept="image/*" del input es UX hint,
-        // no garantía. Validar antes de crear blob URL evita XSS via SVG con
-        // scripts embebidos. Cierra CodeQL js/xss-through-dom.
-        if (!file.type.startsWith('image/')) {
-            onSave?.('Archivo no es una imagen válida', true);
-            return;
-        }
-        const objectUrl = URL.createObjectURL(file);
-        const safeObjectUrl = sanitizeBlobUrl(objectUrl);
-        if (!safeObjectUrl) {
-            URL.revokeObjectURL(objectUrl);
-            onSave?.('No se pudo procesar la imagen seleccionada', true);
-            return;
-        }
-        setPhoto(file);
-        if (photoUrl) URL.revokeObjectURL(photoUrl);
-        setPhotoUrl(safeObjectUrl);
-    };
+    // handlePhotoCapture removed in favor of PhotoCaptureField
 
     const handleLocationCapture = (lat, lon) => {
         setLocation({
@@ -261,20 +240,12 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
                     />
                 </label>
 
-                <div className="flex flex-col gap-2">
-                    <span className="text-xl font-bold text-slate-400">Foto de Evidencia</span>
-                    <input type="file" accept="image/*" capture="environment" id="invasive-photo" onChange={handlePhotoCapture} className="hidden" />
-                    <button
-                        onClick={() => document.getElementById('invasive-photo').click()}
-                        className={`p-5 rounded-xl text-2xl font-bold flex justify-center items-center gap-3 shadow-md min-h-[80px] ${photo ? 'bg-slate-800 border-2 border-emerald-600' : 'bg-slate-800 border-2 border-slate-600'}`}
-                    >
-                        <Camera size={32} />
-                        <span>{photo ? 'Foto lista' : 'Capturar Foto'}</span>
-                    </button>
-                    {photoUrl ? (
-                        <img src={photoUrl} className="mt-2 rounded-xl border border-slate-800 h-40 object-cover w-full" alt="Preview" />
-                    ) : null}
-                </div>
+                <PhotoCaptureField
+                    label="Foto de Evidencia"
+                    value={photo}
+                    onPhoto={(blob) => setPhoto(blob)}
+                    onRemove={() => setPhoto(null)}
+                />
 
                 <button
                     onClick={handleSave}
