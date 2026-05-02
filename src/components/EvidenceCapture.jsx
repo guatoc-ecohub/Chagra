@@ -7,6 +7,7 @@ import { proximityCheck } from '../utils/spatialAnalysis';
 import { wktToGeoJson } from '../utils/geo';
 import AIStreamPanel from './common/AIStreamPanel';
 import { savePayload } from '../services/payloadService';
+import { useGeolocation } from '../hooks/useGeolocation';
 
 /**
  * EvidenceCapture — Captura con diagnóstico IA y evolución histórica (Fase 20.2b).
@@ -35,6 +36,7 @@ export const EvidenceCapture = ({
   // Texto acumulado del LLM durante el diagnóstico (streaming NDJSON). Se
   // muestra con efecto typewriter mientras `diagnosing` es true.
   const [liveDiagnosis, setLiveDiagnosis] = useState('');
+  const { request: requestGeo } = useGeolocation();
   const inputRef = useRef(null);
 
   // Cargar evidencias existentes + historial anterior del asset
@@ -83,10 +85,16 @@ export const EvidenceCapture = ({
     if (!file || !logId) return;
 
     // Proximity gate: verificar que el operario esté cerca del activo
-    if (assetGeometry && navigator.geolocation) {
+    if (assetGeometry) {
       try {
         const gpsPos = await new Promise((res, rej) =>
-          navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 5000 })
+          requestGeo({
+            onSuccess: res,
+            onError: (err) => rej(new Error(err)),
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 30000
+          })
         );
         const rawGeo = typeof assetGeometry === 'string' ? wktToGeoJson(assetGeometry) : assetGeometry;
         if (rawGeo) {

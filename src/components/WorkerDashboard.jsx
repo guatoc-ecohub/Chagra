@@ -7,6 +7,7 @@ import { haversineDistance, getCoords } from '../utils/spatialAnalysis';
 import FarmMap from './FarmMap';
 import EvidenceCapture from './EvidenceCapture';
 import ChagraGrowLoader from './ChagraGrowLoader';
+import { useGeolocation } from '../hooks/useGeolocation';
 
 /**
  * WorkerDashboard — Vista de campo para operario (Fase 20).
@@ -38,14 +39,14 @@ export const WorkerDashboard = () => {
   const plants = useAssetStore((s) => s.plants);
   const lands = useAssetStore((s) => s.lands);
   const [tasks, setTasks] = useState([]);
-  const [gpsCoords, setGpsCoords] = useState(null);
+  const { position, request: requestGeo } = useGeolocation();
   const [loading, setLoading] = useState(true);
   const [completing, setCompleting] = useState(null);
   const [viewMode, setViewMode] = useState('list'); // 'list' | 'map'
   const [evidenceCounts, setEvidenceCounts] = useState({}); // { logId: count }
 
   // Cargar tareas pendientes geolocalizadas
-  const loadTasks = async () => {
+  const loadTasks = React.useCallback(async () => {
     setLoading(true);
     try {
       // Fase 5 ADR-019: Usar el selector unificado que ya filtra completados
@@ -63,24 +64,19 @@ export const WorkerDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // Obtener GPS
-  const refreshGps = () => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition(
-      (pos) => setGpsCoords([pos.coords.longitude, pos.coords.latitude]),
-      (err) => console.warn('[WorkerDashboard] GPS:', err.message),
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
-  };
+  const refreshGps = React.useCallback(() => {
+    requestGeo({ maximumAge: 0 }); // Force fresh GPS for distance sorting
+  }, [requestGeo]);
 
   useEffect(() => {
     loadTasks();
     refreshGps();
     const interval = setInterval(refreshGps, 30000); // re-poll GPS cada 30s
     return () => clearInterval(interval);
-  }, []);
+  }, [loadTasks, refreshGps]);
 
   // Ordenar por distancia
   const sortedTasks = tasks
@@ -89,7 +85,8 @@ export const WorkerDashboard = () => {
       const wkt = typeof rawGeo === 'object' ? rawGeo?.value : rawGeo;
       const geo = wkt ? wktToGeoJson(wkt) : null;
       const coords = getCoords(geo);
-      const distance = gpsCoords && coords ? haversineDistance(gpsCoords, coords) : Infinity;
+      const gpsCoordsArr = position ? [position.lon, position.lat] : null;
+      const distance = gpsCoordsArr && coords ? haversineDistance(gpsCoordsArr, coords) : Infinity;
       return { ...task, distance, coords };
     })
     .sort((a, b) => a.distance - b.distance);
@@ -131,8 +128,8 @@ export const WorkerDashboard = () => {
             Tareas por proximidad
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            {gpsCoords
-              ? `GPS: ${gpsCoords[1].toFixed(5)}°N, ${gpsCoords[0].toFixed(5)}°W`
+            {position
+              ? `GPS: ${position.lat.toFixed(5)}°N, ${position.lon.toFixed(5)}°W`
               : 'Obteniendo ubicación…'}
           </p>
         </div>

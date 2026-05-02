@@ -11,6 +11,7 @@ import SpeciesSelect from './SpeciesSelect';
 import GuildSuggestions from './GuildSuggestions';
 import { geoJsonToWkt } from '../utils/geo';
 import { MapPin, LocateFixed } from 'lucide-react';
+import { useGeolocation } from '../hooks/useGeolocation';
 
 // Catálogos de dominio agroecológico
 const STRUCTURE_EXAMPLES = [
@@ -145,6 +146,8 @@ export default function AssetsDashboard({ onBack }) {
     setSelectedAsset,
   } = useAssetStore();
 
+  const { request: requestGeo } = useGeolocation();
+
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [currentZoneId, setCurrentZoneId] = useState(null); // drill-down Fase 17.2
   const [viewMode, setViewMode] = useState('list'); // 'list' | 'map' (Fase 17.3)
@@ -204,9 +207,9 @@ export default function AssetsDashboard({ onBack }) {
   const getAssetsForTab = () => {
     let list = activeTab === 'plant' ? plants
       : activeTab === 'land' ? lands
-      : activeTab === 'structure' ? structures
-      : activeTab === 'equipment' ? equipment
-      : materials;
+        : activeTab === 'structure' ? structures
+          : activeTab === 'equipment' ? equipment
+            : materials;
 
     // Drill-down: para plants, si hay zona seleccionada, filtrar por parent.
     // '__all__' = modo "ver todos" sin filtro de zona.
@@ -462,11 +465,10 @@ export default function AssetsDashboard({ onBack }) {
             <button
               key={opt.value}
               onClick={() => setFormData({ ...formData, estrato: formData.estrato === opt.value ? '' : opt.value })}
-              className={`p-3 rounded-xl text-left transition-all min-h-[56px] active:scale-[0.98] ${
-                formData.estrato === opt.value
+              className={`p-3 rounded-xl text-left transition-all min-h-[56px] active:scale-[0.98] ${formData.estrato === opt.value
                   ? 'bg-lime-600/20 border-2 border-lime-500 text-lime-300'
                   : 'bg-slate-800 border border-slate-700 text-slate-300'
-              }`}
+                }`}
             >
               <span className="font-bold text-sm block">{opt.label}</span>
               <span className="text-xs text-slate-500">{opt.desc}</span>
@@ -483,11 +485,10 @@ export default function AssetsDashboard({ onBack }) {
             <button
               key={opt.value}
               onClick={() => setFormData({ ...formData, gremio: formData.gremio === opt.value ? '' : opt.value })}
-              className={`text-xs px-3 py-2 rounded-full transition-all active:scale-95 min-h-[36px] ${
-                formData.gremio === opt.value
+              className={`text-xs px-3 py-2 rounded-full transition-all active:scale-95 min-h-[36px] ${formData.gremio === opt.value
                   ? 'bg-lime-600/30 text-lime-300 border border-lime-500 font-bold'
                   : 'bg-slate-800 text-slate-400 border border-slate-700'
-              }`}
+                }`}
             >
               {opt.label}
             </button>
@@ -542,9 +543,8 @@ export default function AssetsDashboard({ onBack }) {
           <button
             type="button"
             onClick={() => {
-              if (!navigator.geolocation) return;
-              navigator.geolocation.getCurrentPosition(
-                (pos) => {
+              requestGeo({
+                onSuccess: (pos) => {
                   setFormData((prev) => ({
                     ...prev,
                     geometry: {
@@ -552,10 +552,11 @@ export default function AssetsDashboard({ onBack }) {
                       coordinates: [pos.coords.longitude, pos.coords.latitude],
                     },
                   }));
-                },
-                (err) => console.error('[Geo] GPS error:', err.message),
-                { enableHighAccuracy: true, timeout: 10000 }
-              );
+                }
+              });
+              // Wait, useGeolocation doesn't have onSuccess callback in my implementation.
+              // I'll update useGeolocation to accept optional callbacks or just use navigator directly with right config here.
+              // Actually, I'll update the hook to support ONE-SHOT with callbacks for easier refactoring of these patterns.
             }}
             className="p-3 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 min-h-[48px] min-w-[48px] flex items-center justify-center"
             aria-label="Usar mi ubicación"
@@ -648,9 +649,8 @@ export default function AssetsDashboard({ onBack }) {
             <button
               type="button"
               onClick={() => setViewMode('list')}
-              className={`px-2.5 py-1.5 rounded-md text-xs font-bold flex items-center gap-1 transition-colors ${
-                viewMode === 'list' ? 'bg-slate-700 text-white' : 'text-slate-400'
-              }`}
+              className={`px-2.5 py-1.5 rounded-md text-xs font-bold flex items-center gap-1 transition-colors ${viewMode === 'list' ? 'bg-slate-700 text-white' : 'text-slate-400'
+                }`}
               aria-label="Vista de lista"
             >
               <List size={14} />
@@ -658,9 +658,8 @@ export default function AssetsDashboard({ onBack }) {
             <button
               type="button"
               onClick={() => setViewMode('map')}
-              className={`px-2.5 py-1.5 rounded-md text-xs font-bold flex items-center gap-1 transition-colors ${
-                viewMode === 'map' ? 'bg-slate-700 text-white' : 'text-slate-400'
-              }`}
+              className={`px-2.5 py-1.5 rounded-md text-xs font-bold flex items-center gap-1 transition-colors ${viewMode === 'map' ? 'bg-slate-700 text-white' : 'text-slate-400'
+                }`}
               aria-label="Vista de mapa"
             >
               <MapIcon size={14} />
@@ -690,11 +689,10 @@ export default function AssetsDashboard({ onBack }) {
               aria-selected={isActive}
               aria-controls={`tabpanel-${tab.id}`}
               onClick={() => { setActiveTab(tab.id); setShowForm(false); resetForm(); }}
-              className={`flex-1 p-3 flex items-center justify-center gap-1.5 font-bold text-xs whitespace-nowrap transition-all min-h-[48px] ${
-                isActive
+              className={`flex-1 p-3 flex items-center justify-center gap-1.5 font-bold text-xs whitespace-nowrap transition-all min-h-[48px] ${isActive
                   ? `${colorMap[tab.color].text} border-b-2 ${colorMap[tab.color].border}`
                   : 'text-slate-500 hover:text-slate-300'
-              }`}
+                }`}
             >
               <Icon size={16} aria-hidden="true" />
               <span>{tab.label}</span>
@@ -843,131 +841,130 @@ export default function AssetsDashboard({ onBack }) {
 
       {/* Lista de activos (plants filtradas por zona, u otras tabs) */}
       {viewMode === 'list' && !(activeTab === 'plant' && !currentZoneId) && (
-      <div className="flex-1 overflow-y-auto p-3 space-y-2">
-        {isLoading && currentAssets.length === 0 ? (
-          <div className="flex items-center justify-center py-12">
-            <RefreshCw size={24} className="animate-spin text-slate-500" />
-            <span className="ml-3 text-slate-500">Cargando...</span>
-          </div>
-        ) : currentAssets.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-slate-500">
-            <tabConfig.icon size={48} className="mb-3 opacity-30" />
-            <p className="text-lg">Sin {tabConfig.label.toLowerCase()} registrados</p>
-            <p className="text-sm mt-1">Toca el botón para agregar</p>
-          </div>
-        ) : (
-          currentAssets.map(asset => {
-            const name = asset.attributes?.name || asset.name || 'Sin nombre';
-            const notes = asset.attributes?.notes;
-            const notesText = typeof notes === 'object' ? notes?.value : notes;
-            const isPending = asset._pending;
-            const TabIcon = tabConfig.icon;
+        <div className="flex-1 overflow-y-auto p-3 space-y-2">
+          {isLoading && currentAssets.length === 0 ? (
+            <div className="flex items-center justify-center py-12">
+              <RefreshCw size={24} className="animate-spin text-slate-500" />
+              <span className="ml-3 text-slate-500">Cargando...</span>
+            </div>
+          ) : currentAssets.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-slate-500">
+              <tabConfig.icon size={48} className="mb-3 opacity-30" />
+              <p className="text-lg">Sin {tabConfig.label.toLowerCase()} registrados</p>
+              <p className="text-sm mt-1">Toca el botón para agregar</p>
+            </div>
+          ) : (
+            currentAssets.map(asset => {
+              const name = asset.attributes?.name || asset.name || 'Sin nombre';
+              const notes = asset.attributes?.notes;
+              const notesText = typeof notes === 'object' ? notes?.value : notes;
+              const isPending = asset._pending;
+              const TabIcon = tabConfig.icon;
 
-            return (
-              <div
-                key={asset.id}
-                className={`p-4 rounded-xl border transition-all ${
-                  isPending
-                    ? 'bg-slate-800/50 border-dashed border-slate-600'
-                    : 'bg-slate-800 border-slate-700'
-                }`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedAsset(asset.id)}
-                    className="flex items-center gap-3 flex-1 min-w-0 text-left hover:opacity-80 transition-opacity"
-                  >
-                    <div className={`p-2.5 rounded-lg ${colors.light} shrink-0`}>
-                      <TabIcon size={20} className={colors.text} />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-bold text-slate-200 truncate text-base">{name}</h4>
-                        {isPending && (
-                          <span className="text-xs text-amber-400 bg-amber-900/30 px-1.5 py-0.5 rounded-full shrink-0">pendiente</span>
-                        )}
+              return (
+                <div
+                  key={asset.id}
+                  className={`p-4 rounded-xl border transition-all ${isPending
+                      ? 'bg-slate-800/50 border-dashed border-slate-600'
+                      : 'bg-slate-800 border-slate-700'
+                    }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedAsset(asset.id)}
+                      className="flex items-center gap-3 flex-1 min-w-0 text-left hover:opacity-80 transition-opacity"
+                    >
+                      <div className={`p-2.5 rounded-lg ${colors.light} shrink-0`}>
+                        <TabIcon size={20} className={colors.text} />
                       </div>
-                      {notesText && <p className="text-xs text-slate-500 truncate mt-1">{notesText}</p>}
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => handleDelete(asset.id)}
-                    className="p-2 rounded-lg bg-red-900/30 hover:bg-red-800/50 text-red-400 shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-
-                {/* Registro de cosecha (solo tab plant, no registros pendientes) */}
-                {activeTab === 'plant' && !isPending && (
-                  <div className="mt-4 border-t border-slate-700 pt-4">
-                    {activeHarvestId !== asset.id ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setActiveHarvestId(asset.id);
-                          setHarvestData({ yield: '', unit: 'kg', notes: '' });
-                        }}
-                        className="w-full py-2 bg-lime-700 text-white rounded-md hover:bg-lime-600 transition-colors text-sm font-medium"
-                      >
-                        Registrar Cosecha
-                      </button>
-                    ) : (
-                      <div className="bg-slate-900 p-3 rounded-md border border-slate-600">
-                        <h4 className="text-sm font-bold text-slate-200 mb-2">Datos de Rendimiento</h4>
-                        <div className="flex gap-2 mb-2">
-                          <input
-                            type="number"
-                            placeholder="Cantidad"
-                            value={harvestData.yield}
-                            onChange={(e) => setHarvestData({ ...harvestData, yield: e.target.value })}
-                            className="w-2/3 p-2 bg-slate-800 border border-slate-700 rounded text-sm text-slate-200"
-                          />
-                          <select
-                            value={harvestData.unit}
-                            onChange={(e) => setHarvestData({ ...harvestData, unit: e.target.value })}
-                            className="w-1/3 p-2 bg-slate-800 border border-slate-700 rounded text-sm text-slate-200"
-                          >
-                            <option value="kg">kg</option>
-                            <option value="g">g</option>
-                            <option value="lb">lb</option>
-                            <option value="unidades">unds</option>
-                          </select>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-bold text-slate-200 truncate text-base">{name}</h4>
+                          {isPending && (
+                            <span className="text-xs text-amber-400 bg-amber-900/30 px-1.5 py-0.5 rounded-full shrink-0">pendiente</span>
+                          )}
                         </div>
-                        <textarea
-                          placeholder="Observaciones fitosanitarias o de calidad..."
-                          value={harvestData.notes}
-                          onChange={(e) => setHarvestData({ ...harvestData, notes: e.target.value })}
-                          className="w-full p-2 bg-slate-800 border border-slate-700 rounded text-sm text-slate-200 mb-2"
-                          rows="2"
-                        />
-                        <div className="flex gap-2 justify-end">
-                          <button
-                            type="button"
-                            onClick={resetHarvestForm}
-                            className="px-3 py-1 text-xs text-slate-400 hover:text-white"
-                          >
-                            Cancelar
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => submitHarvest(asset)}
-                            disabled={!harvestData.yield}
-                            className="px-3 py-1 bg-lime-600 text-white text-xs rounded hover:bg-lime-500 disabled:opacity-50"
-                          >
-                            Guardar Registro
-                          </button>
-                        </div>
+                        {notesText && <p className="text-xs text-slate-500 truncate mt-1">{notesText}</p>}
                       </div>
-                    )}
+                    </button>
+                    <button
+                      onClick={() => handleDelete(asset.id)}
+                      className="p-2 rounded-lg bg-red-900/30 hover:bg-red-800/50 text-red-400 shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </div>
-                )}
-              </div>
-            );
-          })
-        )}
-      </div>
+
+                  {/* Registro de cosecha (solo tab plant, no registros pendientes) */}
+                  {activeTab === 'plant' && !isPending && (
+                    <div className="mt-4 border-t border-slate-700 pt-4">
+                      {activeHarvestId !== asset.id ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActiveHarvestId(asset.id);
+                            setHarvestData({ yield: '', unit: 'kg', notes: '' });
+                          }}
+                          className="w-full py-2 bg-lime-700 text-white rounded-md hover:bg-lime-600 transition-colors text-sm font-medium"
+                        >
+                          Registrar Cosecha
+                        </button>
+                      ) : (
+                        <div className="bg-slate-900 p-3 rounded-md border border-slate-600">
+                          <h4 className="text-sm font-bold text-slate-200 mb-2">Datos de Rendimiento</h4>
+                          <div className="flex gap-2 mb-2">
+                            <input
+                              type="number"
+                              placeholder="Cantidad"
+                              value={harvestData.yield}
+                              onChange={(e) => setHarvestData({ ...harvestData, yield: e.target.value })}
+                              className="w-2/3 p-2 bg-slate-800 border border-slate-700 rounded text-sm text-slate-200"
+                            />
+                            <select
+                              value={harvestData.unit}
+                              onChange={(e) => setHarvestData({ ...harvestData, unit: e.target.value })}
+                              className="w-1/3 p-2 bg-slate-800 border border-slate-700 rounded text-sm text-slate-200"
+                            >
+                              <option value="kg">kg</option>
+                              <option value="g">g</option>
+                              <option value="lb">lb</option>
+                              <option value="unidades">unds</option>
+                            </select>
+                          </div>
+                          <textarea
+                            placeholder="Observaciones fitosanitarias o de calidad..."
+                            value={harvestData.notes}
+                            onChange={(e) => setHarvestData({ ...harvestData, notes: e.target.value })}
+                            className="w-full p-2 bg-slate-800 border border-slate-700 rounded text-sm text-slate-200 mb-2"
+                            rows="2"
+                          />
+                          <div className="flex gap-2 justify-end">
+                            <button
+                              type="button"
+                              onClick={resetHarvestForm}
+                              className="px-3 py-1 text-xs text-slate-400 hover:text-white"
+                            >
+                              Cancelar
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => submitHarvest(asset)}
+                              disabled={!harvestData.yield}
+                              className="px-3 py-1 bg-lime-600 text-white text-xs rounded hover:bg-lime-500 disabled:opacity-50"
+                            >
+                              Guardar Registro
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
       )}
 
       {/* Formulario de creación (slide-up) */}

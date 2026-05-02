@@ -3,6 +3,7 @@ import { ArrowLeft, Camera, MapPin } from 'lucide-react';
 import { savePayload } from '../services/payloadService';
 import { captureAndCompress, savePhoto } from '../services/photoService';
 import { sanitizeBlobUrl } from '../utils/blobUrl';
+import GeolocationButton from './GeolocationButton';
 
 const ASSET_TYPES = [
   { id: 'type-1', name: 'Árbol Frutal' },
@@ -25,7 +26,6 @@ export default function PlantAssetLog({ onBack, onSave }) {
   const [photo, setPhoto] = useState(null);
   const [photoUrl, setPhotoUrl] = useState(null);
   const [location, setLocation] = useState(null);
-  const [isLocating, setIsLocating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -57,33 +57,12 @@ export default function PlantAssetLog({ onBack, onSave }) {
     }
   };
 
-  const captureLocation = () => {
-    setIsLocating(true);
-    setLocation(null);
-
-    if (!("geolocation" in navigator)) {
-      onSave("Geolocalización no soportada", true);
-      setIsLocating(false);
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLocation({
-          lat: pos.coords.latitude,
-          lon: pos.coords.longitude,
-          acc: pos.coords.accuracy,
-          wkt: `POINT (${pos.coords.longitude} ${pos.coords.latitude})`
-        });
-        setIsLocating(false);
-      },
-      (err) => {
-        console.error(err);
-        onSave("Error obteniendo ubicación", true);
-        setIsLocating(false);
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
+  const handleLocationCapture = (lat, lon) => {
+    setLocation({
+      lat,
+      lon,
+      wkt: `POINT (${lon} ${lat})`
+    });
   };
 
   const handleSave = async () => {
@@ -205,14 +184,13 @@ export default function PlantAssetLog({ onBack, onSave }) {
 
         <div className="flex flex-col gap-2">
           <span className="text-xl font-bold">Coordenadas Exactas (WKT)</span>
-          <button onClick={captureLocation} disabled={isLocating} className="p-5 rounded-xl text-2xl font-bold flex justify-center items-center gap-3 shadow-md min-h-[80px] bg-slate-800 border-2 border-slate-600 active:bg-slate-700 disabled:opacity-50">
-            <MapPin size={32} />
-            {isLocating ? 'Obteniendo GPS...' : 'Capturar Coordenada'}
-          </button>
+          <GeolocationButton
+            onCoords={handleLocationCapture}
+            label={location ? "Cambiar ubicación" : "Capturar Coordenada"}
+          />
           {location && (
             <div className="p-4 bg-slate-900 border border-slate-700 rounded-xl mt-2 text-sm overflow-x-auto text-yellow-300">
-              <p>Precisión: ±{location.acc.toFixed(1)} metros</p>
-              <p className="font-mono mt-1 whitespace-nowrap">{location.wkt}</p>
+              <p className="font-mono whitespace-nowrap">{location.wkt}</p>
             </div>
           )}
         </div>
