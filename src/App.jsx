@@ -14,6 +14,7 @@ import FieldFeedback from './components/FieldFeedback';
 import MicFab from './components/MicFab';
 import { ScreenShell } from './components/common/ScreenShell';
 import ChagraGrowLoader from './components/ChagraGrowLoader';
+import IosInstallBanner from './components/IosInstallBanner';
 
 // Lazy-loaded route components
 const TelemetryAlerts = lazy(() => import('./components/TelemetryAlerts'));
@@ -324,6 +325,7 @@ export default function App() {
   return (
     <>
       <NetworkStatusBar />
+      <IosInstallBanner />
       <Suspense fallback={<LoadingFallback />}>
         {renderView()}
       </Suspense>
