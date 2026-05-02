@@ -10,12 +10,15 @@ import { getAllSpecies } from '../db/catalogDB';
 import PhotoCaptureField from './PhotoCaptureField';
 import NativeSubstituteSuggestion from './NativeSubstituteSuggestion';
 import GeolocationButton from './GeolocationButton';
+import StatusBadge from './StatusBadge';
+import { PEST_STATUSES } from '../constants/assetStatuses';
 
 export default function InvasiveObservationLog({ onBack, onSave, initialLocationId = null, initialWkt = null }) {
     const [formData, setFormData] = useState({
         speciesId: '',
         notes: '',
         locationId: initialLocationId || '',
+        status: 'reported'
     });
     const [speciesList, setSpeciesList] = useState([]);
     // 'loading' | 'ready' | 'error' — refleja el estado del fetch del catálogo.
@@ -87,7 +90,7 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
                 `species_id: ${sp.id}`,
                 `nombre_comun: ${sp.nombre_comun}`,
                 `nombre_cientifico: ${sp.nombre_cientifico}`,
-                'action: reported'
+                `action: ${formData.status}`
             ];
             if (formData.notes) {
                 noteLines.push('', '--- Notas operador ---', formData.notes);
@@ -99,7 +102,7 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
                     attributes: {
                         name: `Reporte invasora: ${sp.nombre_comun}`,
                         timestamp: new Date().toISOString().split('.')[0] + '+00:00',
-                        status: "done",
+                        status: formData.status,
                         notes: { value: noteLines.join('\n'), format: 'plain_text' },
                         ...(location?.wkt && { geometry: location.wkt })
                     },
@@ -227,6 +230,22 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
                         label={location ? "Cambiar ubicación" : "Capturar GPS"}
                     />
                 </div>
+
+                <label className="flex flex-col gap-2">
+                    <span className="text-xl font-bold text-slate-400">Estado del Reporte</span>
+                    <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-slate-900 border border-slate-700">
+                        {PEST_STATUSES.map(s => (
+                            <button
+                                key={s.id}
+                                type="button"
+                                onClick={() => setFormData(p => ({ ...p, status: s.id }))}
+                                className={`transition-all ${formData.status === s.id ? 'ring-2 ring-amber-500 ring-offset-2 ring-offset-slate-950 scale-105' : 'opacity-60 hover:opacity-100'}`}
+                            >
+                                <StatusBadge status={s.id} type="pest" />
+                            </button>
+                        ))}
+                    </div>
+                </label>
 
                 <label className="flex flex-col gap-2">
                     <span className="text-xl font-bold text-slate-400">Notas de Extracción</span>

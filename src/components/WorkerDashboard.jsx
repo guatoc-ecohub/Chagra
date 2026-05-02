@@ -7,6 +7,7 @@ import { haversineDistance, getCoords } from '../utils/spatialAnalysis';
 import FarmMap from './FarmMap';
 import EvidenceCapture from './EvidenceCapture';
 import ChagraGrowLoader from './ChagraGrowLoader';
+import StatusBadge from './StatusBadge';
 import { useGeolocation } from '../hooks/useGeolocation';
 
 /**
@@ -203,7 +204,10 @@ export const WorkerDashboard = () => {
                       <Icon size={18} />
                     </div>
                     <div className="min-w-0">
-                      <h4 className="font-bold text-slate-200 text-sm truncate">{taskName}</h4>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <h4 className="font-bold text-slate-200 text-sm truncate">{taskName}</h4>
+                        <StatusBadge status={task.attributes?.status || task.status} type="task" className="scale-75 origin-left" />
+                      </div>
                       <p className="text-[10px] text-slate-500 uppercase">
                         {task.type?.split('--')[1] || 'tarea'}
                       </p>

@@ -63,6 +63,16 @@ Ver:
 
 Si detectas un problema de seguridad, por favor no abras un issue público. Usa el canal privado de GitHub Security Advisories sobre este repositorio, o contacta al mantenedor directamente.
 
+## Asset and Task Status Enums
+
+Para mantener consistencia en la UI y FarmOS, usamos un sistema de enums contextuales por tipo de entidad. Evite usar estados genéricos como "active" o "done" directamente si existe una opción más descriptiva en `src/constants/assetStatuses.js`.
+
+- **Plantas**: seedling, growing, flowering, fruiting, harvested, dormant, dead.
+- **Tareas**: pending, in_progress, completed, urgent, cancelled, blocked.
+- **Plagas/Invasoras**: reported, inspecting, treating, resolved, escalated.
+
+El componente `StatusBadge.jsx` maneja el mapeo visual (colores/etiquetas) y el fallback para registros legacy.
+
 ## Violación de reglas
 
 Cualquier violación de las reglas 1–7 requiere `git reset` antes del push y rotación inmediata del secreto expuesto si alcanzó origen. No hay excepciones.

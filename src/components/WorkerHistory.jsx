@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, CheckCircle, Clock, RefreshCw, Wifi, WifiOff, CloudOff, Cloud, Sprout, Apple, TreePine, Building2, Wrench, Leaf, Droplets, Eye } from 'lucide-react';
 import { syncManager } from '../services/syncManager';
+import StatusBadge from './StatusBadge';
 
 const TRANSACTION_TYPE_LABELS = {
   asset_plant: 'Cultivo / Árbol',
@@ -167,11 +168,10 @@ export default function WorkerHistory({ onBack }) {
       <div className="flex border-b border-slate-800 shrink-0">
         <button
           onClick={() => setActiveSection('recientes')}
-          className={`flex-1 p-3 font-bold text-sm flex items-center justify-center gap-2 transition-all min-h-[48px] ${
-            activeSection === 'recientes'
-              ? 'text-amber-400 border-b-2 border-amber-500'
-              : 'text-slate-500 hover:text-slate-300'
-          }`}
+          className={`flex-1 p-3 font-bold text-sm flex items-center justify-center gap-2 transition-all min-h-[48px] ${activeSection === 'recientes'
+            ? 'text-amber-400 border-b-2 border-amber-500'
+            : 'text-slate-500 hover:text-slate-300'
+            }`}
         >
           <Clock size={16} />
           Registros Recientes
@@ -181,11 +181,10 @@ export default function WorkerHistory({ onBack }) {
         </button>
         <button
           onClick={() => setActiveSection('completadas')}
-          className={`flex-1 p-3 font-bold text-sm flex items-center justify-center gap-2 transition-all min-h-[48px] ${
-            activeSection === 'completadas'
-              ? 'text-green-400 border-b-2 border-green-500'
-              : 'text-slate-500 hover:text-slate-300'
-          }`}
+          className={`flex-1 p-3 font-bold text-sm flex items-center justify-center gap-2 transition-all min-h-[48px] ${activeSection === 'completadas'
+            ? 'text-green-400 border-b-2 border-green-500'
+            : 'text-slate-500 hover:text-slate-300'
+            }`}
         >
           <CheckCircle size={16} />
           Completadas
@@ -228,6 +227,11 @@ export default function WorkerHistory({ onBack }) {
                           <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${typeColor}`}>
                             {typeLabel}
                           </span>
+                          <StatusBadge
+                            status={tx.payload?.data?.attributes?.status}
+                            type={tx.type?.startsWith('asset--plant') ? 'plant' : tx.type?.includes('observation') ? 'pest' : 'task'}
+                            className="scale-90 origin-left"
+                          />
                           <span className="text-xs text-amber-400 bg-amber-900/30 px-1.5 py-0.5 rounded-full flex items-center gap-1">
                             <CloudOff size={10} />
                             Pendiente
@@ -274,10 +278,13 @@ export default function WorkerHistory({ onBack }) {
                         <CheckCircle size={18} className="text-green-400" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h4 className="font-bold text-slate-200 truncate text-base">{task.title}</h4>
-                        {task.type && (
-                          <span className="text-xs text-slate-500">{task.type.replace('log--', '').replace('--', ' ')}</span>
-                        )}
+                        <h4 className="font-bold text-slate-200 truncate text-base">{task.title || task.attributes?.name}</h4>
+                        <div className="flex items-center gap-2">
+                          <StatusBadge status={task.status || task.attributes?.status} type="task" className="scale-75 origin-left" />
+                          {task.type && (
+                            <span className="text-xs text-slate-500">{task.type.replace('log--', '').replace('--', ' ')}</span>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <span className="text-xs text-slate-500 shrink-0 mt-1">
