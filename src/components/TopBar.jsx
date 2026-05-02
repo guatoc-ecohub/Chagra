@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CircleUser, Mic, Plus, Settings, ChevronDown, ChevronUp } from 'lucide-react';
+import { CircleUser, Mic, Plus, Settings, ChevronDown, ChevronUp, Home } from 'lucide-react';
 import { version as APP_VERSION } from '../../package.json';
 import EnvironmentalCard from './EnvironmentalCard';
 
@@ -61,12 +61,22 @@ export default function TopBar({ onNavigate, onLogout }) {
         style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top))' }}
         role="banner"
       >
-        {/* Logo + version */}
-        <h1 className="font-bold text-lg flex items-baseline gap-1.5 shrink-0">
-          <span className="w-2 h-2 bg-muzo rounded-full shadow-neon-muzo self-center" aria-hidden="true"></span>
+        {/* Logo clickable → Home (DR-030 + Lili #16: botón claro a inicio).
+            Patrón estándar PWA: el logo siempre vuelve al dashboard. Lili
+            reportó "navegación rocosa, falta botón claro a inicio" — el
+            logo discreto sin affordance hacía que no se descubriera. Ahora
+            es <button> con cursor + hover + icono Home explícito. */}
+        <button
+          type="button"
+          onClick={() => onNavigate('dashboard')}
+          aria-label="Volver al inicio"
+          title="Volver al inicio"
+          className="font-bold text-lg flex items-baseline gap-1.5 shrink-0 rounded-lg px-2 py-1 -mx-2 hover:bg-slate-800/60 active:bg-slate-700 transition-colors min-h-[44px]"
+        >
+          <Home size={16} aria-hidden="true" className="text-muzo self-center" />
           <span>Chagra</span>
           <span className="text-[10px] text-slate-500 font-mono font-normal">v{APP_VERSION}</span>
-        </h1>
+        </button>
 
         {/* Operador (tap → perfil) */}
         <button
