@@ -38,21 +38,24 @@ for repo in "${REPOS[@]}"; do
     chown -R "$INVOKING_USER" "$REPO_PATH"
     sudo -u "$INVOKING_USER" git -C "$REPO_PATH" pull --ff-only --depth 1 2>&1 | tail -2
   else
-    echo "→ clone --depth 1 $repo (como $INVOKING_USER)"
-    # Si el dir existe SIN .git/ (clone fallido previo deja restos que rompen
-    # git clone con "Permiso denegado" aun pre-creando el dir), limpiar primero.
-    # Validación defensiva: solo rm -rf paths bajo $REPOS_BASE para evitar accidentes.
+    echo "→ clone --depth 1 $repo (como $INVOKING_USER, via /tmp + mv)"
+    # Patrón "clone a /tmp + mv como root":
+    # kortux NO tiene write en $REPOS_BASE (owned por oracle-lab:oracle-lab 0755)
+    # → git clone DIRECTO al destino falla "could not create leading directories"
+    # porque git internamente toca el parent durante la creación del repo.
+    # Workaround: clone como kortux a /tmp (write libre), después mv como root
+    # al destino final (root puede atravesar cualquier perm).
+    TMP_CLONE=$(sudo -u "$INVOKING_USER" mktemp -d -t "ol-clone-${repo}-XXXX")
+    sudo -u "$INVOKING_USER" git clone --depth 1 "$REPO_URL" "$TMP_CLONE/repo" 2>&1 | tail -2
+    # Limpiar destino previo si existe (clone fallido anterior dejó restos)
     if [ -e "$REPO_PATH" ]; then
       case "$REPO_PATH" in
         "$REPOS_BASE"/*) rm -rf "$REPO_PATH" ;;
-        *) echo "ERROR defensivo: REPO_PATH ($REPO_PATH) fuera de REPOS_BASE ($REPOS_BASE), abortando rm" >&2; exit 3 ;;
+        *) echo "ERROR defensivo: REPO_PATH ($REPO_PATH) fuera de REPOS_BASE ($REPOS_BASE), abortando" >&2; exit 3 ;;
       esac
     fi
-    # Pre-crear el subdir con owner = invoking user para que git clone (que corre
-    # como ese user) tenga write en su propio dir, pese a que el parent es oracle-lab.
-    mkdir -p "$REPO_PATH"
-    chown "$INVOKING_USER" "$REPO_PATH"
-    sudo -u "$INVOKING_USER" git clone --depth 1 "$REPO_URL" "$REPO_PATH" 2>&1 | tail -2
+    mv "$TMP_CLONE/repo" "$REPO_PATH"
+    rm -rf "$TMP_CLONE"
   fi
 done
 
