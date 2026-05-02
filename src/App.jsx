@@ -31,6 +31,7 @@ const TaskLogScreen = lazy(() => import('./components/TaskLogScreen'));
 const TaskScreen = lazy(() => import('./components/TaskScreen'));
 const AssetsDashboard = lazy(() => import('./components/AssetsDashboard'));
 const WorkerHistory = lazy(() => import('./components/WorkerHistory'));
+const BitacoraEntryDetail = lazy(() => import('./components/BitacoraEntryDetail'));
 const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').then(m => ({ default: m.InventoryDashboard })));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
@@ -288,7 +289,7 @@ export default function App() {
       case 'new_task':
         return <TaskScreen onBack={() => navigate('task_log')} onSave={showToast} />;
       case 'edit_task':
-        return <TaskScreen onBack={() => navigate('task_log')} onSave={showToast} task={currentViewData?.task} isEdit />;
+        return <TaskScreen onBack={() => navigate('task_log')} onSave={showToast} initialData={currentViewData?.task || currentViewData} />;
       case 'javier':
         return (
           <ScreenShell title={`Campo — ${PRIMARY_WORKER_NAME}`} icon={Eye} onBack={() => navigate('dashboard')}>
@@ -313,7 +314,9 @@ export default function App() {
           </ScreenShell>
         );
       case 'historial':
-        return <WorkerHistory onBack={() => navigate('dashboard')} />;
+        return <WorkerHistory onBack={() => navigate('dashboard')} onEntryClick={(entry) => navigate('bitacora_detail', { entry })} />;
+      case 'bitacora_detail':
+        return <BitacoraEntryDetail entry={currentViewData?.entry || currentViewData} onBack={() => navigate('historial')} onEdit={(entry) => navigate('edit_task', { task: entry })} />;
       case 'biodiversidad':
         return <BiodiversidadView onBack={() => navigate('dashboard')} />;
       case 'voz':

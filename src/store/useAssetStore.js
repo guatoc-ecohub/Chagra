@@ -3,7 +3,7 @@ import { assetCache, openDB, STORES } from '../db/assetCache';
 import { logCache } from '../db/logCache';
 import { useLogStore } from './useLogStore';
 import { newId } from '../utils/id';
-import { savePayload } from '../services/payloadService';
+import { savePayload, updatePayload } from '../services/payloadService';
 
 /**
  * Store global de Activos (Zustand)
@@ -570,6 +570,56 @@ const useAssetStore = create((set, get) => ({
     }
 
     return savePayload('task', payload);
+  },
+
+  // updateTaskLog — editar tarea pendiente (Lili #106). Solo permite edit
+  // de tareas con _pending=true (no sincronizadas aún) o pending status en
+  // backend. Mismo patrón optimistic local que addTaskLog: actualiza
+  // logCache inmediato + envía PATCH al backend.
+  //
+  // taskData: { name?, notes?, due?, status? } — cualquier subset.
+  updateTaskLog: async (logId, taskData) => {
+    const existing = await logCache.get(logId);
+    if (!existing) {
+      console.warn('[Store] updateTaskLog: log no encontrado', logId);
+      return { success: false, message: 'Tarea no encontrada' };
+    }
+
+    const updatedAttributes = {
+      ...existing.attributes,
+      ...(taskData.name !== undefined && { name: taskData.name }),
+      ...(taskData.due !== undefined && { timestamp: taskData.due }),
+      ...(taskData.status !== undefined && { status: taskData.status }),
+      ...(taskData.notes !== undefined && {
+        notes: { value: taskData.notes, format: 'plain_text' },
+      }),
+    };
+
+    const payload = {
+      data: {
+        type: 'log--task',
+        id: logId,
+        attributes: updatedAttributes,
+      },
+    };
+
+    const updatedLog = {
+      ...existing,
+      name: updatedAttributes.name,
+      status: updatedAttributes.status,
+      attributes: updatedAttributes,
+    };
+
+    try {
+      await logCache.put(updatedLog);
+      if (updatedLog.asset_id) {
+        useLogStore.getState().loadLogsForAsset(updatedLog.asset_id);
+      }
+    } catch (logErr) {
+      console.warn('[Store] Fallo persistir log--task actualizado:', logErr);
+    }
+
+    return updatePayload('task', logId, payload);
   },
 
   // ADR-019 Fase 5: Completar una tarea sin mutar el log original (Regla 1).

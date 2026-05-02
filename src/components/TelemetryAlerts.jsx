@@ -136,53 +136,37 @@ export default function TelemetryAlerts() {
     const alertText = aiAlert.toLowerCase();
 
     if (alertText.includes('estrés hídrico') || alertText.includes('humedad') || alertText.includes('humedad crítica')) {
-      const handleRiegoAction = () => handleTelemetryAction(
-        FARM_CONFIG.LOCATION_ID,
-        'riego_emergencia',
-        () => ({
-          data: {
-            type: "log--input",
-            attributes: {
-              name: "Riego de emergencia (Alerta IA)",
-              timestamp: new Date().toISOString().split('.')[0] + '+00:00',
-              status: "pending",
-              notes: `Ejecutado en respuesta a alerta IA: ${aiAlert}`
-            },
-            relationships: {
-              location: {
-                data: [{ type: "asset--land", id: FARM_CONFIG.LOCATION_ID }]
-              },
-              category: {
-                data: [{
-                  type: "taxonomy_term--material",
-                  attributes: { name: "Riego de emergencia" }
-                }]
-              },
-              quantity: {
-                data: [{
-                  type: "quantity--standard",
-                  attributes: {
-                    measure: "volume",
-                    value: { decimal: "0" },
-                    label: "Caudal (L)"
-                  }
-                }]
-              }
+      // Lili #105: "Ejecutar Riego no realiza ninguna acción".
+      // Reemplazado por "Programar Riego" → abre TaskScreen pre-llenado
+      // con título, prioridad y notas. Operario confirma + persiste.
+      // El handle anterior (handleTelemetryAction → log--input) era opaco
+      // (sin feedback al usuario, sin trazabilidad de quién/cuándo).
+      const handleProgramarRiego = () => {
+        const today = new Date().toISOString().split('T')[0];
+        window.dispatchEvent(new CustomEvent('chagraNavigate', {
+          detail: {
+            view: 'new_task',
+            initialData: {
+              name: 'Riego programado (Alerta IA)',
+              severity: 'high',
+              notes: `Disparado por alerta IA: ${aiAlert}`,
+              due: today,
+              status: 'pending'
             }
           }
-        }),
-        { type: 'input', endpoint: '/api/log/input', navigateTo: '#insumos' }
-      );
+        }));
+      };
 
       return (
         <button
-          onClick={handleRiegoAction}
+          onClick={handleProgramarRiego}
+          title="Abre el formulario de tarea pre-llenado para programar un riego en respuesta a la alerta"
           className="mt-3 w-full p-3 rounded-xl bg-cyan-950 border border-cyan-500 text-cyan-400 font-bold flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] hover:bg-cyan-900 transition-all"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9m-6 6h12" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          Ejecutar Riego
+          Programar Riego
         </button>
       );
     }
@@ -738,18 +722,23 @@ export default function TelemetryAlerts() {
         )}
       </div>
 
+      {/* Lili #105: "Sincronizar Telemetría" propósito unclear.
+          Renombrado a "Sincronizar Sensores" + tooltip explicativo.
+          Feedback "Cargando..." durante el fetch. */}
       <button
         onClick={() => {
           const ctrl = new AbortController();
           fetchTelemetryAndAnalyze(ctrl.signal);
         }}
         disabled={loading}
+        title="Forzar actualización de lecturas de sensores Zigbee desde Home Assistant + re-análisis IA"
+        aria-label="Sincronizar lecturas de sensores"
         className="mt-6 w-full p-4 rounded-2xl bg-slate-800 hover:bg-slate-700 active:bg-slate-600 transition-all border border-slate-600 font-bold text-slate-300 flex items-center justify-center gap-3 disabled:opacity-50"
       >
         <svg className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
-        Sincronizar Telemetría
+        {loading ? 'Sincronizando sensores…' : 'Sincronizar Sensores'}
       </button>
     </div>
   );

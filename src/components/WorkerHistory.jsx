@@ -45,7 +45,7 @@ const TRANSACTION_TYPE_ICONS = {
   activity: Clock,
 };
 
-export default function WorkerHistory({ onBack }) {
+export default function WorkerHistory({ onBack, onEntryClick }) {
   const [activeSection, setActiveSection] = useState('recientes');
   const [pendingTx, setPendingTx] = useState([]);
   const [completedTasks, setCompletedTasks] = useState([]);
@@ -216,8 +216,16 @@ export default function WorkerHistory({ onBack }) {
                 const name = getTransactionName(tx);
                 const TxIcon = TRANSACTION_TYPE_ICONS[tx.type] || Clock;
 
+                const Wrap = onEntryClick ? 'button' : 'div';
+                const wrapProps = onEntryClick
+                  ? { type: 'button', onClick: () => onEntryClick(tx), 'aria-label': `Ver detalle: ${name}` }
+                  : {};
                 return (
-                  <div key={tx.id || idx} className="p-4 rounded-xl bg-slate-800 border border-dashed border-slate-600 transition-all">
+                  <Wrap
+                    key={tx.id || idx}
+                    {...wrapProps}
+                    className="w-full text-left p-4 rounded-xl bg-slate-800 border border-dashed border-slate-600 transition-all hover:border-slate-400 active:bg-slate-700"
+                  >
                     <div className="flex items-start justify-between gap-3">
                       <div className={`p-2 rounded-lg ${typeColor} shrink-0 mt-0.5`}>
                         <TxIcon size={16} />
@@ -243,7 +251,7 @@ export default function WorkerHistory({ onBack }) {
                         {formatTimestamp(tx.timestamp)}
                       </span>
                     </div>
-                  </div>
+                  </Wrap>
                 );
               })
             )}
@@ -270,8 +278,17 @@ export default function WorkerHistory({ onBack }) {
                 <p className="text-sm mt-1">Las tareas marcadas como "done" en FarmOS aparecerán aquí</p>
               </div>
             ) : (
-              completedTasks.map((task, idx) => (
-                <div key={task.id || idx} className="p-4 rounded-xl bg-slate-800 border border-slate-700 transition-all">
+              completedTasks.map((task, idx) => {
+                const TaskWrap = onEntryClick ? 'button' : 'div';
+                const taskWrapProps = onEntryClick
+                  ? { type: 'button', onClick: () => onEntryClick(task), 'aria-label': `Ver detalle: ${task.title || task.attributes?.name}` }
+                  : {};
+                return (
+                <TaskWrap
+                  key={task.id || idx}
+                  {...taskWrapProps}
+                  className="w-full text-left p-4 rounded-xl bg-slate-800 border border-slate-700 transition-all hover:border-slate-500 active:bg-slate-700"
+                >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <div className="p-2 rounded-lg bg-green-900/30 shrink-0">
@@ -291,8 +308,9 @@ export default function WorkerHistory({ onBack }) {
                       {formatTimestamp(task.timestamp)}
                     </span>
                   </div>
-                </div>
-              ))
+                </TaskWrap>
+                );
+              })
             )}
           </>
         )}
