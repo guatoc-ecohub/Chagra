@@ -1,3 +1,15 @@
+/**
+ * @deprecated Lili #113 (2026-05-02) — formulario plano en desuso.
+ *
+ * El routing `case 'plant_asset'` en App.jsx ahora redirige a
+ * `<AssetsDashboard initialTab="plant" initialShowForm />` que sí usa
+ * SpeciesSelect (CROP_TAXONOMY 72+ sp), GuildSuggestions (companion plants)
+ * y autofill estrato/gremio/producción.
+ *
+ * Este archivo se mantiene por backwards-compat de imports + para que
+ * AG/CI no rompan. NO enlazar desde UI nueva. Borrar en v0.6.0 si nada
+ * lo importa.
+ */
 import React, { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, Camera, MapPin } from 'lucide-react';
 import { savePayload } from '../services/payloadService';

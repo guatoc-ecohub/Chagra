@@ -277,7 +277,10 @@ export default function App() {
       case 'insumos':
         return <InputLog onBack={() => navigate('dashboard')} onSave={showToast} />;
       case 'plant_asset':
-        return <PlantAssetLog onBack={() => navigate('dashboard')} onSave={showToast} />;
+        // Lili #113 — desaparece el form plano. Redirige al rich form de
+        // AssetsDashboard tab=plant que ya tiene SpeciesSelect, GuildSuggestions
+        // y autofill estrato/gremio/producción (mismo modelo que el flujo voz).
+        return <AssetsDashboard onBack={() => navigate('dashboard')} initialTab="plant" initialShowForm />;
       case 'observacion':
         return <ObservationScreen onBack={() => navigate('dashboard')} onSave={showToast} />;
       case 'reportar_invasora':
