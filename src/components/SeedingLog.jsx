@@ -65,7 +65,11 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
         watchIdRef.current = navigator.geolocation.watchPosition(
           (pos) => setCoordinates(prev => [...prev, [pos.coords.longitude, pos.coords.latitude]]),
           (err) => console.error(err),
-          { enableHighAccuracy: true }
+          {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
+          }
         );
       }
     }

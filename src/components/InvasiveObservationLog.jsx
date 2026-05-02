@@ -9,6 +9,7 @@ import { savePayload } from '../services/payloadService';
 import { getAllSpecies } from '../db/catalogDB';
 import { sanitizeBlobUrl } from '../utils/blobUrl';
 import NativeSubstituteSuggestion from './NativeSubstituteSuggestion';
+import GeolocationButton from './GeolocationButton';
 
 export default function InvasiveObservationLog({ onBack, onSave, initialLocationId = null, initialWkt = null }) {
     const [formData, setFormData] = useState({
@@ -24,7 +25,6 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
     const [photo, setPhoto] = useState(null);
     const [photoUrl, setPhotoUrl] = useState(null);
     const [location, setLocation] = useState(initialWkt ? { wkt: initialWkt } : null);
-    const [isLocating, setIsLocating] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
     const [selectedInvasive, setSelectedInvasive] = useState(null);
@@ -84,23 +84,11 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
         setPhotoUrl(safeObjectUrl);
     };
 
-    const captureLocation = () => {
-        if (!navigator.geolocation) return;
-        setIsLocating(true);
-        navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                setLocation({
-                    wkt: `POINT(${pos.coords.longitude} ${pos.coords.latitude})`,
-                    coords: [pos.coords.longitude, pos.coords.latitude]
-                });
-                setIsLocating(false);
-            },
-            (err) => {
-                console.error(err);
-                setIsLocating(false);
-            },
-            { enableHighAccuracy: true }
-        );
+    const handleLocationCapture = (lat, lon) => {
+        setLocation({
+            wkt: `POINT(${lon} ${lat})`,
+            coords: [lon, lat]
+        });
     };
 
     const handleSave = async () => {
@@ -255,14 +243,10 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
 
                 <div className="flex flex-col gap-2">
                     <span className="text-xl font-bold text-slate-400">Ubicación / GPS</span>
-                    <button
-                        onClick={captureLocation}
-                        disabled={isLocating}
-                        className={`p-5 rounded-xl text-2xl font-bold flex justify-center items-center gap-3 shadow-md min-h-[80px] ${location ? 'bg-slate-800 border-2 border-emerald-600' : 'bg-slate-800 border-2 border-slate-600'}`}
-                    >
-                        <MapPin size={32} />
-                        {isLocating ? 'Buscando satélites...' : (location ? 'Punto capturado' : 'Capturar GPS')}
-                    </button>
+                    <GeolocationButton
+                        onCoords={handleLocationCapture}
+                        label={location ? "Cambiar ubicación" : "Capturar GPS"}
+                    />
                 </div>
 
                 <label className="flex flex-col gap-2">

@@ -305,7 +305,11 @@ export const AssetDetailView = () => {
               if (navigator.geolocation) {
                 try {
                   const gpsPos = await new Promise((res, rej) =>
-                    navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 5000 })
+                    navigator.geolocation.getCurrentPosition(res, rej, {
+                      enableHighAccuracy: true,
+                      timeout: 15000,
+                      maximumAge: 30000
+                    })
                   );
                   const { distance, isClose } = proximityCheck(gpsPos, geometry);
                   if (!isClose) {
