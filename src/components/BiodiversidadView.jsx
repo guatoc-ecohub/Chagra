@@ -61,8 +61,11 @@ export default function BiodiversidadView({ onBack }) {
     };
   }, [plants]);
 
+  // Lili #119: "mejorar la imagen del background". Overlay reducido
+  // (de 0.55-0.82 a 0.45-0.78) para que la ilustración curada del bosque
+  // alto-andino sea más visible sin sacrificar legibilidad de las cards.
   const customBgStyle = {
-    backgroundImage: 'linear-gradient(rgba(2,6,23,0.55), rgba(2,6,23,0.82)), url(/biodiversidad-bg.jpg)',
+    backgroundImage: 'linear-gradient(rgba(2,6,23,0.45), rgba(2,6,23,0.78)), url(/biodiversidad-bg.jpg)',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
@@ -75,16 +78,31 @@ export default function BiodiversidadView({ onBack }) {
         className="min-h-full p-4 flex flex-col gap-4"
         style={customBgStyle}
       >
+        {/* Lili #119: agregado intro contextual. Antes solo había stats
+            sin explicación de qué significaban (Estratos? Gremios?). */}
+        <section className="bg-slate-900/85 backdrop-blur-sm border border-emerald-800/30 rounded-xl p-4">
+          <p className="text-sm text-slate-200 leading-snug mb-2">
+            <span className="text-emerald-300 font-bold">Biodiversidad de la finca.</span>{' '}
+            Métrica clave del diseño agroforestal sintrópico — más especies en
+            estratos diversos = mayor resiliencia climática, mejor regulación de
+            plagas y suelo más vivo.
+          </p>
+          <p className="text-[11px] text-slate-400 leading-tight">
+            <strong>Estratos</strong>: capas verticales del agroecosistema (emergente, alto, medio, bajo).{' '}
+            <strong>Gremios</strong>: rol funcional de cada especie (productiva, fijadora N, atrayente polinizadores, dinámica suelo).
+          </p>
+        </section>
+
         <section className="grid grid-cols-3 gap-2">
-          <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-xl p-3 text-center">
+          <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-xl p-3 text-center" title="Cantidad de especies únicas registradas en la finca">
             <p className="text-3xl font-black text-emerald-300 tabular-nums">{speciesCount}</p>
             <p className="text-2xs text-slate-400 uppercase font-bold mt-1">Especies</p>
           </div>
-          <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-xl p-3 text-center">
+          <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-xl p-3 text-center" title="Niveles verticales ocupados (emergente, alto, medio, bajo)">
             <p className="text-3xl font-black text-amber-300 tabular-nums">{strataCount}</p>
             <p className="text-2xs text-slate-400 uppercase font-bold mt-1">Estratos</p>
           </div>
-          <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-xl p-3 text-center">
+          <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-xl p-3 text-center" title="Roles funcionales distintos en el agroecosistema">
             <p className="text-3xl font-black text-lime-300 tabular-nums">{guildsCount}</p>
             <p className="text-2xs text-slate-400 uppercase font-bold mt-1">Gremios</p>
           </div>
