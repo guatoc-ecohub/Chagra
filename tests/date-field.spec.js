@@ -5,7 +5,10 @@ test.use({
     ...devices['iPhone 13'],
 });
 
-test.describe('DateField component (iOS Safari emulation)', () => {
+// TODO #100: tests E2E mal scoped igual que geolocation + photo-capture.
+// `page.goto('/')` no carga el componente DateField directo (vive dentro de
+// forms que requieren navegación). Refactor a vitest+RTL component mounting.
+test.describe.skip('DateField component (iOS Safari emulation)', () => {
     test.beforeEach(async ({ page }) => {
         // En un entorno real, cargaríamos una historia de Storybook o una app de test.
         // Dado el footprint, inyectamos el componente para testing si es posible, 
