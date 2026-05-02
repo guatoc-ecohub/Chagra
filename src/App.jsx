@@ -2,6 +2,7 @@ import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback } from
 import { Sprout, MapPin, Eye, Package, Clock, NotebookPen, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
+import { useScrollRestoration } from './hooks/useScrollRestoration';
 
 import { isAuthenticated, logoutUser } from './services/authService';
 import useAssetStore from './store/useAssetStore';
@@ -86,6 +87,10 @@ const ACCENT_CLASSES = {
 // useAssetStore() (hook) dispara re-render cuando hydrate()/syncFromServer() actualizan
 // el estado, a diferencia de useAssetStore.getState() que es una lectura snapshot.
 const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, lastLogMessage }) {
+  // Lili #103: preservar scroll al volver de Voz/FieldFeedback/sub-screens.
+  // Sin esto, navegar dashboard → vista_X → dashboard volvía siempre al top.
+  useScrollRestoration('dashboard');
+
   // Selectores shallow: solo re-renderiza cuando las longitudes cambian
   const plantsCount = useAssetStore((s) => s.plants.length);
   const landsCount = useAssetStore((s) => s.lands.length);
@@ -134,7 +139,7 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
         {plantsCount === 0 ? (
           <OnboardingHero onNavigate={onNavigate} />
         ) : (
-          <TelemetryAlerts lastFarmOsLog={lastLogMessage} />
+          <TelemetryAlerts onNavigate={onNavigate} lastFarmOsLog={lastLogMessage} />
         )}
 
         {/* Contadores de inventario consolidados: un solo container con
@@ -169,7 +174,7 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
           </button>
         )}
 
-        <PendingTasksWidget />
+        <div className="h-4 shrink-0" />
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {NAV_TILES.map((tile) => {
@@ -282,6 +287,8 @@ export default function App() {
         return <TaskLogScreen onBack={() => navigate('dashboard')} onNewTask={() => navigate('new_task')} />;
       case 'new_task':
         return <TaskScreen onBack={() => navigate('task_log')} onSave={showToast} />;
+      case 'edit_task':
+        return <TaskScreen onBack={() => navigate('task_log')} onSave={showToast} task={currentViewData?.task} isEdit />;
       case 'javier':
         return (
           <ScreenShell title={`Campo — ${PRIMARY_WORKER_NAME}`} icon={Eye} onBack={() => navigate('dashboard')}>
@@ -332,6 +339,7 @@ export default function App() {
       {/* FAB feedback inline para field testing — siempre visible salvo loading */}
       {currentView !== 'loading' && currentView !== 'login' && <FieldFeedback />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'voz' && <MicFab onNavigate={navigate} />}
+      {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
       {toast && (
         <div
           role={toast.isError ? 'alert' : 'status'}
