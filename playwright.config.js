@@ -2,6 +2,10 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
+  // Excluir vitest unit tests (#100): viven en tests/unit/ y usan
+  // @testing-library/jest-dom que entra en conflict con Playwright
+  // expect global ("Cannot redefine property: Symbol($$jest-matchers-object)").
+  testIgnore: ['**/unit/**', '**/*.test.{js,jsx}'],
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
