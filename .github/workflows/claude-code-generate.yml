@@ -176,14 +176,10 @@ jobs:
           SUMMARY=$(jq -r '.messages[-1].content // "Implementación generada por Claude Code."' "$OUTPUT_FILE" 2>/dev/null | head -c 500)
 
           git add -A
-          git commit -m "$(cat <<EOF
-feat(issue-${ISSUE_NUM}): implementación auto-generada por Claude Code
-
-${SUMMARY}
-
-[claude-code-run #${RUN_ID}]
-EOF
-)"
+          git commit \
+            -m "feat(issue-${ISSUE_NUM}): implementación auto-generada por Claude Code" \
+            -m "${SUMMARY}" \
+            -m "[claude-code-run #${RUN_ID}]"
           git push origin "$BRANCH"
 
       - name: Upload audit transcript
@@ -211,19 +207,20 @@ EOF
           else
             STATUS="❌ Generación falló. Ver logs."
           fi
-          gh pr comment "$PR_NUM" --body "$(cat <<EOF
-🤖 Claude Code Generate ejecutado.
-
-- Run ID: [\`${RUN_ID}\`](${ARTIFACT_URL})
-- Issue: #${ISSUE_NUM}
-- Estado: ${STATUS}
-- Transcript: ver artifact \`claude-code-output-${RUN_ID}\` (retención 90d)
-
-**Próximo paso humano**: revisar el diff. Si OK, marcar el PR como ready-for-review (\`gh pr ready ${PR_NUM}\`).
-
-Re-disparar este workflow: re-aplicar la label \`ready-to-generate\`.
-EOF
-)"
+          BODY_FILE="${RUNNER_TEMP}/pr-comment.md"
+          {
+            echo "🤖 Claude Code Generate ejecutado."
+            echo
+            echo "- Run ID: [\`${RUN_ID}\`](${ARTIFACT_URL})"
+            echo "- Issue: #${ISSUE_NUM}"
+            echo "- Estado: ${STATUS}"
+            echo "- Transcript: ver artifact \`claude-code-output-${RUN_ID}\` (retención 90d)"
+            echo
+            echo "**Próximo paso humano**: revisar el diff. Si OK, marcar el PR como ready-for-review (\`gh pr ready ${PR_NUM}\`)."
+            echo
+            echo "Re-disparar este workflow: re-aplicar la label \`ready-to-generate\`."
+          } > "$BODY_FILE"
+          gh pr comment "$PR_NUM" --body-file "$BODY_FILE"
 
       - name: Remove ready-to-generate label
         if: always()
