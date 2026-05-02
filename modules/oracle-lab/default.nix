@@ -233,6 +233,11 @@ in {
       after = [ "network-online.target" ];
       wants = [ "network-online.target" ];
 
+      # git: requerido por git_activity collector (subprocess "git -C ... log").
+      # Sin esto, collector falla con "[Errno 2] No such file or directory: 'git'"
+      # aunque los repos clones existan en /var/lib/oracle-lab/repos/.
+      path = [ pkgs.git ];
+
       environment = {
         ORACLE_DATA_DIR = cfg.dataDir;
         PYTHONUNBUFFERED = "1";
