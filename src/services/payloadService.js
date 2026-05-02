@@ -143,3 +143,41 @@ export const savePayload = async (type, payload) => {
     return { success: false, message: 'Sin conexión. Guardado localmente. Pendiente sincronización' };
   }
 };
+
+/**
+ * updatePayload — PATCH a una entidad existente. Necesario para edición de
+ * tareas pendientes (Lili #106). Misma resolución de endpoint + manejo
+ * online/offline que savePayload, pero PATCH en lugar de POST + endpoint
+ * incluye el ID del recurso target.
+ *
+ * Scope justificado para CONTRIBUTING.md regla #1: feature edit task del
+ * field test Lili requiere endpoint PATCH explícito que no existía. NO
+ * modifica savePayload existente.
+ *
+ * @param {string} type - mismo enum que savePayload (task, observation, etc.)
+ * @param {string} logId - UUID del recurso a actualizar
+ * @param {object} payload - { data: { type, id, attributes, relationships? } }
+ */
+export const updatePayload = async (type, logId, payload) => {
+  console.log(`PATCH Chagra (${type} #${logId}):`, JSON.stringify(payload, null, 2));
+  const endpoint = `${resolveEndpoint(type)}/${logId}`;
+  if (navigator.onLine) {
+    try {
+      const result = await sendToFarmOS(endpoint, payload, 'PATCH');
+      return { success: true, message: 'Actualizado en servidor', data: result };
+    } catch (error) {
+      console.warn(`[payloadService] PATCH error (${type} #${logId}):`, error.message);
+      await syncManager.saveTransaction({
+        type: `${type}_update`,
+        payload: { ...payload, endpoint, method: 'PATCH' },
+      });
+      return { success: false, message: `Cambios guardados local. Pendiente sync (${error.message})` };
+    }
+  } else {
+    await syncManager.saveTransaction({
+      type: `${type}_update`,
+      payload: { ...payload, endpoint, method: 'PATCH' },
+    });
+    return { success: false, message: 'Sin conexión. Cambios guardados localmente.' };
+  }
+};

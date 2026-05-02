@@ -5,11 +5,12 @@ import DateField from './DateField';
 import StatusBadge from './StatusBadge';
 import { TASK_STATUSES } from '../constants/assetStatuses';
 
-function TaskScreen({ onBack, onSave }) {
+function TaskScreen({ onBack, onSave, initialData }) {
     const plants = useAssetStore((s) => s.plants);
     const structures = useAssetStore((s) => s.structures);
     const lands = useAssetStore((s) => s.lands);
     const addTaskLog = useAssetStore((s) => s.addTaskLog);
+    const updateTaskLog = useAssetStore((s) => s.updateTaskLog);
 
     const allAssets = useMemo(() => [
         ...plants.map(p => ({ id: p.id, name: p.attributes?.name || p.name, type: 'plant' })),
@@ -17,15 +18,21 @@ function TaskScreen({ onBack, onSave }) {
         ...lands.map(l => ({ id: l.id, name: l.attributes?.name || l.name, type: 'land' }))
     ], [plants, structures, lands]);
 
-    const [formData, setFormData] = useState({
-        name: '',
-        assetId: '',
+    // Modo edición: si initialData trae .id, estamos editando una tarea
+    // existente. Si no, crear nueva. Lili #106.
+    const isEdit = !!initialData?.id;
+
+    const [formData, setFormData] = useState(() => ({
+        name: initialData?.name || initialData?.attributes?.name || '',
+        assetId: initialData?.asset_id || '',
         locationId: '',
-        notes: '',
-        due: new Date().toISOString().split('T')[0],
-        severity: 'medium',
-        status: 'pending'
-    });
+        notes: initialData?.attributes?.notes?.value || '',
+        due: initialData?.attributes?.timestamp
+            ? initialData.attributes.timestamp.split('T')[0]
+            : new Date().toISOString().split('T')[0],
+        severity: initialData?.severity || 'medium',
+        status: initialData?.attributes?.status || initialData?.status || 'pending'
+    }));
 
     const [isSaving, setIsSaving] = useState(false);
 
@@ -51,12 +58,17 @@ function TaskScreen({ onBack, onSave }) {
                 status: formData.status
             };
 
-            await addTaskLog(taskData);
-            onSave('Tarea agendada exitosamente (Offline-First)', false);
+            if (isEdit) {
+                await updateTaskLog(initialData.id, taskData);
+                onSave('Tarea actualizada (Offline-First)', false);
+            } else {
+                await addTaskLog(taskData);
+                onSave('Tarea agendada exitosamente (Offline-First)', false);
+            }
             setTimeout(() => onBack(), 500);
         } catch (error) {
             console.error('[TaskScreen] Error saving task:', error);
-            onSave('Error al agendar tarea', true);
+            onSave(isEdit ? 'Error al actualizar tarea' : 'Error al agendar tarea', true);
         } finally {
             setIsSaving(false);
         }
@@ -71,7 +83,7 @@ function TaskScreen({ onBack, onSave }) {
                 >
                     <ArrowLeft size={32} />
                 </button>
-                <h2 className="text-3xl font-black tracking-tight">Agendar Tarea</h2>
+                <h2 className="text-3xl font-black tracking-tight">{isEdit ? 'Editar Tarea' : 'Agendar Tarea'}</h2>
             </header>
 
             <div className="flex-1 p-5 flex flex-col gap-6 pb-24 max-w-2xl mx-auto w-full">
@@ -189,7 +201,7 @@ function TaskScreen({ onBack, onSave }) {
                     disabled={isSaving}
                     className="mt-4 p-6 rounded-xl bg-muzo text-slate-950 text-2xl font-black shadow-neon-muzo active:scale-95 transition-all disabled:opacity-50 disabled:grayscale"
                 >
-                    {isSaving ? 'AGENDANDO...' : 'PROGRAMAR TAREA'}
+                    {isSaving ? (isEdit ? 'ACTUALIZANDO...' : 'AGENDANDO...') : (isEdit ? 'GUARDAR CAMBIOS' : 'PROGRAMAR TAREA')}
                 </button>
             </div>
         </div>
