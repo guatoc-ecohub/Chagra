@@ -4,10 +4,16 @@
  * AGPL-3.0 © Chagra
  */
 
-import React, { useState, useEffect } from 'react';
-import { Leaf, Sprout, X } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Leaf, Sprout, X, RefreshCw } from 'lucide-react';
 import ChagraGrowLoader from './ChagraGrowLoader';
 import { getNativeSubstitutesForInvasive } from '../db/catalogDB';
+
+// Watchdog para evitar "ciclo eterno" en pantalla post-reporte (Miguel
+// 2026-05-02): si initCatalog() o el fetch de /catalog.sqlite cuelgan
+// (offline + Service Worker frío, OPFS bloqueado, WASM init lento), el
+// spinner queda forever. 10s es generoso pero acotado.
+const QUERY_TIMEOUT_MS = 10000;
 
 const ESTRATO_LABEL = {
     bajo: 'Bajo',
@@ -43,32 +49,51 @@ export function NativeSubstituteSuggestion({
     const [substitutes, setSubstitutes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [retryNonce, setRetryNonce] = useState(0);
+
+    const handleRetry = useCallback(() => {
+        setRetryNonce((n) => n + 1);
+    }, []);
 
     useEffect(() => {
         let alive = true;
-        // Reset intencional al cambiar invasiveSpeciesId o thermalZone: el usuario
-        // espera ver el loader nuevamente si salta entre especies distintas.
+        // Reset intencional al cambiar invasiveSpeciesId/thermalZone/retry:
+        // el usuario espera ver el loader nuevamente si salta entre especies
+        // distintas o pulsa "reintentar".
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setLoading(true);
         setError(null);
 
+        const timeoutId = setTimeout(() => {
+            if (alive) {
+                console.warn('[NativeSubstituteSuggestion] Catalog query timeout — likely offline + SW frío.');
+                setError('Catálogo local tardó demasiado en responder. Probablemente sin red o cargando aún.');
+                setLoading(false);
+            }
+        }, QUERY_TIMEOUT_MS);
+
         getNativeSubstitutesForInvasive(invasiveSpeciesId, { thermalZone })
             .then((results) => {
                 if (alive) {
+                    clearTimeout(timeoutId);
                     setSubstitutes(results);
                     setLoading(false);
                 }
             })
             .catch((err) => {
                 if (alive) {
+                    clearTimeout(timeoutId);
                     console.warn('[NativeSubstituteSuggestion] Catalog query failed:', err);
                     setError('No se pudo consultar el catálogo local.');
                     setLoading(false);
                 }
             });
 
-        return () => { alive = false; };
-    }, [invasiveSpeciesId, thermalZone]);
+        return () => {
+            alive = false;
+            clearTimeout(timeoutId);
+        };
+    }, [invasiveSpeciesId, thermalZone, retryNonce]);
 
     const handleSelect = (native) => {
         if (onSelectNative) {
@@ -109,14 +134,46 @@ export function NativeSubstituteSuggestion({
             {/* Body */}
             <div className="p-3 space-y-2">
                 {loading && (
-                    <div className="flex items-center gap-2 text-slate-400 py-2">
-                        <ChagraGrowLoader size={20} />
-                        <span className="text-xs">Consultando catálogo local…</span>
+                    <div className="flex items-center justify-between gap-2 text-slate-400 py-2">
+                        <div className="flex items-center gap-2">
+                            <ChagraGrowLoader size={20} />
+                            <span className="text-xs">Consultando catálogo local…</span>
+                        </div>
+                        {onDismiss && (
+                            <button
+                                type="button"
+                                onClick={onDismiss}
+                                className="text-[10px] text-slate-500 hover:text-slate-300 underline"
+                            >
+                                saltar
+                            </button>
+                        )}
                     </div>
                 )}
 
                 {error && (
-                    <p className="text-xs text-red-400 py-2">{error}</p>
+                    <div className="py-2 space-y-2">
+                        <p className="text-xs text-red-400">{error}</p>
+                        <div className="flex gap-2">
+                            <button
+                                type="button"
+                                onClick={handleRetry}
+                                className="text-xs px-3 py-1.5 rounded-lg bg-slate-800 text-slate-200 border border-slate-700 hover:bg-slate-700 active:scale-95 transition-all flex items-center gap-1.5"
+                            >
+                                <RefreshCw size={12} />
+                                Reintentar
+                            </button>
+                            {onDismiss && (
+                                <button
+                                    type="button"
+                                    onClick={onDismiss}
+                                    className="text-xs px-3 py-1.5 rounded-lg bg-transparent text-slate-400 border border-slate-800 hover:text-slate-200"
+                                >
+                                    Cerrar
+                                </button>
+                            )}
+                        </div>
+                    </div>
                 )}
 
                 {!loading && !error && substitutes.length === 0 && (
