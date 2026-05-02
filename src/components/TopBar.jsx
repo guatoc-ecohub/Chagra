@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CircleUser, Mic, Plus, Settings, ChevronDown, ChevronUp, Home } from 'lucide-react';
+import { CircleUser, Mic, Plus, ChevronDown, ChevronUp, Home } from 'lucide-react';
 import { version as APP_VERSION } from '../../package.json';
 import EnvironmentalCard from './EnvironmentalCard';
 
@@ -109,14 +109,10 @@ export default function TopBar({ onNavigate, onLogout }) {
         >
           <Plus size={22} aria-hidden="true" strokeWidth={2.5} />
         </button>
-        <button
-          type="button"
-          onClick={() => onNavigate('perfil')}
-          aria-label="Configuración"
-          className="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 active:bg-slate-700 text-slate-300 min-h-[44px] min-w-[44px] flex items-center justify-center"
-        >
-          <Settings size={20} aria-hidden="true" />
-        </button>
+        {/* Botón Settings (icono ⚙) eliminado — Lili #115: era duplicado del
+            botón operator name de arriba (ambos onNavigate('perfil')). El
+            operator name button es más explícito + el NAV_TILE Perfil del
+            dashboard sigue accesible. */}
 
         {/* Salir (mantiene el comportamiento actual) */}
         <button
