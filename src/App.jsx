@@ -131,6 +131,30 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
           globales. Reemplaza el header inline previo. La info ambiental
           (msnm/luna/sol) pasó al EnvironmentalCard colapsable bajo el TopBar. */}
       <TopBar onNavigate={onNavigate} onLogout={onLogout} />
+
+      {/* Lili #116: estadísticas al header (siempre visibles).
+          Antes: el bloque assetCounts vivía dentro del <main scrollable>,
+          se perdía al scrollear hacia abajo. Lili pidió "deberían ir al
+          inicio en el header" — ahora es hermano del TopBar (queda fuera
+          del overflow del main, sticky de facto al top siempre). */}
+      {plantsCount > 0 && (
+        <button
+          type="button"
+          onClick={() => onNavigate('activos')}
+          aria-label="Ver inventario de activos"
+          className="w-full bg-slate-900/95 backdrop-blur-md border-b border-slate-800 hover:bg-slate-800/50 transition-colors shrink-0"
+        >
+          <div className="grid grid-cols-4 divide-x divide-slate-800 py-2">
+            {assetCounts.map((ac) => (
+              <div key={ac.label} className="text-center px-2">
+                <p className={`text-xl font-black tabular-nums ${ac.color}`}>{ac.count}</p>
+                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{ac.label}</p>
+              </div>
+            ))}
+          </div>
+        </button>
+      )}
+
       <main className="flex-1 px-4 pt-3 pb-4 flex flex-col overflow-y-auto gap-3 bg-biopunk-pattern">
         {/* DR-030 QW5: cold-start empty-state.
             plantsCount === 0 → OnboardingHero con 3 CTA hero (📸/🎤/✍).
@@ -142,25 +166,6 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
         ) : (
           <TelemetryAlerts onNavigate={onNavigate} lastFarmOsLog={lastLogMessage} />
         )}
-
-        {/* Contadores de inventario consolidados: un solo container con
-            divisores verticales entre columnas, en vez de 4 tarjetas
-            separadas. Compacto y coherente con el resto de paneles Bio-Punk. */}
-        <button
-          type="button"
-          onClick={() => onNavigate('activos')}
-          aria-label="Ver inventario de activos"
-          className="w-full bg-slate-900 border border-slate-800 rounded-xl hover:bg-slate-800/50 transition-colors"
-        >
-          <div className="grid grid-cols-4 divide-x divide-slate-800 py-3">
-            {assetCounts.map((ac) => (
-              <div key={ac.label} className="text-center px-2">
-                <p className={`text-2xl font-black tabular-nums ${ac.color}`}>{ac.count}</p>
-                <p className="text-2xs text-slate-500 uppercase font-bold tracking-wider">{ac.label}</p>
-              </div>
-            ))}
-          </div>
-        </button>
 
         {noGeoCount > 0 && (
           <button
