@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback } from 'react';
-import { Sprout, MapPin, Eye, Package, Clock, NotebookPen, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette } from 'lucide-react';
+import { Sprout, MapPin, Eye, Package, Clock, NotebookPen, CheckCircle, WifiOff, Leaf, Mic, AlertCircle, Palette, FileText } from 'lucide-react';
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
 import { useScrollRestoration } from './hooks/useScrollRestoration';
@@ -32,6 +32,7 @@ const TaskScreen = lazy(() => import('./components/TaskScreen'));
 const AssetsDashboard = lazy(() => import('./components/AssetsDashboard'));
 const WorkerHistory = lazy(() => import('./components/WorkerHistory'));
 const BitacoraEntryDetail = lazy(() => import('./components/BitacoraEntryDetail'));
+const InformesScreen = lazy(() => import('./components/InformesScreen'));
 const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').then(m => ({ default: m.InventoryDashboard })));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
@@ -67,6 +68,7 @@ const NAV_TILES = [
   { id: 'historial', label: 'Bitácora', icon: NotebookPen, accent: 'indigo', desc: 'Trazabilidad de operaciones' },
   { id: 'biodiversidad', label: 'Flora y fauna', icon: Leaf, accent: 'emerald', desc: 'Ecosistema, estratos y gremios' },
   { id: 'reportar_invasora', label: 'Plagas', icon: AlertCircle, accent: 'amber', desc: 'Reporte de plagas y malezas' },
+  { id: 'informes', label: 'Informes', icon: FileText, accent: 'lime', desc: 'Reportes CSV de trazabilidad y descargas' },
   { id: 'perfil', label: 'Perfil', icon: Palette, accent: 'indigo', desc: 'Temas y configuración' },
 ];
 
@@ -318,6 +320,8 @@ export default function App() {
             <InventoryDashboard />
           </ScreenShell>
         );
+      case 'informes':
+        return <InformesScreen onBack={() => navigate('dashboard')} />;
       case 'historial':
         return <WorkerHistory onBack={() => navigate('dashboard')} onEntryClick={(entry) => navigate('bitacora_detail', { entry })} />;
       case 'bitacora_detail':
