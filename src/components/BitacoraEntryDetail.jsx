@@ -1,6 +1,8 @@
-import React from 'react';
-import { ArrowLeft, Edit2, Calendar, MapPin, FileText, Cpu, Hash } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { ArrowLeft, Edit2, Calendar, MapPin, FileText, Cpu, Hash, Camera, Loader2 } from 'lucide-react';
 import StatusBadge from './StatusBadge';
+import useAssetStore from '../store/useAssetStore';
+import { captureAndCompress } from '../services/photoService';
 
 /**
  * BitacoraEntryDetail — vista detalle de una entrada de Bitácora/Historial.
@@ -89,6 +91,42 @@ function isEditableTask(entry) {
 }
 
 export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
+  const attachPhotoToLog = useAssetStore((s) => s.attachPhotoToLog);
+  const [photoState, setPhotoState] = useState('idle'); // idle | uploading | success | error
+  const [photoMsg, setPhotoMsg] = useState('');
+  const fileInputRef = useRef(null);
+
+  const handlePhotoCapture = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !entry?.id) return;
+    if (!file.type.startsWith('image/')) {
+      setPhotoState('error');
+      setPhotoMsg('Archivo no es una imagen válida');
+      return;
+    }
+    setPhotoState('uploading');
+    setPhotoMsg('');
+    try {
+      const { blob } = await captureAndCompress(file);
+      const result = await attachPhotoToLog(entry.id, blob);
+      if (result?.success === false) {
+        setPhotoState('error');
+        setPhotoMsg(result.message || 'Error guardando foto');
+      } else {
+        setPhotoState('success');
+        setPhotoMsg('Foto adjuntada a este evento');
+        setTimeout(() => setPhotoState('idle'), 3000);
+      }
+    } catch (err) {
+      console.error('[BitacoraEntryDetail] Error attach photo:', err);
+      setPhotoState('error');
+      setPhotoMsg(err?.message || 'Error procesando foto');
+    } finally {
+      // Reset input para permitir re-attach mismo archivo si user reintenta
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   if (!entry) {
     return (
       <div className="h-[100dvh] w-full bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-6">
@@ -197,6 +235,53 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
               <p className="text-xs uppercase tracking-wider text-slate-500 font-bold mb-1">ID</p>
               <p className="text-xs text-slate-300 font-mono break-all">{entry.id}</p>
             </div>
+          </section>
+        )}
+
+        {/* Lili #88: agregar foto a evento timeline.
+            Crea un log--task con marker [PHOTO_ATTACHMENT] + target_log_id
+            (patrón append-only consistente con [TASK_COMPLETION]). */}
+        {entry?.id && (
+          <section className="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2">
+            <div className="flex items-center gap-2">
+              <Camera size={16} className="text-emerald-400" />
+              <span className="text-xs uppercase tracking-wider text-slate-500 font-bold">
+                Adjuntar foto a este evento
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-500 leading-snug">
+              La foto se asocia a este evento sin modificarlo (append-only).
+              Útil para documentar evidencia post-registro.
+            </p>
+            <label className={`w-full p-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all min-h-[44px] ${
+              photoState === 'uploading'
+                ? 'bg-slate-800 text-slate-500 cursor-wait'
+                : photoState === 'success'
+                  ? 'bg-emerald-900/40 text-emerald-300 border border-emerald-700'
+                  : photoState === 'error'
+                    ? 'bg-red-900/30 text-red-300 border border-red-800'
+                    : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
+            }`}>
+              {photoState === 'uploading' ? (
+                <><Loader2 size={18} className="animate-spin" /> Procesando…</>
+              ) : (
+                <><Camera size={18} /> {photoState === 'success' ? 'Adjuntar otra' : 'Tomar / elegir foto'}</>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handlePhotoCapture}
+                disabled={photoState === 'uploading'}
+                className="hidden"
+              />
+            </label>
+            {photoMsg && (
+              <p className={`text-xs ${photoState === 'error' ? 'text-red-400' : 'text-emerald-400'}`}>
+                {photoMsg}
+              </p>
+            )}
           </section>
         )}
 
