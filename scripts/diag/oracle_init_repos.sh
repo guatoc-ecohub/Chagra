@@ -35,16 +35,23 @@ for repo in "${REPOS[@]}"; do
   if [ -d "$REPO_PATH/.git" ]; then
     echo "→ $repo ya existe, git pull (como $INVOKING_USER)"
     # Garantizar que el invoking user tenga write durante el pull
-    chown -R "$INVOKING_USER:$INVOKING_USER" "$REPO_PATH"
+    chown -R "$INVOKING_USER" "$REPO_PATH"
     sudo -u "$INVOKING_USER" git -C "$REPO_PATH" pull --ff-only --depth 1 2>&1 | tail -2
   else
     echo "→ clone --depth 1 $repo (como $INVOKING_USER)"
+    # Si el dir existe SIN .git/ (clone fallido previo deja restos que rompen
+    # git clone con "Permiso denegado" aun pre-creando el dir), limpiar primero.
+    # Validación defensiva: solo rm -rf paths bajo $REPOS_BASE para evitar accidentes.
+    if [ -e "$REPO_PATH" ]; then
+      case "$REPO_PATH" in
+        "$REPOS_BASE"/*) rm -rf "$REPO_PATH" ;;
+        *) echo "ERROR defensivo: REPO_PATH ($REPO_PATH) fuera de REPOS_BASE ($REPOS_BASE), abortando rm" >&2; exit 3 ;;
+      esac
+    fi
     # Pre-crear el subdir con owner = invoking user para que git clone (que corre
     # como ese user) tenga write en su propio dir, pese a que el parent es oracle-lab.
-    # Sin este paso: "fatal: no se pudo crear directorios principales: Permiso denegado"
     mkdir -p "$REPO_PATH"
     chown "$INVOKING_USER" "$REPO_PATH"
-    # git clone con destino existente y vacío funciona (no exige dir nuevo)
     sudo -u "$INVOKING_USER" git clone --depth 1 "$REPO_URL" "$REPO_PATH" 2>&1 | tail -2
   fi
 done
