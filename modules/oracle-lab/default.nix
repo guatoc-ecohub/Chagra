@@ -10,6 +10,7 @@ let
     pydantic
     websockets
     matplotlib  # fase 3 — render PNG server-side
+    ephem       # fase 9 — eventos astronómicos especiales (lunar.py)
   ];
 
   pythonEnv = pkgs.python3.withPackages (ps:
