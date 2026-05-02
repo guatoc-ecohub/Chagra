@@ -217,6 +217,7 @@
     arp-scan
     bitwarden-desktop
     jq         # JSON parsing — usado en scripts/diag y diagnósticos manuales
+    warp-terminal  # Terminal moderno con AI agent integrado (unfree)
 
     # --- Herramientas de monitoreo de sistema ---
     htop       # Monitor de procesos

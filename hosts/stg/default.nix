@@ -138,6 +138,9 @@
     # Expuesto via overlay en flake.nix → pkgs.antigravity
     antigravity
 
+    # Warp: terminal moderno con AI agent integrado (unfree)
+    warp-terminal
+
     # --- Herramientas de monitoreo de sistema ---
     htop       # Monitor de procesos
     # nvtop     # Monitor de GPU NVIDIA (comentado temporalmente)
