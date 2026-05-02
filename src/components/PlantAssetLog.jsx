@@ -4,6 +4,7 @@ import { savePayload } from '../services/payloadService';
 import { savePhoto } from '../services/photoService';
 import GeolocationButton from './GeolocationButton';
 import PhotoCaptureField from './PhotoCaptureField';
+import DateField from './DateField';
 
 const ASSET_TYPES = [
   { id: 'type-1', name: 'Árbol Frutal' },
@@ -21,7 +22,8 @@ export default function PlantAssetLog({ onBack, onSave }) {
     assetType: 'type-1',
     species: '',
     variety: '',
-    healthStatus: 'Sano'
+    healthStatus: 'Sano',
+    recordDate: new Date().toISOString().split('T')[0]
   });
   const [photo, setPhoto] = useState(null);
   const [location, setLocation] = useState(null);
@@ -86,6 +88,7 @@ export default function PlantAssetLog({ onBack, onSave }) {
           attributes: {
             name: `${formData.species} - ${formData.variety || 'N/A'}`,
             status: "active",
+            timestamp: `${formData.recordDate}T00:00:00+00:00`,
             intrinsic_geometry: location.wkt,
             notes: `Estado Sanitario: ${formData.healthStatus}`
           },
@@ -100,7 +103,13 @@ export default function PlantAssetLog({ onBack, onSave }) {
       const result = await savePayload('plant_asset', payload);
       onSave(result.message, !result.success);
 
-      setFormData({ assetType: 'type-1', species: '', variety: '', healthStatus: 'Sano' });
+      setFormData({
+        assetType: 'type-1',
+        species: '',
+        variety: '',
+        healthStatus: 'Sano',
+        recordDate: new Date().toISOString().split('T')[0]
+      });
       setPhoto(null);
       setLocation(null);
     } catch (error) {
@@ -127,6 +136,13 @@ export default function PlantAssetLog({ onBack, onSave }) {
           value={photo}
           onPhoto={(blob) => setPhoto(blob)}
           onRemove={() => setPhoto(null)}
+        />
+
+        <DateField
+          label="Fecha de registro"
+          value={formData.recordDate}
+          onChange={(val) => setFormData(p => ({ ...p, recordDate: val }))}
+          required
         />
 
         <label className="flex flex-col gap-2">

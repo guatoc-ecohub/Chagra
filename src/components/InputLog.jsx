@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import DateField from './DateField';
 import { savePayload } from '../services/payloadService';
 import { FARM_CONFIG } from '../config/defaults';
 
@@ -105,10 +106,12 @@ export default function InputLog({ onBack, onSave }) {
       </header>
 
       <div className="flex-1 p-5 flex flex-col gap-6 pb-24">
-        <label className="flex flex-col gap-2">
-          <span className="text-xl font-bold">Fecha de Aplicación</span>
-          <input type="date" name="date" value={formData.date} onChange={handleInput} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-2xl text-white min-h-[64px]" />
-        </label>
+        <DateField
+          label="Fecha de Aplicación"
+          value={formData.date}
+          onChange={(val) => setFormData(p => ({ ...p, date: val }))}
+          required
+        />
 
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Ubicación / Polígono</span>
