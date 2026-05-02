@@ -1,8 +1,15 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { X, MapPin, LocateFixed, Check, Undo2, Footprints, Square } from 'lucide-react';
+import { X, MapPin, LocateFixed, Check, Undo2, Footprints, Square, Loader2, AlertTriangle, Shield } from 'lucide-react';
 import { latLngToPoint, latLngsToPolygon } from '../utils/geo';
+
+// Threshold para warning de baja precisión. Brave con Shields up devuelve
+// posiciones gruesas (>1km) sin emitir error — el usuario veía "ubicación
+// capturada" pero el punto estaba a kilómetros del lugar real. Miguel
+// reportó este patrón 2026-05-02. Ahora si accuracy > 500m, mostramos un
+// warning explícito mencionando Brave Shields.
+const LOW_ACCURACY_THRESHOLD_M = 500;
 
 /**
  * MapPicker — Modal de selección/dibujo de geometría (Fase 17.3).
@@ -46,6 +53,20 @@ export const MapPicker = ({
   // ir sumando vertices al polígono mientras el operario recorre el
   // perimetro del area (ej. un invernadero). Solo disponible en mode=polygon.
   const [isWalking, setIsWalking] = useState(false);
+  // Estado machine GPS: idle → locating → located | low-accuracy | failed.
+  // Renderizado como banner persistente arriba del mapa para que el operador
+  // sepa qué está pasando — antes "Mi ubicación" silenciaba errores y el
+  // usuario quedaba viendo el mapa en DEFAULT_CENTER sin saber por qué.
+  const [gpsStatus, setGpsStatus] = useState('idle');
+  const [gpsResult, setGpsResult] = useState(null);
+  const [gpsError, setGpsError] = useState(null);
+  const [isBrave, setIsBrave] = useState(false);
+
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && navigator.brave?.isBrave) {
+      navigator.brave.isBrave().then((b) => setIsBrave(!!b)).catch(() => {});
+    }
+  }, []);
 
   // Inicializar Leaflet una sola vez al montar
   useEffect(() => {
@@ -195,25 +216,49 @@ export const MapPicker = ({
     }
   };
 
-  const handleUseLocation = () => {
+  // Lectura de GPS reutilizada por:
+  //   (a) auto-locate al abrir el modal (useEffect tras montar Leaflet)
+  //   (b) click del botón "Mi ubicación"
+  // `placeMarker=true` solo cuando es action explícita del usuario o al abrir
+  // sin geometría inicial (no queremos pisar un marker preexistente al re-locate).
+  const captureGps = useCallback((placeMarker) => {
     if (!navigator.geolocation) {
-      console.warn('[MapPicker] Geolocalización no disponible');
+      setGpsStatus('failed');
+      setGpsError('Geolocalización no disponible en este navegador.');
       return;
     }
+    setGpsStatus('locating');
+    setGpsError(null);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const latlng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        const accuracy = pos.coords.accuracy || 0;
+        setGpsResult({ lat: latlng.lat, lon: latlng.lng, accuracy });
         const map = mapRef.current;
+        if (!map) return;
         map.setView([latlng.lat, latlng.lng], DEFAULT_ZOOM);
-        if (mode === 'point') {
+        if (placeMarker && mode === 'point') {
           if (layerRef.current) map.removeLayer(layerRef.current);
           const m = L.marker(latlng).addTo(map);
           layerRef.current = m;
           setMarker(latlng);
         }
+        // Brave Shields a veces devuelve coords gruesas (>1km) sin disparar
+        // error. Detectamos via accuracy y avisamos al usuario explícitamente.
+        if (accuracy > LOW_ACCURACY_THRESHOLD_M) {
+          setGpsStatus('low-accuracy');
+        } else {
+          setGpsStatus('located');
+        }
       },
       (err) => {
-        console.error('[MapPicker] Error GPS:', err.message);
+        let msg = 'No se pudo obtener tu ubicación.';
+        if (err.code === 1) msg = 'Permiso de ubicación denegado por el navegador.';
+        else if (err.code === 2) msg = 'GPS no disponible (sin señal o desactivado).';
+        else if (err.code === 3) msg = 'Tiempo agotado esperando al GPS (15s).';
+        console.error('[MapPicker] Error GPS:', err.code, err.message);
+        setGpsStatus('failed');
+        setGpsError(msg);
       },
       {
         enableHighAccuracy: true,
@@ -221,7 +266,21 @@ export const MapPicker = ({
         maximumAge: 30000
       }
     );
-  };
+  }, [mode]);
+
+  // Auto-locate al abrir el modal (solo si no hay geometría inicial cargada).
+  // Con esto el operador ve el mapa centrado en su ubicación apenas abre,
+  // en lugar del DEFAULT_CENTER de Choachí — fixing reporte Miguel 2026-05-02
+  // "sale el mapa muy desubicado y no hace gran cosa".
+  useEffect(() => {
+    if (initial) return; // respetar geometría pre-cargada
+    // Pequeño delay para que Leaflet termine de montar antes del setView
+    const t = setTimeout(() => captureGps(false), 300);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleUseLocation = () => captureGps(true);
 
   const handleSave = () => {
     if (mode === 'point') {
@@ -266,6 +325,63 @@ export const MapPicker = ({
         </button>
       </div>
 
+      {/* GPS status banner — siempre visible para no silenciar errores. */}
+      {gpsStatus !== 'idle' && (
+        <div
+          className={`px-4 py-2 text-xs flex items-center gap-2 border-b border-slate-800 ${
+            gpsStatus === 'locating' ? 'bg-slate-900 text-blue-300' :
+            gpsStatus === 'located' ? 'bg-emerald-900/30 text-emerald-300' :
+            gpsStatus === 'low-accuracy' ? 'bg-amber-900/30 text-amber-300' :
+            'bg-red-900/30 text-red-300'
+          }`}
+        >
+          {gpsStatus === 'locating' && (
+            <>
+              <Loader2 size={14} className="animate-spin shrink-0" />
+              <span>Obteniendo tu ubicación GPS…</span>
+            </>
+          )}
+          {gpsStatus === 'located' && gpsResult && (
+            <>
+              <LocateFixed size={14} className="shrink-0" />
+              <span className="font-mono text-[11px] truncate">
+                {gpsResult.lat.toFixed(5)}, {gpsResult.lon.toFixed(5)} (±{Math.round(gpsResult.accuracy)}m)
+              </span>
+            </>
+          )}
+          {gpsStatus === 'low-accuracy' && gpsResult && (
+            <>
+              <AlertTriangle size={14} className="shrink-0" />
+              <div className="flex-1 min-w-0">
+                <span className="font-bold">Precisión baja: ±{Math.round(gpsResult.accuracy)}m. </span>
+                {isBrave ? (
+                  <span>
+                    Brave Shields puede estar bloqueando el GPS preciso. Click en el escudo
+                    <Shield size={11} className="inline mx-1" />
+                    de la barra y desactivar &quot;Block fingerprinting&quot; para este sitio.
+                  </span>
+                ) : (
+                  <span>Reintentá a cielo abierto o desactivá filtros de fingerprinting del navegador.</span>
+                )}
+              </div>
+            </>
+          )}
+          {gpsStatus === 'failed' && (
+            <>
+              <AlertTriangle size={14} className="shrink-0" />
+              <span className="flex-1">{gpsError || 'GPS no disponible.'} Podés marcar el punto haciendo click en el mapa.</span>
+              <button
+                type="button"
+                onClick={() => captureGps(true)}
+                className="px-2 py-0.5 rounded bg-red-800/40 border border-red-700 text-red-200 hover:bg-red-800/60 text-[11px] font-bold shrink-0"
+              >
+                Reintentar
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
       <div ref={containerRef} className="flex-1 bg-slate-950" />
 
       <div className="p-4 bg-slate-900 border-t border-slate-700 flex flex-wrap gap-2 justify-between">
@@ -273,9 +389,12 @@ export const MapPicker = ({
           <button
             type="button"
             onClick={handleUseLocation}
-            className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-sm font-bold flex items-center gap-2"
+            disabled={gpsStatus === 'locating'}
+            className="px-3 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-200 rounded-lg text-sm font-bold flex items-center gap-2"
           >
-            <LocateFixed size={16} /> Mi ubicación
+            {gpsStatus === 'locating'
+              ? <><Loader2 size={16} className="animate-spin" /> Buscando…</>
+              : <><LocateFixed size={16} /> Mi ubicación</>}
           </button>
           {mode === 'polygon' && (
             <button
