@@ -565,11 +565,11 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
                       coordinates: [pos.coords.longitude, pos.coords.latitude],
                     },
                   }));
-                }
+                },
+                onError: (errorType) => {
+                  console.warn('[AssetsDashboard] GPS inline falló:', errorType);
+                },
               });
-              // Wait, useGeolocation doesn't have onSuccess callback in my implementation.
-              // I'll update useGeolocation to accept optional callbacks or just use navigator directly with right config here.
-              // Actually, I'll update the hook to support ONE-SHOT with callbacks for easier refactoring of these patterns.
             }}
             className="p-3 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 min-h-[48px] min-w-[48px] flex items-center justify-center"
             aria-label="Usar mi ubicación"
