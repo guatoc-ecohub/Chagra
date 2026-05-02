@@ -3,6 +3,7 @@ import { Search, ChevronDown, X } from 'lucide-react';
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { resolveSpeciesDefaults } from '../config/speciesDefaults';
 import { fuzzyFilter } from '../utils/fuzzySearch';
+import { usePhotoUrl } from '../hooks/usePhotoUrl';
 
 /**
  * SpeciesSelect — Selector de especie con fuzzy search y autocompletado de defaults.
@@ -30,7 +31,23 @@ const ALL_SPECIES = Object.entries(CROP_TAXONOMY).flatMap(([groupId, group]) =>
 export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
+  const [selectedSpeciesId, setSelectedSpeciesId] = useState(null);
   const wrapperRef = useRef(null);
+
+  // Lookup speciesId desde el value persistido (al re-abrir formulario con datos).
+  // Se prefiere el id explicit del último handleSelect; si no, intenta match exact.
+  useEffect(() => {
+    if (selectedSpeciesId) return;
+    if (!value) return;
+    const match = ALL_SPECIES.find((sp) => sp.name === value);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- lookup síncrono local, no causa cascading renders (skip si match falla)
+    if (match) setSelectedSpeciesId(match.id);
+  }, [value, selectedSpeciesId]);
+
+  // Foto guía del catálogo según especie elegida (Fase 1 wiring photoService).
+  // Si no hay foto del catálogo en /catalog-photos/<slug>.jpg cae al placeholder.
+  // En el futuro Fase 3 se hidrata el directorio con ~20 fotos top-uso desde GBIF.
+  const photo = usePhotoUrl({ speciesSlug: selectedSpeciesId });
 
   // Cerrar dropdown al clickar fuera
   useEffect(() => {
@@ -49,6 +66,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
   );
 
   const handleSelect = (species) => {
+    setSelectedSpeciesId(species.id);
     onChange(species.name, species.id);
     setQuery('');
     setOpen(false);
@@ -69,6 +87,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
 
   const handleClear = () => {
     onChange('', null);
+    setSelectedSpeciesId(null);
     setQuery('');
   };
 
@@ -144,6 +163,31 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
               </button>
             ))
           )}
+        </div>
+      )}
+
+      {/* Foto guía del catálogo (Fase 1 wiring photoService).
+          Aparece solo si el operario eligió una especie del fuzzy search.
+          Si hay foto del usuario para la misma especie en otra mata se
+          prioriza esa (4-tier resolver de getPhotoUrl). */}
+      {selectedSpeciesId && photo.url && !photo.loading && (
+        <div className="mt-2 flex items-center gap-2 p-2 rounded-lg bg-slate-900 border border-slate-800">
+          <img
+            src={photo.url}
+            alt={value || 'Foto de la especie'}
+            className="w-12 h-12 rounded object-cover bg-slate-800 shrink-0"
+            loading="lazy"
+          />
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
+              {photo.source === 'user'
+                ? 'Tu última foto de esta especie'
+                : photo.source === 'catalog'
+                  ? 'Foto del catálogo'
+                  : 'Sin foto aún — la primera que tomes queda como referencia'}
+            </p>
+            <p className="text-xs text-slate-300 truncate">{value}</p>
+          </div>
         </div>
       )}
 

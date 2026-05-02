@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo } from 'react';
-import { Sprout, Droplets, Apple, Leaf, RefreshCw, Clock, Bot, Sparkles, Check, X } from 'lucide-react';
+import { Sprout, Droplets, Apple, Leaf, RefreshCw, Clock, Bot, Sparkles, Check, X, Camera } from 'lucide-react';
 import { useLogStore } from '../store/useLogStore';
 import { parseAiInference, parseAiReview } from '../utils/aiInferenceParser';
 import { savePayload } from '../services/payloadService';
 import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
+import { usePhotoUrl } from '../hooks/usePhotoUrl';
 
 /**
  * AssetTimeline — Línea de tiempo agroecológica de un activo (plant).
@@ -78,6 +79,62 @@ const extractNotes = (log) => {
   if (!raw) return '';
   if (typeof raw === 'string') return raw;
   return raw.value || '';
+};
+
+// Detector PHOTO_ATTACHMENT (Fase 1 wiring): los logs de adjuntar foto a un
+// evento se modelan como log--task con marker [PHOTO_ATTACHMENT] +
+// target_log_id + photo_ref (id numérico en media_cache). Patrón append-only
+// definido en useAssetStore.attachPhotoToLog.
+const parsePhotoAttachment = (notes) => {
+  if (!notes || !notes.includes('[PHOTO_ATTACHMENT]')) return null;
+  const photoRefMatch = notes.match(/photo_ref:\s*(\d+)/);
+  const targetMatch = notes.match(/target_log_id:\s*(\S+)/);
+  if (!photoRefMatch) return null;
+  return {
+    photoId: Number(photoRefMatch[1]),
+    targetLogId: targetMatch ? targetMatch[1] : null,
+  };
+};
+
+// Sub-componente con su propio hook usePhotoUrl para no llamarlo dentro del map().
+const PhotoAttachmentThumb = ({ photoId, timestamp, pending }) => {
+  const photo = usePhotoUrl({ photoId });
+  return (
+    <li
+      className={`relative p-3 rounded-xl border bg-fuchsia-900/10 border-fuchsia-700/40 ${pending ? 'opacity-60' : ''}`}
+    >
+      <span className="absolute -left-[26px] top-4 w-4 h-4 rounded-full bg-fuchsia-900 border-2 border-fuchsia-700 flex items-center justify-center">
+        <Camera size={10} className="text-fuchsia-400" />
+      </span>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          {photo.loading ? (
+            <div className="w-16 h-16 rounded bg-slate-800 shrink-0 animate-pulse" />
+          ) : photo.url ? (
+            <img
+              src={photo.url}
+              alt="Foto adjunta al evento"
+              className="w-16 h-16 rounded object-cover bg-slate-800 shrink-0"
+              loading="lazy"
+            />
+          ) : (
+            <div className="w-16 h-16 rounded bg-slate-800 shrink-0 flex items-center justify-center text-slate-600">
+              <Camera size={20} />
+            </div>
+          )}
+          <div className="min-w-0 flex-1">
+            <span className="text-xs font-bold text-fuchsia-400 block">Foto adjunta</span>
+            <p className="text-xs text-slate-500 mt-0.5">
+              {photo.source === 'specific' ? 'Evidencia visual capturada' : 'Foto no encontrada en cache local'}
+            </p>
+          </div>
+        </div>
+        <span className="text-xs text-slate-500 shrink-0 whitespace-nowrap">
+          {timestamp ? new Date(timestamp * 1000).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' }) : '—'}
+        </span>
+      </div>
+    </li>
+  );
 };
 
 const extractQuantity = (log) => {
@@ -159,6 +216,22 @@ export default function AssetTimeline({ assetId }) {
                   const notes = extractNotes(log);
                   const aiData = parseAiInference(notes);
                   const isAi = !!aiData;
+
+                  // Fase 1 wiring fotos (Lili #88): si es un log [PHOTO_ATTACHMENT],
+                  // renderizamos el sub-componente con thumb cargado desde media_cache
+                  // en lugar del entry genérico. Short-circuit evita render condicional
+                  // del hook (regla de hooks).
+                  const photoAttachment = parsePhotoAttachment(notes);
+                  if (photoAttachment) {
+                    return (
+                      <PhotoAttachmentThumb
+                        key={log.id}
+                        photoId={photoAttachment.photoId}
+                        timestamp={log.timestamp}
+                        pending={log._pending}
+                      />
+                    );
+                  }
 
                   // Búsqueda de review (crossing logic)
                   const reviewLog = isAi ? monthLogs.find(l => {
