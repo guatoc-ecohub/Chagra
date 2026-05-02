@@ -105,7 +105,10 @@ export default function PlantAssetLog({ onBack, onSave }) {
               : null,
             meta: {
               capturedAt: new Date().toISOString(),
-              gps: location ? { lat: location.lat, lon: location.lon } : null,
+              // location SIEMPRE truthy aquí — el guard `if (!location) return`
+              // de arriba garantiza no llegar a este bloque sin coords. CodeQL
+              // #29 flagged `location ? {...} : null` como useless conditional.
+              gps: { lat: location.lat, lon: location.lon },
             },
           });
         } catch (err) {
