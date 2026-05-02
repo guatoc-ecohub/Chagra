@@ -49,6 +49,16 @@ export const InputLogForm = ({ assetId, onComplete }) => {
         notes: formData.notes,
       });
       setFormData((prev) => ({ ...prev, value: '', notes: '' }));
+      // Lili #108: feedback explícito de dónde queda guardada la info.
+      // Antes el form solo limpiaba sin decir nada → user no sabía si
+      // realmente se guardó ni dónde verlo.
+      window.dispatchEvent(new CustomEvent('syncSuccess', {
+        detail: {
+          message: 'Aplicación registrada en Bitácora',
+          actionLabel: 'Ver Bitácora',
+          actionView: 'historial',
+        },
+      }));
       if (onComplete) onComplete();
     } catch (err) {
       console.error('[InputLogForm] Error registrando insumo:', err);
@@ -90,10 +100,12 @@ export const InputLogForm = ({ assetId, onComplete }) => {
             ))}
           </select>
           {selectedInfo && (
-            <span className="text-[10px] text-slate-400 flex items-center gap-1 px-1 mt-1">
-              <Info size={10} className="shrink-0" />
-              <span>{selectedInfo.desc}</span>
-            </span>
+            <div className="text-xs text-slate-300 flex items-start gap-2 px-2 py-2 mt-1 rounded-lg bg-slate-800/60 border border-slate-700/50">
+              <Info size={14} className="shrink-0 text-blue-400 mt-0.5" />
+              <span className="leading-snug">
+                {selectedInfo.desc || 'Sin descripción registrada — agregar en config/materials.js'}
+              </span>
+            </div>
           )}
         </div>
 

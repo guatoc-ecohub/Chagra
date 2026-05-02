@@ -457,13 +457,26 @@ export default function VoiceCapture({ onSave }) {
       {view === STATE_DONE && (
         <div className="flex flex-col items-center gap-4 py-8">
           <Save size={48} className="text-green-400" />
-          <p className="text-sm text-green-300 text-center">Registro guardado en la cola de sincronización.</p>
-          <button
-            onClick={resetAll}
-            className="px-6 py-3 min-h-[44px] bg-lime-700 hover:bg-lime-600 rounded-xl font-bold flex items-center gap-2"
-          >
-            <Mic size={18} /> Nueva grabación
-          </button>
+          <div className="text-center max-w-xs">
+            <p className="text-base font-bold text-green-300">Registro guardado ✓</p>
+            <p className="text-xs text-slate-400 mt-1">
+              Se sincronizará con FarmOS cuando haya conexión. Mientras tanto, lo encontrás en <strong className="text-slate-200">Bitácora → Pendientes</strong>.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2 justify-center">
+            <button
+              onClick={resetAll}
+              className="px-6 py-3 min-h-[44px] bg-lime-700 hover:bg-lime-600 rounded-xl font-bold flex items-center gap-2"
+            >
+              <Mic size={18} /> Nueva grabación
+            </button>
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view: 'historial' } }))}
+              className="px-6 py-3 min-h-[44px] bg-slate-800 hover:bg-slate-700 rounded-xl font-bold flex items-center gap-2 text-slate-200"
+            >
+              Ver en Bitácora
+            </button>
+          </div>
         </div>
       )}
     </div>
