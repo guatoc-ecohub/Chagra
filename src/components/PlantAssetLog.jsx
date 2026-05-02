@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, Camera, MapPin } from 'lucide-react';
 import { savePayload } from '../services/payloadService';
 import { savePhoto } from '../services/photoService';
@@ -39,18 +39,25 @@ export default function PlantAssetLog({ onBack, onSave }) {
 
   // handlePhotoCapture removed in favor of PhotoCaptureField
 
-  const handleLocationCapture = (lat, lon) => {
+  const handleLocationCapture = useCallback((lat, lon) => {
     setLocation({
       lat,
       lon,
       wkt: `POINT (${lon} ${lat})`
     });
-  };
+  }, []);
 
   const handleSave = async () => {
-    if (isSaving) return;
-    if (!formData.species || !location) {
-      onSave('Completa Especie/Nombre y captura la coordenada', true);
+    const isSpeciesEmpty = !formData.species || !formData.species.trim();
+    const isLocationMissing = !location;
+
+    if (isSpeciesEmpty || isLocationMissing) {
+      let msg = 'Completa los campos obligatorios';
+      if (isSpeciesEmpty && isLocationMissing) msg = 'Completa Especie/Nombre y captura la coordenada';
+      else if (isSpeciesEmpty) msg = 'Falta Especie/Nombre';
+      else if (isLocationMissing) msg = 'Falta capturar coordenada';
+
+      onSave(msg, true);
       return;
     }
 
