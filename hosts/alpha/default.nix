@@ -17,6 +17,18 @@
     ../../modules/oracle-lab
   ];
 
+  # NTP — los servers default de NixOS (*.nixos.pool.ntp.org) tienen latencia
+  # alta + sync flaky desde Colombia. timedatectl reportaba "synchronized: no"
+  # con NTP service active pero sin sync efectivo. Workaround Lili #9 (hora
+  # desfasada en HYTA). Cloudflare + Google son anycast: <30ms desde LATAM.
+  services.timesyncd = {
+    enable = true;
+    servers = [
+      "time.cloudflare.com"
+      "time.google.com"
+    ];
+  };
+
   # Proxy local OpenAI-compat — fix bug 2026-04-26: openfang manda
   # embeddings al OPENAI_BASE_URL (z.ai), pero el Coding Plan sólo
   # tiene modelos GLM (chat), no embeddings. El proxy routea:
