@@ -50,12 +50,20 @@ const GREMIO_OPTIONS = [
   { value: 'productivo_principal', label: 'Productivo principal' },
 ];
 
+// Lili #111 #112 #114 — clarificar tabs:
+// - 'Zonas' (land): áreas geográficas con polígono — tab mantenida con
+//   descripción explícita en hover/aria.
+// - 'Infraestructura' (structure): construcciones físicas (invernaderos,
+//   bodegas) — diferente de Zonas (que son polígonos abiertos).
+// - 'Herramientas' (equipment): ELIMINADA — Lili "qué finalidad cumple?
+//   sin agregar ubicación, sin contexto". Sin caso de uso MVP claro,
+//   removed hasta que se valide demanda real. Si necesario re-agregar
+//   en v1.x con scope definido (asignación a tasks, inventario físico).
 const ASSET_TABS = [
-  { id: 'plant', label: 'Siembras', icon: TreePine, color: 'lime' },
-  { id: 'land', label: 'Zonas', icon: MapIcon, color: 'amber' },
-  { id: 'structure', label: 'Infraestructura', icon: Building2, color: 'emerald' },
-  { id: 'equipment', label: 'Herramientas', icon: Wrench, color: 'orange' },
-  { id: 'material', label: 'Insumos', icon: Leaf, color: 'sky' },
+  { id: 'plant', label: 'Siembras', icon: TreePine, color: 'lime', desc: 'Plantas y cultivos registrados' },
+  { id: 'land', label: 'Zonas', icon: MapIcon, color: 'amber', desc: 'Áreas geográficas con coordenadas (lotes, potreros)' },
+  { id: 'structure', label: 'Infraestructura', icon: Building2, color: 'emerald', desc: 'Construcciones físicas (invernaderos, bodegas, sistemas de riego)' },
+  { id: 'material', label: 'Insumos', icon: Leaf, color: 'sky', desc: 'Stock de biopreparados, semillas, fertilizantes' },
 ];
 
 const LAND_TYPES = [
@@ -688,6 +696,8 @@ export default function AssetsDashboard({ onBack }) {
               role="tab"
               aria-selected={isActive}
               aria-controls={`tabpanel-${tab.id}`}
+              aria-label={tab.desc ? `${tab.label}: ${tab.desc}` : tab.label}
+              title={tab.desc || tab.label}
               onClick={() => { setActiveTab(tab.id); setShowForm(false); resetForm(); }}
               className={`flex-1 p-3 flex items-center justify-center gap-1.5 font-bold text-xs whitespace-nowrap transition-all min-h-[48px] ${isActive
                   ? `${colorMap[tab.color].text} border-b-2 ${colorMap[tab.color].border}`
