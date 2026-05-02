@@ -33,12 +33,12 @@ const PerformancePanel = ({ assetId }) => {
             <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">Ratio Global</p>
           </div>
           <div className="text-center border-r border-slate-800">
-            <p className="text-xl font-bold text-green-400 tabular-nums">{totalHarvestWeight} kg</p>
-            <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">Cosecha</p>
+            <p className="text-xl font-bold text-green-400 tabular-nums">{totalHarvestWeight}</p>
+            <p className="text-[10px] text-slate-500 uppercase font-bold mt-1" title="Suma normalizada a kg/L base decimal">Cosecha (kg/L)</p>
           </div>
           <div className="text-center">
-            <p className="text-xl font-bold text-blue-400 tabular-nums">{totalInputWeight} kg</p>
-            <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">Insumos</p>
+            <p className="text-xl font-bold text-blue-400 tabular-nums">{totalInputWeight}</p>
+            <p className="text-[10px] text-slate-500 uppercase font-bold mt-1" title="Suma normalizada a kg/L base decimal — desglose por categoría debajo">Insumos (kg/L)</p>
           </div>
         </div>
       </div>
@@ -87,8 +87,8 @@ const CategoryBreakdown = ({ byCategory }) => {
                   <span className="text-xs text-slate-300 truncate">{meta?.label || catId}</span>
                 </div>
                 <div className="flex items-center gap-3 shrink-0 text-[11px] tabular-nums">
-                  <span className="text-slate-500">
-                    {data.total} kg
+                  <span className="text-slate-500" title="Total normalizado a base decimal kg/L">
+                    {data.total} <span className="text-slate-600">kg/L</span>
                   </span>
                   <span className="text-slate-200 font-bold">
                     {catId === 'biofabrica' ? '—' : `×${data.ratio}`}
