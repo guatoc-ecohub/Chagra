@@ -113,3 +113,4 @@ Cualquier contribución al módulo de sincronización (`syncManager`) debe asegu
 ## Licencia
 
 Este proyecto está licenciado bajo los términos de la licencia **GNU AGPLv3**.
+// Smoke test claude-code-runner — 2026-05-01
