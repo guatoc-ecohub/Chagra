@@ -146,7 +146,7 @@ const TAB_LABELS = {
   material: 'Insumo',
 };
 
-export default function AssetsDashboard({ onBack }) {
+export default function AssetsDashboard({ onBack, initialTab, initialShowForm = false }) {
   const {
     plants, structures, equipment, materials, lands,
     isLoading, error, lastSync,
@@ -160,9 +160,14 @@ export default function AssetsDashboard({ onBack }) {
   const [currentZoneId, setCurrentZoneId] = useState(null); // drill-down Fase 17.2
   const [viewMode, setViewMode] = useState('list'); // 'list' | 'map' (Fase 17.3)
 
-  const [activeTab, setActiveTab] = useState('plant');
+  // Lili #113 + decisión 2026-05-02 (deprecar PlantAssetLog plano):
+  // initialTab + initialShowForm permiten que App.jsx case 'plant_asset' redirija
+  // aquí con el form rich abierto directo en tab=plant. Antes el TopBar `+`
+  // navegaba al PlantAssetLog plano que NO usaba SpeciesSelect/GuildSuggestions/
+  // autofill — rich form vivía escondido detrás de Plantas → Siembras → Nuevo.
+  const [activeTab, setActiveTab] = useState(initialTab || 'plant');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(initialShowForm);
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState(INITIAL_FORM_STATE);
 
