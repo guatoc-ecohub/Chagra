@@ -629,6 +629,84 @@ const useAssetStore = create((set, get) => ({
   // estado actual sin necesidad de mutar el primero.
   //
   // verdict: 'completed' | 'cancelled' | 'rescheduled'
+  // attachPhotoToLog — Lili #88: agregar foto a un evento de timeline existente
+  // (siembras, cosechas, observaciones, aplicaciones, etc.) sin mutar el log
+  // original (Regla 1 ADR-019).
+  //
+  // Crea un nuevo log--task con marker [PHOTO_ATTACHMENT] + target_log_id
+  // referencia al log original. La foto se guarda en photoService como
+  // siempre y se referencia via _photoRefId. La timeline cruza ambos para
+  // mostrar la foto inline en el evento original.
+  //
+  // Patrón consistente con [TASK_COMPLETION] arriba — append-only, no muta.
+  attachPhotoToLog: async (targetLogId, photoBlob, notes = '') => {
+    if (!photoBlob) {
+      return { success: false, message: 'Foto vacía' };
+    }
+    const logId = newId('log--task');
+    const ts = new Date().toISOString().split('.')[0] + '+00:00';
+
+    let photoRefId = null;
+    try {
+      const { savePhoto } = await import('../services/photoService');
+      const saved = await savePhoto({
+        blob: photoBlob,
+        speciesSlug: null,
+        meta: {
+          capturedAt: new Date().toISOString(),
+          attachedToLog: targetLogId,
+        },
+      });
+      photoRefId = saved?.id || saved?._photoRefId || null;
+    } catch (err) {
+      console.error('[Store] Error guardando foto attachment:', err);
+      return { success: false, message: 'Error guardando foto local' };
+    }
+
+    const noteLines = [
+      '[PHOTO_ATTACHMENT]',
+      `target_log_id: ${targetLogId}`,
+      `photo_ref: ${photoRefId || 'pending'}`,
+      `attached_at: ${new Date().toISOString()}`,
+    ];
+    if (notes) noteLines.push('', '--- Nota ---', notes);
+
+    const payload = {
+      _photoRefId: photoRefId,
+      data: {
+        type: 'log--task',
+        id: logId,
+        attributes: {
+          name: `Foto adjunta a evento`,
+          timestamp: ts,
+          status: 'done',
+          notes: { value: noteLines.join('\n'), format: 'plain_text' },
+        },
+      },
+    };
+
+    const optimisticLog = {
+      id: logId,
+      type: 'log--task',
+      asset_id: null,
+      timestamp: Math.floor(Date.now() / 1000),
+      name: payload.data.attributes.name,
+      status: 'done',
+      attributes: payload.data.attributes,
+      _pending: true,
+      _photoRefId: photoRefId,
+      _attachmentTargetLogId: targetLogId,
+    };
+
+    try {
+      await logCache.put(optimisticLog);
+    } catch (logErr) {
+      console.warn('[Store] Fallo persistir photo attachment log:', logErr);
+    }
+
+    return savePayload('task', payload);
+  },
+
   completeTaskLog: async (originalTaskId, verdict = 'completed', notes = '') => {
     const logId = newId('log--task');
     const ts = new Date().toISOString().split('.')[0] + '+00:00';
