@@ -5,6 +5,8 @@ import { savePhoto } from '../services/photoService';
 import GeolocationButton from './GeolocationButton';
 import PhotoCaptureField from './PhotoCaptureField';
 import DateField from './DateField';
+import StatusBadge from './StatusBadge';
+import { PLANT_STATUSES } from '../constants/assetStatuses';
 
 const ASSET_TYPES = [
   { id: 'type-1', name: 'Árbol Frutal' },
@@ -23,6 +25,7 @@ export default function PlantAssetLog({ onBack, onSave }) {
     species: '',
     variety: '',
     healthStatus: 'Sano',
+    assetStatus: 'growing',
     recordDate: new Date().toISOString().split('T')[0]
   });
   const [photo, setPhoto] = useState(null);
@@ -94,7 +97,7 @@ export default function PlantAssetLog({ onBack, onSave }) {
           type: "asset--plant",
           attributes: {
             name: `${formData.species} - ${formData.variety || 'N/A'}`,
-            status: "active",
+            status: formData.assetStatus,
             timestamp: `${formData.recordDate}T00:00:00+00:00`,
             intrinsic_geometry: location.wkt,
             notes: `Estado Sanitario: ${formData.healthStatus}`
@@ -115,6 +118,7 @@ export default function PlantAssetLog({ onBack, onSave }) {
         species: '',
         variety: '',
         healthStatus: 'Sano',
+        assetStatus: 'growing',
         recordDate: new Date().toISOString().split('T')[0]
       });
       setPhoto(null);
@@ -167,6 +171,22 @@ export default function PlantAssetLog({ onBack, onSave }) {
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Variedad (Opcional)</span>
           <input type="text" name="variety" value={formData.variety} onChange={handleInput} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-2xl text-white min-h-[64px]" />
+        </label>
+
+        <label className="flex flex-col gap-2">
+          <span className="text-xl font-bold">Estado del Activo</span>
+          <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-slate-900 border border-slate-700">
+            {PLANT_STATUSES.map(s => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => setFormData(p => ({ ...p, assetStatus: s.id }))}
+                className={`transition-all ${formData.assetStatus === s.id ? 'ring-2 ring-purple-500 ring-offset-2 ring-offset-slate-950 scale-105' : 'opacity-60 hover:opacity-100'}`}
+              >
+                <StatusBadge status={s.id} type="plant" />
+              </button>
+            ))}
+          </div>
         </label>
 
         <label className="flex flex-col gap-2">

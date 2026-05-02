@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { ArrowLeft, Calendar, FileText, Tag, Briefcase, Layout } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import DateField from './DateField';
+import StatusBadge from './StatusBadge';
+import { TASK_STATUSES } from '../constants/assetStatuses';
 
 function TaskScreen({ onBack, onSave }) {
     const plants = useAssetStore((s) => s.plants);
@@ -21,7 +23,8 @@ function TaskScreen({ onBack, onSave }) {
         locationId: '',
         notes: '',
         due: new Date().toISOString().split('T')[0],
-        severity: 'medium'
+        severity: 'medium',
+        status: 'pending'
     });
 
     const [isSaving, setIsSaving] = useState(false);
@@ -44,7 +47,8 @@ function TaskScreen({ onBack, onSave }) {
                 assetIds: formData.assetId ? [formData.assetId] : [],
                 locationId: formData.locationId || null,
                 due: new Date(formData.due).toISOString().split('.')[0] + '+00:00',
-                severity: formData.severity
+                severity: formData.severity,
+                status: formData.status
             };
 
             await addTaskLog(taskData);
@@ -102,6 +106,24 @@ function TaskScreen({ onBack, onSave }) {
                                 <option value="high">Alta (Urgente)</option>
                                 <option value="critical">Crítica (Emergencia)</option>
                             </select>
+                        </label>
+
+                        <label className="flex flex-col gap-2">
+                            <span className="text-sm font-bold uppercase tracking-wider text-slate-500">
+                                Estado de la Tarea
+                            </span>
+                            <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-slate-900 border-2 border-slate-800">
+                                {TASK_STATUSES.map(s => (
+                                    <button
+                                        key={s.id}
+                                        type="button"
+                                        onClick={() => setFormData(p => ({ ...p, status: s.id }))}
+                                        className={`transition-all ${formData.status === s.id ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-slate-950 scale-105' : 'opacity-60 hover:opacity-100'}`}
+                                    >
+                                        <StatusBadge status={s.id} type="task" />
+                                    </button>
+                                ))}
+                            </div>
                         </label>
 
                         <DateField
