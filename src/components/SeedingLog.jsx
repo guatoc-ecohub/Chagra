@@ -3,6 +3,7 @@ import { ArrowLeft, Camera, MapPin } from 'lucide-react';
 import { savePayload } from '../services/payloadService';
 import { captureAndCompress, savePhoto } from '../services/photoService';
 import { sanitizeBlobUrl } from '../utils/blobUrl';
+import DateField from './DateField';
 
 export default function SeedingLog({ onBack, onSave, initialData = {} }) {
   const [formData, setFormData] = useState({
@@ -182,10 +183,12 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
           </label>
         </div>
 
-        <label className="flex flex-col gap-2">
-          <span className="text-xl font-bold">Fecha</span>
-          <input type="date" name="date" value={formData.date} onChange={handleInput} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-2xl text-white min-h-[64px]" />
-        </label>
+        <DateField
+          label="Fecha"
+          value={formData.date}
+          onChange={(val) => setFormData(p => ({ ...p, date: val }))}
+          required
+        />
 
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Cultivo</span>

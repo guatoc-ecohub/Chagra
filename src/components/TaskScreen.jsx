@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ArrowLeft, Calendar, FileText, Tag, Briefcase, Layout } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
+import DateField from './DateField';
 
 function TaskScreen({ onBack, onSave }) {
     const plants = useAssetStore((s) => s.plants);
@@ -103,18 +104,13 @@ function TaskScreen({ onBack, onSave }) {
                             </select>
                         </label>
 
-                        <label className="flex flex-col gap-2">
-                            <span className="text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
-                                <Calendar size={14} /> Fecha Programada
-                            </span>
-                            <input
-                                type="date"
-                                name="due"
-                                value={formData.due}
-                                onChange={handleInput}
-                                className="p-4 rounded-xl bg-slate-900 border-2 border-slate-800 text-xl text-white"
-                            />
-                        </label>
+                        <DateField
+                            label="Fecha Programada"
+                            value={formData.due}
+                            onChange={(val) => setFormData(p => ({ ...p, due: val }))}
+                            required
+                            className="w-full"
+                        />
                     </div>
                 </section>
 
