@@ -28,7 +28,10 @@ const buildAdaptiveExample = ({ lands, plants }) => {
   if (firstPlant) {
     return `"sembré 3 ${firstPlant.toLowerCase()} en el balcón"`;
   }
-  return '"sembré 10 fresas y 20 lechugas en el invernadero 1"';
+  // Empty state: usuario sin zonas ni plantas. Ejemplo corto y universal
+  // (balcón aplica para apartamento, casa, finca pequeña). Más accesible
+  // que "invernadero 1" que asumía finca formal.
+  return '"sembré 3 albahacas en el balcón"';
 };
 
 const formatDuration = (ms) => {
@@ -430,6 +433,14 @@ export default function VoiceCapture({ onSave }) {
             <Mic size={56} className="text-white" />
           </button>
           <p className="text-xs text-slate-500">Toca para grabar (máx. 30s)</p>
+          {/* Tip empty-state: si finca vacía, sugerir crear zona primero
+              para que los próximos ejemplos se adapten. Solo visible cuando
+              NO tiene plantas Y NO tiene zonas. */}
+          {lands.length === 0 && plants.length === 0 && (
+            <p className="text-2xs text-slate-600 text-center max-w-xs italic mt-2 leading-relaxed">
+              Tip: cuando registres tu primera planta o zona, los ejemplos se adaptarán a tu finca.
+            </p>
+          )}
         </div>
       )}
 
