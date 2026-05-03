@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { ArrowLeft, Edit2, Calendar, MapPin, FileText, Cpu, Hash, Camera, Loader2 } from 'lucide-react';
+import { ArrowLeft, Edit2, Calendar, MapPin, FileText, Cpu, Hash, Camera, Loader2, Sparkles, AlertTriangle, Bug } from 'lucide-react';
 import StatusBadge from './StatusBadge';
 import useAssetStore from '../store/useAssetStore';
 import { captureAndCompress } from '../services/photoService';
+import { analyzeFoliage } from '../services/aiService';
 
 /**
  * BitacoraEntryDetail — vista detalle de una entrada de Bitácora/Historial.
@@ -96,6 +97,14 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
   const [photoMsg, setPhotoMsg] = useState('');
   const fileInputRef = useRef(null);
 
+  // High-impact #3 (2026-05-03): analyzeFoliage post-attach experimental.
+  // Mantenemos el blob en state tras attach exitoso para permitir analizar
+  // sin re-capturar. Se borra al cerrar la entry o al dispatchar otro photo.
+  const [lastBlob, setLastBlob] = useState(null);
+  const [aiState, setAiState] = useState('idle'); // idle | running | done | error
+  const [aiResult, setAiResult] = useState(null);
+  const [aiStream, setAiStream] = useState('');
+
   const handlePhotoCapture = async (e) => {
     const file = e.target.files?.[0];
     if (!file || !entry?.id) return;
@@ -106,6 +115,9 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
     }
     setPhotoState('uploading');
     setPhotoMsg('');
+    setAiResult(null);
+    setAiStream('');
+    setAiState('idle');
     try {
       const { blob } = await captureAndCompress(file);
       const result = await attachPhotoToLog(entry.id, blob);
@@ -115,6 +127,7 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
       } else {
         setPhotoState('success');
         setPhotoMsg('Foto adjuntada a este evento');
+        setLastBlob(blob); // habilita botón de análisis IA
         setTimeout(() => setPhotoState('idle'), 3000);
       }
     } catch (err) {
@@ -124,6 +137,49 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
     } finally {
       // Reset input para permitir re-attach mismo archivo si user reintenta
       if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleAnalyze = async () => {
+    if (!lastBlob || aiState === 'running') return;
+    setAiState('running');
+    setAiStream('');
+    setAiResult(null);
+    try {
+      const result = await analyzeFoliage(lastBlob, {
+        onToken: (_chunk, fullText) => setAiStream(fullText),
+      });
+      if (result) {
+        setAiResult(result);
+        setAiState('done');
+      } else {
+        setAiState('error');
+      }
+    } catch (err) {
+      console.warn('[BitacoraEntryDetail] analyzeFoliage failed:', err);
+      setAiState('error');
+    }
+  };
+
+  const handleReportBug = () => {
+    // Marcador en bitácora local: el operador podrá identificar
+    // diagnósticos defectuosos cuando revise experimental features.
+    const bugLog = {
+      ts: new Date().toISOString(),
+      feature: 'analyzeFoliage',
+      entryId: entry?.id,
+      stream_preview: (aiStream || '').slice(0, 200),
+      result: aiResult,
+    };
+    try {
+      const existing = JSON.parse(localStorage.getItem('chagra:experimental_bugs') || '[]');
+      existing.push(bugLog);
+      localStorage.setItem('chagra:experimental_bugs', JSON.stringify(existing.slice(-50)));
+      window.dispatchEvent(new CustomEvent('chagraToast', {
+        detail: { message: 'Reporte registrado. Gracias por validar features experimentales.' },
+      }));
+    } catch (err) {
+      console.warn('[BitacoraEntryDetail] bug report failed:', err);
     }
   };
 
@@ -281,6 +337,91 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
               <p className={`text-xs ${photoState === 'error' ? 'text-red-400' : 'text-emerald-400'}`}>
                 {photoMsg}
               </p>
+            )}
+
+            {/* High-impact #3 (2026-05-03): análisis IA experimental sobre la foto recién adjuntada.
+                gemma3:4b multimodal via Ollama. Solo activo si hay blob en memoria
+                (no soporta foto vieja por logId — pendiente extender photoService). */}
+            {lastBlob && (
+              <div className="mt-3 pt-3 border-t border-slate-800 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Sparkles size={14} className="text-amber-400" />
+                  <span className="text-xs uppercase tracking-wider text-amber-400 font-bold">
+                    Análisis IA experimental
+                  </span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-900/40 text-amber-300 border border-amber-800/50 font-bold">
+                    BETA
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 leading-snug">
+                  Detecta enfermedades, deficiencias nutricionales y salud general (gemma3:4b local). Resultados pueden ser inexactos — reporta los falsos positivos para mejorar el feature.
+                </p>
+                {aiState === 'idle' && (
+                  <button
+                    onClick={handleAnalyze}
+                    className="w-full p-3 rounded-xl bg-amber-900/30 hover:bg-amber-800/40 active:bg-amber-800/60 text-amber-300 border border-amber-800 flex items-center justify-center gap-2 min-h-[44px] transition-colors"
+                  >
+                    <Sparkles size={16} /> Analizar foto con IA
+                  </button>
+                )}
+                {aiState === 'running' && (
+                  <div className="p-3 rounded-xl bg-slate-800 border border-slate-700">
+                    <div className="flex items-center gap-2 mb-2 text-amber-400">
+                      <Loader2 size={14} className="animate-spin" />
+                      <span className="text-xs font-bold">Analizando…</span>
+                    </div>
+                    {aiStream && (
+                      <pre className="text-[10px] font-mono text-slate-400 overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-32 overflow-y-auto">
+                        {aiStream}
+                      </pre>
+                    )}
+                  </div>
+                )}
+                {aiState === 'done' && aiResult && (
+                  <div className="p-3 rounded-xl bg-emerald-900/20 border border-emerald-800/50 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-emerald-300">Score salud</span>
+                      <span className="text-2xl font-black text-emerald-400 tabular-nums">{aiResult.score}</span>
+                      <span className="text-xs text-emerald-500">/100</span>
+                    </div>
+                    {Array.isArray(aiResult.issues) && aiResult.issues.length > 0 && (
+                      <div>
+                        <p className="text-[10px] uppercase tracking-wider text-emerald-500 font-bold mb-1">Problemas detectados</p>
+                        <ul className="text-xs text-emerald-200 list-disc list-inside space-y-0.5">
+                          {aiResult.issues.map((iss, i) => <li key={i}>{iss}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                    {aiResult.treatment_suggestion && (
+                      <div>
+                        <p className="text-[10px] uppercase tracking-wider text-emerald-500 font-bold mb-1">Tratamiento sugerido</p>
+                        <p className="text-xs text-emerald-200 leading-relaxed">{aiResult.treatment_suggestion}</p>
+                      </div>
+                    )}
+                    <button
+                      onClick={handleReportBug}
+                      className="w-full mt-2 p-2 rounded-lg bg-red-900/20 hover:bg-red-800/30 text-red-300 border border-red-800/40 flex items-center justify-center gap-2 text-xs"
+                    >
+                      <Bug size={12} /> Reportar diagnóstico defectuoso
+                    </button>
+                  </div>
+                )}
+                {aiState === 'error' && (
+                  <div className="p-3 rounded-xl bg-red-900/20 border border-red-800/50 flex items-start gap-2">
+                    <AlertTriangle size={14} className="text-red-400 shrink-0 mt-0.5" />
+                    <div className="flex-1 text-xs text-red-300">
+                      <p className="font-bold">No se pudo analizar</p>
+                      <p className="text-[11px] text-red-400/80 mt-0.5">El modelo Ollama puede no estar disponible o la imagen no pudo procesarse.</p>
+                      <button
+                        onClick={handleAnalyze}
+                        className="mt-2 text-[11px] underline text-red-300"
+                      >
+                        Reintentar
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
           </section>
         )}

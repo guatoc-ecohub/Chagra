@@ -1,13 +1,91 @@
-import React, { useState, useMemo } from 'react';
-import { X, Calendar, Tag, Activity, MapPin, AlertCircle } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { X, Calendar, Tag, Activity, MapPin, AlertCircle, Images } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import AssetTimeline from './AssetTimeline';
 import { InputLogForm } from './InputLogForm';
 import MapPicker from './MapPicker';
 import { useAssetPerformance } from '../hooks/useAssetPerformance';
 import { MATERIAL_CATEGORIES } from '../config/materials';
+import { FARM_CONFIG } from '../config/defaults';
 import { geoJsonToWkt, wktToGeoJson } from '../utils/geo';
 import { proximityCheck, findNearestLand, checkInvasiveProximity, getCoords } from '../utils/spatialAnalysis';
+import { ExternalAiButton } from './common/ExternalAiButton';
+import { buildOpenExternalPrompt } from '../services/externalAiPromptBuilder';
+import { listUserPhotosBySpecies } from '../services/photoService';
+
+// Derive speciesSlug from asset name. Same pattern usado en SeedingLog.jsx
+// (línea 91-95). Strips " #NNN" suffix de individual-multi (ADR-030).
+function deriveSpeciesSlug(name) {
+  if (!name || typeof name !== 'string') return null;
+  return name.replace(/\s+#\d+$/, '').toLowerCase().replace(/\s+/g, '_').trim() || null;
+}
+
+// High-impact #4 (2026-05-03): galería cross-asset de fotos para esta especie.
+// Solo del operador en su finca (NO cross-farm — decisión Miguel 2026-05-02).
+function SpeciesPhotoGallery({ speciesSlug, currentAssetId }) {
+  const [photos, setPhotos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let alive = true;
+    const urls = [];
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- mismo patrón que usePhotoUrl: reset loading al cambiar speciesSlug + fetch async desde IndexedDB. Sin alternativa razonable salvo useReducer (overkill) o suspense (no aplica a IDB sync).
+    setLoading(true);
+    listUserPhotosBySpecies(speciesSlug).then((records) => {
+      if (!alive) return;
+      const enriched = records
+        .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
+        .map((rec) => {
+          const url = URL.createObjectURL(rec.blob);
+          urls.push(url);
+          return { url, assetId: rec.assetId, createdAt: rec.createdAt };
+        });
+      setPhotos(enriched);
+      setLoading(false);
+    }).catch(() => {
+      if (alive) setLoading(false);
+    });
+    return () => {
+      alive = false;
+      urls.forEach((u) => URL.revokeObjectURL(u));
+    };
+  }, [speciesSlug]);
+
+  if (loading) {
+    return <p className="text-xs text-slate-500 italic">Cargando fotos…</p>;
+  }
+  if (photos.length === 0) {
+    return (
+      <p className="text-xs text-slate-500 leading-relaxed">
+        Aún no hay otras fotos de esta especie en tu finca. Adjunta fotos a tus eventos de bitácora para construir un historial visual.
+      </p>
+    );
+  }
+
+  return (
+    <div>
+      <p className="text-[11px] text-slate-500 mb-2">
+        {photos.length} foto{photos.length === 1 ? '' : 's'} de tu finca para esta especie.
+      </p>
+      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+        {photos.map((p, i) => (
+          <div
+            key={i}
+            className={`aspect-square rounded-lg overflow-hidden border ${p.assetId === currentAssetId ? 'border-emerald-500' : 'border-slate-700'} bg-slate-800`}
+            title={p.createdAt ? new Date(p.createdAt).toLocaleDateString('es-CO') : ''}
+          >
+            <img
+              src={p.url}
+              alt={`Foto especie ${speciesSlug}`}
+              loading="lazy"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 // Panel de bio-eficiencia (Fase 15.3 / extendido 16.3).
 const PerformancePanel = ({ assetId }) => {
@@ -257,6 +335,38 @@ export const AssetDetailView = () => {
                 </h3>
                 <InputLogForm assetId={asset.id} />
               </section>
+
+              <section>
+                <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 px-1">
+                  Consultar IA externa
+                </h3>
+                <p className="text-xs text-slate-400 mb-3 px-1 leading-relaxed">
+                  Genera un prompt con contexto de esta planta (especie, piso térmico, altitud) listo para pegar en Gemini, ChatGPT o Claude.
+                </p>
+                <ExternalAiButton
+                  context={{
+                    speciesName: name,
+                    thermalZones: FARM_CONFIG.THERMAL_ZONES,
+                    altitudMsnm: FARM_CONFIG.ALTITUD_MSNM,
+                    municipio: FARM_CONFIG.MUNICIPIO,
+                  }}
+                  buildPrompt={buildOpenExternalPrompt}
+                  label="Copiar prompt para IA externa"
+                />
+              </section>
+
+              {/* High-impact #4: galería cross-asset de fotos de la misma especie */}
+              {deriveSpeciesSlug(name) && (
+                <section>
+                  <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 px-1 flex items-center gap-2">
+                    <Images size={14} /> Galería de la especie
+                  </h3>
+                  <SpeciesPhotoGallery
+                    speciesSlug={deriveSpeciesSlug(name)}
+                    currentAssetId={asset.id}
+                  />
+                </section>
+              )}
             </>
           )}
 
