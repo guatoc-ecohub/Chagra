@@ -9,10 +9,13 @@ import MapPicker from './MapPicker';
 import FarmMap from './FarmMap';
 import SpeciesSelect from './SpeciesSelect';
 import GuildSuggestions from './GuildSuggestions';
+import BiopreparadoSuggestionModal from './BiopreparadoSuggestionModal';
 import { geoJsonToWkt } from '../utils/geo';
 import { MapPin, LocateFixed } from 'lucide-react';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { usePhotoUrl } from '../hooks/usePhotoUrl';
+import { findBiopreparadosByIngredient } from '../db/catalogDB';
+import { generatePlanForPlant } from '../services/planGeneratorService';
 
 // Thumb foto de planta para cards. Sub-componente porque usePhotoUrl no
 // puede llamarse dentro de un map() condicional (regla de hooks).
@@ -193,6 +196,10 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
   const { request: requestGeo } = useGeolocation();
 
   const [showMapPicker, setShowMapPicker] = useState(false);
+  // Sugerencias post-create. Miguel UX 2026-05-03: cuando user agrega
+  // material (melaza/suero) al inventario, sugerir biopreparados que pueda
+  // hacer con ese ingrediente. State del modal: { ingredientName, biopreparados[] }
+  const [biopreparadoSuggestion, setBiopreparadoSuggestion] = useState(null);
   const [currentZoneId, setCurrentZoneId] = useState(null); // drill-down Fase 17.2
   const [viewMode, setViewMode] = useState('list'); // 'list' | 'map' (Fase 17.3)
 
@@ -416,6 +423,34 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
       }
 
       window.dispatchEvent(new CustomEvent('taskAdded'));
+
+      // Sugerencias post-create según tipo de asset (Fase 21 — high-impact wiring)
+      if (activeTab === 'material' && formData.name?.trim()) {
+        findBiopreparadosByIngredient(formData.name.trim())
+          .then((recipes) => {
+            if (recipes.length > 0) {
+              setBiopreparadoSuggestion({
+                ingredientName: formData.name.trim(),
+                biopreparados: recipes,
+              });
+            }
+          })
+          .catch((err) => console.warn('[AssetsDashboard] biopreparado suggestion failed:', err));
+      } else if (activeTab === 'plant' && formData.speciesId) {
+        generatePlanForPlant({
+          assetId: assetUUIDs[0],
+          speciesSlug: formData.speciesId,
+          plantingDate: new Date().toISOString(),
+        }).then((plan) => {
+          if (plan?.steps?.length > 0) {
+            window.dispatchEvent(new CustomEvent('chagraToast', {
+              detail: {
+                message: `Plan de alimentación sugerido para ${formData.name} (${plan.steps.length} pasos). Ver en Bodega → Planes.`,
+              },
+            }));
+          }
+        }).catch((err) => console.warn('[AssetsDashboard] plan generation failed:', err));
+      }
 
       // Limpieza de UI solo tras éxito del commit IDB
       resetForm();
@@ -1135,6 +1170,15 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
             setShowMapPicker(false);
           }}
           onCancel={() => setShowMapPicker(false)}
+        />
+      )}
+
+      {/* Modal sugerencia biopreparados post-create material (Miguel UX 2026-05-03) */}
+      {biopreparadoSuggestion && (
+        <BiopreparadoSuggestionModal
+          ingredientName={biopreparadoSuggestion.ingredientName}
+          biopreparados={biopreparadoSuggestion.biopreparados}
+          onClose={() => setBiopreparadoSuggestion(null)}
         />
       )}
     </div>
