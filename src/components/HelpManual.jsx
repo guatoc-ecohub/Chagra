@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ChevronDown, ChevronRight, BookOpen, Sprout, Mic, Camera, MapPin, Bug, Apple, MessageCircle, AlertTriangle, Wrench } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronRight, BookOpen, Sprout, Mic, Camera, MapPin, Bug, Apple, MessageCircle, AlertTriangle, Wrench, Sparkles } from 'lucide-react';
 
 /**
  * HelpManual — Manual de usuario integrado en la PWA.
@@ -224,8 +224,50 @@ export default function HelpManual({ onBack }) {
           </ul>
         </Section>
 
+        {/* Sección Novedades v0.12.x — features mergeados sesión 2026-05-03 */}
+        <Section icon={Sparkles} title="✨ Novedades de mayo 2026">
+          <p className="text-xs text-slate-400 mb-2">
+            Cambios recientes que reducen friction. Todos opt-in / no-imposición —
+            la app no fuerza, solo sugiere.
+          </p>
+
+          <h4 className="text-sm font-bold text-emerald-400 mt-3">Sugerencias inteligentes</h4>
+          <ul className="list-disc pl-5 space-y-1 text-xs">
+            <li><strong>Plan de alimentación al crear planta</strong>: cuando agregás una mata (ej. manzana, fresa), aparece toast con plan de alimentación sugerido. Lo encontrás en <strong>Bodega → Planes</strong>.</li>
+            <li><strong>Sugerencia de biopreparados al agregar insumo</strong>: si agregás melaza, suero de leche o similares a la bodega, modal sugiere qué biopreparados podés hacer (Bocashi, Biol, etc.) con receta inline.</li>
+            <li><strong>Companions que ya tenés primero</strong>: en panel de gremios, los compañeros que ya están en tu finca aparecen primero con marca verde. No tenés que comprar — ya los tenés.</li>
+          </ul>
+
+          <h4 className="text-sm font-bold text-emerald-400 mt-3">Adaptive defaults (memoria de uso)</h4>
+          <ul className="list-disc pl-5 space-y-1 text-xs">
+            <li><strong>TaskScreen</strong> recuerda última prioridad + zona usada.</li>
+            <li><strong>HarvestLog</strong> sugiere cantidad como mediana de cosechas pasadas para esa especie.</li>
+            <li><strong>InputLogForm</strong> pre-fillea último biopreparado aplicado.</li>
+            <li><strong>Invasoras</strong>: las relevantes a tu piso térmico aparecen marcadas con ★ primero.</li>
+            <li><strong>InventoryDashboard</strong>: banner amber cuando hay insumos bajo umbral, y los low-stock se ordenan primero.</li>
+          </ul>
+
+          <h4 className="text-sm font-bold text-amber-400 mt-3">IA experimental (BETA)</h4>
+          <p className="text-xs">
+            Marcadas con badge <span className="text-[9px] px-1 py-0.5 rounded bg-amber-900/40 text-amber-300 border border-amber-800/50 font-bold">BETA</span> — funcionan pero pueden errar. Si fallan, hay botón &ldquo;Reportar diagnóstico defectuoso&rdquo; que registra el caso para revisar.
+          </p>
+          <ul className="list-disc pl-5 space-y-1 text-xs mt-1">
+            <li><strong>Identificar especie por foto</strong> en SpeciesSelect → cámara → IA propone especie + alternativas. Confidence ≥70% auto-selecciona si match el catálogo.</li>
+            <li><strong>Analizar foto de bitácora con IA</strong>: en cualquier evento con foto adjunta (presente o pasado) aparece botón &ldquo;Analizar foto con IA&rdquo; que detecta enfermedades, deficiencias, salud general.</li>
+          </ul>
+          <p className="text-[11px] text-slate-500 italic mt-1">
+            Estas features requieren conexión al stack IA local (gemma3:4b). Si no responden, está fuera de servicio temporalmente.
+          </p>
+
+          <h4 className="text-sm font-bold text-emerald-400 mt-3">Galería + IA externa</h4>
+          <ul className="list-disc pl-5 space-y-1 text-xs">
+            <li><strong>Galería de la especie</strong>: en el detalle de cualquier planta, ahora ves todas las fotos del operador para esa especie en tu finca (no cross-farm).</li>
+            <li><strong>Consultar IA externa</strong>: botón en plant detail copia un prompt completo (especie + piso térmico + altitud) listo para pegar en Gemini, ChatGPT o Claude.</li>
+          </ul>
+        </Section>
+
         <p className="text-xs text-slate-600 text-center mt-4 italic">
-          Manual v1.0 — última actualización 2026-05-03
+          Manual v1.1 — última actualización 2026-05-03 (13 features mergeados esta sesión)
         </p>
       </div>
     </div>
