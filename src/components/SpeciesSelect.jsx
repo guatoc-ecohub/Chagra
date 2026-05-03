@@ -1,9 +1,10 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, ChevronDown, X } from 'lucide-react';
+import { Search, ChevronDown, X, Clock } from 'lucide-react';
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { resolveSpeciesDefaults } from '../config/speciesDefaults';
 import { fuzzyFilter } from '../utils/fuzzySearch';
 import { usePhotoUrl } from '../hooks/usePhotoUrl';
+import useAssetStore from '../store/useAssetStore';
 
 /**
  * SpeciesSelect — Selector de especie con fuzzy search y autocompletado de defaults.
@@ -28,11 +29,46 @@ const ALL_SPECIES = Object.entries(CROP_TAXONOMY).flatMap(([groupId, group]) =>
   group.species.map((sp) => ({ ...sp, groupId, groupLabel: group.label }))
 );
 
+// Calcula últimas 3 especies registradas por el usuario (Miguel UX 2026-05-03).
+// Lee plants del store, agrupa por nombre canónico, ordena por _createdAt y
+// devuelve las últimas 3 únicas como { id, name, groupId, groupLabel } match
+// del catálogo CROP_TAXONOMY. Si una planta tiene name libre que NO matchea,
+// la incluye igual con id=null para que el chip funcione como atajo de nombre.
+const computeRecentSpecies = (plants) => {
+  if (!Array.isArray(plants) || plants.length === 0) return [];
+  const sorted = [...plants].sort((a, b) => (b._createdAt || 0) - (a._createdAt || 0));
+  const seen = new Set();
+  const result = [];
+  for (const p of sorted) {
+    const name = p.attributes?.name || p.name || '';
+    if (!name || seen.has(name.toLowerCase())) continue;
+    seen.add(name.toLowerCase());
+    // Quitar sufijo "#001" de nombres bulk-individual para detectar especie real
+    const baseName = name.replace(/\s+#\d+$/, '');
+    const match = ALL_SPECIES.find(
+      (sp) => sp.name === baseName || sp.name.toLowerCase().startsWith(baseName.toLowerCase())
+    );
+    result.push({
+      id: match?.id || null,
+      name: match?.name || baseName,
+      groupId: match?.groupId || null,
+      groupLabel: match?.groupLabel || 'reciente',
+    });
+    if (result.length >= 3) break;
+  }
+  return result;
+};
+
 export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [selectedSpeciesId, setSelectedSpeciesId] = useState(null);
   const wrapperRef = useRef(null);
+
+  // Últimas 3 especies del usuario — atajos rápidos arriba del fuzzy search.
+  // Reduce fricción de escribir/buscar para repeat work (Miguel UX 2026-05-03).
+  const plants = useAssetStore((s) => s.plants);
+  const recentSpecies = useMemo(() => computeRecentSpecies(plants), [plants]);
 
   // Lookup speciesId desde el value persistido (al re-abrir formulario con datos).
   // Se prefiere el id explicit del último handleSelect; si no, intenta match exact.
@@ -99,6 +135,34 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
       <label className="block text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">
         Especie Cultivable
       </label>
+
+      {/* Atajos rápidos: últimas 3 especies registradas (Miguel UX 2026-05-03).
+          Solo aparece si el usuario ya tiene plantas Y aún no eligió especie
+          en el form actual. Cada chip se comporta como tap en fuzzy result. */}
+      {recentSpecies.length > 0 && !value && (
+        <div className="mb-2 flex items-center gap-1.5 flex-wrap">
+          <Clock size={11} className="text-slate-500" />
+          <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">Recientes:</span>
+          {recentSpecies.map((sp) => (
+            <button
+              key={sp.id || sp.name}
+              type="button"
+              onClick={() => {
+                if (sp.id) {
+                  handleSelect(sp);
+                } else {
+                  // Free-text species (no en catálogo): solo setea el name
+                  onChange(sp.name);
+                  setSelectedSpeciesId(null);
+                }
+              }}
+              className="text-xs px-2.5 py-1 rounded-full bg-emerald-900/30 border border-emerald-800/50 text-emerald-300 hover:bg-emerald-800/40 active:scale-95 transition-all"
+            >
+              {sp.name}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Input de búsqueda / display */}
       <div
