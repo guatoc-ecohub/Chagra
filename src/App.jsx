@@ -40,6 +40,7 @@ const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m
 const BiodiversidadView = lazy(() => import('./components/BiodiversidadView'));
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
 const ProfileScreen = lazy(() => import('./components/ProfileScreen'));
+const HelpManual = lazy(() => import('./components/HelpManual'));
 const OnboardingHero = lazy(() => import('./components/OnboardingHero'));
 const TopBar = lazy(() => import('./components/TopBar'));
 
@@ -340,6 +341,8 @@ export default function App() {
         );
       case 'perfil':
         return <ProfileScreen onBack={() => navigate('dashboard')} />;
+      case 'help':
+        return <HelpManual onBack={() => navigate('dashboard')} />;
       default:
         return <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>;
     }
