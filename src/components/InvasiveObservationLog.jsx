@@ -3,15 +3,39 @@
  * AGPL-3.0 © Chagra
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { ArrowLeft, AlertCircle, CheckCircle } from 'lucide-react';
 import { savePayload } from '../services/payloadService';
 import { getAllSpecies } from '../db/catalogDB';
+import { FARM_CONFIG } from '../config/defaults';
 import PhotoCaptureField from './PhotoCaptureField';
 import NativeSubstituteSuggestion from './NativeSubstituteSuggestion';
 import GeolocationButton from './GeolocationButton';
 import StatusBadge from './StatusBadge';
 import { PEST_STATUSES } from '../constants/assetStatuses';
+
+// Autopilot D (2026-05-03): ordena especies invasoras por relevancia al
+// piso térmico del operador. Las que reportan thermal_zones que matchean
+// FARM_CONFIG.THERMAL_ZONES van primero. Reduce friction visual cuando
+// hay 50+ invasoras en catálogo y solo 5-10 son relevantes a la altitud.
+function sortByThermalRelevance(species, userZones) {
+    if (!Array.isArray(userZones) || userZones.length === 0) {
+        return species.slice().sort((a, b) =>
+            (a.nombre_comun || '').localeCompare(b.nombre_comun || '', 'es')
+        );
+    }
+    const userZoneSet = new Set(userZones);
+    const tagged = species.map((sp) => {
+        const spZones = Array.isArray(sp.thermal_zones) ? sp.thermal_zones : [];
+        const matches = spZones.some((z) => userZoneSet.has(z));
+        return { sp, matches };
+    });
+    tagged.sort((a, b) => {
+        if (a.matches !== b.matches) return a.matches ? -1 : 1;
+        return (a.sp.nombre_comun || '').localeCompare(b.sp.nombre_comun || '', 'es');
+    });
+    return tagged.map((t) => t.sp);
+}
 
 export default function InvasiveObservationLog({ onBack, onSave, initialLocationId = null, initialWkt = null }) {
     const [formData, setFormData] = useState({
@@ -54,6 +78,22 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
             });
         return () => { cancelled = true; };
     }, []);
+
+    // Lista ordenada por relevancia al piso térmico del operador (Autopilot D).
+    const sortedSpeciesList = useMemo(
+        () => sortByThermalRelevance(speciesList, FARM_CONFIG.THERMAL_ZONES),
+        [speciesList]
+    );
+
+    // Cuántas matchean exactamente el piso térmico (para mostrar badge contextual).
+    const thermalMatchCount = useMemo(() => {
+        if (!Array.isArray(FARM_CONFIG.THERMAL_ZONES) || FARM_CONFIG.THERMAL_ZONES.length === 0) return 0;
+        const userZoneSet = new Set(FARM_CONFIG.THERMAL_ZONES);
+        return speciesList.filter((sp) => {
+            const spZones = Array.isArray(sp.thermal_zones) ? sp.thermal_zones : [];
+            return spZones.some((z) => userZoneSet.has(z));
+        }).length;
+    }, [speciesList]);
 
     const handleInput = (e) => {
         const { name, value } = e.target;
@@ -209,12 +249,24 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
                         {catalogStatus === 'ready' && speciesList.length > 0 && (
                             <>
                                 <option value="">Selecciona especie…</option>
-                                {speciesList.map((s) => (
-                                    <option key={s.id} value={s.id}>{s.nombre_comun}</option>
-                                ))}
+                                {sortedSpeciesList.map((s) => {
+                                    const spZones = Array.isArray(s.thermal_zones) ? s.thermal_zones : [];
+                                    const userZones = FARM_CONFIG.THERMAL_ZONES || [];
+                                    const isRelevant = userZones.length > 0 && spZones.some((z) => userZones.includes(z));
+                                    return (
+                                        <option key={s.id} value={s.id}>
+                                            {isRelevant ? '★ ' : ''}{s.nombre_comun}
+                                        </option>
+                                    );
+                                })}
                             </>
                         )}
                     </select>
+                    {catalogStatus === 'ready' && thermalMatchCount > 0 && (
+                        <p className="text-xs text-slate-500 mt-1">
+                            ★ marca {thermalMatchCount} especies relevantes a tu piso térmico ({(FARM_CONFIG.THERMAL_ZONES || []).join(', ')})
+                        </p>
+                    )}
                     {catalogStatus === 'error' && (
                         <p className="text-sm text-red-400 mt-1">
                             No se pudo cargar el catálogo de especies. Verifica conexión y refresca.
