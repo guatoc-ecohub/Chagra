@@ -3,6 +3,7 @@ import { Check, X, Trash2, AlertTriangle, Wand2 } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import { FARM_CONFIG } from '../config/defaults';
 import { CROP_TAXONOMY } from '../config/taxonomy';
+import { resolveSpeciesDefaults } from '../config/speciesDefaults';
 import { bestFuzzyMatch, similarity } from '../utils/entityMatcher';
 import GuildSuggestions from './GuildSuggestions';
 
@@ -157,6 +158,15 @@ export default function VoiceConfirmation({
     (r) => r.crop.trim().length > 0 && Number.isInteger(Number(r.quantity)) && Number(r.quantity) > 0 && r.locationId
   );
 
+  // ADR-030: total real de assets que se crearán (rows aggregate=1, individual=qty).
+  // Default 'individual' si species fuera del catálogo (conservativo).
+  const totalAssetsToCreate = rows.reduce((acc, r) => {
+    const qty = parseInt(r.quantity, 10) || 1;
+    const defaults = r.cropSlug ? resolveSpeciesDefaults(r.cropSlug) : null;
+    const trackingMode = defaults?.tracking_mode || 'individual';
+    return acc + (trackingMode === 'individual' ? qty : 1);
+  }, 0);
+
   const handleConfirm = () => {
     if (!allValid || isSaving) return;
     const payload = rows.map((r) => ({
@@ -279,6 +289,30 @@ export default function VoiceConfirmation({
             </select>
           </label>
 
+          {/* ADR-030: Preview de qué se creará según tracking_mode */}
+          {(() => {
+            const qty = parseInt(row.quantity, 10) || 1;
+            const defaults = row.cropSlug ? resolveSpeciesDefaults(row.cropSlug) : null;
+            const trackingMode = defaults?.tracking_mode || 'individual';
+            const isIndividualMulti = trackingMode === 'individual' && qty > 1;
+            const previewText = isIndividualMulti
+              ? `Se crearán ${qty} activos individuales — cada planta con su propia hoja de vida, foto y cosechas separadas.`
+              : trackingMode === 'aggregate' && qty > 1
+                ? `Se creará 1 activo agregado con cantidad=${qty} (cama corrida — cosecha y eventos al conjunto).`
+                : `Se creará 1 activo de ${row.crop || 'esta especie'}.`;
+            return (
+              <div className={`mt-2 px-2 py-1.5 rounded text-2xs ${
+                isIndividualMulti
+                  ? 'bg-emerald-900/20 border border-emerald-800/40 text-emerald-300'
+                  : trackingMode === 'aggregate' && qty > 1
+                    ? 'bg-amber-900/20 border border-amber-800/40 text-amber-200'
+                    : 'bg-slate-800/40 border border-slate-700/40 text-slate-400'
+              }`}>
+                {previewText}
+              </div>
+            );
+          })()}
+
           {/* Compañeros sugeridos (motor de gremios). Solo aparece cuando
               la especie matcheo contra CROP_TAXONOMY (cropSlug presente),
               igual que en el flujo manual de AssetsDashboard. Al clicar un
@@ -308,7 +342,7 @@ export default function VoiceConfirmation({
           disabled={!allValid || isSaving}
           className="flex-1 px-4 py-3 min-h-[44px] bg-lime-700 hover:bg-lime-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50 disabled:bg-slate-700"
         >
-          <Check size={18} /> {isSaving ? 'Guardando…' : `Guardar (${rows.length})`}
+          <Check size={18} /> {isSaving ? 'Guardando…' : `Guardar (${totalAssetsToCreate} ${totalAssetsToCreate === 1 ? 'planta' : 'plantas'})`}
         </button>
       </div>
     </div>
