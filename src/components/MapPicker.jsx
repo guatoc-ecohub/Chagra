@@ -1,8 +1,31 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { X, MapPin, LocateFixed, Check, Undo2, Footprints, Square, Loader2, AlertTriangle, Shield } from 'lucide-react';
 import { latLngToPoint, latLngsToPolygon } from '../utils/geo';
+import useAssetStore from '../store/useAssetStore';
+
+// Extrae centroide [lat, lng] de un asset land con geometría (Point o Polygon).
+// Si la geometría es un Polygon, calcula el promedio de todos los vértices.
+// Si no tiene geometría parseable, retorna null.
+const extractZoneCentroid = (zone) => {
+  const geo = zone?.attributes?.intrinsic_geometry;
+  const wktOrObj = typeof geo === 'object' ? geo?.value : geo;
+  if (!wktOrObj || typeof wktOrObj !== 'string') return null;
+  // POINT(lng lat)
+  const ptMatch = wktOrObj.match(/POINT\s*\(\s*(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s*\)/i);
+  if (ptMatch) return [parseFloat(ptMatch[2]), parseFloat(ptMatch[1])];
+  // POLYGON((lng1 lat1, lng2 lat2, ...))
+  const polyMatch = wktOrObj.match(/POLYGON\s*\(\(([^)]+)\)\)/i);
+  if (polyMatch) {
+    const coords = polyMatch[1].split(',').map((c) => c.trim().split(/\s+/).map(parseFloat));
+    if (coords.length === 0) return null;
+    const sumLat = coords.reduce((s, c) => s + c[1], 0);
+    const sumLng = coords.reduce((s, c) => s + c[0], 0);
+    return [sumLat / coords.length, sumLng / coords.length];
+  }
+  return null;
+};
 
 // Threshold para warning de baja precisión. Brave con Shields up devuelve
 // posiciones gruesas (>1km) sin emitir error — el usuario veía "ubicación
@@ -41,8 +64,22 @@ export const MapPicker = ({
   initial = null,
   onSave,
   onCancel,
-  center = DEFAULT_CENTER,
+  center,  // deja undefined para usar el resolver adaptativo (zona del usuario o Choachí)
 }) => {
+  // Resolver adaptativo: si el caller no provee `center` explícito, usar
+  // centroide de la primera zona del usuario con geometría. Fallback a
+  // DEFAULT_CENTER Choachí cuando la finca no tiene zonas registradas.
+  // Miguel UX 2026-05-03: reduce fricción en operadores fuera de Choachí.
+  const lands = useAssetStore((s) => s.lands);
+  const resolvedCenter = useMemo(() => {
+    if (center) return center;
+    for (const land of lands || []) {
+      const c = extractZoneCentroid(land);
+      if (c) return c;
+    }
+    return DEFAULT_CENTER;
+  }, [center, lands]);
+
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const layerRef = useRef(null); // capa de la geometría dibujada
@@ -73,7 +110,7 @@ export const MapPicker = ({
     if (!containerRef.current || mapRef.current) return;
 
     const map = L.map(containerRef.current, {
-      center,
+      center: resolvedCenter,
       zoom: DEFAULT_ZOOM,
       zoomControl: true,
       attributionControl: false,
