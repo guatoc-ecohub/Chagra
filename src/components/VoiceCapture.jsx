@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Mic, MicOff, AlertTriangle, Save, RotateCcw, Ear, BrainCircuit } from 'lucide-react';
 import useVoiceRecorder from '../hooks/useVoiceRecorder';
 import { transcribe, queueForRetry } from '../services/voiceService';
@@ -7,10 +7,29 @@ import { syncManager } from '../services/syncManager';
 import { savePayload } from '../services/payloadService';
 import { ENV } from '../config/env';
 import { resolveSpeciesDefaults } from '../config/speciesDefaults';
+import useAssetStore from '../store/useAssetStore';
 import Sparkline from './common/Sparkline';
 import AIStreamPanel from './common/AIStreamPanel';
 import VoiceConfirmation from './VoiceConfirmation';
 import ChagraGrowLoader from './ChagraGrowLoader';
+
+// Ejemplo adaptativo en STATE_IDLE: usa la primera zona Y la primera planta
+// del usuario si las hay. Reduce fricción al mostrar contexto reconocible
+// (Miguel 2026-05-03). Fallback a ejemplo genérico si finca vacía.
+const buildAdaptiveExample = ({ lands, plants }) => {
+  const firstZone = lands?.find((l) => l.attributes?.name)?.attributes?.name;
+  const firstPlant = plants?.find((p) => p.attributes?.name)?.attributes?.name;
+  if (firstZone && firstPlant) {
+    return `"sembré 5 ${firstPlant.toLowerCase()} en ${firstZone.toLowerCase()}"`;
+  }
+  if (firstZone) {
+    return `"sembré 5 lechugas en ${firstZone.toLowerCase()}"`;
+  }
+  if (firstPlant) {
+    return `"sembré 3 ${firstPlant.toLowerCase()} en el balcón"`;
+  }
+  return '"sembré 10 fresas y 20 lechugas en el invernadero 1"';
+};
 
 const formatDuration = (ms) => {
   const s = Math.floor(ms / 1000);
@@ -38,6 +57,12 @@ const STATE_DONE = 'done';
  */
 export default function VoiceCapture({ onSave }) {
   const { audioLevel, amplitudeHistory, durationMs, error: recorderError, start, stop, reset, hardLimitMs } = useVoiceRecorder();
+
+  // Ejemplo adaptativo: lee zonas + plantas del store y arma la frase
+  // ejemplo con datos reales del usuario (Miguel UX 2026-05-03).
+  const lands = useAssetStore((s) => s.lands);
+  const plants = useAssetStore((s) => s.plants);
+  const adaptiveExample = useMemo(() => buildAdaptiveExample({ lands, plants }), [lands, plants]);
 
   const [view, setView] = useState(STATE_IDLE);
   const [transcription, setTranscription] = useState('');
@@ -395,7 +420,7 @@ export default function VoiceCapture({ onSave }) {
           <p className="text-sm text-slate-400 text-center max-w-xs">
             Describe en voz alta lo que registraste, por ejemplo:
             <br />
-            <span className="italic text-slate-300">"sembré 10 fresas y 20 lechugas verdes en el invernadero 1"</span>
+            <span className="italic text-slate-300">{adaptiveExample}</span>
           </p>
           <button
             onClick={handleStart}
