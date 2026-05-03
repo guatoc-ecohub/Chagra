@@ -22,17 +22,39 @@ jobs:
     # picos de npm install lento o caché HA HTTP timeout.
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - name: Detect runner identity
+        # Detonante 2026-05-03: ADR-024 introdujo `claude-runner` con labels
+        # [alpha, nixos, claude-runner]. chagra-deploy runner tiene [alpha, nixos]
+        # → ambos matchean `runs-on: [self-hosted, alpha]` y GitHub asigna
+        # cualquiera. claude-runner NO tiene rsync en su PATH → deploy falla
+        # con exit 127 → email "Deploy failed" spammea al operador.
+        # Fix durable en la config IaC remueve `alpha` de claude-runner labels
+        # (nixos-rebuild pendiente). Fix runtime acá: setear flag SKIP_DEPLOY
+        # y saltar todos los steps posteriores con `if:` conditional para que
+        # el job termine con success — sin email spam y sin rsync inválido.
+        run: |
+          if echo "$HOME" | grep -q claude-runner; then
+            echo "::warning::Job matcheado al claude-runner ($HOME) — sin rsync. Skipping (success). Re-pushear si querés forzar otro draw del runner."
+            echo "SKIP_DEPLOY=1" >> "$GITHUB_ENV"
+          else
+            echo "Runner OK ($HOME) — procediendo con deploy."
+          fi
 
-      - name: Install dependencies
+      - if: env.SKIP_DEPLOY != '1'
+        uses: actions/checkout@v4
+
+      - if: env.SKIP_DEPLOY != '1'
+        name: Install dependencies
         run: npm ci
 
-      - name: Lint
+      - if: env.SKIP_DEPLOY != '1'
+        name: Lint
         # max-warnings 20 ya es el cap; si excede, debe BLOQUEAR el deploy.
         # Removido continue-on-error: true que silenciaba errores fatales.
         run: npm run lint -- --max-warnings 20
 
-      - name: Verify secrets
+      - if: env.SKIP_DEPLOY != '1'
+        name: Verify secrets
         run: |
           if [ -z "${{ secrets.VITE_HA_ACCESS_TOKEN }}" ]; then
             echo "::warning::VITE_HA_ACCESS_TOKEN secret is empty"
@@ -42,14 +64,16 @@ jobs:
         env:
           VITE_HA_ACCESS_TOKEN: ${{ secrets.VITE_HA_ACCESS_TOKEN }}
 
-      - name: Build
+      - if: env.SKIP_DEPLOY != '1'
+        name: Build
         run: npm run build
         env:
           VITE_FARMOS_URL: ""
           VITE_FARMOS_CLIENT_ID: farm
           VITE_HA_ACCESS_TOKEN: ${{ secrets.VITE_HA_ACCESS_TOKEN }}
 
-      - name: Deploy to production
+      - if: env.SKIP_DEPLOY != '1'
+        name: Deploy to production
         # El destino /mnt/fast/appdata/farmos-pwa es propiedad de 'kortux'
         # (grupo compartido chagra-deploy con setgid 2775). El runner pertenece
         # al grupo y puede escribir/renombrar archivos, pero utime/chmod/chown
@@ -75,13 +99,15 @@ jobs:
           rsync -avzO --no-perms --delete --no-group --chmod=F644 dist/ /mnt/fast/appdata/farmos-pwa/
           find /mnt/fast/appdata/farmos-pwa -type f -user runner ! -perm 644 -exec chmod 644 {} + || true
 
-      - name: Verify deployment
+      - if: env.SKIP_DEPLOY != '1'
+        name: Verify deployment
         run: |
           test -f /mnt/fast/appdata/farmos-pwa/index.html || exit 1
           HASH=$(sha256sum /mnt/fast/appdata/farmos-pwa/index.html | cut -d' ' -f1)
           echo "Deploy OK: $(date -Iseconds) | index.html sha256: ${HASH:0:12}"
 
-      - name: Notify HA to refresh Nest Hub
+      - if: env.SKIP_DEPLOY != '1'
+        name: Notify HA to refresh Nest Hub
         # `jq -r` reemplaza `node -p "require('./package.json').version"` —
         # node -p evalúa JS arbitrario; jq solo parsea JSON. Defensa contra
         # supply-chain compromise donde package.json sea modificado para
@@ -95,7 +121,8 @@ jobs:
             || echo "HA webhook not reachable (non-blocking)"
         continue-on-error: true
 
-      - name: Bump SW cache version
+      - if: env.SKIP_DEPLOY != '1'
+        name: Bump SW cache version
         # Patrón ERE sin literal 'v' — el cache en prod alterna entre
         # 'chagra-v<N>' (el que viene del repo) y 'chagra-<sha>' (el que
         # este paso deja tras cada deploy). Un patrón que requiera 'v'
