@@ -124,6 +124,31 @@ const useAssetStore = create((set, get) => ({
     }
   },
 
+  // ADR-030 Bloque A: bulk creation atómica para `tracking_mode: individual`
+  // con qty>1 (siembra batch de N plantas individuales con UUIDs únicos).
+  // Garantiza atomicidad — si falla cualquier parte, ningún asset queda
+  // medio-creado.
+  addAssetsBulk: async (assetType, assets, pendingTxs = []) => {
+    if (!Array.isArray(assets) || assets.length === 0) {
+      throw new Error('addAssetsBulk requiere un array de assets no vacío');
+    }
+    try {
+      const updates = assets.map((asset) => ({ assetType, asset }));
+      await assetCache.commitOptimisticUpdate(updates, pendingTxs);
+      set((state) => {
+        const key = assetType === 'plant' ? 'plants'
+          : assetType === 'structure' ? 'structures'
+          : assetType === 'equipment' ? 'equipment'
+          : 'materials';
+        return { [key]: [...state[key], ...assets] };
+      });
+      navigator.serviceWorker?.controller?.postMessage({ type: 'SYNC_REQUESTED' });
+    } catch (error) {
+      console.error('[Store] Fallo en addAssetsBulk atómico:', error);
+      throw error;
+    }
+  },
+
   // Actualizar asset con commit atómico
   updateAsset: async (assetType, asset, pendingTxs = []) => {
     try {

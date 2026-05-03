@@ -113,8 +113,33 @@ export const CATEGORY_FALLBACKS = {
   abonos_verdes_coberturas: { estrato: 'bajo', gremio: 'productor_biomasa', production: 'biomasa' },
 };
 
+// ADR-030 Bloque A Regla 1 — tracking_mode default per category.
+// Espejo del mapping en Chagra-strategy/scripts/migrate-v31-to-v32.mjs.
+// Se aplica si el catálogo SQLite no expone tracking_mode (ej. species
+// inserción libre fuera del catálogo). Mantener sincronizado con el
+// catalog seed v3.2.
+export const CATEGORY_TRACKING_MODE = {
+  // individual (trazabilidad por planta)
+  frutales_perennes:        'individual',
+  tuberculos_raices:        'individual',
+  medicinales_alelopaticas: 'individual',
+  // aggregate (siembra masiva, cama corrida)
+  leguminosas_granos:       'aggregate',
+  hortalizas_hoja:          'aggregate',
+  hortalizas_fruto_flor:    'aggregate',
+  abonos_verdes_coberturas: 'aggregate',
+};
+
 export const resolveSpeciesDefaults = (speciesId, categoryId = null) => {
-  if (speciesId && SPECIES_DEFAULTS[speciesId]) return SPECIES_DEFAULTS[speciesId];
-  if (categoryId && CATEGORY_FALLBACKS[categoryId]) return { ...CATEGORY_FALLBACKS[categoryId], cycleMonths: null, companions: [], antagonists: [] };
-  return null;
+  const base = speciesId && SPECIES_DEFAULTS[speciesId]
+    ? SPECIES_DEFAULTS[speciesId]
+    : (categoryId && CATEGORY_FALLBACKS[categoryId]
+        ? { ...CATEGORY_FALLBACKS[categoryId], cycleMonths: null, companions: [], antagonists: [] }
+        : null);
+  if (!base) return null;
+  // Resolver tracking_mode según category. Operario puede override per-creación
+  // en el form (link sutil "Registrar individualmente" / "Agrupar siembra").
+  const cat = base.category || categoryId;
+  const tracking_mode = cat && CATEGORY_TRACKING_MODE[cat] ? CATEGORY_TRACKING_MODE[cat] : 'individual';
+  return { ...base, tracking_mode };
 };

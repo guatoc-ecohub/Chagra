@@ -71,7 +71,9 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
     setQuery('');
     setOpen(false);
 
-    // Autocompletado: resuelve defaults y notifica al padre
+    // Autocompletado: resuelve defaults y notifica al padre.
+    // ADR-030: incluye tracking_mode (individual|aggregate) para que el form
+    // adapte UI (qty visible si aggregate, link override sutil si quiere lo opuesto).
     if (onAutoFill) {
       const defaults = resolveSpeciesDefaults(species.id, species.groupId);
       if (defaults) {
@@ -80,6 +82,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
           gremio: defaults.gremio,
           production: defaults.production,
           cycleMonths: defaults.cycleMonths,
+          tracking_mode: defaults.tracking_mode,
         });
       }
     }
