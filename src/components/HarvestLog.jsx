@@ -1,7 +1,50 @@
-import React, { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, TrendingUp } from 'lucide-react';
 import DateField from './DateField';
 import { savePayload } from '../services/payloadService';
+import { logCache } from '../db/logCache';
+
+// Autopilot #7 (2026-05-03): mediana de cosechas pasadas como sugerencia
+// de cantidad. Reduce friction en cosechas repetitivas (fresa cada semana,
+// huevo diario) sin imponer — operador siempre puede sobreescribir.
+function median(values) {
+  if (!Array.isArray(values) || values.length === 0) return null;
+  const sorted = values.slice().sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 !== 0
+    ? sorted[mid]
+    : (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
+// Normaliza el nombre del producto para matching fuzzy (lowercase + sin tildes).
+function normProduct(s) {
+  return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+}
+
+async function computeMedianForProduct(productName) {
+  if (!productName || productName.trim().length < 3) return null;
+  try {
+    const allHarvests = await logCache.getByType('log--harvest');
+    const target = normProduct(productName);
+    const matching = allHarvests.filter((log) => {
+      const name = log.name || log.attributes?.name || '';
+      return normProduct(name).includes(target);
+    });
+    if (matching.length === 0) return null;
+    const quantities = matching
+      .map((log) => {
+        const qty = log.quantity?.[0] || log.attributes?.quantity?.[0];
+        const val = parseFloat(qty?.value?.decimal ?? qty?.value);
+        return Number.isFinite(val) ? val : null;
+      })
+      .filter((v) => v !== null && v > 0);
+    if (quantities.length === 0) return null;
+    return { median: median(quantities), count: quantities.length };
+  } catch (err) {
+    console.warn('[HarvestLog] median lookup failed:', err);
+    return null;
+  }
+}
 
 const MOCK_AREAS = [
   { id: 'area-1', name: 'Invernadero Principal' },
@@ -35,6 +78,7 @@ export default function HarvestLog({ onBack, onSave }) {
     notes: ''
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [medianHint, setMedianHint] = useState(null); // { median, count } | null
 
   const handleInput = (e) => {
     const { name, value } = e.target;
@@ -52,6 +96,25 @@ export default function HarvestLog({ onBack, onSave }) {
       return next;
     });
   };
+
+  // Lookup mediana cuando product cambia. Sugerencia, no override forzoso —
+  // solo pre-fillea quantity si el operador NO ha escrito nada todavía.
+  useEffect(() => {
+    let alive = true;
+    if (!formData.product) {
+      setMedianHint(null);
+      return;
+    }
+    computeMedianForProduct(formData.product).then((result) => {
+      if (!alive) return;
+      setMedianHint(result);
+      if (result && !formData.quantity) {
+        setFormData((prev) => ({ ...prev, quantity: String(result.median) }));
+      }
+    });
+    return () => { alive = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intencional: no incluir formData.quantity para evitar loop (sólo queremos disparar al cambiar product, no en cada keystroke de cantidad)
+  }, [formData.product]);
 
   const handleSave = async () => {
     if (isSaving) return;
@@ -146,6 +209,12 @@ export default function HarvestLog({ onBack, onSave }) {
           <label className="flex flex-col gap-2">
             <span className="text-xl font-bold">Cantidad</span>
             <input type="number" step="0.01" name="quantity" value={formData.quantity} onChange={handleInput} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-2xl text-white min-h-[64px]" placeholder="0.00" />
+            {medianHint && (
+              <span className="inline-flex items-center gap-1.5 text-xs text-emerald-400 px-1">
+                <TrendingUp size={12} />
+                Mediana de {medianHint.count} cosecha{medianHint.count > 1 ? 's' : ''} pasada{medianHint.count > 1 ? 's' : ''}: {medianHint.median} {formData.unit.toLowerCase()}
+              </span>
+            )}
           </label>
           <label className="flex flex-col gap-2">
             <span className="text-xl font-bold">Unidad</span>
