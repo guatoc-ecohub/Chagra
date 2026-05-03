@@ -173,6 +173,34 @@ export async function getPhotoUrl({ assetId, speciesSlug } = {}) {
 }
 
 /**
+ * Busca la foto más reciente adjunta a un log específico.
+ *
+ * Útil para componentes que muestran un evento (ej. BitacoraEntryDetail)
+ * y necesitan recuperar la imagen sin re-capturarla — habilita features
+ * como "analizar foto vieja con IA" sin extender el shape del log.
+ *
+ * @param {string} logId — id del log--task / log--seeding / log--observation
+ * @returns {Promise<{url: string, blob: Blob, source: 'user'|'missing', revoke?: () => void}>}
+ *          source='missing' si no hay foto registrada para ese log.
+ */
+export async function getPhotoForLog(logId) {
+  if (!logId) return { url: null, blob: null, source: 'missing' };
+  if (typeof logId !== 'string') return { url: null, blob: null, source: 'missing' };
+
+  const photo = await findLatestUserPhoto({ logId });
+  if (!photo || !photo.blob) {
+    return { url: null, blob: null, source: 'missing' };
+  }
+  const url = URL.createObjectURL(photo.blob);
+  return {
+    url,
+    blob: photo.blob,
+    source: 'user',
+    revoke: () => URL.revokeObjectURL(url),
+  };
+}
+
+/**
  * Lista todas las fotos del usuario para una especie (todas las instalaciones
  * o cultivos del usuario en su finca).
  */
@@ -271,7 +299,7 @@ function canvasToBlob(canvas, type, quality) {
   });
 }
 
-async function findLatestUserPhoto({ assetId, speciesSlug }) {
+async function findLatestUserPhoto({ assetId, speciesSlug, logId }) {
   const db = await openDB();
   const tx = db.transaction(STORES.MEDIA_CACHE, 'readonly');
   const store = tx.objectStore(STORES.MEDIA_CACHE);
@@ -288,7 +316,8 @@ async function findLatestUserPhoto({ assetId, speciesSlug }) {
       const v = cursor.value;
       if (
         (assetId && v.assetId === assetId) ||
-        (speciesSlug && v.speciesSlug === speciesSlug)
+        (speciesSlug && v.speciesSlug === speciesSlug) ||
+        (logId && v.logId === logId)
       ) {
         matches.push(v);
       }
