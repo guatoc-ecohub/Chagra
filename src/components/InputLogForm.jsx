@@ -3,6 +3,23 @@ import { Droplets, Send, Info } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import { MATERIAL_PRESETS, UNIT_OPTIONS } from '../config/materials';
 
+// Autopilot #11 (2026-05-03): pre-fill biopreparado más reciente usado por
+// el operador. Reduce friction en aplicaciones repetitivas (bocashi semanal,
+// biol cada riego). Operador siempre puede cambiar — solo es default smart.
+const RECENT_KEY = 'chagra:inputlog_last_material';
+function readRecentMaterial() {
+  try {
+    const stored = localStorage.getItem(RECENT_KEY);
+    if (!stored) return null;
+    // Validar que el material aún existe en MATERIAL_PRESETS (puede haber
+    // sido removido en un release). Si no, fallback a default.
+    const exists = MATERIAL_PRESETS.find((m) => m.name === stored);
+    return exists ? stored : null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * InputLogForm — Registro de aplicación de bio-insumos (Fase 11.8 / refactor 12.4).
  *
@@ -17,11 +34,16 @@ export const InputLogForm = ({ assetId, onComplete }) => {
   const addInputLog = useAssetStore((state) => state.addInputLog);
   const [loading, setLoading] = useState(false);
 
-  const [formData, setFormData] = useState({
-    material: MATERIAL_PRESETS[0].name,
-    value: '',
-    unit: MATERIAL_PRESETS[0].unit,
-    notes: '',
+  const [formData, setFormData] = useState(() => {
+    const recent = readRecentMaterial();
+    const initialMaterial = recent || MATERIAL_PRESETS[0].name;
+    const preset = MATERIAL_PRESETS.find((m) => m.name === initialMaterial) || MATERIAL_PRESETS[0];
+    return {
+      material: initialMaterial,
+      value: '',
+      unit: preset.unit,
+      notes: '',
+    };
   });
 
   // Auto-ajuste de unidad al cambiar el material seleccionado.
@@ -48,6 +70,10 @@ export const InputLogForm = ({ assetId, onComplete }) => {
         unit: formData.unit,
         notes: formData.notes,
       });
+      // Persistir material usado para próxima apertura del form
+      try {
+        localStorage.setItem(RECENT_KEY, formData.material);
+      } catch { /* localStorage quota / no disponible — silent */ }
       setFormData((prev) => ({ ...prev, value: '', notes: '' }));
       // Lili #108: feedback explícito de dónde queda guardada la info.
       // Antes el form solo limpiaba sin decir nada → user no sabía si
