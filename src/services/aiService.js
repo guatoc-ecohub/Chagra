@@ -19,6 +19,16 @@ const MODEL = 'gemma3:4b';
 
 const DIAGNOSIS_PROMPT = 'detect disease, nutrient deficiency, and overall plant health. Output JSON: {"score": 0-100, "issues": [], "treatment": ""}';
 
+// Species recognition (EXPERIMENTAL — feature flag operador 2026-05-03 Miguel).
+// Mismo modelo gemma3:4b multimodal pero distinto prompt. Output JSON
+// estructurado para que la UI pueda autocompletar SpeciesSelect con la
+// sugerencia + confidence. Scope esperado: vegetales y frutales latinoamericanos
+// comunes (café, gulupa, mora, fresa, lechuga, tomate, papa, plátano, etc.).
+// Edge cases conocidos: angles raros, hojas aisladas sin contexto, especies
+// muy nicho fuera del training de Gemma3. Se acompaña de botón "Reportar
+// problema" que graba audio + ctx para iterar/eliminar el feature.
+const SPECIES_PROMPT = 'Identify the plant species in the image. Output JSON ONLY, no markdown: {"common_name_es": "<nombre comun en español, lowercase>", "scientific_name": "<binomial>", "confidence": <0-1>, "alternatives": [{"common_name_es": "...", "scientific_name": "...", "confidence": <0-1>}]}. If you cannot identify confidently (confidence < 0.5), set common_name_es to empty string and provide alternatives. Limit alternatives to 2.';
+
 /**
  * Convierte un Blob a string Base64 (sin prefijo data:).
  */
@@ -74,6 +84,42 @@ export const analyzeFoliage = async (imageBlob, { onToken, signal } = {}) => {
     return parsed;
   } catch (err) {
     console.warn('[aiService] Diagnóstico no disponible:', err.message);
+    return null;
+  }
+};
+
+/**
+ * Reconoce especie de planta a partir de una foto (EXPERIMENTAL — Miguel
+ * 2026-05-03). Mismo backend gemma3:4b multimodal pero prompt distinto.
+ *
+ * @param {Blob} imageBlob — foto JPEG/WebP comprimida
+ * @param {Object} [options]
+ * @param {Function} [options.onToken] — streaming token callback
+ * @param {AbortSignal} [options.signal]
+ * @returns {Promise<{common_name_es: string, scientific_name: string, confidence: number, alternatives: Array} | null>}
+ *          null si modelo falla o no parseable. Caller debe distinguir
+ *          confidence ≥0.7 (sugerir directo) vs <0.7 (mostrar alternativas
+ *          y dejar al operario elegir).
+ */
+export const recognizeSpecies = async (imageBlob, { onToken, signal } = {}) => {
+  try {
+    const base64 = await blobToBase64(imageBlob);
+    const text = (await streamOllama(
+      OLLAMA_URL,
+      { model: MODEL, prompt: SPECIES_PROMPT, images: [base64] },
+      onToken,
+      { signal },
+    )).trim();
+    const cleaned = text.replace(/```json\s*/g, '').replace(/```/g, '').trim();
+    const parsed = JSON.parse(cleaned);
+    return {
+      common_name_es: (parsed.common_name_es || '').toLowerCase().trim(),
+      scientific_name: parsed.scientific_name || '',
+      confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0,
+      alternatives: Array.isArray(parsed.alternatives) ? parsed.alternatives : [],
+    };
+  } catch (err) {
+    console.warn('[aiService] Species recognition no disponible:', err.message);
     return null;
   }
 };
