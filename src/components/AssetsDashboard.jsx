@@ -116,8 +116,12 @@ const formatNotes = (formData) => {
   return parts.length > 0 ? { value: parts.join(' | ') } : null;
 };
 
-const buildSeedingPayload = (seedingId, assetUUID, formData) => {
+// ADR-030: acepta un assetUUID (string) o un array (para individual qty>1
+// donde N assets comparten un único log--seeding).
+const buildSeedingPayload = (seedingId, assetUUIDOrArray, formData) => {
   const qty = parseInt(formData.quantity, 10) || 1;
+  const assetIds = Array.isArray(assetUUIDOrArray) ? assetUUIDOrArray : [assetUUIDOrArray];
+  const assetCount = assetIds.length;
   return {
     data: {
       type: 'log--seeding',
@@ -129,15 +133,17 @@ const buildSeedingPayload = (seedingId, assetUUID, formData) => {
         notes: formatNotes(formData) || { value: `Registro de siembra para ${formData.name}` },
       },
       relationships: {
-        asset: { data: [{ type: 'asset--plant', id: assetUUID }] },
+        asset: { data: assetIds.map((id) => ({ type: 'asset--plant', id })) },
         location: { data: [{ type: 'asset--land', id: DEFAULT_LOCATION_ID }] },
         quantity: {
           data: [{
             type: 'quantity--standard',
             attributes: {
               measure: 'count',
-              value: { decimal: String(qty) },
-              label: 'Plantas sembradas',
+              // En individual qty>1: cantidad declarada Y N assets registran lo mismo (qty=N).
+              // En aggregate: 1 asset, qty=N. En individual qty=1: 1 asset, qty=1.
+              value: { decimal: String(qty > 1 ? qty : assetCount) },
+              label: assetCount > 1 ? 'Plantas sembradas (individuales)' : 'Plantas sembradas',
             },
           }],
         },
@@ -153,6 +159,11 @@ const INITIAL_FORM_STATE = {
   geometry: null,   // Fase 17: GeoJSON dibujado o geolocalizado
   landType: 'field', // Fase 17.2: sub_type para asset--land
   speciesId: null,   // Fase 18: id para motor de gremios
+  // ADR-030 Bloque A: tracking_mode resuelto desde catálogo per species.
+  // El operario puede override per-creación con link sutil.
+  // 'individual' = N assets qty=1 (frutales valiosos, trazabilidad por planta).
+  // 'aggregate' = 1 asset qty=N (hortalizas en cama corrida, cereales).
+  trackingMode: 'individual',  // default conservativo (mejor más datos que menos)
 };
 
 const colorMap = {
@@ -175,7 +186,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
   const {
     plants, structures, equipment, materials, lands,
     isLoading, error, lastSync,
-    hydrate, syncFromServer, addAsset, removeAsset, addHarvestLog,
+    hydrate, syncFromServer, addAsset, addAssetsBulk, removeAsset, addHarvestLog,
     setSelectedAsset,
   } = useAssetStore();
 
@@ -301,87 +312,103 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     if (!formData.name.trim()) return;
 
     setIsSaving(true);
-    const assetUUID = crypto.randomUUID();
     const notesValue = formatNotes(formData);
+    const qty = parseInt(formData.quantity, 10) || 1;
 
-    // 1. Construcción del payload del asset
-    const assetAttributes = {
-      name: formData.name,
+    // ADR-030 Bloque A Regla 1: detectar individual+qty>1 → N assets UUID
+    // únicos compartiendo 1 log--seeding. Si aggregate o qty=1, comportamiento
+    // legacy (1 asset, qty en log).
+    const isIndividualMulti = activeTab === 'plant' && formData.trackingMode === 'individual' && qty > 1;
+    const assetCount = isIndividualMulti ? qty : 1;
+
+    // Construcción del template de attributes (compartido por todos los assets
+    // en individual mode; en aggregate solo hay 1)
+    const baseAttributes = {
       status: formData.status || 'active',
       ...(notesValue ? { notes: notesValue } : {}),
     };
 
-    // Fase 17: geometría opcional (WKT para FarmOS intrinsic_geometry)
     if (formData.geometry) {
       const wkt = geoJsonToWkt(formData.geometry);
-      if (wkt) {
-        assetAttributes.intrinsic_geometry = { value: wkt };
-      }
+      if (wkt) baseAttributes.intrinsic_geometry = { value: wkt };
     }
-
-    // Fase 17.2: sub_type para asset--land (field/bed/greenhouse/...)
     if (activeTab === 'land' && formData.landType) {
-      assetAttributes.land_type = formData.landType;
+      baseAttributes.land_type = formData.landType;
     }
 
-    const assetPayload = {
-      data: {
-        type: `asset--${activeTab}`,
-        id: assetUUID,
-        attributes: assetAttributes,
-      },
-    };
-
-    // Relaciones opcionales (preservadas + Fase 17 jerarquía)
+    // Relaciones compartidas (location + parent + plant_type)
+    let baseRels = null;
     if (activeTab !== 'material') {
       const parentLandId = formData.parentLandId || DEFAULT_LOCATION_ID;
-      assetPayload.data.relationships = {
+      baseRels = {
         location: { data: [{ type: 'asset--land', id: parentLandId }] },
         parent: { data: [{ type: 'asset--land', id: parentLandId }] },
       };
     }
     if (activeTab === 'plant' && formData.plantType) {
-      assetPayload.data.relationships = assetPayload.data.relationships || {};
-      assetPayload.data.relationships.plant_type = {
-        data: [{
-          type: 'taxonomy_term--plant_type',
-          attributes: { name: formData.plantType },
-        }],
+      baseRels = baseRels || {};
+      baseRels.plant_type = {
+        data: [{ type: 'taxonomy_term--plant_type', attributes: { name: formData.plantType } }],
       };
     }
 
-    // 2. Lista de pendientes para el commit atómico del store
-    const pendingTxs = [{
-      id: assetUUID,
-      type: `asset_${activeTab}`,
-      endpoint: `/api/asset/${activeTab}`,
-      payload: assetPayload,
-      method: 'POST',
-    }];
+    // Generar N assetUUIDs (1 si no individual-multi)
+    const assetUUIDs = Array.from({ length: assetCount }, () => crypto.randomUUID());
 
-    // Macro-transacción: plant + log--seeding con referencia cruzada por UUID
+    // Construir N pendingTxs para assets + (si plant) 1 pendingTx log compartido
+    const pendingTxs = [];
+    const optimisticAssets = [];
+
+    assetUUIDs.forEach((id, i) => {
+      // En individual-multi, cada asset lleva sufijo "#N" para diferenciarlos
+      // visualmente en la lista. En aggregate / individual-single usa el name plano.
+      const indexedName = isIndividualMulti
+        ? `${formData.name} #${String(i + 1).padStart(String(qty).length, '0')}`
+        : formData.name;
+      const assetAttributes = { ...baseAttributes, name: indexedName };
+      const assetPayload = {
+        data: {
+          type: `asset--${activeTab}`,
+          id,
+          attributes: assetAttributes,
+          ...(baseRels ? { relationships: baseRels } : {}),
+        },
+      };
+      pendingTxs.push({
+        id,
+        type: `asset_${activeTab}`,
+        endpoint: `/api/asset/${activeTab}`,
+        payload: assetPayload,
+        method: 'POST',
+      });
+      optimisticAssets.push({
+        id,
+        type: `asset--${activeTab}`,
+        attributes: assetAttributes,
+        _pending: true,
+        _createdAt: Date.now(),
+      });
+    });
+
+    // 1 log--seeding compartido para plants (tanto individual-multi como single)
     if (activeTab === 'plant') {
       const seedingId = crypto.randomUUID();
       pendingTxs.push({
         id: seedingId,
         type: 'seeding',
         endpoint: '/api/log/seeding',
-        payload: buildSeedingPayload(seedingId, assetUUID, formData),
+        payload: buildSeedingPayload(seedingId, isIndividualMulti ? assetUUIDs : assetUUIDs[0], formData),
         method: 'POST',
       });
     }
 
-    // 3. Ejecución atómica vía store
+    // Ejecución atómica vía store (bulk si N>1, single si N=1)
     try {
-      const optimisticAsset = {
-        id: assetUUID,
-        type: `asset--${activeTab}`,
-        attributes: assetAttributes,
-        _pending: true,
-        _createdAt: Date.now(),
-      };
-
-      await addAsset(activeTab, optimisticAsset, pendingTxs);
+      if (assetCount > 1) {
+        await addAssetsBulk(activeTab, optimisticAssets, pendingTxs);
+      } else {
+        await addAsset(activeTab, optimisticAssets[0], pendingTxs);
+      }
 
       window.dispatchEvent(new CustomEvent('taskAdded'));
 
@@ -471,6 +498,9 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
             ...prev,
             estrato: defaults.estrato || prev.estrato,
             gremio: defaults.gremio || prev.gremio,
+            // ADR-030: hereda tracking_mode del catálogo. Operario puede
+            // overridear con link sutil más abajo en el form.
+            trackingMode: defaults.tracking_mode || prev.trackingMode,
           }));
         }}
       />
@@ -534,19 +564,54 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
         </div>
       </div>
 
-      {/* Cantidad de plantas */}
-      <div className="space-y-1.5">
-        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Cantidad (plantas sembradas)</label>
-        <input
-          type="number"
-          inputMode="numeric"
-          min="1"
-          value={formData.quantity}
-          onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-          placeholder="1"
-          className="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 text-white text-2xl font-black text-center min-h-[64px]"
-        />
-      </div>
+      {/* Cantidad de plantas (ADR-030: visible/editable según tracking_mode).
+          - aggregate: input grande prominente (cama corrida, qty=N en 1 asset)
+          - individual: input pequeño (default 1, casi siempre será 1 mata) */}
+      {formData.trackingMode === 'aggregate' ? (
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Cantidad (plantas en la cama)</label>
+          <input
+            type="number"
+            inputMode="numeric"
+            min="1"
+            value={formData.quantity}
+            onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+            placeholder="1"
+            className="w-full p-4 rounded-xl bg-slate-800 border border-slate-700 text-white text-2xl font-black text-center min-h-[64px]"
+          />
+          <button
+            type="button"
+            onClick={() => setFormData({ ...formData, trackingMode: 'individual', quantity: '1' })}
+            className="text-xs text-slate-500 hover:text-slate-300 underline mt-1"
+          >
+            Registrar individualmente cada planta (separa hoja de vida por mata)
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Cantidad</label>
+          <input
+            type="number"
+            inputMode="numeric"
+            min="1"
+            value={formData.quantity || '1'}
+            onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+            placeholder="1"
+            className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-base text-center min-h-[48px]"
+          />
+          <button
+            type="button"
+            onClick={() => setFormData({ ...formData, trackingMode: 'aggregate' })}
+            className="text-xs text-slate-500 hover:text-slate-300 underline mt-1"
+          >
+            Agrupar siembra (registrar como cama / chorrillo, 1 asset con qty=N)
+          </button>
+          <p className="text-[10px] text-slate-600 leading-snug">
+            Cada planta tendrá su propia hoja de vida + foto + historial de cosechas.
+            Si vas a sembrar muchas en cama corrida, usá &ldquo;Agrupar siembra&rdquo;.
+          </p>
+        </div>
+      )}
 
       {/* Notas */}
       <textarea
