@@ -385,6 +385,11 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
         id,
         type: `asset--${activeTab}`,
         attributes: assetAttributes,
+        // Bug fix 2026-05-03: incluir relationships en optimistic asset.
+        // Sin esto, getParentLandId(asset) retorna null y el drill-down por
+        // zona filtra la planta aunque SÍ está guardada en IDB. Usuario
+        // creaba zona + agregaba planta dentro y "no aparecía".
+        ...(baseRels ? { relationships: baseRels } : {}),
         _pending: true,
         _createdAt: Date.now(),
       });
