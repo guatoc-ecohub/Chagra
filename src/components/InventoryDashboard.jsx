@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Package, AlertTriangle, Plus, X, Download } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import { UNIT_OPTIONS } from '../config/materials';
@@ -7,6 +7,12 @@ import { Sparkline } from './charts/Sparkline';
 import { exportTraceabilityCsv } from '../services/exportService';
 import { getAllPlans, markStepExecuted } from '../services/planGeneratorService';
 import { getCurrentOperatorHash } from '../services/operatorIdentityService';
+
+// Autopilot #10 (2026-05-03): banner top + sort low-stock primero. Reduce
+// chance que el operador no se entere de stock bajo hasta que use el material.
+function getStockValue(item) {
+  return parseFloat(item.attributes?.inventory_value) || 0;
+}
 
 /**
  * InventoryDashboard — Bodega de biofábrica (Fase 13.2 / refactor 13.6).
@@ -105,6 +111,21 @@ export const InventoryDashboard = () => {
   const [exporting, setExporting] = useState(false);
 
   const [upcomingSteps, setUpcomingSteps] = useState([]);
+
+  // Autopilot #10: identifica materiales bajo umbral + sorted list (low primero).
+  const { lowStockMaterials, sortedMaterials } = useMemo(() => {
+    const low = materials.filter((m) => getStockValue(m) < LOW_THRESHOLD);
+    const sorted = materials.slice().sort((a, b) => {
+      const sa = getStockValue(a);
+      const sb = getStockValue(b);
+      const aLow = sa < LOW_THRESHOLD;
+      const bLow = sb < LOW_THRESHOLD;
+      if (aLow !== bLow) return aLow ? -1 : 1;
+      // Dentro de cada grupo, ordenar por menor stock primero (urgencia)
+      return sa - sb;
+    });
+    return { lowStockMaterials: low, sortedMaterials: sorted };
+  }, [materials]);
 
   const loadUpcomingSteps = async () => {
     try {
@@ -220,6 +241,37 @@ export const InventoryDashboard = () => {
         </div>
       </header>
 
+      {/* Autopilot #10: Banner reorder cuando hay stock bajo */}
+      {lowStockMaterials.length > 0 && (
+        <section className="bg-amber-900/20 border border-amber-800/50 rounded-2xl p-4 flex items-start gap-3">
+          <AlertTriangle size={20} className="text-amber-400 shrink-0 mt-0.5 animate-pulse" />
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm font-bold text-amber-300 mb-1">
+              {lowStockMaterials.length} insumo{lowStockMaterials.length > 1 ? 's' : ''} bajo umbral
+            </h3>
+            <p className="text-xs text-amber-200/80 mb-2">
+              Conviene abastecer pronto para no quedar sin material durante una aplicación crítica.
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {lowStockMaterials.slice(0, 8).map((m) => (
+                <span
+                  key={m.id}
+                  className="text-[11px] px-2 py-0.5 rounded bg-amber-900/40 text-amber-200 border border-amber-800/60"
+                  title={`Stock: ${getStockValue(m)} ${m.attributes?.inventory_unit || ''}`}
+                >
+                  {m.attributes?.name || m.name || 'sin nombre'} · {getStockValue(m)}
+                </span>
+              ))}
+              {lowStockMaterials.length > 8 && (
+                <span className="text-[11px] text-amber-400/60 italic">
+                  +{lowStockMaterials.length - 8} más
+                </span>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Upcoming Plans Section */}
       {upcomingSteps.length > 0 && (
         <section className="bg-slate-900 border border-slate-700 rounded-2xl p-5 mb-6">
@@ -264,7 +316,7 @@ export const InventoryDashboard = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {materials.map((item) => (
+          {sortedMaterials.map((item) => (
             <MaterialCard key={item.id} item={item} onRefill={openRefillModal} />
           ))}
         </div>
