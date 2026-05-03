@@ -1,8 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Edit2, Calendar, MapPin, FileText, Cpu, Hash, Camera, Loader2, Sparkles, AlertTriangle, Bug } from 'lucide-react';
 import StatusBadge from './StatusBadge';
 import useAssetStore from '../store/useAssetStore';
-import { captureAndCompress } from '../services/photoService';
+import { captureAndCompress, getPhotoForLog } from '../services/photoService';
 import { analyzeFoliage } from '../services/aiService';
 
 /**
@@ -104,6 +104,32 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
   const [aiState, setAiState] = useState('idle'); // idle | running | done | error
   const [aiResult, setAiResult] = useState(null);
   const [aiStream, setAiStream] = useState('');
+  const [oldPhotoUrl, setOldPhotoUrl] = useState(null); // preview de foto vieja
+
+  // Cierre de limitación PR #154/#155 (2026-05-03): si la entry ya tiene
+  // foto adjunta previamente (logId persistido en media_cache), recuperamos
+  // el blob via getPhotoForLog. Habilita botón "Analizar con IA" sobre fotos
+  // viejas, no solo recién capturadas.
+  useEffect(() => {
+    if (!entry?.id) return;
+    let alive = true;
+    let revokeFn = null;
+    getPhotoForLog(entry.id).then((res) => {
+      if (!alive) {
+        res?.revoke?.();
+        return;
+      }
+      if (res?.blob) {
+        setLastBlob(res.blob);
+        setOldPhotoUrl(res.url);
+        revokeFn = res.revoke;
+      }
+    }).catch((err) => console.warn('[BitacoraEntryDetail] getPhotoForLog failed:', err));
+    return () => {
+      alive = false;
+      if (revokeFn) revokeFn();
+    };
+  }, [entry?.id]);
 
   const handlePhotoCapture = async (e) => {
     const file = e.target.files?.[0];
@@ -339,11 +365,21 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
               </p>
             )}
 
-            {/* High-impact #3 (2026-05-03): análisis IA experimental sobre la foto recién adjuntada.
-                gemma3:4b multimodal via Ollama. Solo activo si hay blob en memoria
-                (no soporta foto vieja por logId — pendiente extender photoService). */}
+            {/* High-impact #3 (2026-05-03): análisis IA experimental sobre la foto adjunta.
+                gemma3:4b multimodal via Ollama. Acepta blob recién capturado O foto
+                vieja recuperada via getPhotoForLog (PR #155 cerró limitación). */}
             {lastBlob && (
               <div className="mt-3 pt-3 border-t border-slate-800 space-y-2">
+                {oldPhotoUrl && (
+                  <div className="flex items-center gap-2 text-[11px] text-slate-400">
+                    <img
+                      src={oldPhotoUrl}
+                      alt="Foto adjunta"
+                      className="w-12 h-12 rounded-lg object-cover border border-slate-700 shrink-0"
+                    />
+                    <span>Foto guardada de este evento. Lista para analizar.</span>
+                  </div>
+                )}
                 <div className="flex items-center gap-2">
                   <Sparkles size={14} className="text-amber-400" />
                   <span className="text-xs uppercase tracking-wider text-amber-400 font-bold">
