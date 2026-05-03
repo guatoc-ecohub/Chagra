@@ -1,11 +1,40 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Sprout, AlertTriangle, Sparkles, Loader2 } from 'lucide-react';
+import { Sprout, AlertTriangle, Sparkles, Loader2, Check } from 'lucide-react';
 import { getSuggestedCompanions, buildGuildPrompt } from '../services/guildService';
 import { SPECIES_DEFAULTS } from '../config/speciesDefaults';
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { registry } from '../core/moduleRegistry';
+import useAssetStore from '../store/useAssetStore';
 import ExternalAiButton from './common/ExternalAiButton';
 import { buildGuildExternalPrompt } from '../services/externalAiPromptBuilder';
+
+// Autopilot #8 (2026-05-03): re-rank companions putting existing plants first.
+// Reduce friction de "tengo que comprar otra especie" — mostrar primero las
+// que el operador ya tiene es más accionable.
+function normName(s) {
+  return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+#\d+$/, '').trim();
+}
+
+function buildExistingSpeciesSet(plants) {
+  const set = new Set();
+  for (const p of plants || []) {
+    const name = p.attributes?.name || p.name || '';
+    if (name) set.add(normName(name));
+  }
+  return set;
+}
+
+function isCompanionInFinca(companionName, existingSet) {
+  if (!existingSet || existingSet.size === 0) return false;
+  const target = normName(companionName.split(' (')[0]);
+  if (!target) return false;
+  for (const existing of existingSet) {
+    if (existing === target || existing.includes(target) || target.includes(existing)) {
+      return true;
+    }
+  }
+  return false;
+}
 
 /**
  * GuildSuggestions — Panel de compañeros sugeridos y antagonistas (Fase 18).
@@ -28,11 +57,27 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
   const [aiError, setAiError] = useState(null);
   const [EnrichedComp, setEnrichedComp] = useState(null);
 
-  // Capas 1 + 2: estáticas + estructurales
+  // Plantas existentes en finca para re-ranking de companions (Autopilot #8).
+  const userPlants = useAssetStore((s) => s.plants);
+  const existingSpeciesSet = useMemo(() => buildExistingSpeciesSet(userPlants), [userPlants]);
+
+  // Capas 1 + 2: estáticas + estructurales — re-ranked con companions existentes primero.
   const { companions, antagonists } = useMemo(() => {
     if (!speciesId) return { companions: [], antagonists: [] };
-    return getSuggestedCompanions(speciesId);
-  }, [speciesId]);
+    const raw = getSuggestedCompanions(speciesId);
+    // Anotar cada companion con flag isInFinca y ordenar (existentes primero).
+    const annotated = raw.companions.map((c) => ({
+      ...c,
+      isInFinca: isCompanionInFinca(c.name, existingSpeciesSet),
+    }));
+    annotated.sort((a, b) => {
+      if (a.isInFinca !== b.isInFinca) return a.isInFinca ? -1 : 1;
+      return 0; // mantener orden original dentro de cada grupo
+    });
+    return { companions: annotated, antagonists: raw.antagonists };
+  }, [speciesId, existingSpeciesSet]);
+
+  const inFincaCount = useMemo(() => companions.filter((c) => c.isInFinca).length, [companions]);
 
   // Reset IA al cambiar de especie
   useEffect(() => {
@@ -103,11 +148,16 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
 
   return (
     <div className="space-y-3">
-      {/* Compañeros sugeridos (Capas 1 + 2) */}
+      {/* Compañeros sugeridos (Capas 1 + 2) — Autopilot #8: existentes primero */}
       {companions.length > 0 && (
         <div>
           <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 mb-2">
             <Sprout size={12} /> Compañeros sugeridos
+            {inFincaCount > 0 && (
+              <span className="text-[10px] font-normal text-emerald-400 ml-1">
+                · {inFincaCount} ya en tu finca
+              </span>
+            )}
           </label>
           <div className="flex flex-wrap gap-1.5">
             {companions.map((c) => (
@@ -115,9 +165,14 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
                 key={c.id}
                 type="button"
                 onClick={() => onSelectCompanion && onSelectCompanion(c.name)}
-                className="text-xs px-3 py-2 rounded-full bg-lime-900/30 text-lime-400 border border-lime-800 hover:bg-lime-800/40 transition-all active:scale-95"
-                title={c.reason}
+                className={`text-xs px-3 py-2 rounded-full border transition-all active:scale-95 inline-flex items-center gap-1 ${
+                  c.isInFinca
+                    ? 'bg-emerald-900/40 text-emerald-300 border-emerald-700 hover:bg-emerald-800/50'
+                    : 'bg-lime-900/30 text-lime-400 border-lime-800 hover:bg-lime-800/40'
+                }`}
+                title={c.isInFinca ? `${c.reason} · Ya tenés esta especie` : c.reason}
               >
+                {c.isInFinca && <Check size={10} />}
                 {c.name.split(' (')[0]}
               </button>
             ))}
