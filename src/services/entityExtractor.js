@@ -33,6 +33,7 @@ Reglas:
 - Convierte numerales en palabra a entero: "dos"=2, "tres"=3, "diez"=10, "veinte"=20, "cien"=100, "doscientos"=200, "mil"=1000.
 - Si la cantidad no se menciona, omite la entrada completa.
 - Si el lugar no se menciona, usa "" como location (NO omitas la entrada por eso).
+- VERBOS: el operador puede decir "sembré", "planté", "puse", "trasplante", "metí", "agregué" — todos se interpretan como registro de planta nueva. El verbo en sí no es la entidad; lo que importa es {cultivo, cantidad, lugar}.
 - MULTI-ESPECIE en una grabacion: si el operador menciona varios cultivos separados por "y", "luego", "tambien", "ademas", devuelve UN OBJETO POR CADA CULTIVO. Cada uno hereda la location si solo se menciona al final aplicable a todos.
 - Nunca inventes datos que no estan en la transcripcion.
 - Si no puedes extraer ninguna entidad valida, devuelve [].
@@ -52,6 +53,12 @@ Output: [{"crop":"cafe","quantity":5,"location":"balcon"},{"crop":"lechuga","qua
 
 Input: "Sembre veinte fresas en la cama uno y luego diez tomates en la cama dos"
 Output: [{"crop":"fresa","quantity":20,"location":"cama uno"},{"crop":"tomate","quantity":10,"location":"cama dos"}]
+
+Input: "Plante dos guayabos en la entrada"
+Output: [{"crop":"guayabo","quantity":2,"location":"entrada"}]
+
+Input: "Puse cinco aguacates en el patio"
+Output: [{"crop":"aguacate","quantity":5,"location":"patio"}]
 
 Input: "Hoy tuve un buen dia"
 Output: []`;
