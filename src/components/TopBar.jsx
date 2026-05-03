@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CircleUser, Mic, Plus, ChevronDown, ChevronUp, Home } from 'lucide-react';
+import { CircleUser, Mic, Plus, ChevronDown, ChevronUp, Home, HelpCircle } from 'lucide-react';
 import { version as APP_VERSION } from '../../package.json';
 import EnvironmentalCard from './EnvironmentalCard';
 
@@ -118,6 +118,15 @@ export default function TopBar({ onNavigate, onLogout }) {
           className="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 active:bg-slate-700 text-purple-400 min-h-[44px] min-w-[44px] flex items-center justify-center"
         >
           <Plus size={22} aria-hidden="true" strokeWidth={2.5} />
+        </button>
+        <button
+          type="button"
+          onClick={() => onNavigate('help')}
+          aria-label="Manual de ayuda"
+          title="Cómo usar Chagra"
+          className="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 active:bg-slate-700 text-emerald-400 min-h-[44px] min-w-[44px] flex items-center justify-center"
+        >
+          <HelpCircle size={22} aria-hidden="true" strokeWidth={2.5} />
         </button>
         {/* Botón Settings (icono ⚙) eliminado — Lili #115: era duplicado del
             botón operator name de arriba (ambos onNavigate('perfil')). El
