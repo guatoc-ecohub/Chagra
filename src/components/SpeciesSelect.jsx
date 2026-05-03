@@ -1,10 +1,12 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, ChevronDown, X, Clock } from 'lucide-react';
+import { Search, ChevronDown, X, Clock, Sparkles, Camera, Loader2, Bug } from 'lucide-react';
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { resolveSpeciesDefaults } from '../config/speciesDefaults';
 import { fuzzyFilter } from '../utils/fuzzySearch';
 import { usePhotoUrl } from '../hooks/usePhotoUrl';
 import useAssetStore from '../store/useAssetStore';
+import { captureAndCompress } from '../services/photoService';
+import { recognizeSpecies } from '../services/aiService';
 
 /**
  * SpeciesSelect — Selector de especie con fuzzy search y autocompletado de defaults.
@@ -70,13 +72,85 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
   const plants = useAssetStore((s) => s.plants);
   const recentSpecies = useMemo(() => computeRecentSpecies(plants), [plants]);
 
+  // Autopilot H (2026-05-03): identificación de especie por foto via gemma3:4b.
+  // Marcado experimental — confidence ≥0.7 auto-selecciona si match en CROP_TAXONOMY,
+  // sino muestra alternativas + bug report button para validar.
+  const aiInputRef = useRef(null);
+  const [aiState, setAiState] = useState('idle'); // idle | running | done | error
+  const [aiResult, setAiResult] = useState(null);
+
+  const handleAiCapture = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setAiState('error');
+      return;
+    }
+    setAiState('running');
+    setAiResult(null);
+    try {
+      const { blob } = await captureAndCompress(file);
+      const result = await recognizeSpecies(blob);
+      if (!result) {
+        setAiState('error');
+        return;
+      }
+      setAiResult(result);
+      setAiState('done');
+      // Auto-select si confidence alta + match exacto en CROP_TAXONOMY
+      if (result.confidence >= 0.7 && result.common_name_es) {
+        const match = ALL_SPECIES.find((sp) =>
+          sp.name.toLowerCase() === result.common_name_es.toLowerCase()
+        );
+        if (match) {
+          handleSelect(match);
+        }
+      }
+    } catch (err) {
+      console.warn('[SpeciesSelect] AI recognition failed:', err);
+      setAiState('error');
+    } finally {
+      if (aiInputRef.current) aiInputRef.current.value = '';
+    }
+  };
+
+  const handleAiPickAlternative = (altName) => {
+    const match = ALL_SPECIES.find((sp) => sp.name.toLowerCase() === altName.toLowerCase());
+    if (match) {
+      handleSelect(match);
+      setAiResult(null);
+      setAiState('idle');
+    } else {
+      // No está en CROP_TAXONOMY → entrada libre
+      onChange(altName);
+      setAiResult(null);
+      setAiState('idle');
+    }
+  };
+
+  const handleAiReportBug = () => {
+    try {
+      const existing = JSON.parse(localStorage.getItem('chagra:experimental_bugs') || '[]');
+      existing.push({
+        ts: new Date().toISOString(),
+        feature: 'recognizeSpecies',
+        result: aiResult,
+      });
+      localStorage.setItem('chagra:experimental_bugs', JSON.stringify(existing.slice(-50)));
+      window.dispatchEvent(new CustomEvent('chagraToast', {
+        detail: { message: 'Reporte registrado. Gracias por validar features experimentales.' },
+      }));
+    } catch (err) {
+      console.warn('[SpeciesSelect] bug report failed:', err);
+    }
+  };
+
   // Lookup speciesId desde el value persistido (al re-abrir formulario con datos).
   // Se prefiere el id explicit del último handleSelect; si no, intenta match exact.
   useEffect(() => {
     if (selectedSpeciesId) return;
     if (!value) return;
     const match = ALL_SPECIES.find((sp) => sp.name === value);
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- lookup síncrono local, no causa cascading renders (skip si match falla)
     if (match) setSelectedSpeciesId(match.id);
   }, [value, selectedSpeciesId]);
 
@@ -261,6 +335,108 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
       <p className="mt-1 text-xs text-slate-500">
         Búsqueda aproximada. Los campos de estrato y gremio se sugieren al seleccionar.
       </p>
+
+      {/* Autopilot H — Identificación por foto (experimental gemma3:4b) */}
+      <div className="mt-3 pt-3 border-t border-slate-800">
+        <div className="flex items-center gap-2 mb-2">
+          <Sparkles size={12} className="text-amber-400" />
+          <span className="text-[10px] uppercase tracking-wider text-amber-400 font-bold">
+            Identificar con foto
+          </span>
+          <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-900/40 text-amber-300 border border-amber-800/50 font-bold">
+            BETA
+          </span>
+        </div>
+
+        {aiState === 'idle' && (
+          <label className="w-full p-2.5 rounded-lg bg-amber-900/20 hover:bg-amber-800/30 active:bg-amber-800/50 text-amber-300 border border-amber-800/50 cursor-pointer flex items-center justify-center gap-2 text-xs min-h-[40px] transition-colors">
+            <Camera size={14} /> Tomar foto para identificar especie
+            <input
+              ref={aiInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handleAiCapture}
+              className="hidden"
+            />
+          </label>
+        )}
+
+        {aiState === 'running' && (
+          <div className="p-2.5 rounded-lg bg-slate-800 border border-slate-700 flex items-center gap-2 text-amber-400">
+            <Loader2 size={14} className="animate-spin" />
+            <span className="text-xs">Analizando foto…</span>
+          </div>
+        )}
+
+        {aiState === 'done' && aiResult && (
+          <div className="p-2.5 rounded-lg bg-emerald-900/20 border border-emerald-800/50 space-y-2">
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-emerald-500 font-bold mb-0.5">
+                Especie sugerida ({Math.round((aiResult.confidence || 0) * 100)}% confianza)
+              </p>
+              <p className="text-sm text-emerald-200 font-bold">
+                {aiResult.common_name_es || '—'}
+              </p>
+              {aiResult.scientific_name && (
+                <p className="text-[11px] text-emerald-400 italic">
+                  {aiResult.scientific_name}
+                </p>
+              )}
+            </div>
+            {Array.isArray(aiResult.alternatives) && aiResult.alternatives.length > 0 && (
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-emerald-500 font-bold mb-1">
+                  Alternativas
+                </p>
+                <div className="flex flex-wrap gap-1">
+                  {aiResult.alternatives.map((alt, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => handleAiPickAlternative(typeof alt === 'string' ? alt : alt.name || alt.common_name_es || '')}
+                      className="text-[11px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700"
+                    >
+                      {typeof alt === 'string' ? alt : alt.name || alt.common_name_es || 'Opción'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="flex gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => { setAiResult(null); setAiState('idle'); }}
+                className="flex-1 text-[11px] px-2 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700"
+              >
+                Probar de nuevo
+              </button>
+              <button
+                type="button"
+                onClick={handleAiReportBug}
+                className="text-[11px] px-2 py-1.5 rounded bg-red-900/20 hover:bg-red-800/30 text-red-300 border border-red-800/40 flex items-center gap-1"
+                title="Registrar diagnóstico defectuoso"
+              >
+                <Bug size={11} />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {aiState === 'error' && (
+          <div className="p-2.5 rounded-lg bg-red-900/20 border border-red-800/50 text-xs text-red-300">
+            <p className="font-bold mb-0.5">No se pudo identificar</p>
+            <p className="text-[11px] text-red-400/80">El modelo Ollama puede no estar disponible o la imagen no pudo procesarse.</p>
+            <button
+              type="button"
+              onClick={() => setAiState('idle')}
+              className="mt-1.5 text-[11px] underline text-red-300"
+            >
+              Reintentar
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
