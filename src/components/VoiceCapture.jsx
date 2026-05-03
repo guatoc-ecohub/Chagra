@@ -6,6 +6,7 @@ import { extractEntities } from '../services/entityExtractor';
 import { syncManager } from '../services/syncManager';
 import { savePayload } from '../services/payloadService';
 import { ENV } from '../config/env';
+import { resolveSpeciesDefaults } from '../config/speciesDefaults';
 import Sparkline from './common/Sparkline';
 import AIStreamPanel from './common/AIStreamPanel';
 import VoiceConfirmation from './VoiceConfirmation';
@@ -282,7 +283,34 @@ export default function VoiceCapture({ onSave }) {
     let savedCount = 0;
     const errors = [];
 
+    // ADR-030 Bloque A Regla 1: expandir entities individual+qty>1 en N entities
+    // con qty=1 cada una. Cada entity resultante crea 1 asset+log inline (UUID
+    // único). Para entities aggregate o single (qty=1), comportamiento sin cambio.
+    const expandedEntities = [];
     for (const entity of confirmedEntities) {
+      const defaults = entity.cropSlug ? resolveSpeciesDefaults(entity.cropSlug) : null;
+      const trackingMode = defaults?.tracking_mode || 'individual';  // default conservativo
+      const qty = parseInt(entity.quantity, 10) || 1;
+
+      if (trackingMode === 'individual' && qty > 1) {
+        // Expandir a N entities con qty=1 cada una, name indexado "X #1", "X #2"...
+        const padLen = String(qty).length;
+        for (let i = 0; i < qty; i++) {
+          const indexedName = `${entity.canonical || entity.crop} #${String(i + 1).padStart(padLen, '0')}`;
+          expandedEntities.push({
+            ...entity,
+            quantity: 1,
+            canonical: indexedName,  // sobreescribe canonical para el inlinePlant.attributes.name
+            _individualIndex: i + 1,
+            _individualTotal: qty,
+          });
+        }
+      } else {
+        expandedEntities.push(entity);
+      }
+    }
+
+    for (const entity of expandedEntities) {
       try {
         const payload = buildSeedingPayload(entity);
         const result = await savePayload('seeding', payload);
