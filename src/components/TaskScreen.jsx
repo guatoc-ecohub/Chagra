@@ -5,6 +5,24 @@ import DateField from './DateField';
 import StatusBadge from './StatusBadge';
 import { TASK_STATUSES } from '../constants/assetStatuses';
 
+// Autopilot A (2026-05-03): pre-fill priority + location desde último uso.
+// Reduce friction al crear tareas repetitivas (riego matinal, monitoreo,
+// poda) sin imponer — el usuario sigue editando libremente.
+const LAST_USED_KEY = 'chagra:taskscreen_last';
+function readLastUsed() {
+    try {
+        const raw = localStorage.getItem(LAST_USED_KEY);
+        if (!raw) return null;
+        const obj = JSON.parse(raw);
+        // Sanity check: rechaza si más viejo que 30 días para que el "último"
+        // no contamine UX si el usuario abandonó la app.
+        if (obj.ts && Date.now() - obj.ts > 30 * 24 * 60 * 60 * 1000) return null;
+        return obj;
+    } catch {
+        return null;
+    }
+}
+
 function TaskScreen({ onBack, onSave, initialData }) {
     const plants = useAssetStore((s) => s.plants);
     const structures = useAssetStore((s) => s.structures);
@@ -22,17 +40,25 @@ function TaskScreen({ onBack, onSave, initialData }) {
     // existente. Si no, crear nueva. Lili #106.
     const isEdit = !!initialData?.id;
 
-    const [formData, setFormData] = useState(() => ({
-        name: initialData?.name || initialData?.attributes?.name || '',
-        assetId: initialData?.asset_id || '',
-        locationId: '',
-        notes: initialData?.attributes?.notes?.value || '',
-        due: initialData?.attributes?.timestamp
-            ? initialData.attributes.timestamp.split('T')[0]
-            : new Date().toISOString().split('T')[0],
-        severity: initialData?.severity || 'medium',
-        status: initialData?.attributes?.status || initialData?.status || 'pending'
-    }));
+    const [formData, setFormData] = useState(() => {
+        // En edit mode no aplicamos last-used (ya hay datos canónicos del log).
+        const lastUsed = isEdit ? null : readLastUsed();
+        // Solo aplicamos last-used location si la zona aún existe (evita
+        // referencias zombi a lands borradas).
+        const lastLocationStillExists = lastUsed?.locationId
+            && lands.some((l) => l.id === lastUsed.locationId);
+        return {
+            name: initialData?.name || initialData?.attributes?.name || '',
+            assetId: initialData?.asset_id || '',
+            locationId: lastLocationStillExists ? lastUsed.locationId : '',
+            notes: initialData?.attributes?.notes?.value || '',
+            due: initialData?.attributes?.timestamp
+                ? initialData.attributes.timestamp.split('T')[0]
+                : new Date().toISOString().split('T')[0],
+            severity: initialData?.severity || lastUsed?.severity || 'medium',
+            status: initialData?.attributes?.status || initialData?.status || 'pending'
+        };
+    });
 
     const [isSaving, setIsSaving] = useState(false);
 
@@ -63,6 +89,15 @@ function TaskScreen({ onBack, onSave, initialData }) {
                 onSave('Tarea actualizada (Offline-First)', false);
             } else {
                 await addTaskLog(taskData);
+                // Persistir last-used solo en create (no en edit) para que
+                // la próxima tarea nueva pre-fillee con prioridad + zona usadas.
+                try {
+                    localStorage.setItem(LAST_USED_KEY, JSON.stringify({
+                        severity: formData.severity,
+                        locationId: formData.locationId || null,
+                        ts: Date.now(),
+                    }));
+                } catch { /* localStorage no disponible / quota — silent */ }
                 onSave('Tarea agendada exitosamente (Offline-First)', false);
             }
             setTimeout(() => onBack(), 500);
