@@ -108,12 +108,44 @@ export default function HelpManual({ onBack }) {
           <p className="mt-2">En el formulario aparece un link sutil <em>&ldquo;Agrupar siembra&rdquo;</em> o <em>&ldquo;Registrar individualmente&rdquo;</em> si querés cambiar el default.</p>
         </Section>
 
-        {/* Sección Foto */}
-        <Section icon={Camera} title="📸 Foto: tomar y adjuntar">
+        {/* Sección Foto — expandida con foto por especie */}
+        <Section icon={Camera} title="📸 Foto: tomar, adjuntar y foto guía por especie">
           <p><strong>Al crear planta:</strong> el botón cámara abre tu cámara o galería. La foto queda en la hoja de vida de esa planta.</p>
           <p><strong>Adjuntar a evento existente</strong>: entrá al evento desde Bitácora/Historial → sección &ldquo;Adjuntar foto a este evento&rdquo;. Útil para documentar después de la siembra.</p>
+
+          <div className="mt-3 p-3 rounded-lg bg-emerald-900/15 border border-emerald-800/30">
+            <p className="text-emerald-300 font-bold text-sm mb-1">🌱 Foto guía por especie (cómo y para qué)</p>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Al elegir especie en el formulario aparece un thumbnail bajo el input. Función:
+            </p>
+            <ul className="text-xs text-slate-400 list-disc pl-5 space-y-1 mt-2">
+              <li><strong>Tu primera foto</strong> de esa especie queda como referencia visual cada vez que abrís el form de la misma planta — útil para confirmar &ldquo;sí, esto es lo que sembré&rdquo;.</li>
+              <li><strong>Si nunca tomaste foto</strong>, ves un placeholder verde con &ldquo;Agregá una foto&rdquo;. No es error — es invitación: la primera foto que tomes ocupa ese lugar para tus próximas siembras de la misma especie.</li>
+              <li>Las fotos NO se comparten con otras fincas (privacidad — decidido 2026-05-02). Solo vos las ves en tu cuenta.</li>
+              <li>En el futuro v1.1 cargaremos un &ldquo;banco visual&rdquo; del catálogo (frutos típicos de cada especie desde GBIF/iNaturalist con licencia libre) para que aparezcan ANTES de que tomes tu propia foto.</li>
+            </ul>
+            <p className="text-xs text-slate-500 italic mt-2">
+              Cómo agregar foto por especie: 1) Form planta nueva → seleccioná especie → tomá foto. La foto queda asociada al asset Y como referencia visual de la especie. Siguientes siembras de esa especie heredan esa foto como guía.
+            </p>
+          </div>
+
           <p className="text-xs text-slate-500 italic mt-2">
             Las fotos se comprimen automáticamente a JPEG ≤500KB para no saturar el almacenamiento. La foto original con metadata se preserva localmente.
+          </p>
+        </Section>
+
+        {/* Sección Vision AI — disease diagnosis */}
+        <Section icon={Sprout} title="🧬 Diagnóstico de enfermedades por foto (vision AI)">
+          <p>Chagra tiene un módulo de visión AI (Gemma3 multimodal) que analiza una foto de hojas y detecta:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>Posibles enfermedades fitosanitarias</li>
+            <li>Deficiencias nutricionales</li>
+            <li>Score general de salud (0-100)</li>
+            <li>Sugerencia de tratamiento</li>
+          </ul>
+          <p>Disponible hoy en: <strong>Campo (Worker mode)</strong> → captura evidencia. Tras la foto, Gemma3 genera un análisis que se guarda como <code>log--observation</code> con marker AI. En la línea de tiempo aparece como <em>&ldquo;Inferencia IA&rdquo;</em> con score y debes <strong>confirmar / rechazar</strong> manualmente (gate de revisión humana — ADR-019 Regla 1).</p>
+          <p className="text-xs text-amber-400 italic mt-2">
+            ⚠️ Aún NO hay reconocimiento automático de especie por foto (solo disease). Para identificar &ldquo;¿qué es esta planta?&rdquo;, usá el SpeciesSelect manual del form. v1.1 podría agregarlo si la comunidad lo pide.
           </p>
         </Section>
 
