@@ -6,8 +6,11 @@ import { InputLogForm } from './InputLogForm';
 import MapPicker from './MapPicker';
 import { useAssetPerformance } from '../hooks/useAssetPerformance';
 import { MATERIAL_CATEGORIES } from '../config/materials';
+import { FARM_CONFIG } from '../config/defaults';
 import { geoJsonToWkt, wktToGeoJson } from '../utils/geo';
 import { proximityCheck, findNearestLand, checkInvasiveProximity, getCoords } from '../utils/spatialAnalysis';
+import { ExternalAiButton } from './common/ExternalAiButton';
+import { buildOpenExternalPrompt } from '../services/externalAiPromptBuilder';
 
 // Panel de bio-eficiencia (Fase 15.3 / extendido 16.3).
 const PerformancePanel = ({ assetId }) => {
@@ -256,6 +259,25 @@ export const AssetDetailView = () => {
                   Acciones de Campo
                 </h3>
                 <InputLogForm assetId={asset.id} />
+              </section>
+
+              <section>
+                <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 px-1">
+                  Consultar IA externa
+                </h3>
+                <p className="text-xs text-slate-400 mb-3 px-1 leading-relaxed">
+                  Genera un prompt con contexto de esta planta (especie, piso térmico, altitud) listo para pegar en Gemini, ChatGPT o Claude.
+                </p>
+                <ExternalAiButton
+                  context={{
+                    speciesName: name,
+                    thermalZones: FARM_CONFIG.THERMAL_ZONES,
+                    altitudMsnm: FARM_CONFIG.ALTITUD_MSNM,
+                    municipio: FARM_CONFIG.MUNICIPIO,
+                  }}
+                  buildPrompt={buildOpenExternalPrompt}
+                  label="Copiar prompt para IA externa"
+                />
               </section>
             </>
           )}
