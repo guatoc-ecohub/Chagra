@@ -1,5 +1,5 @@
 import React from 'react';
-import { PLANT_STATUSES, TASK_STATUSES, PEST_STATUSES, STATUS_MAP } from '../constants/assetStatuses';
+import { PLANT_STATUSES, STATUS_MAP } from '../constants/assetStatuses';
 
 const StatusBadge = ({ status, type, editable = false, onChange, className = "" }) => {
     // Backward compatibility: map "active" to "growing" for plants

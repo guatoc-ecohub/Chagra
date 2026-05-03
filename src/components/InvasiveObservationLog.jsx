@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Camera, MapPin, AlertCircle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, AlertCircle, CheckCircle } from 'lucide-react';
 import { savePayload } from '../services/payloadService';
 import { getAllSpecies } from '../db/catalogDB';
 import PhotoCaptureField from './PhotoCaptureField';

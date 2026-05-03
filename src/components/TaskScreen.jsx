@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowLeft, Calendar, FileText, Tag, Briefcase, Layout } from 'lucide-react';
+import { ArrowLeft, FileText, Tag, Briefcase, Layout } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import DateField from './DateField';
 import StatusBadge from './StatusBadge';

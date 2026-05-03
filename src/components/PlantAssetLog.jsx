@@ -11,7 +11,7 @@
  * lo importa.
  */
 import React, { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, Camera, MapPin } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { savePayload } from '../services/payloadService';
 import { savePhoto } from '../services/photoService';
 import GeolocationButton from './GeolocationButton';

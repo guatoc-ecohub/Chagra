@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, Trash2, RefreshCw, Building2, Wrench, Leaf, Search, WifiOff, TreePine, Map as MapIcon, List } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, RefreshCw, Building2, Leaf, Search, WifiOff, TreePine, Map as MapIcon, List } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import { fetchFromFarmOS } from '../services/apiService';
 import AssetDetailView from './AssetDetailView';
