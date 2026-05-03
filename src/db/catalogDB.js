@@ -146,11 +146,58 @@ export async function getNativeSubstitutesForInvasive(invasiveId, options = {}) 
     return results;
 }
 
+/**
+ * Lista todos los biopreparados del catálogo.
+ * @returns {Promise<Array<biopreparado>>}
+ */
+export async function getAllBiopreparados() {
+    if (!dbInstance) await initCatalog();
+    const rows = dbInstance.exec({
+        sql: 'SELECT data FROM biopreparados ORDER BY nombre',
+        rowMode: 'object',
+    });
+    return rows.map((r) => JSON.parse(r.data));
+}
+
+/**
+ * Encuentra biopreparados que usan un ingrediente específico (Miguel UX
+ * 2026-05-03: cuando user agrega melaza a bodega, sugerir Bocashi/Biol/etc).
+ *
+ * Match fuzzy: normaliza ambos lados (lowercase + sin tildes) y comprueba
+ * substring. Maneja sinónimos comunes (suero ↔ suero de leche, leche
+ * ↔ suero de leche).
+ *
+ * @param {string} ingredientName — nombre del material como lo añadió user
+ * @returns {Promise<Array<biopreparado>>}
+ */
+export async function findBiopreparadosByIngredient(ingredientName) {
+    if (!ingredientName || typeof ingredientName !== 'string') return [];
+    if (!dbInstance) await initCatalog();
+    const norm = (s) => (s || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[̀-ͯ]/g, '')
+        .trim();
+    const target = norm(ingredientName);
+    if (target.length < 3) return [];
+
+    const all = await getAllBiopreparados();
+    return all.filter((bp) => {
+        if (!Array.isArray(bp.ingredientes)) return false;
+        return bp.ingredientes.some((ing) => {
+            const ingNorm = norm(ing);
+            return ingNorm.includes(target) || target.includes(ingNorm);
+        });
+    });
+}
+
 if (import.meta.env.DEV) {
     if (typeof window !== 'undefined') {
         window.__chagraCatalog = {
             initCatalog,
             getAllSpecies,
+            getAllBiopreparados,
+            findBiopreparadosByIngredient,
             getSpeciesByThermalZone,
             getNativeSubstitutesForInvasive
         };
