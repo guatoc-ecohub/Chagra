@@ -674,12 +674,15 @@ const useAssetStore = create((set, get) => ({
     let photoRefId = null;
     try {
       const { savePhoto } = await import('../services/photoService');
+      // logId top-level (no en meta) para que findLatestUserPhoto / getPhotoForLog
+      // puedan filtrar. Bug previo: meta.attachedToLog se descartaba en savePhoto
+      // (record solo respeta meta.capturedAt/gps/notes).
       const saved = await savePhoto({
         blob: photoBlob,
+        logId: targetLogId,
         speciesSlug: null,
         meta: {
           capturedAt: new Date().toISOString(),
-          attachedToLog: targetLogId,
         },
       });
       photoRefId = saved?.id || saved?._photoRefId || null;
