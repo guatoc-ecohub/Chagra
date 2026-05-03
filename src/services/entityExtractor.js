@@ -30,9 +30,10 @@ Schema:
 ]
 
 Reglas:
-- Convierte numerales en palabra a entero: "dos"=2, "tres"=3, "diez"=10, "veinte"=20.
+- Convierte numerales en palabra a entero: "dos"=2, "tres"=3, "diez"=10, "veinte"=20, "cien"=100, "doscientos"=200, "mil"=1000.
 - Si la cantidad no se menciona, omite la entrada completa.
 - Si el lugar no se menciona, usa "" como location (NO omitas la entrada por eso).
+- MULTI-ESPECIE en una grabacion: si el operador menciona varios cultivos separados por "y", "luego", "tambien", "ademas", devuelve UN OBJETO POR CADA CULTIVO. Cada uno hereda la location si solo se menciona al final aplicable a todos.
 - Nunca inventes datos que no estan en la transcripcion.
 - Si no puedes extraer ninguna entidad valida, devuelve [].
 
@@ -42,6 +43,15 @@ Output: [{"crop":"tomate","quantity":5,"location":"invernadero"}]
 
 Input: "Sembre tres arandanos"
 Output: [{"crop":"arandano","quantity":3,"location":""}]
+
+Input: "Sembre cien cafes en la parcela tres"
+Output: [{"crop":"cafe","quantity":100,"location":"parcela tres"}]
+
+Input: "Sembre cinco cafes y treinta lechugas en el balcon"
+Output: [{"crop":"cafe","quantity":5,"location":"balcon"},{"crop":"lechuga","quantity":30,"location":"balcon"}]
+
+Input: "Sembre veinte fresas en la cama uno y luego diez tomates en la cama dos"
+Output: [{"crop":"fresa","quantity":20,"location":"cama uno"},{"crop":"tomate","quantity":10,"location":"cama dos"}]
 
 Input: "Hoy tuve un buen dia"
 Output: []`;
