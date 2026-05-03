@@ -465,6 +465,8 @@ export default function FieldFeedback() {
                   </div>
                   <audio
                     controls
+                    loop={false}
+                    preload="metadata"
                     src={audioUrl}
                     style={{ width: '100%', height: 32 }}
                   />
