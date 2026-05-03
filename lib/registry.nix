@@ -52,6 +52,7 @@ rec {
     whisperHttp = 10301; # HTTP Whisper ASR (PWA Chagra — openai-whisper-asr-webservice)
     whisperOpenai = 10302; # OpenAI-compat Whisper (speaches, futuro Opción D voz)
     openaiProxy = 10303; # Path-routing proxy local: /v1/embeddings → Ollama, /v1/audio → speaches, resto → z.ai
+    litellmProxy = 4000; # LiteLLM Anthropic-compat proxy para Claude Code CLI personal (z.ai primary, Ollama fallback)
     piper       = 10200; # Wyoming Piper TTS
     
     # --- ClawBots: Multi-tenant AI Agents (dynamic allocation) ---

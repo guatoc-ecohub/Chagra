@@ -43,6 +43,24 @@
     enableAudioRoute = true;
   };
 
+  # LiteLLM proxy — backup Anthropic-compatible para Claude Code CLI personal.
+  # Detonante 2026-05-02: para usar Claude Code desde stg con backend GLM-4.6
+  # (z.ai Coding Plan) cuando el plan Pro Anthropic se agota o falla.
+  # Listen 127.0.0.1:4000 + Tailscale (no LAN). Fallback Ollama qwen2.5-coder:7b.
+  #
+  # IMPORTANTE — orden de activación (no flippar enable=true antes):
+  #   1. Correr `bash scripts/diag/setup-litellm-secrets.sh` desde stg
+  #      → agrega `litellm-zai-env` + `litellm-master-key` a secrets.yaml
+  #   2. Push commit secrets.yaml + push este host config con enable=true
+  #   3. nixos-rebuild switch --flake .#alpha
+  # Si flippas a true antes que existan los secrets, sops-install-secrets
+  # falla durante activate y rompe el rebuild completo.
+  guatoc.ai.litellmProxy = {
+    enable = false;  # ← cambiar a true tras setup-litellm-secrets.sh
+    listenAddr = "127.0.0.1";  # cambiar a IP Tailscale alpha si necesitas desde stg
+    # zaiUpstream y ollamaFallbackModel quedan en defaults
+  };
+
   # Speaches container (Whisper OpenAI-compat) en :10302 — backend del
   # routing /v1/audio/* del proxy. Modelo Systran/faster-whisper-small
   # (~244MB) balance precisión/tamaño para español. Si latencia es alta

@@ -20,6 +20,7 @@ in
     ./clawbots.nix
     ./openfang.nix
     ./claude-code-runner.nix
+    ./litellm-proxy.nix
   ];
 
   # ============================================
