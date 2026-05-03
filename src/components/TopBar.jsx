@@ -43,15 +43,25 @@ export default function TopBar({ onNavigate, onLogout }) {
       : 'Operador'
   );
 
-  // Re-leer si cambia desde otro tab (sync entre instancias PWA).
+  // Re-leer si cambia desde otro tab (storage event nativo) O desde el mismo
+  // tab via ProfileScreen (chagra:operator-update CustomEvent).
   useEffect(() => {
     const onStorage = (e) => {
       if (e.key === 'chagra:operator:name') {
         setOperatorName(e.newValue || 'Operador');
       }
     };
+    const onOperatorUpdate = (e) => {
+      if (e.detail?.key === 'chagra:operator:name') {
+        setOperatorName(e.detail.value || 'Operador');
+      }
+    };
     window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
+    window.addEventListener('chagra:operator-update', onOperatorUpdate);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('chagra:operator-update', onOperatorUpdate);
+    };
   }, []);
 
   return (

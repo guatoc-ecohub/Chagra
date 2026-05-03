@@ -23,7 +23,8 @@ const LoginScreen = lazy(() => import('./components/LoginScreen'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
-const PlantAssetLog = lazy(() => import('./components/PlantAssetLog'));
+// PlantAssetLog @deprecated 2026-05-02 — case 'plant_asset' redirige a
+// AssetsDashboard rich form. Import removido para limpiar dead code (CodeQL #38).
 const ObservationScreen = lazy(() => import('./components/ObservationScreen'));
 const InvasiveObservationLog = lazy(() => import('./components/InvasiveObservationLog'));
 const MaintenanceScreen = lazy(() => import('./components/MaintenanceScreen'));

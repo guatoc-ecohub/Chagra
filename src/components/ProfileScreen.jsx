@@ -38,16 +38,22 @@ export default function ProfileScreen({ onBack }) {
   );
   const [savedFlash, setSavedFlash] = useState(false);
 
-  // Persistir cambios al storage en cada modificación + emitir storage
-  // event manual (para que TopBar y otros listeners se actualicen).
+  // Persistir cambios al storage en cada modificación + emitir custom event
+  // (CodeQL flag #36/#37 contra StorageEvent ctor — migrado a CustomEvent
+  // que es el patrón canónico para same-tab pub/sub. TopBar escucha ambos
+  // 'storage' (cross-tab nativo) y 'chagra:operator-update' (same-tab).
   useEffect(() => {
     localStorage.setItem('chagra:operator:name', name);
-    window.dispatchEvent(new StorageEvent('storage', { key: 'chagra:operator:name', newValue: name }));
+    window.dispatchEvent(new CustomEvent('chagra:operator-update', {
+      detail: { key: 'chagra:operator:name', value: name },
+    }));
   }, [name]);
 
   useEffect(() => {
     localStorage.setItem('chagra:operator:role', role);
-    window.dispatchEvent(new StorageEvent('storage', { key: 'chagra:operator:role', newValue: role }));
+    window.dispatchEvent(new CustomEvent('chagra:operator-update', {
+      detail: { key: 'chagra:operator:role', value: role },
+    }));
   }, [role]);
 
   const handleSave = () => {
