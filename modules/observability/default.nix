@@ -70,8 +70,17 @@ in
             	yearly = 0
             	recursive = true
             
+            # tank/media vive en pool tank (mirror sda+sdb spinning HDDs).
+            # Snapshots hourly disparan writes en ambos legs del mirror — en
+            # sdb (Toshiba MG07ACA12TE 2026-04 nuevo, con 8 reallocated del
+            # infant mortality batch) cada write pasa por sectores marginales
+            # → ruido mecánico audible cada hora exacta.
+            # Reducción 2026-05-02: hourly 24 → 6 (cada 4h en lugar de cada hora).
+            # Pierde granularidad sub-cuatro-horaria pero mantiene cobertura
+            # diaria/mensual/yearly intacta. Frigate y Immich son tolerantes
+            # a 4h gap (ya hacen sus propios buffers internos).
             [tank/media]
-            	hourly = 24
+            	hourly = 6
             	daily = 7
             	monthly = 3
             	yearly = 0
