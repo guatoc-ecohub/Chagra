@@ -1,0 +1,24 @@
+# SOPS temporal artifacts — sops crea estos al editar y a veces no los limpia
+# (especialmente si se mata el proceso o si se hace edit desde nodos remotos
+# vía clones distintos). Origen 2026-05-04 — operador detectó .bak y .new
+# committed accidentalmente a main post-edit.
+hosts/*/secrets.yaml.bak.*
+hosts/*/secrets.yaml.new
+*.yaml.bak.*
+*.yaml.new
+
+# Backup files genéricos
+*.bak
+*.tmp
+*~
+.#*
+
+# nix
+result
+result-*
+
+# editor / IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
