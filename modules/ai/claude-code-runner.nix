@@ -91,6 +91,13 @@ in
       tokenFile = cfg.tokenFile;
       name = "alpha-claude-code";
 
+      # 2026-05-04: replace=true permite re-registrar runner con mismo nombre
+      # sin colisión. Sin esto, cada nixos-rebuild que reconfigura el runner
+      # falla con "A runner exists with the same name" porque GitHub mantiene
+      # el registro previo aunque el unconfigure.sh haya corrido localmente.
+      # GitHub elimina el zombie automáticamente y registra el nuevo.
+      replace = true;
+
       # Label `claude-runner` es el discriminator que usa el workflow
       # claude-code-request.yml para dirigir el job a este runner aislado.
       #
