@@ -6,6 +6,47 @@
  */
 
 /**
+ * Deriva piso térmico colombiano a partir de altitud en msnm.
+ * Clasificación IDEAM / Caldas modificado:
+ *   - cálido: 0-1000 msnm
+ *   - templado: 1000-2000 msnm
+ *   - frío: 2000-3000 msnm
+ *   - páramo: 3000-3600 msnm
+ *   - glacial: >3600 msnm
+ *
+ * Permite que los prompts incluyan piso térmico aunque
+ * VITE_FARM_THERMAL_ZONES no esté configurado — la altitud sola
+ * basta para inferirlo (Miguel 2026-05-04: "veo en chagra 2550 pero
+ * el prompt dice piso térmico no especificado").
+ *
+ * @param {number} altitudMsnm
+ * @returns {string|null} slug del piso térmico o null si no se puede inferir
+ */
+export function deriveThermalZoneFromAltitud(altitudMsnm) {
+    if (typeof altitudMsnm !== 'number' || !Number.isFinite(altitudMsnm) || altitudMsnm < 0) {
+        return null;
+    }
+    if (altitudMsnm < 1000) return 'cálido';
+    if (altitudMsnm < 2000) return 'templado';
+    if (altitudMsnm < 3000) return 'frío';
+    if (altitudMsnm < 3600) return 'páramo';
+    return 'glacial';
+}
+
+/**
+ * Resuelve thermal zones efectivos: usa thermalZones explícitos si existen,
+ * sino deriva desde altitud. Devuelve array para mantener compatibilidad con
+ * builders que asumen array.
+ */
+function resolveThermalZones(thermalZones, altitudMsnm) {
+    if (Array.isArray(thermalZones) && thermalZones.length > 0) {
+        return thermalZones;
+    }
+    const derived = deriveThermalZoneFromAltitud(altitudMsnm);
+    return derived ? [derived] : [];
+}
+
+/**
  * Construye un prompt de gremio agroecológico.
  * @param {Object} ctx - Contexto de la especie y el gremio
  * @param {string} ctx.speciesName - Nombre común de la especie
@@ -29,7 +70,8 @@ export function buildGuildExternalPrompt(ctx) {
         municipio,
     } = ctx;
 
-    const zonaTermica = thermalZones.length > 0 ? thermalZones.join(', ') : 'no especificado';
+    const resolvedZones = resolveThermalZones(thermalZones, altitudMsnm);
+    const zonaTermica = resolvedZones.length > 0 ? resolvedZones.join(', ') : 'no especificado';
     const altitudStr = altitudMsnm ? `${altitudMsnm} msnm` : 'altitud no especificada';
     const ubicacion = [altitudStr, municipio].filter(Boolean).join(', ');
     const companionsStr = companions.length > 0 ? companions.join(', ') : 'ninguno aún';
@@ -81,7 +123,8 @@ export function buildDiagnosticExternalPrompt(ctx) {
         diasDesdeSiembra,
     } = ctx;
 
-    const zonaTermica = thermalZones.length > 0 ? thermalZones.join(', ') : 'no especificado';
+    const resolvedZones = resolveThermalZones(thermalZones, altitudMsnm);
+    const zonaTermica = resolvedZones.length > 0 ? resolvedZones.join(', ') : 'no especificado';
     const altitudStr = altitudMsnm ? `${altitudMsnm} msnm` : 'altitud no especificada';
     const ubicacion = [altitudStr, municipio].filter(Boolean).join(', ');
     const especieFull = scientificName ? `${scientificName} (${speciesName})` : speciesName;
@@ -124,7 +167,8 @@ export function buildOpenExternalPrompt(ctx) {
         pregunta = '[Escribe tu pregunta aquí]',
     } = ctx;
 
-    const zonaTermica = thermalZones.length > 0 ? thermalZones.join(', ') : 'no especificado';
+    const resolvedZones = resolveThermalZones(thermalZones, altitudMsnm);
+    const zonaTermica = resolvedZones.length > 0 ? resolvedZones.join(', ') : 'no especificado';
     const altitudStr = altitudMsnm ? `${altitudMsnm} msnm` : 'altitud no especificada';
     const ubicacion = [altitudStr, municipio].filter(Boolean).join(', ');
     const especieFull = scientificName ? `${scientificName} (${speciesName})` : speciesName;
