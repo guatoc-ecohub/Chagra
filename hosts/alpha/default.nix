@@ -55,8 +55,10 @@
   #   3. nixos-rebuild switch --flake .#alpha
   # Si flippas a true antes que existan los secrets, sops-install-secrets
   # falla durante activate y rompe el rebuild completo.
+  # 2026-05-04: enabled tras setup secrets (litellm-zai-env y
+  # litellm-master-key existen en secrets.yaml).
   guatoc.ai.litellmProxy = {
-    enable = false;  # ← cambiar a true tras setup-litellm-secrets.sh
+    enable = true;
     listenAddr = "127.0.0.1";  # cambiar a IP Tailscale alpha si necesitas desde stg
     # zaiUpstream y ollamaFallbackModel quedan en defaults
   };
