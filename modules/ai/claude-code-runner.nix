@@ -92,9 +92,16 @@ in
       name = "alpha-claude-code";
 
       # Label `claude-runner` es el discriminator que usa el workflow
-      # claude-code-request.yml para dirigir el job a este runner aislado
-      # (no al runner chagra-deploy ni al nixos-deploy).
-      extraLabels = [ "alpha" "nixos" "claude-runner" ];
+      # claude-code-request.yml para dirigir el job a este runner aislado.
+      #
+      # 2026-05-03: Removido `alpha` y `nixos` de labels. Detonante: deploy.yml
+      # de Chagra usa `runs-on: [self-hosted, alpha]` que matcheaba este runner
+      # cuando GH lo elegía sobre chagra-deploy. claude-runner no tiene rsync
+      # → deploy fallaba con exit 127 → email spam. Ahora claude-runner solo
+      # responde a workflows que explícitamente piden el label `claude-runner`,
+      # sin colisionar con chagra-deploy `[alpha, nixos]` ni nixos-deploy
+      # `[alpha, nixos, infra]`.
+      extraLabels = [ "claude-runner" ];
 
       extraPackages = with pkgs; [
         claude-code      # CLI oficial de Anthropic (en nixpkgs)
