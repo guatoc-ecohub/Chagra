@@ -246,8 +246,23 @@ in {
           cfg.masterKeyFile
         ];
 
+        # 2026-05-04: agregamos `backoff` + `aiohttp` + extras del proxy.
+        # ps.litellm en nixpkgs no propaga las deps del extra [proxy] —
+        # el ExecStart fallaba con `ImportError: No module named 'backoff'`
+        # en proxy_server.py:155. Lista derivada de
+        # pyproject.toml > [tool.poetry.extras.proxy] de litellm upstream.
         ExecStart = ''
-          ${pkgs.python3.withPackages (ps: [ ps.litellm ])}/bin/litellm \
+          ${pkgs.python3.withPackages (ps: with ps; [
+            litellm
+            backoff
+            aiohttp
+            uvicorn
+            fastapi
+            pyyaml
+            python-multipart
+            cryptography
+            pyjwt
+          ])}/bin/litellm \
             --config ${litellmConfig} \
             --host ${cfg.listenAddr} \
             --port ${toString cfg.port} \
