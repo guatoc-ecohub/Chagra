@@ -58,37 +58,37 @@ export default function HelpManual({ onBack }) {
 
       <div className="flex-1 p-4 flex flex-col gap-3 max-w-2xl mx-auto w-full pb-12">
         <p className="text-sm text-slate-400 leading-relaxed">
-          Guía rápida para registrar tu finca o balcón en Chagra. Tap en cada
-          sección para abrir/cerrar. Si algo no está aquí, usá el botón
+          Guía rápida para registrar su finca o balcón en Chagra. Toque cada
+          sección para abrir/cerrar. Si algo no está aquí, use el botón
           flotante 💬 para reportarlo.
         </p>
 
         {/* Sección Inicio Rápido */}
         <Section icon={Sprout} title="🌱 Inicio rápido — primera vez" defaultOpen={true}>
           <ol className="list-decimal pl-5 space-y-1.5">
-            <li>Tap el botón <strong className="text-purple-400">+</strong> arriba (header) para registrar tu primera planta.</li>
-            <li>Buscá la especie escribiendo (ej. &ldquo;gulpa&rdquo; encuentra Gulupa). El sistema autocompleta estrato, gremio y producción.</li>
-            <li>Si tenés foto, subila desde la cámara o galería.</li>
-            <li>Marcá la ubicación: tap mapa o &ldquo;Mi ubicación&rdquo;.</li>
-            <li>Guardá. Aparece en <strong>Activos → Plantas</strong>.</li>
+            <li>Toque el botón <strong className="text-purple-400">+</strong> arriba (header) para registrar su primera planta.</li>
+            <li>Busque la especie escribiendo (ej. &ldquo;gulpa&rdquo; encuentra Gulupa). El sistema autocompleta estrato, gremio y producción.</li>
+            <li>Si tiene foto, súbala desde la cámara o galería.</li>
+            <li>Marque la ubicación: toque mapa o &ldquo;Mi ubicación&rdquo;.</li>
+            <li>Guarde. Aparece en <strong>Activos → Plantas</strong>.</li>
           </ol>
           <p className="mt-2 text-xs text-slate-500 italic">
-            Sin red? La app funciona offline — los datos se sincronizan cuando vuelva la conexión.
+            ¿Sin red? La app funciona offline — los datos se sincronizan cuando vuelva la conexión.
           </p>
         </Section>
 
         {/* Sección Voz */}
         <Section icon={Mic} title="🎤 Registrar por voz">
-          <p>Tap el <strong className="text-emerald-400">FAB micrófono</strong> abajo a la izquierda (siempre visible).</p>
-          <p>Decí algo natural, ejemplos:</p>
+          <p>Toque el <strong className="text-emerald-400">FAB micrófono</strong> abajo a la izquierda (siempre visible).</p>
+          <p>Diga algo natural, ejemplos:</p>
           <ul className="list-disc pl-5 space-y-1 text-slate-400">
             <li>&ldquo;Sembré 5 tomates en el invernadero&rdquo;</li>
             <li>&ldquo;Planté 100 cafés en la parcela tres&rdquo;</li>
             <li>&ldquo;Puse 10 fresas y 30 lechugas en la cama uno&rdquo; (multi-especie OK)</li>
           </ul>
-          <p>El sistema transcribe + extrae <strong>cantidad, especie, ubicación</strong>. Antes de guardar te muestra una pantalla de revisión donde podés editar si algo salió mal.</p>
+          <p>El sistema transcribe + extrae <strong>cantidad, especie, ubicación</strong>. Antes de guardar le muestra una pantalla de revisión donde puede editar si algo salió mal.</p>
           <p className="text-xs text-slate-500 italic mt-2">
-            Cantidad importa: 1 café = 1 planta individual. 100 cafés = 100 plantas individuales (cada una con su hoja de vida). 50 lechugas = 1 cama con 50 (agregado, las hortalizas se manejan en grupo).
+            La cantidad importa: 1 café = 1 planta individual. 100 cafés = 100 plantas individuales (cada una con su hoja de vida). 50 lechugas = 1 cama con 50 (agregado, las hortalizas se manejan en grupo).
           </p>
         </Section>
 
@@ -105,13 +105,13 @@ export default function HelpManual({ onBack }) {
               <p className="text-xs text-slate-400 mt-1">Hortalizas en cama, cereales, abonos verdes. Se gestionan por conjunto, no plantilla por plantilla.</p>
             </div>
           </div>
-          <p className="mt-2">En el formulario aparece un link sutil <em>&ldquo;Agrupar siembra&rdquo;</em> o <em>&ldquo;Registrar individualmente&rdquo;</em> si querés cambiar el default.</p>
+          <p className="mt-2">En el formulario aparece un link sutil <em>&ldquo;Agrupar siembra&rdquo;</em> o <em>&ldquo;Registrar individualmente&rdquo;</em> si quiere cambiar el default.</p>
         </Section>
 
         {/* Sección Foto — expandida con foto por especie */}
         <Section icon={Camera} title="📸 Foto: tomar, adjuntar y foto guía por especie">
-          <p><strong>Al crear planta:</strong> el botón cámara abre tu cámara o galería. La foto queda en la hoja de vida de esa planta.</p>
-          <p><strong>Adjuntar a evento existente</strong>: entrá al evento desde Bitácora/Historial → sección &ldquo;Adjuntar foto a este evento&rdquo;. Útil para documentar después de la siembra.</p>
+          <p><strong>Al crear planta:</strong> el botón cámara abre su cámara o galería. La foto queda en la hoja de vida de esa planta.</p>
+          <p><strong>Adjuntar a evento existente</strong>: entre al evento desde Bitácora/Historial → sección &ldquo;Adjuntar foto a este evento&rdquo;. Útil para documentar después de la siembra.</p>
 
           <div className="mt-3 p-3 rounded-lg bg-emerald-900/15 border border-emerald-800/30">
             <p className="text-emerald-300 font-bold text-sm mb-1">🌱 Foto guía por especie (cómo y para qué)</p>
@@ -119,13 +119,13 @@ export default function HelpManual({ onBack }) {
               Al elegir especie en el formulario aparece un thumbnail bajo el input. Función:
             </p>
             <ul className="text-xs text-slate-400 list-disc pl-5 space-y-1 mt-2">
-              <li><strong>Tu primera foto</strong> de esa especie queda como referencia visual cada vez que abrís el form de la misma planta — útil para confirmar &ldquo;sí, esto es lo que sembré&rdquo;.</li>
-              <li><strong>Si nunca tomaste foto</strong>, ves un placeholder verde con &ldquo;Agregá una foto&rdquo;. No es error — es invitación: la primera foto que tomes ocupa ese lugar para tus próximas siembras de la misma especie.</li>
-              <li>Las fotos NO se comparten con otras fincas (privacidad — decidido 2026-05-02). Solo vos las ves en tu cuenta.</li>
-              <li>En el futuro v1.1 cargaremos un &ldquo;banco visual&rdquo; del catálogo (frutos típicos de cada especie desde GBIF/iNaturalist con licencia libre) para que aparezcan ANTES de que tomes tu propia foto.</li>
+              <li><strong>Su primera foto</strong> de esa especie queda como referencia visual cada vez que abre el form de la misma planta — útil para confirmar &ldquo;sí, esto es lo que sembré&rdquo;.</li>
+              <li><strong>Si nunca tomó foto</strong>, ve un placeholder verde con &ldquo;Agregue una foto&rdquo;. No es error — es invitación: la primera foto que tome ocupa ese lugar para sus próximas siembras de la misma especie.</li>
+              <li>Las fotos NO se comparten con otras fincas (privacidad — decidido 2026-05-02). Solo usted las ve en su cuenta.</li>
+              <li>En el futuro v1.1 cargaremos un &ldquo;banco visual&rdquo; del catálogo (frutos típicos de cada especie desde GBIF/iNaturalist con licencia libre) para que aparezcan ANTES de que tome su propia foto.</li>
             </ul>
             <p className="text-xs text-slate-500 italic mt-2">
-              Cómo agregar foto por especie: 1) Form planta nueva → seleccioná especie → tomá foto. La foto queda asociada al asset Y como referencia visual de la especie. Siguientes siembras de esa especie heredan esa foto como guía.
+              Cómo agregar foto por especie: 1) Form planta nueva → seleccione especie → tome foto. La foto queda asociada al asset Y como referencia visual de la especie. Siguientes siembras de esa especie heredan esa foto como guía.
             </p>
           </div>
 
@@ -134,50 +134,67 @@ export default function HelpManual({ onBack }) {
           </p>
         </Section>
 
-        {/* Sección Vision AI — disease diagnosis */}
-        <Section icon={Sprout} title="🧬 Diagnóstico de enfermedades por foto (vision AI)">
-          <p>Chagra tiene un módulo de visión AI (Gemma3 multimodal) que analiza una foto de hojas y detecta:</p>
+        {/* Sección Vision AI — disease diagnosis + species recognition (BETA) */}
+        <Section icon={Sprout} title="🧬 IA por foto: enfermedades + identificación de especie">
+          <p>Chagra usa visión AI local (Gemma3 multimodal) para dos funciones distintas, ambas marcadas <strong className="text-amber-400">BETA</strong>:</p>
+
+          <h4 className="text-sm font-bold text-emerald-400 mt-3">📋 Diagnóstico de enfermedades por foto</h4>
+          <p>Analiza una foto de hojas y detecta:</p>
           <ul className="list-disc pl-5 space-y-1">
             <li>Posibles enfermedades fitosanitarias</li>
             <li>Deficiencias nutricionales</li>
             <li>Score general de salud (0-100)</li>
-            <li>Sugerencia de tratamiento</li>
+            <li>Sugerencia de tratamiento agroecológico</li>
           </ul>
-          <p>Disponible hoy en: <strong>Campo (Worker mode)</strong> → captura evidencia. Tras la foto, Gemma3 genera un análisis que se guarda como <code>log--observation</code> con marker AI. En la línea de tiempo aparece como <em>&ldquo;Inferencia IA&rdquo;</em> con score y debes <strong>confirmar / rechazar</strong> manualmente (gate de revisión humana — ADR-019 Regla 1).</p>
-          <p className="text-xs text-amber-400 italic mt-2">
-            ⚠️ Aún NO hay reconocimiento automático de especie por foto (solo disease). Para identificar &ldquo;¿qué es esta planta?&rdquo;, usá el SpeciesSelect manual del form. v1.1 podría agregarlo si la comunidad lo pide.
+          <p className="text-xs mt-2">Disponible en <strong>tres puntos</strong>:</p>
+          <ol className="list-decimal pl-5 space-y-1 text-xs">
+            <li><strong>Campo (Worker mode)</strong> → captura evidencia. Análisis se guarda como <code>log--observation</code> con marker AI; aparece en la línea de tiempo como <em>&ldquo;Inferencia IA&rdquo;</em> y debe confirmar/rechazar (gate humano — ADR-019 Regla 1).</li>
+            <li><strong>Bitácora → entrada con foto adjunta</strong> → sección amber &ldquo;Análisis IA experimental&rdquo; abajo del bloque foto. Botón <em>&ldquo;Analizar foto con IA&rdquo;</em>. Funciona con fotos recién capturadas Y fotos viejas guardadas.</li>
+            <li><strong>Plant detail → sección &ldquo;Consultar IA externa&rdquo;</strong> → genera prompt para pegar en Gemini/ChatGPT/Claude (alternativa cuando el modelo local no responde).</li>
+          </ol>
+
+          <h4 className="text-sm font-bold text-emerald-400 mt-3">🔍 Identificación de especie por foto</h4>
+          <p>En <strong>SpeciesSelect</strong> (al crear planta) → botón <em>&ldquo;Tomar foto para identificar especie&rdquo;</em> abajo del selector. Toma foto, IA propone especie + alternativas:</p>
+          <ul className="list-disc pl-5 space-y-1 text-xs">
+            <li>Confianza ≥ 70% + match en catálogo → auto-selecciona la especie</li>
+            <li>Confianza menor → muestra alternativas con chips para que elija</li>
+            <li>Botón <em>&ldquo;Reportar diagnóstico defectuoso&rdquo;</em> registra el caso para validar</li>
+          </ul>
+
+          <p className="text-xs text-slate-500 italic mt-3">
+            Estas funciones requieren conexión al stack IA local (Ollama gemma3:4b en el Nodo Alpha). Si el modelo no responde, sale mensaje de error con opción de reintentar.
           </p>
         </Section>
 
         {/* Sección Zonas */}
         <Section icon={MapPin} title="📍 Zonas y ubicación">
-          <p>Las plantas viven dentro de <strong>zonas</strong> (parcelas, camas, invernaderos). Antes de plantar muchas, creá las zonas:</p>
+          <p>Las plantas viven dentro de <strong>zonas</strong> (parcelas, camas, invernaderos). Antes de plantar muchas, cree las zonas:</p>
           <ol className="list-decimal pl-5 space-y-1">
             <li>Activos → tab <strong>&ldquo;Zonas&rdquo;</strong> (icono mapa) → +</li>
             <li>Nombre (ej. &ldquo;Casa los Sitios&rdquo;) + tipo (parcela / cama / invernadero)</li>
-            <li>Definir el polígono en el mapa o capturar punto GPS</li>
+            <li>Defina el polígono en el mapa o capture punto GPS</li>
           </ol>
-          <p>Después al crear plantas, seleccioná esa zona como contenedor.</p>
+          <p>Después al crear plantas, seleccione esa zona como contenedor.</p>
           <p className="text-xs text-slate-500 italic mt-2">
-            <strong>Brave + GPS</strong>: si el mapa abre &ldquo;desubicado&rdquo;, Brave Shields puede estar bloqueando GPS preciso. Tap el escudo en la barra → desactivá &ldquo;Block fingerprinting&rdquo; para chagra.guatoc.co.
+            <strong>Brave + GPS</strong>: si el mapa abre &ldquo;desubicado&rdquo;, Brave Shields puede estar bloqueando GPS preciso. Toque el escudo en la barra → desactive &ldquo;Block fingerprinting&rdquo; para chagra.guatoc.co.
           </p>
         </Section>
 
         {/* Sección Plagas */}
         <Section icon={Bug} title="🐛 Reportar plaga / invasora">
-          <p>Tap menú principal → <strong>&ldquo;Plagas&rdquo;</strong>. Seleccioná la especie invasora del catálogo, capturá foto y geolocalización.</p>
-          <p>Después de guardar, te aparece una pantalla con <strong>sugerencias de especies nativas para reemplazar</strong> — tap &ldquo;Sembrar aquí&rdquo; lleva al flow de siembra precargado con la nativa + las coords del invasor.</p>
+          <p>Toque menú principal → <strong>&ldquo;Plagas&rdquo;</strong>. Seleccione la especie invasora del catálogo, capture foto y geolocalización.</p>
+          <p>Después de guardar, le aparece una pantalla con <strong>sugerencias de especies nativas para reemplazar</strong> — toque &ldquo;Sembrar aquí&rdquo; y va al flow de siembra precargado con la nativa + las coordenadas del invasor.</p>
         </Section>
 
         {/* Sección Cosechar */}
         <Section icon={Apple} title="🍎 Registrar cosecha">
-          <p>Activos → seleccioná la planta → en la card aparece &ldquo;Registrar cosecha&rdquo;. Capturá cantidad cosechada (kg / unidades) + fecha. Se agrega como log--harvest a la hoja de vida.</p>
+          <p>Activos → seleccione la planta → en la card aparece &ldquo;Registrar cosecha&rdquo;. Capture cantidad cosechada (kg / unidades) + fecha. Se agrega como log--harvest a la hoja de vida.</p>
           <p>También por voz: &ldquo;coseché 5 kilos de gulupas&rdquo; con el FAB micrófono.</p>
         </Section>
 
         {/* Sección Feedback */}
         <Section icon={MessageCircle} title="💬 Reportar bug o sugerir mejora">
-          <p>Botón flotante 💬 abajo a la <strong>derecha</strong> (siempre visible). Podés:</p>
+          <p>Botón flotante 💬 abajo a la <strong>derecha</strong> (siempre visible). Puede:</p>
           <ul className="list-disc pl-5 space-y-1">
             <li>Escribir texto explicando qué pasó</li>
             <li>Grabar audio (botón 🎤 dentro del modal): &ldquo;hice click acá y pasó X&rdquo; — sin necesidad de tipear con manos sucias</li>
@@ -191,30 +208,30 @@ export default function HelpManual({ onBack }) {
           <div className="space-y-3">
             <div>
               <p className="font-bold text-amber-300">📍 GPS no encuentra mi ubicación</p>
-              <p className="text-xs text-slate-400">El mapa centra automático al abrir el modal. Si tarda más de 15s o cae en error, tap &ldquo;Reintentar&rdquo;. En Brave: revisá Shields fingerprinting.</p>
+              <p className="text-xs text-slate-400">El mapa centra automático al abrir el modal. Si tarda más de 15s o cae en error, toque &ldquo;Reintentar&rdquo;. En Brave: revise Shields fingerprinting.</p>
             </div>
             <div>
               <p className="font-bold text-amber-300">🎤 Voz no transcribe</p>
-              <p className="text-xs text-slate-400">Verificá permiso de micrófono (iOS: Ajustes → Safari → Micrófono → chagra.guatoc.co → Permitir). Necesita conexión activa al servidor de transcripción.</p>
+              <p className="text-xs text-slate-400">Verifique permiso de micrófono (iOS: Ajustes → Safari → Micrófono → chagra.guatoc.co → Permitir). Necesita conexión activa al servidor de transcripción.</p>
             </div>
             <div>
               <p className="font-bold text-amber-300">📷 La foto no aparece tras adjuntarla</p>
-              <p className="text-xs text-slate-400">Recargá la pantalla — IndexedDB puede tardar en flush. Si persiste, reportá via 💬.</p>
+              <p className="text-xs text-slate-400">Recargue la pantalla — IndexedDB puede tardar en flush. Si persiste, repórtelo via 💬.</p>
             </div>
             <div>
               <p className="font-bold text-amber-300">🌱 Creé planta y no aparece en la zona</p>
-              <p className="text-xs text-slate-400">Verificá que la zona esté seleccionada como &ldquo;contenedora&rdquo; en el formulario. En vista &ldquo;Activos → Plantas → Todas&rdquo; aparecen sin filtro.</p>
+              <p className="text-xs text-slate-400">Verifique que la zona esté seleccionada como &ldquo;contenedora&rdquo; en el formulario. En vista &ldquo;Activos → Plantas → Todas&rdquo; aparecen sin filtro.</p>
             </div>
             <div>
               <p className="font-bold text-amber-300">⚠️ Sin red en campo</p>
-              <p className="text-xs text-slate-400">Todo funciona offline. Los datos se sincronizan automáticamente cuando volvés a estar online. Indicador en la barra superior.</p>
+              <p className="text-xs text-slate-400">Todo funciona offline. Los datos se sincronizan automáticamente cuando vuelva a estar online. Indicador en la barra superior.</p>
             </div>
           </div>
         </Section>
 
         {/* Sección Tips Lili field test */}
         <Section icon={AlertTriangle} title="🧪 Casos de uso para validar (field test)">
-          <p>Si estás en field test, probá estos casos puntuales y reportá via 💬:</p>
+          <p>Si está en field test, pruebe estos casos puntuales y reporte via 💬:</p>
           <ul className="list-disc pl-5 space-y-1 text-xs text-slate-400">
             <li>Crear zona &ldquo;Balcón&rdquo; + agregar planta &ldquo;Gulupa&rdquo; con foto + GPS</li>
             <li>Voz: &ldquo;Sembré 1 mata de albahaca en la cocina&rdquo;</li>
@@ -233,9 +250,9 @@ export default function HelpManual({ onBack }) {
 
           <h4 className="text-sm font-bold text-emerald-400 mt-3">Sugerencias inteligentes</h4>
           <ul className="list-disc pl-5 space-y-1 text-xs">
-            <li><strong>Plan de alimentación al crear planta</strong>: cuando agregás una mata (ej. manzana, fresa), aparece toast con plan de alimentación sugerido. Lo encontrás en <strong>Bodega → Planes</strong>.</li>
-            <li><strong>Sugerencia de biopreparados al agregar insumo</strong>: si agregás melaza, suero de leche o similares a la bodega, modal sugiere qué biopreparados podés hacer (Bocashi, Biol, etc.) con receta inline.</li>
-            <li><strong>Companions que ya tenés primero</strong>: en panel de gremios, los compañeros que ya están en tu finca aparecen primero con marca verde. No tenés que comprar — ya los tenés.</li>
+            <li><strong>Plan de alimentación al crear planta</strong>: cuando agrega una mata (ej. manzana, fresa), aparece toast con plan de alimentación sugerido. Lo encuentra en <strong>Bodega → Planes</strong>.</li>
+            <li><strong>Sugerencia de biopreparados al agregar insumo</strong>: si agrega melaza, suero de leche o similares a la bodega, modal sugiere qué biopreparados puede hacer (Bocashi, Biol, etc.) con receta inline.</li>
+            <li><strong>Companions que ya tiene primero</strong>: en panel de gremios, los compañeros que ya están en su finca aparecen primero con marca verde. No tiene que comprar — ya los tiene.</li>
           </ul>
 
           <h4 className="text-sm font-bold text-emerald-400 mt-3">Adaptive defaults (memoria de uso)</h4>
@@ -267,7 +284,7 @@ export default function HelpManual({ onBack }) {
         </Section>
 
         <p className="text-xs text-slate-600 text-center mt-4 italic">
-          Manual v1.1 — última actualización 2026-05-03 (13 features mergeados esta sesión)
+          Manual v1.2 — última actualización 2026-05-04 (acento colombiano cordial + correcciones)
         </p>
       </div>
     </div>

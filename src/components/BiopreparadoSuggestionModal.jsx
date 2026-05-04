@@ -38,9 +38,9 @@ export default function BiopreparadoSuggestionModal({ ingredientName, bioprepara
         <header className="p-4 bg-gradient-to-r from-emerald-900/40 to-emerald-950/40 border-b border-emerald-800/40 flex items-start gap-3 shrink-0">
           <Beaker size={22} className="text-emerald-400 mt-0.5 shrink-0" />
           <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-bold text-emerald-300">¡Tenés {ingredientName}!</h3>
+            <h3 className="text-sm font-bold text-emerald-300">¡Ya tiene {ingredientName}!</h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              Con esto podés preparar {biopreparados.length} biopreparado{biopreparados.length > 1 ? 's' : ''} agroecológico{biopreparados.length > 1 ? 's' : ''}:
+              Con esto puede preparar {biopreparados.length} biopreparado{biopreparados.length > 1 ? 's' : ''} agroecológico{biopreparados.length > 1 ? 's' : ''}:
             </p>
           </div>
           <button
