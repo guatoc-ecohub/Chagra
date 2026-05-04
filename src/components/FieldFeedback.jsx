@@ -488,7 +488,7 @@ export default function FieldFeedback() {
 
             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '0.62rem', color: '#4a5664', letterSpacing: '0.08em' }}>
-                Tip: tomá screenshot iPhone para anexar después
+                Tip: tome screenshot iPhone para anexar después
               </span>
               <button
                 type="submit"

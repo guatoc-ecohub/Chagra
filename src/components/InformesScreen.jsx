@@ -120,7 +120,7 @@ export default function InformesScreen({ onBack }) {
             <li>• Reporte de plagas reportadas + tratamientos</li>
           </ul>
           <p className="text-[10px] text-slate-600 mt-3 italic">
-            Si querés priorizar alguno, abrí un issue en el repo etiquetado "informes".
+            Si quiere priorizar alguno, abra un issue en el repo etiquetado "informes".
           </p>
         </div>
       </div>
