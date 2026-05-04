@@ -120,5 +120,47 @@ in
         RandomizedDelaySec = "15min";
       };
     };
+
+    # --- SMART tuning: silenciar Auto Offline Data Collection ---
+    # Los discos Toshiba MG07ACA12TE (sda + sdb del mirror tank) tienen
+    # SMART Automatic Offline Testing enabled de fábrica — barren la
+    # superficie cada ~4h generando ruido HDD audible (operador 2026-05-03:
+    # "el segundo disco que sospecho suena volvió a sonar de la nada").
+    #
+    # Confirmamos via diagnóstico que: pool sano, scrub ZFS limpio Apr 22,
+    # cero errores I/O, cero degradación adicional. El ruido provenía
+    # exclusivamente del barrido SMART firmware-driven, no de actividad
+    # filesystem.
+    #
+    # Solución: deshabilitar Auto Offline Data Collection one-shot al boot.
+    # `smartctl -o off` NO afecta los self-tests programados ni la lectura
+    # SMART attributes — solo desactiva el barrido continuo de superficie.
+    # Auditorías SMART manuales y self-tests on-demand siguen funcionando.
+    #
+    # Si en futuro queremos verificar superficie programadamente, hacerlo
+    # via `smartctl -t long /dev/sdX` mensual en cron, NO via auto-offline.
+    systemd.services.smartctl-disable-auto-offline = {
+      description = "Disable SMART Auto Offline Data Collection on mechanical disks";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "local-fs.target" ];
+      path = [ pkgs.smartmontools ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+      };
+      script = ''
+        # Aplicar a cada disco mecánico Toshiba del mirror tank.
+        # ConditionPathExists no se usa porque queremos best-effort: si un
+        # disco desaparece (RMA pendiente), no fallar el boot — solo skip.
+        for dev in /dev/sda /dev/sdb; do
+          if [ -b "$dev" ]; then
+            echo "Disabling SMART Auto Offline on $dev"
+            smartctl -o off "$dev" || echo "WARN: smartctl -o off failed on $dev (non-fatal)"
+          else
+            echo "INFO: $dev not present, skipping"
+          fi
+        done
+      '';
+    };
   };
 }
