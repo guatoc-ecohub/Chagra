@@ -7,6 +7,7 @@
 
 import React, { useState } from 'react';
 import { Clipboard, Share2, X } from 'lucide-react';
+import { getDeviceAltitude } from '../../services/altitudeService';
 
 const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
 
@@ -63,7 +64,26 @@ export function ExternalAiButton({ context, buildPrompt, label = 'Copiar para IA
     const [fallbackPrompt, setFallbackPrompt] = useState(null);
 
     const handleClick = async () => {
-        const prompt = buildPrompt(context);
+        // Enriquecer context con altitud detectada por GPS si no viene
+        // explícita (Miguel 2026-05-04: el AltitudeBadge mostraba 2550 msnm
+        // pero el prompt decía "altitud no especificada" porque
+        // FARM_CONFIG.ALTITUD_MSNM solo lee env, no GPS).
+        let enrichedContext = context;
+        if (context && (context.altitudMsnm == null)) {
+            try {
+                const detected = await getDeviceAltitude();
+                if (typeof detected === 'number' && Number.isFinite(detected)) {
+                    enrichedContext = { ...context, altitudMsnm: detected };
+                }
+            } catch (err) {
+                // Silent fail — getDeviceAltitude tiene su propio fallback;
+                // si retorna null el builder cae a "altitud no especificada"
+                // que es el comportamiento previo aceptable.
+                console.warn('[ExternalAiButton] altitude resolution failed:', err);
+            }
+        }
+
+        const prompt = buildPrompt(enrichedContext);
 
         if (navigator.clipboard && navigator.clipboard.writeText) {
             try {
