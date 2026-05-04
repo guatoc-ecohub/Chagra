@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { X, Calendar, Tag, Activity, MapPin, AlertCircle, Images } from 'lucide-react';
+import { X, Calendar, Tag, Activity, MapPin, AlertCircle, Images, Skull } from 'lucide-react';
+import PlantCemeteryModal from './PlantCemeteryModal';
 import useAssetStore from '../store/useAssetStore';
 import AssetTimeline from './AssetTimeline';
 import { InputLogForm } from './InputLogForm';
@@ -210,6 +211,7 @@ export const AssetDetailView = () => {
 
   const [showGeoPicker, setShowGeoPicker] = useState(false);
   const [geoSaving, setGeoSaving] = useState(false);
+  const [showCemeteryModal, setShowCemeteryModal] = useState(false);
 
   // T4: useMemo para evitar recrear el spread de arrays en cada render
   const asset = useMemo(() => {
@@ -355,6 +357,27 @@ export const AssetDetailView = () => {
                 />
               </section>
 
+              {/* Cementerio — fracaso como currículo (memoria
+                  project_chagra_educational_dimension). Solo si planta NO está
+                  ya marcada como muerta. */}
+              {status !== 'dead' && (
+                <section>
+                  <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 px-1 flex items-center gap-2">
+                    <Skull size={14} /> Cementerio
+                  </h3>
+                  <p className="text-xs text-slate-400 mb-3 px-1 leading-relaxed">
+                    Si esta planta murió, márcala aquí. La perdida es dato — capturás la razón y queda como lección para tu próxima siembra.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setShowCemeteryModal(true)}
+                    className="text-xs px-3 py-2 rounded-lg bg-slate-900 text-slate-400 border border-slate-700 hover:bg-slate-800 hover:text-slate-300 flex items-center gap-1.5 transition-colors"
+                  >
+                    <Skull size={12} /> Marcar como muerta
+                  </button>
+                </section>
+              )}
+
               {/* High-impact #4: galería cross-asset de fotos de la misma especie */}
               {deriveSpeciesSlug(name) && (
                 <section>
@@ -499,6 +522,60 @@ export const AssetDetailView = () => {
             } finally {
               setGeoSaving(false);
             }
+          }}
+        />
+      )}
+
+      {/* Cementerio — workflow marcar planta muerta + capturar razón */}
+      {showCemeteryModal && isPlantType && (
+        <PlantCemeteryModal
+          plantName={name}
+          onClose={() => setShowCemeteryModal(false)}
+          onConfirm={async (reason, freeText) => {
+            const noteLines = [
+              '[PLANT_LOST]',
+              `reason: ${reason}`,
+              `lost_at: ${new Date().toISOString()}`,
+            ];
+            if (freeText) {
+              noteLines.push('', '--- Notas adicionales ---', freeText);
+            }
+            const updatedAsset = {
+              ...asset,
+              attributes: {
+                ...asset.attributes,
+                status: 'dead',
+                notes: {
+                  value: [
+                    asset.attributes?.notes?.value || '',
+                    asset.attributes?.notes?.value ? '\n' : '',
+                    noteLines.join('\n'),
+                  ].join(''),
+                },
+              },
+            };
+            const pendingTx = {
+              id: crypto.randomUUID(),
+              type: 'asset_plant',
+              remoteId: asset.id,
+              endpoint: `/api/asset/plant/${asset.id}`,
+              method: 'PATCH',
+              payload: {
+                data: {
+                  type: 'asset--plant',
+                  id: asset.id,
+                  attributes: {
+                    status: 'dead',
+                    notes: updatedAsset.attributes.notes,
+                  },
+                },
+              },
+            };
+            await updateAsset('plant', updatedAsset, [pendingTx]);
+            setShowCemeteryModal(false);
+            window.dispatchEvent(new CustomEvent('chagraToast', {
+              detail: { message: `${name} movida al cementerio. La lección queda para próxima siembra.` },
+            }));
           }}
         />
       )}
