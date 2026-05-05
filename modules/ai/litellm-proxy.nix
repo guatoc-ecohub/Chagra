@@ -77,7 +77,10 @@ let
       - model_name: ollama-fallback
         litellm_params:
           model: ollama/${cfg.ollamaFallbackModel}
-          api_base: http://localhost:${toString registry.ports.ollama}
+          # host.docker.internal mapea al gateway podman (configurado con
+          # --add-host=host.docker.internal:host-gateway en extraOptions)
+          # para que el container LiteLLM pueda alcanzar Ollama en el host.
+          api_base: http://host.docker.internal:${toString registry.ports.ollama}
           timeout: 300
 
     router_settings:
@@ -221,85 +224,63 @@ in {
     };
 
     # ─────────────────────────────────────────────
-    # Service systemd
+    # Container Podman — usamos imagen oficial upstream para evitar
+    # whack-a-mole de deps Python del extra [proxy] que ps.litellm en
+    # nixpkgs no propaga (backoff/orjson/gunicorn/etc imports en cascada).
+    # Mismo patrón que whisper-openai container que ya corre en alpha.
+    # 2026-05-04: pivote desde systemd python service tras múltiples
+    # ImportError fails post-rebuild.
     # ─────────────────────────────────────────────
-    systemd.services.litellm-proxy = {
-      description = "LiteLLM proxy — Claude Code backup (z.ai primary, Ollama fallback)";
-      wantedBy = [ "multi-user.target" ];
+    systemd.services.podman-litellm-proxy = {
       after = [ "network-online.target" "ollama.service" ];
-      wants = [ "network-online.target" ];
-
-      environment = {
-        # PYTHONUNBUFFERED para que journalctl muestre logs en tiempo real
-        PYTHONUNBUFFERED = "1";
-      };
-
+      requires = [ "network-online.target" ];
       serviceConfig = {
-        Type = "simple";
-        User = "litellm-proxy";
-        Group = "litellm-proxy";
-        WorkingDirectory = cfg.logsDir;
-
-        # Carga ZAI_API_KEY desde SOPS (formato KEY=VALUE)
-        EnvironmentFile = [
-          cfg.zaiSecretFile
-          cfg.masterKeyFile
+        ExecStartPre = [
+          "${pkgs.coreutils}/bin/install -d -m 0755 ${cfg.logsDir}"
+          # Copiar config a path predecible para mount (Nix store path es
+          # legible pero el container no debería depender de ello directo)
+          "${pkgs.coreutils}/bin/install -m 0444 ${litellmConfig} ${cfg.logsDir}/litellm-config.yaml"
         ];
-
-        # 2026-05-04: lista exhaustiva de deps del extra [proxy] de litellm.
-        # ps.litellm en nixpkgs no propaga las deps del extra — proxy_server.py
-        # importa muchas en cascada (backoff → orjson → gunicorn → ...).
-        # Lista derivada de pyproject.toml de litellm upstream extras.proxy.
-        # Fix incremental no es viable (whack-a-mole de imports).
-        ExecStart = ''
-          ${pkgs.python3.withPackages (ps: with ps; [
-            litellm
-            backoff
-            aiohttp
-            uvicorn
-            fastapi
-            pyyaml
-            python-multipart
-            cryptography
-            pyjwt
-            orjson
-            gunicorn
-            apscheduler
-            boto3
-            email-validator
-            fastapi-sso
-            pynacl
-            resend
-            rich
-            rq
-            websockets
-            httpx
-            jinja2
-            tenacity
-            tiktoken
-            tokenizers
-          ])}/bin/litellm \
-            --config ${litellmConfig} \
-            --host ${cfg.listenAddr} \
-            --port ${toString cfg.port} \
-            --num_workers 1
-        '';
-
-        Restart = "on-failure";
-        RestartSec = 10;
-
-        # Hardening
-        NoNewPrivileges = true;
-        ProtectSystem = "strict";
-        ProtectHome = true;
-        PrivateTmp = true;
-        PrivateDevices = true;
-        ProtectKernelTunables = true;
-        ProtectKernelModules = true;
-        ProtectControlGroups = true;
-        RestrictAddressFamilies = [ "AF_INET" "AF_INET6" "AF_UNIX" ];
-        ReadWritePaths = [ cfg.logsDir ];
       };
+    };
+
+    virtualisation.oci-containers.containers.litellm-proxy = {
+      image = "ghcr.io/berriai/litellm:main-stable";
+      ports = [ "${cfg.listenAddr}:${toString cfg.port}:4000" ];
+      volumes = [
+        "${cfg.logsDir}/litellm-config.yaml:/app/config.yaml:ro"
+      ];
+      environmentFiles = [
+        cfg.zaiSecretFile
+        cfg.masterKeyFile
+      ];
+      environment = {
+        # Acceso a Ollama del host (via gateway podman). El config.yaml
+        # apunta a localhost:11434 pero desde container "localhost" es el
+        # propio container — usamos host.containers.internal alias podman.
+        # ALT: si ese alias no existe en este podman, fallback a IP gateway
+        # del network default 10.88.0.1 o 10.89.0.1 según config.
+        # NOTA: requiere actualizar litellm-config.yaml ollama api_base.
+        LITELLM_LOG = "INFO";
+      };
+      cmd = [
+        "--config"
+        "/app/config.yaml"
+        "--host"
+        "0.0.0.0"
+        "--port"
+        "4000"
+        "--num_workers"
+        "1"
+      ];
+      extraOptions = [
+        # add-host para que el container pueda contactar Ollama en el host.
+        # El config.yaml usa http://localhost:11434, dentro del container
+        # eso resuelve al container mismo. Mapeamos host.docker.internal
+        # al gateway podman para que ollama sea reachable.
+        "--add-host=host.docker.internal:host-gateway"
+        "--name=litellm-proxy"
+      ];
     };
 
     # ─────────────────────────────────────────────
