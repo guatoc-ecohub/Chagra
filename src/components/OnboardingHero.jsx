@@ -1,5 +1,7 @@
 import React from 'react';
 import { Camera, Mic, Pencil } from 'lucide-react';
+import useAssetStore from '../store/useAssetStore';
+import { FARM_CONFIG } from '../config/defaults';
 
 /**
  * OnboardingHero — empty-state cold-start del dashboard (DR-030 QW5).
@@ -13,9 +15,34 @@ import { Camera, Mic, Pencil } from 'lucide-react';
  * (Pl@ntNet/Seek), pero las 3 son first-class — el usuario elige sin
  * jerarquía impuesta.
  *
+ * Adaptive (Autopilot 2026-05-06): el copy del header se ajusta al contexto
+ * detectado del operador para reducir ambigüedad cold-start:
+ *   - Sin zonas creadas Y sin FARM_CONFIG → "primera vez en Chagra"
+ *   - Con zonas pero sin plantas → "ya tenés zonas listas, falta la primera planta"
+ *   - Sin zonas pero con FARM_CONFIG → "tu finca está configurada"
+ *
  * Refs: deepresearch/chagra-ux/decisions/ux-clarity-2026-05.md
  */
 export default function OnboardingHero({ onNavigate }) {
+  const lands = useAssetStore((s) => s.lands);
+  const hasZones = lands.length > 0;
+  const hasFarmContext = !!(FARM_CONFIG.ALTITUD_MSNM || (FARM_CONFIG.THERMAL_ZONES || []).length > 0);
+
+  // Copy adaptive según señales detectadas del operador.
+  // Tono "usted" cordial colombiano (memoria feedback_colombian_tone).
+  let title;
+  let subtitle;
+  if (hasZones) {
+    title = `Tiene ${lands.length} ${lands.length === 1 ? 'zona' : 'zonas'} lista${lands.length === 1 ? '' : 's'}. Falta su primera planta.`;
+    subtitle = 'Elija cómo registrarla. Las tres rutas guardan lo mismo.';
+  } else if (hasFarmContext) {
+    title = 'Su finca está configurada. Sembremos la primera planta.';
+    subtitle = 'Tip: tras la primera, puede crear zonas (parcelas, camas) para organizarlas.';
+  } else {
+    title = 'Bienvenido a Chagra. Empiece registrando su primera planta.';
+    subtitle = 'Elija cómo registrarla. Las tres rutas guardan lo mismo.';
+  }
+
   const ctas = [
     {
       id: 'plant_asset',
@@ -50,10 +77,10 @@ export default function OnboardingHero({ onNavigate }) {
     >
       <div className="flex flex-col gap-1">
         <h2 className="text-2xl font-black text-white">
-          Tu finca está lista para tu primera planta
+          {title}
         </h2>
         <p className="text-sm text-slate-400">
-          Elegí cómo registrar la primera. Las tres rutas guardan lo mismo.
+          {subtitle}
         </p>
       </div>
 
