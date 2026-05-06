@@ -83,6 +83,25 @@ if ('serviceWorker' in navigator) {
       syncManager.syncAll();
     }
   });
+
+  // Auto-reload cuando el SW nuevo toma control (controllerchange).
+  // Pattern Workbox estándar para evitar white screen post-deploy:
+  //   - Si NO había controller previo, es first install (no reload)
+  //   - Si HABÍA controller y cambió a otro = update real, recargar UNA VEZ
+  // Sin este reload el browser puede quedarse con HTML cached que referencia
+  // chunks Vite con hashes viejos que ya no existen post-deploy → todos los
+  // chunks fallan → white screen (incidente 2026-05-06, ver public/sw.js).
+  let initialControllerRegistered = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (initialControllerRegistered) {
+      // Era un update real (no first install). Recargar para HTML fresh +
+      // chunk refs nuevos.
+      window.location.reload();
+    } else {
+      // First install. Marcamos para que próximos controllerchange sí recarguen.
+      initialControllerRegistered = true;
+    }
+  });
 }
 
 createRoot(document.getElementById('root')).render(
