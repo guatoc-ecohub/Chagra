@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * Badge — etiqueta compacta para estados/labels.
+ * Badge, etiqueta compacta para estados/labels.
  * Diseño Bio-Punk: outlined por default, relleno opcional para enfasis.
  *
  * Props:

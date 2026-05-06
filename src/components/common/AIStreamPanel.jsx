@@ -3,7 +3,7 @@ import { Sparkles, Zap } from 'lucide-react';
 import StreamingText from './StreamingText';
 
 /**
- * AIStreamPanel — bloque cyberpunk de render para generaciones del LLM.
+ * AIStreamPanel, bloque cyberpunk de render para generaciones del LLM.
  *
  * Diferencia el contenido IA del contenido determinista con efectos visuales
  * que evocan una terminal CRT + un HUD cyberpunk:
@@ -22,7 +22,7 @@ import StreamingText from './StreamingText';
  *   - text    string        contenido acumulado (chunk a chunk).
  *   - active  boolean       true mientras el LLM genera.
  *   - label   string        header (ej. "IA generando", "Diagnostico IA").
- *   - accent  string        'orchid' | 'muzo' | 'morpho' — borde/glow/header.
+ *   - accent  string        'orchid' | 'muzo' | 'morpho', borde/glow/header.
  *                           El TEXTO siempre es verde fosforo (look uniforme).
  *   - meta    ReactNode     pequeno texto a la derecha del header.
  */
@@ -34,12 +34,12 @@ export default function AIStreamPanel({
   meta = null,
 }) {
   // Fases del ciclo de vida del panel:
-  //   idle      — sin actividad, estatico.
-  //   streaming — LLM genera (active=true); texto pulsa con negative-breath
+  //   idle     , sin actividad, estatico.
+  //   streaming, LLM genera (active=true); texto pulsa con negative-breath
   //               cada 8s como "latido" de IA viva.
-  //   closing   — transicion de cierre inicial: flash de negativo (500ms)
+  //   closing  , transicion de cierre inicial: flash de negativo (500ms)
   //               que invierte colores momentaneamente, anuncia el fin.
-  //   finished  — rayo + burst de cierre (1400/1200ms), fase final visual.
+  //   finished , rayo + burst de cierre (1400/1200ms), fase final visual.
   // Phase machine: cuando active=true, derivamos 'streaming' directo de la prop
   // (evita cascading renders de setState-in-effect). Solo persistimos en state
   // las transiciones temporizadas closing → finished → idle del cierre.
@@ -115,7 +115,7 @@ export default function AIStreamPanel({
   };
 
   // Text-shadow que simula el bloom del fosforo en tubo CRT.
-  // Solo se aplica durante streaming/closing — el texto final consolidado
+  // Solo se aplica durante streaming/closing, el texto final consolidado
   // usa estilos neutros (font-sans, text-slate-300) para maxima legibilidad.
   const phosphorTextStyle = {
     color: phosphorColor,
@@ -125,7 +125,7 @@ export default function AIStreamPanel({
   };
 
   // Decision UX (v0.6.4+): el texto final mantiene el look terminal CRT
-  // verde fosforo — coherente con la metafora "terminal activa" y el
+  // verde fosforo, coherente con la metafora "terminal activa" y el
   // aspecto unico del panel IA. La variante neutra sans-serif fue revertida
   // por preferencia del usuario.
 

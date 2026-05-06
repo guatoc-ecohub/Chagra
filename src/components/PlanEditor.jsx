@@ -15,7 +15,7 @@ export default function PlanEditor({ assetId, speciesSlug, plantingDate, climate
     const [plan, setPlan] = useState(null);
     const [loading, setLoading] = useState(true);
     const { user } = useUserStore();
-    // 'now' como state — lazy init evita la regla react-hooks/purity.
+    // 'now' como state, lazy init evita la regla react-hooks/purity.
     // Refresca cada minuto para que isPast sea preciso sin re-render forzado.
     const [now, setNow] = useState(() => Date.now());
 
@@ -78,7 +78,7 @@ export default function PlanEditor({ assetId, speciesSlug, plantingDate, climate
         return (
             <div className="p-4 border rounded-lg bg-gray-50 text-center shadow-sm">
                 <h3 className="text-lg font-bold mb-2">Plan de Alimentación</h3>
-                <p className="text-gray-600 mb-4">Sin plan — ¿generar uno sugerido?</p>
+                <p className="text-gray-600 mb-4">Sin plan, ¿generar uno sugerido?</p>
                 <button onClick={handleGenerate} className="bg-green-600 text-white px-4 py-2 rounded shadow font-medium hover:bg-green-700 transition">
                     Generar Plan
                 </button>

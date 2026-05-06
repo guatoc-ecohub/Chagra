@@ -2,7 +2,7 @@ import React from 'react';
 import { Mic } from 'lucide-react';
 
 /**
- * MicFab — Floating Action Button global para captura por voz (DR-030 QW4).
+ * MicFab, Floating Action Button global para captura por voz (DR-030 QW4).
  *
  * FAB extendido (pill con ícono + label) anclado abajo-IZQUIERDA. La derecha
  * está ocupada por FieldFeedback (💬). El label visible permanente "Voz"

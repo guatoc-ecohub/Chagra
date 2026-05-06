@@ -6,7 +6,7 @@ import { captureAndCompress, getPhotoForLog } from '../services/photoService';
 import { analyzeFoliage } from '../services/aiService';
 
 /**
- * BitacoraEntryDetail — vista detalle de una entrada de Bitácora/Historial.
+ * BitacoraEntryDetail, vista detalle de una entrada de Bitácora/Historial.
  *
  * Lili #104: "Bitácora / Historial: Aquí no permite ingresar a ninguno de
  * los registros pendientes." Faltaba la screen detalle al tap en cualquier
@@ -22,9 +22,9 @@ import { analyzeFoliage } from '../services/aiService';
  * - Botón Editar si la entry es task pendiente (callback edit)
  *
  * Props:
- *   entry: object — la entry a mostrar
- *   onBack: fn — volver a listado
- *   onEdit: fn(entry) — opcional, abrir edit screen (solo para tareas pending)
+ *   entry: object, la entry a mostrar
+ *   onBack: fn, volver a listado
+ *   onEdit: fn(entry), opcional, abrir edit screen (solo para tareas pending)
  */
 function getEntryTitle(entry) {
   return (
@@ -390,7 +390,7 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-500 leading-snug">
-                  Detecta enfermedades, deficiencias nutricionales y salud general (gemma3:4b local). Resultados pueden ser inexactos — reporta los falsos positivos para mejorar el feature.
+                  Detecta enfermedades, deficiencias nutricionales y salud general (gemma3:4b local). Resultados pueden ser inexactos, reporta los falsos positivos para mejorar el feature.
                 </p>
                 {aiState === 'idle' && (
                   <button

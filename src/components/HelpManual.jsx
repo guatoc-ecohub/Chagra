@@ -14,7 +14,7 @@ const PLACEHOLDER_CYCLES = [
 ];
 
 /**
- * HelpManual — Manual de usuario integrado en la PWA.
+ * HelpManual, Manual de usuario integrado en la PWA.
  *
  * Acceso desde TopBar → botón ? (HelpCircle).
  *
@@ -77,7 +77,7 @@ export default function HelpManual({ onBack }) {
         </p>
 
         {/* Sección Inicio Rápido */}
-        <Section icon={Sprout} title="🌱 Inicio rápido — primera vez" defaultOpen={true}>
+        <Section icon={Sprout} title="🌱 Inicio rápido, primera vez" defaultOpen={true}>
           <ol className="list-decimal pl-5 space-y-1.5">
             <li>Toque el botón <strong className="text-purple-400">+</strong> arriba (header) para registrar su primera planta.</li>
             <li>Busque la especie escribiendo (ej. &ldquo;gulpa&rdquo; encuentra Gulupa). El sistema autocompleta estrato, gremio y producción.</li>
@@ -86,7 +86,7 @@ export default function HelpManual({ onBack }) {
             <li>Guarde. Aparece en <strong>Activos → Plantas</strong>.</li>
           </ol>
           <p className="mt-2 text-xs text-slate-500 italic">
-            ¿Sin red? La app funciona offline — los datos se sincronizan cuando vuelva la conexión.
+            ¿Sin red? La app funciona offline, los datos se sincronizan cuando vuelva la conexión.
           </p>
         </Section>
 
@@ -121,7 +121,7 @@ export default function HelpManual({ onBack }) {
           <p className="mt-2">En el formulario aparece un link sutil <em>&ldquo;Agrupar siembra&rdquo;</em> o <em>&ldquo;Registrar individualmente&rdquo;</em> si quiere cambiar el default.</p>
         </Section>
 
-        {/* Sección Foto — expandida con foto por especie */}
+        {/* Sección Foto, expandida con foto por especie */}
         <Section icon={Camera} title="📸 Foto: tomar, adjuntar y foto guía por especie">
           <p><strong>Al crear planta:</strong> el botón cámara abre su cámara o galería. La foto queda en la hoja de vida de esa planta.</p>
           <p><strong>Adjuntar a evento existente</strong>: entre al evento desde Bitácora/Historial → sección &ldquo;Adjuntar foto a este evento&rdquo;. Útil para documentar después de la siembra.</p>
@@ -132,9 +132,9 @@ export default function HelpManual({ onBack }) {
               Al elegir especie en el formulario aparece un thumbnail bajo el input. Función:
             </p>
             <ul className="text-xs text-slate-400 list-disc pl-5 space-y-1 mt-2">
-              <li><strong>Su primera foto</strong> de esa especie queda como referencia visual cada vez que abre el form de la misma planta — útil para confirmar &ldquo;sí, esto es lo que sembré&rdquo;.</li>
-              <li><strong>Si nunca tomó foto</strong>, ve un placeholder verde con &ldquo;Agregue una foto&rdquo;. No es error — es invitación: la primera foto que tome ocupa ese lugar para sus próximas siembras de la misma especie.</li>
-              <li>Las fotos NO se comparten con otras fincas (privacidad — decidido 2026-05-02). Solo usted las ve en su cuenta.</li>
+              <li><strong>Su primera foto</strong> de esa especie queda como referencia visual cada vez que abre el form de la misma planta, útil para confirmar &ldquo;sí, esto es lo que sembré&rdquo;.</li>
+              <li><strong>Si nunca tomó foto</strong>, ve un placeholder verde con &ldquo;Agregue una foto&rdquo;. No es error, es invitación: la primera foto que tome ocupa ese lugar para sus próximas siembras de la misma especie.</li>
+              <li>Las fotos NO se comparten con otras fincas (privacidad, decidido 2026-05-02). Solo usted las ve en su cuenta.</li>
               <li>En el futuro v1.1 cargaremos un &ldquo;banco visual&rdquo; del catálogo (frutos típicos de cada especie desde GBIF/iNaturalist con licencia libre) para que aparezcan ANTES de que tome su propia foto.</li>
             </ul>
             <p className="text-xs text-slate-500 italic mt-2">
@@ -147,7 +147,7 @@ export default function HelpManual({ onBack }) {
           </p>
         </Section>
 
-        {/* Sección Vision AI — disease diagnosis + species recognition (BETA) */}
+        {/* Sección Vision AI, disease diagnosis + species recognition (BETA) */}
         <Section icon={Sprout} title="🧬 IA por foto: enfermedades + identificación de especie">
           <p>Chagra usa visión AI local (Gemma3 multimodal) para dos funciones distintas, ambas marcadas <strong className="text-amber-400">BETA</strong>:</p>
 
@@ -161,7 +161,7 @@ export default function HelpManual({ onBack }) {
           </ul>
           <p className="text-xs mt-2">Disponible en <strong>tres puntos</strong>:</p>
           <ol className="list-decimal pl-5 space-y-1 text-xs">
-            <li><strong>Campo (Worker mode)</strong> → captura evidencia. Análisis se guarda como <code>log--observation</code> con marker AI; aparece en la línea de tiempo como <em>&ldquo;Inferencia IA&rdquo;</em> y debe confirmar/rechazar (gate humano — ADR-019 Regla 1).</li>
+            <li><strong>Campo (Worker mode)</strong> → captura evidencia. Análisis se guarda como <code>log--observation</code> con marker AI; aparece en la línea de tiempo como <em>&ldquo;Inferencia IA&rdquo;</em> y debe confirmar/rechazar (gate humano, ADR-019 Regla 1).</li>
             <li><strong>Bitácora → entrada con foto adjunta</strong> → sección amber &ldquo;Análisis IA experimental&rdquo; abajo del bloque foto. Botón <em>&ldquo;Analizar foto con IA&rdquo;</em>. Funciona con fotos recién capturadas Y fotos viejas guardadas.</li>
             <li><strong>Plant detail → sección &ldquo;Consultar IA externa&rdquo;</strong> → genera prompt para pegar en Gemini/ChatGPT/Claude (alternativa cuando el modelo local no responde).</li>
           </ol>
@@ -196,7 +196,7 @@ export default function HelpManual({ onBack }) {
         {/* Sección Plagas */}
         <Section icon={Bug} title="🐛 Reportar plaga / invasora">
           <p>Toque menú principal → <strong>&ldquo;Plagas&rdquo;</strong>. Seleccione la especie invasora del catálogo, capture foto y geolocalización.</p>
-          <p>Después de guardar, le aparece una pantalla con <strong>sugerencias de especies nativas para reemplazar</strong> — toque &ldquo;Sembrar aquí&rdquo; y va al flow de siembra precargado con la nativa + las coordenadas del invasor.</p>
+          <p>Después de guardar, le aparece una pantalla con <strong>sugerencias de especies nativas para reemplazar</strong>, toque &ldquo;Sembrar aquí&rdquo; y va al flow de siembra precargado con la nativa + las coordenadas del invasor.</p>
         </Section>
 
         {/* Sección Cosechar */}
@@ -210,7 +210,7 @@ export default function HelpManual({ onBack }) {
           <p>Botón flotante 💬 abajo a la <strong>derecha</strong> (siempre visible). Puede:</p>
           <ul className="list-disc pl-5 space-y-1">
             <li>Escribir texto explicando qué pasó</li>
-            <li>Grabar audio (botón 🎤 dentro del modal): &ldquo;hice click acá y pasó X&rdquo; — sin necesidad de tipear con manos sucias</li>
+            <li>Grabar audio (botón 🎤 dentro del modal): &ldquo;hice click acá y pasó X&rdquo;, sin necesidad de tipear con manos sucias</li>
             <li>Ambos: texto + audio</li>
           </ul>
           <p>El feedback queda guardado localmente y se sincroniza después.</p>
@@ -229,7 +229,7 @@ export default function HelpManual({ onBack }) {
             </div>
             <div>
               <p className="font-bold text-amber-300">📷 La foto no aparece tras adjuntarla</p>
-              <p className="text-xs text-slate-400">Recargue la pantalla — IndexedDB puede tardar en flush. Si persiste, repórtelo via 💬.</p>
+              <p className="text-xs text-slate-400">Recargue la pantalla, IndexedDB puede tardar en flush. Si persiste, repórtelo via 💬.</p>
             </div>
             <div>
               <p className="font-bold text-amber-300">🌱 Creé planta y no aparece en la zona</p>
@@ -254,13 +254,13 @@ export default function HelpManual({ onBack }) {
           </ul>
         </Section>
 
-        {/* Sección Aprende sembrando — corpus curado desde /public/cycle-content/.
+        {/* Sección Aprende sembrando, corpus curado desde /public/cycle-content/.
             Datos consolidados DR-034 cerrado 2026-05-06 (3/3 LLMs convergencia
             alta) + ADR-032 plan curación starter species. Política ADR-033
-            Opción C estricta — solo Nivel 2 evidencia, NO folclore. */}
-        <Section icon={GraduationCap} title="🌿 Aprende sembrando — ciclo agroecológico" defaultOpen={false}>
+            Opción C estricta, solo Nivel 2 evidencia, NO folclore. */}
+        <Section icon={GraduationCap} title="🌿 Aprende sembrando, ciclo agroecológico" defaultOpen={false}>
           <p className="text-sm leading-relaxed">
-            <strong className="text-emerald-300">Punto de partida educativo</strong> para quien empieza desde cero — no solo cómo usar Chagra, sino cómo cultivar.
+            <strong className="text-emerald-300">Punto de partida educativo</strong> para quien empieza desde cero, no solo cómo usar Chagra, sino cómo cultivar.
           </p>
 
           <p className="text-xs text-slate-400 leading-relaxed mt-2">
@@ -283,7 +283,7 @@ export default function HelpManual({ onBack }) {
             ))}
           </div>
 
-          <h4 className="text-xs uppercase tracking-wider text-orange-400 font-bold mt-4 mb-2">Pendientes — curación humana presencial</h4>
+          <h4 className="text-xs uppercase tracking-wider text-orange-400 font-bold mt-4 mb-2">Pendientes, curación humana presencial</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {PLACEHOLDER_CYCLES.map((c) => (
               <div key={c.label} className="p-3 rounded-lg bg-slate-900 border border-slate-800 opacity-70">
@@ -302,32 +302,32 @@ export default function HelpManual({ onBack }) {
           <div className="mt-4 p-3 rounded-xl bg-emerald-900/15 border border-emerald-800/40">
             <p className="text-xs uppercase tracking-wider text-emerald-400 font-bold mb-2">Cada ciclo cubre</p>
             <ul className="text-xs text-slate-300 space-y-1 list-disc pl-5">
-              <li><strong>Preparación de tierra</strong> — matera (mezcla recomendada) vs campo abierto (descompactación + biopreparados)</li>
-              <li><strong>Germinación + propagación</strong> — semilla, esqueje, acodo, división, injerto (según especie)</li>
-              <li><strong>Hitos del ciclo</strong> — día por día, criterio observable + acción clave</li>
-              <li><strong>Razones comunes de fracaso</strong> — top 5 con prevención agroecológica + frecuencia esperada</li>
-              <li><strong>Compañeros validados</strong> y antagonistas — qué NO sembrar cerca</li>
-              <li><strong>Biopreparados</strong> — bocashi, biol, caldo sulfocálcico, M-5, Trichoderma</li>
-              <li><strong>Rangos conservadores</strong> de cosecha — anti-overpromise vs literatura comercial</li>
+              <li><strong>Preparación de tierra</strong>, matera (mezcla recomendada) vs campo abierto (descompactación + biopreparados)</li>
+              <li><strong>Germinación + propagación</strong>, semilla, esqueje, acodo, división, injerto (según especie)</li>
+              <li><strong>Hitos del ciclo</strong>, día por día, criterio observable + acción clave</li>
+              <li><strong>Razones comunes de fracaso</strong>, top 5 con prevención agroecológica + frecuencia esperada</li>
+              <li><strong>Compañeros validados</strong> y antagonistas, qué NO sembrar cerca</li>
+              <li><strong>Biopreparados</strong>, bocashi, biol, caldo sulfocálcico, M-5, Trichoderma</li>
+              <li><strong>Rangos conservadores</strong> de cosecha, anti-overpromise vs literatura comercial</li>
             </ul>
           </div>
 
           <div className="mt-3 p-3 rounded-xl bg-amber-900/15 border border-amber-800/40 flex items-start gap-2">
             <Clock size={14} className="text-amber-400 shrink-0 mt-0.5" />
             <p className="text-[11px] text-amber-200 leading-relaxed">
-              <strong>Filosofía:</strong> NO promete éxito instantáneo. Sembrar es un proceso de meses-años. Documenta también lo que NO funcionó para que cada operador aprenda de la pérdida sin estigma. Coherente con el cementerio de plantas — fracaso como currículo.
+              <strong>Filosofía:</strong> NO promete éxito instantáneo. Sembrar es un proceso de meses-años. Documenta también lo que NO funcionó para que cada operador aprenda de la pérdida sin estigma. Coherente con el cementerio de plantas, fracaso como currículo.
             </p>
           </div>
 
           <p className="text-[10px] text-slate-600 italic mt-3">
-            Corpus consolidado DR-034 (Claude web + Gemini DR + DeepSeek V3 — convergencia 3/3) + plan curación humana presencial 4h por especie advanced (Aguacate → Café → Tomate). Datos calibrados anti-overpromise — rangos agroecológicos colombianos, NO hidroponía.
+            Corpus consolidado DR-034 (Claude web + Gemini DR + DeepSeek V3, convergencia 3/3) + plan curación humana presencial 4h por especie advanced (Aguacate → Café → Tomate). Datos calibrados anti-overpromise, rangos agroecológicos colombianos, NO hidroponía.
           </p>
         </Section>
 
-        {/* Sección Novedades v0.12.x — features mergeados sesión 2026-05-03 */}
+        {/* Sección Novedades v0.12.x, features mergeados sesión 2026-05-03 */}
         <Section icon={Sparkles} title="✨ Novedades de mayo 2026">
           <p className="text-xs text-slate-400 mb-2">
-            Cambios recientes que reducen friction. Todos opt-in / no-imposición —
+            Cambios recientes que reducen friction. Todos opt-in / no-imposición:
             la app no fuerza, solo sugiere.
           </p>
 
@@ -335,7 +335,7 @@ export default function HelpManual({ onBack }) {
           <ul className="list-disc pl-5 space-y-1 text-xs">
             <li><strong>Plan de alimentación al crear planta</strong>: cuando agrega una mata (ej. manzana, fresa), aparece toast con plan de alimentación sugerido. Lo encuentra en <strong>Bodega → Planes</strong>.</li>
             <li><strong>Sugerencia de biopreparados al agregar insumo</strong>: si agrega melaza, suero de leche o similares a la bodega, modal sugiere qué biopreparados puede hacer (Bocashi, Biol, etc.) con receta inline.</li>
-            <li><strong>Companions que ya tiene primero</strong>: en panel de gremios, los compañeros que ya están en su finca aparecen primero con marca verde. No tiene que comprar — ya los tiene.</li>
+            <li><strong>Companions que ya tiene primero</strong>: en panel de gremios, los compañeros que ya están en su finca aparecen primero con marca verde. No tiene que comprar, ya los tiene.</li>
           </ul>
 
           <h4 className="text-sm font-bold text-emerald-400 mt-3">Adaptive defaults (memoria de uso)</h4>
@@ -349,7 +349,7 @@ export default function HelpManual({ onBack }) {
 
           <h4 className="text-sm font-bold text-amber-400 mt-3">IA experimental (BETA)</h4>
           <p className="text-xs">
-            Marcadas con badge <span className="text-[9px] px-1 py-0.5 rounded bg-amber-900/40 text-amber-300 border border-amber-800/50 font-bold">BETA</span> — funcionan pero pueden errar. Si fallan, hay botón &ldquo;Reportar diagnóstico defectuoso&rdquo; que registra el caso para revisar.
+            Marcadas con badge <span className="text-[9px] px-1 py-0.5 rounded bg-amber-900/40 text-amber-300 border border-amber-800/50 font-bold">BETA</span>, funcionan pero pueden errar. Si fallan, hay botón &ldquo;Reportar diagnóstico defectuoso&rdquo; que registra el caso para revisar.
           </p>
           <ul className="list-disc pl-5 space-y-1 text-xs mt-1">
             <li><strong>Identificar especie por foto</strong> en SpeciesSelect → cámara → IA propone especie + alternativas. Confidence ≥70% auto-selecciona si match el catálogo.</li>
@@ -367,7 +367,7 @@ export default function HelpManual({ onBack }) {
         </Section>
 
         <p className="text-xs text-slate-600 text-center mt-4 italic">
-          Manual v1.2 — última actualización 2026-05-04 (acento colombiano cordial + correcciones)
+          Manual v1.2, última actualización 2026-05-04 (acento colombiano cordial + correcciones)
         </p>
       </div>
     </div>

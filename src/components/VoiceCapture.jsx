@@ -47,7 +47,7 @@ const STATE_ERROR = 'error';
 const STATE_DONE = 'done';
 
 /**
- * VoiceCapture — UI principal del módulo de ingreso acústico.
+ * VoiceCapture, UI principal del módulo de ingreso acústico.
  *
  * Pipeline: grabar → transcribir (Whisper) → extraer (qwen3.5:4b) → revisar
  * humano (VoiceConfirmation) → encolar en pending_transactions.

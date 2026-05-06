@@ -7,7 +7,7 @@ import { TASK_STATUSES } from '../constants/assetStatuses';
 
 // Autopilot A (2026-05-03): pre-fill priority + location desde último uso.
 // Reduce friction al crear tareas repetitivas (riego matinal, monitoreo,
-// poda) sin imponer — el usuario sigue editando libremente.
+// poda) sin imponer, el usuario sigue editando libremente.
 const LAST_USED_KEY = 'chagra:taskscreen_last';
 function readLastUsed() {
     try {
@@ -97,7 +97,7 @@ function TaskScreen({ onBack, onSave, initialData }) {
                         locationId: formData.locationId || null,
                         ts: Date.now(),
                     }));
-                } catch { /* localStorage no disponible / quota — silent */ }
+                } catch { /* localStorage no disponible / quota, silent */ }
                 onSave('Tarea agendada exitosamente (Offline-First)', false);
             }
             setTimeout(() => onBack(), 500);

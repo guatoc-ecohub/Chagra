@@ -15,7 +15,7 @@ function getStockValue(item) {
 }
 
 /**
- * InventoryDashboard — Bodega de biofábrica (Fase 13.2 / refactor 13.6).
+ * InventoryDashboard, Bodega de biofábrica (Fase 13.2 / refactor 13.6).
  *
  * Renderiza el stock de todos los materiales registrados como asset--material.
  * El valor de stock se descuenta reactivamente desde addInputLog cada vez que

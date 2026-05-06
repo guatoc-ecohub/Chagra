@@ -1,5 +1,5 @@
 /**
- * ExternalAiButton.jsx — R5
+ * ExternalAiButton.jsx, R5
  * Botón reutilizable que copia un prompt portátil al clipboard.
  * Si el clipboard API falla, muestra un modal con textarea seleccionable.
  * AGPL-3.0 © Chagra
@@ -50,13 +50,13 @@ function ClipboardFallbackModal({ prompt, onClose }) {
 }
 
 /**
- * ExternalAiButton — Componente reutilizable R5.
+ * ExternalAiButton, Componente reutilizable R5.
  *
  * Props:
  *   - context: { speciesName, scientificName, companions, ... } pasado al builder
- *   - buildPrompt: fn(context) → string — constructor de prompt apropiado
+ *   - buildPrompt: fn(context) → string, constructor de prompt apropiado
  *   - label: texto del botón (por defecto 'Copiar para IA externa')
- *   - variant: 'share' | 'clipboard' — selección de icono (por defecto 'clipboard')
+ *   - variant: 'share' | 'clipboard', selección de icono (por defecto 'clipboard')
  *   - className: clases CSS adicionales
  */
 export function ExternalAiButton({ context, buildPrompt, label = 'Copiar para IA externa', variant = 'clipboard', className = '' }) {
@@ -76,7 +76,7 @@ export function ExternalAiButton({ context, buildPrompt, label = 'Copiar para IA
                     enrichedContext = { ...context, altitudMsnm: detected };
                 }
             } catch (err) {
-                // Silent fail — getDeviceAltitude tiene su propio fallback;
+                // Silent fail, getDeviceAltitude tiene su propio fallback;
                 // si retorna null el builder cae a "altitud no especificada"
                 // que es el comportamiento previo aceptable.
                 console.warn('[ExternalAiButton] altitude resolution failed:', err);

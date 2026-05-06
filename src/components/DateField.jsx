@@ -2,7 +2,7 @@ import React from 'react';
 import { Calendar } from 'lucide-react';
 
 /**
- * DateField — Wrapper de <input type="date"> optimizado para iOS Safari.
+ * DateField, Wrapper de <input type="date"> optimizado para iOS Safari.
  * Asegura formato YYYY-MM-DD y área táctil de 44px.
  *
  * @param {Object} props

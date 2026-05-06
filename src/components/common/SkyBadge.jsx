@@ -3,7 +3,7 @@ import { lunarPhase, solarTimes, formatLocalHM, formatDayLength } from '../../ut
 import { FARM_CONFIG } from '../../config/defaults';
 
 /**
- * SkyBadge — fase lunar + horas solares en el header.
+ * SkyBadge, fase lunar + horas solares en el header.
  *
  * Muestra: 🌗 Cuarto · ☀ 5:42-17:53
  * Hover/title revela detalle: nombre completo, iluminación, día/noche, día.
@@ -23,7 +23,7 @@ export default function SkyBadge() {
   const lunarTitle = `${lunar.name} · ${Math.round(lunar.illumination * 100)}% iluminación · ${Math.round(lunar.daysSinceNewMoon)}d desde luna nueva`;
   const solarTitle = solar.sunrise && solar.sunset
     ? `Salida ${formatLocalHM(solar.sunrise)} · puesta ${formatLocalHM(solar.sunset)} · día ${formatDayLength(solar.dayLengthMinutes)} · ${solar.isDaylight ? 'sol arriba' : 'sol abajo'}`
-    : 'Coordenadas no configuradas — sin cálculo solar';
+    : 'Coordenadas no configuradas, sin cálculo solar';
 
   return (
     <span

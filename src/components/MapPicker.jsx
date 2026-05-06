@@ -28,14 +28,14 @@ const extractZoneCentroid = (zone) => {
 };
 
 // Threshold para warning de baja precisión. Brave con Shields up devuelve
-// posiciones gruesas (>1km) sin emitir error — el usuario veía "ubicación
+// posiciones gruesas (>1km) sin emitir error, el usuario veía "ubicación
 // capturada" pero el punto estaba a kilómetros del lugar real. Miguel
 // reportó este patrón 2026-05-02. Ahora si accuracy > 500m, mostramos un
 // warning explícito mencionando Brave Shields.
 const LOW_ACCURACY_THRESHOLD_M = 500;
 
 /**
- * MapPicker — Modal de selección/dibujo de geometría (Fase 17.3).
+ * MapPicker, Modal de selección/dibujo de geometría (Fase 17.3).
  *
  * Soporta dos modos:
  *   - mode="point":   click en el mapa o botón "Usar mi ubicación" → POINT.
@@ -44,7 +44,7 @@ const LOW_ACCURACY_THRESHOLD_M = 500;
  * Tiles se cargan desde /tiles/{z}/{x}/{y}.png (servidos por Nginx desde
  * /mnt/fast/appdata/farmos-pwa/tiles para operación offline). Si el Service
  * Worker no ha cacheado los tiles o no existen, Leaflet mostrará el layer
- * vacío — la geometría sigue siendo dibujable y persistible.
+ * vacío, la geometría sigue siendo dibujable y persistible.
  *
  * Props:
  *   - mode:       "point" | "polygon"
@@ -92,7 +92,7 @@ export const MapPicker = ({
   const [isWalking, setIsWalking] = useState(false);
   // Estado machine GPS: idle → locating → located | low-accuracy | failed.
   // Renderizado como banner persistente arriba del mapa para que el operador
-  // sepa qué está pasando — antes "Mi ubicación" silenciaba errores y el
+  // sepa qué está pasando, antes "Mi ubicación" silenciaba errores y el
   // usuario quedaba viendo el mapa en DEFAULT_CENTER sin saber por qué.
   const [gpsStatus, setGpsStatus] = useState('idle');
   const [gpsResult, setGpsResult] = useState(null);
@@ -182,7 +182,7 @@ export const MapPicker = ({
   // Toggle del modo "trazar caminando": al activar, arranca un watchPosition
   // con alta precision que va anadiendo vertices al polygon a medida que el
   // GPS reporta nuevas coordenadas (tipicamente cada 1-3s segun el dispositivo).
-  // Desactivar detiene la captura — el polygon queda con los vertices
+  // Desactivar detiene la captura, el polygon queda con los vertices
   // acumulados y el usuario puede editarlo con Undo / Cerrar polígono.
   const toggleWalkRecording = () => {
     if (mode !== 'polygon') return;
@@ -307,7 +307,7 @@ export const MapPicker = ({
 
   // Auto-locate al abrir el modal (solo si no hay geometría inicial cargada).
   // Con esto el operador ve el mapa centrado en su ubicación apenas abre,
-  // en lugar del DEFAULT_CENTER de Choachí — fixing reporte Miguel 2026-05-02
+  // en lugar del DEFAULT_CENTER de Choachí, fixing reporte Miguel 2026-05-02
   // "sale el mapa muy desubicado y no hace gran cosa".
   useEffect(() => {
     if (initial) return; // respetar geometría pre-cargada
@@ -362,7 +362,7 @@ export const MapPicker = ({
         </button>
       </div>
 
-      {/* GPS status banner — siempre visible para no silenciar errores. */}
+      {/* GPS status banner, siempre visible para no silenciar errores. */}
       {gpsStatus !== 'idle' && (
         <div
           className={`px-4 py-2 text-xs flex items-center gap-2 border-b border-slate-800 ${

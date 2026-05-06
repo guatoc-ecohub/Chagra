@@ -6,7 +6,7 @@ import { logCache } from '../db/logCache';
 
 // Autopilot #7 (2026-05-03): mediana de cosechas pasadas como sugerencia
 // de cantidad. Reduce friction en cosechas repetitivas (fresa cada semana,
-// huevo diario) sin imponer — operador siempre puede sobreescribir.
+// huevo diario) sin imponer, operador siempre puede sobreescribir.
 function median(values) {
   if (!Array.isArray(values) || values.length === 0) return null;
   const sorted = values.slice().sort((a, b) => a - b);

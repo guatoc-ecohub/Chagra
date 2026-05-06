@@ -4,7 +4,7 @@ import SkyBadge from './common/SkyBadge';
 import PestMonitoringWindow from './PestMonitoringWindow';
 
 /**
- * EnvironmentalCard — card colapsable con info ambiental (DR-030 QW2).
+ * EnvironmentalCard, card colapsable con info ambiental (DR-030 QW2).
  *
  * Reúne los badges que vivían inline en el header del DashboardView
  * (AltitudeBadge + SkyBadge) en una card aparte expandible bajo el TopBar.
@@ -13,8 +13,8 @@ import PestMonitoringWindow from './PestMonitoringWindow';
  * Progressive disclosure: oculta por default, expand on demand.
  *
  * En ventana de luna nueva ± 3 días renderiza también PestMonitoringWindow
- * (feature C.1 ADR-033 — Yela & Holyoak 1997). Fuera de esa ventana,
- * el componente devuelve null y no aparece — sin polución visual.
+ * (feature C.1 ADR-033, Yela & Holyoak 1997). Fuera de esa ventana,
+ * el componente devuelve null y no aparece, sin polución visual.
  *
  * Refs:
  *   - Decisión UX: deepresearch/chagra-ux/decisions/ux-clarity-2026-05.md (D2)

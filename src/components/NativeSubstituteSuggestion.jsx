@@ -1,5 +1,5 @@
 /**
- * NativeSubstituteSuggestion.jsx — R9
+ * NativeSubstituteSuggestion.jsx, R9
  * Muestra sustitutos nativos curados tras la extracción de una especie invasora.
  * AGPL-3.0 © Chagra
  */
@@ -31,10 +31,10 @@ const ESTRATO_COLOR = {
  * NativeSubstituteSuggestion
  *
  * Props:
- *   - invasiveSpeciesId: string — ID en el catálogo (ej: "ulex_europaeus")
- *   - invasiveName: string — nombre común para mostrar al usuario
- *   - coordinates: string | null — WKT o cadena de coords para pre-cargar en seeding log
- *   - thermalZone: string | null — piso térmico para filtrar ("frio", "paramo", etc.)
+ *   - invasiveSpeciesId: string, ID en el catálogo (ej: "ulex_europaeus")
+ *   - invasiveName: string, nombre común para mostrar al usuario
+ *   - coordinates: string | null, WKT o cadena de coords para pre-cargar en seeding log
+ *   - thermalZone: string | null, piso térmico para filtrar ("frio", "paramo", etc.)
  *   - onSelectNative: fn({ id, nombre_comun, nombre_cientifico, estrato, coordinates, inversiveSourceName }) → void
  *   - onDismiss: fn() → void
  */
@@ -66,7 +66,7 @@ export function NativeSubstituteSuggestion({
 
         const timeoutId = setTimeout(() => {
             if (alive) {
-                console.warn('[NativeSubstituteSuggestion] Catalog query timeout — likely offline + SW frío.');
+                console.warn('[NativeSubstituteSuggestion] Catalog query timeout, likely offline + SW frío.');
                 setError('Catálogo local tardó demasiado en responder. Probablemente sin red o cargando aún.');
                 setLoading(false);
             }
@@ -218,7 +218,7 @@ export function NativeSubstituteSuggestion({
 
                 {!loading && substitutes.length > 0 && (
                     <p className="text-[9px] text-slate-600 mt-1 px-1">
-                        ⚑ Sustitutos filtrados para piso {thermalZone || 'cualquier zona'} · Curación BORRADOR_IA — validar con agrónomo antes del transplante.
+                        ⚑ Sustitutos filtrados para piso {thermalZone || 'cualquier zona'} · Curación BORRADOR_IA, validar con agrónomo antes del transplante.
                     </p>
                 )}
             </div>

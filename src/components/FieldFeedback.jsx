@@ -1,5 +1,5 @@
 /**
- * FieldFeedback — botón flotante 💬 + modal para que Lili (o cualquier
+ * FieldFeedback, botón flotante 💬 + modal para que Lili (o cualquier
  * field tester) reporte fricciones UX inline durante el test.
  *
  * - Botón fixed bottom-right, no intrusivo
@@ -10,12 +10,12 @@
  * - Bulk export futuro: script `npm run export:feedback` extrae todo
  *   y crea GitHub Issues en repo Chagra
  *
- * Audio capture (Lili — voto operador 2026-05-02): grabar es más rápido
+ * Audio capture (Lili, voto operador 2026-05-02): grabar es más rápido
  * que tipear "hice click acá y pasó X" en el campo. Reusa useVoiceRecorder
- * (mismo hook que VoiceCapture) — sin pipeline Whisper/qwen, solo Blob
+ * (mismo hook que VoiceCapture), sin pipeline Whisper/qwen, solo Blob
  * crudo persistido para review humano post-sesión.
  *
- * Sin dependencia de html2canvas — Lili saca screenshot iPhone manual y
+ * Sin dependencia de html2canvas, Lili saca screenshot iPhone manual y
  * adjunta luego si quiere. Mantiene bundle liviano.
  */
 import { useState, useEffect } from 'react';
@@ -42,7 +42,7 @@ export default function FieldFeedback() {
   const [submitted, setSubmitted] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Audio state — el hook gestiona MediaRecorder + permisos + hard limit 30s.
+  // Audio state, el hook gestiona MediaRecorder + permisos + hard limit 30s.
   const { isRecording, audioLevel, durationMs, error: recorderError, start, stop, reset, hardLimitMs } = useVoiceRecorder();
   const [audioBlob, setAudioBlob] = useState(null);
   const [audioMime, setAudioMime] = useState('');
@@ -105,7 +105,7 @@ export default function FieldFeedback() {
       const watchdog = setTimeout(() => {
         if (!settled) {
           settled = true;
-          reject(new Error('IndexedDB timeout (8s) — fallback'));
+          reject(new Error('IndexedDB timeout (8s), fallback'));
         }
       }, SUBMIT_TIMEOUT_MS);
 

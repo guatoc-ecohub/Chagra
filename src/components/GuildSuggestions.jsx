@@ -9,7 +9,7 @@ import ExternalAiButton from './common/ExternalAiButton';
 import { buildGuildExternalPrompt } from '../services/externalAiPromptBuilder';
 
 // Autopilot #8 (2026-05-03): re-rank companions putting existing plants first.
-// Reduce friction de "tengo que comprar otra especie" — mostrar primero las
+// Reduce friction de "tengo que comprar otra especie", mostrar primero las
 // que el operador ya tiene es más accionable.
 function normName(s) {
   return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+#\d+$/, '').trim();
@@ -37,12 +37,12 @@ function isCompanionInFinca(companionName, existingSet) {
 }
 
 /**
- * GuildSuggestions — Panel de compañeros sugeridos y antagonistas (Fase 18).
+ * GuildSuggestions, Panel de compañeros sugeridos y antagonistas (Fase 18).
  *
  * Renderiza resultados de las 3 capas del motor de gremios:
  *   1. Compañeros directos (speciesDefaults.companions)
  *   2. Complementos estructurales (estrato + gremio)
- *   3. Inferencia IA (Ollama/Gemma 4) — bajo demanda
+ *   3. Inferencia IA (Ollama/Gemma 4), bajo demanda
  *
  * Props:
  *   - speciesId:       id de la especie seleccionada
@@ -61,7 +61,7 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
   const userPlants = useAssetStore((s) => s.plants);
   const existingSpeciesSet = useMemo(() => buildExistingSpeciesSet(userPlants), [userPlants]);
 
-  // Capas 1 + 2: estáticas + estructurales — re-ranked con companions existentes primero.
+  // Capas 1 + 2: estáticas + estructurales, re-ranked con companions existentes primero.
   const { companions, antagonists } = useMemo(() => {
     if (!speciesId) return { companions: [], antagonists: [] };
     const raw = getSuggestedCompanions(speciesId);
@@ -148,7 +148,7 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
 
   return (
     <div className="space-y-3">
-      {/* Compañeros sugeridos (Capas 1 + 2) — Autopilot #8: existentes primero */}
+      {/* Compañeros sugeridos (Capas 1 + 2), Autopilot #8: existentes primero */}
       {companions.length > 0 && (
         <div>
           <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1 mb-2">
@@ -200,7 +200,7 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
         </div>
       )}
 
-      {/* Capa 3 enriquecida — Pro module si está registrado */}
+      {/* Capa 3 enriquecida, Pro module si está registrado */}
       {EnrichedComp && (
         <EnrichedComp
           speciesId={speciesId}
@@ -209,7 +209,7 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
         />
       )}
 
-      {/* Capa 3 — Consulta IA en vivo (siempre disponible, OSS) */}
+      {/* Capa 3, Consulta IA en vivo (siempre disponible, OSS) */}
       <div>
         <div className="flex items-center gap-2 flex-wrap">
           <button

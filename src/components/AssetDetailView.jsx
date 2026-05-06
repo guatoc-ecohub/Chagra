@@ -22,7 +22,7 @@ function deriveSpeciesSlug(name) {
 }
 
 // High-impact #4 (2026-05-03): galería cross-asset de fotos para esta especie.
-// Solo del operador en su finca (NO cross-farm — decisión Miguel 2026-05-02).
+// Solo del operador en su finca (NO cross-farm, decisión Miguel 2026-05-02).
 function SpeciesPhotoGallery({ speciesSlug, currentAssetId }) {
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -117,7 +117,7 @@ const PerformancePanel = ({ assetId }) => {
           </div>
           <div className="text-center">
             <p className="text-xl font-bold text-blue-400 tabular-nums">{totalInputWeight}</p>
-            <p className="text-[10px] text-slate-500 uppercase font-bold mt-1" title="Suma normalizada a kg/L base decimal — desglose por categoría debajo">Insumos (kg/L)</p>
+            <p className="text-[10px] text-slate-500 uppercase font-bold mt-1" title="Suma normalizada a kg/L base decimal, desglose por categoría debajo">Insumos (kg/L)</p>
           </div>
         </div>
       </div>
@@ -191,7 +191,7 @@ const CategoryBreakdown = ({ byCategory }) => {
 };
 
 /**
- * AssetDetailView — panel lateral de detalle de un activo (Fase 12.2).
+ * AssetDetailView, panel lateral de detalle de un activo (Fase 12.2).
  *
  * Consume `selectedAssetId` desde el store global. Busca el asset en las
  * cuatro colecciones segmentadas (plants/structures/equipment/materials)
@@ -321,7 +321,7 @@ export const AssetDetailView = () => {
             saving={geoSaving}
           />
 
-          {/* Acción de campo: registro de insumo — solo aplica a plants */}
+          {/* Acción de campo: registro de insumo, solo aplica a plants */}
           {(asset.asset_type === 'plant' || asset.type?.includes('plant')) && (
             <>
               <section>
@@ -357,7 +357,7 @@ export const AssetDetailView = () => {
                 />
               </section>
 
-              {/* Cementerio — fracaso como currículo (memoria
+              {/* Cementerio, fracaso como currículo (memoria
                   project_chagra_educational_dimension). Solo si planta NO está
                   ya marcada como muerta. */}
               {status !== 'dead' && (
@@ -366,7 +366,7 @@ export const AssetDetailView = () => {
                     <Skull size={14} /> Cementerio
                   </h3>
                   <p className="text-xs text-slate-400 mb-3 px-1 leading-relaxed">
-                    Si esta planta murió, márcala aquí. La perdida es dato — capturás la razón y queda como lección para tu próxima siembra.
+                    Si esta planta murió, márcala aquí. La perdida es dato, capturás la razón y queda como lección para tu próxima siembra.
                   </p>
                   <button
                     type="button"
@@ -526,7 +526,7 @@ export const AssetDetailView = () => {
         />
       )}
 
-      {/* Cementerio — workflow marcar planta muerta + capturar razón */}
+      {/* Cementerio, workflow marcar planta muerta + capturar razón */}
       {showCemeteryModal && isPlantType && (
         <PlantCemeteryModal
           plantName={name}

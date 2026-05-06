@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * Sparkline SVG inline — renderiza una serie numerica (0..N) con enfasis
+ * Sparkline SVG inline, renderiza una serie numerica (0..N) con enfasis
  * en legibilidad sobre fondo oscuro.
  *
  * v0.6.4+: tamano por defecto mas grande, fuentes mayores, area bajo
@@ -9,8 +9,8 @@ import React from 'react';
  * actual, guia central punteada visible.
  *
  * Acepta:
- *   values: number[]                           — array crudo de numeros.
- *   data:   Array<{ state: string|number }>    — compat con formato HA history.
+ *   values: number[]                          , array crudo de numeros.
+ *   data:   Array<{ state: string|number }>   , compat con formato HA history.
  *
  * Props opcionales: color, height, width, timeLabel, unit, showLastValue,
  * lastValueDecimals.

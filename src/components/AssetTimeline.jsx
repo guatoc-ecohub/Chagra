@@ -7,7 +7,7 @@ import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 import { usePhotoUrl } from '../hooks/usePhotoUrl';
 
 /**
- * AssetTimeline — Línea de tiempo agroecológica de un activo (plant).
+ * AssetTimeline, Línea de tiempo agroecológica de un activo (plant).
  *
  * Consume logs desde useLogStore (alimentado por logCache + pullRecentLogs).
  * Agrupa por mes/año para facilitar lectura secuencial. Los logs _pending

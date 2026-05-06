@@ -262,7 +262,7 @@ const KEYFRAMES_CSS = `
   92%, 100% { fill: #d97706; }
 }
 
-/* FRAILEJÓN (crece ~1 cm/año en la realidad — fases vegetativas pausadas,
+/* FRAILEJÓN (crece ~1 cm/año en la realidad, fases vegetativas pausadas,
    floración como culmen súbito). */
 @keyframes cgl-frai-grass {
   0%, 100% { opacity: 0; transform: scaleY(0); }

@@ -3,7 +3,7 @@ import { AlertTriangle, Clock, RefreshCw, Wifi, WifiOff, ChevronUp, ChevronDown,
 import { syncManager } from '../services/syncManager';
 
 /**
- * PendingTasksWidget — Lili #102 + #106.
+ * PendingTasksWidget, Lili #102 + #106.
  *
  * Refactor 2026-05-02 (post field test Lili):
  * - **Footer collapsable** (sticky bottom) en lugar de bloque fijo en
@@ -12,7 +12,7 @@ import { syncManager } from '../services/syncManager';
  * - **Sort por severity** (critical → high → medium → low) y luego
  *   por fecha. Lili: "ordenar por urgencia, urgent rojo arriba".
  * - **Edit button** (lápiz) en cada item para editar tareas pendientes.
- *   Closes #106 — onEdit prop dispatcha navigate('edit_task', {task}).
+ *   Closes #106, onEdit prop dispatcha navigate('edit_task', {task}).
  * - **Empty state** simple cuando 0 pendientes.
  *
  * El componente padre (DashboardView) le pasa onEdit callback que
@@ -36,7 +36,7 @@ export default function PendingTasksWidget({ onEdit }) {
       const pendingTasks = await syncManager.fetchPendingTasksFromFarmOS();
 
       // Sort por severity rank, después por deadline (string compara bien
-      // si son ISO o relativo similar — fallback robusto).
+      // si son ISO o relativo similar, fallback robusto).
       const sorted = [...pendingTasks].sort((a, b) => {
         const sa = SEVERITY_RANK[a.severity] ?? 99;
         const sb = SEVERITY_RANK[b.severity] ?? 99;
@@ -95,7 +95,7 @@ export default function PendingTasksWidget({ onEdit }) {
 
   return (
     <div className="rounded-2xl bg-slate-900 border border-slate-700 shadow-xl mb-4 overflow-hidden">
-      {/* Header colapsable — siempre visible */}
+      {/* Header colapsable, siempre visible */}
       <button
         type="button"
         onClick={() => setExpanded(v => !v)}

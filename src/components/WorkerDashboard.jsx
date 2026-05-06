@@ -11,7 +11,7 @@ import StatusBadge from './StatusBadge';
 import { useGeolocation } from '../hooks/useGeolocation';
 
 /**
- * WorkerDashboard — Vista de campo para operario (Fase 20).
+ * WorkerDashboard, Vista de campo para operario (Fase 20).
  *
  * Ordena tareas pendientes por proximidad al GPS del dispositivo, permitiendo
  * al trabajador priorizar por cercanía. Cada tarea tiene un botón "Marcar
@@ -156,7 +156,7 @@ export const WorkerDashboard = () => {
         <div className="p-3 rounded-xl bg-amber-900/20 border border-amber-800/50 flex items-center gap-2">
           <MapPin size={14} className="text-amber-400 shrink-0" />
           <span className="text-xs text-amber-400 font-bold">
-            {noGeoCount} activo{noGeoCount > 1 ? 's' : ''} sin ubicación — registra coordenadas al pasar cerca
+            {noGeoCount} activo{noGeoCount > 1 ? 's' : ''} sin ubicación, registra coordenadas al pasar cerca
           </span>
         </div>
       )}

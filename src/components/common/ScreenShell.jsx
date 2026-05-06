@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 
 /**
- * ScreenShell — layout común para vistas full-screen (Fase 13.6).
+ * ScreenShell, layout común para vistas full-screen (Fase 13.6).
  *
  * Extrae el patrón repetitivo usado por AssetsDashboard, WorkerHistory y
  * la vista de Bodega. Cumple DRY: header consistente + botón back + área

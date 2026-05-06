@@ -20,7 +20,7 @@ import { generatePlanForPlant } from '../services/planGeneratorService';
 // Thumb foto de planta para cards. Sub-componente porque usePhotoUrl no
 // puede llamarse dentro de un map() condicional (regla de hooks).
 // Si no hay foto de usuario para este asset, cae al placeholder (Fase 1
-// — Fase 3 hidratará /catalog-photos/<slug>.jpg con fotos GBIF top-uso).
+//, Fase 3 hidratará /catalog-photos/<slug>.jpg con fotos GBIF top-uso).
 // eslint-disable-next-line no-unused-vars -- FallbackIcon SE USA en JSX, eslint react-jsx detection falla en este config
 function PlantCardThumb({ asset, colors, FallbackIcon }) {
   const photo = usePhotoUrl({ assetId: asset?.id });
@@ -78,12 +78,12 @@ const GREMIO_OPTIONS = [
   { value: 'productivo_principal', label: 'Productivo principal' },
 ];
 
-// Lili #111 #112 #114 — clarificar tabs:
-// - 'Zonas' (land): áreas geográficas con polígono — tab mantenida con
+// Lili #111 #112 #114, clarificar tabs:
+// - 'Zonas' (land): áreas geográficas con polígono, tab mantenida con
 //   descripción explícita en hover/aria.
 // - 'Infraestructura' (structure): construcciones físicas (invernaderos,
-//   bodegas) — diferente de Zonas (que son polígonos abiertos).
-// - 'Herramientas' (equipment): ELIMINADA — Lili "qué finalidad cumple?
+//   bodegas), diferente de Zonas (que son polígonos abiertos).
+// - 'Herramientas' (equipment): ELIMINADA, Lili "qué finalidad cumple?
 //   sin agregar ubicación, sin contexto". Sin caso de uso MVP claro,
 //   removed hasta que se valide demanda real. Si necesario re-agregar
 //   en v1.x con scope definido (asignación a tasks, inventario físico).
@@ -207,7 +207,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
   // initialTab + initialShowForm permiten que App.jsx case 'plant_asset' redirija
   // aquí con el form rich abierto directo en tab=plant. Antes el TopBar `+`
   // navegaba al PlantAssetLog plano que NO usaba SpeciesSelect/GuildSuggestions/
-  // autofill — rich form vivía escondido detrás de Plantas → Siembras → Nuevo.
+  // autofill, rich form vivía escondido detrás de Plantas → Siembras → Nuevo.
   const [activeTab, setActiveTab] = useState(initialTab || 'plant');
   const [searchQuery, setSearchQuery] = useState('');
   const [showForm, setShowForm] = useState(initialShowForm);
@@ -443,7 +443,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
 
       window.dispatchEvent(new CustomEvent('taskAdded'));
 
-      // Sugerencias post-create según tipo de asset (Fase 21 — high-impact wiring)
+      // Sugerencias post-create según tipo de asset (Fase 21, high-impact wiring)
       if (activeTab === 'material' && formData.name?.trim()) {
         findBiopreparadosByIngredient(formData.name.trim())
           .then((recipes) => {
@@ -887,7 +887,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
         </div>
       )}
 
-      {/* Vista de mapa global (Fase 17.3) — reemplaza la lista cuando viewMode === 'map' */}
+      {/* Vista de mapa global (Fase 17.3), reemplaza la lista cuando viewMode === 'map' */}
       {viewMode === 'map' && (
         <div className="flex-1 min-h-0">
           <FarmMap
@@ -943,7 +943,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
                   type="button"
                   onClick={() => setCurrentZoneId('__cemetery__')}
                   className="text-slate-400 hover:text-slate-300 hover:underline inline-flex items-center gap-1"
-                  title="Ver plantas que se perdieron — fracaso como currículo"
+                  title="Ver plantas que se perdieron, fracaso como currículo"
                 >
                   🪦 {cemeteryCount}
                 </button>
@@ -986,7 +986,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
               type="button"
               onClick={() => setCurrentZoneId('__cemetery__')}
               className="w-full p-4 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-800 text-left transition-colors"
-              title="Plantas perdidas — espacio para revisar lecciones aprendidas"
+              title="Plantas perdidas, espacio para revisar lecciones aprendidas"
             >
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
@@ -995,7 +995,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
                   </div>
                   <div className="min-w-0">
                     <h4 className="font-bold text-slate-200 truncate">Cementerio</h4>
-                    <p className="text-xs text-slate-500">Lo que se perdió. Sin juicio — son datos para aprender.</p>
+                    <p className="text-xs text-slate-500">Lo que se perdió. Sin juicio, son datos para aprender.</p>
                   </div>
                 </div>
                 <div className="text-right shrink-0">

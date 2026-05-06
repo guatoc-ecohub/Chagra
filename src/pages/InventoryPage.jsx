@@ -1,9 +1,9 @@
 /**
- * InventoryPage — orquesta los 3 componentes del flujo inventario.
+ * InventoryPage, orquesta los 3 componentes del flujo inventario.
  *
  * Estado local:
  *   - selectedItemId: cuál ítem está siendo editado / inspeccionado
- *   - viewMode: 'dashboard' | 'audit' — dashboard por default, audit al click
+ *   - viewMode: 'dashboard' | 'audit', dashboard por default, audit al click
  *   - recountTarget: si != null, abre el RecountDrawer
  *
  * Refresh strategy: después de cada appendEvent exitoso, recargar el

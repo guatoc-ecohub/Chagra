@@ -1,5 +1,5 @@
 /**
- * InventoryAuditTrail — bitácora completa de events por item.
+ * InventoryAuditTrail, bitácora completa de events por item.
  *
  * Cumple ADR-019: muestra TODOS los events incluyendo los "perdidos" en la
  * proyección (counted que reanchoró logs anteriores, idempotency duplicados).

@@ -4,7 +4,7 @@ import { ScreenShell } from './common/ScreenShell';
 import { exportTraceabilityCsv } from '../services/exportService';
 
 /**
- * InformesScreen — sección dedicada para descargar reportes de la finca
+ * InformesScreen, sección dedicada para descargar reportes de la finca
  * (Lili #118). Antes los downloads vivían dentro de InventoryDashboard
  * como acción secundaria; Lili pidió: "el informe que se descarga
  * debería ir en otra sección de INFORMES a detalle y especificando todo
@@ -98,7 +98,7 @@ export default function InformesScreen({ onBack }) {
       <div className="flex flex-col gap-4 pb-8">
         <p className="text-sm text-slate-400 leading-relaxed">
           Reportes descargables consolidados de la finca. Cada uno se genera
-          con la data sincronizada al momento — incluye registros pendientes
+          con la data sincronizada al momento, incluye registros pendientes
           de sync con un marcador.
         </p>
 
@@ -110,7 +110,7 @@ export default function InformesScreen({ onBack }) {
           onExport={exportTraceabilityCsv}
         />
 
-        {/* Placeholders próximos reportes — comentado hasta tener implementación */}
+        {/* Placeholders próximos reportes, comentado hasta tener implementación */}
         <div className="rounded-2xl border border-dashed border-slate-700/60 p-5 bg-slate-900/30">
           <h3 className="text-sm font-bold text-slate-500 mb-2">Próximamente</h3>
           <ul className="space-y-1.5 text-xs text-slate-500">

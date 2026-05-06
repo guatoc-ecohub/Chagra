@@ -1,5 +1,5 @@
 /**
- * LegalLinks.jsx — Acceso a Términos, Privacidad, Soberanía Comunitaria
+ * LegalLinks.jsx, Acceso a Términos, Privacidad, Soberanía Comunitaria
  * y Licencias mediante modales nativos <dialog>. Reutilizable desde Login,
  * Dashboard footer u otros puntos. Texto integral en Chagra-strategy/legal/
  * TERMINOS_Y_CONDICIONES_v0.1_DRAFT.md (pendiente revisión legal).
