@@ -92,7 +92,7 @@ Cuando dudes si algo es estratégico, default privado y consulta. El leak histó
 
 ## Estilo de copy UI, sin em dashes
 
-**NO usar em dashes (`—`, U+2014) en strings UI** (JSX text content, props como `title=`, `aria-label=`, toasts, mensajes al usuario). Razón: David Loka 2026-05-06 lo identificó como fingerprint repetitivo de Claude AI ("ese hpta tiene una fijación con eso"). Reemplazar por:
+**NO usar em dashes (`—`, U+2014) en strings UI** (JSX text content, props como `title=`, `aria-label=`, toasts, mensajes al usuario). Razón: un usuario externo lo identificó como fingerprint repetitivo de Claude AI (feedback 2026-05-06). Reemplazar por:
 
 - `,` cuando es continuación de oración
 - `.` cuando es cierre + nueva idea
