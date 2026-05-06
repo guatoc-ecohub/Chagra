@@ -82,17 +82,24 @@ if ('serviceWorker' in navigator) {
     if (event.data?.type === 'SYNC_REQUESTED') {
       syncManager.syncAll();
     }
-    // SW_UPDATED: el SW activó una versión nueva (post-deploy con chunks
-    // hash distintos). Recargamos UNA VEZ para que el cliente pida los
-    // chunks nuevos. Sin este reload el browser puede quedarse con HTML
-    // cached referenciando chunks viejos que ya no existen, causando
-    // white screen (incidente 2026-05-06, ver public/sw.js).
-    if (event.data?.type === 'SW_UPDATED') {
-      const reloadKey = '__sw_reload_done_' + event.data.version;
-      if (!sessionStorage.getItem(reloadKey)) {
-        sessionStorage.setItem(reloadKey, '1');
-        window.location.reload();
-      }
+  });
+
+  // Auto-reload cuando el SW nuevo toma control (controllerchange).
+  // Pattern Workbox estándar para evitar white screen post-deploy:
+  //   - Si NO había controller previo, es first install (no reload)
+  //   - Si HABÍA controller y cambió a otro = update real, recargar UNA VEZ
+  // Sin este reload el browser puede quedarse con HTML cached que referencia
+  // chunks Vite con hashes viejos que ya no existen post-deploy → todos los
+  // chunks fallan → white screen (incidente 2026-05-06, ver public/sw.js).
+  let initialControllerRegistered = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (initialControllerRegistered) {
+      // Era un update real (no first install). Recargar para HTML fresh +
+      // chunk refs nuevos.
+      window.location.reload();
+    } else {
+      // First install. Marcamos para que próximos controllerchange sí recarguen.
+      initialControllerRegistered = true;
     }
   });
 }
