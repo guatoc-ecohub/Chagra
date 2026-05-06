@@ -102,7 +102,9 @@ in
 
     virtualisation.oci-containers.containers.immich-server = {
       image = "ghcr.io/immich-app/immich-server:release";
-      ports = [ "127.0.0.1:${toString registry.ports.immich}:3001" ];
+      # 2026-05-06: Immich v2.5.x escucha en :2283 dentro del container
+      # (no :3001 como versiones viejas). Mapeo host:container 1:1.
+      ports = [ "127.0.0.1:${toString registry.ports.immich}:2283" ];
       volumes = [
         "/mnt/data/immich:/usr/src/app/upload"
         "/run/secrets/immich-postgres-password:/run/secrets/immich-postgres-password:ro"
