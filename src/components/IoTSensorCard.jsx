@@ -4,7 +4,7 @@ import Sparkline from './common/Sparkline';
 import Badge from './common/Badge';
 
 /**
- * IoTSensorCard — card de lectura de sensor IoT en estilo HUD industrial.
+ * IoTSensorCard, card de lectura de sensor IoT en estilo HUD industrial.
  *
  * Objetivo visual: distinguir claramente la telemetria IoT (datos crudos,
  * frios, deterministas) del panel cyberpunk de IA (generativo, orchid,
@@ -13,7 +13,7 @@ import Badge from './common/Badge';
  * monoespaciada para los readouts numericos y labels tecnicos.
  *
  * Props:
- *   - title               string    encabezado descriptivo ("INVERNADERO — ZONA A").
+ *   - title               string    encabezado descriptivo ("INVERNADERO, ZONA A").
  *   - deviceId            string    identificador tecnico en mono ("matera_cocina · zigbee").
  *   - humidity, temperature          valores crudos de Home Assistant (string|null).
  *   - humidityHistory, temperatureHistory   arrays de HA history para las sparklines.
@@ -83,7 +83,7 @@ export default function IoTSensorCard({
 
         {/* Readouts numericos grandes en mono. Si el sensor no reporta
             (null/undefined/unavailable/unknown) se muestra un Badge OFFLINE
-            en lugar del numero+unidad — evita concatenaciones sin sentido
+            en lugar del numero+unidad, evita concatenaciones sin sentido
             tipo "---%" o "null°C". */}
         <div className="grid grid-cols-2 gap-3 mb-3">
           <div className="bg-slate-950/60 border border-slate-800 rounded px-2.5 py-1.5 min-h-[56px]">

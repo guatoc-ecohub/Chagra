@@ -5,7 +5,7 @@ import ThemeSelector from './common/ThemeSelector';
 import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 
 /**
- * ProfileScreen — perfil del operador.
+ * ProfileScreen, perfil del operador.
  *
  * Lili #120: "debería poderse registrar los datos del 'Trabajador -
  * Operador de Campo'". Antes era display-only con nombre hardcoded.
@@ -39,7 +39,7 @@ export default function ProfileScreen({ onBack }) {
   const [savedFlash, setSavedFlash] = useState(false);
 
   // Persistir cambios al storage en cada modificación + emitir custom event
-  // (CodeQL flag #36/#37 contra StorageEvent ctor — migrado a CustomEvent
+  // (CodeQL flag #36/#37 contra StorageEvent ctor, migrado a CustomEvent
   // que es el patrón canónico para same-tab pub/sub. TopBar escucha ambos
   // 'storage' (cross-tab nativo) y 'chagra:operator-update' (same-tab).
   useEffect(() => {
@@ -66,7 +66,7 @@ export default function ProfileScreen({ onBack }) {
   return (
     <ScreenShell title="Perfil de Usuario" icon={User} onBack={onBack}>
       <div className="flex flex-col gap-6 pb-8">
-        {/* ID Card / User Info — header con datos sintetizados */}
+        {/* ID Card / User Info, header con datos sintetizados */}
         <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col items-center">
           <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mb-4 border-2 border-emerald-500/30">
             <User size={40} className="text-emerald-400" />

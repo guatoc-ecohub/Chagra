@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { X, Skull, AlertTriangle } from 'lucide-react';
 
 /**
- * PlantCemeteryModal — Workflow para marcar planta como muerta + capturar
+ * PlantCemeteryModal, Workflow para marcar planta como muerta + capturar
  * razón + mostrar lección aprendida.
  *
  * Coherente con dirección educativa Chagra (memoria
  * project_chagra_educational_dimension): "fracaso como currículo". El
  * objetivo NO es esconder o estigmatizar la planta muerta, sino tratarla
- * como dato curatorial — el operador aprende de la pérdida.
+ * como dato curatorial, el operador aprende de la pérdida.
  *
  * Workflow:
  * 1. Operador en AssetDetailView de planta activa → tap "Marcar como muerta"
@@ -19,20 +19,20 @@ import { X, Skull, AlertTriangle } from 'lucide-react';
  * Cada razón viene con lección inline para que el operador NO se vaya
  * solo con "perdí mi planta", sino con "perdí mi planta y entendí por qué".
  *
- * Curación preliminar — validar con DR-034 (ciclo de especies). Algunas
+ * Curación preliminar, validar con DR-034 (ciclo de especies). Algunas
  * razones aplican a especies específicas y deben refinarse por piso térmico.
  *
  * Props:
  *   - plantName: string
  *   - onClose: callback cerrar sin marcar
- *   - onConfirm: fn(reason, freeText) — confirma death + persiste
+ *   - onConfirm: fn(reason, freeText), confirma death + persiste
  */
 
 const REASONS = [
   {
     id: 'overwatering',
     label: 'Riego excesivo',
-    lesson: 'Las raíces se pudren cuando el sustrato queda saturado por horas. La regla agroecológica: regar profundo pero menos frecuente. Antes de regar, mete el dedo 3 cm en el sustrato — si está húmedo, espera.',
+    lesson: 'Las raíces se pudren cuando el sustrato queda saturado por horas. La regla agroecológica: regar profundo pero menos frecuente. Antes de regar, mete el dedo 3 cm en el sustrato, si está húmedo, espera.',
   },
   {
     id: 'underwatering',
@@ -47,7 +47,7 @@ const REASONS = [
   {
     id: 'wrong_soil',
     label: 'Sustrato incorrecto (acidez/compactación)',
-    lesson: 'Cada especie tolera un rango de pH y textura. Compactación bloquea oxígeno radicular en 2 semanas. Test casero: si el agua tarda más de 30s en infiltrar, el suelo está compactado — incorpora compost + romper con horca.',
+    lesson: 'Cada especie tolera un rango de pH y textura. Compactación bloquea oxígeno radicular en 2 semanas. Test casero: si el agua tarda más de 30s en infiltrar, el suelo está compactado, incorpora compost + romper con horca.',
   },
   {
     id: 'temperature',
@@ -57,7 +57,7 @@ const REASONS = [
   {
     id: 'light',
     label: 'Luz insuficiente o excesiva',
-    lesson: 'Plantas de sol pleno en sombra se estiran (etiolación) y mueren débiles. Sombra obligatoria en pleno sol queman las hojas. El catálogo Chagra indica radiación óptima por especie — respétala desde la siembra.',
+    lesson: 'Plantas de sol pleno en sombra se estiran (etiolación) y mueren débiles. Sombra obligatoria en pleno sol queman las hojas. El catálogo Chagra indica radiación óptima por especie, respétala desde la siembra.',
   },
   {
     id: 'transplant_shock',
@@ -103,7 +103,7 @@ export default function PlantCemeteryModal({ plantName, onClose, onConfirm }) {
           <div className="flex-1 min-w-0">
             <h3 className="text-sm font-bold text-slate-200">Cementerio: {plantName}</h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              Aprender de la pérdida. Sin juicio — la agricultura agroecológica se construye también desde lo que no funcionó.
+              Aprender de la pérdida. Sin juicio, la agricultura agroecológica se construye también desde lo que no funcionó.
             </p>
           </div>
           <button

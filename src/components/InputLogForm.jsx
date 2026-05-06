@@ -5,7 +5,7 @@ import { MATERIAL_PRESETS, UNIT_OPTIONS } from '../config/materials';
 
 // Autopilot #11 (2026-05-03): pre-fill biopreparado más reciente usado por
 // el operador. Reduce friction en aplicaciones repetitivas (bocashi semanal,
-// biol cada riego). Operador siempre puede cambiar — solo es default smart.
+// biol cada riego). Operador siempre puede cambiar, solo es default smart.
 const RECENT_KEY = 'chagra:inputlog_last_material';
 function readRecentMaterial() {
   try {
@@ -21,7 +21,7 @@ function readRecentMaterial() {
 }
 
 /**
- * InputLogForm — Registro de aplicación de bio-insumos (Fase 11.8 / refactor 12.4).
+ * InputLogForm, Registro de aplicación de bio-insumos (Fase 11.8 / refactor 12.4).
  *
  * Principios de Jairo Restrepo: trazabilidad exhaustiva de biopreparados,
  * caldos minerales y microorganismos para documentar la nutrición del suelo.
@@ -73,7 +73,7 @@ export const InputLogForm = ({ assetId, onComplete }) => {
       // Persistir material usado para próxima apertura del form
       try {
         localStorage.setItem(RECENT_KEY, formData.material);
-      } catch { /* localStorage quota / no disponible — silent */ }
+      } catch { /* localStorage quota / no disponible, silent */ }
       setFormData((prev) => ({ ...prev, value: '', notes: '' }));
       // Lili #108: feedback explícito de dónde queda guardada la info.
       // Antes el form solo limpiaba sin decir nada → user no sabía si
@@ -129,7 +129,7 @@ export const InputLogForm = ({ assetId, onComplete }) => {
             <div className="text-xs text-slate-300 flex items-start gap-2 px-2 py-2 mt-1 rounded-lg bg-slate-800/60 border border-slate-700/50">
               <Info size={14} className="shrink-0 text-blue-400 mt-0.5" />
               <span className="leading-snug">
-                {selectedInfo.desc || 'Sin descripción registrada — agregar en config/materials.js'}
+                {selectedInfo.desc || 'Sin descripción registrada, agregar en config/materials.js'}
               </span>
             </div>
           )}

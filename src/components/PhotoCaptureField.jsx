@@ -4,7 +4,7 @@ import { captureAndCompress } from '../services/photoService';
 import { sanitizeBlobUrl } from '../utils/blobUrl';
 
 /**
- * PhotoCaptureField — Componente reutilizable para captura de fotos en campo.
+ * PhotoCaptureField, Componente reutilizable para captura de fotos en campo.
  * Soporta: captura con cámara, previsualización, compresión automática,
  * re-toma y eliminación (Issue #86, #87).
  *

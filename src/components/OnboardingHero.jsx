@@ -4,7 +4,7 @@ import useAssetStore from '../store/useAssetStore';
 import { FARM_CONFIG } from '../config/defaults';
 
 /**
- * OnboardingHero — empty-state cold-start del dashboard (DR-030 QW5).
+ * OnboardingHero, empty-state cold-start del dashboard (DR-030 QW5).
  *
  * Se renderiza cuando plantsCount === 0 (sin plantas registradas localmente).
  * Reemplaza la telemetría densa de TelemetryAlerts (que sin sensores cableados
@@ -12,7 +12,7 @@ import { FARM_CONFIG } from '../config/defaults';
  *
  * 3 CTA hero, equivalentes en peso visual, mapean a las 3 modalidades de
  * captura disponibles. La foto va primero por convención camera-first
- * (Pl@ntNet/Seek), pero las 3 son first-class — el usuario elige sin
+ * (Pl@ntNet/Seek), pero las 3 son first-class, el usuario elige sin
  * jerarquía impuesta.
  *
  * Adaptive (Autopilot 2026-05-06): el copy del header se ajusta al contexto

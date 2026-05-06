@@ -22,13 +22,13 @@ const DIFFICULTY_BADGE = {
 };
 
 /**
- * CycleContentRenderer — Lazy loader + renderer del corpus curado por especie.
+ * CycleContentRenderer, Lazy loader + renderer del corpus curado por especie.
  *
  * Lee `/public/cycle-content/<slug>.json` (consolidado DR-034 3/3 LLMs +
  * curación pendiente Guatoc / Agrosavia / Cenicafé).
  *
  * Datos vienen del DR-034 cerrado 2026-05-06 (ADR-032). NO mezclar con
- * folclore/biodinámica — política ADR-033 Opción C estricta.
+ * folclore/biodinámica, política ADR-033 Opción C estricta.
  */
 export default function CycleContentRenderer({ slug, onClose }) {
   const [state, setState] = useState({ slug: null, data: null, error: null });
@@ -133,7 +133,7 @@ export default function CycleContentRenderer({ slug, onClose }) {
 
       {Array.isArray(data.failure_modes) && data.failure_modes.length > 0 && (
         <Block icon={AlertTriangle} title="Razones comunes de fracaso" tone="amber">
-          <p className="text-[10px] text-slate-500 italic mb-2">Documentado para que falle menos. Cuando le pase alguno, no se sienta solo — está en el manual.</p>
+          <p className="text-[10px] text-slate-500 italic mb-2">Documentado para que falle menos. Cuando le pase alguno, no se sienta solo, está en el manual.</p>
           <ul className="space-y-2 text-xs">
             {data.failure_modes.map((f, i) => {
               const badge = FREQ_BADGE[f.frecuencia] ?? FREQ_BADGE.ocasional;
@@ -159,7 +159,7 @@ export default function CycleContentRenderer({ slug, onClose }) {
             {data.companions.map((c, i) => (
               <li key={i}>
                 <span className="font-bold text-emerald-300">{c.especie}</span>
-                <span className="text-slate-400"> — {c.razon}</span>
+                <span className="text-slate-400">, {c.razon}</span>
                 {c.evidencia && <span className="text-[10px] text-slate-600"> · {c.evidencia}</span>}
               </li>
             ))}
@@ -173,7 +173,7 @@ export default function CycleContentRenderer({ slug, onClose }) {
             {data.antagonistas.map((a, i) => (
               <li key={i}>
                 <span className="font-bold text-rose-300">{a.especie}</span>
-                <span className="text-slate-400"> — {a.razon}</span>
+                <span className="text-slate-400">, {a.razon}</span>
               </li>
             ))}
           </ul>
@@ -186,7 +186,7 @@ export default function CycleContentRenderer({ slug, onClose }) {
             {data.biopreparados.map((b, i) => (
               <li key={i}>
                 <span className="font-bold text-emerald-300">{b.nombre}</span>
-                <span className="text-slate-400"> — {b.uso}</span>
+                <span className="text-slate-400">, {b.uso}</span>
                 {b.fuente && <span className="text-[10px] text-slate-600 italic"> · {b.fuente}</span>}
               </li>
             ))}

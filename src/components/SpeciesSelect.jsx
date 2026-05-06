@@ -9,7 +9,7 @@ import { captureAndCompress } from '../services/photoService';
 import { recognizeSpecies } from '../services/aiService';
 
 /**
- * SpeciesSelect — Selector de especie con fuzzy search y autocompletado de defaults.
+ * SpeciesSelect, Selector de especie con fuzzy search y autocompletado de defaults.
  *
  * Reemplaza el <select> + <optgroup> estático de renderPlantForm. Soporta:
  *   - Fuzzy search: "Gulpa" → "Gulupa (Passiflora edulis f. edulis)"
@@ -22,8 +22,8 @@ import { recognizeSpecies } from '../services/aiService';
  *
  * Props:
  *   - value:      string actual del campo nombre
- *   - onChange:    callback(name: string, speciesId: string|null) — actualiza formData.name
- *   - onAutoFill: callback({ estrato, gremio, production, cycleMonths }) — sugerencia
+ *   - onChange:    callback(name: string, speciesId: string|null), actualiza formData.name
+ *   - onAutoFill: callback({ estrato, gremio, production, cycleMonths }), sugerencia
  */
 
 // Flatten de todas las especies con su grupo para lookup rápido.
@@ -67,13 +67,13 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
   const [selectedSpeciesId, setSelectedSpeciesId] = useState(null);
   const wrapperRef = useRef(null);
 
-  // Últimas 3 especies del usuario — atajos rápidos arriba del fuzzy search.
+  // Últimas 3 especies del usuario, atajos rápidos arriba del fuzzy search.
   // Reduce fricción de escribir/buscar para repeat work (Miguel UX 2026-05-03).
   const plants = useAssetStore((s) => s.plants);
   const recentSpecies = useMemo(() => computeRecentSpecies(plants), [plants]);
 
   // Autopilot H (2026-05-03): identificación de especie por foto via gemma3:4b.
-  // Marcado experimental — confidence ≥0.7 auto-selecciona si match en CROP_TAXONOMY,
+  // Marcado experimental, confidence ≥0.7 auto-selecciona si match en CROP_TAXONOMY,
   // sino muestra alternativas + bug report button para validar.
   const aiInputRef = useRef(null);
   const [aiState, setAiState] = useState('idle'); // idle | running | done | error
@@ -325,7 +325,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
                 ? 'Tu última foto de esta especie'
                 : photo.source === 'catalog'
                   ? 'Foto del catálogo'
-                  : 'Sin foto aún — la primera que tomes queda como referencia'}
+                  : 'Sin foto aún, la primera que tomes queda como referencia'}
             </p>
             <p className="text-xs text-slate-300 truncate">{value}</p>
           </div>
@@ -336,7 +336,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
         Búsqueda aproximada. Los campos de estrato y gremio se sugieren al seleccionar.
       </p>
 
-      {/* Autopilot H — Identificación por foto (experimental gemma3:4b) */}
+      {/* Autopilot H, Identificación por foto (experimental gemma3:4b) */}
       <div className="mt-3 pt-3 border-t border-slate-800">
         <div className="flex items-center gap-2 mb-2">
           <Sparkles size={12} className="text-amber-400" />

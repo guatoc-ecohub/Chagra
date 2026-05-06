@@ -1,13 +1,13 @@
 import React from 'react';
 
 /**
- * Sparkline — micro-gráfica SVG inline (Fase 14.3).
+ * Sparkline, micro-gráfica SVG inline (Fase 14.3).
  *
  * Polyline puro, sin dependencias. Apto para embeds en cards de inventario,
  * timeline de activos y cualquier panel compacto.
  *
  * Props:
- *   - data:       number[] — serie de valores
+ *   - data:       number[], serie de valores
  *   - width:      ancho en px (default 60)
  *   - height:     alto en px (default 20)
  *   - color:      color del trazo (default blue-500)

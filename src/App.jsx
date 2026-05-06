@@ -53,11 +53,11 @@ const LoadingFallback = () => (
   </div>
 );
 
-// NAV tiles — vocabulario user-facing post DR-030 QW2 (decisión D3+D4 del DR).
+// NAV tiles, vocabulario user-facing post DR-030 QW2 (decisión D3+D4 del DR).
 // Tile "Voz" eliminada: ya está accesible global vía MicFab abajo-izquierda
 // (QW4). Iconos canónicos: Sprout para plantas, NotebookPen para bitácora.
 // Card-sort n>=5 con usuarios 0-contexto colombianos pendiente para
-// validar empíricamente — esta release ships con hipótesis cultural
+// validar empíricamente, esta release ships con hipótesis cultural
 // (lenguaje agronómico colombiano) y se itera post-feedback.
 const NAV_TILES = [
   { id: 'activos', label: 'Plantas', icon: Sprout, accent: 'teal', desc: 'Cultivos, zonas e infraestructura' },
@@ -105,7 +105,7 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
   const hydrate = useAssetStore((s) => s.hydrate);
   const syncFromServer = useAssetStore((s) => s.syncFromServer);
 
-  // T2: Hidratación al montar — llena contadores desde IndexedDB inmediatamente
+  // T2: Hidratación al montar, llena contadores desde IndexedDB inmediatamente
   useEffect(() => {
     hydrate().then(() => {
       if (navigator.onLine) syncFromServer(fetchFromFarmOS);
@@ -137,7 +137,7 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
       {/* Lili #116: estadísticas al header (siempre visibles).
           Antes: el bloque assetCounts vivía dentro del <main scrollable>,
           se perdía al scrollear hacia abajo. Lili pidió "deberían ir al
-          inicio en el header" — ahora es hermano del TopBar (queda fuera
+          inicio en el header", ahora es hermano del TopBar (queda fuera
           del overflow del main, sticky de facto al top siempre). */}
       {plantsCount > 0 && (
         <button
@@ -213,7 +213,7 @@ export default function App() {
   const [toast, setToast] = useState(null);
   const [lastLogMessage, setLastLogMessage] = useState('');
 
-  // navigate(view, data) — único entry point para cambiar vista. Limpia
+  // navigate(view, data), único entry point para cambiar vista. Limpia
   // currentViewData salvo cuando se pasa explícitamente. Sin esto, navegar
   // dashboard → vista_con_initialData → dashboard → misma_vista_otra_vez
   // reusaba el initialData stale (bug latente de UX).
@@ -277,7 +277,7 @@ export default function App() {
       case 'insumos':
         return <InputLog onBack={() => navigate('dashboard')} onSave={showToast} />;
       case 'plant_asset':
-        // Lili #113 — desaparece el form plano. Redirige al rich form de
+        // Lili #113, desaparece el form plano. Redirige al rich form de
         // AssetsDashboard tab=plant que ya tiene SpeciesSelect, GuildSuggestions
         // y autofill estrato/gremio/producción (mismo modelo que el flujo voz).
         return <AssetsDashboard onBack={() => navigate('dashboard')} initialTab="plant" initialShowForm />;
@@ -302,7 +302,7 @@ export default function App() {
         return <TaskScreen onBack={() => navigate('task_log')} onSave={showToast} initialData={currentViewData?.task || currentViewData} />;
       case 'javier':
         return (
-          <ScreenShell title={`Campo — ${PRIMARY_WORKER_NAME}`} icon={Eye} onBack={() => navigate('dashboard')}>
+          <ScreenShell title={`Campo, ${PRIMARY_WORKER_NAME}`} icon={Eye} onBack={() => navigate('dashboard')}>
             <WorkerDashboard />
           </ScreenShell>
         );
@@ -353,7 +353,7 @@ export default function App() {
       <Suspense fallback={<LoadingFallback />}>
         {renderView()}
       </Suspense>
-      {/* FAB feedback inline para field testing — siempre visible salvo loading */}
+      {/* FAB feedback inline para field testing, siempre visible salvo loading */}
       {currentView !== 'loading' && currentView !== 'login' && <FieldFeedback />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'voz' && <MicFab onNavigate={navigate} />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}

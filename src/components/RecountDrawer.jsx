@@ -1,5 +1,5 @@
 /**
- * RecountDrawer — drawer modal para emitir un evento `inventory_counted`.
+ * RecountDrawer, drawer modal para emitir un evento `inventory_counted`.
  *
  * UX clave: el conteo manual NO destruye el log histórico. Reanchora el
  * stock al valor manual en T, descartando contribuciones anteriores en la
@@ -83,7 +83,7 @@ export default function RecountDrawer({ itemId, currentQty, currentUnit, onClose
         <header style={{ marginBottom: '1rem' }}>
           <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Conteo manual</h2>
           <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: 'var(--fg-dim, #8b949e)' }}>
-            <strong>{itemId}</strong> — esto reanchora el stock SIN borrar logs.
+            <strong>{itemId}</strong>, esto reanchora el stock SIN borrar logs.
           </p>
         </header>
 

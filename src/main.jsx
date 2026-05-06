@@ -35,14 +35,14 @@ syncManager.initDB().then(async () => {
   // Migración de identidad: ejecución única, solo si hay sesión activa.
   if (navigator.onLine && !localStorage.getItem('chagra:v1:rename_done')) {
     getAccessToken().then((token) => {
-      if (!token) return; // Sin sesión — no intentar PATCH sin auth
+      if (!token) return; // Sin sesión, no intentar PATCH sin auth
       renameWorker('Jimmy', PRIMARY_WORKER_NAME).then((result) => {
         if (result.success || result.error === 'not_found') {
           localStorage.setItem('chagra:v1:rename_done', '1');
           console.info('[Migration] Renombrado completado o innecesario.');
         }
       }).catch((e) => console.warn('[Migration] Error renombrando:', e));
-    }).catch(() => { }); // Token expirado — skip silencioso
+    }).catch(() => { }); // Token expirado, skip silencioso
   }
 
   // Pull preventivo inicial de logs si hay red (ventana 30 días).

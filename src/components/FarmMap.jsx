@@ -6,7 +6,7 @@ import { wktToGeoJson } from '../utils/geo';
 import { logCache } from '../db/logCache';
 
 /**
- * FarmMap — Vista maestra de activos geolocalizados (Fase 17.2).
+ * FarmMap, Vista maestra de activos geolocalizados (Fase 17.2).
  *
  * Lee todos los assets con `attributes.intrinsic_geometry.value` (WKT) desde
  * el store, los parsea con `wktToGeoJson` y los dibuja como capas de Leaflet
@@ -18,17 +18,17 @@ import { logCache } from '../db/logCache';
  *                  Si es null, muestra toda la finca.
  *   - onAssetClick: callback(assetId) al tocar una capa. Integra con detalle/logs.
  *   - onTaskComplete: callback(logId) al completar tarea desde popup del mapa.
- *   - showTasks:  boolean — si true, renderiza capa de tareas pendientes.
+ *   - showTasks:  boolean, si true, renderiza capa de tareas pendientes.
  */
 
 const DEFAULT_CENTER = [4.5306, -73.9247]; // Choachí, Cundinamarca
 const DEFAULT_ZOOM = 15;
 const MAP_STATE_KEY = 'chagra:v1:map_state';
 
-// Estilos por tipo (Fase 17.2 — estilizado por asset_type).
+// Estilos por tipo (Fase 17.2, estilizado por asset_type).
 const STYLES = {
   land: {
-    color: '#92400e', // brown/amber-800 — borde marrón
+    color: '#92400e', // brown/amber-800, borde marrón
     weight: 2,
     fillColor: 'transparent',
     fillOpacity: 0,
@@ -136,7 +136,7 @@ export const FarmMap = ({ focusZoneId = null, onAssetClick, onTaskComplete, show
     mapRef.current = map;
     featureGroupRef.current = L.featureGroup().addTo(map);
 
-    // Persistir viewport al mover/zoom (Fase 17 — topografía compleja)
+    // Persistir viewport al mover/zoom (Fase 17, topografía compleja)
     const saveViewport = () => {
       try {
         const c = map.getCenter();

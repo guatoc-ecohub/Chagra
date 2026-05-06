@@ -8,7 +8,7 @@ import { bestFuzzyMatch, similarity } from '../utils/entityMatcher';
 import GuildSuggestions from './GuildSuggestions';
 
 /**
- * VoiceConfirmation — pantalla obligatoria de revisión humana del array de
+ * VoiceConfirmation, pantalla obligatoria de revisión humana del array de
  * entidades extraídas. Nada se persiste en pending_transactions sin paso por
  * este componente (ARCHITECTURE_VOICE_0.5.0.md §5).
  *
@@ -53,7 +53,7 @@ export default function VoiceConfirmation({
     const all = [];
     Object.entries(CROP_TAXONOMY).forEach(([groupKey, group]) => {
       group.species.forEach((sp) => {
-        // sp.name viene como "Arandano (Vaccinium corymbosum)" — separamos
+        // sp.name viene como "Arandano (Vaccinium corymbosum)", separamos
         // el nombre comun del cientifico para mejorar el match.
         const commonName = sp.name.split('(')[0].trim();
         all.push({ ...sp, commonName, group: group.label, groupKey });
@@ -296,9 +296,9 @@ export default function VoiceConfirmation({
             const trackingMode = defaults?.tracking_mode || 'individual';
             const isIndividualMulti = trackingMode === 'individual' && qty > 1;
             const previewText = isIndividualMulti
-              ? `Se crearán ${qty} activos individuales — cada planta con su propia hoja de vida, foto y cosechas separadas.`
+              ? `Se crearán ${qty} activos individuales, cada planta con su propia hoja de vida, foto y cosechas separadas.`
               : trackingMode === 'aggregate' && qty > 1
-                ? `Se creará 1 activo agregado con cantidad=${qty} (cama corrida — cosecha y eventos al conjunto).`
+                ? `Se creará 1 activo agregado con cantidad=${qty} (cama corrida, cosecha y eventos al conjunto).`
                 : `Se creará 1 activo de ${row.crop || 'esta especie'}.`;
             return (
               <div className={`mt-2 px-2 py-1.5 rounded text-2xs ${
@@ -317,7 +317,7 @@ export default function VoiceConfirmation({
               la especie matcheo contra CROP_TAXONOMY (cropSlug presente),
               igual que en el flujo manual de AssetsDashboard. Al clicar un
               compañero se agrega una nueva entrada al array de rows con
-              la misma ubicacion heredada — siembra rapida de policultivo. */}
+              la misma ubicacion heredada, siembra rapida de policultivo. */}
           {row.cropSlug && (
             <div className="mt-2 pt-3 border-t border-slate-800">
               <GuildSuggestions

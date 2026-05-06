@@ -168,7 +168,7 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
       </header>
 
       <div className="flex-1 p-5 flex flex-col gap-6 pb-24">
-        {/* Hero foto — primer paso del flujo (DR-030 QW3) */}
+        {/* Hero foto, primer paso del flujo (DR-030 QW3) */}
         <div className="flex flex-col gap-2">
           <span className="text-xl font-bold">Foto de la planta</span>
           <label className="flex flex-col items-center justify-center gap-3 p-6 rounded-xl bg-slate-900 border-2 border-dashed border-slate-600 active:bg-slate-800 cursor-pointer min-h-[140px] overflow-hidden relative">

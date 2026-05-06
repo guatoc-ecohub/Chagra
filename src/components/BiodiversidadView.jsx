@@ -1,5 +1,5 @@
 /**
- * BiodiversidadView — Vista del ecosistema y diversidad biológica de la finca.
+ * BiodiversidadView, Vista del ecosistema y diversidad biológica de la finca.
  *
  * Fondo permanente: ilustración curada "biodiversidad-bg.jpg" con fauna y
  * flora del bosque alto-andino colombiano (oso andino, quetzal, morpho,
@@ -83,7 +83,7 @@ export default function BiodiversidadView({ onBack }) {
         <section className="bg-slate-900/85 backdrop-blur-sm border border-emerald-800/30 rounded-xl p-4">
           <p className="text-sm text-slate-200 leading-snug mb-2">
             <span className="text-emerald-300 font-bold">Biodiversidad de la finca.</span>{' '}
-            Métrica clave del diseño agroforestal sintrópico — más especies en
+            Métrica clave del diseño agroforestal sintrópico, más especies en
             estratos diversos = mayor resiliencia climática, mejor regulación de
             plagas y suelo más vivo.
           </p>

@@ -11,7 +11,7 @@ import { buildDiagnosticExternalPrompt } from '../services/externalAiPromptBuild
 import { detectAndTruncateRepetition } from '../utils/repetitionGuard';
 
 /**
- * TelemetryAlerts — análisis agronómico de telemetría IoT con asistencia LLM.
+ * TelemetryAlerts, análisis agronómico de telemetría IoT con asistencia LLM.
  *
  * Flujo:
  *   1. Suscripción WebSocket a Home Assistant para sensores configurados.
@@ -377,7 +377,7 @@ export default function TelemetryAlerts() {
           tabacoTemperature: tabacoTempData.state !== 'unavailable' ? tabacoTempData.state : null,
         });
 
-        // Si TODOS los sensores están caídos, sí hacemos early return — no hay
+        // Si TODOS los sensores están caídos, sí hacemos early return, no hay
         // datos agronómicos que analizar.
         if (unavailableSensors.length === sensorReadings.length) {
           setAiAlert(offlineNotice);
@@ -393,7 +393,7 @@ export default function TelemetryAlerts() {
         tabacoTemperature: tabacoTempData.state
       });
 
-      // Histórico 24h — HA History API (no bloquea análisis)
+      // Histórico 24h, HA History API (no bloquea análisis)
       const historyStart = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
       const entityIds = [
         'sensor.matera_cocina_humidity',
@@ -443,7 +443,7 @@ export default function TelemetryAlerts() {
         ? alerts.join('\n')
         : `✅ Condiciones estables. Invernadero Zona A: ${inv1Hum}%H/${inv1Temp}°C. Matera Tabaco: ${tabHum}%H/${tabTemp}°C.`;
 
-      // Mostrar reglas INMEDIATAMENTE — sin esperar IA. Prepeende aviso de
+      // Mostrar reglas INMEDIATAMENTE, sin esperar IA. Prepeende aviso de
       // sensores offline (si hay alguno) para que quede visible incluso si la
       // IA después falla o tarda.
       if (parentSignal?.aborted) return;
@@ -599,13 +599,13 @@ export default function TelemetryAlerts() {
         </div>
       )}
 
-      {/* Telemetria IoT — estilo HUD industrial, tipografia monoespaciada,
+      {/* Telemetria IoT, estilo HUD industrial, tipografia monoespaciada,
           borde left accent morpho (cyan) para diferenciar visualmente del
           panel cyberpunk de IA (orchid). Status dot parpadea sutilmente
           como signo de conexion viva al sensor. */}
       <div className="space-y-3 mb-6">
         <IoTSensorCard
-          title="INVERNADERO — ZONA A"
+          title="INVERNADERO, ZONA A"
           deviceId="matera_cocina · zigbee"
           humidity={sensors.invernaderoHumidity}
           temperature={sensors.invernaderoTemperature}

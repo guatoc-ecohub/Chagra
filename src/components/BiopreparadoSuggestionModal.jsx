@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, Beaker, Clock, ChevronDown, ChevronRight, BookOpen } from 'lucide-react';
 
 /**
- * BiopreparadoSuggestionModal — Modal sugerencia de biopreparados para un
+ * BiopreparadoSuggestionModal, Modal sugerencia de biopreparados para un
  * ingrediente que el operador acaba de agregar al inventario.
  *
  * Trigger: post-create asset--material en AssetsDashboard.handleSave si
@@ -53,7 +53,7 @@ export default function BiopreparadoSuggestionModal({ ingredientName, bioprepara
           </button>
         </header>
 
-        {/* Body — lista colapsable de biopreparados */}
+        {/* Body, lista colapsable de biopreparados */}
         <div className="flex-1 overflow-y-auto p-3 space-y-2">
           {biopreparados.map((bp) => {
             const isOpen = expandedId === bp.id;

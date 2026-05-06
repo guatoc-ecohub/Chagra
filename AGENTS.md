@@ -90,6 +90,19 @@ Lista universal de patterns en `oss-pro/PROHIBITED_IN_PUBLIC.md`. Identificadore
 
 Cuando dudes si algo es estratégico, default privado y consulta. El leak histórico de la industria (Anthropic 2026-03-31, sourcemap) cuesta menos como precaución que como remediation.
 
+## Estilo de copy UI, sin em dashes
+
+**NO usar em dashes (`—`, U+2014) en strings UI** (JSX text content, props como `title=`, `aria-label=`, toasts, mensajes al usuario). Razón: David Loka 2026-05-06 lo identificó como fingerprint repetitivo de Claude AI ("ese hpta tiene una fijación con eso"). Reemplazar por:
+
+- `,` cuando es continuación de oración
+- `.` cuando es cierre + nueva idea
+- `:` cuando introduce un concepto
+- `(...)` cuando es nota lateral
+
+**Excepciones aceptables**: `'—'` como placeholder de empty state ("no hay valor aún"), comments JSDoc/JS internos no visibles al usuario.
+
+Auditoría: tras barrido inicial de PR #176 quedan <10 ocurrencias legítimas en JSX. Antes de mergear cualquier PR con texto UI nuevo, correr `grep -rn " — " src/**/*.jsx` y verificar que no se reintroduce el patrón.
+
 ## Merge gates obligatorios
 
 - `CodeQL / Analyze` — SAST.

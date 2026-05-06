@@ -5,10 +5,10 @@ import { pestMonitoringMessage } from '../services/lunarPestService';
 import { FARM_CONFIG } from '../config/defaults';
 
 /**
- * PestMonitoringWindow — Feature C.1 ADR-033.
+ * PestMonitoringWindow, Feature C.1 ADR-033.
  *
  * Aparece SOLO en ventana de luna nueva ± 3 días con texto informativo
- * sobre muestreo nocturno con trampa de luz (Yela & Holyoak 1997 — capturas
+ * sobre muestreo nocturno con trampa de luz (Yela & Holyoak 1997, capturas
  * 2-4× mayores). Fuera de la ventana, NO renderiza nada (return null).
  *
  * Compatible con política Opción C estricta:

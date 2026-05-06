@@ -1,5 +1,5 @@
 /**
- * InvasiveObservationLog.jsx — Flow de reporte de especies invasoras (ADR-019 Phase 1)
+ * InvasiveObservationLog.jsx, Flow de reporte de especies invasoras (ADR-019 Phase 1)
  * AGPL-3.0 © Chagra
  */
 
@@ -45,7 +45,7 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
         status: 'reported'
     });
     const [speciesList, setSpeciesList] = useState([]);
-    // 'loading' | 'ready' | 'error' — refleja el estado del fetch del catálogo.
+    // 'loading' | 'ready' | 'error', refleja el estado del fetch del catálogo.
     // Sin esto, un fallo silencioso dejaba el selector vacío sin diagnóstico
     // y el usuario quedaba bloqueado (no podía guardar).
     const [catalogStatus, setCatalogStatus] = useState('loading');
@@ -186,7 +186,7 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
                         onSelectNative={(native) => {
                             // ADR-019: solo incluir plant_type si el catálogo lo mapea
                             // explícitamente. native.id (string del catálogo, ej. 'aliso')
-                            // NO es taxonomy_term UUID de FarmOS — un fallback con ese id
+                            // NO es taxonomy_term UUID de FarmOS, un fallback con ese id
                             // crearía referencia fantasma y rompería el sync.
                             const initialData = {
                                 crop: native.nombre_comun,
@@ -241,7 +241,7 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
                             <option value="">Cargando catálogo…</option>
                         )}
                         {catalogStatus === 'error' && (
-                            <option value="">Error cargando catálogo — recarga la app</option>
+                            <option value="">Error cargando catálogo, recarga la app</option>
                         )}
                         {catalogStatus === 'ready' && speciesList.length === 0 && (
                             <option value="">No hay especies invasoras en el catálogo</option>

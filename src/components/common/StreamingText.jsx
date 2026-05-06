@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * StreamingText — renderiza texto en progresion con cursor parpadeante.
+ * StreamingText, renderiza texto en progresion con cursor parpadeante.
  *
  * Se usa para mostrar al usuario la generacion token-por-token del LLM
  * (entity extractor, vision, analisis agronomico). Cuando `active` es
@@ -9,7 +9,7 @@ import React from 'react';
  *
  * Props:
  *   - text: string que se acumula a medida que llegan chunks.
- *   - active: boolean — si false, oculta el cursor (streaming terminado).
+ *   - active: boolean, si false, oculta el cursor (streaming terminado).
  *   - variant: 'line' (default, barra neon fina) | 'block' (cursor
  *              cuadrado estilo terminal IBM / VT100 con parpadeo duro).
  *   - className / cursorClassName: customizacion de estilo.

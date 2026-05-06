@@ -10,14 +10,14 @@ import { savePayload } from '../services/payloadService';
 import { useGeolocation } from '../hooks/useGeolocation';
 
 /**
- * EvidenceCapture — Captura con diagnóstico IA y evolución histórica (Fase 20.2b).
+ * EvidenceCapture, Captura con diagnóstico IA y evolución histórica (Fase 20.2b).
  *
  * Props:
  *   - logId:          UUID del log
  *   - assetId:        UUID del activo relacionado (para historial)
  *   - assetGeometry:  WKT o GeoJSON de la ubicación del activo
  *   - onCountChange:  callback(count)
- *   - onDiagnosis:    callback(diagnosis) — para toast externo
+ *   - onDiagnosis:    callback(diagnosis), para toast externo
  *   - disabled:       boolean
  */
 export const EvidenceCapture = ({
@@ -123,7 +123,7 @@ export const EvidenceCapture = ({
 
       console.info(`[Evidence] Foto ${mediaId} guardada (${(optimized.size / 1024).toFixed(0)} KB).`);
 
-      // Diagnóstico IA async — solo si no existe diagnóstico cacheado
+      // Diagnóstico IA async, solo si no existe diagnóstico cacheado
       if (navigator.onLine && !diagnosis) {
         setDiagnosing(true);
         setLiveDiagnosis('');

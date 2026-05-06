@@ -4,11 +4,11 @@ import { version as APP_VERSION } from '../../package.json';
 import EnvironmentalCard from './EnvironmentalCard';
 
 /**
- * TopBar — header persistente con identidad del operador (DR-030 QW2).
+ * TopBar, header persistente con identidad del operador (DR-030 QW2).
  *
  * Reemplaza el header inline del DashboardView que mostraba info ambiental
  * (msnm/luna/sol) sin identidad del operador. La info ambiental NO se
- * elimina — pasa al `<EnvironmentalCard collapsed />` debajo del top-bar
+ * elimina, pasa al `<EnvironmentalCard collapsed />` debajo del top-bar
  * (progressive disclosure: agrónomo experto puede expandir, novato no se
  * satura).
  *
@@ -73,7 +73,7 @@ export default function TopBar({ onNavigate, onLogout }) {
       >
         {/* Logo clickable → Home (DR-030 + Lili #16: botón claro a inicio).
             Patrón estándar PWA: el logo siempre vuelve al dashboard. Lili
-            reportó "navegación rocosa, falta botón claro a inicio" — el
+            reportó "navegación rocosa, falta botón claro a inicio", el
             logo discreto sin affordance hacía que no se descubriera. Ahora
             es <button> con cursor + hover + icono Home explícito. */}
         <button
@@ -128,7 +128,7 @@ export default function TopBar({ onNavigate, onLogout }) {
         >
           <HelpCircle size={22} aria-hidden="true" strokeWidth={2.5} />
         </button>
-        {/* Botón Settings (icono ⚙) eliminado — Lili #115: era duplicado del
+        {/* Botón Settings (icono ⚙) eliminado, Lili #115: era duplicado del
             botón operator name de arriba (ambos onNavigate('perfil')). El
             operator name button es más explícito + el NAV_TILE Perfil del
             dashboard sigue accesible. */}
@@ -144,7 +144,7 @@ export default function TopBar({ onNavigate, onLogout }) {
         </button>
       </header>
 
-      {/* Toggle de info ambiental (msnm/luna/sol) — colapsado por default */}
+      {/* Toggle de info ambiental (msnm/luna/sol), colapsado por default */}
       <button
         type="button"
         onClick={() => setEnvOpen((v) => !v)}
