@@ -1,0 +1,153 @@
+{
+  "species_slug": "lechuga",
+  "scientific_name": "Lactuca sativa L.",
+  "common_names": ["lechuga", "Batavia", "crespa", "romana", "mantequilla"],
+  "family": "Asteraceae",
+  "agrovoc_concept": "c_4347",
+  "difficulty": "starter",
+  "tiempo_a_cosecha_dias": { "min": 60, "tipico": 70, "max": 90 },
+  "diferenciador_colombiano": "La Sabana de Bogotá (2500-2700 msnm) es uno de los pocos lugares del mundo donde se produce lechuga durante todo el año sin invernadero, gracias a la estabilidad térmica andina ecuatorial. Permite Batavia, crespa y romana sin vernalización forzada.",
+  "leccion_agroecologica": "Es el cultivo escuela por excelencia. Ciclo corto (60-90 días) permite al operador novato observar germinación, trasplante, desarrollo, plagas, y cosecha en una temporada. Enseña gestión milimétrica de humedad edáfica y velocidad de ciclo.",
+  "thermal_zone_decisions": {
+    "calido": "Marginal. Si se cultiva, usar variedades crespa termorresistentes (Lemos Neto et al. 2018: Red Salad Bowl, Crespa Lollo Bionda). Sombreado al 30%, riego por goteo dos veces al día. Riesgo: espigado prematuro por temperaturas >25°C.",
+    "templado": "Rango operativo amplio. Permite Batavia, crespa y romana. Cundinamarca medio (Sibaté, La Calera), Antioquia oriental, Boyacá medio. Ciclo total 60-80 días.",
+    "frio": "Óptimo absoluto. Sabana de Bogotá, altiplano cundiboyacense, Nariño alto. Ciclo más largo (75-90 días) pero plantas más densas, mejor sabor.",
+    "paramo": "Posible solo en variedades crespa muy rústicas con cobertura plástica/macrotúnel. Ciclo se alarga a 90-120 días. Marginal económicamente."
+  },
+  "preparacion_tierra": {
+    "matera": {
+      "volumen_min_litros": 5,
+      "volumen_ideal_litros": 8,
+      "profundidad_cm": 15,
+      "mezcla": "40% tierra negra + 30% compost maduro + 20% cascarilla de arroz quemada o fibra de coco + 10% humus de lombriz",
+      "drenaje": "Capa de gravilla 2 cm en fondo + perforaciones múltiples",
+      "reposicion_ciclos": 2
+    },
+    "campo": {
+      "descompactacion": "Bieldo a 25 cm, sin inversión del prisma del suelo",
+      "incorporacion": "2-3 kg/m² compost o bocashi maduro",
+      "encalado": "1-2 kg cal dolomita/m² si pH < 5.8",
+      "barbecho_dias": 30,
+      "abono_verde": "Vicia, alverja forrajera"
+    }
+  },
+  "milestones": [
+    {
+      "fase": "pre_siembra",
+      "dias_relativos": "-15 a -3",
+      "criterio_observable": "Sustrato semillero hidratado a capacidad de campo",
+      "accion_clave": "Mezcla cascarilla de arroz + tierra. Hidratación 6-12h de semillas en agua a temperatura ambiente"
+    },
+    {
+      "fase": "germinacion",
+      "dias_relativos": "0 a 7",
+      "criterio_observable": "Emergencia uniforme de cotiledones bilobulados verdes pálidos",
+      "accion_clave": "Mantenimiento humedad superficial fina (nebulización), evitar impacto cinético de gotas grandes. Temperatura óptima 18-20°C"
+    },
+    {
+      "fase": "trasplante",
+      "dias_relativos": "25 a 35",
+      "criterio_observable": "5-6 hojas verdaderas y altura 8 cm desde cuello hasta ápice",
+      "accion_clave": "Trasplante al atardecer. Hidratar bandeja 2h antes. Hueco profundidad equivalente al cepellón sin enterrar el cuello. Riego inmediato + sombreado parcial 48h"
+    },
+    {
+      "fase": "desarrollo_vegetativo",
+      "dias_relativos": "35 a 60",
+      "criterio_observable": "Tasa de expansión foliar máxima, formación de roseta. Acogollado en Batavia/romana",
+      "accion_clave": "Aplicación de biofertilizantes foliares quincenal (biol al 5%). Monitoreo intensivo del turgor foliar. Mulch para estabilizar humedad"
+    },
+    {
+      "fase": "cosecha",
+      "dias_relativos": "60 a 90",
+      "criterio_observable": "Diámetro comercial alcanzado, pre-elongación del tallo (antes del espigado)",
+      "accion_clave": "Corte basal limpio con cuchillo, temprano en la mañana. Empacado inmediato en contenedores rígidos para evitar magulladuras"
+    }
+  ],
+  "failure_modes": [
+    {
+      "razon": "Espigado prematuro (bolting)",
+      "cuando": "Vegetativo tardío",
+      "sintoma": "Elongación abrupta del tallo, roseta se pierde, sabor amargo (lactucopicrina)",
+      "agente_causal": "Estrés térmico (>25°C) o hídrico/nitrogenado",
+      "mitigacion": "Variedades tolerantes (Batavia Salinas, romana Parris Island), siembra en época fresca, mulch para estabilizar humedad",
+      "frecuencia": "muy_comun"
+    },
+    {
+      "razon": "Tip burn (necrosis marginal)",
+      "cuando": "Desarrollo vegetativo",
+      "sintoma": "Necrosis marginal de hojas jóvenes, aspecto de quemadura",
+      "agente_causal": "Deficiencia localizada de Ca por exceso de N o riegos desbalanceados",
+      "mitigacion": "Estabilización de pulsos de riego, aspersión foliar de calcio orgánico quelatado, mulch",
+      "frecuencia": "comun"
+    },
+    {
+      "razon": "Damping-off (estrangulamiento basal)",
+      "cuando": "Germinación / semillero",
+      "sintoma": "Necrosis del cuello, colapso repentino de la plántula",
+      "agente_causal": "Pythium / Rhizoctonia por exceso de humedad y sustrato no desinfectado",
+      "mitigacion": "Solarización del sustrato, Trichoderma harzianum nativo, riego matutino, reducir lámina de riego",
+      "frecuencia": "comun"
+    },
+    {
+      "razon": "Babosas y caracoles",
+      "cuando": "Trasplante a cosecha",
+      "sintoma": "Agujeros irregulares en hojas, baba plateada en el envés o suelo",
+      "agente_causal": "Moluscos gasterópodos nocturnos",
+      "mitigacion": "Trampas de cerveza, ceniza perimetral, conservación de carábidos depredadores, recolección manual nocturna",
+      "frecuencia": "comun"
+    },
+    {
+      "razon": "Mildiu velloso",
+      "cuando": "Desarrollo vegetativo",
+      "sintoma": "Manchas amarillas en haz con micelio blanco-violáceo en envés",
+      "agente_causal": "Bremia lactucae, alta humedad relativa y rocío persistente",
+      "mitigacion": "Variedades resistentes (Bl:29-41EU Enza Zaden), distancia adecuada entre plantas, caldo bordelés preventivo 0.5%",
+      "frecuencia": "ocasional"
+    }
+  ],
+  "companions": [
+    { "especie": "Allium cepa (cebolla)", "razon": "Compuestos azufrados disuaden herbívoros foliares; complementariedad radicular (cebolla profunda, lechuga superficial)", "evidencia": "tradicion + literatura agronomica" },
+    { "especie": "Daucus carota (zanahoria)", "razon": "Complementariedad radicular (zanahoria pivotante)", "evidencia": "manuales agroecologicos andinos" },
+    { "especie": "Raphanus sativus (rábano)", "razon": "Cultivo de ciclo ultracorto (21 días) que se cosecha antes del acogollado de la lechuga", "evidencia": "tradicion" },
+    { "especie": "Spinacia oleracea (espinaca)", "razon": "Comparte ventana fenológica fría", "evidencia": "tradicion" },
+    { "especie": "Brassica oleracea (coles)", "razon": "Sinergia documentada en literatura agronómica internacional", "evidencia": "literatura internacional" }
+  ],
+  "antagonistas": [
+    { "especie": "Foeniculum vulgare (hinojo)", "razon": "Aleloquímicos agresivos inhiben germinación y expansión celular de la lechuga" },
+    { "especie": "Apium graveolens (apio)", "razon": "Competencia hídrica + atracción de plagas comunes (umbelíferas)" },
+    { "especie": "Helianthus annuus (girasol)", "razon": "Alelopatía (juglona-like)" }
+  ],
+  "biopreparados": [
+    { "nombre": "Bocashi", "uso": "Pre-siembra: 1.5-2 kg/m² incorporado 10-12 días antes del trasplante", "fuente": "Boudet et al. 2017; Tolentino et al. 2023 (extrapolación desde tomate)" },
+    { "nombre": "Biol / lombrifertilizante líquido", "uso": "Aspersión foliar al 5% cada 10 días desde día 10 post-trasplante", "fuente": "Castellanos, Rincón y Argüello 2015 — biofertilizante en lechuga Sabana de Bogotá" },
+    { "nombre": "Caldo sulfocálcico", "uso": "Preventivo en mildiu, dilución 1:80 (0.5L en bomba 20L) cada 15 días en época húmeda", "fuente": "extrapolación desde Cabrera Marulanda et al. 2018" },
+    { "nombre": "Té de compost", "uso": "Dilución 1:5 quincenal foliar", "fuente": "manuales agroecologicos colombianos" },
+    { "nombre": "Trichoderma harzianum", "uso": "Inoculación del sustrato semillero pre-trasplante para prevenir damping-off", "fuente": "Agrosavia + literatura colombiana" }
+  ],
+  "cosecha_estimada_kg_por_planta": {
+    "agroecologico_promedio": { "min": 0.3, "tipico": 0.45, "max": 0.6 },
+    "por_variedad": {
+      "batavia": { "tipico": 0.5 },
+      "crespa": { "tipico": 0.32 },
+      "romana": { "tipico": 0.45 }
+    },
+    "anti_overpromise": "Literatura comercial reporta 800-1000 g, valores que requieren riego tecnificado, sustrato recambiado y nutrición sintética. Chagra opera en modo agroecológico — rangos conservadores."
+  },
+  "reproduccion": {
+    "tipo_principal": "sexual",
+    "metodo": "Semilla botánica. Termodormancia se rompe con almacenamiento seco a 4-10°C por 30 días. Viabilidad bien guardada (cámara fría, 10% humedad): 3-5 años.",
+    "esqueje": "No aplica operacionalmente",
+    "injerto": "No aplica",
+    "guardar_semilla_propia": "Posible para variedades abiertas. NO aconsejable en híbridos comerciales (segregación F2)"
+  },
+  "fuentes_principales": [
+    { "tipo": "institucional", "referencia": "Agrosavia — Modelo productivo lechuga Sabana de Bogotá" },
+    { "tipo": "peer_reviewed", "referencia": "Lemos Neto et al. 2018, Revista Colombiana de Ciencias Hortícolas 12(3) — termorresistencia variedades crespa" },
+    { "tipo": "peer_reviewed", "referencia": "Castellanos, Rincón y Argüello 2015 — biofertilizante en lechuga Sabana de Bogotá" },
+    { "tipo": "taxonomica", "referencia": "Bernal, Gradstein y Celis 2016. Catálogo de Plantas y Líquenes de Colombia. UNAL. ISBN 978-958-775-727-9" },
+    { "tipo": "centro_demostrativo", "referencia": "Centro Agroecológico Ceagro San Pablo (Madrid, Cundinamarca) — 6.83 kg/m² variedad Arizona bajo riego por goteo + cobertura + fertilización organomineral" }
+  ],
+  "convergencia_dr_034": "3/3 LLMs (Claude web + Gemini DR + DeepSeek V3) convergen en lechuga como starter species cultivo escuela. Datos consolidados sin Mistral tiebreak por convergencia alta.",
+  "curacion_status": "draft_3_llm_consolidated",
+  "curacion_pendiente": ["Validacion agronomo Guatoc / extension rural Cundinamarca para datos cuantitativos kg/planta agroecologica colombiana sin biocidas (gap G-A DR-034)"]
+}

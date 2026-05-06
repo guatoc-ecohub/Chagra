@@ -1,5 +1,17 @@
 import React, { useState } from 'react';
 import { ArrowLeft, ChevronDown, ChevronRight, BookOpen, Sprout, Mic, Camera, MapPin, Bug, Apple, MessageCircle, AlertTriangle, Wrench, Sparkles, GraduationCap, Clock } from 'lucide-react';
+import CycleContentRenderer from './CycleContentRenderer.jsx';
+
+const STARTER_CYCLES = [
+  { slug: 'lechuga', emoji: '🥬', label: 'Lechuga', sub: 'Starter · 60-90 días · frío/templado' },
+  { slug: 'fresa', emoji: '🍓', label: 'Fresa', sub: 'Starter Premium · 90-180 días · frío' },
+  { slug: 'tomate_chonto', emoji: '🍅', label: 'Tomate Chonto', sub: 'Intermediate · 90-130 días · templado' },
+];
+
+const PLACEHOLDER_CYCLES = [
+  { emoji: '☕', label: 'Café arábica', sub: 'Advanced · 3 años · curación humana presencial pendiente', tone: 'orange' },
+  { emoji: '🥑', label: 'Aguacate Hass', sub: 'Advanced · 3-5 años · injerto + selección patrón pendiente', tone: 'orange' },
+];
 
 /**
  * HelpManual — Manual de usuario integrado en la PWA.
@@ -38,6 +50,7 @@ const Section = ({ icon: Icon, title, children, defaultOpen = false }) => {
 };
 
 export default function HelpManual({ onBack }) {
+  const [openCycle, setOpenCycle] = useState(null);
   return (
     <div className="h-[100dvh] w-full bg-slate-950 text-white flex flex-col overflow-y-auto">
       {/* Header */}
@@ -241,53 +254,61 @@ export default function HelpManual({ onBack }) {
           </ul>
         </Section>
 
-        {/* Sección Aprende sembrando — scaffold queue/039.
-            Contenido real viene del DR-034 (5 especies × ciclo completo) +
-            curación agrónomo Guatoc/Agrosavia. Por ahora cards placeholder
-            que comunican intención + plan. Cuando DR-034 cierre, se reemplazan
-            placeholders con corpus curado en /public/cycle-content/<slug>.json
-            lazy-loaded. */}
-        <Section icon={GraduationCap} title="🌿 Aprende sembrando — ciclo de 5 especies (próximamente)">
+        {/* Sección Aprende sembrando — corpus curado desde /public/cycle-content/.
+            Datos consolidados DR-034 cerrado 2026-05-06 (3/3 LLMs convergencia
+            alta) + ADR-032 plan curación starter species. Política ADR-033
+            Opción C estricta — solo Nivel 2 evidencia, NO folclore. */}
+        <Section icon={GraduationCap} title="🌿 Aprende sembrando — ciclo agroecológico" defaultOpen={false}>
           <p className="text-sm leading-relaxed">
-            <strong className="text-emerald-300">Esta sección está en construcción.</strong> Va a ser el punto de partida educativo para quien empieza desde cero — no solo cómo usar Chagra, sino cómo cultivar.
+            <strong className="text-emerald-300">Punto de partida educativo</strong> para quien empieza desde cero — no solo cómo usar Chagra, sino cómo cultivar.
           </p>
 
           <p className="text-xs text-slate-400 leading-relaxed mt-2">
-            Cubrirá el <strong>ciclo completo</strong> de 5 especies prioritarias para Colombia, desde preparación de tierra hasta propagación del próximo ciclo:
+            Toque una especie para ver el ciclo completo: preparación de tierra, hitos día a día, razones comunes de fracaso, compañeros validados, biopreparados y rangos conservadores de cosecha.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
-            <div className="p-3 rounded-lg bg-slate-900 border border-slate-800">
-              <p className="font-bold text-emerald-300 text-sm">🥬 Lechuga</p>
-              <p className="text-[11px] text-slate-500 mt-0.5">Starter · 60-90 días · frío/templado</p>
-            </div>
-            <div className="p-3 rounded-lg bg-slate-900 border border-slate-800">
-              <p className="font-bold text-emerald-300 text-sm">🍓 Fresa</p>
-              <p className="text-[11px] text-slate-500 mt-0.5">Starter · 90-180 días · frío/templado</p>
-            </div>
-            <div className="p-3 rounded-lg bg-slate-900 border border-slate-800">
-              <p className="font-bold text-amber-300 text-sm">🍅 Tomate Chonto</p>
-              <p className="text-[11px] text-slate-500 mt-0.5">Intermediate · 90-120 días · cálido/templado</p>
-            </div>
-            <div className="p-3 rounded-lg bg-slate-900 border border-slate-800">
-              <p className="font-bold text-orange-300 text-sm">☕ Café arábica</p>
-              <p className="text-[11px] text-slate-500 mt-0.5">Advanced · 3 años · templado/frío 1200-1900 msnm</p>
-            </div>
-            <div className="p-3 rounded-lg bg-slate-900 border border-slate-800 sm:col-span-2">
-              <p className="font-bold text-orange-300 text-sm">🥑 Aguacate Hass</p>
-              <p className="text-[11px] text-slate-500 mt-0.5">Advanced · 3-5 años · templado 1500-2500 msnm · injerto</p>
-            </div>
+          <h4 className="text-xs uppercase tracking-wider text-emerald-400 font-bold mt-4 mb-2">Disponibles ahora</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {STARTER_CYCLES.map((c) => (
+              <button
+                key={c.slug}
+                type="button"
+                onClick={() => setOpenCycle(c.slug)}
+                className="p-3 rounded-lg bg-slate-900 border border-emerald-800/50 hover:bg-slate-800 active:bg-slate-700 text-left min-h-[64px]"
+              >
+                <p className="font-bold text-emerald-300 text-sm">{c.emoji} {c.label}</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">{c.sub}</p>
+                <p className="text-[10px] text-emerald-500 mt-1">Ver ciclo →</p>
+              </button>
+            ))}
           </div>
 
+          <h4 className="text-xs uppercase tracking-wider text-orange-400 font-bold mt-4 mb-2">Pendientes — curación humana presencial</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {PLACEHOLDER_CYCLES.map((c) => (
+              <div key={c.label} className="p-3 rounded-lg bg-slate-900 border border-slate-800 opacity-70">
+                <p className="font-bold text-orange-300 text-sm">{c.emoji} {c.label}</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">{c.sub}</p>
+              </div>
+            ))}
+          </div>
+
+          {openCycle && (
+            <div className="mt-4 p-3 rounded-xl bg-slate-950/80 border border-emerald-800/50">
+              <CycleContentRenderer slug={openCycle} onClose={() => setOpenCycle(null)} />
+            </div>
+          )}
+
           <div className="mt-4 p-3 rounded-xl bg-emerald-900/15 border border-emerald-800/40">
-            <p className="text-xs uppercase tracking-wider text-emerald-400 font-bold mb-2">Cada ciclo cubrirá</p>
+            <p className="text-xs uppercase tracking-wider text-emerald-400 font-bold mb-2">Cada ciclo cubre</p>
             <ul className="text-xs text-slate-300 space-y-1 list-disc pl-5">
               <li><strong>Preparación de tierra</strong> — matera (mezcla recomendada) vs campo abierto (descompactación + biopreparados)</li>
-              <li><strong>Germinación</strong> — semilla, esqueje, acodo, división, injerto (según especie)</li>
-              <li><strong>Trasplante</strong> — cuándo, técnica, sombreado post</li>
-              <li><strong>Desarrollo + cosecha</strong> — hitos observables día por día</li>
-              <li><strong>Propagación</strong> — qué guardar para el próximo ciclo</li>
-              <li><strong>Razones comunes de fracaso</strong> — top 5 por especie con prevención agroecológica</li>
+              <li><strong>Germinación + propagación</strong> — semilla, esqueje, acodo, división, injerto (según especie)</li>
+              <li><strong>Hitos del ciclo</strong> — día por día, criterio observable + acción clave</li>
+              <li><strong>Razones comunes de fracaso</strong> — top 5 con prevención agroecológica + frecuencia esperada</li>
+              <li><strong>Compañeros validados</strong> y antagonistas — qué NO sembrar cerca</li>
+              <li><strong>Biopreparados</strong> — bocashi, biol, caldo sulfocálcico, M-5, Trichoderma</li>
+              <li><strong>Rangos conservadores</strong> de cosecha — anti-overpromise vs literatura comercial</li>
             </ul>
           </div>
 
@@ -299,7 +320,7 @@ export default function HelpManual({ onBack }) {
           </div>
 
           <p className="text-[10px] text-slate-600 italic mt-3">
-            Curación de contenido pendiente — DR-034 + revisión de agrónomo Guatoc/Agrosavia. Aviso por novedades cuando esté disponible.
+            Corpus consolidado DR-034 (Claude web + Gemini DR + DeepSeek V3 — convergencia 3/3) + plan curación humana presencial 4h por especie advanced (Aguacate → Café → Tomate). Datos calibrados anti-overpromise — rangos agroecológicos colombianos, NO hidroponía.
           </p>
         </Section>
 
