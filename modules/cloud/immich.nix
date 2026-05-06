@@ -66,7 +66,13 @@ in
 
     virtualisation.oci-containers.containers.immich-postgres = {
       image = "docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0";
-      volumes = [ "/mnt/fast/apps/immich-db:/var/lib/postgresql/data" ];
+      volumes = [
+        "/mnt/fast/apps/immich-db:/var/lib/postgresql/data"
+        # Bind mount el secret SOPS-decrypted del host al path que usa
+        # POSTGRES_PASSWORD_FILE. Sin esto, el container no ve los
+        # secrets del host y postgres falla con "No such file or directory".
+        "/run/secrets/immich-postgres-password:/run/secrets/immich-postgres-password:ro"
+      ];
       environment = {
         POSTGRES_PASSWORD_FILE = "/run/secrets/immich-postgres-password";
         POSTGRES_USER = "immich";
@@ -97,7 +103,10 @@ in
     virtualisation.oci-containers.containers.immich-server = {
       image = "ghcr.io/immich-app/immich-server:release";
       ports = [ "127.0.0.1:${toString registry.ports.immich}:3001" ];
-      volumes = [ "/mnt/data/immich:/usr/src/app/upload" ];
+      volumes = [
+        "/mnt/data/immich:/usr/src/app/upload"
+        "/run/secrets/immich-postgres-password:/run/secrets/immich-postgres-password:ro"
+      ];
       environment = {
         DB_HOSTNAME = "immich-postgres";
         DB_USERNAME = "immich";
@@ -122,6 +131,9 @@ in
     virtualisation.oci-containers.containers.immich-ml = {
       image = "ghcr.io/immich-app/immich-machine-learning:release";
       ports = [ "127.0.0.1:${toString registry.ports.immichML}:3003" ];
+      volumes = [
+        "/run/secrets/immich-postgres-password:/run/secrets/immich-postgres-password:ro"
+      ];
       environment = {
         DB_HOSTNAME = "immich-postgres";
         DB_USERNAME = "immich";
