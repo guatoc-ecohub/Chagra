@@ -82,6 +82,18 @@ if ('serviceWorker' in navigator) {
     if (event.data?.type === 'SYNC_REQUESTED') {
       syncManager.syncAll();
     }
+    // SW_UPDATED: el SW activó una versión nueva (post-deploy con chunks
+    // hash distintos). Recargamos UNA VEZ para que el cliente pida los
+    // chunks nuevos. Sin este reload el browser puede quedarse con HTML
+    // cached referenciando chunks viejos que ya no existen, causando
+    // white screen (incidente 2026-05-06, ver public/sw.js).
+    if (event.data?.type === 'SW_UPDATED') {
+      const reloadKey = '__sw_reload_done_' + event.data.version;
+      if (!sessionStorage.getItem(reloadKey)) {
+        sessionStorage.setItem(reloadKey, '1');
+        window.location.reload();
+      }
+    }
   });
 }
 

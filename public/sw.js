@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chagra-v88';
+const CACHE_NAME = 'chagra-v89';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -19,76 +19,85 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activación del Service Worker
+// Activación: borra caches viejos + toma control inmediato + notifica clients
+// para que recarguen (evita white screen post-deploy con chunks hash viejos).
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
-      .then(cacheNames => {
-        return Promise.all(
-          cacheNames.map(cacheName => {
-            if (cacheName !== CACHE_NAME) {
-              return caches.delete(cacheName);
-            }
-          })
-        );
-      })
+      .then(cacheNames => Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+          return undefined;
+        })
+      ))
       .then(() => self.clients.claim())
+      .then(() => self.clients.matchAll({ type: 'window' }))
+      .then(clients => {
+        // Notifica a clients que hay un SW nuevo activo. El cliente decide
+        // si recarga (típicamente sí, para asegurar bundle/chunks frescos).
+        clients.forEach(client => {
+          client.postMessage({ type: 'SW_UPDATED', version: CACHE_NAME });
+        });
+      })
   );
 });
 
-// Estrategia de caché: Network First para API, Cache First para estáticos
+// Estrategia de caché:
+//   - /assets/* (chunks Vite con hash en filename): PASSTHROUGH puro. Vite
+//     genera nombres immutables (index-XXXXX.js); el browser HTTP cache los
+//     maneja eficientemente. NUNCA interceptar en SW: si el deploy cambió
+//     los hashes y el SW tiene refs viejos, intentar cargar un chunk que
+//     ya no existe causa fallback a index.html (MIME text/html) → white
+//     screen. Es el bug que provocó el incidente 2026-05-06.
+//   - Static shell (HTML/manifest/icons): Stale-While-Revalidate
+//   - Otros GET: Network-First con fallback cache
+//   - POST/PUT/DELETE: pasthrough sin caché
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Para recursos estáticos: Cache First
+  // PASSTHROUGH para chunks hasheados de Vite. NO interceptar.
+  if (url.pathname.startsWith('/assets/')) {
+    return; // browser maneja directamente
+  }
+
+  // Static shell: Stale-While-Revalidate (sirve cache rápido, refresca async)
   if (ASSETS_TO_CACHE.some(path => url.pathname === path)) {
     event.respondWith(
-      caches.match(event.request)
-        .then(cachedResponse => {
-          if (cachedResponse) {
-            return cachedResponse;
+      caches.match(event.request).then(cachedResponse => {
+        const networkFetch = fetch(event.request).then(response => {
+          if (event.request.method === 'GET' && response.ok) {
+            const respClone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, respClone));
           }
-          return fetch(event.request).then(response => {
-            // Solo cachear respuestas GET exitosas
-            if (event.request.method === 'GET' && response.ok) {
-              return caches.open(CACHE_NAME).then(cache => {
-                cache.put(event.request, response.clone());
-                return response;
-              });
-            }
-            return response;
-          });
-        })
+          return response;
+        }).catch(() => cachedResponse);
+        return cachedResponse || networkFetch;
+      })
     );
     return;
   }
 
-  // Para API: Network First con fallback (solo cachear GET)
+  // GET (API u otros): Network-First con fallback cache
   if (event.request.method === 'GET') {
     event.respondWith(
       fetch(event.request)
         .then(response => {
           if (response.ok) {
-            return caches.open(CACHE_NAME).then(cache => {
-              cache.put(event.request, response.clone());
-              return response;
-            });
+            const respClone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, respClone));
           }
           return response;
         })
-        .catch(() => {
-          return caches.match(event.request);
-        })
+        .catch(() => caches.match(event.request))
     );
     return;
   }
 
-  // Para otros métodos (POST, PUT, DELETE): Network First sin caché
+  // POST/PUT/DELETE: passthrough sin caché
   event.respondWith(
-    fetch(event.request)
-      .catch(() => {
-        return caches.match(event.request);
-      })
+    fetch(event.request).catch(() => caches.match(event.request))
   );
 });
 
