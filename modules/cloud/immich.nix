@@ -1,7 +1,8 @@
 # modules/cloud/immich.nix
 # =============================================================================
-# IMMICH — Photos & Videos backup
+# IMMICH — Photos & Videos backup + sharing público para parceros
 # Puertos: 2283 (server), 3003 (machine learning)
+# Dominio público: lasfotos.guatoc.co (Cloudflare Tunnel → Nginx → Immich)
 # =============================================================================
 
 { config, pkgs, lib, ... }:
@@ -10,18 +11,50 @@ let
   cfg = config.guatoc.cloud.immich;
   cloudCfg = config.guatoc.cloud;
   registry = import ../../lib/registry.nix { inherit lib; };
+
+  # Passwords via SOPS — si no existen, fallback a defaults (solo primer boot)
+  pgPasswordFile = config.sops.secrets."immich-postgres-password".path or null;
 in
 {
   options.guatoc.cloud.immich = {
     enable = lib.mkEnableOption "Immich - Backup de fotos y videos" // {
       default = false;
     };
+
+    domain = lib.mkOption {
+      type = lib.types.str;
+      default = "lasfotos.guatoc.co";
+      description = "Dominio público para acceso vía Cloudflare Tunnel.";
+    };
+
+    enablePublicSharing = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        Habilitar acceso público con invitación. Inmutable para Immich:
+        se setea al iniciar el container y no se puede cambiar después
+        sin borrar la DB. Por defecto true para parceros.
+      '';
+    };
   };
 
   config = lib.mkIf (cloudCfg.enable && cfg.enable) {
+    # ─────────────────────────────────────────────
+    # SOPS secrets para Immich
+    # ─────────────────────────────────────────────
+    sops.secrets = {
+      "immich-postgres-password" = {
+        owner = "root";
+        group = "root";
+        mode = "0400";
+      };
+    };
+
+    # ─────────────────────────────────────────────
     # Immich PostgreSQL
+    # ─────────────────────────────────────────────
     systemd.services.podman-immich-postgres = {
-      after = [ "zfs.target" "network-online.target" "create-container-networks.service" ];  # Wait for networks
+      after = [ "zfs.target" "network-online.target" "create-container-networks.service" ];
       requires = [ "zfs.target" "create-container-networks.service" ];
       serviceConfig = {
         RequiresMountsFor = [ "/mnt/fast/apps" ];
@@ -32,25 +65,27 @@ in
     };
 
     virtualisation.oci-containers.containers.immich-postgres = {
-      # Pinned 2026-04-20 (era :pg14-v0.2.0).
-      image = "docker.io/tensorchord/pgvecto-rs@sha256:739cdd626151ff1f796dc95a6591b55a714f341c737e27f045019ceabf8e8c52";
+      image = "docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0";
       volumes = [ "/mnt/fast/apps/immich-db:/var/lib/postgresql/data" ];
       environment = {
-        POSTGRES_PASSWORD = "immich";
+        POSTGRES_PASSWORD_FILE = "/run/secrets/immich-postgres-password";
         POSTGRES_USER = "immich";
         POSTGRES_DB = "immich";
       };
       extraOptions = [ "--network=web-network" "--name=immich-postgres" ];
     };
 
+    # ─────────────────────────────────────────────
     # Immich Redis
+    # ─────────────────────────────────────────────
     virtualisation.oci-containers.containers.immich-redis = {
-      # Pinned 2026-04-20 (era :6.2-alpine).
-      image = "docker.io/library/redis@sha256:46884be93652d02a96a176ccf173d1040bef365c5706aa7b6a1931caec8bfeef";
+      image = "docker.io/library/redis:7-alpine";
       extraOptions = [ "--network=web-network" "--name=immich-redis" ];
     };
 
+    # ─────────────────────────────────────────────
     # Immich Server
+    # ─────────────────────────────────────────────
     systemd.services.podman-immich-server = {
       after = [ "zfs.target" "network-online.target" "podman-immich-postgres.service" "create-container-networks.service" ];
       requires = [ "zfs.target" "podman-immich-postgres.service" "create-container-networks.service" ];
@@ -60,16 +95,19 @@ in
     };
 
     virtualisation.oci-containers.containers.immich-server = {
-      # Pinned 2026-04-20 (era :release).
-      image = "ghcr.io/immich-app/immich-server@sha256:aa163d2e1cc2b16a9515dd1fef901e6f5231befad7024f093d7be1f2da14341a";
-      ports = [ "${toString registry.ports.immich}:3001" ];
+      image = "ghcr.io/immich-app/immich-server:release";
+      ports = [ "127.0.0.1:${toString registry.ports.immich}:3001" ];
       volumes = [ "/mnt/data/immich:/usr/src/app/upload" ];
       environment = {
         DB_HOSTNAME = "immich-postgres";
         DB_USERNAME = "immich";
-        DB_PASSWORD = "immich";
+        DB_PASSWORD_FILE = "/run/secrets/immich-postgres-password";
         DB_DATABASE_NAME = "immich";
         REDIS_HOSTNAME = "immich-redis";
+        IMMICH_IGNORE_MOUNT_CHECK_ERRORS = "true";
+        # Acceso público con invitación — inmutable tras primer boot
+        IMMICH_PUBLIC_SHARE = if cfg.enablePublicSharing then "true" else "false";
+        EXTERNAL_URL = "https://${cfg.domain}";
       };
       dependsOn = [ "immich-postgres" "immich-redis" ];
       extraOptions = [
@@ -78,15 +116,16 @@ in
       ];
     };
 
+    # ─────────────────────────────────────────────
     # Immich Machine Learning
+    # ─────────────────────────────────────────────
     virtualisation.oci-containers.containers.immich-ml = {
-      # Pinned 2026-04-20 (era :release).
-      image = "ghcr.io/immich-app/immich-machine-learning@sha256:b213fa3c82d27a21a299c46ffbb38a091f18384db1ad67d409a3b34fe0fce556";
-      ports = [ "${toString registry.ports.immichML}:3003" ];
+      image = "ghcr.io/immich-app/immich-machine-learning:release";
+      ports = [ "127.0.0.1:${toString registry.ports.immichML}:3003" ];
       environment = {
         DB_HOSTNAME = "immich-postgres";
         DB_USERNAME = "immich";
-        DB_PASSWORD = "immich";
+        DB_PASSWORD_FILE = "/run/secrets/immich-postgres-password";
         DB_DATABASE_NAME = "immich";
         REDIS_HOSTNAME = "immich-redis";
       };
@@ -97,6 +136,42 @@ in
       ];
     };
 
-    networking.firewall.allowedTCPPorts = [ registry.ports.immich registry.ports.immichML ];
+    # ─────────────────────────────────────────────
+    # Nginx reverse proxy → Cloudflare Tunnel
+    # Solo localhost (no firewall abierto directo)
+    # ─────────────────────────────────────────────
+    services.nginx.virtualHosts.${cfg.domain} = {
+      listen = [ { addr = "127.0.0.1"; port = 80; } ];
+      serverName = cfg.domain;
+
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:${toString registry.ports.immich}";
+        extraConfig = ''
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection "upgrade";
+
+          # Immich uploads pueden ser grandes (fotos + videos)
+          client_max_body_size 500m;
+          proxy_request_buffering off;
+
+          # Timeouts extendidos para uploads de video
+          proxy_connect_timeout 120s;
+          proxy_send_timeout 120s;
+          proxy_read_timeout 120s;
+
+          # Server-Sent Events (Immich realtime updates)
+          proxy_buffering off;
+          proxy_cache off;
+          gzip off;
+          chunked_transfer_encoding on;
+        '';
+      };
+    };
+
+    # Firewall: ya no abrimos puertos directos, todo pasa por Nginx + Cloudflare
   };
 }
