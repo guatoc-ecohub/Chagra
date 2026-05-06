@@ -1,0 +1,163 @@
+{
+  "species_slug": "tomate_chonto",
+  "scientific_name": "Solanum lycopersicum L. cv. chonto",
+  "synonyms_obsoletas": ["Lycopersicon esculentum Mill."],
+  "common_names": ["tomate chonto", "tomate larga vida tipo chonto"],
+  "family": "Solanaceae",
+  "agrovoc_concept": "c_7787",
+  "difficulty": "intermediate",
+  "tiempo_a_cosecha_dias": { "min": 85, "tipico": 100, "max": 130 },
+  "diferenciador_colombiano": "El tipo varietal CHONTO es identidad culinaria colombiana — fruto ovalado-redondeado 80-180 g, dual mesa-procesado, base ineludible del HOGAO. UNAL Palmira (Vallejo, Estrada, Burbano) ha desarrollado líneas con gen sp (crecimiento determinado) que reducen 47% la mano de obra en tutorado vs hábito indeterminado tradicional. Migración masiva de campo abierto a invernaderos rústicos de guadua y plástico estabilizó rendimientos. 80% de producción concentrada en Cundinamarca, Norte de Santander, Valle del Cauca, Caldas, Huila, Risaralda y Antioquia.",
+  "leccion_agroecologica": "Cultivo aprendiz de poda — bisagra educativa entre hortalizas y frutales perennes. Enseña manejo arquitectónico de la planta: tutorado, deschuponada semanal, descopado al alcanzar 1.8m. La sanidad NO se logra persiguiendo patógenos, sino alterando la geometría de la planta para forzar circulación de aire que inhiba germinación de esporas fúngicas.",
+  "thermal_zone_decisions": {
+    "calido": "Producción a campo abierto tradicional. Variedades Río Grande, Pacal, Bachué adaptadas. Mayor presión de mosca blanca y begomovirus. Rendimiento promedio nacional 26 t/ha.",
+    "templado": "ÓPTIMO para chonto Santa Cruz. Rango 1200-2200 msnm con isotermas 15-25°C provee la cinética metabólica exacta. Marinilla y El Peñol (Antioquia oriental) zona pionera. Boyacá Alto Ricaurte (Sutamarchán, Tinjacá) polo emergente bajo invernadero.",
+    "frio": "Producción casi exclusivamente bajo invernadero. Sabana de Bogotá. Polinización resuelta con introducción del abejorro nativo Bombus atratus. Aborto floral por temperaturas <10°C nocturnas — riesgo de cara de gato.",
+    "paramo": "No aplica — colapso fisiológico térmico"
+  },
+  "preparacion_tierra": {
+    "matera": {
+      "volumen_min_litros": 20,
+      "volumen_ideal_litros": 30,
+      "profundidad_cm": 35,
+      "mezcla": "30% tierra + 30% compost + 25% cascarilla quemada + 15% humus de lombriz",
+      "ph_objetivo": "6.0-6.8",
+      "tutorado_obligatorio": true,
+      "estructura_tutor": "Estaca de 1.8-2 m, hilo en V o malla. Iniciar día 15 post-trasplante",
+      "drenaje": "Profundo — sistema radical alcanza 60 cm"
+    },
+    "campo": {
+      "descompactacion": "Profunda 35 cm",
+      "incorporacion": "30-40 t/ha gallinaza compostada o bocashi maduro",
+      "encalado": "Dolomítico si pH < 6",
+      "surcos": "1.2-1.5 m entre surcos",
+      "distancia_plantas": "0.5 m",
+      "tutorado_campo": "Espaldera colombiana — poste cada 4 m + alambre superior + hilo individual",
+      "rotacion_critica": "ICA Antioquia (1980, 1981) demuestra que el limitante NO es fertilización sino enfermedad y rotación. Barbecho o rotación con leguminosa/maíz mínimo 2 ciclos antes de retornar tomate al lote.",
+      "trichoderma_pre": "Inoculación masiva de camas con Trichoderma spp. semanas antes del trasplante — destruye hifas de Fusarium y Rhizoctonia"
+    }
+  },
+  "milestones": [
+    {
+      "fase": "germinacion_y_semillero",
+      "dias_relativos": "-30 a -20",
+      "criterio_observable": "Semillero esterilizado térmicamente o solarizado. Bandejas 200-294 alvéolos sustrato turba+lombricompuesto",
+      "accion_clave": "Inoculación profiláctica de Trichoderma. Temperatura óptima germinación 22-25°C"
+    },
+    {
+      "fase": "trasplante",
+      "dias_relativos": "0",
+      "criterio_observable": "Plántula altura 10-12 cm, 4-5 hojas verdaderas, tallo lignificado en base, sistema radical bien desarrollado",
+      "accion_clave": "ENTERRAMIENTO PROFUNDO del tallo inferior — provoca emisión de raíces adventicias en el tallo. Tutor + hilo iniciado día 15"
+    },
+    {
+      "fase": "desarrollo_vegetativo",
+      "dias_relativos": "20 a 50",
+      "criterio_observable": "Ramificación axilar profusa (chupones)",
+      "accion_clave": "DESCHUPONADA SEMANAL — sustracción manual sistemática de brotes laterales. Amarre a hilos tutores verticales"
+    },
+    {
+      "fase": "floracion_y_cuaje",
+      "dias_relativos": "45 a 75",
+      "criterio_observable": "Corola amarilla plenamente abierta, senescencia del cáliz, primera floración 30-45 días post-trasplante",
+      "accion_clave": "Facilitar vibración mecánica o entomológica (Bombus atratus en invernadero) para dehiscer las anteras poricidas"
+    },
+    {
+      "fase": "fructificacion_y_cosecha",
+      "dias_relativos": "65 a 130",
+      "criterio_observable": "Viraje del espectro cromático verde al estado 4 (rosa/rojo)",
+      "accion_clave": "Recolección cíclica escalonada usando recipientes de paredes rígidas. Descopado al alcanzar 1.8m o sexto-séptimo racimo. Plantas indeterminadas pueden sostener hasta 10 racimos / 7 meses bajo invernadero"
+    }
+  ],
+  "failure_modes": [
+    {
+      "razon": "Pudrición apical (blossom end rot)",
+      "cuando": "Expansión del fruto",
+      "sintoma": "Mancha necrótica coriácea, hundida y oscura en cicatriz pistilar",
+      "agente_causal": "Falla en translocación de calcio inducida por estrés hídrico transitorio",
+      "mitigacion": "Sincronización impecable de riegos diarios + aportes tempranos de roca calcárea + mulch para estabilizar humedad",
+      "frecuencia": "muy_comun"
+    },
+    {
+      "razon": "Tizón tardío (Phytophthora infestans)",
+      "cuando": "Vegetativo a cosecha",
+      "sintoma": "Manchas oleosas que se necrosan, micelio blanco en envés foliar, frutos con manchas pardas",
+      "agente_causal": "Condiciones frescas-húmedas (frío, templado alto)",
+      "mitigacion": "Caldo bordelés preventivo 0.5%, distanciamiento 1.5m entre surcos, evitar mojado foliar (riego por goteo). NO sembrar cerca de cultivos de papa",
+      "frecuencia": "muy_comun"
+    },
+    {
+      "razon": "Mosca blanca (Trialeurodes vaporariorum) + Fumagina",
+      "cuando": "Vegetativo a cosecha",
+      "sintoma": "Follaje recubierto de costras de polvo negro (fumagina), clorosis severa generalizada",
+      "agente_causal": "Excreción de melaza por mosca blanca permite crecimiento de hongos saprófitos",
+      "mitigacion": "Trampas cromáticas amarillas DENSAS, aspersión de fermento M-5 al 10-20%, encierro fitosanitario en invernadero",
+      "frecuencia": "comun"
+    },
+    {
+      "razon": "Begomovirus (PYMV / TYLCV)",
+      "cuando": "Cualquier estadio",
+      "sintoma": "Enanismo, hojas amarillentas con enrollamiento ascendente, cuajado pobre",
+      "agente_causal": "Transmitidos por Bemisia tabaci. Hospederos arvenses: Desmodium, Amaranthus, Lantana camara (Vaca-Vaca et al. 2012 UNAL Palmira)",
+      "mitigacion": "Control de mosca blanca. Eliminación de arvenses hospederas en bordes del lote. Variedades con tolerancia (Tequila, Calima)",
+      "frecuencia": "comun"
+    },
+    {
+      "razon": "Marchitez vascular (Fusarium / Verticillium)",
+      "cuando": "Crecimiento vegetativo",
+      "sintoma": "Clorosis asimétrica progresiva, taponamiento del xilema, colapso estructural irreversible",
+      "agente_causal": "Hongos edáficos habitantes crónicos",
+      "mitigacion": "Rotación inter-anual de familias botánicas (evitar solanáceas consecutivas). Uso de Trichoderma. Variedades resistentes con genes I/Ve",
+      "frecuencia": "ocasional"
+    }
+  ],
+  "companions": [
+    { "especie": "Ocimum basilicum (albahaca)", "razon": "Eugenoles y linaloles evaporados desestabilizan señales quimiotácticas de dípteros. Priming sistémico de respuesta a heridas mediado por compuestos volátiles", "evidencia": "Suzuki et al. NIH PMC11263239 — evidencia experimental publicada" },
+    { "especie": "Calendula officinalis + Tagetes patula (caléndulas)", "razon": "Plantas trampa para nemátodos Meloidogyne. Atracción de polinizadores", "evidencia": "literatura experimental" },
+    { "especie": "Daucus carota (zanahoria)", "razon": "Complementariedad radicular", "evidencia": "tradicion" },
+    { "especie": "Allium cepa + sativum (cebolla, ajo)", "razon": "Repelencia de áfidos por compuestos azufrados", "evidencia": "tradicion + literatura" },
+    { "especie": "Borago officinalis (borraja)", "razon": "Repele Manduca quinquemaculata (gusano cachón)", "evidencia": "literatura agronomica" }
+  ],
+  "antagonistas": [
+    { "especie": "Foeniculum vulgare (hinojo)", "razon": "Alelopatía severa" },
+    { "especie": "Solanum tuberosum (papa)", "razon": "Comparte Phytophthora infestans — corredor epidemiológico crítico" },
+    { "especie": "Solanum melongena (berenjena), Capsicum annuum (pimentón)", "razon": "Solanáceas — comparten Begomovirus + tizón + Fusarium" },
+    { "especie": "Cucumis sativus (pepino)", "razon": "Vectores comunes (mosca blanca, ácaros)" },
+    { "especie": "Juglans (nogal)", "razon": "Juglona alelopática" }
+  ],
+  "biopreparados": [
+    { "nombre": "M-5 (insecticida orgánico)", "uso": "Decocción anaeróbica de ajo + ají + cebolla + aromáticas + alcohol fermentados 30 días. Asperjar canopia al 5-20% (400 ml a 2 L por bomba 20 L)", "fuente": "manuales agroecologicos colombianos" },
+    { "nombre": "Bocashi", "uso": "1.5-3 t/ha pre-siembra. Boudet et al. 2017 reporta 54 t/ha con 2.99 t/ha bocashi", "fuente": "Boudet et al. 2017 (extrapolación a chonto Colombia con cuidado)" },
+    { "nombre": "Biol", "uso": "5% foliar quincenal en vegetativo y floración temprana", "fuente": "Agrosavia/Asohofrucol 2024 proyecto Cundinamarca-Boyacá" },
+    { "nombre": "Caldo sulfocálcico", "uso": "1% preventivo en oídio y ácaros. NO aplicar en floración (toxicidad sobre polinizadores)", "fuente": "manuales agroecologicos" },
+    { "nombre": "Microorganismos eficientes (EM autóctonos)", "uso": "25 cc/aplicación cada 14 días — aumenta rendimiento y altura", "fuente": "Alarcón et al. 2020" },
+    { "nombre": "Trichoderma harzianum / asperellum", "uso": "Drench radicular pre-trasplante para suprimir Fusarium/Rhizoctonia", "fuente": "Agrosavia + literatura colombiana" }
+  ],
+  "cosecha_estimada_kg_por_planta": {
+    "campo_abierto_agroecologico": { "min": 3, "tipico": 4.5, "max": 6 },
+    "invernadero_tecnificado": { "min": 6, "tipico": 9, "max": 12 },
+    "anti_overpromise": "Proyecciones >12 kg/planta corresponden a cultivares de larga vida bajo fertirriego hidropónico mecanizado — quimera en entorno orgánico de matriz sólida y polinización natural. Una hectárea típica chonto rinde 26 t/año a campo, hasta 80 t/año bajo invernadero (Agrosavia 2018)."
+  },
+  "reproduccion": {
+    "tipo_principal": "sexual_semilla",
+    "metodo": "Autógama mayoritaria (~5% alogamia). Viabilidad de semilla guardada en frasco hermético seco: 4-6 años.",
+    "guardar_semilla_propia": "Posible para variedades ABIERTAS (Río Grande, Santa Cruz, Bachué). Inviable en híbridos F1 comerciales (segregación)",
+    "esqueje": "Técnicamente posible — chupón axilar enraíza en agua o sustrato húmedo en 7-10 días. Útil para multiplicar planta excepcional, NO operacional comercialmente. Las plantas resultantes heredan reloj biológico acortado y caen en vigor",
+    "injerto": "Práctica creciente en producción tecnificada — patrones híbridos Solanum lycopersicum × S. habrochaites resistentes a nematodos/Fusarium. Marginal en agroecología familiar (gap G-02 DR-034)"
+  },
+  "fuentes_principales": [
+    { "tipo": "institucional", "referencia": "Agrosavia 2018. El cultivo de tomate bajo invernadero. ISBN 978-958-740-120-2 (485 pp)" },
+    { "tipo": "peer_reviewed", "referencia": "Burbano y Vallejo 2017. Revista Colombiana de Ciencias Hortícolas 11(1):63-71 — gen sp en chonto" },
+    { "tipo": "peer_reviewed", "referencia": "Vaca-Vaca et al. 2012. Acta Agronómica UNAL Palmira — begomovirus tomate hospederos arvenses" },
+    { "tipo": "institucional", "referencia": "DANE-SIPSA dic 2014 — 17 variedades comerciales colombianas (Santa Cruz, Río Grande, Calima, Tequila, Chévere, Cumanday, Bonus, Andino, Santa Clara, Quindío Colombia, Carina, Atala, Boshara, Pacal, Colibrí, San Isidro, Bachué)" },
+    { "tipo": "institucional", "referencia": "Salinas Ospina 1991. Agrosavia hdl 33611 — Chonto Santa Cruz manejo" },
+    { "tipo": "ica_historico", "referencia": "ICA Antioquia 1980-1981 — 18 ensayos publicados Marinilla-El Peñol. Demuestran que el limitante es enfermedad + rotación, NO fertilización" }
+  ],
+  "convergencia_dr_034": "3/3 LLMs convergen en chonto como intermediate + tutorado obligatorio + albahaca companion validado + Phytophthora infestans riesgo principal + identidad culinaria colombiana.",
+  "curacion_status": "draft_3_llm_consolidated",
+  "curacion_pendiente": [
+    "Curacion presencial 4h DR-034 — DeepSeek T.iii primera prioridad: Tomate Chonto sub-preguntas E.ii (failure modes) + E.v (biopreparados)",
+    "Variedades regionales tomate chonto comparativas exhaustivas — gap G-D DR-034. Consultar Agrosavia 2018 ISBN 978-958-740-120-2",
+    "Esquejes en variedad Chonto Colombia — gap G-02 DR-034. Verificar investigacion Burbano/Vallejo UNAL Palmira"
+  ]
+}

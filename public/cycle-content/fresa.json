@@ -1,0 +1,158 @@
+{
+  "species_slug": "fresa",
+  "scientific_name": "Fragaria × ananassa Duch.",
+  "common_names": ["fresa", "frutilla"],
+  "family": "Rosaceae",
+  "agrovoc_concept": "c_7411",
+  "difficulty": "starter_premium",
+  "tiempo_a_cosecha_dias": { "min": 90, "tipico": 120, "max": 180 },
+  "diferenciador_colombiano": "Cundinamarca produce el 73% de la fresa nacional. Industria de viveros locales en Sibaté y Mosquera ofrece plántula Albión adaptada. La amplitud térmica andina ecuatorial (18-25°C día / 8-13°C noche) favorece dulzura y antocianinas — perfil nutracéutico superior a cultivares de baja latitud. Práctica arraigada de productores cundinamarqueses: renovar cultivo cada 2 años con estolones propios.",
+  "leccion_agroecologica": "Cultivo puente entre agricultura sexual (lechuga) y asexual (café/aguacate por injerto). Enseña propagación vegetativa por estolón — clonación natural visible y manejable. Imperativo de higiene del microclima edáfico y función irreemplazable de cobertura muerta (mulch) para separar fruto del suelo.",
+  "thermal_zone_decisions": {
+    "calido": "Marginal. Estrés térmico + ataque crítico de ácaros. NO recomendable para producción agroecológica.",
+    "templado": "Rango operativo. Norte de Santander, parte de Antioquia. Ciclo más corto pero compromete calibre del fruto.",
+    "frio": "ÓPTIMO Cundinamarca (Sibaté, Mosquera, Madrid, Facatativá), Boyacá. Amplitud térmica favorece dulzura. Albión es la variedad dominante en Mosquera.",
+    "paramo": "Marginal salvo en macrotúnel. Riesgo de congelamiento de exudados radiculares >2800 msnm."
+  },
+  "preparacion_tierra": {
+    "matera": {
+      "volumen_min_litros": 4,
+      "volumen_ideal_litros": 8,
+      "profundidad_cm": 18,
+      "mezcla": "35% tierra negra + 35% compost maduro + 20% cascarilla quemada + 10% humus de lombriz",
+      "ph_objetivo": "5.8-6.5 (ligeramente ácido)",
+      "drenaje": "Crítico — capa gruesa de gravilla + perforaciones múltiples. Encharcamiento mata la planta",
+      "reposicion_ciclos": 1
+    },
+    "campo": {
+      "estructura": "Eras elevadas 1.20m × 0.15m alto",
+      "incorporacion": "10-15 t/ha gallinaza compostada 2 meses antes (ICA 1980s; vigente)",
+      "mulch": "Plástico negro o vegetal (cisco de café, paja) — OBLIGATORIO para aislar fruto del sustrato",
+      "riego": "Por goteo, NO aspersión (favorece Botrytis)",
+      "densidad": "50000-60000 plantas/ha (distancia 30×40 cm)"
+    }
+  },
+  "milestones": [
+    {
+      "fase": "pre_siembra_propagacion",
+      "dias_relativos": "-60 a -7",
+      "criterio_observable": "Estolones primarios emitiendo raíces vigorosas en planta madre frigoconservada o en almácigo de vivero",
+      "accion_clave": "Separación del estolón. Inmersión 5 min en solución preventiva (caldo bordelés diluido o agua + Trichoderma)"
+    },
+    {
+      "fase": "trasplante",
+      "dias_relativos": "0",
+      "criterio_observable": "Masa radicular densa y blanca, 4 hojas extendidas, corona consolidada",
+      "accion_clave": "Siembra MILIMÉTRICA a ras de suelo. CRÍTICO: el meristemo apical (corona) NO se entierra (necrosis fúngica) ni se expone (desecación). Profundidad 6 cm desde corte de raíz"
+    },
+    {
+      "fase": "vegetativo_formativo",
+      "dias_relativos": "15 a 60",
+      "criterio_observable": "Emisión temprana de botones florales y nuevos estolones",
+      "accion_clave": "Poda formativa: supresión MANUAL y TOTAL de las primeras flores para inducir engrosamiento de la corona. Aplicaciones foliares B+Ca para mejorar cuajado posterior"
+    },
+    {
+      "fase": "fructificacion",
+      "dias_relativos": "60 a 90",
+      "criterio_observable": "Cuajado de frutos esféricos verdes, transmutando a blanco",
+      "accion_clave": "Despliegue de cobertura muerta (cascarilla, paja) para aislar fruta emergente del sustrato"
+    },
+    {
+      "fase": "cosecha_continua",
+      "dias_relativos": "90 a 180+",
+      "criterio_observable": "Receptáculo engrosado con pigmentación roja en 3/4 de su área",
+      "accion_clave": "Recolección sutil. Limitar manipulación térmica y mecánica del fruto. Cosechas semanales por 12-18 meses bajo manejo agroecológico"
+    }
+  ],
+  "failure_modes": [
+    {
+      "razon": "Botrytis cinerea (moho gris)",
+      "cuando": "Fructificación",
+      "sintoma": "Masa miceliar grisácea y algodonosa sobre flores y drupas",
+      "agente_causal": "Alta humedad relativa estancada",
+      "mitigacion": "Mulch obligatorio, aclareo foliar para ventilación, distancia adecuada, recolección de frutos caídos, Trichoderma drench preventivo",
+      "frecuencia": "muy_comun"
+    },
+    {
+      "razon": "Pudrición de corona por enterramiento",
+      "cuando": "Post-trasplante inmediato",
+      "sintoma": "Follaje central marchito, raíces oscurecidas, muerte rápida de la planta",
+      "agente_causal": "Asfixia o enterramiento patológico del meristemo apical",
+      "mitigacion": "Eras elevadas con drenaje profundo. Respeto absoluto al nivel del cuello en la siembra (corona a ras)",
+      "frecuencia": "comun"
+    },
+    {
+      "razon": "Araña roja (Tetranychus urticae)",
+      "cuando": "Periodos secos / verano",
+      "sintoma": "Decoloración bronceada y mate en hojas, telarañas microscópicas en envés",
+      "agente_causal": "Plaga favorecida por microclimas áridos",
+      "mitigacion": "Liberación de ácaros fitoseidos depredadores (Phytoseiulus persimilis, Amblyseius spp.), aspersión de extracto ajo-ají, sombra parcial",
+      "frecuencia": "comun"
+    },
+    {
+      "razon": "Sphaerotheca macularis (oídio)",
+      "cuando": "Vegetativo a fructificación",
+      "sintoma": "Manchas pulverulentas blancas en hojas y frutos",
+      "agente_causal": "Hongo biotrofo, condiciones secas con noches frescas",
+      "mitigacion": "Caldo sulfocálcico al 1.5%, variedades resistentes (Albión moderada), evitar exceso de N",
+      "frecuencia": "comun"
+    },
+    {
+      "razon": "Verticillium dahliae (marchitez vascular)",
+      "cuando": "Cualquier estadio",
+      "sintoma": "Marchitez progresiva, taponamiento del xilema",
+      "agente_causal": "Hongo edáfico de larga persistencia",
+      "mitigacion": "Rotación obligatoria — NO sembrar fresa después de tomate, papa, berenjena, pimentón. Solarización del lote.",
+      "frecuencia": "ocasional"
+    }
+  ],
+  "companions": [
+    { "especie": "Borago officinalis (borraja)", "razon": "Atrae polinizadores (sírfidos, abejorros) — efecto sobre cuajado", "evidencia": "literatura agronomica" },
+    { "especie": "Tagetes patula (caléndula francesa)", "razon": "Producción de tiofenos nematicidas — control de Meloidogyne", "evidencia": "evidencia experimental" },
+    { "especie": "Allium sativum (ajo)", "razon": "Repelente de ácaros y áfidos; supresión moderada de Fusarium", "evidencia": "tradicion + literatura" },
+    { "especie": "Mentha piperita (menta)", "razon": "Compuestos volátiles desestabilizan radar olfativo de trips y áfidos", "evidencia": "literatura agronomica" },
+    { "especie": "Spinacia oleracea (espinaca)", "razon": "Complementariedad radicular + ventana fenológica fría", "evidencia": "tradicion" }
+  ],
+  "antagonistas": [
+    { "especie": "Solanum lycopersicum (tomate)", "razon": "Comparten Verticillium dahliae" },
+    { "especie": "Solanum tuberosum (papa)", "razon": "Mismo Verticillium" },
+    { "especie": "Solanum melongena (berenjena)", "razon": "Mismo Verticillium" },
+    { "especie": "Brassica oleracea (repollo, brócoli)", "razon": "Compite agresivamente por nitrógeno + modifica desfavorablemente el consorcio bacteriano de la rizósfera" }
+  ],
+  "biopreparados": [
+    { "nombre": "Bocashi", "uso": "200 g/planta al trasplante; 50 g/planta al inicio de cada pico de floración", "fuente": "extrapolacion literatura cubana/mexicana" },
+    { "nombre": "Biol", "uso": "Dilución 5% foliar quincenal en floración", "fuente": "manuales agroecologicos colombianos" },
+    { "nombre": "Supermagro", "uso": "Complemento mensual al 3%", "fuente": "extrapolacion (gap G-B DR-034)" },
+    { "nombre": "Caldo sulfocálcico", "uso": "1% preventivo cada 15 días en época húmeda (control oídio + ácaros)", "fuente": "Cabrera Marulanda et al. 2018 (referencia cruzable desde café/broca)" },
+    { "nombre": "Caldo bordelés", "uso": "0.5% aspersiones espaciadas. EVITAR durante floración", "fuente": "manuales agroecologicos" }
+  ],
+  "cosecha_estimada_kg_por_planta": {
+    "agroecologico_acumulado_12_18_meses": { "min": 0.42, "tipico": 0.6, "max": 1.0 },
+    "por_variedad": {
+      "albion": { "tipico_g_ciclo": 420 },
+      "san_andreas": { "tipico_g_ciclo": 636 },
+      "camino_real": { "tipico_g_ciclo": 507 }
+    },
+    "anti_overpromise": "Cifras superiores divulgadas por agroindustria provienen de sistemas con suelo esterilizado por bromuro de metilo + fertirriego sintético. Métricas hipertróficas inaplicables al ecosistema vivo de la granja orgánica."
+  },
+  "reproduccion": {
+    "tipo_principal": "vegetativa_estolon",
+    "metodo": "99% propagación por estolón. Tras la primera fructificación (mes 6 aprox.), planta madre produce estolones; enraízan en almácigo a 10 cm en cuadrícula durante 30-40 días, luego trasplante a sitio definitivo.",
+    "frigoconservacion": "Plantas madre a 2-4°C por 30-45 días aumentan vigor de estolones — práctica industrial replicable parcialmente en finca con cuarto frío",
+    "hormona_natural_enraizante": "Extracto de sauce (Salix spp.) al 10% por 12h, o miel diluida 1:10",
+    "esqueje": "División de corona posible cuando planta madre desarrolla varias coronas",
+    "injerto": "No aplica",
+    "semilla": "Solo en mejoramiento genético (no operacional). Híbridos F1 segregan en F2 — inviable",
+    "viroses_riesgo": "XLM, Strawberry mottle virus si planta madre infectada. Comprar plántula certificada cada 4 ciclos"
+  },
+  "fuentes_principales": [
+    { "tipo": "peer_reviewed_institucional", "referencia": "Fischer, López-Valencia, Sánchez-Gómez y Acuña-Caita 2018. Ciencia y Tecnología Agropecuaria 19(1):163-178 — caracterización fisicoquímica de variedades en Sibaté (Agrosavia)" },
+    { "tipo": "institucional", "referencia": "Agrosavia ICA hdl.handle.net/20.500.12324/19076 — Manual fresa Cundinamarca" },
+    { "tipo": "peer_reviewed", "referencia": "Revista Colombiana de Ciencias Hortícolas Vol. 8 No. 1 2014 — costos campo abierto vs macrotúnel" },
+    { "tipo": "tesis", "referencia": "UTEA Tesis 2024 — comparativo Albión 420 g, San Andreas 636 g, Camino Real 507 g/planta" },
+    { "tipo": "marco_economico", "referencia": "Finagro/Agrosavia 2018 — Marco de Referencia Agroeconómico Fresa Albión, costo establecimiento Cundinamarca COP 85 millones/ha" }
+  ],
+  "convergencia_dr_034": "3/3 LLMs convergen. Divergencia menor en tier (DeepSeek starter, Gemini + Claude starter_premium) — adoptado starter_premium 2/3.",
+  "curacion_status": "draft_3_llm_consolidated",
+  "curacion_pendiente": ["Validacion agronomo Cundinamarca/Antioquia para datos cuantitativos kg/planta agroecologica colombiana sin biocidas (gap G-A DR-034)", "Curacion presencial 4h secuencia DR-034 — tercera prioridad Claude web (E.x estolon + frigoconservacion, E.ix preparacion matera/macrotunel)"]
+}
