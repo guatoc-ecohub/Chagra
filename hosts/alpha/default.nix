@@ -745,8 +745,23 @@
 
     # 1. El VirtualHost DEBE llamarse exactamente como el dominio público
     virtualHosts."chagra.guatoc.co" = {
-      # 2. Binding universal para permitir tráfico desde la IP física de la LAN
-      listen = [ { addr = "0.0.0.0"; port = 80; } ];
+      # 2. Listeners:
+      #    - 0.0.0.0:80 acepta tráfico LAN directo (192.168.1.100:80)
+      #    - 127.0.0.1:80 acepta tráfico de Cloudflared tunnel (loopback)
+      # Sin el listener 127.0.0.1:80 explícito, módulos como Immich que
+      # declaran `listen 127.0.0.1:80` con server_name diferente se vuelven
+      # default_server implícito de ese listener específico → cualquier
+      # request via Cloudflared con Host distinto cae a ese módulo.
+      # Incidente 2026-05-06: chagra.guatoc.co cargaba Immich vía Cloudflared
+      # porque Immich virtualHost (lasfotos.guatoc.co, listen 127.0.0.1:80)
+      # era default del listener loopback, mientras Chagra (0.0.0.0:80) NO
+      # tenía presencia en loopback. Resuelto agregando listen 127.0.0.1:80
+      # con default_server explícito.
+      listen = [
+        { addr = "0.0.0.0"; port = 80; }
+        { addr = "127.0.0.1"; port = 80; }
+      ];
+      default = true;
       root = "/mnt/fast/appdata/farmos-pwa";
 
       locations."/" = {
