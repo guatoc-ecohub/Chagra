@@ -106,11 +106,19 @@ let
       cache: false  # evita cachear secrets/PII por error
 
     general_settings:
-      # Bypass auth — el proxy NO valida API keys del cliente. Auth real
-      # se hace en la conexión upstream con ZAI_API_KEY (env var).
-      # Esto está OK porque el proxy escucha SOLO en 127.0.0.1 + Tailscale.
+      # master_key requerido para auth client→proxy. Aunque proxy escucha
+      # solo lo+tailscale, master_key previene que cualquier nodo en
+      # tailnet (futuros nodos, BYO devices) pueda usar el proxy sin auth.
       master_key: os.environ/LITELLM_MASTER_KEY
-      database_connection_pool_limit: 10
+      # 2026-05-05: deshabilitamos features DB-backed (virtual keys,
+      # spend tracking, user mgmt). Sin esto, /v1/messages devuelve
+      # "No connected db" en cada request porque LiteLLM intenta
+      # registrar usage en Postgres que no tenemos.
+      # Si en futuro queremos tracking, agregar Postgres dedicado al
+      # módulo (mismo patrón immich-postgres).
+      disable_spend_logs: true
+      disable_master_key_return: true
+      allow_requests_on_db_unavailable: true
   '';
 
 in {
