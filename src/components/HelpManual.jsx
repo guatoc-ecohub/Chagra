@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ChevronDown, ChevronRight, BookOpen, Sprout, Mic, Camera, MapPin, Bug, Apple, MessageCircle, AlertTriangle, Wrench, Sparkles } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronRight, BookOpen, Sprout, Mic, Camera, MapPin, Bug, Apple, MessageCircle, AlertTriangle, Wrench, Sparkles, GraduationCap, Clock } from 'lucide-react';
 
 /**
  * HelpManual — Manual de usuario integrado en la PWA.
@@ -239,6 +239,68 @@ export default function HelpManual({ onBack }) {
             <li>Adjuntar foto a un registro pasado desde Bitácora</li>
             <li>Cosecha por voz: &ldquo;Coseché 3 frutos de fresa&rdquo;</li>
           </ul>
+        </Section>
+
+        {/* Sección Aprende sembrando — scaffold queue/039.
+            Contenido real viene del DR-034 (5 especies × ciclo completo) +
+            curación agrónomo Guatoc/Agrosavia. Por ahora cards placeholder
+            que comunican intención + plan. Cuando DR-034 cierre, se reemplazan
+            placeholders con corpus curado en /public/cycle-content/<slug>.json
+            lazy-loaded. */}
+        <Section icon={GraduationCap} title="🌿 Aprende sembrando — ciclo de 5 especies (próximamente)">
+          <p className="text-sm leading-relaxed">
+            <strong className="text-emerald-300">Esta sección está en construcción.</strong> Va a ser el punto de partida educativo para quien empieza desde cero — no solo cómo usar Chagra, sino cómo cultivar.
+          </p>
+
+          <p className="text-xs text-slate-400 leading-relaxed mt-2">
+            Cubrirá el <strong>ciclo completo</strong> de 5 especies prioritarias para Colombia, desde preparación de tierra hasta propagación del próximo ciclo:
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
+            <div className="p-3 rounded-lg bg-slate-900 border border-slate-800">
+              <p className="font-bold text-emerald-300 text-sm">🥬 Lechuga</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Starter · 60-90 días · frío/templado</p>
+            </div>
+            <div className="p-3 rounded-lg bg-slate-900 border border-slate-800">
+              <p className="font-bold text-emerald-300 text-sm">🍓 Fresa</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Starter · 90-180 días · frío/templado</p>
+            </div>
+            <div className="p-3 rounded-lg bg-slate-900 border border-slate-800">
+              <p className="font-bold text-amber-300 text-sm">🍅 Tomate Chonto</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Intermediate · 90-120 días · cálido/templado</p>
+            </div>
+            <div className="p-3 rounded-lg bg-slate-900 border border-slate-800">
+              <p className="font-bold text-orange-300 text-sm">☕ Café arábica</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Advanced · 3 años · templado/frío 1200-1900 msnm</p>
+            </div>
+            <div className="p-3 rounded-lg bg-slate-900 border border-slate-800 sm:col-span-2">
+              <p className="font-bold text-orange-300 text-sm">🥑 Aguacate Hass</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">Advanced · 3-5 años · templado 1500-2500 msnm · injerto</p>
+            </div>
+          </div>
+
+          <div className="mt-4 p-3 rounded-xl bg-emerald-900/15 border border-emerald-800/40">
+            <p className="text-xs uppercase tracking-wider text-emerald-400 font-bold mb-2">Cada ciclo cubrirá</p>
+            <ul className="text-xs text-slate-300 space-y-1 list-disc pl-5">
+              <li><strong>Preparación de tierra</strong> — matera (mezcla recomendada) vs campo abierto (descompactación + biopreparados)</li>
+              <li><strong>Germinación</strong> — semilla, esqueje, acodo, división, injerto (según especie)</li>
+              <li><strong>Trasplante</strong> — cuándo, técnica, sombreado post</li>
+              <li><strong>Desarrollo + cosecha</strong> — hitos observables día por día</li>
+              <li><strong>Propagación</strong> — qué guardar para el próximo ciclo</li>
+              <li><strong>Razones comunes de fracaso</strong> — top 5 por especie con prevención agroecológica</li>
+            </ul>
+          </div>
+
+          <div className="mt-3 p-3 rounded-xl bg-amber-900/15 border border-amber-800/40 flex items-start gap-2">
+            <Clock size={14} className="text-amber-400 shrink-0 mt-0.5" />
+            <p className="text-[11px] text-amber-200 leading-relaxed">
+              <strong>Filosofía:</strong> NO promete éxito instantáneo. Sembrar es un proceso de meses-años. Documenta también lo que NO funcionó para que cada operador aprenda de la pérdida sin estigma. Coherente con el cementerio de plantas — fracaso como currículo.
+            </p>
+          </div>
+
+          <p className="text-[10px] text-slate-600 italic mt-3">
+            Curación de contenido pendiente — DR-034 + revisión de agrónomo Guatoc/Agrosavia. Aviso por novedades cuando esté disponible.
+          </p>
         </Section>
 
         {/* Sección Novedades v0.12.x — features mergeados sesión 2026-05-03 */}
