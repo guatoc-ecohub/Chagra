@@ -85,6 +85,7 @@ pre-commit:
 
     eslint:
       glob: "*.{js,jsx,ts,tsx}"
+      exclude: '\.d\.ts$'
       run: npx eslint {staged_files} --max-warnings=0
 
     auto-bump-version:
