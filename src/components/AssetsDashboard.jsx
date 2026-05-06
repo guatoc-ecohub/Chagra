@@ -267,10 +267,24 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
           : activeTab === 'equipment' ? equipment
             : materials;
 
+    // Cementerio (queue/038 + spine educativo): si zona === '__cemetery__'
+    // mostramos solo plants status='dead'. Modo dedicado para reflexionar
+    // sobre lecciones aprendidas. Por default las plantas muertas se ocultan
+    // del listado normal de plant tab para no contaminar la vista activa.
+    if (activeTab === 'plant') {
+      if (currentZoneId === '__cemetery__') {
+        list = list.filter((p) => (p.attributes?.status || p.status) === 'dead');
+      } else {
+        // Default: ocultar plantas muertas del listado normal
+        list = list.filter((p) => (p.attributes?.status || p.status) !== 'dead');
+      }
+    }
+
     // Drill-down: para plants, si hay zona seleccionada, filtrar por parent.
     // '__all__' = modo "ver todos" sin filtro de zona.
     // '__orphan__' = plantas cuyo parent no resuelve a una zona existente.
-    if (activeTab === 'plant' && currentZoneId && currentZoneId !== '__all__') {
+    // '__cemetery__' = plantas muertas (manejado arriba).
+    if (activeTab === 'plant' && currentZoneId && currentZoneId !== '__all__' && currentZoneId !== '__cemetery__') {
       if (currentZoneId === '__orphan__') {
         const landIds = new Set(lands.map((l) => l.id));
         list = list.filter((p) => {
@@ -289,6 +303,11 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
       return name.toLowerCase().includes(q);
     });
   };
+
+  // Cementerio: cuántas plantas muertas hay (para badge en el botón).
+  const cemeteryCount = activeTab === 'plant'
+    ? plants.filter((p) => (p.attributes?.status || p.status) === 'dead').length
+    : 0;
 
   // Activos tipo land filtrados para la vista de zonas (drill-down raíz).
   const getZonesForDrillDown = () => {
@@ -903,15 +922,33 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
                 <span className="text-amber-300 font-bold truncate">Sin zona asignada</span>
               </>
             )}
+            {currentZoneId === '__cemetery__' && (
+              <>
+                <span className="text-slate-600">›</span>
+                <span className="text-slate-400 font-bold truncate">🪦 Cementerio</span>
+              </>
+            )}
           </div>
           {!currentZoneId && (
-            <button
-              type="button"
-              onClick={() => setCurrentZoneId('__all__')}
-              className="text-blue-400 hover:underline shrink-0"
-            >
-              Ver todos ({plants.length})
-            </button>
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => setCurrentZoneId('__all__')}
+                className="text-blue-400 hover:underline"
+              >
+                Ver todos ({plants.length - cemeteryCount})
+              </button>
+              {cemeteryCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setCurrentZoneId('__cemetery__')}
+                  className="text-slate-400 hover:text-slate-300 hover:underline inline-flex items-center gap-1"
+                  title="Ver plantas que se perdieron — fracaso como currículo"
+                >
+                  🪦 {cemeteryCount}
+                </button>
+              )}
+            </div>
           )}
         </div>
       )}
@@ -940,6 +977,30 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
                 <div className="text-right shrink-0">
                   <span className="text-2xl font-black text-amber-300 tabular-nums">{orphanPlants.length}</span>
                   <p className="text-[10px] text-amber-300/60 uppercase">cultivos</p>
+                </div>
+              </div>
+            </button>
+          )}
+          {cemeteryCount > 0 && (
+            <button
+              type="button"
+              onClick={() => setCurrentZoneId('__cemetery__')}
+              className="w-full p-4 rounded-xl bg-slate-900 border border-slate-700 hover:bg-slate-800 text-left transition-colors"
+              title="Plantas perdidas — espacio para revisar lecciones aprendidas"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="p-2.5 rounded-lg bg-slate-800 shrink-0 text-2xl leading-none">
+                    🪦
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="font-bold text-slate-200 truncate">Cementerio</h4>
+                    <p className="text-xs text-slate-500">Lo que se perdió. Sin juicio — son datos para aprender.</p>
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  <span className="text-2xl font-black text-slate-400 tabular-nums">{cemeteryCount}</span>
+                  <p className="text-[10px] text-slate-500 uppercase">cultivos</p>
                 </div>
               </div>
             </button>
