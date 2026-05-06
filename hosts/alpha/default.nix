@@ -59,7 +59,10 @@
   # litellm-master-key existen en secrets.yaml).
   guatoc.ai.litellmProxy = {
     enable = true;
-    listenAddr = "127.0.0.1";  # cambiar a IP Tailscale alpha si necesitas desde stg
+    # 2026-05-05: 0.0.0.0 dentro del container, restringido por firewall
+    # NixOS a interfaces lo + tailscale0 (ver litellm-proxy.nix líneas
+    # firewall.interfaces). Permite uso desde stg via Tailscale.
+    listenAddr = "0.0.0.0";
     # zaiUpstream y ollamaFallbackModel quedan en defaults
   };
 
@@ -212,6 +215,13 @@
       openfang-zai-env = {
         owner = "openfang";
         group = "openfang";
+        mode = "0400";
+      };
+
+      # Immich PostgreSQL password
+      immich-postgres-password = {
+        owner = "root";
+        group = "root";
         mode = "0400";
       };
 
@@ -579,6 +589,7 @@
     enable = true;
     nextcloud.enable = true;
     immich.enable = true;
+    immich.enablePublicSharing = true;
   };
 
   # --- OBSERVABILITY DOMAIN ---
