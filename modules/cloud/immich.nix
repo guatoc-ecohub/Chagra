@@ -114,6 +114,10 @@ in
         DB_DATABASE_NAME = "immich";
         REDIS_HOSTNAME = "immich-redis";
         IMMICH_IGNORE_MOUNT_CHECK_ERRORS = "true";
+        # 2026-05-06: forzar bind IPv4. Por default Immich v2.5.x escucha en
+        # [::1]:2283 (IPv6 loopback only). Nginx hace proxy_pass a
+        # 127.0.0.1:2283 (IPv4) → connection refused → 502.
+        IMMICH_HOST = "0.0.0.0";
         # Acceso público con invitación — inmutable tras primer boot
         IMMICH_PUBLIC_SHARE = if cfg.enablePublicSharing then "true" else "false";
         EXTERNAL_URL = "https://${cfg.domain}";
