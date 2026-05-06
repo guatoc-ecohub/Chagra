@@ -250,17 +250,7 @@ in {
       volumes = [
         "${cfg.logsDir}/litellm-config.yaml:/app/config.yaml:ro"
       ];
-      environmentFiles = [
-        cfg.zaiSecretFile
-        cfg.masterKeyFile
-      ];
       environment = {
-        # Acceso a Ollama del host (via gateway podman). El config.yaml
-        # apunta a localhost:11434 pero desde container "localhost" es el
-        # propio container — usamos host.containers.internal alias podman.
-        # ALT: si ese alias no existe en este podman, fallback a IP gateway
-        # del network default 10.88.0.1 o 10.89.0.1 según config.
-        # NOTA: requiere actualizar litellm-config.yaml ollama api_base.
         LITELLM_LOG = "INFO";
       };
       cmd = [
@@ -274,6 +264,12 @@ in {
         "1"
       ];
       extraOptions = [
+        # 2026-05-05: environmentFiles del módulo oci-containers no se está
+        # propagando al podman exec env (verificado con `podman exec env`).
+        # Usamos --env-file directo en extraOptions que SÍ funciona.
+        # Los archivos vienen de SOPS con formato KEY=VALUE.
+        "--env-file=${cfg.zaiSecretFile}"
+        "--env-file=${cfg.masterKeyFile}"
         # add-host para que el container pueda contactar Ollama en el host.
         # El config.yaml usa http://localhost:11434, dentro del container
         # eso resuelve al container mismo. Mapeamos host.docker.internal
