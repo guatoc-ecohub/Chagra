@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CircleUser, Mic, Plus, ChevronDown, ChevronUp, Home, HelpCircle } from 'lucide-react';
+import { CircleUser, Mic, Plus, ChevronDown, ChevronUp, Home, HelpCircle, LogOut } from 'lucide-react';
 import { version as APP_VERSION } from '../../package.json';
 import EnvironmentalCard from './EnvironmentalCard';
 
@@ -85,10 +85,14 @@ export default function TopBar({ onNavigate, onLogout }) {
         >
           <Home size={16} aria-hidden="true" className="text-muzo self-center" />
           <span>Chagra</span>
-          <span className="text-[10px] text-slate-500 font-mono font-normal">v{APP_VERSION}</span>
+          {/* Version badge: oculto en mobile estrecho (<sm = 640px) para evitar
+              que se solape con iconos de acción a la derecha. Visible desde sm.
+              Feedback usuario externo 2026-05-06 (bug #4 baseline). */}
+          <span className="hidden sm:inline text-[10px] text-slate-500 font-mono font-normal">v{APP_VERSION}</span>
         </button>
 
-        {/* Operador (tap → perfil) */}
+        {/* Operador (tap → perfil). max-w más restrictivo en mobile para
+            preservar espacio de iconos de acción. */}
         <button
           type="button"
           onClick={() => onNavigate('perfil')}
@@ -96,7 +100,7 @@ export default function TopBar({ onNavigate, onLogout }) {
           className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 active:bg-slate-700 text-slate-200 min-h-[44px] truncate"
         >
           <CircleUser size={20} aria-hidden="true" className="shrink-0 text-teal-400" />
-          <span className="text-sm font-semibold truncate max-w-[8rem]">{operatorName}</span>
+          <span className="text-sm font-semibold truncate max-w-[5rem] sm:max-w-[8rem]">{operatorName}</span>
         </button>
 
         {/* Spacer */}
@@ -133,14 +137,17 @@ export default function TopBar({ onNavigate, onLogout }) {
             operator name button es más explícito + el NAV_TILE Perfil del
             dashboard sigue accesible. */}
 
-        {/* Salir (mantiene el comportamiento actual) */}
+        {/* Salir: en mobile estrecho muestra sólo icono LogOut (ahorra ~50px
+            de ancho). Desde sm muestra texto "Salir" tradicional. */}
         <button
           type="button"
           onClick={onLogout}
           aria-label="Cerrar sesión"
-          className="text-slate-400 hover:text-white px-3 min-h-[44px] bg-slate-800 rounded text-sm shrink-0"
+          title="Cerrar sesión"
+          className="text-slate-400 hover:text-white px-2 sm:px-3 min-h-[44px] min-w-[44px] bg-slate-800 rounded text-sm shrink-0 flex items-center justify-center"
         >
-          Salir
+          <LogOut size={18} aria-hidden="true" className="sm:hidden" />
+          <span className="hidden sm:inline">Salir</span>
         </button>
       </header>
 
