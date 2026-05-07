@@ -70,6 +70,13 @@ export default function VoiceCapture({ onSave }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [pendingCount, setPendingCount] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
+  // Timestamp del momento en que el operador habló. Capturado al detener
+  // la grabación restando la duración del audio. Se propaga al log--seeding
+  // (timestamp Unix) y al asset--plant._createdAt (millis JS) para que la
+  // siembra quede fechada cuando se grabó, no cuando se confirmó. Fix bug
+  // operador 2026-05-06: hinojo + otras quedaban con 'Invalid Date' porque
+  // el inlinePlant del payload voz no setteaba ningún timestamp.
+  const [audioRecordedAtMs, setAudioRecordedAtMs] = useState(null);
   // Id de la grabación pendiente en reproceso (null = captura en vivo normal).
   // Cuando está seteado, el pipeline completa su ciclo consumiendo el Blob
   // ya persistido y al confirmar guardado se purga de pending_voice.
@@ -217,6 +224,10 @@ export default function VoiceCapture({ onSave }) {
       setView(STATE_ERROR);
       return;
     }
+    // Timestamp del INICIO de la grabación = ahora menos duración. Mejor
+    // proxy del momento real de la siembra que Date.now() al confirmar
+    // (que puede ser minutos después si el operador revisa la transcripción).
+    setAudioRecordedAtMs(Date.now() - result.durationMs);
     await runPipeline(result.blob, result.durationMs);
   }, [stop, runPipeline]);
 
@@ -262,6 +273,10 @@ export default function VoiceCapture({ onSave }) {
       plant_type: plantTypeRel,
     };
 
+    // Timestamp efectivo: si capturamos audioRecordedAtMs (inicio grabación)
+    // úsalo. Si no (caso edge / pending voice reproceso), fallback Date.now().
+    const effectiveMs = audioRecordedAtMs || Date.now();
+    const effectiveSec = Math.floor(effectiveMs / 1000);
     const inlinePlant = {
       type: 'asset--plant',
       attributes: {
@@ -272,6 +287,10 @@ export default function VoiceCapture({ onSave }) {
         },
       },
       relationships: inlineRels,
+      // Local-first: timestamp en millis JS para AssetDetailView/timeline.
+      // FarmOS server asignará attributes.created al momento del POST si
+      // este campo no se traduce al payload remoto (sólo metadata local).
+      _createdAt: effectiveMs,
     };
 
     return {
@@ -279,7 +298,7 @@ export default function VoiceCapture({ onSave }) {
         type: 'log--seeding',
         attributes: {
           name: `Siembra: ${entity.crop} (x${entity.quantity}) [voz]`,
-          timestamp: Math.floor(Date.now() / 1000),
+          timestamp: effectiveSec,
           status: 'done',
           notes: {
             value: `Registro por voz. Cantidad declarada: ${entity.quantity}. Transcripcion: "${transcription}".`,
@@ -301,7 +320,7 @@ export default function VoiceCapture({ onSave }) {
         },
       },
     };
-  }, [transcription]);
+  }, [transcription, audioRecordedAtMs]);
 
   const handleConfirmSave = useCallback(async (confirmedEntities) => {
     setIsSaving(true);
