@@ -1,18 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, ChevronDown, ChevronRight, BookOpen, Sprout, Mic, Camera, MapPin, Bug, Apple, MessageCircle, AlertTriangle, Wrench, Sparkles, GraduationCap, Clock } from 'lucide-react';
-import CycleContentRenderer from './CycleContentRenderer.jsx';
 import HelpTipCard from './HelpTipCard.jsx';
-
-const STARTER_CYCLES = [
-  { slug: 'lechuga', emoji: '🥬', label: 'Lechuga', sub: 'Starter · 60-90 días · frío/templado' },
-  { slug: 'fresa', emoji: '🍓', label: 'Fresa', sub: 'Starter Premium · 90-180 días · frío' },
-  { slug: 'tomate_chonto', emoji: '🍅', label: 'Tomate Chonto', sub: 'Intermediate · 90-130 días · templado' },
-];
-
-const PLACEHOLDER_CYCLES = [
-  { emoji: '☕', label: 'Café arábica', sub: 'Advanced · 3 años · curación humana presencial pendiente', tone: 'orange' },
-  { emoji: '🥑', label: 'Aguacate Hass', sub: 'Advanced · 3-5 años · injerto + selección patrón pendiente', tone: 'orange' },
-];
+import HelpCycleSection from './HelpCycleSection.jsx';
 
 /**
  * HelpManual, Manual de usuario integrado en la PWA.
@@ -67,7 +56,6 @@ const Section = ({ icon: Icon, title, children, defaultOpen = false, isNew = fal
 };
 
 export default function HelpManual({ onBack, onNavigate }) {
-  const [openCycle, setOpenCycle] = useState(null);
   // Helper para construir un quick-action que cierra el manual y navega al
   // flow real. UX A del PR #188: "leer cómo se hace" + "hacerlo" sin friction.
   const quickAction = (label, route) => ({
@@ -99,6 +87,7 @@ export default function HelpManual({ onBack, onNavigate }) {
        <HelpTipCard />
 
       <div className="flex-1 p-4 flex flex-col gap-3 max-w-2xl mx-auto w-full pb-12">
+        <HelpCycleSection />
         <p className="text-sm text-slate-400 leading-relaxed">
           Guía rápida para registrar su finca o balcón en Chagra. Toque cada
           sección para abrir/cerrar. Si algo no está aquí, use el botón
@@ -293,40 +282,8 @@ export default function HelpManual({ onBack, onNavigate }) {
           </p>
 
           <p className="text-xs text-slate-400 leading-relaxed mt-2">
-            Toque una especie para ver el ciclo completo: preparación de tierra, hitos día a día, razones comunes de fracaso, compañeros validados, biopreparados y rangos conservadores de cosecha.
+            La versión interactiva está arriba en esta misma pantalla, debajo del tip del día: elija lechuga, fresa o tomate chonto, revise el corpus y, si quiere, haga una pregunta por voz con IA que solo usa ese contenido.
           </p>
-
-          <h4 className="text-xs uppercase tracking-wider text-emerald-400 font-bold mt-4 mb-2">Disponibles ahora</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-            {STARTER_CYCLES.map((c) => (
-              <button
-                key={c.slug}
-                type="button"
-                onClick={() => setOpenCycle(c.slug)}
-                className="p-3 rounded-lg bg-slate-900 border border-emerald-800/50 hover:bg-slate-800 active:bg-slate-700 text-left min-h-[64px]"
-              >
-                <p className="font-bold text-emerald-300 text-sm">{c.emoji} {c.label}</p>
-                <p className="text-[11px] text-slate-500 mt-0.5">{c.sub}</p>
-                <p className="text-[10px] text-emerald-500 mt-1">Ver ciclo →</p>
-              </button>
-            ))}
-          </div>
-
-          <h4 className="text-xs uppercase tracking-wider text-orange-400 font-bold mt-4 mb-2">Pendientes, curación humana presencial</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {PLACEHOLDER_CYCLES.map((c) => (
-              <div key={c.label} className="p-3 rounded-lg bg-slate-900 border border-slate-800 opacity-70">
-                <p className="font-bold text-orange-300 text-sm">{c.emoji} {c.label}</p>
-                <p className="text-[11px] text-slate-500 mt-0.5">{c.sub}</p>
-              </div>
-            ))}
-          </div>
-
-          {openCycle && (
-            <div className="mt-4 p-3 rounded-xl bg-slate-950/80 border border-emerald-800/50">
-              <CycleContentRenderer slug={openCycle} onClose={() => setOpenCycle(null)} />
-            </div>
-          )}
 
           <div className="mt-4 p-3 rounded-xl bg-emerald-900/15 border border-emerald-800/40">
             <p className="text-xs uppercase tracking-wider text-emerald-400 font-bold mb-2">Cada ciclo cubre</p>

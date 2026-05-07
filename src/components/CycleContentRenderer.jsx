@@ -101,6 +101,16 @@ export default function CycleContentRenderer({ slug, onClose }) {
         </Block>
       )}
 
+      {Array.isArray(data.lecciones_aprendizaje) && data.lecciones_aprendizaje.length > 0 && (
+        <Block icon={BookOpen} title="Lecciones de aprendizaje" tone="amber">
+          <ul className="list-disc pl-5 space-y-1 text-xs text-slate-300">
+            {data.lecciones_aprendizaje.map((line, i) => (
+              <li key={i}>{typeof line === 'string' ? line : line?.texto || JSON.stringify(line)}</li>
+            ))}
+          </ul>
+        </Block>
+      )}
+
       {data.thermal_zone_decisions && (
         <Block icon={Mountain} title="Decisiones por piso térmico" tone="slate">
           <ul className="space-y-2 text-xs">
