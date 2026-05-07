@@ -1,5 +1,6 @@
 import { sendToFarmOS } from './apiService';
 import { syncManager } from './syncManager';
+import { generatePlanForPlant } from './planGeneratorService';
 
 const isUUID = (uuid) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uuid);
 
@@ -16,6 +17,7 @@ export const savePayload = async (type, payload) => {
   const endpoint = resolveEndpoint(type);
   if (navigator.onLine) {
     try {
+      const planCandidates = [];
       // Fase 1.5: Resolver entidades anidadas y limpiar mock IDs.
       //
       // Bug fix v0.6.8: antes, al procesar un item inline se filtraban sus
@@ -78,6 +80,21 @@ export const savePayload = async (type, payload) => {
               };
 
               const result = await sendToFarmOS(inlineEndpoint, inlinePayload);
+
+              if (type === 'seeding' && item.type === 'asset--plant') {
+                const speciesSlug = item._speciesSlug || null;
+                const timestampSec = Number(payload?.data?.attributes?.timestamp);
+                const plantingDate = Number.isFinite(timestampSec)
+                  ? new Date(timestampSec * 1000).toISOString()
+                  : new Date().toISOString();
+                planCandidates.push({
+                  assetId: result?.data?.id,
+                  speciesSlug,
+                  plantingDate,
+                  plantName: item?.attributes?.name || 'planta',
+                });
+              }
+
               return { type: item.type, id: result.data.id };
             }
             return item;
@@ -110,9 +127,41 @@ export const savePayload = async (type, payload) => {
         // relacionados (ej. la planta inline creada durante un seeding).
         // Sin esto, voz crea la planta en FarmOS pero el store local
         // no se entera hasta un refresh manual.
-        window.dispatchEvent(new CustomEvent('syncCompleted', {
-          detail: { type, id: result?.data?.id },
-        }));
+        const detail = { type, id: result?.data?.id };
+
+        if (type === 'seeding' && planCandidates.length > 0) {
+          const candidate = planCandidates[0];
+          detail.plantId = candidate.assetId;
+
+          if (candidate.assetId && candidate.speciesSlug) {
+            generatePlanForPlant({
+              assetId: candidate.assetId,
+              speciesSlug: candidate.speciesSlug,
+              plantingDate: candidate.plantingDate,
+            }).then((plan) => {
+              if (plan?.steps?.length > 0) {
+                window.dispatchEvent(new CustomEvent('syncCompleted', {
+                  detail: {
+                    ...detail,
+                    planGenerated: {
+                      plantId: candidate.assetId,
+                      plantName: candidate.plantName,
+                      steps: plan.steps.length,
+                    },
+                  },
+                }));
+              } else {
+                window.dispatchEvent(new CustomEvent('syncCompleted', { detail }));
+              }
+            }).catch((err) => {
+              console.warn('[payloadService] No se pudo generar plan post-seeding:', err);
+              window.dispatchEvent(new CustomEvent('syncCompleted', { detail }));
+            });
+            return { success: true, message: 'Guardado y sincronizado con servidor', data: result };
+          }
+        }
+
+        window.dispatchEvent(new CustomEvent('syncCompleted', { detail }));
       }
       return { success: true, message: 'Guardado y sincronizado con servidor', data: result };
     } catch (error) {

@@ -105,6 +105,20 @@ export default function VoiceCapture({ onSave }) {
     return () => window.removeEventListener('voiceRecordingsPending', handler);
   }, [refreshPendingCount]);
 
+  useEffect(() => {
+    const handleSyncCompleted = (event) => {
+      const plan = event?.detail?.planGenerated;
+      if (!plan?.steps) return;
+      window.dispatchEvent(new CustomEvent('chagraToast', {
+        detail: {
+          message: `Plan de alimentación sugerido para ${plan.plantName} (${plan.steps} pasos). Ver en Bodega → Planes.`,
+        },
+      }));
+    };
+    window.addEventListener('syncCompleted', handleSyncCompleted);
+    return () => window.removeEventListener('syncCompleted', handleSyncCompleted);
+  }, []);
+
   const resetAll = useCallback(() => {
     reset();
     setTranscription('');
@@ -279,6 +293,7 @@ export default function VoiceCapture({ onSave }) {
     const effectiveSec = Math.floor(effectiveMs / 1000);
     const inlinePlant = {
       type: 'asset--plant',
+      _speciesSlug: entity.cropSlug || null,
       attributes: {
         name: entity.canonical || entity.crop,
         status: 'active',
