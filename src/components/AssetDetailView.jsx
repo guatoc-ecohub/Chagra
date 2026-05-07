@@ -250,6 +250,21 @@ export const AssetDetailView = () => {
   const geoWkt = typeof geoRaw === 'object' ? geoRaw?.value : geoRaw;
   const currentGeo = geoWkt ? wktToGeoJson(geoWkt) : null;
 
+  // Resolver nombre de zona padre (relationships.parent o location). Cuando
+  // el operador siembra por voz "X en el invernadero", el inlinePlant queda
+  // con relationships.parent → asset--structure/land, pero SIN intrinsic_geometry.
+  // Si no resolvemos el parent, GeometrySection mostraba "Sin ubicación" aunque
+  // SÍ tiene zona asignada. Bug operador 2026-05-06.
+  const parentRefs = asset.relationships?.parent?.data || asset.relationships?.location?.data || [];
+  const parentRef = Array.isArray(parentRefs) ? parentRefs[0] : parentRefs;
+  const parentZoneName = parentRef
+    ? (() => {
+        const lookup = [...(structures || []), ...(lands || [])];
+        const match = lookup.find((a) => a.id === parentRef.id);
+        return match?.attributes?.name || null;
+      })()
+    : null;
+
   return (
     <div
       className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm"
@@ -317,6 +332,7 @@ export const AssetDetailView = () => {
           {/* Geometría / Ubicación (Fase 19) */}
           <GeometrySection
             asset={asset}
+            parentZoneName={parentZoneName}
             onEdit={() => setShowGeoPicker(true)}
             saving={geoSaving}
           />
@@ -584,21 +600,33 @@ export const AssetDetailView = () => {
 };
 
 // Subcomponente: sección de geometría con botón de edición.
-const GeometrySection = ({ asset, onEdit, saving }) => {
+const GeometrySection = ({ asset, parentZoneName, onEdit, saving }) => {
   const geoRaw = asset.attributes?.intrinsic_geometry;
   const wkt = typeof geoRaw === 'object' ? geoRaw?.value : geoRaw;
   const hasGeo = !!wkt;
 
-  // Preview legible del tipo de geometría
-  let preview = 'Sin ubicación registrada';
+  // Jerarquía de preview:
+  //   1. intrinsic_geometry POINT/POLYGON → coordenadas precisas
+  //   2. parent zone (asset--structure/land) → "En zona: <nombre>"
+  //   3. nada → "Sin ubicación registrada"
+  // Bug operador 2026-05-06: plantas por voz quedan con relationships.parent
+  // pero sin intrinsic_geometry; sin caso 2 mostraba "Sin ubicación" aunque
+  // SÍ tenía zona asignada (invernadero, parcela, etc).
+  let preview;
   if (hasGeo) {
     if (wkt.startsWith('POINT')) {
       const match = wkt.match(/POINT\s*\(([\d.-]+)\s+([\d.-]+)\)/);
-      if (match) preview = `Punto: ${Number(match[2]).toFixed(5)}°N, ${Number(match[1]).toFixed(5)}°W`;
+      preview = match ? `Punto: ${Number(match[2]).toFixed(5)}°N, ${Number(match[1]).toFixed(5)}°W` : 'Punto sin parsear';
     } else if (wkt.startsWith('POLYGON')) {
       const vertexCount = (wkt.match(/,/g) || []).length + 1;
       preview = `Polígono (${vertexCount} vértices)`;
+    } else {
+      preview = 'Geometría registrada';
     }
+  } else if (parentZoneName) {
+    preview = `En zona: ${parentZoneName}`;
+  } else {
+    preview = 'Sin ubicación registrada';
   }
 
   return (
