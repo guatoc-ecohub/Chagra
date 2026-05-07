@@ -103,6 +103,41 @@ describe('guildService — filtros funcionales (ADR-034 feedback usuario externo
     });
   });
 
+  describe('Cebolla larga / cebollín (allium_fistulosum) — bug operador 2026-05-06', () => {
+    const result = getSuggestedCompanions('allium_fistulosum');
+
+    it('SÍ retorna companions (no vacío) — antes faltaba en speciesDefaults', () => {
+      expect(result.companions.length).toBeGreaterThan(0);
+    });
+
+    it('SÍ retorna antagonistas (legumbres por alelopatía Allium)', () => {
+      const ids = result.antagonists.map((a) => a.id);
+      expect(ids).toContain('phaseolus_vulgaris');
+    });
+
+    it('NO sugiere perennes de gran porte (filtro ADR-034)', () => {
+      const ids = result.companions.map((c) => c.id);
+      expect(ids).not.toContain('coffea_arabica');
+      expect(ids).not.toContain('passiflora_edulis');
+      expect(ids).not.toContain('solanum_betaceum');
+    });
+  });
+
+  describe('Cebollín francés / chives (allium_schoenoprasum)', () => {
+    const result = getSuggestedCompanions('allium_schoenoprasum');
+
+    it('SÍ retorna companions', () => {
+      expect(result.companions.length).toBeGreaterThan(0);
+    });
+
+    it('SÍ incluye Capa 1 explícita (tomate, fresa, zanahoria)', () => {
+      const ids = result.companions.map((c) => c.id);
+      expect(ids).toContain('solanum_lycopersicum');
+      expect(ids).toContain('fragaria_ananassa');
+      expect(ids).toContain('daucus_carota');
+    });
+  });
+
   describe('Edge cases', () => {
     it('Especie inexistente devuelve listas vacías', () => {
       const result = getSuggestedCompanions('especie_inexistente_xyz');
