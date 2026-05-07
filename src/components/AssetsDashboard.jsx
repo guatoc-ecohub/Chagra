@@ -16,6 +16,7 @@ import { useGeolocation } from '../hooks/useGeolocation';
 import { usePhotoUrl } from '../hooks/usePhotoUrl';
 import { findBiopreparadosByIngredient } from '../db/catalogDB';
 import { generatePlanForPlant } from '../services/planGeneratorService';
+import { getAccessToken } from '../services/authService';
 
 // Thumb foto de planta para cards. Sub-componente porque usePhotoUrl no
 // puede llamarse dentro de un map() condicional (regla de hooks).
@@ -380,6 +381,8 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
 
     // Generar N assetUUIDs (1 si no individual-multi)
     const assetUUIDs = Array.from({ length: assetCount }, () => crypto.randomUUID());
+    const token = navigator.onLine ? await getAccessToken() : null;
+    const pendingReason = !navigator.onLine ? 'no_network' : (!token ? 'no_token' : 'sync_error');
 
     // Construir N pendingTxs para assets + (si plant) 1 pendingTx log compartido
     const pendingTxs = [];
@@ -417,6 +420,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
         // creaba zona + agregaba planta dentro y "no aparecía".
         ...(baseRels ? { relationships: baseRels } : {}),
         _pending: true,
+        _pendingReason: pendingReason,
         _createdAt: Date.now(),
       });
     });

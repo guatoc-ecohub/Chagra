@@ -4,6 +4,7 @@ import { logCache } from '../db/logCache';
 import { useLogStore } from './useLogStore';
 import { newId } from '../utils/id';
 import { savePayload, updatePayload } from '../services/payloadService';
+import { getAccessToken } from '../services/authService';
 
 /**
  * Store global de Activos (Zustand)
@@ -314,6 +315,8 @@ const useAssetStore = create((set, get) => ({
   addInputLog: async (assetId, inputData) => {
     const logId = crypto.randomUUID();
     const timestamp = Math.floor(Date.now() / 1000);
+    const token = navigator.onLine ? await getAccessToken() : null;
+    const pendingReason = !navigator.onLine ? 'no_network' : (!token ? 'no_token' : 'sync_error');
 
     // 1. Resolver el material en bodega (matching por nombre canónico)
     const materialName = inputData.name?.replace(/^Aplicación de /, '') || '';
@@ -351,6 +354,7 @@ const useAssetStore = create((set, get) => ({
           inventory_unit: invUnit,
         },
         _pending: true,
+        _pendingReason: pendingReason,
       };
 
       assetUpdates.push(updatedMaterial);
@@ -469,6 +473,8 @@ const useAssetStore = create((set, get) => ({
   refillMaterial: async (materialId, amount, selectedUnit = null) => {
     const material = get().materials.find((m) => m.id === materialId);
     if (!material) throw new Error('Material no encontrado en bodega');
+    const token = navigator.onLine ? await getAccessToken() : null;
+    const pendingReason = !navigator.onLine ? 'no_network' : (!token ? 'no_token' : 'sync_error');
 
     const invUnit = material.attributes?.inventory_unit || material.unit || selectedUnit;
     let converted = parseFloat(amount) || 0;
@@ -492,6 +498,7 @@ const useAssetStore = create((set, get) => ({
         inventory_value_updated_at: inventoryTs,
       },
       _pending: true,
+      _pendingReason: pendingReason,
     };
 
     const pendingTx = {
@@ -827,7 +834,11 @@ if (typeof window !== 'undefined') {
       if (isAssetOp) {
         const localAsset = await assetCache.getAsset(id);
         if (localAsset) {
-          await assetCache.put(localAsset.asset_type || assetType, { ...localAsset, _pending: false });
+          await assetCache.put(localAsset.asset_type || assetType, {
+            ...localAsset,
+            _pending: false,
+            _pendingReason: null,
+          });
           console.log(`[Sync] Activo ${id} liberado para actualización oficial.`);
         }
       } else {
