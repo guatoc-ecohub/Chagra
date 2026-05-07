@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Sprout, Droplets, Apple, Leaf, RefreshCw, Clock, Bot, Sparkles, Check, X, Camera } from 'lucide-react';
+import { Virtuoso } from 'react-virtuoso';
 import { useLogStore } from '../store/useLogStore';
 import { parseAiInference, parseAiReview } from '../utils/aiInferenceParser';
 import { savePayload } from '../services/payloadService';
@@ -154,10 +155,17 @@ export default function AssetTimeline({ assetId }) {
   const logs = useLogStore((state) => state.logsByAsset[assetId] || EMPTY_LOGS);
   const isSyncing = useLogStore((state) => state.isSyncing);
   const loadLogsForAsset = useLogStore((state) => state.loadLogsForAsset);
+  const [visibleMonths, setVisibleMonths] = useState(2);
 
   useEffect(() => {
     if (assetId) loadLogsForAsset(assetId);
   }, [assetId, loadLogsForAsset]);
+
+  useEffect(() => {
+    // Reset deliberado al cambiar asset — ESLint nuevo rule no entiende el patrón
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setVisibleMonths(2);
+  }, [assetId]);
 
   // Agrupación por mes/año preservando el orden descendente del store
   const groups = useMemo(() => {
@@ -169,6 +177,8 @@ export default function AssetTimeline({ assetId }) {
     }
     return Array.from(map.entries());
   }, [logs]);
+  const visibleGroups = useMemo(() => groups.slice(0, visibleMonths), [groups, visibleMonths]);
+  const canLoadMoreMonths = groups.length > visibleMonths;
 
   if (!assetId) {
     return (
@@ -203,13 +213,24 @@ export default function AssetTimeline({ assetId }) {
         </div>
       ) : (
         <div className="space-y-6">
-          {groups.map(([monthKey, monthLogs]) => (
+          {visibleGroups.map(([monthKey, monthLogs]) => {
+            const reviewByTarget = new Map();
+            for (const possibleReview of monthLogs) {
+              const review = parseAiReview(extractNotes(possibleReview));
+              if (review?.target_log_id) reviewByTarget.set(review.target_log_id, review);
+            }
+            const listHeight = Math.max(160, Math.min(monthLogs.length * 104, 520));
+            return (
             <div key={monthKey}>
               <div className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">
                 {monthKey}
               </div>
-              <ul className="space-y-2 relative border-l-2 border-slate-800 ml-2 pl-4">
-                {monthLogs.map((log) => {
+              <div className="relative border-l-2 border-slate-800 ml-2 pl-4">
+                <Virtuoso
+                  data={monthLogs}
+                  style={{ height: listHeight }}
+                  overscan={280}
+                  itemContent={(_index, log) => {
                   const config = TYPE_CONFIG[log.type] || DEFAULT_CONFIG;
 
                   // ADR-019 Phase 3: Detección y render de IA
@@ -224,21 +245,19 @@ export default function AssetTimeline({ assetId }) {
                   const photoAttachment = parsePhotoAttachment(notes);
                   if (photoAttachment) {
                     return (
-                      <PhotoAttachmentThumb
-                        key={log.id}
-                        photoId={photoAttachment.photoId}
-                        timestamp={log.timestamp}
-                        pending={log._pending}
-                      />
+                      <div className="py-1">
+                        <PhotoAttachmentThumb
+                          key={log.id}
+                          photoId={photoAttachment.photoId}
+                          timestamp={log.timestamp}
+                          pending={log._pending}
+                        />
+                      </div>
                     );
                   }
 
                   // Búsqueda de review (crossing logic)
-                  const reviewLog = isAi ? monthLogs.find(l => {
-                    const r = parseAiReview(extractNotes(l));
-                    return r && r.target_log_id === log.id;
-                  }) : null;
-                  const reviewData = reviewLog ? parseAiReview(extractNotes(reviewLog)) : null;
+                  const reviewData = isAi ? reviewByTarget.get(log.id) : null;
 
                   const Icon = isAi ? (aiData.needs_human_review ? Sparkles : Bot) : config.icon;
                   const qty = extractQuantity(log);
@@ -275,7 +294,7 @@ export default function AssetTimeline({ assetId }) {
                   };
 
                   return (
-                    <li
+                    <div
                       key={log.id}
                       className={`relative p-3 rounded-xl border ${isAi ? 'bg-indigo-900/10 border-indigo-500/30' : config.bg + ' ' + config.border} ${pending ? 'opacity-60' : ''
                         } ${isAi && aiData.needs_human_review && !reviewData ? 'border-amber-500/50 shadow-[0_0_10px_rgba(245,158,11,0.1)]' : ''}`}
@@ -372,12 +391,23 @@ export default function AssetTimeline({ assetId }) {
                           {formatDayLabel(log.timestamp)}
                         </span>
                       </div>
-                    </li>
+                    </div>
                   );
-                })}
-              </ul>
+                }}
+                />
+              </div>
             </div>
-          ))}
+            );
+          })}
+          {canLoadMoreMonths && (
+            <button
+              type="button"
+              onClick={() => setVisibleMonths((prev) => prev + 2)}
+              className="w-full py-2 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-colors"
+            >
+              Cargar más meses
+            </button>
+          )}
         </div>
       )}
     </div>
