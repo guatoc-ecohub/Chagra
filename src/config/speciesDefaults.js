@@ -83,6 +83,15 @@ export const SPECIES_DEFAULTS = {
   calendula_officinalis:  { category: 'medicinales_alelopaticas', estrato: 'bajo', gremio: 'atrayente_polinizadores', production: 'flor', cycleMonths: 3, companions: ['solanum_lycopersicum', 'brassica_oleracea_capitata'], antagonists: [] },
   tropaeolum_majus:       { category: 'medicinales_alelopaticas', estrato: 'bajo', gremio: 'repelente_plagas', production: 'flor', cycleMonths: 3, companions: ['cucurbita_maxima', 'malus_domestica', 'passiflora_edulis'], antagonists: [] },
   allium_cepa:            { category: 'medicinales_alelopaticas', estrato: 'bajo', gremio: 'repelente_plagas', production: 'bulbo', cycleMonths: 4, companions: ['daucus_carota', 'lactuca_sativa', 'fragaria_ananassa'], antagonists: ['phaseolus_vulgaris', 'pisum_sativum', 'vicia_faba'] },
+  // Cebolla larga / cebollín / "cebolla de rama" — cosecha por hoja-tallo,
+  // ciclo más rápido que cabezona (~90 días). Mismos antagonistas Allium
+  // (alelopatía azufrada vs leguminosas). Bug reportado por operador
+  // sembrando "cebollín en el invernadero" via voz: la especie estaba en
+  // taxonomy.js pero no en speciesDefaults → GuildSuggestions devolvía null.
+  allium_fistulosum:      { category: 'medicinales_alelopaticas', estrato: 'bajo', gremio: 'repelente_plagas', production: 'hoja',  cycleMonths: 3, companions: ['daucus_carota', 'lactuca_sativa', 'fragaria_ananassa', 'beta_vulgaris_cicla', 'spinacia_oleracea'], antagonists: ['phaseolus_vulgaris', 'pisum_sativum', 'vicia_faba'] },
+  // Cebollín francés / chives — herbácea perenne, hojas tubulares finas,
+  // rebrota tras corte. Companion clásico de tomate y zanahoria.
+  allium_schoenoprasum:   { category: 'medicinales_alelopaticas', estrato: 'bajo', gremio: 'repelente_plagas', production: 'hoja',  cycleMonths: null, companions: ['daucus_carota', 'fragaria_ananassa', 'solanum_lycopersicum', 'lactuca_sativa'], antagonists: ['phaseolus_vulgaris', 'pisum_sativum'] },
   rosmarinus_officinalis: { category: 'medicinales_alelopaticas', estrato: 'bajo', gremio: 'repelente_plagas', production: 'hoja', cycleMonths: null, companions: ['brassica_oleracea_capitata', 'daucus_carota'], antagonists: [] },
   artemisia_absinthium:   { category: 'medicinales_alelopaticas', estrato: 'bajo', gremio: 'repelente_plagas', production: 'hoja', cycleMonths: null, companions: [], antagonists: ['lactuca_sativa', 'pisum_sativum'] },
   ruta_graveolens:        { category: 'medicinales_alelopaticas', estrato: 'bajo', gremio: 'repelente_plagas', production: 'hoja', cycleMonths: null, companions: [], antagonists: ['ocimum_basilicum'] },
