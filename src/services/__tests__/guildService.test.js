@@ -1,7 +1,7 @@
 /**
  * guildService.test.js — Tests del companion suggester (ADR-034).
  *
- * Caso baseline: bug reportado por David Loka 2026-05-06 — Espinaca sugería
+ * Caso baseline: bug reportado por usuario externo 2026-05-06 — Espinaca sugería
  * companions agronómicamente incompatibles (Café, Tomate árbol, Gulupa,
  * Granadilla, Curuba). Estos tests blindan que el fix funcional no se rompa.
  */
@@ -9,7 +9,7 @@
 import { describe, it, expect } from 'vitest';
 import { getSuggestedCompanions } from '../guildService.js';
 
-describe('guildService — filtros funcionales (ADR-034 David Loka feedback)', () => {
+describe('guildService — filtros funcionales (ADR-034 feedback usuario externo)', () => {
   describe('Espinaca (estrato bajo, ciclo anual 60d, sun-loving)', () => {
     const result = getSuggestedCompanions('spinacia_oleracea');
     const companionIds = result.companions.map((c) => c.id);
