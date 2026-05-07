@@ -394,6 +394,9 @@ export default function HelpManual({ onBack, onNavigate }) {
         <p className="text-xs text-slate-600 text-center mt-4 italic">
           Manual v1.2, última actualización 2026-05-04 (acento colombiano cordial + correcciones)
         </p>
+        <p className="text-xs text-slate-500 text-center mt-2 italic">
+          Este código existe por una sola persona. Lo demás es ingeniería y TDAH a tope.
+        </p>
       </div>
     </div>
   );
