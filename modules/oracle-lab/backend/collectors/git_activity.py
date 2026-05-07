@@ -33,17 +33,27 @@ GITHUB_PAT = os.environ.get("GITHUB_PAT", "")
 
 
 async def _local_git_log(repo_path: Path, since_iso: str) -> dict[str, Any]:
-    """Intenta git log local. Retorna dict con `accessible` flag."""
+    """Intenta git log local. Retorna dict con `accessible` flag.
+
+    DR-031 Issue #2 cierre 3/3 (Claude stg + Gemini DR + DeepSeek):
+      - usar --all para incluir commits en TODAS las branches del repo
+      - incluir timestamp ISO (--date=iso-strict) para sort/filter cliente
+      - separador `|` en lugar de `,` (DeepSeek pidió `,` pero subjects pueden
+        contener comas, `|` es más seguro y ya está en uso)
+    """
     if not repo_path.exists():
         return {"accessible": False, "reason": "path_not_found"}
-    if not (repo_path / ".git").exists():
+    # Soporta tanto repos non-bare (.git/) como bare (HEAD + refs/)
+    is_bare = (repo_path / "HEAD").exists() and not (repo_path / ".git").exists()
+    if not is_bare and not (repo_path / ".git").exists():
         return {"accessible": False, "reason": "not_a_git_repo"}
     if not os.access(repo_path, os.R_OK):
         return {"accessible": False, "reason": "permission_denied"}
     try:
         proc = await asyncio.create_subprocess_exec(
-            "git", "-C", str(repo_path), "log", f"--since={since_iso}",
-            "--pretty=format:%h|%an|%s", "-50",
+            "git", "-C", str(repo_path), "log", "--all",
+            f"--since={since_iso}", "--date=iso-strict",
+            "--pretty=format:%h|%ad|%an|%s", "-50",
             stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
         )
         stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=4.0)
@@ -52,11 +62,17 @@ async def _local_git_log(repo_path: Path, since_iso: str) -> dict[str, Any]:
         lines = [l for l in stdout.decode().splitlines() if l.strip()]
         return {
             "accessible": True,
+            "is_bare": is_bare,
             "commits_7d": len(lines),
             "recent": [
-                {"sha": parts[0], "author": parts[1], "subject": parts[2][:80]}
+                {
+                    "sha": parts[0],
+                    "date": parts[1],
+                    "author": parts[2],
+                    "subject": parts[3][:80],
+                }
                 for line in lines[:5]
-                if (parts := line.split("|", 2)) and len(parts) == 3
+                if (parts := line.split("|", 3)) and len(parts) == 4
             ],
         }
     except (asyncio.TimeoutError, FileNotFoundError) as exc:
@@ -135,14 +151,19 @@ async def fetch() -> dict[str, Any]:
         return {
             "status": "no_data",
             "data": {
-                "reason": "Ningún repo accesible (local + API). Para fix: "
-                          "configurar ORACLE_REPOS_BASE legible por user oracle-lab "
-                          "O agregar GITHUB_PAT a SOPS oracle-lab-env",
+                "reason": "Ningún repo accesible. Setup: ejecutar oracle_init_repos.sh para inicializar /var/lib/oracle-lab/repos/ con git clone de los 4 repos. Alternativa: agregar GITHUB_PAT a SOPS oracle-lab-env.",
+                "fix_command": "sudo bash /var/lib/oracle-lab/code/scripts/oracle_init_repos.sh  # o desde guatoc-nixos: scripts/diag/oracle_init_repos.sh",
                 "details": inaccessible_reasons,
+                "expected_path": str(REPOS_BASE),
+                "repos_configured": REPOS,
             },
         }
 
     out["data"]["total_commits_7d"] = sum(
         r.get("commits_7d", 0) for r in out["data"]["repos"].values()
     )
+    out["data"]["accessible_count"] = sum(
+        1 for r in out["data"]["repos"].values() if r.get("accessible")
+    )
+    out["data"]["total_repos"] = len([r for r in REPOS if r.strip()])
     return out
