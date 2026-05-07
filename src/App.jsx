@@ -340,7 +340,7 @@ export default function App() {
       case 'perfil':
         return <ProfileScreen onBack={() => navigate('dashboard')} />;
       case 'help':
-        return <HelpManual onBack={() => navigate('dashboard')} />;
+        return <HelpManual onBack={() => navigate('dashboard')} onNavigate={navigate} />;
       default:
         return <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>;
     }
