@@ -177,6 +177,25 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
               </button>
             ))}
           </div>
+          {/* Detalles colapsables: razón por companion. Visible en mobile sin
+              hover (donde title= no funciona). Default cerrado para no
+              saturar; el operador expande si quiere entender el filtro. */}
+          <details className="mt-2 text-[11px] text-slate-500">
+            <summary className="cursor-pointer hover:text-slate-300 select-none">
+              ¿Por qué estos compañeros?
+            </summary>
+            <ul className="mt-1.5 pl-3 space-y-0.5 list-disc marker:text-slate-700">
+              {companions.map((c) => (
+                <li key={c.id}>
+                  <span className="text-slate-300">{c.name.split(' (')[0]}</span>
+                  <span className="text-slate-500">: {c.reason}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-1.5 text-[10px] italic text-slate-600">
+              Filtros funcionales aplicados: estrato, ciclo, sombra (ADR-034). Especies de gran porte se excluyen para hortalizas anuales.
+            </p>
+          </details>
         </div>
       )}
 
