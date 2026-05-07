@@ -91,6 +91,114 @@ export const HELP_TIPS = [
     category: 'sustrato',
     text: 'Use mulch para estabilizar humedad del sustrato y prevenir enfermedades como tip burn y mildiu velloso.',
     source: 'species_lesson:lechuga'
+  },
+  {
+    id: 'fresa-lesson',
+    category: 'observacion',
+    text: 'Cultivo puente entre agricultura sexual (lechuga) y asexual (café/aguacate por injerto). Enseña propagación vegetativa por estolón — clonación natural visible y manejable.',
+    source: 'species_lesson:fresa'
+  },
+  {
+    id: 'fresa-mulch-obligatorio',
+    category: 'sustrato',
+    text: 'El mulch es OBLIGATORIO para fresas — aisla el fruto del suelo y previene Botrytis. Use plástico negro o vegetal como cisco de café o paja.',
+    source: 'species_lesson:fresa'
+  },
+  {
+    id: 'fresa-propagacion',
+    category: 'paciencia',
+    text: 'Renueve su cultivo de fresas cada 2 años con estolones propios. Esto mantiene vigor y productividad en su parcela.',
+    source: 'species_lesson:fresa'
+  },
+  {
+    id: 'fresa-riego-goteo',
+    category: 'riego',
+    text: 'Riegue fresas por goteo, nunca por aspersión. La aspersión favorece el desarrollo de Botrytis cinerea en frutos y flores.',
+    source: 'species_lesson:fresa'
+  },
+  {
+    id: 'fresa-higiene',
+    category: 'observacion',
+    text: 'Mantenga rigurosa higiene del microclima edáfico alrededor de sus fresas. Elimina hojas secas y frutos dañados para prevenir enfermedades.',
+    source: 'species_lesson:fresa'
+  },
+  {
+    id: 'tomate-lesson',
+    category: 'observacion',
+    text: 'El tomate chonto es un cultivo aprendiz de poda — enseña manejo arquitectónico de la planta: tutorado, deschuponada semanal, descopado al alcanzar 1.8m.',
+    source: 'species_lesson:tomate_chonto'
+  },
+  {
+    id: 'tomate-tutorado',
+    category: 'observacion',
+    text: 'Inicie el tutorado de tomate chonto el día 15 post-trasplante. Use estaca de 1.8-2m con hilo en V o malla para apoyar el crecimiento vertical.',
+    source: 'species_lesson:tomate_chonto'
+  },
+  {
+    id: 'tomate-deschupone',
+    category: 'plagas',
+    text: 'Realice deschuponada semanal en tomate chonto: elimine los chupones que aparecen en las axilas de las hojas para dirigir energía al fruto principal.',
+    source: 'species_lesson:tomate_chonto'
+  },
+  {
+    id: 'tomate-copa-baja',
+    category: 'observacion',
+    text: 'Mantenga una copa baja en su tomate chonto (máx 1.8m de altura). Esto facilita la cosecha, mejora la circulación de aire y reduce enfermedades fúngicas.',
+    source: 'species_lesson:tomate_chonto'
+  },
+  {
+    id: 'tomate-trichoderma-pre',
+    category: 'plagas',
+    text: 'Antes del trasplante, inocule masivamente las camas con Trichoderma spp. Esto destruye hifas de Fusarium y Rhizoctonia que causan pudrición de raíces.',
+    source: 'species_lesson:tomate_chonto'
+  },
+  {
+    id: 'tomate-rotacion-leguminosa',
+    category: 'sustrato',
+    text: 'Practique rotación crítica con leguminosas o maíz mínimo 2 ciclos antes de retornar tomate al mismo lote. Esto reduce presión de patógenos del suelo.',
+    source: 'species_lesson:tomate_chonto'
+  },
+  {
+    id: 'tomate-espaldera-colombiana',
+    category: 'observacion',
+    text: 'Use la espaldera colombiana para su tomate: poste cada 4m + alambre superior + hilo individual por planta. Esta estructura es económica y efectiva.',
+    source: 'species_lesson:tomate_chonto'
+  },
+  {
+    id: 'tomate-polinizacion-abejorro',
+    category: 'observacion',
+    text: 'En climas fríos, introduzca abejorros nativos Bombus atratus para polinizar su tomate chonto. Esto evita aborto floral por temperaturas <10°C nocturnas.',
+    source: 'species_lesson:tomate_chonto'
+  },
+  {
+    id: 'observacion-humedad-raices',
+    category: 'observacion',
+    text: 'Aprenda a leer las señales de su planta: hojas flojas indican falta de agua; hojas amarillentas pueden indicar exceso. Observe diariamente, no solo riegue por hábito.',
+    source: 'general:observacion'
+  },
+  {
+    id: 'sustrato-compost-maduro',
+    category: 'sustrato',
+    text: 'Siempre use compost maduro en su sustrato. El compost fresco puede quemar las raíces y competir por nitrógeno durante su descomposición.',
+    source: 'general:sustrato'
+  },
+  {
+    id: 'plagas-prevencion-semanal',
+    category: 'plagas',
+    text: 'La prevención es su mejor aliada contra plagas. Dedique 10 minutos cada semana a inspeccionar el envés de las hojas y tallos en busca de insectos o hongos.',
+    source: 'general:plagas'
+  },
+  {
+    id: 'paciencia-cosecha-escalonada',
+    category: 'paciencia',
+    text: 'Siembre en escalonado: cada 2-3 semanas una nueva tanda de semillas. Así tendrá cosecha continua en lugar de un exceso que se pierde.',
+    source: 'general:paciencia'
+  },
+  {
+    id: 'error-aprender-del-fracaso',
+    category: 'observacion',
+    text: 'Cada planta que no prospera es un maestro. Anote qué hizo diferente esa vez y ajuste su próximo intento. El fracaso es parte del currículo agroecológico.',
+    source: 'general:mentalidad'
   }
 ];
 

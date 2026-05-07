@@ -1,7 +1,7 @@
 {
   "name": "chagra",
   "private": true,
-  "version": "0.12.55",
+  "version": "0.12.56",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -23,6 +23,7 @@
     "lucide-react": "^0.577.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-virtuoso": "^4.18.6",
     "ulid": "^3.0.2",
     "zustand": "^5.0.12"
   },
