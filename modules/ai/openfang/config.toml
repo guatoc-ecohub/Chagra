@@ -23,6 +23,11 @@ id       = "<@CamiloRendon>"            # placeholder Telegram ID Camilo
 alias    = "camilo"
 role     = "solar_engineer"
 
+[[users]]
+id       = "<@Reviewer001>"             # placeholder external reviewer
+alias    = "reviewer001"
+role     = "external_reviewer"
+
 # --- Hands registrados ---
 # SECURITY: devops + solar quedan disabled hasta tener Telegram IDs reales
 # (los placeholders <@KortuxAdmin> <@CamiloRendon> no matchean → todo cae en
@@ -42,6 +47,11 @@ enabled  = false
 [[hands]]
 name     = "personal"
 file     = "PERSONAL_HAND.toml"
+enabled  = true
+
+[[hands]]
+name     = "external_reviewer"
+file     = "EXTERNAL_REVIEWER_HAND.toml"
 enabled  = true
 
 # ---------------------------------------------------------------
@@ -88,6 +98,12 @@ hand          = "solar"
 [[routes]]
 match_user    = "<@KortuxAdmin>"
 hand          = "personal"
+
+# 7. Comandos Review Externo → External Reviewer Hand
+[[routes]]
+match_command = ["/bug", "/feature", "/status", "/queue", "/claude-link"]
+require_role  = "external_reviewer"
+hand          = "external_reviewer"
 
 # 7. Default: rechazar
 [[routes]]

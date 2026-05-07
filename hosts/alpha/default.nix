@@ -15,6 +15,8 @@
     ../../modules/iot-energy/deye-byd-killswitch.nix
     ../../modules/ai/openai-proxy.nix
     ../../modules/oracle-lab
+    ../../modules/ai/claude-link.nix
+    ../../modules/ai/openfang/bug-reports-retention.nix
   ];
 
   # NTP — los servers default de NixOS (*.nixos.pool.ntp.org) tienen latencia
@@ -174,6 +176,21 @@
       cloudflared-token = {
         owner = "root";
         group = "root";
+        mode = "0400";
+      };
+      cloudflare-tunnel-bearer = {
+        owner = "openfang";
+        group = "openfang";
+        mode = "0400";
+      };
+      guatoc-bot-whitelist = {
+        owner = "openfang";
+        group = "openfang";
+        mode = "0400";
+      };
+      claude-tokens-by-user = {
+        owner = "openfang";
+        group = "openfang";
         mode = "0400";
       };
       syncthing-alpha-device-id = {};
