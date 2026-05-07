@@ -26,31 +26,56 @@ const PLACEHOLDER_CYCLES = [
  * aggregate), agregar una sección aquí en el orden lógico de uso.
  */
 
-// eslint-disable-next-line no-unused-vars -- Icon SE USA en JSX (línea 26), eslint react-jsx detection falla con destructuring rename
-const Section = ({ icon: Icon, title, children, defaultOpen = false }) => {
+// eslint-disable-next-line no-unused-vars -- Icon SE USA en JSX, eslint react-jsx detection falla con destructuring rename
+const Section = ({ icon: Icon, title, children, defaultOpen = false, isNew = false, action = null }) => {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border border-slate-800 rounded-xl bg-slate-900/60 overflow-hidden">
+    <div className={`border rounded-xl bg-slate-900/60 overflow-hidden transition-all ${isNew ? 'border-emerald-700/60 shadow-[0_0_18px_rgba(16,185,129,0.18)]' : 'border-slate-800'}`}>
       <button
         type="button"
         onClick={() => setOpen(!open)}
         className="w-full p-3 flex items-center gap-3 hover:bg-slate-800/60 active:bg-slate-800 text-left min-h-[56px]"
       >
-        <Icon size={20} className="text-emerald-400 shrink-0" />
+        <span className={`shrink-0 inline-flex items-center justify-center ${open ? 'animate-pulse' : ''}`}>
+          <Icon size={20} className="text-emerald-400" />
+        </span>
         <span className="text-base font-bold text-white flex-1">{title}</span>
+        {isNew && (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-600/40 animate-pulse">
+            ✨ NUEVO
+          </span>
+        )}
         {open ? <ChevronDown size={18} className="text-slate-400" /> : <ChevronRight size={18} className="text-slate-400" />}
       </button>
       {open && (
         <div className="px-4 pb-4 pt-1 text-sm text-slate-300 leading-relaxed space-y-2">
           {children}
+          {action && (
+            <button
+              type="button"
+              onClick={action.onClick}
+              className="mt-3 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 active:bg-emerald-500/35 text-emerald-300 hover:text-emerald-100 border border-emerald-700/50 font-bold text-sm transition-colors min-h-[44px]"
+            >
+              {action.label} <ChevronRight size={16} />
+            </button>
+          )}
         </div>
       )}
     </div>
   );
 };
 
-export default function HelpManual({ onBack }) {
+export default function HelpManual({ onBack, onNavigate }) {
   const [openCycle, setOpenCycle] = useState(null);
+  // Helper para construir un quick-action que cierra el manual y navega al
+  // flow real. UX A del PR #188: "leer cómo se hace" + "hacerlo" sin friction.
+  const quickAction = (label, route) => ({
+    label,
+    onClick: () => {
+      if (typeof onNavigate === 'function') onNavigate(route);
+      else if (typeof onBack === 'function') onBack();
+    },
+  });
   return (
     <div className="h-[100dvh] w-full bg-slate-950 text-white flex flex-col overflow-y-auto">
       {/* Header */}
@@ -77,7 +102,7 @@ export default function HelpManual({ onBack }) {
         </p>
 
         {/* Sección Inicio Rápido */}
-        <Section icon={Sprout} title="🌱 Inicio rápido, primera vez" defaultOpen={true}>
+        <Section icon={Sprout} title="🌱 Inicio rápido, primera vez" defaultOpen={true} action={quickAction('Crear primera planta', 'plant_asset')}>
           <ol className="list-decimal pl-5 space-y-1.5">
             <li>Toque el botón <strong className="text-purple-400">+</strong> arriba (header) para registrar su primera planta.</li>
             <li>Busque la especie escribiendo (ej. &ldquo;gulpa&rdquo; encuentra Gulupa). El sistema autocompleta estrato, gremio y producción.</li>
@@ -91,7 +116,7 @@ export default function HelpManual({ onBack }) {
         </Section>
 
         {/* Sección Voz */}
-        <Section icon={Mic} title="🎤 Registrar por voz">
+        <Section icon={Mic} title="🎤 Registrar por voz" action={quickAction('Probar voz ahora', 'voz')}>
           <p>Toque el <strong className="text-emerald-400">FAB micrófono</strong> abajo a la izquierda (siempre visible).</p>
           <p>Diga algo natural, ejemplos:</p>
           <ul className="list-disc pl-5 space-y-1 text-slate-400">
@@ -122,7 +147,7 @@ export default function HelpManual({ onBack }) {
         </Section>
 
         {/* Sección Foto, expandida con foto por especie */}
-        <Section icon={Camera} title="📸 Foto: tomar, adjuntar y foto guía por especie">
+        <Section icon={Camera} title="📸 Foto: tomar, adjuntar y foto guía por especie" action={quickAction('Crear planta con foto', 'plant_asset')}>
           <p><strong>Al crear planta:</strong> el botón cámara abre su cámara o galería. La foto queda en la hoja de vida de esa planta.</p>
           <p><strong>Adjuntar a evento existente</strong>: entre al evento desde Bitácora/Historial → sección &ldquo;Adjuntar foto a este evento&rdquo;. Útil para documentar después de la siembra.</p>
 
@@ -148,7 +173,7 @@ export default function HelpManual({ onBack }) {
         </Section>
 
         {/* Sección Vision AI, disease diagnosis + species recognition (BETA) */}
-        <Section icon={Sprout} title="🧬 IA por foto: enfermedades + identificación de especie">
+        <Section icon={Sprout} title="🧬 IA por foto: enfermedades + identificación de especie" isNew action={quickAction('Identificar con IA', 'plant_asset')}>
           <p>Chagra usa visión AI local (Gemma3 multimodal) para dos funciones distintas, ambas marcadas <strong className="text-amber-400">BETA</strong>:</p>
 
           <h4 className="text-sm font-bold text-emerald-400 mt-3">📋 Diagnóstico de enfermedades por foto</h4>
@@ -180,7 +205,7 @@ export default function HelpManual({ onBack }) {
         </Section>
 
         {/* Sección Zonas */}
-        <Section icon={MapPin} title="📍 Zonas y ubicación">
+        <Section icon={MapPin} title="📍 Zonas y ubicación" action={quickAction('Ver mapa de la finca', 'mapa')}>
           <p>Las plantas viven dentro de <strong>zonas</strong> (parcelas, camas, invernaderos). Antes de plantar muchas, cree las zonas:</p>
           <ol className="list-decimal pl-5 space-y-1">
             <li>Activos → tab <strong>&ldquo;Zonas&rdquo;</strong> (icono mapa) → +</li>
@@ -194,13 +219,13 @@ export default function HelpManual({ onBack }) {
         </Section>
 
         {/* Sección Plagas */}
-        <Section icon={Bug} title="🐛 Reportar plaga / invasora">
+        <Section icon={Bug} title="🐛 Reportar plaga / invasora" action={quickAction('Reportar plaga ahora', 'reportar_invasora')}>
           <p>Toque menú principal → <strong>&ldquo;Plagas&rdquo;</strong>. Seleccione la especie invasora del catálogo, capture foto y geolocalización.</p>
           <p>Después de guardar, le aparece una pantalla con <strong>sugerencias de especies nativas para reemplazar</strong>, toque &ldquo;Sembrar aquí&rdquo; y va al flow de siembra precargado con la nativa + las coordenadas del invasor.</p>
         </Section>
 
         {/* Sección Cosechar */}
-        <Section icon={Apple} title="🍎 Registrar cosecha">
+        <Section icon={Apple} title="🍎 Registrar cosecha" action={quickAction('Registrar cosecha', 'cosechar')}>
           <p>Activos → seleccione la planta → en la card aparece &ldquo;Registrar cosecha&rdquo;. Capture cantidad cosechada (kg / unidades) + fecha. Se agrega como log--harvest a la hoja de vida.</p>
           <p>También por voz: &ldquo;coseché 5 kilos de gulupas&rdquo; con el FAB micrófono.</p>
         </Section>
@@ -258,7 +283,7 @@ export default function HelpManual({ onBack }) {
             Datos consolidados DR-034 cerrado 2026-05-06 (3/3 LLMs convergencia
             alta) + ADR-032 plan curación starter species. Política ADR-033
             Opción C estricta, solo Nivel 2 evidencia, NO folclore. */}
-        <Section icon={GraduationCap} title="🌿 Aprende sembrando, ciclo agroecológico" defaultOpen={false}>
+        <Section icon={GraduationCap} title="🌿 Aprende sembrando, ciclo agroecológico" defaultOpen={false} isNew>
           <p className="text-sm leading-relaxed">
             <strong className="text-emerald-300">Punto de partida educativo</strong> para quien empieza desde cero, no solo cómo usar Chagra, sino cómo cultivar.
           </p>
@@ -325,7 +350,7 @@ export default function HelpManual({ onBack }) {
         </Section>
 
         {/* Sección Novedades v0.12.x, features mergeados sesión 2026-05-03 */}
-        <Section icon={Sparkles} title="✨ Novedades de mayo 2026">
+        <Section icon={Sparkles} title="✨ Novedades de mayo 2026" isNew>
           <p className="text-xs text-slate-400 mb-2">
             Cambios recientes que reducen friction. Todos opt-in / no-imposición:
             la app no fuerza, solo sugiere.
