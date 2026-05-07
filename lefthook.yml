@@ -96,6 +96,13 @@ pre-commit:
       # Convención: el dev NO bumpea, el hook sí.
       run: node scripts/auto-bump-version.mjs
 
+    cycle-content-anti-overpromise:
+      # Valida /public/cycle-content/<slug>.json contra rangos agroecológicos
+      # colombianos (ADR-032 sec 6). Rechaza overpromise hidropónico disfrazado
+      # de agroecología. Solo corre si cambian JSONs de cycle-content.
+      glob: "public/cycle-content/*.json"
+      run: node scripts/validate-cycle-content.mjs
+
 commit-msg:
   commands:
     conventional:
