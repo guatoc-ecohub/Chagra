@@ -34,17 +34,25 @@ const MaterialCard = ({ item, onRefill }) => {
   const isLow = stock < LOW_THRESHOLD;
   const progressPct = Math.min((stock / BAR_CAPACITY) * 100, 100);
   const isPending = item._pending;
+  const pendingReason = item._pendingReason || 'sync_error';
+  const isLocalPending = isPending && (pendingReason === 'no_network' || pendingReason === 'no_token');
+  const pendingClass = isPending
+    ? (isLocalPending ? 'border-blue-700/60' : 'border-dashed border-slate-600 opacity-80')
+    : 'border-slate-800';
 
   const { values: trend } = useConsumptionMetrics(name, 7);
 
   return (
     <div
-      className={`bg-slate-900 border rounded-2xl p-5 space-y-4 transition-all ${isPending ? 'border-dashed border-slate-600 opacity-80' : 'border-slate-800'
-        }`}
+      className={`bg-slate-900 border rounded-2xl p-5 space-y-4 transition-all ${pendingClass}`}
     >
       <div className="flex justify-between items-start gap-2">
         <h3 className="font-bold text-slate-200 truncate flex-1">{name}</h3>
-        {isLow && (
+        {isLocalPending ? (
+          <span className="text-[10px] px-2 py-1 rounded bg-blue-500/15 text-blue-200 border border-blue-500/40 font-bold uppercase">
+            Guardado local · sync pendiente
+          </span>
+        ) : isLow && (
           <AlertTriangle
             size={18}
             className="text-amber-500 animate-pulse shrink-0"

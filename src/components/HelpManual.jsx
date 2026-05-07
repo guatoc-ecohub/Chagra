@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, ChevronDown, ChevronRight, BookOpen, Sprout, Mic, Camera, MapPin, Bug, Apple, MessageCircle, AlertTriangle, Wrench, Sparkles, GraduationCap, Clock } from 'lucide-react';
 import CycleContentRenderer from './CycleContentRenderer.jsx';
+import HelpTipCard from './HelpTipCard.jsx';
 
 const STARTER_CYCLES = [
   { slug: 'lechuga', emoji: '🥬', label: 'Lechuga', sub: 'Starter · 60-90 días · frío/templado' },
@@ -78,21 +79,24 @@ export default function HelpManual({ onBack, onNavigate }) {
   });
   return (
     <div className="h-[100dvh] w-full bg-slate-950 text-white flex flex-col overflow-y-auto">
-      {/* Header */}
-      <header className="p-4 sticky top-0 bg-slate-950/95 backdrop-blur-md border-b border-slate-800 flex items-center gap-3 z-10 shrink-0 shadow-lg">
-        <button
-          type="button"
-          onClick={onBack}
-          aria-label="Volver"
-          className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[48px] min-w-[48px] flex items-center justify-center"
-        >
-          <ArrowLeft size={22} />
-        </button>
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <BookOpen size={22} className="text-emerald-400 shrink-0" />
-          <h2 className="text-xl font-black tracking-tight truncate">Manual de uso</h2>
-        </div>
-      </header>
+       {/* Header */}
+       <header className="p-4 sticky top-0 bg-slate-950/95 backdrop-blur-md border-b border-slate-800 flex items-center gap-3 z-10 shrink-0 shadow-lg">
+         <button
+           type="button"
+           onClick={onBack}
+           aria-label="Volver"
+           className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[48px] min-w-[48px] flex items-center justify-center"
+         >
+           <ArrowLeft size={22} />
+         </button>
+         <div className="flex items-center gap-2 flex-1 min-w-0">
+           <BookOpen size={22} className="text-emerald-400 shrink-0" />
+           <h2 className="text-xl font-black tracking-tight truncate">Manual de uso</h2>
+         </div>
+       </header>
+       
+       {/* Tip del día */}
+       <HelpTipCard />
 
       <div className="flex-1 p-4 flex flex-col gap-3 max-w-2xl mx-auto w-full pb-12">
         <p className="text-sm text-slate-400 leading-relaxed">
