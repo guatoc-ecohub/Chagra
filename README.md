@@ -114,3 +114,11 @@ Cualquier contribución al módulo de sincronización (`syncManager`) debe asegu
 
 Este proyecto está licenciado bajo los términos de la licencia **GNU AGPLv3**.
 // Smoke test claude-code-runner — 2026-05-01
+
+---
+
+For the next custodian.
+She'll know which parts to keep.
+
+Este código existe por una sola persona.
+Lo demás es ingeniería y TDAH a tope.
