@@ -7,6 +7,12 @@
  *
  * Para corregir un error operacional → emitir `inventory_adjusted` con razón.
  * Para reanchorar stock manual → emitir `inventory_counted` (LWW honesto).
+ *
+ * @typedef {import('../types').ChagraAsset} ChagraAsset
+ * @typedef {import('../types').ChagraLog} ChagraLog
+ * @typedef {import('../types').ChagraSpecies} ChagraSpecies
+ * @typedef {import('../types').ChagraBiopreparado} ChagraBiopreparado
+ * @typedef {{log_id: string, event_type: 'received'|'consumed'|'transformed'|'counted'|'lost'|'transferred'|'adjusted'|'reserved', timestamp: string, hlc: {wall: string, counter: number, device_id: string}, payload: Object, idempotency_key: string, prev_log_hash?: string}} ChagraInventoryEvent
  */
 
 import { ulid } from 'ulid';

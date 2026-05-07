@@ -6,6 +6,11 @@ import { newId } from '../utils/id';
 import { savePayload, updatePayload } from '../services/payloadService';
 import { getAccessToken } from '../services/authService';
 
+/** @typedef {import('../types').ChagraAsset} ChagraAsset */
+/** @typedef {import('../types').ChagraLog} ChagraLog */
+/** @typedef {import('../types').ChagraSpecies} ChagraSpecies */
+/** @typedef {import('../types').ChagraBiopreparado} ChagraBiopreparado */
+
 /**
  * Store global de Activos (Zustand)
  * Patrón Offline-First: memoria (Zustand) ← IndexedDB ← FarmOS API

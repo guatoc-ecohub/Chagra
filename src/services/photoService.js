@@ -13,12 +13,15 @@
  * Render 2-tier en componentes:
  *   const url = await getPhotoUrl({ assetId, speciesSlug });
  *   // Resuelve: user override (media_cache) > catálogo default
- *   //   (/catalog-photos/<slug>.jpg) > placeholder
+ *      (/catalog-photos/<slug>.jpg) > placeholder
  *
  * NO sobre-ingeniería:
  *   - Sin upload a CDN — todo IndexedDB local; FarmOS sync futuro
  *   - Sin EXIF GPS strip por ahora — preservamos por trazabilidad agroecológica
  *   - Sin reconocimiento AI — el usuario elige especie manualmente
+ *
+ * @typedef {import('../types').ChagraAsset} ChagraAsset
+ * @typedef {import('../types').ChagraLog} ChagraLog
  */
 
 import { openDB, STORES } from '../db/dbCore';
@@ -33,7 +36,7 @@ const CATALOG_PHOTOS_BASE = '/catalog-photos';
  * Captura desde input file (cámara o galería). Convierte HEIC→JPEG via canvas,
  * redimensiona, comprime, y retorna un Blob JPEG.
  *
- * @param {File} file — input file (de <input type="file" capture="environment">)
+ * @param {File} file - input file (de <input type="file" capture="environment">)
  * @returns {Promise<{blob: Blob, width: number, height: number, originalSize: number, compressedSize: number, mime: string}>}
  */
 export async function captureAndCompress(file) {

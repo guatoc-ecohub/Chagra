@@ -3,6 +3,11 @@ import { openDB, STORES } from '../db/dbCore.js';
 import { appendEvent, getStock } from './inventoryService.js';
 import { createInventoryEvent, EVENT_TYPES } from './inventoryEvents.js';
 
+/** @typedef {import('../types').ChagraAsset} ChagraAsset */
+/** @typedef {import('../types').ChagraLog} ChagraLog */
+/** @typedef {import('../types').ChagraSpecies} ChagraSpecies */
+/** @typedef {import('../types').ChagraBiopreparado} ChagraBiopreparado */
+
 // Mapeo de companions/antagonists D6 (árboles) + D7 (microorganismos) a
 // sugerencias accionables específicas que el operador puede aplicar al plan.
 // Cada entry produce un suggestion step (no es step obligatorio del template,
