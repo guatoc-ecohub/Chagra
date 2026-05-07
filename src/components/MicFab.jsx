@@ -1,5 +1,6 @@
 import React from 'react';
 import { Mic } from 'lucide-react';
+import useIdleVisibility from '../hooks/useIdleVisibility';
 
 /**
  * MicFab, Floating Action Button global para captura por voz (DR-030 QW4).
@@ -13,11 +14,16 @@ import { Mic } from 'lucide-react';
  * Visible en todas las rutas excepto loading/login (mismo patrón que
  * FieldFeedback). Toca → navigate('voz') abre VoiceCapture screen.
  *
+ * Auto-hide tras 2s sin interacción (feedback usuario externo 2026-05-06,
+ * bug #2 baseline): los FAB tapaban el widget "Cola de tareas" en home.
+ * Reaparecen con cualquier mousemove/touch/scroll/keydown.
+ *
  * Refs: deepresearch/chagra-ux/decisions/ux-clarity-2026-05.md (D1)
  */
 export default function MicFab({ onNavigate }) {
   const COLOR_PRIMARY = '#84cc16';   // lime-500 (matches NAV_TILE 'voz' accent)
   const COLOR_ACCENT = '#bef264';    // lime-300
+  const isVisible = useIdleVisibility(2000);
 
   return (
     <button
@@ -46,6 +52,9 @@ export default function MicFab({ onNavigate }) {
         display: 'flex',
         alignItems: 'center',
         gap: 10,
+        opacity: isVisible ? 1 : 0,
+        pointerEvents: isVisible ? 'auto' : 'none',
+        transition: 'opacity 250ms ease',
       }}
     >
       <Mic size={22} strokeWidth={2.5} aria-hidden="true" />

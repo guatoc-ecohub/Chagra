@@ -21,6 +21,7 @@
 import { useState, useEffect } from 'react';
 import { openDB, STORES } from '../db/dbCore';
 import useVoiceRecorder from '../hooks/useVoiceRecorder';
+import useIdleVisibility from '../hooks/useIdleVisibility';
 
 const FAB_SIZE = 52;
 const COLOR_PRIMARY = '#0E92A6';
@@ -40,6 +41,10 @@ export default function FieldFeedback() {
   const [text, setText] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  // Auto-hide tras 2s sin interacción (feedback usuario externo 2026-05-06,
+  // bug #2: FAB tapaba widgets en home). El modal abierto NO se ve afectado
+  // — solo el FAB fab-button colapsado es lo que se oculta.
+  const isFabVisible = useIdleVisibility(2000);
   const [errorMsg, setErrorMsg] = useState('');
 
   // Audio state, el hook gestiona MediaRecorder + permisos + hard limit 30s.
@@ -208,7 +213,7 @@ export default function FieldFeedback() {
 
   return (
     <>
-      {/* FAB button */}
+      {/* FAB button (auto-hide 2s idle) */}
       <button
         type="button"
         aria-label="Reportar feedback"
@@ -232,6 +237,9 @@ export default function FieldFeedback() {
           alignItems: 'center',
           justifyContent: 'center',
           padding: 0,
+          opacity: isFabVisible ? 1 : 0,
+          pointerEvents: isFabVisible ? 'auto' : 'none',
+          transition: 'opacity 250ms ease',
         }}
       >
         💬
