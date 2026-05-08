@@ -1,5 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { Sprout, AlertTriangle, Users, Beaker, Mountain, BookOpen, Loader2 } from 'lucide-react';
+import { Sprout, AlertTriangle, Users, Beaker, Mountain, BookOpen, Loader2, FileEdit } from 'lucide-react';
+
+/**
+ * Sanitiza strings de fuente para ocultar jerga interna DR-034 al usuario
+ * (audiencia incluye niños 11+ usando Chagra como herramienta educativa).
+ * Elimina patterns como "(gap G-X DR-034)" / " DR-034" / "(extrapolación a X)"
+ * preservando el resto. Si queda vacío post-cleanup, retorna null.
+ */
+function cleanSource(src) {
+  if (!src || typeof src !== 'string') return null;
+  let out = src
+    .replace(/\(gap\s+G-[0-9A-Z]+\s+DR-\d+\)/gi, '')
+    .replace(/\bDR-\d+\b/gi, '')
+    .replace(/\(extrapolaci[oó]n[^)]*\)/gi, '(datos extrapolados)')
+    .replace(/\s+/g, ' ')
+    .replace(/\s+([.,;])/g, '$1')
+    .replace(/^[\s·,;]+|[\s·,;]+$/g, '')
+    .trim();
+  if (!out) return null;
+  return out;
+}
 
 const FREQ_BADGE = {
   muy_comun: { label: 'Muy común', cls: 'bg-rose-900/40 text-rose-300 border-rose-800/60' },
@@ -193,13 +213,16 @@ export default function CycleContentRenderer({ slug, onClose }) {
       {Array.isArray(data.biopreparados) && data.biopreparados.length > 0 && (
         <Block icon={Beaker} title="Biopreparados" tone="emerald">
           <ul className="space-y-1 text-xs">
-            {data.biopreparados.map((b, i) => (
-              <li key={i}>
-                <span className="font-bold text-emerald-300">{b.nombre}</span>
-                <span className="text-slate-400">, {b.uso}</span>
-                {b.fuente && <span className="text-[10px] text-slate-600 italic"> · {b.fuente}</span>}
-              </li>
-            ))}
+            {data.biopreparados.map((b, i) => {
+              const fuenteClean = cleanSource(b.fuente);
+              return (
+                <li key={i}>
+                  <span className="font-bold text-emerald-300">{b.nombre}</span>
+                  <span className="text-slate-400">, {b.uso}</span>
+                  {fuenteClean && <span className="text-[10px] text-slate-600 italic"> · {fuenteClean}</span>}
+                </li>
+              );
+            })}
           </ul>
         </Block>
       )}
@@ -213,15 +236,20 @@ export default function CycleContentRenderer({ slug, onClose }) {
         </Block>
       )}
 
-      {data.curacion_status && (
-        <div className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-[10px] text-slate-500 italic">
-          <p>Estado: <strong className="text-slate-400">{data.curacion_status}</strong></p>
-          {Array.isArray(data.curacion_pendiente) && data.curacion_pendiente.length > 0 && (
-            <ul className="mt-1 list-disc pl-4 space-y-0.5">
-              {data.curacion_pendiente.map((p, i) => <li key={i}>{p}</li>)}
-            </ul>
-          )}
-          {data.convergencia_dr_034 && <p className="mt-1">{data.convergencia_dr_034}</p>}
+      {data.curacion_status && data.curacion_status !== 'curated' && (
+        <div className="mt-1 p-3 rounded-xl bg-amber-900/15 border border-amber-700/40 flex items-start gap-2">
+          <FileEdit size={14} className="text-amber-400 shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap mb-1">
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-amber-300 bg-amber-900/40 border border-amber-700/50 rounded-full px-2 py-0.5">
+                📝 Borrador
+              </span>
+              <span className="text-[10px] text-amber-400/80 font-bold uppercase tracking-wider">Pendiente curación técnica</span>
+            </div>
+            <p className="text-xs text-amber-100 leading-relaxed">
+              Estos datos están basados en literatura agroecológica colombiana revisada y rangos conservadores. Falta validarlos con un agrónomo en campo. Si los aplicas, observa con cuidado y registra en bitácora — tus notas aportan a la curación.
+            </p>
+          </div>
         </div>
       )}
     </div>
