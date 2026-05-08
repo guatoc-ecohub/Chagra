@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { GraduationCap, Mic } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { GraduationCap, Mic, ChevronDown } from 'lucide-react';
 import CycleContentRenderer from './CycleContentRenderer.jsx';
 import HelpVoiceQuestion from './HelpVoiceQuestion.jsx';
 
@@ -30,6 +30,18 @@ const PLACEHOLDER_CYCLES = [
  */
 export default function HelpCycleSection() {
   const [selectedSlug, setSelectedSlug] = useState('lechuga');
+  const contentRef = useRef(null);
+  const isFirstRender = useRef(true);
+
+  // Tras cambio de especie: scroll al contenido + key forzando re-mount.
+  // Skip on mount para no mover la vista al abrir Ayuda.
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [selectedSlug]);
 
   return (
     <div className="border rounded-xl border-amber-700/40 bg-slate-900/80 p-4 mb-6 shadow-[0_0_20px_rgba(245,158,11,0.08)]">
@@ -55,23 +67,34 @@ export default function HelpCycleSection() {
         Disponibles ahora
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-        {STARTER_CYCLES.map((c) => (
-          <button
-            key={c.slug}
-            type="button"
-            onClick={() => setSelectedSlug(c.slug)}
-            className={`p-3 rounded-lg text-left min-h-[64px] border transition-colors ${
-              selectedSlug === c.slug
-                ? 'bg-emerald-900/35 border-emerald-500/60 ring-1 ring-emerald-500/30'
-                : 'bg-slate-950/60 border-emerald-900/30 hover:bg-slate-800/80'
-            }`}
-          >
-            <p className="font-bold text-emerald-300 text-sm">
-              {c.emoji} {c.label}
-            </p>
-            <p className="text-[11px] text-slate-500 mt-0.5">{c.sub}</p>
-          </button>
-        ))}
+        {STARTER_CYCLES.map((c) => {
+          const isSelected = selectedSlug === c.slug;
+          return (
+            <button
+              key={c.slug}
+              type="button"
+              onClick={() => setSelectedSlug(c.slug)}
+              aria-pressed={isSelected}
+              className={`relative p-3 rounded-lg text-left min-h-[64px] border transition-colors ${
+                isSelected
+                  ? 'bg-emerald-900/35 border-emerald-500/60 ring-1 ring-emerald-500/30'
+                  : 'bg-slate-950/60 border-emerald-900/30 hover:bg-slate-800/80'
+              }`}
+            >
+              <p className="font-bold text-emerald-300 text-sm">
+                {c.emoji} {c.label}
+              </p>
+              <p className="text-[11px] text-slate-500 mt-0.5">{c.sub}</p>
+              {isSelected && (
+                <ChevronDown
+                  size={16}
+                  aria-hidden="true"
+                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-emerald-400 animate-bounce"
+                />
+              )}
+            </button>
+          );
+        })}
       </div>
 
       <p className="text-[11px] text-orange-400/90 font-bold uppercase tracking-wider mt-4 mb-2">
@@ -94,8 +117,11 @@ export default function HelpCycleSection() {
         ))}
       </div>
 
-      <div className="mt-4 rounded-xl bg-slate-950/70 border border-emerald-800/40 overflow-hidden">
-        <CycleContentRenderer slug={selectedSlug} />
+      <div
+        ref={contentRef}
+        className="mt-4 rounded-xl bg-slate-950/70 border border-emerald-500/40 overflow-hidden ring-1 ring-emerald-500/20 scroll-mt-4"
+      >
+        <CycleContentRenderer key={selectedSlug} slug={selectedSlug} />
       </div>
 
       <HelpVoiceQuestion speciesSlug={selectedSlug} />
