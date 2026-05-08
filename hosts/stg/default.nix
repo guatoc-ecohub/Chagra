@@ -26,9 +26,14 @@
   };
 
   # Experimental Agents (Picoclaw + OpenClaw)
+  # Hotfix 2026-05-08: enablePicoclaw=false porque preStart chown falla con
+  # "Operación no permitida" — el script corre como user picoclaw y no puede
+  # chown /var/lib/picoclaw/.picoclaw/config.json. Bug latente del módulo
+  # experimental-agents que rompe activación de stg. Reactivar cuando se
+  # arregle el preStart (prefix '+' privileged o tmpfiles.rules separado).
   services.experimental-agents = {
     enable = true;
-    enablePicoclaw = true;  # glm-4.7 con API key
+    enablePicoclaw = false;
     enableOpenclaw = false;  # Por ahora deshabilitado
   };
   
