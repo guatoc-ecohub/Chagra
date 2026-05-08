@@ -2,6 +2,17 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Wifi, WifiOff, RefreshCw, CheckCircle, AlertTriangle, X } from 'lucide-react';
 import { syncManager } from '../services/syncManager';
 
+// Helpers de dismiss persistente por sesión — top-level para que sean
+// estables y no requieran dependencias en useCallback.
+const dismissKey = (st, count) => `chagra:netStatus:dismissed:${st}:${count}`;
+const isDismissedInSession = (st, count) => {
+  try { return sessionStorage.getItem(dismissKey(st, count)) === '1'; }
+  catch (_) { return false; }
+};
+const markDismissedInSession = (st, count) => {
+  try { sessionStorage.setItem(dismissKey(st, count), '1'); } catch (_) { /* noop */ }
+};
+
 const STATUS = {
   ONLINE: 'online',
   OFFLINE: 'offline',
@@ -24,10 +35,10 @@ export default function NetworkStatusBar() {
 
       if (stats.isSyncing) {
         setStatus(STATUS.SYNCING);
-        setVisible(true);
+        if (!isDismissedInSession(STATUS.SYNCING, stats.pendingCount)) setVisible(true);
       } else if (!stats.isOnline) {
         setStatus(STATUS.OFFLINE);
-        setVisible(true);
+        if (!isDismissedInSession(STATUS.OFFLINE, stats.pendingCount)) setVisible(true);
       } else if (stats.pendingCount === 0 && status === STATUS.SYNCING) {
         // Transición de syncing a synced
         setSyncedCount((prev) => prev || 1);
@@ -115,6 +126,7 @@ export default function NetworkStatusBar() {
   };
   const dismiss = (e) => {
     e.stopPropagation();
+    markDismissedInSession(status, pendingCount);
     setVisible(false);
   };
 

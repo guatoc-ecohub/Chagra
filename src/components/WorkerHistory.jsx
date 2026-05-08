@@ -203,11 +203,17 @@ export default function WorkerHistory({ onBack, onEntryClick }) {
         {/* Registros Recientes (pending_transactions) */}
         {activeSection === 'recientes' && !isLoading && (
           <>
+            {/* Honesty note: por ahora esta vista solo muestra pendientes
+                offline. Próxima versión cubrirá también recientes online
+                (ver prompt opencode bitácora-disconnect-audit Parte C). */}
+            <p className="text-[11px] text-slate-500 italic px-2 py-2 leading-relaxed">
+              Por ahora muestra los registros pendientes de sincronizar offline. Si grabaste algo con conexión, ya está sincronizado y lo encuentras en <strong className="text-slate-300">Activos</strong>. Pronto verás también recientes online aquí.
+            </p>
             {pendingTx.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-slate-500">
                 <Cloud size={48} className="mb-3 opacity-30" />
                 <p className="text-lg">Sin registros pendientes</p>
-                <p className="text-sm mt-1">Los registros de esta sesión aparecerán aquí</p>
+                <p className="text-sm mt-1">Cuando registres algo sin red, aparece aquí hasta sincronizar</p>
               </div>
             ) : (
               pendingTx.map((tx, idx) => {
