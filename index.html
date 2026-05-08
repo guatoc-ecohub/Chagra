@@ -22,9 +22,70 @@
     <meta name="apple-mobile-web-app-title" content="Chagra" />
 
     <title>Chagra</title>
+
+    <!-- Pre-React loader inline (issue #121): evita flash blanco al
+         arrancar PWA fría antes de que React + Suspense pinten el
+         ChagraGrowLoader. Sale del DOM cuando React monta el root. -->
+    <style>
+      html, body { background: #020617; margin: 0; }
+      #pre-loader {
+        position: fixed; inset: 0;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        background: #020617;
+        color: #34d399;
+        font-family: system-ui, -apple-system, sans-serif;
+        z-index: 9999;
+        transition: opacity 200ms ease-out;
+      }
+      #pre-loader .pl-emoji {
+        font-size: 48px; line-height: 1;
+        animation: pl-grow 1.6s ease-in-out infinite;
+      }
+      #pre-loader .pl-text {
+        margin-top: 14px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #6ee7b7;
+        opacity: 0.85;
+      }
+      @keyframes pl-grow {
+        0%, 100% { transform: scale(0.85); opacity: 0.7; }
+        50%      { transform: scale(1.05); opacity: 1; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #pre-loader .pl-emoji { animation: none; }
+      }
+    </style>
   </head>
   <body>
+    <div id="pre-loader" aria-label="Cargando Chagra">
+      <span class="pl-emoji" aria-hidden="true">🌱</span>
+      <span class="pl-text">Chagra</span>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Quita el pre-loader cuando React monta su primer render.
+      (function () {
+        var root = document.getElementById('root');
+        var loader = document.getElementById('pre-loader');
+        if (!root || !loader) return;
+        var done = function () {
+          loader.style.opacity = '0';
+          setTimeout(function () { loader.remove(); }, 220);
+        };
+        var obs = new MutationObserver(function () {
+          if (root.children.length > 0) {
+            obs.disconnect();
+            done();
+          }
+        });
+        obs.observe(root, { childList: true });
+        setTimeout(function () { obs.disconnect(); done(); }, 5000);
+      })();
+    </script>
   </body>
 </html>
