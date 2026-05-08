@@ -71,8 +71,15 @@ const useAssetStore = create((set, get) => ({
       land: 'lands',
     };
     try {
+      // FarmOS JSON:API default page size = 50 + orden indeterminado.
+      // Sin sort, plantas nuevas pueden caer en página 2+ y nunca llegar al
+      // store → operador graba pero no las ve (bug 2026-05-08). Cubrimos
+      // 95% de fincas con 200 más recientes ordenadas por created desc.
+      // TODO: paginación completa con `links.next` cuando alguna finca
+      // supere 200 assets activos por tipo.
+      const ASSET_PAGE_LIMIT = 200;
       const results = await Promise.all(targets.map(async (t) => {
-        const res = await fetchFn(`/api/asset/${t}`);
+        const res = await fetchFn(`/api/asset/${t}?sort=-created&page[limit]=${ASSET_PAGE_LIMIT}`);
         const list = res.data || [];
         await assetCache.bulkPut(t, list);
         return { key: typeToKey[t], data: await assetCache.getByType(t) };
