@@ -70,6 +70,11 @@ export default function VoiceCapture({ onSave }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [pendingCount, setPendingCount] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
+  // Path tracking: true si AL MENOS UNA entity cayó al fallback offline
+  // (savePayload retorna message con "local"). Decide el copy de STATE_DONE
+  // — sólo apunta a Bitácora → Pendientes cuando realmente hay algo
+  // pendiente; si todas se sincronizaron directo con FarmOS, no mentimos.
+  const [syncedOffline, setSyncedOffline] = useState(false);
   // Timestamp del momento en que el operador habló. Capturado al detener
   // la grabación restando la duración del audio. Se propaga al log--seeding
   // (timestamp Unix) y al asset--plant._createdAt (millis JS) para que la
@@ -126,6 +131,7 @@ export default function VoiceCapture({ onSave }) {
     setErrorMsg('');
     setReprocessingId(null);
     setLiveStream('');
+    setSyncedOffline(false);
     setView(STATE_IDLE);
   }, [reset]);
 
@@ -369,12 +375,15 @@ export default function VoiceCapture({ onSave }) {
       }
     }
 
+    let hadOfflinePath = false;
     for (const entity of expandedEntities) {
       try {
         const payload = buildSeedingPayload(entity);
         const result = await savePayload('seeding', payload);
-        if (result.success || (result.message || '').toLowerCase().includes('local')) {
+        const isOfflineFallback = (result.message || '').toLowerCase().includes('local');
+        if (result.success || isOfflineFallback) {
           savedCount++;
+          if (isOfflineFallback) hadOfflinePath = true;
         } else {
           errors.push(`${entity.crop}: ${result.message || 'desconocido'}`);
         }
@@ -385,6 +394,7 @@ export default function VoiceCapture({ onSave }) {
 
     setIsSaving(false);
     if (savedCount > 0) {
+      setSyncedOffline(hadOfflinePath);
       // Reproceso exitoso: purgar la grabación de pending_voice para que no
       // reaparezca en el banner en futuras sesiones.
       if (reprocessingId != null) {
@@ -547,7 +557,11 @@ export default function VoiceCapture({ onSave }) {
           <div className="text-center max-w-xs">
             <p className="text-base font-bold text-green-300">Registro guardado ✓</p>
             <p className="text-xs text-slate-400 mt-1">
-              Se sincronizará con FarmOS cuando haya conexión. Mientras tanto, lo encontrás en <strong className="text-slate-200">Bitácora → Pendientes</strong>.
+              {syncedOffline ? (
+                <>Se sincronizará con FarmOS cuando haya conexión. Mientras tanto, lo encuentra en <strong className="text-slate-200">Bitácora → Recientes</strong>.</>
+              ) : (
+                <>Sincronizado con FarmOS.</>
+              )}
             </p>
           </div>
           <div className="flex flex-wrap gap-2 justify-center">
@@ -557,12 +571,14 @@ export default function VoiceCapture({ onSave }) {
             >
               <Mic size={18} /> Nueva grabación
             </button>
-            <button
-              onClick={() => window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view: 'historial' } }))}
-              className="px-6 py-3 min-h-[44px] bg-slate-800 hover:bg-slate-700 rounded-xl font-bold flex items-center gap-2 text-slate-200"
-            >
-              Ver en Bitácora
-            </button>
+            {syncedOffline && (
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view: 'historial' } }))}
+                className="px-6 py-3 min-h-[44px] bg-slate-800 hover:bg-slate-700 rounded-xl font-bold flex items-center gap-2 text-slate-200"
+              >
+                Ver en Bitácora
+              </button>
+            )}
           </div>
         </div>
       )}
