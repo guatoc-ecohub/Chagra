@@ -2,6 +2,11 @@ import { sendToFarmOS } from './apiService';
 import { syncManager } from './syncManager';
 import { generatePlanForPlant } from './planGeneratorService';
 
+/** @typedef {import('../types').ChagraAsset} ChagraAsset */
+/** @typedef {import('../types').ChagraLog} ChagraLog */
+/** @typedef {import('../types').ChagraSpecies} ChagraSpecies */
+/** @typedef {import('../types').ChagraBiopreparado} ChagraBiopreparado */
+
 const isUUID = (uuid) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uuid);
 
 const resolveEndpoint = (type) =>
@@ -12,6 +17,14 @@ const resolveEndpoint = (type) =>
   type === 'task' ? '/api/log/task' :
   '/api/log/seeding';
 
+/**
+ * Guarda un payload en FarmOS (online) o encola para sincronización (offline).
+ * Resuelve entidades anidadas (inlines) antes del envío.
+ *
+ * @param {'plant_asset'|'input'|'harvest'|'observation'|'task'|'seeding'} type - Tipo de entidad FarmOS
+ * @param {Object} payload - Payload JSON:API para enviar a FarmOS
+ * @returns {Promise<{success: boolean, message: string, data: any}>} Resultado de la operación
+ */
 export const savePayload = async (type, payload) => {
   console.log(`Payload Chagra (${type}):`, JSON.stringify(payload, null, 2));
   const endpoint = resolveEndpoint(type);
