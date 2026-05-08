@@ -58,7 +58,11 @@ export async function streamOllama(url, body, onToken, { signal, onDone } = {}) 
   if (!response.ok) {
     let detail = '';
     try { detail = await response.text(); } catch (_) { /* noop */ }
-    throw new Error(`Ollama ${response.status}: ${detail.slice(0, 200)}`);
+    // Sanitize body antes de exponer — cloudflared 502 / Ollama down devuelven
+    // HTML completo que el slice(200) leakea al UI (bug HelpVoiceQuestion 2026-05-08).
+    const { buildCleanErrorMessage } = await import('./sanitizeError.js');
+    const ctype = response.headers?.get?.('content-type') || '';
+    throw new Error(buildCleanErrorMessage('Ollama', response.status, response.statusText, detail, ctype));
   }
   if (!response.body) {
     throw new Error('Respuesta sin body streameable (¿buffering del proxy?)');

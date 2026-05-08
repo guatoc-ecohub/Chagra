@@ -54,9 +54,15 @@ export const fetchFromFarmOS = async (endpoint, options = {}) => {
         if (typeof window !== 'undefined') window.location.hash = '#login';
       }
       const errorDetail = await response.text().catch(() => '');
-      const error = new Error(`FarmOS API Error ${response.status}: ${response.statusText} - ${errorDetail}`);
+      // Sanitize body antes de pegarlo al .message — Drupal/cloudflared a
+      // veces devuelven HTML completo (página 404/502) que bloatea el toast
+      // del operador (bug 2026-05-08).
+      const { buildCleanErrorMessage } = await import('./sanitizeError.js');
+      const ctype = response.headers?.get?.('content-type') || '';
+      const cleanMsg = buildCleanErrorMessage('FarmOS API Error', response.status, response.statusText, errorDetail, ctype);
+      const error = new Error(cleanMsg);
       error.status = response.status;
-      error.detail = errorDetail;
+      error.detail = errorDetail;  // raw preservado para debug en console
       throw error;
     }
     return await response.json();
