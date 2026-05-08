@@ -1,27 +1,19 @@
-# CLOUDFLARE TUNNEL CONFIG
-# ========================
-# El servicio bind 127.0.0.1:8096 pero el ingress de hand.guatoc.co se
-# configura MANUALMENTE en Cloudflare Zero Trust Dashboard porque el
-# tunnel actual usa modo Remote Managed (`run --token`).
-#
-# Para configurar manualmente (operador post-merge):
-#   1. Cloudflare Zero Trust → Networks → Tunnels → alpha-guatoc → Edit
-#   2. Public Hostname → Add hostname:
-#      Subdomain: hand
-#      Domain: guatoc.co
-#      Service: HTTP://localhost:8096
-#   3. Save
-#
-# Migración futura a Local Managed: ver queue/047 (deuda técnica registrada).
+# CLOUDFLARE TUNNEL — Local Managed desde queue/047 (PR #67 mergeado).
+# El service bind 127.0.0.1:8096 y el ingress hand.guatoc.co → :8096 está
+# en hosts/alpha/default.nix `environment.etc."cloudflared/config.yml"`.
 
 { config, lib, pkgs, ... }:
 
 let
   cfg = config.guatoc.ai.claudeLink;
+  # python-multipart es requerido por FastAPI para parsear Form(...) — sin
+  # él, el endpoint POST /claude-link/<uuid> crashea al arranque con
+  # RuntimeError "Form data requires python-multipart to be installed".
   pythonEnv = pkgs.python3.withPackages (ps: with ps; [
     fastapi
     uvicorn
     pydantic
+    python-multipart
   ]);
 in {
   options.guatoc.ai.claudeLink = {
