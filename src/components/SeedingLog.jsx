@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Camera, MapPin } from 'lucide-react';
+import { ArrowLeft, Camera, MapPin, CheckCircle } from 'lucide-react';
 import { savePayload } from '../services/payloadService';
 import { captureAndCompress, savePhoto } from '../services/photoService';
 import { sanitizeBlobUrl } from '../utils/blobUrl';
@@ -19,6 +19,8 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
   const [coordinates, setCoordinates] = useState(initialData.coordinates ? [initialData.coordinates] : []);
   const [notes, setNotes] = useState(initialData.notes || '');
   const [isSaving, setIsSaving] = useState(false);
+  const [syncedOffline, setSyncedOffline] = useState(false);
+  const [view, setView] = useState('form');
   const watchIdRef = useRef(null);
 
   useEffect(() => {
@@ -157,6 +159,40 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
       setIsSaving(false);
     }
   };
+
+  if (view === 'success') {
+    return (
+      <div className="h-[100dvh] w-full bg-slate-950 text-slate-100 flex flex-col p-6 items-center justify-center gap-6">
+        <div className="text-center animate-in fade-in zoom-in duration-300">
+          <CheckCircle size={64} className="text-emerald-500 mx-auto mb-4" />
+          <h3 className="text-2xl font-bold">Registro guardado</h3>
+          <p className="text-sm text-slate-400 mt-2">
+            {syncedOffline ? (
+              <>Se sincronizará con FarmOS cuando haya conexión. Mientras tanto, lo encuentra en <strong className="text-slate-200">Bitácora → Recientes</strong>.</>
+            ) : (
+              <>Sincronizado con FarmOS.</>
+            )}
+          </p>
+        </div>
+        <div className="flex flex-col gap-3 w-full max-w-xs">
+          {syncedOffline && (
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view: 'historial' } }))}
+              className="p-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold flex items-center justify-center gap-2"
+            >
+              Ver en Bitácora
+            </button>
+          )}
+          <button
+            onClick={() => { setView('form'); setSyncedOffline(false); }}
+            className="p-4 rounded-xl bg-lime-700 hover:bg-lime-600 text-white font-bold flex items-center justify-center gap-2"
+          >
+            Nueva Siembra
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-[100dvh] w-full bg-slate-950 text-slate-100 flex flex-col overflow-y-auto">
