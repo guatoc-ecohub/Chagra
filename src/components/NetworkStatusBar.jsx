@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Wifi, WifiOff, RefreshCw, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Wifi, WifiOff, RefreshCw, CheckCircle, AlertTriangle, X } from 'lucide-react';
 import { syncManager } from '../services/syncManager';
 
 const STATUS = {
@@ -107,6 +107,17 @@ export default function NetworkStatusBar() {
 
   if (!visible) return null;
 
+  const isClickable = pendingCount > 0 || status === STATUS.OFFLINE || status === STATUS.SYNCING || status === STATUS.ERROR;
+  const goToBitacora = () => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view: 'historial' } }));
+    }
+  };
+  const dismiss = (e) => {
+    e.stopPropagation();
+    setVisible(false);
+  };
+
   const configs = {
     [STATUS.OFFLINE]: {
       bg: 'bg-frog/10',
@@ -143,12 +154,30 @@ export default function NetworkStatusBar() {
   const config = configs[status] || configs[STATUS.ONLINE];
 
   return (
-    <div role="status" aria-live="polite" className={`fixed top-0 left-0 right-0 z-[100] ${config.bg} ${config.border} border-b px-4 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] flex items-center gap-2 text-white text-sm font-medium backdrop-blur-md transition-all`}>
+    <div
+      role={isClickable ? 'button' : 'status'}
+      tabIndex={isClickable ? 0 : -1}
+      aria-live="polite"
+      onClick={isClickable ? goToBitacora : undefined}
+      onKeyDown={isClickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToBitacora(); } } : undefined}
+      className={`shrink-0 w-full ${config.bg} ${config.border} border-b px-4 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] flex items-center gap-2 text-white text-sm font-medium backdrop-blur-md transition-all ${isClickable ? 'cursor-pointer hover:brightness-110 active:brightness-95' : ''}`}
+    >
       {config.icon}
       <span className="flex-1 truncate">{config.text}</span>
       {status === STATUS.OFFLINE && (
         <span className="text-xs text-amber-300/70 shrink-0">Offline-First activo</span>
       )}
+      {isClickable && (
+        <span className="text-[10px] text-white/60 shrink-0 hidden sm:inline">Toque para detalle</span>
+      )}
+      <button
+        type="button"
+        onClick={dismiss}
+        aria-label="Cerrar barra de sincronización"
+        className="shrink-0 p-1 -mr-1 rounded hover:bg-white/10 active:bg-white/20 min-h-[32px] min-w-[32px] flex items-center justify-center"
+      >
+        <X size={14} className="text-white/70" />
+      </button>
     </div>
   );
 }
