@@ -53,6 +53,7 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
     const [location, setLocation] = useState(initialWkt ? { wkt: initialWkt } : null);
     const [isSaving, setIsSaving] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
+    const [syncedOffline, setSyncedOffline] = useState(false);
     const [selectedInvasive, setSelectedInvasive] = useState(null);
 
     useEffect(() => {
@@ -153,12 +154,11 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
             };
 
             const result = await savePayload('observation', payload);
+            const isOfflineFallback = (result.message || '').toLowerCase().includes('local');
+            setSyncedOffline(isOfflineFallback);
             onSave(result.message, !result.success);
 
-            if (result.success) {
-                setSaveSuccess(true);
-            } else {
-                // En offline también consideramos éxito local para mostrar sugerencia
+            if (result.success || isOfflineFallback) {
                 setSaveSuccess(true);
             }
         } catch (error) {
@@ -175,8 +175,23 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
                 <div className="text-center animate-in fade-in zoom-in duration-300">
                     <CheckCircle size={64} className="text-emerald-500 mx-auto mb-4" />
                     <h3 className="text-2xl font-bold">Reporte Guardado</h3>
-                    <p className="text-slate-400 mt-2">Se ha registrado la presencia de {selectedInvasive.nombre_comun}.</p>
+                    <p className="text-slate-400 mt-2">
+                        {syncedOffline ? (
+                            <>Se sincronizará con FarmOS cuando haya conexión. Mientras tanto, lo encuentra en <strong className="text-slate-200">Bitácora → Recientes</strong>.</>
+                        ) : (
+                            <>Sincronizado con FarmOS.</>
+                        )}
+                    </p>
                 </div>
+
+                {syncedOffline && (
+                    <button
+                        onClick={() => window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view: 'historial' } }))}
+                        className="p-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold flex items-center justify-center gap-2 w-full"
+                    >
+                        Ver en Bitácora
+                    </button>
+                )}
 
                 <div className="w-full max-w-sm">
                     <NativeSubstituteSuggestion
