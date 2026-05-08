@@ -173,7 +173,7 @@
         group = "root";
         mode = "0400";
       };
-      cloudflared-token = {
+      cloudflared-credentials = {
         owner = "root";
         group = "root";
         mode = "0400";
@@ -388,6 +388,9 @@
   # + github-runner-claude-token). Workflow disparador en Chagra/.github/workflows/
   # claude-code-generate.yml, label `ready-to-generate` (gate humano obligatorio).
   guatoc.ai.claudeCodeRunner.enable = true;
+
+  # --- CLAUDE LINK BACKEND ---
+  guatoc.ai.claudeLink.enable = true;
 
   # --- OPENFANG v0.5.9: Agent OS (Telegram → LLM con fallback) ---
   guatoc.ai.openfang = {
@@ -635,9 +638,21 @@
     tailscale.enable = true;
   };
 
-  # --- CLOUDFLARE ZERO TRUST CONNECTOR (MANAGED TUNNEL) ---
+  # --- CLOUDFLARE ZERO TRUST CONNECTOR (LOCAL MANAGED TUNNEL) ---
+  environment.etc."cloudflared/config.yml".text = builtins.toJSON {
+    tunnel = "d0f8f0a4-06a3-4942-8a4a-77ab7a9edc84";
+    credentials-file = "/run/secrets/cloudflared-credentials";
+    ingress = [
+      { hostname = "chagra.guatoc.co"; service = "http://127.0.0.1:80"; }
+      { hostname = "ha.guatoc.co";     service = "http://127.0.0.1:8123"; }
+      { hostname = "ai.guatoc.co";     service = "http://127.0.0.1:11434"; }
+      { hostname = "hand.guatoc.co";   service = "http://127.0.0.1:8096"; }
+      { service = "http_status:404"; }
+    ];
+  };
+
   systemd.services.cloudflared-tunnel = {
-    description = "Cloudflare Zero Trust Managed Tunnel";
+    description = "Cloudflare Zero Trust Local Managed Tunnel";
     wantedBy = [ "multi-user.target" ];
     after = [ "network-online.target" ];
     wants = [ "network-online.target" ];
@@ -647,13 +662,9 @@
 
     serviceConfig = {
       Type = "simple";
-      # Ejecución mediante shell para evaluar el secreto almacenado por SOPS
-      ExecStart = "${pkgs.bash}/bin/bash -c 'cloudflared tunnel --no-autoupdate run --token $(cat /run/secrets/cloudflared-token)'";
+      ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel --config /etc/cloudflared/config.yml --no-autoupdate run";
       Restart = "always";
       RestartSec = "10s";
-
-      # Nota: Se asume que el archivo /run/secrets/cloudflared-token contiene
-      # exclusivamente la cadena del token (eyJh...) sin saltos de línea ni comillas.
     };
   };
 
