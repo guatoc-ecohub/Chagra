@@ -1,13 +1,19 @@
 { config, pkgs, lib, ... }: {
   
-  imports = [ 
+  imports = [
     ./hardware-configuration.nix
     ../../modules/dev-environment.nix
     ../../modules/desktop-gaming.nix
     ../../modules/tunnel-connectivity.nix
     ../../modules/experimental-agents.nix
     ../../modules/audio-hifi.nix  # Audio Hi-Fi para IEMs
+    ../../modules/scripts/stack-update.nix  # Update CLIs mensual via systemd-timer user
   ];
+
+  # Stack update mensual (claude-code, cursor-agent, uv) — reemplaza crontab
+  # (que NixOS no incluye por default). Día 1 de cada mes 04:00 + jitter 30m.
+  # Logs: journalctl --user -u stack-update.service
+  guatoc.scripts.stackUpdate.enable = true;
 
   # --- Workaround para bug known en sphinx/docutils de nixos-unstable ---
   documentation.doc.enable = lib.mkDefault false;
