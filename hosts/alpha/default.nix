@@ -173,7 +173,7 @@
         group = "root";
         mode = "0400";
       };
-      cloudflared-credentials = {
+      cloudflared-token = {
         owner = "root";
         group = "root";
         mode = "0400";
@@ -638,21 +638,25 @@
     tailscale.enable = true;
   };
 
-  # --- CLOUDFLARE ZERO TRUST CONNECTOR (LOCAL MANAGED TUNNEL) ---
-  environment.etc."cloudflared/config.yml".text = builtins.toJSON {
-    tunnel = "d0f8f0a4-06a3-4942-8a4a-77ab7a9edc84";
-    credentials-file = "/run/secrets/cloudflared-credentials";
-    ingress = [
-      { hostname = "chagra.guatoc.co"; service = "http://127.0.0.1:80"; }
-      { hostname = "ha.guatoc.co";     service = "http://127.0.0.1:8123"; }
-      { hostname = "ai.guatoc.co";     service = "http://127.0.0.1:11434"; }
-      { hostname = "hand.guatoc.co";   service = "http://127.0.0.1:8096"; }
-      { service = "http_status:404"; }
-    ];
-  };
-
+  # --- CLOUDFLARE ZERO TRUST CONNECTOR (REMOTE MANAGED TUNNEL) ---
+  # Hotfix 2026-05-08: revert temporal de queue/047 Local Managed por
+  # mismatch entre Connector Token (JWT) y Tunnel Credentials (TunnelSecret).
+  # El refresh del Connector Token desde dashboard invalidó implícitamente
+  # el TunnelSecret del Local Managed sin generar uno nuevo recuperable
+  # vía dashboard (solo `cloudflared tunnel login` o recrear tunnel
+  # entrega un credentials JSON válido — que requiere browser interactivo).
+  #
+  # Volvemos a Remote Managed con el JWT refresheado en SOPS
+  # `cloudflared-token`. Migración Local Managed se retoma con
+  # `cloudflared tunnel login` desde alpha cuando se programe (queue
+  # follow-up).
+  #
+  # Ingress de hand.guatoc.co debe configurarse MANUALMENTE en dashboard
+  # Cloudflare Zero Trust → Networks → Tunnels → tunnel UUID
+  # d0f8f0a4-06a3-4942-8a4a-77ab7a9edc84 → Public Hostnames → Add:
+  #   Subdomain: hand · Domain: guatoc.co · Service: HTTP://localhost:8096
   systemd.services.cloudflared-tunnel = {
-    description = "Cloudflare Zero Trust Local Managed Tunnel";
+    description = "Cloudflare Zero Trust Managed Tunnel";
     wantedBy = [ "multi-user.target" ];
     after = [ "network-online.target" ];
     wants = [ "network-online.target" ];
@@ -662,9 +666,13 @@
 
     serviceConfig = {
       Type = "simple";
-      ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel --config /etc/cloudflared/config.yml --no-autoupdate run";
+      # Ejecución mediante shell para evaluar el secreto almacenado por SOPS
+      ExecStart = "${pkgs.bash}/bin/bash -c 'cloudflared tunnel --no-autoupdate run --token $(cat /run/secrets/cloudflared-token)'";
       Restart = "always";
       RestartSec = "10s";
+
+      # Nota: /run/secrets/cloudflared-token contiene exclusivamente el JWT
+      # eyJh... sin saltos de línea ni comillas.
     };
   };
 
