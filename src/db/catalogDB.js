@@ -80,6 +80,37 @@ export async function getAllSpecies() {
     return rows.map(r => JSON.parse(r.data));
 }
 
+export async function getSpeciesById(id) {
+    if (!id) return null;
+    if (!dbInstance) await initCatalog();
+    const rows = dbInstance.exec({
+        sql: 'SELECT data FROM species WHERE id = ?',
+        bind: [id],
+        rowMode: 'object',
+    });
+    return rows.length ? JSON.parse(rows[0].data) : null;
+}
+
+/**
+ * Versión síncrona para simplificar consumo en componentes React/Hooks (ADR-030).
+ * Retorna null si la DB no está lista o no existe el ID.
+ * App.jsx garantiza el preload; este sync es seguro en el 99% de los casos.
+ */
+export function getSpeciesByIdSync(id) {
+    if (!id || !dbInstance) return null;
+    try {
+        const rows = dbInstance.exec({
+            sql: 'SELECT data FROM species WHERE id = ?',
+            bind: [id],
+            rowMode: 'object',
+        });
+        return rows.length ? JSON.parse(rows[0].data) : null;
+    } catch (e) {
+        console.warn(`[getSpeciesByIdSync] Error lookup ${id}:`, e);
+        return null;
+    }
+}
+
 export async function getSpeciesByThermalZone(zone) {
     if (!dbInstance) await initCatalog();
     const rows = dbInstance.exec({
