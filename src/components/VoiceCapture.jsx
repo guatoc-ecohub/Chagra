@@ -5,6 +5,8 @@ import { transcribe, queueForRetry } from '../services/voiceService';
 import { extractEntities } from '../services/entityExtractor';
 import { syncManager } from '../services/syncManager';
 import { savePayload } from '../services/payloadService';
+import { applyRegionalismOverlay, getRegionFromDepartment } from '../services/regionalismsService';
+import usePrefsStore from '../store/usePrefsStore';
 import { ENV } from '../config/env';
 import { resolveSpeciesDefaults } from '../config/speciesDefaults';
 import useAssetStore from '../store/useAssetStore';
@@ -282,11 +284,11 @@ export default function VoiceCapture({ onSave }) {
     const plantTypeRel = entity.farmosTermId
       ? { data: [{ type: 'taxonomy_term--plant_type', id: entity.farmosTermId }] }
       : {
-          data: [{
-            type: 'taxonomy_term--plant_type',
-            attributes: { name: entity.canonical || entity.crop },
-          }],
-        };
+        data: [{
+          type: 'taxonomy_term--plant_type',
+          attributes: { name: entity.canonical || entity.crop },
+        }],
+      };
     const inlineRels = {
       location: { data: [locRef] },
       ...(isLand ? { parent: { data: [locRef] } } : {}),
@@ -407,7 +409,16 @@ export default function VoiceCapture({ onSave }) {
       const msg = errors.length > 0
         ? `${savedCount} guardada(s), ${errors.length} con error.`
         : `${savedCount} siembra${savedCount > 1 ? 's' : ''} registrada${savedCount > 1 ? 's' : ''} por voz.`;
-      onSave?.(msg);
+
+      const voiceRegionPref = usePrefsStore.getState().voiceRegion;
+      const intensity = usePrefsStore.getState().voiceRegionIntensity;
+      const region =
+        voiceRegionPref === 'auto'
+          ? getRegionFromDepartment('cundiboyacense')
+          : voiceRegionPref;
+      const finalAnswer = applyRegionalismOverlay(msg, region, intensity);
+
+      onSave?.(finalAnswer);
       setView(STATE_DONE);
     } else {
       setErrorMsg(`No se pudo guardar: ${errors.join('; ')}`);
