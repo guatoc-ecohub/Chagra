@@ -3,6 +3,8 @@ import { Mic, MicOff, Loader2, AlertTriangle } from 'lucide-react';
 import useVoiceRecorder from '../hooks/useVoiceRecorder';
 import { transcribe } from '../services/voiceService';
 import { streamOllama } from '../services/ollamaStream';
+import { applyRegionalismOverlay, getRegionFromDepartment } from '../services/regionalismsService';
+import usePrefsStore from '../store/usePrefsStore';
 import { ENV } from '../config/env';
 
 const OLLAMA_CHAT_URL = '/api/ollama/api/chat';
@@ -193,6 +195,14 @@ Formato: párrafo breve (máximo unas 8 oraciones). Sin listas largas salvo que 
         gateOk: true,
       });
       console.info('[HelpCorpusIA]', { species_slug: speciesSlug, query: questionText, gateOk: true });
+      const voiceRegionPref = usePrefsStore.getState().voiceRegion;
+      const intensity = usePrefsStore.getState().voiceRegionIntensity;
+      const region =
+        voiceRegionPref === 'auto'
+          ? getRegionFromDepartment('cundiboyacense')
+          : voiceRegionPref;
+      const finalAnswer = applyRegionalismOverlay(full, region, intensity);
+      setAnswer(finalAnswer);
     }
     setPhase('idle');
   }, [speciesSlug]);
