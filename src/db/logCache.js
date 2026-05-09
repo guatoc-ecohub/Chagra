@@ -194,4 +194,24 @@ export const logCache = {
       tx.onerror = () => reject(tx.error);
     });
   },
+
+  /**
+   * Obtener logs sincronizados de las últimas 24h, ordenados por timestamp desc.
+   * Para WorkerHistory "Recientes" (bitácora Parte C).
+   */
+  async getRecent24h() {
+    const db = await openDB();
+    const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORES.LOGS, 'readonly');
+      const req = tx.objectStore(STORES.LOGS).getAll();
+      req.onsuccess = () => {
+        const recent = (req.result || [])
+          .filter((log) => !log._pending && log.timestamp && log.timestamp * 1000 >= cutoff)
+          .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        resolve(recent);
+      };
+      req.onerror = () => reject(req.error);
+    });
+  },
 };

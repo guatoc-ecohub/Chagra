@@ -176,6 +176,7 @@ class SyncManager {
 
         try {
           await this.syncTransaction(transaction);
+          await this.persistSyncedLog(transaction, null);
           await this.deleteTransaction(transaction.id);
           synced++;
           console.info(`[SyncManager] Transacción ${transaction.id} completada y purgada.`);
@@ -337,6 +338,34 @@ class SyncManager {
     }
 
     return result;
+  }
+
+  /**
+   * Persiste el log resultante de una sincronización exitosa en STORES.LOGS.
+   * WorkerHistory "Recientes 24h" Parte C necesita que los logs sincronizados
+   * aparezcan junto a pendingTransactions.
+   */
+  async persistSyncedLog(transaction, serverResponse) {
+    try {
+      const logData = serverResponse?.data || transaction.payload?.data || {};
+      const logEntry = {
+        id: logData.id || transaction.id,
+        type: logData.type || transaction.type,
+        timestamp: logData.attributes?.timestamp || Math.floor(Date.now() / 1000),
+        name: logData.attributes?.name || logData.attributes?.notes?.value || transaction.type,
+        status: logData.attributes?.status || 'done',
+        asset_id: logData.relationships?.asset?.data?.[0]?.id || null,
+        attributes: logData.attributes || {},
+        relationships: logData.relationships || {},
+        _pending: false,
+        synced_at: Date.now(),
+        cached_at: Date.now(),
+      };
+      await logCache.put(logEntry);
+      console.info(`[SyncManager] Log sincronizado persistido en logCache: ${logEntry.id}`);
+    } catch (err) {
+      console.warn('[SyncManager] No se pudo persistir log sincronizado (no crítico):', err.message);
+    }
   }
 
   // Helper de retrocompatibilidad: resuelve endpoint por type cuando la transacción
