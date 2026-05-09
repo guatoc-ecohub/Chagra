@@ -10,8 +10,8 @@ import { fetchFromFarmOS, sendToFarmOS } from './apiService';
 
 /**
  * Busca un asset de tipo person por nombre exacto.
- * @param {string} name — nombre a buscar (ej. "Jimmy")
- * @returns {Promise<object|null>} — el asset JSON:API encontrado o null
+ * @param {string} name — nombre a buscar
+ * @returns {Promise<import('../types/asset.js').Asset|null>}
  */
 export const findPersonByName = async (name) => {
   const endpoint =

@@ -1,3 +1,10 @@
+/**
+ * authService — Autenticación OAuth2 password-credential contra FarmOS.
+ * Persiste tokens en localforage (offline-first).
+ *
+ * @module authService
+ */
+
 import localforage from 'localforage';
 
 const FARMOS_URL = import.meta.env.VITE_FARMOS_URL;

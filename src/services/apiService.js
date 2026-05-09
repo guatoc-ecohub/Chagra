@@ -1,5 +1,28 @@
+/**
+ * apiService — Cliente HTTP para la API JSON:API de FarmOS.
+ * Gestiona autenticación OAuth, timeouts, y sanitización de errores.
+ *
+ * @module apiService
+ * @requires authService
+ */
+
 import { getAccessToken } from './authService';
 
+/**
+ * @typedef {Object} FetchOptions
+ * @property {number} [timeout=10000]
+ * @property {string} [method='GET']
+ * @property {Object.<string,string>} [headers]
+ * @property {BodyInit} [body]
+ * @property {AbortSignal} [signal]
+ */
+
+/**
+ * Fetch con timeout configurable.
+ * @param {string} resource
+ * @param {FetchOptions} options
+ * @returns {Promise<Response>}
+ */
 const fetchWithTimeout = async (resource, options = {}) => {
   const { timeout = 10000 } = options;
   const controller = new AbortController();

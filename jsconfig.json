@@ -10,11 +10,12 @@
     "noImplicitAny": false,
     "noImplicitThis": false,
     "ignoreDeprecations": "6.0",
+    "skipLibCheck": true,
     "jsx": "react-jsx",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*.js", "src/**/*.jsx"],
-  "exclude": ["node_modules", "dist", "build", "tests"]
+  "include": ["src/**/*.js", "src/**/*.jsx", "src/types/**/*.js"],
+  "exclude": ["node_modules", "dist", "build", "tests", "tests/e2e"]
 }

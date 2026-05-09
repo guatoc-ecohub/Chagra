@@ -1,3 +1,9 @@
+/**
+ * regionalismsService — Overlay lingüístico regional para respuestas LLM.
+ *
+ * @module regionalismsService
+ */
+
 import regionalismsData from '../data/regionalisms-co.json';
 
 export function getRegionFromDepartment(deptSlug) {
