@@ -5,6 +5,7 @@ import HelpHomeScreen from './HelpHomeScreen.jsx';
 import HelpVozScreen from './HelpVozScreen.jsx';
 import HelpUsoScreen from './HelpUsoScreen.jsx';
 import HelpCicloScreen from './HelpCicloScreen.jsx';
+import HelpDictionary from './HelpDictionary.jsx';
 
 /**
  * HelpManual — Manual de usuario integrado en la PWA.
@@ -14,10 +15,11 @@ import HelpCicloScreen from './HelpCicloScreen.jsx';
  * Rediseño 2026-05-08 (queue/039 + UX feedback): router interno con 3
  * sub-vistas grandes en lugar de 12 secciones planas apiladas.
  *
- *   Home  → 3 botones grandes (voz / uso / ciclo)
- *   Voz   → tutorial híbrido + CTA "Probar voz ahora"
- *   Uso   → FAQs reorganizadas en 6 temas (incluye Reportar bug)
- *   Ciclo → wrapper de HelpCycleSection (accordion por especie, PR #201)
+ *   Home        → 4 botones grandes (voz / uso / ciclo / diccionario)
+ *   Voz         → tutorial híbrido + CTA "Probar voz ahora"
+ *   Uso         → FAQs reorganizadas en 6 temas (incluye Reportar bug)
+ *   Ciclo       → wrapper de HelpCycleSection (accordion por especie, PR #201)
+ *   Diccionario → ~70 términos curados (identidad/microorg/biopreparados/...)
  *
  * Principios aplicados (Workspace/Chagra-strategy/ops/chagra-ux-principles.md):
  *   P1 tono "tú" cercano (anti-ladrillo)
@@ -32,7 +34,7 @@ import HelpCicloScreen from './HelpCicloScreen.jsx';
  *   - "Novedades mayo 2026"        → Chagra/CHANGELOG.md (root)
  */
 export default function HelpManual({ onBack, onNavigate }) {
-  // 'home' | 'voz' | 'uso' | 'ciclo'
+  // 'home' | 'voz' | 'uso' | 'ciclo' | 'diccionario'
   const [section, setSection] = useState('home');
 
   // CTAs híbridas (P5): cierran el manual y navegan al flow real.
@@ -76,6 +78,9 @@ export default function HelpManual({ onBack, onNavigate }) {
       )}
       {section === 'ciclo' && (
         <HelpCicloScreen onBackToHome={goHome} />
+      )}
+      {section === 'diccionario' && (
+        <HelpDictionary onBackToHome={goHome} />
       )}
     </div>
   );

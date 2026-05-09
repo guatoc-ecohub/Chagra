@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mic, BookOpen, Sprout, ChevronRight } from 'lucide-react';
+import { Mic, BookOpen, Sprout, ChevronRight, Library } from 'lucide-react';
 
 /**
  * Home del Manual: 3 botones grandes para entrar a las sub-vistas del help.
@@ -43,6 +43,18 @@ export default function HelpHomeScreen({ onSelect }) {
       iconColor: 'text-pink-300',
       titleColor: 'text-pink-100',
       subColor: 'text-pink-200/70',
+    },
+    {
+      key: 'diccionario',
+      icon: Library,
+      title: 'Diccionario',
+      sub: 'Bocashi, micorriza, milpa, RAG… términos curados con fuentes — 0 alucinaciones.',
+      accent: 'from-violet-900/40 to-purple-950/80',
+      border: 'border-violet-600/40 hover:border-violet-400/70',
+      iconBg: 'bg-violet-700/30 border-violet-500/40',
+      iconColor: 'text-violet-300',
+      titleColor: 'text-violet-100',
+      subColor: 'text-violet-200/70',
     },
   ];
 
