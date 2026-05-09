@@ -1,12 +1,19 @@
 # modules/ai/claude-code-runner.nix
 # =============================================================================
-# Claude Code Runner — agente autónomo de generación de código para Chagra (público)
+# AI Coding Runner — agente autónomo de generación de código para Chagra (público)
 #
 # Decisión arquitectónica: ADR-024 (Chagra-strategy/adrs/ADR-024-claude-code-runner-arch.md).
 #
+# Pivot 2026-05-09: backend principal es `opencode` (no claude-code). Razones
+# documentadas en queue/063 + memoria reference_bridge_telegram_runner.md.
+# El nombre del módulo + servicio queda como `claude-code-runner` por
+# compatibilidad operativa (refs en yaml, monitoreo, queue items). No
+# valió la pena renombrar todo cuando el binario backend se cambia entre
+# proveedores opacamente al runner.
+#
 # Responsabilidad:
-#   GitHub Actions self-hosted runner que ejecuta Claude Code CLI cuando un PR
-#   draft es etiquetado con `ready-to-generate`. Claude lee el body del Issue
+#   GitHub Actions self-hosted runner que ejecuta `opencode run` cuando un PR
+#   draft es etiquetado con `ready-to-generate`. opencode lee el body del Issue
 #   linkeado, edita ficheros del repo Chagra, hace push a la rama de la PR.
 #
 # Aislación:
@@ -14,8 +21,7 @@
 #     y `nixos-deployer` infra). NO se cruzan workspaces.
 #   - Repo URL apunta SOLO a guatoc-ecohub/Chagra (público AGPL). NO acceso
 #     a guatoc-nixos, chagra-pro, ni Chagra-strategy.
-#   - Sin age key SOPS, sin /etc/nixos, sin /mnt/fast. Solo lee el secret
-#     claude-code-anthropic-key para invocar la API.
+#   - Sin age key SOPS, sin /etc/nixos, sin /mnt/fast.
 #   - Service-account GitHub `guatoc-claude-bot` con PAT scope mínimo
 #     (contents:write + pull_requests:write + issues:read), branch protection
 #     bloquea merge directo a main.
@@ -58,16 +64,23 @@ in
       type = lib.types.str;
       default = "/run/secrets/claude-code-anthropic-key";
       description = ''
-        Ruta al SOPS secret con auth para el bot.
+        Ruta al SOPS secret con auth para Anthropic API directa.
         Formato del file: `ANTHROPIC_API_KEY=<value>` (EnvironmentFile-compat).
 
-        Pivot 2026-05-09: el value es la litellm-master-key (NO Anthropic API
-        directa) porque el operador no tiene billing pay-per-use. Combinado
-        con ANTHROPIC_BASE_URL=http://127.0.0.1:4000 (hardcoded en
-        serviceOverrides), claude CLI golpea el proxy litellm local que
-        routea a GLM-4.6 (z.ai Coding Plan) con fallback Ollama. Cuando el
-        operador tenga balance Anthropic API directa, rotar este secret a
-        la key real + remover ANTHROPIC_BASE_URL del Environment.
+        Pivot 2026-05-09: el bot usa `opencode/big-pickle` (free tier opencode.ai)
+        que NO requiere API key. Esta option queda DESHABILITADA por default
+        en serviceOverrides (no EnvironmentFile, no ReadOnlyPaths sobre el
+        secret) — el secret SOPS sigue provisionado para reactivación rápida
+        si el operador activa billing Anthropic.
+
+        Para reactivar Anthropic API directa:
+        1. Asegurar que el secret SOPS tiene la key Anthropic real con prefix
+           `ANTHROPIC_API_KEY=sk-ant-...`.
+        2. En serviceOverrides agregar:
+             ReadOnlyPaths = [ cfg.anthropicKeyFile ];
+             EnvironmentFile = [ cfg.anthropicKeyFile ];
+        3. Cambiar el yaml workflow de Chagra para invocar `claude-code` en
+           lugar de `opencode run`.
       '';
     };
   };
@@ -116,12 +129,23 @@ in
       # `[alpha, nixos, infra]`.
       extraLabels = [ "claude-runner" ];
 
+      # PIVOT 2026-05-09 (Bug 12 + tool-calling): el bot ahora corre `opencode`
+      # (no claude-code de Anthropic). Razones:
+      #   1. Operador no tiene balance Anthropic API pay-per-use.
+      #   2. claude-code + GLM-4.6 vía litellm-proxy: GLM no soporta tool-call
+      #      format Anthropic → emite tool calls como TEXTO (no edita archivos).
+      #   3. opencode soporta multi-provider nativo + tool calling correcto.
+      #   4. opencode/big-pickle (free tier built-in opencode.ai) hace tool
+      #      calls reales sin auth (validado 2026-05-09 con prompt Write file).
+      # Mantener claude-code en extraPackages como backup (cuando operador
+      # tenga balance Anthropic, revertir el yaml a claude-code).
       extraPackages = with pkgs; [
-        claude-code      # CLI oficial de Anthropic (en nixpkgs)
-        nodejs_22        # requerido por actions/checkout@v4 + dependencias npm de Chagra
+        opencode         # CLI multi-provider con tool calling — backend principal del bot
+        claude-code      # backup CLI Anthropic — útil si operador activa billing API
+        nodejs_22        # actions/checkout@v4 + dependencias npm de Chagra
         git
-        gh               # GitHub CLI — el workflow lo usa para leer Issue body y postear comments
-        jq               # parsing JSON output de claude (--output-format json)
+        gh               # GitHub CLI — workflow usa para leer Issue body, postear comments
+        jq               # parsing JSON output (audit transcript)
         curl
         coreutils
         bash
@@ -131,39 +155,20 @@ in
       workDir = "/var/lib/claude-runner/work";
 
       serviceOverrides = {
-        # Solo lectura del API key — NO de age key SOPS, NO de telegram-token,
-        # NO de farmos-token, NO de github-runner-token.
-        ReadOnlyPaths = [
-          cfg.anthropicKeyFile
-        ];
-
         # Workspace efímero — el runner crea/destruye repos clones aquí.
         # NO /etc/nixos, NO /mnt/fast/appdata, NO /home/kortux.
         ReadWritePaths = [
           "/var/lib/claude-runner"
         ];
 
-        # Carga el API key como env var ANTHROPIC_API_KEY automáticamente.
-        # claude CLI la lee de ahí. NO se expone en argv ni se loguea.
-        # PIVOT 2026-05-09: el value es la litellm-master-key (no Anthropic
-        # directa). Combinada con ANTHROPIC_BASE_URL abajo, hace que claude
-        # CLI golpee el proxy local litellm en :4000 → routea a GLM-4.6 vía
-        # z.ai Coding Plan (primario) con fallback a Ollama (qwen2.5-coder).
-        # Plan Anthropic API directo queda obsoleto para el bot — operador
-        # tiene plan Max personal pero NO API balance pay-per-use.
-        EnvironmentFile = [
-          cfg.anthropicKeyFile
-        ];
-
-        # Redirige la API call de claude CLI al proxy litellm local.
-        # claude CLI lee "ANTHROPIC_BASE_URL" + "ANTHROPIC_API_KEY" y manda
-        # POST a http://127.0.0.1:4000/v1/messages (Anthropic-compat adapter
-        # del proxy). Master key (=ANTHROPIC_API_KEY arriba) auth client→proxy.
-        # Hardcoded :4000 alineado con default de modules/ai/litellm-proxy.nix —
-        # actualizar ambos en sync si se cambia el puerto.
-        Environment = [
-          "ANTHROPIC_BASE_URL=http://127.0.0.1:4000"
-        ];
+        # PIVOT 2026-05-09: removido EnvironmentFile y Environment.
+        # opencode/big-pickle (free tier opencode.ai) NO requiere API key —
+        # el binario maneja auth contra opencode.ai sin secrets.
+        # Si el operador activa billing Anthropic API directa en el futuro,
+        # agregar de vuelta:
+        #   ReadOnlyPaths = [ cfg.anthropicKeyFile ];
+        #   EnvironmentFile = [ cfg.anthropicKeyFile ];  # ANTHROPIC_API_KEY=...
+        # Y revertir el yaml de Chagra a invocar claude-code.
       };
     };
 
