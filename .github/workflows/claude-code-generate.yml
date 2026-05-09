@@ -47,7 +47,7 @@ jobs:
       && (github.event.sender.login == github.repository_owner
           || github.event.sender.login == vars.CLAUDE_BOT_LOGIN)
       && github.event.pull_request.draft == true
-    runs-on: [self-hosted, alpha, claude-runner]
+    runs-on: [self-hosted, claude-runner]
     timeout-minutes: 20
 
     steps:
