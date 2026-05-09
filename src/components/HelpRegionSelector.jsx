@@ -16,7 +16,7 @@ import { listAvailableRegions } from '../services/regionalismsService';
  *
  * Anti-apropiación: región amazónica muestra banner de respeto a saberes propios.
  */
-export default function HelpRegionSelector({ onNavigateToVoz }) {
+export default function HelpRegionSelector({ onNavigateToDemo }) {
   const [open, setOpen] = useState(false);
   const voiceRegion = usePrefsStore((s) => s.voiceRegion);
   const voiceRegionIntensity = usePrefsStore((s) => s.voiceRegionIntensity);
@@ -87,11 +87,10 @@ export default function HelpRegionSelector({ onNavigateToVoz }) {
                   key={val}
                   type="button"
                   onClick={() => setVoiceRegionIntensity(val)}
-                  className={`flex-1 py-2 rounded-xl text-[11px] font-bold transition-colors ${
-                    voiceRegionIntensity === val
+                  className={`flex-1 py-2 rounded-xl text-[11px] font-bold transition-colors ${voiceRegionIntensity === val
                       ? 'bg-sky-700 text-white border border-sky-500'
                       : 'bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-600'
-                  }`}
+                    }`}
                 >
                   {val === 0 ? 'Off' : val === 1 ? 'Sutil' : 'Full'}
                 </button>
@@ -130,13 +129,13 @@ export default function HelpRegionSelector({ onNavigateToVoz }) {
           )}
 
           {/* CTA híbrida */}
-          {onNavigateToVoz && voiceRegionIntensity > 0 && (
+          {onNavigateToDemo && voiceRegionIntensity > 0 && (
             <button
               type="button"
-              onClick={onNavigateToVoz}
+              onClick={onNavigateToDemo}
               className="w-full py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold active:scale-[0.98] transition-all"
             >
-              Probar la voz con este tono
+              Probar la voz con este tono · pregunta libre IA
             </button>
           )}
         </div>

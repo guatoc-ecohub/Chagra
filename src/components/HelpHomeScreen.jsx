@@ -88,7 +88,7 @@ export default function HelpHomeScreen({ onSelect }) {
         })}
       </div>
 
-      <HelpRegionSelector onNavigateToVoz={() => onSelect('voz')} />
+      <HelpRegionSelector onNavigateToDemo={() => onSelect('voz-regional-demo')} />
 
       <p className="text-[11px] text-slate-600 text-center mt-4 italic leading-relaxed">
         Si algo no está aquí, toca el botón flotante 💬 para reportarlo. La app aprende contigo.
