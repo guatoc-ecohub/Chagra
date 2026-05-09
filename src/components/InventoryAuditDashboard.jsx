@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { AlertCircle, CheckCircle2, RefreshCw, Layers, ArrowRight, Save, History, Scale } from 'lucide-react';
+import { AlertCircle, CheckCircle2, RefreshCw, Save, History, Scale } from 'lucide-react';
 import { useAssetStore } from '../store/useAssetStore';
 import { openDB, STORES } from '../db/dbCore';
 import { reconcileAllItems } from '../services/inventoryReconcile';
