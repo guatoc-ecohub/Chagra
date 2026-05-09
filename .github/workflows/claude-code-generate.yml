@@ -44,7 +44,7 @@ jobs:
     # Triple gate: label correcta + actor whitelisted + PR sigue draft.
     if: |
       github.event.label.name == 'ready-to-generate'
-      && (github.event.sender.login == github.repository_owner
+      && (github.event.sender.login == vars.OPERATOR_LOGIN
           || github.event.sender.login == vars.CLAUDE_BOT_LOGIN)
       && github.event.pull_request.draft == true
     runs-on: [self-hosted, claude-runner]
