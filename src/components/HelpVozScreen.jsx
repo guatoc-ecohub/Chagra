@@ -15,7 +15,7 @@ export default function HelpVozScreen({ onBackToHome, onNavigate }) {
     {
       n: 1,
       icon: Mic,
-      title: 'Toca el micrófono FAB',
+      title: 'Toca el botón micrófono',
       body: 'Está abajo a la izquierda, siempre visible. Lo encuentras en cualquier pantalla menos cuando ya estás dentro del módulo de voz.',
     },
     {
