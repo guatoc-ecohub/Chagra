@@ -160,12 +160,12 @@ export default function VoiceConfirmation({
 
   // ADR-030: total real de assets que se crearán (rows aggregate=1, individual=qty).
   // Default 'individual' si species fuera del catálogo (conservativo).
-  const totalAssetsToCreate = rows.reduce((acc, r) => {
+  const totalAssetsToCreate = useMemo(() => rows.reduce((acc, r) => {
     const qty = parseInt(r.quantity, 10) || 1;
     const defaults = r.cropSlug ? resolveSpeciesDefaults(r.cropSlug) : null;
     const trackingMode = defaults?.tracking_mode || 'individual';
     return acc + (trackingMode === 'individual' ? qty : 1);
-  }, 0);
+  }, 0), [rows]);
 
   const handleConfirm = () => {
     if (!allValid || isSaving) return;
@@ -301,13 +301,12 @@ export default function VoiceConfirmation({
                 ? `Se creará 1 activo agregado con cantidad=${qty} (cama corrida, cosecha y eventos al conjunto).`
                 : `Se creará 1 activo de ${row.crop || 'esta especie'}.`;
             return (
-              <div className={`mt-2 px-2 py-1.5 rounded text-2xs ${
-                isIndividualMulti
+              <div className={`mt-2 px-2 py-1.5 rounded text-2xs ${isIndividualMulti
                   ? 'bg-emerald-900/20 border border-emerald-800/40 text-emerald-300'
                   : trackingMode === 'aggregate' && qty > 1
                     ? 'bg-amber-900/20 border border-amber-800/40 text-amber-200'
                     : 'bg-slate-800/40 border border-slate-700/40 text-slate-400'
-              }`}>
+                }`}>
                 {previewText}
               </div>
             );

@@ -28,6 +28,11 @@ db.exec(`
     altitud_optimo_min INTEGER,
     altitud_optimo_max INTEGER,
     tracking_mode TEXT,  -- ADR-030: "individual" | "aggregate" | NULL (invasoras)
+    dli_optimo_mol_m2_dia REAL, -- ADR-028
+    fotoperiodo_min REAL,
+    fotoperiodo_optimo REAL,
+    fotoperiodo_max REAL,
+    tolerancia_sombra_neta_pct REAL,
     data TEXT NOT NULL
   );
   CREATE INDEX idx_species_tracking_mode ON species(tracking_mode);
@@ -71,8 +76,8 @@ const sourcesData = JSON.parse(fs.readFileSync(path.join(CATALOG_DIR, 'sources-s
 
 db.transaction(() => {
   const insertSpecies = db.prepare(`
-    INSERT INTO species (id, nombre_comun, nombre_cientifico, category, cultivable, conservation_status, altitud_min_absoluto, altitud_max_absoluto, altitud_optimo_min, altitud_optimo_max, tracking_mode, data)
-    VALUES (@id, @nombre_comun, @nombre_cientifico, @category, @cultivable, @conservation_status, @altitud_min_absoluto, @altitud_max_absoluto, @altitud_optimo_min, @altitud_optimo_max, @tracking_mode, @data)
+    INSERT INTO species (id, nombre_comun, nombre_cientifico, category, cultivable, conservation_status, altitud_min_absoluto, altitud_max_absoluto, altitud_optimo_min, altitud_optimo_max, tracking_mode, dli_optimo_mol_m2_dia, fotoperiodo_min, fotoperiodo_optimo, fotoperiodo_max, tolerancia_sombra_neta_pct, data)
+    VALUES (@id, @nombre_comun, @nombre_cientifico, @category, @cultivable, @conservation_status, @altitud_min_absoluto, @altitud_max_absoluto, @altitud_optimo_min, @altitud_optimo_max, @tracking_mode, @dli_optimo_mol_m2_dia, @fotoperiodo_min, @fotoperiodo_optimo, @fotoperiodo_max, @tolerancia_sombra_neta_pct, @data)
   `);
   const insertRole = db.prepare(`INSERT INTO species_roles (species_id, role, priority) VALUES (@species_id, @role, @priority)`);
   const insertZone = db.prepare(`INSERT INTO species_thermal_zones (species_id, thermal_zone) VALUES (@species_id, @thermal_zone)`);
@@ -92,6 +97,11 @@ db.transaction(() => {
       altitud_optimo_min: limits.optimo_min ?? limits.optimal_min ?? null,
       altitud_optimo_max: limits.optimo_max ?? limits.optimal_max ?? null,
       tracking_mode: sp.tracking_mode ?? null,
+      dli_optimo_mol_m2_dia: sp.dli_optimo_mol_m2_dia ?? null,
+      fotoperiodo_min: sp.fotoperiodo_horas_optimo?.min ?? null,
+      fotoperiodo_optimo: sp.fotoperiodo_horas_optimo?.optimo ?? null,
+      fotoperiodo_max: sp.fotoperiodo_horas_optimo?.max ?? null,
+      tolerancia_sombra_neta_pct: sp.tolerancia_sombra_neta_pct ?? null,
       data: JSON.stringify(sp)
     });
 
