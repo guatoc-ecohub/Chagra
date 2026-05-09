@@ -139,7 +139,11 @@ jobs:
           # --permission-mode acceptEdits: edita sin pedir approval (no hay humano).
           # --allowed-tools: whitelist explícita de tools permitidos.
           # --output-format json: log estructurado para audit.
-          claude-code \
+          # NOTA: path absoluto a /run/current-system/sw/bin/ porque el user
+          # claude-runner del systemd service tiene PATH minimal y no incluye
+          # los binarios del system profile. Workaround temporal hasta que
+          # claude-code-runner.nix agregue claude-code a services.github-runners.<n>.path.
+          /run/current-system/sw/bin/claude-code \
             --print \
             --permission-mode acceptEdits \
             --allowed-tools "Read,Edit,Write,Bash(npm:*),Bash(git:*),Bash(gh:*),Bash(node:*),Bash(jq:*),Glob,Grep" \
