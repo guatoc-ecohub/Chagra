@@ -6,6 +6,7 @@ import { streamOllama } from '../services/ollamaStream';
 import { applyRegionalismOverlay, getRegionFromDepartment } from '../services/regionalismsService';
 import usePrefsStore from '../store/usePrefsStore';
 import { ENV } from '../config/env';
+import { detectOffTopicResponse, logRejection } from '../services/llmGuardrails';
 
 const OLLAMA_CHAT_URL = '/api/ollama/api/chat';
 const TIMEOUT_MS = 90000;
@@ -190,8 +191,15 @@ Formato: párrafo breve (máximo unas 8 oraciones). Sin listas largas salvo que 
         gateOk: false,
         gateReason: `unsupported_fragment:${invalidFrag}`,
       });
+      // Telemetría compartida con guardrails (queue/042)
+      logRejection({ prompt: questionText, response: full, reason: 'out_of_corpus' });
       console.info('[HelpCorpusIA]', { species_slug: speciesSlug, query: questionText, gateOk: false, fragment: invalidFrag });
     } else {
+      // Validación adicional: off-topic check del guardrails sobre la respuesta completa
+      const offTopic = detectOffTopicResponse(full, 'general');
+      if (offTopic) {
+        logRejection({ prompt: questionText, response: full, reason: offTopic });
+      }
       appendHelpCorpusLog({
         species_slug: speciesSlug,
         query: questionText,
@@ -262,8 +270,8 @@ Formato: párrafo breve (máximo unas 8 oraciones). Sin listas largas salvo que 
           onClick={handleMic}
           disabled={phase === 'transcribing' || phase === 'thinking' || (speciesSlug !== null && !corpus)}
           className={`inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm min-h-[44px] transition-colors ${isRecording
-              ? 'bg-red-600 hover:bg-red-500 text-white'
-              : 'bg-emerald-700 hover:bg-emerald-600 text-white disabled:opacity-50 disabled:cursor-not-allowed'
+            ? 'bg-red-600 hover:bg-red-500 text-white'
+            : 'bg-emerald-700 hover:bg-emerald-600 text-white disabled:opacity-50 disabled:cursor-not-allowed'
             }`}
         >
           {phase === 'transcribing' || phase === 'thinking' ? (
