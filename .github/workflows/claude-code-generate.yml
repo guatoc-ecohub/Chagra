@@ -135,11 +135,11 @@ jobs:
           OUTPUT_FILE: ${{ runner.temp }}/claude-output.json
         run: |
           set -o pipefail
-          # claude --print: modo no-interactivo, exit cuando termina.
+          # claude-code --print: modo no-interactivo, exit cuando termina.
           # --permission-mode acceptEdits: edita sin pedir approval (no hay humano).
           # --allowed-tools: whitelist explícita de tools permitidos.
           # --output-format json: log estructurado para audit.
-          claude \
+          claude-code \
             --print \
             --permission-mode acceptEdits \
             --allowed-tools "Read,Edit,Write,Bash(npm:*),Bash(git:*),Bash(gh:*),Bash(node:*),Bash(jq:*),Glob,Grep" \
