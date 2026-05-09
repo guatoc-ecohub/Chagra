@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, CheckCircle, Clock, RefreshCw, Wifi, WifiOff, CloudOff, Cloud, Sprout, Apple, TreePine, Building2, Wrench, Leaf, Droplets, Eye } from 'lucide-react';
 import { syncManager } from '../services/syncManager';
+import { logCache } from '../db/logCache';
 import StatusBadge from './StatusBadge';
 
 const TRANSACTION_TYPE_LABELS = {
@@ -48,6 +49,7 @@ const TRANSACTION_TYPE_ICONS = {
 export default function WorkerHistory({ onBack, onEntryClick }) {
   const [activeSection, setActiveSection] = useState('recientes');
   const [pendingTx, setPendingTx] = useState([]);
+  const [recentSyncedLogs, setRecentSyncedLogs] = useState([]);
   const [completedTasks, setCompletedTasks] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -85,11 +87,20 @@ export default function WorkerHistory({ onBack, onEntryClick }) {
     }
   }, []);
 
+  const loadRecentSyncedLogs = useCallback(async () => {
+    try {
+      const recent = await logCache.getRecent24h();
+      setRecentSyncedLogs(recent);
+    } catch (err) {
+      console.error('Error cargando logs sincronizados recientes:', err);
+    }
+  }, []);
+
   const loadData = useCallback(async () => {
     setIsLoading(true);
-    await Promise.all([loadPendingTransactions(), loadCompletedTasks()]);
+    await Promise.allSettled([loadPendingTransactions(), loadCompletedTasks(), loadRecentSyncedLogs()]);
     setIsLoading(false);
-  }, [loadPendingTransactions, loadCompletedTasks]);
+  }, [loadPendingTransactions, loadCompletedTasks, loadRecentSyncedLogs]);
 
   useEffect(() => {
     // Sync inicial: hidratar la vista al montar el componente.
@@ -104,14 +115,17 @@ export default function WorkerHistory({ onBack, onEntryClick }) {
     window.addEventListener('offline', onOffline);
 
     const onTaskAdded = () => loadPendingTransactions();
+    const onSyncCompleted = () => loadRecentSyncedLogs();
     window.addEventListener('taskAdded', onTaskAdded);
+    window.addEventListener('syncCompleted', onSyncCompleted);
 
     return () => {
       window.removeEventListener('online', onOnline);
       window.removeEventListener('offline', onOffline);
       window.removeEventListener('taskAdded', onTaskAdded);
+      window.removeEventListener('syncCompleted', onSyncCompleted);
     };
-  }, [loadData, loadPendingTransactions]);
+  }, [loadData, loadPendingTransactions, loadRecentSyncedLogs]);
 
   const formatTimestamp = (ts) => {
     if (!ts) return '';
@@ -203,64 +217,78 @@ export default function WorkerHistory({ onBack, onEntryClick }) {
         {/* Registros Recientes (pending_transactions) */}
         {activeSection === 'recientes' && !isLoading && (
           <>
-            {/* Honesty note: por ahora esta vista solo muestra pendientes
-                offline. Próxima versión cubrirá también recientes online
-                (ver prompt opencode bitácora-disconnect-audit Parte C). */}
+            {/* Honesty note reemplazada: Parte C fulfilled */}
             <p className="text-[11px] text-slate-500 italic px-2 py-2 leading-relaxed">
-              Por ahora muestra los registros pendientes de sincronizar offline. Si grabaste algo con conexión, ya está sincronizado y lo encuentras en <strong className="text-slate-300">Activos</strong>. Pronto verás también recientes online aquí.
+              Últimas 24h. Para historial completo: Activos, planta, Bitácora.
             </p>
-            {pendingTx.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-slate-500">
-                <Cloud size={48} className="mb-3 opacity-30" />
-                <p className="text-lg">Sin registros pendientes</p>
-                <p className="text-sm mt-1">Cuando registres algo sin red, aparece aquí hasta sincronizar</p>
-              </div>
-            ) : (
-              pendingTx.map((tx, idx) => {
-                const typeColor = TRANSACTION_TYPE_COLORS[tx.type] || 'text-slate-400 bg-slate-700/30';
-                const typeLabel = TRANSACTION_TYPE_LABELS[tx.type] || tx.type || 'Registro';
-                const name = getTransactionName(tx);
-                const TxIcon = TRANSACTION_TYPE_ICONS[tx.type] || Clock;
+            {(() => {
+              // Combinar pending + synced 24h, sort por timestamp desc
+              const pendingItems = pendingTx.map(tx => ({ ...tx, _source: 'pending' }));
+              const syncedItems = recentSyncedLogs.map(log => ({ ...log, _source: 'synced' }));
+              const all = [...pendingItems, ...syncedItems].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+              if (all.length === 0) {
+                return (
+                  <div className="flex flex-col items-center justify-center py-12 text-slate-500">
+                    <Cloud size={48} className="mb-3 opacity-30" />
+                    <p className="text-lg">Aún no hay registros en las últimas 24h</p>
+                    <p className="text-sm mt-1">Cuando grabes algo, aparece aquí</p>
+                  </div>
+                );
+              }
+
+              return all.map((item, idx) => {
+                const isPending = item._source === 'pending';
+                const txType = item.type;
+                const typeColor = TRANSACTION_TYPE_COLORS[txType] || 'text-slate-400 bg-slate-700/30';
+                const name = isPending ? getTransactionName(item) : (item.name || item.type || 'Registro');
+                const TxIcon = TRANSACTION_TYPE_ICONS[txType] || Clock;
 
                 const Wrap = onEntryClick ? 'button' : 'div';
                 const wrapProps = onEntryClick
-                  ? { type: 'button', onClick: () => onEntryClick(tx), 'aria-label': `Ver detalle: ${name}` }
+                  ? { type: 'button', onClick: () => onEntryClick(item), 'aria-label': `Ver detalle: ${name}` }
                   : {};
                 return (
                   <Wrap
-                    key={tx.id || idx}
+                    key={item.id || idx}
                     {...wrapProps}
-                    className="w-full text-left p-4 rounded-xl bg-slate-800 border border-dashed border-slate-600 transition-all hover:border-slate-400 active:bg-slate-700"
+                    className={`w-full text-left p-4 rounded-xl border transition-all hover:border-slate-400 active:bg-slate-700 ${
+                      isPending
+                        ? 'bg-slate-800 border-dashed border-slate-600'
+                        : 'bg-slate-800/70 border-slate-700'
+                    }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className={`p-2 rounded-lg ${typeColor} shrink-0 mt-0.5`}>
                         <TxIcon size={16} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${typeColor}`}>
-                            {typeLabel}
+                            {isPending ? (TRANSACTION_TYPE_LABELS[item.type] || item.type || 'Registro') : (item.type || 'Registro').replace('log--', '')}
                           </span>
-                          <StatusBadge
-                            status={tx.payload?.data?.attributes?.status}
-                            type={tx.type?.startsWith('asset--plant') ? 'plant' : tx.type?.includes('observation') ? 'pest' : 'task'}
-                            className="scale-90 origin-left"
-                          />
-                          <span className="text-xs text-amber-400 bg-amber-900/30 px-1.5 py-0.5 rounded-full flex items-center gap-1">
-                            <CloudOff size={10} />
-                            Pendiente
-                          </span>
+                          {isPending ? (
+                            <span className="text-xs text-amber-400 bg-amber-900/30 px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                              <CloudOff size={10} />
+                              Pendiente
+                            </span>
+                          ) : (
+                            <span className="text-xs text-emerald-400 bg-emerald-900/30 px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                              <Cloud size={10} />
+                              Sincronizado
+                            </span>
+                          )}
                         </div>
                         <h4 className="font-bold text-slate-200 text-base truncate">{name}</h4>
                       </div>
                       <span className="text-xs text-slate-500 shrink-0 mt-1">
-                        {formatTimestamp(tx.timestamp)}
+                        {formatTimestamp(item.timestamp)}
                       </span>
                     </div>
                   </Wrap>
                 );
-              })
-            )}
+              });
+            })()}
 
             {pendingTx.length > 0 && (
               <div className="p-3 rounded-xl bg-amber-900/10 border border-amber-800/30 text-center">
@@ -268,6 +296,13 @@ export default function WorkerHistory({ onBack, onEntryClick }) {
                   {isOnline
                     ? 'Estos registros se sincronizarán automáticamente con FarmOS'
                     : 'Se sincronizarán cuando se restablezca la conexión'}
+                </p>
+              </div>
+            )}
+            {recentSyncedLogs.length > 0 && pendingTx.length === 0 && (
+              <div className="p-3 rounded-xl bg-emerald-900/10 border border-emerald-800/30 text-center">
+                <p className="text-xs text-emerald-400/80">
+                  {recentSyncedLogs.length} registro{recentSyncedLogs.length !== 1 ? 's' : ''} sincronizado{recentSyncedLogs.length !== 1 ? 's' : ''} en las últimas 24h
                 </p>
               </div>
             )}
