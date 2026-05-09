@@ -143,7 +143,7 @@ jobs:
           #   step "Commit and push" fallaba porque no había edits reales.
           # - opencode/big-pickle (free tier opencode.ai) hace tool calls
           #   correctos sin auth.
-          # Detalles arquitecturales: guatoc-nixos modules/ai/claude-code-runner.nix
+          # Detalles arquitecturales: módulo NixOS interno claude-code-runner
           # (mantiene `claude-code` en extraPackages como backup para
           # reactivación si operador habilita billing Anthropic API).
           #
@@ -180,7 +180,7 @@ jobs:
           git config user.email "noreply-claude-code@chagra.bio"
 
           # Si no hay cambios, Claude no editó nada — abortar.
-          if git diff --quiet && git diff --cached --quiet; then
+          if [ -z "$(git status --porcelain)" ]; then
             echo "ERROR: Claude no produjo cambios; abortando push." >&2
             exit 1
           fi
