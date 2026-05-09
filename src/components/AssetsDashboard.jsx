@@ -18,6 +18,11 @@ import { findBiopreparadosByIngredient } from '../db/catalogDB';
 import { generatePlanForPlant } from '../services/planGeneratorService';
 import { getAccessToken } from '../services/authService';
 
+const fincaNombre = (() => {
+  const map = { guatoc: 'Guatoc', naranjalia: 'Naranjalia', roca_blanca: 'Roca Blanca', los_sitios: 'Los Sitios' };
+  return map[localStorage.getItem('chagra:active-finca') ?? ''] ?? 'Guatoc';
+})();
+
 // Thumb foto de planta para cards. Sub-componente porque usePhotoUrl no
 // puede llamarse dentro de un map() condicional (regla de hooks).
 // Si no hay foto de usuario para este asset, cae al placeholder (Fase 1
@@ -832,6 +837,15 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
             </button>
           </div>
           {!navigator.onLine && <WifiOff size={16} className="text-red-400" />}
+          <button
+            type="button"
+            onClick={() => alert('Selector de finca proximamente')}
+            className="flex items-center gap-1 text-xs font-bold uppercase text-emerald-400 bg-emerald-900/30 border border-emerald-700/40 rounded-full px-2.5 py-1 shrink-0 hover:bg-emerald-900/50 transition-colors"
+            aria-label={`Finca activa: ${fincaNombre}`}
+          >
+            <MapPin size={12} aria-hidden="true" />
+            {fincaNombre}
+          </button>
           {lastSync && (
             <span className="text-xs text-slate-500">
               {new Date(lastSync).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}
@@ -1093,8 +1107,9 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
                         </div>
                       )}
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           <h4 className="font-bold text-slate-200 truncate text-base">{name}</h4>
+                          <span className="text-[10px] font-bold uppercase text-emerald-300/70 border border-emerald-700/40 bg-emerald-900/20 rounded-full px-2 py-0.5 shrink-0">{fincaNombre}</span>
                           {isPending && (
                             <span className="text-xs text-amber-400 bg-amber-900/30 px-1.5 py-0.5 rounded-full shrink-0">pendiente</span>
                           )}
