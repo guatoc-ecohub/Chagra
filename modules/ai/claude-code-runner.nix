@@ -58,10 +58,16 @@ in
       type = lib.types.str;
       default = "/run/secrets/claude-code-anthropic-key";
       description = ''
-        Ruta al SOPS secret con la API key de Anthropic dedicada al bot.
-        Formato del file: `ANTHROPIC_API_KEY=sk-ant-...` (EnvironmentFile-compat).
-        Key DEBE ser dedicada (NO el plan Pro personal del operador) — separa
-        rate limits y permite auditar costo del bot independientemente.
+        Ruta al SOPS secret con auth para el bot.
+        Formato del file: `ANTHROPIC_API_KEY=<value>` (EnvironmentFile-compat).
+
+        Pivot 2026-05-09: el value es la litellm-master-key (NO Anthropic API
+        directa) porque el operador no tiene billing pay-per-use. Combinado
+        con ANTHROPIC_BASE_URL=http://127.0.0.1:4000 (hardcoded en
+        serviceOverrides), claude CLI golpea el proxy litellm local que
+        routea a GLM-4.6 (z.ai Coding Plan) con fallback Ollama. Cuando el
+        operador tenga balance Anthropic API directa, rotar este secret a
+        la key real + remover ANTHROPIC_BASE_URL del Environment.
       '';
     };
   };
@@ -139,8 +145,24 @@ in
 
         # Carga el API key como env var ANTHROPIC_API_KEY automáticamente.
         # claude CLI la lee de ahí. NO se expone en argv ni se loguea.
+        # PIVOT 2026-05-09: el value es la litellm-master-key (no Anthropic
+        # directa). Combinada con ANTHROPIC_BASE_URL abajo, hace que claude
+        # CLI golpee el proxy local litellm en :4000 → routea a GLM-4.6 vía
+        # z.ai Coding Plan (primario) con fallback a Ollama (qwen2.5-coder).
+        # Plan Anthropic API directo queda obsoleto para el bot — operador
+        # tiene plan Max personal pero NO API balance pay-per-use.
         EnvironmentFile = [
           cfg.anthropicKeyFile
+        ];
+
+        # Redirige la API call de claude CLI al proxy litellm local.
+        # claude CLI lee "ANTHROPIC_BASE_URL" + "ANTHROPIC_API_KEY" y manda
+        # POST a http://127.0.0.1:4000/v1/messages (Anthropic-compat adapter
+        # del proxy). Master key (=ANTHROPIC_API_KEY arriba) auth client→proxy.
+        # Hardcoded :4000 alineado con default de modules/ai/litellm-proxy.nix —
+        # actualizar ambos en sync si se cambia el puerto.
+        Environment = [
+          "ANTHROPIC_BASE_URL=http://127.0.0.1:4000"
         ];
       };
     };
