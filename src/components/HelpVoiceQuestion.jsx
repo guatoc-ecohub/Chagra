@@ -78,7 +78,7 @@ function appendHelpCorpusLog(entry) {
   }
 }
 
-export default function HelpVoiceQuestion({ speciesSlug }) {
+export default function HelpVoiceQuestion({ speciesSlug = null }) {
   const [corpus, setCorpus] = useState(null);
   const [corpusError, setCorpusError] = useState(null);
   const [phase, setPhase] = useState('idle');
@@ -123,7 +123,8 @@ export default function HelpVoiceQuestion({ speciesSlug }) {
     const corpusJson = JSON.stringify(corpusObj);
     const corpusBlob = flattenCorpusStrings(corpusObj).join('\n');
 
-    const system = `Usted es asistente agroecológico de Chagra (modo ayuda, corpus estricto).
+    const system = speciesSlug
+      ? `Usted es asistente agroecológico de Chagra (modo ayuda, corpus estricto).
 Reglas obligatorias:
 1) Use ÚNICAMENTe el CONTEXTO JSON que el usuario adjunta en su mensaje. No use conocimiento externo.
 2) Si la pregunta no puede responderse con ese CONTEXTO, diga con claridad que no lo sabe y sugiera consultar fuentes revisadas por pares, Agrosavia, Cenicafé o material de extensión de la UNAL, según aplique.
@@ -132,9 +133,12 @@ Reglas obligatorias:
 5) Responda en español, tratamiento de "usted", tono colombiano cordial.
 6) No hable de política, salud humana ni temas fuera de agricultura.
 
-Formato: párrafo breve (máximo unas 8 oraciones). Sin listas largas salvo que el usuario pida enumeración.`;
+Formato: párrafo breve (máximo unas 8 oraciones). Sin listas largas salvo que el usuario pida enumeración.`
+      : 'Eres un asistente agroecológico colombiano. Responde preguntas sobre cultivos, suelos, biopreparados, ciclos lunares, cosecha. Usa el corpus DR-034 cuando esté disponible. NO inventes dosis exactas si no están en corpus — di "consulta con sabedor local" en su lugar.';
 
-    const userMsg = `CONTEXTO (única fuente, JSON):\n${corpusJson}\n\nPREGUNTA:\n${questionText.trim()}`;
+    const userMsg = corpusJson
+      ? `CONTEXTO (única fuente, JSON):\n${corpusJson}\n\nPREGUNTA:\n${questionText.trim()}`
+      : `PREGUNTA:\n${questionText.trim()}`;
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -256,12 +260,11 @@ Formato: párrafo breve (máximo unas 8 oraciones). Sin listas largas salvo que 
         <button
           type="button"
           onClick={handleMic}
-          disabled={phase === 'transcribing' || phase === 'thinking' || !corpus}
-          className={`inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm min-h-[44px] transition-colors ${
-            isRecording
+          disabled={phase === 'transcribing' || phase === 'thinking' || (speciesSlug !== null && !corpus)}
+          className={`inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm min-h-[44px] transition-colors ${isRecording
               ? 'bg-red-600 hover:bg-red-500 text-white'
               : 'bg-emerald-700 hover:bg-emerald-600 text-white disabled:opacity-50 disabled:cursor-not-allowed'
-          }`}
+            }`}
         >
           {phase === 'transcribing' || phase === 'thinking' ? (
             <>

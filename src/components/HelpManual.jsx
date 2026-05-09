@@ -6,6 +6,7 @@ import HelpVozScreen from './HelpVozScreen.jsx';
 import HelpUsoScreen from './HelpUsoScreen.jsx';
 import HelpCicloScreen from './HelpCicloScreen.jsx';
 import HelpDictionary from './HelpDictionary.jsx';
+import HelpVoiceRegionalDemo from './HelpVoiceRegionalDemo.jsx';
 
 /**
  * HelpManual — Manual de usuario integrado en la PWA.
@@ -75,6 +76,9 @@ export default function HelpManual({ onBack, onNavigate }) {
       )}
       {section === 'uso' && (
         <HelpUsoScreen onBackToHome={goHome} onNavigate={closeAndNavigate} />
+      )}
+      {section === 'voz-regional-demo' && (
+        <HelpVoiceRegionalDemo onBackToHome={goHome} />
       )}
       {section === 'ciclo' && (
         <HelpCicloScreen onBackToHome={goHome} />
