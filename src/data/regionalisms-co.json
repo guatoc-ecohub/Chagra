@@ -1,0 +1,75 @@
+{
+  "version": "0.1.0-fase1",
+  "regiones": {
+    "caribe": {
+      "label": "Caribe",
+      "departamentos": ["atlantico", "bolivar", "cesar", "cordoba", "guajira", "magdalena", "san_andres", "sucre"],
+      "saludos": ["¡Ajá, parce!", "¡Vé pue!", "Hermano, mira esto."],
+      "conectores": ["mira que", "fíjate", "viste"],
+      "cierres": ["Saludo desde el Caribe.", "Buena pa' la chagra."]
+    },
+    "paisa": {
+      "label": "Paisa / Antioqueño",
+      "departamentos": ["antioquia", "caldas", "risaralda", "quindio"],
+      "saludos": ["¡Quí más, parce!", "¡Ave maría pues!", "Buenas, parcero."],
+      "conectores": ["pues", "vea", "mire"],
+      "cierres": ["Pa'lante con la chagra, pues.", "Suerte parce."]
+    },
+    "cundiboyacense": {
+      "label": "Cundiboyacense",
+      "departamentos": ["cundinamarca", "boyaca", "bogota_dc"],
+      "saludos": ["Buenas, sumercé.", "Quibo."],
+      "conectores": ["dizque", "como sea"],
+      "cierres": ["Que le vaya bien.", "Aquí estamos."]
+    },
+    "santandereano": {
+      "label": "Santandereano",
+      "departamentos": ["santander", "norte_de_santander"],
+      "saludos": ["¡Quí whopping, mano!", "Hermano, mire."],
+      "conectores": ["mano", "hijuemadre"],
+      "cierres": ["Pa'lante."]
+    },
+    "llanero": {
+      "label": "Llanero",
+      "departamentos": ["meta", "casanare", "vichada", "arauca", "guainia_amazonico"],
+      "saludos": ["Quibo, ome.", "Mire mocho."],
+      "conectores": ["vale", "ome"],
+      "cierres": ["Pa' la sabana."]
+    },
+    "opita": {
+      "label": "Opita / Tolimense",
+      "departamentos": ["tolima", "huila"],
+      "saludos": ["Buenas, paisano.", "Quí houve."],
+      "conectores": ["jue", "ah pues"],
+      "cierres": ["Que le rinda."]
+    },
+    "pastuso": {
+      "label": "Pastuso / Nariñense",
+      "departamentos": ["narino"],
+      "saludos": ["Buenas, taita.", "Hola guagua."],
+      "conectores": ["pues si", "achachay"],
+      "cierres": ["Bendiciones desde Nariño."]
+    },
+    "pacifico": {
+      "label": "Pacífico (afrocolombiano)",
+      "departamentos": ["choco", "valle_del_cauca", "cauca", "narino_pacifico"],
+      "saludos": ["Buenas, compadre.", "Hermano de la mar."],
+      "conectores": ["mira", "oye"],
+      "cierres": ["Que el río acompañe."]
+    },
+    "amazonica": {
+      "label": "Amazónica",
+      "departamentos": ["putumayo", "caqueta", "amazonas", "vaupes"],
+      "saludos": ["Saludo desde el monte."],
+      "conectores": ["así pues"],
+      "cierres": ["Que la selva enseñe."],
+      "nota_apropiacion": "Las comunidades amazónicas tienen voces propias muy diversas. Esta IA usa registro castellano suave reconociendo sus propias voces como saber irreductible."
+    }
+  },
+  "default_neutro": {
+    "label": "Neutro Colombia",
+    "saludos": ["Hola.", "Buenas."],
+    "conectores": ["mira", "ten en cuenta"],
+    "cierres": ["Saludos.", "Pa'lante."]
+  }
+}
