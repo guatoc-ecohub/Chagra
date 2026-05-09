@@ -163,7 +163,7 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
 
           <p className="font-bold text-emerald-200 mt-3">Registrar cosecha</p>
           <p>Activos → selecciona la planta → en la card aparece &ldquo;Registrar cosecha&rdquo;. Captura cantidad cosechada (kg / unidades) + fecha. Se agrega como log de cosecha a la hoja de vida.</p>
-          <p>También por voz: &ldquo;coseché 5 kilos de gulupas&rdquo; con el FAB micrófono.</p>
+          <p>También por voz: &ldquo;coseché 5 kilos de gulupas&rdquo; con el botón micrófono.</p>
 
           <div className="mt-3 flex flex-wrap gap-2">
             <button
