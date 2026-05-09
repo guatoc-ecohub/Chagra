@@ -235,6 +235,100 @@ let
     echo "{\"pr_number\":$PR_NUM,\"html_url\":\"$HTML_URL\",\"label\":\"$LABEL\",\"status\":\"applied\"}"
   '';
 
+  voiceNluExtract = pkgs.writeShellScriptBin "voice-nlu-extract" ''
+    #!${pkgs.bash}/bin/bash
+    set -euo pipefail
+
+    TRANSCRIPT="''${1:-}"
+    if [ -z "$TRANSCRIPT" ]; then
+      echo '{"error":"missing transcript; uso: voice-nlu-extract <transcript>"}' >&2
+      exit 1
+    fi
+
+    # Invoca el módulo Python con el transcript como input
+    ${pkgs.python3}/bin/python3 -c "
+import sys, json
+sys.path.insert(0, '${./scripts}')
+from voice_nlu import extract_voice_nlu
+result = extract_voice_nlu(sys.argv[1])
+print(json.dumps(result, ensure_ascii=False))
+" "$TRANSCRIPT"
+  '';
+
+  # Helper: crea un Issue en repo Chagra desde shell_exec.
+  #
+  # Por qué existe:
+  #   El bot guatoc, en sec 7 manifest paso 4, debe POST a GitHub Issues
+  #   API con label `claude-code-request` que dispara el workflow
+  #   bootstrap. ANTES, el manifest describía el POST raw con header
+  #   `Authorization: Bearer $GITHUB_TOKEN` — pero el subprocess_sandbox
+  #   del bot hace env_clear() antes de invocar shell_exec, por lo que
+  #   $GITHUB_TOKEN expandía a string vacío → 401 Bad credentials
+  #   (incidente field test 2026-05-09).
+  #
+  # Diseño paralelo a applyPRLabel:
+  #   - Token de chagra-deploy-github-token leído del SOPS file con
+  #     awk strip de prefijo (acepta GITHUB_TOKEN= o raw — backwards-compat).
+  #   - Stdout JSON: {issue_number, html_url, status} para que el LLM
+  #     pueda extraer datos sin parsear texto libre.
+  #   - Si label no especificada, default claude-code-request (obligatoria
+  #     para disparar el workflow bootstrap).
+  createChagraIssue = pkgs.writeShellScriptBin "create-chagra-issue" ''
+    #!${pkgs.bash}/bin/bash
+    set -euo pipefail
+
+    TITLE="''${1:-}"
+    BODY="''${2:-}"
+    LABEL="''${3:-claude-code-request}"
+    REPO="''${4:-guatoc-ecohub/Chagra}"
+
+    if [ -z "$TITLE" ] || [ -z "$BODY" ]; then
+      echo '{"error":"missing args; uso: create-chagra-issue <title> <body> [label] [repo]"}' >&2
+      exit 1
+    fi
+
+    # Leer token desde SOPS file (subprocess_sandbox strip env vars).
+    TOKEN_FILE="''${GITHUB_TOKEN_FILE:-/run/secrets/chagra-deploy-github-token}"
+    if [ -z "''${GITHUB_TOKEN:-}" ] && [ -r "$TOKEN_FILE" ]; then
+      GITHUB_TOKEN=$(${pkgs.gawk}/bin/awk -F= '/^(CHAGRA_DEPLOY_GITHUB_TOKEN|GITHUB_TOKEN)=/{sub(/^[^=]+=/,""); print; exit}' "$TOKEN_FILE")
+    fi
+    if [ -z "''${GITHUB_TOKEN:-}" ]; then
+      echo '{"error":"GITHUB_TOKEN no disponible (env vacío + secret file no legible)"}' >&2
+      exit 1
+    fi
+
+    API="https://api.github.com/repos/$REPO/issues"
+
+    # Construir payload JSON con jq para escapar correctamente title/body.
+    PAYLOAD=$(${pkgs.jq}/bin/jq -n \
+      --arg title "$TITLE" \
+      --arg body "$BODY" \
+      --arg label "$LABEL" \
+      '{title: $title, body: $body, labels: [$label]}')
+
+    # POST a GitHub Issues API.
+    RESPONSE=$(${pkgs.curl}/bin/curl -fsS \
+      -X POST \
+      -H "Authorization: Bearer $GITHUB_TOKEN" \
+      -H "Accept: application/vnd.github+json" \
+      -H "Content-Type: application/json" \
+      "$API" \
+      -d "$PAYLOAD") || {
+      echo "{\"error\":\"falló POST de issue (verifica token + permisos issues:write)\"}" >&2
+      exit 2
+    }
+
+    ISSUE_NUM=$(echo "$RESPONSE" | ${pkgs.jq}/bin/jq -r '.number // empty')
+    HTML_URL=$(echo "$RESPONSE" | ${pkgs.jq}/bin/jq -r '.html_url // empty')
+
+    if [ -z "$ISSUE_NUM" ] || [ "$ISSUE_NUM" = "null" ]; then
+      echo "{\"error\":\"respuesta GitHub sin issue number\",\"response\":$(echo "$RESPONSE" | ${pkgs.jq}/bin/jq -c .)}" >&2
+      exit 3
+    fi
+
+    echo "{\"issue_number\":$ISSUE_NUM,\"html_url\":\"$HTML_URL\",\"label\":\"$LABEL\",\"status\":\"created\"}"
+  '';
+
   # Genera config.toml para un agente
   mkAgentConfig = name: agent: pkgs.writeText "openfang-${name}-config.toml" ''
     # OpenFang config — Agent: ${agent.name}
@@ -439,7 +533,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages = [ openfang-pkg transcribeTelegramVoice applyPRLabel ];
+    environment.systemPackages = [ openfang-pkg transcribeTelegramVoice applyPRLabel voiceNluExtract createChagraIssue ];
 
     users.users.openfang = {
       isSystemUser = true;
@@ -612,7 +706,7 @@ in
           # `transcribe-telegram-voice` aparece "no instalado" desde shell_exec.
           # Incidente 2026-04-28: sin esto el LLM cae a curl directo con
           # bot token plano en argv → leak en journalctl.
-          export PATH="${transcribeTelegramVoice}/bin:${applyPRLabel}/bin:${pkgs.curl}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gnused}/bin:${pkgs.bash}/bin:$PATH"
+          export PATH="${transcribeTelegramVoice}/bin:${applyPRLabel}/bin:${voiceNluExtract}/bin:${createChagraIssue}/bin:${pkgs.curl}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gnused}/bin:${pkgs.bash}/bin:$PATH"
 
           exec ${openfang-pkg}/bin/openfang start --config "$HOME/config.toml"
         '';

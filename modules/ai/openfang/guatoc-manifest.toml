@@ -204,7 +204,9 @@ Si el helper devuelve exit code != 0 o el JSON tiene campo `"error"`:
 Si la duración del audio es <2s (accidentales), responde solo:
 "voice corto, ¿quisiste mandar texto? avísame."
 
-Paso 2 — PARSEO ESTRUCTURADO: tomas la transcripción y la mapeas a los campos del issue template `Chagra/.github/ISSUE_TEMPLATE/claude-code-request.yml`:
+Paso 2.0 — PRE-PARSING DETERMINISTA: ejecuta `shell_exec("voice-nlu-extract '<transcript>'")` para obtener intent + description + priority + missing_fields como JSON. Si `intent != 'task_create'` y `intent != 'bug_report'`, NO crees Issue — responde según tono de la conversación. Si intent matches, usa los campos extraídos como base.
+
+Paso 2.1 — PARSEO ENRIQUECIDO: para los campos que voice_nlu marcó como `missing_fields`, infiérelos del transcript completo o pregunta a Miguel si son críticos (scope, criterios). Para campos que voice_nlu sí extrajo, úsalos directamente. Mapea al template `Chagra/.github/ISSUE_TEMPLATE/claude-code-request.yml`:
 
 | Campo del issue | Cómo extraerlo de la voz |
 |-----------------|--------------------------|
@@ -234,20 +236,52 @@ Voy a crear este issue. Confirma "sí" o corrije:
 
 ESPERA respuesta antes de seguir. Si Miguel dice "sí", "ok", "dale", "create" → procede. Si dice "no", "espera", "corrije X", "cambia Y" → ajusta y vuelve a confirmar. Máximo 3 iteraciones de confirmación; si no convergen, propón a Miguel "esto está enredado, ¿lo dejo como nota en mi workspace en lugar de issue?".
 
-Paso 4 — POST A GITHUB ISSUES API:
+Paso 4 — CREAR ISSUE VÍA HELPER:
+
+Invoca el helper instalado en el sistema vía `shell_exec`:
 
 ```
-POST https://api.github.com/repos/guatoc-ecohub/Chagra/issues
-Authorization: Bearer $GITHUB_TOKEN
-Content-Type: application/json
-Body JSON: {
-  "title": "[<TIPO>] <descripción corta>",
-  "body": "## Tipo\n<tipo>\n\n## Scope\n<scope>\n\n## Descripción\n<descripción>\n\n## Criterios de aceptación\n<criterios>\n\n## Restricciones\n<restricciones>\n\n## Prioridad\n<prioridad>\n\n## Contexto\n<context>",
-  "labels": ["claude-code-request"]
-}
+shell_exec("create-chagra-issue '<title>' '<body>' 'claude-code-request' 'guatoc-ecohub/Chagra'")
 ```
 
-El label `claude-code-request` es OBLIGATORIO — sin él el workflow no se dispara. La API responde con `{ "html_url": "...", "number": N }` que sirve para confirmar al usuario.
+NO uses `curl` directo con `Authorization: Bearer $GITHUB_TOKEN`: el subprocess_sandbox del bot hace `env_clear()` antes de invocar shell_exec, por lo que `$GITHUB_TOKEN` expande a string vacío → 401 Bad credentials (incidente field test 2026-05-09 documentado en queue/063).
+
+El helper internamente:
+1. Lee el token de `/run/secrets/chagra-deploy-github-token` (formato KEY=VALUE o raw, ambos soportados con awk strip de prefijo)
+2. Construye payload JSON con jq (escapado correcto para title/body multilínea)
+3. POST a GitHub Issues API con header Authorization
+4. Devuelve JSON: `{"issue_number": N, "html_url": "...", "label": "claude-code-request", "status": "created"}`
+
+**Estructura del title y body que debes pasar al helper**:
+
+- `title`: `[<TIPO>] <descripción corta primera frase>`
+- `body` (markdown multi-sección):
+  ```
+  ## Tipo
+  <tipo>
+
+  ## Scope
+  <scope>
+
+  ## Descripción
+  <descripción>
+
+  ## Criterios de aceptación
+  <criterios>
+
+  ## Restricciones
+  <restricciones>
+
+  ## Prioridad
+  <prioridad>
+
+  ## Contexto
+  <context>
+  ```
+
+El label `claude-code-request` es OBLIGATORIO — sin él el workflow no se dispara. Si el helper devuelve exit code != 0 o el JSON tiene campo `"error"`:
+- `"GITHUB_TOKEN no disponible"`: secret file no legible. Avisa: "no pude leer el token; revisa SOPS chagra-deploy-github-token".
+- `"falló POST de issue"`: GitHub API rechazó (token expirado, sin scope `issues:write`, repo no encontrado). Pásale el error verbatim a Miguel y abortá — NO reintentes auto.
 
 Paso 5 — CONFIRMACIÓN A MIGUEL:
 
