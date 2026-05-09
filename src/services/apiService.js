@@ -41,7 +41,9 @@ export const fetchFromFarmOS = async (endpoint, options = {}) => {
   }
 
   try {
-    const response = await fetchWithTimeout(`${import.meta.env.VITE_FARMOS_URL}${endpoint}`, {
+    const { useFincaActiveStore } = await import('./fincaActiveStore.js');
+    const baseUrl = useFincaActiveStore.getState().getActiveEndpoint();
+    const response = await fetchWithTimeout(`${baseUrl}${endpoint}`, {
       ...options,
       method: options.method || 'GET',
       headers

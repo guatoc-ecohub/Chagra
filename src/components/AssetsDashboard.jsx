@@ -17,6 +17,8 @@ import { usePhotoUrl } from '../hooks/usePhotoUrl';
 import { findBiopreparadosByIngredient } from '../db/catalogDB';
 import { generatePlanForPlant } from '../services/planGeneratorService';
 import { getAccessToken } from '../services/authService';
+import { useFincaActiveStore } from '../services/fincaActiveStore';
+import MultiFincaModal from './MultiFincaModal';
 
 const fincaNombre = (() => {
   const map = { guatoc: 'Guatoc', naranjalia: 'Naranjalia', roca_blanca: 'Roca Blanca', los_sitios: 'Los Sitios' };
@@ -199,9 +201,14 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     setSelectedAsset,
   } = useAssetStore();
 
+  const { activeFincaSlug, getActiveFinca } = useFincaActiveStore();
+  const activeFinca = getActiveFinca();
+  const fincaNombre = activeFinca.nombre;
+
   const { request: requestGeo } = useGeolocation();
 
   const [showMapPicker, setShowMapPicker] = useState(false);
+  const [showFincaModal, setShowFincaModal] = useState(false);
   // Sugerencias post-create. Miguel UX 2026-05-03: cuando user agrega
   // material (melaza/suero) al inventario, sugerir biopreparados que pueda
   // hacer con ese ingrediente. State del modal: { ingredientName, biopreparados[] }
@@ -253,11 +260,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
       }
     };
     init();
-    // hydrate y syncFromServer vienen del store Zustand (referencias estables);
-    // incluirlos dispararía init en cada render. Sync único al montar es lo
-    // correcto.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [activeFincaSlug, hydrate, syncFromServer]); // Re-sync when finca changes
 
   // Extrae el id del parent land desde las relationships JSON:API del asset.
   const getParentLandId = (asset) => {
@@ -602,8 +605,8 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
               key={opt.value}
               onClick={() => setFormData({ ...formData, estrato: formData.estrato === opt.value ? '' : opt.value })}
               className={`p-3 rounded-xl text-left transition-all min-h-[56px] active:scale-[0.98] ${formData.estrato === opt.value
-                  ? 'bg-lime-600/20 border-2 border-lime-500 text-lime-300'
-                  : 'bg-slate-800 border border-slate-700 text-slate-300'
+                ? 'bg-lime-600/20 border-2 border-lime-500 text-lime-300'
+                : 'bg-slate-800 border border-slate-700 text-slate-300'
                 }`}
             >
               <span className="font-bold text-sm block">{opt.label}</span>
@@ -622,8 +625,8 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
               key={opt.value}
               onClick={() => setFormData({ ...formData, gremio: formData.gremio === opt.value ? '' : opt.value })}
               className={`text-xs px-3 py-2 rounded-full transition-all active:scale-95 min-h-[36px] ${formData.gremio === opt.value
-                  ? 'bg-lime-600/30 text-lime-300 border border-lime-500 font-bold'
-                  : 'bg-slate-800 text-slate-400 border border-slate-700'
+                ? 'bg-lime-600/30 text-lime-300 border border-lime-500 font-bold'
+                : 'bg-slate-800 text-slate-400 border border-slate-700'
                 }`}
             >
               {opt.label}
@@ -851,6 +854,15 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
               {new Date(lastSync).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}
             </span>
           )}
+          <button
+            type="button"
+            onClick={() => setShowFincaModal(true)}
+            className="flex items-center gap-1 text-xs font-bold uppercase text-emerald-400 bg-emerald-900/30 border border-emerald-700/40 rounded-full px-2.5 py-1 shrink-0 hover:bg-emerald-900/50 transition-colors"
+            aria-label={`Finca activa: ${fincaNombre}`}
+          >
+            <MapPin size={12} aria-hidden="true" />
+            {fincaNombre}
+          </button>
           <button onClick={handleRefresh} disabled={isLoading} aria-label="Sincronizar activos" className="p-2 bg-slate-800 rounded-lg active:bg-slate-700 disabled:opacity-50 min-h-[40px] min-w-[40px] flex items-center justify-center">
             <RefreshCw size={16} aria-hidden="true" className={isLoading ? 'motion-safe:animate-spin' : ''} />
           </button>
@@ -872,8 +884,8 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
               title={tab.desc || tab.label}
               onClick={() => { setActiveTab(tab.id); setShowForm(false); resetForm(); }}
               className={`flex-1 p-3 flex items-center justify-center gap-1.5 font-bold text-xs whitespace-nowrap transition-all min-h-[48px] ${isActive
-                  ? `${colorMap[tab.color].text} border-b-2 ${colorMap[tab.color].border}`
-                  : 'text-slate-500 hover:text-slate-300'
+                ? `${colorMap[tab.color].text} border-b-2 ${colorMap[tab.color].border}`
+                : 'text-slate-500 hover:text-slate-300'
                 }`}
             >
               <Icon size={16} aria-hidden="true" />
@@ -1089,8 +1101,8 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
                 <div
                   key={asset.id}
                   className={`p-4 rounded-xl border transition-all ${isPending
-                      ? 'bg-slate-800/50 border-dashed border-slate-600'
-                      : 'bg-slate-800 border-slate-700'
+                    ? 'bg-slate-800/50 border-dashed border-slate-600'
+                    : 'bg-slate-800 border-slate-700'
                     }`}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -1260,6 +1272,10 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
           biopreparados={biopreparadoSuggestion.biopreparados}
           onClose={() => setBiopreparadoSuggestion(null)}
         />
+      )}
+      {/* Selector de Fincas (Piloto Multi-finca) */}
+      {showFincaModal && (
+        <MultiFincaModal onClose={() => setShowFincaModal(false)} />
       )}
     </div>
   );
