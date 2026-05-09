@@ -156,6 +156,13 @@
     htop       # Monitor de procesos
     # nvtop     # Monitor de GPU NVIDIA (comentado temporalmente)
 
+    # --- Sesiones persistentes / acceso remoto ---
+    # tmux: sesiones de terminal que sobreviven logout SSH. Usado para
+    # dejar opencode/claude-code corriendo y attach desde Termius en Pixel
+    # 9 Pro vía Tailscale. Recordá `loginctl enable-linger kortux` post-rebuild
+    # para que tmux corra incluso sin sesión gráfica activa.
+    tmux
+
     # Firefox, Chrome + Bitwarden (gestor de contraseñas)
     firefox
     google-chrome
