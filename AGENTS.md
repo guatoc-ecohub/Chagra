@@ -2,13 +2,13 @@
 
 > Reglas para cualquier agente (humano o AI) que toque código de persistencia, sync, o UI que consuma estado de Assets/Logs.
 >
-> Decisión completa en `Chagra-strategy/adrs/ADR-019-data-model-asset-log.md`. Lectura obligatoria antes del primer edit.
+> El modelo de datos completo (decisiones, alternativas evaluadas, plan de migración por fases) está documentado en un ADR técnico mantenido en repo privado interno. Las reglas inviolables resumidas a continuación son lectura obligatoria antes del primer edit.
 
 ## Modelo de datos: las 3 reglas inviolables
 
 **1. IA jamás muta Asset directo.** Toda inferencia (visión, OCR, LLM textual, telemetría con interpretación) entra como `log--observation` con `metadata.ai = {source, model_version, confidence, needs_human_review, reasoning?}`. Mientras `needs_human_review: true`, los logs son sugerencias para la UI, no estado. La proyección de un Asset jamás se construye sobre logs con `needs_human_review: true`.
 
-**2. Vistas derivadas NO se almacenan como campo de Asset.** Si el valor puede computarse leyendo logs, se computa en hooks/selectores y se cachea en memoria. NO se persiste en IndexedDB ni en `attributes` de FarmOS asset. Anti-patrones conocidos a refactorizar (Fase 2 ADR-019):
+**2. Vistas derivadas NO se almacenan como campo de Asset.** Si el valor puede computarse leyendo logs, se computa en hooks/selectores y se cachea en memoria. NO se persiste en IndexedDB ni en `attributes` de FarmOS asset. Anti-patrones conocidos a refactorizar en una fase futura:
 
 - `asset--plant.latestHarvest` ← debe ser derivada de `getLogsByAsset(plantId).filter(t='harvest')`.
 - `asset--plant.status='harvested'` ← debe ser derivada de `exists(log--harvest where asset_id=plantId)`.
@@ -45,9 +45,9 @@ Una operación masiva = UN Log con `relationships.asset = [id1, id2, ..., idN]`.
 
 Lectura obligatoria:
 
-- `Chagra-strategy/adrs/ADR-019-data-model-asset-log.md` — modelo de datos completo + plan de migración por fases.
-- `Chagra-strategy/adrs/ADR-002-oss-pro-boundary.md` — boundary OSS/Pro.
-- `Chagra-strategy/adrs/ADR-013-schema-v3-ambiguities-resolved.md` — schema v3.1 del catálogo.
+- ADR técnico del modelo de datos Asset+Log (privado) — decisiones, plan de migración por fases.
+- ADR del boundary OSS / extensión comercial (privado).
+- ADR del schema del catálogo de especies (privado).
 - `CONTRIBUTING.md` (este repo) — anti-leak rules 1-7, hooks lefthook, merge gates.
 
 ## Archivos clave del modelo
@@ -56,39 +56,101 @@ Lectura obligatoria:
 - `src/db/assetCache.js` — atomic commits + bulk put con preservación de `_pending`.
 - `src/db/logCache.js` — normalización de logs, query por asset.
 - `src/db/mediaCache.js` — blobs separados de logs (attachments).
-- `src/store/useAssetStore.js` — Zustand state, hidratación, addAsset/addLog/refillMaterial. **Aquí viven los anti-patrones a refactorizar en Fases 2 y 4.**
+- `src/store/useAssetStore.js` — Zustand state, hidratación, addAsset/addLog/refillMaterial. **Aquí viven los anti-patrones a refactorizar en fases futuras.**
 - `src/services/syncManager.js` — cola `pending_transactions` con backoff exponencial. **NO refactorar sin necesidad concreta.**
 - `src/services/payloadService.js` — `savePayload(bundle, payload)` con resolución de inlines.
 
+## Reglas inviolables de branching (anti-destructive)
+
+Aplican a todo agente AI o humano que vaya a hacer commits. Incidente 2026-05-09: agentes branchearon desde main viejo y al rebase generaron deletes masivos de ADRs, queues y archivos de producción. Estas reglas son no-negociables.
+
+### Regla 1 — Sincronizar antes de empezar (obligatorio)
+
+Como **primer paso** de cualquier tarea, ejecutar:
+
+```bash
+cd /home/kortux/Workspace/Chagra
+git fetch origin --prune
+git checkout main
+git pull origin main
+git log --oneline -3 origin/main  # confirmar fecha reciente del HEAD
+```
+
+Si el `git log` no muestra commits del día actual o anteriores cercanos, abortar y consultar al operador antes de continuar.
+
+### Regla 2 — Crear rama desde origin/main fresh
+
+```bash
+git checkout -b feat/<scope>-<descripcion> origin/main
+```
+
+NO crear la rama desde HEAD local arbitrario. NO reusar branches viejas. NO branchear desde otro feature branch sin entender por qué.
+
+### Regla 3 — Verificar punto de partida limpio
+
+Antes del primer commit:
+
+```bash
+git log --oneline origin/main..HEAD       # debe estar vacío
+git diff --stat origin/main..HEAD          # debe estar vacío
+```
+
+Si NO está vacío, abortar y consultar.
+
+### Regla 4 — Rebase preventivo si la tarea toma > 2 horas
+
+Antes del primer commit, si hubo más de 2 horas desde el inicio:
+
+```bash
+git fetch origin
+git rebase origin/main
+```
+
+Si hay conflicts en archivos que no tocó la tarea, abortar y consultar.
+
+### Regla 5 — Prohibido eliminar archivos sin permiso explícito
+
+Antes de cada commit:
+
+```bash
+git diff --diff-filter=D --name-only HEAD
+```
+
+Si ese comando lista archivos eliminados, **PARAR y CONSULTAR**. Eliminación de ADRs, queue items, deepresearch, .private/, INDEX.md, public/cycle-content/*.json, public/icon-*.png, scripts/auto-bump-version.mjs, jsconfig.json, vitest.config.js, tests/*, CHANGELOG.md, AGENTS.md, lefthook.yml, package-lock.json, public/manifest.json o public/sw.js sin justificación documentada en el queue item es **violación crítica**.
+
+Solo se eliminan archivos del scope explícito de la tarea, declarados antes de empezar, y aprobados por el operador en el queue/prompt.
+
+### Regla 6 — Output verificable obligatorio
+
+Cuando se reporta tarea completada al operador, incluir verbatim:
+
+- Output de `git log --oneline origin/main..HEAD`
+- Output de `git diff --stat origin/main..HEAD`
+- Output de `git diff --diff-filter=D --name-only origin/main..HEAD` (debe estar vacío salvo deletes pre-aprobados)
+- URL del PR creado (si dice "PR creado" sin URL real, es alucinación)
+
+Reportes "completed" sin estos outputs son inválidos. El operador debe rechazar y pedir verificación.
+
 ## Convención de commits
 
-`feat(...)`, `fix(...)`, `chore(...)`, `refactor(...)`, `docs(...)`. Conventional Commits obligatorio (lefthook valida). Refs ADR-019 cuando el commit toque modelo de datos.
+`feat(...)`, `fix(...)`, `chore(...)`, `refactor(...)`, `docs(...)`. Conventional Commits obligatorio (lefthook valida). Referenciá el ADR técnico aplicable cuando el commit toque modelo de datos.
 
-## Boundary OSS/Pro
+## Boundary con extensión comercial
 
-Este repo es público AGPL-3.0. NO importar estáticamente de `chagra-pro`. Integración via `src/core/moduleRegistry.js` en runtime. Ver `ADR-002` y `oss-pro/PROHIBITED_IN_PUBLIC.md`.
+Este repo es público AGPL-3.0. Existe una extensión comercial privada que **NO** se importa estáticamente desde aquí. La integración entre ambos planos ocurre en runtime mediante `src/core/moduleRegistry.js`.
 
 ## Anti-leak
 
-- Sin URLs internas, IPs RFC1918, tokens, secretos, hostnames operativos. Ver `CONTRIBUTING.md` reglas 1-7.
-- Pre-commit `lefthook` corre escaneo + ESLint `--max-warnings=0` + bloqueo de imports estáticos a `chagra-pro` + `strategic-content-scan`.
-- Post-build `npm run audit:bundle` verifica `dist/` contra `oss-pro/PROHIBITED_IN_PUBLIC.md`.
+- Sin URLs internas, IPs RFC1918, tokens, secretos, hostnames operativos. Detalles en `CONTRIBUTING.md` reglas 1-7.
+- Pre-commit `lefthook` corre escaneo + ESLint `--max-warnings=0` + bloqueo de imports estáticos a la extensión comercial + `strategic-content-scan`.
+- Post-build `npm run audit:bundle` verifica `dist/` contra una lista universal de patterns prohibidos.
 
-## Contenido estratégico — boundary
+## Contenido estratégico
 
-Más allá de identificadores técnicos, **no introducir contenido descriptivo de**:
+Reglas detalladas viven en archivo privado interno (`AGENTS.md` del repo de estrategia). Resumen aplicable aquí:
 
-- **Modelo de negocio** (pricing, tiers, revenue, cap table, valuación, founding team).
-- **Estrategia / roadmap futuro** que telegrafía Pro o monetización antes de release público.
-- **Identidad personal** del operador o trabajadores (nombres reales hardcoded; usar env var `VITE_PRIMARY_WORKER_NAME` o equivalente, default genérico).
-- **Infraestructura operativa propia** (nombres de hosts internos, agentes, código-gen pipelines internos).
-- **ADRs estratégicos** por nombre o resumen: ADR-009/010/014/017/018 son privados. Las **referencias por número son OK**; añadir el título o un resumen entre paréntesis es leak.
-
-ADRs OK-públicos (técnicos/legales): ADR-002, ADR-008, ADR-011, ADR-013, ADR-015, ADR-019.
-
-Lista universal de patterns en `oss-pro/PROHIBITED_IN_PUBLIC.md`. Identificadores específicos (nombres internos de agentes, infra propia) viven en `chagra-pro/PROHIBITED_INTERNAL.md` y se cargan en lefthook si `CHAGRA_PRO_PATH` está set localmente.
-
-Cuando dudes si algo es estratégico, default privado y consulta. El leak histórico de la industria (Anthropic 2026-03-31, sourcemap) cuesta menos como precaución que como remediation.
+- **No** introducir descripciones de modelo de negocio, pricing, roadmap monetización, identidad personal del operador o trabajadores, ni nombres específicos de infraestructura interna.
+- Cuando dudes si algo cae en el lado privado, **default privado y consulta** antes de commitear.
 
 ## Estilo de copy UI, sin em dashes
 
