@@ -1,7 +1,20 @@
+/**
+ * altitudeService — resolución de altitud del dispositivo para derivar
+ * piso térmico colombiano sin depender de VITE_FARM_THERMAL_ZONES.
+ *
+ * @module altitudeService
+ */
+
 import { openDB, STORES } from '../db/dbCore';
 
 const CACHE_TTL = 24 * 60 * 60 * 1000; // 24h
 
+/**
+ * Obtiene la altitud del dispositivo via GPS o API de elevación.
+ * Resuelve en orden: GPS nativo > Open-Elevation API > cache local.
+ *
+ * @returns {Promise<number|null>} altitud en metros sobre el nivel del mar, o null si no disponible
+ */
 export async function getDeviceAltitude() {
     if (import.meta.env.VITE_DEMO_MODE === 'true') {
         return 3050;

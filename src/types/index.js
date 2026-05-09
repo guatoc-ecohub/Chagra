@@ -58,5 +58,10 @@
  * @property {string} expiration
  */
 
-// Export empty object to make this a valid ES module (typedefs are JSDoc-only, no runtime exports)
+/** @typedef {import('./asset.js').Asset} Asset */
+/** @typedef {import('./log.js').Log} Log */
+/** @typedef {import('./syncEvent.js').SyncEvent} SyncEvent */
+/** @typedef {import('./asset.js').Asset} ChagraAsset */
+/** @typedef {import('./log.js').Log} ChagraLog */
+
 export {};

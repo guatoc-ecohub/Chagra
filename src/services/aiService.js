@@ -33,7 +33,13 @@ const DIAGNOSIS_PROMPT = 'detect disease, nutrient deficiency, and overall plant
 // muy nicho fuera del training de Gemma3. Se acompaña de botón "Reportar
 // problema" que graba audio + ctx para iterar/eliminar el feature.
 //
-// @typedef {{common_name_es: string, scientific_name: string, confidence: number, alternatives: Array<{common_name_es: string, scientific_name: string, confidence: number}>>} SpeciesRecognitionResult
+/**
+ * @typedef {Object} SpeciesRecognitionResult
+ * @property {string} common_name_es
+ * @property {string} scientific_name
+ * @property {number} confidence
+ * @property {Array<{common_name_es: string, scientific_name: string, confidence: number}>} alternatives
+ */
 const SPECIES_PROMPT = 'Identify the plant species in the image. Output JSON ONLY, no markdown: {"common_name_es": "<nombre comun en español, lowercase>", "scientific_name": "<binomial>", "confidence": <0-1>, "alternatives": [{"common_name_es": "...", "scientific_name": "...", "confidence": <0-1>}]}. If you cannot identify confidently (confidence < 0.5), set common_name_es to empty string and provide alternatives. Limit alternatives to 2.';
 
 /**
