@@ -35,20 +35,20 @@ npm run hooks:install   # instala lefthook para el pre-commit anti-leak
 Los hooks de `lefthook.yml` corren:
 - Escaneo de secretos (tokens GitHub/OpenAI/AWS/Google/GitLab, llaves privadas).
 - Escaneo de referencias a infraestructura interna (IPs RFC 1918, refs a repos privados).
-- Bloqueo de imports estáticos desde `chagra-pro` (usar `moduleRegistry` en su lugar — ADR-002/ADR-011).
+- Bloqueo de imports estáticos desde la extensión comercial privada (usar `moduleRegistry` en su lugar).
 - ESLint con `--max-warnings=0`.
 - Conventional commits obligatorio en el mensaje.
 
-Auditoría post-build de bundle (`npm run audit:bundle`) consulta `oss-pro/PROHIBITED_IN_PUBLIC.md` y verifica que `dist/` no contenga strings o archivos prohibidos.
+Auditoría post-build de bundle (`npm run audit:bundle`) consulta una lista universal de patterns prohibidos y verifica que `dist/` no contenga strings o archivos sensibles.
 
-## Boundary OSS/Pro
+## Boundary con extensión comercial
 
-Chagra tiene un repo hermano privado (`guatoc-ecohub/chagra-pro`) con módulos comerciales. Este repo público **nunca** importa estáticamente de ahí. La integración se hace vía `src/core/moduleRegistry.js`: los módulos Pro se registran en runtime si están presentes; la UI consulta `registry.byCapability(...)` y renderiza la variante enriquecida solo cuando existe.
+Chagra tiene una extensión comercial privada con módulos adicionales. Este repo público **nunca** importa estáticamente de esa extensión. La integración se hace vía `src/core/moduleRegistry.js`: los módulos comerciales se registran en runtime si están presentes; la UI consulta `registry.byCapability(...)` y renderiza la variante enriquecida solo cuando existe.
 
-Para desarrollar con Pro presente:
+Para desarrollar con la extensión presente, definir la variable de entorno `VITE_PRO_MODULES_PATH` apuntando a tu instalación local de los módulos comerciales:
 
 ```bash
-VITE_PRO_MODULES_PATH=../chagra-pro/modules npm run dev
+VITE_PRO_MODULES_PATH=<path-local> npm run dev
 ```
 
 Sin esa variable de entorno el build arranca puro OSS y la UI degrada elegantemente.
@@ -56,8 +56,7 @@ Sin esa variable de entorno el build arranca puro OSS y la UI degrada eleganteme
 Ver:
 - `src/core/moduleRegistry.js` — interfaz ChagraModule + registry singleton.
 - `src/core/bootstrap-oss.js` — registra módulos OSS en bootstrap.
-- `src/core/loadProModules.js` — carga dinámica de módulos Pro vía env var.
-- `oss-pro/PROHIBITED_IN_PUBLIC.md` — lista viva de patterns prohibidos en el público.
+- `src/core/loadProModules.js` — carga dinámica de módulos opcionales vía env var.
 
 ## Reporte responsable de vulnerabilidades
 
