@@ -329,6 +329,27 @@ print(json.dumps(result, ensure_ascii=False))
     echo "{\"issue_number\":$ISSUE_NUM,\"html_url\":\"$HTML_URL\",\"label\":\"$LABEL\",\"status\":\"created\"}"
   '';
 
+  # apply-file-change: edición segura de archivos evitando sed + pipes.
+  # Uso: apply-file-change <file> <oldString> <newString>
+  # Substitución literal Python (no regex). oldString debe ser único en el archivo.
+  applyFileChange = pkgs.writeShellScriptBin "apply-file-change" ''
+    #!${pkgs.bash}/bin/bash
+    set -euo pipefail
+    FILE="''${1:-}"; OLD="''${2:-}"; NEW="''${3:-}"
+    if [ -z "$FILE" ] || [ -z "$OLD" ] || [ -z "$NEW" ]; then
+      echo '{"error":"usage: apply-file-change <file> <oldString> <newString>"}' >&2; exit 1; fi
+    if [ ! -f "$FILE" ]; then echo "{\"error\":\"file not found: $FILE\"}" >&2; exit 1; fi
+    python3 -c "
+import sys
+f = open('$FILE','r'); c = f.read(); f.close()
+count = c.count('$OLD')
+if count == 0: print(f'\"error\":\"OLD string not found\"}', file=sys.stderr); sys.exit(1)
+if count > 1: print(f'\"error\":\"OLD string ambiguous ({count} matches)\"\}', file=sys.stderr); sys.exit(2)
+f = open('$FILE','w'); f.write(c.replace('$OLD','$NEW',1)); f.close()
+print(f'\"status\":\"changed\",\"file\":\"$FILE\"}')
+    "
+  '';
+
   # Genera config.toml para un agente
   mkAgentConfig = name: agent: pkgs.writeText "openfang-${name}-config.toml" ''
     # OpenFang config — Agent: ${agent.name}
@@ -706,7 +727,10 @@ in
           # `transcribe-telegram-voice` aparece "no instalado" desde shell_exec.
           # Incidente 2026-04-28: sin esto el LLM cae a curl directo con
           # bot token plano en argv → leak en journalctl.
-          export PATH="${transcribeTelegramVoice}/bin:${applyPRLabel}/bin:${voiceNluExtract}/bin:${createChagraIssue}/bin:${pkgs.curl}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gnused}/bin:${pkgs.bash}/bin:$PATH"
+          export PATH="${transcribeTelegramVoice}/bin:${applyPRLabel}/bin:${voiceNluExtract}/bin:${createChagraIssue}/bin:${applyFileChange}/bin:${pkgs.curl}/bin:${pkgs.jq}/bin:${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gnused}/bin:${pkgs.git}/bin:${pkgs.nodejs_20}/bin:${pkgs.bash}/bin:$PATH"
+
+          git config --global user.name "OpenFang Personal Hand"
+          git config --global user.email "bot@guatoc.co"
 
           exec ${openfang-pkg}/bin/openfang start --config "$HOME/config.toml"
         '';

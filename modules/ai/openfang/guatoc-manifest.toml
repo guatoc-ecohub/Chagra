@@ -38,8 +38,19 @@ tool_allowlist = [
   "speech_to_text",
   "media_describe",
   "image_analyze",
-  # GitHub Issue creation via gh CLI
+  # filesystem write del workspace writable de Chagra (sec 6)
+  "file_read",
+  "file_list",
+  "file_write",
+  "file_edit",
+  # shell_exec (para git, npm, apply-file-change, helpers)
   "shell_exec",
+  # Git tools para Chagra (sec 6)
+  "git.status",
+  "git.diff",
+  "git.commit",
+  "git.push",
+  "github.pr_create",
   # research / contexto
   "web_fetch",
   "web_search",
@@ -52,9 +63,6 @@ tool_allowlist = [
   "system_time",
   "schedule_create",
   "schedule_list",
-  # filesystem read del workspace propio del agent
-  "file_read",
-  "file_list",
 ]
 
 [model]
@@ -128,21 +136,19 @@ Si la imagen es de infraestructura: clasifica como structure/equipment/material.
 Tu espacio de trabajo es /var/lib/openfang/agent-guatoc/workspace/personal-evolution. Tienes permiso para escribir scripts (Python/Bash) y probar código para automatizar la vida de Miguel. Eres libre de aprender y evolucionar, pero estás confinado en tu sandbox.
 
 ### 6. DESPLIEGUE DE CÓDIGO EN CHAGRA (PWA pública)
-Cuando Miguel te pida un cambio en Chagra (repo público guatoc-ecohub/Chagra):
-a) Clonar o actualizar el workspace:
-   cd workspace && if [ -d Chagra/.git ]; then cd Chagra && git fetch origin && git reset --hard origin/main; else git clone --depth=5 https://x-access-token:$GITHUB_TOKEN@github.com/guatoc-ecohub/Chagra.git && cd Chagra; fi
-b) Crear rama de trabajo dedicada:
-   git checkout -b bot/<slug-descriptivo>
-c) Implementar el cambio (fs.write / shell.exec para npm).
-d) Para cambios no triviales: correr `npm ci && npm run build` en el workspace y validar que dist/index.html se genere. Reportar errores a Miguel ANTES de commit si el build falla.
-e) git add + git commit con mensaje imperativo en español. Autor: OpenFang Personal Hand <bot@guatoc.co>.
-f) git push -u origin bot/<slug> usando header Authorization del PAT ($GITHUB_TOKEN).
-g) Abrir PR a main vía API GitHub:
-   POST https://api.github.com/repos/guatoc-ecohub/Chagra/pulls
-   Header: Authorization: Bearer $GITHUB_TOKEN
-   Body JSON: { "title": "...", "head": "bot/<slug>", "base": "main", "body": "..." }
-h) Responder a Miguel con el URL del PR: "Listo. Revisa y mergea: https://github.com/guatoc-ecohub/Chagra/pull/<N>".
-i) Cuando Miguel mergea en GitHub, el webhook dispara `chagra-deploy` automáticamente. NO es necesario que tú ejecutes ningún deploy manual.
+Tu workspace writable de Chagra está en `/var/lib/openfang/agent-guatoc/workspaces/guatoc/chagra-workspace`.
+Es un bind mount rw de /home/kortux/Workspace/Chagra — ya ES el repo git. NO clonar.
+El token GitHub para push está en `/run/secrets/chagra-deploy-github-token` (formato KEY=VALUE o raw, ambos soportados).
+a) `cd /var/lib/openfang/agent-guatoc/workspaces/guatoc/chagra-workspace`
+b) `git fetch origin`
+c) `git checkout -b bot/<slug-descriptivo>`
+d) Implementar el cambio (usa `apply-file-change` para ediciones de strings simples).
+e) `git add` + `git commit` con mensaje Conventional Commits imperativo en español. Autor: OpenFang Personal Hand <bot@guatoc.co>.
+f) Configura remote con token: `git remote set-url origin "https://x-access-token:$(awk -F= 'NR==1{sub(/[^=]+=/,"");print}' /run/secrets/chagra-deploy-github-token)@github.com/guatoc-ecohub/Chagra.git"`
+g) `git push -u origin bot/<slug>`
+h) Abre PR via curl con el token leído del secret file.
+i) Responde a Miguel con el URL del PR.
+j) Para cambios no triviales: `npm ci && npm run build` antes de commit. Si falla, reporta error ANTES de commit.
 
 REGLAS DE SCOPE:
 - NUNCA tocar el repo privado guatoc-nixos-stable. Sólo Chagra.

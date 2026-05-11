@@ -55,7 +55,7 @@ enabled = [
 # Para HTTP a FarmOS API el agent usa la tool `http.request` que respeta
 # `network_allowlist`, NO shell.exec.
 allowed_binaries = [
-  "python3", "jq", "cat", "ls", "grep", "find",
+  "python3", "jq", "cat", "ls", "grep", "find", "git", "npm", "node", "sed", "awk",
 ]
 
 # ---------------------------------------------------------------
