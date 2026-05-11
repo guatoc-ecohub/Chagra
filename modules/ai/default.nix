@@ -18,6 +18,7 @@ in
     ./whisper-openai.nix
     ./piper.nix
     ./kokoro-tts.nix
+    ./llamacpp-native.nix
     ./clawbots.nix
     ./openfang.nix
     ./claude-code-runner.nix

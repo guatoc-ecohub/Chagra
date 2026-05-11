@@ -337,6 +337,7 @@
   guatoc.ai = {
     enable = true;
     ollama.enable = true;
+    llamacpp-native.enable = true;
     whisper.enable = true;       # Wyoming STT (puerto 10300 — HA)
     whisper-http = {
       enable = true;

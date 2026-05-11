@@ -55,6 +55,7 @@ rec {
     litellmProxy = 4000; # LiteLLM Anthropic-compat proxy para Claude Code CLI personal (z.ai primary, Ollama fallback)
     piper       = 10200; # Wyoming Piper TTS
     kokoro      = 8088;  # Kokoro-82M StyleTTS2 ONNX HTTP TTS
+    llamacpp    = 11435; # Llama.cpp native server (OpenAI-compat)
     
     # --- ClawBots: Multi-tenant AI Agents (dynamic allocation) ---
     clawbots = {
