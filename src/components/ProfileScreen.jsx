@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { User, Palette, Briefcase, Save, Check } from 'lucide-react';
+import { User, Palette, Briefcase, Save, Check, Mic, Eye } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import ThemeSelector from './common/ThemeSelector';
 import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
+
+const TTL_OPTIONS = [
+  { id: '1d', label: '1 día' },
+  { id: '7d', label: '7 días' },
+  { id: '30d', label: '30 días' },
+  { id: 'never', label: 'Nunca' },
+];
 
 /**
  * ProfileScreen, perfil del operador.
@@ -25,7 +32,7 @@ const ROLES = [
   { id: 'otro', label: 'Otro' },
 ];
 
-export default function ProfileScreen({ onBack }) {
+export default function ProfileScreen({ onBack, onNavigate }) {
   const [name, setName] = useState(() =>
     typeof window !== 'undefined'
       ? localStorage.getItem('chagra:operator:name') || PRIMARY_WORKER_NAME
@@ -37,6 +44,24 @@ export default function ProfileScreen({ onBack }) {
       : 'operador_campo'
   );
   const [savedFlash, setSavedFlash] = useState(false);
+  const [telemetryEnabled, setTelemetryEnabled] = useState(() =>
+    typeof window !== 'undefined'
+      ? localStorage.getItem('chagra:voice:telemetry:enabled') !== '0'
+      : true
+  );
+  const [telemetryTtl, setTelemetryTtl] = useState(() =>
+    typeof window !== 'undefined'
+      ? localStorage.getItem('chagra:voice:telemetry:ttl') || '7d'
+      : '7d'
+  );
+
+  useEffect(() => {
+    localStorage.setItem('chagra:voice:telemetry:enabled', telemetryEnabled ? '1' : '0');
+  }, [telemetryEnabled]);
+
+  useEffect(() => {
+    localStorage.setItem('chagra:voice:telemetry:ttl', telemetryTtl);
+  }, [telemetryTtl]);
 
   // Persistir cambios al storage en cada modificación + emitir custom event
   // (CodeQL flag #36/#37 contra StorageEvent ctor, migrado a CustomEvent
@@ -127,6 +152,57 @@ export default function ProfileScreen({ onBack }) {
             <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Personalización</h3>
           </div>
           <ThemeSelector />
+        </div>
+
+        {/* Telemetry Section */}
+        <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+          <div className="flex items-center gap-2 px-1">
+            <Mic size={18} className="text-morpho" />
+            <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Telemetría de Voz</h3>
+          </div>
+
+          <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-sm font-bold text-slate-200">Habilitar telemetría</span>
+              <span className="text-[10px] text-slate-500">Registrar eventos del pipeline de voz</span>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={telemetryEnabled}
+              onClick={() => setTelemetryEnabled((v) => !v)}
+              className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+                telemetryEnabled ? 'bg-emerald-600' : 'bg-slate-700'
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                  telemetryEnabled ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+            </button>
+          </label>
+
+          <label className="flex flex-col gap-2">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">Período de retención</span>
+            <select
+              value={telemetryTtl}
+              onChange={(e) => setTelemetryTtl(e.target.value)}
+              className="p-3 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-white text-base min-h-[48px] appearance-none"
+            >
+              {TTL_OPTIONS.map((o) => (
+                <option key={o.id} value={o.id}>{o.label}</option>
+              ))}
+            </select>
+          </label>
+
+          <button
+            type="button"
+            onClick={() => onNavigate && onNavigate('voice_telemetry')}
+            className="w-full p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 font-bold text-sm text-slate-200 flex items-center justify-center gap-2 min-h-[48px] transition-colors"
+          >
+            <Eye size={16} /> Ver telemetría
+          </button>
         </div>
 
         {/* App Info Footer */}
