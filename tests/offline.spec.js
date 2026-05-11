@@ -82,7 +82,7 @@ test.describe('IDB schema v9 — índice compuesto asset_id+timestamp', () => {
     await page.getByLabel(/contraseña/i).fill('e2e-pass');
     await page.getByRole('button', { name: /ingresar/i }).click();
     await expect(
-      page.getByRole('button', { name: /tareas por proximidad|campo/i })
+      page.getByText('Cola de tareas')
     ).toBeVisible({ timeout: 15_000 });
 
     const result = await page.evaluate(async () => {
@@ -208,7 +208,7 @@ test.describe('Offline-first — siembra pendiente y reconexión', () => {
 
     // Confirmamos Dashboard cargado.
     await expect(
-      page.getByRole('button', { name: /tareas por proximidad|campo/i })
+      page.getByText('Cola de tareas')
     ).toBeVisible({ timeout: 15_000 });
 
     // Precarga del servicio mientras todavia hay red.
