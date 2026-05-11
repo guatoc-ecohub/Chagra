@@ -75,6 +75,105 @@ const triggerOfflineSeeding = (page, { crop, quantity }) =>
     { crop, quantity }
   );
 
+test.describe('IDB schema v9 — índice compuesto asset_id+timestamp', () => {
+  test('logs store tiene índice compuesto asset_id_timestamp y retorna logs ordenados', async ({ page }) => {
+    await page.goto('/');
+    await page.getByLabel(/usuario/i).fill('e2e-operator');
+    await page.getByLabel(/contraseña/i).fill('e2e-pass');
+    await page.getByRole('button', { name: /ingresar/i }).click();
+    await expect(
+      page.getByRole('button', { name: /tareas por proximidad|campo/i })
+    ).toBeVisible({ timeout: 15_000 });
+
+    const result = await page.evaluate(async () => {
+      const DB_NAME = 'ChagraDB';
+      const db = await new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+
+      const LOGS_STORE = 'logs';
+      if (!db.objectStoreNames.contains(LOGS_STORE)) {
+        db.close();
+        return { error: 'logs store not found' };
+      }
+
+      const tx = db.transaction(LOGS_STORE, 'readwrite');
+      const store = tx.objectStore(LOGS_STORE);
+
+      // 1. Verificar que el índice compuesto existe
+      const hasIndex = store.indexNames.contains('asset_id_timestamp');
+      if (!hasIndex) {
+        db.close();
+        return { error: 'asset_id_timestamp index not found' };
+      }
+
+      // 2. Limpiar logs de prueba previos
+      store.clear();
+
+      // 3. Insertar logs con distintos asset_ids y timestamps
+      const logs = [
+        { id: 'a1-t1', asset_id: 'asset-1', timestamp: 100, type: 'log--observation', name: 'obs-1' },
+        { id: 'a1-t2', asset_id: 'asset-1', timestamp: 300, type: 'log--observation', name: 'obs-2' },
+        { id: 'a1-t3', asset_id: 'asset-1', timestamp: 200, type: 'log--observation', name: 'obs-3' },
+        { id: 'a2-t1', asset_id: 'asset-2', timestamp: 500, type: 'log--harvest', name: 'harvest-1' },
+        { id: 'a2-t2', asset_id: 'asset-2', timestamp: 400, type: 'log--harvest', name: 'harvest-2' },
+      ];
+      for (const log of logs) store.put(log);
+
+      await new Promise((resolve) => { tx.oncomplete = resolve; });
+      db.close();
+
+      // 4. Reabrir para query con el índice compuesto
+      const db2 = await new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+      const tx2 = db2.transaction(LOGS_STORE, 'readonly');
+      const index2 = tx2.objectStore(LOGS_STORE).index('asset_id_timestamp');
+
+      // Query asset-1 con range bound
+      const range = IDBKeyRange.bound(['asset-1', 0], ['asset-1', Infinity]);
+      const asset1Logs = await new Promise((resolve, reject) => {
+        const req = index2.getAll(range);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+
+      // Query asset-2
+      const range2 = IDBKeyRange.bound(['asset-2', 0], ['asset-2', Infinity]);
+      const asset2Logs = await new Promise((resolve, reject) => {
+        const req = index2.getAll(range2);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+
+      db2.close();
+
+      return {
+        hasIndex,
+        asset1Ids: asset1Logs.map((l) => l.id),
+        asset1Timestamps: asset1Logs.map((l) => l.timestamp),
+        asset2Ids: asset2Logs.map((l) => l.id),
+        asset2Timestamps: asset2Logs.map((l) => l.timestamp),
+      };
+    });
+
+    expect(result.error).toBeUndefined();
+    expect(result.hasIndex).toBe(true);
+
+    // asset-1: 3 logs, ascendente por timestamp (el índice devuelve [100, 200, 300])
+    expect(result.asset1Ids).toEqual(['a1-t1', 'a1-t3', 'a1-t2']);
+    expect(result.asset1Timestamps).toEqual([100, 200, 300]);
+
+    // asset-2: 2 logs, ascendente por timestamp (el índice devuelve [400, 500])
+    expect(result.asset2Ids).toEqual(['a2-t2', 'a2-t1']);
+    expect(result.asset2Timestamps).toEqual([400, 500]);
+  });
+});
+
 test.describe('Offline-first — siembra pendiente y reconexión', () => {
   test.beforeEach(async ({ context }) => {
     // Token OAuth2 sustituido por un fake — nunca tocamos FarmOS real.
