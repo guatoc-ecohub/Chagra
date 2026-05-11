@@ -1,13 +1,13 @@
 import { test, expect } from '@playwright/test';
+import { DB_NAME, DB_VERSION } from '../src/db/dbCore.js';
 
-const DB_NAME = 'ChagraDB';
 const PENDING_STORE = 'pending_transactions';
 
 const countPendingTransactions = async (page) =>
   page.evaluate(
-    ({ dbName, storeName }) =>
+    ({ dbName, dbVersion, storeName }) =>
       new Promise((resolve, reject) => {
-        const req = indexedDB.open(dbName);
+        const req = indexedDB.open(dbName, dbVersion);
         req.onsuccess = () => {
           const db = req.result;
           if (!db.objectStoreNames.contains(storeName)) {
@@ -29,7 +29,7 @@ const countPendingTransactions = async (page) =>
         };
         req.onerror = () => reject(req.error);
       }),
-    { dbName: DB_NAME, storeName: PENDING_STORE }
+    { dbName: DB_NAME, dbVersion: DB_VERSION, storeName: PENDING_STORE }
   );
 
 const preloadPayloadService = (page) =>
@@ -107,10 +107,8 @@ test.describe('Offline-first — siembra pendiente y reconexión', () => {
     await page.getByLabel(/contraseña/i).fill('e2e-pass');
     await page.getByRole('button', { name: /ingresar/i }).click();
 
-    // Confirmamos Dashboard cargado.
-    await expect(
-      page.getByRole('button', { name: /tareas por proximidad|campo/i })
-    ).toBeVisible({ timeout: 15_000 });
+    // Confirmamos Cola de tareas cargada.
+    await expect(page.getByText(/cola de tareas/i)).toBeVisible({ timeout: 15_000 });
 
     // Precarga del servicio mientras todavia hay red.
     await preloadPayloadService(page);
