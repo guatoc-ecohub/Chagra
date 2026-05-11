@@ -128,8 +128,8 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
           </div>
 
           <div className="mt-3 p-3 rounded-lg bg-amber-900/15 border border-amber-800/30">
-            <p className="text-amber-300 font-bold text-sm mb-1">🧬 IA por foto (BETA)</p>
-            <p className="text-xs text-slate-300 leading-relaxed">Dos funciones, ambas marcadas <strong className="text-amber-300">BETA</strong>:</p>
+            <p className="text-amber-300 font-bold text-sm mb-1">🧬 IA por foto (PRUEBA)</p>
+            <p className="text-xs text-slate-300 leading-relaxed">Dos funciones, ambas marcadas <strong className="text-amber-300">PRUEBA</strong>:</p>
             <ul className="text-xs text-slate-300 list-disc pl-5 space-y-1 mt-2 leading-relaxed">
               <li><strong>Diagnóstico de enfermedades</strong>: en Bitácora → entrada con foto → botón &ldquo;Analizar foto con IA&rdquo;. Detecta enfermedades, deficiencias, score de salud.</li>
               <li><strong>Identificar especie por foto</strong>: en SpeciesSelect → cámara. IA propone especie + alternativas. Confianza ≥70% auto-selecciona.</li>
@@ -150,9 +150,9 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
             <li>Define el polígono en el mapa o captura punto GPS</li>
           </ol>
           <p>Después al crear plantas, selecciona esa zona como contenedor.</p>
-          <p className="text-xs text-slate-500 italic mt-2">
-            <strong>Brave + GPS</strong>: si el mapa abre &ldquo;desubicado&rdquo;, Brave Shields puede estar bloqueando GPS preciso. Toca el escudo en la barra → desactiva &ldquo;Block fingerprinting&rdquo; para chagra.guatoc.co.
-          </p>
+            <p className="text-xs text-slate-500 italic mt-2">
+              <strong>Brave + GPS</strong>: si el mapa muestra tu ubicación incorrectamente, el navegador podría estar bloqueando el acceso preciso a tu ubicación. Para solucionarlo, toca el icono del escudo en la barra de direcciones del navegador y desactiva la opción de bloqueo de huellas digitales para chagra.guatoc.co.
+            </p>
         </Section>
 
         {/* 4. Plagas y cosechas */}
@@ -188,7 +188,7 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
           <p>Botón flotante 💬 abajo a la <strong>derecha</strong>, siempre visible. Puedes:</p>
           <ul className="list-disc pl-5 space-y-1">
             <li>Escribir texto explicando qué pasó</li>
-            <li>Grabar audio (botón 🎤 dentro del modal): &ldquo;hice click acá y pasó X&rdquo;, sin tipear con manos sucias</li>
+            <li>Grabar audio (botón 🎤 dentro del modal): &ldquo;hice click acá y pasó X&rdquo;, sin tener que escribir en la pantalla</li>
             <li>Ambos: texto + audio</li>
           </ul>
           <p>Tu feedback queda guardado localmente y se sincroniza después.</p>
@@ -202,7 +202,7 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
           <div className="space-y-3">
             <div>
               <p className="font-bold text-amber-300">📍 GPS no encuentra mi ubicación</p>
-              <p className="text-xs text-slate-400 leading-relaxed">El mapa centra automático al abrir el modal. Si tarda más de 15s o cae en error, toca &ldquo;Reintentar&rdquo;. En Brave: revisa Shields fingerprinting.</p>
+              <p className="text-xs text-slate-400 leading-relaxed">El mapa centra automático al abrir el modal. Si tarda más de 15s o cae en error, toca &ldquo;Reintentar&rdquo;. En Brave: revisa que la opción de bloqueo de huellas digitales esté desactivada.</p>
             </div>
             <div>
               <p className="font-bold text-amber-300">🎤 Voz no transcribe</p>
