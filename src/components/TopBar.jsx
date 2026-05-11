@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { CircleUser, Mic, Plus, ChevronDown, ChevronUp, Home, HelpCircle, LogOut } from 'lucide-react';
 import { version as APP_VERSION } from '../../package.json';
 import EnvironmentalCard from './EnvironmentalCard';
+import AltitudeBadge from './AltitudeBadge';
 
 /**
  * TopBar, header persistente con identidad del operador (DR-030 QW2).
@@ -102,6 +103,8 @@ export default function TopBar({ onNavigate, onLogout }) {
           <CircleUser size={20} aria-hidden="true" className="shrink-0 text-teal-400" />
           <span className="text-sm font-semibold truncate max-w-[5rem] sm:max-w-[8rem]">{operatorName}</span>
         </button>
+
+        <AltitudeBadge />
 
         {/* Spacer */}
         <div className="flex-1" />
