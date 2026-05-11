@@ -54,6 +54,7 @@ rec {
     openaiProxy = 10303; # Path-routing proxy local: /v1/embeddings → Ollama, /v1/audio → speaches, resto → z.ai
     litellmProxy = 4000; # LiteLLM Anthropic-compat proxy para Claude Code CLI personal (z.ai primary, Ollama fallback)
     piper       = 10200; # Wyoming Piper TTS
+    kokoro      = 8088;  # Kokoro-82M StyleTTS2 ONNX HTTP TTS
     
     # --- ClawBots: Multi-tenant AI Agents (dynamic allocation) ---
     clawbots = {

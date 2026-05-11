@@ -17,6 +17,7 @@ in
     ./whisper-http.nix
     ./whisper-openai.nix
     ./piper.nix
+    ./kokoro-tts.nix
     ./clawbots.nix
     ./openfang.nix
     ./claude-code-runner.nix

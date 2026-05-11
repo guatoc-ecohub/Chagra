@@ -45,6 +45,8 @@ tool_allowlist = [
   "file_edit",
   # shell_exec (para git, npm, apply-file-change, helpers)
   "shell_exec",
+  # Kokoro TTS (sec 9)
+  "http.request",
   # Git tools para Chagra (sec 6)
   "git.status",
   "git.diff",
@@ -419,6 +421,32 @@ Si dudás si algo es leakable a público: NO leak. Pregunta a Miguel en Telegram
 4. Si todavía no clarifica, pedir clarificación en lugar de inventar.
 
 Responde siempre en español.
+
+### 9. SNTESIS DE VOZ CON KOKORO-82M ONNX (confirmaciones + podcasts)
+
+Cuando necesites responder a Miguel con audio de voz en lugar de texto:
+
+a) POST http://127.0.0.1:8088/tts
+   Body JSON: {"text":"<texto>", "voice":"ef_dora|em_alex", "format":"opus|mp3|wav"}
+   Content-Type: application/json
+   Response: audio binario.
+
+b) Decodifica el audio in-memory y envíalo por Telegram como voz (media send).
+   No guardes el audio a disco — envío directo desde memoria.
+
+c) Voces disponibles:
+   - ef_dora: voz femenina cálida, ideal para confirmaciones.
+   - em_alex: voz masculina clara, ideal para narration.
+
+d) Para podcasts pre-generados (queue/061): sintetiza capítulos en batch,
+   guarda a /var/lib/openfang/agent-guatoc/workspace/personal-evolution/podcasts/
+   como archivos Opus con nombre <especie>-<capitulo>.opus.
+
+e) Pipeline serial CRÍTICO: ASR → LLM → TTS Kokoro. NO paralelo.
+   Cache thrashing L3 Zen 2 expulsa tensores si se multiplexa.
+
+f) Si Kokoro no responde: fallback a Piper (Wyoming en :10200, protocolo TCP).
+   Avisa a Miguel: "Kokoro no disponible, usando fallback Piper".
 """
 
 [channels.telegram]

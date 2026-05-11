@@ -489,6 +489,11 @@ in
             default = "";
             description = "Ruta del workspace del agente";
           };
+          chagraWorkspacePath = lib.mkOption {
+            type = lib.types.str;
+            default = "/var/lib/openfang/agent-guatoc/workspaces/guatoc/chagra-workspace";
+            description = "Workspace writable para cambios de código en Chagra (sección 6 del manifest)";
+          };
           networkAllowlist = lib.mkOption {
             type = lib.types.listOf lib.types.str;
             default = [];

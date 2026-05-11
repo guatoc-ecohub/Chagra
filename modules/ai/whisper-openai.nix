@@ -57,6 +57,12 @@ in
       default = "int8";
       description = "Cuantización (int8 para CPU, float16/bfloat16 para GPU).";
     };
+
+    vadEnabled = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Habilitar Silero VAD para cortar silencio (mejora latencia ~50%).";
+    };
   };
 
   config = lib.mkIf (aiCfg.enable && cfg.enable) {
@@ -92,6 +98,7 @@ in
         WHISPER__MODEL = cfg.model;
         WHISPER__INFERENCE_DEVICE = cfg.inferenceDevice;
         WHISPER__COMPUTE_TYPE = cfg.computeType;
+        WHISPER__VAD_PARAMETERS__USE_VAD = if cfg.vadEnabled then "true" else "false";
         UVICORN_HOST = "0.0.0.0";
         UVICORN_PORT = "8000";
       };

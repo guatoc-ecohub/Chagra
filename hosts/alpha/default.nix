@@ -392,7 +392,9 @@
   # --- CLAUDE LINK BACKEND ---
   guatoc.ai.claudeLink.enable = true;
 
-  # --- OPENFANG v0.5.9: Agent OS (Telegram → LLM con fallback) ---
+  # --- KOKORO-82M ONNX TTS — voces español Latam (ef_dora / em_alex) ---
+  # RTF 0.2, MOS 4.2, footprint ~150 MiB. Reemplaza Piper para confirmaciones + podcasts.
+  guatoc.ai.kokoro-tts.enable = true;
   guatoc.ai.openfang = {
     enable = true;
     agents = {
