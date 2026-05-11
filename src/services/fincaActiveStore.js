@@ -1,45 +1,46 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 /**
- * Store para gestionar la finca activa en la arquitectura multi-finca.
- * P1: Tono cercano y persistencia en localStorage.
+ * fincaActiveStore
+ * ================================================================
+ * Gestiona qué finca está "activa" en la sesión del usuario.
+ * Persiste en localStorage para mantener el contexto entre recargas.
+ * ================================================================
  */
-export const useFincaActiveStore = create(
+const useFincaActiveStore = create(
     persist(
         (set, get) => ({
             activeFincaSlug: 'guatoc',
-            fincas: [], // Cargado dinámicamente desde /fincas-publicas.json
+            fincas: [], // Cache local de fincas-publicas.json
+
+            setActiveFinca: (slug) => set({ activeFincaSlug: slug }),
 
             setFincas: (fincas) => set({ fincas }),
 
-            setActiveFinca: (slug) => {
-                set({ activeFincaSlug: slug });
+            // Resolver el endpoint de FarmOS para la finca activa (Fase 1)
+            getActiveEndpoint: () => {
+                const state = get();
+                const finca = state.fincas.find(f => f.slug === state.activeFincaSlug);
+                // Default a Guatoc si no hay coincidencia (seguridad v2-strict)
+                return finca?.farmos_endpoint || 'https://guatoc.farmos.net';
             },
 
             getActiveFinca: () => {
-                const { fincas, activeFincaSlug } = get();
-                const found = fincas.find(f => f.slug === activeFincaSlug);
-                if (found) return found;
-
-                return {
+                const state = get();
+                return state.fincas.find(f => f.slug === state.activeFincaSlug) || {
                     slug: 'guatoc',
                     nombre: 'Guatoc',
-                    farmos_endpoint: 'https://guatoc.farmos.net',
-                    coords: [4.5167, -73.9333]
+                    biocultural_zone: 'andino_alto_páramo'
                 };
-            },
-
-            getActiveEndpoint: () => {
-                const finca = get().getActiveFinca();
-                return finca.farmos_endpoint || import.meta.env.VITE_FARMOS_URL;
             }
         }),
         {
             name: 'chagra:active-finca',
-            partialize: (state) => ({
-                activeFincaSlug: state.activeFincaSlug
-            }),
+            storage: createJSONStorage(() => localStorage),
         }
     )
 );
+
+export { useFincaActiveStore };
+export default useFincaActiveStore;

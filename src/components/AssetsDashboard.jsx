@@ -20,10 +20,7 @@ import { getAccessToken } from '../services/authService';
 import { useFincaActiveStore } from '../services/fincaActiveStore';
 import MultiFincaModal from './MultiFincaModal';
 
-const fincaNombre = (() => {
-  const map = { guatoc: 'Guatoc', naranjalia: 'Naranjalia', roca_blanca: 'Roca Blanca', los_sitios: 'Los Sitios' };
-  return map[localStorage.getItem('chagra:active-finca') ?? ''] ?? 'Guatoc';
-})();
+// Note: fincaNombre constant removed. Now derived from useFincaActiveStore inside the component.
 
 // Thumb foto de planta para cards. Sub-componente porque usePhotoUrl no
 // puede llamarse dentro de un map() condicional (regla de hooks).
@@ -842,25 +839,11 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
           {!navigator.onLine && <WifiOff size={16} className="text-red-400" />}
           <button
             type="button"
-            onClick={() => alert('Selector de finca proximamente')}
-            className="flex items-center gap-1 text-xs font-bold uppercase text-emerald-400 bg-emerald-900/30 border border-emerald-700/40 rounded-full px-2.5 py-1 shrink-0 hover:bg-emerald-900/50 transition-colors"
-            aria-label={`Finca activa: ${fincaNombre}`}
-          >
-            <MapPin size={12} aria-hidden="true" />
-            {fincaNombre}
-          </button>
-          {lastSync && (
-            <span className="text-xs text-slate-500">
-              {new Date(lastSync).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}
-            </span>
-          )}
-          <button
-            type="button"
             onClick={() => setShowFincaModal(true)}
-            className="flex items-center gap-1 text-xs font-bold uppercase text-emerald-400 bg-emerald-900/30 border border-emerald-700/40 rounded-full px-2.5 py-1 shrink-0 hover:bg-emerald-900/50 transition-colors"
+            className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-emerald-400 bg-emerald-900/30 border border-emerald-700/40 rounded-full px-3 py-1.5 shrink-0 hover:bg-emerald-900/50 transition-all active:scale-95 group"
             aria-label={`Finca activa: ${fincaNombre}`}
           >
-            <MapPin size={12} aria-hidden="true" />
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse group-hover:scale-125 transition-transform"></div>
             {fincaNombre}
           </button>
           <button onClick={handleRefresh} disabled={isLoading} aria-label="Sincronizar activos" className="p-2 bg-slate-800 rounded-lg active:bg-slate-700 disabled:opacity-50 min-h-[40px] min-w-[40px] flex items-center justify-center">
