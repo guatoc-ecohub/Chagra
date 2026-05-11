@@ -12,6 +12,7 @@
  *   - pending_transactions (keyPath: id, autoIncrement; indexes: timestamp, type)
  *   - pending_tasks        (keyPath: id; indexes: timestamp, status)
  *   - logs                 (keyPath: id; indexes: asset_id, timestamp, type)
+ *                           (v8 ADR-027.viii: incluye log--split para modo individual/aggregate)
  *   - media_cache          (keyPath: id, autoIncrement; indexes: logId, createdAt)
  *   - pending_voice_recordings (v0.5.0: keyPath: id, autoIncrement)
  *   - inventory_events     (v7 ADR-027.i+ii: keyPath: id ULID; indexes:
