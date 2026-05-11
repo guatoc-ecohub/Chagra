@@ -57,21 +57,14 @@ export default function HelpTipCard() {
             siguiente &gt;
           </button>
           <p className="text-amber-500 text-xs italic">
-            Fuente: {getSourceLabel(currentTip.source)}
+            {(currentTip.source || '').startsWith('cemetery_reason:')
+              ? 'Origen: lo que pasó antes de morir'
+              : (currentTip.source || '').startsWith('species_lesson:')
+                ? 'Origen: lo que enseña esa especie'
+                : 'Origen: experiencias'}
           </p>
-        </div>
+</div>
       </div>
     </div>
   );
 }
-
-const getSourceLabel = (source) => {
-  if (source.startsWith('cemetery_reason:')) {
-    return 'cementerio';
-  }
-  if (source.startsWith('species_lesson:')) {
-    const slug = source.split(':')[1];
-    return `especie • ${slug}`;
-  }
-  return source.split(':')[1] || source;
-};

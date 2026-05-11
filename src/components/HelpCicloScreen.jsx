@@ -54,7 +54,7 @@ export default function HelpCicloScreen({ onBackToHome }) {
         </div>
 
         <p className="text-[10px] text-slate-600 italic mt-2 leading-relaxed">
-          Corpus consolidado DR-034 (Claude web + Gemini DR + DeepSeek V3, convergencia 3/3) + plan curación humana presencial 4h por especie advanced (aguacate → café → tomate). Datos calibrados anti-overpromise, rangos agroecológicos colombianos. NO hidroponía.
+          Datos de cada planta calibrados con productores reales de Colombia. No prometen cosechas exactas — ayudan a decidir.
         </p>
       </main>
     </div>

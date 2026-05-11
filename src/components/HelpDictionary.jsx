@@ -90,7 +90,7 @@ export default function HelpDictionary({ onBackToHome }) {
               Diccionario
             </h2>
             <p className="text-sm text-slate-300 leading-relaxed mt-1">
-              {DICTIONARY.length} términos curados con definiciones simples y ampliadas. 0 alucinaciones, cada entrada tiene fuente.
+              {DICTIONARY.length} palabras del campo explicadas bien. Todas con fuente — nada inventado.
             </p>
           </div>
         </div>
