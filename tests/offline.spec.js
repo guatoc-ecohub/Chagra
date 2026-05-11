@@ -78,12 +78,18 @@ const triggerOfflineSeeding = (page, { crop, quantity }) =>
 test.describe('IDB schema v9 — índice compuesto asset_id+timestamp', () => {
   test('logs store tiene índice compuesto asset_id_timestamp y retorna logs ordenados', async ({ page }) => {
     await page.goto('/');
-    await page.getByLabel(/usuario/i).fill('e2e-operator');
+await page.getByLabel(/usuario/i).fill('e2e-operator');
     await page.getByLabel(/contraseña/i).fill('e2e-pass');
     await page.getByRole('button', { name: /ingresar/i }).click();
     await expect(
-      page.getByText('Cola de tareas')
+      page.getByRole('heading', { name: /plantas|activos/i })
     ).toBeVisible({ timeout: 15_000 });
+    await expect(
+      page.getByRole('heading', { name: 'Cola de tareas' })
+    ).toBeVisible({ timeout: 5000 });
+    await expect(
+      page.getByRole('heading', { name: 'Cola de tareas' })
+    ).toBeVisible({ timeout: 5000 });
 
     const result = await page.evaluate(async () => {
       const DB_NAME = 'ChagraDB';
