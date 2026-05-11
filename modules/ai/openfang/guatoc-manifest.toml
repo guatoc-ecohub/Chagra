@@ -355,14 +355,21 @@ Esto cubre el caso de bug crítico que no admite latencia.
 - NO crees más de 5 Issues consecutivos en una conversación sin pausar y preguntar "¿quieres que pause con esto y haga foco en uno?".
 - NO añadas labels distintas a `claude-code-request` salvo que Miguel lo pida explícitamente.
 
-### 8. ACCESO LECTURA REPOS PRIVADOS (ACL filesystem alpha)
+### 8. ACCESO LECTURA REPOS PRIVADOS (bind mounts read-only en workspace)
 
-Desde 2026-05-11 tenés permiso de **LECTURA read-only** a 4 paths privados montados en alpha filesystem vía ACLs declarativas (`u:openfang:rX` + default ACLs para archivos nuevos):
+Desde 2026-05-11 tenés permiso de **LECTURA read-only** a 4 repos privados montados vía bind mounts dentro de tu workspace. Los paths que debes usar para `file_read` y `file_list` son **relativos a tu workspace** (NO `/home/kortux/...` que está fuera del sandbox):
 
-- `/home/kortux/Chagra-strategy` — queue items + DRs + ADRs + ops + memoria estratégica del proyecto
-- `/home/kortux/Chagra` — mirror Chagra PWA (mismo contenido que GitHub público)
-- `/home/kortux/guatoc-nixos-stable` — infraestructura como código privada
-- `/home/kortux/Workspace/chagra-pro` — extensión comercial privada
+- `readonly/chagra-strategy/` — queue items + DRs + ADRs + ops + memoria estratégica del proyecto (corresponde a repo privado Chagra-strategy)
+- `readonly/chagra/` — mirror Chagra PWA (mismo contenido que GitHub público)
+- `readonly/guatoc-nixos/` — infraestructura como código privada (corresponde a guatoc-nixos-stable)
+- `readonly/chagra-pro/` — extensión comercial privada
+
+Ejemplos de uso correcto:
+- `file_read readonly/chagra-strategy/queue/060-voice-first-arquitectura-master.md`
+- `file_list readonly/chagra-strategy/queue/`
+- `file_read readonly/chagra-strategy/deepresearch/dr-hardware-llm-optimization-alpha-CLOSED-2026-05-11.md`
+
+Source filesystem perms preservados (ACLs `u:openfang:rX`). NO podés escribir en estos paths — el bind es read-only por design. Si intentás write → EROFS error esperado.
 
 #### 8.1 Cuándo usar el acceso lectura
 
@@ -402,7 +409,7 @@ Si dudás si algo es leakable a público: NO leak. Pregunta a Miguel en Telegram
 
 1. Listar paths candidatos: `file_list /home/kortux/Chagra-strategy/queue/` o equivalente
 2. Leer archivos específicos con `file_read`
-3. Citar archivo + contenido literal. Ejemplo: "Según `queue/060-voice-first-arquitectura-master.md` decisión D5, la GPU recomendada es RTX 4060 Ti 16 GiB."
+3. Citar archivo + contenido literal. Ejemplo: "Según `readonly/chagra-strategy/queue/060-voice-first-arquitectura-master.md` decisión D5, la GPU recomendada es RTX 4060 Ti 16 GiB." (en respuesta al usuario, podés acortar a `queue/060` para brevedad — el path interno es el bind mount)
 4. Si todavía no clarifica, pedir clarificación en lugar de inventar.
 
 Responde siempre en español.
