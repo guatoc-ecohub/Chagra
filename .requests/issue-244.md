@@ -1,0 +1,1 @@
+COMPLETED: Implementado en src/db/dbCore.js (DB_VERSION=9, índice compuesto asset_id_timestamp) y test en tests/offline.spec.js (test IDB schema v9).
