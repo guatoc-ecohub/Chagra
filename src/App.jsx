@@ -38,6 +38,7 @@ const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m
 const BiodiversidadView = lazy(() => import('./components/BiodiversidadView'));
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
 const ProfileScreen = lazy(() => import('./components/ProfileScreen'));
+const VoiceTelemetryScreen = lazy(() => import('./components/VoiceTelemetryScreen'));
 const HelpManual = lazy(() => import('./components/HelpManual'));
 const OnboardingHero = lazy(() => import('./components/OnboardingHero'));
 const TopBar = lazy(() => import('./components/TopBar'));
@@ -338,7 +339,9 @@ export default function App() {
           </ScreenShell>
         );
       case 'perfil':
-        return <ProfileScreen onBack={() => navigate('dashboard')} />;
+        return <ProfileScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />;
+      case 'voice_telemetry':
+        return <VoiceTelemetryScreen onBack={() => navigate('perfil')} />;
       case 'help':
         return <HelpManual onBack={() => navigate('dashboard')} onNavigate={navigate} />;
       default:

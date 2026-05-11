@@ -13,10 +13,18 @@
  */
 
 const STORAGE_KEY_PREFIX = 'chagra:voice:telemetry';
-const TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const DEFAULT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const TTL_MAP = { '1d': 86400000, '7d': 604800000, '30d': 2592000000, 'never': Infinity };
 
 const STORAGE_KEY = `${STORAGE_KEY_PREFIX}:events`;
 const STORAGE_META = `${STORAGE_KEY_PREFIX}:meta`;
+const STORAGE_ENABLED = `${STORAGE_KEY_PREFIX}:enabled`;
+const STORAGE_TTL = `${STORAGE_KEY_PREFIX}:ttl`;
+
+const getEffectiveTtl = () => {
+  const raw = localStorage.getItem(STORAGE_TTL);
+  return raw && TTL_MAP[raw] != null ? TTL_MAP[raw] : DEFAULT_TTL_MS;
+};
 
 const logEventToStorage = (kind, payload, level) => {
   const entry = {
@@ -43,6 +51,9 @@ const logEventToStorage = (kind, payload, level) => {
 };
 
 export const logVoiceEvent = (kind, payload = {}, level = 'info') => {
+  const enabled = localStorage.getItem(STORAGE_ENABLED);
+  if (enabled === '0') return;
+
   const isDebug = localStorage.getItem('chagra:debug:telemetry') === '1';
   const detail = `[${kind}] ${typeof payload === 'string' ? payload : JSON.stringify(payload)}`;
 
@@ -55,7 +66,7 @@ export const logVoiceEvent = (kind, payload = {}, level = 'info') => {
   logEventToStorage(kind, payload, level);
 };
 
-const getSessionEvents = () => {
+export const getSessionEvents = () => {
   try {
     const raw = sessionStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
@@ -75,7 +86,9 @@ const getPersistedMeta = () => {
 
 const isExpired = (meta) => {
   if (!meta) return true;
-  return Date.now() - meta.lastEvent > TTL_MS;
+  const ttl = getEffectiveTtl();
+  if (ttl === Infinity) return false;
+  return Date.now() - meta.lastEvent > ttl;
 };
 
 export const aggregateVoiceMetrics = () => {
