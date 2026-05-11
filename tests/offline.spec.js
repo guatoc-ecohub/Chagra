@@ -76,9 +76,25 @@ const triggerOfflineSeeding = (page, { crop, quantity }) =>
   );
 
 test.describe('IDB schema v9 — índice compuesto asset_id+timestamp', () => {
+  test.beforeEach(async ({ context }) => {
+    // Token OAuth2 sustituido por un fake — nunca tocamos FarmOS real.
+    await context.route('**/oauth/token', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          access_token: 'e2e-fake-access',
+          refresh_token: 'e2e-fake-refresh',
+          expires_in: 3600,
+          token_type: 'Bearer',
+        }),
+      })
+    );
+  });
+
   test('logs store tiene índice compuesto asset_id_timestamp y retorna logs ordenados', async ({ page }) => {
     await page.goto('/');
-await page.getByLabel(/usuario/i).fill('e2e-operator');
+  await page.getByLabel(/usuario/i).fill('e2e-operator');
     await page.getByLabel(/contraseña/i).fill('e2e-pass');
     await page.getByRole('button', { name: /ingresar/i }).click();
     await expect(
