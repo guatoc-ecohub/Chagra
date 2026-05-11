@@ -605,11 +605,13 @@
   };
 
   # --- Bind mounts read-only: repos privados → workspace openfang ---
-  # El sandbox runtime openfang restringe file_read al workspacePath.
-  # Bind mounts ro evaden esa limitación legítimamente — el sandbox los ve
-  # como locales al workspace. Source filesystem perms preservados (ACLs
-  # u:openfang:rX aplicadas en /home/kortux). Anti-leak Capa 2 vía manifest
-  # sec 8 (boundary explícito + reglas sanitización).
+  # El service openfang-guatoc.service tiene ProtectHome=true → mount
+  # namespace privado oculta /home/kortux. systemd.mounts del host NO
+  # llegan al service. Fix: BindReadOnlyPaths= dentro del service unit,
+  # que entra al namespace privado ANTES de aplicar ProtectHome.
+  # ACLs u:openfang:rX en /home/kortux/* siguen vigentes como defensa
+  # en profundidad. Read-only por design (bind ro). Anti-leak Capa 2
+  # vía manifest sec 8.
   systemd.tmpfiles.rules = [
     "d /var/lib/openfang/agent-guatoc/workspace/personal-evolution/readonly 0750 openfang openfang -"
     "d /var/lib/openfang/agent-guatoc/workspace/personal-evolution/readonly/chagra-strategy 0750 openfang openfang -"
@@ -618,47 +620,11 @@
     "d /var/lib/openfang/agent-guatoc/workspace/personal-evolution/readonly/chagra-pro 0750 openfang openfang -"
   ];
 
-  systemd.mounts = [
-    {
-      description = "Bind RO: Chagra-strategy → openfang workspace readonly";
-      what = "/home/kortux/Chagra-strategy";
-      where = "/var/lib/openfang/agent-guatoc/workspace/personal-evolution/readonly/chagra-strategy";
-      type = "none";
-      options = "bind,ro,nofail";
-      requiredBy = [ "openfang-guatoc.service" ];
-      before = [ "openfang-guatoc.service" ];
-      after = [ "local-fs.target" ];
-    }
-    {
-      description = "Bind RO: Chagra → openfang workspace readonly";
-      what = "/home/kortux/Chagra";
-      where = "/var/lib/openfang/agent-guatoc/workspace/personal-evolution/readonly/chagra";
-      type = "none";
-      options = "bind,ro,nofail";
-      requiredBy = [ "openfang-guatoc.service" ];
-      before = [ "openfang-guatoc.service" ];
-      after = [ "local-fs.target" ];
-    }
-    {
-      description = "Bind RO: guatoc-nixos-stable → openfang workspace readonly";
-      what = "/home/kortux/guatoc-nixos-stable";
-      where = "/var/lib/openfang/agent-guatoc/workspace/personal-evolution/readonly/guatoc-nixos";
-      type = "none";
-      options = "bind,ro,nofail";
-      requiredBy = [ "openfang-guatoc.service" ];
-      before = [ "openfang-guatoc.service" ];
-      after = [ "local-fs.target" ];
-    }
-    {
-      description = "Bind RO: chagra-pro → openfang workspace readonly";
-      what = "/home/kortux/Workspace/chagra-pro";
-      where = "/var/lib/openfang/agent-guatoc/workspace/personal-evolution/readonly/chagra-pro";
-      type = "none";
-      options = "bind,ro,nofail";
-      requiredBy = [ "openfang-guatoc.service" ];
-      before = [ "openfang-guatoc.service" ];
-      after = [ "local-fs.target" ];
-    }
+  systemd.services.openfang-guatoc.serviceConfig.BindReadOnlyPaths = [
+    "/home/kortux/Chagra-strategy:/var/lib/openfang/agent-guatoc/workspace/personal-evolution/readonly/chagra-strategy"
+    "/home/kortux/Chagra:/var/lib/openfang/agent-guatoc/workspace/personal-evolution/readonly/chagra"
+    "/home/kortux/guatoc-nixos-stable:/var/lib/openfang/agent-guatoc/workspace/personal-evolution/readonly/guatoc-nixos"
+    "/home/kortux/Workspace/chagra-pro:/var/lib/openfang/agent-guatoc/workspace/personal-evolution/readonly/chagra-pro"
   ];
 
   # --- CLOUD ---
