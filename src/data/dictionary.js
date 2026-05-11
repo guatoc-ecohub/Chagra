@@ -481,16 +481,30 @@ export const DICTIONARY = [
     fuentes: ['Bewley et al. 2013'],
   },
 
-  {
-    slug: 'plantula',
-    termino: 'Plántula',
-    categoria: 'botanica',
-    emoji: '🌱',
-    definicion_simple: 'Planta bebé: ya nació de la semilla, ya tiene sus primeras hojitas, pero todavía es muy chiquita y delicada. Necesita cuidado especial.',
-    definicion_ampliada: 'Plántula es la fase juvenil de una planta, desde la emergencia post-germinación hasta el establecimiento de hojas verdaderas y sistema radicular funcional. Período crítico: alta vulnerabilidad a damping-off (Pythium, Rhizoctonia), exceso de riego, plagas (hormigas cortadoras, áfidos, babosas), sol directo intenso.\n\nManejo agroecológico de plántulas: almácigo bajo media-sombra con sustrato suelto bien drenado (tierra negra + cascarilla de arroz + compost en proporción 2:1:1), riego con regadera (no manguera presurizada), trasplante cuando tiene 4-6 hojas verdaderas y sistema radicular bien formado.',
-    ver_tambien: ['germinacion', 'cotiledon', 'damping-off', 'sustrato'],
-    fuentes: ['Hartmann et al. 2011', 'Restrepo Rivera 2007'],
-  },
+   {
+     slug: 'plantula',
+     termino: 'Plántula',
+     categoria: 'botanica',
+     emoji: '🌱',
+     definicion_simple: 'Planta bebé: ya nació de la semilla, ya tiene sus primeras hojitas, pero todavía es muy chiquita y delicada. Necesita cuidado especial.',
+     definicion_ampliada: 'Plántula es la fase juvenil de una planta, desde la emergencia post-germinación hasta el establecimiento de hojas verdaderas y sistema radicular funcional. Período crítico: alta vulnerabilidad a damping-off (Pythium, Rhizoctonia), exceso de riego, plagas (hormigas cortadoras, áfidos, babosas), sol directo intenso.\n\nManejo agroecológico de plántulas: almácigo bajo media-sombra con sustrato suelto bien drenado (tierra negra + cascarilla de arroz + compost en proporción 2:1:1), riego con regadera (no manguera presurizada), trasplante cuando tiene 4-6 hojas verdaderas y sistema radicular bien formado.',
+     ver_tambien: ['germinacion', 'cotiledon', 'damping-off', 'sustrato'],
+     fuentes: ['Hartmann et al. 2011', 'Restrepo Rivera 2007'],
+   },
+   {
+     slug: 'cepellon',
+     termino: 'Cepellón',
+     categoria: 'botanica',
+     emoji: '🌱',
+     definicion_simple: 'La bola de tierra que rodea las raíces de una planta al trasplantarla. Mantenerla intacta ayuda a que la planta se adapte mejor.',
+     definicion_ampliada: 'El cepellón es el conjunto de raíces y sustrato que permanece unido al trasplantar una planta desde su contenedor original al suelo definitivo. Mantener el cepellón intacto durante el trasplante minimiza el estrés en la planta porque:\n\n1. Las raíces finas responsables de absorción de agua y nutrientes no se rompen\n2. La microbiota benéfica asociada a las raíces se mantiene\n3. El sustrato familiar reduce el choque de adaptación al nuevo entorno\n\nEn agroecología, se recomienda regar bien el cepellón antes del trasplante para que el sustrato se mantenga cohesionado. Al colocar la planta en su nuevo hoyo, se debe asegurar que el cepellón quede completamente cubierto con tierra nueva pero sin comprimirlo excesivamente para permitir buen drenaje y aireación.\n\nAlgunas técnicas especiales incluyen:\n- Trasplante de raíz desnuda (sin cepellón) solo en ciertas especies dormidas\n- Uso de bolsas biodegradables que permiten el crecimiento directo del cepellón\n- Poda de raíces en cepellones muy compactados para estimular nueva absorción',
+     contexto_cultural: 'El concepto de cepellón es fundamental en la agricultura tradicional de muchas culturas, donde el trasplante se realiza con extremo cuidado para preservar la vida del suelo alrededor de las raíces. En sistemas como la chagra amazónica, el trasplante se hace considerando no solo la planta individual sino su relación con los microorganismos del suelo que la acompañan.',
+     ver_tambien: ['trasplante', 'plantula', 'sustrato', 'micorriza'],
+     fuentes: [
+       'Hartmann et al. 2011 — Plant Propagation: Principles and Practices',
+       'Restrepo Rivera 2007 — Manual práctico ABC de la agricultura orgánica',
+     ],
+   },
 
   {
     slug: 'aclareo',
