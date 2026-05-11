@@ -14,6 +14,7 @@ import Sparkline from './common/Sparkline';
 import AIStreamPanel from './common/AIStreamPanel';
 import VoiceConfirmation from './VoiceConfirmation';
 import ChagraGrowLoader from './ChagraGrowLoader';
+import { logVoiceEvent } from '../services/voiceTelemetry';
 
 // Ejemplo adaptativo en STATE_IDLE: usa la primera zona Y la primera planta
 // del usuario si las hay. Reduce fricción al mostrar contexto reconocible
@@ -153,12 +154,16 @@ export default function VoiceCapture({ onSave }) {
       setErrorMsg('');
       setTranscription('');
       setEntities([]);
+      logVoiceEvent('voice:reprocess_started', { pendingId: rec.id });
+      logVoiceEvent('voice:transcription_started');
 
       let text;
       try {
         text = await transcribe(rec.blob);
         setTranscription(text);
+        logVoiceEvent('voice:transcription_done', { textLength: text.length });
       } catch (err) {
+        logVoiceEvent('voice:transcription_failed', { error: err.message }, 'warn');
         setErrorMsg(`No se pudo transcribir la grabación pendiente: ${err.message}. Sigue en la cola.`);
         setReprocessingId(null);
         setView(STATE_ERROR);
@@ -172,8 +177,10 @@ export default function VoiceCapture({ onSave }) {
           onToken: (_chunk, full) => setLiveStream(full),
         });
         setEntities(extracted);
+        logVoiceEvent('voice:extraction_done', { entityCount: extracted.length });
         setView(STATE_REVIEW);
       } catch (err) {
+        logVoiceEvent('voice:extraction_failed', { error: err.message }, 'warn');
         setErrorMsg(`No se pudieron extraer entidades: ${err.message}. Revisa la transcripción manualmente.`);
         setEntities([]);
         setView(STATE_REVIEW);
@@ -191,6 +198,7 @@ export default function VoiceCapture({ onSave }) {
     try {
       const list = await syncManager.getPendingVoiceRecordings();
       if (list.length === 0) return;
+      logVoiceEvent('voice:discarded', { pendingId: list[0].id });
       await syncManager.deleteVoiceRecording(list[0].id);
       await refreshPendingCount();
     } catch (err) {
@@ -205,7 +213,9 @@ export default function VoiceCapture({ onSave }) {
     try {
       text = await transcribe(blob);
       setTranscription(text);
+      logVoiceEvent('voice:transcription_done', { textLength: text.length });
     } catch (err) {
+      logVoiceEvent('voice:transcription_failed', { error: err.message }, 'warn');
       try { await queueForRetry(blob, { reason: `transcribe: ${err.message}`, durationMs: durMs }); }
       catch (_) { /* noop */ }
       await refreshPendingCount();
@@ -221,8 +231,10 @@ export default function VoiceCapture({ onSave }) {
         onToken: (_chunk, full) => setLiveStream(full),
       });
       setEntities(extracted);
+      logVoiceEvent('voice:extraction_done', { entityCount: extracted.length });
       setView(STATE_REVIEW);
     } catch (err) {
+      logVoiceEvent('voice:extraction_failed', { error: err.message }, 'warn');
       setErrorMsg(`No se pudieron extraer entidades: ${err.message}. Revisa la transcripción manualmente.`);
       setEntities([]);
       setView(STATE_REVIEW);
@@ -231,6 +243,7 @@ export default function VoiceCapture({ onSave }) {
 
   const handleStart = useCallback(async () => {
     try {
+      logVoiceEvent('voice:recording_started');
       await start();
       setView(STATE_RECORDING);
     } catch (err) {
@@ -246,10 +259,9 @@ export default function VoiceCapture({ onSave }) {
       setView(STATE_ERROR);
       return;
     }
-    // Timestamp del INICIO de la grabación = ahora menos duración. Mejor
-    // proxy del momento real de la siembra que Date.now() al confirmar
-    // (que puede ser minutos después si el operador revisa la transcripción).
     setAudioRecordedAtMs(Date.now() - result.durationMs);
+    logVoiceEvent('voice:recording_stopped', { durationMs: result.durationMs });
+    logVoiceEvent('voice:transcription_started');
     await runPipeline(result.blob, result.durationMs);
   }, [stop, runPipeline]);
 
@@ -397,8 +409,7 @@ export default function VoiceCapture({ onSave }) {
     setIsSaving(false);
     if (savedCount > 0) {
       setSyncedOffline(hadOfflinePath);
-      // Reproceso exitoso: purgar la grabación de pending_voice para que no
-      // reaparezca en el banner en futuras sesiones.
+      logVoiceEvent('voice:save_done', { savedCount, syncedOffline: hadOfflinePath });
       if (reprocessingId != null) {
         try {
           await syncManager.deleteVoiceRecording(reprocessingId);
@@ -421,6 +432,7 @@ export default function VoiceCapture({ onSave }) {
       onSave?.(finalAnswer);
       setView(STATE_DONE);
     } else {
+      logVoiceEvent('voice:save_failed', { errors }, 'warn');
       setErrorMsg(`No se pudo guardar: ${errors.join('; ')}`);
       setView(STATE_ERROR);
     }
