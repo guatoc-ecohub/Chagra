@@ -246,6 +246,34 @@ jobs:
           # entre cada intento.
           gh pr edit "$PR_NUM" --remove-label "ready-to-generate" || true
 
+      - name: Notify agent via polling endpoint (non-blocking)
+        if: always()
+        env:
+          CLAUDE_LINK_URL: ${{ vars.CLAUDE_LINK_URL }}
+          PR_NUM: ${{ github.event.pull_request.number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          RUN_ID: ${{ github.run_id }}
+          ISSUE_NUM: ${{ steps.issue.outputs.num }}
+        run: |
+          if [ -z "${CLAUDE_LINK_URL:-}" ]; then
+            echo "CLAUDE_LINK_URL not set; skipping agent polling endpoint (non-blocking)"
+            exit 0
+          fi
+          if [ "${CLAUDE_NEEDS_CLARIFICATION:-false}" = "true" ]; then
+            STATUS="clarification"
+            MESSAGE="Claude pidio clarificacion. Sin cambios pusheados."
+          elif [ "${{ job.status }}" = "success" ]; then
+            STATUS="success"
+            MESSAGE="Cambios generados y pusheados al branch del PR."
+          else
+            STATUS="failed"
+            MESSAGE="Generacion fallida. Ver logs del run."
+          fi
+          curl -sS -X POST "${CLAUDE_LINK_URL}/claude-code-run/${PR_NUM}/status" \
+            -H "Content-Type: application/json" \
+            -d "{\"run_id\": \"${RUN_ID}\", \"status\": \"${STATUS}\", \"pr_url\": \"${PR_URL}\", \"message\": \"${MESSAGE}\", \"issue_num\": \"${ISSUE_NUM}\"}" \
+            || echo "Agent polling endpoint notification failed (ignored)"
+
       - name: Notify Telegram (non-blocking)
         if: always()
         env:
