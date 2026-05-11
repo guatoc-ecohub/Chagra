@@ -28,7 +28,7 @@ export default function HelpVozScreen({ onBackToHome, onNavigate }) {
       n: 3,
       icon: BrainCircuit,
       title: 'Chagra entiende y pregunta',
-      body: 'Whisper transcribe + IA extrae cantidad, especie y zona. Si algo queda dudoso te muestra una pantalla de revisión donde corriges antes de guardar.',
+      body: 'Tu voz se convierte en texto y Chagra identifica qué sembraste, dónde y cuántos. Si algo no quedó claro te muestra una pantalla para que confirmes o corrijas antes de guardar.',
     },
     {
       n: 4,
