@@ -613,18 +613,18 @@
   # en profundidad. Read-only por design (bind ro). Anti-leak Capa 2
   # vía manifest sec 8.
   systemd.tmpfiles.rules = [
-    "d /var/lib/openfang/agent-guatoc/workspace/personal-evolution/readonly 0750 openfang openfang -"
-    "d /var/lib/openfang/agent-guatoc/workspace/personal-evolution/readonly/chagra-strategy 0750 openfang openfang -"
-    "d /var/lib/openfang/agent-guatoc/workspace/personal-evolution/readonly/chagra 0750 openfang openfang -"
-    "d /var/lib/openfang/agent-guatoc/workspace/personal-evolution/readonly/guatoc-nixos 0750 openfang openfang -"
-    "d /var/lib/openfang/agent-guatoc/workspace/personal-evolution/readonly/chagra-pro 0750 openfang openfang -"
+    "d /var/lib/openfang/agent-guatoc/workspaces/guatoc/readonly 0750 openfang openfang -"
+    "d /var/lib/openfang/agent-guatoc/workspaces/guatoc/readonly/chagra-strategy 0750 openfang openfang -"
+    "d /var/lib/openfang/agent-guatoc/workspaces/guatoc/readonly/chagra 0750 openfang openfang -"
+    "d /var/lib/openfang/agent-guatoc/workspaces/guatoc/readonly/guatoc-nixos 0750 openfang openfang -"
+    "d /var/lib/openfang/agent-guatoc/workspaces/guatoc/readonly/chagra-pro 0750 openfang openfang -"
   ];
 
   systemd.services.openfang-guatoc.serviceConfig.BindReadOnlyPaths = [
-    "/home/kortux/Chagra-strategy:/var/lib/openfang/agent-guatoc/workspace/personal-evolution/readonly/chagra-strategy"
-    "/home/kortux/Chagra:/var/lib/openfang/agent-guatoc/workspace/personal-evolution/readonly/chagra"
-    "/home/kortux/guatoc-nixos-stable:/var/lib/openfang/agent-guatoc/workspace/personal-evolution/readonly/guatoc-nixos"
-    "/home/kortux/Workspace/chagra-pro:/var/lib/openfang/agent-guatoc/workspace/personal-evolution/readonly/chagra-pro"
+    "/home/kortux/Chagra-strategy:/var/lib/openfang/agent-guatoc/workspaces/guatoc/readonly/chagra-strategy"
+    "/home/kortux/Chagra:/var/lib/openfang/agent-guatoc/workspaces/guatoc/readonly/chagra"
+    "/home/kortux/guatoc-nixos-stable:/var/lib/openfang/agent-guatoc/workspaces/guatoc/readonly/guatoc-nixos"
+    "/home/kortux/Workspace/chagra-pro:/var/lib/openfang/agent-guatoc/workspaces/guatoc/readonly/chagra-pro"
   ];
 
   # --- CLOUD ---
