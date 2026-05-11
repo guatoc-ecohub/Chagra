@@ -1,8 +1,8 @@
 /**
  * Capa de persistencia IndexedDB para logs FarmOS (Fase 11 - Offline-First).
  *
- * Store: 'logs' (ChagraDB v4)
- * Índices: asset_id, timestamp, type
+ * Store: 'logs' (ChagraDB v9)
+ * Índices: asset_id, timestamp, type, asset_id_timestamp (compuesto v9)
  *
  * Esquema normalizado por log:
  *   - id            (PK, string UUID)
@@ -110,18 +110,33 @@ export const logCache = {
 
   /**
    * Obtener logs por asset_id, ordenados por timestamp descendente.
+   * Usa índice compuesto asset_id_timestamp (v9) para evitar sort en memoria.
+   * Fallback a índice asset_id + sort JS si el compuesto no existe
+   * (e.g. durante migración parcial).
    */
   async getLogsByAsset(assetId) {
     const db = await openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.LOGS, 'readonly');
-      const index = tx.objectStore(STORES.LOGS).index('asset_id');
-      const req = index.getAll(IDBKeyRange.only(assetId));
-      req.onsuccess = () => {
-        const sorted = (req.result || []).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-        resolve(sorted);
-      };
-      req.onerror = () => reject(req.error);
+      const store = tx.objectStore(STORES.LOGS);
+      if (store.indexNames.contains('asset_id_timestamp')) {
+        const index = store.index('asset_id_timestamp');
+        const range = IDBKeyRange.bound([assetId, 0], [assetId, Infinity]);
+        const req = index.getAll(range);
+        req.onsuccess = () => {
+          const results = req.result || [];
+          resolve(results.reverse());
+        };
+        req.onerror = () => reject(req.error);
+      } else {
+        const index = store.index('asset_id');
+        const req = index.getAll(IDBKeyRange.only(assetId));
+        req.onsuccess = () => {
+          const sorted = (req.result || []).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+          resolve(sorted);
+        };
+        req.onerror = () => reject(req.error);
+      }
     });
   },
 
