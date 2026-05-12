@@ -11,6 +11,7 @@ import { PRIMARY_WORKER_NAME } from './config/workerConfig';
 import { initCatalog } from './db/catalogDB';
 import NetworkStatusBar from './components/NetworkStatusBar';
 import PendingTasksWidget from './components/PendingTasksWidget';
+import SyncProgressIndicator from './components/common/SyncProgressIndicator';
 import FieldFeedback from './components/FieldFeedback';
 import MicFab from './components/MicFab';
 import { ScreenShell } from './components/common/ScreenShell';
@@ -360,6 +361,7 @@ export default function App() {
       {currentView !== 'loading' && currentView !== 'login' && <FieldFeedback />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'voz' && <MicFab onNavigate={navigate} />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
+      {currentView !== 'loading' && currentView !== 'login' && <SyncProgressIndicator />}
       {toast && (
         <div
           role={toast.isError ? 'alert' : 'status'}
