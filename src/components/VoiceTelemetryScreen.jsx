@@ -72,7 +72,10 @@ export default function VoiceTelemetryScreen({ onBack }) {
     setMetrics(aggregateVoiceMetrics());
   }, []);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    const timer = setTimeout(refresh, 0);
+    return () => clearTimeout(timer);
+  }, [refresh]);
 
   const handleExport = (format) => {
     const data = exportVoiceTelemetry(format);
@@ -292,7 +295,7 @@ export default function VoiceTelemetryScreen({ onBack }) {
   );
 }
 
-function SummaryCard({ label, value, sub, icon: Icon, color }) {
+function SummaryCard({ label, value, sub, color }) {
   return (
     <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col gap-1">
       <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{label}</span>
