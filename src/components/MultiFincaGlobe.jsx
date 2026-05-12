@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useFincaActiveStore } from '../services/fincaActiveStore';
-import { ArrowRight, Info, MapPin } from 'lucide-react';
+import { ArrowRight, Info } from 'lucide-react';
 import L from 'leaflet';
 
 // Fix for default marker icons in Leaflet + Vite

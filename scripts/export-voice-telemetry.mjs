@@ -13,7 +13,6 @@
  *   - FARMOS_URL, FARMOS_TOKEN en entorno (usar .env o variables de entorno)
  */
 
-import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
