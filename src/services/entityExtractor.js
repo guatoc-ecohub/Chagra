@@ -35,10 +35,12 @@ Reglas:
 - Si el lugar no se menciona, usa "" como location (NO omitas la entrada por eso).
 - VERBOS: el operador puede decir "sembré", "planté", "puse", "trasplante", "metí", "agregué" — todos se interpretan como registro de planta nueva. El verbo en sí no es la entidad; lo que importa es {cultivo, cantidad, lugar}.
 - MULTI-ESPECIE en una grabacion: si el operador menciona varios cultivos separados por "y", "luego", "tambien", "ademas", devuelve UN OBJETO POR CADA CULTIVO. Cada uno hereda la location si solo se menciona al final aplicable a todos.
+- Nombres de frutas y cultivos son LITERALES. Si el operador dice "banano", el crop debe ser "banano". Si dice "manzana", el crop debe ser "manzana". NO cambiar, traducir ni sustituir nunca.
+- Cultivos comunes colombianos: banano, platano, cafe, yuca, papaya, mango, limon, mandarina, naranja, aguacate, tomate, lechuga, cilantro, yerbabuena.
 - Nunca inventes datos que no estan en la transcripcion.
 - Si no puedes extraer ninguna entidad valida, devuelve [].
 
-Ejemplos:
+Ejemplos de cultivos colombianos:
 Input: "Sembre cinco tomates en el invernadero"
 Output: [{"crop":"tomate","quantity":5,"location":"invernadero"}]
 
@@ -60,7 +62,22 @@ Output: [{"crop":"guayabo","quantity":2,"location":"entrada"}]
 Input: "Puse cinco aguacates en el patio"
 Output: [{"crop":"aguacate","quantity":5,"location":"patio"}]
 
-Input: "Hoy tuve un buen dia"
+Input: "Sembre quince bananos"
+Output: [{"crop":"banano","quantity":15,"location":""}]
+
+Input: "Plante tres platanos en la zona norte"
+Output: [{"crop":"platano","quantity":3,"location":"zona norte"}]
+
+Input: "Sembre diez mangos y veinte papayas"
+Output: [{"crop":"mango","quantity":10,"location":""},{"crop":"papaya","quantity":20,"location":""}]
+
+Input: "Puse cuatro limones en el huerto"
+Output: [{"crop":"limon","quantity":4,"location":"huerto"}]
+
+Input: "Sembre dos yucas en el solar"
+Output: [{"crop":"yuca","quantity":2,"location":"solar"}]
+
+Input: "Hoy tive un buen dia"
 Output: []`;
 
 // location puede venir vacia cuando el operador no menciona el lugar;
