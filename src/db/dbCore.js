@@ -5,7 +5,7 @@
  * manuales previas en assetCache.js y syncManager.js, evitando race conditions
  * de `onupgradeneeded` duplicado y garantizando una sola versión activa.
  *
- * Esquema v11 (2026-05-12):
+ * Esquema v12 (2026-05-12):
  *   - assets               (keyPath: id; indexes: asset_type, cached_at)
  *   - taxonomy_terms       (keyPath: id; indexes: type)
  *   - sync_meta            (keyPath: key)
@@ -21,12 +21,13 @@
  *   - inventory_events     (v7 ADR-027.i+ii: keyPath: id ULID; indexes:
  *                           item_id, timestamp, event_type, idempotency_key)
  *   - inventory_stock_snapshot (v7: materialized view, keyPath: item_id)
- *   - voice_telemetry      (v10 ADR-030 Regla 8: IDB para telemetría voz,
- *                           NO localStorage; indexes: flujo, created_at)
+ *   - voice_telemetry      (v10 ADR-030 Regla 8: IDB para telemetría voz)
+ *   - conversation_memory (v12 057.3: IDB para memoria conversacional persistente)
+ *                           keyPath: id; indexes: operator_id, timestamp)
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 11;
+export const DB_VERSION = 12;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -41,6 +42,7 @@ export const STORES = {
   INVENTORY_STOCK: 'inventory_stock_snapshot',
   PLANS: 'plans',
   VOICE_TELEMETRY: 'voice_telemetry',
+  CONVERSATION_MEMORY: 'conversation_memory',
 };
 
 let dbInstance = null;
@@ -165,6 +167,16 @@ export const openDB = async () => {
         const mediaStore = event.target.transaction.objectStore(STORES.MEDIA_CACHE);
         if (!mediaStore.indexNames.contains('lastAccessedAt')) {
           mediaStore.createIndex('lastAccessedAt', 'lastAccessedAt', { unique: false });
+        }
+      }
+
+      // v12: conversation_memory para 057.3 (memoria conversacional persistente).
+      // Store para persistir contexto entre turnos de chat.
+      if (event.oldVersion < 12) {
+        if (!db.objectStoreNames.contains(STORES.CONVERSATION_MEMORY)) {
+          const store = db.createObjectStore(STORES.CONVERSATION_MEMORY, { keyPath: 'id' });
+          store.createIndex('operator_id', 'operator_id', { unique: false });
+          store.createIndex('timestamp', 'timestamp', { unique: false });
         }
       }
     };
