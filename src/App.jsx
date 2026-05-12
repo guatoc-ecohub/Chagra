@@ -37,6 +37,7 @@ const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
 const BiodiversidadView = lazy(() => import('./components/BiodiversidadView'));
+const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
 const ProfileScreen = lazy(() => import('./components/ProfileScreen'));
 const VoiceTelemetryScreen = lazy(() => import('./components/VoiceTelemetryScreen'));
@@ -345,6 +346,8 @@ export default function App() {
         return <VoiceTelemetryScreen onBack={() => navigate('perfil')} />;
       case 'help':
         return <HelpManual onBack={() => navigate('dashboard')} onNavigate={navigate} />;
+      case 'agente':
+        return <AgentScreen onBack={() => navigate('dashboard')} />;
       default:
         return <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>;
     }
