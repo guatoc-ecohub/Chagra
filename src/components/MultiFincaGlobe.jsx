@@ -41,22 +41,28 @@ export const MultiFincaGlobe = ({ onSelect }) => {
         loadFincas();
     }, [setFincas]);
 
-    const activeIcon = L.divIcon({
+    const createActiveIcon = (finca) => L.divIcon({
         className: 'bg-transparent',
-        html: `<div class="p-1 bg-emerald-600 rounded-full border-2 border-white shadow-xl scale-125 animate-pulse">
-            <div class="w-3 h-3 bg-white rounded-full"></div>
-           </div>`,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
+        html: `<div class="flex flex-col items-center">
+            <div class="px-2 py-0.5 bg-emerald-900/90 text-white text-[10px] font-bold rounded-md shadow-lg mb-1 whitespace-nowrap">${finca.nombre}</div>
+            <div class="p-1 bg-emerald-600 rounded-full border-2 border-white shadow-xl scale-125 animate-pulse">
+                <div class="w-3 h-3 bg-white rounded-full"></div>
+            </div>
+        </div>`,
+        iconSize: [24, 40],
+        iconAnchor: [12, 38]
     });
 
-    const defaultIcon = L.divIcon({
+    const createDefaultIcon = (finca) => L.divIcon({
         className: 'bg-transparent',
-        html: `<div class="p-1 bg-slate-600 rounded-full border-2 border-white shadow-md">
-            <div class="w-3 h-3 bg-white rounded-full"></div>
-           </div>`,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
+        html: `<div class="flex flex-col items-center">
+            <div class="px-2 py-0.5 bg-slate-800/90 text-white text-[10px] font-bold rounded-md shadow-lg mb-1 whitespace-nowrap">${finca.nombre}</div>
+            <div class="p-1 bg-slate-600 rounded-full border-2 border-white shadow-md">
+                <div class="w-3 h-3 bg-white rounded-full"></div>
+            </div>
+        </div>`,
+        iconSize: [24, 40],
+        iconAnchor: [12, 38]
     });
 
     if (loading) {
@@ -90,7 +96,7 @@ export const MultiFincaGlobe = ({ onSelect }) => {
                         <Marker
                             key={finca.slug}
                             position={finca.coords || [0, 0]}
-                            icon={finca.slug === activeFincaSlug ? activeIcon : defaultIcon}
+                            icon={finca.slug === activeFincaSlug ? createActiveIcon(finca) : createDefaultIcon(finca)}
                         >
                             <Popup className="custom-popup" minWidth={220}>
                                 <div className="p-1 space-y-3 font-sans text-slate-200">
@@ -101,15 +107,33 @@ export const MultiFincaGlobe = ({ onSelect }) => {
                                         </p>
                                     </div>
 
+                                    {finca.operador && (
+                                        <p className="text-xs text-slate-400">
+                                            Operador: <span className="text-white">{finca.operador}</span>
+                                        </p>
+                                    )}
+
                                     <p className="text-sm italic leading-snug text-slate-400">
                                         "{finca.descripcion_corta}"
                                     </p>
 
                                     <div className="flex flex-wrap gap-2 pt-1">
-                                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${finca.estado === 'activo' ? 'bg-emerald-900/40 text-emerald-400' : 'bg-slate-800 text-slate-400'
-                                            }`}>
+                                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                                            finca.estado === 'activo' ? 'bg-emerald-900/40 text-emerald-400' :
+                                            finca.estado === 'piloto' ? 'bg-amber-900/40 text-amber-400' :
+                                            'bg-slate-800 text-slate-400'
+                                        }`}>
                                             {finca.estado}
                                         </span>
+                                        {finca.farmos_endpoint ? (
+                                            <span className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase bg-emerald-900/40 text-emerald-400">
+                                                FarmOS configurado
+                                            </span>
+                                        ) : (
+                                            <span className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase bg-amber-900/40 text-amber-400">
+                                                Pendiente FarmOS
+                                            </span>
+                                        )}
                                     </div>
 
                                     <button

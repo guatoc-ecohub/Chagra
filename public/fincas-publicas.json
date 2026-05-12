@@ -2,12 +2,11 @@
   {
     "slug": "guatoc",
     "nombre": "Guatoc",
-    "coords": [
-      4.5167,
-      -73.9333
-    ],
+    "operador": "Miguel Guerrero",
+    "coords": [4.5167, -73.9333],
     "biocultural_zone": "andino_alto_páramo",
     "estado": "activo",
+    "altitud": 2550,
     "descripcion_corta": "Laboratorio de conservación + restauración de páramo en Choachí.",
     "farmos_endpoint": "https://guatoc.farmos.net"
   }
