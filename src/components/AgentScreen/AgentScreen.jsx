@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff } from 'lucide-react';
+import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { transcribe } from '../../services/voiceService';
 import { addTurn, getFullHistory, getContextString } from '../../services/conversationMemory';
 import { retrieve } from '../../services/ragRetriever';
 import { parseIntent, formatIntentDescription } from '../../services/agentIntentParser';
+import { speak, stop, init as initTTS } from '../../services/ttsService';
 import ChatHistory from './ChatHistory';
 import SuggestedActions from './SuggestedActions';
 import ActionConfirmModal from '../ActionConfirmModal';
@@ -28,6 +29,7 @@ export default function AgentScreen({ onBack }) {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [error, setError] = useState('');
   const [actionModal, setActionModal] = useState({ isOpen: false, intent: null, llmResponse: '' });
+  const [ttsEnabled, setTtsEnabled] = useState(true);
 
   const { durationMs, start: startRecord, stop: stopRecord, reset: resetRecord } = useVoiceRecorder();
   const chatEndRef = useRef(null);
@@ -42,12 +44,14 @@ export default function AgentScreen({ onBack }) {
   }, [operatorId]);
 
   useEffect(() => {
+    initTTS();
     loadHistory();
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
     return () => {
+      stop();
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
@@ -181,6 +185,11 @@ export default function AgentScreen({ onBack }) {
       await addTurn(operatorId, { role: 'assistant', content: response });
       setMessages((prev) => [...prev, assistantMessage]);
 
+      if (ttsEnabled && response) {
+        stop();
+        speak(response, { rate: 0.9, pitch: 1.0 });
+      }
+
       if (intent && intent.toolName === 'crear_log') {
         setActionModal({
           isOpen: true,
@@ -251,6 +260,21 @@ export default function AgentScreen({ onBack }) {
             Asistente IA
           </h1>
         </div>
+        <button
+          type="button"
+          onClick={() => {
+            if (ttsEnabled) {
+              stop();
+            }
+            setTtsEnabled(!ttsEnabled);
+          }}
+          className={`p-2 rounded-full transition-colors ${
+            ttsEnabled ? 'bg-violet-900/40 text-violet-400' : 'bg-slate-800 text-slate-500'
+          }`}
+          title={ttsEnabled ? 'Silenciar voz' : 'Activar voz'}
+        >
+          {ttsEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+        </button>
         <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] ${
           isOnline ? 'bg-emerald-900/40 text-emerald-400' : 'bg-red-900/40 text-red-400'
         }`}>
