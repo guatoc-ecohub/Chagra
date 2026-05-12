@@ -14,6 +14,7 @@ import PendingTasksWidget from './components/PendingTasksWidget';
 import SyncProgressIndicator from './components/common/SyncProgressIndicator';
 import FieldFeedback from './components/FieldFeedback';
 import MicFab from './components/MicFab';
+import AgentFab from './components/AgentFab';
 import { ScreenShell } from './components/common/ScreenShell';
 import ChagraGrowLoader from './components/ChagraGrowLoader';
 import IosInstallBanner from './components/IosInstallBanner';
@@ -363,6 +364,7 @@ export default function App() {
       {/* FAB feedback inline para field testing, siempre visible salvo loading */}
       {currentView !== 'loading' && currentView !== 'login' && <FieldFeedback />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'voz' && <MicFab onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'voz' && currentView !== 'agente' && <AgentFab onNavigate={navigate} />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
       {currentView !== 'loading' && currentView !== 'login' && <SyncProgressIndicator />}
       {toast && (
