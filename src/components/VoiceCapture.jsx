@@ -15,6 +15,7 @@ import AIStreamPanel from './common/AIStreamPanel';
 import VoiceConfirmation from './VoiceConfirmation';
 import ChagraGrowLoader from './ChagraGrowLoader';
 import { logVoiceEvent } from '../services/voiceTelemetry';
+import { recordEvent } from '../services/voiceTelemetryService';
 
 // Ejemplo adaptativo en STATE_IDLE: usa la primera zona Y la primera planta
 // del usuario si las hay. Reduce fricción al mostrar contexto reconocible
@@ -178,9 +179,21 @@ export default function VoiceCapture({ onSave }) {
         });
         setEntities(extracted);
         logVoiceEvent('voice:extraction_done', { entityCount: extracted.length });
+        recordEvent({
+          event_type: 'voice_extraction_success',
+          flujo: 'voice_capture',
+          accepted: true,
+          connectivity: navigator.onLine ? 'online' : 'offline',
+        }).catch(() => {});
         setView(STATE_REVIEW);
       } catch (err) {
         logVoiceEvent('voice:extraction_failed', { error: err.message }, 'warn');
+        recordEvent({
+          event_type: 'voice_extraction_fail',
+          flujo: 'voice_capture',
+          accepted: false,
+          connectivity: navigator.onLine ? 'online' : 'offline',
+        }).catch(() => {});
         setErrorMsg(`No se pudieron extraer entidades: ${err.message}. Revisa la transcripción manualmente.`);
         setEntities([]);
         setView(STATE_REVIEW);

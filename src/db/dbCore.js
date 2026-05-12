@@ -5,7 +5,7 @@
  * manuales previas en assetCache.js y syncManager.js, evitando race conditions
  * de `onupgradeneeded` duplicado y garantizando una sola versión activa.
  *
- * Esquema v9 (2026-05-11):
+ * Esquema v10 (2026-05-12):
  *   - assets               (keyPath: id; indexes: asset_type, cached_at)
  *   - taxonomy_terms       (keyPath: id; indexes: type)
  *   - sync_meta            (keyPath: key)
@@ -20,10 +20,12 @@
  *   - inventory_events     (v7 ADR-027.i+ii: keyPath: id ULID; indexes:
  *                           item_id, timestamp, event_type, idempotency_key)
  *   - inventory_stock_snapshot (v7: materialized view, keyPath: item_id)
+ *   - voice_telemetry      (v10 ADR-030 Regla 8: IDB para telemetría voz,
+ *                           NO localStorage; indexes: flujo, created_at)
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 9;
+export const DB_VERSION = 10;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -37,6 +39,7 @@ export const STORES = {
   INVENTORY_EVENTS: 'inventory_events',
   INVENTORY_STOCK: 'inventory_stock_snapshot',
   PLANS: 'plans',
+  VOICE_TELEMETRY: 'voice_telemetry',
 };
 
 let dbInstance = null;
@@ -141,6 +144,17 @@ export const openDB = async () => {
         const logsStore = event.target.transaction.objectStore(STORES.LOGS);
         if (!logsStore.indexNames.contains('asset_id_timestamp')) {
           logsStore.createIndex('asset_id_timestamp', ['asset_id', 'timestamp'], { unique: false });
+        }
+      }
+
+      // v10: voice_telemetry — ADR-030 Regla 8 (NO localStorage).
+      // Instrumentación para analizar uso de voz vs touch por flujo.
+      if (event.oldVersion < 10) {
+        if (!db.objectStoreNames.contains(STORES.VOICE_TELEMETRY)) {
+          const store = db.createObjectStore(STORES.VOICE_TELEMETRY, { keyPath: 'id' });
+          store.createIndex('flujo', 'flujo', { unique: false });
+          store.createIndex('created_at', 'created_at', { unique: false });
+          store.createIndex('synced', 'synced', { unique: false });
         }
       }
     };

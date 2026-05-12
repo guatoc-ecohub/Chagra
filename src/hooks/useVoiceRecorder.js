@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { recordEvent } from '../services/voiceTelemetryService.js';
 
 const HARD_LIMIT_MS = 30000;
 const AMPLITUDE_HISTORY = 60;
@@ -135,14 +136,31 @@ export default function useVoiceRecorder() {
           stopResolveRef.current({ blob, durationMs: dur, mimeType: finalMime });
           stopResolveRef.current = null;
         }
+        recordEvent({
+          event_type: 'voice_capture_complete',
+          flujo: 'voice_recorder',
+          duration_ms: dur,
+          connectivity: navigator.onLine ? 'online' : 'offline',
+        }).catch(() => {});
       };
       rec.onerror = (e) => {
         setError(e.error?.message || 'Error de MediaRecorder');
+        recordEvent({
+          event_type: 'voice_capture_abort',
+          flujo: 'voice_recorder',
+          connectivity: navigator.onLine ? 'online' : 'offline',
+        }).catch(() => {});
       };
 
       rec.start();
       setIsRecording(true);
       startTsRef.current = Date.now();
+
+      recordEvent({
+        event_type: 'voice_capture_start',
+        flujo: 'voice_recorder',
+        connectivity: navigator.onLine ? 'online' : 'offline',
+      }).catch(() => {});
       rafRef.current = requestAnimationFrame(sampleAmplitude);
       durationTimerRef.current = setInterval(() => {
         setDurationMs(Date.now() - startTsRef.current);

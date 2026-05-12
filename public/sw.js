@@ -112,7 +112,97 @@ self.addEventListener('sync', (event) => {
       })
     );
   }
+
+  // ADR-030 Regla 8: Background Sync para voice telemetry
+  // Lee IDB pending → POST a FarmOS como log--observation con category: voice_metrics
+  if (event.tag === 'voice-telemetry-flush') {
+    event.waitUntil(handleVoiceTelemetrySync());
+  }
 });
+
+async function handleVoiceTelemetrySync() {
+  const MAX_RETRIES = 5;
+  const BASE_DELAY_MS = 1000;
+  const MAX_DELAY_MS = 30000;
+
+  const clients = await self.clients.matchAll({ type: 'window' });
+  if (clients.length === 0) return;
+
+  const client = clients[0];
+
+  try {
+    client.postMessage({ type: 'VOICE_TELEMETRY_SYNC_START' });
+
+    const events = await getPendingTelemetryEvents();
+    if (!events || events.length === 0) {
+      client.postMessage({ type: 'VOICE_TELEMETRY_SYNC_DONE', synced: 0 });
+      return;
+    }
+
+    const payload = {
+      data: {
+        type: 'log--observation',
+        attributes: {
+          name: `Voice Telemetry Batch ${new Date().toISOString()}`,
+          timestamp: new Date().toISOString().split('.')[0] + '+00:00',
+          status: 'done',
+          notes: `Voice telemetry batch: ${events.length} events`,
+        },
+        relationships: {
+          category: { data: { type: 'taxonomy_term', id: 'voice_metrics' } },
+        },
+        metadata: {
+          voice_telemetry: {
+            events: events.map(e => ({
+              event_type: e.event_type,
+              flujo: e.flujo,
+              duration_ms: e.duration_ms,
+              accepted: e.accepted,
+              edits: e.edits,
+              connectivity: e.connectivity,
+              created_at: e.created_at,
+            })),
+          },
+        },
+      },
+    };
+
+    const response = await fetch('/api/logs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/vnd.api+json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      const eventIds = events.map(e => e.id);
+      client.postMessage({ type: 'VOICE_TELEMETRY_SYNC_DONE', synced: eventIds.length, eventIds });
+    } else {
+      throw new Error(`HTTP ${response.status}`);
+    }
+  } catch (error) {
+    client.postMessage({ type: 'VOICE_TELEMETRY_SYNC_ERROR', error: error.message });
+    throw error;
+  }
+}
+
+async function getPendingTelemetryEvents() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('ChagraDB', 10);
+
+    request.onsuccess = async (event) => {
+      const db = event.target.result;
+      const tx = db.transaction('voice_telemetry', 'readonly');
+      const store = tx.objectStore('voice_telemetry');
+      const index = store.index('synced');
+      const getAllRequest = index.getAll(IDBKeyRange.only(false), 50);
+
+      getAllRequest.onsuccess = () => resolve(getAllRequest.result);
+      getAllRequest.onerror = () => reject(getAllRequest.error);
+    };
+
+    request.onerror = () => reject(request.error);
+  });
+}
 
 // Escuchar mensajes del cliente (solo same-origin).
 self.addEventListener('message', (event) => {
@@ -124,6 +214,13 @@ self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'REGISTER_SYNC') {
     if (self.registration.sync) {
       self.registration.sync.register('sync-pending-transactions');
+    }
+  }
+
+  // ADR-030 Regla 8: registrar Background Sync para voice-telemetry-flush
+  if (event.data && event.data.type === 'REGISTER_VOICE_TELEMETRY_SYNC') {
+    if (self.registration.sync) {
+      self.registration.sync.register('voice-telemetry-flush');
     }
   }
 });
