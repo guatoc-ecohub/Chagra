@@ -22,6 +22,8 @@ import { SPECIES_DEFAULTS } from '../config/speciesDefaults';
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { FARM_CONFIG } from '../config/defaults';
 
+const DEFAULT_MAX_ASSETS = parseInt(import.meta.env.VITE_LLM_CONTEXT_MAX_ASSETS || '50', 10);
+
 // Flatten de todas las especies con su grupo para resolución rápida.
 const ALL_SPECIES = Object.entries(CROP_TAXONOMY).flatMap(([groupId, group]) =>
   group.species.map((sp) => ({ ...sp, groupId }))
@@ -236,5 +238,104 @@ export const buildGuildPrompt = (speciesName, estrato) => {
     : `(piso térmico: ${zonas})`;
   return `Basado en principios de agroecología de Jairo Restrepo y permacultura (diseño de gremios), sugiere 3 plantas acompañantes para ${speciesName} en estrato ${estrato} en ${municipio} ${ctxAltitud}. Considera el rango colombiano completo desde el páramo (>3000m) hasta el nivel del mar al evaluar compañeros viables. CRITERIOS FUNCIONALES OBLIGATORIOS: (1) compatibilidad de ciclo (no mezclar hortalizas anuales con perennes de gran porte), (2) compatibilidad de sombra (no sugerir companions que proyecten sombra densa sobre cultivos sun-loving), (3) compatibilidad de estrato. Responde SOLO en formato JSON array: [{"name":"Nombre común (Nombre científico)","reason":"Razón agroecológica breve incluyendo criterios de ciclo + sombra + estrato"}]. No añadas texto fuera del JSON.`;
 };
+
+/**
+ * Selecciona los N assets más relevantes para un query dado.
+ * Implementa scoring por relevancia para evitar context overflow en LLMs
+ * cuando hay muchos assets (ej. 10K plantas).
+ *
+ * Scoring:
+ *   - +10 si nombre contiene palabras del query (case-insensitive)
+ *   - +5 si especie matchea
+ *   - +3 si zona matchea
+ *   - +2 si registrado en últimos 30 días (recencia)
+ *   - +1 si tiene logs recientes
+ *
+ * @param {string} query - Query del usuario
+ * @param {Array} allAssets - Lista de assets del store
+ * @param {number} maxN - Máximo número de assets a retornar (default 50)
+ * @returns {Array} - Top maxN assets ordenados por score
+ */
+export function selectRelevantAssets(query, allAssets, maxN = DEFAULT_MAX_ASSETS) {
+  if (!allAssets || allAssets.length === 0) return [];
+  if (allAssets.length <= maxN) return allAssets; // Fast path: no need to filter
+
+  const queryLower = query.toLowerCase().trim();
+  const queryWords = queryLower.split(/\s+/).filter(Boolean);
+  const now = Date.now();
+  const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+
+  const scored = allAssets.map((asset) => {
+    let score = 0;
+    const name = (asset.attributes?.name || asset.attributes?.species?.name || '').toLowerCase();
+    const species = (asset.attributes?.species_slug || '').toLowerCase();
+    const zone = (asset.relationships?.location?.data?.id || '').toLowerCase();
+    const created = asset.attributes?.created || asset.created || 0;
+    const hasLogs = asset.logs?.length > 0 || asset.relationships?.logs?.data?.length > 0;
+
+    // +10: nombre contiene palabras del query
+    for (const word of queryWords) {
+      if (name.includes(word)) {
+        score += 10;
+        break;
+      }
+    }
+
+    // +5: especie matchea
+    for (const word of queryWords) {
+      if (species.includes(word)) {
+        score += 5;
+        break;
+      }
+    }
+
+    // +3: zona matchea
+    for (const word of queryWords) {
+      if (zone.includes(word)) {
+        score += 3;
+        break;
+      }
+    }
+
+    // +2: registrado en últimos 30 días (recencia)
+    if (now - created < THIRTY_DAYS_MS) {
+      score += 2;
+    }
+
+    // +1: tiene logs recientes
+    if (hasLogs) {
+      score += 1;
+    }
+
+    return { asset, score };
+  });
+
+  return scored
+    .sort((a, b) => b.score - a.score)
+    .slice(0, maxN)
+    .map((s) => s.asset);
+}
+
+/**
+ * Construye contexto resumido de assets para LLM.
+ * Limita a top-N relevantes para evitar context overflow.
+ *
+ * @param {string} query - Query original
+ * @param {Array} allAssets - Todos los assets
+ * @param {number} maxN - Máximo assets (default 50)
+ * @returns {string} - Contexto formateado para LLM
+ */
+export function buildAssetContext(query, allAssets, maxN = DEFAULT_MAX_ASSETS) {
+  const relevant = selectRelevantAssets(query, allAssets, maxN);
+
+  return relevant
+    .map((a) => {
+      const name = a.attributes?.name || 'Sin nombre';
+      const species = a.attributes?.species?.name || a.attributes?.species_slug || 'desconocida';
+      const zone = a.relationships?.location?.data?.id || 'sin zona';
+      return `- ${name} (${species}) [zona: ${zone}]`;
+    })
+    .join('\n');
+}
 
 export default getSuggestedCompanions;
