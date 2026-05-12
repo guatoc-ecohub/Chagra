@@ -32,6 +32,7 @@ const useAssetStore = create((set, get) => ({
   lastSync: null,
   isLoading: false,
   error: null,
+  syncProgress: null, // { current, total, assetType, isComplete, isCancelled, error }
 
   // Estado de navegación: activo seleccionado para vista de detalle (Fase 12.1)
   selectedAssetId: null,
@@ -58,8 +59,10 @@ const useAssetStore = create((set, get) => ({
 
   // Sincronizar desde FarmOS API → IndexedDB → Zustand.
   // Si se pasa assetType, solo refresca ese tipo (pull dirigido tras syncCompleted).
-  syncFromServer: async (fetchFn, assetType = null) => {
-    set({ isLoading: true, error: null });
+  // Soporta paginación incremental con callbacks de progreso.
+  syncFromServer: async (fetchFn, assetType = null, options = {}) => {
+    const { onProgress, signal, pageLimit = 500 } = options;
+    set({ isLoading: true, error: null, syncProgress: null });
     const targets = assetType
       ? [assetType]
       : ['plant', 'structure', 'equipment', 'material', 'land'];
@@ -70,32 +73,80 @@ const useAssetStore = create((set, get) => ({
       material: 'materials',
       land: 'lands',
     };
+
+    const syncProgress = {
+      current: 0,
+      total: 0,
+      assetType: '',
+      isComplete: false,
+      isCancelled: false,
+    };
+
     try {
-      // FarmOS JSON:API default page size = 50 + orden indeterminado.
-      // Sin sort, plantas nuevas pueden caer en página 2+ y nunca llegar al
-      // store → operador graba pero no las ve (bug 2026-05-08). Cubrimos
-      // 95% de fincas con 200 más recientes ordenadas por created desc.
-      // TODO: paginación completa con `links.next` cuando alguna finca
-      // supere 200 assets activos por tipo.
-      const ASSET_PAGE_LIMIT = 200;
+      for (const t of targets) {
+        if (signal?.aborted) {
+          syncProgress.isCancelled = true;
+          break;
+        }
+
+        let page = 0;
+        let hasMore = true;
+        let totalFetched = 0;
+        let estimatedTotal = null;
+
+        while (hasMore && !signal?.aborted) {
+          const offset = page * pageLimit;
+          const url = `/api/asset/${t}?sort=-created&page[limit]=${pageLimit}&page[offset]=${offset}`;
+
+          const res = await fetchFn(url, { signal });
+          const list = res.data || [];
+
+          await assetCache.bulkPut(t, list);
+          totalFetched += list.length;
+
+          estimatedTotal = res.meta?.count || estimatedTotal;
+          if (!estimatedTotal) {
+            estimatedTotal = totalFetched + (list.length >= pageLimit ? pageLimit : 0);
+          }
+
+          syncProgress.current = totalFetched;
+          syncProgress.total = estimatedTotal;
+          syncProgress.assetType = t;
+
+          set({ syncProgress: { ...syncProgress } });
+          onProgress?.({ ...syncProgress });
+
+          hasMore = list.length === pageLimit;
+          page++;
+        }
+
+        if (signal?.aborted) {
+          syncProgress.isCancelled = true;
+          break;
+        }
+      }
+
       const results = await Promise.all(targets.map(async (t) => {
-        const res = await fetchFn(`/api/asset/${t}?sort=-created&page[limit]=${ASSET_PAGE_LIMIT}`);
-        const list = res.data || [];
-        await assetCache.bulkPut(t, list);
-        return { key: typeToKey[t], data: await assetCache.getByType(t) };
+        const data = await assetCache.getByType(t);
+        return { key: typeToKey[t], data };
       }));
+
       const partialUpdate = {};
       for (const r of results) partialUpdate[r.key] = r.data;
+
       await assetCache.setLastSync(Date.now());
+      syncProgress.isComplete = true;
       set({
         ...partialUpdate,
         lastSync: Date.now(),
         isLoading: false,
+        syncProgress: { ...syncProgress },
       });
+      onProgress?.({ ...syncProgress, isComplete: true });
     } catch (err) {
       console.error('Error sincronizando activos:', err);
-      set({ error: err.message, isLoading: false });
-      // Fallback: mantener datos de IndexedDB ya cargados via hydrate()
+      syncProgress.error = err.message;
+      set({ error: err.message, isLoading: false, syncProgress: { ...syncProgress } });
     }
   },
 
