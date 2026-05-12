@@ -4,8 +4,10 @@ import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { transcribe } from '../../services/voiceService';
 import { addTurn, getFullHistory, getContextString } from '../../services/conversationMemory';
 import { retrieve } from '../../services/ragRetriever';
+import { parseIntent, formatIntentDescription } from '../../services/agentIntentParser';
 import ChatHistory from './ChatHistory';
 import SuggestedActions from './SuggestedActions';
+import ActionConfirmModal from '../ActionConfirmModal';
 import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
 
@@ -25,6 +27,7 @@ export default function AgentScreen({ onBack }) {
   const [streamingContent, setStreamingContent] = useState('');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [error, setError] = useState('');
+  const [actionModal, setActionModal] = useState({ isOpen: false, intent: null, llmResponse: '' });
 
   const { durationMs, start: startRecord, stop: stopRecord, reset: resetRecord } = useVoiceRecorder();
   const chatEndRef = useRef(null);
@@ -54,6 +57,45 @@ export default function AgentScreen({ onBack }) {
     const plantNames = plants?.map((p) => p.attributes?.name).filter(Boolean).join(', ') || 'ninguna';
     return `Eres un asistente agroecológico en Colombia. El usuario tiene estas plantas: ${plantNames}. Responde en español, sé helpful y específico. Si no sabes algo, dilo honestamente.`;
   }, [plants]);
+
+  const handleActionApprove = async (params) => {
+    const { intent } = actionModal;
+    const addLog = useAssetStore.getState().addLog;
+
+    if (intent && intent.toolName === 'crear_log' && addLog) {
+      const assetId = params.asset_id || plants?.[0]?.id;
+      if (assetId) {
+        await addLog(assetId, {
+          type: intent.logType,
+          attributes: {
+            notes: params.notes || formatIntentDescription(intent),
+            timestamp: new Date().toISOString(),
+            ...(params.quantity && params.unit && { quantity: { value: params.quantity, unit: params.unit } }),
+          },
+          relationships: {
+            asset: { data: { type: 'asset', id: assetId } },
+          },
+        });
+
+        const successMsg = {
+          role: 'assistant',
+          content: `Listo. He registrado la ${intent.logType.replace('log--', '')} en tu bitácora.`,
+          timestamp: Date.now(),
+        };
+        setMessages((prev) => [...prev, successMsg]);
+      }
+    }
+
+    setActionModal({ isOpen: false, intent: null, llmResponse: '' });
+  };
+
+  const handleActionReject = () => {
+    setActionModal({ isOpen: false, intent: null, llmResponse: '' });
+  };
+
+  const handleActionEdit = async (params) => {
+    await handleActionApprove(params);
+  };
 
   const callLLM = async (query, contextMemory, contextCorpus) => {
     const systemPrompt = getSystemPrompt();
@@ -128,6 +170,8 @@ export default function AgentScreen({ onBack }) {
 
       const response = await callLLM(text, contextMemory, contextCorpus);
 
+      const { intent } = parseIntent(text);
+
       const assistantMessage = {
         role: 'assistant',
         content: response,
@@ -136,6 +180,16 @@ export default function AgentScreen({ onBack }) {
 
       await addTurn(operatorId, { role: 'assistant', content: response });
       setMessages((prev) => [...prev, assistantMessage]);
+
+      if (intent && intent.toolName === 'crear_log') {
+        setActionModal({
+          isOpen: true,
+          intent,
+          llmResponse: response,
+        });
+        setState(STATE_IDLE);
+        return;
+      }
     } catch (e) {
       console.error('[Agent] Error:', e);
       setError('No pude conectarme al asistente. Intenta de nuevo.');
@@ -275,6 +329,19 @@ export default function AgentScreen({ onBack }) {
       </div>
 
       <div ref={chatEndRef} />
+
+      {/* Action Confirmation Modal */}
+      <ActionConfirmModal
+        isOpen={actionModal.isOpen}
+        toolName={actionModal.intent?.toolName || ''}
+        description={actionModal.intent ? formatIntentDescription(actionModal.intent) : ''}
+        parameters={actionModal.intent?.parameters || {}}
+        intent={actionModal.intent}
+        llm_response={actionModal.llmResponse}
+        onApprove={handleActionApprove}
+        onReject={handleActionReject}
+        onEdit={handleActionEdit}
+      />
     </div>
   );
 }
