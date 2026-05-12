@@ -9,38 +9,5 @@
     "altitud": 3200,
     "descripcion_corta": "Laboratorio de conservación + restauración de páramo en Choachí.",
     "farmos_endpoint": "https://guatoc.farmos.net"
-  },
-  {
-    "slug": "los-sitios",
-    "nombre": "Los Sitios",
-    "operador": "David",
-    "coords": [4.95, -73.92],
-    "biocultural_zone": "andino_medio",
-    "estado": "piloto",
-    "altitud": 2580,
-    "descripcion_corta": "Finca de transición agroecológica en zona de Sopó.",
-    "farmos_endpoint": null
-  },
-  {
-    "slug": "naranjalia",
-    "nombre": "Naranjalia",
-    "operador": "Steve",
-    "coords": [3.42, -76.53],
-    "biocultural_zone": "valle_caucano",
-    "estado": "piloto",
-    "altitud": 1050,
-    "descripcion_corta": "Parcela agroforestal en el Valle del Cauca.",
-    "farmos_endpoint": null
-  },
-  {
-    "slug": "roca-blanca",
-    "nombre": "Roca Blanca",
-    "operador": "Steve",
-    "coords": [3.85, -76.25],
-    "biocultural_zone": "andino_medio",
-    "estado": "pendiente",
-    "altitud": 1800,
-    "descripcion_corta": "Nueva zona de restauración en ladera.",
-    "farmos_endpoint": null
   }
 ]
