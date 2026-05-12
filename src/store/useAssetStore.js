@@ -126,8 +126,8 @@ const useAssetStore = create((set, get) => ({
       set((state) => {
         const key = assetType === 'plant' ? 'plants'
           : assetType === 'structure' ? 'structures'
-          : assetType === 'equipment' ? 'equipment'
-          : 'materials';
+            : assetType === 'equipment' ? 'equipment'
+              : 'materials';
         return { [key]: [...state[key], asset] };
       });
       navigator.serviceWorker?.controller?.postMessage({ type: 'SYNC_REQUESTED' });
@@ -151,8 +151,8 @@ const useAssetStore = create((set, get) => ({
       set((state) => {
         const key = assetType === 'plant' ? 'plants'
           : assetType === 'structure' ? 'structures'
-          : assetType === 'equipment' ? 'equipment'
-          : 'materials';
+            : assetType === 'equipment' ? 'equipment'
+              : 'materials';
         return { [key]: [...state[key], ...assets] };
       });
       navigator.serviceWorker?.controller?.postMessage({ type: 'SYNC_REQUESTED' });
@@ -169,8 +169,8 @@ const useAssetStore = create((set, get) => ({
       set((state) => {
         const key = assetType === 'plant' ? 'plants'
           : assetType === 'structure' ? 'structures'
-          : assetType === 'equipment' ? 'equipment'
-          : 'materials';
+            : assetType === 'equipment' ? 'equipment'
+              : 'materials';
         return { [key]: state[key].map((a) => a.id === asset.id ? asset : a) };
       });
       navigator.serviceWorker?.controller?.postMessage({ type: 'SYNC_REQUESTED' });
@@ -211,8 +211,8 @@ const useAssetStore = create((set, get) => ({
       set((state) => {
         const key = assetType === 'plant' ? 'plants'
           : assetType === 'structure' ? 'structures'
-          : assetType === 'equipment' ? 'equipment'
-          : 'materials';
+            : assetType === 'equipment' ? 'equipment'
+              : 'materials';
         return { [key]: state[key].filter((a) => a.id !== assetId) };
       });
       navigator.serviceWorker?.controller?.postMessage({ type: 'SYNC_REQUESTED' });
@@ -864,6 +864,32 @@ if (typeof window !== 'undefined') {
       console.error('[Sync-Listener] Error en post-procesamiento:', err);
     }
   });
+}
+
+// ADR-030 Regla 4: Stress test de virtualización (056.1).
+// Expuesto globalmente solo en modo DEV para inyectar datos masivos desde consola.
+if (import.meta.env.DEV) {
+  window._mockGenerateAssets = async (count = 1000) => {
+    console.info(`[Dev] Generando ${count} activos de prueba...`);
+    const newPlants = Array.from({ length: count }, (_, i) => ({
+      id: crypto.randomUUID(),
+      type: 'asset--plant',
+      attributes: {
+        name: `Planta Mock #${i + 1}`,
+        status: 'active',
+        notes: { value: `Activo generado para pruebas de performance ${i % 5 === 0 ? 'con comentario largo para probar variabilidad de altura en el listado virtualizado.' : '.'}` }
+      },
+      relationships: {
+        location: { data: [{ type: 'asset--land', id: 'farmos-alpha-location-01' }] },
+        parent: { data: [{ type: 'asset--land', id: 'farmos-alpha-location-01' }] }
+      }
+    }));
+
+    useAssetStore.setState((state) => ({
+      plants: [...state.plants, ...newPlants]
+    }));
+    console.info(`[Dev] ✓ ${count} plantas inyectadas en el store.`);
+  };
 }
 
 export default useAssetStore;
