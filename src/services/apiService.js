@@ -45,9 +45,11 @@ export const fetchFromFarmOS = async (endpoint, options = {}) => {
 
   const token = await getAccessToken();
   if (!token) {
-    console.error('[API] Token no disponible. Redirigiendo a login.');
-    if (typeof window !== 'undefined') window.location.hash = '#login';
-    throw new Error('Token no disponible. Reautentique desde el login.');
+    const isLoginPage = typeof window !== 'undefined' && window.location.hash === '#login';
+    if (!isLoginPage) {
+      console.warn('[API] Token no disponible. Continuando en modo offline.');
+    }
+    throw new Error('Token no disponible.');
   }
 
   const isFormData = options.body instanceof FormData;

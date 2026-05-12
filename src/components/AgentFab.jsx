@@ -1,12 +1,7 @@
 import React from 'react';
 import { Sparkles } from 'lucide-react';
-import useIdleVisibility from '../hooks/useIdleVisibility';
 
 export default function AgentFab({ onNavigate }) {
-  const isVisible = useIdleVisibility(2000);
-
-  if (!isVisible) return null;
-
   return (
     <button
       type="button"
@@ -15,7 +10,7 @@ export default function AgentFab({ onNavigate }) {
       onClick={() => onNavigate('agente')}
       style={{
         position: 'fixed',
-        bottom: 'max(18px, env(safe-area-inset-bottom))',
+        bottom: 'max(90px, calc(env(safe-area-inset-bottom) + 90px))',
         right: 18,
         width: 56,
         height: 56,
