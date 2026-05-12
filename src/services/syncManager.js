@@ -3,6 +3,7 @@ import { openDB, STORES } from '../db/dbCore';
 import { logCache } from '../db/logCache';
 import { newId } from '../utils/id';
 import { getCompletedTaskIds } from '../utils/taskCompletionParser';
+import { recordEvent } from './voiceTelemetryService';
 
 const STORE_NAME = 'pending_transactions';
 const TASKS_STORE_NAME = 'pending_tasks';
@@ -422,10 +423,20 @@ class SyncManager {
       this.isOnline = true;
       this.syncAll();
       this.notifyPendingVoiceRecordings();
+      recordEvent({
+        event_type: 'connectivity_state',
+        flujo: 'sync_manager',
+        connectivity: 'online',
+      }).catch(() => {});
     });
 
     window.addEventListener('offline', () => {
       this.isOnline = false;
+      recordEvent({
+        event_type: 'connectivity_state',
+        flujo: 'sync_manager',
+        connectivity: 'offline',
+      }).catch(() => {});
     });
   }
 
