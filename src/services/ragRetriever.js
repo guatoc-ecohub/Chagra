@@ -1,3 +1,5 @@
+import { CROP_TAXONOMY } from '../config/taxonomy';
+
 const CORPUS_PATH = '/cycle-content/';
 
 const BM25_PARAMS = {
@@ -6,7 +8,6 @@ const BM25_PARAMS = {
 };
 
 let corpusCache = null;
-let termDocFreq = new Map();
 let avgDocLen = 0;
 
 function tokenize(text) {
@@ -82,7 +83,9 @@ function flattenDoc(doc, prefix = '') {
 async function loadCorpus() {
   if (corpusCache) return corpusCache;
 
-  const species = ['fresa', 'lechuga', 'tomate_chonto'];
+  const species = Object.values(CROP_TAXONOMY).flatMap((group) =>
+    group.species.map((sp) => sp.id)
+  );
   const docs = [];
 
   for (const slug of species) {
@@ -99,11 +102,11 @@ async function loadCorpus() {
     }
   }
 
-  termDocFreq = buildInvertedIndex(docs);
   const totalLen = docs.reduce((sum, d) => sum + tokenize(d.text).length, 0);
   avgDocLen = docs.length > 0 ? totalLen / docs.length : 1;
 
-  const idf = computeIDF(termDocFreq, docs.length);
+  const df = buildInvertedIndex(docs);
+  const idf = computeIDF(df, docs.length);
   corpusCache = { docs, idf };
   return corpusCache;
 }
