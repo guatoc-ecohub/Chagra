@@ -102,6 +102,12 @@ export default function HelpVoiceQuestion({ speciesSlug = null }) {
     const ctrl = new AbortController();
     setCorpus(null);
     setCorpusError(null);
+
+    if (!speciesSlug || speciesSlug === 'null' || speciesSlug === 'undefined') {
+      setCorpus(null);
+      return;
+    }
+
     fetch(`${import.meta.env.BASE_URL}cycle-content/${speciesSlug}.json`, { signal: ctrl.signal })
       .then((r) => {
         if (!r.ok) throw new Error(`No se cargó el corpus de ${speciesSlug}`);
