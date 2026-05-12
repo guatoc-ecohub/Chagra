@@ -5,7 +5,7 @@
  * manuales previas en assetCache.js y syncManager.js, evitando race conditions
  * de `onupgradeneeded` duplicado y garantizando una sola versión activa.
  *
- * Esquema v10 (2026-05-12):
+ * Esquema v11 (2026-05-12):
  *   - assets               (keyPath: id; indexes: asset_type, cached_at)
  *   - taxonomy_terms       (keyPath: id; indexes: type)
  *   - sync_meta            (keyPath: key)
@@ -15,7 +15,8 @@
  *                           asset_id_timestamp) — v9: índice compuesto para
  *                           queries timeline ordenadas sin sort en memoria)
  *                           (v8 ADR-027.viii: incluye log--split para modo individual/aggregate)
- *   - media_cache          (keyPath: id, autoIncrement; indexes: logId, createdAt)
+ *   - media_cache          (v11: keyPath: id, autoIncrement; indexes: logId,
+ *                           createdAt, lastAccessedAt; LRU eviction support)
  *   - pending_voice_recordings (v0.5.0: keyPath: id, autoIncrement)
  *   - inventory_events     (v7 ADR-027.i+ii: keyPath: id ULID; indexes:
  *                           item_id, timestamp, event_type, idempotency_key)
@@ -25,7 +26,7 @@
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 10;
+export const DB_VERSION = 11;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -155,6 +156,15 @@ export const openDB = async () => {
           store.createIndex('flujo', 'flujo', { unique: false });
           store.createIndex('created_at', 'created_at', { unique: false });
           store.createIndex('synced', 'synced', { unique: false });
+        }
+      }
+
+      // v11: LRU eviction para media_cache (056.4).
+      // Agregar lastAccessedAt a media_cache existente.
+      if (event.oldVersion < 11 && db.objectStoreNames.contains(STORES.MEDIA_CACHE)) {
+        const mediaStore = event.target.transaction.objectStore(STORES.MEDIA_CACHE);
+        if (!mediaStore.indexNames.contains('lastAccessedAt')) {
+          mediaStore.createIndex('lastAccessedAt', 'lastAccessedAt', { unique: false });
         }
       }
     };

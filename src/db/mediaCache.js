@@ -1,11 +1,15 @@
 /**
  * mediaCache.js — CRUD para binarios de evidencia fotográfica (Fase 20.2).
  *
- * Store: media_cache (ChagraDB v5)
- * Schema: { id (auto), logId, blob, mimeType, createdAt }
+ * Store: media_cache (ChagraDB v11)
+ * Schema: { id (auto), logId, blob, mimeType, createdAt, lastAccessedAt, pinned }
+ * v11: Agrega LRU eviction policy para prevenirllenado de disco del browser.
  */
 
 import { openDB, STORES } from './dbCore';
+
+const DEFAULT_MAX_MB = parseInt(import.meta.env.VITE_MEDIA_CACHE_MAX_MB || '500', 10);
+const EVICT_BATCH_SIZE = 50;
 
 export const mediaCache = {
   /**
@@ -16,8 +20,9 @@ export const mediaCache = {
    * @returns {Promise<number>} — id autoincrement generado
    */
   async save(logId, blob, options = {}) {
-    const { mimeType = 'image/webp', assetId = null, ai_diagnosis = null } = typeof options === 'string' ? { mimeType: options } : options;
+    const { mimeType = 'image/webp', assetId = null, ai_diagnosis = null, pinned = false } = typeof options === 'string' ? { mimeType: options } : options;
     const db = await openDB();
+    const now = Date.now();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.MEDIA_CACHE, 'readwrite');
       const request = tx.objectStore(STORES.MEDIA_CACHE).add({
@@ -26,9 +31,15 @@ export const mediaCache = {
         blob,
         mimeType,
         ai_diagnosis,
-        createdAt: Date.now(),
+        pinned,
+        createdAt: now,
+        lastAccessedAt: now,
       });
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = async (e) => {
+        const id = e.target.result;
+        await evictOldestIfNeeded();
+        resolve(id);
+      };
       tx.onerror = () => reject(tx.error);
     });
   },
@@ -59,12 +70,20 @@ export const mediaCache = {
    */
   async getByAssetId(assetId) {
     const db = await openDB();
+    const now = Date.now();
     return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORES.MEDIA_CACHE, 'readonly');
+      const tx = db.transaction(STORES.MEDIA_CACHE, 'readwrite');
       const index = tx.objectStore(STORES.MEDIA_CACHE).index('assetId');
       const request = index.getAll(IDBKeyRange.only(assetId));
       request.onsuccess = () => {
-        const sorted = (request.result || []).sort((a, b) => b.createdAt - a.createdAt);
+        const results = request.result || [];
+        for (const record of results) {
+          if (record.lastAccessedAt !== now) {
+            record.lastAccessedAt = now;
+            tx.objectStore(STORES.MEDIA_CACHE).put(record);
+          }
+        }
+        const sorted = results.sort((a, b) => b.createdAt - a.createdAt);
         resolve(sorted);
       };
       request.onerror = () => reject(request.error);
@@ -76,11 +95,22 @@ export const mediaCache = {
    */
   async getByLogId(logId) {
     const db = await openDB();
+    const now = Date.now();
     return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORES.MEDIA_CACHE, 'readonly');
+      const tx = db.transaction(STORES.MEDIA_CACHE, 'readwrite');
       const index = tx.objectStore(STORES.MEDIA_CACHE).index('logId');
       const request = index.getAll(IDBKeyRange.only(logId));
-      request.onsuccess = () => resolve(request.result || []);
+      request.onsuccess = () => {
+        const results = request.result || [];
+        const store = tx.objectStore(STORES.MEDIA_CACHE);
+        for (const record of results) {
+          if (record.lastAccessedAt !== now) {
+            record.lastAccessedAt = now;
+            store.put(record);
+          }
+        }
+        resolve(results);
+      };
       request.onerror = () => reject(request.error);
     });
   },
@@ -163,3 +193,57 @@ export const mediaCache = {
     });
   },
 };
+
+/**
+ * LRU eviction: elimina los blobs más viejos si el cache excede el threshold.
+ * NO elimina blobs con pinned: true.
+ * @param {number} maxMB — threshold en MB (default 500MB desde VITE_MEDIA_CACHE_MAX_MB)
+ * @param {number} batchSize — cuántos borrar por ejecución (default 50)
+ */
+async function evictOldestIfNeeded(maxMB = DEFAULT_MAX_MB, batchSize = EVICT_BATCH_SIZE) {
+  const maxBytes = maxMB * 1024 * 1024;
+
+  try {
+    const estimate = await navigator.storage.estimate();
+    const currentUsage = estimate.usage || 0;
+
+    if (currentUsage <= maxBytes) {
+      return 0;
+    }
+
+    const db = await openDB();
+    let evicted = 0;
+
+    const tx = db.transaction(STORES.MEDIA_CACHE, 'readwrite');
+    const store = tx.objectStore(STORES.MEDIA_CACHE);
+    const index = store.index('lastAccessedAt');
+    const cursorReq = index.openCursor();
+
+    const toDelete = [];
+
+    cursorReq.onsuccess = (event) => {
+      const cursor = event.target.result;
+      if (cursor && evicted < batchSize) {
+        const record = cursor.value;
+        if (!record.pinned) {
+          toDelete.push(record.id);
+          cursor.delete();
+          evicted++;
+        }
+        cursor.continue();
+      }
+    };
+
+    return new Promise((resolve) => {
+      tx.oncomplete = () => {
+        if (evicted > 0) {
+          console.info(`[MediaCache] LRU evicted ${evicted} blobs (threshold: ${maxMB}MB)`);
+        }
+        resolve(evicted);
+      };
+    });
+  } catch (err) {
+    console.warn('[MediaCache] LRU eviction failed:', err.message);
+    return 0;
+  }
+}
