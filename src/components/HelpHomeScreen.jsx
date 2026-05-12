@@ -49,7 +49,7 @@ export default function HelpHomeScreen({ onSelect }) {
       key: 'diccionario',
       icon: Library,
       title: 'Diccionario',
-      sub: 'Bocashi, micorriza, milpa, RAG… términos curados con fuentes — 0 alucinaciones.',
+      sub: 'Bocashi, micorriza, milpa… palabras del campo explicadas como si tu hije de 11 años te preguntara.',
       accent: 'from-violet-900/40 to-purple-950/80',
       border: 'border-violet-600/40 hover:border-violet-400/70',
       iconBg: 'bg-violet-700/30 border-violet-500/40',

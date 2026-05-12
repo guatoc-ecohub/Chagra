@@ -136,7 +136,7 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
               <li>Si el modelo local no responde, usa <strong>Consultar IA externa</strong> en plant detail (genera prompt para Gemini/ChatGPT/Claude).</li>
             </ul>
             <p className="text-[11px] text-slate-400 italic mt-2">
-              Requiere conexión al stack IA local (Ollama gemma3:4b en alpha). Si no está disponible, sale mensaje con opción reintentar.
+              Necesita internet. Si no se conecta, te跳 opciones para reintentar.
             </p>
           </div>
         </Section>

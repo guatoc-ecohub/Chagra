@@ -5,13 +5,15 @@
  * manuales previas en assetCache.js y syncManager.js, evitando race conditions
  * de `onupgradeneeded` duplicado y garantizando una sola versión activa.
  *
- * Esquema v7 (2026-04-29):
+ * Esquema v9 (2026-05-11):
  *   - assets               (keyPath: id; indexes: asset_type, cached_at)
  *   - taxonomy_terms       (keyPath: id; indexes: type)
  *   - sync_meta            (keyPath: key)
  *   - pending_transactions (keyPath: id, autoIncrement; indexes: timestamp, type)
  *   - pending_tasks        (keyPath: id; indexes: timestamp, status)
- *   - logs                 (keyPath: id; indexes: asset_id, timestamp, type)
+ *   - logs                 (keyPath: id; indexes: asset_id, timestamp, type,
+ *                           asset_id_timestamp) — v9: índice compuesto para
+ *                           queries timeline ordenadas sin sort en memoria)
  *                           (v8 ADR-027.viii: incluye log--split para modo individual/aggregate)
  *   - media_cache          (keyPath: id, autoIncrement; indexes: logId, createdAt)
  *   - pending_voice_recordings (v0.5.0: keyPath: id, autoIncrement)
@@ -21,7 +23,7 @@
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 8;
+export const DB_VERSION = 9;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -130,6 +132,16 @@ export const openDB = async () => {
         const store = db.createObjectStore(STORES.PLANS, { keyPath: 'id' });
         store.createIndex('asset_id', 'asset_id', { unique: false });
         store.createIndex('species_slug', 'species_slug', { unique: false });
+      }
+
+      // v9: índice compuesto asset_id+timestamp en logs para queries
+      // timeline ordenadas sin sort en memoria (Issue #244).
+      // Migration transparente v8→v9: preserva indexes existentes.
+      if (event.oldVersion < 9) {
+        const logsStore = event.target.transaction.objectStore(STORES.LOGS);
+        if (!logsStore.indexNames.contains('asset_id_timestamp')) {
+          logsStore.createIndex('asset_id_timestamp', ['asset_id', 'timestamp'], { unique: false });
+        }
       }
     };
 

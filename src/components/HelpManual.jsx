@@ -25,10 +25,10 @@ import HelpVoiceRegionalDemo from './HelpVoiceRegionalDemo.jsx';
  * Principios aplicados (Workspace/Chagra-strategy/ops/chagra-ux-principles.md):
  *   P1 tono "tú" cercano (anti-ladrillo)
  *   P2 densidad — pantalla en campo, tap targets ≥48px (≥80px en home CTAs)
- *   P3 offline-first sin disculpas
- *   P4 conversacional pero verificable
+ *   P3 sin disculpas — cuando no hay red no se nota, todo sigue funcionando igual
+ *   P4 cercano pero chevereable — cada dato tiene fuente, nada inventado
  *   P5 ayuda discoverable, no monolítica
- *   P6 identidad sin postureo
+ *   P6 identidad sin postureo — somos campo, no startup
  *
  * Movimientos:
  *   - "Field test cases para Lili" → Workspace/Chagra-strategy/ops/field-test-cases.md
