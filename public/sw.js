@@ -121,10 +121,6 @@ self.addEventListener('sync', (event) => {
 });
 
 async function handleVoiceTelemetrySync() {
-  const MAX_RETRIES = 5;
-  const BASE_DELAY_MS = 1000;
-  const MAX_DELAY_MS = 30000;
-
   const clients = await self.clients.matchAll({ type: 'window' });
   if (clients.length === 0) return;
 
