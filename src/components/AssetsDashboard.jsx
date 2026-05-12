@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Plus, Trash2, RefreshCw, Building2, Leaf, Search, WifiOff, TreePine, Map as MapIcon, List } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
+import { Virtuoso } from 'react-virtuoso';
 import { fetchFromFarmOS } from '../services/apiService';
 import AssetDetailView from './AssetDetailView';
 import { FARM_CONFIG } from '../config/defaults';
@@ -193,7 +194,7 @@ const TAB_LABELS = {
 export default function AssetsDashboard({ onBack, initialTab, initialShowForm = false }) {
   const {
     plants, structures, equipment, materials, lands,
-    isLoading, error, lastSync,
+    isLoading, error,
     hydrate, syncFromServer, addAsset, addAssetsBulk, removeAsset, addHarvestLog,
     setSelectedAsset,
   } = useAssetStore();
@@ -1073,120 +1074,136 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
               <p className="text-sm mt-1">Toca el botón para agregar</p>
             </div>
           ) : (
-            currentAssets.map(asset => {
-              const name = asset.attributes?.name || asset.name || 'Sin nombre';
-              const notes = asset.attributes?.notes;
-              const notesText = typeof notes === 'object' ? notes?.value : notes;
-              const isPending = asset._pending;
-              const TabIcon = tabConfig.icon;
+            <Virtuoso
+              data={currentAssets}
+              initialTopMostItemIndex={(() => {
+                const saved = sessionStorage.getItem(`chagra:scroll:activos:${activeTab}`);
+                return saved ? parseInt(saved, 10) : 0;
+              })()}
+              rangeChanged={(range) => {
+                // Throttled save? sessionStorage is fast enough for small strings, 
+                // but let's follow the 056-1 rule of "topmost index".
+                sessionStorage.setItem(`chagra:scroll:activos:${activeTab}`, String(range.startIndex));
+              }}
+              style={{ height: '100%', width: '100%' }}
+              overscan={400}
+              itemContent={(index, asset) => {
+                const name = asset.attributes?.name || asset.name || 'Sin nombre';
+                const notes = asset.attributes?.notes;
+                const notesText = typeof notes === 'object' ? notes?.value : notes;
+                const isPending = asset._pending;
+                const TabIcon = tabConfig.icon;
 
-              return (
-                <div
-                  key={asset.id}
-                  className={`p-4 rounded-xl border transition-all ${isPending
-                    ? 'bg-slate-800/50 border-dashed border-slate-600'
-                    : 'bg-slate-800 border-slate-700'
-                    }`}
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedAsset(asset.id)}
-                      className="flex items-center gap-3 flex-1 min-w-0 text-left hover:opacity-80 transition-opacity"
+                return (
+                  <div className="pb-2 px-1">
+                    <div
+                      role="article"
+                      className={`p-4 rounded-xl border transition-all ${isPending
+                        ? 'bg-slate-800/50 border-dashed border-slate-600'
+                        : 'bg-slate-800 border-slate-700'
+                        }`}
                     >
-                      {activeTab === 'plant' ? (
-                        <PlantCardThumb asset={asset} colors={colors} FallbackIcon={TabIcon} />
-                      ) : (
-                        <div className={`p-2.5 rounded-lg ${colors.light} shrink-0`}>
-                          <TabIcon size={20} className={colors.text} />
-                        </div>
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <h4 className="font-bold text-slate-200 truncate text-base">{name}</h4>
-                          <span className="text-[10px] font-bold uppercase text-emerald-300/70 border border-emerald-700/40 bg-emerald-900/20 rounded-full px-2 py-0.5 shrink-0">{fincaNombre}</span>
-                          {isPending && (
-                            <span className="text-xs text-amber-400 bg-amber-900/30 px-1.5 py-0.5 rounded-full shrink-0">pendiente</span>
-                          )}
-                        </div>
-                        {notesText && <p className="text-xs text-slate-500 truncate mt-1">{notesText}</p>}
-                      </div>
-                    </button>
-                    <button
-                      onClick={() => handleDelete(asset.id)}
-                      className="p-2 rounded-lg bg-red-900/30 hover:bg-red-800/50 text-red-400 shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-
-                  {/* Registro de cosecha (solo tab plant, no registros pendientes) */}
-                  {activeTab === 'plant' && !isPending && (
-                    <div className="mt-4 border-t border-slate-700 pt-4">
-                      {activeHarvestId !== asset.id ? (
+                      <div className="flex items-start justify-between gap-3">
                         <button
                           type="button"
-                          onClick={() => {
-                            setActiveHarvestId(asset.id);
-                            setHarvestData({ yield: '', unit: 'kg', notes: '' });
-                          }}
-                          className="w-full py-2 bg-lime-700 text-white rounded-md hover:bg-lime-600 transition-colors text-sm font-medium"
+                          onClick={() => setSelectedAsset(asset.id)}
+                          className="flex items-center gap-3 flex-1 min-w-0 text-left hover:opacity-80 transition-opacity"
                         >
-                          Registrar Cosecha
+                          {activeTab === 'plant' ? (
+                            <PlantCardThumb asset={asset} colors={colors} FallbackIcon={TabIcon} />
+                          ) : (
+                            <div className={`p-2.5 rounded-lg ${colors.light} shrink-0`}>
+                              <TabIcon size={20} className={colors.text} />
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <h4 className="font-bold text-slate-200 truncate text-base">{name}</h4>
+                              <span className="text-[10px] font-bold uppercase text-emerald-300/70 border border-emerald-700/40 bg-emerald-900/20 rounded-full px-2 py-0.5 shrink-0">{fincaNombre}</span>
+                              {isPending && (
+                                <span className="text-xs text-amber-400 bg-amber-900/30 px-1.5 py-0.5 rounded-full shrink-0">pendiente</span>
+                              )}
+                            </div>
+                            {notesText && <p className="text-xs text-slate-500 truncate mt-1">{notesText}</p>}
+                          </div>
                         </button>
-                      ) : (
-                        <div className="bg-slate-900 p-3 rounded-md border border-slate-600">
-                          <h4 className="text-sm font-bold text-slate-200 mb-2">Datos de Rendimiento</h4>
-                          <div className="flex gap-2 mb-2">
-                            <input
-                              type="number"
-                              placeholder="Cantidad"
-                              value={harvestData.yield}
-                              onChange={(e) => setHarvestData({ ...harvestData, yield: e.target.value })}
-                              className="w-2/3 p-2 bg-slate-800 border border-slate-700 rounded text-sm text-slate-200"
-                            />
-                            <select
-                              value={harvestData.unit}
-                              onChange={(e) => setHarvestData({ ...harvestData, unit: e.target.value })}
-                              className="w-1/3 p-2 bg-slate-800 border border-slate-700 rounded text-sm text-slate-200"
-                            >
-                              <option value="kg">kg</option>
-                              <option value="g">g</option>
-                              <option value="lb">lb</option>
-                              <option value="unidades">unds</option>
-                            </select>
-                          </div>
-                          <textarea
-                            placeholder="Observaciones fitosanitarias o de calidad..."
-                            value={harvestData.notes}
-                            onChange={(e) => setHarvestData({ ...harvestData, notes: e.target.value })}
-                            className="w-full p-2 bg-slate-800 border border-slate-700 rounded text-sm text-slate-200 mb-2"
-                            rows="2"
-                          />
-                          <div className="flex gap-2 justify-end">
+                        <button
+                          onClick={() => handleDelete(asset.id)}
+                          className="p-2 rounded-lg bg-red-900/30 hover:bg-red-800/50 text-red-400 shrink-0 min-h-[40px] min-w-[40px] flex items-center justify-center"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+
+                      {/* Registro de cosecha (solo tab plant, no registros pendientes) */}
+                      {activeTab === 'plant' && !isPending && (
+                        <div className="mt-4 border-t border-slate-700 pt-4">
+                          {activeHarvestId !== asset.id ? (
                             <button
                               type="button"
-                              onClick={resetHarvestForm}
-                              className="px-3 py-1 text-xs text-slate-400 hover:text-white"
+                              onClick={() => {
+                                setActiveHarvestId(asset.id);
+                                setHarvestData({ yield: '', unit: 'kg', notes: '' });
+                              }}
+                              className="w-full py-2 bg-lime-700 text-white rounded-md hover:bg-lime-600 transition-colors text-sm font-medium"
                             >
-                              Cancelar
+                              Registrar Cosecha
                             </button>
-                            <button
-                              type="button"
-                              onClick={() => submitHarvest(asset)}
-                              disabled={!harvestData.yield}
-                              className="px-3 py-1 bg-lime-600 text-white text-xs rounded hover:bg-lime-500 disabled:opacity-50"
-                            >
-                              Guardar Registro
-                            </button>
-                          </div>
+                          ) : (
+                            <div className="bg-slate-900 p-3 rounded-md border border-slate-600">
+                              <h4 className="text-sm font-bold text-slate-200 mb-2">Datos de Rendimiento</h4>
+                              <div className="flex gap-2 mb-2">
+                                <input
+                                  type="number"
+                                  placeholder="Cantidad"
+                                  value={harvestData.yield}
+                                  onChange={(e) => setHarvestData({ ...harvestData, yield: e.target.value })}
+                                  className="w-2/3 p-2 bg-slate-800 border border-slate-700 rounded text-sm text-slate-200"
+                                />
+                                <select
+                                  value={harvestData.unit}
+                                  onChange={(e) => setHarvestData({ ...harvestData, unit: e.target.value })}
+                                  className="w-1/3 p-2 bg-slate-800 border border-slate-700 rounded text-sm text-slate-200"
+                                >
+                                  <option value="kg">kg</option>
+                                  <option value="g">g</option>
+                                  <option value="lb">lb</option>
+                                  <option value="unidades">unds</option>
+                                </select>
+                              </div>
+                              <textarea
+                                placeholder="Observaciones fitosanitarias o de calidad..."
+                                value={harvestData.notes}
+                                onChange={(e) => setHarvestData({ ...harvestData, notes: e.target.value })}
+                                className="w-full p-2 bg-slate-800 border border-slate-700 rounded text-sm text-slate-200 mb-2"
+                                rows={2}
+                              />
+                              <div className="flex gap-2 justify-end">
+                                <button
+                                  type="button"
+                                  onClick={resetHarvestForm}
+                                  className="px-3 py-1 text-xs text-slate-400 hover:text-white"
+                                >
+                                  Cancelar
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => submitHarvest(asset)}
+                                  disabled={!harvestData.yield}
+                                  className="px-3 py-1 bg-lime-600 text-white text-xs rounded hover:bg-lime-500 disabled:opacity-50"
+                                >
+                                  Guardar Registro
+                                </button>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
-                  )}
-                </div>
-              );
-            })
+                  </div>
+                );
+              }}
+            />
           )}
         </div>
       )}
