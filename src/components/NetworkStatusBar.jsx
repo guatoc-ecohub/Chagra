@@ -44,7 +44,7 @@ export default function NetworkStatusBar() {
         setSyncedCount((prev) => prev || 1);
         setStatus(STATUS.SYNCED);
         setVisible(true);
-        setTimeout(() => setVisible(false), 3000);
+        setTimeout(() => setVisible(false), 4000);
       }
     } catch (_err) {
       // DB no inicializada aún, ignorar
