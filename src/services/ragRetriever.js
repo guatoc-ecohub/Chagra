@@ -92,6 +92,8 @@ async function loadCorpus() {
     try {
       const res = await fetch(`${CORPUS_PATH}${slug}.json`);
       if (!res.ok) continue;
+      const ct = res.headers.get('content-type') || '';
+      if (!ct.includes('json')) continue;
       const data = await res.json();
       const passages = flattenDoc(data);
       passages.forEach((p) => {

@@ -210,7 +210,12 @@ export default function AgentScreen({ onBack }) {
 
   const handleVoiceRecord = async () => {
     if (state === STATE_RECORDING) {
-      const blob = stopRecord();
+      const blob = await stopRecord();
+      if (!blob) {
+        setState(STATE_IDLE);
+        setError('No se capturó audio. Intenta de nuevo.');
+        return;
+      }
       setState(STATE_THINKING);
 
       try {
