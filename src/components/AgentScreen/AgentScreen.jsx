@@ -210,7 +210,7 @@ export default function AgentScreen({ onBack }) {
 
   const handleVoiceRecord = async () => {
     if (state === STATE_RECORDING) {
-      const blob = stopRecord();
+      const blob = await stopRecord();
       setState(STATE_THINKING);
 
       try {
@@ -221,9 +221,9 @@ export default function AgentScreen({ onBack }) {
           setState(STATE_IDLE);
           setError('No entendí el audio. Prueba de nuevo.');
         }
-        } catch (err) {
-          setState(STATE_IDLE);
-          setError(`Error al transcribir audio: ${err.message || 'Habla más claro'}`);
+      } catch (err) {
+        setState(STATE_IDLE);
+        setError(`Error al transcribir audio: ${err.message || 'Habla más claro'}`);
       }
     } else {
       resetRecord();
