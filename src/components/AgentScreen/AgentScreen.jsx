@@ -6,7 +6,7 @@ import { addTurn, getFullHistory, getContextString } from '../../services/conver
 import { retrieve } from '../../services/ragRetriever';
 import { parseIntent, formatIntentDescription } from '../../services/agentIntentParser';
 import { streamOllama } from '../../services/ollamaStream';
-import { speak, stop, init as initTTS, isSupported } from '../../services/ttsService';
+import { speak, speakKokoro, stop, init as initTTS, isSupported, isKokoroAvailable } from '../../services/ttsService';
 import ChatHistory from './ChatHistory';
 import SuggestedActions from './SuggestedActions';
 import ActionConfirmModal from '../ActionConfirmModal';
@@ -32,6 +32,7 @@ export default function AgentScreen({ onBack }) {
   const [actionModal, setActionModal] = useState({ isOpen: false, intent: null, llmResponse: '' });
   const [ttsEnabled, setTtsEnabled] = useState(true);
   const ttsSupported = isSupported();
+  const [kokoroReady, setKokoroReady] = useState(false);
 
   const { durationMs, start: startRecord, stop: stopRecord, reset: resetRecord } = useVoiceRecorder();
   const chatEndRef = useRef(null);
@@ -51,6 +52,7 @@ export default function AgentScreen({ onBack }) {
 
   useEffect(() => {
     initTTS();
+    isKokoroAvailable().then(setKokoroReady);
     loadHistory();
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
@@ -179,7 +181,11 @@ export default function AgentScreen({ onBack }) {
 
       if (ttsEnabled && response) {
         stop();
-        speak(response, { rate: 0.9, pitch: 1.0 });
+        if (kokoroReady) {
+          speakKokoro(response, { rate: 0.9, pitch: 1.0 });
+        } else {
+          speak(response, { rate: 0.9, pitch: 1.0 });
+        }
       }
 
       if (intent && intent.toolName === 'crear_log') {
