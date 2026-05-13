@@ -5,6 +5,7 @@ import { transcribe } from '../../services/voiceService';
 import { addTurn, getFullHistory, getContextString } from '../../services/conversationMemory';
 import { retrieve } from '../../services/ragRetriever';
 import { parseIntent, formatIntentDescription } from '../../services/agentIntentParser';
+import { streamOllama } from '../../services/ollamaStream';
 import { speak, stop, init as initTTS } from '../../services/ttsService';
 import ChatHistory from './ChatHistory';
 import SuggestedActions from './SuggestedActions';
@@ -113,43 +114,11 @@ export default function AgentScreen({ onBack }) {
       { role: 'user', content: query },
     ];
 
-    const response = await fetch(OLLAMA_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'qwen3.5:4b',
-        messages,
-        stream: true,
-      }),
-    });
-
-    if (!response.ok) throw new Error('LLM no disponible');
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let fullContent = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      const chunk = decoder.decode(value);
-      const lines = chunk.split('\n');
-      for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          try {
-            const data = JSON.parse(line.slice(6));
-            if (data.content) {
-              fullContent += data.content;
-              setStreamingContent(fullContent);
-            }
-          } catch {
-            // Skip malformed JSON
-          }
-        }
-      }
-    }
-
-    return fullContent;
+    return streamOllama(
+      OLLAMA_URL,
+      { model: 'qwen3.5:4b', messages },
+      (_chunk, fullText) => setStreamingContent(fullText),
+    );
   };
 
   const handleSubmit = async (text) => {
