@@ -265,7 +265,8 @@ export default function TelemetryAlerts() {
     }
 
     if (!HA_TOKEN) {
-      setError('VITE_HA_ACCESS_TOKEN no configurado en el archivo .env');
+      console.warn('TelemetryAlerts: VITE_HA_ACCESS_TOKEN no configurado en el archivo .env');
+      setError('Telemetria no disponible. Verifica configuracion con el administrador.');
       return;
     }
 
