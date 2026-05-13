@@ -67,7 +67,7 @@ const ACTION_PATTERNS = [
     toolName: 'crear_log',
     logType: 'log--input',
     extract: (text) => {
-      const productMatch = text.match(/(?:de\s+)?(\w+(?:\s+\w+)?)/i);
+      const productMatch = text.match(/(?:aplic\S+|fertiliz\S+|abon\S+)\s+(?:(?:de|con)\s+)?(\w+(?:\s+\w+)?)/i);
       return {
         notes: `Aplicación: ${productMatch ? productMatch[1] : 'producto no especificado'}`,
         quantity: null,
