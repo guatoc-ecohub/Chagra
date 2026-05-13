@@ -23,7 +23,7 @@ const useFincaActiveStore = create(
                 const state = get();
                 const finca = state.fincas.find(f => f.slug === state.activeFincaSlug);
                 // Default a Guatoc si no hay coincidencia (seguridad v2-strict)
-                return finca?.farmos_endpoint || 'https://guatoc.farmos.net';
+                return finca?.farmos_endpoint || '';
             },
 
             getActiveFinca: () => {

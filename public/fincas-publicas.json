@@ -8,6 +8,6 @@
     "estado": "activo",
     "altitud": 2550,
     "descripcion_corta": "Laboratorio de conservación + restauración de páramo en Choachí.",
-    "farmos_endpoint": "https://guatoc.farmos.net"
+    "farmos_endpoint": ""
   }
 ]
