@@ -6,7 +6,7 @@ import { addTurn, getFullHistory, getContextString } from '../../services/conver
 import { retrieve } from '../../services/ragRetriever';
 import { parseIntent, formatIntentDescription } from '../../services/agentIntentParser';
 import { streamOllama } from '../../services/ollamaStream';
-import { speak, stop, init as initTTS } from '../../services/ttsService';
+import { speak, stop, init as initTTS, isSupported } from '../../services/ttsService';
 import ChatHistory from './ChatHistory';
 import SuggestedActions from './SuggestedActions';
 import ActionConfirmModal from '../ActionConfirmModal';
@@ -31,6 +31,7 @@ export default function AgentScreen({ onBack }) {
   const [error, setError] = useState('');
   const [actionModal, setActionModal] = useState({ isOpen: false, intent: null, llmResponse: '' });
   const [ttsEnabled, setTtsEnabled] = useState(true);
+  const ttsSupported = isSupported();
 
   const { durationMs, start: startRecord, stop: stopRecord, reset: resetRecord } = useVoiceRecorder();
   const chatEndRef = useRef(null);
@@ -236,6 +237,7 @@ export default function AgentScreen({ onBack }) {
         </div>
         <button
           type="button"
+          disabled={!ttsSupported}
           onClick={() => {
             if (ttsEnabled) {
               stop();
@@ -243,9 +245,13 @@ export default function AgentScreen({ onBack }) {
             setTtsEnabled(!ttsEnabled);
           }}
           className={`p-2 rounded-full transition-colors ${
-            ttsEnabled ? 'bg-violet-900/40 text-violet-400' : 'bg-slate-800 text-slate-500'
+            !ttsSupported
+              ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
+              : ttsEnabled
+                ? 'bg-violet-900/40 text-violet-400'
+                : 'bg-slate-800 text-slate-500'
           }`}
-          title={ttsEnabled ? 'Silenciar voz' : 'Activar voz'}
+          title={!ttsSupported ? 'Tu navegador no soporta sintesis de voz' : ttsEnabled ? 'Silenciar voz' : 'Activar voz'}
         >
           {ttsEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
         </button>

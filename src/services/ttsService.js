@@ -111,6 +111,10 @@ export function resume() {
   }
 }
 
+export function isSupported() {
+  return !!window.speechSynthesis;
+}
+
 export function isSpeaking() {
   return window.speechSynthesis?.speaking || false;
 }
