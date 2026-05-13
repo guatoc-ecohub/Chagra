@@ -35,6 +35,11 @@ export const authenticateUser = async (username, password) => {
             throw new Error(`Error de Autenticación: ${response.status}`);
         }
 
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('json')) {
+            throw new Error('Backend FarmOS no disponible (modo instalacion detectado)');
+        }
+
         const data = await response.json();
 
         // Almacenamiento Offline-First del Token JWT
