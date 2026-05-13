@@ -35,6 +35,10 @@ export default function AgentScreen({ onBack }) {
   const { durationMs, start: startRecord, stop: stopRecord, reset: resetRecord } = useVoiceRecorder();
   const chatEndRef = useRef(null);
 
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages.length, streamingContent]);
+
   const loadHistory = useCallback(async () => {
     try {
       const history = await getFullHistory(operatorId, 50);
