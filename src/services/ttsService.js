@@ -1,12 +1,15 @@
 /**
- * ttsService.js — Text-to-Speech usando Web Speech API.
+ * ttsService.js — Text-to-Speech con Kokoro TTS neuronal + fallback Web Speech API.
  *
- * Proporciona síntesis de voz para las respuestas del agente IA.
- * Usa la API nativa del navegador (speechSynthesis).
+ * SpeakKokoro llama a /api/kokoro/tts (Kokoro-82M ONNX TTS local).
+ * Si Kokoro no está disponible, fallback transparente a window.speechSynthesis.
  */
 
 let voices = [];
 let voicesLoaded = false;
+let kokoroAvailable = null;
+let currentKokoroAudio = null;
+let currentKokoroUrl = null;
 
 function loadVoices() {
   return new Promise((resolve) => {
@@ -97,11 +100,22 @@ export function stop() {
   if (window.speechSynthesis) {
     window.speechSynthesis.cancel();
   }
+  if (currentKokoroAudio) {
+    currentKokoroAudio.pause();
+    currentKokoroAudio = null;
+  }
+  if (currentKokoroUrl) {
+    URL.revokeObjectURL(currentKokoroUrl);
+    currentKokoroUrl = null;
+  }
 }
 
 export function pause() {
   if (window.speechSynthesis) {
     window.speechSynthesis.pause();
+  }
+  if (currentKokoroAudio && !currentKokoroAudio.paused) {
+    currentKokoroAudio.pause();
   }
 }
 
@@ -109,10 +123,62 @@ export function resume() {
   if (window.speechSynthesis) {
     window.speechSynthesis.resume();
   }
+  if (currentKokoroAudio && currentKokoroAudio.paused) {
+    currentKokoroAudio.play().catch(() => {});
+  }
 }
 
 export function isSupported() {
   return !!window.speechSynthesis;
+}
+
+export async function isKokoroAvailable() {
+  if (kokoroAvailable !== null) return kokoroAvailable;
+  try {
+    const res = await fetch('/api/kokoro/health', { method: 'GET', signal: AbortSignal.timeout(3000) });
+    kokoroAvailable = res.ok;
+  } catch {
+    kokoroAvailable = false;
+  }
+  return kokoroAvailable;
+}
+
+export async function speakKokoro(text, options = {}) {
+  const { voice = 'ef_dora', format = 'opus', lang = 'es' } = options;
+
+  stop();
+
+  try {
+    const res = await fetch('/api/kokoro/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, voice, format, lang }),
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+
+    currentKokoroUrl = url;
+    currentKokoroAudio = audio;
+
+    audio.onended = () => {
+      if (currentKokoroUrl === url) {
+        URL.revokeObjectURL(currentKokoroUrl);
+        currentKokoroAudio = null;
+        currentKokoroUrl = null;
+      }
+    };
+
+    await audio.play();
+    return audio;
+  } catch (e) {
+    console.warn('[TTS] Kokoro failed, fallback to Web Speech:', e.message);
+    speak(text, options);
+    return null;
+  }
 }
 
 export function isSpeaking() {
@@ -129,11 +195,14 @@ export function init() {
 
 export default {
   speak,
+  speakKokoro,
   stop,
   pause,
   resume,
   isSpeaking,
   isPaused,
+  isSupported,
+  isKokoroAvailable,
   getVoices,
   getSpanishVoice,
   init,
