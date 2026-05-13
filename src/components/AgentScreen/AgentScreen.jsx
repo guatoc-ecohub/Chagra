@@ -114,11 +114,29 @@ export default function AgentScreen({ onBack }) {
       { role: 'user', content: query },
     ];
 
-    return streamOllama(
-      OLLAMA_URL,
-      { model: 'qwen3.5:4b', messages },
-      (_chunk, fullText) => setStreamingContent(fullText),
-    );
+    try {
+      return await streamOllama(
+        OLLAMA_URL,
+        { model: 'qwen3.5:4b', messages },
+        (_chunk, fullText) => setStreamingContent(fullText),
+      );
+    } catch (e) {
+      if (e.name === 'AbortError') {
+        throw new Error('Tiempo agotado, conexion lenta');
+      }
+      const match = e.message.match(/^Ollama (\d+)/);
+      if (match) {
+        const status = parseInt(match[1], 10);
+        if (status === 401 || status === 403) {
+          throw new Error('Sesion expirada, recarga la app');
+        }
+        if (status >= 500 && status <= 503) {
+          throw new Error('IA no disponible, intenta de nuevo en un momento');
+        }
+        throw new Error(`Error al consultar IA (codigo: ${status})`);
+      }
+      throw new Error('IA no disponible, intenta de nuevo en un momento');
+    }
   };
 
   const handleSubmit = async (text) => {
@@ -170,7 +188,7 @@ export default function AgentScreen({ onBack }) {
       }
     } catch (e) {
       console.error('[Agent] Error:', e);
-      setError('No pude conectarme al asistente. Intenta de nuevo.');
+      setError(e.message || 'No pude conectarme al asistente. Intenta de nuevo.');
     } finally {
       setState(STATE_IDLE);
       setStreamingContent('');
