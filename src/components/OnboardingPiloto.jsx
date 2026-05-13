@@ -81,6 +81,7 @@ function PasswordGate({ onUnlock }) {
           venía en el mensaje.
         </p>
 
+
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
             <label htmlFor="pass" className="block text-xs font-medium text-slate-300 mb-1.5 uppercase tracking-wide">
@@ -118,7 +119,7 @@ function PasswordGate({ onUnlock }) {
         </form>
 
         <p className="text-xs text-slate-500 mt-6 leading-relaxed">
-          ¿No tenés invitación todavía? Escribile a Miguel a{' '}
+          ¿No tienes invitación todavía? Escríbele a Miguel a{' '}
           <a href={`mailto:${MIGUEL_EMAIL}`} className="text-emerald-500 hover:text-emerald-400 underline">
             {MIGUEL_EMAIL}
           </a>
@@ -241,9 +242,9 @@ ${data.operador_nombre}`;
           <h1 className="text-2xl font-bold text-white">Onboarding piloto Chagra</h1>
         </div>
         <p className="text-sm text-slate-400 mb-6 leading-relaxed">
-          Llená los datos de tu finca y te creamos tu acceso al sistema. Esta
-          página no envía nada automático — al final copiás un mensaje y se lo
-          pasás a Miguel por WhatsApp o email. Él lo procesa manualmente y te
+          Llena los datos de tu finca y te creamos tu acceso al sistema. Esta
+          página no envía nada automático — al final copias un mensaje y se lo
+          pasas a Miguel por WhatsApp o email. Él lo procesa manualmente y te
           contacta con tus credenciales.
         </p>
 
@@ -290,7 +291,7 @@ ${data.operador_nombre}`;
                 type="email"
                 value={data.operador_email}
                 onChange={(e) => setField('operador_email', e.target.value)}
-                placeholder="vos@dominio.com"
+                placeholder="tu@dominio.com"
                 className={inputClass(!!errors.operador_email)}
               />
               {errors.operador_email && (
@@ -312,8 +313,8 @@ ${data.operador_nombre}`;
               className={inputClass(!!errors.maps_url)}
             />
             <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-              Abrí Maps parado en el centro del predio → "Compartir" → "Copiar enlace".
-              Si no lo sabés con precisión, pasame la dirección o nombre de la vereda.
+              Abre Maps parado en el centro del predio → "Compartir" → "Copiar enlace".
+              Si no lo sabes con precisión, pásame la dirección o nombre de la vereda.
             </p>
             {errors.maps_url && (
               <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
@@ -336,7 +337,7 @@ ${data.operador_nombre}`;
                 className={inputClass(false)}
               />
               <p className="text-xs text-slate-500 mt-1">
-                Si no la sabés, dejalo vacío — la calculamos desde el link de Maps.
+                Si no la sabes, déjalo vacío — la calculamos desde el link de Maps.
               </p>
             </div>
 
@@ -352,7 +353,7 @@ ${data.operador_nombre}`;
                 className={inputClass(false)}
               />
               <p className="text-xs text-slate-500 mt-1">
-                Escritura o levantamiento. Vacío si no lo sabés.
+                Escritura o levantamiento. Vacío si no lo sabes.
               </p>
             </div>
           </div>
@@ -365,7 +366,7 @@ ${data.operador_nombre}`;
               onChange={(e) => setField('vocacion', e.target.value)}
               className={inputClass(!!errors.vocacion)}
             >
-              <option value="">— elegí una opción —</option>
+              <option value="">— elige una opción —</option>
               {VOCACIONES.map((v) => (
                 <option key={v.value} value={v.value}>{v.label}</option>
               ))}
@@ -396,11 +397,11 @@ ${data.operador_nombre}`;
             Tratamiento de datos personales
           </p>
           <p className="text-xs text-slate-400 leading-relaxed mb-3">
-            Al enviar este mensaje aceptás que tus datos (nombre, email, ubicación,
+            Al enviar este mensaje aceptas que tus datos (nombre, email, ubicación,
             datos de la finca) sean usados por Guatoc/Chagra para crear tu acceso
             al piloto y contactarte por temas relacionados al proyecto. Marco
-            normativo: Ley 1581/2012 (Habeas Data Colombia) — los datos los manejás
-            vos como titular, podés solicitar su rectificación, oposición o
+            normativo: Ley 1581/2012 (Habeas Data Colombia) — los datos los manejas
+            tú como titular, puedes solicitar su rectificación, oposición o
             supresión escribiendo a {' '}
             <a href={`mailto:${MIGUEL_EMAIL}`} className="text-emerald-500 hover:text-emerald-400 underline">
               {MIGUEL_EMAIL}
@@ -470,15 +471,15 @@ ${data.operador_nombre}`;
           <div className="mt-6 rounded-xl bg-slate-900/60 border border-slate-800 p-4 flex items-center gap-2 text-sm text-slate-400">
             <ChevronRight size={18} className="text-slate-500" />
             {camposCompletos
-              ? 'Marcá la casilla de aceptación de condiciones para enviar.'
-              : 'Completá los campos marcados con * para continuar.'}
+              ? 'Marca la casilla de aceptación de condiciones para enviar.'
+              : 'Completa los campos marcados con * para continuar.'}
           </div>
         )}
 
         <div className="mt-12 pt-6 border-t border-slate-800 text-xs text-slate-500 leading-relaxed">
           <p>
             Tus datos NO se guardan en este sitio — esta página solo genera un
-            mensaje que vos enviás manualmente. Sin servidor, sin base de datos.
+            mensaje que tú envías manualmente. Sin servidor, sin base de datos.
           </p>
           <p className="mt-2">
             <a href="#dashboard" className="text-emerald-500 hover:text-emerald-400 underline">
