@@ -221,9 +221,9 @@ export default function AgentScreen({ onBack }) {
           setState(STATE_IDLE);
           setError('No entendí el audio. Prueba de nuevo.');
         }
-} catch (_e) {
-        setState(STATE_IDLE);
-        setError('Error al transcribir. Habla más claro.');
+        } catch (err) {
+          setState(STATE_IDLE);
+          setError(`Error al transcribir audio: ${err.message || 'Habla más claro'}`);
       }
     } else {
       resetRecord();
