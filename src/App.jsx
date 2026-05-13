@@ -40,6 +40,7 @@ const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
 const BiodiversidadView = lazy(() => import('./components/BiodiversidadView'));
 const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
+const OnboardingPiloto = lazy(() => import('./components/OnboardingPiloto'));
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
 const ProfileScreen = lazy(() => import('./components/ProfileScreen'));
 const VoiceTelemetryScreen = lazy(() => import('./components/VoiceTelemetryScreen'));
@@ -242,6 +243,22 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    // Rutas públicas (sin auth check): onboarding-piloto. Soporta pathname
+    // (chagra.guatoc.co/onboarding-piloto) gracias al SPA fallback de Nginx
+    // que sirve index.html, hash (#onboarding-piloto), o query
+    // (?onboarding=piloto). Esto permite que pilotos invitados lleguen al
+    // form sin tener cuenta previa en FarmOS.
+    const pathname = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+    const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
+    const search = new URLSearchParams(window.location.search);
+    const isOnboardingPiloto =
+      pathname === 'onboarding-piloto' ||
+      hash === 'onboarding-piloto' ||
+      search.get('onboarding') === 'piloto';
+    if (isOnboardingPiloto) {
+      navigate('onboarding-piloto');
+      return;
+    }
     isAuthenticated().then((isAuth) => {
       navigate(isAuth ? 'dashboard' : 'login');
     });
@@ -275,6 +292,8 @@ export default function App() {
         return <LoadingFallback />;
       case 'login':
         return <LoginScreen onLoginSuccess={() => navigate('dashboard')} onSave={showToast} />;
+      case 'onboarding-piloto':
+        return <OnboardingPiloto />;
       case 'dashboard':
         return <DashboardView onNavigate={navigate} onLogout={handleLogout} lastLogMessage={lastLogMessage} />;
       case 'sembrar':
