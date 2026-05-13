@@ -18,6 +18,7 @@ import AgentFab from './components/AgentFab';
 import { ScreenShell } from './components/common/ScreenShell';
 import ChagraGrowLoader from './components/ChagraGrowLoader';
 import IosInstallBanner from './components/IosInstallBanner';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Lazy-loaded route components
 const TelemetryAlerts = lazy(() => import('./components/TelemetryAlerts'));
@@ -170,7 +171,9 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
         {plantsCount === 0 ? (
           <OnboardingHero onNavigate={onNavigate} />
         ) : (
-          <TelemetryAlerts onNavigate={onNavigate} lastFarmOsLog={lastLogMessage} />
+          <ErrorBoundary>
+            <TelemetryAlerts onNavigate={onNavigate} lastFarmOsLog={lastLogMessage} />
+          </ErrorBoundary>
         )}
 
         {noGeoCount > 0 && (
@@ -348,7 +351,11 @@ export default function App() {
       case 'help':
         return <HelpManual onBack={() => navigate('dashboard')} onNavigate={navigate} />;
       case 'agente':
-        return <AgentScreen onBack={() => navigate('dashboard')} />;
+        return (
+          <ErrorBoundary>
+            <AgentScreen onBack={() => navigate('dashboard')} />
+          </ErrorBoundary>
+        );
       default:
         return <div className="h-[100dvh] bg-slate-950 text-white flex items-center justify-center">Vista no disponible</div>;
     }
