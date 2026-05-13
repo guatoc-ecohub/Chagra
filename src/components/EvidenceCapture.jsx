@@ -6,6 +6,7 @@ import { analyzeFoliage } from '../services/aiService';
 import { proximityCheck } from '../utils/spatialAnalysis';
 import { wktToGeoJson } from '../utils/geo';
 import AIStreamPanel from './common/AIStreamPanel';
+import { ErrorBoundary } from './ErrorBoundary';
 import { savePayload } from '../services/payloadService';
 import { useGeolocation } from '../hooks/useGeolocation';
 
@@ -288,13 +289,15 @@ export const EvidenceCapture = ({
       )}
 
       {diagnosing && (
-        <AIStreamPanel
-          text={liveDiagnosis}
-          active
-          label="Analizando follaje"
-          accent="morpho"
-          meta={<span className="font-mono">gemma3:4b · visión</span>}
-        />
+        <ErrorBoundary>
+          <AIStreamPanel
+            text={liveDiagnosis}
+            active
+            label="Analizando follaje"
+            accent="morpho"
+            meta={<span className="font-mono">gemma3:4b · visión</span>}
+          />
+        </ErrorBoundary>
       )}
 
       {/* Botón de captura */}
