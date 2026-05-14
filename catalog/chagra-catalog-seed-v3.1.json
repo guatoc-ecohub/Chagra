@@ -4519,6 +4519,322 @@
         "ica-resolucion-3168-2015"
       ],
       "validation_level": "claude_draft"
+    },
+    {
+      "id": "vaccinium_meridionale",
+      "nombre_comun": "Mortino / Agraz",
+      "nombre_cientifico": "Vaccinium meridionale Sw.",
+      "familia_botanica": "Ericaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2500,
+        "optimo_max": 3200,
+        "max_absoluto": 3600
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 8,
+        "optimo_max": 16,
+        "max_tolerable": 22
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinacion lenta (3-6 meses); requiere estratificacion fria. Tambien por acodo y esqueje semi-lenoso con hormonas."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina",
+        "uicn-red-list"
+      ],
+      "valor_pedagogico": "Fruto sagrado muisca: el mortino representa la conexion entre el paramo y la alimentacion tradicional. Su recoleccion estacional ensena los ciclos de la naturaleza y la importancia de no sobreexplotar.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "vaccinium_floribundum",
+      "nombre_comun": "Agraz de paramo",
+      "nombre_cientifico": "Vaccinium floribundum Kunth",
+      "familia_botanica": "Ericaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2500,
+        "optimo_min": 2800,
+        "optimo_max": 3500,
+        "max_absoluto": 4000
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 6,
+        "optimo_max": 14,
+        "max_tolerable": 20
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Especie de paramo no domesticada; su propagacion asistida esta en fase experimental. Depende de dispersion por aves y roedores nativos."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina",
+        "uicn-red-list"
+      ],
+      "valor_pedagogico": "Centinela del paramo: el agraz marca el limite superior del bosque altoandino. Su presencia indica un ecosistema saludable y es fuente de alimento para la fauna paramuna.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "vasconcellea_pubescens",
+      "nombre_comun": "Papayuela / Papayo de monte",
+      "nombre_cientifico": "Vasconcellea pubescens A.DC.",
+      "familia_botanica": "Caricaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Planta dioica (individuos macho y hembra); requiere un macho por cada 5-8 hembras para polinizacion. Crecimiento rapido, vida corta (4-6 anos)."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-colombia",
+        "agrosavia-tibaitata"
+      ],
+      "valor_pedagogico": "Dioecia visible: la papayuela ensena la diferencia entre plantas masculinas y femeninas. Sus frutos cocidos en almibar son memoria viva de la cocina tradicional cundiboyacense.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "fragaria_vesca",
+      "nombre_comun": "Fresa silvestre andina",
+      "nombre_cientifico": "Fragaria vesca L.",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio",
+        "paramo",
+        "templado"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2500,
+        "optimo_max": 3300,
+        "max_absoluto": 3700
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 8,
+        "optimo_max": 18,
+        "max_tolerable": 24
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "estolon",
+        "notas": "Se reproduce vegetativamente por estolones; tambien por semilla pero con menor tasa de exito. Variantes andinas adaptadas a mayor altitud que la europea."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina"
+      ],
+      "valor_pedagogico": "El fruto escondido: la fresa silvestre crece a ras del suelo en los bordes del bosque andino, ensenando que los mejores alimentos a veces estan donde menos se espera. Su estolon es leccion de reproduccion asexual.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "rubus_glaucus",
+      "nombre_comun": "Mora andina / Mora de Castilla",
+      "nombre_cientifico": "Rubus glaucus Benth.",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "living_fence"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1800,
+        "optimo_max": 2600,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 13,
+        "optimo_max": 18,
+        "max_tolerable": 22
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "acodo",
+        "notas": "Propagacion por acodo de punta o esqueje. La forma silvestre presenta espinas; requiere tutorado en espaldera. Produce frutos a partir del segundo ano."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "La espina que protege: la mora silvestre ensena que las defensas naturales de las plantas tienen un proposito. Su cultivo en espaldera muestra como la agricultura domestica sin eliminar la esencia silvestre.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "solanum_quitoense",
+      "nombre_comun": "Lulo / Naranjilla / Chuva",
+      "nombre_cientifico": "Solanum quitoense Lam.",
+      "familia_botanica": "Solanaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1600,
+        "optimo_max": 2400,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 16,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Requiere sombra en etapas tempranas; sensible a nematodos del genero Meloidogyne. Se asocia bien con platano o maiz como sombra temporal."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "Acidez que refresca: el lulo es el citrico andino por excelencia. Ensea la importancia de la acidez como mecanismo de defensa natural y su valor en la gastronomia tradicional.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "hesperomeles_obtusifolia",
+      "nombre_comun": "Durazno criollo / Pesgua / Cerote",
+      "nombre_cientifico": "Hesperomeles obtusifolia (Pers.) Lindl.",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_protegido",
+      "altitud_msnm": {
+        "min_absoluto": 2200,
+        "optimo_min": 2600,
+        "optimo_max": 3300,
+        "max_absoluto": 3700
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 7,
+        "optimo_max": 15,
+        "max_tolerable": 22
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Especie nativa de crecimiento lento; no se cultiva comercialmente. Sus frutos son consumidos por aves y mamiferos dispersores del bosque altoandino."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina",
+        "uicn-red-list"
+      ],
+      "valor_pedagogico": "El falso durazno: sus frutos recuerdan al durazno europeo pero pertenecen a un genero nativo andino. Ensea la diferencia entre especies nativas y exoticas, y como los nombres populares a veces confunden.",
+      "validation_level": "claude_draft"
     }
   ],
   "biopreparados": [
