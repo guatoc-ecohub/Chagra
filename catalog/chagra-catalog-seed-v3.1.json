@@ -5336,6 +5336,297 @@
       "validation_level": "claude_draft"
     },
     {
+      "id": "thymus_vulgaris",
+      "nombre_comun": "Tomillo",
+      "nombre_comunes_regionales": [
+        "Tomillo común",
+        "Tomillo de jardín"
+      ],
+      "nombre_cientifico": "Thymus vulgaris L.",
+      "familia_botanica": "Lamiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 800,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinación lenta (14-21 dias); tambien se propaga por esqueje o division de mata. Tolera suelos pobres y secos."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "valor_pedagogico": "Leccion de rusticidad mediterranea: muestra como una planta con aceites esenciales volatiles sobrevive en suelos pobres y repele plagas del huerto andino."
+    },
+    {
+      "id": "eryngium_foetidum",
+      "nombre_comun": "Cilantro cimarron",
+      "nombre_comunes_regionales": [
+        "Culantro",
+        "Recao",
+        "Cilantro de monte"
+      ],
+      "nombre_cientifico": "Eryngium foetidum L.",
+      "familia_botanica": "Apiaceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 500,
+        "optimo_max": 2200,
+        "max_absoluto": 2600
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 15,
+        "optimo_max": 25,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinacion lenta; siembra directa o en bandeja. Una vez establecido, se resiembra solo con facilidad en el huerto."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "Hierba nativa de las Americas cuyo aroma intenso es parte vital del 'hogao' colombiano. Enseña la relevancia de las especias locales frente a las introducidas."
+    },
+    {
+      "id": "cucurbita_maxima",
+      "nombre_comun": "Calabaza / Auyama",
+      "nombre_comunes_regionales": [
+        "Zapallo",
+        "Calabazo",
+        "Auyama"
+      ],
+      "nombre_cientifico": "Cucurbita maxima Duchesne",
+      "familia_botanica": "Cucurbitaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "flor",
+      "estrato": "rastrero",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 1000,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 16,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa en sitio definitivo. Necesita buen espacio para sus guias rastreras. Las flores masculinas se cosechan temprano en la manana para consumo."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "fao-ecocrop"
+      ],
+      "valor_pedagogico": "En la milpa andina, sus flores rellenas de queso y huevo son patrimonio culinario de Cundinamarca. La planta entera enseña el sistema de 'tres hermanas' con maiz y frijol."
+    },
+    {
+      "id": "matricaria_chamomilla",
+      "nombre_comun": "Manzanilla",
+      "nombre_comunes_regionales": [
+        "Camomila",
+        "Manzanilla dulce"
+      ],
+      "nombre_cientifico": "Matricaria chamomilla L.",
+      "familia_botanica": "Asteraceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 800,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Resiembra natural prolifica; las semillas germinan sobre la superficie del suelo con luz. Se recomienda no cubrirlas."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "valor_pedagogico": "La infusion mas antigua del mundo. En la chagra chiguana, ensena el valor de las plantas indicadoras: su presencia senala suelos compactados que necesitan aireacion."
+    },
+    {
+      "id": "taraxacum_officinale",
+      "nombre_comun": "Diente de leon",
+      "nombre_comunes_regionales": [
+        "Amargon",
+        "Taraxaco",
+        "Lechuguilla"
+      ],
+      "nombre_cientifico": "Taraxacum officinale F.H.Wigg.",
+      "familia_botanica": "Asteraceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "templado",
+        "frio",
+        "paramo"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 1500,
+        "optimo_max": 3200,
+        "max_absoluto": 3600
+      },
+      "temperatura_c": {
+        "helada_letal": -15,
+        "optimo_min": 8,
+        "optimo_max": 18,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa; las semillas con vilano se dispersan por viento. Especie pionera que mejora la estructura del suelo con su raiz pivotante profunda."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "valor_pedagogico": "Leccion de acumulacion dinamica: su raiz pivotante extrae potasio, calcio y hierro de capas profundas. Sus flores son el primer alimento de las abejas nativas al inicio de la temporada de lluvias."
+    },
+    {
+      "id": "artemisia_absinthium",
+      "nombre_comun": "Ajenjo",
+      "nombre_comunes_regionales": [
+        "Hierba mora medicinal",
+        "Artemisa amarga",
+        "Absintio"
+      ],
+      "nombre_cientifico": "Artemisia absinthium L.",
+      "familia_botanica": "Asteraceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -15,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "division_mata",
+        "notas": "Propagacion por semilla o division de raiz. Crece vigorosamente en suelos pobres. Sus aceites amargos (tuyona) son potentes repelentes de plagas en el huerto."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "companions": [],
+      "antagonists": [],
+      "valor_pedagogico": "Leccion de alelopatia: su fuerte olor y sabor amargo ensenan como las plantas se defienden quimicamente en la naturaleza. Tradicionalmente usada en macerados para control de insectos en la chagra."
+    },
+    {
       "id": "avena_sativa",
       "nombre_comun": "Avena forrajera",
       "nombre_comunes_regionales": [
@@ -6583,15 +6874,6 @@
       "titulo": "Fichas técnicas de leguminosas andinas (haba, arveja, lenteja, frijol)",
       "institucion": "Corporación Colombiana de Investigación Agropecuaria (AGROSAVIA)",
       "observaciones": "Compilación de fichas técnicas de AGROSAVIA para leguminosas de clima frío. Año y volumen pendientes de consolidación."
-    },
-    {
-      "id": "restrepo-2005-agroecologia",
-      "tipo": "libro",
-      "autores": "Restrepo Rivera, J.",
-      "año": 2005,
-      "titulo": "Agroecología colombiana: principios y prácticas de la agricultura orgánica en los Andes colombianos",
-      "revista_o_editorial": "Fundación Juquira Candiru",
-      "observaciones": "Fuente Tier A para abonos verdes, coberturas y rotaciones en agricultura orgánica altoandina."
     }
   ]
 }
