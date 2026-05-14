@@ -78,8 +78,10 @@ export default function TelemetryAlerts() {
   // lo renderice en su propio bloque cyberpunk diferenciado.
   const [aiFinalText, setAiFinalText] = useState('');
 
-  // Variables de Entorno (Requeridas en el archivo .env)
-  const HA_TOKEN = import.meta.env.VITE_HA_ACCESS_TOKEN;
+  // Authorization header se inyecta server-side en Nginx desde SOPS
+  // (audit #2). VITE_HA_ACCESS_TOKEN ya no se lee — el token vivía en el
+  // bundle JS y era leak Ley 1581. Ahora /api/ha/ proxy de chagra.guatoc.co
+  // agrega `proxy_set_header Authorization "Bearer ..."` con el secret.
 
   // Helper de observabilidad (v0.7.2)
   const logTelemetryEvent = (kind, payload = {}, level = 'info') => {
@@ -264,12 +266,6 @@ export default function TelemetryAlerts() {
       return;
     }
 
-    if (!HA_TOKEN) {
-      console.warn('TelemetryAlerts: VITE_HA_ACCESS_TOKEN no configurado en el archivo .env');
-      setError('Telemetria no disponible. Verifica configuracion con el administrador.');
-      return;
-    }
-
     setLoading(true);
     setError(null);
     setLiveAnalysis('');
@@ -277,9 +273,9 @@ export default function TelemetryAlerts() {
     setAiMeta(null);
 
     try {
-      // 1. Ingesta de Datos Domóticos (Home Assistant) - IDs Zigbee físicos
-      const haHeaders = { 'Authorization': `Bearer ${HA_TOKEN}`, 'Content-Type': 'application/json' };
-      const haOpts = { method: 'GET', headers: haHeaders, signal: parentSignal };
+      // 1. Ingesta de Datos Domóticos (Home Assistant) - IDs Zigbee físicos.
+      // Authorization se inyecta server-side via Nginx (audit #2 leak fix).
+      const haOpts = { method: 'GET', headers: { 'Content-Type': 'application/json' }, signal: parentSignal };
       const [invernaderoHum, invernaderoTemp, tabacoHum, tabacoTemp] = await Promise.all([
         fetch(`${HA_URL}/states/sensor.matera_cocina_humidity`, haOpts),
         fetch(`${HA_URL}/states/sensor.matera_cocina_temperature`, haOpts),
@@ -405,7 +401,7 @@ export default function TelemetryAlerts() {
       try {
         const histResp = await fetch(
           `${HA_URL}/history/period/${historyStart}?filter_entity_id=${entityIds.join(',')}&minimal_response&no_attributes`,
-          { headers: { 'Authorization': `Bearer ${HA_TOKEN}`, 'Content-Type': 'application/json' }, signal: parentSignal }
+          { headers: { 'Content-Type': 'application/json' }, signal: parentSignal }
         );
         if (histResp.ok) {
           const histData = await histResp.json();
