@@ -2540,7 +2540,7 @@
         "metodo_principal": "semilla",
         "notas": "Inocular con Rhizobium para optimizar la fijación de nitrógeno."
       },
-      "valor_pedagogico": "Lección de biología de suelo: estudio de los nódulos radiculares y la simbiosis con Rhizobium leguminosarum.",
+       "valor_pedagogico": "El frijol común (Phaseolus vulgaris L.) es un fijador de nitrógeno esencial en sistemas agrícolas andinos, contribuyendo con 50-80 kg N/ha mediante simbiosis con Rhizobium leguminosarum. En Colombia se cultiva ampliamente en departamentos como Cundinamarca (cinturón productivo Fómeque-Choachí), Boyacá y Nariño, entre 800-2800 msnm en zonas térmicas fría, templada y cálida. Varietales destacados incluyen Cargamanto, Bola Roja y Radical. Su manejo agronómico incluye propagación por semilla, ciclo de 3-4 meses, asociación tradicional en el sistema '3 hermanas' con maíz y ahuyama, y requiere monitoreo de plagas como Empoasca kraemeri y Bemisia tabaci. Culturalmente, ha sido parte fundamental de la dieta muisca y campesina andina desde época precolombina, utilizado en preparaciones como sopas, guisos y harinas. Fuente: nrc-1989-cultivos-andinos.",
       "plagas_criticas": [
         "Empoasca kraemeri",
         "Apion godmani",
@@ -2550,11 +2550,12 @@
         "Colletotrichum lindemuthianum (antracnosis)",
         "Uromyces appendiculatus"
       ],
-      "source_ids": [
-        "agrosavia-manual-biopreparados-2015",
-        "gbif-taxonomic-backbone",
-        "restrepo-1996-abc-agricultura-organica"
-      ],
+       "source_ids": [
+         "nrc-1989-cultivos-andinos",
+         "agrosavia-leguminosas-andinas",
+         "gbif-taxonomic-backbone",
+         "ica-resolucion-3168-2015"
+       ],
       "validation_level": "claude_draft"
     },
     {
@@ -3068,10 +3069,12 @@
         "metodo_principal": "acodo",
         "notas": "Variedad seleccionada para facilitar la poda y cosecha sin las espinas tradicionales; requiere tutorado en espaldera."
       },
-      "source_ids": [
-        "sib-colombia",
-        "ica-resolucion-3168-2015"
-      ],
+       "source_ids": [
+         "nrc-1989-cultivos-andinos",
+         "agrosavia-leguminosas-andinas",
+         "gbif-taxonomic-backbone",
+         "ica-resolucion-3168-2015"
+       ],
       "valor_pedagogico": "Lección de domesticación: muestra las ventajas de la selección varietal para mejorar la ergonomía y la seguridad en la agricultura familiar."
     },
     {
