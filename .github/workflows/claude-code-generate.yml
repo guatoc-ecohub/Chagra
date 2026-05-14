@@ -147,16 +147,23 @@ jobs:
           # (mantiene `claude-code` en extraPackages como backup para
           # reactivación si operador habilita billing Anthropic API).
           #
+          # PIVOT 2026-05-14: big-pickle reportó cola larga + silent failures
+          # post auditoría master valor real producto. Cambio a nemotron-3-super-free
+          # (Nvidia Nemotron Super 3, free tier 2026, fuerte JSON + reasoning
+          # científico estructurado, mejor para species + valor_pedagogico
+          # narrativo). Fallback alternativos: minimax-m2.5-free (long-context),
+          # hy3-preview-free (Hyper-Yarn 3 preview).
+          #
           # opencode run flags:
           # --dir: working directory donde opencode opera (incluye cd to repo)
           # --dangerously-skip-permissions: equivalente a --permission-mode acceptEdits
-          # -m opencode/big-pickle: modelo free tier opencode.ai (sin API key)
+          # -m opencode/nemotron-3-super-free: Nvidia Nemotron Super free tier
           # --format json: streaming JSON events para audit chain
           # message como argv positional (opencode no acepta stdin como prompt)
           opencode run \
             --dir "$GITHUB_WORKSPACE" \
             --dangerously-skip-permissions \
-            -m opencode/big-pickle \
+            -m opencode/nemotron-3-super-free \
             --format json \
             "$(cat "$PROMPT_FILE")" \
             > "$OUTPUT_FILE"
