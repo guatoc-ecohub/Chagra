@@ -2086,9 +2086,11 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
-        "pamplona-roger-2006-plantas-medicinales"
+        "powo-kew",
+        "perez-arbelaez-1947-plantas-utiles",
+        "jbb-plantas-medicinales"
       ],
-      "valor_pedagogico": "Lección de expansión: muestra cómo las plantas colonizan espacio mediante sistemas radiculares horizontales (estolones)."
+      "valor_pedagogico": "La Mentha spicata (Labiada aromática) se cultiva perenne en huertas de Cundinamarca entre 500-2600 msnm en zonas térmicas cálidas, templadas y frías. Su propagación se realiza mediante esquejes y estolones, requiere control de invasividad mediante barreras físicas y se asocia beneficiosamente con tomate y repollo al repeler pulgón. En contexto campesino andino, su infusión digestiva (té de menta) se usa tradicionalmente para aliviar molestias gastrointestinales, aprovechando su aceite esencial rico en carvona y limoneno. Fuente taxonómica validada por GBIF Backbone Taxonomy y Plants of the World Online (POWO)."
     },
     {
       "id": "origanum_vulgare",
