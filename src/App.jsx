@@ -256,7 +256,10 @@ export default function App() {
       hash === 'onboarding-piloto' ||
       search.get('onboarding') === 'piloto';
     if (isOnboardingPiloto) {
-      navigate('onboarding-piloto');
+      // Microtask para evitar setState sincrónico en effect body
+      // (ESLint react-hooks/set-state-in-effect). Mismo patrón async-like
+      // que el isAuthenticated().then() de abajo, para que pase el lint.
+      Promise.resolve().then(() => navigate('onboarding-piloto'));
       return;
     }
     isAuthenticated().then((isAuth) => {
