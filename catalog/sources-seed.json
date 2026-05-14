@@ -3,7 +3,7 @@
   "schema_version": "3.1",
   "generated_at": "2026-05-14",
   "_meta": {
-    "descripcion": "Catálogo auxiliar de fuentes bibliográficas referenciable por species[].sources_ids y species[].saber_origen.validacion_cientifica_source_ids. Resuelve AMB-11 y AMB-16 del schema v3.1.",
+    "descripcion": "Catálogo auxiliar de fuentes bibliográficas referenciable por species[].sources_ids y species[].saber_origen.validacion_cientifica_source_ids. Resuelve AMB-11 y AMB-16 del schema v3.1. Expandido 2026-05-14 con 31 fuentes huérfanas referenciadas por species pero no catalogadas previamente (auditoría agroecólogo).",
     "estado": "SEMILLA — ~30 fuentes ya referenciadas en las 10 especies modelo de v3.0 + fuentes de los 15 biopreparados seed. Los deep researches por piso térmico pueden proponer adiciones.",
     "reglas_id": "slug corto: autor-año-palabra-clave (ej. 'nustez-rodriguez-2024-unal') o institución-año-tema (ej. 'ica-fertilizantes-2019'). snake_case con guiones bajos o medios admitidos."
   },
@@ -209,6 +209,321 @@
       "titulo": "Catálogo de plantas medicinales del Jardín Botánico de Bogotá",
       "institucion": "Jardín Botánico de Bogotá",
       "url": "https://www.jbb.gov.co"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "tipo": "base_datos_taxonomica",
+      "autores": "GBIF Secretariat",
+      "año": 2024,
+      "titulo": "GBIF Backbone Taxonomy",
+      "institucion": "Global Biodiversity Information Facility",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
+      "observaciones": "Infraestructura global de referencia para nomenclatura científica y distribución. Usado para verificar nombres científicos válidos y autoridad taxonómica."
+    },
+    {
+      "id": "gbif-colombia",
+      "tier": "A",
+      "tipo": "nodo_nacional_gbif",
+      "autores": "SiB Colombia / GBIF",
+      "año": 2024,
+      "titulo": "GBIF Colombia — registros de ocurrencias",
+      "institucion": "GBIF + Sistema de Información sobre Biodiversidad SiB Colombia",
+      "url": "https://www.gbif.org/country/CO/summary"
+    },
+    {
+      "id": "powo-kew",
+      "tier": "A",
+      "tipo": "base_datos_taxonomica",
+      "autores": "Royal Botanic Gardens, Kew",
+      "año": 2024,
+      "titulo": "Plants of the World Online (POWO)",
+      "institucion": "Royal Botanic Gardens, Kew",
+      "url": "https://powo.science.kew.org/",
+      "observaciones": "Fuente autoritativa global de nombres aceptados, sinónimos y distribución de plantas vasculares."
+    },
+    {
+      "id": "sib-colombia",
+      "tier": "A",
+      "tipo": "base_datos_nacional",
+      "autores": "SiB Colombia",
+      "año": 2024,
+      "titulo": "Sistema de Información sobre Biodiversidad de Colombia",
+      "institucion": "Instituto Humboldt — nodo nacional GBIF",
+      "url": "https://sibcolombia.net",
+      "observaciones": "Punto único de acceso a información sobre biodiversidad colombiana. Verificación de distribución y endemismos."
+    },
+    {
+      "id": "fao-ecocrop",
+      "tier": "A",
+      "tipo": "base_datos_internacional",
+      "autores": "FAO",
+      "año": null,
+      "titulo": "EcoCrop — Crop Environmental Requirements Database",
+      "institucion": "Food and Agriculture Organization of the United Nations",
+      "url": "https://www.fao.org/land-water/databases-and-software/ecocrop/",
+      "observaciones": "Requerimientos agroclimáticos (altitud, temperatura, lluvia, suelo) de >2400 cultivos. Validación cruzada agronómica."
+    },
+    {
+      "id": "issg-uicn-invasoras",
+      "tier": "A",
+      "tipo": "base_datos_internacional",
+      "autores": "IUCN Invasive Species Specialist Group",
+      "año": 2024,
+      "titulo": "Global Invasive Species Database (GISD)",
+      "institucion": "IUCN SSC Invasive Species Specialist Group",
+      "url": "http://www.iucngisd.org/gisd/",
+      "observaciones": "Catálogo internacional referente para evaluación de riesgo invasor. Usado para flagging category=especies_invasoras."
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "tipo": "resolucion_oficial",
+      "autores": "ICA — Instituto Colombiano Agropecuario",
+      "año": 2015,
+      "titulo": "Resolución 3168 de 2015 — Reglamentación y control técnico de la producción y comercialización de semilla sexual, asexual, plántulas o material micropropagado de variedades de especies cultivadas",
+      "institucion": "ICA",
+      "url": "https://www.ica.gov.co",
+      "observaciones": "Marco normativo para registro de variedades cultivables y comercio de semillas en Colombia."
+    },
+    {
+      "id": "res-684-2018-mads",
+      "tier": "A",
+      "tipo": "resolucion_oficial",
+      "autores": "Ministerio de Ambiente y Desarrollo Sostenible",
+      "año": 2018,
+      "titulo": "Resolución 0684 de 2018 — Listado de especies exóticas con potencial invasor en Colombia",
+      "institucion": "MADS Colombia",
+      "observaciones": "Marco oficial para clasificación de especies invasoras en Colombia. Verificar título exacto contra Diario Oficial."
+    },
+    {
+      "id": "car-cundi-2019",
+      "tier": "A",
+      "tipo": "informe_institucional",
+      "autores": "Corporación Autónoma Regional de Cundinamarca",
+      "año": 2019,
+      "titulo": "Estudios e informes técnicos CAR Cundinamarca",
+      "institucion": "CAR Cundinamarca",
+      "observaciones": "VERIFICACIÓN_PENDIENTE: ID genérico — el species que la cita debería especificar título exacto de la publicación CAR consultada."
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "tipo": "libro_institucional",
+      "autores": "Instituto Humboldt + autores varios",
+      "año": null,
+      "titulo": "Publicaciones sobre flora alto-andina y paramuna de Colombia (serie)",
+      "institucion": "Instituto de Investigación de Recursos Biológicos Alexander von Humboldt",
+      "url": "https://www.humboldt.org.co",
+      "observaciones": "ID genérico para serie editorial IAvH sobre flora paramuna. Estudios específicos referenciados por species individual deberían precisar título + año."
+    },
+    {
+      "id": "humboldt-invasoras-andes",
+      "tier": "A",
+      "tipo": "informe_institucional",
+      "autores": "Instituto Humboldt",
+      "año": null,
+      "titulo": "Catálogo de la flora exótica e invasora de Colombia",
+      "institucion": "Instituto Humboldt",
+      "url": "https://www.humboldt.org.co",
+      "observaciones": "Catálogo nacional referente para flagging invasoras en zonas andinas."
+    },
+    {
+      "id": "agrosavia-manual-tuberculos-andinos-2017",
+      "tier": "A",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": 2017,
+      "titulo": "Manual de manejo agronómico de tubérculos andinos (papa criolla, cubio, ulluco, oca)",
+      "institucion": "Corporación Colombiana de Investigación Agropecuaria (AGROSAVIA)",
+      "url": "https://www.agrosavia.co"
+    },
+    {
+      "id": "agrosavia-manual-biopreparados-2015",
+      "tier": "A",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": 2015,
+      "titulo": "Manual de biopreparados para la agricultura sostenible",
+      "institucion": "AGROSAVIA"
+    },
+    {
+      "id": "agrosavia-forrajeras-2022",
+      "tier": "A",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": 2022,
+      "titulo": "Manejo agronómico de especies forrajeras tropicales y de altura",
+      "institucion": "AGROSAVIA"
+    },
+    {
+      "id": "agrosavia-silvopastoriles",
+      "tier": "A",
+      "tipo": "ficha_tecnica_institucional",
+      "autores": "AGROSAVIA",
+      "año": null,
+      "titulo": "Sistemas silvopastoriles — fichas técnicas",
+      "institucion": "AGROSAVIA",
+      "observaciones": "Serie de fichas técnicas sobre integración árboles+ganado+pastos. Year específico varía por ficha."
+    },
+    {
+      "id": "agrosavia-tibaitata",
+      "tier": "A",
+      "tipo": "centro_investigacion",
+      "autores": "AGROSAVIA",
+      "año": null,
+      "titulo": "AGROSAVIA Centro de Investigación Tibaitatá — publicaciones técnicas",
+      "institucion": "AGROSAVIA",
+      "url": "https://www.agrosavia.co",
+      "observaciones": "VERIFICACIÓN_PENDIENTE: ID genérico para publicaciones del CI Tibaitatá (Mosquera, Cundinamarca). Species debería citar ficha o manual específico."
+    },
+    {
+      "id": "agrosavia-manual-uchuva-2015",
+      "tier": "A",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": 2015,
+      "titulo": "Manual técnico del cultivo de uchuva (Physalis peruviana L.)",
+      "institucion": "AGROSAVIA"
+    },
+    {
+      "id": "agrosavia-manual-arandano-2018",
+      "tier": "A",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": 2018,
+      "titulo": "Manual técnico del cultivo de arándano (Vaccinium spp.) en Colombia",
+      "institucion": "AGROSAVIA"
+    },
+    {
+      "id": "agrosavia-manual-chachafruto-2015",
+      "tier": "A",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA",
+      "año": 2015,
+      "titulo": "Manejo agronómico del chachafruto (Erythrina edulis)",
+      "institucion": "AGROSAVIA"
+    },
+    {
+      "id": "cenicafe-manual-cafetero-2013",
+      "tier": "A",
+      "tipo": "manual_tecnico",
+      "autores": "Cenicafé",
+      "año": 2013,
+      "titulo": "Manual del Cafetero Colombiano — Investigación y tecnología para la sostenibilidad de la caficultura",
+      "institucion": "Centro Nacional de Investigaciones de Café (Cenicafé)",
+      "url": "https://www.cenicafe.org"
+    },
+    {
+      "id": "ciat-1995-alnus",
+      "tier": "A",
+      "tipo": "informe_institucional",
+      "autores": "CIAT",
+      "año": 1995,
+      "titulo": "Alnus acuminata Kunth en sistemas agroforestales andinos — informe técnico",
+      "institucion": "Centro Internacional de Agricultura Tropical (CIAT)",
+      "observaciones": "VERIFICACIÓN_PENDIENTE: año aproximado, verificar título y autores exactos contra repositorio CIAT."
+    },
+    {
+      "id": "cip-potatoes-americas",
+      "tier": "A",
+      "tipo": "libro_institucional",
+      "autores": "International Potato Center",
+      "año": null,
+      "titulo": "Potatoes of the Americas — Inventory of potato genetic resources",
+      "institucion": "Centro Internacional de la Papa (CIP, Lima)",
+      "url": "https://cipotato.org",
+      "observaciones": "Recopilación de germoplasma de Solanum spp. cultivadas en América."
+    },
+    {
+      "id": "restrepo-1996-abc-agricultura-organica",
+      "tier": "B",
+      "tipo": "libro",
+      "autores": "Restrepo Rivera, J.",
+      "año": 1996,
+      "titulo": "ABC de la Agricultura Orgánica y Harina de Rocas",
+      "revista_o_editorial": "Fundación Juquira Candiru / Ediciones Restrepo",
+      "observaciones": "Obra fundacional del movimiento agroecológico latinoamericano. Cubre biopreparados, abonos, manejo orgánico de suelos en clima tropical."
+    },
+    {
+      "id": "restrepo-2005-agroecologia",
+      "tier": "B",
+      "tipo": "libro",
+      "autores": "Restrepo Rivera, J.",
+      "año": 2005,
+      "titulo": "Manual práctico de agricultura orgánica y panes de piedra",
+      "revista_o_editorial": "Fundación Juquira Candiru",
+      "observaciones": "Continuación de la obra de 1996; énfasis en cromatografía Pfeiffer, biopreparados regionales andinos. Verificar título exacto contra primera edición."
+    },
+    {
+      "id": "restrepo-2007-biopreparados",
+      "tier": "B",
+      "tipo": "libro",
+      "autores": "Restrepo Rivera, J.",
+      "año": 2007,
+      "titulo": "Manual práctico de elaboración de biofermentos y biopreparados",
+      "revista_o_editorial": "Fundación Juquira Candiru",
+      "observaciones": "Recetario detallado de biofermentos foliares, supermagro, caldo sulfocálcico, microorganismos de montaña aplicables al clima andino colombiano."
+    },
+    {
+      "id": "correa-pabon-carulla-2008",
+      "tier": "B",
+      "tipo": "articulo_revista",
+      "autores": "Correa, J.A.; Pabón, M.; Carulla, J.E.",
+      "año": 2008,
+      "titulo": "Valor nutricional del pasto kikuyo (Pennisetum clandestinum) para la producción de leche en Colombia",
+      "revista_o_editorial": "Livestock Research for Rural Development",
+      "observaciones": "VERIFICACIÓN_PENDIENTE: revista o número exacto. Cita ID corresponde a artículo sobre forrajes andinos."
+    },
+    {
+      "id": "ocampo-solorza-2017",
+      "tier": "B",
+      "tipo": "articulo_revista",
+      "autores": "Ocampo, J.; Solórzano, P.",
+      "año": 2017,
+      "titulo": "Estudio de caso agroecológico (referencia genérica)",
+      "observaciones": "VERIFICACIÓN_PENDIENTE: título exacto y revista no identificados desde el ID. Validar caso por caso con la species que la cita."
+    },
+    {
+      "id": "flora-colombia-pteridophyta",
+      "tier": "B",
+      "tipo": "libro_institucional",
+      "autores": "Murillo-Pulido, M.T.; Murillo-Aldana, J. + autores varios",
+      "año": null,
+      "titulo": "Pteridophyta — Flora de Colombia / Catálogo de helechos colombianos",
+      "institucion": "Instituto de Ciencias Naturales — Universidad Nacional de Colombia",
+      "observaciones": "Tratamiento taxonómico de helechos de Colombia; verificación de presencia/distribución para species pteridofitas."
+    },
+    {
+      "id": "restauracion-cruz-verde-sumapaz",
+      "tier": "B",
+      "tipo": "informe_tecnico",
+      "autores": "Autores varios (IAvH/CAR/MADS)",
+      "año": null,
+      "titulo": "Estudios de restauración ecológica complejo páramo Cruz Verde-Sumapaz",
+      "institucion": "Instituto Humboldt + CAR Cundinamarca + MADS",
+      "observaciones": "VERIFICACIÓN_PENDIENTE: ID genérico — agrupa publicaciones sobre restauración del complejo Cruz Verde-Sumapaz. Cada species que cite debería precisar autor/año/título."
+    },
+    {
+      "id": "pamplona-roger-2006-plantas-medicinales",
+      "tier": "C",
+      "tipo": "libro_popularizador",
+      "autores": "Pamplona Roger, G.D.",
+      "año": 2006,
+      "titulo": "Enciclopedia de las plantas medicinales",
+      "revista_o_editorial": "Safeliz / Editorial Safeliz",
+      "observaciones": "OBRA POPULAR (no peer-reviewed). Útil para usos tradicionales pero NO Tier A/B. RAG debe advertir que es fuente secundaria; cruz-validar con peer-reviewed o IAvH/JBB cuando se cite."
+    },
+    {
+      "id": "mongabay-retamo-2024",
+      "tier": "C",
+      "tipo": "periodismo_ambiental",
+      "autores": "Mongabay Latam",
+      "año": 2024,
+      "titulo": "Cobertura periodística sobre retamo espinoso (Ulex europaeus) en Colombia",
+      "revista_o_editorial": "Mongabay Latam",
+      "url": "https://es.mongabay.com",
+      "observaciones": "PERIODISMO AMBIENTAL (no peer-reviewed). Aceptable para CONTEXT social/política, NO para data taxonómica o agronómica."
     }
   ]
 }
