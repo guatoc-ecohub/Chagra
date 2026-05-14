@@ -40,7 +40,22 @@ Reglas:
 - VERBOS: el operador puede decir "sembré", "planté", "puse", "trasplante", "metí", "agregué" — todos se interpretan como registro de planta nueva. El verbo en sí no es la entidad; lo que importa es {cultivo, cantidad, lugar}.
 - MULTI-ESPECIE en una grabacion: si el operador menciona varios cultivos separados por "y", "luego", "tambien", "ademas", devuelve UN OBJETO POR CADA CULTIVO. Cada uno hereda la location si solo se menciona al final aplicable a todos.
 - Nombres de frutas y cultivos son LITERALES. Si el operador dice "banano", el crop debe ser "banano". Si dice "manzana", el crop debe ser "manzana". NO cambiar, traducir ni sustituir nunca.
-- Cultivos comunes colombianos: banano, platano, cafe, yuca, papaya, mango, limon, mandarina, naranja, aguacate, tomate, lechuga, cilantro, yerbabuena.
+- Cultivos comunes colombianos: banano, platano, cafe, yuca, papaya, mango, limon, mandarina, naranja, aguacate, tomate, lechuga, cilantro, yerbabuena, albahaca, cebolla, ajo, zanahoria, remolacha, espinaca, acelga, rabano, pepino, ahuyama, calabacin, frijol, maiz, papa, quinua, cubio, ulluco, oca, arracacha, mora, fresa, uchuva, lulo, tomate de arbol, curuba, granadilla, maracuya, guayaba, guanabana, anon, chirimoya.
+- NORMALIZACIÓN de errores comunes de transcripción (Whisper a veces parte palabras o las distorsiona). Mapea SIEMPRE a la forma canónica:
+    "al vacas" → "albahaca"     (Whisper parte alba+haca en "al"+"vacas")
+    "al baca"  → "albahaca"
+    "alvahaca" → "albahaca"
+    "abahaca"  → "albahaca"
+    "habahaca" → "albahaca"
+    "agua acate" → "aguacate"   (no "agua acate" como dos palabras)
+    "yer ba buena" → "yerbabuena"
+    "ye va buena" → "yerbabuena"
+    "ce bolla"  → "cebolla"
+    "papa ya"   → "papaya"
+    "uchu va"   → "uchuva"
+    "ma raca" / "maracuya" tienen la misma raíz; usa "maracuya".
+  Cuando hay duda sobre dos palabras pegadas o separadas, prefiere la
+  forma de UN cultivo conocido si suena similar.
 - Nunca inventes datos que no estan en la transcripcion.
 - Si no puedes extraer ninguna entidad valida, devuelve [].
 
@@ -80,6 +95,21 @@ Output: [{"crop":"limon","quantity":4,"location":"huerto"}]
 
 Input: "Sembre dos yucas en el solar"
 Output: [{"crop":"yuca","quantity":2,"location":"solar"}]
+
+Input: "Sembre cuatro al vacas, siete pepinos y ocho naranjas en guatoc"
+Output: [{"crop":"albahaca","quantity":4,"location":"guatoc"},{"crop":"pepino","quantity":7,"location":"guatoc"},{"crop":"naranja","quantity":8,"location":"guatoc"}]
+
+Input: "Plante diez abahaca"
+Output: [{"crop":"albahaca","quantity":10,"location":""}]
+
+Input: "Sembre tres agua acates en el patio"
+Output: [{"crop":"aguacate","quantity":3,"location":"patio"}]
+
+Input: "Sembre seis yer ba buena y cinco ce bolla"
+Output: [{"crop":"yerbabuena","quantity":6,"location":""},{"crop":"cebolla","quantity":5,"location":""}]
+
+Input: "Plante doce ulluco y diez cubio en la cama tres"
+Output: [{"crop":"ulluco","quantity":12,"location":"cama tres"},{"crop":"cubio","quantity":10,"location":"cama tres"}]
 
 Input: "Hoy tive un buen dia"
 Output: []`;
