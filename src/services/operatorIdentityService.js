@@ -84,7 +84,7 @@ async function deriveSalt() {
  * Calcula operator_id_hash determinista para un operator_id dado.
  * Mismo input + mismo account_uuid_master → mismo hash siempre.
  *
- * @param {string} operatorId — identidad cruda del operador (ej. "kortux@gmail.com",
+ * @param {string} operatorId — identidad cruda del operador (ej. email,
  *   nombre completo, cédula, o cualquier identificador estable elegido por el owner).
  * @returns {Promise<string>} — 64 chars hex (256 bits)
  */

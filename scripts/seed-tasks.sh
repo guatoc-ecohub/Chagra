@@ -2,7 +2,7 @@
 # =============================================================================
 # SEED: Inyección de tareas agroecológicas en FarmOS v2
 # Requiere: token OAuth válido y acceso a la API de FarmOS
-# Uso: FARMOS_URL=http://192.168.1.100:8081 FARMOS_TOKEN=<token> ./seed-tasks.sh
+# Uso: FARMOS_URL=https://farmos.example.org FARMOS_TOKEN=<token> ./seed-tasks.sh
 # =============================================================================
 set -euo pipefail
 

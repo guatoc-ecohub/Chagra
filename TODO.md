@@ -10,8 +10,7 @@
 1. **Streaming LLM real** — Ollama con `stream: true` + `ReadableStream` en cliente + ajuste de Nginx (`proxy_buffering off` en `/api/ollama/`). Aplica a visión (`aiService.js`) y respuestas de voz/Sembrar.
 2. **Estadísticas públicas — fase A (inmediata):** contadores reales locales de la instalación, pintados **en verde** para marcar "dato real". Resto de métricas (cosecha agregada, agua ahorrada, etc.) con datos simulados en otro color, con etiqueta "red Chagra (beta)". Estructura de datos diseñada desde ya para fase B.
 3. **Autorización de telemetría global** — se solicita explícitamente durante el flujo del instalador. Solo datos agregados y anonimizados salen al agregador público.
-4. **Appliance Chagra (visión)** — Raspberry Pi5 (o equivalente) por finca ejecutando Chagra local + kit de sensores. Interconexión LoRa entre appliances para sincronizar datos agregados (prioridad más baja del roadmap, explorar viabilidad antes de comprometer esfuerzo).
-5. **UX de estadísticas** — visualmente atractiva es un criterio de aceptación, no un nice-to-have.
+4. **UX de estadísticas** — visualmente atractiva es un criterio de aceptación, no un nice-to-have.
 
 ---
 
@@ -47,8 +46,7 @@
 | # | Tarea | Versión | Esfuerzo | Notas |
 |---|---|---|---|---|
 | 11 | **Agregador global de estadísticas** — endpoint público opt-in, anonimización, hosting. Fase B de stats. | 0.8.0 | XL | Requiere hosting público y políticas de privacidad |
-| 12 | **Instalador Chagra** — onboarding con GPS + API de elevación + catálogo de especies por piso térmico + seed de zonas/insumos base + consentimiento de telemetría global | 0.9.0 | XL | Catálogo curado propio (~50 cultivos colombianos por altitud). Ejecutar una vez por appliance. |
-| 13 | **Interconexión LoRa entre appliances** — sincronización de datos agregados finca↔finca vía LoRaWAN. Investigar viabilidad (alcance, duty cycle, costo de módulo) antes de comprometer esfuerzo. | Futuro | XL | **Máxima baja prioridad.** Explorar solo tras v1.0 estable. |
+| 12 | **Instalador Chagra** — onboarding con GPS + API de elevación + catálogo de especies por piso térmico + seed de zonas/insumos base + consentimiento de telemetría global | 0.9.0 | XL | Catálogo curado propio (~50 cultivos colombianos por altitud). |
 
 ---
 
@@ -58,6 +56,10 @@
 - **#3 (wifi):** stacktrace completo del navegador + versión exacta del build cacheado.
 - **#8 (alertas secundarias):** ¿los sensores actuales exponen batería en Home Assistant? Si no, bloqueante de firmware.
 - **#12 (instalador):** fuente autoritativa del catálogo de especies por piso térmico (Agrosavia, Humboldt, ICA) vs catálogo curado propio.
+
+---
+
+> **Nota:** ítems de roadmap referentes a hardware dedicado (kits sensores, sincronización LoRa entre nodos, módulos de visión IoT) viven en `chagra-pro` privado — fuera del alcance AGPL público.
 
 ---
 
