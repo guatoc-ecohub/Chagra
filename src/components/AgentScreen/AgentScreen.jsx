@@ -208,12 +208,18 @@ export default function AgentScreen({ onBack }) {
 
   const handleVoiceRecord = async () => {
     if (state === STATE_RECORDING) {
-      const blob = await stopRecord();
-      if (!blob) {
+      // stopRecord retorna { blob, durationMs, mimeType } — NO el Blob directo.
+      // Si pasas el wrapper a transcribe(), `blob.type.includes(...)` falla con
+      // "Cannot read properties of undefined (reading 'includes')". Mismo bug
+      // patrón que queue/021 ya fixeado en VoiceCapture, pero AgentScreen
+      // quedó sin el destructure cuando se migró.
+      const result = await stopRecord();
+      if (!result || !result.blob) {
         setState(STATE_IDLE);
         setError('No se capturó audio. Intenta de nuevo.');
         return;
       }
+      const { blob } = result;
       setState(STATE_THINKING);
 
       try {
