@@ -13,11 +13,13 @@ import ActionConfirmModal from '../ActionConfirmModal';
 import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
 
-// llama-server nativo expone API OpenAI-compatible en /api/llamacpp/ (proxy
-// Nginx alpha → 127.0.0.1:11435). Migrado desde /api/ollama/ según DR
-// hardware-llm-optimization CLOSED 2026-05-11: OLMoE-1B-7B Q4_K_M sobre
-// llama.cpp nativo (Flash Attention + KV cache q8_0 + AVX2 host-specific).
-const LLM_URL = '/api/llamacpp/v1/chat/completions';
+// Ollama OpenAI-compatible en /api/ollama/v1/chat/completions (proxy Nginx
+// alpha → 127.0.0.1:11434). Migrado de regreso a Ollama+gemma3:4b según
+// bench empírico 2026-05-14 — gemma3:4b winner (14.9 t/s, 3.3 GB RAM, Tier A
+// papa criolla/oca/cubio) vs OLMoE/Qwen 2.5/Qwen 3 que fallaron en
+// CPU Ryzen 4600G UMA (gibberish / 3.2 t/s / no-Tier-A). ADR-040 retiene
+// llama.cpp+Qwen como track futuro GBNF function calling Fase 1.
+const LLM_URL = '/api/ollama/v1/chat/completions';
 
 const STATE_IDLE = 'idle';
 const STATE_RECORDING = 'recording';
@@ -129,7 +131,7 @@ export default function AgentScreen({ onBack }) {
       return await streamOpenAI(
         LLM_URL,
         {
-          model: 'olmoe-1b-7b-instruct',
+          model: 'gemma3:4b',
           messages,
           temperature: 0.7,
           max_tokens: 512,
