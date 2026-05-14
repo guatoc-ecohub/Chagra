@@ -5,7 +5,7 @@ import { transcribe } from '../../services/voiceService';
 import { addTurn, getFullHistory, getContextString } from '../../services/conversationMemory';
 import { retrieve } from '../../services/ragRetriever';
 import { parseIntent, formatIntentDescription } from '../../services/agentIntentParser';
-import { streamOllama } from '../../services/ollamaStream';
+import { streamOpenAI } from '../../services/openaiStream';
 import { speak, speakKokoro, stop, init as initTTS, isSupported, isKokoroAvailable } from '../../services/ttsService';
 import ChatHistory from './ChatHistory';
 import SuggestedActions from './SuggestedActions';
@@ -13,7 +13,11 @@ import ActionConfirmModal from '../ActionConfirmModal';
 import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
 
-const OLLAMA_URL = '/api/ollama/api/chat';
+// llama-server nativo expone API OpenAI-compatible en /api/llamacpp/ (proxy
+// Nginx alpha → 127.0.0.1:11435). Migrado desde /api/ollama/ según DR
+// hardware-llm-optimization CLOSED 2026-05-11: OLMoE-1B-7B Q4_K_M sobre
+// llama.cpp nativo (Flash Attention + KV cache q8_0 + AVX2 host-specific).
+const LLM_URL = '/api/llamacpp/v1/chat/completions';
 
 const STATE_IDLE = 'idle';
 const STATE_RECORDING = 'recording';
@@ -122,16 +126,21 @@ export default function AgentScreen({ onBack }) {
     ];
 
     try {
-      return await streamOllama(
-        OLLAMA_URL,
-        { model: 'gemma3:4b', messages },
+      return await streamOpenAI(
+        LLM_URL,
+        {
+          model: 'olmoe-1b-7b-instruct',
+          messages,
+          temperature: 0.7,
+          max_tokens: 512,
+        },
         (_chunk, fullText) => setStreamingContent(fullText),
       );
     } catch (e) {
       if (e.name === 'AbortError') {
         throw new Error('Tiempo agotado, conexion lenta');
       }
-      const match = e.message.match(/^Ollama (\d+)/);
+      const match = e.message.match(/^LLM (\d+)/);
       if (match) {
         const status = parseInt(match[1], 10);
         if (status === 401 || status === 403) {
