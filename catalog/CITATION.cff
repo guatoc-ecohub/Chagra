@@ -5,7 +5,7 @@ abstract: "Catálogo agroecológico estructurado para la PWA Chagra con especies
 type: dataset
 version: "3.1.0"
 date-released: 2026-05-14
-license: CC-BY-SA-4.0
+license: CC-BY-NC-SA-4.0
 repository-code: "https://github.com/guatoc-ecohub/Chagra"
 url: "https://chagra.guatoc.co"
 authors:
@@ -41,5 +41,5 @@ preferred-citation:
       affiliation: Guatoc
   year: 2026
   version: "3.1.0"
-  license: CC-BY-SA-4.0
+  license: CC-BY-NC-SA-4.0
   url: "https://github.com/guatoc-ecohub/Chagra/tree/main/catalog"

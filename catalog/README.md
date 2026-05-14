@@ -1,6 +1,6 @@
 # Chagra — Catálogo agroecológico público
 
-**Licencia:** CC-BY-SA 4.0 (no bajo AGPL-3.0 del código). Ver `LICENSE.md` en este directorio.
+**Licencia:** CC BY-NC-SA 4.0 (catálogo) · AGPL-3.0 (código de la PWA). Ver `LICENSE.md` en este directorio. Migrado desde CC BY-SA 4.0 el 2026-05-14 (Vector C anti-robo, ADR-043). Atribución obligatoria: "Chagra catálogo, Guatoc, v3.1, 2026". Uso institucional sin ánimo de lucro contemplado como NO COMERCIAL bajo esta licencia.
 
 **Source of truth canónico:** este directorio en el repo público `guatoc-ecohub/Chagra`. Decisión formalizada en **ADR-026** (Scope público/privado del catálogo) y **ADR-025** (Format reconciliation markdown ↔ JSON).
 
@@ -14,7 +14,7 @@
 | `biopreparados-seed.json` | Catálogo de biopreparados agroecológicos |
 | `sources-seed.json` | Fuentes científicas referenciadas por `species[].source_ids` |
 | `AMBIGUITIES_RESOLUTION.md` | Las 11 ambigüedades del schema v3 resueltas (ADR-013) |
-| `LICENSE.md` | CC-BY-SA 4.0 con atribución requerida |
+| `LICENSE.md` | CC BY-NC-SA 4.0 con atribución requerida (migrado 2026-05-14) |
 
 ## Pipeline ADR-025 (markdown frontmatter → JSON)
 
