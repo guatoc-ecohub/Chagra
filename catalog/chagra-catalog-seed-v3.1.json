@@ -7461,6 +7461,425 @@
         "gbif-taxonomic-backbone"
       ],
       "valor_pedagogico": "Planta del sotobosque tropical con usos medicinales y tintoreos tradicionales. Ensenia el conocimiento botanico de las comunidades afrocolombianas del Pacifico y su relacion con el bosque humedo."
+    },
+    {
+      "id": "ipomoea_batatas_blanca",
+      "nombre_comun": "Batata blanca",
+      "nombre_cientifico": "Ipomoea batatas (L.) Lam. cv. blanca",
+      "familia_botanica": "Convolvulaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 800,
+        "optimo_max": 2000,
+        "max_absoluto": 2400
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "esqueje (bejuco)",
+        "notas": "Variedad de pulpa blanca y textura harinosa, menos dulce que la naranja. Preferida para preparaciones saladas y frituras."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Variedad de batata de pulpa blanca que muestra la diversidad intraespecifica de este cultivo global. Ensenia seleccion varietal por textura y contenido de almidon."
+    },
+    {
+      "id": "ipomoea_batatas_morada",
+      "nombre_comun": "Batata morada",
+      "nombre_cientifico": "Ipomoea batatas (L.) Lam. cv. morada",
+      "familia_botanica": "Convolvulaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 800,
+        "optimo_max": 2000,
+        "max_absoluto": 2400
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "esqueje (bejuco)",
+        "notas": "Variedad de pulpa morada intensa, rica en antocianinas. Color que se intensifica con la exposicion solar durante el desarrollo."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Variedad de batata de pulpa morada: leccion de fitoquimica que muestra como las antocianinas actuan como potentes antioxidantes en la dieta y como pigmentos naturales."
+    },
+    {
+      "id": "pachyrhizus_erosus",
+      "nombre_comun": "Jicama",
+      "nombre_cientifico": "Pachyrhizus erosus (L.) Urb.",
+      "familia_botanica": "Fabaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 500,
+        "optimo_max": 1500,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 32
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Leguminosa de raiz tuberosa crocante. Las semillas y vainas contienen rotenona y son toxicas; solo se consume la raiz fresca. Requiere tutores para su habito trepador."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "Leccion de toxicidad selectiva: la jicama ensena que en una misma planta, partes comestibles y toxicas pueden coexistir. La rotenona de sus semillas es un insecticida natural tradicional."
+    },
+    {
+      "id": "raphanus_sativus_longipinnatus",
+      "nombre_comun": "Daikon",
+      "nombre_cientifico": "Raphanus sativus L. var. longipinnatus",
+      "familia_botanica": "Brassicaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 500,
+        "optimo_min": 1500,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa en suelo profundo y suelto. Raiz que puede alcanzar 30-40cm de longitud; requiere cama de siembra profunda. Variedad de raiz blanca alargada de sabor suave."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Leccion de estructura del suelo: el daikon revela la compactacion del suelo al desarrollarse; su raiz profunda descompacta capas inferiores, funcionando como arado biologico."
+    },
+    {
+      "id": "raphanus_sativus_sativus",
+      "nombre_comun": "Rabano rojo",
+      "nombre_cientifico": "Raphanus sativus L. var. sativus",
+      "familia_botanica": "Brassicaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Variedad de raiz roja de ciclo ultra rapido (25-35 dias). Siembra directa escalonada cada 10-15 dias para cosecha continua."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Variedad de raiz roja clasica: su color intenso indica presencia de antocianinas. Ciclo mas corto del huerto, ideal para ensenar germinacion y cosecha a ninos."
+    },
+    {
+      "id": "beta_vulgaris_altissima",
+      "nombre_comun": "Betarraga azucarera",
+      "nombre_cientifico": "Beta vulgaris L. subsp. vulgaris var. altissima",
+      "familia_botanica": "Amaranthaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 14,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Variedad de remolacha seleccionada por alto contenido de sacarosa. Raiz blanca alargada; requiere suelos profundos y ricos en potasio para maxima produccion de azucar."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Leccion de mejoramiento genetico: la betarraga azucarera fue seleccionada durante siglos para concentrar sacarosa, demostrando el poder de la seleccion artificial en la agricultura."
+    },
+    {
+      "id": "pastinaca_sativa",
+      "nombre_comun": "Chirivia",
+      "nombre_cientifico": "Pastinaca sativa L.",
+      "familia_botanica": "Apiaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 12,
+        "optimo_max": 18,
+        "max_tolerable": 24
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinacion lenta (14-21 dias); semilla pierde viabilidad rapidamente (<1 ano). Las heladas convierten almidones en azucares, mejorando su sabor dulce caracteristico."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "fao-ecocrop"
+      ],
+      "valor_pedagogico": "Raiz europea poco conocida en Colombia que demuestra como el frio transforma la quimica de los alimentos. Su sabor dulce post-helada ensena principios de bioquimica vegetal."
+    },
+    {
+      "id": "cynara_cardunculus_scolymus",
+      "nombre_comun": "Alcachofa",
+      "nombre_cientifico": "Cynara cardunculus L. var. scolymus",
+      "familia_botanica": "Asteraceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2500,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 14,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "hijuelos",
+        "notas": "Se propaga por hijuelos (rebrotes de la corona) o por semilla. Planta perenne que produce durante 3-5 anos. El capitulo o cabeza floral inmadura es la parte comestible."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "fao-ecocrop"
+      ],
+      "valor_pedagogico": "Leccion de morfologia floral: lo que consumimos es una inflorescencia inmadura. Ensenia la diferencia entre flor y fruto, y el concepto de domesticacion de un cardo mediterraneo."
+    },
+    {
+      "id": "foeniculum_vulgare_azoricum",
+      "nombre_comun": "Hinojo bulbo",
+      "nombre_cientifico": "Foeniculum vulgare Mill. var. azoricum",
+      "familia_botanica": "Apiaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1500,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Variedad de hinojo seleccionada por su bulbo engrosado en la base de las hojas. Requiere aporque para blanquear el bulbo. Siembra directa por su raiz pivotante sensible al trasplante."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Variedad de hinojo seleccionada por su bulbo comestible. Ensenia el aporque como tecnica de blanqueado y la diferencia entre la forma silvestre y la domesticada."
+    },
+    {
+      "id": "cyclanthera_pedata",
+      "nombre_comun": "Achocha",
+      "nombre_cientifico": "Cyclanthera pedata (L.) Schrad.",
+      "familia_botanica": "Cucurbitaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 14,
+        "optimo_max": 22,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Cucurbitacea trepadora de crecimiento vigoroso. Requiere espaldera o tutores. Los frutos se consumen verdes rellenos o en guisos tradicionales andinos."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "Cucurbitacea nativa de los Andes subestimada. Ensenia el valor de las especies tradicionales subutilizadas en la seguridad alimentaria y la importancia de conservar germoplasma andino."
     }
   ],
   "biopreparados": [
