@@ -16,7 +16,7 @@ export default function UpdateAvailableBanner() {
       if (reg.waiting) {
         reg.waiting.postMessage({ type: 'SKIP_WAITING' });
       }
-    } catch {}
+    } catch (_) { /* SW not ready — recargar igual abajo */ }
     window.location.reload();
   };
 
