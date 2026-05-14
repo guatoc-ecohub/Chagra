@@ -124,7 +124,7 @@ export default function AgentScreen({ onBack }) {
     try {
       return await streamOllama(
         OLLAMA_URL,
-        { model: 'qwen3.5:4b', messages },
+        { model: 'gemma3:4b', messages },
         (_chunk, fullText) => setStreamingContent(fullText),
       );
     } catch (e) {

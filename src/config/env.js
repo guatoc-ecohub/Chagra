@@ -18,5 +18,5 @@ export const ENV = {
   // Modelos de inferencia (configurables sin recompilar).
   // Cambia en .env cuando bumpees el modelo en el Nodo Alpha.
   STT_MODEL: import.meta.env.VITE_STT_MODEL || 'base',
-  NLU_MODEL: import.meta.env.VITE_NLU_MODEL || 'qwen3.5:4b',
+  NLU_MODEL: import.meta.env.VITE_NLU_MODEL || 'gemma3:4b',
 };

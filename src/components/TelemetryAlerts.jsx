@@ -16,7 +16,7 @@ import { detectAndTruncateRepetition } from '../utils/repetitionGuard';
  * Flujo:
  *   1. Suscripción WebSocket a Home Assistant para sensores configurados.
  *   2. Detección de valor anormal (umbral por especie/zona).
- *   3. Streaming de análisis agronómico via Ollama (qwen3.5:4b o gemma3:4b).
+ *   3. Streaming de análisis agronómico via Ollama (gemma3:4b).
  *   4. Acción dispatched por operador → log--maintenance + cooldown idempotente.
  *
  * LLM constraints (v0.7.2):
@@ -472,8 +472,7 @@ export default function TelemetryAlerts() {
         const content = await streamOllama(
           `${OLLAMA_URL}/api/chat`,
           {
-            model: 'qwen3.5:4b',
-            think: false,
+            model: 'gemma3:4b',
             messages: [
               { role: 'system', content: 'Asistente agronómico para finca agroecológica andina (2400msnm). PROHIBIDO recomendar agroquímicos sintéticos. Solo biopreparados orgánicos (biol, caldo sulfocálcico, caldo bordelés, purín de ortiga, compost tea, microorganismos de montaña, Trichoderma). Responde en máximo 3 frases concisas, sin superlativos, sin repetir información.' },
               { role: 'user', content: userPrompt },
@@ -488,7 +487,7 @@ export default function TelemetryAlerts() {
             onDone: (parsed) => {
               if (parentSignal?.aborted) return;
               setAiMeta({
-                model: parsed.model || 'qwen3.5:4b',
+                model: parsed.model || 'gemma3:4b',
                 totalDuration: parsed.total_duration ? (parsed.total_duration / 1e9).toFixed(1) : null,
                 evalCount: parsed.eval_count || null,
                 promptTokens: parsed.prompt_eval_count || null,

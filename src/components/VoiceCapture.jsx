@@ -53,7 +53,7 @@ const STATE_DONE = 'done';
 /**
  * VoiceCapture, UI principal del módulo de ingreso acústico.
  *
- * Pipeline: grabar → transcribir (Whisper) → extraer (qwen3.5:4b) → revisar
+ * Pipeline: grabar → transcribir (Whisper) → extraer (gemma3:4b) → revisar
  * humano (VoiceConfirmation) → encolar en pending_transactions.
  *
  * Si transcripción o extracción fallan con error de red, ofrece encolar el
@@ -557,7 +557,7 @@ export default function VoiceCapture({ onSave }) {
                 active
                 label="Extrayendo entidades"
                 accent="muzo"
-                meta={<span className="font-mono">qwen3.5:4b</span>}
+                meta={<span className="font-mono">gemma3:4b</span>}
               />
             </div>
           )}

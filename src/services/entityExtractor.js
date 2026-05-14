@@ -1,5 +1,5 @@
 /**
- * entityExtractor.js — Extracción de entidades agrícolas vía Ollama / qwen3.5:4b.
+ * entityExtractor.js — Extracción de entidades agrícolas vía Ollama / gemma3:4b.
  *
  * Toma una transcripción en español y devuelve un array estricto de
  * { crop, quantity, location }. Aplica AbortController (timeout 20s) y
@@ -8,13 +8,17 @@
  * Desde v0.6.0 consume la respuesta en streaming NDJSON a través de
  * `streamOllama` y acepta `onToken` para que la UI muestre el JSON
  * apareciendo carácter-a-carácter mientras el modelo genera.
+ *
+ * 2026-05-13: swap qwen3.5:4b → gemma3:4b. qwen35 architecture cuelga
+ * determinísticamente en Ollama 0.23.1 (timeout >120s, retorna 500).
+ * gemma3:4b responde ~10s con calidad equivalente para extracción JSON.
  */
 
 import { streamOllama } from './ollamaStream';
 
 const OLLAMA_CHAT_URL = '/api/ollama/api/chat';
-const MODEL = 'qwen3.5:4b';
-// qwen3 puede tardar 25-35s en CPU incluso con thinking desactivado.
+const MODEL = 'gemma3:4b';
+// gemma3:4b en CPU responde ~10-15s para extracción JSON con format:json.
 // Nginx permite hasta 120s en /api/ollama/; 60s cliente es el punto medio seguro.
 const TIMEOUT_MS = 60000;
 
@@ -119,10 +123,6 @@ export async function extractEntities(text, { onToken } = {}) {
       {
         model: MODEL,
         format: 'json',
-        // qwen3 tiene "thinking mode" siempre activo por default; consume
-        // todos los num_predict razonando antes de emitir content y deja
-        // content="". think:false desactiva esa cadena de razonamiento.
-        think: false,
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: text },
