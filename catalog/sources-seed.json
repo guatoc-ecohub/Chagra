@@ -15,7 +15,8 @@
       "año": 2016,
       "titulo": "Ficha técnica Sol Andina — papa criolla Grupo Phureja",
       "institucion": "Corporación Colombiana de Investigación Agropecuaria (AGROSAVIA)",
-      "url": "https://www.agrosavia.co"
+      "url": "https://www.agrosavia.co",
+      "tier": "A"
     },
     {
       "id": "agrosavia-estrella",
@@ -23,7 +24,8 @@
       "autores": "AGROSAVIA",
       "año": 2018,
       "titulo": "Ficha técnica Estrella — papa criolla",
-      "institucion": "AGROSAVIA"
+      "institucion": "AGROSAVIA",
+      "tier": "A"
     },
     {
       "id": "agrosavia-alhaja-ica-17702-2019",
@@ -31,7 +33,8 @@
       "autores": "ICA — Instituto Colombiano Agropecuario",
       "año": 2019,
       "titulo": "Resolución 00017702 de 2019 — Registro variedad AGROSAVIA Alhaja",
-      "institucion": "ICA"
+      "institucion": "ICA",
+      "tier": "A"
     },
     {
       "id": "nustez-rodriguez-2024-unal",
@@ -40,7 +43,8 @@
       "año": 2024,
       "titulo": "Papa criolla Grupo Phureja, manual de recomendaciones técnicas para Cundinamarca",
       "revista_o_editorial": "Editorial Universidad Nacional de Colombia",
-      "isbn": "9789585054929"
+      "isbn": "9789585054929",
+      "tier": "A"
     },
     {
       "id": "rodriguez-nustez-estrada-2009",
@@ -50,7 +54,8 @@
       "titulo": "Variedades colombianas de papa criolla (Solanum phureja Juz. et Buk.)",
       "revista_o_editorial": "Agronomía Colombiana",
       "volumen_numero": "27(3)",
-      "paginas": "289-303"
+      "paginas": "289-303",
+      "tier": "A"
     },
     {
       "id": "perez-rodriguez-gomez-2008",
@@ -60,7 +65,8 @@
       "titulo": "Plan de fertilización de la papa criolla en el altiplano cundiboyacense",
       "revista_o_editorial": "Agronomía Colombiana",
       "volumen_numero": "26(3)",
-      "paginas": "477-486"
+      "paginas": "477-486",
+      "tier": "A"
     },
     {
       "id": "cip-2006-ghislain",
@@ -68,7 +74,8 @@
       "autores": "Ghislain, M.; Andrade, D.; Rodríguez, F.; Hijmans, R.J.; Spooner, D.M.",
       "año": 2006,
       "titulo": "Genetic analysis of the cultivated potato Solanum tuberosum L. Phureja Group using RAPDs",
-      "institucion": "CIP — International Potato Center"
+      "institucion": "CIP — International Potato Center",
+      "tier": "A"
     },
     {
       "id": "calderon-saenz-2003-invasoras",
@@ -76,7 +83,8 @@
       "autores": "Calderón-Sáenz, E.",
       "año": 2003,
       "titulo": "Las especies invasoras en Colombia (diez peores)",
-      "revista_o_editorial": "Biota Colombiana"
+      "revista_o_editorial": "Biota Colombiana",
+      "tier": "A"
     },
     {
       "id": "humboldt-2016-frailejones",
@@ -85,7 +93,8 @@
       "año": 2016,
       "titulo": "Frailejones de Colombia — Espeletiinae",
       "institucion": "Instituto de Investigación de Recursos Biológicos Alexander von Humboldt",
-      "url": "https://www.humboldt.org.co"
+      "url": "https://www.humboldt.org.co",
+      "tier": "A"
     },
     {
       "id": "diazgranados-2012-espeletiinae",
@@ -96,7 +105,8 @@
       "revista_o_editorial": "PhytoKeys",
       "volumen_numero": "16",
       "paginas": "1-52",
-      "doi": "10.3897/phytokeys.16.3186"
+      "doi": "10.3897/phytokeys.16.3186",
+      "tier": "A"
     },
     {
       "id": "libro-rojo-plantas-colombia",
@@ -104,7 +114,8 @@
       "autores": "Cárdenas-López, D.; Salinas, N.R. (eds.)",
       "año": 2006,
       "titulo": "Libro Rojo de Plantas de Colombia. Volumen 4 — Especies maderables amenazadas (y volúmenes sucesivos)",
-      "institucion": "Instituto Amazónico de Investigaciones Científicas SINCHI / Instituto Humboldt / MADS"
+      "institucion": "Instituto Amazónico de Investigaciones Científicas SINCHI / Instituto Humboldt / MADS",
+      "tier": "A"
     },
     {
       "id": "mads-res-383-2010",
@@ -112,7 +123,8 @@
       "autores": "Ministerio de Ambiente y Desarrollo Sostenible (MADS)",
       "año": 2010,
       "titulo": "Resolución 383 de 2010 — Listado de especies silvestres amenazadas de la diversidad biológica colombiana",
-      "institucion": "MADS Colombia"
+      "institucion": "MADS Colombia",
+      "tier": "A"
     },
     {
       "id": "ley-1930-2018-paramos",
@@ -120,7 +132,8 @@
       "autores": "Congreso de la República de Colombia",
       "año": 2018,
       "titulo": "Ley 1930 de 2018 — Por medio de la cual se dictan disposiciones para la gestión integral de los páramos en Colombia",
-      "institucion": "República de Colombia"
+      "institucion": "República de Colombia",
+      "tier": "A"
     },
     {
       "id": "uicn-red-list",
@@ -128,7 +141,8 @@
       "autores": "IUCN — International Union for Conservation of Nature",
       "año": null,
       "titulo": "The IUCN Red List of Threatened Species",
-      "url": "https://www.iucnredlist.org"
+      "url": "https://www.iucnredlist.org",
+      "tier": "A"
     },
     {
       "id": "bernal-2015-plantas-liquenes-colombia",
@@ -137,7 +151,8 @@
       "año": 2015,
       "titulo": "Catálogo de Plantas y Líquenes de Colombia",
       "institucion": "Instituto de Ciencias Naturales, Universidad Nacional de Colombia",
-      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+      "url": "http://catalogoplantasdecolombia.unal.edu.co",
+      "tier": "A"
     },
     {
       "id": "nrc-1989-cultivos-andinos",
@@ -146,7 +161,8 @@
       "año": 1989,
       "titulo": "Lost Crops of the Incas: Little-Known Plants of the Andes with Promise for Worldwide Cultivation",
       "revista_o_editorial": "National Academy Press",
-      "isbn": "9780309042642"
+      "isbn": "9780309042642",
+      "tier": "A"
     },
     {
       "id": "fao-2013-quinua",
@@ -155,7 +171,8 @@
       "año": 2013,
       "titulo": "Quinua: Año Internacional de la Quinua 2013 — Documentos técnicos y estado del arte",
       "institucion": "FAO",
-      "url": "https://www.fao.org/quinoa-2013"
+      "url": "https://www.fao.org/quinoa-2013",
+      "tier": "A"
     },
     {
       "id": "mujica-1992-quinua",
@@ -163,7 +180,8 @@
       "autores": "Mujica, A.",
       "año": 1992,
       "titulo": "Revisión bibliográfica sobre el cultivo de la quinua (Chenopodium quinoa Willd.) y el amaranto (Amaranthus caudatus L.) en los Andes",
-      "observaciones": "Publicación del Instituto Nacional de Investigaciones Agropecuarias (INIAP), Ecuador. Revisión exhaustiva de germoplasma, agronomía y usos tradicionales."
+      "observaciones": "Publicación del Instituto Nacional de Investigaciones Agropecuarias (INIAP), Ecuador. Revisión exhaustiva de germoplasma, agronomía y usos tradicionales.",
+      "tier": "A"
     },
     {
       "id": "perez-arbelaez-1947-plantas-utiles",
@@ -172,7 +190,8 @@
       "año": 1947,
       "titulo": "Plantas Útiles de Colombia",
       "revista_o_editorial": "Librería Colombiana / Camacho Roldán",
-      "observaciones": "Obra clásica de la botánica económica colombiana; múltiples reediciones posteriores."
+      "observaciones": "Obra clásica de la botánica económica colombiana; múltiples reediciones posteriores.",
+      "tier": "B"
     },
     {
       "id": "agrosavia-leguminosas-andinas",
@@ -181,7 +200,8 @@
       "año": null,
       "titulo": "Fichas técnicas de leguminosas andinas (haba, arveja, lenteja, frijol)",
       "institucion": "Corporación Colombiana de Investigación Agropecuaria (AGROSAVIA)",
-      "observaciones": "Compilación de fichas técnicas de AGROSAVIA para leguminosas de clima frío. Año y volumen pendientes de consolidación."
+      "observaciones": "Compilación de fichas técnicas de AGROSAVIA para leguminosas de clima frío. Año y volumen pendientes de consolidación.",
+      "tier": "A"
     },
     {
       "id": "restrepo-rivera-2005",
@@ -190,7 +210,8 @@
       "año": 2005,
       "titulo": "Manual Práctico de Agricultura Orgánica Andina",
       "institucion": "Fundación para la Investigación y Desarrollo Agrícola (FIDA)",
-      "observaciones": "Obra de referencia del movimiento agroecológico colombiano. Aborda cercas vivas, abonos verdes, biopreparados y diseño de agroecosistemas sostenibles en la región andina."
+      "observaciones": "Obra de referencia del movimiento agroecológico colombiano. Aborda cercas vivas, abonos verdes, biopreparados y diseño de agroecosistemas sostenibles en la región andina.",
+      "tier": "B"
     },
     {
       "id": "ardila-2015-etnobotanica-muisca",
@@ -199,7 +220,8 @@
       "año": 2015,
       "titulo": "Etnobotánica muisca: plantas medicinales del altiplano cundiboyacense",
       "revista_o_editorial": "Revista de la Academia Colombiana de Ciencias Exactas, Físicas y Naturales",
-      "observaciones": "Estudio etnobotánico detallado de plantas medicinales tradicionales del pueblo muisca en Cundinamarca y Boyacá."
+      "observaciones": "Estudio etnobotánico detallado de plantas medicinales tradicionales del pueblo muisca en Cundinamarca y Boyacá.",
+      "tier": "B"
     },
     {
       "id": "jbb-plantas-medicinales",
@@ -208,7 +230,8 @@
       "año": null,
       "titulo": "Catálogo de plantas medicinales del Jardín Botánico de Bogotá",
       "institucion": "Jardín Botánico de Bogotá",
-      "url": "https://www.jbb.gov.co"
+      "url": "https://www.jbb.gov.co",
+      "tier": "A"
     },
     {
       "id": "gbif-taxonomic-backbone",
