@@ -145,6 +145,7 @@ function FormPiloto() {
     notas: '',
   });
   const [aceptaCondiciones, setAceptaCondiciones] = useState(false);
+  const [aceptaCompromiso, setAceptaCompromiso] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const setField = (k, v) => setData((d) => ({ ...d, [k]: v }));
@@ -162,7 +163,7 @@ function FormPiloto() {
   }, [data]);
 
   const camposCompletos = Object.keys(errors).length === 0;
-  const isReadyToSend = camposCompletos && aceptaCondiciones;
+  const isReadyToSend = camposCompletos && aceptaCondiciones && aceptaCompromiso;
 
   const yamlOutput = useMemo(() => {
     if (!camposCompletos) return '';
@@ -187,6 +188,7 @@ function FormPiloto() {
     descripcion_corta: "${(data.notas || `Finca piloto fase 1. Vocación: ${data.vocacion}.`).replace(/"/g, "'")}"
     creada: "${today}"
     consent_ley1581: { aceptado: true, fecha: "${today}" }
+    compromiso_piloto: { aceptado: true, duracion_meses: 6, feedback: "semanal", fecha: "${today}" }
 `;
   }, [data, camposCompletos]);
 
@@ -421,6 +423,49 @@ ${data.operador_nombre}`;
           </label>
         </div>
 
+        {/* Compromiso piloto 6+ meses (gate ADR-036 sub-xii) */}
+        <div className="mt-4 rounded-xl bg-slate-900 border border-amber-900/50 p-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
+            Compromiso piloto fase 1
+          </p>
+          <p className="text-xs text-slate-400 leading-relaxed mb-3">
+            Chagra está en construcción activa. Los pilotos son quienes nos
+            ayudan a probar y mejorar la herramienta. Para que tu participación
+            tenga impacto real necesitamos:
+          </p>
+          <ul className="text-xs text-slate-300 leading-relaxed mb-3 space-y-1 ml-4 list-disc">
+            <li>
+              <span className="font-semibold text-amber-300">6 meses mínimo</span>{' '}
+              de operación activa registrando siembras, cosechas, observaciones.
+            </li>
+            <li>
+              <span className="font-semibold text-amber-300">Feedback semanal</span>{' '}
+              corto (5-10 min, WhatsApp o email) sobre qué funcionó y qué falló.
+            </li>
+            <li>
+              Permitirnos usar tu experiencia (anonimizada) como caso de éxito
+              en grants Minciencias / SWISSAID / NLnet — esto destraba la fase
+              multi-finca completa para todos.
+            </li>
+            <li>
+              Salida sin penalidad en cualquier momento. Tus datos son tuyos
+              (regla soberanía agroecológica, ADR-007).
+            </li>
+          </ul>
+          <label className="flex items-start gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={aceptaCompromiso}
+              onChange={(e) => setAceptaCompromiso(e.target.checked)}
+              className="mt-1 accent-amber-500"
+            />
+            <span className="text-sm text-slate-300">
+              Me comprometo a operar mi finca como piloto Chagra durante mínimo
+              6 meses, con feedback semanal a Miguel.
+            </span>
+          </label>
+        </div>
+
         {/* Preview + acciones */}
         {isReadyToSend ? (
           <div className="mt-6 space-y-4">
@@ -471,7 +516,7 @@ ${data.operador_nombre}`;
           <div className="mt-6 rounded-xl bg-slate-900/60 border border-slate-800 p-4 flex items-center gap-2 text-sm text-slate-400">
             <ChevronRight size={18} className="text-slate-500" />
             {camposCompletos
-              ? 'Marca la casilla de aceptación de condiciones para enviar.'
+              ? 'Marca las dos casillas (datos personales + compromiso piloto) para enviar.'
               : 'Completa los campos marcados con * para continuar.'}
           </div>
         )}
