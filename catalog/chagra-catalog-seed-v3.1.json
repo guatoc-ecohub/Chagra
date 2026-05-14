@@ -2428,15 +2428,16 @@
       "radiacion": "sol_pleno",
       "agua": "medio",
       "drenaje_requerido": "bueno_a_moderado",
-      "propagation": {
-        "metodo_principal": "semilla",
-        "notas": "Germinación lenta; se recomienda remojo previo de la semilla por 24 horas."
-      },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
-      ],
-      "valor_pedagogico": "Lección de paciencia: su lenta germinación enseña los tiempos biológicos diferenciados en el huerto andino."
+       "propagation": {
+         "metodo_principal": "semilla",
+         "notas": "Germinación lenta; se recomienda remojo previo de la semilla por 24 horas."
+       },
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "El perejil crespo (Petroselinum crispum) se cultiva en todo Colombia, especialmente en Cundinamarca y Boyacá entre 1500-2800 msnm, adaptándose a zonas térmicas frías, templadas y cálidas. Su ciclo corto de 60-90 días se propaga por semilla (requiere remojo previo de 24 horas) y se asocia beneficiosamente con zanahoria y lechuga, ayudando a repeler plagas como trips y pulgones. En la tradición muisca y andina, se utilizaba tanto en medicina tradicional como en alimentación, siendo valorado por su alto contenido de vitaminas A, C y K, así como aceites esenciales. Fuente: POWO-Kew (Plants of the World Online, Royal Botanic Gardens, Kew)."
     },
     {
       "id": "petroselinum_crispum_neapolitanum",
