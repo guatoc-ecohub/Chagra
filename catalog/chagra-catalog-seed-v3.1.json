@@ -1,7 +1,7 @@
 {
   "schema_version": "3.1",
-  "seed_version": "0.2.0",
-  "generated_at": "2026-04-30",
+  "seed_version": "0.3.0",
+  "generated_at": "2026-05-13",
   "generated_by": "md-fichas-to-catalog-json.mjs",
   "_meta": {
     "fuente_migracion": "chagra-catalog-seed-v3.0.json",
@@ -21,7 +21,7 @@
       "AMB-14: consistencia invasor aplicada en migración",
       "AMB-15: scale_viability + manejo_por_escala con CI de coherencia"
     ],
-    "alcance_seed": "7 especies migradas desde v3.0. Las DRs por piso térmico poblarán hasta ~400 especies totales (100 × 4 pisos).",
+    "alcance_seed": "7 especies migradas desde v3.0 + 6 especies Batch 3 (tubérculos andinos Cruz Verde). Las DRs por piso térmico poblarán hasta ~400 especies totales (100 × 4 pisos).",
     "advertencia": "Validar con: node scripts/validate-catalog.mjs --seed-mode. Refs a species aún no migradas aparecen como warnings."
   },
   "species": [
@@ -4519,6 +4519,279 @@
         "ica-resolucion-3168-2015"
       ],
       "validation_level": "claude_draft"
+    },
+    {
+      "id": "dioscorea_trifida",
+      "nombre_comun": "Ibia / Name andino",
+      "nombre_comunes_regionales": [
+        "name andino",
+        "mapuey",
+        "name criollo"
+      ],
+      "nombre_cientifico": "Dioscorea trifida L.f.",
+      "familia_botanica": "Dioscoreaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 14,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "tuberculo",
+        "notas": "Propagacion por secciones de tuberculo con yemas o por bulbillos aereos. Requiere sustrato suelto y profundo."
+      },
+      "source_ids": [
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "Name andino tradicional del sistema chagra muisca. Ensenanza de raices reservantes y propagacion vegetativa en la huerta altoandina."
+    },
+    {
+      "id": "tropaeolum_tuberosum_mashua",
+      "nombre_comun": "Mashua (subsp. silvestre)",
+      "nombre_comunes_regionales": [
+        "mashua amarga",
+        "anU",
+        "isaNo"
+      ],
+      "nombre_cientifico": "Tropaeolum tuberosum Ruiz & Pav. subsp. silvestre",
+      "familia_botanica": "Tropaeolaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 2400,
+        "optimo_min": 2800,
+        "optimo_max": 3400,
+        "max_absoluto": 3800
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 8,
+        "optimo_max": 14,
+        "max_tolerable": 18
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "tuberculo",
+        "notas": "Subespecie silvestre de mayor altitud y resistencia a heladas que el cubio. Contenido de isotiocianatos mas alto, lo que le confiere mayor accion nematicida."
+      },
+      "source_ids": [
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Variedad de paramo del genero Tropaeolum. Ensenanza de adaptacion altitudinal y compuestos alelopaticos naturales (isotiocianatos) en la chagra de alta montanya."
+    },
+    {
+      "id": "solanum_tuberosum_sabanera",
+      "nombre_comun": "Papa Sabanera",
+      "nombre_comunes_regionales": [
+        "papa de la sabana",
+        "papa sabanera blanca",
+        "papa sabanera amarilla"
+      ],
+      "nombre_cientifico": "Solanum tuberosum L. subsp. andigenum var. Sabanera",
+      "familia_botanica": "Solanaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2400,
+        "optimo_max": 3000,
+        "max_absoluto": 3400
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 10,
+        "optimo_max": 17,
+        "max_tolerable": 22
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "tuberculo (semilla asexual)",
+        "notas": "Variedad tradicional del altiplano cundiboyacense. Ciclo largo (5-7 meses). Requiere periodos de dormancia antes de resiembra."
+      },
+      "source_ids": [
+        "perez-rodriguez-gomez-2008",
+        "nustez-rodriguez-2024-unal"
+      ],
+      "valor_pedagogico": "Variedad andina tradicional del altiplano. Ensenanza del ciclo largo de la papa de ano y la importancia de las variedades nativas en la soberania alimentaria de la sabana."
+    },
+    {
+      "id": "canna_edulis",
+      "nombre_comun": "Achira / SagU",
+      "nombre_comunes_regionales": [
+        "cucuyU",
+        "chisgua",
+        "capacho"
+      ],
+      "nombre_cientifico": "Canna edulis Ker Gawl.",
+      "familia_botanica": "Cannaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 14,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "medio",
+      "propagation": {
+        "metodo_principal": "rizoma",
+        "notas": "Propagacion por division de rizomas en epoca lluviosa. La harina de achira se usa tradicionalmente para elaborar bizcochos, coladas y pan."
+      },
+      "source_ids": [
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "Planta de usos multiples en la chagra muisca. Ensenanza de procesamiento tradicional de rizomas para harina y valor cultural del bizcocho de achira."
+    },
+    {
+      "id": "smallanthus_sonchifolius",
+      "nombre_comun": "Yacon / Llacon",
+      "nombre_comunes_regionales": [
+        "jiquima",
+        "aricoma",
+        "papa japonesa (impropiamente)"
+      ],
+      "nombre_cientifico": "Smallanthus sonchifolius (Poepp.) H.Rob.",
+      "familia_botanica": "Asteraceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 13,
+        "optimo_max": 20,
+        "max_tolerable": 25
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "division_mata",
+        "notas": "Se propaga por secciones de corona con yemas. Las raices tuberosas acumulan fructooligosacaridos (FOS), ideales para diabeticos."
+      },
+      "source_ids": [
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "Tuberculo functional de la chagra. Ensenanza de nutricion y salud: FOS como alternativa deendulzante natural para la dieta altoandina."
+    },
+    {
+      "id": "arracacia_xanthorrhiza",
+      "nombre_comun": "Arracacha / Zanahoria blanca",
+      "nombre_comunes_regionales": [
+        "racacha",
+        "apio criollo",
+        "virraca"
+      ],
+      "nombre_cientifico": "Arracacia xanthorrhiza Bancr.",
+      "familia_botanica": "Apiaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 13,
+        "optimo_max": 20,
+        "max_tolerable": 25
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "hijuelos (cornos)",
+        "notas": "Se propaga vegetativamente mediante cornos (hijuelos de la corona). Ciclo largo (10-12 meses). Raiz muy perecedera post-cosecha."
+      },
+      "source_ids": [
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "Tuberculo andino por excelencia de la chagra muisca. Ensenanza de manejo de cultivos de ciclo largo y raices de alta digestibilidad para alimentacion infantil."
     }
   ],
   "biopreparados": [
@@ -5284,6 +5557,24 @@
       "año": null,
       "titulo": "The IUCN Red List of Threatened Species",
       "url": "https://www.iucnredlist.org"
+    },
+    {
+      "id": "bernal-2015-catalogo-plantas-colombia",
+      "tipo": "base_datos",
+      "autores": "Bernal, R.; Gradstein, S.R.; Celis, M. (eds.)",
+      "año": 2015,
+      "titulo": "Catálogo de plantas y líquenes de Colombia",
+      "institucion": "Instituto de Ciencias Naturales, Universidad Nacional de Colombia",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "tipo": "libro",
+      "autores": "Perez Arbelaez, E.",
+      "año": 1947,
+      "titulo": "Plantas Utiles de Colombia",
+      "revista_o_editorial": "Editorial Camacho Roldan / Instituto de Ciencias Naturales, Universidad Nacional de Colombia",
+      "observaciones": "Ediciones sucesivas 1956, 1975, 1996. La 4a ed. (1996, Fondo FEN/Colciencias) es la mas accesible."
     }
   ]
 }
