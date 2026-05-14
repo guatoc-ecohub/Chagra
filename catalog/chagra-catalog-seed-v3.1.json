@@ -4519,6 +4519,232 @@
         "ica-resolucion-3168-2015"
       ],
       "validation_level": "claude_draft"
+    },
+    {
+      "id": "amaranthus_caudatus",
+      "nombre_comun": "Amaranto",
+      "nombre_comunes_regionales": [
+        "Kiwicha",
+        "Achis"
+      ],
+      "nombre_cientifico": "Amaranthus caudatus L.",
+      "familia_botanica": "Amaranthaceae",
+      "category": "cereales",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 3000,
+        "max_absoluto": 3600
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 12,
+        "optimo_max": 18,
+        "max_tolerable": 25
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Semilla muy pequeña; sembrar superficialmente en semillero y trasplantar a los 30-45 dias. Tradicionalmente se asocia con maiz y frijol en la milpa andina."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-2013-quinua",
+        "nrc-1989-cultivos-andinos",
+        "perez-arbelaez-1947-plantas-utiles",
+        "mujica-1992-quinua"
+      ],
+      "valor_pedagogico": "Pseudocereal de alta montana: sus inflorescencias contienen miles de semillas ricas en proteina completa (lisina). Ensenia la resiliencia a sequia y heladas en la chagra."
+    },
+    {
+      "id": "vicia_faba",
+      "nombre_comun": "Haba",
+      "nombre_cientifico": "Vicia faba L.",
+      "familia_botanica": "Fabaceae",
+      "category": "granos_legumbres",
+      "thermal_zones": [
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 3000,
+        "max_absoluto": 3400
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 10,
+        "optimo_max": 18,
+        "max_tolerable": 22
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa a 5-8 cm de profundidad. Tradicionalmente se asocia con papa y maiz en la chagra altoandina. Requiere inoculacion con Rhizobium para optimizar fijacion de N."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-leguminosas-andinas",
+        "nrc-1989-cultivos-andinos"
+      ],
+      "valor_pedagogico": "Leguminosa de clima frio por excelencia. Su resistencia a heladas y su capacidad de fijar nitrogeno la convierten en pilar de la rotacion andina."
+    },
+    {
+      "id": "pisum_sativum_andina",
+      "nombre_comun": "Arveja andina",
+      "nombre_comunes_regionales": [
+        "Alverja"
+      ],
+      "nombre_cientifico": "Pisum sativum L. var. andina",
+      "familia_botanica": "Fabaceae",
+      "category": "granos_legumbres",
+      "thermal_zones": [
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 10,
+        "optimo_max": 18,
+        "max_tolerable": 22
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa en surcos a 3-5 cm de profundidad. Variedad de crecimiento indeterminado; requiere tutorado con ramas de aliso o cerca de maiz."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-leguminosas-andinas",
+        "nrc-1989-cultivos-andinos"
+      ],
+      "valor_pedagogico": "Variedad altoandina de arveja adaptada a climas frios. Ensenia el valor de las leguminosas en la rotacion y el aporte de proteina vegetal en la dieta chiguana."
+    },
+    {
+      "id": "lens_culinaris_andina",
+      "nombre_comun": "Lenteja andina",
+      "nombre_cientifico": "Lens culinaris Medik. var. andina",
+      "familia_botanica": "Fabaceae",
+      "category": "granos_legumbres",
+      "thermal_zones": [
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2400,
+        "optimo_max": 3000,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 12,
+        "optimo_max": 18,
+        "max_tolerable": 24
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa en surcos. Variedad tolerante a sequia relativa del altiplano. Inocular con Rhizobium especifico para Lens."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-leguminosas-andinas",
+        "nrc-1989-cultivos-andinos"
+      ],
+      "valor_pedagogico": "Leguminosa de alta montana menos conocida pero valiosa por su rusticidad y aporte proteico en condiciones de frio extremo."
+    },
+    {
+      "id": "phaseolus_vulgaris_nuna",
+      "nombre_comun": "Frijol nuna",
+      "nombre_comunes_regionales": [
+        "Pop-bean",
+        "Frijol reventon",
+        "Nunas"
+      ],
+      "nombre_cientifico": "Phaseolus vulgaris L. cv. nuna",
+      "familia_botanica": "Fabaceae",
+      "category": "granos_legumbres",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 2800,
+        "max_absoluto": 3100
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 14,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Variedad de crecimiento voluble; requiere tutor. Se siembra asociada a maiz (milpa andina) o en cercos. Los granos secos se tuestan y revientan como crispetas."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "nrc-1989-cultivos-andinos",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "Tesoro genetico andino: frijol que revienta al tostarse. Ensenia la diversidad de usos y la importancia de conservar variedades locales."
     }
   ],
   "biopreparados": [
@@ -5284,6 +5510,59 @@
       "año": null,
       "titulo": "The IUCN Red List of Threatened Species",
       "url": "https://www.iucnredlist.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "tipo": "base_datos",
+      "autores": "Bernal, R.; Gradstein, S.R.; Celis, M. (eds.)",
+      "año": 2015,
+      "titulo": "Catálogo de Plantas y Líquenes de Colombia",
+      "institucion": "Instituto de Ciencias Naturales, Universidad Nacional de Colombia",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "nrc-1989-cultivos-andinos",
+      "tipo": "libro",
+      "autores": "National Research Council (NRC)",
+      "año": 1989,
+      "titulo": "Lost Crops of the Incas: Little-Known Plants of the Andes with Promise for Worldwide Cultivation",
+      "revista_o_editorial": "National Academy Press",
+      "isbn": "9780309042642"
+    },
+    {
+      "id": "fao-2013-quinua",
+      "tipo": "libro",
+      "autores": "FAO — Organización de las Naciones Unidas para la Alimentación y la Agricultura",
+      "año": 2013,
+      "titulo": "Quinua: Año Internacional de la Quinua 2013 — Documentos técnicos y estado del arte",
+      "institucion": "FAO",
+      "url": "https://www.fao.org/quinoa-2013"
+    },
+    {
+      "id": "mujica-1992-quinua",
+      "tipo": "articulo_revista",
+      "autores": "Mujica, A.",
+      "año": 1992,
+      "titulo": "Revisión bibliográfica sobre el cultivo de la quinua (Chenopodium quinoa Willd.) y el amaranto (Amaranthus caudatus L.) en los Andes",
+      "observaciones": "Publicación del Instituto Nacional de Investigaciones Agropecuarias (INIAP), Ecuador. Revisión exhaustiva de germoplasma, agronomía y usos tradicionales."
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "tipo": "libro",
+      "autores": "Pérez Arbeláez, E.",
+      "año": 1947,
+      "titulo": "Plantas Útiles de Colombia",
+      "revista_o_editorial": "Librería Colombiana / Camacho Roldán",
+      "observaciones": "Obra clásica de la botánica económica colombiana; múltiples reediciones posteriores."
+    },
+    {
+      "id": "agrosavia-leguminosas-andinas",
+      "tipo": "ficha_tecnica_institucional",
+      "autores": "AGROSAVIA",
+      "año": null,
+      "titulo": "Fichas técnicas de leguminosas andinas (haba, arveja, lenteja, frijol)",
+      "institucion": "Corporación Colombiana de Investigación Agropecuaria (AGROSAVIA)",
+      "observaciones": "Compilación de fichas técnicas de AGROSAVIA para leguminosas de clima frío. Año y volumen pendientes de consolidación."
     }
   ]
 }
