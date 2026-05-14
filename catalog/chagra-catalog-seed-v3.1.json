@@ -995,11 +995,12 @@
         "solanum_lycopersicum_san_marzano"
       ],
       "antagonists": [],
-      "valor_pedagogico": "Aliada estética y funcional. Limpia el suelo para los tomates y regala flores medicinales durante todo el año chiguano.",
+       "valor_pedagogico": "La Caléndula (Calendula officinalis L.) es una especie ornamental-medicinal originaria del Mediterráneo, ampliamente cultivada en jardines campesinos de Cundinamarca entre 0-2800 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con ciclo de floración de 75-90 días, asociándose beneficiosamente con cultivos como el tomate (Solanum lycopersicum) mientras actúa como repelente natural de trips y nemátodos mediante secreciones radiculares. En el contexto cultural andino-campesino, sus flores se utilizan tradicionalmente en preparaciones de crema cicatrizante por sus propiedades flavonoides, saponinas y aceites esenciales. Según GBIF Backbone Taxonomy y Plants of the World Online (POWO), esta especie destaca por su valor ecológico en atracción de polinizadores y manejo integrado de plagas en sistemas agroecológicos de montaña.",
        "source_ids": [
          "gbif-taxonomic-backbone",
          "powo-kew",
-         "ica-resolucion-3168-2015"
+         "perez-arbelaez-1947-plantas-utiles",
+         "jbb-plantas-medicinales"
        ],
       "validation_level": "claude_draft",
       "estrato": "medio"
