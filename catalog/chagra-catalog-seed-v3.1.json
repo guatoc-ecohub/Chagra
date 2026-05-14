@@ -7461,6 +7461,378 @@
         "gbif-taxonomic-backbone"
       ],
       "valor_pedagogico": "Planta del sotobosque tropical con usos medicinales y tintoreos tradicionales. Ensenia el conocimiento botanico de las comunidades afrocolombianas del Pacifico y su relacion con el bosque humedo."
+    },
+    {
+      "id": "cymbopogon_nardus",
+      "nombre_comun": "Citronela",
+      "nombre_comunes_regionales": [
+        "Citronela de Java",
+        "Pasto citronela"
+      ],
+      "nombre_cientifico": "Cymbopogon nardus (L.) Rendle",
+      "familia_botanica": "Poaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "pest_repellent",
+        "biomass_producer",
+        "windbreak"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1200,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 18,
+        "optimo_max": 30,
+        "max_tolerable": 38
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "division_mata",
+        "notas": "Se reproduce por division de macollos. Cultivada en Colombia para extraccion de aceites esenciales repelentes de insectos."
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Aceite esencial vivo: la citronela ensena como las plantas producen metabolitos secundarios para repeler insectos y proteger el cultivo en la chagra."
+    },
+    {
+      "id": "zingiber_officinale",
+      "nombre_comun": "Jengibre",
+      "nombre_comunes_regionales": [
+        "Kion",
+        "Jengibre dulce"
+      ],
+      "nombre_cientifico": "Zingiber officinale Roscoe",
+      "familia_botanica": "Zingiberaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "rizoma",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 300,
+        "optimo_max": 1200,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 35
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "rizoma",
+        "notas": "Se propaga mediante trozos de rizoma con al menos una yema. Requiere suelos sueltos y ricos en materia organica. Cultivo tradicional en la zona cafetera colombiana."
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Rizoma medicinal por excelencia: el jengibre ensena como las plantas almacenan compuestos bioactivos en sus organos subterraneos, base de la farmacopea tradicional colombiana."
+    },
+    {
+      "id": "curcuma_longa",
+      "nombre_comun": "Curcuma",
+      "nombre_comunes_regionales": [
+        "Palillo",
+        "Azafran de la tierra",
+        "Guisador"
+      ],
+      "nombre_cientifico": "Curcuma longa L.",
+      "familia_botanica": "Zingiberaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "rizoma",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1000,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 20,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "rizoma",
+        "notas": "Propagacion por trozos de rizoma. Requiere 8-10 meses para cosecha. El rizoma se usa como colorante natural y antiinflamatorio en la cocina y medicina tradicional colombiana."
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Colorante natural: la curcuma demuestra como los pigmentos vegetales (curcumina) tienen propiedades medicinales antiinflamatorias y usos tintoreos tradicionales."
+    },
+    {
+      "id": "cuminum_cyminum",
+      "nombre_comun": "Comino criollo",
+      "nombre_comunes_regionales": [
+        "Comino",
+        "Comino comun"
+      ],
+      "nombre_cientifico": "Cuminum cyminum L.",
+      "familia_botanica": "Apiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "semilla",
+      "cycleMonths": 4,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 300,
+        "optimo_max": 1500,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 15,
+        "optimo_max": 25,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa en surcos. Cultivo anual de ciclo corto. Las semillas se usan como condimento esencial en la cocina colombiana (sancocho, frijol, arroz)."
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Semilla aromatica: el comino ensena como las plantas concentran aceites esenciales en las semillas, fundamento del condimento en la cocina tradicional colombiana."
+    },
+    {
+      "id": "elettaria_cardamomum",
+      "nombre_comun": "Cardamomo",
+      "nombre_comunes_regionales": [
+        "Cardamomo verde",
+        "Cardamomo de la India"
+      ],
+      "nombre_cientifico": "Elettaria cardamomum (L.) Maton",
+      "familia_botanica": "Zingiberaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "semilla",
+      "altitud_msnm": {
+        "min_absoluto": 500,
+        "optimo_min": 800,
+        "optimo_max": 1500,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 18,
+        "optimo_max": 28,
+        "max_tolerable": 32
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "rizoma",
+        "notas": "Propagacion por division de rizomas. Requiere sombra y alta humedad ambiental. Sus semillas se usan como especia aromatica en infusiones y reposteria tradicional."
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "Especia de sombra: el cardamomo ensena como los cultivos de sotobosque generan alto valor economico sin necesidad de tumbar el dosel arboreo, modelo de agroforesteria."
+    },
+    {
+      "id": "vanilla_planifolia",
+      "nombre_comun": "Vainilla",
+      "nombre_comunes_regionales": [
+        "Vainilla de las Indias",
+        "Vainilla comun"
+      ],
+      "nombre_cientifico": "Vanilla planifolia Jacks. ex Andrews",
+      "familia_botanica": "Orchidaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 600,
+        "max_absoluto": 1000
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Propagacion por esquejes de tallo. Orquidea trepadora que requiere arbol tutor (espaldera viva). Requiere polinizacion manual para produccion comercial de vainas aromaticas."
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Polinizacion manual: la vainilla ensena la relacion simbiotica entre orquideas y polinizadores nativos, y la tecnica tradicional de beneficio del fruto aromatico."
+    },
+    {
+      "id": "illicium_verum",
+      "nombre_comun": "Anis estrella",
+      "nombre_comunes_regionales": [
+        "Anis de la China",
+        "Estrella anisada"
+      ],
+      "nombre_cientifico": "Illicium verum Hook.f.",
+      "familia_botanica": "Schisandraceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1200,
+        "optimo_max": 2000,
+        "max_absoluto": 2500
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Arbol de lento crecimiento que produce frutos en forma de estrella, ricos en anetol. Cultivado en zonas altas de Colombia como aromatica medicinal."
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "Fruto estrella: el anis estrella ensena como la morfologia del fruto revela su parentesco y su uso como expectorante natural en la farmacopea tradicional colombiana."
+    },
+    {
+      "id": "mentha_villosa",
+      "nombre_comun": "Hierbabuena criolla",
+      "nombre_comunes_regionales": [
+        "Menta criolla",
+        "Hierbabuena de Castilla",
+        "Menta peluda"
+      ],
+      "nombre_cientifico": "Mentha x villosa Huds.",
+      "familia_botanica": "Lamiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 300,
+        "optimo_min": 800,
+        "optimo_max": 2500,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 12,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "medio",
+      "propagation": {
+        "metodo_principal": "estolon",
+        "notas": "Hibrido esteril propagado exclusivamente por estolones. Ampliamente cultivada en huertas caseras colombianas para infusiones medicinales y agua de panela con hierbabuena."
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Hibrido esteril: la hierbabuena criolla ensena como la propagacion vegetativa preserva caracteres deseables a traves de generaciones, esencial en la medicina popular colombiana."
     }
   ],
   "biopreparados": [
