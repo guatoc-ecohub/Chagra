@@ -1,0 +1,45 @@
+cff-version: 1.2.0
+message: "Si usa este catálogo en publicaciones, políticas públicas o software derivado, por favor cite el siguiente trabajo con atribución obligatoria CC-BY-SA-4.0."
+title: "Chagra Catálogo Agroecológico Colombiano v3.1"
+abstract: "Catálogo agroecológico estructurado para la PWA Chagra con especies cultivables, invasoras, nativas y endémicas referenciables para los 4 pisos térmicos colombianos (páramo, frío, templado, cálido). Incluye trazabilidad de fuentes científicas Tier A/B/C. Driver estratégico: evidencia documental para proceso delimitación páramo Cruz Verde-Sumapaz (MinAmbiente Colombia)."
+type: dataset
+version: "3.1.0"
+date-released: 2026-05-14
+license: CC-BY-SA-4.0
+repository-code: "https://github.com/guatoc-ecohub/Chagra"
+url: "https://chagra.guatoc.co"
+authors:
+  - family-names: Guerrero
+    given-names: Miguel
+    affiliation: Guatoc
+keywords:
+  - agroecología
+  - Colombia
+  - Cundinamarca
+  - páramo
+  - Cruz Verde-Sumapaz
+  - soberanía alimentaria
+  - biodiversidad
+  - etnobotánica andina
+  - trazabilidad agrícola
+  - tubérculos andinos
+  - PlaN A
+  - Resolución 331/2024
+identifiers:
+  - description: "Repositorio canónico"
+    type: url
+    value: "https://github.com/guatoc-ecohub/Chagra"
+  - description: "PWA producción"
+    type: url
+    value: "https://chagra.guatoc.co"
+preferred-citation:
+  type: dataset
+  title: "Chagra Catálogo Agroecológico Colombiano v3.1 — 175 especies + 54 fuentes"
+  authors:
+    - family-names: Guerrero
+      given-names: Miguel
+      affiliation: Guatoc
+  year: 2026
+  version: "3.1.0"
+  license: CC-BY-SA-4.0
+  url: "https://github.com/guatoc-ecohub/Chagra/tree/main/catalog"
