@@ -992,10 +992,11 @@
       ],
       "antagonists": [],
       "valor_pedagogico": "Aliada estética y funcional. Limpia el suelo para los tomates y regala flores medicinales durante todo el año chiguano.",
-      "source_ids": [
-        "pamplona-roger-2006-plantas-medicinales",
-        "restrepo-1996-abc-agricultura-organica"
-      ],
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "ica-resolucion-3168-2015"
+       ],
       "validation_level": "claude_draft",
       "estrato": "medio"
     },
@@ -1124,10 +1125,11 @@
         "metodo_principal": "semilla",
         "notas": "Cosechar cuando el tallo cambie de color y el grano esté duro (no se deje rayar con la uña)."
       },
-      "source_ids": [
-        "fao-ecocrop",
-        "sib-colombia"
-      ],
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "ica-resolucion-3168-2015"
+       ],
       "valor_pedagogico": "Superalimento andino. Parte de la 'Milpa Andina'; enseña cómo obtener proteína de alta calidad sin depender de mercados externos."
     },
     {
@@ -1237,12 +1239,13 @@
       "propagation": {
         "metodo_principal": "semilla",
         "notas": "Siembra directa escalonada cada 15 días para cosecha continua en la chagra."
-      },
-      "source_ids": [
-        "fao-ecocrop",
-        "restrepo-1996-abc-agricultura-organica"
-      ],
-      "valor_pedagogico": "Básico de la cocina chiguana. Sus flores atraen sírfidos que controlan pulgones de forma natural en el huerto."
+       },
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "El cilantro (Coriandrum sativum L.) es una aromática mediterránea naturalizada en Colombia, cultivada permanentemente en Cundinamarca entre 1000-2400 msnm en zonas térmicas templadas y frías. Su ciclo corto de 40-60 días permite cosechas escalonadas de hojas y semillas utilizadas en preparaciones culinarias tradicionales. Se propaga por siembra directa cada 15 días, prefiriendo medio-sombra en épocas cálidas, y se asocia beneficiosamente con repollo y zanahoria para reducir plagas como áfidos y trips. En el contexto andino campesino, su uso culinario se remonta a tiempos coloniales integrado en sofritos y guayos, mientras su cultivo sostenible evita sintéticos mediante manejo agroecológico. Fuentes: GBIF Taxonomic Backbone, POWO Kew, ICA Resolución 3168/2015."
     },
     {
       "id": "cymbopogon_citratus",
@@ -1615,10 +1618,11 @@
         "metodo_principal": "esqueje (bejuco)",
         "notas": "Planta trepadora o rastrera de rápido crecimiento; requiere climas templados para desarrollar dulzor."
       },
-      "source_ids": [
-        "powo-kew",
-        "restrepo-1996-abc-agricultura-organica"
-      ],
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "ica-resolucion-3168-2015"
+       ],
       "valor_pedagogico": "Lección de raíces reservantes: enseña cómo una planta rastrera puede concentrar energía solar en forma de carbohidratos dulces bajo la tierra."
     },
     {
