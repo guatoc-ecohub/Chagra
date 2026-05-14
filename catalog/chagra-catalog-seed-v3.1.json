@@ -4134,23 +4134,25 @@
         "plan_biopreparado": "Actúa como agroecólogo colombiano.\nTengo {M2} m2 de ortiga (Urtica dioica) establecida. Quiero producir purín enzimático para aplicar en {AREA_CULTIVO_HA} ha de {CULTIVO}.\n\nDame (a) cantidad de biomasa a cosechar, (b) protocolo de fermentación paso a paso, (c) dilución y frecuencia de aplicación, (d) efectos esperados y límites del biopreparado (qué SÍ hace vs qué NO hace)."
       },
       "rol_ecologico": "Acumuladora dinámica de nutrientes. Atractora de sírfidos (parasitoides de pulgones). Alimento de larvas de mariposas. Planta indicadora de suelos ricos en N.",
-      "valor_pedagogico": "Enseña acumulación dinámica, elaboración de biopreparados caseros, control biológico por reservorio de fauna benéfica.",
-      "saber_origen": {
-        "pueblo": "Uso campesino generalizado en Colombia (introducida en época colonial); uso médico tradicional en múltiples regiones",
-        "region": "Andes colombianos 1500-3500 msnm",
-        "practica_original": "Infusión medicinal, purín para huerta, activador de compost, aplicación tópica para artritis",
-        "validacion_cientifica_source_ids": [
-          "restrepo-1996-abc-agricultura-organica"
-        ]
-      },
+       "valor_pedagogico": "La Ortiga (Urtica dioica) es una herbácea perenne naturalizada en los Andes colombianos, presente en departamentos como Cundinamarca, Boyacá y Antioquia entre 1500-3000 msnm en zonas térmicas templado y frío. Presenta tricomas urticantes que contienen histamina y acetilcolina. Su manejo agronómico incluye propagación por semilla, rizoma o división de mata, con establecimiento en 30 días y ciclo perenne; se asocia beneficiosamente con sírfidos parasitoides de áfidos y no presenta plagas críticas significativas. En contexto campesino andino, se usa tradicionalmente para elaborar purín fermentado (7-14 días) como bioestimulante y repelente de pulgones, así como en infusiones medicinales. Su valor proteínico alcanza el 30% en materia seca, según validación en la fuente taxonómica Tier A GBIF Backbone Taxonomy.",
+       "saber_origen": {
+         "pueblo": "Uso campesino generalizado en Colombia (introducida en época colonial); uso médico tradicional en múltiples regiones",
+         "region": "Andes colombianos 1500-3500 msnm",
+         "practica_original": "Infusión medicinal, purín para huerta, activador de compost, aplicación tópica para artritis",
+         "validacion_cientifica_source_ids": [
+           "restrepo-1996-abc-agricultura-organica"
+         ]
+       },
       "nota_conservacion": null,
       "confidence_notes": "ATENCIÓN: confirmar taxonomía (U. dioica vs U. leptophylla vs U. urens) con agrónomo/botánico antes de distribuir. Los umbrales dados aplican a U. dioica sensu lato; pueden variar para especies nativas andinas.",
       "harvest_type": "hoja",
       "validation_level": "operator_reviewed",
-      "source_ids": [
-        "restrepo-1996-abc-agricultura-organica",
-        "pamplona-roger-2006-plantas-medicinales"
-      ]
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "perez-arbelaez-1947-plantas-utiles",
+         "restrepo-rivera-2005"
+       ]
     },
     {
       "id": "vaccinium_corymbosum_biloxi",
