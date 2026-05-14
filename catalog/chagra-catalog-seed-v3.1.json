@@ -1282,15 +1282,16 @@
       "radiacion": "sol_pleno",
       "agua": "medio",
       "drenaje_requerido": "bueno",
-      "propagation": {
-        "metodo_principal": "division_rizoma",
-        "notas": "Se propaga mediante el trasplante de 'hijos' (macollos) de la corona."
-      },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "pamplona-roger-2006-plantas-medicinales"
-      ],
-      "valor_pedagogico": "Lección de diseño microclimático: su uso como barrera contra el viento protege cultivos más delicados en la zona fría."
+"propagation": {
+         "metodo_principal": "division_rizoma",
+         "notas": "Se propaga mediante el trasplante de 'hijos' (macollos) de la corona."
+       },
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "perez-arbelaez-1947-plantas-utiles"
+       ],
+       "valor_pedagogico": "Gramínea aromática tropical presente en departamentos cálidos y templados de Colombia como Cundinamarca (0-2400 msnm, zonas térmicas cálido, templado y frío). Se propaga fácilmente por división de matas o rizomas, formando densos tocuyos que requieren poda periódica para renovar tallos y maximizar producción de aceite esencial rico en citral (75-85%, compuesto por citronelal y geraniol). En contextos campesinos andinos, su infusión se usa tradicionalmente como antiespasmódico y digestivo, mientras su aroma cítrico actúa como repelente natural de mosquitos y otros insectos. Cultivada en asociación con hortalizas y como barrera antiviento en huertos familiares, contribuye al manejo ecológico de plagas sin insumos químicos. Fuente: GBIF Backbone Taxonomy y Plants of the World Online confirman su distribución neotropical y sinonimia taxonómica aceptada."
     },
     {
       "id": "cytisus_monspessulanus",
