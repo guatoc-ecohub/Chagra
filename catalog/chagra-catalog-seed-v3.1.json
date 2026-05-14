@@ -5334,6 +5334,437 @@
       ],
       "valor_pedagogico": "El falso durazno: sus frutos recuerdan al durazno europeo pero pertenecen a un genero nativo andino. Ensea la diferencia entre especies nativas y exoticas, y como los nombres populares a veces confunden.",
       "validation_level": "claude_draft"
+    },
+    {
+      "id": "avena_sativa",
+      "nombre_comun": "Avena forrajera",
+      "nombre_comunes_regionales": [
+        "Avena",
+        "Avena de clima frio"
+      ],
+      "nombre_cientifico": "Avena sativa L.",
+      "familia_botanica": "Poaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "ground_cover",
+        "biomass_producer",
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 3000,
+        "max_absoluto": 3400
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 10,
+        "optimo_max": 18,
+        "max_tolerable": 25
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra directa al voleo o en surcos a 2-3cm de profundidad. Densidad 80-120 kg/ha. Epoca recomendada: inicio de temporada de lluvias. Asociacion comun con vicia sativa o trifolium repens para abono verde.",
+        "tiempo_a_establecimiento_dias": 60,
+        "notas": "Cereal de ciclo corto (4-5 meses). Excelente cobertura invernal en rotacion con papa y hortalizas. Incorporacion en floracion maximiza aporte de biomasa.",
+        "fuente": "AGROSAVIA 2022. Gramineas forrajeras en sistemas ganaderos andinos"
+      },
+      "companions": [
+        "vicia_sativa",
+        "trifolium_repens",
+        "vicia_faba"
+      ],
+      "antagonists": [],
+      "valor_pedagogico": "El manto verde de la chagra: la avena forrajera protege el suelo desnudo entre cosechas, ensenando el valor de la cobertura permanente y el ciclo de materia organica en la rotacion altoandina.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-forrajeras-2022",
+        "restrepo-2005-agroecologia"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "brassica_rapa_rapifera",
+      "nombre_comun": "Nabo forrajero",
+      "nombre_comunes_regionales": [
+        "Nabo",
+        "Nabicol",
+        "Colinabo forrajero"
+      ],
+      "nombre_cientifico": "Brassica rapa L. var. rapifera",
+      "familia_botanica": "Brassicaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "ground_cover",
+        "biomass_producer",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 12,
+        "optimo_max": 18,
+        "max_tolerable": 25
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra directa en surcos a 1-2cm de profundidad. Densidad 4-6 kg/ha. Germinacion rapida a los 5-7 dias. Ciclo de 60-90 dias para forraje. Se asocia con avena forrajera o vicia para mezcla de abono verde.",
+        "tiempo_a_establecimiento_dias": 60,
+        "notas": "Brassica de raiz pivotante que descompacta suelos. Raices profundas reciclan nutrientes de capas inferiores. Sus flores atraen polinizadores y controlan nematodos por biofumigacion.",
+        "fuente": "Restrepo Rivera 2005. Agroecologia colombiana"
+      },
+      "companions": [
+        "avena_sativa",
+        "vicia_sativa"
+      ],
+      "antagonists": [],
+      "valor_pedagogico": "El arado biologico: el nabo forrajero rompe la compactacion del suelo con su raiz pivotante y recicla nutrientes profundos, ensenando que las plantas pueden labrar la tierra mejor que el azadon.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "restrepo-2005-agroecologia"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "festuca_arundinacea",
+      "nombre_comun": "Festuca",
+      "nombre_comunes_regionales": [
+        "Festuca alta",
+        "Festuca de montaña",
+        "Pasto festuca"
+      ],
+      "nombre_cientifico": "Festuca arundinacea Schreb.",
+      "familia_botanica": "Poaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "ground_cover",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 3000,
+        "max_absoluto": 3400
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra directa al voleo o en surcos a 1-2cm de profundidad. Densidad 25-35 kg/ha. Germinacion 7-14 dias. Establece rapido en climas frios. Tolerante a suelos acidos y compactados.",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "Graminea perenne de alta rusticidad y tolerancia a sequia. Excelente para pastoreo rotacional en el altiplano. Raices profundas (hasta 1m) mejoran estructura del suelo.",
+        "fuente": "AGROSAVIA 2022. Gramineas forrajeras en sistemas ganaderos andinos"
+      },
+      "companions": [
+        "trifolium_repens",
+        "lolium_perenne",
+        "medicago_sativa"
+      ],
+      "antagonists": [],
+      "valor_pedagogico": "La graminea resistente: la festuca ensena la importancia de las raices profundas en la recuperacion de suelos compactados y su papel en la estabilizacion de laderas altoandinas.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-forrajeras-2022",
+        "restrepo-2005-agroecologia"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "lolium_perenne",
+      "nombre_comun": "Raigras perenne",
+      "nombre_comunes_regionales": [
+        "Ryegrass perenne",
+        "Pasto inglaterra",
+        "Raigras"
+      ],
+      "nombre_cientifico": "Lolium perenne L.",
+      "familia_botanica": "Poaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "ground_cover",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 3000,
+        "max_absoluto": 3400
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra al voleo en suelos bien preparados. Densidad 25-30 kg/ha para pastoreo, 15-20 kg/ha para cobertura. Germinacion rapida 5-10 dias. Requiere humedad constante en establecimiento.",
+        "tiempo_a_establecimiento_dias": 60,
+        "notas": "La graminea forrajera mas usada en el altiplano cundiboyacense. Establecimiento rapido, alta produccion de biomasa en clima frio. Ideal asociada con trebol blanco para pradera permanente.",
+        "fuente": "AGROSAVIA 2022. Gramineas forrajeras en sistemas ganaderos andinos"
+      },
+      "companions": [
+        "trifolium_repens",
+        "medicago_sativa",
+        "festuca_arundinacea"
+      ],
+      "antagonists": [],
+      "valor_pedagogico": "La alfombra verde del altiplano: el raigras perenne demuestra la sinergia entre gramineas y leguminosas en la pradera, ensenando el equilibrio forrajero que sostiene la ganaderia altoandina.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-forrajeras-2022",
+        "restrepo-2005-agroecologia"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "medicago_sativa",
+      "nombre_comun": "Alfalfa",
+      "nombre_comunes_regionales": [
+        "Alfalfa de clima frio",
+        "Mielga"
+      ],
+      "nombre_cientifico": "Medicago sativa L.",
+      "familia_botanica": "Fabaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer",
+        "ground_cover",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 2000,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 15,
+        "optimo_max": 22,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra en surcos o al voleo, 0.5-1cm profundidad. Densidad 20-25 kg/ha. Requiere inoculacion con Rhizobium meliloti para optimizar fijacion de N. Ciclo de 3-5 anos de produccion. Corte cada 35-45 dias.",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "La reina de las forrajeras: alto contenido proteico (18-22%). Raiz pivotante que alcanza 3-4m de profundidad. Fija 150-250 kg N/ha/ano. Requiere suelos neutros a ligeramente alcalinos y buen drenaje.",
+        "fuente": "AGROSAVIA 2022. Gramineas forrajeras en sistemas ganaderos andinos"
+      },
+      "companions": [
+        "lolium_perenne",
+        "festuca_arundinacea",
+        "trifolium_repens"
+      ],
+      "antagonists": [],
+      "valor_pedagogico": "La maestra de la fijacion de nitrogeno: la alfalfa con su raiz que perfora el subsuelo ensena como las leguminosas transforman el aire en fertilizante, alimentando la pradera desde las profundidades.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-forrajeras-2022",
+        "restrepo-2005-agroecologia"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "mucuna_pruriens",
+      "nombre_comun": "Frijol terciopelo",
+      "nombre_comunes_regionales": [
+        "Mucuna",
+        "Pica-pica",
+        "Frijol abono"
+      ],
+      "nombre_cientifico": "Mucuna pruriens (L.) DC.",
+      "familia_botanica": "Fabaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "ground_cover",
+        "nitrogen_fixer",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1500,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra directa 2-3 semillas por sitio a 3-5cm de profundidad. Distancias 80x50cm. Densidad 20-25 kg/ha. Germinacion 5-10 dias. Ciclo 5-7 meses. Se incorpora al inicio de floracion como abono verde.",
+        "tiempo_a_establecimiento_dias": 45,
+        "notas": "Leguminosa trepadora anual de crecimiento vigoroso. Produce hasta 40 ton/ha de biomasa fresca. Fija 100-200 kg N/ha. Sus semillas contienen L-DOPA, compuesto usado en tratamiento del Parkinson.",
+        "fuente": "Restrepo Rivera 2005. Agroecologia colombiana"
+      },
+      "companions": [
+        "zea_mays"
+      ],
+      "antagonists": [],
+      "valor_pedagogico": "El abono verde mas potente del tropico: el frijol terciopelo produce biomasa masivamente y cubre el suelo como una alfombra viva, ensenando como las leguminosas tropicales restauran suelos degradados en climas calidos.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "restrepo-2005-agroecologia"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "raphanus_sativus_oleifer",
+      "nombre_comun": "Rabano forrajero",
+      "nombre_comunes_regionales": [
+        "Rabano abono",
+        "Rabano oleaginoso",
+        "Rabano forrajero"
+      ],
+      "nombre_cientifico": "Raphanus sativus L. var. oleifer",
+      "familia_botanica": "Brassicaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "ground_cover",
+        "biomass_producer",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 14,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra directa al voleo o surcos a 1-2cm. Densidad 10-15 kg/ha. Germinacion 4-7 dias. Ciclo rapido de 60-90 dias. Excelente cobertura de ciclo corto entre cultivos comerciales.",
+        "tiempo_a_establecimiento_dias": 45,
+        "notas": "Brassica de ciclo corto y crecimiento rapido. Raiz pivotante profunda que descompacta suelos. Efecto biofumigante por glucosinolatos. Sus flores atraen abejas y polinizadores nativos.",
+        "fuente": "Restrepo Rivera 2005. Agroecologia colombiana"
+      },
+      "companions": [
+        "avena_sativa",
+        "vicia_sativa"
+      ],
+      "antagonists": [],
+      "valor_pedagogico": "El abono verde express: el rabano forrajero germina y cubre el suelo en semanas, ensenando el valor de las brassicas como biofumigantes naturales y acumuladoras de nutrientes en rotaciones cortas.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "restrepo-2005-agroecologia"
+      ],
+      "validation_level": "claude_draft"
     }
   ],
   "biopreparados": [
@@ -6152,6 +6583,15 @@
       "titulo": "Fichas técnicas de leguminosas andinas (haba, arveja, lenteja, frijol)",
       "institucion": "Corporación Colombiana de Investigación Agropecuaria (AGROSAVIA)",
       "observaciones": "Compilación de fichas técnicas de AGROSAVIA para leguminosas de clima frío. Año y volumen pendientes de consolidación."
+    },
+    {
+      "id": "restrepo-2005-agroecologia",
+      "tipo": "libro",
+      "autores": "Restrepo Rivera, J.",
+      "año": 2005,
+      "titulo": "Agroecología colombiana: principios y prácticas de la agricultura orgánica en los Andes colombianos",
+      "revista_o_editorial": "Fundación Juquira Candiru",
+      "observaciones": "Fuente Tier A para abonos verdes, coberturas y rotaciones en agricultura orgánica altoandina."
     }
   ]
 }
