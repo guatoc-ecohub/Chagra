@@ -25,7 +25,7 @@ import { Sprout, Copy, MessageCircle, Mail, Check, AlertCircle, ChevronRight, Lo
  */
 
 const PASSWORD_PILOTO = 'guatoc-piloto-2026';   // Miguel: rota cuando quieras
-const MIGUEL_EMAIL = 'kortux@gmail.com';
+const MIGUEL_EMAIL = 'contacto@guatoc.co';
 
 const VOCACIONES = [
   { value: 'frutales',    label: 'Frutales (cítricos, mora, fresa, gulupa)' },
@@ -443,8 +443,8 @@ ${data.operador_nombre}`;
               corto (5-10 min, WhatsApp o email) sobre qué funcionó y qué falló.
             </li>
             <li>
-              Permitirnos usar tu experiencia (anonimizada) como caso de éxito
-              en grants Minciencias / SWISSAID / NLnet — esto destraba la fase
+              Permitirnos usar tu experiencia (anonimizada) como caso de
+              referencia ante apoyos institucionales — esto destraba la fase
               multi-finca completa para todos.
             </li>
             <li>

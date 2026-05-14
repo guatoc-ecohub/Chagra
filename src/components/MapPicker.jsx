@@ -42,9 +42,9 @@ const LOW_ACCURACY_THRESHOLD_M = 500;
  *   - mode="polygon": click para añadir vértices; botón "Finalizar" cierra el ring.
  *
  * Tiles se cargan desde /tiles/{z}/{x}/{y}.png (servidos por Nginx desde
- * /mnt/fast/appdata/farmos-pwa/tiles para operación offline). Si el Service
- * Worker no ha cacheado los tiles o no existen, Leaflet mostrará el layer
- * vacío, la geometría sigue siendo dibujable y persistible.
+ * el directorio webroot del despliegue para operación offline). Si el
+ * Service Worker no ha cacheado los tiles o no existen, Leaflet mostrará
+ * el layer vacío, la geometría sigue siendo dibujable y persistible.
  *
  * Props:
  *   - mode:       "point" | "polygon"
