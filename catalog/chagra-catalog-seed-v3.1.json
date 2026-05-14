@@ -3491,47 +3491,48 @@
       ],
       "valor_pedagogico": "Lección de sabor y color: enseña cómo el color naranja intenso indica altos niveles de azúcares y betacarotenos, siendo el referente mundial de dulzor en tomates."
     },
-    {
-      "id": "solanum_phureja",
-      "nombre_comun": "Papa criolla",
-      "nombre_cientifico": "Solanum phureja Juz. & Bukasov",
-      "familia_botanica": "Solanaceae",
-      "category": "tuberculos_raices",
-      "thermal_zones": [
-        "frio",
-        "templado"
-      ],
-      "roles_in_guild": [
-        "crop",
-        "ground_cover"
-      ],
-      "cultivable": true,
-      "conservation_status": "cultivo_comun",
-      "altitud_msnm": {
-        "min_absoluto": 1500,
-        "optimo_min": 2000,
-        "optimo_max": 2800,
-        "max_absoluto": 3200
-      },
-      "temperatura_c": {
-        "helada_letal": -2,
-        "optimo_min": 12,
-        "optimo_max": 18,
-        "max_tolerable": 25
-      },
-      "radiacion": "sol_pleno",
-      "agua": "medio",
-      "drenaje_requerido": "bueno",
-      "propagation": {
-        "metodo_principal": "tuberculo (semilla asexual)",
-        "notas": "No tiene periodo de dormancia (latencia); su ciclo rápido exige una renovación constante de la semilla en la finca."
-      },
-      "source_ids": [
-        "powo-kew",
-        "sib-colombia"
-      ],
-      "valor_pedagogico": "Lección de inmediatez: a diferencia de las papas de año, la criolla no duerme; su ciclo rápido enseña la dinámica de renovación constante en la chagra chiguana."
-    },
+{
+       "id": "solanum_phureja",
+       "nombre_comun": "Papa criolla",
+       "nombre_cientifico": "Solanum phureja Juz. & Bukasov",
+       "familia_botanica": "Solanaceae",
+       "category": "tuberculos_raices",
+       "thermal_zones": [
+         "frio"
+       ],
+       "roles_in_guild": [
+         "crop",
+         "ground_cover"
+       ],
+       "cultivable": true,
+       "conservation_status": "LC",
+       "altitud_msnm": {
+         "min_absoluto": 1500,
+         "optimo_min": 2500,
+         "optimo_max": 3200,
+         "max_absoluto": 3500
+       },
+       "temperatura_c": {
+         "helada_letal": -3,
+         "optimo_min": 10,
+         "optimo_max": 16,
+         "max_tolerable": 22
+       },
+       "radiacion": "sol_pleno",
+       "agua": "medio",
+       "drenaje_requerido": "bueno",
+       "propagation": {
+         "metodo_principal": "tuberculo (semilla asexual)",
+         "notas": "No tiene periodo de dormancia (latencia); su ciclo rápido exige una renovación constante de la semilla en la finca."
+       },
+       "source_ids": [
+         "agrosavia-sol-andina",
+         "cip-2006-ghislain",
+         "nustez-rodriguez-2024-unal",
+         "gbif-taxonomic-backbone"
+       ],
+       "valor_pedagogico": "La papa criolla (Solanum phureja) se distribuye en los departamentos de Cundinamarca y Boyacá entre 2500 y 3200 msnm en zonas térmicas frías, siendo un cultivo emblemático de la región andina. Su manejo agronómico utiliza el tubérculo como semilla con ciclos cortos de 90-120 días, ideal para rotaciones con leguminosas que mejoran la fijación de nitrógeno en el suelo. Este tubérculo tiene raíces profundas en la cultura muisca y andina, donde se consume diariamente en sopas y guisos como alimento básico desde la época prehispánica. Fuentes de información Tier A incluyen la ficha técnica Sol Andina de AGROSAVIA, investigaciones del Centro Internacional Papa (CIP), estudios de la Universidad Nacional de Colombia y el backbone taxonómico de GBIF."
+     },
     {
       "id": "thunbergia_alata",
       "_curation_status": "CURACIÓN BÁSICA; datos de invasividad en Colombia confirmados; protocolo de manejo requiere fuente primaria específica",
