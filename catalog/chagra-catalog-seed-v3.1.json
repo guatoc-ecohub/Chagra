@@ -2162,11 +2162,13 @@
         "metodo_principal": "tuberculo",
         "notas": "Asoliar los tubérculos antes de consumirlos para reducir el contenido de ácido oxálico y aumentar el dulzor."
       },
-      "source_ids": [
-        "agrosavia-manual-tuberculos-andinos-2017",
-        "cip-2006-ghislain"
-      ],
-      "valor_pedagogico": "Lección de biodiversidad andina. Es la 'hermana del frío' que acompaña a la papa en la chagra alta chiguana."
+       "source_ids": [
+         "nrc-1989-cultivos-andinos",
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-sol-andina"
+       ],
+       "valor_pedagogico": "La oca (Oxalis tuberosa) se cultiva en Colombia principalmente en los departamentos de Cundinamarca, Boyacá, Nariño y Cauca, entre 2400-3400 msnm en zona térmica fría, con propagación por tubérculos semilla y un ciclo de crecimiento de 8-9 meses, asociándose frecuentemente con papa y maíz en sistemas de policultivo andino, mientras enfrenta desafíos por plagas como el gusano blanco y la mosca de la oca; su cultivo tiene profundas raíces culturales en la tradición muisca y campesina andina, donde se reconocen variedades de tubérculo blanco, rosado, morado y amarillo, utilizándose tradicionalmente cocido en sopas y aplicándose la técnica ancestral de 'qollotear' (exposición al sol post-cosecha) para reducir el contenido de ácido oxálico y aumentar el dulzor, tal como documenta el National Research Council en su obra de 1989 'Lost Crops of the Incas' que identifica a la oca como uno de los tubérculos andinos subutilizados con gran potencial para cultivo mundial."
     },
     {
       "id": "passiflora_edulis_flavicarpa",
