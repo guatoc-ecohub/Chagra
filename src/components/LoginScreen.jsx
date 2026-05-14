@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Sprout } from 'lucide-react';
 import { authenticateUser } from '../services/authService';
+import { setCurrentOperator } from '../services/operatorIdentityService';
 import { version as APP_VERSION } from '../../package.json';
 import ChagraGrowLoader from './ChagraGrowLoader';
 import LegalLinks from './LegalLinks';
@@ -18,11 +19,23 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
 
     setLoading(true);
     const result = await authenticateUser(creds.username, creds.password);
-    setLoading(false);
 
     if (result.success) {
+      // Activar Capa 1 HMAC (ADR-027.v): computa operator_id_hash determinista
+      // vía HMAC-SHA256(username, PBKDF2(account_uuid_master, "chagra-salt-v1"))
+      // y persiste en localStorage. Los consumidores (InventoryDashboard,
+      // RecountDrawer, PlanEditor) dejan de usar 'default-hash-0...' fallback.
+      try {
+        await setCurrentOperator(creds.username);
+      } catch (err) {
+        // No bloquear login si falla crypto (browser sin Web Crypto API).
+        // Componentes hacen fallback a default-hash. Tracking warning silenciosa.
+        console.warn('[LoginScreen] setCurrentOperator failed:', err);
+      }
+      setLoading(false);
       onLoginSuccess();
     } else {
+      setLoading(false);
       onSave(result.error || 'Error autenticando', true);
     }
   };
