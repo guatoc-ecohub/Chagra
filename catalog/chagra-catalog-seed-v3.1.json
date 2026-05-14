@@ -851,12 +851,14 @@
       "propagation": {
         "metodo_principal": "semilla",
         "notas": "Requiere trasplante y un suelo profundamente abonado con materia orgánica nitrogenada."
-      },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
-      ],
-      "valor_pedagogico": "Lección de floración: enseña cómo lo que consumimos como 'cabeza' son en realidad miles de botones florales inmaduros."
+       },
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "ica-resolucion-3168-2015",
+         "agrosavia-sol-andina"
+       ],
+       "valor_pedagogico": "El brócoli (Brassica oleracea var. italica) es una crucífera hortícola cultivada en el cinturón agrícola de Cundinamarca (Mosquera-Madrid-Bojacá) entre 1800-2800 msnm en zonas térmicas fría y templada. Su ciclo de cultivo varía entre 90-120 días, se propaga por semilla con trasplante y requiere suelos ricos en materia orgánica nitrogenada. Varietales comerciales como Avenger, Marathon y Calabrese se adaptan bien a estas condiciones. En el contexto andino campesino, se asocia frecuentemente con cultivos de papa y cebolla en rotaciones que mejoran la estructura del suelo. Principal plagas incluyen mosca blanca y lepidópteros que dañan los botones florales. Fuente: AGROSAVIA Sol Andina ficha técnica."
     },
     {
       "id": "brassica_oleracea_sabauda",
