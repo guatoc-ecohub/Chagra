@@ -4745,6 +4745,556 @@
         "perez-arbelaez-1947-plantas-utiles"
       ],
       "valor_pedagogico": "Tesoro genetico andino: frijol que revienta al tostarse. Ensenia la diversidad de usos y la importancia de conservar variedades locales."
+    },
+    {
+      "id": "gliricidia_sepium",
+      "nombre_comun": "Matarratón",
+      "nombre_comunes_regionales": [
+        "Madre cacao",
+        "Cocoite",
+        "Mata ratón"
+      ],
+      "nombre_cientifico": "Gliricidia sepium (Jacq.) Kunth ex Walp.",
+      "familia_botanica": "Fabaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "living_fence",
+        "nitrogen_fixer",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1200,
+        "max_absoluto": 1600
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 20,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "bueno",
+      "fence_function": [
+        "delimitacion",
+        "rompevientos",
+        "sombra_parcial"
+      ],
+      "densidad_siembra_fence_m": 1,
+      "propagation": {
+        "methods": [
+          "esqueje",
+          "semilla"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Estacas de 1.5-2m de largo y 5-10cm de diametro, plantadas directamente a 30cm de profundidad en epoca lluviosa. Sin hojas en la porcion enterrada. Prendimiento superior al 90%.",
+        "notas": "Clasica cerca viva colombiana. Estaca enraiza sin hormonas. Fija N atmosferico. Follaje forrajero rico en proteinas para rumiantes.",
+        "fuente": "Perez Arbelaez 1947; AGROSAVIA sistemas silvopastoriles"
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone",
+        "agrosavia-silvopastoriles"
+      ],
+      "rol_ecologico": "Fijador de nitrogeno simbiotico con Rhizobium. Forrajera de alto valor proteico. Sombra ligera para cafe y cacao. Madera para leña y construcciones rurales.",
+      "valor_pedagogico": "El poste vivo: la estaca que prende sola. Ensenia la reproduccion vegetativa y el rol de las leguminosas arboreas en cercas vivas.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "trichanthera_gigantea",
+      "nombre_comun": "Nacedero",
+      "nombre_comunes_regionales": [
+        "Quiebrabarrigo",
+        "Cajeto",
+        "Uva de monte"
+      ],
+      "nombre_cientifico": "Trichanthera gigantea (Bonpl.) Nees",
+      "familia_botanica": "Acanthaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "living_fence",
+        "biomass_producer",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 500,
+        "optimo_max": 1800,
+        "max_absoluto": 2200
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 18,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno_a_moderado",
+      "fence_function": [
+        "delimitacion",
+        "sombra",
+        "refugio_fauna",
+        "proteccion_fuentes_hidricas"
+      ],
+      "densidad_siembra_fence_m": 1.5,
+      "propagation": {
+        "methods": [
+          "esqueje"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Estacas de 1-1.5m de largo, enterradas 30-40cm, preferiblemente al inicio del periodo lluvioso. Prendimiento alto incluso en suelos humedos.",
+        "notas": "Especie emblematica para proteccion de nacimientos de agua. Cerca viva tradicional en zonas cafeteras y ganaderas. Hojas forrajeras para rumiantes con alto contenido proteico.",
+        "fuente": "Perez Arbelaez 1947; Instituto Humboldt flora alto andina"
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "humboldt-flora-alto-andina"
+      ],
+      "rol_ecologico": "Protector de fuentes hidricas por su sistema radical denso. Banco de forraje proteinado. Refugio de fauna silvestre. Aporte de biomasa foliar al suelo.",
+      "valor_pedagogico": "El que nace del agua: la cerca viva que protege las quebradas. Ensenia la relacion entre vegetacion riparia y calidad del agua en la finca.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "erythrina_rubrinervia",
+      "nombre_comun": "Chiló",
+      "nombre_comunes_regionales": [
+        "Pisamo",
+        "Sangregado",
+        "Cachimbo"
+      ],
+      "nombre_cientifico": "Erythrina rubrinervia Kunth",
+      "familia_botanica": "Fabaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "living_fence",
+        "nitrogen_fixer",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1500,
+        "optimo_max": 2400,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 14,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "fence_function": [
+        "delimitacion",
+        "sombra",
+        "rompevientos"
+      ],
+      "densidad_siembra_fence_m": 2,
+      "propagation": {
+        "methods": [
+          "esqueje",
+          "semilla"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Estacas de 2m de largo, 8-15cm de diametro. Enterrar 40cm en suelo humedo. Florece a los 2-3 anos. Atrae colibries y abejas nativas.",
+        "notas": "Arbol de la familia Fabaceae, fijador de N. Sus flores rojas son fuente de nectar para colibries y abejas nativas. Madera blanda usada para postes y artesania.",
+        "fuente": "Perez Arbelaez 1947; GBIF; Bernal 2015 Catalogo Plantas Colombia"
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "rol_ecologico": "Fijador de nitrogeno simbiotico. Sombra regulada para cultivos asociados. Atraccion de polinizadores (colibries, abejas). Aporte de biomasa foliar rica en N.",
+      "valor_pedagogico": "Cerca viva florecida: cuando florece el chilo, las abejas llegan. Ensenia el rol de las leguminosas en la fertilidad del suelo y la polinizacion.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "tigridia_pavonia",
+      "nombre_comun": "Tigridia / Flor de tigre",
+      "nombre_comunes_regionales": [
+        "Lirio tigre",
+        "Oceloxochitl"
+      ],
+      "nombre_cientifico": "Tigridia pavonia (L.f.) DC.",
+      "familia_botanica": "Iridaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 800,
+        "optimo_max": 2000,
+        "max_absoluto": 2600
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 15,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "bulbo",
+          "semilla"
+        ],
+        "best_method": "bulbo",
+        "protocol_resumen": "Bulbos plantados a 5-8cm de profundidad, separacion 15-20cm. Florece 2-3 meses despues de la siembra. Flores duran un dia pero se suceden por semanas.",
+        "notas": "Herbacea bulbosa ornamental de flores vistosas. Cada flor abre al amanecer y se cierra al atardecer (un solo dia de vida). Uso en bordes de cerca viva.",
+        "fuente": "Perez Arbelaez 1947; GBIF"
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone"
+      ],
+      "rol_ecologico": "Atractora de polinizadores (abejas nativas, colibries). Planta ornamental de bordes de cerca viva. Aporte estetico y educacional al agroecosistema.",
+      "valor_pedagogico": "Reloj del huerto: cada flor abre al amanecer y vive solo un dia. Ensenia la sincronizacion de la planta con el ciclo solar y la importancia de los polinizadores.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "codiaeum_variegatum",
+      "nombre_comun": "Croton ornamental",
+      "nombre_comunes_regionales": [
+        "Croton",
+        "Hoja de colores"
+      ],
+      "nombre_cientifico": "Codiaeum variegatum (L.) Rumph. ex A.Juss.",
+      "familia_botanica": "Euphorbiaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "living_fence"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 800,
+        "max_absoluto": 1500
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 20,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "fence_function": [
+        "delimitacion",
+        "ornamental"
+      ],
+      "densidad_siembra_fence_m": 0.8,
+      "propagation": {
+        "methods": [
+          "esqueje"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Esquejes de 15-20cm de tallos semimaduros, enraizar en sustrato humedo con alta humedad ambiental. Tiempo de enraizamiento 3-4 semanas.",
+        "notas": "Arbusto ornamental de follaje vistoso con variacion cromatica (verde, amarillo, rojo, naranja). Cerca viva densa de baja altura en climas calidos.",
+        "fuente": "Perez Arbelaez 1947; GBIF"
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone"
+      ],
+      "rol_ecologico": "Planta ornamental de bordes de cerca viva en climas calidos. Sus hojas coloridas son indicadoras de luz (mayor color con mas sol).",
+      "valor_pedagogico": "Paleta vegetal: las hojas cambian de color segun la luz. Ensenia los pigmentos vegetales y como la radiacion afecta la expresion fenotipica.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "guadua_angustifolia",
+      "nombre_comun": "Guadua / Bambu nativo",
+      "nombre_comunes_regionales": [
+        "Bambu colombiano",
+        "Guadua angosta"
+      ],
+      "nombre_cientifico": "Guadua angustifolia Kunth",
+      "familia_botanica": "Poaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "emergente",
+      "roles_in_guild": [
+        "living_fence",
+        "windbreak",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 400,
+        "optimo_max": 1500,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 18,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno_a_moderado",
+      "fence_function": [
+        "delimitacion",
+        "rompevientos",
+        "sombra",
+        "proteccion_laderas"
+      ],
+      "densidad_siembra_fence_m": 3,
+      "propagation": {
+        "methods": [
+          "rizoma",
+          "esqueje"
+        ],
+        "best_method": "rizoma",
+        "protocol_resumen": "Propagacion por secciones de rizoma con 2-3 yemas viables. Plantar en surcos a 3-5m de distancia. Temporada lluviosa. Requiere riego los primeros 3 meses.",
+        "notas": "Graminea gigante nativa de Colombia, emblematica del Eje Cafetero. Cerca viva definitiva: unica, duradera y multiproposito. Cultivo de ciclo largo (>20 anos).",
+        "fuente": "Perez Arbelaez 1947; AGROSAVIA silvopastoriles"
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone",
+        "agrosavia-silvopastoriles"
+      ],
+      "rol_ecologico": "Captura y almacenamiento de agua en rizomas. Proteccion de suelos en laderas. Habitat para fauna. Sumidero de carbono. Material de construccion renovable.",
+      "valor_pedagogico": "La fortaleza verde: la guadua como barrera viva definitiva. Ensenia el crecimiento rizomatico, la captura de carbono y la construccion natural renovable.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "buddleja_americana",
+      "nombre_comun": "Buddleja arborea / Salvion",
+      "nombre_comunes_regionales": [
+        "Salvion de monte",
+        "Tabaquillo",
+        "Matico"
+      ],
+      "nombre_cientifico": "Buddleja americana L.",
+      "familia_botanica": "Scrophulariaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "living_fence",
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "fence_function": [
+        "delimitacion",
+        "refugio_fauna",
+        "rompevientos"
+      ],
+      "densidad_siembra_fence_m": 2,
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Esquejes de ramas semimaduras de 20-30cm, enraizar en sustrato humedo. Se propaga facilmente por estaca. Atrae mariposas y colibries durante la floracion.",
+        "notas": "Arbusto o arbolito nativo de los Andes, de crecimiento rapido. Flores lilas en paniculos muy aromaticas. Uso medicinal tradicional como antiinflamatorio y cicatrizante.",
+        "fuente": "Perez Arbelaez 1947; Instituto Humboldt flora alto andina"
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "humboldt-flora-alto-andina"
+      ],
+      "rol_ecologico": "Atractora de polinizadores (mariposas, colibries, abejas). Especie pionera en bordes de bosque. Medicina tradicional cicatrizante. Cerca viva de alta montana.",
+      "valor_pedagogico": "El jardin de mariposas: sus flores aromaticas atraen polinizadores de toda la finca. Ensenia la interaccion planta-polinizador en ecosistemas de alta montana.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "acanthus_mollis",
+      "nombre_comun": "Acanto andino",
+      "nombre_comunes_regionales": [
+        "Oreja de elefante",
+        "Lechuga de rio",
+        "Cardo"
+      ],
+      "nombre_cientifico": "Acanthus mollis L.",
+      "familia_botanica": "Acanthaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "living_fence",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1800,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "fence_function": [
+        "delimitacion",
+        "ornamental"
+      ],
+      "propagation": {
+        "methods": [
+          "division_mata",
+          "rizoma"
+        ],
+        "best_method": "division_mata",
+        "protocol_resumen": "Division de matas establecidas en epoca lluviosa. Cada division con 2-3 yemas y raices. Plantar a 50-80cm de distancia. Crece formando macollos densos.",
+        "notas": "Herbacea perenne de follaje ornamental, naturalizada en los Andes colombianos. Flores altas en espiga. Ideal para bordes de cerca viva y control de erosion en taludes.",
+        "fuente": "Perez Arbelaez 1947; GBIF"
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone"
+      ],
+      "rol_ecologico": "Control de erosion en laderas. Cobertura de bordes de cerca viva. Atraccion de abejas nativas. Follaje ornamental de gran tamano.",
+      "valor_pedagogico": "Hoja monumental: la segunda hoja mas grande entre las herbaceas cultivadas. Ensenia adaptaciones morfologicas para capturar luz en sotobosque y bordes.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "vaccinium_meridionale",
+      "nombre_comun": "Mortiño / Agraz",
+      "nombre_comunes_regionales": [
+        "Arandano andino",
+        "Mortino de monte",
+        "Uva de paramo"
+      ],
+      "nombre_cientifico": "Vaccinium meridionale Sw.",
+      "familia_botanica": "Ericaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "living_fence",
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2400,
+        "optimo_max": 3200,
+        "max_absoluto": 3700
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 8,
+        "optimo_max": 16,
+        "max_tolerable": 22
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno_a_moderado",
+      "ph_suelo": {
+        "min": 4.5,
+        "optimo_min": 5,
+        "optimo_max": 6,
+        "max": 6.5
+      },
+      "fence_function": [
+        "delimitacion",
+        "refugio_fauna"
+      ],
+      "densidad_siembra_fence_m": 1.5,
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas extraidas de frutos maduros, estratificacion fria opcional 30 dias. Germinacion en sustrato acido (pH 5-5.5) con turba. Transplante a los 4-6 meses.",
+        "notas": "Arbusto nativo altoandino productor de frutos comestibles ricos en antioxidantes. Cerca viva productiva. Frutos usados en mermeladas, jugos y medicina tradicional.",
+        "fuente": "Perez Arbelaez 1947; Instituto Humboldt flora alto andina; Bernal 2015 Catalogo Plantas Colombia"
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "humboldt-flora-alto-andina",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "rol_ecologico": "Fuente de alimento para fauna silvestre (aves, mamiferos). Fruto antioxidante de alto valor nutricional. Proteccion de bordes de bosque altoandino y paramo.",
+      "valor_pedagogico": "Antioxidante vivo: el mortino produce el fruto con mayor capacidad antioxidante de los Andes. Ensenia la domesticacion incipiente de frutales nativos y la agroforesteria altoandina.",
+      "validation_level": "claude_draft"
     }
   ],
   "biopreparados": [
@@ -5563,6 +6113,15 @@
       "titulo": "Fichas técnicas de leguminosas andinas (haba, arveja, lenteja, frijol)",
       "institucion": "Corporación Colombiana de Investigación Agropecuaria (AGROSAVIA)",
       "observaciones": "Compilación de fichas técnicas de AGROSAVIA para leguminosas de clima frío. Año y volumen pendientes de consolidación."
+    },
+    {
+      "id": "restrepo-rivera-2005",
+      "tipo": "libro",
+      "autores": "Restrepo Rivera, J.",
+      "año": 2005,
+      "titulo": "Manual Práctico de Agricultura Orgánica Andina",
+      "institucion": "Fundación para la Investigación y Desarrollo Agrícola (FIDA)",
+      "observaciones": "Obra de referencia del movimiento agroecológico colombiano. Aborda cercas vivas, abonos verdes, biopreparados y diseño de agroecosistemas sostenibles en la región andina."
     }
   ]
 }
