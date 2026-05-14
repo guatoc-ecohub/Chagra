@@ -18,6 +18,7 @@ import AgentFab from './components/AgentFab';
 import { ScreenShell } from './components/common/ScreenShell';
 import ChagraGrowLoader from './components/ChagraGrowLoader';
 import IosInstallBanner from './components/IosInstallBanner';
+import UpdateAvailableBanner from './components/UpdateAvailableBanner';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Lazy-loaded route components
@@ -387,6 +388,7 @@ export default function App() {
     <>
       <NetworkStatusBar />
       <IosInstallBanner />
+      <UpdateAvailableBanner />
       <Suspense fallback={<LoadingFallback />}>
         {renderView()}
       </Suspense>

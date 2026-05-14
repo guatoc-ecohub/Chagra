@@ -80,10 +80,38 @@ function flattenDoc(doc, prefix = '') {
   return passages;
 }
 
+/**
+ * Lee public/cycle-content/manifest.json para saber qué slugs JSON
+ * existen físicamente. Sin manifest, el loader iteraba el CROP_TAXONOMY
+ * entero (~30+ species) haciendo fetch a cada slug → mayoría 404 +
+ * fallback SPA HTML (mitigado por content-type guard) → latencia mobile
+ * rural. Audit pre-Diana hallazgo #8.
+ *
+ * El manifest se genera en build time (scripts/generate-cycle-content-manifest.mjs).
+ * Si el manifest no existe o falla la carga, fallback al comportamiento
+ * legacy (iterar CROP_TAXONOMY).
+ */
+async function loadManifest() {
+  try {
+    const res = await fetch(`${CORPUS_PATH}manifest.json`);
+    if (!res.ok) return null;
+    const ct = res.headers.get('content-type') || '';
+    if (!ct.includes('json')) return null;
+    const data = await res.json();
+    if (!Array.isArray(data?.slugs)) return null;
+    return data.slugs;
+  } catch (_) {
+    return null;
+  }
+}
+
 async function loadCorpus() {
   if (corpusCache) return corpusCache;
 
-  const species = Object.values(CROP_TAXONOMY).flatMap((group) =>
+  // Manifest first: si existe, itera solo los slugs presentes.
+  // Fallback: iterar CROP_TAXONOMY (legacy, con N-3 fetches fallidos).
+  const manifestSlugs = await loadManifest();
+  const species = manifestSlugs ?? Object.values(CROP_TAXONOMY).flatMap((group) =>
     group.species.map((sp) => sp.id)
   );
   const docs = [];
