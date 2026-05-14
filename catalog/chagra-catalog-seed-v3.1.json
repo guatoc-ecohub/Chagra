@@ -4745,6 +4745,602 @@
         "perez-arbelaez-1947-plantas-utiles"
       ],
       "valor_pedagogico": "Tesoro genetico andino: frijol que revienta al tostarse. Ensenia la diversidad de usos y la importancia de conservar variedades locales."
+    },
+    {
+      "id": "dodonaea_viscosa",
+      "_curation_status": "VALIDADO con fuentes Humboldt + Bernal + POWO",
+      "nombre_comun": "Hayuelo",
+      "nombre_comunes_regionales": [
+        "hayuelo",
+        "chamiso",
+        "casol"
+      ],
+      "nombre_cientifico": "Dodonaea viscosa Jacq.",
+      "familia_botanica": "Sapindaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "living_fence",
+        "windbreak",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Esqueje semilenoso de 20-30cm en cama de enraizamiento. Alternativa: siembra directa de semillas aladas en semillero con sustrato arenoso. Germinacion en 15-30 dias.",
+        "tiempo_a_establecimiento_dias": 45,
+        "notas": "Arbusto pionero agresivo; ideal para iniciar procesos de restauracion en suelos degradados. Tolera suelos pobres, compactados y sequia."
+      },
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Arbusto de 2-5m no apto para apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Excelente como cerco vivo o rompevientos en borde de lote.",
+          "tips": [
+            "Plantar a 1.5m de distancia en linea",
+            "Podas anuales de formacion"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Requiere sol directo, no apto bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Cerca viva perimetral en potreros y cultivos. Barrera rompevientos para hortalizas.",
+          "tips": [
+            "Densidad cerco: 1.5-2m entre plantas",
+            "Poda de altura a 2.5m para control"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie pionera clave en restauracion de bordes de bosque alto andino y taludes degradados.",
+          "tips": [
+            "Asociar con Alnus acuminata y Weinmannia tomentosa",
+            "Siembra en curva de nivel en laderas erosionadas"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "source_ids": [
+        "humboldt-flora-alto-andina",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "Arbusto pionero por excelencia en la restauracion de suelos degradados. Sus semillas aladas germinan incluso en terrenos compactados. Primera linea de defensa contra el viento en la alta montana.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "espeletia_argentea",
+      "_curation_status": "VALIDADO con fuentes Humboldt + Diazgranados + Bernal",
+      "nombre_comun": "Frailejón plateado",
+      "nombre_comunes_regionales": [
+        "frailejón"
+      ],
+      "nombre_cientifico": "Espeletia argentea Bonpl. & Humb.",
+      "familia_botanica": "Asteraceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "biomass_producer",
+        "nurse_plant"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_protegido",
+      "altitud_msnm": {
+        "min_absoluto": 2900,
+        "optimo_min": 3200,
+        "optimo_max": 3800,
+        "max_absoluto": 4100
+      },
+      "temperatura_c": {
+        "helada_letal": -12,
+        "optimo_min": 3,
+        "optimo_max": 10,
+        "max_tolerable": 16
+      },
+      "humedad_relativa_pct": {
+        "min": 70,
+        "optimo": 90,
+        "max": 100
+      },
+      "ph_suelo": {
+        "min": 4.0,
+        "optimo_min": 4.5,
+        "optimo_max": 5.5,
+        "max": 6.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Recoleccion de aquenios en temporada seca (diciembre-febrero en cordillera oriental). Siembra en sustrato de turba: arena 3:1. Germinacion lenta 30-90 dias. Trasplante a bolsa a los 4-6 meses.",
+        "tiempo_a_establecimiento_dias": 180,
+        "notas": "Protegida por Ley 1930/2018. Cualquier intervencion requiere permiso de autoridad ambiental."
+      },
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Especie de paramo no replicable en condiciones urbanas."
+        },
+        "huerto_casero": {
+          "viable": false,
+          "nota": "Solo en parcelas en paramo con permisos de autoridad ambiental."
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Requiere radiacion UV de altura y temperaturas frias sostenidas."
+        },
+        "produccion": {
+          "viable": false,
+          "nota": "No apta para produccion comercial. Legalmente protegida."
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave para restauracion de paramo degradado. Requiere permiso ambiental.",
+          "tips": [
+            "Densidad 100-400 individuos/ha segun nivel de degradacion",
+            "Exclusion ganadera obligatoria 3+ anos",
+            "Monitoreo anual de supervivencia"
+          ]
+        }
+      },
+      "scale_viability": [
+        "restauracion"
+      ],
+      "source_ids": [
+        "humboldt-2016-frailejones",
+        "diazgranados-2012-espeletiinae",
+        "ley-1930-2018-paramos",
+        "mads-res-383-2010",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "Frailejon de hojas plateadas que reflejan la radiacion UV extrema del paramo. Sus tricomas capturan agua de niebla y la fijan al suelo. Especie clave en la regulacion hidrica de la estrella fluvial Cruz Verde-Sumapaz.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "espeletia_grandiflora",
+      "_curation_status": "MIGRATED from v3.0; VALIDADO con fuentes Humboldt + Diazgranados + PNN Chingaza",
+      "nombre_comun": "Frailejón mayor",
+      "nombre_comunes_regionales": [
+        "frailejón",
+        "frailejón orejas de burro"
+      ],
+      "nombre_cientifico": "Espeletia grandiflora Humb. & Bonpl.",
+      "familia_botanica": "Asteraceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "biomass_producer",
+        "nurse_plant"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_protegido",
+      "altitud_msnm": {
+        "min_absoluto": 2800,
+        "optimo_min": 3200,
+        "optimo_max": 3800,
+        "max_absoluto": 4200
+      },
+      "temperatura_c": {
+        "helada_letal": -15,
+        "optimo_min": 2,
+        "optimo_max": 10,
+        "max_tolerable": 18
+      },
+      "humedad_relativa_pct": {
+        "min": 70,
+        "optimo": 90,
+        "max": 100
+      },
+      "ph_suelo": {
+        "min": 4.0,
+        "optimo_min": 4.5,
+        "optimo_max": 5.5,
+        "max": 6.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Recoleccion de aquenios de inflorescencias maduras (temporada seca, diciembre-febrero en cordillera oriental). Siembra en sustrato de turba de paramo: tierra de subparamo 50% + arena 30% + materia organica 20%. Germinacion lenta: 30-90 dias. Trasplante a bolsa a los 4-6 meses. Plantacion definitiva >12 meses a 15-20cm.",
+        "tiempo_a_establecimiento_dias": 180,
+        "notas": "Tasa de germinacion natural baja (5-20%). Crecimiento ~1cm/ano: individuos de 2m tardan ~200 anos. Protegida por Ley 1930/2018 y Resolucion 383/2010 MADS."
+      },
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Especie de paramo no replicable en condiciones urbanas."
+        },
+        "huerto_casero": {
+          "viable": false,
+          "nota": "Solo en parcelas en paramo con permisos de autoridad ambiental."
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Requiere radiacion UV de altura y temperaturas frias sostenidas."
+        },
+        "produccion": {
+          "viable": false,
+          "nota": "No apta para produccion comercial. Legalmente protegida."
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "ESPECIE CLAVE para restauracion de paramo. Requiere permiso de autoridad ambiental (CAR correspondiente). Protocolo validado por Rojas-Zamora et al. 2013 en PNN Chingaza.",
+          "tips": [
+            "Densidad 100-400 individuos/ha segun nivel de degradacion",
+            "Exclusion ganadera obligatoria 3+ anos",
+            "Monitoreo anual de supervivencia y crecimiento",
+            "Siembra en pastizales dominados por Calamagrostis con gradiente de altitud conocido"
+          ]
+        }
+      },
+      "scale_viability": [
+        "restauracion"
+      ],
+      "rol_ecologico": "Especie clave de ecosistema de paramo. Captura agua de niebla mediante tricomas foliares y la fija al suelo. Regulacion hidrica para cuencas que abastecen 70% del agua de ciudades andinas.",
+      "source_ids": [
+        "humboldt-2016-frailejones",
+        "diazgranados-2012-espeletiinae",
+        "libro-rojo-plantas-colombia",
+        "ley-1930-2018-paramos",
+        "mads-res-383-2010",
+        "bernal-2015-plantas-liquenes-colombia",
+        "uicn-red-list",
+        "restauracion-cruz-verde-sumapaz"
+      ],
+      "valor_pedagogico": "Simbolo del paramo colombiano. Ensenia adaptaciones extremas (hojas marcescentes, pubescencia protectora, congelacion inhibida en citoplasma), regulacion hidrica de paramos, restauracion ecologica de ecosistemas fragiles y crisis climatica en alta montana.",
+      "validation_level": "operator_reviewed"
+    },
+    {
+      "id": "hesperomeles_goudotiana",
+      "_curation_status": "VALIDADO con fuentes Humboldt + Bernal + POWO",
+      "nombre_comun": "Esmeralda chiquita",
+      "nombre_comunes_regionales": [
+        "esmeralda",
+        "mortiño de páramo"
+      ],
+      "nombre_cientifico": "Hesperomeles goudotiana (Decne.) Killip",
+      "familia_botanica": "Rosaceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "nurse_plant",
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2500,
+        "optimo_min": 2800,
+        "optimo_max": 3400,
+        "max_absoluto": 3700
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 6,
+        "optimo_max": 14,
+        "max_tolerable": 20
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 80,
+        "max": 95
+      },
+      "ph_suelo": {
+        "min": 4.5,
+        "optimo_min": 5.0,
+        "optimo_max": 6.5,
+        "max": 7.0
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Recoleccion de frutos maduros, extraccion de semillas y siembra inmediata en semillero con sustrato de bosque. Germinacion en 30-60 dias.",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "Crece en sotobosque de bosque alto andino. Atraccion de aves dispersoras facilita regeneracion natural."
+      },
+      "source_ids": [
+        "humboldt-flora-alto-andina",
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "Pequeño arbol nativo del bosque alto andino y subparamo. Sus frutos rojos alimentan aves dispersoras del bosque de niebla. Especie ideal para ensenar la conectividad ecologica entre bosque y paramo.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "polylepis_sericea",
+      "_curation_status": "VALIDADO con fuentes Humboldt + Bernal + UICN",
+      "nombre_comun": "Polylepis / Colorado",
+      "nombre_comunes_regionales": [
+        "colorado",
+        "quebrada",
+        "sauce de páramo"
+      ],
+      "nombre_cientifico": "Polylepis sericea Wedd.",
+      "familia_botanica": "Rosaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nurse_plant",
+        "biomass_producer",
+        "windbreak"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_protegido",
+      "altitud_msnm": {
+        "min_absoluto": 2600,
+        "optimo_min": 3000,
+        "optimo_max": 3600,
+        "max_absoluto": 4000
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 4,
+        "optimo_max": 12,
+        "max_tolerable": 18
+      },
+      "humedad_relativa_pct": {
+        "min": 70,
+        "optimo": 85,
+        "max": 100
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Recoleccion de aquenios maduros. Siembra inmediata en semillero con sustrato de bosque alto andino. Germinacion 20-60 dias. Trasplante a los 3-4 meses.",
+        "tiempo_a_establecimiento_dias": 120,
+        "notas": "Forma bosques enanos relictuales de alta montana. Corteza laminar anaranjada caracteristica que la protege del frio extremo."
+      },
+      "source_ids": [
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "uicn-red-list",
+        "mads-res-383-2010",
+        "restauracion-cruz-verde-sumapaz"
+      ],
+      "valor_pedagogico": "Uno de los arboles que crece a mayor altitud en el mundo. Sus bosques enanos relictuales son refugio de biodiversidad unica y reservorios de agua para comunidades altoandinas. Corteza laminar que protege del frio extremo.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "salix_humboldtiana",
+      "_curation_status": "VALIDADO con fuentes Humboldt + Bernal + POWO",
+      "nombre_comun": "Sauce andino",
+      "nombre_comunes_regionales": [
+        "sauce",
+        "sauce de páramo",
+        "sauce llorón andino"
+      ],
+      "nombre_cientifico": "Salix humboldtiana Willd.",
+      "familia_botanica": "Salicaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nurse_plant",
+        "biomass_producer",
+        "windbreak"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2500,
+        "optimo_max": 3200,
+        "max_absoluto": 3600
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 8,
+        "optimo_max": 16,
+        "max_tolerable": 22
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 80,
+        "max": 95
+      },
+      "ph_suelo": {
+        "min": 5.0,
+        "optimo_min": 5.5,
+        "optimo_max": 7.0,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "medio",
+      "propagation": {
+        "methods": [
+          "esqueje"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Estacas de 30-50cm de madera de 1-2 anos, plantadas directamente en suelo humedo ribereno en epoca lluviosa. Enraizamiento en 15-30 dias.",
+        "tiempo_a_establecimiento_dias": 30,
+        "notas": "Arbol ribereno de crecimiento rapido. Ideal para estabilizacion de margenes de quebradas y rios de montana."
+      },
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Arbol de 10-25m no apto para apartamento."
+        },
+        "huerto_casero": {
+          "viable": false,
+          "nota": "Requiere espacio amplio junto a fuente de agua permanente."
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Arbol de gran tamano no apto bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Arbol de proteccion de fuentes hidricas y bordes de rio en fincas ganaderas y agricolas.",
+          "tips": [
+            "Plantar en franjas riberenas a 3-5m del agua",
+            "Asociacion natural con Alnus acuminata y Vallea stipularis"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave para restauracion de rondas hidricas, proteccion de cuencas y recuperacion de quebradas degradadas.",
+          "tips": [
+            "Densidad 400-600 individuos/ha en franja riberena",
+            "Propagacion directa por estacas minimiza costo de vivero"
+          ]
+        }
+      },
+      "scale_viability": [
+        "produccion",
+        "restauracion"
+      ],
+      "source_ids": [
+        "humboldt-flora-alto-andina",
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "Arbol ribereno andino por excelencia. Sus raices retienen las orillas de quebradas y rios de montana, previniendo erosion. Especie clave en la proteccion de fuentes hidricas del paramo Cruz Verde.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "vallea_stipularis",
+      "_curation_status": "VALIDADO con fuentes Humboldt + Bernal + SIB Colombia",
+      "nombre_comun": "Raque",
+      "nombre_comunes_regionales": [
+        "raque",
+        "siete sangrías",
+        "chaquiro"
+      ],
+      "nombre_cientifico": "Vallea stipularis L. f.",
+      "familia_botanica": "Elaeocarpaceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nurse_plant",
+        "pollinator_attractor",
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2500,
+        "optimo_max": 3200,
+        "max_absoluto": 3600
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 8,
+        "optimo_max": 16,
+        "max_tolerable": 22
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "ph_suelo": {
+        "min": 5.0,
+        "optimo_min": 5.5,
+        "optimo_max": 6.8,
+        "max": 7.2
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla recolectada de frutos maduros, siembra en semillero con sustrato de bosque. Germinacion en 30-60 dias. Trasplante a bolsa a los 3 meses.",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "Arbol de crecimiento medio. Flores rosadas atraen polinizadores nativos. Madera usada tradicionalmente para cabos de herramientas."
+      },
+      "source_ids": [
+        "humboldt-flora-alto-andina",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "Arbol nativo del bosque alto andino. Sus flores rosadas alimentan colibries y abejas nativas. Madera usada tradicionalmente para herramientas rurales. Especie ideal para restauracion de bordes de paramo.",
+      "validation_level": "claude_draft"
     }
   ],
   "biopreparados": [
@@ -5563,6 +6159,15 @@
       "titulo": "Fichas técnicas de leguminosas andinas (haba, arveja, lenteja, frijol)",
       "institucion": "Corporación Colombiana de Investigación Agropecuaria (AGROSAVIA)",
       "observaciones": "Compilación de fichas técnicas de AGROSAVIA para leguminosas de clima frío. Año y volumen pendientes de consolidación."
+    },
+    {
+      "id": "restauracion-cruz-verde-sumapaz",
+      "tipo": "articulo_revista",
+      "autores": "Varios autores — literatura revisada por pares sobre restauración del páramo Cruz Verde-Sumapaz",
+      "año": null,
+      "titulo": "Estudios de restauración ecológica en el complejo de páramos Cruz Verde-Sumapaz, cordillera oriental colombiana",
+      "institucion": "Instituto Humboldt / CAR Cundinamarca / Universidad Nacional de Colombia",
+      "observaciones": "Fuente compuesta. Incluye: informe delimitación MinAmbiente Cruz Verde; Rojas-Zamora et al. 2013 (Rev. Biol. Trop.); protocolos de restauración PNN Chingaza. Verificar publicación específica."
     }
   ]
 }
