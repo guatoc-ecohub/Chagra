@@ -62,8 +62,10 @@ test.describe('ADR-019 Fase 5: log--task & Inmutabilidad', () => {
         // 1. Navegar a nueva tarea — usar aria-label exacto del tile (no regex /tareas/i
         // que matchea 3 botones: refresh, Campo, Cola). Tile dashboard "Tareas: Cola
         // de pendientes" es el que abre TaskLogScreen donde vive el botón "+".
+        // El botón "+" ahora tiene aria-label="Nueva tarea" (el span '+' es
+        // aria-hidden) — accessible name calculation con sólo `+` era frágil.
         await page.getByLabel('Tareas: Cola de pendientes').click();
-        await page.getByRole('button', { name: '+' }).click();
+        await page.getByRole('button', { name: 'Nueva tarea' }).click();
 
         // 2. Llenar formulario — TaskScreen.jsx:83 usa placeholder
         // "Ej: Riego fertiorgánico". El label "Título de la Operación"

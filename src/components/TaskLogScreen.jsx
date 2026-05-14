@@ -100,8 +100,12 @@ function TaskLogScreen({ onBack, onNewTask }) {
               <span className="text-sm">Offline</span>
             </div>
           )}
-          <button onClick={onNewTask} className="p-3 bg-muzo rounded-full active:bg-muzo-glow min-h-[56px] min-w-[56px] flex justify-center items-center shrink-0 border border-slate-700 shadow-neon-muzo">
-            <span className="text-3xl font-black text-slate-950">+</span>
+          <button
+            onClick={onNewTask}
+            aria-label="Nueva tarea"
+            className="p-3 bg-muzo rounded-full active:bg-muzo-glow min-h-[56px] min-w-[56px] flex justify-center items-center shrink-0 border border-slate-700 shadow-neon-muzo"
+          >
+            <span className="text-3xl font-black text-slate-950" aria-hidden="true">+</span>
           </button>
           <button onClick={syncTasks} disabled={isSyncing} className="p-2 bg-slate-800 rounded-full active:bg-slate-700 min-h-[40px] min-w-[40px] flex justify-center items-center shrink-0 border border-slate-600">
             <RefreshCw size={16} className={isSyncing ? 'animate-spin' : ''} />
