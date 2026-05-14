@@ -248,8 +248,7 @@
       "familia_botanica": "Betulaceae",
       "category": "abonos_verdes_coberturas",
       "thermal_zones": [
-        "frio",
-        "paramo"
+        "frio"
       ],
       "estrato": "alto",
       "roles_in_guild": [
@@ -1016,8 +1015,7 @@
       "familia_botanica": "Poaceae",
       "category": "especies_invasoras",
       "thermal_zones": [
-        "frio",
-        "paramo"
+        "frio"
       ],
       "estrato": "bajo",
       "roles_in_guild": [
@@ -1088,7 +1086,8 @@
       "source_ids": [
         "correa-pabon-carulla-2008",
         "agrosavia-forrajeras-2022"
-      ]
+      ],
+      "valor_pedagogico": "El kikuyo (Cenchrus clandestinus) es gramínea africana introducida en los Andes colombianos hacia 1928 como forraje. Hoy domina pasturas del altiplano cundiboyacense (2200-3200 msnm) desplazando flora nativa de subpáramo y bordes de páramo. Su rizoma agresivo coloniza suelos disturbados y compite con encenillos, frailejones jóvenes y otras nativas en zonas de restauración. Es la gramínea forrajera más sembrada en ganadería andina colombiana, pero ECOLÓGICAMENTE INVASORA en transición frío/páramo. Manejo agroecológico: rotación con leguminosas nativas, corte periódico antes de floración, evitar siembra en cotas >2800 msnm donde desplaza páramo. Citado por IAvH como naturalizada de alto riesgo en Andes."
     },
     {
       "id": "chenopodium_quinoa",
@@ -1295,8 +1294,7 @@
       "familia_botanica": "Fabaceae",
       "category": "especies_invasoras",
       "thermal_zones": [
-        "frio",
-        "paramo"
+        "frio"
       ],
       "roles_in_guild": [
         "invasive",
@@ -2647,8 +2645,7 @@
       "familia_botanica": "Pinaceae",
       "category": "especies_invasoras",
       "thermal_zones": [
-        "frio",
-        "paramo"
+        "frio"
       ],
       "roles_in_guild": [
         "invasive"
@@ -2782,8 +2779,7 @@
       "category": "especies_invasoras",
       "thermal_zones": [
         "templado",
-        "frio",
-        "paramo"
+        "frio"
       ],
       "estrato": "bajo",
       "roles_in_guild": [
@@ -2847,7 +2843,8 @@
       "validation_level": "operator_reviewed",
       "source_ids": [
         "flora-colombia-pteridophyta"
-      ]
+      ],
+      "valor_pedagogico": "El helecho marranero (Pteridium aquilinum var. caudatum) es nativo cosmopolita pero se comporta como invasor agresivo post-quema en potreros andinos colombianos (1500-3200 msnm). Tras incendios o tala, sus rizomas profundos rebrotan y forman monocultivos densos que impiden regeneración de bosque andino. Toxicidad: contiene ptaquilósido (carcinogénico para ganado y humanos por leche contaminada). En Cruz Verde-Sumapaz, ocupa hectáreas de bordes de páramo degradado. Manejo: NO quemar (estimula rebrote), corte mecánico repetido durante 3-5 años + siembra de especies nativas competidoras (Weinmannia, Hesperomeles). Resolución 684/2018 MADS lo lista como prioridad de manejo en restauración paramuna."
     },
     {
       "id": "quercus_humboldtii",
@@ -2859,8 +2856,7 @@
       "familia_botanica": "Fagaceae",
       "category": "arboles_sombra",
       "thermal_zones": [
-        "frio",
-        "paramo"
+        "frio"
       ],
       "roles_in_guild": [
         "nurse_plant",
@@ -3606,7 +3602,8 @@
       "validation_level": "operator_reviewed",
       "source_ids": [
         "humboldt-invasoras-andes"
-      ]
+      ],
+      "valor_pedagogico": "El ojo de poeta o suzanne de ojos negros (Thunbergia alata) es enredadera africana ornamental introducida en Colombia como cercas vivas decorativas. Naturalizada con severidad en zona cafetera, andina media y subandina (1000-2400 msnm). Estrangula vegetación nativa de bordes de quebrada, regeneración de cafetales con sombra y cercas de matarratón/quiebrabarrigo. Listada por IAvH como invasora alta amenaza. Reproducción por semilla y por fragmento de tallo enraizado. Manejo agroecológico: arrancar manualmente con rizoma completo + control biológico aún en investigación + sustituir con enredaderas nativas (passifloras nativas, Mutisia spp.). Resolución 684/2018 MADS la incluye en listado oficial."
     },
     {
       "id": "trifolium_repens",
@@ -3717,8 +3714,7 @@
       "familia_botanica": "Tropaeolaceae",
       "category": "tuberculos_raices",
       "thermal_zones": [
-        "frio",
-        "paramo"
+        "frio"
       ],
       "roles_in_guild": [
         "crop",
@@ -3766,8 +3762,7 @@
       "category": "especies_invasoras",
       "thermal_zones": [
         "templado",
-        "frio",
-        "paramo"
+        "frio"
       ],
       "estrato": "medio",
       "roles_in_guild": [
@@ -3872,7 +3867,8 @@
       ],
       "antagonists": [
         "erythrina_edulis"
-      ]
+      ],
+      "valor_pedagogico": "El retamo espinoso (Ulex europaeus) es arbusto leguminoso europeo introducido en cerros orientales de Bogotá hacia 1948 como ornamental y cerca. Hoy es la INVASORA MÁS DESTRUCTIVA del altiplano cundiboyacense (2400-3300 msnm), ocupando >30000 ha en Cundinamarca según IAvH. Acidifica suelo, fija nitrógeno excesivo que altera sucesión nativa, y es PIROFÍTICA: sus semillas requieren fuego para germinar, incrementando incendios forestales en cerros bogotanos. Cobertura: Cruz Verde, Cerros Orientales Bogotá, Verjón, Tibanica. Manejo: extracción mecánica con cepa completa + revegetación inmediata con nativas (encenillo, mortiño, romero de páramo) + monitoreo 5+ años para nuevos brotes desde banco semillas. Resolución 684/2018 MADS prioridad nacional. Cobertura periodística Mongabay 2024 documenta el avance hacia el complejo Cruz Verde-Sumapaz."
     },
     {
       "id": "ullucus_tuberosus",
@@ -4389,8 +4385,7 @@
       "familia_botanica": "Cunoniaceae",
       "category": "ornamentales_nativas",
       "thermal_zones": [
-        "frio",
-        "paramo"
+        "frio"
       ],
       "roles_in_guild": [
         "nurse_plant",
@@ -4531,8 +4526,7 @@
       "familia_botanica": "Amaranthaceae",
       "category": "cereales",
       "thermal_zones": [
-        "frio",
-        "paramo"
+        "frio"
       ],
       "roles_in_guild": [
         "crop",
@@ -5026,8 +5020,7 @@
       "familia_botanica": "Ericaceae",
       "category": "frutales_perennes",
       "thermal_zones": [
-        "frio",
-        "paramo"
+        "frio"
       ],
       "estrato": "medio",
       "roles_in_guild": [
@@ -5161,7 +5154,6 @@
       "category": "frutales_perennes",
       "thermal_zones": [
         "frio",
-        "paramo",
         "templado"
       ],
       "estrato": "rastrero",
@@ -5296,8 +5288,7 @@
       "familia_botanica": "Rosaceae",
       "category": "frutales_perennes",
       "thermal_zones": [
-        "frio",
-        "paramo"
+        "frio"
       ],
       "estrato": "alto",
       "roles_in_guild": [
@@ -5541,8 +5532,7 @@
       "category": "atractores_polinizadores",
       "thermal_zones": [
         "templado",
-        "frio",
-        "paramo"
+        "frio"
       ],
       "roles_in_guild": [
         "crop",
@@ -6064,8 +6054,7 @@
       "familia_botanica": "Salicaceae",
       "category": "arboles_sombra",
       "thermal_zones": [
-        "frio",
-        "paramo"
+        "frio"
       ],
       "estrato": "alto",
       "roles_in_guild": [
@@ -6166,8 +6155,7 @@
       "familia_botanica": "Elaeocarpaceae",
       "category": "ornamentales_nativas",
       "thermal_zones": [
-        "frio",
-        "paramo"
+        "frio"
       ],
       "estrato": "alto",
       "roles_in_guild": [
@@ -8469,8 +8457,7 @@
       "familia_botanica": "Winteraceae",
       "category": "medicinales_alelopaticas",
       "thermal_zones": [
-        "frio",
-        "paramo"
+        "frio"
       ],
       "estrato": "alto",
       "roles_in_guild": [

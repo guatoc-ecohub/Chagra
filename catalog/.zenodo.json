@@ -1,0 +1,76 @@
+{
+  "title": "Chagra Catálogo Agroecológico Colombiano v3.1 — 175 especies + 54 fuentes",
+  "description": "Catálogo agroecológico estructurado para la PWA Chagra, con especies cultivables, invasoras, nativas y endémicas referenciables para el contexto rural colombiano (4 pisos térmicos: páramo, frío, templado, cálido). Incluye trazabilidad de fuentes científicas Tier A/B/C (GBIF, POWO Kew, Agrosavia, IAvH, FAO EcoCrop, Cenicafé, Restrepo Rivera, Cultivos Andinos Subexplotados NRC 1989, entre otras). Schema v3.1 con campos botánicos, agronómicos, ecológicos, etnobotánicos y normativos colombianos. Driver estratégico: evidencia documental para proceso delimitación páramo Cruz Verde-Sumapaz (MinAmbiente Colombia). Licencia AGPL-3.0 para código + CC-BY-SA 4.0 para datos catalográficos (atribución obligatoria: 'Chagra catálogo, Guatoc, v3.1, 2026').",
+  "creators": [
+    {
+      "name": "Guerrero, Miguel",
+      "affiliation": "Guatoc",
+      "orcid": ""
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Chagra Community",
+      "type": "Other",
+      "affiliation": "Guatoc + operadores piloto Cundinamarca (Choachí + Cruz Verde-Sumapaz)"
+    }
+  ],
+  "upload_type": "dataset",
+  "publication_date": "2026-05-14",
+  "access_right": "open",
+  "license": "CC-BY-SA-4.0",
+  "keywords": [
+    "agroecología",
+    "Colombia",
+    "Cundinamarca",
+    "páramo",
+    "Cruz Verde-Sumapaz",
+    "soberanía alimentaria",
+    "trazabilidad agrícola",
+    "biodiversidad",
+    "etnobotánica andina",
+    "cultivos prehispánicos",
+    "permacultura",
+    "PWA offline-first",
+    "Ley 1581 Habeas Data",
+    "agroforestería",
+    "transición agroecológica",
+    "PlaN A Resolución 331/2024",
+    "tubérculos andinos",
+    "papa criolla",
+    "café",
+    "frailejones",
+    "invasoras IAvH"
+  ],
+  "communities": [
+    {"identifier": "open-source"},
+    {"identifier": "agricultural-research"}
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/guatoc-ecohub/Chagra",
+      "relation": "isSupplementTo",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "https://chagra.guatoc.co",
+      "relation": "isDocumentedBy",
+      "resource_type": "other"
+    }
+  ],
+  "notes": "Driver estratégico: evidencia documental delimitación páramo Cruz Verde-Sumapaz proceso MinAmbiente Colombia (Resolución 2090/2014 + procesos de concertación posteriores 2014-2026). 6 restricciones inviolables del DR Catálogo 400: rigor científico siempre, cero data inventada, fuentes verificables Tier A/B/C, geolocalización anonimizada para species endémicas amenazadas (Frailejones/Polylepis/Cruz Verde), no duplicar species existentes, no promover invasoras como cultivo comercial. Validación humana en curso (Lili agroecóloga + agrónomo independiente). 7 fincas piloto con consent Ley 1581 firmado entre 1730 y 2900 msnm (Choachí + Cruz Verde-Sumapaz + alrededores Cundinamarca).",
+  "version": "3.1",
+  "language": "spa",
+  "subjects": [
+    {
+      "term": "Agroecology",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85002012",
+      "scheme": "url"
+    },
+    {
+      "term": "Biodiversity—Colombia",
+      "identifier": "https://id.loc.gov/authorities/subjects/sh85014203",
+      "scheme": "url"
+    }
+  ]
+}
