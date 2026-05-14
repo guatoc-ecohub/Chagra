@@ -1,7 +1,7 @@
 {
-  "schema_version": "3.1",
   "seed_version": "0.1.0",
-  "generated_at": "2026-04-23",
+  "schema_version": "3.1",
+  "generated_at": "2026-05-14",
   "_meta": {
     "descripcion": "Catálogo auxiliar de fuentes bibliográficas referenciable por species[].sources_ids y species[].saber_origen.validacion_cientifica_source_ids. Resuelve AMB-11 y AMB-16 del schema v3.1.",
     "estado": "SEMILLA — ~30 fuentes ya referenciadas en las 10 especies modelo de v3.0 + fuentes de los 15 biopreparados seed. Los deep researches por piso térmico pueden proponer adiciones.",
@@ -191,6 +191,24 @@
       "titulo": "Manual Práctico de Agricultura Orgánica Andina",
       "institucion": "Fundación para la Investigación y Desarrollo Agrícola (FIDA)",
       "observaciones": "Obra de referencia del movimiento agroecológico colombiano. Aborda cercas vivas, abonos verdes, biopreparados y diseño de agroecosistemas sostenibles en la región andina."
+    },
+    {
+      "id": "ardila-2015-etnobotanica-muisca",
+      "tipo": "articulo_revista",
+      "autores": "Ardila, F.",
+      "año": 2015,
+      "titulo": "Etnobotánica muisca: plantas medicinales del altiplano cundiboyacense",
+      "revista_o_editorial": "Revista de la Academia Colombiana de Ciencias Exactas, Físicas y Naturales",
+      "observaciones": "Estudio etnobotánico detallado de plantas medicinales tradicionales del pueblo muisca en Cundinamarca y Boyacá."
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "tipo": "base_datos",
+      "autores": "Jardín Botánico de Bogotá José Celestino Mutis",
+      "año": null,
+      "titulo": "Catálogo de plantas medicinales del Jardín Botánico de Bogotá",
+      "institucion": "Jardín Botánico de Bogotá",
+      "url": "https://www.jbb.gov.co"
     }
   ]
 }

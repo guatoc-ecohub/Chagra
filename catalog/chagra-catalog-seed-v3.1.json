@@ -8362,6 +8362,389 @@
       "rol_ecologico": "Control de erosion en laderas. Cobertura de bordes de cerca viva. Atraccion de abejas nativas. Follaje ornamental de gran tamano.",
       "valor_pedagogico": "Hoja monumental: la segunda hoja mas grande entre las herbaceas cultivadas. Ensenia adaptaciones morfologicas para capturar luz en sotobosque y bordes.",
       "validation_level": "claude_draft"
+    },
+    {
+      "id": "ruta_graveolens",
+      "nombre_comun": "Ruda",
+      "nombre_comunes_regionales": [
+        "ruda macho",
+        "ruda hembra",
+        "arruda"
+      ],
+      "nombre_cientifico": "Ruta graveolens L.",
+      "familia_botanica": "Rutaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Propagación por esquejes semileñosos en sustrato arenoso. También por semilla (germinación lenta y errática)."
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "Planta maestra de la medicina popular andina: sus hojas azulverdosas y su olor intenso enseñan el poder de los aceites esenciales como repelentes naturales de insectos en la chagra.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "valeriana_pavonii",
+      "nombre_comun": "Valeriana criolla",
+      "nombre_comunes_regionales": [
+        "valeriana andina",
+        "raiz del gato"
+      ],
+      "nombre_cientifico": "Valeriana pavonii Poepp. & Endl.",
+      "familia_botanica": "Caprifoliaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2500,
+        "optimo_min": 2800,
+        "optimo_max": 3500,
+        "max_absoluto": 3800
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 8,
+        "optimo_max": 16,
+        "max_tolerable": 22
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno_a_moderado",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinación lenta; requiere estratificación en frío y suelos ricos en materia orgánica."
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Endémica de los Andes colombianos: un tesoro etnobotánico del páramo que enseña la relación entre altitud, compuestos activos y saber tradicional campesino.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "drimys_granadensis",
+      "nombre_comun": "Canelón",
+      "nombre_comunes_regionales": [
+        "canelo",
+        "canelo de páramo",
+        "cascarilla"
+      ],
+      "nombre_cientifico": "Drimys granadensis L.f.",
+      "familia_botanica": "Winteraceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "nurse_plant",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2500,
+        "optimo_max": 3400,
+        "max_absoluto": 3700
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 8,
+        "optimo_max": 16,
+        "max_tolerable": 22
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno_a_moderado",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinación lenta; requiere semilla fresca y sustrato húmedo. Crece como arbolito de hasta 15 m en bosque altoandino."
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Árbol medicinal de los muiscas: su corteza aromática con aroma a canela conecta la botánica altoandina con la medicina tradicional indígena del altiplano cundiboyacense.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "lavandula_angustifolia",
+      "nombre_comun": "Lavanda",
+      "nombre_comunes_regionales": [
+        "espliego",
+        "lavanda fina",
+        "lavanda inglesa"
+      ],
+      "nombre_cientifico": "Lavandula angustifolia Mill.",
+      "familia_botanica": "Lamiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2700,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -15,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Propagación por esquejes semileñosos en verano. Requiere suelos calcáreos y buen drenaje."
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Clásico de la alelopatía: su aroma alcanforado repele polillas y mosquitos mientras atrae abejas, demostrando el equilibrio entre repelencia y atracción en el diseño de la chagra.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "aloe_vera",
+      "nombre_comun": "Sábila",
+      "nombre_comunes_regionales": [
+        "aloe",
+        "zabila",
+        "savila"
+      ],
+      "nombre_cientifico": "Aloe vera (L.) Burm.f.",
+      "familia_botanica": "Asphodelaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1500,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 18,
+        "optimo_max": 30,
+        "max_tolerable": 40
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "hijuelos",
+        "notas": "Propagación vegetativa por brotes basales (hijuelos). Separar cuando tengan 3-4 hojas y dejar secar la herida 24 h antes de plantar."
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "La farmacia en una hoja: enseña suculencia, adaptación a sequía, y el uso tradicional del gel como cicatrizante en la medicina casera colombiana de tierras cálidas.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "diplostephium_rosmarinifolium",
+      "nombre_comun": "Romero blanco",
+      "nombre_comunes_regionales": [
+        "romero de páramo",
+        "romerillo"
+      ],
+      "nombre_cientifico": "Diplostephium rosmarinifolium (Benth.) Wedd.",
+      "familia_botanica": "Asteraceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2800,
+        "optimo_min": 3000,
+        "optimo_max": 3700,
+        "max_absoluto": 4000
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 4,
+        "optimo_max": 14,
+        "max_tolerable": 20
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla recolectada de capítulos secos. Siembra directa en sustrato arenoso con buen drenaje."
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Habitant-te nativo del páramo colombiano: sus hojas finas como romero enseñan la adaptación de las asteráceas a la alta montaña tropical y su uso en medicina tradicional.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "dysphania_ambrosioides",
+      "nombre_comun": "Paico",
+      "nombre_comunes_regionales": [
+        "paxo",
+        "hierba hedionda",
+        "apasote",
+        "epazote"
+      ],
+      "nombre_cientifico": "Dysphania ambrosioides (L.) Mosyakin & Clemants",
+      "familia_botanica": "Amaranthaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 500,
+        "optimo_max": 2500,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 14,
+        "optimo_max": 24,
+        "max_tolerable": 32
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla; se resiembra fácilmente en suelos perturbados. Crece como arvense en huertas y bordes de camino."
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "Vermífugo natural por excelencia de la medicina tradicional colombiana: el paico enseña cómo una arvense común puede ser la botica familiar para desparasitar, y por qué las chagras lo conservan entre los cultivos.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "thymus_serpyllum",
+      "nombre_comun": "Tomillo silvestre",
+      "nombre_comunes_regionales": [
+        "tomillo rastrero",
+        "serpol",
+        "tomillo de monte"
+      ],
+      "nombre_cientifico": "Thymus serpyllum L.",
+      "familia_botanica": "Lamiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -15,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "division_mata",
+        "notas": "Propagación por acodo natural o división de matas en primavera. Crece como cubresuelos rastrero en suelos rocosos y pobres."
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Cubresuelos aromático que protege el suelo vivo: sus tallos rastreros enseñan cobertura vegetal permanente y su aceite esencial (timol) demuestra repelencia natural de plagas en la base de la chagra.",
+      "validation_level": "claude_draft"
     }
   ],
   "biopreparados": [
