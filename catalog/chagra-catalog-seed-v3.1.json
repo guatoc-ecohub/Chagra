@@ -4745,6 +4745,259 @@
         "perez-arbelaez-1947-plantas-utiles"
       ],
       "valor_pedagogico": "Tesoro genetico andino: frijol que revienta al tostarse. Ensenia la diversidad de usos y la importancia de conservar variedades locales."
+    },
+    {
+      "id": "beta_vulgaris_var_cicla",
+      "nombre_comun": "Acelga",
+      "nombre_cientifico": "Beta vulgaris var. cicla L.",
+      "familia_botanica": "Amaranthaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 12,
+        "optimo_max": 18,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Las semillas son glomerulos (varias semillas juntas); requiere raleo tras germinar. Cosecha de hojas externas permite rebrote continuo."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Ejemplo de cosecha sostenible: la acelga regenera sus hojas tras cada corte, demostrando el principio de produccion continua en la chagra."
+    },
+    {
+      "id": "brassica_oleracea_var_acephala",
+      "nombre_comun": "Col rizada / Kale",
+      "nombre_cientifico": "Brassica oleracea var. acephala L.",
+      "familia_botanica": "Brassicaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3500
+      },
+      "temperatura_c": {
+        "helada_letal": -12,
+        "optimo_min": 10,
+        "optimo_max": 18,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno_a_moderado",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra escalonada cada 4-6 semanas para cosecha continua. Las heladas mejoran el sabor al convertir almidones en azucares."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Leccion de resiliencia al frio: el kale endulza con las heladas, ensenando como el estres termico transforma la quimica de la planta en la alta montana."
+    },
+    {
+      "id": "brassica_oleracea_var_capitata",
+      "nombre_comun": "Repollo",
+      "nombre_cientifico": "Brassica oleracea var. capitata L.",
+      "familia_botanica": "Brassicaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1800,
+        "optimo_max": 2700,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 14,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Requiere semillero y trasplante. La cabeza se forma cuando las hojas internas dejan de recibir luz y se compactan."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Leccion de morfologia vegetal: muestra como una estructura de hojas superpuestas crea microclima interno y protege los tejidos meristematicos."
+    },
+    {
+      "id": "brassica_rapa_var_rapa",
+      "nombre_comun": "Nabo",
+      "nombre_cientifico": "Brassica rapa var. rapa L.",
+      "familia_botanica": "Brassicaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 2000,
+        "optimo_max": 3000,
+        "max_absoluto": 3500
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 12,
+        "optimo_max": 18,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa a chorrillo. Ciclo rapido (60-80 dias). Tanto la raiz como las hojas son comestibles."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Leccion de aprovechamiento integral: el nabo demuestra que una misma planta puede generar alimento de la raiz y de la hoja, minimizando el desperdicio."
+    },
+    {
+      "id": "daucus_carota_subsp_sativus",
+      "nombre_comun": "Zanahoria",
+      "nombre_cientifico": "Daucus carota L. subsp. sativus (Hoffm.) Arcang.",
+      "familia_botanica": "Apiaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2700,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 15,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa en suelo suelto y profundo. Germinacion lenta (14-21 dias); requiere humedad constante en la capa superficial."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Leccion de calidad del suelo: la zanahoria revela la estructura del suelo al desarrollarse; suelos compactos producen raices deformes, ensenando la importancia de la preparacion profunda."
+    },
+    {
+      "id": "allium_schoenoprasum",
+      "nombre_comun": "Cebollino",
+      "nombre_comunes_regionales": [
+        "Cebollin fino",
+        "Cebolleta"
+      ],
+      "nombre_cientifico": "Allium schoenoprasum L.",
+      "familia_botanica": "Amaryllidaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3400
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "division_mata",
+        "notas": "Se propaga facilmente por division de macollos. Sus flores lilas atraen polinizadores. Las hojas tubulares son mas finas que las de allium fistulosum."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Leccion de biodiversidad funcional: sus flores atraen abejas y sus hojas ahuyentan plagas, demostrando el principio de polycultura en bordes de cama."
     }
   ],
   "biopreparados": [
