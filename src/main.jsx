@@ -84,23 +84,24 @@ if ('serviceWorker' in navigator) {
     }
   });
 
-  // Auto-reload cuando el SW nuevo toma control (controllerchange).
-  // Pattern Workbox estándar para evitar white screen post-deploy:
-  //   - Si NO había controller previo, es first install (no reload)
-  //   - Si HABÍA controller y cambió a otro = update real, recargar UNA VEZ
-  // Sin este reload el browser puede quedarse con HTML cached que referencia
-  // chunks Vite con hashes viejos que ya no existen post-deploy → todos los
-  // chunks fallan → white screen (incidente 2026-05-06, ver public/sw.js).
-  let initialControllerRegistered = !!navigator.serviceWorker.controller;
+  // Banner "nueva version disponible" cuando SW cambia (controllerchange) o
+  // cuando un nuevo SW esta en waiting (updatefound). Reemplaza auto-reload:
+  // el operador decide cuando actualizar via UpdateAvailableBanner.
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (initialControllerRegistered) {
-      // Era un update real (no first install). Recargar para HTML fresh +
-      // chunk refs nuevos.
-      window.location.reload();
-    } else {
-      // First install. Marcamos para que próximos controllerchange sí recarguen.
-      initialControllerRegistered = true;
+    window.dispatchEvent(new CustomEvent('chagra:update-available'));
+  });
+
+  // Tambien detectar SW en waiting por si el controllerchange no se dispara
+  // (ej. si el SW no hace skipWaiting automaticamente en el futuro).
+  navigator.serviceWorker.ready.then((registration) => {
+    if (registration.waiting) {
+      window.dispatchEvent(new CustomEvent('chagra:update-available'));
     }
+    registration.addEventListener('updatefound', () => {
+      if (registration.waiting) {
+        window.dispatchEvent(new CustomEvent('chagra:update-available'));
+      }
+    });
   });
 }
 
