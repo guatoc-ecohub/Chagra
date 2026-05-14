@@ -1835,10 +1835,11 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015",
-        "restrepo-1996-abc-agricultura-organica"
+        "powo-kew",
+        "agrosavia-sol-andina",
+        "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Variedad acogollada permite enseñar el blanqueamiento natural por autosombreado de hojas internas."
+      "valor_pedagogico": "La lechuga romana verde (Lactuca sativa L. var. longifolia Lam.) se cultiva en los departamentos andinos de Colombia como Cundinamarca, Boyacá y Santander entre 1000-3000 msnm, con óptimo desarrollo en zonas térmicas templadas y frías (1800-2800 msnm). Su manejo agronómico incluye propagación por semilla con ciclo de cultivo de 65-80 días, cosechándose cuando la cabeza está firme y las hojas internas blanqueadas por autosombreado; se beneficia de asociaciones con zanahoria y rábano que repelen áfidos, requiriendo monitoreo de plagas como pulgones y caracoles mediante trampas de cerveza y extracto de ajo. En el contexto campesino andino, esta variedad ha sido incorporada a ensaladas y acompañamientos desde la época colonial, valorada por su textura crujiente y sabor suave en platos tradicionales como el sancocho de gallina y los sandwiches de chicharrón. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Lactuca sativa L. var. longifolia Lam."
     },
     {
       "id": "lactuca_sativa_roble_morada",
