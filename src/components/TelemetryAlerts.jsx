@@ -575,6 +575,8 @@ export default function TelemetryAlerts() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const allSensorsNull = sensors.invernaderoHumidity === null && sensors.invernaderoTemperature === null && sensors.tabacoHumidity === null && sensors.tabacoTemperature === null;
+
   return (
     <div className="px-5 py-4 rounded-3xl bg-slate-900 border border-morpho/30 shadow-neon-morpho mb-6">
       <h3 className="text-lg font-black mb-3 flex items-center gap-2">
@@ -601,30 +603,105 @@ export default function TelemetryAlerts() {
       )}
 
       {/* Telemetria IoT, estilo HUD industrial, tipografia monoespaciada,
-          borde left accent morpho (cyan) para diferenciar visualmente del
-          panel cyberpunk de IA (orchid). Status dot parpadea sutilmente
-          como signo de conexion viva al sensor. */}
+           borde left accent morpho (cyan) para diferenciar visualmente del
+           panel cyberpunk de IA (orchid). Status dot parpadea sutilmente
+           como signo de conexion viva al sensor. */}
       <div className="space-y-3 mb-6">
-        <IoTSensorCard
-          title="INVERNADERO, ZONA A"
-          deviceId="matera_cocina · zigbee"
-          humidity={sensors.invernaderoHumidity}
-          temperature={sensors.invernaderoTemperature}
-          humidityHistory={sensorHistory['sensor.matera_cocina_humidity']}
-          temperatureHistory={sensorHistory['sensor.matera_cocina_temperature']}
-          getHumidityColor={getHumidityColor}
-          getTemperatureColor={getTemperatureColor}
-        />
-        <IoTSensorCard
-          title="MATERA TABACO"
-          deviceId="cocina · hobeian_zg_303z"
-          humidity={sensors.tabacoHumidity}
-          temperature={sensors.tabacoTemperature}
-          humidityHistory={sensorHistory['sensor.hobeian_zg_303z_humidity']}
-          temperatureHistory={sensorHistory['sensor.hobeian_zg_303z_temperature']}
-          getHumidityColor={getHumidityColor}
-          getTemperatureColor={getTemperatureColor}
-        />
+        {allSensorsNull && !error && !aiAlert ? (
+          <>
+            <div className="relative bg-slate-900/60 border-l-[3px] border-slate-700/50 motion-safe:animate-pulse" aria-hidden="true">
+              <div className="p-3 pr-4">
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-slate-600" />
+                      <span className="h-3 bg-slate-700 rounded w-32 block" />
+                    </div>
+                    <span className="block h-2.5 bg-slate-700 rounded w-24 mt-1.5" />
+                  </div>
+                  <span className="h-3 bg-slate-700 rounded w-8" />
+                </div>
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div className="bg-slate-950/60 border border-slate-800 rounded px-2.5 py-1.5 min-h-[56px]">
+                    <span className="block h-2.5 bg-slate-700 rounded w-14 mb-2.5" />
+                    <span className="block h-7 bg-slate-700 rounded w-16" />
+                  </div>
+                  <div className="bg-slate-950/60 border border-slate-800 rounded px-2.5 py-1.5 min-h-[56px]">
+                    <span className="block h-2.5 bg-slate-700 rounded w-14 mb-2.5" />
+                    <span className="block h-7 bg-slate-700 rounded w-16" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+                  <div>
+                    <span className="block h-2.5 bg-slate-700 rounded w-24 mb-1.5" />
+                    <span className="block h-[72px] bg-slate-700/30 rounded w-full" />
+                  </div>
+                  <div>
+                    <span className="block h-2.5 bg-slate-700 rounded w-24 mb-1.5" />
+                    <span className="block h-[72px] bg-slate-700/30 rounded w-full" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="relative bg-slate-900/60 border-l-[3px] border-slate-700/50 motion-safe:animate-pulse" aria-hidden="true">
+              <div className="p-3 pr-4">
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-slate-600" />
+                      <span className="h-3 bg-slate-700 rounded w-32 block" />
+                    </div>
+                    <span className="block h-2.5 bg-slate-700 rounded w-24 mt-1.5" />
+                  </div>
+                  <span className="h-3 bg-slate-700 rounded w-8" />
+                </div>
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div className="bg-slate-950/60 border border-slate-800 rounded px-2.5 py-1.5 min-h-[56px]">
+                    <span className="block h-2.5 bg-slate-700 rounded w-14 mb-2.5" />
+                    <span className="block h-7 bg-slate-700 rounded w-16" />
+                  </div>
+                  <div className="bg-slate-950/60 border border-slate-800 rounded px-2.5 py-1.5 min-h-[56px]">
+                    <span className="block h-2.5 bg-slate-700 rounded w-14 mb-2.5" />
+                    <span className="block h-7 bg-slate-700 rounded w-16" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+                  <div>
+                    <span className="block h-2.5 bg-slate-700 rounded w-24 mb-1.5" />
+                    <span className="block h-[72px] bg-slate-700/30 rounded w-full" />
+                  </div>
+                  <div>
+                    <span className="block h-2.5 bg-slate-700 rounded w-24 mb-1.5" />
+                    <span className="block h-[72px] bg-slate-700/30 rounded w-full" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="motion-safe:animate-glitch-in">
+            <IoTSensorCard
+              title="INVERNADERO, ZONA A"
+              deviceId="matera_cocina · zigbee"
+              humidity={sensors.invernaderoHumidity}
+              temperature={sensors.invernaderoTemperature}
+              humidityHistory={sensorHistory['sensor.matera_cocina_humidity']}
+              temperatureHistory={sensorHistory['sensor.matera_cocina_temperature']}
+              getHumidityColor={getHumidityColor}
+              getTemperatureColor={getTemperatureColor}
+            />
+            <IoTSensorCard
+              title="MATERA TABACO"
+              deviceId="cocina · hobeian_zg_303z"
+              humidity={sensors.tabacoHumidity}
+              temperature={sensors.tabacoTemperature}
+              humidityHistory={sensorHistory['sensor.hobeian_zg_303z_humidity']}
+              temperatureHistory={sensorHistory['sensor.hobeian_zg_303z_temperature']}
+              getHumidityColor={getHumidityColor}
+              getTemperatureColor={getTemperatureColor}
+            />
+          </div>
+        )}
       </div>
 
       <div className={`p-5 rounded-xl relative overflow-hidden border-l-8 shadow-neon-morpho ${loading ? 'bg-morpho/5 border-morpho' : 'bg-orchid/5 border-orchid'}`}>
