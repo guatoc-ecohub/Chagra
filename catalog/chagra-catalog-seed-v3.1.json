@@ -21,7 +21,7 @@
       "AMB-14: consistencia invasor aplicada en migración",
       "AMB-15: scale_viability + manejo_por_escala con CI de coherencia"
     ],
-    "alcance_seed": "7 especies migradas desde v3.0. Las DRs por piso térmico poblarán hasta ~400 especies totales (100 × 4 pisos).",
+    "alcance_seed": "7 especies migradas desde v3.0 + especies agregadas por batches (incluyendo Batch 16: 10 especies piso tropical bajo). Las DRs por piso térmico poblarán hasta ~400 especies totales (100 × 4 pisos).",
     "advertencia": "Validar con: node scripts/validate-catalog.mjs --seed-mode. Refs a species aún no migradas aparecen como warnings."
   },
   "species": [
@@ -4745,6 +4745,562 @@
         "perez-arbelaez-1947-plantas-utiles"
       ],
       "valor_pedagogico": "Tesoro genetico andino: frijol que revienta al tostarse. Ensenia la diversidad de usos y la importancia de conservar variedades locales."
+    },
+    {
+      "id": "cocos_nucifera",
+      "nombre_comun": "Coco",
+      "nombre_comunes_regionales": [
+        "Cocotero",
+        "Palma de coco"
+      ],
+      "nombre_cientifico": "Cocos nucifera L.",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer",
+        "windbreak"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 120,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 300,
+        "max_absoluto": 500
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 38
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "ph_suelo": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 7,
+        "max": 8
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinacion en vivero de 6-12 meses; requiere transplante a sitio definitivo con suelo profundo y bien drenado. Palma emblematica de la Costa Caribe y Pacifica colombiana."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El arbol de la vida tropical: ensenia aprovechamiento integral (agua, alimento, fibra, aceite, vivienda) en sistemas agroforestales de la costa colombiana. Caso de estudio en resiliencia costera y seguridad alimentaria."
+    },
+    {
+      "id": "bactris_gasipaes",
+      "nombre_comun": "Chontaduro",
+      "nombre_comunes_regionales": [
+        "Pejibaye",
+        "Pixbae",
+        "Cachipay"
+      ],
+      "nombre_cientifico": "Bactris gasipaes Kunth",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer",
+        "living_fence"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 36,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 500,
+        "max_absoluto": 1000
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "ph_suelo": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 6.5,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinacion lenta (3-6 meses); se recomienda siembra en bolsa y transplante con 2-3 hojas. Tradicionalmente sembrado en las chagras indigenas del Pacifico y Amazonia."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Palma multiproposito por excelencia del tropico colombiano: fruto rico en vitamina A y aceites, palmito comestible, y madera para construccion rural. Ensenia agroforesteria tropical y seguridad alimentaria."
+    },
+    {
+      "id": "euterpe_oleracea",
+      "nombre_comun": "Asai",
+      "nombre_comunes_regionales": [
+        "Azai",
+        "Manaca",
+        "Palma de asai"
+      ],
+      "nombre_cientifico": "Euterpe oleracea Mart.",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 12,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 200,
+        "max_absoluto": 500
+      },
+      "temperatura_c": {
+        "helada_letal": 10,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "humedad_relativa_pct": {
+        "min": 70,
+        "optimo": 85,
+        "max": 100
+      },
+      "ph_suelo": {
+        "min": 4.5,
+        "optimo_min": 5,
+        "optimo_max": 6,
+        "max": 6.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "moderado",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Palma nativa de la Amazonia colombiana; crece en rebrotes multiples desde la base (multitallo). Sus frutos son la base del 'asai' de la canasta amazonica."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Superalimento amazonico: sus frutos concentran antioxidantes y energia. Ensenia el aprovechamiento sostenible de productos forestales no maderables del Pacifico y la Amazonia colombiana."
+    },
+    {
+      "id": "aiphanes_aculeata",
+      "nombre_comun": "Corozo",
+      "nombre_comunes_regionales": [
+        "Corozo de cerro",
+        "Coyure",
+        "Palma de corozo"
+      ],
+      "nombre_cientifico": "Aiphanes aculeata Willd.",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "harvest_type": "fruto",
+      "cycleMonths": 24,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 400,
+        "max_absoluto": 700
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 24,
+        "optimo_max": 32,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Palma espinosa de los valles secos interandinos; tolera suelos pobres y periodos secos prolongados. Frutos usados para refrescos tradicionales en la Costa Caribe."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "Palma rustica de tierras secas: sus frutos son fuente de vitamina A y aceites. Ensenia adaptacion a suelos pobres y periodos de sequia en el Caribe colombiano."
+    },
+    {
+      "id": "costus_spicatus",
+      "nombre_comun": "Cana agria",
+      "nombre_comunes_regionales": [
+        "Cana de jabali",
+        "Cana brava",
+        "Cana amarga"
+      ],
+      "nombre_cientifico": "Costus spicatus (Jacq.) Sw.",
+      "familia_botanica": "Costaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 400,
+        "max_absoluto": 800
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno_a_moderado",
+      "propagation": {
+        "metodo_principal": "rizoma",
+        "notas": "Se propaga por fragmentos de rizoma sembrados en sustrato humedo. Crece en bordes de rios y quebradas del tropico humedo. Usada como diuretico y antiinflamatorio en medicina tradicional."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Planta medicinal emblematica del tropico humedo colombiano: sus tallos agrios se usan como diuretico natural. Ensenia el conocimiento botanico tradicional de las comunidades riberenas del Pacifico."
+    },
+    {
+      "id": "alocasia_macrorrhizos",
+      "nombre_comun": "Bore",
+      "nombre_comunes_regionales": [
+        "Bore",
+        "Malanga gigante",
+        "Taro gigante",
+        "Ocumo"
+      ],
+      "nombre_cientifico": "Alocasia macrorrhizos (L.) G.Don",
+      "familia_botanica": "Araceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "tuberculo",
+      "cycleMonths": 9,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 400,
+        "max_absoluto": 800
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 80,
+        "max": 95
+      },
+      "ph_suelo": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 6.5,
+        "max": 7
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno_a_moderado",
+      "propagation": {
+        "metodo_principal": "tuberculo",
+        "notas": "Se propaga plantando hijos o secciones de cormo con yemas. Tolerante a sombra y suelos humedos. Cultivo tradicional de la chagra indigena amazonica y del Pacifico."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Cultivo de seguridad alimentaria del tropico humedo: sus cormos ricos en almidon sostienen comunidades indigenas del Pacifico y Amazonia. Ensenia sistemas agroforestales de chagra."
+    },
+    {
+      "id": "euterpe_enbacca",
+      "_curation_status": "ATENCION: El nombre cientifico 'Euterpe enbacca' entregado en el issue requiere verificacion taxonomica. Podria tratarse de una especie del genero Euterpe u otra Arecaceae. Se conserva el nombre del issue pendiente de confirmacion con botanico.",
+      "nombre_comun": "Chambo",
+      "nombre_comunes_regionales": [
+        "Chamburo",
+        "Palma de chambo"
+      ],
+      "nombre_cientifico": "Euterpe enbacca",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "no_evaluada",
+      "harvest_type": "fruto",
+      "cycleMonths": 36,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 300,
+        "max_absoluto": 500
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinacion tipica de palma tropical. Se recomienda propagacion en vivero con sombra parcial los primeros meses."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "Palma frutal de la region Pacifica colombiana; sus frutos son aprovechados por comunidades locales. Su presencia en el catalogo resalta la importancia de documentar especies con vacios taxonomicos."
+    },
+    {
+      "id": "dioscorea_alata",
+      "nombre_comun": "Name blanco",
+      "nombre_comunes_regionales": [
+        "Name",
+        "Name de agua",
+        "Name de Guinea"
+      ],
+      "nombre_cientifico": "Dioscorea alata L.",
+      "familia_botanica": "Dioscoreaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "tuberculo",
+      "cycleMonths": 8,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 400,
+        "max_absoluto": 800
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "ph_suelo": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 6.5,
+        "max": 7
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "tuberculo",
+        "notas": "Se propaga mediante tubérculos pequenos o secciones de tubérculo con yemas. Requiere tutorado (espaldera). Cultivo tradicional de la Costa Caribe y Pacifico colombiano."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Tuberculo basico de la dieta tropical colombiana: fuente de carbohidratos complejos. Ensenia sistemas de cultivo en espaldera y la importancia de los namees en la seguridad alimentaria del Caribe."
+    },
+    {
+      "id": "solanum_sessiliflorum",
+      "nombre_comun": "Cocona",
+      "nombre_comunes_regionales": [
+        "Cocona",
+        "Topiro",
+        "Tupiro",
+        "Lulo amazonico"
+      ],
+      "nombre_cientifico": "Solanum sessiliflorum Dunal",
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 8,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 400,
+        "max_absoluto": 700
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "ph_suelo": {
+        "min": 4.5,
+        "optimo_min": 5,
+        "optimo_max": 6,
+        "max": 6.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinacion rapida (7-14 dias); se trasplanta a los 30 dias. Nativa de la Amazonia colombiana; crece bien en suelos acidos. Fruto usado en jugos y preparaciones tradicionales."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Fruto amazonico con alto potencial nutritivo: rico en hierro y vitaminas del complejo B. Ensenia el potencial de especies nativas subutilizadas de la Amazonia colombiana."
+    },
+    {
+      "id": "renealmia_alpinia",
+      "nombre_comun": "Pina pina",
+      "nombre_comunes_regionales": [
+        "Pina de monte",
+        "Jengibre de la montana",
+        "Pina silvestre"
+      ],
+      "nombre_cientifico": "Renealmia alpinia (Rottb.) Maas",
+      "familia_botanica": "Zingiberaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 400,
+        "max_absoluto": 800
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 85,
+        "max": 100
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno_a_moderado",
+      "propagation": {
+        "metodo_principal": "rizoma",
+        "notas": "Propagacion por division de rizomas en sustrato rico en materia organica y humedo. Crece en sotobosque de selvas tropicales. Frutos usados como colorante natural y sus hojas en infusion medicinal."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Planta del sotobosque tropical con usos medicinales y tintoreos tradicionales. Ensenia el conocimiento botanico de las comunidades afrocolombianas del Pacifico y su relacion con el bosque humedo."
     }
   ],
   "biopreparados": [
