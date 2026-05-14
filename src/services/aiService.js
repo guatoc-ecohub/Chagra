@@ -61,14 +61,19 @@ const blobToBase64 = (blob) =>
 /**
  * Analiza una imagen de follaje via Ollama (modelo multimodal) en streaming.
  *
- * @param {Blob} imageBlob — imagen optimizada (WebP)
+ * @param {Blob} imageBlob - imagen optimizada (WebP)
  * @param {Object} [options]
- * @param {Function} [options.onToken] — callback (chunk, fullText) invocado
+ * @param {Function} [options.onToken] - callback (chunk, fullText) invocado
  *        por cada token emitido por el modelo. La UI lo usa para mostrar el
- *        diagnóstico apareciendo carácter-a-carácter.
- * @param {AbortSignal} [options.signal] — cancelación externa.
+ *        diagnostico apareciendo caracter-a-caracter.
+ * @param {AbortSignal} [options.signal] - cancelacion externa.
  * @returns {Promise<{score: number, issues: string[], treatment_suggestion: string} | null>}
  *          null si el modelo no responde o no es multimodal.
+ * @example
+ * const result = await analyzeFoliage(imageBlob, {
+ *   onToken: (chunk, text) => setDiagnosis(text),
+ * });
+ * // result => { score: 85, issues: ["mancha foliar"], treatment_suggestion: "aplicar caldo bordeles" }
  */
 export const analyzeFoliage = async (imageBlob, { onToken, signal } = {}) => {
   try {
@@ -102,17 +107,20 @@ export const analyzeFoliage = async (imageBlob, { onToken, signal } = {}) => {
 };
 
 /**
- * Reconoce especie de planta a partir de una foto (EXPERIMENTAL — Miguel
+ * Reconoce especie de planta a partir de una foto (EXPERIMENTAL - Miguel
  * 2026-05-03). Mismo backend gemma3:4b multimodal pero prompt distinto.
  *
- * @param {Blob} imageBlob — foto JPEG/WebP comprimida
+ * @param {Blob} imageBlob - foto JPEG/WebP comprimida
  * @param {Object} [options]
- * @param {Function} [options.onToken] — streaming token callback
+ * @param {Function} [options.onToken] - streaming token callback
  * @param {AbortSignal} [options.signal]
  * @returns {Promise<{common_name_es: string, scientific_name: string, confidence: number, alternatives: Array} | null>}
  *          null si modelo falla o no parseable. Caller debe distinguir
- *          confidence ≥0.7 (sugerir directo) vs <0.7 (mostrar alternativas
+ *          confidence >=0.7 (sugerir directo) vs <0.7 (mostrar alternativas
  *          y dejar al operario elegir).
+ * @example
+ * const species = await recognizeSpecies(imageBlob);
+ * // species => { common_name_es: "cafe", scientific_name: "Coffea arabica", confidence: 0.92, alternatives: [] }
  */
 export const recognizeSpecies = async (imageBlob, { onToken, signal } = {}) => {
   try {

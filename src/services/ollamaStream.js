@@ -46,6 +46,9 @@ const extractChunk = (parsed) => {
  *        total_duration, eval_count, prompt_eval_count, etc.
  * @returns {Promise<string>} texto completo concatenado al terminar.
  * @throws {Error} si el fetch falla, el servidor responde no-2xx o el body no es streameable.
+ * @example
+ * const full = await streamOllama('/api/ollama/api/generate', { model: 'gemma3:4b', prompt: 'hola' }, tok => setText(tok));
+ * // full => "Hola, en que puedo ayudarte?"
  */
 export async function streamOllama(url, body, onToken, { signal, onDone } = {}) {
   const response = await fetch(url, {

@@ -16,11 +16,14 @@ const TIMEOUT_MS = 15000;
 /**
  * Transcribe un Blob de audio a texto usando Whisper.
  *
- * @param {Blob} blob — audio/webm;codecs=opus (típicamente de MediaRecorder).
+ * @param {Blob} blob - audio/webm;codecs=opus (tipicamente de MediaRecorder).
  * @param {Object} [options]
  * @param {string} [options.language='es']
  * @returns {Promise<string>} texto transcrito (trim).
- * @throws {Error} si la red falla, el servidor responde no-2xx o el texto está vacío.
+ * @throws {Error} si la red falla, el servidor responde no-2xx o el texto esta vacio.
+ * @example
+ * const text = await transcribe(audioBlob, { language: 'qu' });
+ * // text => "wakichay tukuy imata"
  */
 export async function transcribe(blob, options = {}) {
   const controller = new AbortController();
@@ -69,8 +72,12 @@ export async function transcribe(blob, options = {}) {
  *
  * @param {Blob} blob
  * @param {Object} [metadata]
- * @param {string} [metadata.reason] — motivo del encolado (error del upstream).
+ * @param {string} [metadata.reason] - motivo del encolado (error del upstream).
  * @param {number} [metadata.durationMs]
+ * @returns {Promise<void>}
+ * @throws {Error} si syncManager.saveVoiceRecording falla.
+ * @example
+ * await queueForRetry(blob, { reason: "Whisper 503", durationMs: 4500 });
  */
 export async function queueForRetry(blob, metadata = {}) {
   return syncManager.saveVoiceRecording(blob, {
