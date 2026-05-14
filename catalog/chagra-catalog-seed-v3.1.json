@@ -6043,6 +6043,67 @@
       "validation_level": "claude_draft"
     },
     {
+      "id": "polylepis_quadrijuga",
+      "_curation_status": "BORRADOR_IA",
+      "nombre_comun": "Coloradito, queñoa de páramo Cruz Verde",
+      "nombre_comunes_regionales": [
+        "queñoa de páramo",
+        "coloradito"
+      ],
+      "nombre_cientifico": "Polylepis quadrijuga Bitter",
+      "familia_botanica": "Rosaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nurse_plant",
+        "ground_cover",
+        "windbreak"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_protegido",
+      "altitud_msnm": {
+        "min_absoluto": 2800,
+        "optimo_min": 3000,
+        "optimo_max": 3500,
+        "max_absoluto": 3800
+      },
+      "temperatura_c": {
+        "helada_letal": -15,
+        "optimo_min": 3,
+        "optimo_max": 10,
+        "max_tolerable": 15
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 75,
+        "max": 90
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Recolección de semillas de frutos maduros durante época seca. Siembra en semilleros con sustrato de turba de páramo y materia orgánica descompuesta. Germinación lenta: 45-90 días. Trasplante a bolsas individuales a los 4-6 meses. Plantación definitiva después de 12-18 meses cuando alcance 30-40 cm de altura.",
+        "tiempo_a_establecimiento_dias": 540,
+        "notas": "Especie de crecimiento lento que forma parches arbustivos en suelos rocosos y mal drenados típicos de páramo. Requiere protección contra heladas intensas durante los primeros años de establecimiento."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "libro-rojo-plantas-colombia",
+        "humboldt-2016-frailejones"
+      ],
+      "valor_pedagogico": "El Coloradito es una especie emblemática de los páramos de la Cordillera Oriental colombiana, fundamental para la regulación hídrica y la fijación de carbono en ecosistemas de alta montaña. Sus raíces fibrosas y ramificación densa permiten estabilizar suelos frágiles y prevenir la erosión en laderas pronunciadas. En el contexto cultural andino, aunque no tiene usos específicos documentados en la tradición muisca, su presencia indica la salud del ecosistema paramuno que ha sido sagrado para las culturas indígenas desde tiempos prehispánicos. La propagación asistida requiere sustrato específico de turba de páramo descompuesta mezclada con arena gruesa y materia orgánica en proporción 2:1:1, manteniendo constante humedad pero sin encharcamiento según protocolos del Instituto Humboldt. Fuentes primarias: GBIF Taxonomic Backbone confirma la distribución andina; POWO-Kew valida el nombre científico y autoría; Libro Rojo de Plantas de Colombia clasifica su estado de conservación; estudios del Instituto Alexander von Humboldt detallan su ecología de páramo y requerimientos de manejo para restauración.",
+      "validation_level": "claude_draft"
+    },
+    {
       "id": "salix_humboldtiana",
       "_curation_status": "VALIDADO con fuentes Humboldt + Bernal + POWO",
       "nombre_comun": "Sauce andino",
