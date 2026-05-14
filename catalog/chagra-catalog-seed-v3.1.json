@@ -1,7 +1,7 @@
 {
   "schema_version": "3.1",
   "seed_version": "0.2.0",
-  "generated_at": "2026-05-14",
+  "generated_at": "2026-04-30",
   "generated_by": "md-fichas-to-catalog-json.mjs",
   "_meta": {
     "fuente_migracion": "chagra-catalog-seed-v3.0.json",
@@ -4747,14 +4747,3641 @@
       "valor_pedagogico": "Tesoro genetico andino: frijol que revienta al tostarse. Ensenia la diversidad de usos y la importancia de conservar variedades locales."
     },
     {
+      "id": "dioscorea_trifida",
+      "nombre_comun": "Ibia / Name andino",
+      "nombre_comunes_regionales": [
+        "name andino",
+        "mapuey",
+        "name criollo"
+      ],
+      "nombre_cientifico": "Dioscorea trifida L.f.",
+      "familia_botanica": "Dioscoreaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 14,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "tuberculo",
+        "notas": "Propagacion por secciones de tuberculo con yemas o por bulbillos aereos. Requiere sustrato suelto y profundo."
+      },
+      "source_ids": [
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "Name andino tradicional del sistema chagra muisca. Ensenanza de raices reservantes y propagacion vegetativa en la huerta altoandina."
+    },
+    {
+      "id": "tropaeolum_tuberosum_mashua",
+      "nombre_comun": "Mashua (subsp. silvestre)",
+      "nombre_comunes_regionales": [
+        "mashua amarga",
+        "anU",
+        "isaNo"
+      ],
+      "nombre_cientifico": "Tropaeolum tuberosum Ruiz & Pav. subsp. silvestre",
+      "familia_botanica": "Tropaeolaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 2400,
+        "optimo_min": 2800,
+        "optimo_max": 3400,
+        "max_absoluto": 3800
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 8,
+        "optimo_max": 14,
+        "max_tolerable": 18
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "tuberculo",
+        "notas": "Subespecie silvestre de mayor altitud y resistencia a heladas que el cubio. Contenido de isotiocianatos mas alto, lo que le confiere mayor accion nematicida."
+      },
+      "source_ids": [
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Variedad de paramo del genero Tropaeolum. Ensenanza de adaptacion altitudinal y compuestos alelopaticos naturales (isotiocianatos) en la chagra de alta montanya."
+    },
+    {
+      "id": "solanum_tuberosum_sabanera",
+      "nombre_comun": "Papa Sabanera",
+      "nombre_comunes_regionales": [
+        "papa de la sabana",
+        "papa sabanera blanca",
+        "papa sabanera amarilla"
+      ],
+      "nombre_cientifico": "Solanum tuberosum L. subsp. andigenum var. Sabanera",
+      "familia_botanica": "Solanaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2400,
+        "optimo_max": 3000,
+        "max_absoluto": 3400
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 10,
+        "optimo_max": 17,
+        "max_tolerable": 22
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "tuberculo (semilla asexual)",
+        "notas": "Variedad tradicional del altiplano cundiboyacense. Ciclo largo (5-7 meses). Requiere periodos de dormancia antes de resiembra."
+      },
+      "source_ids": [
+        "perez-rodriguez-gomez-2008",
+        "nustez-rodriguez-2024-unal"
+      ],
+      "valor_pedagogico": "Variedad andina tradicional del altiplano. Ensenanza del ciclo largo de la papa de ano y la importancia de las variedades nativas en la soberania alimentaria de la sabana."
+    },
+    {
+      "id": "canna_edulis",
+      "nombre_comun": "Achira / SagU",
+      "nombre_comunes_regionales": [
+        "cucuyU",
+        "chisgua",
+        "capacho"
+      ],
+      "nombre_cientifico": "Canna edulis Ker Gawl.",
+      "familia_botanica": "Cannaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 14,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "medio",
+      "propagation": {
+        "metodo_principal": "rizoma",
+        "notas": "Propagacion por division de rizomas en epoca lluviosa. La harina de achira se usa tradicionalmente para elaborar bizcochos, coladas y pan."
+      },
+      "source_ids": [
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "Planta de usos multiples en la chagra muisca. Ensenanza de procesamiento tradicional de rizomas para harina y valor cultural del bizcocho de achira."
+    },
+    {
+      "id": "smallanthus_sonchifolius",
+      "nombre_comun": "Yacon / Llacon",
+      "nombre_comunes_regionales": [
+        "jiquima",
+        "aricoma",
+        "papa japonesa (impropiamente)"
+      ],
+      "nombre_cientifico": "Smallanthus sonchifolius (Poepp.) H.Rob.",
+      "familia_botanica": "Asteraceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 13,
+        "optimo_max": 20,
+        "max_tolerable": 25
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "division_mata",
+        "notas": "Se propaga por secciones de corona con yemas. Las raices tuberosas acumulan fructooligosacaridos (FOS), ideales para diabeticos."
+      },
+      "source_ids": [
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "Tuberculo functional de la chagra. Ensenanza de nutricion y salud: FOS como alternativa deendulzante natural para la dieta altoandina."
+    },
+    {
+      "id": "arracacia_xanthorrhiza",
+      "nombre_comun": "Arracacha / Zanahoria blanca",
+      "nombre_comunes_regionales": [
+        "racacha",
+        "apio criollo",
+        "virraca"
+      ],
+      "nombre_cientifico": "Arracacia xanthorrhiza Bancr.",
+      "familia_botanica": "Apiaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 13,
+        "optimo_max": 20,
+        "max_tolerable": 25
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "hijuelos (cornos)",
+        "notas": "Se propaga vegetativamente mediante cornos (hijuelos de la corona). Ciclo largo (10-12 meses). Raiz muy perecedera post-cosecha."
+      },
+      "source_ids": [
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "Tuberculo andino por excelencia de la chagra muisca. Ensenanza de manejo de cultivos de ciclo largo y raices de alta digestibilidad para alimentacion infantil."
+    },
+    {
+      "id": "vaccinium_meridionale",
+      "nombre_comun": "Mortino / Agraz",
+      "nombre_cientifico": "Vaccinium meridionale Sw.",
+      "familia_botanica": "Ericaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2500,
+        "optimo_max": 3200,
+        "max_absoluto": 3600
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 8,
+        "optimo_max": 16,
+        "max_tolerable": 22
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinacion lenta (3-6 meses); requiere estratificacion fria. Tambien por acodo y esqueje semi-lenoso con hormonas."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina",
+        "uicn-red-list"
+      ],
+      "valor_pedagogico": "Fruto sagrado muisca: el mortino representa la conexion entre el paramo y la alimentacion tradicional. Su recoleccion estacional ensena los ciclos de la naturaleza y la importancia de no sobreexplotar.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "vaccinium_floribundum",
+      "nombre_comun": "Agraz de paramo",
+      "nombre_cientifico": "Vaccinium floribundum Kunth",
+      "familia_botanica": "Ericaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2500,
+        "optimo_min": 2800,
+        "optimo_max": 3500,
+        "max_absoluto": 4000
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 6,
+        "optimo_max": 14,
+        "max_tolerable": 20
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Especie de paramo no domesticada; su propagacion asistida esta en fase experimental. Depende de dispersion por aves y roedores nativos."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina",
+        "uicn-red-list"
+      ],
+      "valor_pedagogico": "Centinela del paramo: el agraz marca el limite superior del bosque altoandino. Su presencia indica un ecosistema saludable y es fuente de alimento para la fauna paramuna.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "vasconcellea_pubescens",
+      "nombre_comun": "Papayuela / Papayo de monte",
+      "nombre_cientifico": "Vasconcellea pubescens A.DC.",
+      "familia_botanica": "Caricaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Planta dioica (individuos macho y hembra); requiere un macho por cada 5-8 hembras para polinizacion. Crecimiento rapido, vida corta (4-6 anos)."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-colombia",
+        "agrosavia-tibaitata"
+      ],
+      "valor_pedagogico": "Dioecia visible: la papayuela ensena la diferencia entre plantas masculinas y femeninas. Sus frutos cocidos en almibar son memoria viva de la cocina tradicional cundiboyacense.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "fragaria_vesca",
+      "nombre_comun": "Fresa silvestre andina",
+      "nombre_cientifico": "Fragaria vesca L.",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio",
+        "paramo",
+        "templado"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2500,
+        "optimo_max": 3300,
+        "max_absoluto": 3700
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 8,
+        "optimo_max": 18,
+        "max_tolerable": 24
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "estolon",
+        "notas": "Se reproduce vegetativamente por estolones; tambien por semilla pero con menor tasa de exito. Variantes andinas adaptadas a mayor altitud que la europea."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina"
+      ],
+      "valor_pedagogico": "El fruto escondido: la fresa silvestre crece a ras del suelo en los bordes del bosque andino, ensenando que los mejores alimentos a veces estan donde menos se espera. Su estolon es leccion de reproduccion asexual.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "rubus_glaucus",
+      "nombre_comun": "Mora andina / Mora de Castilla",
+      "nombre_cientifico": "Rubus glaucus Benth.",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "living_fence"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1800,
+        "optimo_max": 2600,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 13,
+        "optimo_max": 18,
+        "max_tolerable": 22
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "acodo",
+        "notas": "Propagacion por acodo de punta o esqueje. La forma silvestre presenta espinas; requiere tutorado en espaldera. Produce frutos a partir del segundo ano."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "La espina que protege: la mora silvestre ensena que las defensas naturales de las plantas tienen un proposito. Su cultivo en espaldera muestra como la agricultura domestica sin eliminar la esencia silvestre.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "solanum_quitoense",
+      "nombre_comun": "Lulo / Naranjilla / Chuva",
+      "nombre_cientifico": "Solanum quitoense Lam.",
+      "familia_botanica": "Solanaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1600,
+        "optimo_max": 2400,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 16,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Requiere sombra en etapas tempranas; sensible a nematodos del genero Meloidogyne. Se asocia bien con platano o maiz como sombra temporal."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "Acidez que refresca: el lulo es el citrico andino por excelencia. Ensea la importancia de la acidez como mecanismo de defensa natural y su valor en la gastronomia tradicional.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "hesperomeles_obtusifolia",
+      "nombre_comun": "Durazno criollo / Pesgua / Cerote",
+      "nombre_cientifico": "Hesperomeles obtusifolia (Pers.) Lindl.",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_protegido",
+      "altitud_msnm": {
+        "min_absoluto": 2200,
+        "optimo_min": 2600,
+        "optimo_max": 3300,
+        "max_absoluto": 3700
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 7,
+        "optimo_max": 15,
+        "max_tolerable": 22
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Especie nativa de crecimiento lento; no se cultiva comercialmente. Sus frutos son consumidos por aves y mamiferos dispersores del bosque altoandino."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina",
+        "uicn-red-list"
+      ],
+      "valor_pedagogico": "El falso durazno: sus frutos recuerdan al durazno europeo pero pertenecen a un genero nativo andino. Ensea la diferencia entre especies nativas y exoticas, y como los nombres populares a veces confunden.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "thymus_vulgaris",
+      "nombre_comun": "Tomillo",
+      "nombre_comunes_regionales": [
+        "Tomillo común",
+        "Tomillo de jardín"
+      ],
+      "nombre_cientifico": "Thymus vulgaris L.",
+      "familia_botanica": "Lamiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 800,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinación lenta (14-21 dias); tambien se propaga por esqueje o division de mata. Tolera suelos pobres y secos."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "valor_pedagogico": "Leccion de rusticidad mediterranea: muestra como una planta con aceites esenciales volatiles sobrevive en suelos pobres y repele plagas del huerto andino."
+    },
+    {
+      "id": "eryngium_foetidum",
+      "nombre_comun": "Cilantro cimarron",
+      "nombre_comunes_regionales": [
+        "Culantro",
+        "Recao",
+        "Cilantro de monte"
+      ],
+      "nombre_cientifico": "Eryngium foetidum L.",
+      "familia_botanica": "Apiaceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 500,
+        "optimo_max": 2200,
+        "max_absoluto": 2600
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 15,
+        "optimo_max": 25,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinacion lenta; siembra directa o en bandeja. Una vez establecido, se resiembra solo con facilidad en el huerto."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "Hierba nativa de las Americas cuyo aroma intenso es parte vital del 'hogao' colombiano. Enseña la relevancia de las especias locales frente a las introducidas."
+    },
+    {
+      "id": "cucurbita_maxima",
+      "nombre_comun": "Calabaza / Auyama",
+      "nombre_comunes_regionales": [
+        "Zapallo",
+        "Calabazo",
+        "Auyama"
+      ],
+      "nombre_cientifico": "Cucurbita maxima Duchesne",
+      "familia_botanica": "Cucurbitaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "flor",
+      "estrato": "rastrero",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 1000,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 16,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa en sitio definitivo. Necesita buen espacio para sus guias rastreras. Las flores masculinas se cosechan temprano en la manana para consumo."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "fao-ecocrop"
+      ],
+      "valor_pedagogico": "En la milpa andina, sus flores rellenas de queso y huevo son patrimonio culinario de Cundinamarca. La planta entera enseña el sistema de 'tres hermanas' con maiz y frijol."
+    },
+    {
+      "id": "matricaria_chamomilla",
+      "nombre_comun": "Manzanilla",
+      "nombre_comunes_regionales": [
+        "Camomila",
+        "Manzanilla dulce"
+      ],
+      "nombre_cientifico": "Matricaria chamomilla L.",
+      "familia_botanica": "Asteraceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 800,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Resiembra natural prolifica; las semillas germinan sobre la superficie del suelo con luz. Se recomienda no cubrirlas."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "valor_pedagogico": "La infusion mas antigua del mundo. En la chagra chiguana, ensena el valor de las plantas indicadoras: su presencia senala suelos compactados que necesitan aireacion."
+    },
+    {
+      "id": "taraxacum_officinale",
+      "nombre_comun": "Diente de leon",
+      "nombre_comunes_regionales": [
+        "Amargon",
+        "Taraxaco",
+        "Lechuguilla"
+      ],
+      "nombre_cientifico": "Taraxacum officinale F.H.Wigg.",
+      "familia_botanica": "Asteraceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "templado",
+        "frio",
+        "paramo"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 1500,
+        "optimo_max": 3200,
+        "max_absoluto": 3600
+      },
+      "temperatura_c": {
+        "helada_letal": -15,
+        "optimo_min": 8,
+        "optimo_max": 18,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa; las semillas con vilano se dispersan por viento. Especie pionera que mejora la estructura del suelo con su raiz pivotante profunda."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "valor_pedagogico": "Leccion de acumulacion dinamica: su raiz pivotante extrae potasio, calcio y hierro de capas profundas. Sus flores son el primer alimento de las abejas nativas al inicio de la temporada de lluvias."
+    },
+    {
+      "id": "artemisia_absinthium",
+      "nombre_comun": "Ajenjo",
+      "nombre_comunes_regionales": [
+        "Hierba mora medicinal",
+        "Artemisa amarga",
+        "Absintio"
+      ],
+      "nombre_cientifico": "Artemisia absinthium L.",
+      "familia_botanica": "Asteraceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -15,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "division_mata",
+        "notas": "Propagacion por semilla o division de raiz. Crece vigorosamente en suelos pobres. Sus aceites amargos (tuyona) son potentes repelentes de plagas en el huerto."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "companions": [],
+      "antagonists": [],
+      "valor_pedagogico": "Leccion de alelopatia: su fuerte olor y sabor amargo ensenan como las plantas se defienden quimicamente en la naturaleza. Tradicionalmente usada en macerados para control de insectos en la chagra."
+    },
+    {
+      "id": "dodonaea_viscosa",
+      "_curation_status": "VALIDADO con fuentes Humboldt + Bernal + POWO",
+      "nombre_comun": "Hayuelo",
+      "nombre_comunes_regionales": [
+        "hayuelo",
+        "chamiso",
+        "casol"
+      ],
+      "nombre_cientifico": "Dodonaea viscosa Jacq.",
+      "familia_botanica": "Sapindaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "living_fence",
+        "windbreak",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Esqueje semilenoso de 20-30cm en cama de enraizamiento. Alternativa: siembra directa de semillas aladas en semillero con sustrato arenoso. Germinacion en 15-30 dias.",
+        "tiempo_a_establecimiento_dias": 45,
+        "notas": "Arbusto pionero agresivo; ideal para iniciar procesos de restauracion en suelos degradados. Tolera suelos pobres, compactados y sequia."
+      },
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Arbusto de 2-5m no apto para apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Excelente como cerco vivo o rompevientos en borde de lote.",
+          "tips": [
+            "Plantar a 1.5m de distancia en linea",
+            "Podas anuales de formacion"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Requiere sol directo, no apto bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Cerca viva perimetral en potreros y cultivos. Barrera rompevientos para hortalizas.",
+          "tips": [
+            "Densidad cerco: 1.5-2m entre plantas",
+            "Poda de altura a 2.5m para control"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie pionera clave en restauracion de bordes de bosque alto andino y taludes degradados.",
+          "tips": [
+            "Asociar con Alnus acuminata y Weinmannia tomentosa",
+            "Siembra en curva de nivel en laderas erosionadas"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "source_ids": [
+        "humboldt-flora-alto-andina",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "Arbusto pionero por excelencia en la restauracion de suelos degradados. Sus semillas aladas germinan incluso en terrenos compactados. Primera linea de defensa contra el viento en la alta montana.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "espeletia_argentea",
+      "_curation_status": "VALIDADO con fuentes Humboldt + Diazgranados + Bernal",
+      "nombre_comun": "Frailejón plateado",
+      "nombre_comunes_regionales": [
+        "frailejón"
+      ],
+      "nombre_cientifico": "Espeletia argentea Bonpl. & Humb.",
+      "familia_botanica": "Asteraceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "biomass_producer",
+        "nurse_plant"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_protegido",
+      "altitud_msnm": {
+        "min_absoluto": 2900,
+        "optimo_min": 3200,
+        "optimo_max": 3800,
+        "max_absoluto": 4100
+      },
+      "temperatura_c": {
+        "helada_letal": -12,
+        "optimo_min": 3,
+        "optimo_max": 10,
+        "max_tolerable": 16
+      },
+      "humedad_relativa_pct": {
+        "min": 70,
+        "optimo": 90,
+        "max": 100
+      },
+      "ph_suelo": {
+        "min": 4.0,
+        "optimo_min": 4.5,
+        "optimo_max": 5.5,
+        "max": 6.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Recoleccion de aquenios en temporada seca (diciembre-febrero en cordillera oriental). Siembra en sustrato de turba: arena 3:1. Germinacion lenta 30-90 dias. Trasplante a bolsa a los 4-6 meses.",
+        "tiempo_a_establecimiento_dias": 180,
+        "notas": "Protegida por Ley 1930/2018. Cualquier intervencion requiere permiso de autoridad ambiental."
+      },
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Especie de paramo no replicable en condiciones urbanas."
+        },
+        "huerto_casero": {
+          "viable": false,
+          "nota": "Solo en parcelas en paramo con permisos de autoridad ambiental."
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Requiere radiacion UV de altura y temperaturas frias sostenidas."
+        },
+        "produccion": {
+          "viable": false,
+          "nota": "No apta para produccion comercial. Legalmente protegida."
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave para restauracion de paramo degradado. Requiere permiso ambiental.",
+          "tips": [
+            "Densidad 100-400 individuos/ha segun nivel de degradacion",
+            "Exclusion ganadera obligatoria 3+ anos",
+            "Monitoreo anual de supervivencia"
+          ]
+        }
+      },
+      "scale_viability": [
+        "restauracion"
+      ],
+      "source_ids": [
+        "humboldt-2016-frailejones",
+        "diazgranados-2012-espeletiinae",
+        "ley-1930-2018-paramos",
+        "mads-res-383-2010",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "Frailejon de hojas plateadas que reflejan la radiacion UV extrema del paramo. Sus tricomas capturan agua de niebla y la fijan al suelo. Especie clave en la regulacion hidrica de la estrella fluvial Cruz Verde-Sumapaz.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "espeletia_grandiflora",
+      "_curation_status": "MIGRATED from v3.0; VALIDADO con fuentes Humboldt + Diazgranados + PNN Chingaza",
+      "nombre_comun": "Frailejón mayor",
+      "nombre_comunes_regionales": [
+        "frailejón",
+        "frailejón orejas de burro"
+      ],
+      "nombre_cientifico": "Espeletia grandiflora Humb. & Bonpl.",
+      "familia_botanica": "Asteraceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "biomass_producer",
+        "nurse_plant"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_protegido",
+      "altitud_msnm": {
+        "min_absoluto": 2800,
+        "optimo_min": 3200,
+        "optimo_max": 3800,
+        "max_absoluto": 4200
+      },
+      "temperatura_c": {
+        "helada_letal": -15,
+        "optimo_min": 2,
+        "optimo_max": 10,
+        "max_tolerable": 18
+      },
+      "humedad_relativa_pct": {
+        "min": 70,
+        "optimo": 90,
+        "max": 100
+      },
+      "ph_suelo": {
+        "min": 4.0,
+        "optimo_min": 4.5,
+        "optimo_max": 5.5,
+        "max": 6.0
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Recoleccion de aquenios de inflorescencias maduras (temporada seca, diciembre-febrero en cordillera oriental). Siembra en sustrato de turba de paramo: tierra de subparamo 50% + arena 30% + materia organica 20%. Germinacion lenta: 30-90 dias. Trasplante a bolsa a los 4-6 meses. Plantacion definitiva >12 meses a 15-20cm.",
+        "tiempo_a_establecimiento_dias": 180,
+        "notas": "Tasa de germinacion natural baja (5-20%). Crecimiento ~1cm/ano: individuos de 2m tardan ~200 anos. Protegida por Ley 1930/2018 y Resolucion 383/2010 MADS."
+      },
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Especie de paramo no replicable en condiciones urbanas."
+        },
+        "huerto_casero": {
+          "viable": false,
+          "nota": "Solo en parcelas en paramo con permisos de autoridad ambiental."
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Requiere radiacion UV de altura y temperaturas frias sostenidas."
+        },
+        "produccion": {
+          "viable": false,
+          "nota": "No apta para produccion comercial. Legalmente protegida."
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "ESPECIE CLAVE para restauracion de paramo. Requiere permiso de autoridad ambiental (CAR correspondiente). Protocolo validado por Rojas-Zamora et al. 2013 en PNN Chingaza.",
+          "tips": [
+            "Densidad 100-400 individuos/ha segun nivel de degradacion",
+            "Exclusion ganadera obligatoria 3+ anos",
+            "Monitoreo anual de supervivencia y crecimiento",
+            "Siembra en pastizales dominados por Calamagrostis con gradiente de altitud conocido"
+          ]
+        }
+      },
+      "scale_viability": [
+        "restauracion"
+      ],
+      "rol_ecologico": "Especie clave de ecosistema de paramo. Captura agua de niebla mediante tricomas foliares y la fija al suelo. Regulacion hidrica para cuencas que abastecen 70% del agua de ciudades andinas.",
+      "source_ids": [
+        "humboldt-2016-frailejones",
+        "diazgranados-2012-espeletiinae",
+        "libro-rojo-plantas-colombia",
+        "ley-1930-2018-paramos",
+        "mads-res-383-2010",
+        "bernal-2015-plantas-liquenes-colombia",
+        "uicn-red-list",
+        "restauracion-cruz-verde-sumapaz"
+      ],
+      "valor_pedagogico": "Simbolo del paramo colombiano. Ensenia adaptaciones extremas (hojas marcescentes, pubescencia protectora, congelacion inhibida en citoplasma), regulacion hidrica de paramos, restauracion ecologica de ecosistemas fragiles y crisis climatica en alta montana.",
+      "validation_level": "operator_reviewed"
+    },
+    {
+      "id": "hesperomeles_goudotiana",
+      "_curation_status": "VALIDADO con fuentes Humboldt + Bernal + POWO",
+      "nombre_comun": "Esmeralda chiquita",
+      "nombre_comunes_regionales": [
+        "esmeralda",
+        "mortiño de páramo"
+      ],
+      "nombre_cientifico": "Hesperomeles goudotiana (Decne.) Killip",
+      "familia_botanica": "Rosaceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "nurse_plant",
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2500,
+        "optimo_min": 2800,
+        "optimo_max": 3400,
+        "max_absoluto": 3700
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 6,
+        "optimo_max": 14,
+        "max_tolerable": 20
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 80,
+        "max": 95
+      },
+      "ph_suelo": {
+        "min": 4.5,
+        "optimo_min": 5.0,
+        "optimo_max": 6.5,
+        "max": 7.0
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Recoleccion de frutos maduros, extraccion de semillas y siembra inmediata en semillero con sustrato de bosque. Germinacion en 30-60 dias.",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "Crece en sotobosque de bosque alto andino. Atraccion de aves dispersoras facilita regeneracion natural."
+      },
+      "source_ids": [
+        "humboldt-flora-alto-andina",
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "Pequeño arbol nativo del bosque alto andino y subparamo. Sus frutos rojos alimentan aves dispersoras del bosque de niebla. Especie ideal para ensenar la conectividad ecologica entre bosque y paramo.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "polylepis_sericea",
+      "_curation_status": "VALIDADO con fuentes Humboldt + Bernal + UICN",
+      "nombre_comun": "Polylepis / Colorado",
+      "nombre_comunes_regionales": [
+        "colorado",
+        "quebrada",
+        "sauce de páramo"
+      ],
+      "nombre_cientifico": "Polylepis sericea Wedd.",
+      "familia_botanica": "Rosaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nurse_plant",
+        "biomass_producer",
+        "windbreak"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_protegido",
+      "altitud_msnm": {
+        "min_absoluto": 2600,
+        "optimo_min": 3000,
+        "optimo_max": 3600,
+        "max_absoluto": 4000
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 4,
+        "optimo_max": 12,
+        "max_tolerable": 18
+      },
+      "humedad_relativa_pct": {
+        "min": 70,
+        "optimo": 85,
+        "max": 100
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Recoleccion de aquenios maduros. Siembra inmediata en semillero con sustrato de bosque alto andino. Germinacion 20-60 dias. Trasplante a los 3-4 meses.",
+        "tiempo_a_establecimiento_dias": 120,
+        "notas": "Forma bosques enanos relictuales de alta montana. Corteza laminar anaranjada caracteristica que la protege del frio extremo."
+      },
+      "source_ids": [
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "uicn-red-list",
+        "mads-res-383-2010",
+        "restauracion-cruz-verde-sumapaz"
+      ],
+      "valor_pedagogico": "Uno de los arboles que crece a mayor altitud en el mundo. Sus bosques enanos relictuales son refugio de biodiversidad unica y reservorios de agua para comunidades altoandinas. Corteza laminar que protege del frio extremo.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "salix_humboldtiana",
+      "_curation_status": "VALIDADO con fuentes Humboldt + Bernal + POWO",
+      "nombre_comun": "Sauce andino",
+      "nombre_comunes_regionales": [
+        "sauce",
+        "sauce de páramo",
+        "sauce llorón andino"
+      ],
+      "nombre_cientifico": "Salix humboldtiana Willd.",
+      "familia_botanica": "Salicaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nurse_plant",
+        "biomass_producer",
+        "windbreak"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2500,
+        "optimo_max": 3200,
+        "max_absoluto": 3600
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 8,
+        "optimo_max": 16,
+        "max_tolerable": 22
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 80,
+        "max": 95
+      },
+      "ph_suelo": {
+        "min": 5.0,
+        "optimo_min": 5.5,
+        "optimo_max": 7.0,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "medio",
+      "propagation": {
+        "methods": [
+          "esqueje"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Estacas de 30-50cm de madera de 1-2 anos, plantadas directamente en suelo humedo ribereno en epoca lluviosa. Enraizamiento en 15-30 dias.",
+        "tiempo_a_establecimiento_dias": 30,
+        "notas": "Arbol ribereno de crecimiento rapido. Ideal para estabilizacion de margenes de quebradas y rios de montana."
+      },
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Arbol de 10-25m no apto para apartamento."
+        },
+        "huerto_casero": {
+          "viable": false,
+          "nota": "Requiere espacio amplio junto a fuente de agua permanente."
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Arbol de gran tamano no apto bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Arbol de proteccion de fuentes hidricas y bordes de rio en fincas ganaderas y agricolas.",
+          "tips": [
+            "Plantar en franjas riberenas a 3-5m del agua",
+            "Asociacion natural con Alnus acuminata y Vallea stipularis"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave para restauracion de rondas hidricas, proteccion de cuencas y recuperacion de quebradas degradadas.",
+          "tips": [
+            "Densidad 400-600 individuos/ha en franja riberena",
+            "Propagacion directa por estacas minimiza costo de vivero"
+          ]
+        }
+      },
+      "scale_viability": [
+        "produccion",
+        "restauracion"
+      ],
+      "source_ids": [
+        "humboldt-flora-alto-andina",
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "Arbol ribereno andino por excelencia. Sus raices retienen las orillas de quebradas y rios de montana, previniendo erosion. Especie clave en la proteccion de fuentes hidricas del paramo Cruz Verde.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "vallea_stipularis",
+      "_curation_status": "VALIDADO con fuentes Humboldt + Bernal + SIB Colombia",
+      "nombre_comun": "Raque",
+      "nombre_comunes_regionales": [
+        "raque",
+        "siete sangrías",
+        "chaquiro"
+      ],
+      "nombre_cientifico": "Vallea stipularis L. f.",
+      "familia_botanica": "Elaeocarpaceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nurse_plant",
+        "pollinator_attractor",
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2500,
+        "optimo_max": 3200,
+        "max_absoluto": 3600
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 8,
+        "optimo_max": 16,
+        "max_tolerable": 22
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "ph_suelo": {
+        "min": 5.0,
+        "optimo_min": 5.5,
+        "optimo_max": 6.8,
+        "max": 7.2
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla recolectada de frutos maduros, siembra en semillero con sustrato de bosque. Germinacion en 30-60 dias. Trasplante a bolsa a los 3 meses.",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "Arbol de crecimiento medio. Flores rosadas atraen polinizadores nativos. Madera usada tradicionalmente para cabos de herramientas."
+      },
+      "source_ids": [
+        "humboldt-flora-alto-andina",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "Arbol nativo del bosque alto andino. Sus flores rosadas alimentan colibries y abejas nativas. Madera usada tradicionalmente para herramientas rurales. Especie ideal para restauracion de bordes de paramo.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "beta_vulgaris_var_cicla",
+      "nombre_comun": "Acelga",
+      "nombre_cientifico": "Beta vulgaris var. cicla L.",
+      "familia_botanica": "Amaranthaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 12,
+        "optimo_max": 18,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Las semillas son glomerulos (varias semillas juntas); requiere raleo tras germinar. Cosecha de hojas externas permite rebrote continuo."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Ejemplo de cosecha sostenible: la acelga regenera sus hojas tras cada corte, demostrando el principio de produccion continua en la chagra."
+    },
+    {
+      "id": "brassica_oleracea_var_acephala",
+      "nombre_comun": "Col rizada / Kale",
+      "nombre_cientifico": "Brassica oleracea var. acephala L.",
+      "familia_botanica": "Brassicaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3500
+      },
+      "temperatura_c": {
+        "helada_letal": -12,
+        "optimo_min": 10,
+        "optimo_max": 18,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno_a_moderado",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra escalonada cada 4-6 semanas para cosecha continua. Las heladas mejoran el sabor al convertir almidones en azucares."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Leccion de resiliencia al frio: el kale endulza con las heladas, ensenando como el estres termico transforma la quimica de la planta en la alta montana."
+    },
+    {
+      "id": "brassica_oleracea_var_capitata",
+      "nombre_comun": "Repollo",
+      "nombre_cientifico": "Brassica oleracea var. capitata L.",
+      "familia_botanica": "Brassicaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1800,
+        "optimo_max": 2700,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 14,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Requiere semillero y trasplante. La cabeza se forma cuando las hojas internas dejan de recibir luz y se compactan."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Leccion de morfologia vegetal: muestra como una estructura de hojas superpuestas crea microclima interno y protege los tejidos meristematicos."
+    },
+    {
+      "id": "brassica_rapa_var_rapa",
+      "nombre_comun": "Nabo",
+      "nombre_cientifico": "Brassica rapa var. rapa L.",
+      "familia_botanica": "Brassicaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 2000,
+        "optimo_max": 3000,
+        "max_absoluto": 3500
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 12,
+        "optimo_max": 18,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa a chorrillo. Ciclo rapido (60-80 dias). Tanto la raiz como las hojas son comestibles."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Leccion de aprovechamiento integral: el nabo demuestra que una misma planta puede generar alimento de la raiz y de la hoja, minimizando el desperdicio."
+    },
+    {
+      "id": "daucus_carota_subsp_sativus",
+      "nombre_comun": "Zanahoria",
+      "nombre_cientifico": "Daucus carota L. subsp. sativus (Hoffm.) Arcang.",
+      "familia_botanica": "Apiaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2700,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 15,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa en suelo suelto y profundo. Germinacion lenta (14-21 dias); requiere humedad constante en la capa superficial."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Leccion de calidad del suelo: la zanahoria revela la estructura del suelo al desarrollarse; suelos compactos producen raices deformes, ensenando la importancia de la preparacion profunda."
+    },
+    {
+      "id": "allium_schoenoprasum",
+      "nombre_comun": "Cebollino",
+      "nombre_comunes_regionales": [
+        "Cebollin fino",
+        "Cebolleta"
+      ],
+      "nombre_cientifico": "Allium schoenoprasum L.",
+      "familia_botanica": "Amaryllidaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3400
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "division_mata",
+        "notas": "Se propaga facilmente por division de macollos. Sus flores lilas atraen polinizadores. Las hojas tubulares son mas finas que las de allium fistulosum."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Leccion de biodiversidad funcional: sus flores atraen abejas y sus hojas ahuyentan plagas, demostrando el principio de polycultura en bordes de cama."
+    },
+    {
+      "id": "avena_sativa",
+      "nombre_comun": "Avena forrajera",
+      "nombre_comunes_regionales": [
+        "Avena",
+        "Avena de clima frio"
+      ],
+      "nombre_cientifico": "Avena sativa L.",
+      "familia_botanica": "Poaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "ground_cover",
+        "biomass_producer",
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 3000,
+        "max_absoluto": 3400
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 10,
+        "optimo_max": 18,
+        "max_tolerable": 25
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra directa al voleo o en surcos a 2-3cm de profundidad. Densidad 80-120 kg/ha. Epoca recomendada: inicio de temporada de lluvias. Asociacion comun con vicia sativa o trifolium repens para abono verde.",
+        "tiempo_a_establecimiento_dias": 60,
+        "notas": "Cereal de ciclo corto (4-5 meses). Excelente cobertura invernal en rotacion con papa y hortalizas. Incorporacion en floracion maximiza aporte de biomasa.",
+        "fuente": "AGROSAVIA 2022. Gramineas forrajeras en sistemas ganaderos andinos"
+      },
+      "companions": [
+        "vicia_sativa",
+        "trifolium_repens",
+        "vicia_faba"
+      ],
+      "antagonists": [],
+      "valor_pedagogico": "El manto verde de la chagra: la avena forrajera protege el suelo desnudo entre cosechas, ensenando el valor de la cobertura permanente y el ciclo de materia organica en la rotacion altoandina.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-forrajeras-2022",
+        "restrepo-2005-agroecologia"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "brassica_rapa_rapifera",
+      "nombre_comun": "Nabo forrajero",
+      "nombre_comunes_regionales": [
+        "Nabo",
+        "Nabicol",
+        "Colinabo forrajero"
+      ],
+      "nombre_cientifico": "Brassica rapa L. var. rapifera",
+      "familia_botanica": "Brassicaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "ground_cover",
+        "biomass_producer",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 12,
+        "optimo_max": 18,
+        "max_tolerable": 25
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra directa en surcos a 1-2cm de profundidad. Densidad 4-6 kg/ha. Germinacion rapida a los 5-7 dias. Ciclo de 60-90 dias para forraje. Se asocia con avena forrajera o vicia para mezcla de abono verde.",
+        "tiempo_a_establecimiento_dias": 60,
+        "notas": "Brassica de raiz pivotante que descompacta suelos. Raices profundas reciclan nutrientes de capas inferiores. Sus flores atraen polinizadores y controlan nematodos por biofumigacion.",
+        "fuente": "Restrepo Rivera 2005. Agroecologia colombiana"
+      },
+      "companions": [
+        "avena_sativa",
+        "vicia_sativa"
+      ],
+      "antagonists": [],
+      "valor_pedagogico": "El arado biologico: el nabo forrajero rompe la compactacion del suelo con su raiz pivotante y recicla nutrientes profundos, ensenando que las plantas pueden labrar la tierra mejor que el azadon.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "restrepo-2005-agroecologia"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "festuca_arundinacea",
+      "nombre_comun": "Festuca",
+      "nombre_comunes_regionales": [
+        "Festuca alta",
+        "Festuca de montaña",
+        "Pasto festuca"
+      ],
+      "nombre_cientifico": "Festuca arundinacea Schreb.",
+      "familia_botanica": "Poaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "ground_cover",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 3000,
+        "max_absoluto": 3400
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra directa al voleo o en surcos a 1-2cm de profundidad. Densidad 25-35 kg/ha. Germinacion 7-14 dias. Establece rapido en climas frios. Tolerante a suelos acidos y compactados.",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "Graminea perenne de alta rusticidad y tolerancia a sequia. Excelente para pastoreo rotacional en el altiplano. Raices profundas (hasta 1m) mejoran estructura del suelo.",
+        "fuente": "AGROSAVIA 2022. Gramineas forrajeras en sistemas ganaderos andinos"
+      },
+      "companions": [
+        "trifolium_repens",
+        "lolium_perenne",
+        "medicago_sativa"
+      ],
+      "antagonists": [],
+      "valor_pedagogico": "La graminea resistente: la festuca ensena la importancia de las raices profundas en la recuperacion de suelos compactados y su papel en la estabilizacion de laderas altoandinas.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-forrajeras-2022",
+        "restrepo-2005-agroecologia"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "lolium_perenne",
+      "nombre_comun": "Raigras perenne",
+      "nombre_comunes_regionales": [
+        "Ryegrass perenne",
+        "Pasto inglaterra",
+        "Raigras"
+      ],
+      "nombre_cientifico": "Lolium perenne L.",
+      "familia_botanica": "Poaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "ground_cover",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 3000,
+        "max_absoluto": 3400
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra al voleo en suelos bien preparados. Densidad 25-30 kg/ha para pastoreo, 15-20 kg/ha para cobertura. Germinacion rapida 5-10 dias. Requiere humedad constante en establecimiento.",
+        "tiempo_a_establecimiento_dias": 60,
+        "notas": "La graminea forrajera mas usada en el altiplano cundiboyacense. Establecimiento rapido, alta produccion de biomasa en clima frio. Ideal asociada con trebol blanco para pradera permanente.",
+        "fuente": "AGROSAVIA 2022. Gramineas forrajeras en sistemas ganaderos andinos"
+      },
+      "companions": [
+        "trifolium_repens",
+        "medicago_sativa",
+        "festuca_arundinacea"
+      ],
+      "antagonists": [],
+      "valor_pedagogico": "La alfombra verde del altiplano: el raigras perenne demuestra la sinergia entre gramineas y leguminosas en la pradera, ensenando el equilibrio forrajero que sostiene la ganaderia altoandina.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-forrajeras-2022",
+        "restrepo-2005-agroecologia"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "medicago_sativa",
+      "nombre_comun": "Alfalfa",
+      "nombre_comunes_regionales": [
+        "Alfalfa de clima frio",
+        "Mielga"
+      ],
+      "nombre_cientifico": "Medicago sativa L.",
+      "familia_botanica": "Fabaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer",
+        "ground_cover",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 2000,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 15,
+        "optimo_max": 22,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra en surcos o al voleo, 0.5-1cm profundidad. Densidad 20-25 kg/ha. Requiere inoculacion con Rhizobium meliloti para optimizar fijacion de N. Ciclo de 3-5 anos de produccion. Corte cada 35-45 dias.",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "La reina de las forrajeras: alto contenido proteico (18-22%). Raiz pivotante que alcanza 3-4m de profundidad. Fija 150-250 kg N/ha/ano. Requiere suelos neutros a ligeramente alcalinos y buen drenaje.",
+        "fuente": "AGROSAVIA 2022. Gramineas forrajeras en sistemas ganaderos andinos"
+      },
+      "companions": [
+        "lolium_perenne",
+        "festuca_arundinacea",
+        "trifolium_repens"
+      ],
+      "antagonists": [],
+      "valor_pedagogico": "La maestra de la fijacion de nitrogeno: la alfalfa con su raiz que perfora el subsuelo ensena como las leguminosas transforman el aire en fertilizante, alimentando la pradera desde las profundidades.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-forrajeras-2022",
+        "restrepo-2005-agroecologia"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "mucuna_pruriens",
+      "nombre_comun": "Frijol terciopelo",
+      "nombre_comunes_regionales": [
+        "Mucuna",
+        "Pica-pica",
+        "Frijol abono"
+      ],
+      "nombre_cientifico": "Mucuna pruriens (L.) DC.",
+      "familia_botanica": "Fabaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "ground_cover",
+        "nitrogen_fixer",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1500,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra directa 2-3 semillas por sitio a 3-5cm de profundidad. Distancias 80x50cm. Densidad 20-25 kg/ha. Germinacion 5-10 dias. Ciclo 5-7 meses. Se incorpora al inicio de floracion como abono verde.",
+        "tiempo_a_establecimiento_dias": 45,
+        "notas": "Leguminosa trepadora anual de crecimiento vigoroso. Produce hasta 40 ton/ha de biomasa fresca. Fija 100-200 kg N/ha. Sus semillas contienen L-DOPA, compuesto usado en tratamiento del Parkinson.",
+        "fuente": "Restrepo Rivera 2005. Agroecologia colombiana"
+      },
+      "companions": [
+        "zea_mays"
+      ],
+      "antagonists": [],
+      "valor_pedagogico": "El abono verde mas potente del tropico: el frijol terciopelo produce biomasa masivamente y cubre el suelo como una alfombra viva, ensenando como las leguminosas tropicales restauran suelos degradados en climas calidos.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "restrepo-2005-agroecologia"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "raphanus_sativus_oleifer",
+      "nombre_comun": "Rabano forrajero",
+      "nombre_comunes_regionales": [
+        "Rabano abono",
+        "Rabano oleaginoso",
+        "Rabano forrajero"
+      ],
+      "nombre_cientifico": "Raphanus sativus L. var. oleifer",
+      "familia_botanica": "Brassicaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "ground_cover",
+        "biomass_producer",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 14,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra directa al voleo o surcos a 1-2cm. Densidad 10-15 kg/ha. Germinacion 4-7 dias. Ciclo rapido de 60-90 dias. Excelente cobertura de ciclo corto entre cultivos comerciales.",
+        "tiempo_a_establecimiento_dias": 45,
+        "notas": "Brassica de ciclo corto y crecimiento rapido. Raiz pivotante profunda que descompacta suelos. Efecto biofumigante por glucosinolatos. Sus flores atraen abejas y polinizadores nativos.",
+        "fuente": "Restrepo Rivera 2005. Agroecologia colombiana"
+      },
+      "companions": [
+        "avena_sativa",
+        "vicia_sativa"
+      ],
+      "antagonists": [],
+      "valor_pedagogico": "El abono verde express: el rabano forrajero germina y cubre el suelo en semanas, ensenando el valor de las brassicas como biofumigantes naturales y acumuladoras de nutrientes en rotaciones cortas.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "restrepo-2005-agroecologia"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "cocos_nucifera",
+      "nombre_comun": "Coco",
+      "nombre_comunes_regionales": [
+        "Cocotero",
+        "Palma de coco"
+      ],
+      "nombre_cientifico": "Cocos nucifera L.",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer",
+        "windbreak"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 120,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 300,
+        "max_absoluto": 500
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 38
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "ph_suelo": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 7,
+        "max": 8
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinacion en vivero de 6-12 meses; requiere transplante a sitio definitivo con suelo profundo y bien drenado. Palma emblematica de la Costa Caribe y Pacifica colombiana."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El arbol de la vida tropical: ensenia aprovechamiento integral (agua, alimento, fibra, aceite, vivienda) en sistemas agroforestales de la costa colombiana. Caso de estudio en resiliencia costera y seguridad alimentaria."
+    },
+    {
+      "id": "bactris_gasipaes",
+      "nombre_comun": "Chontaduro",
+      "nombre_comunes_regionales": [
+        "Pejibaye",
+        "Pixbae",
+        "Cachipay"
+      ],
+      "nombre_cientifico": "Bactris gasipaes Kunth",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer",
+        "living_fence"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 36,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 500,
+        "max_absoluto": 1000
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "ph_suelo": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 6.5,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinacion lenta (3-6 meses); se recomienda siembra en bolsa y transplante con 2-3 hojas. Tradicionalmente sembrado en las chagras indigenas del Pacifico y Amazonia."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Palma multiproposito por excelencia del tropico colombiano: fruto rico en vitamina A y aceites, palmito comestible, y madera para construccion rural. Ensenia agroforesteria tropical y seguridad alimentaria."
+    },
+    {
+      "id": "euterpe_oleracea",
+      "nombre_comun": "Asai",
+      "nombre_comunes_regionales": [
+        "Azai",
+        "Manaca",
+        "Palma de asai"
+      ],
+      "nombre_cientifico": "Euterpe oleracea Mart.",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 12,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 200,
+        "max_absoluto": 500
+      },
+      "temperatura_c": {
+        "helada_letal": 10,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "humedad_relativa_pct": {
+        "min": 70,
+        "optimo": 85,
+        "max": 100
+      },
+      "ph_suelo": {
+        "min": 4.5,
+        "optimo_min": 5,
+        "optimo_max": 6,
+        "max": 6.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "moderado",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Palma nativa de la Amazonia colombiana; crece en rebrotes multiples desde la base (multitallo). Sus frutos son la base del 'asai' de la canasta amazonica."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Superalimento amazonico: sus frutos concentran antioxidantes y energia. Ensenia el aprovechamiento sostenible de productos forestales no maderables del Pacifico y la Amazonia colombiana."
+    },
+    {
+      "id": "aiphanes_aculeata",
+      "nombre_comun": "Corozo",
+      "nombre_comunes_regionales": [
+        "Corozo de cerro",
+        "Coyure",
+        "Palma de corozo"
+      ],
+      "nombre_cientifico": "Aiphanes aculeata Willd.",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "harvest_type": "fruto",
+      "cycleMonths": 24,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 400,
+        "max_absoluto": 700
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 24,
+        "optimo_max": 32,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Palma espinosa de los valles secos interandinos; tolera suelos pobres y periodos secos prolongados. Frutos usados para refrescos tradicionales en la Costa Caribe."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "Palma rustica de tierras secas: sus frutos son fuente de vitamina A y aceites. Ensenia adaptacion a suelos pobres y periodos de sequia en el Caribe colombiano."
+    },
+    {
+      "id": "costus_spicatus",
+      "nombre_comun": "Cana agria",
+      "nombre_comunes_regionales": [
+        "Cana de jabali",
+        "Cana brava",
+        "Cana amarga"
+      ],
+      "nombre_cientifico": "Costus spicatus (Jacq.) Sw.",
+      "familia_botanica": "Costaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 400,
+        "max_absoluto": 800
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno_a_moderado",
+      "propagation": {
+        "metodo_principal": "rizoma",
+        "notas": "Se propaga por fragmentos de rizoma sembrados en sustrato humedo. Crece en bordes de rios y quebradas del tropico humedo. Usada como diuretico y antiinflamatorio en medicina tradicional."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Planta medicinal emblematica del tropico humedo colombiano: sus tallos agrios se usan como diuretico natural. Ensenia el conocimiento botanico tradicional de las comunidades riberenas del Pacifico."
+    },
+    {
+      "id": "alocasia_macrorrhizos",
+      "nombre_comun": "Bore",
+      "nombre_comunes_regionales": [
+        "Bore",
+        "Malanga gigante",
+        "Taro gigante",
+        "Ocumo"
+      ],
+      "nombre_cientifico": "Alocasia macrorrhizos (L.) G.Don",
+      "familia_botanica": "Araceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "tuberculo",
+      "cycleMonths": 9,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 400,
+        "max_absoluto": 800
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 80,
+        "max": 95
+      },
+      "ph_suelo": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 6.5,
+        "max": 7
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno_a_moderado",
+      "propagation": {
+        "metodo_principal": "tuberculo",
+        "notas": "Se propaga plantando hijos o secciones de cormo con yemas. Tolerante a sombra y suelos humedos. Cultivo tradicional de la chagra indigena amazonica y del Pacifico."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Cultivo de seguridad alimentaria del tropico humedo: sus cormos ricos en almidon sostienen comunidades indigenas del Pacifico y Amazonia. Ensenia sistemas agroforestales de chagra."
+    },
+    {
+      "id": "euterpe_enbacca",
+      "_curation_status": "ATENCION: El nombre cientifico 'Euterpe enbacca' entregado en el issue requiere verificacion taxonomica. Podria tratarse de una especie del genero Euterpe u otra Arecaceae. Se conserva el nombre del issue pendiente de confirmacion con botanico.",
+      "nombre_comun": "Chambo",
+      "nombre_comunes_regionales": [
+        "Chamburo",
+        "Palma de chambo"
+      ],
+      "nombre_cientifico": "Euterpe enbacca",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "no_evaluada",
+      "harvest_type": "fruto",
+      "cycleMonths": 36,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 300,
+        "max_absoluto": 500
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinacion tipica de palma tropical. Se recomienda propagacion en vivero con sombra parcial los primeros meses."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "Palma frutal de la region Pacifica colombiana; sus frutos son aprovechados por comunidades locales. Su presencia en el catalogo resalta la importancia de documentar especies con vacios taxonomicos."
+    },
+    {
+      "id": "dioscorea_alata",
+      "nombre_comun": "Name blanco",
+      "nombre_comunes_regionales": [
+        "Name",
+        "Name de agua",
+        "Name de Guinea"
+      ],
+      "nombre_cientifico": "Dioscorea alata L.",
+      "familia_botanica": "Dioscoreaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "tuberculo",
+      "cycleMonths": 8,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 400,
+        "max_absoluto": 800
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "ph_suelo": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 6.5,
+        "max": 7
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "tuberculo",
+        "notas": "Se propaga mediante tubérculos pequenos o secciones de tubérculo con yemas. Requiere tutorado (espaldera). Cultivo tradicional de la Costa Caribe y Pacifico colombiano."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Tuberculo basico de la dieta tropical colombiana: fuente de carbohidratos complejos. Ensenia sistemas de cultivo en espaldera y la importancia de los namees en la seguridad alimentaria del Caribe."
+    },
+    {
+      "id": "solanum_sessiliflorum",
+      "nombre_comun": "Cocona",
+      "nombre_comunes_regionales": [
+        "Cocona",
+        "Topiro",
+        "Tupiro",
+        "Lulo amazonico"
+      ],
+      "nombre_cientifico": "Solanum sessiliflorum Dunal",
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": 8,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 400,
+        "max_absoluto": 700
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "ph_suelo": {
+        "min": 4.5,
+        "optimo_min": 5,
+        "optimo_max": 6,
+        "max": 6.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinacion rapida (7-14 dias); se trasplanta a los 30 dias. Nativa de la Amazonia colombiana; crece bien en suelos acidos. Fruto usado en jugos y preparaciones tradicionales."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Fruto amazonico con alto potencial nutritivo: rico en hierro y vitaminas del complejo B. Ensenia el potencial de especies nativas subutilizadas de la Amazonia colombiana."
+    },
+    {
+      "id": "renealmia_alpinia",
+      "nombre_comun": "Pina pina",
+      "nombre_comunes_regionales": [
+        "Pina de monte",
+        "Jengibre de la montana",
+        "Pina silvestre"
+      ],
+      "nombre_cientifico": "Renealmia alpinia (Rottb.) Maas",
+      "familia_botanica": "Zingiberaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 400,
+        "max_absoluto": 800
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 85,
+        "max": 100
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno_a_moderado",
+      "propagation": {
+        "metodo_principal": "rizoma",
+        "notas": "Propagacion por division de rizomas en sustrato rico en materia organica y humedo. Crece en sotobosque de selvas tropicales. Frutos usados como colorante natural y sus hojas en infusion medicinal."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "Planta del sotobosque tropical con usos medicinales y tintoreos tradicionales. Ensenia el conocimiento botanico de las comunidades afrocolombianas del Pacifico y su relacion con el bosque humedo."
+    },
+    {
+      "id": "ipomoea_batatas_blanca",
+      "nombre_comun": "Batata blanca",
+      "nombre_cientifico": "Ipomoea batatas (L.) Lam. cv. blanca",
+      "familia_botanica": "Convolvulaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 800,
+        "optimo_max": 2000,
+        "max_absoluto": 2400
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "esqueje (bejuco)",
+        "notas": "Variedad de pulpa blanca y textura harinosa, menos dulce que la naranja. Preferida para preparaciones saladas y frituras."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Variedad de batata de pulpa blanca que muestra la diversidad intraespecifica de este cultivo global. Ensenia seleccion varietal por textura y contenido de almidon."
+    },
+    {
+      "id": "ipomoea_batatas_morada",
+      "nombre_comun": "Batata morada",
+      "nombre_cientifico": "Ipomoea batatas (L.) Lam. cv. morada",
+      "familia_botanica": "Convolvulaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 800,
+        "optimo_max": 2000,
+        "max_absoluto": 2400
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "esqueje (bejuco)",
+        "notas": "Variedad de pulpa morada intensa, rica en antocianinas. Color que se intensifica con la exposicion solar durante el desarrollo."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Variedad de batata de pulpa morada: leccion de fitoquimica que muestra como las antocianinas actuan como potentes antioxidantes en la dieta y como pigmentos naturales."
+    },
+    {
+      "id": "pachyrhizus_erosus",
+      "nombre_comun": "Jicama",
+      "nombre_cientifico": "Pachyrhizus erosus (L.) Urb.",
+      "familia_botanica": "Fabaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 500,
+        "optimo_max": 1500,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 32
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Leguminosa de raiz tuberosa crocante. Las semillas y vainas contienen rotenona y son toxicas; solo se consume la raiz fresca. Requiere tutores para su habito trepador."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "Leccion de toxicidad selectiva: la jicama ensena que en una misma planta, partes comestibles y toxicas pueden coexistir. La rotenona de sus semillas es un insecticida natural tradicional."
+    },
+    {
+      "id": "raphanus_sativus_longipinnatus",
+      "nombre_comun": "Daikon",
+      "nombre_cientifico": "Raphanus sativus L. var. longipinnatus",
+      "familia_botanica": "Brassicaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 500,
+        "optimo_min": 1500,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa en suelo profundo y suelto. Raiz que puede alcanzar 30-40cm de longitud; requiere cama de siembra profunda. Variedad de raiz blanca alargada de sabor suave."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Leccion de estructura del suelo: el daikon revela la compactacion del suelo al desarrollarse; su raiz profunda descompacta capas inferiores, funcionando como arado biologico."
+    },
+    {
+      "id": "raphanus_sativus_sativus",
+      "nombre_comun": "Rabano rojo",
+      "nombre_cientifico": "Raphanus sativus L. var. sativus",
+      "familia_botanica": "Brassicaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Variedad de raiz roja de ciclo ultra rapido (25-35 dias). Siembra directa escalonada cada 10-15 dias para cosecha continua."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Variedad de raiz roja clasica: su color intenso indica presencia de antocianinas. Ciclo mas corto del huerto, ideal para ensenar germinacion y cosecha a ninos."
+    },
+    {
+      "id": "beta_vulgaris_altissima",
+      "nombre_comun": "Betarraga azucarera",
+      "nombre_cientifico": "Beta vulgaris L. subsp. vulgaris var. altissima",
+      "familia_botanica": "Amaranthaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 14,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Variedad de remolacha seleccionada por alto contenido de sacarosa. Raiz blanca alargada; requiere suelos profundos y ricos en potasio para maxima produccion de azucar."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Leccion de mejoramiento genetico: la betarraga azucarera fue seleccionada durante siglos para concentrar sacarosa, demostrando el poder de la seleccion artificial en la agricultura."
+    },
+    {
+      "id": "pastinaca_sativa",
+      "nombre_comun": "Chirivia",
+      "nombre_cientifico": "Pastinaca sativa L.",
+      "familia_botanica": "Apiaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 12,
+        "optimo_max": 18,
+        "max_tolerable": 24
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinacion lenta (14-21 dias); semilla pierde viabilidad rapidamente (<1 ano). Las heladas convierten almidones en azucares, mejorando su sabor dulce caracteristico."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "fao-ecocrop"
+      ],
+      "valor_pedagogico": "Raiz europea poco conocida en Colombia que demuestra como el frio transforma la quimica de los alimentos. Su sabor dulce post-helada ensena principios de bioquimica vegetal."
+    },
+    {
+      "id": "cynara_cardunculus_scolymus",
+      "nombre_comun": "Alcachofa",
+      "nombre_cientifico": "Cynara cardunculus L. var. scolymus",
+      "familia_botanica": "Asteraceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2500,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 14,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "hijuelos",
+        "notas": "Se propaga por hijuelos (rebrotes de la corona) o por semilla. Planta perenne que produce durante 3-5 anos. El capitulo o cabeza floral inmadura es la parte comestible."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "fao-ecocrop"
+      ],
+      "valor_pedagogico": "Leccion de morfologia floral: lo que consumimos es una inflorescencia inmadura. Ensenia la diferencia entre flor y fruto, y el concepto de domesticacion de un cardo mediterraneo."
+    },
+    {
+      "id": "foeniculum_vulgare_azoricum",
+      "nombre_comun": "Hinojo bulbo",
+      "nombre_cientifico": "Foeniculum vulgare Mill. var. azoricum",
+      "familia_botanica": "Apiaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1500,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Variedad de hinojo seleccionada por su bulbo engrosado en la base de las hojas. Requiere aporque para blanquear el bulbo. Siembra directa por su raiz pivotante sensible al trasplante."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "Variedad de hinojo seleccionada por su bulbo comestible. Ensenia el aporque como tecnica de blanqueado y la diferencia entre la forma silvestre y la domesticada."
+    },
+    {
+      "id": "cyclanthera_pedata",
+      "nombre_comun": "Achocha",
+      "nombre_cientifico": "Cyclanthera pedata (L.) Schrad.",
+      "familia_botanica": "Cucurbitaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 14,
+        "optimo_max": 22,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Cucurbitacea trepadora de crecimiento vigoroso. Requiere espaldera o tutores. Los frutos se consumen verdes rellenos o en guisos tradicionales andinos."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "Cucurbitacea nativa de los Andes subestimada. Ensenia el valor de las especies tradicionales subutilizadas en la seguridad alimentaria y la importancia de conservar germoplasma andino."
+    },
+    {
+      "id": "gliricidia_sepium",
+      "nombre_comun": "Matarratón",
+      "nombre_comunes_regionales": [
+        "Madre cacao",
+        "Cocoite",
+        "Mata ratón"
+      ],
+      "nombre_cientifico": "Gliricidia sepium (Jacq.) Kunth ex Walp.",
+      "familia_botanica": "Fabaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "living_fence",
+        "nitrogen_fixer",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1200,
+        "max_absoluto": 1600
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 20,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "bueno",
+      "fence_function": [
+        "delimitacion",
+        "rompevientos",
+        "sombra_parcial"
+      ],
+      "densidad_siembra_fence_m": 1,
+      "propagation": {
+        "methods": [
+          "esqueje",
+          "semilla"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Estacas de 1.5-2m de largo y 5-10cm de diametro, plantadas directamente a 30cm de profundidad en epoca lluviosa. Sin hojas en la porcion enterrada. Prendimiento superior al 90%.",
+        "notas": "Clasica cerca viva colombiana. Estaca enraiza sin hormonas. Fija N atmosferico. Follaje forrajero rico en proteinas para rumiantes.",
+        "fuente": "Perez Arbelaez 1947; AGROSAVIA sistemas silvopastoriles"
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone",
+        "agrosavia-silvopastoriles"
+      ],
+      "rol_ecologico": "Fijador de nitrogeno simbiotico con Rhizobium. Forrajera de alto valor proteico. Sombra ligera para cafe y cacao. Madera para leña y construcciones rurales.",
+      "valor_pedagogico": "El poste vivo: la estaca que prende sola. Ensenia la reproduccion vegetativa y el rol de las leguminosas arboreas en cercas vivas.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "trichanthera_gigantea",
+      "nombre_comun": "Nacedero",
+      "nombre_comunes_regionales": [
+        "Quiebrabarrigo",
+        "Cajeto",
+        "Uva de monte"
+      ],
+      "nombre_cientifico": "Trichanthera gigantea (Bonpl.) Nees",
+      "familia_botanica": "Acanthaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "living_fence",
+        "biomass_producer",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 500,
+        "optimo_max": 1800,
+        "max_absoluto": 2200
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 18,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno_a_moderado",
+      "fence_function": [
+        "delimitacion",
+        "sombra",
+        "refugio_fauna",
+        "proteccion_fuentes_hidricas"
+      ],
+      "densidad_siembra_fence_m": 1.5,
+      "propagation": {
+        "methods": [
+          "esqueje"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Estacas de 1-1.5m de largo, enterradas 30-40cm, preferiblemente al inicio del periodo lluvioso. Prendimiento alto incluso en suelos humedos.",
+        "notas": "Especie emblematica para proteccion de nacimientos de agua. Cerca viva tradicional en zonas cafeteras y ganaderas. Hojas forrajeras para rumiantes con alto contenido proteico.",
+        "fuente": "Perez Arbelaez 1947; Instituto Humboldt flora alto andina"
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "humboldt-flora-alto-andina"
+      ],
+      "rol_ecologico": "Protector de fuentes hidricas por su sistema radical denso. Banco de forraje proteinado. Refugio de fauna silvestre. Aporte de biomasa foliar al suelo.",
+      "valor_pedagogico": "El que nace del agua: la cerca viva que protege las quebradas. Ensenia la relacion entre vegetacion riparia y calidad del agua en la finca.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "erythrina_rubrinervia",
+      "nombre_comun": "Chiló",
+      "nombre_comunes_regionales": [
+        "Pisamo",
+        "Sangregado",
+        "Cachimbo"
+      ],
+      "nombre_cientifico": "Erythrina rubrinervia Kunth",
+      "familia_botanica": "Fabaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "living_fence",
+        "nitrogen_fixer",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1500,
+        "optimo_max": 2400,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 14,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "fence_function": [
+        "delimitacion",
+        "sombra",
+        "rompevientos"
+      ],
+      "densidad_siembra_fence_m": 2,
+      "propagation": {
+        "methods": [
+          "esqueje",
+          "semilla"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Estacas de 2m de largo, 8-15cm de diametro. Enterrar 40cm en suelo humedo. Florece a los 2-3 anos. Atrae colibries y abejas nativas.",
+        "notas": "Arbol de la familia Fabaceae, fijador de N. Sus flores rojas son fuente de nectar para colibries y abejas nativas. Madera blanda usada para postes y artesania.",
+        "fuente": "Perez Arbelaez 1947; GBIF; Bernal 2015 Catalogo Plantas Colombia"
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "rol_ecologico": "Fijador de nitrogeno simbiotico. Sombra regulada para cultivos asociados. Atraccion de polinizadores (colibries, abejas). Aporte de biomasa foliar rica en N.",
+      "valor_pedagogico": "Cerca viva florecida: cuando florece el chilo, las abejas llegan. Ensenia el rol de las leguminosas en la fertilidad del suelo y la polinizacion.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "tigridia_pavonia",
+      "nombre_comun": "Tigridia / Flor de tigre",
+      "nombre_comunes_regionales": [
+        "Lirio tigre",
+        "Oceloxochitl"
+      ],
+      "nombre_cientifico": "Tigridia pavonia (L.f.) DC.",
+      "familia_botanica": "Iridaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 800,
+        "optimo_max": 2000,
+        "max_absoluto": 2600
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 15,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "bulbo",
+          "semilla"
+        ],
+        "best_method": "bulbo",
+        "protocol_resumen": "Bulbos plantados a 5-8cm de profundidad, separacion 15-20cm. Florece 2-3 meses despues de la siembra. Flores duran un dia pero se suceden por semanas.",
+        "notas": "Herbacea bulbosa ornamental de flores vistosas. Cada flor abre al amanecer y se cierra al atardecer (un solo dia de vida). Uso en bordes de cerca viva.",
+        "fuente": "Perez Arbelaez 1947; GBIF"
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone"
+      ],
+      "rol_ecologico": "Atractora de polinizadores (abejas nativas, colibries). Planta ornamental de bordes de cerca viva. Aporte estetico y educacional al agroecosistema.",
+      "valor_pedagogico": "Reloj del huerto: cada flor abre al amanecer y vive solo un dia. Ensenia la sincronizacion de la planta con el ciclo solar y la importancia de los polinizadores.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "codiaeum_variegatum",
+      "nombre_comun": "Croton ornamental",
+      "nombre_comunes_regionales": [
+        "Croton",
+        "Hoja de colores"
+      ],
+      "nombre_cientifico": "Codiaeum variegatum (L.) Rumph. ex A.Juss.",
+      "familia_botanica": "Euphorbiaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "living_fence"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 800,
+        "max_absoluto": 1500
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 20,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "fence_function": [
+        "delimitacion",
+        "ornamental"
+      ],
+      "densidad_siembra_fence_m": 0.8,
+      "propagation": {
+        "methods": [
+          "esqueje"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Esquejes de 15-20cm de tallos semimaduros, enraizar en sustrato humedo con alta humedad ambiental. Tiempo de enraizamiento 3-4 semanas.",
+        "notas": "Arbusto ornamental de follaje vistoso con variacion cromatica (verde, amarillo, rojo, naranja). Cerca viva densa de baja altura en climas calidos.",
+        "fuente": "Perez Arbelaez 1947; GBIF"
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone"
+      ],
+      "rol_ecologico": "Planta ornamental de bordes de cerca viva en climas calidos. Sus hojas coloridas son indicadoras de luz (mayor color con mas sol).",
+      "valor_pedagogico": "Paleta vegetal: las hojas cambian de color segun la luz. Ensenia los pigmentos vegetales y como la radiacion afecta la expresion fenotipica.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "guadua_angustifolia",
+      "nombre_comun": "Guadua / Bambu nativo",
+      "nombre_comunes_regionales": [
+        "Bambu colombiano",
+        "Guadua angosta"
+      ],
+      "nombre_cientifico": "Guadua angustifolia Kunth",
+      "familia_botanica": "Poaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "emergente",
+      "roles_in_guild": [
+        "living_fence",
+        "windbreak",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 400,
+        "optimo_max": 1500,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 18,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno_a_moderado",
+      "fence_function": [
+        "delimitacion",
+        "rompevientos",
+        "sombra",
+        "proteccion_laderas"
+      ],
+      "densidad_siembra_fence_m": 3,
+      "propagation": {
+        "methods": [
+          "rizoma",
+          "esqueje"
+        ],
+        "best_method": "rizoma",
+        "protocol_resumen": "Propagacion por secciones de rizoma con 2-3 yemas viables. Plantar en surcos a 3-5m de distancia. Temporada lluviosa. Requiere riego los primeros 3 meses.",
+        "notas": "Graminea gigante nativa de Colombia, emblematica del Eje Cafetero. Cerca viva definitiva: unica, duradera y multiproposito. Cultivo de ciclo largo (>20 anos).",
+        "fuente": "Perez Arbelaez 1947; AGROSAVIA silvopastoriles"
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone",
+        "agrosavia-silvopastoriles"
+      ],
+      "rol_ecologico": "Captura y almacenamiento de agua en rizomas. Proteccion de suelos en laderas. Habitat para fauna. Sumidero de carbono. Material de construccion renovable.",
+      "valor_pedagogico": "La fortaleza verde: la guadua como barrera viva definitiva. Ensenia el crecimiento rizomatico, la captura de carbono y la construccion natural renovable.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "buddleja_americana",
+      "nombre_comun": "Buddleja arborea / Salvion",
+      "nombre_comunes_regionales": [
+        "Salvion de monte",
+        "Tabaquillo",
+        "Matico"
+      ],
+      "nombre_cientifico": "Buddleja americana L.",
+      "familia_botanica": "Scrophulariaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "living_fence",
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "fence_function": [
+        "delimitacion",
+        "refugio_fauna",
+        "rompevientos"
+      ],
+      "densidad_siembra_fence_m": 2,
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Esquejes de ramas semimaduras de 20-30cm, enraizar en sustrato humedo. Se propaga facilmente por estaca. Atrae mariposas y colibries durante la floracion.",
+        "notas": "Arbusto o arbolito nativo de los Andes, de crecimiento rapido. Flores lilas en paniculos muy aromaticas. Uso medicinal tradicional como antiinflamatorio y cicatrizante.",
+        "fuente": "Perez Arbelaez 1947; Instituto Humboldt flora alto andina"
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "humboldt-flora-alto-andina"
+      ],
+      "rol_ecologico": "Atractora de polinizadores (mariposas, colibries, abejas). Especie pionera en bordes de bosque. Medicina tradicional cicatrizante. Cerca viva de alta montana.",
+      "valor_pedagogico": "El jardin de mariposas: sus flores aromaticas atraen polinizadores de toda la finca. Ensenia la interaccion planta-polinizador en ecosistemas de alta montana.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "acanthus_mollis",
+      "nombre_comun": "Acanto andino",
+      "nombre_comunes_regionales": [
+        "Oreja de elefante",
+        "Lechuga de rio",
+        "Cardo"
+      ],
+      "nombre_cientifico": "Acanthus mollis L.",
+      "familia_botanica": "Acanthaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "living_fence",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1800,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "fence_function": [
+        "delimitacion",
+        "ornamental"
+      ],
+      "propagation": {
+        "methods": [
+          "division_mata",
+          "rizoma"
+        ],
+        "best_method": "division_mata",
+        "protocol_resumen": "Division de matas establecidas en epoca lluviosa. Cada division con 2-3 yemas y raices. Plantar a 50-80cm de distancia. Crece formando macollos densos.",
+        "notas": "Herbacea perenne de follaje ornamental, naturalizada en los Andes colombianos. Flores altas en espiga. Ideal para bordes de cerca viva y control de erosion en taludes.",
+        "fuente": "Perez Arbelaez 1947; GBIF"
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone"
+      ],
+      "rol_ecologico": "Control de erosion en laderas. Cobertura de bordes de cerca viva. Atraccion de abejas nativas. Follaje ornamental de gran tamano.",
+      "valor_pedagogico": "Hoja monumental: la segunda hoja mas grande entre las herbaceas cultivadas. Ensenia adaptaciones morfologicas para capturar luz en sotobosque y bordes.",
+      "validation_level": "claude_draft"
+    },
+    {
       "id": "ruta_graveolens",
       "nombre_comun": "Ruda",
-      "nombre_comunes_regionales": ["ruda macho", "ruda hembra", "arruda"],
+      "nombre_comunes_regionales": [
+        "ruda macho",
+        "ruda hembra",
+        "arruda"
+      ],
       "nombre_cientifico": "Ruta graveolens L.",
       "familia_botanica": "Rutaceae",
       "category": "medicinales_alelopaticas",
-      "thermal_zones": ["templado", "frio"],
-      "roles_in_guild": ["crop", "pest_repellent"],
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
       "cultivable": true,
       "conservation_status": "cultivo_comun",
       "altitud_msnm": {
@@ -4787,12 +8414,20 @@
     {
       "id": "valeriana_pavonii",
       "nombre_comun": "Valeriana criolla",
-      "nombre_comunes_regionales": ["valeriana andina", "raiz del gato"],
+      "nombre_comunes_regionales": [
+        "valeriana andina",
+        "raiz del gato"
+      ],
       "nombre_cientifico": "Valeriana pavonii Poepp. & Endl.",
       "familia_botanica": "Caprifoliaceae",
       "category": "medicinales_alelopaticas",
-      "thermal_zones": ["frio", "paramo"],
-      "roles_in_guild": ["crop"],
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
       "cultivable": true,
       "conservation_status": "nativo_silvestre",
       "altitud_msnm": {
@@ -4825,13 +8460,24 @@
     {
       "id": "drimys_granadensis",
       "nombre_comun": "Canelón",
-      "nombre_comunes_regionales": ["canelo", "canelo de páramo", "cascarilla"],
+      "nombre_comunes_regionales": [
+        "canelo",
+        "canelo de páramo",
+        "cascarilla"
+      ],
       "nombre_cientifico": "Drimys granadensis L.f.",
       "familia_botanica": "Winteraceae",
       "category": "medicinales_alelopaticas",
-      "thermal_zones": ["frio", "paramo"],
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
       "estrato": "alto",
-      "roles_in_guild": ["crop", "nurse_plant", "pollinator_attractor"],
+      "roles_in_guild": [
+        "crop",
+        "nurse_plant",
+        "pollinator_attractor"
+      ],
       "cultivable": true,
       "conservation_status": "nativo_silvestre",
       "altitud_msnm": {
@@ -4864,12 +8510,23 @@
     {
       "id": "lavandula_angustifolia",
       "nombre_comun": "Lavanda",
-      "nombre_comunes_regionales": ["espliego", "lavanda fina", "lavanda inglesa"],
+      "nombre_comunes_regionales": [
+        "espliego",
+        "lavanda fina",
+        "lavanda inglesa"
+      ],
       "nombre_cientifico": "Lavandula angustifolia Mill.",
       "familia_botanica": "Lamiaceae",
       "category": "medicinales_alelopaticas",
-      "thermal_zones": ["templado", "frio"],
-      "roles_in_guild": ["crop", "pollinator_attractor", "pest_repellent"],
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "pest_repellent"
+      ],
       "cultivable": true,
       "conservation_status": "cultivo_comun",
       "altitud_msnm": {
@@ -4901,12 +8558,21 @@
     {
       "id": "aloe_vera",
       "nombre_comun": "Sábila",
-      "nombre_comunes_regionales": ["aloe", "zabila", "savila"],
+      "nombre_comunes_regionales": [
+        "aloe",
+        "zabila",
+        "savila"
+      ],
       "nombre_cientifico": "Aloe vera (L.) Burm.f.",
       "familia_botanica": "Asphodelaceae",
       "category": "medicinales_alelopaticas",
-      "thermal_zones": ["calido", "templado"],
-      "roles_in_guild": ["crop"],
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
       "cultivable": true,
       "conservation_status": "cultivo_comun",
       "altitud_msnm": {
@@ -4938,12 +8604,21 @@
     {
       "id": "diplostephium_rosmarinifolium",
       "nombre_comun": "Romero blanco",
-      "nombre_comunes_regionales": ["romero de páramo", "romerillo"],
+      "nombre_comunes_regionales": [
+        "romero de páramo",
+        "romerillo"
+      ],
       "nombre_cientifico": "Diplostephium rosmarinifolium (Benth.) Wedd.",
       "familia_botanica": "Asteraceae",
       "category": "medicinales_alelopaticas",
-      "thermal_zones": ["frio", "paramo"],
-      "roles_in_guild": ["crop", "ground_cover"],
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
       "cultivable": true,
       "conservation_status": "nativo_silvestre",
       "altitud_msnm": {
@@ -4974,52 +8649,26 @@
       "validation_level": "claude_draft"
     },
     {
-      "id": "artemisia_absinthium",
-      "nombre_comun": "Ajenjo",
-      "nombre_comunes_regionales": ["absintio", "artemisia amarga", "hierba santa"],
-      "nombre_cientifico": "Artemisia absinthium L.",
-      "familia_botanica": "Asteraceae",
-      "category": "medicinales_alelopaticas",
-      "thermal_zones": ["templado", "frio"],
-      "roles_in_guild": ["crop", "pest_repellent"],
-      "cultivable": true,
-      "conservation_status": "cultivo_comun",
-      "altitud_msnm": {
-        "min_absoluto": 1500,
-        "optimo_min": 2000,
-        "optimo_max": 3000,
-        "max_absoluto": 3300
-      },
-      "temperatura_c": {
-        "helada_letal": -15,
-        "optimo_min": 10,
-        "optimo_max": 20,
-        "max_tolerable": 28
-      },
-      "radiacion": "sol_pleno",
-      "agua": "bajo",
-      "drenaje_requerido": "excelente",
-      "propagation": {
-        "metodo_principal": "esqueje",
-        "notas": "Propagación por división de mata o esquejes basales. Crece vigorosamente en suelos pobres con buen drenaje."
-      },
-      "source_ids": [
-        "perez-arbelaez-1947-plantas-utiles",
-        "gbif-taxonomic-backbone",
-        "bernal-2015-plantas-liquenes-colombia"
-      ],
-      "valor_pedagogico": "Amargor que cura: la planta más amarga de la chagra enseña que los compuestos secundarios (tuyona, absintina) son defensas químicas que la medicina tradicional aprendió a dosificar.",
-      "validation_level": "claude_draft"
-    },
-    {
       "id": "dysphania_ambrosioides",
       "nombre_comun": "Paico",
-      "nombre_comunes_regionales": ["paxo", "hierba hedionda", "apasote", "epazote"],
+      "nombre_comunes_regionales": [
+        "paxo",
+        "hierba hedionda",
+        "apasote",
+        "epazote"
+      ],
       "nombre_cientifico": "Dysphania ambrosioides (L.) Mosyakin & Clemants",
       "familia_botanica": "Amaranthaceae",
       "category": "medicinales_alelopaticas",
-      "thermal_zones": ["calido", "templado", "frio"],
-      "roles_in_guild": ["crop", "pest_repellent"],
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
       "cultivable": true,
       "conservation_status": "cultivo_comun",
       "altitud_msnm": {
@@ -5052,12 +8701,23 @@
     {
       "id": "thymus_serpyllum",
       "nombre_comun": "Tomillo silvestre",
-      "nombre_comunes_regionales": ["tomillo rastrero", "serpol", "tomillo de monte"],
+      "nombre_comunes_regionales": [
+        "tomillo rastrero",
+        "serpol",
+        "tomillo de monte"
+      ],
       "nombre_cientifico": "Thymus serpyllum L.",
       "familia_botanica": "Lamiaceae",
       "category": "medicinales_alelopaticas",
-      "thermal_zones": ["templado", "frio"],
-      "roles_in_guild": ["crop", "ground_cover", "pest_repellent"],
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover",
+        "pest_repellent"
+      ],
       "cultivable": true,
       "conservation_status": "cultivo_comun",
       "altitud_msnm": {
@@ -5903,24 +9563,6 @@
       "titulo": "Fichas técnicas de leguminosas andinas (haba, arveja, lenteja, frijol)",
       "institucion": "Corporación Colombiana de Investigación Agropecuaria (AGROSAVIA)",
       "observaciones": "Compilación de fichas técnicas de AGROSAVIA para leguminosas de clima frío. Año y volumen pendientes de consolidación."
-    },
-    {
-      "id": "ardila-2015-etnobotanica-muisca",
-      "tipo": "articulo_revista",
-      "autores": "Ardila, F.",
-      "año": 2015,
-      "titulo": "Etnobotánica muisca: plantas medicinales del altiplano cundiboyacense",
-      "revista_o_editorial": "Revista de la Academia Colombiana de Ciencias Exactas, Físicas y Naturales",
-      "observaciones": "Estudio etnobotánico detallado de plantas medicinales tradicionales del pueblo muisca en Cundinamarca y Boyacá."
-    },
-    {
-      "id": "jbb-plantas-medicinales",
-      "tipo": "base_datos",
-      "autores": "Jardín Botánico de Bogotá José Celestino Mutis",
-      "año": null,
-      "titulo": "Catálogo de plantas medicinales del Jardín Botánico de Bogotá",
-      "institucion": "Jardín Botánico de Bogotá",
-      "url": "https://www.jbb.gov.co"
     }
   ]
 }
