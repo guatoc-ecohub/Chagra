@@ -127,7 +127,15 @@ const parseJsonTolerant = (raw) => {
   const direct = (() => { try { return JSON.parse(raw); } catch (_) { return null; } })();
   if (direct !== null) return direct;
   const cleaned = raw.replace(/```json\s*/gi, '').replace(/```/g, '').trim();
-  try { return JSON.parse(cleaned); } catch (_) { return null; }
+  const cleanedParsed = (() => { try { return JSON.parse(cleaned); } catch (_) { return null; } })();
+  if (cleanedParsed !== null) return cleanedParsed;
+  // Bench gemma3:4b 2026-05-15 (Ollama 0.23.1): cuando el modelo es chico
+  // a veces emite texto antes/después del JSON. Última red: extraer el
+  // primer [...] balanceado del raw. Solo soporta arrays top-level (que
+  // es el schema esperado del SYSTEM_PROMPT).
+  const arrMatch = cleaned.match(/\[[\s\S]*\]/);
+  if (arrMatch) { try { return JSON.parse(arrMatch[0]); } catch (_) { /* noop */ } }
+  return null;
 };
 
 /**
@@ -148,11 +156,16 @@ export async function extractEntities(text, { onToken } = {}) {
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
   try {
+    // Bench 2026-05-15 en gemma3:4b: con `format: 'json'` Ollama fuerza
+    // un objeto JSON top-level único, lo que colapsa la salida a UN solo
+    // `{crop, quantity, location}` incluso cuando el operador menciona
+    // múltiples cultivos ("dos arvejas y tres papas" → solo extrae arvejas).
+    // SIN format:json y dejando que el SYSTEM_PROMPT (con few-shots) guíe
+    // al modelo, devuelve arrays correctos en todos los casos probados.
     const content = await streamOllama(
       OLLAMA_CHAT_URL,
       {
         model: MODEL,
-        format: 'json',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: text },
@@ -171,6 +184,10 @@ export async function extractEntities(text, { onToken } = {}) {
     if (!Array.isArray(parsed)) {
       if (Array.isArray(parsed?.entities)) parsed = parsed.entities;
       else if (Array.isArray(parsed?.data)) parsed = parsed.data;
+      // Fallback: un único objeto {crop, quantity, location} → wrap en array.
+      // Algunos modelos chicos (gemma3:4b sin format:json en edge cases)
+      // emiten una sola entidad como objeto plano.
+      else if (parsed && typeof parsed === 'object' && 'crop' in parsed) parsed = [parsed];
       else parsed = [];
     }
 
