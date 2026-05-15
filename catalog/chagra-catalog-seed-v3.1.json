@@ -4234,19 +4234,21 @@
         "metodo_principal": "esqueje",
         "notas": "Suelo debe ser muy ácido y rico en materia orgánica leñosa."
       },
-      "valor_pedagogico": "Lección de cultivares 'low-chill': explica cómo variedades seleccionadas florecen sin inviernos marcados.",
-      "plagas_criticas": [
-        "Drosophila suzukii",
-        "Pulgones"
-      ],
-      "enfermedades_criticas": [
-        "Phytophthora cinnamomi",
-        "Botrytis cinerea"
-      ],
-      "source_ids": [
-        "agrosavia-manual-arandano-2018",
-        "gbif-taxonomic-backbone"
-      ],
+       "valor_pedagogico": "El arándano Vaccinium corymbosum cultivar 'Biloxi' se cultiva en zonas térmicas templadas y frías de los Andes colombianos entre 1200 y 2600 msnm, particularmente en departamentos como Cundinamarca, Boyacá y Antioquia. Su manejo agronómico incluye propagación por esquejes en suelos muy ácidos ricos en materia orgánica leñosa, con un ciclo de fructificación de aproximadamente 120 días, asociándose beneficiosamente con el cultivar 'Emerald' para polinización cruzada, mientras requiere manejo integrado de plagas como Drosophila suzukii y pulgones mediante monitoreo y biopreparados andinos. En el contexto campesino andino, su cultivo representa una innovación agrícola de alto valor que diversifica la producción tradicional de la chagra, adaptando especies exóticas de valor nutricional a las condiciones tropicales de altura. Según el Manual Técnico del Cultivo de Arándano de AGROSAVIA (2018) y verificado en GBIF Backbone Taxonomy y Plants of the World Online (POWO), esta variedad de bajo requisito de frío florece adecuadamente sin inviernos marcados.",
+       "plagas_criticas": [
+         "Drosophila suzukii",
+         "Pulgones"
+       ],
+       "enfermedades_criticas": [
+         "Phytophthora cinnamomi",
+         "Botrytis cinerea"
+       ],
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-manual-arandano-2018",
+         "ica-resolucion-3168-2015"
+       ],
       "validation_level": "claude_draft"
     },
     {
