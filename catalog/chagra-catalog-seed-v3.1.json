@@ -3670,11 +3670,7 @@
         "zea_mays"
       ],
       "antagonists": [],
-      "valor_pedagogico": "Alfombra de vida. Fija nitrógeno para los frutales y praderas, permitiendo una nutrición constante del suelo.",
-      "source_ids": [
-        "fao-ecocrop",
-        "restrepo-1996-abc-agricultura-organica"
-      ],
+      "valor_pedagogico": "El trébol blanco (Trifolium repens L.) se distribuye en Colombia principalmente en departamentos andinos como Cundinamarca, Boyacá y Nariño entre 1000 y 3200 msnm en zonas térmicas frías. Su manejo agronómico incluye propagación por semilla al voleo, formando una alfombra densa que previene la erosión, con ciclo perenne y asociaciones beneficiosas con aliso (Alnus acuminata) y maíz (Zea mays) para fijación de nitrógeno. En contextos campesinos andinos, se utiliza como cobertura viva en caminos de finca para mejorar la estructura del suelo y reducir compactación. Según el backbone taxonómico de GBIF y Plants of the World Online (POW0), esta leguminosa forrajera destaca por su valor ecológico en sistemas agroforestales de montaña.",
       "validation_level": "claude_draft",
       "estrato": "bajo"
     },
@@ -3723,8 +3719,10 @@
       "antagonists": [],
       "valor_pedagogico": "Lección de sacrificio biológico. Prefiere que los pulgones la ataquen a ella antes que a tus coles. Un escudo comestible en la chagra.",
       "source_ids": [
-        "fao-ecocrop",
-        "restrepo-1996-abc-agricultura-organica"
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-sol-andina",
+        "ica-resolucion-3168-2015"
       ],
       "validation_level": "claude_draft",
       "estrato": "bajo"
