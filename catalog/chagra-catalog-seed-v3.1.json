@@ -4340,11 +4340,13 @@
       "antagonists": [
         "acacia_melanoxylon"
       ],
-      "valor_pedagogico": "La cerca viva perfecta para el chiguano que ama a los pájaros. Sustituye a la acacia negra sin invadir.",
-      "source_ids": [
-        "humboldt-flora-alto-andina",
-        "powo-kew"
-      ],
+        "valor_pedagogico": "El garrocho (Viburnum triphyllum Benth.) es una especie nativa de los Andes colombianos, presente en departamentos como Cundinamarca, Boyacá, Antioquia y Santander entre 1800 y 3100 msnm en zonas térmicas frías, particularmente en estratos alto y medio. Su manejo agronómico incluye propagación principalmente por semilla, con ciclos de floración entre octubre y enero y fructificación posterior, dispersada por aves que consumen sus frutos azules-negros, formando parte de sistemas de cerca viva perenne donde se asocia beneficiosamente con especies como Quercus humboldtii mientras actúa como antagonista natural de la acacia negra (Acacia melanoxylon), reduciendo la necesidad de control químico. En el contexto campesino andino, esta planta ha sido tradicionalmente utilizada por comunidades Muisca en la establecimiento de linderos vivos que protegen cultivos y proporcionan refugio para fauna silvestre, particularmente aves frutívoras como tangaras y tucanes, cuya presencia indica buen estado ecológico del sistema. Según la taxonomía verificable en GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Viburnum triphyllum Benth.",
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-sol-andina",
+         "ica-resolucion-3168-2015"
+       ],
       "validation_level": "claude_draft",
       "estrato": "alto"
     },
