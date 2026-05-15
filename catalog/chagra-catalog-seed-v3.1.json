@@ -1913,16 +1913,17 @@
       "radiacion": "sol_pleno",
       "agua": "medio",
       "drenaje_requerido": "bueno",
-      "propagation": {
-        "metodo_principal": "semilla",
-        "notas": "Trasplante a los 25-30 días; excelente para siembra escalonada por su rápido rebrote."
-      },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015",
-        "restrepo-1996-abc-agricultura-organica"
-      ],
-      "valor_pedagogico": "Hortaliza de ciclo rápido e ideal para enseñar el concepto de roseta y crecimiento centrífugo en el huerto."
+       "propagation": {
+         "metodo_principal": "semilla",
+         "notas": "Trasplante a los 25-30 días; excelente para siembra escalonada por su rápido rebrote."
+       },
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-sol-andina",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "La lechuga hoja de roble verde (Lactuca sativa L.) se cultiva ampliamente en Colombia entre 1000-3000 msnm, particularmente en zonas térmicas templadas y frías de Cundinamarca y Boyacá. Su manejo agronómico incluye propagación por semilla con trasplante a los 25-30 días, ciclo de 45-60 días, asociaciones beneficiosas con zanahoria y radish que mejora la biodiversidad del huerto, y requiere manejo de plagas como áfidos y caracoles mediante monitoreo y biopreparados andinos. En el contexto campesino andino, esta verdura de hoja ha sido incorporada recientemente a las dietas locales como fuente fresca de vitaminas A y K, complementando cultivos tradicionales de papa y maíz. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Lactuca sativa L."
     },
     {
       "id": "lantana_camara",
