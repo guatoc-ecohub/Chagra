@@ -3166,11 +3166,13 @@
         "metodo_principal": "hijuelos",
         "notas": "Planta remonta (produce en tallos de primer y segundo año); requiere podas de renovación para mantener el vigor."
       },
-      "source_ids": [
-        "powo-kew",
-        "ica-resolucion-3168-2015"
-      ],
-      "valor_pedagogico": "Lección de ciclo de tallo: enseña la diferencia entre floricanes y primocanes en plantas arbustivas y su manejo ergonómico."
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-sol-andina",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "La frambuesa roja Heritage (Rubus idaeus 'Heritage') se cultiva en Colombia principalmente en departamentos de Cundinamarca, Boyacá y Nariño entre 1800-2800 msnm en zonas térmicas frías. Su manejo agronómico incluye propagación mediante hijuelos, ciclo biennal con floricanes (tallos de segundo año que fructifican) y primocanes (tallos de primer año vegetativos), asociaciones beneficiosas con trébol para fijación de nitrógeno, y manejo de plagas como áfidos y ácaros mediante podas de renovación y biopreparados andinos. En el contexto campesino andino, su cultivo se ha integrado en huertos familiares como complemento alimenticio y económico, aprovechando su adaptación a climas de montaña. Fuente: GBIF Backbone Taxonomy y Plants of the World Online."
     },
     {
       "id": "salvia_officinalis",
