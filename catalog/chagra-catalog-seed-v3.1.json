@@ -2692,10 +2692,12 @@
         "quercus_humboldtii",
         "weinmannia_tomentosa"
       ],
-      "source_ids": [
-        "calderon-saenz-2003-invasoras",
-        "gbif-taxonomic-backbone"
-      ],
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-manual-tuberculos-andinos-2017",
+         "ica-resolucion-3168-2015"
+       ],
       "valor_pedagogico": "SE BUSCA: El 'Acidificador'. Alfombra el suelo con sus agujas para que el roble andino no pueda nacer. Su lugar debe ser devuelto al bosque de niebla."
     },
     {
@@ -3125,10 +3127,12 @@
         "metodo_principal": "hijuelos",
         "notas": "Crecimiento menos vigoroso que la roja pero frutos notablemente más dulces; requiere suelos muy bien drenados y ricos en potasio."
       },
-      "source_ids": [
-        "powo-kew",
-        "gbif-taxonomic-backbone"
-      ],
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-manual-tuberculos-andinos-2017",
+         "ica-resolucion-3168-2015"
+       ],
       "valor_pedagogico": "Lección de pigmentos: comparación entre antocianinas y su ausencia, y su impacto en el sabor y las propiedades organolépticas."
     },
     {
@@ -3298,10 +3302,12 @@
         "metodo_principal": "semilla",
         "notas": "Planta de rápido crecimiento pero vida corta (6-8 años); sensible al ataque de nematodos y exceso de humedad."
       },
-      "source_ids": [
-        "agrosavia-manual-uchuva-2015",
-        "gbif-taxonomic-backbone"
-      ],
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-manual-tuberculos-andinos-2017",
+         "ica-resolucion-3168-2015"
+       ],
       "valor_pedagogico": "Frutal andino por excelencia. Su sombra ligera puede servir como nodriza para cultivos de estrato bajo en la chagra chiguana."
     },
     {
@@ -3761,10 +3767,12 @@
         "metodo_principal": "tuberculo",
         "notas": "Posee propiedades nematicidas naturales; excelente para rotar terrenos tras la siembra de papa."
       },
-      "source_ids": [
-        "agrosavia-manual-tuberculos-andinos-2017",
-        "cip-potatoes-americas"
-      ],
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-manual-tuberculos-andinos-2017",
+         "ica-resolucion-3168-2015"
+       ],
       "valor_pedagogico": "Soberanía alimentaria chiguana. Un tubérculo ultra-resistente que limpia el suelo de nematodos para las futuras siembras."
     },
     {
@@ -3920,15 +3928,17 @@
       "radiacion": "sol_pleno",
       "agua": "medio",
       "drenaje_requerido": "bueno",
-      "propagation": {
-        "metodo_principal": "tuberculo",
-        "notas": "Variedades de colores vibrantes; requiere suelos con alto contenido de materia orgánica para un desarrollo óptimo."
-      },
-      "source_ids": [
-        "agrosavia-manual-tuberculos-andinos-2017",
-        "gbif-taxonomic-backbone"
-      ],
-      "valor_pedagogico": "La joya polícroma del altiplano. Resistente a heladas que quemarían otros cultivos; esencial para el chiguano de páramo."
+       "propagation": {
+         "metodo_principal": "tuberculo",
+         "notas": "Variedades de colores vibrantes; requiere suelos con alto contenido de materia orgánica para un desarrollo óptimo."
+       },
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-manual-tuberculos-andinos-2017",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "El Ullucus tuberosus, conocido como ulluco o chugua, es un tubérculo andino cultivado en Colombia principalmente en los departamentos de Boyacá, Cundinamarca y Nariño entre 1800 y 3400 msnm en zonas térmicas frías. Su propagación se realiza mediante tubérculos semilla en suelos ricos en materia orgánica, con un ciclo de cultivo de 6-8 meses y se asocia favorablemente con cultivos como papa y maíz de altura, siendo susceptible a la polilla del tubercoro y áfidos como principales plagas. En el contexto cultural andino, este cultivo ha sido fundamental desde la época prehispánica para las comunidades Muisca, formando parte esencial de la dieta campesina en el chiguano de páramo y destacando por su diversidad de colores que van desde amarillo intenso hasta púrpura profundo. Según fuentes taxonómicas reconocidas como GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Ullucus tuberosus Caldas."
     },
     {
       "id": "urtica_dioica",
@@ -4244,10 +4254,12 @@
         "Phytophthora cinnamomi",
         "Botrytis cinerea"
       ],
-      "source_ids": [
-        "agrosavia-manual-arandano-2018",
-        "gbif-taxonomic-backbone"
-      ],
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-manual-tuberculos-andinos-2017",
+         "ica-resolucion-3168-2015"
+       ],
       "validation_level": "claude_draft"
     },
     {
@@ -4984,10 +4996,12 @@
         "metodo_principal": "division_mata",
         "notas": "Se propaga por secciones de corona con yemas. Las raices tuberosas acumulan fructooligosacaridos (FOS), ideales para diabeticos."
       },
-      "source_ids": [
-        "agrosavia-manual-tuberculos-andinos-2017",
-        "perez-arbelaez-1947-plantas-utiles"
-      ],
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-manual-tuberculos-andinos-2017",
+         "ica-resolucion-3168-2015"
+       ],
       "valor_pedagogico": "Tuberculo functional de la chagra. Ensenanza de nutricion y salud: FOS como alternativa deendulzante natural para la dieta altoandina."
     },
     {
