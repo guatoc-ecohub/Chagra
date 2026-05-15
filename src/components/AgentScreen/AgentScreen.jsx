@@ -7,6 +7,8 @@ import { retrieve } from '../../services/ragRetriever';
 import { parseIntent, formatIntentDescription } from '../../services/agentIntentParser';
 import { streamOpenAI } from '../../services/openaiStream';
 import { speak, speakKokoro, stop, init as initTTS, isSupported, isKokoroAvailable } from '../../services/ttsService';
+import { executeAction, setActionGateCallback } from '../../services/actionExecutor';
+import { getTool } from '../../services/llmTools';
 import ChatHistory from './ChatHistory';
 import SuggestedActions from './SuggestedActions';
 import ActionConfirmModal from '../ActionConfirmModal';
@@ -42,6 +44,11 @@ export default function AgentScreen({ onBack }) {
 
   const { durationMs, start: startRecord, stop: stopRecord, reset: resetRecord } = useVoiceRecorder();
   const chatEndRef = useRef(null);
+  // 057.4 integration: resolver del Promise pendiente del actionExecutor gate.
+  // El callback registrado en setActionGateCallback abre el modal y retorna
+  // un Promise; el resolver vive aquí para que los handlers approve/reject/
+  // edit puedan resolverlo cuando el operador interactúa.
+  const actionGateResolverRef = useRef(null);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -60,12 +67,32 @@ export default function AgentScreen({ onBack }) {
     initTTS();
     isKokoroAvailable().then(setKokoroReady);
     loadHistory();
+    // 057.4 integration: registrar el callback del actionExecutor. Cuando el
+    // LLM proponga una tool con requiresGate=true, actionExecutor llamará
+    // este callback que abre el ActionConfirmModal y retorna un Promise.
+    // El Promise se resuelve cuando handleAction{Approve,Reject,Edit} corre.
+    setActionGateCallback(({ toolName, description, parameters, intent, llm_response }) => {
+      return new Promise((resolve) => {
+        actionGateResolverRef.current = resolve;
+        setActionModal({
+          isOpen: true,
+          toolName,
+          description,
+          parameters,
+          intent,
+          llmResponse: llm_response,
+        });
+      });
+    });
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
     return () => {
       stop();
+      // Limpiar callback al desmontar para evitar referencias stale
+      setActionGateCallback(null);
+      actionGateResolverRef.current = null;
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
@@ -76,43 +103,35 @@ export default function AgentScreen({ onBack }) {
     return `Eres un asistente agroecológico en Colombia. El usuario tiene estas plantas: ${plantNames}. Responde en español, sé helpful y específico. Si no sabes algo, dilo honestamente.`;
   }, [plants]);
 
-  const handleActionApprove = async (params) => {
-    const { intent } = actionModal;
-    const addLog = useAssetStore.getState().addLog;
-
-    if (intent && intent.toolName === 'crear_log' && addLog) {
-      const assetId = params.asset_id || plants?.[0]?.id;
-      if (assetId) {
-        await addLog(assetId, {
-          type: intent.logType,
-          attributes: {
-            notes: params.notes || formatIntentDescription(intent),
-            timestamp: new Date().toISOString(),
-            ...(params.quantity && params.unit && { quantity: { value: params.quantity, unit: params.unit } }),
-          },
-          relationships: {
-            asset: { data: { type: 'asset', id: assetId } },
-          },
-        });
-
-        const successMsg = {
-          role: 'assistant',
-          content: `Listo. He registrado la ${intent.logType.replace('log--', '')} en tu bitácora.`,
-          timestamp: Date.now(),
-        };
-        setMessages((prev) => [...prev, successMsg]);
-      }
-    }
-
+  // 057.4 integration: los handlers ya NO ejecutan addLog directo. Solo
+  // resuelven el Promise del callback registrado en setActionGateCallback.
+  // actionExecutor recibe el resultado, llama tool.handler (que ejecuta
+  // addLog vía llmTools.crear_log) y loguea audit trail. Mensaje de éxito
+  // post-execute se emite desde handleSubmit cuando executeAction retorna.
+  const handleActionApprove = (params) => {
+    const wasEdited = JSON.stringify(params) !== JSON.stringify(actionModal.parameters);
+    const resolver = actionGateResolverRef.current;
+    actionGateResolverRef.current = null;
     setActionModal({ isOpen: false, intent: null, llmResponse: '' });
+    if (resolver) {
+      resolver({
+        status: wasEdited ? 'edited' : 'approved',
+        edited_params: wasEdited ? params : undefined,
+      });
+    }
   };
 
   const handleActionReject = () => {
+    const resolver = actionGateResolverRef.current;
+    actionGateResolverRef.current = null;
     setActionModal({ isOpen: false, intent: null, llmResponse: '' });
+    if (resolver) {
+      resolver({ status: 'rejected' });
+    }
   };
 
-  const handleActionEdit = async (params) => {
-    await handleActionApprove(params);
+  const handleActionEdit = (params) => {
+    handleActionApprove(params);
   };
 
   // Bug reportado 2026-05-15: el botón quedaba en "thinking" indefinido si
@@ -213,13 +232,35 @@ export default function AgentScreen({ onBack }) {
         }
       }
 
+      // 057.4 integration: en lugar de abrir el modal directo, delegamos a
+      // executeAction que dispara el callback registrado (que abre el modal),
+      // espera resolución del operador, ejecuta el tool.handler de llmTools
+      // (que internamente llama store.addLog) y loguea audit trail.
       if (intent && intent.toolName === 'crear_log') {
-        setActionModal({
-          isOpen: true,
-          intent,
-          llmResponse: response,
-        });
-        setState(STATE_IDLE);
+        setState(STATE_IDLE); // libera UI mientras se muestra el modal
+        const assetId = plants?.[0]?.id;
+        const proposal = {
+          tool_name: 'crear_log',
+          parameters: {
+            asset_id: assetId || '',
+            log_type: intent.logType,
+            notes: formatIntentDescription(intent),
+            timestamp: new Date().toISOString(),
+            ...(intent.quantity && intent.unit && { quantity: intent.quantity, unit: intent.unit }),
+          },
+          intent: text,
+          llm_response: response,
+          timestamp: new Date().toISOString(),
+        };
+        const result = await executeAction(proposal, operatorId);
+        if (result.status === 'executed' && result.result?.success) {
+          const successMsg = {
+            role: 'assistant',
+            content: `Listo. He registrado la ${intent.logType.replace('log--', '')} en tu bitácora.`,
+            timestamp: Date.now(),
+          };
+          setMessages((prev) => [...prev, successMsg]);
+        }
         return;
       }
     } catch (e) {
@@ -393,12 +434,12 @@ export default function AgentScreen({ onBack }) {
 
       <div ref={chatEndRef} />
 
-      {/* Action Confirmation Modal */}
+      {/* Action Confirmation Modal — alimentado por actionExecutor gate callback (057.4) */}
       <ActionConfirmModal
         isOpen={actionModal.isOpen}
-        toolName={actionModal.intent?.toolName || ''}
-        description={actionModal.intent ? formatIntentDescription(actionModal.intent) : ''}
-        parameters={actionModal.intent?.parameters || {}}
+        toolName={actionModal.toolName || ''}
+        description={actionModal.description || ''}
+        parameters={actionModal.parameters || {}}
         intent={actionModal.intent}
         llm_response={actionModal.llmResponse}
         onApprove={handleActionApprove}
