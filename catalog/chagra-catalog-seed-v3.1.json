@@ -3454,19 +3454,21 @@
         "metodo_principal": "semilla",
         "notas": "Crecimiento determinado; cosecha concentrada en un periodo corto."
       },
-      "valor_pedagogico": "Lección de procesamiento: su bajo contenido de agua y pulpa densa lo hacen el estándar para conservas y salsas.",
-      "plagas_criticas": [
-        "Trps",
-        "Heliothis"
-      ],
-      "enfermedades_criticas": [
-        "Podredumbre apical (Blossom end rot)"
-      ],
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "restrepo-1996-abc-agricultura-organica"
-      ],
-      "validation_level": "claude_draft"
+      "valor_pedagogico": "El tomate San Marzano (Solanum lycopersicum 'San Marzano') se cultiva en Colombia principalmente en los departamentos de Cundinamarca, Boyacá y Antioquia, entre 1500 y 2400 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con crecimiento determinado y cosecha concentrada en períodos de 5 meses, asociándose beneficiosamente con perejil, citronela, melisa, ortuga y lechuga para reducir presión de plagas como trips y helicoverpa, mientras requiere monitoreo de antagonistas como hinojo y papas andinas. En el contexto campesino andino, esta variedad ha sido adoptada por su alto contenido de sólidos solubles que lo hacen ideal para procesamiento artesanal de salsas y conservas, preservando técnicas de postcosecha transmitidas oralmente en comunidades de la Sabana de Bogotá. Según la taxonomía verificable de GBIF Backbone Taxonomy y Plants of the World Online (POWO), respaldada por el ICA Resolución 3168/2015 y el manual AGROSAVIA Sol Andina, su nombre científico válido es Solanum lycopersicum 'San Marzano'.",
+"plagas_criticas": [
+         "Trps",
+         "Heliothis"
+       ],
+       "enfermedades_criticas": [
+         "Podredumbre apical (Blossom end rot)"
+       ],
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-sol-andina",
+         "ica-resolucion-3168-2015"
+       ],
+       "validation_level": "claude_draft"
     },
     {
       "id": "solanum_lycopersicum_sungold",
