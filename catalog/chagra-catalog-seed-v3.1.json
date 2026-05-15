@@ -2012,46 +2012,48 @@
       "valor_pedagogico": "Leguminosa de alta montaña. Sus alcaloides actúan como repelentes naturales en la chagra; enseña el valor de los cultivos de ciclo cerrado."
     },
     {
-      "id": "melissa_officinalis",
-      "nombre_comun": "Toronjil",
-      "nombre_cientifico": "Melissa officinalis L.",
-      "familia_botanica": "Lamiaceae",
-      "category": "medicinales_alelopaticas",
-      "thermal_zones": [
-        "templado",
-        "frio"
-      ],
-      "roles_in_guild": [
-        "crop",
-        "pollinator_attractor",
-        "pest_repellent"
-      ],
-      "cultivable": true,
-      "conservation_status": "cultivo_comun",
-      "altitud_msnm": {
-        "min_absoluto": 1000,
-        "optimo_min": 1800,
-        "optimo_max": 2700,
-        "max_absoluto": 3200
-      },
-      "temperatura_c": {
-        "helada_letal": -15,
-        "optimo_min": 10,
-        "optimo_max": 20,
-        "max_tolerable": 27
-      },
-      "radiacion": "sombra_parcial",
-      "agua": "medio",
-      "drenaje_requerido": "bueno_a_moderado",
-      "propagation": {
-        "metodo_principal": "division_mata",
-        "notas": "Fácil propagación vegetativa mediante la separación de macollos estacionales."
-      },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "pamplona-roger-2006-plantas-medicinales"
-      ],
-      "valor_pedagogico": "Lección de alelopatía positiva: su aroma cítrico confunde plagas de hortalizas vecinas (especialmente tomates)."
+       "id": "melissa_officinalis",
+       "nombre_comun": "Toronjil",
+       "nombre_cientifico": "Melissa officinalis L.",
+       "familia_botanica": "Lamiaceae",
+       "category": "medicinales_alelopaticas",
+       "thermal_zones": [
+         "templado",
+         "frio"
+       ],
+       "roles_in_guild": [
+         "crop",
+         "pollinator_attractor",
+         "pest_repellent"
+       ],
+       "cultivable": true,
+       "conservation_status": "cultivo_comun",
+       "altitud_msnm": {
+         "min_absoluto": 1000,
+         "optimo_min": 1800,
+         "optimo_max": 2700,
+         "max_absoluto": 3200
+       },
+       "temperatura_c": {
+         "helada_letal": -15,
+         "optimo_min": 10,
+         "optimo_max": 20,
+         "max_tolerable": 27
+       },
+       "radiacion": "sombra_parcial",
+       "agua": "medio",
+       "drenaje_requerido": "bueno_a_moderado",
+       "propagation": {
+         "metodo_principal": "division_mata",
+         "notas": "Fácil propagación vegetativa mediante la separación de macollos estacionales."
+       },
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-sol-andina",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "Melissa officinalis, conocida como toronjil o melisa, se cultiva en Colombia en departamentos como Bogotá DC, Boyacá, Cauca, Cundinamarca, Huila, Santander y Valle del Cauca, entre 1200 y 2800 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación vegetativa mediante división de macollos estacionales, ciclo perenne de 2-3 años con podas de renovación, asociaciones beneficiosas con tomate y coles para confundir plagas mediante su aroma cítrico, y manejo de áfidos y trips mediante monitoreo y biopreparados andinos. En el contexto campesino andino, sus hojas se utilizan tradicionalmente en infusiones digestivas y calmantes, siendo parte del botiquín casero desde la época colonial para aliviar nerviosismo y trastornos del sueño. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Melissa officinalis L."
     },
     {
       "id": "mentha_spicata",
