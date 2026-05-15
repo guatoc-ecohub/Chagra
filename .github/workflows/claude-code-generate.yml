@@ -48,7 +48,14 @@ jobs:
           || github.event.sender.login == vars.CLAUDE_BOT_LOGIN)
       && github.event.pull_request.draft == true
     runs-on: [self-hosted, claude-runner]
-    timeout-minutes: 20
+    # 2026-05-15: bump 20→60min. Causa raíz observada: en runs.list de 3h se
+    # vieron 161 jobs disparados con resultado 2 success + 37 cancelled.
+    # journalctl github-runner-claude-code reveló patrón exacto: cada job
+    # cancelado dura 20m20s (timeout hit). Nemotron (qwen2.5-coder-7b en CPU
+    # Ryzen 4600G UMA) con prompts grandes (batch 3-5 incluyen datos
+    # verificados extraídos del JSON existente) no alcanza el budget. 60min
+    # cubre el peor caso observado en bench batch 1 (~10-15min típico).
+    timeout-minutes: 60
 
     steps:
       - name: Checkout PR branch
