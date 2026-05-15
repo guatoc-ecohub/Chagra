@@ -115,6 +115,14 @@ export default function AgentScreen({ onBack }) {
     await handleActionApprove(params);
   };
 
+  // Bug reportado 2026-05-15: el botón quedaba en "thinking" indefinido si
+  // la red/proxy colgaba sin emitir tokens (nginx tiene proxy_read_timeout
+  // 120s pero el fetch no lleva señal de aborto, así que ante un cuelgue
+  // silencioso el `finally` que resetea STATE_IDLE nunca dispara).
+  // Solución: AbortController con timeout 90s — antes que nginx cierre la
+  // conexión por su lado, fuerza AbortError → catch → finally → IDLE.
+  const LLM_TIMEOUT_MS = 90000;
+
   const callLLM = async (query, contextMemory, contextCorpus) => {
     const systemPrompt = getSystemPrompt();
     const corpusContext = contextCorpus.length > 0
@@ -127,6 +135,9 @@ export default function AgentScreen({ onBack }) {
       { role: 'user', content: query },
     ];
 
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), LLM_TIMEOUT_MS);
+
     try {
       return await streamOpenAI(
         LLM_URL,
@@ -137,6 +148,7 @@ export default function AgentScreen({ onBack }) {
           max_tokens: 512,
         },
         (_chunk, fullText) => setStreamingContent(fullText),
+        { signal: controller.signal },
       );
     } catch (e) {
       if (e.name === 'AbortError') {
@@ -154,6 +166,8 @@ export default function AgentScreen({ onBack }) {
         throw new Error(`Error al consultar IA (codigo: ${status})`);
       }
       throw new Error('IA no disponible, intenta de nuevo en un momento');
+    } finally {
+      clearTimeout(timer);
     }
   };
 
