@@ -810,15 +810,17 @@
       "radiacion": "sol_pleno",
       "agua": "medio",
       "drenaje_requerido": "bueno",
-      "propagation": {
-        "metodo_principal": "semilla",
-        "notas": "Requiere suelos ricos en materia orgánica (humus/compost) para desarrollar un color purpúreo intenso."
-      },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
-      ],
-      "valor_pedagogico": "Lección de pigmentos: las antocianinas actúan como protector solar y anticongelante natural en la alta montaña."
+       "propagation": {
+         "metodo_principal": "semilla",
+         "notas": "Requiere suelos ricos en materia orgánica (humus/compost) para desarrollar un color purpúreo intenso."
+       },
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-sol-andina",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "El repollo morado (Brassica oleracea var. capitata f. rubra) se cultiva en los departamentos andinos de Colombia como Cundinamarca, Boyacá y Nariño entre 800 y 3200 msnm en zonas térmicas fría y templada. Su manejo agronómico incluye propagación por semilla con ciclo de 90-120 días, requiere suelos ricos en materia orgánica (humus/compost) para desarrollar su característico color purpúreo intenso, se asocia beneficiosamente con zanahoria y cebolla para reducir plagas como áfidos y lepidópteros, y requiere monitoreo de plagas como la mosca blanca y gusanos del repollo. En el contexto campesino andino, esta variedad se valora por su alto contenido de antocianinas como antioxidantes naturales y se utiliza tradicionalmente en ensaladas y preparaciones culinarias que aportan color y nutrientes a la dieta familiar. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Brassica oleracea var. capitata f. rubra."
     },
     {
       "id": "brassica_oleracea_italica",
@@ -3166,9 +3168,11 @@
         "notas": "Planta remonta (produce en tallos de primer y segundo año); requiere podas de renovación para mantener el vigor."
       },
       "source_ids": [
-        "powo-kew",
-        "ica-resolucion-3168-2015"
-      ],
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-sol-andina",
+         "ica-resolucion-3168-2015"
+       ],
       "valor_pedagogico": "Lección de ciclo de tallo: enseña la diferencia entre floricanes y primocanes en plantas arbustivas y su manejo ergonómico."
     },
     {
