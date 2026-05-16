@@ -73,10 +73,10 @@ const NAV_TILES = [
   { id: 'javier', label: 'Hoy en finca', icon: Eye, accent: 'green', desc: `Tareas por proximidad (${PRIMARY_WORKER_NAME})` },
   { id: 'bodega', label: 'Insumos', icon: Package, accent: 'sky', desc: 'Stock de biopreparados' },
   { id: 'task_log', label: 'Tareas', icon: Clock, accent: 'rose', desc: 'Cola de pendientes' },
-  { id: 'historial', label: 'Bitácora', icon: NotebookPen, accent: 'indigo', desc: 'Trazabilidad de operaciones' },
+  { id: 'historial', label: 'Bitácora', icon: NotebookPen, accent: 'indigo', desc: 'Historial de actividades' },
   { id: 'biodiversidad', label: 'Flora y fauna', icon: Leaf, accent: 'emerald', desc: 'Ecosistema, estratos y gremios' },
   { id: 'reportar_invasora', label: 'Plagas', icon: AlertCircle, accent: 'amber', desc: 'Reporte de plagas y malezas' },
-  { id: 'informes', label: 'Informes', icon: FileText, accent: 'lime', desc: 'Reportes CSV de trazabilidad y descargas' },
+  { id: 'informes', label: 'Informes', icon: FileText, accent: 'lime', desc: 'Descargas de reportes en CSV' },
   { id: 'perfil', label: 'Perfil', icon: Palette, accent: 'indigo', desc: 'Temas y configuración' },
 ];
 
