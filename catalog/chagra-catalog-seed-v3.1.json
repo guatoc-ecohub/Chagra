@@ -5339,6 +5339,50 @@
       "validation_level": "claude_draft"
     },
     {
+      "id": "spondias_mombin",
+      "nombre_comun": "Jobo / Hobo",
+      "nombre_cientifico": "Spondias mombin L.",
+      "familia_botanica": "Anacardiaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "frutal"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 600,
+        "max_absoluto": 800
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 38
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla fresca directamente en campo o por injerto para acelerar fructificación. La semilla tiene baja viabilidad almacenamiento, requiere siembra inmediata post-cosecha."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "sib-colombia",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "El jobo (Spondias mombin L.) se distribuye naturalmente en las regiones Caribe y Orinoquía colombianas, presente en departamentos como Cesar, Magdalena, Bolívar, Córdoba, Sucre, Meta y Casanare, entre 0 y 800 msnm en zona térmica cálida. Su manejo agronómico incluye propagación por semilla fresca o injerto para obtener fructificación en 3-4 años, ciclo productivo de 4-6 meses post-floración, con asociaciones beneficiosas en sistemas agroforestales con cacao, plátano y frutales nativos, tolerando podas de formación y respondiendo bien a manejo orgánico. En el contexto cultural Caribe y Llanero, el jobo ha sido históricamente utilizado por comunidades indígenas y campesinas para consumo fresco de su fruto ácido-dulce, preparación de jugos, conservas y como medicinal para trastornos digestivos, conocimiento tradicional documentado en la obra clásica de Pérez Arbeláez 'Plantas Útiles de Colombia' (1947) que registra sus múltiples usos tradicionales en la región tropical colombiana.",
+      "validation_level": "ai_draft"
+    },
+    {
       "id": "hesperomeles_obtusifolia",
       "nombre_comun": "Durazno criollo / Pesgua / Cerote",
       "nombre_cientifico": "Hesperomeles obtusifolia (Pers.) Lindl.",
