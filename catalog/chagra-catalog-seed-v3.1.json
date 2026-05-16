@@ -234,10 +234,11 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015",
-        "restrepo-1996-abc-agricultura-organica"
+        "powo-kew",
+        "agrosavia-sol-andina",
+        "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "El antibiótico natural del huerto: su azufre orgánico es la base de los caldos preventivos de plagas en la chagra chiguana."
+      "valor_pedagogico": "El ajo (Allium sativum L.) se cultiva en diversos departamentos de Colombia incluyendo Cundinamarca, Boyacá, Nariño y Antioquia entre 0 y 3400 msnm en zonas térmicas frías y templadas. Su manejo agronómico incluye propagación por clavos bulbillos (dientes) sembrados con el ápice hacia arriba, ciclo vegetativo de 90-120 días, asociaciones beneficiosas con zanahoria, lechuga y fresas que repelen plagas como áfidos y ácaros, y requiere monitoreo de plagas como el nemátodo del tallo y enfermedades como la pudrición blanca. En el contexto cultural muisca y andino, este bulbo ha sido tradicionalmente utilizado tanto en preparaciones culinarias como en remedios medicinales por sus propiedades antibacterianas y antifúngicas, formando parte esencial de la dieta y la medicina tradicional andina. Según fuentes taxonómicas verificadas de GBIF Backbone Taxonomy, Plants of the World Online (POWO), AGROSAVIA Sol Andina y la ICA Resolución 3168/2015, su nombre científico válido es Allium sativum L."
     },
     {
       "id": "alnus_acuminata",
@@ -3780,11 +3781,13 @@
         "metodo_principal": "tuberculo",
         "notas": "Posee propiedades nematicidas naturales; excelente para rotar terrenos tras la siembra de papa."
       },
-      "source_ids": [
-        "agrosavia-manual-tuberculos-andinos-2017",
-        "cip-potatoes-americas"
-      ],
-      "valor_pedagogico": "Soberanía alimentaria chiguana. Un tubérculo ultra-resistente que limpia el suelo de nematodos para las futuras siembras."
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-manual-tuberculos-andinos-2017",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "La mashua (Tropaeolum tuberosum) se cultiva en los departamentos andinos de Colombia como Boyacá, Cundinamarca, Nariño y Cauca entre 2000 y 3600 msnm en zonas térmicas frías. Su manejo agronómico incluye propagación por tubérculos semilla, ciclo de cultivo de 8-9 meses, asociaciones beneficiosas con papa y maíz que reducen nemátodos y plagas del suelo, y requiere monitoreo de plagas como trips y áfidos mediante biopreparados andinos. En el contexto cultural muisca y andino, este tubérculo ha sido tradicionalmente utilizado en sopros y guisos como alimento esencial, preservando sabores prehispánicos en las cocinas rurales de los Andes colombianos. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Tropaeolum tuberosum Ruiz & Pav."
     },
     {
       "id": "ulex_europaeus",
