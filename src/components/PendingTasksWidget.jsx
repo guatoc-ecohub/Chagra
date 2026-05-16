@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AlertTriangle, Clock, RefreshCw, Wifi, WifiOff, ChevronUp, ChevronDown, Edit2 } from 'lucide-react';
 import { syncManager } from '../services/syncManager';
+import useFincaActiveStore from '../services/fincaActiveStore';
 
 /**
  * PendingTasksWidget, Lili #102 + #106.
@@ -27,6 +28,12 @@ export default function PendingTasksWidget({ onEdit }) {
   const [error, setError] = useState(null);
   const [cacheAgeMinutes, setCacheAgeMinutes] = useState(null);
   const [expanded, setExpanded] = useState(false);
+  // 062.5: re-fetch al cambiar de finca activa para que las tasks reflejen
+  // el endpoint farmOS de la finca donde el operador está físicamente.
+  // apiService.js:161 ya hace el routing dinámico; aquí solo nos enganchamos
+  // al cambio del slug para forzar refresh inmediato (sin esperar evento
+  // taskAdded/taskUpdated).
+  const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
 
   const fetchTasks = async () => {
     setIsLoading(true);
@@ -73,7 +80,7 @@ export default function PendingTasksWidget({ onEdit }) {
       window.removeEventListener('taskAdded', handleTaskAdded);
       window.removeEventListener('taskUpdated', handleTaskAdded);
     };
-  }, []);
+  }, [activeFincaSlug]);
 
   const getSeverityConfig = (severity) => {
     switch (severity) {
