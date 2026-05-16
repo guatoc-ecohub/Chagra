@@ -6,6 +6,14 @@ import { persist, createJSONStorage } from 'zustand/middleware';
  * ================================================================
  * Gestiona qué finca está "activa" en la sesión del usuario.
  * Persiste en localStorage para mantener el contexto entre recargas.
+ *
+ * Extendido en 062 (GPS context-aware multi-finca):
+ *   - gpsOverride: boolean — true cuando el operador eligió finca manual;
+ *     el banner GPS deja de consultar Geolocation hasta que se vuelva auto.
+ *   - indoorZone: string|null — última zona indoor (invernadero) recordada
+ *     cuando GPS pierde fix (062.7).
+ *   - gpsHistoryEnabled: boolean — opt-in para sincronizar GPS history al
+ *     server (default false, privacy-first 062.8).
  * ================================================================
  */
 const useFincaActiveStore = create(
@@ -13,10 +21,31 @@ const useFincaActiveStore = create(
         (set, get) => ({
             activeFincaSlug: 'guatoc',
             fincas: [], // Cache local de fincas-publicas.json
+            gpsOverride: false,
+            indoorZone: null,
+            gpsHistoryEnabled: false,
 
             setActiveFinca: (slug) => set({ activeFincaSlug: slug }),
 
             setFincas: (fincas) => set({ fincas }),
+
+            // 062.3: GPS detectó match → cambiar finca activa sin marcar override
+            // (operador queda en modo auto-detect, el banner sigue activo).
+            setActiveFincaFromGps: (slug) => set({ activeFincaSlug: slug, gpsOverride: false }),
+
+            // 062.3: operador eligió manualmente → marcar override para que
+            // el banner deje de consultar GPS hasta clearGpsOverride.
+            setActiveFincaManual: (slug) => set({ activeFincaSlug: slug, gpsOverride: true }),
+
+            // 062.3: volver a modo auto-detect.
+            clearGpsOverride: () => set({ gpsOverride: false }),
+
+            // 062.7: registrar/limpiar zona indoor para fallback cuando GPS
+            // pierde fix bajo techo invernadero.
+            setIndoorZone: (zone) => set({ indoorZone: zone }),
+
+            // 062.8: opt-in privacy para sync GPS history al server.
+            setGpsHistoryEnabled: (enabled) => set({ gpsHistoryEnabled: !!enabled }),
 
             // Resolver el endpoint de FarmOS para la finca activa (Fase 1)
             getActiveEndpoint: () => {
