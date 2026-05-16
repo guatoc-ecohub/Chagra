@@ -1884,12 +1884,13 @@
         "metodo_principal": "semilla",
         "notas": "Variedades pigmentadas suelen tener termodormancia más marcada; sembrar en lotes con buena ventilación nocturna."
       },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015",
-        "restrepo-1996-abc-agricultura-organica"
-      ],
-      "valor_pedagogico": "Las antocianinas responden al fotoperíodo y la temperatura: ideal para enseñar respuestas fisiológicas al ambiente andino."
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-sol-andina",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "La lechuga hoja de roble morada (Lactuca sativa L.) se cultiva en los departamentos andinos de Colombia como Cundinamarca, Boyacá y Santander entre 1000 y 3000 msnm, con óptimo desarrollo en zonas térmicas templadas y frías (1800-2800 msnm). Su manejo agronómico incluye propagación por semilla con ciclo de cultivo de 60-80 días, cosechándose cuando las hojas presentan el característico color morado y textura tierna; se beneficia de asociaciones con zanahoria y cebolla que repelen áfidos, requiriendo monitoreo de plagas como pulgones y caracoles mediante trampas de cerveza y extracto de ajo. En el contexto campesino andino, esta variedad ha sido incorporada a ensaladas y acompañamientos desde la época colonial, valorada por su color vibrante y propiedades antioxidantes en platos tradicionales como el sancocho de gallina y los sandwiches de chicharrón. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Lactuca sativa L."
     },
     {
       "id": "lactuca_sativa_roble_verde",
@@ -3545,7 +3546,8 @@
          "ground_cover"
        ],
        "cultivable": true,
-       "conservation_status": "LC",
+       "conservation_status": "cultivo_comun",
+       "estrato": "medio",
        "altitud_msnm": {
          "min_absoluto": 1500,
          "optimo_min": 2500,
