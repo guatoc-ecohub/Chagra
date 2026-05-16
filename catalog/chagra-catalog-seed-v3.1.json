@@ -3320,10 +3320,12 @@
         "notas": "Planta de rápido crecimiento pero vida corta (6-8 años); sensible al ataque de nematodos y exceso de humedad."
       },
       "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
         "agrosavia-manual-uchuva-2015",
-        "gbif-taxonomic-backbone"
+        "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Frutal andino por excelencia. Su sombra ligera puede servir como nodriza para cultivos de estrato bajo en la chagra chiguana."
+      "valor_pedagogico": "El tomate de árbol (Solanum betaceum Cav.) se cultiva en departamentos andinos de Colombia como Cundinamarca, Boyacá, Nariño, Valle del Cauca, Antioquia y Tolima entre 1200 y 3000 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla o injerto, ciclo de fructificación de 8-12 meses desde la siembra, asociaciones beneficiosas con café, cacao y especies de sombra que mejoran la estructura del huerto, y requiere manejo integrado de nematodos, mosca de la fruta y trips mediante monitoreo y biopreparados andinos. En el contexto cultural muisca y andino, este frutal ha sido tradicionalmente consumido fresco o en jugos, conservando su valor como alimento nativo de los Andes colombianos. Según las fuentes taxonómicas verificadas de GBIF Backbone Taxonomy, Plants of the World Online (POWO), AGROSAVIA Manual de Uchuva y la ICA Resolución 3168/2015, su nombre científico válido es Solanum betaceum Cav."
     },
     {
       "id": "solanum_lycopersicum_cerasiforme",
