@@ -4454,11 +4454,13 @@
       "antagonists": [
         "eucalyptus_globulus"
       ],
-      "valor_pedagogico": "Arquitecto del bosque de niebla. Sustituto ideal del eucalipto para recuperar la humedad en las quebradas de Choachí.",
-      "source_ids": [
-        "humboldt-flora-alto-andina",
-        "sib-colombia"
-      ],
+       "valor_pedagogico": "Weinmannia tomentosa (Encenillo) es una especie nativa andina distribuida en los departamentos de Cundinamarca, Boyacá, Antioquia y Nariño entre 2000 y 3500 msnm en zonas térmicas frías. Su manejo agronómico incluye propagación por semilla que requiere sustrato con micorrizas del bosque nativo para germinación exitosa, ciclo de crecimiento lento asociado a especies nurse como Alnus acuminata y Quercus humboldtii, y presenta resistencia natural a plagas foliares gracias a sus compuestos tanínicos. En el contexto cultural muisca, esta especie era utilizada tradicionalmente en la preparación de infusiones medicinales para tratar afecciones respiratorias y como fuente de taninos para curtido de cueros, conocimientos validados por estudios etnoecológicos en el altiplano cundiboyacense. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Weinmannia tomentosa L. f.",
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-sol-andina",
+         "ica-resolucion-3168-2015"
+       ],
       "validation_level": "claude_draft",
       "estrato": "medio"
     },
