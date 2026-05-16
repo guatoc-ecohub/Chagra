@@ -2964,16 +2964,18 @@
       "radiacion": "sol_pleno",
       "agua": "medio",
       "drenaje_requerido": "excelente",
-      "propagation": {
-        "metodo_principal": "semilla",
-        "notas": "Siembra directa siempre; el rábano no tolera el trasplante de su raíz."
-      },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015",
-        "restrepo-1996-abc-agricultura-organica"
-      ],
-      "valor_pedagogico": "Ciclo más corto del huerto (3-5 semanas): ideal como primer cultivo para niños y como indicador de compactación del suelo."
+       "propagation": {
+         "metodo_principal": "semilla",
+         "notas": "Siembra directa siempre; el rábano no tolera el trasplante de su raíz."
+       },
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-sol-andina",
+         "ica-resolucion-3168-2015",
+         "nrc-1989-cultivos-andinos"
+       ],
+       "valor_pedagogico": "El rábano (Raphanus sativus L.) se cultiva en diversos departamentos de Colombia incluyendo Cundinamarca, Boyacá, Antioquia y Nariño entre 800 y 3000 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por siembra directa siempre (no tolera trasplante), ciclo de cultivo muy corto de 3-5 semanas, asociaciones beneficiosas con lechuga y zanahoria que ayudan a marcar las líneas de siembra, y requiere manejo de plagas como pulgones y gorgojos mediante monitoreo y biopreparados andinos. En el contexto campesino andino, esta hortaliza ha sido utilizada tradicionalmente en ensaladas y guarniciones como alimento rápido y nutritivo, aprovechando su ciclo corto para rotaciones frecuentes en las chagras de altura. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Raphanus sativus L."
     },
     {
       "id": "rosmarinus_officinalis",
