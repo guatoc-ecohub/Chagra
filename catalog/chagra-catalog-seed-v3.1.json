@@ -142,17 +142,18 @@
       },
       "radiacion": "sol_pleno",
       "agua": "medio",
-      "drenaje_requerido": "excelente",
-      "propagation": {
-        "metodo_principal": "semilla",
-        "notas": "En la chagra chiguana se prefiere la siembra por bulbitos (cebollín de siembra) para acelerar el ciclo."
-      },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015",
-        "restrepo-1996-abc-agricultura-organica"
-      ],
-      "valor_pedagogico": "Lección de estratificación: enseña cómo la planta acumula reservas en capas (túnicas) para sobrevivir a periodos adversos."
+       "drenaje_requerido": "excelente",
+       "propagation": {
+         "metodo_principal": "semilla",
+         "notas": "En la chagra chiguana se prefiere la siembra por bulbitos (cebollín de siembra) para acelerar el ciclo."
+       },
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-sol-andina",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "La cebolla cabezona (Allium cepa L.) se cultiva en diversos departamentos de Colombia, incluyendo Cundinamarca, Boyacá, Nariño y Antioquia, entre 0 y 3500 msnm, con óptimo entre 1500 y 2800 msnm en zonas térmicas frías y templadas. Su manejo agronómico incluye propagación por semilla o bulbitos (cebollín de siembra) para acelerar el ciclo, con un ciclo vegetativo de 90-120 días, asociaciones beneficiosas con zanahoria y lechuga que mejoran la salud del huerto, y requiere manejo de plagas como trips, minadores de hojas y áfidos mediante monitoreo frecuente y biopreparados andinos. En el contexto campesino andino, esta hortaliza ha sido tradicionalmente utilizada en guisos, sopros y ensaladas como ingrediente esencial, preservando sabores prehispánicos en las cocinas rurales. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Allium cepa L."
     },
     {
       "id": "allium_fistulosum",
