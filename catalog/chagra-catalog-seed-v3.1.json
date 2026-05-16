@@ -2225,16 +2225,17 @@
       "radiacion": "sol_pleno",
       "agua": "medio",
       "drenaje_requerido": "excelente",
-      "propagation": {
-        "metodo_principal": "semilla",
-        "notas": "Polinización manual a menudo necesaria para alta producción; muy sensible al frío."
-      },
-      "source_ids": [
-        "powo-kew",
-        "sib-colombia",
-        "gbif-taxonomic-backbone"
-      ],
-      "valor_pedagogico": "Lección de gradiente térmico: contraste de requerimientos calurosos frente a sus parientes andinos (gulupa/curuba)."
+       "propagation": {
+         "metodo_principal": "semilla",
+         "notas": "Polinización manual a menudo necesaria para alta producción; muy sensible al frío."
+       },
+       "source_ids": [
+         "powo-kew",
+         "gbif-taxonomic-backbone",
+         "agrosavia-sol-andina",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "La Passiflora edulis f. flavicarpa, conocida como maracuyá amarilla, se cultiva en departamentos colombianos como Antioquia, Cundinamarca, Santander y el Valle del Cauca entre 0 y 1800 msnm en zonas térmicas cálidas y templadas. Su manejo agronómico incluye propagación por semilla o injerto, ciclo productivo de 18-24 meses, asociaciones beneficiosas con cultivos de sombra como plátano y caucho para reducir estrés hídrico, y requiere manejo de plagas como la mosca de la fruta (Ceratitis capitata) y ácaros mediante monitoreo y biopreparados. En el contexto andino-colombiano, aunque originaria de Brasil, su cultivo se ha integrado en sistemas agrofrutícolas de mediana altura, contribuyendo a la diversificación económica de pequeños productores. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Passiflora edulis f. flavicarpa Deg."
     },
     {
        "id": "passiflora_edulis_morada",
