@@ -3945,11 +3945,13 @@
         "metodo_principal": "tuberculo",
         "notas": "Variedades de colores vibrantes; requiere suelos con alto contenido de materia orgánica para un desarrollo óptimo."
       },
-      "source_ids": [
-        "agrosavia-manual-tuberculos-andinos-2017",
-        "gbif-taxonomic-backbone"
-      ],
-      "valor_pedagogico": "La joya polícroma del altiplano. Resistente a heladas que quemarían otros cultivos; esencial para el chiguano de páramo."
+       "source_ids": [
+         "agrosavia-manual-tuberculos-andinos-2017",
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "El ulluco (Ullucus tuberosus Caldas) es un tubérculo andino cultivado en Colombia principalmente en los departamentos de Cundinamarca, Boyacá y Nariño entre 1800 y 3400 msnm en zonas térmicas frías. Su manejo agronómico incluye propagación mediante tubérculos semilla con un ciclo de cultivo de 6-8 meses, requiere suelos con alto contenido de materia orgánica para un desarrollo óptimo, se asocia beneficiosamente con maíz y haba en sistemas de cultivo mixto, y requiere manejo de plagas como el gorgojo del ulluco y enfermedades como el mildiu mediante rotación de cultivos y uso de biopreparados andinos. En el contexto cultural andino, especialmente muisca, el ulluco ha sido cultivado desde tiempos prehispánicos como alimento esencial en la dieta campesino, utilizado tanto en su forma fresca en guisos y sopas como en forma seca para conservación, formando parte de la chagra tradicional como uno de los tubérculos originarios de los Andes. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Ullucus tuberosus Caldas."
     },
     {
       "id": "urtica_dioica",
