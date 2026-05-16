@@ -34,7 +34,7 @@
       "distancia_plantas": "0.5 m",
       "tutorado_campo": "Espaldera colombiana — poste cada 4 m + alambre superior + hilo individual",
       "rotacion_critica": "ICA Antioquia (1980, 1981) demuestra que el limitante NO es fertilización sino enfermedad y rotación. Barbecho o rotación con leguminosa/maíz mínimo 2 ciclos antes de retornar tomate al lote.",
-      "trichoderma_pre": "Inoculación masiva de camas con Trichoderma spp. semanas antes del trasplante — destruye hifas de Fusarium y Rhizoctonia"
+      "trichoderma_pre": "Aplicar mucho Trichoderma (un hongo bueno) en las camas de siembra, semanas antes del trasplante — el Trichoderma se come a los hongos malos Fusarium y Rhizoctonia"
     }
   },
   "milestones": [
@@ -71,59 +71,59 @@
   ],
   "failure_modes": [
     {
-      "razon": "Pudrición apical (blossom end rot)",
-      "cuando": "Expansión del fruto",
-      "sintoma": "Mancha necrótica coriácea, hundida y oscura en cicatriz pistilar",
-      "agente_causal": "Falla en translocación de calcio inducida por estrés hídrico transitorio",
-      "mitigacion": "Sincronización impecable de riegos diarios + aportes tempranos de roca calcárea + mulch para estabilizar humedad",
+      "razon": "Culo negro del tomate (Pudrición apical / Blossom end rot)",
+      "cuando": "Cuando el fruto está creciendo",
+      "sintoma": "En la puntita del tomate (donde estuvo la flor) aparece una mancha oscura, hundida y dura como cuero",
+      "agente_causal": "Al tomate le falta calcio porque el riego es irregular",
+      "mitigacion": "Riega todos los días a la misma hora sin saltarte ningún día. Echa harina de roca calcárea desde el comienzo. Cubre el suelo con paja para que la humedad sea pareja.",
       "frecuencia": "muy_comun"
     },
     {
       "razon": "Tizón tardío (Phytophthora infestans)",
-      "cuando": "Vegetativo a cosecha",
-      "sintoma": "Manchas oleosas que se necrosan, micelio blanco en envés foliar, frutos con manchas pardas",
-      "agente_causal": "Condiciones frescas-húmedas (frío, templado alto)",
-      "mitigacion": "Caldo bordelés preventivo 0.5%, distanciamiento 1.5m entre surcos, evitar mojado foliar (riego por goteo). NO sembrar cerca de cultivos de papa",
+      "cuando": "Desde que crece hasta la cosecha",
+      "sintoma": "Manchas que parecen aceitosas y se vuelven oscuras. Pelusa blanca debajo de las hojas. Manchas marrones en los frutos.",
+      "agente_causal": "Pasa cuando hace fresco y hay mucha humedad",
+      "mitigacion": "Aplica caldo bordelés al 0.5% como prevención. Deja 1.5 m entre filas de plantas. No mojes las hojas (usa riego por goteo). NO siembres tomate cerca de papa.",
       "frecuencia": "muy_comun"
     },
     {
-      "razon": "Mosca blanca (Trialeurodes vaporariorum) + Fumagina",
-      "cuando": "Vegetativo a cosecha",
-      "sintoma": "Follaje recubierto de costras de polvo negro (fumagina), clorosis severa generalizada",
-      "agente_causal": "Excreción de melaza por mosca blanca permite crecimiento de hongos saprófitos",
-      "mitigacion": "Trampas cromáticas amarillas DENSAS, aspersión de fermento M-5 al 10-20%, encierro fitosanitario en invernadero",
+      "razon": "Mosca blanca (Trialeurodes vaporariorum) + Fumagina (hongo negro)",
+      "cuando": "Desde que crece hasta la cosecha",
+      "sintoma": "Las hojas se ven cubiertas de un polvo negro (fumagina). Las hojas se ponen amarillas por toda la planta.",
+      "agente_causal": "La mosca blanca suelta un líquido dulce sobre las hojas y encima crece un hongo negro",
+      "mitigacion": "Pon muchas trampas amarillas pegajosas. Rocía fermento M-5 al 10-20%. Si tienes invernadero, ciérralo bien.",
       "frecuencia": "comun"
     },
     {
-      "razon": "Begomovirus (PYMV / TYLCV)",
-      "cuando": "Cualquier estadio",
-      "sintoma": "Enanismo, hojas amarillentas con enrollamiento ascendente, cuajado pobre",
-      "agente_causal": "Transmitidos por Bemisia tabaci. Hospederos arvenses: Desmodium, Amaranthus, Lantana camara (Vaca-Vaca et al. 2012 UNAL Palmira)",
-      "mitigacion": "Control de mosca blanca. Eliminación de arvenses hospederas en bordes del lote. Variedades con tolerancia (Tequila, Calima)",
+      "razon": "Virus del enrollado del tomate (Begomovirus PYMV / TYLCV)",
+      "cuando": "En cualquier momento del ciclo",
+      "sintoma": "La planta no crece, las hojas se ponen amarillas y se enrollan hacia arriba, los tomates no se forman bien",
+      "agente_causal": "Lo transmite la mosca blanca (Bemisia tabaci). Vive en malezas vecinas como Desmodium, Amaranthus y Lantana camara",
+      "mitigacion": "Controla la mosca blanca. Quita las malezas alrededor del cultivo. Usa variedades resistentes (Tequila, Calima).",
       "frecuencia": "comun"
     },
     {
-      "razon": "Marchitez vascular (Fusarium / Verticillium)",
-      "cuando": "Crecimiento vegetativo",
-      "sintoma": "Clorosis asimétrica progresiva, taponamiento del xilema, colapso estructural irreversible",
-      "agente_causal": "Hongos edáficos habitantes crónicos",
-      "mitigacion": "Rotación inter-anual de familias botánicas (evitar solanáceas consecutivas). Uso de Trichoderma. Variedades resistentes con genes I/Ve",
+      "razon": "Marchitez vascular (hongos Fusarium / Verticillium)",
+      "cuando": "Cuando la planta está creciendo",
+      "sintoma": "Las hojas se ponen amarillas de a poquito, los tubos por donde sube el agua dentro de la planta se tapan, la planta se cae y no se recupera",
+      "agente_causal": "Hongos que viven en el suelo por muchos años",
+      "mitigacion": "Cada año cambia el tipo de planta que siembras en el mismo terreno (no repitas tomate, papa, berenjena ni pimentón). Aplica Trichoderma al suelo. Usa variedades resistentes con genes I/Ve.",
       "frecuencia": "ocasional"
     }
   ],
   "companions": [
-    { "especie": "Ocimum basilicum (albahaca)", "razon": "Eugenoles y linaloles evaporados desestabilizan señales quimiotácticas de dípteros. Priming sistémico de respuesta a heridas mediado por compuestos volátiles", "evidencia": "Suzuki et al. NIH PMC11263239 — evidencia experimental publicada" },
-    { "especie": "Calendula officinalis + Tagetes patula (caléndulas)", "razon": "Plantas trampa para nemátodos Meloidogyne. Atracción de polinizadores", "evidencia": "literatura experimental" },
-    { "especie": "Daucus carota (zanahoria)", "razon": "Complementariedad radicular", "evidencia": "tradicion" },
-    { "especie": "Allium cepa + sativum (cebolla, ajo)", "razon": "Repelencia de áfidos por compuestos azufrados", "evidencia": "tradicion + literatura" },
-    { "especie": "Borago officinalis (borraja)", "razon": "Repele Manduca quinquemaculata (gusano cachón)", "evidencia": "literatura agronomica" }
+    { "especie": "Albahaca (Ocimum basilicum)", "razon": "Su olor confunde a las moscas y las plagas para que no encuentren el tomate. También avisa a la planta para defenderse cuando es atacada.", "evidencia": "Suzuki et al. NIH PMC11263239 — evidencia experimental publicada" },
+    { "especie": "Caléndulas (Calendula officinalis + Tagetes patula)", "razon": "Atraen a los nematodos (gusanitos del suelo) y los engañan. Atraen abejas y mariposas que polinizan.", "evidencia": "literatura experimental" },
+    { "especie": "Zanahoria (Daucus carota)", "razon": "Sus raíces van más profundo y no pelean con las del tomate", "evidencia": "tradicion" },
+    { "especie": "Cebolla y ajo (Allium cepa + sativum)", "razon": "Su olor a azufre espanta a los pulgones", "evidencia": "tradicion + literatura" },
+    { "especie": "Borraja (Borago officinalis)", "razon": "Espanta al gusano cachón del tomate (Manduca quinquemaculata)", "evidencia": "literatura agronomica" }
   ],
   "antagonistas": [
-    { "especie": "Foeniculum vulgare (hinojo)", "razon": "Alelopatía severa" },
-    { "especie": "Solanum tuberosum (papa)", "razon": "Comparte Phytophthora infestans — corredor epidemiológico crítico" },
-    { "especie": "Solanum melongena (berenjena), Capsicum annuum (pimentón)", "razon": "Solanáceas — comparten Begomovirus + tizón + Fusarium" },
-    { "especie": "Cucumis sativus (pepino)", "razon": "Vectores comunes (mosca blanca, ácaros)" },
-    { "especie": "Juglans (nogal)", "razon": "Juglona alelopática" }
+    { "especie": "Hinojo (Foeniculum vulgare)", "razon": "Suelta sustancias fuertes que no dejan crecer al tomate" },
+    { "especie": "Papa (Solanum tuberosum)", "razon": "Comparten el hongo Phytophthora infestans — se contagian fácilmente" },
+    { "especie": "Berenjena (Solanum melongena), Pimentón (Capsicum annuum)", "razon": "Son de la misma familia que el tomate — comparten virus, tizón y Fusarium" },
+    { "especie": "Pepino (Cucumis sativus)", "razon": "Comparten plagas (mosca blanca, ácaros)" },
+    { "especie": "Nogal (Juglans)", "razon": "Suelta juglona, sustancia que afecta al tomate" }
   ],
   "biopreparados": [
     { "nombre": "M-5 (insecticida orgánico)", "uso": "Decocción anaeróbica de ajo + ají + cebolla + aromáticas + alcohol fermentados 30 días. Asperjar canopia al 5-20% (400 ml a 2 L por bomba 20 L)", "fuente": "manuales agroecologicos colombianos" },
