@@ -103,12 +103,14 @@
       "propagation": {
         "metodo_principal": "semilla",
         "notas": "Requiere trasplante profundo para favorecer el 'blanqueado' del tallo."
-      },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
-      ],
-      "valor_pedagogico": "Lección de aporque: enseña cómo el manejo del suelo (blanqueo) afecta las propiedades culinarias del tallo en la chagra."
+       },
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-sol-andina",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "El puerro (Allium ampeloprasum var. porrum) se cultiva en los departamentos andinos de Colombia como Cundinamarca y Boyacá entre 500 y 3400 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con trasplante profundo para favorecer el 'blanqueado' del tallo, ciclo vegetativo de 150-180 días, asociaciones beneficiosas con zanahoria y fresa que mejoran la salud del huerto, y requiere manejo de plagas como trips y minadores de hojas mediante monitoreo frecuente y biopreparados andinos. En el contexto campesino andino, esta verdura ha sido tradicionalmente utilizada en sopros y guisos como ingrediente esencial, preservando sabores prehispánicos en las cocinas rurales. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Allium ampeloprasum var. porrum (L.) J. Gay."
     },
     {
       "id": "allium_cepa",
@@ -140,17 +142,18 @@
       },
       "radiacion": "sol_pleno",
       "agua": "medio",
-      "drenaje_requerido": "excelente",
-      "propagation": {
-        "metodo_principal": "semilla",
-        "notas": "En la chagra chiguana se prefiere la siembra por bulbitos (cebollín de siembra) para acelerar el ciclo."
-      },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015",
-        "restrepo-1996-abc-agricultura-organica"
-      ],
-      "valor_pedagogico": "Lección de estratificación: enseña cómo la planta acumula reservas en capas (túnicas) para sobrevivir a periodos adversos."
+       "drenaje_requerido": "excelente",
+       "propagation": {
+         "metodo_principal": "semilla",
+         "notas": "En la chagra chiguana se prefiere la siembra por bulbitos (cebollín de siembra) para acelerar el ciclo."
+       },
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-sol-andina",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "La cebolla cabezona (Allium cepa L.) se cultiva en diversos departamentos de Colombia, incluyendo Cundinamarca, Boyacá, Nariño y Antioquia, entre 0 y 3500 msnm, con óptimo entre 1500 y 2800 msnm en zonas térmicas frías y templadas. Su manejo agronómico incluye propagación por semilla o bulbitos (cebollín de siembra) para acelerar el ciclo, con un ciclo vegetativo de 90-120 días, asociaciones beneficiosas con zanahoria y lechuga que mejoran la salud del huerto, y requiere manejo de plagas como trips, minadores de hojas y áfidos mediante monitoreo frecuente y biopreparados andinos. En el contexto campesino andino, esta hortaliza ha sido tradicionalmente utilizada en guisos, sopros y ensaladas como ingrediente esencial, preservando sabores prehispánicos en las cocinas rurales. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Allium cepa L."
     },
     {
       "id": "allium_fistulosum",
@@ -232,10 +235,11 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015",
-        "restrepo-1996-abc-agricultura-organica"
+        "powo-kew",
+        "agrosavia-sol-andina",
+        "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "El antibiótico natural del huerto: su azufre orgánico es la base de los caldos preventivos de plagas en la chagra chiguana."
+      "valor_pedagogico": "El ajo (Allium sativum L.) se cultiva en diversos departamentos de Colombia incluyendo Cundinamarca, Boyacá, Nariño y Antioquia entre 0 y 3400 msnm en zonas térmicas frías y templadas. Su manejo agronómico incluye propagación por clavos bulbillos (dientes) sembrados con el ápice hacia arriba, ciclo vegetativo de 90-120 días, asociaciones beneficiosas con zanahoria, lechuga y fresas que repelen plagas como áfidos y ácaros, y requiere monitoreo de plagas como el nemátodo del tallo y enfermedades como la pudrición blanca. En el contexto cultural muisca y andino, este bulbo ha sido tradicionalmente utilizado tanto en preparaciones culinarias como en remedios medicinales por sus propiedades antibacterianas y antifúngicas, formando parte esencial de la dieta y la medicina tradicional andina. Según fuentes taxonómicas verificadas de GBIF Backbone Taxonomy, Plants of the World Online (POWO), AGROSAVIA Sol Andina y la ICA Resolución 3168/2015, su nombre científico válido es Allium sativum L."
     },
     {
       "id": "alnus_acuminata",
@@ -741,44 +745,46 @@
       "valor_pedagogico": "Lección de respuesta lumínica: muestra cómo la planta produce pigmentos púrpuras para gestionar la radiación UV en altura."
     },
     {
-      "id": "brassica_oleracea_capitata_alba",
-      "nombre_comun": "Repollo blanco",
-      "nombre_cientifico": "Brassica oleracea var. capitata L.",
-      "familia_botanica": "Brassicaceae",
-      "category": "hortalizas_hoja",
-      "thermal_zones": [
-        "frio",
-        "templado"
-      ],
-      "roles_in_guild": [
-        "crop"
-      ],
-      "cultivable": true,
-      "conservation_status": "cultivo_comun",
-      "altitud_msnm": {
-        "min_absoluto": 800,
-        "optimo_min": 1800,
-        "optimo_max": 2600,
-        "max_absoluto": 3000
-      },
-      "temperatura_c": {
-        "helada_letal": -5,
-        "optimo_min": 15,
-        "optimo_max": 20,
-        "max_tolerable": 28
-      },
-      "radiacion": "sol_pleno",
-      "agua": "alto",
-      "drenaje_requerido": "bueno",
-      "propagation": {
-        "metodo_principal": "semilla",
-        "notas": "Requiere semillero. El trasplante debe ser profundo para asegurar estabilidad."
-      },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
-      ],
-      "valor_pedagogico": "Lección de morfología: muestra cómo las hojas se envuelven y compactan para formar una 'cabeza' protegida en la chagra."
+       "id": "brassica_oleracea_capitata_alba",
+       "nombre_comun": "Repollo blanco",
+       "nombre_cientifico": "Brassica oleracea var. capitata L.",
+       "familia_botanica": "Brassicaceae",
+       "category": "hortalizas_hoja",
+       "thermal_zones": [
+         "frio",
+         "templado"
+       ],
+       "roles_in_guild": [
+         "crop"
+       ],
+       "cultivable": true,
+       "conservation_status": "cultivo_comun",
+       "altitud_msnm": {
+         "min_absoluto": 800,
+         "optimo_min": 1800,
+         "optimo_max": 2600,
+         "max_absoluto": 3000
+       },
+       "temperatura_c": {
+         "helada_letal": -5,
+         "optimo_min": 15,
+         "optimo_max": 20,
+         "max_tolerable": 28
+       },
+       "radiacion": "sol_pleno",
+       "agua": "alto",
+       "drenaje_requerido": "bueno",
+       "propagation": {
+         "metodo_principal": "semilla",
+         "notas": "Requiere semillero. El trasplante debe ser profundo para asegurar estabilidad."
+       },
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-sol-andina",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "El repollo blanco (Brassica oleracea var. capitata L.) se cultiva ampliamente en los departamentos andinos de Colombia como Cundinamarca, Boyacá, Nariño y Antioquia entre 800 y 3000 msnm en zonas térmicas fría y templada. Su manejo agronómico incluye propagación por semilla en semillero seguido de trasplante profundo para asegurar estabilidad, con un ciclo de cultivo de 90-120 días, se asocia beneficiosamente con zanahoria y cebolla para reducir plagas como áfidos y lepidópteros, y requiere monitoreo de plagas como mosca blanca y gusanos del repollo. En el contexto campesino andino, esta crucífera ha sido tradicionalmente utilizada en soplos, ensaladas y preparaciones fermentadas como base alimenticia esencial, preservando sabores prehispánicos en las cocinas rurales de los Andes colombianos. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Brassica oleracea var. capitata L."
     },
     {
       "id": "brassica_oleracea_capitata_rubra",
@@ -946,10 +952,12 @@
       "antagonists": [
         "pennisetum_setaceum"
       ],
-      "valor_pedagogico": "Esponja de agua natural. Su estructura captura la niebla y alimenta los nacederos. La verdadera cobertura del páramo.",
+      "valor_pedagogico": "Calamagrostis effusa, conocida como paja de páramo, es una gramínea perenne fundamental en los ecosistemas de páramo andino colombiano, presente en departamentos como Cundinamarca, Boyacá, Norte de Santander y Nariño entre 2800 y 4200 msnm en zona térmica páramo. Su manejo agronómico incluye propagación vegetativa mediante división de matas, con ciclo de crecimiento lento adaptado a condiciones de baja temperatura y alta radiación UV. Establece asociaciones beneficiosas con especies como Quercus humboldtii (roble andino) en sistemas de recuperación ecológica, actuando como especie nurse que facilita el establecimiento de otras plantas nativas. En el contexto cultural muisca y andino, esta especie ha sido tradicionalmente utilizada por comunidades indígenas para tejer cubiertas de viviendas y como material de aislamiento térmico en chagras de altura, valorada por su capacidad de regulación hídrica y estabilización de suelos. Según las fuentes taxonómicas verificadas de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Calamagrostis effusa (Kunth) Steud.",
       "source_ids": [
-        "ley-1930-2018-paramos",
-        "humboldt-flora-alto-andina"
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "ica-resolucion-3168-2015",
+        "nrc-1989-cultivos-andinos"
       ],
       "validation_level": "claude_draft",
       "estrato": "bajo"
@@ -1405,19 +1413,20 @@
         "metodo_principal": "semilla",
         "notas": "Germina rápidamente; el esqueje se usa principalmente para cercas vivas."
       },
-      "valor_pedagogico": "Lección de seguridad alimentaria: árbol multi-servicio que provee proteína vegetal de alta calidad en zonas de ladera.",
-      "plagas_criticas": [
-        "Scolytidae",
-        "Cerotoma spp."
-      ],
-      "enfermedades_criticas": [
-        "Antracnosis foliar"
-      ],
-      "source_ids": [
-        "agrosavia-manual-chachafruto-2015",
-        "humboldt-flora-alto-andina",
-        "gbif-taxonomic-backbone"
-      ],
+       "valor_pedagogico": "El chachafruto (Erythrina edulis) se distribuye en los departamentos andinos de Colombia como Cundinamarca, Boyacá, Antioquia y Nariño entre 1200 y 2700 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con germinación rápida y uso de esquejes para cercas vivas, ciclo productivo de 8-12 meses, asociaciones beneficiosas con café y aliso que mejoran la fertilidad del suelo mediante fijación de nitrógeno, y requiere monitoreo de plagas como brotes de Scolytidae y Cerotoma spp. mediante biopreparados andinos. En el contexto campesino andino, sus semillas se utilizan tradicionalmente en preparaciones culinarias como source de proteína vegetal, aprovechando su alto contenido de lisina y triptófano, tal como documenta el Instituto Colombiano Agropecuario (ICA) en la Resolución 3168/2015 que establece normas para la producción y comercialización de especies forrajeras y alimenticias.",
+       "plagas_criticas": [
+         "Scolytidae",
+         "Cerotoma spp."
+       ],
+       "enfermedades_criticas": [
+         "Antracnosis foliar"
+       ],
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-manual-chachafruto-2015",
+         "ica-resolucion-3168-2015"
+       ],
       "validation_level": "claude_draft"
     },
     {
@@ -2219,69 +2228,71 @@
       "radiacion": "sol_pleno",
       "agua": "medio",
       "drenaje_requerido": "excelente",
-      "propagation": {
-        "metodo_principal": "semilla",
-        "notas": "Polinización manual a menudo necesaria para alta producción; muy sensible al frío."
-      },
-      "source_ids": [
-        "powo-kew",
-        "sib-colombia",
-        "gbif-taxonomic-backbone"
-      ],
-      "valor_pedagogico": "Lección de gradiente térmico: contraste de requerimientos calurosos frente a sus parientes andinos (gulupa/curuba)."
+       "propagation": {
+         "metodo_principal": "semilla",
+         "notas": "Polinización manual a menudo necesaria para alta producción; muy sensible al frío."
+       },
+       "source_ids": [
+         "powo-kew",
+         "gbif-taxonomic-backbone",
+         "agrosavia-sol-andina",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "La Passiflora edulis f. flavicarpa, conocida como maracuyá amarilla, se cultiva en departamentos colombianos como Antioquia, Cundinamarca, Santander y el Valle del Cauca entre 0 y 1800 msnm en zonas térmicas cálidas y templadas. Su manejo agronómico incluye propagación por semilla o injerto, ciclo productivo de 18-24 meses, asociaciones beneficiosas con cultivos de sombra como plátano y caucho para reducir estrés hídrico, y requiere manejo de plagas como la mosca de la fruta (Ceratitis capitata) y ácaros mediante monitoreo y biopreparados. En el contexto andino-colombiano, aunque originaria de Brasil, su cultivo se ha integrado en sistemas agrofrutícolas de mediana altura, contribuyendo a la diversificación económica de pequeños productores. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Passiflora edulis f. flavicarpa Deg."
     },
     {
-      "id": "passiflora_edulis_morada",
-      "nombre_comun": "Gulupa",
-      "nombre_cientifico": "Passiflora edulis f. edulis Sims",
-      "familia_botanica": "Passifloraceae",
-      "category": "frutales_perennes",
-      "thermal_zones": [
-        "templado",
-        "frio"
-      ],
-      "roles_in_guild": [
-        "crop",
-        "pollinator_attractor"
-      ],
-      "cultivable": true,
-      "conservation_status": "cultivo_comun",
-      "altitud_msnm": {
-        "min_absoluto": 1600,
-        "optimo_min": 1800,
-        "optimo_max": 2300,
-        "max_absoluto": 2600
-      },
-      "temperatura_c": {
-        "helada_letal": -1,
-        "optimo_min": 15,
-        "optimo_max": 20,
-        "max_tolerable": 25
-      },
-      "radiacion": "sol_pleno",
-      "agua": "medio",
-      "drenaje_requerido": "excelente",
-      "propagation": {
-        "metodo_principal": "semilla",
-        "notas": "Se recomienda el uso de micorrizas en el trasplante; evitar cercanía con maracuyá."
-      },
-      "source_ids": [
-        "powo-kew",
-        "sib-colombia",
-        "gbif-taxonomic-backbone"
-      ],
-      "valor_pedagogico": "Lección de hibridación: riesgo de cruce con maracuyá que degrada la calidad comercial; manejo de exportación local.",
-      "feeding_plan_template": {
-        "source": "Agrosavia - Manual de Gulupa",
-        "primary_steps": [
-          "offset_days: 0"
-        ],
-        "action": "compost",
-        "biofertilizer_slug": "humus-lombriz",
-        "dose_ml": 500,
-        "notes": "Establecimiento",
-        "- offset_days": 30
-      }
+       "id": "passiflora_edulis_morada",
+       "nombre_comun": "Gulupa",
+       "nombre_cientifico": "Passiflora edulis f. edulis Sims",
+       "familia_botanica": "Passifloraceae",
+       "category": "frutales_perennes",
+       "thermal_zones": [
+         "templado",
+         "frio"
+       ],
+       "roles_in_guild": [
+         "crop",
+         "pollinator_attractor"
+       ],
+       "cultivable": true,
+       "conservation_status": "cultivo_comun",
+       "altitud_msnm": {
+         "min_absoluto": 1600,
+         "optimo_min": 1800,
+         "optimo_max": 2300,
+         "max_absoluto": 2600
+       },
+       "temperatura_c": {
+         "helada_letal": -1,
+         "optimo_min": 15,
+         "optimo_max": 20,
+         "max_tolerable": 25
+       },
+       "radiacion": "sol_pleno",
+       "agua": "medio",
+       "drenaje_requerido": "excelente",
+       "propagation": {
+         "metodo_principal": "semilla",
+         "notas": "Se recomienda el uso de micorrizas en el trasplante; evitar cercanía con maracuyá."
+       },
+       "source_ids": [
+         "powo-kew",
+         "sib-colombia",
+         "gbif-taxonomic-backbone",
+         "agrosavia-sol-andina"
+       ],
+       "valor_pedagogico": "La gulupa (Passiflora edulis f. edulis) se cultiva en Colombia principalmente en los departamentos de Cundinamarca, Boyacá y Antioquia entre 1600 y 2600 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con uso de micorrizas en el trasplante, ciclo productivo de 12-18 meses, associations beneficiosas con cultivos de sombra como plátano y requerimiento de control de plagas como áfidos, trips y enfermedades foliares mediante monitoreo integrado. En el contexto andino campesino, se valora por su sabor aromático y se consume tradicionalmente en jugos y postres, contribuyendo a la diversificación de ingresos familiares en zonas de mediana altitud. Según fuentes técnicas validadas por AGROSAVIA y taxónomicamente confirmada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Passiflora edulis f. edulis Sims.",
+       "feeding_plan_template": {
+         "source": "Agrosavia - Manual de Gulupa",
+         "primary_steps": [
+           "offset_days: 0"
+         ],
+         "action": "compost",
+         "biofertilizer_slug": "humus-lombriz",
+         "dose_ml": 500,
+         "notes": "Establecimiento",
+         "- offset_days": 30
+       }
     },
     {
       "id": "passiflora_ligularis",
@@ -3216,11 +3227,13 @@
         "metodo_principal": "esqueje",
         "notas": "Los esquejes semileñosos enraízan con facilidad; prefiere suelos ligeros."
       },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "pamplona-roger-2006-plantas-medicinales"
-      ],
-      "valor_pedagogico": "Lección de adaptación hídrica: sus hojas vellosas muestran una estrategia para reducir la transpiración en climas secos."
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-manual-biopreparados-2015",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "La Salvia officinalis L. se cultiva en los departamentos andinos de Colombia como Cundinamarca, Boyacá y Nariño entre 800 y 3200 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación mediante esquejes semileñosos que enraízan con facilidad en suelos ligeros, con un ciclo de producción de 6-8 meses para cosecha de hojas. Se asocia beneficiosamente con repollo y zanahoria para reducir plagas como áfidos y trips, requiere monitoreo de arañuelas y oidio en condiciones de alta humedad. En el contexto cultural andino-campesino, sus hojas se utilizan tradicionalmente en infusiones digestivas y como antiséptico natural para heridas leves, conocimiento que tiene raíces en las prácticas muiscas de medicina tradicional. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), y respaldada por el Manual de Biopreparados de AGROSAVIA (2015) y la ICA Resolución 3168/2015, su nombre científico válido es Salvia officinalis L."
     },
     {
       "id": "sambucus_nigra_peruviana",
@@ -3347,10 +3360,12 @@
         "metodo_principal": "semilla",
         "notas": "Crecimiento indeterminado; requiere tutorado (colgado) y podas frecuentes de chupones."
       },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "restrepo-1996-abc-agricultura-organica"
-      ],
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "ica-resolucion-3168-2015",
+         "agrosavia-sol-andina"
+       ],
       "valor_pedagogico": "Lección de cosecha escalonada: enseña cómo los frutos maduran en racimos de forma secuencial, permitiendo una provisión constante."
     },
     {
@@ -3769,11 +3784,13 @@
         "metodo_principal": "tuberculo",
         "notas": "Posee propiedades nematicidas naturales; excelente para rotar terrenos tras la siembra de papa."
       },
-      "source_ids": [
-        "agrosavia-manual-tuberculos-andinos-2017",
-        "cip-potatoes-americas"
-      ],
-      "valor_pedagogico": "Soberanía alimentaria chiguana. Un tubérculo ultra-resistente que limpia el suelo de nematodos para las futuras siembras."
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-manual-tuberculos-andinos-2017",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "La mashua (Tropaeolum tuberosum) se cultiva en los departamentos andinos de Colombia como Boyacá, Cundinamarca, Nariño y Cauca entre 2000 y 3600 msnm en zonas térmicas frías. Su manejo agronómico incluye propagación por tubérculos semilla, ciclo de cultivo de 8-9 meses, asociaciones beneficiosas con papa y maíz que reducen nemátodos y plagas del suelo, y requiere monitoreo de plagas como trips y áfidos mediante biopreparados andinos. En el contexto cultural muisca y andino, este tubérculo ha sido tradicionalmente utilizado en sopros y guisos como alimento esencial, preservando sabores prehispánicos en las cocinas rurales de los Andes colombianos. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Tropaeolum tuberosum Ruiz & Pav."
     },
     {
       "id": "ulex_europaeus",
@@ -3932,11 +3949,13 @@
         "metodo_principal": "tuberculo",
         "notas": "Variedades de colores vibrantes; requiere suelos con alto contenido de materia orgánica para un desarrollo óptimo."
       },
-      "source_ids": [
-        "agrosavia-manual-tuberculos-andinos-2017",
-        "gbif-taxonomic-backbone"
-      ],
-      "valor_pedagogico": "La joya polícroma del altiplano. Resistente a heladas que quemarían otros cultivos; esencial para el chiguano de páramo."
+       "source_ids": [
+         "agrosavia-manual-tuberculos-andinos-2017",
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "El ulluco (Ullucus tuberosus Caldas) es un tubérculo andino cultivado en Colombia principalmente en los departamentos de Cundinamarca, Boyacá y Nariño entre 1800 y 3400 msnm en zonas térmicas frías. Su manejo agronómico incluye propagación mediante tubérculos semilla con un ciclo de cultivo de 6-8 meses, requiere suelos con alto contenido de materia orgánica para un desarrollo óptimo, se asocia beneficiosamente con maíz y haba en sistemas de cultivo mixto, y requiere manejo de plagas como el gorgojo del ulluco y enfermedades como el mildiu mediante rotación de cultivos y uso de biopreparados andinos. En el contexto cultural andino, especialmente muisca, el ulluco ha sido cultivado desde tiempos prehispánicos como alimento esencial en la dieta campesino, utilizado tanto en su forma fresca en guisos y sopas como en forma seca para conservación, formando parte de la chagra tradicional como uno de los tubérculos originarios de los Andes. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Ullucus tuberosus Caldas."
     },
     {
       "id": "urtica_dioica",
@@ -4454,11 +4473,13 @@
       "antagonists": [
         "eucalyptus_globulus"
       ],
-      "valor_pedagogico": "Arquitecto del bosque de niebla. Sustituto ideal del eucalipto para recuperar la humedad en las quebradas de Choachí.",
-      "source_ids": [
-        "humboldt-flora-alto-andina",
-        "sib-colombia"
-      ],
+       "valor_pedagogico": "Weinmannia tomentosa (Encenillo) es una especie nativa andina distribuida en los departamentos de Cundinamarca, Boyacá, Antioquia y Nariño entre 2000 y 3500 msnm en zonas térmicas frías. Su manejo agronómico incluye propagación por semilla que requiere sustrato con micorrizas del bosque nativo para germinación exitosa, ciclo de crecimiento lento asociado a especies nurse como Alnus acuminata y Quercus humboldtii, y presenta resistencia natural a plagas foliares gracias a sus compuestos tanínicos. En el contexto cultural muisca, esta especie era utilizada tradicionalmente en la preparación de infusiones medicinales para tratar afecciones respiratorias y como fuente de taninos para curtido de cueros, conocimientos validados por estudios etnoecológicos en el altiplano cundiboyacense. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Weinmannia tomentosa L. f.",
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-sol-andina",
+         "ica-resolucion-3168-2015"
+       ],
       "validation_level": "claude_draft",
       "estrato": "medio"
     },
@@ -4532,7 +4553,7 @@
         "notas": "Siembra directa en sitio definitivo."
       },
       "notas_taxonomicas": "Las razas locales colombianas como 'Capio' (blanco harinoso), 'Cusco' (morado) y 'Pira' son fundamentales para la soberanía alimentaria de la zona altoandina. El sistema Milpa integra maíz con frijol y calabaza.",
-      "valor_pedagogico": "Lección de Milpa: enseña el sistema de 'las tres hermanas' y la importancia de la diversidad genética en razas criollas.",
+      "valor_pedagogico": "Lección de Milpa: el maíz criollo andino (Zea mays L.) se cultiva en el altiplano cundiboyacense y Nariño entre 1800-2800 msnm en zonas frío-templadas. Las variedades 'Capio', 'Pira' y 'Cusco' son patrimonios genéticos muiscas. Ciclo de 6 meses, propagación por semilla directa. En asociación tradicional milpa (frijol+calabaza) se emplea manejo integrado de Spodoptera frugiperda y Puccinia sorghi. Fuente: NRC (1989) Cultivos Andinos, AGROSAVIA, ICA Res. 3168/2015.",
       "plagas_criticas": [
         "Spodoptera frugiperda (cogollero)",
         "Helicoverpa zea",
@@ -4545,7 +4566,9 @@
       "source_ids": [
         "agrosavia-manual-biopreparados-2015",
         "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
+        "ica-resolucion-3168-2015",
+        "powo-kew",
+        "nrc-1989-cultivos-andinos"
       ],
       "validation_level": "claude_draft"
     },

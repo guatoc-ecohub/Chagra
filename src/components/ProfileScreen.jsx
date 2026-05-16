@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { User, Palette, Briefcase, Save, Check, Mic, Eye } from 'lucide-react';
+import { User, Palette, Briefcase, Save, Check, Mic, Eye, MapPin, Home } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import ThemeSelector from './common/ThemeSelector';
 import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
+import useFincaActiveStore from '../services/fincaActiveStore';
 
 const TTL_OPTIONS = [
   { id: '1d', label: '1 día' },
@@ -205,6 +206,9 @@ export default function ProfileScreen({ onBack, onNavigate }) {
           </button>
         </div>
 
+        {/* Multifinca + GPS Section (062.7 indoor override + 062.8 privacy) */}
+        <MultifincaGpsSection />
+
         {/* App Info Footer */}
         <div className="mt-8 pt-6 border-t border-slate-800/50 text-center">
           <p className="text-[10px] text-slate-600 font-mono tracking-tighter uppercase">
@@ -216,5 +220,126 @@ export default function ProfileScreen({ onBack, onNavigate }) {
         </div>
       </div>
     </ScreenShell>
+  );
+}
+
+/**
+ * MultifincaGpsSection — 062.7 (indoor override) + 062.8 (privacy opt-in).
+ *
+ * Settings que viven en fincaActiveStore (persiste en localStorage vía
+ * zustand middleware, key 'chagra:active-finca'):
+ *   - gpsOverride: si está en true, banner GPS no consulta Geolocation.
+ *   - indoorZone: última zona indoor recordada cuando GPS pierde fix.
+ *   - gpsHistoryEnabled: opt-in para sync GPS history al server (default off).
+ */
+function MultifincaGpsSection() {
+  const {
+    gpsOverride,
+    clearGpsOverride,
+    indoorZone,
+    setIndoorZone,
+    gpsHistoryEnabled,
+    setGpsHistoryEnabled,
+    activeFincaSlug,
+  } = useFincaActiveStore();
+
+  const [indoorInput, setIndoorInput] = useState(indoorZone || '');
+
+  const handleSaveIndoor = () => {
+    const trimmed = indoorInput.trim();
+    setIndoorZone(trimmed.length > 0 ? trimmed : null);
+  };
+
+  return (
+    <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+      <div className="flex items-center gap-2 px-1">
+        <MapPin size={18} className="text-emerald-400" />
+        <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">
+          Multifinca y GPS
+        </h3>
+      </div>
+
+      <p className="text-xs text-slate-500 leading-relaxed">
+        Finca activa: <strong className="text-slate-300">{activeFincaSlug}</strong>.
+        {' '}Cambiala en el banner GPS o el selector de fincas.
+      </p>
+
+      {/* 062.3 / 062.7: si gpsOverride activo, ofrecer volver a auto-detect */}
+      {gpsOverride && (
+        <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-amber-900/20 border border-amber-700/40">
+          <div className="flex flex-col gap-0.5 flex-1">
+            <span className="text-sm font-bold text-amber-200">Modo manual activo</span>
+            <span className="text-[10px] text-amber-300/70">
+              El banner GPS no consultará tu ubicación hasta que vuelvas a modo auto.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={clearGpsOverride}
+            className="px-3 py-1.5 rounded-lg bg-amber-700 hover:bg-amber-600 text-amber-50 text-xs font-bold whitespace-nowrap"
+          >
+            Volver a auto
+          </button>
+        </div>
+      )}
+
+      {/* 062.7: indoor invernadero override */}
+      <label className="flex flex-col gap-2">
+        <span className="text-xs font-bold text-slate-400 uppercase tracking-wide flex items-center gap-1.5">
+          <Home size={12} /> Zona indoor (invernadero)
+        </span>
+        <span className="text-[10px] text-slate-500 leading-relaxed">
+          Cuando estás bajo techo y el GPS pierde fix, Chagra recuerda esta zona
+          para no volver a "out of range". Vacío = sin zona indoor activa.
+        </span>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={indoorInput}
+            onChange={(e) => setIndoorInput(e.target.value)}
+            placeholder="Ej: Invernadero 1, Vivero norte"
+            className="flex-1 p-3 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-white text-base min-h-[48px]"
+          />
+          <button
+            type="button"
+            onClick={handleSaveIndoor}
+            className="px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 text-sm font-bold border border-slate-700 min-h-[48px]"
+          >
+            Guardar
+          </button>
+        </div>
+        {indoorZone && (
+          <p className="text-[10px] text-emerald-400/80">
+            Activo: <strong>{indoorZone}</strong>
+          </p>
+        )}
+      </label>
+
+      {/* 062.8: privacy opt-in GPS history */}
+      <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
+        <div className="flex flex-col gap-0.5 flex-1">
+          <span className="text-sm font-bold text-slate-200">Sincronizar histórico GPS</span>
+          <span className="text-[10px] text-slate-500 leading-snug">
+            Off por default. Cuando activo, Chagra envía tu ubicación al server
+            para análisis multifinca. Off = solo lookup local sin persistencia.
+          </span>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={gpsHistoryEnabled}
+          onClick={() => setGpsHistoryEnabled(!gpsHistoryEnabled)}
+          className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+            gpsHistoryEnabled ? 'bg-emerald-600' : 'bg-slate-700'
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+              gpsHistoryEnabled ? 'translate-x-5' : 'translate-x-0'
+            }`}
+          />
+        </button>
+      </label>
+    </div>
   );
 }
