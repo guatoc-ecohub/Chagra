@@ -19,6 +19,7 @@ import { ScreenShell } from './components/common/ScreenShell';
 import ChagraGrowLoader from './components/ChagraGrowLoader';
 import IosInstallBanner from './components/IosInstallBanner';
 import UpdateAvailableBanner from './components/UpdateAvailableBanner';
+import GpsFincaBanner from './components/GpsFincaBanner';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Lazy-loaded route components
@@ -389,6 +390,7 @@ export default function App() {
       <NetworkStatusBar />
       <IosInstallBanner />
       <UpdateAvailableBanner />
+      <GpsFincaBanner />
       <Suspense fallback={<LoadingFallback />}>
         {renderView()}
       </Suspense>

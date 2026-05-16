@@ -8,12 +8,12 @@ import { parseIntent, formatIntentDescription } from '../../services/agentIntent
 import { streamOpenAI } from '../../services/openaiStream';
 import { speak, speakKokoro, stop, init as initTTS, isSupported, isKokoroAvailable } from '../../services/ttsService';
 import { executeAction, setActionGateCallback } from '../../services/actionExecutor';
-import { getTool } from '../../services/llmTools';
 import ChatHistory from './ChatHistory';
 import SuggestedActions from './SuggestedActions';
 import ActionConfirmModal from '../ActionConfirmModal';
 import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
+import useFincaActiveStore from '../../services/fincaActiveStore';
 
 // Ollama OpenAI-compatible en /api/ollama/v1/chat/completions (proxy Nginx
 // alpha → 127.0.0.1:11434). Migrado de regreso a Ollama+gemma3:4b según
@@ -30,6 +30,11 @@ const STATE_THINKING = 'thinking';
 export default function AgentScreen({ onBack }) {
   const operatorId = usePrefsStore((s) => s.operatorId) || 'default-operator';
   const plants = useAssetStore((s) => s.plants);
+  // 062.6: contexto finca activa para system prompt (zona biocultural,
+  // altitud, override indoor invernadero).
+  const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
+  const fincas = useFincaActiveStore((s) => s.fincas);
+  const indoorZone = useFincaActiveStore((s) => s.indoorZone);
 
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
@@ -100,8 +105,18 @@ export default function AgentScreen({ onBack }) {
 
   const getSystemPrompt = useCallback(() => {
     const plantNames = plants?.map((p) => p.attributes?.name).filter(Boolean).join(', ') || 'ninguna';
-    return `Eres un asistente agroecológico en Colombia. El usuario tiene estas plantas: ${plantNames}. Responde en español, sé helpful y específico. Si no sabes algo, dilo honestamente.`;
-  }, [plants]);
+    // 062.6: inyectar contexto finca activa (slug, nombre, biocultural_zone, altitud)
+    // + indoor override si aplica. El LLM responde con criterio agronómico ajustado
+    // a la zona ecológica donde el operador está físicamente.
+    const finca = fincas.find((f) => f.slug === activeFincaSlug);
+    const fincaContext = finca
+      ? `Estás asistiendo en la finca "${finca.nombre}" (slug: ${finca.slug}, zona biocultural: ${finca.biocultural_zone || 'no definida'}${finca.altitud ? `, ~${finca.altitud} msnm` : ''}). `
+      : '';
+    const indoorContext = indoorZone
+      ? `El operador está bajo techo en: ${indoorZone}. Considera condiciones de invernadero al recomendar. `
+      : '';
+    return `Eres un asistente agroecológico en Colombia. ${fincaContext}${indoorContext}El usuario tiene estas plantas: ${plantNames}. Responde en español, sé helpful y específico. Si no sabes algo, dilo honestamente.`;
+  }, [plants, fincas, activeFincaSlug, indoorZone]);
 
   // 057.4 integration: los handlers ya NO ejecutan addLog directo. Solo
   // resuelven el Promise del callback registrado en setActionGateCallback.
