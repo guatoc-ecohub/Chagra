@@ -1687,6 +1687,49 @@
       "valor_pedagogico": "SE BUSCA: La 'Estranguladora'. Se trepa sobre los árboles recién sembrados para robarles el sol. Cámbiala por una Pasiflora nativa."
     },
     {
+      "id": "inga_edulis",
+      "nombre_comun": "Guamo",
+      "nombre_cientifico": "Inga edulis Mart.",
+      "familia_botanica": "Fabaceae",
+      "category": "frutales_nativos",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 500,
+        "optimo_max": 1500,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 35
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Semilla recalcitrante; sembrar inmediatamente post-recolección. Rápida emergencia (7-14 días). También puede propagarse por estacas de ramas jóvenes."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-sol-andina",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "El guamo (Inga edulis) se cultiva en departamentos colombianos como Valle del Cauca, Antioquia, Caldas, Quindío, Tolima y Huila entre 0 y 2000 msnm en zonas térmicas cálidas y templadas. Su manejo agronómico incluye propagación por semilla recalcitrante (sembrar inmediatamente post-recolección) con emergencia rápida de 7-14 días, ciclo productivo de 3-5 años hasta primera cosecha significativa, asociaciones tradicionales con cacao y café como especie sombreadora que fija nitrógeno atmosférico mediante simbiosis con rizobios, y requiere manejo de plagas como barrenadores de tallos y mosca de la fruta mediante monitoreo y poda fitosanitaria. En el contexto cultural campesino andino, esta leguminosa ha sido tradicionalmente utilizada como sombra de cacao y café, sus vainas contienen pulpa dulce comestible rica en azúcares naturales, y forma parte de sistemas agroforestales tradicionales que combinan producción con conservación de suelo. Según las fuentes taxonómicas verificadas de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Inga edulis Mart."
+    },
+    {
       "id": "lactuca_sativa_capitata",
       "nombre_comun": "Lechuga cogollo morada",
       "nombre_cientifico": "Lactuca sativa var. capitata L.",
