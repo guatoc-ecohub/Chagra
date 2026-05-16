@@ -1411,19 +1411,20 @@
         "metodo_principal": "semilla",
         "notas": "Germina rápidamente; el esqueje se usa principalmente para cercas vivas."
       },
-      "valor_pedagogico": "Lección de seguridad alimentaria: árbol multi-servicio que provee proteína vegetal de alta calidad en zonas de ladera.",
-      "plagas_criticas": [
-        "Scolytidae",
-        "Cerotoma spp."
-      ],
-      "enfermedades_criticas": [
-        "Antracnosis foliar"
-      ],
-      "source_ids": [
-        "agrosavia-manual-chachafruto-2015",
-        "humboldt-flora-alto-andina",
-        "gbif-taxonomic-backbone"
-      ],
+       "valor_pedagogico": "El chachafruto (Erythrina edulis) se distribuye en los departamentos andinos de Colombia como Cundinamarca, Boyacá, Antioquia y Nariño entre 1200 y 2700 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con germinación rápida y uso de esquejes para cercas vivas, ciclo productivo de 8-12 meses, asociaciones beneficiosas con café y aliso que mejoran la fertilidad del suelo mediante fijación de nitrógeno, y requiere monitoreo de plagas como brotes de Scolytidae y Cerotoma spp. mediante biopreparados andinos. En el contexto campesino andino, sus semillas se utilizan tradicionalmente en preparaciones culinarias como source de proteína vegetal, aprovechando su alto contenido de lisina y triptófano, tal como documenta el Instituto Colombiano Agropecuario (ICA) en la Resolución 3168/2015 que establece normas para la producción y comercialización de especies forrajeras y alimenticias.",
+       "plagas_criticas": [
+         "Scolytidae",
+         "Cerotoma spp."
+       ],
+       "enfermedades_criticas": [
+         "Antracnosis foliar"
+       ],
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-manual-chachafruto-2015",
+         "ica-resolucion-3168-2015"
+       ],
       "validation_level": "claude_draft"
     },
     {
