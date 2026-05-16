@@ -6,22 +6,20 @@ import { addTurn, getFullHistory, getContextString } from '../../services/conver
 import { retrieve } from '../../services/ragRetriever';
 import { parseIntent, formatIntentDescription } from '../../services/agentIntentParser';
 import { streamOpenAI } from '../../services/openaiStream';
+import { buildLLMRequest } from '../../services/llmRouter';
 import { speak, speakKokoro, stop, init as initTTS, isSupported, isKokoroAvailable } from '../../services/ttsService';
 import { executeAction, setActionGateCallback } from '../../services/actionExecutor';
-import { getTool } from '../../services/llmTools';
 import ChatHistory from './ChatHistory';
 import SuggestedActions from './SuggestedActions';
 import ActionConfirmModal from '../ActionConfirmModal';
 import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
+import useFincaActiveStore from '../../services/fincaActiveStore';
 
-// Ollama OpenAI-compatible en /api/ollama/v1/chat/completions (proxy Nginx
-// alpha → 127.0.0.1:11434). Migrado de regreso a Ollama+gemma3:4b según
-// bench empírico 2026-05-14 — gemma3:4b winner (14.9 t/s, 3.3 GB RAM, Tier A
-// papa criolla/oca/cubio) vs OLMoE/Qwen 2.5/Qwen 3 que fallaron en
-// CPU Ryzen 4600G UMA (gibberish / 3.2 t/s / no-Tier-A). ADR-040 retiene
-// llama.cpp+Qwen como track futuro GBNF function calling Fase 1.
-const LLM_URL = '/api/ollama/v1/chat/completions';
+// 2026-05-16: migrado a llmRouter (Multi-LLM por tarea). AgentScreen usa
+// `chat` route → gemma3:4b 15 t/s con keep_alive=5m (hot model). Bench
+// completo en Chagra-strategy/ops/bench-llamacpp-puro-2026-05-16.md.
+// Para NLU/tools usar llmRouter('nlu') → qwen2.5-coder:7b.
 
 const STATE_IDLE = 'idle';
 const STATE_RECORDING = 'recording';
@@ -30,6 +28,11 @@ const STATE_THINKING = 'thinking';
 export default function AgentScreen({ onBack }) {
   const operatorId = usePrefsStore((s) => s.operatorId) || 'default-operator';
   const plants = useAssetStore((s) => s.plants);
+  // 062.6: contexto finca activa para system prompt (zona biocultural,
+  // altitud, override indoor invernadero).
+  const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
+  const fincas = useFincaActiveStore((s) => s.fincas);
+  const indoorZone = useFincaActiveStore((s) => s.indoorZone);
 
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
@@ -100,8 +103,18 @@ export default function AgentScreen({ onBack }) {
 
   const getSystemPrompt = useCallback(() => {
     const plantNames = plants?.map((p) => p.attributes?.name).filter(Boolean).join(', ') || 'ninguna';
-    return `Eres un asistente agroecológico en Colombia. El usuario tiene estas plantas: ${plantNames}. Responde en español, sé helpful y específico. Si no sabes algo, dilo honestamente.`;
-  }, [plants]);
+    // 062.6: inyectar contexto finca activa (slug, nombre, biocultural_zone, altitud)
+    // + indoor override si aplica. El LLM responde con criterio agronómico ajustado
+    // a la zona ecológica donde el operador está físicamente.
+    const finca = fincas.find((f) => f.slug === activeFincaSlug);
+    const fincaContext = finca
+      ? `Estás asistiendo en la finca "${finca.nombre}" (slug: ${finca.slug}, zona biocultural: ${finca.biocultural_zone || 'no definida'}${finca.altitud ? `, ~${finca.altitud} msnm` : ''}). `
+      : '';
+    const indoorContext = indoorZone
+      ? `El operador está bajo techo en: ${indoorZone}. Considera condiciones de invernadero al recomendar. `
+      : '';
+    return `Eres un asistente agroecológico en Colombia. ${fincaContext}${indoorContext}El usuario tiene estas plantas: ${plantNames}. Responde en español, sé helpful y específico. Si no sabes algo, dilo honestamente.`;
+  }, [plants, fincas, activeFincaSlug, indoorZone]);
 
   // 057.4 integration: los handlers ya NO ejecutan addLog directo. Solo
   // resuelven el Promise del callback registrado en setActionGateCallback.
@@ -158,14 +171,12 @@ export default function AgentScreen({ onBack }) {
     const timer = setTimeout(() => controller.abort(), LLM_TIMEOUT_MS);
 
     try {
+      // llmRouter resuelve url + model + temperature + max_tokens + keep_alive
+      // según la tarea. AgentScreen = chat → gemma3:4b hot (keep_alive=5m).
+      const { url, body } = buildLLMRequest('chat', messages);
       return await streamOpenAI(
-        LLM_URL,
-        {
-          model: 'gemma3:4b',
-          messages,
-          temperature: 0.7,
-          max_tokens: 512,
-        },
+        url,
+        body,
         (_chunk, fullText) => setStreamingContent(fullText),
         { signal: controller.signal },
       );
