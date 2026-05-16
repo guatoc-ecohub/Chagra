@@ -533,10 +533,12 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-sol-andina",
         "ica-resolucion-3168-2015",
-        "restrepo-1996-abc-agricultura-organica"
+        "nrc-1989-cultivos-andinos"
       ],
-      "valor_pedagogico": "La variedad estándar de mayor productividad; ideal para enseñar el manejo de biomasa foliar y cortes sostenibles."
+      "valor_pedagogico": "La acelga blanca (Beta vulgaris var. cicla) es una hoja comestible de alta productividad, cultivada extensamente en Colombia en departamentos como Cundinamarca, Boyacá, Nariño y Antioquia, entre 1500-2800 msnm en zonas frías y templadas. Su manejo agronómico incluye propagación por semilla, ciclo de 90-120 días, asociación con cultivos como maíz, fríjol y cebolla, y requiere monitoreo de plagas como áfidos (Myzus persicae) y minador de hoja (Liriomyza spp.). Culturalmente, el cultivo de Beta vulgaris fue domesticado en el Mediterráneo y llegó a Colombia con la colonización europea, integrándose en la dieta campesina andina como fuente de vitaminas A, C y minerales (hierro, calcio). Los muiscas cultivaban especies de Beta spp. en sus chagras como parte de la horticultura precolombina. Fuente: nrc-1989-cultivos-andinos, agrosavia-sol-andina."
     },
     {
       "id": "beta_vulgaris_cicla_roja",
