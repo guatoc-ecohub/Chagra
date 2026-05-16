@@ -702,385 +702,48 @@
       ],
       "valor_pedagogico": "Lección de arquitectura: a diferencia del repollo, sus hojas crecen abiertas sobre un tallo central persistente, permitiendo la 'cosecha de abajo hacia arriba'."
     },
-    {
-      "id": "brassica_oleracea_acephala_red_russian",
-      "nombre_comun": "Kale morado / Red Russian",
-      "nombre_cientifico": "Brassica oleracea var. acephala 'Red Russian'",
-      "familia_botanica": "Brassicaceae",
-      "category": "hortalizas_hoja",
-      "thermal_zones": [
-        "frio"
-      ],
-      "roles_in_guild": [
-        "crop",
-        "biomass_producer"
-      ],
-      "cultivable": true,
-      "conservation_status": "cultivo_comun",
-      "altitud_msnm": {
-        "min_absoluto": 1200,
-        "optimo_min": 2000,
-        "optimo_max": 3000,
-        "max_absoluto": 3600
-      },
-      "temperatura_c": {
-        "helada_letal": -15,
-        "optimo_min": 8,
-        "optimo_max": 20,
-        "max_tolerable": 28
-      },
-      "radiacion": "sol_pleno",
-      "agua": "medio",
-      "drenaje_requerido": "bueno",
-      "propagation": {
-        "metodo_principal": "semilla",
-        "notas": "Sus hojas son notablemente más tiernas que las de los kales rizados; ideal para cosecha joven (baby kale)."
-      },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
-      ],
-      "valor_pedagogico": "Lección de respuesta lumínica: muestra cómo la planta produce pigmentos púrpuras para gestionar la radiación UV en altura."
-    },
-    {
-       "id": "brassica_oleracea_capitata_alba",
-       "nombre_comun": "Repollo blanco",
-       "nombre_cientifico": "Brassica oleracea var. capitata L.",
-       "familia_botanica": "Brassicaceae",
-       "category": "hortalizas_hoja",
-       "thermal_zones": [
-         "frio",
-         "templado"
-       ],
-       "roles_in_guild": [
-         "crop"
-       ],
-       "cultivable": true,
-       "conservation_status": "cultivo_comun",
-       "altitud_msnm": {
-         "min_absoluto": 800,
-         "optimo_min": 1800,
-         "optimo_max": 2600,
-         "max_absoluto": 3000
-       },
-       "temperatura_c": {
-         "helada_letal": -5,
-         "optimo_min": 15,
-         "optimo_max": 20,
-         "max_tolerable": 28
-       },
-       "radiacion": "sol_pleno",
-       "agua": "alto",
-       "drenaje_requerido": "bueno",
-       "propagation": {
-         "metodo_principal": "semilla",
-         "notas": "Requiere semillero. El trasplante debe ser profundo para asegurar estabilidad."
-       },
-       "source_ids": [
-         "gbif-taxonomic-backbone",
-         "powo-kew",
-         "agrosavia-sol-andina",
-         "ica-resolucion-3168-2015"
-       ],
-       "valor_pedagogico": "El repollo blanco (Brassica oleracea var. capitata L.) se cultiva ampliamente en los departamentos andinos de Colombia como Cundinamarca, Boyacá, Nariño y Antioquia entre 800 y 3000 msnm en zonas térmicas fría y templada. Su manejo agronómico incluye propagación por semilla en semillero seguido de trasplante profundo para asegurar estabilidad, con un ciclo de cultivo de 90-120 días, se asocia beneficiosamente con zanahoria y cebolla para reducir plagas como áfidos y lepidópteros, y requiere monitoreo de plagas como mosca blanca y gusanos del repollo. En el contexto campesino andino, esta crucífera ha sido tradicionalmente utilizada en soplos, ensaladas y preparaciones fermentadas como base alimenticia esencial, preservando sabores prehispánicos en las cocinas rurales de los Andes colombianos. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Brassica oleracea var. capitata L."
-    },
-    {
-      "id": "brassica_oleracea_capitata_rubra",
-      "nombre_comun": "Repollo morado",
-      "nombre_cientifico": "Brassica oleracea var. capitata f. rubra",
-      "familia_botanica": "Brassicaceae",
-      "category": "hortalizas_hoja",
-      "thermal_zones": [
-        "frio",
-        "templado"
-      ],
-      "roles_in_guild": [
-        "crop"
-      ],
-      "cultivable": true,
-      "conservation_status": "cultivo_comun",
-      "altitud_msnm": {
-        "min_absoluto": 800,
-        "optimo_min": 1800,
-        "optimo_max": 2800,
-        "max_absoluto": 3200
-      },
-      "temperatura_c": {
-        "helada_letal": -6,
-        "optimo_min": 14,
-        "optimo_max": 20,
-        "max_tolerable": 26
-      },
-      "radiacion": "sol_pleno",
-      "agua": "medio",
-      "drenaje_requerido": "bueno",
-       "propagation": {
-         "metodo_principal": "semilla",
-         "notas": "Requiere suelos ricos en materia orgánica (humus/compost) para desarrollar un color purpúreo intenso."
-       },
-       "source_ids": [
-         "gbif-taxonomic-backbone",
-         "powo-kew",
-         "agrosavia-sol-andina",
-         "ica-resolucion-3168-2015"
-       ],
-       "valor_pedagogico": "El repollo morado (Brassica oleracea var. capitata f. rubra) se cultiva en los departamentos andinos de Colombia como Cundinamarca, Boyacá y Nariño entre 800 y 3200 msnm en zonas térmicas fría y templada. Su manejo agronómico incluye propagación por semilla con ciclo de 90-120 días, requiere suelos ricos en materia orgánica (humus/compost) para desarrollar su característico color purpúreo intenso, se asocia beneficiosamente con zanahoria y cebolla para reducir plagas como áfidos y lepidópteros, y requiere monitoreo de plagas como la mosca blanca y gusanos del repollo. En el contexto campesino andino, esta variedad se valora por su alto contenido de antocianinas como antioxidantes naturales y se utiliza tradicionalmente en ensaladas y preparaciones culinarias que aportan color y nutrientes a la dieta familiar. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Brassica oleracea var. capitata f. rubra."
-    },
-    {
-      "id": "brassica_oleracea_italica",
-      "nombre_comun": "Brócoli",
-      "nombre_cientifico": "Brassica oleracea var. italica Plenck",
-      "familia_botanica": "Brassicaceae",
-      "category": "hortalizas_fruto_flor",
-      "thermal_zones": [
-        "frio",
-        "templado"
-      ],
-      "roles_in_guild": [
-        "crop"
-      ],
-      "cultivable": true,
-      "conservation_status": "cultivo_comun",
-      "altitud_msnm": {
-        "min_absoluto": 800,
-        "optimo_min": 1800,
-        "optimo_max": 2800,
-        "max_absoluto": 3200
-      },
-      "temperatura_c": {
-        "helada_letal": -4,
-        "optimo_min": 14,
-        "optimo_max": 20,
-        "max_tolerable": 26
-      },
-      "radiacion": "sol_pleno",
-      "agua": "alto",
-      "drenaje_requerido": "bueno",
-      "propagation": {
-        "metodo_principal": "semilla",
-        "notas": "Requiere trasplante y un suelo profundamente abonado con materia orgánica nitrogenada."
-       },
-       "source_ids": [
-         "gbif-taxonomic-backbone",
-         "powo-kew",
-         "ica-resolucion-3168-2015",
-         "agrosavia-sol-andina"
-       ],
-       "valor_pedagogico": "El brócoli (Brassica oleracea var. italica) es una crucífera hortícola cultivada en el cinturón agrícola de Cundinamarca (Mosquera-Madrid-Bojacá) entre 1800-2800 msnm en zonas térmicas fría y templada. Su ciclo de cultivo varía entre 90-120 días, se propaga por semilla con trasplante y requiere suelos ricos en materia orgánica nitrogenada. Varietales comerciales como Avenger, Marathon y Calabrese se adaptan bien a estas condiciones. En el contexto andino campesino, se asocia frecuentemente con cultivos de papa y cebolla en rotaciones que mejoran la estructura del suelo. Principal plagas incluyen mosca blanca y lepidópteros que dañan los botones florales. Fuente: AGROSAVIA Sol Andina ficha técnica."
-    },
-    {
-      "id": "brassica_oleracea_sabauda",
-      "nombre_comun": "Repollo rizado / Savoy",
-      "nombre_cientifico": "Brassica oleracea var. sabauda L.",
-      "familia_botanica": "Brassicaceae",
-      "category": "hortalizas_hoja",
-      "thermal_zones": [
-        "frio"
-      ],
-      "roles_in_guild": [
-        "crop"
-      ],
-      "cultivable": true,
-      "conservation_status": "cultivo_comun",
-      "altitud_msnm": {
-        "min_absoluto": 1500,
-        "optimo_min": 2000,
-        "optimo_max": 2800,
-        "max_absoluto": 3200
-      },
-      "temperatura_c": {
-        "helada_letal": -8,
-        "optimo_min": 12,
-        "optimo_max": 18,
-        "max_tolerable": 25
-      },
-      "radiacion": "sol_pleno",
-      "agua": "alto",
-      "drenaje_requerido": "bueno",
-      "propagation": {
-        "metodo_principal": "semilla",
-        "notes": "Ciclo más largo que el repollo liso; requiere paciencia en la zona fría."
-      },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
-      ],
-      "valor_pedagogico": "Lección de selección varietal: su textura rugosa es un aislante térmico natural que le permite resistir inviernos intensos en la montaña."
-    },
-    {
-      "id": "calamagrostis_effusa",
-      "nombre_comun": "Paja de páramo",
-      "nombre_cientifico": "Calamagrostis effusa (Kunth) Steud.",
-      "nombre_comunes_regionales": [
-        "Paja de cerro"
-      ],
-      "familia_botanica": "Poaceae",
-      "category": "abonos_verdes_coberturas",
-      "thermal_zones": [
-        "paramo"
-      ],
-      "roles_in_guild": [
-        "ground_cover",
-        "nurse_plant"
-      ],
-      "cultivable": false,
-      "conservation_status": "nativo_silvestre",
-      "altitud_msnm": {
-        "min_absoluto": 2800,
-        "optimo_min": 3200,
-        "optimo_max": 3800,
-        "max_absoluto": 4200
-      },
-      "temperatura_c": {
-        "helada_letal": -15,
-        "optimo_min": 4,
-        "optimo_max": 10,
-        "max_tolerable": 18
-      },
-      "radiacion": "sol_pleno",
-      "agua": "medio",
-      "drenaje_requerido": "bueno",
-      "propagation": {
-        "metodo_principal": "division_mata",
-        "notas": "Se recomienda propagar por macollas en la recuperación de áreas degradadas del páramo de Chingaza."
-      },
-      "companions": [
-        "quercus_humboldtii"
-      ],
-      "antagonists": [
-        "pennisetum_setaceum"
-      ],
-      "valor_pedagogico": "Calamagrostis effusa, conocida como paja de páramo, es una gramínea perenne fundamental en los ecosistemas de páramo andino colombiano, presente en departamentos como Cundinamarca, Boyacá, Norte de Santander y Nariño entre 2800 y 4200 msnm en zona térmica páramo. Su manejo agronómico incluye propagación vegetativa mediante división de matas, con ciclo de crecimiento lento adaptado a condiciones de baja temperatura y alta radiación UV. Establece asociaciones beneficiosas con especies como Quercus humboldtii (roble andino) en sistemas de recuperación ecológica, actuando como especie nurse que facilita el establecimiento de otras plantas nativas. En el contexto cultural muisca y andino, esta especie ha sido tradicionalmente utilizada por comunidades indígenas para tejer cubiertas de viviendas y como material de aislamiento térmico en chagras de altura, valorada por su capacidad de regulación hídrica y estabilización de suelos. Según las fuentes taxonómicas verificadas de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Calamagrostis effusa (Kunth) Steud.",
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "powo-kew",
-        "ica-resolucion-3168-2015",
-        "nrc-1989-cultivos-andinos"
-      ],
-      "validation_level": "claude_draft",
-      "estrato": "bajo"
-    },
-    {
-      "id": "calendula_officinalis",
-      "nombre_comun": "Caléndula",
-      "nombre_cientifico": "Calendula officinalis L.",
-      "nombre_comunes_regionales": [
-        "Margarita dorada"
-      ],
-      "familia_botanica": "Asteraceae",
-      "category": "atractores_polinizadores",
-      "thermal_zones": [
-        "templado",
-        "frio"
-      ],
-      "roles_in_guild": [
-        "crop",
-        "pollinator_attractor",
-        "pest_repellent"
-      ],
-      "cultivable": true,
-      "conservation_status": "cultivo_comun",
-      "altitud_msnm": {
-        "min_absoluto": 0,
-        "optimo_min": 1200,
-        "optimo_max": 2500,
-        "max_absoluto": 2800
-      },
-      "temperatura_c": {
-        "helada_letal": -5,
-        "optimo_min": 15,
-        "optimo_max": 22,
-        "max_tolerable": 28
-      },
-      "radiacion": "sol_pleno",
-      "agua": "medio",
-      "drenaje_requerido": "excelente",
-      "propagation": {
-        "metodo_principal": "semilla",
-        "notas": "Se resiembra sola con facilidad; sus raíces secretan sustancias que controlan nematodos en el suelo."
-      },
-      "companions": [
-        "solanum_lycopersicum_san_marzano"
-      ],
-      "antagonists": [],
-       "valor_pedagogico": "La Caléndula (Calendula officinalis L.) es una especie ornamental-medicinal originaria del Mediterráneo, ampliamente cultivada en jardines campesinos de Cundinamarca entre 0-2800 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con ciclo de floración de 75-90 días, asociándose beneficiosamente con cultivos como el tomate (Solanum lycopersicum) mientras actúa como repelente natural de trips y nemátodos mediante secreciones radiculares. En el contexto cultural andino-campesino, sus flores se utilizan tradicionalmente en preparaciones de crema cicatrizante por sus propiedades flavonoides, saponinas y aceites esenciales. Según GBIF Backbone Taxonomy y Plants of the World Online (POWO), esta especie destaca por su valor ecológico en atracción de polinizadores y manejo integrado de plagas en sistemas agroecológicos de montaña.",
-       "source_ids": [
-         "gbif-taxonomic-backbone",
-         "powo-kew",
-         "perez-arbelaez-1947-plantas-utiles",
-         "jbb-plantas-medicinales"
-       ],
-      "validation_level": "claude_draft",
-      "estrato": "medio"
-    },
-    {
-      "id": "cenchrus_clandestinus",
-      "_curation_status": "VALIDADO; nombre taxonómico actualizado (previamente Pennisetum clandestinum)",
-      "nombre_comun": "Kikuyo",
-      "nombre_comunes_regionales": [
-        "kikuyo",
-        "cundo",
-        "pasto kikuyo",
-        "pasto africano"
-      ],
-      "nombre_cientifico": "Cenchrus clandestinus (Hochst. ex Chiov.) Morrone",
-      "_nombre_cientifico_anterior": "Pennisetum clandestinum Hochst. ex Chiov., 1903",
-      "autor_ano": "Hochst. ex Chiov. 1903 → reubicado en Cenchrus por Morrone 2010",
-      "familia_botanica": "Poaceae",
-      "category": "especies_invasoras",
-      "thermal_zones": [
-        "frio"
-      ],
-      "estrato": "bajo",
-      "roles_in_guild": [
-        "invasive",
-        "ground_cover"
-      ],
-      "cultivable": false,
-      "_nota_cultivable": "PARADOJA COLOMBIANA: es la gramínea forrajera más importante del trópico alto (>2200 msnm) para ganadería de leche. Simultáneamente es invasora crítica en páramos y bosques altoandinos. Uso legal en potreros, prohibido/indeseable en áreas de restauración y delimitación de páramo (Ley 1930/2018).",
-      "conservation_status": "invasor",
-      "habito": "gramínea perenne postrada con estolones y rizomas agresivos",
-      "origen": "África oriental (altiplanos Kenia, Etiopía, Uganda, Rwanda, Tanzania, Zaire)",
-      "altitud_msnm": {
-        "min_absoluto": 1800,
-        "optimo_min": 2200,
-        "optimo_max": 3200,
-        "max_absoluto": 3600
-      },
-      "impacto_ecologico": "alto (en páramo) / uso forrajero (en potreros bajo manejo)",
-      "ecosistemas_afectados": [
-        "paramo",
-        "subparamo",
-        "bosque_alto_andino",
-        "humedales_altoandinos"
-      ],
-      "mecanismos_invasion": [
-        "Estolones rápidos forman matas densas que excluyen nativas",
-        "Rizomas penetran suelo y son difíciles de extraer",
-        "Semillas viables hasta 10 años en el suelo",
-        "Dispersión vía tubo digestivo del ganado",
-        "Responde a fertilización nitrogenada (de origen natural o agropecuario)",
-        "Desplaza a Calamagrostis effusa y otros pastizales nativos de páramo"
-      ],
-      "metodos_extraccion": [
-        {
-          "metodo": "desenraice_completo",
-          "efectividad": "alta",
-          "costo": "alto",
-          "notas": "Requiere extraer estolones y rizomas completos; suelos pedregosos dificultan. Herramienta: azadón de péndulo."
-        },
-        {
-          "metodo": "solarizacion",
-          "efectividad": "media",
-          "costo": "medio",
-          "notas": "6-8 semanas bajo plástico negro en temporada seca; efectivo en parches pequeños"
-        },
-        {
-          "metodo": "corte_bajo_repetido",
-          "efectividad": "baja",
-          "costo": "bajo",
-          "notas": "NO suficiente por sí solo; requiere acompañamiento de siembra de nativas"
-        }
+{
+  "id": "brassica_oleracea_acephala_red_russian",
+  "nombre_comun": "Kale morado / Red Russian",
+  "nombre_cientifico": "Brassica oleracea var. acephala 'Red Russian'",
+  "familia_botanica": "Brassicaceae",
+  "category": "hortalizas_hoja",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "biomass_producer"
+  ],
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "altitud_msnm": {
+    "min_absoluto": 1200,
+    "optimo_min": 2000,
+    "optimo_max": 3000,
+    "max_absoluto": 3600
+  },
+  "temperatura_c": {
+    "helada_letal": -15,
+    "optimo_min": 8,
+    "optimo_max": 20,
+    "max_tolerable": 28
+  },
+  "radiacion": "sol_pleno",
+  "agua": "medio",
+  "drenaje_requerido": "bueno",
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Sus hojas son notablemente más tiernas que las de los kales rizados; ideal para cosecha joven (baby kale)."
+  },
+  "source_ids": [
+    "gbif-taxonomic-backbone",
+    "powo-kew",
+    "ica-resolucion-3168-2015",
+    "agrosavia-sol-andina"
+  ],
+  "valor_pedagogico": "El kale morado o Red Russian (Brassica oleracea var. acephala 'Red Russian') se cultiva en los departamentos andinos de Colombia como Cundinamarca, Boyacá, Nariño y Antioquia entre 1200 y 3600 msnm en zonas térmicas frías. Su manejo agronómico incluye propagación por semilla, con ciclo vegetativo de 60-90 días para cosecha juvenil y 90-120 días para madurez plena, asociaciones beneficiosas con papa y cebolla que reducen la presión de plagas como áfidos y la mosca blanca, y requiere monitoreo de plagas como la oruga del repollo y áfidos mediante control biológico con enemigos naturales. En el contexto campesino andino, esta variedad ha sido adoptada recientemente por su alto contenido de antioxidantes y su adaptabilidad a altitudes elevadas, complementando alimentos tradicionales en dietas locales. Según la taxonomía verificada por GBIF Backbone Taxonomy, Plants of the World Online (POWO), ICA Resolución 3168/2015 y AGROSAVIA Sol Andina, su nombre científico válido es Brassica oleracea var. acephala 'Red Russian'."
+}
       ],
       "epoca_optima_remocion": "Temporada seca, antes de floración y semillación",
       "especies_nativas_sustitutas": [
@@ -2975,7 +2638,7 @@
          "ica-resolucion-3168-2015",
          "nrc-1989-cultivos-andinos"
        ],
-       "valor_pedagogico": "El rábano (Raphanus sativus L.) se cultiva en diversos departamentos de Colombia incluyendo Cundinamarca, Boyacá, Antioquia y Nariño entre 800 y 3000 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por siembra directa siempre (no tolera trasplante), ciclo de cultivo muy corto de 3-5 semanas, asociaciones beneficiosas con lechuga y zanahoria que ayudan a marcar las líneas de siembra, y requiere manejo de plagas como pulgones y gorgojos mediante monitoreo y biopreparados andinos. En el contexto campesino andino, esta hortaliza ha sido utilizada tradicionalmente en ensaladas y guarniciones como alimento rápido y nutritivo, aprovechando su ciclo corto para rotaciones frecuentes en las chagras de altura. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Raphanus sativus L."
+        "valor_pedagogico": "El rábano (Raphanus sativus L.) se cultiva ampliamente en los departamentos andinos de Colombia como Cundinamarca, Boyacá, Antioquia, Nariño y Cauca entre 800 y 3000 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por siembra directa siempre (no tolera el trasplante debido a su raíz delicada), ciclo de cultivo muy corto de 20-30 días para variedades tempranas y 40-50 días para tardías, asociaciones beneficiosas con lechuga, zanahoria y espinaca que ayudan a marcar líneas de siembra y reducir plagas, y requiere manejo integrado de plagas como pulgones, gorgojos y mosca blanca mediante monitoreo frecuente y aplicación de biopreparados andinos como extracto de ajo y chilca. En el contexto campesino andino e indigenous muisca, esta hortaliza ha sido tradicionalmente valorada por su crecimiento rápido y propiedades medicinales, consumiéndose tanto la raíz como las hojas en ensaladas, sopas y preparaciones curativas, aprovechando su ciclo corto para sistemas de rotación intensiva en chagras de montaña. Según las fuentes taxonómicas verificadas de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Raphanus sativus L."
     },
     {
       "id": "rosmarinus_officinalis",
