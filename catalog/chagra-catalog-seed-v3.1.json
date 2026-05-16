@@ -740,9 +740,11 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
+        "powo-kew",
+        "ica-resolucion-3168-2015",
+        "agrosavia-sol-andina"
       ],
-      "valor_pedagogico": "Lección de respuesta lumínica: muestra cómo la planta produce pigmentos púrpuras para gestionar la radiación UV en altura."
+      "valor_pedagogico": "El kale morado o Red Russian (Brassica oleracea var. acephala 'Red Russian') es una variedad de col rizada de hojas tiernas y textura suave, notable por sus tallos morados y venas plateadas. En Colombia se cultiva principalmente en los departamentos andinos de Cundinamarca, Boyacá, Nariño y Antioquia entre 1200 y 3600 msnm en zonas térmicas fría, con óptimo entre 2000-3000 msnm. Su manejo agronómico incluye propagación por semilla en semillero seguido de trasplante, ciclo de cultivo de 60-90 días para cosecha baby leaf y 90-120 días para hoja adulta, se asocia beneficiosamente con cebolla, zanahoria y leguminosas para reducir presiones de plagas como pulguillas (Phyllotreta spp.) y gusanos defoliadores (Plutella xylostella), y requiere monitoreo de enfermedades como mildiu velloso (Peronospora parasitica). En el contexto cultural andino, esta Brassica ha sido integrada en la gastronomía local como sustituto suave de la col tradicional, utilizándose en ensaladas, sautés y sopas. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Brassica oleracea var. acephala 'Red Russian'. Fuente: ICA Resolución 3168 de 2015, AGROSAVIA."
     },
     {
        "id": "brassica_oleracea_capitata_alba",
