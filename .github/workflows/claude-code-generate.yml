@@ -197,11 +197,18 @@ jobs:
             tail -c 2000 "$out_file" || true
             echo "::endgroup::"
 
-            # Detectar fin de tokens / quota / rate-limit explícito en output
-            # antes de chequear edits. Heurística amplia para cubrir formatos
-            # variados de error de providers free.
-            if grep -qiE 'quota|rate.?limit|insufficient.?(credit|balance|token)|429|payment.?required|free.?tier.?expired|out of (credits|tokens)|usage limit' "$out_file"; then
-              echo "WARN tier $label: señal de quota exhausted detectada en output." >&2
+            # Detectar fin de tokens / quota / rate-limit explícito en output.
+            # Doble pasada para evitar falsos positivos (incidente 2026-05-16:
+            # `429` matcheaba substring dentro de sessionIDs hex tipo `e329d…`
+            # o números de output_tokens, marcando como quota runs que en
+            # realidad solo tenían bash tool-call fallido por shell nologin).
+            # Pasada 1: el output debe contener al menos UN indicador de error
+            # estructural (campo "error", status code 4xx/5xx, HTTP error
+            # line). Pasada 2: alguna palabra de quota debe aparecer.
+            # Ambas deben pasar para clasificar como quota exhausted.
+            if grep -qiE '"error"\s*:\s*"[^"]+"|"status"\s*:\s*"(error|failed|exhausted|quota[a-z_-]*|payment[a-z_-]*|rate[a-z_-]*|insufficient[a-z_-]*)"|"(status_code|code)"\s*:\s*[45][0-9]{2}|HTTP/[12]\.[01]\s+[45][0-9]{2}|"finish_reason"\s*:\s*"(length|content_filter)"' "$out_file" \
+               && grep -qiE '\b(quota|rate[._-]?limit|insufficient[._ -]?(credit|balance|token)s?|payment[._ -]?required|free[._ -]?tier[._ -]?expired|out of (credits|tokens)|usage[._ -]?limit|too many requests|model not available)\b' "$out_file"; then
+              echo "WARN tier $label: señal de quota exhausted detectada (error + keyword en output)." >&2
               return 10  # código reservado: quota
             fi
 
