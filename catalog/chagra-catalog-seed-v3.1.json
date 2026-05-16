@@ -103,12 +103,14 @@
       "propagation": {
         "metodo_principal": "semilla",
         "notas": "Requiere trasplante profundo para favorecer el 'blanqueado' del tallo."
-      },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
-      ],
-      "valor_pedagogico": "Lección de aporque: enseña cómo el manejo del suelo (blanqueo) afecta las propiedades culinarias del tallo en la chagra."
+       },
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-sol-andina",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "El puerro (Allium ampeloprasum var. porrum) se cultiva en los departamentos andinos de Colombia como Cundinamarca y Boyacá entre 500 y 3400 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con trasplante profundo para favorecer el 'blanqueado' del tallo, ciclo vegetativo de 150-180 días, asociaciones beneficiosas con zanahoria y fresa que mejoran la salud del huerto, y requiere manejo de plagas como trips y minadores de hojas mediante monitoreo frecuente y biopreparados andinos. En el contexto campesino andino, esta verdura ha sido tradicionalmente utilizada en sopros y guisos como ingrediente esencial, preservando sabores prehispánicos en las cocinas rurales. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Allium ampeloprasum var. porrum (L.) J. Gay."
     },
     {
       "id": "allium_cepa",
@@ -3352,10 +3354,12 @@
         "metodo_principal": "semilla",
         "notas": "Crecimiento indeterminado; requiere tutorado (colgado) y podas frecuentes de chupones."
       },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "restrepo-1996-abc-agricultura-organica"
-      ],
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "ica-resolucion-3168-2015",
+         "agrosavia-sol-andina"
+       ],
       "valor_pedagogico": "Lección de cosecha escalonada: enseña cómo los frutos maduran en racimos de forma secuencial, permitiendo una provisión constante."
     },
     {
