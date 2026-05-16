@@ -104,7 +104,7 @@ export default function InformesScreen({ onBack }) {
 
         <ReportCard
           icon={FileText}
-          title="Trazabilidad CSV"
+          title="Historial completo (CSV)"
           description="Cosechas, aplicaciones de biopreparados, observaciones y siembras por activo."
           helpText="Formato CSV abierto, compatible con Excel, Google Sheets, R, Python pandas. Se descarga en tu dispositivo."
           onExport={exportTraceabilityCsv}
