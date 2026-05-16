@@ -7,7 +7,7 @@
   "difficulty": "starter_premium",
   "tiempo_a_cosecha_dias": { "min": 90, "tipico": 120, "max": 180 },
   "diferenciador_colombiano": "Cundinamarca produce el 73% de la fresa nacional. Industria de viveros locales en Sibaté y Mosquera ofrece plántula Albión adaptada. La amplitud térmica andina ecuatorial (18-25°C día / 8-13°C noche) favorece dulzura y antocianinas — perfil nutracéutico superior a cultivares de baja latitud. Práctica arraigada de productores cundinamarqueses: renovar cultivo cada 2 años con estolones propios.",
-  "leccion_agroecologica": "Cultivo puente entre agricultura sexual (lechuga) y asexual (café/aguacate por injerto). Enseña propagación vegetativa por estolón — clonación natural visible y manejable. Imperativo de higiene del microclima edáfico y función irreemplazable de cobertura muerta (mulch) para separar fruto del suelo.",
+  "leccion_agroecologica": "La fresa enseña cómo se hacen nuevas plantas de dos maneras: por semilla (como la lechuga) y por estolones (un tallo rastrero que produce plantas hijas idénticas, igual que el café o el aguacate por injerto). Es importante mantener limpio el ambiente del suelo y cubrirlo con paja (mulch) para que los frutos no toquen la tierra.",
   "thermal_zone_decisions": {
     "calido": "Marginal. Estrés térmico + ataque crítico de ácaros. NO recomendable para producción agroecológica.",
     "templado": "Rango operativo. Norte de Santander, parte de Antioquia. Ciclo más corto pero compromete calibre del fruto.",
@@ -43,7 +43,7 @@
       "fase": "trasplante",
       "dias_relativos": "0",
       "criterio_observable": "Masa radicular densa y blanca, 4 hojas extendidas, corona consolidada",
-      "accion_clave": "Siembra MILIMÉTRICA a ras de suelo. CRÍTICO: el meristemo apical (corona) NO se entierra (necrosis fúngica) ni se expone (desecación). Profundidad 6 cm desde corte de raíz"
+      "accion_clave": "Siembra muy precisa: el centro de la planta (corona, donde nacen las hojas nuevas) queda a ras del suelo. CRÍTICO: NI se entierra (porque le da pudrición por hongos) NI se deja expuesta (porque se seca). La raíz queda enterrada 6 cm desde su corte."
     },
     {
       "fase": "vegetativo_formativo",
@@ -66,58 +66,58 @@
   ],
   "failure_modes": [
     {
-      "razon": "Botrytis cinerea (moho gris)",
+      "razon": "Moho gris (Botrytis cinerea)",
       "cuando": "Fructificación",
-      "sintoma": "Masa miceliar grisácea y algodonosa sobre flores y drupas",
-      "agente_causal": "Alta humedad relativa estancada",
-      "mitigacion": "Mulch obligatorio, aclareo foliar para ventilación, distancia adecuada, recolección de frutos caídos, Trichoderma drench preventivo",
+      "sintoma": "Pelusa gris peluda como algodón sobre las flores y los frutos",
+      "agente_causal": "Demasiada humedad sin que el aire circule",
+      "mitigacion": "Cubre el suelo con paja o mantillo (mulch), corta hojas viejas para que pase el aire, deja espacio entre plantas, recoge los frutos caídos, aplica Trichoderma al suelo como prevención",
       "frecuencia": "muy_comun"
     },
     {
-      "razon": "Pudrición de corona por enterramiento",
-      "cuando": "Post-trasplante inmediato",
-      "sintoma": "Follaje central marchito, raíces oscurecidas, muerte rápida de la planta",
-      "agente_causal": "Asfixia o enterramiento patológico del meristemo apical",
-      "mitigacion": "Eras elevadas con drenaje profundo. Respeto absoluto al nivel del cuello en la siembra (corona a ras)",
+      "razon": "Pudrición del centro de la planta por siembra muy profunda",
+      "cuando": "Justo después de trasplantar",
+      "sintoma": "Hojas del centro marchitas, raíces oscuras, la planta se muere rápido",
+      "agente_causal": "La planta se ahogó porque enterraron el centro donde nacen las hojas nuevas",
+      "mitigacion": "Siembra en camas levantadas con buen drenaje. Deja el centro de la planta (corona) a ras del suelo, sin enterrarlo.",
       "frecuencia": "comun"
     },
     {
       "razon": "Araña roja (Tetranychus urticae)",
-      "cuando": "Periodos secos / verano",
-      "sintoma": "Decoloración bronceada y mate en hojas, telarañas microscópicas en envés",
-      "agente_causal": "Plaga favorecida por microclimas áridos",
-      "mitigacion": "Liberación de ácaros fitoseidos depredadores (Phytoseiulus persimilis, Amblyseius spp.), aspersión de extracto ajo-ají, sombra parcial",
+      "cuando": "Épocas secas o verano",
+      "sintoma": "Hojas de color bronce sin brillo y telarañas muy chiquititas debajo de las hojas",
+      "agente_causal": "Es una plaga que aparece cuando hay mucho calor seco",
+      "mitigacion": "Suelta ácaros buenos que se la comen (Phytoseiulus persimilis, Amblyseius). Rocía extracto de ajo y ají. Pon sombra parcial.",
       "frecuencia": "comun"
     },
     {
-      "razon": "Sphaerotheca macularis (oídio)",
-      "cuando": "Vegetativo a fructificación",
-      "sintoma": "Manchas pulverulentas blancas en hojas y frutos",
-      "agente_causal": "Hongo biotrofo, condiciones secas con noches frescas",
-      "mitigacion": "Caldo sulfocálcico al 1.5%, variedades resistentes (Albión moderada), evitar exceso de N",
+      "razon": "Oídio (Sphaerotheca macularis)",
+      "cuando": "Desde que crece la planta hasta dar fruto",
+      "sintoma": "Manchas blancas como polvo en hojas y frutos",
+      "agente_causal": "Hongo que aparece en días secos con noches frescas",
+      "mitigacion": "Aplica caldo sulfocálcico al 1.5%, usa variedades resistentes (como Albión), no le pongas demasiado abono nitrogenado",
       "frecuencia": "comun"
     },
     {
-      "razon": "Verticillium dahliae (marchitez vascular)",
-      "cuando": "Cualquier estadio",
-      "sintoma": "Marchitez progresiva, taponamiento del xilema",
-      "agente_causal": "Hongo edáfico de larga persistencia",
-      "mitigacion": "Rotación obligatoria — NO sembrar fresa después de tomate, papa, berenjena, pimentón. Solarización del lote.",
+      "razon": "Marchitez vascular (Verticillium dahliae)",
+      "cuando": "En cualquier momento del ciclo",
+      "sintoma": "La planta se va marchitando poco a poco porque el hongo tapa los tubos por donde sube el agua dentro de la planta",
+      "agente_causal": "Hongo del suelo que dura muchos años en el terreno",
+      "mitigacion": "Rotación obligatoria — NO siembres fresa después de tomate, papa, berenjena o pimentón. Cubre el terreno con plástico bajo el sol (solarización).",
       "frecuencia": "ocasional"
     }
   ],
   "companions": [
-    { "especie": "Borago officinalis (borraja)", "razon": "Atrae polinizadores (sírfidos, abejorros) — efecto sobre cuajado", "evidencia": "literatura agronomica" },
-    { "especie": "Tagetes patula (caléndula francesa)", "razon": "Producción de tiofenos nematicidas — control de Meloidogyne", "evidencia": "evidencia experimental" },
-    { "especie": "Allium sativum (ajo)", "razon": "Repelente de ácaros y áfidos; supresión moderada de Fusarium", "evidencia": "tradicion + literatura" },
-    { "especie": "Mentha piperita (menta)", "razon": "Compuestos volátiles desestabilizan radar olfativo de trips y áfidos", "evidencia": "literatura agronomica" },
-    { "especie": "Spinacia oleracea (espinaca)", "razon": "Complementariedad radicular + ventana fenológica fría", "evidencia": "tradicion" }
+    { "especie": "Borraja (Borago officinalis)", "razon": "Atrae abejas y sírfidos que polinizan — ayuda a que cuajen más frutos", "evidencia": "literatura agronomica" },
+    { "especie": "Caléndula francesa (Tagetes patula)", "razon": "Sus raíces sueltan sustancias que matan gusanitos del suelo (nematodos)", "evidencia": "evidencia experimental" },
+    { "especie": "Ajo (Allium sativum)", "razon": "Espanta ácaros y pulgones; ayuda contra el hongo Fusarium", "evidencia": "tradicion + literatura" },
+    { "especie": "Menta (Mentha piperita)", "razon": "Su olor confunde a los trips y pulgones para que no encuentren la fresa", "evidencia": "literatura agronomica" },
+    { "especie": "Espinaca (Spinacia oleracea)", "razon": "Sus raíces no pelean con las de la fresa y comparte la temporada fría", "evidencia": "tradicion" }
   ],
   "antagonistas": [
-    { "especie": "Solanum lycopersicum (tomate)", "razon": "Comparten Verticillium dahliae" },
-    { "especie": "Solanum tuberosum (papa)", "razon": "Mismo Verticillium" },
-    { "especie": "Solanum melongena (berenjena)", "razon": "Mismo Verticillium" },
-    { "especie": "Brassica oleracea (repollo, brócoli)", "razon": "Compite agresivamente por nitrógeno + modifica desfavorablemente el consorcio bacteriano de la rizósfera" }
+    { "especie": "Tomate (Solanum lycopersicum)", "razon": "Comparten el mismo hongo Verticillium dahliae" },
+    { "especie": "Papa (Solanum tuberosum)", "razon": "Comparten el mismo Verticillium" },
+    { "especie": "Berenjena (Solanum melongena)", "razon": "Comparten el mismo Verticillium" },
+    { "especie": "Repollo y brócoli (Brassica oleracea)", "razon": "Le quitan el nitrógeno a la fresa y cambian los microorganismos buenos del suelo" }
   ],
   "biopreparados": [
     { "nombre": "Bocashi", "uso": "200 g/planta al trasplante; 50 g/planta al inicio de cada pico de floración", "fuente": "extrapolacion literatura cubana/mexicana" },
