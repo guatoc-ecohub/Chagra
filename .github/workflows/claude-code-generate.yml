@@ -138,49 +138,177 @@ jobs:
           # ANTHROPIC_API_KEY viene del EnvironmentFile del systemd service del
           # runner (claude-code-runner.nix) — NO se pasa por secrets de workflow
           # ni queda en logs.
+          # LITELLM_MASTER_KEY (opcional): si el runner tiene acceso al secret
+          # sops `litellm-master-key`, se habilita TIER0 (GLM-4.6 vía proxy
+          # local). Mientras el operador no agregue ese EnvironmentFile en
+          # claude-code-runner.nix, TIER0 se salta sin error y la chain arranca
+          # en TIER1.
           PROMPT_FILE: ${{ steps.prompt.outputs.file }}
           OUTPUT_FILE: ${{ runner.temp }}/claude-output.json
         run: |
           set -o pipefail
+          # =====================================================================
           # PIVOT 2026-05-09: backend cambiado de claude-code (Anthropic) a
-          # opencode (multi-provider). Razones:
-          # - Operador no tiene balance Anthropic API pay-per-use.
-          # - Intentos previos vía litellm-proxy a GLM-4.6: GLM no soporta
-          #   tool-call format Anthropic → emite tool calls como TEXTO →
-          #   step "Commit and push" fallaba porque no había edits reales.
-          # - opencode/big-pickle (free tier opencode.ai) hace tool calls
-          #   correctos sin auth.
-          # Detalles arquitecturales: módulo NixOS interno claude-code-runner
-          # (mantiene `claude-code` en extraPackages como backup para
-          # reactivación si operador habilita billing Anthropic API).
+          # opencode (multi-provider). Operador sin balance Anthropic API
+          # pay-per-use. Intentos previos vía litellm-proxy a GLM-4.6: GLM
+          # emitía tool calls como TEXTO → step "Commit and push" fallaba.
+          # opencode/big-pickle (free) sí hacía tool calls correctos.
           #
-          # PIVOT 2026-05-14: big-pickle reportó cola larga + silent failures
-          # post auditoría master valor real producto. Cambio a nemotron-3-super-free
-          # (Nvidia Nemotron Super 3, free tier 2026, fuerte JSON + reasoning
-          # científico estructurado, mejor para species + valor_pedagogico
-          # narrativo). Fallback alternativos: minimax-m2.5-free (long-context),
-          # hy3-preview-free (Hyper-Yarn 3 preview).
+          # PIVOT 2026-05-14: big-pickle con cola larga + silent failures →
+          # cambio a opencode/nemotron-3-super-free.
           #
-          # opencode run flags:
-          # --dir: working directory donde opencode opera (incluye cd to repo)
-          # --dangerously-skip-permissions: equivalente a --permission-mode acceptEdits
-          # -m opencode/nemotron-3-super-free: Nvidia Nemotron Super free tier
-          # --format json: streaming JSON events para audit chain
-          # message como argv positional (opencode no acepta stdin como prompt)
+          # PIVOT 2026-05-16 (este): nemotron-3-super-free se cuelga >90s sin
+          # responder en probes locales (`opencode run -m opencode/nemotron-3-
+          # super-free` con prompt trivial). Hipótesis del operador: fin de
+          # tokens free tier. Síntoma idéntico en GH Actions: 100% de runs del
+          # día terminan failure/cancelled — los cortos (30-48s) fallan en
+          # "Run Claude Code", los largos (1-10h) timeout. Catálogo congelado
+          # en 176 species de 450 meta.
+          #
+          # Solución: CHAIN de modelos con fallback automático en vez de un
+          # único modelo. Detección de fallo silencioso (sin edits reales)
+          # como señal universal de "este tier no sirvió, probar siguiente".
+          #
+          # TIER0 (preferido, condicional): opencode/zai/glm-4.6 vía litellm-
+          #   proxy local (z.ai Coding Plan pago, subutilizado por bot
+          #   Telegram). Requiere LITELLM_MASTER_KEY en env del runner —
+          #   sin esa env, este tier se salta limpio.
+          # TIER1 (default): opencode/minimax-m2.5-free. Probado 2026-05-16
+          #   en alpha: responde 1s, hace tool calls reales (write+bash
+          #   verificados), cost 0, sin auth. Reemplaza a nemotron.
+          #
+          # Se quitaron `hy3-preview-free` y `nemotron-3-super-free` de la
+          # chain: el primero no existe en opencode 1.14.35
+          # (ProviderModelNotFoundError), el segundo cuelga.
+          # =====================================================================
+
+          run_tier() {
+            local label="$1"
+            local cmd_file="$2"
+            local out_file="$3"
+            local hard_timeout="$4"
+
+            echo "::group::Tier $label"
+            echo "Hard timeout: ${hard_timeout}s"
+            local rc=0
+            timeout "${hard_timeout}s" bash "$cmd_file" > "$out_file" 2>&1 || rc=$?
+            echo "Exit code: $rc"
+            echo "Output tail:"
+            tail -c 2000 "$out_file" || true
+            echo "::endgroup::"
+
+            # Detectar fin de tokens / quota / rate-limit explícito en output
+            # antes de chequear edits. Heurística amplia para cubrir formatos
+            # variados de error de providers free.
+            if grep -qiE 'quota|rate.?limit|insufficient.?(credit|balance|token)|429|payment.?required|free.?tier.?expired|out of (credits|tokens)|usage limit' "$out_file"; then
+              echo "WARN tier $label: señal de quota exhausted detectada en output." >&2
+              return 10  # código reservado: quota
+            fi
+
+            # Pedido explícito de clarificación: no es fallo, se respeta.
+            if grep -q "CLARIFICATION_NEEDED:" "$out_file"; then
+              echo "CLAUDE_NEEDS_CLARIFICATION=true" >> "$GITHUB_ENV"
+              echo "Tier $label: el agente pidió clarificación; no se intentan más tiers." >&2
+              return 0
+            fi
+
+            # Detectar fallo silencioso: el agente "respondió" pero no tocó
+            # archivos. Cubre (a) tool calls emitidos como texto (problema
+            # histórico GLM), (b) modelo que solo describe sin actuar, (c)
+            # timeout sin output útil.
+            if [ -z "$(git status --porcelain)" ]; then
+              echo "WARN tier $label: sin cambios en working tree (no edits reales)." >&2
+              return 20  # código reservado: no edits
+            fi
+
+            return 0
+          }
+
+          # Construir scripts de cada tier en archivos temporales (no inline)
+          # para mantener el bash legible y poder ejecutarlos bajo `timeout`.
+          TIER0_CMD="${RUNNER_TEMP}/tier0.sh"
+          TIER1_CMD="${RUNNER_TEMP}/tier1.sh"
+          TIER0_OUT="${RUNNER_TEMP}/tier0-output.txt"
+          TIER1_OUT="${RUNNER_TEMP}/tier1-output.txt"
+
+          cat > "$TIER0_CMD" <<'TIER0_EOF'
+          # TIER0: GLM-4.6 vía litellm-proxy local (claude-code CLI nativo).
+          # litellm corre en alpha:4000 como podman-litellm-proxy.service y
+          # expone /anthropic/v1/messages compatible. ZAI_API_KEY ya vive en
+          # SOPS y el container lo monta. Lo único que falta para activar este
+          # tier es exponer LITELLM_MASTER_KEY al user claude-runner.
+          export ANTHROPIC_BASE_URL="http://127.0.0.1:4000"
+          export ANTHROPIC_API_KEY="${LITELLM_MASTER_KEY}"
+          claude-code \
+            --dangerously-skip-permissions \
+            --output-format=stream-json \
+            --print < "$PROMPT_FILE"
+          TIER0_EOF
+
+          cat > "$TIER1_CMD" <<'TIER1_EOF'
+          # TIER1: opencode/minimax-m2.5-free. Free tier opencode.ai, sin auth.
           opencode run \
             --dir "$GITHUB_WORKSPACE" \
             --dangerously-skip-permissions \
-            -m opencode/nemotron-3-super-free \
+            -m opencode/minimax-m2.5-free \
             --format json \
-            "$(cat "$PROMPT_FILE")" \
-            > "$OUTPUT_FILE"
+            "$(cat "$PROMPT_FILE")"
+          TIER1_EOF
+
+          WINNER=""
+          QUOTA_HIT=""
+
+          # ─── TIER0 (condicional) ────────────────────────────────────────────
+          if [ -n "${LITELLM_MASTER_KEY:-}" ] && command -v claude-code >/dev/null 2>&1; then
+            if run_tier "0-glm46-litellm" "$TIER0_CMD" "$TIER0_OUT" 900; then
+              cp "$TIER0_OUT" "$OUTPUT_FILE"
+              WINNER="tier0-glm-4.6-via-litellm"
+            else
+              rc=$?
+              [ "$rc" = "10" ] && QUOTA_HIT="${QUOTA_HIT}tier0(glm) "
+              echo "TIER0 falló (rc=$rc). Probando TIER1." >&2
+              git checkout -- . 2>/dev/null || true  # limpieza por si quedó algo a medias
+            fi
+          else
+            echo "TIER0 skip: LITELLM_MASTER_KEY no presente o claude-code no instalado." >&2
+          fi
+
+          # ─── TIER1 (default) ────────────────────────────────────────────────
+          if [ -z "$WINNER" ] && [ "${CLAUDE_NEEDS_CLARIFICATION:-false}" != "true" ]; then
+            if run_tier "1-minimax-m2.5-free" "$TIER1_CMD" "$TIER1_OUT" 1500; then
+              cp "$TIER1_OUT" "$OUTPUT_FILE"
+              WINNER="tier1-minimax-m2.5-free"
+            else
+              rc=$?
+              [ "$rc" = "10" ] && QUOTA_HIT="${QUOTA_HIT}tier1(minimax) "
+              echo "TIER1 falló (rc=$rc)." >&2
+            fi
+          fi
+
+          # ─── Resultado ──────────────────────────────────────────────────────
           echo "output=$OUTPUT_FILE" >> "$GITHUB_OUTPUT"
-          # Detectar pedido explícito de clarificación.
-          if grep -q "CLARIFICATION_NEEDED:" "$OUTPUT_FILE"; then
-            echo "CLAUDE_NEEDS_CLARIFICATION=true" >> "$GITHUB_ENV"
-            echo "Claude pidió clarificación; no se hace push." >&2
+
+          if [ "${CLAUDE_NEEDS_CLARIFICATION:-false}" = "true" ]; then
+            echo "Resultado: clarificación pedida (sin push)."
             exit 0
           fi
+
+          if [ -z "$WINNER" ]; then
+            echo "::error::Toda la chain de modelos falló. Quota hits: ${QUOTA_HIT:-ninguno explícito}"
+            # Concatenar outputs para audit aunque el job termine en failure
+            {
+              echo "=== TIER0 OUTPUT (si corrió) ==="
+              [ -f "$TIER0_OUT" ] && cat "$TIER0_OUT" || echo "(no se intentó)"
+              echo "=== TIER1 OUTPUT ==="
+              [ -f "$TIER1_OUT" ] && cat "$TIER1_OUT" || echo "(no se intentó)"
+            } > "$OUTPUT_FILE"
+            echo "CHAIN_EXHAUSTED=true" >> "$GITHUB_ENV"
+            echo "QUOTA_HIT=${QUOTA_HIT}" >> "$GITHUB_ENV"
+            exit 1
+          fi
+
+          echo "WINNER_TIER=$WINNER" >> "$GITHUB_ENV"
+          echo "Resultado: $WINNER produjo cambios reales."
 
       - name: Commit and push changes
         if: env.CLAUDE_NEEDS_CLARIFICATION != 'true'
@@ -199,14 +327,25 @@ jobs:
             exit 1
           fi
 
-          # Extraer summary del output JSON de Claude (último mensaje).
-          SUMMARY=$(jq -r '.messages[-1].content // "Implementación generada por Claude Code."' "$OUTPUT_FILE" 2>/dev/null | head -c 500)
+          # Extraer summary del output. Cada tier escribe en formato distinto:
+          # - claude-code stream-json: línea(s) JSON con .type=="assistant", .message.content[].text
+          # - opencode --format json: stream con .type=="text", .part.text
+          # Fallback: las últimas 500 chars del archivo. Nunca rompemos por jq.
+          SUMMARY=$(jq -rs '
+            [ .[]
+              | select(.type=="text" or .type=="assistant")
+              | (.part.text // (.message.content[]? | .text) // empty)
+            ] | last // "Implementación generada por Claude Code."
+          ' "$OUTPUT_FILE" 2>/dev/null | head -c 500)
+          if [ -z "$SUMMARY" ] || [ "$SUMMARY" = "null" ]; then
+            SUMMARY="Implementación generada por ${WINNER_TIER:-Claude Code}."
+          fi
 
           git add -A
           git commit \
             -m "feat(issue-${ISSUE_NUM}): implementación auto-generada por Claude Code" \
             -m "${SUMMARY}" \
-            -m "[claude-code-run #${RUN_ID}]"
+            -m "[claude-code-run #${RUN_ID}] [tier=${WINNER_TIER:-unknown}]"
           git push origin "$BRANCH"
 
       - name: Upload audit transcript
@@ -229,8 +368,10 @@ jobs:
           ARTIFACT_URL="https://github.com/${REPO}/actions/runs/${RUN_ID}"
           if [ "${CLAUDE_NEEDS_CLARIFICATION:-false}" = "true" ]; then
             STATUS="⚠️ Claude pidió clarificación — no hay cambios pusheados."
+          elif [ "${CHAIN_EXHAUSTED:-false}" = "true" ]; then
+            STATUS="❌ Chain de modelos agotada. Quota hits: \`${QUOTA_HIT:-ninguno explícito}\`. Ver logs."
           elif [ "${{ job.status }}" = "success" ]; then
-            STATUS="✅ Cambios pusheados al branch del PR."
+            STATUS="✅ Cambios pusheados al branch del PR (tier: \`${WINNER_TIER:-unknown}\`)."
           else
             STATUS="❌ Generación falló. Ver logs."
           fi
@@ -276,16 +417,19 @@ jobs:
           if [ "${CLAUDE_NEEDS_CLARIFICATION:-false}" = "true" ]; then
             STATUS="clarification"
             MESSAGE="Claude pidio clarificacion. Sin cambios pusheados."
+          elif [ "${CHAIN_EXHAUSTED:-false}" = "true" ]; then
+            STATUS="quota_exhausted"
+            MESSAGE="Chain agotada. Quota hits: ${QUOTA_HIT:-ninguno explicito}."
           elif [ "${{ job.status }}" = "success" ]; then
             STATUS="success"
-            MESSAGE="Cambios generados y pusheados al branch del PR."
+            MESSAGE="Cambios generados y pusheados (tier=${WINNER_TIER:-unknown})."
           else
             STATUS="failed"
             MESSAGE="Generacion fallida. Ver logs del run."
           fi
           curl -sS -X POST "${CLAUDE_LINK_URL}/claude-code-run/${PR_NUM}/status" \
             -H "Content-Type: application/json" \
-            -d "{\"run_id\": \"${RUN_ID}\", \"status\": \"${STATUS}\", \"pr_url\": \"${PR_URL}\", \"message\": \"${MESSAGE}\", \"issue_num\": \"${ISSUE_NUM}\"}" \
+            -d "{\"run_id\": \"${RUN_ID}\", \"status\": \"${STATUS}\", \"pr_url\": \"${PR_URL}\", \"message\": \"${MESSAGE}\", \"issue_num\": \"${ISSUE_NUM}\", \"tier\": \"${WINNER_TIER:-}\"}" \
             || echo "Agent polling endpoint notification failed (ignored)"
 
       - name: Notify Telegram (non-blocking)
@@ -304,8 +448,10 @@ jobs:
           fi
           if [ "${CLAUDE_NEEDS_CLARIFICATION:-false}" = "true" ]; then
             STATUS="⚠️ pidió clarificación"
+          elif [ "${CHAIN_EXHAUSTED:-false}" = "true" ]; then
+            STATUS="🪫 chain agotada (quota: ${QUOTA_HIT:-?})"
           elif [ "${{ job.status }}" = "success" ]; then
-            STATUS="✅ push OK"
+            STATUS="✅ push OK (tier=${WINNER_TIER:-?})"
           else
             STATUS="❌ falló"
           fi
