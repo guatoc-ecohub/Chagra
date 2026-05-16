@@ -65,57 +65,57 @@
   ],
   "failure_modes": [
     {
-      "razon": "Espigado prematuro (bolting)",
-      "cuando": "Vegetativo tardío",
-      "sintoma": "Elongación abrupta del tallo, roseta se pierde, sabor amargo (lactucopicrina)",
-      "agente_causal": "Estrés térmico (>25°C) o hídrico/nitrogenado",
-      "mitigacion": "Variedades tolerantes (Batavia Salinas, romana Parris Island), siembra en época fresca, mulch para estabilizar humedad",
+      "razon": "Espigado: la lechuga se va a flor antes de tiempo",
+      "cuando": "Antes de cosechar",
+      "sintoma": "El tallo crece muy rápido hacia arriba, la lechuga pierde su forma redonda y las hojas saben amargas",
+      "agente_causal": "Hace mucho calor (más de 25°C) o le falta agua o tiene demasiado abono nitrogenado",
+      "mitigacion": "Usa variedades que aguantan calor (Batavia Salinas, romana Parris Island). Siembra en temporada fresca. Cubre el suelo con paja para que no se reseque.",
       "frecuencia": "muy_comun"
     },
     {
-      "razon": "Tip burn (necrosis marginal)",
-      "cuando": "Desarrollo vegetativo",
-      "sintoma": "Necrosis marginal de hojas jóvenes, aspecto de quemadura",
-      "agente_causal": "Deficiencia localizada de Ca por exceso de N o riegos desbalanceados",
-      "mitigacion": "Estabilización de pulsos de riego, aspersión foliar de calcio orgánico quelatado, mulch",
+      "razon": "Quemaduras en los bordes de las hojas (Tip burn)",
+      "cuando": "Cuando la planta está creciendo",
+      "sintoma": "Los bordes de las hojas jóvenes se ven como quemados, marrones y secos",
+      "agente_causal": "Le falta calcio porque tiene mucho nitrógeno o porque el riego está desbalanceado",
+      "mitigacion": "Riega de forma regular sin altibajos. Rocía las hojas con calcio orgánico. Cubre el suelo con paja.",
       "frecuencia": "comun"
     },
     {
-      "razon": "Damping-off (estrangulamiento basal)",
-      "cuando": "Germinación / semillero",
-      "sintoma": "Necrosis del cuello, colapso repentino de la plántula",
-      "agente_causal": "Pythium / Rhizoctonia por exceso de humedad y sustrato no desinfectado",
-      "mitigacion": "Solarización del sustrato, Trichoderma harzianum nativo, riego matutino, reducir lámina de riego",
+      "razon": "Caída de plantulitas (Damping-off)",
+      "cuando": "Cuando la semilla acaba de germinar",
+      "sintoma": "El tallo de la plántula se pone delgado en la base y la planta se cae de repente",
+      "agente_causal": "Hongos del suelo (Pythium o Rhizoctonia) por demasiada humedad en sustrato sin desinfectar",
+      "mitigacion": "Calienta el sustrato bajo el sol antes de sembrar (solarización). Usa Trichoderma. Riega en la mañana, no en la tarde. Reduce el agua.",
       "frecuencia": "comun"
     },
     {
       "razon": "Babosas y caracoles",
-      "cuando": "Trasplante a cosecha",
-      "sintoma": "Agujeros irregulares en hojas, baba plateada en el envés o suelo",
-      "agente_causal": "Moluscos gasterópodos nocturnos",
-      "mitigacion": "Trampas de cerveza, ceniza perimetral, conservación de carábidos depredadores, recolección manual nocturna",
+      "cuando": "Desde el trasplante hasta la cosecha",
+      "sintoma": "Hojas con agujeros irregulares y un rastro brillante plateado debajo o en el suelo",
+      "agente_causal": "Salen de noche a comerse las hojas",
+      "mitigacion": "Pon trampas con un poco de cerveza. Rodea las plantas con ceniza. Sal de noche con una linterna a recogerlos.",
       "frecuencia": "comun"
     },
     {
-      "razon": "Mildiu velloso",
-      "cuando": "Desarrollo vegetativo",
-      "sintoma": "Manchas amarillas en haz con micelio blanco-violáceo en envés",
-      "agente_causal": "Bremia lactucae, alta humedad relativa y rocío persistente",
-      "mitigacion": "Variedades resistentes (Bl:29-41EU Enza Zaden), distancia adecuada entre plantas, caldo bordelés preventivo 0.5%",
+      "razon": "Mildiu velloso (hongo Bremia lactucae)",
+      "cuando": "Cuando la planta está creciendo",
+      "sintoma": "Manchas amarillas en la parte de arriba de las hojas y una pelusa blanca con tono morado en la parte de abajo",
+      "agente_causal": "Mucha humedad en el aire y rocío que no se seca",
+      "mitigacion": "Usa variedades resistentes (Bl:29-41EU Enza Zaden). Deja espacio entre plantas. Aplica caldo bordelés al 0.5% como prevención.",
       "frecuencia": "ocasional"
     }
   ],
   "companions": [
-    { "especie": "Allium cepa (cebolla)", "razon": "Compuestos azufrados disuaden herbívoros foliares; complementariedad radicular (cebolla profunda, lechuga superficial)", "evidencia": "tradicion + literatura agronomica" },
-    { "especie": "Daucus carota (zanahoria)", "razon": "Complementariedad radicular (zanahoria pivotante)", "evidencia": "manuales agroecologicos andinos" },
-    { "especie": "Raphanus sativus (rábano)", "razon": "Cultivo de ciclo ultracorto (21 días) que se cosecha antes del acogollado de la lechuga", "evidencia": "tradicion" },
-    { "especie": "Spinacia oleracea (espinaca)", "razon": "Comparte ventana fenológica fría", "evidencia": "tradicion" },
-    { "especie": "Brassica oleracea (coles)", "razon": "Sinergia documentada en literatura agronómica internacional", "evidencia": "literatura internacional" }
+    { "especie": "Cebolla (Allium cepa)", "razon": "Su olor a azufre espanta insectos que se comen las hojas. Sus raíces van más hondo que las de la lechuga, así no pelean por espacio.", "evidencia": "tradicion + literatura agronomica" },
+    { "especie": "Zanahoria (Daucus carota)", "razon": "Su raíz baja recto hacia abajo y no pelea con las raíces de la lechuga", "evidencia": "manuales agroecologicos andinos" },
+    { "especie": "Rábano (Raphanus sativus)", "razon": "Crece muy rápido (21 días) y se cosecha antes de que la lechuga forme su corazón", "evidencia": "tradicion" },
+    { "especie": "Espinaca (Spinacia oleracea)", "razon": "Le gusta el mismo clima fresco que la lechuga", "evidencia": "tradicion" },
+    { "especie": "Coles (Brassica oleracea)", "razon": "Combinación que funciona bien según los libros de agricultura", "evidencia": "literatura internacional" }
   ],
   "antagonistas": [
-    { "especie": "Foeniculum vulgare (hinojo)", "razon": "Aleloquímicos agresivos inhiben germinación y expansión celular de la lechuga" },
-    { "especie": "Apium graveolens (apio)", "razon": "Competencia hídrica + atracción de plagas comunes (umbelíferas)" },
-    { "especie": "Helianthus annuus (girasol)", "razon": "Alelopatía (juglona-like)" }
+    { "especie": "Hinojo (Foeniculum vulgare)", "razon": "Suelta sustancias que no dejan crecer bien a la lechuga" },
+    { "especie": "Apio (Apium graveolens)", "razon": "Compite por agua y atrae plagas comunes" },
+    { "especie": "Girasol (Helianthus annuus)", "razon": "Sus raíces sueltan sustancias que afectan a la lechuga" }
   ],
   "biopreparados": [
     { "nombre": "Bocashi", "uso": "Pre-siembra: 1.5-2 kg/m² incorporado 10-12 días antes del trasplante", "fuente": "Boudet et al. 2017; Tolentino et al. 2023 (extrapolación desde tomate)" },
