@@ -4553,7 +4553,7 @@
         "notas": "Siembra directa en sitio definitivo."
       },
       "notas_taxonomicas": "Las razas locales colombianas como 'Capio' (blanco harinoso), 'Cusco' (morado) y 'Pira' son fundamentales para la soberanía alimentaria de la zona altoandina. El sistema Milpa integra maíz con frijol y calabaza.",
-      "valor_pedagogico": "Lección de Milpa: enseña el sistema de 'las tres hermanas' y la importancia de la diversidad genética en razas criollas.",
+      "valor_pedagogico": "Lección de Milpa: el maíz criollo andino (Zea mays L.) se cultiva en el altiplano cundiboyacense y Nariño entre 1800-2800 msnm en zonas frío-templadas. Las variedades 'Capio', 'Pira' y 'Cusco' son patrimonios genéticos muiscas. Ciclo de 6 meses, propagación por semilla directa. En asociación tradicional milpa (frijol+calabaza) se emplea manejo integrado de Spodoptera frugiperda y Puccinia sorghi. Fuente: NRC (1989) Cultivos Andinos, AGROSAVIA, ICA Res. 3168/2015.",
       "plagas_criticas": [
         "Spodoptera frugiperda (cogollero)",
         "Helicoverpa zea",
@@ -4566,7 +4566,9 @@
       "source_ids": [
         "agrosavia-manual-biopreparados-2015",
         "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
+        "ica-resolucion-3168-2015",
+        "powo-kew",
+        "nrc-1989-cultivos-andinos"
       ],
       "validation_level": "claude_draft"
     },
