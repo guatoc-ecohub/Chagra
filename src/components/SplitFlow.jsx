@@ -48,7 +48,7 @@ export const SplitFlow = ({ asset, onClose }) => {
             <div className="flex justify-between items-center mb-8">
                 <h2 className="text-xl font-bold text-white flex items-center gap-2">
                     <Layers className="text-emerald-400" />
-                    Splitear {trackingMode === 'individual' ? 'a Agregado' : 'a Individual'}
+                    {trackingMode === 'individual' ? 'Juntar en grupo' : 'Dividir en plantas individuales'}
                 </h2>
                 <button onClick={onClose} className="p-2 text-slate-400 hover:text-white transition-colors">
                     <X size={24} />
@@ -104,7 +104,7 @@ export const SplitFlow = ({ asset, onClose }) => {
                             onClick={() => setStep(2)}
                             className="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black shadow-lg shadow-emerald-900/20 active:scale-95 transition-transform"
                         >
-                            Continuar a Preview
+                            Continuar a Vista previa
                         </button>
                     </div>
                 )}
