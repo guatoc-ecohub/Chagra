@@ -12,19 +12,5 @@
     "estado": "activo",
     "descripcion_corta": "Laboratorio de conservación + restauración de páramo en Choachí.",
     "farmos_endpoint": "https://farmos.guatoc.co"
-  },
-  {
-    "slug": "los-sitios",
-    "nombre": "Los Sitios",
-    "operador": "Placeholder",
-    "coords": [
-      4.5500,
-      -73.9000
-    ],
-    "altitud": 2200,
-    "biocultural_zone": "andino_medio",
-    "estado": "demo",
-    "descripcion_corta": "Finca demo (coords aproximadas, sustituir con datos reales antes de field test).",
-    "farmos_endpoint": "https://farmos.guatoc.co"
   }
 ]
