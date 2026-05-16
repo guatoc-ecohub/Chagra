@@ -182,7 +182,7 @@ export const AssetDetailView = () => {
               </section>
 
               <section className="pt-2">
-                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Gestión de Trazabilidad</h3>
+                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Historial de la planta</h3>
                 <div className="flex flex-wrap gap-2">
                   {status !== 'dead' && (
                     <>
@@ -190,7 +190,7 @@ export const AssetDetailView = () => {
                         <Skull size={14} /> Marcar muerte
                       </button>
                       <button onClick={() => setShowSplitFlow(true)} className="px-3 py-2 rounded-lg bg-emerald-900/20 text-emerald-400 border border-emerald-700/30 text-xs flex items-center gap-2">
-                        <Layers size={14} /> Splitear / Unificar
+                        <Layers size={14} /> Dividir / Juntar
                       </button>
                     </>
                   )}
