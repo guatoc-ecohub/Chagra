@@ -3216,11 +3216,13 @@
         "metodo_principal": "esqueje",
         "notas": "Los esquejes semileñosos enraízan con facilidad; prefiere suelos ligeros."
       },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "pamplona-roger-2006-plantas-medicinales"
-      ],
-      "valor_pedagogico": "Lección de adaptación hídrica: sus hojas vellosas muestran una estrategia para reducir la transpiración en climas secos."
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-manual-biopreparados-2015",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "La Salvia officinalis L. se cultiva en los departamentos andinos de Colombia como Cundinamarca, Boyacá y Nariño entre 800 y 3200 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación mediante esquejes semileñosos que enraízan con facilidad en suelos ligeros, con un ciclo de producción de 6-8 meses para cosecha de hojas. Se asocia beneficiosamente con repollo y zanahoria para reducir plagas como áfidos y trips, requiere monitoreo de arañuelas y oidio en condiciones de alta humedad. En el contexto cultural andino-campesino, sus hojas se utilizan tradicionalmente en infusiones digestivas y como antiséptico natural para heridas leves, conocimiento que tiene raíces en las prácticas muiscas de medicina tradicional. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), y respaldada por el Manual de Biopreparados de AGROSAVIA (2015) y la ICA Resolución 3168/2015, su nombre científico válido es Salvia officinalis L."
     },
     {
       "id": "sambucus_nigra_peruviana",
