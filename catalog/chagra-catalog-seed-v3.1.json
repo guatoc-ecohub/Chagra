@@ -2331,10 +2331,11 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
-        "fao-ecocrop",
-        "powo-kew"
+        "powo-kew",
+        "agrosavia-sol-andina",
+        "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de entomología: importancia de los abejorros (Xylocopa spp.) para la polinización efectiva y el éxito de la cosecha."
+      "valor_pedagogico": "La granadilla (Passiflora ligularis Juss.) se distribuye en los departamentos andinos de Colombia como Cundinamarca, Boyacá, Antioquia, Nariño y Santander entre 1500 y 2600 msnm, con óptimo productivo entre 1800 y 2400 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con tratamiento de escarificación para acelerar la germinación (14-21 días), ciclo productivo de 12-18 meses desde siembra hasta primera cosecha, requiere tutoraje con espalderas o emparrillados sturdy para soportar el peso de los racimos, y se asocia beneficiosamente con plátano y café como sombra parcial. Las principales plagas incluyen nematodos del género Meloidogyne, trips (Frankliniella spp.), mosca de la fruta (Ceratitis capitata) y enfermedades fungosas como antracnosis (Colletotrichum gloeosporioides), requeridas de manejo integrado mediante monitoreo quincenal y biopreparados andinos. En el contexto cultural muisca y andino, esta passiflora ha sido tradicionalmente cultivada en huertos caseros y chagras de altura, donde sus frutos se consumen frescos en jugos y obras, mientras la planta se usa como cerca viva decorativa por sus flores vistosas. Los saberes tradicionales incluyen el uso de hojas en infusiones para calmar aftas y la aplicación del mucílago de los frutos como gelatinizante natural en la cocina campesina. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), respaldada por AGROSAVIA Sol Andina y la ICA Resolución 3168/2015, su nombre científico válido es Passiflora ligularis Juss."
     },
     {
        "id": "passiflora_tripartita_mollissima",
