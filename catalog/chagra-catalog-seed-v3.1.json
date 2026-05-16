@@ -946,10 +946,12 @@
       "antagonists": [
         "pennisetum_setaceum"
       ],
-      "valor_pedagogico": "Esponja de agua natural. Su estructura captura la niebla y alimenta los nacederos. La verdadera cobertura del páramo.",
+      "valor_pedagogico": "Calamagrostis effusa, conocida como paja de páramo, es una gramínea perenne fundamental en los ecosistemas de páramo andino colombiano, presente en departamentos como Cundinamarca, Boyacá, Norte de Santander y Nariño entre 2800 y 4200 msnm en zona térmica páramo. Su manejo agronómico incluye propagación vegetativa mediante división de matas, con ciclo de crecimiento lento adaptado a condiciones de baja temperatura y alta radiación UV. Establece asociaciones beneficiosas con especies como Quercus humboldtii (roble andino) en sistemas de recuperación ecológica, actuando como especie nurse que facilita el establecimiento de otras plantas nativas. En el contexto cultural muisca y andino, esta especie ha sido tradicionalmente utilizada por comunidades indígenas para tejer cubiertas de viviendas y como material de aislamiento térmico en chagras de altura, valorada por su capacidad de regulación hídrica y estabilización de suelos. Según las fuentes taxonómicas verificadas de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Calamagrostis effusa (Kunth) Steud.",
       "source_ids": [
-        "ley-1930-2018-paramos",
-        "humboldt-flora-alto-andina"
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "ica-resolucion-3168-2015",
+        "nrc-1989-cultivos-andinos"
       ],
       "validation_level": "claude_draft",
       "estrato": "bajo"
