@@ -741,44 +741,46 @@
       "valor_pedagogico": "Lección de respuesta lumínica: muestra cómo la planta produce pigmentos púrpuras para gestionar la radiación UV en altura."
     },
     {
-      "id": "brassica_oleracea_capitata_alba",
-      "nombre_comun": "Repollo blanco",
-      "nombre_cientifico": "Brassica oleracea var. capitata L.",
-      "familia_botanica": "Brassicaceae",
-      "category": "hortalizas_hoja",
-      "thermal_zones": [
-        "frio",
-        "templado"
-      ],
-      "roles_in_guild": [
-        "crop"
-      ],
-      "cultivable": true,
-      "conservation_status": "cultivo_comun",
-      "altitud_msnm": {
-        "min_absoluto": 800,
-        "optimo_min": 1800,
-        "optimo_max": 2600,
-        "max_absoluto": 3000
-      },
-      "temperatura_c": {
-        "helada_letal": -5,
-        "optimo_min": 15,
-        "optimo_max": 20,
-        "max_tolerable": 28
-      },
-      "radiacion": "sol_pleno",
-      "agua": "alto",
-      "drenaje_requerido": "bueno",
-      "propagation": {
-        "metodo_principal": "semilla",
-        "notas": "Requiere semillero. El trasplante debe ser profundo para asegurar estabilidad."
-      },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
-      ],
-      "valor_pedagogico": "Lección de morfología: muestra cómo las hojas se envuelven y compactan para formar una 'cabeza' protegida en la chagra."
+       "id": "brassica_oleracea_capitata_alba",
+       "nombre_comun": "Repollo blanco",
+       "nombre_cientifico": "Brassica oleracea var. capitata L.",
+       "familia_botanica": "Brassicaceae",
+       "category": "hortalizas_hoja",
+       "thermal_zones": [
+         "frio",
+         "templado"
+       ],
+       "roles_in_guild": [
+         "crop"
+       ],
+       "cultivable": true,
+       "conservation_status": "cultivo_comun",
+       "altitud_msnm": {
+         "min_absoluto": 800,
+         "optimo_min": 1800,
+         "optimo_max": 2600,
+         "max_absoluto": 3000
+       },
+       "temperatura_c": {
+         "helada_letal": -5,
+         "optimo_min": 15,
+         "optimo_max": 20,
+         "max_tolerable": 28
+       },
+       "radiacion": "sol_pleno",
+       "agua": "alto",
+       "drenaje_requerido": "bueno",
+       "propagation": {
+         "metodo_principal": "semilla",
+         "notas": "Requiere semillero. El trasplante debe ser profundo para asegurar estabilidad."
+       },
+       "source_ids": [
+         "gbif-taxonomic-backbone",
+         "powo-kew",
+         "agrosavia-sol-andina",
+         "ica-resolucion-3168-2015"
+       ],
+       "valor_pedagogico": "El repollo blanco (Brassica oleracea var. capitata L.) se cultiva ampliamente en los departamentos andinos de Colombia como Cundinamarca, Boyacá, Nariño y Antioquia entre 800 y 3000 msnm en zonas térmicas fría y templada. Su manejo agronómico incluye propagación por semilla en semillero seguido de trasplante profundo para asegurar estabilidad, con un ciclo de cultivo de 90-120 días, se asocia beneficiosamente con zanahoria y cebolla para reducir plagas como áfidos y lepidópteros, y requiere monitoreo de plagas como mosca blanca y gusanos del repollo. En el contexto campesino andino, esta crucífera ha sido tradicionalmente utilizada en soplos, ensaladas y preparaciones fermentadas como base alimenticia esencial, preservando sabores prehispánicos en las cocinas rurales de los Andes colombianos. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Brassica oleracea var. capitata L."
     },
     {
       "id": "brassica_oleracea_capitata_rubra",
