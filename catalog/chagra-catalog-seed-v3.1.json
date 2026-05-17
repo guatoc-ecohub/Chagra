@@ -1430,6 +1430,51 @@
       "validation_level": "claude_draft"
     },
     {
+      "id": "eugenia_stipitata",
+      "nombre_comun": "Arazá",
+      "nombre_cientifico": "Eugenia stipitata McVaugh",
+      "familia_botanica": "Myrtaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "harvest_type": "fruto",
+      "cycleMonths": 48,
+      "estrato": "medio",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 600,
+        "max_absoluto": 1000
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 22,
+        "optimo_max": 28,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Los frutos contienen múltiples semillas que se extraen de la pulpa; germinación en 2-4 semanas bajo condiciones de alta humedad."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "gbif-colombia",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "El arazá (Eugenia stipitata McVaugh) es un frutal nativo de la Amazonía colombiana, presente en los departamentos de Putumayo, Caquetá, Amazonas y Vaupés entre 0 y 1000 msnm en zonas térmicas calidas. Su manejo agronómico incluye propagación por semilla con germinación de 2-4 semanas bajo alta humedad, ciclo de fructificación de 3-4 años desde la siembra, requiere ambientes con alta humedad relativa y suelos bien drenados, y presenta sensibilidad a enfermedades fúngicas como la antracnosis (Colletotrichum gloeosporioides) y ataque de moscas de la fruta (Anastrepha spp.). En el contexto cultural amazonense, esta especie ha sido tradicionalmente consumida por comunidades indígenas y campesinas amazónicas como fruta fresca y en preparaciones de jugos y mermeladas, representando un recurso alimenticio nativo de la región biogeográfica del Amazonas colombiano. Según el inventario taxonómico verificado por GBIF Backbone Taxonomy, Plants of the World Online (POWO), GBIF Colombia y el Sistema de Información sobre Biodiversidad de Colombia (SiB Colombia), su nombre científico válido es Eugenia stipitata McVaugh.",
+      "validation_level": "ai_draft"
+    },
+    {
       "id": "eucalyptus_globulus",
       "nombre_comun": "Eucalipto blanco",
       "nombre_cientifico": "Eucalyptus globulus Labill.",
