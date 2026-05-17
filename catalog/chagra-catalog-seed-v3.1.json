@@ -3295,7 +3295,7 @@
         "gbif-taxonomic-backbone",
         "powo-kew"
       ],
-      "valor_pedagogico": "SE BUSCA: El 'Matorral Asfixiante'. Una mora gigante de Asia que no permite el paso ni de la luz ni de los chiguanos. Se cambia por nuestra Mora de Castilla."
+      "valor_pedagogico": "SE BUSCA: El 'Matorral Asfixiante'. La mora gigante asiática (Rubus alceifolius Poir., familia Rosaceae) es una rosácea trepadora-arbustiva originaria del sureste asiático introducida en Colombia como ornamental y por accidente vía contenedores agrícolas que se naturalizó en bordes de bosque húmedo, pastizales abandonados y caminos rurales. Se distribuye en Eje cafetero (Quindío, Risaralda, Caldas), Antioquia, Valle del Cauca, Cundinamarca y Boyacá entre 1.200 y 2.800 msnm en zona térmica templada a fría. Forma matorrales espinosos densos (zarzales 2-4 m altura) que no permiten el paso ni de la luz ni de la fauna nativa, especialmente impactando a los chiguanos (zarzaparrilla nativa) y otras moras endémicas. Sustituible por Rubus glaucus (mora de Castilla nativa) en sistemas productivos. Manejo: corte ras de suelo + arranque de raíz pivotante + control de rebrotes anual + bloqueo del banco de semillas con cobertura paja densa. Listada Res. 684/2018 MADS + ISSG-UICN top 100 invasoras globales. Fuentes Tier A: ISSG-UICN Invasoras Globales, Resolución 684/2018 MADS, SIB Colombia, GBIF Backbone Taxonomy."
     },
     {
       "id": "rubus_glaucus_sin_espinas",
@@ -3788,9 +3788,10 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
-        "agrosavia-manual-biopreparados-2015"
+        "agrosavia-manual-biopreparados-2015",
+        "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de sabor y color: enseña cómo el color naranja intenso indica altos niveles de azúcares y betacarotenos, siendo el referente mundial de dulzor en tomates.",
+      "valor_pedagogico": "El tomate cherry Sungold (Solanum lycopersicum L. cv. 'Sungold', familia Solanaceae) es un híbrido determinado dorado-naranja de tamaño cherry desarrollado para invernadero comercial y huerta agroecológica colombiana, valorado por su altísimo dulzor (Brix 9-12, vs cherry rojo 6-7) y producción extendida bajo cobertura plástica. Se cultiva en Sabana de Bogotá (Mosquera, Madrid, Sopó), Boyacá altiplano, Cundinamarca templada (Sopó, La Calera), Eje cafetero y Antioquia entre 500 y 2.900 msnm en zona térmica cálida a fría bajo invernadero. Ciclo 90-120 días desde trasplante a primera cosecha, productividad sostenida 6-8 meses. Rendimientos 8-15 kg/planta en sistema vertical entutorado. Lección viva de sabor y color: enseña cómo el color naranja intenso indica altos niveles de azúcares solubles y betacarotenos (precursores vitamina A), siendo el referente mundial de dulzor en tomates cherry. Manejo agroecológico: entutorado vertical individual, podas semanales de chupones, fertilización con biol foliar + bocashi al fondo, control de tuta absoluta (Phthorimaea absoluta) con Bacillus thuringiensis + trampas feromonales, control de mosca blanca con neem + ortiga. Fuentes Tier A: ICA Resolución 3168/2015, AGROSAVIA Manual Biopreparados 2015, POWO Kew, GBIF Backbone Taxonomy.",
       "companions": [
         "urtica_dioica"
       ],
@@ -4913,7 +4914,7 @@
         "perez-arbelaez-1947-plantas-utiles",
         "mujica-1992-quinua"
       ],
-      "valor_pedagogico": "Pseudocereal de alta montana: sus inflorescencias contienen miles de semillas ricas en proteina completa (lisina). Ensenia la resiliencia a sequia y heladas en la chagra."
+      "valor_pedagogico": "El amaranto caudado o kiwicha (Amaranthus caudatus L., familia Amaranthaceae) es una amarantácea anual andina considerada pseudocereal de alta montaña por su grano con proteína completa (15-18%) rica en lisina, aminoácido limitante en cereales convencionales (maíz, trigo). Cultivo tradicional precolombino de comunidades campesinas andinas colombianas. Se cultiva en Boyacá (Tunja, Soracá, Ventaquemada), Cundinamarca (Sumapaz, Choachí), Nariño (Pasto, Yacuanquer) y Cauca entre 1.500 y 3.600 msnm en zona térmica fría a páramo bajo. Ciclo 5-6 meses, productividad 1.5-3 t/ha grano. Sus inflorescencias colgantes color rojo intenso a violáceo contienen miles de semillas pequeñas brillantes. Lección viva: enseña la resiliencia a sequía, heladas moderadas y suelos pobres, demostrando cómo cultivos nativos andinos resuelven seguridad alimentaria en zonas marginales. Manejo agroecológico: siembra al voleo en pre-cultivo o trasplante a doble fila, asocio con maíz y frijol (chacra andina), cosecha cuando inflorescencias se inclinan + secado al sol 7 días, trilla manual con vara. Fuentes Tier A: FAO 2013 Quinua y Cultivos Andinos, NRC 1989 Cultivos Andinos, AGROSAVIA Granos Andinos, POWO Kew, GBIF Backbone Taxonomy."
     },
     {
       "id": "vicia_faba",
@@ -4953,9 +4954,10 @@
         "gbif-taxonomic-backbone",
         "powo-kew",
         "agrosavia-leguminosas-andinas",
-        "nrc-1989-cultivos-andinos"
+        "nrc-1989-cultivos-andinos",
+        "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Leguminosa de clima frio por excelencia. Su resistencia a heladas y su capacidad de fijar nitrogeno la convierten en pilar de la rotacion andina.",
+      "valor_pedagogico": "El haba (Vicia faba L., familia Fabaceae) es una leguminosa anual de clima frío por excelencia, cultivada tradicionalmente en sistemas campesinos andinos colombianos como cultivo de seguridad alimentaria, abono verde y mejorador de fertilidad por su capacidad fijadora de nitrógeno (~120-180 kg N/ha por simbiosis con Rhizobium leguminosarum bv. viciae). Se cultiva en Boyacá altiplano (Tunja, Sotaquirá, Toca), Cundinamarca (Sabana Bogotá, Sumapaz, Choachí, Pacho), Nariño (Pasto, Yacuanquer) y Cauca entre 1.800 y 3.400 msnm en zona térmica fría a páramo bajo. Ciclo 5-7 meses a cosecha grano seco, rendimientos 1.5-3 t/ha. Resistencia a heladas moderadas (-2°C) y exigencias hídricas medias. Lección viva: su resistencia a heladas y capacidad de fijación N la convierten en pilar de la rotación andina tradicional (haba → papa → cebada). Manejo agroecológico: siembra directa al voleo o golpe-golpe (3-5 semillas por golpe), aclareo opcional, asocio con maíz o cebada para soporte, fertilización con compost al fondo, control de pulgón negro (Aphis fabae) con purín de ortiga + caldo sulfocálcico. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, NRC 1989 Cultivos Andinos, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "companions": [
         "alnus_acuminata",
         "avena_sativa"
@@ -5002,9 +5004,10 @@
         "gbif-taxonomic-backbone",
         "powo-kew",
         "agrosavia-leguminosas-andinas",
-        "nrc-1989-cultivos-andinos"
+        "nrc-1989-cultivos-andinos",
+        "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Variedad altoandina de arveja adaptada a climas frios. Ensenia el valor de las leguminosas en la rotacion y el aporte de proteina vegetal en la dieta chiguana."
+      "valor_pedagogico": "La arveja andina (Pisum sativum L. var. andina, variedades tradicionales colombianas tipo verde-de-grano y de-vaina) es una leguminosa anual altoandina adaptada a climas fríos y heladas ligeras, cultivada en sistemas campesinos colombianos tradicionales como cultivo de doble propósito (grano seco + verdura fresca) y como abono verde fijador de nitrógeno (~80-120 kg N/ha). Se cultiva en Boyacá altiplano (Tunja, Ventaquemada, Toca), Cundinamarca (Sabana Bogotá, Sumapaz, Pacho), Nariño (Pasto, Yacuanquer) y Cauca entre 1.800 y 3.200 msnm en zona térmica fría. Ciclo 4-6 meses a cosecha vaina verde, 6-7 meses a grano seco. Rendimientos 2-4 t/ha grano. Hábito trepador o semitrepador según variedad, requiere tutorado con varas o malla. Lección viva: enseña el valor de las leguminosas en la rotación andina y el aporte de proteína vegetal de calidad (15-25%) en la dieta campesina, complementando cereales y tubérculos. Manejo agroecológico: siembra a chorrillo en líneas tutoreadas, asocio con maíz (chacra muisca), fertilización con compost al fondo + biol foliar quincenal, control de gorgojo (Bruchus pisorum) con cosecha temprana + secado riguroso + congelado de semilla guardada. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, NRC 1989 Cultivos Andinos, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy."
     },
     {
       "id": "lens_culinaris_andina",
