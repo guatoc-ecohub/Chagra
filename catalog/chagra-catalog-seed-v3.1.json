@@ -995,7 +995,7 @@
         "ica-resolucion-3168-2015",
         "powo-kew"
       ],
-      "valor_pedagogico": "Lección de selección varietal: su textura rugosa es un aislante térmico natural que le permite resistir inviernos intensos en la montaña.",
+      "valor_pedagogico": "El repollo crespo o de saboya (Brassica oleracea L. var. sabauda, cultivares Savoy King, Famosa) es una crucífera bienal cultivada como anual con hojas crespas/ampolladas características que retienen menos agua y son más resistentes al transporte que el repollo común. En Colombia se cultiva en Sabana de Bogotá (Mosquera, Madrid, Funza), Boyacá altiplano y Nariño entre 2.000 y 2.900 msnm en zona térmica fría. Ciclo 4-5 meses a cosecha, rendimientos 35-50 t/ha. Cabeza compacta 1-2 kg. Manejo agroecológico: trasplante a doble fila densa (40×50 cm), rotación con leguminosas (haba, frijol) anti-Plasmodiophora brassicae (hernia col), bordura de capuchina trampa, control de palomilla crucíferas (Plutella xylostella) con Bacillus thuringiensis + Trichogramma, fertilización con bocashi + biol. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "antagonists": [
         "solanum_lycopersicum_san_marzano",
         "vaccinium_corymbosum_biloxi"
@@ -1673,7 +1673,7 @@
         "gbif-taxonomic-backbone",
         "agrosavia-manual-biopreparados-2015"
       ],
-      "valor_pedagogico": "Lección de fotoperiodo: variedad que permite entender cómo la planta produce flores y frutos independientemente de la duración del día.",
+      "valor_pedagogico": "La fresa Monterrey (Fragaria × ananassa Duchesne ex Rozier cv. Monterrey) es una rosácea perenne híbrida productiva (day-neutral) muy adoptada en cultivos comerciales colombianos por su precocidad, fruto grande y firme, y producción extendida primavera-otoño. Se cultiva en Cundinamarca (Sabana Bogotá, Sopó, Choachí, Sibaté), Boyacá (Sotaquirá, Toca), Nariño y Antioquia entre 1.800 y 2.800 msnm en zona térmica fría. Ciclo a primera cosecha 60-90 días desde trasplante, productividad sostenida 8-12 meses con manejo adecuado. Rendimientos 25-45 t/ha en sistema agroecológico mulching. Manejo: cama elevada con MO abundante, mulch plástico o paja, fertilización con biol foliar y bocashi al fondo, control de Botrytis cinerea con caldo bordelés + bacillus_subtilis, manejo de ácaros con caldo sulfocálcico. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "estrato": "rastrero"
     },
     {
@@ -2194,9 +2194,10 @@
       "source_ids": [
         "agrosavia-manual-biopreparados-2015",
         "cip-2006-ghislain",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "agrosavia-leguminosas-andinas"
       ],
-      "valor_pedagogico": "Leguminosa de alta montaña. Sus alcaloides actúan como repelentes naturales en la chagra; enseña el valor de los cultivos de ciclo cerrado.",
+      "valor_pedagogico": "El tarwi o chocho andino (Lupinus mutabilis Sweet) es una leguminosa nativa de los Andes con alto contenido proteico en grano (35-50%), tradicionalmente cultivada en sistemas campesinos altoandinos colombianos para autoconsumo (cosecha desamargada). Se cultiva en Boyacá (Tunja, Soatá, Ventaquemada), Cundinamarca (Sumapaz, Choachí), Nariño y Cauca entre 2.500 y 3.500 msnm en zona térmica fría a páramo bajo. Ciclo 6-8 meses, fijación N biológica ~100-160 kg N/ha. Granos con alcaloides amargos (quinolizidínicos) requieren desamargado tradicional (remojo + enjuagues). Manejo agroecológico: siembra al voleo en pre-cultivo (8-12 kg/ha), incorporación como abono verde o cosecha grano + restos al suelo, rotación con tubérculos andinos. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, NRC 1989 Cultivos Andinos, POWO Kew, GBIF Backbone Taxonomy.",
       "companions": [
         "alnus_acuminata",
         "zea_mays"
@@ -4023,7 +4024,7 @@
         "solanum_lycopersicum_san_marzano"
       ],
       "antagonists": [],
-      "valor_pedagogico": "Lección de sacrificio biológico. Prefiere que los pulgones la ataquen a ella antes que a tus coles. Un escudo comestible en la chagra.",
+      "valor_pedagogico": "La capuchina ornamental (Tropaeolum majus L.) es una tropeolácea anual originaria de los Andes peruanos, cultivada en Colombia como planta ornamental, comestible (flores en ensaladas) y trampa cultivo. Se cultiva en zonas frías y templadas: Sabana de Bogotá, Boyacá, Eje cafetero y Antioquia entre 1.500 y 2.800 msnm en zona térmica fría a templada. Ciclo anual 90-120 días desde germinación a senescencia. Flores comestibles ricas en glucosinolatos (sabor picante similar al berro), hojas comestibles también. Manejo agroecológico: siembra borde de huerta como trampa cultivo (atrae áfidos lejos de hortalizas principales), siembra densa al voleo en franja perimetral, cobertura suelo de pendientes erosionables, atrayente de polinizadores (abejas, abejorros, colibríes). Auto-siembra natural. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "source_ids": [
         "gbif-taxonomic-backbone",
         "powo-kew",
@@ -5091,9 +5092,10 @@
         "gbif-taxonomic-backbone",
         "powo-kew",
         "nrc-1989-cultivos-andinos",
-        "perez-arbelaez-1947-plantas-utiles"
+        "perez-arbelaez-1947-plantas-utiles",
+        "agrosavia-leguminosas-andinas"
       ],
-      "valor_pedagogico": "Tesoro genetico andino: frijol que revienta al tostarse. Ensenia la diversidad de usos y la importancia de conservar variedades locales."
+      "valor_pedagogico": "El frijol nuña (Phaseolus vulgaris L. tipo nuña, pop bean andino) es una variedad tradicional precolombina del frijol común con la característica única de explotar/tostar al calor seco (sin agua) produciendo una palomita similar al maíz pop. Cultivado tradicionalmente por comunidades campesinas en Cundinamarca, Boyacá, Nariño y Cauca entre 2.000 y 3.000 msnm en zona térmica fría. Ciclo 4-5 meses, hábito determinado o semi-trepador según variedad local. Fija nitrógeno biológico (~60-100 kg N/ha) por simbiosis con Rhizobium leguminosarum. Manejo agroecológico: asocio tradicional con maíz (chacra muisca, milpa), rotación trienal con tubérculos, semilla seleccionada del operador (custodios de semilla). Conservación de variedad andina amenazada por modernización. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, NRC 1989 Cultivos Andinos, POWO Kew, GBIF Backbone Taxonomy."
     },
     {
       "id": "dioscorea_trifida",
