@@ -37,6 +37,12 @@ const ROOT = resolve(__dirname, '..');
 
 const args = process.argv.slice(2);
 const SEED_MODE = args.includes('--seed-mode');
+// --lenient-schema downgrades JSON Schema errors a warnings. Útil para
+// cablear el validador a CI/lefthook mientras hay 35 errores legacy en main
+// (enums inválidos introducidos por auto-gen pre-pipeline: frutales_nativos,
+// ai_draft, naturalizada, LC, rizoma, etc). Los validadores semánticos
+// AMB-05..18 siguen siendo strict — son los que catchean bugs nuevos.
+const LENIENT_SCHEMA = args.includes('--lenient-schema');
 const positional = args.filter((a) => !a.startsWith('--'));
 const [catalogArg, schemaArg] = positional;
 const CATALOG_PATH = catalogArg
@@ -316,6 +322,74 @@ function validateAmb15_scaleCoherence(catalog) {
   return errors;
 }
 
+// AMB-16: valor_pedagogico ≥200 chars (compromiso template species-batch-prompt
+// para que el contenido tenga densidad pedagógica suficiente; species PRs auto-
+// generados con vp corto deben ser rechazados).
+const VP_MIN_CHARS = 200;
+function validateAmb16_vpLength(catalog) {
+  const errors = [];
+  for (const sp of catalog.species || []) {
+    if (typeof sp.valor_pedagogico !== 'string') continue;
+    const len = sp.valor_pedagogico.trim().length;
+    if (len < VP_MIN_CHARS) {
+      errors.push(`AMB-16 [${sp.id}]: valor_pedagogico=${len} chars < ${VP_MIN_CHARS} (densidad pedagógica insuficiente)`);
+    }
+  }
+  return errors;
+}
+
+// AMB-17: source_ids con ≥2 fuentes Tier A (rigor científico). Lista canónica
+// derivada de templates/species-batch-prompt.md §"FUENTES OBLIGATORIAS Tier A".
+// Match laxo (substring) para tolerar variantes del slug (e.g. "gbif-...", "iavh-...").
+const TIER_A_KEYWORDS = [
+  'iavh', 'humboldt',
+  'bernal', 'plantas-liquenes-colombia',
+  'powo', 'kew',
+  'gbif',
+  'tropicos',
+  'agrosavia',
+  'caldasia', 'acta-biologica',  // peer-reviewed con DOI
+  'doi-',
+];
+function isTierASourceId(sid) {
+  const s = String(sid || '').toLowerCase();
+  return TIER_A_KEYWORDS.some((kw) => s.includes(kw));
+}
+function validateAmb17_tierACoverage(catalog) {
+  const errors = [];
+  for (const sp of catalog.species || []) {
+    const sids = sp.source_ids || [];
+    const tierA = sids.filter(isTierASourceId);
+    if (tierA.length < 2) {
+      errors.push(`AMB-17 [${sp.id}]: ${tierA.length} fuente(s) Tier A en source_ids=[${sids.join(', ')}] — requiere ≥2`);
+    }
+  }
+  return errors;
+}
+
+// AMB-18: roundtrip de formato. JSON.stringify(parsed, null, 2) === raw file.
+// Detecta bugs de indentación introducidos por generators que escriben texto
+// directo (e.g. TIER1 minimax dejó "source_ids": [ sin indent en PR #728).
+// El catálogo de Chagra es source-of-truth para reproducibilidad cross-host —
+// re-formatear constantemente con `prettier --write` evita merge-conflicts
+// triviales.
+function validateAmb18_formatRoundtrip(catalogPath) {
+  const raw = readFileSync(catalogPath, 'utf8');
+  const parsed = JSON.parse(raw);
+  const formatted = JSON.stringify(parsed, null, 2) + '\n';
+  if (raw === formatted) return [];
+  // Identificar línea del primer mismatch para feedback útil
+  const rawLines = raw.split('\n');
+  const fmtLines = formatted.split('\n');
+  const max = Math.min(rawLines.length, fmtLines.length);
+  for (let i = 0; i < max; i++) {
+    if (rawLines[i] !== fmtLines[i]) {
+      return [`AMB-18: formato no normalizado (primer mismatch línea ${i + 1}).\n    raw: ${rawLines[i].slice(0, 80)}\n    fmt: ${fmtLines[i].slice(0, 80)}\n    Fix: node -e "const fs=require('fs'); const p='${catalogPath}'; fs.writeFileSync(p, JSON.stringify(JSON.parse(fs.readFileSync(p,'utf8')), null, 2) + '\\n');"`];
+    }
+  }
+  return [`AMB-18: formato no normalizado (length diff: raw=${rawLines.length} líneas vs fmt=${fmtLines.length})`];
+}
+
 // ----------------------------------------------------------------
 // Main
 // ----------------------------------------------------------------
@@ -332,12 +406,24 @@ const catalog = loadJSON(CATALOG_PATH);
 const schemaErrors = [];
 validate(catalog, schema, schema, '$', schemaErrors);
 if (schemaErrors.length) {
-  for (const e of schemaErrors) console.error(`  ✗ schema: ${e}`);
-  die(1, `${schemaErrors.length} errores de JSON Schema`);
+  if (LENIENT_SCHEMA) {
+    warn(`JSON Schema v3.1: ${schemaErrors.length} warning(s) (lenient)`);
+    for (const e of schemaErrors.slice(0, 10)) console.warn(`    ${e}`);
+    if (schemaErrors.length > 10) console.warn(`    ... +${schemaErrors.length - 10} más`);
+  } else {
+    for (const e of schemaErrors) console.error(`  ✗ schema: ${e}`);
+    die(1, `${schemaErrors.length} errores de JSON Schema (usa --lenient-schema para downgrade a warnings)`);
+  }
+} else {
+  ok('JSON Schema v3.1 — PASS');
 }
-ok('JSON Schema v3.1 — PASS');
 
 // 2. Validadores semánticos
+// Nota: AMB-16/17/18 introducidos 2026-05-16 tras detectar bugs en species PRs
+// auto-generados (vp corto, source_ids sin Tier A, formato sin roundtrip).
+// SEED_MODE relaja AMB-16/17 a warnings: el catálogo seed legacy aún tiene
+// entradas pre-pipeline con vp/sources incompletos que se completan progresivo
+// vía batches. main no debe REGRESAR — el guard es para PRs nuevos, no existing.
 const semanticChecks = [
   ['AMB-05 altitud chain', (c) => ({ errors: validateAmb05_altitudChain(c), warnings: [] })],
   ['AMB-10 companions/antagonists symmetry', (c) => {
@@ -347,6 +433,18 @@ const semanticChecks = [
   ['AMB-13 cross-refs existencia', (c) => validateAmb13_crossRefs(c, SEED_MODE)],
   ['AMB-14 invasor consistency', (c) => ({ errors: validateAmb14_invasorConsistency(c), warnings: [] })],
   ['AMB-15 scale_viability ↔ manejo_por_escala', (c) => ({ errors: validateAmb15_scaleCoherence(c), warnings: [] })],
+  ['AMB-16 valor_pedagogico ≥200 chars', (c) => {
+    const arr = validateAmb16_vpLength(c);
+    return SEED_MODE ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
+  }],
+  ['AMB-17 source_ids ≥2 Tier A', (c) => {
+    const arr = validateAmb17_tierACoverage(c);
+    return SEED_MODE ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
+  }],
+  ['AMB-18 format roundtrip', () => {
+    const arr = validateAmb18_formatRoundtrip(CATALOG_PATH);
+    return SEED_MODE ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
+  }],
 ];
 
 if (SEED_MODE) console.log('  mode:    SEED (refs a species ausentes = warnings)\n');
