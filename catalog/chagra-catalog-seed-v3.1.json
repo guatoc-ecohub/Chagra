@@ -356,7 +356,7 @@
         "erythrina_edulis",
         "lupinus_mutabilis",
         "passiflora_tripartita_mollissima",
-        "pennisetum_clandestinum_manejado",
+        "cenchrus_clandestinus_manejado",
         "quercus_humboldtii",
         "solanum_phureja",
         "trifolium_repens",
@@ -9741,6 +9741,207 @@
       "valor_pedagogico": "El guamo macheto (Inga densiflora Benth.) se cultiva en departamentos andinos y amazónicos de Colombia como Putumayo, Caquetá, Meta, Amazonas y parte de la cordillera oriental entre 0 y 2200 msnm, con óptimo entre 500 y 1800 msnm en zonas térmicas templadas. Su manejo agronómico incluye propagación por semilla fresca (recalcitrante) con germinación de 15-30 días, ciclo de establecimiento de 6-12 meses hasta primera producción de vainas, se asocia beneficiosamente con café y cacao como sombra temporal en sistemas agroforestales, y fija nitrógeno atmosférico mediante nodulación con rhizobios, mejorando la fertilidad del suelo. En el contexto cultural muisca y campesino andino, los frutos (vainas) se consumen tradicionalmente como snack dulce y la madera se usa para postes y leña. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Inga densiflora Benth.",
       "validation_level": "claude_draft",
       "estrato": "alto"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "cenchrus_clandestinus_manejado",
+      "nombre_comun": "Kikuyo manejado",
+      "nombre_comunes_regionales": [
+        "kikuyu",
+        "pasto kikuyo"
+      ],
+      "nombre_cientifico": "Cenchrus clandestinus (Hochst. ex Chiov.) Morrone",
+      "familia_botanica": "Poaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "ground_cover",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2000,
+        "optimo_max": 2900,
+        "max_absoluto": 3200
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "Variedad manejada del kikuyo (Cenchrus clandestinus), pasto perenne ampliamente usado en ganadería extensiva andina. Bajo manejo agroecológico (cortes programados, asociaciones con Alnus acuminata, rotación de potreros) reduce su carácter invasor original.",
+      "companions": [
+        "alnus_acuminata"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "sambucus_peruviana",
+      "nombre_comun": "Sauco peruano",
+      "nombre_comunes_regionales": [
+        "sauco andino",
+        "tilo del campo"
+      ],
+      "nombre_cientifico": "Sambucus peruviana Kunth",
+      "familia_botanica": "Adoxaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "living_fence",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2000,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "Árbol/arbusto nativo andino utilizado tradicionalmente para cercas vivas y como sustituta nativa frente al retamo espinoso (Ulex europaeus) invasor. Floración blanca atractiva para polinizadores."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "festuca_sp_paramo",
+      "nombre_comun": "Pajonal de páramo",
+      "nombre_comunes_regionales": [
+        "paja paramuna",
+        "festuca paramuna"
+      ],
+      "nombre_cientifico": "Festuca spp. (complejo paramuno)",
+      "familia_botanica": "Poaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "ground_cover",
+        "nurse_plant"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_protegido",
+      "altitud_msnm": {
+        "min_absoluto": 2800,
+        "optimo_min": 3000,
+        "optimo_max": 4000,
+        "max_absoluto": 4500
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "Complejo de Festuca (varias spp.) nativo del páramo colombiano. Componente estructural fundamental del ecosistema páramo, regula hídricamente y forma cobertura suelo."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "agrostis_foliata",
+      "nombre_comun": "Pasto agrostis foliado",
+      "nombre_comunes_regionales": [],
+      "nombre_cientifico": "Agrostis foliata Roem. & Schult.",
+      "familia_botanica": "Poaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "ground_cover"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2500,
+        "optimo_min": 3000,
+        "optimo_max": 3800,
+        "max_absoluto": 4200
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "Gramínea nativa andina sub-páramo / páramo. Útil como cobertura vegetal en sistemas de restauración."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "miconia_squamulosa",
+      "nombre_comun": "Niguito",
+      "nombre_comunes_regionales": [
+        "miconia"
+      ],
+      "nombre_cientifico": "Miconia squamulosa Naudin",
+      "familia_botanica": "Melastomataceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nurse_plant",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 3000,
+        "max_absoluto": 3300
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "Árbol andino nativo de bosque sub-páramo. Frutos atraen avifauna; especie útil en restauración como nurse plant frente a invasoras (Pteridium aquilinum, Ulex europaeus)."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "escallonia_paniculata",
+      "nombre_comun": "Chacate",
+      "nombre_comunes_regionales": [
+        "pucho",
+        "escalonia"
+      ],
+      "nombre_cientifico": "Escallonia paniculata (Ruiz & Pav.) Schult.",
+      "familia_botanica": "Escalloniaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "living_fence",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2500,
+        "optimo_max": 3200,
+        "max_absoluto": 3500
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "Árbol/arbusto andino nativo usado en cercas vivas y restauración de bordes de páramo. Sustituta documentada de Ulex europaeus invasor en planes restauración Cruz Verde-Sumapaz."
     }
   ],
   "biopreparados": [
