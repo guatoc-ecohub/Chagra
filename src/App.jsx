@@ -46,6 +46,9 @@ const OnboardingPiloto = lazy(() => import('./components/OnboardingPiloto'));
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
 const ProfileScreen = lazy(() => import('./components/ProfileScreen'));
 const VoiceTelemetryScreen = lazy(() => import('./components/VoiceTelemetryScreen'));
+const CaseStudyScreen = lazy(() => import('./components/CaseStudyScreen'));
+const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
+const CaseStudyTopWidget = lazy(() => import('./components/CaseStudyTopWidget'));
 const HelpManual = lazy(() => import('./components/HelpManual'));
 const OnboardingHero = lazy(() => import('./components/OnboardingHero'));
 const TopBar = lazy(() => import('./components/TopBar'));
@@ -179,6 +182,12 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
             <TelemetryAlerts onNavigate={onNavigate} lastFarmOsLog={lastLogMessage} />
           </ErrorBoundary>
         )}
+
+        {/* Top problemas activos casos de estudio (DR-044 sub-iv). */}
+        {/* Se auto-oculta cuando no hay casos activos (KISS, zero footprint). */}
+        <ErrorBoundary>
+          <CaseStudyTopWidget onNavigate={onNavigate} maxItems={3} />
+        </ErrorBoundary>
 
         {noGeoCount > 0 && (
           <button
