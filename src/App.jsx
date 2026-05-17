@@ -76,6 +76,7 @@ const NAV_TILES = [
   { id: 'historial', label: 'Bitácora', icon: NotebookPen, accent: 'indigo', desc: 'Historial de actividades' },
   { id: 'biodiversidad', label: 'Flora y fauna', icon: Leaf, accent: 'emerald', desc: 'Ecosistema, estratos y gremios' },
   { id: 'reportar_invasora', label: 'Plagas', icon: AlertCircle, accent: 'amber', desc: 'Reporte de plagas y malezas' },
+  { id: 'casos', label: 'Casos', icon: FileText, accent: 'amber', desc: 'Seguimiento de problemas y tratamientos' },
   { id: 'informes', label: 'Informes', icon: FileText, accent: 'lime', desc: 'Descargas de reportes en CSV' },
   { id: 'perfil', label: 'Perfil', icon: Palette, accent: 'indigo', desc: 'Temas y configuración' },
 ];
@@ -372,6 +373,20 @@ export default function App() {
         return <ProfileScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />;
       case 'voice_telemetry':
         return <VoiceTelemetryScreen onBack={() => navigate('perfil')} />;
+      case 'casos':
+        return (
+          <CaseStudyScreen
+            onBack={() => navigate('dashboard')}
+            onSelectCase={(id) => navigate('caso_detail', { caseId: id })}
+          />
+        );
+      case 'caso_detail':
+        return (
+          <CaseStudyDetail
+            caseId={currentViewData?.caseId}
+            onBack={() => navigate('casos')}
+          />
+        );
       case 'help':
         return <HelpManual onBack={() => navigate('dashboard')} onNavigate={navigate} />;
       case 'agente':
