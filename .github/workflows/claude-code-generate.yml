@@ -119,6 +119,7 @@ jobs:
             echo "4. **Respeta el boundary anti-leak**: opera SOLO en este repo. NO referencies recursos de repos privados, infra interna, ni hostnames LAN. Lo que documenta CONTRIBUTING.md §1-§2."
             echo "5. **Cero hardcoding** de URLs, IPs, tokens. Toda config externa via \`import.meta.env.VITE_*\` y proxy Nginx."
             echo "6. Si después de leer el código no tienes claridad sobre cómo implementar, EXIT 1 con mensaje en stdout que diga 'CLARIFICATION_NEEDED: <pregunta concreta>'. NO inventes."
+            echo "7. **Scope estricto**: solo modificar archivos relevantes al issue. NUNCA borres archivos en \`.requests/\` salvo el propio \`.requests/issue-${ISSUE_NUM}.md\`. Esos stubs los gestiona claude-code-request.yml, no este workflow. Un guardrail post-generate rechaza commits que violen esta regla (bug PR #728 forzó este check)."
             echo
             echo "## Tu tarea"
             echo
@@ -333,6 +334,30 @@ jobs:
             echo "ERROR: Claude no produjo cambios; abortando push." >&2
             exit 1
           fi
+
+          # ─── Guardrail anti-scope-creep (added 2026-05-16) ────────────────
+          # Bug detectado en PR #728 (allium_sativum): TIER1 (minimax-m2.5-free)
+          # borró .requests/issue-{689,710,713,718,729,730,732,740,752,759,770,772}.md
+          # — stubs de OTROS issues no relacionados con #720. Esos archivos los
+          # gestiona EXCLUSIVAMENTE claude-code-request.yml; este workflow NUNCA
+          # debe tocarlos salvo el propio .requests/issue-${ISSUE_NUM}.md.
+          BAD_DELETIONS=$( { git diff --cached --name-only --diff-filter=D 2>/dev/null; \
+                             git diff --name-only --diff-filter=D 2>/dev/null; } \
+                          | sort -u \
+                          | grep -E '^\.requests/issue-[0-9]+\.md$' \
+                          | grep -vE "^\.requests/issue-${ISSUE_NUM}\.md$" || true)
+          if [ -n "$BAD_DELETIONS" ]; then
+            echo "::error::Guardrail scope-creep: el AI borró .requests/* de OTROS issues:" >&2
+            echo "$BAD_DELETIONS" >&2
+            echo "Esos archivos los gestiona claude-code-request.yml, no este workflow." >&2
+            echo "Posible causa: modelo cloud salió del scope. Revertir y reintentar tier." >&2
+            exit 1
+          fi
+
+          # Snapshot del scope efectivo (informativo, no bloqueante).
+          echo "── Diff scope summary ──"
+          git diff --name-only HEAD | sort | head -20
+          echo "──"
 
           # Extraer summary del output. Cada tier escribe en formato distinto:
           # - claude-code stream-json: línea(s) JSON con .type=="assistant", .message.content[].text

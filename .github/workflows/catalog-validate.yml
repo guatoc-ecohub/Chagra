@@ -1,0 +1,57 @@
+name: Catalog Validate
+
+# Corre validate-catalog.mjs cuando un PR toca catalog/ o el schema. Es un
+# merge-gate adicional barato (segundos, sin npm install ni build), separado
+# de los gates pesados (CodeQL + Playwright) para feedback rápido a species
+# refiners.
+#
+# Modo CI: --lenient-schema --seed-mode. Schema errors legacy quedan como
+# warnings (cleanup pendiente fuera de este workflow). Pero AMB-11 (source_id
+# refs sin entrada), AMB-18 (format roundtrip) y otros checks duros sí
+# fallan — ahí es donde catchea bugs nuevos.
+
+on:
+  pull_request:
+    paths:
+      - 'catalog/**/*.json'
+      - 'scripts/validate-catalog.mjs'
+      - '.github/workflows/catalog-validate.yml'
+  # También en push a main para detectar regresiones (si alguien hace push
+  # directo bypassing PRs — branch protection lo bloquea pero defense in depth).
+  push:
+    branches: [main]
+    paths:
+      - 'catalog/**/*.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: catalog-validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run catalog validator (lenient + seed)
+        run: node scripts/validate-catalog.mjs --lenient-schema --seed-mode
+
+      # Comentario informativo en el PR cuando hay warnings significativos.
+      # Si AMB-16 sigue creciendo (vp <200 chars), señala que el batch de
+      # refinement no está cerrando el backlog.
+      - name: Summarize warnings
+        if: always()
+        run: |
+          echo "## Validator summary" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          node scripts/validate-catalog.mjs --lenient-schema --seed-mode 2>&1 | tail -30 >> $GITHUB_STEP_SUMMARY || true
+          echo '```' >> $GITHUB_STEP_SUMMARY

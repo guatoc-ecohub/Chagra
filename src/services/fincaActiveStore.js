@@ -48,11 +48,16 @@ const useFincaActiveStore = create(
             setGpsHistoryEnabled: (enabled) => set({ gpsHistoryEnabled: !!enabled }),
 
             // Resolver el endpoint de FarmOS para la finca activa (Fase 1)
+            // Fallback chain: activa.farmos_endpoint → guatoc.farmos_endpoint → ''
+            // Fase 1 v2-strict: si la finca activa NO tiene endpoint propio
+            // (asesor externo, finca sin FarmOS server), operador opera
+            // contra Guatoc default para no romper UX. Test cubre el caso.
             getActiveEndpoint: () => {
                 const state = get();
                 const finca = state.fincas.find(f => f.slug === state.activeFincaSlug);
-                // Default a Guatoc si no hay coincidencia (seguridad v2-strict)
-                return finca?.farmos_endpoint || '';
+                if (finca?.farmos_endpoint) return finca.farmos_endpoint;
+                const guatoc = state.fincas.find(f => f.slug === 'guatoc');
+                return guatoc?.farmos_endpoint || '';
             },
 
             getActiveFinca: () => {

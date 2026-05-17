@@ -46,6 +46,9 @@ const OnboardingPiloto = lazy(() => import('./components/OnboardingPiloto'));
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
 const ProfileScreen = lazy(() => import('./components/ProfileScreen'));
 const VoiceTelemetryScreen = lazy(() => import('./components/VoiceTelemetryScreen'));
+const CaseStudyScreen = lazy(() => import('./components/CaseStudyScreen'));
+const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
+const CaseStudyTopWidget = lazy(() => import('./components/CaseStudyTopWidget'));
 const HelpManual = lazy(() => import('./components/HelpManual'));
 const OnboardingHero = lazy(() => import('./components/OnboardingHero'));
 const TopBar = lazy(() => import('./components/TopBar'));
@@ -76,6 +79,7 @@ const NAV_TILES = [
   { id: 'historial', label: 'Bitácora', icon: NotebookPen, accent: 'indigo', desc: 'Historial de actividades' },
   { id: 'biodiversidad', label: 'Flora y fauna', icon: Leaf, accent: 'emerald', desc: 'Ecosistema, estratos y gremios' },
   { id: 'reportar_invasora', label: 'Plagas', icon: AlertCircle, accent: 'amber', desc: 'Reporte de plagas y malezas' },
+  { id: 'casos', label: 'Casos', icon: FileText, accent: 'amber', desc: 'Seguimiento de problemas y tratamientos' },
   { id: 'informes', label: 'Informes', icon: FileText, accent: 'lime', desc: 'Descargas de reportes en CSV' },
   { id: 'perfil', label: 'Perfil', icon: Palette, accent: 'indigo', desc: 'Temas y configuración' },
 ];
@@ -178,6 +182,12 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
             <TelemetryAlerts onNavigate={onNavigate} lastFarmOsLog={lastLogMessage} />
           </ErrorBoundary>
         )}
+
+        {/* Top problemas activos casos de estudio (DR-044 sub-iv). */}
+        {/* Se auto-oculta cuando no hay casos activos (KISS, zero footprint). */}
+        <ErrorBoundary>
+          <CaseStudyTopWidget onNavigate={onNavigate} maxItems={3} />
+        </ErrorBoundary>
 
         {noGeoCount > 0 && (
           <button
@@ -372,6 +382,20 @@ export default function App() {
         return <ProfileScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />;
       case 'voice_telemetry':
         return <VoiceTelemetryScreen onBack={() => navigate('perfil')} />;
+      case 'casos':
+        return (
+          <CaseStudyScreen
+            onBack={() => navigate('dashboard')}
+            onSelectCase={(id) => navigate('caso_detail', { caseId: id })}
+          />
+        );
+      case 'caso_detail':
+        return (
+          <CaseStudyDetail
+            caseId={currentViewData?.caseId}
+            onBack={() => navigate('casos')}
+          />
+        );
       case 'help':
         return <HelpManual onBack={() => navigate('dashboard')} onNavigate={navigate} />;
       case 'agente':
