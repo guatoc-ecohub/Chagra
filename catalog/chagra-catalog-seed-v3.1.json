@@ -113,7 +113,7 @@
         "agrosavia-manual-frutales-tropicales",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "El anón (Annona squamosa L.) es un frutal tropical nativo de América tropical, cultivado en las regiones cálidas del Caribe colombiano como Córdoba, Bolívar, Magdalena, Cesar y La Guajira, entre 0 y 1500 msnm en zonas térmicas calidas. Su manejo agronómico incluye propagación por semilla de frutos maduros o injerto de púa para mantener características varietales, con un ciclo de fructificación de 3-4 años desde siembra, requiere podas de formación y mantenimiento, se asocia beneficiosamente con otros frutales tropicales como mango y papaya, y puede ser afectado por plagas como la mosca de la fruta y trips. En el contexto cultural Caribe colombiano, el anón es una fruta muy apreciada por su sabor dulce y cremoso, utilizada tradicionalmente en repostería local y consumed directamente como fruta fresca. Según las fuentes taxonómicas verificadas de GBIF Backbone Taxonomy y Plants of the World Online (POWO), así como el manual de frutales tropicales de AGROSAVIA y la ICA Resolución 3168/2015, su nombre científico válido es Annona squamosa L.",
+      "valor_pedagogico": "El anón (Annona squamosa L.) es un frutal de la familia Annonaceae adaptado a climas cálidos-secos a templados bajos colombianos, valorado por su fruto pulposo dulce de aroma característico. Se cultiva en Tolima (Norte, Mariquita), Huila (Garzón, La Plata), Cundinamarca (Tocaima, Apulo), Valle del Cauca, Antioquia y Magdalena entre 0 y 1.600 msnm en zona térmica cálida a templada. Árbol pequeño 4-6 m, ciclo a primera cosecha 3-4 años. Frutos cosechados pintones (cambio color, semi-firmes) para madurar fuera del árbol. Manejo agroecológico: poda formación copa baja, fertilización con compost + roca fosfórica, control de la perforadora del fruto (Bephratelloides cubensis) con embolsado de frutos y captura de adultos con trampas amarillas. Polinización manual mejora cuajado (Annona spp. son auto-poco-fértiles). Fuentes Tier A: AGROSAVIA Manual Frutales Tropicales, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "validation_level": "claude_draft",
       "estrato": "medio"
     },
@@ -1803,7 +1803,7 @@
         "sib-colombia",
         "gbif-taxonomic-backbone"
       ],
-      "valor_pedagogico": "SE BUSCA: La 'Estranguladora'. Se trepa sobre los árboles recién sembrados para robarles el sol. Cámbiala por una Pasiflora nativa."
+      "valor_pedagogico": "La campana morada o campanilla (Ipomoea purpurea (L.) Roth) es una convolvulácea anual trepadora ampliamente naturalizada en Colombia, valorada como ornamental, cobertura de cercas y atrayente de polinizadores (abejas, abejorros, colibríes). Crece prácticamente en todas las zonas térmicas entre 0 y 2.800 msnm. Floración vistosa morada-azul-rosa según ecotipo, ciclo anual con autodispersión por semilla (potencial maleza moderada en cultivos densos; manejar bordes). Manejo agroecológico: cerca viva temporal, control biológico al final de ciclo (corte antes de semilla madura para reducir banco semillas), uso como cobertura suelo en pendientes. NO es invasora alto riesgo según IAvH Baptiste 2010 pero se considera naturalizada de manejo. Fuentes Tier A: Catálogo Plantas y Líquenes Colombia, IAvH, POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA."
     },
     {
       "id": "inga_edulis",
@@ -2335,7 +2335,7 @@
         "pamplona-roger-2006-plantas-medicinales",
         "powo-kew"
       ],
-      "valor_pedagogico": "Lección de rusticidad y sabor mediterráneo adaptado: muestra cómo una planta puede ser cobertura de suelo y botica al mismo tiempo."
+      "valor_pedagogico": "El orégano común (Origanum vulgare L.) es una labiada perenne aromática originaria del Mediterráneo, ampliamente cultivada en huertas familiares y campesinas colombianas para uso culinario, medicinal y como repelente natural. Se cultiva en zonas frías y templadas: Sabana de Bogotá, Boyacá, Antioquia, Quindío, Caldas y Risaralda entre 1.200 y 2.800 msnm en zona térmica fría a templada. Propagación por estaca leñosa (60-80% prendimiento) o división de mata establecida. Ciclo perenne con vida productiva 4-6 años. Cortes graduales mensuales mantienen el porte compacto. Manejo agroecológico: cama elevada con drenaje excelente, suelos calcáreos pH 6.5-7.5, riego moderado (NO encharcamiento), asocio con tomate y pimentón (efecto repelente). Aceite esencial con carvacrol y timol confiere propiedades antibacterianas y antifúngicas. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy."
     },
     {
       "id": "oxalis_tuberosa",
@@ -3151,7 +3151,7 @@
       "antagonists": [
         "pinus_patula"
       ],
-      "valor_pedagogico": "Símbolo del bosque andino clímax. Los robledales son reservorios de agua para los chiguanos. Su conservación es prioridad regional.",
+      "valor_pedagogico": "El roble andino o roble negro (Quercus humboldtii Bonpl.) es una fagácea endémica de Colombia y Panamá, símbolo del bosque altoandino y especie ecológicamente clave para la restauración de la cordillera Oriental, incluyendo el complejo páramo Cruz Verde-Sumapaz. Se distribuye naturalmente en Cundinamarca (Sumapaz, Choachí, Ubaque, La Calera), Boyacá (Iguaque), Santander (Cordillera Yariguíes), Antioquia, Cauca y Nariño entre 1.800 y 3.200 msnm en zona térmica fría. Árbol grande hasta 25 m, copa amplia, hojas perennes coriáceas, bellotas alimento clave para fauna nativa (oso de anteojos, mamíferos pequeños, avifauna). Manejo agroecológico: propagación por bellota fresca (estratificación frío 60 días), planta nodriza Vallea stipularis o Buddleja bullata en primeras etapas, restauración riberas microcuencas. Protegido nacional. Fuentes Tier A: Catálogo de Plantas y Líquenes Colombia (Bernal et al.), Instituto Humboldt (IAvH), POWO Kew, GBIF Backbone Taxonomy.",
       "source_ids": [
         "libro-rojo-plantas-colombia",
         "humboldt-flora-alto-andina",
@@ -5139,7 +5139,7 @@
         "agrosavia-manual-tuberculos-andinos-2017",
         "powo-kew"
       ],
-      "valor_pedagogico": "Name andino tradicional del sistema chagra muisca. Ensenanza de raices reservantes y propagacion vegetativa en la huerta altoandina."
+      "valor_pedagogico": "El ñame trifoliado o cush-cush (Dioscorea trifida L.f.) es una dioscoreácea perenne trepadora cultivada por sus tubérculos comestibles ricos en almidón (~20% peso fresco), tradicional en la cocina afrocolombiana de las costas Pacífica y Atlántica. Se cultiva en zonas cálidas y templadas bajas: Chocó (Quibdó, Tadó), Valle del Cauca, Cauca (Buenaventura), Magdalena, Bolívar y Cesar entre 0 y 1.500 msnm en zona térmica cálida. Propagación por trozos de tubérculo o cabeza. Ciclo 8-10 meses a cosecha; rendimientos 8-15 t/ha. Crecimiento trepador exige tutorado con varas o árboles vivos. Manejo agroecológico: asocio con yuca, plátano y maíz en sistemas multipiso, fertilización orgánica al fondo (bocashi), control de gorgojo (Cyrtomenus bergi) con manejo cultural y rotación. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy, Catálogo Plantas y Líquenes Colombia."
     },
     {
       "id": "tropaeolum_tuberosum_mashua",
