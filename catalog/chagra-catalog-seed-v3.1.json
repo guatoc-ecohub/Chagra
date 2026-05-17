@@ -70,6 +70,48 @@
       "valor_pedagogico": "SE BUSCA: El 'Rebrotador Invencible'. Un error histórico de reforestación que asfixia los bordes de bosque. Se sustituye por el Aliso, que sí pertenece aquí."
     },
     {
+      "id": "annona_squamosa",
+      "nombre_comun": "Anón",
+      "nombre_cientifico": "Annona squamosa L.",
+      "familia_botanica": "Annonaceae",
+      "category": "frutales_nativos",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 800,
+        "max_absoluto": 1500
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 22,
+        "optimo_max": 28,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Se propaga por semilla de frutos maduros; la germinación toma 30-60 días. También por injerto de púa para mantener características varietales. El crecimiento es lento los primeros 2 años."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-manual-frutales-tropicales",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "El anón (Annona squamosa L.) es un frutal tropical nativo de América tropical, cultivado en las regiones cálidas del Caribe colombiano como Córdoba, Bolívar, Magdalena, Cesar y La Guajira, entre 0 y 1500 msnm en zonas térmicas calidas. Su manejo agronómico incluye propagación por semilla de frutos maduros o injerto de púa para mantener características varietales, con un ciclo de fructificación de 3-4 años desde siembra, requiere podas de formación y mantenimiento, se asocia beneficiosamente con otros frutales tropicales como mango y papaya, y puede ser afectado por plagas como la mosca de la fruta y trips. En el contexto cultural Caribe colombiano, el anón es una fruta muy apreciada por su sabor dulce y cremoso, utilizada tradicionalmente en repostería local y consumed directamente como fruta fresca. Según las fuentes taxonómicas verificadas de GBIF Backbone Taxonomy y Plants of the World Online (POWO), así como el manual de frutales tropicales de AGROSAVIA y la ICA Resolución 3168/2015, su nombre científico válido es Annona squamosa L.",
+      "validation_level": "ai_draft"
+    },
+    {
       "id": "allium_ampeloprasum",
       "nombre_comun": "Cebolla puerro",
       "nombre_cientifico": "Allium ampeloprasum var. porrum (L.) J. Gay",
