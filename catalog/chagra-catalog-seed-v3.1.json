@@ -575,10 +575,12 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-sol-andina",
         "ica-resolucion-3168-2015",
         "restrepo-1996-abc-agricultura-organica"
       ],
-      "valor_pedagogico": "Ejemplo de fitoquímica: muestra cómo las betalaínas (pigmentos rojos) actúan como potentes antioxidantes en la dieta chiguana."
+      "valor_pedagogico": "La acelga roja (Beta vulgaris var. cicla L.) es una hoja nutritiva cultivada en zonas frías y templadas de Colombia, especialmente en Cundinamarca (valle de Bogotá, Sabana), Boyacá (altiplano) y Nariño (corredor andino), entre 1500-2800 msnm. Su manejo agronómico incluye propagación por semilla en almácigo, trasplante a surcos con densidad de 20-25 cm entre plantas, ciclo de 90-120 días para cosecha continua de hojas externas, y asociaciones beneficiosas con espinaca, lechuga y cebolla. Plagas relevantes: pulgones (Myzus persicae), minerador de hoja (Liriomyza spp.) y alternaria (Alternaria alternata). Culturalmente, las variedades de hoja roja fueron valoradas en la gastronomía muisca por su contenido de betalaínas (pigmentos antioxidants), y hoy integran huertas urbanas y sistemas de producción orgánica en el altiplano cundiboyacense. Fuente: agrosavia-sol-andina."
     },
     {
       "id": "beta_vulgaris_conditiva",
