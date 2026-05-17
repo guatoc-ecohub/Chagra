@@ -1626,7 +1626,7 @@
         "restrepo-2007-biopreparados",
         "powo-kew"
       ],
-      "valor_pedagogico": "Caso de estudio principal en alelopatía: sus exudados inhiben a la mayoría de vecinos. Enseña la necesidad de aislamiento en el diseño del huerto.",
+      "valor_pedagogico": "El hinojo (Foeniculum vulgare Mill., familia Apiaceae) es una umbelífera perenne aromática originaria del Mediterráneo, naturalizada y cultivada en huertas familiares colombianas para uso culinario (bulbo, semilla, hoja), medicinal (digestivo, carminativo) e industrial (aceite esencial rico en anetol). Se cultiva en zonas templadas a frías: Cundinamarca (Sabana Bogotá), Boyacá, Antioquia, Quindío y Nariño entre 1.500 y 2.800 msnm en zona térmica templada a fría. Ciclo 4-6 meses a primera cosecha, perennización opcional 2-3 años. Caso de estudio principal en alelopatía: sus exudados radicales (compuestos cumarínicos) inhiben la germinación y crecimiento de la mayoría de vecinos, especialmente tomate, frijol, cilantro y eneldo. Manejo agroecológico: aislamiento mínimo 2-3 m de otras hortalizas O confinamiento en bordura/macetón, asocio compatible solo con hisopo y romero, fertilización moderada con compost al fondo, atrayente de polinizadores beneficiosos (Syrphidae, Braconidae) en floración. Lección viva: enseña la necesidad de planificar diseño espacial del huerto considerando interacciones químicas. Fuentes Tier A: ICA Resolución 3168/2015, Pamplona Roger 2006 Plantas Medicinales, Restrepo 2007 Biopreparados, POWO Kew, GBIF Backbone Taxonomy.",
       "antagonists": [
         "coffea_arabica",
         "phaseolus_vulgaris",
@@ -1716,7 +1716,7 @@
         "res-684-2018-mads",
         "powo-kew"
       ],
-      "valor_pedagogico": "SE BUSCA: La 'Invasora de Quebradas'. Sus flores huelen bien pero sus raíces matan el río. Si ves una mariposa blanca en la orilla, ¡es una alarma ecológica!"
+      "valor_pedagogico": "SE BUSCA: La 'Invasora de Quebradas'. El lirio jengibre o mariposa blanca (Hedychium coronarium J. König, familia Zingiberaceae) es una invasora del SE Asia tropical introducida en Colombia como ornamental por sus flores blancas fragantes que recuerdan mariposas. Se naturaliza agresivamente en riberas, quebradas, humedales y bordes de bosque húmedo entre 800 y 2.800 msnm. Se distribuye invadiendo Cundinamarca (Choachí, La Calera, Sabana Bogotá), Antioquia, Eje cafetero, Valle del Cauca y Tolima en zona térmica templada a fría. Forma matas densas vía rizomas vigorosos que asfixian la regeneración nativa ribereña, alteran la dinámica hidrológica (acumulan sedimento y restringen flujo) y desplazan flora riparia clave para fauna acuática. Si ves una 'mariposa blanca' en la orilla de quebrada, ¡es una alarma ecológica! Manejo: arranque manual con rizoma completo (NUNCA dejar fragmentos viables) + monitoreo trianual, prohibición jardinería en zonas de quebrada. Listada Res. 684/2018 MADS. Fuentes Tier A: Humboldt Invasoras Andes, Resolución 684/2018 MADS, POWO Kew, GBIF Backbone Taxonomy."
     },
     {
       "id": "ipomoea_batatas",
@@ -1758,7 +1758,7 @@
         "powo-kew",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de raíces reservantes: enseña cómo una planta rastrera puede concentrar energía solar en forma de carbohidratos dulces bajo la tierra."
+      "valor_pedagogico": "La batata o camote (Ipomoea batatas (L.) Lam., familia Convolvulaceae) es una convolvulácea perenne rastrera cultivada como anual por sus raíces tuberosas dulces ricas en betacarotenos (precursores vitamina A) y carbohidratos complejos. Cultivo tradicional precolombino de los campesinos colombianos para seguridad alimentaria. Se cultiva en Cundinamarca (Tena, Tocaima, La Mesa, La Vega), Tolima, Huila, Valle del Cauca, Antioquia, Magdalena y Llanos Orientales entre 0 y 2.400 msnm en zona térmica cálida a templada. Lección viva de raíces reservantes: enseña cómo una planta rastrera puede concentrar la energía solar capturada por su follaje en forma de carbohidratos dulces almacenados bajo la tierra. Propagación por esquejes tallo (15-30 cm) plantados en caballón, ciclo 4-6 meses, rendimientos 15-30 t/ha. Manejo agroecológico: cama o caballón elevado para mejor desarrollo tubérculo, suelos francoarenosos drenados, asocio con maíz y frijol (chacra muisca), fertilización con compost al fondo + ceniza madera, rotación trienal anti-gorgojo (Cylas spp.) con trampas feromonales. Fuentes Tier A: ICA Resolución 3168/2015, AGROSAVIA Tubérculos Tropicales, POWO Kew, GBIF Backbone Taxonomy."
     },
     {
       "id": "ipomoea_purpurea",
@@ -2617,7 +2617,7 @@
         "gbif-taxonomic-backbone",
         "powo-kew"
       ],
-      "valor_pedagogico": "SE BUSCA: El 'Plumacho Pirómano'. Una belleza ornamental que se convierte en combustible para incendios y destierra a nuestros pastos nativos.",
+      "valor_pedagogico": "SE BUSCA: El 'Plumacho Pirómano'. El pasto plumacho (Pennisetum setaceum (Forssk.) Chiov., sinonimo Cenchrus setaceus, familia Poaceae) es una gramínea originaria de Eurasia y norte de África introducida en Colombia como ornamental por sus inflorescencias plumosas color crema-violáceo, que se naturalizó como invasora altamente flamable en zonas semiáridas, taludes viales y matorrales degradados. Se distribuye en Cundinamarca (valles cálidos de Tena, Anapoima, La Mesa, Apulo), Tolima, Huila, Valle del Cauca y costa Caribe entre 0 y 2.800 msnm en zona térmica cálida a templada. Una belleza ornamental engañosa que se convierte en combustible para incendios (cargas pirogénicas > 8 t MS/ha) y forma monocultivos densos que destierran a nuestros pastos nativos (Paspalum, Andropogon) y plántulas leñosas. Manejo: arranque manual pre-floración + cobertura con paja seca (smothering) o solarización, monitoreo bianual del banco semillas (vida útil 5-10 años). Listada Res. 684/2018 MADS + ISSG-UICN top 100 invasoras globales. Fuentes Tier A: Resolución 684/2018 MADS, ISSG-UICN Invasoras Globales, POWO Kew, GBIF Backbone Taxonomy.",
       "antagonists": [
         "calamagrostis_effusa"
       ]
@@ -2924,7 +2924,7 @@
         "gbif-taxonomic-backbone",
         "powo-kew"
       ],
-      "valor_pedagogico": "SE BUSCA: El 'Acidificador'. Alfombra el suelo con sus agujas para que el roble andino no pueda nacer. Su lugar debe ser devuelto al bosque de niebla.",
+      "valor_pedagogico": "SE BUSCA: El 'Acidificador'. El pino pátula (Pinus patula Schiede ex Schltdl. & Cham., familia Pinaceae) es una conífera nativa de México introducida en Colombia desde mediados del siglo XX para programas de reforestación industrial masiva (CAR, antiguas SmurfitKappa-Cartón Colombia) y naturalizada como invasora en bosques altoandinos, particularmente impactando el bosque de roble negro (Quercus humboldtii) endémico. Se distribuye en Cundinamarca (Tabio, Subachoque, San Antonio del Tequendama, La Calera), Boyacá altiplano, Nariño, Antioquia y Cauca entre 1.800 y 3.400 msnm en zona térmica fría. Árbol perenne 20-35 m que alfombra el suelo con sus agujas resinosas no degradables, acidificando el sustrato (pH puede descender de 5.5 a 4.0) y impidiendo la germinación de robles, alisos y encenillos nativos. Su sombra densa y alelopatía bloquean regeneración natural. Manejo: estrategia 'desmonte por núcleos' (clearcut + replante con Alnus acuminata + Quercus humboldtii), descortezamiento en anillo para árboles aislados, prohibición nuevas plantaciones cerca de remanentes nativos. Fuentes Tier A: Calderón Sáenz 2003 Invasoras Colombia, POWO Kew, GBIF Backbone Taxonomy.",
       "antagonists": [
         "quercus_humboldtii"
       ]
