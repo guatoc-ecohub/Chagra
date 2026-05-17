@@ -65,7 +65,9 @@
       ],
       "source_ids": [
         "calderon-saenz-2003-invasoras",
-        "res-684-2018-mads"
+        "res-684-2018-mads",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ],
       "valor_pedagogico": "SE BUSCA: El 'Rebrotador Invencible'. Un error histórico de reforestación que asfixia los bordes de bosque. Se sustituye por el Aliso, que sí pertenece aquí."
     },
@@ -493,7 +495,8 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
+        "ica-resolucion-3168-2015",
+        "powo-kew"
       ],
       "valor_pedagogico": "Lección de nutrición hídrica: el apio demuestra la importancia de la humedad constante para evitar tallos fibrosos en la montaña."
     },
@@ -535,7 +538,8 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015",
-        "restrepo-1996-abc-agricultura-organica"
+        "restrepo-1996-abc-agricultura-organica",
+        "powo-kew"
       ],
       "valor_pedagogico": "Lección de color y nutrición: la variedad amarilla destaca por su contenido de carotenoides y su vistosidad en la huerta arcoíris."
     },
@@ -665,7 +669,8 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015",
-        "restrepo-1996-abc-agricultura-organica"
+        "restrepo-1996-abc-agricultura-organica",
+        "powo-kew"
       ],
       "valor_pedagogico": "Lección sobre almacenamiento de energía: muestra cómo la planta guarda azúcares y nutrientes en su raíz hipocotila para sobrevivir al invierno (o épocas secas)."
     },
@@ -750,7 +755,8 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
+        "ica-resolucion-3168-2015",
+        "powo-kew"
       ],
       "valor_pedagogico": "Lección de arquitectura: a diferencia del repollo, sus hojas crecen abiertas sobre un tallo central persistente, permitiendo la 'cosecha de abajo hacia arriba'."
     },
@@ -957,7 +963,8 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
+        "ica-resolucion-3168-2015",
+        "powo-kew"
       ],
       "valor_pedagogico": "Lección de selección varietal: su textura rugosa es un aislante térmico natural que le permite resistir inviernos intensos en la montaña."
     },
@@ -1153,7 +1160,8 @@
       "validation_level": "operator_reviewed",
       "source_ids": [
         "correa-pabon-carulla-2008",
-        "agrosavia-forrajeras-2022"
+        "agrosavia-forrajeras-2022",
+        "gbif-taxonomic-backbone"
       ],
       "valor_pedagogico": "El kikuyo (Cenchrus clandestinus) es gramínea africana introducida en los Andes colombianos hacia 1928 como forraje. Hoy domina pasturas del altiplano cundiboyacense (2200-3200 msnm) desplazando flora nativa de subpáramo y bordes de páramo. Su rizoma agresivo coloniza suelos disturbados y compite con encenillos, frailejones jóvenes y otras nativas en zonas de restauración. Es la gramínea forrajera más sembrada en ganadería andina colombiana, pero ECOLÓGICAMENTE INVASORA en transición frío/páramo. Manejo agroecológico: rotación con leguminosas nativas, corte periódico antes de floración, evitar siembra en cotas >2800 msnm donde desplaza páramo. Citado por IAvH como naturalizada de alto riesgo en Andes."
     },
@@ -1268,7 +1276,8 @@
       "source_ids": [
         "cenicafe-manual-cafetero-2013",
         "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
+        "ica-resolucion-3168-2015",
+        "powo-kew"
       ],
       "validation_level": "claude_draft"
     },
@@ -1398,7 +1407,8 @@
       "source_ids": [
         "humboldt-invasoras-andes",
         "mongabay-retamo-2024",
-        "res-684-2018-mads"
+        "res-684-2018-mads",
+        "gbif-taxonomic-backbone"
       ],
       "valor_pedagogico": "SE BUSCA: El 'Falso Nativo'. Engaña con flores amarillas bonitas pero destruye el equilibrio químico del páramo. Su erradicación es un acto de soberanía hídrica."
     },
@@ -1522,7 +1532,8 @@
       "source_ids": [
         "humboldt-invasoras-andes",
         "issg-uicn-invasoras",
-        "res-684-2018-mads"
+        "res-684-2018-mads",
+        "gbif-taxonomic-backbone"
       ],
       "valor_pedagogico": "SE BUSCA: El 'Sediento de los Andes'. Seca las quebradas y envenena el suelo para que nada más crezca. Su sombra no es vida, es desierto verde."
     },
@@ -1565,7 +1576,8 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "pamplona-roger-2006-plantas-medicinales",
-        "restrepo-2007-biopreparados"
+        "restrepo-2007-biopreparados",
+        "powo-kew"
       ],
       "valor_pedagogico": "Caso de estudio principal en alelopatía: sus exudados inhiben a la mayoría de vecinos. Enseña la necesidad de aislamiento en el diseño del huerto."
     },
@@ -1735,7 +1747,8 @@
       ],
       "source_ids": [
         "powo-kew",
-        "sib-colombia"
+        "sib-colombia",
+        "gbif-taxonomic-backbone"
       ],
       "valor_pedagogico": "SE BUSCA: La 'Estranguladora'. Se trepa sobre los árboles recién sembrados para robarles el sol. Cámbiala por una Pasiflora nativa."
     },
@@ -1864,7 +1877,8 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015",
-        "restrepo-1996-abc-agricultura-organica"
+        "restrepo-1996-abc-agricultura-organica",
+        "powo-kew"
       ],
       "valor_pedagogico": "Hortaliza emblemática de huertos urbanos y rurales por su rápido ciclo, rebrote tras corte y bajo requerimiento de espacio."
     },
@@ -1905,7 +1919,8 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015",
-        "restrepo-1996-abc-agricultura-organica"
+        "restrepo-1996-abc-agricultura-organica",
+        "powo-kew"
       ],
       "valor_pedagogico": "Combina la morfología acogollada con pigmentación púrpura: ideal para enseñar respuestas fisiológicas al ambiente andino."
     },
@@ -1989,7 +2004,8 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015",
-        "restrepo-1996-abc-agricultura-organica"
+        "restrepo-1996-abc-agricultura-organica",
+        "powo-kew"
       ],
       "valor_pedagogico": "Las antocianinas responden al fotoperíodo y la temperatura: ideal para enseñar respuestas fisiológicas al ambiente andino."
     },
@@ -2120,7 +2136,8 @@
       },
       "source_ids": [
         "agrosavia-manual-biopreparados-2015",
-        "cip-2006-ghislain"
+        "cip-2006-ghislain",
+        "gbif-taxonomic-backbone"
       ],
       "valor_pedagogico": "Leguminosa de alta montaña. Sus alcaloides actúan como repelentes naturales en la chagra; enseña el valor de los cultivos de ciclo cerrado."
     },
@@ -2251,7 +2268,8 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
-        "pamplona-roger-2006-plantas-medicinales"
+        "pamplona-roger-2006-plantas-medicinales",
+        "powo-kew"
       ],
       "valor_pedagogico": "Lección de rusticidad y sabor mediterráneo adaptado: muestra cómo una planta puede ser cobertura de suelo y botica al mismo tiempo."
     },
@@ -2523,7 +2541,9 @@
       ],
       "source_ids": [
         "res-684-2018-mads",
-        "issg-uicn-invasoras"
+        "issg-uicn-invasoras",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ],
       "valor_pedagogico": "SE BUSCA: El 'Plumacho Pirómano'. Una belleza ornamental que se convierte en combustible para incendios y destierra a nuestros pastos nativos."
     },
@@ -2608,7 +2628,8 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
+        "ica-resolucion-3168-2015",
+        "powo-kew"
       ],
       "valor_pedagogico": "Lección de diversidad varietal: comparación de perfiles aromáticos y resistencia climática entre variedades de una misma especie."
     },
@@ -2774,7 +2795,8 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
-        "pamplona-roger-2006-plantas-medicinales"
+        "pamplona-roger-2006-plantas-medicinales",
+        "powo-kew"
       ],
       "valor_pedagogico": "Lección de aromaterapia viva: permite identificar cómo las plantas atraen polinizadores y repelen plagas mediante aceites volátiles."
     },
@@ -2817,7 +2839,8 @@
       ],
       "source_ids": [
         "calderon-saenz-2003-invasoras",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ],
       "valor_pedagogico": "SE BUSCA: El 'Acidificador'. Alfombra el suelo con sus agujas para que el roble andino no pueda nacer. Su lugar debe ser devuelto al bosque de niebla."
     },
@@ -2858,7 +2881,8 @@
       },
       "source_ids": [
         "powo-kew",
-        "sib-colombia"
+        "sib-colombia",
+        "gbif-taxonomic-backbone"
       ],
       "valor_pedagogico": "El cerezo de los Andes. Esencial en el paisaje chiguano por su valor cultural, su madera fina y su rol como rompevientos natural.",
       "estrato": "alto"
@@ -2901,7 +2925,8 @@
       "source_ids": [
         "fao-ecocrop",
         "gbif-taxonomic-backbone",
-        "restrepo-1996-abc-agricultura-organica"
+        "restrepo-1996-abc-agricultura-organica",
+        "powo-kew"
       ],
       "valor_pedagogico": "Lección de rusticidad: planta adaptada a suelos marginales que provee altísima nutrición (Vitamina C) con mínimo manejo externo.",
       "estrato": "alto"
@@ -2984,7 +3009,9 @@
       "foto_referencia_sugerida": "https://commons.wikimedia.org/wiki/Category:Pteridium_aquilinum",
       "validation_level": "operator_reviewed",
       "source_ids": [
-        "flora-colombia-pteridophyta"
+        "flora-colombia-pteridophyta",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ],
       "valor_pedagogico": "El helecho marranero (Pteridium aquilinum var. caudatum) es nativo cosmopolita pero se comporta como invasor agresivo post-quema en potreros andinos colombianos (1500-3200 msnm). Tras incendios o tala, sus rizomas profundos rebrotan y forman monocultivos densos que impiden regeneración de bosque andino. Toxicidad: contiene ptaquilósido (carcinogénico para ganado y humanos por leche contaminada). En Cruz Verde-Sumapaz, ocupa hectáreas de bordes de páramo degradado. Manejo: NO quemar (estimula rebrote), corte mecánico repetido durante 3-5 años + siembra de especies nativas competidoras (Weinmannia, Hesperomeles). Resolución 684/2018 MADS lo lista como prioridad de manejo en restauración paramuna."
     },
@@ -3039,7 +3066,8 @@
       "valor_pedagogico": "Símbolo del bosque andino clímax. Los robledales son reservorios de agua para los chiguanos. Su conservación es prioridad regional.",
       "source_ids": [
         "libro-rojo-plantas-colombia",
-        "humboldt-flora-alto-andina"
+        "humboldt-flora-alto-andina",
+        "gbif-taxonomic-backbone"
       ],
       "validation_level": "claude_draft",
       "estrato": "alto"
@@ -3083,7 +3111,8 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015",
-        "restrepo-1996-abc-agricultura-organica"
+        "restrepo-1996-abc-agricultura-organica",
+        "powo-kew"
       ],
       "valor_pedagogico": "Ciclo más corto del huerto (3-5 semanas): ideal como primer cultivo para niños y como indicador de compactación del suelo."
     },
@@ -3125,7 +3154,8 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
-        "pamplona-roger-2006-plantas-medicinales"
+        "pamplona-roger-2006-plantas-medicinales",
+        "powo-kew"
       ],
       "valor_pedagogico": "Lección de rusticidad: ejemplifica la capacidad de algunas especies para prosperar en suelos pobres y climas extremos de la cordillera."
     },
@@ -3169,7 +3199,9 @@
       "source_ids": [
         "issg-uicn-invasoras",
         "res-684-2018-mads",
-        "sib-colombia"
+        "sib-colombia",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ],
       "valor_pedagogico": "SE BUSCA: El 'Matorral Asfixiante'. Una mora gigante de Asia que no permite el paso ni de la luz ni de los chiguanos. Se cambia por nuestra Mora de Castilla."
     },
@@ -3392,7 +3424,8 @@
       "valor_pedagogico": "Farmacia viva chiguana. Sus flores y frutos no solo atraen aves, sino que son fundamentales en la medicina tradicional andina.",
       "source_ids": [
         "pamplona-roger-2006-plantas-medicinales",
-        "humboldt-flora-alto-andina"
+        "humboldt-flora-alto-andina",
+        "gbif-taxonomic-backbone"
       ],
       "validation_level": "claude_draft",
       "estrato": "alto"
@@ -3762,7 +3795,8 @@
       "foto_referencia_sugerida": "https://commons.wikimedia.org/wiki/Category:Thunbergia_alata",
       "validation_level": "operator_reviewed",
       "source_ids": [
-        "humboldt-invasoras-andes"
+        "humboldt-invasoras-andes",
+        "gbif-taxonomic-backbone"
       ],
       "valor_pedagogico": "El ojo de poeta o suzanne de ojos negros (Thunbergia alata) es enredadera africana ornamental introducida en Colombia como cercas vivas decorativas. Naturalizada con severidad en zona cafetera, andina media y subandina (1000-2400 msnm). Estrangula vegetación nativa de bordes de quebrada, regeneración de cafetales con sombra y cercas de matarratón/quiebrabarrigo. Listada por IAvH como invasora alta amenaza. Reproducción por semilla y por fragmento de tallo enraizado. Manejo agroecológico: arrancar manualmente con rizoma completo + control biológico aún en investigación + sustituir con enredaderas nativas (passifloras nativas, Mutisia spp.). Resolución 684/2018 MADS la incluye en listado oficial."
     },
@@ -4029,7 +4063,9 @@
         "ocampo-solorza-2017",
         "car-cundi-2019",
         "res-684-2018-mads",
-        "mongabay-retamo-2024"
+        "mongabay-retamo-2024",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ],
       "antagonists": [
         "erythrina_edulis"
@@ -4545,7 +4581,8 @@
       "valor_pedagogico": "Recuperadora de suelos. Su siembra previa a los cereales andinos asegura una explosión de crecimiento gracias al nitrógeno acumulado.",
       "source_ids": [
         "agrosavia-manual-biopreparados-2015",
-        "fao-ecocrop"
+        "fao-ecocrop",
+        "gbif-taxonomic-backbone"
       ],
       "validation_level": "claude_draft",
       "estrato": "bajo"
@@ -5051,7 +5088,9 @@
       },
       "source_ids": [
         "perez-rodriguez-gomez-2008",
-        "nustez-rodriguez-2024-unal"
+        "nustez-rodriguez-2024-unal",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ],
       "valor_pedagogico": "Variedad andina tradicional del altiplano. Ensenanza del ciclo largo de la papa de ano y la importancia de las variedades nativas en la soberania alimentaria de la sabana."
     },
@@ -5143,7 +5182,8 @@
       },
       "source_ids": [
         "agrosavia-manual-tuberculos-andinos-2017",
-        "perez-arbelaez-1947-plantas-utiles"
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone"
       ],
       "valor_pedagogico": "Tuberculo functional de la chagra. Ensenanza de nutricion y salud: FOS como alternativa deendulzante natural para la dieta altoandina."
     },
@@ -8271,7 +8311,8 @@
       },
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
-        "humboldt-flora-alto-andina"
+        "humboldt-flora-alto-andina",
+        "gbif-taxonomic-backbone"
       ],
       "rol_ecologico": "Protector de fuentes hidricas por su sistema radical denso. Banco de forraje proteinado. Refugio de fauna silvestre. Aporte de biomasa foliar al suelo.",
       "valor_pedagogico": "El que nace del agua: la cerca viva que protege las quebradas. Ensenia la relacion entre vegetacion riparia y calidad del agua en la finca.",
@@ -8388,7 +8429,8 @@
       },
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ],
       "rol_ecologico": "Atractora de polinizadores (abejas nativas, colibries). Planta ornamental de bordes de cerca viva. Aporte estetico y educacional al agroecosistema.",
       "valor_pedagogico": "Reloj del huerto: cada flor abre al amanecer y vive solo un dia. Ensenia la sincronizacion de la planta con el ciclo solar y la importancia de los polinizadores.",
@@ -8444,7 +8486,8 @@
       },
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ],
       "rol_ecologico": "Planta ornamental de bordes de cerca viva en climas calidos. Sus hojas coloridas son indicadoras de luz (mayor color con mas sol).",
       "valor_pedagogico": "Paleta vegetal: las hojas cambian de color segun la luz. Ensenia los pigmentos vegetales y como la radiacion afecta la expresion fenotipica.",
@@ -8569,7 +8612,8 @@
       },
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
-        "humboldt-flora-alto-andina"
+        "humboldt-flora-alto-andina",
+        "gbif-taxonomic-backbone"
       ],
       "rol_ecologico": "Atractora de polinizadores (mariposas, colibries, abejas). Especie pionera en bordes de bosque. Medicina tradicional cicatrizante. Cerca viva de alta montana.",
       "valor_pedagogico": "El jardin de mariposas: sus flores aromaticas atraen polinizadores de toda la finca. Ensenia la interaccion planta-polinizador en ecosistemas de alta montana.",
@@ -8628,7 +8672,8 @@
       },
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ],
       "rol_ecologico": "Control de erosion en laderas. Cobertura de bordes de cerca viva. Atraccion de abejas nativas. Follaje ornamental de gran tamano.",
       "valor_pedagogico": "Hoja monumental: la segunda hoja mas grande entre las herbaceas cultivadas. Ensenia adaptaciones morfologicas para capturar luz en sotobosque y bordes.",
@@ -8820,7 +8865,8 @@
       },
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ],
       "valor_pedagogico": "Clásico de la alelopatía: su aroma alcanforado repele polillas y mosquitos mientras atrae abejas, demostrando el equilibrio entre repelencia y atracción en el diseño de la chagra.",
       "validation_level": "claude_draft"
@@ -8866,7 +8912,8 @@
       },
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ],
       "valor_pedagogico": "La farmacia en una hoja: enseña suculencia, adaptación a sequía, y el uso tradicional del gel como cicatrizante en la medicina casera colombiana de tierras cálidas.",
       "validation_level": "claude_draft"
@@ -9011,7 +9058,8 @@
       },
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ],
       "valor_pedagogico": "Cubresuelos aromático que protege el suelo vivo: sus tallos rastreros enseñan cobertura vegetal permanente y su aceite esencial (timol) demuestra repelencia natural de plagas en la base de la chagra.",
       "validation_level": "claude_draft"
@@ -9058,7 +9106,8 @@
       },
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ],
       "valor_pedagogico": "Aceite esencial vivo: la citronela ensena como las plantas producen metabolitos secundarios para repeler insectos y proteger el cultivo en la chagra."
     },
@@ -9104,7 +9153,8 @@
       },
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ],
       "valor_pedagogico": "Rizoma medicinal por excelencia: el jengibre ensena como las plantas almacenan compuestos bioactivos en sus organos subterraneos, base de la farmacopea tradicional colombiana."
     },
@@ -9151,7 +9201,8 @@
       },
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ],
       "valor_pedagogico": "Colorante natural: la curcuma demuestra como los pigmentos vegetales (curcumina) tienen propiedades medicinales antiinflamatorias y usos tintoreos tradicionales."
     },
@@ -9198,7 +9249,8 @@
       },
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ],
       "valor_pedagogico": "Semilla aromatica: el comino ensena como las plantas concentran aceites esenciales en las semillas, fundamento del condimento en la cocina tradicional colombiana."
     },
@@ -9244,7 +9296,8 @@
       },
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
-        "powo-kew"
+        "powo-kew",
+        "gbif-taxonomic-backbone"
       ],
       "valor_pedagogico": "Especia de sombra: el cardamomo ensena como los cultivos de sotobosque generan alto valor economico sin necesidad de tumbar el dosel arboreo, modelo de agroforesteria."
     },
@@ -9290,7 +9343,8 @@
       },
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ],
       "valor_pedagogico": "Polinizacion manual: la vainilla ensena la relacion simbiotica entre orquideas y polinizadores nativos, y la tecnica tradicional de beneficio del fruto aromatico."
     },
@@ -9336,7 +9390,8 @@
       },
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
-        "powo-kew"
+        "powo-kew",
+        "gbif-taxonomic-backbone"
       ],
       "valor_pedagogico": "Fruto estrella: el anis estrella ensena como la morfologia del fruto revela su parentesco y su uso como expectorante natural en la farmacopea tradicional colombiana."
     },
@@ -9384,7 +9439,8 @@
       },
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ],
       "valor_pedagogico": "Hibrido esteril: la hierbabuena criolla ensena como la propagacion vegetativa preserva caracteres deseables a traves de generaciones, esencial en la medicina popular colombiana."
     },
