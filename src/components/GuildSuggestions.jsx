@@ -169,7 +169,7 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
                     ? 'bg-emerald-900/40 text-emerald-300 border-emerald-700 hover:bg-emerald-800/50'
                     : 'bg-lime-900/30 text-lime-400 border-lime-800 hover:bg-lime-800/40'
                 }`}
-                title={c.isInFinca ? `${c.reason} · Ya tenés esta especie` : c.reason}
+                title={c.isInFinca ? `${c.reason} · Ya tienes esta especie` : c.reason}
               >
                 {c.isInFinca && <Check size={10} />}
                 {c.name.split(' (')[0]}
