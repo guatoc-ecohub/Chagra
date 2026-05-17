@@ -510,7 +510,7 @@
         "ica-resolucion-3168-2015",
         "powo-kew"
       ],
-      "valor_pedagogico": "Lección de nutrición hídrica: el apio demuestra la importancia de la humedad constante para evitar tallos fibrosos en la montaña."
+      "valor_pedagogico": "El apio (Apium graveolens L.) es una umbelífera bienal originaria del Mediterráneo, ampliamente cultivada como hortaliza de hoja, tallo y semilla en zonas frías colombianas. Se siembra en Cundinamarca (Sabana de Bogotá: Mosquera, Madrid, Funza), Boyacá, Nariño y altiplano antioqueño entre 2.000 y 3.000 msnm en zona térmica fría. Variedades comerciales más comunes: Tall Utah 52-70, Pascal, Florida 683. Ciclo 12-16 semanas desde trasplante. Requiere suelos profundos con materia orgánica abundante (>5%), pH 6.0-7.0 y riego constante (lámina ~5 mm/día). Manejo agroecológico: rotación con leguminosas, fertilización con biol + compost maduro, asocio con tomate y lechuga (no con perejil mismo familia), control de Septoria apiicola con caldo bordelés y bacillus_subtilis. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone."
     },
     {
       "id": "beta_vulgaris_cicla_amarilla",
@@ -1236,9 +1236,11 @@
       "source_ids": [
         "gbif-taxonomic-backbone",
         "powo-kew",
-        "ica-resolucion-3168-2015"
+        "ica-resolucion-3168-2015",
+        "agrosavia-leguminosas-andinas",
+        "agrosavia-manual-biopreparados-2015"
       ],
-      "valor_pedagogico": "Superalimento andino. Parte de la 'Milpa Andina'; enseña cómo obtener proteína de alta calidad sin depender de mercados externos.",
+      "valor_pedagogico": "La quinua (Chenopodium quinoa Willd.) es un pseudocereal andino tradicional con alto valor proteico (~14-18%) y aminoácidos esenciales, redescubierta como cultivo estratégico de seguridad alimentaria. En Colombia se cultiva en Boyacá, Nariño, Cundinamarca y Cauca entre 2.500 y 3.500 msnm en zona térmica fría a páramo bajo. Las variedades AGROSAVIA Aurora, Tunkahuán y Blanca de Jericó están adaptadas al altiplano cundiboyacense con ciclo 5-6 meses. Tolera salinidad moderada, sequía y heladas leves (-2°C en estados vegetativos). Manejo agroecológico: rotación con leguminosas, fertilización orgánica con bocashi y biol, control mecánico de mildiú (Peronospora variabilis) por densidad de siembra adecuada (60-80 cm entre surcos). Fuentes Tier A: AGROSAVIA fichas técnicas, FAO Quinoa Sourcebook 2013, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone.",
       "companions": [
         "vicia_sativa",
         "zea_mays"
@@ -1302,7 +1304,7 @@
         "metodo_principal": "semilla",
         "notas": "Requiere germinador en arena y posterior embolsado."
       },
-      "valor_pedagogico": "Lección de selección varietal: comparación de resistencia a Hemileia vastatrix entre variedades tradicionales y mejoradas.",
+      "valor_pedagogico": "El café arábica (Coffea arabica L.) es el cultivo agroindustrial emblemático de Colombia y la principal fuente de ingresos de la economía campesina cafetera, con cerca de 850.000 hectáreas distribuidas en Caldas, Quindío, Risaralda, Antioquia, Tolima, Huila, Cundinamarca y Santander entre 1.200 y 2.000 msnm en zona térmica templada. Las variedades Caturra, Castillo y Cenicafé 1 son las más adoptadas en Colombia por su resistencia a roya (Hemileia vastatrix) y broca (Hypothenemus hampei) según Cenicafé. Requiere sombra parcial 35-50%, suelos francos con pH 5.0-5.5, y precipitación 1.800-2.800 mm anuales. Sistemas agroecológicos asocian café con plátano (Musa spp.), guandul (Cajanus cajan) y nogal cafetero (Cordia alliodora) para sombra estratificada. Fuentes Tier A: Cenicafé Manual del Cafetero 2013, AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone.",
       "plagas_criticas": [
         "Hypothenemus hampei (broca)",
         "Hemileia vastatrix (roya)",
@@ -1315,7 +1317,8 @@
         "cenicafe-manual-cafetero-2013",
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015",
-        "powo-kew"
+        "powo-kew",
+        "agrosavia-manual-biopreparados-2015"
       ],
       "validation_level": "claude_draft"
     },
@@ -2826,9 +2829,10 @@
       },
       "source_ids": [
         "agrosavia-manual-uchuva-2015",
-        "powo-kew"
+        "powo-kew",
+        "agrosavia-leguminosas-andinas"
       ],
-      "valor_pedagogico": "La joya protegida: su capacho natural enseña la importancia de la protección post-cosecha y la conservación del valor nutritivo.",
+      "valor_pedagogico": "La uchuva (Physalis peruviana L.) es una solanácea perenne nativa de los Andes ahora cultivada comercialmente para exportación. Colombia es el principal exportador mundial con cerca de 1.000 hectáreas en Cundinamarca (Granada, Silvania, Pasca), Boyacá (Ventaquemada), Antioquia (Sonsón) y Nariño entre 1.800 y 2.800 msnm en zona térmica fría a templada. La variedad AGROSAVIA Andina es la más adoptada, con ciclo productivo 8-10 meses y rendimientos 18-25 t/ha. Crece como arbusto perenne con cáliz papiráceo que envuelve la baya naranja madura. Manejo agroecológico: tutorado vertical, poda de formación, manejo integrado de Tuta absoluta (polilla) y Liriomyza huidobrensis (minador hoja) con biopreparados como BT y purín de ortiga, fertilización con bocashi + biol. Fuentes Tier A: AGROSAVIA Manual Uchuva, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone.",
       "estrato": "bajo",
       "antagonists": [
         "vaccinium_corymbosum_biloxi"
@@ -3009,9 +3013,10 @@
         "fao-ecocrop",
         "gbif-taxonomic-backbone",
         "restrepo-1996-abc-agricultura-organica",
-        "powo-kew"
+        "powo-kew",
+        "agrosavia-manual-frutales-tropicales"
       ],
-      "valor_pedagogico": "Lección de rusticidad: planta adaptada a suelos marginales que provee altísima nutrición (Vitamina C) con mínimo manejo externo.",
+      "valor_pedagogico": "La guayaba manzana (Psidium guajava L. variedad manzana) es una mirtácea perenne nativa de los Andes y muy adaptada a sistemas agroecológicos colombianos en transición de zona templada a frío bajo. Se cultiva en Santander, Boyacá, Cundinamarca, Tolima y Huila entre 1.000 y 2.000 msnm en zona térmica templada. La variedad manzana se caracteriza por fruto blanco crocante con menor número de semillas, ciclo a primera cosecha de 2-3 años, vida productiva 15-25 años y rendimientos 25-40 t/ha. Soporta períodos de sequía moderados y tolera suelos francos a francoarcillosos con pH 4.5-7.0. Manejo agroecológico: poda formación copa baja, fertilización orgánica compost + roca fosfórica, control de mosca de la fruta (Anastrepha spp.) con trampas McPhail y biopreparados. Fuentes Tier A: AGROSAVIA Manual Frutales Tropicales, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone, Bernal et al. Catálogo Plantas y Líquenes de Colombia.",
       "estrato": "alto"
     },
     {
