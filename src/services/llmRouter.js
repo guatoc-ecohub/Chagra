@@ -1,31 +1,40 @@
 /**
  * llmRouter.js — Selector de modelo LLM según tarea (Multi-LLM routing).
  *
- * Decisión de modelo basada en bench empírico 2026-05-15/16 sobre Ollama
- * 0.23.1 + Ryzen 4600G UMA (14 GB RAM) corriendo en alpha. Resultados
- * completos en `Chagra-strategy/ops/bench-ollama-2026-05-15.md` y
- * `Chagra-strategy/ops/bench-llamacpp-puro-2026-05-16.md`.
+ * Decisión de modelo basada en bench empírico CPU 2026-05-15/16 + bench
+ * GPU Quadro M6000 sm_52 2026-05-17 (alpha, Ollama 0.23.1 + driver 580.142).
+ * Resultados completos en `Chagra-strategy/ops/bench-ollama-2026-05-15.md`,
+ * `bench-llamacpp-puro-2026-05-16.md` y
+ * `bench-results/2026-05-17-gpu-m6000-sm52-summary.md`.
  *
- * Estrategia: 1 modelo "hot" para chat (gemma3:4b siempre cargado con
- * keep_alive=5m) + 2 modelos "on-demand" para tareas especializadas
- * (qwen2.5-coder:7b para NLU/JSON strict, gemma2:9b para reasoning
- * profundo). Esto evita OOM en 14 GB y mantiene latencia chat <8s.
+ * Estado actual: GPU offload 35/35 layers para todos los modelos listados.
+ * Eval rate chat gemma3:4b 13.5 t/s CPU → 118 t/s GPU (+8.7×); load time
+ * 7.6s → 3.0s (2.5× más rápido).
  *
- * RAM budget worst-case: 3.7 GB (gemma3 hot) + 5.0 GB (gemma2 cargado on
- * demand) + OS/Chagra/services ~4 GB = ~12.7 GB de 14 GB → margen ~1.3 GB.
- * Requiere `llamacpp-server.service` STOPPED en alpha (5 GB de Qwen2.5-7B
- * pinned competía con gemma sin uso real).
+ * Estrategia: 1 modelo "hot" para chat (gemma3:4b keep_alive=30m, viable
+ * post-GPU porque load es barato y VRAM 4 GB) + 2 modelos "on-demand"
+ * para tareas especializadas (qwen2.5-coder:7b NLU/JSON, gemma2:9b
+ * reasoning) + 1 vision (qwen2.5vl:7b on-demand, nuevo post-GPU).
+ *
+ * Budget VRAM M6000 (12 GB): gemma3:4b hot (4.0 GB) + cualquier 7B/8B
+ * on-demand (~5-7 GB). gemma3:12b (9.6 GB) y llava:13b (11.6 GB) caben
+ * solos pero requieren unload de hot. nlu/reasoning unload tras request
+ * (keep_alive=0) para liberar VRAM al siguiente turno chat.
+ *
+ * Modelos HABILITADOS post-GPU (antes inviables en CPU):
+ * - qwen2.5vl:7b vision (78 t/s GPU, 11.8 GB VRAM)
+ * - gemma3:12b reasoning (37.6 t/s GPU, 9.6 GB VRAM)
+ * - deepseek-r1:8b reasoning chain-of-thought (46 t/s GPU)
+ * - llava:13b vision alt (22.94 t/s GPU)
  *
  * Modelos DESCARTADOS por bench:
  * - qwen3.5:4b: qwen35 arch hang en Ollama 0.23.1
- * - qwen3:8b, deepseek-r1:8b: output vacío con prompts JSON estrictos
- * - gemma3:12b: OOM con --no-mmap, requiere GPU
- * - qwen2.5vl:7b: multimodal, llama-server no soporta vision standalone
+ * - qwen3:8b: output vacío con prompts JSON estrictos
  */
 
 /**
  * Tipos de tarea soportadas por el router.
- * @typedef {'chat' | 'nlu' | 'reasoning'} LLMTask
+ * @typedef {'chat' | 'nlu' | 'reasoning' | 'vision'} LLMTask
  */
 
 /**
@@ -44,13 +53,14 @@
 export const ROUTES = {
   chat: {
     model: 'gemma3:4b',
-    keep_alive_min: 5,
+    keep_alive_min: 30,
     temperature: 0.7,
     max_tokens: 512,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Bench: 15.0 t/s (Ollama), 3.7 GB RAM, Tier A papa/oca/cubio. ' +
-      '2x más rápido que cualquier 7B+. UX fluida en campo.',
+      'Bench GPU: 118 t/s, 4 GB VRAM, load 3s. CPU baseline 13.5 t/s. ' +
+      'keep_alive=30m viable porque load es barato post-GPU y VRAM 4 GB ' +
+      'cabe holgado con cualquier 7B on-demand. UX fluida en campo.',
   },
   nlu: {
     model: 'qwen2.5-coder:7b',
@@ -73,7 +83,22 @@ export const ROUTES = {
     rationale:
       'Bench: NLU ✓ AND chat ✓ en llama.cpp puro. 9.2B params = más ' +
       'knowledge embedded para temas agroecológicos específicos (variedades ' +
-      'regionales, taxonomía Tier A, manejos andinos). Spanish quality alto.',
+      'regionales, taxonomía Tier A, manejos andinos). Spanish quality alto. ' +
+      'Alternativas post-GPU pendientes bench round 2: gemma3:12b (37.6 t/s, ' +
+      'mejor capability) o deepseek-r1:8b (46 t/s, chain-of-thought).',
+  },
+  vision: {
+    model: 'qwen2.5vl:7b',
+    keep_alive_min: 0,
+    temperature: 0.2,
+    max_tokens: 512,
+    url: '/api/ollama/v1/chat/completions',
+    rationale:
+      'Bench GPU: 78 t/s, 11.8 GB VRAM (apretado pero cabe en M6000 12 GB). ' +
+      'Multimodal nativo, antes inviable por OOM CPU. Habilita pest ' +
+      'diagnostic (DR-040 F2) y plant ID. Alternativa: llava:13b (22.94 t/s) ' +
+      'si Qwen falla con flora silvestre. unload tras request porque ' +
+      'compite con chat hot por VRAM.',
   },
 };
 
