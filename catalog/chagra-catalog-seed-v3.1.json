@@ -1860,10 +1860,11 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
+        "powo-kew",
         "ica-resolucion-3168-2015",
-        "restrepo-1996-abc-agricultura-organica"
+        "nrc-1989-cultivos-andinos"
       ],
-      "valor_pedagogico": "Hortaliza emblemática de huertos urbanos y rurales por su rápido ciclo, rebrote tras corte y bajo requerimiento de espacio."
+      "valor_pedagogico": "La lechuga crespa verde (Lactuca sativa var. crispa) es la variedad de lechuga más cultivada en huertos urbanos y rurales de Colombia, presente en departamentos como Cundinamarca (cinturón Choachí-Fómeque), Boyacá, Nariño, Santander y Antioquia, entre 1000-3000 msnm en zonas térmicas templada y fría (óptimo 1800-2800 msnm). Su manejo agronómico incluye propagación por semilla en semillero con sustrato estéril, tratamiento de semillas en agua fría 12-24h para romper termodormancia (germinación óptima 10-20°C), trasplante a los 20-25 días, ciclo de 45-70 días según condiciones, y asociaciones beneficiosas con Brassicaceae (repelencia de pulguilla) y Allium. Plagas principales: pulgones (Myzus persicae), babosas (Deroceras reticulatum), minadores (Liriomyza spp.) y ácaros (Tetranychus urticae). En el contexto andino, se ha integrado como cultivo de ciclo corto para seguridad alimentaria por su rápido rendimiento y rebrote tras corte. Fuente: nrc-1989-cultivos-andinos."
     },
     {
       "id": "lactuca_sativa_longifolia_morada",
