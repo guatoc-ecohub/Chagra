@@ -1758,7 +1758,7 @@
         "powo-kew",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de raíces reservantes: enseña cómo una planta rastrera puede concentrar energía solar en forma de carbohidratos dulces bajo la tierra."
+      "valor_pedagogico": "El batata o camote (Ipomoea batatas (L.) Lam.) es una convolvulácea perenne cultivada como anual por su tubérculo dulce rico en betacarotenos y vitamina A, cultivado tradicionalmente en sistemas campesinos colombianos como cultivo de seguridad alimentaria. Se cultiva en Cundinamarca (cálidas Tena, Tocaima, La Mesa), Tolima, Huila, Valle del Cauca, Antioquia, Magdalena y Llanos Orientales entre 0 y 1.800 msnm en zona térmica cálida a templada. Propagación por esqueje de tallo (15-30 cm) o tubérculo entero, ciclo 4-6 meses, rendimientos 15-30 t/ha. Crece bien en suelos francoarenosos con buen drenaje. Manejo agroecológico: cama o caballón elevado, asocio con maíz y frijol, fertilización con compost al fondo + ceniza madera, control de gorgojo (Cylas spp.) con rotación trienal y trampas. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy."
     },
     {
       "id": "ipomoea_purpurea",
@@ -3338,7 +3338,7 @@
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de domesticación: muestra las ventajas de la selección varietal para mejorar la ergonomía y la seguridad en la agricultura familiar.",
+      "valor_pedagogico": "La mora de Castilla sin espinas (Rubus glaucus Benth. cv. sin espinas, también llamado morera andina) es una rosácea perenne híbrida desarrollada para facilitar la cosecha (sin espinas en cañas), variedad comercial dominante en Colombia. Se cultiva en Cundinamarca (Subachoque, San Bernardo, Silvania), Boyacá, Antioquia, Cauca, Nariño y Valle del Cauca entre 1.800 y 2.800 msnm en zona térmica fría a templada. Ciclo a primera cosecha 8-10 meses; productividad sostenida 5-8 años. Rendimiento 10-15 t/ha en sistema agroecológico. Tutorado horizontal con alambre doble o espaldera T. Manejo: poda anual cañas viejas, mulch grueso (paja, virutas), fertilización con compost + biol, control de antracnosis (Colletotrichum gloeosporioides) con caldo bordelés. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "estrato": "medio"
     },
     {
@@ -6720,7 +6720,7 @@
         "powo-kew",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Ejemplo de cosecha sostenible: la acelga regenera sus hojas tras cada corte, demostrando el principio de produccion continua en la chagra."
+      "valor_pedagogico": "La acelga (Beta vulgaris L. subsp. vulgaris var. cicla, formas verde y pigmentadas) es una quenopodiácea bienal cultivada como anual para hojas y peciolos, hortaliza fundamental en huertas familiares colombianas con alto aporte nutricional (vitamina A, K, magnesio, hierro). Se cultiva en zonas frías y templadas: Sabana de Bogotá (Mosquera, Madrid, Funza), Boyacá altiplano, Nariño y Antioquia entre 1.500 y 2.900 msnm en zona térmica fría a templada. Ciclo 60-90 días desde trasplante a primera cosecha; productividad sostenida con cortes graduales de hojas externas 4-6 meses. Suelos francos pH 6.5-7.5, MO >4%. Manejo agroecológico: doble fila densa (25×30 cm), fertilización con bocashi + biol foliar quincenal, control de minador hoja (Liriomyza huidobrensis) con BT y trampas amarillas. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy."
     },
     {
       "id": "brassica_oleracea_var_acephala",
@@ -6803,7 +6803,7 @@
         "powo-kew",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Leccion de morfologia vegetal: muestra como una estructura de hojas superpuestas crea microclima interno y protege los tejidos meristematicos."
+      "valor_pedagogico": "El repollo común (Brassica oleracea L. var. capitata, cultivares Tropic Sun, Globe Master, Quintal) es una crucífera bienal cultivada como anual para producción de cabeza compacta de hojas, una de las hortalizas más consumidas en Colombia. Se cultiva en Sabana de Bogotá (Mosquera, Madrid, Funza, Cota), Boyacá altiplano, Nariño, Antioquia y Cauca entre 2.000 y 2.900 msnm en zona térmica fría. Ciclo 4-5 meses a cosecha, rendimientos 40-60 t/ha. Cabeza 1-3 kg según variedad. Manejo agroecológico: rotación trienal con leguminosas anti-Plasmodiophora brassicae (hernia col), borde de capuchina como trampa cultivo, asocio con cebolla y lavanda (repelentes naturales), control de palomilla (Plutella xylostella) con Bacillus thuringiensis, mosca blanca con purín de ortiga. Fertilización con bocashi + biol foliar. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy."
     },
     {
       "id": "brassica_rapa_var_rapa",
@@ -8464,7 +8464,7 @@
         "gbif-taxonomic-backbone"
       ],
       "rol_ecologico": "Protector de fuentes hidricas por su sistema radical denso. Banco de forraje proteinado. Refugio de fauna silvestre. Aporte de biomasa foliar al suelo.",
-      "valor_pedagogico": "El que nace del agua: la cerca viva que protege las quebradas. Ensenia la relacion entre vegetacion riparia y calidad del agua en la finca.",
+      "valor_pedagogico": "El nacedero o yátago (Trichanthera gigantea (Bonpl.) Nees) es una acantácea árbol pequeño nativo de los Andes colombianos, ampliamente usado en sistemas silvopastoriles y agroforestales por su alto valor nutricional (proteína cruda 18-22% en hoja fresca) como forraje suplementario para bovinos, porcinos, conejos y aves. Se cultiva en Cundinamarca, Boyacá, Antioquia, Valle del Cauca, Tolima y Eje cafetero entre 0 y 2.000 msnm en zona térmica cálida a templada. Propagación por estaca leñosa (80-95% prendimiento), crecimiento rápido alcanza 3-4 m primer año. Vida productiva 15-25 años con cortes anuales o bianuales. Manejo agroecológico: cercas vivas en linderos, banco proteico forrajero (corte y acarreo), conservación riberas (raíces estabilizadoras), atrayente avifauna. Fuentes Tier A: AGROSAVIA, Catálogo Plantas y Líquenes Colombia (Bernal et al.), POWO Kew, GBIF Backbone Taxonomy.",
       "validation_level": "claude_draft"
     },
     {
