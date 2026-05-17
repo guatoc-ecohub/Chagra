@@ -1937,7 +1937,7 @@
         "restrepo-1996-abc-agricultura-organica",
         "powo-kew"
       ],
-      "valor_pedagogico": "Hortaliza emblemática de huertos urbanos y rurales por su rápido ciclo, rebrote tras corte y bajo requerimiento de espacio."
+      "valor_pedagogico": "La lechuga crespa verde (Lactuca sativa L. var. crispa, cultivares Vera, Verónica, Salinas) es una hortaliza de hoja anual ampliamente cultivada en Colombia, principalmente en el cinturón hortícola de la Sabana de Bogotá (Mosquera, Madrid, Funza, Tenjo, Cota), Boyacá altiplano y Nariño entre 2.000 y 2.900 msnm en zona térmica fría. Ciclo corto 50-70 días desde trasplante, rendimientos 18-25 t/ha cabezas. Crece bien en suelos francos con materia orgánica abundante (>4%), pH 6.0-7.0, riego constante. Sensible a heladas; aprecia días frescos (10-22°C). Manejo agroecológico: rotación con leguminosas (frijol, haba), siembra densa para sombreo entre filas, biopreparados como biol foliar y compost al fondo, control de áfidos (Myzus persicae) con purín de ortiga + lavanderas. Fuentes Tier A: AGROSAVIA Sol Andina, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy."
     },
     {
       "id": "lactuca_sativa_longifolia_morada",
@@ -3202,7 +3202,7 @@
         "restrepo-1996-abc-agricultura-organica",
         "powo-kew"
       ],
-      "valor_pedagogico": "Ciclo más corto del huerto (3-5 semanas): ideal como primer cultivo para niños y como indicador de compactación del suelo."
+      "valor_pedagogico": "El rábano (Raphanus sativus L.) es una crucífera anual de ciclo muy corto (25-45 días) y uno de los cultivos más fáciles de iniciar para agricultura urbana, periurbana y huertas campesinas. En Colombia se cultiva año redondo en clima frío (Sabana Bogotá, altiplano Boyacá-Cundinamarca, Nariño) entre 2.000 y 2.900 msnm en zona térmica fría a templada. Variedades comunes: Champion, Cherry Belle, Crimson Giant, Daikon (rábano largo). Siembra directa a 1-2 cm profundidad, distanciamiento 5×15 cm. Demanda baja en nutrientes, buen indicador de salud suelo. Manejo agroecológico: cultivo rápido entre cama y cama para optimizar espacio, asocio con zanahoria (espacios distintos), control de pulguilla de hojas (Phyllotreta) con cenizas de madera y malla anti-insectos. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy."
     },
     {
       "id": "rosmarinus_officinalis",
@@ -3512,11 +3512,12 @@
       },
       "companions": [],
       "antagonists": [],
-      "valor_pedagogico": "Farmacia viva chiguana. Sus flores y frutos no solo atraen aves, sino que son fundamentales en la medicina tradicional andina.",
+      "valor_pedagogico": "El sauco andino (Sambucus nigra L. subsp. peruviana) es un arbusto/árbol pequeño nativo de los Andes ampliamente naturalizado en Colombia, cultivado por sus flores (té) y frutos (mermeladas, vinos artesanales). Se encuentra en Cundinamarca (Sabana Bogotá, Choachí, Ubaque, La Calera), Boyacá altiplano, Nariño y Cauca entre 2.000 y 3.000 msnm en zona térmica fría a templada. Propagación por estaca leñosa (estaca de 30-50 cm) con 70-90% prendimiento sin hormonas. Crecimiento rápido alcanza 3-5 m en 3 años. Manejo agroecológico: cercas vivas en linderos, sombra de patio campesino, atrayente polinizadores (abejas, abejorros), fortalecedor de inmunidad de cultivos asociados. Fuentes Tier A: Jardín Botánico Bogotá, AGROSAVIA, POWO Kew, GBIF Backbone Taxonomy, Bernal et al. Catálogo Plantas y Líquenes Colombia.",
       "source_ids": [
         "pamplona-roger-2006-plantas-medicinales",
         "humboldt-flora-alto-andina",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "jbb-plantas-medicinales"
       ],
       "validation_level": "claude_draft",
       "estrato": "alto"
@@ -5044,7 +5045,7 @@
         "agrosavia-leguminosas-andinas",
         "nrc-1989-cultivos-andinos"
       ],
-      "valor_pedagogico": "Leguminosa de alta montana menos conocida pero valiosa por su rusticidad y aporte proteico en condiciones de frio extremo."
+      "valor_pedagogico": "La lenteja andina (Lens culinaris Medik. variedad andina) es una leguminosa de grano alto en proteína (~24-26%) y fibra, tradicionalmente cultivada en sistemas campesinos del altiplano colombiano para autoconsumo y mercados locales. Se siembra en Boyacá (Tunja, Sotaquirá, Toca), Cundinamarca (Ubaté, Chiquinquirá), Nariño y Norte de Santander entre 2.000 y 2.800 msnm en zona térmica fría. Ciclo corto 90-110 días, rendimientos 0.8-1.5 t/ha en sistema agroecológico. Fija nitrógeno biológico (~50-90 kg N/ha) por simbiosis con Rhizobium, mejorando suelos antecesores. Manejo: rotación con cereales (cebada, trigo, quinua), control mecánico de malezas en estado de roseta, baja demanda de insumos. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, NRC 1989 Cultivos Andinos, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy."
     },
     {
       "id": "phaseolus_vulgaris_nuna",
@@ -5230,7 +5231,7 @@
         "gbif-taxonomic-backbone",
         "powo-kew"
       ],
-      "valor_pedagogico": "Variedad andina tradicional del altiplano. Ensenanza del ciclo largo de la papa de ano y la importancia de las variedades nativas en la soberania alimentaria de la sabana.",
+      "valor_pedagogico": "La papa Sabanera (Solanum tuberosum L. variedad Sabanera) es una variedad colombiana de papa de gran adaptación al altiplano cundiboyacense, desarrollada y registrada por ICA y AGROSAVIA. Se cultiva en Cundinamarca (Mosquera, Bojacá, Soacha), Boyacá (Tunja, Ventaquemada, Toca) y Nariño entre 2.500 y 3.200 msnm en zona térmica fría. Ciclo vegetativo 5-6 meses, rendimientos comerciales 25-35 t/ha. Tubérculo grande oblongo con piel crema y carne amarilla suave. Susceptible a Phytophthora infestans (tizón tardío); manejo agroecológico incluye rotación trienal con leguminosas (haba, arveja andina), siembra escalonada, manejo de inóculo de papa-volunta, biopreparados como caldo bordelés y trichoderma. Fuentes Tier A: AGROSAVIA fichas papa, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy, Bernal et al. Catálogo Plantas y Líquenes Colombia.",
       "enfermedades_criticas": [
         "Trozador (Agrotis ipsilon)"
       ]
