@@ -30,4 +30,30 @@ describe('fincaActiveStore', () => {
         expect(finca.slug).toBe('guatoc');
         expect(finca.nombre).toBe('Guatoc');
     });
+
+    // 062.3 GPS auto-detect vs manual override (demo Tuesday path)
+    it('GPS detect changes finca without setting gpsOverride flag', () => {
+        useFincaActiveStore.getState().setActiveFincaFromGps('naranjalia');
+        expect(useFincaActiveStore.getState().activeFincaSlug).toBe('naranjalia');
+        expect(useFincaActiveStore.getState().gpsOverride).toBe(false);
+    });
+
+    it('manual selection sets gpsOverride flag, clearGpsOverride resets', () => {
+        useFincaActiveStore.getState().setActiveFincaManual('naranjalia');
+        expect(useFincaActiveStore.getState().gpsOverride).toBe(true);
+        useFincaActiveStore.getState().clearGpsOverride();
+        expect(useFincaActiveStore.getState().gpsOverride).toBe(false);
+        // Slug debe persistir tras clearGpsOverride
+        expect(useFincaActiveStore.getState().activeFincaSlug).toBe('naranjalia');
+    });
+
+    // Edge: empty fincas[] (boot inicial antes de fetch fincas-publicas.json)
+    it('returns sane defaults when fincas list is empty', () => {
+        useFincaActiveStore.setState({ activeFincaSlug: 'guatoc', fincas: [] });
+        const finca = useFincaActiveStore.getState().getActiveFinca();
+        expect(finca.slug).toBe('guatoc'); // fallback hardcoded
+        expect(finca.biocultural_zone).toBe('andino_alto_páramo');
+        // Endpoint vacío esperado (sin fincas[] no hay donde buscar)
+        expect(useFincaActiveStore.getState().getActiveEndpoint()).toBe('');
+    });
 });
