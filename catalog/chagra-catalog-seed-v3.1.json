@@ -5954,10 +5954,10 @@
         "max": 100
       },
       "ph_suelo": {
-        "min": 4.0,
+        "min": 4,
         "optimo_min": 4.5,
         "optimo_max": 5.5,
-        "max": 6.0
+        "max": 6
       },
       "radiacion": "sol_pleno",
       "agua": "alto",
@@ -6050,10 +6050,10 @@
         "max": 100
       },
       "ph_suelo": {
-        "min": 4.0,
+        "min": 4,
         "optimo_min": 4.5,
         "optimo_max": 5.5,
-        "max": 6.0
+        "max": 6
       },
       "radiacion": "sol_pleno",
       "agua": "alto",
@@ -6154,9 +6154,9 @@
       },
       "ph_suelo": {
         "min": 4.5,
-        "optimo_min": 5.0,
+        "optimo_min": 5,
         "optimo_max": 6.5,
-        "max": 7.0
+        "max": 7
       },
       "radiacion": "sombra_parcial",
       "agua": "medio",
@@ -6346,9 +6346,9 @@
         "max": 95
       },
       "ph_suelo": {
-        "min": 5.0,
+        "min": 5,
         "optimo_min": 5.5,
-        "optimo_max": 7.0,
+        "optimo_max": 7,
         "max": 7.5
       },
       "radiacion": "sol_pleno",
@@ -6447,7 +6447,7 @@
         "max": 95
       },
       "ph_suelo": {
-        "min": 5.0,
+        "min": 5,
         "optimo_min": 5.5,
         "optimo_max": 6.8,
         "max": 7.2
@@ -9896,6 +9896,15 @@
       "observaciones": "STUB migrado de v3.0."
     },
     {
+      "id": "agrosavia-leguminosas-andinas",
+      "tipo": "ficha_tecnica_institucional",
+      "autores": "AGROSAVIA",
+      "año": null,
+      "titulo": "Fichas técnicas de leguminosas andinas (haba, arveja, lenteja, frijol)",
+      "institucion": "Corporación Colombiana de Investigación Agropecuaria (AGROSAVIA)",
+      "observaciones": "Compilación de fichas técnicas de AGROSAVIA para leguminosas de clima frío. Año y volumen pendientes de consolidación."
+    },
+    {
       "id": "agrosavia-manual-arandano-2018",
       "tipo": "manual_tecnico",
       "autores": "AGROSAVIA",
@@ -9917,6 +9926,14 @@
       "autores": "AGROSAVIA",
       "año": 2015,
       "titulo": "Manual técnico para el cultivo de chachafruto (Erythrina edulis) en sistemas agroforestales andinos",
+      "institucion": "AGROSAVIA"
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "tipo": "manual",
+      "autores": "AGROSAVIA — Corporación Colombiana de Investigación Agropecuaria",
+      "año": 2017,
+      "titulo": "Manual técnico para el cultivo de frutales tropicales en Colombia",
       "institucion": "AGROSAVIA"
     },
     {
@@ -9961,6 +9978,15 @@
       "titulo": "Centro de Investigación Tibaitatá — publicaciones sobre cultivos andinos y altoandinos",
       "institucion": "AGROSAVIA",
       "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "tipo": "base_datos",
+      "autores": "Bernal, R.; Gradstein, S.R.; Celis, M. (eds.)",
+      "año": 2015,
+      "titulo": "Catálogo de Plantas y Líquenes de Colombia",
+      "institucion": "Instituto de Ciencias Naturales, Universidad Nacional de Colombia",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
     },
     {
       "id": "calderon-saenz-2003-invasoras",
@@ -10040,6 +10066,15 @@
       "volumen_numero": "16",
       "paginas": "1-52",
       "doi": "10.3897/phytokeys.16.3186"
+    },
+    {
+      "id": "fao-2013-quinua",
+      "tipo": "libro",
+      "autores": "FAO — Organización de las Naciones Unidas para la Alimentación y la Agricultura",
+      "año": 2013,
+      "titulo": "Quinua: Año Internacional de la Quinua 2013 — Documentos técnicos y estado del arte",
+      "institucion": "FAO",
+      "url": "https://www.fao.org/quinoa-2013"
     },
     {
       "id": "fao-ecocrop",
@@ -10143,6 +10178,14 @@
       "url": "http://www.iucngisd.org"
     },
     {
+      "id": "jbb-plantas-medicinales",
+      "tipo": "libro",
+      "autores": "Jardín Botánico José Celestino Mutis — Bogotá",
+      "año": 2010,
+      "titulo": "Plantas medicinales de Cundinamarca y Boyacá",
+      "institucion": "Jardín Botánico de Bogotá José Celestino Mutis"
+    },
+    {
       "id": "khan-2009-seaweed-extracts",
       "tipo": "articulo_revista",
       "autores": "Khan, W.; Rayirath, U.P.; Subramanian, S.; et al.",
@@ -10187,6 +10230,23 @@
       "observaciones": "STUB — artículo periodístico, validar contra fuente primaria antes de citar en ministerial."
     },
     {
+      "id": "mujica-1992-quinua",
+      "tipo": "articulo_revista",
+      "autores": "Mujica, A.",
+      "año": 1992,
+      "titulo": "Revisión bibliográfica sobre el cultivo de la quinua (Chenopodium quinoa Willd.) y el amaranto (Amaranthus caudatus L.) en los Andes",
+      "observaciones": "Publicación del Instituto Nacional de Investigaciones Agropecuarias (INIAP), Ecuador. Revisión exhaustiva de germoplasma, agronomía y usos tradicionales."
+    },
+    {
+      "id": "nrc-1989-cultivos-andinos",
+      "tipo": "libro",
+      "autores": "National Research Council (NRC)",
+      "año": 1989,
+      "titulo": "Lost Crops of the Incas: Little-Known Plants of the Andes with Promise for Worldwide Cultivation",
+      "revista_o_editorial": "National Academy Press",
+      "isbn": "9780309042642"
+    },
+    {
       "id": "nustez-rodriguez-2024-unal",
       "tipo": "libro",
       "autores": "Ñústez, C.E.; Rodríguez, L.E.",
@@ -10211,6 +10271,15 @@
       "titulo": "Enciclopedia de las plantas medicinales",
       "revista_o_editorial": "Safeliz",
       "observaciones": "STUB migrado de v3.0 — confirmar ISBN."
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "tipo": "libro",
+      "autores": "Pérez Arbeláez, E.",
+      "año": 1947,
+      "titulo": "Plantas Útiles de Colombia",
+      "revista_o_editorial": "Librería Colombiana / Camacho Roldán",
+      "observaciones": "Obra clásica de la botánica económica colombiana; múltiples reediciones posteriores."
     },
     {
       "id": "perez-rodriguez-gomez-2008",
@@ -10239,6 +10308,14 @@
       "institucion": "MADS Colombia"
     },
     {
+      "id": "restauracion-cruz-verde-sumapaz",
+      "tipo": "reporte_tecnico",
+      "autores": "Instituto Alexander von Humboldt + CAR Cundinamarca",
+      "año": 2018,
+      "titulo": "Plan de restauración ecológica páramos Cruz Verde — Sumapaz",
+      "institucion": "IAvH / CAR Cundinamarca"
+    },
+    {
       "id": "restrepo-1996-abc-agricultura-organica",
       "tipo": "libro",
       "autores": "Restrepo, J.",
@@ -10255,12 +10332,28 @@
       "revista_o_editorial": "OIT"
     },
     {
+      "id": "restrepo-2005-agroecologia",
+      "tipo": "libro",
+      "autores": "Restrepo Rivera, Jairo",
+      "año": 2005,
+      "titulo": "Manual práctico ABC de la agricultura orgánica y panes de piedra",
+      "institucion": "Editorial Feriva"
+    },
+    {
       "id": "restrepo-2007-biopreparados",
       "tipo": "manual_tecnico",
       "autores": "Jairo Restrepo Rivera",
       "año": 2007,
       "titulo": "Manual práctico de biopreparados aplicados a la agricultura orgánica",
       "institucion": "Fundación Juquira Candiru"
+    },
+    {
+      "id": "restrepo-rivera-2005",
+      "tipo": "libro",
+      "autores": "Restrepo Rivera, Jairo",
+      "año": 2005,
+      "titulo": "Agroecología — principios y aplicación en el manejo de fincas tropicales",
+      "institucion": "Editorial Feriva"
     },
     {
       "id": "rodriguez-nustez-2009",
@@ -10303,59 +10396,6 @@
       "año": null,
       "titulo": "The IUCN Red List of Threatened Species",
       "url": "https://www.iucnredlist.org"
-    },
-    {
-      "id": "bernal-2015-plantas-liquenes-colombia",
-      "tipo": "base_datos",
-      "autores": "Bernal, R.; Gradstein, S.R.; Celis, M. (eds.)",
-      "año": 2015,
-      "titulo": "Catálogo de Plantas y Líquenes de Colombia",
-      "institucion": "Instituto de Ciencias Naturales, Universidad Nacional de Colombia",
-      "url": "http://catalogoplantasdecolombia.unal.edu.co"
-    },
-    {
-      "id": "nrc-1989-cultivos-andinos",
-      "tipo": "libro",
-      "autores": "National Research Council (NRC)",
-      "año": 1989,
-      "titulo": "Lost Crops of the Incas: Little-Known Plants of the Andes with Promise for Worldwide Cultivation",
-      "revista_o_editorial": "National Academy Press",
-      "isbn": "9780309042642"
-    },
-    {
-      "id": "fao-2013-quinua",
-      "tipo": "libro",
-      "autores": "FAO — Organización de las Naciones Unidas para la Alimentación y la Agricultura",
-      "año": 2013,
-      "titulo": "Quinua: Año Internacional de la Quinua 2013 — Documentos técnicos y estado del arte",
-      "institucion": "FAO",
-      "url": "https://www.fao.org/quinoa-2013"
-    },
-    {
-      "id": "mujica-1992-quinua",
-      "tipo": "articulo_revista",
-      "autores": "Mujica, A.",
-      "año": 1992,
-      "titulo": "Revisión bibliográfica sobre el cultivo de la quinua (Chenopodium quinoa Willd.) y el amaranto (Amaranthus caudatus L.) en los Andes",
-      "observaciones": "Publicación del Instituto Nacional de Investigaciones Agropecuarias (INIAP), Ecuador. Revisión exhaustiva de germoplasma, agronomía y usos tradicionales."
-    },
-    {
-      "id": "perez-arbelaez-1947-plantas-utiles",
-      "tipo": "libro",
-      "autores": "Pérez Arbeláez, E.",
-      "año": 1947,
-      "titulo": "Plantas Útiles de Colombia",
-      "revista_o_editorial": "Librería Colombiana / Camacho Roldán",
-      "observaciones": "Obra clásica de la botánica económica colombiana; múltiples reediciones posteriores."
-    },
-    {
-      "id": "agrosavia-leguminosas-andinas",
-      "tipo": "ficha_tecnica_institucional",
-      "autores": "AGROSAVIA",
-      "año": null,
-      "titulo": "Fichas técnicas de leguminosas andinas (haba, arveja, lenteja, frijol)",
-      "institucion": "Corporación Colombiana de Investigación Agropecuaria (AGROSAVIA)",
-      "observaciones": "Compilación de fichas técnicas de AGROSAVIA para leguminosas de clima frío. Año y volumen pendientes de consolidación."
     }
   ]
 }
