@@ -1,0 +1,183 @@
+name: LLM local review (Gate 5)
+
+# Gate 5 de la cadena defense-in-depth: review LLM on-host en alpha
+# (self-hosted runner + Ollama qwen3-coder:7b), NO bloqueante.
+#
+# Privacy: el diff NO sale del host. Runner self-hosted, Ollama local.
+# Operador lee comentario y decide. Falsos positivos esperados ~20-30%.
+#
+# Re-entrante: el comentario tiene marker `<!-- llm-review-bot -->` para
+# upsert (no duplica entre pushes).
+#
+# Soft-fail: si Ollama caído o timeout (8 min), el job falla silencioso
+# sin bloquear merge — solo se pierde el review esta corrida.
+#
+# Documentación: docs/ai-review-gates.md (en este repo) + prompt template
+# Chagra-strategy/ops/antigravity-prompts/llm-local-review-workflow.md
+# (en repo privado).
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: llm-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    runs-on: [self-hosted, alpha]
+    timeout-minutes: 10
+    if: github.event.pull_request.draft == false
+
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Verify Ollama reachable
+        run: |
+          curl -fsS http://127.0.0.1:11434/api/tags > /tmp/ollama-tags.json
+          jq -e '.models[] | select(.name | startswith("qwen3-coder"))' /tmp/ollama-tags.json \
+            || { echo "qwen3-coder no disponible en Ollama"; exit 1; }
+
+      - name: Compute diff (truncated)
+        id: diff
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git diff "$BASE_SHA".."$HEAD_SHA" -- \
+            ':(exclude)*.lock' ':(exclude)package-lock.json' \
+            ':(exclude)*.svg' ':(exclude)*.png' ':(exclude)*.jpg' \
+            > /tmp/full.diff
+          DIFF_LINES=$(wc -l < /tmp/full.diff)
+          if [ "$DIFF_LINES" -gt 2000 ]; then
+            head -n 2000 /tmp/full.diff > /tmp/pr.diff
+            echo "" >> /tmp/pr.diff
+            echo "[... truncated $((DIFF_LINES - 2000)) lines ...]" >> /tmp/pr.diff
+          else
+            cp /tmp/full.diff /tmp/pr.diff
+          fi
+          echo "lines=$DIFF_LINES" >> "$GITHUB_OUTPUT"
+
+      - name: Detect relevant ADRs
+        id: adrs
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          PATHS=$(git diff --name-only "$BASE_SHA".."$HEAD_SHA")
+          ADRS=""
+          if echo "$PATHS" | grep -qE '(catalog|logCache|assetCache|stores/.*Store\.js|services/(catalog|logs|assets))'; then
+            ADRS="$ADRS adr-019"
+          fi
+          if echo "$PATHS" | grep -qE '(prompts|content|README|AGENTS|CLAUDE\.md|docs/)'; then
+            ADRS="$ADRS adr-020"
+          fi
+          echo "list=${ADRS:- generic}" >> "$GITHUB_OUTPUT"
+
+      - name: Cache ADRs (best-effort, optional)
+        continue-on-error: true
+        run: |
+          mkdir -p .adr-cache
+          # En alpha, los ADRs de Chagra-strategy están en /home/kortux/Workspace/Chagra-strategy o /home/kortux/Chagra-strategy.
+          for base in /home/kortux/Workspace/Chagra-strategy /home/kortux/Chagra-strategy; do
+            if [ -d "$base/deepresearch" ]; then
+              cp "$base/deepresearch/data-model/adr-019-asset-log-3-reglas-inviolables.md" .adr-cache/adr-019.md 2>/dev/null || true
+              cp "$base/deepresearch/architecture/ADR-020-anti-leak-content-boundary.md" .adr-cache/adr-020.md 2>/dev/null || true
+              break
+            fi
+          done
+
+      - name: Build prompt
+        env:
+          ADR_LIST: ${{ steps.adrs.outputs.list }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_NUM: ${{ github.event.pull_request.number }}
+        run: |
+          {
+            echo "Eres reviewer técnico senior del repo Chagra (PWA agroecológica)."
+            echo "Tarea: revisar el diff del PR #$PR_NUM contra las reglas inviolables del proyecto."
+            echo ""
+            echo "REGLAS INVIOLABLES (de los ADRs cargados):"
+            if echo "$ADR_LIST" | grep -q adr-019; then
+              echo "--- ADR-019 (data model) ---"
+              cat .adr-cache/adr-019.md 2>/dev/null || echo "(no cargado)"
+            fi
+            if echo "$ADR_LIST" | grep -q adr-020; then
+              echo "--- ADR-020 (anti-leak content boundary) ---"
+              cat .adr-cache/adr-020.md 2>/dev/null || echo "(no cargado)"
+            fi
+            echo ""
+            echo "CLAUDE.md del repo:"
+            sed -n '1,80p' CLAUDE.md 2>/dev/null || echo "(sin CLAUDE.md)"
+            echo ""
+            echo "PR title: $PR_TITLE"
+            echo ""
+            echo "DIFF:"
+            cat /tmp/pr.diff
+            echo ""
+            echo "INSTRUCCIONES DE REVIEW:"
+            echo "1. Lista hallazgos por severidad: 🔴 critical / 🟠 high / 🟡 medium / 🟢 low / ℹ️ info."
+            echo "2. Para cada hallazgo: archivo:línea, descripción breve, sugerencia accionable."
+            echo "3. Si tocaste catálogo/logs: verifica las 3 reglas ADR-019 (asset-flat, append-only, encoding [*])."
+            echo "4. Si tocaste prompts/content: verifica ADR-020 capas (negocio, identidad operativa, identidad personal)."
+            echo "5. Si NO encuentras issues, dilo explícitamente: 'Sin hallazgos bloqueantes'."
+            echo "6. Máximo 25 hallazgos. Si hay más, prioriza los más graves."
+            echo "7. NO inventes archivos ni líneas que no existan en el diff."
+          } > /tmp/prompt.txt
+          wc -c /tmp/prompt.txt
+
+      - name: Run Ollama
+        id: ollama
+        run: |
+          PROMPT=$(jq -Rs . < /tmp/prompt.txt)
+          REQ=$(jq -n --argjson p "$PROMPT" '{model:"qwen3-coder:7b", prompt:$p, stream:false, options:{temperature:0.2, num_ctx:16384}}')
+          echo "$REQ" | curl -fsS -X POST http://127.0.0.1:11434/api/generate \
+            -H 'Content-Type: application/json' \
+            --max-time 480 \
+            --data-binary @- \
+            > /tmp/ollama.json
+          jq -r '.response' /tmp/ollama.json > /tmp/review.md
+          REVIEW_LEN=$(wc -c < /tmp/review.md)
+          if [ "$REVIEW_LEN" -lt 50 ]; then
+            echo "Review vacía, fail soft"
+            echo "skip=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upsert PR comment
+        if: steps.ollama.outputs.skip != '1'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUM: ${{ github.event.pull_request.number }}
+        run: |
+          MARKER='<!-- llm-review-bot -->'
+          {
+            echo "$MARKER"
+            echo "## 🤖 Local LLM review (Gate 5, no bloqueante)"
+            echo ""
+            echo "Modelo: \`qwen3-coder:7b\` · runner: \`alpha\` self-hosted · diff: ${{ steps.diff.outputs.lines }} líneas · ADRs: ${{ steps.adrs.outputs.list }}"
+            echo ""
+            cat /tmp/review.md
+            echo ""
+            echo "---"
+            echo "_Comentario generado por workflow .github/workflows/llm-local-review.yml. Falsos positivos esperados ~20-30%. Operador decide qué accionar._"
+          } > /tmp/comment.md
+
+          # Upsert: si existe comentario con marker, lo actualiza; si no, crea uno nuevo.
+          EXISTING_ID=$(gh api "repos/${{ github.repository }}/issues/$PR_NUM/comments" \
+            --jq ".[] | select(.body | contains(\"$MARKER\")) | .id" | head -n1)
+          if [ -n "$EXISTING_ID" ]; then
+            gh api -X PATCH "repos/${{ github.repository }}/issues/comments/$EXISTING_ID" \
+              -F body=@/tmp/comment.md
+          else
+            gh pr comment "$PR_NUM" --body-file /tmp/comment.md
+          fi
