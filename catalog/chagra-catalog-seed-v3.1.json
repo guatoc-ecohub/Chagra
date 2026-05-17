@@ -74,7 +74,7 @@
       "nombre_comun": "Anón",
       "nombre_cientifico": "Annona squamosa L.",
       "familia_botanica": "Annonaceae",
-      "category": "frutales_nativos",
+      "category": "frutales_perennes",
       "thermal_zones": [
         "calido"
       ],
@@ -109,7 +109,8 @@
         "ica-resolucion-3168-2015"
       ],
       "valor_pedagogico": "El anón (Annona squamosa L.) es un frutal tropical nativo de América tropical, cultivado en las regiones cálidas del Caribe colombiano como Córdoba, Bolívar, Magdalena, Cesar y La Guajira, entre 0 y 1500 msnm en zonas térmicas calidas. Su manejo agronómico incluye propagación por semilla de frutos maduros o injerto de púa para mantener características varietales, con un ciclo de fructificación de 3-4 años desde siembra, requiere podas de formación y mantenimiento, se asocia beneficiosamente con otros frutales tropicales como mango y papaya, y puede ser afectado por plagas como la mosca de la fruta y trips. En el contexto cultural Caribe colombiano, el anón es una fruta muy apreciada por su sabor dulce y cremoso, utilizada tradicionalmente en repostería local y consumed directamente como fruta fresca. Según las fuentes taxonómicas verificadas de GBIF Backbone Taxonomy y Plants of the World Online (POWO), así como el manual de frutales tropicales de AGROSAVIA y la ICA Resolución 3168/2015, su nombre científico válido es Annona squamosa L.",
-      "validation_level": "ai_draft"
+      "validation_level": "claude_draft",
+      "estrato": "medio"
     },
     {
       "id": "allium_ampeloprasum",
@@ -1607,7 +1608,8 @@
         "gbif-taxonomic-backbone",
         "agrosavia-manual-biopreparados-2015"
       ],
-      "valor_pedagogico": "Lección de fotoperiodo: variedad que permite entender cómo la planta produce flores y frutos independientemente de la duración del día."
+      "valor_pedagogico": "Lección de fotoperiodo: variedad que permite entender cómo la planta produce flores y frutos independientemente de la duración del día.",
+      "estrato": "rastrero"
     },
     {
       "id": "hedychium_coronarium",
@@ -1742,7 +1744,7 @@
       "nombre_comun": "Guamo",
       "nombre_cientifico": "Inga edulis Mart.",
       "familia_botanica": "Fabaceae",
-      "category": "frutales_nativos",
+      "category": "frutales_perennes",
       "thermal_zones": [
         "calido",
         "templado"
@@ -1778,7 +1780,8 @@
         "agrosavia-sol-andina",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "El guamo (Inga edulis) se cultiva en departamentos colombianos como Valle del Cauca, Antioquia, Caldas, Quindío, Tolima y Huila entre 0 y 2000 msnm en zonas térmicas cálidas y templadas. Su manejo agronómico incluye propagación por semilla recalcitrante (sembrar inmediatamente post-recolección) con emergencia rápida de 7-14 días, ciclo productivo de 3-5 años hasta primera cosecha significativa, asociaciones tradicionales con cacao y café como especie sombreadora que fija nitrógeno atmosférico mediante simbiosis con rizobios, y requiere manejo de plagas como barrenadores de tallos y mosca de la fruta mediante monitoreo y poda fitosanitaria. En el contexto cultural campesino andino, esta leguminosa ha sido tradicionalmente utilizada como sombra de cacao y café, sus vainas contienen pulpa dulce comestible rica en azúcares naturales, y forma parte de sistemas agroforestales tradicionales que combinan producción con conservación de suelo. Según las fuentes taxonómicas verificadas de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Inga edulis Mart."
+      "valor_pedagogico": "El guamo (Inga edulis) se cultiva en departamentos colombianos como Valle del Cauca, Antioquia, Caldas, Quindío, Tolima y Huila entre 0 y 2000 msnm en zonas térmicas cálidas y templadas. Su manejo agronómico incluye propagación por semilla recalcitrante (sembrar inmediatamente post-recolección) con emergencia rápida de 7-14 días, ciclo productivo de 3-5 años hasta primera cosecha significativa, asociaciones tradicionales con cacao y café como especie sombreadora que fija nitrógeno atmosférico mediante simbiosis con rizobios, y requiere manejo de plagas como barrenadores de tallos y mosca de la fruta mediante monitoreo y poda fitosanitaria. En el contexto cultural campesino andino, esta leguminosa ha sido tradicionalmente utilizada como sombra de cacao y café, sus vainas contienen pulpa dulce comestible rica en azúcares naturales, y forma parte de sistemas agroforestales tradicionales que combinan producción con conservación de suelo. Según las fuentes taxonómicas verificadas de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Inga edulis Mart.",
+      "estrato": "alto"
     },
     {
       "id": "lactuca_sativa_capitata",
@@ -2335,7 +2338,8 @@
         "agrosavia-sol-andina",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "La Passiflora edulis f. flavicarpa, conocida como maracuyá amarilla, se cultiva en departamentos colombianos como Antioquia, Cundinamarca, Santander y el Valle del Cauca entre 0 y 1800 msnm en zonas térmicas cálidas y templadas. Su manejo agronómico incluye propagación por semilla o injerto, ciclo productivo de 18-24 meses, asociaciones beneficiosas con cultivos de sombra como plátano y caucho para reducir estrés hídrico, y requiere manejo de plagas como la mosca de la fruta (Ceratitis capitata) y ácaros mediante monitoreo y biopreparados. En el contexto andino-colombiano, aunque originaria de Brasil, su cultivo se ha integrado en sistemas agrofrutícolas de mediana altura, contribuyendo a la diversificación económica de pequeños productores. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Passiflora edulis f. flavicarpa Deg."
+      "valor_pedagogico": "La Passiflora edulis f. flavicarpa, conocida como maracuyá amarilla, se cultiva en departamentos colombianos como Antioquia, Cundinamarca, Santander y el Valle del Cauca entre 0 y 1800 msnm en zonas térmicas cálidas y templadas. Su manejo agronómico incluye propagación por semilla o injerto, ciclo productivo de 18-24 meses, asociaciones beneficiosas con cultivos de sombra como plátano y caucho para reducir estrés hídrico, y requiere manejo de plagas como la mosca de la fruta (Ceratitis capitata) y ácaros mediante monitoreo y biopreparados. En el contexto andino-colombiano, aunque originaria de Brasil, su cultivo se ha integrado en sistemas agrofrutícolas de mediana altura, contribuyendo a la diversificación económica de pequeños productores. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Passiflora edulis f. flavicarpa Deg.",
+      "estrato": "alto"
     },
     {
       "id": "passiflora_edulis_morada",
@@ -2389,7 +2393,8 @@
         "dose_ml": 500,
         "notes": "Establecimiento",
         "- offset_days": 30
-      }
+      },
+      "estrato": "alto"
     },
     {
       "id": "passiflora_ligularis",
@@ -2432,7 +2437,8 @@
         "agrosavia-sol-andina",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "La granadilla (Passiflora ligularis Juss.) se distribuye en los departamentos andinos de Colombia como Cundinamarca, Boyacá, Antioquia, Nariño y Santander entre 1500 y 2600 msnm, con óptimo productivo entre 1800 y 2400 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con tratamiento de escarificación para acelerar la germinación (14-21 días), ciclo productivo de 12-18 meses desde siembra hasta primera cosecha, requiere tutoraje con espalderas o emparrillados sturdy para soportar el peso de los racimos, y se asocia beneficiosamente con plátano y café como sombra parcial. Las principales plagas incluyen nematodos del género Meloidogyne, trips (Frankliniella spp.), mosca de la fruta (Ceratitis capitata) y enfermedades fungosas como antracnosis (Colletotrichum gloeosporioides), requeridas de manejo integrado mediante monitoreo quincenal y biopreparados andinos. En el contexto cultural muisca y andino, esta passiflora ha sido tradicionalmente cultivada en huertos caseros y chagras de altura, donde sus frutos se consumen frescos en jugos y obras, mientras la planta se usa como cerca viva decorativa por sus flores vistosas. Los saberes tradicionales incluyen el uso de hojas en infusiones para calmar aftas y la aplicación del mucílago de los frutos como gelatinizante natural en la cocina campesina. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), respaldada por AGROSAVIA Sol Andina y la ICA Resolución 3168/2015, su nombre científico válido es Passiflora ligularis Juss."
+      "valor_pedagogico": "La granadilla (Passiflora ligularis Juss.) se distribuye en los departamentos andinos de Colombia como Cundinamarca, Boyacá, Antioquia, Nariño y Santander entre 1500 y 2600 msnm, con óptimo productivo entre 1800 y 2400 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con tratamiento de escarificación para acelerar la germinación (14-21 días), ciclo productivo de 12-18 meses desde siembra hasta primera cosecha, requiere tutoraje con espalderas o emparrillados sturdy para soportar el peso de los racimos, y se asocia beneficiosamente con plátano y café como sombra parcial. Las principales plagas incluyen nematodos del género Meloidogyne, trips (Frankliniella spp.), mosca de la fruta (Ceratitis capitata) y enfermedades fungosas como antracnosis (Colletotrichum gloeosporioides), requeridas de manejo integrado mediante monitoreo quincenal y biopreparados andinos. En el contexto cultural muisca y andino, esta passiflora ha sido tradicionalmente cultivada en huertos caseros y chagras de altura, donde sus frutos se consumen frescos en jugos y obras, mientras la planta se usa como cerca viva decorativa por sus flores vistosas. Los saberes tradicionales incluyen el uso de hojas en infusiones para calmar aftas y la aplicación del mucílago de los frutos como gelatinizante natural en la cocina campesina. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), respaldada por AGROSAVIA Sol Andina y la ICA Resolución 3168/2015, su nombre científico válido es Passiflora ligularis Juss.",
+      "estrato": "alto"
     },
     {
       "id": "passiflora_tripartita_mollissima",
@@ -2474,7 +2480,8 @@
         "agrosavia-sol-andina",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "La Curuba de Castilla (Passiflora tripartita var. mollissima) se distribuye en los departamentos de Cundinamarca y Boyacá entre 1800-3200 msnm en zona térmica fría, siendo cultivada comercialmente principalmente entre 2200-2800 msnm. Su manejo agronómico incluye propagación por semilla con ciclo productivo de 12-18 meses, requiere poda de formación constante cada 3-4 meses para evitar enmarañamiento y facilitar la cosecha, se asocia beneficiosamente con Alnus acuminata en sistemas agroforestales donde el aliso proporciona tutoraje y fijación de nitrógeno, y es susceptible a antracnosis en períodos de alta neblina requeriendo monitoreo preventivo. En el contexto campesino andino, sus frutos son la base del tradicional sorbete de curuba preparado en las casas chiguanas, aprovechando su pulpa aromática rica en vitaminas A y C. Según la Resolución ICA 3168/2015 que establece normas para la producción, certificación y comercio de semillas en Colombia."
+      "valor_pedagogico": "La Curuba de Castilla (Passiflora tripartita var. mollissima) se distribuye en los departamentos de Cundinamarca y Boyacá entre 1800-3200 msnm en zona térmica fría, siendo cultivada comercialmente principalmente entre 2200-2800 msnm. Su manejo agronómico incluye propagación por semilla con ciclo productivo de 12-18 meses, requiere poda de formación constante cada 3-4 meses para evitar enmarañamiento y facilitar la cosecha, se asocia beneficiosamente con Alnus acuminata en sistemas agroforestales donde el aliso proporciona tutoraje y fijación de nitrógeno, y es susceptible a antracnosis en períodos de alta neblina requeriendo monitoreo preventivo. En el contexto campesino andino, sus frutos son la base del tradicional sorbete de curuba preparado en las casas chiguanas, aprovechando su pulpa aromática rica en vitaminas A y C. Según la Resolución ICA 3168/2015 que establece normas para la producción, certificación y comercio de semillas en Colombia.",
+      "estrato": "alto"
     },
     {
       "id": "pennisetum_setaceum",
@@ -2726,7 +2733,8 @@
         "agrosavia-manual-uchuva-2015",
         "powo-kew"
       ],
-      "valor_pedagogico": "La joya protegida: su capacho natural enseña la importancia de la protección post-cosecha y la conservación del valor nutritivo."
+      "valor_pedagogico": "La joya protegida: su capacho natural enseña la importancia de la protección post-cosecha y la conservación del valor nutritivo.",
+      "estrato": "bajo"
     },
     {
       "id": "pimpinella_anisum",
@@ -2852,7 +2860,8 @@
         "powo-kew",
         "sib-colombia"
       ],
-      "valor_pedagogico": "El cerezo de los Andes. Esencial en el paisaje chiguano por su valor cultural, su madera fina y su rol como rompevientos natural."
+      "valor_pedagogico": "El cerezo de los Andes. Esencial en el paisaje chiguano por su valor cultural, su madera fina y su rol como rompevientos natural.",
+      "estrato": "alto"
     },
     {
       "id": "psidium_guajava_manzana",
@@ -2894,7 +2903,8 @@
         "gbif-taxonomic-backbone",
         "restrepo-1996-abc-agricultura-organica"
       ],
-      "valor_pedagogico": "Lección de rusticidad: planta adaptada a suelos marginales que provee altísima nutrición (Vitamina C) con mínimo manejo externo."
+      "valor_pedagogico": "Lección de rusticidad: planta adaptada a suelos marginales que provee altísima nutrición (Vitamina C) con mínimo manejo externo.",
+      "estrato": "alto"
     },
     {
       "id": "pteridium_aquilinum",
@@ -3204,7 +3214,8 @@
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de domesticación: muestra las ventajas de la selección varietal para mejorar la ergonomía y la seguridad en la agricultura familiar."
+      "valor_pedagogico": "Lección de domesticación: muestra las ventajas de la selección varietal para mejorar la ergonomía y la seguridad en la agricultura familiar.",
+      "estrato": "medio"
     },
     {
       "id": "rubus_idaeus_golden",
@@ -3246,7 +3257,8 @@
         "agrosavia-sol-andina",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Frambuesa dorada cultivada en zonas frías de Colombia (Cundinamarca, Boyacá, Nariño, Santander) entre 2000-2600 msnm, en zona térmica frío. Propagación por hijuelos con excelente enraizamiento; ciclo productiva de 3-5 años con podas de renovación. Se asocia con leguminosas (frijol, alfalfa) que fijan nitrógeno y protegen de erosión. Plagas principales: araña roja (Tetranychus urticae), trips y botrytis en frutos por exceso de humedad. Contexto cultural: los muiscas cultivaban frutales nativos de altura como uchuva y mora; la introducción de Rubus spp. doradas data del siglo XX con cultivares traídos de Norteamérica. Los agricultores andinos valoran esta variedad por su bajo requerimiento de frío comparado con rojas y por su dulzura sin astringencia. Fuente: ICA Resolución 3168-2015 regula el material vegetal de frutales menores en Colombia."
+      "valor_pedagogico": "Frambuesa dorada cultivada en zonas frías de Colombia (Cundinamarca, Boyacá, Nariño, Santander) entre 2000-2600 msnm, en zona térmica frío. Propagación por hijuelos con excelente enraizamiento; ciclo productiva de 3-5 años con podas de renovación. Se asocia con leguminosas (frijol, alfalfa) que fijan nitrógeno y protegen de erosión. Plagas principales: araña roja (Tetranychus urticae), trips y botrytis en frutos por exceso de humedad. Contexto cultural: los muiscas cultivaban frutales nativos de altura como uchuva y mora; la introducción de Rubus spp. doradas data del siglo XX con cultivares traídos de Norteamérica. Los agricultores andinos valoran esta variedad por su bajo requerimiento de frío comparado con rojas y por su dulzura sin astringencia. Fuente: ICA Resolución 3168-2015 regula el material vegetal de frutales menores en Colombia.",
+      "estrato": "medio"
     },
     {
       "id": "rubus_idaeus_heritage",
@@ -3289,7 +3301,8 @@
         "agrosavia-sol-andina",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de ciclo de tallo: enseña la diferencia entre floricanes y primocanes en plantas arbustivas y su manejo ergonómico."
+      "valor_pedagogico": "Lección de ciclo de tallo: enseña la diferencia entre floricanes y primocanes en plantas arbustivas y su manejo ergonómico.",
+      "estrato": "medio"
     },
     {
       "id": "salvia_officinalis",
@@ -3425,7 +3438,8 @@
         "agrosavia-manual-uchuva-2015",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "El tomate de árbol (Solanum betaceum Cav.) se cultiva en departamentos andinos de Colombia como Cundinamarca, Boyacá, Nariño, Valle del Cauca, Antioquia y Tolima entre 1200 y 3000 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla o injerto, ciclo de fructificación de 8-12 meses desde la siembra, asociaciones beneficiosas con café, cacao y especies de sombra que mejoran la estructura del huerto, y requiere manejo integrado de nematodos, mosca de la fruta y trips mediante monitoreo y biopreparados andinos. En el contexto cultural muisca y andino, este frutal ha sido tradicionalmente consumido fresco o en jugos, conservando su valor como alimento nativo de los Andes colombianos. Según las fuentes taxonómicas verificadas de GBIF Backbone Taxonomy, Plants of the World Online (POWO), AGROSAVIA Manual de Uchuva y la ICA Resolución 3168/2015, su nombre científico válido es Solanum betaceum Cav."
+      "valor_pedagogico": "El tomate de árbol (Solanum betaceum Cav.) se cultiva en departamentos andinos de Colombia como Cundinamarca, Boyacá, Nariño, Valle del Cauca, Antioquia y Tolima entre 1200 y 3000 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla o injerto, ciclo de fructificación de 8-12 meses desde la siembra, asociaciones beneficiosas con café, cacao y especies de sombra que mejoran la estructura del huerto, y requiere manejo integrado de nematodos, mosca de la fruta y trips mediante monitoreo y biopreparados andinos. En el contexto cultural muisca y andino, este frutal ha sido tradicionalmente consumido fresco o en jugos, conservando su valor como alimento nativo de los Andes colombianos. Según las fuentes taxonómicas verificadas de GBIF Backbone Taxonomy, Plants of the World Online (POWO), AGROSAVIA Manual de Uchuva y la ICA Resolución 3168/2015, su nombre científico válido es Solanum betaceum Cav.",
+      "estrato": "medio"
     },
     {
       "id": "solanum_lycopersicum_cerasiforme",
@@ -3651,7 +3665,7 @@
         "ground_cover"
       ],
       "cultivable": true,
-      "conservation_status": "LC",
+      "conservation_status": "cultivo_comun",
       "altitud_msnm": {
         "min_absoluto": 1500,
         "optimo_min": 2500,
@@ -3797,7 +3811,12 @@
       "antagonists": [],
       "valor_pedagogico": "El trébol blanco (Trifolium repens L.) se distribuye en Colombia principalmente en departamentos andinos como Cundinamarca, Boyacá y Nariño entre 1000 y 3200 msnm en zonas térmicas frías. Su manejo agronómico incluye propagación por semilla al voleo, formando una alfombra densa que previene la erosión, con ciclo perenne y asociaciones beneficiosas con aliso (Alnus acuminata) y maíz (Zea mays) para fijación de nitrógeno. En contextos campesinos andinos, se utiliza como cobertura viva en caminos de finca para mejorar la estructura del suelo y reducir compactación. Según el backbone taxonómico de GBIF y Plants of the World Online (POW0), esta leguminosa forrajera destaca por su valor ecológico en sistemas agroforestales de montaña.",
       "validation_level": "claude_draft",
-      "estrato": "bajo"
+      "estrato": "bajo",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-forrajeras-2022"
+      ]
     },
     {
       "id": "tropaeolum_majus",
@@ -4420,7 +4439,8 @@
         "agrosavia-manual-arandano-2018",
         "powo-kew"
       ],
-      "valor_pedagogico": "Lección de precocidad: variedad que permite entender la importancia de la adaptación climática y la ventana de cosecha temprana."
+      "valor_pedagogico": "Lección de precocidad: variedad que permite entender la importancia de la adaptación climática y la ventana de cosecha temprana.",
+      "estrato": "medio"
     },
     {
       "id": "viburnum_triphyllum",
@@ -5451,8 +5471,7 @@
       ],
       "estrato": "alto",
       "roles_in_guild": [
-        "crop",
-        "frutal"
+        "crop"
       ],
       "cultivable": true,
       "conservation_status": "naturalizada",
@@ -5482,7 +5501,7 @@
         "perez-arbelaez-1947-plantas-utiles"
       ],
       "valor_pedagogico": "El jobo (Spondias mombin L.) se distribuye naturalmente en las regiones Caribe y Orinoquía colombianas, presente en departamentos como Cesar, Magdalena, Bolívar, Córdoba, Sucre, Meta y Casanare, entre 0 y 800 msnm en zona térmica cálida. Su manejo agronómico incluye propagación por semilla fresca o injerto para obtener fructificación en 3-4 años, ciclo productivo de 4-6 meses post-floración, con asociaciones beneficiosas en sistemas agroforestales con cacao, plátano y frutales nativos, tolerando podas de formación y respondiendo bien a manejo orgánico. En el contexto cultural Caribe y Llanero, el jobo ha sido históricamente utilizado por comunidades indígenas y campesinas para consumo fresco de su fruto ácido-dulce, preparación de jugos, conservas y como medicinal para trastornos digestivos, conocimiento tradicional documentado en la obra clásica de Pérez Arbeláez 'Plantas Útiles de Colombia' (1947) que registra sus múltiples usos tradicionales en la región tropical colombiana.",
-      "validation_level": "ai_draft"
+      "validation_level": "claude_draft"
     },
     {
       "id": "hesperomeles_obtusifolia",
@@ -9063,7 +9082,7 @@
       ],
       "cultivable": true,
       "conservation_status": "cultivo_comun",
-      "harvest_type": "rizoma",
+      "harvest_type": "tuberculo",
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 300,
@@ -9110,7 +9129,7 @@
       ],
       "cultivable": true,
       "conservation_status": "cultivo_comun",
-      "harvest_type": "rizoma",
+      "harvest_type": "tuberculo",
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 200,
@@ -9374,7 +9393,7 @@
       "nombre_comun": "Borojó",
       "nombre_cientifico": "Borojoa patinoi Cuatrec.",
       "familia_botanica": "Rubiaceae",
-      "category": "frutales_nativos",
+      "category": "frutales_perennes",
       "thermal_zones": [
         "calido"
       ],
@@ -9408,7 +9427,8 @@
         "sib-colombia",
         "bernal-2015-plantas-liquenes-colombia"
       ],
-      "valor_pedagogico": "El borojó (Borojoa patinoi Cuatrec.) es una especie endémica del Pacífico Chocó colombiano, distribuida principalmente en los departamentos de Chocó, Valle del Cauca y Nariño, entre 0 y 1000 msnm en zonas térmicas cálidas con alta humedad relativa (bosque pluvial tropical). Su manejo agronómico incluye propagación por semillas recolectadas de frutos maduros, con requiereniento de sombra parcial durante el establecimiento, ciclo productivo de 3-5 años desde siembra hasta primera fructificación, y asociaciones beneficiosas con otras especies del bosque pluvial como palmas y heliconias. En el contexto cultural de las comunidades afrocolombianas del Pacífico, el borojó se utiliza tradicionalmente en preparaciones de jugos, batidos y dulces por su alto contenido de azúcares naturales y propiedades nutricionales. Según el catálogo de plantas de Colombia de Bernal et al. (2015) y la base de datos del Sistema de Información sobre Biodiversidad de Colombia (SiB Colombia), esta especie está confirmada como endémica del Chocó biogeográfico. Las fuentes taxonómicas verificadas GBIF Backbone Taxonomy y Plants of the World Online (POWO) confirman su nombre científico válido Borojoa patinoi Cuatrec., descrito por el botánico José Cuatrecasas."
+      "valor_pedagogico": "El borojó (Borojoa patinoi Cuatrec.) es una especie endémica del Pacífico Chocó colombiano, distribuida principalmente en los departamentos de Chocó, Valle del Cauca y Nariño, entre 0 y 1000 msnm en zonas térmicas cálidas con alta humedad relativa (bosque pluvial tropical). Su manejo agronómico incluye propagación por semillas recolectadas de frutos maduros, con requiereniento de sombra parcial durante el establecimiento, ciclo productivo de 3-5 años desde siembra hasta primera fructificación, y asociaciones beneficiosas con otras especies del bosque pluvial como palmas y heliconias. En el contexto cultural de las comunidades afrocolombianas del Pacífico, el borojó se utiliza tradicionalmente en preparaciones de jugos, batidos y dulces por su alto contenido de azúcares naturales y propiedades nutricionales. Según el catálogo de plantas de Colombia de Bernal et al. (2015) y la base de datos del Sistema de Información sobre Biodiversidad de Colombia (SiB Colombia), esta especie está confirmada como endémica del Chocó biogeográfico. Las fuentes taxonómicas verificadas GBIF Backbone Taxonomy y Plants of the World Online (POWO) confirman su nombre científico válido Borojoa patinoi Cuatrec., descrito por el botánico José Cuatrecasas.",
+      "estrato": "alto"
     },
     {
       "id": "pourouma_cecropiifolia",
@@ -9450,7 +9470,8 @@
         "bernal-2015-plantas-liquenes-colombia"
       ],
       "valor_pedagogico": "La uva caimarona (Pourouma cecropiifolia Mart.) es un frutal nativo de la Amazonia colombiana, presente en los departamentos del Caquetá, Putumayo, Amazonas, Guainía, Vaupés y Meta entre 0 y 800 msnm en zonas termicas calidas. Su manejo agronomico incluye propagacion por semilla con germinacion de 30-60 dias, ciclo productivo de 3-5 anos hasta primera cosecha, asociaciones con otros frutales amazonicos como arazá (Eugenia stipitata) y camu camu (Myrciaria dubia), y requiere monitoreo de plagas como moscas de la fruta (Anastrepha spp.) y garrapatas en frutos. En el contexto cultural amazonense, los pueblos indigenas Tucano, Witoto, Embera y Kofan consumen tradicionalmente el fruto fresco o fermentado como bebida alcoholica suave. Segun el inventario taxonomico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre cientifico valido es Pourouma cecropiifolia Mart.",
-      "validation_level": "ai_draft"
+      "validation_level": "claude_draft",
+      "estrato": "alto"
     },
     {
       "id": "inga_vera",
@@ -9465,7 +9486,7 @@
       "roles_in_guild": [
         "crop",
         "nitrogen_fixer",
-        "sombra"
+        "nurse_plant"
       ],
       "cultivable": true,
       "conservation_status": "nativo_silvestre",
@@ -9495,14 +9516,14 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El guamo de monte (Inga vera Willd.) es un árbol nativo de la familia Fabaceae distribución en la Amazonía colombiana, particularmente en los departamentos de Amazonas, Caquetá, Putumayo, Guainía y Vaupés, entre 0 y 1200 msnm en zonas térmicas cálidas. Su manejo agronómico incluye propagación por semilla recalcitrante que debe sembrarse inmediatamente após recolección, con germinación rápida de 7-15 días, aunque también se reproduce por esquejes semi-leñosos. Como especie fijadora de nitrógeno, forma nodulaciones con rizobios simbiontes que enriquecen el suelo, siendo utilizada传统的 en sistemas agroforestales amazónicos como sombra para cultivos como café y cacao. En el contexto cultural indigenous amazonico, sus frutos vainas carnosas son consumidos directamente y sus semillas sirven para propagación de sistemas agroforestales tradicionales. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Inga vera Willd., especie nativa de la región tropical americana.",
-      "validation_level": "ai_draft"
+      "validation_level": "claude_draft"
     },
     {
       "id": "inga_densiflora",
       "nombre_comun": "Guamo macheto",
       "nombre_cientifico": "Inga densiflora Benth.",
       "familia_botanica": "Fabaceae",
-      "category": "frutales_nativos",
+      "category": "frutales_perennes",
       "thermal_zones": [
         "templado"
       ],
@@ -9537,7 +9558,8 @@
         "ica-resolucion-3168-2015"
       ],
       "valor_pedagogico": "El guamo macheto (Inga densiflora Benth.) se cultiva en departamentos andinos y amazónicos de Colombia como Putumayo, Caquetá, Meta, Amazonas y parte de la cordillera oriental entre 0 y 2200 msnm, con óptimo entre 500 y 1800 msnm en zonas térmicas templadas. Su manejo agronómico incluye propagación por semilla fresca (recalcitrante) con germinación de 15-30 días, ciclo de establecimiento de 6-12 meses hasta primera producción de vainas, se asocia beneficiosamente con café y cacao como sombra temporal en sistemas agroforestales, y fija nitrógeno atmosférico mediante nodulación con rhizobios, mejorando la fertilidad del suelo. En el contexto cultural muisca y campesino andino, los frutos (vainas) se consumen tradicionalmente como snack dulce y la madera se usa para postes y leña. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Inga densiflora Benth.",
-      "validation_level": "ai_draft"
+      "validation_level": "claude_draft",
+      "estrato": "alto"
     }
   ],
   "biopreparados": [
@@ -9930,7 +9952,7 @@
     },
     {
       "id": "agrosavia-manual-frutales-tropicales",
-      "tipo": "manual",
+      "tipo": "manual_tecnico",
       "autores": "AGROSAVIA — Corporación Colombiana de Investigación Agropecuaria",
       "año": 2017,
       "titulo": "Manual técnico para el cultivo de frutales tropicales en Colombia",
@@ -10309,7 +10331,7 @@
     },
     {
       "id": "restauracion-cruz-verde-sumapaz",
-      "tipo": "reporte_tecnico",
+      "tipo": "manual_tecnico",
       "autores": "Instituto Alexander von Humboldt + CAR Cundinamarca",
       "año": 2018,
       "titulo": "Plan de restauración ecológica páramos Cruz Verde — Sumapaz",
