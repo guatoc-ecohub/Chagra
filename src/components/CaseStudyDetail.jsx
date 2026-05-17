@@ -4,6 +4,7 @@ import { ScreenShell } from './common/ScreenShell';
 import { useCaseStudyStore } from '../store/useCaseStudyStore';
 import PhotoCaptureField from './PhotoCaptureField';
 import { summarizeLessons } from '../services/caseStudyLessonsSummarizer';
+import { recommendTreatments } from '../services/caseStudyTreatmentRecommender';
 
 /**
  * CaseStudyDetail — vista detalle + edición de un caso de estudio
@@ -41,25 +42,27 @@ const formatDT = (iso) => {
   return `${d.toLocaleDateString('es-CO')} ${d.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}`;
 };
 
-const TreatmentForm = ({ onSubmit, onCancel }) => {
-  // Lista mínima de biopreparados conocidos del catálogo. Post-DR-040
-  // esto será un typeahead contra catalog.biopreparados[]. MVP usa lista
-  // hardcodeada de los más comunes + free text.
+const TreatmentForm = ({ onSubmit, onCancel, caseObj }) => {
+  // Lista canónica del catálogo Chagra v3.1 + Track C (2026-05-17:
+  // bacillus_thuringiensis, trichogramma_spp, extracto_neem agregados).
+  // Post-DR-040 esto será un typeahead vivo contra catalog.biopreparados[].
   const KNOWN = [
-    'bacillus_thuringiensis',
-    'trichogramma_spp',
-    'extracto_neem',
-    'bocashi',
-    'biol',
-    'purin_ortiga',
-    'caldo_sulfocalcico',
-    'caldo_bordeles',
-    'te_compost',
-    'humus_liquido',
+    'bacillus_thuringiensis', 'trichogramma_spp', 'extracto_neem',
+    'caldo_bordeles', 'caldo_sulfocalcico', 'bacillus_subtilis_foliar',
     'trichoderma_harzianum_suelo',
-    'bacillus_subtilis_foliar',
+    'bocashi', 'biol', 'purin_ortiga', 'te_compost', 'humus_liquido',
+    'lixiviado_frutas', 'supermagro', 'compost_maduro', 'biofertilizante_algas',
+    'cal_dolomita', 'roca_fosforica', 'ceniza_madera',
   ];
-  const [bid, setBid] = useState(KNOWN[0]);
+
+  // DR-044 sub-viii Feature 4: sugerencias contextuales del recommender
+  // basadas en el problema del caso. KISS offline-first: keyword matching
+  // contra catalog. Post-DR-040 será RAG embeddings nomic-embed-text + LLM.
+  const suggestions = caseObj?.problem?.name_freetext
+    ? recommendTreatments(caseObj.problem.name_freetext)
+    : [];
+
+  const [bid, setBid] = useState(suggestions[0]?.id || KNOWN[0]);
   const [dose, setDose] = useState('');
   const [notes, setNotes] = useState('');
 
@@ -71,6 +74,32 @@ const TreatmentForm = ({ onSubmit, onCancel }) => {
       }}
       className="space-y-2 p-3 rounded-lg bg-slate-900 border border-slate-700"
     >
+      {/* Sugerencias contextuales (DR-044 F4) */}
+      {suggestions.length > 0 && (
+        <div className="space-y-1.5">
+          <p className="text-[10px] uppercase font-black tracking-wider text-purple-300 flex items-center gap-1">
+            <Sparkles className="w-2.5 h-2.5" /> Sugeridos para "{caseObj.problem.name_freetext}"
+          </p>
+          <div className="flex flex-wrap gap-1">
+            {suggestions.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => { setBid(s.id); setNotes(s.rationale); }}
+                title={s.rationale}
+                className={`text-[10px] px-2 py-1 rounded font-mono ${
+                  bid === s.id
+                    ? 'bg-purple-700 text-white'
+                    : 'bg-slate-800 text-purple-200 hover:bg-purple-900/50'
+                } ${s.priority === 'high' ? 'ring-1 ring-purple-500/50' : ''}`}
+              >
+                {s.id}
+                {s.priority === 'high' && ' ★'}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       <select
         value={bid}
         onChange={(e) => setBid(e.target.value)}
@@ -391,6 +420,7 @@ export default function CaseStudyDetail({ caseId, onBack }) {
           <section>
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Nuevo tratamiento</h3>
             <TreatmentForm
+              caseObj={c}
               onSubmit={(t) => {
                 addTreatment(c.id, t);
                 setShowTreatment(false);
