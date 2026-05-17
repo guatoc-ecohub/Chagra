@@ -553,7 +553,7 @@
         "restrepo-1996-abc-agricultura-organica",
         "powo-kew"
       ],
-      "valor_pedagogico": "Lección de color y nutrición: la variedad amarilla destaca por su contenido de carotenoides y su vistosidad en la huerta arcoíris."
+      "valor_pedagogico": "La acelga amarilla (Beta vulgaris L. subsp. vulgaris var. cicla cultivares Bright Lights, Yellow Sunset) es una variedad de acelga con peciolo amarillo intenso, valorada por su atractivo visual además del aporte nutricional (vitaminas A, C, K, calcio). En Colombia se cultiva en Sabana de Bogotá (Mosquera, Madrid, Funza), Boyacá altiplano y Nariño entre 2.000 y 2.900 msnm en zona térmica fría. Ciclo 60-80 días desde trasplante, productividad sostenida con cortes graduales de hojas externas durante 4-6 meses. Suelos francos con MO >4%, pH 6.5-7.5. Manejo agroecológico: trasplante en doble fila densa (25×30 cm), fertilización con bocashi al fondo + biol foliar quincenal, control de minador hoja (Liriomyza) con trampas amarillas y BT. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy."
     },
     {
       "id": "beta_vulgaris_cicla_blanca",
@@ -2708,7 +2708,7 @@
         "ica-resolucion-3168-2015",
         "powo-kew"
       ],
-      "valor_pedagogico": "Lección de diversidad varietal: comparación de perfiles aromáticos y resistencia climática entre variedades de una misma especie."
+      "valor_pedagogico": "El perejil liso (Petroselinum crispum (Mill.) Nyman ex A.W.Hill var. neapolitanum, también llamado perejil italiano) es una umbelífera bienal cultivada como anual para uso aromático culinario, con hojas planas más fragantes que la variedad crespa. En Colombia se cultiva en Sabana de Bogotá, Boyacá altiplano y Antioquia entre 2.000 y 2.900 msnm en zona térmica fría. Ciclo 70-90 días a primera cosecha; permite múltiples cortes (4-6) en 5-6 meses. Semilla con germinación lenta (15-25 días), pre-tratamiento con agua tibia 12h acelera. Manejo agroecológico: bandejas plug 200 cavidades para almácigo, asocio con tomate y zanahoria (familias distintas), fertilización con biol foliar mensual, control de áfidos con purín de ortiga. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy."
     },
     {
       "id": "phaseolus_vulgaris",
@@ -3607,7 +3607,7 @@
         "ica-resolucion-3168-2015",
         "agrosavia-sol-andina"
       ],
-      "valor_pedagogico": "Lección de cosecha escalonada: enseña cómo los frutos maduran en racimos de forma secuencial, permitiendo una provisión constante.",
+      "valor_pedagogico": "El tomate cherry estándar (Solanum lycopersicum L. var. cerasiforme cultivares Sweet 100, Sungold, Sweet Million) es una solanácea de fruto pequeño dulce ampliamente cultivada en invernaderos y huertas familiares colombianas para autoconsumo y mercados gourmet. Se cultiva en Sabana de Bogotá (Mosquera, Madrid, Cota), altiplano Boyacá, Antioquia y Cauca entre 1.500 y 2.800 msnm en zona térmica fría a templada bajo invernadero, o cálida a campo abierto. Ciclo 90-120 días a primera cosecha, productividad sostenida 6-9 meses en invernadero. Tutorado vertical obligatorio. Manejo agroecológico: poda axilas, deshoje semanal, fertilización con biol foliar y bocashi al fondo, control integrado de trozador (Bacillus thuringiensis), polilla del tomate Tuta absoluta (trichograma + neem) y mosca blanca (Trialeurodes) con trampas amarillas + jabón potásico. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "companions": [
         "urtica_dioica"
       ],
@@ -3654,7 +3654,7 @@
         "gbif-taxonomic-backbone",
         "agrosavia-manual-biopreparados-2015"
       ],
-      "valor_pedagogico": "Lección de textura y conservación: enseña cómo la forma elongada y la piel firme reducen el rajado de los frutos en la montaña.",
+      "valor_pedagogico": "El tomate cherry uvalina (Solanum lycopersicum L. var. cerasiforme, tipo grape/oval pequeño elongado, cultivares Santa, Juliet, Sweet Hearts) se diferencia del cherry redondo por la forma oval-cilíndrica de los frutos, mayor firmeza y vida postcosecha extendida. En Colombia se cultiva principalmente bajo invernadero en Sabana de Bogotá, altiplano Boyacá, Antioquia y Cauca entre 1.800 y 2.800 msnm en zona térmica fría. Ciclo similar al cherry estándar (90-120 días primer fruto). Mayor demanda de mercado gourmet por presentación estética. Manejo agroecológico: tutorado holandés (cordel guiado), poda axilas riguroso, riego goteo con fertirriego orgánico (biol diluido), control integrado de Tuta absoluta con Bacillus thuringiensis + Trichogramma, manejo de oídio (caldo bordelés). Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "companions": [
         "urtica_dioica"
       ],
@@ -8399,7 +8399,7 @@
         "agrosavia-silvopastoriles"
       ],
       "rol_ecologico": "Fijador de nitrogeno simbiotico con Rhizobium. Forrajera de alto valor proteico. Sombra ligera para cafe y cacao. Madera para leña y construcciones rurales.",
-      "valor_pedagogico": "El poste vivo: la estaca que prende sola. Ensenia la reproduccion vegetativa y el rol de las leguminosas arboreas en cercas vivas.",
+      "valor_pedagogico": "El matarratón (Gliricidia sepium (Jacq.) Walp.) es una leguminosa arbórea nativa de Mesoamérica naturalizada y ampliamente usada en sistemas agroforestales colombianos. Fija nitrógeno biológico (~100-200 kg N/ha/año) por simbiosis con Rhizobium, sirviendo como cerca viva, sombra ganadera, banco proteico forrajero y especie pionera en restauración. Se cultiva en zonas templadas y cálidas: Tolima, Huila, Valle del Cauca, Antioquia, Cauca, Magdalena y Llanos Orientales entre 0 y 1.700 msnm en zona térmica cálida a templada. Propagación por estaca leñosa (60-80% prendimiento), crecimiento rápido alcanza 3-4 m primer año. Manejo agroecológico: poda anual a 1.5 m altura, biomasa cortada se usa como mulch verde o forraje (proteína 20-25%). Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "validation_level": "claude_draft"
     },
     {
