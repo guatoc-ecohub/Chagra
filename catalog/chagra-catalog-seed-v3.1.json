@@ -9266,6 +9266,47 @@
         "gbif-taxonomic-backbone"
       ],
       "valor_pedagogico": "Hibrido esteril: la hierbabuena criolla ensena como la propagacion vegetativa preserva caracteres deseables a traves de generaciones, esencial en la medicina popular colombiana."
+    },
+    {
+      "id": "borojoa_patinoi",
+      "nombre_comun": "Borojó",
+      "nombre_cientifico": "Borojoa patinoi Cuatrec.",
+      "familia_botanica": "Rubiaceae",
+      "category": "frutales_nativos",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "endemica_colombia",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 800,
+        "max_absoluto": 1000
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 24,
+        "optimo_max": 28,
+        "max_tolerable": 32
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Fruto globoso de pulpa cremosa; requiere sombra parcial en establecimiento. Frutación entre 3-5 años post-siembra."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "sib-colombia",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El borojó (Borojoa patinoi Cuatrec.) es una especie endémica del Pacífico Chocó colombiano, distribuida principalmente en los departamentos de Chocó, Valle del Cauca y Nariño, entre 0 y 1000 msnm en zonas térmicas cálidas con alta humedad relativa (bosque pluvial tropical). Su manejo agronómico incluye propagación por semillas recolectadas de frutos maduros, con requiereniento de sombra parcial durante el establecimiento, ciclo productivo de 3-5 años desde siembra hasta primera fructificación, y asociaciones beneficiosas con otras especies del bosque pluvial como palmas y heliconias. En el contexto cultural de las comunidades afrocolombianas del Pacífico, el borojó se utiliza tradicionalmente en preparaciones de jugos, batidos y dulces por su alto contenido de azúcares naturales y propiedades nutricionales. Según el catálogo de plantas de Colombia de Bernal et al. (2015) y la base de datos del Sistema de Información sobre Biodiversidad de Colombia (SiB Colombia), esta especie está confirmada como endémica del Chocó biogeográfico. Las fuentes taxonómicas verificadas GBIF Backbone Taxonomy y Plants of the World Online (POWO) confirman su nombre científico válido Borojoa patinoi Cuatrec., descrito por el botánico José Cuatrecasas."
     }
   ],
   "biopreparados": [
