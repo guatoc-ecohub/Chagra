@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { FileText, AlertTriangle, AlertCircle, Activity, CheckCircle, XCircle, Beaker, Clock, MapPin } from 'lucide-react';
+import { FileText, AlertTriangle, AlertCircle, Activity, CheckCircle, XCircle, Beaker, Clock, MapPin, Camera, Sparkles, Loader2, Image as ImageIcon, Trash2 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { useCaseStudyStore } from '../store/useCaseStudyStore';
+import PhotoCaptureField from './PhotoCaptureField';
+import { summarizeLessons } from '../services/caseStudyLessonsSummarizer';
 
 /**
  * CaseStudyDetail — vista detalle + edición de un caso de estudio
@@ -106,10 +108,31 @@ const TreatmentForm = ({ onSubmit, onCancel }) => {
   );
 };
 
-const CloseCaseForm = ({ onSubmit, onCancel, currentAffected }) => {
+const CloseCaseForm = ({ onSubmit, onCancel, currentAffected, caseObj }) => {
   const [resolved, setResolved] = useState(true);
   const [finalAffected, setFinalAffected] = useState(currentAffected || '');
   const [lessons, setLessons] = useState('');
+  const [generating, setGenerating] = useState(false);
+  const [genError, setGenError] = useState(null);
+
+  // DR-044 sub-viii Feature 5: lessons_learned summarization via Ollama
+  const handleGenerate = async () => {
+    setGenerating(true);
+    setGenError(null);
+    try {
+      const result = await summarizeLessons(caseObj);
+      if (!result || !result.text) {
+        setGenError('IA no disponible. Llena manualmente.');
+        return;
+      }
+      setLessons(result.text);
+    } catch (e) {
+      setGenError(e?.message || 'Error generando resumen');
+    } finally {
+      setGenerating(false);
+    }
+  };
+
   return (
     <form
       onSubmit={(e) => {
@@ -146,13 +169,29 @@ const CloseCaseForm = ({ onSubmit, onCancel, currentAffected }) => {
         onChange={(e) => setFinalAffected(e.target.value)}
         className="w-full px-3 py-2 rounded bg-slate-800 border border-slate-700 text-white text-sm"
       />
-      <textarea
-        placeholder="Lecciones aprendidas (qué funcionó, qué no, qué repetir/evitar)"
-        value={lessons}
-        onChange={(e) => setLessons(e.target.value)}
-        rows={3}
-        className="w-full px-3 py-2 rounded bg-slate-800 border border-slate-700 text-white text-sm"
-      />
+      <div className="space-y-1">
+        <div className="flex items-center justify-between">
+          <label className="text-[10px] uppercase font-bold tracking-wider text-slate-500">Lecciones aprendidas</label>
+          <button
+            type="button"
+            onClick={handleGenerate}
+            disabled={generating}
+            title="Generar borrador con IA local (Ollama)"
+            className="text-[10px] px-2 py-1 rounded bg-purple-900/50 text-purple-200 hover:bg-purple-800/50 disabled:opacity-50 flex items-center gap-1"
+          >
+            {generating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+            {generating ? 'Generando…' : 'Sugerir con IA'}
+          </button>
+        </div>
+        <textarea
+          placeholder="Qué funcionó, qué no, qué repetir/evitar"
+          value={lessons}
+          onChange={(e) => setLessons(e.target.value)}
+          rows={4}
+          className="w-full px-3 py-2 rounded bg-slate-800 border border-slate-700 text-white text-sm"
+        />
+        {genError && <p className="text-red-400 text-[10px]">{genError}</p>}
+      </div>
       <div className="flex gap-2">
         <button type="button" onClick={onCancel} className="flex-1 py-2 rounded bg-slate-800 text-slate-300 text-sm">
           Cancelar
@@ -165,6 +204,92 @@ const CloseCaseForm = ({ onSubmit, onCancel, currentAffected }) => {
   );
 };
 
+/**
+ * PhotoGallery — visualiza fotos linkadas al caso (DR-044 sub-viii F2 partial).
+ * MVP: photos guardadas como data URLs en photo_asset_ids[].
+ * Post-DR-044 sub-i: migración a FarmOS media asset IDs reales.
+ */
+const PhotoGallery = ({ photos, onAdd, onRemove }) => {
+  const [showCapture, setShowCapture] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  const handlePhoto = async (blob) => {
+    if (!blob) return;
+    setBusy(true);
+    try {
+      // KISS: convertir blob a data URL para storage local en case.photo_asset_ids[]
+      // Migración a FarmOS media post-DR-044 sub-i.
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        onAdd(reader.result); // data:image/jpeg;base64,...
+        setShowCapture(false);
+        setBusy(false);
+      };
+      reader.onerror = () => setBusy(false);
+      reader.readAsDataURL(blob);
+    } catch {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section>
+      <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 flex items-center gap-2">
+        <ImageIcon className="w-3 h-3" /> Fotos ({photos.length})
+        {!showCapture && (
+          <button
+            type="button"
+            onClick={() => setShowCapture(true)}
+            className="ml-auto text-[10px] px-2 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center gap-1"
+          >
+            <Camera className="w-3 h-3" /> Capturar
+          </button>
+        )}
+      </h3>
+      {showCapture && (
+        <div className="mb-3 p-3 rounded-lg bg-slate-900 border border-slate-700">
+          <PhotoCaptureField onPhoto={handlePhoto} onRemove={() => setShowCapture(false)} label="Tomar foto del problema" />
+          {busy && <p className="text-slate-400 text-xs mt-2">Procesando…</p>}
+          <button
+            type="button"
+            onClick={() => setShowCapture(false)}
+            disabled={busy}
+            className="mt-2 w-full py-1.5 rounded bg-slate-800 text-slate-400 text-xs"
+          >
+            Cancelar
+          </button>
+        </div>
+      )}
+      {photos.length === 0 && !showCapture && (
+        <p className="text-slate-600 text-xs italic">Sin fotos aún. Captura para documentar.</p>
+      )}
+      {photos.length > 0 && (
+        <div className="grid grid-cols-3 gap-2">
+          {photos.map((url, idx) => (
+            <div key={idx} className="relative group">
+              <img
+                src={url}
+                alt={`Foto ${idx + 1}`}
+                className="w-full h-24 object-cover rounded-lg border border-slate-800"
+              />
+              {onRemove && (
+                <button
+                  type="button"
+                  onClick={() => onRemove(url)}
+                  className="absolute top-1 right-1 p-1 rounded bg-red-900/80 text-red-200 opacity-0 group-hover:opacity-100 transition-opacity"
+                  aria-label="Eliminar foto"
+                >
+                  <Trash2 className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+};
+
 export default function CaseStudyDetail({ caseId, onBack }) {
   const c = useCaseStudyStore((s) => s.getById(caseId));
   const addTreatment = useCaseStudyStore((s) => s.addTreatment);
@@ -173,6 +298,20 @@ export default function CaseStudyDetail({ caseId, onBack }) {
 
   const [showTreatment, setShowTreatment] = useState(false);
   const [showClose, setShowClose] = useState(false);
+  const linkPhoto = useCaseStudyStore((s) => s.linkPhoto);
+  // KISS: mutator local para remove (sin agregar action al store; raro en MVP).
+  const removePhoto = (url) => {
+    const store = useCaseStudyStore.getState();
+    const target = store.cases.find((cc) => cc.id === caseId);
+    if (!target) return;
+    useCaseStudyStore.setState({
+      cases: store.cases.map((cc) =>
+        cc.id === caseId
+          ? { ...cc, photo_asset_ids: cc.photo_asset_ids.filter((u) => u !== url), updated_at: new Date().toISOString() }
+          : cc
+      ),
+    });
+  };
 
   if (!c) {
     return (
@@ -266,6 +405,7 @@ export default function CaseStudyDetail({ caseId, onBack }) {
           <section>
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Cierre del caso</h3>
             <CloseCaseForm
+              caseObj={c}
               currentAffected={c.subject.count_affected}
               onSubmit={(payload) => {
                 closeCase(c.id, payload);
@@ -275,6 +415,13 @@ export default function CaseStudyDetail({ caseId, onBack }) {
             />
           </section>
         )}
+
+        {/* Photo gallery (DR-044 sub-viii F2 partial) */}
+        <PhotoGallery
+          photos={c.photo_asset_ids}
+          onAdd={(dataUrl) => linkPhoto(c.id, dataUrl)}
+          onRemove={removePhoto}
+        />
 
         {/* Treatments applied */}
         {c.treatments_applied.length > 0 && (
