@@ -69,7 +69,7 @@
         "gbif-taxonomic-backbone",
         "powo-kew"
       ],
-      "valor_pedagogico": "SE BUSCA: El 'Rebrotador Invencible'. Un error histórico de reforestación que asfixia los bordes de bosque. Se sustituye por el Aliso, que sí pertenece aquí.",
+      "valor_pedagogico": "SE BUSCA: El 'Rebrotador Invencible'. La acacia negra australiana (Acacia melanoxylon R.Br., familia Fabaceae) es una especie introducida en programas de reforestación del siglo XX que se naturalizó como invasora agresiva de bordes de bosque andino y zonas de páramo intervenido en Colombia. Se distribuye en Cundinamarca (Sumapaz, Chingaza), Boyacá, Antioquia, Santander y Eje cafetero entre 2.000 y 3.300 msnm. Árbol perenne 8-25 m altura que asfixia regeneración nativa por sombra densa, alelopatía (fenoles del rebrote) y banco de semillas longevo. Rebrota vigorosamente de raíz tras corte. Estrategia agroecológica de manejo: descortezamiento en anillo (ring-barking) + monitoreo bianual rebrote + sustitución progresiva por Alnus acuminata (aliso andino fijador de N, sí nativo). Listada en Res. 684/2018 MADS como invasora declarada. Fuentes Tier A: Calderón Sáenz 2003 Invasoras Colombia, Resolución 684/2018 MADS, POWO Kew, GBIF Backbone Taxonomy.",
       "antagonists": [
         "viburnum_triphyllum"
       ]
@@ -684,7 +684,7 @@
         "restrepo-1996-abc-agricultura-organica",
         "powo-kew"
       ],
-      "valor_pedagogico": "Lección sobre almacenamiento de energía: muestra cómo la planta guarda azúcares y nutrientes en su raíz hipocotila para sobrevivir al invierno (o épocas secas)."
+      "valor_pedagogico": "La remolacha o betarraga (Beta vulgaris L. subsp. vulgaris Conditiva Group) es una quenopodiácea bienal cultivada como anual por su raíz hipocotila engrosada rica en azúcares, betalaínas (pigmentos antioxidantes) y nitratos vegetales. Hortaliza tradicional de huertas andinas colombianas. Se cultiva en Sabana de Bogotá (Mosquera, Madrid, Funza), Boyacá altiplano (Tunja, Duitama), Nariño y Antioquia entre 1.800 y 2.900 msnm en zona térmica fría. Ciclo 90-120 días desde siembra directa hasta raíz comercial (5-10 cm diámetro). Rendimientos 25-40 t/ha. Lección viva: muestra cómo la planta acumula reservas en raíz hipocotila para sobrevivir período seco o frío. Manejo agroecológico: siembra directa a chorrillo, aclareo a 10-15 cm planta, suelos francos profundos pH 6.5-7.5, fertilización con compost + bocashi al fondo, asocio con lechugas y zanahorias en cama mixta, control de minador hoja (Pegomya betae) con purín de ortiga + caldo sulfocálcico. Fuentes Tier A: ICA Resolución 3168/2015, Restrepo 1996 ABC Agricultura Orgánica, POWO Kew, GBIF Backbone Taxonomy."
     },
     {
       "id": "brassica_oleracea_acephala_curly",
@@ -773,7 +773,7 @@
         "ica-resolucion-3168-2015",
         "powo-kew"
       ],
-      "valor_pedagogico": "Lección de arquitectura: a diferencia del repollo, sus hojas crecen abiertas sobre un tallo central persistente, permitiendo la 'cosecha de abajo hacia arriba'.",
+      "valor_pedagogico": "La col rizada Lacinato o Toscana negra (Brassica oleracea L. var. acephala 'Lacinato', también llamada 'col dinosaurio' por la textura ampollada de las hojas) es una crucífera bienal cultivada como hortaliza de hoja persistente con altísimo valor nutricional (vitamina K, A, C, calcio, hierro). Reintroducida en huertas urbanas colombianas durante el boom agroecológico 2010-2020. Se cultiva en Sabana de Bogotá, Boyacá, Eje cafetero y Antioquia entre 1.800 y 2.900 msnm en zona térmica fría. Ciclo 60-90 días desde trasplante a primera cosecha, productividad sostenida 6-9 meses con cosechas escalonadas de hojas externas. Lección viva de arquitectura: a diferencia del repollo formador de cabeza, sus hojas crecen abiertas sobre tallo central persistente, permitiendo la cosecha 'de abajo hacia arriba' sin perder la planta. Manejo agroecológico: rotación trienal anti-Plasmodiophora brassicae, asocio con cebollas y romero (repelentes), control de palomilla (Plutella xylostella) con Bacillus thuringiensis + Trichogramma, fertilización con bocashi + biol foliar. Fuentes Tier A: ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "antagonists": [
         "solanum_lycopersicum_san_marzano"
       ]
@@ -1454,7 +1454,7 @@
         "res-684-2018-mads",
         "gbif-taxonomic-backbone"
       ],
-      "valor_pedagogico": "SE BUSCA: El 'Falso Nativo'. Engaña con flores amarillas bonitas pero destruye el equilibrio químico del páramo. Su erradicación es un acto de soberanía hídrica."
+      "valor_pedagogico": "SE BUSCA: El 'Falso Nativo'. El retamo liso (Cytisus monspessulanus L., sinonimia Genista monspessulana, familia Fabaceae) es un arbusto leguminoso mediterráneo introducido en Colombia que invade páramos y bosques altoandinos perturbados, particularmente en Cundinamarca (Páramo de Sumapaz, Chingaza, Cruz Verde), Boyacá (Iguaque), Antioquia y Nariño entre 2.500 y 3.500 msnm. Arbusto 1-3 m altura con flores amarillas vistosas que lo disfrazan de planta ornamental inofensiva. Fija nitrógeno (~50-100 kg N/ha/año) y altera el equilibrio nutricional del suelo paramuno (oligotrófico por naturaleza), desplazando flora nativa adaptada a baja fertilidad como frailejones y pajonales. Su erradicación es acto de soberanía hídrica porque protege la función reguladora hídrica del páramo. Manejo: arranque mecánico anterior a floración (pre-banco de semillas) + monitoreo trienal del banco residual (semillas viables 10-25 años en suelo). Listada Res. 684/2018 MADS. Fuentes Tier A: Humboldt Invasoras Andes, Mongabay reporte retamo 2024, Resolución 684/2018 MADS, GBIF Backbone Taxonomy."
     },
     {
       "id": "erythrina_edulis",
@@ -1579,7 +1579,7 @@
         "res-684-2018-mads",
         "gbif-taxonomic-backbone"
       ],
-      "valor_pedagogico": "SE BUSCA: El 'Sediento de los Andes'. Seca las quebradas y envenena el suelo para que nada más crezca. Su sombra no es vida, es desierto verde.",
+      "valor_pedagogico": "SE BUSCA: El 'Sediento de los Andes'. El eucalipto azul australiano (Eucalyptus globulus Labill., familia Myrtaceae) fue introducido en Colombia desde fines del siglo XIX para programas de reforestación industrial (madera y pulpa de papel) y se expandió como especie naturalizada problemática en altiplanos andinos. Se distribuye en Cundinamarca (Sabana de Bogotá), Boyacá (Tunja, Duitama, Sogamoso), Nariño, Antioquia y Eje cafetero entre 1.800 y 3.000 msnm. Árbol perenne 30-50 m altura, alta demanda hídrica (~200-400 L/día por árbol maduro) seca quebradas y nacederos en cuencas altas. Alelopatía severa por aceites esenciales (1,8-cineol, citronelal) inhibe germinación de flora nativa generando 'desierto verde' bajo dosel. Banco de semillas resistente al fuego. Estrategia de manejo agroecológico: anillado (ring-barking) sin cosecha + remplazo progresivo por Alnus acuminata (aliso andino nativo) o Polylepis quadrijuga (colorado) en sistemas silvopastoriles. Listada Res. 684/2018 MADS. Fuentes Tier A: Humboldt Invasoras Andes, ISSG-UICN Invasoras Globales, Resolución 684/2018 MADS, GBIF Backbone Taxonomy.",
       "antagonists": [
         "weinmannia_tomentosa"
       ]

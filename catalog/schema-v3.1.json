@@ -843,6 +843,9 @@
           "items": {
             "type": "string"
           }
+        },
+        "_curation_status": {
+          "type": "string"
         }
       },
       "additionalProperties": false
