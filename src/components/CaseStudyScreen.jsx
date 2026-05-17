@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { FileText, Plus, AlertTriangle, AlertCircle, Activity, CheckCircle, XCircle, ChevronRight, Sparkles, Loader2 } from 'lucide-react';
+import { FileText, Plus, AlertTriangle, AlertCircle, Activity, CheckCircle, XCircle, ChevronRight, Sparkles, Loader2, Mic, MicOff } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { useCaseStudyStore, CASE_SEVERITIES } from '../store/useCaseStudyStore';
 import { useFincaActiveStore } from '../services/fincaActiveStore';
 import { extractCaseFromText } from '../services/caseStudyVoiceExtractor';
+import useVoiceRecorder from '../hooks/useVoiceRecorder';
+import { transcribe } from '../services/voiceService';
 
 /**
  * CaseStudyScreen — vista lista de casos de estudio agronómicos
@@ -104,6 +106,8 @@ const NewCaseForm = ({ onCreate, onCancel, defaultFincaSlug }) => {
   const [transcript, setTranscript] = useState('');
   const [extracting, setExtracting] = useState(false);
   const [extractError, setExtractError] = useState(null);
+  const [transcribing, setTranscribing] = useState(false);
+  const recorder = useVoiceRecorder();
 
   const submit = (e) => {
     e.preventDefault();
@@ -152,6 +156,34 @@ const NewCaseForm = ({ onCreate, onCancel, defaultFincaSlug }) => {
     }
   };
 
+  // DR-044 sub-viii Feature 1 (voice path real): mic → recorder → Whisper transcribe → fill textarea
+  const handleMicToggle = async () => {
+    setExtractError(null);
+    if (recorder.isRecording) {
+      // Stop + transcribe
+      try {
+        const blob = await recorder.stop();
+        if (!blob) {
+          setExtractError('Grabación vacía. Vuelve a intentar.');
+          return;
+        }
+        setTranscribing(true);
+        const text = await transcribe(blob, { language: 'es' });
+        setTranscript((prev) => (prev ? prev + ' ' + text : text).trim());
+      } catch (e) {
+        setExtractError('Transcripción falló: ' + (e?.message || 'sin detalle'));
+      } finally {
+        setTranscribing(false);
+      }
+    } else {
+      try {
+        await recorder.start();
+      } catch (e) {
+        setExtractError('Mic no disponible: ' + (e?.message || 'permiso denegado'));
+      }
+    }
+  };
+
   return (
     <form onSubmit={submit} className="space-y-3 p-4 rounded-xl bg-slate-900/60 border border-slate-700">
       {/* DR-044 sub-viii Feature 1: extracción asistida por IA local */}
@@ -168,22 +200,49 @@ const NewCaseForm = ({ onCreate, onCancel, defaultFincaSlug }) => {
       {showExtractor && (
         <div className="p-3 rounded-lg bg-purple-950/30 border border-purple-700/50 space-y-2">
           <p className="text-purple-200 text-[10px] uppercase font-black tracking-wider flex items-center gap-1.5">
-            <Sparkles className="w-3 h-3" /> Pega o dicta lo que observaste
+            <Sparkles className="w-3 h-3" /> Dicta o escribe lo que observaste
           </p>
+          {/* Mic button (DR-044 F1 voice real) */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleMicToggle}
+              disabled={transcribing || extracting}
+              title={recorder.isRecording ? 'Detener grabación' : 'Iniciar grabación'}
+              className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                recorder.isRecording
+                  ? 'bg-red-600 hover:bg-red-500 animate-pulse'
+                  : 'bg-purple-700 hover:bg-purple-600'
+              } text-white disabled:opacity-50`}
+            >
+              {recorder.isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            </button>
+            <div className="flex-1 text-[10px] text-purple-300">
+              {recorder.isRecording && (
+                <span>Grabando… {Math.floor(recorder.durationMs / 1000)}s</span>
+              )}
+              {transcribing && (
+                <span className="flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Transcribiendo…</span>
+              )}
+              {!recorder.isRecording && !transcribing && (
+                <span className="text-slate-500">Tap el micro para dictar (o escribe abajo)</span>
+              )}
+            </div>
+          </div>
           <textarea
             placeholder='Ej: "Esta mañana en el invernadero de los 1000 tomates, encontré 10 plantas cerca de la entrada atacadas por trozador, los tallos cortados."'
             value={transcript}
             onChange={(e) => setTranscript(e.target.value)}
             rows={3}
             className="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-purple-500"
-            disabled={extracting}
+            disabled={extracting || transcribing}
           />
           {extractError && <p className="text-red-400 text-xs">{extractError}</p>}
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={() => { setShowExtractor(false); setTranscript(''); setExtractError(null); }}
-              disabled={extracting}
+              onClick={() => { setShowExtractor(false); setTranscript(''); setExtractError(null); recorder.reset?.(); }}
+              disabled={extracting || transcribing}
               className="flex-1 py-1.5 rounded bg-slate-800 text-slate-300 text-xs"
             >
               Cancelar
@@ -191,10 +250,10 @@ const NewCaseForm = ({ onCreate, onCancel, defaultFincaSlug }) => {
             <button
               type="button"
               onClick={handleExtract}
-              disabled={extracting || !transcript.trim()}
+              disabled={extracting || transcribing || !transcript.trim()}
               className="flex-1 py-1.5 rounded bg-purple-700 text-white text-xs font-bold disabled:opacity-50 flex items-center justify-center gap-1.5"
             >
-              {extracting ? <><Loader2 className="w-3 h-3 animate-spin" /> Procesando…</> : 'Extraer'}
+              {extracting ? <><Loader2 className="w-3 h-3 animate-spin" /> Procesando…</> : 'Extraer campos'}
             </button>
           </div>
         </div>
