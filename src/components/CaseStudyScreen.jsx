@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { FileText, Plus, AlertTriangle, AlertCircle, Activity, CheckCircle, XCircle, ChevronRight } from 'lucide-react';
+import { FileText, Plus, AlertTriangle, AlertCircle, Activity, CheckCircle, XCircle, ChevronRight, Sparkles, Loader2 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { useCaseStudyStore, CASE_SEVERITIES } from '../store/useCaseStudyStore';
 import { useFincaActiveStore } from '../services/fincaActiveStore';
+import { extractCaseFromText } from '../services/caseStudyVoiceExtractor';
 
 /**
  * CaseStudyScreen — vista lista de casos de estudio agronómicos
@@ -98,6 +99,11 @@ const NewCaseForm = ({ onCreate, onCancel, defaultFincaSlug }) => {
     count_total: '',
     count_affected: '',
   });
+  // DR-044 sub-viii feature 1: Voice/text → Caso extraction via Ollama
+  const [showExtractor, setShowExtractor] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [extracting, setExtracting] = useState(false);
+  const [extractError, setExtractError] = useState(null);
 
   const submit = (e) => {
     e.preventDefault();
@@ -118,8 +124,82 @@ const NewCaseForm = ({ onCreate, onCancel, defaultFincaSlug }) => {
     });
   };
 
+  const handleExtract = async () => {
+    if (!transcript.trim()) return;
+    setExtracting(true);
+    setExtractError(null);
+    try {
+      const extracted = await extractCaseFromText(transcript);
+      if (!extracted) {
+        setExtractError('No se pudo extraer información. Verifica el texto o llena manualmente.');
+        return;
+      }
+      // Pre-fill form fields (preserva ediciones manuales previas si están)
+      setForm((prev) => ({
+        ...prev,
+        title: prev.title || extracted.title || '',
+        problem_name: prev.problem_name || extracted.problem_name || '',
+        zone_freetext: prev.zone_freetext || extracted.subzone || '',
+        severity: extracted.severity || prev.severity,
+        count_total: extracted.count_total != null ? String(extracted.count_total) : prev.count_total,
+        count_affected: extracted.count_affected != null ? String(extracted.count_affected) : prev.count_affected,
+      }));
+      setShowExtractor(false);
+    } catch (e) {
+      setExtractError(e?.message || 'Error en extracción');
+    } finally {
+      setExtracting(false);
+    }
+  };
+
   return (
     <form onSubmit={submit} className="space-y-3 p-4 rounded-xl bg-slate-900/60 border border-slate-700">
+      {/* DR-044 sub-viii Feature 1: extracción asistida por IA local */}
+      {!showExtractor && (
+        <button
+          type="button"
+          onClick={() => setShowExtractor(true)}
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-purple-900/40 border border-purple-700/50 text-purple-200 text-xs font-bold hover:bg-purple-800/40 transition-colors"
+        >
+          <Sparkles className="w-3.5 h-3.5" />
+          Extraer desde transcripción (IA local)
+        </button>
+      )}
+      {showExtractor && (
+        <div className="p-3 rounded-lg bg-purple-950/30 border border-purple-700/50 space-y-2">
+          <p className="text-purple-200 text-[10px] uppercase font-black tracking-wider flex items-center gap-1.5">
+            <Sparkles className="w-3 h-3" /> Pega o dicta lo que observaste
+          </p>
+          <textarea
+            placeholder='Ej: "Esta mañana en el invernadero de los 1000 tomates, encontré 10 plantas cerca de la entrada atacadas por trozador, los tallos cortados."'
+            value={transcript}
+            onChange={(e) => setTranscript(e.target.value)}
+            rows={3}
+            className="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-purple-500"
+            disabled={extracting}
+          />
+          {extractError && <p className="text-red-400 text-xs">{extractError}</p>}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => { setShowExtractor(false); setTranscript(''); setExtractError(null); }}
+              disabled={extracting}
+              className="flex-1 py-1.5 rounded bg-slate-800 text-slate-300 text-xs"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={handleExtract}
+              disabled={extracting || !transcript.trim()}
+              className="flex-1 py-1.5 rounded bg-purple-700 text-white text-xs font-bold disabled:opacity-50 flex items-center justify-center gap-1.5"
+            >
+              {extracting ? <><Loader2 className="w-3 h-3 animate-spin" /> Procesando…</> : 'Extraer'}
+            </button>
+          </div>
+        </div>
+      )}
+
       <input
         type="text"
         required
