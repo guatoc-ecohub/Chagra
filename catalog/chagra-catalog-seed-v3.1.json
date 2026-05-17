@@ -9543,48 +9543,6 @@
       "source_ids": [
         "khan-2009-seaweed-extracts"
       ]
-    },
-    {
-      "id": "annona_muricata",
-      "nombre_comun": "Guanábana",
-      "nombre_cientifico": "Annona muricata L.",
-      "familia_botanica": "Annonaceae",
-      "category": "frutales_perennes",
-      "thermal_zones": [
-        "calido"
-      ],
-      "roles_in_guild": [
-        "crop"
-      ],
-      "cultivable": true,
-      "conservation_status": "cultivo_comun",
-      "altitud_msnm": {
-        "min_absoluto": 0,
-        "optimo_min": 0,
-        "optimo_max": 1000,
-        "max_absoluto": 1200
-      },
-      "temperatura_c": {
-        "helada_letal": 0,
-        "optimo_min": 22,
-        "optimo_max": 30,
-        "max_tolerable": 35
-      },
-      "radiacion": "sol_pleno",
-      "agua": "alto",
-      "drenaje_requerido": "bueno",
-      "propagation": {
-        "metodo_principal": "semilla",
-        "notas": "Propagación por semillas recalcitrantes de frutos maduros; también por injerto de púa en patrones deillo. La germinación toma 30-60 días con alta viabilidad."
-      },
-      "source_ids": [
-        "gbif-taxonomic-backbone",
-        "powo-kew",
-        "agrosavia-sol-andina",
-        "ica-resolucion-3168-2015"
-      ],
-      "valor_pedagogico": "La guanábana (Annona muricata L.) se cultiva en Colombia principalmente en los departamentos de Magdalena, Bolívar, Chocó, Valle del Cauca, Nariño y Putumayo, entre 0 y 1200 msnm en zonas térmicas cálidas del trópico bajo, con propagación por semilla o injerto y un ciclo productivo de 3-4 años, asociándose frecuentemente con plátano, cacao y frutales tropicales en sistemas agroforestales, mientras requiere manejo de plagas como la mosca de la fruta (Anastrepha spp.) y la enfermedad de la антракnosis mediante monitoreo y culturales. En el contexto cultural colombiano, la guanábana es valorada por sus frutos ricos en vitaminas C y B, consumiéndose tradicionalmente en jugos, helados y dulces, además de usarse en medicina popular para tratar problemas digestivos y fiebre, tal como documenta el ICA en la Resolución 3168 de 2015 que establece las condiciones fitosanitarias para su cultivo comercial en Colombia, y la taxonomy validada por GBIF Backbone Taxonomy y Plants of the World Online (POWO) confirma su nombre científico válido Annona muricata L.",
-      "validation_level": "ai_draft"
     }
   ],
   "sources": [
