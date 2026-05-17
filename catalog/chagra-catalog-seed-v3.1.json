@@ -659,9 +659,12 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
+        "powo-kew",
+        "agrosavia-sol-andina",
+        "ica-resolucion-3168-2015",
+        "nrc-1989-cultivos-andinos"
       ],
-      "valor_pedagogico": "Lección de hortaliza perenne: permite entender el concepto de plantas multianuales y su resistencia a la escarcha en el huerto."
+      "valor_pedagogico": "El kale rizado (Brassica oleracea var. acephala DC 'Curly') es una Brassicaceae de hoja rizada de origen europeo introducida a los Andes colombianos durante la Colonia. En Colombia se cultiva principalmente en departamentos de clima frío y templado como Cundinamarca (valle de Ubaqué-Choachí), Boyacá, Nariño, Putumayo y el altiplano cundiboyacense, en altitudes entre 1800 y 2800 msnm (rango efectivo 1000-3500 msnm), en zonas térmicas frío y templado con temperaturas óptimas entre 10°C y 18°C. Su manejo agronómico incluye propagación por semilla en semillero, ciclo de vegetativo de 60-90 días hasta primera cosecha, y se asocia tradicionalmente con otras brassicáceas como el repollo y la coliflor, así como en sistemas de policultivo con especies de ciclo corto como radícheta y espinaca. Las principales plagas incluyen pulgones (Brevicoryne brassicae), mosca minadora (Liriomyza spp.) y oruga de la col (Pieris rapae), mientras que las enfermedades críticas son la hernia de la col (Plasmodiophora brassicae) y mildiu velloso (Peronospora parasitica). Culturalmente, esta especie se ha integrado en la dieta campesina andina desde el siglo XVI, utilizándose en preparaciones como hervidos, jugos verdes, sautés y como ingrediente nutricional por su alto contenido en vitaminas A, C, K y antioxidantes. Fuente: nrc-1989-cultivos-andinos."
     },
     {
       "id": "brassica_oleracea_acephala_lacinato",
