@@ -190,11 +190,12 @@
         "metodo_principal": "division_mata",
         "notas": "Se dividen los macollos (hijuelos) para una propagación rápida y perenne."
       },
-      "source_ids": [
+"source_ids": [
         "gbif-taxonomic-backbone",
         "powo-kew",
+        "agrosavia-sol-andina",
         "ica-resolucion-3168-2015",
-        "agrosavia-sol-andina"
+        "nrc-1989-cultivos-andinos"
       ],
       "valor_pedagogico": "Allium fistulosum, conocida como cebolla larga o cebollín, es una aliácea hortícola perenne ampliamente cultivada en el cinturón agrícola de Cundinamarca, particularmente en las zonas de Aquitania y Sumapaz, donde abastece los mercados de Bogotá entre 1800 y 2800 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación mediante división de bulbillos (hijuelos) cada 4 meses para cosecha permanente, asociaciones beneficiosas con zanahoria y lechuga que mejora la salud del huerto, y requiere manejo de plagas como trips y manchas foliares mediante monitoreo frecuente y biopreparados andinos. En el contexto campesino andino, esta cebolla ha sido tradicionalmente utilizada en sofritos y guisos como base aromática esencial, preservando sabores prehispánicos en las cocinas rurales de Cundinamarca y Boyacá. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Allium fistulosum L."
     },
@@ -237,9 +238,10 @@
         "gbif-taxonomic-backbone",
         "powo-kew",
         "agrosavia-sol-andina",
-        "ica-resolucion-3168-2015"
+        "ica-resolucion-3168-2015",
+        "nrc-1989-cultivos-andinos"
       ],
-      "valor_pedagogico": "El ajo (Allium sativum L.) se cultiva en diversos departamentos de Colombia incluyendo Cundinamarca, Boyacá, Nariño y Antioquia entre 0 y 3400 msnm en zonas térmicas frías y templadas. Su manejo agronómico incluye propagación por clavos bulbillos (dientes) sembrados con el ápice hacia arriba, ciclo vegetativo de 90-120 días, asociaciones beneficiosas con zanahoria, lechuga y fresas que repelen plagas como áfidos y ácaros, y requiere monitoreo de plagas como el nemátodo del tallo y enfermedades como la pudrición blanca. En el contexto cultural muisca y andino, este bulbo ha sido tradicionalmente utilizado tanto en preparaciones culinarias como en remedios medicinales por sus propiedades antibacterianas y antifúngicas, formando parte esencial de la dieta y la medicina tradicional andina. Según fuentes taxonómicas verificadas de GBIF Backbone Taxonomy, Plants of the World Online (POWO), AGROSAVIA Sol Andina y la ICA Resolución 3168/2015, su nombre científico válido es Allium sativum L."
+      "valor_pedagogico": "El ajo (Allium sativum L.) se cultiva en diversos departamentos de Colombia incluyendo Cundinamarca, Boyacá, Nariño y Antioquia entre 0 y 3400 msnm en zonas térmicas frías y templadas. Su manejo agronómico incluye propagación por clavos bulbillos (dientes) sembrados con el ápice hacia arriba, ciclo vegetativo de 90-120 días, asociaciones beneficiosas con zanahoria, lechuga y fresas que repelen plagas como áfidos y ácaros, y requiere monitoreo de plagas como el nemátodo del tallo y enfermedades como la pudrición blanca. En el contexto cultural muisca y andino, este bulbo ha sido tradicionalmente utilizado tanto en preparaciones culinarias como en remedios medicinales por sus propiedades antibacterianas y antifúngicas, formando parte esencial de la dieta y la medicina tradicional andina. Citas: GBIF Backbone Taxonomy [gbif-taxonomic-backbone], POWO [powo-kew], AGROSAVIA Sol Andina [agrosavia-sol-andina], ICA Resolución 3168/2015 [ica-resolucion-3168-2015], NRC Cultivos Andinos 1989 [nrc-1989-cultivos-andinos]. Nombre científico válido según estas fuentes Tier A: Allium sativum L."
     },
     {
       "id": "alnus_acuminata",
@@ -953,9 +955,10 @@
         "pennisetum_setaceum"
       ],
       "valor_pedagogico": "Calamagrostis effusa, conocida como paja de páramo, es una gramínea perenne fundamental en los ecosistemas de páramo andino colombiano, presente en departamentos como Cundinamarca, Boyacá, Norte de Santander y Nariño entre 2800 y 4200 msnm en zona térmica páramo. Su manejo agronómico incluye propagación vegetativa mediante división de matas, con ciclo de crecimiento lento adaptado a condiciones de baja temperatura y alta radiación UV. Establece asociaciones beneficiosas con especies como Quercus humboldtii (roble andino) en sistemas de recuperación ecológica, actuando como especie nurse que facilita el establecimiento de otras plantas nativas. En el contexto cultural muisca y andino, esta especie ha sido tradicionalmente utilizada por comunidades indígenas para tejer cubiertas de viviendas y como material de aislamiento térmico en chagras de altura, valorada por su capacidad de regulación hídrica y estabilización de suelos. Según las fuentes taxonómicas verificadas de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Calamagrostis effusa (Kunth) Steud.",
-      "source_ids": [
+"source_ids": [
         "gbif-taxonomic-backbone",
         "powo-kew",
+        "agrosavia-sol-andina",
         "ica-resolucion-3168-2015",
         "nrc-1989-cultivos-andinos"
       ],
