@@ -3604,6 +3604,9 @@
       "valor_pedagogico": "Lección de cosecha escalonada: enseña cómo los frutos maduran en racimos de forma secuencial, permitiendo una provisión constante.",
       "companions": [
         "urtica_dioica"
+      ],
+      "enfermedades_criticas": [
+        "Trozador (Agrotis ipsilon)"
       ]
     },
     {
@@ -3648,6 +3651,9 @@
       "valor_pedagogico": "Lección de textura y conservación: enseña cómo la forma elongada y la piel firme reducen el rajado de los frutos en la montaña.",
       "companions": [
         "urtica_dioica"
+      ],
+      "enfermedades_criticas": [
+        "Trozador (Agrotis ipsilon)"
       ]
     },
     {
@@ -3727,7 +3733,8 @@
         "Heliothis"
       ],
       "enfermedades_criticas": [
-        "Podredumbre apical (Blossom end rot)"
+        "Podredumbre apical (Blossom end rot)",
+        "Trozador (Agrotis ipsilon)"
       ],
       "source_ids": [
         "gbif-taxonomic-backbone",
@@ -3779,6 +3786,9 @@
       "valor_pedagogico": "Lección de sabor y color: enseña cómo el color naranja intenso indica altos niveles de azúcares y betacarotenos, siendo el referente mundial de dulzor en tomates.",
       "companions": [
         "urtica_dioica"
+      ],
+      "enfermedades_criticas": [
+        "Trozador (Agrotis ipsilon)"
       ]
     },
     {
@@ -3829,6 +3839,9 @@
       ],
       "antagonists": [
         "solanum_lycopersicum_san_marzano"
+      ],
+      "enfermedades_criticas": [
+        "Trozador (Agrotis ipsilon)"
       ]
     },
     {
@@ -5212,7 +5225,10 @@
         "gbif-taxonomic-backbone",
         "powo-kew"
       ],
-      "valor_pedagogico": "Variedad andina tradicional del altiplano. Ensenanza del ciclo largo de la papa de ano y la importancia de las variedades nativas en la soberania alimentaria de la sabana."
+      "valor_pedagogico": "Variedad andina tradicional del altiplano. Ensenanza del ciclo largo de la papa de ano y la importancia de las variedades nativas en la soberania alimentaria de la sabana.",
+      "enfermedades_criticas": [
+        "Trozador (Agrotis ipsilon)"
+      ]
     },
     {
       "id": "canna_edulis",
@@ -10262,6 +10278,72 @@
       "vida_util_dias": 365,
       "source_ids": [
         "khan-2009-seaweed-extracts"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (caso David trozador; DR-040 pest catalog)",
+      "id": "bacillus_thuringiensis",
+      "nombre": "Bacillus thuringiensis (BT) — bioinsecticida lepidópteros",
+      "tipo": "microbiano",
+      "proposito": [
+        "fitosanitario_curativo"
+      ],
+      "ingredientes": [
+        "esporas y cristales proteicos comerciales Bacillus thuringiensis var. kurstaki (BTk) o aizawai (BTa)",
+        "agua sin cloro",
+        "adherente foliar (jabón potásico opcional, 0.5%)"
+      ],
+      "proceso_resumen": "Producto comercial registrado ante ICA (no preparación finca). Dilución típica 1-2 g/L de agua. Aplicación foliar al ATARDECER (luz UV degrada cristales delta-endotoxina). Efectivo contra larvas Lepidoptera incluyendo Agrotis ipsilon (trozador), Spodoptera frugiperda (cogollero), Tuta absoluta (polilla tomate), Plutella xylostella (palomilla crucíferas). NO afecta abejas ni vertebrados. Repetir cada 7-10 días si presión alta. Eficacia tras ingesta de la larva — esperar 24-72h mortalidad.",
+      "tiempo_elaboracion_dias": 0,
+      "vida_util_dias": 730,
+      "source_ids": [
+        "agrosavia-manual-biopreparados-2015",
+        "ica-resolucion-3168-2015",
+        "gbif-taxonomic-backbone"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (caso David trozador; DR-040 pest catalog)",
+      "id": "trichogramma_spp",
+      "nombre": "Trichogramma spp. — parasitoide de huevos de lepidópteros",
+      "tipo": "microbiano",
+      "proposito": [
+        "fitosanitario_preventivo"
+      ],
+      "ingredientes": [
+        "cartulinas con huevos parasitados (pulgas pre-emergencia) Trichogramma exiguum o T. pretiosum",
+        "soporte de papel para liberación"
+      ],
+      "proceso_resumen": "Control biológico CLÁSICO preventivo: avispas microscópicas parasitan huevos de Lepidoptera antes de eclosionar. Liberación 50.000-100.000 individuos/hectárea cuando se detectan adultos (trampas de luz o monitoreo). Sinergia con BT (Trichogramma actúa sobre huevos, BT sobre larvas eclosionadas). AGROSAVIA y empresas como Bioglobal producen comercialmente en Colombia. Distribuir en campo cada 7-10 días por 3-4 ciclos.",
+      "tiempo_elaboracion_dias": 0,
+      "vida_util_dias": 7,
+      "source_ids": [
+        "agrosavia-manual-biopreparados-2015",
+        "gbif-taxonomic-backbone"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (caso David trozador; DR-040 pest catalog)",
+      "id": "extracto_neem",
+      "nombre": "Extracto de neem (Azadirachta indica)",
+      "tipo": "extracto",
+      "proposito": [
+        "fitosanitario_curativo",
+        "repelente_insectos"
+      ],
+      "ingredientes": [
+        "semillas o frutos secos Azadirachta indica (neem)",
+        "agua o aceite vegetal portador",
+        "alcohol etílico 70% (opcional, para extracto alcohólico)",
+        "jabón potásico (emulsionante)"
+      ],
+      "proceso_resumen": "Macerar semillas molidas 24-48h en agua tibia (50g/L) o usar aceite de neem comercial. La azadiractina actúa como antialimentario (inhibe ecdisis) en larvas Lepidoptera + áfidos + ácaros. NO sistémico foliar pero translaminar leve. Compatible con BT y Trichogramma. Aplicar al atardecer cada 7d. Cuidado: tóxico para peces; no aplicar cerca de fuentes hídricas. En Colombia hay cultivos comerciales en valle del Magdalena.",
+      "tiempo_elaboracion_dias": 2,
+      "vida_util_dias": 14,
+      "source_ids": [
+        "agrosavia-manual-biopreparados-2015",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ]
     }
   ],
