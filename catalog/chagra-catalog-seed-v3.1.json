@@ -3235,10 +3235,12 @@
         "notas": "Crecimiento menos vigoroso que la roja pero frutos notablemente más dulces; requiere suelos muy bien drenados y ricos en potasio."
       },
       "source_ids": [
+        "gbif-taxonomic-backbone",
         "powo-kew",
-        "gbif-taxonomic-backbone"
+        "agrosavia-sol-andina",
+        "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Lección de pigmentos: comparación entre antocianinas y su ausencia, y su impacto en el sabor y las propiedades organolépticas."
+      "valor_pedagogico": "Frambuesa dorada cultivada en zonas frías de Colombia (Cundinamarca, Boyacá, Nariño, Santander) entre 2000-2600 msnm, en zona térmica frío. Propagación por hijuelos con excelente enraizamiento; ciclo productiva de 3-5 años con podas de renovación. Se asocia con leguminosas (frijol, alfalfa) que fijan nitrógeno y protegen de erosión. Plagas principales: araña roja (Tetranychus urticae), trips y botrytis en frutos por exceso de humedad. Contexto cultural: los muiscas cultivaban frutales nativos de altura como uchuva y mora; la introducción de Rubus spp. doradas data del siglo XX con cultivares traídos de Norteamérica. Los agricultores andinos valoran esta variedad por su bajo requerimiento de frío comparado con rojas y por su dulzura sin astringencia. Fuente: ICA Resolución 3168-2015 regula el material vegetal de frutales menores en Colombia."
     },
     {
       "id": "rubus_idaeus_heritage",
