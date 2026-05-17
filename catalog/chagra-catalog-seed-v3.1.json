@@ -450,7 +450,7 @@
         "plan_restauracion": "Actúa como ecólogo de restauración de bosque alto andino colombiano.\nÁrea: {AREA_HA} ha a {ALTITUD} msnm en {MUNICIPIO}, pendiente {PENDIENTE}%, suelo degradado por {HISTORIAL_USO}. Quiero restaurar con Alnus acuminata como especie nodriza asociada a {ESPECIES_OBJETIVO}.\n\nDiseña: (a) marco de plantación y espaciamiento, (b) secuencia de establecimiento por fases (pioneras 1-3 años, secundarias 3-8 años, climácicas 8+ años), (c) protocolo de protección contra ganado, (d) indicadores de éxito de restauración a 1, 3, 5 años."
       },
       "rol_ecologico": "Especie nodriza clave en restauración de bosque alto andino. Fija nitrógeno simbiótico con actinomiceto Frankia alni. Hojas ricas en N mejoran el mantillo. Madera usada tradicionalmente para herramientas, construcciones rurales y leña. Corteza con taninos para curtiembre.",
-      "valor_pedagogico": "Enseña fijación simbiótica de N (con actinomiceto, no rizobio); rol de especies nodrizas en restauración; sistemas silvopastoriles andinos.",
+      "valor_pedagogico": "El aliso andino (Alnus acuminata Kunth) es una betulácea árbol nativo de los Andes ampliamente usada en sistemas agroforestales colombianos por su capacidad fijadora de nitrógeno (~150-200 kg N/ha/año mediante simbiosis con Frankia, actinorrhizas). Se distribuye naturalmente en Cundinamarca, Boyacá (cordillera Oriental), Antioquia, Cauca, Nariño y Tolima entre 1.500 y 3.200 msnm en zona térmica fría. Árbol caducifolio puede alcanzar 20-25 m, copa rala que permite paso de luz a cultivos asociados. Vida productiva 30-50 años. Manejo agroecológico: asocio café (sombra + N), sistemas silvopastoriles con pasturas naturalizadas, riberas microcuencas (estabilización suelo + sombra agua), barreras rompevientos en franjas anchas, restauración bosque altoandino. Madera blanda para artesanías locales. Fuentes Tier A: AGROSAVIA, Catálogo Plantas y Líquenes Colombia (Bernal et al.), POWO Kew, GBIF Backbone Taxonomy.",
       "saber_origen": {
         "pueblo": "Pueblos andinos (uso generalizado Muisca, Pasto, Inga)",
         "region": "Andes colombianos 1800-3600 msnm",
@@ -2879,7 +2879,7 @@
         "pamplona-roger-2006-plantas-medicinales",
         "powo-kew"
       ],
-      "valor_pedagogico": "Lección de aromaterapia viva: permite identificar cómo las plantas atraen polinizadores y repelen plagas mediante aceites volátiles."
+      "valor_pedagogico": "El anís verde (Pimpinella anisum L.) es una umbelífera anual aromática originaria del Mediterráneo, cultivada en huertas familiares colombianas para uso culinario, infusiones digestivas y galletería tradicional. Se siembra en zonas frías y templadas: Cundinamarca (Sabana Bogotá), Boyacá, Antioquia y Quindío entre 1.500 y 2.800 msnm en zona térmica templada a fría. Ciclo 4-5 meses a cosecha de semillas maduras. Necesita días largos y temperaturas 18-24°C para floración óptima. Manejo agroecológico: siembra directa a chorrillo en líneas separadas 40 cm, aclareo a 15-20 cm planta, control de malezas mecánico en primeras 6 semanas, fertilización orgánica con compost al fondo, atrayente de polinizadores beneficiosos (abejas, syrphidae). Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy."
     },
     {
       "id": "pinus_patula",
@@ -3245,7 +3245,7 @@
         "pamplona-roger-2006-plantas-medicinales",
         "powo-kew"
       ],
-      "valor_pedagogico": "Lección de rusticidad: ejemplifica la capacidad de algunas especies para prosperar en suelos pobres y climas extremos de la cordillera.",
+      "valor_pedagogico": "El romero (Rosmarinus officinalis L., sinonimo Salvia rosmarinus Schleid. según APG IV) es una labiada perenne aromática originaria del Mediterráneo, ampliamente naturalizada y cultivada en Colombia para uso culinario, medicinal y ornamental. Se cultiva en Sabana de Bogotá, Boyacá, Antioquia y Quindío entre 1.500 y 2.800 msnm en zona térmica templada a fría. Propagación por estaca leñosa (60-80% prendimiento) o acodos. Arbusto perenne 1-2 m, ciclo de vida 8-12 años. Aceite esencial con cineol, alcanfor y borneol confiere propiedades antioxidantes y antimicrobianas. Manejo agroecológico: suelos calcáreos con drenaje excelente, riego escaso (sequía-tolerante), poda formación copa abierta, asocio con manzanilla y caléndula en jardín herbal, atrayente de polinizadores. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "companions": [
         "urtica_dioica"
       ]
@@ -4712,7 +4712,7 @@
       "antagonists": [
         "allium_sativum"
       ],
-      "valor_pedagogico": "Recuperadora de suelos. Su siembra previa a los cereales andinos asegura una explosión de crecimiento gracias al nitrógeno acumulado.",
+      "valor_pedagogico": "La veza común (Vicia sativa L.) es una leguminosa anual ampliamente utilizada en Colombia como abono verde, cobertura suelo, forraje y mejorador de fertilidad por su capacidad fijadora de nitrógeno (~80-120 kg N/ha por simbiosis con Rhizobium). Se siembra en zonas frías y templadas: altiplano cundiboyacense, Nariño, Antioquia y eje cafetero entre 1.500 y 3.000 msnm en zona térmica fría a templada. Ciclo 90-130 días. Tolera heladas moderadas y suelos pobres en N. Manejo agroecológico: siembra al voleo en pre-cultivo (30-50 kg/ha), incorporación en floración para maximizar aporte N, asocio con cereales (avena, cebada) para soporte estructural (cultivo en mezcla 70:30), rotación pre-papa o pre-hortalizas exigentes. Fuentes Tier A: AGROSAVIA, NRC 1989, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "source_ids": [
         "agrosavia-manual-biopreparados-2015",
         "fao-ecocrop",
@@ -5327,7 +5327,7 @@
         "perez-arbelaez-1947-plantas-utiles",
         "gbif-taxonomic-backbone"
       ],
-      "valor_pedagogico": "Tuberculo functional de la chagra. Ensenanza de nutricion y salud: FOS como alternativa deendulzante natural para la dieta altoandina."
+      "valor_pedagogico": "El yacón (Smallanthus sonchifolius (Poepp.) H.Rob.) es una asterácea andina tradicional de tubérculo dulce-crocante con bajo índice glucémico (rico en fructooligosacáridos FOS), redescubierto como alimento funcional para diabéticos y prebiótico intestinal. Se cultiva en Cundinamarca, Boyacá, Antioquia, Cauca y Nariño entre 1.500 y 2.800 msnm en zona térmica templada a fría. Propagación por colinos (rizomas pequeños), ciclo 7-9 meses a cosecha, rendimientos 30-60 t/ha tubérculos. Manejo agroecológico: cama elevada con MO abundante, fertilización con bocashi al fondo, asocio con maíz como tutor de sombra, manejo de gusano blanco (Premnotrypes vorax) con rotación trienal y trampas. Fuentes Tier A: AGROSAVIA Manual Tubérculos Andinos 2017, NRC 1989, POWO Kew, GBIF Backbone Taxonomy, Catálogo Plantas y Líquenes Colombia."
     },
     {
       "id": "arracacia_xanthorrhiza",
