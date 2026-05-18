@@ -10376,8 +10376,21 @@
       "proceso_resumen": "Aplicación foliar 1L/ha cada 7-10 días. Control de Botrytis, Alternaria, Monilia. Compatible con caldos minerales.",
       "tiempo_elaboracion_dias": 14,
       "vida_util_dias": 30,
+      "uso": "Prevención y control biológico de hongos foliares (Botrytis cinerea, Alternaria spp., Monilia spp., Sclerotinia) en hortalizas, frutales y aromáticas; aplicar al atardecer con cielo cubierto.",
+      "dosis": "Foliar: 2-5 ml/L de agua (suspensión 10^9 UFC/ml) cada 7-10 días en presión preventiva; 5-10 ml/L cada 5-7 días en presión curativa. Equivalente 1-2 L/ha. Volumen 200-400 L/ha según follaje.",
+      "target": [
+        "botrytis_cinerea",
+        "alternaria_spp",
+        "monilia_spp",
+        "sclerotinia_sclerotiorum",
+        "mildiu_velloso",
+        "oidio_temprano"
+      ],
+      "valor_pedagogico": "Bacteria Gram+ esporulada que coloniza la filosfera por exclusión competitiva y secreta lipopéptidos cíclicos (iturina, fengicina, surfactina) que perforan membranas fúngicas y disparan resistencia sistémica inducida (ISR) vía jasmonato/etileno. AGROSAVIA 2018 reporta cepas nativas con 60-80% de eficacia contra Botrytis en fresa/mora —equiparable a azoxistrobina, sin resistencia cruzada ni residuos. Restrepo lo combina con bocashi: éste siembra microbiota en suelo, B. subtilis la extiende al follaje. ADVERTENCIA: esporas fotosensibles (UV degrada en 2-4 h) → aplicar SIEMPRE al atardecer con adherente; incompatible con cobre y caldo sulfocálcico (alternar 48 h).",
       "source_ids": [
-        "agrosavia-bacillus-2018"
+        "agrosavia-bacillus-2018",
+        "agrosavia-manual-biopreparados-2015",
+        "restrepo-2007-biopreparados"
       ]
     },
     {
@@ -10394,8 +10407,22 @@
       "proceso_resumen": "Aplicación directa al suelo antes de siembra, dosis según análisis (típicamente 500-2000 kg/ha para subir pH 0.5 puntos).",
       "tiempo_elaboracion_dias": 0,
       "vida_util_dias": 730,
+      "uso": "Enmienda correctiva para suelos ácidos con saturación de aluminio tóxica, SOLO con análisis de suelo en mano (pH < 5.5 y saturación Al > 30%); aplicar 2-3 meses antes de la siembra e incorporar a 10-15 cm.",
+      "dosis": "Fórmula Cochrane (1980): t/ha = 1.5-2 × cmol Al intercambiable/kg (suelos andinos tipo Andisol). Rango operativo 500-2000 kg/ha para subir pH 0.5 unidades. Particionar 50% pre-arado + 50% post-arado mejora homogeneidad. NUNCA exceder 3 t/ha por aplicación.",
+      "target": [
+        "acidez_suelo_ph_menor_5_5",
+        "toxicidad_aluminio_intercambiable",
+        "deficiencia_calcio",
+        "deficiencia_magnesio",
+        "saturacion_bases_baja"
+      ],
+      "valor_pedagogico": "CaMg(CO3)2 neutraliza H+/Al3+ del complejo de intercambio: CaMg(CO3)2 + 2Al3+ → Ca2+ + Mg2+ + 2Al(OH)3↓ + 2CO2. La cal NO es fertilizante de Ca: es corrector de toxicidad de aluminio (Cochrane 1980). Usarla 'a ojo' alcaliniza el complejo, precipita P como Ca-fosfatos insolubles, calcina la microbiota y emite ~440 kg CO2/t. REGLA DURA AGROECOLÓGICA: aplicar SOLO con análisis de suelo que muestre pH<5.5 Y saturación Al>30% —sin esos dos criterios es daño neto. NUNCA cal viva (CaO) ni hidratada (Ca(OH)2) en orgánico: Pinheiro y Restrepo lo prohíben (queman raíces y microbiota). Alternativas: bocashi, biocarbón, compost maduro o yeso (CaSO4·2H2O) si solo se requiere Ca sin subir pH.",
       "source_ids": [
-        "ica-fertilizantes-2019"
+        "ica-fertilizantes-2019",
+        "cochrane-1980-aluminio-saturacion",
+        "pinheiro-2003-cartilha-cal",
+        "restrepo-2005-agroecologia",
+        "agrosavia-manual-biopreparados-2015"
       ]
     },
     {
@@ -10412,8 +10439,20 @@
       "proceso_resumen": "Aplicación pre-siembra, dosis 500-1000 kg/ha. Liberación lenta de P, requiere suelos ácidos (pH<5.5) para solubilizar, o compostaje previo con ácidos orgánicos.",
       "tiempo_elaboracion_dias": 0,
       "vida_util_dias": 730,
+      "uso": "Corrección de deficiencia crónica de fósforo en suelos ácidos (pH < 5.5) con baja fertilidad nativa; ideal pre-siembra de cultivos perennes, frutales, café, plátano y como acelerador de bocashi/compost.",
+      "dosis": "Aplicación directa al suelo: 500-1000 kg/ha incorporados pre-arado. Hoyo de siembra frutales: 200-500 g por hoyo mezclados con compost. Co-compostaje: 5-10% peso/peso de la pila de bocashi o compost (acelera mineralización vía ácidos orgánicos).",
+      "target": [
+        "deficiencia_fosforo_p_olsen_bajo",
+        "suelos_acidos_alta_fijacion_p",
+        "establecimiento_perennes",
+        "enraizamiento_inicial",
+        "floracion_fructificacion"
+      ],
+      "valor_pedagogico": "Apatita Ca5(PO4)3(F,Cl,OH) de yacimientos colombianos (Pesca-Boyacá, Norte de Santander) molida a malla 200. Libera P-PO4 lentamente sólo en suelo ácido: H+ del rizoplano y ácidos orgánicos (cítrico, oxálico) de micorrizas Glomus protonan el fluorapatito y solubilizan P por 6-24 meses. A pH>6.5 es inerte —aplicarla sobre suelo encalado es desperdicio. AGROSAVIA 2015 y Restrepo 2007 la co-compostan con bocashi: los ácidos del fermento aceleran solubilización 3-5× y Pseudomonas/Bacillus solubilizadores la liberan como P disponible. Vs. DAP/MAP químicos: entrega P sostenida sin acidificar ni salinizar, conserva micorrizas, compatible con IFOAM. Aporta Ca pero no Mg. Usar mascarilla: contiene flúor.",
       "source_ids": [
-        "ica-fertilizantes-2019"
+        "ica-fertilizantes-2019",
+        "agrosavia-manual-biopreparados-2015",
+        "restrepo-2007-biopreparados"
       ]
     },
     {
@@ -10430,8 +10469,19 @@
       "proceso_resumen": "Aplicación al pie o incorporada 100-200 g/planta. Rica en K, Ca. Alcalinizante; no usar en suelos con pH>6.5 ni en cultivos acidófilos (arándano, té).",
       "tiempo_elaboracion_dias": 0,
       "vida_util_dias": 730,
+      "uso": "Aporte de potasio y calcio + corrección suave de acidez en suelos ácidos (pH 5.0-6.0); también ingrediente clave del bocashi (5-10%) y repelente físico de babosas en bordes de era.",
+      "dosis": "Riego al pie: 100-200 g por planta/año en frutales jóvenes; 50-80 g/planta en hortalizas de fruto (tomate, pimentón). Suelo: 1-3 t/ha incorporadas pre-siembra. Bocashi: 5-10% del peso total. Barrera anti-babosa: cordón de 2-3 cm alrededor del cultivo (re-aplicar tras lluvia).",
+      "target": [
+        "deficiencia_potasio_k",
+        "deficiencia_calcio_suave",
+        "acidez_suelo_moderada_ph_5_a_6",
+        "babosas_caracoles_barrera_fisica",
+        "ingrediente_bocashi"
+      ],
+      "valor_pedagogico": "Residuo de combustión completa de madera dura no tratada: K2CO3 (5-10%), CaO+CaCO3 (20-35%), MgO, P2O5 y micros (B, Zn, Mn, Cu). Restrepo 1996 la incorpora al bocashi como aporte mineral y modulador de pH. ADVERTENCIAS: (1) NUNCA ceniza tratada/pintada/contrachapado/carbón mineral —Cr-Cu-As (CCA), dioxinas, metales pesados; (2) alcalinizante fuerte (~30-50% eq. CaCO3): prohibida con pH>6.5 y en acidófilos (arándano, té); (3) lixivia K rápido —no almacenar a la intemperie; (4) volatiliza NH3 con fertilizante amoniacal. Vs. KCl químico: aporta K+Ca+micros sin salinización por Cl-. AGROSAVIA 2015 la valida como fuente económica de K en finca con leña disponible.",
       "source_ids": [
-        "restrepo-1996-bocashi"
+        "restrepo-1996-bocashi",
+        "agrosavia-manual-biopreparados-2015"
       ]
     },
     {
@@ -10451,9 +10501,22 @@
       "proceso_resumen": "Compostaje aeróbico por pila con volteos cada 7 días durante 90-120 días. Maduro cuando baja a temperatura ambiente, color oscuro, olor a tierra fresca.",
       "tiempo_elaboracion_dias": 100,
       "vida_util_dias": 365,
+      "uso": "Enmienda orgánica base para preparación de eras, hoyos de siembra y mantenimiento anual del suelo; restaura materia orgánica, estructura, capacidad de intercambio catiónico (CIC) y microbiota tras décadas de manejo extractivista.",
+      "dosis": "Pre-siembra hortalizas: 2-5 kg/m² (20-50 t/ha) incorporados a 15 cm. Hoyo de siembra frutales: 5-10 kg por hoyo mezclado con tierra. Mantenimiento perennes: 3-5 kg/planta/año en corona, sin tocar el tallo. Sustrato semillero: 30-40% del volumen mezclado con tierra negra y cascarilla de arroz.",
+      "target": [
+        "baja_materia_organica_suelo",
+        "estructura_suelo_compactada",
+        "baja_capacidad_intercambio_cationico",
+        "deficiencia_n_p_k_balanceada",
+        "microbiota_suelo_empobrecida",
+        "retencion_agua_suelo"
+      ],
+      "valor_pedagogico": "Compostaje aeróbico mesofílico-termofílico: sucesión de bacterias (Bacillus, Pseudomonas), actinomicetos (Streptomyces, olor a tierra) y hongos saprófitos que degradan C:N 30:1 hasta húmicos estables (C:N ~12:1). Fase termofílica 55-70°C esteriliza patógenos y semillas de arvenses. Restrepo 1996 y AGROSAVIA 2015 lo posicionan como pilar agroecológico: vs. bocashi (microbioma fresco), aporta materia orgánica HUMIFICADA estable que mejora CIC y retención hídrica (1 g humus = 4-6 g H2O). Vs. NPK químico: no saliniza, secuestra C y reinocula microbiota. CONTROL: C:N 10-15, germinación rábano >80%, sin olor amoniacal. NO usar inmaduro ni de origen desconocido (clopiralida residual mata leguminosas).",
       "source_ids": [
         "restrepo-1996-bocashi",
-        "agrosavia-manual-biopreparados-2015"
+        "agrosavia-manual-biopreparados-2015",
+        "restrepo-2007-biopreparados",
+        "restrepo-2005-agroecologia"
       ]
     },
     {
@@ -10729,6 +10792,17 @@
       "url": "https://cipotato.org"
     },
     {
+      "id": "cochrane-1980-aluminio-saturacion",
+      "tipo": "articulo_revista",
+      "autores": "Cochrane, T.T.; Salinas, J.G.; Sánchez, P.A.",
+      "año": 1980,
+      "titulo": "An equation for liming acid mineral soils to compensate crop aluminum tolerance",
+      "revista_o_editorial": "Tropical Agriculture (Trinidad)",
+      "volumen_numero": "57(2)",
+      "paginas": "133-140",
+      "observaciones": "Referencia clásica para el cálculo de dosis de cal en suelos ácidos tropicales basado en saturación de aluminio (Al sat %), criterio operativo central en agroecología andina y trópico bajo colombiano."
+    },
+    {
       "id": "correa-pabon-carulla-2008",
       "tipo": "articulo_revista",
       "autores": "Correa, R.; Pabón, R.; Carulla, J.",
@@ -10970,6 +11044,15 @@
       "revista_o_editorial": "Agronomía Colombiana",
       "volumen_numero": "26(3)",
       "paginas": "477-486"
+    },
+    {
+      "id": "pinheiro-2003-cartilha-cal",
+      "tipo": "libro",
+      "autores": "Pinheiro, S.; Restrepo Rivera, J.",
+      "año": 2003,
+      "titulo": "Cartilha da saúde do solo — agricultura orgânica e biodinâmica: o uso correto da cal e das enmendas minerais",
+      "institucion": "Fundação Juquira Candiru / MAELA",
+      "observaciones": "Texto de divulgación agroecológica latinoamericana que sistematiza las advertencias sobre cal viva/hidratada en sistemas orgánicos y defiende criterios técnicos de aplicación basados en análisis de suelo."
     },
     {
       "id": "powo-kew",
