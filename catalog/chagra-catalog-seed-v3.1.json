@@ -15610,6 +15610,1020 @@
         "gbif-taxonomic-backbone",
         "jbb-plantas-medicinales"
       ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH39_GRAMINEAS_FORRAJERAS",
+      "id": "brachiaria_decumbens",
+      "nombre_comun": "Pasto brachiaria",
+      "nombre_comunes_regionales": [
+        "brachiaria",
+        "pasto peludo",
+        "pasto braquiaria",
+        "signal grass"
+      ],
+      "nombre_cientifico": "Urochloa decumbens (Stapf) R.D.Webster",
+      "_nombre_cientifico_anterior": "Brachiaria decumbens Stapf, 1919",
+      "familia_botanica": "Poaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "ground_cover",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1200,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 38
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "gramínea perenne estolonífera-decumbente, 30-90 cm de altura, follaje pubescente",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "estolon"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla escarificada (ácido sulfúrico 15 min o agua caliente) para romper dormancia. Siembra al inicio de lluvias, 4-8 kg/ha al voleo o en surcos. Establecimiento 60-90 días. Pastoreo a partir del día 90-120 con altura de planta 30-40 cm.",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "Naturalizada y ampliamente difundida en ganadería tropical colombiana (Llanos, Caribe, Magdalena Medio). Sensible a salivazo (Aeneolamia varia) sin manejo integrado. Posee saponinas hepatotóxicas (esporidesmina) que pueden causar fotosensibilización en bovinos en floración intensa.",
+        "fuente": "AGROSAVIA Manual Forrajeras Tropicales 2022; CIAT Tropical Forages; POWO Kew; Bernal 2015"
+      },
+      "companions": [],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Gramínea de pastoreo extensivo, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": false,
+          "nota": "No es especie de huerto; uso forrajero específico de pradera."
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta — pasto de pastoreo extensivo."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Forrajera tropical de alta carga animal: 2.5-4 UGG/ha bien manejada. Apropiada para suelos ácidos y baja fertilidad de Llanos Orientales y Caribe seco-húmedo.",
+          "tips": [
+            "Carga: 2.5-4 UGG/ha en sistemas rotacionales bien manejados",
+            "Período de descanso: 28-35 días entre pastoreos",
+            "Monitorear salivazo (Aeneolamia varia) con conteo de espumas; usar Metarhizium anisopliae como control biológico",
+            "Evitar floración intensa por riesgo de fotosensibilización hepática en bovinos jóvenes"
+          ]
+        },
+        "restauracion": {
+          "viable": false,
+          "nota": "Naturalizada agresiva; no recomendada en restauración de bosque seco o ecosistemas nativos por desplazamiento de gramíneas autóctonas."
+        }
+      },
+      "scale_viability": [
+        "produccion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Gramínea forrajera tropical naturalizada, base de la ganadería extensiva colombiana en Llanos Orientales, Caribe y Magdalena Medio. Adaptada a suelos ácidos de baja fertilidad con alta saturación de aluminio (>60%). Produce biomasa 12-18 t MS/ha/año con bajo input. Riesgo de invasividad en bosques secos tropicales y sabanas naturales nativas.",
+      "valor_pedagogico": "El pasto brachiaria o brachiaria decumbens (Urochloa decumbens (Stapf) R.D.Webster, sin. Brachiaria decumbens Stapf, Poaceae, subfamilia Panicoideae) es una de las gramíneas forrajeras tropicales más sembradas en Colombia y América Latina: originaria de las sabanas del África oriental (Uganda, Kenia, Tanzania, Rwanda, Burundi), fue introducida al Neotrópico por el CIAT en los años 1960-70 como solución agronómica al desafío de las sabanas ácidas de baja fertilidad de los Llanos Orientales colombianos, la Orinoquía venezolana y el Cerrado brasileño donde casi ninguna otra gramínea forrajera sobrevivía a la alta saturación de aluminio (>60-80%), el bajo pH (4.0-4.8) y la deficiencia crítica de fósforo. Hoy domina vastas extensiones de los Llanos Orientales (Meta, Casanare, Vichada, Arauca), el Caribe colombiano (Sucre, Córdoba, Magdalena), el Magdalena Medio (Antioquia, Santander, Boyacá bajo) y la Amazonía deforestada (Caquetá, Guaviare, Putumayo) entre 0 y 1.500 msnm en zona térmica cálida. Es gramínea perenne estolonífera-decumbente de 30-90 cm de altura con follaje pubescente verde-amarillento (de ahí su nombre \"pasto peludo\"), hojas lineares lanceoladas pubescentes, inflorescencia en panícula con 3-5 racimos lineales unilaterales, semillas pequeñas con dormancia post-cosecha de 6-12 meses que requiere escarificación química o térmica antes de la siembra. Su característica agronómica más importante es la tolerancia extrema a la acidez del suelo y a la saturación de aluminio: prospera donde gramíneas templadas (Lolium, Festuca, Dactylis) o forrajeras exigentes en fertilidad mueren, gracias a un sistema radicular profundo (1.5-2 m) que explora capas subsuelo y a mecanismos bioquímicos de tolerancia al Al3+ a nivel de raíz. Produce biomasa de 12-18 t MS/ha/año con bajo input de fertilización (apenas mantenimiento de P y K), soporta carga animal de 2.5-4 UGG/ha en sistemas rotacionales bien manejados con descanso de 28-35 días entre pastoreos y altura de planta de entrada al pastoreo de 30-40 cm, valor nutricional moderado (PC 7-10%, DIVMS 55-65% en hoja, declina rápido con la edad). Tiene tres problemas críticos que el ganadero debe manejar: (1) Salivazo o mión de los pastos (Aeneolamia varia, Zulia carbonaria, Prosapia simulans, Cercopidae) es la plaga más limitante en Colombia, las ninfas chupan savia del cuello de la raíz produciendo espumas blancas características y los adultos defolian el pasto reduciendo producción 30-60%; manejo integrado con rotación de potreros, control biológico con Metarhizium anisopliae (entomopatógeno) o aplicaciones tempranas en focos detectados por conteo de espumas; (2) Fotosensibilización hepática en bovinos jóvenes por saponinas esteroidales (esporidesmina) presentes en mayor concentración durante floración intensa y rebrotes tiernos, manifestada como queratoconjuntivitis, dermatitis en zonas no pigmentadas y daño hepático; manejo evitando pastoreo de animales jóvenes en floración pico y manteniendo el pasto en estado vegetativo; (3) Naturalización agresiva y carácter invasivo: tras décadas de difusión masiva en sabanas nativas tropicales (Llanos, Cerrado, Orinoquía), brachiaria se ha establecido como dominante en parches de sabana semi-natural y bosque seco tropical disturbado desplazando gramíneas y herbáceas nativas (Trachypogon spp., Andropogon spp., Axonopus spp., Paspalum spp.) y reduciendo biodiversidad, por lo cual NO se recomienda en proyectos de restauración ecológica, conservación de bosque seco tropical (BST en categoría crítica nacional), o áreas protegidas. Manejo agroecológico: propagación por semilla escarificada (ácido sulfúrico 15 min o agua caliente 80°C 10 min) en surcos de 0.5 m al inicio de las lluvias a 4-8 kg/ha, fertilización inicial baja (200 kg/ha de fórmula 10-30-10) y mantenimiento mínimo, descanso obligatorio post-establecimiento 90-120 días, rotación de potreros con leguminosas tropicales (Centrosema, Stylosanthes, Arachis pintoi) para mejorar valor nutricional y fijar N biológicamente. Es lección agronómica de doble filo: gramínea africana naturalizada que permitió la expansión ganadera neotropical sobre suelos imposibles para forrajeras templadas, pero cuyo dominio actual es también símbolo del costo ecológico de la ganadería extensiva sobre sabana nativa y bosque seco tropical colombiano. Fuentes Tier A: AGROSAVIA Manual Forrajeras Tropicales 2022, CIAT Tropical Forages Database, POWO Kew, GBIF Backbone Taxonomy, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia.",
+      "source_ids": [
+        "agrosavia-forrajeras-2022",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH39_GRAMINEAS_FORRAJERAS",
+      "id": "brachiaria_brizantha",
+      "nombre_comun": "Pasto brizantha",
+      "nombre_comunes_regionales": [
+        "brizantha",
+        "pasto marandú",
+        "pasto toledo",
+        "palisade grass"
+      ],
+      "nombre_cientifico": "Urochloa brizantha (Hochst. ex A.Rich.) R.D.Webster",
+      "_nombre_cientifico_anterior": "Brachiaria brizantha (Hochst. ex A.Rich.) Stapf, 1919",
+      "familia_botanica": "Poaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "biomass_producer",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1500,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 38
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "gramínea perenne cespitosa-erecta, 60-150 cm de altura, macollas vigorosas",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "division_mata"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla escarificada al inicio de lluvias, 5-10 kg/ha a chorrillo o voleo. Establecimiento 70-100 días. Variedades comerciales más usadas en Colombia: cv. Marandú, cv. Toledo, cv. Xaraés (Mulato), cv. La Libertad (AGROSAVIA, registro ICA).",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "Mayor resistencia a salivazo que B. decumbens (cv. Marandú es referencia continental por tolerancia a Aeneolamia spp.). Mejor valor nutricional. Susceptible a \"muerte del marandú\" (Pythium-Rhizoctonia) en suelos mal drenados con saturación hídrica.",
+        "fuente": "AGROSAVIA La Libertad 2018; CIAT Tropical Forages; POWO Kew; Bernal 2015"
+      },
+      "companions": [],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Gramínea de pastoreo extensivo, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": false,
+          "nota": "No es especie de huerto; uso forrajero específico."
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Forrajera tropical perenne de alta producción y mejor calidad nutricional que B. decumbens. Carga 3-5 UGG/ha bien manejada. Sistema silvopastoril compatible con Leucaena leucocephala, Gliricidia sepium.",
+          "tips": [
+            "Carga: 3-5 UGG/ha en rotacional intensivo",
+            "Descanso 30-40 días, altura entrada 40-50 cm",
+            "Cv. Marandú referencia continental por tolerancia a salivazo",
+            "Evitar suelos mal drenados (riesgo \"muerte del marandú\" por Pythium-Rhizoctonia)"
+          ]
+        },
+        "restauracion": {
+          "viable": false,
+          "nota": "Naturalizada; no recomendada en restauración de bosque seco tropical o sabana natural."
+        }
+      },
+      "scale_viability": [
+        "produccion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Gramínea forrajera tropical perenne cespitosa, naturalizada, central en ganadería intensiva tropical colombiana. Mejor valor nutricional y mayor tolerancia a Aeneolamia spp. que B. decumbens. Compatible con sistemas silvopastoriles. Adaptada a suelos ácidos de baja-media fertilidad.",
+      "valor_pedagogico": "El pasto brizantha (Urochloa brizantha (Hochst. ex A.Rich.) R.D.Webster, sin. Brachiaria brizantha (Hochst. ex A.Rich.) Stapf, Poaceae) es la segunda gran gramínea forrajera tropical sembrada en Colombia después de su congénere B. decumbens, originaria también de las sabanas del África oriental (Uganda, Kenia, Etiopía, Tanzania) e introducida al Neotrópico por el CIAT en los años 1970-80 como mejora agronómica sobre B. decumbens: mayor resistencia al salivazo (Aeneolamia spp.), mejor valor nutricional, mayor carga animal soportada y compatibilidad con sistemas silvopastoriles. Hoy se cultiva ampliamente en los Llanos Orientales (Meta, Casanare, Arauca, Vichada), el Caribe colombiano (Córdoba, Sucre, Cesar), el Magdalena Medio (Antioquia, Santander), la Amazonía deforestada (Caquetá, Putumayo, Guaviare) y los piedemontes (Huila, Tolima) entre 0 y 1.500 msnm en zona térmica cálida. Es gramínea perenne cespitosa-erecta de macollas vigorosas que alcanza 60-150 cm de altura con hojas lineares-lanceoladas glabras (a diferencia de B. decumbens que es pubescente y decumbente), inflorescencia en panícula con 4-8 racimos unilaterales, espiguillas más grandes que B. decumbens, semillas con dormancia post-cosecha que requiere escarificación pre-siembra. Las variedades comerciales más sembradas en Colombia son: cv. Marandú (referencia continental, liberada por EMBRAPA Brasil en 1984 y luego introducida a Colombia, famosa por su tolerancia a Aeneolamia spp.); cv. Toledo (CIAT BRA-003395, mayor productividad de hoja); cv. Xaraés o Mulato (híbrido B. brizantha x B. ruziziensis x B. decumbens, EMBRAPA-CIAT, mayor valor nutricional pero más exigente en fertilidad); cv. La Libertad (AGROSAVIA, registro ICA, adaptada al Piedemonte Llanero colombiano). Su característica agronómica distintiva es la mayor productividad de biomasa (15-25 t MS/ha/año) y mejor valor nutricional (PC 8-12%, DIVMS 60-68%) comparado con B. decumbens, soportando carga animal de 3-5 UGG/ha en sistemas rotacionales intensivos con descanso de 30-40 días entre pastoreos y altura de planta de entrada al pastoreo de 40-50 cm. Es la gramínea forrajera tropical preferida para sistemas silvopastoriles intensivos (SSPi) en Colombia: tolera la sombra parcial de árboles como Leucaena leucocephala, Gliricidia sepium, Tithonia diversifolia y Albizia spp. y forma sistemas multi-estrato productivos. Tiene dos problemas críticos: (1) La \"muerte del marandú\" o pudrición radicular por complejo Pythium-Rhizoctonia-Fusarium en suelos mal drenados con saturación hídrica estacional, que ha causado pérdidas masivas en el Cerrado brasileño y en los Llanos Orientales colombianos durante temporadas lluviosas extremas; manejo preventivo con siembra en suelos bien drenados, evitar topografías con encharcamiento, rotación con leguminosas y mejora de drenaje superficial. (2) Naturalización en sabanas y bosques secos tropicales (problema continental compartido con B. decumbens) que desplaza vegetación nativa y se establece como dominante post-deforestación, motivo por el cual no se recomienda en restauración ecológica o conservación de bosque seco tropical. Manejo agroecológico: propagación por semilla escarificada (5-10 kg/ha al inicio de lluvias en surcos de 0.5 m), fertilización inicial moderada (300 kg/ha 10-30-10), descanso post-establecimiento 90-120 días, rotación con leguminosas tropicales (Stylosanthes guianensis, Arachis pintoi, Centrosema spp.) y arbóreas (Leucaena, Gliricidia) para mejorar nutrición animal, fijación de N biológica al sistema y captura de carbono. Es lección de la modernización ganadera tropical colombiana: gramínea africana que junto con sistemas silvopastoriles permite intensificar la producción ganadera sobre tierra deforestada sin nueva expansión sobre bosque, pero cuyo manejo requiere monitoreo de drenaje y compromiso con la regeneración del bosque seco tropical aledaño. Fuentes Tier A: AGROSAVIA La Libertad 2018, CIAT Tropical Forages Database, POWO Kew, GBIF Backbone Taxonomy, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia.",
+      "source_ids": [
+        "agrosavia-forrajeras-2022",
+        "agrosavia-silvopastoriles",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH39_GRAMINEAS_FORRAJERAS",
+      "id": "panicum_maximum_mombasa",
+      "nombre_comun": "Guinea Mombasa",
+      "nombre_comunes_regionales": [
+        "mombasa",
+        "pasto guinea mombasa",
+        "panicum mombasa",
+        "tanzania-mombasa"
+      ],
+      "nombre_cientifico": "Megathyrsus maximus (Jacq.) B.K.Simon & S.W.L.Jacobs cv. Mombasa",
+      "_nombre_cientifico_anterior": "Panicum maximum Jacq. cv. Mombasa",
+      "familia_botanica": "Poaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "biomass_producer",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1000,
+        "max_absoluto": 1500
+      },
+      "temperatura_c": {
+        "helada_letal": 6,
+        "optimo_min": 22,
+        "optimo_max": 32,
+        "max_tolerable": 40
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "gramínea perenne cespitosa de gran porte, 1.5-2.5 m de altura, macollas vigorosas",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "division_mata"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla pretratada (escarificación o reposo post-cosecha 6-9 meses para romper dormancia). Siembra a 4-8 kg/ha en surcos o voleo al inicio de lluvias. Establecimiento 80-110 días. Variedades hermanas: cv. Tanzania, cv. Mombasa (EMBRAPA-CIAT), cv. Massai.",
+        "tiempo_a_establecimiento_dias": 100,
+        "notas": "Cultivar Mombasa liberado por EMBRAPA Brasil 1993 y difundido en Llanos colombianos. Alta producción de biomasa (25-35 t MS/ha/año). Más exigente en fertilidad que brachiaria (requiere suelos de fertilidad media-alta).",
+        "fuente": "EMBRAPA cv. Mombasa 1993; AGROSAVIA Forrajeras Tropicales; CIAT Tropical Forages; POWO Kew"
+      },
+      "companions": [],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Gramínea de gran porte (>2m), inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": false,
+          "nota": "Uso forrajero específico de pradera; gran porte inadecuado para huerto."
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta — pasto extensivo."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Forrajera tropical de altísima producción y calidad nutricional. Carga 4-6 UGG/ha en sistemas rotacionales intensivos sobre suelos de fertilidad media-alta. Excelente para ceba y producción lechera tropical.",
+          "tips": [
+            "Carga: 4-6 UGG/ha en rotacional intensivo (mayor que brachiaria)",
+            "Descanso 25-35 días, altura entrada 80-100 cm",
+            "Exige suelos de fertilidad media-alta (no compite con brachiaria en suelos pobres)",
+            "PC 10-14% y DIVMS 60-70% en hoja joven — calidad nutricional alta"
+          ]
+        },
+        "restauracion": {
+          "viable": false,
+          "nota": "Naturalizada; no recomendada en restauración ecológica."
+        }
+      },
+      "scale_viability": [
+        "produccion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Gramínea forrajera tropical de gran porte, alta producción y excelente valor nutricional. Cultivar Mombasa liberado por EMBRAPA Brasil 1993, difundido en Llanos Orientales colombianos. Adaptada a suelos de fertilidad media-alta. Productividad superior a brachiaria pero más exigente.",
+      "valor_pedagogico": "La Guinea Mombasa (Megathyrsus maximus (Jacq.) B.K.Simon & S.W.L.Jacobs cv. Mombasa, sin. Panicum maximum Jacq. cv. Mombasa, Poaceae) es una de las gramíneas forrajeras tropicales de mayor productividad mundial, originaria de las sabanas tropicales del África subsahariana (desde Senegal hasta Tanzania) e introducida al Neotrópico desde el siglo XIX como forrajera del género Panicum, con cultivares específicos seleccionados durante el siglo XX (Tanzania, Mombasa, Massai, Tobiatã). El cultivar Mombasa fue liberado por EMBRAPA Brasil en 1993 a partir de germoplasma colectado en África oriental por el ORSTOM-IRD francés en los años 1960-70, seleccionado por su productividad excepcional, vigor de rebrote y calidad nutricional, y rápidamente difundido por toda América tropical desde mediados de los años 1990. En Colombia se cultiva en los Llanos Orientales (Meta, Casanare, Arauca, Vichada), Magdalena Medio (Antioquia, Santander), Caribe seco-húmedo (Sucre, Córdoba, Cesar, Magdalena), Pacífico (Valle bajo) y Amazonía deforestada (Caquetá, Putumayo) entre 0 y 1.000 msnm en zona térmica cálida sobre suelos de fertilidad media-alta. Es gramínea perenne cespitosa de gran porte (1.5-2.5 m de altura) con macollas vigorosas erectas, hojas largas lineares lanceoladas verde-oscuras, vaina foliar pubescente, inflorescencia en panícula amplia abierta de 30-60 cm, espiguillas pequeñas con dormancia post-cosecha de 6-9 meses (la semilla recién cosechada germina mal y requiere reposo o escarificación química). Su característica agronómica distintiva es la altísima productividad de biomasa (25-35 t MS/ha/año en óptimo manejo, comparable a las mejores forrajeras tropicales del mundo) y la excelente calidad nutricional (PC 10-14%, DIVMS 60-70% en hoja joven), soportando carga animal de 4-6 UGG/ha en sistemas rotacionales intensivos con descanso de 25-35 días entre pastoreos y altura de planta de entrada al pastoreo de 80-100 cm (notar la altura: por su gran porte se maneja más alta que brachiaria). Es la gramínea forrajera preferida en ganadería de ceba intensiva y lechería tropical en Colombia, donde la combinación de alta carga, buen valor nutricional y rebrote rápido permite tasas de ganancia diaria de peso de 700-900 g/animal/día en bovinos de carne y producciones de leche de 8-12 L/vaca/día en sistemas tropicales bien manejados. Su limitación principal es la exigencia en fertilidad: requiere suelos de fertilidad media-alta (P > 15 ppm Bray II, K > 0.3 cmol/kg, Ca > 4 cmol/kg, pH > 5.0) y no compite con brachiaria en suelos ácidos de baja fertilidad como los Llanos Orientales puros donde la saturación de aluminio supera 60%; en esas condiciones la Mombasa requiere encalado y fertilización fosfórica de establecimiento (500-800 kg/ha de cal + 100-150 kg/ha P2O5) que duplica el costo de implantación frente a brachiaria. Por esa razón en Colombia se cultiva preferentemente en zonas con mejor suelo: piedemonte llanero, vegas de río, sabana mejorada, antiguas zonas de cultivo o áreas de Caribe húmedo. Susceptible a salivazo (Aeneolamia spp., Mahanarva spp.) aunque menos que brachiaria, y a la enfermedad foliar Bipolaris-Drechslera. Manejo agroecológico: propagación por semilla escarificada o con reposo de 6-9 meses (4-8 kg/ha al inicio de lluvias en surcos de 0.5-0.7 m), fertilización inicial alta (500 kg/ha 10-30-10), descanso post-establecimiento 100-130 días, rotación con leguminosas tropicales (Arachis pintoi, Stylosanthes guianensis, Centrosema spp.) para mejorar nutrición animal y reducir necesidad de N sintético, sistemas silvopastoriles con Leucaena leucocephala y Gliricidia sepium que potencian aún más la productividad y captura de carbono. Es lección de la \"intensificación verde\" de la ganadería tropical colombiana: una gramínea africana de alto desempeño que combinada con leguminosas y arbóreas permite triplicar la carga animal y la producción por hectárea sin nueva expansión sobre bosque, pero cuyo manejo exige inversión en fertilidad de suelo y compromiso con sistemas silvopastoriles integrados. Fuentes Tier A: AGROSAVIA Manual Forrajeras Tropicales 2022, CIAT Tropical Forages Database, POWO Kew, GBIF Backbone Taxonomy, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia.",
+      "source_ids": [
+        "agrosavia-forrajeras-2022",
+        "agrosavia-silvopastoriles",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH39_GRAMINEAS_FORRAJERAS",
+      "id": "cynodon_nlemfuensis",
+      "nombre_comun": "Pasto estrella",
+      "nombre_comunes_regionales": [
+        "estrella africana",
+        "estrella verde",
+        "star grass",
+        "pasto estrella africano"
+      ],
+      "nombre_cientifico": "Cynodon nlemfuensis Vanderyst",
+      "familia_botanica": "Poaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "ground_cover",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1500,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 38
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "gramínea perenne estolonífera-rizomatosa, 30-60 cm de altura, agresiva",
+      "propagation": {
+        "methods": [
+          "estolon",
+          "rizoma"
+        ],
+        "best_method": "estolon",
+        "protocol_resumen": "Propagación principal vegetativa por estolones (no produce semilla viable). 2-3 t/ha de material vegetativo plantado a surcos de 0.5 m al inicio de lluvias. Establecimiento 60-90 días por crecimiento estolonífero agresivo.",
+        "tiempo_a_establecimiento_dias": 75,
+        "notas": "Comúnmente confundido con Cynodon dactylon (bermuda). C. nlemfuensis es de mayor porte y productividad. AGROSAVIA mantiene material de propagación certificado de cv. Florona, cv. Tropical, cv. Tifton.",
+        "fuente": "AGROSAVIA Pasto Estrella; CIAT Tropical Forages; POWO Kew; Bernal 2015"
+      },
+      "companions": [],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Gramínea de pastoreo, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": false,
+          "nota": "Uso forrajero específico; crecimiento agresivo invasor de huerto."
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Forrajera tropical de alta carga animal y excelente recuperación post-pastoreo. Carga 3-5 UGG/ha. Apropiada para ganadería de carne y leche tropical en suelos bien drenados de fertilidad media.",
+          "tips": [
+            "Propagación 100% vegetativa por estolones (no usar semilla)",
+            "Carga: 3-5 UGG/ha en rotacional intensivo",
+            "Descanso 21-28 días — rebrote muy rápido",
+            "Tolerante a pastoreo intensivo continuo (manejo más laxo que brachiaria)"
+          ]
+        },
+        "restauracion": {
+          "viable": false,
+          "nota": "Naturalizada agresiva; estolones expansivos no apta para restauración."
+        }
+      },
+      "scale_viability": [
+        "produccion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Gramínea forrajera tropical estolonífera de gran agresividad colonizadora y alta tolerancia a pastoreo intensivo. Propagación 100% vegetativa por estolones. Adaptada a ganadería tropical de carne y leche en suelos bien drenados de fertilidad media.",
+      "valor_pedagogico": "El pasto estrella o estrella africana (Cynodon nlemfuensis Vanderyst, Poaceae, subfamilia Chloridoideae) es una de las gramíneas forrajeras tropicales más importantes en ganadería intensiva colombiana, originaria del África central y oriental (cuenca del Congo, Kenia, Uganda, Tanzania, donde \"nlemfu\" es nombre vernáculo local) e introducida al Neotrópico durante el siglo XX como forrajera de alto desempeño para climas cálidos. Es comúnmente confundida con su pariente cercano Cynodon dactylon (bermuda o pata de gallina, cosmopolita) y con Cynodon plectostachyus (estrella de África, cultivada también en Colombia), pero C. nlemfuensis se distingue por su mayor porte (30-60 cm vs. 10-30 cm de bermuda), mayor productividad de biomasa y mejor valor forrajero. En Colombia se cultiva ampliamente en los Llanos Orientales (Meta, Casanare, Arauca), Magdalena Medio (Antioquia, Santander, Boyacá bajo), Caribe (Sucre, Córdoba, Cesar, Magdalena, La Guajira), Pacífico (Valle bajo), Amazonía deforestada (Caquetá, Putumayo) y piedemontes interandinos (Huila, Tolima, valle del Cauca) entre 0 y 1.500 msnm en zona térmica cálida sobre suelos bien drenados de fertilidad media. Es gramínea perenne estolonífera-rizomatosa de 30-60 cm de altura con estolones largos y agresivos que enraízan en cada nudo, rizomas superficiales-cortos, hojas lineares glabras verde-oscuras, inflorescencia en 4-7 racimos digitados al ápice del culmo dispuestos en forma de estrella radial (de ahí su nombre común \"pasto estrella\"), semillas raramente viables (la propagación natural es 99% vegetativa por estolones, motivo por el cual se establece exclusivamente con material vegetativo en surcos). Su característica agronómica distintiva es la propagación 100% vegetativa por estolones (no se siembra por semilla), lo que tiene una implicación importante: la implantación es más cara y laboriosa que las brachiarias (que sí se siembran por semilla), requiere 2-3 t/ha de material vegetativo, siembra en surcos de 0.5 m al inicio de las lluvias y mano de obra intensiva durante el establecimiento, pero una vez establecido es extremadamente resiliente, con rebrote rapidísimo post-pastoreo (descanso de apenas 21-28 días entre pastoreos), tolerancia a pastoreo intensivo continuo y persistencia decadal en la pradera con manejo mínimo. Produce biomasa de 18-25 t MS/ha/año con buen manejo, soporta carga animal de 3-5 UGG/ha en sistemas rotacionales intensivos con altura de planta de entrada al pastoreo de 30-40 cm, valor nutricional medio-alto (PC 9-13%, DIVMS 58-65%). Es la gramínea forrajera preferida en sistemas de doble propósito (carne + leche) en el trópico bajo colombiano por su tolerancia a pastoreo intensivo y manejo más laxo que las brachiarias (no requiere descansos tan largos ni alturas de entrada altas). Las variedades comerciales más sembradas son: cv. Florona (originalmente seleccionado en Centroamérica, difundido por AGROSAVIA en Colombia); cv. Estrella Africana (germoplasma colectado por CIAT en África oriental); cv. Tropical (selección regional colombiana). Es susceptible a salivazo (Aeneolamia spp.) aunque menos que brachiaria, y a complejos foliares Bipolaris-Curvularia en estaciones lluviosas intensas. Su limitación es la naturalización agresiva: los estolones colonizan rápidamente bordes de pradera, canales de riego, cercas vivas y cultivos vecinos, requiriendo manejo de bordes para prevenir invasión de áreas no destinadas a forraje. Manejo agroecológico: propagación 100% vegetativa por estolones cosechados de pradera madre (2-3 t/ha en surcos de 0.5 m al inicio de lluvias), fertilización inicial moderada (200-300 kg/ha 10-30-10), descanso post-establecimiento 60-90 días, rotación con leguminosas rastreras (Arachis pintoi, Stylosanthes spp.) para mejorar valor nutricional y fijar N biológicamente, sistemas silvopastoriles con Leucaena leucocephala (la combinación pasto estrella + leucaena es referencia continental de productividad ganadera tropical sostenible), manejo de bordes con cercas vivas (Erythrina, Gliricidia) que también funcionan como contención de estolones invasores. Es lección agroecológica de la ganadería tropical: gramínea estolonífera africana de alto desempeño cuyo manejo en sistema silvopastoril con leucaena permite intensificar producción ganadera tropical reduciendo huella ambiental y mejorando bienestar animal por sombra de árboles, pero cuya naturalización agresiva exige manejo cuidadoso de bordes y compromiso con la conservación de áreas no productivas adyacentes. Fuentes Tier A: AGROSAVIA Pasto Estrella, CIAT Tropical Forages Database, POWO Kew, GBIF Backbone Taxonomy, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia.",
+      "source_ids": [
+        "agrosavia-estrella",
+        "agrosavia-silvopastoriles",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH39_GRAMINEAS_FORRAJERAS",
+      "id": "digitaria_decumbens",
+      "nombre_comun": "Pasto pangola",
+      "nombre_comunes_regionales": [
+        "pangola",
+        "pangola grass",
+        "pasto pangola africano"
+      ],
+      "nombre_cientifico": "Digitaria eriantha Steud. cv. Pangola",
+      "_nombre_cientifico_anterior": "Digitaria decumbens Stent",
+      "familia_botanica": "Poaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "ground_cover",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1200,
+        "max_absoluto": 1700
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 38
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "gramínea perenne estolonífera-decumbente, 40-80 cm de altura",
+      "propagation": {
+        "methods": [
+          "estolon"
+        ],
+        "best_method": "estolon",
+        "protocol_resumen": "Propagación 100% vegetativa por estolones (no produce semilla viable). 2-3 t/ha de material vegetativo en surcos de 0.5 m al inicio de lluvias. Establecimiento 70-100 días.",
+        "tiempo_a_establecimiento_dias": 85,
+        "notas": "Histórica forrajera del Caribe colombiano (introducida desde Sudáfrica vía Florida en años 1930-40). Hoy desplazada parcialmente por brachiarias pero persiste en fincas tradicionales por su rusticidad.",
+        "fuente": "CIAT Tropical Forages; AGROSAVIA Forrajeras; POWO Kew; Bernal 2015"
+      },
+      "companions": [],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": false,
+          "nota": "Forrajera específica de pradera."
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Forrajera tropical clásica del Caribe colombiano. Carga 2-3.5 UGG/ha. Histórica relevancia en ganadería costeña antes de la difusión de brachiarias.",
+          "tips": [
+            "Propagación 100% vegetativa por estolones",
+            "Carga: 2-3.5 UGG/ha en rotacional moderado",
+            "Descanso 28-35 días",
+            "Más rústica y resistente a sequía que brachiarias"
+          ]
+        },
+        "restauracion": {
+          "viable": false,
+          "nota": "Naturalizada; no recomendada en restauración."
+        }
+      },
+      "scale_viability": [
+        "produccion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Gramínea forrajera tropical estolonífera clásica del Caribe colombiano, introducida en los años 1930-40 desde Sudáfrica vía Florida. Propagación 100% vegetativa por estolones. Rústica y resistente a sequía. Histórica relevancia en ganadería costeña.",
+      "valor_pedagogico": "El pasto pangola (Digitaria eriantha Steud. cv. Pangola, sin. Digitaria decumbens Stent, Poaceae) es una gramínea forrajera tropical de relevancia histórica en la ganadería del Caribe colombiano, originaria de las sabanas de Sudáfrica (Provincia de Pangola, KwaZulu-Natal, de donde toma el nombre) e introducida al Neotrópico a través de Florida en los años 1930-40 por la USDA-CIAT como forrajera estolonífera para sustituir gramíneas nativas de baja productividad en las llanuras del Caribe tropical. Dominó la ganadería costeña colombiana entre los años 1940 y 1980 antes de ser parcialmente desplazada por la introducción masiva de las brachiarias (B. decumbens, B. brizantha) en los años 1970-80, pero persiste hoy en muchas fincas tradicionales del Caribe (Sucre, Córdoba, Magdalena, Cesar, La Guajira), el Magdalena Medio (Antioquia, Santander) y valles interandinos cálidos (Huila, Tolima, Valle del Cauca bajo) entre 0 y 1.200 msnm en zona térmica cálida sobre suelos bien drenados de fertilidad media. Es gramínea perenne estolonífera-decumbente de 40-80 cm de altura con estolones largos rastreros que enraízan en cada nudo, hojas lineares-lanceoladas glabras verde-medio, inflorescencia en 3-9 racimos digitados al ápice del culmo (similar a Cynodon pero con racimos más largos y delgados), semillas raramente viables (al igual que pasto estrella, la propagación natural es 99% vegetativa por estolones). Su característica agronómica distintiva es la rusticidad: tolerancia a sequía moderada (mejor que brachiarias en períodos secos prolongados del Caribe seco), tolerancia a pastoreo intensivo continuo, persistencia decadal en pradera, manejo simple sin requerimientos altos de fertilidad ni descansos largos. Produce biomasa de 12-18 t MS/ha/año con manejo moderado, soporta carga animal de 2-3.5 UGG/ha en sistemas rotacionales con descanso de 28-35 días entre pastoreos y altura de entrada al pastoreo de 30-40 cm, valor nutricional medio (PC 8-11%, DIVMS 55-62%). Su desempeño es inferior a las brachiarias y Mombasa en condiciones óptimas, pero supera a estas en condiciones marginales: sequía severa, suelos arenosos pobres, manejo mínimo. Por esa razón persiste como reserva forrajera en fincas tradicionales del Caribe colombiano donde la inversión en fertilización y manejo intensivo de brachiarias no es viable. Como las otras gramíneas estoloníferas del trópico (Cynodon nlemfuensis, C. plectostachyus), su implantación 100% vegetativa exige 2-3 t/ha de material de propagación cosechado de pradera madre, siembra en surcos de 0.5 m al inicio de las lluvias, descanso post-establecimiento 70-100 días. Es susceptible a salivazo y a Helminthosporium foliar en estaciones lluviosas. Su naturalización es menos agresiva que brachiarias o pasto estrella: los estolones expanden el potrero pero no colonizan agresivamente bosques secos o sabanas nativas, lo que lo hace relativamente aceptable en sistemas tradicionales del Caribe. Manejo agroecológico: propagación 100% vegetativa por estolones de pradera madre (2-3 t/ha), fertilización inicial mínima (150-200 kg/ha 10-30-10), descanso post-establecimiento 70-100 días, rotación con leguminosas tropicales (Stylosanthes hamata, Centrosema brasilianum, Macroptilium atropurpureum) bien adaptadas al Caribe seco-húmedo, sistemas silvopastoriles con árboles nativos del bosque seco tropical (Caesalpinia ebano, Guazuma ulmifolia, Pithecellobium dulce). Es lección histórica de la ganadería tropical colombiana: pasto sudafricano que dominó la ganadería costeña durante 40 años antes de ser desplazado por gramíneas más productivas, pero cuya rusticidad lo mantiene relevante en fincas tradicionales como recordatorio de que el \"pasto óptimo\" depende del nivel de manejo disponible, y de que la diversidad de gramíneas forrajeras en una región es seguro contra eventos climáticos extremos. Fuentes Tier A: CIAT Tropical Forages Database, AGROSAVIA Manual Forrajeras Tropicales 2022, POWO Kew, GBIF Backbone Taxonomy, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia.",
+      "source_ids": [
+        "agrosavia-forrajeras-2022",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH39_GRAMINEAS_FORRAJERAS",
+      "id": "andropogon_gayanus",
+      "nombre_comun": "Carimagua",
+      "nombre_comunes_regionales": [
+        "pasto carimagua",
+        "gamba grass",
+        "andropogon",
+        "pasto gayanus"
+      ],
+      "nombre_cientifico": "Andropogon gayanus Kunth",
+      "familia_botanica": "Poaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "biomass_producer",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1000,
+        "max_absoluto": 1500
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 32,
+        "max_tolerable": 40
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "bueno",
+      "habito": "gramínea perenne cespitosa de gran porte, 1.5-3 m de altura, macollas vigorosas",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla escarificada (reposo post-cosecha 6 meses para romper dormancia). Siembra a 5-10 kg/ha al inicio de lluvias. Establecimiento 80-120 días. Variedad principal: cv. Carimagua (CIAT-Colombia), cv. Planaltina (EMBRAPA Brasil).",
+        "tiempo_a_establecimiento_dias": 100,
+        "notas": "Variedad cv. Carimagua liberada por CIAT en estación experimental Carimagua (Meta-Vichada) en 1980. Tolerancia excepcional a suelos ácidos con alta saturación de aluminio (>80%). Pionera de la mejora de pasturas en Llanos Orientales.",
+        "fuente": "CIAT cv. Carimagua 1980; AGROSAVIA Forrajeras Tropicales; POWO Kew; Bernal 2015"
+      },
+      "companions": [],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Gramínea de gran porte (>2m), inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": false,
+          "nota": "Uso forrajero extensivo de sabana."
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Forrajera tropical clave para Llanos Orientales colombianos. Tolerancia extrema a aluminio y sequía. Carga 1.5-3 UGG/ha en sabana mejorada con manejo extensivo a semi-intensivo.",
+          "tips": [
+            "Tolerancia excepcional a Al sat >80% en suelos llaneros",
+            "Carga: 1.5-3 UGG/ha en sabana mejorada",
+            "Resistente a sequía estacional de 3-4 meses",
+            "Asociación recomendada con Stylosanthes guianensis (CIAT-184)"
+          ]
+        },
+        "restauracion": {
+          "viable": false,
+          "nota": "Naturalizada en Llanos; no recomendada en restauración de sabana nativa."
+        }
+      },
+      "scale_viability": [
+        "produccion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Gramínea forrajera tropical de gran porte clave en la mejora de pasturas de Llanos Orientales colombianos. Tolerancia extrema a aluminio y sequía. Variedad cv. Carimagua liberada por CIAT en 1980. Pionera de la ganadería sobre sabana ácida.",
+      "valor_pedagogico": "El pasto carimagua o andropogon (Andropogon gayanus Kunth, Poaceae, subfamilia Panicoideae, tribu Andropogoneae) es una gramínea forrajera tropical de gran porte y enorme importancia agronómica en los Llanos Orientales colombianos, originaria de las sabanas tropicales del África occidental (desde Senegal hasta Sudán y Etiopía) e introducida al Neotrópico por el CIAT a través de la estación experimental Carimagua (en el límite Meta-Vichada, Llanos Orientales colombianos) en los años 1970-80 como solución agronómica al desafío de las sabanas hiperácidas de la Orinoquía: suelos Oxisoles-Ultisoles con saturación de aluminio mayor a 80%, pH menor a 4.5, deficiencia crítica de P y Ca, y prolongado período seco estacional de 3-4 meses donde casi ninguna otra gramínea forrajera (ni siquiera brachiaria en sus inicios) prosperaba. La variedad cv. Carimagua fue liberada oficialmente por CIAT en 1980 a partir de germoplasma colectado por el ORSTOM-IRD francés en Burkina Faso y Mali, y a partir de ese momento permitió la transformación productiva de las sabanas naturales de los Llanos Orientales (originalmente dominadas por Trachypogon-Axonopus de bajo valor forrajero, soportando apenas 0.1-0.3 UGG/ha en régimen extensivo) a sabanas mejoradas capaces de soportar carga animal de 1.5-3 UGG/ha. Esta variedad fue homenaje a la estación experimental Carimagua y marca historia agronómica: es la primera gramínea forrajera específicamente seleccionada para sabana ácida que llegó a difundirse masivamente en Colombia, abriendo el camino para las brachiarias y Mombasa años después. En Colombia se cultiva ampliamente en los Llanos Orientales (Meta, Casanare, Vichada, Arauca), la Orinoquía baja (piedemonte llanero del Meta y Casanare), partes del Magdalena Medio y la Amazonía deforestada (Caquetá), todos entre 0 y 1.000 msnm en zona térmica cálida sobre suelos ácidos de baja fertilidad. Es gramínea perenne cespitosa de gran porte (1.5-3 m de altura) con macollas vigorosas erectas, hojas largas lineares verde-azuladas, vaina foliar con pelos basales, inflorescencia compuesta de muchos racimos pareados al ápice del culmo (caracter diagnóstico de Andropogoneae), semillas peludas con dormancia post-cosecha de 6 meses que requiere reposo o escarificación pre-siembra. Su característica agronómica distintiva es la combinación rara de tolerancia extrema a aluminio (>80% saturación), tolerancia a sequía estacional (sistema radicular profundo de 2-3 m, mecanismos de cierre estomático, latencia vegetativa en seca), persistencia en pradera decadal y compatibilidad con leguminosas tropicales adaptadas a sabana ácida (especialmente Stylosanthes guianensis cv. CIAT-184, asociación referencial liberada también por CIAT-Carimagua). Produce biomasa de 10-15 t MS/ha/año en sabana mejorada con manejo extensivo, soporta carga animal de 1.5-3 UGG/ha en sistemas rotacionales con descanso de 35-45 días entre pastoreos y altura de entrada al pastoreo de 60-80 cm, valor nutricional moderado (PC 6-9%, DIVMS 50-58%, inferior a brachiarias y Mombasa pero suficiente para ceba extensiva sobre sabana). Hoy es parcialmente desplazada por brachiaria y Mombasa en fincas con mejor manejo, pero persiste como base de la ganadería extensiva de los Llanos sobre sabana ácida no fertilizada donde brachiaria y Mombasa requieren inversión que no es viable. Susceptible a salivazo (Aeneolamia varia) aunque menos que brachiaria, y a la hormiga arriera (Atta spp.) que defolia macollas jóvenes. Su naturalización en Colombia es preocupante en ecosistemas adyacentes: en Australia es considerada invasiva agresiva (gamba grass) que desplaza eucaliptos y arbustos nativos del Top End, y aunque en Colombia la dinámica ecológica es diferente (proviene del mismo bioma sabánico), su presencia masiva en Llanos contribuye al desplazamiento de gramíneas nativas como Trachypogon spp. y Axonopus purpusii. Manejo agroecológico: propagación por semilla escarificada o con reposo de 6 meses (5-10 kg/ha al inicio de lluvias en surcos de 0.7-1.0 m, espaciamiento amplio por gran porte de la macolla), fertilización inicial mínima (150-200 kg/ha 10-30-10) o cero fertilización, descanso post-establecimiento 100-130 días, asociación con Stylosanthes guianensis cv. CIAT-184 (combinación pionera difundida por CIAT desde 1980 que duplica la carga animal del sistema), sistemas silvopastoriles con Acacia mangium, Albizia spp. y Pithecellobium dulce que potencian la productividad y captura de carbono en sabana mejorada. Es lección agroecológica fundamental de la Orinoquía colombiana: una gramínea africana cuya selección en la estación CIAT-Carimagua durante los años 1970-80 transformó la ganadería extensiva sobre sabana ácida del nivel marginal (0.1-0.3 UGG/ha) al nivel productivo (1.5-3 UGG/ha), pionera de toda la mejora forrajera tropical posterior en Colombia, pero cuyo manejo actual debe equilibrarse con la conservación de sabanas naturales remanentes y la integración con sistemas silvopastoriles. Fuentes Tier A: CIAT cv. Carimagua 1980, AGROSAVIA Manual Forrajeras Tropicales 2022, POWO Kew, GBIF Backbone Taxonomy, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia.",
+      "source_ids": [
+        "agrosavia-forrajeras-2022",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH39_GRAMINEAS_FORRAJERAS",
+      "id": "paspalum_notatum",
+      "nombre_comun": "Pasto bahía",
+      "nombre_comunes_regionales": [
+        "bahia",
+        "pasto horqueta",
+        "bahiagrass",
+        "pasto paspalum"
+      ],
+      "nombre_cientifico": "Paspalum notatum Flüggé",
+      "familia_botanica": "Poaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "ground_cover",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1800,
+        "max_absoluto": 2200
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 18,
+        "optimo_max": 28,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "gramínea perenne rizomatosa-cespitosa, 20-50 cm de altura, alfombrante",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "division_mata"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla con dormancia post-cosecha 6-12 meses (escarificación o reposo). Siembra 8-15 kg/ha al inicio de lluvias. Establecimiento lento 100-150 días por rizomas. Variedades: cv. Pensacola, cv. Argentine, ecotipos nativos colombianos.",
+        "tiempo_a_establecimiento_dias": 120,
+        "notas": "Nativa neotropical (incluye Colombia natural). Pasto rústico tolerante a pisoteo, defoliación intensa y suelos ácidos. Usada como cobertura permanente en fincas frutícolas y cafetales del trópico medio.",
+        "fuente": "CIAT Tropical Forages; POWO Kew; Bernal 2015; GBIF"
+      },
+      "companions": [],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Cobertura permanente entre frutales o cultivos perennes. Tolera pisoteo y mantenimiento mínimo."
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "No es especie de invernadero."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Forrajera nativa neotropical apropiada para ganadería extensiva-semi-intensiva en trópico medio. Carga 1.5-3 UGG/ha. Excelente como cobertura permanente en frutales y cafetales.",
+          "tips": [
+            "Nativa neotropical (incluye ecotipos colombianos)",
+            "Carga: 1.5-3 UGG/ha en rotacional moderado",
+            "Tolerancia a pisoteo y defoliación intensa",
+            "Excelente cobertura permanente en sistemas frutícolas"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Apta para cobertura inicial en restauración productiva por su carácter nativo, aunque hay ecotipos cultivados de origen extranjero."
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Gramínea forrajera nativa neotropical rizomatosa, alfombrante, tolerante a pisoteo y defoliación intensa. Apropiada para ganadería extensiva-semi-intensiva en trópico medio y como cobertura permanente en sistemas frutícolas/cafetaleros. Incluye ecotipos colombianos.",
+      "valor_pedagogico": "El pasto bahía o pasto horqueta (Paspalum notatum Flüggé, Poaceae, subfamilia Panicoideae, tribu Paspaleae) es una de las gramíneas forrajeras nativas neotropicales más importantes y, a diferencia de la mayoría de las forrajeras tropicales comerciales que son africanas naturalizadas (brachiaria, Mombasa, estrella, pangola, carimagua), es genuinamente americana: distribución natural desde el sureste de Estados Unidos (Florida, Texas) hasta Argentina y Uruguay, con presencia natural en Colombia documentada por SIB Colombia y herbarios nacionales en regiones de bosque tropical seco, premontano y de galería entre 0 y 1.800 msnm. Es la única gramínea forrajera de uso comercial relevante en Colombia que es nativa, hecho de enorme importancia para sistemas agroecológicos y de restauración productiva que buscan minimizar la introducción de exóticas. En Colombia se distribuye naturalmente y se cultiva en el Caribe (Sucre, Córdoba, Bolívar, Magdalena, Cesar), Magdalena Medio (Antioquia, Santander), valles interandinos (Huila, Tolima, valle del Cauca), piedemonte llanero (Meta, Casanare), Pacífico (Valle, Chocó bajo), y zonas premontanas del eje cafetero (Caldas, Quindío, Risaralda) entre 0 y 1.800 msnm en zona térmica cálida y templada baja. Existen variedades comerciales liberadas en Estados Unidos (cv. Pensacola, cv. Argentine, cv. Tifton-9) sembradas también en Colombia, y ecotipos nativos colombianos de uso local en fincas tradicionales. Es gramínea perenne rizomatosa-cespitosa de 20-50 cm de altura con rizomas cortos superficiales que forman macollas densas, hojas lineares glabras verde-medio, inflorescencia característica en 2-3 (rara vez 4) racimos divergentes al ápice del culmo en forma de horqueta (de ahí su nombre común \"pasto horqueta\" en Colombia), espiguillas pequeñas en pares sobre los racimos. Su característica agronómica distintiva es la rusticidad y persistencia: tolerancia a pisoteo intensivo y defoliación severa por su sistema rizomatoso, tolerancia moderada a sequía estacional, tolerancia a suelos ácidos de baja fertilidad (aunque menos extrema que brachiaria o carimagua), tolerancia a inundación temporal, mantenimiento mínimo, persistencia decadal en pradera. Produce biomasa de 8-12 t MS/ha/año (inferior a brachiaria y Mombasa, en línea con pangola y carimagua), soporta carga animal de 1.5-3 UGG/ha en sistemas rotacionales moderados con descanso de 25-35 días entre pastoreos y altura de entrada de 20-30 cm, valor nutricional medio (PC 8-11%, DIVMS 52-60%). Su productividad inferior a brachiaria-Mombasa se compensa con su carácter nativo (no requiere preocupación por naturalización agresiva ni desplazamiento de flora local), su excelente función como cobertura permanente en sistemas multi-estrato (cafetales, cacaotales, frutales tropicales, plantaciones de aguacate, cítricos), y su uso en restauración productiva como cobertura inicial en degradadas pasturas africanas para \"limpiar\" suelos antes de la introducción de árboles nativos. Es susceptible a salivazo (Aeneolamia spp.) en pradera pura, aunque su porte bajo y rizomas le confieren mejor recuperación post-ataque que gramíneas cespitosas. Manejo agroecológico: propagación por semilla escarificada o con reposo de 6-12 meses (8-15 kg/ha al inicio de lluvias en surcos de 0.3-0.5 m o al voleo en cobertura), fertilización mínima (sin necesidad de fertilización si el suelo tiene fertilidad media), descanso post-establecimiento 100-130 días por establecimiento lento vía rizomas, asociación con leguminosas tropicales rastreras nativas (Arachis pintoi en zonas más frescas, Centrosema spp. y Stylosanthes spp. en cálidos), sistemas silvopastoriles con árboles nativos del bosque tropical seco y bosque premontano (Tabebuia, Caesalpinia, Cordia, Pithecellobium, Erythrina, Albizia), uso como cobertura permanente en cafetales (callejones entre surcos de café), cacaotales y frutales tropicales donde su carácter alfombrante y tolerancia a pisoteo permite manejo de podas y cosechas sin daño. Es lección agroecológica fundamental: gramínea forrajera nativa neotropical demostrando que la flora americana tiene en su propio patrimonio botánico opciones productivas robustas que no requieren introducir exóticas naturalizadas con costo ecológico, y que en sistemas agroecológicos integrados con sombrío arbóreo nativo y leguminosas, una \"forrajera nativa de menor productividad puntual\" puede ser superior en términos de sostenibilidad sistémica a una \"forrajera exótica de alta productividad\" que naturaliza y degrada. Fuentes Tier A: CIAT Tropical Forages Database, POWO Kew, GBIF Backbone Taxonomy, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, SIB Colombia.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "agrosavia-forrajeras-2022"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH39_GRAMINEAS_FORRAJERAS",
+      "id": "melinis_minutiflora",
+      "nombre_comun": "Pasto gordura",
+      "nombre_comunes_regionales": [
+        "gordura",
+        "pasto melao",
+        "molasses grass",
+        "pasto chilenito"
+      ],
+      "nombre_cientifico": "Melinis minutiflora P.Beauv.",
+      "familia_botanica": "Poaceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "invasive",
+        "ground_cover"
+      ],
+      "cultivable": false,
+      "conservation_status": "invasor",
+      "altitud_msnm": {
+        "min_absoluto": 500,
+        "optimo_min": 800,
+        "optimo_max": 1800,
+        "max_absoluto": 2400
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 18,
+        "optimo_max": 26,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "gramínea perenne cespitosa-decumbente, 60-100 cm de altura, hojas pegajosas aromáticas",
+      "origen": "África tropical y subtropical; introducida en Brasil siglo XIX como forrajera y de allí difundida a Colombia",
+      "clasificacion_uicn": "Listada en ISSG/GISD Global Invasive Species Database; IAvH-Humboldt la cataloga como naturalizada de alto riesgo invasor en bosque seco tropical colombiano, bosque sub-andino y matorrales xerofíticos",
+      "normativa_colombiana": "Resolución 684/2018 MADS la incluye en lineamientos de control en áreas de restauración del bosque seco tropical; IAvH-Humboldt la considera prioridad de manejo en BST y bosque sub-andino. Su siembra deliberada en áreas protegidas, zonas de amortiguamiento de PNN y áreas de restauración está desaconsejada técnicamente.",
+      "impacto_ecologico": "Forma masas densas que alteran el régimen de fuego en bosque seco tropical y matorrales xerofíticos colombianos: las hojas pegajosas-aromáticas son altamente inflamables y aumentan la intensidad y frecuencia de incendios estacionales, eliminando regeneración de árboles nativos del BST (Tabebuia, Caesalpinia, Bursera, Cordia, Pithecellobium) y favoreciendo sucesión hacia pradera dominada por la propia M. minutiflora; en bosque sub-andino del piedemonte (1.000-2.000 msnm) compite con sotobosque nativo y desplaza Calamagrostis, Festuca y otras gramíneas autóctonas; tras incendios el rebrote por estolones es masivo, generando bucle de retroalimentación fuego-invasión que es uno de los principales motores de degradación del BST y del piedemonte tropical en Colombia.",
+      "ecosistemas_afectados": [
+        "bosque_seco_tropical",
+        "bosque_subandino",
+        "matorrales_xerofiticos"
+      ],
+      "mecanismos_invasion": [
+        "Hojas pegajosas-aromáticas altamente inflamables que aumentan intensidad y frecuencia de incendios",
+        "Bucle de retroalimentación fuego-invasión: el fuego favorece M. minutiflora que aumenta combustible",
+        "Estolones que rebrotan masivamente post-fuego antes que árboles nativos",
+        "Semillas anemocoras que se dispersan por viento hasta cientos de metros",
+        "Tolerancia a sequía severa que le da ventaja en BST estacional",
+        "Compite con Calamagrostis effusa y otras gramíneas nativas en bosque sub-andino"
+      ],
+      "metodos_extraccion": [
+        {
+          "metodo": "desenraice_manual_repetido",
+          "efectividad": "media",
+          "costo": "alto",
+          "notas": "Requiere extraer mata completa con sistema radicular; rebrote post-fuego es masivo."
+        },
+        {
+          "metodo": "fuego_controlado_invertido",
+          "efectividad": "baja",
+          "costo": "medio",
+          "notas": "NO recomendado: el fuego favorece a M. minutiflora frente a nativas. Evitar como método de control."
+        },
+        {
+          "metodo": "restauracion_con_sombra_arborea",
+          "efectividad": "alta",
+          "costo": "alto",
+          "notas": "Plantación densa de árboles nativos del BST (Tabebuia, Caesalpinia, Pithecellobium, Cordia) que cierran dosel y suprimen el pasto por sombreo; método de largo plazo (5-10 años)."
+        }
+      ],
+      "epoca_optima_remocion": "Temporada lluviosa al inicio del rebrote, antes de floración",
+      "especies_nativas_sustitutas": [
+        "paspalum_notatum"
+      ],
+      "manejo_biomasa_extraida": "compostaje termófilo >60°C por >3 semanas para destruir semillas; NUNCA quemar in situ (favorece a la especie)",
+      "riesgo_rebrote": "muy alto — la combinación de rebrote vegetativo post-fuego, banco de semillas en suelo y dispersión anemocora genera recolonización rápida si no se restaura con dosel arbóreo nativo cerrado",
+      "protocolo_post_remocion": "Restauración activa con plantación densa de árboles nativos del bosque seco tropical (Tabebuia rosea, Caesalpinia ebano, Pithecellobium dulce, Cordia gerascanthus, Bursera simarouba) a 400-600 ind/ha al inicio de la temporada lluviosa siguiente; mulching grueso con biomasa nativa por 12-18 meses para suprimir banco de semillas; monitoreo trimestral durante 3-5 años con eliminación manual inmediata de cualquier rebrote o plántula; reporte al SIB Colombia e IAvH-Humboldt con coordenadas y área tratada; NO usar fuego como herramienta de manejo (favorece a la especie).",
+      "altitud_msnm_validation": "cubre BST (500-1.000), bosque sub-andino (1.000-1.800) y borde de bosque alto andino (1.800-2.400)",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "estolon"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Naturalizada agresiva — su siembra deliberada como forrajera está desaconsejada técnicamente en Colombia por riesgo invasor. Propagación natural por semilla anemocora y rebrote estolonífero post-fuego.",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "En los años 1950-70 se promovió como forrajera de altura por su aroma a melao y buen valor nutricional aparente; hoy su naturalización en BST, bosque sub-andino y matorrales xerofíticos colombianos la convierte en una de las invasoras más problemáticas del país.",
+        "fuente": "IAvH-Humboldt Invasoras Andes; ISSG/UICN Invasoras; POWO Kew; MADS Res 684/2018"
+      },
+      "companions": [],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Especie invasora prohibida de cultivo."
+        },
+        "huerto_casero": {
+          "viable": false,
+          "nota": "Especie invasora — su siembra deliberada está desaconsejada."
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable."
+        },
+        "produccion": {
+          "viable": false,
+          "nota": "Especie invasora — no apta para sistemas productivos. Su uso histórico como forrajera está superado por brachiaria y otras gramíneas no invasoras."
+        },
+        "restauracion": {
+          "viable": false,
+          "nota": "Especie objetivo de control activo en restauración de bosque seco tropical y bosque sub-andino."
+        }
+      },
+      "scale_viability": [],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Gramínea africana invasora de altísimo impacto en bosque seco tropical (BST), bosque sub-andino y matorrales xerofíticos colombianos. Modifica régimen de fuego: hojas pegajosas-aromáticas altamente inflamables generan bucle de retroalimentación fuego-invasión que degrada ecosistemas. Listada IAvH-Humboldt como prioridad de manejo.",
+      "valor_pedagogico": "El pasto gordura o melao (Melinis minutiflora P.Beauv., Poaceae, subfamilia Panicoideae, tribu Paniceae) es una de las gramíneas invasoras más problemáticas del Neotrópico y, en Colombia, uno de los principales motores de degradación del bosque seco tropical (BST, ecosistema en categoría crítica nacional con apenas 8% de cobertura remanente) y del bosque sub-andino del piedemonte tropical. Originaria del África tropical y subtropical (desde Etiopía y Tanzania hasta Sudáfrica), fue introducida a Brasil en el siglo XIX como forrajera prometedora por su aroma característico a melao (de ahí el nombre común \"molasses grass\") y su buen palatabilidad aparente para ganado, y de allí difundida a Colombia y otros países latinoamericanos durante el siglo XX, particularmente promovida entre 1950 y 1970 como \"forrajera de altura\" para zonas templadas y sub-cálidas donde las brachiarias del piso cálido aún no llegaban. Hoy se ha naturalizado agresivamente en gran parte del territorio nacional entre 500 y 2.400 msnm en zona térmica cálida y templada, con presencia masiva e invasora en bosque seco tropical (Caribe seco-húmedo, valles interandinos del Magdalena, Cauca, Patía), bosque sub-andino del piedemonte (Antioquia, Cundinamarca, Boyacá, Tolima, Huila, Santander, Valle del Cauca), matorrales xerofíticos (La Guajira, Tatacoa, alta Boyacá) y bordes del bosque alto-andino en algunas regiones del eje cafetero. Es gramínea perenne cespitosa-decumbente de 60-100 cm de altura con macollas medianas, hojas lineares-lanceoladas con pubescencia glandular pegajosa que produce el aroma característico a melao-canela (de ahí \"pasto gordura\": las hojas se sienten pegajosas-grasosas al tacto), inflorescencia en panícula amplia con espiguillas pequeñas vellosas, semillas pequeñas con pelos largos sedosos (caracter diagnóstico) que se dispersan por viento (anemocoria) a distancias de cientos de metros, propagación también por estolones rastreros post-disturbio. Su característica ecológica más perversa y diferenciadora de otras invasoras es la modificación del régimen de fuego en los ecosistemas que invade: las hojas pegajosas contienen aceites volátiles aromáticos (compuestos terpénicos) altamente inflamables que aumentan dramáticamente la intensidad, velocidad de propagación y frecuencia de los incendios estacionales en BST y bosque sub-andino, donde los árboles nativos (Tabebuia rosea, Caesalpinia ebano, Pithecellobium dulce, Bursera simarouba, Cordia gerascanthus, Albizia spp.) no están adaptados a regímenes de fuego intenso y son eliminados, mientras M. minutiflora rebrota masivamente desde sus estolones y banco de semillas post-fuego antes que las nativas, estableciéndose como dominante en pradera invadida. Este bucle de retroalimentación fuego-invasión convierte progresivamente bosque seco tropical en sabana monoespecífica dominada por M. minutiflora, fenómeno documentado por IAvH-Humboldt como uno de los principales motores de degradación del BST en Colombia (junto con la deforestación directa para ganadería) y por el cual la especie está listada como naturalizada de alto riesgo invasor en bases de datos como ISSG/GISD (Global Invasive Species Database) e IAvH-Humboldt Invasoras Andes. La Resolución 684/2018 del MADS la incluye en lineamientos de control en áreas de restauración del BST, y su siembra deliberada en áreas protegidas, zonas de amortiguamiento de PNN y áreas de restauración está desaconsejada técnicamente. Métodos de control: el desenraice manual repetido es efectivo en parches pequeños pero requiere extraer mata completa con sistema radicular; el fuego controlado NO se recomienda como método de control porque favorece a la propia especie sobre las nativas (error frecuente de quienes intentan \"limpiar\" el pasto con fuego); el método de mayor efectividad a largo plazo es la restauración activa con plantación densa de árboles nativos del BST que cierran dosel y suprimen el pasto por sombreo, complementado con mulching grueso y monitoreo trimestral durante 3-5 años. Es lección ecológica fundamental de la invasión biológica neotropical: una gramínea africana introducida con buenas intenciones forrajeras hace siglo y medio se ha convertido en uno de los principales motores de degradación del bosque seco tropical colombiano, ecosistema en categoría crítica nacional, demostrando que la introducción de especies exóticas para fines productivos puede tener costos ecológicos de larga duración que superan ampliamente sus beneficios iniciales. Su control y la restauración del BST invadido es prioridad nacional de conservación ambiental. Fuentes Tier A: IAvH-Humboldt Invasoras Andes, ISSG/UICN Global Invasive Species Database, POWO Kew, GBIF Backbone Taxonomy, MADS Resolución 684/2018, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia.",
+      "source_ids": [
+        "humboldt-invasoras-andes",
+        "issg-uicn-invasoras",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "res-684-2018-mads",
+        "bernal-2015-plantas-liquenes-colombia"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH39_GRAMINEAS_FORRAJERAS",
+      "id": "setaria_sphacelata",
+      "nombre_comun": "Setaria",
+      "nombre_comunes_regionales": [
+        "pasto setaria",
+        "kazungula",
+        "setaria africana",
+        "pasto miel"
+      ],
+      "nombre_cientifico": "Setaria sphacelata (Schumach.) Stapf & C.E.Hubb. ex M.B.Moss",
+      "familia_botanica": "Poaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "biomass_producer",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 14,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "gramínea perenne cespitosa, 0.8-2 m de altura, macollas vigorosas",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "division_mata"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla con dormancia moderada (escarificación o reposo 3-6 meses). Siembra 6-12 kg/ha al inicio de lluvias. Establecimiento 80-120 días. Variedades comerciales: cv. Kazungula (Sudáfrica), cv. Nandi (Kenia), cv. Narok.",
+        "tiempo_a_establecimiento_dias": 100,
+        "notas": "Forrajera clave para ganadería de clima templado-frío en Colombia (Boyacá, Cundinamarca, Nariño, Antioquia altoandina). Mejor adaptada a 1.800-2.800 msnm que las brachiarias. Contiene oxalatos solubles — vigilar consumo en bovinos.",
+        "fuente": "AGROSAVIA Forrajeras; CIAT Tropical Forages; POWO Kew; Bernal 2015"
+      },
+      "companions": [],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": false,
+          "nota": "Forrajera específica de pradera."
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Forrajera tropical-templada para ganadería andina (Boyacá, Cundinamarca, Nariño, Antioquia altoandina, eje cafetero alto). Carga 2-4 UGG/ha. Alternativa a kikuyo (Cenchrus clandestinus) en sistemas que evitan invasoras de páramo.",
+          "tips": [
+            "Mejor adaptada que brachiaria a 1.800-2.800 msnm",
+            "Carga: 2-4 UGG/ha en rotacional moderado-intensivo",
+            "Descanso 28-35 días",
+            "Contiene oxalatos — limitar consumo en bovinos a <70% de la ración"
+          ]
+        },
+        "restauracion": {
+          "viable": false,
+          "nota": "Naturalizada; no recomendada en restauración de páramo o bosque alto-andino."
+        }
+      },
+      "scale_viability": [
+        "produccion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Gramínea forrajera tropical-templada adaptada a 1.800-2.800 msnm en clima templado-frío colombiano. Alternativa a kikuyo (Cenchrus clandestinus) que evita invasiones de páramo. Variedades cv. Kazungula y cv. Narok difundidas en altiplano cundiboyacense.",
+      "valor_pedagogico": "La setaria (Setaria sphacelata (Schumach.) Stapf & C.E.Hubb. ex M.B.Moss, Poaceae, subfamilia Panicoideae) es una gramínea forrajera tropical-templada de gran importancia en la ganadería de clima frío y templado-alto en Colombia, originaria de las montañas del África oriental (Kenia, Uganda, Tanzania, Etiopía, Rwanda, Burundi, donde se encuentra entre 1.500 y 3.000 msnm) e introducida al Neotrópico durante el siglo XX como alternativa forrajera para las zonas altoandinas donde las brachiarias y otras gramíneas tropicales del piso cálido no prosperan por las bajas temperaturas. Es una de las pocas gramíneas forrajeras comerciales adaptadas a la franja altitudinal de 1.800-2.800 msnm, lo que la convierte en candidata estratégica para ganadería en Boyacá, Cundinamarca, Nariño, Antioquia altoandina, eje cafetero alto (Caldas, Quindío, Risaralda), Cauca alto y Santander altoandino — todas regiones donde la ganadería de leche y doble propósito domina y donde la otra gramínea ampliamente sembrada, el kikuyo (Cenchrus clandestinus), tiene el problema crítico de ser invasora de páramo y subpáramo según la Ley 1930/2018. La setaria ofrece así una alternativa importante: gramínea africana también, pero menos agresiva ecológicamente en zonas de páramo y mejor adaptada a manejo intensivo de leche en altiplano. En Colombia se cultiva ampliamente en el altiplano cundiboyacense (Boyacá, Cundinamarca), Nariño altoandino, eje cafetero alto (cinturón cafetalero >1.500 msnm), valles interandinos altos (Quimbaya, Sumapaz, Tota) entre 1.800 y 2.800 msnm en zona térmica templada y fría. Las variedades comerciales más difundidas son cv. Kazungula (Sudáfrica, mayor porte y resistencia a defoliación), cv. Nandi (Kenia, finer leaf, mejor valor nutricional), cv. Narok (Kenia, mayor tolerancia a frío). Es gramínea perenne cespitosa de macollas vigorosas erectas que alcanza 0.8-2 m de altura con hojas lineares-lanceoladas verde-azuladas, inflorescencia en panícula contraída cilíndrica con pelos amarillo-anaranjados (aspecto de \"cepillo\" característico que diagnostica el género Setaria), semillas pequeñas con dormancia moderada de 3-6 meses. Produce biomasa de 12-20 t MS/ha/año con buen manejo, soporta carga animal de 2-4 UGG/ha en sistemas rotacionales con descanso de 28-35 días entre pastoreos y altura de entrada al pastoreo de 50-70 cm, valor nutricional medio-alto (PC 10-14%, DIVMS 60-68%) competitivo con kikuyo y superior a brachiaria. Su limitación principal es la presencia de oxalatos solubles en hoja joven que pueden causar problemas en bovinos: el oxalato se une al calcio del torrente sanguíneo formando cristales que pueden generar hipocalcemia y daño renal si el consumo es alto y exclusivo; por esa razón se recomienda limitar la dieta a menos del 70% de setaria y complementar con leguminosas y otras gramíneas, especialmente en vacas lecheras de alta producción. Susceptible a roya foliar (Puccinia spp.) en estaciones lluviosas y a salivazo (Aeneolamia spp.) menos que brachiarias. Su naturalización en Colombia es menos agresiva que kikuyo: no invade páramo activamente (aunque puede colonizar pastizales sub-andinos disturbados), por lo cual desde el punto de vista de conservación de páramo y delimitación de áreas protegidas según Ley 1930/2018, la setaria es una alternativa más segura que el kikuyo para ganadería en cotas 1.800-2.800 msnm. Manejo agroecológico: propagación por semilla escarificada o con reposo de 3-6 meses (6-12 kg/ha al inicio de lluvias en surcos de 0.5 m), fertilización inicial moderada (300-400 kg/ha 10-30-10 más cal en suelos ácidos), descanso post-establecimiento 90-120 días, rotación con tréboles (Trifolium repens, T. pratense) y otras leguminosas templadas (Lotus uliginosus, Medicago sativa en altiplano) para mejorar nutrición animal y diluir oxalatos, sistemas silvopastoriles con árboles altoandinos nativos (Alnus acuminata, Acaena cylindristachya, Hesperomeles, Vallea stipularis, Weinmannia) que mejoran captura de carbono y protegen el pasto del viento y heladas. Es lección agroecológica de la ganadería altoandina: una gramínea africana de altura naturalizada que en regiones de páramo y sub-páramo colombianos representa la alternativa más limpia ecológicamente al kikuyo invasor, demostrando que dentro de las gramíneas exóticas también hay gradientes de impacto ecológico que el ganadero responsable debe conocer y elegir conscientemente. Fuentes Tier A: AGROSAVIA Manual Forrajeras Tropicales 2022, CIAT Tropical Forages Database, POWO Kew, GBIF Backbone Taxonomy, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia.",
+      "source_ids": [
+        "agrosavia-forrajeras-2022",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH39_GRAMINEAS_FORRAJERAS",
+      "id": "axonopus_compressus",
+      "nombre_comun": "Pasto carpet",
+      "nombre_comunes_regionales": [
+        "carpet grass",
+        "pasto alfombra",
+        "pasto axonopus",
+        "maicillo",
+        "pasto chigüiro"
+      ],
+      "nombre_cientifico": "Axonopus compressus (Sw.) P.Beauv.",
+      "familia_botanica": "Poaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "ground_cover",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1800,
+        "max_absoluto": 2200
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 35
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno_a_moderado",
+      "habito": "gramínea perenne estolonífera rastrera alfombrante, 10-30 cm de altura",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "estolon"
+        ],
+        "best_method": "estolon",
+        "protocol_resumen": "Propagación principal por estolones (semilla viable pero germinación lenta). 1-2 t/ha de material vegetativo o 4-8 kg/ha de semilla al inicio de lluvias. Establecimiento 70-100 días por crecimiento estolonífero.",
+        "tiempo_a_establecimiento_dias": 85,
+        "notas": "Nativa neotropical (incluye Colombia natural). Tolerancia notable a sombra parcial y alta humedad. Excelente cobertura permanente en sotobosque de cafetales, cacaotales y plantaciones de plátano/banano en piso medio.",
+        "fuente": "CIAT Tropical Forages; POWO Kew; Bernal 2015; GBIF; SIB Colombia"
+      },
+      "companions": [],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Cobertura permanente entre frutales, especialmente en sombra parcial y alta humedad. Tolera pisoteo moderado."
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "No es especie de invernadero."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Forrajera nativa neotropical para sistemas silvopastoriles húmedos. Cobertura permanente excelente en cafetales, cacaotales y plataneras. Carga 1-2.5 UGG/ha en sistemas extensivos.",
+          "tips": [
+            "Nativa neotropical — apta para sistemas de bajo impacto",
+            "Tolerancia única a sombra parcial entre gramíneas forrajeras",
+            "Excelente cobertura en cafetales, cacaotales, plataneras",
+            "Carga modesta 1-2.5 UGG/ha — no compite con brachiaria en pradera abierta"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Cobertura nativa apta para restauración inicial en zonas húmedas y sombrías; tolera sotobosque en regeneración."
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Gramínea forrajera nativa neotropical estolonífera rastrera, única entre forrajeras comerciales por su tolerancia a sombra parcial y alta humedad. Excelente cobertura permanente en cafetales, cacaotales y plataneras. Apropiada para restauración productiva en zonas húmedas.",
+      "valor_pedagogico": "El pasto carpet o pasto alfombra (Axonopus compressus (Sw.) P.Beauv., Poaceae, subfamilia Panicoideae, tribu Paspaleae) es una gramínea forrajera nativa neotropical de gran importancia en sistemas silvopastoriles húmedos y como cobertura permanente en cultivos perennes de sombra (cafetales, cacaotales, plataneras, frutales tropicales), originaria de toda la América tropical desde México hasta Argentina y con presencia natural ampliamente documentada en Colombia por SIB Colombia y herbarios nacionales en regiones de bosque húmedo tropical, bosque premontano, bosque sub-andino y borde de bosque alto-andino entre 0 y 1.800 (excepcionalmente 2.200) msnm. Junto con Paspalum notatum (también nativo), es de las pocas gramíneas forrajeras de uso relevante en Colombia que son genuinamente americanas y no introducidas africanas — hecho de gran valor agroecológico para sistemas que priorizan la conservación de flora nativa y la reducción de naturalización de exóticas. En Colombia se distribuye naturalmente y se cultiva en el Pacífico húmedo (Chocó, Valle, Cauca, Nariño), Caribe húmedo (Magdalena, Atlántico, Bolívar bajo), Magdalena Medio (Antioquia, Santander), Amazonía (Caquetá, Putumayo, Amazonas), valles interandinos húmedos (Huila bajo, Valle del Cauca medio), piedemonte andino-amazónico, eje cafetero (Caldas, Quindío, Risaralda) y valles húmedos del piedemonte llanero, todos en zona térmica cálida y templada baja entre 0 y 1.800 msnm. Es gramínea perenne estolonífera rastrera alfombrante de bajo porte (10-30 cm de altura) con estolones cortos que enraízan en cada nudo, hojas linear-lanceoladas anchas verde-medio glabras o con pelos finos en los bordes, vaina foliar comprimida lateralmente (carácter diagnóstico del género Axonopus, \"axon-opus\" = \"eje en pie\"), inflorescencia en 2-4 racimos digitados al ápice del culmo (similar a Paspalum pero más delgados), espiguillas pequeñas en hilera única, semillas viables aunque la propagación principal es vegetativa por estolones. Su característica agronómica única entre forrajeras comerciales es la tolerancia notable a sombra parcial (50-70% de sombra) y a alta humedad relativa (>80% durante meses), atributos que la convierten en la mejor opción de cobertura permanente en sotobosques productivos: cafetales con sombra de Inga, Erythrina, Cordia, Albizia, Cedrela; cacaotales con sombra de Cordia alliodora, Erythrina, Gliricidia; plataneras y bananeras con sombra parcial; frutales tropicales bajo dosel parcial; sistemas silvopastoriles densamente arbolados. En ese rol, A. compressus mantiene cobertura del suelo, controla erosión en pendientes húmedas, suprime malezas heliófilas, capta y devuelve materia orgánica al suelo, y aporta forraje complementario al ganado en sistemas silvopastoriles que cosechan también frutos o aromáticas en estrato superior. Produce biomasa de 6-10 t MS/ha/año (modesta, inferior a brachiaria y kikuyo, en línea con paspalum), soporta carga animal de 1-2.5 UGG/ha en sistemas extensivos rotacionales con descanso de 30-45 días entre pastoreos y altura de entrada al pastoreo de 15-20 cm, valor nutricional medio (PC 8-11%, DIVMS 55-62%). Su productividad inferior a las gramíneas comerciales de sol pleno se compensa con: (1) carácter nativo (no requiere preocupación por naturalización agresiva), (2) tolerancia única a sombra parcial entre forrajeras comerciales, (3) excelente función ecosistémica como cobertura permanente en sistemas multi-estrato, (4) compatibilidad con sotobosque en restauración productiva. Es susceptible a salivazo (Aeneolamia spp.) menos que brachiaria, y a complejos foliares Bipolaris-Curvularia en humedad extrema sostenida. Manejo agroecológico: propagación principal por estolones cosechados de pradera madre (1-2 t/ha en surcos amplios al inicio de lluvias) o por semilla (4-8 kg/ha, germinación lenta), fertilización inicial mínima (sin requerimiento alto, especialmente bajo dosel arbóreo donde el ciclaje de nutrientes vía hojarasca aporta lo necesario), descanso post-establecimiento 80-110 días, asociación con leguminosas rastreras nativas (Desmodium spp., Centrosema brasilianum), sistemas silvopastoriles densamente arbolados con especies nativas del bosque tropical húmedo y premontano (Inga edulis, Erythrina poeppigiana, Cordia alliodora, Albizia spp., Cedrela odorata, Caryocar amygdaliferum), uso como cobertura permanente en cafetales (callejones entre cafetos), cacaotales (sotobosque productivo) y plataneras (cobertura entre matas) donde su carácter alfombrante y tolerancia a pisoteo permite manejo cotidiano sin daño. Es lección agroecológica fundamental: una gramínea forrajera nativa neotropical que demuestra cómo la flora americana tiene en su propio patrimonio botánico opciones productivas adaptadas a nichos específicos (sombra parcial, alta humedad) que las gramíneas africanas no llenan, y cómo los sistemas silvopastoriles multi-estrato con dosel arbóreo nativo + pasto carpet nativo + leguminosas nativas pueden producir alimento, fibra, madera, frutos y servicios ecosistémicos simultáneamente sin recurrir a exóticas naturalizadas. Fuentes Tier A: CIAT Tropical Forages Database, POWO Kew, GBIF Backbone Taxonomy, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, SIB Colombia.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "agrosavia-forrajeras-2022"
+      ]
     }
   ],
   "biopreparados": [
