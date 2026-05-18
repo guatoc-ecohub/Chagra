@@ -10864,6 +10864,401 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El chacate, pucho o escalonia (Escallonia paniculata (Ruiz & Pav.) Schult., Escalloniaceae) es un árbol o arbusto andino nativo (3-8 m altura) propio del bosque alto-andino y bordes de páramo colombiano entre 2.500 y 3.200 msnm (Cundinamarca: Cruz Verde, Sumapaz, Chingaza, Verjón; Boyacá: páramo de Pisba, Iguaque; Santander: páramo de Berlín; Nariño y Cauca: páramos del macizo colombiano). Hojas pequeñas brillantes, panículas blanco-rosadas que atraen colibríes y abejas nativas, frutos en cápsula que dispersan aves. Es una lección viva de restauración ecológica y soberanía botánica que enseña a niñas y niños por qué las especies nativas son la mejor cerca viva del altoandino: a diferencia del retamo espinoso (Ulex europaeus) y del retamo liso (Genista monspessulana), invasoras introducidas que se vuelven plaga y desplazan flora nativa de páramo, el chacate cumple las mismas funciones de cercar potreros, frenar viento y marcar linderos pero conviviendo con la flora nativa, alimentando avifauna local y generando hojarasca compatible con los suelos andinos. Por eso aparece como sustituta documentada en planes de restauración ecológica de los páramos Cruz Verde-Sumapaz (IAvH + CAR Cundinamarca 2018), donde se siembra en bordes de fragmento de bosque y zonas de transición para acelerar la sucesión vegetal y bloquear el avance del retamo. Manejo agroecológico: propagación por semilla recolectada de frutos maduros, vivero 6-8 meses antes del trasplante en lluvias, distancia 1-2 m en cerca viva, tolerancia a podas, función ecológica como planta niñera (nurse plant) que da sombra a especies de sucesión tardía. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015 Catálogo Plantas y Líquenes de Colombia, IAvH Flora Alto Andina, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "tibouchina_lepidota",
+      "nombre_comun": "Siete cueros",
+      "nombre_comunes_regionales": [
+        "sietecueros",
+        "siete cueros real",
+        "flor de mayo andino"
+      ],
+      "nombre_cientifico": "Tibouchina lepidota (Bonpl.) Baill.",
+      "familia_botanica": "Melastomataceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 3000,
+        "max_absoluto": 3400
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "jbb-plantas-medicinales",
+        "restauracion-cruz-verde-sumapaz",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "El siete cueros (Tibouchina lepidota (Bonpl.) Baill., Melastomataceae) es un arbolito o arbusto andino nativo (4-12 m altura) emblemático del bosque alto-andino colombiano entre 2.200 y 3.000 msnm, propio de Cundinamarca (cerros orientales de Bogotá, Cruz Verde, Sumapaz, Chingaza, Verjón), Boyacá (Iguaque, Pisba), Antioquia (San Félix, Belmira), Tolima, Caldas y Nariño. Su nombre alude a las siete capas de corteza papirácea que se desprenden con la edad. Hojas elípticas de nervadura paralela característica (3-5 nervios convergentes), flores grandes (5-8 cm) púrpura-violeta intenso que florecen en panículas terminales casi todo el año, atrayendo abejorros nativos (Bombus rubicundus, B. funebris), abejas sin aguijón y avispas polinizadoras. Es lección viva de restauración ecológica y soberanía botánica que enseña a niñas y niños por qué las especies nativas son la mejor estrategia para revegetar laderas degradadas del altoandino: a diferencia del eucalipto (Eucalyptus globulus) y pino pátula (Pinus patula), introducidas que acidifican y desecan suelos de páramo, el siete cueros estabiliza taludes con su raíz pivotante, alimenta polinizadores nativos, genera hojarasca compatible con los hongos micorrízicos andinos y sucesionaliza bosque secundario. Por eso aparece como especie prioritaria en planes de restauración ecológica de los páramos Cruz Verde-Sumapaz (IAvH + CAR Cundinamarca 2018) y en los corredores de conservación del Distrito Capital. Manejo agroecológico: propagación por semilla (germinación 30-60 días, requiere luz) o esqueje semileñoso bajo cámara húmeda, vivero 8-12 meses antes de trasplante en lluvias (abril-mayo, octubre-noviembre), distancia 3-5 m, tolera podas formativas, función ecológica como planta niñera (nurse plant) que protege plántulas de sucesión tardía y como árbol melífero clave. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015 Catálogo Plantas y Líquenes de Colombia, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "chuquiraga_jussieui",
+      "nombre_comun": "Chuquiragua",
+      "nombre_comunes_regionales": [
+        "chuquiragua andina",
+        "flor del andinista",
+        "arbusto de los Andes"
+      ],
+      "nombre_cientifico": "Chuquiraga jussieui J.F.Gmel.",
+      "familia_botanica": "Asteraceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 3000,
+        "optimo_min": 3400,
+        "optimo_max": 4200,
+        "max_absoluto": 4500
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "jbb-plantas-medicinales",
+        "ley-1930-2018-paramos",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "La chuquiragua andina (Chuquiraga jussieui J.F.Gmel., Asteraceae) es un arbusto leñoso paramuno nativo (50-150 cm altura) emblemático de los páramos altos colombo-ecuatoriano-peruanos entre 3.400 y 4.200 msnm, presente en Colombia en los páramos de Sumapaz, Cruz Verde (sector alto Sumapaz), Chingaza, Pisba, Cocuy, Almorzadero, Santurbán y macizo colombiano (Nariño-Cauca). Hojas rígidas, coriáceas, espinosas en los extremos (adaptación xerofítica al estrés hídrico paramuno), capítulos terminales de un anaranjado-amarillento brillante característico que atraen colibríes paramunos (Oxypogon guerinii, Eriocnemis vestita) y mariposas Pierella. Su flor es símbolo cultural del andinismo y aparece en cosmovisión kichwa-aymara como ofrenda a Pachamama. Es lección viva de soberanía botánica y conservación del páramo que enseña a niñas y niños por qué proteger este ecosistema productor de agua: las especies de páramo como la chuquiragua están entre las más amenazadas por ganadería extensiva, quemas y minería ilegal, prácticas explícitamente prohibidas por la Ley 1930 de 2018 que declara los páramos ecosistemas estratégicos protegidos. Sus tallos y flores se han usado tradicionalmente como medicinal hepatoprotector y antiinflamatorio en infusión (con fitoquímicos validados: flavonoides, sesquiterpenlactonas) por comunidades campesinas de Boyacá y Cundinamarca, aunque hoy se priorizan usos no extractivos en el marco de la Ley de Páramos. Manejo agroecológico: propagación por semilla (germinación lenta 3-6 meses, requiere estratificación fría) o esqueje semileñoso difícil, vivero 18-24 meses antes de plantación, función exclusiva en restauración ecológica de áreas paramunas degradadas (no apta para chagra productiva). Distancia 1-2 m en parches de restauración, asociada a frailejones (Espeletia spp.), pajonales (Calamagrostis) y otras paramunas. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Ley 1930 de 2018 Páramos, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "piper_bogotense",
+      "nombre_comun": "Cordoncillo de Bogotá",
+      "nombre_comunes_regionales": [
+        "cordoncillo",
+        "matico bogotano",
+        "cordoncillo andino"
+      ],
+      "nombre_cientifico": "Piper bogotense C.DC.",
+      "familia_botanica": "Piperaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "pest_repellent",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "endemica_colombia",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 3000,
+        "max_absoluto": 3300
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "jbb-plantas-medicinales",
+        "restauracion-cruz-verde-sumapaz",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "El cordoncillo de Bogotá (Piper bogotense C.DC., Piperaceae) es un arbusto o arbolito andino endémico de Colombia (1-4 m altura), propio del sotobosque del bosque alto-andino y bordes de páramo entre 2.200 y 3.000 msnm, con distribución concentrada en la cordillera Oriental: Cundinamarca (cerros orientales de Bogotá, Cruz Verde, Sumapaz, Verjón, Chingaza, Guasca), Boyacá (Iguaque, Arcabuco, Chiquinquirá), Santander (Berlín, Almorzadero) y norte de Tolima. Hojas elípticas-lanceoladas de 8-15 cm con punto pellúcido aromático característico (aceites esenciales con safrol, miristicina, eugenol), espigas erectas blanco-amarillentas características del género Piper. Su carácter endémico colombiano lo convierte en pieza clave de soberanía botánica y patrimonio biológico nacional. Es lección viva sobre el sotobosque andino que enseña a niñas y niños por qué los bosques nativos son irreemplazables: el cordoncillo solo existe aquí, ningún país más en el mundo lo tiene, y depende del microclima húmedo, sombreado y mantillado del bosque alto-andino que solo las especies nativas pueden generar. Uso tradicional medicinal por comunidades campesinas de Cundinamarca-Boyacá: hojas en cataplasma para inflamaciones, infusión digestiva carminativa (uso validado farmacognosticamente por JBB e ICTA-UNAL); también usado como repelente natural de insectos en huertos (frotando hojas sobre tutores). Manejo agroecológico: propagación por esqueje semileñoso (90% prendimiento bajo cámara húmeda con hojas reducidas a 1/3) o semilla recolectada de espigas maduras (vivero 4-6 meses), trasplante en lluvias bajo sombra parcial, distancia 1.5-2 m, función ecológica como sotobosque enriquecedor en planes de restauración Cruz Verde-Sumapaz y como repelente vivo en linderos de huertas frío-paramunas. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "tovaria_pendula",
+      "nombre_comun": "Vaquero",
+      "nombre_comunes_regionales": [
+        "vaquero paramuno",
+        "hierba del páramo",
+        "tovaria"
+      ],
+      "nombre_cientifico": "Tovaria pendula Ruiz & Pav.",
+      "familia_botanica": "Tovariaceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2400,
+        "optimo_max": 3200,
+        "max_absoluto": 3500
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "restauracion-cruz-verde-sumapaz",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "El vaquero (Tovaria pendula Ruiz & Pav., Tovariaceae) es una hierba o subarbusto andino nativo (50-150 cm altura) emblemático del bosque alto-andino y bordes de páramo de Colombia, Ecuador, Perú y Bolivia entre 2.400 y 3.200 msnm, presente en Colombia en Cundinamarca (Cruz Verde, Sumapaz, Chingaza, Verjón, Guasca), Boyacá (Iguaque, Cocuy), Santander (Berlín), Antioquia (Belmira), Tolima, Caldas y Nariño. Es la única especie del género Tovaria y única representante de la familia Tovariaceae en Colombia (familia monogenérica, monotípica en Tovaria), lo que la convierte en una rareza taxonómica de altísimo valor para biogeografía andina. Hojas trifoliadas pubescentes, racimos colgantes (de ahí pendula) de flores blanco-verdosas pequeñas pero numerosas que atraen abejas nativas y avispas, frutos en baya pequeña. Es lección viva de soberanía botánica y biogeografía que enseña a niñas y niños por qué cada planta del páramo importa: el vaquero es una rareza evolutiva única, sin parientes botánicos cercanos, y solo sobrevive en bordes de bosque alto-andino bien conservados. Si se pierde el ecosistema, no hay reemplazo posible en ningún jardín del mundo. Por eso aparece en planes de restauración Cruz Verde-Sumapaz (IAvH + CAR Cundinamarca) como indicadora de buen estado sucesional. Manejo agroecológico: propagación por semilla recolectada de frutos maduros (vivero 4-8 meses), trasplante en lluvias en sotobosque o bordes sombreados, distancia 0.5-1 m, función exclusiva en restauración ecológica y jardines pedagógicos de flora nativa. No apta para chagra productiva. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "myrcianthes_leucoxyla",
+      "nombre_comun": "Arrayán de Bogotá",
+      "nombre_comunes_regionales": [
+        "arrayán blanco",
+        "arrayán andino",
+        "arrayán de Cundinamarca"
+      ],
+      "nombre_cientifico": "Myrcianthes leucoxyla (Ortega) McVaugh",
+      "familia_botanica": "Myrtaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_protegido",
+      "altitud_msnm": {
+        "min_absoluto": 2200,
+        "optimo_min": 2500,
+        "optimo_max": 3200,
+        "max_absoluto": 3500
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "jbb-plantas-medicinales",
+        "restauracion-cruz-verde-sumapaz",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "El arrayán de Bogotá (Myrcianthes leucoxyla (Ortega) McVaugh, Myrtaceae) es un árbol andino nativo emblemático del bosque alto-andino colombiano (8-15 m altura, hasta 25 m en bosques maduros bien conservados) entre 2.500 y 3.200 msnm, presente en Cundinamarca (cerros orientales de Bogotá, Cruz Verde, Sumapaz, Chingaza, Verjón, Guasca, La Calera), Boyacá (Iguaque, Arcabuco, Tota), Santander, Tolima y Nariño. Es árbol patrimonial del Distrito Capital y especie protegida por la Resolución 1923 de 2017 (SDA-Bogotá) que prohíbe su tala salvo emergencia fitosanitaria. Corteza rojiza-anaranjada papirácea característica que se desprende en placas, hojas pequeñas ovales lustrosas aromáticas (aceites esenciales con eucaliptol), flores blancas con muchos estambres dorados que atraen abejas (excelente meliferal) y otros polinizadores, frutos en baya pequeña púrpura-negro comestible (sabor dulce-aromático, alto en taninos, antioxidantes). Es lección viva de soberanía botánica y restauración ecológica que enseña a niñas y niños por qué los árboles patrimoniales nativos son irreemplazables: a diferencia del eucalipto y pino pátula introducidos que acidifican suelos paramunos y dan sombra estéril, el arrayán de Bogotá fue el dosel original de los bosques de la Sabana, alberga avifauna nativa (mirla, cucarachero, copetón, tángaras), genera hojarasca compatible con suelos andinos y produce frutos comestibles que pueden integrarse a chagra agroforestal. Por eso es especie prioritaria en planes de restauración Cruz Verde-Sumapaz (IAvH + CAR) y en programas de arborización urbana de Bogotá. Manejo agroecológico: propagación por semilla recién recolectada (germinación 40-90 días, no tolera deshidratación), vivero 12-18 meses antes de trasplante en lluvias, distancia 4-6 m en agroforestería o cerca viva alta, fructificación a partir de 6-8 años, función como árbol multifuncional (sombra, frutal, melífero, nurse plant, patrimonio). Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "macleania_rupestris",
+      "nombre_comun": "Uva camarona",
+      "nombre_comunes_regionales": [
+        "uva de monte",
+        "camarona",
+        "uva de páramo",
+        "reventadera"
+      ],
+      "nombre_cientifico": "Macleania rupestris (Kunth) A.C.Sm.",
+      "familia_botanica": "Ericaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2200,
+        "optimo_min": 2600,
+        "optimo_max": 3400,
+        "max_absoluto": 3800
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "jbb-plantas-medicinales",
+        "restauracion-cruz-verde-sumapaz",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "La uva camarona (Macleania rupestris (Kunth) A.C.Sm., Ericaceae) es un arbusto andino nativo (1-3 m altura, ocasionalmente epífito sobre árboles del bosque alto-andino) propio del bosque alto-andino y subpáramo colombiano entre 2.600 y 3.400 msnm, distribuido por Cundinamarca (Cruz Verde, Sumapaz, Chingaza, Verjón, Guasca), Boyacá (Iguaque, Cocuy, Pisba), Santander (Berlín, Almorzadero), Tolima, Caldas, Antioquia (Belmira, Sonsón) y Nariño. Pertenece a la familia Ericaceae (misma de los arándanos, blueberries, y mortiño), tribu Vaccinieae. Tallos rojizos quebradizos (de ahí reventadera), hojas coriáceas ovales gruesas, flores tubulares colgantes rojo-rosadas características (corola fusionada de 1.5-2.5 cm) que atraen colibríes paramunos especialistas (Eriocnemis vestita, Coeligena bonapartei, Lafresnaya lafresnayi) en una coevolución planta-colibrí clásica andina, frutos en baya globosa púrpura-negro comestible de sabor agridulce intenso (alto en antocianinas, polifenoles, vitamina C). Es lección viva de coevolución y soberanía alimentaria que enseña a niñas y niños cómo flores y colibríes evolucionaron juntos en los Andes durante millones de años, y por qué los frutos silvestres del páramo son superalimentos nativos. La uva camarona se ha consumido tradicionalmente por comunidades campesinas de Cundinamarca-Boyacá fresca, en mermeladas, conservas y bebidas fermentadas; en los últimos años ha sido reivindicada por chefs colombianos y emprendimientos agroecológicos como producto gourmet de origen. Por eso aparece en planes de restauración Cruz Verde-Sumapaz como especie productiva nativa de doble propósito (restauración + soberanía alimentaria). Manejo agroecológico: propagación por semilla (germinación 60-120 días, requiere luz y sustrato ácido pH 4.5-5.5) o esqueje semileñoso bajo cámara húmeda, vivero 12-18 meses antes de trasplante, distancia 1.5-2 m, fructificación a partir de 3-5 años, función como frutal silvestre integrable a chagra agroecológica frío-paramuna y como atractor de colibríes en restauración. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "bomarea_caldasii",
+      "nombre_comun": "Cucubo",
+      "nombre_comunes_regionales": [
+        "parásita de árboles",
+        "bomarea de Caldas",
+        "campanilla andina"
+      ],
+      "nombre_cientifico": "Bomarea caldasii (Kunth) Asch. & Graebn.",
+      "familia_botanica": "Alstroemeriaceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2400,
+        "optimo_max": 3200,
+        "max_absoluto": 3600
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "restauracion-cruz-verde-sumapaz",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "El cucubo o parásita de árboles (Bomarea caldasii (Kunth) Asch. & Graebn., Alstroemeriaceae) es una enredadera o trepadora herbácea andina nativa (2-6 m largo) emblemática del bosque alto-andino colombiano entre 2.400 y 3.200 msnm, presente en Cundinamarca (Cruz Verde, Sumapaz, Chingaza, Verjón, Guasca), Boyacá (Iguaque, Arcabuco, Cocuy), Santander, Tolima, Caldas, Antioquia y Nariño. El nombre cucubo viene del muisca cucuba y honra al sabio Francisco José de Caldas. Pese a su nombre vulgar parásita de árboles no es parásita verdadera: solo trepa apoyándose en otras plantas (planta apoyante, scandent) sin extraer savia, usando sus tubérculos subterráneos para almacenar reservas. Hojas alternas resupinadas (giran 180° en el pecíolo, carácter diagnóstico de Alstroemeriaceae), umbelas terminales colgantes con flores tubulares de 3-5 cm rojo-anaranjadas con interior amarillo punteado de marrón características que atraen colibríes paramunos (Lafresnaya lafresnayi, Eriocnemis cupreoventris) en una coevolución clásica. Frutos en cápsula que dispersan aves. Es lección viva de etimología muisca, coevolución y soberanía botánica que enseña a niñas y niños por qué nombres como cucubo o Caldas anclan la flora al territorio: cada nombre vernáculo guarda historia muisca, historia colombiana, historia evolutiva. Por eso aparece en planes de restauración Cruz Verde-Sumapaz como ornamental nativa y atractor de avifauna. Manejo agroecológico: propagación por división de tubérculos (90% éxito) o semilla (germinación 60-120 días), siembra directa o vivero 6-12 meses, requiere tutor o árbol/arbusto soporte, distancia 1-2 m, función ecológica como ornamental trepadora pedagógica en restauración, jardines de flora nativa y patios escolares. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "monnina_aestuans",
+      "nombre_comun": "Azulejito de páramo",
+      "nombre_comunes_regionales": [
+        "monnina",
+        "azulejito",
+        "flor azul de páramo"
+      ],
+      "nombre_cientifico": "Monnina aestuans (L.f.) DC.",
+      "familia_botanica": "Polygalaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2200,
+        "optimo_min": 2600,
+        "optimo_max": 3400,
+        "max_absoluto": 3700
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "jbb-plantas-medicinales",
+        "restauracion-cruz-verde-sumapaz",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "El azulejito de páramo (Monnina aestuans (L.f.) DC., Polygalaceae) es un arbusto o subarbusto andino nativo (50-200 cm altura) propio del bosque alto-andino y subpáramo colombiano entre 2.600 y 3.400 msnm, presente en Cundinamarca (Cruz Verde, Sumapaz, Chingaza, Verjón, Guasca), Boyacá (Iguaque, Arcabuco, Pisba), Santander (Berlín, Almorzadero), Antioquia, Tolima, Cauca y Nariño. Hojas alternas elípticas-lanceoladas, racimos terminales de flores zigomorfas azul-violeta intenso (1-1.5 cm) con quilla amarilla característica de Polygalaceae que atraen abejorros nativos (Bombus funebris, B. rubicundus) y abejas sin aguijón. Frutos en sámara (con ala) o drupa pequeña azul-negra. Es lección viva de tintes naturales nativos y soberanía botánica que enseña a niñas y niños cómo la flora andina ofreció colores a textiles muiscas y campesinos mucho antes que las anilinas industriales: los frutos azules de la monnina y especies cercanas se usaron como tinte natural azul-morado por comunidades campesinas de Boyacá-Cundinamarca (validado etnobotánicamente por JBB e ICANH), aunque hoy con baja extracción para no afectar reservorios silvestres. También tiene usos medicinales tradicionales como antiinflamatorio y para afecciones bucales (con saponinas y xantonas validadas farmacognosticamente). Es indicadora de buen estado del bosque alto-andino y aparece en planes de restauración Cruz Verde-Sumapaz como especie de sotobosque enriquecedor. Manejo agroecológico: propagación por semilla (germinación 60-90 días) o esqueje semileñoso, vivero 8-12 meses antes de trasplante en lluvias, distancia 1-2 m, función como sotobosque ornamental en restauración, atractor de polinizadores nativos y tinte natural artesanal. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "gaultheria_anastomosans",
+      "nombre_comun": "Asnao",
+      "nombre_comunes_regionales": [
+        "chaquillo",
+        "asnay",
+        "reventadera blanca"
+      ],
+      "nombre_cientifico": "Gaultheria anastomosans (L.f.) Kunth",
+      "familia_botanica": "Ericaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2400,
+        "optimo_min": 2800,
+        "optimo_max": 3600,
+        "max_absoluto": 4000
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "jbb-plantas-medicinales",
+        "restauracion-cruz-verde-sumapaz",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "El asnao o chaquillo (Gaultheria anastomosans (L.f.) Kunth, Ericaceae) es un arbusto andino nativo (30-150 cm altura) propio del bosque alto-andino, subpáramo y páramo colombiano entre 2.800 y 3.600 msnm, presente en Cundinamarca (Cruz Verde, Sumapaz, Chingaza, Verjón), Boyacá (Iguaque, Cocuy, Pisba), Santander (Berlín, Almorzadero), Antioquia (Belmira), Tolima, Cauca y Nariño. Pertenece a la familia Ericaceae (igual que arándanos y uva camarona) y al género Gaultheria del que se extrae tradicionalmente el aceite esencial wintergreen (con metilsalicilato como compuesto activo, presente también en Gaultheria anastomosans). Hojas coriáceas alternas elípticas con margen serrado-glanduloso aromáticas (al estrujarse desprenden olor a wintergreen característico), flores urceoladas (en forma de urna) colgantes blanco-rosadas pequeñas (5-8 mm) que atraen abejorros y abejas nativas, frutos en cápsula carnosa blanca-rosada subglobosa (5-10 mm) comestible de sabor mentolado-dulce característico. Es lección viva de etnobotánica medicinal y soberanía alimentaria-medicinal que enseña a niñas y niños cómo una sola hoja de chaquillo machacada huele a pomada de mentol natural, mostrando que la naturaleza ya tenía el wintergreen mucho antes que la farmacia: los frutos y hojas se han usado tradicionalmente para infecciones respiratorias, inflamaciones musculares y como expectorante por comunidades campesinas de Boyacá-Cundinamarca (uso validado farmacognosticamente por JBB). Frutos comestibles directamente o en preparaciones. Por eso aparece en planes de restauración Cruz Verde-Sumapaz como especie productiva nativa de doble propósito. Manejo agroecológico: propagación por semilla (sustrato ácido pH 4.5-5.5, germinación 90-120 días) o esqueje semileñoso, vivero 12-18 meses, distancia 0.8-1.5 m, fructificación a partir de 3-4 años, función como cobertura baja, frutal silvestre, medicinal y atractor de polinizadores en restauración. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "cavendishia_bracteata",
+      "nombre_comun": "Uvito de monte",
+      "nombre_comunes_regionales": [
+        "chaquilulo",
+        "uva de monte",
+        "cavendishia",
+        "uvito andino"
+      ],
+      "nombre_cientifico": "Cavendishia bracteata (Ruiz & Pav. ex J.St.-Hil.) Hoerold",
+      "familia_botanica": "Ericaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2400,
+        "optimo_max": 3200,
+        "max_absoluto": 3500
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "jbb-plantas-medicinales",
+        "restauracion-cruz-verde-sumapaz",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "El uvito de monte o chaquilulo (Cavendishia bracteata (Ruiz & Pav. ex J.St.-Hil.) Hoerold, Ericaceae) es un arbusto o arbolito andino nativo (1-4 m altura, ocasionalmente epífito sobre árboles del bosque alto-andino) propio del bosque alto-andino y subpáramo colombiano entre 2.400 y 3.200 msnm, presente en Cundinamarca (Cruz Verde, Sumapaz, Chingaza, Verjón, Guasca), Boyacá (Iguaque, Arcabuco, Cocuy, Pisba), Santander (Berlín), Antioquia (Belmira, Sonsón), Tolima, Cauca, Caldas, Risaralda y Nariño. Pertenece a Ericaceae tribu Vaccinieae (igual familia que arándanos, uva camarona, mortiño y asnao). Hojas coriáceas alternas elípticas-lanceoladas brillantes con nervadura broquidódroma característica, brácteas florales rojo-vivas muy llamativas (de ahí el epíteto bracteata) que envuelven la inflorescencia y persisten en el fruto, flores tubulares colgantes rojo-anaranjadas o rojo-blancas (1.5-2 cm) que atraen colibríes paramunos especialistas (Lafresnaya lafresnayi, Coeligena bonapartei, Eriocnemis vestita) en una coevolución planta-colibrí clásica andina. Frutos en baya globosa azul-violeta-negra (8-12 mm) comestible de sabor dulce-aromático intenso (alto en antocianinas, polifenoles, vitamina C: comparable a arándanos importados). Es lección viva de soberanía alimentaria y biodiversidad andina que enseña a niñas y niños por qué tenemos arándanos colombianos nativos sin necesidad de importar blueberries de Norteamérica: el chaquilulo, la uva camarona, el asnao y el mortiño son nuestras frutas Ericaceae andinas, adaptadas al páramo, productivas, deliciosas y de menor huella de carbono. Reivindicada hoy por chefs colombianos y agroecólogos como superfruta nativa. Aparece en planes de restauración Cruz Verde-Sumapaz como especie productiva de doble propósito. Manejo agroecológico: propagación por semilla (sustrato ácido pH 4.5-5.5, germinación 60-120 días) o esqueje semileñoso bajo cámara húmeda, vivero 12-24 meses antes de trasplante, distancia 1.5-2 m, fructificación a partir de 4-6 años, función como frutal silvestre, atractor de colibríes, nurse plant en restauración y cultivo agroforestal nativo. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia."
     }
   ],
   "biopreparados": [
