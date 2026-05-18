@@ -47,6 +47,7 @@ export const getCoords = (geometry) => {
  * @param {number} threshold — umbral en metros (default 50)
  */
 export const proximityCheck = (gpsPosition, geometry, threshold = 50) => {
+  /** @type {[number, number]} */
   const deviceCoords = [gpsPosition.coords.longitude, gpsPosition.coords.latitude];
   const targetCoords = getCoords(geometry);
   if (!targetCoords) return { distance: Infinity, isClose: false };
