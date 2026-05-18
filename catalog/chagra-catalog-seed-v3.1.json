@@ -25810,6 +25810,862 @@
         "jbb-plantas-medicinales"
       ],
       "valor_pedagogico": "El bálsamo del Perú (Myroxylon balsamum var. pereirae (Royle) Harms, familia Fabaceae) es un árbol perennifolio de gran porte (15-30 m altura) leguminoso, fijador biológico de nitrógeno, nativo de Mesoamérica y norte de Sudamérica (El Salvador, Honduras, Nicaragua, Costa Rica, Panamá, norte de Colombia: Caribe, Magdalena medio, Magdalena bajo, piedemonte del Catatumbo). El nombre popular \"del Perú\" es uno de los errores históricos más curiosos del comercio colonial — la resina NO es peruana, sino centroamericana-norandina, pero los comerciantes coloniales españoles la embarcaban hacia Europa desde el puerto del Callao (Perú) por las rutas marítimas del Pacífico, y los compradores europeos asumieron erróneamente que la planta era peruana. Es planta hermana botánica del bálsamo de Tolú (M. balsamum var. balsamum, que SÍ es colombiano-tolimense con resina distinta) — comparten género y morfología pero difieren en la composición de la resina: el bálsamo del Perú es más oscuro, más aromático (cinamato de bencilo, benzoato de bencilo, vainillina, ácido cinámico, ácido benzoico) y más viscoso; el bálsamo de Tolú es más claro y más resinoso (ácido toluico, esteres del ácido benzoico). Ha sido producto medicinal-cosmético-ritual de gran importancia desde tiempos precolombinos en Mesoamérica (cultura maya, náhuatl-azteca — \"xochicotzotl\", usado en rituales y como antiséptico de heridas) y se exportaba a Europa desde el siglo XVI como medicamento de heridas (aún hoy es ingrediente reconocido en farmacopeas europeas como antiséptico y cicatrizante tópico). En Colombia se distribuye nativa-naturalizada en bosque seco tropical y bosque húmedo bajo del Caribe (Bolívar, Sucre, Magdalena, La Guajira semihúmeda), Magdalena medio (Antioquia, Santander), Catatumbo (Norte de Santander) y piedemonte del Magdalena bajo entre 0 y 1.800 msnm. Lección viva sobre BOTÁNICA SISTEMÁTICA, HISTORIA DEL COMERCIO COLONIAL DE RESINAS, PARES BOTÁNICOS HERMANOS y AGROFORESTERÍA MEDICINAL: el par botánico M. balsamum var. balsamum (Tolú) vs M. balsamum var. pereirae (Perú) es ejemplo perfecto de cómo dos variedades de la misma especie pueden tener perfiles bioquímicos distintos por adaptación local y deriva genética, y de cómo el nombre popular puede engañar geográficamente (bálsamo \"del Perú\" no es peruano, igual que el \"guayacán de Manizales\" no es manizalita, el \"café arábigo\" no es de Arabia, el \"Hawaiian baby woodrose\" no es hawaiana, etc.). Aplicaciones modernas: antiséptico cicatrizante tópico (formulaciones farmacéuticas reconocidas — INVIMA), ingrediente cosmético en perfumería de lujo (notas balsámicas-resinosas en perfumes orientales), fragancia ritual en sincretismo afrocaribe. Manejo agroecológico: árbol leguminoso fijador de N (30-50 kg/ha/año), excelente para sistemas agroforestales del Caribe colombiano y Magdalena medio en asocio con cacao, café, plátano hartón y leguminosas pioneras; restauración de bosque seco tropical; espaciamiento 8x8 m en producción; cosecha de resina por incisión cuidadosa NO destructiva tras 15-25 años de establecimiento. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, FAO EcoCrop, Bernal 2015 Catálogo Plantas Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia, JBB Plantas Medicinales."
+    },
+    {
+      "id": "polylepis_incana",
+      "nombre_comun": "Pino-papel andino (Polylepis incana)",
+      "nombre_comunes_regionales": [
+        "queñoa",
+        "pino-papel",
+        "queñual"
+      ],
+      "nombre_cientifico": "Polylepis incana Kunth",
+      "familia_botanica": "Rosaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nurse_plant",
+        "windbreak",
+        "ground_cover"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_protegido",
+      "altitud_msnm": {
+        "min_absoluto": 2900,
+        "optimo_min": 3200,
+        "optimo_max": 4200,
+        "max_absoluto": 4800
+      },
+      "temperatura_c": {
+        "helada_letal": -18,
+        "optimo_min": 2,
+        "optimo_max": 9,
+        "max_tolerable": 15
+      },
+      "humedad_relativa_pct": {
+        "min": 55,
+        "optimo": 75,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Recolección de aquenios maduros en temporada seca (jun-ago en cordillera oriental). Germinación lenta (45-120 días) en sustrato turba+arena 2:1 bajo invernadero de altura. Trasplante a bolsa 4-6 meses, plantación definitiva >18 meses a 30 cm altura mínima. Distancia 2-3 m entre individuos en parches polylépicos. Crecimiento ~1 cm/año en altura — proyectos de restauración requieren horizonte >50 años. Protegido por Ley 1930/2018 (páramos); aprovechamiento prohibido sin permiso CAR."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "ley-1930-2018-paramos",
+        "uicn-red-list"
+      ],
+      "valor_pedagogico": "El pino-papel andino (Polylepis incana Kunth, familia Rosaceae) es uno de los árboles que vive a mayor altitud del planeta — los bosques polylépicos de los Andes centrales se sostienen entre 3.200 y 4.800 msnm, superando incluso el límite altitudinal de coníferas y eucaliptos exóticos. Su nombre genérico (polys + lepis = \"muchas escamas\") describe la corteza papirácea exfoliante en láminas rojizas que es su rasgo más reconocible y su principal adaptación a la radiación UV-B extrema de la alta montaña tropical. En Colombia P. incana se distribuye marginalmente en la cordillera Central (Nariño, Cauca, Huila) y forma parte del complejo polylépico colombiano junto con P. sericea (Cordillera Central) y P. quadrijuga (Cordillera Oriental, endémica). El género Polylepis (~28 especies neotropicales, Rosaceae-Sanguisorbeae) representa una de las radiaciones más espectaculares de árboles tropicales de altísima montaña: tronco retorcido y achaparrado, hojas pinnaticompuestas pequeñas trifolioladas tomentosas, flores apétalas anemófilas — todo lo opuesto al modelo arbóreo tropical de bajura. Forman bosquetes (queñuales) en quebradas, roquedales y laderas protegidas del viento, donde crean micro-hábitats con temperaturas 4-8°C más cálidas que el pajonal abierto adyacente, sosteniendo aves endémicas críticamente amenazadas (Leptasthenura yanacensis, Anairetes alpinus, Cinclodes aricomae). Servicio ecosistémico estratégico: regulación hídrica de cabeceras de cuenca y secuestro de carbono en suelos turbosos andinos. Amenazas históricas: quema para ampliar pastoreo ovino/bovino, extracción de leña, tala para construcción rural, cambio climático con migración altitudinal limitada por techo geográfico. Protección legal Colombia: Ley 1930 de 2018 (Gestión Integral de Páramos) prohíbe TODA actividad de aprovechamiento, tala, expansión agropecuaria o minera en ecosistemas de páramo delimitados; Resolución 1912/2017 MADS-IAvH lista especies amenazadas; UICN cataloga el género como Vulnerable o En Peligro según especie. Manejo agroecológico (solo restauración con autorización CAR): recolección de aquenios maduros, germinación en sustrato turba de páramo + arena gruesa 2:1 con humedad constante, vivero de altura bajo malla 50%, plantación en parches polylépicos de 100-400 ind/ha intercalados con Hypericum juniperinum, Diplostephium rosmarinifolium y Calamagrostis effusa para restaurar la matriz pajonal-bosquete. Tasas de crecimiento extraordinariamente lentas (~1 cm/año en altura, individuos de 5 m con >300 años) exigen protocolos de cero perturbación y exclusión ganadera estricta. Fuentes Tier A: POWO Kew (taxonomía aceptada), GBIF Taxonomic Backbone (distribución), Humboldt Flora Alto-Andina, Libro Rojo de Plantas de Colombia (estado de conservación), Ley 1930 de 2018 (marco legal), UICN Red List (amenaza global).",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "polylepis_pauta",
+      "nombre_comun": "Pino-papel sub-andino (Polylepis pauta)",
+      "nombre_comunes_regionales": [
+        "queñoa de Pauta",
+        "queñual"
+      ],
+      "nombre_cientifico": "Polylepis pauta Hieron.",
+      "familia_botanica": "Rosaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nurse_plant",
+        "windbreak"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_protegido",
+      "altitud_msnm": {
+        "min_absoluto": 2800,
+        "optimo_min": 3000,
+        "optimo_max": 4000,
+        "max_absoluto": 4400
+      },
+      "temperatura_c": {
+        "helada_letal": -15,
+        "optimo_min": 3,
+        "optimo_max": 11,
+        "max_tolerable": 16
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 85,
+        "max": 100
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Recolección de aquenios maduros temporada seca. Germinación 60-120 días en sustrato turba+arena+materia orgánica (2:1:1). Trasplante a bolsa 6 meses. Plantación definitiva >18 meses bajo malla 50% en sitios con exclusión ganadera. Crecimiento lento; tasa ~1.2 cm/año en altura. Protegido por Ley 1930/2018."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "ley-1930-2018-paramos",
+        "uicn-red-list"
+      ],
+      "valor_pedagogico": "El pino-papel sub-andino (Polylepis pauta Hieron., familia Rosaceae) es una de las especies más tolerantes al estrés hídrico estacional del género Polylepis y forma bosquetes en la franja de transición sub-páramo a páramo medio (3.000-4.000 msnm) tanto en cordilleras secas (Andes ecuatorianos, sur de Colombia) como en laderas más húmedas. En Colombia, P. pauta tiene presencia documentada en la cordillera Central (Cauca, Nariño) y porciones del macizo colombiano, con poblaciones fragmentadas resultado de siglos de quema y extracción de leña por comunidades altoandinas. Su corteza es papirácea exfoliante en láminas color cobre-naranja, mecanismo de fotoprotección contra UV-B intenso y aislante térmico que reduce el daño por congelamiento del cambium en heladas nocturnas radiativas (-5 a -10°C). Hojas pinnaticompuestas (3-5 pares de foliolos) con tomento amarillo-pardo en envés que limita la pérdida transpiratoria. El bosquete de P. pauta sostiene aves endémicas amenazadas como Leptasthenura andicola y Asthenes flammulata, sus suelos turbosos almacenan carbono milenario (1.000-2.500 t C/ha en el horizonte orgánico) y regulan caudales base de cuencas que abastecen acueductos rurales de los municipios paramunos colombianos (Sotará, San Sebastián, Almaguer, Bolívar-Cauca; entre otros del corredor Sumapaz-Macizo). Amenazas críticas: quema para ampliar pastoreo, tala para construcción de casas vereda, expansión de papa pastusa y haba sobre límite agronómico, minería ilegal de oro de aluvión en quebradas paramunas, cambio climático y migración altitudinal ascendente del límite altimontano. Protección legal Colombia: Ley 1930/2018 (Gestión Integral Páramos), Resolución 1912/2017 MADS-IAvH listado nacional especies amenazadas, jurisprudencia Sentencia T-361/2017 Corte Constitucional (Páramo de Santurbán) extiende principio de precaución a delimitación participativa. Manejo agroecológico (restauración exclusivamente con autorización CAR/Corporación Autónoma): recolección de aquenios maduros temporada seca (junio-agosto), germinación en vivero de altura con sustrato turba de páramo + arena gruesa + materia orgánica 2:1:1, plantación en parches de 100-300 ind/ha asociados con Diplostephium rosmarinifolium, Hypericum juniperinum, Bartsia santolinifolia y Calamagrostis effusa para restaurar el cortejo florístico paramuno completo. Exclusión ganadera obligatoria 5-10 años. Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, Bernal 2015 Catálogo Plantas y Líquenes Colombia, Humboldt Flora Alto-Andina, Ley 1930/2018, UICN Red List.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "espeletia_pycnophylla",
+      "nombre_comun": "Frailejón de Nariño (Espeletia pycnophylla)",
+      "nombre_comunes_regionales": [
+        "frailejón de Nariño",
+        "frailejón de Chiles"
+      ],
+      "nombre_cientifico": "Espeletia pycnophylla Cuatrec.",
+      "familia_botanica": "Asteraceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "biomass_producer",
+        "nurse_plant"
+      ],
+      "cultivable": false,
+      "conservation_status": "endemica_colombia",
+      "altitud_msnm": {
+        "min_absoluto": 3100,
+        "optimo_min": 3400,
+        "optimo_max": 4000,
+        "max_absoluto": 4300
+      },
+      "temperatura_c": {
+        "helada_letal": -12,
+        "optimo_min": 2,
+        "optimo_max": 9,
+        "max_tolerable": 16
+      },
+      "humedad_relativa_pct": {
+        "min": 70,
+        "optimo": 88,
+        "max": 100
+      },
+      "ph_suelo": {
+        "min": 4,
+        "optimo_min": 4.5,
+        "optimo_max": 5.5,
+        "max": 6
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Recolección de aquenios diciembre-febrero. Germinación 30-60 días en vivero de altura con sustrato turba de páramo + tierra subpáramo + arena gruesa (50:30:20). Trasplante a bolsa 4-6 meses. Plantación >12 meses a 15 cm altura con exclusión ganadera obligatoria. Crecimiento ~1 cm/año. Endémico Páramo de Chiles-Cumbal-Azufral (Nariño). Protegido por Ley 1930/2018 y Resolución 383/2010 MADS."
+      },
+      "source_ids": [
+        "humboldt-2016-frailejones",
+        "diazgranados-2012-espeletiinae",
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "ley-1930-2018-paramos",
+        "mads-res-383-2010"
+      ],
+      "valor_pedagogico": "El frailejón de Nariño (Espeletia pycnophylla Cuatrec., familia Asteraceae) es la especie diagnóstica del complejo paramuno binacional Chiles-Cumbal-Azufral-Quitasol (Nariño, frontera con Ecuador-Carchi), el sistema paramuno volcánico activo del sur colombiano. Endémico restringido del complejo Chiles-Cumbal con presencia ecuatoriana marginal en el Carchi; nombrado por Cuatrecasas en honor a su pubescencia foliar excepcionalmente densa (\"pycno-phyllum\" = hoja densa). Roseta caulescente acaule a corto-caulescente (0.5-2.5 m altura) con hojas lanceoladas-espatuladas (20-40 cm largo) densamente cubiertas por tricomas blanco-plateados que cumplen función termorreguladora doble: refractan radiación UV-B intensa (>10 mW/cm² en 3.800 msnm tropical) y forman capa límite que reduce pérdida convectiva de calor nocturna, manteniendo el meristemo apical 4-7°C por encima de la temperatura ambiente en heladas radiativas (-5 a -10°C). Inflorescencia en racimo terminal con capítulos amarillo-dorados grandes y brácteas tomentosas. Polinización por himenópteros andinos (Bombus funebris, B. rohweri) y avifauna nectarívora (Eriocnemis derbyi colibrí endémico amenazado). Distribución colombiana: complejo paramuno Chiles-Cumbal-Azufral-Quitasol (3.100-4.300 msnm) en municipios Cumbal, Mallama, Túquerres, Guachucal del departamento Nariño. Lección viva de endemismo paramuno y biogeografía de \"sky islands\" andinos: cada complejo paramuno colombiano alberga especies endémicas exclusivas (E. pycnophylla en Chiles-Cumbal, E. uribei en Sumapaz, E. killipii en Chingaza, E. lopezii en Sierra Nevada del Cocuy, E. perijaensis en Serranía del Perijá) — patrón biogeográfico que documenta especiación alopátrica por aislamiento geográfico entre páramos separados por valles interandinos cálidos infranqueables. Amenazas críticas: quema para ampliar potreros y siembra de papa pastusa, pisoteo ganadero bovino, expansión de frontera papera más allá del límite agronómico, minería de azufre tradicional en el Volcán Azufral, conflicto armado histórico que limitó conservación efectiva 1990-2016, cambio climático y desecación de turberas asociadas. Protección legal: Ley 1930/2018 prohíbe TODA actividad agropecuaria, minera y de hidrocarburos en páramo delimitado; Resolución 383/2010 MADS declara especies amenazadas todo el género Espeletia y géneros relacionados (Espeletiinae) con prohibición absoluta de aprovechamiento, tránsito y movilización sin permiso CAR (CORPONARIÑO en este caso); estado de conservación: En Peligro (EN) según Libro Rojo de Plantas de Colombia por endemismo restringido + amenaza activa. Manejo agroecológico (solo restauración con autorización CORPONARIÑO): recolección aquenios maduros temporada seca diciembre-febrero, germinación en vivero de altura municipal con sustrato turba de páramo + tierra subpáramo + arena gruesa 50:30:20, plantación 100-400 ind/ha en sitios degradados con exclusión ganadera obligatoria 5 años, asocio con Calamagrostis effusa, Hypericum juniperinum, Diplostephium rosmarinifolium, Loricaria complanata, Bartsia santolinifolia. Monitoreo bianual supervivencia + crecimiento foliar. Fuentes Tier A: Humboldt 2016 Frailejones, Diazgranados 2012 Revisión Espeletiinae, Libro Rojo Plantas Colombia, Bernal 2015 Catálogo, Ley 1930/2018, Resolución 383/2010 MADS.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "espeletia_lopezii",
+      "nombre_comun": "Frailejón de López (Espeletia lopezii)",
+      "nombre_comunes_regionales": [
+        "frailejón de López",
+        "frailejón del Cocuy"
+      ],
+      "nombre_cientifico": "Espeletia lopezii Cuatrec.",
+      "familia_botanica": "Asteraceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "biomass_producer",
+        "nurse_plant"
+      ],
+      "cultivable": false,
+      "conservation_status": "endemica_colombia",
+      "altitud_msnm": {
+        "min_absoluto": 3300,
+        "optimo_min": 3600,
+        "optimo_max": 4200,
+        "max_absoluto": 4500
+      },
+      "temperatura_c": {
+        "helada_letal": -15,
+        "optimo_min": 1,
+        "optimo_max": 8,
+        "max_tolerable": 15
+      },
+      "humedad_relativa_pct": {
+        "min": 70,
+        "optimo": 88,
+        "max": 100
+      },
+      "ph_suelo": {
+        "min": 4,
+        "optimo_min": 4.5,
+        "optimo_max": 5.5,
+        "max": 6
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Recolección aquenios temporada seca enero-marzo. Germinación 45-90 días en vivero de altura. Sustrato turba de páramo + tierra subpáramo + arena gruesa 50:30:20. Trasplante bolsa 4-6 meses, plantación >12 meses a 15-20 cm en sitios degradados con exclusión ganadera obligatoria 5+ años. Endémico del Páramo del Cocuy-Pisba-Yariguíes (Boyacá-Santander). Crecimiento ~0.9 cm/año. Protegido por Ley 1930/2018 y Res. 383/2010 MADS."
+      },
+      "source_ids": [
+        "humboldt-2016-frailejones",
+        "diazgranados-2012-espeletiinae",
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "ley-1930-2018-paramos",
+        "mads-res-383-2010"
+      ],
+      "valor_pedagogico": "El frailejón de López (Espeletia lopezii Cuatrec., familia Asteraceae) es un frailejón endémico del complejo paramuno Cocuy-Pisba (Boyacá), nombrado por el botánico colombiano José Cuatrecasas en honor a Hernando López G., colector nariñense que aportó al herbario nacional las primeras colecciones del macizo de El Cocuy en los años 1940-1950. Distribución exclusivamente en la Sierra Nevada del Cocuy-Güicán-Chita (Parque Nacional Natural El Cocuy, 306.000 hectáreas) y porciones aledañas del Páramo de Pisba, Boyacá, entre 3.300 y 4.500 msnm — uno de los rangos altitudinales más altos del género Espeletia, asociado a las morrenas glaciares y bofedales periglaciares del último macizo nevado del norte de Colombia (las cumbres Pan de Azúcar, El Castillo, Ritacuba Blanco aún con glaciares vivos pero en retroceso acelerado por cambio climático: pérdida >50% del área glaciar 1980-2020). Roseta caulescente acaule a corto-caulescente con tallo subterráneo y hojas lanceoladas (15-30 cm) densamente cubiertas por tricomas blanco-grisáceos. Adaptación foliar a temperaturas mínimas absolutas <-12°C: cutícula gruesa, mesófilo compacto con escasos espacios intercelulares (reduce daño por congelamiento intracelular), pubescencia plateada (refracción UV-B + aislamiento térmico). Inflorescencia en racimo terminal con capítulos amarillos. Polinización por himenópteros andinos (Bombus rohweri) y dispersión anemócora limitada (aquenios con vilano). Lección viva: endemismo paramuno restringido + biogeografía del macizo glacial del Cocuy. La especiación de Espeletia en el complejo Cocuy-Pisba-Sierra Nevada del Cocuy ilustra el patrón \"sky islands\" donde cada macizo paramuno aislado por valles interandinos cálidos infranqueables desarrolla su propia fauna y flora endémica — E. lopezii (Cocuy), E. estanislana (Pisba), E. tunjana (Tota-Bijagual), E. boyacensis (Iguaque). Amenazas críticas: quema para ampliar pastoreo ovino y bovino, pisoteo, expansión de papa criolla sobre límite agronómico (3.500 msnm), retroceso glaciar y secado de bofedales asociados, turismo no regulado en el corredor PNN Cocuy con pisoteo masivo de la Laguna de la Plaza y senderos paramunos (cerrado al público 2013-2016 por presiones U'wa + conservación). Protección legal: Ley 1930/2018 (Páramos), Resolución 383/2010 MADS (frailejones especies amenazadas), Plan de Manejo PNN El Cocuy (jurisdicción Parques Nacionales Naturales de Colombia + Pueblo U'wa territorio ancestral con jurisdicción compartida según Acuerdo Resguardo Indígena U'wa 2002 y sentencia T-849/2014). Estado conservación Libro Rojo Plantas Colombia: Vulnerable (VU) a En Peligro (EN). Manejo agroecológico (restauración exclusivamente con autorización CORPOBOYACÁ + Parques Nacionales + consulta previa U'wa): recolección aquenios maduros enero-marzo, germinación en vivero municipal Güicán/El Cocuy con sustrato turba + tierra subpáramo + arena gruesa, plantación 100-400 ind/ha exclusión ganadera 5 años, asocio con Loricaria complanata, Hypericum juniperinum, Diplostephium rosmarinifolium. Fuentes Tier A: Humboldt 2016, Diazgranados 2012, Libro Rojo Plantas Colombia, Bernal 2015, Ley 1930/2018, Resolución 383/2010 MADS.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "paragynoxys_uribei",
+      "nombre_comun": "Paragyn de Uribe (Paragynoxys uribei)",
+      "nombre_comunes_regionales": [
+        "paragyn",
+        "tabaquillo de páramo"
+      ],
+      "nombre_cientifico": "Paragynoxys uribei Cuatrec.",
+      "familia_botanica": "Asteraceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nurse_plant",
+        "windbreak"
+      ],
+      "cultivable": false,
+      "conservation_status": "endemica_colombia",
+      "altitud_msnm": {
+        "min_absoluto": 3000,
+        "optimo_min": 3200,
+        "optimo_max": 3700,
+        "max_absoluto": 4000
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 4,
+        "optimo_max": 11,
+        "max_tolerable": 16
+      },
+      "humedad_relativa_pct": {
+        "min": 70,
+        "optimo": 88,
+        "max": 100
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Aquenios maduros recolectados en temporada seca. Germinación 30-60 días en vivero de altura con sustrato turba + arena 2:1. Trasplante a bolsa a los 4 meses, plantación definitiva >12 meses. Crecimiento moderado (~3-5 cm/año en altura). Endémico de Colombia, presencia en complejos paramunos de la Cordillera Oriental (Sumapaz, Chingaza, Iguaque). Protegido por Ley 1930/2018."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "ley-1930-2018-paramos"
+      ],
+      "valor_pedagogico": "El paragyn de Uribe (Paragynoxys uribei Cuatrec., familia Asteraceae) es un arbolito o arbusto arborescente del sub-páramo y bosque altoandino colombiano (3.000-4.000 msnm), nombrado por José Cuatrecasas en honor al sacerdote-botánico Lorenzo Uribe-Uribe S.J., pionero del estudio florístico colombiano y autor de la \"Flora de Colombia\". El género Paragynoxys (Asteraceae-Senecioneae, ~15 especies neotropicales) representa una de las pocas radiaciones de árboles compuestos arborescentes del páramo y bosque altoandino colombiano-venezolano-ecuatoriano. Tronco corto retorcido con corteza rugosa pardo-grisácea, ramas con cicatrices foliares prominentes (tipo \"candelabro\"). Hojas alternas grandes (10-20 cm largo) oval-lanceoladas, coriáceas, con haz verde-oscuro lustroso y envés tomentoso blanco-grisáceo que refracta radiación UV-B y reduce transpiración por viento andino. Inflorescencia en panícula terminal de capítulos amarillo-crema con flores liguladas y discoidales — patrón estructural de Senecioneae arborescentes. Distribución colombiana endémica: complejos paramunos de la Cordillera Oriental (Sumapaz-Cruz Verde-Chingaza-Iguaque-Pisba-Cocuy) y porciones altas del Macizo Colombiano (Las Hermosas, Sotará, Doña Juana), con poblaciones fragmentadas resultado del avance histórico de la frontera agropecuaria papera + ganadería bovina extensiva sobre el subpáramo. Servicio ecosistémico: componente estructural clave del ecotono bosque altoandino-páramo, junto con Drimys granadensis, Weinmannia tomentosa, Hesperomeles obtusifolia, Escallonia myrtilloides — su presencia indica buena conservación del cinturón altimontano y diversidad de hábitats para fauna endémica (Cinclodes albidiventris, Anisognathus igniventris). Amenazas: tala para construcción de cercas y leña, quema para apertura de potreros, expansión de papa pastusa sobre límite agronómico, fragmentación de hábitat, cambio climático con migración altitudinal ascendente que tiene techo geográfico en cumbres paramunas. Protección: Ley 1930/2018 (Páramos), Resolución 1912/2017 MADS-IAvH lista nacional especies amenazadas, jurisdicción CAR Cundinamarca/CORPOBOYACÁ/CORPORINOQUIA según subregión. Estado conservación: Vulnerable (VU) según Libro Rojo Plantas Colombia, con tendencia poblacional decreciente. Manejo agroecológico (solo restauración con autorización CAR): recolección de aquenios maduros temporada seca (julio-agosto cordillera oriental), germinación en vivero municipal con sustrato turba de páramo + arena gruesa 2:1, plantación intercalada con Weinmannia tomentosa, Drimys granadensis, Hesperomeles obtusifolia, Escallonia myrtilloides para restaurar matriz forestal del ecotono altoandino-páramo a densidades 400-800 ind/ha. Exclusión ganadera 5-7 años obligatoria. Monitoreo bianual. Fuentes Tier A: Bernal 2015 Catálogo Plantas y Líquenes Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, GBIF Taxonomic Backbone, POWO Kew, Ley 1930/2018.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "vernonanthura_patens",
+      "nombre_comun": "Mortiño falso (Vernonanthura patens)",
+      "nombre_comunes_regionales": [
+        "mortiño falso",
+        "vernonia arborescente",
+        "tabaquillo"
+      ],
+      "nombre_cientifico": "Vernonanthura patens (Kunth) H.Rob.",
+      "familia_botanica": "Asteraceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nurse_plant",
+        "pollinator_attractor"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 3000,
+        "optimo_min": 3100,
+        "optimo_max": 3600,
+        "max_absoluto": 3900
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 5,
+        "optimo_max": 12,
+        "max_tolerable": 18
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Aquenios con vilano blanco dispersados por viento. Recolección temporada seca, germinación 30-60 días en vivero. Plantación a 1-2 m de altura tras 10-14 meses en bolsa. Atractor polinizador (Bombus spp., abejas nativas Meliponini de altura). Crecimiento rápido inicial (~10-15 cm/año primeros 2 años). Aplica Ley 1930/2018 si crece en límite paramuno delimitado."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "ley-1930-2018-paramos"
+      ],
+      "valor_pedagogico": "El mortiño falso o vernonia arborescente (Vernonanthura patens (Kunth) H.Rob., familia Asteraceae) es un arbolito o arbusto arborescente del sub-páramo y bosque altoandino colombiano (3.000-3.900 msnm), perteneciente al género Vernonanthura (Asteraceae-Vernonieae, ~50 especies neotropicales — segregado de Vernonia s.l. por Harold Robinson 1992 en revisión taxonómica que reconoció la polifilia del género clásico). Su nombre común \"mortiño falso\" refiere a la similitud visual con verdaderos mortiños (Vaccinium spp.) por hábito y porte, aunque pertenece a una familia completamente distinta (Asteraceae vs. Ericaceae). Tronco corto ramificado desde la base (3-8 m altura máxima), corteza pardo-rojiza fisurada. Hojas alternas lanceolado-oblanceoladas (8-15 cm) con haz verde-oscuro y envés tomentoso blanco-grisáceo. Inflorescencia en corimbo terminal con numerosos capítulos pequeños lila a lavanda (a veces blancuzcos en montaña alta) — patrón estructural típico de Vernonieae con flores tubulares homógamas, sin flores liguladas marginales. Aquenios con vilano blanco-plateado, dispersión anemócora eficiente que le permite colonizar claros y bordes de bosque altoandino. Servicio ecosistémico estratégico: atractor de polinizadores andinos (Bombus rohweri, B. funebris, abejas nativas Meliponini de altura como Geotrigona spp., mariposas paramunas), recurso floral en temporada seca cuando otras especies han fructificado, especie pionera tras disturbio (apertura de claros, derrumbes en cabeceras de cuenca). Distribución colombiana amplia: cordilleras Central, Oriental y Occidental en franja altoandina y sub-páramo (3.000-3.900 msnm), con presencia documentada en Sumapaz, Chingaza, Iguaque, Cocuy, Las Hermosas, Macizo Colombiano, Volcán Galeras. Amenazas moderadas: tala para leña en veredas paramunas, fragmentación de hábitat por expansión de potreros, pero su capacidad pionera y dispersión anemócora le permiten persistir mejor que otras especies altoandinas estrictas. Protección legal Colombia: cuando crece dentro de páramo delimitado aplica Ley 1930/2018 con prohibición de aprovechamiento; en bosque altoandino fuera de delimitación paramuna aplica regulación CAR jurisdiccional sobre bosque natural (Decreto 1076/2015 MADS Compilatorio + Decreto 1791/1996 régimen forestal). Manejo agroecológico: especie útil para enriquecimiento ecológico en restauración de borde bosque altoandino-pastizal degradado y cercas vivas en veredas paramunas; recolección de aquenios maduros con vilano + secado, germinación en vivero municipal con sustrato franco-arenoso, plantación a 2-3 m de separación intercalada con Drimys granadensis, Weinmannia tomentosa, Diplostephium rosmarinifolium. Sirve como nurse plant para regeneración de especies más lentas. Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, Bernal 2015 Catálogo Plantas Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Ley 1930/2018.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "oreocallis_grandiflora",
+      "nombre_comun": "Ñacha (Oreocallis grandiflora)",
+      "nombre_comunes_regionales": [
+        "ñacha",
+        "gañal",
+        "cucharillo"
+      ],
+      "nombre_cientifico": "Oreocallis grandiflora (Lam.) R.Br.",
+      "familia_botanica": "Proteaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 3000,
+        "optimo_min": 3100,
+        "optimo_max": 3700,
+        "max_absoluto": 4000
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 5,
+        "optimo_max": 13,
+        "max_tolerable": 18
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Semillas aladas de folículos maduros. Germinación 30-60 días en sustrato turba + arena + materia orgánica 2:1:1. Trasplante bolsa 4-6 meses. Plantación >14 meses. Crecimiento lento (~8-12 cm/año en altura). Atractor de colibríes paramunos (Aglaeactis cupripennis, Coeligena helianthea, Eriocnemis derbyi). Aplica Ley 1930/2018 en páramo delimitado."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "ley-1930-2018-paramos"
+      ],
+      "valor_pedagogico": "La ñacha o gañal (Oreocallis grandiflora (Lam.) R.Br., familia Proteaceae) es uno de los arbolitos más emblemáticos y vistosos del sub-páramo y bosque altoandino del sur de Colombia, Ecuador y Perú (3.000-4.000 msnm). Pertenece a la familia Proteaceae — una de las familias gondwánicas más antiguas (>90 millones de años, separación de Sudamérica y Australia), con representantes icónicos australianos (Banksia, Grevillea) y un puñado de géneros andinos (Oreocallis, Roupala, Lomatia) que documentan la conexión paleobiogeográfica austral. El género Oreocallis es monotípico o casi monotípico (O. grandiflora ampliamente distribuida + O. mucronata más restringida). Arbolito o arbusto arborescente 3-8 m altura, tronco corto retorcido con corteza grisácea fisurada, ramificación desde la base. Hojas alternas oblongo-lanceoladas (8-15 cm) coriáceas con haz verde-oscuro lustroso y envés blanco-grisáceo tomentoso, margen entero ligeramente revoluto — adaptación a la radiación intensa y al viento andino. Inflorescencia en racimo terminal espectacular: 10-30 flores tubulares rojo-coral a rojo-rosado de 4-6 cm con estambres exertos coloridos, perfectamente diseñadas para polinización por colibríes paramunos (síndrome ornitófilo trochilido): Aglaeactis cupripennis, Coeligena helianthea, Eriocnemis derbyi (colibrí endémico Cordillera Central críticamente amenazado), Pterophanes cyanopterus. Servicio ecosistémico estratégico: recurso nectarífero crítico para colibríes andinos especialmente en temporada seca cuando otras Proteaceae andinas y Ericaceae han fructificado; mantenimiento de redes mutualistas planta-polinizador altoandinas; estructura forestal del ecotono altoandino-páramo. Distribución colombiana: presencia documentada principalmente en cordillera Central (Cauca, Huila, Nariño, Tolima) y porciones del Macizo Colombiano y Andes del sur, en complejos paramunos y bosque altoandino (3.000-4.000 msnm) — distribución más boreal y disyunta en cordillera Oriental, ausente del Cocuy. Folículos maduros pardos abriéndose en dos valvas, semillas aladas anemócoras. Amenazas: tala para leña y construcción de cercas en veredas paramunas, quema para apertura de potreros, fragmentación de hábitat, expansión de papa pastusa y haba sobre límite agronómico (~3.500 msnm), cambio climático con migración altitudinal restringida por techo paramuno. Protección legal Colombia: Ley 1930/2018 cuando crece en páramo delimitado, regulación CAR + bosque natural Decreto 1076/2015 fuera de delimitación paramuna. Estado conservación: Vulnerable (VU) Libro Rojo Plantas Colombia por fragmentación y declive poblacional. Manejo agroecológico (restauración con autorización CAR): recolección de folículos maduros antes de dehiscencia (temporada seca), extracción de semillas aladas, germinación en vivero con sustrato turba + arena + MO 2:1:1, plantación intercalada con Drimys granadensis, Weinmannia tomentosa, Hesperomeles obtusifolia en densidades 400-600 ind/ha; especie clave para cercas vivas paramunas multipropósito (sombra ganadera baja densidad + atractor colibríes + producción miel). Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, Bernal 2015, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Ley 1930/2018.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "clethra_kalbreyeri",
+      "nombre_comun": "Laurel de páramo (Clethra kalbreyeri)",
+      "nombre_comunes_regionales": [
+        "laurel de páramo",
+        "manzano de páramo",
+        "cucharo blanco"
+      ],
+      "nombre_cientifico": "Clethra kalbreyeri Britton",
+      "familia_botanica": "Clethraceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nurse_plant",
+        "pollinator_attractor"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2900,
+        "optimo_min": 3000,
+        "optimo_max": 3600,
+        "max_absoluto": 3800
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 5,
+        "optimo_max": 13,
+        "max_tolerable": 18
+      },
+      "humedad_relativa_pct": {
+        "min": 70,
+        "optimo": 88,
+        "max": 100
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Cápsulas maduras con semillas diminutas (>1000 semillas/g). Siembra superficial sobre sustrato turba + arena gruesa 1:1, humedad constante, germinación 30-60 días bajo malla 70%. Trasplante a bolsa 6-8 meses, plantación >18 meses. Crecimiento lento (~5-8 cm/año). Atractor abejas nativas, sírfidos y mariposas paramunas. Aplica Ley 1930/2018 en páramo delimitado."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "ley-1930-2018-paramos"
+      ],
+      "valor_pedagogico": "El laurel de páramo o manzano de páramo (Clethra kalbreyeri Britton, familia Clethraceae) es un árbol o arbusto arborescente del bosque altoandino y sub-páramo colombiano (2.900-3.800 msnm), pertenecientea la familia Clethraceae — pequeña familia (~75 especies, solo dos géneros Clethra y Purdiaea) con distribución disyunta neotropical-asiática-norteamericana, descrita por James Britton en honor al colector alemán Friedrich Carl Wilhelm Kalbreyer que colectó intensamente la flora colombiana 1879-1882 para Veitch Nurseries y Kew Gardens. Arbolito 4-10 m altura con tronco corto y ramificación desde baja, corteza pardo-rojiza fisurada longitudinalmente. Hojas alternas oblongo-elípticas (6-12 cm) coriáceas, margen aserrado distal, haz verde-oscuro lustroso con nervación impresa, envés verde-claro con pubescencia estrellada característica de Clethra. Inflorescencia en racimo terminal erecto (10-20 cm largo) con numerosas flores blancas pequeñas (5-7 mm) muy fragantes, 5 pétalos libres, 10 estambres con anteras dehiscencia por poros apicales — estructura floral conservada de la familia. Polinización entomófila por himenópteros (Bombus, abejas nativas Meliponini, abejas solitarias andinas Halictidae y Andrenidae), sírfidos y mariposas; recurso floral importante por la abundancia de flores fragantes en racimos prolongados. Fruto cápsula loculicida pequeña con numerosas semillas diminutas anemócoras. Distribución colombiana: presencia en cordilleras Central (Cauca, Huila, Tolima, Quindío) y Oriental (Cundinamarca, Boyacá, Santander) en franja altoandina y sub-páramo (2.900-3.800 msnm) — frecuente en bordes de bosque altoandino, claros y laderas con humedad sostenida, ausente o muy escaso en complejos paramunos secos como Berlín (Santander) o La Rusia (Boyacá). Servicio ecosistémico: nurse plant para regeneración de especies pioneras (Polylepis, Weinmannia, Drimys), recurso nectarífero para polinizadores andinos en temporada de floración, estructura forestal del ecotono altoandino-páramo. Amenazas moderadas: tala para leña y madera de carpintería rústica (madera blanca-rosada de grano fino, históricamente usada para cucharas y utensilios — origen del nombre \"cucharo\"), apertura de potreros, fragmentación. Protección legal: cuando crece dentro de páramo delimitado aplica Ley 1930/2018, en bosque altoandino aplica regulación CAR + Decreto 1076/2015 régimen forestal. Manejo agroecológico (restauración con autorización CAR): recolección de cápsulas maduras temporada seca, siembra superficial de semillas diminutas sobre sustrato turba + arena 1:1, vivero bajo malla 70%, plantación intercalada con Weinmannia tomentosa, Drimys granadensis, Vallea stipularis a densidades 400-700 ind/ha. Especie multiservicio: nurse plant + atractor polinizadores + madera blanda artesanal (uso restringido a podas de manejo en proyectos autorizados). Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, Bernal 2015 Catálogo Plantas Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Ley 1930/2018.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "escallonia_myrtilloides",
+      "nombre_comun": "Rodamonte (Escallonia myrtilloides)",
+      "nombre_comunes_regionales": [
+        "rodamonte",
+        "tibar",
+        "pegamosco"
+      ],
+      "nombre_cientifico": "Escallonia myrtilloides L.f.",
+      "familia_botanica": "Escalloniaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nurse_plant",
+        "windbreak"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 3000,
+        "optimo_min": 3100,
+        "optimo_max": 3700,
+        "max_absoluto": 4000
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 4,
+        "optimo_max": 11,
+        "max_tolerable": 17
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 85,
+        "max": 100
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Cápsulas con semillas diminutas. Siembra superficial sobre turba + arena 1:1, humedad constante. Germinación 30-60 días. Trasplante a bolsa 4-6 meses, plantación >14 meses. Esquejes leñosos también viables con auxinas. Crecimiento moderado (~8-12 cm/año). Aplica Ley 1930/2018 en páramo delimitado."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "ley-1930-2018-paramos"
+      ],
+      "valor_pedagogico": "El rodamonte o tíbar (Escallonia myrtilloides L.f., familia Escalloniaceae) es un arbolito o arbusto arborescente del sub-páramo y páramo bajo colombiano-ecuatoriano-peruano (3.000-4.000 msnm), uno de los pocos elementos arbóreos que persiste por encima del límite del bosque altoandino formando bosquetes mixtos con Polylepis spp., Hesperomeles obtusifolia, Diplostephium rosmarinifolium en quebradas protegidas y micrositios con menor exposición al viento. El género Escallonia (~40-50 especies sudamericanas) es uno de los grupos arbóreos más diversificados del cinturón altoandino-paramuno, con especies pioneras y de bosque maduro. E. myrtilloides toma su epíteto del parecido foliar a un Vaccinium o Myrtus (\"myrt-illo-ides\" = parecido a Myrtilus, antiguo nombre del arándano). Arbolito 3-7 m altura con tronco corto retorcido y corteza pardo-grisácea exfoliante. Hojas alternas obovadas pequeñas (1-2.5 cm) coriáceas, margen aserrado distal, glandulosas con olor resinoso-aromático característico al frote (presencia de aceites esenciales en glándulas foliares — de ahí el nombre \"pegamosco\" por la resina pegajosa). Inflorescencia en racimo corto axilar con flores blancas a blanco-rosadas pequeñas (8-12 mm), 5 pétalos, polinización entomófila por himenópteros andinos. Fruto cápsula globosa con semillas diminutas. Servicio ecosistémico estratégico: especie pionera + nurse plant en restauración de páramo intervenido, rompevientos natural en bosquetes polylépicos, recurso nectarífero para polinizadores andinos (Bombus rohweri, abejas nativas, mariposas), estructura para fauna paramuna (aves Cinclodes, Asthenes, Anairetes; pequeños mamíferos Cryptotis, Akodon). Distribución colombiana: presencia documentada en cordilleras Central, Oriental y Occidental en franja sub-páramo y páramo bajo (3.000-4.000 msnm); abundante en complejos paramunos colombianos (Sumapaz, Chingaza, Iguaque, Pisba, Cocuy, Las Hermosas, Macizo Colombiano). Amenazas moderadas: tala para leña, fragmentación, pisoteo ganadero juvenil — pero su capacidad pionera y rebrote vigoroso tras corte limitan el declive poblacional comparado con especies altoandinas más estrictas. Protección legal: Ley 1930/2018 en páramo delimitado, regulación CAR + Decreto 1076/2015 forestal en bosque altoandino. Estado conservación: Preocupación Menor (LC) actualmente pero con tendencia decreciente en complejos paramunos altamente intervenidos. Manejo agroecológico: especie altamente útil para restauración de páramo intervenido y cercas vivas paramunas; recolección de cápsulas maduras temporada seca, siembra superficial en vivero con turba+arena 1:1, plantación intercalada en parches polylépicos a densidades 400-800 ind/ha con Polylepis sericea/quadrijuga, Diplostephium rosmarinifolium, Hypericum juniperinum. Multiservicio: rompevientos + nurse plant + atractor polinizadores + cercas vivas paramunas + madera blanda para podas artesanales. Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, Bernal 2015, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Ley 1930/2018.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "gynoxys_baccharoides",
+      "nombre_comun": "Molasco (Gynoxys baccharoides)",
+      "nombre_comunes_regionales": [
+        "molasco",
+        "gynoxys",
+        "tabaquillo de altura"
+      ],
+      "nombre_cientifico": "Gynoxys baccharoides (Kunth) Cass.",
+      "familia_botanica": "Asteraceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nurse_plant",
+        "pollinator_attractor"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 3000,
+        "optimo_min": 3200,
+        "optimo_max": 3900,
+        "max_absoluto": 4200
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 3,
+        "optimo_max": 11,
+        "max_tolerable": 16
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 85,
+        "max": 100
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Aquenios con vilano blanco. Recolección temporada seca. Germinación 30-60 días en vivero con sustrato turba + arena 2:1. Trasplante bolsa 4 meses, plantación >12 meses. Esquejes semileñosos viables (~50% prendimiento con auxinas). Crecimiento moderado-rápido (~10-15 cm/año primeros años). Atractor polinizadores. Aplica Ley 1930/2018."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "ley-1930-2018-paramos"
+      ],
+      "valor_pedagogico": "El molasco o gynoxys (Gynoxys baccharoides (Kunth) Cass., familia Asteraceae) es un arbolito o arbusto arborescente del páramo y sub-páramo andino colombiano-ecuatoriano-peruano (3.000-4.200 msnm), uno de los pocos árboles compuestos arborescentes que persisten en la franja paramuna por encima del límite del bosque altoandino convencional. El género Gynoxys (Asteraceae-Senecioneae, ~85 especies neotropicales con epicentro andino) representa una de las radiaciones más espectaculares de árboles paramunos del neotrópico, junto con Polylepis (Rosaceae) y Buddleja (Scrophulariaceae). Cuatrecasas y Robinson clarificaron la sistemática del grupo en revisiones 1970-1990. Arbolito 3-8 m altura con tronco corto retorcido y ramificación desde la base, corteza pardo-grisácea fisurada. Hojas opuestas decusadas (rasgo diagnóstico del género — contrasta con la alternancia general de Asteraceae) oblongo-elípticas (4-10 cm) coriáceas con haz verde-oscuro y envés tomentoso blanco-amarillento densamente cubierto por tricomas que cumplen función termorreguladora y reducen pérdida hídrica por viento andino. Inflorescencia en panícula corimbiforme terminal con numerosos capítulos amarillo-dorados pequeños (8-12 mm), flores liguladas marginales + flores discoidales centrales — patrón estructural típico de Senecioneae. Polinización por himenópteros andinos (Bombus rohweri, B. funebris, abejas nativas Meliponini de altura), sírfidos, mariposas paramunas; recurso nectarífero importante en temporada seca. Aquenios con vilano blanco-plateado, dispersión anemócora eficiente. Servicio ecosistémico estratégico: especie pionera + nurse plant en restauración de páramo intervenido, estructura para fauna paramuna (Cinclodes albidiventris, Asthenes flammulata, ratones andinos Akodon, Thomasomys), recurso polinizador en temporada seca crítica para abejas y mariposas. Distribución colombiana: cordillera Central (Cauca, Huila, Tolima, Quindío, Risaralda, Caldas) y porciones del Macizo Colombiano y Andes del sur (Nariño, Putumayo) en complejos paramunos y sub-páramo (3.000-4.200 msnm). Más limitada en cordillera Oriental (presencia escasa en Sumapaz, Chingaza, Iguaque) con géneros relacionados (Paragynoxys) dominando ese cinturón. Amenazas: tala para leña y construcción de cercas en veredas paramunas, quema para apertura de potreros, fragmentación por expansión de papa pastusa, pisoteo ganadero. Protección legal Colombia: Ley 1930/2018 en páramo delimitado, regulación CAR + Decreto 1076/2015 forestal. Estado conservación: Preocupación Menor (LC) a Vulnerable (VU) según complejo paramuno. Manejo agroecológico (restauración con autorización CAR): recolección aquenios maduros temporada seca, vivero con sustrato turba + arena 2:1, plantación intercalada con Polylepis, Diplostephium, Hypericum a densidades 400-800 ind/ha; especie útil para enriquecimiento ecológico de cercas vivas paramunas y restauración de borde bosque altoandino-páramo. Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, Bernal 2015, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Ley 1930/2018.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "myrsine_dependens",
+      "nombre_comun": "Cucharo de altura (Myrsine dependens)",
+      "nombre_comunes_regionales": [
+        "cucharo de altura",
+        "cucharo paramuno",
+        "palo cucharo"
+      ],
+      "nombre_cientifico": "Myrsine dependens (Ruiz & Pav.) Spreng.",
+      "familia_botanica": "Primulaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nurse_plant",
+        "pollinator_attractor"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2900,
+        "optimo_min": 3100,
+        "optimo_max": 3700,
+        "max_absoluto": 3900
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 5,
+        "optimo_max": 12,
+        "max_tolerable": 18
+      },
+      "humedad_relativa_pct": {
+        "min": 70,
+        "optimo": 88,
+        "max": 100
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Drupas pequeñas dispersadas por aves paramunas (Turdus fuscater, mirlas). Semillas con tegumento duro requieren escarificación + estratificación fría 30-45 días. Germinación 60-120 días en sustrato turba + arena 2:1. Trasplante a bolsa 6-8 meses. Plantación >18 meses. Crecimiento lento (~5-8 cm/año). Aplica Ley 1930/2018."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "ley-1930-2018-paramos"
+      ],
+      "valor_pedagogico": "El cucharo de altura (Myrsine dependens (Ruiz & Pav.) Spreng., familia Primulaceae sensu APG IV, anteriormente Myrsinaceae) es un arbolito o arbusto arborescente del bosque altoandino superior y sub-páramo colombiano-ecuatoriano-peruano-boliviano (2.900-3.900 msnm), uno de los elementos forestales clave del ecotono altoandino-páramo en cordilleras húmedas. El género Myrsine (~200 especies pantropicales, antes incluyendo Rapanea) fue revisado por Hipólito Pichardo y Pipoly en revisiones taxonómicas recientes que devolvieron a Myrsine las especies neotropicales antes en Rapanea. M. dependens fue descrita por Hipólito Ruiz López y José Antonio Pavón durante la Expedición Botánica al Perú y Chile (1777-1788), una de las primeras descripciones formales de flora altoandina sudamericana. Arbolito 4-8 m altura con tronco corto retorcido y corteza pardo-grisácea lisa a finamente fisurada. Hojas alternas obovado-elípticas (4-9 cm) coriáceas con haz verde-oscuro lustroso y envés glandular punteado (puntos translúcidos visibles a contraluz — rasgo diagnóstico de Primulaceae-Myrsinoideae), margen entero, peciolo corto. Inflorescencias axilares fasciculadas en grupos de 5-15 flores diminutas (3-5 mm) blanco-verdosas a rojizas, unisexuales (especie dioica: árboles macho y hembra separados), polinización entomófila por himenópteros andinos pequeños y sírfidos. Fruto drupa globosa pequeña (4-6 mm) negro-morada a la madurez, dispersión por aves paramunas (Turdus fuscater \"mirla común\" altoandina, Buthraupis montana, Pipraeidea bonariensis) que consumen frutos y dispersan semillas a distancias considerables — servicio mutualista crítico para conectividad de bosquetes altoandinos. Distribución colombiana: cordilleras Central, Oriental y Occidental en franja altoandina superior y sub-páramo (2.900-3.900 msnm), abundante en bordes de bosque altoandino y bosquetes paramunos en quebradas y laderas protegidas — presencia documentada en Sumapaz, Chingaza, Iguaque, Pisba, Cocuy, Las Hermosas, Macizo Colombiano, cordillera de los Picachos. Servicio ecosistémico estratégico: recurso frugívoro para aves paramunas en temporada de fructificación, nurse plant para regeneración de especies de bosque altoandino, estructura forestal del ecotono, secuestro de carbono en biomasa y suelos turbosos asociados. Amenazas: tala para leña y madera (madera blanda blanca-rosada usada históricamente para \"cucharas\" en veredas — origen del nombre común), fragmentación, ganadería bovina extensiva. Protección legal Colombia: Ley 1930/2018 cuando crece en páramo delimitado, regulación CAR + Decreto 1076/2015 forestal en bosque altoandino. Manejo agroecológico (restauración con autorización CAR): drupas maduras escarificadas + estratificación fría, germinación en vivero, plantación a densidades 400-700 ind/ha intercalado con Weinmannia tomentosa, Drimys granadensis, Clethra kalbreyeri en restauración de bosquetes altoandinos. Multiservicio: frugívoro para aves + nurse plant + estructura forestal. Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, Bernal 2015 Catálogo Plantas Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Ley 1930/2018.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "myrsine_andina",
+      "nombre_comun": "Cucharo andino (Myrsine andina)",
+      "nombre_comunes_regionales": [
+        "cucharo andino",
+        "cucharo blanco",
+        "palo cucharo"
+      ],
+      "nombre_cientifico": "Myrsine andina (Mez) Pipoly",
+      "familia_botanica": "Primulaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nurse_plant",
+        "pollinator_attractor"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2900,
+        "optimo_min": 3000,
+        "optimo_max": 3600,
+        "max_absoluto": 3900
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 5,
+        "optimo_max": 12,
+        "max_tolerable": 18
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 85,
+        "max": 100
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Drupas dispersadas por aves frugívoras. Semillas escarificadas + estratificación fría 30 días. Germinación 60-100 días. Trasplante bolsa 6 meses. Plantación >15 meses. Crecimiento lento-moderado (~6-10 cm/año). Aplica Ley 1930/2018 en páramo delimitado."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "ley-1930-2018-paramos"
+      ],
+      "valor_pedagogico": "El cucharo andino (Myrsine andina (Mez) Pipoly, familia Primulaceae sensu APG IV, antes Myrsinaceae) es un arbolito o arbusto arborescente del bosque altoandino superior y sub-páramo colombiano (2.900-3.900 msnm), pariente cercano de Myrsine dependens con la que comparte hábito, función ecológica y servicios ecosistémicos pero se diferencia por morfología foliar más esbelta y distribución biogeográfica complementaria. La especie fue descrita originalmente por Carl Mez en Pflanzenreich (1902) en el género Rapanea y transferida a Myrsine por John Pipoly en revisiones taxonómicas recientes (1992) que devolvieron a Myrsine las especies neotropicales antes segregadas en Rapanea. Arbolito 3-7 m altura con tronco corto retorcido y corteza pardo-grisácea fisurada. Hojas alternas oblongo-lanceoladas (5-11 cm) coriáceas con haz verde-oscuro lustroso y envés glandular punteado (puntos translúcidos visibles a contraluz — rasgo diagnóstico de la subfamilia Myrsinoideae), margen entero levemente revoluto. Inflorescencias axilares fasciculadas con flores diminutas blanco-verdosas a rojizas, especie dioica con polinización entomófila por himenópteros pequeños y sírfidos andinos. Fruto drupa pequeña globosa (3-5 mm) negro-morada a la madurez, dispersión por aves paramunas frugívoras (Turdus fuscater, Buthraupis, Pipraeidea, Anisognathus igniventris). Distribución colombiana: cordilleras Central y Oriental en franja altoandina superior y sub-páramo (2.900-3.900 msnm); abundante en bordes de bosque altoandino, claros y bosquetes paramunos. Presencia documentada en complejos paramunos Sumapaz, Chingaza, Iguaque, Pisba, Cocuy, Las Hermosas. Servicio ecosistémico estratégico: recurso frugívoro para aves paramunas en temporada de fructificación, nurse plant para regeneración de especies de bosque altoandino, estructura forestal del ecotono altoandino-páramo, secuestro de carbono. Amenazas: tala para leña y madera (madera blanda blanca-rosada históricamente usada para cucharas y utensilios artesanales rurales — origen del nombre vernáculo común para varias especies de Myrsine), fragmentación por expansión papera y ganadera, quema para apertura de potreros veredales. Protección legal Colombia: Ley 1930/2018 cuando crece en páramo delimitado, regulación CAR + Decreto 1076/2015 régimen forestal en bosque altoandino fuera de delimitación paramuna. Estado conservación: Preocupación Menor (LC) actualmente pero con tendencia decreciente regional. Manejo agroecológico (restauración ecológica con autorización CAR/Corporación): recolección drupas maduras, escarificación + estratificación fría, germinación en vivero con sustrato turba + arena 2:1, plantación intercalada con Weinmannia tomentosa, Drimys granadensis, Clethra kalbreyeri, Vallea stipularis en densidades 400-700 ind/ha para restauración de bosquetes altoandinos paramunos. Especie multiservicio: frugivoría aviar + nurse plant + estructura forestal. Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, Bernal 2015 Catálogo Plantas y Líquenes Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Ley 1930/2018.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "aragoa_abietina",
+      "nombre_comun": "Aragoa (Aragoa abietina)",
+      "nombre_comunes_regionales": [
+        "aragoa",
+        "falso ciprés de páramo",
+        "pino de páramo"
+      ],
+      "nombre_cientifico": "Aragoa abietina Kunth",
+      "familia_botanica": "Plantaginaceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "nurse_plant",
+        "ground_cover"
+      ],
+      "cultivable": false,
+      "conservation_status": "endemica_colombia",
+      "altitud_msnm": {
+        "min_absoluto": 3100,
+        "optimo_min": 3300,
+        "optimo_max": 3900,
+        "max_absoluto": 4200
+      },
+      "temperatura_c": {
+        "helada_letal": -12,
+        "optimo_min": 2,
+        "optimo_max": 9,
+        "max_tolerable": 15
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 85,
+        "max": 98
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Cápsulas con semillas diminutas. Siembra superficial sobre sustrato turba de páramo + arena 1:1, humedad constante. Germinación 30-60 días bajo invernadero de altura. Trasplante a bolsa 4-6 meses. Plantación >12 meses. Crecimiento lento (~3-5 cm/año). Endémico de Colombia (cordillera Oriental). Protegido por Ley 1930/2018."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "ley-1930-2018-paramos"
+      ],
+      "valor_pedagogico": "La aragoa o falso ciprés de páramo (Aragoa abietina Kunth, familia Plantaginaceae sensu APG IV) es un arbusto erecto del páramo colombiano endémico de la cordillera Oriental, uno de los elementos diagnósticos del cortejo florístico de los frailejonales-pajonales de Sumapaz, Cruz Verde, Chingaza, Iguaque, Pisba y Cocuy (3.100-4.200 msnm). El género Aragoa (~19 especies) es endémico de los páramos colombiano-venezolanos (con presencia marginal en la Sierra Nevada del Cocuy + Sierra de Perijá venezolana), descrito por Alexander von Humboldt y Aimé Bonpland durante el viaje a las regiones equinocciales (1799-1804) y nombrado en honor al naturalista español Diego de Aragón. Recientes filogenias moleculares (Albach et al. 2005, Tank & Olmstead 2008) confirmaron que Aragoa, antes en Scrophulariaceae, pertenece a la familia Plantaginaceae sensu APG IV, formando un clado con Veronica, Plantago y Digitalis — una transición notable de la sistemática clásica a la filogenética. Arbusto erecto 1-2.5 m altura, ramificación densa desde la base con apariencia de pequeño ciprés o conífera (de ahí el nombre vernáculo \"falso ciprés de páramo\" o \"pino de páramo\"). Hojas pequeñas (4-10 mm) imbricadas linear-lanceoladas escuamiformes en disposición decusada o tetrástica, coriáceas, dispuestas en ramillas terminales que recuerdan estructuralmente a Cupressus o Callitris — convergencia adaptativa a las condiciones del páramo (alta radiación UV-B, viento, heladas radiativas, baja humedad atmosférica diurna alternando con saturación nocturna). Flores axilares solitarias pequeñas blanco-rosadas (5-8 mm), corola tubular 4-5 lobada, polinización entomófila por himenópteros andinos pequeños (abejas Halictidae, Andrenidae, dípteros sírfidos). Fruto cápsula bivalva con semillas diminutas anemócoras. Servicio ecosistémico estratégico: componente estructural diagnóstico del frailejonal-pajonal paramuno colombiano, recurso polinizador, suelo y micrositios bajo cobertura aragoide para germinación de especies anuales y bryofitos paramunos, contribución al servicio hidrológico paramuno por interceptación de niebla y rocío en la masa foliar densa. Lección viva: endemismo de la cordillera Oriental colombiana + biogeografía paramuna + convergencia adaptativa morfológica con coníferas (siendo angiospermo, no gimnospermo) en respuesta al ambiente paramuno extremo. Distribución colombiana: cordillera Oriental exclusiva (Sumapaz, Cruz Verde, Chingaza, Guerrero, Iguaque, La Rusia, Pisba, Cocuy, Tamá) en franja sub-páramo a páramo medio (3.100-4.200 msnm). Amenazas: quema para apertura de potreros, pisoteo ganadero, minería de carbón en flancos paramunos (Boyacá-Santander), turismo no regulado en PNN Chingaza y Cocuy. Protección legal: Ley 1930/2018 (Páramos), Resolución 1912/2017 MADS-IAvH lista nacional amenazadas (con varias Aragoa listadas), jurisprudencia Sentencia T-361/2017 Corte Constitucional. Estado conservación: Vulnerable (VU) Libro Rojo Plantas Colombia por endemismo restringido + amenaza activa. Manejo agroecológico (restauración con autorización CAR): siembra superficial de semillas diminutas en vivero con sustrato turba de páramo + arena 1:1, vivero de altura bajo malla 50%, plantación intercalada con Espeletia spp., Hypericum juniperinum, Loricaria complanata, Diplostephium rosmarinifolium en frailejonales degradados a densidades 200-400 ind/ha con exclusión ganadera estricta. Fuentes Tier A: Bernal 2015 Catálogo Plantas Colombia (endemismo confirmado), Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, GBIF Taxonomic Backbone, POWO Kew, Ley 1930/2018.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "valeriana_arborea",
+      "nombre_comun": "Valeriana arbórea (Valeriana arborea)",
+      "nombre_comunes_regionales": [
+        "valeriana arbórea",
+        "valeriana de páramo gigante",
+        "cipresillo"
+      ],
+      "nombre_cientifico": "Valeriana arborea Killip",
+      "familia_botanica": "Caprifoliaceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "nurse_plant",
+        "pollinator_attractor"
+      ],
+      "cultivable": false,
+      "conservation_status": "endemica_colombia",
+      "altitud_msnm": {
+        "min_absoluto": 3000,
+        "optimo_min": 3200,
+        "optimo_max": 3800,
+        "max_absoluto": 4100
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 3,
+        "optimo_max": 11,
+        "max_tolerable": 16
+      },
+      "humedad_relativa_pct": {
+        "min": 70,
+        "optimo": 88,
+        "max": 100
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Aquenios pequeños con vilano plumoso. Recolección temporada seca. Germinación 30-60 días en sustrato turba + arena 2:1 bajo invernadero de altura. Trasplante bolsa 4-6 meses. Plantación >12 meses a 15-20 cm. Esquejes semileñosos con auxinas también viables (~40-60% prendimiento). Crecimiento lento (~5-8 cm/año). Endémico Colombia, protegido por Ley 1930/2018."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "ley-1930-2018-paramos"
+      ],
+      "valor_pedagogico": "La valeriana arbórea (Valeriana arborea Killip, familia Caprifoliaceae sensu APG IV, antes Valerianaceae) es una rareza ecológica y taxonómica del páramo colombiano: una valeriana arborescente — hábito altamente inusual en un género (Valeriana ~250 especies pantemperadas) dominado por hierbas y subarbustos. Endémica de Colombia, restringida a complejos paramunos de la cordillera Oriental (Sumapaz, Chingaza, Cocuy) y porciones del Macizo Colombiano (3.000-4.100 msnm). Descrita por Ellsworth Killip (1890-1968), botánico del Smithsonian Institution especialista en flora andina, durante sus expediciones colombianas 1922-1944. Filogenias moleculares recientes (Bell 2004, Donoghue et al. 2003) reposicionaron Valerianaceae dentro de Caprifoliaceae sensu lato APG IV, agrupándola con Lonicera, Sambucus y Dipsacus en el clado Dipsacales. Arbusto arborescente erecto 1.5-3.5 m altura con tronco corto y ramificación esparcida desde baja, corteza pardo-grisácea estriada. Hojas opuestas decusadas (rasgo diagnóstico de Dipsacales) pinnatífidas a pinnatipartidas (8-18 cm largo) con 3-7 pares de foliolos lanceolados aserrados, glabras a subglabras, fuertemente aromáticas al frote por presencia de valepotriatos y ácido valérico (principios activos sedantes característicos del género — uso etnomédico documentado para infusiones calmantes en tradición campesina cundiboyacense, aunque siempre con la advertencia de NO confundir con especies cultivadas medicinales y de NO extraer del páramo). Inflorescencia en cima corimbiforme terminal grande con numerosas flores pequeñas blancas a blanco-rosadas tubulares 4-7 mm, polinización entomófila por himenópteros andinos (Bombus, abejas Halictidae, Andrenidae), sírfidos y mariposas paramunas. Aquenios pequeños comprimidos coronados por vilano plumoso, dispersión anemócora eficiente. Servicio ecosistémico: recurso polinizador en plena temporada de floración paramuna, nurse plant para regeneración de especies más lentas, contribución a la diversidad estructural del frailejonal-pajonal. Lección viva de biogeografía y radiación adaptativa: el género Valeriana es uno de los grupos angiospermos con mayor proporción de endemismos paramunos colombiano-andinos (>40 especies neotropicales con epicentro andino), V. arborea ilustra la radiación adaptativa \"isleña\" del género en los páramos colombianos, con hábitos que van desde herbáceo rastrero (V. pavonii) a arborescente erecto (V. arborea) pasando por subarbustivo (V. jatamansi andina). Amenazas: extracción ilegal para uso etnomédico (a pesar de la prohibición), quema, fragmentación, expansión papera. Protección legal: Ley 1930/2018, Resolución 1912/2017 MADS-IAvH listado nacional especies amenazadas (varias Valeriana paramunas listadas), Decreto 1076/2015 MADS Compilatorio. Estado conservación: Vulnerable (VU) a En Peligro (EN) según localidad — endemismo restringido + amenaza activa. Manejo agroecológico (restauración ecológica con autorización CAR; PROHIBIDA la extracción etnomédica): recolección aquenios maduros temporada seca, vivero de altura con sustrato turba + arena 2:1, plantación 200-500 ind/ha en frailejonales paramunos en restauración, asocio con Espeletia spp., Aragoa abietina, Hypericum juniperinum. Esquejes semileñosos viables como alternativa propagativa. Fuentes Tier A: Bernal 2015 Catálogo Plantas Colombia (endemismo + autoría), Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, GBIF Taxonomic Backbone, POWO Kew, Ley 1930/2018.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "lupinus_carrikeri",
+      "nombre_comun": "Chocho de Carriker (Lupinus carrikeri)",
+      "nombre_comunes_regionales": [
+        "chocho de páramo",
+        "chocho de Carriker",
+        "lupino paramuno"
+      ],
+      "nombre_cientifico": "Lupinus carrikeri C.P.Sm.",
+      "familia_botanica": "Fabaceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "paramo"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "nitrogen_fixer",
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": false,
+      "conservation_status": "endemica_colombia",
+      "altitud_msnm": {
+        "min_absoluto": 3100,
+        "optimo_min": 3300,
+        "optimo_max": 3900,
+        "max_absoluto": 4200
+      },
+      "temperatura_c": {
+        "helada_letal": -12,
+        "optimo_min": 2,
+        "optimo_max": 10,
+        "max_tolerable": 16
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 85,
+        "max": 100
+      },
+      "ph_suelo": {
+        "min": 4,
+        "optimo_min": 4.5,
+        "optimo_max": 5.5,
+        "max": 6
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Semillas con tegumento duro: escarificación mecánica (lija) o inmersión agua caliente 60°C/12h. Germinación 14-30 días tras escarificación. Sustrato turba + arena 2:1. Trasplante bolsa 3-4 meses. Plantación >9 meses. Fijador biológico de N (~30-60 kg N/ha/año vía Bradyrhizobium spp.). Crecimiento moderado (~10-15 cm/año primeros años). Endémico Colombia, protegido por Ley 1930/2018."
+      },
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "ley-1930-2018-paramos"
+      ],
+      "valor_pedagogico": "El chocho de Carriker (Lupinus carrikeri C.P.Sm., familia Fabaceae) es un arbusto erecto endémico del páramo colombiano, una de las especies de Lupinus paramuno con porte arbustivo más robusto del cinturón altoandino (3.100-4.200 msnm). Descrito por Charles Piper Smith (botánico del USDA especialista mundial en Lupinus) en honor a Melbourne Armstrong Carriker Jr. (1879-1965), ornitólogo y colector estadounidense que vivió y trabajó largamente en Colombia (1908-1947) reuniendo una de las colecciones zoológicas y botánicas más extensas de la flora altoandina colombiana, depositada en parte en el Museo Americano de Historia Natural y en el ICN/Universidad Nacional de Colombia. El género Lupinus (~250 especies con epicentro andino y mediterráneo) es uno de los grupos de leguminosas con mayor diversidad altoandina-paramuna; los chochos colombianos forman un complejo de >30 especies, varias endémicas restringidas (L. carrikeri, L. alopecuroides \"lupino-zorro\" emblemático, L. tominensis, L. bogotensis). Arbusto erecto 0.5-2 m altura con tronco corto y ramificación densa desde la base, corteza pardo-grisácea. Hojas alternas digitado-compuestas con 7-13 foliolos oblongo-lanceolados (3-7 cm largo) sericeo-pubescentes en haz y envés con tricomas plateados que cumplen función termorreguladora + protección UV-B (rasgo compartido con otros Lupinus paramunos como L. alopecuroides). Inflorescencia en racimo terminal erecto grande (20-40 cm) con numerosas flores zigomorfas papilionáceas azul-violáceas a azul-púrpura características de Fabaceae-Papilionoideae, polinización entomófila por Bombus rohweri (abejorro paramuno endémico del cinturón altoandino colombiano-venezolano) que opera el mecanismo \"buzz pollination\" (vibración torácica que libera el polen desde la quilla floral) — relación mutualista crítica para ambas especies. Fruto legumbre vellosa con semillas duras café-oscuras. Fijación biológica de nitrógeno: simbiosis con Bradyrhizobium spp. en nódulos radiculares (~30-60 kg N/ha/año) que mejora la fertilidad de suelos turbosos paramunos oligotróficos — servicio ecosistémico crítico para la sucesión vegetal y la restauración de áreas paramunas degradadas. Servicio ecosistémico estratégico: recurso polinizador para Bombus rohweri y otros polinizadores andinos en plena temporada paramuna, fijación de N que facilita el establecimiento de otras especies pioneras y de bosque altoandino, atractor visual para fauna y turismo paramuno regulado, nurse plant. Distribución colombiana: cordillera Oriental (Sumapaz, Chingaza, Iguaque, Pisba, Cocuy) y cordillera Central (porciones Cauca-Huila) en franja sub-páramo a páramo medio (3.100-4.200 msnm). Amenazas: quema, pisoteo ganadero, fragmentación, expansión papera; algunas poblaciones críticamente fragmentadas. Protección legal: Ley 1930/2018 (Páramos), Resolución 1912/2017 MADS-IAvH lista nacional amenazadas, jurisprudencia Sentencia T-361/2017 Corte Constitucional. Estado conservación: Vulnerable (VU) Libro Rojo Plantas Colombia. Manejo agroecológico (restauración con autorización CAR, NO cultivo): recolección legumbres maduras temporada seca, escarificación mecánica + inmersión agua caliente, germinación rápida en vivero, plantación intercalada con Espeletia spp., Aragoa abietina, Hypericum juniperinum a densidades 200-600 ind/ha como pionera fijadora de N en frailejonales paramunos degradados. Asocio óptimo con Polylepis spp. para restauración multiservicio. Fuentes Tier A: Bernal 2015 Catálogo Plantas Colombia (endemismo + autoría), Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, GBIF Taxonomic Backbone, POWO Kew, Ley 1930/2018.",
+      "validation_level": "claude_draft"
     }
   ],
   "biopreparados": [
