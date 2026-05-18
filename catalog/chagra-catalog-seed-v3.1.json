@@ -11259,6 +11259,408 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El uvito de monte o chaquilulo (Cavendishia bracteata (Ruiz & Pav. ex J.St.-Hil.) Hoerold, Ericaceae) es un arbusto o arbolito andino nativo (1-4 m altura, ocasionalmente epífito sobre árboles del bosque alto-andino) propio del bosque alto-andino y subpáramo colombiano entre 2.400 y 3.200 msnm, presente en Cundinamarca (Cruz Verde, Sumapaz, Chingaza, Verjón, Guasca), Boyacá (Iguaque, Arcabuco, Cocuy, Pisba), Santander (Berlín), Antioquia (Belmira, Sonsón), Tolima, Cauca, Caldas, Risaralda y Nariño. Pertenece a Ericaceae tribu Vaccinieae (igual familia que arándanos, uva camarona, mortiño y asnao). Hojas coriáceas alternas elípticas-lanceoladas brillantes con nervadura broquidódroma característica, brácteas florales rojo-vivas muy llamativas (de ahí el epíteto bracteata) que envuelven la inflorescencia y persisten en el fruto, flores tubulares colgantes rojo-anaranjadas o rojo-blancas (1.5-2 cm) que atraen colibríes paramunos especialistas (Lafresnaya lafresnayi, Coeligena bonapartei, Eriocnemis vestita) en una coevolución planta-colibrí clásica andina. Frutos en baya globosa azul-violeta-negra (8-12 mm) comestible de sabor dulce-aromático intenso (alto en antocianinas, polifenoles, vitamina C: comparable a arándanos importados). Es lección viva de soberanía alimentaria y biodiversidad andina que enseña a niñas y niños por qué tenemos arándanos colombianos nativos sin necesidad de importar blueberries de Norteamérica: el chaquilulo, la uva camarona, el asnao y el mortiño son nuestras frutas Ericaceae andinas, adaptadas al páramo, productivas, deliciosas y de menor huella de carbono. Reivindicada hoy por chefs colombianos y agroecólogos como superfruta nativa. Aparece en planes de restauración Cruz Verde-Sumapaz como especie productiva de doble propósito. Manejo agroecológico: propagación por semilla (sustrato ácido pH 4.5-5.5, germinación 60-120 días) o esqueje semileñoso bajo cámara húmeda, vivero 12-24 meses antes de trasplante, distancia 1.5-2 m, fructificación a partir de 4-6 años, función como frutal silvestre, atractor de colibríes, nurse plant en restauración y cultivo agroforestal nativo. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "nasturtium_officinale",
+      "nombre_comun": "Berro de agua",
+      "nombre_comunes_regionales": [
+        "berro",
+        "cresón",
+        "watercress",
+        "berro común"
+      ],
+      "nombre_cientifico": "Nasturtium officinale W.T.Aiton",
+      "familia_botanica": "Brassicaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "jbb-plantas-medicinales",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "valor_pedagogico": "El berro de agua o cresón (Nasturtium officinale W.T.Aiton, Brassicaceae) es una hortaliza de hoja acuática-semiacuática perenne (15-40 cm altura) originaria de Europa, Asia occidental y el norte de África, ampliamente naturalizada en los andes colombianos entre 2.000 y 2.800 msnm en quebradas frías y aguas corrientes limpias de Cundinamarca (Sabana de Bogotá, Tabio, Tenjo, La Calera), Boyacá (Tunja, Villa de Leyva), Antioquia (Oriente antioqueño), Nariño (Pasto, Ipiales), Tolima (Cajamarca) y Cauca. Pertenece a la familia Brassicaceae (igual que rúgula, rábano, mostaza, repollo, brócoli y col) y al género Nasturtium (no confundir con Tropaeolum, la 'capuchina' a la que también se llama nasturtium en inglés). Hojas pinnadas con folíolos ovales-redondeados verde brillante (3-7 folíolos por hoja), tallos huecos suculentos que enraízan en cada nodo permitiendo propagación clonal explosiva en aguas oxigenadas, flores blancas pequeñas en racimos terminales (4 pétalos en cruz característica de Brassicaceae), silícuas alargadas con semillas en dos hileras. Es lección viva de soberanía alimentaria acuática y de aguas limpias que enseña a niñas y niños cómo una hortaliza solo crece donde el agua está sana — el berro es bioindicador de aguas no contaminadas por coliformes ni metales pesados. Hortaliza de hoja con sabor picante característico (compuestos glucosinolatos sulfurados como gluconasturtina, antioxidante, hepatoprotector y antiinflamatorio), altísima densidad nutricional (vitamina K, C, A, calcio, hierro, ranqueada #1 en el índice de densidad nutricional ANDI del CDC), tradicionalmente consumida en ensaladas frescas, sopas frías, jugos verdes y como guarnición. Cuidado sanitario: cosechar solo de aguas conocidas no contaminadas (riesgo de Fasciola hepatica en zonas ganaderas); en cultivo doméstico usar agua de lluvia o de pozo limpio en canales hidropónicos rasos. Manejo agroecológico: propagación por esqueje de tallo enraizado directo (más rápido) o semilla (germinación 7-10 días a 15-20°C, fototropo positivo), siembra en canales hidropónicos con agua corriente o lechos húmedos con riego constante, cosecha continua a partir de 4-6 semanas pellizcando ápices (estimula ramificación), distancia 15-25 cm, ciclo de cosecha 4-8 meses por planta antes de bolting. Función en chagra como hortaliza de hoja acuática complementaria, cobertura de cuerpos de agua artificiales, bioindicadora de calidad de agua de riego. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Pamplona-Roger 2006."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "ocimum_basilicum",
+      "nombre_comun": "Albahaca",
+      "nombre_comunes_regionales": [
+        "albahaca dulce",
+        "albahaca de hoja ancha",
+        "alfavaca",
+        "basil"
+      ],
+      "nombre_cientifico": "Ocimum basilicum L.",
+      "familia_botanica": "Lamiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 400,
+        "optimo_max": 1800,
+        "max_absoluto": 2400
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "jbb-plantas-medicinales",
+        "pamplona-roger-2006-plantas-medicinales",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "La albahaca dulce (Ocimum basilicum L., Lamiaceae) es una hierba aromática anual de 30-80 cm de altura originaria de India tropical y África oriental, naturalizada y cultivada extensamente en Colombia desde el nivel del mar hasta 1.800 msnm en zonas térmicas cálidas y templadas: Atlántico, Magdalena, Bolívar, Sucre (Caribe), Tolima, Huila, Valle del Cauca (valles interandinos), Cundinamarca (Tena, Mesitas, Anolaima), Antioquia (Oriente cálido), Santander (Mesa de los Santos, Lebrija). Pertenece a la familia Lamiaceae (igual que orégano, romero, menta, tomillo, salvia, hierbabuena, mejorana) y al género Ocimum del que existen >150 cultivares globales (genovesa, thai, púrpura, limón, cinnamon, sagrada-tulsi). Hojas opuestas decusadas ovaladas-elípticas verde brillante (4-10 cm) con superficie ligeramente abullonada, glándulas oleíferas visibles a contraluz que emiten el aroma característico al rozar, tallos cuadrangulares típicos de Lamiaceae, flores blanco-rosadas en espigas terminales (verticilastros) muy atractoras de abejas y polinizadores. Es lección viva de policultivo aromático y manejo integrado de plagas que enseña a niñas y niños cómo una planta repele mosquitos (limoneno, eugenol) al tiempo que atrae abejas para polinizar tomate, ají y pimentón vecinos — clásico companion plant del tomate (mejora sabor, repele Tuta absoluta, Bemisia tabaci, ácaros, hormigas). Aceite esencial rico en linalol, eucaliptol, eugenol y metil-chavicol con propiedades antibacterianas, antifúngicas, carminativas, digestivas y ansiolíticas suaves; usada en cocina mediterránea (pesto, salsas), cocina thai-vietnamita (pad krapow), cocina caribeña colombiana, té digestivo y para baños aromáticos. Manejo agroecológico: propagación por semilla (germinación 5-10 días a 22-28°C, no tolera heladas — anual obligado en clima frío), siembra directa o trasplante a las 4-6 semanas, distancia 25-40 cm, cosecha continua pellizcando ápices florales antes de antesis (mantiene producción de hoja y posterga floración), ciclo 4-8 meses, pinzar inflorescencias para prolongar productividad. Función en chagra como aromática culinaria, repelente companion del tomate-ají-pimentón, atractora de polinizadores y barrera olfativa contra plagas vectoras. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, JBB Plantas Medicinales, Pamplona-Roger 2006, Pérez-Arbeláez 1947."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "selenicereus_megalanthus",
+      "nombre_comun": "Pitahaya amarilla",
+      "nombre_comunes_regionales": [
+        "pitaya amarilla",
+        "pitahaya",
+        "yellow dragon fruit",
+        "pitaya colombiana"
+      ],
+      "nombre_cientifico": "Selenicereus megalanthus (K.Schum. ex Vaupel) Moran",
+      "familia_botanica": "Cactaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 600,
+        "optimo_min": 1200,
+        "optimo_max": 1900,
+        "max_absoluto": 2200
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-sol-andina",
+        "sib-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "La pitahaya amarilla (Selenicereus megalanthus (K.Schum. ex Vaupel) Moran, Cactaceae) es un cactus epífito-hemiepífito trepador perenne originario del piedemonte amazónico-andino de Colombia, Ecuador, Perú y Bolivia, cultivado comercialmente en Colombia entre 1.200 y 1.900 msnm en clima templado-cálido moderado en Boyacá (Miraflores, Páez, San Eduardo, principal productor — denominación de origen 'Pitahaya de Miraflores' bajo estudio), Cundinamarca (Caqueza, Fómeque, Ubaque, Quetame), Huila, Valle del Cauca y Santander. Pertenece a la familia Cactaceae tribu Hylocereeae (igual que la pitaya roja Hylocereus undatus y Hylocereus costaricensis), de tallos verdes triangulares-3-angulados con aréolas y espinas cortas blanco-amarillentas, crecimiento trepador con raíces aéreas que se adhieren a árboles tutores o estructuras de tutorado (concreto/madera/tela polietileno), flores nocturnas blanco-cremas gigantes (25-35 cm de diámetro, las más grandes de la flora colombiana cultivada) que abren una sola noche y son polinizadas por murciélagos nectarívoros (Anoura, Glossophaga) y polillas esfíngidas — aunque en cultivos comerciales se realiza polinización manual matinal para asegurar cuajado. Fruto baya elipsoidal con cáscara amarillo-brillante con brácteas (escamas) cortas y pulpa blanca translúcida con semillas negras pequeñas masticables (sabor dulce delicado, único en el mundo: Colombia es líder mundial de exportación de S. megalanthus). Es lección viva de bioeconomía sostenible, biocomercio y agroexportación colombiana que enseña a niñas y niños cómo un cactus nativo amazónico-andino se convirtió en uno de los frutales de mayor valor agregado del país (USD 8-15/kg en mercados de exportación a Europa, Asia, Norteamérica). Producto bandera del programa 'Colombia, semilla de exportación' y mercados orgánicos certificados; rica en antioxidantes (betacianinas), vitamina C, prebióticos (oligofructosa), efecto laxante suave. Manejo agroecológico: propagación por esqueje de cladodio maduro (segmento de 30-40 cm, cicatrizado 5-7 días antes de siembra) o semilla (sin uso comercial — variabilidad genética alta), tutorado obligatorio sobre 'T' de concreto con tela polietileno o sobre tutor vivo (matarratón, leucaena), distancia 3x3 m o doble fila 2.5x1.5 m, plena producción a partir de año 3-4, cosecha 8-9 meses post-floración cuando cáscara cambia de verde a amarillo intenso, polinización manual al amanecer para maximizar cuajado. Función en chagra como frutal de alto valor agregado, atractora de murciélagos polinizadores nocturnos, cultivo de exportación sostenible. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Sol Andina, SiB Colombia, Bernal 2015, ICA Resolución 3168."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "solanum_muricatum",
+      "nombre_comun": "Pepino dulce",
+      "nombre_comunes_regionales": [
+        "pepino andino",
+        "pepino melón",
+        "mataserrano",
+        "sweet cucumber",
+        "cachún"
+      ],
+      "nombre_cientifico": "Solanum muricatum Aiton",
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 2800,
+        "max_absoluto": 3100
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "nrc-1989-cultivos-andinos",
+        "agrosavia-sol-andina",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "El pepino dulce o pepino andino (Solanum muricatum Aiton, Solanaceae) es una hortaliza-frutal subutilizada perenne herbácea de 60-100 cm de altura nativa de los Andes (Colombia, Ecuador, Perú, Bolivia — sin progenitor silvestre conocido, lo que indica largo proceso de domesticación pre-incaica > 2.500 años), cultivada en Colombia entre 2.000 y 2.800 msnm en clima templado-frío en Boyacá (Tunja, Paipa, Sogamoso, Tibasosa), Cundinamarca (Sabana de Bogotá, Tenjo, Cota, Chía, Cajicá), Nariño (Pasto, Ipiales, Yacuanquer), Antioquia (Oriente antioqueño, Sonsón, Abejorral), Caldas (Manizales rural) y Santander (Páramo de Berlín). Pertenece a la familia Solanaceae (igual que tomate, papa, ají, lulo, tomate de árbol, uchuva) y al género Solanum sección Petota próximo a la papa. Tallos suculentos semileñosos en la base, hojas alternas simples o pinnadas ovado-lanceoladas verde grisáceas, flores azul-violetas a blancas con estrías púrpuras (estructura solanácea típica de 5 pétalos fusionados con anteras amarillas cónicas), fruto baya ovoide-piriforme amarillo-crema con estrías o jaspes púrpura-violetas características, pulpa blanca-amarilla acuosa-jugosa de sabor dulce-suave-aromático combinando melón con pepino (140-300 g por fruto). Es lección viva de biodiversidad andina subutilizada y soberanía alimentaria que enseña a niñas y niños cómo Colombia tiene un pepino dulce nativo que NO necesita riego intensivo ni invernadero como el pepino europeo (Cucumis sativus), y cómo los pueblos muiscas, pastos y chibchas pre-colombinos seleccionaron por generaciones esta solanácea — pero hoy es 'olvidada' porque no figura en supermercados. Bajo en calorías, alto en agua, vitamina C, β-caroteno (variedades pigmentadas) y minerales; consumido fresco, en ensaladas, jugos, postres y mermeladas. Variedades colombianas reportadas: 'Pasto morado', 'Soatá criollo'. Manejo agroecológico: propagación principalmente por esqueje semileñoso (más rápido y conserva clon — selección de plantas madre productivas) o semilla (germinación 14-21 días a 18-22°C), distancia 80x80 cm o 100x50 cm, tutorado o conducción rastrera, ciclo productivo 6-8 meses hasta primera cosecha, productivo 2-3 años antes de renovación, cosecha escalonada cuando fruto desarrolla color amarillo-crema con vetas púrpuras. Función en chagra como hortaliza-frutal nativa, cultivo de rescate del germoplasma andino, diversificación productiva familiar. Fuentes Tier A: GBIF, POWO Kew, NRC 1989 Cultivos Andinos, AGROSAVIA Sol Andina, Bernal 2015, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "agave_americana",
+      "nombre_comun": "Cabuya",
+      "nombre_comunes_regionales": [
+        "fique de maguey",
+        "maguey",
+        "pita",
+        "century plant",
+        "penca azul"
+      ],
+      "nombre_cientifico": "Agave americana L.",
+      "familia_botanica": "Asparagaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "living_fence",
+        "pollinator_attractor",
+        "windbreak"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 500,
+        "optimo_min": 1500,
+        "optimo_max": 2400,
+        "max_absoluto": 2800
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "La cabuya o fique de maguey (Agave americana L., Asparagaceae subfamilia Agavoideae) es una planta suculenta xerófila monocárpica perenne (vive 10-30 años y florece una sola vez antes de morir) originaria de México y Centroamérica, naturalizada en Colombia desde la colonia entre 1.500 y 2.400 msnm en zonas térmicas templadas-cálidas semiáridas: Boyacá (Villa de Leyva, Sáchica, Sutamarchán, Ráquira, valle seco del Suárez), Santander (Cañón del Chicamocha, Curití, San Gil, Barichara, Aratoca — corazón histórico de la cultura del fique colombiano), Norte de Santander (Chinácota), Cundinamarca (Suesca, Nemocón, Tausa), Huila (Tatacoa), Tolima (norte) y Nariño (Patía). Pertenece a la familia Asparagaceae subfamilia Agavoideae (no Agavaceae como en taxonomías antiguas previas APG IV; igual familia que esparragueras y reclasificada con yucas y dracaenas). Roseta gigantesca (1.5-3 m de diámetro) de hojas (pencas) suculentas gris-azulado-glaucas lanceoladas lineales (1-2 m largo x 15-25 cm ancho) con dientes marginales fuertes y espina apical perforante muy aguda. Tras 10-30 años produce un escapo floral gigantesco (5-10 m altura) tipo asparágido con miles de flores amarillentas-verdosas polinizadas por murciélagos, abejorros y colibríes. Es lección viva de patrimonio agrícola colonial, cerca viva tradicional santandereana y bioeconomía artesanal que enseña a niñas y niños cómo de cada penca se sacaba la cabuya o fique blanco artesanal (fibra mediante 'raspado') para tejer alpargatas, costales, mochilas (Barichara, San Gil); cómo del corazón se extraía aguamiel y se fermentaba en chicha-de-maguey similar al pulque mexicano; cómo del escapo floral se sacaban quiotes alimenticios; y cómo las cercas vivas de maguey eran (y son) barreras infranqueables para ganado mucho antes del alambre de púas. Aunque la fibra industrial colombiana actual viene principalmente de Furcraea (Furcraea andina, Furcraea cabuya, Furcraea macrophylla — el 'fique' propiamente dicho), el Agave americana sigue vivo en cercas, paisaje cultural santandereano-boyacense y patrimonio. Manejo agroecológico: propagación por hijuelos basales (más rápido — la planta produce 20-50 hijos a lo largo de su vida) o bulbillos del escapo floral o semilla (rara, lenta), distancia 2-4 m en línea de cerca o 5x5 m disperso, tolera sequía extrema (CAM photosynthesis), suelos pobres y pedregosos, prácticamente sin manejo durante 10-30 años, alelopática moderada (ayuda a controlar malezas en su radio). Función en chagra como cerca viva impenetrable, rompevientos xérico, atractor de polinizadores nocturnos, regenerador de suelos degradados, fibra artesanal y patrimonio cultural campesino. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, Pérez-Arbeláez 1947, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "passiflora_edulis_amarilla_colombia",
+      "nombre_comun": "Gulupa amarilla colombiana",
+      "nombre_comunes_regionales": [
+        "gulupa amarilla",
+        "gulupa de exportación",
+        "passion fruit yellow Colombia",
+        "yellow gulupa"
+      ],
+      "nombre_cientifico": "Passiflora edulis Sims (cultivar amarillo colombiano)",
+      "familia_botanica": "Passifloraceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1800,
+        "optimo_max": 2400,
+        "max_absoluto": 2700
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-sol-andina",
+        "sib-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "La gulupa amarilla colombiana (Passiflora edulis Sims, cultivar amarillo de altitud, Passifloraceae) es un cultivar híbrido-seleccionado de Passiflora edulis adaptado a clima templado-frío de altitud (1.800-2.400 msnm) que combina la coloración externa amarilla del maracuyá tropical (P. edulis f. flavicarpa) con el porte, sabor aromático intenso y aptitud para zonas frías de la gulupa morada (P. edulis f. edulis) — material distinto al maracuyá común de tierra caliente (registrado como `passiflora_edulis_flavicarpa` en este catálogo), desarrollado en programas colombianos de mejoramiento de pasifloras de exportación con cultivos comerciales emergentes en Cundinamarca (Tena, Granada, Cáqueza, Fómeque), Boyacá (Garagoa, Tenza, Pachavita), Antioquia (Oriente — La Ceja, Marinilla, El Carmen), Caldas (Manizales rural) y Valle del Cauca (Sevilla, Caicedonia). Pertenece a la familia Passifloraceae como el resto del complejo Passiflora cultivado en Colombia (gulupa morada, maracuyá amarillo de tierra caliente, granadilla, curuba mollissima, badea). Liana trepadora vigorosa con zarcillos axilares, hojas alternas trilobadas verde brillante con margen serrado, flores hermafroditas grandes (8-10 cm) con la corona filamentosa púrpura-blanca característica de las pasifloras, fruto baya globosa-elipsoidal con cáscara amarilla brillante (a diferencia de la morada de la gulupa tradicional), arilos gelatinosos anaranjados con semillas negras envueltas, aroma intenso característico, mayor acidez balanceada con dulzor que en la gulupa morada estándar — perfil sensorial valorado en mercados europeos de exportación. Es lección viva de mejoramiento participativo, biocomercio y diferenciación de mercado que enseña a niñas y niños cómo la diversidad genética de un mismo género (Passiflora) permite a Colombia exportar gulupa morada, gulupa amarilla, maracuyá tropical, granadilla, curuba y badea — cada una a un nicho de mercado distinto. Manejo agroecológico: propagación por semilla seleccionada (germinación 14-21 días a 22-26°C) o por injerto sobre patrón resistente a Fusarium oxysporum (mejor rendimiento y vida útil), micorrizas obligatorias al trasplante, tutorado en T o emparrado de alambre a 2-2.2 m, distancia 3x3 m o 4x2 m, ciclo a primera cosecha 10-14 meses, ciclo productivo 2-4 años antes de renovación, manejo integrado de plagas (trips, ácaros, áfidos, mosca de la fruta) y enfermedades (virus mosaico, antracnosis, septoriosis). Función en chagra como frutal de exportación diversificado dentro del complejo Passiflora cultivable en clima frío de altitud. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Sol Andina, SiB Colombia, Bernal 2015, ICA Resolución 3168."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "passiflora_quadrangularis",
+      "nombre_comun": "Badea",
+      "nombre_comunes_regionales": [
+        "parcha gigante",
+        "parchita guanábana",
+        "maracuyá gigante",
+        "giant granadilla",
+        "tumbo gigante"
+      ],
+      "nombre_cientifico": "Passiflora quadrangularis L.",
+      "familia_botanica": "Passifloraceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 400,
+        "optimo_max": 1600,
+        "max_absoluto": 2000
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "agrosavia-sol-andina",
+        "sib-colombia",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "La badea o parcha gigante (Passiflora quadrangularis L., Passifloraceae) es una liana frutal perenne nativa del neotrópico (norte de Suramérica y Caribe, posiblemente originaria de Amazonia colombo-peruana), cultivada tradicionalmente en Colombia desde el nivel del mar hasta 1.600 msnm en zonas térmicas cálidas y templadas: Tolima (Mariquita, Honda, Chaparral, Líbano — corazón histórico productor que dio fama nacional a 'la badea del Tolima'), Huila (Neiva, Rivera, Campoalegre), Cundinamarca (Tena, Apulo, Anolaima, Quipile, La Mesa), Antioquia (Oriente cálido — Sonsón bajo, Cocorná), Caldas, Quindío, Valle del Cauca, Santander (Mesa de los Santos, Lebrija) y el piedemonte amazónico (Caquetá, Putumayo). Pertenece a la familia Passifloraceae como el resto del complejo cultivado (gulupa morada, gulupa amarilla, maracuyá amarillo, granadilla, curuba). Liana trepadora vigorosísima con tallos cuadrangulares alados característicos (de ahí el epíteto quadrangularis — el único en el género con esta morfología), hojas grandes ovado-cordadas enteras verde brillante (10-20 cm), zarcillos axilares robustos, flores hermafroditas espectaculares las más grandes del género (10-15 cm de diámetro) con corona filamentosa violeta-blanca multicolor que atraen abejorros carpinteros (Xylocopa) — sus polinizadores específicos —, fruto baya gigante ovoide-elipsoidal (15-30 cm largo, 1-4 kg, los más grandes de todo el género Passiflora a nivel mundial), cáscara verde-amarilla gruesa carnosa comestible cuando madura, pulpa amarilla gelatinosa-aromática con semillas pequeñas. Es lección viva de gigantismo neotropical, agroforestería tropical y patrimonio cultural cafetero-tolimense que enseña a niñas y niños cómo una sola fruta de un solo bejuco puede pesar 4 kilos y alimentar a una familia entera, y cómo en la cultura cafetera del Tolima la badea se cultiva sobre los mismos tutores vivos del café o sobre techos de patio (parras de patio) como sombra alimenticia + frutal + ornamental. Mesocarpo carnoso (la 'carne blanca' bajo la cáscara) consumido en sopas, sancochos y dulces; pulpa interior en jugos refrescantes (sabor dulce-aromático suave), mermeladas y postres. Manejo agroecológico: propagación por semilla (germinación 21-30 días a 25-28°C) o esqueje semileñoso, polinización manual recomendada en cultivos comerciales (sustituye al abejorro Xylocopa en ausencia), tutorado robusto en parra alta (cables 2.5-3 m) o sobre tutor vivo (matarratón, guamo, café de sombra), distancia 4x4 m a 5x5 m por su porte gigante, ciclo a primera cosecha 12-18 meses, vida productiva 4-6 años. Función en chagra como frutal de patio tropical, atractor de Xylocopa carpenter bees, sombra alimenticia integrada en agroforestería cafetera. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, AGROSAVIA Sol Andina, SiB Colombia, Pérez-Arbeláez 1947."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "physalis_philadelphica",
+      "nombre_comun": "Tomatillo verde",
+      "nombre_comunes_regionales": [
+        "tomatillo mexicano",
+        "miltomate",
+        "tomate de cáscara",
+        "husk tomato",
+        "tomate verde"
+      ],
+      "nombre_cientifico": "Physalis philadelphica Lam.",
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "nrc-1989-cultivos-andinos",
+        "agrosavia-manual-uchuva-2015",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "El tomatillo verde mexicano (Physalis philadelphica Lam., Solanaceae) es una hortaliza-frutal anual de 40-90 cm de altura nativa de Mesoamérica (México central, principalmente del altiplano mexicano donde fue domesticada por los pueblos mexicas, otomíes y mayas hace más de 2.500 años — la base de la salsa verde mesoamericana), naturalizada y cultivada en Colombia entre 1.800 y 2.600 msnm como cultivo emergente de soberanía alimentaria y diversificación gastronómica en Cundinamarca (Sabana de Bogotá rural, Cota, Chía, Subachoque, Sopó), Boyacá (Tunja, Soracá, Combita, Tibaná), Nariño (Pasto, Yacuanquer, Tangua) y zona cafetera (Caldas, Quindío, Risaralda — altitudes templadas). Pertenece a la familia Solanaceae y al género Physalis (igual que la uchuva colombiana Physalis peruviana — su pariente más cercano y registrado en este catálogo) — la diferencia esencial es que el tomatillo NO es la uchuva: el tomatillo se consume verde inmaduro con cáscara papirácea ajustada al fruto, mientras la uchuva se consume madura amarilla con cáscara holgada. Hojas alternas ovadas con margen sinuado, flores amarillas con manchas púrpura en la base de los pétalos (estructura solanácea típica de 5 pétalos fusionados con anteras moradas), fruto baya esférica verde-amarillenta brillante (2.5-5 cm) envuelta en cáliz acrescente papiráceo verde-marrón característico del género, pulpa firme jugosa con sabor agrio-fresco distintivo (alto en ácido cítrico y ácido málico). Es lección viva de soberanía alimentaria latinoamericana, intercambio cultural mesoamericano-andino y biodiversidad culinaria que enseña a niñas y niños cómo la salsa verde mexicana (chilaquiles, enchiladas verdes, salsa para tacos) tiene un primo colombiano (la uchuva) y cómo la cocina colombiana se enriquece adoptando este ingrediente prehispánico hermano. Variedades comerciales: 'Rendidora', 'Verde Puebla', 'Salsa Verde'. Manejo agroecológico: propagación por semilla (germinación 7-14 días a 18-22°C, requiere autoincompatibilidad — sembrar 2+ plantas para polinización cruzada por abejas), siembra directa o trasplante a las 4-6 semanas, distancia 60-80 cm entre plantas y 1-1.2 m entre surcos, ciclo 90-120 días desde trasplante hasta primera cosecha, planta indeterminada que produce continuamente 3-5 meses, tutorado opcional pero recomendado, cosecha cuando el cáliz cambia de verde a paja-amarillo y el fruto llena pero aún está verde-brillante (NO esperar a que amarillee — pierde calidad). Función en chagra como hortaliza-frutal solanácea diversificadora, sustituta culinaria de la uchuva en preparaciones saladas, atractora de polinizadores. Fuentes Tier A: GBIF, POWO Kew, NRC 1989 Cultivos Andinos, AGROSAVIA Manual Uchuva 2015, Bernal 2015, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "solanum_betaceum_naranja",
+      "nombre_comun": "Tomate de árbol naranja",
+      "nombre_comunes_regionales": [
+        "tomate de árbol amarillo",
+        "tamarillo orange",
+        "tamarillo amarillo",
+        "tomate de palo naranja"
+      ],
+      "nombre_cientifico": "Solanum betaceum Cav. (cultivar naranja-amarillo)",
+      "familia_botanica": "Solanaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1800,
+        "optimo_max": 2500,
+        "max_absoluto": 2800
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-sol-andina",
+        "bernal-2015-plantas-liquenes-colombia",
+        "nrc-1989-cultivos-andinos",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "El tomate de árbol naranja (Solanum betaceum Cav., cultivar naranja-amarillo, Solanaceae) es la variedad o forma cromática anaranjada-amarilla del tomate de árbol andino tradicional (registrado en este catálogo como `solanum_betaceum`, donde el cultivar dominante comercializado es el rojo-púrpura), nativa de los Andes (Colombia, Ecuador, Perú, Bolivia) y cultivada en Colombia entre 1.800 y 2.500 msnm en clima templado-frío con cultivos comerciales notables en Antioquia (Oriente — La Unión, La Ceja, Sonsón, Abejorral), Cundinamarca (Sabana de Bogotá, Subachoque, Tausa, Pacho), Boyacá (Garagoa, Tenza, Sutatenza, Pachavita), Caldas (Manizales rural, Villamaría, Marulanda), Risaralda (Pereira rural, Belén de Umbría) y Nariño (Pasto, Yacuanquer, Tangua). Misma familia Solanaceae y mismo género Solanum sección Cyphomandra (igual que el tomate de árbol rojo-púrpura, lulo, naranjilla y otros tamarillos cordilleranos). Arbolito perenne semileñoso de copa redondeada (2-4 m altura, vida útil productiva 4-8 años), hojas alternas grandes acorazonadas pubescentes verde grisáceo, flores pequeñas rosa-blancas con anteras amarillas (estructura solanácea típica) en cimas axilares, fruto baya ovoide (5-10 cm) con piel lisa anaranjado-amarillo brillante (en contraste con el rojo-púrpura intenso del cultivar tradicional), pulpa jugosa anaranjada con semillas pardas envueltas en gel translúcido — perfil sensorial menos ácido y más dulce-aromático que el rojo-púrpura, mayor contenido de carotenoides (β-caroteno, criptoxantina — provitamina A). Es lección viva de diversidad cromática intraespecífica, agrobiodiversidad andina y bioeconomía pigmentaria que enseña a niñas y niños cómo dentro de UNA misma especie domesticada (Solanum betaceum) los pueblos andinos seleccionaron por miles de años diferentes cultivares cromáticos: rojo-púrpura, anaranjado-amarillo y morado oscuro (este último registrado como `solanum_betaceum_morado`), cada uno con perfil nutricional y sensorial propio (carotenoides vs antocianinas vs licopeno). Consumido fresco, en jugos pulpa-leche, mermeladas, salsas dulces, sorbetes y cocteles de fruta tropical fría. Manejo agroecológico: propagación por semilla seleccionada de plantas madre productivas (germinación 21-30 días a 18-22°C, requiere 6-12 meses en vivero antes de trasplante) o por injerto sobre patrón resistente a Phytophthora cinnamomi y a nematodos (mejor longevidad), distancia 3x3 m o 4x2.5 m, tutoreo en estaca para soporte mecánico del fuste delgado, fertilización balanceada con micorrizas, plena producción a partir de año 2, manejo integrado de antracnosis, mildew velloso, virus del tomate de árbol y mosca de la fruta (Anastrepha). Función en chagra como frutal andino de pigmento naranja, sustituto/complemento del cultivar rojo-púrpura para diversificación de mercado y nutricional. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Sol Andina, Bernal 2015, NRC 1989 Cultivos Andinos, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "solanum_betaceum_morado",
+      "nombre_comun": "Tomate de árbol morado",
+      "nombre_comunes_regionales": [
+        "tamarillo morado",
+        "tomate de árbol negro",
+        "tamarillo black",
+        "tomate de palo morado"
+      ],
+      "nombre_cientifico": "Solanum betaceum Cav. (cultivar morado-antocianínico)",
+      "familia_botanica": "Solanaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1800,
+        "optimo_max": 2500,
+        "max_absoluto": 2800
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-sol-andina",
+        "bernal-2015-plantas-liquenes-colombia",
+        "nrc-1989-cultivos-andinos",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "El tomate de árbol morado (Solanum betaceum Cav., cultivar morado-antocianínico, Solanaceae) es la variedad o forma cromática morada-pigmentada del tomate de árbol andino (registrado en este catálogo como `solanum_betaceum` para el cultivar dominante rojo-púrpura y `solanum_betaceum_naranja` para el cultivar amarillo), nativa de los Andes (Colombia, Ecuador, Perú, Bolivia) y cultivada en Colombia entre 1.800 y 2.500 msnm en clima templado-frío con presencia en cultivos especializados y huertos campesinos de Antioquia (Oriente — La Unión, La Ceja, Sonsón), Cundinamarca (Sabana de Bogotá, Subachoque, Tausa, Pacho), Boyacá (Garagoa, Tenza, Sutatenza), Caldas (Manizales rural, Villamaría), Nariño (Pasto, Yacuanquer) y zonas de mejoramiento participativo del germoplasma del banco genético de AGROSAVIA en La Selva (Rionegro, Antioquia). Misma familia Solanaceae, mismo género Solanum sección Cyphomandra. Morfología idéntica al cultivar rojo-púrpura (arbolito perenne semileñoso 2-4 m, hojas acorazonadas pubescentes, flores rosa-blancas, vida productiva 4-8 años), pero fruto baya ovoide (5-10 cm) con piel lisa morado-oscuro-casi-negro brillante con manchas longitudinales más claras, pulpa anaranjada-amarilla profunda con semillas pardas envueltas en gel morado-violeta intenso (antocianinas concentradas en la cáscara y en el gel que rodea las semillas) — perfil bioquímico distintivo: alto contenido de antocianinas (delfinidina-3-glucósido, cianidina-3-rutinósido, peonidina-3-glucósido) con capacidad antioxidante 2-3 veces superior al cultivar rojo, perfil aromático ligeramente más complejo, sabor agridulce más intenso. Es lección viva de bioquímica de pigmentos vegetales, agrobiodiversidad funcional y nutracéutica andina que enseña a niñas y niños cómo el color morado de una fruta NO es estético sino quimiprotector — las antocianinas son antioxidantes potentes producidos por la planta para protegerse de la radiación UV del altiplano, y al consumir el fruto morado las personas heredan esa protección antioxidante (capacidad ORAC 4.000-8.000 µmol TE/100 g vs 1.500-3.000 del cultivar rojo). Producto emergente de exportación de superfrutas andinas; consumido fresco, en jugos pulpa-leche, postres, sorbetes pigmentados, salsas dulces y formulaciones funcionales (suplementos antioxidantes naturales). Manejo agroecológico: propagación por semilla seleccionada de plantas madre con pigmentación intensa (estable — el morado se hereda) o por injerto sobre patrón resistente a Phytophthora cinnamomi y nematodos, distancia 3x3 m, tutoreo en estaca, fertilización balanceada con micorrizas, plena producción a partir de año 2, manejo integrado de antracnosis, mildew velloso, virus del tomate de árbol y mosca de la fruta. Función en chagra como frutal andino de pigmento antociánico, cultivo de alto valor nutracéutico, diversificación cromática del germoplasma de Solanum betaceum y oportunidad de exportación de superfrutas funcionales. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Sol Andina, Bernal 2015, NRC 1989 Cultivos Andinos, SiB Colombia."
     }
   ],
   "biopreparados": [
