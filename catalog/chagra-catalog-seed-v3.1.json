@@ -955,7 +955,10 @@
         "ica-resolucion-3168-2015",
         "agrosavia-sol-andina"
       ],
-      "valor_pedagogico": "El brócoli (Brassica oleracea var. italica) es una crucífera hortícola cultivada en el cinturón agrícola de Cundinamarca (Mosquera-Madrid-Bojacá) entre 1800-2800 msnm en zonas térmicas fría y templada. Su ciclo de cultivo varía entre 90-120 días, se propaga por semilla con trasplante y requiere suelos ricos en materia orgánica nitrogenada. Varietales comerciales como Avenger, Marathon y Calabrese se adaptan bien a estas condiciones. En el contexto andino campesino, se asocia frecuentemente con cultivos de papa y cebolla en rotaciones que mejoran la estructura del suelo. Principal plagas incluyen mosca blanca y lepidópteros que dañan los botones florales. Fuente: AGROSAVIA Sol Andina ficha técnica."
+      "valor_pedagogico": "El brócoli (Brassica oleracea var. italica) es una crucífera hortícola cultivada en el cinturón agrícola de Cundinamarca (Mosquera-Madrid-Bojacá) entre 1800-2800 msnm en zonas térmicas fría y templada. Su ciclo de cultivo varía entre 90-120 días, se propaga por semilla con trasplante y requiere suelos ricos en materia orgánica nitrogenada. Varietales comerciales como Avenger, Marathon y Calabrese se adaptan bien a estas condiciones. En el contexto andino campesino, se asocia frecuentemente con cultivos de papa y cebolla en rotaciones que mejoran la estructura del suelo. Principal plagas incluyen mosca blanca y lepidópteros que dañan los botones florales. Fuente: AGROSAVIA Sol Andina ficha técnica.",
+      "antagonists": [
+        "lactuca_sativa_crispa_verde"
+      ]
     },
     {
       "id": "brassica_oleracea_sabauda",
@@ -1980,9 +1983,17 @@
         "gbif-taxonomic-backbone",
         "ica-resolucion-3168-2015",
         "restrepo-1996-abc-agricultura-organica",
-        "powo-kew"
+        "powo-kew",
+        "agrosavia-tibaitata"
       ],
-      "valor_pedagogico": "La lechuga crespa verde (Lactuca sativa L. var. crispa, cultivares Vera, Verónica, Salinas) es una hortaliza de hoja anual ampliamente cultivada en Colombia, principalmente en el cinturón hortícola de la Sabana de Bogotá (Mosquera, Madrid, Funza, Tenjo, Cota), Boyacá altiplano y Nariño entre 2.000 y 2.900 msnm en zona térmica fría. Ciclo corto 50-70 días desde trasplante, rendimientos 18-25 t/ha cabezas. Crece bien en suelos francos con materia orgánica abundante (>4%), pH 6.0-7.0, riego constante. Sensible a heladas; aprecia días frescos (10-22°C). Manejo agroecológico: rotación con leguminosas (frijol, haba), siembra densa para sombreo entre filas, biopreparados como biol foliar y compost al fondo, control de áfidos (Myzus persicae) con purín de ortiga + lavanderas. Fuentes Tier A: AGROSAVIA Sol Andina, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy."
+      "valor_pedagogico": "La lechuga crespa verde (Lactuca sativa L. var. crispa, cultivares Vera, Verónica, Salinas) es una hortaliza de hoja anual ampliamente cultivada en Colombia, principalmente en el cinturón hortícola de la Sabana de Bogotá (Mosquera, Madrid, Funza, Tenjo, Cota), Boyacá altiplano y Nariño entre 2.000 y 2.900 msnm en zona térmica fría. Ciclo corto 50-70 días desde trasplante, rendimientos 18-25 t/ha cabezas. Crece bien en suelos francos con materia orgánica abundante (>4%), pH 6.0-7.0, riego constante. Sensible a heladas; aprecia días frescos (10-22°C). Manejo agroecológico: rotación con leguminosas (frijol, haba), siembra densa para sombreo entre filas, biopreparados como biol foliar y compost al fondo, control de áfidos (Myzus persicae) con purín de ortiga + jabón potásico. Asociar con zanahoria (Daucus carota) que repele áfidos por aroma de aceites esenciales y con frijol arbustivo (Phaseolus vulgaris) que aporta N. Evitar siembra contigua con brassicáceas (col, brócoli) que compiten fuerte por N y ahuyentan polinizadores beneficiosos. Para evitar bolting prematuro en verano, sembrar bajo media sombra (35-50% malla) y cosechar antes del filamiento floral. Fuentes Tier A: AGROSAVIA Tibaitatá, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
+      "companions": [
+        "daucus_carota_subsp_sativus",
+        "phaseolus_vulgaris"
+      ],
+      "antagonists": [
+        "brassica_oleracea_italica"
+      ]
     },
     {
       "id": "lactuca_sativa_longifolia_morada",
@@ -2809,7 +2820,8 @@
       },
       "companions": [
         "zea_mays",
-        "lactuca_sativa_capitata"
+        "lactuca_sativa_capitata",
+        "lactuca_sativa_crispa_verde"
       ],
       "antagonists": [
         "foeniculum_vulgare",
@@ -6933,7 +6945,10 @@
         "powo-kew",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Leccion de calidad del suelo: la zanahoria revela la estructura del suelo al desarrollarse; suelos compactos producen raices deformes, ensenando la importancia de la preparacion profunda."
+      "valor_pedagogico": "Leccion de calidad del suelo: la zanahoria revela la estructura del suelo al desarrollarse; suelos compactos producen raices deformes, ensenando la importancia de la preparacion profunda.",
+      "companions": [
+        "lactuca_sativa_crispa_verde"
+      ]
     },
     {
       "id": "allium_schoenoprasum",
