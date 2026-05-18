@@ -1,27 +1,6 @@
 /**
- * @typedef {Object} ChagraAsset
- * @property {string} id - UUID FarmOS
- * @property {'asset--plant' | 'asset--material' | 'asset--land' | 'asset--structure'} type
- * @property {Object} attributes
- * @property {string} attributes.name
- * @property {'active' | 'archived'} attributes.status
- * @property {Object} [attributes.notes]
- * @property {string} [attributes.notes.value]
- * @property {Object} relationships
- * @property {boolean} [_pending] - flag local pre-FarmOS sync
- * @property {'no_network' | 'no_token' | 'sync_error'} [_pendingReason]
- * @property {number} [_createdAt] - timestamp local ms
- */
-
-/**
- * @typedef {Object} ChagraLog
- * @property {string} id
- * @property {'log--seeding' | 'log--input' | 'log--harvest' | 'log--observation'} type
- * @property {Object} attributes
- * @property {string} attributes.name
- * @property {number} attributes.timestamp - unix seconds
- * @property {'pending' | 'done'} attributes.status
- * @property {Object} relationships
+ * ChagraAsset / ChagraLog: definiciones canónicas viven en `./asset.js` y `./log.js`.
+ * Se re-exportan abajo vía `@typedef {import(...)}` para evitar duplicate identifier (TS2300).
  */
 
 /**

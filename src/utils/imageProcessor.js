@@ -65,7 +65,14 @@ export const optimizeImage = (file, maxWidth = 1280, quality = 0.8) => {
 export const blobToDataUrl = (blob) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result);
+    reader.onloadend = () => {
+      // readAsDataURL siempre produce string; narrow para satisfacer TS.
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
+      } else {
+        reject(new Error('FileReader devolvió un tipo inesperado (esperaba string).'));
+      }
+    };
     reader.onerror = () => reject(reader.error);
     reader.readAsDataURL(blob);
   });

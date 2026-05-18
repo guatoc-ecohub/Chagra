@@ -49,7 +49,7 @@ export function formatRelativeTime(ts, locale = 'es-CO') {
   const d = new Date(ts);
   if (isNaN(d.getTime())) return '';
   const now = new Date();
-  const diffMs = now - d;
+  const diffMs = now.getTime() - d.getTime();
   const diffMin = Math.floor(diffMs / 60000);
 
   if (diffMin < 1) return 'Ahora mismo';
