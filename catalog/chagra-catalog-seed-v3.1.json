@@ -8343,9 +8343,12 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "bernal-2015-plantas-liquenes-colombia",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Variedad de hinojo seleccionada por su bulbo comestible. Ensenia el aporque como tecnica de blanqueado y la diferencia entre la forma silvestre y la domesticada."
+      "valor_pedagogico": "El hinojo de bulbo o hinojo dulce (Foeniculum vulgare Mill. var. azoricum (Mill.) Thell., familia Apiaceae, subfamilia Apioideae) es una apiácea bienal cultivada seleccionada del hinojo silvestre mediterráneo (Foeniculum vulgare var. vulgare) por su base foliar engrosada-suculenta en forma de bulbo blanco-verdoso (5-15 cm diámetro) formado por las vainas de los pecíolos sobrepuestas en roseta, originaria de las Islas Azores y el Mediterráneo occidental. Su sabor anisado-dulce característico proviene de aceites esenciales ricos en trans-anetol (60-90%), estragol, fenchona y limoneno. Se cultiva en huertos andinos colombianos de clima frío templado en Cundinamarca (Sabana de Bogotá, Subachoque, Sopó, Tabio), Boyacá (Tunja, Villa de Leyva, Sutamarchán), Antioquia (oriente — La Ceja, El Retiro), Nariño (Pasto) y Eje cafetero alto entre 1.500 y 2.600 msnm en zona térmica templada a fría seca. Ciclo 90-120 días desde siembra a cosecha de bulbo. Rendimientos 18-30 t/ha bulbo fresco. Lección viva de técnicas hortícolas y de domesticación dirigida: variedad de hinojo seleccionada específicamente por su bulbo comestible (rasgo ausente en la forma silvestre original), enseña el aporque como técnica de blanqueado (etiolización por exclusión lumínica con tierra acumulada alrededor de la base) que produce bulbos blancos más tiernos y dulces al inhibir clorofila y reducir compuestos amargos, y enseña la diferencia conceptual entre la forma silvestre poliflorítica resistente y la forma domesticada bulbosa fino, comparable a la transformación apio silvestre-apio Pascal y achicoria silvestre-endivia. Manejo agroecológico: siembra directa por su raíz pivotante sensible al trasplante (evita transplante post-cotiledones), raleo a 25-30 cm entre plantas, aporque progresivo cada 20 días a partir de los 60 días, riego constante moderado, asocio con lechuga y rábano de ciclo corto, no requiere agroquímicos. Fuentes Tier A: AGROSAVIA Manual Hortalizas, POWO Kew, GBIF Backbone Taxonomy, ICA Resolución 3168/2015, Bernal 2015 Catálogo Plantas Colombia."
     },
     {
       "id": "cyclanthera_pedata",
@@ -8385,9 +8388,13 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
-        "sib-colombia"
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "agrosavia-sol-andina"
       ],
-      "valor_pedagogico": "Cucurbitacea nativa de los Andes subestimada. Ensenia el valor de las especies tradicionales subutilizadas en la seguridad alimentaria y la importancia de conservar germoplasma andino."
+      "valor_pedagogico": "La achocha o caigua (Cyclanthera pedata (L.) Schrad., familia Cucurbitaceae, tribu Cucurbiteae) es una cucurbitácea anual herbácea trepadora vigorosa nativa de los Andes sudamericanos (Colombia, Ecuador, Perú, Bolivia), domesticada hace ~4.000 años por las culturas precolombinas andinas y cultivada tradicionalmente en huertos campesinos colombianos como cultivo de chagra subutilizado de altísimo valor agronómico y nutricional. Produce frutos verdes elongados curvos (8-15 cm) huecos con semillas planas oscuras, paredes carnosas comestibles consumidas verdes-tiernas (no requiere despepitado), ricas en fibra dietaria, minerales (calcio, magnesio, hierro, potasio), vitaminas A y C, y compuestos hipolipemiantes documentados (acción reductora de colesterol LDL y triglicéridos en estudios preclínicos). Se cultiva en huertos campesinos andinos colombianos en Cundinamarca (Sumapaz, Choachí, Sopó), Boyacá (Tunja, Villa de Leyva, Sutamarchán), Nariño (Pasto, Túquerres, Yacuanquer), Cauca (Silvia, Totoró, Inzá), Antioquia (oriente) y Eje cafetero alto entre 1.500 y 2.800 msnm en zona térmica templada a fría. Ciclo 3-5 meses desde siembra a primera cosecha, producción escalonada continua. Rendimientos 15-25 t/ha fruto fresco. Lección viva: cucurbitácea nativa de los Andes subestimada (Neglected and Underutilized Species, FAO), enseña el valor de las especies tradicionales subutilizadas en la seguridad alimentaria y la importancia de conservar germoplasma andino frente a la erosión genética por estandarización comercial con calabacines exóticos (zapallo italiano, zucchini), proporcionando alternativa nutricional alta en fibra y bioactivos hipolipemiantes con manejo sin agroquímicos. Manejo agroecológico: siembra directa de 3-5 semillas por golpe a 1.5-2 m entre plantas, requiere espaldera robusta o tutor vivo (maíz) por crecimiento vigoroso trepador, cosecha continua de frutos tiernos cada 2-3 días, asocio en milpa andina con maíz y fríjol, control biológico de mosca de las cucurbitáceas con trampas, no requiere agroquímicos. Fuentes Tier A: AGROSAVIA, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia."
     },
     {
       "id": "gliricidia_sepium",
@@ -8570,12 +8577,17 @@
         "fuente": "Perez Arbelaez 1947; GBIF; Bernal 2015 Catalogo Plantas Colombia"
       },
       "source_ids": [
-        "perez-arbelaez-1947-plantas-utiles",
+        "powo-kew",
         "gbif-taxonomic-backbone",
-        "bernal-2015-plantas-liquenes-colombia"
+        "gbif-colombia",
+        "agrosavia-leguminosas-andinas",
+        "agrosavia-silvopastoriles",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "perez-arbelaez-1947-plantas-utiles"
       ],
       "rol_ecologico": "Fijador de nitrogeno simbiotico. Sombra regulada para cultivos asociados. Atraccion de polinizadores (colibries, abejas). Aporte de biomasa foliar rica en N.",
-      "valor_pedagogico": "Cerca viva florecida: cuando florece el chilo, las abejas llegan. Ensenia el rol de las leguminosas en la fertilidad del suelo y la polinizacion.",
+      "valor_pedagogico": "El chiló o cámbulo (Erythrina rubrinervia Kunth, familia Fabaceae, subfamilia Faboideae, tribu Phaseoleae) es una fabácea arbórea pequeña a mediana (5-12 m altura) caducifolia nativa endémica de los Andes colombianos y venezolanos, ampliamente utilizada en sistemas tradicionales campesinos como cerca viva, soporte de cultivos epífitos (vainilla, pimienta), sombra de café tradicional bajo dosel y fijador biológico de nitrógeno por simbiosis con Bradyrhizobium spp. Produce inflorescencias terminales conspicuas en racimos densos de flores rojo-escarlatas tipo papilionoide pre-foliación (florece antes de las hojas), atractivas para colibríes (Coeligena spp., Boissonneaua flavescens) y abejas nativas. Se distribuye en Cundinamarca (Tena, Mesa, Sopó, La Calera), Boyacá (Moniquirá, Santa Sofía, Garagoa), Santander (San Gil, Barichara, Curití), Antioquia (oriente cercano — Marinilla, Guarne), Eje cafetero (Quindío, Risaralda, Caldas) y Cauca andina entre 1.500 y 2.400 msnm en zona térmica templada a fría. Ciclo perenne, longevidad 40-80 años, floración anual conspicua marzo-mayo. Lección viva: cerca viva florecida — cuando florece el chiló, las abejas y colibríes llegan en masa, enseñando el rol crítico de las leguminosas fijadoras en la fertilidad del suelo (fija 80-150 kg N biológico/ha/año vía nódulos radicales rosados con Bradyrhizobium), su función como puente trófico para polinizadores nectarívoros en el calendario fenológico andino (floración pre-lluvias), y su utilidad multipropósito en silvopastoreo (sombra estratégica para café y cacao, leña, postes vivos para cerca, ornamental ribereña). Manejo agroecológico: propagación por estaca leñosa de 1-2 m directamente en suelo (alta tasa de prendimiento 80-95%), trasplante también por semilla, siembra en línea para cerca viva a 2-3 m entre plantas, poda de mantenimiento bianual, asocio con café arábica como sombra. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA Leguminosas Andinas, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia.",
       "validation_level": "claude_draft"
     },
     {
@@ -8625,12 +8637,15 @@
         "fuente": "Perez Arbelaez 1947; GBIF"
       },
       "source_ids": [
-        "perez-arbelaez-1947-plantas-utiles",
+        "powo-kew",
         "gbif-taxonomic-backbone",
-        "powo-kew"
+        "gbif-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "perez-arbelaez-1947-plantas-utiles"
       ],
       "rol_ecologico": "Atractora de polinizadores (abejas nativas, colibries). Planta ornamental de bordes de cerca viva. Aporte estetico y educacional al agroecosistema.",
-      "valor_pedagogico": "Reloj del huerto: cada flor abre al amanecer y vive solo un dia. Ensenia la sincronizacion de la planta con el ciclo solar y la importancia de los polinizadores.",
+      "valor_pedagogico": "La tigridia o flor de tigre (Tigridia pavonia (L.f.) DC., familia Iridaceae, subfamilia Iridoideae) es una iridácea herbácea perenne bulbosa (40-60 cm altura) nativa de México central y Mesoamérica, domesticada por las culturas precolombinas mexica y maya como flor ornamental ceremonial y como tubérculo-bulbo alimenticio (consumo restringido tradicional, rico en almidón). Aclimatada en Colombia desde la Colonia como ornamental de huertos campesinos y bordes de cerca viva. Produce flores grandes conspicuas (10-15 cm diámetro) con tres tépalos externos amplios anaranjado-rojos manchados de pintas oscuras irregulares (patrón críptico evocador del pelaje de jaguar Panthera onca de donde proviene el nombre Tigridia y nahuatl Cacaloxochitl) y tres tépalos internos pequeños amarillos. Se cultiva en Cundinamarca (Sabana de Bogotá, Subachoque, Sopó), Boyacá (Tunja, Villa de Leyva), Antioquia (oriente), Eje cafetero, Valle del Cauca y Caribe colombiano entre 800 y 2.000 msnm en zona térmica cálida a templada. Ciclo perenne con bulbo dormante, floración estival noviembre-febrero. Lección viva pedagógica de fisiología vegetal: reloj del huerto — cada flor abre al amanecer (5-7 am) y vive solo un día cerrándose y marchitándose al atardecer (5-7 pm), enseñando la sincronización de la planta con el ciclo solar circadiano por floración efímera diurna unidireccional, la importancia ecológica de los polinizadores diurnos (abejas Apis mellifera, abejas nativas Centris spp., colibríes) que deben ser presentes en la ventana temporal estrecha de 12 horas, y el concepto fisiológico de las flores diurnas efímeras como estrategia evolutiva de inversión floral concentrada. Manejo agroecológico: propagación por separación de bulbillos en otoño, plantación a 15-20 cm profundidad en suelos sueltos, asocio en bordes de cerca viva, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, Pérez-Arbeláez 1947 Plantas Útiles, SIB Colombia.",
       "validation_level": "claude_draft"
     },
     {
@@ -8745,12 +8760,16 @@
         "fuente": "Perez Arbelaez 1947; AGROSAVIA silvopastoriles"
       },
       "source_ids": [
-        "perez-arbelaez-1947-plantas-utiles",
+        "powo-kew",
         "gbif-taxonomic-backbone",
-        "agrosavia-silvopastoriles"
+        "gbif-colombia",
+        "agrosavia-silvopastoriles",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "perez-arbelaez-1947-plantas-utiles"
       ],
       "rol_ecologico": "Captura y almacenamiento de agua en rizomas. Proteccion de suelos en laderas. Habitat para fauna. Sumidero de carbono. Material de construccion renovable.",
-      "valor_pedagogico": "La fortaleza verde: la guadua como barrera viva definitiva. Ensenia el crecimiento rizomatico, la captura de carbono y la construccion natural renovable.",
+      "valor_pedagogico": "La guadua o bambú nativo (Guadua angustifolia Kunth, familia Poaceae, subfamilia Bambusoideae, tribu Bambuseae) es una poácea gigante perenne rizomatosa (hasta 20-25 m altura, 15-25 cm diámetro de culmo) nativa endémica de los valles interandinos colombianos, considerada bambú emblemático de Colombia, símbolo del Eje Cafetero y declarada Patrimonio Cultural Natural por el Ministerio de Cultura. Sus culmos cilíndricos huecos con paredes de 1-3 cm grosor presentan internodios largos (30-50 cm) y resistencia mecánica excepcional (resistencia a compresión 50-100 MPa, comparable al concreto), considerada el acero vegetal por sus propiedades sismorresistentes. Se distribuye en Eje Cafetero (Quindío — Filandia, Calarcá, Pijao; Risaralda — Pereira, Marsella; Caldas — Manizales, Chinchiná, Aranzazu), Valle del Cauca (Sevilla, Caicedonia, Restrepo), Tolima (Líbano, Murillo), Antioquia (Suroeste — Jericó, Jardín; Magdalena medio), Cundinamarca (Sumapaz, Anolaima, Tena) y Santander entre 400 y 1.800 msnm en zona térmica cálida a templada subhúmeda. Ciclo de larga duración: cultivo perenne con primer aprovechamiento a los 5-7 años, productividad sostenida 60-100 años con manejo. Rendimientos 1.500-3.000 culmos/ha/año en guaduales bien manejados. Lección viva: la fortaleza verde — la guadua como barrera viva definitiva con sus culmos rectos, leñosos, ligeros y rígidos, enseñando el crecimiento rizomático monopodial-paquimorfo (formación de matas densas), la captura intensa de carbono (40-50 t CO2/ha/año, una de las mayores entre fitosistemas terrestres), y la construcción natural renovable (estructuras sismorresistentes, viviendas bioclimáticas, mobiliario, tutorado agrícola). Manejo agroecológico: propagación por chusquines (vástagos basales rizomatosos), trasplante por sección de rizoma con yema, plantación a 6-8 m entre matas en suelos con humedad alta y pendientes moderadas, aprovechamiento selectivo de culmos maduros (4-6 años) post-cosecha de lunas adecuadas (luna menguante para mejor curado). Fuentes Tier A: AGROSAVIA Silvopastoriles, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia.",
       "validation_level": "claude_draft"
     },
     {
