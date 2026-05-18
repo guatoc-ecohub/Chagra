@@ -15610,6 +15610,659 @@
         "gbif-taxonomic-backbone",
         "jbb-plantas-medicinales"
       ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH42_ACUATICAS_HUMEDALES",
+      "id": "eichhornia_crassipes",
+      "nombre_comun": "Taruya",
+      "nombre_comunes_regionales": [
+        "buchón de agua",
+        "jacinto de agua",
+        "lirio acuático",
+        "camalote",
+        "water hyacinth"
+      ],
+      "nombre_cientifico": "Eichhornia crassipes (Mart.) Solms",
+      "familia_botanica": "Pontederiaceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "invasive",
+        "dynamic_accumulator",
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "invasor",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1800,
+        "max_absoluto": 2600
+      },
+      "temperatura_c": {
+        "helada_letal": 1,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "pantanoso",
+      "drenaje_requerido": "pantanoso",
+      "propagation": {
+        "methods": [
+          "estolon",
+          "semilla",
+          "division_mata"
+        ],
+        "best_method": "estolon",
+        "protocol_resumen": "Propagación vegetativa explosiva por estolones que producen rosetas hijas cada 5-15 días — una sola planta puede generar >1000 individuos en 50 días. Semillas viables hasta 20 años en sedimento. NO PROPAGAR: especie invasora prohibida fuera de sistemas de fitorremediación controlados.",
+        "tiempo_a_establecimiento_dias": 10,
+        "notas": "Listada por ISSG entre las 100 peores invasoras del mundo. En Colombia colapsa cuerpos de agua: embalse del Muña, ciénagas del Magdalena, humedales de Bogotá. Solo se permite manejo en biorreactores cerrados de fitorremediación, NUNCA en aguas abiertas.",
+        "fuente": "IAvH Humboldt — Catálogo Especies Invasoras Andes; ISSG-UICN; POWO Kew; GBIF"
+      },
+      "especies_nativas_sustitutas": [
+        "limnobium_laevigatum",
+        "ludwigia_peploides",
+        "pistia_stratiotes",
+        "nymphoides_humboldtiana"
+      ],
+      "clasificacion_uicn": "Listada entre las 100 peores especies invasoras del mundo por ISSG/UICN (Global Invasive Species Database); IAvH-Humboldt la cataloga como invasora prioritaria de humedales colombianos con impacto severo en cuerpos de agua tropicales y subtropicales",
+      "protocolo_post_remocion": "Remoción mecánica por extracción manual o cosechadora acuática (NUNCA con herbicidas: riesgo de eutrofización masiva post-descomposición). Compostaje obligatorio del material removido fuera del cuerpo de agua durante 6 meses para garantizar inactivación de semillas y estolones residuales. Restauración activa del cuerpo de agua: re-oxigenación, control de aportes de N y P aguas arriba (causa raíz del crecimiento explosivo), reintroducción de macrófitas nativas (Limnobium laevigatum, Nymphoides humboldtiana). Monitoreo trimestral durante 5 años post-remoción para arrancar rosetas residuales antes de floración. Reporte obligatorio al SIB Colombia, IDEAM y CAR/Corporación Autónoma Regional jurisdiccional con coordenadas, área tratada y biomasa extraída.",
+      "rol_ecologico": "Macrófita flotante invasora de origen amazónico-orinoquense. Fitorremediadora poderosa (acumula N, P, metales pesados Cd-Pb-Zn-Hg en raíces y biomasa) PERO de crecimiento explosivo descontrolado en aguas eutroficadas: duplica su biomasa en 5-15 días. Colapsa la fauna acuática por sombreado total, anoxia subsuperficial y bloqueo de intercambio gaseoso aire-agua. Solo aprovechable en sistemas cerrados de fitorremediación con cosecha programada y deshidratación inmediata de biomasa para uso como compost activado, biogás o alimento porcino-piscícola controlado.",
+      "valor_pedagogico": "La taruya, buchón de agua o jacinto de agua (Eichhornia crassipes (Mart.) Solms, Pontederiaceae) es la macrófita acuática flotante invasora más emblemática del trópico mundial y una lección viva de cómo una planta hermosa con flores violeta-azuladas espectaculares puede convertirse en catástrofe ecológica cuando colapsa un cuerpo de agua. Nativa del Amazonas y Orinoquia (cuenca alta del río Amazonas, Pantanal brasileño, llanos venezolanos y colombianos donde coevoluciona con peces, manatíes y caimanes que la consumen y controlan), está listada por ISSG/UICN entre las 100 peores especies invasoras del mundo y por IAvH-Humboldt como invasora prioritaria de humedales colombianos con impacto severo en cuerpos de agua entre 0 y 1.800 msnm: ciénagas del Magdalena medio y bajo (Zapatosa, El Sapo, Ayapel, Chilloa), humedales del Bogotá (Jaboque, Juan Amarillo, Tibanica, Córdoba — donde la liberación de aguas eutroficadas dispara crecimiento explosivo), embalse del Muña (caso paradigmático colombiano: la taruya cubrió >90% del espejo de agua durante décadas por contaminación con aguas residuales de Bogotá), humedales del Valle del Cauca (Sonso, La Guinea), planicie inundable de la Orinoquia (Casanare, Arauca, Meta) y lagunas costeras del Caribe. Pertenece a la familia Pontederiaceae y se reconoce por su roseta flotante con hojas redondeado-cordadas de 5-15 cm con pecíolos hinchados característicos (aerénquima espongioso lleno de aire que da flotabilidad), raíces fibrosas plumosas violetas-negruzcas sumergidas (10-50 cm de largo) e inflorescencia erecta espigada con 8-15 flores violeta-azuladas hermafroditas con un pétalo superior con mancha amarilla central rodeada de violeta — su belleza la convirtió en planta ornamental de exportación durante los siglos XIX-XX, lo cual disparó su invasión global. Su crecimiento explosivo (duplica biomasa en 5-15 días, una sola planta produce >1000 individuos en 50 días vía estolones más banco de semillas viable hasta 20 años) y su impacto destructor (sombreado total del agua, anoxia subsuperficial por descomposición de capas inferiores muertas, bloqueo de intercambio gaseoso aire-agua, colapso de fauna acuática nativa, obstrucción de navegación y compuertas hidroeléctricas, criadero de Anopheles vector de malaria y Mansonia vector de filariasis) la convierten en la pesadilla número uno de los humedales tropicales. Paradójicamente es una fitorremediadora extraordinaria: acumula nitrógeno, fósforo, metales pesados (cadmio, plomo, zinc, mercurio, cromo), colorantes industriales y compuestos orgánicos tóxicos en raíces y biomasa con eficiencia 5-10 veces superior a macrófitas nativas, lo cual ha llevado a su uso CONTROLADO en biorreactores cerrados de fitorremediación de aguas residuales industriales (curtiembres, textileras, papeleras) donde la cosecha programada cada 2-4 semanas y la deshidratación inmediata de biomasa permiten aprovecharla como compost activado, sustrato de biogás o alimento porcino-piscícola tratado. Manejo agroecológico: NO PROPAGAR jamás fuera de sistemas cerrados; en humedales invadidos remoción mecánica por extracción manual con rastrillos largos o cosechadora acuática (NUNCA con herbicidas glifosato/2,4-D: riesgo de eutrofización masiva post-descomposición que mata peces y agrava el problema), compostaje obligatorio del material removido a 60+°C por 6 meses fuera del cuerpo de agua para inactivar semillas, restauración con macrófitas nativas (Limnobium laevigatum, Nymphoides humboldtiana), y atacar la causa raíz: control de aportes de N y P aguas arriba (saneamiento básico, tratamiento de aguas residuales, prohibición de vertimientos industriales). Es lección viva de cómo las invasoras prosperan en sistemas degradados y de cómo restaurar humedales requiere sanear las cuencas que los alimentan, no solo arrancar la planta visible. Fuentes Tier A: IAvH Humboldt — Catálogo Especies Invasoras Andes, ISSG-UICN Global Invasive Species Database, POWO Kew, GBIF Backbone Taxonomy, Calderón-Sáenz 2003 Invasoras Colombia.",
+      "source_ids": [
+        "humboldt-invasoras-andes",
+        "issg-uicn-invasoras",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "calderon-saenz-2003-invasoras",
+        "sib-colombia"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH42_ACUATICAS_HUMEDALES",
+      "id": "victoria_amazonica",
+      "nombre_comun": "Victoria regia",
+      "nombre_comunes_regionales": [
+        "victoria amazónica",
+        "loto amazónico",
+        "reina de las aguas",
+        "flor de agua",
+        "yacuruna sisa",
+        "mururé-açu"
+      ],
+      "nombre_cientifico": "Victoria amazonica (Poepp.) J.C.Sowerby",
+      "familia_botanica": "Nymphaeaceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_protegido",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 80,
+        "optimo_max": 300,
+        "max_absoluto": 500
+      },
+      "temperatura_c": {
+        "helada_letal": 10,
+        "optimo_min": 24,
+        "optimo_max": 32,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "pantanoso",
+      "drenaje_requerido": "pantanoso",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas grandes (10-15 mm) viables solo frescas, conservar en agua. Escarificación mecánica leve y siembra en barro acuático cálido (28-32°C) bajo 30-50 cm de agua. Germinación 14-30 días. Plántula con hojas sumergidas durante primeros 60-90 días, luego desarrolla hojas flotantes hasta alcanzar tamaño adulto (1.5-3 m diámetro) al año 1-2.",
+        "tiempo_a_establecimiento_dias": 180,
+        "notas": "Especie patrimonial del Amazonas colombiano (Leticia, Puerto Nariño, Mocagua, Tarapacá, Puerto Alegría). Recolección de semillas regulada — requiere permisos ambientales del Ministerio de Ambiente y Corpoamazonia. Cultivo ex-situ permitido en jardines botánicos certificados (JBB Bogotá, JB Quindío, JB Cali) y estanques ornamentales de fincas amazónicas.",
+        "fuente": "Sinchi Instituto Amazónico de Investigaciones Científicas; Bernal 2015; POWO Kew; GBIF"
+      },
+      "rol_ecologico": "Macrófita acuática emblemática de la Amazonia. Hojas flotantes circulares gigantes (1.5-3 m de diámetro) con borde levantado característico, soportan hasta 30-40 kg distribuidos. Flores nocturnas grandes (25-40 cm de diámetro) con termogénesis (autocalentamiento +10°C sobre el ambiente para volatilizar aroma a piña-melón-banana que atrae a escarabajos polinizadores Cyclocephala que quedan atrapados durante el primer día, polinización cruzada al segundo día). Hábitat clave para hatzeria (Hoatzin), nutria gigante (Pteronura brasiliensis), tortugas charapas, peces juveniles y aves zancudas en cochas amazónicas. Patrimonio biocultural de los pueblos Tikuna, Yagua, Witoto, Bora y Cocama del trapecio amazónico colombiano.",
+      "valor_pedagogico": "La Victoria amazónica o victoria regia (Victoria amazonica (Poepp.) J.C.Sowerby, Nymphaeaceae) es la macrófita acuática más emblemática y espectacular del Amazonas y uno de los símbolos botánicos más reconocibles del Neotrópico: una lección viva de la majestuosidad del bosque húmedo tropical inundable y de la coevolución insecto-planta más sofisticada del reino vegetal. Nativa de los cuerpos de agua quietos del Amazonas colombiano, brasileño, peruano, ecuatoriano, boliviano, venezolano y de las Guayanas, en Colombia se distribuye en cochas, lagunas, igarapés y cananguchales del trapecio amazónico (Leticia, Puerto Nariño, Mocagua, Tarapacá, Puerto Alegría, La Pedrera, Mirití-Paraná) y zonas de los ríos Putumayo, Caquetá, Apaporis y Vaupés, todas entre 80 y 300 msnm en bosque húmedo tropical de tierras bajas. Pertenece a la familia Nymphaeaceae (loto, nenúfares) y es protegida por la Constitución de 1991 y la legislación ambiental colombiana como especie patrimonial; su recolección y comercio están regulados por el Ministerio de Ambiente y la autoridad ambiental amazónica Corpoamazonia, requiriendo permisos específicos para cultivo ex-situ en jardines botánicos certificados o estanques ornamentales. Su rasgo más impactante son las hojas flotantes circulares gigantes de 1.5-3 metros de diámetro con borde levantado de 5-15 cm característico (como una sartén o bandeja flotante) sostenidas por venas radiales engrosadas con espinas defensivas en el envés rojizo-violáceo y un sistema de aerénquima espongioso interno que provee flotabilidad — una sola hoja puede soportar 30-40 kg distribuidos uniformemente (los pobladores ribereños demuestran esto colocando un niño pequeño sobre la hoja, práctica documentada por viajeros desde el siglo XIX). Sus flores nocturnas son aún más asombrosas: de 25-40 cm de diámetro, blancas el primer día y rosado-fucsia el segundo, exhiben uno de los casos más estudiados de termogénesis floral del reino vegetal — la flor se autocalienta +10°C sobre la temperatura ambiente para volatilizar aromas dulces a piña-melón-banana que atraen escarabajos polinizadores del género Cyclocephala que quedan atrapados durante el primer día (la flor se cierra), cubriéndose de polen al alimentarse del tejido nutritivo interno; al segundo día la flor cambia a rosado, se abre liberando los escarabajos cubiertos de polen que vuelan a otra flor blanca recién abierta donde depositan el polen en el estigma receptivo, garantizando polinización cruzada absoluta (mecanismo descrito por Donald Prance y W. Anderson en los 1970s, hito de la ecología tropical). Su importancia ecológica es central: es hábitat clave para el Hoatzin (Opisthocomus hoazin, ave amazónica única), la nutria gigante (Pteronura brasiliensis, en peligro), tortugas charapas (Podocnemis expansa y Podocnemis unifilis), peces juveniles (sábalos, tucunarés) que se refugian bajo las hojas, y aves zancudas (garzas, hoatzines, jacanas) que caminan sobre las hojas flotantes. Para los pueblos Tikuna, Yagua, Witoto, Bora y Cocama del trapecio amazónico colombiano es patrimonio biocultural: la flor representa a la 'yacuruna sisa' (flor de la persona-agua) en cosmología tikuna, sus semillas se consumían tradicionalmente como alimento ('maíz de agua'), y sus hojas tienen uso medicinal-ritual. Manejo agroecológico ex-situ: cultivo solo permitido en jardines botánicos certificados (JBB Bogotá, JB Quindío, JB Cali) o estanques ornamentales de fincas amazónicas con permiso ambiental; siembra de semillas frescas (10-15 mm, conservar en agua, viables solo si no se secan) en barro acuático cálido a 28-32°C bajo 30-50 cm de agua, germinación 14-30 días, plántula con hojas sumergidas durante 60-90 días luego desarrolla hojas flotantes hasta tamaño adulto al año 1-2; el estanque debe ser de mínimo 3-4 m de diámetro y 60-80 cm de profundidad con sustrato rico en materia orgánica, mantener temperatura >22°C todo el año (en Bogotá requiere invernadero acuático climatizado). Es lección extraordinaria de biodiversidad neotropical, coevolución insecto-planta, ingeniería biomecánica vegetal (las venas radiales de la hoja inspiraron al ingeniero victoriano Joseph Paxton para diseñar el Crystal Palace de Londres 1851) y patrimonio biocultural amazónico. Fuentes Tier A: Sinchi Instituto Amazónico, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, IAvH Humboldt — Flora Amazonia.",
+      "source_ids": [
+        "sinchi-amazonia-colombiana",
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "sib-colombia"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH42_ACUATICAS_HUMEDALES",
+      "id": "nymphaea_alba_andina",
+      "nombre_comun": "Nenúfar blanco andino",
+      "nombre_comunes_regionales": [
+        "nenúfar",
+        "flor de loto andino",
+        "loto blanco",
+        "water lily"
+      ],
+      "nombre_cientifico": "Nymphaea alba L.",
+      "familia_botanica": "Nymphaeaceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 25
+      },
+      "radiacion": "sol_pleno",
+      "agua": "pantanoso",
+      "drenaje_requerido": "pantanoso",
+      "propagation": {
+        "methods": [
+          "rizoma",
+          "semilla",
+          "division_mata"
+        ],
+        "best_method": "rizoma",
+        "protocol_resumen": "División de rizoma horizontal cada 2-3 años a inicio de primavera (febrero-marzo en Sabana de Bogotá). Cortar trozos de rizoma de 8-15 cm con al menos un brote terminal. Plantar en canastas acuáticas con sustrato arcilloso pesado + materia orgánica madura cubierto con grava bajo 30-80 cm de agua. Floración al año 1-2.",
+        "tiempo_a_establecimiento_dias": 120,
+        "notas": "Naturalizada en humedales fríos de la Sabana de Bogotá (Jaboque, Juan Amarillo, Tibanica, Córdoba, La Conejera), Tunja (Lago Sochagota), Villa de Leyva (laguna de Iguaque), Boyacá (laguna de Tota — donde es manejada como ornamental controlada). Introducida desde Europa en el siglo XIX. NO confundir con Nymphoides humboldtiana, nenúfar amarillo nativo.",
+        "fuente": "IAvH Flora Alto Andina; POWO Kew; GBIF Colombia; JBB Bogotá"
+      },
+      "rol_ecologico": "Macrófita acuática rizomatosa de hojas flotantes circulares de 10-30 cm verde oscuro brillante con seno basal. Flores solitarias flotantes blancas con centro amarillo dorado (10-15 cm de diámetro), aromáticas, abren al amanecer y cierran al atardecer durante 4 días consecutivos. Polinización por escarabajos acuáticos y moscas en humedales fríos andinos. Hábitat para anfibios (rana sabanera Dendropsophus molitor), aves acuáticas (tinguas, focha andina, pato canadiense) y macroinvertebrados de humedal. Estabiliza bordes de espejo de agua y reduce evaporación.",
+      "valor_pedagogico": "El nenúfar blanco andino (Nymphaea alba L., Nymphaeaceae) es la macrófita acuática ornamental más conocida de los humedales fríos de los Andes colombianos y una lección viva de cómo una especie introducida puede naturalizarse en humedales altoandinos sin convertirse en invasora destructora cuando el manejo de su densidad es adecuado y los humedales conservan sus condiciones biofísicas. Nativa de Europa, norte de África y Asia occidental templada, fue introducida a Colombia en el siglo XIX como ornamental para jardines y estanques de las haciendas de la Sabana de Bogotá durante la colonización botánica europea de la altiplanicie cundiboyacense, naturalizándose progresivamente en los humedales fríos de los Andes orientales entre 1.800 y 3.200 msnm: humedales de la Sabana de Bogotá (Jaboque, Juan Amarillo, Tibanica, Córdoba, La Conejera, El Burro, Capellanía, La Vaca), lagos de Tunja (Lago Sochagota), humedales de Villa de Leyva (laguna de Iguaque ribera baja), laguna de Tota (Boyacá, donde es manejada como ornamental controlada por la autoridad ambiental Corpoboyacá), Lago Calima (Valle), embalses de Cundinamarca-Boyacá (Tominé, Sisga, San Rafael) y estanques ornamentales del Jardín Botánico José Celestino Mutis (JBB Bogotá) y de fincas patrimoniales de la Sabana. Pertenece a la familia Nymphaeaceae (loto, victoria regia) y se reconoce por su rizoma horizontal espeso anclado al sedimento del humedal del cual emergen hojas flotantes circulares de 10-30 cm verde oscuro brillante con seno basal característico y largos pecíolos sumergidos elásticos que ajustan la altura de la hoja al nivel del agua, y por sus flores solitarias flotantes blancas con centro amarillo dorado (10-15 cm de diámetro, 20-30 pétalos elípticos blancos rodeando numerosos estambres dorados) aromáticas que abren al amanecer y cierran al atardecer durante 4 días consecutivos antes de sumergirse para fructificar bajo el agua. Su importancia ecológica en los humedales fríos andinos es relevante: como macrófita rizomatosa estabiliza bordes del espejo de agua, sombrea capas superficiales reduciendo crecimiento de fitoplancton oportunista y evaporación durante época seca, las hojas flotantes ofrecen sombra y refugio a anfibios nativos (rana sabanera Dendropsophus molitor, salamandra Bolitoglossa adspersa) y peces nativos (capitán de la sabana, runcho), aves acuáticas (tingua bogotana Rallus semiplumbeus en peligro, tingua de pico verde Porphyriops melanops, focha andina Fulica ardesiaca, pato canadiense Anas discors) caminan y forrajean sobre las hojas, y los macroinvertebrados acuáticos colonizan sus pecíolos y rizomas (importante para la cadena trófica del humedal). Polinización por escarabajos acuáticos (Cyclocephala andina), moscas (Syrphidae) y abejas nativas en humedales fríos andinos. NO confundir con la especie nativa Nymphoides humboldtiana (nenúfar amarillo nativo, sustituto preferido para restauración pura, ver ficha aparte) ni con Nymphaea ampla (nenúfar blanco tropical de tierras cálidas). Manejo agroecológico ornamental-restauración blanda: propagación por división de rizoma horizontal cada 2-3 años a inicio de primavera (febrero-marzo en Sabana de Bogotá), trozos de 8-15 cm con al menos un brote terminal, plantar en canastas acuáticas con sustrato arcilloso pesado + materia orgánica madura cubierto con grava de 1-2 cm bajo 30-80 cm de agua quieta, floración al año 1-2 desde establecimiento; en humedales restaurados densidad recomendada 1-2 individuos por 10 m² para evitar cobertura excesiva (>30% afecta oxigenación). Es lección viva de cómo el manejo ornamental controlado en estanques patrimoniales coexiste con la restauración de humedales con macrófitas nativas (Nymphoides humboldtiana es prioritaria para restauración pura), y de cómo conservar los humedales fríos andinos —reconocidos como sitios Ramsar y ecosistemas estratégicos por Ley 1930 de 2018— es conservar biodiversidad endémica de altiplano única en el mundo. Fuentes Tier A: IAvH Humboldt — Flora Alto Andina, POWO Kew, GBIF Colombia, Bernal 2015, JBB Plantas Medicinales.",
+      "source_ids": [
+        "humboldt-flora-alto-andina",
+        "powo-kew",
+        "gbif-colombia",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "jbb-plantas-medicinales"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH42_ACUATICAS_HUMEDALES",
+      "id": "lemna_minor",
+      "nombre_comun": "Lenteja de agua",
+      "nombre_comunes_regionales": [
+        "lemna",
+        "lenteja acuática",
+        "pluma de agua",
+        "duckweed",
+        "mancha de agua"
+      ],
+      "nombre_cientifico": "Lemna minor L.",
+      "familia_botanica": "Araceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "biomass_producer",
+        "dynamic_accumulator",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 500,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 15,
+        "optimo_max": 28,
+        "max_tolerable": 33
+      },
+      "radiacion": "sol_pleno",
+      "agua": "pantanoso",
+      "drenaje_requerido": "pantanoso",
+      "harvest_type": "biomasa",
+      "propagation": {
+        "methods": [
+          "division_mata"
+        ],
+        "best_method": "division_mata",
+        "protocol_resumen": "Propagación vegetativa exclusiva por gemación de frondas hijas que se desprenden de la fronda madre. Una colonia duplica biomasa en 1.5-4 días en condiciones óptimas. Inoculación inicial: tomar 1-2 puñados de lenteja sana de un humedal o estanque limpio y dispersar en superficie de agua tranquila (no corriente) rica en N-P-K disuelto (estanque piscícola, biodigestor efluente, agua de lavado de lácteos). Cosecha con malla fina cada 7-14 días una vez establecida cobertura completa.",
+        "tiempo_a_establecimiento_dias": 14,
+        "notas": "Distribución cosmopolita en humedales colombianos entre 0 y 3.200 msnm: humedales Sabana de Bogotá, ciénagas Magdalena medio, jagüeyes Caribe seco, lagunas Boyacá-Cundinamarca. Excelente alimento proteico para tilapia, cachama, cerdos y aves de patio. Fitorremediador eficaz para N-P de efluentes piscícolas.",
+        "fuente": "IAvH Flora Alto Andina; POWO Kew; GBIF Colombia; Agrosavia"
+      },
+      "rol_ecologico": "Macrófita flotante diminuta (frondas de 2-5 mm, las más pequeñas del reino vegetal con flores — flores microscópicas raras de 1 mm). Forma cobertura verde sobre estanques tranquilos. Acumuladora dinámica de N (proteína cruda 25-45% de su materia seca, comparable a soja). Fitorremediadora eficaz para N-amoniacal, P-soluble, K y metales pesados leves en efluentes piscícolas, biodigestores y aguas de lavado de granja. Alimento clave para tilapia, cachama, peces ornamentales, cerdos en sistemas integrados acuicultura-cerdo (China, Vietnam) y aves de patio. Refugio para macroinvertebrados acuáticos (daphnias, cyclops) base de la cadena alimentaria piscícola.",
+      "valor_pedagogico": "La lenteja de agua menor (Lemna minor L., Araceae subfamilia Lemnoideae) es una de las plantas más pequeñas y eficientes del reino vegetal: una lección viva de soberanía alimentaria proteica circular y de cómo integrar acuicultura, ganadería de patio y agricultura mediante una sola macrófita acuática microscópica. Nativa o cosmopolita en humedales templados y tropicales de todos los continentes (excepto Antártida), en Colombia se distribuye en humedales y cuerpos de agua tranquilos entre 0 y 3.200 msnm: humedales fríos de la Sabana de Bogotá (Jaboque, Juan Amarillo, Tibanica, Córdoba, La Conejera, Torca-Guaymaral, El Burro), lagunas y embalses de Boyacá-Cundinamarca (Tota, Iguaque, Tominé, Sisga, San Rafael), ciénagas del Magdalena medio (Zapatosa, Ayapel, El Sapo, Chilloa), humedales del Valle del Cauca (Sonso, La Guinea, Sonso, La Yuyos), jagüeyes y micro-humedales del Caribe seco (La Guajira, Sucre, Córdoba, Atlántico), lagunas altoandinas (Tota, Iguaque, Buitrera, Siecha, Tausa) y cuerpos de agua amazónicos y orinoquenses. Pertenece a la familia Araceae subfamilia Lemnoideae (reclasificada desde la antigua familia Lemnaceae por estudios moleculares 2003) y se reconoce por sus frondas diminutas (2-5 mm de diámetro), ovaladas, planas, verde brillante, con una sola raíz fibrosa colgante de 1-2 cm en el envés — son las plantas con flor más pequeñas del reino vegetal (sus flores son microscópicas, de 1 mm, raras de ver, dos estambres y un pistilo, lo que llevó a confusión taxonómica histórica entre botánica y ficología hasta el siglo XX). Propagación exclusivamente vegetativa por gemación de frondas hijas (cada fronda madre produce 2-4 frondas hijas que se desprenden cuando alcanzan tamaño adulto), tasa de duplicación de 1.5-4 días en condiciones óptimas (15-28°C, agua quieta, alta carga N-P-K disuelta), capacidad de cubrir 100% de un estanque pequeño en 2-3 semanas desde inóculo inicial. Su importancia agroecológica es enorme y subestimada en Colombia: como acumuladora dinámica de N acumula 25-45% de proteína cruda en materia seca (comparable o superior a la soja), 5-8% lípidos, 8-15% fibra cruda, 20-25% carbohidratos, perfil de aminoácidos completo incluyendo lisina, metionina y triptofano, alta digestibilidad >85% en monogástricos; como fitorremediadora capta N-amoniacal, P-soluble, K, Cu, Zn, Mn y metales pesados leves (Cd, Pb, Cr trazas) de efluentes piscícolas, biodigestores, aguas de lavado de lácteos y de procesamiento de frutas; como alimento es la base de sistemas integrados acuicultura-cerdo-aves clásicos en China, Vietnam y el sudeste asiático donde 1 m² de estanque con lemna produce 50-150 g de biomasa fresca/día (15-30 g materia seca, equivalente a 4-12 g de proteína vegetal de alta calidad/día/m²). En Colombia, Agrosavia y CIAT documentan su uso creciente en sistemas piscícolas integrados de pequeños productores del Caribe, Valle, Eje Cafetero y Llanos: estanque madre de tilapia produce efluente rico en N-P → alimenta estanque de lemna → biomasa cosechada cada 7-14 días con malla fina → alimenta cerdos, gallinas, peces secundarios o se aplica fresca como cobertura verde-mulching al cultivo. Manejo agroecológico: inóculo inicial con 1-2 puñados de lenteja sana de humedal limpio dispersada en superficie de agua tranquila (NO corriente, NO oxigenada por aireador fuerte) rica en N-P-K disuelto, mantener pH 6.5-7.5, temperatura 15-28°C, profundidad 30-80 cm, sombra parcial o sol pleno; cosecha con malla fina o tamiz cada 7-14 días una vez establecida cobertura completa, no agotar la cobertura (dejar >30% para regeneración); aplicar fresca al cultivo o secarla al sol para conservar; en sistemas integrados acuicultura-cerdo equivalente a sustituir 30-50% del concentrado proteico comercial. Es lección extraordinaria de soberanía alimentaria proteica, agricultura circular, integración acuicultura-cultivo, fitorremediación y eficiencia fotosintética (Lemna tiene la tasa de fotosíntesis y duplicación biomasa más alta del reino vegetal por unidad de superficie). Fuentes Tier A: IAvH Humboldt — Flora Alto Andina, POWO Kew, GBIF Colombia, Bernal 2015, Agrosavia Manuales, FAO Ecocrop.",
+      "source_ids": [
+        "humboldt-flora-alto-andina",
+        "powo-kew",
+        "gbif-colombia",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "agrosavia-tibaitata",
+        "fao-ecocrop"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH42_ACUATICAS_HUMEDALES",
+      "id": "pistia_stratiotes",
+      "nombre_comun": "Lechuga de agua",
+      "nombre_comunes_regionales": [
+        "repollito de agua",
+        "lechuga acuática",
+        "oreja de venado",
+        "water lettuce"
+      ],
+      "nombre_cientifico": "Pistia stratiotes L.",
+      "familia_botanica": "Araceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "invasive",
+        "dynamic_accumulator",
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "invasor",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1500,
+        "max_absoluto": 2200
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "pantanoso",
+      "drenaje_requerido": "pantanoso",
+      "propagation": {
+        "methods": [
+          "estolon",
+          "semilla"
+        ],
+        "best_method": "estolon",
+        "protocol_resumen": "Propagación vegetativa explosiva por estolones cortos que producen rosetas hijas cada 7-15 días. Semillas viables hasta 4-8 años en sedimento. NO PROPAGAR: especie invasora controlada por IAvH-Humboldt, solo permitida en sistemas de fitorremediación cerrados con cosecha programada y deshidratación inmediata de biomasa.",
+        "tiempo_a_establecimiento_dias": 14,
+        "notas": "Nativa estatus controversial: algunos autores la consideran nativa neotropical, otros pantropical introducida. IAvH-Humboldt la cataloga como especie de manejo controlado por su crecimiento explosivo en aguas eutroficadas colombianas (ciénagas Magdalena, humedales Bogotá, embalses).",
+        "fuente": "IAvH Humboldt — Catálogo Invasoras Andes; ISSG; POWO Kew; GBIF"
+      },
+      "especies_nativas_sustitutas": [
+        "limnobium_laevigatum",
+        "nymphoides_humboldtiana",
+        "lemna_minor"
+      ],
+      "clasificacion_uicn": "Listada por ISSG/GISD Global Invasive Species Database como invasora ambiental en aguas tropicales y subtropicales; IAvH-Humboldt la clasifica como especie de manejo controlado en humedales colombianos por su potencial invasor en aguas eutroficadas",
+      "protocolo_post_remocion": "Remoción mecánica por extracción manual con rastrillos largos o cosechadora acuática (NUNCA con herbicidas: riesgo eutrofización masiva post-descomposición). Compostaje obligatorio del material removido a 60+°C por 4-6 meses fuera del cuerpo de agua. Restauración con macrófitas nativas (Limnobium laevigatum, Nymphoides humboldtiana, Lemna minor). Atacar causa raíz: control de aportes de N y P aguas arriba. Monitoreo bimensual durante 3 años post-remoción para arrancar rosetas residuales. Reporte al SIB Colombia y autoridad ambiental jurisdiccional.",
+      "rol_ecologico": "Macrófita flotante en roseta de hojas aterciopeladas verde-grisáceas (10-25 cm de diámetro) con nervaduras paralelas longitudinales prominentes y pubescencia hidrófoba que repele el agua. Fitorremediadora eficaz para N, P, metales pesados leves (acumula Cd, Zn, Cu en raíces fibrosas plumosas sumergidas). Crecimiento explosivo en aguas eutroficadas — comportamiento invasor similar a Eichhornia crassipes aunque algo menos agresivo. Solo aprovechable en sistemas cerrados de fitorremediación con cosecha programada.",
+      "valor_pedagogico": "La lechuga de agua o repollito de agua (Pistia stratiotes L., Araceae) es una macrófita acuática flotante de comportamiento ambiguo en Colombia: técnicamente cosmopolita pantropical con estatus nativo controversial (algunos autores la consideran nativa neotropical antigua, otros una introducción muy temprana), pero catalogada por IAvH-Humboldt como especie de manejo controlado por su potencial invasor en aguas eutroficadas colombianas, paralelo al de la taruya (Eichhornia crassipes) aunque algo menos destructora. Distribuida en cuerpos de agua tranquilos entre 0 y 1.500 msnm en zona térmica cálida a templada: ciénagas del Magdalena medio y bajo (Zapatosa, El Sapo, Ayapel, Chilloa), humedales del Valle del Cauca (Sonso, La Guinea), humedales y embalses de la Sabana de Bogotá donde llega ocasionalmente (Embalse del Muña, humedales calientes asociados a aguas residuales), planicie inundable de la Orinoquia (Casanare, Arauca, Meta), lagunas costeras del Caribe (La Guajira, Atlántico, Sucre, Córdoba) y cuerpos de agua amazónicos. Pertenece a la familia Araceae (igual que arracacha, aro, ñame y la propia Lemna minor) y se reconoce por su roseta flotante característica de hojas aterciopeladas verde-grisáceas (10-25 cm de diámetro) con nervaduras paralelas longitudinales prominentes y pubescencia hidrófoba que repele el agua (las gotas resbalan sin mojar la hoja, propiedad similar a la del loto sagrado y a la del repollo), y por sus raíces fibrosas plumosas sumergidas (10-50 cm de largo) blanquecino-violáceas. Inflorescencia diminuta dentro de la roseta (espádice oculto en una espata blanco-verdosa de <2 cm, característica diagnóstica de Araceae) raramente visible, con polinización por moscas pequeñas. Reproducción vegetativa explosiva por estolones cortos que producen rosetas hijas cada 7-15 días y semillas viables hasta 4-8 años en sedimento — una sola roseta puede generar >500 individuos en 80-90 días en aguas eutroficadas cálidas. Su comportamiento invasor en aguas eutroficadas colombianas (sombreado total del agua, anoxia subsuperficial, colapso de fauna acuática nativa, obstrucción de compuertas y canales de riego, criadero de Anopheles y Mansonia) la convierte en problema serio aunque algo más manejable que la taruya por su menor tasa de crecimiento explosivo. Paradójicamente, como Eichhornia, es fitorremediadora eficaz: acumula N, P, K, metales pesados leves (cadmio, zinc, cobre, plomo trazas) y compuestos orgánicos tóxicos en raíces fibrosas plumosas y biomasa con eficiencia 4-6 veces superior a macrófitas nativas, uso aprovechable solo en biorreactores cerrados de fitorremediación con cosecha programada cada 2-3 semanas y deshidratación inmediata de biomasa para uso como compost activado o sustrato de biogás. Manejo agroecológico: NO PROPAGAR jamás fuera de sistemas cerrados de fitorremediación controlados (decisión IAvH-Humboldt 2010 y Resolución MADS 684/2018); en humedales colombianos donde está establecida, manejo controlado por remoción mecánica con rastrillos largos o cosechadora acuática (NUNCA herbicidas), compostaje obligatorio del material removido a 60+°C por 4-6 meses fuera del cuerpo de agua, restauración con macrófitas nativas (Limnobium laevigatum macrófita flotante nativa neotropical preferida para sustitución, Nymphoides humboldtiana, Lemna minor para cobertura ligera), control de aportes de N y P aguas arriba (causa raíz), monitoreo bimensual durante 3 años post-remoción para arrancar rosetas residuales antes de floración, reporte obligatorio al SIB Colombia, IDEAM y autoridad ambiental jurisdiccional. Es lección viva de cómo la frontera taxonómica entre nativa-naturalizada-invasora es borrosa para especies pantropicales antiguas, de cómo la eutrofización dispara crecimiento explosivo de macrófitas oportunistas, y de cómo la restauración de humedales requiere atacar la causa raíz (aportes de N y P aguas arriba) y no solo arrancar la planta visible. Fuentes Tier A: IAvH Humboldt — Catálogo Invasoras Andes, ISSG-UICN Global Invasive Species Database, POWO Kew, GBIF Backbone Taxonomy, Calderón-Sáenz 2003 Invasoras Colombia.",
+      "source_ids": [
+        "humboldt-invasoras-andes",
+        "issg-uicn-invasoras",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "calderon-saenz-2003-invasoras",
+        "sib-colombia"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH42_ACUATICAS_HUMEDALES",
+      "id": "azolla_filiculoides",
+      "nombre_comun": "Azolla",
+      "nombre_comunes_regionales": [
+        "helecho mosquito",
+        "helecho de agua",
+        "azolla americana",
+        "mosquito fern",
+        "fairy moss"
+      ],
+      "nombre_cientifico": "Azolla filiculoides Lam.",
+      "familia_botanica": "Salviniaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "nitrogen_fixer",
+        "biomass_producer",
+        "ground_cover",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 500,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 15,
+        "optimo_max": 28,
+        "max_tolerable": 32
+      },
+      "radiacion": "sol_pleno",
+      "agua": "pantanoso",
+      "drenaje_requerido": "pantanoso",
+      "harvest_type": "biomasa",
+      "propagation": {
+        "methods": [
+          "division_mata",
+          "espora"
+        ],
+        "best_method": "division_mata",
+        "protocol_resumen": "Propagación vegetativa por fragmentación de la fronda (cada fragmento con al menos 1 lóbulo viable regenera colonia completa en 5-10 días). Esporas (megasporas y microsporas) raras en cultivo, no necesarias en propagación práctica. Inoculación inicial: 200-500 g/m² de superficie de agua tranquila a inicio de cultivo (arrozal, estanque piscícola). Duplicación de biomasa en 3-5 días en óptimas condiciones.",
+        "tiempo_a_establecimiento_dias": 15,
+        "notas": "Helecho acuático fijador de N (8-12% N en biomasa seca vía simbiosis con cianobacteria Anabaena azollae en cámaras foliares). Manejo clásico en arrozales asiáticos (China, Vietnam, Filipinas, India): se siembra azolla con el arroz, fija 50-150 kg N/ha/ciclo, al final del ciclo se entierra como abono verde. Adopción incipiente en Colombia: Sevilla (Tolima), Saldaña, Espinal, Ibagué, Aipe (Huila). Excelente alimento proteico para tilapia, cachama, cerdos y aves.",
+        "fuente": "IAvH Flora Alto Andina; Bernal 2015; POWO Kew; GBIF Colombia; FAO Ecocrop; CIAT"
+      },
+      "rol_ecologico": "Helecho acuático flotante diminuto (frondas de 1-2 cm) que forma cobertura verde-rojiza sobre superficie de agua tranquila. Fijador biológico de N vía simbiosis con cianobacteria Anabaena azollae que vive en cámaras foliares — el único helecho del mundo con fijación biológica de N. Acumulador dinámico de N (3-5% N en biomasa fresca, 8-12% en biomasa seca, ratio C/N=10-12 ideal para abono verde rápido). Forraje proteico (25-30% proteína seca) para tilapia, cachama, cerdos, aves de patio, conejos. En arrozales asiáticos manejo dual (cubre la lámina de agua reduciendo evaporación y suprimiendo malezas + fija N que pasa al arroz al enterrarse como abono verde) que fija 50-150 kg N/ha/ciclo de arroz, reemplazando 30-60% de la fertilización N sintética.",
+      "valor_pedagogico": "La azolla (Azolla filiculoides Lam., Salviniaceae) es un helecho acuático flotante diminuto que constituye una de las mayores joyas agroecológicas del mundo y una lección viva de simbiosis biológica, soberanía nitrogenada y agricultura circular: es el único helecho del planeta con fijación biológica de nitrógeno gracias a su simbiosis con la cianobacteria Anabaena azollae que vive en cámaras foliares especializadas dentro de sus frondas — una alianza simbiótica que data del Cretácico y que durante el Eoceno (hace 50 millones de años) cubrió el océano Ártico durante 800.000 años fijando suficiente CO₂ atmosférico como para enfriar el planeta y dar inicio a la era de hielo actual ('Evento Azolla', uno de los descubrimientos paleoclimatológicos más impactantes de la última década). Nativa o cosmopolita en humedales templados y tropicales de todos los continentes (excepto Antártida), en Colombia se distribuye en humedales, ciénagas, arrozales y estanques tranquilos entre 0 y 3.000 msnm: humedales fríos de la Sabana de Bogotá (Jaboque, Juan Amarillo, Tibanica), arrozales del Tolima-Huila-Meta-Casanare (Sevilla, Saldaña, Espinal, Ibagué, Aipe, Yopal, Villavicencio), humedales del Valle del Cauca (Sonso, La Guinea), ciénagas del Magdalena medio (Zapatosa, El Sapo), lagunas altoandinas (Tota, Iguaque, Siecha) y planicie inundable de la Orinoquia. Pertenece a la familia Salviniaceae (orden Salviniales, helechos acuáticos heterosporados) y se reconoce por sus frondas diminutas de 1-2 cm de tamaño, escamosas, con dos lóbulos por hoja (uno dorsal flotante verde con cámaras simbióticas que albergan Anabaena, uno ventral sumergido reducido absorbente), de color verde brillante en óptimo crecimiento que vira a rojo-burdeos en estrés (alta luz, frío, fósforo limitante — el rojo proviene de antocianinas protectoras), forma cobertura densa sobre superficie de agua tranquila que da la apariencia de una alfombra verde-rojiza. Reproducción vegetativa explosiva por fragmentación (cada fragmento con al menos 1 lóbulo viable regenera colonia completa en 5-10 días, duplicación de biomasa en 3-5 días en óptimo) y rara reproducción sexual por megasporas-microsporas. Su importancia agroecológica es enorme: fija biológicamente 50-150 kg N/ha/ciclo de cultivo (comparable o superior a la simbiosis Rhizobium-leguminosa), 3-5% N en biomasa fresca, 8-12% en seca (ratio C/N=10-12 ideal para abono verde de liberación rápida), 25-30% proteína cruda en seca (excelente forraje proteico), acumulador dinámico de P, K, Ca, micronutrientes (Fe, Mn, Zn, B) y fitorremediador eficaz de aguas residuales N-amoniacales. Su uso clásico es el manejo dual en arrozales asiáticos (China, Vietnam, Filipinas, India, Indonesia, Bangladesh) practicado desde el siglo XI: se inocula azolla con el arroz al inicio del ciclo, la azolla cubre la lámina de agua del arrozal reduciendo evaporación, sombreando y suprimiendo malezas anuales, mientras fija 50-150 kg N/ha durante el ciclo; al final del ciclo se entierra como abono verde antes de la cosecha del arroz o se cosecha como forraje proteico para cerdos, aves y peces; reemplaza 30-60% de la fertilización nitrogenada sintética del arrozal y mantiene o aumenta el rendimiento. En Colombia esta práctica es incipiente pero adoptada por arroceros agroecológicos del Tolima (Sevilla, Saldaña, Espinal, Ibagué), Huila (Aipe, Campoalegre), Meta (Villavicencio, Acacías) y Casanare (Yopal, Aguazul) — Agrosavia y CIAT documentan rendimientos comparables a fertilización sintética con reducción de 40-50% en costos de N y eliminación de pico de emisión de óxidos de N. Como forraje y alimento proteico es base para sistemas integrados acuicultura-cerdo-aves-arroz (rotación cuatripartita asiática clásica). Manejo agroecológico: inóculo inicial 200-500 g/m² de superficie de agua tranquila al inicio del cultivo de arroz o en estanque piscícola, mantener pH 5.5-7.5, temperatura 15-28°C, profundidad lámina de agua 5-15 cm en arrozal, alta luminosidad, fosfato disponible (fertilización P en arrozales con bajo P); cosecha con malla cada 7-14 días una vez establecida cobertura completa, no agotar (>30% remanente para regeneración); aplicar fresca o enterrada como abono verde, o seca al sol como forraje proteico o ingrediente de concentrado animal. Es lección extraordinaria de simbiosis biológica, fijación biológica de N alternativa a leguminosas, soberanía nitrogenada del arrozal tropical, agricultura circular, integración acuicultura-cultivo y eficiencia evolutiva (la alianza Azolla-Anabaena tiene 70-90 millones de años de coevolución continua, los socios ya no se reconocen como individuos separados sino como un superorganismo simbiótico). Fuentes Tier A: IAvH Humboldt — Flora Alto Andina, POWO Kew, GBIF Colombia, Bernal 2015 Catálogo Plantas y Líquenes Colombia, FAO Ecocrop, Agrosavia.",
+      "source_ids": [
+        "humboldt-flora-alto-andina",
+        "powo-kew",
+        "gbif-colombia",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "fao-ecocrop",
+        "agrosavia-tibaitata"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH42_ACUATICAS_HUMEDALES",
+      "id": "typha_dominguensis",
+      "nombre_comun": "Enea",
+      "nombre_comunes_regionales": [
+        "espadaña",
+        "totora del sur",
+        "junco de agua",
+        "cattail tropical",
+        "enea sureña"
+      ],
+      "nombre_cientifico": "Typha domingensis Pers.",
+      "familia_botanica": "Typhaceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "biomass_producer",
+        "dynamic_accumulator",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 500,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 14,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "pantanoso",
+      "drenaje_requerido": "pantanoso",
+      "harvest_type": "biomasa",
+      "propagation": {
+        "methods": [
+          "rizoma",
+          "semilla",
+          "division_mata"
+        ],
+        "best_method": "rizoma",
+        "protocol_resumen": "División de rizoma horizontal grueso a inicio de época húmeda. Trozos de 15-25 cm con al menos un brote terminal. Plantar en lodo saturado a 5-20 cm bajo agua. Establecimiento en 30-60 días. Semillas viables (pluma algodonosa) pero germinación errática; propagación por rizoma es estándar. Manejar densidad: una vez establecida puede colonizar agresivamente el humedal.",
+        "tiempo_a_establecimiento_dias": 45,
+        "notas": "Macrófita emergente nativa neotropical, presente en humedales colombianos entre 0 y 3.200 msnm: humedales Sabana de Bogotá, ciénagas Magdalena, lagunas altoandinas, humedales Caribe-Valle. Uso múltiple: fibra para artesanía (esteras, sombreros, canastos — tradición chibcha-muisca en altiplano), filtración biológica de aguas residuales (humedal artificial subsuperficial), forraje verde para ganadería de patio, polen comestible y nutritivo.",
+        "fuente": "IAvH Flora Alto Andina; Bernal 2015; POWO Kew; GBIF Colombia; Pérez Arbeláez 1947"
+      },
+      "rol_ecologico": "Macrófita emergente nativa neotropical de 1.5-3.5 m de altura con tallos cilíndricos huecos rígidos y hojas lineares largas (1-2 m) en forma de espada que dan el nombre español \"espadaña\". Inflorescencias terminales cilíndricas características en dos partes (parte superior estaminada delgada que cae al madurar, parte inferior pistilada gruesa marrón-canela aterciopelada de 15-30 cm de largo = \"el cigarro\"). Fitorremediador eficaz para humedales artificiales subsuperficiales (HAS) de tratamiento de aguas residuales: acumula N, P, metales pesados (Cd, Pb, Cr, Zn, Cu, Hg trazas), coliformes en raíces y rizomas, eficiencia de remoción >90% para N-amoniacal y >85% para P-soluble en sistemas bien diseñados. Hábitat clave para aves de humedal (tinguas, gallaretas, garzas, patos, hoacines) y refugio de anfibios.",
+      "valor_pedagogico": "La enea o espadaña (Typha domingensis Pers., Typhaceae) es la macrófita emergente más versátil y útil de los humedales tropicales-subtropicales colombianos y una lección viva de saberes ancestrales chibcha-muisca, fitorremediación biológica y soberanía artesanal: una planta nativa que combina aprovechamiento tradicional milenario (fibra para esteras, sombreros, canastos), uso moderno en humedales artificiales de tratamiento de aguas residuales y forraje-alimento nutritivo. Nativa del Neotrópico (desde el sur de Estados Unidos hasta Argentina y Chile, incluyendo todo el Caribe y el Pacífico mexicano-centroamericano), en Colombia se distribuye en humedales, ciénagas, lagunas, jagüeyes y bordes de cuerpos de agua tranquilos entre 0 y 3.200 msnm en todas las zonas térmicas: humedales fríos de la Sabana de Bogotá (Jaboque, Juan Amarillo, Tibanica, Córdoba, La Conejera, Torca-Guaymaral, El Burro, Capellanía — donde es la macrófita emergente dominante junto con Schoenoplectus californicus 'junco de palo'), lagunas y embalses de Boyacá-Cundinamarca (Tota, Iguaque, Tominé, Sisga, San Rafael), ciénagas del Magdalena medio y bajo (Zapatosa, Ayapel, El Sapo, Chilloa), humedales del Valle del Cauca (Sonso, La Guinea, La Yuyos), jagüeyes y humedales del Caribe (La Guajira, Atlántico, Sucre, Córdoba, Bolívar), planicie inundable de la Orinoquia (Casanare, Arauca, Meta) y humedales amazónicos en cochas y meandros abandonados. Pertenece a la familia Typhaceae (única familia del orden Typhales) y se reconoce por su porte robusto de 1.5-3.5 m de altura con tallos cilíndricos huecos rígidos, hojas lineares larguísimas (1-2 m de longitud, 1-2 cm de ancho) verde-grisáceas con base envainadora en forma de espada que da el nombre español 'espadaña', y por sus inflorescencias terminales cilíndricas únicas en el reino vegetal: dos partes separadas — la superior estaminada delgada (5-20 cm de largo, amarilla por el polen, cae al madurar) y la inferior pistilada gruesa marrón-canela aterciopelada (15-30 cm de largo, 1-3 cm de diámetro, 'el cigarro' o 'la totora' del lenguaje campesino colombiano) que al madurar libera miles de aquenios diminutos con pluma algodonosa para dispersión por viento — el famoso 'algodón de eneas' que se usaba como relleno de cojines en la Sabana de Bogotá colonial. Diferenciar de Typha latifolia (enea de hoja ancha, hojas >2.5 cm, distribución templada superior) y Typha angustifolia (enea de hoja angosta, hojas <1.5 cm, distribución cosmopolita pero menos común en Colombia). Su importancia ecológica y cultural es central: fue una de las plantas más utilizadas por los chibcha-muiscas del altiplano cundiboyacense para artesanía (esteras de enea, sombreros, canastos, asientos, paredes de bohíos), tradición que persiste en municipios como Tibasosa, Tuta, Sogamoso, Tota (Boyacá), Cota, Chía, Tabio, Tenjo (Cundinamarca) y entre artesanos del Caribe (zenú); el polen seco (recolectado de la parte estaminada en floración) es alimento nutritivo (rico en proteína vegetal, vitaminas B, fibra) que se mezcla con harinas tradicionalmente; los rizomas jóvenes son comestibles (con un proceso de cocción para eliminar fibras duras); y modernamente es la macrófita estrella en sistemas de tratamiento de aguas residuales por humedales artificiales subsuperficiales (HAS) construidos: acumula N-amoniacal y P-soluble en raíces y rizomas con eficiencia >90% y >85% respectivamente, metales pesados (Cd, Pb, Cr, Zn, Cu, Hg trazas) y coliformes, en sistemas bien diseñados de 1-3 m² de HAS por habitante equivalente para municipios rurales colombianos (proyectos pilotos en municipios de Cundinamarca, Boyacá, Tolima y Valle desde los 2000s). Como hábitat es refugio clave de aves de humedal en peligro (tingua bogotana Rallus semiplumbeus endémica de Bogotá, tingua de pico verde Porphyriops melanops, focha andina, gallareta, garzas, hoatzin en Amazonia) y anfibios. Manejo agroecológico: propagación por división de rizoma horizontal grueso a inicio de época húmeda, trozos de 15-25 cm con al menos un brote terminal, plantar en lodo saturado a 5-20 cm bajo agua, establecimiento en 30-60 días; cosecha de hojas para artesanía cada 4-6 meses cortando 30-40 cm sobre el suelo (la planta rebrota); manejo de densidad importante porque puede colonizar agresivamente el humedal (recomendado mantener cobertura 40-60% del espejo de agua, no >80%); para HAS construido densidad de siembra 4-9 macollas/m². Es lección extraordinaria de saberes ancestrales chibcha-muiscas, soberanía artesanal y alimentaria, fitorremediación biológica y tecnología apropiada para tratamiento de aguas residuales en municipios rurales. Fuentes Tier A: IAvH Humboldt — Flora Alto Andina, POWO Kew, GBIF Colombia, Bernal 2015, Pérez Arbeláez 1947 Plantas Útiles Colombia.",
+      "source_ids": [
+        "humboldt-flora-alto-andina",
+        "powo-kew",
+        "gbif-colombia",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH42_ACUATICAS_HUMEDALES",
+      "id": "juncus_effusus",
+      "nombre_comun": "Junco común",
+      "nombre_comunes_regionales": [
+        "junco",
+        "junco esparcido",
+        "junquillo",
+        "soft rush",
+        "common rush"
+      ],
+      "nombre_cientifico": "Juncus effusus L.",
+      "familia_botanica": "Juncaceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "biomass_producer",
+        "ground_cover",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 3000,
+        "max_absoluto": 3600
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 10,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "pantanoso",
+      "drenaje_requerido": "pantanoso",
+      "harvest_type": "biomasa",
+      "propagation": {
+        "methods": [
+          "division_mata",
+          "semilla",
+          "rizoma"
+        ],
+        "best_method": "division_mata",
+        "protocol_resumen": "División de macolla cada 2-3 años a inicio de primavera (febrero-marzo en Sabana de Bogotá). Separar macollas hijas con al menos 5-8 culmos y porción de rizoma. Plantar a 30-50 cm de distancia en suelo saturado o bajo lámina de agua 5-15 cm. Establecimiento en 60-90 días. Semillas diminutas viables, germinan en sustrato saturado con luz.",
+        "tiempo_a_establecimiento_dias": 75,
+        "notas": "Macrófita emergente cosmopolita-nativa de humedales fríos andinos colombianos entre 1.500 y 3.600 msnm: páramos de Sumapaz, Chingaza, Cruz Verde, Iguaque, Belmira; humedales Sabana de Bogotá; laguna de Tota; lagunas altoandinas Boyacá-Cundinamarca-Nariño-Cauca. Uso tradicional para artesanía (esteras, canastos finos), filtración biológica en humedales artificiales fríos, bioindicador de calidad de suelo saturado.",
+        "fuente": "IAvH Flora Alto Andina; Bernal 2015; POWO Kew; GBIF Colombia"
+      },
+      "rol_ecologico": "Macrófita emergente cespitosa formando macollas densas de 60-130 cm de altura con culmos cilíndricos verde oscuro brillante huecos por dentro (médula esponjosa blanca) sin hojas evidentes (hojas reducidas a vainas basales). Inflorescencias laterales discretas de 3-10 cm aparentando salir del culmo a un tercio del extremo, en realidad terminales con bráctea de envoltura que continúa el culmo (característica diagnóstica de Juncus effusus). Fitorremediador eficaz para humedales artificiales subsuperficiales fríos altoandinos (alternativa a Typha donde el frío y la altitud limitan a Typha): acumula N-amoniacal, P-soluble, K, metales pesados leves en raíces fibrosas densas y rizomas. Hábitat para anfibios altoandinos (rana sabanera, salamandra Bolitoglossa) e invertebrados de humedal frío.",
+      "valor_pedagogico": "El junco común o junco esparcido (Juncus effusus L., Juncaceae) es la macrófita emergente más representativa de los humedales fríos altoandinos colombianos y una lección viva de adaptación a suelos saturados, soberanía artesanal andina y fitorremediación biológica en climas fríos donde Typha (enea) ya no prospera. Cosmopolita-nativa en humedales templados-fríos de todos los continentes, en Colombia se distribuye en humedales y suelos saturados entre 1.500 y 3.600 msnm en zonas térmicas templada y fría: humedales fríos de la Sabana de Bogotá (Jaboque, Juan Amarillo, Tibanica, Córdoba, La Conejera, Torca-Guaymaral, El Burro, Capellanía — donde forma parches densos mezclados con Typha en bordes y zonas inundables), páramos y subpáramos del corredor cordillera Oriental (Sumapaz, Chingaza, Cruz Verde, Iguaque, Belmira, Pisba, Cocuy — donde es macrófita dominante de turberas y humedales de páramo entre 3.000-3.600 msnm), humedales y lagunas altoandinas de Boyacá-Cundinamarca (Tota, Iguaque, Siecha, Buitrera, Tausa), lagunas altoandinas de Nariño-Cauca-Tolima-Caldas (Cumbal, Cocha, Magdalena en Páramo de las Papas, Otún, El Plumón), valles fríos de Antioquia-Caldas-Quindío-Risaralda (Oriente antioqueño, Valle de San Nicolás, Eje Cafetero alto), y bordes de quebradas y manantiales fríos en piedemontes andinos. Pertenece a la familia Juncaceae (familia hermana de Cyperaceae 'papiros' y Poaceae 'gramíneas', orden Poales) y se reconoce por su porte cespitoso formando macollas densas de 60-130 cm de altura, sus culmos cilíndricos verde oscuro brillante huecos por dentro con médula esponjosa blanca (característica diagnóstica visible al cortar transversalmente el culmo — la médula seca era usada tradicionalmente como mecha de velas en el siglo XIX en Europa, 'rushlight'), sin hojas evidentes (las hojas están reducidas a vainas basales rojizo-marrones envainando la base del culmo), y por sus inflorescencias laterales discretas de 3-10 cm aparentando salir del culmo a un tercio del extremo aunque en realidad son terminales con una bráctea de envoltura que continúa la apariencia del culmo (característica diagnóstica de la especie). Diferenciar de otros Juncus colombianos (J. arcticus, J. tenuis, J. bufonius, J. ramboi) por la médula continua, la inflorescencia lateral aparente y la altura mayor. Su importancia ecológica y cultural es central: como macrófita dominante de humedales fríos andinos estabiliza suelos saturados de turberas, regula el flujo hídrico subsuperficial de páramos (los humedales de páramo son el principal sistema de captación, regulación y entrega de agua a las cabeceras de cuencas hidrográficas colombianas que abastecen las grandes ciudades — Bogotá, Tunja, Sogamoso, Manizales, Pereira, Pasto, Popayán, San Gil, Bucaramanga), forma hábitat para anfibios altoandinos (rana sabanera Dendropsophus molitor, salamandra Bolitoglossa adspersa, rana de cristal andina), invertebrados de humedal frío (libélulas, chinches acuáticas, anfípodos) y aves de humedal altoandinas (tingua bogotana Rallus semiplumbeus endémica de Bogotá en peligro, tingua de pico verde, focha andina, becasinas, agachadizas migratorias); culturalmente fue planta artesanal importante en el altiplano cundiboyacense (esteras finas, canastos, asientos — tradiciones que persisten en municipios artesanales de Boyacá-Cundinamarca y Nariño); modernamente es la macrófita estrella en sistemas de humedales artificiales subsuperficiales (HAS) fríos altoandinos para tratamiento de aguas residuales en municipios rurales de páramo donde Typha (enea) ya no prospera por el frío extremo (>2.800 msnm) — es la macrófita estrella en HAS de páramo, acumula N-amoniacal, P-soluble, K y metales pesados leves en raíces fibrosas densas y rizomas con eficiencia comparable a Typha en sistemas adaptados a clima frío. Manejo agroecológico ornamental-restauración-HAS: propagación por división de macolla cada 2-3 años a inicio de primavera (febrero-marzo en Sabana de Bogotá, marzo-abril en páramos altos), separar macollas hijas con al menos 5-8 culmos y porción de rizoma, plantar a 30-50 cm de distancia en suelo saturado o bajo lámina de agua 5-15 cm, establecimiento en 60-90 días; cosecha de culmos para artesanía cada 4-6 meses cortando a 10 cm del suelo (la planta rebrota); para HAS construido densidad de siembra 6-9 macollas/m². Es lección extraordinaria de adaptación a humedales fríos andinos, conservación de páramos (sistemas estratégicos protegidos por Ley 1930 de 2018), soberanía artesanal andina y tecnología apropiada para tratamiento de aguas residuales en municipios fríos colombianos. Fuentes Tier A: IAvH Humboldt — Flora Alto Andina, POWO Kew, GBIF Colombia, Bernal 2015, JBB Plantas Medicinales.",
+      "source_ids": [
+        "humboldt-flora-alto-andina",
+        "powo-kew",
+        "gbif-colombia",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "ley-1930-2018-paramos"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH42_ACUATICAS_HUMEDALES",
+      "id": "cyperus_articulatus",
+      "nombre_comun": "Papiro andino",
+      "nombre_comunes_regionales": [
+        "papiro de humedal",
+        "piri-piri",
+        "junco articulado",
+        "jointed flatsedge",
+        "piripiri"
+      ],
+      "nombre_cientifico": "Cyperus articulatus L.",
+      "familia_botanica": "Cyperaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "biomass_producer",
+        "ground_cover",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1800,
+        "max_absoluto": 2400
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 18,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "pantanoso",
+      "drenaje_requerido": "pantanoso",
+      "harvest_type": "raiz",
+      "propagation": {
+        "methods": [
+          "rizoma",
+          "tuberculo",
+          "division_mata"
+        ],
+        "best_method": "rizoma",
+        "protocol_resumen": "División de rizoma horizontal con tubérculos asociados (los tubérculos almacenan los aceites esenciales medicinales aromáticos). Plantar trozos de rizoma de 10-20 cm con tubérculos en lodo saturado o bajo lámina de agua 5-15 cm a 30-40 cm de distancia. Cosecha de tubérculos a los 8-12 meses, en época seca cuando concentran aceites esenciales máximos.",
+        "tiempo_a_establecimiento_dias": 60,
+        "notas": "Conocido entre los pueblos amazónicos como 'piri-piri' (Shipibo-Konibo del Perú-Brasil; Yagua, Tikuna, Witoto, Bora del trapecio amazónico colombiano-peruano-brasileño): rizoma aromático con uso medicinal-ritual ancestral. Aceite esencial rico en mustakone, ciperotundona, isocyperol — bioactividad antiparasitaria (malaria, Leishmania), antiinflamatoria, neuroactiva, repelente de insectos. Crece en humedales del Amazonas, Orinoquia, Caribe húmedo, valles interandinos cálidos.",
+        "fuente": "Sinchi Instituto Amazónico; Bernal 2015; POWO Kew; GBIF Colombia; JBB Plantas Medicinales"
+      },
+      "rol_ecologico": "Macrófita emergente cespitosa de 50-150 cm de altura con culmos triangulares (característica diagnóstica de Cyperaceae, recordar la regla mnemotécnica botánica 'Sedges have edges, rushes are round, grasses have nodes from the top to the ground'), nudos visibles en el culmo (de ahí el epíteto 'articulatus' = articulado, con articulaciones), hojas reducidas a vainas basales, inflorescencia terminal umbeliforme con brácteas largas radiando, espiguillas pardo-doradas. Rizoma horizontal grueso con tubérculos secundarios aromáticos (almacenan aceites esenciales medicinales — cipernotrón, mustakone, isocyperol). Repelente natural de insectos (mosquitos, mosquilla negra) por aceites esenciales. Fitorremediador moderado en humedales. Hábitat de macroinvertebrados acuáticos en cochas amazónicas y humedales cálidos.",
+      "valor_pedagogico": "El papiro andino o piri-piri (Cyperus articulatus L., Cyperaceae) es una de las plantas medicinales-rituales más sagradas y biotecnológicamente importantes de la Amazonia colombiana y una lección viva de farmacopea ancestral indígena, fitoquímica de aceites esenciales y soberanía sanitaria amazónica. Nativa del Neotrópico (desde el sur de Estados Unidos hasta Bolivia y Brasil, abundante en cuencas amazónicas), en Colombia se distribuye en humedales, ciénagas, bordes de cochas y lagunas tranquilas entre 0 y 2.400 msnm: humedales y cochas del trapecio amazónico colombiano (Leticia, Puerto Nariño, Mocagua, Tarapacá, Puerto Alegría, La Pedrera, Mirití-Paraná, río Putumayo, Caquetá, Apaporis y Vaupés), planicie inundable de la Orinoquia (Casanare, Arauca, Meta, Vichada, Guainía), ciénagas del Magdalena medio y bajo (Zapatosa, Ayapel, El Sapo, Chilloa), humedales del Caribe húmedo (Magdalena, Atlántico, Sucre, Córdoba, Bolívar), humedales del Valle del Cauca (Sonso, La Guinea, La Yuyos), valles interandinos cálidos del Magdalena y Cauca, y piedemontes amazónicos y orinoquenses. Pertenece a la familia Cyperaceae ('papiros') y se reconoce por sus culmos triangulares de 50-150 cm de altura (característica diagnóstica de Cyperaceae, recordar la regla mnemotécnica botánica anglosajona 'Sedges have edges, rushes are round, grasses have nodes from the top to the ground' — los papiros tienen aristas, los juncos son redondos, las gramíneas tienen nudos del techo al suelo), nudos transversales visibles en los culmos (de ahí el epíteto 'articulatus' = articulado, con articulaciones, característica diagnóstica de la especie), hojas reducidas a vainas basales rojizo-marrones, inflorescencias terminales umbeliformes con brácteas largas radiando y espiguillas pardo-doradas o castañas, y por su rizoma horizontal grueso con tubérculos secundarios aromáticos del tamaño de un dedo pulgar (los tubérculos almacenan los aceites esenciales medicinales — cipernotrón, mustakone, ciperotundona, isocyperol). Pero su importancia trasciende lo botánico: para los pueblos amazónicos peruanos (Shipibo-Konibo, Awajún), brasileños (Kashinawá, Yawanawá), bolivianos (Tacana, Esse-Ejja) y colombianos (Yagua, Tikuna, Witoto, Bora, Murui-Muinane del trapecio amazónico) es la planta medicinal-ritual conocida como 'piri-piri' (Shipibo) o 'piripiri' (Yagua) y es una de las plantas maestras más sagradas de la farmacopea amazónica ancestral con cientos de cultivariedades (los Shipibo-Konibo reconocen >50 variedades de piri-piri según uso medicinal-ritual específico: piri-piri para parto, piri-piri para visión, piri-piri para tejido y kené patterns, piri-piri para caza, piri-piri para amor, piri-piri para repeler serpientes, piri-piri para tratar fiebre, piri-piri para diarrea infantil, etc.) — saber tradicional documentado por etnobotánicos colombianos (Mauricio Sánchez), peruanos (Glenn Shepard) y brasileños (William Milliken) desde los 1980s y 1990s, en proceso de validación fitoquímica y farmacológica desde los 2000s. La fitoquímica moderna ha validado parcialmente varias bioactividades del aceite esencial de Cyperus articulatus rico en mustakone, ciperotundona, isocyperol, α-corimbolol: antiparasitaria contra Plasmodium falciparum (malaria) y Leishmania amazonensis (leishmaniosis cutánea), antiinflamatoria, neuroactiva (psicoestimulante leve, ansiolítico), repelente de insectos (mosquitos Anopheles vector de malaria, Aedes vector de dengue, mosquilla negra Simulium vector de oncocercosis, garrapatas), antimicrobiana de amplio espectro, y posible neuroprotectora en estudios preclínicos. Es una de las plantas amazónicas con mayor potencial farmacéutico actual y a la vez una de las más amenazadas por biopiratería (varios alcaloides aislados y patentados por farmacéuticas europeas y estadounidenses sin reconocimiento del saber Shipibo-Konibo originario, casos documentados de bioprospección extractivista). Manejo agroecológico: propagación por división de rizoma horizontal con tubérculos asociados (los tubérculos almacenan los aceites esenciales medicinales aromáticos), trozos de rizoma de 10-20 cm con tubérculos plantados en lodo saturado o bajo lámina de agua 5-15 cm a 30-40 cm de distancia, establecimiento en 60-90 días; cosecha de tubérculos a los 8-12 meses en época seca (cuando concentran aceites esenciales máximos), cosecha sostenible dejando al menos 30% de los tubérculos para regeneración; en chagras amazónicas integrado en sistemas tradicionales de cultivo (chagra Witoto, Bora, Tikuna) cerca de ríos o cochas. Es lección extraordinaria de farmacopea ancestral amazónica, biotecnología tradicional indígena, fitoquímica de aceites esenciales, biopiratería y soberanía sanitaria amazónica, derechos de los pueblos indígenas sobre conocimiento tradicional (Convenio 169 OIT, Convenio sobre la Diversidad Biológica, Protocolo de Nagoya). Fuentes Tier A: Sinchi Instituto Amazónico, IAvH Humboldt — Flora Amazonia, POWO Kew, GBIF Colombia, Bernal 2015 Catálogo Plantas y Líquenes Colombia, JBB Plantas Medicinales.",
+      "source_ids": [
+        "sinchi-amazonia-colombiana",
+        "humboldt-flora-alto-andina",
+        "powo-kew",
+        "gbif-colombia",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "jbb-plantas-medicinales"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH42_ACUATICAS_HUMEDALES",
+      "id": "polygonum_punctatum",
+      "nombre_comun": "Chilco de agua",
+      "nombre_comunes_regionales": [
+        "chilca de humedal",
+        "sietevenas",
+        "pimentilla de agua",
+        "barbasco de humedal",
+        "water smartweed",
+        "dotted smartweed"
+      ],
+      "nombre_cientifico": "Polygonum punctatum Elliott",
+      "familia_botanica": "Polygonaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "pest_repellent",
+        "ground_cover",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 800,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 14,
+        "optimo_max": 26,
+        "max_tolerable": 32
+      },
+      "radiacion": "sol_pleno",
+      "agua": "pantanoso",
+      "drenaje_requerido": "pantanoso",
+      "harvest_type": "hoja",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje",
+          "division_mata"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Propagación por esqueje de tallo (los tallos enraízan en cada nodo en contacto con suelo saturado o agua, alta tasa de prendimiento >90%). Trozos de tallo de 15-25 cm con 3-5 nodos plantados en lodo saturado o suelo permanentemente húmedo. Establecimiento en 20-30 días. Semillas (aquenios triangulares brillantes negros) viables 5-10 años en sedimento, germinan en sustrato saturado.",
+        "tiempo_a_establecimiento_dias": 30,
+        "notas": "Nativa neotropical de humedales colombianos entre 0 y 3.200 msnm: humedales Sabana de Bogotá, ciénagas Magdalena, humedales Caribe-Valle, lagunas altoandinas. Uso medicinal-ritual ancestral chibcha-muisca y campesino andino: emoliente, antiinflamatorio, hemostático, diurético, vermífugo, repelente de insectos. Hojas con manchas oscuras puntuadas glandulares (de ahí \"punctatum\") con sabor picante característico (aceites esenciales tipo poligodial).",
+        "fuente": "IAvH Flora Alto Andina; Bernal 2015; POWO Kew; GBIF Colombia; JBB Plantas Medicinales"
+      },
+      "rol_ecologico": "Hierba semi-acuática de 30-100 cm de altura con tallos suculentos cilíndricos articulados con nudos engrosados característicos de Polygonaceae (de ahí el nombre de familia \"Polygonaceae\" = muchas rodillas/muchos nudos), hojas lanceoladas alternas con manchas oscuras puntuadas glandulares (de ahí epíteto \"punctatum\"), ócreas membranosas envainadoras en cada nudo (característica diagnóstica de Polygonaceae), inflorescencias terminales en espigas delgadas con flores diminutas blanco-rosadas perladas. Repelente natural de insectos por aceites esenciales (poligodial, isodrimeninol) — antimosquitos, antipulgas, antichinches. Atractor de polinizadores nativos (abejas meliponas, syrphidos). Fitorremediador moderado en humedales.",
+      "valor_pedagogico": "El chilco de agua, chilca de humedal o sietevenas (Polygonum punctatum Elliott, Polygonaceae; sinónimo taxonómico Persicaria punctata (Elliott) Small en clasificaciones modernas APG IV, mantenido como Polygonum aquí por uso histórico colombiano) es una hierba semi-acuática medicinal nativa de los humedales y bordes de cuerpos de agua del Neotrópico y una lección viva de farmacopea campesina andina-chibcha, control biológico natural de insectos por aceites esenciales y soberanía sanitaria de los humedales colombianos. Nativa del Neotrópico (desde el sur de Estados Unidos hasta Argentina y Chile), en Colombia se distribuye en humedales, bordes de cuerpos de agua, suelos saturados, ciénagas, lagunas y orillas de quebradas entre 0 y 3.200 msnm en todas las zonas térmicas: humedales fríos de la Sabana de Bogotá (Jaboque, Juan Amarillo, Tibanica, Córdoba, La Conejera, Torca-Guaymaral, El Burro), lagunas y embalses altoandinos de Boyacá-Cundinamarca (Tota, Iguaque, Tominé, Sisga), ciénagas del Magdalena medio y bajo (Zapatosa, Ayapel, El Sapo, Chilloa), humedales del Valle del Cauca (Sonso, La Guinea, La Yuyos), humedales y jagüeyes del Caribe (Atlántico, Sucre, Córdoba, Bolívar, Magdalena), planicie inundable de la Orinoquia (Casanare, Arauca, Meta), bordes de cochas amazónicas, y orillas de quebradas y manantiales en piedemontes y valles interandinos. Pertenece a la familia Polygonaceae (familia del trigo sarraceno, del ruibarbo, de las acederas y de las acederilas) y se reconoce por su porte herbáceo semi-acuático de 30-100 cm de altura con tallos suculentos cilíndricos articulados con nudos engrosados característicos de Polygonaceae (de ahí el nombre de familia 'Polygonaceae' = muchas rodillas/muchos nudos en griego; el detalle morfológico característico que distingue Polygonaceae de cualquier otra familia herbácea son las 'ócreas' membranosas envainadoras en cada nudo, vainas papiráceas marrón-pálidas que envuelven el tallo en cada articulación), por sus hojas lanceoladas alternas de 5-15 cm de largo con manchas oscuras puntuadas glandulares características de la especie (de ahí el epíteto 'punctatum' = punteado, manchado, característica diagnóstica de Polygonum punctatum / Persicaria punctata frente a otras especies del género), y por sus inflorescencias terminales en espigas delgadas, laxas, péndulas, con flores diminutas blanco-rosadas o blanco-perladas con perianto de 4-5 segmentos punteado-glandular, frutos en aquenios triangulares brillantes negros (viables 5-10 años en sedimento). Su importancia farmacológica y cultural es relevante: el chilco de agua es planta medicinal tradicional de la farmacopea campesina andina y de la tradición chibcha-muisca-pijao del altiplano cundiboyacense, con usos documentados como emoliente y antiinflamatorio (cataplasmas de hojas para golpes, esguinces, inflamaciones articulares), antiséptico de heridas, hemostático (corta sangrados leves de heridas superficiales), diurético (infusión de hojas para retención de líquidos, edemas leves, problemas urinarios), vermífugo (parasitosis intestinales leves en uso pediátrico tradicional supervisado), repelente natural de insectos (las hojas frescas frotadas sobre la piel repelen mosquitos, las hojas secas espolvoreadas en colchones y rincones de casa repelen pulgas, chinches y piojos — uso ampliamente documentado en zonas rurales del Magdalena medio, Caribe y Llanos), y barbasco de humedal (los pueblos amazónicos y caribeños usaban tradicionalmente las hojas y tallos macerados para aturdir peces en pozas pequeñas durante pesca artesanal, práctica regulada actualmente). La fitoquímica moderna ha identificado los compuestos activos: poligodial, isodrimeninol y otros sesquiterpenos picantes responsables del sabor picante característico de las hojas frescas (similar al picante de la pimienta de agua europea Polygonum hydropiper, planta hermana del mismo género), con bioactividad insecticida-repelente comprobada contra mosquitos Aedes aegypti (vector de dengue, zika, chikungunya) y Anopheles (malaria), antimicrobiana contra Staphylococcus aureus y Escherichia coli, antiinflamatoria por inhibición de COX-2, y citotóxica selectiva en líneas tumorales en estudios preclínicos. Como atractor de polinizadores nativos las flores blanco-rosadas perladas son visitadas por abejas meliponas (angelitas Tetragonisca angustula, abeja real Melipona favosa), syrphidos y otros insectos beneficiosos. Manejo agroecológico: propagación por esqueje de tallo (alta tasa de prendimiento >90%, los tallos enraízan en cada nodo en contacto con suelo saturado o agua), trozos de tallo de 15-25 cm con 3-5 nodos plantados en lodo saturado o suelo permanentemente húmedo, establecimiento en 20-30 días; cosecha de hojas continuamente desde 60 días post-establecimiento, mejor en floración cuando concentran aceites esenciales máximos; uso tradicional rural campesino fresco en cataplasma, infusión, decocción o como espolvoreo seco en rincones de casa contra pulgas-chinches; en chagra como cobertura de humedales artificiales, repelente de mosquitos en piscifactorías y estanques cerca de viviendas. Es lección extraordinaria de farmacopea campesina andina-chibcha, soberanía sanitaria de los humedales colombianos, control biológico natural de insectos por aceites esenciales nativos, integración de plantas medicinales en humedales productivos, y conexión entre conservación de humedales y salud pública rural. Fuentes Tier A: IAvH Humboldt — Flora Alto Andina, POWO Kew, GBIF Colombia, Bernal 2015 Catálogo Plantas y Líquenes Colombia, JBB Plantas Medicinales, Pamplona-Roger 2006 Plantas Medicinales.",
+      "source_ids": [
+        "humboldt-flora-alto-andina",
+        "powo-kew",
+        "gbif-colombia",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "jbb-plantas-medicinales",
+        "pamplona-roger-2006-plantas-medicinales"
+      ]
     }
   ],
   "biopreparados": [
