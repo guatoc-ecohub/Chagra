@@ -10178,8 +10178,19 @@
       "vida_util_dias": 180,
       "source_ids": [
         "restrepo-1996-bocashi",
-        "agrosavia-manual-biopreparados-2015"
-      ]
+        "agrosavia-manual-biopreparados-2015",
+        "restrepo-2007-biopreparados"
+      ],
+      "uso": "Al sustrato pre-siembra incorporado 0-15 cm, o como abonado de fondo en hoyos de trasplante. Reaplicación cada ciclo de cultivo (3-6 meses) en bandas al pie de la planta.",
+      "dosis": "1-2 kg/m² al voleo en cama de siembra; 100-300 g/planta en hoyo de trasplante; 8-15 t/ha en aplicación general. Reducir 30% si el suelo ya tiene >4% MO.",
+      "target": [
+        "fertilizante_general",
+        "inoculacion_microbiana_suelo",
+        "mejorador_estructura_suelo",
+        "aporte_materia_organica"
+      ],
+      "valor_pedagogico": "Tecnología japonesa (boka-shi, 'materia orgánica fermentada') adaptada a Latinoamérica por Jairo Restrepo. Fermentación aeróbica 45-55°C selecciona microbiota termófila (Bacillus, actinomicetos, levaduras) y estabiliza N orgánico no lixiviable, a diferencia de la urea sintética. La cascarilla aporta Si bioactivo; el carbón vegetal actúa como biochar (CEC + hábitat microbiano). Advertencias: >5 kg/m² en hortalizas de hoja → exceso N atrae áfidos y mildeo; humedad >65% vira a pútrida y pierde N. AGROSAVIA 2015 documenta respuestas equivalentes a 50% NPK sintético en papa criolla y maíz andino.",
+      "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17"
     },
     {
       "id": "biol",
@@ -10201,8 +10212,20 @@
       "tiempo_elaboracion_dias": 40,
       "vida_util_dias": 180,
       "source_ids": [
-        "restrepo-1996-bocashi"
-      ]
+        "restrepo-1996-bocashi",
+        "restrepo-2007-biopreparados",
+        "pinheiro-machado-2017-biofertilizantes"
+      ],
+      "uso": "Foliar al amanecer o atardecer (evitar sol directo) cada 7-15 días en etapas de crecimiento vegetativo y prefloración. También aplicable al pie/riego durante toda la etapa productiva. Compatible con caldos minerales si se aplica 48 h antes/después.",
+      "dosis": "Foliar: 100-200 ml/L de agua (dilución 1:10 a 1:5). Drench/riego al pie: 1-2 L/m² o 200 L/ha del concentrado diluido 1:5. Empezar con dilución alta (1:20) en plántulas para evitar fitotoxicidad.",
+      "target": [
+        "fertilizante_foliar_N",
+        "bioestimulante_fitohormonal",
+        "inoculacion_microbiana_filosfera",
+        "resistencia_induccion_SAR"
+      ],
+      "valor_pedagogico": "Biofertilizante anaeróbico andino, popularizado por Restrepo y Pinheiro Machado. La fermentación selecciona bacterias fijadoras de N (Azotobacter, Clostridium) y solubilizadoras de P, generando fitohormonas (auxinas, citoquininas) y ácidos quelantes. La leche aporta caseínas fungistáticas y Lactobacillus que inducen SAR (Resistencia Sistémica Adquirida). Vs. urea 46-0-0 entrega N orgánico sin quemar follaje. Advertencias: olor amoniacal = mal sellado (descartar); filtrar antes de boquilla; >30% en lechuga/fresa necrosa. AGROSAVIA 2015: +15-25% en hortalizas andinas.",
+      "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17"
     },
     {
       "id": "purin_ortiga",
@@ -10221,8 +10244,21 @@
       "tiempo_elaboracion_dias": 12,
       "vida_util_dias": 60,
       "source_ids": [
-        "restrepo-1996-bocashi"
-      ]
+        "restrepo-1996-bocashi",
+        "restrepo-2007-biopreparados",
+        "agrosavia-manual-biopreparados-2015"
+      ],
+      "uso": "Foliar al amanecer cada 7-10 días en etapa vegetativa. Como repelente preventivo: aplicar al detectar plagas chupadoras incipientes. También al pie como bioestimulante de enraizamiento en plántulas y trasplantes.",
+      "dosis": "Foliar: 100 ml/L de agua (1:10) preventivo, 200 ml/L (1:5) curativo contra pulgón. Drench/raíz: 50 ml/L (1:20). Macerado fresco no fermentado (24-48 h) se usa más diluido 1:20 a 1:50.",
+      "target": [
+        "control_pulgon",
+        "control_acaros",
+        "fertilizante_foliar_Fe_Si",
+        "bioestimulante_enraizamiento",
+        "fitosanitario_preventivo_chupadores"
+      ],
+      "valor_pedagogico": "Preparado tradicional europeo (purin d'ortie) introducido a la agroecología latinoamericana por Restrepo y validado por AGROSAVIA. Urtica dioica/U. urens concentra Fe (4-7 mg/g MS), Si soluble, ácido fórmico y polifenoles antialimentarios contra áfidos (Myzus persicae) y ácaros (Tetranychus urticae). Corrige clorosis férrica sin acidificar el sustrato. Fermentación completa (cesa espuma) es clave: macerados frescos tienen formicato fitotóxico. Vs. imidacloprid no deja residuos ni daña polinizadores. NO mezclar con caldos cúpricos (precipita Fe).",
+      "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17"
     },
     {
       "id": "caldo_sulfocalcico",
@@ -10241,8 +10277,22 @@
       "tiempo_elaboracion_dias": 1,
       "vida_util_dias": 180,
       "source_ids": [
-        "restrepo-1996-bocashi"
-      ]
+        "restrepo-1996-bocashi",
+        "restrepo-2007-biopreparados",
+        "agrosavia-manual-biopreparados-2015"
+      ],
+      "uso": "Foliar al atardecer cada 10-15 días en preventivo; cada 7 días en curativo activo contra hongos y ácaros. Suspender 15 días antes de cosecha. NO aplicar en frutales durante floración ni con temperaturas >28°C o humedad relativa <50% (riesgo fitotoxicidad).",
+      "dosis": "Preventivo foliar: 10 ml/L de agua (1:100). Curativo foliar: 50 ml/L (1:20). Invernal o tratamiento de troncos (escamas, chancros): 100-200 ml/L (1:10 a 1:5). En invernadero reducir 50%.",
+      "target": [
+        "mildeo_polvoso",
+        "oidio_foliar",
+        "roya_foliar",
+        "acaros_eriofidos",
+        "escamas_cocoideos",
+        "fitosanitario_curativo_amplio_espectro"
+      ],
+      "valor_pedagogico": "Polisulfuro de calcio (CaSx, x=4-5) coloidal por cocción S:cal 2:1. El S elemental se oxida en la cutícula del patógeno a SO2/H2S, inhibiendo respiración mitocondrial de hongos (Oidium, Erysiphe) y ácaros eriofidos. Permitido en orgánico (IFOAM, EU 2018/848), no genera resistencia cruzada vs. IBE sintéticos (tebuconazol). FITOTÓXICO en cucurbitáceas, durazno y cerezo en floración o con T>28°C — quemaduras severas. NO mezclar con bordelés (precipita CuS) ni con aceites; 21 d de separación. pH ~11-12: guantes y gafas.",
+      "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17"
     },
     {
       "id": "caldo_bordeles",
@@ -10260,8 +10310,22 @@
       "tiempo_elaboracion_dias": 1,
       "vida_util_dias": 1,
       "source_ids": [
-        "agrosavia-manual-biopreparados-2015"
-      ]
+        "agrosavia-manual-biopreparados-2015",
+        "restrepo-2007-biopreparados",
+        "cenicafe-manual-cafetero-2013"
+      ],
+      "uso": "Foliar preventivo al amanecer cada 10-14 días durante etapas de alta humedad relativa (>80%) o llovizna persistente. Suspender en floración (afecta polinizadores y cuaje) y 21 días antes de cosecha. Aplicar el mismo día de preparación — vida útil <24 h una vez mezclado.",
+      "dosis": "Concentración estándar 1% (10 g sulfato + 10 g cal por L de agua); foliar 1:1 (sin diluir, 10 L/100 m²) o lo equivalente a 200-400 L/ha. Cultivos sensibles (solanáceas en floración, durazno): bajar a 0.5%. Tratamiento invernal de troncos: hasta 2%.",
+      "target": [
+        "phytophthora_infestans",
+        "mildeo_velloso",
+        "antracnosis_colletotrichum",
+        "roya_cafe_hemileia",
+        "cercosporiosis",
+        "fungicida_cuprico_preventivo_amplio_espectro"
+      ],
+      "valor_pedagogico": "Fungicida cúprico de Burdeos 1885 (Millardet), fundacional en orgánico certificado (IFOAM, EU 2018/848 — máx 4 kg Cu/ha/año). CuSO4 neutralizado con cal forma Cu(OH)2·CuSO4 coloidal que libera Cu²⁺ con humedad/exudados fúngicos, inhibiendo tioles en oomicetes (Phytophthora, Peronospora) y hongos (Colletotrichum, Hemileia del café). pH 7-8 crítico: ácido = Cu²⁺ fitotóxico, alcalino = precipita inactivo. Test lámina de hierro: si se cubre de Cu rojizo, falta cal. NO mezclar con sulfocálcico (CuS) ni aceites; Cu >100 ppm daña lombrices y micorrizas — rotar con Bacillus o Trichoderma.",
+      "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17"
     },
     {
       "id": "te_compost",
@@ -10970,6 +11034,15 @@
       "revista_o_editorial": "Agronomía Colombiana",
       "volumen_numero": "26(3)",
       "paginas": "477-486"
+    },
+    {
+      "id": "pinheiro-machado-2017-biofertilizantes",
+      "tipo": "libro",
+      "autores": "Pinheiro, S.; Restrepo Rivera, J. (eds.)",
+      "año": 2017,
+      "titulo": "Manual de Agricultura Orgánica y Biofertilizantes — fundamentos de la trofobiosis y nutrición vegetal agroecológica",
+      "institucion": "Fundación Juquira Candiru / MAELA",
+      "observaciones": "Referencia continental para biol, supermagro y caldos minerales bajo enfoque trofobiótico de Chaboussou."
     },
     {
       "id": "powo-kew",
