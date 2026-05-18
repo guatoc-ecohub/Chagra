@@ -20240,6 +20240,662 @@
       ],
       "valor_pedagogico": "La siempreviva u hoja del aire (Kalanchoe pinnata (Lam.) Pers., Crassulaceae, sinónimo Bryophyllum pinnatum (Lam.) Oken — algunos autores la ubican aún en género Bryophyllum) es una planta suculenta perenne originaria de Madagascar y África Oriental tropical, ampliamente naturalizada pantropicalmente (incluida Colombia desde hace siglos) entre 0 y 2.200 msnm en zonas térmicas cálidas-templadas-moderadas en casi todo el país: Antioquia (Medellín, Suroeste cafetero, Oriente, Bajo Cauca), Valle del Cauca (cinturón frutícola y zonas urbanas), Cundinamarca (Sabana templada — La Mesa, Anolaima, Anapoima, Fusagasugá), Boyacá templada (Moniquirá, Santana, Chitaraque), Caldas, Risaralda, Quindío (Eje Cafetero), Tolima, Huila, Santander (Bucaramanga, San Gil, Barichara, Lebrija), Norte de Santander, Magdalena (Santa Marta), Atlántico (Barranquilla), Bolívar (Cartagena), Cesar (Valledupar), La Guajira (sur), Córdoba, Sucre, Chocó (Quibdó), Cauca, Nariño y zonas urbanas en general. Es lección viva PEDAGÓGICAMENTE EXCELENTE — entre las plantas más mágicas del catálogo de huerta escolar — de reproducción asexual vegetativa por apomixis foliar (también llamada reproducción foliar plantular o yemas foliares marginales), un fenómeno biológico extraordinario que enseña a niñas y niños cómo una sola hoja desprendida de Kalanchoe pinnata produce espontáneamente 5-15 plantulas en miniatura (propágulos foliares) en cada hendidura del margen serrado-crenado de la hoja — sin necesidad de semilla, sin floración, sin polinización, sin riego intensivo, en apenas 7-21 días — basta dejar una hoja sobre tierra apenas humedecida (o incluso pegada con cinta a una pared con humedad ambiental) para que emita docenas de hijos perfectos clonales con sus propias raíces y hojas listas para autopropagarse y formar nuevas plantas adultas en pocos meses. Goethe la estudió obsesivamente durante sus investigaciones de metamorfosis vegetal y la nombró 'Goethe-Pflanze' (planta de Goethe) en honor a esa capacidad regenerativa que parecía contradecir las leyes biológicas conocidas en su época (siglo XVIII-XIX) — fenómeno hoy entendido como meristemos epifilos pre-formados en el primordio foliar que se activan tras desconexión del flujo de auxinas-citokininas de la planta madre. Pertenece a la familia Crassulaceae (igual familia que Crassula ovata jade, sedum, echeveria), planta perenne arbustiva-herbácea de 0.6-1.8 m de altura con tallos suculentos huecos rojizo-verdosos, hojas suculentas opuestas decusadas pinnadas en las plantas adultas (3-5 folíolos elípticos crenado-aserrados) o simples ovalado-crenadas en plantas juveniles (3-15 cm largo x 2-8 cm ancho) verde-jade brillantes a veces con bordes rojizos en exposición sol, inflorescencia panícula terminal péndula vistosa con flores tubulares colgantes péndulas anaranjado-rojizo-purpúreas (2-5 cm largo) polinizadas por colibríes (Trochilidae — colibríes esmeralda, pico-de-hoz, ermitaños neotropicales) y polillas crepusculares, frutos folículos con muchas semillas pequeñas (rara vez forma fruto en Colombia — predomina reproducción foliar asexual). Patrón fotosintético CAM. Uso medicinal tradicional pantropical bien documentado: hojas frescas trituradas como cataplasma cicatrizante de heridas-quemaduras-úlceras cutáneas, jugo de hojas como antiinflamatorio-antitusivo-diurético-antilitiásico (uso popular muy difundido en Colombia, Caribe, Centroamérica, Brasil, África, India — 'leaf of life'), estudios fitoquímicos identifican bufadienólidos (cardenólidos similares a digitálicos — precaución cardíaca en dosis altas), flavonoides, esteroles, ácidos orgánicos. Considerada planta ritual-protectora en tradiciones afrocaribeñas-yorubas santería ('yerba bruja' protectora del hogar). Manejo agroecológico: PROPAGACIÓN PRÁCTICAMENTE GRATUITA E ILIMITADA — basta dejar una hoja madura desprendida sobre sustrato apenas humedecido (tierra + arena 1:1) o incluso colgada en una bolsa plástica transparente con poca humedad ambiental y a los 7-21 días emite plantulas marginales listas para trasplantar individualmente, distancia 30-50 cm en cobertura, sombra parcial a sol parcial filtrado (no sol pleno tropical), riego moderado-escaso, suelos bien drenados, tolera sequía moderada, asocio con menta, hierbabuena, hierbabuena, cilantro, ajenjo, ruda en huertos medicinales caseros. Función en chagra/huerto escolar como medicinal tradicional cosmopolita de soberanía alimentaria, planta PEDAGÓGICAMENTE EXCELENTE para enseñar reproducción asexual vegetativa por apomixis foliar a niñas y niños (la lección biológica más impactante y visual de toda la huerta — un solo experimento simple con una hoja sobre tierra muestra la magia de la propagación clonal), cobertura del suelo medicinal, atractora de colibríes y polillas, ornamental tropical. Fuentes Tier A: GBIF, POWO Kew, Pamplona-Roger 2006 Plantas Medicinales, JBB Plantas Medicinales Cundinamarca-Boyacá, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015.",
       "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH50_FRUTALES_EXTENDIDOS",
+      "id": "chrysophyllum_cainito",
+      "nombre_comun": "Caimito morado",
+      "nombre_comunes_regionales": [
+        "caimito",
+        "caimito violeta",
+        "caimito de hoja dorada",
+        "star apple",
+        "cainito",
+        "caimo",
+        "aguay"
+      ],
+      "nombre_cientifico": "Chrysophyllum cainito L.",
+      "familia_botanica": "Sapotaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "windbreak"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": null,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 800,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "injerto",
+          "acodo"
+        ],
+        "best_method": "injerto",
+        "protocol_resumen": "Semilla recalcitrante de germinación rápida (15-30 días) pero árboles francos demoran 6-10 años en producir; injerto de yema o púa sobre patrón franco baja a 3-4 años. Acodo aéreo en ramas semileñosas con plástico negro + hormona durante época lluviosa. Plantación a 8-10 m, suelos profundos bien drenados, sensibles a anegamiento.",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "Frutos en racimos terminales — cosecha por color (violeta-oscuro brillante) y blandeo al tacto. Pulpa lechosa-mucilaginosa dulce con figura estrellada al corte transversal (origen del nombre comercial \"star apple\").",
+        "fuente": "POWO Kew; GBIF; AGROSAVIA manual frutales tropicales; Pérez Arbeláez 1947"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-manual-frutales-tropicales",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El caimito morado (Chrysophyllum cainito L., Sapotaceae) es un árbol frutal perenne neotropical originario de las Antillas Mayores y norte de Sudamérica (Colombia, Venezuela, Panamá, Centroamérica), ampliamente cultivado en zonas bajas cálidas del Caribe colombiano (Atlántico, Bolívar, Magdalena — patios de Barranquilla, Cartagena, Santa Marta, Valledupar), Chocó biogeográfico (Quibdó, Buenaventura), Valle medio y bajo Magdalena (Honda, La Dorada, Puerto Berrío), zonas cálidas de Antioquia (Bajo Cauca, Urabá), Córdoba (Montería), Sucre (Sincelejo), Cesar y enclaves bajos de Santander (Barrancabermeja). Crece óptimamente entre 0 y 800 msnm con temperaturas de 22-30 °C, requiere sol pleno, suelos profundos bien drenados arcillosos a francos, riego moderado y resiste sequías estacionales una vez establecido. Árbol siempreverde de 12-25 m de altura con copa amplia globosa-densa y hojas pinnado-paralelas verde-brillante por el haz y dorado-bronceadas pubescentes por el envés (carácter taxonómico distintivo de Chrysophyllum — \"hoja dorada\" — visible al voltearlas con el viento, espectáculo visual que da nombre vernáculo \"hoja dorada\" en Centroamérica). Flores pequeñas blanco-cremosas perfumadas en cimas axilares polinizadas por abejas nativas (Meliponini, Trigonini) y mariposas. Frutos baya esférica de 6-10 cm con cáscara lisa violeta-purpúrea oscuro (raza más común) o verde-amarillenta (raza alba), pulpa lechosa-mucilaginosa blanca a rosada muy dulce (15-18 °Brix) con 4-10 semillas grandes negras dispuestas en figura estrellada visible al corte transversal — origen del nombre comercial \"star apple\" en mercados anglófonos. Cosecha por color violeta intenso brillante y blandeo suave; frutos verdes son astringentes por latex no maduro (lección sobre maduración postcosecha y compuestos secundarios). El árbol exuda latex blanco-lechoso al cortarse (carácter Sapotaceae) usado tradicionalmente en Cuba y Antillas como ingrediente menor de gomas de mascar artesanales (no es la fuente principal, ese es Manilkara zapota). Manejo: plantación a 8-10 m entre árboles, asocio en patio tropical con cacao en sombra inicial, plátano nodriza, mango, aguacate criollo, anón, guanábana — sistema multiestrato tradicional de patios caribeños caracterizado por Pérez Arbeláez 1947 como \"ecosistema de patio campesino afrocaribeño\". Función pedagógica excelente: enseña a niñas y niños la diversidad de Sapotaceae neotropicales (junto con níspero/zapote Manilkara zapota, mamey colorado Pouteria sapota, caimo silvestre Pouteria caimito), patrón ecológico de hojas con doble color (dorado-bronceado por envés — adaptación a alta radiación tropical reflejando luz infrarroja y reduciendo pérdida de agua), polinización por abejas nativas sin aguijón (meliponicultura urbana), maduración postcosecha y compuestos astringentes-taninos en frutos inmaduros, latex blanco como carácter Sapotaceae. Importancia cultural en Caribe colombiano como árbol de patio tradicional, alimento dulce de temporada (julio-noviembre en Atlántico), refugio de aves (tángaras Thraupidae se alimentan de frutos maduros y dispersan semillas). Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA manual frutales tropicales, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH50_FRUTALES_EXTENDIDOS",
+      "id": "manilkara_zapota",
+      "nombre_comun": "Níspero",
+      "nombre_comunes_regionales": [
+        "sapote",
+        "zapote chico",
+        "chicozapote",
+        "sapotí",
+        "chicle",
+        "sapodilla",
+        "chico"
+      ],
+      "nombre_cientifico": "Manilkara zapota (L.) P.Royen",
+      "familia_botanica": "Sapotaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "windbreak"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": null,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 900,
+        "max_absoluto": 1400
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 22,
+        "optimo_max": 32,
+        "max_tolerable": 38
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "injerto",
+          "acodo"
+        ],
+        "best_method": "injerto",
+        "protocol_resumen": "Semilla viable 1-2 meses (recalcitrante); germinación lenta 30-60 días. Árboles francos demoran 7-10 años en producir; injerto de yema (T-budding o parche) sobre patrón franco baja a 4-5 años. Plantación a 8-12 m, tolera suelos calcáreos y arenosos pobres, muy tolerante a sequía y vientos costeros (carácter caribeño-yucateco).",
+        "tiempo_a_establecimiento_dias": 120,
+        "notas": "Frutos cosechados duros y madurados en planta o postcosecha (climatérico). Verdes son astringentes por latex; maduros pulpa marrón-translúcida granulosa muy dulce sabor a azúcar moreno y miel.",
+        "fuente": "POWO Kew; GBIF; AGROSAVIA frutales tropicales; Pérez Arbeláez 1947; FAO Ecocrop"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-manual-frutales-tropicales",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "fao-ecocrop"
+      ],
+      "valor_pedagogico": "El níspero o sapote (Manilkara zapota (L.) P.Royen, Sapotaceae — sinónimos botánicos históricos Achras zapota L., Achras sapota, Manilkara achras (Mill.) Fosberg) es un árbol frutal perenne neotropical originario de la península de Yucatán-Belice-Guatemala-sur de México (centro mesoamericano), domesticado por civilizaciones mayas desde hace al menos 2500 años por su doble valor económico histórico extraordinario: (1) fruto comestible delicioso de pulpa marrón-translúcida granulosa dulce sabor a azúcar moreno-miel-caramelo (15-22 °Brix maduro), y (2) látex lechoso espeso \"chicle\" exudado al sangrar la corteza con cortes en zig-zag — materia prima histórica indispensable de la goma de mascar industrial moderna (Wrigley, Adams, primera mitad del siglo XX cuando todavía no existía la goma sintética petroquímica) y antes durante miles de años de los chicleros mayas-yucatecos que mascaban \"tzictli\" como práctica cultural-ritual cotidiana. En Colombia se cultiva ampliamente en zonas cálidas costeras del Caribe (Atlántico, Bolívar, Magdalena, Córdoba, Sucre, Cesar, La Guajira sur), Chocó, Valle medio y bajo Magdalena, zonas bajas de Antioquia (Urabá, Bajo Cauca), Tolima y Huila bajos, Llanos bajos (Casanare-Meta-Arauca cálidos) y zonas urbanas en general entre 0 y 900 msnm. Árbol siempreverde de 18-30 m altura con copa piramidal-globosa densa, corteza gris-marrón fisurada longitudinalmente que al cortarse exuda latex blanco abundante (la herida cierra naturalmente sin pudrirse — adaptación de Sapotaceae frente a herbivoría y patógenos, principio biotecnológico estudiado para biopolímeros). Hojas alternas elípticas-coriáceas 7-15 cm verde-brillante. Flores pequeñas blanco-cremosas en axilas de hojas terminales polinizadas por abejas nativas (Meliponini), mariposas nocturnas y murciélagos pequeños polinizadores. Frutos baya esférica-aovada 5-9 cm con cáscara marrón-clara áspera tipo \"papel de lija fino\" (carácter distintivo del taxón), pulpa marrón-translúcida cristalina granulosa fundente muy dulce con 1-6 semillas grandes lustrosas negras de testa lisa con cicatriz blanca-amarillenta (las semillas contienen sapotinina amarga — no consumir entera, principio educativo de defensas químicas en semillas). Muy resistente a sequías estacionales costeras, vientos salinos, suelos calcáreos pobres (carácter yucateco) y plagas — uno de los frutales más resilientes y de menor mantenimiento del Caribe. Manejo agroecológico tradicional: plantación a 8-12 m intercalado en patios tropicales con mango, aguacate, anón, guanábana, papaya, plátano, cacao en multiestrato, asocio con coberturas de leguminosas (Arachis pintoi, Desmodium spp.) para control de arvenses y aporte de nitrógeno. Función pedagógica excepcional: enseña a niñas y niños (1) la historia precolombina del chicle como producto cultural maya milenario (anterior por miles de años al chicle sintético petroquímico Wrigley/Adams del siglo XX), (2) extracción tradicional sustentable de látex en árboles vivos por sangrado en zig-zag (técnica chiclera de Yucatán-Petén) que NO mata al árbol y permite cosechas periódicas multidecenales, (3) doble función económica fruto-látex característica de árboles polifuncionales mesoamericanos, (4) carácter Sapotaceae de exudar látex blanco al cortarse (compartido con Pouteria, Chrysophyllum, Mimusops), (5) maduración postcosecha climatérica con frutos cosechados duros que ablandan en almacenaje, (6) astringencia de frutos verdes por taninos-latex como defensa química anti-herbivoría. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA manual frutales tropicales, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015, FAO Ecocrop.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH50_FRUTALES_EXTENDIDOS",
+      "id": "pouteria_sapota",
+      "nombre_comun": "Mamey colorado",
+      "nombre_comunes_regionales": [
+        "zapote mamey",
+        "mamey rojo",
+        "sapote",
+        "mamey de Santo Domingo",
+        "red mamey",
+        "mamey"
+      ],
+      "nombre_cientifico": "Pouteria sapota (Jacq.) H.E.Moore & Stearn",
+      "familia_botanica": "Sapotaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": null,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 700,
+        "max_absoluto": 1000
+      },
+      "temperatura_c": {
+        "helada_letal": 6,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "injerto"
+        ],
+        "best_method": "injerto",
+        "protocol_resumen": "Semilla muy recalcitrante (pierde viabilidad en 2 semanas a temperatura ambiente, viable 1-2 meses en pulpa fresca refrigerada). Germinación lenta 45-90 días con escarificado mecánico ligero. Árboles francos demoran 8-12 años en producir; injerto de yema sobre patrón franco baja a 5-7 años. Plantación a 10-12 m, suelos profundos bien drenados, sensible a anegamiento y heladas.",
+        "tiempo_a_establecimiento_dias": 150,
+        "notas": "Frutos grandes (10-25 cm) cosechados por color marrón-óxido áspero y leve ablandamiento; pulpa rojo-naranja-salmón densa cremosa dulce sabor único almendrado-canela-mamey.",
+        "fuente": "POWO Kew; GBIF; AGROSAVIA frutales tropicales; Pérez Arbeláez 1947"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-manual-frutales-tropicales",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El mamey colorado o zapote mamey (Pouteria sapota (Jacq.) H.E.Moore & Stearn, Sapotaceae — sinónimos históricos Calocarpum sapota (Jacq.) Merr., Calocarpum mammosum (L.) Pierre, Lucuma mammosa (L.) Gaertn.) es un árbol frutal perenne neotropical originario de Mesoamérica (sur de México, Guatemala, Belice, Honduras, El Salvador, Nicaragua) y norte de Sudamérica, cultivado desde tiempos prehispánicos por civilizaciones mayas y náhuatl (\"tezontzapotl\"). Crece en zonas cálidas costeras del Caribe colombiano (Atlántico, Bolívar, Magdalena, Córdoba, Sucre, Cesar — en patios tradicionales de Cartagena, Barranquilla, Sincelejo, Montería, Valledupar), Chocó biogeográfico, Magdalena medio y bajo (Honda, Puerto Berrío, La Dorada), zonas bajas de Antioquia (Urabá, Bajo Cauca), Llanos bajos cálidos (Casanare-Meta-Arauca) y zonas urbanas tropicales entre 0 y 700 msnm con temperaturas 22-30 °C, sol pleno, suelos profundos bien drenados arcillo-arenosos a francos, riego moderado y muy sensible a heladas (helada letal ~6 °C). Árbol siempreverde de 15-30 m altura con copa piramidal-densa y madera blanca-rojiza usada en carpintería tradicional (\"zapote-mamey wood\"). Hojas grandes (15-40 cm) alternas-coriáceas obovadas concentradas en extremos de ramas verde-oscuro brillante por el haz y verde-claro algo pubescente por el envés. Flores pequeñas blanco-cremosas en axilas de hojas viejas polinizadas por abejas nativas, murciélagos pequeños polinizadores y mariposas. Frutos grandes baya elipsoide-aovada (10-25 cm largo, 8-15 cm ancho, 0.5-3 kg de peso — uno de los frutos comestibles más grandes del Neotrópico, junto con guanábana, jaca y borojó), cáscara marrón-óxido áspera coriácea como \"papel de lija grueso\", pulpa muy densa-cremosa-fundente rojo-salmón-naranja intenso (15-20 °Brix) de sabor único almendrado-canela-mamey-zapote (sabor complejo difícil de describir por nuevos catadores — lección de cata sensorial pedagógica), con 1-2 semillas grandes lustrosas marrón-rojizas tipo \"huevo\" 5-10 cm. Manejo: plantación a 10-12 m, asocio en patio tropical con cacao en sombra inicial, plátano nodriza, anón, guanábana, mango, aguacate criollo, café arábica en zonas marginales altas, sistema multiestrato Sapotaceae-Anonaceae-Rutaceae característico de patios caribeños tradicionales documentado por Pérez Arbeláez 1947. Importancia económica regional creciente en Caribe colombiano como fruta de exportación nicho a mercados étnicos hispano-mesoamericanos en Estados Unidos (Miami, Houston, Los Ángeles — donde se vende a USD 8-12/kg). Función pedagógica: enseña diversidad Sapotaceae neotropicales (Pouteria, Chrysophyllum, Manilkara, Mimusops, Pouteria caimito hermano de género), patrón de Mesoamérica como centro de domesticación de frutales tropicales (zapote-mamey, aguacate, papaya, cacao, vainilla, achiote, anón), maduración postcosecha climatérica de frutos cosechados duros que requieren 7-14 días para ablandar adecuadamente, semillas grandes recalcitrantes de Sapotaceae que pierden viabilidad rápidamente (no se pueden almacenar — lección sobre conservación in-situ vs ex-situ de germoplasma tropical). Las semillas contienen un aceite (\"aceite de sapuyul\" o sapote-oil) extraído tradicionalmente en Centroamérica para usos cosméticos y medicinales. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA manual frutales tropicales, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH50_FRUTALES_EXTENDIDOS",
+      "id": "mammea_americana",
+      "nombre_comun": "Mamey amarillo",
+      "nombre_comunes_regionales": [
+        "mamey de Cartagena",
+        "mamey americano",
+        "albaricoque de Santo Domingo",
+        "mammee apple",
+        "mamey colombiano"
+      ],
+      "nombre_cientifico": "Mammea americana L.",
+      "familia_botanica": "Calophyllaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "harvest_type": "fruto",
+      "cycleMonths": null,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 800,
+        "max_absoluto": 1100
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "injerto"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla recalcitrante grande (4-7 cm) viable 1-2 meses; germinación 45-90 días sin tratamiento. Árboles francos productivos a 6-9 años. Plantación a 10-12 m, tolerante a sal marina y vientos costeros (carácter caribeño), suelos bien drenados, sensible a anegamiento prolongado.",
+        "tiempo_a_establecimiento_dias": 120,
+        "notas": "Frutos cosechados maduros por color marrón-óxido firme; pulpa amarillo-anaranjada firme dulce-aromática sabor a albaricoque-mango-melocotón. Semillas y látex tóxicos a insectos — uso como insecticida tradicional (mammeína).",
+        "fuente": "POWO Kew; GBIF; Pérez Arbeláez 1947; SiB Colombia; AGROSAVIA"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "agrosavia-manual-frutales-tropicales"
+      ],
+      "valor_pedagogico": "El mamey amarillo o mamey de Cartagena (Mammea americana L., Calophyllaceae — antes Clusiaceae sensu lato hasta la reclasificación APG III-IV 2009-2016) es un árbol frutal perenne nativo del Caribe insular (Antillas Mayores) y continental (norte de Sudamérica — Colombia, Venezuela, Panamá), considerado uno de los pocos frutales NATIVOS del Caribe colombiano por excelencia (a diferencia del níspero/zapote Manilkara zapota que es mesoamericano y el mamey colorado Pouteria sapota que es mesoamericano-yucateco — el mamey amarillo SÍ es nativo caribeño-circuncaribe, presente en Colombia desde antes del contacto colonial documentado por crónicas tempranas del siglo XVI en Cartagena de Indias, origen del nombre vernáculo regional \"mamey de Cartagena\"). Distribución colombiana en zonas cálidas costeras del Caribe (Atlántico, Bolívar — especialmente Montes de María y Cartagena, Magdalena — Santa Marta y Ciénaga Grande, Córdoba, Sucre — San Onofre y Tolú, Cesar, La Guajira sur), Chocó biogeográfico (Quibdó, Bahía Solano, Nuquí), zonas bajas de Antioquia (Urabá), Valle medio y bajo Magdalena, Llanos bajos cálidos y zonas urbanas tropicales entre 0 y 800 msnm con temperaturas 22-30 °C, sol pleno, suelos bien drenados, tolerante a brisas salinas y vientos costeros. Árbol siempreverde majestuoso de 15-25 m altura con copa piramidal-densa simétrica de gran valor ornamental y de sombra, madera dura rojiza usada en carpintería de exterior y construcciones rurales tradicionales. Hojas grandes (10-25 cm) opuestas-coriáceas elíptico-oblongas verde-oscuro brillante por el haz con puntos translúcidos visibles al trasluz (glándulas oleíferas características del clado Calophyllaceae-Clusiaceae). Flores blanco-cremosas perfumadas grandes (3-5 cm) solitarias o en grupos pequeños en ramas — polinizadas por abejas, mariposas y murciélagos. Frutos baya esférica-globosa (8-20 cm diámetro, 0.5-2 kg), cáscara marrón-óxido coriácea-fibrosa firme que se pela manualmente revelando pulpa amarillo-anaranjada firme aromática (12-18 °Brix) de sabor delicioso comparado a albaricoque-melocotón-mango-vainilla (de ahí el nombre antillano histórico \"albaricoque de Santo Domingo\" usado por colonos franceses-españoles caribeños), con 1-4 semillas grandes lustrosas marrón-rojizas. Manejo: plantación a 10-12 m, ideal para patios tropicales costeros tradicionales caribeños, asocio con coco, plátano, mango, anón, guanábana, papaya, cacao, ñame, yuca — sistema multiestrato afrocaribe documentado por Pérez Arbeláez 1947. PROPIEDAD INSECTICIDA NATURAL DESTACADA: semillas y látex contienen mammeína (cumarinas insecticidas naturales) usadas tradicionalmente en Antillas-Caribe como insecticida natural para piojos, pulgas, chinches y plagas de cultivos — lección pedagógica importante sobre química verde y biopesticidas tradicionales (precursores naturales de los piretroides modernos), aunque deben manejarse con precaución porque también son tóxicos a peces y mamíferos en dosis altas (no comer las semillas crudas). Las flores se usan tradicionalmente para perfumar licores caribeños (\"crème de mamey\", \"eau de mammée\") por su aroma intenso vainilla-tropical. Función pedagógica excelente: enseña a niñas y niños (1) que SÍ existen frutales NATIVOS del Caribe colombiano (no todos los frutales son foráneos mesoamericanos), (2) la familia Calophyllaceae con sus glándulas oleíferas translúcidas visibles al trasluz como carácter taxonómico (compartido con Calophyllum y Garcinia), (3) biopesticidas naturales mammeína como precursor de químicas verdes modernas, (4) árboles polifuncionales fruta-madera-medicinal-insecticida-ornamental característicos de sistemas agroforestales caribeños tradicionales. Fuentes Tier A: GBIF, POWO Kew, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015, AGROSAVIA.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH50_FRUTALES_EXTENDIDOS",
+      "id": "talisia_olivaeformis",
+      "nombre_comun": "Mamoncillo",
+      "nombre_comunes_regionales": [
+        "guayo",
+        "cotopriz",
+        "guaya",
+        "talisia",
+        "maco",
+        "huaya"
+      ],
+      "nombre_cientifico": "Talisia olivaeformis (Kunth) Radlk.",
+      "familia_botanica": "Sapindaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "windbreak"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "harvest_type": "fruto",
+      "cycleMonths": null,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 900,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla viable solo 2-4 semanas fresca (recalcitrante). Germinación rápida 15-30 días sin tratamiento. Árboles francos productivos a 5-7 años. Plantación a 8-10 m, tolerante a sequías estacionales y suelos pobres calcáreos del Caribe seco.",
+        "tiempo_a_establecimiento_dias": 60,
+        "notas": "Frutos en racimos largos pendulares cosechados verde-amarillentos a marrones según raza local; cáscara coriácea se rompe con dientes liberando pulpa gelatinosa traslúcida ácido-dulce alrededor de semilla grande única.",
+        "fuente": "POWO Kew; GBIF; Pérez Arbeláez 1947; SiB Colombia; Bernal 2015"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El mamoncillo (Talisia olivaeformis (Kunth) Radlk., Sapindaceae) es un árbol frutal perenne nativo del Caribe continental colombo-venezolano y zonas secas tropicales del norte de Sudamérica (Colombia, Venezuela, Guayanas, Antillas Menores), distinto del mamón/quenepa de Antillas (Melicoccus bijugatus — Sapindaceae también pero género distinto y de origen diferente, ver entrada complementaria en este mismo batch), aunque popularmente ambos se confunden bajo el nombre genérico \"mamón\" o \"mamoncillo\" en el Caribe colombiano. Talisia olivaeformis es el verdadero mamoncillo NATIVO continental colombo-venezolano, mientras que Melicoccus bijugatus es el mamón-quenepa originario de las Antillas. Distribución colombiana en zonas cálidas secas del Caribe (Atlántico, Bolívar, Magdalena, Cesar — La Mata, La Paz, Codazzi, Aguachica; Guajira media-sur — Riohacha, Maicao; Norte de Santander — Cúcuta, Ocaña), valle medio del Magdalena (Honda, Puerto Berrío, La Dorada), zonas bajas de Santander (Bucaramanga, Lebrija, Girón) y enclaves de Llanos bajos (Casanare-Arauca) entre 0 y 900 msnm con temperaturas 22-30 °C, sol pleno, suelos bien drenados arcillo-arenosos calcáreos típicos del bosque seco tropical (BST). Árbol siempreverde de 10-25 m altura con copa piramidal-redondeada densa muy ornamental, madera dura amarillenta usada en carpintería rural y postes de cerca durables. Hojas grandes (15-35 cm) alternas-paripinnadas con 4-8 folíolos elípticos verde-oscuro brillante (carácter de Sapindaceae junto con tamarindo, lichi, longan, guayabo). Flores pequeñas blanco-cremosas perfumadas en panículas terminales-axilares polinizadas por abejas nativas (Trigonini, Apini), avispas y mariposas. Frutos baya elipsoide (2-3 cm) en racimos largos pendulares de 10-40 frutos por racimo, cáscara coriácea verde-amarillenta a marrón-oliva (origen del epíteto \"olivaeformis\" = \"en forma de oliva\") que se rompe con los dientes — característica práctica de consumo callejero caribeño donde se compran racimos enteros y se van mascando uno a uno —, pulpa arilo gelatinoso translúcido amarillo-rosado ácido-dulce (10-15 °Brix) rodea una semilla grande única lustrosa marrón. Manejo: árbol prácticamente silvestre rústico en BST, no requiere mayor manejo agronómico, plantación a 8-10 m, tolerante a sequías estacionales largas, suelos pobres calcáreos y vientos cálidos secos del Caribe. Importante en SISTEMAS SILVOPASTORILES de bosque seco tropical donde proporciona sombra a ganadería bovina-caprina y forraje complementario por hojas tiernas-frutos caídos. Función ecológica importante para fauna del BST: frutos consumidos por loros (Amazona, Pionus), tucanes, monos aulladores y capuchinos, agutíes y ñeques que dispersan semillas. Función pedagógica: enseña diversidad Sapindaceae tropicales (mamoncillo Talisia, mamón Melicoccus, lichi Litchi, longan Dimocarpus, ackee Blighia, guayabo Cupania — todos con frutos arilo gelatinoso comestible alrededor de semilla), distinción importante entre mamoncillo continental nativo vs mamón antillano introducido (lección de biogeografía caribeña), importancia del bosque seco tropical colombiano como ecosistema en peligro crítico (<10% remanente) con frutales nativos subutilizados, técnica práctica de consumo callejero de Sapindaceae con cáscara que se rompe a dientes. Fuentes Tier A: GBIF, POWO Kew, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH50_FRUTALES_EXTENDIDOS",
+      "id": "melicoccus_bijugatus",
+      "nombre_comun": "Mamón",
+      "nombre_comunes_regionales": [
+        "quenepa",
+        "mamoncillo antillano",
+        "limoncillo",
+        "genip",
+        "spanish lime",
+        "mamón de Cartagena"
+      ],
+      "nombre_cientifico": "Melicoccus bijugatus Jacq.",
+      "familia_botanica": "Sapindaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "windbreak"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": null,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 800,
+        "max_absoluto": 1000
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "injerto",
+          "acodo"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla recalcitrante viable 1-2 meses fresca. Germinación 20-45 días. Árboles francos productivos a 6-10 años; injerto sobre franco baja a 4-5 años. Plantación a 10-12 m, dioico (árboles macho y hembra separados — solo hembras producen frutos, plantar ratio 1 macho : 8-10 hembras o injertar ramas macho en árboles hembras para asegurar polinización).",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "DIOICIA estricta — lección pedagógica importante. Frutos cosechados en racimos verde-amarillentos firmes; pulpa arilo rosado-anaranjado dulce-acidulado consumida callejeramente rompiendo cáscara coriácea con dientes.",
+        "fuente": "POWO Kew; GBIF; Pérez Arbeláez 1947; AGROSAVIA frutales tropicales"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "agrosavia-manual-frutales-tropicales"
+      ],
+      "valor_pedagogico": "El mamón o quenepa (Melicoccus bijugatus Jacq., Sapindaceae — sinónimo histórico Melicocca bijuga L.) es un árbol frutal perenne nativo de las Antillas Mayores (Cuba, Jamaica, Puerto Rico, La Española) y posiblemente del norte de Sudamérica (Colombia, Venezuela — origen disputado entre Antillas y costa norte sudamericana), ampliamente cultivado y naturalizado en todo el Caribe insular y continental (Antillas, Caribe colombiano, Venezuela, Panamá, México sur, Centroamérica, Florida sur). Es el mamón-quenepa POPULAR Y CALLEJERO POR EXCELENCIA del Caribe colombiano (distinto del mamoncillo continental Talisia olivaeformis con el que se confunde popularmente — ver entrada complementaria de Talisia en este mismo batch — pero Melicoccus es el verdadero \"mamón de Cartagena\" comercial, vendido en racimos en plazas de mercado y vendedores ambulantes de Cartagena, Barranquilla, Santa Marta, Sincelejo, Montería, Valledupar en temporada junio-septiembre). Distribución colombiana en zonas cálidas costeras del Caribe (Atlántico, Bolívar — especialmente Cartagena origen del nombre regional, Magdalena, Córdoba, Sucre, Cesar, La Guajira sur), Chocó biogeográfico, valle bajo del Magdalena, zonas bajas de Antioquia (Urabá, Bajo Cauca), Llanos bajos cálidos (Casanare-Meta-Arauca) y zonas urbanas tropicales entre 0 y 800 msnm con temperaturas 22-30 °C, sol pleno, suelos bien drenados, muy tolerante a sequías estacionales costeras y vientos salinos. Árbol siempreverde majestuoso de 18-25 m altura con copa amplia piramidal-redondeada simétrica de gran valor ornamental y de sombra urbana (plantado masivamente en parques y avenidas de ciudades caribeñas), madera dura amarilla-clara usada en carpintería. Hojas alternas-paripinnadas con 4 folíolos elípticos verde-oscuro brillante (epíteto \"bijugatus\" = \"con dos pares de folíolos\"). Característica botánica destacada: DIOICIA ESTRICTA — los árboles son macho o hembra separados (no hermafroditas), solo las hembras producen frutos. Esta característica es lección pedagógica importante porque (1) significa que para producción comercial se debe plantar ratio 1 macho : 8-10 hembras o injertar ramas macho en árboles hembras, (2) muchos productores compran árboles de semilla y descubren después de 6-10 años que tienen un macho improductivo (frustración común — promueve uso de injerto sobre franco), (3) ejemplifica diversidad de sistemas reproductivos vegetales (compáralo con hermafroditas como mango, aguacate; monoicos como maíz, cucurbitáceas; dioicos como papayo, kiwi, mamón). Flores pequeñas blanco-cremosas perfumadas en panículas terminales (flores macho con estambres, flores hembra con ovario sin estambres funcionales) polinizadas por abejas nativas y mariposas. Frutos baya esférica-aovada (2-3 cm) en racimos densos de 15-50 frutos por racimo, cáscara coriácea verde-amarillenta firme que se rompe con los dientes liberando pulpa arilo gelatinoso rosado-anaranjado-amarillo claro dulce-acidulado (10-14 °Brix) muy refrescante alrededor de una semilla grande única lustrosa beige-rosada. Manejo: plantación a 10-12 m, ideal en patios tropicales caribeños tradicionales, asocio con mango, aguacate, anón, guanábana, papayo, plátano, coco, mamey amarillo Mammea americana, níspero Manilkara zapota. Importancia económica creciente en Caribe colombiano como fruta callejera comercial de temporada (vendedores ambulantes con racimos enteros), exportación nicho a mercados étnicos hispano-caribeños en Estados Unidos (Miami, NYC). Función pedagógica excepcional: enseña a niñas y niños (1) DIOICIA estricta como sistema reproductivo vegetal distintivo, (2) distinción geográfica importante entre mamón antillano-naturalizado Melicoccus bijugatus vs mamoncillo continental nativo Talisia olivaeformis (lección de biogeografía caribeña — ambos confusamente llamados \"mamón/mamoncillo\" en habla popular pero son géneros distintos de Sapindaceae), (3) consumo callejero tradicional caribeño rompiendo cáscara con dientes (técnica práctica), (4) diversidad de Sapindaceae frutales (mamón, mamoncillo, lichi, longan, ackee). Fuentes Tier A: GBIF, POWO Kew, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015, AGROSAVIA.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH50_FRUTALES_EXTENDIDOS",
+      "id": "spondias_purpurea",
+      "nombre_comun": "Ciruela criolla",
+      "nombre_comunes_regionales": [
+        "jocote",
+        "ciruela campesina",
+        "ciruela costeña",
+        "ciruela mexicana",
+        "red mombin",
+        "jobo colorado"
+      ],
+      "nombre_cientifico": "Spondias purpurea L.",
+      "familia_botanica": "Anacardiaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "living_fence",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": null,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 1200,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 3,
+        "optimo_min": 20,
+        "optimo_max": 30,
+        "max_tolerable": 38
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje",
+          "acodo"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "PROPAGACIÓN POR ESTACA GRUESA EXTRAORDINARIA: ramas de 1-3 m largo y 5-15 cm grosor clavadas directo en suelo enraízan en 15-45 días — propiedad excepcional usada masivamente en CERCAS VIVAS rurales del Caribe colombiano y centroamericano (millones de km de cercas de jocote en Honduras, Nicaragua, El Salvador, Guatemala, costa caribe colombiana). Árboles productivos a 2-4 años. No requiere injerto.",
+        "tiempo_a_establecimiento_dias": 30,
+        "notas": "CERCA VIVA POR EXCELENCIA: estacas gruesas pre-trozadas (1-3 m) plantadas a 1-2 m entre sí en hilera enraízan masivamente y forman cerca productiva de fruta + leña + sombra ganadera. Frutos pequeños (3-5 cm) amarillos-rojos-purpúreos según raza.",
+        "fuente": "POWO Kew; GBIF; Pérez Arbeláez 1947; AGROSAVIA silvopastoriles"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "agrosavia-silvopastoriles",
+        "agrosavia-manual-frutales-tropicales"
+      ],
+      "valor_pedagogico": "La ciruela criolla, jocote o ciruela campesina (Spondias purpurea L., Anacardiaceae) es un árbol frutal perenne neotropical originario de Mesoamérica (sur de México, Guatemala, Honduras, El Salvador, Nicaragua — donde se llama \"jocote\" del náhuatl xocotl = \"fruta agria-dulce\"), cultivado desde tiempos prehispánicos y naturalizado ampliamente en todo el Neotrópico cálido. En Colombia se cultiva en zonas cálidas-templadas del Caribe (Atlántico, Bolívar, Magdalena, Córdoba, Sucre, Cesar, La Guajira — donde se llama \"ciruela costeña\"), valle medio del Magdalena (Honda, Puerto Berrío, La Dorada — \"ciruela campesina\"), zonas bajas de Antioquia (Bajo Cauca, Urabá, Suroeste), Valle del Cauca cinturón frutícola, Tolima-Huila cálidos, Santander-Norte de Santander (Bucaramanga, Cúcuta, Ocaña), Cundinamarca templada (La Mesa, Anolaima, Anapoima), Llanos bajos cálidos y zonas urbanas en general entre 0 y 1.200 msnm con temperaturas 20-30 °C, sol pleno, suelos bien drenados, muy tolerante a sequías estacionales largas (carácter de Anacardiaceae mesoamericana de bosque seco tropical). Árbol semicaducifolio mediano de 5-15 m altura con copa abierta-irregular, corteza gruesa gris-rojiza, follaje pinnado caduco en estación seca. Hojas alternas-pinnadas con 5-12 folíolos elípticos verde-claro. Flores pequeñas rojo-purpúreas-amarillentas en panículas terminales antes de la brotación foliar (floración en estación seca después de defoliación — fenología característica de árboles caducifolios tropicales). Frutos drupa elipsoide pequeña (3-5 cm) amarilla, roja o purpúrea-oscura según raza (existen razas regionales: \"ciruela amarilla\", \"ciruela roja\", \"ciruela purpúrea\" — todas Spondias purpurea), pulpa amarillo-anaranjada ácido-dulce aromática (10-14 °Brix) con un hueso grande fibroso característico de Spondias. PROPIEDAD AGRONÓMICA EXCEPCIONAL — CERCA VIVA POR EXCELENCIA: estacas gruesas pre-trozadas de ramas de 1-3 m largo y 5-15 cm grosor, plantadas directo en suelo (clavadas o introducidas en hoyo somero) en inicio de lluvias, ENRAÍZAN MASIVAMENTE en 15-45 días sin necesidad de hormona, vivero o cuidado intensivo — propiedad rizogénica extraordinaria que la convierte en el árbol predilecto para CERCAS VIVAS rurales del Caribe colombiano y centroamericano. Millones de kilómetros de cercas de jocote rodean potreros en Honduras, Nicaragua, El Salvador, Guatemala, costa Pacífico nicaragüense-costarricense, Caribe colombiano, Llanos colombo-venezolanos — sistema agroforestal-silvopastoril campesino de bajísimo costo (regalo de estacas entre vecinos), múltiple función (cerca-fruta-leña-sombra ganadera-forraje hojas tiernas-refugio fauna-corredor biológico) y sustentabilidad multidecenal (postes vivos duran décadas mientras los muertos de madera se pudren en 2-5 años). Manejo: cerca viva con estacas a 1-2 m entre sí en hilera, podas regulares para mantener altura y promover fructificación, ramas podadas dan leña, hojas caídas dan biomasa al suelo. Función pedagógica excelente: enseña a niñas y niños (1) propiedad rizogénica excepcional de estacas gruesas Spondias (compárese con Erythrina, Gliricidia, Sambucus — otros taxones de cerca viva regional), (2) sistemas silvopastoriles tradicionales campesinos como agroforestería de base, (3) árboles polifuncionales fruta-leña-cerca-sombra-forraje característicos de campesinado caribeño-centroamericano, (4) fenología de árboles caducifolios tropicales (defoliación-floración-fructificación en estación seca, brotación en lluvias), (5) familia Anacardiaceae (junto con mango, marañón, jobo Spondias mombin, jobo cajá S. dulcis) y sus drupas con hueso fibroso característico. Fuentes Tier A: GBIF, POWO Kew, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015, AGROSAVIA silvopastoriles.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH50_FRUTALES_EXTENDIDOS",
+      "id": "spondias_dulcis",
+      "nombre_comun": "Jobo cajá",
+      "nombre_comunes_regionales": [
+        "cajá manga",
+        "manga del Perú",
+        "ambarella",
+        "ciruela polinesia",
+        "mango del Brasil",
+        "pomme cythère",
+        "jobo de la India"
+      ],
+      "nombre_cientifico": "Spondias dulcis Parkinson",
+      "familia_botanica": "Anacardiaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "windbreak"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": null,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 900,
+        "max_absoluto": 1300
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje",
+          "acodo"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Estacas gruesas semileñosas (carácter compartido con S. purpurea pero menos vigoroso). Semilla recalcitrante viable 1-2 meses germina en 30-60 días. Acodo aéreo en ramas semileñosas durante lluvias. Árboles francos productivos a 4-6 años, injertados a 2-3 años. Plantación a 10-12 m.",
+        "tiempo_a_establecimiento_dias": 60,
+        "notas": "Frutos grandes (6-10 cm) elipsoides amarillo-dorados maduros con pulpa firme aromática sabor único piña-mango-manzana-ciruela. Hueso grande fibroso espinoso característico — adaptación de dispersión por mamíferos grandes en su origen oceánico polinesio.",
+        "fuente": "POWO Kew; GBIF; Pérez Arbeláez 1947; AGROSAVIA frutales tropicales; FAO Ecocrop"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "agrosavia-manual-frutales-tropicales",
+        "fao-ecocrop"
+      ],
+      "valor_pedagogico": "El jobo cajá, cajá-manga, ambarella o manga del Perú (Spondias dulcis Parkinson, Anacardiaceae — sinónimo histórico Spondias cytherea Sonn.) es un árbol frutal perenne tropical originario de las islas del Pacífico Sur (Polinesia, Melanesia — origen oceánico, no neotropical, a diferencia de sus hermanas Spondias americanas mombin y purpurea), domesticado en Polinesia hace miles de años, llevado por exploradores europeos (Captain Cook 1768-1779, traslado documentado a las Antillas francesas en el siglo XVIII) y ampliamente naturalizado en todo el trópico mundial (Indias, Sudeste Asiático, Caribe, Brasil — donde se llama \"cajá-manga\" y se popularizó masivamente, Centroamérica, África). En Colombia se cultiva en zonas cálidas costeras y de valle (Atlántico, Bolívar, Magdalena, Córdoba, Sucre, Cesar, La Guajira, Chocó, valle bajo y medio del Magdalena, Llanos bajos, Antioquia bajo Cauca-Urabá, Valle del Cauca cinturón frutícola, Tolima-Huila cálidos) entre 0 y 900 msnm con temperaturas 22-30 °C, sol pleno, suelos bien drenados, riego moderado, tolerante a sequías estacionales y vientos costeros. Árbol semicaducifolio mediano-grande de 12-25 m altura con copa amplia abierta-irregular, corteza gruesa gris-marrón fisurada, follaje pinnado parcialmente caduco en estación seca. Hojas grandes (25-60 cm) alternas-pinnadas con 9-25 folíolos elípticos-lanceolados verde-brillante. Flores pequeñas blanco-verdosas perfumadas en panículas terminales largas (30-50 cm) polinizadas por abejas, mariposas y mosquitas-de-las-flores. Frutos drupa elipsoide grande (6-10 cm largo, 3-6 cm ancho, 100-400 g) — frutos significativamente más grandes que sus hermanas Spondias americanas —, cáscara firme amarillo-dorada-anaranjada al madurar, pulpa amarillo-clara firme jugosa-aromática aroma único intermedio entre piña-mango-manzana-ciruela-vainilla (15-18 °Brix maduro), con un hueso grande fibroso-espinoso característico (la masa fibrosa rodea el hueso interno y forma una \"red espinosa\" alrededor — adaptación de dispersión por mamíferos grandes del origen oceánico polinesio). Frutos consumidos en madurez para fruta fresca y a medio madurar (verde-amarillentos) para encurtidos, ensaladas tropicales y bebidas refrescantes (en Brasil y Caribe se hace \"suco de cajá-manga\" famoso). Manejo: plantación a 10-12 m, ideal en patios tropicales caribeños y de valles cálidos, asocio con mango, aguacate, anón, mamey amarillo, níspero, papayo, plátano. Función pedagógica destacada: enseña a niñas y niños (1) BIOGEOGRAFÍA de Spondias — el género tiene origen pantropical con tres centros principales (Sudamérica neotropical jobo S. mombin, Mesoamérica ciruela S. purpurea, Oceanía polinesia ambarella S. dulcis — todos llegaron a Colombia por rutas distintas y en épocas distintas), (2) HISTORIA de la dispersión postcolombina de cultivos por expediciones europeas (Cook, Bligh) entre Oceanía y América-Caribe — lección de historia botánica colonial, (3) adaptación de hueso fibroso-espinoso como dispersión por mamíferos grandes terrestres (en Polinesia: cerdos, ratas; en Neotrópico naturalizado: tapires, dantas, zaínos, monos), (4) familia Anacardiaceae frutales globales (mango Mangifera, marañón Anacardium, jobo Spondias mombin, ciruela Spondias purpurea, ambarella Spondias dulcis, pistacho Pistacia) y (5) por qué se llama \"cajá-manga\" en Brasil — porque combina caracteres de cajá (S. mombin nativo neotropical, fruta pequeña) y de manga (Mangifera indica asiática, fruta grande aromática) en un solo fruto. Fuentes Tier A: GBIF, POWO Kew, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015, AGROSAVIA, FAO Ecocrop.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH50_FRUTALES_EXTENDIDOS",
+      "id": "eugenia_uniflora",
+      "nombre_comun": "Pitanga",
+      "nombre_comunes_regionales": [
+        "ñangapirí",
+        "cerezo de Cayena",
+        "cereza de Surinam",
+        "cereza brasileña",
+        "arrayán amazónico",
+        "pitangueira"
+      ],
+      "nombre_cientifico": "Eugenia uniflora L.",
+      "familia_botanica": "Myrtaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "living_fence"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "harvest_type": "fruto",
+      "cycleMonths": null,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1800,
+        "max_absoluto": 2200
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 18,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje",
+          "acodo"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla recalcitrante viable 2-4 semanas; germinación 30-60 días. Esquejes semileñosos con hormona enraízan moderadamente (40-60% éxito) en cama de propagación con humedad alta. Acodo aéreo en ramas semileñosas. Árboles productivos a 3-5 años — uno de los frutales de PRECOCIDAD ALTA. Plantación a 3-4 m para cerca viva-seto frutal, 5-6 m para árboles aislados.",
+        "tiempo_a_establecimiento_dias": 60,
+        "notas": "SETO FRUTAL PEDAGÓGICO IDEAL: tolera podas frecuentes, mantiene tamaño compacto (2-4 m), produce frutos rojo-brillantes acanalados muy ornamentales durante meses. Frutos pequeños (1-2 cm) rojo-naranja-purpúreos sabor ácido-dulce-resinoso característico Myrtaceae.",
+        "fuente": "POWO Kew; GBIF; SiB Colombia; Pérez Arbeláez 1947; AGROSAVIA"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "sib-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "bernal-2015-plantas-liquenes-colombia",
+        "agrosavia-manual-frutales-tropicales"
+      ],
+      "valor_pedagogico": "La pitanga, ñangapirí o cerezo de Cayena (Eugenia uniflora L., Myrtaceae) es un árbol frutal perenne nativo del Cono Sur sudamericano y noreste sudamericano (sur de Brasil — donde se llama \"pitanga\" del tupí-guaraní \"pi-tang\" = \"rojo-brillante\", Uruguay, noreste de Argentina, Paraguay, Bolivia, sur de Venezuela, Guayanas, Suriname — donde se llama \"cereza de Surinam\"), naturalizado y cultivado ampliamente en todo el Neotrópico cálido-templado y en muchas regiones subtropicales del mundo (Florida, California sur, sur de China, India, África subtropical, Mediterráneo cálido). En Colombia se cultiva y naturaliza en zonas cálidas-templadas-moderadas en casi todo el país (Antioquia, Valle del Cauca, Cundinamarca templada — Sabana Bogotá hasta 2.200 msnm, Boyacá templada, Caldas-Risaralda-Quindío Eje Cafetero, Tolima-Huila, Santander-Norte de Santander, Magdalena-Atlántico-Bolívar costa Caribe, Chocó biogeográfico, Llanos bajos cálidos, Putumayo-Caquetá-Amazonas pie de monte y bosque húmedo) entre 0 y 1.800 msnm con temperaturas 18-28 °C, sol pleno-sombra parcial filtrada, suelos bien drenados ligeramente ácidos, riego moderado y tolerante a heladas leves (a diferencia de la mayoría de Myrtaceae tropicales). Arbusto-árbol pequeño-mediano siempreverde de 2-8 m altura (raramente hasta 12 m) con copa densa-globosa muy ornamental, corteza fina gris-marrón fisurada. Hojas opuestas-simples-elípticas pequeñas (3-7 cm) verde-oscuro brillante por el haz y verde-claro por el envés con puntos translúcidos visibles al trasluz (glándulas oleíferas características de Myrtaceae que liberan aroma resinoso-frutal al frotarse — carácter pedagógico-sensorial excelente). Flores pequeñas blanco-cremosas (1.5-2 cm) con cuatro pétalos y muchos estambres prominentes blancos (característica florística típica Myrtaceae) muy perfumadas atrayentes a abejas nativas (Meliponini), abejas exóticas y mariposas. Frutos baya pequeña (1.5-2.5 cm) ACANALADA con 7-10 costillas longitudinales muy características (carácter taxonómico inmediato — \"pitanga\" = \"rojo acanalado\"), color verde inmaduro pasando a amarillo, naranja, rojo-cereza-brillante y maduro oscuro purpúreo-negro según madurez progresiva (lección visual de maduración secuencial), pulpa rojo-purpúrea jugosa ácido-dulce-resinosa (10-13 °Brix) con sabor único frutal-resinoso característico Myrtaceae (mezcla cereza-jamaica-resina) que algunos describen como \"ligeramente medicinal\" — proviene de los terpenos volátiles de la familia. SETO FRUTAL PEDAGÓGICO PERFECTO para huertas escolares: tolera podas frecuentes, mantiene tamaño compacto manejable (2-4 m con podas anuales), produce frutos rojo-brillantes acanalados muy ornamentales durante varios meses (febrero-mayo en zonas cálidas, septiembre-noviembre en zonas templadas), no requiere injerto, fructifica precozmente (3-5 años desde semilla — uno de los frutales de PRECOCIDAD MÁS ALTA), atrae abejas y mariposas (jardín de polinizadores escolar), hojas aromáticas para clases sensoriales sobre glándulas oleíferas Myrtaceae. Manejo: plantación a 3-4 m para cerca viva-seto frutal escolar, asocio con guayaba (Psidium guajava), arrayán (Myrcianthes leucoxyla), feijoa (Acca sellowiana) — multidiverso seto Myrtaceae —, café como sotobosque pedagógico, podas anuales formativas-mantenedoras, riego moderado. Las hojas se usan en medicina tradicional Brasil-Argentina-Paraguay como infusión digestiva-hipotensora-antiinflamatoria. Función pedagógica excepcional: enseña (1) familia MYRTACEAE neotropical diversa (junto con guayaba, arrayán, feijoa, eucalipto, clavo, mirto), (2) glándulas oleíferas translúcidas visibles al trasluz como carácter taxonómico (frotar hoja → aroma resinoso → genera curiosidad inmediata en niñas-niños), (3) frutos acanalados como carácter morfológico distintivo (compárese con otros frutos lisos), (4) maduración progresiva por colores visible verde→amarillo→naranja→rojo→purpúreo-negro (lección sobre madurez y cosecha), (5) atracción de polinizadores y biodiversidad de jardín escolar. Fuentes Tier A: GBIF, POWO Kew, SiB Colombia, Pérez Arbeláez 1947, Bernal 2015, AGROSAVIA.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH50_FRUTALES_EXTENDIDOS",
+      "id": "mauritia_minor",
+      "nombre_comun": "Canangucho menor",
+      "nombre_comunes_regionales": [
+        "moriche pequeño",
+        "aguaje menor",
+        "morichito",
+        "mauritia enana",
+        "palma de canangucha enana"
+      ],
+      "nombre_cientifico": "Mauritia minor Burret",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "harvest_type": "fruto",
+      "cycleMonths": null,
+      "altitud_msnm": {
+        "min_absoluto": 100,
+        "optimo_min": 150,
+        "optimo_max": 500,
+        "max_absoluto": 800
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 23,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "pantanoso",
+      "drenaje_requerido": "pantanoso",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla muy recalcitrante (pierde viabilidad en 4-6 semanas a temperatura ambiente). Pretratamiento: limpiar de pulpa, escarificado mecánico ligero o remojo 48-72h. Germinación lenta 60-180 días en sustrato húmedo permanente (turba + arena 2:1). Palma DIOICA (machos y hembras separadas — solo hembras producen frutos), productiva a 8-12 años desde semilla. Plantación en humedales-aguajales-morichales naturales o restauración de zonas bajas inundables.",
+        "tiempo_a_establecimiento_dias": 180,
+        "notas": "Distinta de Mauritia flexuosa (canangucho mayor / moriche / aguaje grande, palma emblema Llanos-Amazonía colombiana) — Mauritia minor es palma de menor porte (8-15 m vs 25-35 m), distribución más restringida a humedales bajos Vaupés-Guainía-Putumayo-Caquetá-Amazonas Orinoquia y enclaves específicos.",
+        "fuente": "POWO Kew; GBIF; Sinchi Amazonía colombiana; Pérez Arbeláez 1947; SiB Colombia"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "sinchi-amazonia-colombiana",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El canangucho menor o moriche pequeño (Mauritia minor Burret, Arecaceae) es una palma neotropical nativa de humedales y aguajales de zonas bajas inundables de la cuenca amazónica-orinoquia colombo-venezolano-brasileña (Colombia: Vaupés, Guainía, Vichada, Putumayo, Caquetá, Amazonas, enclaves específicos en Meta y Casanare; Venezuela: Amazonas y Bolívar; Brasil: Roraima, Amazonas — humedales restringidos), distinta de su hermana mucho más conocida Mauritia flexuosa (canangucho mayor / moriche / aguaje / buriti — la palma emblema de los Llanos colombo-venezolanos y de la Amazonía peruano-brasileña, frecuente en morichales-aguajales-buritizales — palma de hasta 25-35 m altura). Mauritia minor es palma de PORTE MENOR (8-15 m altura vs 25-35 m de M. flexuosa) y distribución mucho MÁS RESTRINGIDA a humedales bajos del piedemonte amazónico-orinoquia entre 100 y 500 msnm, con preferencia por suelos saturados permanentemente (carácter de Mauritia compartido — adaptación a anegamiento crónico con neumatóforos y raíces adventicias aéreas), temperaturas cálidas 23-30 °C, sol pleno. Palma SOLITARIA (no cespitosa, distinta de Bactris, Astrocaryum) con estipe único columnar liso gris-marrón con cicatrices foliares anulares prominentes, corona apical de 8-15 hojas grandes palmadas-costapalmadas verde-claro brillante (3-5 m largo) con segmentos rígidos pendulares colgantes característicos de Mauritia (la \"corona péndula\" da el aspecto inconfundible del género). Característica botánica destacada: DIOICIA ESTRICTA — los individuos son macho o hembra separados (no hermafroditas), solo las palmas hembras producen frutos. Inflorescencias grandes pendulares ramificadas con miles de flores pequeñas amarillo-cremosas polinizadas principalmente por escarabajos y mosquitas-de-las-palmas (Curculionidae, Drosophilidae). Frutos drupa elipsoide-aovada pequeña-mediana (3-5 cm — significativamente más pequeños que los de M. flexuosa que alcanzan 5-7 cm) con cáscara escamosa marrón-rojiza brillante característica de Mauritia (escamas romboidales imbricadas — carácter taxonómico inmediato del género), pulpa amarillo-anaranjada fibrosa-cremosa aceitosa muy rica en betacaroteno (provitamina A — concentraciones altas, lección nutricional sobre biofortificación natural), aceite vegetal comestible, ácidos grasos insaturados y vitamina E, con un hueso grande interno. Importancia cultural y ecológica enorme para pueblos indígenas amazónico-orinoquia (Tikuna, Huitoto, Bora, Sikuani, Cubeo, Kurripaco, Wayuu interior, Piapoco) que aprovechan toda la palma: frutos para alimento humano (consumo directo, masas fermentadas-no-fermentadas, jugos refrescantes \"champu de canangucho\"), hojas para techos de malocas y artesanías-canastos-esteras, fibras para cuerdas-redes-hamacas tradicionales, larvas comestibles de gorgojos (Rhynchophorus palmarum — \"mojojoy\") que crecen en estipes muertos como fuente proteica destacada de las dietas indígenas, palmito comestible de palmas jóvenes (en sostenibilidad — no debe extraerse de poblaciones silvestres). Función pedagógica excepcional: enseña a niñas y niños (1) palmas Arecaceae como familia clave de selva tropical-humedales sudamericanos (junto con Euterpe açaí, Bactris chontaduro, Attalea seje-mil-pesos, Astrocaryum corozo, Oenocarpus seje-bacaba), (2) DIOICIA estricta como sistema reproductivo (compárese con monoicas como cocotero, palma africana, dátiles), (3) adaptaciones a humedales tropicales saturados (neumatóforos, raíces adventicias aéreas, copa péndula tolerante a vientos), (4) BIOFORTIFICACIÓN NATURAL con betacaroteno-provitamina A — el canangucho es uno de los frutos más ricos en provitamina A del planeta (lección nutricional sobre soberanía alimentaria indígena vs alimentos ultraprocesados industriales), (5) aprovechamiento integral indígena de la palma (alimento humano-techo-fibras-larvas comestibles-palmito) como ejemplo de \"todo se aprovecha\" — sostenibilidad cultural amazónica, (6) DISTINCIÓN entre canangucho menor (M. minor — palma pequeña restringida humedales bajos) vs canangucho mayor (M. flexuosa — palma grande Llanos-Amazonía-Pantanal) — lección taxonómica de especies hermanas congenéricas con distribución y tamaño distintos. Fuentes Tier A: GBIF, POWO Kew, Sinchi Amazonía colombiana, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015.",
+      "validation_level": "claude_draft"
     }
   ],
   "biopreparados": [
