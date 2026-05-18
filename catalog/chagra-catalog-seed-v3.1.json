@@ -9213,9 +9213,12 @@
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
         "gbif-taxonomic-backbone",
-        "powo-kew"
+        "powo-kew",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales",
+        "agrosavia-tibaitata"
       ],
-      "valor_pedagogico": "La farmacia en una hoja: enseña suculencia, adaptación a sequía, y el uso tradicional del gel como cicatrizante en la medicina casera colombiana de tierras cálidas.",
+      "valor_pedagogico": "La sábila o aloe (Aloe vera (L.) Burm.f., familia Asphodelaceae) es una asphodelácea suculenta perenne acaule originaria de la Península Arábiga, naturalizada y cultivada extensamente en huertos de tierra caliente y templada colombiana por su gel mucilaginoso translúcido contenido en el parénquima foliar central, rico en polisacáridos (acemanano, glucomanano), antraquinonas (aloína, barbaloína) en el latex amarillo periférico, vitaminas y aminoácidos. Se cultiva en Bolívar (Cartagena, El Carmen de Bolívar), Magdalena (Santa Marta), Atlántico, Sucre, La Guajira (sur de Riohacha), Cesar (Valledupar), Tolima caliente (Espinal, Flandes), Huila (Neiva, Aipe) y Valle del Cauca entre 0 y 1.500 msnm en zona térmica cálida seca a templada. Ciclo perenne con hijuelos basales propagables desde el segundo año. Lección viva: la farmacia en una hoja — enseña suculencia y la estrategia metabólica CAM (Crassulacean Acid Metabolism) de las plantas xerófilas que abren estomas de noche para fijar CO2 reduciendo pérdida de agua diurna, adaptación clave a sequía documentada en Aloe, Agave, Opuntia y piñas (Bromeliaceae). El gel del parénquima foliar interno se usa en la medicina casera colombiana como cicatrizante de quemaduras solares, hidratante cutáneo y demulcente digestivo (uso tradicional respaldado por el JBB Bogotá). Manejo agroecológico: propagación por hijuelos basales separados con 3-4 hojas (dejar secar la herida 24 h antes de plantar), siembra en sustrato arenoso con drenaje excelente, exposición sol pleno, riego escaso (cada 15-20 días en seco), tolera salinidad moderada, asocio con henequén y cactáceas en sistemas xerófilos del Caribe, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Pérez Arbeláez 1947 Plantas Útiles de Colombia, Pamplona-Roger 2006 Plantas Medicinales, JBB Plantas Medicinales Cundinamarca-Boyacá, AGROSAVIA Tibaitatá.",
       "validation_level": "claude_draft"
     },
     {
@@ -9691,9 +9694,11 @@
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
         "powo-kew",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales"
       ],
-      "valor_pedagogico": "Fruto estrella: el anis estrella ensena como la morfologia del fruto revela su parentesco y su uso como expectorante natural en la farmacopea tradicional colombiana."
+      "valor_pedagogico": "El anís estrella (Illicium verum Hook.f., familia Schisandraceae) es una schisandrácea arbórea perenne (8-15 m altura) originaria del suroeste de China (Guangxi, Yunnan) y norte de Vietnam, introducida y aclimatada con éxito en zonas templadas húmedas de Colombia. Produce frutos en folículos múltiples dispuestos en estrella de 6-8 puntas (de ahí el nombre vernáculo), ricos en anetol (80-90% del aceite esencial), estragol, anisaldehído y sesquiterpenos, compuestos con acción carminativa, expectorante, antibacteriana, antifúngica y antiespasmódica documentada en la farmacopea tradicional china, europea y latinoamericana. Se cultiva ocasionalmente en Cundinamarca (zonas templadas húmedas de Fusagasugá, Silvania), Eje cafetero (Quindío, Risaralda), Antioquia (oriente cercano), Tolima (norte, Líbano) y Valle del Cauca entre 1.200 y 2.000 msnm. Árbol de lento crecimiento que inicia producción de frutos a los 6-8 años. Lección viva: la morfología en estrella del fruto folicular múltiple revela el parentesco arcaico de Schisandraceae con las primeras angiospermas (linaje basal Austrobaileyales junto con Trimeniaceae y Austrobaileyaceae), enseñando que la diversificación morfológica del fruto es una evidencia evolutiva clave en la sistemática botánica moderna basada en filogenia molecular (APG IV 2016). Cuidado pedagógico importante: NO confundir con Illicium anisatum L. (anís estrella japonés, tóxico, contiene anisatina neurotóxica) — la diferenciación morfológica y química es esencial. En la chagra colombiana enseña la prudencia botánica: identificación binomial obligatoria antes del uso medicinal. Manejo agroecológico: propagación por semilla fresca (pierde viabilidad rápido), trasplante a campo definitivo al año, asocio en sistemas agroforestales con cacao y café, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Pérez Arbeláez 1947 Plantas Útiles de Colombia, Pamplona-Roger 2006 Plantas Medicinales, JBB Plantas Medicinales Cundinamarca-Boyacá."
     },
     {
       "id": "mentha_villosa",
@@ -10017,9 +10022,14 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
-        "powo-kew"
+        "powo-kew",
+        "ley-1930-2018-paramos",
+        "humboldt-flora-alto-andina",
+        "restauracion-cruz-verde-sumapaz",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia"
       ],
-      "valor_pedagogico": "Complejo de Festuca (varias spp.) nativo del páramo colombiano. Componente estructural fundamental del ecosistema páramo, regula hídricamente y forma cobertura suelo."
+      "valor_pedagogico": "El pajonal de páramo (Festuca spp., complejo paramuno nativo, familia Poaceae) agrupa varias especies del género Festuca propias del páramo colombiano (incluyendo F. dolichophylla, F. orthophylla, F. asplundii y otras de difícil delimitación taxonómica sin material reproductivo), gramíneas perennes cespitosas de hojas duras enrolladas longitudinalmente y panículas glumáceas. Constituyen, junto con Calamagrostis effusa y Agrostis spp., el estrato graminoide dominante del páramo de pajonal, tipología de páramo más extendida en Colombia (Sumapaz, Chingaza, Cruz Verde, Pisba, Cocuy, Belmira, Frontino, Romerales, Nevados, Las Hermosas, Puracé, Doña Juana, Chiles-Cumbal) entre 3.000 y 4.200 msnm en la franja altoandina y paramuna. Lección viva del ecosistema páramo: componente estructural fundamental de la fábrica de agua andina — sus matas cespitosas amortiguan lluvias torrenciales, almacenan agua en bases foliares y suelos orgánicos (histosoles y andisoles negros de hasta 60% de materia orgánica), y la liberan gradualmente a las quebradas durante meses secos, regulando el caudal de los acueductos de Bogotá (sistema Chingaza), Tunja, Manizales y Pasto. Tolera heladas nocturnas -4 a -8 °C, radiación UV-B intensa por altitud y suelos ácidos pH 4-5. El páramo está protegido constitucionalmente por la Ley 1930/2018 que prohíbe agricultura, ganadería y minería sobre cota delimitada IAvH, por lo que esta species NO es cultivable — su uso es estrictamente para restauración ecológica participativa con comunidades campesinas en reconversión productiva. Manejo agroecológico (solo restauración): propagación por división de mata cespitosa con semillas asociadas, trasplante en hoyos pequeños sin labranza profunda (no romper turba), sin riego ni fertilización, asocio nodriza con frailejones (Espeletia) y arbustos paramunos en franjas multiestrato. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, Ley 1930/2018 Páramos, IAvH Flora Alto-Andina, IAvH+CAR Plan Restauración Cruz Verde-Sumapaz, SiB Colombia."
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
