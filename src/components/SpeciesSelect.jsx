@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, ChevronDown, X, Clock, Sparkles, Camera, Loader2, Bug } from 'lucide-react';
+import { Search, ChevronDown, X, Clock, Sparkles, Camera, ImagePlus, Loader2, Bug } from 'lucide-react';
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { resolveSpeciesDefaults } from '../config/speciesDefaults';
 import { fuzzyFilter } from '../utils/fuzzySearch';
@@ -7,6 +7,7 @@ import { usePhotoUrl } from '../hooks/usePhotoUrl';
 import useAssetStore from '../store/useAssetStore';
 import { captureAndCompress } from '../services/photoService';
 import { recognizeSpecies } from '../services/aiService';
+import { getAllSpecies } from '../db/catalogDB';
 
 /**
  * SpeciesSelect, Selector de especie con fuzzy search y autocompletado de defaults.
@@ -26,18 +27,44 @@ import { recognizeSpecies } from '../services/aiService';
  *   - onAutoFill: callback({ estrato, gremio, production, cycleMonths }), sugerencia
  */
 
-// Flatten de todas las especies con su grupo para lookup rápido.
-const ALL_SPECIES = Object.entries(CROP_TAXONOMY).flatMap(([groupId, group]) =>
+// Fallback estático legacy: ~77 species hardcoded en config/taxonomy.js.
+// Se mantiene porque (a) catalogDB SQLite WASM puede tardar/fallar en cold
+// boot (b) garantiza offline-first hard. Si el catálogo v3.1 (480 species)
+// carga OK desde catalogDB, lo reemplaza in-memory en el componente.
+const LEGACY_SPECIES = Object.entries(CROP_TAXONOMY).flatMap(([groupId, group]) =>
   group.species.map((sp) => ({ ...sp, groupId, groupLabel: group.label }))
 );
+
+// Normaliza un row del catálogo SQLite ({id, nombre_comun, nombre_cientifico,
+// categoria}) al shape interno {id, name, groupId, groupLabel} consumido por
+// el resto del componente (fuzzy + recent + auto-select por nombre).
+const normalizeCatalogSpecies = (row) => {
+  if (!row || !row.id) return null;
+  const nombre = (row.nombre_comun || row.id || '').trim();
+  const cientifico = (row.nombre_cientifico || '').trim();
+  const display = cientifico ? `${nombre} (${cientifico})` : nombre;
+  const cat = row.categoria || row.category || row.tipo || 'catálogo';
+  return {
+    id: row.id,
+    name: display,
+    nombre_comun: nombre,
+    nombre_cientifico: cientifico,
+    groupId: cat,
+    groupLabel: cat,
+  };
+};
+
+// Timeout duro para no congelar el form si OPFS/WASM se queda colgado.
+const CATALOG_LOAD_TIMEOUT_MS = 2000;
 
 // Calcula últimas 3 especies registradas por el usuario (Miguel UX 2026-05-03).
 // Lee plants del store, agrupa por nombre canónico, ordena por _createdAt y
 // devuelve las últimas 3 únicas como { id, name, groupId, groupLabel } match
-// del catálogo CROP_TAXONOMY. Si una planta tiene name libre que NO matchea,
-// la incluye igual con id=null para que el chip funcione como atajo de nombre.
-const computeRecentSpecies = (plants) => {
+// del catálogo activo. Si una planta tiene name libre que NO matchea, la
+// incluye igual con id=null para que el chip funcione como atajo de nombre.
+const computeRecentSpecies = (plants, allSpecies) => {
   if (!Array.isArray(plants) || plants.length === 0) return [];
+  const pool = Array.isArray(allSpecies) ? allSpecies : [];
   const sorted = [...plants].sort((a, b) => (b._createdAt || 0) - (a._createdAt || 0));
   const seen = new Set();
   const result = [];
@@ -47,7 +74,7 @@ const computeRecentSpecies = (plants) => {
     seen.add(name.toLowerCase());
     // Quitar sufijo "#001" de nombres bulk-individual para detectar especie real
     const baseName = name.replace(/\s+#\d+$/, '');
-    const match = ALL_SPECIES.find(
+    const match = pool.find(
       (sp) => sp.name === baseName || sp.name.toLowerCase().startsWith(baseName.toLowerCase())
     );
     result.push({
@@ -61,21 +88,59 @@ const computeRecentSpecies = (plants) => {
   return result;
 };
 
-export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
+export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [selectedSpeciesId, setSelectedSpeciesId] = useState(null);
   const wrapperRef = useRef(null);
 
+  // Catálogo dinámico (v3.1 ≈480 species) con fallback legacy (~77).
+  // Se carga async desde catalogDB al mount; si tarda >2s o falla, queda
+  // el legacy para no romper offline-first ni la UX del form.
+  const [allSpecies, setAllSpecies] = useState(LEGACY_SPECIES);
+  useEffect(() => {
+    let cancelled = false;
+    const timeoutId = setTimeout(() => {
+      if (!cancelled) {
+        console.warn('[SpeciesSelect] catalogDB timeout >2s, manteniendo LEGACY_SPECIES');
+      }
+    }, CATALOG_LOAD_TIMEOUT_MS);
+
+    Promise.race([
+      getAllSpecies(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('catalog_timeout')), CATALOG_LOAD_TIMEOUT_MS)),
+    ])
+      .then((rows) => {
+        if (cancelled) return;
+        if (!Array.isArray(rows) || rows.length === 0) return;
+        const normalized = rows.map(normalizeCatalogSpecies).filter(Boolean);
+        if (normalized.length === 0) return;
+        setAllSpecies(normalized);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.warn('[SpeciesSelect] catalogDB load failed, usando LEGACY_SPECIES:', err?.message || err);
+      })
+      .finally(() => clearTimeout(timeoutId));
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
   // Últimas 3 especies del usuario, atajos rápidos arriba del fuzzy search.
   // Reduce fricción de escribir/buscar para repeat work (Miguel UX 2026-05-03).
   const plants = useAssetStore((s) => s.plants);
-  const recentSpecies = useMemo(() => computeRecentSpecies(plants), [plants]);
+  const recentSpecies = useMemo(() => computeRecentSpecies(plants, allSpecies), [plants, allSpecies]);
 
-  // Autopilot H (2026-05-03): identificación de especie por foto via gemma3:4b.
-  // Marcado experimental, confidence ≥0.7 auto-selecciona si match en CROP_TAXONOMY,
-  // sino muestra alternativas + bug report button para validar.
-  const aiInputRef = useRef(null);
+  // Autopilot H (2026-05-03): identificación de especie por foto.
+  // Vision model qwen2.5vl:7b (con fallback gemma3:4b en aiService).
+  // confidence ≥0.7 auto-selecciona si match en catálogo, sino muestra
+  // alternativas + bug report button para validar.
+  // Dual capture (2026-05-18): camera (capture=environment) + gallery.
+  const aiCameraRef = useRef(null);
+  const aiGalleryRef = useRef(null);
   const [aiState, setAiState] = useState('idle'); // idle | running | done | error
   const [aiResult, setAiResult] = useState(null);
 
@@ -90,6 +155,17 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
     setAiResult(null);
     try {
       const { blob } = await captureAndCompress(file);
+      // Bug fix #2 (2026-05-18): la foto sirve tanto para identificar como
+      // para persistirse como foto de la planta. Si el parent pasó onPhoto,
+      // le delegamos el blob ya comprimido (mismo blob que enviamos a Ollama)
+      // para evitar doble captura.
+      if (typeof onPhoto === 'function') {
+        try {
+          onPhoto(blob);
+        } catch (err) {
+          console.warn('[SpeciesSelect] onPhoto callback failed:', err);
+        }
+      }
       const result = await recognizeSpecies(blob);
       if (!result) {
         setAiState('error');
@@ -97,11 +173,14 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
       }
       setAiResult(result);
       setAiState('done');
-      // Auto-select si confidence alta + match exacto en CROP_TAXONOMY
+      // Auto-select si confidence alta + match exacto en catálogo activo
       if (result.confidence >= 0.7 && result.common_name_es) {
-        const match = ALL_SPECIES.find((sp) =>
-          sp.name.toLowerCase() === result.common_name_es.toLowerCase()
-        );
+        const match = allSpecies.find((sp) => {
+          const display = (sp.name || '').toLowerCase();
+          const comun = (sp.nombre_comun || '').toLowerCase();
+          const target = result.common_name_es.toLowerCase();
+          return display === target || comun === target || display.startsWith(target);
+        });
         if (match) {
           handleSelect(match);
         }
@@ -110,18 +189,24 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
       console.warn('[SpeciesSelect] AI recognition failed:', err);
       setAiState('error');
     } finally {
-      if (aiInputRef.current) aiInputRef.current.value = '';
+      if (aiCameraRef.current) aiCameraRef.current.value = '';
+      if (aiGalleryRef.current) aiGalleryRef.current.value = '';
     }
   };
 
   const handleAiPickAlternative = (altName) => {
-    const match = ALL_SPECIES.find((sp) => sp.name.toLowerCase() === altName.toLowerCase());
+    const match = allSpecies.find((sp) => {
+      const display = (sp.name || '').toLowerCase();
+      const comun = (sp.nombre_comun || '').toLowerCase();
+      const target = (altName || '').toLowerCase();
+      return display === target || comun === target;
+    });
     if (match) {
       handleSelect(match);
       setAiResult(null);
       setAiState('idle');
     } else {
-      // No está en CROP_TAXONOMY → entrada libre
+      // No está en el catálogo → entrada libre
       onChange(altName);
       setAiResult(null);
       setAiState('idle');
@@ -150,9 +235,9 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
   useEffect(() => {
     if (selectedSpeciesId) return;
     if (!value) return;
-    const match = ALL_SPECIES.find((sp) => sp.name === value);
+    const match = allSpecies.find((sp) => sp.name === value);
     if (match) setSelectedSpeciesId(match.id);
-  }, [value, selectedSpeciesId]);
+  }, [value, selectedSpeciesId, allSpecies]);
 
   // Foto guía del catálogo según especie elegida (Fase 1 wiring photoService).
   // Si no hay foto del catálogo en /catalog-photos/<slug>.jpg cae al placeholder.
@@ -171,8 +256,8 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
   }, []);
 
   const filtered = useMemo(
-    () => fuzzyFilter(query, ALL_SPECIES, (sp) => sp.name, 30),
-    [query]
+    () => fuzzyFilter(query, allSpecies, (sp) => sp.name, 30),
+    [query, allSpecies]
   );
 
   const handleSelect = (species) => {
@@ -349,17 +434,36 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
         </div>
 
         {aiState === 'idle' && (
-          <label className="w-full p-2.5 rounded-lg bg-amber-900/20 hover:bg-amber-800/30 active:bg-amber-800/50 text-amber-300 border border-amber-800/50 cursor-pointer flex items-center justify-center gap-2 text-xs min-h-[40px] transition-colors">
-            <Camera size={14} /> Tomar foto para identificar especie
-            <input
-              ref={aiInputRef}
-              type="file"
-              accept="image/*"
-             
-              onChange={handleAiCapture}
-              className="hidden"
-            />
-          </label>
+          // Bug fix #3 (2026-05-18): dual capture — cámara + galería.
+          // - "Tomar foto" usa capture="environment" forzando la cámara trasera
+          //   (mobile UX nativa, sin picker intermedio).
+          // - "Elegir foto" sin capture deja al SO mostrar el picker
+          //   (galería / cámara / archivos).
+          // Side-by-side en grid 2 columnas. Ambos delegan al mismo handler
+          // que (#2) re-emite el blob al parent via onPhoto si está conectado.
+          <div className="grid grid-cols-2 gap-2">
+            <label className="w-full p-2.5 rounded-lg bg-amber-900/20 hover:bg-amber-800/30 active:bg-amber-800/50 text-amber-300 border border-amber-800/50 cursor-pointer flex items-center justify-center gap-2 text-xs min-h-[40px] transition-colors">
+              <Camera size={14} /> Tomar foto
+              <input
+                ref={aiCameraRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handleAiCapture}
+                className="hidden"
+              />
+            </label>
+            <label className="w-full p-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-amber-300 border border-amber-800/50 cursor-pointer flex items-center justify-center gap-2 text-xs min-h-[40px] transition-colors">
+              <ImagePlus size={14} /> Elegir foto
+              <input
+                ref={aiGalleryRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAiCapture}
+                className="hidden"
+              />
+            </label>
+          </div>
         )}
 
         {aiState === 'running' && (

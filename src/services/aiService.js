@@ -20,7 +20,14 @@ const OLLAMA_BASE = '/api/ollama';
 const OLLAMA_URL = `${OLLAMA_BASE}/api/generate`;
 // Gemma 3 4B (oficial Google, multimodal nativo). Reemplaza paligemma
 // porque el runner Llama de Ollama crashea con arquitectura PaliGemma.
-const MODEL = 'gemma3:4b';
+const DIAGNOSIS_MODEL = 'gemma3:4b';
+// Vision-specialized model para species recognition. Bench Quadro M6000
+// 2026-05-17: qwen2.5vl:7b da 78 t/s GPU + identificación notablemente
+// mejor que gemma3:4b en frutales/hortalizas latam (11.8 GB VRAM, calza
+// holgado con 24 GB de la Quadro). Caller hace fallback a gemma3:4b si
+// qwen falla (modelo no cargado, OOM transitorio, etc.).
+const VISION_SPECIES_MODEL = 'qwen2.5vl:7b';
+const VISION_SPECIES_FALLBACK_MODEL = 'gemma3:4b';
 
 const DIAGNOSIS_PROMPT = 'detect disease, nutrient deficiency, and overall plant health. Output JSON: {"score": 0-100, "issues": [], "treatment": ""}';
 
@@ -84,7 +91,7 @@ export const analyzeFoliage = async (imageBlob, { onToken, signal } = {}) => {
     // local no requiere autenticación.
     const text = (await streamOllama(
       OLLAMA_URL,
-      { model: MODEL, prompt: DIAGNOSIS_PROMPT, images: [base64] },
+      { model: DIAGNOSIS_MODEL, prompt: DIAGNOSIS_PROMPT, images: [base64] },
       onToken,
       { signal },
     )).trim();
@@ -122,25 +129,45 @@ export const analyzeFoliage = async (imageBlob, { onToken, signal } = {}) => {
  * const species = await recognizeSpecies(imageBlob);
  * // species => { common_name_es: "cafe", scientific_name: "Coffea arabica", confidence: 0.92, alternatives: [] }
  */
+const runSpeciesRecognition = async (model, base64, { onToken, signal }) => {
+  const text = (await streamOllama(
+    OLLAMA_URL,
+    { model, prompt: SPECIES_PROMPT, images: [base64] },
+    onToken,
+    { signal },
+  )).trim();
+  const cleaned = text.replace(/```json\s*/g, '').replace(/```/g, '').trim();
+  const parsed = JSON.parse(cleaned);
+  return {
+    common_name_es: (parsed.common_name_es || '').toLowerCase().trim(),
+    scientific_name: parsed.scientific_name || '',
+    confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0,
+    alternatives: Array.isArray(parsed.alternatives) ? parsed.alternatives : [],
+    _model: model,
+  };
+};
+
 export const recognizeSpecies = async (imageBlob, { onToken, signal } = {}) => {
+  let base64;
   try {
-    const base64 = await blobToBase64(imageBlob);
-    const text = (await streamOllama(
-      OLLAMA_URL,
-      { model: MODEL, prompt: SPECIES_PROMPT, images: [base64] },
-      onToken,
-      { signal },
-    )).trim();
-    const cleaned = text.replace(/```json\s*/g, '').replace(/```/g, '').trim();
-    const parsed = JSON.parse(cleaned);
-    return {
-      common_name_es: (parsed.common_name_es || '').toLowerCase().trim(),
-      scientific_name: parsed.scientific_name || '',
-      confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0,
-      alternatives: Array.isArray(parsed.alternatives) ? parsed.alternatives : [],
-    };
+    base64 = await blobToBase64(imageBlob);
   } catch (err) {
-    console.warn('[aiService] Species recognition no disponible:', err.message);
+    console.warn('[aiService] Species recognition base64 failed:', err.message);
+    return null;
+  }
+
+  // Primary: qwen2.5vl:7b (vision-specialized, mejor identificación).
+  try {
+    return await runSpeciesRecognition(VISION_SPECIES_MODEL, base64, { onToken, signal });
+  } catch (err) {
+    console.warn(`[aiService] ${VISION_SPECIES_MODEL} failed, fallback to ${VISION_SPECIES_FALLBACK_MODEL}:`, err.message);
+  }
+
+  // Fallback: gemma3:4b (modelo de diagnóstico, ya cargado en VRAM normalmente).
+  try {
+    return await runSpeciesRecognition(VISION_SPECIES_FALLBACK_MODEL, base64, { onToken, signal });
+  } catch (err) {
+    console.warn('[aiService] Species recognition no disponible (fallback también falló):', err.message);
     return null;
   }
 };
