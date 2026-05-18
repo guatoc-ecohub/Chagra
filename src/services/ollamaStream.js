@@ -15,7 +15,45 @@
  *   proxy_http_version 1.1;
  * Sin esa configuracion, los chunks llegan en un unico lote al cliente y el
  * efecto de typewriter se pierde (la request sigue funcionando igual).
+ *
+ * Telemetría (v13 2026-05-17): cada call registra un evento privacy-safe en
+ * IDB store `llm_telemetry` con modelo, latencia, tokens y processor
+ * (gpu/cpu detectado vía /api/ps cache 5s). NUNCA persiste prompt ni respuesta.
+ * Falla silente — telemetría jamás rompe la UX.
  */
+
+import { recordLLMEvent } from './llmTelemetryService';
+import { getGpuSnapshot } from './gpuTelemetryService';
+
+const detectProcessorFor = async (model) => {
+  try {
+    const snapshot = await getGpuSnapshot();
+    if (!snapshot?.available) return 'unknown';
+    const entry = snapshot.models.find((m) => m.name === model || m.name?.startsWith(`${model}:`) || model?.startsWith(`${m.name}`));
+    if (!entry) return 'unknown';
+    return entry.processor === 'partial' ? 'partial' : entry.processor;
+  } catch (_) {
+    return 'unknown';
+  }
+};
+
+const inferFlujo = (url, body) => {
+  if (body?.flujo) return body.flujo;
+  if (typeof url !== 'string') return 'other';
+  if (url.includes('/api/chat')) return 'chat';
+  if (url.includes('/api/generate')) return 'vision'; // generate se usa para vision foliage analysis
+  if (url.includes('/v1/chat/completions')) return 'chat';
+  return 'other';
+};
+
+const classifyError = (err, status) => {
+  if (err?.name === 'AbortError') return 'abort';
+  if (status >= 500) return 'http_5xx';
+  if (status >= 400) return 'http_4xx';
+  if (err?.message?.toLowerCase().includes('network')) return 'network';
+  if (err?.message?.toLowerCase().includes('timeout')) return 'timeout';
+  return 'network';
+};
 
 const parseLine = (line) => {
   if (!line) return null;
@@ -51,12 +89,30 @@ const extractChunk = (parsed) => {
  * // full => "Hola, en que puedo ayudarte?"
  */
 export async function streamOllama(url, body, onToken, { signal, onDone } = {}) {
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...body, stream: true }),
-    signal,
-  });
+  const t0 = Date.now();
+  const modelHint = body?.model || 'unknown';
+  const flujoHint = inferFlujo(url, body);
+  let lastDoneObj = null;
+  let response;
+
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...body, stream: true }),
+      signal,
+    });
+  } catch (err) {
+    recordLLMEvent({
+      model: modelHint,
+      endpoint: url,
+      flujo: flujoHint,
+      status: err?.name === 'AbortError' ? 'abort' : 'error',
+      total_ms: Date.now() - t0,
+      error_kind: classifyError(err, 0),
+    });
+    throw err;
+  }
 
   if (!response.ok) {
     let detail = '';
@@ -65,9 +121,25 @@ export async function streamOllama(url, body, onToken, { signal, onDone } = {}) 
     // HTML completo que el slice(200) leakea al UI (bug HelpVoiceQuestion 2026-05-08).
     const { buildCleanErrorMessage } = await import('./sanitizeError.js');
     const ctype = response.headers?.get?.('content-type') || '';
+    recordLLMEvent({
+      model: modelHint,
+      endpoint: url,
+      flujo: flujoHint,
+      status: 'error',
+      total_ms: Date.now() - t0,
+      error_kind: classifyError(null, response.status),
+    });
     throw new Error(buildCleanErrorMessage('Ollama', response.status, response.statusText, detail, ctype));
   }
   if (!response.body) {
+    recordLLMEvent({
+      model: modelHint,
+      endpoint: url,
+      flujo: flujoHint,
+      status: 'error',
+      total_ms: Date.now() - t0,
+      error_kind: 'parse',
+    });
     throw new Error('Respuesta sin body streameable (¿buffering del proxy?)');
   }
 
@@ -96,6 +168,7 @@ export async function streamOllama(url, body, onToken, { signal, onDone } = {}) 
           if (onToken) onToken(chunk, fullText);
         }
         if (parsed.done) {
+          lastDoneObj = parsed;
           if (onDone) {
             try { onDone(parsed); } catch (_) { /* noop */ }
           }
@@ -104,6 +177,16 @@ export async function streamOllama(url, body, onToken, { signal, onDone } = {}) 
         }
       }
     }
+  } catch (err) {
+    recordLLMEvent({
+      model: lastDoneObj?.model || modelHint,
+      endpoint: url,
+      flujo: flujoHint,
+      status: err?.name === 'AbortError' ? 'abort' : 'error',
+      total_ms: Date.now() - t0,
+      error_kind: classifyError(err, 0),
+    });
+    throw err;
   } finally {
     try { reader.releaseLock(); } catch (_) { /* noop */ }
   }
@@ -117,7 +200,32 @@ export async function streamOllama(url, body, onToken, { signal, onDone } = {}) 
       fullText += chunk;
       if (onToken) onToken(chunk, fullText);
     }
+    if (parsed?.done) lastDoneObj = parsed;
   }
+
+  // Telemetría privacy-safe (NUNCA prompt ni respuesta, solo metadata).
+  const total_ms = Date.now() - t0;
+  const load_ms = lastDoneObj?.load_duration ? Math.round(lastDoneObj.load_duration / 1e6) : null;
+  const eval_count = lastDoneObj?.eval_count ?? null;
+  const eval_duration_ns = lastDoneObj?.eval_duration || 0;
+  const eval_rate = (eval_count && eval_duration_ns)
+    ? Math.round((eval_count / (eval_duration_ns / 1e9)) * 100) / 100
+    : null;
+  // Detección processor non-blocking (no esperamos, schedule en background)
+  detectProcessorFor(lastDoneObj?.model || modelHint).then((processor) => {
+    recordLLMEvent({
+      model: lastDoneObj?.model || modelHint,
+      endpoint: url,
+      flujo: flujoHint,
+      status: 'success',
+      total_ms,
+      load_ms,
+      prompt_eval_count: lastDoneObj?.prompt_eval_count ?? null,
+      eval_count,
+      eval_rate,
+      processor,
+    });
+  });
 
   return fullText;
 }

@@ -24,10 +24,15 @@
  *   - voice_telemetry      (v10 ADR-030 Regla 8: IDB para telemetría voz)
  *   - conversation_memory (v12 057.3: IDB para memoria conversacional persistente)
  *                           keyPath: id; indexes: operator_id, timestamp)
+ *   - llm_telemetry        (v13 2026-05-17: telemetría privacy-safe de calls LLM
+ *                           para Eco-Oracle Dashboard ADR-023. Captura solo
+ *                           metadata — modelo, latencia, tokens, processor
+ *                           gpu/cpu — NUNCA prompt ni respuesta. keyPath: id;
+ *                           indexes: model, flujo, created_at, status, synced)
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 12;
+export const DB_VERSION = 13;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -43,6 +48,7 @@ export const STORES = {
   PLANS: 'plans',
   VOICE_TELEMETRY: 'voice_telemetry',
   CONVERSATION_MEMORY: 'conversation_memory',
+  LLM_TELEMETRY: 'llm_telemetry',
 };
 
 let dbInstance = null;
@@ -177,6 +183,21 @@ export const openDB = async () => {
           const store = db.createObjectStore(STORES.CONVERSATION_MEMORY, { keyPath: 'id' });
           store.createIndex('operator_id', 'operator_id', { unique: false });
           store.createIndex('timestamp', 'timestamp', { unique: false });
+        }
+      }
+
+      // v13: llm_telemetry — metadata privacy-safe de cada call LLM
+      // (ollamaStream + openaiStream). Captura solo modelo, latencia, tokens,
+      // processor gpu/cpu — NUNCA prompt ni respuesta. Alimenta Eco-Oracle
+      // Dashboard (ADR-023) sección LLM + GPU.
+      if (event.oldVersion < 13) {
+        if (!db.objectStoreNames.contains(STORES.LLM_TELEMETRY)) {
+          const store = db.createObjectStore(STORES.LLM_TELEMETRY, { keyPath: 'id' });
+          store.createIndex('model', 'model', { unique: false });
+          store.createIndex('flujo', 'flujo', { unique: false });
+          store.createIndex('created_at', 'created_at', { unique: false });
+          store.createIndex('status', 'status', { unique: false });
+          store.createIndex('synced', 'synced', { unique: false });
         }
       }
     };

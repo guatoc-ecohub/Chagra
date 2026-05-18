@@ -46,6 +46,7 @@ const OnboardingPiloto = lazy(() => import('./components/OnboardingPiloto'));
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
 const ProfileScreen = lazy(() => import('./components/ProfileScreen'));
 const VoiceTelemetryScreen = lazy(() => import('./components/VoiceTelemetryScreen'));
+const LLMTelemetryScreen = lazy(() => import('./components/LLMTelemetryScreen'));
 const CaseStudyScreen = lazy(() => import('./components/CaseStudyScreen'));
 const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
 const CaseStudyTopWidget = lazy(() => import('./components/CaseStudyTopWidget'));
@@ -382,6 +383,8 @@ export default function App() {
         return <ProfileScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />;
       case 'voice_telemetry':
         return <VoiceTelemetryScreen onBack={() => navigate('perfil')} />;
+      case 'llm_telemetry':
+        return <LLMTelemetryScreen onBack={() => navigate('perfil')} />;
       case 'casos':
         return (
           <CaseStudyScreen

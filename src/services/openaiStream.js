@@ -23,7 +23,42 @@
  *   proxy_cache off;
  *   chunked_transfer_encoding on;
  * (configurado en hosts/alpha/default.nix, mismo patrón que /api/ollama/).
+ *
+ * Telemetría (v13 2026-05-17): cada call registra evento privacy-safe en
+ * IDB `llm_telemetry` con modelo, latencia, tokens, processor (gpu/cpu).
+ * NUNCA persiste prompt ni respuesta. Falla silente.
  */
+
+import { recordLLMEvent } from './llmTelemetryService';
+import { getGpuSnapshot } from './gpuTelemetryService';
+
+const detectProcessorFor = async (model) => {
+  try {
+    const snapshot = await getGpuSnapshot();
+    if (!snapshot?.available) return 'unknown';
+    const entry = snapshot.models.find((m) => m.name === model || m.name?.startsWith(`${model}:`) || model?.startsWith(`${m.name}`));
+    if (!entry) return 'unknown';
+    return entry.processor === 'partial' ? 'partial' : entry.processor;
+  } catch (_) {
+    return 'unknown';
+  }
+};
+
+const classifyError = (err, status) => {
+  if (err?.name === 'AbortError') return 'abort';
+  if (status >= 500) return 'http_5xx';
+  if (status >= 400) return 'http_4xx';
+  if (err?.message?.toLowerCase().includes('network')) return 'network';
+  if (err?.message?.toLowerCase().includes('timeout')) return 'timeout';
+  return 'network';
+};
+
+const inferFlujo = (url, body) => {
+  if (body?.flujo) return body.flujo;
+  if (typeof url !== 'string') return 'other';
+  if (url.includes('/v1/chat/completions')) return 'chat';
+  return 'other';
+};
 
 const SSE_DATA_PREFIX = 'data: ';
 
@@ -67,24 +102,57 @@ const isDoneChunk = (parsed) =>
  * @throws {Error} si fetch falla, no-2xx, o body no streameable.
  */
 export async function streamOpenAI(url, body, onToken, { signal, onDone } = {}) {
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'text/event-stream',
-    },
-    body: JSON.stringify({ ...body, stream: true }),
-    signal,
-  });
+  const t0 = Date.now();
+  const modelHint = body?.model || 'unknown';
+  const flujoHint = inferFlujo(url, body);
+  let response;
+
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'text/event-stream',
+      },
+      body: JSON.stringify({ ...body, stream: true }),
+      signal,
+    });
+  } catch (err) {
+    recordLLMEvent({
+      model: modelHint,
+      endpoint: url,
+      flujo: flujoHint,
+      status: err?.name === 'AbortError' ? 'abort' : 'error',
+      total_ms: Date.now() - t0,
+      error_kind: classifyError(err, 0),
+    });
+    throw err;
+  }
 
   if (!response.ok) {
     let detail = '';
     try { detail = await response.text(); } catch (_) { /* noop */ }
     const { buildCleanErrorMessage } = await import('./sanitizeError.js');
     const ctype = response.headers?.get?.('content-type') || '';
+    recordLLMEvent({
+      model: modelHint,
+      endpoint: url,
+      flujo: flujoHint,
+      status: 'error',
+      total_ms: Date.now() - t0,
+      error_kind: classifyError(null, response.status),
+    });
     throw new Error(buildCleanErrorMessage('LLM', response.status, response.statusText, detail, ctype));
   }
   if (!response.body) {
+    recordLLMEvent({
+      model: modelHint,
+      endpoint: url,
+      flujo: flujoHint,
+      status: 'error',
+      total_ms: Date.now() - t0,
+      error_kind: 'parse',
+    });
     throw new Error('Respuesta sin body streameable (¿buffering del proxy?)');
   }
 
@@ -132,6 +200,16 @@ export async function streamOpenAI(url, body, onToken, { signal, onDone } = {}) 
         if (done) break;
       }
     }
+  } catch (err) {
+    recordLLMEvent({
+      model: lastParsed?.model || modelHint,
+      endpoint: url,
+      flujo: flujoHint,
+      status: err?.name === 'AbortError' ? 'abort' : 'error',
+      total_ms: Date.now() - t0,
+      error_kind: classifyError(err, 0),
+    });
+    throw err;
   } finally {
     try { reader.releaseLock(); } catch (_) { /* noop */ }
   }
@@ -139,6 +217,30 @@ export async function streamOpenAI(url, body, onToken, { signal, onDone } = {}) 
   if (onDone && lastParsed) {
     try { onDone(lastParsed); } catch (_) { /* noop */ }
   }
+
+  // Telemetría privacy-safe.
+  const total_ms = Date.now() - t0;
+  const usage = lastParsed?.usage || null;
+  const eval_count = usage?.completion_tokens ?? null;
+  const prompt_eval_count = usage?.prompt_tokens ?? null;
+  // OpenAI-compatible no expone eval_duration. Estimación tokens/s sobre wall-clock.
+  const eval_rate = (eval_count && total_ms)
+    ? Math.round((eval_count / (total_ms / 1000)) * 100) / 100
+    : null;
+  detectProcessorFor(lastParsed?.model || modelHint).then((processor) => {
+    recordLLMEvent({
+      model: lastParsed?.model || modelHint,
+      endpoint: url,
+      flujo: flujoHint,
+      status: 'success',
+      total_ms,
+      load_ms: null,
+      prompt_eval_count,
+      eval_count,
+      eval_rate,
+      processor,
+    });
+  });
 
   return fullText;
 }
