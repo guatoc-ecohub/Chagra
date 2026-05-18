@@ -31542,6 +31542,196 @@
         "cenicafe-manual-cafetero-2013"
       ],
       "tracking_mode": "individual"
+    },
+    {
+      "id": "persea_americana",
+      "nombre_comun": "Aguacate",
+      "nombre_cientifico": "Persea americana Mill.",
+      "familia_botanica": "Lauraceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 800,
+        "optimo_max": 2200,
+        "max_absoluto": 2500
+      },
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "tracking_mode": "individual",
+      "valor_pedagogico": "El aguacate (Persea americana Mill., Lauraceae) es uno de los frutales nativos americanos más importantes y emblemáticos de la agricultura colombiana, con producción concentrada en Antioquia, Tolima, Caldas, Quindío, Risaralda, Valle del Cauca y Cundinamarca. Variedades dominantes en Colombia: Hass (mayoritaria exportación), Lorena, Choquette, Booth, Trapp, criollos antillanos. Cultivo perenne 3-30 m altura con sistema radical superficial sensible a encharcamiento — requiere drenaje EXCELENTE (suelos francos a franco-arenosos, pH 5.5-6.5). Floración tipo A/B con dicogamia (mecanismo de polinización cruzada que requiere coexistencia de tipos florales A y B para fructificación máxima — lección agroecológica de biodiversidad funcional). Manejo: trasplante 6-8 meses post-vivero, distancia 7x7 m (Hass) a 9x9 m (criollos), tutorado primer año, poda de formación años 2-4, cosecha desde año 3-5 hasta año 25+. Plagas: trips (Frankliniella), ácaros, monalonion. Enfermedades graves: Phytophthora cinnamomi (muerte de la raíz), antracnosis, mancha negra. Manejo agroecológico: Trichoderma harzianum + sombrío de guamo (Inga edulis) reduce 70% Phytophthora. Asocio clásico: café-aguacate-plátano en sistema multiestrato cafetero.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-manual-frutales-tropicales",
+        "perez-arbelaez-1947-plantas-utiles"
+      ]
+    },
+    {
+      "id": "mangifera_indica",
+      "nombre_comun": "Mango",
+      "nombre_cientifico": "Mangifera indica L.",
+      "familia_botanica": "Anacardiaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1200,
+        "max_absoluto": 1800
+      },
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "tracking_mode": "individual",
+      "valor_pedagogico": "El mango (Mangifera indica L., Anacardiaceae) es frutal tropical originario del subcontinente indio, naturalizado en Colombia desde el siglo XVI, hoy emblemático de Caribe, Valle del Magdalena, Tolima, Cundinamarca (Mesa-Guaduas), Caquetá. Variedades comerciales en Colombia: Tommy Atkins, Kent, Keitt, Haden, Yulima criollo, hilacha, manzano. Árbol perenne 10-40 m altura con corona globosa densa, follaje verde brillante. Fructificación estacional (Colombia: noviembre-marzo en Caribe, abril-julio en Cundinamarca), con alternancia bienal típica (un año alta producción, siguiente baja — fenómeno fisiológico común en frutales). Lección agroecológica: el mango criollo Colombia ha sido perdido masivamente por industrialización Tommy Atkins — recuperar criollos = soberanía genética. Manejo: trasplante 4-6 meses, distancia 10x10 m, poda de formación post-cosecha, tolera sequía moderada cuando ya establecido. Asocio: cacao-mango-plátano sistema cacaotero, o monocultivo. Plagas: mosca de fruta (Anastrepha obliqua), antracnosis, oidio.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-manual-frutales-tropicales",
+        "perez-arbelaez-1947-plantas-utiles"
+      ]
+    },
+    {
+      "id": "ananas_comosus",
+      "nombre_comun": "Piña",
+      "nombre_cientifico": "Ananas comosus (L.) Merr.",
+      "familia_botanica": "Bromeliaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1000,
+        "max_absoluto": 1500
+      },
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "tracking_mode": "aggregate",
+      "valor_pedagogico": "La piña (Ananas comosus, Bromeliaceae) es bromelia terrestre originaria del sur de Brasil/Paraguay, cultivada en Colombia desde tiempos precolombinos por los Tikuna y Bora. Variedades en Colombia: Gold MD-2 (industrial Santander, Llanos), Manzana (criolla cundinamarquesa), Cayena Lisa (Tolima, Magdalena). Planta perenne de 1-1.5 m con roseta de hojas espinosas rígidas, fruto múltiple sincárpico formado por fusión de 100-200 frutillas individuales. Lección agroecológica: la piña usa fotosíntesis CAM (Crassulacean Acid Metabolism — abre estomas de noche para ahorrar agua), única bromelia comestible comercial — enseña diversidad de estrategias fotosintéticas. Manejo agroecológico: propagación por hijuelos basales o corona del fruto, suelo bien drenado pH 4.5-5.5 (tolera ácido), riego escaso pero regular, cosecha 18-24 meses post-siembra, 1-2 frutos por planta antes de renovación. Asocio: maíz-piña-yuca en chagras amazónicas tradicionales.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-manual-frutales-tropicales",
+        "sinchi-amazonia-colombiana"
+      ]
+    },
+    {
+      "id": "musa_paradisiaca",
+      "nombre_comun": "Plátano",
+      "nombre_cientifico": "Musa × paradisiaca L.",
+      "familia_botanica": "Musaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1800,
+        "max_absoluto": 2200
+      },
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "tracking_mode": "aggregate",
+      "valor_pedagogico": "El plátano (Musa × paradisiaca, Musaceae) es híbrido cultivado entre Musa acuminata × Musa balbisiana, base alimentaria del campesinado colombiano. Variedades clave: Hartón (Caribe-Pacífico), Dominico Hartón (Eje cafetero), Cachaco (Antioquia), Comino, Pelipita, Manzano, Topocho. Hierba gigante 4-8 m altura (NO árbol — el tronco es pseudotallo formado por vainas foliares enrolladas), reproducción asexual por hijuelos basales (yemas del rizoma o cormo). Lección agroecológica de bioarquitectura única: el plátano se reproduce SOLO clonalmente desde siglo XIX (pérdida de semilla viable por triploidía estéril) — todas las matas son clones genéticos vulnerables a una sola plaga. Sigatoka negra (Mycosphaerella fijiensis) y Fusarium oxysporum f. sp. cubense raza 4 (Foc R4T) son amenazas globales. Manejo agroecológico: distancias 3x3 m a 4x4 m según variedad, sombrío con guamo en cafetal, deshije a 1 planta + 1 hijo + 1 nieto (cosecha continua), aplicación Trichoderma + bocashi al cuello del rizoma. Asocio multiestrato cafetero clásico.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-manual-frutales-tropicales",
+        "cenicafe-manual-cafetero-2013"
+      ]
+    },
+    {
+      "id": "citrus_latifolia",
+      "nombre_comun": "Limón Tahití",
+      "nombre_cientifico": "Citrus × latifolia (Yu. Tanaka) Tanaka",
+      "familia_botanica": "Rutaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 400,
+        "optimo_max": 1600,
+        "max_absoluto": 2000
+      },
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "tracking_mode": "individual",
+      "valor_pedagogico": "El limón Tahití o lima persa (Citrus × latifolia, Rutaceae) es híbrido cítrico triploide entre limón mexicano y cidra/limón dulce, hoy la lima ácida más cultivada en Colombia (Tolima, Cundinamarca, Antioquia, Llanos). Árbol perenne 5-8 m, espinas reducidas, frutos verdes con piel lisa-delgada, pulpa muy ácida (pH 2.0-2.5, alta vitamina C). Reproducción por injerto sobre patrones tolerantes: Volkameriana, Cleopatra, citrumelo. Lección agroecológica: el limón Tahití es CLONAL VEGETATIVAMENTE — todas las plantaciones derivan de pocos genotipos seleccionados, vulnerable a Citrus Greening (Candidatus Liberibacter asiaticus, vector Diaphorina citri psyllido). Manejo agroecológico: distancia 6x6 m, sombrío parcial primer año, fertilización balanceada con énfasis en Zn (deficiencia común síntoma característico hojas pequeñas amarillentas con nervios verdes), poda anual de mantenimiento, tutorado del injerto primeros 2 años. Asocio con leguminosas de cobertura.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-manual-frutales-tropicales",
+        "ica-resolucion-3168-2015"
+      ]
+    },
+    {
+      "id": "citrus_sinensis",
+      "nombre_comun": "Naranja",
+      "nombre_cientifico": "Citrus × sinensis (L.) Osbeck",
+      "familia_botanica": "Rutaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 400,
+        "optimo_max": 1800,
+        "max_absoluto": 2200
+      },
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "tracking_mode": "individual",
+      "valor_pedagogico": "La naranja dulce (Citrus × sinensis, Rutaceae) es híbrido cítrico originario del sudeste asiático, cultivado en Colombia desde el siglo XVI, hoy concentrado en el Eje cafetero (Quindío, Risaralda, Caldas), Santander, Antioquia, Tolima, Llanos. Variedades comerciales: Valencia tardía (mayoría exportación), Salustiana, Washington Navel, Pera, Tangelo Minneola (híbrido con mandarina). Árbol perenne 5-10 m, copa redondeada densa, flores aromáticas blancas (azahar), frutos esférico-oblongos amarillo-naranja en madurez con piel lisa-rugosa. Reproducción por injerto en patrones (mandarina Cleopatra, Carrizo citrange, lima Rangpur — cada patrón confiere resistencia distinta). Lección agroecológica de adaptación tropical: la naranja colombiana NO sigue el ciclo estacional europeo, fructifica 8-10 meses al año debido al clima tropical bimodal. Manejo: distancia 7x7 m, sombrío inicial con guamo o plátano, fertilización con cuidado en Zn y Mg (deficiencias comunes con síntomas visibles). Plagas críticas: HLB (Huanglongbing) o citrus greening — sin cura, manejo preventivo del vector Diaphorina citri obligatorio.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-manual-frutales-tropicales",
+        "cenicafe-manual-cafetero-2013"
+      ]
     }
   ],
   "biopreparados": [
