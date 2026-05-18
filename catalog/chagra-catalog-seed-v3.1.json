@@ -21922,18 +21922,17 @@
       ],
       "nombre_cientifico": "Phytelephas seemannii O.F.Cook",
       "familia_botanica": "Arecaceae",
-      "category": "frutales_nativos",
+      "category": "frutales_perennes",
       "thermal_zones": [
         "calido"
       ],
       "estrato": "medio",
       "roles_in_guild": [
         "crop",
-        "pollinator_attractor",
-        "shade_tolerant"
+        "pollinator_attractor"
       ],
       "cultivable": true,
-      "conservation_status": "casi_amenazada",
+      "conservation_status": "en_peligro",
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 50,
@@ -21983,7 +21982,7 @@
       ],
       "nombre_cientifico": "Mauritia flexuosa L.f.",
       "familia_botanica": "Arecaceae",
-      "category": "frutales_nativos",
+      "category": "frutales_perennes",
       "thermal_zones": [
         "calido"
       ],
@@ -21994,7 +21993,7 @@
         "nitrogen_fixer"
       ],
       "cultivable": true,
-      "conservation_status": "preocupacion_menor",
+      "conservation_status": "no_evaluada",
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 50,
@@ -22008,8 +22007,8 @@
         "max_tolerable": 38
       },
       "radiacion": "sol_pleno",
-      "agua": "muy_alto",
-      "drenaje_requerido": "encharcado",
+      "agua": "alto",
+      "drenaje_requerido": "pantanoso",
       "propagation": {
         "methods": [
           "semilla"
@@ -22044,18 +22043,17 @@
       ],
       "nombre_cientifico": "Oenocarpus mapora H.Karst.",
       "familia_botanica": "Arecaceae",
-      "category": "frutales_nativos",
+      "category": "frutales_perennes",
       "thermal_zones": [
         "calido"
       ],
       "estrato": "alto",
       "roles_in_guild": [
         "crop",
-        "pollinator_attractor",
-        "shade_tolerant"
+        "pollinator_attractor"
       ],
       "cultivable": true,
-      "conservation_status": "preocupacion_menor",
+      "conservation_status": "no_evaluada",
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 100,
@@ -22103,18 +22101,17 @@
       ],
       "nombre_cientifico": "Borojoa sorbilis (Ducke) Cuatrec.",
       "familia_botanica": "Rubiaceae",
-      "category": "frutales_nativos",
+      "category": "frutales_perennes",
       "thermal_zones": [
         "calido"
       ],
       "estrato": "medio",
       "roles_in_guild": [
         "crop",
-        "pollinator_attractor",
-        "shade_tolerant"
+        "pollinator_attractor"
       ],
       "cultivable": true,
-      "conservation_status": "datos_insuficientes",
+      "conservation_status": "no_evaluada",
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 50,
@@ -22128,7 +22125,7 @@
         "max_tolerable": 36
       },
       "radiacion": "sombra_parcial",
-      "agua": "muy_alto",
+      "agua": "alto",
       "drenaje_requerido": "moderado",
       "propagation": {
         "methods": [
@@ -22165,18 +22162,17 @@
       ],
       "nombre_cientifico": "Theobroma bicolor Humb. & Bonpl.",
       "familia_botanica": "Malvaceae",
-      "category": "frutales_nativos",
+      "category": "frutales_perennes",
       "thermal_zones": [
         "calido"
       ],
       "estrato": "medio",
       "roles_in_guild": [
         "crop",
-        "pollinator_attractor",
-        "shade_tolerant"
+        "pollinator_attractor"
       ],
       "cultivable": true,
-      "conservation_status": "preocupacion_menor",
+      "conservation_status": "no_evaluada",
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 100,
@@ -22226,15 +22222,14 @@
       ],
       "nombre_cientifico": "Myristica fragrans Houtt.",
       "familia_botanica": "Myristicaceae",
-      "category": "aromaticas_condimentarias",
+      "category": "medicinales_alelopaticas",
       "thermal_zones": [
         "calido"
       ],
       "estrato": "medio",
       "roles_in_guild": [
         "crop",
-        "pollinator_attractor",
-        "shade_tolerant"
+        "pollinator_attractor"
       ],
       "cultivable": true,
       "conservation_status": "naturalizada",
@@ -22286,7 +22281,7 @@
       ],
       "nombre_cientifico": "Pourouma cecropiifolia Mart.",
       "familia_botanica": "Urticaceae",
-      "category": "frutales_nativos",
+      "category": "frutales_perennes",
       "thermal_zones": [
         "calido"
       ],
@@ -22296,7 +22291,7 @@
         "pollinator_attractor"
       ],
       "cultivable": true,
-      "conservation_status": "preocupacion_menor",
+      "conservation_status": "no_evaluada",
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 100,
@@ -22345,18 +22340,17 @@
       ],
       "nombre_cientifico": "Garcinia madruno (Kunth) Hammel",
       "familia_botanica": "Clusiaceae",
-      "category": "frutales_nativos",
+      "category": "frutales_perennes",
       "thermal_zones": [
         "calido"
       ],
       "estrato": "medio",
       "roles_in_guild": [
         "crop",
-        "pollinator_attractor",
-        "shade_tolerant"
+        "pollinator_attractor"
       ],
       "cultivable": true,
-      "conservation_status": "preocupacion_menor",
+      "conservation_status": "no_evaluada",
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 100,
@@ -22408,7 +22402,7 @@
       ],
       "nombre_cientifico": "Couma macrocarpa Barb.Rodr.",
       "familia_botanica": "Apocynaceae",
-      "category": "frutales_nativos",
+      "category": "frutales_perennes",
       "thermal_zones": [
         "calido"
       ],
@@ -22418,7 +22412,7 @@
         "pollinator_attractor"
       ],
       "cultivable": true,
-      "conservation_status": "preocupacion_menor",
+      "conservation_status": "no_evaluada",
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 50,
@@ -22467,18 +22461,17 @@
       ],
       "nombre_cientifico": "Pouteria torta (Mart.) Radlk.",
       "familia_botanica": "Sapotaceae",
-      "category": "frutales_nativos",
+      "category": "frutales_perennes",
       "thermal_zones": [
         "calido"
       ],
       "estrato": "alto",
       "roles_in_guild": [
         "crop",
-        "pollinator_attractor",
-        "shade_tolerant"
+        "pollinator_attractor"
       ],
       "cultivable": true,
-      "conservation_status": "preocupacion_menor",
+      "conservation_status": "no_evaluada",
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 100,
