@@ -2930,17 +2930,41 @@
     {
       "id": "pinus_patula",
       "nombre_comun": "Pino pátula",
+      "nombre_comunes_regionales": [
+        "pino pátula",
+        "pino llorón",
+        "pino colombiano",
+        "ocote"
+      ],
       "nombre_cientifico": "Pinus patula Schiede ex Schltdl. & Cham.",
       "familia_botanica": "Pinaceae",
       "category": "especies_invasoras",
       "thermal_zones": [
         "frio"
       ],
+      "estrato": "alto",
+      "habito": "arbol_conifera 20-35m",
+      "origen": "Mesoamérica (México, Sierra Madre Oriental)",
       "roles_in_guild": [
         "invasive"
       ],
       "cultivable": false,
       "conservation_status": "invasor",
+      "clasificacion_uicn": "No listada en ISSG-100; categorizada como invasora regional por IAvH y CAR Cundinamarca en ecosistemas altoandinos colombianos",
+      "normativa_colombiana": [
+        {
+          "norma": "Resolución 684 de 2018 del Ministerio de Ambiente y Desarrollo Sostenible",
+          "alcance": "Lineamientos nacionales para prevención, manejo integral y restauración de áreas afectadas por especies exóticas con potencial invasor; coníferas exóticas referenciadas en anexos técnicos"
+        },
+        {
+          "norma": "Resolución CAR Cundinamarca lineamientos restauración cerros orientales y subpáramo",
+          "alcance": "Restricción de nuevas plantaciones de coníferas exóticas en áreas de importancia ambiental y obligatoriedad de manejo de remanentes en restauración"
+        },
+        {
+          "norma": "Ley 1930 de 2018 (Páramos)",
+          "alcance": "Prohíbe plantaciones forestales con especies exóticas en complejos paramunos y áreas de transición bosque-páramo"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 1800,
         "optimo_min": 2200,
@@ -2960,12 +2984,71 @@
         "metodo_principal": "semilla",
         "notas": "Las acículas acidifican el suelo; requiere limpieza de sitio post-tala."
       },
+      "impacto_ecologico": "alto",
+      "ecosistemas_afectados": [
+        "bosque_alto_andino",
+        "robledales",
+        "subparamo",
+        "bordes_paramo",
+        "matorrales_andinos",
+        "cuencas_abastecedoras_agua"
+      ],
+      "mecanismos_invasion": [
+        "Alelopatía: acículas resinosas liberan terpenos y fenoles que inhiben germinación de nativas (roble negro, encenillo, aliso)",
+        "Acidificación progresiva del suelo (pH puede descender de 5.5 a 4.0 bajo dosel de pino)",
+        "Mantillo no degradable forma capa gruesa que bloquea regeneración del banco de semillas nativo",
+        "Sombra densa permanente reduce radiación al sotobosque por debajo del umbral de regeneración",
+        "Reducción significativa de rendimiento hídrico de cuenca por alto consumo de agua",
+        "Dispersión por viento desde plantaciones forestales hacia remanentes nativos (regeneración wildlings hasta 200m)",
+        "Aumento de carga de combustible fino (acículas, resina) y riesgo de incendios de copa"
+      ],
+      "metodos_extraccion": [
+        {
+          "metodo": "clearcut_por_nucleos",
+          "efectividad": "alta",
+          "costo": "alto",
+          "notas": "Tala rasa por núcleos de 0.5-2 ha intercalados con remanentes nativos; permite replante inmediato y evita erosión masiva; preferido en plantaciones consolidadas"
+        },
+        {
+          "metodo": "descortezamiento_anillo",
+          "efectividad": "alta",
+          "costo": "bajo",
+          "notas": "Anillado completo a 1.3m de altura (DAP); el árbol muere de pie en 1-3 años permitiendo regeneración paulatina del sotobosque; preferido para árboles aislados o dispersos en restauración"
+        },
+        {
+          "metodo": "extraccion_plantulas_wildlings",
+          "efectividad": "alta",
+          "costo": "medio",
+          "notas": "Arrancado manual de plántulas <1m antes de establecer raíz pivotante profunda; obligatorio en zonas de amortiguación a plantaciones madre"
+        },
+        {
+          "metodo": "fuego_controlado",
+          "efectividad": "NEGATIVA",
+          "costo": "bajo",
+          "notas": "PROHIBIDO: pino patula tiene cortezas semi-serotinas; algunas semillas resisten fuego de baja intensidad y la quema elimina sotobosque nativo dejando suelo libre para colonización agresiva"
+        }
+      ],
+      "epoca_optima_remocion": "Tala rasa: temporada seca (diciembre-febrero altiplano) para minimizar erosión y facilitar acceso. Anillado: cualquier época. Extracción de wildlings: temporada lluviosa temprana cuando el suelo blando facilita arranque con raíz completa.",
       "especies_nativas_sustitutas": [
         "quercus_humboldtii",
-        "weinmannia_tomentosa"
+        "weinmannia_tomentosa",
+        "alnus_acuminata",
+        "escallonia_paniculata",
+        "miconia_squamulosa"
       ],
+      "manejo_biomasa_extraida": "aprovechamiento_madera_in_situ",
+      "_nota_manejo_biomasa": "La madera tiene valor comercial: aprovechar como aserrío, postes o leña para evitar acumulación de combustible. Acículas y ramaje fino: NO dejar en sitio (acidifican y bloquean regeneración); retirar para compostaje termofílico en sitio separado o disposición controlada. Resina y conos: incineración controlada (los conos contienen semillas viables).",
+      "riesgo_rebrote": "bajo",
+      "_nota_rebrote": "Pinus patula NO rebrota de tocón (a diferencia de retamo); riesgo principal es regeneración por banco de semillas en el suelo y wildlings dispersos desde plantaciones vecinas. Monitoreo de plántulas obligatorio.",
+      "protocolo_post_remocion": "Restauración activa obligatoria: siembra de roble negro (Q. humboldtii), aliso (A. acuminata fijador de N que corrige acidificación) y encenillo (W. tomentosa) en densidad 1100-1600 ind/ha al siguiente semestre lluvioso. Encalado opcional con cal dolomítica si pH<4.5. Monitoreo semestral de wildlings por 5 años; arranque inmediato de cualquier plántula <1m. Restaurar capa de mantillo nativo retirando acículas residuales año 1 y 2.",
+      "validation_level": "operator_reviewed",
       "source_ids": [
         "calderon-saenz-2003-invasoras",
+        "humboldt-invasoras-andes",
+        "res-684-2018-mads",
+        "ley-1930-2018-paramos",
+        "car-cundi-2019",
+        "restauracion-cruz-verde-sumapaz",
         "gbif-taxonomic-backbone",
         "powo-kew"
       ],
@@ -3090,6 +3173,22 @@
       "conservation_status": "invasor",
       "_nota_conservacion": "Especie con distribución cosmopolita; en Colombia se comporta como invasor agresivo post-disturbio. Tóxica para ganado y potencialmente cancerígena (ptaquiloside).",
       "habito": "helecho rizomatoso 0.5-2m",
+      "origen": "Cosmopolita (taxón complejo de distribución mundial; en Colombia var. caudatum y var. arachnoideum se comportan como invasoras agresivas post-disturbio en zonas andinas)",
+      "clasificacion_uicn": "Categorizada como 'invasora transformadora' (transformer species) por la categoría Richardson et al. en literatura ecológica internacional; IAvH la lista en plataformas de invasoras de Colombia por su agresividad post-fuego en ecosistemas andinos",
+      "normativa_colombiana": [
+        {
+          "norma": "Resolución 684 de 2018 del Ministerio de Ambiente y Desarrollo Sostenible",
+          "alcance": "Lineamientos nacionales para prevención, manejo integral y restauración de áreas afectadas; P. aquilinum referenciado en protocolos de restauración post-incendio en bosque altoandino y subpáramo"
+        },
+        {
+          "norma": "Ley 1930 de 2018 (Páramos)",
+          "alcance": "Marco regulatorio para restauración de complejos paramunos donde el helecho marranero es invasora prioritaria post-disturbio (incendios, ganadería)"
+        },
+        {
+          "norma": "ICA - normativa sanitaria pecuaria",
+          "alcance": "Riesgo sanitario reconocido para ganado bovino (intoxicación enzoótica hematúrica, carcinogénesis); recomendación de erradicación en potreros activos"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 1500,
@@ -3105,45 +3204,60 @@
         "cicatrices_fuego"
       ],
       "mecanismos_invasion": [
-        "Rizomas profundos (hasta 1m) y extensos resistentes a remoción",
-        "Producción masiva de esporas con dispersión eólica de larga distancia",
-        "Alelopatía inhibe germinación de nativas",
-        "Tolerancia al fuego; rebrota desde rizoma",
-        "Compuestos tóxicos (ptaquiloside, tiaminasa) desalientan herbivoría"
+        "Rizomas profundos (hasta 1m) y extensos resistentes a remoción mecánica; banco de yemas latentes",
+        "Producción masiva de esporas con dispersión eólica de larga distancia (banco de esporas durmiente en suelo)",
+        "Alelopatía: rizomas y frondes liberan compuestos fenólicos que inhiben germinación de nativas",
+        "Tolerancia y favorecimiento por fuego: rebrota vigorosamente desde rizoma post-quema mientras nativas mueren",
+        "Compuestos tóxicos (ptaquilósido, tiaminasa, ácido prúsico) desalientan herbivoría por ganado y fauna silvestre permitiendo monopolización del estrato bajo",
+        "Establecimiento agresivo en suelos compactados, pisoteados o post-incendio donde la regeneración nativa está inhibida"
       ],
       "metodos_extraccion": [
         {
           "metodo": "desenraice_completo",
           "efectividad": "media",
           "costo": "alto",
-          "notas": "Rizomas profundos y extensos dificultan extracción total"
+          "notas": "Rizomas profundos y extensos dificultan extracción total; requiere EPP completo (guantes, mascarilla N95, manga larga) por riesgo de ptaquilósido en savia y esporas"
         },
         {
           "metodo": "corte_bajo_repetido",
           "efectividad": "alta",
           "costo": "medio",
-          "notas": "Corte mensual durante 2-3 temporadas agota reservas del rizoma"
+          "notas": "Corte mensual durante 2-3 temporadas agota reservas del rizoma; método preferido en áreas extensas; usar EPP por exposición a esporas"
         },
         {
           "metodo": "sombra_forzada",
           "efectividad": "alta",
           "costo": "alto",
-          "notas": "Plantación de especies arbóreas nativas que den sombra densa; el helecho es intolerante a sombra"
+          "notas": "Plantación de especies arbóreas nativas que den sombra densa; el helecho es intolerante a sombra cerrada; preferido como estrategia de largo plazo combinada con corte inicial"
+        },
+        {
+          "metodo": "fuego_controlado",
+          "efectividad": "NEGATIVA",
+          "costo": "bajo",
+          "notas": "PROHIBIDO: el fuego estimula rebrote vigoroso del rizoma y elimina competidoras nativas; empeora la invasión y aumenta exposición de fauna y humanos a ptaquilósido en cenizas"
         }
       ],
-      "epoca_optima_remocion": "Previo a formación de frondes maduras (temporada lluviosa temprana)",
+      "epoca_optima_remocion": "Previo a formación de frondes maduras y antes de esporulación (temporada lluviosa temprana). Evitar manejo durante esporulación (frondes maduras café-doradas) por riesgo respiratorio. Usar EPP en toda manipulación.",
       "especies_nativas_sustitutas": [
         "alnus_acuminata",
         "weinmannia_tomentosa",
-        "miconia_squamulosa"
+        "miconia_squamulosa",
+        "hesperomeles_goudotiana",
+        "vallea_stipularis"
       ],
-      "manejo_biomasa_extraida": "incineracion_controlada O entierro_profundo",
-      "_nota_manejo": "Evitar contacto prolongado sin protección (esporas potencialmente cancerígenas). No usar como forraje ni cama para ganado.",
+      "manejo_biomasa_extraida": "incineracion_controlada",
+      "_nota_manejo": "Evitar contacto prolongado sin protección (esporas potencialmente cancerígenas). No usar como forraje ni cama para ganado. Manipulación SIEMPRE con EPP (guantes, mascarilla N95, manga larga, gafas). NO compostar (las esporas y ptaquilósido sobreviven compostaje doméstico). NO entierro superficial: incineración controlada en sitio autorizado o entierro a >1m de profundidad con cubierta de cal. NUNCA quemar in situ junto a viviendas, escuelas o corrales por riesgo de inhalación de humo con compuestos tóxicos.",
       "riesgo_rebrote": "muy_alto",
+      "_nota_riesgo_sanitario": "RIESGO SANITARIO ELEVADO: ptaquilósido es carcinógeno comprobado en humanos (cáncer gástrico, esofágico, vejiga) por exposición directa o vía leche de ganado pastoreado en zonas invadidas. Tiaminasa causa intoxicación aguda en bovinos (síndrome hemorrágico, hematuria enzoótica bovina). En zonas rurales con invasión consolidada: NO permitir pastoreo bovino, NO consumir leche cruda local, NO usar agua de manantiales sin tratamiento. Comunicar riesgo a comunidad antes de remoción.",
+      "protocolo_post_remocion": "Restauración activa obligatoria: siembra de especies nativas competidoras de rápido crecimiento (Alnus acuminata, Weinmannia tomentosa, Miconia squamulosa) en densidad 1600 ind/ha al siguiente semestre lluvioso para forzar sombra. Cobertura del suelo con mulch grueso para suprimir esporas en banco superficial. Monitoreo trimestral de rebrotes por 5 años; corte inmediato de cualquier fronde emergente (NO permitir formación de frondes maduras). Año 2-3: revisar establecimiento de dosel arbóreo (>50% cobertura) para asegurar exclusión por sombra. Mantener exclusión de ganado por mínimo 3 años.",
       "foto_referencia_sugerida": "https://commons.wikimedia.org/wiki/Category:Pteridium_aquilinum",
       "validation_level": "operator_reviewed",
       "source_ids": [
         "flora-colombia-pteridophyta",
+        "humboldt-invasoras-andes",
+        "res-684-2018-mads",
+        "ley-1930-2018-paramos",
+        "restauracion-cruz-verde-sumapaz",
         "gbif-taxonomic-backbone",
         "powo-kew"
       ],
@@ -3299,6 +3413,12 @@
     {
       "id": "rubus_alceifolius",
       "nombre_comun": "Mora silvestre asiática",
+      "nombre_comunes_regionales": [
+        "mora gigante asiática",
+        "zarza asiática",
+        "mora trepadora",
+        "matorral espinoso"
+      ],
       "nombre_cientifico": "Rubus alceifolius Poir.",
       "familia_botanica": "Rosaceae",
       "category": "especies_invasoras",
@@ -3306,11 +3426,25 @@
         "templado",
         "frio"
       ],
+      "estrato": "medio",
+      "habito": "arbusto trepador espinoso 2-4m",
+      "origen": "Sureste asiático (Indomalaya: Indonesia, Malasia, Vietnam, sur de China)",
       "roles_in_guild": [
         "invasive"
       ],
       "cultivable": false,
       "conservation_status": "invasor",
+      "clasificacion_uicn": "Listada por ISSG-UICN como especie invasora de alto impacto en regiones tropicales y subtropicales (impacto demostrado en La Réunion, Madagascar, Australia, Sudamérica); referenciada en res-684/2018 MADS",
+      "normativa_colombiana": [
+        {
+          "norma": "Resolución 684 de 2018 del Ministerio de Ambiente y Desarrollo Sostenible",
+          "alcance": "Listada en anexos técnicos como especie con potencial invasor en zonas andinas y subandinas; lineamientos para prevención y manejo"
+        },
+        {
+          "norma": "Resolución CAR Cundinamarca - lineamientos restauración cuencas",
+          "alcance": "Manejo prioritario en bordes de quebrada, cercas vivas y áreas de regeneración natural en jurisdicción CAR"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 1200,
         "optimo_min": 1600,
@@ -3330,12 +3464,69 @@
         "metodo_principal": "semilla",
         "notas": "Crecimiento extremadamente vigoroso; forma túneles que entierran a las especies nativas."
       },
-      "especies_nativas_sustitutas": [
-        "rubus_glaucus_sin_espinas"
+      "impacto_ecologico": "alto",
+      "ecosistemas_afectados": [
+        "bosque_andino",
+        "bosque_subandino",
+        "bordes_bosque_niebla",
+        "cafetales_abandonados",
+        "potreros_degradados",
+        "bordes_quebrada",
+        "caminos_rurales"
       ],
+      "mecanismos_invasion": [
+        "Banco de semillas durmiente en suelo (viabilidad reportada >5 años en literatura ISSG)",
+        "Dispersión endozoocórica por aves frugívoras y mamíferos pequeños (largas distancias)",
+        "Rebrote vigoroso desde raíz pivotante profunda y desde fragmentos de tallo (acodo natural al tocar el suelo)",
+        "Espinas curvadas robustas impiden remoción manual eficiente y excluyen herbivoría correctora",
+        "Crecimiento rápido (hasta 5-7 m de tallo por temporada) forma zarzales densos impenetrables",
+        "Acidificación moderada del suelo y producción de mantillo lignificado que retarda regeneración nativa",
+        "Establecimiento agresivo en cafetales abandonados y áreas de borde por colonización de aves"
+      ],
+      "metodos_extraccion": [
+        {
+          "metodo": "desenraice_completo",
+          "efectividad": "alta",
+          "costo": "alto",
+          "notas": "Método preferido: corte de tallos a 30cm + arranque de raíz pivotante con palín o tractor pequeño. EPP obligatorio (guantes de cuero, manga larga, perneras) por espinas curvadas que enganchan piel y ropa"
+        },
+        {
+          "metodo": "corte_bajo_repetido",
+          "efectividad": "media",
+          "costo": "medio",
+          "notas": "Corte trimestral durante 2-3 años agota reservas de la raíz; NO funciona solo (rebrote garantizado desde raíz y banco de semillas); combinar con cobertura"
+        },
+        {
+          "metodo": "cobertura_supresora",
+          "efectividad": "alta",
+          "costo": "medio",
+          "notas": "Post-corte: cobertura de paja gruesa o cartón + mulch (>10cm) durante 6-12 meses suprime banco de semillas superficial y rebrote; combinar con plantación de sustitutas"
+        },
+        {
+          "metodo": "fuego_controlado",
+          "efectividad": "NEGATIVA",
+          "costo": "bajo",
+          "notas": "PROHIBIDO: el fuego destruye sotobosque nativo pero NO mata la raíz pivotante profunda; estimula rebrote desde raíz y germinación del banco de semillas; empeora invasión"
+        }
+      ],
+      "epoca_optima_remocion": "Temporada seca (diciembre-marzo región andina; junio-agosto Eje cafetero) ANTES de fructificación para evitar dispersión de semillas por aves. Evitar corte durante floración o fructificación (frutos rojos maduros = dispersión activa). Inicio de temporada lluviosa óptimo para plantación de sustitutas inmediatamente post-remoción.",
+      "especies_nativas_sustitutas": [
+        "rubus_glaucus_sin_espinas",
+        "rubus_glaucus",
+        "hesperomeles_goudotiana",
+        "hesperomeles_obtusifolia",
+        "miconia_squamulosa"
+      ],
+      "manejo_biomasa_extraida": "incineracion_controlada",
+      "_nota_manejo_biomasa": "Tallos espinosos: NO compostar (las semillas en frutos residuales sobreviven compostaje doméstico y las espinas presentan riesgo en manipulación posterior). Incineración controlada en sitio autorizado o disposición en relleno con trituración previa. Raíces pivotantes: secar al sol 30 días antes de disposición para asegurar muerte total. NUNCA dispersar en bosque o quebrada.",
+      "riesgo_rebrote": "muy_alto",
+      "protocolo_post_remocion": "Restauración activa obligatoria: cobertura supresora inmediata post-extracción + siembra de mora nativa (Rubus glaucus) en sistemas productivos o Hesperomeles spp. (mortiño nativo) y Miconia squamulosa en restauración ecológica, densidad 1100-1600 ind/ha al siguiente semestre lluvioso. Monitoreo trimestral de rebrotes por mínimo 5 años (banco de semillas profundo). Corte inmediato de cualquier rebrote <30cm. Año 2-3: verificar establecimiento de dosel competidor para exclusión por sombra. Educación a propietarios sobre identificación temprana en cercas vivas y bordes de cafetal.",
+      "validation_level": "operator_reviewed",
       "source_ids": [
         "issg-uicn-invasoras",
         "res-684-2018-mads",
+        "humboldt-invasoras-andes",
+        "calderon-saenz-2003-invasoras",
         "sib-colombia",
         "gbif-taxonomic-backbone",
         "powo-kew"
@@ -3921,8 +4112,23 @@
       "cultivable": false,
       "_nota_cultivable": "Introducida y usada como ornamental en muchas ciudades andinas; se ha escapado a ambientes naturales y es invasora en bosque alto andino y borde de subpáramo.",
       "conservation_status": "invasor",
-      "origen": "África oriental y austral",
+      "origen": "África oriental y austral (Kenia, Tanzania, Mozambique, Sudáfrica; cuencas del Rift y costa índica)",
       "habito": "trepadora herbácea perenne 2-8m",
+      "clasificacion_uicn": "Listada por ISSG-UICN como especie invasora de ámbito global (Global Invasive Species Database); IAvH la clasifica como invasora de alta amenaza para ecosistemas andinos colombianos",
+      "normativa_colombiana": [
+        {
+          "norma": "Resolución 684 de 2018 del Ministerio de Ambiente y Desarrollo Sostenible",
+          "alcance": "Listada en anexos técnicos como especie con potencial invasor; lineamientos para prevención, control de comercialización ornamental y manejo en áreas naturales"
+        },
+        {
+          "norma": "Resolución CAR Cundinamarca lineamientos cerros orientales",
+          "alcance": "Restricción de uso ornamental en jardinería urbana adyacente a áreas de importancia ambiental; obligatoriedad de remoción en restauración"
+        },
+        {
+          "norma": "Lineamiento IAvH para jardinería ecológica andina",
+          "alcance": "Recomendación de sustitución por enredaderas nativas en cercas vivas y jardinería urbana de la región andina"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 1500,
         "optimo_min": 2000,
@@ -3934,40 +4140,64 @@
         "bosque_alto_andino",
         "subparamo",
         "bordes_bosque_niebla",
-        "cercos_vivos_urbanos"
+        "cercos_vivos_urbanos",
+        "bordes_quebrada_urbanos",
+        "cafetales_con_sombra"
       ],
       "mecanismos_invasion": [
-        "Crecimiento trepador rápido que cubre y asfixia vegetación nativa",
-        "Producción masiva de semillas",
-        "Dispersión por aves (endozoocoria)",
-        "Regeneración vegetativa por trozos de tallo",
-        "Asfixia de sotobosque al formar dosel denso"
+        "Crecimiento trepador rápido (hasta 8m/temporada) que cubre y asfixia vegetación nativa por exclusión lumínica",
+        "Producción masiva de semillas con dispersión a corta-media distancia",
+        "Dispersión por aves (endozoocoria) facilita salto desde jardines urbanos a remanentes naturales adyacentes",
+        "Regeneración vegetativa por fragmentos de tallo enraizados (acodo natural al contactar suelo)",
+        "Formación de dosel trepador denso que asfixia sotobosque y regeneración natural",
+        "Tubérculos radiculares pequeños que rebrotan tras corte aéreo (banco de yemas latentes)",
+        "Escape desde jardinería ornamental: principal vector es plantación deliberada en cercas vivas urbanas"
       ],
       "metodos_extraccion": [
         {
           "metodo": "desenraice_completo",
           "efectividad": "alta",
-          "costo": "medio"
+          "costo": "medio",
+          "notas": "Método preferido: aflojar suelo, extraer raíz pivotante y tubérculos radiculares completos; revisar 30cm alrededor por fragmentos enraizados"
         },
         {
           "metodo": "corte_bajo_repetido",
           "efectividad": "media",
           "costo": "bajo",
-          "notas": "Debe combinarse con extracción de raíz para evitar rebrote"
+          "notas": "Debe combinarse con extracción de raíz para evitar rebrote; corte mensual durante 2-3 temporadas si no se puede desenraizar"
+        },
+        {
+          "metodo": "extraccion_dosel_trepador",
+          "efectividad": "alta",
+          "costo": "medio",
+          "notas": "En árboles invadidos: cortar tallos al pie del árbol y dejar secar el dosel trepador (no halar para evitar daño al hospedero); retirar biomasa seca tras 30-45 días"
+        },
+        {
+          "metodo": "fuego_controlado",
+          "efectividad": "NEGATIVA",
+          "costo": "bajo",
+          "notas": "PROHIBIDO: el fuego rara vez alcanza temperatura suficiente bajo dosel trepador húmedo, estimula rebrote desde tubérculos profundos y daña vegetación nativa adyacente"
         }
       ],
-      "epoca_optima_remocion": "Antes de floración (temporada seca local)",
-      "especies_nativas_sustitutas_trepadoras": [
-        "passiflora_tripartita_mollissima_NATIVA",
-        "bomarea_sp"
+      "epoca_optima_remocion": "Antes de floración (temporada seca local: diciembre-febrero altiplano cundiboyacense; junio-agosto Eje cafetero) para evitar dispersión de semillas. Evitar manejo durante fructificación (semillas en cápsulas maduras dispersan al ser manipuladas). Inicio de temporada lluviosa óptimo para plantación de sustitutas inmediatamente post-remoción.",
+      "especies_nativas_sustitutas": [
+        "passiflora_tripartita_mollissima",
+        "passiflora_ligularis"
       ],
-      "manejo_biomasa_extraida": "compostaje_termofilico O incineracion_controlada",
+      "_nota_especies_sustitutas": "Sustitutas para uso ornamental/cercas vivas: Passiflora tripartita var. mollissima (curuba de Castilla nativa) y Passiflora ligularis (granadilla) cubren la misma función estética y productiva. En jardinería ecológica andina también recomendar Bomarea spp. (no listada como id propio aún en el catálogo).",
+      "manejo_biomasa_extraida": "incineracion_controlada",
+      "_nota_manejo_biomasa": "Tallos y hojas: NO compostar (los fragmentos de tallo enraízan en compost doméstico y las semillas sobreviven). Secar al sol 30 días antes de incinerar o disposición en relleno sanitario. Tubérculos radiculares: trituración mecánica + secado >30 días o incineración directa. NUNCA dispersar fragmentos en bosque, quebrada o jardín de vecinos.",
       "riesgo_rebrote": "alto",
+      "protocolo_post_remocion": "Restauración activa obligatoria: siembra de enredaderas nativas (Passiflora tripartita mollissima nativa, Passiflora ligularis) en cercas vivas reemplazo o restauración con Miconia squamulosa y Hesperomeles spp. en bordes naturales, densidad 800-1100 ind/ha al siguiente semestre lluvioso. Monitoreo trimestral de rebrotes por 3 años; corte inmediato de cualquier tallo emergente <50cm. Año 1-2: revisar tubérculos radiculares residuales en radio de 1m alrededor de plantas removidas. Educación a propietarios urbanos sobre identificación y prohibición de re-plantación ornamental.",
       "foto_referencia_sugerida": "https://commons.wikimedia.org/wiki/Category:Thunbergia_alata",
       "validation_level": "operator_reviewed",
       "source_ids": [
         "humboldt-invasoras-andes",
-        "gbif-taxonomic-backbone"
+        "issg-uicn-invasoras",
+        "res-684-2018-mads",
+        "calderon-saenz-2003-invasoras",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
       ],
       "valor_pedagogico": "El ojo de poeta o suzanne de ojos negros (Thunbergia alata) es enredadera africana ornamental introducida en Colombia como cercas vivas decorativas. Naturalizada con severidad en zona cafetera, andina media y subandina (1000-2400 msnm). Estrangula vegetación nativa de bordes de quebrada, regeneración de cafetales con sombra y cercas de matarratón/quiebrabarrigo. Listada por IAvH como invasora alta amenaza. Reproducción por semilla y por fragmento de tallo enraizado. Manejo agroecológico: arrancar manualmente con rizoma completo + control biológico aún en investigación + sustituir con enredaderas nativas (passifloras nativas, Mutisia spp.). Resolución 684/2018 MADS la incluye en listado oficial."
     },
