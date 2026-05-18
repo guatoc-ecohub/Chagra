@@ -8134,9 +8134,13 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "agrosavia-forrajeras-2022",
+        "bernal-2015-plantas-liquenes-colombia",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Leccion de estructura del suelo: el daikon revela la compactacion del suelo al desarrollarse; su raiz profunda descompacta capas inferiores, funcionando como arado biologico."
+      "valor_pedagogico": "El daikon o rábano japonés (Raphanus sativus L. var. longipinnatus, familia Brassicaceae) es una brasicácea anual cultivada de raíz pivotante engrosada alargada cilíndrica blanca (longitud 30-50 cm, diámetro 6-10 cm, peso 1-3 kg) originaria de Asia oriental (China, Japón, Corea), aclimatada en huertos andinos colombianos donde funciona simultáneamente como hortaliza fresca de sabor suave-picante y como cover crop bio-drilling de uso emergente en agricultura regenerativa. Contiene glucosinolatos (glucoraphenina, glucoraphasatina), isotiocianatos volátiles, vitamina C (22 mg/100g), fibra dietaria y minerales. Se cultiva en Cundinamarca (Sabana de Bogotá, Subachoque, Cota, Madrid), Boyacá (Tunja, Villa de Leyva, Sotaquirá), Antioquia (oriente — La Ceja, Rionegro), Nariño (Pasto), Eje cafetero alto y zonas frías templadas entre 1.500 y 2.600 msnm en zona térmica templada a fría. Ciclo 70-100 días desde siembra a cosecha. Rendimientos 30-50 t/ha raíz fresca. Lección viva de estructura del suelo: el daikon revela la compactación del suelo al desarrollarse — su raíz pivotante profunda descompacta capas inferiores de subsuelo arcilloso compactado (bio-tillage drilling), funcionando como arado biológico que crea canales radiculares de 30-40 cm de profundidad que persisten en el perfil del suelo aún después de la cosecha o descomposición de la raíz, mejorando infiltración hídrica, aireación, y permitiendo desarrollo de raíces de cultivos sucesores en suelos antes inaccesibles. Manejo agroecológico: siembra directa a chorrillo en suelo profundo y suelto sin piedras, raleo a 15-20 cm entre plantas, cosecha cuando emerge corona de la raíz, alternativamente uso como cover crop pre-papa o pre-hortalizas con incorporación pre-floración, asocio con zanahoria y cebolla, no requiere agroquímicos. Fuentes Tier A: AGROSAVIA Manual Hortalizas, POWO Kew, GBIF Backbone Taxonomy, ICA Resolución 3168/2015, Bernal 2015 Catálogo Plantas Colombia."
     },
     {
       "id": "raphanus_sativus_sativus",
@@ -8176,9 +8180,12 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "bernal-2015-plantas-liquenes-colombia",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Variedad de raiz roja clasica: su color intenso indica presencia de antocianinas. Ciclo mas corto del huerto, ideal para ensenar germinacion y cosecha a ninos."
+      "valor_pedagogico": "El rábano rojo o rabanito (Raphanus sativus L. var. sativus, familia Brassicaceae) es una brasicácea anual herbácea cultivada de raíz pivotante engrosada esférica a oblonga (1-4 cm diámetro) de piel roja a rosada intensa y pulpa blanca crocante de sabor picante característico, originaria de la cuenca mediterránea-Asia central y aclimatada universalmente en huertos campesinos colombianos como hortaliza-modelo de ciclo ultra-corto para enseñanza y producción rápida. Su color rojo intenso proviene de antocianinas (pelargonidina-3-sophorósido principalmente) acumuladas en la epidermis radicular, y su sabor picante de glucosinolatos (glucoraphanina) hidrolizados por mirosinasa endógena al cortar o masticar la raíz, generando isotiocianatos pungentes. Se cultiva en Cundinamarca (Sabana de Bogotá, Sopó, Subachoque), Boyacá (Tunja, Sutamarchán), Antioquia (oriente), Nariño, Eje cafetero alto y todos los huertos urbanos colombianos entre 1.500 y 2.800 msnm en zona térmica templada a fría. Ciclo ultra-corto 25-35 días desde siembra a cosecha (el ciclo más corto del huerto andino). Rendimientos 8-15 t/ha raíz fresca, siembra escalonada cada 10-15 días para cosecha continua. Lección viva pedagógica: variedad de raíz roja clásica cuyo color intenso indica presencia de antocianinas (lección visible de pigmentos bioactivos), considerado el ciclo más corto del huerto y por ello ideal para enseñar germinación, desarrollo y cosecha a niños, estudiantes y nuevos huerteros en escuelas agroecológicas, mostrando ciclo completo de un cultivo en menos de un mes y la satisfacción del aprendizaje productivo rápido. Manejo agroecológico: siembra directa a chorrillo cada 10-15 días para cosecha escalonada continua, raleo a 3-5 cm entre plantas, cosecha cuando raíz alcanza 2-3 cm de diámetro antes de fibrosa, asocio con lechuga y zanahoria (uso eficiente de cama), no requiere agroquímicos. Fuentes Tier A: AGROSAVIA Manual Hortalizas, POWO Kew, GBIF Backbone Taxonomy, ICA Resolución 3168/2015, Bernal 2015 Catálogo Plantas Colombia."
     },
     {
       "id": "beta_vulgaris_altissima",
@@ -8218,9 +8225,13 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "fao-ecocrop",
+        "bernal-2015-plantas-liquenes-colombia",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Leccion de mejoramiento genetico: la betarraga azucarera fue seleccionada durante siglos para concentrar sacarosa, demostrando el poder de la seleccion artificial en la agricultura."
+      "valor_pedagogico": "La betarraga azucarera o remolacha azucarera (Beta vulgaris L. subsp. vulgaris var. altissima, familia Amaranthaceae, subfamilia Betoideae) es una amarantácea bienal cultivada seleccionada del complejo Beta vulgaris específicamente por su altísima concentración de sacarosa (16-22% peso fresco) en la raíz pivotante engrosada blanca-amarillenta, originada por selección artificial sistemática en Europa central (Alemania, Francia) durante los siglos XVIII-XIX por mejoradores como Achard y Vilmorin como respuesta a los bloqueos comerciales napoleónicos sobre la caña de azúcar caribeña. Aclimatada con éxito limitado en Colombia en zonas frías altas como cultivo de demostración y enseñanza agronómica. Se cultiva ocasionalmente en Cundinamarca (Sabana de Bogotá experimental), Boyacá (altiplano experimental), Nariño (Pasto) y centros de investigación agronómica entre 1.500 y 2.800 msnm en zona térmica templada a fría seca. Ciclo bienal con cosecha de raíz al primer año (8-10 meses). Rendimientos 40-70 t/ha raíz fresca con 15-20% sacarosa. Lección viva de mejoramiento genético: la betarraga azucarera fue seleccionada durante más de dos siglos para concentrar sacarosa progresivamente (de 6% en 1850 a 20% actual), demostrando el poder transformador de la selección artificial sistemática en la agricultura moderna, ilustrando conceptos clave de mejoramiento genético cuantitativo, heredabilidad de caracteres económicos, y la evolución dirigida de cultivos por intervención humana. Es planta-modelo para enseñar genética cuantitativa y selección por caracteres químicos no morfológicos. Manejo agroecológico: siembra directa en suelos profundos y ricos en potasio, raleo a 25-30 cm entre plantas, cosecha cuando raíz alcanza tamaño comercial 1-2 kg, asocio con leguminosas en rotación trianual, no compite económicamente con caña en Colombia. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA, FAO Ecocrop, Bernal 2015 Catálogo Plantas Colombia."
     },
     {
       "id": "pastinaca_sativa",
@@ -8259,9 +8270,12 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
-        "fao-ecocrop"
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "fao-ecocrop",
+        "bernal-2015-plantas-liquenes-colombia"
       ],
-      "valor_pedagogico": "Raiz europea poco conocida en Colombia que demuestra como el frio transforma la quimica de los alimentos. Su sabor dulce post-helada ensena principios de bioquimica vegetal."
+      "valor_pedagogico": "La chirivía o pastinaca (Pastinaca sativa L., familia Apiaceae, subfamilia Apioideae) es una apiácea bienal cultivada de raíz pivotante engrosada cilíndrica-cónica blanca-crema (longitud 20-35 cm, diámetro 4-8 cm) de aroma anisado-dulce intenso y textura harinosa, originaria de Eurasia templada (Europa central, Cáucaso) y aclimatada parcialmente en huertos andinos colombianos de clima frío como hortaliza de raíz alternativa a la zanahoria. Contiene azúcares (glucosa, fructosa, sacarosa, hasta 10% peso fresco), almidón, vitamina C, K, ácido fólico, potasio, y compuestos aromáticos furanocumarinas (psoraleno, bergapteno) responsables del aroma característico y de fitofototoxicidad leve por contacto. Se cultiva ocasionalmente en Cundinamarca (Sabana de Bogotá, Subachoque, Sopó), Boyacá (Tunja, Villa de Leyva, Sutamarchán), Nariño (Pasto) y Eje cafetero alto entre 1.800 y 2.800 msnm en zona térmica fría seca a templada. Ciclo bienal, cosecha de raíz al primer año (4-5 meses), conservación post-helada en suelo. Rendimientos 18-30 t/ha raíz fresca. Lección viva de bioquímica vegetal aplicada: raíz europea poco conocida en Colombia que demuestra cómo el frío transforma la química de los alimentos por conversión enzimática de almidón en azúcares solubles (sacarosa, fructosa, glucosa) como respuesta de crioprotección frente a heladas — su sabor dulce post-helada enseña principios de bioquímica vegetal de la criorresistencia y cómo la cosecha temporal estratégica (post-primera helada) optimiza calidad sensorial y nutricional, fenómeno también observado en kale, repollo, coles de Bruselas y rábano de invierno. Manejo agroecológico: siembra directa con semilla fresca (pierde viabilidad <1 año), germinación lenta 14-21 días requiere humedad superficial constante, raleo a 10-15 cm, cosecha post-primera helada (julio-agosto altiplano), conservación en suelo cubierto con paja, no requiere agroquímicos. Fuentes Tier A: AGROSAVIA, POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Bernal 2015 Catálogo Plantas Colombia."
     },
     {
       "id": "cynara_cardunculus_scolymus",
@@ -8301,9 +8315,12 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
-        "fao-ecocrop"
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "fao-ecocrop",
+        "bernal-2015-plantas-liquenes-colombia"
       ],
-      "valor_pedagogico": "Leccion de morfologia floral: lo que consumimos es una inflorescencia inmadura. Ensenia la diferencia entre flor y fruto, y el concepto de domesticacion de un cardo mediterraneo."
+      "valor_pedagogico": "La alcachofa (Cynara cardunculus L. var. scolymus (L.) Fiori, familia Asteraceae, subfamilia Carduoideae) es una asterácea perenne herbácea robusta (1-1.5 m altura) seleccionada del cardo silvestre mediterráneo Cynara cardunculus por su capítulo floral conspicuo agrandado e indehiscente con receptáculo carnoso y brácteas tiernas comestibles, originaria de la cuenca mediterránea (Italia, Sicilia, sur de Francia, España, norte de África). Aclimatada en huertos andinos colombianos de clima frío sub-mediterráneo donde encuentra condiciones óptimas. La inflorescencia inmadura comestible contiene cinarina (compuesto fenólico hepatoprotector y colerético documentado), inulina (oligofructano prebiótico), vitamina C, hierro, magnesio, potasio y fibra dietaria. Se cultiva en Cundinamarca (Sabana de Bogotá, Subachoque, Tabio, Sopó), Boyacá (Tunja, Villa de Leyva, Sutamarchán), Antioquia (oriente — La Ceja, El Retiro), Nariño (Pasto) y Eje cafetero alto entre 1.800 y 2.500 msnm en zona térmica templada a fría seca. Ciclo perenne con productividad sostenida 3-5 años, primera cosecha de capítulos a los 10-12 meses. Rendimientos 6-12 t/ha capítulos. Lección viva de morfología floral aplicada: lo que consumimos en la alcachofa es una inflorescencia inmadura en capítulo (cabezuela floral aún sin antesis) — la parte carnosa comestible es el receptáculo (corazón) y las bases tiernas de las brácteas involucrales (no son hojas verdaderas, son hipsófilos), enseñando la diferencia entre flor, fruto e inflorescencia y el concepto fundamental de la domesticación dirigida de un cardo silvestre mediterráneo originalmente espinoso y de escaso valor alimentario hacia un cultivo de hortícola fino. Manejo agroecológico: propagación por hijuelos (rebrotes laterales de la corona) o semilla, plantación a 1 m entre plantas, cosecha de capítulos pre-floración, encalado preventivo, asocio con habas y arvejas, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA, FAO Ecocrop, Bernal 2015 Catálogo Plantas Colombia."
     },
     {
       "id": "foeniculum_vulgare_azoricum",
