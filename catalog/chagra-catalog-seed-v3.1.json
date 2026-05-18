@@ -28,6 +28,11 @@
     {
       "id": "acacia_melanoxylon",
       "nombre_comun": "Acacia negra",
+      "nombre_comunes_regionales": [
+        "acacia negra",
+        "acacia australiana",
+        "blackwood"
+      ],
       "nombre_cientifico": "Acacia melanoxylon R. Br.",
       "familia_botanica": "Fabaceae",
       "category": "especies_invasoras",
@@ -35,12 +40,17 @@
         "templado",
         "frio"
       ],
+      "estrato": "alto",
+      "habito": "árbol perennifolio 8-25 m con corteza fisurada y filodios falciformes",
+      "origen": "Sudeste de Australia (Tasmania, Victoria, NSW); introducida en Colombia ca. 1950 para reforestación industrial y cortinas rompevientos",
       "roles_in_guild": [
         "invasive",
         "nitrogen_fixer"
       ],
       "cultivable": false,
       "conservation_status": "invasor",
+      "clasificacion_uicn": "Listada en ISSG/GISD Global Invasive Species Database; categorizada por IAvH-Humboldt como invasora de alto riesgo en bosque altoandino colombiano",
+      "normativa_colombiana": "Resolución 684/2018 MADS (lineamientos nacionales prevención manejo y restauración invasoras); ICA Resolución 3168/2015 (cuarentena de propágulos forestales); incluida en listados regionales de CAR Cundinamarca y CORPOBOYACÁ como especie de manejo prioritario",
       "altitud_msnm": {
         "min_absoluto": 1500,
         "optimo_min": 2200,
@@ -60,16 +70,51 @@
         "metodo_principal": "semilla",
         "notas": "Rebrote agresivo desde la raíz post-tala; requiere control de tocones."
       },
-      "especies_nativas_sustitutas": [
-        "alnus_acuminata"
+      "impacto_ecologico": "Alelopatía severa por liberación de fenoles y taninos en hojarasca que inhiben la germinación de plántulas nativas; fijación excesiva de nitrógeno (~30-60 kg N/ha/año) que altera la condición oligotrófica de suelos andinos favoreciendo otras exóticas nitrófilas; sombra densa que impide regeneración del sotobosque nativo; banco de semillas longevo (>50 años) con dormancia física rota por fuego o escarificación mecánica; competencia por agua y nutrientes que desplaza encenillo (Weinmannia tomentosa), aliso (Alnus acuminata) y otras especies de bosque alto andino en proceso de sucesión.",
+      "ecosistemas_afectados": [
+        "bosque_alto_andino",
+        "subparamo",
+        "bordes_de_via",
+        "areas_de_reforestacion_industrial",
+        "cuencas_altas_andinas"
       ],
+      "mecanismos_invasion": [
+        "banco_semillas_longevo",
+        "rebrote_radical_vigoroso",
+        "alelopatía_por_fenoles",
+        "fijación_nitrógeno_alteradora_suelo",
+        "dispersión_aviar_de_semillas_ariloides",
+        "germinación_estimulada_por_fuego"
+      ],
+      "metodos_extraccion": [
+        "anillado_de_corteza_ring_barking",
+        "decapitación_recurrente_de_rebrote",
+        "extracción_manual_de_plántulas",
+        "corte_de_raíz_principal_con_pala_zapapico",
+        "tratamiento_de_tocón_con_pasta_de_sal_y_cal_viva_si_se_autoriza"
+      ],
+      "epoca_optima_remocion": "Temporada seca del altiplano (diciembre-febrero y junio-agosto) ANTES de la fructificación (julio-septiembre en cordillera oriental) para evitar dispersión de semillas; el anillado es más efectivo al inicio de temporada seca cuando el árbol moviliza reservas.",
+      "especies_nativas_sustitutas": [
+        "alnus_acuminata",
+        "weinmannia_tomentosa",
+        "vallea_stipularis",
+        "viburnum_triphyllum",
+        "hesperomeles_goudotiana"
+      ],
+      "manejo_biomasa_extraida": "Madera aprovechable como leña o carpintería rústica (tradición artesanal); ramas con semillas inmaduras: trituración + compostaje termofílico >60°C por 4 semanas; ramas con semillas maduras: incineración controlada en sitio autorizado o disposición en relleno sanitario con trituración previa. NUNCA dispersar restos en bosque o nacederos: las semillas escarificadas por el corte germinan masivamente.",
+      "riesgo_rebrote": "altísimo — rebrota vigorosamente de raíz y de tocón; el corte simple sin anillado previo o sin tratamiento del tocón GARANTIZA expansión clonal a 3-5m del fuste original",
+      "protocolo_post_remocion": "Restauración activa obligatoria: siembra de nativas sustitutas (Alnus acuminata, Weinmannia tomentosa, Vallea stipularis) a 1100 ind/ha al siguiente semestre lluvioso; mulching con hojarasca nativa para suprimir banco de semillas residual; monitoreo bianual de rebrotes radicales y plántulas durante 5-7 años; corte inmediato de cualquier rebrote antes de 1 m altura; reporte de la intervención al SIB Colombia y a la CAR/Corporación Autónoma Regional jurisdiccional con coordenadas y área tratada.",
+      "especies_nativas_sustitutas_nota": "Alnus acuminata (aliso andino) reemplaza función de fijador de N siendo nativo; Weinmannia tomentosa (encenillo) restablece estructura de bosque alto andino; Vallea stipularis (raque) y Viburnum triphyllum (juco) ocupan el estrato medio-alto; Hesperomeles goudotiana (mortiño) consolida el sotobosque.",
       "source_ids": [
         "calderon-saenz-2003-invasoras",
         "res-684-2018-mads",
+        "humboldt-invasoras-andes",
+        "issg-uicn-invasoras",
         "gbif-taxonomic-backbone",
         "powo-kew"
       ],
       "valor_pedagogico": "SE BUSCA: El 'Rebrotador Invencible'. La acacia negra australiana (Acacia melanoxylon R.Br., familia Fabaceae) es una especie introducida en programas de reforestación del siglo XX que se naturalizó como invasora agresiva de bordes de bosque andino y zonas de páramo intervenido en Colombia. Se distribuye en Cundinamarca (Sumapaz, Chingaza), Boyacá, Antioquia, Santander y Eje cafetero entre 2.000 y 3.300 msnm. Árbol perenne 8-25 m altura que asfixia regeneración nativa por sombra densa, alelopatía (fenoles del rebrote) y banco de semillas longevo. Rebrota vigorosamente de raíz tras corte. Estrategia agroecológica de manejo: descortezamiento en anillo (ring-barking) + monitoreo bianual rebrote + sustitución progresiva por Alnus acuminata (aliso andino fijador de N, sí nativo). Listada en Res. 684/2018 MADS como invasora declarada. Fuentes Tier A: Calderón Sáenz 2003 Invasoras Colombia, Resolución 684/2018 MADS, POWO Kew, GBIF Backbone Taxonomy.",
+      "validation_level": "operator_reviewed",
       "antagonists": [
         "viburnum_triphyllum"
       ]
@@ -1133,15 +1178,17 @@
       "cultivable": false,
       "_nota_cultivable": "PARADOJA COLOMBIANA: es la gramínea forrajera más importante del trópico alto (>2200 msnm) para ganadería de leche. Simultáneamente es invasora crítica en páramos y bosques altoandinos. Uso legal en potreros, prohibido/indeseable en áreas de restauración y delimitación de páramo (Ley 1930/2018).",
       "conservation_status": "invasor",
-      "habito": "gramínea perenne postrada con estolones y rizomas agresivos",
-      "origen": "África oriental (altiplanos Kenia, Etiopía, Uganda, Rwanda, Tanzania, Zaire)",
+      "habito": "gramínea perenne postrada estolonífera-rizomatosa, alfombrante 10-30 cm de altura",
+      "origen": "África oriental (altiplanos Kenia, Etiopía, Uganda, Rwanda, Tanzania, Zaire); introducida en Colombia ca. 1928 para ganadería lechera",
+      "clasificacion_uicn": "Listada en ISSG/GISD Global Invasive Species Database; IAvH-Humboldt la cataloga como naturalizada de alto riesgo para ecosistemas de páramo y subpáramo colombianos",
+      "normativa_colombiana": "Ley 1930/2018 prohíbe su siembra y manejo agropecuario en áreas delimitadas de páramo; Resolución 684/2018 MADS la incluye en lineamientos de control en áreas de restauración; ICA Resolución 3168/2015 regula su comercialización como forrajera; el conflicto regulatorio (forrajera legal en potreros vs. invasora prohibida en páramo) requiere validar la cota y el ecosistema antes de toda intervención",
       "altitud_msnm": {
         "min_absoluto": 1800,
         "optimo_min": 2200,
         "optimo_max": 3200,
         "max_absoluto": 3600
       },
-      "impacto_ecologico": "alto (en páramo) / uso forrajero (en potreros bajo manejo)",
+      "impacto_ecologico": "Forma alfombras densas mediante estolones y rizomas que excluyen físicamente la regeneración de Calamagrostis effusa, Festuca spp. y otros pastizales nativos del subpáramo y páramo; altera el régimen hídrico al competir con frailejones jóvenes (Espeletia spp.) por humedad superficial; responde positivamente a fertilización nitrogenada de origen ganadero, agroquímico o deposición atmosférica, generando bucle de retroalimentación que amplía el área invadida; reduce la captura de niebla y la regulación hidrológica del páramo al sustituir la roseta-cojín nativa por dosel rasante; en ecotonos bosque-páramo desplaza el sotobosque nativo y dificulta la sucesión secundaria post-disturbio.",
       "ecosistemas_afectados": [
         "paramo",
         "subparamo",
@@ -1183,7 +1230,8 @@
         "agrostis_foliata"
       ],
       "manejo_biomasa_extraida": "compostaje en condiciones termófilas >60°C por >3 semanas (destruye semillas) O incineracion_controlada",
-      "riesgo_rebrote": "alto",
+      "riesgo_rebrote": "alto — rebrote vigoroso desde estolones y rizomas residuales en el suelo; el corte simple sin extracción de propágulos vegetativos garantiza recolonización en 2-4 meses",
+      "protocolo_post_remocion": "Restauración activa con macollas de Calamagrostis effusa y Festuca spp. a 5-9 macollas/m2 al inicio de la siguiente temporada lluviosa; mulching con paja de páramo o tela termodegradable por 6-12 meses para suprimir rebrote de propágulos residuales; monitoreo trimestral de rebrotes vegetativos durante 3 años; eliminación manual inmediata de cualquier rebrote antes de que produzca estolones secundarios; reporte de la intervención al SIB Colombia y a la autoridad ambiental jurisdiccional con coordenadas, área tratada y especies sustitutas establecidas.",
       "foto_referencia_sugerida": "https://commons.wikimedia.org/wiki/Category:Cenchrus_clandestinus",
       "referencias_cientificas": [
         "Correa, Pabón & Carulla 2008. Valor nutricional del kikuyo. Livestock Research for Rural Development 20(59)",
@@ -1414,18 +1462,30 @@
     {
       "id": "cytisus_monspessulanus",
       "nombre_comun": "Retamo liso",
+      "nombre_comunes_regionales": [
+        "retamo liso",
+        "retamo francés",
+        "retama",
+        "escobón"
+      ],
       "nombre_cientifico": "Cytisus monspessulanus L.",
+      "_nombre_cientifico_sinonimia": "Genista monspessulana (L.) L.A.S.Johnson",
       "familia_botanica": "Fabaceae",
       "category": "especies_invasoras",
       "thermal_zones": [
         "frio"
       ],
+      "estrato": "medio",
+      "habito": "arbusto leguminoso perenne 1-3 m, ramas finas estriadas con hojas trifoliadas y flores amarillas vistosas",
+      "origen": "Cuenca mediterránea occidental (sur de Francia, Iberia, Marruecos); introducida en Colombia hacia 1950 como ornamental y estabilizadora de taludes",
       "roles_in_guild": [
         "invasive",
         "nitrogen_fixer"
       ],
       "cultivable": false,
       "conservation_status": "invasor",
+      "clasificacion_uicn": "Listada en ISSG/GISD Global Invasive Species Database como invasora ambiental global; IAvH-Humboldt la clasifica como invasora prioritaria del altiplano cundiboyacense junto con Ulex europaeus",
+      "normativa_colombiana": "Resolución 684/2018 MADS (lineamientos nacionales prevención manejo y restauración para U. europaeus y Genista monspessulana, sinonimia de C. monspessulanus); Resolución 7615/2009 Secretaría Distrital de Ambiente de Bogotá (prohíbe su uso en Distrito Capital); Protocolo CAR Cundinamarca 2019 (prevención y control en jurisdicción CAR); Ley 1930/2018 (prohibida en áreas delimitadas de páramo)",
       "altitud_msnm": {
         "min_absoluto": 1800,
         "optimo_min": 2400,
@@ -1445,16 +1505,53 @@
         "metodo_principal": "semilla",
         "notas": "Especial cuidado con el banco de semillas; el fuego estimula la germinación masiva."
       },
+      "impacto_ecologico": "Fija nitrógeno (~50-100 kg N/ha/año) que altera la condición oligotrófica natural del suelo paramuno y favorece sucesión hacia especies nitrófilas exóticas; banco de semillas longevo (10-25 años viables en el suelo) con dormancia física rota por fuego, escarificación y fluctuación térmica; forma matorrales monoespecíficos densos que desplazan frailejones (Espeletia spp.), pajonales nativos (Calamagrostis effusa) y especies de borde de bosque alto andino; sus flores amarillas y producción de néctar atraen polinizadores nativos pero desincronizan la fenología local de polinización; sinergiza con Ulex europaeus en cerros bogotanos formando complejos invasores difíciles de erradicar.",
+      "ecosistemas_afectados": [
+        "subparamo",
+        "paramo",
+        "bosque_alto_andino",
+        "bordes_de_via",
+        "areas_quemadas",
+        "taludes_y_canteras_abandonadas"
+      ],
+      "mecanismos_invasion": [
+        "banco_semillas_longevo_decadal",
+        "dormancia_rota_por_fuego_y_escarificación",
+        "fijación_nitrógeno_alteradora_suelo",
+        "rebrote_vegetativo_desde_tocón",
+        "dispersión_balística_por_dehiscencia_de_legumbres",
+        "dispersión_secundaria_por_hormigas_mirmecocoria",
+        "germinación_masiva_post_disturbio"
+      ],
+      "metodos_extraccion": [
+        "desenraice_completo_con_palanca_o_extractor_weed_wrench",
+        "corte_bajo_repetido_cada_3-4_meses",
+        "anillado_de_tallos_principales",
+        "extracción_manual_de_plántulas_post_lluvia",
+        "solarización_de_parches_pequeños"
+      ],
+      "epoca_optima_remocion": "Temporada seca del altiplano (diciembre-febrero y junio-agosto) ANTES de la floración (marzo-mayo y septiembre-noviembre) para evitar dispersión de semillas; el desenraice es más eficaz tras lluvias ligeras cuando el suelo está blando pero no encharcado.",
       "especies_nativas_sustitutas": [
+        "weinmannia_tomentosa",
+        "vallea_stipularis",
+        "hesperomeles_goudotiana",
+        "viburnum_triphyllum",
+        "miconia_squamulosa",
         "erythrina_edulis"
       ],
+      "manejo_biomasa_extraida": "Compostaje NO recomendado: las semillas sobreviven temperaturas del compost doméstico. Incineración controlada en sitio autorizado, o trituración fina + disposición en relleno sanitario. Material sin frutos puede usarse como mulch tras secado al sol; material con flores o legumbres debe quemarse o enterrarse a >50 cm. NUNCA dispersar restos en bosque, páramo ni nacederos.",
+      "riesgo_rebrote": "alto — rebrota desde tocón si no se desenraiza completo, y el banco de semillas decadal garantiza emergencia de plántulas durante 10-25 años post-intervención",
+      "protocolo_post_remocion": "Restauración activa con nativas sustitutas (Weinmannia tomentosa, Vallea stipularis, Hesperomeles goudotiana, Viburnum triphyllum, Miconia squamulosa) a 1100-1600 ind/ha al siguiente semestre lluvioso; mulching con hojarasca nativa para suprimir banco de semillas residual; monitoreo trimestral de plántulas durante los primeros 2 años y semestral durante 5-10 años; eliminación manual inmediata de plántulas antes de que produzcan flores; ciclos de control bianual durante la primera década por la persistencia del banco de semillas; reporte al SIB Colombia y a la CAR/Corporación Autónoma Regional jurisdiccional con coordenadas y área tratada.",
       "source_ids": [
         "humboldt-invasoras-andes",
         "mongabay-retamo-2024",
         "res-684-2018-mads",
+        "car-cundi-2019",
+        "issg-uicn-invasoras",
         "gbif-taxonomic-backbone"
       ],
-      "valor_pedagogico": "SE BUSCA: El 'Falso Nativo'. El retamo liso (Cytisus monspessulanus L., sinonimia Genista monspessulana, familia Fabaceae) es un arbusto leguminoso mediterráneo introducido en Colombia que invade páramos y bosques altoandinos perturbados, particularmente en Cundinamarca (Páramo de Sumapaz, Chingaza, Cruz Verde), Boyacá (Iguaque), Antioquia y Nariño entre 2.500 y 3.500 msnm. Arbusto 1-3 m altura con flores amarillas vistosas que lo disfrazan de planta ornamental inofensiva. Fija nitrógeno (~50-100 kg N/ha/año) y altera el equilibrio nutricional del suelo paramuno (oligotrófico por naturaleza), desplazando flora nativa adaptada a baja fertilidad como frailejones y pajonales. Su erradicación es acto de soberanía hídrica porque protege la función reguladora hídrica del páramo. Manejo: arranque mecánico anterior a floración (pre-banco de semillas) + monitoreo trienal del banco residual (semillas viables 10-25 años en suelo). Listada Res. 684/2018 MADS. Fuentes Tier A: Humboldt Invasoras Andes, Mongabay reporte retamo 2024, Resolución 684/2018 MADS, GBIF Backbone Taxonomy."
+      "valor_pedagogico": "SE BUSCA: El 'Falso Nativo'. El retamo liso (Cytisus monspessulanus L., sinonimia Genista monspessulana, familia Fabaceae) es un arbusto leguminoso mediterráneo introducido en Colombia que invade páramos y bosques altoandinos perturbados, particularmente en Cundinamarca (Páramo de Sumapaz, Chingaza, Cruz Verde), Boyacá (Iguaque), Antioquia y Nariño entre 2.500 y 3.500 msnm. Arbusto 1-3 m altura con flores amarillas vistosas que lo disfrazan de planta ornamental inofensiva. Fija nitrógeno (~50-100 kg N/ha/año) y altera el equilibrio nutricional del suelo paramuno (oligotrófico por naturaleza), desplazando flora nativa adaptada a baja fertilidad como frailejones y pajonales. Su erradicación es acto de soberanía hídrica porque protege la función reguladora hídrica del páramo. Manejo: arranque mecánico anterior a floración (pre-banco de semillas) + monitoreo trienal del banco residual (semillas viables 10-25 años en suelo). Listada Res. 684/2018 MADS. Fuentes Tier A: Humboldt Invasoras Andes, Mongabay reporte retamo 2024, Resolución 684/2018 MADS, GBIF Backbone Taxonomy.",
+      "validation_level": "operator_reviewed"
     },
     {
       "id": "erythrina_edulis",
@@ -1583,6 +1680,12 @@
     {
       "id": "eucalyptus_globulus",
       "nombre_comun": "Eucalipto blanco",
+      "nombre_comunes_regionales": [
+        "eucalipto blanco",
+        "eucalipto azul",
+        "eucalipto común",
+        "eucalipto de Tasmania"
+      ],
       "nombre_cientifico": "Eucalyptus globulus Labill.",
       "familia_botanica": "Myrtaceae",
       "category": "especies_invasoras",
@@ -1590,12 +1693,17 @@
         "templado",
         "frio"
       ],
+      "estrato": "emergente",
+      "habito": "árbol perennifolio 30-50 m, fuste recto con corteza decidua en placas, hojas juveniles glaucas y hojas adultas falcadas",
+      "origen": "Tasmania y sureste de Australia; introducido en Colombia desde finales del siglo XIX (ca. 1880) para reforestación industrial maderable y pulpa de papel",
       "roles_in_guild": [
         "invasive",
         "biomass_producer"
       ],
       "cultivable": false,
       "conservation_status": "invasor",
+      "clasificacion_uicn": "Listada en ISSG/GISD Global Invasive Species Database; IAvH-Humboldt la cataloga como especie con alto impacto hídrico y alelopático en cuencas altoandinas colombianas",
+      "normativa_colombiana": "Resolución 684/2018 MADS (lineamientos nacionales de prevención y manejo de invasoras forestales); Ley 1930/2018 (prohibida en áreas delimitadas de páramo y zonas de recarga hídrica); Resoluciones de CAR Cundinamarca y CORPOBOYACÁ que restringen su siembra en zonas de protección de nacederos y rondas hídricas; ICA Resolución 3168/2015 (regulación fitosanitaria de propágulos forestales)",
       "altitud_msnm": {
         "min_absoluto": 1200,
         "optimo_min": 1800,
@@ -1615,16 +1723,54 @@
         "metodo_principal": "semilla",
         "notas": "Control de rebrote de cepa es crítico; requiere monitoreo por al menos 2 años."
       },
-      "especies_nativas_sustitutas": [
-        "alnus_acuminata"
+      "impacto_ecologico": "Alta demanda hídrica (~200-400 L/día por árbol maduro) que seca quebradas, nacederos y humedales en cuencas altas, comprometiendo la oferta hídrica para comunidades campesinas y ecosistemas dependientes; alelopatía severa por aceites esenciales foliares y radicales (1,8-cineol, citronelal, eucaliptol, alfa-pineno) que inhiben la germinación de flora nativa generando el característico 'desierto verde' sin sotobosque bajo el dosel; acidificación del suelo por hojarasca recalcitrante con C:N elevado y descomposición lenta; banco de semillas resistente al fuego y germinación masiva post-incendio que amplifica la invasión; reducción de biodiversidad de avifauna y entomofauna nativa por homogenización del hábitat; competencia directa con especies de bosque alto andino y subpáramo como encenillo (Weinmannia tomentosa), aliso (Alnus acuminata) y raque (Vallea stipularis).",
+      "ecosistemas_afectados": [
+        "bosque_alto_andino",
+        "subparamo",
+        "cuencas_altas_andinas",
+        "rondas_hidricas",
+        "humedales_altoandinos",
+        "areas_de_reforestacion_industrial",
+        "bordes_de_via"
       ],
+      "mecanismos_invasion": [
+        "banco_semillas_resistente_al_fuego",
+        "germinación_masiva_post_incendio",
+        "alelopatía_por_aceites_esenciales",
+        "rebrote_vigoroso_desde_tocón_y_lignotúber",
+        "dispersión_anemócora_de_semillas_aladas",
+        "competencia_por_agua_en_horizontes_profundos",
+        "acidificación_de_suelo_por_hojarasca"
+      ],
+      "metodos_extraccion": [
+        "anillado_de_corteza_ring_barking_sin_cosecha",
+        "decapitación_recurrente_de_rebrotes_de_tocón",
+        "extracción_de_lignotúber_con_retroexcavadora_en_individuos_jóvenes",
+        "corte_y_tratamiento_de_tocón_con_pasta_de_sal_y_cal_viva_si_se_autoriza",
+        "no_aprovechamiento_maderable_en_zonas_de_protección_hídrica"
+      ],
+      "epoca_optima_remocion": "Temporada seca del altiplano (diciembre-febrero y junio-agosto) cuando el árbol moviliza reservas y el anillado interrumpe el flujo descendente de fotosintatos; ANTES de la dispersión anemócora de semillas (julio-octubre en cordillera oriental); evitar intervención durante temporada lluviosa porque el rebrote es más vigoroso.",
+      "especies_nativas_sustitutas": [
+        "alnus_acuminata",
+        "weinmannia_tomentosa",
+        "polylepis_quadrijuga",
+        "vallea_stipularis",
+        "viburnum_triphyllum",
+        "hesperomeles_goudotiana"
+      ],
+      "manejo_biomasa_extraida": "Madera maderable aprovechable como leña, postes o construcción rústica fuera de la zona invadida; hojarasca y ramas finas: secado al sol + incineración controlada (NO compostar in situ por persistencia de aceites esenciales alelopáticos que esterilizan el suelo); cápsulas con semillas: incineración obligatoria o trituración fina + disposición en relleno sanitario. NUNCA dejar hojarasca acumulada en sitio porque mantiene la alelopatía durante años post-corte.",
+      "riesgo_rebrote": "altísimo — el lignotúber subterráneo emite múltiples rebrotes vigorosos desde la base del tocón; el corte simple sin anillado previo ni tratamiento del tocón GARANTIZA recolonización clonal y mayor densidad de fustes que el árbol original",
+      "protocolo_post_remocion": "Restauración hídrica activa con nativas sustitutas (Alnus acuminata como fijador de N, Weinmannia tomentosa para estructura de bosque alto andino, Polylepis quadrijuga en cotas superiores) a 1100-1600 ind/ha al siguiente semestre lluvioso; remoción mecánica de hojarasca acumulada para acelerar restablecimiento de microbiota nativa del suelo; mulching con hojarasca de nativas para sombrear el suelo y favorecer germinación de banco de semillas nativo; monitoreo de caudales en quebradas y nacederos durante 3-5 años post-intervención; control bianual de rebrotes durante 5-7 años; reporte al SIB Colombia y a la autoridad ambiental jurisdiccional con coordenadas, área tratada y especies sustitutas establecidas.",
       "source_ids": [
         "humboldt-invasoras-andes",
         "issg-uicn-invasoras",
         "res-684-2018-mads",
+        "ley-1930-2018-paramos",
+        "ciat-1995-alnus",
         "gbif-taxonomic-backbone"
       ],
       "valor_pedagogico": "SE BUSCA: El 'Sediento de los Andes'. El eucalipto azul australiano (Eucalyptus globulus Labill., familia Myrtaceae) fue introducido en Colombia desde fines del siglo XIX para programas de reforestación industrial (madera y pulpa de papel) y se expandió como especie naturalizada problemática en altiplanos andinos. Se distribuye en Cundinamarca (Sabana de Bogotá), Boyacá (Tunja, Duitama, Sogamoso), Nariño, Antioquia y Eje cafetero entre 1.800 y 3.000 msnm. Árbol perenne 30-50 m altura, alta demanda hídrica (~200-400 L/día por árbol maduro) seca quebradas y nacederos en cuencas altas. Alelopatía severa por aceites esenciales (1,8-cineol, citronelal) inhibe germinación de flora nativa generando 'desierto verde' bajo dosel. Banco de semillas resistente al fuego. Estrategia de manejo agroecológico: anillado (ring-barking) sin cosecha + remplazo progresivo por Alnus acuminata (aliso andino nativo) o Polylepis quadrijuga (colorado) en sistemas silvopastoriles. Listada Res. 684/2018 MADS. Fuentes Tier A: Humboldt Invasoras Andes, ISSG-UICN Invasoras Globales, Resolución 684/2018 MADS, GBIF Backbone Taxonomy.",
+      "validation_level": "operator_reviewed",
       "antagonists": [
         "weinmannia_tomentosa"
       ]
