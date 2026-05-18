@@ -321,7 +321,7 @@ export const EvidenceCapture = ({
         ref={inputRef}
         type="file"
         accept="image/*"
-        capture="environment"
+       
         className="hidden"
         onChange={handleCapture}
       />

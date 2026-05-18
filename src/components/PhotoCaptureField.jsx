@@ -85,7 +85,6 @@ const PhotoCaptureField = ({ onPhoto, onRemove, label = "Capturar Foto", value =
             <input
                 type="file"
                 accept="image/*"
-                capture="environment"
                 onChange={handleFileChange}
                 ref={fileInputRef}
                 className="hidden"
