@@ -11259,6 +11259,415 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El uvito de monte o chaquilulo (Cavendishia bracteata (Ruiz & Pav. ex J.St.-Hil.) Hoerold, Ericaceae) es un arbusto o arbolito andino nativo (1-4 m altura, ocasionalmente epífito sobre árboles del bosque alto-andino) propio del bosque alto-andino y subpáramo colombiano entre 2.400 y 3.200 msnm, presente en Cundinamarca (Cruz Verde, Sumapaz, Chingaza, Verjón, Guasca), Boyacá (Iguaque, Arcabuco, Cocuy, Pisba), Santander (Berlín), Antioquia (Belmira, Sonsón), Tolima, Cauca, Caldas, Risaralda y Nariño. Pertenece a Ericaceae tribu Vaccinieae (igual familia que arándanos, uva camarona, mortiño y asnao). Hojas coriáceas alternas elípticas-lanceoladas brillantes con nervadura broquidódroma característica, brácteas florales rojo-vivas muy llamativas (de ahí el epíteto bracteata) que envuelven la inflorescencia y persisten en el fruto, flores tubulares colgantes rojo-anaranjadas o rojo-blancas (1.5-2 cm) que atraen colibríes paramunos especialistas (Lafresnaya lafresnayi, Coeligena bonapartei, Eriocnemis vestita) en una coevolución planta-colibrí clásica andina. Frutos en baya globosa azul-violeta-negra (8-12 mm) comestible de sabor dulce-aromático intenso (alto en antocianinas, polifenoles, vitamina C: comparable a arándanos importados). Es lección viva de soberanía alimentaria y biodiversidad andina que enseña a niñas y niños por qué tenemos arándanos colombianos nativos sin necesidad de importar blueberries de Norteamérica: el chaquilulo, la uva camarona, el asnao y el mortiño son nuestras frutas Ericaceae andinas, adaptadas al páramo, productivas, deliciosas y de menor huella de carbono. Reivindicada hoy por chefs colombianos y agroecólogos como superfruta nativa. Aparece en planes de restauración Cruz Verde-Sumapaz como especie productiva de doble propósito. Manejo agroecológico: propagación por semilla (sustrato ácido pH 4.5-5.5, germinación 60-120 días) o esqueje semileñoso bajo cámara húmeda, vivero 12-24 meses antes de trasplante, distancia 1.5-2 m, fructificación a partir de 4-6 años, función como frutal silvestre, atractor de colibríes, nurse plant en restauración y cultivo agroforestal nativo. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "leucaena_leucocephala",
+      "nombre_comun": "Leucaena",
+      "nombre_comunes_regionales": [
+        "guaje",
+        "huaje",
+        "leucaena criolla",
+        "tamarindo silvestre",
+        "acacia forrajera"
+      ],
+      "nombre_cientifico": "Leucaena leucocephala (Lam.) de Wit",
+      "familia_botanica": "Fabaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nitrogen_fixer",
+        "living_fence",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1200,
+        "max_absoluto": 1800
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-silvopastoriles",
+        "agrosavia-forrajeras-2022",
+        "humboldt-flora-alto-andina",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "La leucaena (Leucaena leucocephala (Lam.) de Wit, Fabaceae-Mimosoideae) es un árbol leguminoso de origen mesoamericano (México-Centroamérica) ampliamente naturalizado en el trópico colombiano (0-1.200 msnm), cultivado en Tolima, Huila, Cesar, Magdalena, Córdoba, Valle del Cauca, Cauca, Antioquia, Casanare y Meta como componente protagónico de sistemas silvopastoriles intensivos (SSPi) diseñados y validados por CIPAV-AGROSAVIA con bovinos cebú-mestizos. Árbol o arbolito de 4-10 m (raramente hasta 15 m), copa abierta, fuste recto, corteza gris-pardusca con lenticelas, hojas bipinnadas alternas (4-9 pares de pinnas, cada pinna con 11-22 pares de folíolos), inflorescencias en cabezuelas globosas blanco-cremas (1.5-2 cm) muy mielíferas, frutos en legumbres lineares aplanadas (10-20 cm) que viran de verde a marrón al madurar, semillas oblongas brillantes pardas. Fija nitrógeno biológico atmosférico (~200-500 kg N/ha/año en SSPi de alta densidad) por simbiosis con Rhizobium específicos del género Mesorhizobium. Forrajera proteínica de primer orden: hojas frescas con 22-30% proteína cruda, alta digestibilidad, palatable a bovinos, ovinos, caprinos y conejos (manejar mimosina <8% en dieta total para evitar caída de pelo en monogástricos; rumiantes adaptados con cepa Synergistes jonesii la degradan). Manejo agroecológico: propagación por semilla escarificada (agua caliente 80°C/3 min o ácido sulfúrico 5 min, germinación 70-90% en 5-10 días), siembra directa o vivero, distancia 0.5-1 m en franjas a 1.5-2 m entre franjas para SSPi (densidad 5.000-10.000 plantas/ha), poda de igualación a 1 m altura cada 60-90 días en lluvias, ramoneo directo de bovinos o corte-acarreo. Banco forrajero proteico complementa pastos megatérmicos (Cynodon, Megathyrsus, Urochloa). Otros usos: cerca viva, sombra ligera, leña, postes durables. Lección viva de soberanía proteica ganadera y carbono-neutralidad: una hectárea de SSPi con leucaena puede producir 20-30 ton MS forrajera/año fijando N propio, secuestrando 4-7 t CO2/ha/año y reduciendo emisiones entéricas de metano por mejor balance nutricional, mostrando a productores y estudiantes que la ganadería sostenible NO es oxímoron sino diseño agroforestal. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Silvopastoriles, AGROSAVIA Forrajeras 2022, IAvH Flora, Pérez Arbeláez 1947."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "tithonia_diversifolia",
+      "nombre_comun": "Botón de oro",
+      "nombre_comunes_regionales": [
+        "suncho amarillo",
+        "falsa girasol",
+        "mirasol",
+        "tithonia",
+        "árnica de campo"
+      ],
+      "nombre_cientifico": "Tithonia diversifolia (Hemsl.) A.Gray",
+      "familia_botanica": "Asteraceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "biomass_producer",
+        "dynamic_accumulator",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 800,
+        "optimo_max": 1800,
+        "max_absoluto": 2300
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-silvopastoriles",
+        "agrosavia-forrajeras-2022",
+        "humboldt-flora-alto-andina",
+        "restrepo-2005-agroecologia"
+      ],
+      "valor_pedagogico": "El botón de oro o suncho amarillo (Tithonia diversifolia (Hemsl.) A.Gray, Asteraceae) es un arbusto perenne mesoamericano (México-Centroamérica) naturalizado y ampliamente difundido en Colombia entre 800 y 1.800 msnm (Cauca, Valle del Cauca, Tolima, Huila, Caldas, Quindío, Risaralda, Antioquia, Santander, Boyacá zona cafetera, Putumayo) como una de las especies más versátiles del agroecosistema tropical-andino colombiano. Arbusto de 2-4 m altura (ocasionalmente 6 m), crecimiento rápido (1-2 m primer año), tallos fistulosos verde-claros suculentos, hojas alternas grandes (15-30 cm) palmatilobadas o trilobadas pubescentes serradas, capítulos solitarios o agrupados de flores amarillo-anaranjadas intenso (8-15 cm diámetro, lígulas radiadas amarillo-oro, disco amarillo-anaranjado) muy llamativas tipo girasol. Fitoextractor extraordinario de fósforo (P) y potasio (K) del subsuelo: biomasa fresca contiene 3-4% N, 0.3-0.4% P y 3-4% K — equivalente a una fórmula NPK orgánica completa. Producción de biomasa explosiva: 30-80 ton MS/ha/año en cortes de 60-90 días, hasta 6-8 cortes anuales. Usos múltiples: (1) abono verde mulch en cultivos perennes (café, cacao, frutales), (2) forraje proteico para bovinos lecheros (CIPAV-AGROSAVIA: 20-25% PC, complemento de pastos), (3) banco de biomasa para compostaje y biopreparados (té de tithonia: 1 kg biomasa fresca + 10 L agua + 7 días = abono foliar líquido), (4) cerca viva agroecológica, (5) atractor masivo de polinizadores y enemigos naturales (avispas parasitoides, sírfidos, mariposas), (6) restauración de suelos degradados y compactados (raíces profundas que rompen capas duras). Manejo agroecológico: propagación por estaca semileñosa (30-50 cm, prendimiento >90%, sin hormonas) o semilla, distancia 0.5-1 m en franjas, poda de igualación a 50 cm post-floración, incorporación al suelo o mulch superficial. Lección viva de agroecología tropical: enseña a niñas, niños y campesinos que una sola especie puede reemplazar fertilizantes sintéticos costosos (P-K importados de Marruecos-Canadá) cosechando biomasa de su propio jardín — soberanía nutricional vegetal en cuatro meses. Reivindicado por escuelas agroecológicas de CIPAV, AGROSAVIA Palmira, y movimientos agroecológicos Colombia-Brasil. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Silvopastoriles, AGROSAVIA Forrajeras 2022, IAvH Flora, Restrepo 2005 Agroecología."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "cratylia_argentea",
+      "nombre_comun": "Cratylia",
+      "nombre_comunes_regionales": [
+        "veranera forrajera",
+        "cratylia plateada",
+        "cratilia"
+      ],
+      "nombre_cientifico": "Cratylia argentea (Desv.) Kuntze",
+      "familia_botanica": "Fabaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "nitrogen_fixer",
+        "biomass_producer",
+        "living_fence"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1200,
+        "max_absoluto": 1600
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-silvopastoriles",
+        "agrosavia-forrajeras-2022",
+        "agrosavia-leguminosas-andinas"
+      ],
+      "valor_pedagogico": "La cratylia o veranera forrajera (Cratylia argentea (Desv.) Kuntze, Fabaceae-Faboideae) es una leguminosa arbustiva perenne nativa de la cuenca amazónica sur (Brasil, Bolivia, Perú) ampliamente introducida y validada en Colombia para sistemas ganaderos del Caribe seco (Cesar, La Guajira, Magdalena, Córdoba, Sucre, Bolívar), Llanos Orientales (Casanare, Meta, Arauca) y valles interandinos secos (Patía, Huila, Tolima), entre 0 y 1.200 msnm. Su característica distintiva agroclimática: es la leguminosa forrajera tropical de mayor tolerancia a sequía estacional prolongada (3-6 meses sin lluvia), mantiene follaje verde y palatable durante el verano cuando los pastos megatérmicos se secan completamente, llenando el déficit forrajero crítico de la ganadería trópico-seca colombiana. Arbusto de 2-4 m altura, copa densa, tallos múltiples desde la base, hojas alternas trifoliadas con foliolos elípticos (8-15 cm) verde-grisáceos en el haz y plateado-pubescentes en el envés (de ahí \"argentea\"), inflorescencias en racimos terminales con flores papilionadas malva-lila vistosas, frutos en legumbres lineares (10-15 cm) con 6-10 semillas oblongas pardo-claras. Fija nitrógeno biológico atmosférico (~150-200 kg N/ha/año) con Bradyrhizobium específico. Forraje de alta calidad: hojas con 18-25% proteína cruda, digestibilidad 55-65%, alta palatabilidad a bovinos, ovinos y caprinos. Validación colombiana: AGROSAVIA La Libertad (Villavicencio) y CIPAV-Cauca evaluaron cratylia en bancos de proteína para ceba bovina, demostrando ganancias diarias de 600-800 g/animal en sistemas mejorados con pasto Brachiaria + 20% cratylia. Manejo agroecológico: propagación por semilla escarificada (agua caliente 80°C/3 min o lija manual, germinación 70-85% en 7-15 días) o estaca semileñosa, distancia 0.5-1 m en franjas para banco de proteína (densidad 10.000-20.000 plantas/ha), establecimiento 4-6 meses, primer corte a los 8-12 meses, podas de cosecha cada 60-90 días a 50-70 cm altura, persistencia productiva 10-15 años. Otros usos: leña, sombra para café/cacao en márgenes secos, cerca viva forrajera, mejorador de suelos degradados. Lección viva de adaptación climática: enseña cómo seleccionar especies nativas amazónicas para mitigar el cambio climático en zonas trópico-secas donde las sequías se intensifican — la cratylia es seguro forrajero campesino frente al cambio climático. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Silvopastoriles, AGROSAVIA Forrajeras 2022, AGROSAVIA Leguminosas Andinas."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "desmodium_intortum",
+      "nombre_comun": "Desmodium verde",
+      "nombre_comunes_regionales": [
+        "desmodio",
+        "pega-pega trepador",
+        "amor seco verde"
+      ],
+      "nombre_cientifico": "Desmodium intortum (Mill.) Urb.",
+      "familia_botanica": "Fabaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "nitrogen_fixer",
+        "ground_cover",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 500,
+        "optimo_max": 1800,
+        "max_absoluto": 2200
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-silvopastoriles",
+        "agrosavia-forrajeras-2022",
+        "agrosavia-leguminosas-andinas"
+      ],
+      "valor_pedagogico": "El desmodium verde (Desmodium intortum (Mill.) Urb., Fabaceae-Faboideae) es una leguminosa herbácea rastrera-trepadora perenne nativa de Mesoamérica-Caribe ampliamente difundida en Colombia entre 500 y 1.800 msnm como cobertura viva, forraje y abono verde en sistemas agroforestales de café, cacao, cítricos y frutales (Antioquia, Caldas, Quindío, Risaralda, Tolima, Huila, Valle del Cauca, Cauca, Santander, Cundinamarca cafetera, Casanare premontano). Hierba perenne de tallos delgados (1-3 m largo) postrados o trepadores cubiertos de pelos uncinados (ganchudos) que se adhieren a la ropa y animales — característica que justifica el nombre vernáculo \"pega-pega\". Hojas alternas trifoliadas, foliolo central rómbico-ovado mayor (4-7 cm) verde-oscuro brillante, con manchitas plateadas en el haz en algunas formas. Inflorescencias en racimos axilares con flores papilionadas pequeñas (5-7 mm) rosado-lila a púrpura. Frutos en legumbres articuladas (lomentos) con 5-8 segmentos uncinados que se desprenden individualmente y se adhieren para dispersión zoocórica. Fija nitrógeno biológico atmosférico (~80-150 kg N/ha/año) con Bradyrhizobium. Cobertura viva multipropósito: (1) protege el suelo contra erosión hídrica e impacto de gotas en pendientes cafeteras, (2) suprime malezas competidoras (efecto alelopático leve sobre gramíneas), (3) aporta N y biomasa al suelo (15-30 ton MS/ha/año), (4) forraje complementario para bovinos y conejos (16-22% PC, digestibilidad 55-65%), (5) atractor de polinizadores nativos y enemigos naturales (avispas, mariquitas), (6) componente clave del esquema \"push-pull\" agroecológico africano-colombiano (repele lepidópteros plaga del maíz por emisión de volátiles). Manejo agroecológico: propagación por semilla escarificada (lija o agua caliente, 50-70% germinación en 10-20 días) o estolón enraizado, siembra al voleo a 4-8 kg/ha o líneas a 50 cm, establecimiento 3-5 meses, manejo por pastoreo controlado, segado o poda parcial cada 60-90 días, persistencia 4-8 años, asocia bien con Brachiaria, Megathyrsus, Cynodon y con maíz-frijol-yuca. Lección viva de ecología de leguminosas tropicales: enseña que las \"malezas pega-pega\" del campesinado son en realidad fijadoras de N que dejan el suelo más fértil, y que el manejo agroecológico convierte adversarias en aliadas. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Silvopastoriles, AGROSAVIA Forrajeras 2022, AGROSAVIA Leguminosas Andinas."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "pueraria_phaseoloides",
+      "nombre_comun": "Kudzu tropical",
+      "nombre_comunes_regionales": [
+        "kudzú",
+        "pueraria",
+        "puero",
+        "frijol kudzu",
+        "tropical kudzu"
+      ],
+      "nombre_cientifico": "Pueraria phaseoloides (Roxb.) Benth.",
+      "familia_botanica": "Fabaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "nitrogen_fixer",
+        "ground_cover",
+        "invasive"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1200,
+        "max_absoluto": 1800
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-silvopastoriles",
+        "agrosavia-forrajeras-2022",
+        "humboldt-invasoras-andes",
+        "issg-uicn-invasoras"
+      ],
+      "valor_pedagogico": "El kudzu tropical (Pueraria phaseoloides (Roxb.) Benth., Fabaceae-Faboideae) es una leguminosa herbácea perenne trepadora-rastrera nativa del sureste asiático (India, Indochina, Indonesia, Filipinas) introducida a Colombia hace décadas como cobertura para plantaciones de palma africana, caucho y cacao en zonas cálidas húmedas (Magdalena Medio, Urabá, Chocó, Putumayo, Caquetá, Amazonas, Llanos Orientales, Valle del Cauca, 0-1.200 msnm). ADVERTENCIA DE MANEJO — POTENCIALMENTE INVASIVO: Pueraria phaseoloides está catalogada como especie con riesgo invasor moderado-alto por IAvH (Humboldt Invasoras Andes) y referenciada en bases globales (ISSG-UICN, GISD), capaz de cubrir y \"sofocar\" árboles jóvenes, vegetación secundaria, cercas y bordes de cultivos si NO se maneja activamente; su pariente cercano Pueraria montana (kudzu del sureste de EE.UU.) es paradigma global de planta invasora (\"the vine that ate the South\"). USAR ÚNICAMENTE en plantaciones perennes establecidas (palma, caucho, cacao adulto, frutales >3 años) donde la competencia con árboles dominantes está resuelta, con manejo controlado de podas regulares y NUNCA en bordes de bosque, áreas de regeneración natural, corredores ribereños o restauración ecológica. Para esos contextos preferir alternativas nativas o naturalizadas no agresivas: Arachis pintoi, Centrosema, Stylosanthes, Calopogonium, Desmodium ovalifolium. Características botánicas: hierba perenne trepadora vigorosa con tallos cilíndricos pubescentes (3-10 m largo), hojas alternas trifoliadas con foliolos rómbicos-ovados grandes (10-20 cm) verde-oscuros pubescentes, inflorescencias en racimos axilares densos con flores papilionadas púrpura-violáceas (1.5 cm), frutos en legumbres lineares-pubescentes (5-10 cm) con 8-15 semillas pardas. Fija nitrógeno biológico atmosférico extraordinariamente (~150-250 kg N/ha/año) con Bradyrhizobium específico. Producción de biomasa masiva (15-30 ton MS/ha/año) con altísimo contenido proteico (18-22% PC). Bajo manejo controlado: cobertura agresiva del suelo, control eficaz de erosión en pendientes cafeteras-palmeras, supresión de malezas heliófilas (paja, cuncho), aporte de N y biomasa, alimentación complementaria de ganado. Manejo agroecológico controlado: propagación por semilla escarificada (agua caliente 70°C/3 min, germinación 60-80%) o estaca con nudos enraizables, siembra al voleo 3-5 kg/ha o líneas a 60 cm, ESTABLECER LÍMITES FÍSICOS (zanjas, vías) o LÍMITES MECÁNICOS (poda quincenal de bordes) para evitar invasión a parches naturales, podas de control cada 30-60 días en márgenes, monitoreo permanente de avance lateral. Lección viva de ecología de invasoras y responsabilidad agronómica: enseña que NO TODA leguminosa fijadora es buena — el contexto, el manejo y los límites son tan importantes como la especie misma; un campesino agroecólogo responsable elige primero las nativas (Arachis pintoi, Cratylia, Desmodium) y solo usa Pueraria phaseoloides bajo manejo estricto donde su agresividad sea ventaja, no problema. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Silvopastoriles, AGROSAVIA Forrajeras 2022, IAvH Invasoras Andes, ISSG-UICN."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "arachis_pintoi",
+      "nombre_comun": "Maní forrajero",
+      "nombre_comunes_regionales": [
+        "maní perenne",
+        "maní rastrero",
+        "arachis ornamental",
+        "pinto peanut"
+      ],
+      "nombre_cientifico": "Arachis pintoi Krapov. & W.C.Greg.",
+      "familia_botanica": "Fabaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "nitrogen_fixer",
+        "ground_cover",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1400,
+        "max_absoluto": 1800
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-silvopastoriles",
+        "agrosavia-forrajeras-2022",
+        "agrosavia-leguminosas-andinas"
+      ],
+      "valor_pedagogico": "El maní forrajero perenne (Arachis pintoi Krapov. & W.C.Greg., Fabaceae-Faboideae) es una leguminosa herbácea rastrera perenne nativa del Cerrado brasileño (Brasil central, Mato Grosso, Goiás) introducida y ampliamente adaptada en Colombia entre 0 y 1.400 msnm como una de las coberturas vivas más exitosas del trópico latinoamericano por su combinación única de no agresividad invasora, fijación robusta de nitrógeno, floración ornamental masiva y compatibilidad con cultivos perennes y pastos. Hierba perenne rastrera estolonífera de 20-40 cm altura, tallos verde-claros postrados que enraízan en cada nudo formando un césped denso, hojas alternas tetrafoliadas (rasgo distintivo: cuatro folíolos en cruz, atípico del género Arachis que es típicamente trifoliado-paripinnado) elíptico-obovados verde-medio, flores papilionadas amarillo-oro vistosas (1-1.5 cm, similares al maní cultivado A. hypogaea pero abundantes y continuas), frutos geocárpicos (se entierran tras polinización, igual que el maní): vainas indehiscentes 1-cm con 1-2 semillas redondas-marrones. Fija nitrógeno biológico atmosférico (~100-200 kg N/ha/año) con Bradyrhizobium específico del género Arachis. Cobertura ornamental-funcional: (1) suprime efectivamente malezas en plantaciones perennes (café, cacao, frutales, palma, caucho, cítricos) mediante densidad de follaje y alelopatía leve, (2) protege contra erosión hídrica en pendientes y áreas críticas, (3) aporta N y biomasa al suelo (10-20 ton MS/ha/año, 16-22% PC), (4) forraje suplementario palatable a bovinos, ovinos y conejos en pastoreo controlado, (5) atractor masivo de abejas nativas y melíferas (importante para apicultura en cafetales), (6) cobertura ornamental en jardines agroecológicos, parques urbanos, taludes y zonas industriales — los cultivares CIAT-Amarillo y CIAT-17434 son ampliamente sembrados en Cauca, Valle, Antioquia, Quindío, Risaralda, Caldas, Meta, Casanare. Diferencia clave con Pueraria: NO INVASIVO, manejable, compatible con árboles jóvenes. Manejo agroecológico: propagación por estolón enraizado (mejor método, prendimiento >95%, ahorra costo de semilla cara) o semilla geocárpica (escarificación con lija + tratamiento térmico, germinación 60-80%), siembra a 30-50 cm entre estolones, establecimiento 4-6 meses, persistencia 10+ años, manejo con podas suaves o pastoreo rotacional. Lección viva de cobertura agroecológica óptima: enseña que existe una opción tropical no invasora, no agresiva, ornamental y multifuncional para reemplazar las coberturas químicas (glifosato, paraquat) que destruyen suelo y polinizadores en las grandes plantaciones colombianas. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Silvopastoriles, AGROSAVIA Forrajeras 2022, AGROSAVIA Leguminosas Andinas."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "astrocaryum_chambira",
+      "nombre_comun": "Chambira",
+      "nombre_comunes_regionales": [
+        "cumare",
+        "tucum",
+        "palma chambira",
+        "tucumã",
+        "fibra chambira"
+      ],
+      "nombre_cientifico": "Astrocaryum chambira Burret",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 500,
+        "max_absoluto": 1000
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "La chambira o cumare (Astrocaryum chambira Burret, Arecaceae-Cocoseae) es una palma nativa amazónica solitaria de gran porte, ampliamente distribuida en la Amazonía colombiana (Amazonas, Caquetá, Putumayo, Guainía, Vaupés, Guaviare, Vichada) entre 100 y 500 msnm en bosque húmedo tropical de tierra firme y várzeas estacionalmente inundables, así como en la Amazonía peruana, ecuatoriana, brasileña y venezolana. Palma de 18-30 m altura, estípite solitario erecto recubierto de espinas negras planas largas (10-20 cm) muy agresivas dispuestas en bandas anulares densas (característica defensiva que disuade herbívoros y dificulta la cosecha — los cosechadores indígenas usan técnicas tradicionales con escaleras improvisadas, garfios o trepan árboles vecinos), corona de 8-15 hojas pinnadas erectas (4-6 m largo) verde-oscuras con foliolos numerosos rectos, inflorescencias entre las hojas con flores unisexuales monoicas, infrutescencias colgantes pesadas con 100-300 frutos drupáceos elipsoides (4-6 cm largo) verde-amarillentos al madurar, mesocarpo carnoso fibroso anaranjado comestible, semilla endocarpo durísimo con almendra blanca oleaginosa. Importancia etnobotánica EXCEPCIONAL: es la palma de las fibras artesanales más importantes de la Amazonía colombiana y del noroeste amazónico. De los foliolos jóvenes (cogollos) se extrae la fibra de chambira o cumare por raspado y separación de la cutícula brillante, fibra que se hila a mano formando cordeles tensos resistentes al agua (tradicionalmente sobre el muslo de la artesana) y se teje en hamacas, mochilas, atarrayas, redes de pesca, sombreros, canastos, manillas y artesanías comerciales — actividad económica central de mujeres tikuna, huitoto, bora, miraña, cocama, yucuna, yagua, ticuna, andoke, muinane en el trapecio amazónico colombiano-peruano-brasileño. Los frutos: mesocarpo comestible directamente (sabor dulce-aceitoso), prensado para aceite vegetal (alto en ácido oleico y palmítico, comparable a palma africana pero más nutritivo en vit. A), almendras consumidas y prensadas también para aceite. Cogollo (palmito) comestible (uso sostenible solo de palmas de tumba selectiva). Manejo agroecológico-extractivista sostenible: propagación por semilla (latencia profunda 6-18 meses, germinación irregular 30-50%, requiere remoción del endocarpo), vivero 2-3 años, trasplante a sitio definitivo en SAF (sistemas agroforestales) o enriquecimiento de bosque secundario, distancia 10-15 m, fructificación 8-12 años post-siembra (palma de inversión generacional), cosecha sostenible de cogollos cada 2-3 años por planta (no tumba). Lección viva de etnobotánica amazónica y soberanía cultural-económica: la chambira es ejemplo perfecto de cómo una palma silvestre amazónica integra alimentación, materia prima artesanal, identidad cultural de pueblos indígenas y economía comunitaria sostenible — su domesticación pendiente para SAF amazónicos representa una oportunidad de productos forestales no maderables con valor agregado. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015 Plantas y Líquenes de Colombia, IAvH Flora, Pérez Arbeláez 1947, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "phytelephas_macrocarpa",
+      "nombre_comun": "Tagua",
+      "nombre_comunes_regionales": [
+        "palma marfil vegetal",
+        "marfil vegetal",
+        "cabecinegro",
+        "yarina",
+        "pullipunta",
+        "anta"
+      ],
+      "nombre_cientifico": "Phytelephas macrocarpa Ruiz & Pav.",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 800,
+        "max_absoluto": 1500
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "La tagua o palma marfil vegetal (Phytelephas macrocarpa Ruiz & Pav., Arecaceae-Phytelepheae) es una palma nativa neotropical de la región amazónica occidental, presente en la Amazonía colombiana (Putumayo, Caquetá, Amazonas, Guaviare), Pacífico colombiano (con la especie hermana Phytelephas seemannii dominante en Chocó-Valle-Nariño) y a lo largo del piedemonte amazónico Andino entre 100 y 800 msnm en bosque húmedo tropical, várzeas y bosques de galería. Palma acaule o de estípite muy corto (hasta 2 m, mayormente subterráneo o procumbente), corona basal de 8-15 hojas pinnadas grandes (5-8 m largo) verde-medias con raquis arqueado y foliolos numerosos lanceolados regularmente dispuestos, dioica (plantas masculinas y femeninas separadas), inflorescencias densas globosas de coloración crema y aroma dulce intenso muy atractor de abejas-orquídeas Euglossini y escarabajos polinizadores, infrutescencias compuestas en cabezuelas pesadas (10-25 kg) con 6-20 frutos drupáceos espinosos exteriores (cabeza-de-negro) cada uno conteniendo 5-9 semillas endurísimas blanco-marfil del tamaño de un huevo de gallina — endospermo cristalino-translúcido al madurar que da el nombre \"marfil vegetal\" o \"ivory nut\" por su parecido al marfil animal en dureza, color y tallabilidad. Importancia económica histórica y contemporánea EXCEPCIONAL: el endospermo seco y curado de las semillas (la \"tagua\") es uno de los productos forestales no maderables más emblemáticos de Colombia y Ecuador. Tallada artesanalmente en botones, joyería, figuras, dijes, esculturas miniatura — sustituye éticamente el marfil animal de elefante (prohibido por CITES) en aplicaciones de lujo, moda y arte. La tagua colombiana del Pacífico (Phytelephas seemannii) abasteció gran parte de la industria mundial de botones entre 1900-1940 antes del plástico (Manizales-Pereira-Chocó), industria que ha resurgido en el siglo XXI como producto sostenible certificable. Frutos jóvenes con endospermo lechoso comestible (sabor a coco), maduros con endospermo durísimo no comestible humano. Manejo agroecológico-extractivista sostenible: propagación por semilla (germinación lenta 6-18 meses con latencia profunda, plántulas crecen 20-30 cm/año), vivero 2-4 años, trasplante a SAF o enriquecimiento de bosque, distancia 5-8 m, fructificación 10-15 años (palma de inversión generacional), cosecha sostenible de cabezuelas caídas naturalmente cada 3-4 meses por planta hembra productiva durante 50-80 años (longevidad excepcional). Lección viva de bioeconomía sostenible y conservación de biodiversidad: la tagua es ejemplo paradigmático de producto forestal no maderable (PFNM) que enseña cómo un bosque colombiano conservado en pie produce más valor económico de largo plazo (productos artesanales de exportación, ecoturismo, captura de carbono, agua) que un bosque tumbado para ganadería extensiva — modelo de economía verde de comunidades afro y campesinas del Pacífico-Amazonía. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015 Plantas y Líquenes de Colombia, IAvH Flora, Pérez Arbeláez 1947, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "oenocarpus_bataua",
+      "nombre_comun": "Seje",
+      "nombre_comunes_regionales": [
+        "mil pesos",
+        "milpesos",
+        "patabá",
+        "batauá",
+        "palma de leche",
+        "unguragui"
+      ],
+      "nombre_cientifico": "Oenocarpus bataua Mart.",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "emergente",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1000,
+        "max_absoluto": 1500
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "El seje, mil pesos o patabá (Oenocarpus bataua Mart., Arecaceae-Euterpeae) es una palma nativa neotropical de gran porte ampliamente distribuida en la Amazonía colombiana (Amazonas, Caquetá, Putumayo, Vaupés, Guaviare, Guainía), Orinoquia (Vichada, Meta, Casanare, Arauca) y Pacífico (Chocó, Valle del Cauca, Cauca, Nariño) entre 100 y 1.000 msnm en bosques húmedos tropicales de tierra firme, várzeas y bosques de galería, así como en toda la cuenca amazónica desde Bolivia hasta Venezuela y las Guayanas. Palma emergente solitaria majestuosa de 15-25 m altura (hasta 30 m en bosques maduros), estípite columnar liso gris-blanquecino sin espinas (rasgo distintivo frente a Astrocaryum), corona apical de 10-15 hojas pinnadas erectas-arqueadas enormes (6-10 m largo) verde-oscuras con foliolos numerosos regularmente dispuestos en un solo plano, inflorescencias entre las hojas con raquillas colgantes en forma de cola de caballo (hasta 1 m), monoica con flores unisexuales, infrutescencias pesadas (10-25 kg) con 500-2.000 frutos drupáceos elipsoides (3-4 cm) verde-violáceos que viran a morado-negro al madurar, mesocarpo púrpura aceitoso comestible, endocarpo fibroso, semilla con almendra blanca oleaginosa. Importancia alimentaria-nutricional-cultural EXCEPCIONAL: los frutos maduros, ablandados en agua tibia (40-50°C) durante 30-60 minutos, producen la tradicional \"leche de seje\" o \"yuco\" — bebida espesa color púrpura-violeta intenso, sabor dulce-aceitoso-cremoso similar a chocolate vegetal, ALTÍSIMO valor nutricional: 8-12% proteína (cualidad de aminoácidos comparable a leche humana — de ahí \"palma de leche\"), 25-30% aceite (rico en ácido oleico monoinsaturado >75%, similar al aceite de oliva pero mejor estabilidad oxidativa), vitaminas A y E, antocianinas antioxidantes. Bebida ancestral de pueblos indígenas amazónicos (huitoto, bora, miraña, andoke, yucuna, tikuna, makuna, cocama, ticuna) y comunidades afro del Pacífico (Tumaco, Buenaventura, Quibdó). El aceite de seje es aceite vegetal premium para uso medicinal-cosmético-gastronómico (Innpulsa-Vichada, AGROSAVIA Macarena, comunidades del Bajo Caquetá han impulsado cadenas productivas certificadas). Otros usos: hojas para techos, fibras para artesanías, palmito (uso sostenible). Manejo agroecológico-extractivista sostenible: propagación por semilla (latencia 6-12 meses, germinación 40-70% con remoción del mesocarpo), vivero 18-24 meses, trasplante en SAF amazónicos-pacíficos o enriquecimiento de bosque secundario, distancia 10-15 m, fructificación 8-12 años, cosecha sostenible 2-3 racimos/planta/año durante 60-80 años. Lección viva de soberanía alimentaria amazónica-pacífica y bioeconomía PFNM: el seje enseña que el bosque húmedo tropical conservado es la mayor despensa nutricional y económica posible — un kilo de frutos de seje aporta más nutrición esencial que muchos productos industriales importados, y un solo árbol adulto sostiene una familia campesina-indígena durante décadas sin tumbar bosque. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015 Plantas y Líquenes de Colombia, IAvH Flora, Pérez Arbeláez 1947, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "attalea_butyracea",
+      "nombre_comun": "Palma de vino",
+      "nombre_comunes_regionales": [
+        "palma real llanera",
+        "corozo de puerco",
+        "cuesco",
+        "palma de cuesco",
+        "táparo",
+        "corozo de marrano"
+      ],
+      "nombre_cientifico": "Attalea butyracea (Mutis ex L.f.) Wess.Boer",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "emergente",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1000,
+        "max_absoluto": 1400
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "La palma de vino o palma real llanera (Attalea butyracea (Mutis ex L.f.) Wess.Boer, Arecaceae-Cocoseae) es una palma nativa neotropical de gran porte, una de las palmas más conspicuas y económicamente importantes de los Llanos Orientales colombianos (Casanare, Meta, Arauca, Vichada), valles interandinos (Magdalena Medio, Valle del Cauca, Tolima, Huila, Cesar), Caribe (Córdoba, Sucre, Bolívar, Magdalena, La Guajira), Catatumbo (Norte de Santander) y partes bajas del piedemonte amazónico, entre 0 y 1.000 msnm en sabanas inundables, bosques de galería, potreros y zonas agropecuarias en transformación. Es la palma silvestre más característica del paisaje ganadero llanero y costeño colombiano, sobreviviendo a quemas, pastoreo extensivo y deforestación parcial gracias a su yema apical bien protegida — actúa como \"nurse plant\" en restauración de sabanas y bosques tropicales secos. Palma emergente solitaria majestuosa de 12-20 m altura, estípite columnar grueso (40-60 cm diámetro) gris-pardo recubierto en su porción media-baja de bases foliares persistentes (rasgo distintivo frente a Oenocarpus que es liso), corona apical de 15-25 hojas pinnadas erectas-arqueadas de hasta 10 m largo verde-medias con raquis robusto y foliolos numerosos rígidos dispuestos en planos a veces irregulares, monoica con inflorescencias interfoliares grandes (1.5-2 m), infrutescencias pesadas (20-50 kg) con 500-2.000 frutos drupáceos elipsoides (5-8 cm largo, 4-5 cm ancho) amarillo-anaranjados al madurar, mesocarpo carnoso-fibroso oleaginoso dulce-aromático comestible muy apetecido por ganado vacuno, cerdos, danta, chigüiro y pequeños mamíferos (de ahí \"corozo de puerco/marrano\"), endocarpo durísimo lignificado con 1-3 semillas (cuesco) que contienen almendra blanca oleaginosa comestible. Importancia multipropósito EXCEPCIONAL: (1) frutos: mesocarpo y almendra comestibles humanos y forraje porcino-bovino crítico durante la temporada seca llanera; (2) vino de palma o \"guarapo de palma\": savia dulce extraída por sangría del meristemo apical o de la inflorescencia masculina, fermentada espontáneamente en 1-3 días para producir bebida tradicional llanera de 4-8% alcohol — práctica ancestral sikuani, achagua, sáliba, cocama y de campesinos llaneros (CUIDADO: extracción no sostenible si mata la palma; preferir sangría parcial controlada o cosecha exclusiva de frutos); (3) hojas: techos rurales de palma muy duraderos (5-10 años), esteras, abanicos, cestas, escobas; (4) palmito: comestible (uso solo de palmas a tumbar); (5) endocarpos (cuescos): carbón vegetal de alto poder calórico, semillas decorativas; (6) ecológicamente: hábitat clave para múltiples especies de aves (guacamayas, loros, pavas, paujiles), mamíferos (perezoso, mono araña, capuchino) y reptiles (iguanas) que dependen de los frutos en sabanas y bosques secos donde otros recursos escasean. Manejo agroecológico sostenible: propagación por semilla (latencia 6-12 meses, germinación 40-60% con remoción del mesocarpo y estratificación), vivero 18-24 meses, trasplante a sabanas-potreros o SAF de cacao-cítricos como sombra alta, distancia 8-12 m, fructificación 10-15 años, cosecha sostenible 1-3 racimos/planta/año durante 60-80 años. Lección viva de palmicultura sostenible llanera-caribeña y resiliencia frente a fuego/sequía: la palma de vino enseña cómo el paisaje cultural llanero coexiste con vegetación nativa que provee alimentación, bebida tradicional, fibra y hábitat de fauna — manejada agroecológicamente reemplazaría parcialmente cultivos exógenos de alto insumo (palma africana, arroz) por bioeconomía nativa adaptada. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015 Plantas y Líquenes de Colombia, IAvH Flora, Pérez Arbeláez 1947, SiB Colombia."
     }
   ],
   "biopreparados": [
