@@ -844,6 +844,21 @@
             "type": "string"
           }
         },
+        "uso": {
+          "type": "string"
+        },
+        "dosis": {
+          "type": "string"
+        },
+        "target": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "valor_pedagogico": {
+          "type": "string"
+        },
         "_curation_status": {
           "type": "string"
         }
