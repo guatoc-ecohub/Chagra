@@ -8446,9 +8446,11 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
+        "ica-resolucion-3168-2015",
+        "fao-ecocrop",
+        "jbb-plantas-medicinales"
       ],
-      "valor_pedagogico": "Variedad de hinojo seleccionada por su bulbo comestible. Ensenia el aporque como tecnica de blanqueado y la diferencia entre la forma silvestre y la domesticada."
+      "valor_pedagogico": "El hinojo de bulbo o hinojo de Florencia (Foeniculum vulgare Mill. var. azoricum (Mill.) Thell., familia Apiaceae) es la variedad cultivar seleccionada de Foeniculum vulgare a partir de poblaciones de las islas Azores, diferenciada de la forma silvestre y de las variedades semilleras (var. dulce, var. vulgare) por su base foliar engrosada y carnosa que forma un pseudobulbo comestible blanco-verdoso de sabor anisado dulce y textura crujiente. Se cultiva en zonas templadas a frías colombianas (Cundinamarca, Boyacá, Antioquia oriental, Nariño, Cauca) entre 1.500 y 2.600 msnm con sol pleno, riego regular y suelo profundo de buena fertilidad. Su raíz pivotante sensible al trasplante obliga a siembra directa en surcos definitivos, y el bulbo se desarrolla en 3-4 meses tras la nascencia, requiriendo aporque progresivo de tierra contra la base foliar para blanquear y enternecer el pseudobulbo (similar al apio y al puerro). Lección viva: variedad de hinojo seleccionada por su bulbo comestible que enseña el aporque como técnica agronómica de blanqueado (la ausencia de luz inhibe la síntesis de clorofila y favorece textura tierna), la diferencia entre la forma silvestre alelopática semillera y la domesticada hortícola (un mismo binomio botánico puede contener cultivares con uso, manejo y química radicalmente distintos por selección humana milenaria), y el principio de selección varietal por órgano cosechado (semilla vs bulbo vs hoja) como motor de la diversidad agrícola europea introducida en Colombia. Comparte con el hinojo silvestre los exudados radicales cumarínicos alelopáticos, por lo que requiere aislamiento mínimo 2-3 m de tomate, frijol, cilantro y eneldo. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, ICA Resolución 3168/2015, FAO EcoCrop, JBB Plantas Medicinales."
     },
     {
       "id": "cyclanthera_pedata",
@@ -8730,10 +8732,12 @@
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
         "gbif-taxonomic-backbone",
-        "powo-kew"
+        "powo-kew",
+        "sib-colombia",
+        "bernal-2015-plantas-liquenes-colombia"
       ],
       "rol_ecologico": "Atractora de polinizadores (abejas nativas, colibries). Planta ornamental de bordes de cerca viva. Aporte estetico y educacional al agroecosistema.",
-      "valor_pedagogico": "Reloj del huerto: cada flor abre al amanecer y vive solo un dia. Ensenia la sincronizacion de la planta con el ciclo solar y la importancia de los polinizadores.",
+      "valor_pedagogico": "La tigridia o flor de tigre (Tigridia pavonia (L.f.) DC., familia Iridaceae) es una herbácea bulbosa perenne nativa de México y Centroamérica, naturalizada y cultivada en jardines campesinos colombianos como ornamental de bordes de cerca viva entre 800 y 2.000 msnm en zonas templadas. Recibe los nombres regionales lirio tigre y oceloxóchitl (náhuatl, flor de ocelote), por las manchas atigradas que decoran el centro de sus flores triangulares de 8-15 cm de pétalos vistosos (rojo, naranja, amarillo, blanco según cultivar). Su rasgo botánico más singular es la efemerofloración: cada flor individual abre al amanecer del día, alcanza receptividad polínica máxima al mediodía, y se marchita irreversiblemente al atardecer del mismo día (anthesis circadiana de aproximadamente 8-10 horas), pero el escapo floral produce sucesivamente nuevas flores durante semanas, dando continuidad de polen y néctar al agroecosistema. Lección viva del reloj del huerto: cada flor abre al amanecer y vive solo un día, enseñando la sincronización de la planta con el ciclo solar (cronobiología vegetal, ritmos circadianos regulados por fitocromos y criptocromos sensibles a la luz azul-roja del alba), el concepto de esfuerzo reproductivo distribuido en el tiempo como estrategia evolutiva alternativa a la flor de larga duración, y la importancia de los polinizadores nativos (abejas Apidae, Halictidae, colibríes Trochilidae y mariposas Lepidoptera) que deben sincronizar su forrajeo matinal con la apertura floral en una ventana corta. Excelente herramienta pedagógica para enseñar a niños la observación fenológica diaria y la conexión profunda planta-polinizador-tiempo solar. Manejo agroecológico: propagación por bulbos a 5-8 cm profundidad con separación 15-20 cm, floración 2-3 meses tras siembra, sin agroquímicos, asocio en bordes de cerca viva y guildas ornamentales-polinizadoras. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, SIB Colombia, Bernal 2015 Catálogo Plantas Colombia, Pérez Arbeláez 1947 Plantas Útiles.",
       "validation_level": "claude_draft"
     },
     {
@@ -9502,9 +9506,11 @@
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
         "gbif-taxonomic-backbone",
-        "powo-kew"
+        "powo-kew",
+        "fao-ecocrop",
+        "jbb-plantas-medicinales"
       ],
-      "valor_pedagogico": "Colorante natural: la curcuma demuestra como los pigmentos vegetales (curcumina) tienen propiedades medicinales antiinflamatorias y usos tintoreos tradicionales."
+      "valor_pedagogico": "La cúrcuma (Curcuma longa L., familia Zingiberaceae) es una zingiberácea herbácea perenne rizomatosa originaria del sur de Asia (India, Indonesia), naturalizada y cultivada en huertas familiares colombianas como tintórea y medicinal tradicional bajo los nombres locales palillo, azafrán de la tierra y guisador. Su rizoma carnoso anaranjado-amarillo intenso concentra curcuminoides (curcumina, demetoxicurcumina, bisdemetoxicurcumina), polifenoles con actividad antiinflamatoria, antioxidante y hepatoprotectora documentada en farmacopea moderna y medicina tradicional ayurvédica. Se cultiva en zonas cálidas a templadas bajas: Tolima, Huila, Valle del Cauca, Caribe colombiano y piedemonte llanero entre 200 y 1.000 msnm, ciclo 8-10 meses a cosecha del rizoma maduro. Lección viva: la cúrcuma demuestra cómo los pigmentos vegetales (curcumina) tienen propiedades medicinales antiinflamatorias y usos tintóreos tradicionales (tinte amarillo intenso para tejidos artesanales, colorante alimentario natural en arroces y guisos, sustituto cultural del azafrán). Enseña fitoquímica aplicada (los pigmentos secundarios protegen la planta y aportan valor terapéutico al humano), permacultura tropical (acumulador dinámico de potasio del suelo profundo) y la conexión entre cocina, salud y cultivo de patio en huertas campesinas. Manejo agroecológico: propagación por trozos de rizoma con yemas activas, siembra en sustrato rico en materia orgánica con buen drenaje, sombra parcial, asocio con jengibre, plátano y achiote, sin agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO EcoCrop, JBB Plantas Medicinales, Pérez Arbeláez 1947 Plantas Útiles."
     },
     {
       "id": "cuminum_cyminum",
@@ -9550,9 +9556,11 @@
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
         "gbif-taxonomic-backbone",
-        "powo-kew"
+        "powo-kew",
+        "fao-ecocrop",
+        "jbb-plantas-medicinales"
       ],
-      "valor_pedagogico": "Semilla aromatica: el comino ensena como las plantas concentran aceites esenciales en las semillas, fundamento del condimento en la cocina tradicional colombiana."
+      "valor_pedagogico": "El comino (Cuminum cyminum L., familia Apiaceae) es una umbelífera herbácea anual de ciclo corto (3-4 meses) originaria del Mediterráneo oriental y suroeste asiático, introducida en Colombia desde el período colonial y conservada en huertas familiares como condimento esencial de la cocina tradicional (sancocho, frijol, arroz, lomo, hogao costeño y carnes adobadas). Su fruto (aquenio comúnmente llamado semilla) concentra 2-5% aceite esencial rico en cuminaldehído, p-cimeno, β-pineno y γ-terpineno, responsables de su aroma cálido y propiedades carminativas, digestivas y antimicrobianas documentadas. Se adapta a zonas cálidas a templadas secas: Boyacá, Cundinamarca seca, Santander, Norte de Santander y enclaves áridos del Caribe entre 300 y 1.500 msnm con sol pleno y baja humedad relativa. Lección viva: el comino enseña cómo las plantas concentran aceites esenciales en las semillas como estrategia de defensa química y dispersión, fundamento del condimento en la cocina tradicional colombiana mestiza, y la importancia de los aromas como portadores de identidad cultural en la gastronomía campesina. Manejo agroecológico: siembra directa en surcos al final de la temporada de lluvias, bajo requerimiento hídrico (cultivo de secano tras establecimiento), aislamiento de otras apiáceas para evitar hibridación, asocio compatible con maíz y cilantro, cosecha cuando las umbelas tornan amarillo-pardo, secado a la sombra para preservar aceites volátiles. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO EcoCrop, JBB Plantas Medicinales, Pérez Arbeláez 1947 Plantas Útiles."
     },
     {
       "id": "elettaria_cardamomum",
@@ -9644,9 +9652,12 @@
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
         "gbif-taxonomic-backbone",
-        "powo-kew"
+        "powo-kew",
+        "fao-ecocrop",
+        "sinchi-amazonia-colombiana",
+        "bernal-2015-plantas-liquenes-colombia"
       ],
-      "valor_pedagogico": "Polinizacion manual: la vainilla ensena la relacion simbiotica entre orquideas y polinizadores nativos, y la tecnica tradicional de beneficio del fruto aromatico."
+      "valor_pedagogico": "La vainilla (Vanilla planifolia Jacks. ex Andrews, familia Orchidaceae) es una orquídea epífita trepadora hemiepifítica nativa de Mesoamérica (México y Centroamérica), naturalizada y con poblaciones silvestres reconocidas en Colombia (Amazonas, Putumayo, Vaupés, Caquetá, Magdalena medio, Chocó), cultivada en sistemas agroforestales tropicales como fuente del aroma natural más apreciado del mundo. Sus vainas (cápsulas dehiscentes mal llamadas frutos) concentran vainillina (3-metoxi-4-hidroxibenzaldehído), piperonal y centenares de compuestos aromáticos que solo se desarrollan tras el curado fermentativo de 3-6 meses post-cosecha (sudado, secado, condicionado), proceso bioquímico clave del beneficio tradicional. En su hábitat natural mexicano es polinizada exclusivamente por abejas Euglossini (Eulaema, Euglossa) ausentes en cultivos colombianos, lo que obliga a la polinización manual flor por flor durante el breve período de receptividad (una mañana al amanecer) usando una astilla de bambú, técnica desarrollada por Edmond Albius en 1841 que democratizó el cultivo mundial. Se cultiva en clima cálido húmedo entre 0 y 1.000 msnm con sombra parcial 50-70%, sustrato rico orgánico de drenaje rápido y tutor vivo (árbol espaldera). Lección viva: la vainilla enseña la relación simbiótica entre orquídeas y polinizadores nativos (coevolución mutualista altamente especializada), la fragilidad del servicio ecosistémico de polinización cuando se desplaza el cultivo de su hábitat original, la técnica tradicional de beneficio del fruto aromático que transforma una vaina inodora en el aroma del chocolate, helados y reposterías del mundo, y el valor de los sistemas agroforestales tropicales como conservadores de biodiversidad y proveedores de productos no maderables de alto valor. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO EcoCrop, SINCHI Amazonia Colombiana, Bernal 2015 Catálogo Plantas Colombia, Pérez Arbeláez 1947 Plantas Útiles."
     },
     {
       "id": "illicium_verum",
