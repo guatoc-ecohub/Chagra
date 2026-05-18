@@ -929,6 +929,15 @@
         },
         "observaciones": {
           "type": "string"
+        },
+        "tier": {
+          "type": "string",
+          "enum": [
+            "A",
+            "B",
+            "C"
+          ],
+          "description": "Calidad de la fuente: A=papers/institucionales, B=manuales divulgativos, C=web/blog"
         }
       },
       "additionalProperties": false
