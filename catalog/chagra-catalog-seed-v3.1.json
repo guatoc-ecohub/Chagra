@@ -1724,18 +1724,34 @@
     {
       "id": "hedychium_coronarium",
       "nombre_comun": "Matandrea",
+      "nombre_comunes_regionales": [
+        "lirio jengibre",
+        "mariposa blanca",
+        "matandrea",
+        "cucha"
+      ],
       "nombre_cientifico": "Hedychium coronarium J. König",
-      "familia_botanica": "Parsing Zingiberaceae",
+      "familia_botanica": "Zingiberaceae",
       "category": "especies_invasoras",
       "thermal_zones": [
         "templado",
         "frio"
       ],
+      "estrato": "medio",
       "roles_in_guild": [
         "invasive"
       ],
       "cultivable": false,
       "conservation_status": "invasor",
+      "habito": "herbácea rizomatosa perenne 1-2.5m",
+      "origen": "Asia tropical (Himalaya oriental a sur de China e Indochina)",
+      "clasificacion_uicn": "Invasora reconocida por ISSG (Global Invasive Species Database) en ambientes ribereños neotropicales",
+      "normativa_colombiana": [
+        {
+          "norma": "Resolución 684 de 2018 del Ministerio de Ambiente y Desarrollo Sostenible",
+          "alcance": "Listada como especie con alto riesgo de invasión en Colombia; lineamientos de prevención, manejo integral y restauración en áreas afectadas"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 800,
         "optimo_min": 1500,
@@ -1753,15 +1769,71 @@
       "drenaje_requerido": "bueno",
       "propagation": {
         "metodo_principal": "rizoma",
-        "notas": "Extracción TOTAL del rizoma; cualquier fragmento puede iniciar una nueva invasión rí abajo."
+        "notas": "Extracción TOTAL del rizoma; cualquier fragmento puede iniciar una nueva invasión río abajo."
       },
-      "especies_nativas_sustitutas": [],
+      "impacto_ecologico": "alto",
+      "ecosistemas_afectados": [
+        "corredores_hidricos",
+        "humedales",
+        "riberas_quebradas",
+        "bosque_de_galeria",
+        "bordes_bosque_humedo"
+      ],
+      "mecanismos_invasion": [
+        "Rizomas vigorosos forman matas monoespecíficas densas que excluyen flora riparia nativa",
+        "Dispersión hidrocórica: fragmentos de rizoma viajan río abajo y rebrotan en bancos de sedimento",
+        "Alteración hidrológica: acumulación de sedimentos y restricción de flujo en quebradas estrechas",
+        "Reproducción asexual dominante (semillas raramente fértiles fuera del rango nativo), banco de propágulos vegetativos persistente",
+        "Tolerancia a sombra parcial le permite invadir sotobosque ribereño bajo dosel cerrado"
+      ],
+      "metodos_extraccion": [
+        {
+          "metodo": "desenraice_completo",
+          "efectividad": "alta",
+          "costo": "alto",
+          "notas": "Único método curativo: extraer TODA la masa rizomatosa con palín o azadón en suelo húmedo post-lluvia. Tamizar suelo en sitios prioritarios para retirar fragmentos >2cm."
+        },
+        {
+          "metodo": "corte_bajo_repetido",
+          "efectividad": "baja",
+          "costo": "medio",
+          "notas": "Solo corte aéreo NO funciona: rebrote garantizado desde rizoma. Útil únicamente como medida pre-floración para evitar dispersión de semillas mientras se programa el desenraice."
+        },
+        {
+          "metodo": "solarizacion",
+          "efectividad": "baja",
+          "costo": "medio",
+          "notas": "Poco efectiva: el rizoma sobrevive bajo plástico en suelos húmedos de ribera; aplicable solo en taludes drenados sin reconexión hídrica."
+        },
+        {
+          "metodo": "herbicida_glifosato_dirigido",
+          "efectividad": "media",
+          "costo": "medio",
+          "notas": "PROHIBIDO cerca de cursos de agua (normativa ambiental colombiana, Decreto 1076/2015). Solo aplicable en parches fuera de zona de ronda hídrica (>30m del cauce) y con licencia."
+        }
+      ],
+      "epoca_optima_remocion": "Temporada seca (diciembre-febrero altiplano; junio-agosto Andes occidentales) ANTES de floración (julio-octubre típica) para evitar dispersión de semillas y minimizar arrastre de fragmentos de rizoma por crecida del cauce.",
+      "especies_nativas_sustitutas": [
+        "renealmia_alpinia",
+        "costus_spicatus",
+        "salix_humboldtiana",
+        "trichanthera_gigantea",
+        "buddleja_americana"
+      ],
+      "manejo_biomasa_extraida": "compostaje_termofilo_con_solarizacion_previa",
+      "_nota_manejo_biomasa": "Rizomas NUNCA dejar in situ ni arrastrar a cauce: rebrotan. Solarizar bajo plástico negro 60+ días o compostaje termofílico (>55°C sostenido) en pila lejos de quebrada. Alternativa: incineración controlada en sitio autorizado. PROHIBIDO disponer en bordes de ribera o humedal.",
+      "riesgo_rebrote": "altisimo",
+      "protocolo_post_remocion": "Restauración riparia activa obligatoria al siguiente semestre lluvioso: siembra de nativas ribereñas (sauce, aliso de quebrada, cucharo) con densidad 800-1100 ind/ha. Monitoreo trimestral año 1, semestral años 2-5. Corte/arranque inmediato de cualquier rebrote antes de 30cm altura. Estabilizar talud con cobertura vegetal nativa para evitar reinvasión por arrastre de propágulos aguas arriba.",
       "source_ids": [
         "humboldt-invasoras-andes",
         "res-684-2018-mads",
-        "powo-kew"
+        "issg-uicn-invasoras",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "sib-colombia"
       ],
-      "valor_pedagogico": "SE BUSCA: La 'Invasora de Quebradas'. El lirio jengibre o mariposa blanca (Hedychium coronarium J. König, familia Zingiberaceae) es una invasora del SE Asia tropical introducida en Colombia como ornamental por sus flores blancas fragantes que recuerdan mariposas. Se naturaliza agresivamente en riberas, quebradas, humedales y bordes de bosque húmedo entre 800 y 2.800 msnm. Se distribuye invadiendo Cundinamarca (Choachí, La Calera, Sabana Bogotá), Antioquia, Eje cafetero, Valle del Cauca y Tolima en zona térmica templada a fría. Forma matas densas vía rizomas vigorosos que asfixian la regeneración nativa ribereña, alteran la dinámica hidrológica (acumulan sedimento y restringen flujo) y desplazan flora riparia clave para fauna acuática. Si ves una 'mariposa blanca' en la orilla de quebrada, ¡es una alarma ecológica! Manejo: arranque manual con rizoma completo (NUNCA dejar fragmentos viables) + monitoreo trianual, prohibición jardinería en zonas de quebrada. Listada Res. 684/2018 MADS. Fuentes Tier A: Humboldt Invasoras Andes, Resolución 684/2018 MADS, POWO Kew, GBIF Backbone Taxonomy."
+      "valor_pedagogico": "SE BUSCA: La 'Invasora de Quebradas'. El lirio jengibre o mariposa blanca (Hedychium coronarium J. König, familia Zingiberaceae) es una invasora del SE Asia tropical introducida en Colombia como ornamental por sus flores blancas fragantes que recuerdan mariposas. Se naturaliza agresivamente en riberas, quebradas, humedales y bordes de bosque húmedo entre 800 y 2.800 msnm. Se distribuye invadiendo Cundinamarca (Choachí, La Calera, Sabana Bogotá), Antioquia, Eje cafetero, Valle del Cauca y Tolima en zona térmica templada a fría. Forma matas densas vía rizomas vigorosos que asfixian la regeneración nativa ribereña, alteran la dinámica hidrológica (acumulan sedimento y restringen flujo) y desplazan flora riparia clave para fauna acuática. Si ves una 'mariposa blanca' en la orilla de quebrada, ¡es una alarma ecológica! Manejo: arranque manual con rizoma completo (NUNCA dejar fragmentos viables) + monitoreo trianual, prohibición jardinería en zonas de quebrada. Listada Res. 684/2018 MADS. Fuentes Tier A: Humboldt Invasoras Andes, Resolución 684/2018 MADS, POWO Kew, GBIF Backbone Taxonomy.",
+      "validation_level": "operator_reviewed"
     },
     {
       "id": "ipomoea_batatas",
@@ -1808,6 +1880,13 @@
     {
       "id": "ipomoea_purpurea",
       "nombre_comun": "Campanilla morada",
+      "nombre_comunes_regionales": [
+        "campana",
+        "campanilla",
+        "batatilla morada",
+        "manto de la virgen",
+        "bejuco campana"
+      ],
       "nombre_cientifico": "Ipomoea purpurea (L.) Roth",
       "familia_botanica": "Convolvulaceae",
       "category": "especies_invasoras",
@@ -1816,11 +1895,25 @@
         "templado",
         "frio"
       ],
+      "estrato": "medio",
       "roles_in_guild": [
         "invasive"
       ],
       "cultivable": false,
       "conservation_status": "invasor",
+      "habito": "herbácea trepadora anual con tallos volubles de 2-4m",
+      "origen": "Mesoamérica tropical (México a Centroamérica); naturalizada pantropical",
+      "clasificacion_uicn": "No incluida en lista UICN de peores invasoras; categorizada por IAvH (Baptiste et al. 2010) como naturalizada con riesgo bajo-moderado en agroecosistemas",
+      "normativa_colombiana": [
+        {
+          "norma": "Resolución 684 de 2018 del Ministerio de Ambiente y Desarrollo Sostenible",
+          "alcance": "No incluida en listado prioritario nacional; manejo a nivel predial bajo lineamientos generales de prevención de invasoras"
+        },
+        {
+          "norma": "Resolución ICA 3168 de 2015",
+          "alcance": "Manejo fitosanitario como arvense facultativa en cultivos comerciales con potencial maleza en monocultivos"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 1000,
@@ -1840,15 +1933,70 @@
         "metodo_principal": "semilla",
         "notas": "Especial cuidado con los fragmentos de tallo con nudos; enraízan fácilmente."
       },
-      "especies_nativas_sustitutas": [
-        "passiflora_tripartita_mollissima"
+      "impacto_ecologico": "medio",
+      "ecosistemas_afectados": [
+        "bordes_de_via",
+        "potreros",
+        "cultivos_anuales",
+        "cercas_vivas",
+        "ruderal_urbano",
+        "rastrojos"
       ],
+      "mecanismos_invasion": [
+        "Producción masiva de semillas viables (banco persistente 3-5 años en suelo)",
+        "Crecimiento trepador agresivo que sombrea y ahoga plántulas leñosas en regeneración",
+        "Enraizamiento adventicio en nudos de tallo en contacto con suelo húmedo",
+        "Autocompatibilidad reproductiva: una sola planta puede iniciar foco invasivo",
+        "Hospedero de virus de cultivos (potyvirus de batata, geminivirus) — vector fitosanitario"
+      ],
+      "metodos_extraccion": [
+        {
+          "metodo": "desenraice_manual_pre_floracion",
+          "efectividad": "alta",
+          "costo": "bajo",
+          "notas": "Arranque manual con raíz pivotante antes de floración (3-4 meses post-germinación). Eficaz por ciclo anual y raíz superficial. Fácil de revertir."
+        },
+        {
+          "metodo": "corte_bajo_repetido",
+          "efectividad": "media",
+          "costo": "bajo",
+          "notas": "Corte a nivel de suelo cada 4-6 semanas antes de semillación; agota reservas en 1-2 ciclos. Combinable con cobertura muerta para suprimir rebrote."
+        },
+        {
+          "metodo": "cobertura_muerta_acolchado",
+          "efectividad": "alta",
+          "costo": "bajo",
+          "notas": "Mulch grueso (>10cm de paja, hojarasca o cartón) suprime germinación del banco de semillas. Recomendado en sistemas agroecológicos."
+        },
+        {
+          "metodo": "rotacion_con_cobertura_densa",
+          "efectividad": "alta",
+          "costo": "bajo",
+          "notas": "Siembra densa de leguminosas de cobertura (mucuna, dolichos) o pastos de corte agota luz disponible para germinación."
+        }
+      ],
+      "epoca_optima_remocion": "Final de temporada seca / inicio de lluvias (marzo-abril altiplano; septiembre-octubre Andes occidentales) cuando aparecen plántulas y antes de la floración (julio-noviembre típica). PROHIBIDO arrancar con frutos formados sin embolsar inflorescencias (autodispersión por semilla).",
+      "especies_nativas_sustitutas": [
+        "passiflora_tripartita_mollissima",
+        "passiflora_ligularis",
+        "tropaeolum_majus",
+        "mucuna_pruriens",
+        "trifolium_repens"
+      ],
+      "manejo_biomasa_extraida": "compostaje_termofilo",
+      "_nota_manejo_biomasa": "Material vegetativo sin semilla puede ir a compostaje normal. Material con semilla o flor: compostaje termofílico (>55°C 30+ días) o solarización 45 días antes de incorporar. PROHIBIDO usar como mulch fresco con frutos viables.",
+      "riesgo_rebrote": "medio",
+      "protocolo_post_remocion": "Sembrar inmediatamente cobertura competitiva (trébol, mucuna, raygrass anual en zona fría) o policultivo denso. Monitoreo mensual durante 2 años post-extracción para arrancar plántulas del banco de semillas antes de floración. En bordes de cultivo: mantener franja de leguminosas perennes (≥1m ancho) como barrera.",
       "source_ids": [
         "powo-kew",
         "sib-colombia",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "calderon-saenz-2003-invasoras",
+        "ica-resolucion-3168-2015",
+        "agrosavia-forrajeras-2022"
       ],
-      "valor_pedagogico": "La campana morada o campanilla (Ipomoea purpurea (L.) Roth) es una convolvulácea anual trepadora ampliamente naturalizada en Colombia, valorada como ornamental, cobertura de cercas y atrayente de polinizadores (abejas, abejorros, colibríes). Crece prácticamente en todas las zonas térmicas entre 0 y 2.800 msnm. Floración vistosa morada-azul-rosa según ecotipo, ciclo anual con autodispersión por semilla (potencial maleza moderada en cultivos densos; manejar bordes). Manejo agroecológico: cerca viva temporal, control biológico al final de ciclo (corte antes de semilla madura para reducir banco semillas), uso como cobertura suelo en pendientes. NO es invasora alto riesgo según IAvH Baptiste 2010 pero se considera naturalizada de manejo. Fuentes Tier A: Catálogo Plantas y Líquenes Colombia, IAvH, POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA."
+      "valor_pedagogico": "La campana morada o campanilla (Ipomoea purpurea (L.) Roth) es una convolvulácea anual trepadora ampliamente naturalizada en Colombia, valorada como ornamental, cobertura de cercas y atrayente de polinizadores (abejas, abejorros, colibríes). Crece prácticamente en todas las zonas térmicas entre 0 y 2.800 msnm. Floración vistosa morada-azul-rosa según ecotipo, ciclo anual con autodispersión por semilla (potencial maleza moderada en cultivos densos; manejar bordes). Manejo agroecológico: cerca viva temporal, control biológico al final de ciclo (corte antes de semilla madura para reducir banco semillas), uso como cobertura suelo en pendientes. NO es invasora alto riesgo según IAvH Baptiste 2010 pero se considera naturalizada de manejo. Fuentes Tier A: Catálogo Plantas y Líquenes Colombia, IAvH, POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA.",
+      "validation_level": "operator_reviewed"
     },
     {
       "id": "inga_edulis",
@@ -2157,6 +2305,14 @@
     {
       "id": "lantana_camara",
       "nombre_comun": "Camaroncillo",
+      "nombre_comunes_regionales": [
+        "venturosa",
+        "lantana",
+        "camaroncillo",
+        "siete colores",
+        "supirrosa",
+        "mora de caballo"
+      ],
       "nombre_cientifico": "Lantana camara L.",
       "familia_botanica": "Verbenaceae",
       "category": "especies_invasoras",
@@ -2165,12 +2321,26 @@
         "templado",
         "frio"
       ],
+      "estrato": "medio",
       "roles_in_guild": [
         "invasive",
         "pollinator_attractor"
       ],
       "cultivable": false,
       "conservation_status": "invasor",
+      "habito": "arbusto perenne ramificado 1-3m con tallos tetragonales y pubescencia áspera",
+      "origen": "América tropical (cuenca caribeña y norte de Sudamérica); estatus en Colombia debatido entre nativa de tierras bajas e híbrido naturalizado de cultivares ornamentales",
+      "clasificacion_uicn": "Listada entre las 100 peores especies invasoras del mundo (ISSG/UICN)",
+      "normativa_colombiana": [
+        {
+          "norma": "Resolución 684 de 2018 del Ministerio de Ambiente y Desarrollo Sostenible",
+          "alcance": "Cultivares ornamentales exóticos listados; manejo diferenciado de poblaciones naturalizadas vs. silvestres tropicales"
+        },
+        {
+          "norma": "Resolución ICA 3168 de 2015",
+          "alcance": "Regulación fitosanitaria por toxicidad a ganado bovino, equino y ovino (triterpenos pentacíclicos: lantadenos A y B causan hepatotoxicidad y fotosensibilización)"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 1200,
@@ -2190,16 +2360,72 @@
         "metodo_principal": "semilla",
         "notas": "Requiere remoción completa de raíz; los frutos son tóxicos para el ganado."
       },
-      "especies_nativas_sustitutas": [
-        "viburnum_triphyllum"
+      "impacto_ecologico": "alto",
+      "ecosistemas_afectados": [
+        "pastizales_degradados",
+        "potreros_abandonados",
+        "bordes_de_via",
+        "bosque_seco_tropical",
+        "matorrales_xerofiticos",
+        "areas_quemadas"
       ],
+      "mecanismos_invasion": [
+        "Dispersión zoocórica masiva por aves frugívoras (mirlas, sirirís) que consumen drupas y depositan semillas viables a kilómetros",
+        "Alelopatía: liberación de lantadenos y compuestos fenólicos en suelo inhibe germinación de gramíneas nativas y forrajeras",
+        "Rebrote vigoroso desde corona radical post-corte, fuego o pastoreo",
+        "Crecimiento rápido en suelos degradados con baja competencia (potreros sobrepastoreados)",
+        "Variabilidad genética por hibridación de cultivares ornamentales con poblaciones silvestres dificulta control",
+        "Tóxica para ganado: ingestión causa hepatotoxicidad fatal en bovinos y ovinos"
+      ],
+      "metodos_extraccion": [
+        {
+          "metodo": "desenraice_completo",
+          "efectividad": "alta",
+          "costo": "alto",
+          "notas": "Extracción manual con cepa completa (corona radical entera) usando palas, hachas o tracción animal en suelo húmedo. Esencial para evitar rebrote. Usar guantes (látex puede irritar piel sensible)."
+        },
+        {
+          "metodo": "corte_bajo_repetido",
+          "efectividad": "baja",
+          "costo": "medio",
+          "notas": "Solo desbroce NO funciona: rebrote vigoroso desde corona en 4-8 semanas. Útil únicamente como medida pre-extracción para reducir biomasa y acceder a corona."
+        },
+        {
+          "metodo": "pastoreo_caprino_controlado",
+          "efectividad": "media",
+          "costo": "bajo",
+          "notas": "Las cabras consumen rebrotes tiernos con tolerancia parcial; bovinos NO (toxicidad). Útil como complemento de control mecánico en parches densos. NO previene reinvasión por semilla."
+        },
+        {
+          "metodo": "fuego_controlado",
+          "efectividad": "NEGATIVA",
+          "costo": "bajo",
+          "notas": "PROHIBIDO: el fuego estimula germinación del banco de semillas y rebrote desde corona. Empeora la invasión y degrada pastizales."
+        }
+      ],
+      "epoca_optima_remocion": "Temporada seca (diciembre-marzo Andes; junio-septiembre Caribe) ANTES de floración pico (octubre-diciembre típica, variable según ecotipo) para evitar dispersión de drupas por aves. Suelo húmedo facilita desenraice; programar 1-2 semanas post-lluvias iniciales.",
+      "especies_nativas_sustitutas": [
+        "viburnum_triphyllum",
+        "dodonaea_viscosa",
+        "buddleja_americana",
+        "hesperomeles_goudotiana",
+        "miconia_squamulosa"
+      ],
+      "manejo_biomasa_extraida": "incineracion_controlada",
+      "_nota_manejo_biomasa": "Frutos verdes y maduros son tóxicos (no compostables in situ por riesgo de envenenamiento de animales si la pila es accesible). Incineración controlada en sitio autorizado o compostaje termofílico cercado (>60°C, 60+ días). PROHIBIDO dejar ramas con frutos en potreros: bovinos pueden ingerir hojas marchitas (mayor palatabilidad y misma toxicidad).",
+      "riesgo_rebrote": "alto",
+      "protocolo_post_remocion": "Restauración activa de pastizal o matorral nativo al siguiente semestre lluvioso: siembra de leguminosas forrajeras nativas + arbustivas nativas (dodonea, mortiño) en densidad 600-1100 ind/ha. Manejo de pastoreo rotacional para evitar sobrepastoreo (puerta abierta a reinvasión). Monitoreo trimestral año 1, semestral años 2-5. Capacitar a ganaderos: identificar plántulas y arrancar pre-floración. Cercar lotes en restauración hasta cobertura cierra (mínimo 18 meses).",
       "source_ids": [
         "gbif-taxonomic-backbone",
         "powo-kew",
         "ica-resolucion-3168-2015",
-        "nrc-1989-cultivos-andinos"
+        "issg-uicn-invasoras",
+        "res-684-2018-mads",
+        "humboldt-invasoras-andes",
+        "calderon-saenz-2003-invasoras"
       ],
-      "valor_pedagogico": "El camaroncillo (Lantana camara L.) es una especie arbustiva invasora presente en Colombia desde 0 hasta 2800 msnm, con óptimo entre 1200-2400 msnm en zonas térmicas cálidas, templadas y frías de departamentos como Cundinamarca, Valle del Cauca, Magdalena y Meta. Su manejo agronómico en contextos de control requiere remoción completa de raíces superficiales, control manual antes de floración para evitar dispersión de semillas por aves, y monitoreo de rebrotes después de quemas. Las asociaciones con otras especies son generalmente negativas por su capacidad de competir agresivamente por luz y nutrientes. Sus principales plagas en Colombia incluyen lepidópteros defoliadores y áfidos, pero su toxicidad para ganado (frutos y hojas contienen metabolitos secundarios) limita su uso en sistemas productivos. En el contexto cultural andino, comunidades campesinas la reconocen como 'hoja de pago' o indicador de disturbio antrópico, usándola tradicionalmente en barreras vivas para delimitar potreros aunque con precaución por su expansión rápida. Según la taxonomía de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido y distribución global está documentada, mientras que la Resolución ICA 3168 de 2015 regula su manejo en el territorio nacional."
+      "valor_pedagogico": "El camaroncillo (Lantana camara L.) es una especie arbustiva invasora presente en Colombia desde 0 hasta 2800 msnm, con óptimo entre 1200-2400 msnm en zonas térmicas cálidas, templadas y frías de departamentos como Cundinamarca, Valle del Cauca, Magdalena y Meta. Su manejo agronómico en contextos de control requiere remoción completa de raíces superficiales, control manual antes de floración para evitar dispersión de semillas por aves, y monitoreo de rebrotes después de quemas. Las asociaciones con otras especies son generalmente negativas por su capacidad de competir agresivamente por luz y nutrientes. Sus principales plagas en Colombia incluyen lepidópteros defoliadores y áfidos, pero su toxicidad para ganado (frutos y hojas contienen metabolitos secundarios) limita su uso en sistemas productivos. En el contexto cultural andino, comunidades campesinas la reconocen como 'hoja de pago' o indicador de disturbio antrópico, usándola tradicionalmente en barreras vivas para delimitar potreros aunque con precaución por su expansión rápida. Según la taxonomía de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido y distribución global está documentada, mientras que la Resolución ICA 3168 de 2015 regula su manejo en el territorio nacional.",
+      "validation_level": "operator_reviewed"
     },
     {
       "id": "lupinus_mutabilis",
@@ -2621,6 +2847,12 @@
     {
       "id": "pennisetum_setaceum",
       "nombre_comun": "Pasto fuente",
+      "nombre_comunes_regionales": [
+        "pasto plumacho",
+        "pasto fountain",
+        "plumero",
+        "cola de zorra ornamental"
+      ],
       "nombre_cientifico": "Pennisetum setaceum (Forssk.) Chiov.",
       "familia_botanica": "Poaceae",
       "category": "especies_invasoras",
@@ -2629,11 +2861,21 @@
         "templado",
         "frio"
       ],
+      "estrato": "bajo",
       "roles_in_guild": [
         "invasive"
       ],
       "cultivable": false,
       "conservation_status": "invasor",
+      "habito": "gramínea perenne cespitosa 0.6-1.2m con macollas densas y panículas plumosas crema-violáceas",
+      "origen": "Norte de África, Cuerno de África y Oriente Medio (de Marruecos a Pakistán, zonas semiáridas)",
+      "clasificacion_uicn": "Listada entre las 100 peores especies invasoras del mundo (ISSG/UICN); reconocida como invasora prioritaria en sistemas insulares (Hawái, Canarias, Galápagos) y áreas secas continentales",
+      "normativa_colombiana": [
+        {
+          "norma": "Resolución 684 de 2018 del Ministerio de Ambiente y Desarrollo Sostenible",
+          "alcance": "Listada como especie con alto riesgo de invasión en Colombia; lineamientos de prevención, manejo integral y restauración. Prohibida su comercialización como ornamental en viveros."
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 1000,
@@ -2653,19 +2895,81 @@
         "metodo_principal": "semilla",
         "notas": "Cubrir las inflorescencias con bolsas antes de arrancar para evitar dispersión por viento."
       },
-      "especies_nativas_sustitutas": [
-        "calamagrostis_effusa"
+      "impacto_ecologico": "alto",
+      "ecosistemas_afectados": [
+        "bosque_seco_tropical",
+        "matorrales_xerofiticos",
+        "taludes_viales",
+        "pastizales_degradados",
+        "areas_quemadas",
+        "valles_interandinos_secos"
       ],
+      "mecanismos_invasion": [
+        "Reproducción apomíctica (semillas viables sin polinización cruzada): un único individuo establece una invasión completa",
+        "Producción prolífica de semillas (>3000 semillas/macolla/año) con dispersión anemócora a distancias >100m",
+        "Banco de semillas persistente 5-10 años en suelos secos",
+        "Alta carga pirogénica (>8 t MS/ha) y arquitectura de macolla seca generan ciclo fuego-invasión: el fuego elimina nativas y favorece rebrote desde corona",
+        "Tolerancia extrema a sequía (raíces profundas) le permite invadir nichos secos sin competencia",
+        "Inhibición competitiva de gramíneas nativas (Paspalum spp., Andropogon spp.) y plántulas leñosas por monopolización de luz y humedad superficial"
+      ],
+      "metodos_extraccion": [
+        {
+          "metodo": "desenraice_completo",
+          "efectividad": "alta",
+          "costo": "medio",
+          "notas": "Arranque manual con macolla completa usando palín, pala o azadón en suelo húmedo post-lluvia. ESENCIAL embolsar inflorescencias antes de arrancar (semillas viables al menor disturbio). Tamizar suelo en focos prioritarios."
+        },
+        {
+          "metodo": "corte_bajo_repetido",
+          "efectividad": "baja",
+          "costo": "bajo",
+          "notas": "Solo desbroce NO funciona: rebrote vigoroso desde corona en 6-10 semanas y deja banco de semillas intacto. Útil únicamente como medida pre-extracción para reducir biomasa y dispersión inminente."
+        },
+        {
+          "metodo": "solarizacion",
+          "efectividad": "media",
+          "costo": "medio",
+          "notas": "Plástico negro 60-90 días en zonas planas suprime germinación del banco. Eficaz post-desenraice en focos pequeños y bordes."
+        },
+        {
+          "metodo": "cobertura_muerta_con_paja_seca",
+          "efectividad": "media",
+          "costo": "bajo",
+          "notas": "Mulch grueso de paja o material vegetal (smothering) sobre suelo desenraizado suprime rebrote y germinación. Combinable con siembra de nativas en agujeros."
+        },
+        {
+          "metodo": "fuego_controlado",
+          "efectividad": "NEGATIVA",
+          "costo": "bajo",
+          "notas": "PROHIBIDO: el ciclo fuego-invasión es el principal mecanismo de expansión de P. setaceum. Rebrote desde corona y germinación masiva post-quema. Empeora la invasión."
+        }
+      ],
+      "epoca_optima_remocion": "Temporada seca (diciembre-marzo en zona andina; junio-septiembre Caribe) ANTES de floración pico (febrero-mayo y agosto-noviembre, bimodal). Suelo aún húmedo de lluvias previas facilita desenraice; programar 2-4 semanas post-fin de lluvias. Si hay inflorescencias formadas, embolsar y arrancar como medida de urgencia.",
+      "especies_nativas_sustitutas": [
+        "calamagrostis_effusa",
+        "festuca_sp_paramo",
+        "agrostis_foliata",
+        "dodonaea_viscosa",
+        "buddleja_americana"
+      ],
+      "manejo_biomasa_extraida": "incineracion_controlada",
+      "_nota_manejo_biomasa": "Inflorescencias y biomasa con semillas: incineración controlada en sitio autorizado (la biomasa seca es excelente combustible — manejar precauciones de fuego). Alternativa: compostaje termofílico cercado (>60°C 60+ días) — semillas resisten compostaje doméstico frío. PROHIBIDO disponer en bordes o taludes: reinfecta el sitio.",
+      "riesgo_rebrote": "altisimo",
+      "protocolo_post_remocion": "Restauración inmediata con gramíneas nativas (calamagrostis en zona fría, festucas y agrostis en alto andino, paspalum y andropogon en valles cálidos) + arbustivas xerofíticas nativas (dodonea, buddleja) en densidad 1100-1500 ind/ha. Cobertura muerta gruesa sobre suelo expuesto. Monitoreo mensual año 1 (banco de semillas activo), trimestral años 2-5, semestral años 6-10 hasta agotamiento del banco. Arrancar plántulas pre-floración SIN EXCEPCIÓN. Coordinar con vecinos: erradicar focos en propiedades adyacentes para evitar reinfección por viento.",
       "source_ids": [
         "res-684-2018-mads",
         "issg-uicn-invasoras",
         "gbif-taxonomic-backbone",
-        "powo-kew"
+        "powo-kew",
+        "humboldt-invasoras-andes",
+        "calderon-saenz-2003-invasoras",
+        "sib-colombia"
       ],
       "valor_pedagogico": "SE BUSCA: El 'Plumacho Pirómano'. El pasto plumacho (Pennisetum setaceum (Forssk.) Chiov., sinonimo Cenchrus setaceus, familia Poaceae) es una gramínea originaria de Eurasia y norte de África introducida en Colombia como ornamental por sus inflorescencias plumosas color crema-violáceo, que se naturalizó como invasora altamente flamable en zonas semiáridas, taludes viales y matorrales degradados. Se distribuye en Cundinamarca (valles cálidos de Tena, Anapoima, La Mesa, Apulo), Tolima, Huila, Valle del Cauca y costa Caribe entre 0 y 2.800 msnm en zona térmica cálida a templada. Una belleza ornamental engañosa que se convierte en combustible para incendios (cargas pirogénicas > 8 t MS/ha) y forma monocultivos densos que destierran a nuestros pastos nativos (Paspalum, Andropogon) y plántulas leñosas. Manejo: arranque manual pre-floración + cobertura con paja seca (smothering) o solarización, monitoreo bianual del banco semillas (vida útil 5-10 años). Listada Res. 684/2018 MADS + ISSG-UICN top 100 invasoras globales. Fuentes Tier A: Resolución 684/2018 MADS, ISSG-UICN Invasoras Globales, POWO Kew, GBIF Backbone Taxonomy.",
       "antagonists": [
         "calamagrostis_effusa"
-      ]
+      ],
+      "validation_level": "operator_reviewed"
     },
     {
       "id": "petroselinum_crispum",
