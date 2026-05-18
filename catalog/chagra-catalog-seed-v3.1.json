@@ -20240,6 +20240,645 @@
       ],
       "valor_pedagogico": "La siempreviva u hoja del aire (Kalanchoe pinnata (Lam.) Pers., Crassulaceae, sinónimo Bryophyllum pinnatum (Lam.) Oken — algunos autores la ubican aún en género Bryophyllum) es una planta suculenta perenne originaria de Madagascar y África Oriental tropical, ampliamente naturalizada pantropicalmente (incluida Colombia desde hace siglos) entre 0 y 2.200 msnm en zonas térmicas cálidas-templadas-moderadas en casi todo el país: Antioquia (Medellín, Suroeste cafetero, Oriente, Bajo Cauca), Valle del Cauca (cinturón frutícola y zonas urbanas), Cundinamarca (Sabana templada — La Mesa, Anolaima, Anapoima, Fusagasugá), Boyacá templada (Moniquirá, Santana, Chitaraque), Caldas, Risaralda, Quindío (Eje Cafetero), Tolima, Huila, Santander (Bucaramanga, San Gil, Barichara, Lebrija), Norte de Santander, Magdalena (Santa Marta), Atlántico (Barranquilla), Bolívar (Cartagena), Cesar (Valledupar), La Guajira (sur), Córdoba, Sucre, Chocó (Quibdó), Cauca, Nariño y zonas urbanas en general. Es lección viva PEDAGÓGICAMENTE EXCELENTE — entre las plantas más mágicas del catálogo de huerta escolar — de reproducción asexual vegetativa por apomixis foliar (también llamada reproducción foliar plantular o yemas foliares marginales), un fenómeno biológico extraordinario que enseña a niñas y niños cómo una sola hoja desprendida de Kalanchoe pinnata produce espontáneamente 5-15 plantulas en miniatura (propágulos foliares) en cada hendidura del margen serrado-crenado de la hoja — sin necesidad de semilla, sin floración, sin polinización, sin riego intensivo, en apenas 7-21 días — basta dejar una hoja sobre tierra apenas humedecida (o incluso pegada con cinta a una pared con humedad ambiental) para que emita docenas de hijos perfectos clonales con sus propias raíces y hojas listas para autopropagarse y formar nuevas plantas adultas en pocos meses. Goethe la estudió obsesivamente durante sus investigaciones de metamorfosis vegetal y la nombró 'Goethe-Pflanze' (planta de Goethe) en honor a esa capacidad regenerativa que parecía contradecir las leyes biológicas conocidas en su época (siglo XVIII-XIX) — fenómeno hoy entendido como meristemos epifilos pre-formados en el primordio foliar que se activan tras desconexión del flujo de auxinas-citokininas de la planta madre. Pertenece a la familia Crassulaceae (igual familia que Crassula ovata jade, sedum, echeveria), planta perenne arbustiva-herbácea de 0.6-1.8 m de altura con tallos suculentos huecos rojizo-verdosos, hojas suculentas opuestas decusadas pinnadas en las plantas adultas (3-5 folíolos elípticos crenado-aserrados) o simples ovalado-crenadas en plantas juveniles (3-15 cm largo x 2-8 cm ancho) verde-jade brillantes a veces con bordes rojizos en exposición sol, inflorescencia panícula terminal péndula vistosa con flores tubulares colgantes péndulas anaranjado-rojizo-purpúreas (2-5 cm largo) polinizadas por colibríes (Trochilidae — colibríes esmeralda, pico-de-hoz, ermitaños neotropicales) y polillas crepusculares, frutos folículos con muchas semillas pequeñas (rara vez forma fruto en Colombia — predomina reproducción foliar asexual). Patrón fotosintético CAM. Uso medicinal tradicional pantropical bien documentado: hojas frescas trituradas como cataplasma cicatrizante de heridas-quemaduras-úlceras cutáneas, jugo de hojas como antiinflamatorio-antitusivo-diurético-antilitiásico (uso popular muy difundido en Colombia, Caribe, Centroamérica, Brasil, África, India — 'leaf of life'), estudios fitoquímicos identifican bufadienólidos (cardenólidos similares a digitálicos — precaución cardíaca en dosis altas), flavonoides, esteroles, ácidos orgánicos. Considerada planta ritual-protectora en tradiciones afrocaribeñas-yorubas santería ('yerba bruja' protectora del hogar). Manejo agroecológico: PROPAGACIÓN PRÁCTICAMENTE GRATUITA E ILIMITADA — basta dejar una hoja madura desprendida sobre sustrato apenas humedecido (tierra + arena 1:1) o incluso colgada en una bolsa plástica transparente con poca humedad ambiental y a los 7-21 días emite plantulas marginales listas para trasplantar individualmente, distancia 30-50 cm en cobertura, sombra parcial a sol parcial filtrado (no sol pleno tropical), riego moderado-escaso, suelos bien drenados, tolera sequía moderada, asocio con menta, hierbabuena, hierbabuena, cilantro, ajenjo, ruda en huertos medicinales caseros. Función en chagra/huerto escolar como medicinal tradicional cosmopolita de soberanía alimentaria, planta PEDAGÓGICAMENTE EXCELENTE para enseñar reproducción asexual vegetativa por apomixis foliar a niñas y niños (la lección biológica más impactante y visual de toda la huerta — un solo experimento simple con una hoja sobre tierra muestra la magia de la propagación clonal), cobertura del suelo medicinal, atractora de colibríes y polillas, ornamental tropical. Fuentes Tier A: GBIF, POWO Kew, Pamplona-Roger 2006 Plantas Medicinales, JBB Plantas Medicinales Cundinamarca-Boyacá, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015.",
       "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH48_MEDICINALES_SECUNDARIAS",
+      "id": "aloysia_citrodora",
+      "nombre_comun": "Cedrón",
+      "nombre_comunes_regionales": [
+        "hierba luisa",
+        "verbena de Indias",
+        "yerbaluisa",
+        "cedrón del Perú",
+        "lemon verbena"
+      ],
+      "nombre_cientifico": "Aloysia citrodora Paláu",
+      "familia_botanica": "Verbenaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2600,
+        "max_absoluto": 2900
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "esqueje",
+          "acodo"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Esquejes semileñosos de 15-20 cm en primavera-verano andino (febrero-abril y agosto-octubre en Cundinamarca-Boyacá), defoliar mitad inferior, sumergir base en hormona enraizante natural (sauce o miel diluida) y plantar en sustrato arena+turba 1:1 con humedad constante y sombra parcial. Enraizamiento 25-40 días. Trasplante a campo a los 90-120 días cuando la plántula supere 25 cm. Acodo aéreo también funciona en ramas semileñosas.",
+        "tiempo_a_establecimiento_dias": 35,
+        "notas": "Resiste podas formativas anuales que estimulan ramificación y mayor producción foliar. No produce semilla viable en clima andino — propagación exclusivamente clonal en Colombia.",
+        "fuente": "POWO Kew; Pamplona-Roger 2006; JBB Plantas Medicinales; Pérez Arbeláez 1947"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "perez-arbelaez-1947-plantas-utiles",
+        "jbb-plantas-medicinales",
+        "pamplona-roger-2006-plantas-medicinales",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "El cedrón o hierba luisa (Aloysia citrodora Paláu, Verbenaceae, sinónimos taxonómicos antiguos Lippia citriodora, Aloysia triphylla — recientemente consolidada bajo el género Aloysia tras revisiones moleculares POWO/GBIF 2015-2020) es un arbusto medicinal aromático perenne semileñoso originario de Argentina-Chile-Perú-Uruguay (cono sur sudamericano andino), introducido en Colombia desde la época colonial y profundamente naturalizado en huertos medicinales caseros andinos entre 1.500 y 2.600 msnm en zonas térmicas templadas-frías-moderadas: Cundinamarca (Sabana de Bogotá completa — Bogotá, Funza, Mosquera, Chía, Cota, Cajicá, Sopó, Tocancipá; cinturón templado Anolaima, La Mesa, Fusagasugá, Pacho), Boyacá (Tunja, Duitama, Sogamoso, Villa de Leyva, Paipa, Tibasosa, Moniquirá), Nariño (Pasto, Túquerres, Ipiales), Cauca (Popayán, Silvia), Antioquia oriental (Rionegro, La Ceja, Marinilla, El Carmen de Viboral, Guarne), Eje Cafetero (Manizales, Pereira, Armenia y veredas frías), Quindío alto, Santander (Bucaramanga, San Gil, Barichara, Socorro), Norte de Santander (Pamplona — coincidencia con Pamplona-Roger), Tolima alto (Líbano, Falan, Ibagué cordillera) y Valle del Cauca templado-frío (Sevilla, Caicedonia, Buga zona alta). Pertenece a la familia Verbenaceae junto con su pariente lejana Lippia alba (prontoalivio) y Verbena officinalis (verbena oficinal) — comparten estructura morfológica básica de flores tubulares pequeñas en espigas terminales. Arbusto erecto de 1-3 m de altura con tallos cuadrangulares semileñosos lila-grisáceos, hojas verticiladas (3-4 por nudo — característica diagnóstica frente a Verbenaceae opuestas) lanceoladas estrechas (5-10 cm largo x 1-2 cm ancho) verde-claras brillantes con superficie ásperamente puberulenta y olor intenso a limón fresco al frotarlas (aceite esencial rico en citral 25-40%, geranial, limoneno, ocimeno, citronelal — terpenoides volátiles responsables del aroma cítrico inconfundible y de las propiedades digestivas-sedantes-antiespasmódicas documentadas), inflorescencia panícula terminal con flores blanco-lilas pequeñas (4-5 mm) tubulares poco vistosas pero melíferas atractivas para abejas Apis, Meliponini, Bombus y mariposas. Uso medicinal tradicional colombiano milenario en mestizos andinos y migración cultural europea-mediterránea: infusión de hojas frescas o secas (3-5 hojas en taza de agua caliente, no hervida) como digestiva post-comida, carminativa (gases intestinales), sedante leve (ansiolítico nocturno suave), antiespasmódica gástrica, antitusiva, febrífuga moderada — frecuentemente combinada con manzanilla (Matricaria chamomilla), toronjil (Melissa officinalis) y hierbabuena (Mentha spicata) en aguas aromáticas digestivas mixtas. Documentada por Pérez Arbeláez 1947 y Pamplona-Roger 2006. Manejo agroecológico: propagación exclusivamente clonal por esqueje semileñoso o acodo aéreo, distancia 1.0-1.5 m entre plantas en bordes de huerto o cama dedicada de aromáticas, sol pleno a sombra parcial filtrada matutina (medio día sombreado), riego moderado regular sin encharcamiento, suelos bien drenados arenoso-arcillosos pH 6.0-7.5, podas formativas anuales en agosto-septiembre andino (fin sequía) que estimulan ramificación y mayor producción foliar, cosecha foliar continua durante todo el año (hojas frescas para infusión o secadas a la sombra para conserva), asocio benéfico con menta, manzanilla, toronjil, lavanda, romero, ruda, salvia en huertos medicinales mixtos. Pierde hojas en heladas fuertes (-3 °C) pero rebrota desde base en primavera-verano andinos. Función en chagra/huerto medicinal como aromática digestiva-sedante leve cosmopolita complementaria al toronjil-manzanilla-menta, atractora de polinizadores domesticados y silvestres, repelente moderado de mosca blanca y áfidos por liberación volátil de citral. Fuentes Tier A: GBIF, POWO Kew, Pérez Arbeláez 1947, JBB Plantas Medicinales Cundinamarca-Boyacá, Pamplona-Roger 2006, Bernal 2015, SiB Colombia.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH48_MEDICINALES_SECUNDARIAS",
+      "id": "cymbopogon_flexuosus",
+      "nombre_comun": "Limonaria india",
+      "nombre_comunes_regionales": [
+        "limonaria de Cochin",
+        "lemongrass East Indian",
+        "Malabar grass",
+        "limoncillo indio"
+      ],
+      "nombre_cientifico": "Cymbopogon flexuosus (Nees ex Steud.) W. Watson",
+      "familia_botanica": "Poaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 400,
+        "optimo_max": 1800,
+        "max_absoluto": 2300
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 18,
+        "optimo_max": 30,
+        "max_tolerable": 38
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "division_mata",
+          "rizoma"
+        ],
+        "best_method": "division_mata",
+        "protocol_resumen": "División de macolla madura: extraer la mata completa con horquilla, separar manualmente en hijuelos de 2-4 macollos cada uno con raíces propias, recortar hojas a 20-30 cm para reducir transpiración y plantar inmediatamente en suelo húmedo a 60-100 cm de distancia. Establecimiento 30-60 días. Rendimiento aceite esencial 0.4-0.8% peso seco (más alto que C. citratus 0.2-0.5%) — variedad preferida para destilación industrial de citral.",
+        "tiempo_a_establecimiento_dias": 45,
+        "notas": "DISTINTA DE Cymbopogon citratus (limonaria común de West Indies): C. flexuosus es el lemongrass del este (India-Ceilán) con mayor concentración de citral y hojas más rojizas en la base. Ambas se confunden frecuentemente; POWO las separa por morfología foliar y origen geográfico.",
+        "fuente": "POWO Kew; GBIF; Pamplona-Roger 2006; AGROSAVIA aromáticas tropicales"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "La limonaria india o lemongrass East Indian (Cymbopogon flexuosus (Nees ex Steud.) W. Watson, Poaceae, gramínea aromática originaria de India-Ceilán-Sri Lanka tropical) es una poácea perenne macolladora de tallo aéreo introducida en Colombia para destilación industrial de aceite esencial de citral (~70-85% de citral total, mayor que C. citratus ~65-75%), cultivada entre 0 y 1.800 msnm en zonas térmicas cálidas-templadas-moderadas en: Antioquia (Urabá, Bajo Cauca, Magdalena Medio, Suroeste cafetero), Valle del Cauca (cinturón frutícola Tuluá, Buga, Palmira, Ginebra), Cundinamarca templada (La Mesa, Anolaima, Anapoima, Fusagasugá, Tena, Cachipay), Tolima (Espinal, Ibagué, Mariquita, Honda), Huila (Neiva, La Plata, Pitalito), Caldas templada (La Dorada, Victoria), Magdalena (Santa Marta, Aracataca, Fundación), Cesar (Valledupar, Codazzi, La Paz, Bosconia), Bolívar (Cartagena rural, El Carmen de Bolívar), Atlántico, Sucre, Córdoba, Casanare, Meta (Villavicencio, Acacías, Granada), Caquetá (Florencia, El Doncello, Belén), Putumayo (Mocoa, Puerto Asís), Chocó (Quibdó, Istmina). Pertenece al género Cymbopogon (familia Poaceae, subfamilia Panicoideae) junto con C. citratus (West Indian lemongrass — la limonaria común mucho más extendida en Colombia), C. nardus (citronela), C. martinii (palmarosa) y C. winterianus (citronela de Java) — todos los citronelas-limonarias forman grupo botánico-quimotípico unitario distinguible por matices morfológicos foliares y composición de aceite esencial (citral vs citronelal vs geraniol). DIFERENCIACIÓN CRÍTICA con C. citratus (West Indian, ya presente en catálogo): C. flexuosus posee tallos basales rojizo-purpúreos (no verdes), hojas más estrechas (1.0-1.5 cm vs 1.5-2.5 cm en citratus), inflorescencia más vistosa (panícula laxa con espiguillas pareadas vs panícula compacta en citratus) y origen India en lugar del Caribe-Malasia. Es macolla perenne erecta de 1.5-2.5 m altura con hojas largas lanceoladas verde-azuladas-glaucas (60-120 cm largo x 1.0-1.5 cm ancho) acanaladas y aromáticas, base envainadora rojiza, inflorescencia panícula laxa terminal (60-90 cm largo) con espiguillas pareadas (rara vez fructifica en Colombia — propagación exclusivamente vegetativa). Uso tradicional como aromática culinaria (tés digestivos, sazonador en sopas y curries asiáticos asimilados a gastronomía colombiana del Pacífico-Caribe), medicinal (infusión digestiva, carminativa, antiespasmódica, febrífuga, sedante leve, hipotensora moderada), repelente de insectos (mosquitos, zancudos, jejenes — aceite esencial rico en citral repele Aedes aegypti documentado en estudios INS Colombia 2010-2018), industrial (destilación de aceite esencial para perfumería, aromaterapia, cosmética, productos de limpieza ecológicos, repelentes naturales en velas y aerosoles), forrajera de bajo valor (consumida por bovinos solo en escasez extrema por su alto contenido aromático). Manejo agroecológico: propagación clonal por división de macolla en hijuelos de 2-4 macollos cada uno (cada planta madura da 20-40 hijuelos cada 2-3 años), distancia 80-100 cm entre plantas en línea y 100-150 cm entre líneas, sol pleno a sombra parcial leve, riego moderado regular sin encharcamiento, suelos arenosos-arcillosos bien drenados pH 5.5-7.0, fertilización moderada con compost y bocashi 2 kg/planta/año, cosecha foliar trimestral o semestral cortando hojas a 20 cm del suelo (la mata rebrota vigorosamente), cosecha total cada 4-6 años redividiendo y renovando, asocio benéfico con cítricos, plátano, café, cacao, yuca, maíz como repelente perimetral de plagas, ciclo productivo útil 8-15 años. Tolera sequía moderada estacional pero no heladas (helada letal +2 °C). Función en chagra/huerto medicinal como aromática repelente perimetral cálida-templada complementaria a citratus, ornamental gramínea, productora industrial de citral. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, FAO Ecocrop, Pamplona-Roger 2006, JBB Plantas Medicinales, SiB Colombia.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH48_MEDICINALES_SECUNDARIAS",
+      "id": "verbena_officinalis",
+      "nombre_comun": "Verbena oficinal",
+      "nombre_comunes_regionales": [
+        "verbena común",
+        "hierba sagrada",
+        "verbena europea",
+        "vervain",
+        "herba sacra"
+      ],
+      "nombre_cientifico": "Verbena officinalis L.",
+      "familia_botanica": "Verbenaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 10,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "division_mata"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra superficial directa o en semillero (las semillas requieren luz para germinar — no cubrir), germinación 14-28 días con humedad constante, trasplante a los 45-60 días. División de mata madura en otoño/inicio temporada seca también viable. Distancia 30-40 cm. Floración primer año si siembra temprano.",
+        "tiempo_a_establecimiento_dias": 60,
+        "notas": "Se naturaliza fácilmente en suelos perturbados de altiplano andino — comportamiento ruderal moderado sin invadir. Resiembra natural prolífica controlable con desbrote.",
+        "fuente": "POWO Kew; Pamplona-Roger 2006; JBB Plantas Medicinales; Pérez Arbeláez 1947"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "perez-arbelaez-1947-plantas-utiles",
+        "jbb-plantas-medicinales",
+        "pamplona-roger-2006-plantas-medicinales",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "La verbena oficinal o hierba sagrada (Verbena officinalis L., Verbenaceae, especie tipo del género Verbena que da nombre a la familia botánica completa) es una hierba perenne medicinal originaria de Europa-Mediterráneo-Asia occidental, ampliamente naturalizada cosmopolitamente y bien establecida en altiplanos andinos colombianos entre 1.800 y 2.800 msnm en zonas térmicas templadas-frías-moderadas: Cundinamarca (Sabana de Bogotá, Subachoque, Cajicá, Chía, Tocancipá, Suesca, Sesquilé; cinturón templado La Mesa-Anolaima-Anapoima), Boyacá (Tunja, Sotaquirá, Cómbita, Villa de Leyva, Paipa, Duitama, Sogamoso, Tibasosa, Pesca), Nariño (Pasto, Túquerres, Ipiales, Cumbal, Aldana, Yacuanquer), Cauca alto (Popayán, Silvia, Totoró, Coconuco), Antioquia oriental fría (Sonsón, Abejorral, La Unión, La Ceja alta, El Retiro alto), Quindío alto (Salento, Filandia), Risaralda alta (Santa Rosa de Cabal, Marsella, Belén de Umbría), Caldas (Manizales, Villamaría, Aguadas, Salamina, Riosucio alto), Santander (Vélez, Mogotes, San Gil, Onzaga, Cerrito) y Norte de Santander alto (Pamplona, Chitagá, Toledo, Mutiscua, Silos). Pertenece a la familia Verbenaceae (la familia bautizada por esta especie tipo) junto con Aloysia citrodora (cedrón), Lippia alba (prontoalivio), Lippia dulcis, Lantana camara, Lantana trifolia y otras verbenáceas medicinales-ornamentales. Hierba perenne erecta de 30-80 cm de altura con tallos cuadrangulares delgados ramificados rígidos verde-grisáceos, hojas opuestas decusadas pinnatífidas profundamente lobuladas verde-oscuras ásperas (3-7 cm largo x 1-3 cm ancho — variables según ambiente), inflorescencia espigas terminales largas delgadas (10-25 cm) con flores diminutas tubulares lila-pálidas a blanco-lavanda (3-5 mm) escalonadas desde la base hacia el ápice (floración acrópeta — patrón clásico Verbenaceae) melíferas pequeñas atractivas para abejas, sírfidos y avispas parasitoides, frutos esquizocarpos secos con 4 mericarpos longitudinales. Uso medicinal tradicional ancestralmente sagrada en cultura celta-romana-druida-medieval europea ('herba sacra' usada en rituales druidas, romanos en altares de Júpiter, medieval medicina monástica), conservada en medicina popular colombiana mestiza pos-colombiana como infusión sedante leve nocturna (ansiolítica, ayuda al sueño suave), digestiva (tras comidas pesadas), hepato-protectora suave (tradición popular sin evidencia clínica fuerte), antiespasmódica menstrual (mujeres rurales andinas la usan en infusión durante calambres menstruales), galactogoga moderada (estimula lactancia popular), antiinflamatoria tópica (cataplasmas en moretones-esguinces leves) y febrífuga moderada. Fitoquímica: glucósidos iridoides (verbenalina, verbenina, hastatosido), flavonoides (luteolina, escutellareína), aceite esencial menor (citral, geraniol, limoneno), taninos. NO confundir con: verbena cidrera (Aloysia citrodora arbusto de 1-3 m), prontoalivio (Lippia alba arbusto), lantana (Lantana camara arbusto con cabezuelas — TÓXICA en bayas inmaduras). Manejo agroecológico: propagación por semilla superficial sin cubrir (luz-germinante) o división de mata madura, distancia 30-40 cm, sol pleno preferido, riego moderado, suelos pobres a moderadamente fértiles bien drenados arenoso-arcillosos pH 6.0-7.5, tolera sequía moderada estacional, muy resistente a heladas (-8 °C), poda ligera tras floración estimula rebrote, cosecha foliar y de espigas en plena floración (mayor concentración de iridoides), secado a la sombra. Función en chagra/huerto medicinal como sedante leve tradicional europea conservada en cultura mestiza andina, atractora de polinizadores diminutos y avispas parasitoides benéficas (control biológico de plagas), ornamental discreta de bordes. Fuentes Tier A: GBIF, POWO Kew, Pérez Arbeláez 1947, JBB Plantas Medicinales, Pamplona-Roger 2006, Bernal 2015, SiB Colombia.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH48_MEDICINALES_SECUNDARIAS",
+      "id": "lippia_alba",
+      "nombre_comun": "Prontoalivio",
+      "nombre_comunes_regionales": [
+        "cidrón mexicano",
+        "juanilama",
+        "pronto alivio",
+        "salvia santa",
+        "orozul",
+        "Caribbean oregano"
+      ],
+      "nombre_cientifico": "Lippia alba (Mill.) N.E.Br. ex Britton & P.Wilson",
+      "familia_botanica": "Verbenaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1800,
+        "max_absoluto": 2400
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 18,
+        "optimo_max": 28,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "esqueje",
+          "acodo"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Esqueje semileñoso de 15-25 cm en cualquier época húmeda, defoliar mitad inferior, plantar directo en suelo húmedo o en sustrato arena+turba 1:1. Enraizamiento extraordinariamente fácil 14-25 días. Acodo aéreo natural en ramas inferiores que tocan suelo. Trasplante a campo a 45-60 días con plántulas de 30 cm.",
+        "tiempo_a_establecimiento_dias": 25,
+        "notas": "Especie de quimotipos múltiples documentados en Colombia: quimotipo carvona-limoneno (más dulce, aromático cítrico), quimotipo citral (lemon-cítrico fuerte), quimotipo mirceno-tagetona (alcanfor-mentolado) — cada quimotipo tiene perfil de uso terapéutico distinto.",
+        "fuente": "POWO Kew; AGROSAVIA aromáticas; JBB Plantas Medicinales; Pamplona-Roger 2006"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "perez-arbelaez-1947-plantas-utiles",
+        "jbb-plantas-medicinales",
+        "pamplona-roger-2006-plantas-medicinales",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "gbif-colombia"
+      ],
+      "valor_pedagogico": "El prontoalivio o cidrón mexicano (Lippia alba (Mill.) N.E.Br. ex Britton & P.Wilson, Verbenaceae, sinónimos antiguos Lantana alba Mill., Lippia geminata Kunth) es un arbusto medicinal aromático perenne semileñoso NATIVO neotropical de distribución amplia desde México hasta Argentina-Paraguay incluyendo el Caribe colombiano y la cuenca del Magdalena, cultivada y silvestre simultáneamente en Colombia entre 0 y 1.800 msnm en zonas térmicas cálidas-templadas-moderadas en: Caribe colombiano completo (La Guajira, Magdalena, Atlántico, Bolívar, Cesar, Sucre, Córdoba — donde es nativa silvestre frecuente en sabanas, rastrojos y bordes), Pacífico (Chocó, Valle costero, Cauca costero, Nariño costero), Magdalena Medio (Santander, Antioquia ribereña, Bolívar, Cesar), Valle del Cauca (Cali, Buga, Tuluá, Palmira), Tolima (Espinal, Ibagué, Honda, Mariquita), Huila (Neiva, La Plata, Garzón, Pitalito), Antioquia templada-cálida (Suroeste, Magdalena Medio, Bajo Cauca, Urabá), Cundinamarca templada-cálida (La Mesa, Anolaima, Anapoima, Fusagasugá, Pacho cálido, Yacopí, Pacho, Caparrapí), Norte de Santander (Cúcuta, Pamplonita templada, Ocaña), Casanare, Meta, Vichada, Arauca (Llanos Orientales completos), Caquetá (Florencia, Belén), Putumayo (Mocoa, Puerto Asís) y zonas urbanas tropicales en general. Pertenece a la familia Verbenaceae (parientes A. citrodora cedrón, V. officinalis verbena oficinal, Lippia dulcis orozú) — el género Lippia incluye ~200 especies neotropicales aromáticas con potencial industrial-medicinal documentado. Arbusto erecto o decumbente ramificado de 1.0-2.5 m altura con tallos cuadrangulares semileñosos rugosos, hojas opuestas verticiladas (3-4 por nudo) ovado-lanceoladas (3-7 cm largo x 1.5-3 cm ancho) verde-grisáceas pubescentes ásperas con aroma intenso variable según quimotipo (cítrico-limonado, alcanforado-mentolado o dulce-anisado), inflorescencia capítulo cabezuela esférico-cilíndrica pequeña axilar pedunculada (4-8 mm) con flores diminutas blanco-violáceas tubulares (2-3 mm) melíferas atractivas para abejas Apis, Meliponini, mariposas pequeñas y avispas parasitoides. Uso medicinal tradicional ampliamente documentado en medicina popular colombiana, mexicana, caribeña y centroamericana como nombre 'prontoalivio' refleja su versatilidad terapéutica: infusión de hojas frescas o secas como digestiva post-comida (carminativa, antiespasmódica gástrica, antiemética en náuseas), sedante leve (ansiolítica suave nocturna), antitusiva (cólicos infantiles, tos), antiinflamatoria gástrica (gastritis, úlceras leves), febrífuga moderada (fiebres bajas), antibacteriana tópica (heridas, abscesos cutáneos — uso popular), repelente de insectos perimetral (mosquitos, zancudos), aromática culinaria caribeña (ingredientes en sopas costeñas, sancochos, sazonadores tradicionales). Quimotipos múltiples documentados en Colombia con composiciones de aceite esencial muy variables — investigación UNal Medellín, CIAT, AGROSAVIA Caribe documentan al menos 5 quimotipos (citral, carvona-limoneno, mirceno-tagetona, alcanfor-1,8-cineol, geraniol) con aplicaciones industriales distintas en aromaterapia, perfumería y biopesticidas. Manejo agroecológico: propagación clonal extraordinariamente fácil por esqueje semileñoso de 15-25 cm (enraíza en 14-25 días casi sin manejo), distancia 1.0-1.5 m entre plantas en bordes o cama dedicada de aromáticas, sol pleno preferido, riego moderado, suelos arenoso-arcillosos bien drenados pH 5.5-7.5, podas formativas anuales estimulan ramificación y mayor producción foliar, cosecha foliar continua, asocio benéfico con cítricos, mango, guayaba, papaya, café, cacao, plátano como repelente perimetral. Tolera sequía estacional moderada pero no heladas. Función en chagra/huerto cálido-templado medicinal como aromática multipropósito digestiva-sedante-repelente nativa caribeña-pacífica complementaria a cedrón-toronjil-manzanilla, atractora de polinizadores y avispas benéficas, ornamental aromática perimetral. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Pérez Arbeláez 1947, JBB Plantas Medicinales, Pamplona-Roger 2006, Bernal 2015, SiB Colombia, GBIF Colombia.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH48_MEDICINALES_SECUNDARIAS",
+      "id": "chamaemelum_nobile",
+      "nombre_comun": "Manzanilla romana",
+      "nombre_comunes_regionales": [
+        "manzanilla perenne",
+        "manzanilla inglesa",
+        "Roman chamomile",
+        "manzanilla noble",
+        "camomila romana"
+      ],
+      "nombre_cientifico": "Chamaemelum nobile (L.) All.",
+      "familia_botanica": "Asteraceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "ground_cover",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3100
+      },
+      "temperatura_c": {
+        "helada_letal": -7,
+        "optimo_min": 10,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "division_mata",
+          "esqueje"
+        ],
+        "best_method": "division_mata",
+        "protocol_resumen": "División de mata madura en otoño-invierno andino o primavera temprana: extraer la planta completa, separar manualmente en hijuelos enraizados de 5-10 cm de diámetro y replantar inmediatamente a 25-30 cm de distancia. También por semilla superficial (luz-germinante, no cubrir) en semillero — más lenta. Esquejes estoloníferos de tallos rastreros enraízan en contacto con suelo húmedo. Establecimiento de cobertura rastrera 60-90 días.",
+        "tiempo_a_establecimiento_dias": 75,
+        "notas": "DISTINTA DE Matricaria chamomilla (manzanilla común alemana anual ya en catálogo): Chamaemelum nobile es PERENNE rastrera (mata persistente 4-8 años), forma cobertura del suelo densa, hojas más finamente pinnadas-bipinnadas. Ambas comparten capítulos blanco-amarillos pero el aroma de C. nobile es más dulce-amanzanado-frutal y el aceite esencial dominado por ésteres de ácido angélico (no por bisabolol-camazuleno como M. chamomilla).",
+        "fuente": "POWO Kew; Pamplona-Roger 2006; JBB Plantas Medicinales"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales",
+        "perez-arbelaez-1947-plantas-utiles",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "La manzanilla romana o manzanilla perenne (Chamaemelum nobile (L.) All., Asteraceae, sinónimos antiguos Anthemis nobilis L., Ormenis nobilis (L.) J.Gay) es una asterácea perenne rastrera medicinal-aromática originaria de Europa occidental-Mediterráneo (Inglaterra, Portugal, España, Francia atlántica) introducida en Colombia hace siglos por colonos europeos y bien establecida en altiplanos andinos colombianos entre 1.800 y 2.800 msnm en zonas térmicas templadas-frías-moderadas: Cundinamarca (Sabana de Bogotá, Subachoque, Cota, Chía, Tabio, Tenjo, Cajicá, Tocancipá, Sopó, Sesquilé), Boyacá (Tunja, Cómbita, Sotaquirá, Villa de Leyva, Paipa, Tibasosa, Sogamoso, Duitama, Iza, Tota), Nariño (Pasto, Túquerres, Ipiales, Cumbal, Yacuanquer, La Cruz), Cauca alto (Popayán, Silvia, Totoró, Coconuco, Puracé), Antioquia oriental fría (Sonsón, La Unión, El Retiro alto, San Vicente alto, Abejorral, La Ceja alta), Quindío alto (Salento, Filandia, Pijao alto, Calarcá alto), Risaralda alta (Santa Rosa de Cabal, Marsella alta, Belén de Umbría alta), Caldas (Manizales, Villamaría, Aguadas, Salamina, Pácora), Santander alto (Mogotes, San José de Miranda, Cerrito, Vélez alto, Onzaga, Concepción) y Norte de Santander alto (Pamplona, Pamplonita, Chitagá, Toledo, Mutiscua, Silos, Cucutilla). DIFERENCIACIÓN CRÍTICA con Matricaria chamomilla L. (manzanilla común alemana anual ya presente en catálogo desde Sprint 2): Chamaemelum nobile es PERENNE (vive 4-8 años continuos) frente a Matricaria chamomilla ANUAL (ciclo 90-120 días tras siembra-cosecha), tiene hábito RASTRERO formando cobertura tapizante de 15-30 cm altura frente a Matricaria erecta de 30-60 cm, hojas finamente pinnadas-bipinnadas casi 'plumosas' frente a Matricaria pinnatipartidas más sueltas, capítulos sólo levemente más grandes (15-25 mm vs 10-20 mm) con receptáculo CÓNICO HUECO (no macizo — diferencia diagnóstica tradicional), aceite esencial DIFERENTE QUÍMICAMENTE: dominado por ésteres del ácido angélico (isobutil-angelato, 2-metilbutil-angelato — hasta 80% del aceite esencial) y NO por α-bisabolol/camazuleno como Matricaria. Esta diferencia química explica por qué las dos manzanillas tienen aromas distinguibles: la romana es más dulce-amanzanado-frutal con notas a manzana madura, mientras la alemana es más herbácea-floral. Pertenece a la familia Asteraceae junto con Matricaria, Achillea millefolium (milenrama), Tanacetum, Calendula officinalis, Tagetes, Helianthus y demás compositas medicinales-ornamentales. Hierba perenne rastrera estolonífera con tallos rastreros radicantes que forman cobertura densa tapizante perenne 15-30 cm altura, hojas alternas finamente bipinnadas verde-claras-grisáceas casi plumosas (1.5-5 cm largo) muy aromáticas al frotar (aroma a manzana fresca), capítulos solitarios terminales pedunculados largos (15-25 mm diámetro) con flores liguladas blanco-marfil dispuestas alrededor de disco central amarillo cónico hueco, flores tubulares amarillas internas, fruto aquenio sin vilano. Uso medicinal tradicional europeo y colonial pos-colombiano: infusión de capítulos secos como sedante suave nocturno, digestiva post-comida (carminativa, antiespasmódica gástrica), antiinflamatoria sistémica suave, analgésica leve, antiséptica tópica (lavados oftálmicos suaves, gárgaras), cosmética capilar (aclarante natural de cabellos rubios). En aromaterapia el aceite esencial de C. nobile (más caro que el de Matricaria por menor rendimiento y mayor exclusividad europea — Inglaterra es productora histórica desde el siglo XVII) se usa en relajantes-ansiolíticos-sedantes premium. Manejo agroecológico: propagación clonal por división de mata madura (más rápida), semilla superficial sin cubrir (luz-germinante, más lenta) o esqueje estolonífero radicante, distancia 25-30 cm para formar cobertura del suelo densa tapizante, sol pleno preferido (tolera sombra parcial leve), riego moderado regular sin encharcamiento, suelos pobres a moderadamente fértiles arenoso-arcillosos bien drenados pH 6.0-7.5, muy resistente a heladas (-7 °C), tolera pisoteo moderado (puede usarse como césped aromático ornamental tradicional inglés), poda con cortacésped a 5-10 cm altura tras floración estimula rebrote y cobertura más densa, cosecha de capítulos en plena floración (mayor concentración aromática), secado a la sombra. Función en chagra/huerto medicinal-ornamental como cobertura del suelo perenne aromática complementaria a manzanilla común anual (ofrece producción continua perenne mientras Matricaria es ciclo corto), atractora extraordinaria de polinizadores nativos y domesticados (abejas, sírfidos, mariposas pequeñas) y enemigos naturales de plagas (Chrysoperla externa, microhimenópteros parasitoides), repelente moderado de mosca blanca y trips por liberación de ésteres angélicos volátiles. Fuentes Tier A: GBIF, POWO Kew, Pamplona-Roger 2006, JBB Plantas Medicinales, Pérez Arbeláez 1947, Bernal 2015, SiB Colombia.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH48_MEDICINALES_SECUNDARIAS",
+      "id": "passiflora_incarnata",
+      "nombre_comun": "Pasionaria medicinal",
+      "nombre_comunes_regionales": [
+        "passionflower",
+        "maypop",
+        "flor de la pasión sedante",
+        "passiflora silvestre",
+        "purple passionflower"
+      ],
+      "nombre_cientifico": "Passiflora incarnata L.",
+      "familia_botanica": "Passifloraceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 200,
+        "optimo_min": 800,
+        "optimo_max": 2000,
+        "max_absoluto": 2400
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 16,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje",
+          "acodo"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Esqueje semileñoso de 20-30 cm con 3-4 nudos en primavera-verano, defoliar mitad inferior, plantar en sustrato arena+turba 1:1 con humedad constante y sombra parcial. Enraizamiento 30-45 días. Semilla viable previa escarificación mecánica suave (lija) y estratificación fría 30 días en refrigerador, germinación 30-90 días variable. Tutorado obligatorio sobre malla o cerca.",
+        "tiempo_a_establecimiento_dias": 45,
+        "notas": "DISTINTA DE Passiflora edulis (maracuyá frutal comercial) y P. ligularis (granadilla frutal andina): P. incarnata es la passiflora MEDICINAL SEDANTE por excelencia, sus frutos son pequeños amarillo-verdosos (4-6 cm) poco apreciados comercialmente pero comestibles maduros. Las hojas y flores secas son la droga vegetal de interés farmacéutico internacional.",
+        "fuente": "POWO Kew; Pamplona-Roger 2006; JBB Plantas Medicinales"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "perez-arbelaez-1947-plantas-utiles",
+        "jbb-plantas-medicinales",
+        "pamplona-roger-2006-plantas-medicinales",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "La pasionaria medicinal o passionflower (Passiflora incarnata L., Passifloraceae, sinónimos antiguos Passiflora kerii Spreng., Granadilla incarnata Medik.) es una passiflora trepadora perenne medicinal originaria del sureste de Estados Unidos (Florida, Texas, Carolinas, Georgia, Virginia, Tennessee — única passiflora nativa templada de Norteamérica con tolerancia a heladas suaves), naturalizada e introducida en Colombia para uso medicinal en huertos botánicos universitarios, jardines medicinales y cultivos especializados entre 800 y 2.000 msnm en zonas térmicas cálidas-templadas-moderadas: Antioquia (Medellín, Suroeste cafetero, Oriente templado — Rionegro, La Ceja, Marinilla, Guarne), Cundinamarca templada (La Mesa, Anolaima, Anapoima, Fusagasugá, Tena, Cachipay, Sasaima, Albán, Útica, Pacho), Quindío (Armenia, Calarcá, Salento bajo, Filandia bajo), Risaralda (Pereira, Santa Rosa de Cabal baja, Belén de Umbría baja), Caldas (Manizales bajo, Chinchiná, Palestina, Anserma), Valle del Cauca templado (Sevilla, Caicedonia, Buga zona alta, Tuluá zona alta, Trujillo), Tolima (Ibagué bajo, Líbano, Falan, Honda, Mariquita), Huila (Pitalito, Garzón, La Plata baja), Cauca (Popayán bajo, Santander de Quilichao, Caldono), Santander (Bucaramanga, Floridablanca, Piedecuesta, San Gil, Barichara), Norte de Santander (Cúcuta templada, Ocaña). Pertenece al género Passiflora (familia Passifloraceae) que incluye en Colombia más de 80 especies — desde frutales comerciales (maracuyá P. edulis, granadilla P. ligularis, gulupa P. edulis f. flavicarpa, badea P. quadrangularis, curuba P. tripartita var. mollissima) hasta especies silvestres ornamentales y medicinales — Colombia es uno de los centros de mayor diversidad mundial de Passiflora con ~150 spp nativas (Bernal 2015). DIFERENCIACIÓN CRÍTICA con passifloras frutales comerciales: P. incarnata es la passiflora MEDICINAL SEDANTE por excelencia farmacéuticamente reconocida (registrada en farmacopeas europeas — Comisión E alemana, EMA, USP), frutos pequeños amarillo-verdosos (4-6 cm) poco interesantes comercialmente, hojas trilobuladas profundamente con margen aserrado, flores grandes vistosas (6-9 cm diámetro) blanco-lavandas con corona filamentosa lila-azulada característica de toda la 'flor de la pasión' (los misioneros españoles del siglo XVI interpretaban sus estructuras florales como símbolos del calvario cristiano — 3 estilos = 3 clavos, 5 estambres = 5 llagas, corona filamentosa = corona de espinas, 10 sépalos+pétalos = 10 apóstoles fieles, espina central = lanza romana, zarcillos = látigos, lóbulos foliares = manos de los verdugos), tiempo de floración prolongado mayo-septiembre andino. Frutos comestibles maduros (amarillos a marrones cuando maduros) pero el interés es medicinal: hojas y flores secas como infusión sedante leve a moderada, ansiolítica suave, antiespasmódica gastrointestinal y muscular, hipnótica suave nocturna (inducción del sueño sin efecto narcótico fuerte), antitusiva. Fitoquímica: alcaloides indólicos (harmano, harmina, harmol — beta-carbolinas), flavonoides C-glucósidos (vitexina, isovitexina, orientina, isoorientina, apigenina, crisina — chrysin es activo benzodiacepino-mimético leve), cumarinas, glucósidos cianogénicos en concentraciones bajas. Uso medicinal documentado en farmacopeas internacionales y conservado popularmente en Colombia. Manejo agroecológico: propagación clonal por esqueje semileñoso (más rápida y fiable) o semilla previamente escarificada-estratificada, distancia 2-3 m sobre malla o cerca de tutorado obligatorio (trepadora con zarcillos foliares — alcanza 4-8 m de longitud), sol pleno preferido (tolera sombra parcial leve matutina), riego moderado regular, suelos arenoso-arcillosos bien drenados pH 5.5-7.0, podas formativas anuales en agosto-septiembre andino, tolera heladas suaves (-3 °C) — único passiflora con esa tolerancia explica su uso para sustituir maracuyá en zonas templadas frías de altiplano. Función en chagra/huerto medicinal-ornamental como cobertura vertical sobre cercas y tutorados con función dual ornamental (flores espectaculares de la pasión cristiana) y medicinal sedante leve cosmopolita, atractora extraordinaria de polinizadores grandes (Xylocopa abejorros carpinteros, abejas Apis, mariposas Heliconius cuyas larvas se especializan en passifloras), fuente alimentaria nectarífera de avispas benéficas. Fuentes Tier A: GBIF, POWO Kew, Pérez Arbeláez 1947, JBB Plantas Medicinales, Pamplona-Roger 2006, Bernal 2015, SiB Colombia.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH48_MEDICINALES_SECUNDARIAS",
+      "id": "petiveria_alliacea",
+      "nombre_comun": "Anamú",
+      "nombre_comunes_regionales": [
+        "anamú",
+        "mucura",
+        "hierba de las gallinitas",
+        "guinea hen weed",
+        "apacin",
+        "calauchin",
+        "tipi"
+      ],
+      "nombre_cientifico": "Petiveria alliacea L.",
+      "familia_botanica": "Phytolaccaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1500,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 20,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Esqueje semileñoso de 15-20 cm tomado de planta madura, defoliar mitad inferior, plantar en sustrato húmedo arena+suelo 1:1 con sombra parcial. Enraizamiento 20-30 días. Semilla pequeña germina espontáneamente en suelo perturbado húmedo del sotobosque tropical-subtropical. Trasplante a 30-45 días.",
+        "tiempo_a_establecimiento_dias": 30,
+        "notas": "PRECAUCIÓN CONTRAINDICACIONES MÉDICAS DOCUMENTADAS: CONTRAINDICADO EN EMBARAZO (efecto abortivo documentado por dibencildisulfuros — abortifaciente uterino), CONTRAINDICADO EN LACTANCIA, CONTRAINDICADO en personas con anticoagulantes (warfarina-aspirina — potencia antiagregación plaquetaria), CONTRAINDICADO en cirugía programada (suspender 2 semanas antes por antiagregación). Olor sulfuroso a ajo (dibencildisulfuros) repele insectos y debe usarse con guantes para evitar dermatitis de contacto.",
+        "fuente": "POWO Kew; Pamplona-Roger 2006; JBB Plantas Medicinales; SiB Colombia"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "perez-arbelaez-1947-plantas-utiles",
+        "jbb-plantas-medicinales",
+        "pamplona-roger-2006-plantas-medicinales",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "gbif-colombia"
+      ],
+      "valor_pedagogico": "El anamú o mucura (Petiveria alliacea L., Phytolaccaceae, una de las plantas medicinales tradicionales más importantes del trópico americano y caribeño-pacífico colombiano) es una hierba-arbusto perenne medicinal NATIVO neotropical de distribución amplia desde el sur de Estados Unidos (Florida) hasta Argentina-Paraguay incluyendo todo el Caribe insular y continental, silvestre y cultivada en Colombia entre 0 y 1.500 msnm en zonas térmicas cálidas-templadas-moderadas tropicales y subtropicales: Caribe colombiano completo donde es nativa silvestre frecuente en sotobosques, rastrojos y bordes de bosque seco tropical-bosque húmedo (La Guajira, Magdalena, Atlántico, Bolívar, Cesar, Sucre, Córdoba — uso afrocaribeño-palenquero), Pacífico colombiano completo donde es centro de uso afrocolombiano (Chocó — uso ancestral afroquibdoseño, Buenaventura, Tumaco, Guapi, Timbiquí, López de Micay — patrimonio afrocolombiano), Magdalena Medio (Antioquia ribereña, Santander, Bolívar bajo), Valle del Cauca (cinturón cálido), Antioquia cálida-templada (Suroeste, Bajo Cauca, Urabá, Magdalena Medio), Cundinamarca cálida (La Mesa, Anolaima, Anapoima, Fusagasugá baja, Pacho cálido), Tolima (Espinal, Honda, Mariquita, Ibagué bajo), Huila (Neiva, Garzón, La Plata baja), Norte de Santander (Cúcuta, Ocaña baja), Casanare, Meta, Vichada, Arauca (Llanos Orientales), Caquetá (Florencia, Belén, El Doncello), Putumayo (Mocoa, Puerto Asís) y Amazonas (Leticia, Puerto Nariño — uso ancestral amazónico indígena). Pertenece a la familia Phytolaccaceae (parientes Phytolacca americana yerba carmín, Phytolacca dioica ombú, Rivina humilis sangre de toro). Hierba o arbusto erecto perenne de 0.6-1.5 m altura con tallos delgados ramificados verde-purpúreos, hojas alternas elípticas-oblongas (8-15 cm largo x 3-8 cm ancho) verde-claras lisas con olor sulfuroso característico INTENSO a ajo al frotar (dibencildisulfuros y polisulfuros — compuestos azufrados volátiles únicos en familia Phytolaccaceae), inflorescencia racimo terminal o axilar largo delgado (15-40 cm) con flores diminutas blanco-verdosas (4-5 mm) tetrámeras con 4 sépalos y sin pétalos, fruto aquenio en forma de cuña espinoso adherente que se dispersa pegándose a pelajes de animales o ropa humana (epizoocoria — dispersión por adhesión a animales). Patrimonio inmaterial medicinal afroamericano: documentado uso ancestral afrocolombiano del Caribe-Pacífico-Amazonas, afrobrasileño, afrocaribeño antillano (Cuba, Puerto Rico, República Dominicana, Haití, Jamaica), candomblé brasileño y santería cubana como planta inmunomoduladora-antitumoral-antiparasitaria-abortiva ritual ancestral. Fitoquímica: dibencildisulfuros (S-bencil-cisteína sulfoxidos — análogo del aliín de Allium cepa-sativum-porrum), petiverinas, alcaloides peptídicos, flavonoides, taninos, saponinas, esteroles. Investigación farmacológica documentada (UNAL Bogotá-Medellín, Universidad del Valle, ICA, INS, Universidades del Caribe) desde 1990 reporta actividad inmunomoduladora (estimulación de macrófagos), citotóxica selectiva contra ciertas líneas tumorales in vitro (cáncer mama, leucemia — estudios preclínicos no concluyentes terapéuticamente), antibacteriana, antifúngica, antiviral suave, antiparasitaria (giardia, amebas), antiinflamatoria. PRECAUCIÓN ABSOLUTA: CONTRAINDICADO EN EMBARAZO (efecto abortifaciente documentado por dibencildisulfuros — potencial estimulante uterino), CONTRAINDICADO EN LACTANCIA, CONTRAINDICADO EN INTERACCIONES CON ANTICOAGULANTES (warfarina, aspirina, clopidogrel — potencia antiagregación plaquetaria), CONTRAINDICADO 2 SEMANAS ANTES DE CIRUGÍA PROGRAMADA, contacto cutáneo prolongado puede causar dermatitis irritativa por dibencildisulfuros — usar guantes en manipulación de hojas frescas. Uso popular controlado: infusión muy diluida de hojas secas (no fresca, no concentrada) como inmunomoduladora preventiva en personas adultas sin contraindicaciones documentadas, dosis baja recomendada 1-2 g hoja seca/día máximo durante ciclos cortos 7-15 días discontinuos con seguimiento médico, NUNCA automedicar sin asesoría. Manejo agroecológico: propagación clonal por esqueje semileñoso (más rápida y fiable) o semilla espontánea en sotobosque húmedo, distancia 60-100 cm en cama dedicada de medicinales con uso controlado (ALEJAR DE NIÑOS PEQUEÑOS Y MUJERES GESTANTES — letrero identificativo recomendado en huertos comunitarios y huertos escolares: NO PARA CONSUMO DIRECTO), sombra parcial preferida (tolera sol pleno con riego), riego moderado regular sin encharcamiento, suelos arenoso-arcillosos bien drenados pH 5.5-7.0, repelente perimetral natural de mosca blanca, áfidos, garrapatas y nematodos del suelo (uso reconocido en agroecología tropical como biopesticida vegetal in situ — extractos hidroalcohólicos de hojas aplicados foliarmente en cultivos de hortalizas controlan plagas chupadoras), asocio benéfico perimetral en huertos de papaya, plátano, cacao, café, yuca, hortalizas tropicales. Función en chagra/huerto medicinal-bioplaguicida cálida-templada como patrimonio inmaterial afrocolombiano-caribeño-pacífico-amazónico de uso restringido controlado en adultos sin contraindicaciones, repelente perimetral natural de plagas, fuente potencial de bioplaguicidas vegetales en investigación. Fuentes Tier A: GBIF, POWO Kew, Pérez Arbeláez 1947, JBB Plantas Medicinales, Pamplona-Roger 2006, Bernal 2015, SiB Colombia, GBIF Colombia.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH48_MEDICINALES_SECUNDARIAS",
+      "id": "pteridium_arachnoideum",
+      "nombre_comun": "Helecho marranero amazónico",
+      "nombre_comunes_regionales": [
+        "helecho macho amazónico",
+        "amambay",
+        "amazonian bracken",
+        "marranero del sur",
+        "yaba amazónica"
+      ],
+      "nombre_cientifico": "Pteridium arachnoideum (Kaulf.) Maxon",
+      "familia_botanica": "Dennstaedtiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "ground_cover",
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 100,
+        "optimo_min": 500,
+        "optimo_max": 2000,
+        "max_absoluto": 2600
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 16,
+        "optimo_max": 26,
+        "max_tolerable": 32
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "rizoma",
+          "espora"
+        ],
+        "best_method": "rizoma",
+        "protocol_resumen": "Reproducción NATURAL en campo por rizomas profundos y esporas — NO se recomienda propagación intencional por agricultor (tendencia ruderal agresiva). Estudio in situ exclusivamente. Documentación etnobotánica de manejo tradicional Tikuna-Cocama-Uitoto en Amazonas.",
+        "tiempo_a_establecimiento_dias": 180,
+        "notas": "DISTINTA DE Pteridium aquilinum (helecho marranero cosmopolita ya en catálogo): P. arachnoideum es el helecho marranero amazónico-andino-suramericano nativo (anteriormente considerado subespecie de aquilinum pero hoy aceptado como especie aparte por POWO/GBIF 2015+), con hojas más anchas y rizoma más superficial. Igual que aquilinum es CARCINÓGENO por ptaquilosida — NO consumir helecho crudo ni cocido prolongadamente, no usar en forrajes bovinos (causa hematuria enzoótica bovina BEH-leukemia bovina).",
+        "fuente": "POWO Kew; SiB Colombia; flora-colombia-pteridophyta; Sinchi Amazonia"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "sib-colombia",
+        "flora-colombia-pteridophyta",
+        "gbif-colombia",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El helecho marranero amazónico o amambay (Pteridium arachnoideum (Kaulf.) Maxon, Dennstaedtiaceae, anteriormente considerado subespecie Pteridium aquilinum var. arachnoideum pero hoy aceptado como ESPECIE APARTE por POWO 2015+ y GBIF Backbone Taxonomy tras revisiones moleculares y morfológicas) es un helecho terrestre rizomatoso perenne NATIVO suramericano de distribución amplia desde Centroamérica hasta Argentina-Paraguay-Uruguay incluyendo gran parte del trópico amazónico-andino colombiano, silvestre y a veces ruderal en Colombia entre 500 y 2.000 msnm en zonas térmicas cálidas-templadas-moderadas tropicales: Amazonas colombiano (Leticia, Puerto Nariño, La Pedrera, Tarapacá, Mirití-Paraná — patrimonio biocultural Tikuna-Cocama-Uitoto-Yagua-Bora), Caquetá (Florencia, Belén, San Vicente del Caguán, El Doncello, La Montañita, Solano — patrimonio amazónico colono y indígena), Putumayo (Mocoa, Puerto Asís, Villagarzón, Orito, La Hormiga, Valle del Guamuez — patrimonio Inga-Kamentsá-Cofán piedemonte amazónico), Vaupés (Mitú, Carurú — patrimonio Cubeo-Tucano), Guaviare (San José del Guaviare, Calamar, El Retorno, Miraflores), Vichada (Cumaribo, Puerto Carreño parte sur), Meta (Mapiripán, San José del Guaviare borde, La Macarena, Mesetas, Vistahermosa), Casanare baja, Arauca baja, piedemonte llanero, Magdalena Medio rural, partes del Pacífico colombiano (Chocó alto piedemonte selva, Buenaventura selva, Tumaco selva, Guapi-Timbiquí-López de Micay), zonas montañosas templadas-cálidas. DIFERENCIACIÓN CRÍTICA con Pteridium aquilinum L. Kuhn (helecho marranero cosmopolita ya presente en catálogo): P. arachnoideum es ESPECIE APARTE recientemente reconocida del complejo arachnoideum-aquilinum-caudatum-esculentum suramericano, hojas más anchas (segmentos pinnados-pinnatífidos más amplios y obtusos que aquilinum), rizoma más superficial, distribución más estrictamente suramericana neotropical y mayor sensibilidad a heladas. Comparte con aquilinum la condición de PLANTA POTENCIALMENTE CARCINÓGENA por contenido de ptaquilósido (norsesquiterpeno glicósido — carcinógeno documentado en literatura agrícola internacional desde 1980, asociado a cáncer gástrico humano en regiones donde se consume el helecho — Japón fiddleheads, Brasil hematuria enzoótica bovina BEH, Colombia Boyacá-Cundinamarca-Putumayo casos sospechosos en bovinos pastoreando praderas con helecho dominante), por tanto NO RECOMENDABLE PARA CONSUMO HUMANO NI ANIMAL en forrajes bovinos-equinos-ovinos por riesgo de hematuria enzoótica bovina-leucemia bovina enzoótica BEH-BL. Helecho terrestre rizomatoso perenne robusto de 0.5-1.5 m altura con rizomas subterráneos largos rastreros (1-5 m longitud horizontal) con tomento marrón-rojizo aracnoide característico (de ahí el epíteto 'arachnoideum'), hojas (frondas) tripinnado-pinnatífidas grandes triangulares-deltoides (60-150 cm largo x 30-90 cm ancho) verde-claras coriáceas con pelos arancnoides pubescentes en envés, soros marginales (esporas) continuos a lo largo del margen del pinnula bajo indusio falso-marginal, esporas amarillo-marrones dispersables por viento a larga distancia (anemocoria). Uso etnobotánico tradicional ancestral indígena amazónico documentado (Tikuna-Cocama-Uitoto-Yagua-Bora-Inga-Kamentsá-Cofán): rizoma cocido como antihelmíntico tradicional (purga de parásitos intestinales — uso muy controlado), cataplasma de fronda cocida en quemaduras leves, cobertura del piso de malocas-ranchos como aislante térmico-acústico y repelente de insectos por la pubescencia foliar, paja-techos temporales en construcción tradicional indígena, alimento ceremonial muy restringido (cabezas inmaduras 'fiddleheads' cocidas en aguas múltiples — NO recomendado actualmente por carcinogenicidad demostrada de ptaquilósido). Patrón biológico relevante para chagra agroecológica andina-amazónica: especie indicadora de suelos ácidos perturbados degradados con baja fertilidad y baja humedad superficial (la presencia abundante de Pteridium spp señala suelos compactados degradados o praderas sobrepastoreadas en proceso de invasión por helecho — recuperación posible mediante encalado moderado, materia orgánica y rotación de pastos), planta colonizadora pionera tras fuego (rebrote vigoroso desde rizomas profundos), competidora agresiva en praderas con helechos dominantes que requiere manejo por alelopatía rizoma. Manejo NO se recomienda propagación intencional — manejo en campo solo como documentación etnobotánica in situ. Función en chagra/huerto amazónico-piedemonte llanero como referencia etnobotánica indígena ancestral con uso muy restringido controlado, indicador biológico de suelos degradados que requieren recuperación, no recomendado para consumo humano-animal por carcinogenicidad documentada. Fuentes Tier A: GBIF, POWO Kew, SiB Colombia, Flora Colombia Pteridophyta, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH48_MEDICINALES_SECUNDARIAS",
+      "id": "solanum_americanum",
+      "nombre_comun": "Yerba mora",
+      "nombre_comunes_regionales": [
+        "amargo",
+        "hierba mora",
+        "mortiño bajo",
+        "macuy",
+        "American black nightshade",
+        "yerbamora silvestre"
+      ],
+      "nombre_cientifico": "Solanum americanum Mill.",
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 500,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 14,
+        "optimo_max": 26,
+        "max_tolerable": 32
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Resiembra natural prolífica desde semillas de los frutos consumidos por aves (ornitocoria) — colonización espontánea de huertos abandonados y bordes de cultivo. Semillado intencional posible: bayas maduras NEGRAS aplastadas con pulpa en suelo húmedo. Germinación 7-14 días. Cosecha foliar 30-45 días tras germinación.",
+        "tiempo_a_establecimiento_dias": 30,
+        "notas": "CRÍTICO PARA SEGURIDAD ALIMENTARIA: CONFUSIÓN HISTÓRICA con Solanum nigrum (yerba mora venenosa europea) y con bayas verdes inmaduras (CONTIENEN SOLANINA TÓXICA). Solo bayas COMPLETAMENTE MADURAS NEGRAS son comestibles. Hojas tiernas comestibles solo COCIDAS en 2-3 cambios de agua que se descartan (técnica tradicional Maya 'macuy' y andina muisca para eliminar alcaloides). NUNCA consumir crudo ni con bayas verdes. Uso culinario moderado.",
+        "fuente": "POWO Kew; Pérez Arbeláez 1947; JBB Plantas Medicinales; SiB Colombia; Bernal 2015"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "perez-arbelaez-1947-plantas-utiles",
+        "jbb-plantas-medicinales",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "gbif-colombia"
+      ],
+      "valor_pedagogico": "La yerba mora o amargo (Solanum americanum Mill., Solanaceae, especie nativa del complejo Solanum nigrum sensu lato con frecuente confusión histórica) es una hierba anual o bienal nativa neotropical de distribución amplia desde Norteamérica templada hasta el sur de Argentina-Chile incluyendo todo el territorio colombiano, silvestre frecuente y semicultivada tradicionalmente en huertos campesinos andinos-amazónicos-caribeños colombianos entre 0 y 2.600 msnm en zonas térmicas cálidas-templadas-frías-moderadas en prácticamente todo el país: altiplano cundiboyacense (Sabana de Bogotá, Tunja-Sogamoso-Duitama-Villa de Leyva-Paipa — patrimonio biocultural muisca documentado en Ardila 2015 etnobotánica muisca), Nariño (Pasto, Túquerres, Ipiales, La Cruz, Cumbal — patrimonio Pasto-Quillacinga), Cauca (Popayán, Silvia, Totoró — patrimonio Misak-Nasa), Antioquia (Medellín, Suroeste, Oriente, Bajo Cauca, Urabá), Eje Cafetero (Caldas, Risaralda, Quindío), Valle del Cauca, Tolima, Huila, Santander, Norte de Santander, Caribe colombiano completo (donde es comestible tradicional afrocaribeño-palenquero), Pacífico (Chocó, Buenaventura, Tumaco, Guapi-Timbiquí — patrimonio afrocolombiano), Llanos Orientales (Casanare, Meta, Vichada, Arauca), Amazonas-Caquetá-Putumayo-Vaupés-Guaviare-Guainía (patrimonio amazónico indígena Tikuna-Cocama-Uitoto-Inga-Kamentsá-Cofán) y zonas urbanas en general. Pertenece a la familia Solanaceae junto con tomate (Solanum lycopersicum), papa (Solanum tuberosum), berenjena (S. melongena), tabaco (Nicotiana tabacum), aji-pimentón (Capsicum spp), uchuva (Physalis peruviana) — todas con presencia de alcaloides solanaceos en grado variable. ALERTA DE SEGURIDAD ALIMENTARIA — CONFUSIÓN HISTÓRICA: existe gran confusión taxonómica e identidad entre Solanum americanum (nativa neotropical, COMESTIBLE TRADICIONAL EN PARTES TIERNAS COCIDAS Y BAYAS MADURAS NEGRAS), Solanum nigrum L. (europea naturalizada, presenta CONFUSIÓN VENENOSIDAD-COMESTIBILIDAD según quimotipo — algunos quimotipos venenosos por mayor concentración de solasodina-solamargina) y Solanum ptychanthum Dunal (otra especie del complejo nigrum-americanum-villosum). En Colombia el complejo nigrum se conoce popularmente como 'yerba mora' independientemente de la especie exacta, lo que requiere identificación cuidadosa antes del consumo. ALCALOIDES SOLANINA Y SOLASODINA: presentes en mayor concentración en bayas VERDES INMADURAS (toxicidad gastrointestinal: vómitos, diarrea, hipersalivación, alucinaciones en casos severos), en hojas viejas y tallos no cocidos. Solo las bayas COMPLETAMENTE MADURAS NEGRAS son COMESTIBLES CRUDAS en moderación (sabor dulce-acidulado similar a mortiño), y las HOJAS TIERNAS son COMESTIBLES SOLO COCIDAS EN 2-3 CAMBIOS DE AGUA QUE SE DESCARTAN (técnica tradicional maya yucateca 'macuy' y andina muisca-quillacinga-misak — la cocción elimina alcaloides solanaceos hidrosolubles, dejando un manjar nutritivo rico en hierro, calcio, vitamina A y antioxidantes flavonoides). NUNCA CONSUMIR CRUDO, NUNCA CONSUMIR BAYAS VERDES — el operador en huerto comunitario y huerto escolar debe identificar claramente esta especie con letrero (NO COMER CRUDO — COCIDO 2 CAMBIOS DE AGUA) y NUNCA permitir consumo libre por niñas y niños sin supervisión adulta. DOSIS CULINARIA MODERADA COCIDA recomendada: 50-100 g hoja tierna cocida/persona/comida 1-2 veces semana máximo, NO consumo diario prolongado. Hierba anual o bienal erecta de 30-80 cm altura con tallos ramificados verde-purpúreos, hojas alternas ovado-lanceoladas (5-12 cm largo x 3-7 cm ancho) verde-oscuras con margen sinuado-entero suave, inflorescencias cimas axilares con 4-8 flores blancas pequeñas estrelladas (8-12 mm) típicas Solanum con 5 pétalos blancos y 5 estambres amarillos prominentes, frutos bayas globulares pequeñas (5-8 mm) que maduran de VERDE INMADURO TÓXICO a NEGRO BRILLANTE MADURO COMESTIBLE polinizadas por abejorros (Xylocopa, Bombus). Uso tradicional ancestral colombiano: hojas tiernas cocidas como verdura comestible nutritiva (similar a la espinaca pero con sabor más amargo distintivo) en sopas, calderos, sancochos, ajiacos campesinos andinos (sustitutos de espinaca-acelga), bayas maduras negras en compotas-mermeladas-licores artesanales caseros (técnica tradicional muisca-pasto-misak documentada en Ardila 2015), uso medicinal popular antiguo como cataplasma de hojas cocidas en abscesos cutáneos, infusión MUY DILUIDA como antiinflamatoria suave (uso restringido por toxicidad). Manejo agroecológico: resiembra natural prolífica desde semillas dispersadas por aves (ornitocoria), semillado intencional con bayas maduras aplastadas en suelo húmedo, distancia 30-50 cm en huerto silvestre semicultivado, sombra parcial preferida (tolera sol pleno con riego), riego moderado, suelos fértiles bien drenados pH 5.5-7.5, asocio espontáneo con maíz, fríjol, papa, hortalizas tradicionales muiscas, control fácil por arranque si se vuelve excesiva. Función en chagra/huerto andino-amazónico-caribeño-pacífico como verdura silvestre tradicional ancestral de las tres regiones biogeográficas colombianas mayores, atractora de polinizadores, fuente de hierro-calcio-vitamina A bajo manejo culinario tradicional ESTRICTO con cocción en cambios de agua, patrimonio biocultural indígena muisca-quillacinga-misak-amazónico-afrocolombiano de soberanía alimentaria silvestre. Fuentes Tier A: GBIF, POWO Kew, Pérez Arbeláez 1947, JBB Plantas Medicinales, Bernal 2015, SiB Colombia, GBIF Colombia, Ardila 2015 Etnobotánica Muisca.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH48_MEDICINALES_SECUNDARIAS",
+      "id": "kalanchoe_blossfeldiana",
+      "nombre_comun": "Kalanchoe rojo",
+      "nombre_comunes_regionales": [
+        "calandiva",
+        "florist kalanchoe",
+        "kalanchoe ornamental",
+        "flaming Katy",
+        "kalanchoe de Navidad"
+      ],
+      "nombre_cientifico": "Kalanchoe blossfeldiana Poelln.",
+      "familia_botanica": "Crassulaceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 500,
+        "optimo_min": 1500,
+        "optimo_max": 2700,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 14,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "methods": [
+          "esqueje"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Esqueje de tallo de 8-12 cm con 3-5 nudos foliares en cualquier época, dejar cicatrizar 2-5 días a la sombra (callosidad), plantar en sustrato cactus (tierra+arena+perlita 1:1:1) con riego mínimo inicial. Enraizamiento 14-21 días. Esqueje foliar también viable: hoja entera con peciolo cicatrizada sobre sustrato apenas humedecido emite raíces y nueva roseta clonal en 25-40 días.",
+        "tiempo_a_establecimiento_dias": 21,
+        "notas": "DISTINTA DE Kalanchoe pinnata (siempreviva medicinal ya en catálogo): K. blossfeldiana es la kalanchoe ORNAMENTAL por excelencia con flores agrupadas en panículas terminales muy vistosas rojo-anaranjadas-rosadas-amarillas-blancas según variedad, planta compacta (15-40 cm) frente a K. pinnata grande (60-180 cm). NO presenta apomixis foliar visible. Floración fotoperiódica obligada de día corto (octubre-marzo en Colombia).",
+        "fuente": "POWO Kew; GBIF; JBB ornamentales; Bernal 2015"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "jbb-plantas-medicinales",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "El kalanchoe rojo o calandiva (Kalanchoe blossfeldiana Poelln., Crassulaceae, una de las kalanchoes ornamentales más cultivadas comercialmente en el mundo y en floricultura colombiana — Sabana de Bogotá segundo centro mundial de exportación tras Holanda) es una planta suculenta perenne ornamental originaria de Madagascar tropical (provincia de Tsiroanomandidy montañas centrales) introducida en Colombia para floricultura comercial industrial desde la década de 1970-1980 y cultivada simultáneamente en hogares-jardines-huertas urbanas-escuelas como ornamental cosmopolita entre 1.500 y 2.700 msnm en zonas térmicas templadas-frías-moderadas: Sabana de Bogotá (Bogotá, Funza, Mosquera, Chía, Cota, Cajicá, Sopó, Tocancipá, Madrid, Subachoque, Tabio, Tenjo — corazón de la floricultura colombiana de exportación con cultivos comerciales bajo invernadero), Boyacá (Tunja, Duitama, Sogamoso, Villa de Leyva, Paipa, Tibasosa), Eje Cafetero (Manizales, Pereira, Armenia, Salento), Antioquia oriental (Rionegro, La Ceja, Marinilla, Guarne, El Carmen de Viboral — segundo polo floricultor de exportación), Nariño (Pasto, Túquerres, Ipiales), Cauca (Popayán), Valle del Cauca templado (Sevilla, Caicedonia, Buga zona alta), Quindío, Risaralda alta, Caldas templada (Manizales-Villamaría), Santander (Bucaramanga, Floridablanca, Piedecuesta, San Gil, Barichara), Norte de Santander (Pamplona templada), Tolima alto (Líbano, Ibagué cordillera) y Cundinamarca templada (Fusagasugá, Pacho, La Mesa, Anolaima). DIFERENCIACIÓN CRÍTICA con Kalanchoe pinnata (Lam.) Pers. (siempreviva u hoja del aire ya presente en catálogo): K. blossfeldiana es la kalanchoe ORNAMENTAL por excelencia comercialmente reconocida internacionalmente con flores muy vistosas agrupadas en panículas terminales corimboso-cimosas densas (50-200 flores por inflorescencia) tetrámeras tubulares rojo-escarlata-anaranjadas-rosadas-amarillas-magentas-blancas-bicolor según variedad cultivada (más de 200 variedades comerciales registradas — series 'Calandiva' con flores dobles 32-pétalos rosaformes, 'Roseflowers', 'Kerinci', 'Don Marshall', 'Mirabella' y otras), planta compacta de roseta basal con tallos cortos verticales (15-40 cm altura total) frente a K. pinnata grande arbustivo (60-180 cm), hojas suculentas ovaladas verde-oscuras brillantes con margen levemente crenado pero SIN apomixis foliar visible (no produce plantulas marginales como pinnata — característica diagnóstica clave). Floración fotoperiódica obligada de día corto (DCO, día corto obligado): florece naturalmente solo cuando recibe menos de 10 horas de luz diaria — en Colombia (12 horas constantes ecuatoriales) la floración requiere oscurecimiento artificial controlado en floricultura comercial (cobertura nocturna negra 14+ horas/día durante 4-6 semanas para inducir floración fenotípica) o estímulo natural durante octubre-marzo cuando los días son ligeramente más cortos (lo que explica el nombre coloquial 'kalanchoe de Navidad'). Patrón fotosintético CAM. Patrimonio comercial-cultural: el kalanchoe blossfeldiana es una de las 5 flores ornamentales más exportadas por Colombia (junto con rosa-clavel-hortensia-crisantemo), generando empleo formal e informal en Sabana de Bogotá y Antioquia oriental. Lección viva sobre fotoperiodismo: planta perfecta para enseñar a niñas y niños el concepto de fotoperiodismo de día corto (DCO) y floración inducida por longitud de día, así como propagación clonal por esqueje suculento. Manejo agroecológico: propagación exclusivamente clonal por esqueje de tallo o foliar (no se siembra por semilla — las variedades comerciales son híbridos estériles), distancia 25-40 cm en bordes ornamentales o materas individuales, sol pleno a sombra parcial filtrada matutina (no sol pleno tropical intenso), riego escaso quincenal-mensual (planta suculenta CAM tolera 3-6 semanas sin riego), suelos arenosos bien drenados pH 6.0-7.5 sustrato tipo cactus, NO TOLERA HELADAS FUERTES (helada letal -1 °C — daño foliar permanente), tolera podas tras floración para estimular ramificación y nueva floración cíclica anual, ciclo productivo útil 3-5 años antes de renovación. Función en chagra/huerto urbano-escolar como ornamental cosmopolita de interior-exterior de aprendizaje sobre fotoperiodismo (DCO) y propagación clonal, atractora de polinizadores domesticados durante temporada de floración (abejas Apis y Meliponini, mariposas pequeñas), cobertura de borde ornamental templado-fría, planta hogareña navideña tradicional importada y cosmopolita. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, JBB Bogotá, Bernal 2015, SiB Colombia, Pérez Arbeláez 1947.",
+      "validation_level": "claude_draft"
     }
   ],
   "biopreparados": [
