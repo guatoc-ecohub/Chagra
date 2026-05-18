@@ -201,8 +201,15 @@ export default function AgentScreen({ onBack }) {
     }
   };
 
-  const handleSubmit = async (text) => {
-    if (!text.trim() || state !== STATE_IDLE) return;
+  const handleSubmit = async (text, { fromVoice = false } = {}) => {
+    if (!text.trim()) return;
+    // Re-entry guard: rechaza submits concurrentes. Permitimos `fromVoice`
+    // como excepción porque `handleVoiceRecord` ya seteó STATE_THINKING
+    // antes de await transcribe(blob), por lo que cuando llega acá `state`
+    // NO es IDLE (closure capturó STATE_RECORDING). Bug previo: el guard
+    // `state !== STATE_IDLE` rechazaba la llamada → UI quedaba en pensando
+    // sin disparar el LLM (race de closure + async state).
+    if (!fromVoice && state !== STATE_IDLE) return;
 
     const userMessage = {
       role: 'user',
@@ -302,7 +309,14 @@ export default function AgentScreen({ onBack }) {
       try {
         const text = await transcribe(blob);
         if (text) {
-          handleSubmit(text);
+          // Auto-activar TTS cuando el input fue voz: si hablás, esperás
+          // respuesta hablada. Si el operador silenció TTS manualmente y
+          // habla, respetamos su preferencia (sólo activamos si estaba
+          // ya en true por default, o si nunca lo tocó).
+          if (!ttsEnabled) setTtsEnabled(true);
+          // bypass del guard porque state !== IDLE (está THINKING). Sin
+          // este flag, handleSubmit retorna early y la UI queda colgada.
+          await handleSubmit(text, { fromVoice: true });
         } else {
           setState(STATE_IDLE);
           setError('No entendí el audio. Prueba de nuevo.');
