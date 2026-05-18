@@ -44,9 +44,18 @@ export default function AgentScreen({ onBack }) {
   const [ttsEnabled, setTtsEnabled] = useState(true);
   const ttsSupported = isSupported();
   const [kokoroReady, setKokoroReady] = useState(false);
+  // Bug 2026-05-18 (Karen reportó stuck-pensando): tras 20s sin token visible,
+  // mostrar mensaje "Aún pensando, toca cancelar si querés reintentar" y
+  // habilitar botón cancelar que dispara AbortController. Si pasan 30s sin
+  // token, abortamos automáticamente con error visible.
+  const [showSlowWarning, setShowSlowWarning] = useState(false);
+  const [llmHealthy, setLlmHealthy] = useState(true);
 
   const { durationMs, start: startRecord, stop: stopRecord, reset: resetRecord } = useVoiceRecorder();
   const chatEndRef = useRef(null);
+  // Bug 2026-05-18: ref al AbortController activo para que botón Cancelar
+  // pueda abortar la inferencia LLM en curso desde fuera del callLLM scope.
+  const activeControllerRef = useRef(null);
   // 057.4 integration: resolver del Promise pendiente del actionExecutor gate.
   // El callback registrado en setActionGateCallback abre el modal y retorna
   // un Promise; el resolver vive aquí para que los handlers approve/reject/
@@ -65,6 +74,42 @@ export default function AgentScreen({ onBack }) {
       console.warn('[Agent] Failed to load history:', e);
     }
   }, [operatorId]);
+
+  // Bug 2026-05-18: warning timer cuando STATE_THINKING dura >20s sin tokens
+  // visibles. Antes el operador quedaba viendo "Pensando…" hasta 90s antes
+  // del AbortError → percepción de UI muerta. Ahora a los 20s mostramos
+  // explícito "Aún pensando, toca Cancelar".
+  useEffect(() => {
+    if (state !== STATE_THINKING) {
+      setShowSlowWarning(false);
+      return;
+    }
+    const slowTimer = setTimeout(() => setShowSlowWarning(true), 20000);
+    return () => clearTimeout(slowTimer);
+  }, [state]);
+
+  // Bug 2026-05-18: health check del LLM al mount. Si /api/ollama/api/tags
+  // no responde en 5s, marcamos llmHealthy=false y avisamos al operador
+  // antes que intente submit (evita stuck-pensando frente a backend caído).
+  useEffect(() => {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 5000);
+    fetch('/api/ollama/api/tags', { signal: ctrl.signal })
+      .then((r) => setLlmHealthy(r.ok))
+      .catch(() => setLlmHealthy(false))
+      .finally(() => clearTimeout(t));
+    return () => { ctrl.abort(); clearTimeout(t); };
+  }, []);
+
+  const handleCancelLLM = () => {
+    if (activeControllerRef.current) {
+      console.warn('[Agent] User cancelled LLM inference manually');
+      activeControllerRef.current.abort();
+    }
+    setState(STATE_IDLE);
+    setStreamingContent('');
+    setError('Cancelado. Toca de nuevo si querés reintentar.');
+  };
 
   useEffect(() => {
     initTTS();
@@ -160,13 +205,15 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
     handleActionApprove(params);
   };
 
-  // Bug reportado 2026-05-15: el botón quedaba en "thinking" indefinido si
-  // la red/proxy colgaba sin emitir tokens (nginx tiene proxy_read_timeout
-  // 120s pero el fetch no lleva señal de aborto, así que ante un cuelgue
-  // silencioso el `finally` que resetea STATE_IDLE nunca dispara).
-  // Solución: AbortController con timeout 90s — antes que nginx cierre la
-  // conexión por su lado, fuerza AbortError → catch → finally → IDLE.
-  const LLM_TIMEOUT_MS = 90000;
+  // Bug reportado 2026-05-15 + 2026-05-18 (Karen): el botón quedaba en
+  // "thinking" indefinido si la red/proxy colgaba sin emitir tokens.
+  // Solución v2 (2026-05-18): AbortController con timeout 30s + ref externo
+  // para botón Cancelar + warning visible a los 20s ("Aún pensando…").
+  // Antes era 90s silent — UX inaceptable cuando bench muestra latencia
+  // típica de 5-15s (p95 22s). 30s captura el outlier raro sin congelar
+  // la UI tanto. Si el operador necesita seguir esperando, ve mensaje +
+  // botón Cancelar para reintentar.
+  const LLM_TIMEOUT_MS = 30000;
 
   const callLLM = async (query, contextMemory, contextCorpus) => {
     const systemPrompt = getSystemPrompt();
@@ -181,21 +228,26 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
     ];
 
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), LLM_TIMEOUT_MS);
+    activeControllerRef.current = controller;
+    const timer = setTimeout(() => {
+      console.warn(`[Agent] LLM timeout ${LLM_TIMEOUT_MS}ms — aborting`);
+      controller.abort();
+    }, LLM_TIMEOUT_MS);
 
     try {
-      // llmRouter resuelve url + model + temperature + max_tokens + keep_alive
-      // según la tarea. AgentScreen = chat → gemma3:4b hot (keep_alive=5m).
       const { url, body } = buildLLMRequest('chat', messages);
-      return await streamOpenAI(
+      console.warn('[Agent] LLM call start', { url, queryLen: query.length });
+      const result = await streamOpenAI(
         url,
         body,
         (_chunk, fullText) => setStreamingContent(fullText),
         { signal: controller.signal },
       );
+      console.warn('[Agent] LLM call complete', { responseLen: result?.length || 0 });
+      return result;
     } catch (e) {
       if (e.name === 'AbortError') {
-        throw new Error('Tiempo agotado, conexion lenta');
+        throw new Error('Tiempo agotado o cancelado. Toca de nuevo.');
       }
       const match = e.message.match(/^LLM (\d+)/);
       if (match) {
@@ -211,6 +263,7 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
       throw new Error('IA no disponible, intenta de nuevo en un momento');
     } finally {
       clearTimeout(timer);
+      activeControllerRef.current = null;
     }
   };
 
@@ -464,8 +517,23 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
         )}
 
         {state === STATE_THINKING && (
-          <p className="text-center text-xs text-violet-400 mt-2">
-            Pensando...
+          <div className="flex flex-col items-center gap-2 mt-2">
+            <p className={`text-center text-xs ${showSlowWarning ? 'text-amber-400' : 'text-violet-400'}`}>
+              {showSlowWarning ? 'Aún pensando — toca Cancelar si querés reintentar' : 'Pensando...'}
+            </p>
+            <button
+              type="button"
+              onClick={handleCancelLLM}
+              className="text-[10px] px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 active:scale-95 transition-all"
+            >
+              Cancelar
+            </button>
+          </div>
+        )}
+
+        {!llmHealthy && state === STATE_IDLE && (
+          <p className="text-center text-xs text-amber-400 mt-2 px-3">
+            IA offline o lenta — las respuestas pueden tardar más de lo normal.
           </p>
         )}
       </div>
