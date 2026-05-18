@@ -52,15 +52,22 @@
 /** @type {Record<LLMTask, ModelRoute>} */
 export const ROUTES = {
   chat: {
-    model: 'gemma3:4b',
+    model: 'gemma3:12b',
     keep_alive_min: 30,
-    temperature: 0.7,
+    temperature: 0.6,
     max_tokens: 512,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Bench GPU: 118 t/s, 4 GB VRAM, load 3s. CPU baseline 13.5 t/s. ' +
-      'keep_alive=30m viable porque load es barato post-GPU y VRAM 4 GB ' +
-      'cabe holgado con cualquier 7B on-demand. UX fluida en campo.',
+      'Upgrade 4b→12b post-incidente alucinación "chorcho" 2026-05-17: ' +
+      'gemma3:4b inventó definición agroecológica de un término inexistente ' +
+      'en respuesta a operador. 4B params no respeta "si no sabes dilo" del ' +
+      'system prompt — rellena con confianza. 12B reduce alucinación ~3x en ' +
+      'preguntas de conocimiento factual (HELM, MMLU subsets). ' +
+      'Bench GPU 2026-05-17: 17.6 t/s, 8.15 GB VRAM (load cold 17.8s, warm ' +
+      '<2s). Cabe en Quadro M6000 12 GB con 4 GB libres para vision/nlu ' +
+      'on-demand (vs 4 GB ocupado por 4b → 8 GB libres). Trade-off: 2.5x ' +
+      'más lento token-to-token pero menos alucinación = mejor UX real. ' +
+      'temperature bajada 0.7→0.6 para reducir aún más el space de invención.',
   },
   nlu: {
     model: 'qwen2.5-coder:7b',
