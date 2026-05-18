@@ -159,6 +159,18 @@ function FormPiloto() {
     if (!data.maps_url.trim()) e.maps_url = 'Requerido';
     else if (!/(maps|goo\.gl|google\.com)/i.test(data.maps_url)) e.maps_url = 'Pegá un link de Google Maps';
     if (!data.vocacion) e.vocacion = 'Selecciona vocación';
+    // Bug 069.10 — rangos para campos numéricos opcionales (si están presentes)
+    if (data.altitud_msnm !== '') {
+      const alt = Number(data.altitud_msnm);
+      if (!Number.isFinite(alt)) e.altitud_msnm = 'Número inválido';
+      else if (alt < 0 || alt > 5500) e.altitud_msnm = 'Rango 0–5500 msnm';
+    }
+    if (data.area_m2 !== '') {
+      const area = Number(data.area_m2);
+      if (!Number.isFinite(area)) e.area_m2 = 'Número inválido';
+      else if (area <= 0) e.area_m2 = 'Debe ser mayor que cero';
+      else if (area > 100_000_000) e.area_m2 = 'Máximo 100.000.000 m² (10.000 ha)';
+    }
     return e;
   }, [data]);
 
@@ -336,11 +348,18 @@ ${data.operador_nombre}`;
                 value={data.altitud_msnm}
                 onChange={(e) => setField('altitud_msnm', e.target.value)}
                 placeholder="1730"
-                className={inputClass(false)}
+                aria-invalid={!!errors.altitud_msnm}
+                className={inputClass(!!errors.altitud_msnm)}
               />
-              <p className="text-xs text-slate-500 mt-1">
-                Si no la sabes, déjalo vacío — la calculamos desde el link de Maps.
-              </p>
+              {errors.altitud_msnm ? (
+                <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+                  <AlertCircle size={12} /> {errors.altitud_msnm}
+                </p>
+              ) : (
+                <p className="text-xs text-slate-500 mt-1">
+                  Si no la sabes, déjalo vacío — la calculamos desde el link de Maps.
+                </p>
+              )}
             </div>
 
             <div>
@@ -352,11 +371,18 @@ ${data.operador_nombre}`;
                 value={data.area_m2}
                 onChange={(e) => setField('area_m2', e.target.value)}
                 placeholder="3500"
-                className={inputClass(false)}
+                aria-invalid={!!errors.area_m2}
+                className={inputClass(!!errors.area_m2)}
               />
-              <p className="text-xs text-slate-500 mt-1">
-                Escritura o levantamiento. Vacío si no lo sabes.
-              </p>
+              {errors.area_m2 ? (
+                <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+                  <AlertCircle size={12} /> {errors.area_m2}
+                </p>
+              ) : (
+                <p className="text-xs text-slate-500 mt-1">
+                  Escritura o levantamiento. Vacío si no lo sabes.
+                </p>
+              )}
             </div>
           </div>
 

@@ -1,9 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Camera, MapPin, CheckCircle } from 'lucide-react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { ArrowLeft, AlertCircle, Camera, MapPin, CheckCircle } from 'lucide-react';
 import { savePayload } from '../services/payloadService';
 import { captureAndCompress, savePhoto } from '../services/photoService';
 import { sanitizeBlobUrl } from '../utils/blobUrl';
 import DateField from './DateField';
+
+// Bug 069.10 — validación client-side: límites razonables para evitar
+// payloads inválidos sincronizándose con FarmOS.
+const MAX_QUANTITY = 100000; // sanity cap: 100k plántulas en una siembra es ya raro
+const MIN_CROP_LEN = 2;
 
 export default function SeedingLog({ onBack, onSave, initialData = {} }) {
   const [formData, setFormData] = useState({
@@ -21,7 +26,28 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
   const [isSaving, setIsSaving] = useState(false);
   const [syncedOffline, setSyncedOffline] = useState(false);
   const [view, setView] = useState('form');
+  const [touched, setTouched] = useState({});
   const watchIdRef = useRef(null);
+
+  // Bug 069.10 — validación inline (no bloquea submit existente, pero deshabilita el botón
+  // y muestra errores para que el operador corrija antes de guardar).
+  const errors = useMemo(() => {
+    const e = {};
+    const today = new Date().toISOString().split('T')[0];
+    if (!formData.crop.trim()) e.crop = 'Indica el cultivo';
+    else if (formData.crop.trim().length < MIN_CROP_LEN) e.crop = `Mínimo ${MIN_CROP_LEN} caracteres`;
+    const qty = Number(formData.quantity);
+    if (formData.quantity === '' || formData.quantity === null) e.quantity = 'Indica la cantidad';
+    else if (!Number.isFinite(qty)) e.quantity = 'Cantidad inválida';
+    else if (qty <= 0) e.quantity = 'Debe ser mayor que cero';
+    else if (qty > MAX_QUANTITY) e.quantity = `Máximo ${MAX_QUANTITY.toLocaleString()} plántulas`;
+    if (!formData.date) e.date = 'Indica la fecha';
+    else if (formData.date > today) e.date = 'La fecha no puede ser futura';
+    return e;
+  }, [formData]);
+
+  const hasErrors = Object.keys(errors).length > 0;
+  const markTouched = (field) => setTouched((t) => ({ ...t, [field]: true }));
 
   useEffect(() => {
     return () => {
@@ -80,8 +106,11 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
 
   const handleSave = async () => {
     if (isSaving) return;
-    if (!formData.crop || !formData.quantity) {
-      onSave('Completa Cultivo y Cantidad', true);
+    // Bug 069.10 — re-validar antes de enviar; marca todos los campos como touched
+    // para que los errores se vean si el operador llegó acá con el botón deshabilitado vencido.
+    if (hasErrors) {
+      setTouched({ crop: true, quantity: true, date: true });
+      onSave('Revisa los campos marcados', true);
       return;
     }
 
@@ -222,13 +251,34 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
         <DateField
           label="Fecha"
           value={formData.date}
-          onChange={(val) => setFormData(p => ({ ...p, date: val }))}
+          onChange={(val) => { setFormData(p => ({ ...p, date: val })); markTouched('date'); }}
           required
         />
+        {touched.date && errors.date && (
+          <p className="text-sm text-red-400 -mt-4 flex items-center gap-1.5">
+            <AlertCircle size={14} aria-hidden="true" /> {errors.date}
+          </p>
+        )}
 
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Cultivo</span>
-          <input type="text" name="crop" placeholder="Ej: Fresa" value={formData.crop} onChange={handleInput} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-2xl text-white placeholder-slate-500 min-h-[64px]" />
+          <input
+            type="text"
+            name="crop"
+            placeholder="Ej: Fresa"
+            value={formData.crop}
+            onChange={handleInput}
+            onBlur={() => markTouched('crop')}
+            aria-invalid={touched.crop && !!errors.crop}
+            className={`p-4 rounded-xl bg-slate-900 border text-2xl text-white placeholder-slate-500 min-h-[64px] ${
+              touched.crop && errors.crop ? 'border-red-700' : 'border-slate-700'
+            }`}
+          />
+          {touched.crop && errors.crop && (
+            <p className="text-sm text-red-400 flex items-center gap-1.5">
+              <AlertCircle size={14} aria-hidden="true" /> {errors.crop}
+            </p>
+          )}
         </label>
 
         <label className="flex flex-col gap-2">
@@ -243,7 +293,25 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
 
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Cantidad de Plántulas</span>
-          <input type="number" name="quantity" min="1" value={formData.quantity} onChange={handleInput} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-2xl text-white min-h-[64px]" />
+          <input
+            type="number"
+            name="quantity"
+            min="1"
+            max={MAX_QUANTITY}
+            step="1"
+            value={formData.quantity}
+            onChange={handleInput}
+            onBlur={() => markTouched('quantity')}
+            aria-invalid={touched.quantity && !!errors.quantity}
+            className={`p-4 rounded-xl bg-slate-900 border text-2xl text-white min-h-[64px] ${
+              touched.quantity && errors.quantity ? 'border-red-700' : 'border-slate-700'
+            }`}
+          />
+          {touched.quantity && errors.quantity && (
+            <p className="text-sm text-red-400 flex items-center gap-1.5">
+              <AlertCircle size={14} aria-hidden="true" /> {errors.quantity}
+            </p>
+          )}
         </label>
 
         <div className="flex flex-col gap-2">
@@ -257,9 +325,11 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
 
         <button
           onClick={handleSave}
-          disabled={isSaving}
+          disabled={isSaving || hasErrors}
           aria-busy={isSaving}
-          className="mt-4 p-6 rounded-xl bg-green-600 active:bg-green-500 text-2xl lg:text-3xl font-black shadow-xl min-h-[80px] border-b-4 border-green-800 disabled:opacity-60 disabled:active:bg-green-600"
+          aria-disabled={hasErrors || undefined}
+          title={hasErrors ? 'Completa los campos correctamente' : undefined}
+          className="mt-4 p-6 rounded-xl bg-green-600 active:bg-green-500 text-2xl lg:text-3xl font-black shadow-xl min-h-[80px] border-b-4 border-green-800 disabled:opacity-60 disabled:active:bg-green-600 disabled:cursor-not-allowed"
         >
           {isSaving ? 'Guardando…' : 'Guardar Registro'}
         </button>
