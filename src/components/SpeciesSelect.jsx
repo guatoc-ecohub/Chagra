@@ -173,8 +173,19 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
       }
       setAiResult(result);
       setAiState('done');
-      // Auto-select si confidence alta + match exacto en catálogo activo
-      if (result.confidence >= 0.7 && result.common_name_es) {
+      // Bug 2026-05-18 operator: 'cuando activo reconocimiento por imagen
+      // solo para agregar la foto, se cambia la especie que ya seleccioné y
+      // se puede poner una incorrecta cuando el módulo falla'.
+      //
+      // Si el operador YA seleccionó especie (`value` no vacío o
+      // `selectedSpeciesId` definido), el rol del flow es: capturar foto
+      // como evidencia de SU planta — NO re-identificar la especie. La
+      // foto se emite igual via onPhoto al parent. El resultado AI queda
+      // como sugerencia (aiResult) pero NO sobrescribe la selección
+      // actual. Si el operador quiere usar la sugerencia, toca el botón
+      // de alternativas explícitamente.
+      const alreadySelected = (value && value.trim().length > 0) || !!selectedSpeciesId;
+      if (!alreadySelected && result.confidence >= 0.7 && result.common_name_es) {
         const match = allSpecies.find((sp) => {
           const display = (sp.name || '').toLowerCase();
           const comun = (sp.nombre_comun || '').toLowerCase();
