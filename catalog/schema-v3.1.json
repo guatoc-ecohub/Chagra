@@ -698,6 +698,18 @@
             },
             "additionalProperties": false
           }
+        },
+        "tracking_mode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "individual",
+            "aggregate",
+            null
+          ],
+          "description": "ADR-030: individual (perennes/árboles trackeados uno por uno) | aggregate (hortalizas cultivo masivo) | null (invasoras / no aplica)"
         }
       },
       "allOf": [
