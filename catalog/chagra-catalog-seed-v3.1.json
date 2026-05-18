@@ -11259,6 +11259,1171 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El uvito de monte o chaquilulo (Cavendishia bracteata (Ruiz & Pav. ex J.St.-Hil.) Hoerold, Ericaceae) es un arbusto o arbolito andino nativo (1-4 m altura, ocasionalmente epífito sobre árboles del bosque alto-andino) propio del bosque alto-andino y subpáramo colombiano entre 2.400 y 3.200 msnm, presente en Cundinamarca (Cruz Verde, Sumapaz, Chingaza, Verjón, Guasca), Boyacá (Iguaque, Arcabuco, Cocuy, Pisba), Santander (Berlín), Antioquia (Belmira, Sonsón), Tolima, Cauca, Caldas, Risaralda y Nariño. Pertenece a Ericaceae tribu Vaccinieae (igual familia que arándanos, uva camarona, mortiño y asnao). Hojas coriáceas alternas elípticas-lanceoladas brillantes con nervadura broquidódroma característica, brácteas florales rojo-vivas muy llamativas (de ahí el epíteto bracteata) que envuelven la inflorescencia y persisten en el fruto, flores tubulares colgantes rojo-anaranjadas o rojo-blancas (1.5-2 cm) que atraen colibríes paramunos especialistas (Lafresnaya lafresnayi, Coeligena bonapartei, Eriocnemis vestita) en una coevolución planta-colibrí clásica andina. Frutos en baya globosa azul-violeta-negra (8-12 mm) comestible de sabor dulce-aromático intenso (alto en antocianinas, polifenoles, vitamina C: comparable a arándanos importados). Es lección viva de soberanía alimentaria y biodiversidad andina que enseña a niñas y niños por qué tenemos arándanos colombianos nativos sin necesidad de importar blueberries de Norteamérica: el chaquilulo, la uva camarona, el asnao y el mortiño son nuestras frutas Ericaceae andinas, adaptadas al páramo, productivas, deliciosas y de menor huella de carbono. Reivindicada hoy por chefs colombianos y agroecólogos como superfruta nativa. Aparece en planes de restauración Cruz Verde-Sumapaz como especie productiva de doble propósito. Manejo agroecológico: propagación por semilla (sustrato ácido pH 4.5-5.5, germinación 60-120 días) o esqueje semileñoso bajo cámara húmeda, vivero 12-24 meses antes de trasplante, distancia 1.5-2 m, fructificación a partir de 4-6 años, función como frutal silvestre, atractor de colibríes, nurse plant en restauración y cultivo agroforestal nativo. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH38_MADERABLES_SOMBRIO",
+      "id": "cedrela_odorata",
+      "nombre_comun": "Cedro real",
+      "nombre_comunes_regionales": [
+        "cedro",
+        "cedro colorado",
+        "cedro caoba",
+        "cedro amargo"
+      ],
+      "nombre_cientifico": "Cedrela odorata L.",
+      "familia_botanica": "Meliaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "biomass_producer",
+        "windbreak",
+        "nurse_plant",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_protegido",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1500,
+        "max_absoluto": 1900
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 18,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "arbol caducifolio, 20-35 m de altura, fuste recto",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla alada recolectada de cápsulas dehiscentes en estación seca. Sin tratamiento pre-germinativo. Germinación 70-90% a 15-25 días en bandejas con sustrato orgánico. Trasplante a bolsa 1.5-2 kg a las 6 semanas. Plantación definitiva a los 4-6 meses (30-40 cm altura). Vivero a sombra parcial 50%.",
+        "tiempo_a_establecimiento_dias": 60,
+        "notas": "Crítico manejo contra Hypsipyla grandella (barrenador del cedro) que perfora yema apical y deforma fuste. Asocio con sombrío parcial (café, cacao) o plantación bajo dosel disminuye ataque vs plantación a plena exposición.",
+        "fuente": "Cárdenas & Salinas 2007 'Libro Rojo Plantas Colombia'; CONIF/Cárdenas; CATIE manuales agroforestales meliáceas tropicales"
+      },
+      "companions": [
+        "coffea_arabica",
+        "theobroma_cacao",
+        "inga_edulis",
+        "musa_paradisiaca",
+        "erythrina_poeppigiana",
+        "cordia_alliodora"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol 20-35 m, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Un árbol patrimonial por huerto >500 m² como sombra y reserva maderable familiar.",
+          "tips": [
+            "Plantar a >8 m de construcciones (raíz extensa)",
+            "Podas de formación años 2-4 para fuste recto"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío en café 100-200 árb/ha, cacao 80-120 árb/ha o plantaciones maderables puras 400-625 árb/ha (5x5 a 4x4 m). Turno comercial 25-35 años para diámetros >40 cm.",
+          "tips": [
+            "Asocio café/cacao reduce ataque Hypsipyla 40-60%",
+            "Raleos progresivos a los 8, 14 y 20 años",
+            "Cosecha de semilla genética seleccionada"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave restauración bosque seco tropical y bosque húmedo premontano. Listado Apéndice III CITES para Colombia.",
+          "tips": [
+            "Densidad 600-800 ind/ha asociado a pioneras (Ochroma, Cordia)",
+            "Protección contra ganado primeros 4 años"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [
+        "Hypsipyla grandella (barrenador del cedro y la caoba) — perfora yema apical en plantaciones puras, deforma fuste"
+      ],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Especie maderable patrimonial neotropical. Hojas pinnadas con olor característico a ajo o cedro (de ahí 'odorata'). Madera aromática amarillo-rojiza muy apreciada por carpintería fina, ebanistería, instrumentos musicales, cigarros (cajas), construcción naval. Hospedero de larvas de mariposas Sphingidae y refugio de epífitas. Listada como vulnerable por sobreexplotación maderera histórica en Colombia, Apéndice III CITES.",
+      "valor_pedagogico": "El cedro real (Cedrela odorata L., Meliaceae) es uno de los árboles maderables más patrimoniales de la América tropical, nativo desde el sur de México hasta el norte de Argentina. En Colombia se distribuye en bosques húmedos y secos tropicales y premontanos de las regiones Caribe (Magdalena, Cesar, Bolívar, Sucre, Córdoba, La Guajira), Andina (valles interandinos del Magdalena, Cauca, Patía, en Tolima, Huila, Valle, Antioquia, Santander, Norte de Santander), Pacífico (Chocó, Valle), Orinoquía (piedemonte llanero Casanare, Meta) y Amazonía (piedemonte caqueteño y putumayense) entre 0 y 1.500 msnm en zona térmica cálida a templada. Árbol caducifolio de 20-35 m de altura con fuste recto cilíndrico y corteza fisurada, hojas pinnadas grandes con folíolos lanceolados que despiden olor característico a ajo o cedro al romperlas (epíteto 'odorata'), flores pequeñas blanco-verdosas en panículas terminales melíferas, cápsulas leñosas dehiscentes con semillas aladas dispersadas por viento. Madera aromática rojiza muy apreciada en ebanistería fina, instrumentos musicales (guitarras clásicas), cajas para puros cubanos, construcción naval, mueblería de lujo. Históricamente sobreexplotada: poblaciones silvestres reducidas en >70% del rango original, listada en Apéndice III CITES Colombia y Libro Rojo Plantas Colombia como vulnerable. Su asocio agroecológico clásico es con café y cacao bajo sombrío diversificado, donde el dosel parcial reduce hasta un 60% el ataque del barrenador Hypsipyla grandella (lepidóptero Pyralidae que perfora la yema apical y deforma el fuste en plantaciones puras a plena exposición), aporta biomasa hojarasca rica en N, hospeda fauna polinizadora y eventualmente provee madera de valor patrimonial para herencia familiar (turno 25-35 años a diámetros >40 cm). Manejo agroecológico: vivero a sombra 50%, plantación definitiva entre cacaotales o cafetales, podas de formación años 2-4 para fuste recto, raleos progresivos años 8-14-20, cosecha de semilla genéticamente seleccionada. Es lección de soberanía maderera: en lugar de teca asiática o pino radiata exótico, el cedro colombiano provee maderas finas locales con menor huella ecológica y valor cultural patrimonial. Fuentes Tier A: Cárdenas & Salinas 2007 Libro Rojo Plantas Colombia, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, CATIE/CONIF manuales agroforestales meliáceas tropicales.",
+      "nota_conservacion": "Listado Apéndice III CITES Colombia y categoría Vulnerable en Libro Rojo Plantas Colombia por sobreexplotación maderera histórica. Aprovechamiento silvestre requiere permiso CAR/Ministerio Ambiente. Plantaciones agroforestales y huertos familiares contribuyen a recuperación poblacional.",
+      "source_ids": [
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "perez-arbelaez-1947-plantas-utiles"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH38_MADERABLES_SOMBRIO",
+      "id": "cordia_alliodora",
+      "nombre_comun": "Nogal cafetero",
+      "nombre_comunes_regionales": [
+        "nogal",
+        "moho",
+        "salmwood",
+        "vara de humo",
+        "canalete"
+      ],
+      "nombre_cientifico": "Cordia alliodora (Ruiz & Pav.) Oken",
+      "familia_botanica": "Boraginaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "biomass_producer",
+        "windbreak",
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 400,
+        "optimo_max": 1600,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 18,
+        "optimo_max": 26,
+        "max_tolerable": 32
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "arbol semicaducifolio, 15-25 m de altura, copa rala estratificada",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Recolección de núcula seca en panículas persistentes (cáliz acrescente actúa como ala anemócora). Sin tratamiento pre-germinativo. Germinación 60-80% a 10-20 días. Plántula vigorosa, trasplante directo o a bolsa 1 kg. Definitiva a 3-4 meses (25-35 cm).",
+        "tiempo_a_establecimiento_dias": 45,
+        "notas": "Regeneración natural espontánea en cafetales y potreros (anemócora). Asocio nodal con Coffea arabica en Eje Cafetero colombiano: dosel ralo permite paso de luz tamizada óptima para café.",
+        "fuente": "Cenicafé manuales sombrío cafetero; CATIE 1997 'Cordia alliodora en sistemas agroforestales'; Trees of Antioquia"
+      },
+      "companions": [
+        "coffea_arabica",
+        "theobroma_cacao",
+        "musa_paradisiaca",
+        "inga_edulis",
+        "cedrela_odorata",
+        "erythrina_poeppigiana"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol 15-25 m, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Sombrío puntual o lindero. Regenera espontáneamente desde semilla anemócora dispersada del vecindario.",
+          "tips": [
+            "Aprovechar regeneración natural en lugar de plantar",
+            "Selección de fustes rectos para uso maderable"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío clásico cafetero zona templada 100-250 árb/ha. Sistemas cacaoteros 80-150 árb/ha. Plantación maderable pura 400-600 árb/ha, turno 15-20 años.",
+          "tips": [
+            "Manejo de regeneración natural en cafetales (raleos selectivos)",
+            "Poda apical año 2-3 para corregir bifurcaciones",
+            "Madera con valor comercial: ebanistería, postes, instrumentos"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Pionera de bosque secundario tropical. Colonización rápida de potreros abandonados.",
+          "tips": [
+            "Densidad 600-800 ind/ha asociado a Ochroma pyramidale",
+            "Tolera suelos pobres y compactados"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Sombrío cafetero clásico del Eje Cafetero colombiano. Copa rala estratificada permite paso de luz tamizada óptima para café. Hojas pequeñas aromáticas (olor a ajo al estrujarlas, de ahí 'alliodora') con descomposición rápida y aporte de N. Flores blancas pequeñas en panículas terminales, melíferas, atraen abejas y polinizadores. Núcula dispersada por viento permite regeneración natural espontánea. Madera marrón clara apreciada en ebanistería, postes, instrumentos musicales, canoas.",
+      "valor_pedagogico": "El nogal cafetero (Cordia alliodora (Ruiz & Pav.) Oken, Boraginaceae) es el árbol de sombrío más emblemático del paisaje cultural cafetero colombiano. Nativo del Neotrópico, en Colombia se distribuye en bosques húmedos a subhúmedos premontanos de toda la región Andina (Eje Cafetero: Quindío, Risaralda, Caldas; Antioquia, Cundinamarca, Tolima, Huila, Santander, Norte de Santander, Valle, Cauca, Nariño), Caribe (estribaciones Sierra Nevada, Serranía Perijá, Montes de María) y Pacífico entre 400 y 1.600 msnm en zona térmica cálida a templada. Árbol semicaducifolio de 15-25 m con fuste recto y copa rala estratificada en pisos horizontales característicos (de ahí 'estratificada'), hojas pequeñas alternas elíptico-lanceoladas que despiden olor a ajo al estrujarlas (epíteto 'alliodora' del griego 'allion' = ajo), flores blancas pequeñas en grandes panículas terminales muy melíferas que atraen abejas nativas y Apis mellifera, frutos pequeños tipo núcula con cáliz persistente acrescente que actúa como ala anemócora permitiendo dispersión por viento a decenas de metros (de ahí su regeneración espontánea masiva en potreros y cafetales del Eje). Es la lección viva del agroforestería cafetera colombiana: a diferencia del sombrío con especies exóticas (Grevillea robusta australiana, Inga densiflora introducida o Eucalyptus invasor), el nogal cafetero es nativo, no demanda manejo intensivo porque se regenera solo desde semilla anemócora del vecindario, tiene copa rala que deja pasar 30-50% de luz tamizada (ideal para café arábica de mediana sombra), descompone hojarasca rápido aportando N al suelo cafetero, produce madera de valor (ebanistería, postes, mangos de herramienta, canoas) que el caficultor puede aprovechar como reserva al final de la vida útil del cafetal, y atrae polinizadores que benefician al café y otros cultivos asociados. Cenicafé ha documentado densidades óptimas de 100-250 árboles/ha en cafetales tradicionales del Quindío y Risaralda. Es también pionera valiosa en restauración de bosque secundario: coloniza rápidamente potreros abandonados, tolera suelos pobres y prepara sitios para especies climácicas. Manejo agroecológico: aprovechar regeneración natural antes que plantar, raleos selectivos cada 5-7 años, podas apicales tempranas para corregir bifurcaciones, cosecha de madera a 15-20 años para diámetros >30 cm. Fuentes Tier A: Cenicafé manuales cafeteros, CATIE 1997 manual Cordia alliodora sistemas agroforestales, Trees of Antioquia, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF.",
+      "source_ids": [
+        "cenicafe-manual-cafetero-2013",
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "perez-arbelaez-1947-plantas-utiles"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH38_MADERABLES_SOMBRIO",
+      "id": "swietenia_macrophylla",
+      "nombre_comun": "Caoba andina",
+      "nombre_comunes_regionales": [
+        "caoba",
+        "caoba de hoja grande",
+        "mahogany",
+        "caoba del Amazonas"
+      ],
+      "nombre_cientifico": "Swietenia macrophylla King",
+      "familia_botanica": "Meliaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "biomass_producer",
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "en_peligro",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1000,
+        "max_absoluto": 1400
+      },
+      "temperatura_c": {
+        "helada_letal": 6,
+        "optimo_min": 22,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "habito": "arbol siempreverde, 30-50 m de altura, fuste recto cilíndrico",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Cápsulas leñosas grandes dehiscentes liberan semillas aladas. Sin tratamiento pre-germinativo. Germinación 70-85% a 14-21 días. Vivero a sombra 60% durante 6-8 meses. Plantación definitiva a 40-50 cm de altura. Raíz pivotante profunda: trasplante temprano evitando daño radicular.",
+        "tiempo_a_establecimiento_dias": 75,
+        "notas": "Mismo problema que Cedrela: Hypsipyla grandella ataca yema apical en plantaciones puras. Asocio con cacao, café o dosel residual reduce drásticamente daño. Crecimiento lento-moderado, turno 30-50 años para madera comercial.",
+        "fuente": "Cárdenas & Salinas 2007 Libro Rojo; CITES Apéndice II; IUCN Red List EN; Sinchi Amazonía"
+      },
+      "companions": [
+        "theobroma_cacao",
+        "coffea_arabica",
+        "cordia_alliodora",
+        "inga_edulis",
+        "musa_paradisiaca",
+        "cedrela_odorata"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol gigante 30-50 m, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Un árbol patrimonial generacional en huerto >1000 m². Plantar pensando en nietos.",
+          "tips": [
+            "Plantar a >15 m de construcciones",
+            "Asociar con cacao o frutales tropicales para protección Hypsipyla"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío maderable en cacaotales tropicales 60-100 árb/ha. Plantaciones puras 400 árb/ha en suelos profundos, turno 30-50 años.",
+          "tips": [
+            "Plantación bajo dosel residual reduce 70% ataque Hypsipyla",
+            "Sólo semilla certificada de procedencia conocida",
+            "Manejo silvicultural intensivo años 1-10"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave restauración bosque amazónico y bosque húmedo Magdalena. Categoría EN PELIGRO (EN) IUCN.",
+          "tips": [
+            "Densidad 200-400 ind/ha asociado a pioneras tropicales",
+            "Protección legal estricta CITES Apéndice II"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [
+        "Hypsipyla grandella (barrenador del cedro y la caoba)"
+      ],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Especie maderable patrimonial neotropical de máximo valor comercial histórico. Gigante emergente del bosque amazónico y húmedo tropical. Madera rojiza fina veteada considerada la más preciada del mundo para mueblería de lujo, instrumentos musicales (guitarras, pianos), construcción naval, ebanistería patrimonial. Sobreexplotada al borde del exterminio comercial: listada IUCN Red List como EN PELIGRO (EN) y CITES Apéndice II.",
+      "valor_pedagogico": "La caoba andina o caoba de hoja grande (Swietenia macrophylla King, Meliaceae) es uno de los árboles maderables más patrimoniales y más amenazados del mundo. Su madera rojiza fina veteada es considerada históricamente la más preciada para ebanistería de lujo, mueblería patrimonial, instrumentos musicales (guitarras clásicas, pianos), construcción naval clásica y altares de iglesias coloniales. Nativa de Mesoamérica y Sudamérica tropical, en Colombia se distribuye en bosques húmedos tropicales de baja altitud en la Amazonía (piedemonte caqueteño, putumayense, amazonense), valle medio del Magdalena (Antioquia, Santander, Bolívar, Cesar) y Pacífico chocoano y vallecaucano entre 0 y 1.000 msnm en zona térmica cálida muy húmeda. Árbol siempreverde gigante que puede alcanzar 30-50 m de altura con fuste recto cilíndrico de hasta 2 m de diámetro y contrafuertes basales, copa amplia hemisférica emergente del dosel, hojas pinnadas con folíolos lanceolados grandes (de ahí 'macrophylla'), flores pequeñas blanco-amarillentas en panículas axilares, cápsulas leñosas grandes erectas dehiscentes en 4-5 valvas que liberan numerosas semillas aladas dispersadas por viento. ALERTA CONSERVACIÓN: categorizada EN PELIGRO (EN) en la Lista Roja de IUCN y listada en CITES Apéndice II por sobreexplotación maderera histórica desde la época colonial: poblaciones silvestres reducidas en >80% del rango original en Colombia, su comercio internacional requiere permisos CITES y su aprovechamiento doméstico requiere autorización del Ministerio de Ambiente. Aparece en Libro Rojo Plantas Colombia (Cárdenas & Salinas 2007). El cultivo agroforestal y plantaciones bajo dosel residual son la principal alternativa para reducir presión sobre poblaciones silvestres y son promovidos por Sinchi en la Amazonía colombiana. Comparte con Cedrela odorata el principal limitante silvicultural: el barrenador Hypsipyla grandella (Pyralidae) perfora la yema apical y deforma el fuste en plantaciones puras a plena exposición, pero el asocio con cacao o bajo dosel residual reduce hasta 70% el daño. Crecimiento lento-moderado, turno comercial 30-50 años para diámetros >50 cm. Manejo agroecológico: sólo semilla certificada de procedencia conocida, vivero a sombra 60% por 6-8 meses, plantación bajo dosel residual o asociada a cacao, podas de formación años 2-5, raleos progresivos años 10-20-30. Es lección crítica de conservación maderera: la madera que su tatarabuelo aprovechaba libremente del bosque amazónico hoy está protegida internacionalmente por la presión exterminadora del mercado global, y plantar caoba en su huerto agroforestal es un acto de soberanía y de reparación con la selva. Fuentes Tier A: Cárdenas & Salinas 2007 Libro Rojo Plantas Colombia, IUCN Red List, CITES Apéndice II, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF, Sinchi Amazonía Colombiana.",
+      "nota_conservacion": "EN PELIGRO (EN) según IUCN Red List. Listada CITES Apéndice II: comercio internacional regulado. Aprovechamiento silvestre prohibido sin permiso CAR/Ministerio Ambiente Colombia. Plantaciones agroforestales y conservación in situ son críticas para supervivencia de la especie en Colombia.",
+      "source_ids": [
+        "libro-rojo-plantas-colombia",
+        "uicn-red-list",
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "sinchi-amazonia-colombiana"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH38_MADERABLES_SOMBRIO",
+      "id": "tabebuia_rosea",
+      "nombre_comun": "Guayacán rosado",
+      "nombre_comunes_regionales": [
+        "ocobo",
+        "roble morado",
+        "flor morado",
+        "macuelizo",
+        "Handroanthus rosea"
+      ],
+      "nombre_cientifico": "Tabebuia rosea (Bertol.) DC.",
+      "familia_botanica": "Bignoniaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "biomass_producer",
+        "pollinator_attractor",
+        "windbreak"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1600,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 18,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "arbol caducifolio, 15-25 m de altura, floración rosada espectacular",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla alada recolectada de cápsulas dehiscentes en estación seca (enero-marzo en Caribe). Sin tratamiento pre-germinativo. Germinación 80-95% a 8-15 días, una de las germinaciones más rápidas de los maderables tropicales. Vivero a sol parcial, trasplante definitivo a 30-40 cm.",
+        "tiempo_a_establecimiento_dias": 50,
+        "notas": "Floración masiva sincrónica en estación seca (febrero-marzo Andes/Caribe) tras estrés hídrico: árbol totalmente desnudo de hojas se cubre de flores rosado-violáceas que tapizan el suelo al caer. Espectáculo paisajístico icónico del paisaje cafetero y de pueblos del Caribe.",
+        "fuente": "Bernal 2015; Cárdenas-Salinas 2007; Trees of Antioquia; arbolado urbano municipios Andes-Caribe"
+      },
+      "companions": [
+        "coffea_arabica",
+        "cordia_alliodora",
+        "inga_edulis",
+        "musa_paradisiaca",
+        "theobroma_cacao",
+        "erythrina_poeppigiana"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol 15-25 m, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Árbol ornamental-maderable patrimonial. Floración espectacular paisajística.",
+          "tips": [
+            "Plantar en zona visible (jardín frontal, andén)",
+            "Tolera podas urbanas anuales para formación"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío cafetalero compatible 80-150 árb/ha. Maderable secundario en plantaciones mixtas. Arbolado urbano patrimonial municipal.",
+          "tips": [
+            "Madera dura amarillo-marrón apreciada para construcción rural",
+            "Polen y néctar para apicultura nativa",
+            "Tolera contaminación urbana mejor que Quercus"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Pionera bosque seco tropical en restauración Caribe y valles interandinos.",
+          "tips": [
+            "Tolera suelos pedregosos y pendientes fuertes",
+            "Asocio con Bombacopsis quinata en bosque seco"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Árbol ornamental-maderable patrimonial neotropical. Floración masiva sincrónica rosado-violácea en estación seca tras estrés hídrico, espectáculo paisajístico icónico de cafetales y pueblos del Caribe colombiano. Madera amarillo-marrón dura apreciada para construcción rural, vigas, postes, ebanistería. Flores grandes tubulares atraen abejas y colibríes. Importante en arbolado urbano municipal de ciudades cálidas y templadas.",
+      "valor_pedagogico": "El guayacán rosado u ocobo (Tabebuia rosea (Bertol.) DC., sinónimo válido Handroanthus roseus, Bignoniaceae) es uno de los árboles más patrimoniales del paisaje colombiano. Nativo desde el sur de México hasta Ecuador, en Colombia se distribuye prácticamente en todas las regiones bajas y medias: Caribe (Sucre, Córdoba, Bolívar, Magdalena, La Guajira), Andina (valles del Magdalena, Cauca y Patía, piedemonte llanero en Cundinamarca, Tolima, Huila, Antioquia, Santander, Norte de Santander, Caldas, Risaralda, Quindío, Valle), Pacífico (Chocó, Valle), Orinoquía (Casanare, Meta) entre 0 y 1.600 msnm en zona térmica cálida a templada. Árbol caducifolio de 15-25 m de altura con fuste recto y copa abierta hemisférica, hojas opuestas palmaticompuestas con 5 folíolos elípticos, su característica más espectacular es la floración masiva sincrónica en estación seca (febrero-marzo en Andes, enero-marzo en Caribe): tras estrés hídrico el árbol pierde totalmente las hojas y se cubre de grandes flores tubulares rosado-violáceas (5-8 cm) en panículas terminales que tapizan el suelo al caer convirtiendo calles y veredas en alfombras rosadas. Este fenómeno paisajístico es ícono cultural de pueblos cafeteros (Pueblo Tapao, Filandia, Salento), municipios del Caribe (Sincelejo, Valledupar), Ibagué, Bogotá (avenidas), y aparece en pinturas, poesía y postales turísticas. Su madera amarillo-marrón dura y resistente a la pudrición es apreciada para construcción rural (vigas, postes, durmientes), ebanistería e instrumentos musicales artesanales. Es importante en arbolado urbano municipal porque tolera mejor que el roble (Quercus) la contaminación urbana, los suelos compactados y las podas eléctricas, además provee néctar y polen para abejas y colibríes urbanos durante semanas de floración masiva. En sistemas agroforestales cafetales templados acepta densidades 80-150 árb/ha como sombrío estético-productivo. En restauración de bosque seco tropical (Caribe, valle del Magdalena) es pionera valiosa por tolerancia a suelos pedregosos y pendientes. La floración masiva sincrónica es tema clásico de fenología tropical: dispara la dehiscencia de cápsulas y la dispersión de semillas aladas justo al inicio de lluvias, maximizando germinación. Manejo agroecológico: propagación por semilla recién recolectada con germinación rápida (8-15 días), vivero al sol parcial, plantación definitiva a 30-40 cm, podas de formación años 1-3, tolera podas urbanas anuales. Es lección de soberanía paisajística: en lugar de plantar jacaranda exótica de Argentina-Brasil o cerezos japoneses ornamentales, el ocobo nativo provee la misma magia floral en su versión rosada colombiana, con valor maderable adicional. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, Cárdenas & Salinas 2007, Trees of Antioquia, POWO Kew, GBIF Backbone Taxonomy.",
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "libro-rojo-plantas-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "perez-arbelaez-1947-plantas-utiles"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH38_MADERABLES_SOMBRIO",
+      "id": "tabebuia_chrysantha",
+      "nombre_comun": "Guayacán amarillo",
+      "nombre_comunes_regionales": [
+        "araguaney",
+        "guayacán",
+        "guayacán de Manizales",
+        "Handroanthus chrysanthus",
+        "flor amarilla"
+      ],
+      "nombre_cientifico": "Tabebuia chrysantha (Jacq.) G.Nicholson",
+      "familia_botanica": "Bignoniaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "biomass_producer",
+        "pollinator_attractor",
+        "windbreak"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1800,
+        "max_absoluto": 2200
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 18,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "arbol caducifolio, 10-25 m de altura, floración amarillo dorado espectacular",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla alada recolectada de cápsulas dehiscentes en estación seca. Sin tratamiento pre-germinativo. Germinación 70-90% a 10-20 días. Vivero a sol parcial, definitiva a 30-40 cm.",
+        "tiempo_a_establecimiento_dias": 55,
+        "notas": "Floración masiva sincrónica amarillo dorado intensa en estación seca, complemento cromático del ocobo rosado. Más rústico que T. rosea, tolera bosque seco más severo.",
+        "fuente": "Bernal 2015; Cárdenas-Salinas 2007; Trees of Antioquia; árbol nacional Venezuela"
+      },
+      "companions": [
+        "coffea_arabica",
+        "cordia_alliodora",
+        "tabebuia_rosea",
+        "bombacopsis_quinata",
+        "inga_edulis"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol 10-25 m, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Árbol patrimonial-ornamental con floración amarillo dorado espectacular.",
+          "tips": [
+            "Plantar en jardín frontal para floración pública",
+            "Combinar con T. rosea para contraste rosado-amarillo"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío cafetalero 80-150 árb/ha. Maderable secundario alta calidad. Arbolado urbano municipal.",
+          "tips": [
+            "Madera dura amarilla-marrón muy resistente para postes y vigas",
+            "Flor patrimonial nacional de Venezuela (araguaney)",
+            "Tolera bosque seco más severo que T. rosea"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Pionera valiosa bosque seco tropical Caribe y valles interandinos Andes.",
+          "tips": [
+            "Tolera suelos pedregosos y sequía estacional severa",
+            "Asocio con Bombacopsis quinata en bosque seco"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Árbol ornamental-maderable patrimonial neotropical. Floración masiva sincrónica amarillo dorado intensa en estación seca, complemento cromático del ocobo rosado. Madera dura amarillo-marrón muy resistente para postes, vigas, durmientes. Flores grandes tubulares atraen abejas y colibríes. Flor patrimonial nacional de Venezuela (araguaney) y emblemática del paisaje tropical colombiano.",
+      "valor_pedagogico": "El guayacán amarillo o araguaney (Tabebuia chrysantha (Jacq.) G.Nicholson, sinónimo válido Handroanthus chrysanthus, Bignoniaceae) es el complemento cromático del ocobo rosado en el paisaje patrimonial colombiano-venezolano: mientras T. rosea cubre los pueblos de flores rosadas, T. chrysantha los cubre de un amarillo dorado intenso espectacular. Nativo del Neotrópico, en Colombia se distribuye en bosques húmedos a secos tropicales y premontanos de las regiones Caribe (Sucre, Córdoba, Bolívar, Magdalena, Cesar, Guajira), Andina (valles interandinos del Magdalena, Cauca y Patía, piedemontes en Antioquia, Santander, Norte de Santander, Cundinamarca, Tolima, Huila, Caldas, Risaralda, Quindío, Valle, Cauca, Nariño), Pacífico (Valle, Chocó, Nariño) y Orinoquía (Casanare, Meta) entre 0 y 1.800 msnm en zona térmica cálida a templada. Árbol caducifolio de 10-25 m de altura con fuste recto y copa abierta hemisférica, hojas opuestas palmaticompuestas con 5 folíolos elípticos pubescentes, flores tubulares amarillo dorado intenso de 5-8 cm en panículas terminales densas durante estación seca (enero-marzo Andes, diciembre-marzo Caribe), tras pérdida total de hojas el árbol queda como un sol vegetal incandescente. Es flor patrimonial nacional de Venezuela (donde se llama araguaney, declarado árbol nacional desde 1948), íntimamente ligado a la cultura andina venezolana y colombiana fronteriza (Norte de Santander, Arauca, Vichada, Guainía). Su madera es una de las más duras y resistentes del Neotrópico, con densidad >1 g/cm³, color amarillo-marrón a verdoso, apreciada para postes, durmientes ferroviarios, vigas estructurales, construcción rural pesada, ebanistería y tornería; sirve incluso como sustituto del bossier africano en herramientas. Más rústico que T. rosea: tolera suelos pedregosos, sequía estacional severa de hasta 5-6 meses, suelos delgados de laderas calcáreas y arenosos, lo que lo convierte en pionera ideal para restauración de bosque seco tropical en Caribe colombiano (Montes de María, Serranía Perijá) y valles interandinos secos del Patía y Magdalena. En sistemas agroforestales acepta densidades 80-150 árb/ha como sombrío cafetalero estético-productivo. Manejo agroecológico: propagación por semilla recién recolectada con germinación rápida (10-20 días), vivero al sol parcial, plantación definitiva a 30-40 cm, podas de formación años 1-3, tolera podas urbanas anuales. Es lección viva de fenología tropical y soberanía paisajística: la floración masiva sincrónica disparada por estrés hídrico permite ver el ritmo estacional del trópico marcado por floración en vez de hojas; y plantar guayacán amarillo nativo en arbolado urbano provee la misma espectacularidad estética que el cerezo japonés sin las exigencias hídricas o climáticas exóticas. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, Cárdenas & Salinas 2007 Libro Rojo Plantas Colombia, Trees of Antioquia, POWO Kew, GBIF Backbone Taxonomy.",
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "libro-rojo-plantas-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "perez-arbelaez-1947-plantas-utiles"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH38_MADERABLES_SOMBRIO",
+      "id": "bombacopsis_quinata",
+      "nombre_comun": "Ceiba tolúa",
+      "nombre_comunes_regionales": [
+        "ceiba tolú",
+        "pino bobo",
+        "ceiba colorada",
+        "tolú",
+        "cedro espino",
+        "Pachira quinata"
+      ],
+      "nombre_cientifico": "Bombacopsis quinata (Jacq.) Dugand",
+      "familia_botanica": "Malvaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "biomass_producer",
+        "windbreak",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "en_peligro",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 800,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 6,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "arbol caducifolio, 25-40 m de altura, tronco con aguijones cónicos",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Cápsulas leñosas dehiscentes liberan semillas envueltas en pelos algodonosos (kapok). Sin tratamiento pre-germinativo. Germinación 75-90% a 10-15 días. Vivero a sol parcial, definitiva a 40-50 cm. Esqueje grueso (10-15 cm diámetro) prende bien en estación lluviosa, técnica tradicional para cercas vivas.",
+        "tiempo_a_establecimiento_dias": 60,
+        "notas": "Tronco juvenil cubierto de aguijones cónicos característicos (protección contra herbívoros) que se pierden en adultos. Crecimiento rápido en juventud, turno comercial 20-30 años. Especie clave bosque seco tropical Caribe.",
+        "fuente": "Cárdenas-Salinas 2007 Libro Rojo; IUCN Vulnerable; CONIF; CIPAV Tolú Tolima Sucre"
+      },
+      "companions": [
+        "tabebuia_rosea",
+        "tabebuia_chrysantha",
+        "cordia_alliodora",
+        "myroxylon_balsamum",
+        "inga_edulis"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol gigante 25-40 m, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Árbol patrimonial bosque seco. Aguijones del tronco juvenil pueden lesionar, plantar lejos de zona de paso.",
+          "tips": [
+            "Distancia >12 m de construcciones",
+            "Cuidado con aguijones juveniles primeros 5-8 años"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Plantación maderable en bosque seco Tolima, Sucre, Córdoba, Cesar, Magdalena 400-625 árb/ha. Sombrío disperso en sistemas silvopastoriles del Caribe. Cercas vivas tradicionales por esqueje grueso.",
+          "tips": [
+            "Madera blanca-rosada liviana apreciada para construcción rural",
+            "Cerca viva tradicional por esqueje 10-15 cm en lluvias",
+            "Crecimiento rápido inicial, raleos años 8-15"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave bosque seco tropical Caribe colombiano, categoría VULNERABLE IUCN.",
+          "tips": [
+            "Densidad 400-600 ind/ha asociado a Tabebuia, Cordia",
+            "Tolera suelos arcillosos pesados y sequía estacional 5-7 meses"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Especie maderable patrimonial del bosque seco tropical neotropical. Gigante emergente del bosque seco caribeño, llamado 'tolú' en zona ancestral del municipio Tolú (Sucre) y Tolú Viejo. Tronco juvenil cubierto de aguijones cónicos característicos (protección anti-herbívoros). Madera blanca-rosada liviana apreciada para construcción rural, postes, embalajes, contrachapados. Cápsulas con pelos algodonosos (kapok) útil para rellenos artesanales. Categorizada VULNERABLE por sobreexplotación maderera histórica del bosque seco.",
+      "valor_pedagogico": "La ceiba tolúa o pino bobo (Bombacopsis quinata (Jacq.) Dugand, sinónimo válido Pachira quinata, Malvaceae subfamilia Bombacoideae) es uno de los árboles maderables más patrimoniales y más amenazados del bosque seco tropical neotropical. Su nombre 'tolú' proviene del municipio Tolú (Sucre) y Tolú Viejo en la región Caribe colombiana, donde la especie es ancestral y emblemática. Nativa del bosque seco tropical del norte de Sudamérica y Mesoamérica, en Colombia se distribuye en la región Caribe (Sucre, Córdoba, Bolívar, Magdalena, Cesar, Guajira, Atlántico), valle medio y bajo del Magdalena (Tolima seco, Antioquia norte, Santander seco), valle del Patía (Cauca) y piedemonte llanero seco (norte Casanare) entre 0 y 800 msnm en zona térmica cálida con estación seca pronunciada de 4-7 meses. Árbol caducifolio gigante de 25-40 m de altura, una de las especies emergentes más altas del bosque seco caribeño, con fuste recto cilíndrico que puede alcanzar 1.5 m de diámetro, copa amplia hemisférica caduca en estación seca, su característica más distintiva es que el tronco y ramas juveniles están cubiertos de aguijones cónicos robustos (3-5 cm de longitud) que protegen contra herbívoros grandes y trepadores (estos aguijones se pierden en árboles adultos viejos), hojas digitado-palmaticompuestas con 5 folíolos elípticos (de ahí 'quinata' = de 5), flores grandes blancas-amarillentas crepusculares-nocturnas polinizadas por murciélagos, cápsulas leñosas elípticas dehiscentes que liberan semillas envueltas en pelos algodonosos blancos (kapok) útil artesanalmente para rellenos de almohadas y aislamientos en la tradición caribeña. ALERTA CONSERVACIÓN: categorizada VULNERABLE (VU) en la Lista Roja IUCN y categoría EN PELIGRO (EN) en el Libro Rojo Plantas Colombia (Cárdenas & Salinas 2007) por sobreexplotación maderera histórica del bosque seco y deforestación masiva para ganadería extensiva: el bosque seco tropical caribeño está hoy reducido a <8% de su cobertura original en Colombia. Su madera blanca-rosada liviana y suave (densidad 0.35-0.45 g/cm³, de ahí el nombre popular 'pino bobo') es apreciada para construcción rural, postes, embalajes, cajas, contrachapados, modelado y tallado. Es lección clave de conservación: lo que su bisabuela llamaba 'la tolúa del patio' y servía para postes, leña y refugio para ganado en el Caribe, hoy es un árbol con cifras de extinción comercial. CIPAV documenta su uso en sistemas silvopastoriles modernos del Caribe colombiano como árbol disperso de sombra para ganado, alternativa nativa a especies introducidas como Albizia o Leucaena. Otra técnica tradicional es la propagación por esqueje grueso (10-15 cm de diámetro) clavados en tierra al inicio de las lluvias, que prende y forma cercas vivas duraderas en los hatos del Caribe. Manejo agroecológico: vivero a sol parcial, plantación definitiva a 40-50 cm, cuidado con los aguijones juveniles los primeros 5-8 años, crecimiento rápido inicial (1-2 m/año), turno comercial 20-30 años para diámetros >40 cm. Fuentes Tier A: Cárdenas & Salinas 2007 Libro Rojo Plantas Colombia, IUCN Red List, Bernal et al. 2015, POWO Kew, GBIF, CIPAV silvopastoriles Caribe.",
+      "nota_conservacion": "VULNERABLE (VU) según IUCN Red List y EN PELIGRO (EN) en Libro Rojo Plantas Colombia. Bosque seco tropical colombiano reducido a <8% de cobertura original. Plantaciones agroforestales, silvopastoriles y cercas vivas son críticas para conservación in situ. Aprovechamiento silvestre requiere permiso CAR.",
+      "source_ids": [
+        "libro-rojo-plantas-colombia",
+        "uicn-red-list",
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH38_MADERABLES_SOMBRIO",
+      "id": "juglans_neotropica",
+      "nombre_comun": "Nogal andino",
+      "nombre_comunes_regionales": [
+        "cedro negro",
+        "nogal cafetero andino",
+        "nogal de Colombia",
+        "cedro nogal",
+        "nogal sudamericano"
+      ],
+      "nombre_cientifico": "Juglans neotropica Diels",
+      "familia_botanica": "Juglandaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "biomass_producer",
+        "windbreak",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "en_peligro",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "arbol semicaducifolio, 20-30 m de altura, fuste recto",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Nuez recolectada de frutos maduros caídos (octubre-diciembre cordillera Oriental). Estratificación fría húmeda 60-90 días en arena. Germinación 50-75% a 30-60 días. Vivero a sombra parcial 50% durante 8-12 meses. Plantación definitiva a 40-50 cm. Raíz pivotante profunda: trasplante temprano para no dañar raíz.",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "Alelopático fuerte (juglona en raíces y hojas) limita asocio con cultivos sensibles (tomate, papa, manzano). Compatible con café, pasturas, gramíneas. Crecimiento lento, turno comercial 40-60 años para madera fina.",
+        "fuente": "Cárdenas-Salinas 2007 Libro Rojo; IUCN EN; Cenicafé sombrío; Trees of Antioquia"
+      },
+      "companions": [
+        "coffea_arabica",
+        "musa_paradisiaca",
+        "alnus_acuminata",
+        "cenchrus_clandestinus_manejado"
+      ],
+      "antagonists": [
+        "solanum_lycopersicum",
+        "solanum_tuberosum",
+        "malus_domestica"
+      ],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol 20-30 m, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Un árbol patrimonial generacional. Frutos nuez comestibles aprovechables a partir de los 15-20 años.",
+          "tips": [
+            "Plantar lejos de huertas de hortalizas (alelopatía juglona)",
+            "Compatible con cafetal, banano, pasturas",
+            "Cosecha de nueces octubre-diciembre"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío cafetal templado-frío 80-150 árb/ha. Plantación maderable mixta 400-500 árb/ha, turno 40-60 años para madera fina valiosa.",
+          "tips": [
+            "Madera negra-rojiza considerada la más fina de los Andes colombianos",
+            "Frutos nuez comestible (similar a Juglans regia europea)",
+            "Asocio café acepta sombrío 30-40% del nogal"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave restauración bosque andino y subandino, categoría EN PELIGRO IUCN.",
+          "tips": [
+            "Densidad 400-600 ind/ha en bosque montano",
+            "Tolera suelos calcáreos y arcillosos profundos"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Maderable patrimonial andino de máximo valor. Su madera negra-rojiza fina veteada es considerada la más preciada de los Andes colombianos para ebanistería de lujo. Fruto nuez comestible análoga al nogal europeo (Juglans regia). Alelopático fuerte (juglona) limita asocio con cultivos sensibles pero compatible con café y pasturas. Categorizada EN PELIGRO IUCN por sobreexplotación maderera y deforestación bosque andino.",
+      "valor_pedagogico": "El nogal andino o cedro negro (Juglans neotropica Diels, Juglandaceae) es la joya maderable de los bosques andinos colombianos: su madera negra-rojiza con vetas oscuras es considerada la más preciada y fina de los Andes para ebanistería de lujo, mueblería patrimonial, instrumentos musicales (cuerpos de guitarras finas), tornería artística y altares de iglesias coloniales. Nativo de los Andes tropicales (Venezuela, Colombia, Ecuador, Perú, Bolivia), en Colombia se distribuye en bosques húmedos premontanos y montanos de la región Andina: cordillera Oriental (Cundinamarca en Choachí, La Calera, Ubaque, Caquetá montano, Boyacá en Iguaque y Arcabuco, Santander en Charalá, Norte de Santander en Pamplona), cordillera Central (Antioquia en San Vicente, Sonsón, Marinilla; Caldas, Risaralda, Quindío del Eje Cafetero; Tolima, Huila; Cauca; Nariño) y cordillera Occidental (Antioquia, Chocó montano, Valle, Cauca) entre 1.800 y 2.600 msnm en zona térmica templada a fría con humedad alta. Árbol semicaducifolio de 20-30 m de altura con fuste recto cilíndrico, corteza grisácea-negruzca fisurada, hojas pinnadas grandes (30-50 cm) con 11-21 folíolos lanceolados, flores monoicas (amentos masculinos colgantes y flores femeninas en racimos cortos), frutos drupáceos globosos verdes que al madurar liberan una nuez comestible análoga a la nuez europea (Juglans regia) con sabor aceitoso suave aprovechable artesanalmente. ALERTA CONSERVACIÓN: categorizada EN PELIGRO (EN) en la Lista Roja IUCN y Libro Rojo Plantas Colombia por sobreexplotación maderera histórica y deforestación del bosque andino: las mejores poblaciones del Eje Cafetero, Antioquia y Cundinamarca fueron taladas masivamente entre 1900 y 1980 para mueblería de lujo, dejando poblaciones silvestres reducidas en >75% del rango original. Su característica ecológica más conocida es la alelopatía fuerte: las raíces, hojas y frutos producen juglona (5-hidroxi-1,4-naftoquinona) que inhibe el crecimiento de cultivos sensibles como tomate, papa, manzano, alfalfa y otros plantados a menos de 10-15 m del árbol; pero es compatible con café, banano, pasturas gramíneas y otros maderables andinos. Cenicafé documenta su uso como sombrío valioso en cafetales del Eje a densidades 80-150 árb/ha donde aporta sombra ligera (30-40%), hojarasca rica en N, valor maderable patrimonial generacional para el caficultor y frutos nuez comestible. Crecimiento lento (turno comercial 40-60 años para diámetros >50 cm), pero la madera adulta es de las más valiosas del país y plantar nogal hoy es legado para nietos y biznietos. Manejo agroecológico: nuez recolectada fresca de frutos caídos, estratificación fría húmeda 60-90 días en arena (sin estratificación germinación <20%), vivero a sombra parcial 50% por 8-12 meses, plantación a 40-50 cm, raíz pivotante profunda requiere trasplante temprano y evitando daño. Es lección de soberanía maderera y alimentaria: lo que Europa cosecha del Juglans regia, Colombia lo cosecha del Juglans neotropica nativo con la misma calidad gastronómica y maderera, sin necesidad de importar nueces europeas. Fuentes Tier A: Cárdenas & Salinas 2007 Libro Rojo Plantas Colombia, IUCN Red List, Bernal et al. 2015, POWO Kew, GBIF, Cenicafé manuales sombrío.",
+      "nota_conservacion": "EN PELIGRO (EN) según IUCN Red List y Libro Rojo Plantas Colombia. Aprovechamiento silvestre requiere permiso CAR/Ministerio Ambiente. Plantaciones agroforestales y reforestación cafetalera son críticas para recuperación poblacional.",
+      "source_ids": [
+        "libro-rojo-plantas-colombia",
+        "uicn-red-list",
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "cenicafe-manual-cafetero-2013"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH38_MADERABLES_SOMBRIO",
+      "id": "cariniana_pyriformis",
+      "nombre_comun": "Abarco",
+      "nombre_comunes_regionales": [
+        "coco-cristal",
+        "chibugá",
+        "cocuelo",
+        "abarco del Catatumbo",
+        "abarco del Pacífico"
+      ],
+      "nombre_cientifico": "Cariniana pyriformis Miers",
+      "familia_botanica": "Lecythidaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "biomass_producer",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "en_peligro",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 800,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 22,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "habito": "arbol siempreverde gigante, 35-50 m de altura, fuste recto cilíndrico contrafuerteado",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Pixidio (cápsula con tapa operculada característica) libera semillas aladas a finales estación seca. Sin tratamiento pre-germinativo. Germinación 60-80% a 20-30 días. Vivero a sombra 60% durante 8-12 meses. Plantación definitiva a 50-60 cm.",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "Especie clave del bosque húmedo tropical Catatumbo, Magdalena medio y Pacífico. Categoría CRÍTICA (CR) en Libro Rojo Plantas Colombia por sobreexplotación maderera y deforestación regional severa.",
+        "fuente": "Cárdenas-Salinas 2007 Libro Rojo CR; IUCN EN; CONIF; Sinchi Catatumbo"
+      },
+      "companions": [
+        "theobroma_cacao",
+        "cedrela_odorata",
+        "swietenia_macrophylla",
+        "cordia_alliodora",
+        "myroxylon_balsamum"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol gigante 35-50 m, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Sólo en huertos amplios >2000 m² o conservación in situ. Árbol patrimonial generacional para legado biznietos.",
+          "tips": [
+            "Distancia >20 m de construcciones",
+            "Asociar con cacaotal tropical húmedo"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Plantación bajo dosel residual o asocio cacaotal 80-150 árb/ha. Madera de máximo valor comercial histórico. Turno 40-60 años para madera comercial.",
+          "tips": [
+            "Madera marrón-rojiza extremadamente durable y resistente",
+            "Sólo plantación con permiso autoridad ambiental",
+            "Conservación in situ prioritaria"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie crítica restauración bosque húmedo tropical Catatumbo, Magdalena medio, Pacífico. EN PELIGRO IUCN, CRÍTICA Libro Rojo Plantas Colombia.",
+          "tips": [
+            "Conservación in situ + enriquecimiento bosque secundario",
+            "Densidad restauración 200-300 ind/ha",
+            "Programas Sinchi/CAR Catatumbo prioritarios"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Especie maderable patrimonial gigante de bosque húmedo tropical neotropical. Madera marrón-rojiza extremadamente durable y resistente a la pudrición, considerada una de las maderas finas más valiosas del Neotrópico para construcción naval (cuadernas, quillas), durmientes, puentes, ebanistería de lujo. Pixidio (cápsula con tapa operculada) característico Lecythidaceae. Listada EN PELIGRO IUCN y CRÍTICA en Libro Rojo Plantas Colombia.",
+      "valor_pedagogico": "El abarco (Cariniana pyriformis Miers, Lecythidaceae) es uno de los árboles maderables más patrimoniales, más gigantes y más amenazados del bosque húmedo tropical colombiano. Nativo del norte de Sudamérica, en Colombia se distribuye en bosques húmedos tropicales de baja altitud en la región del Catatumbo (Norte de Santander), Magdalena medio (Santander, Cesar, Antioquia bajo), Pacífico (Chocó, Valle, Cauca) y Amazonía baja (Caquetá, Putumayo) entre 0 y 800 msnm en zona térmica cálida muy húmeda con precipitación >2000 mm/año. Árbol siempreverde gigante que alcanza 35-50 m de altura emergente del dosel forestal, fuste recto cilíndrico de hasta 1.8 m de diámetro con contrafuertes basales tabulares prominentes, copa amplia hemisférica, hojas alternas elípticas coriáceas brillantes, flores blanco-amarillentas pequeñas en panículas terminales, su característica más distintiva es el fruto: un pixidio (cápsula leñosa con tapa operculada que se abre como una bombonera) en forma de pera invertida (de ahí 'pyriformis' = en forma de pera) que libera semillas aladas dispersadas por viento, fruto típico de la familia Lecythidaceae (igual familia que la castaña amazónica Bertholletia excelsa y el sapucayá). ALERTA CONSERVACIÓN CRÍTICA: categorizada EN PELIGRO (EN) en la Lista Roja IUCN y CRÍTICAMENTE AMENAZADA / CRÍTICA (CR) en el Libro Rojo Plantas Colombia (Cárdenas & Salinas 2007), una de las categorías más alarmantes para un árbol nativo colombiano. La sobreexplotación maderera histórica para construcción naval y obras civiles pesadas, combinada con la deforestación masiva de las regiones del Catatumbo (frontera con Venezuela), Magdalena medio y Pacífico chocoano, han reducido las poblaciones silvestres en >85% del rango original. Sinchi y CAR Norte de Santander mantienen programas prioritarios de conservación in situ del abarco en la serranía de los Motilones. Su madera marrón-rojiza extremadamente densa (>0.85 g/cm³), durable y resistente a la pudrición, los hongos y los xilófagos marinos es considerada una de las maderas finas más valiosas del Neotrópico para construcción naval (cuadernas, quillas, costillas de barcos), durmientes ferroviarios, puentes de carga pesada, vigas estructurales y ebanistería patrimonial; en la región del Catatumbo es la madera tradicional para construcciones rurales históricas. El cultivo agroforestal asociado a cacao o bajo dosel residual es la principal alternativa de conservación productiva: aporta sombrío ligero al cacaotal y permite cosecha de madera a 40-60 años como legado generacional. Manejo agroecológico: vivero a sombra 60% por 8-12 meses, plantación definitiva a 50-60 cm con espacio amplio (mínimo 8x8 m), asocio bajo dosel de árboles pioneros, crecimiento moderado, sólo plantación con permiso de autoridad ambiental. Es lección crítica de conservación: el abarco es uno de los árboles más emblemáticos del bosque húmedo tropical colombiano y simultáneamente uno de los más cerca de la extinción comercial; plantar abarco hoy en sistema agroforestal o programa de restauración es acto urgente de reparación con la selva. Fuentes Tier A: Cárdenas & Salinas 2007 Libro Rojo Plantas Colombia (CR), IUCN Red List (EN), Bernal et al. 2015, POWO Kew, GBIF, Sinchi Amazonía/Catatumbo.",
+      "nota_conservacion": "EN PELIGRO (EN) según IUCN Red List y CRÍTICAMENTE AMENAZADA (CR) en Libro Rojo Plantas Colombia. Una de las maderables nativas más críticamente amenazadas del país. Aprovechamiento silvestre prohibido sin permiso CAR/Ministerio Ambiente. Conservación in situ y plantaciones agroforestales son críticas e inaplazables.",
+      "source_ids": [
+        "libro-rojo-plantas-colombia",
+        "uicn-red-list",
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "sinchi-amazonia-colombiana"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH38_MADERABLES_SOMBRIO",
+      "id": "ochroma_pyramidale",
+      "nombre_comun": "Balso",
+      "nombre_comunes_regionales": [
+        "palo balso",
+        "lano",
+        "balsa",
+        "tambor",
+        "Ochroma lagopus"
+      ],
+      "nombre_cientifico": "Ochroma pyramidale (Cav. ex Lam.) Urb.",
+      "familia_botanica": "Malvaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "biomass_producer",
+        "nurse_plant",
+        "pollinator_attractor",
+        "windbreak"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1000,
+        "max_absoluto": 1500
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "habito": "arbol siempreverde de crecimiento muy rápido, 15-25 m de altura, fuste recto",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Cápsulas leñosas dehiscentes liberan semillas envueltas en pelos algodonosos (lana). Escarificación leve con agua caliente 60°C por 1 minuto o lijado opcional. Germinación 80-95% a 7-15 días. Crecimiento muy rápido en vivero (15-25 cm/mes), plantación a 3-4 meses (40-60 cm).",
+        "tiempo_a_establecimiento_dias": 30,
+        "notas": "Pionera por excelencia de bosque húmedo tropical: una de las especies de crecimiento más rápido del Neotrópico (3-5 m/año primeros años), corta vida (15-25 años), prepara sitios para sucesión secundaria. Madera más liviana del mundo comercial (densidad 0.1-0.2 g/cm³).",
+        "fuente": "Bernal 2015; POWO; Sinchi; CIAT manuales agroforestales tropicales"
+      },
+      "companions": [
+        "theobroma_cacao",
+        "musa_paradisiaca",
+        "cedrela_odorata",
+        "swietenia_macrophylla",
+        "cordia_alliodora",
+        "inga_edulis"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol 15-25 m, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Pionera valiosa para sombrío rápido temporal (5-10 años) mientras crecen maderables nobles (cedro, caoba, abarco).",
+          "tips": [
+            "Plantar como sombrío rápido temporal",
+            "Cosechar a los 6-8 años para liberar maderables nobles",
+            "Lana de cápsulas para rellenos artesanales"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Pionera rápida en cacaotales jóvenes 150-300 árb/ha (sombrío inicial). Plantación maderera ligera 400-625 árb/ha, turno 6-10 años para madera de balso comercial.",
+          "tips": [
+            "Madera más liviana del mundo: modelado, aislamiento, surf, aeromodelismo",
+            "Cosecha rápida 6-10 años",
+            "Pionera de sucesión: reemplazar con maderables nobles después"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Pionera por excelencia bosque húmedo tropical. Nurse plant para especies climácicas.",
+          "tips": [
+            "Densidad 600-1000 ind/ha en primer ciclo restauración",
+            "Sucesión secundaria: reemplazar con climácicas a 8-10 años"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Pionera por excelencia del bosque húmedo tropical neotropical. Una de las especies de crecimiento más rápido del mundo (3-5 m/año primeros años). Vida corta (15-25 años) pero ecológicamente clave para sucesión secundaria, prepara sitios para especies climácicas (cedro, caoba, abarco). Produce la madera comercial más liviana del mundo (densidad 0.1-0.2 g/cm³, comparable al corcho), usada mundialmente en aeromodelismo, surf, aislamiento, modelado y juguetería.",
+      "valor_pedagogico": "El balso o palo balso (Ochroma pyramidale (Cav. ex Lam.) Urb., sinónimo Ochroma lagopus, Malvaceae subfamilia Bombacoideae) es la pionera por excelencia del bosque húmedo tropical neotropical y una de las especies de crecimiento más rápido del mundo. Nativo del Neotrópico, en Colombia se distribuye en bosques húmedos tropicales bajos del Pacífico (Chocó, Valle, Cauca, Nariño), Caribe húmedo (Antioquia bajo, Córdoba, Urabá, sierra Nevada), Magdalena medio, Catatumbo, Amazonía (piedemonte caqueteño, putumayense, amazonense) y Orinoquía (piedemonte Casanare, Meta) entre 0 y 1.000 msnm en zona térmica cálida muy húmeda. Árbol siempreverde de 15-25 m de altura con fuste recto y copa abierta, hojas alternas grandes palmaticompuestas o palmadas pubescentes, flores grandes blanco-amarillentas crepusculares-nocturnas polinizadas por murciélagos y polillas grandes, cápsulas leñosas largas (15-25 cm) dehiscentes que liberan semillas envueltas en abundante lana o pelos algodonosos (de ahí 'lano' o 'lana' en algunas regiones) útil tradicionalmente para rellenos artesanales de almohadas, juguetes y aislamientos. Su característica más extraordinaria es el crecimiento exponencial en juventud: 3-5 metros por año los primeros 5 años, alcanzando 10-15 m a los 4 años (el árbol comercial de crecimiento más rápido del trópico), con corta vida útil (15-25 años) propia de pioneras. La madera comercial del balso es la más liviana del mundo con densidad de 0.1-0.2 g/cm³ (comparable al corcho), usada mundialmente para aeromodelismo profesional (alas y fuselajes), tablas de surf (núcleos), modelado arquitectónico, juguetería educativa, aislamiento térmico de buques, equipos de salvamento (chalecos), embalajes ligeros frágiles y trabajos de bricolaje. Su rol ecológico como pionera de sucesión secundaria es crítico: coloniza rápidamente claros del bosque, potreros abandonados o quemas; aporta hojarasca abundante mejorando suelos degradados; provee sombrío rápido temporal que protege la germinación de especies climácicas de sucesión tardía como cedro, caoba o abarco; y muere naturalmente a los 15-25 años liberando dosel para que las climácicas tomen el espacio. En sistemas agroforestales tropicales este rol se aprovecha conscientemente: se planta balso en cacaotales jóvenes a 150-300 árb/ha como sombrío rápido temporal mientras crecen los maderables nobles asociados, y a los 6-8 años se cosecha el balso para madera y se libera el dosel para la siguiente fase. Manejo agroecológico: escarificación leve de semilla con agua caliente 60°C por 1 minuto o lijado opcional, germinación 7-15 días, vivero a sol pleno 3-4 meses con crecimiento muy rápido (15-25 cm/mes), plantación definitiva a 40-60 cm de altura. Es lección clave de sucesión ecológica tropical: la naturaleza no construye un bosque maduro de golpe, lo construye en capas temporales donde el balso prepara la cama para el cedro, y entender esto es entender cómo restaurar selva en lugar de monocultivar. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, Sinchi Amazonía, CIAT manuales agroforestales tropicales.",
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "sinchi-amazonia-colombiana",
+        "perez-arbelaez-1947-plantas-utiles"
+      ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH38_MADERABLES_SOMBRIO",
+      "id": "myroxylon_balsamum",
+      "nombre_comun": "Bálsamo de Tolú",
+      "nombre_comunes_regionales": [
+        "bálsamo del Perú",
+        "bálsamo",
+        "balsamillo",
+        "tolú",
+        "quina-quina"
+      ],
+      "nombre_cientifico": "Myroxylon balsamum (L.) Harms",
+      "familia_botanica": "Fabaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "biomass_producer",
+        "nitrogen_fixer",
+        "windbreak",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1500,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "arbol siempreverde, 20-35 m de altura, fuste recto, resina aromática",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Vaina indehiscente alada con una semilla. Sin tratamiento pre-germinativo. Germinación 60-80% a 15-30 días. Vivero a sol parcial durante 6-8 meses. Plantación definitiva a 40-50 cm.",
+        "tiempo_a_establecimiento_dias": 75,
+        "notas": "Producción de resina (bálsamo) por sangrado controlado del tronco mediante incisiones y aplicación de fuego suave: técnica ancestral del municipio Tolú (Sucre) y Tolú Viejo. Resina aromática de uso medicinal, perfumería y cosmética desde la época precolombina.",
+        "fuente": "Pérez Arbeláez 1947 Plantas Útiles Colombia; Bernal 2015; POWO; uso ancestral Caribe colombiano"
+      },
+      "companions": [
+        "coffea_arabica",
+        "theobroma_cacao",
+        "cordia_alliodora",
+        "bombacopsis_quinata",
+        "inga_edulis",
+        "cedrela_odorata"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol 20-35 m, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Árbol patrimonial-medicinal-aromático. Resina cosechable a partir de los 12-15 años.",
+          "tips": [
+            "Plantar a >10 m de construcciones",
+            "Cosecha de resina por sangrado controlado años 12+",
+            "Madera fina valor maderable adicional"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío cafetalero/cacaotero 80-150 árb/ha. Plantación mixta para resina + madera + N. Doble propósito clásico Caribe colombiano.",
+          "tips": [
+            "Resina (bálsamo de Tolú) uso medicinal-cosmético-perfumería",
+            "Madera marrón-rojiza dura fina ebanistería",
+            "Leguminosa fijadora de N parcial al sistema"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie patrimonial bosque húmedo tropical Caribe-Andes. Importancia histórico-cultural y económica.",
+          "tips": [
+            "Densidad 400-600 ind/ha en restauración productiva",
+            "Doble propósito: madera + resina + N biológico"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Especie maderable, medicinal y aromática patrimonial neotropical. Produce el famoso 'bálsamo de Tolú' o 'bálsamo del Perú': resina aromática extraída por sangrado controlado del tronco con uso ancestral en medicina tradicional (expectorante, cicatrizante, antiséptico), perfumería de alta gama, cosmética y aromatización de licores. Leguminosa fijadora parcial de N. Madera marrón-rojiza dura apreciada en ebanistería fina.",
+      "valor_pedagogico": "El bálsamo de Tolú (Myroxylon balsamum (L.) Harms, Fabaceae subfamilia Faboideae) es una de las especies más patrimoniales y multi-propósito de la herencia botánica colombiano-caribeña: un árbol nativo que produce simultáneamente madera fina, resina aromática medicinal famosa mundialmente desde la época colonial y fija nitrógeno biológico al sistema. Su nombre 'tolú' proviene del municipio Tolú (Sucre) y Tolú Viejo en la región Caribe colombiana donde la especie es ancestral y de donde se exportó al mundo el famoso 'bálsamo de Tolú' durante los siglos XVI-XIX. Nativo del Neotrópico, en Colombia se distribuye en bosques húmedos tropicales y premontanos de las regiones Caribe (Sucre, Córdoba, Bolívar, Magdalena, Cesar, Antioquia bajo), Andina (valles interandinos del Magdalena y Cauca, piedemontes Antioquia, Santander, Norte de Santander, Tolima, Huila, Caldas, Quindío, Risaralda, Valle), Pacífico (Chocó, Valle) y Orinoquía (piedemonte llanero) entre 0 y 1.500 msnm en zona térmica cálida a templada. Árbol siempreverde de 20-35 m de altura con fuste recto cilíndrico, corteza grisácea con resina aromática característica, hojas pinnadas con folíolos elípticos puntiagudos brillantes con puntos translúcidos (glándulas de aceite esencial visibles al trasluz, característica diagnóstica), flores blanco-amarillentas pequeñas en racimos terminales melíferos, frutos en vaina indehiscente alada con una semilla aplanada. Su característica más famosa es la producción de la resina conocida como 'bálsamo de Tolú' o 'bálsamo del Perú' (este último nombre proviene del puerto colonial de embarque, no del país): se extrae por sangrado controlado del tronco mediante incisiones en V y aplicación de fuego suave (técnica ancestral indígena y afrocolombiana del Caribe), la resina aromática rojizo-marrón con olor dulce a vainilla-canela tiene uso medicinal tradicional (expectorante para bronquitis y tos, cicatrizante en heridas, antiséptico, antiparasitario), perfumería de alta gama (fijador y nota base en perfumes clásicos como Chanel Nº5 y otros), cosmética (cremas, jabones), aromatización de licores y tabaco premium, e industria farmacéutica moderna. Fue uno de los productos de exportación icónicos de la Nueva Granada durante los siglos XVI-XIX hacia Europa. Su madera marrón-rojiza dura y resistente a la pudrición es también apreciada en ebanistería fina, durmientes, construcción rural pesada. Como leguminosa Faboideae fija parcialmente nitrógeno biológico al sistema mediante asociación con rizobios, aporte valioso en sistemas cafetales y cacaoteros. En sistemas agroforestales acepta densidades 80-150 árb/ha como sombrío de doble propósito: madera fina + resina cosechable a los 12-15 años + N biológico al cafetal o cacaotal. Manejo agroecológico: propagación por semilla fresca (germinación 15-30 días sin tratamiento), vivero a sol parcial 6-8 meses, plantación definitiva a 40-50 cm, primer sangrado de resina a los 12-15 años con incisiones controladas para no debilitar el árbol, cosecha de madera al final del turno (40-50 años) como legado. Es lección extraordinaria de soberanía y multi-propósito agroforestal: un solo árbol nativo provee madera fina + medicina tradicional + perfumería de exportación + fijación de N + sombrío cafetalero, ejemplo perfecto de cómo el bosque manejado supera al monocultivo, y de cómo Colombia tiene en su flora nativa productos que el mercado mundial valora pero que pocos colombianos conocen. Fuentes Tier A: Pérez Arbeláez 1947 Plantas Útiles Colombia, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, JBB Plantas Medicinales.",
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "jbb-plantas-medicinales"
+      ]
     }
   ],
   "biopreparados": [
