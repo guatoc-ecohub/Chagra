@@ -5,9 +5,16 @@ import Database from 'better-sqlite3';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = path.join(__dirname, '../public/catalog.sqlite');
-// v3.2 (ADR-030): seed data is canonical in the sibling Chagra-strategy repo
-const CATALOG_DIR = path.join(__dirname, '../../Chagra-strategy/catalog');
-const SEED_FILE = 'chagra-catalog-seed-v3.2.json';  // bump v3.1 → v3.2 con tracking_mode
+// Bug 069.1 fix 2026-05-18: builder ahora apunta al catálogo canónico v3.1
+// en el repo público chagra (480 species). La v3.2 en Chagra-strategy
+// (60 species + tracking_mode ADR-030) está stale y desincronizada con
+// el trabajo de las últimas 24h.
+//
+// Campos v3.2-only (tracking_mode, dli_optimo_mol_m2_dia, fotoperiodo_*,
+// tolerancia_sombra_neta_pct) quedan NULL cuando no existen en v3.1.
+// Cuando se migre catálogo a v3.2, basta bump SEED_FILE y poblará automáticamente.
+const CATALOG_DIR = path.join(__dirname, '../catalog');
+const SEED_FILE = 'chagra-catalog-seed-v3.1.json';
 
 if (fs.existsSync(DB_PATH)) {
   fs.unlinkSync(DB_PATH);
@@ -70,9 +77,14 @@ db.exec(`
   );
 `);
 
-const speciesData = JSON.parse(fs.readFileSync(path.join(CATALOG_DIR, SEED_FILE), 'utf8')).species || [];
-const biopreparadosData = JSON.parse(fs.readFileSync(path.join(CATALOG_DIR, 'biopreparados-seed.json'), 'utf8')).biopreparados || [];
-const sourcesData = JSON.parse(fs.readFileSync(path.join(CATALOG_DIR, 'sources-seed.json'), 'utf8')).sources || [];
+// Bug 069.1 fix 2026-05-18: v3.1 tiene biopreparados[] + sources[] INLINE en
+// el mismo seed file. Cargar todo desde un único parse para evitar mismatch
+// (los archivos separados biopreparados-seed.json/sources-seed.json en
+// Chagra-strategy son legacy v3.0 con 16/54 entries vs v3.1 inline 19/66).
+const seedJson = JSON.parse(fs.readFileSync(path.join(CATALOG_DIR, SEED_FILE), 'utf8'));
+const speciesData = seedJson.species || [];
+const biopreparadosData = seedJson.biopreparados || [];
+const sourcesData = seedJson.sources || [];
 
 db.transaction(() => {
   const insertSpecies = db.prepare(`
