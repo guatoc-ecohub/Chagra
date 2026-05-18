@@ -30,7 +30,7 @@ export default function SyncProgressIndicator() {
   if (!shouldShow && !syncProgress) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 animate-slide-up">
+    <div className="fixed bottom-4 right-4 z-[9100] animate-slide-up">
       <div className="bg-slate-800 border border-slate-700 rounded-lg shadow-xl p-4 min-w-[300px]">
         {syncProgress?.isComplete ? (
           <div className="flex items-center gap-3 text-emerald-400">

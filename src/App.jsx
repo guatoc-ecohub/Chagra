@@ -423,7 +423,7 @@ export default function App() {
       </Suspense>
       {/* FAB feedback inline para field testing, siempre visible salvo loading */}
       {currentView !== 'loading' && currentView !== 'login' && <FieldFeedback />}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'voz' && <MicFab onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'voz' && currentView !== 'agente' && <MicFab onNavigate={navigate} />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'voz' && currentView !== 'agente' && <AgentFab onNavigate={navigate} />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
       {currentView !== 'loading' && currentView !== 'login' && <SyncProgressIndicator />}
