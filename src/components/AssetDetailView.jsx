@@ -13,12 +13,70 @@ import { geoJsonToWkt, wktToGeoJson } from '../utils/geo';
 import { proximityCheck, findNearestLand, checkInvasiveProximity, getCoords } from '../utils/spatialAnalysis';
 import { ExternalAiButton } from './common/ExternalAiButton';
 import { buildOpenExternalPrompt } from '../services/externalAiPromptBuilder';
-import { listUserPhotosBySpecies } from '../services/photoService';
+import { listUserPhotosBySpecies, captureAndCompress, savePhoto } from '../services/photoService';
 
 // Derive speciesSlug from asset name.
 function deriveSpeciesSlug(name) {
   if (!name || typeof name !== 'string') return null;
   return name.replace(/\s+#\d+$/, '').toLowerCase().replace(/\s+/g, '_').trim() || null;
+}
+
+// Bug 2026-05-18: agregar foto a planta ya creada (post-registro).
+// Dual options cámara + galería + savePhoto al assetId/speciesSlug.
+function AddPhotoSection({ assetId, speciesSlug }) {
+  const [busy, setBusy] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const cameraRef = React.useRef(null);
+  const galleryRef = React.useRef(null);
+
+  const handleFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) return;
+    setBusy(true);
+    setSuccess(false);
+    try {
+      const { blob } = await captureAndCompress(file);
+      await savePhoto({ blob, assetId, speciesSlug });
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      console.warn('[AddPhotoSection] save failed:', err);
+    } finally {
+      setBusy(false);
+      if (e.target) e.target.value = '';
+    }
+  };
+
+  return (
+    <section className="rounded-xl border border-slate-700/50 bg-slate-800/40 p-4 space-y-3">
+      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+        <Images size={12} /> Agregar foto a esta planta
+      </h3>
+      <div className="grid grid-cols-2 gap-3">
+        <input ref={cameraRef} type="file" accept="image/*" capture="environment" onChange={handleFile} className="hidden" />
+        <input ref={galleryRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
+        <button
+          type="button"
+          onClick={() => cameraRef.current?.click()}
+          disabled={busy}
+          className="p-3 rounded-xl bg-emerald-700 hover:bg-emerald-600 active:scale-95 text-white text-sm font-bold disabled:opacity-50"
+        >
+          📷 Tomar foto
+        </button>
+        <button
+          type="button"
+          onClick={() => galleryRef.current?.click()}
+          disabled={busy}
+          className="p-3 rounded-xl bg-slate-700 hover:bg-slate-600 active:scale-95 text-white text-sm font-bold disabled:opacity-50"
+        >
+          🖼️ Elegir foto
+        </button>
+      </div>
+      {busy && <p className="text-xs text-slate-400 italic">Procesando...</p>}
+      {success && <p className="text-xs text-emerald-400">✓ Foto guardada para esta planta.</p>}
+    </section>
+  );
 }
 
 // Gallery of photos for the same species.
@@ -134,7 +192,15 @@ export const AssetDetailView = () => {
 
   const name = asset.attributes?.name || asset.name || 'Sin nombre';
   const status = asset.attributes?.status || 'active';
-  const createdTs = asset.attributes?.created ? new Date(asset.attributes.created * 1000) : null;
+  // Bug 2026-05-18 operator (cubio recién creado): asset.attributes.created
+  // viene del server FarmOS post-sync. Para optimistic locales (recién creadas
+  // aún no sincronizadas), fallback a asset._createdAt (timestamp local en ms
+  // que AssetsDashboard setea con Date.now()). Si tampoco existe, usar 'hoy'.
+  const createdTs = asset.attributes?.created
+    ? new Date(asset.attributes.created * 1000)
+    : asset._createdAt
+      ? new Date(asset._createdAt)
+      : (asset._pending ? new Date() : null);
   const isPlantType = (asset.asset_type || asset.type || '').includes('plant');
   const geoRaw = asset.attributes?.intrinsic_geometry;
   const geoWkt = typeof geoRaw === 'object' ? geoRaw?.value : geoRaw;
@@ -170,6 +236,17 @@ export const AssetDetailView = () => {
               <p className="text-white text-sm font-medium capitalize">{status}</p>
             </div>
           </div>
+
+          {/* Bug 2026-05-18 operator: 'no es posible agregar foto a una planta
+              ya creada' (cubio recién agregado). Botones para subir foto
+              post-creación con dual options cámara/galería + captureAndCompress
+              + savePhoto. Refresh la galería al guardar. */}
+          {isPlantType && (
+            <AddPhotoSection
+              assetId={asset.id}
+              speciesSlug={deriveSpeciesSlug(name)}
+            />
+          )}
 
           <GeometrySection asset={asset} parentZoneName={parentZoneName} onEdit={() => setShowGeoPicker(true)} saving={geoSaving} />
 
