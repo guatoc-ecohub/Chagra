@@ -21905,6 +21905,724 @@
         "sinchi-amazonia-colombiana"
       ],
       "valor_pedagogico": "La malanga morada u ocumo morado (Xanthosoma violaceum Schott, familia Araceae) es la especie hermana pigmentada de la malanga blanca (X. sagittifolium) — una aroidea tuberosa neotropical de cormo central y cormelos hijos múltiples con pulpa morada-violácea intensa por acumulación de antocianinas (principalmente cianidina-3-glucósido y peonidina-3-glucósido, mismos pigmentos antioxidantes responsables del color de la mora andina, el maíz morado peruano y la batata morada), reconocible además por sus peciolos morados-violáceos diagnósticos en campo y por el margen foliar violáceo en hojas tiernas. Es una variedad gastronómica especial neotropical cultivada tradicionalmente en el Caribe (afrocaribe, Puerto Rico-Cuba-República Dominicana-Haití, donde se llama 'yautía morada' o 'blue taro') y en el Pacífico afrocolombiano-amazónico colombiano donde se conserva como cultivo de chagra-finca-azotea tradicional por su valor culinario especial, su color llamativo y su perfil nutricional enriquecido en antioxidantes respecto a la malanga blanca común. En Colombia se cultiva en el Pacífico colombiano (Chocó-Valle litoral-Cauca litoral-Nariño litoral: Buenaventura, Quibdó, Istmina, Tumaco, Guapi, López de Micay), Caribe húmedo (Magdalena, Bolívar, San Andrés y Providencia donde es alimento ancestral afrosanandresano del 'callaloo'), Amazonía (trapecio amazónico Leticia-Puerto Nariño, Putumayo-Caquetá piedemonte) y zonas bajas inundables del Magdalena medio entre 0 y 1.000 msnm en zona térmica cálida húmeda, bajo nombres locales 'ocumo morado' o 'mafafa morada' (Caribe), 'malanga lila' (Pacífico) y 'yautía morada' (San Andrés-Providencia). Lección viva de variabilidad genética intra-género y color-marker antioxidante: el par botánico Xanthosoma sagittifolium (blanco) y X. violaceum (morado) es ejemplo perfecto de cómo la diversidad fenotípica de un cultivo tradicional refleja diversidad bioquímica funcional importante — el color morado de la malanga violácea NO es un capricho ornamental sino un perfil antioxidante real (capacidad antioxidante ORAC 4-8 veces superior a malanga blanca, similar a batata morada y mora andina), lección magistral de cómo el manejo campesino tradicional conserva 'farmacias vivas' en los policultivos de la chagra-finca-azotea. Esta misma lógica de color-marker antioxidante aparece en otros pares de cultivos neotropicales tradicionales: batata blanca vs batata morada (Ipomoea batatas), arracacha blanca vs arracacha morada (Arracacia xanthorrhiza), maíz blanco vs maíz morado (Zea mays), papa criolla amarilla vs papa criolla negra (Solanum phureja). El cormo central (5-12 cm diámetro, 0.5-2 kg) y los cormelos hijos con pulpa morada-violácea son ricos en antocianinas antioxidantes, almidón fino, fibra dietaria, mucílagos prebióticos, vitaminas B1-B6, vitamina C, potasio y proteína vegetal moderada (2-3%), consumidos cocidos en sancocho de mariscos del Pacífico, ajiaco caribeño, sopa de queso del Pacífico, frituras dulces, croquetas, cremas espesas y como ingrediente especial en mesa gourmet por su color llamativo. Las hojas también son comestibles tras cocción prolongada (callaloo morado del Caribe insular). Manejo agroecológico: propagación por cormelos hijos preferentemente del mismo color (selección campesina de mantenimiento de cv.) o por trozos de cormo madre con yemas activas, plantación a 60-80 cm entre plantas en suelo húmedo bien drenado rico en MO con pH 5.5-6.5, ciclo 8-12 meses a cosecha, rendimientos 8-20 t/ha cormos (ligeramente menores que la blanca por menor vigor vegetativo). Asocio idéntico a malanga blanca con plátano hartón, yuca dulce, piña, achiote, caña panelera y árboles frutales en finca pacífica-caribe-amazónica. Cultivo especializado de soberanía alimentaria afrocolombiana e indígena amazónica con potencial gourmet altísimo para gastronomía colombiana moderna. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, FAO EcoCrop, Bernal 2015 Catálogo Plantas Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia, SINCHI Amazonía Colombiana."
+    },
+    {
+      "id": "banisteriopsis_caapi",
+      "nombre_comun": "Ayahuasca / Yajé",
+      "nombre_comunes_regionales": [
+        "yajé",
+        "caapi",
+        "natemä",
+        "pinde",
+        "yagé",
+        "bejuco del alma"
+      ],
+      "nombre_cientifico": "Banisteriopsis caapi (Spruce ex Griseb.) C.V. Morton",
+      "familia_botanica": "Malpighiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "habito": "liana leñosa trepadora perenne 10-30 m con tallo retorcido distintivo",
+      "origen": "Cuenca amazónica neotropical (Colombia, Ecuador, Perú, Brasil, Venezuela, Bolivia)",
+      "roles_in_guild": [
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_protegido",
+      "normativa_colombiana": "Patrimonio cultural inmaterial de los pueblos indígenas del Putumayo, Caquetá y Amazonas; uso ritual restringido a contextos ceremoniales ancestrales y centros de medicina tradicional autorizados por autoridades indígenas (Cofán, Inga, Siona, Kofán, Kamëntsá). NO existe registro legal para uso recreativo en Colombia; el cultivo y comercio fuera de contextos rituales ancestrales o de investigación científica regulada es regulado por el Ministerio de Cultura (Resolución 0633/2009 reconoce el yajé como patrimonio inmaterial de la Nación) y por las normas de protección de conocimiento tradicional asociado.",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 800,
+        "max_absoluto": 1500
+      },
+      "temperatura_c": {
+        "helada_letal": 10,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "humedad_relativa_pct": {
+        "min": 70,
+        "optimo": 90,
+        "max": 100
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Propagación por esquejes leñosos de 30-50 cm con 2-3 nudos en bolsas de vivero con sustrato amazónico (limo-arcilloso rico en MO); enraizamiento 90-120 días en sombra alta y humedad >85%. SOLO documentar para contextos de investigación etnobotánica autorizada o conservación en centros de medicina tradicional con permisos del Ministerio de Cultura y consentimiento de la autoridad indígena custodia. NO se promueve cultivo doméstico."
+      },
+      "toxicidad": "CONTIENE alcaloides beta-carbolínicos (harmina, harmalina, tetrahidroharmina) que son inhibidores reversibles de la monoaminooxidasa A (IMAO-A); interacción farmacológica grave con ISRS, IMAOs, alimentos ricos en tiramina (quesos curados, vino tinto, alimentos fermentados), antihistamínicos, simpaticomiméticos. Uso fuera de contexto ritual ancestral preparado por taita/yachag experimentado puede causar síndrome serotoninérgico, crisis hipertensiva, vómitos severos. ESTA FICHA TIENE PROPÓSITO HISTÓRICO-ETNOBOTÁNICO; NO ES GUÍA DE USO.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sinchi-amazonia-colombiana",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "La ayahuasca o yajé (Banisteriopsis caapi (Spruce ex Griseb.) C.V. Morton, familia Malpighiaceae) es una liana leñosa trepadora amazónica de tallo retorcido distintivo (que se asemeja a cordones trenzados, de ahí el nombre quechua aya-huasca, \"soga del alma\" o \"soga de los muertos\") y de profundísima importancia cultural y espiritual para más de 70 pueblos indígenas amazónicos de Colombia, Ecuador, Perú, Brasil y Venezuela. En Colombia es planta maestra ceremonial central de las comunidades Cofán (Putumayo, Valle del Guamuez, Orito), Inga (Sibundoy, Mocoa, Santiago, San Andrés, Colón), Kamëntsá (Valle de Sibundoy, Putumayo), Siona (Putumayo y Caquetá bajo, río Caquetá y Putumayo), Kofán-Ai (frontera con Ecuador), Coreguaje (Caquetá medio), Tikuna, Yagua, Murui-Muinane, Bora y Kubeo (trapecio amazónico Leticia-Puerto Nariño, La Pedrera, Mitú-Vaupés), donde se prepara la bebida ceremonial yajé/ayahuasca por cocción prolongada (8-12 horas) del tallo machacado en mortero de madera junto con las hojas de chacruna (Psychotria viridis), chagropanga (Diplopterys cabrerana) u otras plantas compañeras, bajo dirección estricta de taita, yachag, payé o curaca (\"médico tradicional\", \"abuelo sabio\") con décadas de formación ritual. La planta NO es droga recreativa: es sacramento espiritual y herramienta de diagnóstico-curación tradicional usada en ceremonias de toma (\"tomas de yajé\"), curación física-emocional-espiritual, resolución de conflictos comunitarios, transmisión intergeneracional de conocimiento y conexión con los espíritus protectores del bosque. Lección viva sobre ETNOBOTÁNICA, RESPETO CULTURAL y SOBERANÍA DEL CONOCIMIENTO ANCESTRAL: el yajé fue reconocido en 2009 como patrimonio cultural inmaterial de la Nación colombiana (Resolución 0633/2009 Ministerio de Cultura), y su uso fuera de contextos ceremoniales legítimos guiados por taitas con autoridad cultural reconocida por su comunidad es considerado apropiación cultural y riesgo grave de salud pública. La planta produce alcaloides beta-carbolínicos (harmina, harmalina, tetrahidroharmina) que actúan como inhibidores reversibles de la monoaminooxidasa A (IMAO-A) — interacción farmacológica peligrosa con antidepresivos ISRS, IMAOs, alimentos ricos en tiramina (quesos curados, vinos, alimentos fermentados), antihistamínicos y simpaticomiméticos. Crece silvestre en sotobosques de selva tropical amazónica neotropical entre 0 y 800 msnm, en zona térmica cálida húmeda con humedad relativa >80%. ESTA FICHA TIENE PROPÓSITO HISTÓRICO-ETNOBOTÁNICO Y DE RESPETO AL CONOCIMIENTO TRADICIONAL — NO ES GUÍA DE CULTIVO DOMÉSTICO NI DE USO. El cultivo, comercio y uso ceremonial debe ocurrir únicamente dentro de los contextos rituales ancestrales legítimos guiados por autoridades indígenas reconocidas o en centros de medicina tradicional autorizados por el Ministerio de Cultura colombiano con consentimiento de las comunidades custodias del saber. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía Colombiana, Pérez-Arbeláez 1947 Plantas Útiles Colombia, SIB Colombia."
+    },
+    {
+      "id": "psychotria_viridis",
+      "nombre_comun": "Chacruna",
+      "nombre_comunes_regionales": [
+        "chacrona",
+        "chacruna",
+        "rainha",
+        "hoja de la reina",
+        "amirucapanga"
+      ],
+      "nombre_cientifico": "Psychotria viridis Ruiz & Pav.",
+      "familia_botanica": "Rubiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "bajo",
+      "habito": "arbusto perennifolio 2-5 m con hojas opuestas brillantes elípticas",
+      "origen": "Cuenca amazónica neotropical (Colombia, Ecuador, Perú, Brasil)",
+      "roles_in_guild": [
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_protegido",
+      "normativa_colombiana": "Planta compañera ceremonial del yajé/ayahuasca; uso ritual ancestral restringido a contextos ceremoniales de medicina tradicional de pueblos amazónicos (Cofán, Inga, Siona, Kamëntsá, Kofán, Murui-Muinane). Sujeta al mismo marco de patrimonio cultural inmaterial (Resolución 0633/2009 MinCultura) y normas de conocimiento tradicional asociado al recurso genético. NO se promueve uso recreativo ni doméstico.",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 800,
+        "max_absoluto": 1500
+      },
+      "temperatura_c": {
+        "helada_letal": 10,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "humedad_relativa_pct": {
+        "min": 70,
+        "optimo": 90,
+        "max": 100
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Propagación por esquejes semileñosos de 15-25 cm con 3-4 nudos en sustrato amazónico; enraizamiento 60-90 días en sombra alta. Documentar SOLO para contextos de investigación etnobotánica autorizada o conservación en centros de medicina tradicional con permisos del Ministerio de Cultura."
+      },
+      "toxicidad": "CONTIENE N,N-dimetiltriptamina (DMT) endógeno en sus hojas, sustancia que NO es psicoactiva oralmente sin un inhibidor MAO (como la harmina del yajé); su uso fuera del contexto ritual ancestral de combinación con Banisteriopsis caapi por taita experimentado puede causar crisis hipertensiva grave, síndrome serotoninérgico y otros efectos farmacológicos peligrosos. ESTA FICHA TIENE PROPÓSITO HISTÓRICO-ETNOBOTÁNICO; NO ES GUÍA DE USO.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sinchi-amazonia-colombiana",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "La chacruna (Psychotria viridis Ruiz & Pav., familia Rubiaceae) es un arbusto perennifolio amazónico (2-5 m altura) de hojas opuestas brillantes elípticas, planta ceremonial compañera tradicional del yajé/ayahuasca en las preparaciones rituales de los pueblos indígenas amazónicos. La hoja de chacruna aporta el componente N,N-dimetiltriptamina (DMT) endógeno que, en presencia de los alcaloides beta-carbolínicos inhibidores de MAO de Banisteriopsis caapi, hace al brebaje ceremonial efectivo oralmente — sin el yajé, las hojas de chacruna NO tienen actividad psicoactiva oral (el DMT es destruido por la MAO intestinal). Esta sinergia farmacológica binaria — descubierta empíricamente por los pueblos amazónicos hace milenios, sin instrumentos químicos modernos — es uno de los hallazgos etnofarmacológicos más extraordinarios de la humanidad y enseña que el conocimiento tradicional indígena tiene profundidad técnica equiparable a la farmacología moderna. En Colombia se documenta su uso ritual ancestral entre los pueblos Cofán (Putumayo, Valle del Guamuez), Inga (Sibundoy, Mocoa), Kamëntsá (Sibundoy), Siona (Putumayo bajo), Kofán-Ai, Murui-Muinane y otros pueblos amazónicos de Putumayo, Caquetá y Amazonas. Crece silvestre en sotobosques de selva tropical húmeda entre 0 y 800 msnm con sombra parcial-alta y humedad >80%. Como compañera del yajé, está sujeta al mismo marco de protección como patrimonio cultural inmaterial (Resolución 0633/2009 Ministerio de Cultura Colombia) y los protocolos de conocimiento tradicional asociado al recurso genético. Lección viva de ETNOFARMACOLOGÍA SINÉRGICA y RESPETO CULTURAL: las plantas maestras del Amazonas funcionan en combinaciones precisas heredadas por linajes ceremoniales, y separar la planta de su contexto ritual y de su preparación tradicional por un taita/yachag con autoridad cultural reconocida por su comunidad es a la vez apropiación cultural y riesgo grave de salud pública (crisis hipertensiva, síndrome serotoninérgico, interacciones con medicamentos ISRS-IMAO). ESTA FICHA TIENE PROPÓSITO HISTÓRICO-ETNOBOTÁNICO; NO ES GUÍA DE CULTIVO NI DE USO. La conservación y propagación debe ocurrir únicamente en contextos rituales ancestrales legítimos guiados por autoridades indígenas custodias del saber o en centros de medicina tradicional autorizados por el Ministerio de Cultura. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía Colombiana, Pérez-Arbeláez 1947 Plantas Útiles Colombia, SIB Colombia."
+    },
+    {
+      "id": "brugmansia_aurea",
+      "nombre_comun": "Borrachero amarillo",
+      "nombre_comunes_regionales": [
+        "borrachero dorado",
+        "floripondio amarillo",
+        "cacao sabanero",
+        "campana dorada",
+        "huantug"
+      ],
+      "nombre_cientifico": "Brugmansia aurea Lagerh.",
+      "familia_botanica": "Solanaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "habito": "arbusto o arbolito 3-8 m con flores tubulares péndulas amarillas",
+      "origen": "Andes neotropicales (Colombia, Ecuador, Perú); cultivo ancestral pre-colombino Muisca-Inca",
+      "roles_in_guild": [
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_protegido",
+      "normativa_colombiana": "Planta sagrada de la cultura Muisca (cundiboyacense) y de las culturas andinas precolombinas; uso ritual ancestral por taitas y mamos (Kogui, Arhuaco, Wiwa, Kankuamo de Sierra Nevada de Santa Marta; Muisca de Cundinamarca-Boyacá; Inga y Kamëntsá del Sibundoy). NO existe normativa que regule su cultivo doméstico como ornamental (frecuente como cerca viva ornamental en altiplano andino) PERO su uso medicinal-ritual está restringido a contextos ceremoniales legítimos. La planta es ALTAMENTE TÓXICA — registros forenses históricos de intoxicaciones criminales con \"burundanga\" en Colombia ligadas a esta especie y a B. arborea.",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 10,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Propagación por esquejes leñosos de 30-60 cm con 3-5 nudos en sustrato bien drenado; enraizamiento 30-60 días. SOLO documentar para investigación etnobotánica y conservación en jardines botánicos especializados con señalética de toxicidad. NO se promueve cultivo doméstico — TODA la planta es altamente tóxica."
+      },
+      "toxicidad": "ALTAMENTE TÓXICA — TODA la planta (flores, hojas, semillas, tallo, raíz) contiene alcaloides tropánicos (escopolamina, hiosciamina, atropina) en concentraciones letales. La ingesta de pequeñas dosis (1-2 flores en infusión) puede causar delirio severo, taquicardia, alucinaciones, midriasis fija, hipertermia, retención urinaria, parálisis muscular, coma y muerte por paro respiratorio. La escopolamina extraída de B. aurea y B. arborea es la base histórica de la llamada \"burundanga\" usada criminalmente en Colombia. El contacto cutáneo con savia o el frote de los ojos tras manipular las flores también es peligroso. NO TOCAR, NO INHALAR, NO INGERIR. ESTA FICHA TIENE PROPÓSITO HISTÓRICO-ETNOBOTÁNICO; NO ES GUÍA DE USO. La planta ornamental en jardines requiere señalética de toxicidad, especialmente en zonas con niños o mascotas.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "libro-rojo-plantas-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "jbb-plantas-medicinales",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "El borrachero amarillo (Brugmansia aurea Lagerh., familia Solanaceae) es un arbusto o arbolito de 3-8 m altura, nativo andino neotropical (Colombia, Ecuador, Perú), de flores tubulares péndulas amarillas-doradas espectaculares (15-30 cm longitud) y fuerte fragancia nocturna. Es una de las plantas sagradas centrales de la cultura Muisca precolombina (Cundinamarca-Boyacá, altiplano cundiboyacense) y de las culturas andinas-amazónicas del Putumayo (Inga, Kamëntsá del Valle del Sibundoy), donde era usada ceremonialmente por taitas, mamos y curacas en rituales de adivinación, comunicación con ancestros, diagnóstico de enfermedades espirituales y rituales funerarios (cultura Muisca: registros etnohistóricos del cronista Pedro Simón sobre el \"cacao sabanero\" en rituales funerarios de caciques zipas). Crece silvestre y cultivada como ornamental ancestral en altiplano andino entre 1.800 y 3.200 msnm en zona térmica templada-fría. ADVERTENCIA CRÍTICA DE TOXICIDAD: TODA la planta (flores, hojas, semillas, tallo, raíz, savia) contiene alcaloides tropánicos potentes (escopolamina, hiosciamina, atropina) en concentraciones letales — la ingesta de 1-2 flores en infusión puede causar delirio severo, alucinaciones violentas, taquicardia, midriasis fija (pupilas dilatadas), hipertermia, parálisis muscular, coma y muerte por paro respiratorio. La escopolamina extraída de Brugmansia aurea y B. arborea es la base farmacológica histórica de la llamada \"burundanga\" usada criminalmente en Colombia para incapacitar víctimas en delitos de robo, secuestro y violación. Lección viva de ETNOBOTÁNICA y RESPETO CULTURAL CRÍTICO: el borrachero NO es planta para experimentación amateur ni para curiosidad — su uso ceremonial requería décadas de formación ritual del taita, ayuno preparatorio estricto, dosis microcontrolada, contexto comunitario protector y conocimiento profundo de antídotos vegetales. Su separación del contexto ceremonial ancestral y su uso fuera de centros de medicina tradicional autorizados con autoridades indígenas reconocidas es a la vez apropiación cultural grave y riesgo letal real. La planta se cultiva con frecuencia como ornamental en jardines andinos colombianos (Bogotá, Tunja, Pasto, Popayán) — toda persona que tenga la planta DEBE colocar señalética de toxicidad visible, restringir acceso de niños y mascotas, lavar las manos tras podar, y NUNCA preparar infusiones, tés, baños ni ingerir cualquier parte de la planta bajo NINGUNA circunstancia. La planta tiene flores polinizadas por murciélagos nectarívoros andinos (Anoura geoffroyi) — relación coevolutiva única. ESTA FICHA TIENE PROPÓSITO HISTÓRICO-ETNOBOTÁNICO Y DE PREVENCIÓN DE SALUD PÚBLICA; NO ES GUÍA DE USO. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, Libro Rojo Plantas Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia, JBB Plantas Medicinales, SIB Colombia."
+    },
+    {
+      "id": "brugmansia_arborea",
+      "nombre_comun": "Floripondio blanco",
+      "nombre_comunes_regionales": [
+        "borrachero blanco",
+        "campana blanca",
+        "reina de la noche",
+        "huantug blanco",
+        "datura arbórea"
+      ],
+      "nombre_cientifico": "Brugmansia arborea (L.) Lagerh.",
+      "familia_botanica": "Solanaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "habito": "arbolito 3-10 m con flores tubulares péndulas blancas perfumadas",
+      "origen": "Andes neotropicales (norte de Chile, Bolivia, Perú, Ecuador, Colombia)",
+      "roles_in_guild": [
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_protegido",
+      "normativa_colombiana": "Planta ornamental común en altiplano andino colombiano como cerca viva-ornamental; uso ritual ancestral por culturas andinas precolombinas (Muisca, Inca, Cañaris, Inga, Kamëntsá). NO existe normativa específica que regule su cultivo doméstico ornamental PERO su uso medicinal-ritual está restringido a contextos ceremoniales legítimos guiados por autoridades indígenas reconocidas. La planta es ALTAMENTE TÓXICA — registros forenses históricos de intoxicaciones criminales con \"burundanga\" en Colombia ligadas a esta especie.",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 10,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Propagación por esquejes leñosos de 30-60 cm con 3-5 nudos en sustrato bien drenado; enraizamiento 30-60 días. SOLO documentar para investigación etnobotánica y conservación en jardines botánicos especializados con señalética de toxicidad. NO se promueve cultivo doméstico — TODA la planta es altamente tóxica."
+      },
+      "toxicidad": "ALTAMENTE TÓXICA — TODA la planta (flores, hojas, semillas, tallo, raíz, savia) contiene alcaloides tropánicos (escopolamina, hiosciamina, atropina) en concentraciones letales. Mismo perfil farmacológico-toxicológico que B. aurea. La ingesta accidental por niños que confunden las flores grandes con campanas comestibles ha causado muertes documentadas en Colombia y Ecuador. NO TOCAR, NO INHALAR EXCESIVAMENTE EL PERFUME NOCTURNO INTENSO, NO INGERIR. ESTA FICHA TIENE PROPÓSITO HISTÓRICO-ETNOBOTÁNICO; NO ES GUÍA DE USO.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "libro-rojo-plantas-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "jbb-plantas-medicinales",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "El floripondio blanco o borrachero blanco (Brugmansia arborea (L.) Lagerh., familia Solanaceae) es un arbolito andino neotropical de 3-10 m altura con flores tubulares péndulas blancas espectaculares (20-35 cm longitud) y fragancia nocturna intensa que atrae murciélagos polinizadores (Anoura geoffroyi). Se distribuye nativa-cultivada en los Andes desde el norte de Chile-Bolivia hasta Colombia entre 1.800 y 3.200 msnm; en Colombia se conoce en cultivo ancestral ornamental-ceremonial Muisca (Cundinamarca, Boyacá, altiplano cundiboyacense), Inga-Kamëntsá (Valle del Sibundoy, Putumayo), Yanacona (Cauca andino), Misak-Guambiano (resguardos de Cauca, Silvia, Totoró). Hermana botánica de B. aurea y B. sanguinea, comparte el mismo perfil farmacológico de alcaloides tropánicos (escopolamina-hiosciamina-atropina) y el mismo papel ceremonial ancestral en rituales de adivinación, diagnóstico espiritual, comunicación con ancestros y rituales funerarios de las culturas andinas precolombinas (cronistas Bernabé Cobo, Pedro Simón, Juan de Castellanos documentan su uso ritual en culturas Muisca, Inca y Aymara). ADVERTENCIA CRÍTICA DE TOXICIDAD: TODA la planta (flores, hojas, semillas, tallo, raíz, savia) contiene alcaloides tropánicos potentes en concentraciones letales — los registros forenses colombianos documentan muertes infantiles por confusión de las flores blancas grandes con \"campanas comestibles\", y la escopolamina extraída de Brugmansia es la base farmacológica de la \"burundanga\" criminal usada para incapacitar víctimas. Lección viva de ETNOBOTÁNICA RESPETUOSA: el floripondio era preparado por taitas y mamos en dosis microcontroladas con décadas de formación ritual, ayuno preparatorio y contexto comunitario protector — NUNCA experimentación amateur. Como planta ornamental común en jardines andinos colombianos (frecuente en Bogotá, Tunja, Sogamoso, Pasto, Popayán, Manizales, Ibagué), TODA persona que tenga la planta DEBE colocar señalética de toxicidad visible, restringir acceso de niños y mascotas, lavar las manos tras podar y NUNCA preparar infusiones, baños, tés ni ingerir cualquier parte. La planta es polinizada principalmente por murciélagos nectarívoros andinos (relación coevolutiva fascinante de quiropterofilia). ESTA FICHA TIENE PROPÓSITO HISTÓRICO-ETNOBOTÁNICO Y DE PREVENCIÓN DE SALUD PÚBLICA; NO ES GUÍA DE USO. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, Libro Rojo Plantas Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia, JBB Plantas Medicinales, SIB Colombia."
+    },
+    {
+      "id": "nicotiana_rustica",
+      "nombre_comun": "Tabaco silvestre / Mapacho",
+      "nombre_comunes_regionales": [
+        "mapacho",
+        "tabaco bravo",
+        "tabaco amazónico",
+        "sayri",
+        "tabaco ceremonial",
+        "wild tobacco"
+      ],
+      "nombre_cientifico": "Nicotiana rustica L.",
+      "familia_botanica": "Solanaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "bajo",
+      "habito": "herbácea anual robusta 0.5-1.5 m con hojas grandes ovales pubescentes",
+      "origen": "Neotropical andino-amazónico (Bolivia, Perú, Ecuador, Colombia); domesticación pre-colombina temprana",
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "normativa_colombiana": "Especie domesticada precolombina de uso ceremonial central en pueblos amazónicos colombianos (Murui-Muinane, Bora, Uitoto, Tikuna, Yagua, Kubeo, Tucano, Cofán, Inga, Kamëntsá, Siona) y andinos. Cultivo y uso ritual permitido en contextos comunitarios indígenas. Su producción comercial está regulada por las normas de tabaco del ICA y de la DIAN cuando se destina a venta no-ritual. NO equiparable al tabaco comercial (Nicotiana tabacum) — el mapacho ceremonial tiene 5-10 veces más nicotina y se usa en cantidades microcontroladas no en consumo crónico.",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1800,
+        "max_absoluto": 2500
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 18,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "humedad_relativa_pct": {
+        "min": 50,
+        "optimo": 70,
+        "max": 90
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra en semillero protegido con sustrato fino, germinación 7-14 días; trasplante a campo definitivo a los 30-45 días a 60-80 cm entre plantas. Ciclo 90-120 días a primera cosecha de hojas basales. SOLO en huerto educativo-ceremonial con conciencia explícita de su perfil de alta nicotina y manejo respetuoso del saber ancestral.",
+        "tiempo_a_establecimiento_dias": 45,
+        "notas": "Mapacho NO equiparable al tabaco comercial Nicotiana tabacum — tiene 5-10 veces más nicotina (8-15% materia seca foliar vs 0.5-3% en N. tabacum). Permitido como cultivo en huerto educativo-ceremonial con respeto ancestral; nicotina foliar es repelente natural potente de plagas (insecticida orgánico ancestral)."
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion"
+      ],
+      "manejo_por_escala": {
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Cultivable como planta educativa-ceremonial en huerto andino-amazónico; respetar contexto cultural; señalética de toxicidad obligatoria si hay niños.",
+          "tips": [
+            "Semillero en bandeja germinadora bajo malla 50%",
+            "Riego moderado",
+            "Hojas usadas como repelente natural de plagas en chagra"
+          ]
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Cultivo tradicional comunitario en chagras indígenas amazónicas y andinas; producción NO comercial sino para uso ritual local.",
+          "tips": [
+            "Selección de semilla local",
+            "Asocio con maíz y yuca",
+            "Cosecha foliar escalonada"
+          ]
+        }
+      },
+      "toxicidad": "CONTIENE NIVELES EXTREMOS DE NICOTINA (8-15% materia seca foliar, 5-10× más que tabaco comercial Nicotiana tabacum). La dosis letal oral de nicotina pura es 30-60 mg en adulto, 10 mg en niño — una hoja de mapacho puede contener varias veces esa cantidad. Ingesta accidental por niños o mascotas es emergencia médica grave. El humo concentrado puede causar bradicardia, vómitos, convulsiones. ESTA FICHA RECONOCE el uso ritual ancestral de pueblos amazónicos en cantidades microcontroladas pero NO PROMUEVE ni el consumo crónico ni el uso recreativo. La nicotina foliar es también potente insecticida natural usado tradicionalmente como biopreparado repelente de plagas en chagras (NUNCA aplicar sin EPI completo y NUNCA cerca de aves polinizadoras o abejas).",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sinchi-amazonia-colombiana",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia",
+        "jbb-plantas-medicinales"
+      ],
+      "valor_pedagogico": "El tabaco silvestre o mapacho (Nicotiana rustica L., familia Solanaceae) es una herbácea anual robusta (0.5-1.5 m altura) domesticada en el neotrópico andino-amazónico hace milenios y planta sagrada central de la mayoría de pueblos amazónicos colombianos. NO es equiparable al tabaco comercial (Nicotiana tabacum) — el mapacho tiene 5-10 veces más nicotina (8-15% materia seca foliar) y fue desde tiempos precolombinos planta ritual purificadora, no producto de consumo crónico. En Colombia es planta maestra ceremonial fundamental de los pueblos Murui-Muinane y Bora (medio Caquetá-Putumayo, \"ambil de mambe\" — pasta espesa de tabaco cocido mezclada con sal vegetal de yarumo, usada ritualmente en la \"palabra de vida\" del mambeadero comunitario), Uitoto (Caquetá-Amazonas), Tikuna (Leticia-Puerto Nariño), Cofán (Putumayo, \"soplo de tabaco\" purificador en ceremonias de yajé), Inga-Kamëntsá (Valle del Sibundoy, \"limpias\" con humo de tabaco), Siona (Putumayo bajo), Yagua, Kubeo, Tucano (Vaupés). También documentada como planta ritual ancestral de la cultura Muisca cundiboyacense (\"mosca\" o \"hosca\" en muisca, ritualmente quemada en ofrendas a Bachué en lagunas sagradas de Guatavita, Iguaque, Siecha, Tota). Crece naturalizada-cultivada entre 0 y 2.500 msnm en zonas térmicas cálidas a templadas. Lección viva sobre ETNOBOTÁNICA SAGRADA, MANEJO MICROCONTROLADO y PARADOJA TÓXICO-TERAPÉUTICA: el mismo alcaloide (nicotina) que mata en altas dosis es purificador ritual en microdosis controladas por taitas con décadas de formación, y el conocimiento ancestral indígena entendía esta relación dosis-efecto siglos antes que la farmacología moderna formalizara el concepto. ADVERTENCIA DE TOXICIDAD CRÍTICA: la nicotina del mapacho es letal en dosis pequeñas (ingesta de una hoja por un niño es emergencia médica), su humo concentrado causa bradicardia y vómitos, y su consumo recreativo crónico es altamente adictivo y dañino. Como cultivo en huerto educativo-ceremonial: requiere señalética de toxicidad, respeto al saber ancestral y NO promoción de consumo recreativo. Funcionalmente, la nicotina foliar también es uno de los insecticidas naturales más potentes que existen, y su preparación como extracto repelente de plagas es tradición ancestral de las chagras (debe aplicarse con equipo de protección completo y NUNCA cerca de polinizadores). ESTA FICHA TIENE PROPÓSITO HISTÓRICO-ETNOBOTÁNICO Y AGROECOLÓGICO; NO ES GUÍA DE CONSUMO. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía Colombiana, Pérez-Arbeláez 1947 Plantas Útiles Colombia, SIB Colombia, JBB Plantas Medicinales."
+    },
+    {
+      "id": "cannabis_sativa_indica_cbd",
+      "nombre_comun": "Cáñamo industrial / Cannabis CBD medicinal",
+      "nombre_comunes_regionales": [
+        "cáñamo",
+        "hemp industrial",
+        "cannabis no-psicoactivo",
+        "CBD medicinal",
+        "fibra de cáñamo"
+      ],
+      "nombre_cientifico": "Cannabis sativa L. subsp. sativa (var. industrial CBD-dominante <1% THC)",
+      "familia_botanica": "Cannabaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "habito": "herbácea anual dioica 1-4 m con hojas palmaticompuestas y flores resinosas",
+      "origen": "Centro-Asia (Hindukush, Tian Shan, Pamir); domesticación neolítica; introducida en América siglo XVI por colonización española",
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "normativa_colombiana": "Resolución 577/2017 MADS (Ministerio de Ambiente y Desarrollo Sostenible) regula el uso lícito de Cannabis sativa para fines medicinales y científicos en Colombia. Decreto 613/2017 (regulación del cultivo y uso de cannabis con fines médicos y científicos). Resolución 2891/2017 MinSalud (manufactura de derivados). Ley 1787/2016 (marco legal nacional de cannabis medicinal). Variedades CBD-dominantes con <1% THC quedan dentro del régimen \"no psicoactivo industrial\" que admite cultivo y manufactura bajo licencias otorgadas por MinJusticia (cultivo de semilla, cultivo de plantas, fabricación de derivados, fabricación de productos terminados). Para uso doméstico personal el cultivo doméstico para autoconsumo medicinal con prescripción está permitido hasta 20 plantas (sentencia Corte Constitucional T-095/2022 ratifica el derecho fundamental al acceso). USO RECREATIVO sigue restringido — la Sentencia C-221/1994 despenalizó la dosis personal de psicoactivos pero no su comercialización.",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 500,
+        "optimo_max": 2200,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 15,
+        "optimo_max": 28,
+        "max_tolerable": 35
+      },
+      "humedad_relativa_pct": {
+        "min": 40,
+        "optimo": 60,
+        "max": 80
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Para conservar variedad CBD-dominante: propagación clonal por esqueje apical de plantas madre certificadas (5-10 cm con 2-3 nudos en jiffy o lana de roca, enraizamiento 14-21 días). Siembra por semilla certificada feminizada CBD <1% THC en huerto medicinal con licencia. Ciclo 90-150 días según fotoperíodo.",
+        "tiempo_a_establecimiento_dias": 30,
+        "notas": "Cultivo doméstico para autoconsumo medicinal con prescripción requiere registro de variedad CBD-dominante <1% THC y máximo 20 plantas según Resolución 577/2017. Producción comercial requiere licencia MinJusticia."
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "invernadero_mediano",
+        "produccion"
+      ],
+      "manejo_por_escala": {
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Permitido hasta 20 plantas para autoconsumo medicinal con prescripción (Res. 577/2017 + sentencia T-095/2022). Variedad debe ser CBD-dominante <1% THC.",
+          "tips": [
+            "Semilla certificada CBD-dominante",
+            "Iluminación natural 12-14h diarias",
+            "Sustrato bien drenado pH 6-7"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": true,
+          "nota": "Cultivo medicinal con licencia MinJusticia bajo invernadero con control de humedad y luz.",
+          "tips": [
+            "Control humedad <70%",
+            "Fotoperíodo 12/12 para inducir floración",
+            "Sustrato vivo con micorrizas"
+          ]
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Cultivo industrial-medicinal con licencia plena MinJusticia (cultivo de plantas + manufactura + producto terminado).",
+          "tips": [
+            "Trazabilidad blockchain de lote",
+            "Análisis HPLC de cannabinoides obligatorio",
+            "Asocio con caléndula y ajenjo repelentes"
+          ]
+        }
+      },
+      "toxicidad": "Variedad CBD-dominante <1% THC no produce efectos psicoactivos significativos. CBD tiene perfil de seguridad farmacológica favorable pero puede interactuar con anticoagulantes (warfarina), anticonvulsivantes y otros medicamentos metabolizados por CYP450 — consultar médico tratante. Hojas frescas y flores no son tóxicas pero el humo de la planta (cualquier variedad) contiene PAHs cancerígenos. Variedades THC-dominantes (no descritas en esta ficha) están sujetas a regulación estricta. ESTA FICHA describe variedad industrial CBD-dominante con marco legal colombiano vigente.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "El cáñamo industrial o cannabis CBD medicinal (Cannabis sativa L. subsp. sativa, variedad industrial CBD-dominante con <1% THC, familia Cannabaceae) es una herbácea anual dioica originaria de Asia Central (Hindukush, Tian Shan, Pamir), domesticada en el Neolítico hace 10.000+ años y reintroducida en América por colonización española siglo XVI principalmente como fuente de FIBRA (cordelería, sacos, velas náuticas, ropa rústica) y de aceite vegetal alimentario de las semillas (cañamones — alto en ácidos grasos esenciales omega-3 y omega-6 en proporción 3:1, proteína completa con todos los aminoácidos esenciales, vitamina E, magnesio). La variedad industrial CBD-dominante con <1% THC es la base del actual sector colombiano de cannabis medicinal regulado, marco normativo establecido por la Resolución 577/2017 MADS, el Decreto 613/2017, la Ley 1787/2016 y refinado por la sentencia T-095/2022 de la Corte Constitucional que reconoce el derecho fundamental al acceso medicinal. Se cultiva en Colombia bajo licencias MinJusticia en regiones de Cundinamarca (Sopó, Tenjo), Antioquia (Rionegro, Medellín), Valle del Cauca, Tolima (Ibagué), Cauca y Quindío entre 500 y 2.800 msnm, en zonas térmicas templadas-frías con suelos bien drenados pH 6-7. Lección viva sobre BOTÁNICA UTILITARIA, MARCO REGULATORIO BIOÉTICO y SOBERANÍA TERAPÉUTICA: el cannabis es uno de los cultivos más versátiles documentados (fibra industrial textil-cordelera, aceite alimentario premium, biomasa para construcción \"hempcrete\", fitorremediación de suelos contaminados con metales pesados que la planta acumula, sumideros de CO₂, y cannabinoides terapéuticos no-psicoactivos como CBD, CBG, CBC con evidencia clínica creciente en epilepsia refractaria, dolor crónico neuropático, ansiedad clínica, inflamación crónica y enfermedades neurodegenerativas). El marco regulatorio colombiano de Cannabis medicinal-industrial es uno de los más avanzados de Latinoamérica y reconoce la diferencia farmacológica entre variedades CBD-dominantes (no psicoactivas, perfil terapéutico) y THC-dominantes (psicoactivas, regulación estricta). Manejo agroecológico: propagación clonal por esqueje apical para conservar variedad CBD certificada; siembra por semilla feminizada certificada en sustrato bien drenado con micorrizas; ciclo 90-150 días según fotoperíodo; asocio con caléndula (Calendula officinalis) y ajenjo (Artemisia absinthium) como repelentes naturales; cosecha foliar y floral con secado lento <25°C para preservar terpenos. ESTA FICHA describe variedad industrial CBD-dominante DENTRO del marco legal colombiano vigente para uso medicinal y para fines de educación agroecológica; NO promueve uso recreativo ni variedades THC-dominantes (sujetas a marco legal restrictivo). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, FAO EcoCrop, Pamplona-Roger 2006 Plantas Medicinales, JBB Plantas Medicinales, Pérez-Arbeláez 1947 Plantas Útiles Colombia."
+    },
+    {
+      "id": "salvia_divinorum",
+      "nombre_comun": "Hierba pastora / Hojas de la pastora",
+      "nombre_comunes_regionales": [
+        "hierba María",
+        "pipiltzintzintli",
+        "ska María pastora",
+        "salvia divina",
+        "hojas de María"
+      ],
+      "nombre_cientifico": "Salvia divinorum Epling & Játiva",
+      "familia_botanica": "Lamiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado"
+      ],
+      "estrato": "bajo",
+      "habito": "herbácea perenne 0.5-1.5 m con tallos cuadrangulares y hojas opuestas verdes",
+      "origen": "Sierra Mazateca de Oaxaca, México; reproducción casi exclusivamente clonal (semillas raras y de baja viabilidad)",
+      "roles_in_guild": [
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "no_evaluada",
+      "normativa_colombiana": "No tiene marco legal específico en Colombia. NO incluida en listados oficiales de sustancias controladas del Ministerio de Salud ni del Ministerio de Justicia colombiano. SIN EMBARGO, su uso ritual fuera de contexto ceremonial mazateco mexicano (donde es planta sagrada de la médica tradicional mazateca María Sabina y linajes anteriores) es considerado apropiación cultural inaceptable, y su comercialización como producto recreativo es éticamente reprobable y potencialmente regulable por sus efectos psicoactivos potentes. RECOMENDACIÓN: NO cultivo doméstico recreativo; conservación SOLO en jardines botánicos especializados con propósito de investigación científica autorizada o conservación de germoplasma vegetal con consentimiento de la comunidad mazateca custodia.",
+      "altitud_msnm": {
+        "min_absoluto": 300,
+        "optimo_min": 800,
+        "optimo_max": 1800,
+        "max_absoluto": 2400
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 18,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "humedad_relativa_pct": {
+        "min": 70,
+        "optimo": 90,
+        "max": 100
+      },
+      "radiacion": "sombra_densa",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Reproducción CASI EXCLUSIVAMENTE CLONAL por esqueje de tallo (semillas extremadamente raras y de baja viabilidad — rasgo de domesticación profunda por la cultura mazateca, indicio de cuidado humano milenario). Esqueje semileñoso de 10-20 cm con 2-3 nudos en sustrato húmedo bajo alta humedad y sombra densa; enraizamiento 30-60 días. SOLO conservación en jardines botánicos especializados con autorización científica y consentimiento de la comunidad mazateca custodia."
+      },
+      "toxicidad": "CONTIENE salvinorina A — el alucinógeno natural más potente conocido, agonista único de los receptores opioides kappa (no opioide en el sentido convencional, mecanismo distinto a opio-morfina). Activo en microdosis de 100-1000 microgramos vía oral o inhalada. Efectos psicoactivos extremadamente intensos, disociativos y desorientadores en personas no preparadas — pueden incluir pérdida total de la noción del propio cuerpo, alucinaciones visuales-cinéticas violentas, sensaciones de transformación corporal y episodios de pánico/disociación severa. NO produce dependencia física PERO sí puede causar daño psicológico en consumo recreativo amateur. Su uso ceremonial mazateco tradicional ocurre en contexto sagrado con la curandera (mujer-medicina), masticación de hojas frescas en dosis cuidadosamente controladas y propósito de diagnóstico-curación, NUNCA recreativo. ESTA FICHA TIENE PROPÓSITO HISTÓRICO-ETNOBOTÁNICO; NO ES GUÍA DE USO.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "La hierba pastora o ska María pastora (Salvia divinorum Epling & Játiva, familia Lamiaceae) es una herbácea perenne lamíacea endémica de la Sierra Mazateca de Oaxaca, México, planta sagrada central de la médica-curandera mazateca tradicional (la más célebre fue María Sabina, 1894-1985, \"sabia de los honguitos\" que también usaba esta planta como \"ska María pastora\" o \"hoja de la pastora\" en sus veladas de curación). Es históricamente la salvia más enigmática del mundo botánico por dos rasgos extraordinarios: (1) su reproducción es casi exclusivamente clonal — las semillas son extremadamente raras y de baja viabilidad — lo que sugiere domesticación profunda y cuidado humano milenario por la cultura mazateca, y (2) contiene salvinorina A, el alucinógeno natural más potente conocido por la química, agonista único de los receptores opioides kappa (mecanismo farmacológico totalmente distinto al de opio-morfina, mescalina, psilocibina, LSD y DMT) activo en microdosis de 100-1000 microgramos. NO existe en Colombia ni es planta tradicional colombiana — la información se documenta en esta ficha catalográfica únicamente por completitud etnobotánica del grupo de \"plantas maestras\" del Neotrópico-Mesoamérica y por la relevancia educativa de entender RESPETO CULTURAL frente al conocimiento ancestral indígena no propio. Lección viva sobre ETNOBOTÁNICA RESPETUOSA, APROPIACIÓN CULTURAL y FARMACOLOGÍA DE NICHO: la salvia divinorum es ejemplo paradigmático de cómo el conocimiento ancestral indígena descubre moléculas y mecanismos farmacológicos que la química moderna sólo está empezando a entender, y de cómo el saber tradicional siempre venía empaquetado con un protocolo ritual de seguridad (preparación, dosis microcontrolada, contexto comunitario protector, propósito curativo, presencia de la curandera-guía con décadas de formación) cuyo desmontaje en uso recreativo amateur en internet/clubes occidentales ha causado experiencias profundamente negativas, daño psicológico y desinformación. ADVERTENCIA: la salvinorina A en uso recreativo aislado puede producir episodios disociativos severos, pérdida total de noción corporal, alucinaciones violentas y crisis de pánico. Su uso tradicional mazateco — masticación cuidadosa de hojas frescas o té de las hojas guiado por la curandera en velada nocturna — NO es comparable al uso recreativo amateur en cigarrillos de hoja seca concentrada que se vende en internet. NO existe cultivo legítimo en Colombia más allá de jardines botánicos especializados de conservación. ESTA FICHA TIENE PROPÓSITO HISTÓRICO-ETNOBOTÁNICO Y EDUCATIVO; NO ES GUÍA DE CULTIVO NI DE USO. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO EcoCrop, Pamplona-Roger 2006 Plantas Medicinales, JBB Plantas Medicinales, Pérez-Arbeláez 1947 Plantas Útiles Colombia."
+    },
+    {
+      "id": "argyreia_nervosa",
+      "nombre_comun": "Rosa de Hawaii / Campana de bosque",
+      "nombre_comunes_regionales": [
+        "Hawaiian baby woodrose",
+        "campana india",
+        "morning glory hawaiana",
+        "vajravalli",
+        "samudra-shokh"
+      ],
+      "nombre_cientifico": "Argyreia nervosa (Burm.f.) Bojer",
+      "familia_botanica": "Convolvulaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "habito": "liana leñosa trepadora vigorosa 8-15 m con hojas grandes cordiformes plateadas y flores acampanadas blanco-rosadas",
+      "origen": "Subcontinente indio (India peninsular, Sri Lanka, Bangladés); naturalizada pantropical incluida Centroamérica-Caribe",
+      "roles_in_guild": [
+        "biomass_producer",
+        "pollinator_attractor"
+      ],
+      "cultivable": false,
+      "conservation_status": "naturalizada",
+      "normativa_colombiana": "No tiene marco legal específico en Colombia. La planta es naturalizada en zonas térmicas cálidas-templadas como ornamental ocasional, pero su SEMILLA contiene amidas del ácido lisérgico que sí pueden caer bajo la regulación general de psicoactivos. SIN EMBARGO, su uso fuera del contexto ayurvédico medicinal tradicional indio (donde la raíz es \"vidhara\" — tónico nervino y afrodisíaco) es éticamente discutible y potencialmente peligroso. RECOMENDACIÓN: conservación únicamente en jardines botánicos o como ornamental sin propagación de semillas.",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1500,
+        "max_absoluto": 1900
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 36
+      },
+      "humedad_relativa_pct": {
+        "min": 50,
+        "optimo": 75,
+        "max": 95
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla escarificada (germinación 14-30 días tras escarificación con lija o remojo 24h en agua tibia) o por esqueje semileñoso. SOLO documentar para investigación etnobotánica y conservación en jardines botánicos especializados."
+      },
+      "toxicidad": "Las SEMILLAS contienen amidas del ácido lisérgico (LSA, ergina, isoergina, lisergol, ergometrina) — alcaloides ergolínicos psicoactivos relacionados estructuralmente con el LSD pero más débiles y con perfil farmacológico distinto (más sedante-disociativo). La ingesta de 4-10 semillas puede producir efectos psicoactivos prolongados con náuseas, vómitos, vasoconstricción periférica intensa, taquicardia y disociación. NO es uso medicinal documentado en el contexto ayurvédico original (la medicina ayurvédica usa la RAÍZ como \"vidhara\", tónico nervino, NO las semillas). Su uso recreativo en internet/Occidente es desinformado y peligroso. ESTA FICHA TIENE PROPÓSITO HISTÓRICO-ETNOBOTÁNICO; NO ES GUÍA DE USO.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "La rosa de Hawaii o campana de bosque (Argyreia nervosa (Burm.f.) Bojer, familia Convolvulaceae) es una liana leñosa vigorosa trepadora (8-15 m) nativa del subcontinente indio (India peninsular, Sri Lanka, Bangladés), naturalizada pantropical y presente en Colombia como ornamental ocasional en zonas térmicas cálidas-templadas. Es planta hermana botánica de la \"morning glory\" (Ipomoea spp.) y comparte con ellas el perfil de amidas del ácido lisérgico (LSA) en las semillas. Tiene profunda tradición medicinal en la farmacopea ayurvédica india como \"vidhara\" — donde la RAÍZ (NO las semillas) se usa como tónico nervino, adaptógeno, afrodisíaco moderado y antiinflamatorio. El nombre popular \"rosa de Hawaii\" o \"Hawaiian baby woodrose\" es comercial-occidental — no es endémica de Hawaii ni fue planta ritual hawaiana, pero el nombre se popularizó por la naturalización masiva en las islas hawaianas en el siglo XX. En Colombia se observa cultivada esporádicamente como ornamental en zonas térmicas cálidas-templadas (Caribe, Magdalena medio, Valle del Cauca, zonas bajas andinas) entre 0 y 1.900 msnm. Lección viva sobre ETNOBOTÁNICA COMPARADA, NOMBRES POPULARES ENGAÑOSOS y APROPIACIÓN DESINFORMADA: la planta es un ejemplo paradigmático de cómo el uso medicinal tradicional (raíz como tónico ayurvédico desde hace 2.500+ años) ha sido reemplazado en circuitos occidentales por un uso recreativo amateur de las semillas que ni siquiera era parte del saber tradicional original — separación grave entre conocimiento ancestral y consumo de internet. ADVERTENCIA DE TOXICIDAD: las semillas contienen LSA, ergina, isoergina, lisergol y ergometrina, alcaloides ergolínicos psicoactivos con perfil distinto al LSD (más sedante-disociativo) que producen náuseas intensas, vómitos, vasoconstricción periférica peligrosa para personas con problemas cardiovasculares, taquicardia y disociación prolongada. NO es uso medicinal documentado — la medicina ayurvédica original usaba la raíz como tónico, no las semillas. Su cultivo como ornamental es válido si las semillas se eliminan post-floración para evitar diseminación accidental o uso recreativo desinformado. ESTA FICHA TIENE PROPÓSITO HISTÓRICO-ETNOBOTÁNICO; NO ES GUÍA DE USO. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO EcoCrop, Pamplona-Roger 2006 Plantas Medicinales, JBB Plantas Medicinales, Pérez-Arbeláez 1947 Plantas Útiles Colombia."
+    },
+    {
+      "id": "boswellia_sacra",
+      "nombre_comun": "Incienso / Olíbano",
+      "nombre_comunes_regionales": [
+        "frankincense",
+        "olíbano",
+        "incienso de Arabia",
+        "luban",
+        "mukul de Arabia"
+      ],
+      "nombre_cientifico": "Boswellia sacra Flück.",
+      "familia_botanica": "Burseraceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "habito": "árbol caducifolio xerofítico 2-8 m con corteza papirácea exfoliante y resina aromática",
+      "origen": "Cuerno de África (Somalia, Etiopía, Eritrea) y Arabia (Omán, Yemen); naturalizado en zonas secas tropicales mundiales",
+      "roles_in_guild": [
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "naturalizada",
+      "normativa_colombiana": "No tiene marco legal específico en Colombia. La planta es naturalizada esporádicamente en zonas térmicas cálidas secas (Caribe seco, Guajira, Magdalena medio bajo, Tolima seco) como árbol ornamental-ritual en iglesias y conventos católicos coloniales — la resina (olíbano) se usa litúrgicamente en la Iglesia Católica desde el primer milenio cristiano, en la Iglesia Ortodoxa, en el Judaísmo (ketoret bíblico), en el Islam y en muchas tradiciones rituales colombianas (misas, procesiones de Semana Santa, \"limpias\" sincréticas afro-católicas en Cartagena y Caribe).",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1500,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 18,
+        "optimo_max": 32,
+        "max_tolerable": 42
+      },
+      "humedad_relativa_pct": {
+        "min": 20,
+        "optimo": 45,
+        "max": 75
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Propagación por semilla fresca (germinación 30-90 días en sustrato seco-arenoso con drenaje extremo) o por esqueje semileñoso (más difícil — porcentaje de enraizamiento bajo 20-40%). Cultivable como árbol ornamental-ritual en zonas secas tropicales con drenaje extremo. Conservación de germoplasma en jardines botánicos."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "El incienso u olíbano (Boswellia sacra Flück., familia Burseraceae) es un árbol xerofítico caducifolio (2-8 m altura) de corteza papirácea exfoliante (rasgo distintivo de muchas Burseráceas — el papel-corteza protege contra desecación extrema) y resina aromática gomorresinosa que ha sido recurso ritual-medicinal central de las civilizaciones del Cuerno de África (Somalia, Etiopía, Eritrea) y de Arabia (Omán, Yemen) desde hace más de 5.000 años. Es históricamente uno de los productos más valiosos del comercio antiguo — la \"ruta del incienso\" pre-romana llevaba el olíbano desde Omán-Yemen hasta el Mediterráneo, Egipto faraónico, Mesopotamia, Persia y China imperial. En el cristianismo es uno de los tres regalos de los Magos al niño Jesús (junto con oro y mirra, Mateo 2:11), y se usa litúrgicamente en la Iglesia Católica desde el primer milenio, en la Iglesia Ortodoxa Oriental, en el Judaísmo bíblico (ketoret del Templo, Éxodo 30:34), en el Islam (luban, quemado en ceremonias domésticas de purificación), en muchas tradiciones budistas y en el sincretismo religioso afrocolombiano-caribe (procesiones de Semana Santa en Mompox, Popayán, Cartagena, Tunja, Tunja, \"limpias\" con incienso en San Basilio de Palenque). En Colombia se cultiva esporádicamente como árbol ornamental-ritual en zonas secas tropicales (Guajira, Caribe seco de Barranquilla-Cartagena-Santa Marta, Magdalena medio bajo, Tolima seco, Huila árido) entre 0 y 2.000 msnm en suelos arenosos-rocosos con drenaje extremo y precipitación 200-600 mm/año. Lección viva sobre BOTÁNICA RITUAL UNIVERSAL, COMERCIO ANTIGUO DE PLANTAS y SINCRETISMO RELIGIOSO COLOMBIANO: el incienso es ejemplo paradigmático de cómo una planta xerofítica de regiones secas extremas se convirtió en commodity global de las civilizaciones antiguas y cómo su uso ritual purificador (humo aromático para \"limpiar\" espacios, transición entre el mundo profano y el sagrado, propósito apotropaico anti-mal-de-ojo) trasciende todas las grandes tradiciones religiosas del Mediterráneo-Oriente-Próximo y llega a Colombia vía evangelización católica colonial donde se sincretiza con prácticas afrodescendientes (\"baño con incienso\" para limpiar energía) e indígenas (\"limpia\" con humo). Aplicaciones medicinales modernas: la resina contiene ácidos boswélicos con actividad antiinflamatoria moderada (estudios clínicos en artritis y enfermedad inflamatoria intestinal), uso en aromaterapia tradicional para meditación y manejo de estrés. Manejo agroecológico: árbol de zonas secas con drenaje extremo, NO tolera encharcamiento, propagación por semilla fresca con escarificación, ciclo 8-15 años a primera cosecha de resina (recolección por incisión cuidadosa de la corteza, \"tapping\" tradicional somalí-omaní que NO mata al árbol). Conservación en jardines botánicos colombianos y como ornamental ritual con respeto por las tradiciones culturales múltiples que la usan. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO EcoCrop, Pamplona-Roger 2006 Plantas Medicinales, JBB Plantas Medicinales, Pérez-Arbeláez 1947 Plantas Útiles Colombia."
+    },
+    {
+      "id": "myroxylon_pereirae",
+      "nombre_comun": "Bálsamo del Perú",
+      "nombre_comunes_regionales": [
+        "bálsamo negro",
+        "bálsamo de San Salvador",
+        "bálsamo americano",
+        "quina-quina del Perú",
+        "estoraque americano"
+      ],
+      "nombre_cientifico": "Myroxylon balsamum var. pereirae (Royle) Harms",
+      "familia_botanica": "Fabaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "habito": "árbol perennifolio 15-30 m con copa amplia y resina aromática-medicinal",
+      "origen": "Mesoamérica-norte de Sudamérica (El Salvador, Honduras, Nicaragua, Costa Rica, norte de Colombia); pese al nombre \"del Perú\" NO es peruano — confusión histórica de comerciantes coloniales que lo embarcaban vía El Callao",
+      "roles_in_guild": [
+        "biomass_producer",
+        "nitrogen_fixer"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "normativa_colombiana": "Especie naturalizada en Caribe colombiano y Magdalena medio; cultivable como árbol agroforestal y maderable. NO está en listados de especies amenazadas en Colombia (a diferencia de M. balsamum var. balsamum — bálsamo de Tolú, que sí ha sido sobreexplotado históricamente). Su resina (bálsamo de Perú) es regulada como producto medicinal-cosmético por INVIMA cuando se comercializa como producto farmacéutico o cosmético.",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1200,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 10,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Propagación por semilla fresca (germinación 30-60 días en sustrato arenoso-orgánico bien drenado). Crecimiento 1-2 m/año en condiciones óptimas. Cosecha de resina por incisión de la corteza (NO tala) tras 15-25 años de establecimiento.",
+        "tiempo_a_establecimiento_dias": 180,
+        "notas": "Distinto al bálsamo de Tolú (Myroxylon balsamum var. balsamum) — el \"del Perú\" es la variedad pereirae con resina más oscura y aromática, originaria de Mesoamérica-norte de Sudamérica, NO de Perú."
+      },
+      "scale_viability": [
+        "produccion",
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "produccion": {
+          "viable": true,
+          "nota": "Cultivable en sistemas agroforestales y plantaciones de especies medicinales-resinosas en Caribe colombiano y Magdalena medio.",
+          "tips": [
+            "Asocio con cacao y café",
+            "Espaciamiento 8x8 m",
+            "Cosecha de resina post 15-25 años, no destructiva"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie restauradora-fijadora de nitrógeno apta para sistemas de restauración en bosque seco tropical y bosque húmedo tropical bajo.",
+          "tips": [
+            "Plantación con micorrizas",
+            "Asocio con leguminosas pioneras",
+            "Densidades 400-800 ind/ha"
+          ]
+        }
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "fao-ecocrop",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "jbb-plantas-medicinales"
+      ],
+      "valor_pedagogico": "El bálsamo del Perú (Myroxylon balsamum var. pereirae (Royle) Harms, familia Fabaceae) es un árbol perennifolio de gran porte (15-30 m altura) leguminoso, fijador biológico de nitrógeno, nativo de Mesoamérica y norte de Sudamérica (El Salvador, Honduras, Nicaragua, Costa Rica, Panamá, norte de Colombia: Caribe, Magdalena medio, Magdalena bajo, piedemonte del Catatumbo). El nombre popular \"del Perú\" es uno de los errores históricos más curiosos del comercio colonial — la resina NO es peruana, sino centroamericana-norandina, pero los comerciantes coloniales españoles la embarcaban hacia Europa desde el puerto del Callao (Perú) por las rutas marítimas del Pacífico, y los compradores europeos asumieron erróneamente que la planta era peruana. Es planta hermana botánica del bálsamo de Tolú (M. balsamum var. balsamum, que SÍ es colombiano-tolimense con resina distinta) — comparten género y morfología pero difieren en la composición de la resina: el bálsamo del Perú es más oscuro, más aromático (cinamato de bencilo, benzoato de bencilo, vainillina, ácido cinámico, ácido benzoico) y más viscoso; el bálsamo de Tolú es más claro y más resinoso (ácido toluico, esteres del ácido benzoico). Ha sido producto medicinal-cosmético-ritual de gran importancia desde tiempos precolombinos en Mesoamérica (cultura maya, náhuatl-azteca — \"xochicotzotl\", usado en rituales y como antiséptico de heridas) y se exportaba a Europa desde el siglo XVI como medicamento de heridas (aún hoy es ingrediente reconocido en farmacopeas europeas como antiséptico y cicatrizante tópico). En Colombia se distribuye nativa-naturalizada en bosque seco tropical y bosque húmedo bajo del Caribe (Bolívar, Sucre, Magdalena, La Guajira semihúmeda), Magdalena medio (Antioquia, Santander), Catatumbo (Norte de Santander) y piedemonte del Magdalena bajo entre 0 y 1.800 msnm. Lección viva sobre BOTÁNICA SISTEMÁTICA, HISTORIA DEL COMERCIO COLONIAL DE RESINAS, PARES BOTÁNICOS HERMANOS y AGROFORESTERÍA MEDICINAL: el par botánico M. balsamum var. balsamum (Tolú) vs M. balsamum var. pereirae (Perú) es ejemplo perfecto de cómo dos variedades de la misma especie pueden tener perfiles bioquímicos distintos por adaptación local y deriva genética, y de cómo el nombre popular puede engañar geográficamente (bálsamo \"del Perú\" no es peruano, igual que el \"guayacán de Manizales\" no es manizalita, el \"café arábigo\" no es de Arabia, el \"Hawaiian baby woodrose\" no es hawaiana, etc.). Aplicaciones modernas: antiséptico cicatrizante tópico (formulaciones farmacéuticas reconocidas — INVIMA), ingrediente cosmético en perfumería de lujo (notas balsámicas-resinosas en perfumes orientales), fragancia ritual en sincretismo afrocaribe. Manejo agroecológico: árbol leguminoso fijador de N (30-50 kg/ha/año), excelente para sistemas agroforestales del Caribe colombiano y Magdalena medio en asocio con cacao, café, plátano hartón y leguminosas pioneras; restauración de bosque seco tropical; espaciamiento 8x8 m en producción; cosecha de resina por incisión cuidadosa NO destructiva tras 15-25 años de establecimiento. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, FAO EcoCrop, Bernal 2015 Catálogo Plantas Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia, JBB Plantas Medicinales."
     }
   ],
   "biopreparados": [
