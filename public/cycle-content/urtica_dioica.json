@@ -1,0 +1,76 @@
+{
+  "species_slug": "urtica_dioica",
+  "scientific_name": "Urtica dioica L.",
+  "common_names": [
+    "Ortiga"
+  ],
+  "family": "Urticaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "dynamic_accumulator",
+    "pest_repellent",
+    "pollinator_attractor",
+    "biomass_producer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "rizoma",
+      "division_mata"
+    ],
+    "best_method": "rizoma",
+    "protocol_resumen": "Extraer trozos de rizoma de 10-15cm con al menos 2-3 yemas. Plantar a 5cm profundidad en sustrato húmedo rico en MO. Rebrote en 10-15 días. Alternativa: semilla en bandeja (germinación 14-21 días).",
+    "tiempo_a_establecimiento_dias": 30,
+    "notas": "Propagación agresiva: contenerla con barrera física de 30cm profundidad en huertos pequeños."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 1500,
+      "optimo_min": 2000,
+      "optimo_max": 3000,
+      "max_absoluto": 3500
+    },
+    "temperatura_c": {
+      "helada_letal": -8,
+      "optimo_min": 12,
+      "optimo_max": 20,
+      "max_tolerable": 28
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "medio"
+  },
+  "valor_pedagogico": "La Ortiga (Urtica dioica) es una herbácea perenne naturalizada en los Andes colombianos, presente en departamentos como Cundinamarca, Boyacá y Antioquia entre 1500-3000 msnm en zonas térmicas templado y frío. Presenta tricomas urticantes que contienen histamina y acetilcolina. Su manejo agronómico incluye propagación por semilla, rizoma o división de mata, con establecimiento en 30 días y ciclo perenne; se asocia beneficiosamente con sírfidos parasitoides de áfidos y no presenta plagas críticas significativas. En contexto campesino andino, se usa tradicionalmente para elaborar purín fermentado (7-14 días) como bioestimulante y repelente de pulgones, así como en infusiones medicinales. Su valor proteínico alcanza el 30% en materia seca, según validación en la fuente taxonómica Tier A GBIF Backbone Taxonomy.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "url": null
+    },
+    {
+      "id": "restrepo-rivera-2005",
+      "title": "restrepo-rivera-2005",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-18T03:26:41.096Z"
+}

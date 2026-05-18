@@ -1,0 +1,69 @@
+{
+  "species_slug": "allium_sativum",
+  "scientific_name": "Allium sativum L.",
+  "common_names": [
+    "Ajo"
+  ],
+  "family": "Amaryllidaceae",
+  "category": "tuberculos_raices",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "frio",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pest_repellent"
+  ],
+  "antagonists": [
+    "vicia_sativa"
+  ],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "clavo_bulbo",
+    "notas": "Se siembran los 'dientes' o clavos individuales con el ápice hacia arriba."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 1500,
+      "optimo_max": 2800,
+      "max_absoluto": 3400
+    },
+    "temperatura_c": {
+      "helada_letal": -10,
+      "optimo_min": 12,
+      "optimo_max": 20,
+      "max_tolerable": 28
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "El ajo (Allium sativum L.) se cultiva en diversos departamentos de Colombia incluyendo Cundinamarca, Boyacá, Nariño y Antioquia entre 0 y 3400 msnm en zonas térmicas frías y templadas. Su manejo agronómico incluye propagación por clavos bulbillos (dientes) sembrados con el ápice hacia arriba, ciclo vegetativo de 90-120 días, asociaciones beneficiosas con zanahoria, lechuga y fresas que repelen plagas como áfidos y ácaros, y requiere monitoreo de plagas como el nemátodo del tallo y enfermedades como la pudrición blanca. En el contexto cultural muisca y andino, este bulbo ha sido tradicionalmente utilizado tanto en preparaciones culinarias como en remedios medicinales por sus propiedades antibacterianas y antifúngicas, formando parte esencial de la dieta y la medicina tradicional andina. Según fuentes taxonómicas verificadas de GBIF Backbone Taxonomy, Plants of the World Online (POWO), AGROSAVIA Sol Andina y la ICA Resolución 3168/2015, su nombre científico válido es Allium sativum L.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-sol-andina",
+      "title": "agrosavia-sol-andina",
+      "url": "https://www.agrosavia.co"
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-18T03:26:41.091Z"
+}
