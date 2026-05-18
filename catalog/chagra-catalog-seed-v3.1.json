@@ -32168,7 +32168,8 @@
       "año": 2019,
       "titulo": "Resolución 00017702 de 2019 — Registro variedad AGROSAVIA Alhaja",
       "institucion": "ICA",
-      "tier": "A"
+      "tier": "A",
+      "_orphan_audit_2026_05_18": "no_referenced_by_species_or_biopreparados — keep as historical reference until referenced"
     },
     {
       "id": "agrosavia-bacillus-2018",
@@ -32367,7 +32368,8 @@
       "titulo": "Catalogue of potato varieties and germplasm collections",
       "institucion": "CIP",
       "url": "https://cipotato.org",
-      "tier": "A"
+      "tier": "A",
+      "_orphan_audit_2026_05_18": "no_referenced_by_species_or_biopreparados — keep as historical reference until referenced"
     },
     {
       "id": "correa-pabon-carulla-2008",
@@ -32492,7 +32494,8 @@
       "año": null,
       "titulo": "IFOAM Norms for Organic Production and Processing",
       "url": "https://www.ifoam.bio/our-work/how/standards-certification/organic-guarantee-system/ifoam-norms",
-      "tier": "A"
+      "tier": "A",
+      "_orphan_audit_2026_05_18": "no_referenced_by_species_or_biopreparados — keep as historical reference until referenced"
     },
     {
       "id": "ingham-2000-compost-tea",
@@ -32729,7 +32732,8 @@
       "año": 2009,
       "titulo": "(Variante de cita usada en v3.0; curadura pendiente — probablemente idéntica a rodriguez-nustez-estrada-2009)",
       "observaciones": "STUB migrado de v3.0. Verificar si es la misma fuente que rodriguez-nustez-estrada-2009 y dedupear.",
-      "tier": "A"
+      "tier": "A",
+      "_orphan_audit_2026_05_18": "no_referenced_by_species_or_biopreparados — keep as historical reference until referenced"
     },
     {
       "id": "rodriguez-nustez-estrada-2009",
@@ -32740,7 +32744,8 @@
       "revista_o_editorial": "Agronomía Colombiana",
       "volumen_numero": "27(3)",
       "paginas": "289-303",
-      "tier": "A"
+      "tier": "A",
+      "_orphan_audit_2026_05_18": "no_referenced_by_species_or_biopreparados — keep as historical reference until referenced"
     },
     {
       "id": "sib-colombia",
