@@ -35,7 +35,12 @@ export default function NetworkStatusBar() {
 
       if (stats.isSyncing) {
         setStatus(STATUS.SYNCING);
-        if (!isDismissedInSession(STATUS.SYNCING, stats.pendingCount)) setVisible(true);
+        // Bug 2026-05-18 operator: NO mostrar el bar de "Sincronizando X registros..."
+        // como overlay visible — es ruido visual. El indicador rotatorio del TopBar
+        // ya muestra el sync en curso. Si el operador quiere ver detalle, toca el
+        // SyncProgressIndicator (z-9100 bottom-right). El bar SYNCING queda
+        // disponible vía dispatch event syncStarted pero no auto-visible.
+        setVisible(false);
       } else if (!stats.isOnline) {
         setStatus(STATUS.OFFLINE);
         if (!isDismissedInSession(STATUS.OFFLINE, stats.pendingCount)) setVisible(true);
