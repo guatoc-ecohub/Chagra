@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import React, { useEffect, useRef, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useFincaActiveStore } from '../services/fincaActiveStore';
 import { ArrowRight, Info } from 'lucide-react';
 import L from 'leaflet';
 
-// Fix for default marker icons in Leaflet + Vite
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
@@ -17,13 +16,33 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-/**
- * MultiFincaGlobe - Seleccionador de fincas interactivo.
- * Tono cercano colombiano (P1). 
- */
+// Fases del entry: 'initial' (zoom-out Colombia) → 'highlighted' (zoom Choachí + pulse) → 'faded' (marker semi-oculto).
+// Hover sobre el marker activo restaura visualmente la fase highlighted hasta mouseout.
+const PHASE_INITIAL_MS = 500;
+const PHASE_HIGHLIGHT_MS = 2500;
+const FADED_OPACITY = 0.4;
+
+// Vista contextual de entrada: Colombia centro-andino para que se reconozcan otras fincas registradas
+// (Choachí, Boyacá, Santa Marta, etc.) cuando existan. flyTo a Choachí tras PHASE_INITIAL_MS.
+const COLOMBIA_VIEW = { center: [4.5, -74.5], zoom: 6 };
+const CHOACHI_VIEW = { center: [4.5167, -73.9333], zoom: 9 };
+
+function MapEntryFlyTo({ phase }) {
+    const map = useMap();
+    useEffect(() => {
+        if (phase === 'highlighted') {
+            map.flyTo(CHOACHI_VIEW.center, CHOACHI_VIEW.zoom, { duration: 1.4 });
+        }
+    }, [phase, map]);
+    return null;
+}
+
 export const MultiFincaGlobe = ({ onSelect }) => {
     const { activeFincaSlug, setActiveFinca, setFincas, fincas } = useFincaActiveStore();
     const [loading, setLoading] = useState(fincas.length === 0);
+    const [entryPhase, setEntryPhase] = useState('initial');
+    const [hoveredSlug, setHoveredSlug] = useState(null);
+    const markerRefs = useRef({});
 
     useEffect(() => {
         const loadFincas = async () => {
@@ -41,11 +60,26 @@ export const MultiFincaGlobe = ({ onSelect }) => {
         loadFincas();
     }, [setFincas]);
 
-    const createActiveIcon = (finca) => L.divIcon({
+    // Secuencia de entrada — solo al primer mount cuando ya hay fincas cargadas.
+    useEffect(() => {
+        if (loading || fincas.length === 0) return;
+        const t1 = setTimeout(() => setEntryPhase('highlighted'), PHASE_INITIAL_MS);
+        const t2 = setTimeout(() => setEntryPhase('faded'), PHASE_INITIAL_MS + PHASE_HIGHLIGHT_MS);
+        return () => { clearTimeout(t1); clearTimeout(t2); };
+    }, [loading, fincas.length]);
+
+    // El marker activo está "destacado" durante highlighted, o cuando el operador lo sobrevuela.
+    const isActiveHighlighted = (slug) => {
+        if (slug !== activeFincaSlug) return false;
+        if (entryPhase === 'initial' || entryPhase === 'highlighted') return true;
+        return hoveredSlug === slug;
+    };
+
+    const createActiveIcon = (finca, highlighted) => L.divIcon({
         className: 'bg-transparent',
-        html: `<div class="flex flex-col items-center">
+        html: `<div class="flex flex-col items-center" style="opacity:${highlighted ? 1 : FADED_OPACITY}; transition: opacity 350ms ease;">
             <div class="px-2 py-0.5 bg-emerald-900/90 text-white text-[10px] font-bold rounded-md shadow-lg mb-1 whitespace-nowrap">${finca.nombre}</div>
-            <div class="p-1 bg-emerald-600 rounded-full border-2 border-white shadow-xl scale-125 animate-pulse">
+            <div class="p-1 bg-emerald-600 rounded-full border-2 border-white shadow-xl ${highlighted ? 'scale-125 animate-pulse' : ''}">
                 <div class="w-3 h-3 bg-white rounded-full"></div>
             </div>
         </div>`,
@@ -83,8 +117,8 @@ export const MultiFincaGlobe = ({ onSelect }) => {
 
             <div className="h-[400px] w-full rounded-2xl overflow-hidden shadow-2xl border border-slate-700 relative z-0">
                 <MapContainer
-                    center={[4.5167, -73.9333]} // Centro: Choachí
-                    zoom={9}
+                    center={COLOMBIA_VIEW.center}
+                    zoom={COLOMBIA_VIEW.zoom}
                     className="h-full w-full"
                     scrollWheelZoom={false}
                 >
@@ -92,12 +126,21 @@ export const MultiFincaGlobe = ({ onSelect }) => {
                         url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
                         attribution='&copy; OpenStreetMap contributors'
                     />
-                    {fincas.map((finca) => (
-                        <Marker
-                            key={finca.slug}
-                            position={finca.coords || [0, 0]}
-                            icon={finca.slug === activeFincaSlug ? createActiveIcon(finca) : createDefaultIcon(finca)}
-                        >
+                    <MapEntryFlyTo phase={entryPhase} />
+                    {fincas.map((finca) => {
+                        const isActive = finca.slug === activeFincaSlug;
+                        const highlighted = isActive && isActiveHighlighted(finca.slug);
+                        return (
+                            <Marker
+                                key={finca.slug}
+                                position={finca.coords || [0, 0]}
+                                icon={isActive ? createActiveIcon(finca, highlighted) : createDefaultIcon(finca)}
+                                ref={(ref) => { if (ref) markerRefs.current[finca.slug] = ref; }}
+                                eventHandlers={{
+                                    mouseover: () => isActive && setHoveredSlug(finca.slug),
+                                    mouseout: () => isActive && setHoveredSlug(null),
+                                }}
+                            >
                             <Popup className="custom-popup" minWidth={220}>
                                 <div className="p-1 space-y-3 font-sans text-slate-200">
                                     <div>
@@ -148,8 +191,9 @@ export const MultiFincaGlobe = ({ onSelect }) => {
                                     </button>
                                 </div>
                             </Popup>
-                        </Marker>
-                    ))}
+                            </Marker>
+                        );
+                    })}
                 </MapContainer>
             </div>
         </div>
