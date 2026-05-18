@@ -15610,6 +15610,633 @@
         "gbif-taxonomic-backbone",
         "jbb-plantas-medicinales"
       ]
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH43_CACTACEAS_SUCULENTAS",
+      "id": "opuntia_ficus_indica",
+      "nombre_comun": "Nopal tuna",
+      "nombre_comunes_regionales": [
+        "tuna",
+        "nopal",
+        "higo chumbo",
+        "penca de nopal",
+        "tuna mansa"
+      ],
+      "nombre_cientifico": "Opuntia ficus-indica (L.) Mill.",
+      "familia_botanica": "Cactaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "living_fence",
+        "biomass_producer",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 2200,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 18,
+        "optimo_max": 30,
+        "max_tolerable": 40
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "methods": [
+          "esqueje"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Propagación vegetativa por cladodios (pencas) maduros separados con 1-2 años de edad. Cicatrizar la herida 7-15 días a la sombra antes de plantar enterrando 1/3 del cladodio en suelo bien drenado. Establecimiento 30-60 días.",
+        "tiempo_a_establecimiento_dias": 45,
+        "notas": "Sin riego durante primera semana post-siembra para evitar pudrición. Producción de tunas (frutos) a partir del segundo año.",
+        "fuente": "Pérez Arbeláez 1947; AGROSAVIA forrajeras 2022; POWO Kew"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "perez-arbelaez-1947-plantas-utiles",
+        "agrosavia-forrajeras-2022",
+        "sib-colombia",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El nopal tuna (Opuntia ficus-indica (L.) Mill., Cactaceae subfamilia Opuntioideae) es un cactus arborescente perenne nativo del altiplano mexicano (Mesoamérica), domesticado por las culturas precolombinas mexicanas hace más de 9.000 años y naturalizado-cultivado en Colombia desde la época colonial entre 200 y 2.200 msnm en zonas térmicas cálidas-templadas secas y semiáridas: La Guajira (Riohacha, Maicao, Uribia, Manaure — territorio Wayúu), Cesar (Valledupar, valle del río Cesar), Magdalena (Santa Marta, Ciénaga), Bolívar (interior seco), Santander (Cañón del Chicamocha — Curití, Aratoca, Cepitá, Mogotes), Boyacá (Villa de Leyva, Sutamarchán, Ráquira, valle seco del Suárez, Sogamoso), Cundinamarca (Suesca, Nemocón, Tausa, Sabana norte seca), Huila (Desierto de la Tatacoa, Aipe, Villavieja), Tolima caliente (Espinal, Flandes), Norte de Santander (Cúcuta) y Nariño (Patía-Cauca). Pertenece a la familia Cactaceae subfamilia Opuntioideae (igual familia que pitaya, tunas serranas Opuntia stricta, Opuntia tuna), planta arbustiva-arborescente de 3-5 m de altura con tallos suculentos en forma de paletas aplanadas (cladodios o pencas), aréolas con glóquidas (espinas pequeñas finas urticantes) y espinas mayores variables según cultivar (los cultivares 'mansos' tienen pocas espinas), flores grandes amarillo-anaranjadas-rojizas vistosas polinizadas por abejas (incluyendo Apis mellifera y abejas nativas Meliponini), frutos baya carnosa (tuna o higo chumbo) elipsoidal de 5-10 cm con cáscara espinosa amarilla-anaranjada-roja-púrpura según variedad, pulpa dulce con muchas semillas comestibles duras (sabor refrescante similar a sandía-pera). Es lección viva extraordinaria de adaptación xerofítica, soberanía alimentaria en zonas secas y bioeconomía agroecológica colombiana-mexicana que enseña a niñas y niños cómo una cactácea mesoamericana se volvió cultivo patrimonial de las zonas áridas colombianas con múltiples productos del mismo individuo: las pencas tiernas (nopalitos) se comen como verdura asada o en ensalada (alta en mucílagos, fibra, calcio, vitaminas A y C, reduce glicemia — investigación médica colombiana e internacional valida uso para diabetes tipo 2), los frutos (tunas) son frescos refrescantes muy apreciados o procesados en mermeladas, jaleas, jugos y dulces tradicionales (la 'colación de tuna' boyacense), las pencas son forraje estratégico para ganado en sequía (15-20 kg/cabeza/día de penca picada con melaza), la planta es cerca viva impenetrable (las espinas y glóquidas detienen ganado y predadores), los cladodios secos son combustible, las raíces y mucílagos se usan en bioconstrucción (estabilizador de morteros de tierra cruda y tapia pisada — técnica ancestral mexicana adaptada en Boyacá-Santander), y la cochinilla del nopal (Dactylopius coccus) parasita la planta produciendo el famoso colorante natural carmín rojo de uso textil-alimentario-cosmético. Patrón fotosintético CAM (Crassulacean Acid Metabolism) que enseña la estrategia metabólica de las plantas xerófilas: estomas abiertos de noche para fijar CO2 reduciendo pérdida de agua diurna, adaptación clave a sequía documentada en Cactaceae, Crassulaceae, Agavaceae y otras suculentas. Manejo agroecológico: propagación por cladodios maduros de 1-2 años (cicatrizados 7-15 días a la sombra antes de enterrar 1/3 en suelo bien drenado sin riego primera semana), distancia 2-3x1-1.5 m según uso (denso para forraje, espaciado para fruta), tolera sequía extrema (sobrevive meses sin agua), suelos pobres y pedregosos, prácticamente sin manejo durante 15-30 años de vida productiva, asocio con cactáceas, agaves, cabuya, henequén en sistemas xerofíticos del Caribe-Andes, no requiere agroquímicos. Función en chagra como frutal de zona seca, forrajera estratégica de sequía, cerca viva impenetrable, soporte para producción de cochinilla, sombrío parcial para huertos áridos, bioconstrucción y patrimonio cultural caribeño-cundiboyacense-santandereano. Fuentes Tier A: GBIF, POWO Kew, Pérez Arbeláez 1947 Plantas Útiles Colombia, AGROSAVIA Manual Forrajeras 2022, SiB Colombia, Bernal 2015.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH43_CACTACEAS_SUCULENTAS",
+      "id": "cereus_repandus",
+      "nombre_comun": "Cardón guajiro",
+      "nombre_comunes_regionales": [
+        "cardón",
+        "cardón de dato",
+        "yosú",
+        "yosush (wayuunaiki)",
+        "cadushi"
+      ],
+      "nombre_cientifico": "Cereus repandus (L.) Mill.",
+      "familia_botanica": "Cactaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "living_fence",
+        "pollinator_attractor",
+        "windbreak",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 600,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 34,
+        "max_tolerable": 42
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "methods": [
+          "esqueje",
+          "semilla"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Esquejes de tallo columnar de 30-50 cm cicatrizados a la sombra 15-21 días antes de enterrar 10-15 cm en suelo arenoso muy drenado. Sin riego primera semana. Establecimiento 60-90 días. Semilla viable pero crecimiento muy lento (3-5 años para altura 1 m).",
+        "tiempo_a_establecimiento_dias": 75,
+        "notas": "CITES Apéndice II como toda la familia Cactaceae — requiere permiso ICA-MADS para movilización comercial. Endemismo regional norandino-caribeño (norte de Suramérica: La Guajira colombo-venezolana, Antillas Holandesas).",
+        "fuente": "POWO Kew; Bernal 2015; CITES Apéndice II Cactaceae; Pérez Arbeláez 1947"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia",
+        "libro-rojo-plantas-colombia",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "El cardón guajiro (Cereus repandus (L.) Mill., Cactaceae subfamilia Cactoideae, sinónimo histórico Cereus peruvianus auct. non (L.) Mill.) es un cactus columnar arborescente nativo emblemático de las zonas áridas del norte de Colombia y Venezuela, endémico regional del bioma Bosque Seco Tropical-Subxerófilo de La Guajira-Caribe-Antillas Holandesas (Curazao, Aruba, Bonaire), distribuido en Colombia entre 0 y 600 msnm en La Guajira (Alta y Media Guajira — Riohacha, Maicao, Uribia, Manaure, Punta Gallinas, Cabo de la Vela, Macuira — corazón del territorio Wayúu), Magdalena (Santa Marta, Ciénaga Grande zonas secas), norte de Cesar y zonas muy secas de Bolívar, con poblaciones disjuntas hasta el norte del Cañón del Chicamocha (Santander). Catalogado en CITES Apéndice II como toda la familia Cactaceae — requiere permiso ICA-MADS para movilización comercial y aprovechamiento sostenible. Pertenece a la familia Cactaceae subfamilia Cactoideae tribu Cereeae, planta arborescente columnar de 6-12 m de altura con tallos cilíndricos suculentos verde-grisáceos de 10-15 cm de diámetro con 8-10 costillas con aréolas blanco-lanosas y espinas amarillas-marrones cortas (1-3 cm), ramificación candelabriforme característica en la parte alta, flores grandes blanco-cremas (15-20 cm) que abren una sola noche polinizadas por murciélagos nectarívoros endémicos del Caribe colombiano (Leptonycteris curasoae — en peligro UICN — y Glossophaga soricina), frutos baya esférica rojo-rosada con pulpa blanca-rosada dulce y semillas pequeñas negras comestibles (consumidas tradicionalmente por los Wayúu fresca o como dulce-conserva 'arepa de yosú'). Es lección viva extraordinaria de patrimonio biocultural Wayúu, endemismo norandino-caribeño, conservación CITES de cactáceas, fragilidad del bosque seco tropical (uno de los biomas más amenazados de Colombia con <8% de cobertura original) y coevolución mutualista planta-murciélago que enseña a niñas y niños la integridad de los ecosistemas xerofíticos colombianos. Los Wayúu llaman 'yosú' o 'yosush' al cardón y 'cadushi' a una preparación tradicional con sus tallos pelados-fermentados; las espinas se usaron históricamente como agujas para tejido de mochilas Wayúu; los tallos secos vacíos sirven como vigas de techos en construcciones tradicionales rancho-bajareque guajiro; las cercas vivas de cardón son barreras infranqueables tradicionales contra ganado caprino-ovino. Manejo agroecológico: propagación por esquejes de tallo columnar de 30-50 cm cicatrizados 15-21 días a la sombra antes de enterrar 10-15 cm en suelo arenoso muy drenado sin riego primera semana, o por semilla viable pero crecimiento muy lento (3-5 años para 1 m), distancia 1-2 m en cerca o 4-5 m disperso, tolera sequía extrema y salinidad moderada, suelos pobres pedregosos arenosos calcáreos, prácticamente sin manejo durante 50-100+ años de vida, asocio xerofítico con Opuntia, Stenocereus, Pereskia guamacho, agaves, prosopis (trupillo) y leguminosas espinosas del bosque seco tropical caribeño. NO movilizar fuera de su rango natural sin permiso CITES-ICA. Función en chagra como cerca viva monumental de zona muy seca, atractor de murciélagos polinizadores nocturnos en peligro, restaurador de bosque seco tropical Caribe, patrimonio biocultural Wayúu, sin agroquímicos. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, Pérez Arbeláez 1947, SiB Colombia, Libro Rojo Plantas Colombia, CITES Apéndice II Cactaceae / ICA Resolución 3168.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH43_CACTACEAS_SUCULENTAS",
+      "id": "stenocereus_griseus",
+      "nombre_comun": "Cardón datos",
+      "nombre_comunes_regionales": [
+        "cardón de dato",
+        "dato",
+        "ipa (wayuunaiki)",
+        "iguaraya",
+        "pitayo guajiro",
+        "cardón pitahaya"
+      ],
+      "nombre_cientifico": "Stenocereus griseus (Haw.) Buxb.",
+      "familia_botanica": "Cactaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "living_fence",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 500,
+        "max_absoluto": 1000
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 34,
+        "max_tolerable": 42
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "methods": [
+          "esqueje",
+          "semilla"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Esquejes de 40-60 cm de tallo columnar cicatrizados 15-21 días a la sombra antes de enterrar 15 cm en suelo arenoso muy drenado. Sin riego primera semana. Establecimiento 60-90 días. Producción de frutos (datos/iguarayas) a partir del año 4-6.",
+        "tiempo_a_establecimiento_dias": 80,
+        "notas": "CITES Apéndice II como toda la familia Cactaceae. Especie clave de la dieta tradicional Wayúu (frutos 'iguaraya'/'dato' — 'wayuu food') durante temporada lluviosa corta (mayo-junio). Endemismo regional Caribe norandino.",
+        "fuente": "POWO Kew; Bernal 2015; CITES Apéndice II Cactaceae; etnobotánica Wayúu"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia",
+        "libro-rojo-plantas-colombia",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "El cardón datos o iguaraya (Stenocereus griseus (Haw.) Buxb., Cactaceae subfamilia Cactoideae tribu Pachycereeae) es un cactus columnar arborescente frutal silvestre nativo del bosque seco tropical caribeño, endémico regional del norte de Colombia-Venezuela-Antillas Holandesas (igual área biogeográfica que Cereus repandus pero coexistiendo en mosaico), distribuido en Colombia entre 0 y 500 msnm en La Guajira (Alta y Media Guajira — Uribia, Maicao, Manaure, Cabo de la Vela, Macuira, Riohacha — territorio Wayúu), Magdalena (Santa Marta, Tayrona zonas secas, Ciénaga sur), norte de Cesar (Valledupar zonas secas), Atlántico, Bolívar (interior seco), y zonas muy áridas del valle medio del Magdalena. Catalogado en CITES Apéndice II como toda la familia Cactaceae — requiere permiso ICA-MADS para movilización comercial y aprovechamiento sostenible. Pertenece a la familia Cactaceae subfamilia Cactoideae tribu Pachycereeae (igual tribu que el saguaro Carnegiea gigantea y otros cactos columnares mexicanos), planta arborescente de 6-10 m con tallos columnares cilíndricos suculentos verde-grisáceos de 8-15 cm de diámetro con 8-10 costillas y aréolas blancas con espinas grises-marrones, ramificación candelabriforme desde la base o tronco corto, flores blanco-cremosas medianas (8-12 cm) nocturnas polinizadas por murciélagos nectarívoros (Leptonycteris curasoae, Glossophaga soricina) y polillas esfíngidas, frutos baya esférica-elipsoidal de 5-8 cm con cáscara espinosa que se desprende fácilmente al madurar revelando pulpa carnosa roja-púrpura dulce (sabor parecido a la pitaya colombiana pero más intenso, rica en betalaínas antioxidantes) con muchas semillas pequeñas negras comestibles. Es lección viva extraordinaria de soberanía alimentaria indígena Wayúu, fruta silvestre del bosque seco tropical, endemismo norandino-caribeño y conservación CITES de cactáceas frutales nativas que enseña a niñas y niños cómo el pueblo Wayúu (más de 380.000 personas en la frontera colombo-venezolana) tiene en los datos (iguarayas) una de sus principales fuentes calóricas-nutricionales durante la temporada de lluvias cortas (mayo-junio), consumidos frescos directamente o procesados en chichi-iguaraya (bebida fermentada tradicional similar a la chicha de maíz pero con frutos de cardón), dulce-conserva, mermelada, jugos y sirope; las semillas tostadas son aperitivo tradicional; los tallos columnares jóvenes se cosechan-pelan-fermentan en cadushi guajiro (alimento tradicional); los tallos viejos secos vacíos sirven como vigas de techos en arquitectura tradicional rancho-bajareque guajiro; cercas vivas espinosas tradicionales contra ganado caprino-ovino. Coevolución mutualista cactus-murciélago en peligro: Leptonycteris curasoae está en peligro UICN y depende críticamente del néctar y polen de cardones columnares caribeños para su ciclo migratorio Colombia-Venezuela-Antillas Holandesas-Aruba-Curazao. Manejo agroecológico: propagación por esqueje de 40-60 cm de tallo columnar cicatrizado 15-21 días a la sombra antes de enterrar 15 cm en suelo arenoso muy drenado, distancia 2-3 m monocultivo frutal o 1.5 m en cerca, tolera sequía extrema y salinidad moderada, suelos pobres pedregosos arenosos calcáreos, producción de iguarayas año 4-6 con plena producción año 8-10, vida productiva 50-80 años, asocio xerofítico con Cereus repandus, Opuntia, Pereskia guamacho, prosopis trupillo, agaves. NO movilizar fuera de rango natural sin permiso CITES-ICA. Función en chagra como frutal silvestre nativo de zona muy seca, atractor murciélagos polinizadores en peligro, cerca viva, restaurador de bosque seco tropical Caribe, patrimonio biocultural Wayúu y soberanía alimentaria indígena. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, Pérez Arbeláez 1947, SiB Colombia, Libro Rojo Plantas Colombia, CITES Apéndice II Cactaceae / ICA Resolución 3168.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH43_CACTACEAS_SUCULENTAS",
+      "id": "hylocereus_undatus",
+      "nombre_comun": "Pitaya blanca",
+      "nombre_comunes_regionales": [
+        "pitaya roja",
+        "pitahaya",
+        "dragon fruit",
+        "fruta del dragón",
+        "pitaya de Costa Rica"
+      ],
+      "nombre_cientifico": "Hylocereus undatus (Haw.) Britton & Rose",
+      "familia_botanica": "Cactaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1500,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 20,
+        "optimo_max": 30,
+        "max_tolerable": 38
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "methods": [
+          "esqueje",
+          "semilla"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Esquejes de cladodio maduro de 30-40 cm cicatrizados 5-7 días a la sombra antes de plantar. Tutorado obligatorio sobre 'T' de concreto con tela polietileno o tutor vivo. Distancia 3x3 m o doble fila 2.5x1.5 m. Plena producción año 2-3.",
+        "tiempo_a_establecimiento_dias": 60,
+        "notas": "Polinización manual al amanecer para asegurar cuajado en cultivos comerciales (flores nocturnas, polinizadores naturales murciélagos y polillas). Fruto cáscara rojo-rosado con escamas verdes y pulpa blanca con semillas negras pequeñas (cultivar 'pitaya blanca' o 'pitaya roja' confusamente: rojo es la cáscara, blanco es la pulpa).",
+        "fuente": "AGROSAVIA Manual Frutales Tropicales; POWO Kew; ICA Resolución 3168"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-manual-frutales-tropicales",
+        "sib-colombia",
+        "ica-resolucion-3168-2015",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "La pitaya blanca o pitaya roja de cáscara (Hylocereus undatus (Haw.) Britton & Rose, Cactaceae subfamilia Cactoideae tribu Hylocereeae) es un cactus epífito-hemiepífito trepador perenne originario de Mesoamérica (sur de México, Belize, Guatemala, Honduras, Costa Rica) y naturalizado-cultivado pantropicalmente como frutal comercial de exportación, en Colombia cultivado entre 200 y 1.500 msnm en zonas térmicas cálidas-templadas-moderadas: Valle del Cauca (cinturón frutícola de Buga, Palmira, Tulúa), Tolima (Lérida, Líbano, Falan), Cundinamarca (Cáqueza, Fómeque, Ubaque, Quetame, La Mesa, Anolaima — junto con la pitahaya amarilla S. megalanthus), Boyacá (San Eduardo, Páez, Miraflores), Huila (Garzón, Pitalito), Santander (Lebrija, San Vicente de Chucurí), Antioquia (Suroeste, Urabá) y Magdalena Medio. Pertenece a la familia Cactaceae tribu Hylocereeae (igual tribu que la pitahaya amarilla colombiana Selenicereus megalanthus, ahora reclasificada como Selenicereus undatus en algunas taxonomías recientes — sinónimo Selenicereus undatus (Haw.) D.R.Hunt 2017), planta trepadora epífita-hemiepífita con tallos verdes triangulares-3-angulados de hasta 20 m con aréolas con espinas cortas amarillentas (1-4 mm), crecimiento trepador con raíces aéreas adventicias que se adhieren a árboles tutores o estructuras de tutorado (concreto/madera/tela polietileno), flores blanco-cremas gigantes (25-30 cm de diámetro) que abren una sola noche tropical y son polinizadas por murciélagos nectarívoros (Glossophaga soricina, Anoura geoffroyi) y polillas esfíngidas — en cultivos comerciales se realiza polinización manual al amanecer para asegurar cuajado, frutos baya elipsoidal con cáscara rojo-rosado-magenta brillante con escamas (brácteas) verde-anaranjadas grandes y pulpa blanca translúcida con semillas negras pequeñas masticables (sabor dulce-refrescante delicado, parecido a kiwi-pera-melón). Es lección viva extraordinaria de bioeconomía agroexportadora, polinización por murciélagos, cactáceas no espinosas trepadoras epífitas y cultivo intensivo bajo tutor que enseña a niñas y niños cómo Colombia produce dos pitayas distintas (la blanca H. undatus de cáscara roja y la amarilla S. megalanthus de cáscara amarilla, distintas en distribución, ciclo y mercado — Colombia es líder mundial de S. megalanthus y productora notable de H. undatus). Diferencia diagnóstica didáctica: H. undatus tallos triangulares con espinas más cortas, fruto cáscara roja con escamas verdes anchas, pulpa blanca; S. megalanthus tallos similares pero más delgados con espinas amarillas, fruto cáscara amarilla con brácteas cortas, pulpa blanca translúcida. Ambas comparten ciclo Hylocereeae epífito-trepador-tutorado, polinización por murciélagos y exportación de alto valor. Rica en betacianinas antioxidantes (en cultivares de pulpa roja), vitamina C, fibra, prebióticos (oligofructosa), efecto laxante suave. Producto bandera del programa 'Colombia, semilla de exportación' y mercados orgánicos certificados. Manejo agroecológico: propagación por esqueje de cladodio maduro de 30-40 cm (segmento cicatrizado 5-7 días a la sombra antes de siembra), tutorado obligatorio sobre 'T' de concreto con tela polietileno o sobre tutor vivo (matarratón Gliricidia sepium, leucaena, eritrina), distancia 3x3 m o doble fila 2.5x1.5 m, plena producción a partir del año 2-3 (más rápido que la pitahaya amarilla — H. undatus es de ciclo más corto), cosecha 30-40 días post-floración cuando cáscara cambia de verde a rojo-rosado intenso, polinización manual al amanecer del día siguiente a apertura floral, vida productiva 15-20 años. Función en chagra como frutal de alto valor agregado, atractora de murciélagos polinizadores nocturnos, cultivo de exportación sostenible, soporte vivo trepador en sistemas agroforestales tutorados. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Manual Frutales Tropicales, SiB Colombia, ICA Resolución 3168, Bernal 2015.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH43_CACTACEAS_SUCULENTAS",
+      "id": "epiphyllum_phyllanthus",
+      "nombre_comun": "Lengua de víbora",
+      "nombre_comunes_regionales": [
+        "lengua de suegra epífita",
+        "cactus orquídea",
+        "fishbone cactus",
+        "cactus hoja",
+        "epífilo"
+      ],
+      "nombre_cientifico": "Epiphyllum phyllanthus (L.) Haw.",
+      "familia_botanica": "Cactaceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 200,
+        "optimo_min": 800,
+        "optimo_max": 2200,
+        "max_absoluto": 2600
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 15,
+        "optimo_max": 26,
+        "max_tolerable": 32
+      },
+      "radiacion": "sombra_filtrada",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "methods": [
+          "esqueje",
+          "semilla"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Esquejes de cladodio foliáceo aplanado de 15-25 cm cicatrizados 3-5 días a la sombra antes de plantar en sustrato muy drenado (corteza de pino + perlita + tierra de hoja). Tutorado obligatorio sobre árbol nodriza o estructura. Sombra filtrada de bosque nublado/subandino. Establecimiento 30-45 días.",
+        "tiempo_a_establecimiento_dias": 38,
+        "notas": "Cactácea epífita verdadera de bosque nublado/subandino tropical americano: vive sobre árboles forofitos (no parásita), enseña biodiversidad de cactos no espinosos foliáceos colgantes selváticos contrastando con la imagen estereotipada del cactus desértico espinoso.",
+        "fuente": "POWO Kew; Bernal 2015; SiB Colombia; Sinchi Amazonía"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "sinchi-amazonia-colombiana",
+        "humboldt-flora-alto-andina"
+      ],
+      "valor_pedagogico": "La lengua de víbora epífita (Epiphyllum phyllanthus (L.) Haw., Cactaceae subfamilia Cactoideae tribu Hylocereeae) es un cactus epífito de bosque nublado y selva subandina-amazónica neotropical, nativo de Colombia y ampliamente distribuido en Suramérica tropical (Venezuela, Ecuador, Perú, Bolivia, Brasil, Guayanas, Trinidad-Tobago, Panamá), encontrado en Colombia entre 800 y 2.200 msnm en bosques de niebla y selvas subandinas-piedemonte amazónico-pacífico: Vertientes andinas de Antioquia (Suroeste-Anorí), Caldas, Quindío, Risaralda (Eje Cafetero — sobre árboles cafetales en sombra), Valle del Cauca (vertiente occidental cordillera), Cauca (bosque de niebla Munchique), Nariño (bosque andino occidental), Chocó (Pacífico nuboso), Putumayo (piedemonte amazónico), Caquetá (piedemonte), Cundinamarca (subandinos pre-páramo en sombra), Boyacá, Santander (Cordillera Oriental) y Norte de Santander. Pertenece a la familia Cactaceae subfamilia Cactoideae tribu Hylocereeae (igual tribu que las pitayas H. undatus y S. megalanthus, todas epífitas-hemiepífitas selváticas), aunque vegetativamente muy distinta: planta epífita verdadera (no parásita: vive sobre ramas de árboles forofitos usándolos como soporte, recibiendo agua y nutrientes de la lluvia, neblina y materia orgánica acumulada en las hendiduras del soporte), tallos cladodios primarios cilíndricos cortos suculentos que producen cladodios secundarios foliáceos aplanados verde-brillante coriáceos lanceolados (15-50 cm largo x 2-5 cm ancho) con margen ondulado-aserrado fino que recuerda una hoja gigante o una lengua de serpiente (de ahí el nombre vernáculo), aréolas reducidas casi sin espinas (mínimas o ausentes — distintivo Epiphyllum) en los nodos marginales, flores tubulares largas blanco-cremosas-rosáceas (10-20 cm largo) nocturnas o crepusculares polinizadas por murciélagos nectarívoros selváticos (Anoura, Glossophaga) y polillas esfíngidas grandes, frutos baya elipsoidal rojo-rosado-violáceo con semillas negras pequeñas dispersadas por aves frugívoras del dosel. Es lección viva extraordinaria de biodiversidad de cactáceas no-desérticas, epífitismo selvático, contraste con la imagen estereotipada del cactus desértico espinoso, y mutualismo planta-bosque nublado-polinizador que enseña a niñas y niños cómo existen cactos suculentos colgantes con hojas-aparentes (cladodios foliáceos) que viven sobre árboles del bosque de niebla colombiano, en las mismas zonas donde crecen las orquídeas y bromelias epífitas (la pertenencia de Epiphyllum al gremio epífito subandino se enseña perfectamente junto a esos otros grupos epífitos del bosque andino-cafetero). Familia ancestral de los cultivares ornamentales 'cactus orquídea' (Epiphyllum × híbridos comerciales) cultivados mundialmente como ornamentales colgantes en macetas y orquidearios. Cumple servicio ecosistémico como hospedero de microbiota del dosel epífito (musgos, líquenes, bromelias, orquídeas, anfibios arborícolas pequeños, hormigas, escarabajos) y atractor nocturno de murciélagos polinizadores selváticos. Manejo agroecológico: propagación por esqueje de cladodio foliáceo aplanado de 15-25 cm cicatrizado 3-5 días a la sombra antes de plantar en sustrato muy drenado (corteza de pino + perlita + tierra de hoja + raíz de helecho 1:1:1:1), tutorado obligatorio sobre árbol nodriza o estructura colgante, sombra filtrada de bosque nublado (no sol pleno — se quema) y alta humedad relativa (>70%), riego moderado (no encharcar), asocio epífito con orquídeas, bromelias y aráceas trepadoras (Anthurium, Philodendron), uso ornamental subandino-cafetero. Función en chagra/agroforestería como ornamental nativa colgante para huertos cafetales bajo sombra densa, hospedero epífito, atractor de murciélagos polinizadores selváticos y educación sobre biodiversidad de cactáceas no-desérticas colombianas. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, SiB Colombia, Sinchi Amazonía, IAvH Flora Alto Andina.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH43_CACTACEAS_SUCULENTAS",
+      "id": "aloe_arborescens",
+      "nombre_comun": "Sábila árbol",
+      "nombre_comunes_regionales": [
+        "aloe arborescente",
+        "candelabro",
+        "krantz aloe",
+        "aloe del candelabro",
+        "sábila roja"
+      ],
+      "nombre_cientifico": "Aloe arborescens Mill.",
+      "familia_botanica": "Asphodelaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "living_fence"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 800,
+        "optimo_max": 2400,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 14,
+        "optimo_max": 28,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "methods": [
+          "esqueje",
+          "division_mata"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Esquejes de tallo o ramas laterales de 20-40 cm cicatrizados 7-15 días a la sombra antes de enterrar 8-12 cm en suelo arenoso bien drenado. Sin riego primera semana. Establecimiento 30-45 días. Alternativa: división de mata con hijuelos basales.",
+        "tiempo_a_establecimiento_dias": 40,
+        "notas": "Distinta de Aloe vera (acaule, hojas en roseta basal, sin tallo aéreo): A. arborescens es arbustivo con tallo leñoso y ramificado de hasta 3-4 m, hojas en rosetas terminales múltiples, flores rojo-anaranjadas brillantes en racimos terminales. Usada en medicina tradicional italiana (Padre Romano Zago) como inmunoestimulante, antitumoral adyuvante (estudios clínicos preliminares).",
+        "fuente": "POWO Kew; Pamplona-Roger 2006 Plantas Medicinales; JBB Plantas Medicinales"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "La sábila árbol o aloe arborescente (Aloe arborescens Mill., Asphodelaceae subfamilia Asphodeloideae) es una asphodelácea suculenta arbustiva-arborescente perenne originaria del sur de África (provincia del Cabo y KwaZulu-Natal, Sudáfrica, Mozambique, Zimbabue, Malawi — especie comúnmente llamada 'krantz aloe' por crecer en farallones rocosos sudafricanos), introducida y cultivada en Colombia desde hace décadas como ornamental, medicinal y cerca viva entre 800 y 2.400 msnm en zonas térmicas templadas-frías-moderadas: Cundinamarca (Sabana de Bogotá — Funza, Mosquera, Chía, Cota, Tocancipá, Cajicá, Sopó; Sumapaz cafetero — Tibacuy, Pasca; Tequendama — La Mesa, Anolaima, Anapoima), Boyacá (Tunja, Duitama, Sogamoso, Villa de Leyva), Antioquia (Oriente — Marinilla, Rionegro, La Ceja, Guarne; Suroeste cafetero), Valle del Cauca (cinturón frutícola), Quindío, Risaralda, Caldas (Eje Cafetero), Tolima, Huila, Santander (Bucaramanga, Floridablanca, Piedecuesta, Lebrija), Norte de Santander (Pamplona, Chinácota), Nariño (Pasto) y Cesar (Valledupar). Es lección viva extraordinaria de farmacopea botánica casera, contraste taxonómico con Aloe vera y bioeconomía medicinal artesanal que enseña a niñas y niños cómo el género Aloe tiene más de 600 especies sudafricanas-arábigas con biodiversidad funcional distinta: Aloe vera (acaule, hojas en roseta basal sin tallo aéreo, flores amarillas) usada principalmente como cicatrizante de quemaduras y demulcente digestivo; Aloe arborescens (arbustivo-arborescente de 2-4 m con tallo leñoso ramificado, hojas en rosetas terminales múltiples, flores rojo-anaranjadas brillantes melíferas) usada como inmunoestimulante general en la medicina tradicional italiana popularizada por el Padre Romano Zago O.F.M. (Franciscano brasileño-italiano, 1932-2025) con su fórmula 'tres ingredientes': hojas frescas trituradas con piel + miel pura + aguardiente o cachaza, en proporciones tradicionales como adyuvante inmunoestimulante (existen estudios clínicos preliminares italianos en oncología como coadyuvante, sin reemplazar tratamientos convencionales). Pertenece a la familia Asphodelaceae subfamilia Asphodeloideae (taxonomía APG IV — separada de Liliaceae y Aloeaceae tradicionales), planta arbustiva-arborescente perenne suculenta con tallo principal leñoso y ramificado de 2-4 m de altura, rosetas terminales múltiples de hojas suculentas verde-grisáceo-azuladas lanceoladas-falcadas (curvadas como hoz) de 40-60 cm con dientes marginales prominentes triangulares blanquecinos, inflorescencia racimo terminal cilíndrico erecto vistoso de 30-50 cm con flores tubulares rojo-anaranjado-brillantes melíferas que florece predominantemente en invierno-primavera atrayendo polinizadores diurnos (colibríes — el género Trochilidae se siente atraído por flores tubulares rojas, abejas Apis y nativas Meliponini) y nocturnos (murciélagos en algunas localidades). Patrón fotosintético CAM como toda Aloe. Manejo agroecológico: propagación por esqueje de tallo o ramas laterales de 20-40 cm (cicatrizar la herida 7-15 días a la sombra antes de enterrar 8-12 cm en suelo arenoso bien drenado sin riego primera semana) o por división de mata con hijuelos basales, distancia 1-1.5 m en cerca o 2-3 m disperso, sol pleno a sombra parcial leve, tolera sequía extrema, suelos pobres pedregosos arenosos, tolera heladas suaves (-3 °C breves), prácticamente sin manejo durante 20-40 años de vida productiva, asocio con Aloe vera, cactáceas, agaves, romero, lavanda en huertos secos templados-fríos andinos. Función en chagra como medicinal complementaria a Aloe vera, ornamental floración vistosa invernal, cerca viva espinosa moderada, atractora de colibríes y abejas. Fuentes Tier A: GBIF, POWO Kew, Pamplona-Roger 2006 Plantas Medicinales, JBB Plantas Medicinales Cundinamarca-Boyacá, Pérez Arbeláez 1947, SiB Colombia.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH43_CACTACEAS_SUCULENTAS",
+      "id": "agave_tequilana",
+      "nombre_comun": "Agave azul tequilero",
+      "nombre_comunes_regionales": [
+        "agave azul",
+        "agave tequilero",
+        "maguey azul",
+        "blue agave",
+        "tequilana weber"
+      ],
+      "nombre_cientifico": "Agave tequilana F.A.C.Weber",
+      "familia_botanica": "Asparagaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "living_fence",
+        "biomass_producer",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 600,
+        "optimo_min": 1200,
+        "optimo_max": 2000,
+        "max_absoluto": 2400
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 18,
+        "optimo_max": 30,
+        "max_tolerable": 38
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "methods": [
+          "esqueje"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Propagación principal por hijuelos basales (rizomas) de 20-40 cm separados de la planta madre con su sistema radicular incipiente. Cicatrizar 7-10 días a la sombra antes de plantar en suelo arenoso muy drenado. Sin riego primera semana. Establecimiento 30-60 días.",
+        "tiempo_a_establecimiento_dias": 45,
+        "notas": "Especie monocárpica hapaxántica: vive 7-10 años (más rápido que A. americana) y muere tras florecer una sola vez. Identidad biológica del Tequila mexicano (denominación de origen estricta — Jalisco). En Colombia naturalizado en zonas secas templadas: Sabana de Bogotá norte, valles secos santandereanos-boyacenses, Valle del Cauca. Material para fibra y aguardiente experimental colombiano (no es tequila legal).",
+        "fuente": "POWO Kew; Bernal 2015; Pérez Arbeláez 1947"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia",
+        "humboldt-flora-alto-andina"
+      ],
+      "valor_pedagogico": "El agave azul tequilero (Agave tequilana F.A.C.Weber, Asparagaceae subfamilia Agavoideae, cultivar comercial dominante 'Weber azul') es una planta suculenta xerófila monocárpica hapaxántica originaria del estado de Jalisco, México (cuna mundial del tequila, con denominación de origen estricta protegida por la Norma Oficial Mexicana NOM-006-SCFI-2012 que limita el uso del nombre 'tequila' a aguardientes destilados de A. tequilana Weber azul cultivado en municipios certificados de Jalisco, Guanajuato, Michoacán, Nayarit y Tamaulipas), introducida y naturalizada en Colombia desde hace décadas entre 1.200 y 2.000 msnm en zonas térmicas templadas semiáridas: Boyacá (Villa de Leyva, Sáchica, Sutamarchán, Ráquira — valle seco del Suárez), Santander (Cañón del Chicamocha, Curití, San Gil, Barichara, Aratoca, Cepitá), Norte de Santander (Cúcuta, Pamplona), Cundinamarca (Sabana norte seca — Suesca, Nemocón, Tausa), Huila (Desierto de Tatacoa, Aipe), Valle del Cauca (cinturón seco) y Nariño (Patía). Pertenece a la familia Asparagaceae subfamilia Agavoideae (igual familia que A. americana cabuya, A. cocui de La Guajira-Cesar y otros agaves), planta suculenta perenne con roseta gigantesca compacta de 1-1.5 m de diámetro y 1.5-2 m de altura de hojas (pencas) suculentas-fibrosas verde-azul-grisáceo glaucas brillantes lanceoladas-lineales rígidas más estrechas y erguidas que A. americana (60-120 cm largo x 8-12 cm ancho — más estrechas que cabuya) con dientes marginales triangulares y espina apical perforante muy aguda, ciclo monocárpico hapaxántico más corto que otras Agave (7-10 años vs 10-30 años de A. americana — característica genética que la hace cultivo industrial óptimo en México) terminando con escapo floral erecto gigantesco (4-6 m altura) tipo asparágido con miles de flores amarillentas-verdosas tubulares melíferas polinizadas por murciélagos nectarívoros migratorios (Leptonycteris yerbabuenae — la 'gran murciélago nariz larga mexicano' es polinizador clave del agave azul mexicano y está en peligro UICN por industrialización monocultivos tequileros, lección política-ecológica sobre cómo bebidas industriales destruyen ecosistemas y especies polinizadoras), abejorros y colibríes. Es lección viva extraordinaria de bioeconomía agro-industrial, denominación de origen, contraste tequila vs. mezcal vs. cocuy vs. raicilla (diferentes Agave producen diferentes destilados según región: A. tequilana → tequila Jalisco; A. salmiana, A. potatorum, A. angustifolia → mezcal Oaxaca; A. cocui → cocuy de penca colombo-venezolano La Guajira-Cesar; A. inaequidens, A. maximiliana → raicilla Jalisco-Nayarit), y soberanía cultural-alimentaria que enseña a niñas y niños cómo Colombia tiene su propio Agave-licor patrimonial (Agave cocui de La Guajira-Cesar — cocuy de penca con denominación de origen binacional Pecaya/Colombia-Venezuela) y cómo el monocultivo industrial de agave azul mexicano transformó-amenazó la ecología tradicional jalisciense (destrucción de bosque seco, drogamiento de hijuelos, pérdida de murciélagos polinizadores). Aprovechamiento: el cogollo o piña central (corazón de la roseta sin hojas, 30-80 kg) se hornea-cuece tradicionalmente en hornos de tierra subterráneos (taloas) durante 36-72 horas convirtiendo inulina en azúcares fermentables (fructosa, glucosa), se machaca-prensa para extraer mostos azucarados (aguamiel cocida), se fermentan con levaduras nativas en tinas de roble durante 5-10 días, se destila doble en alambiques de cobre obteniendo aguardiente clear-blanco que puede madurarse en barricas de roble americano-europeo para reposados-añejos. En Colombia el agave azul se cultiva experimentalmente para fibra (similar a cabuya pero más fina) y aguardientes artesanales experimentales (no son tequila legal por denominación de origen mexicana), también como ornamental xerofítico cerca viva. Patrón fotosintético CAM como toda Agavoideae. Manejo agroecológico: propagación principal por hijuelos basales-rizomas (la planta produce 20-50 hijos a lo largo de su vida) cicatrizados 7-10 días, distancia 1.5-2 m monocultivo o 2-3 m disperso, tolera sequía extrema y suelos pobres pedregosos, prácticamente sin manejo durante 7-10 años hasta floración, ciclo productivo más corto que A. americana, alelopática moderada. Función en chagra como cerca viva impenetrable, ornamental xerofítica vistosa, productora de fibra y aguardiente artesanal experimental, atractora de polinizadores nocturnos, conservación de germoplasma Agave. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, Pérez Arbeláez 1947, SiB Colombia, IAvH Flora Alto Andina.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH43_CACTACEAS_SUCULENTAS",
+      "id": "sansevieria_trifasciata",
+      "nombre_comun": "Lengua de suegra",
+      "nombre_comunes_regionales": [
+        "espada de San Jorge",
+        "lengua de tigre",
+        "snake plant",
+        "viper bowstring hemp",
+        "san sebastián"
+      ],
+      "nombre_cientifico": "Dracaena trifasciata (Prain) Mabb.",
+      "familia_botanica": "Asparagaceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "ground_cover",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1800,
+        "max_absoluto": 2400
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 18,
+        "optimo_max": 30,
+        "max_tolerable": 38
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "methods": [
+          "division_mata",
+          "esqueje",
+          "rizoma"
+        ],
+        "best_method": "division_mata",
+        "protocol_resumen": "Propagación por división de mata (separar rizomas con 2-3 hojas y raíces propias) o por esqueje foliar (cortar hoja en secciones de 5-10 cm, cicatrizar 2-3 días, enterrar 1/3 vertical en sustrato bien drenado — pierde variegado en cultivares amarillos). Establecimiento 30-60 días.",
+        "tiempo_a_establecimiento_dias": 45,
+        "notas": "Reclasificada taxonómicamente: anteriormente Sansevieria trifasciata Prain (1903) — desde 2017 (Mabberley) se ubica en género Dracaena como D. trifasciata, aunque el nombre vernáculo 'sansevieria' persiste en cultivo y comercio. Famosa por filtración nocturna de toxinas del aire interior (formaldehído, benceno, tricloroetileno) estudio NASA Clean Air 1989 — purificadora aire interior por excelencia.",
+        "fuente": "POWO Kew; Mabberley 2017; NASA Clean Air Study 1989; JBB Plantas Medicinales"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "jbb-plantas-medicinales",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "La lengua de suegra o espada de San Jorge (Dracaena trifasciata (Prain) Mabb., Asparagaceae subfamilia Nolinoideae, basónimo y sinónimo de cultivo Sansevieria trifasciata Prain) es una planta suculenta-rizomatosa perenne nativa de África occidental tropical (Nigeria, Camerún, República Democrática del Congo) ampliamente naturalizada en Colombia desde hace décadas como ornamental cosmopolita de interior y exterior entre 0 y 1.800 msnm en zonas térmicas cálidas-templadas: prácticamente ubicua en huertos caseros, antejardines, materas urbanas, oficinas, hospitales y escuelas de todo el país (Bogotá, Medellín, Cali, Barranquilla, Cartagena, Bucaramanga, Pereira, Manizales, Ibagué, Neiva, Pasto, Cúcuta, Tunja, Villavicencio). Reclasificación taxonómica reciente importante: el género Sansevieria fue fusionado al género Dracaena por Mabberley (2017) basándose en estudios moleculares y morfológicos modernos, por lo que el nombre científico válido actual es Dracaena trifasciata (Prain) Mabb. — aunque el nombre vernáculo comercial 'sansevieria' persiste universalmente en horticultura y comercio. Pertenece a la familia Asparagaceae subfamilia Nolinoideae (taxonomía APG IV — antes en Ruscaceae, antes en Dracaenaceae, antes en Agavaceae, antes en Liliaceae — historia perfecta para enseñar a niñas y niños cómo la taxonomía botánica cambia con evidencia molecular contemporánea), planta rizomatosa con hojas suculentas erguidas rígidas lanceolado-lineales aplanadas (40-120 cm largo x 4-7 cm ancho) verde oscuro brillante con bandas transversales irregulares verde-claro-grisáceas (en el tipo silvestre) o variegado amarillo-marginal (cultivares ornamentales 'Laurentii', 'Hahnii', 'Moonshine'), inflorescencia racimo terminal cilíndrico erecto con flores blanco-cremas pequeñas perfumadas nocturnas melíferas-polinizadas por polillas. Patrón fotosintético CAM como suculenta xerofítica adaptada — característica clave que la hace excepcional para interiores: a diferencia de la mayoría de plantas C3-C4 que toman CO2 de día y liberan O2 de día, las plantas CAM (Sansevieria, Aloe, Agave, cactos, piñas, orquídeas-CAM) abren estomas y absorben CO2 de noche para fijar carbono mediante ácido málico almacenado en vacuolas y procesar en Ciclo Calvin durante el día con estomas cerrados (reducción pérdida de agua), por lo que la lengua de suegra libera O2 de noche dentro de la habitación-dormitorio — perfecta planta de interior nocturna. Es lección viva extraordinaria de purificación del aire interior (estudio histórico NASA Clean Air Study 1989 — coordinado por B.C. Wolverton — identificó a Dracaena trifasciata entre las 10 plantas más eficientes para filtrar formaldehído, benceno, tricloroetileno, xileno, tolueno y otros COV de aire interior, datos relevantes en arquitectura sostenible y bienestar laboral-domiciliario), taxonomía botánica contemporánea-molecular y patrón fotosintético CAM. Uso medicinal tradicional caribeño africano: rizoma rallado en infusión como adyuvante antiparasitario (uso popular sin validación clínica fuerte), fibra muy fuerte de hojas trituradas se ha usado tradicionalmente en África Occidental para arcos-y-flechas y tejidos rurales (nombre vernáculo inglés 'viper bowstring hemp' = cáñamo cuerda-de-arco-de-víbora). Manejo agroecológico: propagación principal por división de mata (separar rizomas con 2-3 hojas y raíces propias) o por esqueje foliar (cortar hoja en secciones de 5-10 cm — vertical en sustrato seco — pierde variegado amarillo en cultivares variegados que revierten a verde plain), sustrato muy drenado tipo cactos (tierra + arena gruesa + perlita 1:1:1), sombra parcial a sol parcial filtrado (no sol pleno tropical — quema hojas), riego escaso quincenal o mensual (es planta extremadamente tolerante a olvido — sobrevive 4-8 semanas sin riego). Función en chagra/huerto urbano-interior como ornamental purificadora aire interior por excelencia (dormitorio-oficina-aula escolar), cobertura del suelo seca, atractora de polillas polinizadoras nocturnas, plantilla ideal para enseñar fotosíntesis CAM y taxonomía molecular a niñas y niños en huertas escolares. Fuentes Tier A: GBIF, POWO Kew, Mabberley 2017, NASA Clean Air Study 1989, JBB Plantas Medicinales, Bernal 2015, Pérez Arbeláez 1947.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH43_CACTACEAS_SUCULENTAS",
+      "id": "crassula_ovata",
+      "nombre_comun": "Planta jade",
+      "nombre_comunes_regionales": [
+        "árbol de jade",
+        "planta de la fortuna",
+        "money tree",
+        "friendship tree",
+        "lucky plant"
+      ],
+      "nombre_cientifico": "Crassula ovata (Mill.) Druce",
+      "familia_botanica": "Crassulaceae",
+      "category": "ornamentales_nativas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 12,
+        "optimo_max": 26,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "methods": [
+          "esqueje"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Propagación por esqueje foliar simple (arrancar hoja entera con peciolo, cicatrizar 3-7 días a la sombra antes de poner sobre sustrato apenas humedecido — emite raíces y nueva roseta) o esqueje de tallo de 5-15 cm. Sin riego primera semana. Establecimiento 15-30 días — entre las suculentas más fáciles de propagar.",
+        "tiempo_a_establecimiento_dias": 25,
+        "notas": "Familia tipo del patrón fotosintético CAM (Crassulacean Acid Metabolism — nombre proviene de esta familia, descubierto en Crassulaceae). Lección perfecta de fisiología CAM para huertas escolares. Tolerante a heladas suaves breves.",
+        "fuente": "POWO Kew; JBB Plantas Medicinales; Pérez Arbeláez 1947"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "jbb-plantas-medicinales",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "La planta jade o árbol de jade (Crassula ovata (Mill.) Druce, Crassulaceae) es una planta suculenta arbustiva perenne originaria de Sudáfrica (provincia del Cabo Oriental y KwaZulu-Natal — bioma sudafricano fynbos-thicket) introducida y cultivada en Colombia desde hace décadas como ornamental cosmopolita de interior y exterior entre 1.500 y 2.800 msnm en zonas térmicas templadas-frías-moderadas: Sabana de Bogotá (Bogotá, Funza, Mosquera, Chía, Cota, Cajicá, Sopó, Tocancipá — corazón altiplánico cundiboyacense), Boyacá (Tunja, Duitama, Sogamoso, Villa de Leyva, Paipa), Antioquia oriental (Rionegro, La Ceja, Marinilla, Guarne, El Carmen de Viboral, El Retiro), Valle del Cauca (cinturón frutícola), Quindío, Risaralda, Caldas (Eje Cafetero), Cauca (Popayán), Nariño (Pasto, Ipiales), Santander (Bucaramanga, Floridablanca, Piedecuesta, San Gil), Norte de Santander (Pamplona), Cundinamarca templada (Fusagasugá, Pacho, La Mesa, Anolaima) y Tolima alto (Líbano, Ibagué cordillera). Pertenece a la familia Crassulaceae (igual familia que kalanchoes, sedums, echeverias, sempervivium, dudleyas y otras suculentas ornamentales-medicinales), planta arbustiva ramificada de 1-2.5 m de altura con tallos suculentos gruesos verde-grisáceo-marronáceos leñosos en la base, hojas suculentas ovaladas-redondeadas verde-jade-brillantes opacas brillosas (3-7 cm largo x 2-4 cm ancho) opuestas en pares cruzados (filotaxia decusada — patrón clásico de Crassulaceae para enseñar morfología), margen entero a veces con borde rojizo en exposición pleno sol, flores blanco-rosadas pequeñas estrelladas (8-12 mm) en panículas terminales numerosas durante invierno seco-frío (noviembre-febrero en altiplano andino colombiano) melíferas atractivas para abejas Apis y nativas Meliponini. Es lección viva extraordinaria de fisiología vegetal CAM (Crassulacean Acid Metabolism — el nombre del patrón metabólico CAM proviene literalmente de la familia Crassulaceae donde fue descubierto y descrito originalmente en los 1940s: las plantas CAM abren estomas y absorben CO2 de noche para fijar carbono mediante ácido málico almacenado en vacuolas, procesan en Ciclo Calvin durante el día con estomas cerrados reduciendo drásticamente la pérdida de agua por transpiración, adaptación clave a sequía documentada en Crassulaceae, Cactaceae, Agavaceae, Liliaceae sensu lato, Bromeliaceae, Orchidaceae epífitas y otros grupos suculentos), facilidad de propagación clonal (las hojas caídas emiten raíces y nuevas rosetas espontáneamente, perfecta para huertas escolares) y simbolismo cultural-económico (en culturas asiáticas-japonesas-chinas se llama 'árbol del dinero' o 'planta de la fortuna' y se regala en bodas-mudanzas-graduaciones como símbolo de prosperidad y amistad). Patrón fotosintético CAM por excelencia. Manejo agroecológico: propagación clonal extraordinariamente fácil — arrancar una hoja entera con peciolo, dejarla cicatrizar 3-7 días a la sombra, ponerla sobre sustrato apenas humedecido (tipo cactos: tierra + arena gruesa + perlita 1:1:1) y a los 15-30 días emite raíces y nueva roseta clonal (las hojas caídas espontáneamente en macetas vecinas se enraízan solas — la planta es prolíficamente clonal), también por esqueje de tallo de 5-15 cm cicatrizado, distancia 30-50 cm en bordes ornamentales o materas individuales, sol pleno a sombra parcial filtrada, riego escaso quincenal-mensual (tolera 4-8 semanas sin riego sin daño), tolera heladas suaves breves (-2 °C), suelos pobres pedregosos arenosos, prácticamente sin manejo durante décadas de vida productiva. Función en chagra/huerto urbano-escolar como ornamental cosmopolita de interior-exterior, planta perfecta para enseñar fisiología CAM y propagación clonal a niñas y niños en huertas escolares (un solo individuo produce decenas de hijos por hojas caídas — multiplicación gratuita ilimitada), atractora invernal de polinizadores (abejas, mariposas), cobertura ornamental templada-fría. Fuentes Tier A: GBIF, POWO Kew, JBB Plantas Medicinales Cundinamarca-Boyacá, Bernal 2015, Pérez Arbeláez 1947.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH43_CACTACEAS_SUCULENTAS",
+      "id": "kalanchoe_pinnata",
+      "nombre_comun": "Siempreviva",
+      "nombre_comunes_regionales": [
+        "hoja del aire",
+        "yerba bruja",
+        "prodigiosa",
+        "hoja milagrosa",
+        "planta de Goethe",
+        "hojerilla",
+        "leaf of life"
+      ],
+      "nombre_cientifico": "Kalanchoe pinnata (Lam.) Pers.",
+      "familia_botanica": "Crassulaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "ground_cover",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 2200,
+        "max_absoluto": 2600
+      },
+      "temperatura_c": {
+        "helada_letal": 3,
+        "optimo_min": 16,
+        "optimo_max": 28,
+        "max_tolerable": 36
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "esqueje"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "PROPAGACIÓN FOLIAR MILAGROSA: cada hoja madura desprendida emite plantulas (propágulos) en cada hendidura del margen serrado-crenado — apomixis foliar verdadera. Basta dejar una hoja sobre suelo apenas humedecido o incluso pegada con cinta en una pared y a los 7-21 días emite 5-15 plantulas en miniatura con raíces y hojas listas para autopropagación. Establecimiento 7-21 días — la más rápida y mágica del catálogo.",
+        "tiempo_a_establecimiento_dias": 14,
+        "notas": "PEDAGÓGICAMENTE EXCELENTE PARA HUERTAS ESCOLARES: apomixis foliar visible — la lección de reproducción asexual vegetativa más impactante para niñas y niños. Cada hoja se vuelve madre de docenas de hijos en semanas, sin semilla, sin floración. Goethe la estudió y nombró 'Goethe-Pflanze' por su capacidad regenerativa.",
+        "fuente": "POWO Kew; Pamplona-Roger 2006; JBB Plantas Medicinales; Pérez Arbeláez 1947"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "La siempreviva u hoja del aire (Kalanchoe pinnata (Lam.) Pers., Crassulaceae, sinónimo Bryophyllum pinnatum (Lam.) Oken — algunos autores la ubican aún en género Bryophyllum) es una planta suculenta perenne originaria de Madagascar y África Oriental tropical, ampliamente naturalizada pantropicalmente (incluida Colombia desde hace siglos) entre 0 y 2.200 msnm en zonas térmicas cálidas-templadas-moderadas en casi todo el país: Antioquia (Medellín, Suroeste cafetero, Oriente, Bajo Cauca), Valle del Cauca (cinturón frutícola y zonas urbanas), Cundinamarca (Sabana templada — La Mesa, Anolaima, Anapoima, Fusagasugá), Boyacá templada (Moniquirá, Santana, Chitaraque), Caldas, Risaralda, Quindío (Eje Cafetero), Tolima, Huila, Santander (Bucaramanga, San Gil, Barichara, Lebrija), Norte de Santander, Magdalena (Santa Marta), Atlántico (Barranquilla), Bolívar (Cartagena), Cesar (Valledupar), La Guajira (sur), Córdoba, Sucre, Chocó (Quibdó), Cauca, Nariño y zonas urbanas en general. Es lección viva PEDAGÓGICAMENTE EXCELENTE — entre las plantas más mágicas del catálogo de huerta escolar — de reproducción asexual vegetativa por apomixis foliar (también llamada reproducción foliar plantular o yemas foliares marginales), un fenómeno biológico extraordinario que enseña a niñas y niños cómo una sola hoja desprendida de Kalanchoe pinnata produce espontáneamente 5-15 plantulas en miniatura (propágulos foliares) en cada hendidura del margen serrado-crenado de la hoja — sin necesidad de semilla, sin floración, sin polinización, sin riego intensivo, en apenas 7-21 días — basta dejar una hoja sobre tierra apenas humedecida (o incluso pegada con cinta a una pared con humedad ambiental) para que emita docenas de hijos perfectos clonales con sus propias raíces y hojas listas para autopropagarse y formar nuevas plantas adultas en pocos meses. Goethe la estudió obsesivamente durante sus investigaciones de metamorfosis vegetal y la nombró 'Goethe-Pflanze' (planta de Goethe) en honor a esa capacidad regenerativa que parecía contradecir las leyes biológicas conocidas en su época (siglo XVIII-XIX) — fenómeno hoy entendido como meristemos epifilos pre-formados en el primordio foliar que se activan tras desconexión del flujo de auxinas-citokininas de la planta madre. Pertenece a la familia Crassulaceae (igual familia que Crassula ovata jade, sedum, echeveria), planta perenne arbustiva-herbácea de 0.6-1.8 m de altura con tallos suculentos huecos rojizo-verdosos, hojas suculentas opuestas decusadas pinnadas en las plantas adultas (3-5 folíolos elípticos crenado-aserrados) o simples ovalado-crenadas en plantas juveniles (3-15 cm largo x 2-8 cm ancho) verde-jade brillantes a veces con bordes rojizos en exposición sol, inflorescencia panícula terminal péndula vistosa con flores tubulares colgantes péndulas anaranjado-rojizo-purpúreas (2-5 cm largo) polinizadas por colibríes (Trochilidae — colibríes esmeralda, pico-de-hoz, ermitaños neotropicales) y polillas crepusculares, frutos folículos con muchas semillas pequeñas (rara vez forma fruto en Colombia — predomina reproducción foliar asexual). Patrón fotosintético CAM. Uso medicinal tradicional pantropical bien documentado: hojas frescas trituradas como cataplasma cicatrizante de heridas-quemaduras-úlceras cutáneas, jugo de hojas como antiinflamatorio-antitusivo-diurético-antilitiásico (uso popular muy difundido en Colombia, Caribe, Centroamérica, Brasil, África, India — 'leaf of life'), estudios fitoquímicos identifican bufadienólidos (cardenólidos similares a digitálicos — precaución cardíaca en dosis altas), flavonoides, esteroles, ácidos orgánicos. Considerada planta ritual-protectora en tradiciones afrocaribeñas-yorubas santería ('yerba bruja' protectora del hogar). Manejo agroecológico: PROPAGACIÓN PRÁCTICAMENTE GRATUITA E ILIMITADA — basta dejar una hoja madura desprendida sobre sustrato apenas humedecido (tierra + arena 1:1) o incluso colgada en una bolsa plástica transparente con poca humedad ambiental y a los 7-21 días emite plantulas marginales listas para trasplantar individualmente, distancia 30-50 cm en cobertura, sombra parcial a sol parcial filtrado (no sol pleno tropical), riego moderado-escaso, suelos bien drenados, tolera sequía moderada, asocio con menta, hierbabuena, hierbabuena, cilantro, ajenjo, ruda en huertos medicinales caseros. Función en chagra/huerto escolar como medicinal tradicional cosmopolita de soberanía alimentaria, planta PEDAGÓGICAMENTE EXCELENTE para enseñar reproducción asexual vegetativa por apomixis foliar a niñas y niños (la lección biológica más impactante y visual de toda la huerta — un solo experimento simple con una hoja sobre tierra muestra la magia de la propagación clonal), cobertura del suelo medicinal, atractora de colibríes y polillas, ornamental tropical. Fuentes Tier A: GBIF, POWO Kew, Pamplona-Roger 2006 Plantas Medicinales, JBB Plantas Medicinales Cundinamarca-Boyacá, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015.",
+      "validation_level": "claude_draft"
     }
   ],
   "biopreparados": [
