@@ -11259,6 +11259,425 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El uvito de monte o chaquilulo (Cavendishia bracteata (Ruiz & Pav. ex J.St.-Hil.) Hoerold, Ericaceae) es un arbusto o arbolito andino nativo (1-4 m altura, ocasionalmente epífito sobre árboles del bosque alto-andino) propio del bosque alto-andino y subpáramo colombiano entre 2.400 y 3.200 msnm, presente en Cundinamarca (Cruz Verde, Sumapaz, Chingaza, Verjón, Guasca), Boyacá (Iguaque, Arcabuco, Cocuy, Pisba), Santander (Berlín), Antioquia (Belmira, Sonsón), Tolima, Cauca, Caldas, Risaralda y Nariño. Pertenece a Ericaceae tribu Vaccinieae (igual familia que arándanos, uva camarona, mortiño y asnao). Hojas coriáceas alternas elípticas-lanceoladas brillantes con nervadura broquidódroma característica, brácteas florales rojo-vivas muy llamativas (de ahí el epíteto bracteata) que envuelven la inflorescencia y persisten en el fruto, flores tubulares colgantes rojo-anaranjadas o rojo-blancas (1.5-2 cm) que atraen colibríes paramunos especialistas (Lafresnaya lafresnayi, Coeligena bonapartei, Eriocnemis vestita) en una coevolución planta-colibrí clásica andina. Frutos en baya globosa azul-violeta-negra (8-12 mm) comestible de sabor dulce-aromático intenso (alto en antocianinas, polifenoles, vitamina C: comparable a arándanos importados). Es lección viva de soberanía alimentaria y biodiversidad andina que enseña a niñas y niños por qué tenemos arándanos colombianos nativos sin necesidad de importar blueberries de Norteamérica: el chaquilulo, la uva camarona, el asnao y el mortiño son nuestras frutas Ericaceae andinas, adaptadas al páramo, productivas, deliciosas y de menor huella de carbono. Reivindicada hoy por chefs colombianos y agroecólogos como superfruta nativa. Aparece en planes de restauración Cruz Verde-Sumapaz como especie productiva de doble propósito. Manejo agroecológico: propagación por semilla (sustrato ácido pH 4.5-5.5, germinación 60-120 días) o esqueje semileñoso bajo cámara húmeda, vivero 12-24 meses antes de trasplante, distancia 1.5-2 m, fructificación a partir de 4-6 años, función como frutal silvestre, atractor de colibríes, nurse plant en restauración y cultivo agroforestal nativo. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "indigofera_suffruticosa",
+      "nombre_comun": "Añil indígena",
+      "nombre_comunes_regionales": [
+        "añil",
+        "azul de mata",
+        "jiquilete",
+        "indigo silvestre"
+      ],
+      "nombre_cientifico": "Indigofera suffruticosa Mill.",
+      "familia_botanica": "Fabaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "nitrogen_fixer",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1500,
+        "max_absoluto": 2000
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "jbb-plantas-medicinales",
+        "sib-colombia",
+        "humboldt-flora-alto-andina"
+      ],
+      "valor_pedagogico": "El añil indígena (Indigofera suffruticosa Mill., Fabaceae) es un arbusto leguminoso nativo neotropical (50-200 cm altura, ocasionalmente hasta 3 m) ampliamente distribuido en tierras cálidas y templadas de Colombia entre 0 y 1.500 msnm, presente en Caribe (Magdalena, Cesar, Bolívar, Atlántico, Córdoba, Sucre, La Guajira), valles interandinos (Cauca, Tolima, Huila), Pacífico (Chocó, Valle), Orinoquía (Casanare, Meta, Arauca) y Amazonía. Hojas alternas imparipinnadas (5-9 pares de folíolos elíptico-oblongos), racimos axilares densos de flores papilionáceas rosado-anaranjadas pequeñas (4-6 mm) que atraen abejas melíferas y nativas, frutos en legumbres cilíndricas falcadas (15-25 mm) con 6-10 semillas marrón-grisáceas. Es lección viva de soberanía cromática y química verde indígena que enseña a niñas y niños cómo nuestras comunidades produjeron el legendario tinte azul-índigo precolombino mucho antes que la anilina sintética alemana: el añil fue cultivado y procesado por comunidades Wayúu, Zenú, Kogui y campesinas del Caribe-Pacífico para teñir mantas, hamacas, mochilas y vestimenta ceremonial, mediante un proceso de fermentación anaeróbica de las hojas verdes en agua (24-48 horas) que libera el precursor indicán, oxidación al aire que produce indigotina insoluble azul-profunda, y precipitación-secado para obtener pasta o polvo de tinte. La Colonia luego industrializó haciendas añileras en el Caribe colombiano (siglos XVII-XIX). Hoy reivindicado por colectivos artesanos del Caribe (Mompox, San Jacinto, Galerazamba) como tinte natural sostenible alternativo a colorantes industriales. Como leguminosa fija nitrógeno atmosférico vía Rhizobium en raíces (60-120 kg N/ha/año), recupera suelos degradados y funciona como abono verde de cobertura tropical. Manejo agroecológico: propagación por semilla escarificada con agua caliente 24h (germinación 7-14 días), siembra directa al inicio de lluvias, distancia 0.5-1 m, ciclo productivo de cosecha de hojas a partir de 4-6 meses, manejo como cobertura semi-perenne 2-3 años, atractora de polinizadores y fijadora de N en sistemas agroforestales tropicales. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, Pérez Arbeláez 1947 Plantas Útiles, JBB Plantas Medicinales, SiB Colombia, IAvH Flora."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "genipa_americana",
+      "nombre_comun": "Jagua",
+      "nombre_comunes_regionales": [
+        "huito",
+        "jenipapo",
+        "caruto",
+        "totumillo",
+        "irayol"
+      ],
+      "nombre_cientifico": "Genipa americana L.",
+      "familia_botanica": "Rubiaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1200,
+        "max_absoluto": 1500
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia",
+        "humboldt-flora-alto-andina",
+        "jbb-plantas-medicinales"
+      ],
+      "valor_pedagogico": "La jagua o huito (Genipa americana L., Rubiaceae) es un árbol neotropical nativo (8-15 m altura, ocasionalmente hasta 20 m, tronco recto con corteza gris-clara) ampliamente distribuido en tierras cálidas y templadas de Colombia entre 0 y 1.200 msnm, presente en Caribe, Pacífico (especialmente Chocó-Darién), valle del Magdalena, Catatumbo, Orinoquía y Amazonía colombiana. Hojas grandes simples opuestas oblongo-elípticas (15-35 cm) brillantes con estípulas interpeciolares características de Rubiaceae, flores tubulares blanco-cremas a amarillentas (3-5 cm) muy fragantes que atraen polillas esfíngidas crepusculares y abejas, frutos en baya globosa-elipsoide (8-12 cm) marrón-grisácea con pulpa amarillenta dulce-ácida aromática y semillas numerosas planas. Es lección viva de soberanía cromática indígena amazónico-pacífica que enseña a niñas y niños cómo los pueblos Embera, Wounaan, Tikuna, Yagua, Kichwa, Bora, Huitoto y comunidades afrocolombianas del Pacífico han usado el fruto verde como tinte azul-negro corporal ceremonial (kipará/jagua) durante milenios: el jugo del fruto verde inmaduro contiene genipina incolora que reacciona con aminoácidos cutáneos formando una pigmentación azul-negra profunda que dura 12-15 días sin dañar la piel, usada en pintura corporal ritual, marcaje de pertenencia clánica, repelente espiritual de malas energías, protección contra insectos (la planta tiene actividad antimalárica documentada) y como tinte natural permanente para fibras vegetales (chambira, werregue, iraca) y artesanía cestera. La pulpa madura es comestible (mermeladas, jaleas, bebidas fermentadas tradicionales como jugo de jagua chocoano). Manejo agroecológico: propagación por semilla fresca (germinación 30-60 días), vivero 6-12 meses, distancia 6-8 m, fructificación a partir de 5-7 años, función como árbol multipropósito frutal-tintóreo-medicinal en sistemas agroforestales Pacífico y Amazonía, atractor de polinizadores nocturnos y nurse plant en restauración de selva húmeda tropical. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, Pérez Arbeláez 1947, SiB Colombia, IAvH Flora, JBB Plantas Medicinales."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "caesalpinia_sappan",
+      "nombre_comun": "Palo brasil",
+      "nombre_comunes_regionales": [
+        "sappan",
+        "brasilete",
+        "palo de tinte",
+        "palo rojo",
+        "sappanwood"
+      ],
+      "nombre_cientifico": "Biancaea sappan (L.) Tod.",
+      "familia_botanica": "Fabaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "nitrogen_fixer",
+        "living_fence"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1200,
+        "max_absoluto": 1600
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "perez-arbelaez-1947-plantas-utiles",
+        "jbb-plantas-medicinales",
+        "humboldt-flora-alto-andina"
+      ],
+      "valor_pedagogico": "El palo brasil o sappan (Biancaea sappan (L.) Tod., antes Caesalpinia sappan L., Fabaceae) es un árbol o arbusto leguminoso espinoso (4-10 m altura, ocasionalmente hasta 12 m, tronco con espinas curvas características) originario del sudeste asiático (India, Birmania, Tailandia, Malasia, Indonesia, Filipinas) introducido tempranamente a América tropical durante la colonia y hoy naturalizado en regiones cálidas-templadas de Colombia entre 100 y 1.200 msnm, particularmente en Caribe (Magdalena, Bolívar, Sucre), valle del Cauca, Tolima-Huila y Santander. Hojas alternas bipinnadas con 8-13 pares de pinnas (cada pinna con 10-20 pares de folíolos pequeños oblongos), inflorescencias panículas terminales amarillas-doradas, frutos en legumbres aplanadas (5-10 cm) leñosas dehiscentes con 3-4 semillas marrones. Es lección viva de historia global del color y rutas comerciales tintóreas que enseña a niñas y niños cómo el rojo intenso que dio nombre al país sudamericano Brasil viene de una especie hermana de palo brasil (Paubrasilia echinata), y cómo el sappan asiático fue el sustituto colonial introducido por españoles a América: del duramen rojo-anaranjado de la madera se extrae brasilina, pigmento natural soluble en agua que produce rojos-vinosos-violáceos profundos usados durante siglos para teñir lanas, sedas, algodones, papeles, tintas para escribir manuscritos coloniales y como colorante alimentario tradicional. Reivindicado hoy por artesanos textiles del Caribe colombiano (Mompox, San Jacinto, Sampués) como tinte rojo natural alternativo a colorantes azoicos sintéticos. Como leguminosa fija nitrógeno atmosférico vía Rhizobium (40-80 kg N/ha/año), y funciona como cerca viva espinosa eficaz por sus espinas. Tiene también amplio uso medicinal tradicional asiático (antiinflamatorio, antimicrobiano, hepatoprotector) validado farmacognosticamente. Manejo agroecológico: propagación por semilla escarificada con agua caliente 24h (germinación 14-30 días) o esqueje semileñoso, vivero 8-12 meses, distancia 3-5 m si es individual, 0.5-1 m en seto-cerca viva, cosecha de duramen a partir de 6-10 años (no destructiva si se hace por poda selectiva), función como leguminosa multipropósito tintórea-cerca-fijadora-medicinal en sistemas agroforestales cálidos. Fuentes Tier A: GBIF, POWO Kew, FAO Ecocrop, Pérez Arbeláez 1947, JBB Plantas Medicinales, IAvH Flora."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "arrabidaea_chica",
+      "nombre_comun": "Carayurú",
+      "nombre_comunes_regionales": [
+        "chica",
+        "puca panga",
+        "crajirú",
+        "pariri",
+        "achiote del monte"
+      ],
+      "nombre_cientifico": "Fridericia chica (Bonpl.) L.G.Lohmann",
+      "familia_botanica": "Bignoniaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1000,
+        "max_absoluto": 1500
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia",
+        "jbb-plantas-medicinales",
+        "humboldt-flora-alto-andina"
+      ],
+      "valor_pedagogico": "El carayurú o chica (Fridericia chica (Bonpl.) L.G.Lohmann, antes Arrabidaea chica (Bonpl.) B.Verl., Bignoniaceae) es una liana o bejuco trepador leñoso amazónico-pacífico nativo (5-15 m largo, trepa por zarcillos) propio del bosque húmedo tropical de Colombia entre 100 y 1.000 msnm, presente en Amazonía (Amazonas, Putumayo, Caquetá, Guaviare, Vaupés, Guainía), Pacífico (Chocó, Valle, Cauca, Nariño), Orinoquía (Vichada, Meta) y Magdalena Medio. Hojas opuestas trifolioladas o bifolioladas con zarcillo terminal característico de Bignoniaceae, inflorescencias panículas axilares de flores tubulares rosado-lilas-blanquecinas (3-5 cm) que atraen colibríes y abejas grandes, frutos en cápsulas alargadas dehiscentes con semillas aladas. Es lección viva de farmacopea y cosmética amazónica indígena que enseña a niñas y niños cómo los pueblos Tikuna, Huitoto, Yucuna, Kichwa, Bora, Yagua, Shuar, Awá y Embera-Katío de la Amazonía-Pacífico colombiano han usado las hojas como fuente del legendario tinte rojo carayurú durante milenios: las hojas frescas se machacan y fermentan en agua, liberando antocianinas rojo-anaranjadas-violáceas (carajurina y carajurona, pigmentos flavonoides únicos del género) que se concentran en pasta-polvo seco de color rojo-ladrillo intenso, usado en pintura corporal ritual y cosmética indígena, marcaje ceremonial de chamanes y guerreros, tinte natural para fibras vegetales (chambira, palma real, werregue, iraca) y artesanía, y como remedio tradicional antiinflamatorio-cicatrizante-antimicrobiano (validado farmacognosticamente para uso dermatológico). Reivindicada por colectivos amazónicos como tinte natural sostenible y cosmético tradicional. Manejo agroecológico: propagación por esqueje semileñoso de tallo (mejor método, enraizamiento 30-60 días bajo cámara húmeda) o semilla (menos común), vivero 6-12 meses, requiere tutor o soporte vivo (árbol nodriza), cosecha de hojas a partir de 12-18 meses con sistema de poda rotacional sostenible, función como liana medicinal-tintórea-cosmética en sistemas agroforestales pacífico-amazónicos, atractora de colibríes. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, Pérez Arbeláez 1947, SiB Colombia, JBB Plantas Medicinales, IAvH Flora."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "furcraea_andina",
+      "nombre_comun": "Fique andino",
+      "nombre_comunes_regionales": [
+        "cabuya",
+        "fique",
+        "penca",
+        "maguey andino",
+        "chuchau"
+      ],
+      "nombre_cientifico": "Furcraea andina Trel.",
+      "familia_botanica": "Asparagaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "living_fence",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "agrosavia-tibaitata",
+        "sib-colombia",
+        "humboldt-flora-alto-andina"
+      ],
+      "valor_pedagogico": "El fique andino o cabuya (Furcraea andina Trel., Asparagaceae subfamilia Agavoideae) es una planta xerófita rosetada gigante nativa andina (roseta de 1.5-3 m de diámetro, hojas suculentas-fibrosas verdes-grisáceas lanceoladas dentadas en márgenes, inflorescencia panícula erecta gigante de 6-12 m al final de vida) propia de laderas secas y semihúmedas de Colombia entre 1.500 y 2.600 msnm, especialmente cultivada y semi-silvestre en Santander, Boyacá, Cauca, Antioquia, Nariño, Cundinamarca y Tolima. Inflorescencia con flores blanco-verdosas tubulares pendulosas que atraen murciélagos nectarívoros y colibríes, propagación principalmente vegetativa por bulbillos aéreos en la panícula (miles por planta) o por hijuelos basales (rebrotes laterales). Es lección viva de patrimonio agroindustrial nativo, identidad cultural santandereano-boyacense y soberanía textil colombiana que enseña a niñas y niños cómo el fique fue domesticado por culturas Muisca, Guane y Lache milenios antes de la llegada española, y cómo sus fibras vegetales fuertes y biodegradables fueron y siguen siendo la base de empaques de café exportación, costales, lazos, alpargatas tradicionales, mochilas wayuu (en mezcla con algodón), tapices, redes pesqueras artesanales y artesanía utilitaria de los Andes colombianos. Del corte longitudinal de las hojas (desfibrado mecánico tradicional con macana o moderno con desfibradoras) se obtienen 4-5% de fibras largas blancas (50-150 cm) que se secan al sol, se rastrillan y se hilan. El residuo verde (bagazo) es rico en sapogeninas esteroidales (precursores de hormonas farmacéuticas), forraje complementario y abono verde. Reivindicado hoy en planes de soberanía agroindustrial Santander-Boyacá con apoyo de Agrosavia (Tibaitatá) como cultivo patrimonial alternativo a polipropileno importado para empaques de café. Manejo agroecológico: propagación por bulbillos aéreos (germinación 30-60 días, mejor método) o hijuelos basales (trasplante directo), vivero 6-12 meses, distancia 2.5-3 m (monocultivo) o 1-1.5 m en seto-cerca viva, cosecha de hojas a partir de 4-6 años con sistema rotacional sostenible (8-12 hojas por planta al año), ciclo productivo 15-25 años, función como cerca viva multipropósito fibrera-saponífera-paisajística de laderas andinas. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, Pérez Arbeláez 1947, Agrosavia Tibaitatá, SiB Colombia, IAvH Flora."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "gossypium_barbadense_criollo",
+      "nombre_comun": "Algodón criollo del Caribe",
+      "nombre_comunes_regionales": [
+        "algodón pardo",
+        "algodón nativo",
+        "algodón pima",
+        "algodón tuparo",
+        "algodón vicuña"
+      ],
+      "nombre_cientifico": "Gossypium barbadense L.",
+      "familia_botanica": "Malvaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 800,
+        "max_absoluto": 1200
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia",
+        "agrosavia-tibaitata",
+        "humboldt-flora-alto-andina"
+      ],
+      "valor_pedagogico": "El algodón criollo del Caribe (Gossypium barbadense L., Malvaceae) es un arbusto-subarbusto perenne o anual nativo neotropical (1-2.5 m altura) considerado uno de los cuatro algodones domesticados del mundo (junto con G. hirsutum mesoamericano, G. arboreum y G. herbaceum afroasiáticos), de fibra extra-larga (35-50 mm, considerada premium mundial), distribuido históricamente en tierras cálidas costeras de Colombia entre 0 y 800 msnm, con variedades criollas tradicionales preservadas por comunidades Wayúu (La Guajira), Zenú (Sucre-Córdoba), Kogui (Sierra Nevada), Caribe en general y campesinos del valle del Cauca-Magdalena. Hojas alternas palmatilobadas con 3-5 lóbulos profundos, flores grandes (5-7 cm) amarillo-cremosas que viran a rosado-violáceas tras polinización (atrayendo abejas grandes y abejorros), frutos en cápsula (bellota o capullo) dehiscente que libera fibras blancas o pardas-naturales adheridas a semillas oleaginosas marrones. Es lección viva de soberanía textil precolombina y patrimonio fitogenético nativo que enseña a niñas y niños cómo Colombia tuvo algodones nativos de fibra superior milenios antes de la llegada del algodón comercial (G. hirsutum acala) importado del Texas estadounidense en el siglo XX: las variedades criollas pardas (algodón pardo, tuparo, vicuña) preservadas por mujeres Wayúu y Zenú tienen fibras coloreadas naturalmente (beige, marrón, café, ocre) que no requieren tintes, son resistentes a plagas tropicales (gorgojo del algodón, Anthonomus grandis), y son la materia prima ancestral de mantas wayuu, hamacas de chinchorro, tejidos zenú, sombreros vueltiao (en mezcla con caña flecha) y artesanía textil del Caribe colombiano. Hoy reivindicado por colectivos Wayúu, Zenú y mujeres tejedoras del Caribe en alianza con Agrosavia (Tibaitatá) y BanRep Etnoeducación como cultivo patrimonial alternativo a algodón transgénico importado, con valor agregado en mercados de moda lenta y comercio justo. Manejo agroecológico: propagación por semilla (germinación 7-14 días), siembra al inicio de lluvias, distancia 0.8-1 m entre plantas y 1.2-1.5 m entre surcos, ciclo productivo 5-7 meses (anual) o 2-4 años (perenne arbustivo en clima cálido estable), cosecha manual escalonada de capullos, función como cultivo textil-fibrero-patrimonial en sistemas tropicales del Caribe-Pacífico colombiano. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, Pérez Arbeláez 1947, SiB Colombia, Agrosavia Tibaitatá, IAvH Flora."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "agave_cocui",
+      "nombre_comun": "Cocuy",
+      "nombre_comunes_regionales": [
+        "cocui",
+        "maguey de cocuy",
+        "cocuiza",
+        "cocuy pecayero",
+        "agave cocuy"
+      ],
+      "nombre_cientifico": "Agave cocui Trel.",
+      "familia_botanica": "Asparagaceae",
+      "category": "cercas_vivas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "living_fence",
+        "biomass_producer",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1500,
+        "max_absoluto": 2000
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia",
+        "humboldt-flora-alto-andina",
+        "jbb-plantas-medicinales"
+      ],
+      "valor_pedagogico": "El cocuy (Agave cocui Trel., Asparagaceae subfamilia Agavoideae) es una planta xerófita rosetada nativa caribeña-norandina (roseta de 1-2 m de diámetro y altura, hojas suculentas-fibrosas verde-grisáceas espinosas en margen y ápice, inflorescencia panícula erecta gigante de 4-8 m al final de vida hapaxántica) propia de zonas secas del norte de Colombia entre 100 y 1.500 msnm, especialmente en La Guajira, Cesar, Magdalena, norte de Santander (Cúcuta), enclaves secos del Patía-Cauca y el cañón del Chicamocha (Boyacá-Santander). Inflorescencia con flores amarillo-cremosas tubulares que atraen murciélagos nectarívoros (Leptonycteris curasoae, Glossophaga soricina), colibríes diurnos y polillas crepusculares en coevolución mutualista. Es lección viva de patrimonio biocultural caribeño-norandino y soberanía gastronómica indígena que enseña a niñas y niños cómo los pueblos Wayúu (La Guajira), Yukpa-Yuko (Serranía del Perijá) y comunidades campesinas binacionales Colombia-Venezuela han usado el cocuy de modo multipropósito durante siglos: las fibras de las hojas (tras desfibrado tradicional) producen cabuya gruesa para tejer mochilas, redes pesqueras, lazos y artesanías; el cogollo (piña central) fermentado tras hornearlo en hornos de tierra produce el legendario aguardiente artesanal 'cocuy de penca' (similar al mezcal mexicano, declarado patrimonio binacional Venezuela-Colombia con denominación de origen Pecaya); el dulce de mauche (jarabe concentrado del cogollo cocido) es endulzante tradicional; y la planta funciona como cerca viva espinosa eficaz contra ganado y como restauradora de suelos áridos degradados por sobrepastoreo. Reivindicado hoy por colectivos Wayúu y mestizos caribeños como cultivo patrimonial sostenible alternativo a monocultivos comerciales en zonas secas, con apoyo de etnobotánicos del Caribe y mercados de mezcales-aguardientes artesanales latinoamericanos. Manejo agroecológico: propagación por hijuelos basales (mejor método, trasplante directo) o semilla (germinación 30-90 días, más lento), vivero 8-12 meses, distancia 2-3 m monocultivo o 1-1.5 m en seto, ciclo productivo 8-15 años hasta floración (hapaxántico-muere tras florecer dejando hijuelos), cosecha de cogollo justo antes de la inflorescencia (manejo sostenible mantiene 2-3 hijuelos), función como cerca viva multipropósito fibrera-licorera-edulcorante-restauradora de zonas semiáridas caribeñas. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, Pérez Arbeláez 1947, SiB Colombia, IAvH Flora, JBB Plantas Medicinales."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "cecropia_telealba",
+      "nombre_comun": "Yarumo plateado",
+      "nombre_comunes_regionales": [
+        "yarumo blanco",
+        "guarumo",
+        "yarumo plateado",
+        "yagrumo blanco",
+        "trompeta de mono"
+      ],
+      "nombre_cientifico": "Cecropia telealba Cuatrec.",
+      "familia_botanica": "Urticaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "templado",
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "nurse_plant",
+        "biomass_producer",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1200,
+        "optimo_max": 2400,
+        "max_absoluto": 2800
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "sib-colombia",
+        "restauracion-cruz-verde-sumapaz",
+        "jbb-plantas-medicinales"
+      ],
+      "valor_pedagogico": "El yarumo plateado (Cecropia telealba Cuatrec., Urticaceae) es un árbol pionero andino nativo (8-20 m altura, ocasionalmente hasta 25 m, tronco recto hueco entrenudoso característico del género Cecropia que aloja hormigas Azteca en simbiosis) propio del bosque subandino y alto-andino colombiano entre 1.200 y 2.400 msnm, presente en cordilleras Oriental, Central y Occidental: Cundinamarca, Boyacá, Antioquia, Caldas, Risaralda, Quindío, Valle, Cauca, Nariño, Santander y Tolima. Hojas grandes peltadas digitalmente lobuladas (7-11 lóbulos, 25-50 cm de diámetro) con envés característico blanco-plateado tomentoso (de ahí el nombre 'telealba' = paño blanco) que crea efecto plateado visible a distancia en el dosel, inflorescencias amentos cilíndricos colgantes con flores diminutas dioicas, frutos numerosos en infrutescencias amentiformes amarillo-rojizas muy buscadas por tucanes, perezosos de tres dedos (Bradypus variegatus), monos y aves frugívoras. Es lección viva de ecología de bosques pioneros andinos y mutualismos planta-animal que enseña a niñas y niños cómo el yarumo plateado es uno de los pilares de la restauración de bosques alto-andinos colombianos por ser una especie pionera de crecimiento muy rápido (2-4 m/año), que abre dosel y crea sombra ligera bajo la cual germinan especies de sucesión tardía (robles, encenillos, gaques), aloja una de las simbiosis hormiga-planta mejor documentadas de los neotrópicos (las hormigas Azteca habitan los entrenudos huecos y defienden la planta contra herbívoros recibiendo a cambio cuerpos müllerianos ricos en glucógeno producidos en las trichilias de la base del peciolo), alimenta perezosos y tucanes en redes ecológicas críticas, produce fibra de corteza usada artesanalmente, sus hojas grandes y secas se usan tradicionalmente como papel-cartón biodegradable y como medicina (diurética, antiasmática, hipoglucemiante validada farmacognosticamente), y aparece como especie estratégica en planes de restauración Cruz Verde-Sumapaz, Chingaza y cuenca del río Bogotá. Manejo agroecológico: propagación por semilla (germinación 30-60 días, requiere luz) o esqueje semileñoso, vivero 6-12 meses, distancia 4-6 m, crecimiento juvenil muy rápido pero vida útil de árbol corta (30-50 años), función como árbol pionero de sombra ligera-restauración-nodriza-medicinal en sistemas agroforestales andinos y planes de restauración de cuencas. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora, SiB Colombia, Plan Restauración Cruz Verde-Sumapaz, JBB Plantas Medicinales."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "lonchocarpus_velutinus",
+      "nombre_comun": "Barbasco",
+      "nombre_comunes_regionales": [
+        "barbasco",
+        "cube",
+        "timbó",
+        "haiari",
+        "veneno de pesca"
+      ],
+      "nombre_cientifico": "Deguelia utilis (A.C.Sm.) A.M.G.Azevedo",
+      "familia_botanica": "Fabaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "nitrogen_fixer",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 800,
+        "max_absoluto": 1200
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sib-colombia",
+        "jbb-plantas-medicinales",
+        "humboldt-flora-alto-andina"
+      ],
+      "valor_pedagogico": "El barbasco o cube (Deguelia utilis (A.C.Sm.) A.M.G.Azevedo, antes Lonchocarpus utilis y comúnmente citado bajo el nombre genérico Lonchocarpus velutinus en literatura etnobotánica colombiana, Fabaceae) es un arbusto-bejuco leguminoso amazónico nativo (2-5 m altura o trepador 5-12 m) propio del bosque húmedo tropical de Colombia entre 100 y 800 msnm, presente en Amazonía (Amazonas, Putumayo, Caquetá, Vaupés, Guainía), Pacífico (Chocó, Valle, Cauca, Nariño), Orinoquía baja y Magdalena Medio. Hojas alternas imparipinnadas con folíolos elíptico-oblongos pubescentes, inflorescencias racimos axilares con flores papilionáceas violetas-lilas-blancas pequeñas (8-12 mm), frutos en legumbres aplanadas indehiscentes (3-8 cm) con 1-3 semillas. Es lección viva de etnoictiología y química botánica amazónica que enseña a niñas y niños cómo los pueblos Tikuna, Huitoto, Yagua, Bora, Kichwa, Cofán, Siona, Inga, Embera y Wounaan han usado las raíces y tallos machacados del barbasco como ictiotóxico tradicional para pesca de subsistencia en charcas, brazos cerrados y pozos estacionales de ríos amazónicos y pacíficos: las raíces contienen rotenona (5-10% en raíz seca), isoflavonoide que inhibe la cadena respiratoria mitocondrial de los peces causando asfixia rápida (los peces flotan en 10-30 min) sin contaminar significativamente la carne para consumo humano (la rotenona se degrada rápidamente en el tracto digestivo de mamíferos). USO RESPONSABLE INNEGOCIABLE: esta práctica solo es ecológicamente sostenible en POZOS PEQUEÑOS Y CERRADOS DE ESTACIÓN SECA (1-100 m²), donde el agua se renueva con las lluvias y mata exclusivamente peces capturables; ESTÁ PROHIBIDA y es ECOLÓGICAMENTE DESASTROSA en ríos abiertos, ciénagas grandes, lagos permanentes o cualquier cuerpo de agua con peces no-objetivo, juveniles, alevines, anfibios o invertebrados acuáticos protegidos. La rotenona también mata indiscriminadamente caracoles, larvas de insectos benéficos, anfibios y peces ornamentales endémicos. ALTERNATIVAS MODERNAS RECOMENDADAS para autoconsumo amazónico: pesca con anzuelo, atarrayas selectivas con malla apropiada al tamaño legal de pesca, nasas y trampas selectivas. La planta también tiene uso histórico (mediado siglo XX) como insecticida agrícola natural rotenoide contra plagas chupadoras (áfidos, ácaros) — hoy desplazado por preocupaciones sobre toxicidad a peces, abejas y biodiversidad acuática. Como leguminosa fija nitrógeno (40-80 kg N/ha/año) y aporta biomasa orgánica. Manejo agroecológico: propagación por esqueje de tallo (mejor método, enraizamiento 30-60 días) o semilla escarificada (germinación 14-30 días), vivero 6-12 meses, distancia 2-3 m, cosecha de raíces a partir de 18-24 meses solo para uso doméstico controlado o etnobotánico, función como leguminosa fijadora de N con uso restringido tradicional en sistemas agroforestales amazónicos bajo principios de manejo responsable. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, Pérez Arbeláez 1947, SiB Colombia, JBB Plantas Medicinales, IAvH Flora."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "crotalaria_juncea",
+      "nombre_comun": "Sunn hemp",
+      "nombre_comunes_regionales": [
+        "crotalaria",
+        "cáñamo de la India",
+        "sunn",
+        "abono verde tropical",
+        "crotalaria juncea"
+      ],
+      "nombre_cientifico": "Crotalaria juncea L.",
+      "familia_botanica": "Fabaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "nitrogen_fixer",
+        "biomass_producer",
+        "ground_cover",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1800,
+        "max_absoluto": 2200
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "agrosavia-tibaitata",
+        "agrosavia-leguminosas-andinas",
+        "agrosavia-forrajeras-2022",
+        "jbb-plantas-medicinales"
+      ],
+      "valor_pedagogico": "La crotalaria o sunn hemp (Crotalaria juncea L., Fabaceae) es una leguminosa herbácea-subarbustiva anual de rápido crecimiento (1.5-3 m altura, ocasionalmente hasta 4 m) originaria del subcontinente indio, ampliamente naturalizada y adoptada por la agroecología tropical mundial e introducida en Colombia para usos como abono verde y fibra, presente en tierras cálidas y templadas entre 0 y 1.800 msnm en Caribe, valle del Cauca-Magdalena, Tolima-Huila, valles interandinos y zona cafetera. Hojas simples lanceoladas-estrechas alternas (5-12 cm), inflorescencias racimos terminales erectos con flores papilionáceas amarillas brillantes grandes (2-3 cm) muy atractivas para abejas melíferas, abejorros nativos (Bombus, Trigona, Melipona) y mariposas, frutos en legumbres infladas cilíndricas (3-5 cm) características de Crotalaria (de ahí el nombre del género 'crotalum' = sonajero, por las semillas que suenan dentro al madurar). Es lección viva de agroecología tropical y soberanía edáfica que enseña a niñas y niños el potencial transformador de los abonos verdes leguminosos en sistemas tropicales para regenerar suelos degradados sin insumos químicos: la crotalaria juncea es uno de los abonos verdes leguminosos más eficientes del trópico mundial documentado por FAO Ecocrop, Embrapa, IITA y Agrosavia, capaz de fijar 120-300 kg N/ha en un solo ciclo de 90-120 días (récord entre leguminosas anuales tropicales) gracias a su robusta simbiosis con Rhizobium específicos, produce 8-15 toneladas de biomasa fresca por hectárea (4-6 t materia seca) en 3-4 meses, suprime malezas agresivas por sombreado denso y alelopatía suave, controla nematodos parásitos del suelo (Meloidogyne incognita, Pratylenchus) por su acción antagonista de raíces, mejora estructura del suelo con su sistema radicular pivotante de penetración profunda (1-1.5 m) que rompe compactaciones y recicla nutrientes del subsuelo, y produce fibra de corteza de calidad fina usada históricamente en cordelería marina, papel, redes de pesca y textil grueso. Adoptada en Colombia por Agrosavia (Tibaitatá) y movimientos agroecológicos en transición a la agricultura regenerativa como cobertura de pre-siembra en algodón, caña, café joven, hortalizas comerciales y restauración de suelos compactados. Manejo agroecológico: propagación por semilla escarificada con agua tibia 12h (germinación 5-10 días, alta tasa), siembra directa al voleo o en surcos al inicio de lluvias, densidad 30-50 kg semilla/ha, incorporación al suelo a la floración (60-90 días después de siembra, momento de pico N foliar) por corte y volcado superficial o picado con guadaña, dejar 15-30 días en descomposición antes de siembra del cultivo principal, función como abono verde-cobertura-fijadora-fibrera de ciclo corto en rotaciones tropicales agroecológicas. Fuentes Tier A: GBIF, POWO Kew, FAO Ecocrop, Agrosavia Tibaitatá, Agrosavia Leguminosas Andinas, Agrosavia Forrajeras 2022, JBB Plantas Medicinales."
     }
   ],
   "biopreparados": [
