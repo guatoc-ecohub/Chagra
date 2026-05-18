@@ -11259,6 +11259,505 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El uvito de monte o chaquilulo (Cavendishia bracteata (Ruiz & Pav. ex J.St.-Hil.) Hoerold, Ericaceae) es un arbusto o arbolito andino nativo (1-4 m altura, ocasionalmente epífito sobre árboles del bosque alto-andino) propio del bosque alto-andino y subpáramo colombiano entre 2.400 y 3.200 msnm, presente en Cundinamarca (Cruz Verde, Sumapaz, Chingaza, Verjón, Guasca), Boyacá (Iguaque, Arcabuco, Cocuy, Pisba), Santander (Berlín), Antioquia (Belmira, Sonsón), Tolima, Cauca, Caldas, Risaralda y Nariño. Pertenece a Ericaceae tribu Vaccinieae (igual familia que arándanos, uva camarona, mortiño y asnao). Hojas coriáceas alternas elípticas-lanceoladas brillantes con nervadura broquidódroma característica, brácteas florales rojo-vivas muy llamativas (de ahí el epíteto bracteata) que envuelven la inflorescencia y persisten en el fruto, flores tubulares colgantes rojo-anaranjadas o rojo-blancas (1.5-2 cm) que atraen colibríes paramunos especialistas (Lafresnaya lafresnayi, Coeligena bonapartei, Eriocnemis vestita) en una coevolución planta-colibrí clásica andina. Frutos en baya globosa azul-violeta-negra (8-12 mm) comestible de sabor dulce-aromático intenso (alto en antocianinas, polifenoles, vitamina C: comparable a arándanos importados). Es lección viva de soberanía alimentaria y biodiversidad andina que enseña a niñas y niños por qué tenemos arándanos colombianos nativos sin necesidad de importar blueberries de Norteamérica: el chaquilulo, la uva camarona, el asnao y el mortiño son nuestras frutas Ericaceae andinas, adaptadas al páramo, productivas, deliciosas y de menor huella de carbono. Reivindicada hoy por chefs colombianos y agroecólogos como superfruta nativa. Aparece en planes de restauración Cruz Verde-Sumapaz como especie productiva de doble propósito. Manejo agroecológico: propagación por semilla (sustrato ácido pH 4.5-5.5, germinación 60-120 días) o esqueje semileñoso bajo cámara húmeda, vivero 12-24 meses antes de trasplante, distancia 1.5-2 m, fructificación a partir de 4-6 años, función como frutal silvestre, atractor de colibríes, nurse plant en restauración y cultivo agroforestal nativo. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia."
+    },
+    {
+      "id": "malus_domestica_sabanera",
+      "nombre_comun": "Manzano de Sabana",
+      "nombre_comunes_regionales": [
+        "manzana sabanera",
+        "manzana cundiboyacense",
+        "manzano criollo"
+      ],
+      "nombre_cientifico": "Malus domestica (Suckow) Borkh. cv. Sabanera",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "windbreak"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2300,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 10,
+        "optimo_max": 18,
+        "max_tolerable": 24
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "injerto",
+        "notas": "Injerto sobre patrón franco (semillero local) o patrón clonal MM-106/M-9 para altiplano; requiere acumulación de horas frío (300-600 h <7°C) que sí se logra en Sabana Bogotá y altiplanos cundiboyacenses."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-manual-frutales-tropicales",
+        "ica-resolucion-3168-2015",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "El manzano de Sabana (Malus domestica (Suckow) Borkh. cv. Sabanera, Rosaceae) es un frutal templado caducifolio de la Sabana Bogotá y altiplano cundiboyacense, cultivado tradicionalmente entre 2.300 y 2.800 msnm en zona térmica fría con acumulación natural de horas frío (300-600 h <7°C). Presente en Cundinamarca (Sopó, Chía, Cota, Tenjo, Subachoque, Choachí, Ubaté), Boyacá (Paipa, Duitama, Sotaquirá, Tibasosa, Tunja), Nariño (Ipiales, Túquerres, Pasto) y altiplano antioqueño (Santa Rosa de Osos, Belmira). Árbol de 4-8 m de altura, copa redondeada, follaje caducifolio que reposa en periodo seco. Flores blanco-rosadas en corimbo que aparecen antes que las hojas, atrayendo abejas (Apis mellifera) y polinizadores nativos (Bombus rubicundus, Xylocopa). Frutos en pomo globoso de 5-8 cm, piel verde-amarilla con chapa rosa-rojiza al sol, pulpa blanca crujiente dulce-acidulada (12-14° Brix). Lección viva de soberanía alimentaria templada andina: enseña a niñas y niños que Colombia sí produce manzana propia, adaptada al clima frío de altura, sin necesidad de importar manzana chilena/argentina/estadounidense de menor frescura y mayor huella de carbono. Manejo agroecológico: poda de formación en vaso o eje central, distancia 4×5 m (500 árboles/ha), fertilización con compost + biol foliar, control de Cydia pomonella (gusano de la manzana) con trampas de feromona + Bacillus thuringiensis, manejo de Venturia inaequalis (sarna del manzano) con caldo bordelés + caldo sulfocálcico preventivo. Asocios productivos en altiplano: tagasaste (Cytisus proliferus) como cortavientos y aporte N, papa criolla en calles primeros 2 años, fresa Monterrey como cobertura productiva, trébol blanco fijador. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA Manual Frutales Tropicales, ICA Resolución 3168/2015, Pérez-Arbeláez 1947 Plantas Útiles."
+    },
+    {
+      "id": "pyrus_communis_anjou",
+      "nombre_comun": "Pera Anjou",
+      "nombre_comunes_regionales": [
+        "pera de agua",
+        "pera europea",
+        "pera anjou verde"
+      ],
+      "nombre_cientifico": "Pyrus communis L. cv. Anjou",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 2700,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -7,
+        "optimo_min": 10,
+        "optimo_max": 18,
+        "max_tolerable": 24
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "injerto",
+        "notas": "Injerto sobre patrón Pyrus communis franco o membrillero (Cydonia oblonga) que enaniza el árbol y precoza la entrada en producción; requiere ≥400 h frío <7°C."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-manual-frutales-tropicales",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "La pera Anjou (Pyrus communis L. cv. Anjou, Rosaceae) es un frutal templado caducifolio europeo tradicionalmente cultivado en el altiplano cundiboyacense desde la época colonial. Crece entre 2.200 y 2.700 msnm en zona térmica fría con acumulación de horas frío suficientes (≥400 h <7°C), presente en Cundinamarca (Sopó, Chía, Subachoque, Tenjo, Cogua, Zipaquirá, Ubaté), Boyacá (Paipa, Tibasosa, Duitama, Sogamoso, Nobsa, Tunja), Nariño (Pasto, Ipiales) y altiplano antioqueño (Santa Rosa de Osos, Belmira, La Unión). Árbol de 5-10 m de altura, copa piramidal-elongada, hábito más erecto que el manzano. Flores blancas en corimbo agrupado que abren antes que las hojas, fuerte atractivo para Apis mellifera y polinizadores nativos. Frutos en pomo piriforme característico (8-12 cm), piel verde-amarillenta con chapa rosa-asalmonada al sol, pulpa blanco-cremosa jugosa muy dulce-perfumada (13-15° Brix) que madura post-cosecha (climatérico). Lección viva de patrimonio frutícola colonial andino: enseña a niñas y niños que los huertos campesinos de la Sabana llevan más de tres siglos integrando perales europeos al paisaje productivo, formando parte de la identidad cundiboyacense. Manejo agroecológico: poda de formación en eje central modificado, distancia 4×5 m (500 árboles/ha), aclareo de frutos manual para tamaño comercial, fertilización con compost + bocashi + biol, control de Erwinia amylovora (fuego bacteriano) con cobre + poda sanitaria estricta, manejo de Psylla pyri con caldo sulfocálcico + parasitoides nativos. Asocios: tagasaste como cortavientos N-fijador, fresa Monterrey como cobertura, manzano sabanero para polinización cruzada (autoincompatible). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA Manual Frutales Tropicales, ICA Resolución 3168/2015."
+    },
+    {
+      "id": "prunus_persica_amarilla",
+      "nombre_comun": "Durazno amarillo Sabanero",
+      "nombre_comunes_regionales": [
+        "durazno amarillo",
+        "melocotón amarillo",
+        "durazno antioqueño",
+        "durazno boyacense"
+      ],
+      "nombre_cientifico": "Prunus persica (L.) Batsch cv. Amarillo Sabanero",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1600,
+        "optimo_min": 2000,
+        "optimo_max": 2600,
+        "max_absoluto": 2900
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "injerto",
+        "notas": "Injerto de yema o púa sobre patrón de durazno criollo o ciruelo silvestre; necesita ≥200 h frío <7°C que se acumulan parcialmente en Sabana y completamente en altiplano boyacense-antioqueño."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-manual-frutales-tropicales",
+        "ica-resolucion-3168-2015",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "El durazno amarillo Sabanero (Prunus persica (L.) Batsch cv. Amarillo Sabanero, Rosaceae) es un frutal templado caducifolio de origen chino con tradición de cultivo de ≥3 siglos en el altiplano colombiano. Se cultiva entre 2.000 y 2.600 msnm en zona térmica fría y templada-fría, presente en Antioquia (Santa Rosa de Osos, Belmira, La Unión, Sonsón, Yarumal), Boyacá (Nuevo Colón, Jenesano, Tibaná, Ramiriquí, Boyacá-Boyacá, Tibasosa), Cundinamarca (Sasaima, Pacho, San Francisco, Sopó, Choachí), Nariño (Buesaco, Pasto, Sandoná) y Norte de Santander (Pamplona). Árbol de 3-6 m de altura, copa abierta. Flores rosadas solitarias antes de las hojas, fuerte atractivo para abejas. Frutos drupáceos globosos de 5-7 cm, piel pubescente amarilla con chapa roja al sol, pulpa amarilla-naranja firme jugosa muy dulce-aromática (11-14° Brix) y carozo libre (freestone) en variedad amarilla. Es lección viva de soberanía alimentaria templada y patrimonio campesino antioqueño-boyacense: enseña a niñas y niños que el durazno colombiano es muchísimo más fresco, sabroso y de menor huella de carbono que el durazno chileno importado en lata o fresco. Manejo agroecológico: poda de formación en vaso abierto (mejor luminosidad), aclareo de frutos al estado de chícharo (40% de frutos jóvenes), distancia 4×5 m (500 árboles/ha), fertilización con compost + bocashi + biol foliar, control de Monilinia fructicola (podredumbre parda) con caldo bordelés + caldo sulfocálcico preventivo, manejo de Anastrepha fraterculus (mosca de la fruta) con trampas McPhail + bioplaguicida Beauveria bassiana, control de Taphrina deformans (lepra del durazno) con Bordelés en yema dormante. Asocios: tagasaste cortavientos, fresa como cobertura productiva, papa criolla calles primeros 2 años, trébol blanco fijador. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA Manual Frutales Tropicales, ICA Resolución 3168/2015, Pérez-Arbeláez 1947 Plantas Útiles."
+    },
+    {
+      "id": "prunus_avium_ducezno",
+      "nombre_comun": "Cereza ducezno",
+      "nombre_comunes_regionales": [
+        "cereza dulce",
+        "cereza europea",
+        "ducezno",
+        "cerezo silvestre"
+      ],
+      "nombre_cientifico": "Prunus avium (L.) L. cv. Ducezno",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "windbreak"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2400,
+        "optimo_max": 2800,
+        "max_absoluto": 3100
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 8,
+        "optimo_max": 16,
+        "max_tolerable": 22
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "injerto",
+        "notas": "Injerto sobre patrón Prunus mahaleb o Prunus cerasus que confiere rusticidad y resistencia a Phytophthora; requiere ≥600 h frío <7°C que se logra en altiplano cundiboyacense alto."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-manual-frutales-tropicales",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "El cerezo ducezno (Prunus avium (L.) L. cv. Ducezno, Rosaceae) es un frutal templado caducifolio europeo naturalizado en el altiplano cundiboyacense por colonos europeos del siglo XIX-XX. Crece entre 2.400 y 2.800 msnm en zona térmica fría con acumulación natural de horas frío altas (≥600 h <7°C), presente en Cundinamarca (Subachoque, Tabio, Tenjo, Cogua, Chía, Sopó, La Calera), Boyacá (Paipa, Duitama, Sogamoso, Tibasosa, Tunja, Nobsa), altiplano nariñense (Pasto, Ipiales, Túquerres) y altiplano antioqueño (Santa Rosa de Osos, Belmira). Árbol de 8-15 m de altura, copa piramidal abierta, follaje caducifolio que se torna rojizo-anaranjado en otoño tropical. Flores blancas en umbela perfumadas que abren con las hojas, fuertísimo atractivo para abejas (Apis mellifera) y abejorros nativos (Bombus rubicundus, Bombus funebris). Frutos en drupa globosa pequeña de 18-25 mm, piel rojo-oscura a casi negra brillante, pulpa rojo-vinosa firme dulce-acidulada (16-22° Brix) con carozo redondeado adherido. Lección viva de patrimonio agrofloral europeo-andino: enseña a niñas y niños que las cerezas frescas del altiplano colombiano son una rareza productiva de cosecha corta (3-4 semanas anuales) que vale celebrar y proteger, alternativa local a cerezas chilenas importadas. Manejo agroecológico: poda de formación en eje central modificado, distancia 5×6 m (333 árboles/ha), aclareo selectivo, fertilización con compost + biol foliar + bocashi, control de Drosophila suzukii (mosca de las alas manchadas) con trampas de vinagre+azúcar+jabón y red antiinsectos, manejo de Monilinia laxa con caldo bordelés preventivo y poda sanitaria. Asocios: tagasaste cortavientos N-fijador, sauce alianta polinizador, manzano sabanero como compañía sinérgica (mismo ciclo). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA Manual Frutales Tropicales, ICA Resolución 3168/2015."
+    },
+    {
+      "id": "prunus_domestica_ciruela_imperial",
+      "nombre_comun": "Ciruela imperial",
+      "nombre_comunes_regionales": [
+        "ciruela europea",
+        "ciruela morada",
+        "ciruelo imperial",
+        "ciruela de clima frío"
+      ],
+      "nombre_cientifico": "Prunus domestica L. cv. Imperial",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 2700,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 10,
+        "optimo_max": 18,
+        "max_tolerable": 25
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "injerto",
+        "notas": "Injerto de yema o púa sobre patrón Prunus cerasifera (mirabolano) o Prunus insititia (endrino injertal); requiere ≥500 h frío <7°C; entrada en producción rápida 2-3 años post-injerto."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-manual-frutales-tropicales",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "La ciruela imperial (Prunus domestica L. cv. Imperial, Rosaceae) es un frutal templado caducifolio eurasiático cultivado tradicionalmente en altiplanos andinos colombianos desde la época colonial. Crece entre 2.200 y 2.700 msnm en zona térmica fría, presente en Cundinamarca (Sopó, Chía, Tabio, Tenjo, Subachoque, Choachí, Ubaque, Sasaima), Boyacá (Nuevo Colón, Jenesano, Tibaná, Ramiriquí, Tibasosa, Paipa, Duitama), Nariño (Pasto, Buesaco, Sandoná, Ipiales), Norte de Santander (Pamplona, Chitagá) y altiplano antioqueño (Santa Rosa de Osos, La Unión). Árbol de 4-8 m de altura, copa redondeada-extendida, hábito ramificado. Flores blanco-puras en corimbo de 2-3 flores que abren antes que las hojas, atractivo para Apis mellifera y polinizadores nativos. Frutos en drupa elipsoidal de 4-6 cm, piel violeta-azulada cubierta de pruína blanquecina característica, pulpa amarillo-ámbar jugosa dulce-acidulada (13-16° Brix), carozo libre (freestone) elíptico. Lección viva de patrimonio frutícola colonial andino y soberanía alimentaria templada: enseña a niñas y niños que la ciruela colombiana del altiplano es alternativa local fresca de mucho mejor calidad que la ciruela importada en compota o seca, y que el ciruelo es un árbol de doble propósito (frutal+ornamental con floración espectacular). Manejo agroecológico: poda de formación en vaso abierto o eje central modificado, distancia 4×5 m (500 árboles/ha), fertilización con compost + bocashi + biol foliar, control de Monilinia fructicola (podredumbre parda) con caldo bordelés y poda sanitaria, manejo de Hoplocampa flava (avispa del ciruelo) con trampas de feromonas, control de Anastrepha con trampas McPhail. Asocios: tagasaste cortavientos N-fijador, fresa Monterrey cobertura productiva, manzano sabanero compañía sinérgica, trébol blanco como cobertura N-fijadora. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA Manual Frutales Tropicales, ICA Resolución 3168/2015."
+    },
+    {
+      "id": "cydonia_oblonga",
+      "nombre_comun": "Membrillo",
+      "nombre_comunes_regionales": [
+        "membrillero",
+        "membrillo común",
+        "manzana-pera",
+        "marmello"
+      ],
+      "nombre_cientifico": "Cydonia oblonga Mill.",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "windbreak"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 2700,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Propagación por esqueje leñoso de invierno (alto enraizamiento sin hormona) o por acodo aéreo; el membrillero franco también es usado como patrón enanizante para perales (Pyrus)."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-manual-frutales-tropicales",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "El membrillo (Cydonia oblonga Mill., Rosaceae) es un frutal templado caducifolio originario de Asia Menor (Cáucaso, Irán, Anatolia) introducido a Colombia en la época colonial y naturalizado en el altiplano cundiboyacense desde el siglo XVII como árbol patrimonial de patios y huertos campesinos. Crece entre 2.200 y 2.700 msnm en zona térmica fría, presente en Cundinamarca (Sopó, Chía, Tenjo, Cota, Sasaima, Choachí, Ubaté), Boyacá (Tibasosa, Paipa, Duitama, Nobsa, Sogamoso, Tunja, Villa de Leyva), Nariño (Pasto, Ipiales) y altiplano antioqueño. Arbolito de 3-6 m de altura, copa irregular tortuosa con ramaje denso. Hojas alternas ovaladas con envés tomentoso plateado característico. Flores solitarias grandes (4-5 cm) blanco-rosadas muy llamativas que abren con las hojas, atractivo para Apis mellifera y polinizadores nativos. Frutos en pomo piriforme grande (8-12 cm), piel amarillo-dorada cubierta de tomento (pubescencia) gris-plateado al madurar, pulpa amarilla muy aromática, firme, astringente y ácida en crudo (impropia para consumo fresco) pero con altísimo contenido de pectinas que la hace insuperable para dulces, jaleas, bocadillos (dulce de membrillo) y conservas tradicionales. Lección viva de patrimonio frutícola colonial andino y medicina tradicional: enseña a niñas y niños que el bocadillo de membrillo cundiboyacense es expresión cultural del altiplano, y que las semillas tienen uso medicinal demulcente-expectorante (mucílago) reconocido por Pérez-Arbeláez. Manejo agroecológico: poda mínima de formación (árbol rústico), distancia 4×4 m (625 árboles/ha), prácticamente no requiere fertilización adicional en suelos andinos buenos, control de Erwinia amylovora (fuego bacteriano) con cobre + poda sanitaria, manejo de Cydia pomonella con feromonas + Bacillus thuringiensis, resistente a la mayoría de enfermedades del manzano-peral. Asocios: tagasaste como cortavientos, lavanda como repelente de plagas, perales para los que sirve de patrón clonal enanizante. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA Manual Frutales Tropicales, Pérez-Arbeláez 1947 Plantas Útiles."
+    },
+    {
+      "id": "ficus_carica_higo",
+      "nombre_comun": "Higuera",
+      "nombre_comunes_regionales": [
+        "higo común",
+        "breval",
+        "brevera",
+        "higuera mediterránea"
+      ],
+      "nombre_cientifico": "Ficus carica L.",
+      "familia_botanica": "Moraceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1700,
+        "optimo_max": 2400,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 14,
+        "optimo_max": 24,
+        "max_tolerable": 32
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Propagación por esqueje leñoso de 25-35 cm con 2-3 yemas plantado directamente en suelo en inicio de lluvias; altísimo enraizamiento sin hormona; entrada en producción 2-3 años."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "perez-arbelaez-1947-plantas-utiles",
+        "agrosavia-manual-frutales-tropicales"
+      ],
+      "valor_pedagogico": "La higuera (Ficus carica L., Moraceae) es un frutal mediterráneo caducifolio originario de Asia Menor y la cuenca del Mediterráneo, introducido a Colombia por los colonizadores españoles en el siglo XVI y naturalizado en zonas templadas y templado-frías del país desde entonces. Crece entre 1.700 y 2.400 msnm en zonas térmicas templadas y templado-frías, presente en Cundinamarca (Tena, Sasaima, La Mesa, Anolaima, Subachoque, Tabio, Tenjo, Cota), Boyacá (Villa de Leyva, Sutamarchán, Sáchica, Moniquirá, Arcabuco, Tinjacá), Santander (San Gil, Curití, Barichara, Charalá), Norte de Santander (Pamplona, Chinácota) y Tolima (Líbano, Murillo, Anzoátegui). Arbolito de 3-6 m de altura, copa redondeada-extendida con ramas gruesas y tortuosas, tronco grisáceo liso. Hojas grandes (10-25 cm) palmatilobadas con 3-7 lóbulos profundos, ásperas al tacto, caedizas. Inflorescencia sicónica (siconio) única en Moraceae: las flores son internas a la estructura carnosa del futuro fruto, mecanismo evolutivamente coadaptado con avispas del higo (Blastophaga psenes) en el Mediterráneo. Curiosidad biológica: las variedades comerciales colombianas son partenocárpicas (frutos sin polinización) ya que la avispa simbionte no existe en Colombia. Frutos pseudobaya (siconio carnoso) de 4-7 cm, piel verde-violeta-negra según cultivar, pulpa carnosa roja-rosada cargada de aquenios crujientes (16-22° Brix), muy dulce-meliflua. Lección viva de patrimonio frutícola mediterráneo-andino: enseña a niñas y niños la biología única de la higuera (fruto que es realmente una inflorescencia invertida) y reivindica el higo colombiano fresco frente al higo seco importado. Manejo agroecológico: poda fuerte invernal de renovación, distancia 5×5 m (400 árboles/ha), prácticamente no requiere fertilización (rústica), control de Ceroplastes rusci (cochinilla) con jabón potásico + caldo sulfocálcico, manejo de Ceratitis capitata con trampas McPhail. Asocios: lavanda repelente, romero, vid (asocio mediterráneo clásico), fresa cobertura. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Pérez-Arbeláez 1947 Plantas Útiles, AGROSAVIA Manual Frutales Tropicales."
+    },
+    {
+      "id": "morus_nigra_mora_de_arbol",
+      "nombre_comun": "Mora de árbol negra",
+      "nombre_comunes_regionales": [
+        "morera negra",
+        "moral",
+        "mora de árbol",
+        "morera europea"
+      ],
+      "nombre_cientifico": "Morus nigra L.",
+      "familia_botanica": "Moraceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "windbreak"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 2500,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Propagación por esqueje leñoso de invierno (25-40 cm, 3-4 yemas) o semilla (variabilidad alta); entrada en producción 3-5 años; árbol longevo (>100 años) con frutas anuales abundantes."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "perez-arbelaez-1947-plantas-utiles",
+        "agrosavia-manual-frutales-tropicales"
+      ],
+      "valor_pedagogico": "La mora de árbol negra (Morus nigra L., Moraceae) es un frutal templado caducifolio originario del suroeste asiático (Persia-Mesopotamia) introducido en Colombia desde la época colonial y naturalizado en altiplanos templados y templado-fríos. Crece entre 1.800 y 2.500 msnm en zonas térmicas templadas y frías, presente en Cundinamarca (Sasaima, La Mesa, Anolaima, Sopó, Tabio, Subachoque, Tenjo, La Calera), Boyacá (Villa de Leyva, Moniquirá, Arcabuco, Sutamarchán, Paipa), Santander (San Gil, Barichara, Charalá), Antioquia (Santa Rosa de Osos, La Ceja, Rionegro) y Norte de Santander (Pamplona). Es importantísimo distinguir esta especie de la mora andina (Rubus glaucus): Morus nigra es un ÁRBOL de 6-12 m con frutos compuestos en sorosis (no en agregado de drupas como Rubus), mientras Rubus glaucus es un arbusto sarmentoso con espinas y frutos en agregado de drupas pequeñas. Lección biológica fundamental para niñas y niños. Hojas alternas ovaladas-cordadas con margen aserrado, ásperas al tacto, caedizas en zonas frías. Flores en amentos colgantes verde-amarillentos (anemofilia parcial + entomofilia). Frutos en sorosis cilíndrica de 2-3.5 cm, color rojo-vino a negro-púrpura al madurar, jugo muy intenso (manchador), sabor dulce-acidulado complejo (15-18° Brix) con altísimo contenido de antocianinas y vitamina C. Lección viva de patrimonio frutícola colonial y nutrición funcional: enseña a niñas y niños que la mora de árbol colombiana es superfruta nativa-naturalizada de antioxidantes y que su jugo manchador era usado tradicionalmente como tinta vegetal. Manejo agroecológico: poda fuerte invernal de renovación, distancia 6×6 m (278 árboles/ha), prácticamente no requiere fertilización (rústica), cosecha extendida 6-8 semanas con caída natural al suelo (recolectar con malla bajo el árbol), control de Drosophila suzukii con trampas vinagre-azúcar, manejo casi nulo de enfermedades. Asocios: tagasaste cortavientos, gallinas en pradera bajo el árbol que comen frutas caídas (sinergia avícola), café variedades de sombra parcial en zona templada. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Pérez-Arbeláez 1947 Plantas Útiles, AGROSAVIA Manual Frutales Tropicales."
+    },
+    {
+      "id": "eriobotrya_japonica",
+      "nombre_comun": "Níspero japonés",
+      "nombre_comunes_regionales": [
+        "níspero",
+        "níspero del Japón",
+        "loquat",
+        "níspero amarillo"
+      ],
+      "nombre_cientifico": "Eriobotrya japonica (Thunb.) Lindl.",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "windbreak"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1700,
+        "optimo_max": 2400,
+        "max_absoluto": 2700
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 14,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "injerto",
+        "notas": "Injerto sobre patrón franco (semilla) para variedades selectas; semilla simple también viable pero con variabilidad alta; entrada en producción 3-5 años; árbol siempreverde productivo 40+ años."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-manual-frutales-tropicales",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "El níspero japonés (Eriobotrya japonica (Thunb.) Lindl., Rosaceae) es un frutal subtropical siempreverde originario del sureste de China y naturalizado en Japón hace más de 1.000 años, introducido a Colombia a fines del siglo XIX y ampliamente adoptado en altiplanos templado-fríos como árbol de patio campesino. Crece entre 1.700 y 2.400 msnm en zonas térmicas templadas a templado-frías, presente en Antioquia (Rionegro, La Ceja, El Retiro, Marinilla, Carmen de Viboral, La Unión, Sonsón), Cundinamarca (Sasaima, La Mesa, Anolaima, Subachoque, Tabio, Sopó, Tenjo, Cogua), Boyacá (Villa de Leyva, Moniquirá, Paipa, Duitama, Tibasosa), Tolima (Líbano, Murillo, Anzoátegui), Caldas (Manizales, Villamaría), Risaralda (Santa Rosa de Cabal, Pereira), Quindío (Salento, Calarcá) y Norte de Santander (Pamplona, Chinácota). Árbol de 4-10 m de altura, copa redondeada-densa, hábito robusto. Hojas grandes (15-30 cm) coriáceas elípticas con envés tomentoso ferrugíneo característico, persistentes (siempreverde). Flores blanco-cremosas pequeñas (1-2 cm) en panícula terminal pubescente, muy fragantes, floración invernal (julio-septiembre en Colombia), atractivo para Apis mellifera en época de escasez de néctar (importante en planeación apícola). Frutos en pomo ovoide-piriforme de 3-5 cm, piel amarillo-naranja aterciopelada delgada, pulpa amarillo-anaranjada jugosa dulce-acidulada perfumada (10-13° Brix) con 2-5 semillas grandes brunas. Lección viva de patrimonio frutícola asiático-andino y soberanía alimentaria templada-subtropical: enseña a niñas y niños la importancia de los frutales de cosecha invernal (febrero-mayo en Colombia) que complementan la oferta frutícola del año, y reivindica el níspero antioqueño-cundiboyacense como fruto patrimonial. Manejo agroecológico: poda mínima de formación (árbol naturalmente bien estructurado), distancia 6×6 m (278 árboles/ha), aclareo de frutos para tamaño comercial, fertilización con compost + biol foliar, control de Anastrepha fraterculus con trampas McPhail + Beauveria bassiana, manejo de Pseudomonas syringae con poda sanitaria + cobre, control de Aspidiotus (escamas) con jabón potásico + sulfocálcico. Asocios: café variedades de sombra parcial en zona templada, plátano dominico hartón compañero histórico, frijol arbustivo bajo árbol joven. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA Manual Frutales Tropicales, Pérez-Arbeláez 1947 Plantas Útiles."
+    },
+    {
+      "id": "actinidia_deliciosa",
+      "nombre_comun": "Kiwi",
+      "nombre_comunes_regionales": [
+        "kiwi verde",
+        "kiwi Hayward",
+        "grosella china",
+        "actinidia"
+      ],
+      "nombre_cientifico": "Actinidia deliciosa (A.Chev.) C.F.Liang & A.R.Ferguson",
+      "familia_botanica": "Actinidiaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 2700,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 10,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Propagación por esqueje semileñoso bajo cámara húmeda con hormona enraizante (IBA) o por injerto; especie DIOICA (plantas macho y hembra separadas): se requiere 1 macho por cada 6-8 hembras para polinización; requiere ≥600 h frío <7°C y soporte de espaldera/parral."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-manual-frutales-tropicales",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "El kiwi (Actinidia deliciosa (A.Chev.) C.F.Liang & A.R.Ferguson, Actinidiaceae) es un frutal templado-frío trepador (liana leñosa) originario del centro-sur de China (provincia de Hunan-Hubei) y desarrollado comercialmente en Nueva Zelanda durante el siglo XX, introducido a Colombia como cultivo emergente desde la década de 2010 en Boyacá y Sabana Bogotá. Crece entre 2.200 y 2.700 msnm en zona térmica fría con acumulación significativa de horas frío (≥600 h <7°C), presente como cultivo experimental-comercial en Boyacá (Paipa, Duitama, Sotaquirá, Toca, Sogamoso, Tibasosa, Nobsa), Cundinamarca (Sopó, Sibaté, Subachoque, Cogua, Zipaquirá, Tenjo, Tabio) y altiplano antioqueño (Santa Rosa de Osos, Belmira). Liana leñosa caducifolia de 5-10 m con tallos volubles que requieren obligatoriamente soporte de espaldera, parral en T o pérgola robusta. Hojas grandes (8-15 cm) cordadas tomentoso-rojizas en envés. Especie DIOICA (lección biológica clave): hay plantas macho que solo dan flores polinizadoras y plantas hembra que dan frutos; sin macho compatible el cultivo no produce. Flores grandes (3-5 cm) blanco-amarillentas perfumadas, atractivo para Apis mellifera (pero kiwi produce solo polen, no néctar, lo que requiere planeación apícola especial con colmenas dedicadas en floración). Frutos baya ovoide-cilíndrica de 5-8 cm, piel marrón-verdosa tomentosa peluda, pulpa verde-esmeralda intensa con semillas negras radiales pequeñas crujientes, sabor dulce-acidulado intenso (13-18° Brix), altísimo contenido vitamina C (90 mg/100g, superior a naranja). Lección viva de innovación productiva del altiplano colombiano y soberanía frutícola emergente: enseña a niñas y niños que Colombia puede producir kiwi propio adaptado al altiplano boyacense-sabanero, alternativa local fresca al kiwi neozelandés-chileno importado. Manejo agroecológico: instalación obligatoria de parral en T a 1.8 m de altura, distancia 4×5 m (500 plantas/ha + 70 machos/ha distribuidos), poda invernal severa de renovación de cargadores, fertilización abundante con compost + biol + bocashi (cultivo exigente), control de Pseudomonas syringae pv. actinidiae (PSA o cancro bacteriano) con cobre estricto + poda sanitaria + control de heladas, riego abundante en formación de fruto. Asocios: tagasaste cortavientos N-fijador imprescindible, frutillas o pasto manejado bajo parral, leguminosas de cobertura. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA Manual Frutales Tropicales, ICA Resolución 3168/2015."
     }
   ],
   "biopreparados": [
