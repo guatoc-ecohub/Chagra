@@ -1675,7 +1675,7 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El arazá (Eugenia stipitata McVaugh) es un frutal nativo de la Amazonía colombiana, presente en los departamentos de Putumayo, Caquetá, Amazonas y Vaupés entre 0 y 1000 msnm en zonas térmicas calidas. Su manejo agronómico incluye propagación por semilla con germinación de 2-4 semanas bajo alta humedad, ciclo de fructificación de 3-4 años desde la siembra, requiere ambientes con alta humedad relativa y suelos bien drenados, y presenta sensibilidad a enfermedades fúngicas como la antracnosis (Colletotrichum gloeosporioides) y ataque de moscas de la fruta (Anastrepha spp.). En el contexto cultural amazonense, esta especie ha sido tradicionalmente consumida por comunidades indígenas y campesinas amazónicas como fruta fresca y en preparaciones de jugos y mermeladas, representando un recurso alimenticio nativo de la región biogeográfica del Amazonas colombiano. Según el inventario taxonómico verificado por GBIF Backbone Taxonomy, Plants of the World Online (POWO), GBIF Colombia y el Sistema de Información sobre Biodiversidad de Colombia (SiB Colombia), su nombre científico válido es Eugenia stipitata McVaugh.",
-      "validation_level": "ai_draft"
+      "validation_level": "claude_draft"
     },
     {
       "id": "eucalyptus_globulus",
@@ -11280,7 +11280,7 @@
         "crop"
       ],
       "cultivable": true,
-      "conservation_status": "variedad_tradicional",
+      "conservation_status": "naturalizada",
       "altitud_msnm": {
         "min_absoluto": 2400,
         "optimo_min": 2800,
@@ -11376,7 +11376,7 @@
         "crop"
       ],
       "cultivable": true,
-      "conservation_status": "variedad_tradicional",
+      "conservation_status": "naturalizada",
       "altitud_msnm": {
         "min_absoluto": 2100,
         "optimo_min": 2500,
@@ -11418,7 +11418,7 @@
       ],
       "nombre_cientifico": "Cucurbita moschata Duchesne",
       "familia_botanica": "Cucurbitaceae",
-      "category": "verduras_legumbres",
+      "category": "granos_legumbres",
       "thermal_zones": [
         "calido",
         "templado"
@@ -11468,7 +11468,7 @@
       ],
       "nombre_cientifico": "Zea mays L. cv. 'Negro de Páramo'",
       "familia_botanica": "Poaceae",
-      "category": "cereales_pseudocereales",
+      "category": "cereales",
       "thermal_zones": [
         "frio",
         "paramo"
@@ -11477,7 +11477,7 @@
         "crop"
       ],
       "cultivable": true,
-      "conservation_status": "variedad_tradicional",
+      "conservation_status": "naturalizada",
       "altitud_msnm": {
         "min_absoluto": 2200,
         "optimo_min": 2600,
@@ -11517,7 +11517,7 @@
       ],
       "nombre_cientifico": "Zea mays L. cv. 'Capio'",
       "familia_botanica": "Poaceae",
-      "category": "cereales_pseudocereales",
+      "category": "cereales",
       "thermal_zones": [
         "frio"
       ],
@@ -11525,7 +11525,7 @@
         "crop"
       ],
       "cultivable": true,
-      "conservation_status": "variedad_tradicional",
+      "conservation_status": "naturalizada",
       "altitud_msnm": {
         "min_absoluto": 2000,
         "optimo_min": 2400,
@@ -11566,7 +11566,7 @@
       ],
       "nombre_cientifico": "Amaranthus caudatus L. cv. 'Kiwicha'",
       "familia_botanica": "Amaranthaceae",
-      "category": "cereales_pseudocereales",
+      "category": "cereales",
       "thermal_zones": [
         "templado",
         "frio"
@@ -11575,7 +11575,7 @@
         "crop"
       ],
       "cultivable": true,
-      "conservation_status": "variedad_tradicional",
+      "conservation_status": "naturalizada",
       "altitud_msnm": {
         "min_absoluto": 1500,
         "optimo_min": 2000,
@@ -11615,7 +11615,7 @@
       ],
       "nombre_cientifico": "Phaseolus vulgaris L. cv. 'Bola Roja'",
       "familia_botanica": "Fabaceae",
-      "category": "verduras_legumbres",
+      "category": "granos_legumbres",
       "thermal_zones": [
         "frio",
         "templado"
@@ -11625,7 +11625,7 @@
         "nitrogen_fixer"
       ],
       "cultivable": true,
-      "conservation_status": "variedad_tradicional",
+      "conservation_status": "naturalizada",
       "altitud_msnm": {
         "min_absoluto": 1800,
         "optimo_min": 2200,
@@ -11666,7 +11666,7 @@
       ],
       "nombre_cientifico": "Phaseolus lunatus L. cv. andino",
       "familia_botanica": "Fabaceae",
-      "category": "verduras_legumbres",
+      "category": "granos_legumbres",
       "thermal_zones": [
         "templado",
         "frio"
@@ -11676,7 +11676,7 @@
         "nitrogen_fixer"
       ],
       "cultivable": true,
-      "conservation_status": "variedad_tradicional",
+      "conservation_status": "naturalizada",
       "altitud_msnm": {
         "min_absoluto": 1500,
         "optimo_min": 1800,
@@ -11718,7 +11718,7 @@
       ],
       "nombre_cientifico": "Chenopodium pallidicaule Aellen",
       "familia_botanica": "Amaranthaceae",
-      "category": "cereales_pseudocereales",
+      "category": "cereales",
       "thermal_zones": [
         "frio",
         "paramo"
@@ -11727,7 +11727,7 @@
         "crop"
       ],
       "cultivable": true,
-      "conservation_status": "variedad_tradicional",
+      "conservation_status": "naturalizada",
       "altitud_msnm": {
         "min_absoluto": 3000,
         "optimo_min": 3500,
