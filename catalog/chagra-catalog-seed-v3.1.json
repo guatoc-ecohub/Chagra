@@ -6036,9 +6036,13 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
-        "pamplona-roger-2006-plantas-medicinales"
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "bernal-2015-plantas-liquenes-colombia",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales"
       ],
-      "valor_pedagogico": "Leccion de acumulacion dinamica: su raiz pivotante extrae potasio, calcio y hierro de capas profundas. Sus flores son el primer alimento de las abejas nativas al inicio de la temporada de lluvias."
+      "valor_pedagogico": "El diente de león (Taraxacum officinale F.H.Wigg., familia Asteraceae) es una asterácea perenne herbácea originaria de Eurasia, naturalizada cosmopolita y abundante en huertos andinos colombianos, con roseta basal de hojas dentadas y capítulos florales amarillos sostenidos por escapos huecos sin hojas, seguidos de aquenios con vilano (pappus) dispersados por viento. Su raíz pivotante profunda (hasta 50-60 cm) y el látex blanco amargo (taraxaceno, taraxacina) son rasgos diagnósticos. Se encuentra en Cundinamarca (Sabana de Bogotá, Subachoque, Chía), Boyacá (Tunja, Villa de Leyva, Sutamarchán), Nariño (Pasto, Túquerres, Sandoná) y zonas de páramo bajo entre 1.500 y 3.200 msnm en zona térmica fría a páramo bajo. Ciclo perenne, floración continua durante todo el año en clima andino estable. Lección viva de acumulación dinámica: su raíz pivotante extrae potasio, calcio, hierro y oligoelementos de capas profundas del subsuelo (40-60 cm) inaccesibles para hortalizas de raíz somera (lechuga, espinaca, rábano), bombeando nutrientes hacia las hojas que al descomponerse enriquecen el horizonte A — clave en sistemas regenerativos. Sus flores son el primer alimento (néctar y polen) de abejas nativas (Bombus rohweri, Apis mellifera) al inicio de la temporada de lluvias andinas (marzo-abril, septiembre-octubre). Manejo agroecológico: bioindicador de compactación moderada y agotamiento de calcio del suelo, se tolera o cultiva intencionalmente en franjas marginales del huerto, hojas jóvenes son comestibles (ensaladas amargas) y medicinales (digestivo, hepatoprotector por amargos), no requiere control siempre que se cosechen flores antes de la dispersión del vilano. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA, Bernal 2015 Catálogo Plantas Colombia, Pamplona-Roger 2006 Plantas Medicinales."
     },
     {
       "id": "artemisia_absinthium",
@@ -6083,11 +6087,15 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
-        "pamplona-roger-2006-plantas-medicinales"
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "bernal-2015-plantas-liquenes-colombia",
+        "pamplona-roger-2006-plantas-medicinales",
+        "restrepo-2007-biopreparados"
       ],
       "companions": [],
       "antagonists": [],
-      "valor_pedagogico": "Leccion de alelopatia: su fuerte olor y sabor amargo ensenan como las plantas se defienden quimicamente en la naturaleza. Tradicionalmente usada en macerados para control de insectos en la chagra."
+      "valor_pedagogico": "El ajenjo (Artemisia absinthium L., familia Asteraceae) es una asterácea perenne subarbustiva aromática originaria de Eurasia templada y norte de África, naturalizada y cultivada en huertos andinos colombianos por su intenso aroma alcanforado y sabor amargo, atribuibles a aceites esenciales ricos en α-tuyona y β-tuyona (35-60% del aceite esencial), absintina, anabsintina y artemisinina-relacionados. Su follaje plateado-pubescente, hojas profundamente lobuladas y capítulos pequeños amarillo-grisáceos son rasgos diagnósticos. Se cultiva en Cundinamarca (Sabana de Bogotá, Sopó, Tabio), Boyacá (Tunja, Sutamarchán, Villa de Leyva), Antioquia (oriente, Santuario, La Ceja) y Eje cafetero entre 2.000 y 2.800 msnm en zona térmica fría seca. Ciclo perenne, productividad sostenida 3-5 años antes de renovar plantación. Rendimientos 0.6-1.2 t/ha hierba seca. Lección viva de alelopatía: su fuerte olor y sabor amargo enseñan cómo las plantas se defienden químicamente en la naturaleza mediante metabolitos secundarios disuasorios para herbívoros y fitófagos. Tradicionalmente usada en macerados acuosos y purines fermentados para control biológico de plagas en la chagra (pulgones Myzus persicae, mosca blanca Bemisia tabaci, larvas de lepidópteros Plutella xylostella, polilla del tomate Tuta absoluta), aplicación foliar 10-15 g hoja seca/litro de agua reposo 24 h. Manejo agroecológico: propagación por división de mata o esquejes (más confiable que semilla), siembra en bordes perimetrales del huerto como repelente vivo, asocio con coles para protección contra mariposa de la col, no consumir en embarazo por toxicidad de tuyona, cosecha foliar pre-floración para máxima concentración de aceites. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA, Bernal 2015 Catálogo Plantas Colombia, Pamplona-Roger 2006 Plantas Medicinales."
     },
     {
       "id": "dodonaea_viscosa",
@@ -6178,12 +6186,14 @@
         "restauracion"
       ],
       "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
         "humboldt-flora-alto-andina",
         "bernal-2015-plantas-liquenes-colombia",
-        "sib-colombia",
-        "powo-kew"
+        "sib-colombia"
       ],
-      "valor_pedagogico": "Arbusto pionero por excelencia en la restauracion de suelos degradados. Sus semillas aladas germinan incluso en terrenos compactados. Primera linea de defensa contra el viento en la alta montana.",
+      "valor_pedagogico": "El hayuelo (Dodonaea viscosa Jacq., familia Sapindaceae) es una sapindácea arbustiva perenne pantropical de amplia distribución (Asia, África, América tropical), nativa silvestre y abundante en los Andes colombianos donde funciona como especie pionera por excelencia en procesos de sucesión ecológica secundaria sobre suelos degradados, erosionados, compactados o disturbados por incendios y pastoreo. Su follaje viscoso pegajoso (resinas terpénicas), cápsulas trialadas papiráceas color rosa-marrón y crecimiento arbustivo denso (1.5-4 m altura) son rasgos diagnósticos. Se encuentra en Cundinamarca (Sumapaz, Cruz Verde, Choachí, La Calera), Boyacá (cordillera Oriental, Iza, Mongua), Nariño, Cauca y zonas altoandinas entre 2.000 y 2.800 msnm en zona térmica fría. Ciclo perenne, longevidad 15-25 años. Lección viva en restauración ecológica: arbusto pionero agresivo por excelencia para restauración de suelos degradados, sus semillas aladas dispersadas por viento (anemócoras) germinan incluso en terrenos compactados, pedregosos y de pH ácido, sus raíces fijadoras de nitrógeno asociado a hongos micorrizicos arbusculares mejoran fertilidad biológica del suelo, su copa densa funciona como primera línea de defensa contra el viento en exposiciones de alta montaña (cortavientos vivos) y crea microclima para sucesión arbórea posterior (Weinmannia, Clusia, Hesperomeles). Manejo agroecológico: siembra directa de semilla escarificada en parcelas de restauración cordillerana, asocio con Lupinus bogotensis (chocho) fijador de nitrógeno y Baccharis latifolia (chilco), aprovechamiento de leña sostenible y carbón vegetal, polinizado por abejas nativas y atrayente de aves frugívoras. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Humboldt Flora Alto-Andina, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia.",
       "validation_level": "claude_draft"
     },
     {
@@ -6442,12 +6452,15 @@
         "notas": "Crece en sotobosque de bosque alto andino. Atraccion de aves dispersoras facilita regeneracion natural."
       },
       "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
         "humboldt-flora-alto-andina",
         "bernal-2015-plantas-liquenes-colombia",
-        "powo-kew",
-        "sib-colombia"
+        "sib-colombia",
+        "libro-rojo-plantas-colombia"
       ],
-      "valor_pedagogico": "Pequeño arbol nativo del bosque alto andino y subparamo. Sus frutos rojos alimentan aves dispersoras del bosque de niebla. Especie ideal para ensenar la conectividad ecologica entre bosque y paramo.",
+      "valor_pedagogico": "La esmeralda chiquita o mortiño de monte (Hesperomeles goudotiana (Decne.) Killip, familia Rosaceae) es una rosácea arbustiva a arbórea pequeña perenne (3-8 m altura) nativa endémica del bosque altoandino y subpáramo colombiano, considerada especie clave de la transición ecotono bosque-páramo. Produce hojas coriáceas brillantes ovaladas, racimos de flores blancas pentámeras y frutos pequeños globosos rojos a negro-violáceos (5-8 mm) carnosos. Se distribuye en cordilleras Oriental y Central colombianas: Cundinamarca (Cruz Verde, Sumapaz, Chingaza), Boyacá (Páramo de la Rusia, El Cocuy), Nariño (Volcán Galeras), Cauca (Macizo Colombiano) y Antioquia (Páramo de Belmira) entre 2.800 y 3.400 msnm en zona térmica fría a páramo bajo. Ciclo perenne, longevidad 30-50 años, floración bianual. Cultivable no recomendado, especie silvestre protegida bajo categoría Vulnerable UICN regional y Resoluciones MADS de páramos. Lección viva ecosistémica: pequeño árbol nativo del bosque alto andino y subpáramo, sus frutos rojos alimentan aves dispersoras del bosque de niebla (Catharus ustulatus, Turdus fuscater, Anisognathus igniventris, Conirostrum cinereum), siendo especie ideal para enseñar la conectividad ecológica entre bosque andino y páramo, su rol en la cadena trófica de dispersión zoócora y la importancia de los relictos arbóreos altoandinos en la regulación hídrica y captura de carbono. Manejo agroecológico: aprovechamiento únicamente por restauración ecológica activa con propagación por semilla (estratificación fría 2 meses) o esqueje semileñoso, asocio con encenillos (Weinmannia tomentosa), arrayanes (Myrcianthes leucoxyla) y romeros de páramo (Diplostephium spp.), prohibida tala con fines comerciales. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Humboldt Flora Alto-Andina, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia.",
       "validation_level": "claude_draft"
     },
     {
@@ -6668,12 +6681,15 @@
         "restauracion"
       ],
       "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
         "humboldt-flora-alto-andina",
         "bernal-2015-plantas-liquenes-colombia",
-        "powo-kew",
-        "sib-colombia"
+        "sib-colombia",
+        "restauracion-cruz-verde-sumapaz"
       ],
-      "valor_pedagogico": "Arbol ribereno andino por excelencia. Sus raices retienen las orillas de quebradas y rios de montana, previniendo erosion. Especie clave en la proteccion de fuentes hidricas del paramo Cruz Verde.",
+      "valor_pedagogico": "El sauce andino o sauce de Humboldt (Salix humboldtiana Willd., familia Salicaceae) es una salicácea arbórea perenne caducifolia (8-20 m altura) nativa de los Andes tropicales sudamericanos, dedicada por Willdenow al naturalista Alexander von Humboldt tras su expedición americana 1799-1804. Produce hojas linear-lanceoladas estrechas (5-15 cm), flores en amentos cilíndricos diclinos (especie dioica) y semillas algodonosas con pelos de dispersión anemócora. Se distribuye en riberas de quebradas, ríos y humedales altoandinos colombianos: Cundinamarca (cuenca alta Bogotá-Tunjuelo, La Calera, Sopó, Cota), Boyacá (cuenca Chicamocha alta, Sogamoso, Paipa), Antioquia (Río Negro, Río Grande), Nariño y Cauca entre 2.500 y 3.200 msnm en zona térmica fría. Ciclo perenne, longevidad 60-100 años, crecimiento rápido (1-2 m/año en condiciones óptimas). Lección viva en restauración hidrológica: árbol ribereño andino por excelencia, sus raíces fasciculadas densas retienen las orillas de quebradas y ríos de montaña previniendo erosión hídrica lateral, su corteza rica en salicina (precursor del ácido acetilsalicílico) es bioactiva, y su rol es clave en la protección de fuentes hídricas y nacimientos del páramo Cruz Verde, Sumapaz, Iguaque y Chingaza. Forma corredores ribereños con aliso (Alnus acuminata) y arrayán (Myrcianthes leucoxyla). Manejo agroecológico: propagación facilísima por estaca leñosa de 30-50 cm directamente en suelo húmedo (90% prendimiento), siembra en franjas ribereñas a 2 m entre plantas para estabilización de margen, atrayente de aves insectívoras y fauna acuática, no plantar en cultivos por competencia hídrica. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Humboldt Flora Alto-Andina, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia.",
       "validation_level": "claude_draft"
     },
     {
