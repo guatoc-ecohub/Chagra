@@ -11259,6 +11259,550 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El uvito de monte o chaquilulo (Cavendishia bracteata (Ruiz & Pav. ex J.St.-Hil.) Hoerold, Ericaceae) es un arbusto o arbolito andino nativo (1-4 m altura, ocasionalmente epífito sobre árboles del bosque alto-andino) propio del bosque alto-andino y subpáramo colombiano entre 2.400 y 3.200 msnm, presente en Cundinamarca (Cruz Verde, Sumapaz, Chingaza, Verjón, Guasca), Boyacá (Iguaque, Arcabuco, Cocuy, Pisba), Santander (Berlín), Antioquia (Belmira, Sonsón), Tolima, Cauca, Caldas, Risaralda y Nariño. Pertenece a Ericaceae tribu Vaccinieae (igual familia que arándanos, uva camarona, mortiño y asnao). Hojas coriáceas alternas elípticas-lanceoladas brillantes con nervadura broquidódroma característica, brácteas florales rojo-vivas muy llamativas (de ahí el epíteto bracteata) que envuelven la inflorescencia y persisten en el fruto, flores tubulares colgantes rojo-anaranjadas o rojo-blancas (1.5-2 cm) que atraen colibríes paramunos especialistas (Lafresnaya lafresnayi, Coeligena bonapartei, Eriocnemis vestita) en una coevolución planta-colibrí clásica andina. Frutos en baya globosa azul-violeta-negra (8-12 mm) comestible de sabor dulce-aromático intenso (alto en antocianinas, polifenoles, vitamina C: comparable a arándanos importados). Es lección viva de soberanía alimentaria y biodiversidad andina que enseña a niñas y niños por qué tenemos arándanos colombianos nativos sin necesidad de importar blueberries de Norteamérica: el chaquilulo, la uva camarona, el asnao y el mortiño son nuestras frutas Ericaceae andinas, adaptadas al páramo, productivas, deliciosas y de menor huella de carbono. Reivindicada hoy por chefs colombianos y agroecólogos como superfruta nativa. Aparece en planes de restauración Cruz Verde-Sumapaz como especie productiva de doble propósito. Manejo agroecológico: propagación por semilla (sustrato ácido pH 4.5-5.5, germinación 60-120 días) o esqueje semileñoso bajo cámara húmeda, vivero 12-24 meses antes de trasplante, distancia 1.5-2 m, fructificación a partir de 4-6 años, función como frutal silvestre, atractor de colibríes, nurse plant en restauración y cultivo agroforestal nativo. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "pouteria_caimito",
+      "nombre_comun": "Abiu",
+      "nombre_comunes_regionales": [
+        "caimito amarillo",
+        "caimito amazónico",
+        "madura verde",
+        "temare",
+        "luma"
+      ],
+      "nombre_cientifico": "Pouteria caimito (Ruiz & Pav.) Radlk.",
+      "familia_botanica": "Sapotaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 600,
+        "max_absoluto": 1000
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Semilla recalcitrante: pierde viabilidad en 1-2 semanas — sembrar fresca tras despulpar. Germinación 25-45 días. Vivero 8-12 meses bajo sombra 50% antes de trasplante a sitio definitivo. Distancia 8-10 m entre árboles. Primera fructificación 4-6 años desde semilla, antes con injerto. Tradicionalmente sembrado en chagras kichwa, ticuna y huitoto del trapecio amazónico."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "sinchi-amazonia-colombiana",
+        "agrosavia-manual-frutales-tropicales",
+        "bernal-2015-plantas-liquenes-colombia",
+        "fao-ecocrop"
+      ],
+      "valor_pedagogico": "El abiu o caimito amarillo (Pouteria caimito (Ruiz & Pav.) Radlk., familia Sapotaceae) es un árbol frutal nativo amazónico (8-20 m altura) de la cuenca occidental amazónica colombiana (Caquetá, Putumayo, Amazonas, Vaupés, Guainía), peruana y brasileña, donde se cultiva en chagras tradicionales de los pueblos kichwa, ticuna, huitoto y bora desde hace siglos. Produce frutos esféricos a ovoides (4-8 cm diámetro) de cáscara amarilla brillante lisa y pulpa blanca translúcida gelatinosa muy dulce (15-20 °Brix), aromática, con 1-4 semillas grandes elipsoidales de testa pardo-brillante. La pulpa contiene látex blanco pegajoso al cortar la fruta verde (de ahí el nombre vernáculo 'madura verde'), que desaparece al madurar — diagnóstico de campo confiable. Distribución natural en bosque húmedo tropical (bh-T) de tierra firme y várzea, asociado a suelos ácidos de baja fertilidad (pH 4.5-5.5) bien drenados, alta humedad relativa (>80%) y precipitación >2.000 mm/año bien distribuida. Lección viva: árbol multiproposito de la chagra amazónica que enseña tres conceptos clave para niñas y niños: (1) la importancia ecológica de los frutales nativos como alternativa sostenible a la deforestación para ganadería en la Amazonía, sustentando la soberanía alimentaria de pueblos indígenas y campesinos colonos; (2) el concepto de semilla recalcitrante (Roberts 1973) que no tolera desecación ni almacenamiento prolongado, contrastando con semillas ortodoxas como el maíz o el frijol, lo cual obliga a sembrar fresca y limita la conservación ex-situ; (3) la dispersión zoocórica por mamíferos arborícolas (Ateles belzebuth marimonda, Lagothrix lagotricha churuco, Cebus albifrons maicero cariblanco) y aves frugívoras grandes (Ramphastos tucanus tucán pechiblanco, Penelope jacquacu pava de monte) que actúan como reforestadores naturales del bosque amazónico. Manejo agroecológico: asocio en chagra con yuca, plátano, piña y copoazú; sombra parcial en juveniles; cero agroquímicos; cosecha manual de fruto maduro caído o por sacudida; fruta de consumo fresco con perecibilidad alta (3-5 días), lo cual restringe comercialización a mercados locales (Leticia, Florencia, Mocoa, Mitú). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, AGROSAVIA Manual Frutales Tropicales, SINCHI Amazonía, FAO EcoCrop."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "theobroma_grandiflorum",
+      "nombre_comun": "Copoazú",
+      "nombre_comunes_regionales": [
+        "cupuaçu",
+        "cacao blanco",
+        "cupuassu",
+        "patas",
+        "cabeza de mono"
+      ],
+      "nombre_cientifico": "Theobroma grandiflorum (Willd. ex Spreng.) K.Schum.",
+      "familia_botanica": "Malvaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 400,
+        "max_absoluto": 800
+      },
+      "temperatura_c": {
+        "helada_letal": 10,
+        "optimo_min": 22,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Semilla recalcitrante: sembrar fresca tras extracción de mucílago (germinación 12-25 días). Vivero 5-7 meses con sombra 50-70% bajo plátano o guamo. Trasplante a sitio definitivo en lluvias a 5x5 m bajo sombra de Inga edulis o Erythrina. Primera fructificación 3-5 años, plena producción a 7-8 años. Tradicionalmente sembrado en chagras amazónicas y pacíficas asociado a cacao y plátano."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-manual-frutales-tropicales",
+        "sinchi-amazonia-colombiana",
+        "bernal-2015-plantas-liquenes-colombia",
+        "fao-ecocrop"
+      ],
+      "valor_pedagogico": "El copoazú o cupuaçu (Theobroma grandiflorum (Willd. ex Spreng.) K.Schum., familia Malvaceae subfamilia Byttnerioideae) es un árbol frutal nativo de la Amazonía sudoccidental (5-15 m altura, ramificación baja en candelabro) cultivado tradicionalmente por pueblos indígenas amazónicos brasileños, peruanos y colombianos (Caquetá, Putumayo, Amazonas, Guainía, Vaupés) desde tiempos precolombinos, considerado uno de los frutales nativos amazónicos más valiosos junto al cacao (Theobroma cacao) y el macambo (Theobroma bicolor). Produce frutos elipsoidales muy grandes (15-25 cm largo, 10-12 cm diámetro, 1-2 kg peso) de cáscara dura leñosa marrón-rojiza pubescente que protege una pulpa blanco-cremosa fibrosa muy aromática (aroma a chocolate-piña-mango) muy ácida (pH 3.2-3.8) con 15-25 semillas grandes elipsoidales similares a las del cacao. La pulpa contiene compuestos volátiles únicos (theaspirano, linalool, mirceno, copaeno) responsables del perfume distintivo que la convierte en materia prima de pulpa congelada de exportación, helados, jugos y mermeladas; las semillas se procesan como 'cupulate' (análogo amazónico al chocolate sin estimulantes, ya que carecen de teobromina pero contienen teacrina). Distribución natural en bosque húmedo tropical de tierra firme (bh-T) sobre suelos ácidos ferralíticos bien drenados, requiere precipitación >2.000 mm/año bien distribuida y humedad relativa >80%. Lección viva: árbol-emblema de la chagra amazónica que enseña tres lecciones críticas: (1) la pulpa cremosa con perfil aromático complejo es resultado de coevolución con dispersores mamíferos grandes (tapires Tapirus terrestris, dantos, sahínos Pecari tajacu) que tragan las semillas enteras y las defecan a kilómetros del árbol madre, lección clave sobre síndromes de dispersión y endozoocoria; (2) la diferencia funcional con el cacao Theobroma cacao (su 'primo' mesoamericano): mientras el cacao se procesa por las semillas (teobromina, manteca de cacao), el copoazú se aprovecha principalmente por la pulpa y las semillas dan un producto sin estimulantes apto para niños y adultos sensibles a la cafeína; (3) el potencial de los frutales nativos amazónicos como alternativa económica viable a la ganadería extensiva y la coca, sustentando proyectos productivos de la Cámara de Comercio del Amazonas, SINCHI y AGROSAVIA en cadenas de valor de pulpa congelada y cosméticos (manteca de cupuaçu como ingrediente premium en hidratantes). Manejo agroecológico: siembra bajo sombra de Inga edulis o Erythrina poeppigiana al 50%, asocio en sistemas agroforestales (SAF) con cacao, plátano, açaí y achiote, no tolera agroquímicos sintéticos, cosecha manual de frutos caídos maduros (no se cortan del árbol — caen solos al madurar, indicador claro de cosecha óptima). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Manual Frutales Tropicales, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía, FAO EcoCrop."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "myrciaria_dubia",
+      "nombre_comun": "Camu camu",
+      "nombre_comunes_regionales": [
+        "caçari",
+        "araçá-d'água",
+        "camu camu negro",
+        "guayabito"
+      ],
+      "nombre_cientifico": "Myrciaria dubia (Kunth) McVaugh",
+      "familia_botanica": "Myrtaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 80,
+        "optimo_max": 300,
+        "max_absoluto": 700
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 23,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "pantanoso",
+      "drenaje_requerido": "pantanoso",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Semilla recalcitrante: sembrar fresca, germinación 20-40 días. Vivero 8-12 meses bajo sombra 50%. Distancia 3x3 m en plantaciones, 2x2 m en alta densidad. Tolera inundación estacional 2-5 meses (especie de várzea/restinga). Primera fructificación 3-4 años, plena producción a 6-8 años. Cosecha manual escalonada (junio-octubre en Amazonia colombiana)."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "sinchi-amazonia-colombiana",
+        "bernal-2015-plantas-liquenes-colombia",
+        "agrosavia-manual-frutales-tropicales",
+        "fao-ecocrop"
+      ],
+      "valor_pedagogico": "El camu camu (Myrciaria dubia (Kunth) McVaugh, familia Myrtaceae) es un arbusto o árbol pequeño (3-8 m altura, ramificación desde la base) nativo de las várzeas inundables (bosques estacionalmente inundados por aguas blancas) de la cuenca amazónica occidental (Loreto en Perú, Amazonas y Caquetá en Colombia, Acre en Brasil), donde forma rodales naturales densos a orillas de los ríos Amazonas, Putumayo, Caquetá, Napo, Ucayali y sus tributarios. Es famoso por ser la fruta con mayor contenido de vitamina C (ácido ascórbico) registrado en el reino vegetal: 2.000-3.000 mg por 100 g de pulpa fresca — entre 50 y 60 veces más que la naranja (50 mg/100 g), 10 veces más que la guayaba (228 mg/100 g) y 20 veces más que el kiwi (93 mg/100 g). Produce frutos esféricos pequeños (1.5-3 cm diámetro) de cáscara morada-roja brillante a negra en madurez plena, pulpa rosada-blanquecina muy ácida (pH 2.5-3.0) y astringente con 1-3 semillas. La maduración escalonada y la perecibilidad altísima (2-3 días tras cosecha) obligan a procesamiento inmediato — pulpa congelada, jugo pasteurizado, polvo deshidratado o cápsulas de extracto seco para mercado nutracéutico premium (Japón, Estados Unidos, Unión Europea). Lección viva: planta-emblema de la diversidad amazónica que enseña cuatro conceptos clave: (1) el récord mundial de vitamina C es ejemplo extremo de bioquímica vegetal — la planta acumula ácido ascórbico como antioxidante para protegerse del estrés oxidativo en ambientes de várzea (alta radiación, fluctuaciones de oxígeno por inundación); (2) la adaptación a inundación estacional (várzea) es ejemplo magistral de plasticidad fenotípica — las raíces toleran anoxia parcial 2-5 meses al año y la planta sincroniza floración con bajante de aguas; (3) el potencial económico de los productos forestales no maderables (PFNM) amazónicos como alternativa a la deforestación, con cadenas de valor lideradas por AGROSAVIA, SINCHI y cooperativas indígenas del Trapecio Amazónico; (4) la soberanía alimentaria y farmacológica: el camu camu es a Colombia lo que el açaí es a Brasil, un superalimento nativo invisible en supermercados nacionales pero exportado a precio premium, situación que invita a la reflexión crítica sobre cadenas de valor injustas. Manejo agroecológico: siembra en suelos inundables o de drenaje pantanoso a orillas de quebradas y bajos, asocio en SAF con copoazú, açaí y plátano, polinización por abejas nativas Trigonini (Tetragonisca angustula angelita), no tolera sequía prolongada, cero agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Manual Frutales Tropicales, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía, FAO EcoCrop."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "euterpe_precatoria",
+      "nombre_comun": "Asaí amazónica",
+      "nombre_comunes_regionales": [
+        "açaí solteiro",
+        "huasaí",
+        "manaca",
+        "asaí de la Amazonía",
+        "naidí amazónico"
+      ],
+      "nombre_cientifico": "Euterpe precatoria Mart.",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 500,
+        "max_absoluto": 900
+      },
+      "temperatura_c": {
+        "helada_letal": 10,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Semilla recalcitrante: sembrar fresca tras despulpado en agua, germinación 30-90 días. Vivero 8-14 meses bajo sombra densa 70%. Distancia 5x5 m o más en sistemas extensivos, 3x3 m en manejo intensivo. A diferencia de Euterpe oleracea (asaí multicaule del bajo Amazonas), E. precatoria es monocaule (un solo estípite) — no rebrota tras corte. Primera fructificación 5-7 años."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "sinchi-amazonia-colombiana",
+        "bernal-2015-plantas-liquenes-colombia",
+        "agrosavia-manual-frutales-tropicales",
+        "fao-ecocrop"
+      ],
+      "valor_pedagogico": "La asaí amazónica o huasaí (Euterpe precatoria Mart., familia Arecaceae) es una palmera frutal nativa solitaria monocaule (10-20 m altura, estípite delgado 8-15 cm diámetro) de la Amazonía occidental colombiana (Amazonas, Caquetá, Putumayo, Guainía, Vaupés), peruana (Loreto, Madre de Dios) y boliviana, considerada la palmera más abundante del bioma amazónico colombiano según inventarios SINCHI y la especie de palmera con mayor biomasa per cápita registrada en bosques de tierra firme. Se diferencia de su congénere oriental Euterpe oleracea (asaí multicaule del estuario del Amazonas brasileño, cultivada masivamente en Pará y Maranhão) por su hábito solitario — un solo estípite no rebrotante, que muere tras corte completo. Produce racimos péndulos con frutos esféricos pequeños (1-1.5 cm diámetro) morado-negros en madurez, con pulpa delgada oleosa morada-grasienta (15-20% lípidos) rica en antocianinas, ácidos grasos omega-9 (oleico) y omega-6 (linoleico), y polifenoles antioxidantes; del fruto se procesa pulpa amazónica usada en jugos, helados, mermeladas y mercados gourmet internacionales (superfood). Lección viva: palmera-emblema del bosque amazónico colombiano que enseña cuatro conceptos críticos: (1) la diferencia entre las dos especies del género Euterpe — la oriental multicaule (oleracea) y la occidental monocaule (precatoria) — como ejemplo de especiación alopátrica en la cuenca amazónica, separadas hace millones de años por el arco de Iquitos; (2) la importancia del manejo sostenible de productos forestales no maderables (PFNM): mientras E. oleracea brasileña se maneja por touceiras rebrotantes (cosecha sustentable indefinida), E. precatoria colombiana muere al cortarla para extracción de palmito o cosecha agresiva, lo cual obliga a manejo extractivista sostenible por trepa (subida con peconha tradicional) y no por tumba; (3) el rol ecológico como fuente clave de alimento para fauna amazónica — sus frutos sustentan tucanes (Ramphastos tucanus, R. vitellinus), pavas (Pipile pipile), mamíferos arborícolas (Ateles, Lagothrix, Cebus) y dispersores terrestres (Tapirus terrestris, agutíes Dasyprocta fuliginosa); (4) la cadena de valor del asaí colombiano como alternativa económica viable a la ganadería extensiva en Caquetá, Putumayo y Amazonas, con liderazgo de cooperativas indígenas y proyectos SINCHI-IIAP. Manejo agroecológico: siembra en sistemas agroforestales (SAF) bajo sombra inicial, asocio con copoazú, plátano y cacao en chagras amazónicas, cosecha por trepa tradicional o pértiga, polinización por abejas nativas (Meliponini), no tolera sol pleno en juveniles, cero agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Manual Frutales Tropicales, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía, FAO EcoCrop."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "solanum_quitoense_amazonico",
+      "nombre_comun": "Naranjilla amazónica",
+      "nombre_comunes_regionales": [
+        "lulo de tierras bajas",
+        "lulo amazónico",
+        "lulo de la Amazonía",
+        "cocona de monte"
+      ],
+      "nombre_cientifico": "Solanum quitoense Lam. var. septentrionale (R.E.Schult. & Cuatrec.) Whalen",
+      "familia_botanica": "Solanaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 200,
+        "optimo_min": 400,
+        "optimo_max": 1200,
+        "max_absoluto": 1600
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Semillas de fruto maduro lavadas y secadas a sombra (germinación 15-30 días). Vivero 2-3 meses bajo sombra parcial. Trasplante a 2x2 m bajo sombra de plátano o guamo. La variedad septentrionale (lulo amazónico) carece de espinas y tolera más calor que el lulo andino típico (S. quitoense var. quitoense); fruto algo más pequeño y menos ácido (pH 3.4-3.8)."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-manual-frutales-tropicales",
+        "sinchi-amazonia-colombiana",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "La naranjilla amazónica o lulo de tierras bajas (Solanum quitoense Lam. var. septentrionale, familia Solanaceae) es la variedad ecotípica de zonas bajas amazónicas y piedemonte (200-1.200 msnm) del complejo del lulo andino (S. quitoense var. quitoense, 1.600-2.400 msnm) que se cultiva en chagras campesinas e indígenas del piedemonte amazónico colombiano (Caquetá: Florencia, Belén de los Andaquíes, San Vicente del Caguán; Putumayo: Mocoa, Villagarzón, Puerto Asís; Amazonas: Leticia, Tarapacá; Vichada: Cumaribo). Se diferencia de la variedad andina típica por dos rasgos morfo-fisiológicos diagnósticos: (1) ausencia o reducción drástica de espinas en tallo y hojas (variedad inerme, mientras el lulo andino es espinoso), (2) mayor tolerancia térmica (óptimo 20-28 °C versus 16-22 °C de la variedad andina) y altitudinal hacia abajo, (3) frutos más pequeños (3-5 cm diámetro vs 5-8 cm del lulo andino) y menos ácidos. Produce frutos esféricos anaranjados-amarillentos pubescentes (vellosidades estrelladas marrones que se desprenden al frotar) de pulpa verde gelatinosa rica en vitamina C, ácido cítrico, ácido málico y carotenoides. Lección viva: planta-puente entre el piedemonte amazónico y el altiplano cundiboyacense que enseña tres conceptos botánicos y agroecológicos críticos: (1) el concepto de variedad ecotípica como adaptación local intraespecífica — la misma especie Solanum quitoense desarrolla dos ecotipos diferenciados (andino espinoso vs amazónico inerme) por presión selectiva diferencial de altitud, temperatura y herbivoría, ejemplo magistral de plasticidad fenotípica y selección adaptativa local; (2) la importancia de conservar germoplasma campesino e indígena de variedades adaptadas localmente como soberanía genética y alimentaria, especialmente frente al riesgo de erosión genética por hibridación con la variedad comercial andina; (3) el rol del lulo amazónico en la cadena de valor regional — pulpa congelada en frigoríficos de Florencia y Mocoa, jugos en cafeterías y restaurantes amazónicos, mermeladas artesanales en mercados campesinos. Manejo agroecológico: siembra bajo sombra de plátano, guamo (Inga edulis) o copoazú, asocio en SAF con yuca y piña, control biológico de Neoleucinodes elegantalis (perforador del fruto) con Trichogramma pretiosum, vigilancia de Meloidogyne incognita (nematodo del nudo radical), cero agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Manual Frutales Tropicales, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "bactris_gasipaes_amazonica",
+      "nombre_comun": "Pijuayo amazónico",
+      "nombre_comunes_regionales": [
+        "chontaduro amazónico",
+        "pejibaye amazónico",
+        "pifayo",
+        "tembe",
+        "cachipay amazónico"
+      ],
+      "nombre_cientifico": "Bactris gasipaes Kunth var. gasipaes (ecotipo amazónico)",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer",
+        "living_fence"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 600,
+        "max_absoluto": 1000
+      },
+      "temperatura_c": {
+        "helada_letal": 10,
+        "optimo_min": 23,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Semilla recalcitrante: sembrar fresca, germinación lenta (3-6 meses, requiere paciencia). Vivero 8-12 meses en bolsa con sombra 50%. Trasplante a 5x5 m o 6x6 m. Ecotipo amazónico se diferencia del chocoano (Pacífico) por frutos más harinosos y menos aceitosos, racimos con espinas más cortas y palmas cespitosas (multicaule rebrotante) lo cual permite cosecha sustentable indefinida. Tradicionalmente cultivado en chagras tikuna, huitoto y bora."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-manual-frutales-tropicales",
+        "sinchi-amazonia-colombiana",
+        "bernal-2015-plantas-liquenes-colombia",
+        "fao-ecocrop",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "El pijuayo amazónico o chontaduro de tierra firme (Bactris gasipaes Kunth ecotipo amazónico, familia Arecaceae) es una palmera cespitosa multicaule (8-20 m altura, 4-12 estípites por mata) cultivada milenariamente en chagras de pueblos indígenas amazónicos colombianos (tikuna, huitoto, bora, ocaina, miraña, andoke en el trapecio amazónico) y de la Amazonía peruana, ecuatoriana y brasileña. Se diferencia del ecotipo chocoano del Pacífico colombiano (Tumaco, Buenaventura, Quibdó) por tres rasgos: (1) frutos más harinosos y menos aceitosos (12-18% lípidos vs 20-30% en chocoano), de mayor contenido de almidón y carotenoides (provitamina A), (2) racimos con espinas más cortas o ausentes en algunas variedades amazónicas seleccionadas tradicionalmente, (3) hábito cespitoso pleno (multicaule rebrotante) que permite cosecha sustentable indefinida — al cortar un estípite para palmito o por vejez, los hijuelos basales continúan la mata, contrastando con palmas monocaules como Euterpe precatoria que mueren al cortarlas. Produce racimos pesados con 50-300 frutos drupáceos elipsoidales (3-6 cm) anaranjados-rojizos en madurez con pulpa harinosa-fibrosa muy rica en almidón, carotenoides, proteína (5-7%) y aceites, semilla central dura comestible (sabor a coco) — fruto cocido en agua con sal por 30-60 minutos, consumo cotidiano en mercados de Leticia, Florencia, Mocoa, Mitú e Inírida. Lección viva: palmera-emblema de la chagra amazónica colombiana que enseña cuatro conceptos críticos: (1) la diferencia funcional entre ecotipos amazónico (harinoso, multicaule, cosecha sustentable) y chocoano (aceitoso, monocaule en algunas variedades, mayor rendimiento por individuo) como ejemplo de domesticación independiente paralela por dos pueblos diferentes (indígenas amazónicos vs afrocolombianos del Pacífico) durante 6.000-10.000 años, registro arqueobotánico en la Amazonía peruana documenta domesticación temprana en el Holoceno medio; (2) el concepto de domesticación pre-colombina de palmeras y la pérdida de biodiversidad varietal tradicional, ya que la chagra de cada comunidad maneja 3-8 ecotipos locales irreproducibles ex-situ (banco de germoplasma vivo); (3) la importancia nutricional: el pijuayo aporta proteína completa (8 aminoácidos esenciales), almidón resistente y carotenoides en una sola pieza, siendo uno de los alimentos básicos más completos del trópico americano; (4) la cosecha sustentable por hábito cespitoso contrastada con palmeras monocaules, lección magistral de manejo sostenible de productos forestales no maderables. Manejo agroecológico: siembra en chagras junto a yuca, plátano, copoazú y piña; cosecha manual con sopladera o trepa tradicional con peconha; cero agroquímicos; control natural de Rhynchophorus palmarum (gualpa, picudo de la palma) por trampas con feromonas. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Manual Frutales Tropicales, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía, FAO EcoCrop."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "manihot_esculenta",
+      "nombre_comun": "Yuca brava amazónica",
+      "nombre_comunes_regionales": [
+        "yuca amarga",
+        "mandioca brava",
+        "casabe",
+        "fariña",
+        "yuca venenosa",
+        "tapioca"
+      ],
+      "nombre_cientifico": "Manihot esculenta Crantz",
+      "familia_botanica": "Euphorbiaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 800,
+        "max_absoluto": 1500
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "estaca",
+        "notas": "Estacas de 20-25 cm de tallo maduro (1 año), sembradas en horizontal o inclinadas a 5-10 cm de profundidad. Cosecha de raíces tuberosas a 8-18 meses según ecotipo (yuca brava amazónica suele ser de ciclo largo 12-18 meses). La yuca amarga (alto contenido cianogénico, >100 mg HCN/kg fresco) requiere procesamiento obligatorio: rallado, prensado del manipueira (líquido amarillo tóxico) y tostado para fabricar casabe o fariña, lección milenaria de seguridad alimentaria indígena."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-manual-frutales-tropicales",
+        "sinchi-amazonia-colombiana",
+        "bernal-2015-plantas-liquenes-colombia",
+        "fao-ecocrop",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "La yuca brava amazónica o mandioca amarga (Manihot esculenta Crantz, familia Euphorbiaceae) es un arbusto leñoso (2-4 m altura) nativo de las tierras bajas de Sudamérica tropical, domesticada hace 8.000-10.000 años en el sudoeste de la cuenca amazónica (frontera Brasil-Bolivia, área de Rondônia) según evidencia arqueobotánica y genética (Olsen & Schaal 1999), considerada la cuarta fuente de carbohidratos para la humanidad después del arroz, el trigo y el maíz, y la base alimentaria milenaria de los pueblos amazónicos colombianos (tikuna, huitoto, bora, miraña, muinane, andoke, ocaina, yagua, kichwa, siona, kofán, secoya, inga, kamëntsá, makuna, yukpa, sikuani, piaroa). Existen dos grupos varietales tradicionales bien diferenciados: yuca dulce (mansa, bajo contenido de glucósidos cianogénicos <50 mg HCN/kg, consumo directo cocida) y yuca brava o amarga (alto contenido cianogénico 100-500 mg HCN/kg, requiere procesamiento elaborado para eliminar el ácido cianhídrico y transformarse en casabe, fariña o manicuera fermentada). El proceso tradicional indígena para procesar la yuca brava — rallado en tabla de aserrín de palma o concha, prensado en sebucán (cilindro tejido de palma con torsión gravitacional) para extraer el manipueira o yare (líquido amarillo cianhídrico tóxico), tamizado de la masa, tostado en budare o tiesto cerámico para hacer casabe (torta delgada) o fariña (granulado seco) — es uno de los logros etnoquímicos más sofisticados de la humanidad precolombina, comparable al procesamiento del maíz por nixtamalización mesoamericana. Lección viva: planta-pilar de la chagra amazónica colombiana que enseña cinco conceptos críticos: (1) la domesticación temprana de plantas tóxicas (yuca amarga) por pueblos amazónicos como ejemplo magistral de coevolución cultura-naturaleza, donde un cultivo venenoso se vuelve alimento básico mediante una tecnología procesual milenaria; (2) la diferencia entre yuca dulce y yuca brava como caso de selección artificial divergente — la yuca brava conserva su defensa cianogénica natural contra herbívoros y la cultura humana la procesa, mientras la yuca dulce ha perdido esa defensa por selección y se cultiva en zonas con menor presión de saqueo (ej. periurbano colombiano); (3) la chagra amazónica de yuca como sistema rotatorio milenario sostenible: tumba-pudre o slash-and-mulch, ciclo de 1-3 años de cultivo seguido de barbecho de 8-15 años, lección magistral de agricultura itinerante de bosque tropical sin uso de fuego en muchas variantes; (4) la soberanía alimentaria amazónica — el casabe y la fariña son alimentos vivos de la identidad cultural de pueblos como los huitoto, tikuna y bora, y la pérdida del manejo tradicional implica erosión cultural y genética simultánea (>200 variedades locales documentadas en chagras del trapecio amazónico colombiano por SINCHI); (5) la bioquímica defensiva vegetal: los glucósidos cianogénicos (linamarina, lotaustralina) liberan HCN al ser hidrolizados por la enzima linamarasa, lección de bioquímica de defensa estructural disociada espacialmente (los glucósidos en vacuola, la enzima en citoplasma, contacto solo al daño mecánico). Manejo agroecológico: siembra en chagras nuevas (tumba-pudre tradicional), asocio con plátano, piña, copoazú, ají, achiote, cocona; cosecha escalonada manual; cero agroquímicos; control biológico de Phenacoccus manihoti (cochinilla de la yuca) con Anagyrus lopezi (avispita brasileña). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Manual Frutales Tropicales, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía, FAO EcoCrop, Pérez-Arbeláez 1947."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "annona_mucosa",
+      "nombre_comun": "Biribá",
+      "nombre_comunes_regionales": [
+        "anona amazónica",
+        "anón amazónico",
+        "biribá rosado",
+        "fruta-da-condessa",
+        "lemon meringue fruit"
+      ],
+      "nombre_cientifico": "Annona mucosa Jacq.",
+      "familia_botanica": "Annonaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 600,
+        "max_absoluto": 1100
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Semillas recalcitrantes a semi-recalcitrantes (mejor sembrar frescas, germinación 25-50 días). Vivero 6-9 meses bajo sombra 50%. Trasplante a 6x6 m o 7x7 m. Primera fructificación 3-5 años desde semilla. Tradicionalmente sembrado en chagras kichwa, ticuna y siona del trapecio amazónico y piedemonte putumayense. Sinónimo taxonómico anterior: Rollinia mucosa (Jacq.) Baill. — POWO reconoce Annona mucosa Jacq. como nombre aceptado vigente."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "sinchi-amazonia-colombiana",
+        "agrosavia-manual-frutales-tropicales",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El biribá o anona amazónica (Annona mucosa Jacq., sinónimo anterior Rollinia mucosa (Jacq.) Baill., familia Annonaceae) es un árbol frutal nativo amazónico (5-12 m altura, copa abierta) de la cuenca amazónica occidental y central, distribuido naturalmente en bosque húmedo tropical de tierra firme de Colombia (Caquetá, Putumayo, Amazonas, Vaupés, Guainía), Ecuador (Napo, Pastaza), Perú (Loreto, Madre de Dios) y Brasil (Acre, Amazonas, Pará). Produce frutos sincárpicos esféricos a obovoides grandes (10-20 cm diámetro, 0.5-2 kg peso) de cáscara amarilla brillante con proyecciones cónicas o gibas piramidales (los carpelos individuales fusionados) que recuerdan a la chirimoya andina, pulpa blanco-cremosa muy aromática y mucilaginosa (de ahí el epíteto mucosa) extraordinariamente dulce (18-22 °Brix) con sabor a piña-mango-lemon meringue (de ahí su nombre comercial inglés 'lemon meringue fruit') y semillas negras numerosas elipsoidales planas. Es una de las anonáceas tropicales más codiciadas por su sabor y aroma, comercializada en mercados regionales de Leticia, Florencia, Mocoa, Mitú e Inírida, y cada vez más demandada como fruta exótica en cadenas gourmet internacionales. Lección viva: árbol-tesoro de la chagra amazónica que enseña cuatro conceptos críticos: (1) la nomenclatura botánica viva — el cambio reciente de Rollinia a Annona (Maas et al. 2011, reclassification of Annonaceae basada en filogenia molecular) muestra que la taxonomía no es estática, sino una construcción científica en evolución constante; los profesores y agricultores deben actualizar sus libros para no confundir a niñas y niños con nombres obsoletos; (2) la familia Annonaceae como uno de los clados angiospermos más antiguos (linaje Magnoliid basal, divergente del resto de eudicotiledóneas hace ~125 millones de años), con flores con muchos estambres en disposición espiralada (estado plesiomórfico), polinización por escarabajos tempranos (síndrome cantarofilia ancestral) y olores fermentados que atraen al género polinizador Cyclocephala (escarabajo melolontino); (3) el contraste con su prima andina chirimoya (Annona cherimola), que es de zonas templadas (1.500-2.500 msnm), versus el biribá que es estrictamente cálido (0-1.000 msnm) — ejemplo magistral de radiación adaptativa altitudinal dentro del mismo género; (4) la sub-utilización económica del biribá en Colombia, conocido y consumido localmente en la Amazonía pero invisible en mercados de Bogotá, Medellín o Cali, situación que invita a reflexión sobre cadenas de valor y conocimiento campesino-indígena marginalizado. Manejo agroecológico: siembra en sistemas agroforestales con sombra parcial inicial (50%) bajo plátano o guamo (Inga edulis), asocio con copoazú, asaí, piña y yuca, cosecha manual de fruto maduro caído (no se corta del árbol — cae al madurar, indicador claro), cero agroquímicos, control biológico de Bephratelloides cubensis (perforador de la semilla) por podas sanitarias y trampas de luz. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Manual Frutales Tropicales, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "inga_feuilleei",
+      "nombre_comun": "Pacae amazónico",
+      "nombre_comunes_regionales": [
+        "guabo amazónico",
+        "pacay",
+        "guama amazónica",
+        "ice cream bean",
+        "huaba amazónica"
+      ],
+      "nombre_cientifico": "Inga feuilleei DC.",
+      "familia_botanica": "Fabaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer",
+        "nurse_plant",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 200,
+        "optimo_min": 500,
+        "optimo_max": 1800,
+        "max_absoluto": 2400
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 18,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Semilla recalcitrante: germina espontáneamente dentro de la vaina madura por viviparidad incipiente, sembrar inmediatamente. Vivero 4-6 meses. Trasplante a 8x8 m como sombra de café/cacao, 5x5 m como cortina cortavientos. Crecimiento rápido (2-3 m/año juveniles). Fija nitrógeno por simbiosis con rizobios. Primera vainas a 3-4 años."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-manual-frutales-tropicales",
+        "sinchi-amazonia-colombiana",
+        "bernal-2015-plantas-liquenes-colombia",
+        "fao-ecocrop"
+      ],
+      "valor_pedagogico": "El pacae amazónico o guabo (Inga feuilleei DC., familia Fabaceae subfamilia Mimosoideae) es un árbol mediano-grande (10-18 m altura, copa amplia umbeliforme) nativo de la vertiente oriental andina y piedemonte amazónico colombiano-peruano-ecuatoriano, cultivado tradicionalmente desde tiempos prehispánicos por culturas amazónicas e incaicas (registros arqueobotánicos de Pacae en sitios pre-Tiwanaku, Wari y Chimú peruanos demuestran domesticación temprana). Produce vainas péndulas alargadas características del género Inga (15-50 cm largo, 3-5 cm ancho, ligeramente curvadas en forma de sable) que al abrirse revelan semillas grandes negras rodeadas de un arilo blanco esponjoso muy dulce (15-18 °Brix) con textura algodonosa y sabor a vainilla-helado, lección viva del fenómeno biológico de los arilos como pulpas adyacentes a la semilla (no fruto verdadero — el fruto es la vaina seca dehiscente, el dulce es arilo adaptado a dispersión zoocórica). El género Inga es uno de los más diversos del bosque neotropical (300+ especies, con centro de diversidad en la cuenca amazónica) y las especies son icónicas como árboles de sombra en sistemas agroforestales de cacao y café desde tiempos coloniales. Lección viva: árbol-pilar del SAF amazónico y andino que enseña cinco conceptos críticos: (1) la simbiosis radical con rizobios (Bradyrhizobium spp., bacterias fijadoras de nitrógeno atmosférico) que permite a Inga aportar 100-300 kg N/ha/año al sistema, ejemplo magistral de fijación biológica de nitrógeno (FBN) sin agroquímicos, base de la fertilidad sostenible en chagras amazónicas; (2) la función ecológica de árbol sombra en cultivos de café arábigo, cacao, lulo, plátano, copoazú y vainilla — el pacae actúa como nurse plant clave que mejora microclima, recicla nutrientes vía hojarasca, conserva humedad del suelo y reduce 30-50% la incidencia de patógenos foliares; (3) la diferencia entre fruto verdadero (legumbre) y arilo (estructura adicional adaptada a dispersión zoocórica) — concepto clave de morfología floral y carpológica que se enseña en biología vegetal usando el pacae como ejemplo didáctico ideal; (4) la domesticación pre-incaica de árboles en los Andes y Amazonía como ejemplo de manejo forestal antiguo, el pacae fue mencionado por cronistas españoles del s. XVI como uno de los frutales más apreciados; (5) la importancia del género Inga para restauración ecológica y agroforestería del trópico — sistema de 'Inga alley cropping' (cultivo en callejones de Inga) desarrollado por Mike Hands en Belice y replicado en Amazonía como alternativa sostenible al slash-and-burn. Manejo agroecológico: siembra en chagras como sombra inicial para cacao, café o copoazú; asocio rotatorio con cultivos anuales bajo callejones (alley cropping); poda anual de ramas para mulch in-situ (kg de biomasa/ha) que aporta N al suelo; corta y deja (chop-and-drop) tradicional; cero agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Manual Frutales Tropicales, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía, FAO EcoCrop."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
+      "id": "psidium_friedrichsthalianum",
+      "nombre_comun": "Guayaba ácida",
+      "nombre_comunes_regionales": [
+        "cas",
+        "guayaba agria",
+        "arrayán de Costa Rica",
+        "guayaba de Costa Rica",
+        "guayaba del Pacífico"
+      ],
+      "nombre_cientifico": "Psidium friedrichsthalianum (O.Berg) Nied.",
+      "familia_botanica": "Myrtaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1400,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Semilla ortodoxa (tolera secado) — viabilidad 1-2 años con almacenamiento seco. Germinación 20-40 días en semilleros con sombra parcial. Vivero 6-8 meses. Trasplante a 4x4 m o 5x5 m. Primera fructificación 2-3 años. Tolerante a Tephritidae (mosca de la fruta) por menor tamaño y mayor acidez que la guayaba dulce común (Psidium guajava), considerada portainjerto resistente a nematodos y enfermedades del suelo."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-manual-frutales-tropicales",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sinchi-amazonia-colombiana",
+        "fao-ecocrop"
+      ],
+      "valor_pedagogico": "La guayaba ácida o cas (Psidium friedrichsthalianum (O.Berg) Nied., familia Myrtaceae) es un árbol pequeño-mediano (5-10 m altura, tronco característico de corteza papirácea exfoliante color cobrizo-canela) nativo de Mesoamérica (Costa Rica, Nicaragua, Panamá, sur de México) y noroccidente sudamericano (vertiente pacífica y amazónica de Colombia: Chocó, Valle del Cauca, Cauca, Nariño, Putumayo, Caquetá, Amazonas), donde aparece naturalmente en bosques húmedos tropicales secundarios y se cultiva tradicionalmente en huertas familiares por sus frutos altamente ácidos. Produce frutos esféricos pequeños a medianos (3-5 cm diámetro) de cáscara amarilla brillante lisa al madurar, pulpa blanca-rosada muy ácida (pH 2.5-3.0) con numerosas semillas pequeñas duras, sabor que combina la guayaba dulce común con un toque cítrico y resinoso muy distintivo. Lección viva: árbol-puente entre Centroamérica y Sudamérica que enseña cinco conceptos críticos: (1) la diferencia entre las dos especies del género Psidium domesticadas — la guayaba dulce común (P. guajava) cosmopolita y supercultivada, versus la guayaba ácida (P. friedrichsthalianum) regional y artesanal — como ejemplo de domesticación parcial y mantenimiento de variabilidad silvestre cercana al ancestro, lección útil para entender el continuo silvestre-cultivado; (2) el rol del intercambio biótico de plantas útiles a lo largo del puente terrestre centroamericano-sudamericano post-cierre del istmo de Panamá (3 millones de años atrás), parte del Gran Intercambio Biótico Americano (GABI); (3) el uso como portainjerto resistente — la guayaba ácida es la planta madre injertable preferida para injertar guayaba dulce comercial (P. guajava) en zonas con problemas de Meloidogyne incognita (nematodo del nudo radical) o hongos del suelo, lección práctica de injertación interespecífica y manejo agroecológico de patógenos sin agroquímicos; (4) la cultura gastronómica costarricense del 'fresco de cas' (jugo agridulce con azúcar) como ejemplo de patrimonio gastronómico regional asociado a una sola especie botánica, lección de etnobiología aplicada; (5) los compuestos volátiles aromáticos de la familia Myrtaceae (eugenol, mirceno, limoneno, ácido ascórbico abundante 100-200 mg/100 g) como base bioquímica del aroma característico y de las propiedades antimicrobianas reconocidas en medicina tradicional para tratamiento de afecciones gastrointestinales y respiratorias. Manejo agroecológico: siembra en huertas familiares y cercas vivas; asocio con cítricos, plátano, lulo amazónico y café; cosecha manual escalonada (mayo-agosto en piedemonte amazónico colombiano); cero agroquímicos; control biológico de Anastrepha fraterculus (mosca de la fruta) por trampas McPhail con cebos proteínicos y bolsas de papel sobre frutos en desarrollo. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Manual Frutales Tropicales, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía, FAO EcoCrop."
     }
   ],
   "biopreparados": [
