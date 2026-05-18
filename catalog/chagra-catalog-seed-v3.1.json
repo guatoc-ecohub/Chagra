@@ -9046,9 +9046,12 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "bernal-2015-plantas-liquenes-colombia",
         "fao-ecocrop"
       ],
-      "valor_pedagogico": "Raiz europea poco conocida en Colombia que demuestra como el frio transforma la quimica de los alimentos. Su sabor dulce post-helada ensena principios de bioquimica vegetal."
+      "valor_pedagogico": "La chirivía o pastinaca (Pastinaca sativa L., familia Apiaceae, subfamilia Apioideae, tribu Tordylieae) es una apiácea bienal herbácea de raíz pivotante engrosada-suculenta (15-30 cm largo, 3-6 cm diámetro en la corona) color blanco-crema marfileño, originaria de Eurasia (Mediterráneo central y Europa templada), cultivada desde el periodo romano como hortaliza de raíz y aclimatada en huertos campesinos colombianos de clima templado-frío de la Sabana de Bogotá y altiplano cundiboyacense desde el periodo colonial temprano. Su sabor característico dulce-aromático con notas anisadas-terrosas proviene de un perfil de azúcares (sacarosa, glucosa, fructosa) y compuestos volátiles (terpenoides, miristicina, apiol) que se concentran tras exposición a temperaturas bajo cero. Se cultiva en Cundinamarca (Sabana de Bogotá, Subachoque, Sopó, Tabio, Mosquera), Boyacá (Tunja, Villa de Leyva, Sutamarchán, Duitama), Antioquia (oriente — La Ceja, El Retiro, Marinilla), Nariño (Pasto, Túquerres) y Eje cafetero alto entre 1.800 y 2.800 msnm en zona térmica fría a templada seca. Ciclo 100-140 días desde siembra a cosecha de raíz. Rendimientos 25-40 t/ha raíz fresca. Lección viva de bioquímica vegetal: raíz europea poco conocida en Colombia que demuestra como el frío transforma la química de los alimentos por hidrólisis enzimática del almidón a azúcares simples (amilasa activada a 0-5 °C), un mecanismo de criopreservación natural que la planta usa para sobrevivir el invierno al evitar la cristalización celular. Su sabor dulce post-helada enseña principios de bioquímica vegetal: la conversión almidón → azúcar como respuesta adaptativa al estrés térmico, comparable al proceso documentado en otras raíces y tubérculos andinos (papa criolla, oca, ulluco). Manejo agroecológico: siembra directa por su raíz pivotante sensible al trasplante (evita transplante post-cotiledones), semilla fresca obligatoria (pierde viabilidad en <1 año), raleo a 8-10 cm entre plantas, riego moderado constante, asocio con lechuga y rábano de ciclo corto, cosecha posterior a primera helada para maximizar dulzura, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Tibaitatá, Bernal 2015 Catálogo Plantas Colombia, FAO Ecocrop."
     },
     {
       "id": "cynara_cardunculus_scolymus",
@@ -9811,11 +9814,15 @@
         "notas": "Germinación lenta; requiere semilla fresca y sustrato húmedo. Crece como arbolito de hasta 15 m en bosque altoandino."
       },
       "source_ids": [
-        "perez-arbelaez-1947-plantas-utiles",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
         "bernal-2015-plantas-liquenes-colombia",
-        "gbif-taxonomic-backbone"
+        "humboldt-flora-alto-andina",
+        "jbb-plantas-medicinales",
+        "perez-arbelaez-1947-plantas-utiles"
       ],
-      "valor_pedagogico": "Árbol medicinal de los muiscas: su corteza aromática con aroma a canela conecta la botánica altoandina con la medicina tradicional indígena del altiplano cundiboyacense.",
+      "valor_pedagogico": "El canelón o canelo de páramo (Drimys granadensis L.f., familia Winteraceae, orden Canellales) es una winteriácea arbórea pequeña a mediana (6-15 m altura, copa densa cónica) perennifolia nativa endémica de los Andes del norte de Sudamérica (Colombia, Venezuela, Ecuador) y considerada uno de los linajes angiospermos más basales del planeta — su madera carece de vasos xilemáticos (solo traqueidas), un rasgo ancestral que la convierte en testigo viviente de la evolución temprana de las plantas con flores en el periodo Cretácico inferior (140 millones de años atrás). Sus hojas coriáceas alternas elípticas con envés glauco-blanquecino y su corteza fibrosa contienen drimanos sesquiterpenoides (poligodial, drimenol, isodrimeninol) responsables del aroma penetrante a canela-pimienta y de su uso medicinal tradicional. Se distribuye en bosque altoandino y sub-páramo de Cundinamarca (Chingaza, Sumapaz, Cruz Verde, Guerrero), Boyacá (Iguaque, Pisba, Cocuy), Santander (Páramo del Almorzadero, Yariguíes), Cauca (Puracé), Nariño (Galeras, Cumbal), Antioquia (Sonsón, Belmira) y Eje cafetero (Los Nevados) entre 2.500 y 3.700 msnm en zona térmica fría a páramo bajo. Ciclo perenne de larga duración, longevidad >100 años, floración asincrónica enero-abril. Lección viva: árbol medicinal de los muiscas — su corteza aromática con aroma a canela penetrante (de donde proviene el nombre vernáculo) conecta la botánica altoandina con la medicina tradicional indígena del altiplano cundiboyacense, donde la etnia muisca la usaba para tratar afecciones gastrointestinales, dolores reumáticos y como aromática ritual. Enseña tres conceptos críticos: filogenia angiosperma basal (madera sin vasos = ancestralidad), endemismo andino del norte de Sudamérica (no existe fuera de los Andes tropicales), y valor crítico en restauración ecológica de bosque altoandino y sub-páramo como nurse plant facilitadora frente a invasión por retamo espinoso (Ulex europaeus) y kikuyo (Cenchrus clandestinus) en franjas degradadas Cruz Verde-Sumapaz-Chingaza. Manejo agroecológico: propagación por semilla fresca (pierde viabilidad <3 meses) en sustrato húmedo bajo sombra, germinación lenta 60-120 días, trasplante con cepellón a sitio definitivo en lluvias, asocio en restauración con romero de páramo y mortiño, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, Humboldt Flora Alto-Andina, JBB Plantas Medicinales, Pérez-Arbeláez 1947 Plantas Útiles.",
       "validation_level": "claude_draft"
     },
     {
@@ -9957,11 +9964,15 @@
         "notas": "Propagación por semilla recolectada de capítulos secos. Siembra directa en sustrato arenoso con buen drenaje."
       },
       "source_ids": [
-        "perez-arbelaez-1947-plantas-utiles",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
         "bernal-2015-plantas-liquenes-colombia",
-        "gbif-taxonomic-backbone"
+        "humboldt-flora-alto-andina",
+        "humboldt-2016-frailejones",
+        "perez-arbelaez-1947-plantas-utiles"
       ],
-      "valor_pedagogico": "Habitant-te nativo del páramo colombiano: sus hojas finas como romero enseñan la adaptación de las asteráceas a la alta montaña tropical y su uso en medicina tradicional.",
+      "valor_pedagogico": "El romero blanco o romero de páramo (Diplostephium rosmarinifolium (Benth.) Wedd., familia Asteraceae, subfamilia Asteroideae, tribu Astereae) es una asterácea arbustiva perennifolia (1-3 m altura, hábito muy ramificado denso) nativa endémica de los páramos colombianos, ecuatorianos y venezolanos, y considerada una de las especies leñosas asociadas características de las comunidades de frailejón (Espeletia spp.) en los páramos cundiboyacenses (Cruz Verde, Sumapaz, Chingaza, Iguaque) y de los Andes del norte. Sus hojas lineares-coriáceas pequeñas (1-2 cm largo, 1-2 mm ancho) con envés blanco-tomentoso y márgenes revolutos recuerdan estructuralmente al romero mediterráneo (Salvia rosmarinus) por convergencia evolutiva hacia el síndrome xerofítico-microfilo de plantas adaptadas a desecación, alta radiación UV y vientos fríos extremos del ecosistema páramo. Sus capítulos pequeños blanco-amarillentos contienen lactonas sesquiterpénicas y compuestos fenólicos con actividad antiinflamatoria documentada en uso etnobotánico tradicional. Se distribuye exclusivamente en páramo andino de Cundinamarca (Sumapaz, Chingaza, Cruz Verde, Guerrero, Guacheneque), Boyacá (Iguaque, Pisba, Cocuy, Rabanal), Santander (Almorzadero, Yariguíes), Cauca (Puracé, Sotará), Nariño (Las Ovejas, Doña Juana) y Tolima (Los Nevados) entre 2.800 y 4.000 msnm en zona térmica páramo bajo a páramo alto. Ciclo perenne de larga duración, longevidad >50 años, floración escalonada todo el año con picos en seca. Lección viva: habitante nativo del páramo colombiano — sus hojas finas linear-revolutas como romero enseñan la adaptación convergente de las asteráceas a la alta montaña tropical mediante el síndrome xeromorfo-microfilo (hojas pequeñas coriáceas envés tomentoso) que reduce pérdida de agua por transpiración y refleja exceso de radiación UV, comparable al adoptado independientemente por plantas mediterráneas (romero, tomillo, lavanda) — un caso clásico de evolución convergente bajo presiones selectivas análogas. Enseña tres conceptos críticos: convergencia evolutiva morfo-fisiológica entre biomas (páramo tropical vs. matorral mediterráneo), endemismo de páramo andino del norte (Colombia-Ecuador-Venezuela), y uso en medicina tradicional muisca-andina (infusión antitusiva, antiinflamatoria, sahumerio ritual). Manejo agroecológico: propagación por semilla recolectada de capítulos secos (alta tasa de germinación 60-80% en sustrato arenoso), siembra directa en lluvias, planta clave en restauración de páramos degradados por ganadería extensiva, asocio en restauración con frailejón y senecio, no requiere ni tolera agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, Humboldt Flora Alto-Andina, Humboldt 2016 Frailejones, Pérez-Arbeláez 1947 Plantas Útiles.",
       "validation_level": "claude_draft"
     },
     {
@@ -10298,11 +10309,15 @@
         "notas": "Propagacion por division de rizomas. Requiere sombra y alta humedad ambiental. Sus semillas se usan como especia aromatica en infusiones y reposteria tradicional."
       },
       "source_ids": [
-        "perez-arbelaez-1947-plantas-utiles",
         "powo-kew",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "bernal-2015-plantas-liquenes-colombia",
+        "fao-ecocrop",
+        "perez-arbelaez-1947-plantas-utiles"
       ],
-      "valor_pedagogico": "Especia de sombra: el cardamomo ensena como los cultivos de sotobosque generan alto valor economico sin necesidad de tumbar el dosel arboreo, modelo de agroforesteria."
+      "valor_pedagogico": "El cardamomo verde o cardamomo de la India (Elettaria cardamomum (L.) Maton, familia Zingiberaceae, subfamilia Alpinioideae, tribu Alpinieae) es una zingiberácea rizomatosa perenne (2-4 m altura, hábito macollado denso) nativa de los Ghats Occidentales del sur de la India y Sri Lanka, considerada la tercera especia más cara del mundo por peso después del azafrán y la vainilla, e introducida en Colombia como cultivo de sotobosque tropical desde mediados del siglo XX en regiones cafeteras y de bosque húmedo premontano. Sus tallos pseudoaéreos (en realidad hojas envainadoras) sostienen hojas lanceoladas verde-brillantes (40-60 cm largo), y sus inflorescencias racemosas terrestres rastreras producen cápsulas trígonas verde-claras (1-2 cm) con 15-20 semillas pequeñas color marrón-oscuro intensamente aromáticas. Su perfil de aceites esenciales (3-8% de la semilla seca) es dominado por 1,8-cineol, α-terpinil acetato, sabineno y limoneno, responsables del aroma cítrico-balsámico-mentolado distintivo y de sus propiedades carminativas, digestivas y antiespasmódicas usadas en medicina ayurvédica milenaria. Se cultiva en Colombia en Caquetá (Florencia, Belén de los Andaquíes), Putumayo (Mocoa, Sibundoy), Huila (Pitalito, San Agustín), Tolima (Líbano, Líbano), Antioquia (oriente cercano — San Carlos, Cocorná), Eje cafetero (Quindío, Risaralda) y Magdalena medio entre 800 y 1.500 msnm en zona térmica cálida-templada húmeda con sombra del 50-70%. Ciclo de larga duración: cultivo perenne con primera cosecha a los 3-4 años, productividad sostenida 15-20 años con manejo. Rendimientos 200-500 kg/ha semilla seca. Lección viva: especia de sombra — el cardamomo enseña como los cultivos de sotobosque generan alto valor económico por unidad de área (USD 30-50/kg semilla seca en mercado internacional) sin necesidad de tumbar el dosel arbóreo, modelo paradigmático de agroforestería diversificada donde la conservación del bosque y la generación de ingresos son sinérgicas y no antagónicas. Enseña tres conceptos críticos: economía agroforestal de alto valor por unidad de área (alternativa a la lógica deforestación-rentabilidad), simbiosis silvícola con árboles de sombra nativos (Cordia, Inga, Erythrina) que regulan microclima y aportan biomasa foliar, y diversificación de ingresos campesinos como estrategia anti-volatilidad de precios cafeteros. Manejo agroecológico: propagación por división de rizomas con 2-3 macollas activas, plantación a 2-3 m entre matas en sotobosque con árboles de sombra establecidos, riego o lluvia abundante 2.000-4.000 mm/año, cosecha manual escalonada de cápsulas verde-maduras (no rojas) cada 30-45 días, secado al sol o en horno tradicional, asocio con café arábica de sombra y plátano bocadillo, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Tibaitatá, Bernal 2015 Catálogo Plantas Colombia, FAO Ecocrop, Pérez-Arbeláez 1947 Plantas Útiles."
     },
     {
       "id": "vanilla_planifolia",
@@ -10794,10 +10809,15 @@
         "max_absoluto": 3300
       },
       "source_ids": [
+        "powo-kew",
         "gbif-taxonomic-backbone",
-        "powo-kew"
+        "gbif-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "restauracion-cruz-verde-sumapaz",
+        "sib-colombia"
       ],
-      "valor_pedagogico": "Árbol andino nativo de bosque sub-páramo. Frutos atraen avifauna; especie útil en restauración como nurse plant frente a invasoras (Pteridium aquilinum, Ulex europaeus)."
+      "valor_pedagogico": "El niguito o tuno (Miconia squamulosa Naudin, familia Melastomataceae, tribu Miconieae) es una melastomatácea arbórea pequeña a mediana (5-12 m altura, hábito ramificado denso) perennifolia nativa de los bosques altoandinos y sub-páramo de Colombia, Venezuela y Ecuador, considerada una de las especies leñosas pioneras-tempranas más importantes en la sucesión ecológica secundaria del bosque alto-andino colombiano post-disturbio (potreros abandonados, deslizamientos, áreas de regeneración natural). Sus hojas opuestas decusadas elípticas-ovadas (8-15 cm largo) presentan el patrón característico de venación acródroma curvinervia (3-5 nervios principales paralelos partiendo de la base) diagnóstico inequívoco de la familia Melastomataceae, una sinapomorfía morfológica visible a simple vista que permite identificación de campo confiable. Su envés foliar es densamente escamoso-tomentoso (de ahí el epíteto squamulosa). Produce inflorescencias terminales en panículas densas con flores pequeñas blanco-rosadas pentámeras y frutos en baya pequeña (5-8 mm diámetro) morado-negros maduros, altamente apetecidos por avifauna frugívora. Se distribuye en bosque altoandino y sub-páramo de Cundinamarca (Chingaza, Sumapaz, Cruz Verde, La Calera, Guasca), Boyacá (Iguaque, Arcabuco, Santa Sofía), Santander (Yariguíes, Páramo del Almorzadero), Antioquia (oriente — San Rafael, Sonsón), Cauca (Puracé) y Eje cafetero (Los Nevados) entre 1.800 y 3.300 msnm en zona térmica fría a templada húmeda. Ciclo perenne de larga duración, longevidad 40-80 años, fructificación masiva escalonada todo el año con picos en lluvias. Lección viva: árbol andino nativo de bosque sub-páramo y sucesional pionero-temprano de alto valor para restauración ecológica — sus frutos morado-negros atraen avifauna frugívora andina (Turdus fuscater mirla patiamarilla, Tangara vassorii cuningui, Diglossa cyanea pinchaflor, Catamblyrhynchus diadema mielero gorra-castaña) que actúan como dispersores de semillas a sitios degradados (zoocoria), enseñando el rol crítico de las melastomatáceas pioneras como nurse plants facilitadoras frente a invasoras agresivas del altiplano cundiboyacense (Pteridium aquilinum helecho marranero, Ulex europaeus retamo espinoso, Cenchrus clandestinus kikuyo). Enseña tres conceptos críticos: sucesión ecológica secundaria con nurse plants nativas (mecanismo de facilitación de Connell-Slatyer 1977), zoocoria por avifauna como motor de regeneración de bosque altoandino, y restauración asistida por especies nativas en planes de la CAR-Cundinamarca y Cruz Verde-Sumapaz como alternativa documentada al control químico de invasoras. Manejo agroecológico: propagación por semilla recolectada de frutos maduros (germinación lenta 30-60 días, requiere sustrato ácido húmedo bajo sombra), trasplante con cepellón a sitio definitivo en lluvias, plantación en grupos densos de 5-10 plantas a 2 m entre individuos como núcleo de restauración, asocio con drimys, weinmannia y escalonia, no tolera agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, Humboldt Flora Alto-Andina, Restauración Cruz Verde-Sumapaz, SIB Colombia."
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
