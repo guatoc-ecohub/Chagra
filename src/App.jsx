@@ -52,6 +52,7 @@ const CaseStudyDetail = lazy(() => import('./components/CaseStudyDetail'));
 const CaseStudyTopWidget = lazy(() => import('./components/CaseStudyTopWidget'));
 const HelpManual = lazy(() => import('./components/HelpManual'));
 const OnboardingHero = lazy(() => import('./components/OnboardingHero'));
+const WelcomeStatsHero = lazy(() => import('./components/WelcomeStatsHero'));
 const TopBar = lazy(() => import('./components/TopBar'));
 
 localforage.config({
@@ -171,14 +172,24 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
       )}
 
       <main className="flex-1 px-4 pt-3 pb-4 flex flex-col overflow-y-auto gap-3 bg-biopunk-pattern">
-        {/* DR-030 QW5: cold-start empty-state.
-            plantsCount === 0 → OnboardingHero con 3 CTA hero (📸/🎤/✍).
-            Sin plantas registradas, la telemetría densa es ruido informacional;
-            la suprimimos a favor del onboarding directo. Cuando hay ≥1 planta
-            registrada, vuelve el dashboard normal con TelemetryAlerts. */}
-        {plantsCount === 0 ? (
+        {/* Bug 2026-05-18 (operator): TelemetryAlerts mostraba errores IoT +
+            sync no resueltos como PRIMERA cosa visible post-login. Mal first
+            impression — Chagra debe arrancar con stats positivos (especies,
+            plantas cuidadas, fichas pedagógicas, biopreparados).
+            Ahora: WelcomeStatsHero como hero card SIEMPRE primera.
+            OnboardingHero (CTAs 📸/🎤/✍) sigue mostrándose si plantsCount=0
+            (junto al WelcomeStatsHero, para guiar al primer registro).
+            TelemetryAlerts se mueve más abajo (problemas técnicos visibles
+            pero no como hero). */}
+        <ErrorBoundary>
+          <WelcomeStatsHero />
+        </ErrorBoundary>
+
+        {plantsCount === 0 && (
           <OnboardingHero onNavigate={onNavigate} />
-        ) : (
+        )}
+
+        {plantsCount > 0 && (
           <ErrorBoundary>
             <TelemetryAlerts onNavigate={onNavigate} lastFarmOsLog={lastLogMessage} />
           </ErrorBoundary>
