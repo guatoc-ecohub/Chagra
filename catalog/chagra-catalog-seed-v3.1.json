@@ -20240,6 +20240,634 @@
       ],
       "valor_pedagogico": "La siempreviva u hoja del aire (Kalanchoe pinnata (Lam.) Pers., Crassulaceae, sinónimo Bryophyllum pinnatum (Lam.) Oken — algunos autores la ubican aún en género Bryophyllum) es una planta suculenta perenne originaria de Madagascar y África Oriental tropical, ampliamente naturalizada pantropicalmente (incluida Colombia desde hace siglos) entre 0 y 2.200 msnm en zonas térmicas cálidas-templadas-moderadas en casi todo el país: Antioquia (Medellín, Suroeste cafetero, Oriente, Bajo Cauca), Valle del Cauca (cinturón frutícola y zonas urbanas), Cundinamarca (Sabana templada — La Mesa, Anolaima, Anapoima, Fusagasugá), Boyacá templada (Moniquirá, Santana, Chitaraque), Caldas, Risaralda, Quindío (Eje Cafetero), Tolima, Huila, Santander (Bucaramanga, San Gil, Barichara, Lebrija), Norte de Santander, Magdalena (Santa Marta), Atlántico (Barranquilla), Bolívar (Cartagena), Cesar (Valledupar), La Guajira (sur), Córdoba, Sucre, Chocó (Quibdó), Cauca, Nariño y zonas urbanas en general. Es lección viva PEDAGÓGICAMENTE EXCELENTE — entre las plantas más mágicas del catálogo de huerta escolar — de reproducción asexual vegetativa por apomixis foliar (también llamada reproducción foliar plantular o yemas foliares marginales), un fenómeno biológico extraordinario que enseña a niñas y niños cómo una sola hoja desprendida de Kalanchoe pinnata produce espontáneamente 5-15 plantulas en miniatura (propágulos foliares) en cada hendidura del margen serrado-crenado de la hoja — sin necesidad de semilla, sin floración, sin polinización, sin riego intensivo, en apenas 7-21 días — basta dejar una hoja sobre tierra apenas humedecida (o incluso pegada con cinta a una pared con humedad ambiental) para que emita docenas de hijos perfectos clonales con sus propias raíces y hojas listas para autopropagarse y formar nuevas plantas adultas en pocos meses. Goethe la estudió obsesivamente durante sus investigaciones de metamorfosis vegetal y la nombró 'Goethe-Pflanze' (planta de Goethe) en honor a esa capacidad regenerativa que parecía contradecir las leyes biológicas conocidas en su época (siglo XVIII-XIX) — fenómeno hoy entendido como meristemos epifilos pre-formados en el primordio foliar que se activan tras desconexión del flujo de auxinas-citokininas de la planta madre. Pertenece a la familia Crassulaceae (igual familia que Crassula ovata jade, sedum, echeveria), planta perenne arbustiva-herbácea de 0.6-1.8 m de altura con tallos suculentos huecos rojizo-verdosos, hojas suculentas opuestas decusadas pinnadas en las plantas adultas (3-5 folíolos elípticos crenado-aserrados) o simples ovalado-crenadas en plantas juveniles (3-15 cm largo x 2-8 cm ancho) verde-jade brillantes a veces con bordes rojizos en exposición sol, inflorescencia panícula terminal péndula vistosa con flores tubulares colgantes péndulas anaranjado-rojizo-purpúreas (2-5 cm largo) polinizadas por colibríes (Trochilidae — colibríes esmeralda, pico-de-hoz, ermitaños neotropicales) y polillas crepusculares, frutos folículos con muchas semillas pequeñas (rara vez forma fruto en Colombia — predomina reproducción foliar asexual). Patrón fotosintético CAM. Uso medicinal tradicional pantropical bien documentado: hojas frescas trituradas como cataplasma cicatrizante de heridas-quemaduras-úlceras cutáneas, jugo de hojas como antiinflamatorio-antitusivo-diurético-antilitiásico (uso popular muy difundido en Colombia, Caribe, Centroamérica, Brasil, África, India — 'leaf of life'), estudios fitoquímicos identifican bufadienólidos (cardenólidos similares a digitálicos — precaución cardíaca en dosis altas), flavonoides, esteroles, ácidos orgánicos. Considerada planta ritual-protectora en tradiciones afrocaribeñas-yorubas santería ('yerba bruja' protectora del hogar). Manejo agroecológico: PROPAGACIÓN PRÁCTICAMENTE GRATUITA E ILIMITADA — basta dejar una hoja madura desprendida sobre sustrato apenas humedecido (tierra + arena 1:1) o incluso colgada en una bolsa plástica transparente con poca humedad ambiental y a los 7-21 días emite plantulas marginales listas para trasplantar individualmente, distancia 30-50 cm en cobertura, sombra parcial a sol parcial filtrado (no sol pleno tropical), riego moderado-escaso, suelos bien drenados, tolera sequía moderada, asocio con menta, hierbabuena, hierbabuena, cilantro, ajenjo, ruda en huertos medicinales caseros. Función en chagra/huerto escolar como medicinal tradicional cosmopolita de soberanía alimentaria, planta PEDAGÓGICAMENTE EXCELENTE para enseñar reproducción asexual vegetativa por apomixis foliar a niñas y niños (la lección biológica más impactante y visual de toda la huerta — un solo experimento simple con una hoja sobre tierra muestra la magia de la propagación clonal), cobertura del suelo medicinal, atractora de colibríes y polillas, ornamental tropical. Fuentes Tier A: GBIF, POWO Kew, Pamplona-Roger 2006 Plantas Medicinales, JBB Plantas Medicinales Cundinamarca-Boyacá, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015.",
       "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH47_CHOCO_BIOGEOGRAFICO",
+      "id": "phytelephas_seemannii",
+      "nombre_comun": "Tagua del Pacífico",
+      "nombre_comunes_regionales": [
+        "tagua",
+        "tagua pacífica",
+        "anta",
+        "antá",
+        "marfil vegetal",
+        "cabecita",
+        "palma de marfil",
+        "vegetable ivory palm"
+      ],
+      "nombre_cientifico": "Phytelephas seemannii O.F.Cook",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_nativos",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "shade_tolerant"
+      ],
+      "cultivable": true,
+      "conservation_status": "casi_amenazada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 800,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "moderado",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas frescas (endospermo marfileño endurecido) requieren escarificación mecánica + remojo 48-72 h en agua dulce. Germinación lenta 60-180 días en sustrato arenoso-húmedo. Trasplante a sombra parcial bajo dosel del bosque chocoano a los 12 meses. Establecimiento 24-36 meses; primer fruto a los 8-12 años.",
+        "tiempo_a_establecimiento_dias": 720,
+        "notas": "Especie dioica — requiere proporción mínima 1 macho : 6 hembras para fructificación. Comunidades afrocolombianas del Pacífico (Bajo Atrato, San Juan, Baudó) y Embera-Wounaan manejan rodales naturales con extracción rotacional de la 'pepa' (semilla marfileña) para artesanía.",
+        "fuente": "Bernal & Galeano 2010 Palmas de Colombia; POWO Kew; Cárdenas-Salinas Sinchi"
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sinchi-amazonia-colombiana",
+        "iiap-pacifico",
+        "cardenas-salinas-frutales-amazonicos"
+      ],
+      "valor_pedagogico": "La tagua del Pacífico (Phytelephas seemannii O.F.Cook, familia Arecaceae) es una palma dioica acaule a subterránea endémica del bioma chocoano biogeográfico — Pacífico colombiano (Chocó: Bajo Atrato, San Juan, Baudó, Quibdó, Nuquí, Bahía Solano; Valle del Cauca pacífico: Buenaventura, Bajo Calima; Cauca pacífico: Guapi, Timbiquí, López de Micay; Nariño pacífico: Tumaco, Barbacoas, Mosquera) y Pacífico panameño (Darién) — entre 0 y 1.200 msnm en bosque húmedo tropical y bosque muy húmedo tropical (>4000 mm precipitación anual) con suelos ácidos lateríticos derivados de aluviones de los ríos Atrato, San Juan, Baudó, Mira y Patía. Es PEDAGÓGICAMENTE EXCELENTE como lección viva del manejo ancestral del bosque chocoano por parte de las COMUNIDADES AFROCOLOMBIANAS del Pacífico colombiano (consejos comunitarios Cocomacia, Acadesan, Cocomasur del Bajo Atrato y San Juan que tienen titulación colectiva de territorios desde Ley 70/1993) y los pueblos indígenas EMBERA (Embera-Dóbida, Embera-Chamí, Embera-Katío) y WOUNAAN del bajo Atrato y San Juan, que durante siglos han manejado rodales naturales (taguales) en sistemas agroforestales tradicionales con extracción rotacional sostenible de la 'pepa' (semilla endurecida que al madurar se vuelve marfil vegetal de dureza similar a la del marfil animal) para tallar botones, joyería, esculturas miniatura y artesanía exportable. Palma acaule de tallo postrado subterráneo a corto emergente (0.5-3 m), hojas pinnadas erectas de 5-9 m con folíolos de 1-1.5 m, infrutescencias compactas globosas en cabezuela de 15-30 cm con 4-10 frutos drupáceos cubiertos de espinas blandas conteniendo 4-9 semillas cada uno (endospermo marfil vegetal). Polinización por escarabajos curculiónidos y derelómidos. Pertenece a tribu Phytelepheae junto a P. macrocarpa, P. tenuicaulis y P. tumacana. Distinta a Phytelephas macrocarpa (tagua amazónica) por su distribución pacífica estricta, infrutescencias más pequeñas y manejo cultural específico afrochocoano. Manejo agroecológico: regeneración natural por escarabajo dispersor; siembra enriquecimiento bajo dosel a 8-12 m entre plantas; tolerante a sombra del 60-80%; resiliente a inundación temporal de orillas. Función en chagra/agroforestal del Pacífico como sustento económico de comunidades afrocolombianas y Embera-Wounaan (cadena de valor de artesanía marfil vegetal con certificación FairTrade), conservación de palma casi-amenazada por sobreextracción histórica, restauración de bosques chocoanos degradados, banco genético del bioma con mayor biodiversidad endémica de Colombia. Fuentes Tier A: POWO Kew, GBIF, Bernal & Galeano 2010 Palmas de Colombia (referencia obligada para palmas colombianas), Sinchi, IIAP Pacífico (Instituto de Investigaciones Ambientales del Pacífico Chocó), Cárdenas-Salinas frutales amazónicos.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH47_CHOCO_BIOGEOGRAFICO",
+      "id": "mauritia_flexuosa",
+      "nombre_comun": "Moriche",
+      "nombre_comunes_regionales": [
+        "moriche",
+        "aguaje",
+        "canangucho",
+        "buriti",
+        "mirití",
+        "ité",
+        "moriche palm"
+      ],
+      "nombre_cientifico": "Mauritia flexuosa L.f.",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_nativos",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "nitrogen_fixer"
+      ],
+      "cultivable": true,
+      "conservation_status": "preocupacion_menor",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 500,
+        "max_absoluto": 900
+      },
+      "temperatura_c": {
+        "helada_letal": 10,
+        "optimo_min": 24,
+        "optimo_max": 32,
+        "max_tolerable": 38
+      },
+      "radiacion": "sol_pleno",
+      "agua": "muy_alto",
+      "drenaje_requerido": "encharcado",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas frescas recalcitrantes (no toleran desecación). Despulpado manual, remojo 24-48 h. Germinación 60-150 días en sustrato hidromórfico (turba + arena 70:30). Trasplante a humedal o moriche degradado a los 18-24 meses. Establecimiento 36 meses; primer fruto a los 7-10 años.",
+        "tiempo_a_establecimiento_dias": 1080,
+        "notas": "Especie clave de morichales (humedales palmáceos) — biotopo de ecosistema único de la Orinoquia-Amazonia-Chocó. Comunidades indígenas TIKUNA del Amazonas trapecio, Sikuani, Piapoco, Curripaco de la Orinoquia, y comunidades Embera del Bajo Atrato manejan morichales para fruto, fibra y palmito.",
+        "fuente": "Bernal & Galeano 2010 Palmas de Colombia; POWO Kew; Sinchi morichales Amazonas; Cárdenas-Salinas"
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sinchi-amazonia-colombiana",
+        "iiap-pacifico",
+        "cardenas-salinas-frutales-amazonicos",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "El moriche o aguaje (Mauritia flexuosa L.f., familia Arecaceae) es la palma dioica más emblemática de los humedales palmáceos neotropicales — los llamados 'morichales' o 'aguajales' que constituyen un ecosistema clave en las llanuras inundables de la Orinoquia, Amazonia y zonas húmedas del Chocó biogeográfico (especialmente Bajo Atrato y Bajo San Juan en Chocó). En Colombia se distribuye entre 0 y 900 msnm en Vichada (Cumaribo, Puerto Carreño — morichales del Tomo y Bita), Meta (Llanos Orientales — Puerto López, San Martín, Carimagua, Vichada), Casanare (Yopal, Tauramena, Hato Corozal), Arauca, Amazonas (Leticia, Puerto Nariño, La Pedrera, Tarapacá), Vaupés (Mitú), Guainía (Inírida — Estrella Fluvial), Guaviare (San José del Guaviare), Caquetá (Solano, Florencia), Putumayo (Puerto Asís), y Chocó (Bajo Atrato, Bajo San Juan, Murindó). Es PEDAGÓGICAMENTE EXCELENTE como lección viva de manejo ancestral de humedales por parte de los pueblos indígenas TIKUNA del trapecio amazónico (Leticia, Puerto Nariño — comunidades Maranguapé, San Sebastián de los Lagos), HUITOTO/MUINANE/BORA del medio Caquetá-Putumayo, SIKUANI/PIAPOCO/CURRIPACO de la Orinoquia, y comunidades EMBERA del Bajo Atrato — y por las COMUNIDADES AFROCOLOMBIANAS del Bajo Atrato chocoano y Bajo San Juan. El moriche es palma dioica de 20-35 m altura con tallo erecto solitario columnar, hojas costapalmadas circulares de 4-6 m diámetro con folíolos divididos hasta la base (palmadas verdaderas, no pinnadas), infrutescencias péndulas masivas de 1-2 m con 600-1200 frutos drupáceos elipsoidales 4-7 cm cubiertos de escamas romboidales rojo-vinotinto-anaranjadas brillantes — el fruto contiene mesocarpo carnoso aceitoso anaranjado (5-10% lípidos, 30% beta-caroteno — más betacaroteno que la zanahoria) consumido fresco, en jugo ('aguajina' en Perú, 'chicha de moriche' en Colombia), helados, dulces, mermeladas; el palmito apical es alimento; las hojas se trenzan para techos, cestería y cordelería; el tallo da harina ('chuchío') para fermentar bebida; las larvas comestibles del coleóptero Rhynchophorus palmarum criadas en troncos caídos ('mojojoy' o 'suri') son delicia gastronómica de alto valor proteico. Tribu Lepidocaryeae junto a Lepidocaryum tenue (caraná). Especie clave de bosque inundable que reduce inundación, captura carbono, fija nutrientes en suelos hidromórficos, y mantiene biodiversidad del morichal (fauna asociada: guacamayas Ara macao y Ara ararauna, dantas Tapirus terrestris, chigüiros Hydrochoerus hydrochaeris, monos churucos Lagothrix lagothricha). Manejo agroecológico: regeneración natural masiva en humedales; siembra enriquecimiento en moriches degradados; tolerancia total a inundación estacional 6-9 meses; cosecha sostenible sin tala (escalado tradicional o uso de aríetes-sogas indígenas — la tala del moriche para 'fácil' cosecha es práctica destructiva combatida por planes de manejo Sinchi-IIAP). Función en chagra/agroforestal de humedales como cosecha comunitaria sostenible (cadena de valor moriche con certificación), conservación de morichales — ecosistema de los más amenazados de Suramérica por drenaje agropecuario, banco genético de palmas neotropicales. Fuentes Tier A: POWO Kew, GBIF, Bernal & Galeano 2010 Palmas de Colombia, Sinchi (Instituto Amazónico de Investigaciones Científicas — estudio insignia de morichales), IIAP Pacífico, Cárdenas-Salinas frutales amazónicos.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH47_CHOCO_BIOGEOGRAFICO",
+      "id": "oenocarpus_mapora",
+      "nombre_comun": "Don pedrito",
+      "nombre_comunes_regionales": [
+        "don pedrito",
+        "maquenque",
+        "bacaba",
+        "mapora",
+        "ungurahui pequeño",
+        "majo"
+      ],
+      "nombre_cientifico": "Oenocarpus mapora H.Karst.",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_nativos",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "shade_tolerant"
+      ],
+      "cultivable": true,
+      "conservation_status": "preocupacion_menor",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 800,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 10,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas frescas con despulpado manual, remojo 48 h. Germinación 90-180 días en sustrato húmedo bajo sombra. Trasplante a sistema agroforestal a los 18 meses con sombra parcial 50%. Establecimiento 24-36 meses; primer fruto a los 5-7 años (más rápido que O. bataua).",
+        "tiempo_a_establecimiento_dias": 720,
+        "notas": "Palma cespitosa (multicaule) — uno de pocos Oenocarpus con tallos múltiples. Comunidades EMBERA y WOUNAAN del Bajo Atrato y San Juan, TIKUNA del trapecio amazónico, y afrocolombianas pacíficas manejan rodales para fruto y palmito.",
+        "fuente": "Bernal & Galeano 2010 Palmas de Colombia; POWO Kew; Sinchi; IIAP"
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sinchi-amazonia-colombiana",
+        "iiap-pacifico",
+        "cardenas-salinas-frutales-amazonicos"
+      ],
+      "valor_pedagogico": "El don pedrito o maquenque (Oenocarpus mapora H.Karst., familia Arecaceae) es una palma cespitosa (multicaule) neotropical distribuida en bosque húmedo tropical desde Costa Rica, Panamá, Colombia (toda la Amazonia y Chocó biogeográfico — Chocó, Valle del Cauca pacífico, Cauca pacífico, Nariño pacífico, Amazonas, Vaupés, Guaviare, Putumayo, Caquetá), Venezuela, Ecuador, Perú y Brasil amazónico, entre 0 y 1.200 msnm en bosque muy húmedo tropical y bosque húmedo premontano con precipitaciones >3000 mm anuales. Es PEDAGÓGICAMENTE EXCELENTE como lección viva de manejo ancestral del bosque biogeográfico chocoano y amazónico por parte de COMUNIDADES AFROCOLOMBIANAS del Pacífico (Cocomacia, Acadesan, consejos comunitarios del Bajo Atrato, San Juan, Baudó, Buenaventura, Guapi, Timbiquí, López de Micay, Tumaco) y los pueblos indígenas EMBERA (Dóbida, Chamí, Katío) y WOUNAAN del Pacífico chocoano-vallecaucano, TIKUNA-HUITOTO-BORA del trapecio amazónico, y SIKUANI-CURRIPACO de la Orinoquia-Guainía. Pertenece al género Oenocarpus (junto a O. bataua/milpesos — ya en catálogo, O. bacaba, O. minor) en tribu Euterpeae junto a Euterpe oleracea (açaí — ya en catálogo). Distinta a O. bataua por su hábito cespitoso multicaule (tallos múltiples desde la base, 5-15 tallos por mata de 6-15 m altura cada uno con diámetro 8-12 cm), hojas pinnadas erectas de 4-6 m, infrutescencias péndulas tipo 'cola de caballo' (raquillas múltiples colgantes) con 200-500 frutos drupáceos elipsoidales 1.5-2.5 cm púrpura-vinotinto-negro con mesocarpo aceitoso comestible procesado tradicionalmente en bebida espesa nutritiva ('jugo de mapora', 'bebida de maquenque', similar al chapo amazónico) con alto valor de aceites monoinsaturados (40-50% mesocarpo, perfil similar al aceite de oliva). El palmito apical es alimento; las hojas se trenzan para techos y cestería; las raíces son leñosa-fibrosas de uso artesanal. Fructifica más temprano y abundantemente que O. bataua (5-7 años vs 10-15 años) — por eso es promovida por programas agroforestales de Sinchi e IIAP como alternativa de seguridad alimentaria de comunidades pacíficas. Manejo agroecológico: regeneración por escarabajos dispersores; siembra enriquecimiento bajo dosel a 6-8 m entre matas; tolerante a sombra 50-70%; resiliente a inundación temporal de orillas; asocio con cacao (Theobroma cacao), bacao (T. bicolor) y borojó (Borojoa patinoi) en sistemas agroforestales chocoanos. Función en chagra/agroforestal pacífica y amazónica como cosecha comunitaria sostenible, conservación de bosques húmedos tropicales, banco genético de palmas multicaules, fuente nutricional aceitosa-proteica. Fuentes Tier A: POWO Kew, GBIF, Bernal & Galeano 2010 Palmas de Colombia (referencia obligada), Sinchi (programas amazónicos), IIAP Pacífico (programas chocoanos), Cárdenas-Salinas frutales amazónicos.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH47_CHOCO_BIOGEOGRAFICO",
+      "id": "borojoa_sorbilis",
+      "nombre_comun": "Borojó del Chocó",
+      "nombre_comunes_regionales": [
+        "borojó del monte",
+        "borojó silvestre",
+        "borojó de la Amazonia",
+        "purui",
+        "purumá"
+      ],
+      "nombre_cientifico": "Borojoa sorbilis (Ducke) Cuatrec.",
+      "familia_botanica": "Rubiaceae",
+      "category": "frutales_nativos",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "shade_tolerant"
+      ],
+      "cultivable": true,
+      "conservation_status": "datos_insuficientes",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 800,
+        "max_absoluto": 1000
+      },
+      "temperatura_c": {
+        "helada_letal": 12,
+        "optimo_min": 24,
+        "optimo_max": 32,
+        "max_tolerable": 36
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "muy_alto",
+      "drenaje_requerido": "moderado",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas frescas con despulpado, remojo 24 h. Germinación 30-90 días en sustrato húmedo bajo sombra plena. Trasplante a sistema agroforestal a los 8-12 meses con sombra parcial 60-80%. Establecimiento 18-24 meses; primer fruto a los 3-4 años (similar a B. patinoi).",
+        "tiempo_a_establecimiento_dias": 540,
+        "notas": "Especie dioica — requiere macho y hembra próximos. Distinta a Borojoa patinoi (borojó pacífico ya en catálogo) por su distribución amazónica-chocoana mixta y fruto algo más pequeño. Manejada por TIKUNA, HUITOTO y EMBERA en sistemas agroforestales.",
+        "fuente": "POWO Kew; GBIF; Sinchi Amazonia; Cárdenas-Salinas"
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "sinchi-amazonia-colombiana",
+        "iiap-pacifico",
+        "cardenas-salinas-frutales-amazonicos",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El borojó del Chocó o borojó silvestre (Borojoa sorbilis (Ducke) Cuatrec., familia Rubiaceae) es un frutal nativo dioico del bioma chocoano biogeográfico y amazónico, distinto al borojó pacífico Borojoa patinoi (ya en catálogo) que es el cultivado comercialmente del Chocó. B. sorbilis se distribuye en bosque húmedo y muy húmedo tropical entre 0 y 1.000 msnm en Colombia (Chocó: Bajo Atrato, San Juan, Baudó, Quibdó; Amazonas: Leticia, Puerto Nariño, La Pedrera, Tarapacá; Vaupés: Mitú; Guaviare; Caquetá; Putumayo), Brasil amazónico (Amazonas, Pará, Acre, Rondonia), Perú (Loreto, Ucayali, Madre de Dios) y Ecuador amazónico. Es PEDAGÓGICAMENTE EXCELENTE como lección viva del manejo ancestral del bosque por parte de los pueblos indígenas TIKUNA (trapecio amazónico colombiano), HUITOTO/MUINANE/BORA (medio Caquetá-Putumayo), YAGUA y COFAN del piedemonte amazónico, y EMBERA (Dóbida, Chamí, Katío) y WOUNAAN del Pacífico chocoano, y por las COMUNIDADES AFROCOLOMBIANAS del Chocó biogeográfico (Cocomacia, Acadesan, consejos comunitarios del Bajo Atrato, San Juan, Baudó) que durante generaciones han manejado rodales naturales en sistemas agroforestales tradicionales asociados a cacao (Theobroma cacao), bacao (T. bicolor), chontaduro (Bactris gasipaes) y don pedrito (Oenocarpus mapora). Pertenece al género Borojoa (Rubiaceae, tribu Gardenieae — algunos autores la ubican aún en género Alibertia) junto a B. patinoi y B. claviflora. Arbusto a árbol pequeño dioico de 3-6 m altura con tallos ramificados, hojas opuestas decusadas elípticas verdes brillantes 15-30 cm largo coriáceas con nervadura prominente, flores pequeñas blanco-cremas tubulares aromáticas polinizadas por abejas euglosinas y trigonas, fruto baya carnosa globosa-elipsoidal 6-10 cm diámetro (algo menor que B. patinoi de 8-12 cm), pulpa marrón-vinotinta agridulce densa con sabor a chocolate-tamarindo conteniendo 100-200 semillas pequeñas planas — consumida fresca, en jugo, mermelada, dulce de fruta, helado, considerada planta medicinal energética-afrodisíaca por la tradición chocoana-amazónica (alto contenido en aminoácidos esenciales, proteínas — 1.5%, fósforo, calcio, hierro, vitamina B). Manejo agroecológico: regeneración natural por dispersión de tortugas, monos y pájaros frugívoros; siembra enriquecimiento bajo dosel a 4-6 m entre plantas; tolerancia alta a sombra (60-80%); cultivo asociado a otras especies del agroforestal chocoano-amazónico; tolerancia a inundación estacional. Función en chagra/agroforestal chocoana-amazónica como cosecha comunitaria sostenible (cadena de valor 'borojó silvestre' con denominación de origen pendiente), conservación de la biodiversidad del bioma chocoano (uno de los hot-spots de biodiversidad del planeta), conservación de género Borojoa endémico-amazónico, banco genético frutal de Rubiaceae nativa. Fuentes Tier A: POWO Kew, GBIF, Sinchi (Instituto Amazónico de Investigaciones Científicas), IIAP Pacífico, Cárdenas-Salinas frutales amazónicos, Bernal 2015.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH47_CHOCO_BIOGEOGRAFICO",
+      "id": "theobroma_bicolor",
+      "nombre_comun": "Cacao blanco",
+      "nombre_comunes_regionales": [
+        "bacao",
+        "patashte",
+        "cacao macambo",
+        "macambo",
+        "cacao silvestre",
+        "balamte",
+        "white cacao"
+      ],
+      "nombre_cientifico": "Theobroma bicolor Humb. & Bonpl.",
+      "familia_botanica": "Malvaceae",
+      "category": "frutales_nativos",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "shade_tolerant"
+      ],
+      "cultivable": true,
+      "conservation_status": "preocupacion_menor",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1000,
+        "max_absoluto": 1400
+      },
+      "temperatura_c": {
+        "helada_letal": 10,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje",
+          "injerto"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas frescas recalcitrantes (no toleran desecación). Despulpado manual, lavado de mucílago, siembra inmediata. Germinación 15-30 días en sustrato húmedo. Trasplante a sistema agroforestal con sombra 50% a los 6-9 meses. Establecimiento 18-24 meses; primer fruto a los 4-6 años.",
+        "tiempo_a_establecimiento_dias": 540,
+        "notas": "Especie hermana de Theobroma cacao (ya en catálogo) — uso tradicional ancestral mesoamericano (patashte maya — bebida ceremonial Popol Vuh) y amazónico-chocoano (bacao). Manejada por EMBERA, TIKUNA, HUITOTO, BORA y comunidades AFROCOLOMBIANAS pacíficas.",
+        "fuente": "POWO Kew; GBIF; Cárdenas-Salinas; Sinchi"
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "sinchi-amazonia-colombiana",
+        "iiap-pacifico",
+        "cardenas-salinas-frutales-amazonicos",
+        "agrosavia-pacifico",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El cacao blanco, bacao o patashte (Theobroma bicolor Humb. & Bonpl., familia Malvaceae — antes Sterculiaceae) es un frutal nativo neotropical hermano del cacao común (Theobroma cacao — ya en catálogo) distribuido desde el sur de México (Chiapas — patashte maya) por Centroamérica (Guatemala, Belice, Honduras), Colombia (Chocó biogeográfico: Chocó, Valle del Cauca pacífico — Bajo Calima, Cauca pacífico, Nariño pacífico; Amazonia: Leticia, Caquetá, Putumayo, Vaupés, Guaviare, Amazonas; piedemonte llanero del Meta y Casanare), Ecuador, Perú amazónico, Venezuela amazónica y Brasil amazónico, entre 0 y 1.400 msnm en bosque húmedo tropical. Es PEDAGÓGICAMENTE EXCELENTE como lección viva de manejo ancestral por parte de las CULTURAS PREHISPÁNICAS MAYAS (patashte ceremonial mencionado en Popol Vuh y códices), los pueblos indígenas amazónicos TIKUNA (trapecio amazónico — Leticia, Puerto Nariño), HUITOTO/MUINANE/BORA (medio Caquetá-Putumayo donde se considera 'cacao de monte' sagrado), YAGUA, COFAN, INGA del piedemonte amazónico, y EMBERA (Dóbida, Chamí, Katío) y WOUNAAN del Pacífico chocoano, así como por las COMUNIDADES AFROCOLOMBIANAS del Chocó (Cocomacia, Acadesan, consejos comunitarios del Bajo Atrato, San Juan, Baudó, Buenaventura, Guapi, Tumaco) que durante siglos lo han manejado como 'bacao' en sistemas agroforestales tradicionales — frecuentemente intercalado con cacao común (T. cacao), copoazú (T. grandiflorum — ya en catálogo), borojó (Borojoa patinoi y B. sorbilis), chontaduro (Bactris gasipaes), don pedrito (Oenocarpus mapora) y plátano (Musa spp.). Pertenece al género Theobroma (Malvaceae, subfamilia Byttnerioideae) junto a T. cacao, T. grandiflorum (copoazú), T. subincanum (cacao de monte), T. speciosum y T. obovatum. Árbol de 8-15 m altura con tronco recto cilíndrico, hojas alternas elípticas-ovaladas 20-30 cm verde-oscuras coriáceas con envés blanquecino-tomentoso (característica diagnóstica — de ahí 'bicolor'), inflorescencias caulifloras (flores directamente sobre tronco y ramas gruesas — fenómeno caulifloría como en T. cacao) con flores pequeñas blanco-rosadas polinizadas por mosquitas Forcipomyia (Ceratopogonidae), fruto cápsula leñosa elipsoidal-oblonga 15-30 cm largo x 8-15 cm ancho con cáscara dura amarilla-anaranjada cuando madura conteniendo 30-50 semillas inmersas en pulpa blanca-cremosa dulce-acidulada aromática. Diferencias con T. cacao: fruto más grande, cáscara amarilla (no roja-purpúrea), pulpa más dulce-aromática (perfil mango-piña-cacao), semillas más grandes y de uso menos chocolatero (más para harina y pulpa fresca); diferencias con T. grandiflorum: pulpa más dulce (no tan ácida), fruto menos elongado, hojas con envés tomentoso (vs envés glabro en grandiflorum). USOS: pulpa fresca consumida directamente, en jugos, helados, mermeladas, dulces; semillas tostadas y molidas dan bebida 'patashte' o 'chicha de bacao' (tradición maya y amazónica) similar al chocolate pero más ligera; semillas también consumidas tostadas como 'pepas' (similar a almendras); cáscara como abono y forraje. Manejo agroecológico: requiere sombra parcial 40-60% (igual que T. cacao); siembra a 5-7 m entre plantas; asocio con cacao, plátano, copoazú, borojó, palmas en sistema agroforestal multiestrato; tolerancia mayor a humedad alta que T. cacao (resistente a monilia y escoba de bruja); cosecha cuando el fruto suene hueco al golpe. Función en chagra/agroforestal pacífica y amazónica como cosecha comunitaria sostenible, conservación de género Theobroma neotropical, diversificación de cadena cacaotera (mercado especialidad 'cacao blanco' creciente), banco genético prehispánico mesoamericano-amazónico. Fuentes Tier A: POWO Kew, GBIF, Sinchi, IIAP Pacífico, Cárdenas-Salinas frutales amazónicos, AGROSAVIA Pacífico, Bernal 2015.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH47_CHOCO_BIOGEOGRAFICO",
+      "id": "myristica_fragrans_americana",
+      "nombre_comun": "Nuez moscada del Pacífico",
+      "nombre_comunes_regionales": [
+        "nuez moscada",
+        "nuez moscada chocoana",
+        "macís",
+        "moscada americana",
+        "nutmeg"
+      ],
+      "nombre_cientifico": "Myristica fragrans Houtt.",
+      "familia_botanica": "Myristicaceae",
+      "category": "aromaticas_condimentarias",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "shade_tolerant"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 600,
+        "max_absoluto": 900
+      },
+      "temperatura_c": {
+        "helada_letal": 12,
+        "optimo_min": 24,
+        "optimo_max": 32,
+        "max_tolerable": 36
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "injerto"
+        ],
+        "best_method": "injerto",
+        "protocol_resumen": "Semillas recalcitrantes — siembra inmediata tras extracción del fruto. Germinación 60-90 días bajo sombra. Especie dioica: la propagación por semilla genera 50% machos improductivos — por eso INJERTO de yemas de hembras productivas sobre patrón masculino o de plántula es el método agrocomercial. Establecimiento 24-36 meses; primer fruto a los 7-9 años.",
+        "tiempo_a_establecimiento_dias": 900,
+        "notas": "Originaria de las islas Banda (Indonesia), introducida en el Chocó colombiano siglos XIX-XX (probable vía Caribe-Cuba) y naturalizada-cultivada por comunidades AFROCOLOMBIANAS del Pacífico colombiano (Chocó, Buenaventura, Guapi, Tumaco) en sistemas agroforestales tradicionales. Famosa en Chocó por la 'nuez moscada chocoana' usada en repostería local (panes, alfajores).",
+        "fuente": "POWO Kew; GBIF; Pamplona-Roger 2006; AGROSAVIA Pacífico"
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "pamplona-roger-2006-plantas-medicinales",
+        "agrosavia-pacifico",
+        "iiap-pacifico",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "La nuez moscada del Pacífico (Myristica fragrans Houtt., familia Myristicaceae) es un árbol aromático-condimentario originario de las islas Banda del archipiélago de las Molucas en Indonesia, introducido en el Caribe (Granada, Trinidad, Jamaica) en los siglos XVII-XVIII por holandeses, británicos y franceses, y traído a Colombia probablemente vía Caribe-Cuba a finales del siglo XIX e inicios del XX, naturalizándose y cultivándose desde entonces especialmente en el bioma chocoano biogeográfico — Chocó (Bajo Atrato, San Juan, Baudó, Quibdó), Valle del Cauca pacífico (Buenaventura, Bajo Calima), Cauca pacífico (Guapi, Timbiquí, López de Micay), Nariño pacífico (Tumaco, Barbacoas) — entre 0 y 900 msnm en bosque húmedo tropical. Es PEDAGÓGICAMENTE EXCELENTE como lección viva de adopción cultural y aclimatación tropical de un especiero originalmente del Sudeste Asiático por parte de las COMUNIDADES AFROCOLOMBIANAS del Pacífico colombiano (consejos comunitarios Cocomacia, Acadesan, Cocomasur del Bajo Atrato y San Juan; comunidades de Buenaventura, Guapi, Timbiquí, Tumaco) — la 'nuez moscada chocoana' es ingrediente emblemático de la repostería tradicional afropacífica (panes especiados, alfajores, postres como cocadas, dulces de frutas, bebidas como chocolate con especias, café aromatizado, jengibre con nuez moscada como remedio tradicional). En menor medida también cultivada por algunas comunidades EMBERA-WOUNAAN del Pacífico y agricultores mestizos. Pertenece al género Myristica (Myristicaceae, familia primitiva de las magnoliideas) — relevante para nuestra biogeografía porque la familia Myristicaceae también tiene representantes nativos amazónicos-chocoanos (Virola spp. — sangre de drago, otoba — Otoba parvifolia, O. novogranatensis) que son árboles clave del Chocó biogeográfico. Árbol dioico de 8-15 m altura perennifolio con copa cónica densa, hojas alternas elípticas verde-oscuras brillantes 8-15 cm con aroma a nuez moscada al estrujarlas, flores pequeñas amarillo-cremas tubulares unisexuales en racimos axilares, fruto drupáceo globoso 5-7 cm carnoso amarillo que al madurar se abre exponiendo la semilla cubierta por un arilo rojo brillante carnoso ('macis' — especia distinta de la semilla) que envuelve la semilla esferoidal marrón endurecida ('nuez moscada' — el endospermo seco molido). USOS: nuez moscada y macís son condimentos aromáticos universales en repostería, panadería, salsas, bechamel, embutidos, ponche, eggnog, chocolates especiados; medicinales tradicionales como digestivo, carminativo, antiespasmódico, hipnótico ligero (precaución dosis altas — la miristicina y elemicina son alucinógenas-tóxicas en >5 g); aceite esencial de macis en perfumería. Manejo agroecológico: sombra parcial 50-60%; siembra a 6-8 m entre plantas en sistema agroforestal con cacao, bacao, borojó, copoazú; riego abundante en época seca; cosecha manual de frutos maduros que se abren naturalmente; secado de la semilla en sombra ventilada por 4-6 semanas hasta que la nuez 'suene' al agitarla. Función en chagra/agroforestal del Pacífico colombiano como condimento de alto valor para repostería tradicional afropacífica, cadena de valor 'nuez moscada chocoana' con potencial de denominación de origen, diversificación de sistemas cacao-bacao-borojó, conservación cultural-gastronómica afropacífica. Fuentes Tier A: POWO Kew, GBIF, Pamplona-Roger 2006 Plantas Medicinales, AGROSAVIA Pacífico, IIAP Pacífico, Pérez Arbeláez 1947.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH47_CHOCO_BIOGEOGRAFICO",
+      "id": "pourouma_cecropiifolia_silvestre",
+      "nombre_comun": "Uvilla silvestre",
+      "nombre_comunes_regionales": [
+        "uvilla del monte",
+        "uvilla amazónica silvestre",
+        "puruma",
+        "caimarón",
+        "wild grape tree"
+      ],
+      "nombre_cientifico": "Pourouma cecropiifolia Mart.",
+      "familia_botanica": "Urticaceae",
+      "category": "frutales_nativos",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "preocupacion_menor",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 800,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 10,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas frescas (despulpado manual con agua), siembra inmediata sin escarificación. Germinación rápida 15-30 días en sustrato húmedo a sol parcial. Trasplante a sistema agroforestal a los 4-6 meses con sol parcial. Establecimiento 12-18 meses; primer fruto a los 3-4 años. Distinta a la variedad cultivada (pourouma_cecropiifolia ya en catálogo) por menor tamaño de fruto, mayor variabilidad genética y manejo de poblaciones silvestres-semicultivadas.",
+        "tiempo_a_establecimiento_dias": 450,
+        "notas": "Forma silvestre/semicultivada del 'uvilla amazónica' (P. cecropiifolia var. silvestris en sentido amplio) manejada por TIKUNA, HUITOTO, BORA, MUINANE, YAGUA, COFAN y comunidades AFROCOLOMBIANAS del Pacífico chocoano como recurso forestal no maderable.",
+        "fuente": "POWO Kew; GBIF; Cárdenas-Salinas frutales amazónicos; Sinchi"
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "sinchi-amazonia-colombiana",
+        "iiap-pacifico",
+        "cardenas-salinas-frutales-amazonicos",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "La uvilla silvestre (Pourouma cecropiifolia Mart., familia Urticaceae — antes Cecropiaceae/Moraceae) es un árbol frutal nativo amazónico-chocoano de poblaciones silvestres y semicultivadas, distinto a la forma cultivada-domesticada del mismo taxón (pourouma_cecropiifolia ya en catálogo como 'uvilla amazónica' del manejo agroforestal) — esta entrada documenta el manejo de poblaciones silvestres del bosque chocoano biogeográfico y amazónico, con menor selección genética, mayor variabilidad de tamaño de fruto, y un patrón cultural de recolección comunitaria distinto al cultivo intensificado. Se distribuye en bosque húmedo y muy húmedo tropical entre 0 y 1.200 msnm en Colombia (Chocó: Bajo Atrato, San Juan, Baudó, Quibdó; Valle del Cauca pacífico: Buenaventura, Bajo Calima; Cauca pacífico: Guapi, Timbiquí; Nariño pacífico: Tumaco, Barbacoas; Amazonia colombiana: Leticia, Puerto Nariño, La Pedrera, Tarapacá, Mitú; Caquetá, Putumayo, Guaviare; piedemonte llanero del Meta), Brasil amazónico (Amazonas, Pará, Acre, Rondônia), Perú (Loreto, Ucayali), Ecuador amazónico, Venezuela amazónica y norte de Bolivia. Es PEDAGÓGICAMENTE EXCELENTE como lección viva del manejo ancestral de bosques húmedos tropicales por parte de los pueblos indígenas TIKUNA (trapecio amazónico colombiano — Leticia, Puerto Nariño, comunidades Maranguapé, San Sebastián), HUITOTO/MUINANE/BORA (medio Caquetá-Putumayo — territorios de Predio Putumayo, Aduche), YAGUA (Amazonas trapecio), COFAN (piedemonte putumayense), INGA (Sibundoy, alto Putumayo) del piedemonte amazónico colombiano, y por las COMUNIDADES AFROCOLOMBIANAS del Chocó biogeográfico (consejos comunitarios Cocomacia, Acadesan, Cocomasur del Bajo Atrato, San Juan, Baudó, Buenaventura, Guapi, Timbiquí, Tumaco) y comunidades EMBERA (Dóbida, Chamí, Katío) y WOUNAAN del Pacífico chocoano-vallecaucano — el manejo cultural de poblaciones silvestres-semicultivadas en sistemas agroforestales tradicionales 'de monte' (no cultivo intensificado) incluye protección selectiva de árboles productivos, dispersión asistida de semillas, y cosecha rotacional comunitaria. Pertenece al género Pourouma (Urticaceae, antes Cecropiaceae) — emparentado con Cecropia (yarumos) — con unos 30 taxa neotropicales. Árbol dioico de 12-20 m altura con tronco recto delgado, hojas alternas grandes peltadas-palmatilobadas 20-50 cm (parecidas a Cecropia — de ahí 'cecropiifolia') con haz verde-oscuro y envés blanquecino, infrutescencias dioicas con frutos en racimos péndulos masivos de 100-300 drupas globosas 1.5-3 cm púrpura-violetas-vinotintas con pulpa blanco-cremosa dulce-aromática que recuerda a uva-cacao-mango con pepita marrón endurecida. Distinta a la variedad cultivada por su menor tamaño de fruto (en monte 1.5-2 cm, cultivada 2.5-3 cm), mayor diversidad genética intra-poblacional, manejo no intensificado y patrón cultural de recolección de monte. USOS: pulpa consumida fresca, en jugo, vino artesanal 'vino de uvilla' (chicha fermentada tradicional), helados, mermeladas; semillas consumidas tostadas (similar a almendras); madera ligera para tablones de canoa-bote; corteza interior fibrosa para cuerdas. Manejo agroecológico: dispersión natural por monos churucos (Lagothrix), aulladores (Alouatta), pájaros frugívoros (tucanes, loros, paujiles); siembra enriquecimiento en claros del bosque a 6-8 m entre árboles; sol parcial 60-80%; cosecha de monte con escalado tradicional (no tala). Función en chagra/agroforestal chocoano-amazónica como recurso forestal no maderable, conservación de bosques húmedos tropicales del Chocó y Amazonia, banco genético silvestre del taxón (importante para mejoramiento de la forma cultivada), seguridad alimentaria estacional comunitaria, fauna asociada conservada. Fuentes Tier A: POWO Kew, GBIF, Sinchi, IIAP Pacífico, Cárdenas-Salinas frutales amazónicos, Bernal 2015.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH47_CHOCO_BIOGEOGRAFICO",
+      "id": "garcinia_madruno",
+      "nombre_comun": "Madroño del Chocó",
+      "nombre_comunes_regionales": [
+        "madroño",
+        "madroño amarillo",
+        "charichuelo",
+        "limoncillo",
+        "mameicillo",
+        "lemon drop mangosteen"
+      ],
+      "nombre_cientifico": "Garcinia madruno (Kunth) Hammel",
+      "familia_botanica": "Clusiaceae",
+      "category": "frutales_nativos",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "shade_tolerant"
+      ],
+      "cultivable": true,
+      "conservation_status": "preocupacion_menor",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1200,
+        "max_absoluto": 1600
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "injerto"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas recalcitrantes — siembra inmediata sin desecación. Germinación 30-60 días en sustrato húmedo a sombra plena. Trasplante a sistema agroforestal con sombra 50-70% a los 8-12 meses. Establecimiento 24-36 meses; primer fruto a los 6-8 años. Especies hermana del mangostán asiático Garcinia mangostana — produce frutos análogos pero menores.",
+        "tiempo_a_establecimiento_dias": 720,
+        "notas": "Frutal nativo del Chocó biogeográfico, Magdalena medio y piedemonte amazónico-llanero. Manejado por comunidades AFROCOLOMBIANAS del Pacífico, EMBERA-WOUNAAN y campesinos del Magdalena medio.",
+        "fuente": "POWO Kew; GBIF; AGROSAVIA; Bernal 2015"
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "agrosavia-pacifico",
+        "sinchi-amazonia-colombiana",
+        "iiap-pacifico",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "El madroño del Chocó (Garcinia madruno (Kunth) Hammel, familia Clusiaceae — antes Guttiferae, sinonimias antiguas Rheedia madruno y Calophyllum madruno) es un frutal nativo neotropical hermano del célebre mangostán asiático (Garcinia mangostana) — produce frutos análogos en tamaño menor pero con la misma pulpa traslúcida-gelatinosa de sabor dulce-acidulado refrescante. Se distribuye en bosque húmedo y muy húmedo tropical y bosque premontano desde Honduras-Nicaragua-Costa Rica-Panamá por toda Colombia (Chocó biogeográfico: Chocó, Valle del Cauca pacífico, Cauca pacífico, Nariño pacífico; Magdalena medio: Caldas, Antioquia, Boyacá, Santander, Cesar; piedemonte amazónico-llanero: Caquetá, Putumayo, Meta, Casanare; piedemonte amazónico: Amazonas, Vaupés, Guaviare), Venezuela, Ecuador, Perú amazónico, Bolivia y Brasil amazónico, entre 0 y 1.600 msnm. Es PEDAGÓGICAMENTE EXCELENTE como lección viva del manejo agroforestal del bosque tropical húmedo por parte de las COMUNIDADES AFROCOLOMBIANAS del Pacífico colombiano (consejos comunitarios Cocomacia, Acadesan, Cocomasur del Bajo Atrato, San Juan, Baudó, Buenaventura, Guapi, Timbiquí, Tumaco) — el madroño es uno de los frutales emblemáticos del 'monte chocoano' manejado en parches productivos comunitarios — y por los pueblos indígenas EMBERA (Dóbida, Chamí, Katío) y WOUNAAN del Pacífico chocoano-vallecaucano, INGA del alto Putumayo, COFAN del piedemonte putumayense, y comunidades campesinas mestizas del Magdalena medio (Cimitarra, Yondó, Yarumal, Puerto Berrío) donde es frutal de jardín-huerta tradicional. Pertenece al género Garcinia (Clusiaceae) con ~250 especies pantropicales (la mayoría asiáticas — G. mangostana mangostán, G. atroviridis, G. hanburyi gamboge, etc.) y solo unas 15 neotropicales (G. madruno, G. magnifolia, G. intermedia, G. macrophylla — varias también productoras de frutos). Árbol perennifolio dioico de 8-15 m altura con tronco recto cilíndrico, corteza marrón-grisácea exudante de látex amarillo (carácter diagnóstico de Clusiaceae — el látex se solidifica al aire), hojas opuestas decusadas elípticas-oblongas 10-20 cm verde-oscuras coriáceas brillantes con nervadura prominente y látex amarillo en venas cortadas, flores pequeñas blanco-cremas-rosadas unisexuales aromáticas polinizadas por abejas trigonas y meliponas, fruto baya globosa 3-5 cm amarillo-anaranjada brillante con piel coriácea conteniendo 2-4 semillas grandes envueltas en pulpa traslúcida blanco-cremosa-gelatinosa dulce-acidulada-aromática — el sabor recuerda al mangostán asiático con notas cítricas-florales (de ahí 'lemon drop mangosteen' en inglés). USOS: pulpa consumida fresca directa del fruto (muy refrescante), en jugos, mermeladas, dulces; cáscara y semillas con compuestos xantónicos (mangostina, garcinia-ácido — antiinflamatorios y antioxidantes documentados); látex como sello traumatúrgico en uso tradicional; madera dura para construcción menor y carpintería rústica. Manejo agroecológico: sombra parcial 50-70%; siembra a 6-8 m entre árboles en sistema agroforestal con cacao, bacao, borojó, copoazú; tolerancia a humedad alta del Pacífico; cosecha manual cuando el fruto amarillea completamente. Función en chagra/agroforestal del Pacífico y Magdalena medio como cosecha comunitaria sostenible (cadena de valor 'mangostán del Chocó' con potencial gourmet creciente), conservación del género Garcinia neotropical, diversificación de frutales chocoanos, banco genético frutal de Clusiaceae nativa. Fuentes Tier A: POWO Kew, GBIF, AGROSAVIA Pacífico, Sinchi, IIAP Pacífico, Bernal 2015, Pérez Arbeláez 1947.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH47_CHOCO_BIOGEOGRAFICO",
+      "id": "couma_macrocarpa",
+      "nombre_comun": "Sorva",
+      "nombre_comunes_regionales": [
+        "sorva",
+        "sorvinha",
+        "leche-caspi",
+        "leche huayo",
+        "perillo",
+        "milk tree",
+        "cow tree"
+      ],
+      "nombre_cientifico": "Couma macrocarpa Barb.Rodr.",
+      "familia_botanica": "Apocynaceae",
+      "category": "frutales_nativos",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "preocupacion_menor",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 700,
+        "max_absoluto": 1000
+      },
+      "temperatura_c": {
+        "helada_letal": 12,
+        "optimo_min": 24,
+        "optimo_max": 32,
+        "max_tolerable": 38
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas recalcitrantes — siembra inmediata. Germinación 30-90 días en sustrato húmedo a sol parcial. Trasplante a sistema agroforestal a los 12-18 meses. Establecimiento 36 meses; primer fruto a los 8-12 años.",
+        "tiempo_a_establecimiento_dias": 1080,
+        "notas": "Doble uso: látex blanco potable (de ahí 'cow tree' / árbol-vaca, usado tradicionalmente como sustituto de leche en monte amazónico) + fruto pulposo dulce-aromático. Manejado por TIKUNA, HUITOTO, BORA, YAGUA, COFAN amazónicos y EMBERA-WOUNAAN del Pacífico chocoano.",
+        "fuente": "POWO Kew; GBIF; Cárdenas-Salinas; Sinchi"
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "sinchi-amazonia-colombiana",
+        "iiap-pacifico",
+        "cardenas-salinas-frutales-amazonicos",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "La sorva o sorvinha (Couma macrocarpa Barb.Rodr., familia Apocynaceae — la familia de la adelfa, plumeria, vinca) es un árbol de doble uso látex-frutal nativo neotropical distribuido en bosque húmedo y muy húmedo tropical entre 0 y 1.000 msnm desde Panamá oriental por toda Colombia (Chocó biogeográfico: Chocó, Valle del Cauca pacífico, Cauca pacífico, Nariño pacífico; toda la Amazonia: Leticia, Puerto Nariño, La Pedrera, Tarapacá, Mitú, Inírida, San José del Guaviare, Florencia, Puerto Asís; piedemonte llanero del Meta y Casanare), Venezuela amazónica, Ecuador amazónico, Perú (Loreto, Ucayali, Madre de Dios), Bolivia (Pando, Beni) y Brasil amazónico. Es PEDAGÓGICAMENTE EXCELENTE como lección viva del aprovechamiento integral de árboles del bosque tropical húmedo por parte de los pueblos indígenas TIKUNA (trapecio amazónico — Leticia, Puerto Nariño), HUITOTO/MUINANE/BORA (medio Caquetá-Putumayo — territorios de Predio Putumayo, Aduche), YAGUA (Amazonas), COFAN (piedemonte putumayense), INGA (Sibundoy, alto Putumayo), SIONA (Putumayo) del piedemonte amazónico colombiano, y por las COMUNIDADES AFROCOLOMBIANAS del Chocó biogeográfico (consejos comunitarios Cocomacia, Acadesan, Cocomasur del Bajo Atrato, San Juan, Baudó, Buenaventura, Guapi, Timbiquí, Tumaco) y comunidades EMBERA (Dóbida, Chamí, Katío) y WOUNAAN del Pacífico chocoano-vallecaucano — los pueblos amazónicos llaman a la sorva 'leche-caspi' o 'palo de leche' porque su látex blanco abundante (semejante a leche de vaca) es tradicionalmente bebido directo del corte de la corteza en el monte como sustituto de leche cuando se está de viaje o cacería ('árbol-vaca' en inglés 'cow tree'), un fenómeno único entre Apocynaceae que en general son tóxicas pero Couma macrocarpa y C. utilis son las excepciones potables aprovechadas. Pertenece al género Couma (Apocynaceae, subfamilia Rauvolfioideae) con ~5 taxa neotropicales. Árbol perennifolio dioico de 15-30 m altura con tronco recto cilíndrico-columnar, corteza grisácea-marrón exudante de látex blanco-lechoso abundante al corte, hojas verticiladas (3-4 por nudo — carácter diagnóstico) elípticas oblanceoladas 15-25 cm verde-oscuras coriáceas brillantes con nervadura prominente, inflorescencias terminales-axilares con flores blanco-cremas tubulares aromáticas polinizadas por escarabajos y abejas, fruto baya globosa-elipsoidal grande 8-12 cm verde-amarillenta cuando madura con cáscara coriácea gruesa conteniendo 30-50 semillas inmersas en pulpa blanco-cremosa-aceitosa dulce-aromática (sabor a mantequilla-vainilla-coco — perfil único). DOBLE USO: (1) látex blanco-lechoso bebido directo del corte como sustituto de leche en monte, también espesado para chicle natural amazónico (similar a chicle del balatá Manilkara bidentata) y para sellar caños-canoas; (2) pulpa del fruto consumida fresca, en jugos, helados, dulces, mermeladas (es uno de los frutos amazónicos más apreciados gastronómicamente). Madera dura para construcción rústica y leña. Manejo agroecológico: sol parcial; siembra a 8-12 m entre árboles en sistema agroforestal con cacao, bacao, borojó; cosecha manual del fruto cuando amarillea; sangrado controlado del látex con cortes verticales sin matar el árbol. Función en chagra/agroforestal pacífica y amazónica como cosecha comunitaria doble (látex + fruto), conservación del género Couma neotropical, valor cultural insignia ('árbol-vaca' como pedagogía de relación bosque-alimentación-cuerpo en cosmovisiones amazónicas), banco genético frutal de Apocynaceae potable. Fuentes Tier A: POWO Kew, GBIF, Sinchi, IIAP Pacífico, Cárdenas-Salinas frutales amazónicos, Bernal 2015, Pérez Arbeláez 1947.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH47_CHOCO_BIOGEOGRAFICO",
+      "id": "pouteria_torta",
+      "nombre_comun": "Caimito del monte",
+      "nombre_comunes_regionales": [
+        "caimito silvestre",
+        "caimo del monte",
+        "abiu del Chocó",
+        "lúcumo silvestre",
+        "mamey de monte"
+      ],
+      "nombre_cientifico": "Pouteria torta (Mart.) Radlk.",
+      "familia_botanica": "Sapotaceae",
+      "category": "frutales_nativos",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "shade_tolerant"
+      ],
+      "cultivable": true,
+      "conservation_status": "preocupacion_menor",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 900,
+        "max_absoluto": 1300
+      },
+      "temperatura_c": {
+        "helada_letal": 10,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas recalcitrantes grandes — siembra inmediata. Germinación 60-120 días en sustrato húmedo a sombra plena. Trasplante a sistema agroforestal con sombra 50-70% a los 12-18 meses. Establecimiento 36 meses; primer fruto a los 7-10 años. Diferente de Pouteria caimito (caimito cultivado ya en catálogo) por su distribución silvestre chocoana-amazónica y mayor variabilidad genética.",
+        "tiempo_a_establecimiento_dias": 1080,
+        "notas": "Frutal silvestre de Sapotaceae del Chocó biogeográfico y Amazonia colombiana. Manejado por TIKUNA, HUITOTO, BORA, EMBERA-WOUNAAN y comunidades AFROCOLOMBIANAS pacíficas.",
+        "fuente": "POWO Kew; GBIF; Cárdenas-Salinas; Sinchi"
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "sinchi-amazonia-colombiana",
+        "iiap-pacifico",
+        "cardenas-salinas-frutales-amazonicos",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El caimito del monte (Pouteria torta (Mart.) Radlk., familia Sapotaceae) es un árbol frutal silvestre nativo neotropical distinto al caimito cultivado Pouteria caimito (ya en catálogo) — esta entrada documenta la especie silvestre del bosque chocoano biogeográfico y amazónico, manejada por comunidades indígenas y afrocolombianas en sistemas agroforestales tradicionales y forestales no maderables. Se distribuye en bosque húmedo y muy húmedo tropical entre 0 y 1.300 msnm en Colombia (Chocó biogeográfico: Chocó, Valle del Cauca pacífico — Buenaventura, Bajo Calima; Cauca pacífico: Guapi, Timbiquí; Nariño pacífico: Tumaco, Barbacoas; toda la Amazonia colombiana: Leticia, Puerto Nariño, La Pedrera, Tarapacá, Mitú, Inírida; Caquetá, Putumayo, Guaviare; piedemonte llanero del Meta), Venezuela amazónica, Ecuador amazónico, Perú (Loreto, Ucayali, Madre de Dios), Bolivia (Pando, Beni) y Brasil amazónico extenso. Es PEDAGÓGICAMENTE EXCELENTE como lección viva del aprovechamiento de frutales silvestres del bosque tropical húmedo por parte de los pueblos indígenas TIKUNA (trapecio amazónico — Leticia, Puerto Nariño, comunidades Maranguapé), HUITOTO/MUINANE/BORA (medio Caquetá-Putumayo — territorios de Predio Putumayo, Aduche), YAGUA (Amazonas), COFAN (piedemonte putumayense), INGA (Sibundoy, alto Putumayo), SIONA (Putumayo) del piedemonte amazónico colombiano, y por las COMUNIDADES AFROCOLOMBIANAS del Chocó biogeográfico (consejos comunitarios Cocomacia, Acadesan, Cocomasur del Bajo Atrato, San Juan, Baudó, Buenaventura, Guapi, Timbiquí, Tumaco) y comunidades EMBERA (Dóbida, Chamí, Katío) y WOUNAAN del Pacífico chocoano-vallecaucano. Pertenece al género Pouteria (Sapotaceae, subfamilia Chrysophylloideae) con ~325 especies pantropicales — el género más diverso de Sapotaceae — donde encontramos varios frutales emblemáticos (P. caimito caimito cultivado ya en catálogo, P. lucuma lúcumo andino, P. sapota mamey-zapote mesoamericano, P. campechiana canistel, P. macrophylla cutite). Distinta a P. caimito por su distribución silvestre amplia (no cultivada intensivamente), fruto más pequeño (4-7 cm vs 6-10 cm en P. caimito cultivada), forma elipsoidal-oblonga (vs globosa en P. caimito), y manejo cultural de poblaciones silvestres-semicultivadas. Árbol perennifolio de 15-25 m altura con tronco recto cilíndrico, corteza marrón-grisácea exudante de látex blanco lechoso (carácter diagnóstico de Sapotaceae — látex de muchas Sapotaceae es base del chicle natural balatá-gutapercha), hojas alternas elípticas-oblanceoladas 10-20 cm verde-oscuras coriáceas brillantes con haz glabro y envés más claro, flores pequeñas blanco-cremas tubulares en fascículos axilares polinizadas por insectos pequeños (mosquitas, abejas trigonas, escarabajos), fruto baya elipsoidal-oblonga 4-7 cm amarillo-anaranjado-marrón cuando madura con cáscara coriácea conteniendo 1-3 semillas grandes elipsoidales marrón-brillantes envueltas en pulpa blanca-amarillenta-cremosa dulce-aromática-mucilaginosa (sabor a flan-vainilla-caimito con notas tropicales). USOS: pulpa consumida fresca directa del fruto (refrescante y muy energética por azúcares), en jugos, helados, mermeladas, dulces; semillas tostadas comestibles; látex blanco como pegamento natural y base de chicle; madera dura para construcción rústica y carpintería de talleres comunitarios. Manejo agroecológico: sombra parcial 50-70%; siembra a 8-12 m entre árboles en sistema agroforestal con cacao, bacao, borojó, copoazú, sorva; cosecha manual cuando el fruto amarillea-amaronea completamente; dispersión natural por monos churucos (Lagothrix), aulladores (Alouatta), tucanes y paujiles. Función en chagra/agroforestal chocoano-amazónica como cosecha comunitaria sostenible de frutal silvestre, conservación del género Pouteria neotropical (uno de los más diversos), banco genético de Sapotaceae silvestre (importante para mejoramiento de P. caimito cultivada), seguridad alimentaria estacional comunitaria. Fuentes Tier A: POWO Kew, GBIF, Sinchi, IIAP Pacífico, Cárdenas-Salinas frutales amazónicos, Bernal 2015.",
+      "validation_level": "claude_draft"
     }
   ],
   "biopreparados": [
@@ -21422,6 +22050,30 @@
       "titulo": "Cartilha da saúde do solo — agricultura orgânica e biodinâmica: o uso correto da cal e das enmendas minerais",
       "institucion": "Fundação Juquira Candiru / MAELA",
       "observaciones": "Texto de divulgación agroecológica latinoamericana que sistematiza las advertencias sobre cal viva/hidratada en sistemas orgánicos y defiende criterios técnicos de aplicación basados en análisis de suelo."
+    },
+    {
+      "id": "iiap-pacifico",
+      "tipo": "manual_tecnico",
+      "autores": "IIAP — Instituto de Investigaciones Ambientales del Pacífico John von Neumann",
+      "año": 2020,
+      "titulo": "Programas de investigación y manejo agroforestal del bioma chocoano biogeográfico",
+      "institucion": "IIAP"
+    },
+    {
+      "id": "cardenas-salinas-frutales-amazonicos",
+      "tipo": "libro_cientifico",
+      "autores": "Cárdenas-López, D. & Salinas, N.R.",
+      "año": 2007,
+      "titulo": "Libro Rojo de plantas de Colombia — Especies maderables amenazadas / Frutales amazónicos",
+      "institucion": "Instituto Sinchi"
+    },
+    {
+      "id": "agrosavia-pacifico",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA — Corporación Colombiana de Investigación Agropecuaria",
+      "año": 2019,
+      "titulo": "Sistemas agroforestales del Pacífico colombiano — Manual de manejo",
+      "institucion": "AGROSAVIA"
     }
   ]
 }
