@@ -8683,7 +8683,7 @@
         "bernal-2015-plantas-liquenes-colombia"
       ],
       "rol_ecologico": "Fijador de nitrogeno simbiotico. Sombra regulada para cultivos asociados. Atraccion de polinizadores (colibries, abejas). Aporte de biomasa foliar rica en N.",
-      "valor_pedagogico": "Cerca viva florecida: cuando florece el chilo, las abejas llegan. Ensenia el rol de las leguminosas en la fertilidad del suelo y la polinizacion.",
+      "valor_pedagogico": "El chiló (Erythrina rubrinervia Kunth, Fabaceae) es un árbol nativo andino de cerca viva tradicional en Cundinamarca, Boyacá, Antioquia y Eje cafetero (1.200-2.800 msnm). Propagación facilísima por estaca leñosa de 2 m: se entierra 40 cm en suelo húmedo y prende sin riego. Sus flores rojo-coral (año 2-3) atraen colibríes y abejas nativas — comedero aéreo de fauna polinizadora. Como leguminosa, fija nitrógeno atmosférico vía simbiosis con Rhizobium en nódulos radiculares, enriqueciendo el suelo del lindero sin abono químico. Lección viva: una cerca puede ser árbol vivo, alimento para colibríes y fábrica gratis de nitrógeno al mismo tiempo. Fuentes Tier A: Pérez Arbeláez 1947, Bernal 2015 Catálogo Plantas Colombia, GBIF Backbone.",
       "validation_level": "claude_draft"
     },
     {
@@ -8797,7 +8797,7 @@
         "powo-kew"
       ],
       "rol_ecologico": "Planta ornamental de bordes de cerca viva en climas calidos. Sus hojas coloridas son indicadoras de luz (mayor color con mas sol).",
-      "valor_pedagogico": "Paleta vegetal: las hojas cambian de color segun la luz. Ensenia los pigmentos vegetales y como la radiacion afecta la expresion fenotipica.",
+      "valor_pedagogico": "El croton ornamental (Codiaeum variegatum (L.) Rumph. ex A.Juss., Euphorbiaceae) es un arbusto introducido del sudeste asiático, aclimatado en zona cálida colombiana (0-1.500 msnm) en patios y cercas vivas de Tolima, Huila, Valle del Cauca, Magdalena y Llanos. Propagación por estaca semimadura de 15-20 cm, enraíza en 3-4 semanas. Sus hojas combinan verde, amarillo, rojo y naranja — el color depende de la radiación: a más sol, más antocianinas y carotenoides; a la sombra domina la clorofila (verde). Lección viva: el color de una hoja no es decoración fija, sino respuesta química a la luz — bioquímica al alcance del patio. Atención: como toda euforbiácea, su látex es irritante y tóxico si se ingiere; no apta para huertos infantiles sin supervisión. Fuentes Tier A: Pérez Arbeláez 1947, POWO Kew, GBIF Backbone.",
       "validation_level": "claude_draft"
     },
     {
@@ -9423,7 +9423,7 @@
         "gbif-taxonomic-backbone",
         "powo-kew"
       ],
-      "valor_pedagogico": "Aceite esencial vivo: la citronela ensena como las plantas producen metabolitos secundarios para repeler insectos y proteger el cultivo en la chagra."
+      "valor_pedagogico": "La citronela (Cymbopogon nardus (L.) Rendle, Poaceae) es una gramínea perenne en macollo, introducida de Sri Lanka y aclimatada en zona cálida a templada colombiana (0-2.000 msnm) en Tolima, Huila, Valle del Cauca, Llanos y Eje cafetero bajo. Propagación facilísima por división de macollo en temporada lluviosa. Sus hojas largas y fibrosas concentran aceite esencial rico en citronelal, geraniol y citronelol — compuestos que dan el olor a limón y efecto repelente contra mosquitos (Aedes, Culex) y mosca blanca. Lección viva: las plantas fabrican su propia farmacia para defenderse; basta restregar una hoja entre las manos para soltar el perfume defensivo. Manejo: se siembra en bordes como cortina aromática biorrepelente, sin agroquímicos, y la mata se renueva cada 4-5 años por división. Fuentes Tier A: Pérez Arbeláez 1947, POWO Kew, GBIF Backbone."
     },
     {
       "id": "zingiber_officinale",
@@ -10075,9 +10075,11 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
-        "powo-kew"
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina"
       ],
-      "valor_pedagogico": "Gramínea nativa andina sub-páramo / páramo. Útil como cobertura vegetal en sistemas de restauración."
+      "valor_pedagogico": "Agrostis foliata (Poaceae) es una gramínea nativa rastrera del sub-páramo y páramo andino colombiano (2.500-4.200 msnm) en Cundinamarca-Sumapaz, Boyacá-Chingaza y cordillera Central. Forma matas bajas y estolones que tejen cobertura continua sobre suelo desnudo, función clave en restauración tras sobrepastoreo o quemas. Lección viva: en el páramo no todo es frailejón — las gramíneas son las costureras del suelo, retienen humedad atmosférica y abren paso a especies más exigentes. No se cultiva en chagra: se respeta donde aparece espontánea como indicadora de regeneración. Fuentes Tier A: Bernal 2015 Catálogo Plantas Colombia, POWO Kew, GBIF Backbone, Humboldt Flora Alto-Andina."
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
