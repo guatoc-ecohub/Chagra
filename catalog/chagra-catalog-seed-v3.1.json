@@ -11280,7 +11280,7 @@
         "crop"
       ],
       "cultivable": true,
-      "conservation_status": "variedad_tradicional",
+      "conservation_status": "naturalizada",
       "altitud_msnm": {
         "min_absoluto": 2400,
         "optimo_min": 2800,
@@ -11376,7 +11376,7 @@
         "crop"
       ],
       "cultivable": true,
-      "conservation_status": "variedad_tradicional",
+      "conservation_status": "naturalizada",
       "altitud_msnm": {
         "min_absoluto": 2100,
         "optimo_min": 2500,
@@ -11418,7 +11418,7 @@
       ],
       "nombre_cientifico": "Cucurbita moschata Duchesne",
       "familia_botanica": "Cucurbitaceae",
-      "category": "verduras_legumbres",
+      "category": "granos_legumbres",
       "thermal_zones": [
         "calido",
         "templado"
@@ -11468,7 +11468,7 @@
       ],
       "nombre_cientifico": "Zea mays L. cv. 'Negro de Páramo'",
       "familia_botanica": "Poaceae",
-      "category": "cereales_pseudocereales",
+      "category": "cereales",
       "thermal_zones": [
         "frio",
         "paramo"
@@ -11477,7 +11477,7 @@
         "crop"
       ],
       "cultivable": true,
-      "conservation_status": "variedad_tradicional",
+      "conservation_status": "naturalizada",
       "altitud_msnm": {
         "min_absoluto": 2200,
         "optimo_min": 2600,
@@ -11517,7 +11517,7 @@
       ],
       "nombre_cientifico": "Zea mays L. cv. 'Capio'",
       "familia_botanica": "Poaceae",
-      "category": "cereales_pseudocereales",
+      "category": "cereales",
       "thermal_zones": [
         "frio"
       ],
@@ -11525,7 +11525,7 @@
         "crop"
       ],
       "cultivable": true,
-      "conservation_status": "variedad_tradicional",
+      "conservation_status": "naturalizada",
       "altitud_msnm": {
         "min_absoluto": 2000,
         "optimo_min": 2400,
@@ -11566,7 +11566,7 @@
       ],
       "nombre_cientifico": "Amaranthus caudatus L. cv. 'Kiwicha'",
       "familia_botanica": "Amaranthaceae",
-      "category": "cereales_pseudocereales",
+      "category": "cereales",
       "thermal_zones": [
         "templado",
         "frio"
@@ -11575,7 +11575,7 @@
         "crop"
       ],
       "cultivable": true,
-      "conservation_status": "variedad_tradicional",
+      "conservation_status": "naturalizada",
       "altitud_msnm": {
         "min_absoluto": 1500,
         "optimo_min": 2000,
@@ -11615,7 +11615,7 @@
       ],
       "nombre_cientifico": "Phaseolus vulgaris L. cv. 'Bola Roja'",
       "familia_botanica": "Fabaceae",
-      "category": "verduras_legumbres",
+      "category": "granos_legumbres",
       "thermal_zones": [
         "frio",
         "templado"
@@ -11625,7 +11625,7 @@
         "nitrogen_fixer"
       ],
       "cultivable": true,
-      "conservation_status": "variedad_tradicional",
+      "conservation_status": "naturalizada",
       "altitud_msnm": {
         "min_absoluto": 1800,
         "optimo_min": 2200,
@@ -11666,7 +11666,7 @@
       ],
       "nombre_cientifico": "Phaseolus lunatus L. cv. andino",
       "familia_botanica": "Fabaceae",
-      "category": "verduras_legumbres",
+      "category": "granos_legumbres",
       "thermal_zones": [
         "templado",
         "frio"
@@ -11676,7 +11676,7 @@
         "nitrogen_fixer"
       ],
       "cultivable": true,
-      "conservation_status": "variedad_tradicional",
+      "conservation_status": "naturalizada",
       "altitud_msnm": {
         "min_absoluto": 1500,
         "optimo_min": 1800,
@@ -11718,7 +11718,7 @@
       ],
       "nombre_cientifico": "Chenopodium pallidicaule Aellen",
       "familia_botanica": "Amaranthaceae",
-      "category": "cereales_pseudocereales",
+      "category": "cereales",
       "thermal_zones": [
         "frio",
         "paramo"
@@ -11727,7 +11727,7 @@
         "crop"
       ],
       "cultivable": true,
-      "conservation_status": "variedad_tradicional",
+      "conservation_status": "naturalizada",
       "altitud_msnm": {
         "min_absoluto": 3000,
         "optimo_min": 3500,
