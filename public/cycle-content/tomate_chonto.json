@@ -27,9 +27,11 @@
       "drenaje": "Profundo — sistema radical alcanza 60 cm"
     },
     "campo": {
+      "analisis_suelo_pre_siembra": "Arrancar SIEMPRE por análisis de suelo (físico + químico) en laboratorio acreditado (AGROSAVIA Tibaitatá, ICA, Universidad Nacional). Mínimo 45 días antes del trasplante. Reportar: pH en agua y KCl, % materia orgánica, CIC, bases intercambiables (Ca, Mg, K), elementos menores (B, Zn, Cu, Mn, Fe), textura, densidad aparente. Sin análisis previo se camina a ciegas — fertilización empírica destruye suelo y bolsillo.",
+      "analisis_toxicologia": "Si hay sospecha de uso previo de agroquímicos (lote convencional reciente, vecindad bananera/papera, fungicidas cobrados), pedir análisis de toxicología: residuos de plaguicidas organoclorados (DDT, lindano, endosulfán — persistentes 10-30 años), residuos cobre acumulado (toxicidad >150 ppm), metales pesados Cd/Pb (zonas mineras o tráfico vehicular cercano). Norma NTC 5167 + Resolución MinSalud 4506/2013 (límites Cd en hortalizas).",
       "descompactacion": "Profunda 35 cm",
       "incorporacion": "30-40 t/ha gallinaza compostada o bocashi maduro",
-      "encalado": "Dolomítico si pH < 6",
+      "encalado": "DECISIÓN AGROECOLÓGICA, no automática. Encalar SOLO cuando análisis de suelo lo justifique: pH < 5.5 (acidez activa) y/o saturación de aluminio > 30% (acidez intercambiable tóxica). Material según deficiencia detectada: cal dolomítica (CaMg) si Mg < 1 cmol/kg; cal agrícola (CaCO3) si solo Ca; cal viva (CaO) NUNCA en agroecológico (mata microbiota). Dosis se calcula con fórmula Cochrane (1980) ajustada por Al intercambiable, NO empírica. Aplicar 60-90 días antes del trasplante, incorporar superficial 0-15 cm, regar para activar. Sobre-encalado provoca lock-out de fósforo, hierro y zinc — peor que el problema original. Alternativas agroecológicas si pH 5.5-6.0: enmiendas orgánicas con efecto buffer (compost maduro, bocashi, biocarbón) que suben pH gradual sin shock microbiano.",
       "surcos": "1.2-1.5 m entre surcos",
       "distancia_plantas": "0.5 m",
       "tutorado_campo": "Espaldera colombiana — poste cada 4 m + alambre superior + hilo individual",
@@ -38,6 +40,12 @@
     }
   },
   "milestones": [
+    {
+      "fase": "pre_siembra_diagnostico",
+      "dias_relativos": "-60 a -45",
+      "criterio_observable": "Análisis de suelo en laboratorio acreditado (AGROSAVIA, ICA, UNAL) con reporte físico-químico completo. Si lote con uso convencional reciente o vecindad sospechosa, sumar análisis toxicológico (residuos plaguicidas, Cu acumulado, metales pesados Cd/Pb).",
+      "accion_clave": "Tomar 15-20 sub-muestras a 0-30 cm en zigzag por lote homogéneo, mezclar 1 kg compuesta, enviar a laboratorio. Decidir encalado SOLO con análisis en mano: pH < 5.5 y/o saturación Al > 30%. Sin diagnóstico no hay decisión técnica posible."
+    },
     {
       "fase": "germinacion_y_semillero",
       "dias_relativos": "-30 a -20",
