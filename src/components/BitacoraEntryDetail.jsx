@@ -353,7 +353,7 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
-                capture="environment"
+               
                 onChange={handlePhotoCapture}
                 disabled={photoState === 'uploading'}
                 className="hidden"

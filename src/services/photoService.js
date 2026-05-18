@@ -36,7 +36,7 @@ const CATALOG_PHOTOS_BASE = '/catalog-photos';
  * Captura desde input file (cámara o galería). Convierte HEIC→JPEG via canvas,
  * redimensiona, comprime, y retorna un Blob JPEG.
  *
- * @param {File} file - input file (de <input type="file" capture="environment">)
+ * @param {File} file - input file de <input type="file" accept="image/*"> (cámara o galería)
  * @returns {Promise<{blob: Blob, width: number, height: number, originalSize: number, compressedSize: number, mime: string}>}
  */
 export async function captureAndCompress(file) {

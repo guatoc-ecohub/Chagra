@@ -131,7 +131,7 @@ function ObservationScreen({ onBack, onSave }) {
 
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Foto</span>
-          <input type="file" accept="image/*" capture="environment" onChange={handlePhotoCapture} className="hidden" />
+          <input type="file" accept="image/*" onChange={handlePhotoCapture} className="hidden" />
           <button onClick={() => document.querySelector('input[type="file"]').click()} className="p-5 rounded-xl text-2xl font-bold flex justify-center items-center gap-3 shadow-md min-h-[80px] bg-slate-800 border-2 border-slate-600 active:bg-slate-700">
             <Camera size={32} />
             <span>{photo ? photo.name.substring(0, 15) + '...' : 'Capturar Foto'}</span>

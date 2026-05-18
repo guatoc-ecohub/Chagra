@@ -215,7 +215,7 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
               <Camera size={48} />
               <span className="text-xl font-bold">{photo ? '📸 Cambiar foto' : '📸 Foto de la planta'}</span>
             </div>
-            <input type="file" accept="image/*" capture="environment" onChange={handlePhotoCapture} className="hidden" />
+            <input type="file" accept="image/*" onChange={handlePhotoCapture} className="hidden" />
           </label>
         </div>
 

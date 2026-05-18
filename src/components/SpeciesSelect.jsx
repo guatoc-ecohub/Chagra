@@ -355,7 +355,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill }) => {
               ref={aiInputRef}
               type="file"
               accept="image/*"
-              capture="environment"
+             
               onChange={handleAiCapture}
               className="hidden"
             />
