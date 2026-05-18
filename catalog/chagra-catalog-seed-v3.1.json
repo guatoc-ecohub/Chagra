@@ -7098,10 +7098,14 @@
         "vicia_sativa"
       ],
       "antagonists": [],
-      "valor_pedagogico": "El arado biologico: el nabo forrajero rompe la compactacion del suelo con su raiz pivotante y recicla nutrientes profundos, ensenando que las plantas pueden labrar la tierra mejor que el azadon.",
+      "valor_pedagogico": "El nabo forrajero (Brassica rapa L. var. rapifera, familia Brassicaceae) es una brasicácea anual a bienal forrajera cultivada en sistemas ganaderos andinos colombianos como cover crop, abono verde, biofumigante natural y forraje verde de corte para bovinos y ovinos del altiplano cundiboyacense. Variedad selectivamente diferenciada del nabo de mesa por mayor desarrollo radicular (raíz pivotante 50-80 cm), menor desarrollo de raíz reservante comestible y mayor producción de biomasa aérea verde. Se cultiva en Boyacá (Tunja, Sotaquirá, Sutamarchán, Villa de Leyva, altiplano), Cundinamarca (Sabana de Bogotá, Subachoque, Sumapaz), Nariño (Pasto, Túquerres, Sapuyes), Cauca (Silvia, Totoró, Inzá) y Antioquia (oriente lechero — La Unión, La Ceja, Sonsón) entre 2.000 y 2.800 msnm en zona térmica fría. Ciclo corto 90-120 días desde siembra a incorporación o forraje. Rendimientos 30-50 t/ha biomasa fresca, 5-8 t/ha materia seca. Lección viva del arado biológico: el nabo forrajero rompe la compactación del suelo con su raíz pivotante profunda perforando capas de subsuelo arcilloso y compactado, recicla nutrientes profundos (potasio, calcio, fósforo) bombeándolos hacia hojas y biomasa aérea, enseñando que las plantas pueden labrar la tierra mejor que el azadón (bio-tillage). Sus glucosinolatos liberados al descomponer biomasa actúan como biofumigantes naturales contra Globodera spp. (nematodo dorado de la papa), Rhizoctonia solani y Fusarium oxysporum, principio agroecológico clave en rotación post-papa. Manejo agroecológico: siembra al voleo 8-12 kg/ha semilla en post-cosecha de papa, asocio con vicia o raigras para mejorar relación C/N de cobertura, incorporación pre-floración a los 80-90 días para evitar semillación espontánea, alternativamente forraje verde de corte cada 60 días con rebrote, no requiere fertilización ni agroquímicos. Fuentes Tier A: AGROSAVIA Forrajeras 2022, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia.",
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-forrajeras-2022",
+        "agrosavia-tibaitata",
+        "bernal-2015-plantas-liquenes-colombia",
         "restrepo-2005-agroecologia"
       ],
       "validation_level": "claude_draft"
@@ -7159,11 +7163,14 @@
         "medicago_sativa"
       ],
       "antagonists": [],
-      "valor_pedagogico": "La graminea resistente: la festuca ensena la importancia de las raices profundas en la recuperacion de suelos compactados y su papel en la estabilizacion de laderas altoandinas.",
+      "valor_pedagogico": "La festuca alta o festuca arundinácea (Festuca arundinacea Schreb., familia Poaceae, subfamilia Pooideae) es una poácea perenne herbácea cespitosa originaria de Europa templada y norte de África, naturalizada y cultivada extensamente en sistemas ganaderos altoandinos colombianos como gramínea forrajera estructural de pradera permanente, especialmente en rotaciones lecheras y de carne del altiplano cundiboyacense, Eje cafetero alto y Nariño. Forma macollos densos con raíces profundas (hasta 1-1.5 m), hojas anchas, planas y verde oscuro, y panículas erectas con espiguillas multifloras. Se cultiva en Boyacá (Tunja, Sotaquirá, Sutamarchán, Villa de Leyva, altiplano lechero), Cundinamarca (Sabana de Bogotá, Subachoque, Tabio, Madrid, Mosquera, Chocontá), Nariño (Pasto, Túquerres, Ipiales), Cauca (Silvia, Totoró), Antioquia (oriente — La Unión, La Ceja, Sonsón, El Carmen) y Eje cafetero alto entre 2.200 y 3.000 msnm en zona térmica fría. Ciclo perenne, productividad sostenida 5-8 años antes de renovar pradera. Rendimientos 12-18 t/ha materia seca por año en pradera bien manejada con asocios. Lección viva de la gramínea resistente: la festuca enseña la importancia de las raíces profundas en la recuperación de suelos compactados y degradados, su papel en la estabilización de laderas altoandinas (anti-erosión por anclaje radicular denso), y la simbiosis con endófitos beneficos (Epichloë coenophiala) que confieren resistencia a plagas y sequía. Manejo agroecológico: siembra al voleo 25-35 kg/ha semilla certificada en cama bien preparada, asocio obligatorio con trébol blanco (Trifolium repens) o rojo (Trifolium pratense) para fijación biológica de nitrógeno y mejora del valor nutricional del forraje, manejo en pastoreo rotacional con descansos de 28-35 días, encalado preventivo cada 3 años. Fuentes Tier A: AGROSAVIA Forrajeras 2022, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia.",
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
+        "gbif-colombia",
         "agrosavia-forrajeras-2022",
+        "agrosavia-silvopastoriles",
+        "bernal-2015-plantas-liquenes-colombia",
         "restrepo-2005-agroecologia"
       ],
       "validation_level": "claude_draft"
@@ -7221,11 +7228,14 @@
         "festuca_arundinacea"
       ],
       "antagonists": [],
-      "valor_pedagogico": "La alfombra verde del altiplano: el raigras perenne demuestra la sinergia entre gramineas y leguminosas en la pradera, ensenando el equilibrio forrajero que sostiene la ganaderia altoandina.",
+      "valor_pedagogico": "El raigrás perenne o ballico inglés (Lolium perenne L., familia Poaceae, subfamilia Pooideae) es una poácea perenne herbácea cespitosa originaria de Europa templada y Asia occidental, considerada la gramínea forrajera más cultivada del altiplano cundiboyacense colombiano y referente productivo de la lechería especializada de zona fría. Forma macollos densos verde-oscuro brillantes con hojas planas glabras, panículas erectas con espiguillas multifloras dísticas opuestas al raquis (rasgo diagnóstico del género Lolium) y crecimiento rápido en clima frío húmedo. Se cultiva en Cundinamarca (Sabana de Bogotá, Mosquera, Madrid, Funza, Subachoque, Chocontá, Tabio), Boyacá (Tunja, Sotaquirá, Paipa, Duitama, Sogamoso, altiplano lechero), Nariño (Pasto, Túquerres, Ipiales, Sapuyes), Antioquia (oriente lechero — La Unión, La Ceja, El Carmen de Viboral) y Eje cafetero alto entre 2.200 y 3.000 msnm en zona térmica fría húmeda. Ciclo perenne, productividad sostenida 4-6 años antes de renovar pradera. Rendimientos 14-20 t/ha materia seca por año, base de la producción láctea industrial colombiana de hato Holstein y cruces (95% del altiplano cundiboyacense). Lección viva de la alfombra verde del altiplano: el raigrás perenne demuestra la sinergia entre gramíneas y leguminosas en la pradera (raigrás + trébol blanco Trifolium repens), enseñando el equilibrio forrajero que sostiene la ganadería altoandina lechera, con el trébol aportando 100-200 kg N biológico/ha/año y el raigrás aportando biomasa de alta digestibilidad (NDF 45-55%, proteína 18-22%). Manejo agroecológico: siembra al voleo 20-30 kg/ha asociada con trébol blanco 3-5 kg/ha, pastoreo rotacional intensivo con franjas eléctricas y descansos de 21-28 días, fertilización con abonos orgánicos (estiércol, compost) y encalado preventivo. Fuentes Tier A: AGROSAVIA Forrajeras 2022, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia.",
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
+        "gbif-colombia",
         "agrosavia-forrajeras-2022",
+        "agrosavia-silvopastoriles",
+        "bernal-2015-plantas-liquenes-colombia",
         "restrepo-2005-agroecologia"
       ],
       "validation_level": "claude_draft"
@@ -7284,11 +7294,15 @@
         "trifolium_repens"
       ],
       "antagonists": [],
-      "valor_pedagogico": "La maestra de la fijacion de nitrogeno: la alfalfa con su raiz que perfora el subsuelo ensena como las leguminosas transforman el aire en fertilizante, alimentando la pradera desde las profundidades.",
+      "valor_pedagogico": "La alfalfa (Medicago sativa L., familia Fabaceae, subfamilia Faboideae) es una fabácea perenne herbácea originaria del Asia central (Persia, Caucaso, Anatolia), considerada la reina de las forrajeras a nivel global por su altísimo valor nutricional (proteína cruda 18-22%, calcio, fósforo, vitaminas A y K), su capacidad fijadora de nitrógeno biológico por simbiosis con Sinorhizobium meliloti y su raíz pivotante profunda (3-4 m) que perfora el subsuelo accediendo a humedad y nutrientes inaccesibles a otros forrajes. Se cultiva en sistemas ganaderos altoandinos colombianos en Cundinamarca (Sabana de Bogotá, Madrid, Mosquera, Funza, Subachoque), Boyacá (Tunja, Villa de Leyva, Sotaquirá, Duitama, altiplano lechero), Nariño (Pasto, Túquerres, Sapuyes, Ipiales), Valle de Tenza, Valle del Cauca y zonas con suelos neutros a alcalinos entre 2.000 y 2.800 msnm en zona térmica templada a fría seca. Ciclo perenne, productividad sostenida 4-6 años en pradera bien manejada. Rendimientos 10-18 t/ha materia seca/año en 5-7 cortes anuales. Lección viva de la maestra de la fijación de nitrógeno: la alfalfa con su raíz que perfora el subsuelo enseña cómo las leguminosas transforman el aire (N2 atmosférico) en fertilizante biológico utilizable (NH3, NH4+, NO3-) por simbiosis con bacterias del género Sinorhizobium en nódulos radicales rosados, alimentando la pradera desde las profundidades y fijando 150-250 kg N/ha/año sin necesidad de fertilización nitrogenada sintética. Manejo agroecológico: siembra al voleo 15-25 kg/ha semilla inoculada con cepa específica de Sinorhizobium meliloti, asocio con festuca o raigrás para mejor cobertura, pastoreo rotacional con descansos largos 35-45 días para no agotar reservas radiculares, encalado obligatorio para mantener pH 6.5-7.5, no requiere fertilización N. Fuentes Tier A: AGROSAVIA Forrajeras 2022, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia.",
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
+        "gbif-colombia",
         "agrosavia-forrajeras-2022",
+        "agrosavia-leguminosas-andinas",
+        "agrosavia-silvopastoriles",
+        "bernal-2015-plantas-liquenes-colombia",
         "restrepo-2005-agroecologia"
       ],
       "validation_level": "claude_draft"
@@ -7406,10 +7420,14 @@
         "vicia_sativa"
       ],
       "antagonists": [],
-      "valor_pedagogico": "El abono verde express: el rabano forrajero germina y cubre el suelo en semanas, ensenando el valor de las brassicas como biofumigantes naturales y acumuladoras de nutrientes en rotaciones cortas.",
+      "valor_pedagogico": "El rábano forrajero o rábano oleífero (Raphanus sativus L. var. oleifer, familia Brassicaceae) es una brasicácea anual herbácea cultivada selectivamente del rábano común por mayor desarrollo radicular (raíz pivotante 50-100 cm) y biomasa aérea, usado en sistemas ganaderos y hortícolas andinos colombianos como cover crop de ciclo corto, abono verde rápido, biofumigante natural y forraje secundario para bovinos. Se cultiva en sistemas de rotación con papa, hortalizas y praderas en Cundinamarca (Sabana de Bogotá, Subachoque, Sumapaz), Boyacá (Tunja, Sotaquirá, Sutamarchán), Nariño (Pasto, Túquerres, Sapuyes), Antioquia (oriente — La Unión, La Ceja) y Eje cafetero alto entre 1.800 y 2.600 msnm en zona térmica templada a fría. Ciclo cortísimo 60-90 días desde siembra a incorporación o cosecha. Rendimientos 25-40 t/ha biomasa fresca, 4-7 t/ha materia seca. Lección viva del abono verde express: el rábano forrajero germina y cubre el suelo desnudo en 2-3 semanas (cobertura rápida anti-arvenses por sombreado denso), enseñando el valor de las brasicas como biofumigantes naturales por liberación de isotiocianatos al descomponer biomasa (acción supresora sobre Globodera spp. nematodo dorado de la papa, Rhizoctonia solani, Verticillium dahliae) y como acumuladoras de nutrientes profundos en rotaciones cortas pre-papa o post-cosecha de hortalizas. Su raíz pivotante descompacta suelos arcillosos compactados (bio-tillage) y sus flores blanco-rosadas atraen polinizadores nativos y enemigos naturales. Manejo agroecológico: siembra al voleo 15-25 kg/ha en suelo descansado, asocio con avena o vicia para mejorar C/N de cobertura mixta, incorporación pre-floración para evitar semillación, alternativamente pastoreo controlado por bovinos en franja, no requiere fertilización. Fuentes Tier A: AGROSAVIA Forrajeras 2022, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia.",
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-forrajeras-2022",
+        "agrosavia-tibaitata",
+        "bernal-2015-plantas-liquenes-colombia",
         "restrepo-2005-agroecologia"
       ],
       "validation_level": "claude_draft"
