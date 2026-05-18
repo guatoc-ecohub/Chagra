@@ -1,0 +1,57 @@
+{
+  "species_slug": "fragaria_ananassa_monterrey",
+  "scientific_name": "Fragaria × ananassa 'Monterrey'",
+  "common_names": [
+    "Fresa Monterrey"
+  ],
+  "family": "Rosaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "estolon",
+    "notas": "Variedad de día neutro; requiere acolchado (mulch) de paja o plástico para evitar que el fruto toque el suelo y se pudra."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1000,
+      "optimo_min": 1800,
+      "optimo_max": 2800,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -5,
+      "optimo_min": 14,
+      "optimo_max": 20,
+      "max_tolerable": 26
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "La fresa Monterrey (Fragaria × ananassa Duchesne ex Rozier cv. Monterrey) es una rosácea perenne híbrida productiva (day-neutral) muy adoptada en cultivos comerciales colombianos por su precocidad, fruto grande y firme, y producción extendida primavera-otoño. Se cultiva en Cundinamarca (Sabana Bogotá, Sopó, Choachí, Sibaté), Boyacá (Sotaquirá, Toca), Nariño y Antioquia entre 1.800 y 2.800 msnm en zona térmica fría. Ciclo a primera cosecha 60-90 días desde trasplante, productividad sostenida 8-12 meses con manejo adecuado. Rendimientos 25-45 t/ha en sistema agroecológico mulching. Manejo: cama elevada con MO abundante, mulch plástico o paja, fertilización con biol foliar y bocashi al fondo, control de Botrytis cinerea con caldo bordelés + bacillus_subtilis, manejo de ácaros con caldo sulfocálcico. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "agrosavia-manual-biopreparados-2015",
+      "title": "agrosavia-manual-biopreparados-2015",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-18T03:26:41.093Z"
+}

@@ -1,0 +1,67 @@
+{
+  "species_slug": "passiflora_edulis_morada",
+  "scientific_name": "Passiflora edulis f. edulis Sims",
+  "common_names": [
+    "Gulupa"
+  ],
+  "family": "Passifloraceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Se recomienda el uso de micorrizas en el trasplante; evitar cercanía con maracuyá."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1600,
+      "optimo_min": 1800,
+      "optimo_max": 2300,
+      "max_absoluto": 2600
+    },
+    "temperatura_c": {
+      "helada_letal": -1,
+      "optimo_min": 15,
+      "optimo_max": 20,
+      "max_tolerable": 25
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "La gulupa (Passiflora edulis f. edulis) se cultiva en Colombia principalmente en los departamentos de Cundinamarca, Boyacá y Antioquia entre 1600 y 2600 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con uso de micorrizas en el trasplante, ciclo productivo de 12-18 meses, associations beneficiosas con cultivos de sombra como plátano y requerimiento de control de plagas como áfidos, trips y enfermedades foliares mediante monitoreo integrado. En el contexto andino campesino, se valora por su sabor aromático y se consume tradicionalmente en jugos y postres, contribuyendo a la diversificación de ingresos familiares en zonas de mediana altitud. Según fuentes técnicas validadas por AGROSAVIA y taxónomicamente confirmada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Passiflora edulis f. edulis Sims.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "agrosavia-sol-andina",
+      "title": "agrosavia-sol-andina",
+      "url": "https://www.agrosavia.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-18T03:26:41.094Z"
+}
