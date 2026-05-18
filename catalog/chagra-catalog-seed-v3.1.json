@@ -15610,6 +15610,650 @@
         "gbif-taxonomic-backbone",
         "jbb-plantas-medicinales"
       ]
+    },
+    {
+      "id": "helianthus_annuus",
+      "nombre_comun": "Girasol",
+      "nombre_cientifico": "Helianthus annuus L.",
+      "nombre_comunes_regionales": [
+        "Mirasol",
+        "Maravilla",
+        "Acahual"
+      ],
+      "familia_botanica": "Asteraceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "crop",
+        "dynamic_accumulator",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 2200,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 18,
+        "optimo_max": 28,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa a sitio definitivo, 2-3 cm profundidad, distancia 30-60 cm entre plantas. Germinación 5-12 días. Ciclo 90-120 días. Cosecha de capítulo cuando reverso vira marrón y semillas se desprenden con presión leve."
+      },
+      "companions": [
+        "zea_mays",
+        "phaseolus_vulgaris",
+        "cucurbita_maxima"
+      ],
+      "antagonists": [],
+      "harvest_type": "semilla",
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "valor_pedagogico": "El Girasol (Helianthus annuus L., Asteraceae) es una especie anual originaria de Norteamérica (cuenca del Mississippi, México, suroeste de Estados Unidos) cultivada en Colombia y todo el Neotrópico como ornamental masivo, productora de semilla comestible y oleaginosa, y atrayente excepcional de polinizadores. Sus capítulos compuestos (inflorescencias) son uno de los íconos botánicos universales y su heliotropismo (seguimiento del sol por capítulos jóvenes, fenómeno reversible mediado por crecimiento diferencial del tallo bajo el control del reloj circadiano) es lección viva de fisiología vegetal para huerta escolar. En Colombia se cultiva entre 0 y 2.800 msnm en zonas térmicas cálida a fría: Sabana de Bogotá, valles interandinos del Magdalena y Cauca, Caribe seco, Eje Cafetero, Antioquia. Manejo agronómico: siembra directa a sitio definitivo en suelo bien drenado y soleado, 2-3 cm profundidad, distancia 30-60 cm entre plantas y 60-90 cm entre surcos, germinación 5-12 días, ciclo total 90-120 días según variedad (enanas 80 días, gigantes 130+ días). El capítulo puede albergar entre 100 y 2.000 flores tubulares (flósculos del disco) rodeadas por las flores liguladas amarillas vistosas (radio), cada flósculo polinizado produce una semilla (técnicamente cipsela). Atracción de polinizadores: una sola planta puede sostener decenas de abejas (Apis mellifera, Trigona spp., Melipona spp.) y abejorros nativos (Bombus spp.) simultáneamente durante la floración, y es flor visitada también por mariposas y aves granívoras (loros, pericos, jilgueros) que aprovechan las semillas maduras. Asociación clásica con la \"milpa mesoamericana\": maíz + frijol + calabaza + girasol como cuarta hermana en borde para atracción de polinizadores y defensa contra plagas (acumula áfidos lejos de las hortalizas). Producción de aceite: las variedades oleaginosas modernas alcanzan 40-50% de aceite en semilla (insaturado, rico en ácido linoleico y vitamina E), siendo el girasol uno de los tres aceites vegetales más consumidos en el mundo junto con palma y soya. Las semillas tostadas o crudas son consumo humano directo en muchas culturas (pipas en España, sunflower seeds en Estados Unidos, pepas de mirasol en México). La torta residual del prensado es alimento balanceado de alta calidad para aves y porcinos. Acumulador dinámico de potasio y fósforo del subsuelo (sistema radical pivotante profundo de 1.5-2 m), su biomasa al final del ciclo es excelente abono verde si se incorpora antes de la lignificación del tallo. Uso ancestral: pueblos originarios de Norteamérica lo cultivaban hace 4.000+ años como cuarto cultivo principal (maíz, frijol, calabaza, girasol), Aztecas y Mayas lo veneraban como flor solar simbólica (la flor mira al sol como el alma busca a Dios), llegada a Europa siglo XVI vía conquistadores españoles desde México (de ahí \"mirasol\" y \"girasol\"). Manejo en chagra: siembra perimetral o en hileras intercaladas con hortalizas, como planta atrayente y trampa, asociación con maíz-frijol-calabaza, cosecha del capítulo cuando reverso vira marrón claro y las brácteas se secan, secado al sol 1-2 semanas antes de desgrane manual. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pérez Arbeláez 1947 Plantas Útiles Colombia, JBB Plantas Medicinales.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "perez-arbelaez-1947-plantas-utiles",
+        "jbb-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "viola_tricolor",
+      "nombre_comun": "Pensamiento / Trinitaria",
+      "nombre_cientifico": "Viola tricolor L.",
+      "nombre_comunes_regionales": [
+        "Pensamiento silvestre",
+        "Hierba de la trinidad",
+        "Pensativa"
+      ],
+      "familia_botanica": "Violaceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 3000,
+        "max_absoluto": 3300
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra en semillero, germinación 10-20 días a 15-18°C, trasplante 4-6 semanas, distancia 15-20 cm. Auto-resiembra natural en jardines de clima frío. Floración 60-90 días post-siembra."
+      },
+      "companions": [
+        "fragaria_vesca",
+        "allium_schoenoprasum"
+      ],
+      "antagonists": [],
+      "harvest_type": "flor",
+      "scale_viability": [
+        "apartamento",
+        "huerto_casero",
+        "produccion"
+      ],
+      "valor_pedagogico": "El Pensamiento o Trinitaria (Viola tricolor L., Violaceae) es una especie herbácea anual o bienal originaria de Europa templada (regiones boreales hasta el Mediterráneo) y naturalizada-cultivada mundialmente como ornamental clásico de jardín, con la característica adicional de tener flores comestibles ampliamente usadas en gastronomía decorativa de alta gama. En Colombia se cultiva en clima frío y de páramo entre 2.000 y 3.300 msnm: Sabana de Bogotá, Boyacá altoandino, Nariño altoandino, Cundinamarca rural, Antioquia oriente frío, viveros y jardines de Tunja, Manizales, Pasto. Manejo agronómico: siembra en semillero protegido con sustrato bien drenado, germinación 10-20 días a temperatura 15-18°C, trasplante al sitio definitivo 4-6 semanas post-germinación con distancia 15-20 cm entre plantas, floración inicia 60-90 días post-siembra y se mantiene 4-6 meses continuos si se eliminan flores marchitas (deadheading). Florece masivamente en clima frío (10-20°C) con tolerancia a heladas leves de -5 a -8°C: especie ideal para jardín y huerta de páramo. Sus flores presentan el característico patrón tricolor (violeta, amarillo, blanco; de ahí el epíteto específico tricolor) y son comestibles crudas en ensaladas, decoración de tortas, repostería fina, gelatinas, té de flor, cubitos de hielo florales para cócteles, vinagretas perfumadas. Sabor suave, ligeramente dulce y herbáceo, textura aterciopelada delicada. Atracción de polinizadores: abejas pequeñas (Apis mellifera, Bombus spp.), mariposas (varias especies de Pieridae y Nymphalidae que la usan como planta hospedera para oviposición de larvas), sírfidos y abejorros nativos andinos. Uso medicinal tradicional documentado en farmacopeas europeas: flor seca infusión expectorante suave, diurética leve, depurativo sanguíneo tradicional (\"hierba de la trinidad\" por la triple coloración floral simbólica), uso en cosmética (mucílagos para pieles sensibles). Su pariente cultivado moderno Viola × wittrockiana (pensamiento de jardín) es híbrido del siglo XIX derivado en parte de V. tricolor con flores más grandes y multicolores. Manejo en huerta agroecológica: borde y franja perimetral de hortalizas como atrayente de polinizadores en clima frío, asociación con fresa (Fragaria vesca) y cebollín (Allium schoenoprasum), siembra en macetera vertical o jardín de balcón en apartamento bogotano (escala apartamento viable), cosecha de flores en mañana fresca para uso culinario inmediato. Auto-resiembra natural: en jardines bien manejados se naturaliza y reaparece año tras año sin intervención. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pamplona Roger 2006 Plantas Medicinales, JBB Plantas Medicinales.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "viola_odorata",
+      "nombre_comun": "Violeta perfumada",
+      "nombre_cientifico": "Viola odorata L.",
+      "nombre_comunes_regionales": [
+        "Violeta común",
+        "Violeta de olor",
+        "Violeta dulce"
+      ],
+      "familia_botanica": "Violaceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 8,
+        "optimo_max": 20,
+        "max_tolerable": 24
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "estolon",
+        "notas": "División de matas con estolones radicantes (método principal, más rápido y fiable). Alternativa por semilla con estratificación fría 4-6 semanas. Plantación en sombra parcial o filtrada, distancia 20 cm. Floración invierno-primavera fría andina."
+      },
+      "companions": [
+        "fragaria_vesca",
+        "mentha_spicata"
+      ],
+      "antagonists": [],
+      "harvest_type": "flor",
+      "scale_viability": [
+        "apartamento",
+        "huerto_casero",
+        "produccion"
+      ],
+      "valor_pedagogico": "La Violeta perfumada (Viola odorata L., Violaceae) es una especie herbácea perenne rastrera originaria de Europa, norte de África y Asia occidental templadas, cultivada mundialmente desde la antigüedad clásica greco-romana como planta ornamental aromática, medicinal y comestible. Su perfume floral característico —dulce, intenso, ligeramente almizclado— es uno de los aromas más antiguos de la perfumería: ya los griegos y romanos la cultivaban para coronas, perfumes y confituras, y es base del célebre \"absolu de violette\" de la perfumería moderna francesa. Distinta de V. tricolor (anual de flor tricolor visiblemente vistosa) por ser perenne, rastrera con estolones radicantes, hojas reniforme-cordadas y flores violeta-azuladas oscuras muy pequeñas pero intensamente perfumadas. En Colombia se cultiva en clima frío y templado entre 1.800 y 3.000 msnm: jardines de Sabana de Bogotá, Boyacá, Antioquia oriente frío, Eje Cafetero altoandino. Manejo agronómico: propagación principal por división de matas con estolones radicantes (método más rápido, fiable y predecible), alternativa por semilla con estratificación fría 4-6 semanas a 5°C para romper dormancia, plantación en sombra parcial o filtrada bajo árboles caducifolios o frutales, distancia 20 cm entre plantas, suelo rico en materia orgánica con buen drenaje, floración invierno-primavera fría andina (noviembre-febrero), expansión vegetativa por estolones formando alfombra densa. Sus flores son comestibles cristalizadas en azúcar (clásicas violetas de Toulouse francesas), perfumando pasteles, helados, jaleas, vinagretas, jarabes, licores tradicionales. Uso medicinal tradicional documentado por Dioscórides, Plinio, farmacopeas europeas medievales y la medicina tradicional europea: flor y hoja contienen ácido salicílico (precursor natural de la aspirina), saponinas, mucílagos, antocianinas; infusión de flor expectorante para bronquitis y tos seca, jarabe pectoral pediátrico tradicional (\"sirop de violettes\"), uso externo para irritaciones cutáneas. Atracción de polinizadores: abejas pequeñas (Apis mellifera, abejas solitarias), abejorros (Bombus spp.), mariposas pequeñas y sírfidos en clima frío andino, especie temprana de floración que provee néctar y polen cuando pocas otras flores están disponibles. Curiosamente produce dos tipos de flores: las visibles violetas perfumadas (chasmógamas, polinización abierta cruzada) y flores cleistógamas autopolinizantes ocultas cerca del suelo que aseguran semilla incluso sin polinizadores (estrategia evolutiva ingeniosa). Manejo en huerta agroecológica: cobertura viva bajo árboles frutales (sotobosque productivo), asociación con fresa y menta (consorcio aromático andino), siembra en jardín de sombra parcial, cosecha de flores en mañana fresca para uso culinario o medicinal inmediato. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pamplona Roger 2006 Plantas Medicinales, JBB Plantas Medicinales.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "lavandula_dentata",
+      "nombre_comun": "Lavanda dentada",
+      "nombre_cientifico": "Lavandula dentata L.",
+      "nombre_comunes_regionales": [
+        "Alhucema dentada",
+        "Cantueso dentado"
+      ],
+      "familia_botanica": "Lamiaceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "pest_repellent",
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1500,
+        "optimo_max": 2600,
+        "max_absoluto": 2900
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 12,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Esqueje semileñoso 10-15 cm de rama lateral, enraizamiento 4-6 semanas en sustrato arenoso bien drenado, distancia 80-100 cm entre plantas. Alternativa semilla pero germinación lenta e irregular. Floración casi continua en clima andino templado."
+      },
+      "companions": [
+        "rosmarinus_officinalis",
+        "salvia_officinalis",
+        "thymus_vulgaris"
+      ],
+      "antagonists": [],
+      "harvest_type": "flor",
+      "scale_viability": [
+        "apartamento",
+        "huerto_casero",
+        "produccion"
+      ],
+      "valor_pedagogico": "La Lavanda dentada (Lavandula dentata L., Lamiaceae) es un arbusto perenne aromático originario de la región mediterránea (sur de España, Marruecos, Argelia, islas Baleares) y naturalizado-cultivado mundialmente como ornamental aromático, medicinal y atrayente excepcional de polinizadores. Distinta de Lavandula angustifolia (lavanda inglesa o \"true lavender\" de clima frío montañoso con hojas lineares enteras y flores azul-violeta intensas) por sus hojas dentadas características pinnatipartidas (de ahí dentata), su tolerancia a clima más cálido y seco mediterráneo (vs. el clima alpino-templado de angustifolia), su floración casi continua a lo largo del año en clima andino templado (vs. floración estacional de angustifolia), y flores ligeramente más pálidas violeta-grisáceas con bráctea apical estéril vistosa coronando la espiga. En Colombia se cultiva en clima templado y frío seco entre 1.500 y 2.900 msnm: Sabana de Bogotá, Boyacá, Cundinamarca, Antioquia oriente, Eje Cafetero, Valle del Cauca andino, Nariño altoandino. Manejo agronómico: propagación principal por esqueje semileñoso de 10-15 cm de rama lateral (método más rápido y fiable, preserva características parentales), enraizamiento 4-6 semanas en sustrato arenoso bien drenado bajo invernadero o cama nebulizada, alternativa por semilla con germinación lenta e irregular (15-40 días) y variabilidad genética alta no recomendada para producción comercial, distancia de plantación 80-100 cm entre plantas en seto aromático, suelo calcáreo o neutro bien drenado (NO tolera encharcamiento ni suelos pesados), riego moderado a bajo (drought-tolerant), poda anual post-floración para estimular nuevos brotes y compacidad. Floración casi continua en clima andino templado (vs. estacional de L. angustifolia en clima frío). Atracción excepcional de polinizadores: una sola planta floreciente sostiene decenas de abejas (Apis mellifera, abejas solitarias, abejorros Bombus spp.) y mariposas a lo largo del día, es de las plantas mediterráneas más visitadas por himenópteros en jardines colombianos, planta apícola clave para apiarios urbanos y periurbanos andinos. Aceite esencial: las flores frescas o secas destiladas producen aceite esencial rico en linalool, alcanfor, cineol y acetato de linalilo (composición distinta de angustifolia, más cánfora-cineol, menos linalool puro), aroma alcanforado-floral característico, usos en aromaterapia (relajante, antiséptico aéreo, repelente de moscas y polillas), perfumería de gama media-alta, cosmética artesanal (jabones, sales de baño, cremas), repostería discreta (helados de lavanda, panaderías francesas, mieles aromatizadas). Uso medicinal tradicional documentado: infusión de flores sedante leve para nervios y ansiedad, antiespasmódico digestivo, antiséptico de heridas leves, repelente de polillas en armarios (saquitos de lavanda seca). Manejo en huerta agroecológica: seto perimetral aromático junto con romero (Rosmarinus officinalis), salvia (Salvia officinalis) y tomillo (Thymus vulgaris) como gremio mediterráneo repelente de plagas y atrayente de polinizadores, plantación en macetera grande en balcón o terraza (escala apartamento viable con sol pleno), poda anual de mantenimiento post-floración. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pamplona Roger 2006 Plantas Medicinales, JBB Plantas Medicinales.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "phacelia_tanacetifolia",
+      "nombre_comun": "Facelia",
+      "nombre_cientifico": "Phacelia tanacetifolia Benth.",
+      "nombre_comunes_regionales": [
+        "Facelia azul",
+        "Phacelia",
+        "Tansy phacelia"
+      ],
+      "familia_botanica": "Boraginaceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "ground_cover",
+        "biomass_producer",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 12,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa al voleo o en hileras, 1-2 cm profundidad, densidad 8-12 kg/ha como abono verde, germinación 8-15 días, floración 45-60 días post-siembra, abono verde incorporado en plena floración (max biomasa + N residual). Auto-resiembra natural."
+      },
+      "companions": [
+        "brassica_napus",
+        "avena_sativa",
+        "vicia_sativa"
+      ],
+      "antagonists": [],
+      "harvest_type": "biomasa",
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "valor_pedagogico": "La Facelia (Phacelia tanacetifolia Benth., Boraginaceae) es una especie herbácea anual originaria del suroeste de Estados Unidos y norte de México (desiertos del Mojave y Sonora, montañas de California, Arizona, Nuevo México, Sonora, Baja California), cultivada mundialmente desde mediados del siglo XX como uno de los abonos verdes y atrayentes de polinizadores más valiosos de la agroecología moderna. En Europa es la planta atrayente número uno para apicultura comercial junto con el girasol y la colza melífera. En Colombia su uso es aún reciente pero creciente en sistemas agroecológicos andinos entre 1.500 y 3.200 msnm: Sabana de Bogotá, Boyacá altoandino, Nariño altoandino, Cundinamarca rural, Eje Cafetero altoandino. Manejo agronómico: siembra directa al voleo o en hileras, 1-2 cm profundidad, densidad 8-12 kg/ha como abono verde o 4-6 kg/ha como cultivo apícola de banda perimetral, germinación 8-15 días a 12-20°C, ciclo total 90-120 días, floración inicia a los 45-60 días post-siembra y se mantiene 4-8 semanas continuas con flores azul-lavanda en inflorescencias escorpioides características (cima helicoidal típica de Boraginaceae). La floración es el momento clave del ciclo: cada espiga floral abre flores progresivamente desde la base al ápice durante 2-3 semanas, asegurando néctar y polen continuos para polinizadores. Atracción de polinizadores excepcional: estudios europeos (Alemania, Reino Unido, Francia) y norteamericanos demuestran que la facelia es UNA DE LAS 20 PLANTAS MÁS ATRACTIVAS PARA ABEJAS DEL MUNDO, sostiene poblaciones masivas de abejas (Apis mellifera, abejas solitarias, abejorros), sírfidos parasitoides de áfidos, mariposas, y atrae mariquitas (Coccinellidae) y crisopas (Chrysopidae) — depredadores claves del control biológico de áfidos. Una hectárea de facelia florecida puede sostener 400-1.000 kg de miel por temporada en condiciones óptimas, y atrae polinizadores hacia cultivos adyacentes de hortalizas, frutales y leguminosas mejorando significativamente la fructificación. Uso como abono verde: incorporación al suelo en plena floración (max biomasa antes de lignificación, alta relación C:N de 15-20:1, descomposición rápida), aporta 3-4 ton/ha de biomasa seca con 80-120 kg/ha de N residual al cultivo siguiente, mejora estructura del suelo por sistema radical fibroso superficial denso, supresión de malezas por sombreado y alelopatía suave (sin daño a cultivos siguientes), compatible con rotaciones brassicas (Brassica napus), avena (Avena sativa) y veza (Vicia sativa). NO COMPETITIVA: por ser de familia Boraginaceae (no es Poaceae, no es Brassicaceae, no es Fabaceae) es ROTACIONALMENTE NEUTRAL — no comparte plagas ni enfermedades con las familias mayoritarias de cultivos, lo que la hace abono verde universal compatible con cualquier rotación. Auto-resiembra natural si se deja semillar, pero NO ES INVASORA documentada en Colombia. Manejo agroecológico ideal: siembra en franjas perimetrales de huerta o entre líneas de frutales como banda apícola permanente, siembra de cobertura otoño-invernal en clima frío andino, siembra de rotación primavera-verano antes de hortalizas exigentes en N, cosecha apícola por abejorros y abejas durante 4-8 semanas continuas. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pamplona Roger 2006 Plantas Medicinales, AGROSAVIA Sol Andina.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "agrosavia-sol-andina"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "centaurea_cyanus",
+      "nombre_comun": "Aciano azul",
+      "nombre_cientifico": "Centaurea cyanus L.",
+      "nombre_comunes_regionales": [
+        "Azulejo",
+        "Botón de soltero",
+        "Cornflower",
+        "Aldiza"
+      ],
+      "familia_botanica": "Asteraceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 10,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa o semillero, 0.5-1 cm profundidad, distancia 20-30 cm, germinación 7-14 días, floración 60-90 días post-siembra, ciclo anual 120-150 días, auto-resiembra natural. Cosecha de flores en plena apertura para uso culinario y medicinal."
+      },
+      "companions": [
+        "triticum_aestivum",
+        "helianthus_annuus",
+        "calendula_officinalis"
+      ],
+      "antagonists": [],
+      "harvest_type": "flor",
+      "scale_viability": [
+        "apartamento",
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "valor_pedagogico": "El Aciano azul o Azulejo (Centaurea cyanus L., Asteraceae) es una especie herbácea anual originaria de Europa templada y mediterránea, históricamente acompañante característica de campos de trigo y cereales europeos (de ahí su nombre inglés \"cornflower\" — flor del cereal), cultivada mundialmente como ornamental clásico de jardín por sus inflorescencias en capítulo de color azul cobalto puro intenso (uno de los azules más vibrantes del reino vegetal, debido a antocianinas cianidínicas estabilizadas por complejos con metales) — color tan emblemático que dio nombre al \"azul aciano\" o \"cornflower blue\" en paletas de pintura, joyería y diseño. En Colombia se cultiva en clima templado y frío entre 1.500 y 3.000 msnm: jardines Sabana de Bogotá, Boyacá altoandino, Nariño altoandino, Eje Cafetero altoandino, Antioquia oriente frío, viveros ornamentales urbanos. Manejo agronómico: siembra directa al sitio definitivo o en semillero con trasplante 4 semanas post-germinación, 0.5-1 cm profundidad, distancia 20-30 cm entre plantas, germinación 7-14 días a 12-20°C, ciclo anual 120-150 días, floración inicia 60-90 días post-siembra y se mantiene 6-10 semanas continuas si se eliminan flores marchitas (deadheading), auto-resiembra natural si se deja semillar (estrategia de poblaciones perennizadas en jardín). Las flores son comestibles crudas en ensaladas decorativas, repostería, panes (pan azul aciano francés), cubitos de hielo florales para cócteles (mantienen el azul intenso), té de flor seca (jasmin-blue cornflower blend clásico de tés británicos), pigmento natural azul (los pétalos secos teñidos suavemente azulan agua y vinagres). Uso medicinal tradicional documentado en farmacopeas europeas medievales (Hildegard von Bingen, Dioscórides referenciado a Centaurea spp.): flor en infusión astringente suave para conjuntivitis y orzuelos (lavados oculares con infusión filtrada — uso documentado como \"agua de aciano\" de farmacopea francesa siglo XIX), diurético leve, tónico digestivo. Atracción de polinizadores excepcional: el capítulo presenta flores tubulares fértiles azul puro intenso UV-reflectantes (espectro visible para abejas que detectan UV) rodeadas por flores liguladas azules vistosas, sostiene poblaciones masivas de abejas (Apis mellifera, abejas solitarias, abejorros nativos Bombus spp.), sírfidos, mariposas pequeñas, en floración prolongada de 6-10 semanas. Histórico-cultural: flor nacional de Estonia y Bielorrusia, símbolo de Prusia siglo XIX, emblema de la I Guerra Mundial en Francia (recuerdo de los caídos), flor preferida del rey Luis II de Baviera, color emblemático y nombre dado al \"cornflower blue\" en gemología (variedad azul del zafiro). Manejo en huerta agroecológica: borde perimetral o en banda apícola intercalada con trigo (recreación del paisaje agrícola europeo tradicional), girasol (Helianthus annuus) y caléndula (Calendula officinalis) como gremio multi-color atrayente de polinizadores, siembra en macetera profunda en balcón (escala apartamento viable con sol pleno), cosecha de flores en mañana fresca para uso culinario inmediato o secado a la sombra para té e infusión. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pamplona Roger 2006 Plantas Medicinales, JBB Plantas Medicinales.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "hibiscus_sabdariffa",
+      "nombre_comun": "Jamaica / Flor de Jamaica",
+      "nombre_cientifico": "Hibiscus sabdariffa L.",
+      "nombre_comunes_regionales": [
+        "Rosa de Jamaica",
+        "Rosella",
+        "Roselle",
+        "Acedera de Guinea",
+        "Sereni"
+      ],
+      "familia_botanica": "Malvaceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1500,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 20,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa post-último riesgo de heladas, 1-2 cm profundidad, distancia 80-100 cm entre plantas, germinación 7-14 días, floración 90-120 días post-siembra, cosecha de cálices carnosos 10-21 días post-fecundación (cuando alcanzan máximo tamaño y color rojo intenso pero antes de lignificarse), ciclo 150-180 días."
+      },
+      "companions": [
+        "zea_mays",
+        "cajanus_cajan",
+        "vigna_unguiculata"
+      ],
+      "antagonists": [],
+      "harvest_type": "flor",
+      "scale_viability": [
+        "huerto_casero",
+        "produccion"
+      ],
+      "valor_pedagogico": "La Jamaica o Flor de Jamaica (Hibiscus sabdariffa L., Malvaceae) es una especie herbácea-arbustiva anual originaria de África occidental (Sudán, Senegal, Nigeria, Guinea — donde existen las mayores diversidad genética y formas silvestres congenéricas) y dispersada en la diáspora africana a través del comercio transatlántico durante los siglos XVI-XVIII al Caribe, México, Centroamérica y Sudamérica donde se naturalizó y se convirtió en cultivo emblemático del Caribe (de ahí \"Jamaica\" — referencia a la isla caribeña, no al país asiático). En Colombia se cultiva en clima cálido y templado entre 0 y 1.800 msnm: Caribe (Bolívar, Magdalena, Cesar, Atlántico, La Guajira, Sucre, Córdoba), Pacífico (Chocó, Valle), valles interandinos cálidos del Magdalena y Cauca, Llanos Orientales, Amazonía, Eje Cafetero zona cafetera baja, Antioquia bajo, Santander. Manejo agronómico: siembra directa al sitio definitivo post-último riesgo de heladas, 1-2 cm profundidad, distancia 80-100 cm entre plantas (porte vigoroso 1.5-2.5 m alto), germinación 7-14 días a 22-30°C, ciclo total 150-180 días, floración inicia 90-120 días post-siembra con flores grandes amarillo-cremosas con centro purpúreo profundo característico del género Hibiscus (5 pétalos vistosos, columna estaminal larga característica de Malvaceae). Lo COSECHABLE NO ES LA FLOR EN SÍ SINO LOS CÁLICES carnosos rojo-purpúreo intensos que se forman post-fecundación rodeando la cápsula seminal: 10-21 días post-fecundación alcanzan máximo tamaño y color rojo intenso pero antes de lignificarse, momento crítico de cosecha manual. Los cálices frescos son la materia prima de la bebida emblemática del Caribe (agua de Jamaica, agua de Jamaica fría con limón y panela en México y Centroamérica, sorrel drink en Jamaica isla y Trinidad, bissap en Senegal y África Occidental, karkadeh en Egipto y Sudán) y se consumen también: secados al sol para infusión (té rojo cítrico-ácido refrescante rico en vitamina C, antocianinas, ácido hibíscico), mermeladas y jaleas (excelente cuajado natural por alto contenido de pectina), salsas agridulces, sirops y licores tradicionales, tinte alimentario natural rojo-rosado (estable a pH ácido), gelatinas, vinos de fruta artesanales. Uso medicinal tradicional documentado y respaldado por evidencia clínica moderna: cálices secos en infusión hipotensor leve (efecto antihipertensivo respaldado por ensayos clínicos controlados publicados en Journal of Human Hypertension y otros), diurético, antioxidante alto por antocianinas y polifenoles, hipocolesterolemiante leve, refrescante. Atracción de polinizadores: flores grandes vistosas atrayentes de abejorros nativos (Bombus spp.), abejas (Apis mellifera), polinizadores grandes, y aves (colibríes ocasionalmente en zonas cálidas). En África Occidental también es importante alimento de hoja: las hojas tiernas se consumen cocidas como verdura (sabor ácido suave por oxalatos similar a acedera, de ahí \"acedera de Guinea\"), aporte vitamínico significativo en dietas rurales sahelianas. Asociación clásica con maíz (Zea mays), gandul (Cajanus cajan), caupí (Vigna unguiculata) en sistemas agroforestales tropicales tradicionales africanos y caribeños. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pamplona Roger 2006 Plantas Medicinales, JBB Plantas Medicinales.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "dahlia_imperialis",
+      "nombre_comun": "Dahlia gigante / Dalia arbórea",
+      "nombre_cientifico": "Dahlia imperialis Roezl ex Ortgies",
+      "nombre_comunes_regionales": [
+        "Dahlia imperial",
+        "Árbol de Dahlia",
+        "Acocoxóchitl gigante",
+        "Mata de muerto"
+      ],
+      "familia_botanica": "Asteraceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Esqueje de caña de 30-60 cm con 2-3 nudos enterrados horizontalmente, brotación 2-4 semanas, plantación final marzo-mayo, distancia 1.5-2 m entre plantas. Alternativa por división de tubérculos (rizomas tuberosos crecen radialmente del cuello). NO sembrar por semilla (variabilidad alta + lento)."
+      },
+      "companions": [
+        "salvia_officinalis",
+        "lavandula_dentata",
+        "rosmarinus_officinalis"
+      ],
+      "antagonists": [],
+      "harvest_type": "tuberculo",
+      "scale_viability": [
+        "huerto_casero",
+        "produccion"
+      ],
+      "valor_pedagogico": "La Dahlia gigante o Dalia arbórea (Dahlia imperialis Roezl ex Ortgies, Asteraceae) es una especie herbácea-arbustiva gigante perenne originaria de México y Guatemala (montañas templadas de Oaxaca, Chiapas, Veracruz, Puebla, Michoacán entre 1.500 y 3.000 msnm) y de Centroamérica andina, naturalizada en Colombia desde su introducción ornamental por jardineros europeos del siglo XIX. Es la dalia más grande del género: tallos huecos cañiformes alcanzan 4-8 m de altura en ejemplares maduros con porte de árbol-bambú-asteráceo único en el mundo, capítulos terminales colgantes de hasta 15 cm de diámetro con lígulas color rosa-lila a magenta intenso o blanco según variedad, floración invierno-primavera fría andina (noviembre-marzo). Dahlia es el GÉNERO FLOR NACIONAL DE MÉXICO desde 1963 (decreto presidencial Adolfo López Mateos), reconocimiento del origen mesoamericano del género y de su importancia cultural milenaria: el pueblo Náhuatl (azteca) cultivaba dahlia (acocoxóchitl, \"flor del agua hueca\" en referencia a tallos huecos) en jardines reales tenochtitlanos, los registros de Hernández (siglo XVI) describen su cultivo con fines ornamentales, medicinales y alimentarios. En Colombia se cultiva en clima templado y frío andino entre 1.800 y 3.000 msnm: Sabana de Bogotá, Boyacá altoandino, Cundinamarca rural, Antioquia oriente frío, Eje Cafetero altoandino, Nariño altoandino, Santander, donde se ha naturalizado en bordes de caminos, jardines abandonados y áreas perturbadas montañas (hay poblaciones asilvestradas estables en Boyacá y Cundinamarca alrededor de fincas y haciendas viejas). Manejo agronómico: propagación principal por esqueje de caña de 30-60 cm con 2-3 nudos enterrados horizontalmente (cada nudo brota una nueva planta — método clásico mexicano), brotación 2-4 semanas, plantación final marzo-mayo en clima andino, distancia 1.5-2 m entre plantas, alternativa por división de tubérculos (rizomas tuberosos engrosados radian del cuello, similar a yacón Smallanthus sonchifolius en estructura), NO recomendable siembra por semilla (variabilidad genética alta y crecimiento lento), suelo rico bien drenado, riego moderado durante crecimiento, post-floración el tallo se seca y se corta a 50 cm sobre suelo para protección de yemas basales durante época seca (rebrota al inicio de siguiente temporada lluviosa). Doble propósito ornamental + comestible: ornamental masivo por porte único de \"árbol-bambú florecido\" y floración invernal vistosa rosa-lila colgante, COMESTIBLE POR LOS TUBÉRCULOS (rizomas tuberosos) que se forman al cuello de la planta — uso tradicional mesoamericano azteca-náhuatl pre-hispánico documentado por Hernández y otras crónicas, similares en uso al yacón andino (Smallanthus sonchifolius, también Asteraceae): tubérculos crudos dulces-acuosos (almacenan inulina, fructano de cadena corta de bajo índice glucémico, apto para diabéticos), cocidos en sopas y guisos (sabor suave-dulce similar a alcachofa de Jerusalén Helianthus tuberosus, también Asteraceae), tostados o asados, materia prima histórica de elaboración de bebidas fermentadas mexicanas y de jarabes endulzantes pre-hispánicos. Atracción excepcional de polinizadores: en floración invernal (cuando pocas otras flores están disponibles en clima andino frío) sostiene poblaciones masivas de colibríes (en Colombia: Coeligena spp., Boissonneaua spp., Lafresnaya lafresnayi), abejas (Apis mellifera, abejas solitarias), abejorros (Bombus spp.) y mariposas — siendo recurso melífero clave de invierno andino. Manejo en chagra: plantar en borde de huerta como \"árbol-flor\" multi-propósito (ornamental masivo + comestible patrimonial mexicano + atrayente polinizador invernal + biomasa al final de ciclo), asociación con seto aromático mediterráneo (Salvia officinalis, Lavandula dentata, Rosmarinus officinalis) en jardín polifuncional, cosecha de tubérculos en época seca cuando tallos se han secado, propagación vegetativa de caña post-floración para multiplicación. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pérez Arbeláez 1947 Plantas Útiles Colombia, JBB Plantas Medicinales.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "perez-arbelaez-1947-plantas-utiles",
+        "jbb-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "cosmos_sulphureus",
+      "nombre_comun": "Cosmos amarillo",
+      "nombre_cientifico": "Cosmos sulphureus Cav.",
+      "nombre_comunes_regionales": [
+        "Cosmos naranja",
+        "Mirasolillo",
+        "Yellow cosmos"
+      ],
+      "familia_botanica": "Asteraceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 600,
+        "optimo_max": 2500,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 15,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa al voleo o en hileras post-último riesgo de heladas, 0.5-1 cm profundidad, distancia 30-40 cm entre plantas, germinación 5-10 días, floración 50-70 días post-siembra, ciclo anual 100-120 días, auto-resiembra natural abundante."
+      },
+      "companions": [
+        "helianthus_annuus",
+        "tagetes_minuta",
+        "zinnia_elegans"
+      ],
+      "antagonists": [],
+      "harvest_type": "flor",
+      "scale_viability": [
+        "apartamento",
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "valor_pedagogico": "El Cosmos amarillo (Cosmos sulphureus Cav., Asteraceae) es una especie herbácea anual originaria de México (mesetas centrales, Oaxaca, Chiapas, Veracruz) y Centroamérica, naturalizada y cultivada mundialmente como ornamental clásico de jardín tropical-subtropical por sus capítulos vistosos de color amarillo-anaranjado a rojo-naranja intenso característico (de ahí sulphureus — del color del sulfuro/azufre) y por su atractivo masivo de mariposas y otros polinizadores. Distinta de su congenérica Cosmos bipinnatus (cosmos rosado-blanco de clima frío, hojas bipinnadas finísimas, capítulos rosa-blanco-morado, mayor altitud) por su color cálido amarillo-anaranjado característico, hojas pinnadas más anchas (no bipinnadas finísimas), tolerancia a clima más cálido tropical (vs. preferencia de bipinnatus por clima frío), tamaño menor (1-2 m vs. bipinnatus 1.5-3 m). En Colombia se cultiva en clima cálido, templado y frío entre 0 y 2.800 msnm: Caribe, valles interandinos, Sabana de Bogotá, Eje Cafetero, Antioquia, Boyacá, Nariño, Llanos Orientales — especie de amplísimo rango altitudinal por adaptación termal flexible. Manejo agronómico: siembra directa al sitio definitivo al voleo o en hileras post-último riesgo de heladas (en clima frío andino esperar a final de febrero-marzo), 0.5-1 cm profundidad, distancia 30-40 cm entre plantas, germinación 5-10 días a 18-25°C, ciclo anual 100-120 días, floración inicia 50-70 días post-siembra y se mantiene 8-12 semanas continuas si se eliminan flores marchitas, auto-resiembra natural ABUNDANTE (se naturaliza en jardines y bordes de huerta tras una sola siembra). Atracción excepcional de polinizadores: especie reconocida mundialmente como UNA DE LAS PLANTAS MÁS ATRAYENTES DE MARIPOSAS del mundo (lepidópteros diurnos de varias familias: Pieridae, Nymphalidae, Hesperiidae, Lycaenidae), también atrae intensivamente abejas (Apis mellifera, abejas solitarias, abejorros Bombus spp.), sírfidos, escarabajos polinizadores y colibríes. La estructura del capítulo presenta abundante néctar accesible y polen abundante en disco amarillo central, en floración prolongada de 2-3 meses continuos. Pigmentos naturales: las flores secas son fuente de carotenoides (xantofilas, luteína, zeaxantina) usados como tintes alimentarios naturales amarillo-naranja en panadería, mantequillas, quesos, yemas de huevo de gallinas alimentadas con harina de flor seca (mejora pigmentación natural sin químicos), tinte textil natural amarillo-naranja tradicional mexicano. Uso medicinal tradicional documentado en farmacopeas mexicanas: infusión de flor diaforético, suavemente sedante, antimicrobiano. Manejo en chagra y huerta agroecológica: borde perimetral de huerta como banda atrayente de polinizadores y mariposas (mariposario de huerta — pedagogía infantil ideal), siembra en gremio con girasol (Helianthus annuus), tagetes (Tagetes minuta) y zinnia (Zinnia elegans) como combo \"jardín de mariposas mexicano\", siembra en macetera profunda en balcón con sol pleno (escala apartamento viable), cosecha de flores en mañana fresca para secado a la sombra y uso como pigmento o medicinal. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pamplona Roger 2006 Plantas Medicinales, JBB Plantas Medicinales.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "monarda_didyma",
+      "nombre_comun": "Bergamota silvestre / Té de Oswego",
+      "nombre_cientifico": "Monarda didyma L.",
+      "nombre_comunes_regionales": [
+        "Monarda escarlata",
+        "Bee balm",
+        "Oswego tea",
+        "Bálsamo de abejas"
+      ],
+      "familia_botanica": "Lamiaceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "division",
+        "notas": "División de matas en primavera (más rápido y fiable, preserva características parentales). Alternativa por esqueje de tallo en primavera o semilla con germinación irregular 15-25 días. Plantación a 40-60 cm entre plantas. Floración verano-otoño en clima andino frío."
+      },
+      "companions": [
+        "lavandula_dentata",
+        "salvia_officinalis",
+        "rosmarinus_officinalis"
+      ],
+      "antagonists": [],
+      "harvest_type": "flor",
+      "scale_viability": [
+        "huerto_casero",
+        "produccion"
+      ],
+      "valor_pedagogico": "La Bergamota silvestre o Té de Oswego (Monarda didyma L., Lamiaceae) es una especie herbácea perenne aromática originaria de Norteamérica oriental templada (bosques húmedos de los Apalaches, Pensilvania, Nueva York, Virginia, Carolina del Norte, Tennessee, Kentucky, Ontario), cultivada mundialmente como ornamental, medicinal y atrayente excepcional de polinizadores, con relevancia histórica como té sustituto consumido por los colonos rebeldes de las Trece Colonias norteamericanas tras el Boston Tea Party de 1773 (boicot al té británico — los colonos adoptaron el té de hojas de Monarda usado por los pueblos originarios Oswego de la región de Nueva York, de ahí \"Oswego tea\"). En Colombia se cultiva en clima templado y frío andino entre 1.800 y 3.000 msnm: Sabana de Bogotá, Boyacá altoandino, Antioquia oriente frío, Eje Cafetero altoandino, Nariño altoandino, viveros aromáticos urbanos especializados. Manejo agronómico: propagación principal por división de matas en primavera (método más rápido y fiable, preserva características parentales — Monarda forma touffes densas con rizomas superficiales que se separan fácilmente), alternativa por esqueje de tallo en primavera-verano con enraizamiento en 3-4 semanas, alternativa por semilla con germinación irregular 15-25 días a 18-22°C y variabilidad genética alta, plantación al sitio definitivo a 40-60 cm entre plantas, suelo rico bien drenado con humedad consistente (prefiere humedad media constante — no sequía ni encharcamiento), sol pleno o sombra parcial leve, riego moderado regular durante floración, poda de tallos secos al final de cada ciclo. Floración verano-otoño en clima andino frío (mayo-octubre), con espigas terminales en capitulillos esféricos densos de flores tubulares bilabiadas escarlata intenso (típicas de Lamiaceae, característica diagnóstica) muy vistosas. Atracción de polinizadores excepcional: COMÚNMENTE LLAMADA \"BEE BALM\" — BÁLSAMO DE ABEJAS — por su atracción masiva de abejas, abejorros (Bombus spp.), colibríes (en Norteamérica colibríes nativos, en Colombia atraería Coeligena spp., Boissonneaua spp.) y mariposas. La flor tubular larga escarlata es polinizada principalmente por colibríes (sintropía evolutiva clásica de ornitofilia: rojo vivo + flor tubular + néctar abundante + sin perfume), pero también recibe visitas masivas de abejas y abejorros que acceden al néctar perforando la base del tubo floral. Uso como té y comestible: las hojas aromáticas frescas o secas se usan para té herbal cítrico-floral aromático (sabor recordando vagamente a la bergamota cítrica del té Earl Grey — de ahí el nombre vulgar \"bergamota silvestre\", aunque NO es la bergamota cítrica Citrus bergamia: ambas comparten compuestos similares de timol, carvacrol y bergamotene), flores comestibles crudas en ensaladas decorativas (color escarlata vistoso + sabor herbáceo suave), repostería floral, decoración de postres. Uso medicinal tradicional documentado: la medicina tradicional indígena norteamericana (Oswego, Iroqueses, Cherokee, Algonquinos) usaba infusión de hojas para resfriados, dolor de garganta, problemas digestivos, expectorante, antiséptico aéreo; herbarios europeos del siglo XVIII-XIX la incorporaron tras la introducción. Composición fitoquímica rica en timol y carvacrol (mismos compuestos del orégano y tomillo, por convergencia química en Lamiaceae): aceite esencial con propiedades antimicrobianas, antisépticas y carminativas documentadas. Manejo en chagra: gremio aromático mediterráneo-anglosajón con lavanda dentada (Lavandula dentata), salvia (Salvia officinalis) y romero (Rosmarinus officinalis) como seto perenne atrayente de polinizadores, banda apícola perimetral de huerta en clima frío andino, jardín pedagógico de hierbas aromáticas. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pamplona Roger 2006 Plantas Medicinales, JBB Plantas Medicinales.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
     }
   ],
   "biopreparados": [
