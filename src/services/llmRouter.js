@@ -54,13 +54,16 @@ export const ROUTES = {
   chat: {
     model: 'gemma3:4b',
     keep_alive_min: 30,
-    temperature: 0.7,
+    temperature: 0.3,
     max_tokens: 512,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Bench GPU: 118 t/s, 4 GB VRAM, load 3s. CPU baseline 13.5 t/s. ' +
-      'keep_alive=30m viable porque load es barato post-GPU y VRAM 4 GB ' +
-      'cabe holgado con cualquier 7B on-demand. UX fluida en campo.',
+      'Bench GPU 2026-05-17: 118 t/s, 4 GB VRAM, load 3s. keep_alive=30m. ' +
+      'temperature 0.7→0.3 tras incidente alucinación "chorcho" 2026-05-17: ' +
+      'gemma3:12b (probado en PR #809, cerrado) NO resolvió — inventó OTRA ' +
+      'definición con más confianza. La fix real es system prompt agresivo ' +
+      '(ver AgentScreen.getSystemPrompt) + temperature baja. Mantener 4b ' +
+      'por velocidad y VRAM (vision cabe on-demand). Solución modelo-agnóstica.',
   },
   nlu: {
     model: 'qwen2.5-coder:7b',

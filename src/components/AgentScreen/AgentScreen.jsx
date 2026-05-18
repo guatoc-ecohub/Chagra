@@ -113,7 +113,20 @@ export default function AgentScreen({ onBack }) {
     const indoorContext = indoorZone
       ? `El operador está bajo techo en: ${indoorZone}. Considera condiciones de invernadero al recomendar. `
       : '';
-    return `Eres un asistente agroecológico en Colombia. ${fincaContext}${indoorContext}El usuario tiene estas plantas: ${plantNames}. Responde en español, sé helpful y específico. Si no sabes algo, dilo honestamente.`;
+    // REGLA ANTI-ALUCINACIÓN: "Si no sabes algo, dilo honestamente" (versión
+    // previa) era demasiado débil — el modelo lo ignoraba y rellenaba con
+    // confianza. Incidente 2026-05-17: operador escribió "chorcho" (typo de
+    // chocho/Lupinus mutabilis) y gemma3:4b inventó "sistema de agricultura
+    // de bajo impacto". Probado en bench: 12b inventó OTRA cosa distinta
+    // (Alternaria solani). Subir parámetros no ayuda. Solución: prompt
+    // agresivo con respuesta literal exigida + ejemplo + bajar temperature
+    // a 0.3. Bench 2026-05-17 con esta versión devolvió la respuesta
+    // EXACTA esperada (no reconozco el término) en 27 tokens / 8s.
+    return `Eres un asistente agroecológico en Colombia. ${fincaContext}${indoorContext}El usuario tiene estas plantas: ${plantNames}.
+
+REGLA CRÍTICA ANTI-ALUCINACIÓN: si un término te suena raro, no es estándar agroecológico colombiano, o no estás 100% seguro de lo que significa, responde EXACTAMENTE: "No reconozco ese término. ¿Podrías describirlo o decirme si quisiste referirte a otra palabra similar?" NUNCA inventes definiciones de términos que no reconozcas. Es PREFERIBLE pedir aclaración que dar información incorrecta. Si sospechas que el operador escribió mal una palabra (typo), sugiere la palabra correcta como PREGUNTA, no como afirmación.
+
+Responde en español colombiano (tú/usted, sin voseo argentino). Sé específico y útil cuando tengas certeza; humilde y preguntón cuando no.`;
   }, [plants, fincas, activeFincaSlug, indoorZone]);
 
   // 057.4 integration: los handlers ya NO ejecutan addLog directo. Solo
