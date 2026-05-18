@@ -26442,7 +26442,8 @@
       "autores": "ICA — Instituto Colombiano Agropecuario",
       "año": 2019,
       "titulo": "Resolución 00017702 de 2019 — Registro variedad AGROSAVIA Alhaja",
-      "institucion": "ICA"
+      "institucion": "ICA",
+      "tier": "A"
     },
     {
       "id": "agrosavia-bacillus-2018",
@@ -26450,7 +26451,8 @@
       "autores": "AGROSAVIA",
       "año": 2018,
       "titulo": "Control biológico con Bacillus subtilis en cultivos hortícolas andinos",
-      "institucion": "AGROSAVIA"
+      "institucion": "AGROSAVIA",
+      "tier": "A"
     },
     {
       "id": "agrosavia-estrella",
@@ -26458,7 +26460,8 @@
       "autores": "AGROSAVIA",
       "año": 2018,
       "titulo": "Ficha técnica Estrella — papa criolla",
-      "institucion": "AGROSAVIA"
+      "institucion": "AGROSAVIA",
+      "tier": "A"
     },
     {
       "id": "agrosavia-forrajeras-2022",
@@ -26467,7 +26470,8 @@
       "año": 2022,
       "titulo": "Gramíneas forrajeras en sistemas ganaderos andinos",
       "institucion": "AGROSAVIA",
-      "observaciones": "STUB migrado de v3.0."
+      "observaciones": "STUB migrado de v3.0.",
+      "tier": "A"
     },
     {
       "id": "agrosavia-leguminosas-andinas",
@@ -26476,7 +26480,8 @@
       "año": null,
       "titulo": "Fichas técnicas de leguminosas andinas (haba, arveja, lenteja, frijol)",
       "institucion": "Corporación Colombiana de Investigación Agropecuaria (AGROSAVIA)",
-      "observaciones": "Compilación de fichas técnicas de AGROSAVIA para leguminosas de clima frío. Año y volumen pendientes de consolidación."
+      "observaciones": "Compilación de fichas técnicas de AGROSAVIA para leguminosas de clima frío. Año y volumen pendientes de consolidación.",
+      "tier": "A"
     },
     {
       "id": "agrosavia-manual-arandano-2018",
@@ -26484,7 +26489,8 @@
       "autores": "AGROSAVIA",
       "año": 2018,
       "titulo": "Manual técnico para el cultivo de arándano (Vaccinium corymbosum) en Colombia",
-      "institucion": "AGROSAVIA"
+      "institucion": "AGROSAVIA",
+      "tier": "A"
     },
     {
       "id": "agrosavia-manual-biopreparados-2015",
@@ -26492,7 +26498,8 @@
       "autores": "AGROSAVIA",
       "año": 2015,
       "titulo": "Manual de biopreparados para la agricultura colombiana",
-      "institucion": "AGROSAVIA"
+      "institucion": "AGROSAVIA",
+      "tier": "A"
     },
     {
       "id": "agrosavia-manual-chachafruto-2015",
@@ -26500,7 +26507,8 @@
       "autores": "AGROSAVIA",
       "año": 2015,
       "titulo": "Manual técnico para el cultivo de chachafruto (Erythrina edulis) en sistemas agroforestales andinos",
-      "institucion": "AGROSAVIA"
+      "institucion": "AGROSAVIA",
+      "tier": "A"
     },
     {
       "id": "agrosavia-manual-frutales-tropicales",
@@ -26508,7 +26516,8 @@
       "autores": "AGROSAVIA — Corporación Colombiana de Investigación Agropecuaria",
       "año": 2017,
       "titulo": "Manual técnico para el cultivo de frutales tropicales en Colombia",
-      "institucion": "AGROSAVIA"
+      "institucion": "AGROSAVIA",
+      "tier": "A"
     },
     {
       "id": "agrosavia-manual-tuberculos-andinos-2017",
@@ -26516,7 +26525,8 @@
       "autores": "AGROSAVIA",
       "año": 2017,
       "titulo": "Manual técnico para el cultivo de tubérculos andinos (oca, ulluco, mashua) en Colombia",
-      "institucion": "AGROSAVIA"
+      "institucion": "AGROSAVIA",
+      "tier": "A"
     },
     {
       "id": "agrosavia-manual-uchuva-2015",
@@ -26524,7 +26534,8 @@
       "autores": "AGROSAVIA",
       "año": 2015,
       "titulo": "Manual técnico para el cultivo de uchuva (Physalis peruviana) bajo condiciones colombianas",
-      "institucion": "AGROSAVIA"
+      "institucion": "AGROSAVIA",
+      "tier": "A"
     },
     {
       "id": "agrosavia-silvopastoriles",
@@ -26533,7 +26544,8 @@
       "año": null,
       "titulo": "Sistemas silvopastoriles en el altoandino colombiano",
       "institucion": "AGROSAVIA",
-      "observaciones": "STUB migrado de v3.0. Año y publicación específica pendientes."
+      "observaciones": "STUB migrado de v3.0. Año y publicación específica pendientes.",
+      "tier": "A"
     },
     {
       "id": "agrosavia-sol-andina",
@@ -26542,7 +26554,8 @@
       "año": 2016,
       "titulo": "Ficha técnica Sol Andina — papa criolla Grupo Phureja",
       "institucion": "Corporación Colombiana de Investigación Agropecuaria (AGROSAVIA)",
-      "url": "https://www.agrosavia.co"
+      "url": "https://www.agrosavia.co",
+      "tier": "A"
     },
     {
       "id": "agrosavia-tibaitata",
@@ -26551,7 +26564,8 @@
       "año": null,
       "titulo": "Centro de Investigación Tibaitatá — publicaciones sobre cultivos andinos y altoandinos",
       "institucion": "AGROSAVIA",
-      "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1"
+      "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1",
+      "tier": "A"
     },
     {
       "id": "bernal-2015-plantas-liquenes-colombia",
@@ -26560,7 +26574,8 @@
       "año": 2015,
       "titulo": "Catálogo de Plantas y Líquenes de Colombia",
       "institucion": "Instituto de Ciencias Naturales, Universidad Nacional de Colombia",
-      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+      "url": "http://catalogoplantasdecolombia.unal.edu.co",
+      "tier": "A"
     },
     {
       "id": "calderon-saenz-2003-invasoras",
@@ -26568,7 +26583,8 @@
       "autores": "Calderón-Sáenz, E.",
       "año": 2003,
       "titulo": "Las especies invasoras en Colombia (diez peores)",
-      "revista_o_editorial": "Biota Colombiana"
+      "revista_o_editorial": "Biota Colombiana",
+      "tier": "A"
     },
     {
       "id": "car-cundi-2019",
@@ -26577,7 +26593,8 @@
       "año": 2019,
       "titulo": "Protocolos de manejo de especies invasoras en jurisdicción CAR",
       "institucion": "CAR Cundinamarca",
-      "observaciones": "STUB migrado de v3.0 — número de resolución pendiente."
+      "observaciones": "STUB migrado de v3.0 — número de resolución pendiente.",
+      "tier": "A"
     },
     {
       "id": "cenicafe-manual-cafetero-2013",
@@ -26586,7 +26603,8 @@
       "año": 2013,
       "titulo": "Manual del Cafetero Colombiano — Investigación y tecnología para la sostenibilidad de la caficultura",
       "institucion": "Centro Nacional de Investigaciones de Café (Cenicafé)",
-      "url": "https://www.cenicafe.org/es/index.php/nuestras_publicaciones"
+      "url": "https://www.cenicafe.org/es/index.php/nuestras_publicaciones",
+      "tier": "A"
     },
     {
       "id": "cenicafe-trichoderma-2010",
@@ -26594,7 +26612,8 @@
       "autores": "Cenicafé",
       "año": 2010,
       "titulo": "Uso de Trichoderma spp. en el manejo integrado de enfermedades del café",
-      "institucion": "Centro Nacional de Investigaciones de Café (Cenicafé)"
+      "institucion": "Centro Nacional de Investigaciones de Café (Cenicafé)",
+      "tier": "A"
     },
     {
       "id": "ciat-1995-alnus",
@@ -26603,7 +26622,8 @@
       "año": 1995,
       "titulo": "Alnus acuminata en sistemas agroforestales andinos",
       "institucion": "CIAT Palmira",
-      "observaciones": "STUB migrado de v3.0 — título y paginación pendientes de confirmación."
+      "observaciones": "STUB migrado de v3.0 — título y paginación pendientes de confirmación.",
+      "tier": "A"
     },
     {
       "id": "cip-2006-ghislain",
@@ -26611,7 +26631,8 @@
       "autores": "Ghislain, M.; Andrade, D.; Rodríguez, F.; Hijmans, R.J.; Spooner, D.M.",
       "año": 2006,
       "titulo": "Genetic analysis of the cultivated potato Solanum tuberosum L. Phureja Group using RAPDs",
-      "institucion": "CIP — International Potato Center"
+      "institucion": "CIP — International Potato Center",
+      "tier": "A"
     },
     {
       "id": "cip-potatoes-americas",
@@ -26620,7 +26641,8 @@
       "año": null,
       "titulo": "Catalogue of potato varieties and germplasm collections",
       "institucion": "CIP",
-      "url": "https://cipotato.org"
+      "url": "https://cipotato.org",
+      "tier": "A"
     },
     {
       "id": "correa-pabon-carulla-2008",
@@ -26628,7 +26650,8 @@
       "autores": "Correa, R.; Pabón, R.; Carulla, J.",
       "año": 2008,
       "titulo": "Valor nutricional del kikuyo (Cenchrus clandestinus) y respuestas productivas en ganadería lechera andina",
-      "observaciones": "STUB migrado de v3.0 — revista y paginación pendientes."
+      "observaciones": "STUB migrado de v3.0 — revista y paginación pendientes.",
+      "tier": "A"
     },
     {
       "id": "diazgranados-2012-espeletiinae",
@@ -26639,7 +26662,8 @@
       "revista_o_editorial": "PhytoKeys",
       "volumen_numero": "16",
       "paginas": "1-52",
-      "doi": "10.3897/phytokeys.16.3186"
+      "doi": "10.3897/phytokeys.16.3186",
+      "tier": "A"
     },
     {
       "id": "fao-2013-quinua",
@@ -26648,7 +26672,8 @@
       "año": 2013,
       "titulo": "Quinua: Año Internacional de la Quinua 2013 — Documentos técnicos y estado del arte",
       "institucion": "FAO",
-      "url": "https://www.fao.org/quinoa-2013"
+      "url": "https://www.fao.org/quinoa-2013",
+      "tier": "A"
     },
     {
       "id": "fao-ecocrop",
@@ -26656,7 +26681,8 @@
       "autores": "FAO",
       "año": null,
       "titulo": "EcoCrop — Crop Environmental Requirements Database",
-      "url": "https://gaez.fao.org/pages/ecocrop"
+      "url": "https://gaez.fao.org/pages/ecocrop",
+      "tier": "A"
     },
     {
       "id": "flora-colombia-pteridophyta",
@@ -26664,7 +26690,8 @@
       "autores": "Murillo-A., J.; Polanía, C.; et al.",
       "año": null,
       "titulo": "Flora de Colombia — Pteridophyta (helechos)",
-      "observaciones": "STUB migrado de v3.0 — editorial y año pendientes."
+      "observaciones": "STUB migrado de v3.0 — editorial y año pendientes.",
+      "tier": "A"
     },
     {
       "id": "gbif-colombia",
@@ -26672,7 +26699,8 @@
       "autores": "GBIF Secretariat / SiB Colombia",
       "año": null,
       "titulo": "GBIF — Global Biodiversity Information Facility (datos de ocurrencia en Colombia)",
-      "url": "https://www.gbif.org/country/CO"
+      "url": "https://www.gbif.org/country/CO",
+      "tier": "A"
     },
     {
       "id": "gbif-taxonomic-backbone",
@@ -26681,7 +26709,8 @@
       "año": 2024,
       "titulo": "GBIF Backbone Taxonomy",
       "institucion": "Global Biodiversity Information Facility",
-      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
+      "tier": "A"
     },
     {
       "id": "humboldt-2016-frailejones",
@@ -26690,7 +26719,8 @@
       "año": 2016,
       "titulo": "Frailejones de Colombia — Espeletiinae",
       "institucion": "Instituto de Investigación de Recursos Biológicos Alexander von Humboldt",
-      "url": "https://www.humboldt.org.co"
+      "url": "https://www.humboldt.org.co",
+      "tier": "A"
     },
     {
       "id": "humboldt-flora-alto-andina",
@@ -26699,7 +26729,8 @@
       "año": null,
       "titulo": "Flora del bosque alto andino colombiano",
       "institucion": "Instituto Humboldt",
-      "observaciones": "STUB migrado de v3.0."
+      "observaciones": "STUB migrado de v3.0.",
+      "tier": "A"
     },
     {
       "id": "humboldt-invasoras-andes",
@@ -26708,7 +26739,8 @@
       "año": null,
       "titulo": "Plantas invasoras en los Andes colombianos",
       "institucion": "Instituto Humboldt",
-      "observaciones": "STUB migrado de v3.0 — año y referencia específica pendientes."
+      "observaciones": "STUB migrado de v3.0 — año y referencia específica pendientes.",
+      "tier": "A"
     },
     {
       "id": "ica-fertilizantes-2019",
@@ -26716,7 +26748,8 @@
       "autores": "ICA — Instituto Colombiano Agropecuario",
       "año": 2019,
       "titulo": "Guía de uso racional de fertilizantes y enmiendas en Colombia",
-      "institucion": "ICA"
+      "institucion": "ICA",
+      "tier": "A"
     },
     {
       "id": "ica-resolucion-3168-2015",
@@ -26724,7 +26757,8 @@
       "autores": "ICA",
       "año": 2015,
       "titulo": "Resolución 3168 de 2015 — Reglamenta la producción, importación y exportación de semillas",
-      "institucion": "Instituto Colombiano Agropecuario (ICA)"
+      "institucion": "Instituto Colombiano Agropecuario (ICA)",
+      "tier": "A"
     },
     {
       "id": "ifoam-normativa-organica",
@@ -26732,7 +26766,8 @@
       "autores": "IFOAM — Organics International",
       "año": null,
       "titulo": "IFOAM Norms for Organic Production and Processing",
-      "url": "https://www.ifoam.bio/our-work/how/standards-certification/organic-guarantee-system/ifoam-norms"
+      "url": "https://www.ifoam.bio/our-work/how/standards-certification/organic-guarantee-system/ifoam-norms",
+      "tier": "A"
     },
     {
       "id": "ingham-2000-compost-tea",
@@ -26741,7 +26776,8 @@
       "año": 2000,
       "titulo": "The Compost Tea Brewing Manual",
       "revista_o_editorial": "Soil Foodweb Inc.",
-      "observaciones": "Fuente internacional; validada contra condiciones colombianas por AGROSAVIA 2015."
+      "observaciones": "Fuente internacional; validada contra condiciones colombianas por AGROSAVIA 2015.",
+      "tier": "A"
     },
     {
       "id": "issg-uicn-invasoras",
@@ -26749,7 +26785,8 @@
       "autores": "ISSG — Invasive Species Specialist Group (UICN)",
       "año": null,
       "titulo": "Global Invasive Species Database — 100 of the World's Worst Invasive Alien Species",
-      "url": "http://www.iucngisd.org"
+      "url": "http://www.iucngisd.org",
+      "tier": "A"
     },
     {
       "id": "jbb-plantas-medicinales",
@@ -26757,7 +26794,8 @@
       "autores": "Jardín Botánico José Celestino Mutis — Bogotá",
       "año": 2010,
       "titulo": "Plantas medicinales de Cundinamarca y Boyacá",
-      "institucion": "Jardín Botánico de Bogotá José Celestino Mutis"
+      "institucion": "Jardín Botánico de Bogotá José Celestino Mutis",
+      "tier": "A"
     },
     {
       "id": "khan-2009-seaweed-extracts",
@@ -26768,7 +26806,8 @@
       "revista_o_editorial": "Journal of Plant Growth Regulation",
       "volumen_numero": "28(4)",
       "paginas": "386-399",
-      "doi": "10.1007/s00344-009-9103-x"
+      "doi": "10.1007/s00344-009-9103-x",
+      "tier": "A"
     },
     {
       "id": "ley-1930-2018-paramos",
@@ -26776,7 +26815,8 @@
       "autores": "Congreso de la República de Colombia",
       "año": 2018,
       "titulo": "Ley 1930 de 2018 — Por medio de la cual se dictan disposiciones para la gestión integral de los páramos en Colombia",
-      "institucion": "República de Colombia"
+      "institucion": "República de Colombia",
+      "tier": "A"
     },
     {
       "id": "libro-rojo-plantas-colombia",
@@ -26784,7 +26824,8 @@
       "autores": "Cárdenas-López, D.; Salinas, N.R. (eds.)",
       "año": 2006,
       "titulo": "Libro Rojo de Plantas de Colombia. Volumen 4 — Especies maderables amenazadas (y volúmenes sucesivos)",
-      "institucion": "Instituto Amazónico de Investigaciones Científicas SINCHI / Instituto Humboldt / MADS"
+      "institucion": "Instituto Amazónico de Investigaciones Científicas SINCHI / Instituto Humboldt / MADS",
+      "tier": "A"
     },
     {
       "id": "mads-res-383-2010",
@@ -26792,7 +26833,8 @@
       "autores": "Ministerio de Ambiente y Desarrollo Sostenible (MADS)",
       "año": 2010,
       "titulo": "Resolución 383 de 2010 — Listado de especies silvestres amenazadas de la diversidad biológica colombiana",
-      "institucion": "MADS Colombia"
+      "institucion": "MADS Colombia",
+      "tier": "B"
     },
     {
       "id": "mongabay-retamo-2024",
@@ -26801,7 +26843,8 @@
       "año": 2024,
       "titulo": "El retamo espinoso: la plaga que amenaza los páramos colombianos",
       "url": "https://es.mongabay.com",
-      "observaciones": "STUB — artículo periodístico, validar contra fuente primaria antes de citar en ministerial."
+      "observaciones": "STUB — artículo periodístico, validar contra fuente primaria antes de citar en ministerial.",
+      "tier": "A"
     },
     {
       "id": "mujica-1992-quinua",
@@ -26809,7 +26852,8 @@
       "autores": "Mujica, A.",
       "año": 1992,
       "titulo": "Revisión bibliográfica sobre el cultivo de la quinua (Chenopodium quinoa Willd.) y el amaranto (Amaranthus caudatus L.) en los Andes",
-      "observaciones": "Publicación del Instituto Nacional de Investigaciones Agropecuarias (INIAP), Ecuador. Revisión exhaustiva de germoplasma, agronomía y usos tradicionales."
+      "observaciones": "Publicación del Instituto Nacional de Investigaciones Agropecuarias (INIAP), Ecuador. Revisión exhaustiva de germoplasma, agronomía y usos tradicionales.",
+      "tier": "B"
     },
     {
       "id": "nrc-1989-cultivos-andinos",
@@ -26818,7 +26862,8 @@
       "año": 1989,
       "titulo": "Lost Crops of the Incas: Little-Known Plants of the Andes with Promise for Worldwide Cultivation",
       "revista_o_editorial": "National Academy Press",
-      "isbn": "9780309042642"
+      "isbn": "9780309042642",
+      "tier": "A"
     },
     {
       "id": "nustez-rodriguez-2024-unal",
@@ -26827,7 +26872,8 @@
       "año": 2024,
       "titulo": "Papa criolla Grupo Phureja, manual de recomendaciones técnicas para Cundinamarca",
       "revista_o_editorial": "Editorial Universidad Nacional de Colombia",
-      "isbn": "9789585054929"
+      "isbn": "9789585054929",
+      "tier": "B"
     },
     {
       "id": "ocampo-solorza-2017",
@@ -26835,7 +26881,8 @@
       "autores": "Ocampo, D.; Solorza, J.",
       "año": 2017,
       "titulo": "Manejo de retamo espinoso (Ulex europaeus) en zonas altoandinas de Cundinamarca",
-      "observaciones": "STUB migrado de v3.0 — revista y paginación pendientes."
+      "observaciones": "STUB migrado de v3.0 — revista y paginación pendientes.",
+      "tier": "B"
     },
     {
       "id": "pamplona-roger-2006-plantas-medicinales",
@@ -26844,7 +26891,8 @@
       "año": 2006,
       "titulo": "Enciclopedia de las plantas medicinales",
       "revista_o_editorial": "Safeliz",
-      "observaciones": "STUB migrado de v3.0 — confirmar ISBN."
+      "observaciones": "STUB migrado de v3.0 — confirmar ISBN.",
+      "tier": "B"
     },
     {
       "id": "perez-arbelaez-1947-plantas-utiles",
@@ -26853,7 +26901,8 @@
       "año": 1947,
       "titulo": "Plantas Útiles de Colombia",
       "revista_o_editorial": "Librería Colombiana / Camacho Roldán",
-      "observaciones": "Obra clásica de la botánica económica colombiana; múltiples reediciones posteriores."
+      "observaciones": "Obra clásica de la botánica económica colombiana; múltiples reediciones posteriores.",
+      "tier": "A"
     },
     {
       "id": "perez-rodriguez-gomez-2008",
@@ -26863,7 +26912,8 @@
       "titulo": "Plan de fertilización de la papa criolla en el altiplano cundiboyacense",
       "revista_o_editorial": "Agronomía Colombiana",
       "volumen_numero": "26(3)",
-      "paginas": "477-486"
+      "paginas": "477-486",
+      "tier": "B"
     },
     {
       "id": "pinheiro-machado-2017-biofertilizantes",
@@ -26872,7 +26922,8 @@
       "año": 2017,
       "titulo": "Manual de Agricultura Orgánica y Biofertilizantes — fundamentos de la trofobiosis y nutrición vegetal agroecológica",
       "institucion": "Fundación Juquira Candiru / MAELA",
-      "observaciones": "Referencia continental para biol, supermagro y caldos minerales bajo enfoque trofobiótico de Chaboussou."
+      "observaciones": "Referencia continental para biol, supermagro y caldos minerales bajo enfoque trofobiótico de Chaboussou.",
+      "tier": "B"
     },
     {
       "id": "powo-kew",
@@ -26880,7 +26931,8 @@
       "autores": "Royal Botanic Gardens, Kew",
       "año": null,
       "titulo": "Plants of the World Online (POWO)",
-      "url": "https://powo.science.kew.org"
+      "url": "https://powo.science.kew.org",
+      "tier": "A"
     },
     {
       "id": "res-684-2018-mads",
@@ -26888,7 +26940,8 @@
       "autores": "MADS — Ministerio de Ambiente y Desarrollo Sostenible",
       "año": 2018,
       "titulo": "Resolución 684 de 2018 — Lista nacional de especies invasoras",
-      "institucion": "MADS Colombia"
+      "institucion": "MADS Colombia",
+      "tier": "A"
     },
     {
       "id": "restauracion-cruz-verde-sumapaz",
@@ -26896,7 +26949,8 @@
       "autores": "Instituto Alexander von Humboldt + CAR Cundinamarca",
       "año": 2018,
       "titulo": "Plan de restauración ecológica páramos Cruz Verde — Sumapaz",
-      "institucion": "IAvH / CAR Cundinamarca"
+      "institucion": "IAvH / CAR Cundinamarca",
+      "tier": "B"
     },
     {
       "id": "restrepo-1996-abc-agricultura-organica",
@@ -26904,7 +26958,8 @@
       "autores": "Restrepo, J.",
       "año": 1996,
       "titulo": "ABC de la agricultura orgánica (variante de cita usada en v3.0)",
-      "observaciones": "STUB — posiblemente misma obra que restrepo-1996-bocashi. Verificar y dedupear."
+      "observaciones": "STUB — posiblemente misma obra que restrepo-1996-bocashi. Verificar y dedupear.",
+      "tier": "B"
     },
     {
       "id": "restrepo-1996-bocashi",
@@ -26912,7 +26967,8 @@
       "autores": "Restrepo, J.",
       "año": 1996,
       "titulo": "Abonos orgánicos fermentados — experiencias de agricultores en Centroamérica y Brasil",
-      "revista_o_editorial": "OIT"
+      "revista_o_editorial": "OIT",
+      "tier": "B"
     },
     {
       "id": "restrepo-2005-agroecologia",
@@ -26920,7 +26976,8 @@
       "autores": "Restrepo Rivera, Jairo",
       "año": 2005,
       "titulo": "Manual práctico ABC de la agricultura orgánica y panes de piedra",
-      "institucion": "Editorial Feriva"
+      "institucion": "Editorial Feriva",
+      "tier": "B"
     },
     {
       "id": "restrepo-2007-biopreparados",
@@ -26928,7 +26985,8 @@
       "autores": "Jairo Restrepo Rivera",
       "año": 2007,
       "titulo": "Manual práctico de biopreparados aplicados a la agricultura orgánica",
-      "institucion": "Fundación Juquira Candiru"
+      "institucion": "Fundación Juquira Candiru",
+      "tier": "B"
     },
     {
       "id": "restrepo-rivera-2005",
@@ -26936,7 +26994,8 @@
       "autores": "Restrepo Rivera, Jairo",
       "año": 2005,
       "titulo": "Agroecología — principios y aplicación en el manejo de fincas tropicales",
-      "institucion": "Editorial Feriva"
+      "institucion": "Editorial Feriva",
+      "tier": "B"
     },
     {
       "id": "rodriguez-nustez-2009",
@@ -26944,7 +27003,8 @@
       "autores": "Rodríguez, L.E.; Ñústez, C.E.",
       "año": 2009,
       "titulo": "(Variante de cita usada en v3.0; curadura pendiente — probablemente idéntica a rodriguez-nustez-estrada-2009)",
-      "observaciones": "STUB migrado de v3.0. Verificar si es la misma fuente que rodriguez-nustez-estrada-2009 y dedupear."
+      "observaciones": "STUB migrado de v3.0. Verificar si es la misma fuente que rodriguez-nustez-estrada-2009 y dedupear.",
+      "tier": "A"
     },
     {
       "id": "rodriguez-nustez-estrada-2009",
@@ -26954,7 +27014,8 @@
       "titulo": "Variedades colombianas de papa criolla (Solanum phureja Juz. et Buk.)",
       "revista_o_editorial": "Agronomía Colombiana",
       "volumen_numero": "27(3)",
-      "paginas": "289-303"
+      "paginas": "289-303",
+      "tier": "A"
     },
     {
       "id": "sib-colombia",
@@ -26962,7 +27023,8 @@
       "autores": "Sistema de Información sobre Biodiversidad de Colombia",
       "año": null,
       "titulo": "SiB Colombia — Catálogo de la biodiversidad de Colombia",
-      "url": "https://sibcolombia.net"
+      "url": "https://sibcolombia.net",
+      "tier": "A"
     },
     {
       "id": "sinchi-amazonia-colombiana",
@@ -26970,7 +27032,8 @@
       "autores": "Instituto SINCHI",
       "año": null,
       "titulo": "Publicaciones científicas sobre especies de la Amazonía colombiana",
-      "institucion": "Instituto Amazónico de Investigaciones Científicas SINCHI"
+      "institucion": "Instituto Amazónico de Investigaciones Científicas SINCHI",
+      "tier": "A"
     },
     {
       "id": "uicn-red-list",
@@ -26978,7 +27041,8 @@
       "autores": "IUCN — International Union for Conservation of Nature",
       "año": null,
       "titulo": "The IUCN Red List of Threatened Species",
-      "url": "https://www.iucnredlist.org"
+      "url": "https://www.iucnredlist.org",
+      "tier": "A"
     },
     {
       "id": "cochrane-1980-aluminio-saturacion",
@@ -26989,7 +27053,8 @@
       "revista_o_editorial": "Tropical Agriculture (Trinidad)",
       "volumen_numero": "57(2)",
       "paginas": "133-140",
-      "observaciones": "Referencia clásica para el cálculo de dosis de cal en suelos ácidos tropicales basado en saturación de aluminio (Al sat %), criterio operativo central en agroecología andina y trópico bajo colombiano."
+      "observaciones": "Referencia clásica para el cálculo de dosis de cal en suelos ácidos tropicales basado en saturación de aluminio (Al sat %), criterio operativo central en agroecología andina y trópico bajo colombiano.",
+      "tier": "A"
     },
     {
       "id": "pinheiro-2003-cartilha-cal",
@@ -26998,7 +27063,8 @@
       "año": 2003,
       "titulo": "Cartilha da saúde do solo — agricultura orgânica e biodinâmica: o uso correto da cal e das enmendas minerais",
       "institucion": "Fundação Juquira Candiru / MAELA",
-      "observaciones": "Texto de divulgación agroecológica latinoamericana que sistematiza las advertencias sobre cal viva/hidratada en sistemas orgánicos y defiende criterios técnicos de aplicación basados en análisis de suelo."
+      "observaciones": "Texto de divulgación agroecológica latinoamericana que sistematiza las advertencias sobre cal viva/hidratada en sistemas orgánicos y defiende criterios técnicos de aplicación basados en análisis de suelo.",
+      "tier": "B"
     }
   ]
 }
