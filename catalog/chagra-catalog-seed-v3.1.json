@@ -5689,10 +5689,13 @@
       "source_ids": [
         "powo-kew",
         "gbif-colombia",
+        "gbif-taxonomic-backbone",
         "agrosavia-tibaitata",
+        "agrosavia-manual-frutales-tropicales",
+        "bernal-2015-plantas-liquenes-colombia",
         "sib-colombia"
       ],
-      "valor_pedagogico": "Acidez que refresca: el lulo es el citrico andino por excelencia. Ensea la importancia de la acidez como mecanismo de defensa natural y su valor en la gastronomia tradicional.",
+      "valor_pedagogico": "El lulo o naranjilla (Solanum quitoense Lam., familia Solanaceae) es una solanácea subarbustiva perenne nativa de la región andina norte (Colombia, Ecuador, Perú), cultivada tradicionalmente en sistemas agroforestales campesinos colombianos por sus frutos esféricos anaranjados de pulpa verde ácida (pH 2.8-3.4), ricos en vitamina C, ácido cítrico y carotenoides, considerada el cítrico andino por excelencia. Se cultiva en Cundinamarca (Fómeque, Quetame, Une), Boyacá (Miraflores, Garagoa), Huila (San Agustín, Pitalito), Caquetá (Florencia) y Cauca (Silvia, Inzá) entre 1.600 y 2.400 msnm en zona térmica templada a fría. Ciclo perenne con primera cosecha a los 9-12 meses, producción sostenida 3-4 años. Rendimientos 12-20 t/ha fruto fresco. Lección viva: enseña la importancia de la acidez (ácido cítrico y málico) como mecanismo de defensa natural anti-herbívoros y anti-microbiano, su valor en la gastronomía tradicional (jugo, sorbete, mermelada, lulada vallecaucana) y la sensibilidad a nematodos del nudo radical Meloidogyne incognita como bioindicador de salud del suelo. Manejo agroecológico: siembra con sombra parcial (40-60%) en sistemas con plátano o guamo (Inga edulis) como sombra temporal, asocio con maíz para protección contra viento, podas sanitarias de hojas viejas, control biológico de Neoleucinodes elegantalis (perforador) con Trichogramma pretiosum, no requiere agroquímicos. Fuentes Tier A: AGROSAVIA Manual Frutales Tropicales, POWO Kew, GBIF Backbone Taxonomy, SIB Colombia, Bernal 2015 Catálogo Plantas Colombia.",
       "validation_level": "claude_draft"
     },
     {
@@ -5826,9 +5829,12 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
-        "pamplona-roger-2006-plantas-medicinales"
+        "agrosavia-tibaitata",
+        "bernal-2015-plantas-liquenes-colombia",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales"
       ],
-      "valor_pedagogico": "Leccion de rusticidad mediterranea: muestra como una planta con aceites esenciales volatiles sobrevive en suelos pobres y repele plagas del huerto andino."
+      "valor_pedagogico": "El tomillo (Thymus vulgaris L., familia Lamiaceae) es una lamiácea subarbustiva perenne aromática originaria de la cuenca mediterránea occidental (España, Italia, sur de Francia), aclimatada exitosamente en huertos andinos colombianos como planta medicinal y condimentaria multipropósito. Sus tallos leñosos rastreros producen hojas pequeñas grisáceas ricas en aceites esenciales fenólicos (timol 20-50%, carvacrol 5-15%, p-cimeno 10-20%), responsables de su acción antibacteriana, antifúngica y expectorante documentada. Se cultiva en Cundinamarca (Subachoque, Cota, Tabio, sabana de Bogotá), Boyacá (Tunja, Villa de Leyva, Sutamarchán), Antioquia (Santuario, La Ceja, Rionegro) y Eje cafetero entre 800 y 2.600 msnm en zona térmica templada a fría seca. Ciclo perenne, producción comercial 3-4 años antes de renovar plantación. Rendimientos 0.8-1.5 t/ha hierba seca. Lección viva: muestra la rusticidad mediterránea adaptada a los Andes — cómo una planta con aceites esenciales volátiles sobrevive en suelos pobres, pedregosos y secos, y repele plagas del huerto (pulgones Myzus persicae, mosca blanca Bemisia tabaci, polilla del tomate Tuta absoluta) por efecto alelopático aéreo. Manejo agroecológico: propagación por esquejes semileñosos o división de mata (más confiable que semilla por germinación lenta 14-21 días), siembra en bordes y caminos del huerto como repelente natural, poda post-floración para mantener compacidad, no requiere riego frecuente ni fertilización, asocio con tomate y pimentón. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA, Bernal 2015 Catálogo Plantas Colombia, Pamplona-Roger 2006 Plantas Medicinales."
     },
     {
       "id": "eryngium_foetidum",
@@ -5874,9 +5880,12 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
-        "sib-colombia"
+        "gbif-colombia",
+        "sib-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "agrosavia-tibaitata"
       ],
-      "valor_pedagogico": "Hierba nativa de las Americas cuyo aroma intenso es parte vital del 'hogao' colombiano. Enseña la relevancia de las especias locales frente a las introducidas."
+      "valor_pedagogico": "El cilantro cimarrón o culantro (Eryngium foetidum L., familia Apiaceae) es una apiácea bienal a perenne herbácea nativa de las Américas tropicales (Caribe, Mesoamérica, norte de Sudamérica), cultivada y silvestre en huertos campesinos colombianos por sus hojas dentadas en roseta basal de aroma intenso similar al cilantro común (Coriandrum sativum) pero más estable al calor de cocción. Su aroma característico proviene de aldehídos aromáticos volátiles (E-2-dodecenal, dodecanal) presentes en mayor concentración que en el cilantro común. Se cultiva en Caribe colombiano (Magdalena, Bolívar, Sucre, Córdoba), Antioquia (Urabá, Magdalena medio), Valle del Cauca, Tolima, Huila y Eje cafetero entre 500 y 2.200 msnm en zona térmica cálida a fría, con preferencia por sombra parcial y humedad alta. Ciclo bienal con producción continua de hojas durante 12-18 meses. Rendimientos 0.5-1 t/ha hoja fresca. Lección viva: enseña la relevancia de las especias locales frente a las introducidas, su rol en el hogao colombiano y los sancochos costeños como sustituto resistente al calor de cocción del cilantro común, y su valor como planta multipropósito (condimento, medicinal contra cólicos y gripes, atrayente de polinizadores apícolas por sus inflorescencias verde-amarillas). Manejo agroecológico: siembra directa o en bandeja con germinación lenta 14-21 días, suelo orgánico bien drenado con pH 5.5-7, asocio con plátano y yuca como sombra temporal, cosecha de hojas externas dejando corazón intacto, autoresiembra natural prolífica en el huerto bien manejado, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, SIB Colombia, Bernal 2015 Catálogo Plantas Colombia, AGROSAVIA."
     },
     {
       "id": "cucurbita_maxima",
@@ -5925,9 +5934,12 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
-        "fao-ecocrop"
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "fao-ecocrop",
+        "bernal-2015-plantas-liquenes-colombia"
       ],
-      "valor_pedagogico": "En la milpa andina, sus flores rellenas de queso y huevo son patrimonio culinario de Cundinamarca. La planta entera enseña el sistema de 'tres hermanas' con maiz y frijol."
+      "valor_pedagogico": "La calabaza o auyama (Cucurbita maxima Duchesne, familia Cucurbitaceae) es una cucurbitácea anual herbácea rastrera-trepadora originaria de los Andes sudamericanos (Bolivia, Perú, Argentina), domesticada hace más de 8.000 años y dispersada precolombinamente por toda América, cultivada tradicionalmente en sistemas campesinos colombianos como uno de los tres pilares del sistema mesoamericano-andino de las tres hermanas (maíz-fríjol-calabaza). Produce frutos grandes (3-15 kg, hasta 50 kg en variedades gigantes) de pulpa amarillo-anaranjada rica en betacaroteno, vitamina A y fibra. Se cultiva en Cundinamarca (Pacho, Subachoque, sabana de Bogotá), Boyacá (Tunja, Villa de Leyva), Nariño (Pasto, Ipiales), Cauca, Antioquia (oriente, Suroeste) y Eje cafetero entre 1.000 y 2.600 msnm en zona térmica cálida a fría. Ciclo anual de 4-6 meses. Rendimientos 15-30 t/ha fruto. Lección viva: en la milpa andina-mesoamericana enseña el sistema de las tres hermanas — el maíz aporta soporte estructural a la guía rastrera, el fríjol fija nitrógeno biológico (Rhizobium spp.) y la calabaza cubre el suelo con sus hojas amplias reduciendo evapotranspiración y suprimiendo arvenses. Las flores masculinas rellenas de queso y huevo son patrimonio culinario de Cundinamarca y Boyacá. Manejo agroecológico: siembra directa en sitio definitivo a 1.5-2 m entre golpes, asocio obligatorio en milpa, polinización por abejas nativas (Peponapis pruinosa, Apis mellifera), cosecha post-marchitamiento de guía, almacenamiento en bodega ventilada hasta 6 meses, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA, FAO Ecocrop, Bernal 2015 Catálogo Plantas Colombia."
     },
     {
       "id": "matricaria_chamomilla",
@@ -5972,9 +5984,13 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
-        "pamplona-roger-2006-plantas-medicinales"
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "bernal-2015-plantas-liquenes-colombia",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales"
       ],
-      "valor_pedagogico": "La infusion mas antigua del mundo. En la chagra chiguana, ensena el valor de las plantas indicadoras: su presencia senala suelos compactados que necesitan aireacion."
+      "valor_pedagogico": "La manzanilla común o alemana (Matricaria chamomilla L., familia Asteraceae) es una asterácea anual herbácea originaria de Europa central y Asia occidental, naturalizada e cultivada extensamente en huertos andinos colombianos por sus inflorescencias en capítulo con flores liguladas blancas y disco amarillo, fuente del aceite esencial de manzanilla rico en α-bisabolol (10-50%), camazuleno (1-15%) y matricina, compuestos antiinflamatorios, antiespasmódicos y sedantes documentados. Se cultiva en Cundinamarca (Sabana de Bogotá, Subachoque, Cota), Boyacá (Tunja, Sotaquirá, Villa de Leyva), Nariño (Pasto, Túquerres), Antioquia (oriente cercano) y Eje cafetero entre 800 y 2.600 msnm en zona térmica templada a fría seca. Ciclo anual corto 90-120 días desde siembra a cosecha de flor. Rendimientos 0.4-0.8 t/ha flor seca. Lección viva: la infusión medicinal más antigua del mundo (documentada desde el Egipto faraónico y la medicina griega de Dioscórides), en la chagra muisca y campesina enseña el valor de las plantas indicadoras edáficas — su presencia abundante señala suelos compactados con baja porosidad que necesitan aireación mecánica o biológica, su autoresiembra prolífica enseña ciclos cortos, y sus capítulos atraen polinizadores nativos (Bombus spp., abejas Tetragonisca angustula) y enemigos naturales de plagas (Chrysoperla externa, sírfidos). Manejo agroecológico: siembra superficial sobre suelo desnudo sin cubrir semilla (requiere luz para germinar), asocio con cebolla y col, cosecha manual de capítulos en floración plena, secado a la sombra para conservar aceites esenciales, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA, Bernal 2015 Catálogo Plantas Colombia, Pamplona-Roger 2006 Plantas Medicinales."
     },
     {
       "id": "taraxacum_officinale",
