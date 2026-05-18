@@ -1,8 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, TrendingUp, CheckCircle } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { ArrowLeft, AlertCircle, TrendingUp, CheckCircle } from 'lucide-react';
 import DateField from './DateField';
 import { savePayload } from '../services/payloadService';
 import { logCache } from '../db/logCache';
+
+// Bug 069.10 — sanity caps para evitar typos absurdos (ej. "100kg" → 100000)
+// que rompan analítica downstream sin que el operador lo note.
+const MAX_QTY_KG = 50000;     // 50 toneladas en una sola cosecha → ya implausible
+const MAX_QTY_UNITS = 1000000; // 1 millón de unidades / huevos / manojos
+const MIN_PRODUCT_LEN = 2;
 
 // Autopilot #7 (2026-05-03): mediana de cosechas pasadas como sugerencia
 // de cantidad. Reduce friction en cosechas repetitivas (fresa cada semana,
@@ -81,6 +87,30 @@ export default function HarvestLog({ onBack, onSave }) {
   const [medianHint, setMedianHint] = useState(null); // { median, count } | null
   const [syncedOffline, setSyncedOffline] = useState(false);
   const [view, setView] = useState('form'); // 'form' | 'success'
+  const [touched, setTouched] = useState({});
+
+  // Bug 069.10 — validación inline (subArea, product, quantity, date)
+  const errors = useMemo(() => {
+    const e = {};
+    const today = new Date().toISOString().split('T')[0];
+    if (!formData.subArea) e.subArea = 'Selecciona el sub-área';
+    if (!formData.product.trim()) e.product = 'Indica el producto';
+    else if (formData.product.trim().length < MIN_PRODUCT_LEN) e.product = `Mínimo ${MIN_PRODUCT_LEN} caracteres`;
+    const qty = Number(formData.quantity);
+    const cap = formData.unit === 'Gramos' ? MAX_QTY_KG * 1000
+              : formData.unit === 'Kilogramos' ? MAX_QTY_KG
+              : MAX_QTY_UNITS;
+    if (formData.quantity === '' || formData.quantity === null) e.quantity = 'Indica la cantidad';
+    else if (!Number.isFinite(qty)) e.quantity = 'Cantidad inválida';
+    else if (qty <= 0) e.quantity = 'Debe ser mayor que cero';
+    else if (qty > cap) e.quantity = `Máximo ${cap.toLocaleString()} ${formData.unit.toLowerCase()}`;
+    if (!formData.date) e.date = 'Indica la fecha';
+    else if (formData.date > today) e.date = 'La fecha no puede ser futura';
+    return e;
+  }, [formData]);
+
+  const hasErrors = Object.keys(errors).length > 0;
+  const markTouched = (field) => setTouched((t) => ({ ...t, [field]: true }));
 
   const handleInput = (e) => {
     const { name, value } = e.target;
@@ -120,8 +150,10 @@ export default function HarvestLog({ onBack, onSave }) {
 
   const handleSave = async () => {
     if (isSaving) return;
-    if (!formData.subArea || !formData.quantity || !formData.product) {
-      onSave('Completa Sub-área, Producto y Cantidad', true);
+    // Bug 069.10 — re-validar antes de enviar
+    if (hasErrors) {
+      setTouched({ subArea: true, product: true, quantity: true, date: true });
+      onSave('Revisa los campos marcados', true);
       return;
     }
 
@@ -220,9 +252,14 @@ export default function HarvestLog({ onBack, onSave }) {
         <DateField
           label="Fecha"
           value={formData.date}
-          onChange={(val) => setFormData(p => ({ ...p, date: val }))}
+          onChange={(val) => { setFormData(p => ({ ...p, date: val })); markTouched('date'); }}
           required
         />
+        {touched.date && errors.date && (
+          <p className="text-sm text-red-400 -mt-4 flex items-center gap-1.5">
+            <AlertCircle size={14} aria-hidden="true" /> {errors.date}
+          </p>
+        )}
 
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Área Principal</span>
@@ -235,22 +272,70 @@ export default function HarvestLog({ onBack, onSave }) {
         {formData.mainArea && (
           <label className="flex flex-col gap-2">
             <span className="text-xl font-bold">Segmento / Sub-área</span>
-            <select name="subArea" value={formData.subArea} onChange={handleInput} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-2xl text-white min-h-[64px] appearance-none">
+            <select
+              name="subArea"
+              value={formData.subArea}
+              onChange={handleInput}
+              onBlur={() => markTouched('subArea')}
+              aria-invalid={touched.subArea && !!errors.subArea}
+              className={`p-4 rounded-xl bg-slate-900 border text-2xl text-white min-h-[64px] appearance-none ${
+                touched.subArea && errors.subArea ? 'border-red-700' : 'border-slate-700'
+              }`}
+            >
               <option value="">-- Seleccionar --</option>
               {MOCK_SUB_AREAS[formData.mainArea]?.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
             </select>
+            {touched.subArea && errors.subArea && (
+              <p className="text-sm text-red-400 flex items-center gap-1.5">
+                <AlertCircle size={14} aria-hidden="true" /> {errors.subArea}
+              </p>
+            )}
           </label>
         )}
 
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Producto</span>
-          <input type="text" name="product" value={formData.product} onChange={handleInput} placeholder="Ej: Fresa Monterrey" className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-2xl text-white min-h-[64px] placeholder-slate-500" />
+          <input
+            type="text"
+            name="product"
+            value={formData.product}
+            onChange={handleInput}
+            onBlur={() => markTouched('product')}
+            aria-invalid={touched.product && !!errors.product}
+            placeholder="Ej: Fresa Monterrey"
+            className={`p-4 rounded-xl bg-slate-900 border text-2xl text-white min-h-[64px] placeholder-slate-500 ${
+              touched.product && errors.product ? 'border-red-700' : 'border-slate-700'
+            }`}
+          />
+          {touched.product && errors.product && (
+            <p className="text-sm text-red-400 flex items-center gap-1.5">
+              <AlertCircle size={14} aria-hidden="true" /> {errors.product}
+            </p>
+          )}
         </label>
 
         <div className="grid grid-cols-2 gap-4">
           <label className="flex flex-col gap-2">
             <span className="text-xl font-bold">Cantidad</span>
-            <input type="number" step="0.01" name="quantity" value={formData.quantity} onChange={handleInput} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-2xl text-white min-h-[64px]" placeholder="0.00" />
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              name="quantity"
+              value={formData.quantity}
+              onChange={handleInput}
+              onBlur={() => markTouched('quantity')}
+              aria-invalid={touched.quantity && !!errors.quantity}
+              className={`p-4 rounded-xl bg-slate-900 border text-2xl text-white min-h-[64px] ${
+                touched.quantity && errors.quantity ? 'border-red-700' : 'border-slate-700'
+              }`}
+              placeholder="0.00"
+            />
+            {touched.quantity && errors.quantity && (
+              <p className="text-sm text-red-400 flex items-center gap-1.5">
+                <AlertCircle size={14} aria-hidden="true" /> {errors.quantity}
+              </p>
+            )}
             {medianHint && (
               <span className="inline-flex items-center gap-1.5 text-xs text-emerald-400 px-1">
                 <TrendingUp size={12} />
@@ -276,9 +361,11 @@ export default function HarvestLog({ onBack, onSave }) {
 
         <button
           onClick={handleSave}
-          disabled={isSaving}
+          disabled={isSaving || hasErrors}
           aria-busy={isSaving}
-          className="mt-4 p-6 rounded-xl bg-orange-600 active:bg-orange-500 text-2xl lg:text-3xl font-black shadow-xl min-h-[80px] border-b-4 border-orange-800 disabled:opacity-60 disabled:active:bg-orange-600"
+          aria-disabled={hasErrors || undefined}
+          title={hasErrors ? 'Completa los campos correctamente' : undefined}
+          className="mt-4 p-6 rounded-xl bg-orange-600 active:bg-orange-500 text-2xl lg:text-3xl font-black shadow-xl min-h-[80px] border-b-4 border-orange-800 disabled:opacity-60 disabled:active:bg-orange-600 disabled:cursor-not-allowed"
         >
           {isSaving ? 'Guardando…' : 'Guardar Cosecha'}
         </button>

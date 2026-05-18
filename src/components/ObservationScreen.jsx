@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
-import { ArrowLeft, Camera } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { ArrowLeft, AlertCircle, Camera } from 'lucide-react';
 import DateField from './DateField';
 import { syncManager } from '../services/syncManager';
+
+// Bug 069.10 — observation requiere descripción mínima útil + ubicación.
+// Mínimo de 5 caracteres descarta entries vacíos tipo "ok" o "test".
+const MIN_DESCRIPTION_LEN = 5;
+const MAX_DESCRIPTION_LEN = 2000;
 
 function ObservationScreen({ onBack, onSave }) {
   const [formData, setFormData] = useState({
@@ -14,6 +19,25 @@ function ObservationScreen({ onBack, onSave }) {
   const [photo, setPhoto] = useState(null);
   const [photoUrl, setPhotoUrl] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [touched, setTouched] = useState({});
+
+  // Bug 069.10 — validación inline para description + date. `locationId` no
+  // tiene input en la UI todavía (queda en el handleSave check legacy) — no se
+  // incluye acá para no deshabilitar el botón de forma permanente.
+  const errors = useMemo(() => {
+    const e = {};
+    const today = new Date().toISOString().split('T')[0];
+    const desc = (formData.description || '').trim();
+    if (!desc) e.description = 'Describe la observación';
+    else if (desc.length < MIN_DESCRIPTION_LEN) e.description = `Mínimo ${MIN_DESCRIPTION_LEN} caracteres`;
+    else if (desc.length > MAX_DESCRIPTION_LEN) e.description = `Máximo ${MAX_DESCRIPTION_LEN} caracteres`;
+    if (!formData.date) e.date = 'Indica la fecha';
+    else if (formData.date > today) e.date = 'La fecha no puede ser futura';
+    return e;
+  }, [formData]);
+
+  const hasErrors = Object.keys(errors).length > 0;
+  const markTouched = (field) => setTouched((t) => ({ ...t, [field]: true }));
 
   const handleInput = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -30,6 +54,12 @@ function ObservationScreen({ onBack, onSave }) {
 
   const handleSave = async () => {
     if (isSaving) return;
+    // Bug 069.10 — validación inline previa
+    if (hasErrors) {
+      setTouched({ description: true, date: true });
+      onSave('Revisa los campos marcados', true);
+      return;
+    }
     if (!formData.description || !formData.locationId) {
       onSave('Completa descripcion y ubicacion', true);
       return;
@@ -104,7 +134,24 @@ function ObservationScreen({ onBack, onSave }) {
 
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Descripcion</span>
-          <textarea name="description" value={formData.description} onChange={handleInput} rows="4" className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-xl text-white min-h-[80px]" placeholder="Describe la observacion..." />
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleInput}
+            onBlur={() => markTouched('description')}
+            aria-invalid={touched.description && !!errors.description}
+            rows="4"
+            maxLength={MAX_DESCRIPTION_LEN}
+            className={`p-4 rounded-xl bg-slate-900 border text-xl text-white min-h-[80px] ${
+              touched.description && errors.description ? 'border-red-700' : 'border-slate-700'
+            }`}
+            placeholder="Describe la observacion..."
+          />
+          {touched.description && errors.description && (
+            <p className="text-sm text-red-400 flex items-center gap-1.5">
+              <AlertCircle size={14} aria-hidden="true" /> {errors.description}
+            </p>
+          )}
         </label>
 
         <label className="flex flex-col gap-2">
@@ -120,9 +167,14 @@ function ObservationScreen({ onBack, onSave }) {
         <DateField
           label="Fecha"
           value={formData.date}
-          onChange={(val) => setFormData(p => ({ ...p, date: val }))}
+          onChange={(val) => { setFormData(p => ({ ...p, date: val })); markTouched('date'); }}
           required
         />
+        {touched.date && errors.date && (
+          <p className="text-sm text-red-400 -mt-4 flex items-center gap-1.5">
+            <AlertCircle size={14} aria-hidden="true" /> {errors.date}
+          </p>
+        )}
 
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Notas Adicionales</span>
@@ -140,9 +192,11 @@ function ObservationScreen({ onBack, onSave }) {
 
         <button
           onClick={handleSave}
-          disabled={isSaving}
+          disabled={isSaving || hasErrors}
           aria-busy={isSaving}
-          className="mt-4 p-6 rounded-xl bg-purple-600 active:bg-purple-500 text-2xl lg:text-3xl font-black shadow-xl min-h-[80px] border-b-4 border-purple-800 disabled:opacity-60 disabled:active:bg-purple-600"
+          aria-disabled={hasErrors || undefined}
+          title={hasErrors ? 'Completa los campos correctamente' : undefined}
+          className="mt-4 p-6 rounded-xl bg-purple-600 active:bg-purple-500 text-2xl lg:text-3xl font-black shadow-xl min-h-[80px] border-b-4 border-purple-800 disabled:opacity-60 disabled:active:bg-purple-600 disabled:cursor-not-allowed"
         >
           {isSaving ? 'Guardando…' : 'Guardar Observacion'}
         </button>

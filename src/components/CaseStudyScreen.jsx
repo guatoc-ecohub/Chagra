@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { FileText, Plus, AlertTriangle, AlertCircle, Activity, CheckCircle, XCircle, ChevronRight, Sparkles, Loader2, Mic, MicOff } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { useCaseStudyStore, CASE_SEVERITIES } from '../store/useCaseStudyStore';
@@ -107,10 +107,42 @@ const NewCaseForm = ({ onCreate, onCancel, defaultFincaSlug }) => {
   const [extracting, setExtracting] = useState(false);
   const [extractError, setExtractError] = useState(null);
   const [transcribing, setTranscribing] = useState(false);
+  const [touched, setTouched] = useState({});
   const recorder = useVoiceRecorder();
+
+  // Bug 069.10 — validación inline: títulos/problemas mínimos para no crear
+  // casos de estudio basura; counts coherentes (afectados ≤ total).
+  const errors = useMemo(() => {
+    const e = {};
+    if (!form.title.trim()) e.title = 'Indica un título';
+    else if (form.title.trim().length < 3) e.title = 'Mínimo 3 caracteres';
+    if (!form.problem_name.trim()) e.problem_name = 'Describe el problema';
+    else if (form.problem_name.trim().length < 3) e.problem_name = 'Mínimo 3 caracteres';
+    const total = form.count_total === '' ? null : Number(form.count_total);
+    const affected = form.count_affected === '' ? null : Number(form.count_affected);
+    if (total !== null) {
+      if (!Number.isFinite(total) || total < 0) e.count_total = 'Debe ser ≥ 0';
+      else if (!Number.isInteger(total)) e.count_total = 'Sin decimales';
+    }
+    if (affected !== null) {
+      if (!Number.isFinite(affected) || affected < 0) e.count_affected = 'Debe ser ≥ 0';
+      else if (!Number.isInteger(affected)) e.count_affected = 'Sin decimales';
+      else if (total !== null && Number.isFinite(total) && affected > total) {
+        e.count_affected = 'No puede exceder el total';
+      }
+    }
+    return e;
+  }, [form]);
+
+  const hasErrors = Object.keys(errors).length > 0;
+  const markTouched = (field) => setTouched((t) => ({ ...t, [field]: true }));
 
   const submit = (e) => {
     e.preventDefault();
+    if (hasErrors) {
+      setTouched({ title: true, problem_name: true, count_total: true, count_affected: true });
+      return;
+    }
     if (!form.title.trim() || !form.problem_name.trim()) return;
     onCreate({
       title: form.title.trim(),
@@ -259,22 +291,44 @@ const NewCaseForm = ({ onCreate, onCancel, defaultFincaSlug }) => {
         </div>
       )}
 
-      <input
-        type="text"
-        required
-        placeholder="Título del caso (ej. Trozador invernadero David)"
-        value={form.title}
-        onChange={(e) => setForm({ ...form, title: e.target.value })}
-        className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white text-sm focus:outline-none focus:border-slate-500"
-      />
-      <input
-        type="text"
-        placeholder="Problema (ej. Trozador — Agrotis ipsilon)"
-        required
-        value={form.problem_name}
-        onChange={(e) => setForm({ ...form, problem_name: e.target.value })}
-        className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white text-sm focus:outline-none focus:border-slate-500"
-      />
+      <div>
+        <input
+          type="text"
+          required
+          placeholder="Título del caso (ej. Trozador invernadero David)"
+          value={form.title}
+          onChange={(e) => setForm({ ...form, title: e.target.value })}
+          onBlur={() => markTouched('title')}
+          aria-invalid={touched.title && !!errors.title}
+          className={`w-full px-3 py-2 rounded-lg bg-slate-800 border text-white text-sm focus:outline-none focus:border-slate-500 ${
+            touched.title && errors.title ? 'border-red-700' : 'border-slate-700'
+          }`}
+        />
+        {touched.title && errors.title && (
+          <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+            <AlertCircle className="w-3 h-3" /> {errors.title}
+          </p>
+        )}
+      </div>
+      <div>
+        <input
+          type="text"
+          placeholder="Problema (ej. Trozador — Agrotis ipsilon)"
+          required
+          value={form.problem_name}
+          onChange={(e) => setForm({ ...form, problem_name: e.target.value })}
+          onBlur={() => markTouched('problem_name')}
+          aria-invalid={touched.problem_name && !!errors.problem_name}
+          className={`w-full px-3 py-2 rounded-lg bg-slate-800 border text-white text-sm focus:outline-none focus:border-slate-500 ${
+            touched.problem_name && errors.problem_name ? 'border-red-700' : 'border-slate-700'
+          }`}
+        />
+        {touched.problem_name && errors.problem_name && (
+          <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+            <AlertCircle className="w-3 h-3" /> {errors.problem_name}
+          </p>
+        )}
+      </div>
       <div className="grid grid-cols-2 gap-2">
         <input
           type="text"
@@ -296,22 +350,46 @@ const NewCaseForm = ({ onCreate, onCancel, defaultFincaSlug }) => {
         </select>
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <input
-          type="number"
-          min="0"
-          placeholder="Total plantas"
-          value={form.count_total}
-          onChange={(e) => setForm({ ...form, count_total: e.target.value })}
-          className="px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white text-sm focus:outline-none focus:border-slate-500"
-        />
-        <input
-          type="number"
-          min="0"
-          placeholder="Afectadas"
-          value={form.count_affected}
-          onChange={(e) => setForm({ ...form, count_affected: e.target.value })}
-          className="px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white text-sm focus:outline-none focus:border-slate-500"
-        />
+        <div>
+          <input
+            type="number"
+            min="0"
+            step="1"
+            placeholder="Total plantas"
+            value={form.count_total}
+            onChange={(e) => setForm({ ...form, count_total: e.target.value })}
+            onBlur={() => markTouched('count_total')}
+            aria-invalid={touched.count_total && !!errors.count_total}
+            className={`w-full px-3 py-2 rounded-lg bg-slate-800 border text-white text-sm focus:outline-none focus:border-slate-500 ${
+              touched.count_total && errors.count_total ? 'border-red-700' : 'border-slate-700'
+            }`}
+          />
+          {touched.count_total && errors.count_total && (
+            <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+              <AlertCircle className="w-3 h-3" /> {errors.count_total}
+            </p>
+          )}
+        </div>
+        <div>
+          <input
+            type="number"
+            min="0"
+            step="1"
+            placeholder="Afectadas"
+            value={form.count_affected}
+            onChange={(e) => setForm({ ...form, count_affected: e.target.value })}
+            onBlur={() => markTouched('count_affected')}
+            aria-invalid={touched.count_affected && !!errors.count_affected}
+            className={`w-full px-3 py-2 rounded-lg bg-slate-800 border text-white text-sm focus:outline-none focus:border-slate-500 ${
+              touched.count_affected && errors.count_affected ? 'border-red-700' : 'border-slate-700'
+            }`}
+          />
+          {touched.count_affected && errors.count_affected && (
+            <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+              <AlertCircle className="w-3 h-3" /> {errors.count_affected}
+            </p>
+          )}
+        </div>
       </div>
       <div className="flex gap-2 pt-1">
         <button
@@ -323,7 +401,10 @@ const NewCaseForm = ({ onCreate, onCancel, defaultFincaSlug }) => {
         </button>
         <button
           type="submit"
-          className="flex-1 px-3 py-2 rounded-lg bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-500 transition-colors"
+          disabled={hasErrors}
+          aria-disabled={hasErrors || undefined}
+          title={hasErrors ? 'Completa los campos correctamente' : undefined}
+          className="flex-1 px-3 py-2 rounded-lg bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-emerald-600"
         >
           Crear caso
         </button>
