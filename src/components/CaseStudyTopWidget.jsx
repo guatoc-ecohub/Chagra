@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { AlertTriangle, AlertCircle, Activity, ChevronRight, FileText } from 'lucide-react';
 import { useCaseStudyStore } from '../store/useCaseStudyStore';
 
@@ -45,7 +45,33 @@ const formatPct = (a, t) => {
 };
 
 export default function CaseStudyTopWidget({ onNavigate, maxItems = 3 }) {
-  const topActive = useCaseStudyStore((s) => s.getTopActiveProblems(10));
+  // Suscribirse solo a `cases` (estable por referencia entre actions del store) y
+  // derivar el ranking con useMemo. Llamar `getTopActiveProblems(10)` dentro del
+  // selector retornaba un nuevo array + nuevos objetos `{...c, _score}` en cada
+  // render → Zustand re-suscripción infinita → React #185 (Maximum update depth).
+  const cases = useCaseStudyStore((s) => s.cases);
+  // `now` capturado una sola vez al mount (no afecta resultado: el sort solo
+  // necesita orden relativo de edad entre casos, no tiempo absoluto).
+  // eslint-disable-next-line react-hooks/purity
+  const mountedAt = useMemo(() => Date.now(), []);
+  const topActive = useMemo(() => {
+    if (!Array.isArray(cases) || cases.length === 0) return [];
+    const severityWeight = { critical: 4, high: 3, medium: 2, low: 1 };
+    return [...cases]
+      .filter((c) => !['closed_resolved', 'closed_failed'].includes(c.state))
+      .map((c) => {
+        const ageMs = mountedAt - new Date(c.problem.detected_at || c.created_at).getTime();
+        const ageDays = Math.max(1, ageMs / 86400000);
+        const sevW = severityWeight[c.problem.severity] || 1;
+        const affPct = c.subject.count_total
+          ? (c.subject.count_affected || 0) / c.subject.count_total
+          : 0;
+        const score = sevW * (1 + affPct) * Math.log10(1 + ageDays);
+        return { ...c, _score: score };
+      })
+      .sort((a, b) => b._score - a._score)
+      .slice(0, 10);
+  }, [cases, mountedAt]);
   const totalActive = topActive.length;
   if (totalActive === 0) return null;
 
