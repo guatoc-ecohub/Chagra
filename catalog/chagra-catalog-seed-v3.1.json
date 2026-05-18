@@ -8282,9 +8282,10 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
+        "ica-resolucion-3168-2015",
+        "fao-ecocrop"
       ],
-      "valor_pedagogico": "Variedad de raiz roja clasica: su color intenso indica presencia de antocianinas. Ciclo mas corto del huerto, ideal para ensenar germinacion y cosecha a ninos."
+      "valor_pedagogico": "Variedad de rabano de raiz roja (Raphanus sativus var. sativus, Brassicaceae) con el ciclo mas corto del huerto: 25-35 dias de semilla a cosecha. Su color rojo intenso indica antocianinas y su sabor picante viene de glucosinolatos que ahuyentan insectos del suelo. Ideal para enseñar a niños germinacion, crecimiento y cosecha en menos de un mes escolar, y para siembras escalonadas cada 10-15 dias que dan cosecha continua. Cultivo puente en rotaciones que rompe ciclos de plagas en parcelas hortelanas andinas."
     },
     {
       "id": "beta_vulgaris_altissima",
@@ -8922,10 +8923,12 @@
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
         "humboldt-flora-alto-andina",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "jbb-plantas-medicinales"
       ],
       "rol_ecologico": "Atractora de polinizadores (mariposas, colibries, abejas). Especie pionera en bordes de bosque. Medicina tradicional cicatrizante. Cerca viva de alta montana.",
-      "valor_pedagogico": "El jardin de mariposas: sus flores aromaticas atraen polinizadores de toda la finca. Ensenia la interaccion planta-polinizador en ecosistemas de alta montana.",
+      "valor_pedagogico": "Arbusto o arbolito nativo de los Andes neotropicales (Buddleja americana, Scrophulariaceae) llamado salvion o matico por el campesinado andino. Sus flores lilas aromaticas en paniculos atraen mariposas, colibries y abejas nativas durante toda la floracion, sosteniendo la polinizacion de la chagra entera. Sus hojas se usan en infusion tradicional como antiinflamatorio y cicatrizante de heridas. Enseña la doble funcion de una cerca viva nativa: refugio de polinizadores y botiquin campesino de alta montaña.",
       "validation_level": "claude_draft"
     },
     {
@@ -9079,9 +9082,11 @@
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
         "bernal-2015-plantas-liquenes-colombia",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "jbb-plantas-medicinales"
       ],
-      "valor_pedagogico": "Endémica de los Andes colombianos: un tesoro etnobotánico del páramo que enseña la relación entre altitud, compuestos activos y saber tradicional campesino.",
+      "valor_pedagogico": "Valeriana criolla endémica de los Andes colombianos (Valeriana pavonii, Caprifoliaceae) que habita páramos y bosques altoandinos entre 2.800 y 3.500 msnm. Sus raíces contienen valepotriatos sedantes usados en infusión tradicional para calmar nervios y mejorar el sueño, conocimiento conservado por campesinos de Cundinamarca, Boyacá y Santander. Enseña la relación entre altitud, compuestos activos y saber etnobotánico, y por qué conservar el páramo equivale a conservar una farmacopea viva.",
       "validation_level": "claude_draft"
     },
     {
