@@ -25810,6 +25810,1410 @@
         "jbb-plantas-medicinales"
       ],
       "valor_pedagogico": "El bálsamo del Perú (Myroxylon balsamum var. pereirae (Royle) Harms, familia Fabaceae) es un árbol perennifolio de gran porte (15-30 m altura) leguminoso, fijador biológico de nitrógeno, nativo de Mesoamérica y norte de Sudamérica (El Salvador, Honduras, Nicaragua, Costa Rica, Panamá, norte de Colombia: Caribe, Magdalena medio, Magdalena bajo, piedemonte del Catatumbo). El nombre popular \"del Perú\" es uno de los errores históricos más curiosos del comercio colonial — la resina NO es peruana, sino centroamericana-norandina, pero los comerciantes coloniales españoles la embarcaban hacia Europa desde el puerto del Callao (Perú) por las rutas marítimas del Pacífico, y los compradores europeos asumieron erróneamente que la planta era peruana. Es planta hermana botánica del bálsamo de Tolú (M. balsamum var. balsamum, que SÍ es colombiano-tolimense con resina distinta) — comparten género y morfología pero difieren en la composición de la resina: el bálsamo del Perú es más oscuro, más aromático (cinamato de bencilo, benzoato de bencilo, vainillina, ácido cinámico, ácido benzoico) y más viscoso; el bálsamo de Tolú es más claro y más resinoso (ácido toluico, esteres del ácido benzoico). Ha sido producto medicinal-cosmético-ritual de gran importancia desde tiempos precolombinos en Mesoamérica (cultura maya, náhuatl-azteca — \"xochicotzotl\", usado en rituales y como antiséptico de heridas) y se exportaba a Europa desde el siglo XVI como medicamento de heridas (aún hoy es ingrediente reconocido en farmacopeas europeas como antiséptico y cicatrizante tópico). En Colombia se distribuye nativa-naturalizada en bosque seco tropical y bosque húmedo bajo del Caribe (Bolívar, Sucre, Magdalena, La Guajira semihúmeda), Magdalena medio (Antioquia, Santander), Catatumbo (Norte de Santander) y piedemonte del Magdalena bajo entre 0 y 1.800 msnm. Lección viva sobre BOTÁNICA SISTEMÁTICA, HISTORIA DEL COMERCIO COLONIAL DE RESINAS, PARES BOTÁNICOS HERMANOS y AGROFORESTERÍA MEDICINAL: el par botánico M. balsamum var. balsamum (Tolú) vs M. balsamum var. pereirae (Perú) es ejemplo perfecto de cómo dos variedades de la misma especie pueden tener perfiles bioquímicos distintos por adaptación local y deriva genética, y de cómo el nombre popular puede engañar geográficamente (bálsamo \"del Perú\" no es peruano, igual que el \"guayacán de Manizales\" no es manizalita, el \"café arábigo\" no es de Arabia, el \"Hawaiian baby woodrose\" no es hawaiana, etc.). Aplicaciones modernas: antiséptico cicatrizante tópico (formulaciones farmacéuticas reconocidas — INVIMA), ingrediente cosmético en perfumería de lujo (notas balsámicas-resinosas en perfumes orientales), fragancia ritual en sincretismo afrocaribe. Manejo agroecológico: árbol leguminoso fijador de N (30-50 kg/ha/año), excelente para sistemas agroforestales del Caribe colombiano y Magdalena medio en asocio con cacao, café, plátano hartón y leguminosas pioneras; restauración de bosque seco tropical; espaciamiento 8x8 m en producción; cosecha de resina por incisión cuidadosa NO destructiva tras 15-25 años de establecimiento. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, FAO EcoCrop, Bernal 2015 Catálogo Plantas Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia, JBB Plantas Medicinales."
+    },
+    {
+      "id": "clusia_multiflora",
+      "nombre_comun": "Gaque",
+      "nombre_comunes_regionales": [
+        "chagualo",
+        "gaque blanco",
+        "cucharo de gaque",
+        "cape"
+      ],
+      "nombre_cientifico": "Clusia multiflora Kunth",
+      "familia_botanica": "Clusiaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "alto",
+      "habito": "árbol perennifolio hemiepífito facultativo 8-20 m con hojas coriáceas crasas opuestas, látex amarillo-resinoso al corte y flores blanco-cremosas dioicas",
+      "origen": "Andes del norte de Sudamérica (Colombia, Ecuador, Venezuela, Perú): bosque alto andino de Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander, Norte de Santander en franja 2000-3200 msnm",
+      "roles_in_guild": [
+        "nurse_plant",
+        "biomass_producer",
+        "pollinator_attractor"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 2900,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 8,
+        "optimo_max": 16,
+        "max_tolerable": 22
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 85,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Propagación por semilla fresca recolectada de frutos maduros dehiscentes (cápsulas que abren liberando semillas con arilo carnoso anaranjado, dispersadas por aves frugívoras como tucanetas y mirlas). Germinación 45-90 días en sustrato turba-arena (3:1) con sombra parcial 50% y humedad constante. Trasplante a bolsa a los 4-6 meses. Plantación definitiva 12-18 meses. También por esqueje semileñoso de 20-25 cm tratado con AIB 2000 ppm (enraizamiento 40-60%). Crecimiento moderado 30-60 cm/año.",
+        "tiempo_a_establecimiento_dias": 540,
+        "notas": "Especie hemiepífita facultativa: puede germinar sobre otros árboles y eventualmente lanzar raíces al suelo (estrategia 'strangler-like' suave, sin matar al hospedante). Indica buena humedad atmosférica y suelos con hojarasca acumulada."
+      },
+      "scale_viability": [
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave para restauración del bosque alto andino en la franja 2000-3000 msnm de la Cordillera Oriental (Cruz Verde-Sumapaz, Chingaza, Iguaque, Guerrero) y de la Cordillera Central. Tolera suelos pobres con hojarasca acumulada y aporta sombra estructural a la regeneración del sotobosque.",
+          "tips": [
+            "Plantación en claros de bosque secundario con sombra parcial inicial",
+            "Asocio con weinmannia_tomentosa, quercus_humboldtii, hesperomeles_goudotiana y vallea_stipularis",
+            "Densidades 200-400 ind/ha para reconectar fragmentos de bosque alto andino",
+            "Evitar plantación en sitios totalmente expuestos al viento de páramo"
+          ]
+        }
+      },
+      "companions": [
+        "weinmannia_tomentosa",
+        "quercus_humboldtii",
+        "vallea_stipularis"
+      ],
+      "antagonists": [
+        "eucalyptus_globulus",
+        "pinus_patula"
+      ],
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "libro-rojo-plantas-colombia",
+        "humboldt-flora-alto-andina",
+        "jbb-plantas-medicinales",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El gaque o chagualo (Clusia multiflora Kunth, familia Clusiaceae) es un árbol perennifolio hemiepífito facultativo (8-20 m altura) emblemático del bosque alto andino de la Cordillera Oriental colombiana, distribuido entre 1800 y 3200 msnm en piso térmico FRÍO (Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander, Norte de Santander). Es planta nativa silvestre central para la restauración ecológica de la franja 2000-3000 msnm de Cruz Verde-Sumapaz, Chingaza, Iguaque y Guerrero, donde forma rodales mixtos con encenillo (Weinmannia tomentosa), roble (Quercus humboldtii), mortiño (Hesperomeles goudotiana) y raque (Vallea stipularis). Sus hojas coriáceas crasas opuestas (rasgo distintivo de Clusiaceae junto con el látex amarillo-resinoso al corte) son resistentes a la radiación intensa de alta montaña y a la desecación atmosférica de la estación seca. Sus flores blanco-cremosas dioicas atraen polinizadores nativos (abejas sin aguijón Meliponini, sírfidos y mariposas de alta montaña) y sus cápsulas dehiscentes con semillas de arilo carnoso anaranjado son alimento clave de aves frugívoras alto-andinas (mirlas, tucanetas esmeralda, atrapamoscas de páramo) — por eso es especie 'sombrilla' o 'paraguas ecológico': su presencia indica un bosque sano y su plantación recupera no solo la cubierta arbórea sino también la red trófica de aves dispersoras. Estrategia hemiepífita facultativa: puede germinar sobre otros árboles (epifitismo inicial sobre robles, encenillos, raques) y luego lanzar raíces aéreas al suelo formando una estructura columnar — NO mata al hospedante (a diferencia del 'strangler fig' Ficus tropical), sino que coexiste, lo que la hace ecológicamente noble. Lección viva sobre BOSQUE ALTO ANDINO, HEMIEPIFITISMO, RESTAURACIÓN DE LADERAS COLOMBIANAS y DISPERSIÓN ORNITÓCORA: el gaque es ejemplo paradigmático de cómo una especie nativa con estrategia ecológica sofisticada (hemiepífita + dioica + ornitócora) sostiene ecosistemas enteros, y de cómo su plantación en proyectos de restauración del flanco occidental de la Cordillera Oriental (Cruz Verde-Sumapaz, Chingaza) acelera la regeneración del bosque alto andino vs plantaciones monoespecíficas de pino o eucalipto que esterilizan el suelo. Manejo agroecológico: propagación por semilla fresca con sombra parcial 50%, trasplante 4-6 meses, plantación 12-18 meses; asocio con encenillo, roble andino y raque; densidades 200-400 ind/ha para reconectar fragmentos boscosos; evitar sitios expuestos al viento de páramo. Estado conservación: nativo silvestre NO amenazado pero localmente raro en sitios donde el bosque alto andino fue convertido a pastura para ganadería lechera (Sabana de Bogotá, altiplano cundiboyacense, altiplano nariñense). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Libro Rojo Plantas Colombia, Humboldt Flora Alto-Andina, JBB Plantas Medicinales, Bernal 2015 Catálogo Plantas Líquenes Colombia.",
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "clusia_grandiflora",
+      "nombre_comun": "Gaque grande",
+      "nombre_comunes_regionales": [
+        "chagualo grande",
+        "cape grande",
+        "gaque de monte",
+        "manzano de monte"
+      ],
+      "nombre_cientifico": "Clusia grandiflora Splitg.",
+      "familia_botanica": "Clusiaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "alto",
+      "habito": "árbol perennifolio 10-25 m con hojas grandes coriáceas (15-25 cm), flores blanco-rosáceas grandes (8-12 cm diámetro) y látex amarillo abundante",
+      "origen": "Norte de Sudamérica (escudo guayanés, Andes orientales): Colombia (Cundinamarca, Boyacá, Santander, Antioquia, Caquetá-piedemonte), Venezuela, Guyana, Surinam, Brasil amazónico; en Colombia bosque alto andino y subandino 1800-2800 msnm",
+      "roles_in_guild": [
+        "nurse_plant",
+        "biomass_producer",
+        "pollinator_attractor"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2000,
+        "optimo_max": 2700,
+        "max_absoluto": 2900
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 10,
+        "optimo_max": 17,
+        "max_tolerable": 24
+      },
+      "humedad_relativa_pct": {
+        "min": 70,
+        "optimo": 85,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Propagación por semilla fresca de cápsulas maduras (las semillas envueltas en arilo anaranjado son dispersadas por aves grandes — pavas, tucanetas, mirlas grandes). Germinación 60-120 días en sustrato turba-arena con sombra parcial 60%. Trasplante 6-8 meses. Plantación 18-24 meses. Esqueje semileñoso con AIB (enraizamiento 30-50%). Crecimiento lento 25-50 cm/año.",
+        "tiempo_a_establecimiento_dias": 600,
+        "notas": "Especie sucesional tardía del bosque alto andino. Indica madurez ecológica del rodal. Sus flores grandes blanco-rosáceas son entre las más vistosas de la Clusiaceae andina."
+      },
+      "scale_viability": [
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie sucesional tardía clave para restauración del bosque alto andino subhúmedo de la Cordillera Oriental (Chingaza, Cruz Verde, Iguaque) y Cordillera Central (Antioquia). Aporta estructura forestal de dosel y refugio para fauna alto-andina.",
+          "tips": [
+            "Plantación tardía en rodales restaurados ya con cobertura pionera",
+            "Asocio con clusia_multiflora, weinmannia_tomentosa, quercus_humboldtii",
+            "Densidades 100-200 ind/ha en restauración avanzada",
+            "Requiere suelos profundos con hojarasca acumulada"
+          ]
+        }
+      },
+      "companions": [
+        "clusia_multiflora",
+        "weinmannia_tomentosa",
+        "quercus_humboldtii"
+      ],
+      "antagonists": [
+        "pinus_patula",
+        "eucalyptus_globulus"
+      ],
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "Clusia grandiflora Splitg. (gaque grande, chagualo grande, cape grande — familia Clusiaceae) es un árbol perennifolio (10-25 m altura) hermano botánico de Clusia multiflora pero distinguible por sus hojas mucho más grandes (15-25 cm vs 8-15 cm) y por sus flores espectaculares blanco-rosáceas de 8-12 cm de diámetro — entre las más vistosas de las Clusiaceae andinas. Su distribución abarca el escudo guayanés-amazónico-andino oriental: Colombia (Cundinamarca, Boyacá, Santander, Antioquia, piedemonte del Caquetá), Venezuela, Guyana, Surinam, Brasil amazónico. En Colombia se encuentra en el bosque alto andino y subandino 1800-2800 msnm en piso térmico FRÍO con tendencia a templado-húmedo (zona de transición). A diferencia de su hermana C. multiflora (más generalista y tolerante), C. grandiflora es una especie SUCESIONAL TARDÍA del bosque alto andino — indica madurez ecológica del rodal y solo se establece cuando hay sombra parcial inicial, suelos profundos con hojarasca acumulada y red micorrízica activa. Por eso es especie BIOINDICADORA de bosques alto-andinos maduros y poco intervenidos. Lección viva sobre SUCESIÓN ECOLÓGICA, ESPECIES BIOINDICADORAS DE MADUREZ FORESTAL y RESTAURACIÓN POR FASES: en proyectos de restauración del bosque alto andino de la Cordillera Oriental (Cruz Verde-Sumapaz, Chingaza, Iguaque) y de la Cordillera Central (Antioquia, Cordillera Central de Caldas), C. grandiflora se planta en una FASE TARDÍA de la restauración — primero entran especies pioneras (Alnus acuminata, Sambucus peruviana, Vallea stipularis, Hesperomeles goudotiana), luego sucesionales intermedias (Weinmannia tomentosa, Clusia multiflora, Escallonia paniculata, Miconia squamulosa), y finalmente sucesionales tardías como C. grandiflora, Prumnopitys montana, Quercus humboldtii. Plantarla en sitios desnudos o sin sombra previa fracasa — confirma el principio agroecológico de que la restauración no es plantar árboles al azar sino reconstruir el SISTEMA con sus fases sucesionales en orden. Manejo agroecológico: propagación por semilla fresca con sombra parcial 60%; trasplante 6-8 meses; plantación 18-24 meses; asocio con C. multiflora, encenillo, roble andino; densidades 100-200 ind/ha en restauración avanzada; suelos profundos con hojarasca. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Bernal 2015 Catálogo Plantas Líquenes Colombia.",
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "viburnum_tinoides",
+      "nombre_comun": "Juco / Sietecueros (árbol)",
+      "nombre_comunes_regionales": [
+        "garrocho",
+        "juco de monte",
+        "jucal",
+        "guajalote"
+      ],
+      "nombre_cientifico": "Viburnum tinoides L. f.",
+      "familia_botanica": "Adoxaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "medio",
+      "habito": "árbol pequeño a mediano 4-12 m perennifolio con hojas opuestas verde-lustrosas, inflorescencias terminales en corimbo blanco-crema y frutos drupáceos negro-azulados",
+      "origen": "Andes del norte de Sudamérica (Colombia, Ecuador, Venezuela, Perú); en Colombia bosque alto andino de Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander entre 1800 y 3200 msnm",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "nurse_plant",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 3000,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 7,
+        "optimo_max": 15,
+        "max_tolerable": 22
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "esqueje",
+        "protocol_resumen": "Propagación principal por esqueje semileñoso de 15-20 cm tratado con AIB 1500-2000 ppm (enraizamiento 60-80% en sustrato turba-arena 1:1 con humedad constante y sombra 60%). Semilla fresca de drupas maduras (germinación lenta 90-150 días, requiere estratificación fría 4°C por 60 días). Trasplante a bolsa 4-6 meses. Plantación definitiva 12-15 meses. Crecimiento moderado 40-60 cm/año.",
+        "tiempo_a_establecimiento_dias": 450,
+        "notas": "Atractiva como ornamental nativa en jardines alto-andinos por su floración abundante blanco-crema y sus frutos negro-azulados que atraen aves."
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Apta como árbol nativo ornamental en huertos alto-andinos de la Sabana de Bogotá, altiplano cundiboyacense y altiplano nariñense. Floración abundante atrae polinizadores y avifauna nativa.",
+          "tips": [
+            "Plantación en hueco 60x60x60 cm con humus de lombriz",
+            "Riego moderado primer año hasta establecimiento",
+            "Sin poda formativa agresiva — respetar arquitectura natural"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie nativa clave para restauración del bosque alto andino y borde de bosque en Cruz Verde-Sumapaz, Chingaza, Iguaque, Guerrero. Aporta corredores florales para polinizadores nativos y frutos para avifauna.",
+          "tips": [
+            "Plantación en borde de bosque y matrices de pastura abandonada",
+            "Asocio con sambucus_peruviana, vallea_stipularis, hesperomeles_goudotiana",
+            "Densidades 300-500 ind/ha"
+          ]
+        }
+      },
+      "companions": [
+        "sambucus_peruviana",
+        "vallea_stipularis",
+        "hesperomeles_goudotiana"
+      ],
+      "antagonists": [
+        "eucalyptus_globulus",
+        "pinus_patula"
+      ],
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina",
+        "jbb-plantas-medicinales",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "Viburnum tinoides L. f. (juco, sietecueros arbóreo, garrocho — familia Adoxaceae, antes Caprifoliaceae) es un árbol pequeño a mediano (4-12 m altura) perennifolio nativo de los Andes del norte de Sudamérica (Colombia, Ecuador, Venezuela, Perú), distribuido en el bosque alto andino entre 1800 y 3200 msnm en piso térmico FRÍO de los departamentos de Cundinamarca, Boyacá, Antioquia, Nariño, Cauca y Santander. Es reconocible por sus hojas opuestas verde-lustrosas con nerviación pinnada marcada, sus inflorescencias terminales en corimbo de flores blanco-crema (15-25 cm de diámetro) que floran masivamente en agosto-octubre, y sus frutos drupáceos pequeños negro-azulados muy buscados por avifauna alto-andina (mirlas, semilleros, atrapamoscas, copetones andinos). El nombre 'juco' es de origen muisca-chibcha (Cundinamarca-Boyacá) y se mantiene en topónimos como Jucal y Jucales — pueblos cuya historia agrícola está ligada al bosque de jucal. El nombre 'sietecueros' es polisémico — se usa también para Tibouchina lepidota (Melastomataceae arbórea, flor morada) y para varias herbáceas con corteza exfoliante; aquí refiere específicamente al Viburnum tinoides (NO la confusión es importante destacarla en educación botánica de campo). Lección viva sobre BOTÁNICA NATIVA DEL BOSQUE ALTO ANDINO, NOMBRES POPULARES POLISÉMICOS y RESTAURACIÓN DE BORDES DE BOSQUE: el juco/sietecueros es especie clave para reconectar fragmentos boscosos en la Sabana de Bogotá, el altiplano cundiboyacense, el altiplano nariñense y la Cordillera Central, ya que tolera tanto sombra parcial (interior de bosque) como sol pleno (borde de bosque) — esta plasticidad lo hace ideal para los proyectos de restauración del flanco oriental de la Cordillera Oriental (Cruz Verde-Sumapaz, Chingaza, Iguaque, Guerrero) donde se busca densificar la matriz de pastura abandonada con corredores florales. Manejo agroecológico: propagación principal por esqueje semileñoso con AIB (60-80% enraizamiento), semilla también viable con estratificación fría; trasplante 4-6 meses; plantación 12-15 meses; crecimiento moderado 40-60 cm/año; asocio con sauco peruano (Sambucus peruviana), raque (Vallea stipularis), mortiño (Hesperomeles goudotiana); densidades 300-500 ind/ha en restauración, ornamental nativo en huertos alto-andinos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, JBB Plantas Medicinales, Bernal 2015 Catálogo Plantas Líquenes Colombia.",
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "myrcianthes_rhopaloides",
+      "nombre_comun": "Arrayán de hoja menuda",
+      "nombre_comunes_regionales": [
+        "arrayán andino",
+        "arrayán de páramo bajo",
+        "arrayancito",
+        "arrayán colorado"
+      ],
+      "nombre_cientifico": "Myrcianthes rhopaloides (Kunth) McVaugh",
+      "familia_botanica": "Myrtaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "medio",
+      "habito": "árbol perennifolio 6-15 m con corteza exfoliante anaranjado-canela, hojas pequeñas opuestas elípticas aromáticas y flores blancas pequeñas en racimos axilares",
+      "origen": "Andes de Colombia, Ecuador, Perú, Bolivia y Venezuela; en Colombia bosque alto andino de Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander, Tolima en franja 2000-3300 msnm",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "nurse_plant",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2300,
+        "optimo_max": 3000,
+        "max_absoluto": 3300
+      },
+      "temperatura_c": {
+        "helada_letal": -7,
+        "optimo_min": 7,
+        "optimo_max": 15,
+        "max_tolerable": 22
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Propagación principal por semilla fresca de bayas maduras (rojas-violáceas en madurez, despulpadas inmediatamente). Germinación 30-60 días en sustrato turba-arena con sombra parcial 50%. Trasplante 4-6 meses. Plantación 12-18 meses. Esqueje semileñoso con AIB (enraizamiento 30-50%, más difícil). Crecimiento lento 25-50 cm/año.",
+        "tiempo_a_establecimiento_dias": 540,
+        "notas": "Especie indicadora de bosque alto andino maduro. Corteza exfoliante en placas anaranjadas-canela es rasgo distintivo de las Myrtaceae andinas (compartido con eugenia y arrayanes hermanos)."
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Apta como árbol nativo ornamental aromático para huertos alto-andinos de la Sabana de Bogotá, altiplano cundiboyacense y Nariño. Hojas aromáticas usadas en infusiones digestivas; bayas comestibles.",
+          "tips": [
+            "Plantación en hueco 60x60x60 cm con humus",
+            "Riego moderado primer año",
+            "Poda formativa suave para realzar arquitectura natural"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie nativa de bosque alto andino maduro clave para restauración avanzada en Cruz Verde-Sumapaz, Chingaza y altiplano nariñense. Indicadora de madurez ecológica.",
+          "tips": [
+            "Plantación tardía en restauración (no en sitios pioneros)",
+            "Asocio con clusia_multiflora, weinmannia_tomentosa, hesperomeles_goudotiana",
+            "Densidades 150-300 ind/ha"
+          ]
+        }
+      },
+      "companions": [
+        "clusia_multiflora",
+        "weinmannia_tomentosa",
+        "hesperomeles_goudotiana"
+      ],
+      "antagonists": [
+        "eucalyptus_globulus",
+        "pinus_patula"
+      ],
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina",
+        "jbb-plantas-medicinales",
+        "libro-rojo-plantas-colombia"
+      ],
+      "valor_pedagogico": "Myrcianthes rhopaloides (Kunth) McVaugh (arrayán de hoja menuda, arrayán andino, arrayán de páramo bajo — familia Myrtaceae) es un árbol perennifolio (6-15 m altura) nativo de los Andes de Colombia, Ecuador, Perú, Bolivia y Venezuela, distribuido en el bosque alto andino entre 2000 y 3300 msnm en piso térmico FRÍO. En Colombia se encuentra en Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander y Tolima. Es reconocible por su CORTEZA EXFOLIANTE ANARANJADO-CANELA en placas (rasgo distintivo de las Myrtaceae andinas, compartido con sus hermanas Eugenia spp. y otros Myrcianthes), por sus HOJAS PEQUEÑAS OPUESTAS ELÍPTICAS AROMÁTICAS (al estrujarlas liberan aceites esenciales similares al eugenol y al pineno — son fragantes a 'monte fresco andino') y por sus flores blancas pequeñas en racimos axilares con muchos estambres (carácter típico de Myrtaceae). Sus bayas globosas pequeñas rojo-violáceas en madurez son comestibles (sabor dulce-resinoso) y muy buscadas por avifauna alto-andina (mirlas, semilleros, copetones, atrapamoscas). Lección viva sobre BOTÁNICA SISTEMÁTICA DE MYRTACEAE ANDINAS, PARES BOTÁNICOS HERMANOS y RESTAURACIÓN AVANZADA: el género Myrcianthes en Colombia incluye varias especies arbóreas alto-andinas distinguibles por tamaño y forma de hoja — M. rhopaloides (hoja menuda 2-4 cm), M. ferreyrae (hoja media, arrayán negro), M. leucoxyla (hoja grande, arrayán de monte) — y todas comparten la 'firma' de la familia: corteza exfoliante canela, hojas opuestas aromáticas, flores con muchos estambres, bayas comestibles. Es especie indicadora de bosque alto andino maduro — su presencia testifica un rodal con red micorrízica activa, hojarasca acumulada y avifauna dispersora funcional. En proyectos de restauración del flanco oriental de la Cordillera Oriental (Cruz Verde-Sumapaz, Chingaza) y del altiplano nariñense se planta en FASE AVANZADA de la sucesión, después de pioneras (Alnus, Sambucus, Vallea) y sucesionales intermedias (Weinmannia, Clusia multiflora, Escallonia). Etnobotánica: las hojas se usan en infusión digestiva-carminativa en pueblos campesinos del altiplano cundiboyacense, y las bayas en compotas caseras. Manejo agroecológico: propagación por semilla fresca con sombra parcial 50%; trasplante 4-6 meses; plantación 12-18 meses; crecimiento lento 25-50 cm/año; asocio con encenillo, gaque y mortiño; densidades 150-300 ind/ha en restauración avanzada. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, JBB Plantas Medicinales, Libro Rojo Plantas Colombia.",
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "morella_pubescens",
+      "nombre_comun": "Laurel de cera",
+      "nombre_comunes_regionales": [
+        "mirto",
+        "olivo de cera",
+        "laurel",
+        "cera de monte",
+        "olivo silvestre andino"
+      ],
+      "nombre_cientifico": "Morella pubescens (Humb. & Bonpl. ex Willd.) Wilbur",
+      "familia_botanica": "Myricaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "medio",
+      "habito": "árbol perennifolio dioico 4-12 m con hojas alternas lanceoladas pubescentes, flores diminutas verdes en amentos y drupas globosas pequeñas cubiertas de cera blanco-azulada extraíble",
+      "origen": "Andes de Colombia, Ecuador, Perú, Bolivia, Venezuela y Centroamérica (Costa Rica, Panamá montañas altas); en Colombia bosque alto andino y subandino de Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Tolima, Santander entre 1800 y 3300 msnm",
+      "roles_in_guild": [
+        "nitrogen_fixer",
+        "nurse_plant",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 3000,
+        "max_absoluto": 3300
+      },
+      "temperatura_c": {
+        "helada_letal": -7,
+        "optimo_min": 8,
+        "optimo_max": 15,
+        "max_tolerable": 22
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Propagación por semilla fresca de drupas maduras despojadas de cera por lavado en agua tibia con jabón orgánico (la cera inhibe la germinación). Germinación 45-90 días en sustrato turba-arena. Trasplante 4-6 meses. Plantación 12-15 meses. Esqueje semileñoso con AIB (enraizamiento 40-60%). Crecimiento moderado 50-80 cm/año en sitios óptimos.",
+        "tiempo_a_establecimiento_dias": 450,
+        "notas": "Especie fijadora de nitrógeno mediante simbiosis con actinobacterias Frankia (rasgo poco común fuera de Fabaceae, compartido con Alnus). Las drupas cubiertas de cera blanco-azulada son extraíbles por inmersión en agua hirviendo y han sido fuente histórica de cera natural para velas y barnices artesanales."
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Apta como árbol nativo multiusos en huertos alto-andinos: fijador de nitrógeno NO leguminoso, sombra ligera, cera artesanal de las drupas, atrayente de avifauna.",
+          "tips": [
+            "Plantación en hueco 60x60x60 cm con humus",
+            "Aprovechamiento de cera de drupas 1 vez/año en madurez",
+            "Asocio con frutales del altiplano"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie nativa pionera-fijadora de N clave para restauración de suelos degradados en la Cordillera Oriental (Cruz Verde-Sumapaz, Chingaza, Iguaque) y Cordillera Central. Mejora suelo para sucesionales tardías.",
+          "tips": [
+            "Plantación pionera junto con aliso (Alnus acuminata)",
+            "Asocio con sambucus_peruviana, vallea_stipularis",
+            "Densidades 400-600 ind/ha en suelos degradados"
+          ]
+        }
+      },
+      "companions": [
+        "alnus_acuminata",
+        "sambucus_peruviana",
+        "vallea_stipularis"
+      ],
+      "antagonists": [
+        "eucalyptus_globulus",
+        "pinus_patula"
+      ],
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina",
+        "jbb-plantas-medicinales",
+        "perez-arbelaez-1947-plantas-utiles",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "Morella pubescens (Humb. & Bonpl. ex Willd.) Wilbur (laurel de cera, mirto, olivo de cera — familia Myricaceae) es un árbol perennifolio dioico (4-12 m altura) nativo de los Andes (Colombia, Ecuador, Perú, Bolivia, Venezuela) y de las montañas altas de Costa Rica y Panamá, distribuido en bosque alto andino y subandino entre 1800 y 3300 msnm en piso térmico FRÍO. En Colombia se encuentra en Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Tolima y Santander. Tiene DOS rasgos extraordinariamente interesantes para la pedagogía agroecológica: (1) es FIJADOR BIOLÓGICO DE NITRÓGENO mediante simbiosis con actinobacterias del género Frankia en nódulos radiculares — un rasgo poco común FUERA de la familia Fabaceae, compartido en Colombia solo con el aliso (Alnus acuminata, también Frankia-fijador) — esto la hace especie clave para restaurar suelos andinos degradados sin necesidad de leguminosas; (2) sus DRUPAS GLOBOSAS PEQUEÑAS están cubiertas de una capa de CERA NATURAL BLANCO-AZULADA EXTRAÍBLE por inmersión en agua hirviendo, que ha sido históricamente fuente de cera artesanal para velas, barnices y selladores en el altiplano cundiboyacense, en Boyacá colonial-republicano y en el altiplano nariñense — la 'cera de mirto' o 'cera de laurel' figura en relatos coloniales de José Celestino Mutis y Pérez-Arbeláez como producto rural de exportación menor desde los Andes colombianos hacia el Caribe en el siglo XIX. Lección viva sobre FIJACIÓN DE N NO-LEGUMINOSA, PRODUCTOS NATURALES ANDINOS y RESTAURACIÓN PIONERA: el laurel de cera es ejemplo paradigmático de cómo una especie pionera con doble servicio (fijación de N + producto natural útil) acelera la restauración de suelos degradados en la Cordillera Oriental (Cruz Verde-Sumapaz, Chingaza, Iguaque, Guerrero) y en la Cordillera Central de Antioquia y Caldas. Se planta en FASE PIONERA junto con aliso (Alnus acuminata), sauco peruano (Sambucus peruviana) y raque (Vallea stipularis) — los dos fijadores de N (laurel y aliso) cargan el suelo de nitrógeno disponible, las pioneras de copa amplia (sauco, raque) aportan sombra parcial, y se prepara el terreno para las sucesionales intermedias y tardías. Etnobotánica viva: extracción de cera de drupas en Boyacá rural (Tunja, Villa de Leyva, Sutamarchán) para velas artesanales y selladores de madera; hojas en infusión astringente. Manejo agroecológico: propagación por semilla fresca con lavado previo para remover cera; trasplante 4-6 meses; plantación 12-15 meses; crecimiento moderado 50-80 cm/año; asocio con aliso y sauco; densidades 400-600 ind/ha en restauración pionera de suelos degradados. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, JBB Plantas Medicinales, Pérez-Arbeláez 1947 Plantas Útiles Colombia, Bernal 2015 Catálogo Plantas Líquenes Colombia.",
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "freziera_canescens",
+      "nombre_comun": "Freziera",
+      "nombre_comunes_regionales": [
+        "freziera de monte",
+        "cucharo de bosque nublado",
+        "encinillo de freziera"
+      ],
+      "nombre_cientifico": "Freziera canescens Bonpl.",
+      "familia_botanica": "Pentaphylacaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "medio",
+      "habito": "árbol perennifolio 5-15 m con hojas alternas elípticas pubescentes blanquecinas en el envés, flores blancas pequeñas axilares y bayas globosas pequeñas negro-violáceas",
+      "origen": "Andes de Colombia, Ecuador, Perú, Venezuela; en Colombia bosque nublado alto andino de Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander entre 2000 y 3200 msnm",
+      "roles_in_guild": [
+        "nurse_plant",
+        "pollinator_attractor",
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2300,
+        "optimo_max": 2900,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 8,
+        "optimo_max": 15,
+        "max_tolerable": 22
+      },
+      "humedad_relativa_pct": {
+        "min": 75,
+        "optimo": 90,
+        "max": 98
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Propagación por semilla fresca de bayas maduras negro-violáceas, despulpadas y sembradas inmediatamente en sustrato turba-musgo con sombra densa 75% y humedad atmosférica alta 90%. Germinación 60-120 días. Trasplante 6-8 meses. Plantación 18-24 meses. Esqueje muy difícil (enraizamiento <20%). Crecimiento lento 20-40 cm/año.",
+        "tiempo_a_establecimiento_dias": 600,
+        "notas": "Especie INDICADORA de bosque nublado andino bien conservado. Requiere niebla persistente y humedad atmosférica >85%. NO se establece en sitios secos o expuestos."
+      },
+      "scale_viability": [
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie indicadora de bosque nublado andino maduro. Clave para restauración avanzada en franja húmeda alta de Chingaza, Cruz Verde-Sumapaz oriental, Tatamá y reservas del Eje Cafetero. NO viable en sitios expuestos.",
+          "tips": [
+            "Plantación tardía en restauración con cobertura previa establecida",
+            "Asocio con clusia_multiflora, weinmannia_tomentosa, prumnopitys_montana",
+            "Densidades 100-200 ind/ha en bosque nublado húmedo",
+            "Evitar plantación en bordes secos o sitios sin niebla"
+          ]
+        }
+      },
+      "companions": [
+        "clusia_multiflora",
+        "weinmannia_tomentosa",
+        "prumnopitys_montana"
+      ],
+      "antagonists": [
+        "eucalyptus_globulus",
+        "pinus_patula"
+      ],
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "Freziera canescens Bonpl. (freziera, cucharo de bosque nublado — familia Pentaphylacaceae, antes clasificada en Theaceae) es un árbol perennifolio (5-15 m altura) nativo de los Andes del norte de Sudamérica (Colombia, Ecuador, Perú, Venezuela), distribuido en BOSQUE NUBLADO alto andino entre 2000 y 3200 msnm en piso térmico FRÍO HÚMEDO con niebla persistente. En Colombia se encuentra en Cundinamarca, Boyacá, Antioquia, Nariño, Cauca y Santander, con poblaciones notables en Chingaza, en el flanco oriental húmedo de Cruz Verde-Sumapaz, en Tatamá, en el Parque Otún-Quimbaya y en reservas del Eje Cafetero alto. Es reconocible por sus hojas alternas elípticas con PUBESCENCIA BLANQUECINA EN EL ENVÉS (rasgo distintivo — al voltear la hoja se ve plateada-blanquecina por los tricomas finos que atrapan gotas de niebla y reducen la transpiración foliar), por sus flores blancas pequeñas axilares cuatrímeras-pentámeras y por sus bayas globosas pequeñas negro-violáceas (alimento de avifauna nublada — atrapamoscas, mirlas pequeñas, semilleros). Lección viva sobre BOSQUE NUBLADO ANDINO, ADAPTACIONES ANATÓMICAS A LA NIEBLA y BIOINDICACIÓN ECOLÓGICA: la freziera es ESPECIE INDICADORA de bosque nublado andino bien conservado — su presencia testifica un rodal con niebla persistente >150 días/año, humedad relativa atmosférica >85% y red micorrízica fúngica funcional. Su pubescencia foliar blanquecina es una adaptación anatómica fina para capturar agua de niebla por intercepción foliar (un fenómeno que en ingeniería ecológica se llama 'horizontal precipitation' o 'fog drip' — los bosques de freziera y otras especies de hoja pubescente AUMENTAN el aporte hídrico local de un 15-30% sobre la precipitación medida en pluviómetros, dato relevante para el balance hídrico de cuencas abastecedoras como la del río Tunjuelo en Sumapaz o la del río Teusacá en Chingaza). En restauración, la freziera se planta en FASE TARDÍA del bosque nublado, después de pioneras y sucesionales intermedias, en sitios con niebla persistente — fracasa si se planta en bordes secos o cortafuegos. Manejo agroecológico: propagación por semilla fresca con sombra densa 75% y humedad alta; trasplante 6-8 meses; plantación 18-24 meses; crecimiento lento 20-40 cm/año; asocio con gaque, encenillo y pino romerón (Prumnopitys montana); densidades 100-200 ind/ha; restauración del bosque nublado húmedo de Chingaza, Cruz Verde-Sumapaz oriental, Tatamá, Otún-Quimbaya. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Bernal 2015 Catálogo Plantas Líquenes Colombia.",
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "oreopanax_incisus",
+      "nombre_comun": "Mano de oso de páramo bajo",
+      "nombre_comunes_regionales": [
+        "mano de oso",
+        "pata de gallina arbórea",
+        "mano de león",
+        "higueron de monte"
+      ],
+      "nombre_cientifico": "Oreopanax incisus (Willd. ex Roem. & Schult.) Decne. & Planch.",
+      "familia_botanica": "Araliaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "alto",
+      "habito": "árbol perennifolio 8-20 m con hojas alternas grandes palmatilobadas-incisas (15-30 cm de diámetro), inflorescencia paniculada terminal de umbelas y frutos drupáceos pequeños negros",
+      "origen": "Andes de Colombia, Ecuador, Venezuela, Perú; en Colombia bosque alto andino y subpáramo de Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander entre 2000 y 3400 msnm",
+      "roles_in_guild": [
+        "nurse_plant",
+        "pollinator_attractor",
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2400,
+        "optimo_max": 3100,
+        "max_absoluto": 3400
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 6,
+        "optimo_max": 14,
+        "max_tolerable": 20
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 85,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Propagación por semilla fresca de drupas maduras negras, despulpadas y sembradas inmediatamente en sustrato turba-arena con sombra parcial 50%. Germinación 60-120 días. Trasplante 6-8 meses. Plantación 18-24 meses. Esqueje semileñoso con AIB (enraizamiento 30-50%). Crecimiento lento-moderado 30-50 cm/año.",
+        "tiempo_a_establecimiento_dias": 600,
+        "notas": "Especie típica de la franja de transición bosque alto andino — subpáramo (2800-3400 msnm). Sus hojas grandes palmatilobadas son reconocibles 'desde lejos' — silueta inconfundible en el dosel andino."
+      },
+      "scale_viability": [
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave para restauración de la franja de transición bosque alto andino — subpáramo en Cruz Verde-Sumapaz (2800-3400 msnm), Chingaza, Iguaque, Guerrero y altiplano nariñense. Tolera heladas moderadas y suelos esqueléticos andinos.",
+          "tips": [
+            "Plantación en franja de transición bosque-páramo",
+            "Asocio con clusia_multiflora, weinmannia_tomentosa, hesperomeles_goudotiana, polylepis_quadrijuga",
+            "Densidades 200-400 ind/ha",
+            "Protección contra heladas el primer año con mulch grueso"
+          ]
+        }
+      },
+      "companions": [
+        "weinmannia_tomentosa",
+        "clusia_multiflora",
+        "hesperomeles_goudotiana"
+      ],
+      "antagonists": [
+        "eucalyptus_globulus",
+        "pinus_patula"
+      ],
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "jbb-plantas-medicinales"
+      ],
+      "valor_pedagogico": "Oreopanax incisus (Willd. ex Roem. & Schult.) Decne. & Planch. (mano de oso, pata de gallina arbórea, mano de león — familia Araliaceae) es un árbol perennifolio (8-20 m altura) nativo de los Andes (Colombia, Ecuador, Venezuela, Perú), distribuido en bosque alto andino y subpáramo entre 2000 y 3400 msnm en piso térmico FRÍO con tolerancia a heladas leves. En Colombia se encuentra en Cundinamarca, Boyacá, Antioquia, Nariño, Cauca y Santander. El género Oreopanax es endemismo neotropical-andino con varias especies hermanas en Colombia (O. incisus, O. floribundus, O. capitatus, O. cundinamarcensis) — todas reconocibles por sus HOJAS GRANDES PALMATILOBADAS-INCISAS de 15-30 cm de diámetro que recuerdan vagamente la 'mano de un oso' o la 'pata de una gallina gigante' (de ahí los nombres populares). Las hojas dispuestas alternas en ramas gruesas y la INFLORESCENCIA TERMINAL PANICULADA DE UMBELAS (rasgo típico de Araliaceae junto con ginseng, hiedra y aralia) producen abundantes drupas pequeñas negras muy buscadas por avifauna alto-andina, tucanetas esmeralda, mirlas patiblancas y atrapamoscas. Lección viva sobre BOTÁNICA DE ARALIACEAE NEOTROPICALES, FRANJA DE TRANSICIÓN BOSQUE-PÁRAMO y RESTAURACIÓN ECOTONAL: el mano de oso es ESPECIE TÍPICA DE ECOTONO — la franja de transición entre el bosque alto andino y el subpáramo (2800-3400 msnm) en la Cordillera Oriental colombiana es uno de los ecotonos más biodiversos del país, y O. incisus es indicador estructural de ese ecotono. En restauración de Cruz Verde-Sumapaz, Chingaza, Iguaque y Guerrero, el mano de oso se planta en la FRANJA SUPERIOR (2800-3400 msnm) donde otras especies de bosque alto andino ya no prosperan, junto con queñoa (Polylepis quadrijuga), encenillo, gaque y mortiño — formando un mosaico estructural de bosque enano subpáramo que es resistente a heladas, retiene agua de niebla y protege la cabecera de cuenca. Etnobotánica: hojas grandes usadas como envolventes para envueltos de masa en pueblos campesinos del altiplano cundiboyacense (tradición pre-hojas de plátano en el frío); corteza astringente en cocimientos antidiarreicos. Manejo agroecológico: propagación por semilla fresca con sombra parcial; trasplante 6-8 meses; plantación 18-24 meses; crecimiento 30-50 cm/año; asocio con queñoa, encenillo y mortiño en restauración ecotonal; densidades 200-400 ind/ha; protección anti-heladas con mulch grueso el primer año. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, JBB Plantas Medicinales.",
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "axinaea_macrophylla",
+      "nombre_comun": "Pámpano",
+      "nombre_comunes_regionales": [
+        "tuno macho",
+        "tuno",
+        "pámpano de monte",
+        "siete cueros macho"
+      ],
+      "nombre_cientifico": "Axinaea macrophylla (Naudin) Triana",
+      "familia_botanica": "Melastomataceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "medio",
+      "habito": "árbol perennifolio 5-12 m con hojas grandes opuestas (15-25 cm) con nerviación pentanervia-marcada (rasgo Melastomataceae) y flores tetrámeras blanco-rosáceas con estambres modificados glandulares",
+      "origen": "Andes de Colombia, Ecuador y norte de Perú; en Colombia bosque alto andino de Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander, Tolima entre 2000 y 3200 msnm",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "nurse_plant",
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2300,
+        "optimo_max": 2900,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 8,
+        "optimo_max": 15,
+        "max_tolerable": 22
+      },
+      "humedad_relativa_pct": {
+        "min": 70,
+        "optimo": 85,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Propagación por semilla fresca de cápsulas maduras (semillas diminutas, miles por gramo — siembra superficial). Germinación 30-60 días en sustrato turba-arena con sombra parcial 50% y humedad constante. Trasplante 4-6 meses. Plantación 12-18 meses. Esqueje semileñoso con AIB (enraizamiento 40-60%). Crecimiento moderado 40-60 cm/año.",
+        "tiempo_a_establecimiento_dias": 450,
+        "notas": "Polinización ORNITÓFILA única — los estambres modificados glandulares funcionan como 'biofuelles' que disparan polen a las aves polinizadoras (mirlas, atrapamoscas, copetones andinos) cuando muerden el apéndice estaminal. Mecanismo de polinización extraordinario descrito por Dellinger et al. 2014 (Naturwissenschaften)."
+      },
+      "scale_viability": [
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave para restauración del bosque alto andino y borde de bosque-páramo en Cruz Verde-Sumapaz, Chingaza, Iguaque, Tatamá. Aporta polinización ornitófila única que sostiene la red trófica de aves alto-andinas.",
+          "tips": [
+            "Plantación en borde de bosque y sotobosque abierto",
+            "Asocio con clusia_multiflora, weinmannia_tomentosa, miconia_squamulosa",
+            "Densidades 200-400 ind/ha",
+            "Polinización requiere avifauna nativa — restauración multiespecífica"
+          ]
+        }
+      },
+      "companions": [
+        "clusia_multiflora",
+        "weinmannia_tomentosa",
+        "miconia_squamulosa"
+      ],
+      "antagonists": [
+        "eucalyptus_globulus",
+        "pinus_patula"
+      ],
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "Axinaea macrophylla (Naudin) Triana (pámpano, tuno macho — familia Melastomataceae) es un árbol perennifolio (5-12 m altura) nativo de los Andes de Colombia, Ecuador y norte de Perú, distribuido en bosque alto andino entre 2000 y 3200 msnm en piso térmico FRÍO. En Colombia se encuentra en Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander y Tolima. Es reconocible por sus HOJAS GRANDES OPUESTAS (15-25 cm) con NERVIACIÓN PENTANERVIA MARCADA (3-5 nervios principales que corren paralelos desde la base hasta el ápice — el rasgo más distintivo de las Melastomataceae a nivel mundial, presente también en mortiño, tuno hembra Miconia spp., sietecueros Tibouchina, mayos Meriania spp.) y por sus FLORES TETRÁMERAS BLANCO-ROSÁCEAS con un mecanismo de polinización ORNITÓFILO ÚNICO DESCUBIERTO RECIENTEMENTE — los estambres tienen apéndices glandulares modificados que funcionan como BIOFUELLES o 'aerosoles biológicos': cuando un ave polinizadora (mirla, atrapamoscas, copetón andino) muerde el apéndice estaminal para alimentarse del tejido glandular azucarado, la presión mecánica de la mordida DISPARA UN CHORRO DE POLEN al pico y plumas del ave, asegurando la polinización cruzada. Este mecanismo fue descrito formalmente por Agnes Dellinger et al. 2014 (Naturwissenschaften 101:545-559) como uno de los mecanismos de polinización ornitófila más sofisticados conocidos en plantas con flores tetrámeras — antes se creía que solo las aves del Viejo Mundo y las flores zigomorfas con néctar profundo lograban tal precisión. Lección viva sobre POLINIZACIÓN ORNITÓFILA EXÓTICA, COEVOLUCIÓN PLANTA-AVE ANDINA y RESTAURACIÓN MULTIESPECÍFICA: el pámpano es ejemplo paradigmático de cómo una especie nativa tiene una red ecológica obligada con su polinizador ave — sin avifauna alto-andina (mirlas, atrapamoscas, copetones, semilleros) NO hay reproducción sexual del pámpano. Esto refuerza el principio agroecológico de que la restauración multiespecífica del bosque alto andino debe incluir simultáneamente la vegetación, el suelo Y la fauna — plantar pámpano en una matriz sin avifauna fracasa biológicamente. En proyectos de restauración del flanco occidental de Cruz Verde-Sumapaz, Chingaza, Iguaque y Tatamá, el pámpano se planta en borde de bosque y sotobosque abierto, asociado con gaque, encenillo y mortiño, para reconstruir la red trófica completa. Manejo agroecológico: propagación por semilla fresca con siembra superficial (semillas diminutas); trasplante 4-6 meses; plantación 12-18 meses; crecimiento 40-60 cm/año; densidades 200-400 ind/ha; restauración multiespecífica con avifauna nativa. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Bernal 2015 Catálogo Plantas Líquenes Colombia.",
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "clethra_fagifolia",
+      "nombre_comun": "Laurel hojiancho",
+      "nombre_comunes_regionales": [
+        "clethra",
+        "laurel de monte",
+        "clethra colombiana",
+        "amarguero"
+      ],
+      "nombre_cientifico": "Clethra fagifolia Kunth",
+      "familia_botanica": "Clethraceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "medio",
+      "habito": "árbol perennifolio 6-15 m con hojas alternas grandes obovado-elípticas (10-18 cm) recordando hojas de Fagus (haya europea), inflorescencia terminal en racimo de flores blancas pequeñas fragantes",
+      "origen": "Andes del norte de Sudamérica (Colombia, Ecuador, Venezuela, norte de Perú); en Colombia bosque alto andino de Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander entre 2000 y 3100 msnm",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "nurse_plant",
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2300,
+        "optimo_max": 2900,
+        "max_absoluto": 3100
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 8,
+        "optimo_max": 15,
+        "max_tolerable": 22
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 85,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Propagación por semilla fresca de cápsulas maduras (semillas pequeñas, siembra superficial en sustrato turba-arena 1:1). Germinación 45-90 días con sombra parcial 50%. Trasplante 5-7 meses. Plantación 15-20 meses. Esqueje semileñoso con AIB (enraizamiento 30-50%). Crecimiento moderado 40-60 cm/año.",
+        "tiempo_a_establecimiento_dias": 540,
+        "notas": "Familia Clethraceae es monogenérica (solo Clethra) — par botánico raro y didáctico. Sus inflorescencias blancas fragantes atraen abejas nativas Meliponini y sírfidos alto-andinos."
+      },
+      "scale_viability": [
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave para restauración del bosque alto andino en Cruz Verde-Sumapaz, Chingaza, Iguaque y la Cordillera Central de Antioquia. Aporta floración masiva blanca fragante y refugio para polinizadores nativos.",
+          "tips": [
+            "Plantación en interior de rodal restaurado con cobertura previa",
+            "Asocio con clusia_multiflora, weinmannia_tomentosa, viburnum_tinoides",
+            "Densidades 200-300 ind/ha",
+            "Aprovechar floración masiva para corredores polinizadores"
+          ]
+        }
+      },
+      "companions": [
+        "clusia_multiflora",
+        "weinmannia_tomentosa",
+        "viburnum_tinoides"
+      ],
+      "antagonists": [
+        "eucalyptus_globulus",
+        "pinus_patula"
+      ],
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "Clethra fagifolia Kunth (laurel hojiancho, clethra colombiana — familia Clethraceae) es un árbol perennifolio (6-15 m altura) nativo de los Andes del norte de Sudamérica (Colombia, Ecuador, Venezuela, norte de Perú), distribuido en bosque alto andino entre 2000 y 3100 msnm en piso térmico FRÍO. En Colombia se encuentra en Cundinamarca, Boyacá, Antioquia, Nariño, Cauca y Santander. La familia CLETHRACEAE es botánicamente especial — es una FAMILIA MONOGENÉRICA, es decir, contiene UN SOLO GÉNERO (Clethra) con aproximadamente 75 especies distribuidas en las montañas tropicales y subtropicales de América, Asia (Malasia, Filipinas, China) y la isla de Madeira. Esta distribución biogeográfica DISYUNTA es típica de linajes antiguos gondwánicos-laurásicos que se fragmentaron con la deriva continental — Clethra es por tanto un 'fósil viviente' de las floras paleotropicales del Cretácico-Paleógeno. El epíteto 'fagifolia' significa 'hoja de haya' por la similitud morfológica con las hojas obovado-elípticas de Fagus sylvatica (haya europea) — pero NO hay relación filogenética (es convergencia evolutiva). Las flores blancas pequeñas en racimos terminales (15-30 cm de largo) son MASIVAMENTE FRAGANTES (aroma dulce a miel-cera-vainilla) y constituyen uno de los recursos florales más importantes para la avifauna polinizadora y las abejas nativas Meliponini (Trigona, Tetragonisca, Plebeia) del bosque alto andino en agosto-octubre. Lección viva sobre BIOGEOGRAFÍA DISYUNTA, FAMILIAS MONOGENÉRICAS y FLORES MELÍFERAS DEL BOSQUE ALTO ANDINO: la clethra es ejemplo paradigmático de cómo una especie aparentemente 'menor' del bosque colombiano pertenece a un linaje antiguo de distribución gondwánica-laurásica, y de cómo su floración masiva sostiene a las abejas sin aguijón Meliponini — polinizadores nativos críticos para la red ecológica de la Sabana de Bogotá, el altiplano cundiboyacense y la Cordillera Central. En restauración de Cruz Verde-Sumapaz, Chingaza, Iguaque y la Cordillera Central de Antioquia, la clethra se planta en interior de rodal restaurado con cobertura previa, asociada con gaque, encenillo y juco/sietecueros (Viburnum tinoides), formando corredores florales para polinizadores nativos. Manejo agroecológico: propagación por semilla fresca con sombra parcial 50%; trasplante 5-7 meses; plantación 15-20 meses; crecimiento 40-60 cm/año; densidades 200-300 ind/ha. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Bernal 2015 Catálogo Plantas Líquenes Colombia.",
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "ilex_kunthiana",
+      "nombre_comun": "Palo de zorro",
+      "nombre_comunes_regionales": [
+        "ilex de Kunth",
+        "palo de zorro andino",
+        "acebo andino",
+        "huesito",
+        "cargadero"
+      ],
+      "nombre_cientifico": "Ilex kunthiana Triana",
+      "familia_botanica": "Aquifoliaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "medio",
+      "habito": "árbol perennifolio dioico 6-15 m con hojas alternas coriáceas elípticas con margen serrulado-espinuloso, flores blancas pequeñas dioicas y drupas globosas pequeñas rojo-violáceas",
+      "origen": "Andes de Colombia, Ecuador, Venezuela, Perú; en Colombia bosque alto andino de Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander, Tolima entre 2000 y 3200 msnm",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "nurse_plant",
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2300,
+        "optimo_max": 2900,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -7,
+        "optimo_min": 7,
+        "optimo_max": 15,
+        "max_tolerable": 22
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 85,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Propagación por semilla fresca de drupas maduras rojo-violáceas, despulpadas y sometidas a estratificación fría 4°C por 60-90 días para romper dormancia. Germinación 90-180 días en sustrato turba-arena. Trasplante 6-8 meses. Plantación 18-24 meses. Esqueje semileñoso con AIB (enraizamiento 30-50%). Crecimiento lento 25-40 cm/año.",
+        "tiempo_a_establecimiento_dias": 600,
+        "notas": "Especie DIOICA — requiere plantar ejemplares masculinos y femeninos para producción de drupas. Las drupas atraen avifauna alto-andina (mirlas, tucanetas, atrapamoscas)."
+      },
+      "scale_viability": [
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie nativa clave para restauración del bosque alto andino en Cruz Verde-Sumapaz, Chingaza, Iguaque y altiplano nariñense. Drupas alimento crítico para avifauna en estación seca.",
+          "tips": [
+            "Plantación con proporción 1 macho : 4-5 hembras para producción de drupas",
+            "Asocio con clusia_multiflora, weinmannia_tomentosa, hesperomeles_goudotiana",
+            "Densidades 200-300 ind/ha",
+            "Crecimiento lento — paciencia 5-10 años para dosel"
+          ]
+        }
+      },
+      "companions": [
+        "clusia_multiflora",
+        "weinmannia_tomentosa",
+        "hesperomeles_goudotiana"
+      ],
+      "antagonists": [
+        "eucalyptus_globulus",
+        "pinus_patula"
+      ],
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "Ilex kunthiana Triana (palo de zorro, acebo andino, huesito — familia Aquifoliaceae) es un árbol perennifolio DIOICO (6-15 m altura) nativo de los Andes (Colombia, Ecuador, Venezuela, Perú), distribuido en bosque alto andino entre 2000 y 3200 msnm en piso térmico FRÍO. En Colombia se encuentra en Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander y Tolima. La familia AQUIFOLIACEAE es monogenérica de gran trascendencia botánica — el género Ilex incluye al acebo europeo (Ilex aquifolium, sagrado para los celtas y emblema navideño europeo desde el medievo), al yerba mate sudamericano (Ilex paraguariensis, base de la infusión cultural rioplatense), al té de yaupon norteamericano (Ilex vomitoria, infusión ritual y cafeinada de los indios algonquinos del sureste de EEUU) y a este palo de zorro andino — TODAS las especies de Ilex comparten morfología similar (hojas coriáceas alternas con margen variable, flores dioicas pequeñas, drupas globosas pequeñas) y muchas contienen CAFEÍNA Y TEOBROMINA (los alcaloides estimulantes que han hecho del mate, té y café las bebidas más consumidas del mundo). Aunque NO está documentado que Ilex kunthiana se haya usado tradicionalmente como bebida estimulante en Colombia (a diferencia del mate argentino-paraguayo), su pertenencia al género Ilex la hace candidata interesante para investigación etnofarmacológica andina. Su epíteto 'kunthiana' honra a Karl Sigismund Kunth (1788-1850), el botánico alemán colaborador de Humboldt y Bonpland que describió cientos de especies de la flora de Colombia, Venezuela y Ecuador en la obra 'Nova Genera et Species Plantarum' (1815-1825) — fundacional para la botánica neotropical. Lección viva sobre BOTÁNICA SISTEMÁTICA DE ILEX, COSMOPOLITISMO DE LA AQUIFOLIACEAE y HISTORIA DE LA BOTÁNICA COLOMBIANA: el palo de zorro andino es ejemplo paradigmático de cómo una especie aparentemente menor del bosque colombiano pertenece a un género cosmopolita (acebo europeo + mate sudamericano + té yaupon norteamericano) con valor cultural, medicinal y económico global. Como especie DIOICA, la restauración requiere plantar proporción 1 macho : 4-5 hembras para asegurar producción de drupas — error frecuente en proyectos es plantar solo hembras y no obtener fruta. En restauración de Cruz Verde-Sumapaz, Chingaza, Iguaque y altiplano nariñense, las drupas rojo-violáceas son ALIMENTO CRÍTICO para avifauna alto-andina (mirlas patiblancas, tucanetas esmeralda, atrapamoscas, copetones) en la estación seca diciembre-marzo cuando otros frutos escasean. Manejo agroecológico: propagación por semilla fresca con estratificación fría 60-90 días; trasplante 6-8 meses; plantación 18-24 meses; crecimiento lento 25-40 cm/año; proporción dioica 1M:4-5H; densidades 200-300 ind/ha; restauración alto-andina con vista a alimento de avifauna en seca. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Bernal 2015 Catálogo Plantas Líquenes Colombia.",
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "weinmannia_pubescens",
+      "nombre_comun": "Encenillo pubescente",
+      "nombre_comunes_regionales": [
+        "encino pubescente",
+        "encenillo de hoja peluda",
+        "encenillo blanco"
+      ],
+      "nombre_cientifico": "Weinmannia pubescens Kunth",
+      "familia_botanica": "Cunoniaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "alto",
+      "habito": "árbol perennifolio 8-18 m con hojas opuestas pinnadas con foliolos pubescentes (rasgo distintivo vs W. tomentosa), inflorescencia terminal en racimo de flores blanco-cremosas y cápsulas pequeñas dehiscentes",
+      "origen": "Andes de Colombia, Ecuador, Venezuela, Perú; en Colombia bosque alto andino de Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander entre 2000 y 3300 msnm",
+      "roles_in_guild": [
+        "nurse_plant",
+        "pollinator_attractor",
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2300,
+        "optimo_max": 3000,
+        "max_absoluto": 3300
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 7,
+        "optimo_max": 14,
+        "max_tolerable": 22
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 85,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Propagación por semilla fresca de cápsulas dehiscentes (semillas diminutas, miles por gramo, dispersión por viento). Germinación 30-60 días en sustrato turba-musgo con humedad alta y sombra parcial 60%. Requiere inoculación micorrízica con sustrato de bosque nativo para prosperar. Trasplante 5-7 meses. Plantación 12-18 meses. Crecimiento moderado 50-70 cm/año.",
+        "tiempo_a_establecimiento_dias": 540,
+        "notas": "Especie hermana de Weinmannia tomentosa pero distinguible por la pubescencia más densa de los foliolos. Coexisten en muchos rodales del bosque alto andino formando complejos de encenillos."
+      },
+      "scale_viability": [
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie nativa clave del bosque alto andino para restauración de Cruz Verde-Sumapaz, Chingaza, Iguaque y altiplano nariñense. Forma complejos de encenillos junto con W. tomentosa, W. microphylla y W. rollottii.",
+          "tips": [
+            "Plantación en franja de bosque alto andino 2300-3000 msnm",
+            "Asocio con weinmannia_tomentosa, weinmannia_microphylla, clusia_multiflora",
+            "Densidades 300-500 ind/ha — clave estructural",
+            "Inoculación micorrízica con sustrato de bosque nativo"
+          ]
+        }
+      },
+      "companions": [
+        "weinmannia_tomentosa",
+        "weinmannia_microphylla",
+        "clusia_multiflora"
+      ],
+      "antagonists": [
+        "eucalyptus_globulus",
+        "pinus_patula"
+      ],
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "Weinmannia pubescens Kunth (encenillo pubescente, encino pubescente — familia Cunoniaceae) es un árbol perennifolio (8-18 m altura) nativo de los Andes (Colombia, Ecuador, Venezuela, Perú), distribuido en bosque alto andino entre 2000 y 3300 msnm en piso térmico FRÍO. En Colombia se encuentra en Cundinamarca, Boyacá, Antioquia, Nariño, Cauca y Santander. Es ESPECIE HERMANA de Weinmannia tomentosa L. f. (encenillo común, ya catalogada en Chagra) pero distinguible por la PUBESCENCIA MÁS DENSA Y BLANQUECINA DE LOS FOLIOLOS (W. pubescens) vs la pubescencia más rojiza-tomentosa de W. tomentosa — par botánico clásico de identificación de campo para botánicos colombianos. El género Weinmannia en Colombia incluye al menos 8-10 especies (W. tomentosa, W. pubescens, W. microphylla, W. rollottii, W. balbisiana, W. ovata, W. fagaroides, W. mariquitae, W. multijuga) que se diferencian por tamaño y pubescencia de los foliolos pinnados — todas comparten la 'firma' Cunoniaceae: HOJAS OPUESTAS PINNADAS (rasgo distintivo, raro en árboles andinos), inflorescencia en racimo terminal de flores blanco-cremosas, cápsulas pequeñas dehiscentes con semillas diminutas dispersadas por viento, corteza rica en TANINOS (históricamente usada para curtido de cueros en el altiplano cundiboyacense y nariñense, junto con corteza de quina Cinchona y de aliso Alnus). Lección viva sobre PARES BOTÁNICOS HERMANOS, COMPLEJOS DE ENCENILLO ANDINOS y CONSERVACIÓN DE LA DIVERSIDAD INTRAGENÉRICA: el bosque alto andino de la Cordillera Oriental NO es un bosque monoespecífico de encenillo W. tomentosa — es un COMPLEJO DE ENCENILLOS donde coexisten varias especies de Weinmannia que se reparten microhábitats (W. tomentosa en suelos más drenados, W. pubescens en suelos más húmedos, W. microphylla en bordes secos, W. rollottii en zonas de niebla persistente). La restauración multiespecífica del flanco oriental de la Cordillera Oriental (Cruz Verde-Sumapaz, Chingaza, Iguaque, Guerrero) requiere plantar varias especies del complejo, no solo W. tomentosa — esto refuerza el principio agroecológico de que la diversidad intragenérica es tan crítica como la diversidad intergenérica para la resiliencia del ecosistema. La propagación requiere INOCULACIÓN MICORRÍZICA con sustrato de bosque nativo — sin la micorriza simbionte específica las plántulas languidecen (replanteamiento clásico del fracaso de plantaciones 'estériles' de encenillo en viveros convencionales del altiplano). Manejo agroecológico: propagación por semilla fresca con sombra parcial 60% e inoculación micorrízica; trasplante 5-7 meses; plantación 12-18 meses; crecimiento 50-70 cm/año; asocio con otros encenillos (W. tomentosa, W. microphylla); densidades 300-500 ind/ha. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Bernal 2015 Catálogo Plantas Líquenes Colombia.",
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "weinmannia_microphylla",
+      "nombre_comun": "Encenillo de hoja menuda",
+      "nombre_comunes_regionales": [
+        "encino de hoja menuda",
+        "encenillo enano",
+        "encenillo de borde",
+        "miconcillo"
+      ],
+      "nombre_cientifico": "Weinmannia microphylla Kunth",
+      "familia_botanica": "Cunoniaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "medio",
+      "habito": "árbol pequeño 4-10 m con hojas opuestas pinnadas de foliolos diminutos (3-8 mm cada uno), inflorescencia en racimo blanco-cremoso y cápsulas dehiscentes pequeñas",
+      "origen": "Andes de Colombia, Ecuador, Venezuela; en Colombia bosque alto andino y franja subpáramo de Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander entre 2200 y 3500 msnm",
+      "roles_in_guild": [
+        "nurse_plant",
+        "windbreak",
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2200,
+        "optimo_min": 2500,
+        "optimo_max": 3200,
+        "max_absoluto": 3500
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 5,
+        "optimo_max": 13,
+        "max_tolerable": 20
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Propagación por semilla fresca de cápsulas dehiscentes (semillas diminutas dispersadas por viento). Germinación 30-60 días en sustrato turba-musgo con sombra parcial 60% e inoculación micorrízica con sustrato de bosque nativo. Trasplante 5-7 meses. Plantación 12-18 meses. Crecimiento moderado 40-60 cm/año.",
+        "tiempo_a_establecimiento_dias": 540,
+        "notas": "Especie de la franja superior de transición bosque alto andino — subpáramo (2800-3500 msnm). Tolera heladas fuertes y vientos de páramo gracias a su hábito compacto y hojas pequeñas xerofíticas."
+      },
+      "scale_viability": [
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave para restauración de la franja superior del bosque alto andino y de la transición a subpáramo (2800-3500 msnm) en Cruz Verde-Sumapaz, Chingaza, Iguaque, Guerrero. Tolera heladas y vientos fuertes.",
+          "tips": [
+            "Plantación en franja superior bosque-subpáramo",
+            "Asocio con polylepis_quadrijuga, weinmannia_tomentosa, weinmannia_pubescens, oreopanax_incisus",
+            "Densidades 300-500 ind/ha",
+            "Plantación con cortavientos vivos para protección anti-heladas"
+          ]
+        }
+      },
+      "companions": [
+        "weinmannia_tomentosa",
+        "weinmannia_pubescens",
+        "polylepis_quadrijuga"
+      ],
+      "antagonists": [
+        "eucalyptus_globulus",
+        "pinus_patula"
+      ],
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "Weinmannia microphylla Kunth (encenillo de hoja menuda, miconcillo — familia Cunoniaceae) es un árbol pequeño (4-10 m altura) nativo de los Andes (Colombia, Ecuador, Venezuela), distribuido en bosque alto andino y franja de transición a subpáramo entre 2200 y 3500 msnm en piso térmico FRÍO con tolerancia a heladas fuertes (-10°C). En Colombia se encuentra en Cundinamarca, Boyacá, Antioquia, Nariño, Cauca y Santander. Es la tercera especie del complejo de encenillos Weinmannia presente en Chagra (junto con W. tomentosa y W. pubescens) — y la más especializada en la franja SUPERIOR del bosque alto andino-subpáramo, donde el viento, las heladas y la radiación UV intensa son los limitantes ecológicos dominantes. Sus FOLIOLOS DIMINUTOS (3-8 mm cada uno) son adaptación XEROFÍTICA-CRIOTOLERANTE — la pequeñez de la lámina foliar reduce la superficie expuesta al viento y a la pérdida hídrica por transpiración, una estrategia compartida con las queñoas (Polylepis quadrijuga, P. sericea), con los frailejones (Espeletia spp.) y con los chuscales (Chusquea tessellata) que dominan el subpáramo de Cruz Verde-Sumapaz, Chingaza e Iguaque. Lección viva sobre ESPECIALIZACIÓN ALTITUDINAL EN UN GÉNERO, ADAPTACIONES XEROFÍTICAS-CRIOTOLERANTES y RESTAURACIÓN DE FRANJA SUPERIOR DE BOSQUE: el complejo de encenillos Weinmannia en Colombia ilustra paradigmáticamente cómo un género se especializa altitudinalmente — W. tomentosa y W. pubescens dominan la franja 2000-3000 msnm (bosque alto andino central), W. microphylla domina la franja superior 2800-3500 msnm (bosque alto andino-subpáramo) — y juntas forman un MOSAICO ESTRUCTURAL que protege la cabecera de cuenca de los acueductos abastecedores de Bogotá (Chingaza-Sumapaz), Tunja (Iguaque) y Pasto (Galeras-Azufral). Su plantación en la franja superior junto con queñoa (Polylepis quadrijuga), encenillo común (W. tomentosa), encenillo pubescente (W. pubescens) y mano de oso (Oreopanax incisus) reconstruye el bosque-enano de transición — esencial para la regulación hídrica y la protección del páramo. Manejo agroecológico: propagación por semilla fresca con sombra parcial 60% e inoculación micorrízica; trasplante 5-7 meses; plantación 12-18 meses; crecimiento 40-60 cm/año; asocio con queñoa y otros encenillos; densidades 300-500 ind/ha; cortavientos vivos para protección anti-heladas el primer año. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Bernal 2015 Catálogo Plantas Líquenes Colombia.",
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "gaiadendron_punctatum",
+      "nombre_comun": "Chuque",
+      "nombre_comunes_regionales": [
+        "sietelechos",
+        "gaiadendron",
+        "chuquiraga falsa",
+        "arbol-muérdago andino",
+        "amarillo de páramo"
+      ],
+      "nombre_cientifico": "Gaiadendron punctatum (Ruiz & Pav.) G. Don",
+      "familia_botanica": "Loranthaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "medio",
+      "habito": "árbol-arbusto hemiparásito facultativo terrestre 3-8 m con hojas alternas elípticas coriáceas, flores tubulares amarillo-anaranjadas vistosas y bayas globosas pequeñas amarillo-anaranjadas",
+      "origen": "Andes desde Costa Rica hasta Bolivia (Colombia, Ecuador, Perú, Venezuela, Bolivia, Costa Rica, Panamá); en Colombia bosque alto andino y subpáramo de Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander entre 2200 y 3500 msnm",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "biomass_producer"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2200,
+        "optimo_min": 2500,
+        "optimo_max": 3200,
+        "max_absoluto": 3500
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 6,
+        "optimo_max": 14,
+        "max_tolerable": 20
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 85,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Propagación por semilla fresca de bayas amarillo-anaranjadas (dispersión ornitócora — aves alto-andinas dispersan en sus heces sobre raíces de otras plantas). Germinación 30-60 días en sustrato turba-arena CON RAÍCES DE PLANTA HOSPEDANTE disponibles (encenillo, mortiño, raque, frailejón pueden funcionar como hospedante facultativo). Trasplante 6-8 meses. Plantación 18-24 meses. NO se establece sin presencia de raíces hospedantes en el suelo. Crecimiento lento 30-50 cm/año.",
+        "tiempo_a_establecimiento_dias": 600,
+        "notas": "Especie HEMIPARÁSITA FACULTATIVA TERRESTRE — único árbol-muérdago colombiano que parasita raíces de otras plantas vía haustorios subterráneos, NO es epífita como los muérdagos arbóreos Loranthaceae típicos (Aetanthus, Tristerix, Phthirusa). Caso botánico raro y didáctico."
+      },
+      "scale_viability": [
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie nativa rara y de altísimo valor pedagógico para restauración avanzada del bosque alto andino y subpáramo en Cruz Verde-Sumapaz, Chingaza, Iguaque. Requiere presencia previa de plantas hospedantes — NO viable en restauración primaria de sitios desnudos.",
+          "tips": [
+            "Plantación SOLO en restauración tardía con hospedantes ya establecidos",
+            "Asocio con weinmannia_tomentosa, hesperomeles_goudotiana, polylepis_quadrijuga como hospedantes facultativos",
+            "Densidades 30-80 ind/ha (especie rara, no dominante)",
+            "Inoculación con sustrato de bosque nativo donde G. punctatum crezca naturalmente"
+          ]
+        }
+      },
+      "companions": [
+        "weinmannia_tomentosa",
+        "hesperomeles_goudotiana",
+        "polylepis_quadrijuga"
+      ],
+      "antagonists": [
+        "eucalyptus_globulus",
+        "pinus_patula"
+      ],
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-2016-frailejones"
+      ],
+      "valor_pedagogico": "Gaiadendron punctatum (Ruiz & Pav.) G. Don (chuque, sietelechos, gaiadendron — familia Loranthaceae) es un árbol-arbusto perennifolio (3-8 m altura) HEMIPARÁSITO FACULTATIVO TERRESTRE — el ÚNICO árbol-muérdago colombiano que parasita raíces de otras plantas vía HAUSTORIOS SUBTERRÁNEOS, no es epífita como los muérdagos arbóreos típicos de Loranthaceae (Aetanthus, Tristerix, Phthirusa) que viven sobre las ramas. Distribución amplia: Andes desde Costa Rica hasta Bolivia (Colombia, Ecuador, Perú, Venezuela, Bolivia, Costa Rica, Panamá). En Colombia se encuentra en Cundinamarca, Boyacá, Antioquia, Nariño, Cauca y Santander entre 2200 y 3500 msnm en piso térmico FRÍO de bosque alto andino y subpáramo. Sus FLORES TUBULARES AMARILLO-ANARANJADAS VISTOSAS (4-5 cm de largo) son polinizadas por COLIBRÍES alto-andinos (Pterophanes cyanopterus, Eriocnemis vestita, Heliangelus exortis, Coeligena bonapartei) — coevolución colibrí-flor de neta importancia ecológica en la red de polinizadores del subpáramo. Sus BAYAS AMARILLO-ANARANJADAS son dispersadas por aves frugívoras alto-andinas que defecan las semillas pegajosas sobre raíces de otras plantas — donde germinan y se enchufan al sistema radicular del hospedante mediante haustorios. Lección viva sobre HEMIPARASITISMO TERRESTRE ÚNICO, COEVOLUCIÓN COLIBRÍ-FLOR ANDINA y RESTAURACIÓN DE NICHOS BIOLÓGICOS RAROS: el chuque es uno de los ejemplos más extraordinarios de la flora colombiana — combina hemiparasitismo terrestre (caso evolutivo raro en Loranthaceae, familia mayormente epífita), polinización ornitófila especializada con colibríes alto-andinos y dispersión ornitócora con aves frugívoras. Su presencia es BIOINDICADORA de un bosque alto andino con red trófica intacta: necesita simultáneamente plantas hospedantes (encenillo, mortiño, queñoa), colibríes polinizadores Y aves dispersoras — la pérdida de cualquiera de los tres rompe su ciclo reproductivo. En restauración avanzada de Cruz Verde-Sumapaz, Chingaza e Iguaque, el chuque se planta SOLO en sitios con hospedantes ya establecidos (no en restauración primaria de pasturas degradadas) y en densidades bajas 30-80 ind/ha (es especie rara, no dominante en el ecosistema natural). Etnobotánica: el nombre 'sietelechos' aludía en la tradición campesina muisca-andina al látex blanquecino que aparece al cortar la corteza (mito popular de 'siete lechosas') — usado en cocimientos tópicos para heridas. Manejo agroecológico: propagación por semilla fresca con hospedantes presentes; trasplante 6-8 meses; plantación 18-24 meses; crecimiento 30-50 cm/año; inoculación con sustrato de bosque nativo; restauración tardía con encenillo, mortiño y queñoa como hospedantes facultativos; densidades 30-80 ind/ha. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Bernal 2015 Catálogo Plantas Líquenes Colombia, Humboldt 2016 Frailejones.",
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "myrcianthes_ferreyrae",
+      "nombre_comun": "Arrayán negro",
+      "nombre_comunes_regionales": [
+        "arrayán de Ferreyra",
+        "arrayán de fruto negro",
+        "arrayán de monte"
+      ],
+      "nombre_cientifico": "Myrcianthes ferreyrae (McVaugh) McVaugh",
+      "familia_botanica": "Myrtaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "medio",
+      "habito": "árbol perennifolio 6-15 m con corteza exfoliante anaranjada-canela, hojas medianas opuestas elípticas aromáticas y bayas negras pequeñas en madurez",
+      "origen": "Andes de Colombia, Ecuador y Perú; en Colombia bosque alto andino de Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander entre 2000 y 3200 msnm",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "nurse_plant",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2300,
+        "optimo_max": 2900,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 8,
+        "optimo_max": 15,
+        "max_tolerable": 22
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 85,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Propagación por semilla fresca de bayas maduras negras, despulpadas inmediatamente y sembradas en sustrato turba-arena con sombra parcial 50%. Germinación 30-60 días. Trasplante 4-6 meses. Plantación 12-18 meses. Esqueje semileñoso con AIB (enraizamiento 30-50%, más difícil que arrayán de hoja menuda). Crecimiento lento-moderado 30-50 cm/año.",
+        "tiempo_a_establecimiento_dias": 540,
+        "notas": "Distinto al arrayán común (Myrcianthes leucoxyla) y al arrayán de hoja menuda (M. rhopaloides) — sus bayas son NEGRAS en madurez (no rojas-violáceas) por mayor contenido de antocianinas oscuras. Comestibles, sabor dulce-resinoso intenso."
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Apta como árbol nativo aromático-frutal en huertos alto-andinos. Bayas negras comestibles para compotas y mermeladas; hojas aromáticas en infusión.",
+          "tips": [
+            "Plantación en hueco 60x60x60 cm con humus",
+            "Cosecha de bayas julio-octubre",
+            "Poda formativa para arquitectura ornamental"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie nativa de bosque alto andino para restauración en Cruz Verde-Sumapaz, Chingaza, Iguaque y Cordillera Central. Aporta floración y bayas negras para avifauna alto-andina en estación seca.",
+          "tips": [
+            "Plantación en sotobosque y borde de rodal restaurado",
+            "Asocio con myrcianthes_rhopaloides, clusia_multiflora, weinmannia_tomentosa",
+            "Densidades 150-300 ind/ha"
+          ]
+        }
+      },
+      "companions": [
+        "myrcianthes_rhopaloides",
+        "clusia_multiflora",
+        "weinmannia_tomentosa"
+      ],
+      "antagonists": [
+        "eucalyptus_globulus",
+        "pinus_patula"
+      ],
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "humboldt-flora-alto-andina",
+        "libro-rojo-plantas-colombia",
+        "jbb-plantas-medicinales"
+      ],
+      "valor_pedagogico": "Myrcianthes ferreyrae (McVaugh) McVaugh (arrayán negro, arrayán de Ferreyra — familia Myrtaceae) es un árbol perennifolio (6-15 m altura) nativo de los Andes de Colombia, Ecuador y Perú, distribuido en bosque alto andino entre 2000 y 3200 msnm en piso térmico FRÍO. En Colombia se encuentra en Cundinamarca, Boyacá, Antioquia, Nariño, Cauca y Santander. Es la TERCERA especie del género Myrcianthes en Chagra (junto con M. rhopaloides arrayán de hoja menuda, y la conocida M. leucoxyla arrayán común de Bogotá) — y se distingue por sus BAYAS NEGRAS EN MADUREZ (no rojas-violáceas como M. rhopaloides ni anaranjadas-rojizas como M. leucoxyla) por mayor contenido de ANTOCIANINAS OSCURAS (cianidina-3-glucósido, peonidina-3-glucósido y derivados). Las bayas negras son COMESTIBLES con sabor dulce-resinoso intenso (más concentrado que el arrayán común), usadas en mermeladas, compotas y vinos artesanales en comunidades campesinas del altiplano cundiboyacense y nariñense. El epíteto 'ferreyrae' honra al botánico peruano Ramón Ferreyra Huerta (1910-2005), pionero de la botánica andina peruana y descriptor de cientos de especies de la flora del Perú y Ecuador. Lección viva sobre BOTÁNICA DE MYRCIANTHES, ANTOCIANINAS EN BAYAS DE MYRTACEAE y HISTORIA DE LA BOTÁNICA NEOTROPICAL: el género Myrcianthes en Colombia tiene al menos 3-4 especies arbóreas alto-andinas (M. leucoxyla, M. rhopaloides, M. ferreyrae, M. orthostemon) que se diferencian por color de baya, tamaño de hoja y porte del árbol — todas comparten la 'firma' Myrtaceae: corteza exfoliante canela, hojas opuestas aromáticas, flores con muchos estambres, bayas comestibles. Las antocianinas oscuras de M. ferreyrae son INTERESANTES PARA NUTRACÉUTICA — antioxidantes potentes con perfil similar al de los arándanos (Vaccinium spp.) y a las moras (Morus nigra). En restauración de Cruz Verde-Sumapaz, Chingaza, Iguaque y la Cordillera Central, el arrayán negro se planta en sotobosque y borde de rodal restaurado junto con otros arrayanes y gaque y encenillo, formando corredores frutales para avifauna alto-andina (mirlas patiblancas, atrapamoscas, semilleros) en la ESTACIÓN SECA diciembre-marzo cuando otros frutos escasean — servicio ecosistémico crítico. Manejo agroecológico: propagación por semilla fresca con sombra parcial 50%; trasplante 4-6 meses; plantación 12-18 meses; crecimiento 30-50 cm/año; asocio con M. rhopaloides, gaque y encenillo; densidades 150-300 ind/ha. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, JBB Plantas Medicinales.",
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "prumnopitys_montana",
+      "nombre_comun": "Pino romerón / Chaquiro",
+      "nombre_comunes_regionales": [
+        "romerón",
+        "chaquiro",
+        "pino colombiano",
+        "pino montañero",
+        "chaquiro de monte"
+      ],
+      "nombre_cientifico": "Prumnopitys montana (Humb. & Bonpl. ex Willd.) de Laub.",
+      "familia_botanica": "Podocarpaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "frio"
+      ],
+      "estrato": "alto",
+      "habito": "árbol perennifolio conífero dioico 15-25 m con copa cónica-piramidal, hojas pequeñas lineares planas en disposición dística (NO acículas en mechón como los pinos verdaderos) y semillas drupáceas envueltas en arilo carnoso púrpura-violáceo",
+      "origen": "Andes de Colombia, Ecuador, Venezuela, Perú, Bolivia; en Colombia bosque alto andino y subandino de Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander, Tolima entre 1800 y 3000 msnm",
+      "roles_in_guild": [
+        "nurse_plant",
+        "biomass_producer",
+        "windbreak"
+      ],
+      "cultivable": false,
+      "conservation_status": "nativo_protegido",
+      "normativa_colombiana": "Especie en categoría VULNERABLE (VU) según el Libro Rojo de Plantas de Colombia (2007). Su tala está regulada por las CAR (Corporaciones Autónomas Regionales) en Cundinamarca (CAR Cundinamarca), Boyacá (Corpoboyacá), Antioquia (Cornare, Corantioquia) y Nariño (Corponariño). Aprovechamiento maderable comercial PROHIBIDO en bosque natural; permitido únicamente de plantaciones registradas. Especie incluida en planes de restauración prioritaria del SINAP (Sistema Nacional de Áreas Protegidas) para Chingaza, Iguaque, Tatamá y Otún-Quimbaya. Resolución MADS específica de protección como bosque protector-productor en cuencas abastecedoras (Tunjuelo, Teusacá, Bogotá, Pasto).",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2100,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 8,
+        "optimo_max": 16,
+        "max_tolerable": 22
+      },
+      "humedad_relativa_pct": {
+        "min": 70,
+        "optimo": 85,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Propagación por semilla fresca de 'frutos' (técnicamente semillas envueltas en arilo púrpura-violáceo carnoso) maduros recolectados en febrero-mayo. Despulpado inmediato (el arilo carnoso inhibe la germinación), estratificación fría 4°C por 60-90 días y siembra en sustrato turba-arena con sombra parcial 60% e inoculación con micorrizas arbusculares de bosque nativo. Germinación 90-180 días. Trasplante 6-12 meses. Plantación definitiva 24-36 meses. Esqueje semileñoso muy difícil (enraizamiento <30%). Crecimiento MUY LENTO 15-30 cm/año en los primeros 5 años (típico de coníferas Podocarpaceae andinas).",
+        "tiempo_a_establecimiento_dias": 900,
+        "notas": "Especie DIOICA — requiere proporción 1 macho : 4-5 hembras para producción de semillas. Es la ÚNICA CONÍFERA NATIVA de la familia Podocarpaceae presente en altiplanos colombianos (junto con Podocarpus oleifolius y Retrophyllum rospigliosii), grupo botánico de origen gondwánico relictual."
+      },
+      "scale_viability": [
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie EMBLEMÁTICA Y PRIORITARIA para restauración del bosque alto andino en Cruz Verde-Sumapaz, Chingaza, Iguaque, Tatamá y Otún-Quimbaya. Estado VU en Libro Rojo. Plantación EXIGE proporción dioica correcta y paciencia (crecimiento lento).",
+          "tips": [
+            "Plantación con proporción 1 macho : 4-5 hembras para producción de semillas",
+            "Asocio con quercus_humboldtii, weinmannia_tomentosa, clusia_multiflora, freziera_canescens",
+            "Densidades 100-200 ind/ha (especie estructural de dosel, no dominante)",
+            "Inoculación micorrízica obligatoria con sustrato de bosque nativo",
+            "Crecimiento muy lento — 5-10 años para alcanzar 2-3 m, paciencia"
+          ]
+        }
+      },
+      "companions": [
+        "quercus_humboldtii",
+        "weinmannia_tomentosa",
+        "clusia_multiflora"
+      ],
+      "antagonists": [
+        "eucalyptus_globulus",
+        "pinus_patula"
+      ],
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "libro-rojo-plantas-colombia",
+        "humboldt-flora-alto-andina",
+        "bernal-2015-plantas-liquenes-colombia",
+        "uicn-red-list",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "El pino romerón o chaquiro (Prumnopitys montana (Humb. & Bonpl. ex Willd.) de Laub., familia Podocarpaceae) es uno de los árboles MÁS EXTRAORDINARIAMENTE INTERESANTES de la flora colombiana — es CONÍFERA NATIVA SUDAMERICANA, perennifolia, dioica, de gran porte (15-25 m altura) con copa cónica-piramidal, distribuida en los Andes (Colombia, Ecuador, Venezuela, Perú, Bolivia). En Colombia se encuentra en bosque alto andino y subandino entre 1800 y 3000 msnm en piso térmico FRÍO, en los departamentos de Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander y Tolima. La familia PODOCARPACEAE es una RAREZA BOTÁNICA EXTRAORDINARIA — es una familia de coníferas de ORIGEN GONDWÁNICO RELICTUAL, es decir, sus ancestros vivieron en el supercontinente Gondwana hace más de 200 millones de años (Triásico-Jurásico) y se distribuyeron por Sudamérica, África, Australia, Nueva Zelanda y la Antártida cuando estos formaban un solo continente. Tras la fragmentación de Gondwana en el Cretácico-Cenozoico, las Podocarpaceae se mantuvieron en los refugios montañosos del hemisferio sur — y los Andes tropicales son uno de los pocos enclaves de Podocarpaceae en el hemisferio norte tropical (refugio relictual). En Colombia hay TRES especies de Podocarpaceae nativas: Prumnopitys montana (pino romerón, este), Podocarpus oleifolius (chaquiro real) y Retrophyllum rospigliosii (chaquiro de hoja menuda) — todas son CONÍFERAS NATIVAS SUDAMERICANAS, dato que rompe la idea popular de que 'todas las coníferas son del hemisferio norte' (Pinus, Abies, Picea, Cedrus son del norte; pero Araucaria, Podocarpus, Prumnopitys, Retrophyllum, Saxegothaea, Pilgerodendron son del hemisferio sur de origen gondwánico). El pino romerón se distingue MORFOLÓGICAMENTE de los pinos verdaderos (Pinus, género del hemisferio norte) por: (1) hojas LINEARES PLANAS dispuestas DÍSTICAMENTE en ramillas planas (NO acículas en mechón como Pinus); (2) NO produce conos típicos sino SEMILLAS DRUPÁCEAS envueltas en arilo carnoso púrpura-violáceo (dispersión ORNITÓCORA por aves frugívoras alto-andinas — pavas, tucanetas, mirlas grandes, atrapamoscas grandes — no por viento como los pinos verdaderos); (3) es DIOICA (separación de sexos en árboles distintos, raro en Pinus). Estado de conservación: VULNERABLE (VU) en el Libro Rojo de Plantas de Colombia (2007) por sobreexplotación maderera histórica (la madera del pino romerón es de excelente calidad — rojiza, aromática, durable, codiciada para carpintería fina, instrumentos musicales, mástiles, postes y muebles desde la colonia hasta el siglo XX). Su aprovechamiento maderable comercial está PROHIBIDO en bosque natural y regulado estrictamente por las CAR (CAR Cundinamarca, Corpoboyacá, Cornare, Corantioquia, Corponariño) y por el SINAP. Lección viva sobre BIOGEOGRAFÍA GONDWÁNICA, CONÍFERAS NATIVAS SUDAMERICANAS, RAREZAS BOTÁNICAS y RESTAURACIÓN PRIORITARIA DEL BOSQUE ALTO ANDINO: el pino romerón es ejemplo paradigmático de cómo una especie nativa colombiana pertenece a un linaje botánico antiguo de distribución gondwánica relictual, y de cómo la sobreexplotación maderera del siglo XIX-XX la llevó al estado VU — la restauración prioritaria con romerón en Cruz Verde-Sumapaz, Chingaza, Iguaque, Tatamá y Otún-Quimbaya es ESTRATÉGICA tanto ecológica (estructura de dosel, alimento de avifauna alto-andina en estación seca) como simbólica (recuperación de patrimonio genético gondwánico). Manejo agroecológico: propagación por semilla fresca con despulpado inmediato, estratificación fría 60-90 días e inoculación micorrízica obligatoria; trasplante 6-12 meses; plantación 24-36 meses; CRECIMIENTO MUY LENTO 15-30 cm/año (paciencia 5-10 años); proporción dioica 1M:4-5H; asocio con roble andino (Quercus humboldtii), encenillo (Weinmannia tomentosa), gaque (Clusia multiflora) y freziera (Freziera canescens); densidades 100-200 ind/ha como especie estructural de dosel. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Libro Rojo Plantas Colombia, Humboldt Flora Alto-Andina, Bernal 2015 Catálogo Plantas Líquenes Colombia, IUCN Red List, Pérez-Arbeláez 1947 Plantas Útiles Colombia.",
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA"
     }
   ],
   "biopreparados": [
