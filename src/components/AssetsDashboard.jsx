@@ -19,6 +19,8 @@ import { findBiopreparadosByIngredient } from '../db/catalogDB';
 import { generatePlanForPlant } from '../services/planGeneratorService';
 import { getAccessToken } from '../services/authService';
 import { useFincaActiveStore } from '../services/fincaActiveStore';
+import { savePhoto } from '../services/photoService';
+import { wktToGeoJson } from '../utils/geo';
 import MultiFincaModal from './MultiFincaModal';
 
 // Note: fincaNombre constant removed. Now derived from useFincaActiveStore inside the component.
@@ -110,6 +112,70 @@ const LAND_TYPES = [
 
 const DEFAULT_LOCATION_ID = FARM_CONFIG.LOCATION_ID;
 
+// Bug fix #5 (2026-05-18): persistencia liviana de la zona pre-seleccionada
+// en localStorage. La key vive scoped a "siembra pending" para que (a)
+// re-abrir el form en la misma sesión recupere la zona elegida y (b) si el
+// operador escanea/agrega varias plantas en la misma zona no tenga que
+// re-seleccionar manualmente. Se limpia al guardar exitosamente.
+const PENDING_FORM_ZONE_KEY = 'chagra:pending_form_parentLandId';
+
+const readPendingFormZone = () => {
+  try {
+    return localStorage.getItem(PENDING_FORM_ZONE_KEY) || '';
+  } catch (err) {
+    console.warn('[AssetsDashboard] localStorage read failed:', err);
+    return '';
+  }
+};
+
+const writePendingFormZone = (id) => {
+  try {
+    if (id) localStorage.setItem(PENDING_FORM_ZONE_KEY, id);
+    else localStorage.removeItem(PENDING_FORM_ZONE_KEY);
+  } catch (err) {
+    console.warn('[AssetsDashboard] localStorage write failed:', err);
+  }
+};
+
+// Point-in-polygon ray-casting (lon/lat). Acepta un ring GeoJSON
+// (array de [lon, lat]) cerrado o abierto. Robusto a polígonos pequeños
+// (escalas de finca), suficiente para auto-sugerir zona.
+const isPointInRing = (lon, lat, ring) => {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [xi, yi] = ring[i];
+    const [xj, yj] = ring[j];
+    const intersects =
+      ((yi > lat) !== (yj > lat)) &&
+      (lon < ((xj - xi) * (lat - yi)) / ((yj - yi) || 1e-12) + xi);
+    if (intersects) inside = !inside;
+  }
+  return inside;
+};
+
+// Devuelve el land cuyo polígono contiene [lon, lat], o el más cercano
+// por centroide si ninguno lo contiene (con cap de distancia). Si todos
+// los lands son POINT (sin polígono), no auto-detecta para evitar falsos
+// positivos. Operador: 'ideal sería que automáticamente lo sugiriera
+// por ubicación GPS'.
+const detectZoneByGps = (lon, lat, lands) => {
+  if (!Array.isArray(lands) || lands.length === 0) return null;
+  for (const land of lands) {
+    const wkt = land.attributes?.intrinsic_geometry?.value;
+    if (!wkt) continue;
+    const geo = wktToGeoJson(wkt);
+    if (!geo) continue;
+    if (geo.type === 'Polygon') {
+      // ring 0 = exterior
+      const ring = geo.coordinates[0] || [];
+      if (ring.length >= 3 && isPointInRing(lon, lat, ring)) {
+        return land;
+      }
+    }
+  }
+  return null;
+};
+
 // Helpers puros para construcción de payloads JSON:API
 const formatNotes = (formData) => {
   const parts = [];
@@ -173,7 +239,16 @@ const INITIAL_FORM_STATE = {
   // 'individual' = N assets qty=1 (frutales valiosos, trazabilidad por planta).
   // 'aggregate' = 1 asset qty=N (hortalizas en cama corrida, cereales).
   trackingMode: 'individual',  // default conservativo (mejor más datos que menos)
+  // Bug fix #2 (2026-05-18): foto opcional capturada via SpeciesSelect.
+  // El blob comprimido viaja en el form state hasta handleSave, donde
+  // se persiste en media_cache (IndexedDB) atado al assetId recién creado.
+  photoBlob: null,
 };
+
+const buildInitialFormState = () => ({
+  ...INITIAL_FORM_STATE,
+  parentLandId: readPendingFormZone(),
+});
 
 const colorMap = {
   lime: { bg: 'bg-lime-600', border: 'border-lime-500', text: 'text-lime-400', light: 'bg-lime-900/30' },
@@ -223,7 +298,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
   const [searchQuery, setSearchQuery] = useState('');
   const [showForm, setShowForm] = useState(initialShowForm);
   const [isSaving, setIsSaving] = useState(false);
-  const [formData, setFormData] = useState(INITIAL_FORM_STATE);
+  const [formData, setFormData] = useState(buildInitialFormState);
 
   // Estado local del formulario de cosecha scoped por asset.id
   const [activeHarvestId, setActiveHarvestId] = useState(null);
@@ -338,8 +413,53 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
   }, [plants, lands]);
 
   const resetForm = () => {
-    setFormData(INITIAL_FORM_STATE);
+    setFormData(buildInitialFormState());
   };
+
+  // Persistencia liviana de la zona pre-seleccionada (#5): cualquier cambio
+  // de parentLandId mientras el form está abierto se refleja en localStorage
+  // para sobrevivir re-open. Se limpia al guardar exitosamente más abajo.
+  useEffect(() => {
+    if (showForm && formData.parentLandId) {
+      writePendingFormZone(formData.parentLandId);
+    }
+  }, [showForm, formData.parentLandId]);
+
+  // GPS auto-detect zone (#5 avanzado, operador: 'ideal sería que
+  // automáticamente lo sugiriera por ubicación GPS'). Al abrir el form
+  // de siembra y SIN zona ya elegida, pide GPS (silent, no UI bloqueante)
+  // y elige la zona cuyo polígono WKT contiene la ubicación. Si falla o
+  // está fuera de cualquier polígono, NO bloquea — el operador puede
+  // elegir manualmente como siempre.
+  useEffect(() => {
+    if (!showForm) return;
+    if (activeTab !== 'plant') return;
+    if (formData.parentLandId) return; // ya hay zona (manual o localStorage)
+    if (!Array.isArray(lands) || lands.length === 0) return;
+    if (!navigator?.geolocation) return;
+
+    let cancelled = false;
+    requestGeo({
+      enableHighAccuracy: false, // suficiente para detectar zona, ahorra batería
+      timeout: 8000,
+      onSuccess: (pos) => {
+        if (cancelled) return;
+        const lon = pos.coords.longitude;
+        const lat = pos.coords.latitude;
+        const land = detectZoneByGps(lon, lat, lands);
+        if (land?.id) {
+          setFormData((prev) => {
+            // Race: si entre tanto el operador eligió manualmente, respetar
+            if (prev.parentLandId) return prev;
+            return { ...prev, parentLandId: land.id };
+          });
+        }
+      },
+      onError: () => { /* silent: deja al operador elegir manual */ },
+    });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showForm, activeTab, lands]);
 
   const handleSave = async () => {
     if (!formData.name.trim()) return;
@@ -450,6 +570,27 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
       } else {
         await addAsset(activeTab, optimisticAssets[0], pendingTxs);
       }
+
+      // Bug fix #2 (2026-05-18): persistir la foto capturada por
+      // SpeciesSelect. La foto sirve doble: identificar especie + quedar
+      // como referencia de la planta. Se ata al primer asset creado y
+      // al speciesSlug para que el resolver de usePhotoUrl la encuentre
+      // por assetId (prioridad alta) o por especie (fallback).
+      if (activeTab === 'plant' && formData.photoBlob instanceof Blob) {
+        try {
+          await savePhoto({
+            blob: formData.photoBlob,
+            assetId: assetUUIDs[0],
+            speciesSlug: formData.speciesId || null,
+          });
+        } catch (err) {
+          console.warn('[AssetsDashboard] savePhoto falló (no bloquea siembra):', err);
+        }
+      }
+
+      // Limpiar zona persistida — siembra guardada, próxima abrirá vacía
+      // o con la nueva zona que el operador elija.
+      writePendingFormZone('');
 
       window.dispatchEvent(new CustomEvent('taskAdded'));
 
@@ -572,7 +713,16 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
             trackingMode: defaults.tracking_mode || prev.trackingMode,
           }));
         }}
+        // Bug fix #2 (2026-05-18): SpeciesSelect re-emite el blob ya
+        // comprimido tras identificar especie. Lo guardamos en formData
+        // para persistir en media_cache al hacer handleSave.
+        onPhoto={(blob) => setFormData((prev) => ({ ...prev, photoBlob: blob }))}
       />
+      {formData.photoBlob && (
+        <p className="text-[10px] text-emerald-400 -mt-2 px-1">
+          Foto adjunta — se guardará junto a la siembra.
+        </p>
+      )}
 
       {/* Motor de gremios: compañeros sugeridos (Fase 18) */}
       {formData.speciesId && (
