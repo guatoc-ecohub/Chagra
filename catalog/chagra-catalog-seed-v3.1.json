@@ -15610,6 +15610,518 @@
         "gbif-taxonomic-backbone",
         "jbb-plantas-medicinales"
       ]
+    },
+    {
+      "id": "capsicum_chinense_aji_panca",
+      "nombre_comun": "Ají panca",
+      "nombre_comunes_regionales": [
+        "ají panca colombiano",
+        "ají rojo seco",
+        "ají dulce-picante",
+        "panca"
+      ],
+      "nombre_cientifico": "Capsicum chinense Jacq. cv. 'Panca'",
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1800,
+        "max_absoluto": 2200
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 18,
+        "optimo_max": 28,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinación 8-15 días a 22-28°C. Trasplante a las 6-8 semanas con 4-6 hojas verdaderas. Distancia 50-60 cm. Ciclo 4-6 meses a primera cosecha."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "agrosavia-manual-frutales-tropicales",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "El ají panca (Capsicum chinense Jacq. cv. 'Panca', Solanaceae) es un cultivar de ají de fruto rojo intenso y picor moderado (10.000-30.000 SHU en escala Scoville, equivalente a ají cayena suave) tradicional de la región andina noroccidental de Suramérica con presencia ancestral en Colombia bajo el nombre 'ají panca colombiano' o 'ají rojo seco', particularmente en las regiones Andina (Cundinamarca, Boyacá clima medio, Santander, Norte de Santander, Tolima, Huila, Antioquia, Valle del Cauca, Cauca, Nariño) y Caribe (Magdalena, Bolívar, Sucre, Córdoba) entre 0 y 1.800 msnm en zonas térmicas cálidas y templadas. Pertenece a la familia Solanaceae (igual que tomate, papa, pimentón, lulo, tomate de árbol, uchuva, ají dulce, rocoto, ulluco) y al género Capsicum del que existen cinco especies domesticadas: C. annuum (pimentón, jalapeño, cayena), C. chinense (habanero, panca, ají charapita, ají amarillo de mar), C. baccatum (ají amarillo andino), C. pubescens (rocoto), C. frutescens (tabasco, chiltepín). El cultivar 'panca' se distingue por frutos alargados (8-12 cm) de color rojo oscuro a casi negro cuando maduros, secados al sol para uso culinario en pastas y aderezos, picor moderado equilibrado por dulzor afrutado, y aceites esenciales ricos en capsaicina (alcaloide responsable del picor con propiedades vasodilatadoras, analgésicas tópicas y antimicrobianas) y carotenoides (capsantina, capsorubina, beta-caroteno provitamina A). Es lección viva de domesticación precolombina y biodiversidad cultivada que enseña a niñas y niños cómo los pueblos andinos seleccionaron durante miles de años decenas de cultivares de ají con diferentes niveles de picor, color, sabor y uso culinario — patrimonio agrobiocultural irreemplazable. Manejo agroecológico: propagación por semilla (germinación 8-15 días a 22-28°C, no tolera heladas), trasplante a las 6-8 semanas con 4-6 hojas verdaderas, distancia 50-60 cm entre plantas y 80 cm entre surcos, riego regular pero sin encharcamiento (sensible a Phytophthora capsici), tutorado opcional para variedades altas, cosecha escalonada de frutos maduros rojos durante 2-4 meses, secado al sol para conservación de pasta picante. Companion plants ideales: albahaca (repele plagas), cebollín y cebolla larga (repele áfidos), zanahoria. Antagonistas: hinojo (alelopatía), brassicas en proximidad cercana. Función en chagra como hortaliza-condimento de alto valor culinario y atractora de polinizadores. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015 Catálogo Plantas y Líquenes Colombia, AGROSAVIA Manual Frutales Tropicales, Pérez-Arbeláez 1947 Plantas Útiles Colombia."
+    },
+    {
+      "id": "capsicum_baccatum_aji_amarillo",
+      "nombre_comun": "Ají amarillo andino",
+      "nombre_comunes_regionales": [
+        "ají amarillo",
+        "ají escabeche",
+        "ají kellu uchu",
+        "ají andino"
+      ],
+      "nombre_cientifico": "Capsicum baccatum L.",
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 600,
+        "optimo_min": 1500,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 15,
+        "optimo_max": 25,
+        "max_tolerable": 32
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinación 10-20 días a 20-25°C (más lenta que C. annuum). Trasplante a las 8 semanas. Distancia 60-80 cm. Ciclo 5-7 meses a primera cosecha. Más rústico al frío andino que otras especies de Capsicum."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "agrosavia-manual-frutales-tropicales",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "El ají amarillo andino (Capsicum baccatum L., Solanaceae) es una de las cinco especies de ají domesticadas en los Andes precolombinos, originaria del altiplano boliviano-peruano-noroeste argentino y cultivada ancestralmente en los Andes ecuatorianos y colombianos desde el sur de Nariño hasta Boyacá-Cundinamarca, con presencia documentada en las regiones Andina (Nariño, Cauca, Valle del Cauca, Huila, Tolima, Cundinamarca, Boyacá, Santander) entre 600 y 3.000 msnm en zonas térmicas templadas y frías — su adaptación al clima fresco-frío andino es su rasgo más distintivo frente a otras especies de Capsicum que prefieren climas cálidos. Pertenece a la familia Solanaceae (igual que tomate, papa, pimentón, lulo, tomate de árbol, uchuva, rocoto, ají dulce, ulluco) y al género Capsicum sección Baccatum, hermana evolutiva de C. pubescens (rocoto) con la que comparte adaptación a altitudes altas. El fruto característico es alargado-fusiforme (8-15 cm), color amarillo intenso a anaranjado cuando maduro, con picor moderado a alto (30.000-50.000 SHU equivalente a cayena), sabor afrutado-frutal distintivo con notas a piña-mango (debido a ésteres aromáticos únicos de la especie), excelente para conservas en escabeche, pastas, salsas y cocina andina tradicional. Carácter diagnóstico: corolas blanco-cremas con manchas amarillas en la base de los pétalos (única en el género Capsicum cultivado), distinto a las corolas blanco-puras de C. annuum/chinense. Su nombre quechua 'kellu uchu' significa literalmente 'ají amarillo' y constituye uno de los condimentos icónicos de la cocina peruano-boliviana (papa a la huancaína, ají de gallina, escabeche) que también se cultiva en Colombia andina. Es lección viva de bio-diversidad cultivada y soberanía alimentaria que enseña a niñas y niños cómo cada especie de ají se adaptó a un piso térmico distinto: el chinense al trópico cálido, el baccatum al andino fresco, el pubescens al frío. Manejo agroecológico: propagación por semilla (germinación 10-20 días a 20-25°C, más lenta que C. annuum por adaptación a clima fresco), trasplante a las 8 semanas, distancia 60-80 cm entre plantas, riego regular sin encharcamiento, tutorado obligatorio (planta puede alcanzar 1.5-2 m), cosecha escalonada 5-7 meses, frutos verdes para escabeche y maduros amarillos para pastas. Companion plants: albahaca, cebollín, zanahoria, lechuga. Función en chagra como hortaliza-condimento andina de alto valor agroalimentario y cultural. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015, AGROSAVIA Manual Frutales Tropicales, Pérez-Arbeláez 1947."
+    },
+    {
+      "id": "capsicum_pubescens_rocoto",
+      "nombre_comun": "Rocoto",
+      "nombre_comunes_regionales": [
+        "locoto",
+        "rocoto andino",
+        "ají de monte",
+        "uchu"
+      ],
+      "nombre_cientifico": "Capsicum pubescens Ruiz & Pav.",
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 3200,
+        "max_absoluto": 3500
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinación lenta 15-30 días a 18-22°C. Planta perenne arbustiva 2-3 m. Trasplante a las 10-12 semanas. Distancia 1-1.2 m. Primera cosecha 8-12 meses, productiva 3-5 años. Único Capsicum con semillas negras (carácter diagnóstico) y flores moradas."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "agrosavia-tibaitata"
+      ],
+      "valor_pedagogico": "El rocoto (Capsicum pubescens Ruiz & Pav., Solanaceae) es el único ají adaptado al clima frío de los Andes altos, una especie única en el género Capsicum por su rusticidad a altitudes superiores a 2.000 msnm donde otras especies de ají no prosperan, originaria del altiplano boliviano-peruano y cultivada ancestralmente desde la época precolombina en los Andes ecuatoriano-colombianos: en Colombia se cultiva en Nariño (Pasto, Ipiales, Cumbal), Cauca (Popayán, Silvia, Páez), Boyacá (Tunja, Garagoa, Sogamoso), Cundinamarca (Sabana, Tenjo, Cota) entre 1.200 y 3.500 msnm en zonas térmicas frías y templadas frías. Pertenece a la familia Solanaceae y al género Capsicum sección Pubescens, taxonómicamente más basal y evolutivamente más antigua que las otras especies del género. Tiene tres caracteres diagnósticos únicos en Capsicum: 1) semillas negras (todas las demás especies tienen semillas blanco-amarillas), 2) flores violeta-moradas con corola estrellada (las demás tienen flores blancas o crema), 3) hojas y tallos pubescentes (con pelos visibles, de allí el epíteto 'pubescens'). El fruto es globoso a piriforme (4-7 cm), color rojo-naranja a amarillo cuando maduro, picor alto a muy alto (30.000-100.000 SHU equivalente a habanero suave), pulpa carnosa más gruesa que otros ajíes (semejante a pimentón), sabor frutal con sutil amargor herbal, excelente para rellenar (rocoto relleno boliviano-peruano), salsas crudas (ají de rocoto) y conservas. Planta arbustiva-arborescente perenne de 2-3 m de altura que puede vivir 5-10 años produciendo en clima andino — característica única en el género que la convierte en cultivo permanente patio-huerto-shamba andino. Es lección extraordinaria de adaptación evolutiva al frío y de cómo los pueblos andinos seleccionaron una especie diferente a las del trópico para resolver el problema cultural de tener ají en clima frío: el rocoto demuestra que la biodiversidad agrícola no es uniformidad sino especialización ecológica, y enseña a niñas y niños que el clima frío también tiene su propio picante nativo. Manejo agroecológico: propagación por semilla (germinación lenta 15-30 días a 18-22°C, requiere paciencia), trasplante a las 10-12 semanas, distancia 1-1.2 m (planta grande), tutorado obligatorio (arbusto pesado), poda de formación al 2do año, riego regular sin exceso, primera cosecha 8-12 meses, productiva 3-5 años, sensible a heladas intensas (-2°C letal). Función en chagra andina como ají perenne patrimonial de clima frío, condimento patio y cosecha continua. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015, Pérez-Arbeláez 1947, AGROSAVIA Tibaitatá."
+    },
+    {
+      "id": "capsicum_annuum_aji_dulce_caribe",
+      "nombre_comun": "Ají dulce caribe",
+      "nombre_comunes_regionales": [
+        "ají dulce",
+        "ají de olor",
+        "ají gustoso",
+        "ajicito dulce"
+      ],
+      "nombre_cientifico": "Capsicum annuum L. cv. 'Dulce'",
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1500,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 20,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinación 7-12 días a 25-28°C. Trasplante a las 5-6 semanas. Distancia 40-50 cm. Ciclo 3-5 meses a primera cosecha. Sin picor por mutación recesiva del gen Pun1 — frutos aromáticos pero sin capsaicina."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "agrosavia-manual-frutales-tropicales",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "El ají dulce caribe (Capsicum annuum L. cv. 'Dulce', Solanaceae) es un cultivar emblemático de la cocina caribeña colombiana, venezolana y antillana caracterizado por la ausencia total de picor (0 SHU, mutación recesiva del gen Pun1 que desactiva la biosíntesis de capsaicina) pero con un aroma frutal-floral intenso y único que lo convierte en el condimento aromático base del sofrito caribeño, hogao y guisos costeños — patrimonio agroalimentario afro-caribeño irreemplazable. Se cultiva en toda la región Caribe colombiana (Atlántico, Magdalena, Bolívar, Cesar, Córdoba, Sucre, La Guajira, Arauca, Casanare en piedemonte llanero), Pacífico (Chocó, Valle), Andina baja (valles cálidos interandinos de Antioquia, Santander, Norte de Santander, Tolima, Huila, Valle del Cauca) y Orinoquía (Meta, Vichada) entre 0 y 1.500 msnm en zonas térmicas cálidas y templadas. Pertenece a la familia Solanaceae y al género Capsicum, especie C. annuum (la más cultivada globalmente, que incluye pimentón, jalapeño, cayena, paprika), cultivar 'Dulce' diferenciado del pimentón por su tamaño pequeño (3-6 cm), forma campanulada irregular o piriforme, colores variados al madurar (rojo, amarillo, naranja, verde-amarillento), pulpa delgada aromática y aroma intenso frutal-floral con notas a manzana-piña-floral distinto del aroma vegetal del pimentón. La mutación que elimina el picor mantiene íntegros los carotenoides (capsantina, capsorubina, beta-caroteno), flavonoides (quercetina, luteolina), vitamina C abundante y aceites esenciales aromáticos — convirtiéndolo en condimento de alta densidad nutricional sin la barrera sensorial del picante para niños y mayores. Es lección viva de domesticación selectiva por sabor y de cómo los pueblos afro-caribeños seleccionaron a través de generaciones una variante sin picor pero con aroma maximizado para construir una identidad culinaria distintiva: el sofrito caribeño con ají dulce, cebolla larga, ajo, cilantro y tomate es la base aromática de la cocina costeña colombiana, venezolana, cubana, dominicana y boricua. Manejo agroecológico: propagación por semilla (germinación 7-12 días a 25-28°C), trasplante a las 5-6 semanas, distancia 40-50 cm entre plantas, riego regular, sin tutorado en variedades compactas, cosecha escalonada 3-5 meses, primera cosecha temprana (más rápido que ajíes picantes). Companion plants ideales: albahaca, cilantro cimarrón, cebollín, tomate, plátano (estrato superior). Función en chagra costeña como hortaliza-condimento aromática insustituible. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015 Catálogo Plantas y Líquenes Colombia, AGROSAVIA Manual Frutales Tropicales, Pérez-Arbeláez 1947 Plantas Útiles Colombia."
+    },
+    {
+      "id": "tagetes_minuta",
+      "nombre_comun": "Chinchilla",
+      "nombre_comunes_regionales": [
+        "huacatay andino",
+        "chinchilla",
+        "anís de monte",
+        "muicle del sur",
+        "wakatay"
+      ],
+      "nombre_cientifico": "Tagetes minuta L.",
+      "familia_botanica": "Asteraceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 500,
+        "optimo_min": 1800,
+        "optimo_max": 3200,
+        "max_absoluto": 3600
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 10,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinación 5-10 días a 18-22°C. Anual. Resiembra espontánea abundante. Cosecha foliar para té anti-pulgones y uso culinario al inicio de la floración (5-6 meses). Aceite esencial concentrado en hojas y flores."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "jbb-plantas-medicinales",
+        "agrosavia-manual-biopreparados-2015"
+      ],
+      "valor_pedagogico": "La chinchilla o huacatay andino (Tagetes minuta L., Asteraceae) es una hierba aromática-medicinal-repelente nativa de los Andes suramericanos (originaria del altiplano peruano-boliviano-noroeste argentino) presente ancestralmente en Colombia andina como especie nativa silvestre y cultivada en los departamentos de Nariño (Pasto, Túquerres, Ipiales), Cauca (Popayán, Silvia, Páez), Putumayo (Sibundoy, Mocoa alto), Boyacá (Sogamoso, Belén, Cerinza), Cundinamarca (Sabana, Sumapaz), Antioquia (Oriente alto, Suroeste), Santander (páramos), entre 500 y 3.600 msnm en zonas térmicas frías y templadas. Pertenece a la familia Asteraceae (Compositae, igual que girasol, lechuga, calendula, manzanilla, ajenjo, achicoria, diente de león) y al género Tagetes — el mismo del cempasúchil mexicano (T. erecta) y del pericón (T. lucida) — que contiene >50 especies neotropicales caracterizadas por la producción de aceites esenciales con propiedades insecticidas, nematicidas y aromáticas. Planta herbácea anual de 1-2 m de altura con hojas pinnatisectas verde-grisáceas con glándulas oleíferas visibles (puntos translúcidos al trasluz), tallos erectos pubescentes con olor fuerte característico a anís-cítrico-resinoso al estrujar, capítulos pequeños amarillos en panículas terminales, frutos en aquenios cipsela ligeros dispersados por viento. Doble función patrimonial: 1) como **aromática culinaria andina** es el 'huacatay' icónico de la cocina peruano-boliviana (ocopa, pollo en salsa de huacatay, papas chorreadas) y se usa también en cocina nariñense colombiana en sopas y carnes; aceite esencial rico en tagetona, ocimeno, dihidrotagetona, limoneno y beta-cariofileno con notas aromáticas únicas no replicables por otra hierba; 2) como **repelente-nematicida agroecológico** es uno de los biopreparados clave de la agricultura andina: el 'té de huacatay' (infusión 10% p/v de hojas y flores frescas en agua tibia, 24 h maceración, filtrado, dilución 1:5, aspersión foliar) controla pulgones (Myzus persicae), trips (Frankliniella spp.), ácaros (Tetranychus urticae) y mosquita blanca (Bemisia tabaci) en cultivos vecinos sin daño a polinizadores; sembrada intercalada con papa, maíz, fríjol, hortalizas inhibe nemátodos del nudo (Meloidogyne spp.) a través de exudados radiculares con alfa-tertienilo y otros tiofenos nematicidas — biofumigante natural. Es lección extraordinaria de soberanía agroecológica y patrimonio biocultural andino que enseña a niñas y niños cómo una hierba nativa puede ser simultáneamente alimento, medicina y biopreparado, reemplazando insecticidas químicos por una decocción aromática. Manejo agroecológico: propagación por semilla (germinación 5-10 días a 18-22°C, resiembra espontánea abundante en cama), distancia 30-40 cm, ciclo 5-7 meses anual obligado, cosecha foliar al inicio de floración para máxima concentración de aceite esencial. Companion plants ideales: papa, maíz, fríjol, hortalizas en general. Función en chagra como aromática culinaria + repelente + nematicida + atractora de polinizadores. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015 Catálogo Plantas y Líquenes Colombia, JBB Plantas Medicinales, AGROSAVIA Manual Biopreparados 2015."
+    },
+    {
+      "id": "tagetes_lucida",
+      "nombre_comun": "Pericón",
+      "nombre_comunes_regionales": [
+        "hierba de Santa María",
+        "yerbanís",
+        "anís de monte",
+        "tagetes mexicano",
+        "estragón mexicano"
+      ],
+      "nombre_cientifico": "Tagetes lucida Cav.",
+      "familia_botanica": "Asteraceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "calido",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 500,
+        "optimo_min": 1200,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 14,
+        "optimo_max": 24,
+        "max_tolerable": 32
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Propagación por esqueje basal o división de cepa (más rápido) o semilla (germinación 8-15 días). Planta perenne herbácea 50-80 cm. Cosecha foliar continua tras los 4 meses de establecimiento."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "jbb-plantas-medicinales",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "valor_pedagogico": "El pericón o hierba de Santa María (Tagetes lucida Cav., Asteraceae) es una hierba aromática-medicinal perenne nativa de Mesoamérica (México, Guatemala, Honduras) cultivada ancestralmente y naturalizada en Colombia andina como alternativa al estragón europeo (Artemisia dracunculus) que no prospera en el trópico — su uso como 'estragón mexicano' o 'estragón colombiano' la convierte en el sustituto perfecto del tarragón para cocina internacional sin necesidad de importar la especie europea. Se cultiva en jardines, huertos caseros y zonas medicinales en los departamentos andinos de Cundinamarca, Boyacá, Antioquia, Santander, Valle del Cauca, Cauca, Nariño, Tolima, Huila, Risaralda, Quindío, Caldas entre 500 y 3.000 msnm en zonas térmicas templadas, cálidas y frías. Pertenece a la familia Asteraceae y al género Tagetes (mismo género del cempasúchil mexicano T. erecta, marigold francés T. patula y chinchilla T. minuta), con todas las especies del género caracterizadas por producir aceites esenciales con propiedades aromáticas-medicinales-insecticidas. Planta herbácea perenne de 50-80 cm de altura con hojas linear-lanceoladas verde brillante intenso con glándulas oleíferas visibles, tallos erectos glabros, capítulos pequeños amarillo-dorados en cimas terminales con 3-5 lígulas amarillas y disco amarillo, aroma fuerte característico a anís-estragón-vainilla al estrujar las hojas (debido al alto contenido de estragol, metileugenol, ocimeno y anetol). Sus usos son múltiples y patrimoniales: 1) **culinario** como sustituto del estragón europeo en preparaciones de pollo, pescado, ensaladas, vinagretas, mantequillas aromatizadas y cocina internacional (excelente para platos franceses como bearnaise y pollo a la estragón sin necesidad de importar tarragón europeo); 2) **medicinal** tradicional mexicano-mesoamericano como infusión digestiva-carminativa, antiespasmódica, ansiolítica suave, contra cólicos menstruales y como tranquilizante natural — uso milenario maya-azteca documentado en códices precolombinos como hierba sagrada utilizada en rituales y curaciones; 3) **agroecológico** como repelente de plagas (igual que otras Tagetes) intercalable en huerto, atractora de polinizadores y mariquitas. Es lección extraordinaria de adaptación cultural y soberanía culinaria que enseña a niñas y niños cómo una hierba mesoamericana resolvió en Colombia el problema cultural de tener 'estragón sin estragón': el pericón demuestra que no hace falta importar especies de clima templado europeo cuando el Neotrópico ofrece equivalentes funcionales superiores. Manejo agroecológico: propagación preferente por esqueje basal o división de cepa (perenne, rebrota cada año), o por semilla (germinación 8-15 días); distancia 40-50 cm; cosecha foliar continua tras los 4 meses de establecimiento; planta longeva 5-10 años en condiciones óptimas. Companion plants: hortalizas en general, plantas medicinales, frutales. Función en chagra como aromática culinaria + medicinal + repelente + atractora de polinizadores. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015, JBB Plantas Medicinales, Pamplona-Roger 2006 Plantas Medicinales."
+    },
+    {
+      "id": "anethum_graveolens",
+      "nombre_comun": "Eneldo",
+      "nombre_comunes_regionales": [
+        "dill",
+        "hinojo de hoja",
+        "eneldo común",
+        "anís bastardo"
+      ],
+      "nombre_cientifico": "Anethum graveolens L.",
+      "familia_botanica": "Apiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio",
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 1200,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 10,
+        "optimo_max": 22,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa preferente (raíz pivotante delicada que no tolera trasplante). Germinación 7-14 días a 18-22°C. Distancia 20-30 cm. Ciclo 3-4 meses a cosecha foliar, 5-6 meses a semillas. Anual."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "jbb-plantas-medicinales",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "valor_pedagogico": "El eneldo (Anethum graveolens L., Apiaceae) es una hierba aromática anual umbelífera originaria del Mediterráneo oriental y suroeste de Asia, naturalizada y cultivada en Colombia desde la Colonia como hierba culinaria-medicinal en huertos caseros y producción para mercado fresco. Se cultiva en zonas andinas de Cundinamarca (Sabana, Tena, Anolaima), Boyacá (Tunja, Sogamoso, Garagoa), Antioquia (Oriente, Suroeste), Nariño (Pasto, Túquerres), Santander (Mesa de los Santos), Valle del Cauca (Restrepo, Calima), Tolima y Huila entre 0 y 3.000 msnm en zonas térmicas templadas, frías y cálidas adaptables. Pertenece a la familia Apiaceae (Umbelliferae, igual que cilantro, perejil, zanahoria, apio, hinojo, comino, alcaravea, anís verde) y al género monoespecífico Anethum (única especie del género). Planta anual herbácea de 60-120 cm de altura con tallo erecto hueco glabro estriado verde-azulado, hojas alternas finamente divididas pinnatisectas filiformes (semejantes a las de hinojo pero más finas y de color verde-azuloso) con aroma característico a 'pepinillo encurtido', flores amarillas pequeñas en umbelas compuestas terminales muy atractoras de polinizadores y avispas parasitoides (control biológico de plagas), frutos esquizocárpicos en diaquenios ovales aplanados (las 'semillas de eneldo' culinarias) con aroma a alcaravea-anís-pepino. Tiene tres usos culinarios diferenciados según la parte cosechada: 1) hojas frescas (eneldo de hoja, 'dill weed') aromatizan pescados al horno, salmón gravlax, salsas blancas, ensaladas de papa, queso fresco, yogur, sopas frías; 2) semillas secas aromatizan encurtidos de pepinillo (carácter aromático icónico del 'pickle' anglosajón y germánico), panes, repostería, conservas; 3) inflorescencias frescas se usan junto con las semillas en fermentación láctica de pepinillos y chucrut. Es lección viva de migración culinaria y aromáticas mediterráneas que enseña a niñas y niños cómo una hierba del Mediterráneo se integró al huerto andino colombiano sin desplazar especies nativas, y cómo cada parte de la planta (hoja, flor, semilla) tiene un uso aromático distinto. Aceite esencial rico en carvona (50-60%), limoneno, felandreno y dilapiol con propiedades carminativas, digestivas, lactogogas (uso tradicional para estimular producción de leche materna en mujeres lactantes), antiespasmódicas y sedantes suaves; té de semillas para cólicos infantiles y digestiones lentas. Manejo agroecológico: siembra directa preferente (raíz pivotante delicada que no tolera trasplante), germinación 7-14 días a 18-22°C, distancia 20-30 cm, ciclo 3-4 meses a cosecha foliar, 5-6 meses a semillas, anual obligado. Companion plants: pepino (sinergia obligada para encurtidos), repollo (mejora sabor y repele orugas), cebolla, maíz. Antagonistas: zanahoria (compite por raíz pivotante e hibridación), hinojo (alelopatía). Función en chagra como aromática culinaria + medicinal + atractora de polinizadores + control biológico. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015, JBB Plantas Medicinales, Pamplona-Roger 2006."
+    },
+    {
+      "id": "levisticum_officinale",
+      "nombre_comun": "Apio de monte",
+      "nombre_comunes_regionales": [
+        "ligústico",
+        "levístico",
+        "perejil silvestre gigante",
+        "lovage",
+        "apio mata"
+      ],
+      "nombre_cientifico": "Levisticum officinale W.D.J.Koch",
+      "familia_botanica": "Apiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -15,
+        "optimo_min": 8,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno_a_moderado",
+      "propagation": {
+        "metodo_principal": "division",
+        "notas": "Propagación preferente por división de cepa o esqueje radical (más rápido). Semilla viable solo fresca (germinación 14-21 días a 15-20°C). Planta perenne herbácea de hasta 2 m. Productiva 5-10 años. Cosecha foliar continua tras el primer año."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "jbb-plantas-medicinales",
+        "pamplona-roger-2006-plantas-medicinales",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El apio de monte o ligústico (Levisticum officinale W.D.J.Koch, Apiaceae) es una hierba aromática-medicinal perenne robusta originaria del Mediterráneo y suroeste de Asia (probablemente Irán-Anatolia), cultivada en Europa desde la antigüedad romana y traída a Colombia durante la Colonia como hierba medicinal-culinaria de huertos andinos altos. Su presencia es escasa pero patrimonial en jardines tradicionales de Cundinamarca, Boyacá, Antioquia (Oriente alto), Nariño, Cauca andino, Santander (páramos) entre 800 y 3.200 msnm en zonas térmicas frías y templadas — su tolerancia a heladas hasta -15°C la convierte en una de las pocas aromáticas culinarias robustas para clima de páramo y altiplano frío. Pertenece a la familia Apiaceae (igual que cilantro, perejil, zanahoria, apio, hinojo, eneldo, comino) y al género monoespecífico Levisticum (única especie del género). Planta perenne herbácea robusta de hasta 2 m de altura con tallos huecos estriados glabros, hojas grandes pinnado-compuestas con folíolos romboidales lobulados verde-oscuro brillante (semejantes a las de apio común Apium graveolens pero más grandes), umbelas compuestas grandes de flores amarillo-verdosas muy atractoras de polinizadores y avispas parasitoides, frutos esquizocárpicos diaquenios con costillas marcadas. Toda la planta posee un aroma intenso y único a 'apio concentrado x10' (similar al de apio común pero mucho más fuerte, con notas a anís-curry-comino) debido a aceites esenciales ricos en ligustilido, butilftaleida, alfa-terpinilo y otros ftalidos. Sus usos son múltiples: 1) **culinario** como sustituto-amplificador del apio común — una hoja basta para sazonar una sopa entera, semillas para conservas, tallos blanqueados al sol para usar como apio gourmet, raíces tuberosas comestibles cocidas como hortaliza-condimento; 2) **medicinal** tradicional europeo (carminativo, diurético potente, emenagogo, expectorante, antibacteriano de vías urinarias) usado en infusiones de hoja, decocciones de raíz y tinturas; 3) **agroecológico** como planta perenne de alta biomasa atractora de polinizadores y enemigos naturales en jardín-huerto medicinal. Es lección extraordinaria de patrimonio etnobotánico europeo y soberanía culinaria que enseña a niñas y niños cómo una sola planta perenne puede reemplazar al apio anual (sin tener que resembrarlo cada año) y aromatizar toda la cocina de la familia durante décadas — una sola cepa puede vivir 10 años produciendo cada temporada. Manejo agroecológico: propagación por división de cepa o esqueje radical (más rápido que semilla), distancia 80-100 cm (planta grande), suelo profundo rico en materia orgánica, humedad constante (no tolera sequía prolongada), poda al final de temporada para rebrote vigoroso, cosecha foliar continua tras el primer año, productiva 5-10 años. Companion plants: rosa, tomate, fríjol, plantas medicinales. Función en chagra fría como aromática perenne robusta + medicinal + biomasa + atractora de polinizadores. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, JBB Plantas Medicinales, Pamplona-Roger 2006, Bernal 2015."
+    },
+    {
+      "id": "salvia_hispanica",
+      "nombre_comun": "Chía",
+      "nombre_comunes_regionales": [
+        "chía mexicana",
+        "chía blanca",
+        "chía negra",
+        "chía nutracéutica"
+      ],
+      "nombre_cientifico": "Salvia hispanica L.",
+      "familia_botanica": "Lamiaceae",
+      "category": "cereales",
+      "thermal_zones": [
+        "templado",
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 600,
+        "optimo_min": 1400,
+        "optimo_max": 2200,
+        "max_absoluto": 2500
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 15,
+        "optimo_max": 25,
+        "max_tolerable": 32
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa al voleo o en líneas. Germinación 4-8 días a 20-25°C. Distancia 30-40 cm en línea, 50-60 cm entre líneas. Ciclo 4-6 meses a cosecha de semilla. Anual. Floración fotoperiódica de día corto — siembra en abril-mayo para floración octubre-noviembre en hemisferio norte tropical."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-manual-frutales-tropicales",
+        "bernal-2015-plantas-liquenes-colombia",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "valor_pedagogico": "La chía (Salvia hispanica L., Lamiaceae) es una planta nutracéutica milenaria originaria de México central y Guatemala (no de los Andes a pesar del nombre 'hispanica' que se debe a un error de Linneo que creyó que provenía de España), cultivada ancestralmente por aztecas y mayas precolombinos como uno de los cuatro pilares alimentarios mesoamericanos junto a maíz, fríjol y amaranto. En Colombia se cultiva con creciente expansión comercial y huerto-casero en zonas andinas medias-cálidas de Cundinamarca (Tena, La Mesa), Tolima (Espinal, Guamo, Chaparral), Huila (Pitalito, La Plata, San Agustín), Antioquia (Suroeste, Oriente cálido), Santander (Mesa de los Santos), Valle del Cauca (Restrepo) entre 600 y 2.500 msnm en zonas térmicas templadas y cálidas, expandida significativamente desde 2010 por la demanda mundial de superalimentos. Pertenece a la familia Lamiaceae (igual que albahaca, orégano, romero, menta, hierbabuena, mejorana, salvia, tomillo) y al género Salvia (el más diverso de las Lamiaceae con >900 especies globales) — distinta evolutivamente de la salvia común (S. officinalis L.) aunque comparten género. Planta herbácea anual de 1-1.5 m de altura con tallos cuadrangulares pubescentes característicos de Lamiaceae, hojas opuestas decusadas ovales-lanceoladas dentadas verde-oscuro, espigas terminales de flores azul-violáceas o blancas pequeñas en verticilastros muy atractoras de abejas y abejorros (cultivo melífero adicional), frutos en tetraquenios de los que se cosechan las 'semillas de chía' — pequeñas (1-2 mm), ovaladas, color blanco-crema (chía blanca) o gris-negro moteado (chía negra), oleaginosas con altísimo contenido nutricional. La composición de la semilla la convierte en superalimento: 30-35% aceite (con 60-65% omega-3 alfa-linolénico, la mayor concentración vegetal conocida), 20-25% proteína completa (con todos los aminoácidos esenciales), 30-40% fibra dietaria (mucílagos hidrofílicos que absorben 10-12 veces su peso en agua formando gel — útil para regulación intestinal y saciedad), alta densidad de calcio, hierro, magnesio, zinc, antioxidantes (ácido cafeico, quercetina, miricetina). Es lección extraordinaria de domesticación nutricional precolombina y soberanía alimentaria recuperada que enseña a niñas y niños cómo los aztecas seleccionaron durante siglos una semilla milagrosa con propiedades nutricionales únicas y cómo Colombia puede recuperar esa joya mesoamericana en su huerto andino sin necesidad de importarla. Manejo agroecológico: siembra directa al voleo o en líneas, germinación 4-8 días a 20-25°C, distancia 30-40 cm en línea y 50-60 cm entre líneas, ciclo 4-6 meses a cosecha de semilla, anual obligado, floración fotoperiódica de día corto (siembra abril-mayo para floración octubre-noviembre en Colombia ecuatorial). Trilla manual sencilla. Companion plants: maíz, fríjol, amaranto (las 4 'milpa' mesoamericanas). Función en chagra como pseudocereal nutracéutico patrimonial y atractor melífero. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, AGROSAVIA Manual Frutales Tropicales, Bernal 2015, Pamplona-Roger 2006."
+    },
+    {
+      "id": "nigella_sativa",
+      "nombre_comun": "Comino negro",
+      "nombre_comunes_regionales": [
+        "kalonji",
+        "ajenuz",
+        "black cumin",
+        "habat al-barakah",
+        "comino negro de oriente"
+      ],
+      "nombre_cientifico": "Nigella sativa L.",
+      "familia_botanica": "Ranunculaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2600,
+        "max_absoluto": 2900
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 12,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa preferente (raíz pivotante delicada). Germinación 10-15 días a 15-20°C. Distancia 15-25 cm. Ciclo 3-4 meses a floración, 4-5 meses a cosecha de semilla. Anual. Cosecha de cápsulas maduras secas y trilla manual."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "jbb-plantas-medicinales",
+        "pamplona-roger-2006-plantas-medicinales",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El comino negro o kalonji (Nigella sativa L., Ranunculaceae) es una hierba aromática-medicinal anual originaria del suroeste de Asia y norte de África (probablemente Anatolia-Mesopotamia) cultivada desde hace más de 3.000 años en Egipto, India, Medio Oriente y Mediterráneo oriental como semilla nutracéutica-medicinal sagrada — su uso ancestral fue documentado en la tumba de Tutankamón y en textos médicos hipocráticos, persas, ayurvédicos y proféticos islámicos (la tradición sufí lo llama 'habat al-barakah', semilla de la bendición). En Colombia su presencia es muy escasa pero creciente en huertos especializados de aromáticas-medicinales asiáticas en zonas andinas medias-frías de Cundinamarca (Sabana, Tena), Boyacá, Antioquia (Oriente alto), Nariño, Cauca andino entre 800 y 2.900 msnm en zonas térmicas templadas y frías. Pertenece a la familia Ranunculaceae (igual que el ranúnculo, anémona, peonía, aquilegia, ajenjo-acónito — familia primitiva de dicotiledóneas con muchas plantas medicinales potentes) y al género Nigella con >20 especies de las cuales N. sativa es la única cultivada por semilla comestible, distinta de la N. damascena (cultivada solo como ornamental). NO debe confundirse con el 'comino común' (Cuminum cyminum, Apiaceae) que es una umbelífera completamente diferente — son aromáticas distintas a pesar del nombre vernáculo coincidente. Planta herbácea anual de 20-40 cm de altura con tallos erectos ramificados glabros, hojas finamente divididas pinnatisectas filiformes verde-grisáceas, flores solitarias terminales hermosas azul-celestes o blanco-azuladas con 5 sépalos petaloides (los pétalos verdaderos son inconspicuos) atractoras de polinizadores, frutos en cápsulas infladas conspicuas con 5-7 carpelos persistentes que contienen las pequeñas semillas negras triangulares aromáticas. La semilla negra es el producto cosechable: aroma a comino-pimienta-orégano-nuez muy distintivo y sabor levemente picante-amargo aromático, rica en aceites esenciales (timoquinona principal compuesto bioactivo, p-cimeno, alfa-pineno, carvacrol) con propiedades antiinflamatorias, antimicrobianas, antioxidantes potentes, hipoglucemiantes (estudios clínicos modernos en diabetes tipo 2), inmunomoduladoras y antitumorales documentadas. Sus usos son patrimoniales: 1) **culinario** como semilla aromática para panes (icónica del 'naan' indio, 'pide' turco, 'borek' anatolio), encurtidos, quesos frescos, infusiones, mezclas de especias (panch phoron bengalí, dukkah egipcio); 2) **medicinal** tradicional con uso milenario (cardamomo de los pobres, semilla de la bendición islámica) en infusiones, decocciones, aceite prensado en frío para uso tópico (caspa, eczema, dolores articulares) y oral (digestiones, asma, diabetes); 3) **agroecológico** atractora de polinizadores con floración corta pero intensa. Es lección viva de patrimonio medicinal mediterráneo-asiático y soberanía nutricional que enseña a niñas y niños cómo una semilla del Medio Oriente puede integrarse al huerto andino colombiano y abrir puerta a tradiciones culinarias y medicinales milenarias de la humanidad. Manejo agroecológico: siembra directa preferente (raíz pivotante delicada), germinación 10-15 días a 15-20°C, distancia 15-25 cm, ciclo 3-4 meses a floración y 4-5 meses a cosecha, anual obligado, cosecha de cápsulas maduras secas y trilla manual sencilla. Companion plants: hortalizas en general, frutales aromáticos, otras Ranunculaceae. Función en chagra como aromática-medicinal patrimonial y atractora de polinizadores. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, JBB Plantas Medicinales, Pamplona-Roger 2006, Bernal 2015."
     }
   ],
   "biopreparados": [
