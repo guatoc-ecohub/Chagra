@@ -10470,8 +10470,19 @@
       "proceso_resumen": "Extracto hidrolizado alcalino o ácido. Aplicación foliar 1:500. Fuente de citoquininas, auxinas, oligoelementos. Estimulante de enraizamiento.",
       "tiempo_elaboracion_dias": 0,
       "vida_util_dias": 365,
+      "uso": "Bioestimulante foliar en trasplante, prefloración y post-estrés (sequía, granizo, helada leve); también en remojo de semillas/esquejes para enraizamiento.",
+      "dosis": "Foliar 2-3 mL/L (1:500) cada 10-15 días; remojo de semillas 5 mL/L por 12h; drench 3-5 mL/L en trasplante. No exceder 4 aplicaciones por ciclo para evitar desbalance hormonal.",
+      "target": [
+        "estrés hídrico y térmico",
+        "trasplante con baja sobrevivencia",
+        "deficiencias de micronutrientes (B, Zn, Mo)",
+        "raíces débiles o sistema radicular pobre",
+        "floración irregular o aborto floral"
+      ],
+      "valor_pedagogico": "El extracto de algas pardas concentra citoquininas (zeatina) y auxinas (IAA) que estimulan división celular y enraizamiento; aporta manitol osmoprotector y oligoelementos quelados (B, Zn, Mn) biodisponibles vía cutícula foliar. Alginatos y laminarinas activan defensa SAR como elicitores PAMP. En Colombia se usan importados (Ascophyllum nodosum) y lixiviados de Sargassum del Caribe. Advertencia: NO mezclar con caldo bordelés ni sulfocálcico (oxidan los reguladores); aplicar al atardecer (UV degrada citoquininas).",
       "source_ids": [
-        "khan-2009-seaweed-extracts"
+        "khan-2009-seaweed-extracts",
+        "agrosavia-manual-biopreparados-2015"
       ]
     },
     {
@@ -10490,6 +10501,17 @@
       "proceso_resumen": "Producto comercial registrado ante ICA (no preparación finca). Dilución típica 1-2 g/L de agua. Aplicación foliar al ATARDECER (luz UV degrada cristales delta-endotoxina). Efectivo contra larvas Lepidoptera incluyendo Agrotis ipsilon (trozador), Spodoptera frugiperda (cogollero), Tuta absoluta (polilla tomate), Plutella xylostella (palomilla crucíferas). NO afecta abejas ni vertebrados. Repetir cada 7-10 días si presión alta. Eficacia tras ingesta de la larva — esperar 24-72h mortalidad.",
       "tiempo_elaboracion_dias": 0,
       "vida_util_dias": 730,
+      "uso": "Aplicar al detectar larvas pequeñas (instares 1-3) de lepidópteros — antes son más sensibles a las endotoxinas Cry. Monitoreo con trampas de feromona o conteo de hojas con daño fresco para definir umbral.",
+      "dosis": "BTk en polvo mojable: 1-2 g/L de agua (500-1000 g/ha) con adherente foliar 0.5%. Aplicar al atardecer cada 7-10 días mientras dure la presión. En tomate y maíz, dirigir aspersión a cogollos y envés de hojas.",
+      "target": [
+        "trozador (Agrotis ipsilon, A. segetum) en almácigos",
+        "cogollero (Spodoptera frugiperda) en maíz",
+        "polilla del tomate (Tuta absoluta)",
+        "palomilla de las crucíferas (Plutella xylostella)",
+        "gusano de la mazorca (Helicoverpa zea)",
+        "minador del fruto (Neoleucinodes elegantalis)"
+      ],
+      "valor_pedagogico": "Bt produce cristales Cry (delta-endotoxinas) que el pH alcalino (>9.5) del mesenterón larval solubiliza y proteasas activan; las toxinas se unen a receptores cadherina/aminopeptidasa, forman poros y causan parálisis, sepsis y muerte en 24-72h. BTk (var. kurstaki) es la cepa más usada en Colombia orgánico contra Lepidoptera; BTi controla dípteros; BTt coleópteros. AGROSAVIA registra formulaciones nativas. Advertencia: UV inactiva cristales en 4-8h — aplicar al atardecer; pH agua >8 degrada; resistencia en P. xylostella exige rotar con neem o spinosad.",
       "source_ids": [
         "agrosavia-manual-biopreparados-2015",
         "ica-resolucion-3168-2015",
@@ -10511,6 +10533,17 @@
       "proceso_resumen": "Control biológico CLÁSICO preventivo: avispas microscópicas parasitan huevos de Lepidoptera antes de eclosionar. Liberación 50.000-100.000 individuos/hectárea cuando se detectan adultos (trampas de luz o monitoreo). Sinergia con BT (Trichogramma actúa sobre huevos, BT sobre larvas eclosionadas). AGROSAVIA y empresas como Bioglobal producen comercialmente en Colombia. Distribuir en campo cada 7-10 días por 3-4 ciclos.",
       "tiempo_elaboracion_dias": 0,
       "vida_util_dias": 7,
+      "uso": "Liberar PREVENTIVAMENTE al detectar primeros adultos del lepidóptero plaga (trampas de luz, feromona) o antes de oviposición esperada. Es control preventivo, NO curativo: no funciona si ya hay larvas eclosionadas.",
+      "dosis": "50.000-100.000 individuos/hectárea por liberación, distribuidos en 25-50 puntos. Repetir cada 7-10 días por 3-4 ciclos consecutivos cubriendo el periodo de oviposición. En huertos familiares: 1 pulguilla (~2.000 individuos) cada 100 m².",
+      "target": [
+        "trozador (Agrotis ipsilon) — control preventivo de huevos",
+        "cogollero (Spodoptera frugiperda) en maíz",
+        "polilla del tomate (Tuta absoluta)",
+        "gusano de la mazorca (Helicoverpa zea)",
+        "perforador del fruto (Neoleucinodes elegantalis)",
+        "barrenador de la caña (Diatraea saccharalis)"
+      ],
+      "valor_pedagogico": "Trichogramma spp. son microhimenópteros (Trichogrammatidae) de 0.3-0.5 mm — MACROORGANISMOS parasitoides, NO microbios. La hembra deposita un huevo dentro del huevo del lepidóptero; la larva consume el embrión y emerge en 8-10d a 25°C, cortando el ciclo ANTES de la larva fitófaga. AGROSAVIA y Bioglobal producen T. exiguum y T. pretiosum sobre Sitotroga cerealella. Sinergia con Bt: Trichogramma sobre huevos, Bt sobre larvas. Advertencia: incompatible con insecticidas amplio espectro 15d antes/después; vida útil 5-7d refrigerado. Pilar del MIP campesino del ICA/CIAT desde los 80s.",
       "source_ids": [
         "agrosavia-manual-biopreparados-2015",
         "gbif-taxonomic-backbone"
@@ -10534,6 +10567,17 @@
       "proceso_resumen": "Macerar semillas molidas 24-48h en agua tibia (50g/L) o usar aceite de neem comercial. La azadiractina actúa como antialimentario (inhibe ecdisis) en larvas Lepidoptera + áfidos + ácaros. NO sistémico foliar pero translaminar leve. Compatible con BT y Trichogramma. Aplicar al atardecer cada 7d. Cuidado: tóxico para peces; no aplicar cerca de fuentes hídricas. En Colombia hay cultivos comerciales en valle del Magdalena.",
       "tiempo_elaboracion_dias": 2,
       "vida_util_dias": 14,
+      "uso": "Aplicar al detectar primeros instares larvales o colonias incipientes de chupadores; útil en MIP rotando con Bt y caldos minerales para evitar resistencia. Repelente y antialimentario, no derribante: efecto progresivo en 3-7 días.",
+      "dosis": "Extracto acuoso de semilla: 50 g/L de macerado o 3-5 mL/L de aceite de neem comercial (1500 ppm azadiractina) + jabón potásico 0.5% como emulsionante. Foliar al atardecer cada 7 días. NO superar 4 aplicaciones consecutivas — rotar con otro modo de acción.",
+      "target": [
+        "larvas de lepidópteros (trozador, cogollero, Tuta)",
+        "áfidos (Myzus persicae, Aphis gossypii)",
+        "mosca blanca (Bemisia tabaci, Trialeurodes vaporariorum)",
+        "ácaros (Tetranychus urticae) — leve",
+        "trips (Frankliniella occidentalis)",
+        "nematodos fitoparásitos (aplicación al suelo)"
+      ],
+      "valor_pedagogico": "La azadiractina (limonoide de A. indica) actúa como análogo de ecdisona: bloquea PTTH e interrumpe la muda, inhibe alimentación vía quimiorreceptores gustativos y reduce oviposición. Translaminar leve pero NO sistémica vía xilema — requiere cobertura del envés foliar. Compatible con Bt, Trichogramma y entomopatógenos (Beauveria, Metarhizium): pilar del MIP orgánico. En Colombia se cultiva en valle medio del Magdalena; difundido en los 90s vía Cenicaña y CIPAV. Advertencias: TÓXICO para peces — no aplicar a <30 m de hídricos; UV degrada en 3-5d; macerado pierde azadiractina si se almacena >14d.",
       "source_ids": [
         "agrosavia-manual-biopreparados-2015",
         "gbif-taxonomic-backbone",
