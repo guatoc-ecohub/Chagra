@@ -47,17 +47,35 @@ const useFincaActiveStore = create(
             // 062.8: opt-in privacy para sync GPS history al server.
             setGpsHistoryEnabled: (enabled) => set({ gpsHistoryEnabled: !!enabled }),
 
-            // Resolver el endpoint de FarmOS para la finca activa (Fase 1)
-            // Fallback chain: activa.farmos_endpoint → guatoc.farmos_endpoint → ''
-            // Fase 1 v2-strict: si la finca activa NO tiene endpoint propio
-            // (asesor externo, finca sin FarmOS server), operador opera
-            // contra Guatoc default para no romper UX. Test cubre el caso.
+            // Resolver el endpoint de FarmOS para la finca activa.
+            //
+            // Bug 2026-05-18 (operator: 100+ registros stuck pendientes con WiFi):
+            // si retorna URL absoluta cross-origin (ej. 'https://farmos.guatoc.co'
+            // desde 'https://chagra.guatoc.co'), Cloudflare Access devuelve 302
+            // redirect a login → sync falla. Solución: si la URL absoluta del
+            // farmos_endpoint comparte hostname o es el "farmos." pair del
+            // origin actual de la PWA, usar relative '' → fetch same-origin
+            // pasa por Nginx local que inyecta service token CF Access
+            // server-side (ver PR #91).
             getActiveEndpoint: () => {
                 const state = get();
                 const finca = state.fincas.find(f => f.slug === state.activeFincaSlug);
-                if (finca?.farmos_endpoint) return finca.farmos_endpoint;
-                const guatoc = state.fincas.find(f => f.slug === 'guatoc');
-                return guatoc?.farmos_endpoint || '';
+                const candidate = finca?.farmos_endpoint
+                    || state.fincas.find(f => f.slug === 'guatoc')?.farmos_endpoint
+                    || '';
+                if (!candidate) return '';
+                if (typeof window !== 'undefined' && window.location?.origin) {
+                    try {
+                        const candidateUrl = new URL(candidate);
+                        const currentHost = window.location.hostname;
+                        const sameOrCousinHost =
+                            candidateUrl.hostname === currentHost ||
+                            candidateUrl.hostname === currentHost.replace(/^chagra\./, 'farmos.') ||
+                            currentHost === candidateUrl.hostname.replace(/^farmos\./, 'chagra.');
+                        if (sameOrCousinHost) return '';
+                    } catch (_) { /* candidate no es URL válida, retornarlo como está */ }
+                }
+                return candidate;
             },
 
             getActiveFinca: () => {
