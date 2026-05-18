@@ -54,25 +54,48 @@ export const authenticateUser = async (username, password) => {
     }
 };
 
+/**
+ * Lee el access token persistido. Si está expirado, fuerza logout y retorna null.
+ *
+ * @returns {Promise<string|null>} token activo, o null si no existe / expiró /
+ *   localforage falló (defensive: la app debe tratar null como "no auth").
+ */
 export const getAccessToken = async () => {
-    const token = await localforage.getItem('farmos_access_token');
-    const expiry = await localforage.getItem('farmos_token_expiry');
+    try {
+        const token = await localforage.getItem('farmos_access_token');
+        const expiry = await localforage.getItem('farmos_token_expiry');
 
-    // Basic check for expiration (could trigger refresh here)
-    if (token && expiry && Date.now() > expiry) {
-        await logoutUser();
+        // Basic check for expiration (could trigger refresh here)
+        if (token && expiry && Date.now() > expiry) {
+            await logoutUser();
+            return null;
+        }
+
+        return token;
+    } catch (err) {
+        console.error('[Auth] getAccessToken failed:', err);
         return null;
     }
-
-    return token;
 };
 
+/**
+ * Limpia los tokens persistidos. No-throw: si localforage falla, se loguea
+ * y se continúa (el siguiente getAccessToken devolverá null de todas formas).
+ */
 export const logoutUser = async () => {
-    await localforage.removeItem('farmos_access_token');
-    await localforage.removeItem('farmos_refresh_token');
-    await localforage.removeItem('farmos_token_expiry');
+    try {
+        await localforage.removeItem('farmos_access_token');
+        await localforage.removeItem('farmos_refresh_token');
+        await localforage.removeItem('farmos_token_expiry');
+    } catch (err) {
+        console.error('[Auth] logoutUser failed (tokens may persist):', err);
+    }
 };
 
+/**
+ * @returns {Promise<boolean>} true si hay token vigente. Nunca throw —
+ *   delega en getAccessToken() que es defensive.
+ */
 export const isAuthenticated = async () => {
     const token = await getAccessToken();
     return !!token;

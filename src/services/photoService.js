@@ -103,27 +103,32 @@ export async function captureAndCompress(file) {
  * @returns {Promise<number>} id de la foto persistida
  */
 export async function savePhoto({ blob, assetId, logId, speciesSlug, meta = {} }) {
-  const db = await openDB();
-  const tx = db.transaction(STORES.MEDIA_CACHE, 'readwrite');
-  const store = tx.objectStore(STORES.MEDIA_CACHE);
-  const record = {
-    blob,
-    mime: blob.type,
-    size: blob.size,
-    assetId: assetId || null,
-    logId: logId || null,
-    speciesSlug: speciesSlug || null,
-    createdAt: new Date().toISOString(),
-    capturedAt: meta.capturedAt || new Date().toISOString(),
-    gps: meta.gps || null,
-    notes: meta.notes || null,
-    isUserOverride: true,  // distingue de catalog defaults
-  };
-  return new Promise((resolve, reject) => {
-    const req = store.add(record);
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
+  try {
+    const db = await openDB();
+    const tx = db.transaction(STORES.MEDIA_CACHE, 'readwrite');
+    const store = tx.objectStore(STORES.MEDIA_CACHE);
+    const record = {
+      blob,
+      mime: blob.type,
+      size: blob.size,
+      assetId: assetId || null,
+      logId: logId || null,
+      speciesSlug: speciesSlug || null,
+      createdAt: new Date().toISOString(),
+      capturedAt: meta.capturedAt || new Date().toISOString(),
+      gps: meta.gps || null,
+      notes: meta.notes || null,
+      isUserOverride: true,  // distingue de catalog defaults
+    };
+    return await new Promise((resolve, reject) => {
+      const req = store.add(record);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  } catch (err) {
+    console.error('[photoService] savePhoto failed:', err);
+    throw err;
+  }
 }
 
 /**
@@ -144,35 +149,41 @@ export async function savePhoto({ blob, assetId, logId, speciesSlug, meta = {} }
  * @returns {Promise<{url: string, source: 'user'|'catalog'|'placeholder', revoke?: () => void}>}
  */
 export async function getPhotoUrl({ assetId, speciesSlug } = {}) {
-  // 1) buscar user override por assetId
-  if (assetId) {
-    const userPhoto = await findLatestUserPhoto({ assetId });
-    if (userPhoto) {
-      const url = URL.createObjectURL(userPhoto.blob);
-      return { url, source: 'user', revoke: () => URL.revokeObjectURL(url) };
+  try {
+    // 1) buscar user override por assetId
+    if (assetId) {
+      const userPhoto = await findLatestUserPhoto({ assetId });
+      if (userPhoto) {
+        const url = URL.createObjectURL(userPhoto.blob);
+        return { url, source: 'user', revoke: () => URL.revokeObjectURL(url) };
+      }
     }
-  }
 
-  // 2) buscar user override por species (cualquier asset de esta especie)
-  if (speciesSlug) {
-    const userPhoto = await findLatestUserPhoto({ speciesSlug });
-    if (userPhoto) {
-      const url = URL.createObjectURL(userPhoto.blob);
-      return { url, source: 'user', revoke: () => URL.revokeObjectURL(url) };
+    // 2) buscar user override por species (cualquier asset de esta especie)
+    if (speciesSlug) {
+      const userPhoto = await findLatestUserPhoto({ speciesSlug });
+      if (userPhoto) {
+        const url = URL.createObjectURL(userPhoto.blob);
+        return { url, source: 'user', revoke: () => URL.revokeObjectURL(url) };
+      }
     }
-  }
 
-  // 3) catalog default
-  if (speciesSlug) {
-    const catalogUrl = `${CATALOG_PHOTOS_BASE}/${speciesSlug}.jpg`;
-    const exists = await checkUrlExists(catalogUrl);
-    if (exists) {
-      return { url: catalogUrl, source: 'catalog' };
+    // 3) catalog default
+    if (speciesSlug) {
+      const catalogUrl = `${CATALOG_PHOTOS_BASE}/${speciesSlug}.jpg`;
+      const exists = await checkUrlExists(catalogUrl);
+      if (exists) {
+        return { url: catalogUrl, source: 'catalog' };
+      }
     }
-  }
 
-  // 4) placeholder
-  return { url: PLACEHOLDER_URL, source: 'placeholder' };
+    // 4) placeholder
+    return { url: PLACEHOLDER_URL, source: 'placeholder' };
+  } catch (err) {
+    // Fallback no-throw: la UI nunca debe quedar sin un url placeholder
+    console.error('[photoService] getPhotoUrl failed, returning placeholder:', err);
+    return { url: PLACEHOLDER_URL, source: 'placeholder' };
+  }
 }
 
 /**
@@ -190,17 +201,22 @@ export async function getPhotoForLog(logId) {
   if (!logId) return { url: null, blob: null, source: 'missing' };
   if (typeof logId !== 'string') return { url: null, blob: null, source: 'missing' };
 
-  const photo = await findLatestUserPhoto({ logId });
-  if (!photo || !photo.blob) {
+  try {
+    const photo = await findLatestUserPhoto({ logId });
+    if (!photo || !photo.blob) {
+      return { url: null, blob: null, source: 'missing' };
+    }
+    const url = URL.createObjectURL(photo.blob);
+    return {
+      url,
+      blob: photo.blob,
+      source: 'user',
+      revoke: () => URL.revokeObjectURL(url),
+    };
+  } catch (err) {
+    console.error('[photoService] getPhotoForLog failed:', err);
     return { url: null, blob: null, source: 'missing' };
   }
-  const url = URL.createObjectURL(photo.blob);
-  return {
-    url,
-    blob: photo.blob,
-    source: 'user',
-    revoke: () => URL.revokeObjectURL(url),
-  };
 }
 
 /**
@@ -209,17 +225,22 @@ export async function getPhotoForLog(logId) {
  */
 export async function listUserPhotosBySpecies(speciesSlug) {
   if (!speciesSlug) return [];
-  const db = await openDB();
-  const tx = db.transaction(STORES.MEDIA_CACHE, 'readonly');
-  const store = tx.objectStore(STORES.MEDIA_CACHE);
-  return new Promise((resolve) => {
-    const req = store.getAll();
-    req.onsuccess = () => {
-      const all = req.result || [];
-      resolve(all.filter((p) => p.speciesSlug === speciesSlug));
-    };
-    req.onerror = () => resolve([]);
-  });
+  try {
+    const db = await openDB();
+    const tx = db.transaction(STORES.MEDIA_CACHE, 'readonly');
+    const store = tx.objectStore(STORES.MEDIA_CACHE);
+    return await new Promise((resolve) => {
+      const req = store.getAll();
+      req.onsuccess = () => {
+        const all = req.result || [];
+        resolve(all.filter((p) => p.speciesSlug === speciesSlug));
+      };
+      req.onerror = () => resolve([]);
+    });
+  } catch (err) {
+    console.error('[photoService] listUserPhotosBySpecies failed:', err);
+    return [];
+  }
 }
 
 /**
@@ -234,22 +255,27 @@ export async function getPhotoById(photoId) {
   if (photoId == null) return null;
   const numericId = typeof photoId === 'string' ? Number(photoId) : photoId;
   if (Number.isNaN(numericId)) return null;
-  const db = await openDB();
-  const tx = db.transaction(STORES.MEDIA_CACHE, 'readonly');
-  const store = tx.objectStore(STORES.MEDIA_CACHE);
-  return new Promise((resolve) => {
-    const req = store.get(numericId);
-    req.onsuccess = () => {
-      const rec = req.result;
-      if (!rec || !rec.blob) {
-        resolve(null);
-        return;
-      }
-      const url = URL.createObjectURL(rec.blob);
-      resolve({ url, revoke: () => URL.revokeObjectURL(url) });
-    };
-    req.onerror = () => resolve(null);
-  });
+  try {
+    const db = await openDB();
+    const tx = db.transaction(STORES.MEDIA_CACHE, 'readonly');
+    const store = tx.objectStore(STORES.MEDIA_CACHE);
+    return await new Promise((resolve) => {
+      const req = store.get(numericId);
+      req.onsuccess = () => {
+        const rec = req.result;
+        if (!rec || !rec.blob) {
+          resolve(null);
+          return;
+        }
+        const url = URL.createObjectURL(rec.blob);
+        resolve({ url, revoke: () => URL.revokeObjectURL(url) });
+      };
+      req.onerror = () => resolve(null);
+    });
+  } catch (err) {
+    console.error('[photoService] getPhotoById failed:', err);
+    return null;
+  }
 }
 
 /** Borra una foto por id. */

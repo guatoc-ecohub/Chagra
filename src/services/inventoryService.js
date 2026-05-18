@@ -22,86 +22,131 @@ import { validateLogEntry, EVENT_TYPES } from './inventoryEvents.js';
 /**
  * Persiste un evento ya validado. Idempotente — si el id ya existe, NO sobrescribe
  * (ADR-019 inmutable).
+ *
+ * @throws {ValidationError} si el event no pasa validateLogEntry()
+ * @throws {DOMException} si IndexedDB falla (transaction abort, quota exceeded, etc.).
+ *   El caller debe capturar para mostrar toast al operador y NO perder el evento
+ *   (encolarlo en pending_inventory_events para reintento).
  */
 export async function appendEvent(event) {
-  validateLogEntry(event); // defensive: re-validate antes de persistir
+  try {
+    validateLogEntry(event); // defensive: re-validate antes de persistir
 
-  const db = await openDB();
-  const tx = db.transaction([STORES.INVENTORY_EVENTS, STORES.INVENTORY_STOCK], 'readwrite');
-  const eventStore = tx.objectStore(STORES.INVENTORY_EVENTS);
+    const db = await openDB();
+    const tx = db.transaction([STORES.INVENTORY_EVENTS, STORES.INVENTORY_STOCK], 'readwrite');
+    const eventStore = tx.objectStore(STORES.INVENTORY_EVENTS);
 
-  // Check duplicado por id (ULID es global unique, pero defense-in-depth)
-  const existing = await new Promise((resolve, reject) => {
-    const r = eventStore.get(event.id);
-    r.onsuccess = () => resolve(r.result);
-    r.onerror = () => reject(r.error);
-  });
-  if (existing) {
-    return { duplicated: true, event: existing };
+    // Check duplicado por id (ULID es global unique, pero defense-in-depth)
+    const existing = await new Promise((resolve, reject) => {
+      const r = eventStore.get(event.id);
+      r.onsuccess = () => resolve(r.result);
+      r.onerror = () => reject(r.error);
+    });
+    if (existing) {
+      return { duplicated: true, event: existing };
+    }
+
+    await new Promise((resolve, reject) => {
+      const r = eventStore.add(event);
+      r.onsuccess = resolve;
+      r.onerror = () => reject(r.error);
+    });
+
+    // Update stock snapshot incrementalmente (proyección incremental)
+    await applyToSnapshot(tx, event);
+
+    return await new Promise((resolve, reject) => {
+      tx.oncomplete = () => resolve({ duplicated: false, event });
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (err) {
+    console.error('[inventoryService] appendEvent failed:', err, { event_id: event?.id, event_type: event?.event_type });
+    throw err;
   }
-
-  await new Promise((resolve, reject) => {
-    const r = eventStore.add(event);
-    r.onsuccess = resolve;
-    r.onerror = () => reject(r.error);
-  });
-
-  // Update stock snapshot incrementalmente (proyección incremental)
-  await applyToSnapshot(tx, event);
-
-  return new Promise((resolve, reject) => {
-    tx.oncomplete = () => resolve({ duplicated: false, event });
-    tx.onerror = () => reject(tx.error);
-  });
 }
 
 // ─── Read paths (snapshot O(1)) ──────────────────────────────────────
 
+/**
+ * @returns {Promise<Object>} stock entry o default `{quantity: 0, unit: null}` si
+ *   no existe o IndexedDB falla (defensive: UI no debe romperse).
+ */
 export async function getStock(itemId) {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORES.INVENTORY_STOCK, 'readonly');
-    const r = tx.objectStore(STORES.INVENTORY_STOCK).get(itemId);
-    r.onsuccess = () => resolve(r.result || { item_id: itemId, quantity: 0, unit: null, last_updated: null });
-    r.onerror = () => reject(r.error);
-  });
+  try {
+    const db = await openDB();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORES.INVENTORY_STOCK, 'readonly');
+      const r = tx.objectStore(STORES.INVENTORY_STOCK).get(itemId);
+      r.onsuccess = () => resolve(r.result || { item_id: itemId, quantity: 0, unit: null, last_updated: null });
+      r.onerror = () => reject(r.error);
+    });
+  } catch (err) {
+    console.error('[inventoryService] getStock failed:', err);
+    return { item_id: itemId, quantity: 0, unit: null, last_updated: null };
+  }
 }
 
+/**
+ * @returns {Promise<Array>} snapshot completo o [] si IndexedDB falla.
+ */
 export async function getAllStock() {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORES.INVENTORY_STOCK, 'readonly');
-    const r = tx.objectStore(STORES.INVENTORY_STOCK).getAll();
-    r.onsuccess = () => resolve(r.result || []);
-    r.onerror = () => reject(r.error);
-  });
+  try {
+    const db = await openDB();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORES.INVENTORY_STOCK, 'readonly');
+      const r = tx.objectStore(STORES.INVENTORY_STOCK).getAll();
+      r.onsuccess = () => resolve(r.result || []);
+      r.onerror = () => reject(r.error);
+    });
+  } catch (err) {
+    console.error('[inventoryService] getAllStock failed:', err);
+    return [];
+  }
 }
 
+/**
+ * @returns {Promise<Array>} eventos ordenados de un item, o [] si falla.
+ */
 export async function getEventsForItem(itemId) {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORES.INVENTORY_EVENTS, 'readonly');
-    const idx = tx.objectStore(STORES.INVENTORY_EVENTS).index('item_id');
-    const r = idx.getAll(itemId);
-    r.onsuccess = () => {
-      const sorted = (r.result || []).sort(compareEventOrder);
-      resolve(sorted);
-    };
-    r.onerror = () => reject(r.error);
-  });
+  try {
+    const db = await openDB();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORES.INVENTORY_EVENTS, 'readonly');
+      const idx = tx.objectStore(STORES.INVENTORY_EVENTS).index('item_id');
+      const r = idx.getAll(itemId);
+      r.onsuccess = () => {
+        const sorted = (r.result || []).sort(compareEventOrder);
+        resolve(sorted);
+      };
+      r.onerror = () => reject(r.error);
+    });
+  } catch (err) {
+    console.error('[inventoryService] getEventsForItem failed:', err);
+    return [];
+  }
 }
 
+/**
+ * @returns {Promise<Array>} todos los eventos ordenados, o [] si falla.
+ *   Nota: rebuildSnapshot() depende de esta lectura — si retorna [] por error,
+ *   el snapshot quedará vacío hasta el próximo rebuild exitoso.
+ */
 export async function getAllEvents() {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORES.INVENTORY_EVENTS, 'readonly');
-    const r = tx.objectStore(STORES.INVENTORY_EVENTS).getAll();
-    r.onsuccess = () => {
-      const sorted = (r.result || []).sort(compareEventOrder);
-      resolve(sorted);
-    };
-    r.onerror = () => reject(r.error);
-  });
+  try {
+    const db = await openDB();
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORES.INVENTORY_EVENTS, 'readonly');
+      const r = tx.objectStore(STORES.INVENTORY_EVENTS).getAll();
+      r.onsuccess = () => {
+        const sorted = (r.result || []).sort(compareEventOrder);
+        resolve(sorted);
+      };
+      r.onerror = () => reject(r.error);
+    });
+  } catch (err) {
+    console.error('[inventoryService] getAllEvents failed:', err);
+    return [];
+  }
 }
 
 // ─── Pure projection (corazón de la reconciliación) ──────────────────
@@ -260,33 +305,38 @@ export function projectStock(events) {
  * Llamar después de un sync grande, o si se sospecha drift.
  */
 export async function rebuildSnapshot() {
-  const events = await getAllEvents();
-  const stock = projectStock(events);
+  try {
+    const events = await getAllEvents();
+    const stock = projectStock(events);
 
-  const db = await openDB();
-  const tx = db.transaction(STORES.INVENTORY_STOCK, 'readwrite');
-  const store = tx.objectStore(STORES.INVENTORY_STOCK);
+    const db = await openDB();
+    const tx = db.transaction(STORES.INVENTORY_STOCK, 'readwrite');
+    const store = tx.objectStore(STORES.INVENTORY_STOCK);
 
-  // Limpiar snapshot anterior
-  await new Promise((resolve, reject) => {
-    const r = store.clear();
-    r.onsuccess = resolve;
-    r.onerror = () => reject(r.error);
-  });
-
-  // Escribir el nuevo
-  for (const value of stock.values()) {
+    // Limpiar snapshot anterior
     await new Promise((resolve, reject) => {
-      const r = store.put(value);
+      const r = store.clear();
       r.onsuccess = resolve;
       r.onerror = () => reject(r.error);
     });
-  }
 
-  return new Promise((resolve, reject) => {
-    tx.oncomplete = () => resolve({ rebuilt_count: stock.size });
-    tx.onerror = () => reject(tx.error);
-  });
+    // Escribir el nuevo
+    for (const value of stock.values()) {
+      await new Promise((resolve, reject) => {
+        const r = store.put(value);
+        r.onsuccess = resolve;
+        r.onerror = () => reject(r.error);
+      });
+    }
+
+    return await new Promise((resolve, reject) => {
+      tx.oncomplete = () => resolve({ rebuilt_count: stock.size });
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (err) {
+    console.error('[inventoryService] rebuildSnapshot failed:', err);
+    throw err;
+  }
 }
 
 /**

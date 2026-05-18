@@ -141,28 +141,47 @@ async function loadCorpus() {
   return corpusCache;
 }
 
+/**
+ * Recupera los top-K passages más relevantes al query usando BM25.
+ *
+ * @returns {Promise<Array>} top-K passages con score>0, o [] si falla la carga
+ *   del corpus (caller debe tratar [] como "sin contexto RAG disponible").
+ */
 export async function retrieve(query, topK = 5) {
-  const { docs, idf } = await loadCorpus();
-  const queryTerms = tokenize(query);
+  try {
+    const { docs, idf } = await loadCorpus();
+    const queryTerms = tokenize(query);
 
-  if (queryTerms.length === 0) return [];
+    if (queryTerms.length === 0) return [];
 
-  const scored = docs.map((doc) => ({
-    ...doc,
-    score: scoreBM25(doc, queryTerms, idf, avgDocLen),
-  }));
+    const scored = docs.map((doc) => ({
+      ...doc,
+      score: scoreBM25(doc, queryTerms, idf, avgDocLen),
+    }));
 
-  scored.sort((a, b) => b.score - a.score);
-  return scored.slice(0, topK).filter((d) => d.score > 0);
+    scored.sort((a, b) => b.score - a.score);
+    return scored.slice(0, topK).filter((d) => d.score > 0);
+  } catch (err) {
+    console.error('[RAG] retrieve failed, returning empty result:', err);
+    return [];
+  }
 }
 
+/**
+ * @returns {Promise<Object>} stats del corpus o defaults zero si falla.
+ */
 export async function getCorpusStats() {
-  const { docs, idf } = await loadCorpus();
-  return {
-    totalDocs: docs.length,
-    uniqueTerms: idf.size,
-    avgDocLen: Math.round(avgDocLen),
-  };
+  try {
+    const { docs, idf } = await loadCorpus();
+    return {
+      totalDocs: docs.length,
+      uniqueTerms: idf.size,
+      avgDocLen: Math.round(avgDocLen),
+    };
+  } catch (err) {
+    console.error('[RAG] getCorpusStats failed:', err);
+    return { totalDocs: 0, uniqueTerms: 0, avgDocLen: 0 };
+  }
 }
 
 export const RAG_SERVICE = {

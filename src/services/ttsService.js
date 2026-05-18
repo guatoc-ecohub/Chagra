@@ -35,6 +35,11 @@ function loadVoices() {
   });
 }
 
+/**
+ * @returns {Promise<SpeechSynthesisVoice[]>} array de voces disponibles.
+ *   loadVoices() resuelve con [] si SpeechSynthesis no está disponible,
+ *   por lo que esta función nunca throw — siempre retorna un array.
+ */
 export async function getVoices() {
   if (!voicesLoaded) {
     await loadVoices();
