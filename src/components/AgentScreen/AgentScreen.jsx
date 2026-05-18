@@ -45,7 +45,7 @@ export default function AgentScreen({ onBack }) {
   const ttsSupported = isSupported();
   const [kokoroReady, setKokoroReady] = useState(false);
   // Bug 2026-05-18 (Karen reportó stuck-pensando): tras 20s sin token visible,
-  // mostrar mensaje "Aún pensando, toca cancelar si querés reintentar" y
+  // mostrar mensaje "Aún pensando, toca cancelar si quieres reintentar" y
   // habilitar botón cancelar que dispara AbortController. Si pasan 30s sin
   // token, abortamos automáticamente con error visible.
   const [showSlowWarning, setShowSlowWarning] = useState(false);
@@ -108,7 +108,7 @@ export default function AgentScreen({ onBack }) {
     }
     setState(STATE_IDLE);
     setStreamingContent('');
-    setError('Cancelado. Toca de nuevo si querés reintentar.');
+    setError('Cancelado. Toca de nuevo si quieres reintentar.');
   };
 
   useEffect(() => {
@@ -375,7 +375,7 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
       try {
         const text = await transcribe(blob);
         if (text) {
-          // Auto-activar TTS cuando el input fue voz: si hablás, esperás
+          // Auto-activar TTS cuando el input fue voz: si hablas, esperas
           // respuesta hablada. Si el operador silenció TTS manualmente y
           // habla, respetamos su preferencia (sólo activamos si estaba
           // ya en true por default, o si nunca lo tocó).
@@ -519,7 +519,7 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
         {state === STATE_THINKING && (
           <div className="flex flex-col items-center gap-2 mt-2">
             <p className={`text-center text-xs ${showSlowWarning ? 'text-amber-400' : 'text-violet-400'}`}>
-              {showSlowWarning ? 'Aún pensando — toca Cancelar si querés reintentar' : 'Pensando...'}
+              {showSlowWarning ? 'Aún pensando — toca Cancelar si quieres reintentar' : 'Pensando...'}
             </p>
             <button
               type="button"

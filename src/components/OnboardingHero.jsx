@@ -18,7 +18,7 @@ import { FARM_CONFIG } from '../config/defaults';
  * Adaptive (Autopilot 2026-05-06): el copy del header se ajusta al contexto
  * detectado del operador para reducir ambigüedad cold-start:
  *   - Sin zonas creadas Y sin FARM_CONFIG → "primera vez en Chagra"
- *   - Con zonas pero sin plantas → "ya tenés zonas listas, falta la primera planta"
+ *   - Con zonas pero sin plantas → "ya tienes zonas listas, falta la primera planta"
  *   - Sin zonas pero con FARM_CONFIG → "tu finca está configurada"
  *
  * Refs: deepresearch/chagra-ux/decisions/ux-clarity-2026-05.md

@@ -5,6 +5,7 @@ import { setCurrentOperator } from '../services/operatorIdentityService';
 import { version as APP_VERSION } from '../../package.json';
 import ChagraGrowLoader from './ChagraGrowLoader';
 import LegalLinks from './LegalLinks';
+import WelcomeStatsHero from './WelcomeStatsHero';
 
 export default function LoginScreen({ onLoginSuccess, onSave }) {
   const [creds, setCreds] = useState({ username: '', password: '' });
@@ -41,14 +42,23 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
   };
 
   return (
-    <div className="h-[100dvh] w-full bg-slate-950 bg-biopunk-pattern flex flex-col justify-center items-center p-6 text-slate-100">
-      <div className="w-full max-w-sm flex flex-col items-center gap-8">
-        <div className="w-32 h-32 bg-muzo/20 rounded-full flex items-center justify-center shadow-neon-muzo">
-          <Sprout size={72} className="text-muzo-glow" />
+    <div className="min-h-[100dvh] w-full bg-slate-950 bg-biopunk-pattern flex flex-col justify-start items-center p-6 text-slate-100 overflow-y-auto">
+      <div className="w-full max-w-sm flex flex-col items-center gap-6 pt-8">
+        <div className="w-24 h-24 bg-muzo/20 rounded-full flex items-center justify-center shadow-neon-muzo">
+          <Sprout size={56} className="text-muzo-glow" />
         </div>
         <div className="text-center">
           <h1 className="text-4xl font-black text-muzo animate-bounce">Chagra</h1>
           <span className="text-sm text-slate-500 font-mono mt-2">v{APP_VERSION}</span>
+        </div>
+
+        {/* Bug 2026-05-18 operator: 'antes de loguearme quiero estadísticas
+            generales de todas las instalaciones de chagra en el login'.
+            Stats globales del catálogo (especies, fichas pedagógicas,
+            biopreparados) son públicos — visibles pre-auth. Plantas cuidadas
+            del operador aparece como 0 hasta login. */}
+        <div className="w-full">
+          <WelcomeStatsHero />
         </div>
 
         <form onSubmit={handleLogin} className="w-full flex flex-col gap-6">
