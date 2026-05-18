@@ -358,6 +358,7 @@
         "passiflora_tripartita_mollissima",
         "cenchrus_clandestinus_manejado",
         "quercus_humboldtii",
+        "sambucus_nigra_peruviana",
         "solanum_phureja",
         "trifolium_repens",
         "vicia_faba",
@@ -3556,14 +3557,18 @@
         "metodo_principal": "esqueje",
         "notas": "Su estaca prende fácilmente, permitiendo establecer cercas funcionales en poco tiempo."
       },
-      "companions": [],
+      "companions": [
+        "alnus_acuminata",
+        "trifolium_repens"
+      ],
       "antagonists": [],
-      "valor_pedagogico": "El sauco andino (Sambucus nigra L. subsp. peruviana) es un arbusto/árbol pequeño nativo de los Andes ampliamente naturalizado en Colombia, cultivado por sus flores (té) y frutos (mermeladas, vinos artesanales). Se encuentra en Cundinamarca (Sabana Bogotá, Choachí, Ubaque, La Calera), Boyacá altiplano, Nariño y Cauca entre 2.000 y 3.000 msnm en zona térmica fría a templada. Propagación por estaca leñosa (estaca de 30-50 cm) con 70-90% prendimiento sin hormonas. Crecimiento rápido alcanza 3-5 m en 3 años. Manejo agroecológico: cercas vivas en linderos, sombra de patio campesino, atrayente polinizadores (abejas, abejorros), fortalecedor de inmunidad de cultivos asociados. Fuentes Tier A: Jardín Botánico Bogotá, AGROSAVIA, POWO Kew, GBIF Backbone Taxonomy, Bernal et al. Catálogo Plantas y Líquenes Colombia.",
+      "valor_pedagogico": "El sauco andino (Sambucus nigra L. subsp. peruviana) es un arbusto/árbol pequeño nativo de los Andes ampliamente naturalizado en Colombia, cultivado por sus flores (té) y frutos (mermeladas, vinos artesanales). Se encuentra en Cundinamarca (Sabana Bogotá, Choachí, Ubaque, La Calera), Boyacá altiplano, Nariño y Cauca entre 2.000 y 3.000 msnm en zona térmica fría a templada. Propagación por estaca leñosa (30-50 cm) con 70-90% prendimiento sin hormonas. Crecimiento rápido alcanza 3-5 m en 3 años. Manejo agroecológico: cercas vivas en linderos, sombra de patio campesino, atrayente polinizadores (abejas, abejorros), fortalecedor de inmunidad de cultivos asociados. Asociado bien con aliso andino (Alnus acuminata, fijador de N) en bordes silvopastoriles y trébol blanco (Trifolium repens) como cobertura del estrato bajo. Las flores se cosechan secas en sombra para infusiones expectorantes y febrífugas; los frutos maduros (negros, NO los verdes que son cianogénicos) para mermeladas. Fuentes Tier A: Humboldt Flora Alto-Andina, GBIF Backbone Taxonomy, JBB Plantas Medicinales, Pamplona-Roger Plantas Medicinales.",
       "source_ids": [
         "pamplona-roger-2006-plantas-medicinales",
         "humboldt-flora-alto-andina",
         "gbif-taxonomic-backbone",
-        "jbb-plantas-medicinales"
+        "jbb-plantas-medicinales",
+        "powo-kew"
       ],
       "validation_level": "claude_draft",
       "estrato": "alto"
@@ -4011,6 +4016,7 @@
       },
       "companions": [
         "alnus_acuminata",
+        "sambucus_nigra_peruviana",
         "zea_mays",
         "avena_sativa",
         "festuca_arundinacea",
