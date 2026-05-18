@@ -26869,6 +26869,1688 @@
       "companions": null,
       "antagonists": null,
       "especies_nativas_sustitutas": null
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_ARBOLES_TEMPLADO_RETRY",
+      "id": "nectandra_acutifolia",
+      "nombre_comun": "Jigua",
+      "nombre_comunes_regionales": [
+        "amarillo de Río",
+        "jigua amarillo",
+        "laurel jigua"
+      ],
+      "nombre_cientifico": "Nectandra acutifolia (Ruiz & Pav.) Mez",
+      "familia_botanica": "Lauraceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "biomass_producer",
+        "windbreak",
+        "nurse_plant",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1200,
+        "optimo_max": 1800,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 15,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "árbol perennifolio de dosel medio-alto, 15-25 m altura, copa redondeada y fuste cilíndrico recto, corteza pardo-grisácea fisurada",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas recalcitrantes recolectadas de frutos maduros (drupa morado-negruzca) que deben sembrarse inmediatamente, no toleran desecación ni almacenamiento >2 semanas. Germinación 50-70% a 30-60 días en sustrato orgánico de bosque. Vivero a sombra 70%. Trasplante a bolsa al alcanzar 10-15 cm. Plantación definitiva al alcanzar 40-50 cm altura, a los 8-12 meses.",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "Especie esciófita en juventud, requiere sombrío. Crecimiento lento en primeros 3 años, luego acelera. Ideal para enriquecimiento de bosques secundarios y dosel diversificado en café bajo sombrío.",
+        "fuente": "Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia; van der Werff Lauraceae Neotropicales; Cenicafé manuales sombrío"
+      },
+      "companions": [
+        "coffea_arabica",
+        "cedrela_odorata",
+        "inga_edulis",
+        "cordia_alliodora"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol 15-25 m, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Un ejemplar patrimonial por huerto >800 m² como sombra y refugio de fauna.",
+          "tips": [
+            "Plantar bajo sombra de pioneras los primeros 3 años",
+            "Distancia >6 m de construcciones"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío para café 80-120 árb/ha en cafetales bajo sombrío diversificado de la zona cafetera templada.",
+          "tips": [
+            "Densidad 8x10 m en cafetal",
+            "Asociación con Inga y Erythrina como nodriza inicial"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave para restauración de bosques húmedos premontanos andinos zona cafetera.",
+          "tips": [
+            "Plantación en parches bajo dosel de pioneras",
+            "Densidad 400-600 ind/ha en enriquecimiento"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Árbol del dosel premontano andino, productor de biomasa hojarasca rica en taninos, hospedero de aves frugívoras (tucanes, mirlas, tángaras) que dispersan sus drupas. Madera amarilla aromática usada localmente en construcción rural y mueblería rústica. Parte estructural del bosque andino cafetero entre 1.000-2.000 msnm.",
+      "valor_pedagogico": "El jigua o amarillo de Río (Nectandra acutifolia, Lauraceae) es uno de los árboles representativos del bosque andino premontano colombiano entre 1.000 y 2.000 msnm en la zona cafetera de la región Andina. Distribuido en las cordilleras Central, Occidental y Oriental colombianas, principalmente en Quindío, Risaralda, Caldas, Antioquia, Valle del Cauca, Tolima, Huila, Cundinamarca y Santander. Árbol perennifolio de 15-25 metros de altura con copa redondeada densa, fuste cilíndrico recto con corteza pardo-grisácea fisurada longitudinalmente, hojas alternas elípticas-lanceoladas coriáceas verde oscuro brillante en haz y verde pálido pubescente en envés con olor característico a laurel al frotarlas, flores pequeñas amarillento-blancas en panículas axilares melíferas atractoras de abejas nativas Meliponini, frutos drupas globosas verde-violáceas que viran a negro al madurar muy buscadas por aves frugívoras del bosque andino (tucanes Andigena nigrirostris, mirlas Turdus fuscater, tángaras Tangara spp). Su madera amarillenta aromática se ha usado tradicionalmente en construcción rural cafetera, ebanistería rústica, mangos de herramienta y elaboración de cucharas. Es especie esciófita en juventud (requiere sombrío para germinar y establecerse) por lo que prospera bajo dosel de pioneras como Cecropia o Croton; crece lentamente los primeros 3 años para luego acelerar hasta alcanzar el dosel intermedio del bosque andino. Su asocio agroecológico clásico es con café bajo sombrío diversificado, donde aporta biomasa hojarasca, regula microclima, atrae polinizadores y hospeda fauna silvestre que controla plagas del cafetal. Las semillas son recalcitrantes y deben sembrarse inmediatamente tras la cosecha (intolerantes a desecación), lo que ha limitado su propagación masiva y su disponibilidad en viveros forestales. Es lección de soberanía botánica: revalorizar las lauráceas nativas de los bosques andinos cafeteros como dosel diversificado del café, en lugar del monocultivo de Inga densiflora, ofrece servicios ecosistémicos similares con mayor diversidad genética y resiliencia ante cambio climático. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, van der Werff revisiones Lauraceae Neotropicales, Cenicafé manuales cafeteros sombrío diversificado.",
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "cenicafe-manual-cafetero-2013"
+      ],
+      "especies_nativas_sustitutas": null
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_ARBOLES_TEMPLADO_RETRY",
+      "id": "ocotea_calophylla",
+      "nombre_comun": "Laurel comino",
+      "nombre_comunes_regionales": [
+        "comino",
+        "laurel del monte",
+        "amarillo comino"
+      ],
+      "nombre_cientifico": "Ocotea calophylla Mez",
+      "familia_botanica": "Lauraceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "biomass_producer",
+        "nurse_plant",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1400,
+        "optimo_max": 1900,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 1,
+        "optimo_min": 14,
+        "optimo_max": 22,
+        "max_tolerable": 27
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "árbol perennifolio de 18-28 m altura, copa amplia globosa, fuste recto y corteza gris fisurada que exuda aroma a laurel",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas recalcitrantes recolectadas de drupas maduras, siembra inmediata en sustrato orgánico forestal. Germinación 40-60% a 45-90 días bajo sombra 70%. Vivero con riego frecuente. Plantación definitiva a los 10-14 meses (40-60 cm altura) bajo dosel parcial.",
+        "tiempo_a_establecimiento_dias": 120,
+        "notas": "Madera amarilla muy apreciada (uno de los 'cominos' del bosque andino colombiano). Población silvestre reducida por tala selectiva histórica. Crecimiento lento, especie de bosque maduro.",
+        "fuente": "Cárdenas & Salinas 2007 Libro Rojo Plantas Colombia; Bernal et al. 2015; Cenicafé sombrío"
+      },
+      "companions": [
+        "coffea_arabica",
+        "cedrela_odorata",
+        "nectandra_acutifolia",
+        "inga_edulis"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol grande, inviable."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Ejemplar patrimonial en huerto >1000 m² como sombrío y reserva maderable familiar.",
+          "tips": [
+            "Sombrío de establecimiento años 1-3",
+            "Distancia >8 m de construcciones"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío diversificado de café 60-100 árb/ha en zona cafetera templada media-alta.",
+          "tips": [
+            "Asocio con Inga densiflora como nodriza inicial",
+            "Distancia 9x12 m"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave para enriquecimiento de bosque andino premontano. Tala histórica redujo poblaciones silvestres.",
+          "tips": [
+            "Plantación bajo dosel pioneras",
+            "Densidad 300-500 ind/ha enriquecimiento"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Lauráceas cafeteras del dosel medio premontano. Productor de biomasa, hospedero de fauna frugívora (drupas comidas por mirlas y tucanes), atractor de abejas nativas Meliponini. Madera amarilla aromática muy valorada como uno de los 'cominos' del bosque andino colombiano, sobreexplotada en el siglo XX por carpintería y ebanistería fina.",
+      "valor_pedagogico": "El laurel comino (Ocotea calophylla, Lauraceae) es una de las lauráceas estructurales del bosque andino premontano cafetero colombiano, distribuida entre 1.200 y 2.000 msnm en la región Andina (cordilleras Central y Occidental especialmente en Quindío, Risaralda, Caldas, Antioquia, Valle del Cauca, Cauca, Tolima, Huila y Cundinamarca). Árbol perennifolio de 18-28 metros de altura con copa amplia globosa, fuste cilíndrico recto y corteza gris fisurada que al cortarse exuda un aroma intenso a laurel (de ahí el nombre vernáculo); hojas alternas elípticas grandes coriáceas verde oscuro brillantes, flores pequeñas blanco-verdosas en panículas axilares atractoras de abejas nativas Meliponini, drupas elipsoidales verdes que viran a negro-violáceo al madurar consumidas y dispersadas por tucanes (Andigena, Aulacorhynchus), mirlas (Turdus) y tángaras frugívoras. Su madera amarilla aromática es uno de los 'cominos' del bosque andino colombiano: aromática, durable, fácil de trabajar, históricamente sobreexplotada durante el siglo XX para carpintería fina, ebanistería, instrumentos musicales y construcción de puertas y ventanas en arquitectura cafetera tradicional, lo que redujo significativamente las poblaciones silvestres. Es especie de bosque maduro con crecimiento lento, esciófita en juventud (necesita sombrío para germinación y establecimiento), por lo que su recuperación natural requiere bosques continuos con dosel intermedio. Su asocio agroecológico clásico es con café bajo sombrío diversificado típico de fincas cafeteras patrimoniales del Eje Cafetero y Antioquia, donde combinado con Inga densiflora (nodriza N-fijadora), Cordia alliodora (maderable acompañante) y Cedrela odorata (maderable patrimonial) configura un dosel multiestrato con altos servicios ecosistémicos. Sus semillas recalcitrantes (intolerantes a desecación y almacenamiento) deben sembrarse inmediatamente tras cosecha lo que limita su propagación masiva en viveros forestales convencionales. Es lección de soberanía botánica y maderera: recuperar el laurel comino en los cafetales con sombrío y restauración del bosque andino premontano reduce dependencia de maderas finas importadas (teca, caoba africana) y revaloriza el patrimonio forestal de la zona cafetera colombiana. Fuentes Tier A: Cárdenas & Salinas 2007 Libro Rojo Plantas Colombia, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, Cenicafé manuales sombrío diversificado cafetero.",
+      "source_ids": [
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "cenicafe-manual-cafetero-2013"
+      ],
+      "especies_nativas_sustitutas": null
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_ARBOLES_TEMPLADO_RETRY",
+      "id": "aniba_perutilis",
+      "nombre_comun": "Aniba comino",
+      "nombre_comunes_regionales": [
+        "comino crespo",
+        "comino real",
+        "canelo Andes",
+        "chachajo"
+      ],
+      "nombre_cientifico": "Aniba perutilis Hemsl.",
+      "familia_botanica": "Lauraceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "biomass_producer",
+        "nurse_plant",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "en_peligro",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1300,
+        "optimo_max": 1800,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 16,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "árbol perennifolio de bosque maduro, 20-30 m altura, fuste cilíndrico recto, copa redondeada densa, corteza pardo-grisácea fina aromática",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas recalcitrantes (sin tolerancia a desecación), siembra inmediata en sustrato orgánico forestal bajo sombra 70-80%. Germinación 30-50% a 60-90 días. Vivero a sombra densa con riego constante. Plantación definitiva a los 12-18 meses (40-60 cm) bajo dosel forestal. Crecimiento muy lento, especie de bosque maduro climácico.",
+        "tiempo_a_establecimiento_dias": 180,
+        "notas": "Especie EN PELIGRO (Libro Rojo Plantas Colombia, UICN). Madera 'comino crespo' una de las más finas del país, sobreexplotada históricamente para ebanistería de lujo. Aprovechamiento silvestre prohibido sin permiso CAR. Propagación esencial para conservación ex situ.",
+        "fuente": "Cárdenas & Salinas 2007 Libro Rojo Plantas Colombia (categoría EN); Bernal et al. 2015; IUCN Red List"
+      },
+      "companions": [
+        "coffea_arabica",
+        "cedrela_odorata",
+        "ocotea_calophylla",
+        "inga_edulis"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol 20-30 m, inviable."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Un ejemplar patrimonial por huerto >1000 m² como contribución a conservación ex situ y reserva maderable familiar.",
+          "tips": [
+            "Sombrío permanente al menos 50%",
+            "Plantación bajo dosel pionero existente",
+            "Distancia >10 m de construcciones"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío de café altamente diversificado 40-80 árb/ha en cafetales del Eje Cafetero y Antioquia. Especie altamente patrimonial.",
+          "tips": [
+            "Plantación con sombra establecida (Inga, Erythrina)",
+            "Distancia 10x12 m mínimo",
+            "Manejo a largo plazo turno >40 años"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave conservación ex situ por status EN. Restauración bosque andino premontano con prioridad alta.",
+          "tips": [
+            "Plantación bajo dosel maduro existente",
+            "Densidad 200-400 ind/ha enriquecimiento bosque secundario",
+            "Registro genético genealógico de individuos plantados"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Árbol del dosel del bosque andino premontano climácico. Especie EN PELIGRO por sobreexplotación maderera histórica del 'comino crespo'. Productor de biomasa rica, hospedero de polinizadores nativos y fauna frugívora. Madera más fina del bosque andino colombiano (densidad alta, aroma persistente, durabilidad excepcional), prácticamente extinta del comercio legal.",
+      "valor_pedagogico": "El aniba comino o comino crespo (Aniba perutilis, Lauraceae) es uno de los árboles maderables más emblemáticos y críticamente amenazados del bosque andino colombiano, listado como EN PELIGRO en el Libro Rojo de Plantas de Colombia (Cárdenas & Salinas 2007) y en la lista roja de la UICN. Es nativo de los bosques húmedos premontanos andinos entre 1.000 y 2.000 msnm, distribuido en la región Andina especialmente en Antioquia, Caldas, Risaralda, Quindío, Valle del Cauca, Cauca, Tolima, Huila, Chocó, Nariño y Cundinamarca. Árbol perennifolio de bosque maduro climácico de 20-30 metros de altura con fuste cilíndrico recto, copa redondeada densa y corteza pardo-grisácea fina con aroma intenso característico a comino y canela cuando se raspa; hojas alternas elípticas coriáceas verde oscuro brillantes en haz, flores pequeñas blanco-amarillentas en panículas axilares atractoras de abejas Meliponini, drupas elipsoidales verde-negruzcas dispersadas por aves frugívoras del bosque andino. Su madera —conocida comercialmente como 'comino crespo' o 'comino real'— ha sido históricamente considerada una de las más finas del país: densidad alta, veteado ondulado característico, aroma persistente a canela-comino, durabilidad excepcional, lo que la convirtió en madera predilecta para ebanistería de lujo, mueblería patrimonial, puertas talladas, instrumentos musicales, cofres y altares en arquitectura colonial y republicana colombiana del siglo XVIII al XX. Esta sobreexplotación maderera por más de 200 años redujo las poblaciones silvestres hasta el estado crítico actual, con árboles maduros prácticamente extintos en muchas zonas de su rango histórico. Su recuperación es lenta y compleja: especie de bosque maduro con semillas recalcitrantes que no toleran desecación (siembra inmediata obligatoria), crecimiento muy lento (turnos >40 años para diámetros comerciales), esciófita estricta (requiere dosel forestal continuo) y baja regeneración natural fuera de bosques maduros. El aprovechamiento silvestre está prohibido sin permiso especial de la autoridad ambiental (CAR/Ministerio de Ambiente). Su conservación ex situ en cafetales con sombrío diversificado y huertos patrimoniales rurales constituye una de las estrategias más viables para mantener su acervo genético y evitar la extinción comercial completa. Es lección de soberanía botánica y advertencia ecológica: la 'sobreexplotación silenciosa' de maderas finas del bosque andino —comino, cedro, nogal andino, ceroxylon— es paralela a la deforestación amazónica pero con menor visibilidad pública. Recuperar el aniba comino en los cafetales colombianos es acto de restauración cultural y patrimonio botánico nacional. Fuentes Tier A: Cárdenas & Salinas 2007 Libro Rojo Plantas Colombia (categoría EN — En Peligro), Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, IUCN Red List, Pérez-Arbeláez 1947 Plantas Útiles de Colombia.",
+      "nota_conservacion": "Especie EN PELIGRO (EN) según Libro Rojo Plantas Colombia y UICN Red List por sobreexplotación maderera histórica del 'comino crespo'. Aprovechamiento silvestre prohibido sin permiso CAR. Conservación ex situ en huertos cafeteros patrimoniales y restauración bosque andino con prioridad alta.",
+      "source_ids": [
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "especies_nativas_sustitutas": null
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_ARBOLES_TEMPLADO_RETRY",
+      "id": "cedrela_montana",
+      "nombre_comun": "Cedro de montaña",
+      "nombre_comunes_regionales": [
+        "cedro andino",
+        "cedro de tierra fría",
+        "cedro rosado"
+      ],
+      "nombre_cientifico": "Cedrela montana Moritz ex Turcz.",
+      "familia_botanica": "Meliaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "biomass_producer",
+        "windbreak",
+        "nurse_plant",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_protegido",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1800,
+        "optimo_max": 2400,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 25
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "árbol caducifolio de montaña, 20-30 m altura, fuste recto, copa amplia globosa, corteza pardo-grisácea profundamente fisurada",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla alada recolectada de cápsulas dehiscentes en estación seca (julio-agosto en Andes colombianos). Sin tratamiento pregerminativo. Germinación 60-80% a 20-40 días en bandejas con sustrato orgánico. Vivero a media sombra 50%. Plantación definitiva a los 5-8 meses (30-50 cm altura) a inicio de lluvias.",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "Análogo andino de Cedrela odorata adaptado a clima frío templado. Menos atacado por Hypsipyla grandella que C. odorata. Madera rosada apreciada en mueblería andina. Recomendado restauración Andes 1500-2800 msnm.",
+        "fuente": "Cárdenas & Salinas 2007 Libro Rojo Plantas Colombia; Bernal et al. 2015; CIAT/AGROSAVIA manuales restauración andina"
+      },
+      "companions": [
+        "alnus_acuminata",
+        "juglans_neotropica",
+        "coffea_arabica",
+        "inga_densiflora"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol 20-30 m, inviable."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Ejemplar patrimonial en huerto andino >800 m² como sombra y reserva maderable familiar.",
+          "tips": [
+            "Plantación a >8 m de construcciones",
+            "Podas de formación años 2-4 para fuste recto"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Plantaciones maderables andinas templado-frío 400-625 árb/ha (4x4 a 5x5 m) o sombrío café-altura 80-150 árb/ha. Turno comercial 30-40 años para diámetros >40 cm.",
+          "tips": [
+            "Asocio con Alnus o Inga densiflora",
+            "Raleos progresivos años 10-18-25",
+            "Menor presión Hypsipyla que C. odorata"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave restauración bosque andino premontano y montano bajo Andes colombianos.",
+          "tips": [
+            "Densidad 600-800 ind/ha",
+            "Asociar con Alnus acuminata como N-fijadora pionera",
+            "Protección de ganado primeros 5 años"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [
+        "Hypsipyla grandella — barrenador del cedro, menor presión que C. odorata pero presente en plantaciones puras"
+      ],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Maderable nativo del bosque andino montano colombiano. Caducifolio que aporta hojarasca estacional rica en N al suelo, atractor de polinizadores nativos (panículas florales melíferas), hospedero de avifauna andina, especie clave para restauración entre 1500-2800 msnm. Madera rosada-rojiza apreciada en ebanistería tradicional andina.",
+      "valor_pedagogico": "El cedro de montaña (Cedrela montana, Meliaceae) es el análogo andino del cedro real (Cedrela odorata) adaptado al clima templado-frío de los bosques montanos colombianos entre 1.500 y 2.800 msnm. Distribuido en la región Andina especialmente en Antioquia, Boyacá, Cundinamarca, Caldas, Quindío, Risaralda, Tolima, Huila, Valle del Cauca, Cauca, Nariño y Santanderes. Árbol caducifolio de montaña de 20-30 metros de altura con fuste cilíndrico recto, copa amplia globosa y corteza pardo-grisácea profundamente fisurada longitudinalmente; hojas pinnadas grandes con folíolos lanceolados-elípticos verde oscuro que despiden olor característico a cedro al frotarlas (igual que C. odorata), flores pequeñas blanco-verdosas en panículas terminales melíferas atractoras de abejas y mariposas nativas, cápsulas leñosas dehiscentes con semillas aladas dispersadas por viento de montaña en estación seca. Su madera —de color rosado-rojizo, aromática, de densidad media— ha sido históricamente apreciada en la ebanistería tradicional andina colombiana para mueblería rural, puertas, ventanas, vigas y construcción patrimonial campesina del altiplano cundiboyacense y la zona cafetera de altura. A diferencia del cedro real (C. odorata) de tierras bajas calientes, el cedro de montaña se desarrolla en climas templados-fríos con temperaturas medias 12-20°C y aguanta heladas suaves hasta -2°C, lo que lo hace ideal para reforestación de tierras altas y de cordillera Andina colombiana. Su mayor virtud agroecológica es que sufre menor presión del barrenador Hypsipyla grandella que su congénere de tierra caliente, lo que permite plantaciones más puras y de mayor productividad maderable sin requerir tanto sombrío protector. Es especie clave en programas de restauración de bosque andino montano y premontano, asociado a Alnus acuminata (aliso N-fijador pionero) que actúa como nodriza inicial mientras el cedro alcanza el dosel intermedio. Su asocio agroecológico tradicional incluye los cafetales de altura (1.500-2.000 msnm) en Caldas, Quindío, Antioquia y Santander, donde aporta sombrío parcial, biomasa hojarasca rica, atractor de polinizadores y madera patrimonial familiar de turno largo (30-40 años). Es lección de soberanía maderera andina: en lugar de pino patula o pino radiata exóticos plantados masivamente en los Andes durante el siglo XX (con altos costos ecológicos: acidificación, erosión, desertificación de suelos), el cedro de montaña nativo ofrece servicios maderables equivalentes con servicios ecosistémicos completos (biodiversidad, polinización, fauna). Fuentes Tier A: Cárdenas & Salinas 2007 Libro Rojo Plantas Colombia, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, CIAT/AGROSAVIA manuales restauración andina.",
+      "source_ids": [
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "ciat-1995-alnus"
+      ],
+      "especies_nativas_sustitutas": null
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_ARBOLES_TEMPLADO_RETRY",
+      "id": "magnolia_caricifragrans",
+      "nombre_comun": "Magnolia colombiana",
+      "nombre_comunes_regionales": [
+        "molinillo",
+        "magnolia de monte",
+        "molinillo del monte"
+      ],
+      "nombre_cientifico": "Magnolia caricifragrans (Lozano) Govaerts",
+      "familia_botanica": "Magnoliaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "templado"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "biomass_producer",
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "endemica_colombia",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1500,
+        "optimo_max": 1900,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 1,
+        "optimo_min": 14,
+        "optimo_max": 22,
+        "max_tolerable": 27
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "árbol perennifolio endémico de bosque andino premontano, 15-25 m altura, fuste recto, copa piramidal-redondeada, corteza gris lisa con lenticelas",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas recalcitrantes recolectadas de conos folicíferos maduros (rojo-anaranjados). Siembra inmediata tras limpieza de arilo rojo. Germinación 30-50% a 30-60 días bajo sombra 70%. Vivero a sombra densa con humedad alta. Trasplante a los 6 meses. Plantación definitiva a los 12-15 meses bajo dosel forestal parcial.",
+        "tiempo_a_establecimiento_dias": 150,
+        "notas": "Magnolia endémica de Colombia (Antioquia, Caldas, Risaralda, Quindío principalmente). Poblaciones silvestres muy reducidas por deforestación bosque andino. Florecimiento espectacular con flores blanco-cremas aromáticas. Conservación ex situ prioritaria en JBB y arboretos cafeteros.",
+        "fuente": "Lozano-Contreras 2003 Magnoliaceae Colombia; Calderón-Sáenz et al. 2007 Libro Rojo Magnoliaceae; Bernal et al. 2015"
+      },
+      "companions": [
+        "coffea_arabica",
+        "cedrela_montana",
+        "ocotea_calophylla",
+        "inga_densiflora"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol 15-25 m, inviable."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Ejemplar ornamental-patrimonial en huerto >500 m² como conservación ex situ de magnolia endémica colombiana.",
+          "tips": [
+            "Sombrío de establecimiento 50%",
+            "Riego sostenido años 1-3",
+            "Floración espectacular blanca-crema aromática"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío diversificado de café-altura 40-80 árb/ha como ornamental-patrimonial y reserva de magnolia endémica.",
+          "tips": [
+            "Asocio con Inga densiflora como nodriza",
+            "Distancia 10x10 m",
+            "Manejo a largo plazo"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie endémica clave para restauración bosque andino premontano cafetero. Prioridad alta conservación ex situ.",
+          "tips": [
+            "Plantación bajo dosel maduro existente",
+            "Densidad 200-400 ind/ha enriquecimiento",
+            "Inventario individuos plantados"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "flor",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Magnolia endémica de Colombia del bosque andino premontano. Atractor de polinizadores (escarabajos primitivos Coleoptera, abejas nativas), hospedero de fauna asociada a bosque maduro. Flores grandes blanco-cremas aromáticas con polinización entomófila primitiva característica del clado Magnoliales. Conservación ex situ prioritaria.",
+      "valor_pedagogico": "La magnolia colombiana o molinillo (Magnolia caricifragrans, Magnoliaceae) es una de las magnolias endémicas más representativas de los bosques andinos premontanos cafeteros de Colombia, distribuida exclusivamente en las cordilleras Central y Occidental colombianas, principalmente en Antioquia, Caldas, Risaralda, Quindío y Valle del Cauca entre 1.200 y 2.000 msnm. Árbol perennifolio de 15-25 metros de altura con fuste cilíndrico recto, copa piramidal-redondeada, corteza gris lisa con lenticelas características, hojas alternas grandes coriáceas oblongo-elípticas verde oscuro brillantes en haz y pálidas pubescentes en envés, flores solitarias terminales grandes (10-15 cm) blanco-cremas con tépalos carnosos y aroma intenso a frutas frescas o cítricos característicos de las Magnoliaceae primitivas, conos folicíferos rojo-anaranjados al madurar con semillas rodeadas de arilo carnoso rojo dispersadas por aves frugívoras. La familia Magnoliaceae es uno de los linajes más antiguos de plantas con flores (130-140 millones de años de antigüedad, Cretácico inferior) y conserva características florales primitivas: tépalos no diferenciados en pétalos y sépalos, ovario apocárpico (carpelos libres), polinización por escarabajos primitivos Coleoptera anteriores a la diversificación de las abejas. Esto la convierte en una de las plantas vivas más interesantes para la enseñanza de la evolución vegetal. Colombia es uno de los países con mayor diversidad de magnolias del Neotrópico (33 especies conocidas, la mayoría endémicas) pero también con el mayor número de magnolias amenazadas: M. caricifragrans está categorizada como endémica colombiana con poblaciones silvestres altamente reducidas por la deforestación histórica del bosque andino premontano cafetero (especialmente en el Eje Cafetero entre 1900-1970 cuando se transformaron millones de hectáreas a cafetal y potrero). Su conservación ex situ depende hoy de jardines botánicos (Jardín Botánico de Bogotá, JB Quindío, JB Joaquín Antonio Uribe Medellín), arboretos cafeteros y huertos patrimoniales rurales. Es lección de soberanía botánica y biogeografía: cada cordillera de los Andes colombianos alberga magnolias endémicas únicas (M. caricifragrans en zona cafetera, M. yarumalensis en Antioquia, M. hernandezii en Quindío, M. mahechae en Valle, M. wolfii en Quindío) que constituyen patrimonio genético irreemplazable del país y de la humanidad. Recuperar las magnolias colombianas en cafetales con sombrío diversificado, huertos patrimoniales y programas de restauración bosque andino es acto de conservación cultural y genética. Fuentes Tier A: Lozano-Contreras 2003 Magnoliaceae Colombia, Calderón-Sáenz et al. 2007 Libro Rojo Magnoliaceae Colombia, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy.",
+      "nota_conservacion": "Magnolia ENDÉMICA de Colombia con poblaciones silvestres altamente reducidas por deforestación histórica bosque andino premontano cafetero. Conservación ex situ prioritaria en jardines botánicos y arboretos. Aprovechamiento silvestre prohibido sin permiso especial CAR/Ministerio Ambiente.",
+      "source_ids": [
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "especies_nativas_sustitutas": null
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_ARBOLES_TEMPLADO_RETRY",
+      "id": "magnolia_yarumalensis",
+      "nombre_comun": "Magnolia Yarumal",
+      "nombre_comunes_regionales": [
+        "molinillo de Yarumal",
+        "magnolia antioqueña",
+        "almanegra"
+      ],
+      "nombre_cientifico": "Magnolia yarumalensis (Lozano) Govaerts",
+      "familia_botanica": "Magnoliaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "biomass_producer",
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "en_peligro",
+      "altitud_msnm": {
+        "min_absoluto": 1700,
+        "optimo_min": 1900,
+        "optimo_max": 2000,
+        "max_absoluto": 2500
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 12,
+        "optimo_max": 19,
+        "max_tolerable": 24
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "árbol perennifolio endémico crítico de bosque andino premontano-montano bajo, 18-28 m altura, fuste recto, copa piramidal, corteza gris lisa con lenticelas",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas recalcitrantes extremadamente sensibles, recolección de conos rojos maduros directamente del árbol. Limpieza de arilo. Siembra inmediata en sustrato orgánico forestal bajo sombra 80%. Germinación 20-40% a 45-90 días. Vivero a sombra densa con humedad alta y riego diario. Plantación bajo dosel maduro a los 15-18 meses (40-50 cm).",
+        "tiempo_a_establecimiento_dias": 200,
+        "notas": "Magnolia EN PELIGRO CRÍTICO según Libro Rojo Magnoliaceae Colombia. Endémica del norte de Antioquia (Yarumal, Angostura, Santa Rosa de Osos, Belmira). Poblaciones silvestres con <50 individuos maduros conocidos. Conservación ex situ urgente. JB Joaquín Antonio Uribe Medellín lidera programas de propagación.",
+        "fuente": "Lozano-Contreras 2003 Magnoliaceae Colombia; Calderón-Sáenz et al. 2007 Libro Rojo Magnoliaceae (categoría CR/EN); Velásquez-Rúa 2014 conservación M. yarumalensis"
+      },
+      "companions": [
+        "alnus_acuminata",
+        "cedrela_montana",
+        "juglans_neotropica",
+        "inga_densiflora"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol 18-28 m, inviable."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Ejemplar de conservación ex situ urgente en huerto patrimonial antioqueño >500 m². Acto de conservación genética.",
+          "tips": [
+            "Sombrío permanente 50-70%",
+            "Riego diario primeros 2 años",
+            "Suelo forestal orgánico ácido",
+            "Registro genealógico del individuo"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": false,
+          "nota": "Estado CR impide producción comercial. Conservación únicamente."
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie ENDÉMICA CRÍTICA bosque andino montano norte antioqueño. Prioridad MÁXIMA conservación ex situ y restauración asistida.",
+          "tips": [
+            "Plantación coordinada con JB Joaquín Antonio Uribe Medellín y Cornare",
+            "Densidad 100-200 ind/ha en enriquecimiento bosque maduro",
+            "Inventario genético cada individuo"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "flor",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Magnolia endémica crítica del norte de Antioquia. Bosque andino premontano-montano bajo. Polinización por escarabajos primitivos. Hospedero de fauna asociada a bosque maduro andino. Conservación ex situ urgente con <50 individuos maduros silvestres conocidos.",
+      "valor_pedagogico": "La magnolia Yarumal o molinillo de Yarumal (Magnolia yarumalensis, Magnoliaceae) es una de las magnolias endémicas más críticamente amenazadas de Colombia y del Neotrópico, descrita originalmente por el botánico colombiano Jesús Idrobo y posteriormente revisada por Lozano-Contreras como especie estricta. Es endémica exclusiva del norte del departamento de Antioquia, principalmente en los municipios de Yarumal (de donde toma su nombre), Angostura, Santa Rosa de Osos, Belmira y áreas aledañas del altiplano norte antioqueño, entre 1.700 y 2.500 msnm en remanentes de bosque andino premontano y montano bajo. Árbol perennifolio de 18-28 metros de altura con fuste cilíndrico recto, copa piramidal característica, corteza gris lisa con lenticelas, hojas alternas grandes coriáceas oblongo-elípticas verde oscuro lustroso en haz y pálidas pubescentes en envés con base obtusa, flores solitarias terminales grandes (10-13 cm) blanco-cremas con tépalos carnosos aromáticos a frutas, conos folicíferos rojo-anaranjados al madurar con semillas envueltas en arilo rojo dispersadas por aves frugívoras del bosque andino. Su estado de conservación es crítico: las poblaciones silvestres conocidas suman menos de 50 individuos maduros distribuidos en fragmentos relictuales de bosque andino antioqueño, severamente afectados por la deforestación histórica del altiplano norte antioqueño para ganadería extensiva durante los siglos XIX y XX. Está categorizada como EN PELIGRO (EN) tendiente a CRÍTICAMENTE AMENAZADA (CR) en el Libro Rojo de Magnoliaceae de Colombia (Calderón-Sáenz et al. 2007). El Jardín Botánico Joaquín Antonio Uribe de Medellín lidera desde 2010 un programa de conservación ex situ que incluye colecciones vivas en arboretos, propagación de semillas (con tasas de germinación bajas por la recalcitrancia y sensibilidad de las semillas), y reintroducciones experimentales en bosques relictuales con Cornare (Corporación Autónoma Regional de las Cuencas de los Ríos Negro y Nare) y Corantioquia. Es lección de soberanía botánica y conservación: las magnolias endémicas antioqueñas (M. yarumalensis, M. cespedesii, M. polyhypsophylla, M. silvioi entre otras) son un patrimonio genético irreemplazable que está literalmente al borde de la extinción comercial silenciosa, paralela a la pérdida masiva de bosque andino antioqueño durante el siglo XX. Cada ejemplar plantado en huertos patrimoniales, fincas cafeteras de altura y jardines rurales del norte antioqueño es un acto concreto de conservación genética y resistencia ante la extinción. La especie también tiene valor cultural local: en el patrimonio cafetero antioqueño se conoce como 'almanegra' por la corteza oscura, y aparece en relatos campesinos del altiplano norte como árbol emblemático de los bosques de niebla relictuales. Fuentes Tier A: Lozano-Contreras 2003 Magnoliaceae Colombia, Calderón-Sáenz et al. 2007 Libro Rojo Magnoliaceae Colombia (categoría EN/CR), Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, IUCN Red List.",
+      "nota_conservacion": "Magnolia ENDÉMICA CRÍTICA del norte de Antioquia con <50 individuos maduros silvestres conocidos. Categoría EN/CR en Libro Rojo Magnoliaceae Colombia. Aprovechamiento silvestre prohibido. Conservación ex situ urgente liderada por JB Joaquín Antonio Uribe Medellín y Cornare/Corantioquia.",
+      "source_ids": [
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "especies_nativas_sustitutas": null
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_ARBOLES_TEMPLADO_RETRY",
+      "id": "clethra_revoluta",
+      "nombre_comun": "Laurel iguá",
+      "nombre_comunes_regionales": [
+        "manzano de monte",
+        "clethra cafetera",
+        "totumillo"
+      ],
+      "nombre_cientifico": "Clethra revoluta (Ruiz & Pav.) Spreng.",
+      "familia_botanica": "Clethraceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "biomass_producer",
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1500,
+        "optimo_max": 1900,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 1,
+        "optimo_min": 14,
+        "optimo_max": 22,
+        "max_tolerable": 27
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "árbol perennifolio de mediano porte 10-18 m altura, copa redondeada densa, fuste recto, corteza grisácea fisurada",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas pequeñas recolectadas de cápsulas dehiscentes. Siembra superficial en sustrato fino bajo sombra 60%. Germinación 50-70% a 30-50 días. Vivero a sombra parcial con riego sostenido. Plantación definitiva a los 8-12 meses (30-40 cm) en cafetal o restauración.",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "Clethra del bosque andino premontano cafetero. Floración blanca-aromática espectacular muy atractora de abejas (alta producción miel uniflorada en zonas cafeteras). Madera blanca-pálida usada localmente en construcción rural.",
+        "fuente": "Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia; Cenicafé manuales sombrío; POWO Kew Clethraceae Andes"
+      },
+      "companions": [
+        "coffea_arabica",
+        "cedrela_montana",
+        "inga_densiflora",
+        "alnus_acuminata"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol 10-18 m, inviable."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Excelente sombra y atractor de abejas en huertos andinos >300 m².",
+          "tips": [
+            "Sombrío inicial 50%",
+            "Floración aromática anual",
+            "Buena producción miel apícola"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío diversificado de café en zona cafetera media-alta 100-200 árb/ha. Atractor abejas mejora polinización del cafetal y producción miel.",
+          "tips": [
+            "Densidad 8x8 m en cafetal",
+            "Floración masiva atractora apis y meliponini"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie pionera-secundaria temprana para restauración bosque andino premontano. Rápido establecimiento.",
+          "tips": [
+            "Densidad 400-800 ind/ha",
+            "Asociar con Inga densiflora N-fijadora"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "flor",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Árbol mediano del bosque andino premontano cafetero. Atractor masivo de abejas en floración (alta producción miel uniflorada). Productor de biomasa, hospedero de avifauna. Especie pionera-secundaria temprana en sucesión, ideal para enriquecimiento de bosque secundario.",
+      "valor_pedagogico": "El laurel iguá o manzano de monte (Clethra revoluta, Clethraceae) es un árbol mediano característico del bosque andino premontano cafetero colombiano, distribuido en la región Andina entre 1.200 y 2.000 msnm en las cordilleras Central, Occidental y Oriental, especialmente en Quindío, Risaralda, Caldas, Antioquia, Cundinamarca, Boyacá, Santanderes, Tolima, Huila, Cauca y Nariño. Árbol perennifolio de 10-18 metros de altura con copa redondeada densa, fuste recto y corteza grisácea fisurada longitudinalmente; hojas alternas elípticas-oblanceoladas coriáceas verde oscuro brillantes en haz y pubescentes con bordes revolutos (de ahí el epíteto 'revoluta') en envés, flores pequeñas blancas en racimos terminales densos pubescentes muy aromáticas que se producen abundantemente entre julio y octubre en la zona cafetera, frutos cápsulas pequeñas dehiscentes con semillas diminutas dispersadas por viento. La familia Clethraceae es un linaje botánico relictual con distribución disjunta entre los bosques templados-fríos del este de Asia, el sureste de Estados Unidos y los Andes neotropicales —patrón biogeográfico que evidencia conexiones florísticas pretéritas del Cretácico-Terciario. Su mayor virtud agroecológica es su floración masiva aromática que actúa como atractor de abejas melíferas (Apis mellifera) y abejas nativas Meliponini, generando alta producción de miel uniflorada de excelente calidad en las zonas cafeteras donde está presente —la 'miel de laurel iguá' es producto apícola patrimonial del Eje Cafetero y Antioquia con sabor balsámico-aromático característico. Como sombrío diversificado del café aporta beneficios múltiples: sombrío parcial regulador del microclima, biomasa hojarasca rica en compuestos fenólicos, atracción de polinizadores que mejoran la producción del cafetal vecino, y reserva apícola familiar. Es especie pionera-secundaria temprana en sucesión ecológica con rápido establecimiento en suelos pobres y degradados, lo que la hace valiosa para programas de restauración de bosque andino premontano y para enriquecimiento de bosques secundarios cafeteros. Su madera blanca-pálida de densidad media se usa localmente en construcción rural, cercas vivas, postes de cerco, mangos de herramienta y leña doméstica. Es lección de soberanía botánica apícola: revalorizar la flora melífera nativa del bosque andino —laurel iguá, alelí amarillo, Inga spp, Tibouchina spp— en lugar de depender exclusivamente de eucalipto o flora exótica para producción apícola, fortalece la apicultura agroecológica colombiana y la conservación de polinizadores nativos Meliponini en riesgo. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, Cenicafé manuales sombrío diversificado cafetero, monografías Clethraceae Neotropicales.",
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "cenicafe-manual-cafetero-2013"
+      ],
+      "especies_nativas_sustitutas": null
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_ARBOLES_TEMPLADO_RETRY",
+      "id": "myrcia_popayanensis",
+      "nombre_comun": "Arrayán de Popayán",
+      "nombre_comunes_regionales": [
+        "arrayán caucano",
+        "arrayán de monte",
+        "arrayán blanco"
+      ],
+      "nombre_cientifico": "Myrcia popayanensis Hieron.",
+      "familia_botanica": "Myrtaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "biomass_producer",
+        "pollinator_attractor",
+        "living_fence"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1500,
+        "optimo_max": 1900,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 1,
+        "optimo_min": 14,
+        "optimo_max": 22,
+        "max_tolerable": 27
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "árbol perennifolio mediano 8-15 m altura, copa densa globosa, fuste corto ramificado bajo, corteza rojiza descortezándose en placas",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas extraídas de drupas maduras (negro-violáceas), siembra inmediata en sustrato fino orgánico. Germinación 40-60% a 30-60 días bajo sombra 50%. Vivero a media sombra. Plantación definitiva a los 8-12 meses (30-40 cm altura).",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "Arrayán nativo del valle interandino del Cauca y altiplano nariñense-caucano. Madera aromática rojiza usada en mueblería rural. Floración blanca-aromática atractora apícola. Frutos consumidos por aves frugívoras.",
+        "fuente": "Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia; POWO Kew; Lucas & Bünger 2015 Myrcia Neotropicales"
+      },
+      "companions": [
+        "coffea_arabica",
+        "inga_densiflora",
+        "clethra_revoluta",
+        "myrcianthes_leucoxyla"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol 8-15 m, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Excelente árbol ornamental-medicinal en huerto andino >300 m². Madera aromática y atractor apícola.",
+          "tips": [
+            "Tolera sol pleno o sombra parcial",
+            "Floración aromática",
+            "Frutos comestibles aves"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Tamaño excede invernadero."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Cerca viva y sombrío diversificado de café en zona cafetera Cauca-Nariño 200-400 árb/ha.",
+          "tips": [
+            "Cerca viva densidad 1x1 m",
+            "Sombrío 8x8 m",
+            "Atractor apis y meliponini"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie pionera del bosque andino premontano caucano y nariñense. Buen establecimiento.",
+          "tips": [
+            "Densidad 600-800 ind/ha en restauración",
+            "Asocio con Inga y Alnus"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "flor",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Mirtácea andina del bosque premontano caucano-nariñense. Atractor masivo de polinizadores (abejas Apis y Meliponini, mariposas), productor de frutos consumidos por avifauna. Madera aromática rojiza apreciada en mueblería rural y artesanía. Especie estructural del bosque andino premontano cauca-nariñense.",
+      "valor_pedagogico": "El arrayán de Popayán (Myrcia popayanensis, Myrtaceae) es un árbol mediano característico de los bosques andinos premontanos del suroccidente colombiano, distribuido principalmente en los departamentos de Cauca (de donde toma su nombre, Popayán), Nariño, Valle del Cauca, Huila y Tolima entre 1.200 y 2.000 msnm. Árbol perennifolio de 8-15 metros de altura con copa densa globosa, fuste corto ramificado bajo y corteza rojiza característica que se descortezándose en placas finas (rasgo común en muchas mirtáceas neotropicales como las Myrcianthes), hojas opuestas elípticas-lanceoladas coriáceas verde oscuro brillantes glabras con glándulas oleíferas puntiformes visibles a contraluz (al estrujarlas desprenden aroma intenso aromático-mentolado característico de las Myrtaceae), flores blancas pequeñas en panículas axilares aromáticas atractoras masivas de abejas Apis mellifera y abejas nativas Meliponini durante la floración (julio-octubre en zona andina cafetera caucana-nariñense), drupas pequeñas globosas verde-negruzcas a violáceas al madurar muy buscadas por aves frugívoras del bosque andino (mirlas Turdus, tángaras Tangara, Atlapetes torquatus). Su madera —rojiza, aromática, de densidad alta— ha sido tradicionalmente apreciada en mueblería rural caucana y nariñense, artesanía, mangos de herramienta, postes de cerca y construcción patrimonial campesina del altiplano caucano-nariñense. Las hojas se usan localmente como aromática en cocción tradicional (sustituto del laurel mediterráneo) y en infusiones medicinales para problemas digestivos y respiratorios, aprovechando los aceites esenciales ricos en eugenol y otros fenoles propios de las Myrtaceae. Como árbol de cerca viva tradicional caucana-nariñense, junto a otros arrayanes nativos (Myrcianthes leucoxyla del altiplano cundiboyacense, Myrcianthes hallii ecuatoriano), configura los paisajes patrimoniales de cordillera andina suroccidental. Su mayor virtud agroecológica es la combinación de atractor de polinizadores nativos, sombrío parcial diversificado del café, biomasa hojarasca aromática y madera de calidad para usos rurales, lo que lo convierte en candidato ideal para sistemas agroforestales cafeteros del Cauca y Nariño. La región del valle del Patía y la cordillera central nariñense conserva poblaciones silvestres importantes que son fuente genética crítica para la propagación regional. Es lección de soberanía botánica regional: revalorizar las mirtáceas nativas del bosque andino premontano suroccidental colombiano en cafetales, huertos patrimoniales y restauración fortalece la apicultura agroecológica, la conservación de polinizadores y el patrimonio botánico cauca-nariñense. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, Lucas & Bünger 2015 revisiones Myrcia Neotropicales, Cenicafé manuales sombrío cafetero.",
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "cenicafe-manual-cafetero-2013"
+      ],
+      "especies_nativas_sustitutas": null
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_ARBOLES_TEMPLADO_RETRY",
+      "id": "escallonia_pendula",
+      "nombre_comun": "Mortiño colgante",
+      "nombre_comunes_regionales": [
+        "chilco colgante",
+        "rodamonte colgante",
+        "tibar colgante"
+      ],
+      "nombre_cientifico": "Escallonia pendula (Ruiz & Pav.) Pers.",
+      "familia_botanica": "Escalloniaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "biomass_producer",
+        "living_fence"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1800,
+        "optimo_max": 2000,
+        "max_absoluto": 2400
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 25
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "árbol perennifolio mediano 8-12 m altura, copa irregular con ramas colgantes, fuste corto, corteza rojiza descortezándose en placas",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "estaca"
+        ],
+        "best_method": "estaca",
+        "protocol_resumen": "Estacas semi-leñosas 25-40 cm de ramas del año, plantar directo en bolsa con sustrato franco-orgánico bajo sombra 50%. Enraizamiento 70-85% a 30-45 días. Semillas finas posibles pero menos confiables. Plantación definitiva a los 5-8 meses (40-60 cm altura).",
+        "tiempo_a_establecimiento_dias": 60,
+        "notas": "Pionera andina rápida, ideal para cercas vivas y restauración temprana. Floración rosada-blanca atractora colibríes (ornitofilia) y abejas. Madera rojiza aromática usada como leña y postes.",
+        "fuente": "Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia; POWO Kew Escalloniaceae; Sevillano-Marín 2010 Escallonia Andes"
+      },
+      "companions": [
+        "alnus_acuminata",
+        "cedrela_montana",
+        "tibouchina_lepidota",
+        "vallea_stipularis"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol 8-12 m, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Excelente cerca viva ornamental y atractor de colibríes en huertos andinos >200 m².",
+          "tips": [
+            "Estacas de fácil enraizamiento",
+            "Cerca viva densidad 1x1 m",
+            "Floración estacional atractora colibríes"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Cerca viva tradicional altoandina 1000-2000 estacas/km perimetral. Apicultura y atractor colibríes ornamental.",
+          "tips": [
+            "Poda anual mantiene cerca densa",
+            "Producción miel y leña"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Pionera andina rápida ideal para restauración temprana de borde de bosque y áreas degradadas Andes 1500-2400 msnm.",
+          "tips": [
+            "Densidad 800-1200 ind/ha",
+            "Establecimiento rápido por estacas"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "flor",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Escalloniácea andina pionera de rápido establecimiento. Atractor masivo de colibríes (ornitofilia con flores tubulares rosadas-blancas) y abejas. Hábito de ramas colgantes característico. Cerca viva tradicional altoandina colombiana. Productora de leña, postes y miel apícola.",
+      "valor_pedagogico": "El mortiño colgante o chilco colgante (Escallonia pendula, Escalloniaceae) es uno de los árboles medianos más representativos de las cercas vivas y bordes de bosque del altiplano andino colombiano entre 1.500 y 2.400 msnm en las cordilleras Central, Occidental y Oriental, especialmente en Cundinamarca, Boyacá, Santanderes, Antioquia, Caldas, Quindío, Risaralda, Tolima, Huila, Cauca y Nariño. Árbol perennifolio de 8-12 metros de altura con copa irregular caracterizada por ramas largas péndulas-colgantes (de ahí el epíteto 'pendula'), fuste corto y corteza rojiza fina que se descortezándose en placas; hojas alternas oblanceoladas glandulares de bordes serrulados verde oscuro brillantes con aroma resinoso al frotarlas (típico de la familia Escalloniaceae), flores en racimos péndulos terminales de corolas tubulares rosadas-blancas características, con polinización ornitófila adaptada a colibríes (Coeligena coeligena, Aglaiocercus kingii, Colibri coruscans entre otros polinizadores del altiplano cundiboyacense y Andes colombianos), frutos cápsulas pequeñas dehiscentes con semillas diminutas dispersadas por viento. La familia Escalloniaceae es un linaje botánico endémico del hemisferio sur con centro de diversidad en los Andes —en Colombia hay más de 10 especies del género Escallonia, todas con distribución estrictamente andina y altoandina. Su mayor virtud agroecológica es su rapidez de establecimiento por estacas semi-leñosas (enraizamiento 70-85% en 30-45 días sin tratamiento hormonal), lo que la convierte en una de las especies pioneras más eficientes para cercas vivas tradicionales altoandinas (la 'cerca de chilco' del altiplano cundiboyacense es paisaje cultural patrimonial campesino), para restauración temprana de áreas degradadas de cordillera Andina, y para enriquecimiento de borde de bosque. Su floración estacional atractora de colibríes la convierte en especie clave para conservación de la fauna ornitófila andina —el 'corredor de chilcos' que entrelaza cercas vivas en parcelas campesinas funciona como corredor ecológico para colibríes y polinizadores nativos. Su madera rojiza-aromática se usa tradicionalmente como leña doméstica, postes de cerca, mangos de herramienta y construcción rural altoandina. Es lección de soberanía botánica andina: revalorizar las cercas vivas de Escallonia, Vallea y Weinmannia en lugar de cercas de alambre exclusivamente, recupera paisajes culturales campesinos, fortalece la conservación de colibríes y polinizadores nativos del altiplano y suministra leña-postes renovables de manera autónoma. La especie también es valorada en jardinería ornamental andina por su hábito colgante elegante y floración atractora de fauna. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew Escalloniaceae, GBIF Backbone Taxonomy, monografías Sevillano-Marín 2010 Escallonia Andes, CAR Cundinamarca cercas vivas tradicionales altoandinas.",
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "car-cundi-2019"
+      ],
+      "especies_nativas_sustitutas": null
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_ARBOLES_TEMPLADO_RETRY",
+      "id": "oreopanax_floribundum",
+      "nombre_comun": "Mano de oso",
+      "nombre_comunes_regionales": [
+        "cariseco",
+        "higuerón andino",
+        "pata de gallina",
+        "tucumo"
+      ],
+      "nombre_cientifico": "Oreopanax floribundum Decne. & Planch.",
+      "familia_botanica": "Araliaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "biomass_producer",
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1700,
+        "optimo_max": 2000,
+        "max_absoluto": 2500
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 13,
+        "optimo_max": 20,
+        "max_tolerable": 25
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "árbol perennifolio mediano 8-15 m altura, copa irregular abierta, hojas grandes palmatilobadas en forma de mano (de ahí 'mano de oso'), corteza grisácea con cicatrices foliares",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas pequeñas extraídas de drupas maduras violáceo-negras. Siembra superficial en sustrato fino orgánico bajo sombra 60-70%. Germinación 40-60% a 30-60 días. Vivero a sombra parcial. Plantación a los 10-14 meses (30-40 cm altura) bajo dosel forestal parcial.",
+        "tiempo_a_establecimiento_dias": 120,
+        "notas": "Especie del bosque andino premontano-montano bajo. Hojas grandes palmatilobadas decorativas. Floración blanca-verdosa en panículas muy atractora de polinizadores. Frutos consumidos por avifauna y mamíferos pequeños (osos andinos).",
+        "fuente": "Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia; POWO Kew Araliaceae Andes; Cuevas-Reyes 2010 Oreopanax Colombia"
+      },
+      "companions": [
+        "coffea_arabica",
+        "cedrela_montana",
+        "clethra_revoluta",
+        "alnus_acuminata"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol 8-15 m, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Excelente árbol ornamental por sus hojas grandes palmatilobadas en huertos andinos >300 m². Atractor de avifauna.",
+          "tips": [
+            "Sombrío 50%",
+            "Suelo orgánico fresco",
+            "Floración atractora polinizadores"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Tamaño excede invernadero."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío diversificado de café altura 60-100 árb/ha o ornamental urbano-rural. Hojas decorativas patrimoniales.",
+          "tips": [
+            "Distancia 10x10 m en cafetal",
+            "Atractor avifauna control biológico"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie del dosel medio bosque andino premontano-montano bajo. Buena para enriquecimiento bosque secundario.",
+          "tips": [
+            "Densidad 300-500 ind/ha",
+            "Asocio con Alnus, Cedrela montana"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Araliácea del dosel medio del bosque andino premontano-montano bajo colombiano. Hojas palmatilobadas decorativas grandes características. Atractor masivo de polinizadores (panículas florales). Hospedero de avifauna frugívora (drupas) y mamíferos pequeños incluido oso andino Tremarctos ornatus (de ahí 'mano de oso' en referencia a la huella similar de las hojas a las pisadas del oso).",
+      "valor_pedagogico": "El mano de oso o cariseco (Oreopanax floribundum, Araliaceae) es uno de los árboles emblemáticos del bosque andino premontano-montano bajo colombiano entre 1.500 y 2.500 msnm, distribuido en la región Andina especialmente en Cundinamarca, Boyacá, Santanderes, Antioquia, Caldas, Quindío, Risaralda, Tolima, Huila, Cauca, Nariño y Valle del Cauca. Árbol perennifolio de 8-15 metros de altura con copa irregular abierta, fuste corto y corteza grisácea con cicatrices foliares conspicuas; sus hojas son grandes palmatilobadas con 5-9 lóbulos digitados que recuerdan la forma de una mano abierta o una garra de oso (de ahí los nombres vernáculos 'mano de oso' y 'pata de gallina'), verde oscuro lustrosas en haz y pálidas en envés, con pecíolos largos característicos; flores pequeñas blanco-verdosas en panículas terminales densas muy atractoras de abejas Apis y Meliponini, sírfidos, escarabajos polinizadores y otros himenópteros nativos, frutos drupas violáceo-negruzcas dispuestas en racimos consumidas y dispersadas por aves frugívoras del bosque andino (tucanes Andigena, mirlas Turdus, tángaras Tangara) y por mamíferos arborícolas incluido históricamente el oso andino o oso de anteojos (Tremarctos ornatus) —de hecho el nombre vernáculo 'mano de oso' alude tanto a la forma de las hojas como a las huellas similares que deja el oso andino en la corteza al trepar para alimentarse de los frutos. La familia Araliaceae es un linaje botánico con representantes notables como el ginseng (Panax ginseng) asiático y el guayabo de pava (Schefflera) tropical, y en Colombia incluye más de 30 especies del género Oreopanax distribuidas en los Andes y bosques de niebla. Su mayor virtud agroecológica es la combinación de ornamentalidad patrimonial (las hojas palmatilobadas son uno de los rasgos botánicos más reconocibles del bosque andino colombiano, presente en patrimonio cultural campesino y en jardinería urbana de altiplano), atracción masiva de polinizadores nativos en floración, hospedaje de avifauna frugívora y mamíferos asociados al bosque andino (incluido el oso de anteojos, ícono de conservación), y aporte de biomasa hojarasca al suelo. Como sombrío parcial diversificado del café en zona cafetera de altura (1.500-2.000 msnm) en Caldas, Quindío y Antioquia aporta servicios ecosistémicos complementarios a otros árboles del dosel andino. Es lección de biogeografía andina y conservación: el mano de oso es indicador de bosque andino premontano-montano bajo en estado de conservación medio a bueno, su presencia en cafetales y huertos patrimoniales rurales contribuye a la conectividad ecológica para fauna y al sostenimiento de polinizadores nativos. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew Araliaceae, GBIF Backbone Taxonomy, Cuevas-Reyes 2010 Oreopanax Colombia, Cenicafé manuales sombrío diversificado.",
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "cenicafe-manual-cafetero-2013"
+      ],
+      "especies_nativas_sustitutas": null
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_ARBOLES_TEMPLADO_RETRY",
+      "id": "bocconia_frutescens",
+      "nombre_comun": "Toche",
+      "nombre_comunes_regionales": [
+        "trompeto",
+        "árbol del bálsamo",
+        "papaya cimarrona",
+        "trompetero"
+      ],
+      "nombre_cientifico": "Bocconia frutescens L.",
+      "familia_botanica": "Papaveraceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "pest_repellent",
+        "biomass_producer",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1500,
+        "optimo_max": 2000,
+        "max_absoluto": 2500
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 13,
+        "optimo_max": 22,
+        "max_tolerable": 27
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "bueno",
+      "habito": "arbolito-arbusto perennifolio 4-8 m altura, ramas alladas con látex anaranjado, hojas grandes pinnatífidas glaucas, panículas terminales largas",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas pequeñas extraídas de cápsulas maduras (rojo-anaranjadas a marrones). Siembra superficial sin tratamiento, germinación 50-70% a 15-30 días a sol pleno. Vivero a sol parcial. Plantación a los 4-6 meses (30-40 cm) en sitio definitivo. Crecimiento rápido pionero.",
+        "tiempo_a_establecimiento_dias": 60,
+        "notas": "Pionera andina rápida con propiedades alelopáticas (alcaloides isoquinolínicos sanguinarina, queleritrina, bocconina) usados tradicionalmente como antiparasitarios externos veterinarios. PRECAUCIÓN: látex tóxico irritante por contacto. Atractor de abejas pese a látex.",
+        "fuente": "Pérez-Arbeláez 1947 Plantas Útiles Colombia; Correa-Pabón Carulla 2008 Plantas Medicinales; Bernal et al. 2015; POWO Kew"
+      },
+      "companions": [
+        "alnus_acuminata",
+        "vallea_stipularis",
+        "escallonia_pendula"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Arbolito 4-8 m, inviable apartamento. Látex tóxico riesgoso en interior."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Linderos y perímetros huerto andino >300 m² como pest_repellent y atractor polinizadores. Manejo cuidadoso del látex.",
+          "tips": [
+            "Plantar en linderos lejos de zonas de paso niños",
+            "Guantes al manipular",
+            "Crecimiento rápido pionero"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta, látex irritante en aire confinado."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Lindero de cafetales y cercas vivas con función alelopática anti-plagas. Producción rural de extractos antiparasitarios veterinarios artesanales.",
+          "tips": [
+            "Lindero 1x1 m densidad",
+            "Cosecha hojas para extractos siempre con EPP completo"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Pionera andina rápida para sucesión temprana en áreas degradadas. Importante para conectividad pero NO en alta densidad por toxicidad.",
+          "tips": [
+            "Densidad moderada 200-400 ind/ha",
+            "Sucesión rápida hacia bosque secundario en 5-8 años"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "hoja",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Pionera andina rápida con propiedades alelopáticas anti-plagas. Productora de látex anaranjado rico en alcaloides isoquinolínicos (sanguinarina, queleritrina) con uso tradicional antiparasitario veterinario externo. Atractora de polinizadores en floración. Importante en sucesión temprana de bosque andino pero requiere manejo cuidadoso por toxicidad del látex.",
+      "valor_pedagogico": "El toche o trompeto (Bocconia frutescens, Papaveraceae) es uno de los arbolitos pioneros más característicos del bosque andino premontano-montano bajo colombiano entre 1.000 y 2.500 msnm, distribuido en toda la región Andina especialmente en bordes de carretera, áreas en sucesión y terrenos en abandono. Pertenece a la familia Papaveraceae —la misma familia de la amapola (Papaver somniferum) y el opio— y es una de las pocas papaveráceas arborescentes del mundo, característica que la hace especialmente interesante desde el punto de vista botánico y filogenético. Árbol pequeño o arbusto grande de 4-8 metros de altura con ramas alladas, hojas grandes pinnatífidas verde-glaucas con lóbulos profundos (recuerdan a las hojas de papaya, de ahí el nombre 'papaya cimarrona' en algunas regiones), inflorescencias en panículas terminales largas con flores pequeñas verde-amarillentas sin pétalos pero con estambres conspicuos atractores de polinizadores nativos (abejas Meliponini, sírfidos, escarabajos), cápsulas pequeñas rojo-anaranjadas dehiscentes con semillas dispersadas por aves frugívoras. Su característica más distintiva es el látex anaranjado que exuda al cortar cualquier parte del árbol —este látex es rico en alcaloides isoquinolínicos (sanguinarina, queleritrina, bocconina, alocriptopina) con propiedades farmacológicas potentes: antimicrobiano, antiparasitario externo, citotóxico, y tradicionalmente usado en medicina popular colombiana como antiparasitario veterinario externo para tratar miasis y ectoparásitos en ganado y caballos (aplicación tópica del látex directo a las lesiones), como cicatrizante de heridas (con precaución por irritación), y en algunos usos rituales y de protección espiritual del campo. PRECAUCIÓN: el látex es tóxico irritante por contacto (puede causar dermatitis severa) y altamente tóxico si se ingiere, por lo que el manejo de la especie requiere conocimiento tradicional y equipos de protección personal —no es una planta para experimentación lúdica con niños o personas no entrenadas. Su rol ecológico es ser pionera andina de rápido crecimiento que coloniza áreas degradadas, taludes, bordes de carretera y potreros en abandono, facilitando la sucesión temprana hacia bosque secundario en 5-8 años. Como árbol de lindero en cafetales y huertos patrimoniales aporta función alelopática anti-plagas a través de los compuestos liberados al suelo y al aire por las hojas y la corteza. Es lección de farmacognosia colombiana y manejo tradicional: el conocimiento campesino sobre el toche como antiparasitario veterinario es patrimonio etnobotánico que combina eficacia farmacológica real con manejo cuidadoso de la toxicidad —ejemplo de la sabiduría tradicional que no romantiza ni demoniza a las plantas medicinales potentes. Fuentes Tier A: Pérez-Arbeláez 1947 Plantas Útiles Colombia, Correa-Pabón Carulla 2008 Plantas Medicinales, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy.",
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "correa-pabon-carulla-2008",
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "especies_nativas_sustitutas": null
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_ARBOLES_TEMPLADO_RETRY",
+      "id": "vismia_baccifera",
+      "nombre_comun": "Manzanita",
+      "nombre_comunes_regionales": [
+        "sangre de drago",
+        "achiotillo",
+        "lacre",
+        "carate"
+      ],
+      "nombre_cientifico": "Vismia baccifera (L.) Triana & Planch.",
+      "familia_botanica": "Hypericaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "nurse_plant",
+        "biomass_producer",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 200,
+        "optimo_min": 1000,
+        "optimo_max": 1800,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 16,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "árbol pionero mediano 6-12 m altura, copa redondeada, fuste corto, corteza rojiza que exuda látex anaranjado-rojo (sangre de drago)",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas extraídas de drupas rojas maduras, siembra inmediata superficial. Germinación 60-80% a 15-30 días a sol pleno. Vivero a sol directo o media sombra. Plantación a los 3-5 meses (30-40 cm altura) en sitio definitivo. Crecimiento rápido pionero.",
+        "tiempo_a_establecimiento_dias": 45,
+        "notas": "Pionera neotropical fundamental para sucesión secundaria en bosque tropical y subandino. Exuda látex anaranjado-rojo ('sangre de drago') usado tradicionalmente como cicatrizante y antimicótico tópico. Frutos comestibles dulces para fauna. Atractor polinizadores nativos.",
+        "fuente": "Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia; Pérez-Arbeláez 1947 Plantas Útiles; Gentry 1993 Vismia Neotropical; POWO Kew Hypericaceae"
+      },
+      "companions": [
+        "coffea_arabica",
+        "inga_edulis",
+        "cordia_alliodora",
+        "cecropia_telealba"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol 6-12 m, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Pionera rápida para sombrío inicial y atractor polinizadores en huerto rural >300 m².",
+          "tips": [
+            "Crecimiento rápido años 1-3",
+            "Látex usado tradicionalmente cicatrizante",
+            "Frutos comidos por aves"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Tamaño excede invernadero."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío pionero temporal en cafetal y cacaotal en piso templado-cálido 150-300 árb/ha primeros años, luego raleo a 50-80 árb/ha.",
+          "tips": [
+            "Función nodriza nutritiva",
+            "Raleo progresivo años 5-8 a favor de especies del dosel maduro"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie PIONERA CLAVE para sucesión secundaria en bosque tropical-subandino degradado. Una de las más usadas en restauración 200-2000 msnm.",
+          "tips": [
+            "Densidad alta 600-1000 ind/ha inicial",
+            "Facilita establecimiento de especies del dosel maduro en 8-15 años"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Especie PIONERA estructural del bosque tropical y subandino neotropical. Sucesión secundaria temprana, nodriza para especies del dosel maduro. Productora de látex anaranjado-rojo ('sangre de drago') con propiedades cicatrizantes y antimicóticas. Atractor de polinizadores nativos. Drupas comidas por avifauna frugívora.",
+      "valor_pedagogico": "La manzanita o sangre de drago (Vismia baccifera, Hypericaceae) es una de las especies pioneras más importantes y emblemáticas del bosque tropical y subandino neotropical colombiano, distribuida desde el nivel del mar hasta los 2.000 msnm en toda la región Andina, piedemonte amazónico, piedemonte llanero, Caribe y Pacífico colombiano. Árbol pionero mediano de 6-12 metros de altura con copa redondeada, fuste corto y corteza rojiza fina que al cortarse exuda abundante látex anaranjado-rojo característico conocido tradicionalmente como 'sangre de drago' (no confundir con la sangre de drago amazónica Croton lechleri ni con el sangre de drago canario Dracaena draco —tres plantas filogenéticamente distintas con látex rojo coincidentemente usado tradicionalmente como cicatrizante); hojas opuestas elípticas-lanceoladas verde oscuro con glándulas oleíferas oscuras puntiformes características de la familia Hypericaceae (parente botánico cercano al hipérico Hypericum perforatum medicinal europeo), flores blanco-cremas con estambres dorados conspicuos en cimas terminales atractoras de polinizadores nativos, drupas rojas pequeñas dulces consumidas masivamente por aves frugívoras del bosque tropical y subandino (mirlas, tángaras, eufonias, manakines). Su rol ecológico es ser una de las pioneras estructurales más importantes del bosque tropical y subandino neotropical: coloniza rápidamente claros, deslizamientos, áreas quemadas, potreros en abandono y bordes de bosque, donde establece un dosel pionero de 5-10 años bajo el cual germinan y se establecen las especies del dosel maduro intermedio y final, facilitando la sucesión ecológica completa hacia bosque secundario en 15-25 años. Esto la convierte en una de las especies más utilizadas en programas de restauración ecológica neotropical entre 200 y 2.000 msnm. Su látex anaranjado-rojo es uno de los remedios tradicionales más conocidos del campo colombiano: aplicación tópica directa a heridas, cortes, hongos en la piel (pie de atleta), llagas y úlceras dérmicas, con propiedades reales documentadas en farmacognosia moderna (compuestos bencénicos como vismione, friedelina y antraquinonas con actividad antimicrobiana, antifúngica y cicatrizante). Como árbol de sombrío pionero temporal en cafetales y cacaotales del piso templado-cálido (1.000-1.800 msnm) aporta función nodriza nutritiva los primeros años de establecimiento del cultivo permanente, antes de ser raleado en favor del dosel maduro definitivo (Cedrela, Cordia, Inga). Es lección de farmacognosia popular y ecología de sucesión: revalorizar las especies pioneras nativas del bosque tropical colombiano —Vismia, Cecropia, Croton, Trema, Heliocarpus— en programas de restauración ecológica y como medicinas tradicionales accesibles, fortalece la soberanía botánica rural y reduce la dependencia de tratamientos farmacéuticos importados para problemas dérmicos básicos. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia, POWO Kew Hypericaceae, GBIF Backbone Taxonomy, monografías Gentry 1993 Vismia Neotropical, Cenicafé manuales sombrío pionero cafetero.",
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "cenicafe-manual-cafetero-2013"
+      ],
+      "especies_nativas_sustitutas": null
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_ARBOLES_TEMPLADO_RETRY",
+      "id": "cinchona_pubescens",
+      "nombre_comun": "Quina roja",
+      "nombre_comunes_regionales": [
+        "cascarilla roja",
+        "quina cascarilla",
+        "quinina roja"
+      ],
+      "nombre_cientifico": "Cinchona pubescens Vahl",
+      "familia_botanica": "Rubiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "biomass_producer",
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "en_peligro",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1500,
+        "optimo_max": 1900,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 16,
+        "optimo_max": 22,
+        "max_tolerable": 27
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "árbol perennifolio mediano 8-15 m altura, fuste recto, copa redondeada, corteza pardo-rojiza rica en alcaloides quinolínicos (quinina, quinidina, cinconina, cinconidina)",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "estaca"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas pequeñas aladas extraídas de cápsulas dehiscentes, siembra superficial bajo sombra 70%. Germinación 30-50% a 30-60 días. Vivero a sombra densa con humedad alta. Plantación a los 12-15 meses (30-50 cm altura) bajo dosel forestal parcial.",
+        "tiempo_a_establecimiento_dias": 120,
+        "notas": "Especie EN PELIGRO por sobreexplotación histórica de corteza (siglo XVII al XIX) para extracción de quinina contra malaria. Cultivo en huertos patrimoniales y restauración bosque andino premontano. PRECAUCIÓN: corteza tóxica si mal dosificada.",
+        "fuente": "Cárdenas & Salinas 2007 Libro Rojo Plantas Colombia (categoría EN); Bernal et al. 2015; Pérez-Arbeláez 1947; Andersson 1998 Cinchona Neotropicales"
+      },
+      "companions": [
+        "coffea_arabica",
+        "cedrela_montana",
+        "inga_densiflora",
+        "clethra_revoluta"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol 8-15 m, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Ejemplar patrimonial-histórico en huerto andino cafetero >300 m² como conservación ex situ de la quina histórica colombiana.",
+          "tips": [
+            "Sombrío 50-60%",
+            "Cosecha de corteza solo de podas, NUNCA tala",
+            "Conservación genética prioritaria"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Tamaño excede invernadero."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío diversificado de café altura 60-100 árb/ha en zona cafetera con función histórica-patrimonial. NO sobreexplotación de corteza.",
+          "tips": [
+            "Asocio café-quina recupera tradición histórica",
+            "Cosecha de corteza solo de raleos selectivos cada 8-10 años"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie EN PELIGRO. Restauración bosque andino premontano cafetero con prioridad alta conservación.",
+          "tips": [
+            "Plantación bajo dosel maduro existente",
+            "Densidad 200-400 ind/ha enriquecimiento",
+            "Registro genético ejemplares"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "corteza",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Rubiácea histórica del bosque andino premontano colombiano. EN PELIGRO por sobreexplotación histórica de corteza para extracción de quinina contra malaria (siglos XVII-XIX). Productora de alcaloides quinolínicos farmacológicamente potentes (quinina, quinidina, cinconina, cinconidina). Atractora de polinizadores nativos en floración. Patrimonio botánico histórico del Eje Cafetero y región Andina.",
+      "valor_pedagogico": "La quina roja o cascarilla roja (Cinchona pubescens, Rubiaceae) es uno de los árboles más históricamente importantes del bosque andino premontano sudamericano y patrimonio botánico-medicinal colombiano por antonomasia. Distribuida originalmente en los bosques andinos premontanos entre 1.000 y 2.000 msnm en las cordilleras Central, Occidental y Oriental colombianas, especialmente en Antioquia, Caldas, Quindío, Risaralda, Valle del Cauca, Cauca, Tolima, Huila, Cundinamarca, Boyacá, Santanderes, Nariño y Putumayo. Árbol perennifolio de 8-15 metros de altura con fuste recto, copa redondeada y corteza pardo-rojiza característica rica en alcaloides quinolínicos (quinina, quinidina, cinconina, cinconidina) que son la base farmacológica de los antimaláricos tradicionales; hojas opuestas elípticas-ovadas grandes coriáceas verde oscuro brillantes, flores pequeñas blanco-rosadas con corolas tubulares cinco-lobuladas dispuestas en panículas terminales atractoras de polinizadores nativos (abejas Meliponini, mariposas, colibríes), cápsulas leñosas pequeñas dehiscentes con semillas aladas dispersadas por viento. Su historia es uno de los capítulos más fascinantes y trágicos de la etnobotánica neotropical: los pueblos indígenas andinos (Cañaris, Quechuas, Lojas, y otros pueblos del actual Ecuador, Perú y sur de Colombia) descubrieron y usaron la corteza de quina contra fiebres palúdicas siglos antes del contacto europeo; los jesuitas españoles documentaron el uso desde el siglo XVII y exportaron la corteza a Europa donde se convirtió en el primer tratamiento eficaz contra la malaria (la 'Polvo de los Jesuitas' o 'Cinchona' nombrada en honor a la condesa de Chinchón), salvando millones de vidas durante los siglos XVIII y XIX y posibilitando la expansión colonial europea en África y Asia tropical. La sobreexplotación masiva de las poblaciones silvestres entre 1630 y 1880 (descortezamiento que mataba al árbol, talas masivas, comercio sin regulación) llevó las poblaciones colombianas, ecuatorianas, peruanas y bolivianas al borde de la extinción comercial. Cuando los holandeses lograron establecer plantaciones en Java (Indonesia) a fines del siglo XIX con esquejes y semillas extraídas clandestinamente de Sudamérica, el comercio andino de quina colapsó, dejando un legado de bosques empobrecidos genéticamente y comunidades campesinas empobrecidas económicamente. Hoy Cinchona pubescens está categorizada EN PELIGRO en el Libro Rojo de Plantas de Colombia (Cárdenas & Salinas 2007) y su conservación ex situ en huertos patrimoniales, cafetales históricos del Eje Cafetero (especialmente en Caldas y Quindío donde el cultivo de quina precedió al boom cafetero del siglo XIX) y arboretos botánicos es prioridad alta. Su asocio agroecológico tradicional con el café bajo sombrío diversificado es históricamente continuo y ofrece oportunidad de recuperación genética y cultural. PRECAUCIÓN: los alcaloides de la corteza son farmacológicamente potentes y tóxicos si se mal dosifican; uso medicinal tradicional solo bajo conocimiento etnobotánico riguroso. Es lección de soberanía botánica, historia colonial y conservación: la quina colombiana es patrimonio biocultural y medicinal del país, su recuperación en cafetales y bosques patrimoniales es acto de justicia histórica botánica. Fuentes Tier A: Cárdenas & Salinas 2007 Libro Rojo Plantas Colombia (categoría EN), Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia, POWO Kew, GBIF Backbone Taxonomy, Andersson 1998 monografía Cinchona Neotropicales.",
+      "nota_conservacion": "Especie EN PELIGRO según Libro Rojo Plantas Colombia por sobreexplotación histórica de corteza (siglos XVII-XIX) para extracción de quinina antimalárica. Aprovechamiento silvestre prohibido sin permiso especial CAR/Ministerio Ambiente. Conservación ex situ en huertos cafeteros patrimoniales y restauración bosque andino premontano con prioridad alta.",
+      "source_ids": [
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "especies_nativas_sustitutas": null
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_ARBOLES_TEMPLADO_RETRY",
+      "id": "cinchona_officinalis",
+      "nombre_comun": "Quina amarilla",
+      "nombre_comunes_regionales": [
+        "cascarilla amarilla",
+        "quina antimalárica",
+        "quina fina"
+      ],
+      "nombre_cientifico": "Cinchona officinalis L.",
+      "familia_botanica": "Rubiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "biomass_producer",
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_protegido",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1700,
+        "optimo_max": 2000,
+        "max_absoluto": 2400
+      },
+      "temperatura_c": {
+        "helada_letal": 1,
+        "optimo_min": 14,
+        "optimo_max": 20,
+        "max_tolerable": 25
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "árbol perennifolio mediano 6-12 m altura, fuste recto delgado, copa redondeada, corteza pardo-amarillenta rica en quinina (mayor contenido que C. pubescens)",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas pequeñas aladas, siembra superficial inmediata bajo sombra 70%. Germinación 25-45% a 45-90 días. Vivero a sombra densa con humedad alta y suelo orgánico ácido. Plantación a los 12-18 meses (30-45 cm altura) bajo dosel forestal parcial.",
+        "tiempo_a_establecimiento_dias": 150,
+        "notas": "Especie clave histórica antimalárica, mayor concentración de quinina que C. pubescens. Distribución más restringida (zona sur colombiana Cauca-Nariño-Putumayo-frontera ecuatoriana). Conservación ex situ en huertos patrimoniales sur-colombianos.",
+        "fuente": "Cárdenas & Salinas 2007 Libro Rojo Plantas Colombia; Bernal et al. 2015; Andersson 1998 Cinchona Neotropicales; Pérez-Arbeláez 1947"
+      },
+      "companions": [
+        "coffea_arabica",
+        "cedrela_montana",
+        "inga_densiflora",
+        "cinchona_pubescens"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol 6-12 m, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Ejemplar histórico-medicinal patrimonial en huerto andino sur-colombiano >300 m².",
+          "tips": [
+            "Sombrío 60-70%",
+            "Suelo orgánico ácido",
+            "Mayor concentración alcaloides que C. pubescens"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Tamaño excede invernadero."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío diversificado de café altura zona sur Colombia 60-120 árb/ha con función histórica.",
+          "tips": [
+            "Cosecha corteza solo raleos selectivos",
+            "Conservación genética cordillera sur"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave restauración bosque andino premontano sur colombiano (Cauca, Nariño, Putumayo) con prioridad alta.",
+          "tips": [
+            "Plantación bajo dosel maduro",
+            "Densidad 200-400 ind/ha",
+            "Registro genético"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "corteza",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Rubiácea histórica antimalárica del bosque andino premontano sur-colombiano y norte ecuatoriano. Mayor concentración de quinina entre las Cinchona neotropicales. Atractor polinizadores en floración. Patrimonio botánico-medicinal histórico de la región sur andina (Cauca-Nariño-Putumayo-Loja).",
+      "valor_pedagogico": "La quina amarilla o cascarilla amarilla (Cinchona officinalis, Rubiaceae) es el patrimonio botánico-medicinal por excelencia de los bosques andinos premontanos del sur de Colombia y norte de Ecuador, considerada históricamente la especie con mayor concentración de alcaloides antimaláricos —especialmente quinina— entre todas las Cinchona neotropicales. Su distribución natural se centra en la cordillera Andina del sur colombiano (Cauca sur, Nariño, Putumayo) y norte ecuatoriano (Loja, Zamora-Chinchipe), entre 1.500 y 2.400 msnm en bosques andinos premontanos y montanos bajos. La región de Loja en Ecuador es considerada la 'patria original' de la quina amarilla y desde allí los jesuitas en el siglo XVII iniciaron el comercio mundial de la corteza antimalárica. Árbol perennifolio mediano de 6-12 metros de altura con fuste recto delgado, copa redondeada y corteza pardo-amarillenta característica que da su nombre vernáculo, hojas opuestas elípticas-lanceoladas verde oscuro brillantes coriáceas, flores pequeñas rosado-blanquecinas con corolas tubulares cinco-lobuladas peludas en su garganta dispuestas en panículas terminales aromáticas atractoras de polinizadores nativos (mariposas, colibríes Andigena, abejas Meliponini), cápsulas leñosas pequeñas dehiscentes con semillas aladas dispersadas por viento de montaña. Su importancia histórica es paralela a la de C. pubescens pero con química más concentrada: cuando los químicos franceses Pierre Joseph Pelletier y Joseph Bienaimé Caventou aislaron por primera vez la quinina pura en 1820 a partir de corteza de Cinchona, lo hicieron principalmente con C. officinalis, lo que confirmó científicamente lo que el conocimiento indígena andino había documentado siglos antes: que la corteza era el primer antimalárico eficaz conocido en la historia humana. Durante el siglo XIX la quina amarilla fue tan codiciada que su sobreexplotación llevó a las poblaciones silvestres sur-colombianas al borde de la extinción, hasta que el establecimiento de plantaciones holandesas en Java (con semillas extraídas clandestinamente de Bolivia y Ecuador por Charles Ledger en 1865) cambió la economía mundial de la quina y dejó el ecosistema andino sur-colombiano severamente empobrecido. Hoy está categorizada como nativa protegida en Colombia y su conservación ex situ en huertos patrimoniales del sur del país y en cafetales históricos de la cordillera sur es prioridad para mantener su acervo genético. Su asocio agroecológico tradicional con café bajo sombrío diversificado en las fincas patrimoniales del Cauca, Nariño y Putumayo permite recuperación gradual de poblaciones cultivadas. La química de la corteza incluye quinina (28-35% de los alcaloides totales), quinidina (5-8%, antiarrítmico cardíaco usado hoy en farmacopea), cinconina y cinconidina (15-20%, antimaláricos secundarios), todos farmacológicamente potentes y tóxicos si se mal dosifican —por lo que el uso medicinal tradicional requiere conocimiento etnobotánico riguroso de comunidades indígenas y campesinas sur-colombianas y norte-ecuatorianas. Es lección de soberanía botánica binacional Colombia-Ecuador: la quina amarilla es patrimonio biocultural y medicinal del eje cordillerano andino sur, su recuperación es acto de justicia histórica botánica y de fortalecimiento de la farmacopea andina. Fuentes Tier A: Cárdenas & Salinas 2007 Libro Rojo Plantas Colombia, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia, POWO Kew, GBIF Backbone Taxonomy, Andersson 1998 monografía Cinchona Neotropicales.",
+      "source_ids": [
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "especies_nativas_sustitutas": null
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_ARBOLES_TEMPLADO_RETRY",
+      "id": "myrsine_coriacea",
+      "nombre_comun": "Cucharo",
+      "nombre_comunes_regionales": [
+        "espadero",
+        "raque",
+        "yarumo blanco",
+        "carbonero blanco"
+      ],
+      "nombre_cientifico": "Myrsine coriacea (Sw.) R.Br. ex Roem. & Schult.",
+      "familia_botanica": "Primulaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "biomass_producer",
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1700,
+        "optimo_max": 2000,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 25
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "habito": "árbol perennifolio mediano 6-12 m altura, copa cónica-piramidal densa, fuste recto, corteza grisácea finamente fisurada",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas pequeñas extraídas de drupas violáceo-negras, siembra superficial en sustrato fino. Germinación 50-70% a 30-60 días a media sombra. Vivero a sombra parcial. Plantación a los 8-12 meses (30-40 cm altura).",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "Pionera-secundaria andina muy versátil entre 1500-2800 msnm. Frutos consumidos masivamente por aves del bosque andino. Madera blanca pálida usada como leña y carbón vegetal local. Cerca viva tradicional cundiboyacense.",
+        "fuente": "Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia; POWO Kew Primulaceae; CAR Cundinamarca cercas vivas; Cenicafé sombrío altoandino"
+      },
+      "companions": [
+        "alnus_acuminata",
+        "cedrela_montana",
+        "escallonia_pendula",
+        "myrcianthes_leucoxyla"
+      ],
+      "antagonists": [],
+      "manejo_por_escala": {
+        "apartamento": {
+          "viable": false,
+          "nota": "Árbol 6-12 m, inviable apartamento."
+        },
+        "huerto_casero": {
+          "viable": true,
+          "nota": "Cerca viva tradicional altoandina y atractor avifauna en huertos >200 m². Rústico y rápido establecimiento.",
+          "tips": [
+            "Cerca viva 1x1 m",
+            "Frutos comidos por aves año redondo",
+            "Tolera podas frecuentes"
+          ]
+        },
+        "invernadero_mediano": {
+          "viable": false,
+          "nota": "Inviable bajo cubierta."
+        },
+        "produccion": {
+          "viable": true,
+          "nota": "Cerca viva tradicional altoandina 1000-2000 estacas/km perimetral. Sombrío diversificado café-altura 80-150 árb/ha. Producción leña y carbón vegetal local.",
+          "tips": [
+            "Poda anual mantiene cerca densa",
+            "Rebrote vigoroso desde tocón"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Pionera-secundaria andina ideal para restauración entre 1500-2800 msnm. Buen establecimiento y conectividad con avifauna.",
+          "tips": [
+            "Densidad 800-1200 ind/ha",
+            "Asocio con Alnus N-fijadora"
+          ]
+        }
+      },
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "plagas_criticas": [],
+      "enfermedades_criticas": [],
+      "harvest_type": "biomasa",
+      "validation_level": "claude_draft",
+      "rol_ecologico": "Primulácea andina pionera-secundaria muy versátil. Productor de drupas violáceo-negras consumidas masivamente por aves del bosque andino (mirlas, tángaras, atrapamoscas). Madera blanca-pálida usada como leña y carbón vegetal local. Cerca viva tradicional cundiboyacense y altiplano antioqueño.",
+      "valor_pedagogico": "El cucharo o espadero (Myrsine coriacea, Primulaceae) es uno de los árboles medianos más versátiles y ampliamente distribuidos en los bosques andinos templados-fríos colombianos entre 1.500 y 2.800 msnm, presente en toda la región Andina especialmente en Cundinamarca, Boyacá, Santanderes, Antioquia, Caldas, Quindío, Risaralda, Tolima, Huila, Cauca, Nariño y Valle del Cauca. Árbol perennifolio de 6-12 metros de altura con copa cónica-piramidal densa, fuste recto y corteza grisácea finamente fisurada; hojas alternas oblongo-lanceoladas coriáceas verde oscuro brillantes con ápice obtuso característico, agrupadas en los extremos de las ramas (aspecto que recuerda a las primaveras herbáceas Primulaceae —familia botánica a la que pertenece tras la revisión filogenética de APG IV que reubicó a las Myrsinaceae como subfamilia Myrsinoideae dentro de Primulaceae), flores pequeñas verdoso-blanquecinas en racimos cortos axilares atractoras de polinizadores nativos, drupas pequeñas globosas verdes que viran a violáceo-negruzcas al madurar muy buscadas por aves frugívoras del bosque andino (mirlas Turdus fuscater, tángaras Anisognathus, atrapamoscas Tyranniidae, eufonias Euphonia) que actúan como dispersores principales. Su mayor virtud agroecológica es la versatilidad: es pionera-secundaria con rápido establecimiento que coloniza áreas degradadas, taludes y bordes, tolera suelos pobres y ácidos, soporta heladas suaves hasta -2°C, rebrota vigorosamente desde el tocón al podarla, lo que la convierte en una de las especies más utilizadas en cercas vivas tradicionales del altiplano cundiboyacense (la 'cerca de cucharo' es paisaje cultural patrimonial campesino), en restauración ecológica andina entre 1.500 y 2.800 msnm, en sombrío diversificado de café-altura en zona cafetera alta de Caldas y Antioquia, y como productora rural de leña y carbón vegetal artesanal (la madera blanco-pálida es de combustión limpia y duradera). Sus frutos son recurso clave para la avifauna andina: producción casi continua durante el año, con picos estacionales que sostienen poblaciones de aves frugívoras incluso en épocas de escasez, lo que la convierte en especie focal para conservación de avifauna en paisajes rurales cafeteros y altoandinos. La conexión filogenética con la familia Primulaceae es lección de filogenia botánica moderna: hasta los años 2000 las myrsines eran familia propia (Myrsinaceae) tradicionalmente; los estudios de filogenia molecular (APG II, III, IV) demostraron su anidamiento dentro de Primulaceae, lo que cambió la clasificación taxonómica y pedagógica. Es lección de soberanía botánica andina: el cucharo es uno de los árboles más útiles, versátiles y rústicos del bosque andino colombiano, ejemplo de especie 'común y subvalorada' que merece revalorización en cercas vivas, restauración, sombrío y producción rural de leña-carbón, fortaleciendo paisajes culturales campesinos altoandinos y conservación de avifauna nativa. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew Primulaceae (subfamilia Myrsinoideae), GBIF Backbone Taxonomy, CAR Cundinamarca cercas vivas tradicionales, Cenicafé manuales sombrío altoandino.",
+      "source_ids": [
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "car-cundi-2019",
+        "cenicafe-manual-cafetero-2013"
+      ],
+      "especies_nativas_sustitutas": null
     }
   ],
   "biopreparados": [
