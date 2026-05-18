@@ -252,13 +252,6 @@ export default function App() {
   const navigate = useCallback((view, initialData = null) => {
     setCurrentView(view);
     setCurrentViewData(initialData);
-    // Bug 2026-05-18 operator: botón atrás Android/iOS/navegador debe volver
-    // al home siempre. Usamos history.pushState para registrar cada navigate
-    // como entry del browser history. Eso permite que el OS back button
-    // dispare popstate → handleBack → vuelve a 'dashboard'.
-    if (typeof window !== 'undefined' && view !== 'loading') {
-      window.history.pushState({ chagraView: view }, '', `#${view}`);
-    }
   }, []);
 
   useEffect(() => {
@@ -266,21 +259,6 @@ export default function App() {
     window.addEventListener('chagraNavigate', handleNavigate);
     return () => window.removeEventListener('chagraNavigate', handleNavigate);
   }, [navigate]);
-
-  // Bug 2026-05-18 operator: botón atrás Android/iOS/navegador → volver al home.
-  // popstate dispara cuando el usuario toca back nativo del browser/OS.
-  // Si view actual NO es dashboard/login, volver al dashboard (home).
-  // Si está EN dashboard, dejar que el browser cierre/pause la PWA naturalmente.
-  useEffect(() => {
-    const handlePopState = () => {
-      if (currentView !== 'dashboard' && currentView !== 'login' && currentView !== 'loading') {
-        setCurrentView('dashboard');
-        setCurrentViewData(null);
-      }
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [currentView]);
 
   useEffect(() => {
     const handler = (e) => setLastLogMessage(e.detail);
