@@ -1,116 +1,108 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Sprout, Leaf, BookOpen, Database, Droplet, TreePine, Users, ShieldCheck, FileCheck, Cloud } from 'lucide-react';
+import { Sprout, Leaf, BookOpen, Database, Droplet, TreePine, Users, ShieldCheck, FileCheck, Cloud, Bot } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 
 /**
- * WelcomeStatsHero — widget de bienvenida con stats impactantes.
- * Renderiza pre-login (LoginScreen) y post-login (Dashboard hero).
+ * WelcomeStatsHero — widget de bienvenida con narrativa de impacto del agente.
  *
- * Operator feedback 2026-05-18: 'estadísticas generales de todas las
- * instalaciones de chagra, algo demo como agua ahorrada en riego por
- * goteo... datos más impactantes a nivel global'.
- *
- * Carousel rotativo cada 5s con 6 categorías de impact:
- * 1. Especies en catálogo (catalogStats.species) — siempre visible
- * 2. Agua ahorrada con riego goteo (proyectado por planta cuidada)
- * 3. CO2 secuestrado por árboles nativos plantados
- * 4. Especies endémicas + endangered protegidas (18 EN + 9 endémicas)
- * 5. Comunidades indígenas/afro custodias documentadas (8+ pueblos)
- * 6. Fuentes científicas Tier A curadas (52 papers + institucionales)
- *
- * Las stats locales (plantas cuidadas del operador) se muestran fijas
- * abajo en grid 2x2 minor.
+ * Operator feedback 2026-05-18: 'el carousel debe estar enfocado en estadísticas
+ * tipo el agente Chagra al frente del sistema de riego ayudó a ahorrar X cantidad
+ * de litros en X días'. → Cada slide tiene al agente como sujeto protagonista,
+ * con verbo de acción + número concreto + ventana temporal cuando aplique.
  */
 
-const HERO_ROTATION_MS = 5000;
+const HERO_ROTATION_MS = 6000;
+const MONITOR_DAYS_PER_PLANT = 90;
+const DRIP_SAVING_L_PER_DAY = 5;   // FAO + AGROSAVIA Riego Eficiente
+const CO2_KG_PER_TREE_YEAR = 22;   // IDEAM-MADS carbono forestal andino
+const TREE_FRACTION = 0.3;          // ~30% de plantas registradas son árboles
 
-// Hero stats agregados — algunos derivados (species, plantsCount), otros
-// estimados con factores conservadores razonables para narrativa de impacto.
-// Operator request demo Diana: 'imagina y complementa con datos impactantes
-// a nivel global'.
 function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesTierA, endangeredCount, endemicasCount, invasorasCount }) {
-  // Factor: planta con riego por goteo ahorra ~5 L/día vs aspersión
-  // (FAO Riego Eficiente, AGROSAVIA Manual Riego 2018). Asumiendo
-  // 90 días promedio de monitoreo activo por planta.
-  const aguaAhorradaL = Math.max(0, plantsCount) * 5 * 90;
-
-  // Factor: árbol nativo andino secuestra ~22 kg CO2/año en sus primeros
-  // 5 años (IDEAM-MADS Tabla nacional carbono forestal). Conservador
-  // para plantas no-arbóreas (estimación 30% de plantsCount sean árboles).
-  const co2KgAnio = Math.max(0, plantsCount) * 0.3 * 22;
+  const aguaAhorradaL = Math.max(0, plantsCount) * DRIP_SAVING_L_PER_DAY * MONITOR_DAYS_PER_PLANT;
+  const co2KgAnio = Math.max(0, plantsCount) * TREE_FRACTION * CO2_KG_PER_TREE_YEAR;
+  const plantsLabel = plantsCount === 1 ? 'planta' : 'plantas';
 
   return [
     {
-      icon: Leaf,
-      label: 'Especies en catálogo',
-      value: species,
-      unit: 'curadas científicamente',
-      tone: 'emerald',
-      caption: 'Catálogo agroecológico colombiano',
-    },
-    {
       icon: Droplet,
-      label: 'Agua ahorrada estimada',
+      headline: 'El agente Chagra al frente del riego',
       value: aguaAhorradaL.toLocaleString('es-CO'),
-      unit: 'litros · riego por goteo',
+      unit: `litros ahorrados en ${MONITOR_DAYS_PER_PLANT} días`,
       tone: 'cyan',
-      caption: 'Factor FAO + AGROSAVIA · 5 L/día/planta vs aspersión',
+      story: `Acompañando ${plantsCount} ${plantsLabel} con riego por goteo en lugar de aspersión.`,
+      caption: 'Factor FAO + AGROSAVIA · 5 L/día por planta',
     },
     {
       icon: Cloud,
-      label: 'CO₂ secuestrado',
+      headline: 'El agente Chagra cuida el aire',
       value: Math.round(co2KgAnio).toLocaleString('es-CO'),
-      unit: 'kg/año · árboles nativos',
+      unit: 'kg de CO₂ secuestrados al año',
       tone: 'lime',
-      caption: 'Factor IDEAM-MADS · 22 kg CO₂/año por árbol andino',
+      story: `Monitoreando árboles nativos andinos sembrados con Chagra.`,
+      caption: 'Factor IDEAM-MADS · 22 kg CO₂/año por árbol joven',
+    },
+    {
+      icon: Leaf,
+      headline: 'El agente Chagra conoce',
+      value: species,
+      unit: 'especies del catálogo colombiano',
+      tone: 'emerald',
+      story: 'Sugiere especies nativas, advierte invasoras y propone asociaciones.',
+      caption: 'Catálogo curado científicamente',
     },
     {
       icon: ShieldCheck,
-      label: 'Species protegidas',
+      headline: 'El agente Chagra protege',
       value: endangeredCount + endemicasCount,
-      unit: 'endémicas + en peligro',
+      unit: 'especies endémicas y en peligro',
       tone: 'amber',
-      caption: 'Conservación in-situ documentada en Chagra',
+      story: 'Marca riesgos UICN y prioriza conservación in-situ con el campesino.',
+      caption: `${endangeredCount} en peligro · ${endemicasCount} endémicas colombianas`,
     },
     {
       icon: Users,
-      label: 'Pueblos custodios',
+      headline: 'El agente Chagra recoge saberes',
       value: 8,
-      unit: 'culturas documentadas',
+      unit: 'pueblos custodios documentados',
       tone: 'fuchsia',
+      story: 'Conocimiento ancestral validado y entregado en cada recomendación.',
       caption: 'Embera · Wounaan · Tikuna · Bora · Muisca · Wayúu · Kogui · Inga',
     },
     {
-      icon: FileCheck,
-      label: 'Fuentes científicas Tier A',
-      value: sourcesTierA,
-      unit: 'papers + institucionales',
-      tone: 'sky',
-      caption: 'POWO · GBIF · IAvH · AGROSAVIA · ICA · UNAL · Humboldt',
-    },
-    {
       icon: TreePine,
-      label: 'Invasoras catalogadas',
+      headline: 'El agente Chagra alerta sobre invasoras',
       value: invasorasCount,
-      unit: 'manejo y sustitución nativa',
+      unit: 'especies invasoras vigiladas',
       tone: 'orange',
-      caption: 'Ulex europaeus · kikuyo · retamo · eucalipto · etc.',
-    },
-    {
-      icon: BookOpen,
-      label: 'Fichas pedagógicas',
-      value: ragDocs,
-      unit: 'agente IA con contexto',
-      tone: 'violet',
-      caption: 'RAG offline-first · 100% privacidad',
+      story: 'Sugiere sustitución por nativas y rutas de manejo agroecológico.',
+      caption: 'Ulex · kikuyo · retamo · eucalipto · etc.',
     },
     {
       icon: Database,
-      label: 'Biopreparados',
+      headline: 'El agente Chagra reemplaza químicos',
       value: biopreparados,
-      unit: 'orgánicos sin químicos',
+      unit: 'biopreparados orgánicos sugeridos',
       tone: 'yellow',
-      caption: 'Bocashi · Bordelés · Trichoderma · Neem · Bt · etc.',
+      story: 'Bocashi, caldo bordelés, Trichoderma, neem, Bt y más, paso a paso.',
+      caption: 'Sin glifosato · sin agroquímicos',
+    },
+    {
+      icon: FileCheck,
+      headline: 'El agente Chagra cita fuentes Tier A',
+      value: sourcesTierA,
+      unit: 'papers y guías institucionales',
+      tone: 'sky',
+      story: 'Cada respuesta respaldada por evidencia trazable.',
+      caption: 'POWO · GBIF · IAvH · AGROSAVIA · ICA · UNAL · Humboldt',
+    },
+    {
+      icon: BookOpen,
+      headline: 'El agente Chagra funciona offline',
+      value: ragDocs,
+      unit: 'fichas pedagógicas embebidas',
+      tone: 'violet',
+      story: 'Sin internet, sin nube ajena. RAG local con privacidad total.',
+      caption: 'Soberanía digital campesina',
     },
   ];
 }
@@ -195,18 +187,19 @@ export default function WelcomeStatsHero() {
   return (
     <section
       className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-950 to-slate-900 p-4 space-y-4"
-      aria-label="Resumen de Chagra"
+      aria-label="Impacto del agente Chagra"
     >
       <div className="flex items-center justify-between px-1">
-        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-          Chagra en cifras
+        <h2 className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+          <Bot className="w-3 h-3 text-emerald-400" aria-hidden="true" />
+          Agente Chagra · impacto
         </h2>
         <span className="text-[10px] text-slate-600 italic">
-          Soberanía alimentaria · datos curados
+          Soberanía alimentaria
         </span>
       </div>
 
-      {/* Hero card grande con stat rotativa */}
+      {/* Hero card grande con narrativa agente-protagonista rotativa */}
       <div
         className={`${tone.bg} ${tone.border} border rounded-2xl p-5 transition-all duration-500 animate-in fade-in`}
         key={carouselIndex}
@@ -214,17 +207,22 @@ export default function WelcomeStatsHero() {
         <div className="flex items-start gap-3">
           <CurrentIcon className={`w-6 h-6 ${tone.text} shrink-0 mt-1`} aria-hidden="true" />
           <div className="flex-1 min-w-0">
-            <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">
-              {current.label}
+            <div className="text-[11px] uppercase tracking-wider text-slate-300 font-bold leading-tight">
+              {current.headline}
             </div>
-            <div className={`text-4xl font-black ${tone.text} leading-none mt-1`}>
+            <div className={`text-4xl font-black ${tone.text} leading-none mt-2`}>
               {current.value}
             </div>
-            <div className="text-xs text-slate-300 mt-1 font-medium">
+            <div className="text-xs text-slate-200 mt-1 font-medium">
               {current.unit}
             </div>
+            {current.story && (
+              <div className="text-[11px] text-slate-400 mt-2 leading-snug">
+                {current.story}
+              </div>
+            )}
             {current.caption && (
-              <div className="text-[10px] text-slate-500 mt-2 leading-snug italic">
+              <div className="text-[10px] text-slate-500 mt-1.5 leading-snug italic">
                 {current.caption}
               </div>
             )}
@@ -242,7 +240,7 @@ export default function WelcomeStatsHero() {
                   ? `w-6 ${tone.text.replace('text-', 'bg-')}`
                   : 'w-1.5 bg-slate-700'
               }`}
-              aria-label={`Ver stat ${idx + 1}`}
+              aria-label={`Ver historia ${idx + 1}`}
             />
           ))}
         </div>
