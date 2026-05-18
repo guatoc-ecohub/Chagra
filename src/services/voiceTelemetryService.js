@@ -18,91 +18,127 @@ const generateId = () => {
   return `vt_${timestamp}${random}`;
 };
 
+/**
+ * Registra un evento de telemetría de voz en IndexedDB.
+ *
+ * Telemetría es NO-CRÍTICA: si IndexedDB falla, se loguea y se retorna null
+ * para no propagar el error al caller (la UI no debe romperse por telemetría).
+ *
+ * @returns {Promise<Object|null>} evento persistido, o null si falló persistencia.
+ */
 export const recordEvent = async ({ event_type, flujo, duration_ms, accepted, edits, connectivity }) => {
-  const db = await openDB();
-  const tx = db.transaction(STORES.VOICE_TELEMETRY, 'readwrite');
-  const store = tx.objectStore(STORES.VOICE_TELEMETRY);
+  try {
+    const db = await openDB();
+    const tx = db.transaction(STORES.VOICE_TELEMETRY, 'readwrite');
+    const store = tx.objectStore(STORES.VOICE_TELEMETRY);
 
-  const event = {
-    id: generateId(),
-    event_type,
-    flujo,
-    duration_ms: duration_ms ?? null,
-    accepted: accepted ?? null,
-    edits: edits ?? null,
-    connectivity: connectivity ?? null,
-    created_at: new Date().toISOString(),
-    synced: false,
-  };
+    const event = {
+      id: generateId(),
+      event_type,
+      flujo,
+      duration_ms: duration_ms ?? null,
+      accepted: accepted ?? null,
+      edits: edits ?? null,
+      connectivity: connectivity ?? null,
+      created_at: new Date().toISOString(),
+      synced: false,
+    };
 
-  store.add(event);
+    store.add(event);
 
-  return new Promise((resolve, reject) => {
-    tx.oncomplete = () => resolve(event);
-    tx.onerror = () => reject(tx.error);
-  });
+    return await new Promise((resolve, reject) => {
+      tx.oncomplete = () => resolve(event);
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (err) {
+    console.error('[voiceTelemetry] recordEvent failed:', err);
+    return null;
+  }
 };
 
+/**
+ * @returns {Promise<Array>} eventos pendientes de sync, o [] si IndexedDB falla.
+ */
 export const getPendingEvents = async (limit = 50) => {
-  const db = await openDB();
-  const tx = db.transaction(STORES.VOICE_TELEMETRY, 'readonly');
-  const store = tx.objectStore(STORES.VOICE_TELEMETRY);
+  try {
+    const db = await openDB();
+    const tx = db.transaction(STORES.VOICE_TELEMETRY, 'readonly');
+    const store = tx.objectStore(STORES.VOICE_TELEMETRY);
 
-  const index = store.index('synced');
-  const request = index.getAll(IDBKeyRange.only(false), limit);
+    const index = store.index('synced');
+    const request = index.getAll(IDBKeyRange.only(false), limit);
 
-  return new Promise((resolve, reject) => {
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
+    return await new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  } catch (err) {
+    console.error('[voiceTelemetry] getPendingEvents failed:', err);
+    return [];
+  }
 };
 
+/**
+ * Marca un set de eventos como sync'd. No-throw (telemetría es best-effort).
+ */
 export const markSynced = async (eventIds) => {
   if (!eventIds || eventIds.length === 0) return;
 
-  const db = await openDB();
-  const tx = db.transaction(STORES.VOICE_TELEMETRY, 'readwrite');
-  const store = tx.objectStore(STORES.VOICE_TELEMETRY);
+  try {
+    const db = await openDB();
+    const tx = db.transaction(STORES.VOICE_TELEMETRY, 'readwrite');
+    const store = tx.objectStore(STORES.VOICE_TELEMETRY);
 
-  for (const id of eventIds) {
-    const getRequest = store.get(id);
-    getRequest.onsuccess = () => {
-      const event = getRequest.result;
-      if (event) {
-        event.synced = true;
-        event.synced_at = new Date().toISOString();
-        store.put(event);
-      }
-    };
+    for (const id of eventIds) {
+      const getRequest = store.get(id);
+      getRequest.onsuccess = () => {
+        const event = getRequest.result;
+        if (event) {
+          event.synced = true;
+          event.synced_at = new Date().toISOString();
+          store.put(event);
+        }
+      };
+    }
+
+    return await new Promise((resolve, reject) => {
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (err) {
+    console.error('[voiceTelemetry] markSynced failed:', err);
   }
-
-  return new Promise((resolve, reject) => {
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
 };
 
+/**
+ * @returns {Promise<Array>} eventos ordenados desc por created_at, o [] si falla.
+ */
 export const getAllEvents = async (limit = 1000) => {
-  const db = await openDB();
-  const tx = db.transaction(STORES.VOICE_TELEMETRY, 'readonly');
-  const store = tx.objectStore(STORES.VOICE_TELEMETRY);
+  try {
+    const db = await openDB();
+    const tx = db.transaction(STORES.VOICE_TELEMETRY, 'readonly');
+    const store = tx.objectStore(STORES.VOICE_TELEMETRY);
 
-  const index = store.index('created_at');
-  const request = index.openCursor(null, 'prev', limit);
+    const index = store.index('created_at');
+    const request = index.openCursor(null, 'prev', limit);
 
-  const events = [];
-  return new Promise((resolve, reject) => {
-    request.onsuccess = (event) => {
-      const cursor = event.target.result;
-      if (cursor) {
-        events.push(cursor.value);
-        cursor.continue();
-      } else {
-        resolve(events);
-      }
-    };
-    request.onerror = () => reject(request.error);
-  });
+    const events = [];
+    return await new Promise((resolve, reject) => {
+      request.onsuccess = (event) => {
+        const cursor = event.target.result;
+        if (cursor) {
+          events.push(cursor.value);
+          cursor.continue();
+        } else {
+          resolve(events);
+        }
+      };
+      request.onerror = () => reject(request.error);
+    });
+  } catch (err) {
+    console.error('[voiceTelemetry] getAllEvents failed:', err);
+    return [];
+  }
 };
 
 export const getMetrics = async () => {
@@ -150,30 +186,38 @@ export const getMetrics = async () => {
   };
 };
 
+/**
+ * Limpia eventos sincronizados anteriores a olderThanDays. No-throw
+ * (mantenimiento best-effort, no debe romper la app).
+ */
 export const clearSyncedEvents = async (olderThanDays = 30) => {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - olderThanDays);
   const cutoffISO = cutoff.toISOString();
 
-  const db = await openDB();
-  const tx = db.transaction(STORES.VOICE_TELEMETRY, 'readwrite');
-  const store = tx.objectStore(STORES.VOICE_TELEMETRY);
+  try {
+    const db = await openDB();
+    const tx = db.transaction(STORES.VOICE_TELEMETRY, 'readwrite');
+    const store = tx.objectStore(STORES.VOICE_TELEMETRY);
 
-  const index = store.index('synced');
-  const request = index.openCursor(IDBKeyRange.only(true));
+    const index = store.index('synced');
+    const request = index.openCursor(IDBKeyRange.only(true));
 
-  return new Promise((resolve, reject) => {
-    request.onsuccess = (event) => {
-      const cursor = event.target.result;
-      if (cursor) {
-        const e = cursor.value;
-        if (e.synced_at && e.synced_at < cutoffISO) {
-          store.delete(e.id);
+    return await new Promise((resolve, reject) => {
+      request.onsuccess = (event) => {
+        const cursor = event.target.result;
+        if (cursor) {
+          const e = cursor.value;
+          if (e.synced_at && e.synced_at < cutoffISO) {
+            store.delete(e.id);
+          }
+          cursor.continue();
         }
-        cursor.continue();
-      }
-    };
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
+      };
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (err) {
+    console.error('[voiceTelemetry] clearSyncedEvents failed:', err);
+  }
 };

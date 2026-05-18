@@ -196,6 +196,20 @@ export const fetchFromFarmOS = async (endpoint, options = {}) => {
   }
 };
 
+/**
+ * Wrapper sobre fetchFromFarmOS para POST/PUT/PATCH/DELETE.
+ *
+ * NO captura errores intencionalmente — delega al try/catch interno de
+ * fetchFromFarmOS (que ya logea AbortError y propaga el error sanitized).
+ * Cualquier caller debe envolver en try/catch para mostrar feedback al operador.
+ *
+ * @param {string} endpoint - ruta JSON:API ej. '/api/log/activity'
+ * @param {Object|FormData|null} payload - cuerpo de la request (null para DELETE)
+ * @param {'GET'|'POST'|'PUT'|'PATCH'|'DELETE'} [method='POST']
+ * @returns {Promise<Object>} respuesta JSON:API parseada y type-remapped
+ * @throws {Error} con .status / .detail si el servidor responde no-2xx
+ * @throws {Error} si timeout (AbortError) o red caída
+ */
 export const sendToFarmOS = async (endpoint, payload, method = 'POST') => {
   const isFormData = payload instanceof FormData;
   const options = { method };

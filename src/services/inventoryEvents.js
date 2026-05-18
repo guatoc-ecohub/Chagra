@@ -224,25 +224,32 @@ export async function createInventoryEvent(eventType, payload, opts = {}) {
   if (!opts.operator_id_hash) {
     throw new ValidationError('opts.operator_id_hash', 'required string (HMAC-SHA256)', opts.operator_id_hash);
   }
-  const deviceHash = await getOrCreateDeviceLexHash();
-  const idempotencyKey = opts.idempotency_key || computeIdempotencyKey(eventType, payload);
+  try {
+    const deviceHash = await getOrCreateDeviceLexHash();
+    const idempotencyKey = opts.idempotency_key || computeIdempotencyKey(eventType, payload);
 
-  const entry = {
-    id: ulid(),
-    event_type: eventType,
-    timestamp: new Date().toISOString(),
-    device_id_lex_hash: deviceHash,
-    sequence_number: nextSequenceNumber(),
-    operator_id_hash: opts.operator_id_hash,
-    idempotency_key: idempotencyKey,
-    payload,
-    schema_version: '1',
-  };
-  if (opts.prev_hash) entry.prev_hash = opts.prev_hash;
-  if (opts.notes) entry.notes = opts.notes;
+    const entry = {
+      id: ulid(),
+      event_type: eventType,
+      timestamp: new Date().toISOString(),
+      device_id_lex_hash: deviceHash,
+      sequence_number: nextSequenceNumber(),
+      operator_id_hash: opts.operator_id_hash,
+      idempotency_key: idempotencyKey,
+      payload,
+      schema_version: '1',
+    };
+    if (opts.prev_hash) entry.prev_hash = opts.prev_hash;
+    if (opts.notes) entry.notes = opts.notes;
 
-  validateLogEntry(entry);
-  return entry;
+    validateLogEntry(entry);
+    return entry;
+  } catch (err) {
+    // ValidationError ya viene con info útil; re-log para tracking forense
+    // y propagar — el caller necesita saber que NO debe persistir el evento.
+    console.error('[inventoryEvents] createInventoryEvent failed:', err, { eventType });
+    throw err;
+  }
 }
 
 /**

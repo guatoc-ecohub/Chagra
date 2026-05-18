@@ -226,12 +226,21 @@ export async function safeLLMQuery(userPrompt, options = {}) {
     const fullPrompt = `${systemPrompt}${catalogSection}\n\nPREGUNTA DEL OPERADOR: ${userPrompt}`;
 
     let rawResponse = '';
-    rawResponse = await streamOllama(
-        OLLAMA_GENERATE_URL,
-        { model, prompt: fullPrompt },
-        onToken,
-        { signal },
-    );
+    try {
+        rawResponse = await streamOllama(
+            OLLAMA_GENERATE_URL,
+            { model, prompt: fullPrompt },
+            onToken,
+            { signal },
+        );
+    } catch (err) {
+        // AbortError es esperado (cancelación user) — propagar para que el caller
+        // distinga. Otros errores (red, Ollama caído) → respuesta de fallback
+        // amigable en lugar de crashear la UI del operador.
+        if (err?.name === 'AbortError') throw err;
+        console.error('[safeLLMQuery] streamOllama failed:', err);
+        return 'Lo siento, no pude consultar al asistente en este momento. Verifica tu conexión y reintenta.';
+    }
 
     // Post-processing: heurística corre DESPUÉS del stream completo
     // para no bloquear la UX con onToken.

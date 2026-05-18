@@ -25,32 +25,39 @@ function generateTurnId() {
  * Agregar un turno a la memoria conversacional.
  * @param {string} operatorId - ID del operador
  * @param {Object} turn - { role: 'user'|'assistant', content: string, metadata?: object }
+ * @returns {Promise<Object|null>} turn persistido o null si IndexedDB falla.
+ *   Failure es no-fatal: la conversación sigue, sólo pierde memoria persistente.
  */
 export async function addTurn(operatorId, turn) {
-  const db = await openDB();
-  const tx = db.transaction(STORES.CONVERSATION_MEMORY, 'readwrite');
-  const store = tx.objectStore(STORES.CONVERSATION_MEMORY);
+  try {
+    const db = await openDB();
+    const tx = db.transaction(STORES.CONVERSATION_MEMORY, 'readwrite');
+    const store = tx.objectStore(STORES.CONVERSATION_MEMORY);
 
-  const now = Date.now();
-  const turnData = {
-    id: generateTurnId(),
-    operator_id: operatorId,
-    role: turn.role,
-    content: turn.content,
-    metadata: turn.metadata || null,
-    timestamp: now,
-    created_at: new Date(now).toISOString(),
-  };
-
-  store.add(turnData);
-
-  return new Promise((resolve, reject) => {
-    tx.oncomplete = () => {
-      cleanOldEntries(operatorId);
-      resolve(turnData);
+    const now = Date.now();
+    const turnData = {
+      id: generateTurnId(),
+      operator_id: operatorId,
+      role: turn.role,
+      content: turn.content,
+      metadata: turn.metadata || null,
+      timestamp: now,
+      created_at: new Date(now).toISOString(),
     };
-    tx.onerror = () => reject(tx.error);
-  });
+
+    store.add(turnData);
+
+    return await new Promise((resolve, reject) => {
+      tx.oncomplete = () => {
+        cleanOldEntries(operatorId);
+        resolve(turnData);
+      };
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (err) {
+    console.error('[conversationMemory] addTurn failed:', err);
+    return null;
+  }
 }
 
 /**
@@ -60,28 +67,33 @@ export async function addTurn(operatorId, turn) {
  * @returns {Promise<Array>} Array de turnos [{role, content, timestamp}]
  */
 export async function getRecentContext(operatorId, maxTurns = MAX_TURNS) {
-  const db = await openDB();
-  const tx = db.transaction(STORES.CONVERSATION_MEMORY, 'readonly');
-  const store = tx.objectStore(STORES.CONVERSATION_MEMORY);
+  try {
+    const db = await openDB();
+    const tx = db.transaction(STORES.CONVERSATION_MEMORY, 'readonly');
+    const store = tx.objectStore(STORES.CONVERSATION_MEMORY);
 
-  const index = store.index('operator_id');
-  const range = IDBKeyRange.only(operatorId);
-  const request = index.getAll(range);
+    const index = store.index('operator_id');
+    const range = IDBKeyRange.only(operatorId);
+    const request = index.getAll(range);
 
-  return new Promise((resolve, reject) => {
-    request.onsuccess = () => {
-      const allTurns = request.result || [];
-      const sorted = allTurns.sort((a, b) => a.timestamp - b.timestamp);
-      const recent = sorted.slice(-maxTurns);
-      resolve(recent.map((t) => ({
-        role: t.role,
-        content: t.content,
-        timestamp: t.timestamp,
-        metadata: t.metadata,
-      })));
-    };
-    request.onerror = () => reject(request.error);
-  });
+    return await new Promise((resolve, reject) => {
+      request.onsuccess = () => {
+        const allTurns = request.result || [];
+        const sorted = allTurns.sort((a, b) => a.timestamp - b.timestamp);
+        const recent = sorted.slice(-maxTurns);
+        resolve(recent.map((t) => ({
+          role: t.role,
+          content: t.content,
+          timestamp: t.timestamp,
+          metadata: t.metadata,
+        })));
+      };
+      request.onerror = () => reject(request.error);
+    });
+  } catch (err) {
+    console.error('[conversationMemory] getRecentContext failed, returning empty:', err);
+    return [];
+  }
 }
 
 /**
@@ -147,25 +159,30 @@ export async function getFullHistory(operatorId, limit = 100) {
  * Limpiar toda la memoria de un operador (para reset/privacy).
  */
 export async function clearMemory(operatorId) {
-  const db = await openDB();
-  const tx = db.transaction(STORES.CONVERSATION_MEMORY, 'readwrite');
-  const store = tx.objectStore(STORES.CONVERSATION_MEMORY);
+  try {
+    const db = await openDB();
+    const tx = db.transaction(STORES.CONVERSATION_MEMORY, 'readwrite');
+    const store = tx.objectStore(STORES.CONVERSATION_MEMORY);
 
-  const index = store.index('operator_id');
-  const range = IDBKeyRange.only(operatorId);
-  const request = index.openCursor(range);
+    const index = store.index('operator_id');
+    const range = IDBKeyRange.only(operatorId);
+    const request = index.openCursor(range);
 
-  return new Promise((resolve, reject) => {
-    request.onsuccess = (event) => {
-      const cursor = event.target.result;
-      if (cursor) {
-        cursor.delete();
-        cursor.continue();
-      }
-    };
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
+    return await new Promise((resolve, reject) => {
+      request.onsuccess = (event) => {
+        const cursor = event.target.result;
+        if (cursor) {
+          cursor.delete();
+          cursor.continue();
+        }
+      };
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (err) {
+    console.error('[conversationMemory] clearMemory failed:', err);
+    throw err;
+  }
 }
 
 export default {

@@ -92,21 +92,26 @@ export async function computeOperatorHash(operatorId) {
   if (typeof operatorId !== 'string' || operatorId.length === 0) {
     throw new Error('operatorId must be non-empty string');
   }
-  const salt = await deriveSalt();
-  const key = await crypto.subtle.importKey(
-    'raw',
-    salt,
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign']
-  );
-  const sig = await crypto.subtle.sign(
-    'HMAC',
-    key,
-    TEXT_ENCODER.encode(operatorId)
-  );
-  const bytes = new Uint8Array(sig);
-  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+  try {
+    const salt = await deriveSalt();
+    const key = await crypto.subtle.importKey(
+      'raw',
+      salt,
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
+    const sig = await crypto.subtle.sign(
+      'HMAC',
+      key,
+      TEXT_ENCODER.encode(operatorId)
+    );
+    const bytes = new Uint8Array(sig);
+    return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+  } catch (err) {
+    console.error('[operatorIdentity] computeOperatorHash failed:', err);
+    throw err;
+  }
 }
 
 // ─── Cache del operator_id_hash actual ───────────────────────────────
@@ -118,9 +123,14 @@ const CURRENT_OPERATOR_KEY = 'chagra:current_operator_hash';
  * Llamar al login. Debe persistir entre sesiones del mismo device.
  */
 export async function setCurrentOperator(operatorId) {
-  const hash = await computeOperatorHash(operatorId);
-  localStorage.setItem(CURRENT_OPERATOR_KEY, hash);
-  return hash;
+  try {
+    const hash = await computeOperatorHash(operatorId);
+    localStorage.setItem(CURRENT_OPERATOR_KEY, hash);
+    return hash;
+  } catch (err) {
+    console.error('[operatorIdentity] setCurrentOperator failed:', err);
+    throw err;
+  }
 }
 
 export function getCurrentOperatorHash() {
@@ -138,8 +148,13 @@ export function clearCurrentOperator() {
  * Útil para autoauditoría y debug.
  */
 export async function verifyOperatorIdentity(operatorId, expectedHash) {
-  const computed = await computeOperatorHash(operatorId);
-  return computed === expectedHash;
+  try {
+    const computed = await computeOperatorHash(operatorId);
+    return computed === expectedHash;
+  } catch (err) {
+    console.error('[operatorIdentity] verifyOperatorIdentity failed:', err);
+    return false;
+  }
 }
 
 // ─── Reset para tests / desarrollo ────────────────────────────────────
