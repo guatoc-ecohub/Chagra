@@ -7584,11 +7584,14 @@
         "notas": "Palma nativa de la Amazonia colombiana; crece en rebrotes multiples desde la base (multitallo). Sus frutos son la base del 'asai' de la canasta amazonica."
       },
       "source_ids": [
-        "bernal-2015-plantas-liquenes-colombia",
         "powo-kew",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "sinchi-amazonia-colombiana"
       ],
-      "valor_pedagogico": "Superalimento amazonico: sus frutos concentran antioxidantes y energia. Ensenia el aprovechamiento sostenible de productos forestales no maderables del Pacifico y la Amazonia colombiana."
+      "valor_pedagogico": "El açaí o asaí (Euterpe oleracea Mart., familia Arecaceae, subfamilia Arecoideae) es una arecácea palmiforme cespitosa multitallo nativa silvestre de la cuenca amazónica y zonas estuarinas del bajo Amazonas y el Pacífico colombiano, considerada producto forestal no maderable (PFNM) emblemático del Chocó biogeográfico y la Amazonia colombiana. Forma touceiras o macollas de 4-10 estipes (tallos) desde una misma base por rebrote basal, alcanzando 15-25 m de altura, con hojas pinnadas verde-oscuras, inflorescencias en panícula entre las hojas y frutos pequeños globosos negro-morados (1-2 cm) con un único pirene grande y mesocarpo carnoso delgado rico en antocianinas (cianidina-3-glucósido, cianidina-3-rutinósido), ácidos grasos monoinsaturados (oleico 60%), polifenoles antioxidantes y minerales. Se distribuye en Chocó (Quibdó, Atrato medio, Bajo Baudó, Bahía Solano, Nuquí), Valle del Cauca (Buenaventura, Bajo Calima), Cauca (Guapi, Timbiquí, López), Nariño (Tumaco, Mosquera, Olaya Herrera), Amazonas (Leticia, Puerto Nariño, Trapecio amazónico) y Vaupés (Mitú) entre 0 y 200 msnm en zona térmica cálida húmeda con altísima pluviosidad (3.000-9.000 mm/año). Ciclo perenne, primera fructificación a los 4-5 años, productividad sostenida 30-50 años. Rendimientos 6-12 kg fruto/estipe/año, 30-60 kg/touceira/año. Lección viva: el açaí enseña el aprovechamiento sostenible de productos forestales no maderables del Pacífico y la Amazonia colombiana por comunidades afrocolombianas e indígenas (Embera, Wounaan, Tikuna, Yagua), su rol en la canasta amazónica como superalimento (concentra antioxidantes y energía), y la importancia de los manglares ribereños y bosques de várzea estuarina como ecosistemas de provisión. Manejo agroecológico: aprovechamiento por extractivismo regulado certificado con comunidades locales, propagación por semilla en germinador con sombra (90-180 días germinación), siembra a 4-6 m entre touceiras en sistemas agroforestales con plátano, cacao y maderables nativos, cosecha manual de racimos por trepador, no requiere agroquímicos. Fuentes Tier A: SINCHI Amazonia Colombiana, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia."
     },
     {
       "id": "aiphanes_aculeata",
@@ -7633,11 +7636,14 @@
         "notas": "Palma espinosa de los valles secos interandinos; tolera suelos pobres y periodos secos prolongados. Frutos usados para refrescos tradicionales en la Costa Caribe."
       },
       "source_ids": [
-        "bernal-2015-plantas-liquenes-colombia",
         "powo-kew",
-        "sib-colombia"
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "humboldt-flora-alto-andina"
       ],
-      "valor_pedagogico": "Palma rustica de tierras secas: sus frutos son fuente de vitamina A y aceites. Ensenia adaptacion a suelos pobres y periodos de sequia en el Caribe colombiano."
+      "valor_pedagogico": "El corozo de puerco o macahuite (Aiphanes aculeata Willd., familia Arecaceae, subfamilia Arecoideae) es una arecácea palmiforme espinosa subarbórea (4-10 m altura) nativa de los valles secos interandinos colombianos y zonas xerofíticas del Caribe colombiano, caracterizada por su estipe cubierto de espinas largas negras conspicuas (rasgo diagnóstico del género Aiphanes), hojas pinnadas verde-claras irregularmente segmentadas y frutos pequeños globosos (1-2 cm) anaranjado-rojizos en racimos colgantes, ricos en β-caroteno (provitamina A), aceites grasos saturados (palmítico, esteárico) y carbohidratos. Se distribuye en Caribe colombiano (Magdalena, Bolívar, Cesar, La Guajira media), valles secos interandinos del Magdalena medio (Tolima, Huila, Cundinamarca), Santanderes (Cañón del Chicamocha, Cañón del Sogamoso), Antioquia (cañón del Cauca), Valle del Cauca (zonas xerofíticas Yotoco-Tuluá) entre 50 y 400 msnm en zona térmica cálida seca a subhúmeda. Ciclo perenne, longevidad 25-40 años, fructificación bianual. Lección viva: palma rústica de tierras secas que enseña adaptación a suelos pobres y períodos de sequía prolongada (mecanismo CAM facultativo, control estomático), sus frutos son fuente de vitamina A y aceites en la cocina campesina costeña (refrescos tradicionales del Caribe colombiano, dulces, vino artesanal de corozo), enseñando el potencial de las palmas nativas en sistemas agroforestales del bosque seco tropical (bs-T) hoy ecosistema crítico en Colombia (apenas 5% remanente). Manejo agroecológico: propagación por semilla recolectada en racimos maduros, germinación lenta 3-6 meses, siembra a 6-8 m entre plantas en sistemas silvopastoriles con cuajilla (Pithecellobium dulce), guácimo (Guazuma ulmifolia) y trupillo (Prosopis juliflora), tolerancia altísima a sequía y suelos pedregosos, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Humboldt Catálogo Plantas, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia."
     },
     {
       "id": "costus_spicatus",
@@ -7686,11 +7692,15 @@
         "notas": "Se propaga por fragmentos de rizoma sembrados en sustrato humedo. Crece en bordes de rios y quebradas del tropico humedo. Usada como diuretico y antiinflamatorio en medicina tradicional."
       },
       "source_ids": [
-        "bernal-2015-plantas-liquenes-colombia",
         "powo-kew",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "sinchi-amazonia-colombiana",
+        "jbb-plantas-medicinales"
       ],
-      "valor_pedagogico": "Planta medicinal emblematica del tropico humedo colombiano: sus tallos agrios se usan como diuretico natural. Ensenia el conocimiento botanico tradicional de las comunidades riberenas del Pacifico."
+      "valor_pedagogico": "La caña agria o caña de jabalí (Costus spicatus (Jacq.) Sw., familia Costaceae) es una costácea herbácea perenne rizomatosa (1-2.5 m altura) nativa del Neotropico (Caribe, Mesoamérica, norte de Sudamérica), distribuida en sotobosques de selva húmeda tropical, bordes de ríos y quebradas del trópico húmedo colombiano. Su tallo aéreo helicoidal característico (filotaxia espiralada-monistica diagnóstica de Costaceae frente a la dística de Zingiberaceae), hojas elípticas oblongas con vaina ciliada y espigas terminales conspicuas con brácteas rojas y flores tubulares amarillas, son rasgos diagnósticos. Sus tallos jugosos contienen ácidos orgánicos (cítrico, málico), saponinas (diosgenina), flavonoides y mucílagos responsables del sabor ácido y propiedades medicinales documentadas (diurético, antiinflamatorio, hipotensor leve). Se distribuye en Chocó (Quibdó, Atrato, Baudó), Valle del Cauca (Buenaventura, Bajo Calima), Cauca (Guapi, Timbiquí), Nariño (Tumaco, Mosquera, Olaya Herrera), Amazonas (Leticia, Puerto Nariño), Vaupés, Caquetá (Florencia, Solano), Putumayo (Mocoa, Puerto Asís) y zonas del Magdalena medio bajas entre 50 y 400 msnm en zona térmica cálida húmeda. Ciclo perenne, floración continua en clima húmedo estable. Lección viva: planta medicinal emblemática del trópico húmedo colombiano cuyos tallos agrios se usan como diurético natural y antiinflamatorio en macerados acuosos, infusiones y cocciones por comunidades afrocolombianas e indígenas, enseñando el conocimiento botánico tradicional de las comunidades ribereñas del Pacífico y Amazonia colombiana y el rol del sotobosque húmedo como farmacopea viva. Manejo agroecológico: propagación facilísima por fragmentos de rizoma de 15-20 cm con yemas activas sembrados en sustrato rico en materia orgánica y humedad alta, tolerancia a sombra parcial (40-70%), asocio con plátano, cacao y heliconias en huerta tropical, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia, SINCHI Amazonia Colombiana."
     },
     {
       "id": "alocasia_macrorrhizos",
@@ -7747,11 +7757,14 @@
         "notas": "Se propaga plantando hijos o secciones de cormo con yemas. Tolerante a sombra y suelos humedos. Cultivo tradicional de la chagra indigena amazonica y del Pacifico."
       },
       "source_ids": [
-        "bernal-2015-plantas-liquenes-colombia",
         "powo-kew",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "sinchi-amazonia-colombiana"
       ],
-      "valor_pedagogico": "Cultivo de seguridad alimentaria del tropico humedo: sus cormos ricos en almidon sostienen comunidades indigenas del Pacifico y Amazonia. Ensenia sistemas agroforestales de chagra."
+      "valor_pedagogico": "El bore o malanga gigante (Alocasia macrorrhizos (L.) G.Don, familia Araceae) es una arácea herbácea perenne robusta (1-4 m altura) originaria del sureste asiático tropical (Filipinas, Indonesia, Borneo, Malasia) y aclimatada hace siglos en sistemas tradicionales del trópico húmedo colombiano por comunidades afrocolombianas e indígenas. Produce hojas sagitadas-cordadas gigantes verde-brillantes (60-150 cm largo) sostenidas por pecíolos suculentos largos, inflorescencia tipo espádice con espata color crema y cormo subterráneo grande (10-25 cm diámetro) rico en almidón (60-80% peso seco), proteínas (3-5%) y minerales. Contiene cristales de oxalato de calcio (rafidios) que deben neutralizarse por cocción prolongada o fermentación previo al consumo humano y animal. Se cultiva en Chocó (Atrato, Quibdó, Bajo Baudó), Valle del Cauca (Buenaventura, Bajo Calima), Cauca (Guapi, Timbiquí), Nariño (Tumaco, Mosquera, Olaya Herrera), Amazonas (Leticia, Puerto Nariño), Vaupés (Mitú), Putumayo, Caquetá y Magdalena medio bajo entre 0 y 400 msnm en zona térmica cálida húmeda. Ciclo perenne, primera cosecha de cormo a los 10-14 meses. Rendimientos 25-50 t/ha cormo fresco. Lección viva: cultivo de seguridad alimentaria del trópico húmedo cuyos cormos ricos en almidón sostienen comunidades indígenas del Pacífico y Amazonia, enseñando sistemas agroforestales de chagra indígena (Embera, Wounaan, Tikuna, Curripaco), policultivo tropical con yuca y plátano, manejo tradicional de plantas con compuestos antinutricionales por procesamiento culinario (cocción, fermentación, rallado y lavado) y diversificación de fuentes de carbohidratos resistente a sequías y plagas que afectan cultivos comerciales monocultivo. Manejo agroecológico: propagación por hijos basales o secciones de cormo con yemas activas, siembra a 1.5-2 m entre plantas en sistemas con sombra parcial bajo plátano y palmera, asocio con yuca y plátano en chagra, cosecha rotacional planta por planta, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia, SINCHI Amazonia Colombiana."
     },
     {
       "id": "euterpe_enbacca",
@@ -7850,11 +7863,15 @@
         "notas": "Se propaga mediante tubérculos pequenos o secciones de tubérculo con yemas. Requiere tutorado (espaldera). Cultivo tradicional de la Costa Caribe y Pacifico colombiano."
       },
       "source_ids": [
-        "bernal-2015-plantas-liquenes-colombia",
         "powo-kew",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "agrosavia-tibaitata",
+        "agrosavia-manual-tuberculos-andinos-2017"
       ],
-      "valor_pedagogico": "Tuberculo basico de la dieta tropical colombiana: fuente de carbohidratos complejos. Ensenia sistemas de cultivo en espaldera y la importancia de los namees en la seguridad alimentaria del Caribe."
+      "valor_pedagogico": "El ñame blanco o ñame de agua (Dioscorea alata L., familia Dioscoreaceae) es una dioscoreácea herbácea perenne trepadora vigorosa originaria del sureste asiático tropical (Malasia, Indonesia, Nueva Guinea), introducida en América durante el comercio transatlántico y aclimatada profundamente en sistemas campesinos del Caribe colombiano donde es considerada cultivo básico de seguridad alimentaria. Produce un tubérculo subterráneo grande (1-8 kg, hasta 25 kg en variedades gigantes) cilíndrico o irregular de pulpa blanca a violácea, rico en almidón (70-80% peso seco), proteínas (5-8%) y minerales, además de tallos cuadrangulares alados verde-purpúreos (rasgo diagnóstico de D. alata) trepadores hasta 4-10 m sobre tutorado. Se cultiva en Caribe colombiano (Bolívar — María La Baja, San Juan Nepomuceno, San Jacinto; Córdoba — Ciénaga de Oro, San Bernardo; Sucre — Sincelejo, Corozal; Magdalena, Cesar), Antioquia (Urabá, Magdalena medio), Chocó (Quibdó, Bajo Baudó), Valle del Cauca y Cauca pacíficos entre 0 y 400 msnm en zona térmica cálida húmeda. Ciclo 8-10 meses desde siembra a cosecha. Rendimientos 15-30 t/ha tubérculo. Lección viva: tubérculo básico de la dieta tropical colombiana, fuente de carbohidratos complejos de bajo índice glicémico, enseñando sistemas de cultivo en espaldera (tutorado vivo con yuca, plátano o tutor muerto de guadua) y la importancia de los ñames en la seguridad alimentaria del Caribe colombiano (sancocho, pasteles, sopas), región con dependencia alimentaria histórica de este cultivo afrocolombiano. Manejo agroecológico: propagación por trozos de tubérculo con yemas o tubérculos pequeños semilla 200-500 g, siembra en hoyos profundos 30-40 cm con compost al fondo, requiere tutorado obligatorio en espaldera o tutor vivo, asocio con yuca y plátano, control biológico de antracnosis Colletotrichum gloeosporioides con podas sanitarias y rotación 3 años, no requiere agroquímicos. Fuentes Tier A: AGROSAVIA Manual Tubérculos, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia."
     },
     {
       "id": "solanum_sessiliflorum",
