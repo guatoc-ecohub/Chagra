@@ -300,6 +300,22 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState(buildInitialFormState);
 
+  // Bug 2026-05-18 operator: 'agregué 50 plantas dentro de Túnel +100 especies
+  // y siguen sin aparecer ahí'. Causa: si el operador navega DENTRO de una
+  // zona específica (currentZoneId NO __all__/__orphan__/__cemetery__) y
+  // abre el form de agregar planta, formData.parentLandId queda vacío y
+  // cae a DEFAULT_LOCATION_ID — la planta NO va al túnel actual.
+  // Fix: al abrir el form, pre-poblar parentLandId con currentZoneId si es
+  // una zona real (no virtual).
+  useEffect(() => {
+    if (!showForm) return;
+    const isRealZone = currentZoneId && !['__all__', '__orphan__', '__cemetery__'].includes(currentZoneId);
+    if (isRealZone && !formData.parentLandId) {
+      setFormData((prev) => ({ ...prev, parentLandId: currentZoneId }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showForm, currentZoneId]);
+
   // Estado local del formulario de cosecha scoped por asset.id
   const [activeHarvestId, setActiveHarvestId] = useState(null);
   const [harvestData, setHarvestData] = useState({ yield: '', unit: 'kg', notes: '' });
