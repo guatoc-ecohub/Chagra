@@ -8920,9 +8920,10 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
-        "ica-resolucion-3168-2015"
+        "ica-resolucion-3168-2015",
+        "fao-ecocrop"
       ],
-      "valor_pedagogico": "Leccion de estructura del suelo: el daikon revela la compactacion del suelo al desarrollarse; su raiz profunda descompacta capas inferiores, funcionando como arado biologico."
+      "valor_pedagogico": "El daikon (Raphanus sativus L. var. longipinnatus, Brassicaceae) es un rábano largo japonés naturalizado en huertas andinas colombianas entre 1.500 y 2.600 msnm (Cundinamarca, Boyacá, Nariño, Antioquia altoandina) que enseña una lección viva de estructura del suelo y bioingeniería campesina. Su raíz pivotante blanca alcanza 30-40 cm de profundidad y atraviesa capas compactadas que el arado de bueyes no alcanza, funcionando como arado biológico: al cosechar o dejar descomponer la raíz en el sitio, queda una galería vertical por donde bajan agua, aire y raíces de cultivos siguientes (papa, arveja, haba). Ciclo corto de 60-80 días, sabor suave (menos picante que el rábano rojo porque tiene menos glucosinolatos volátiles), tolera heladas leves hasta -4 °C. Manejo agroecológico campesino: siembra directa a 20-25 cm entre plantas en cama profunda y suelta, riego moderado, asocio con leguminosas que aporten nitrógeno, cosecha antes de la floración para que la raíz no se vuelva fibrosa, o se deja florecer para producir semilla propia. Es cultivo bandera del abonado verde en rotaciones de invierno seco del altiplano cundiboyacense: rompe pisones de tractor y mejora la infiltración de lluvia. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, ICA Resolución 3168 de 2015, FAO EcoCrop."
     },
     {
       "id": "raphanus_sativus_sativus",
@@ -9088,9 +9089,10 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
-        "fao-ecocrop"
+        "fao-ecocrop",
+        "perez-arbelaez-1947-plantas-utiles"
       ],
-      "valor_pedagogico": "Leccion de morfologia floral: lo que consumimos es una inflorescencia inmadura. Ensenia la diferencia entre flor y fruto, y el concepto de domesticacion de un cardo mediterraneo."
+      "valor_pedagogico": "La alcachofa (Cynara cardunculus L. var. scolymus, Asteraceae) es una hortaliza perenne mediterránea domesticada del cardo silvestre, aclimatada en zonas frías y templadas colombianas entre 1.800 y 2.500 msnm (Boyacá altiplano, Cundinamarca norte, Nariño, Antioquia oriente, Eje cafetero alto). Enseña una lección viva de morfología floral y domesticación humana: lo que se come no es una fruta ni una hoja, sino una inflorescencia inmadura completa — el capítulo o cabeza floral antes de que las flores violetas se abran. Cada bráctea (la 'hojita' que se desprende y se chupa) es realmente una hoja modificada que protege cientos de flores tubulosas todavía dormidas; el corazón es el receptáculo donde van pegadas las flores. Si se deja madurar, se abre como un cardo púrpura espectacular que atrae abejas, abejorros y mariposas: por eso la planta cumple doble función en la chagra como cultivo y como atractor de polinizadores. Domesticación: el ancestro silvestre (cardo) tiene capítulos chicos y espinosos; siglos de selección campesina mediterránea agrandaron el receptáculo carnoso y redujeron las espinas. Manejo agroecológico: propagación por hijuelos de la corona en mayo-junio para aprovechar lluvias, marco amplio 1,2 × 1 m, abonado de fondo con compost o bocashi, planta perenne productiva 3-5 años, después se renueva con hijuelos propios. Tolera heladas suaves hasta -3 °C. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO EcoCrop, Pérez Arbeláez 1947 Plantas Útiles de Colombia."
     },
     {
       "id": "foeniculum_vulgare_azoricum",
@@ -9862,9 +9864,11 @@
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
         "gbif-taxonomic-backbone",
-        "powo-kew"
+        "powo-kew",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales"
       ],
-      "valor_pedagogico": "Clásico de la alelopatía: su aroma alcanforado repele polillas y mosquitos mientras atrae abejas, demostrando el equilibrio entre repelencia y atracción en el diseño de la chagra.",
+      "valor_pedagogico": "La lavanda fina (Lavandula angustifolia Mill., Lamiaceae), conocida también como espliego o lavanda inglesa, es una aromática mediterránea perenne (40-80 cm) bien aclimatada en zonas templadas y frías colombianas entre 1.800 y 2.700 msnm (Cundinamarca, Boyacá, Nariño, Antioquia oriente), muy rústica y tolerante a heladas fuertes hasta -15 °C cuando ya está establecida. Es un clásico vivo de alelopatía y diseño de chagra que muestra a niñas y niños un equilibrio aparentemente paradójico: su aroma alcanforado (rico en linalol y acetato de linalilo, los mismos aceites del bálsamo y del agua de Florida casera) repele polillas de la ropa, hormigas arrieras, mosquitos y pulgas del gallinero, pero al mismo tiempo atrae abejas melíferas, abejorros nativos (Bombus spp.) y mariposas que buscan el néctar morado de sus espigas. Esa doble función — repelente para unos, néctar para otros — es la lección práctica de que las plantas no son 'buenas' o 'malas' para los insectos sino que cada compuesto químico cumple un papel distinto según el visitante. Manejo agroecológico: propagación por esquejes semileñosos en verano (febrero-marzo en Cundinamarca), suelo bien drenado preferiblemente calcáreo o neutro (pH 6,5-7,5), poda anual post-floración para mantener forma redondeada y evitar lignificación, riego escaso porque el exceso de agua pudre la raíz, asocio benéfico en bordes de huerta de hortalizas y como cerca aromática del gallinero. Las espigas se cosechan al inicio de floración para sachets, infusiones relajantes y agua aromática. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Pérez Arbeláez 1947 Plantas Útiles, Pamplona-Roger 2006 Plantas Medicinales, JBB Plantas Medicinales Cundinamarca-Boyacá.",
       "validation_level": "claude_draft"
     },
     {
@@ -10153,9 +10157,11 @@
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
         "gbif-taxonomic-backbone",
-        "powo-kew"
+        "powo-kew",
+        "fao-ecocrop",
+        "jbb-plantas-medicinales"
       ],
-      "valor_pedagogico": "Rizoma medicinal por excelencia: el jengibre ensena como las plantas almacenan compuestos bioactivos en sus organos subterraneos, base de la farmacopea tradicional colombiana."
+      "valor_pedagogico": "El jengibre (Zingiber officinale Roscoe, Zingiberaceae), llamado también kion en la cocina afrocolombiana del Pacífico, es una herbácea perenne (60-120 cm) originaria del sudeste asiático y cultivada tradicionalmente en la zona cafetera colombiana, Eje cafetero, Tolima norte, Huila, Santander, Antioquia oriente y selvas húmedas templadas entre 300 y 1.200 msnm con temperaturas de 20-28 °C y sombra parcial bajo cacao, café, plátano o guamo. No tolera heladas: por debajo de 5 °C se daña irreversiblemente. Es un rizoma medicinal-culinario por excelencia que enseña a los niños cómo las plantas almacenan compuestos bioactivos en sus órganos subterráneos: el rizoma engrosado (no es raíz verdadera sino tallo subterráneo modificado) concentra gingeroles, shogaoles, zingibereno y aceites esenciales picantes que actúan como antiinflamatorio, digestivo, anti-náusea y carminativo, base de la farmacopea tradicional colombiana en formas de agua de panela con jengibre, aromáticas y emplastos. Manejo agroecológico campesino: propagación por trozos de rizoma con al menos una yema visible, siembra al inicio de lluvias en suelo suelto rico en materia orgánica con abundante compost o bocashi, surcos a 25-30 cm entre plantas, sombra de 30-50% imprescindible, riego frecuente sin encharcar, cosecha al cabo de 8-10 meses cuando la parte aérea amarillea (semitierno) o se deja madurar otros 2 meses para rizoma seco picante. Asocio clásico con cúrcuma, plátano, cacao y café en sistema multiestrato. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Pérez Arbeláez 1947 Plantas Útiles, FAO EcoCrop, JBB Plantas Medicinales Cundinamarca-Boyacá."
     },
     {
       "id": "curcuma_longa",
@@ -10448,9 +10454,11 @@
       "source_ids": [
         "perez-arbelaez-1947-plantas-utiles",
         "gbif-taxonomic-backbone",
-        "powo-kew"
+        "powo-kew",
+        "jbb-plantas-medicinales",
+        "pamplona-roger-2006-plantas-medicinales"
       ],
-      "valor_pedagogico": "Hibrido esteril: la hierbabuena criolla ensena como la propagacion vegetativa preserva caracteres deseables a traves de generaciones, esencial en la medicina popular colombiana."
+      "valor_pedagogico": "La hierbabuena criolla o menta vellosa (Mentha × villosa Huds., Lamiaceae), llamada también menta de Castilla, es un híbrido natural entre Mentha spicata y Mentha suaveolens originario de Europa y ampliamente naturalizado en huertas caseras colombianas desde zonas cálidas húmedas hasta el altiplano frío (300-2.500 msnm: Llanos, Eje cafetero, Cundinamarca, Boyacá, Nariño, Antioquia). Tolera heladas suaves hasta -5 °C y rebrota desde el rizoma cuando el frío quema la parte aérea. Es una lección viva de hibridación interespecífica y propagación vegetativa que enseña a niñas y niños un concepto biológico clave: por ser un híbrido estéril (sus semillas casi nunca germinan o producen plantas inviables) solo se reproduce por estolones — tallos rastreros que se entierran y echan raíces en cada nudo — lo que significa que todas las matas de hierbabuena del país son clones genéticos, copias idénticas de una misma planta madre que se ha multiplicado por miles de manos campesinas durante siglos. Esta propagación vegetativa preserva exactamente el aroma, el sabor y el contenido de aceite esencial (mentol, mentona, pulegona) generación tras generación, garantizando que el agua de panela con hierbabuena de la abuela sepa igual que la del nieto. Manejo agroecológico: siembra de estolones en suelo húmedo y rico en materia orgánica, sombra parcial preferida en clima cálido, riego frecuente, cosecha de hojas y tallos tiernos antes de floración para máxima concentración de aceites esenciales, control del crecimiento con bordes enterrados porque tiende a invadir camas vecinas. Usos: aromática digestiva, carminativa, antiespasmódica, repelente suave de hormigas en despensa. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Pérez Arbeláez 1947 Plantas Útiles, JBB Plantas Medicinales Cundinamarca-Boyacá, Pamplona-Roger 2006."
     },
     {
       "id": "borojoa_patinoi",
@@ -10829,9 +10837,13 @@
       },
       "source_ids": [
         "gbif-taxonomic-backbone",
-        "powo-kew"
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "humboldt-flora-alto-andina",
+        "restauracion-cruz-verde-sumapaz",
+        "sib-colombia"
       ],
-      "valor_pedagogico": "Árbol/arbusto andino nativo usado en cercas vivas y restauración de bordes de páramo. Sustituta documentada de Ulex europaeus invasor en planes restauración Cruz Verde-Sumapaz."
+      "valor_pedagogico": "El chacate, pucho o escalonia (Escallonia paniculata (Ruiz & Pav.) Schult., Escalloniaceae) es un árbol o arbusto andino nativo (3-8 m altura) propio del bosque alto-andino y bordes de páramo colombiano entre 2.500 y 3.200 msnm (Cundinamarca: Cruz Verde, Sumapaz, Chingaza, Verjón; Boyacá: páramo de Pisba, Iguaque; Santander: páramo de Berlín; Nariño y Cauca: páramos del macizo colombiano). Hojas pequeñas brillantes, panículas blanco-rosadas que atraen colibríes y abejas nativas, frutos en cápsula que dispersan aves. Es una lección viva de restauración ecológica y soberanía botánica que enseña a niñas y niños por qué las especies nativas son la mejor cerca viva del altoandino: a diferencia del retamo espinoso (Ulex europaeus) y del retamo liso (Genista monspessulana), invasoras introducidas que se vuelven plaga y desplazan flora nativa de páramo, el chacate cumple las mismas funciones de cercar potreros, frenar viento y marcar linderos pero conviviendo con la flora nativa, alimentando avifauna local y generando hojarasca compatible con los suelos andinos. Por eso aparece como sustituta documentada en planes de restauración ecológica de los páramos Cruz Verde-Sumapaz (IAvH + CAR Cundinamarca 2018), donde se siembra en bordes de fragmento de bosque y zonas de transición para acelerar la sucesión vegetal y bloquear el avance del retamo. Manejo agroecológico: propagación por semilla recolectada de frutos maduros, vivero 6-8 meses antes del trasplante en lluvias, distancia 1-2 m en cerca viva, tolerancia a podas, función ecológica como planta niñera (nurse plant) que da sombra a especies de sucesión tardía. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015 Catálogo Plantas y Líquenes de Colombia, IAvH Flora Alto Andina, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia."
     }
   ],
   "biopreparados": [
