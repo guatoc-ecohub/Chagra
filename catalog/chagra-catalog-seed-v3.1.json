@@ -1675,7 +1675,7 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El arazá (Eugenia stipitata McVaugh) es un frutal nativo de la Amazonía colombiana, presente en los departamentos de Putumayo, Caquetá, Amazonas y Vaupés entre 0 y 1000 msnm en zonas térmicas calidas. Su manejo agronómico incluye propagación por semilla con germinación de 2-4 semanas bajo alta humedad, ciclo de fructificación de 3-4 años desde la siembra, requiere ambientes con alta humedad relativa y suelos bien drenados, y presenta sensibilidad a enfermedades fúngicas como la antracnosis (Colletotrichum gloeosporioides) y ataque de moscas de la fruta (Anastrepha spp.). En el contexto cultural amazonense, esta especie ha sido tradicionalmente consumida por comunidades indígenas y campesinas amazónicas como fruta fresca y en preparaciones de jugos y mermeladas, representando un recurso alimenticio nativo de la región biogeográfica del Amazonas colombiano. Según el inventario taxonómico verificado por GBIF Backbone Taxonomy, Plants of the World Online (POWO), GBIF Colombia y el Sistema de Información sobre Biodiversidad de Colombia (SiB Colombia), su nombre científico válido es Eugenia stipitata McVaugh.",
-      "validation_level": "ai_draft"
+      "validation_level": "claude_draft"
     },
     {
       "id": "eucalyptus_globulus",
