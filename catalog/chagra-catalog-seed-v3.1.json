@@ -20240,6 +20240,686 @@
       ],
       "valor_pedagogico": "La siempreviva u hoja del aire (Kalanchoe pinnata (Lam.) Pers., Crassulaceae, sinónimo Bryophyllum pinnatum (Lam.) Oken — algunos autores la ubican aún en género Bryophyllum) es una planta suculenta perenne originaria de Madagascar y África Oriental tropical, ampliamente naturalizada pantropicalmente (incluida Colombia desde hace siglos) entre 0 y 2.200 msnm en zonas térmicas cálidas-templadas-moderadas en casi todo el país: Antioquia (Medellín, Suroeste cafetero, Oriente, Bajo Cauca), Valle del Cauca (cinturón frutícola y zonas urbanas), Cundinamarca (Sabana templada — La Mesa, Anolaima, Anapoima, Fusagasugá), Boyacá templada (Moniquirá, Santana, Chitaraque), Caldas, Risaralda, Quindío (Eje Cafetero), Tolima, Huila, Santander (Bucaramanga, San Gil, Barichara, Lebrija), Norte de Santander, Magdalena (Santa Marta), Atlántico (Barranquilla), Bolívar (Cartagena), Cesar (Valledupar), La Guajira (sur), Córdoba, Sucre, Chocó (Quibdó), Cauca, Nariño y zonas urbanas en general. Es lección viva PEDAGÓGICAMENTE EXCELENTE — entre las plantas más mágicas del catálogo de huerta escolar — de reproducción asexual vegetativa por apomixis foliar (también llamada reproducción foliar plantular o yemas foliares marginales), un fenómeno biológico extraordinario que enseña a niñas y niños cómo una sola hoja desprendida de Kalanchoe pinnata produce espontáneamente 5-15 plantulas en miniatura (propágulos foliares) en cada hendidura del margen serrado-crenado de la hoja — sin necesidad de semilla, sin floración, sin polinización, sin riego intensivo, en apenas 7-21 días — basta dejar una hoja sobre tierra apenas humedecida (o incluso pegada con cinta a una pared con humedad ambiental) para que emita docenas de hijos perfectos clonales con sus propias raíces y hojas listas para autopropagarse y formar nuevas plantas adultas en pocos meses. Goethe la estudió obsesivamente durante sus investigaciones de metamorfosis vegetal y la nombró 'Goethe-Pflanze' (planta de Goethe) en honor a esa capacidad regenerativa que parecía contradecir las leyes biológicas conocidas en su época (siglo XVIII-XIX) — fenómeno hoy entendido como meristemos epifilos pre-formados en el primordio foliar que se activan tras desconexión del flujo de auxinas-citokininas de la planta madre. Pertenece a la familia Crassulaceae (igual familia que Crassula ovata jade, sedum, echeveria), planta perenne arbustiva-herbácea de 0.6-1.8 m de altura con tallos suculentos huecos rojizo-verdosos, hojas suculentas opuestas decusadas pinnadas en las plantas adultas (3-5 folíolos elípticos crenado-aserrados) o simples ovalado-crenadas en plantas juveniles (3-15 cm largo x 2-8 cm ancho) verde-jade brillantes a veces con bordes rojizos en exposición sol, inflorescencia panícula terminal péndula vistosa con flores tubulares colgantes péndulas anaranjado-rojizo-purpúreas (2-5 cm largo) polinizadas por colibríes (Trochilidae — colibríes esmeralda, pico-de-hoz, ermitaños neotropicales) y polillas crepusculares, frutos folículos con muchas semillas pequeñas (rara vez forma fruto en Colombia — predomina reproducción foliar asexual). Patrón fotosintético CAM. Uso medicinal tradicional pantropical bien documentado: hojas frescas trituradas como cataplasma cicatrizante de heridas-quemaduras-úlceras cutáneas, jugo de hojas como antiinflamatorio-antitusivo-diurético-antilitiásico (uso popular muy difundido en Colombia, Caribe, Centroamérica, Brasil, África, India — 'leaf of life'), estudios fitoquímicos identifican bufadienólidos (cardenólidos similares a digitálicos — precaución cardíaca en dosis altas), flavonoides, esteroles, ácidos orgánicos. Considerada planta ritual-protectora en tradiciones afrocaribeñas-yorubas santería ('yerba bruja' protectora del hogar). Manejo agroecológico: PROPAGACIÓN PRÁCTICAMENTE GRATUITA E ILIMITADA — basta dejar una hoja madura desprendida sobre sustrato apenas humedecido (tierra + arena 1:1) o incluso colgada en una bolsa plástica transparente con poca humedad ambiental y a los 7-21 días emite plantulas marginales listas para trasplantar individualmente, distancia 30-50 cm en cobertura, sombra parcial a sol parcial filtrado (no sol pleno tropical), riego moderado-escaso, suelos bien drenados, tolera sequía moderada, asocio con menta, hierbabuena, hierbabuena, cilantro, ajenjo, ruda en huertos medicinales caseros. Función en chagra/huerto escolar como medicinal tradicional cosmopolita de soberanía alimentaria, planta PEDAGÓGICAMENTE EXCELENTE para enseñar reproducción asexual vegetativa por apomixis foliar a niñas y niños (la lección biológica más impactante y visual de toda la huerta — un solo experimento simple con una hoja sobre tierra muestra la magia de la propagación clonal), cobertura del suelo medicinal, atractora de colibríes y polillas, ornamental tropical. Fuentes Tier A: GBIF, POWO Kew, Pamplona-Roger 2006 Plantas Medicinales, JBB Plantas Medicinales Cundinamarca-Boyacá, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015.",
       "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH49_LEGUMINOSAS_NAMES",
+      "id": "vigna_unguiculata",
+      "nombre_comun": "Caupí",
+      "nombre_comunes_regionales": [
+        "fríjol vaca",
+        "fríjol de vaca",
+        "fríjol cabecita negra",
+        "blackeye pea",
+        "cowpea",
+        "fríjol castilla"
+      ],
+      "nombre_cientifico": "Vigna unguiculata (L.) Walp.",
+      "familia_botanica": "Fabaceae",
+      "category": "granos_legumbres",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1200,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 32,
+        "max_tolerable": 38
+      },
+      "ph_suelo": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 7,
+        "max": 8
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra directa a 2-4 cm de profundidad, distancia 30-40 cm entre plantas x 60-80 cm entre surcos, densidad 25-40 kg/ha. Germinación rápida 4-7 días. Inoculación con Bradyrhizobium específico de cowpea para optimizar fijación N en suelos vírgenes. Ciclo corto 60-90 días grano verde, 90-120 días grano seco — la leguminosa tropical de ciclo más corto del catálogo.",
+        "tiempo_a_establecimiento_dias": 7,
+        "notas": "Leguminosa anual herbácea de hábito variable (erecto, semierecto, postrado o trepador según variedad) tolerante a sequía y suelos pobres. Fija 80-150 kg N/ha en simbiosis con Bradyrhizobium sp. cowpea. Tradicional Caribe colombiano y Valle del Patía.",
+        "fuente": "AGROSAVIA Leguminosas; NRC 1989; FAO Ecocrop; ICA Resolución 3168/2015"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-leguminosas-andinas",
+        "fao-ecocrop",
+        "ica-resolucion-3168-2015",
+        "nrc-1989-cultivos-andinos"
+      ],
+      "valor_pedagogico": "El caupí o fríjol vaca (Vigna unguiculata (L.) Walp., familia Fabaceae, subtribu Phaseolinae) es una leguminosa anual herbácea originaria del África Occidental tropical (Sahel-Sudán-Nigeria) domesticada hace ~5000 años y diseminada pantropicalmente, introducida en América durante el comercio transatlántico de esclavos como cultivo de subsistencia afrocolombiano. Se cultiva tradicionalmente en Caribe colombiano (Córdoba — Montería, Cereté, San Pelayo; Sucre — Sincelejo, Corozal, Sampués; Bolívar — María La Baja, San Juan Nepomuceno; Magdalena — Ciénaga, Plato; Cesar — Valledupar, San Diego; La Guajira — Riohacha, Maicao), Valle del Cauca (Patía, Norte del Valle), Antioquia (Urabá, Bajo Cauca), Tolima (Espinal, Saldaña), Huila (Neiva), Santander (Lebrija, Girón) y Llanos Orientales (Casanare, Meta) entre 0 y 1.800 msnm en zonas térmicas cálidas-templadas. Lección viva PEDAGÓGICAMENTE EXCELENTE de adaptación africana al trópico americano: alta proteína (22-28% peso seco en grano), ciclo cortísimo (60-90 días grano verde, 90-120 días grano seco — la leguminosa tropical de ciclo más rápido), tolerancia a sequía moderada (sobrevive estiajes de 4-8 semanas), tolerancia a suelos ácidos pobres (pH 5-7, Al sat hasta 30%), fijación biológica de N (80-150 kg N/ha por simbiosis con Bradyrhizobium sp. cowpea) — propiedades que lo convierten en cultivo de seguridad alimentaria de poblaciones afrocaribeñas costeñas. Planta herbácea de hábito polimórfico (erecto, semierecto, postrado o trepador según variedad — variedades erectas para grano, postradas para forraje-cobertura) de 0.3-2 m de altura, hojas trifoliadas alternas con foliolo terminal romboide-ovado y foliolos laterales asimétricos, flores grandes papilionadas blanco-violáceas en racimos axilares péndulos, frutos legumbres alargadas cilíndricas (10-25 cm largo) verdes a amarillas a maduras, semillas reniformes (cabecita negra o blanca o moteada según cultivar) — la variedad 'cabecita negra' (blackeye pea) es la más cultivada en Colombia. Uso alimenticio múltiple: grano seco (sopas, sancochos, fríjoles guisados afrocaribeños como el 'arroz con fríjol cabecita negra' costeño), grano verde tierno (vainitas-judias verdes), hojas tiernas como hortaliza (espinaca tropical africana), raíces como medicinales tradicionales (antiparasitarias). Manejo agroecológico: siembra directa a 2-4 cm profundidad, distancia 30-40 cm x 60-80 cm, densidad 25-40 kg/ha semilla, inoculación con Bradyrhizobium específico para suelos vírgenes (no usar inóculo de fríjol común — son rizobios distintos), asocio tradicional con maíz (la milpa caribeña) y yuca, rotación con cereales-tubérculos para romper ciclos de Macrophomina phaseolina y antracnosis, control biológico de pulgón Aphis craccivora con purín de ortiga + caldo sulfocálcico, cosecha grano verde 60-75 días, grano seco 90-110 días, rendimientos 0.8-2.5 t/ha grano seco según variedad y manejo, doble función como cultivo de cobertura-abono verde y grano alimenticio. Función en chagra/huerto escolar afrocaribeño como leguminosa proteica de ciclo corto adaptada a sequía, ideal para asocio en milpa caribeña, abono verde tropical, ground cover, fijador N suelos pobres, soberanía alimentaria afrocolombiana ancestral. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, NRC 1989 Lost Crops Africa, FAO Ecocrop Vigna unguiculata, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH49_LEGUMINOSAS_NAMES",
+      "id": "vigna_subterranea",
+      "nombre_comun": "Maní bambara",
+      "nombre_comunes_regionales": [
+        "fríjol bambara",
+        "maní de tierra africano",
+        "bambara groundnut",
+        "njugu",
+        "voandzou"
+      ],
+      "nombre_cientifico": "Vigna subterranea (L.) Verdc.",
+      "familia_botanica": "Fabaceae",
+      "category": "granos_legumbres",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1200,
+        "max_absoluto": 1600
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 24,
+        "optimo_max": 32,
+        "max_tolerable": 38
+      },
+      "ph_suelo": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 6.8,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra directa de semilla a 3-5 cm de profundidad, distancia 20-30 cm entre plantas x 50-60 cm entre surcos, densidad 30-50 kg/ha. Germinación 7-14 días. Ciclo 110-150 días. Tras la floración, el pedúnculo se geocarpa (enterrando el fruto en el suelo como el maní cacahuete), comportamiento extraordinario clavado-geocárpico subterráneo. Cosecha por arranque manual de planta completa.",
+        "tiempo_a_establecimiento_dias": 14,
+        "notas": "Leguminosa anual herbácea rastrera-postrada con frutos subterráneos geocárpicos — único caso entre las Vigna americanas adaptadas. Tolera sequías severas. Adaptada a sabanas tropicales arenosas degradadas. Cultivo emergente para Llanos Orientales colombianos.",
+        "fuente": "NRC 1996 Lost Crops Africa Vol III; FAO Ecocrop; AGROSAVIA forrajeras 2022"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "nrc-1989-cultivos-andinos",
+        "fao-ecocrop",
+        "agrosavia-forrajeras-2022"
+      ],
+      "valor_pedagogico": "El maní bambara o fríjol bambara (Vigna subterranea (L.) Verdc., familia Fabaceae) es una leguminosa anual herbácea rastrera-postrada GEOCÁRPICA (frutos subterráneos clavados como el maní cacahuete Arachis hypogaea) originaria del África Occidental sudano-saheliana (cuenca del Níger — Burkina Faso, Mali, Nigeria, Camerún del norte) donde fue domesticada hace ~3000-5000 años por pueblos bantúes-mandé, sigue siendo cultivo de subsistencia femenino africano fundamental. Se introduce en Colombia en últimas décadas como cultivo emergente de adaptación a Llanos Orientales (Casanare, Meta, Vichada, Arauca), Caribe seco (La Guajira, Cesar, Magdalena) y zonas áridas de Boyacá-Cundinamarca-Santander entre 0 y 1.600 msnm en zonas térmicas cálidas secas-húmedas-sabaneras donde su tolerancia extraordinaria a sequía severa (sobrevive estiajes de 12-16 semanas en sabana), suelos arenosos pobres degradados (pH 5-7, Al sat hasta 40%, P bajo, salinidad moderada) y altas temperaturas (28-35°C) lo posicionan como cultivo estratégico de seguridad alimentaria climática en zonas marginales de la Orinoquia colombiana. Lección viva PEDAGÓGICAMENTE EXCELENTE de geocarpia (fenómeno extraordinario por el cual tras la fertilización de la flor el pedicelo curvo del fruto se elonga y empuja el ovario fertilizado hacia abajo enterrándolo en el suelo donde madura subterráneamente — clave la enseñanza didáctica para niñas y niños mostrando como la planta entierra sus frutos para protegerlos de fuego, sequía, herbivoría y cosecha por aves) — patrón evolutivo compartido únicamente con el maní cacahuete Arachis hypogaea (otra leguminosa geocárpica) y con Lathyrus amphicarpos. Planta herbácea de hábito postrado-rastrero formando rosetas densas (15-30 cm altura, expandiéndose 30-60 cm de diámetro), hojas trifoliadas con peciolos largos rosulados al cuello, flores pequeñas amarillas papilionadas autógamas-cleistógamas autopolinizantes (no requieren polinizadores — autopolinización obligada) que tras fertilización geocarpan-clavan al suelo, frutos legumbres subterráneas (1-2 cm largo) cremoso-marrón con 1-2 semillas redondeadas (cremas, marrones, rojas, negras según landrace africana) — proteína 17-25%, carbohidratos 50-65%, grasas 6-7%, considerada 'alimento completo' por su balance nutricional. Fijación N 50-100 kg/ha por simbiosis con Bradyrhizobium sp. específico bambara. Manejo agroecológico llanero: siembra directa de semilla pre-remojada 12-24h a 3-5 cm profundidad, distancia 20-30 cm x 50-60 cm, densidad 30-50 kg/ha, asocio tradicional con sorgo-mijo-mandioca-fonio en sabanas africanas (replicable con yuca-maíz-cachama en Llanos colombianos), no requiere fertilización N (autosuficiente por fijación), tolera Al saturación alta de Oxisoles llaneros sin encalado intensivo, cosecha por arranque manual de planta completa a los 110-150 días tras siembra, rendimientos 0.5-1.5 t/ha grano seco (limitado por cosecha manual subterránea trabajosa), beneficio doble como grano proteico + forraje hojoso para ganadería bovina llanera. Función en chagra/huerto escolar llanero/sabanero como leguminosa de adaptación climática extrema, fijador N en Oxisoles ácidos pobres, ground cover anti-erosión en arenales, cultivo emergente de soberanía alimentaria climática, lección viva de geocarpia. Fuentes Tier A: NRC 1996 Lost Crops Africa Vol III, FAO Ecocrop Vigna subterranea, AGROSAVIA Forrajeras 2022 evaluación llanera, POWO Kew, GBIF Backbone Taxonomy.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH49_LEGUMINOSAS_NAMES",
+      "id": "cajanus_cajan",
+      "nombre_comun": "Gandul",
+      "nombre_comunes_regionales": [
+        "gandules",
+        "guandú",
+        "guandul",
+        "fríjol de palo",
+        "fríjol arbusto",
+        "pigeon pea",
+        "fríjol quinchoncho"
+      ],
+      "nombre_cientifico": "Cajanus cajan (L.) Huth",
+      "familia_botanica": "Fabaceae",
+      "category": "granos_legumbres",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer",
+        "biomass_producer",
+        "living_fence"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1600,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 20,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "ph_suelo": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 7,
+        "max": 8
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra directa de semilla a 3-5 cm profundidad, distancia 60-100 cm entre plantas x 1-1.5 m entre surcos, densidad 8-15 kg/ha. Germinación 7-14 días. Ciclo 5-9 meses primera cosecha. Planta semi-perenne 2-5 años productiva. Floración invernal en Colombia (octubre-diciembre cosecha grano verde).",
+        "tiempo_a_establecimiento_dias": 14,
+        "notas": "Leguminosa arbustiva semi-perenne erecta 2-4 m altura. Fija 100-200 kg N/ha. Tolerante a sequía severa y suelos pobres. Doble propósito: grano alimenticio + abono verde + cerca viva + forraje + leña. Cultivo afrocolombiano Caribe.",
+        "fuente": "FAO Ecocrop Cajanus cajan; AGROSAVIA Leguminosas; NRC 1989"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-leguminosas-andinas",
+        "fao-ecocrop",
+        "nrc-1989-cultivos-andinos",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "El gandul o guandú (Cajanus cajan (L.) Huth, familia Fabaceae, tribu Phaseoleae) es una leguminosa arbustiva semi-perenne erecta de 2-4 m de altura originaria del subcontinente indio (Ghats Occidentales — Maharashtra, Karnataka, Andhra Pradesh) donde fue domesticada hace ~3500 años y diseminada vía África e introducida en América durante el comercio transatlántico como cultivo de subsistencia afroamericano profundamente arraigado en el Caribe colombiano. Se cultiva tradicionalmente en Caribe colombiano (Bolívar — Cartagena, San Juan Nepomuceno, María La Baja; Córdoba — Montería, Lorica, Cereté; Sucre — Sincelejo, Sampués; Magdalena — Santa Marta, Ciénaga, Plato; Cesar — Valledupar, San Diego; La Guajira — Riohacha, Maicao, San Juan del Cesar), Antioquia (Urabá — Apartadó, Turbo, Chigorodó; Bajo Cauca), Chocó (Quibdó, Bajo Baudó), Valle del Cauca (Buenaventura, Norte del Valle), Tolima (Espinal, Ibagué), Huila (Neiva, Garzón), Norte de Santander (Cúcuta, Ocaña) y Santander (Bucaramanga, Barrancabermeja) entre 0 y 2.000 msnm en zonas térmicas cálidas-templadas-secas-húmedas. Lección viva PEDAGÓGICAMENTE EXCELENTE de cultivo multipropósito-multiestrato: combina simultáneamente grano alimenticio proteico (semillas maduras grano seco — 19-24% proteína — para sopas, sancochos costeños, arroz con gandules), grano tierno verde como hortaliza (vainitas y semillas verdes — gastronomía afrocaribeña ancestral 'gandules verdes'), abono verde-cobertura por su rica biomasa hojosa, fijación biológica de N (100-200 kg N/ha por simbiosis con Bradyrhizobium sp. cajani), forraje arbustivo proteico para ganadería rumiante (vacas, ovejas, cabras costeñas) ramoneando hojas tiernas y vainas verdes, cerca viva-living fence productiva en bordes de chagras campesinas, leña de tallos lignificados al final del ciclo, atractor de polinizadores nativos (Apidae, Megachilidae). Planta arbustiva erecta con tallos lignificados rojizos pubescentes, hojas trifoliadas alternas pubescentes plateadas-grisáceas (foliolos elípticos), inflorescencia racimo terminal y axilar de flores grandes amarillas papilionadas (a veces con estandarte rayado rojizo), frutos legumbres alargadas planas (5-9 cm largo) verdes a maduras marrón-paja pubescentes, semillas redondeadas-ovales (cremas, marrones, rojas, negras moteadas según landrace — diversidad genética enorme de cultivares africanos-asiáticos-caribeños). Tolerancia extraordinaria a sequía severa (sobrevive estiajes de 3-5 meses por sistema radicular profundo pivotante 1-2 m), suelos pobres degradados ácidos (pH 5-7, Al sat hasta 30%), alta temperatura, salinidad moderada. Manejo agroecológico: siembra directa de semilla a 3-5 cm profundidad, distancia 60-100 cm entre plantas x 1-1.5 m entre surcos (8-15 kg/ha semilla), inoculación con Bradyrhizobium cajani opcional (ya hay cepas nativas en Caribe colombiano por siglos de cultivo), asocio tradicional con maíz-yuca-plátano-papaya en milpas afrocaribeñas, no requiere fertilización N (autosuficiente por fijación), poda anual tras cosecha para estimular rebrote (planta semi-perenne 2-5 años productiva), control de barrenadores de vainas Maruca vitrata con purín de tabaco + ajo y trampas de feromonas, cosecha grano verde 5-6 meses, grano seco 7-9 meses, rendimientos 0.8-2.5 t/ha grano seco según landrace y manejo. Función en chagra/huerto escolar afrocaribeño como leguminosa arbustiva multipropósito de soberanía alimentaria, cerca viva productiva, abono verde-cobertura biomasa, fijador N suelos pobres, forraje rumiante costeño, atractor polinizadores, cultivo afrocolombiano patrimonial. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, NRC 1989, FAO Ecocrop Cajanus cajan, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH49_LEGUMINOSAS_NAMES",
+      "id": "cicer_arietinum",
+      "nombre_comun": "Garbanzo",
+      "nombre_comunes_regionales": [
+        "garbanzo común",
+        "garbanzo de Castilla",
+        "chickpea",
+        "kabuli",
+        "desi"
+      ],
+      "nombre_cientifico": "Cicer arietinum L.",
+      "familia_botanica": "Fabaceae",
+      "category": "granos_legumbres",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 15,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6,
+        "optimo_max": 7.5,
+        "max": 8.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra directa de semilla a 4-6 cm profundidad, distancia 10-15 cm entre plantas x 30-40 cm entre surcos, densidad 80-100 kg/ha. Germinación 7-14 días. Ciclo 110-150 días grano seco. Cultivo estacional altiplano andino frío-seco — clave: requiere drenaje excelente, intolerante a encharcamiento.",
+        "tiempo_a_establecimiento_dias": 14,
+        "notas": "Leguminosa anual herbácea de clima templado-frío seco mediterráneo, adaptada a altiplano andino colombiano. Fija 60-120 kg N/ha. Cultivo emergente en Boyacá-Cundinamarca-Nariño. Intolerante a humedad excesiva — exclusivo de zonas secas-semiáridas altoandinas.",
+        "fuente": "FAO Ecocrop Cicer arietinum; AGROSAVIA Leguminosas; ICA Resolución 3168/2015"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-leguminosas-andinas",
+        "fao-ecocrop",
+        "ica-resolucion-3168-2015"
+      ],
+      "valor_pedagogico": "El garbanzo (Cicer arietinum L., familia Fabaceae, tribu Cicereae) es una leguminosa anual herbácea de clima templado-frío seco mediterráneo originaria del Cuerno Fértil del Cercano Oriente (Anatolia turca — Karacadağ, sureste de Turquía y norte de Siria) donde fue domesticada hace ~9500-10000 años junto con trigo, cebada y lenteja como uno de los 'cultivos fundadores' (founder crops) de la agricultura neolítica. Diseminada vía Mediterráneo a Iberia y de allí introducida en América durante la conquista española como cultivo de tradición castellana arraigado profundamente en el altiplano andino colombiano. Se cultiva tradicionalmente en altiplano cundiboyacense (Boyacá — Tunja, Sotaquirá, Toca, Soracá, Villa de Leyva, Sutamarchán, Tinjacá; Cundinamarca — Sabana de Bogotá, Sopó, Zipaquirá, Pacho, Ubaté, Susa, Carmen de Carupa; Nariño — Pasto, Yacuanquer, Tangua, Túquerres, Ipiales; Cauca — Silvia, Totoró), Santander (Mogotes, San Gil, Barichara, Curití zonas semiáridas) y zonas semiáridas de Boyacá (Cañón del Chicamocha — Soatá, Tipacoque, Capitanejo) entre 1.200 y 3.000 msnm en zonas térmicas templadas-frías secas-semiáridas mediterráneas-andinas. Lección viva PEDAGÓGICAMENTE EXCELENTE de cultivo neolítico fundador de la agricultura humana: enseña a niñas y niños las raíces históricas de 10000 años de agricultura cerealera-leguminosa del Creciente Fértil, la geografía de la difusión transcultural mediterránea-andina, y las propiedades nutricionales completas del garbanzo (proteína 18-22%, carbohidratos 60-65% — almidón resistente prebiótico —, fibra 12-17%, minerales Fe-Zn-Mn-K, vitaminas grupo B — folato, vitamina B6 —, sin gluten, índice glicémico bajo IG 28) que lo convierten en 'alimento completo' de la dieta mediterránea y vegetariana mundial. Planta herbácea erecta-semi-erecta pequeña (30-60 cm altura) con tallos angulosos pubescente-glandulares (las glándulas secretan ácidos oxálico-málico — característica taxonómica del género Cicer), hojas imparipinnadas con 9-17 foliolos elípticos pequeños dentados, flores pequeñas papilionadas blancas (variedad kabuli — semilla grande blanco-cremosa, mediterránea-española) o rosado-violáceas (variedad desi — semilla pequeña marrón-oscura-moteada, india-etíope), frutos legumbres pequeñas ovaladas-globosas inflado-vesiculadas (2-3 cm largo) verdes a maduras paja, semillas características con punta ahusada-rostradas (aspecto de cabeza de carnero — Cicer arietinum, del latín 'aries' carnero), una a dos semillas por vaina. Tolerancia extraordinaria a sequía-frío seco (sobrevive heladas suaves hasta -4°C en estado vegetativo joven), suelos calcáreos básicos alcalinos (pH 6-8.5 — único leguminosa del catálogo que prefiere suelos calizos), pero crítica: INTOLERANTE a humedad excesiva-encharcamiento (susceptible a Fusarium oxysporum f.sp. ciceris marchitez vascular y Ascochyta rabiei rabia del garbanzo en humedad alta) por lo que requiere drenaje excelente — exclusivo de zonas secas-semiáridas altoandinas. Fija 60-120 kg N/ha por simbiosis con Mesorhizobium ciceri (rizobio específico del garbanzo, NO el mismo de fríjol o haba — requiere inoculación específica en suelos vírgenes). Manejo agroecológico altoandino: siembra directa de semilla pre-remojada 12h a 4-6 cm profundidad, distancia 10-15 cm x 30-40 cm, densidad 80-100 kg/ha, inoculación con Mesorhizobium ciceri obligatoria en suelos sin cultivo previo de garbanzo, asocio limitado con cebada-trigo en rotación (no asocio simultáneo — el garbanzo necesita sol pleno), no requiere fertilización N (autosuficiente), encalado moderado a alcalinizar suelos ácidos hasta pH 6.5-7, control biológico de Ascochyta con caldo bordelés moderado + rotación 3-4 años, cosecha 110-150 días, rendimientos 0.8-2 t/ha grano seco. Función en chagra/huerto escolar altoandino seco-semiárido como leguminosa proteica mediterránea-fundadora de agricultura, fijador N alcalino, cultivo histórico-patrimonial de soberanía alimentaria castellana-andina, alimento completo nutricionalmente balanceado para escuelas-comedores comunitarios, lección viva de los 'founder crops' neolíticos del Creciente Fértil. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, FAO Ecocrop Cicer arietinum, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH49_LEGUMINOSAS_NAMES",
+      "id": "psophocarpus_tetragonolobus",
+      "nombre_comun": "Fríjol alado",
+      "nombre_comunes_regionales": [
+        "fríjol cuatro alas",
+        "winged bean",
+        "fríjol de los cuatro alas",
+        "guisante alado",
+        "asparagus pea tropical",
+        "fríjol espárrago"
+      ],
+      "nombre_cientifico": "Psophocarpus tetragonolobus (L.) DC.",
+      "familia_botanica": "Fabaceae",
+      "category": "granos_legumbres",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1500,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 22,
+        "optimo_max": 32,
+        "max_tolerable": 36
+      },
+      "ph_suelo": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 7,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "tuberculo"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra directa de semilla escarificada (lijado o remojo 24h) a 3-5 cm profundidad, distancia 50-80 cm entre plantas, requiere tutorado obligatorio (espaldera o tutor vivo) — leguminosa trepadora vigorosa hasta 3-5 m. Densidad 15-25 kg/ha. Germinación 7-14 días. Ciclo 5-9 meses. Propagación alternativa por tubérculos pequeños (raíz tuberizada engrosada subterránea — fenómeno extraordinario en una leguminosa).",
+        "tiempo_a_establecimiento_dias": 14,
+        "notas": "Leguminosa trepadora perenne tropical de proteína CASI TOTAL — todas las partes son comestibles y proteicas: vainas tiernas (hortaliza), semillas maduras (grano seco proteína 30-37%), hojas tiernas (espinaca tropical), flores (decorativas comestibles), tubérculo radicular (carbohidrato proteico 15-20%) — patrón único en leguminosas. Cultivo emergente trópico bajo colombiano.",
+        "fuente": "NRC 1981 Winged Bean; FAO Ecocrop Psophocarpus; NRC 1989"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "nrc-1989-cultivos-andinos",
+        "fao-ecocrop",
+        "agrosavia-leguminosas-andinas"
+      ],
+      "valor_pedagogico": "El fríjol alado o fríjol cuatro alas (Psophocarpus tetragonolobus (L.) DC., familia Fabaceae, tribu Phaseoleae) es una leguminosa trepadora perenne tropical originaria del archipiélago de Papúa Nueva Guinea y Sudeste Asiático húmedo (Indonesia, Filipinas, Sri Lanka, Tailandia) donde se cultiva ancestralmente como cultivo de subsistencia integral hace milenios. Se introduce en Colombia en últimas décadas como cultivo emergente experimental en trópico bajo húmedo Caribe (Magdalena medio, Bajo Cauca antioqueño, Urabá), Pacífico (Chocó — Quibdó, Bajo Baudó; Valle Pacífico — Buenaventura, Bajo San Juan; Cauca Pacífico — Guapi, Timbiquí; Nariño Pacífico — Tumaco), Amazonía (Putumayo, Caquetá, Amazonas — Leticia) y trópico medio del Magdalena medio entre 0 y 2.000 msnm en zonas térmicas cálidas-húmedas tropicales-ecuatoriales con disponibilidad hídrica alta. Lección viva PEDAGÓGICAMENTE EXTRAORDINARIA de planta de PROTEÍNA CASI TOTAL — fenómeno botánico-nutricional sin precedente en otras leguminosas mundiales: TODAS las partes vegetales son comestibles y altamente proteicas, una verdadera 'fábrica vegetal de proteína completa' que enseña a niñas y niños la riqueza nutricional integral de una sola especie — (1) vainas tiernas inmaduras (las características vainas aladas-cuatro alas de 8-25 cm — único en Fabaceae mundialmente) como hortaliza fresca (similar al fríjol verde-judía pero con cuatro alas longitudinales decorativas) — proteína 5-6%, carbohidratos, vitamina C y A; (2) semillas maduras grano seco — proteína 30-37% (entre las leguminosas más proteicas del mundo, igual o superando a soja Glycine max), grasa 15-18% (lipidos saludables), aminoácidos esenciales completos incluido lisina abundante; (3) hojas tiernas como espinaca tropical — proteína 5-7% en peso fresco, hierro, calcio, vitaminas A-C; (4) flores grandes vistosas azules-violáceas-blancas como decoración comestible (similar a flor de calabaza); (5) raíz tuberizada engrosada subterránea (fenómeno extraordinario único en leguminosas tropicales — la planta acumula carbohidratos en raíz tuberosa como ñame o batata) — proteína 15-20% en peso seco (proteína superior a yuca-papa-batata), almidón 30-40%, comestible cruda o cocida — un tubérculo proteico-energético sin precedente. Planta trepadora perenne vigorosa enredadera tipo fríjol-judía pero perenne (3-5 años productiva) trepando 3-5 m sobre tutorado, tallos cuadrangulares-alados verdes con anillos morados-rojizos, hojas trifoliadas grandes alternas con foliolos ovado-romboides, flores grandes papilionadas vistosas azul-violáceas-blanco-amarillas en racimos axilares péndulos polinizadas por abejorros Xylocopa-Bombus, frutos legumbres alargadas CUATRO-ALADAS rectangulares-rectangulares (8-25 cm largo) verdes a maduras marrón-paja con 4 alas longitudinales serradas (de allí el nombre 'tetragonolobus' = cuatro alas), semillas redondeadas oscuras (cremas, marrones, rojas, negras según landrace asiática), raíces pivotantes profundas con engrosamiento tuberoso comestible. Fija 100-200 kg N/ha por simbiosis con Bradyrhizobium sp. psophocarpus (rizobio específico). Manejo agroecológico tropical húmedo: siembra directa de semilla escarificada (lijado o remojo 24h tibia) a 3-5 cm profundidad, distancia 50-80 cm entre plantas, tutorado obligatorio en espaldera o tutor vivo con maíz-yuca-plátano, no requiere fertilización N (autosuficiente fijación), asocio tradicional asiático con yuca-mandioca-jengibre-cúrcuma (replicable en chagra tropical colombiana), control biológico de áfidos Aphis fabae y mosca blanca Bemisia tabaci con purín de ortiga-tabaco-ajo + sulfocálcico, cosecha vainas verdes 60-90 días, hojas continuas 90-180 días, grano seco 5-7 meses, raíz tuberizada 7-12 meses (alternativa: dejar planta perenne y cosechar tubérculo al ciclo 2-3 años), rendimientos 2-4 t/ha grano seco más 5-10 t/ha hojas-vainas-tubérculos según manejo. Función en chagra/huerto escolar tropical húmedo como leguminosa de proteína casi total integral, fijador N tropical, biomass producer-cobertura, cultivo emergente de soberanía alimentaria proteica, lección viva extraordinaria de planta multipropósito-multinutricional. Fuentes Tier A: NRC 1981 Winged Bean Underexploited Crops, AGROSAVIA Leguminosas Andinas, FAO Ecocrop Psophocarpus tetragonolobus, POWO Kew, GBIF Backbone Taxonomy.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH49_LEGUMINOSAS_NAMES",
+      "id": "canavalia_ensiformis",
+      "nombre_comun": "Canavalia",
+      "nombre_comunes_regionales": [
+        "fríjol de espada",
+        "fríjol machete",
+        "fríjol jack",
+        "jack bean",
+        "fríjol caballero",
+        "haba caballo"
+      ],
+      "nombre_cientifico": "Canavalia ensiformis (L.) DC.",
+      "familia_botanica": "Fabaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "ground_cover",
+        "nitrogen_fixer",
+        "biomass_producer",
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1600,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 22,
+        "optimo_max": 32,
+        "max_tolerable": 36
+      },
+      "ph_suelo": {
+        "min": 4.5,
+        "optimo_min": 5,
+        "optimo_max": 7,
+        "max": 8
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Siembra directa de semilla grande (4-5 cm) escarificada a 4-6 cm profundidad, distancia 50-80 cm entre plantas x 80-100 cm entre surcos, densidad 60-100 kg/ha (semilla muy grande — alta dosis). Germinación 5-10 días. Ciclo 4-7 meses. Se incorpora al inicio-mitad de floración como abono verde — biomasa masiva 30-60 t/ha fresca.",
+        "tiempo_a_establecimiento_dias": 10,
+        "notas": "Leguminosa anual erecta-semierecta 0.6-1.2 m altura, biomasa masiva. Fija 150-300 kg N/ha. CRÍTICO: semillas crudas contienen concanavalina A (lectina tóxica hepatotóxica-neurotóxica) y canavanina (aminoácido no proteico tóxico) — requieren cocción prolongada >2h + cambio de agua antes de consumo humano-animal. Uso principalmente como abono verde, no alimento.",
+        "fuente": "Restrepo Rivera 2005; AGROSAVIA forrajeras; FAO Ecocrop Canavalia"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "restrepo-2005-agroecologia",
+        "agrosavia-forrajeras-2022",
+        "fao-ecocrop",
+        "restrepo-2007-biopreparados"
+      ],
+      "valor_pedagogico": "La canavalia o fríjol de espada (Canavalia ensiformis (L.) DC., familia Fabaceae, tribu Phaseoleae) es una leguminosa anual herbácea erecta-semierecta originaria de Centro y Sudamérica tropical (México, Centroamérica, Caribe, norte de Sudamérica — probablemente Yucatán-Veracruz mexicano-mesoamericano) domesticada hace milenios por culturas precolombinas mesoamericanas como abono verde y planta ritual, ampliamente cultivada pantropicalmente como ABONO VERDE-COBERTURA por excelencia. Se cultiva en Caribe colombiano (Córdoba, Sucre, Bolívar, Magdalena, Cesar, La Guajira), Antioquia (Urabá, Bajo Cauca, Magdalena medio), Chocó (Quibdó), Valle del Cauca, Cauca, Tolima, Huila, Norte de Santander, Santander, Boyacá templado-cálido, Llanos Orientales (Casanare, Meta, Vichada, Arauca) y zonas piedemonte andino entre 0 y 2.000 msnm en zonas térmicas cálidas-templadas-secas-húmedas tropicales-subtropicales. Lección viva PEDAGÓGICAMENTE EXCELENTE de ABONO VERDE TROPICAL DE EXCELENCIA combinada con ADVERTENCIA NUTRICIONAL FUNDAMENTAL DE TOXINAS — ATENCIÓN PEDAGÓGICA CRÍTICA: las semillas crudas contienen concentraciones significativas de CONCANAVALINA A (lectina hepatotóxica-neurotóxica capaz de aglutinar glóbulos rojos y dañar mucosa intestinal en humanos y animales monogástricos cerdos-aves) y CANAVANINA (aminoácido no proteico análogo estructural de arginina con propiedades antimetabólicas tóxicas) — requieren cocción prolongada de al menos 2 horas en agua hirviendo con cambio de agua a la mitad del proceso antes de ser consumidas con seguridad por humanos o animales monogástricos, y por estas toxinas su uso principal NO es alimenticio sino como abono verde-cobertura-biomasa, lección biológica pedagógica sobre defensa química anti-herbivoría de las leguminosas tropicales (las lectinas y aminoácidos no proteicos son metabolitos secundarios defensivos evolucionados contra herbívoros). Como ABONO VERDE TROPICAL es una de las leguminosas más potentes del catálogo: biomasa fresca masiva 30-60 t/ha en 4-6 meses (entre las más altas del catálogo, comparable a Mucuna pruriens), fijación N extraordinaria 150-300 kg N/ha (mayor que Crotalaria juncea, Vigna unguiculata, Cajanus cajan) por simbiosis con Bradyrhizobium sp. canavalia (rizobio específico altamente eficiente), incorporación al suelo en floración deja inmensa cantidad de N + materia orgánica para cultivo subsiguiente. Planta herbácea anual erecta-semierecta robusta de 0.6-1.2 m altura (no trepadora — diferencia clave con Canavalia gladiata su congénere trepadora), tallos angulosos verdes glabros-pubescentes, hojas trifoliadas alternas grandes con foliolo terminal ovado-elíptico (10-20 cm largo) y foliolos laterales asimétricos, flores grandes papilionadas blanco-cremoso-rosáceas-violáceas en racimos terminales y axilares péndulos polinizadas por abejorros Xylocopa-Bombus, frutos legumbres alargadas grandes ENVAINADAS-ENSIFORMES (forma de espada — de allí el epíteto 'ensiformis' = en forma de espada y el nombre vulgar 'fríjol de espada' o 'machete') de 20-35 cm largo x 3-4 cm ancho rectangulares-aplanadas verdes a maduras paja, semillas grandes (2-3 cm largo) ovales-aplanadas blanco-marfileñas-cremosas (8-15 semillas por vaina — entre las semillas más grandes de leguminosas tropicales). Tolerancia extraordinaria a suelos pobres-ácidos (pH 4.5-8, Al sat hasta 40%), sequías moderadas (3-4 meses), altas temperaturas, encharcamiento moderado. Manejo agroecológico: siembra directa de semilla pre-escarificada (lijado superficial o remojo 24h en agua tibia, opcionalmente con ácido sulfúrico diluido 5min industrial) a 4-6 cm profundidad, distancia 50-80 cm x 80-100 cm, densidad 60-100 kg/ha (semilla grande — dosis alta en peso pero baja en número), inoculación con Bradyrhizobium específico opcional (cepas nativas tropicales adecuadas), asocio tradicional rotación con maíz-sorgo-yuca-plátano (la canavalia precede al cereal-tubérculo cargando el suelo de N), no requiere fertilización N (autosuficiente fijación masiva), incorporación al suelo a los 90-120 días en plena floración con corte-volcado-arado-pase rastrillo o disco (mejor: poda manual + cobertura mulching sin enterrar), beneficio agronómico: cultivo subsiguiente de maíz puede ahorrar 80-150 kg/ha urea (40-50% fertilización N convencional), control biológico no requiere mucho (planta tóxica para herbívoros — defensa química). Función en chagra/huerto escolar tropical-subtropical como ABONO VERDE TROPICAL POR EXCELENCIA, fijador N masivo suelos pobres degradados, biomass producer-cobertura anti-erosión, planta restauradora de suelos agotados post-monocultivo, lección viva extraordinaria de defensa química anti-herbivoría (toxinas concanavalina A + canavanina), ADVERTENCIA NUTRICIONAL CRÍTICA: no consumo crudo, cocción prolongada obligatoria si uso alimenticio. Fuentes Tier A: Restrepo Rivera 2005 Agroecología Colombiana, AGROSAVIA Forrajeras 2022, Restrepo 2007 Biopreparados, FAO Ecocrop Canavalia ensiformis, POWO Kew, GBIF Backbone Taxonomy.",
+      "validation_level": "claude_draft"
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH49_LEGUMINOSAS_NAMES",
+      "id": "dioscorea_rotundata",
+      "nombre_comun": "Ñame blanco africano",
+      "nombre_comunes_regionales": [
+        "ñame blanco",
+        "ñame africano",
+        "white yam",
+        "ñame de Guinea",
+        "ñame de Costa"
+      ],
+      "nombre_cientifico": "Dioscorea rotundata Poir.",
+      "familia_botanica": "Dioscoreaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "harvest_type": "tuberculo",
+      "cycleMonths": 9,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 600,
+        "max_absoluto": 1000
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "ph_suelo": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 6.8,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "methods": [
+          "tuberculo"
+        ],
+        "best_method": "tuberculo",
+        "protocol_resumen": "Propagación por trozos de tubérculo (semilla-tubérculo) de 100-300 g con yemas viables, siembra en hoyos profundos 30-40 cm con compost al fondo, distancia 1 x 1 m, requiere tutorado obligatorio en espaldera 2-3 m. Ciclo 8-10 meses cosecha tubérculo único grande. Rendimiento 10-25 t/ha.",
+        "tiempo_a_establecimiento_dias": 30,
+        "notas": "Dioscoreácea trepadora vigorosa con tallos CILÍNDRICOS lisos sin alas (diferencia clave con D. alata que tiene tallos cuadrangulares alados). Tubérculo único cilíndrico-irregular grande (2-15 kg) pulpa blanca harinosa. Naturalizado Caribe colombiano siglos XVII-XX como cultivo afrocolombiano patrimonial.",
+        "fuente": "AGROSAVIA Manual Tubérculos Andinos 2017; POWO Kew Dioscorea rotundata; NRC 1996 Lost Crops Africa Vol III"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "nrc-1989-cultivos-andinos"
+      ],
+      "valor_pedagogico": "El ñame blanco africano (Dioscorea rotundata Poir., familia Dioscoreaceae) es una dioscoreácea herbácea perenne trepadora vigorosa originaria del África Occidental tropical (cinturón ñamero — Nigeria, Ghana, Costa de Marfil, Benín, Togo, Camerún del sur, Sierra Leona — el llamado 'Yam Belt' o cinturón del ñame africano que produce el 95% del ñame mundial) donde fue domesticada hace ~7000 años por pueblos bantúes-Niger-Congo y constituye cultivo de base alimentaria de >70 millones de africanos occidentales. Introducida masivamente en el Caribe americano durante el comercio transatlántico de esclavos (siglos XVI-XIX) como cultivo de subsistencia de poblaciones afroamericanas esclavizadas, naturalizada profundamente en el Caribe colombiano donde se ha cultivado por casi 4 siglos como base alimentaria afrocaribeña — patrimonio agroecológico-cultural afrocolombiano fundamental. Se cultiva tradicionalmente en Caribe colombiano (Córdoba — Montería, Ciénaga de Oro, San Bernardo del Viento, Lorica, Tierralta; Sucre — Sincelejo, Sampués, San Onofre, Tolú, Corozal; Bolívar — María La Baja, San Juan Nepomuceno, San Jacinto, El Carmen de Bolívar — DENOMINACIÓN DE ORIGEN para ñame Montes de María; Magdalena — Plato, Pivijay, Sitionuevo; Cesar — Valledupar, San Diego; La Guajira — Riohacha sur), Antioquia (Urabá — Apartadó, Turbo, Chigorodó; Bajo Cauca — Caucasia, El Bagre) y Chocó (Quibdó, Bajo Baudó) entre 0 y 1.000 msnm en zonas térmicas cálidas húmedas-bimodales. Lección viva PEDAGÓGICAMENTE EXCELENTE de cultivo afrocolombiano patrimonial diasporán de seguridad alimentaria: enseña a niñas y niños las raíces históricas del 'Triángulo Atlántico' (África-Caribe-América) en cultivos alimentarios diaspóranos, la importancia de los Montes de María como zona ñamera de denominación de origen colombiana, y la nutrición del ñame como carbohidrato de bajo índice glicémico (IG 51, almidón resistente prebiótico) base de la dieta sancocho-mote-pasteles-pasabocas costeñas. Diferencia diagnóstica taxonómica clave con D. alata (ñame blanco asiático): D. rotundata tiene tallos CILÍNDRICOS lisos sin alas (D. alata tiene tallos cuadrangulares-alados característicos), foliolos cordiformes-acuminados (D. alata sagitados-cordados), tubérculo único cilíndrico-irregular vertical 2-15 kg con pulpa blanca harinosa firme (D. alata produce 1-3 tubérculos irregulares pulpa blanca-violácea), ciclo 9-11 meses (D. alata 8-10 meses), preferencia por sabanas africanas con estación seca marcada (D. alata por trópicos húmedos asiáticos sin estación seca pronunciada). Planta trepadora vigorosa con tallos cilíndricos lisos verdes a marrones espinescentes en la base, hojas cordiformes-acuminadas alternas grandes (8-20 cm) verde oscuras brillantes, inflorescencias en espigas axilares pequeñas (planta dioica — flores masculinas y femeninas separadas en plantas distintas), frutos cápsulas trialadas (rara vez forma fruto en cultivo — predomina propagación vegetativa por tubérculo-semilla), tubérculo subterráneo único cilíndrico-irregular vertical (2-15 kg, hasta 30 kg en variedades gigantes africanas) corteza marrón-negruzca rugosa con pulpa blanca-cremosa harinosa firme rica en almidón (70-78% peso seco), proteínas (6-8%), fibra (3-5%), minerales K-Mg-Ca-P-Fe, vitaminas C-B6, polisacáridos mucilaginosos digestivos. Manejo agroecológico afrocaribeño tradicional: propagación por trozos de tubérculo-semilla 100-300 g con yemas viables o tubérculos pequeños enteros, siembra en hoyos profundos 30-40 cm con compost-bocashi al fondo, distancia 1 m x 1 m (10000 plantas/ha), requiere tutorado obligatorio en espaldera 2-3 m de altura o tutor vivo con guadua o caña brava (tradicional Montes de María) o tutorado vivo con yuca-plátano, asocio tradicional milpa caribeña con maíz-yuca-plátano-ñame en sistema multiestrato afrocolombiano, control biológico de antracnosis Colletotrichum gloeosporioides con podas sanitarias + rotación 3-4 años + caldo bordelés moderado, control de cochinillas Pseudococcidae con sulfocálcico-jabón potásico, cosecha por arranque manual a los 8-10 meses cuando hojas amarillean, almacenamiento post-cosecha en pilas ventiladas a la sombra 4-6 meses sin refrigeración. Rendimientos 10-25 t/ha tubérculo según variedad y manejo (Montes de María registra hasta 30 t/ha en cultivares élite). Función en chagra/huerto escolar afrocaribeño como TUBÉRCULO BASE DE LA SEGURIDAD ALIMENTARIA AFROCOLOMBIANA, cultivo patrimonial diaspórico africano-caribeño, ground cover trepador, sistema productivo tradicional Montes de María (denominación de origen colombiana), lección viva del Triángulo Atlántico de cultivos diaspórinos, soberanía alimentaria comunidades afrodescendientes. Fuentes Tier A: AGROSAVIA Manual Tubérculos Andinos 2017, NRC 1996 Lost Crops Africa Vol III, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH49_LEGUMINOSAS_NAMES",
+      "id": "dioscorea_cayennensis",
+      "nombre_comun": "Ñame amarillo",
+      "nombre_comunes_regionales": [
+        "ñame amarillo del Pacífico",
+        "yellow yam",
+        "ñame de Guinea amarillo",
+        "ñame amarillo costeño",
+        "ñame negro"
+      ],
+      "nombre_cientifico": "Dioscorea cayennensis Lam.",
+      "familia_botanica": "Dioscoreaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "harvest_type": "tuberculo",
+      "cycleMonths": 10,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 500,
+        "max_absoluto": 900
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "ph_suelo": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 6.8,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "tuberculo"
+        ],
+        "best_method": "tuberculo",
+        "protocol_resumen": "Propagación por trozos de tubérculo (semilla-tubérculo) de 150-300 g con yemas viables, siembra en hoyos profundos 30-40 cm con compost al fondo, distancia 1 x 1 m. Requiere tutorado obligatorio. Ciclo 10-12 meses. Rendimiento 8-20 t/ha. Adaptado a trópico húmedo del Pacífico colombiano (lluvias 3000-7000 mm anuales).",
+        "tiempo_a_establecimiento_dias": 30,
+        "notas": "Dioscoreácea trepadora con tubérculo único de pulpa AMARILLA (rica en carotenoides — diferencia clave con D. rotundata pulpa blanca y D. alata pulpa blanca-violácea). Naturalizado en Pacífico colombiano afrocolombiano y Caribe húmedo. Ciclo más largo (10-12 meses) y requerimiento hídrico mayor que D. rotundata.",
+        "fuente": "AGROSAVIA Manual Tubérculos Andinos 2017; POWO Kew; NRC 1996 Lost Crops Africa Vol III"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "El ñame amarillo (Dioscorea cayennensis Lam., familia Dioscoreaceae) es una dioscoreácea herbácea perenne trepadora vigorosa originaria del África Occidental tropical húmedo (Costa de Marfil, Liberia, Sierra Leona, Guinea, Guinea-Bissau — bosque húmedo tropical más que sabana) donde se ha cultivado por milenios junto con D. rotundata (el otro 'ñame guineano') aunque genéticamente distinto. Introducida en América durante el comercio transatlántico de esclavos como cultivo de subsistencia afroamericano, naturalizada profundamente en Costa Pacífica colombiana donde encuentra condiciones ecológicas óptimas (lluvias 3000-7000 mm anuales — el Chocó biogeográfico es uno de los lugares más lluviosos del planeta, equivalente al cinturón ñamero africano húmedo). Se cultiva tradicionalmente en Costa Pacífica colombiana (Chocó — Quibdó, Bajo Baudó, Istmina, Condoto, San José del Palmar; Valle del Cauca — Buenaventura, Bajo San Juan; Cauca — Guapi, Timbiquí, López de Micay; Nariño — Tumaco, Olaya Herrera, Roberto Payán, Barbacoas, Magüí), Caribe húmedo de Bolívar-Córdoba (María La Baja, San Juan Nepomuceno, San Onofre, Tolú), Magdalena medio antioqueño (Bajo Cauca, Magdalena medio), Urabá antioqueño (Apartadó, Turbo, Chigorodó) y Catatumbo norte santandereano entre 0 y 900 msnm en zonas térmicas cálidas húmedas-superhúmedas tropicales pluviales. Lección viva PEDAGÓGICAMENTE EXCELENTE de cultivo afrocolombiano del Pacífico de seguridad alimentaria: enseña a niñas y niños la riqueza nutricional del ñame amarillo (carbohidratos 70-75%, proteínas 5-7%, CAROTENOIDES — provitamina A, beta-caroteno — que dan el característico color amarillo a la pulpa, antioxidantes naturales, riboflavina, niacina, vitamina C, minerales K-Mg-Mn-Cu), su rol como cultivo patrimonial afrocolombiano del Pacífico biogeográfico, y la adaptación extrema a lluvias superpluviales tropicales chocoanas (3000-7000 mm/año — sobrevive incluso a inundaciones temporales en suelos con buen drenaje interno). Diferencia diagnóstica taxonómica clave con D. rotundata y D. alata: D. cayennensis tiene tubérculo único subcilíndrico-cordiforme con pulpa AMARILLA-OCRE característica (rica en carotenoides — diferenciador inmediato con D. rotundata pulpa blanca-cremosa y D. alata pulpa blanca a veces violácea), ciclo 10-12 meses (más largo que D. rotundata 9-11 y D. alata 8-10 — el ñame de ciclo más largo del catálogo), preferencia ecológica por bosques húmedos tropicales pluviales del Chocó biogeográfico (D. rotundata por sabanas africanas y Caribe colombiano semihúmedo, D. alata por trópicos húmedos asiáticos), tallos cilíndricos espinescentes en la base como D. rotundata, hojas cordiformes-acuminadas grandes verde oscuras. Planta trepadora vigorosa con tallos cilíndricos verdes-marrón, hojas cordiformes-acuminadas alternas grandes (10-25 cm) verde oscuras brillantes, planta dioica con flores masculinas-femeninas separadas en plantas distintas (espigas axilares pequeñas blanco-amarillentas), tubérculo único subcilíndrico-cordiforme vertical (2-12 kg, ocasionalmente hasta 20 kg) corteza marrón-oscura rugosa con pulpa amarilla-ocre firme harinosa rica en almidón (65-75% peso seco), carotenoides (provitamina A), proteínas (5-7%), fibra (3-5%), polisacáridos mucilaginosos. Manejo agroecológico afrocolombiano del Pacífico tradicional: propagación por trozos de tubérculo-semilla 150-300 g con yemas viables, siembra en hoyos profundos 30-40 cm con compost-tierra negra al fondo, distancia 1 m x 1 m (10000 plantas/ha), tutorado obligatorio en espaldera o tutor vivo con guadua-caña brava-chontaduro-plátano, asocio tradicional milpa pacífica con plátano-yuca-chontaduro-borojó en sistemas multiestrato afrocolombianos, control biológico de antracnosis Colletotrichum gloeosporioides + roya Puccinia con podas sanitarias y rotación 3-4 años, manejo del agua con drenaje superficial en surcos elevados (camas raised beds) para evitar encharcamiento prolongado a pesar de las altas lluvias, cosecha 10-12 meses por arranque manual, almacenamiento post-cosecha en pilas ventiladas a la sombra 3-5 meses (más perecedero que D. rotundata por mayor contenido hídrico-carotenoide). Rendimientos 8-20 t/ha tubérculo según manejo y variedad. Función en chagra/huerto escolar afrocolombiano del Pacífico como TUBÉRCULO BASE DE LA SEGURIDAD ALIMENTARIA AFROPACÍFICA, cultivo patrimonial afrocolombiano del Chocó biogeográfico, ñame de pulpa carotenoide-amarilla con provitamina A nutricionalmente superior, lección viva de adaptación tropical superpluvial chocoana, sistema productivo tradicional de comunidades negras del Pacífico colombiano. Fuentes Tier A: AGROSAVIA Manual Tubérculos Andinos 2017, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH49_LEGUMINOSAS_NAMES",
+      "id": "colocasia_antiquorum",
+      "nombre_comun": "Taro asiático",
+      "nombre_comunes_regionales": [
+        "taro",
+        "papa china",
+        "ocumo chino",
+        "yautía blanca",
+        "Asian taro",
+        "eddoe",
+        "dasheen"
+      ],
+      "nombre_cientifico": "Colocasia antiquorum Schott",
+      "familia_botanica": "Araceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "harvest_type": "tuberculo",
+      "cycleMonths": 8,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1500,
+        "max_absoluto": 2000
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "ph_suelo": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 7,
+        "max": 7.5
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "moderado",
+      "propagation": {
+        "methods": [
+          "tuberculo"
+        ],
+        "best_method": "tuberculo",
+        "protocol_resumen": "Propagación vegetativa por cormos hijos pequeños (cormelos secundarios — 'eddoes' de 50-150 g) o trozos de cormo principal con yemas, siembra en hoyos 15-25 cm de profundidad con materia orgánica al fondo, distancia 60-80 cm entre plantas x 80-100 cm entre surcos. Requiere humedad alta sostenida (camas inundables alternativas). Ciclo 7-10 meses cosecha cormos.",
+        "tiempo_a_establecimiento_dias": 21,
+        "notas": "Aroidea de tubérculo principal pequeño con MUCHOS hijos-cormelos secundarios pequeños — patrón diferenciador con Colocasia esculenta (que produce 1-2 cormos grandes principales). Ideal para chinampas-camellones inundables. Variedad asiática de la papa china. Toxicidad de oxalato de calcio en crudo — requiere cocción.",
+        "fuente": "POWO Kew Colocasia antiquorum; FAO Ecocrop; AGROSAVIA Manual Tubérculos Andinos 2017"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "El taro asiático o papa china (Colocasia antiquorum Schott, familia Araceae, subfamilia Aroideae) es una aroidea herbácea perenne tuberosa originaria del sudeste asiático tropical (India oriental — Bengala, Bangladesh, Myanmar, Tailandia, Camboya, Vietnam, sur de China, Malasia, Indonesia, Filipinas) donde se cultiva ancestralmente hace ~9000-10000 años como uno de los cultivos tuberosos tropicales más antiguos del mundo (junto con yuca Manihot esculenta de América y batata Ipomoea batatas de Sudamérica). Considerada por taxónomos modernos como variedad-cultivar o subespecie del complejo Colocasia esculenta (L.) Schott — con quien se cruza fácilmente y comparte morfología general — pero diferenciada hortícola-comercialmente por su patrón de tuberización característico: produce un cormo principal pequeño-mediano (200-800 g) acompañado de MUCHOS cormos hijos secundarios pequeños llamados 'cormelos' o 'eddoes' (50-150 g cada uno, 5-15 por planta) — patrón diferenciador clave con Colocasia esculenta var. esculenta clásica (la 'taro dasheen' americano-pacífico que produce 1-2 cormos principales grandes de 1-3 kg con pocos cormelos) — diferencia hortícola comercial fundamental. Naturalizada en Colombia desde introducción asiática post-canal-Panamá y migraciones chinas-japonesas al Pacífico colombiano. Se cultiva tradicionalmente en Costa Pacífica colombiana (Valle del Cauca — Buenaventura; Cauca — Guapi, Timbiquí; Nariño — Tumaco), Caribe húmedo (Córdoba, Sucre, Bolívar, Antioquia Urabá-Bajo Cauca, Chocó), Magdalena medio antioqueño-santandereano, Eje Cafetero zonas húmedas (Quindío, Risaralda templado húmedo, Caldas), Tolima-Huila zonas húmedas riberas de río, Llanos Orientales (Casanare, Meta zonas inundables), Amazonía colombiana (Putumayo, Caquetá, Amazonas — Leticia) entre 0 y 2.000 msnm en zonas térmicas cálidas-templadas húmedas-superhúmedas tropicales-ecuatoriales con alta disponibilidad hídrica. Lección viva PEDAGÓGICAMENTE EXCELENTE de tuberización múltiple aroidea y sistemas agrícolas inundables: enseña a niñas y niños la diferencia botánica entre cormos primarios y secundarios (cormelos-eddoes), las chinampas-camellones inundables mesoamericanas y los sistemas agrícolas asiáticos de cultivo en agua (los taros se cultivan tradicionalmente en arrozales-paddy fields asiáticos por su tolerancia a inundación prolongada), y la importancia del oxalato de calcio como mecanismo de defensa anti-herbivoría en Araceae (TODA la planta cruda contiene cristales de oxalato de calcio en forma de rafidios que causan irritación bucal-traqueal severa — requiere cocción prolongada por hervor o vapor o asado para destruir los rafidios y hacer la planta comestible — lección biológica importante de toxinas vegetales y manejo culinario tradicional). Planta herbácea perenne acaule con cormo principal subterráneo + cormelos hijos secundarios numerosos, hojas grandes peltado-sagitadas-cordiformes verde oscuras brillantes (30-80 cm largo) con peciolos largos suculentos verde-violáceos-purpúreos (60-150 cm altura) — aspecto ornamental tropical, inflorescencia espádice envuelto en espata amarillo-verdosa (rara en cultivo — predomina propagación vegetativa por cormelos), planta perenne en clima cálido (resiembra anual en climas con estación seca marcada). Manejo agroecológico tropical húmedo: propagación vegetativa por cormos hijos pequeños (cormelos-eddoes 50-150 g) o trozos de cormo principal con yemas, siembra en hoyos 15-25 cm con compost-bocashi-materia orgánica al fondo, distancia 60-80 cm x 80-100 cm, requiere humedad alta sostenida (riego frecuente o ubicación en bajos-vegas-orillas de quebrada-camas inundables alternativas tipo chinampa mesoamericana), tolera encharcamiento moderado (camas inundables son ideales), asocio tradicional con plátano-yuca-borojó-chontaduro en chagras pacíficas húmedas y con maíz-arroz-yuca en milpas caribeñas, control biológico de tizón Phytophthora colocasiae con podas sanitarias + drenaje superficial + caldo bordelés moderado + rotación 3 años, cosecha por arranque manual a los 7-10 meses, los cormelos hijos se cosechan continuamente dejando el cormo principal seguir produciendo, rendimientos 10-25 t/ha cormos totales (cormo principal + cormelos hijos). Función en chagra/huerto escolar tropical-subtropical húmedo como tubérculo aroideo asiático naturalizado de seguridad alimentaria, ground cover hojas grandes ornamentales tropicales, cultivo ideal para sistemas inundables-chinampas-camellones, lección viva extraordinaria de tuberización múltiple aroidea y manejo culinario de toxinas oxalato calcio. Fuentes Tier A: AGROSAVIA Manual Tubérculos Andinos 2017, FAO Ecocrop Colocasia, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH49_LEGUMINOSAS_NAMES",
+      "id": "eleocharis_dulcis",
+      "nombre_comun": "Castaña de agua china",
+      "nombre_comunes_regionales": [
+        "castaña de agua",
+        "chinese water chestnut",
+        "matai",
+        "ma tai",
+        "castaña acuática"
+      ],
+      "nombre_cientifico": "Eleocharis dulcis (Burm.f.) Trin. ex Hensch.",
+      "familia_botanica": "Cyperaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "emergente",
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "harvest_type": "tuberculo",
+      "cycleMonths": 7,
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1200,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6,
+        "optimo_max": 7,
+        "max": 7.5
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "pantanoso",
+      "propagation": {
+        "methods": [
+          "tuberculo"
+        ],
+        "best_method": "tuberculo",
+        "protocol_resumen": "Propagación vegetativa por cormelos (tubérculos pequeños del rizoma) plantados directamente en camas inundables permanentes (5-15 cm lámina de agua sostenida), distancia 30 x 30 cm. CRÍTICO: requiere inundación permanente sostenida (paddy field-arrozal-chinampa) durante todo el ciclo de 7-9 meses. Ciclo: planta 7-9 meses, secar campo últimas 4-6 semanas para inducir maduración tubérculo, cosecha por excavación manual al drenar la cama.",
+        "tiempo_a_establecimiento_dias": 30,
+        "notas": "Ciperácea acuática emergente — nicho ECOLÓGICO ACUÁTICO ESPECÍFICO no replicable en cultivo seco. Requiere inundación permanente 5-15 cm de lámina de agua durante todo el ciclo — incompatible con sistemas agrícolas convencionales de secano. Tubérculos subterráneos (cormelos) crujientes blancos dulces — gastronomía asiática chino-tailandesa.",
+        "fuente": "POWO Kew Eleocharis dulcis; FAO Ecocrop; NRC 1989"
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "nrc-1989-cultivos-andinos",
+        "sib-colombia"
+      ],
+      "valor_pedagogico": "La castaña de agua china (Eleocharis dulcis (Burm.f.) Trin. ex Hensch., familia Cyperaceae) es una ciperácea acuática emergente herbácea perenne originaria del sudeste asiático tropical (sur de China, Vietnam, Tailandia, Camboya, Laos, Indonesia, Filipinas, India oriental, Sri Lanka) donde se cultiva ancestralmente hace ~3000 años en arrozales-chinampas inundables del valle del río Yangtze chino y deltas del Mekong vietnamita-tailandés-camboyano como tubérculo dulce-crujiente característico de la gastronomía asiática chino-tailandesa-vietnamita (chop suey, sopas wonton, rollitos primavera, stir-fries, ensaladas frescas — su crocancia se preserva incluso tras cocción larga, propiedad culinaria única). Distribuida pantropicalmente como cultivo emergente y como especie acuática naturalizada en humedales tropicales-subtropicales. Introducida experimentalmente en Colombia en últimas décadas en zonas con sistemas acuáticos manejados (Valle del Cauca — Cali, Palmira, Yumbo; Tolima — Espinal, Saldaña; Huila — Neiva, Garzón; Llanos Orientales — Casanare, Meta zonas inundables ribera de río) entre 0 y 1.800 msnm en zonas térmicas cálidas-templadas con disponibilidad de agua permanente. Lección viva PEDAGÓGICAMENTE EXCELENTE de NICHO ECOLÓGICO ACUÁTICO ESPECÍFICO INSUSTITUIBLE — ATENCIÓN PEDAGÓGICA CRÍTICA: este cultivo requiere INUNDACIÓN PERMANENTE SOSTENIDA durante todo el ciclo de 7-9 meses (5-15 cm de lámina de agua estable continua sobre la cama-arrozal-chinampa) — patrón ecológico-agronómico INCOMPATIBLE con sistemas agrícolas convencionales de secano-riego intermitente — solo cultivable en arrozales-paddy fields-camellones-chinampas-camas pantanosas inundables permanentes alimentadas por escorrentía continua, manantial, río o canal de riego sostenido — lección agronómica fundamental sobre cómo cada especie tiene su nicho ecológico específico no negociable y sobre cómo los sistemas agrícolas asiáticos del arroz desarrollaron ecosistemas inundables productivos sofisticados (arrozales-chinampas-paddy fields) que también albergan castaña de agua, lotus Nelumbo nucifera, taro Colocasia, cana de azúcar, y peces como tilapia-carpa en policultivos acuáticos multiespecíficos integrados. Planta herbácea perenne acaule con tallos cilíndricos huecos verde-azulados emergentes (50-150 cm altura — los 'tallos' son técnicamente escapos foliares modificados, las hojas verdaderas reducidas a vainas basales en Cyperaceae) que emergen verticales del rizoma subterráneo horizontal blanco-amarillento, inflorescencia espiguilla terminal pequeña marrón-paja cilíndrica (2-4 cm) con flores pequeñas anemófilas autógamas (autopolinización viento — no requiere polinizadores), frutos aquenios pequeños marrones (rara vez se reproduce sexualmente en cultivo — predomina propagación vegetativa por cormelos del rizoma), tubérculos subterráneos cormelos redondeados (2-4 cm diámetro) corteza marrón-rojiza-negruzca rugosa con pulpa blanca-crema crujiente dulce (de allí el epíteto 'dulcis' — los más dulces de las Cyperaceae) rica en almidón resistente, azúcares simples, vitaminas C-B6-tiamina-niacina, minerales K-Mg-Fe-Zn-Cu-Mn, fibra dietética, polisacáridos, y un compuesto fenólico característico (puchiin) que preserva crocancia tras cocción — propiedad culinaria única no replicable por otros tubérculos. Manejo agroecológico acuático específico: cultivo en arrozales-camas pantanosas inundables permanentes (lámina de agua 5-15 cm sostenida durante todo el ciclo), propagación vegetativa por cormelos del rizoma plantados a 5-10 cm profundidad en suelo encharcado-pantanoso a inicio de período lluvioso, distancia 30 x 30 cm (111000 plantas/ha — densidad alta tipo arrozal), no requiere fertilización (los humedales tropicales son sistemas naturalmente fértiles + cianobacterias fijadoras N libres-Azolla-Anabaena en agua), asocio tradicional con arroz acuático Oryza sativa y peces tilapia-carpa-cachama en policultivo acuático integrado, manejo: drenar el campo las últimas 4-6 semanas antes de cosecha para inducir maduración del tubérculo y facilitar arranque manual, cosecha por excavación manual al drenar la cama, almacenamiento post-cosecha en agua fresca o tierra húmeda 2-4 meses (perecedero), rendimientos 10-25 t/ha cormelos. Función en chagra/huerto escolar tropical-subtropical con disponibilidad hídrica permanente como tubérculo acuático emergente de gastronomía asiática, cultivo de nicho ecológico acuático específico (camas inundables-chinampas-arrozales), lección viva extraordinaria sobre nicho ecológico no negociable, sistemas agrícolas acuáticos asiáticos del arroz, y policultivos acuáticos multiespecíficos integrados (arroz-castaña-taro-tilapia-Azolla). ADVERTENCIA AGRONÓMICA CRÍTICA: incompatible con sistemas de secano — requiere inundación permanente. Fuentes Tier A: NRC 1989 Lost Crops Incas Andes (sección cultivos acuáticos), FAO Ecocrop Eleocharis dulcis, POWO Kew, GBIF Backbone Taxonomy, SIB Colombia."
     }
   ],
   "biopreparados": [
