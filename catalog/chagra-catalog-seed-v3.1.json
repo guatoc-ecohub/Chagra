@@ -7911,11 +7911,14 @@
         "notas": "Germinacion rapida (7-14 dias); se trasplanta a los 30 dias. Nativa de la Amazonia colombiana; crece bien en suelos acidos. Fruto usado en jugos y preparaciones tradicionales."
       },
       "source_ids": [
-        "bernal-2015-plantas-liquenes-colombia",
         "powo-kew",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "sinchi-amazonia-colombiana"
       ],
-      "valor_pedagogico": "Fruto amazonico con alto potencial nutritivo: rico en hierro y vitaminas del complejo B. Ensenia el potencial de especies nativas subutilizadas de la Amazonia colombiana."
+      "valor_pedagogico": "La cocona o tomate amazónico (Solanum sessiliflorum Dunal, familia Solanaceae) es una solanácea arbustiva semi-perenne (1-2.5 m altura) nativa silvestre y domesticada de la cuenca amazónica suroccidental (Colombia, Ecuador, Perú, Brasil), cultivada tradicionalmente por comunidades indígenas amazónicas como cultivo de chagra y frutal subutilizado con altísimo potencial nutricional. Produce frutos globosos a piriformes anaranjado-rojizos (3-7 cm) con pulpa amarilla ácida-aromática rica en hierro (1.5-2.5 mg/100g, hasta 4 veces más que el tomate común), niacina, vitamina B1, B2, ácido fólico, β-caroteno y compuestos fenólicos antioxidantes. Se distribuye en Amazonas (Leticia, Puerto Nariño, La Pedrera, Tarapacá), Vaupés (Mitú, Carurú), Caquetá (Florencia, Solano, Cartagena del Chairá), Putumayo (Mocoa, Puerto Asís, La Hormiga), Guainía (Puerto Inírida), Guaviare (San José) entre 50 y 400 msnm en zona térmica cálida húmeda. Ciclo bienal a semi-perenne, primera cosecha 6-10 meses, productividad sostenida 2-3 años. Rendimientos 15-30 t/ha fruto fresco. Lección viva: fruto amazónico con alto potencial nutritivo subutilizado, enseñando el potencial de especies nativas neotropicales subutilizadas (NUS — Neglected and Underutilized Species, FAO) en la seguridad alimentaria de regiones tropicales, su rol en la chagra indígena amazónica (Tikuna, Yagua, Cocama, Witoto, Murui, Bora) como cultivo complementario a la yuca brava (Manihot esculenta), y su valor en la fortificación nutricional natural por su excepcional contenido de hierro biodisponible (clave en lucha contra anemia infantil amazónica). Manejo agroecológico: propagación por semilla con germinación rápida 7-14 días, trasplante a campo a los 30-45 días con sustrato rico en materia orgánica, asocio en chagra con yuca, plátano, piña, achiote (Bixa orellana) y guama (Inga edulis) como sombra parcial, tolerancia a suelos ácidos (pH 4.5-6) típicos de oxisoles amazónicos, no requiere fertilización química, control biológico de mosca del fruto (Anastrepha spp.) con trampas. Fuentes Tier A: SINCHI Amazonia Colombiana, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia."
     },
     {
       "id": "renealmia_alpinia",
@@ -7964,11 +7967,15 @@
         "notas": "Propagacion por division de rizomas en sustrato rico en materia organica y humedo. Crece en sotobosque de selvas tropicales. Frutos usados como colorante natural y sus hojas en infusion medicinal."
       },
       "source_ids": [
-        "bernal-2015-plantas-liquenes-colombia",
         "powo-kew",
-        "gbif-taxonomic-backbone"
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "sinchi-amazonia-colombiana",
+        "jbb-plantas-medicinales"
       ],
-      "valor_pedagogico": "Planta del sotobosque tropical con usos medicinales y tintoreos tradicionales. Ensenia el conocimiento botanico de las comunidades afrocolombianas del Pacifico y su relacion con el bosque humedo."
+      "valor_pedagogico": "La piña piña o matandrea (Renealmia alpinia (Rottb.) Maas, familia Zingiberaceae) es una zingiberácea herbácea perenne rizomatosa robusta (1.5-3 m altura) nativa silvestre del Neotrópico húmedo (Caribe, Mesoamérica, norte de Sudamérica), distribuida en sotobosques de selva tropical húmeda, bordes de quebradas y zonas ribereñas del trópico húmedo colombiano. Produce hojas elípticas lanceoladas con vaina ciliada y filotaxia dística (rasgo diagnóstico Zingiberaceae frente a Costaceae), inflorescencias en panícula basal terminal con brácteas escarlatas y flores tubulares amarillas, y frutos globosos rojo-anaranjados con pulpa-arilo morado oscuro rica en antocianinas (cianidina-3-rutinósido, peonidina) usadas como colorante natural tradicional. Se distribuye en Chocó (Quibdó, Atrato, Bajo Baudó, Bahía Solano, Nuquí), Valle del Cauca (Buenaventura, Bajo Calima, Anchicayá), Cauca (Guapi, Timbiquí, López), Nariño (Tumaco, Olaya Herrera), Amazonas (Leticia, Puerto Nariño), Vaupés, Caquetá, Putumayo y Magdalena medio bajo entre 50 y 400 msnm en zona térmica cálida húmeda con sombra parcial a alta. Ciclo perenne, floración bianual en clima húmedo estable. Lección viva: planta del sotobosque tropical húmedo con usos medicinales (infusión foliar antiinflamatoria, decocción rizomatosa para cólicos) y tintóreos tradicionales (colorante natural morado-rojo para tejidos artesanales, alimentos, cestería), enseñando el conocimiento botánico de las comunidades afrocolombianas e indígenas del Pacífico y Amazonia y su relación profunda con el bosque húmedo como farmacopea, despensa y proveedor de servicios bioculturales. Manejo agroecológico: propagación por división de rizomas con yemas activas en sustrato rico en materia orgánica y humedad alta sostenida, tolerancia a sombra parcial 60-80% (sotobosque), asocio en sistemas agroforestales con cacao, plátano, açaí y heliconias, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia, SINCHI Amazonia Colombiana."
     },
     {
       "id": "ipomoea_batatas_blanca",
@@ -8008,9 +8015,13 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "bernal-2015-plantas-liquenes-colombia",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Variedad de batata de pulpa blanca que muestra la diversidad intraespecifica de este cultivo global. Ensenia seleccion varietal por textura y contenido de almidon."
+      "valor_pedagogico": "La batata blanca (Ipomoea batatas (L.) Lam. cv. blanca, familia Convolvulaceae) es una variedad cultivar de batata o camote de pulpa blanca a crema y textura harinosa, parte de la diversidad intraespecífica del complejo Ipomoea batatas domesticado hace ~5.000 años en Centroamérica y Sudamérica precolombina y aclimatado a sistemas campesinos colombianos de clima cálido a templado-cálido. La variedad blanca contiene 25-30% almidón fresco (mayor que las variedades naranjas), menor concentración de β-caroteno y mayor proporción de fibra dietaria, prefiriéndose para preparaciones culinarias saladas (fritos, sopas, sancocho costeño, bollos campesinos) y frituras industriales. Se cultiva en Caribe colombiano (Bolívar, Córdoba, Sucre, Magdalena), Tolima (Lérida, Armero, Ibagué), Huila (Garzón, Pitalito), Valle del Cauca, Cauca, Antioquia (Urabá, Magdalena medio), Eje cafetero bajo y Cundinamarca (Mesa, Mesitas) entre 800 y 2.000 msnm en zona térmica cálida a templada. Ciclo 4-6 meses desde siembra a cosecha. Rendimientos 15-25 t/ha tubérculo. Lección viva: variedad de batata de pulpa blanca que muestra la diversidad intraespecífica de este cultivo global (más de 7.000 cultivares documentados a nivel mundial), enseñando selección varietal por textura, contenido de almidón, color de pulpa y aptitud culinaria, y la importancia de la conservación in situ del germoplasma campesino frente a la erosión genética por estandarización comercial. Manejo agroecológico: propagación por esquejes de tallo con 4-6 nudos (no por tubérculo-semilla en este cultivar), siembra en camas elevadas (camellones) a 30 cm entre plantas, asocio con maíz y fríjol en milpa tropical, cosecha rotacional, baja demanda nutricional (raíces eficientes en absorción de P y K), no requiere agroquímicos. Fuentes Tier A: AGROSAVIA Manual Tubérculos, POWO Kew, GBIF Backbone Taxonomy, ICA Resolución 3168/2015, Bernal 2015 Catálogo Plantas Colombia."
     },
     {
       "id": "ipomoea_batatas_morada",
@@ -8050,9 +8061,13 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "bernal-2015-plantas-liquenes-colombia",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Variedad de batata de pulpa morada: leccion de fitoquimica que muestra como las antocianinas actuan como potentes antioxidantes en la dieta y como pigmentos naturales."
+      "valor_pedagogico": "La batata morada o boniato morado (Ipomoea batatas (L.) Lam. cv. morada, familia Convolvulaceae) es una variedad cultivar de batata o camote de pulpa morada intensa rica en antocianinas, parte de la diversidad intraespecífica del complejo Ipomoea batatas domesticado hace ~5.000 años en Centroamérica y Sudamérica precolombina y conservado en sistemas campesinos colombianos como variedad nativa de la Costa Caribe, Magdalena medio y Eje cafetero bajo. La variedad morada concentra 200-600 mg antocianinas/100g pulpa fresca (cianidina-3-sophorósido y peonidina-3-sophorósido principalmente), polifenoles, ácido clorogénico y β-caroteno secundario, con potente actividad antioxidante in vitro 3-5 veces mayor que arándanos y propiedades antiinflamatorias y cardioprotectoras documentadas. Se cultiva en Caribe colombiano (Bolívar, Córdoba, Sucre, Magdalena, Atlántico), Antioquia (Urabá, Magdalena medio), Valle del Cauca, Cauca, Tolima, Huila, Eje cafetero bajo y Cundinamarca caliente (Mesa, Mesitas, Tocaima) entre 800 y 2.000 msnm en zona térmica cálida a templada. Ciclo 4-6 meses desde siembra a cosecha. Rendimientos 12-22 t/ha tubérculo. Lección viva de fitoquímica aplicada: variedad de batata de pulpa morada que muestra cómo las antocianinas actúan como potentes antioxidantes en la dieta (acción anti-radical libre, hepatoprotectora, antitumoral en estudios preclínicos) y como pigmentos naturales (color que se intensifica con exposición solar durante el desarrollo de la raíz por estímulo lumínico de la vía de los fenilpropanoides), enseñando bioquímica vegetal aplicada y valoración nutricional de variedades campesinas frente a comerciales estandarizadas. Manejo agroecológico: propagación por esquejes de tallo, siembra en camellones, asocio con maíz, fríjol y plátano enano, exposición solar plena para máxima síntesis de antocianinas, no requiere agroquímicos. Fuentes Tier A: AGROSAVIA Manual Tubérculos, POWO Kew, GBIF Backbone Taxonomy, ICA Resolución 3168/2015, Bernal 2015 Catálogo Plantas Colombia."
     },
     {
       "id": "pachyrhizus_erosus",
@@ -8092,9 +8107,13 @@
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
-        "sib-colombia"
+        "gbif-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "sib-colombia",
+        "agrosavia-leguminosas-andinas",
+        "agrosavia-tibaitata"
       ],
-      "valor_pedagogico": "Leccion de toxicidad selectiva: la jicama ensena que en una misma planta, partes comestibles y toxicas pueden coexistir. La rotenona de sus semillas es un insecticida natural tradicional."
+      "valor_pedagogico": "La jícama o nabo mexicano (Pachyrhizus erosus (L.) Urb., familia Fabaceae, subfamilia Faboideae) es una fabácea anual a bienal herbácea trepadora vigorosa originaria de Mesoamérica (México central, Guatemala) y aclimatada en sistemas campesinos tropicales colombianos por su raíz pivotante tuberizada globosa-piriforme (15-30 cm diámetro, 1-3 kg peso) de piel parda y pulpa blanca crocante dulce-acuosa rica en carbohidratos solubles (azúcares simples, oligofructanos prebióticos), agua (85-90%) y vitamina C, consumida fresca como fruta-hortaliza. Se cultiva en Caribe colombiano (Magdalena, Bolívar, Atlántico, Sucre), Antioquia (Urabá, Magdalena medio), Valle del Cauca (zonas bajas), Tolima, Huila, Santander (Magdalena medio), Eje cafetero bajo y zonas tropicales bajas entre 500 y 1.500 msnm en zona térmica cálida a templada. Ciclo 6-9 meses desde siembra a cosecha. Rendimientos 20-35 t/ha raíz fresca. Lección viva de toxicidad selectiva y separación de aprovechamiento: la jícama enseña que en una misma planta, partes comestibles (raíz tuberosa) y partes tóxicas (semillas, vainas verdes y flores) pueden coexistir como adaptación evolutiva de defensa diferencial, donde las semillas y vainas contienen rotenona (5-10% peso seco), pterocarpina y otras isoflavonoides — la rotenona es un insecticida natural tradicional usado por comunidades campesinas en macerados acuosos contra plagas hortícolas (Aphis spp., Bemisia tabaci, Plutella xylostella) y como pesticida orgánico certificado, principio bioactivo del insecticida natural derris-rotenona usado históricamente. Manejo agroecológico: propagación por semilla viable un año, siembra a 30-50 cm entre plantas con tutorado obligatorio (espaldera, tutor vivo de maíz), cosecha de raíz antes de floración para máximo desarrollo de tubérculo, las flores deben removerse (despunte) para concentrar fotosíntatos en raíz, manejo cuidadoso de semillas y vainas en almacén (rotuladas como tóxicas), no consumir vaina verde. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia, AGROSAVIA."
     },
     {
       "id": "raphanus_sativus_longipinnatus",
