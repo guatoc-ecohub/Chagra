@@ -25810,6 +25810,1356 @@
         "jbb-plantas-medicinales"
       ],
       "valor_pedagogico": "El bálsamo del Perú (Myroxylon balsamum var. pereirae (Royle) Harms, familia Fabaceae) es un árbol perennifolio de gran porte (15-30 m altura) leguminoso, fijador biológico de nitrógeno, nativo de Mesoamérica y norte de Sudamérica (El Salvador, Honduras, Nicaragua, Costa Rica, Panamá, norte de Colombia: Caribe, Magdalena medio, Magdalena bajo, piedemonte del Catatumbo). El nombre popular \"del Perú\" es uno de los errores históricos más curiosos del comercio colonial — la resina NO es peruana, sino centroamericana-norandina, pero los comerciantes coloniales españoles la embarcaban hacia Europa desde el puerto del Callao (Perú) por las rutas marítimas del Pacífico, y los compradores europeos asumieron erróneamente que la planta era peruana. Es planta hermana botánica del bálsamo de Tolú (M. balsamum var. balsamum, que SÍ es colombiano-tolimense con resina distinta) — comparten género y morfología pero difieren en la composición de la resina: el bálsamo del Perú es más oscuro, más aromático (cinamato de bencilo, benzoato de bencilo, vainillina, ácido cinámico, ácido benzoico) y más viscoso; el bálsamo de Tolú es más claro y más resinoso (ácido toluico, esteres del ácido benzoico). Ha sido producto medicinal-cosmético-ritual de gran importancia desde tiempos precolombinos en Mesoamérica (cultura maya, náhuatl-azteca — \"xochicotzotl\", usado en rituales y como antiséptico de heridas) y se exportaba a Europa desde el siglo XVI como medicamento de heridas (aún hoy es ingrediente reconocido en farmacopeas europeas como antiséptico y cicatrizante tópico). En Colombia se distribuye nativa-naturalizada en bosque seco tropical y bosque húmedo bajo del Caribe (Bolívar, Sucre, Magdalena, La Guajira semihúmeda), Magdalena medio (Antioquia, Santander), Catatumbo (Norte de Santander) y piedemonte del Magdalena bajo entre 0 y 1.800 msnm. Lección viva sobre BOTÁNICA SISTEMÁTICA, HISTORIA DEL COMERCIO COLONIAL DE RESINAS, PARES BOTÁNICOS HERMANOS y AGROFORESTERÍA MEDICINAL: el par botánico M. balsamum var. balsamum (Tolú) vs M. balsamum var. pereirae (Perú) es ejemplo perfecto de cómo dos variedades de la misma especie pueden tener perfiles bioquímicos distintos por adaptación local y deriva genética, y de cómo el nombre popular puede engañar geográficamente (bálsamo \"del Perú\" no es peruano, igual que el \"guayacán de Manizales\" no es manizalita, el \"café arábigo\" no es de Arabia, el \"Hawaiian baby woodrose\" no es hawaiana, etc.). Aplicaciones modernas: antiséptico cicatrizante tópico (formulaciones farmacéuticas reconocidas — INVIMA), ingrediente cosmético en perfumería de lujo (notas balsámicas-resinosas en perfumes orientales), fragancia ritual en sincretismo afrocaribe. Manejo agroecológico: árbol leguminoso fijador de N (30-50 kg/ha/año), excelente para sistemas agroforestales del Caribe colombiano y Magdalena medio en asocio con cacao, café, plátano hartón y leguminosas pioneras; restauración de bosque seco tropical; espaciamiento 8x8 m en producción; cosecha de resina por incisión cuidadosa NO destructiva tras 15-25 años de establecimiento. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, FAO EcoCrop, Bernal 2015 Catálogo Plantas Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia, JBB Plantas Medicinales."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH40_ARBOLES_NATIVOS_CALIDO",
+      "id": "attalea_speciosa",
+      "nombre_comun": "Babassú",
+      "nombre_comunes_regionales": [
+        "babasú",
+        "palma babasú",
+        "cusi",
+        "motacú-babasú",
+        "aguassú"
+      ],
+      "nombre_cientifico": "Attalea speciosa Mart. ex Spreng.",
+      "familia_botanica": "Arecaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "habito": "palma arborescente monoica solitaria, 15-30 m de altura, estípite robusto, hojas pinnadas grandes 7-10 m",
+      "origen": "Sudamérica tropical (Amazonía baja brasileña, peruana, colombiana —Amazonas, Caquetá, Putumayo, Vaupés—, Bolivia, norte Mato Grosso); palma de hábitats abiertos y secundarios de bosque húmedo tropical bajo (<800 msnm)",
+      "roles_in_guild": [
+        "biomass_producer",
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "normativa_colombiana": "Nativa silvestre del piso cálido amazónico colombiano (<800 msnm); palma de uso múltiple custodia de comunidades indígenas (Tikuna, Uitoto, Murui-Muinane, Bora) y campesino-ribereñas del trapecio amazónico. NO listada en libros rojos. Aprovechamiento sostenible permitido bajo planes de manejo comunitario.",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 600,
+        "max_absoluto": 900
+      },
+      "temperatura_c": {
+        "helada_letal": 12,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 85,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Propagación exclusiva por semilla. Endocarpo extremadamente duro requiere escarificación mecánica o fuego de campo (manejo indígena tradicional). Germinación lenta 6-18 meses. Trasplante a bolsa grande (5-10 L) a los 12 meses. Plantación definitiva a los 24 meses (40-60 cm). Crecimiento juvenil 0.5-1 m/año, productivo desde los 8-12 años.",
+        "tiempo_a_establecimiento_dias": 365,
+        "notas": "Palma multiusos: aceite del mesocarpo y endospermo (similar al coco), fibra del raquis, hojas para techar malocas, palmito comestible (caulinar destructivo, evitar), endocarpo como carbón vegetal de altísima calidad calorífica."
+      },
+      "scale_viability": [
+        "produccion",
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "produccion": {
+          "viable": true,
+          "nota": "Cultivable en sistemas agroforestales amazónicos como palma de uso múltiple. Densidad baja 100-200 ind/ha intercalada con cacao, copoazú, açaí.",
+          "tips": [
+            "Asocio con Theobroma cacao y T. grandiflorum",
+            "Cosecha racimos anuales por escalada",
+            "Procesamiento aceite mesocarpo + endospermo"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Pionera de claros y bordes en bosque húmedo amazónico bajo; tolera fuego y suelos pobres.",
+          "tips": [
+            "Plantación 80-150 ind/ha en mosaicos restaurativos",
+            "Asocio con Inga y Cecropia pioneras"
+          ]
+        }
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "sinchi-amazonia-colombiana",
+        "bernal-2015-plantas-liquenes-colombia",
+        "fao-ecocrop"
+      ],
+      "valor_pedagogico": "El babasú (Attalea speciosa Mart. ex Spreng., familia Arecaceae) es una palma monoica solitaria robusta de 15-30 m de altura con hojas pinnadas erectas-arqueadas de 7-10 m, nativa de la Amazonía baja sudamericana (Brasil norte, Bolivia, Perú, Colombia: Amazonas, Caquetá, Putumayo, Vaupés, Guainía) en piso térmico CÁLIDO bajo 0-900 msnm. En Colombia es palma custodia de las comunidades indígenas amazónicas (Tikuna, Uitoto, Murui-Muinane, Bora, Yagua, Kokama) y campesino-ribereñas del trapecio amazónico, quienes la aprovechan integralmente: aceite del mesocarpo (cocción, jabonería, cosmética artesanal) y endospermo (similar al coco, alimenticio), fibra del raquis y peciolos (cuerda, cestería, escoba), hojas pinnadas para techar malocas indígenas (durabilidad 6-10 años), endocarpo durísimo como carbón vegetal de altísimo poder calorífico (mejor que carbón de Eucalyptus en termo-economía amazónica) o como cuentas-bisutería, palmito caulinar comestible (cosecha destructiva, desaconsejada salvo manejo). Hábitat preferente: bosque húmedo tropical bajo amazónico, claros y bordes de bosque secundario, vegas de río Amazonas-Caquetá-Putumayo, suelos arenosos a arcillosos bien drenados con alta precipitación (2.500-4.000 mm/año), tolerancia notable al fuego (rebrota desde el estipíte enterrado tras quemas controladas indígenas — manejo ancestral que mantiene poblaciones productivas). Palma pionera de claros: coloniza activamente claros de bosque por aves dispersoras (loros, guacamayos) y mamíferos (agutí, danta, sahíno) que entierran los frutos como caché. Su nombre \"babasú\" proviene del tupí-guaraní \"ybá-uasú\" (fruto grande) y se ha extendido al castellano amazónico. Manejo agroecológico amazónico: densidad 80-200 ind/ha en sistemas agroforestales multiestrato con cacao (Theobroma cacao), copoazú (T. grandiflorum), açaí (Euterpe oleracea), guaraná (Paullinia cupana), inga (Inga spp.) y plátano hartón; cosecha de racimos por escalada manual una vez al año (60-90 kg/racimo); procesamiento de aceite por presión en frío del mesocarpo y endospermo (rendimiento 50-70 L/ha/año en plantaciones manejadas); restauración pasiva en mosaicos de bosque secundario. Lección viva sobre PALMAS MULTIUSO AMAZÓNICAS, ECOLOGÍA DEL FUEGO en bosques pluviales, MANEJO INDÍGENA SOSTENIBLE de palmas amazónicas, y SOBERANÍA OLEAGINOSA AMAZÓNICA: el babasú es alternativa nativa al cultivo industrial de palma africana (Elaeis guineensis) — mismo perfil oleaginoso pero sin deforestación, en sistemas agroforestales y no en monocultivo, custodiada por comunidades indígenas y no por empresas agroexportadoras. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, SINCHI Amazonía Colombiana, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, FAO EcoCrop.",
+      "rol_ecologico": "Palma multiestrato del bosque húmedo amazónico bajo. Pionera de claros y sucesión secundaria; tolera fuego (rebrote desde estipíte). Provee aceite-fibra-techo-carbón a comunidades indígenas amazónicas. Hospeda fauna palmícola (loros guacamayos, agutíes, dantas, escarabajos Rhynchophorus). Sus racimos pueden pesar 60-90 kg."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH40_ARBOLES_NATIVOS_CALIDO",
+      "id": "pseudobombax_septenatum",
+      "nombre_comun": "Ceiba bonga",
+      "nombre_comunes_regionales": [
+        "barrigón",
+        "ceiba verde",
+        "majagua de árbol",
+        "majaguillo",
+        "bonga"
+      ],
+      "nombre_cientifico": "Pseudobombax septenatum (Jacq.) Dugand",
+      "familia_botanica": "Malvaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "habito": "árbol caducifolio 18-30 m con tronco verde fotosintético notablemente abombado-conoidal en la base (caudex de reserva)",
+      "origen": "Mesoamérica-norte de Sudamérica (Costa Rica, Panamá, Colombia Caribe-Pacífico-Magdalena, Venezuela, Ecuador occidental); típica del bosque seco tropical y bosque húmedo tropical bajo del Caribe colombiano y Pacífico norte",
+      "roles_in_guild": [
+        "biomass_producer",
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "normativa_colombiana": "Nativa silvestre del bosque seco tropical (bs-T) del Caribe colombiano (Bolívar, Sucre, Córdoba, Cesar, Magdalena, La Guajira sur) y bosque húmedo tropical bajo del Pacífico norte (Chocó, Valle, Cauca) y valle medio del Magdalena. NO en libro rojo individual pero su ecosistema (bs-T) está catalogado en peligro crítico — protección por habitat. Tala y aprovechamiento de individuos en bs-T requieren permiso CAR.",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 800,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 10,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 38
+      },
+      "humedad_relativa_pct": {
+        "min": 50,
+        "optimo": 75,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla",
+          "esqueje"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semillas dentro de cápsulas dehiscentes con lana algodonosa kapok (similar a Ceiba). Recolección de cápsulas maduras antes de la dehiscencia explosiva. Sin tratamiento pre-germinativo. Germinación rápida 7-15 días en bandejas con sustrato arenoso. Esquejes-estacas gruesas (>5 cm diámetro) enraízan en estación lluviosa para cercas vivas. Crecimiento juvenil rápido 1.5-3 m/año.",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "Tronco verde fotosintético en juveniles permite continuidad de fotosíntesis durante caducifolia estacional. Caudex conoidal almacena reservas de agua para estación seca extrema (mecanismo xerofítico clave en bs-T)."
+      },
+      "scale_viability": [
+        "produccion",
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío en sistemas agroforestales del bs-T y bh-T bajo, cercas vivas en potreros del Caribe. Densidad baja 20-50 ind/ha por su porte y caudex.",
+          "tips": [
+            "Cerca viva post-estacas en estación lluviosa",
+            "Sombrío disperso en potreros silvopastoriles",
+            "Floración nocturna polinizada por murciélagos"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave restauración bosque seco tropical y bosque húmedo tropical bajo del Caribe-Pacífico colombiano. Pionera tolerante a estrés hídrico.",
+          "tips": [
+            "Plantación 150-300 ind/ha asociada a Tabebuia, Bursera, Cordia",
+            "Tolerancia notable a fuego de pastizal por corteza gruesa"
+          ]
+        }
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "libro-rojo-plantas-colombia"
+      ],
+      "valor_pedagogico": "La ceiba bonga o barrigón (Pseudobombax septenatum (Jacq.) Dugand, familia Malvaceae —antes Bombacaceae—) es un árbol caducifolio de 18-30 m de altura emblemático del bosque seco tropical (bs-T) y bosque húmedo tropical bajo neotropical, nativa del piso CÁLIDO de Mesoamérica y norte de Sudamérica, distribuida en Colombia en bs-T del Caribe (Bolívar, Sucre, Córdoba, Cesar, Magdalena, La Guajira sur), bosque húmedo tropical bajo del Pacífico norte (Chocó-Darién, Valle, Cauca), valle medio del Magdalena (Antioquia, Santander) y piedemonte del Catatumbo, entre 0 y 1.200 msnm. Su rasgo morfológico inconfundible es el tronco verde fotosintético notablemente abombado-conoidal en la base —un caudex de reserva—, que almacena agua y fotosintetiza durante la caducifolia estacional cuando el árbol pierde todas las hojas y la fotosíntesis caulinar (corteza verde clorofilada) mantiene metabolismo basal. Es una adaptación xerofítica magistral al bs-T donde las estaciones secas pueden durar 6-8 meses con precipitaciones <600 mm anuales concentradas en pulsos. Su nombre genérico \"Pseudobombax\" significa \"falso Bombax\" porque era considerada del género Bombax antes de las revisiones filogenéticas modernas, y \"septenatum\" refiere a sus hojas digitadas-compuestas con típicamente 7 folíolos (digitatum septenatum). La floración ocurre en el período de caducifolia estacional (enero-marzo en el Caribe colombiano), con flores grandes blanco-rosadas de estambres numerosos que abren al atardecer y son polinizadas por murciélagos nectarívoros (Glossophaga soricina, Phyllostomus discolor) en una clase ecológica ejemplar de quiropterofilia. Las cápsulas leñosas dehiscentes liberan semillas envueltas en lana kapok (fibra algodonosa estructuralmente idéntica a la de la ceiba bonga grande Ceiba pentandra), dispersadas por viento. Aprovechamiento tradicional en el Caribe colombiano: tronco para canoas y bateas (madera blanda liviana), fibra kapok para almohadas-colchones-aislantes acústicos artesanales, hojas como forraje seco para ganado en sequía extrema, sombra de potrero, cerca viva por enraizamiento de estacas gruesas (>5 cm) en estación lluviosa. Manejo agroecológico: especie clave de restauración del bs-T (ecosistema catalogado en peligro crítico en Colombia con <8% de cobertura original remanente — ver Pizano & García 2014); siembra por semilla recién cosechada o estacas en sistemas silvopastoriles del Caribe; sombrío disperso 20-50 ind/ha en potreros y cultivos de algodón-tabaco-cacao; restauración de bs-T en mosaicos 150-300 ind/ha asociados a Tabebuia rosea, Bursera simaruba, Cordia alliodora, Gliricidia sepium. Lección viva sobre ADAPTACIONES XEROFÍTICAS (caudex, fotosíntesis caulinar, caducifolia estacional), QUIROPTEROFILIA (polinización por murciélagos), DISPERSIÓN ANEMOCÓRICA (kapok), CONSERVACIÓN DEL BOSQUE SECO TROPICAL (ecosistema en peligro crítico) y FIBRAS NATURALES ARTESANALES (kapok como alternativa local a fibras sintéticas y a algodón industrial). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia, Libro Rojo Plantas Colombia / Pizano & García 2014 bs-T Colombia.",
+      "rol_ecologico": "Árbol emblemático del bosque seco tropical y bosque húmedo tropical bajo neotropical. Floración nocturna espectacular de color blanco-rosado con estambres numerosos (polinización por murciélagos nectarívoros Glossophaga, Phyllostomus). Caudex conoidal almacena agua. Tronco verde fotosintético en juveniles permite carbono asimilación durante caducifolia estacional. Hospeda epífitas, fauna arbórea (pericos, iguanas, perezosos) y semillas con lana kapok dispersadas por viento."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH40_ARBOLES_NATIVOS_CALIDO",
+      "id": "anacardium_excelsum",
+      "nombre_comun": "Caracolí",
+      "nombre_comunes_regionales": [
+        "mijao",
+        "caracol",
+        "espavé",
+        "merey de monte",
+        "caracolí costeño"
+      ],
+      "nombre_cientifico": "Anacardium excelsum (Bertero & Balb. ex Kunth) Skeels",
+      "familia_botanica": "Anacardiaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "habito": "árbol perennifolio gigante 25-45 m con tronco macizo 1-2 m de diámetro, copa amplia umbeliforme",
+      "origen": "Mesoamérica-norte de Sudamérica (Costa Rica, Panamá, Colombia Caribe-Pacífico-Magdalena, Venezuela, Ecuador occidental); típica de vegas de ríos y bosques húmedos tropicales bajos",
+      "roles_in_guild": [
+        "biomass_producer",
+        "nurse_plant",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "normativa_colombiana": "Nativa silvestre y emblemática del piso cálido colombiano (<1.000 msnm). Listada como Vulnerable (VU) en algunas regionales por sobreexplotación maderera (madera caracolí muy apreciada para construcción y mueblería rústica costeña). Aprovechamiento maderable de individuos >40 cm DAP requiere permiso CAR. Especie protegida en áreas de manejo en Cesar, Antioquia y Chocó.",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 800,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 12,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 85,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla riñoniforme grande (similar al marañón A. occidentale pero más pequeña) dentro de pseudofruto carnoso. Sin tratamiento pre-germinativo. Germinación 60-80% a 20-40 días en bandejas con sustrato orgánico bien drenado. Trasplante a bolsa grande 3-5 L a las 8 semanas. Plantación definitiva a los 5-7 meses (40-60 cm). Crecimiento juvenil 1.5-2.5 m/año en condiciones óptimas. Productivo de semilla desde los 8-12 años.",
+        "tiempo_a_establecimiento_dias": 150,
+        "notas": "Madera caracolí color crema-rosado muy apreciada en mueblería costeña (lockerías, ventanería, marcos, cajonería). Goma-resina (similar a almáciga) usable como sellador artesanal. Cuidado: savia y polen pueden generar dermatitis de contacto en personas sensibles (familia Anacardiaceae igual que mango y marañón)."
+      },
+      "scale_viability": [
+        "produccion",
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío disperso en sistemas agroforestales 20-40 ind/ha. Madera-cebado de larvas comestibles en algunas culturas indígenas chocoanas (Embera, Wounaan).",
+          "tips": [
+            "Plantar a >12 m de construcciones (raíz extensa)",
+            "Asocio con cacao y caucho",
+            "Cosecha de madera turno 30-45 años"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave restauración bosque húmedo tropical bajo y vegas de río Atrato-Magdalena-Cauca-Sinú. Tolerante a inundación temporal.",
+          "tips": [
+            "Plantación 100-200 ind/ha en mosaicos restaurativos",
+            "Pionera secundaria tardía",
+            "Refugio de fauna (perezosos, monos aulladores, iguanas, tucanes)"
+          ]
+        }
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "libro-rojo-plantas-colombia"
+      ],
+      "valor_pedagogico": "El caracolí (Anacardium excelsum (Bertero & Balb. ex Kunth) Skeels, familia Anacardiaceae) es uno de los árboles GIGANTES más emblemáticos del bosque húmedo tropical bajo y vegas de río neotropical, nativo del piso CÁLIDO de Mesoamérica y norte de Sudamérica, distribuido en Colombia en bosques húmedos tropicales del Caribe (Antioquia norte, Córdoba, Sucre, Bolívar, Magdalena, Cesar piedemonte), Pacífico (Chocó, Valle, Cauca), Magdalena medio (Antioquia, Santander, Bolívar sur, Cesar bajo) y bajo Catatumbo (Norte de Santander) entre 0 y 1.200 msnm. Es un árbol perennifolio gigante de 25 hasta 45 m de altura con tronco macizo de 1-2 m de diámetro y copa amplia umbeliforme inconfundible que domina el dosel y el sotosobredosel (emergente). Pariente botánico cercano del marañón cultivado (Anacardium occidentale) y del mango (Mangifera indica) — todos de la familia Anacardiaceae con savia resinosa potencialmente irritante (urushiol-related). Custodia de las vegas de los grandes ríos del Caribe-Magdalena: Río Atrato (custodios Embera-Wounaan en Chocó), Río Sinú (custodios Zenú en Córdoba-Sucre), Río Magdalena (custodios afrocolombianos del Magdalena medio y bajo), Río Cauca (custodios afrocolombianos del Cauca medio), Río San Jorge (Zenú), Río León y Atrato bajo (Wounaan-Cuna), Río Patía (afrocolombianos). Producto: madera color crema-rosado de densidad media (0.4-0.5 g/cm³) y excelente trabajabilidad, muy apreciada en mueblería costeña tradicional (lockerías, ventanería, marcos, cajonería, embalaje), construcción rural y artesanía; pseudofruto carnoso comestible (similar al marañón pero más pequeño y astringente) con semilla riñoniforme tostable como el marañón pero con menor rendimiento; goma-resina (similar a almáciga) usable como sellador artesanal; floración melífera importante para apicultura costeña. Hospeda fauna del dosel: perezosos de tres dedos (Bradypus variegatus), monos aulladores rojos (Alouatta seniculus) y tití cabeciblanco (Saguinus oedipus) en su rango Caribe, iguanas verdes (Iguana iguana), tucanes pichí (Pteroglossus torquatus), guacharos (Steatornis caripensis) en cuevas asociadas. La sobreexplotación maderera histórica (1900-1990) redujo las poblaciones >50% en algunas regionales — listada Vulnerable (VU) en libros rojos regionales (Antioquia, Cesar). Manejo agroecológico: sombrío disperso 20-40 ind/ha en sistemas agroforestales de cacao-caucho-plátano del Caribe-Pacífico, plantación a >12 m de construcciones por raíz extensa y porte, asocio con caucho (Hevea brasiliensis), cacao (Theobroma cacao), copoazú, palma chontaduro (Bactris gasipaes); restauración de vegas de río 100-200 ind/ha en mosaicos con palma real (Attalea butyracea), ceiba (Ceiba pentandra), guácimo (Guazuma ulmifolia), níspero (Manilkara zapota); turno maderable 30-45 años a diámetros >50 cm. Lección viva sobre ÁRBOLES GIGANTES EMERGENTES del bosque húmedo tropical bajo, ECOLOGÍA DE VEGAS DE RÍO (riparian forest), HOSPEDAJE DE FAUNA ARBÓREA (perezosos, monos aulladores, tucanes), CUSTODIA INDÍGENA-AFROCOLOMBIANA del paisaje rivereño y SOBERANÍA MADERERA NATIVA frente a maderas tropicales asiáticas importadas. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia, Libro Rojo Plantas Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH40_ARBOLES_NATIVOS_CALIDO",
+      "id": "inga_alba",
+      "nombre_comun": "Guabilla blanca",
+      "nombre_comunes_regionales": [
+        "guamo blanco",
+        "guabilla",
+        "guama de mico",
+        "guabo amazónico"
+      ],
+      "nombre_cientifico": "Inga alba (Sw.) Willd.",
+      "familia_botanica": "Fabaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "habito": "árbol perennifolio mediano 15-25 m, copa redondeada-extendida, raquis foliar alado característico",
+      "origen": "Sudamérica tropical (Amazonía colombiana, peruana, ecuatoriana, brasileña, boliviana; Guayanas; Caribe insular menor); típica del bosque húmedo tropical bajo amazónico y vegas de río",
+      "roles_in_guild": [
+        "nitrogen_fixer",
+        "biomass_producer",
+        "nurse_plant",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "normativa_colombiana": "Nativa silvestre del piso cálido amazónico colombiano (<800 msnm); especie cultivada y semicultivada por comunidades indígenas amazónicas (Tikuna, Yagua, Bora, Uitoto, Murui-Muinane) como sombrío para cacao silvestre, copoazú y huertos selváticos. NO en libro rojo. Aprovechamiento doméstico permitido sin restricción.",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 700,
+        "max_absoluto": 1100
+      },
+      "temperatura_c": {
+        "helada_letal": 14,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 85,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla recalcitrante (no tolera deshidratación): siembra inmediata post-cosecha. Vainas pubescentes con pulpa algodonosa dulce alrededor de semillas grandes. Germinación rápida 7-15 días en bandejas. Trasplante a bolsa 1-2 L a las 4 semanas. Plantación definitiva a los 3-4 meses (30-50 cm). Crecimiento juvenil 1.5-2 m/año. Fijación biológica de N (30-50 kg/ha/año) desde año 2.",
+        "tiempo_a_establecimiento_dias": 90,
+        "notas": "Pulpa algodonosa dulce comestible (similar a guamo I. edulis pero más pequeña). Hojarasca rica en N excelente para fertilización de suelos amazónicos pobres."
+      },
+      "scale_viability": [
+        "produccion",
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío clásico para cacao silvestre, copoazú, café amazónico de altura baja y huertos selváticos indígenas. Densidad 100-300 ind/ha.",
+          "tips": [
+            "Asocio con Theobroma cacao y T. grandiflorum",
+            "Poda anual para hojarasca de fertilización",
+            "Cosecha vainas dulces como snack infantil"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Pionera leguminosa fijadora de N apta para restauración acelerada de bosque húmedo tropical bajo amazónico tras tala-quema (sucesión secundaria).",
+          "tips": [
+            "Plantación 300-600 ind/ha en mosaicos restaurativos",
+            "Asocio con Cecropia y Ochroma pioneras",
+            "Recuperación de suelos degradados"
+          ]
+        }
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "sinchi-amazonia-colombiana",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "La guabilla blanca o guamo blanco amazónico (Inga alba (Sw.) Willd., familia Fabaceae subfamilia Mimosoideae) es un árbol perennifolio mediano de 15-25 m de altura con copa redondeada-extendida y raquis foliar alado característico (alas membranosas que conectan los pares de folíolos opuestos, rasgo diagnóstico del subgénero Inga sensu stricto), nativo del bosque húmedo tropical bajo amazónico y vegas de río de Sudamérica tropical (Amazonía colombiana, peruana, ecuatoriana, brasileña, boliviana, Guayanas) en piso térmico CÁLIDO 0-1.100 msnm. En Colombia se distribuye en la Amazonía baja (Amazonas, Caquetá bajo, Putumayo bajo, Vaupés, Guainía, Guaviare), piedemonte amazónico y vegas de los ríos Amazonas, Caquetá, Putumayo, Apaporis, Vaupés. Es una de las decenas de especies del género Inga —el más diverso de árboles leguminosos neotropicales con cerca de 300 especies, todas FIJADORAS BIOLÓGICAS DE NITRÓGENO en simbiosis con Rhizobium del suelo— que las comunidades indígenas amazónicas custodian y aprovechan integralmente como sombrío para cacao silvestre, copoazú, chocolatillo, café amazónico, y huertos selváticos multiestrato (chagra amazónica tradicional). El género Inga es columna vertebral de la agroforestería amazónica tradicional: las hojas pinnadas grandes producen hojarasca densa rica en N (30-50 kg/ha/año al suelo) que fertiliza biológicamente cultivos asociados; las vainas largas (5-15 cm) cilíndricas pubescentes contienen semillas grandes envueltas en pulpa algodonosa dulce comestible —de ahí el nombre vulgar \"ice-cream-bean\" en inglés, \"guama de helado\"— consumida como snack por niños amazónicos. El epíteto \"alba\" se refiere a la corteza blanquecina-clara diagnóstica que la distingue de la guama común I. edulis (corteza más oscura) y de la guama de mico I. spectabilis. Custodios: pueblos indígenas Tikuna del trapecio amazónico, Yagua, Bora, Uitoto, Murui-Muinane, Yucuna, Tanimuka del medio-bajo Caquetá-Apaporis-Vaupés, campesino-ribereños del eje Leticia-Caballococha-Iquitos. Manejo agroecológico amazónico: vivero a sombra parcial (sustrato orgánico amazónico bien drenado), plantación definitiva por semilla recalcitrante inmediata (no tolera deshidratación), densidad 100-300 ind/ha como sombrío de cacao silvestre y copoazú, poda anual para producir hojarasca de fertilización in-situ; restauración acelerada de bosque amazónico tras tala-quema (slash-and-burn) con densidad 300-600 ind/ha en mosaicos pioneros junto a Cecropia y Ochroma. Lección viva sobre FIJACIÓN BIOLÓGICA DE NITRÓGENO en leguminosas arbóreas, CHAGRA AMAZÓNICA INDÍGENA (sistema agroforestal multiestrato custodiado por pueblos indígenas), DIVERSIDAD DEL GÉNERO INGA (300 especies neotropicales — más diverso entre árboles leguminosos), HOJARASCA COMO FERTILIZANTE BIOLÓGICO y SOBERANÍA NITROGENADA AGROFORESTAL frente a urea sintética importada. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, SINCHI Amazonía Colombiana, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH40_ARBOLES_NATIVOS_CALIDO",
+      "id": "caryocar_amygdaliferum",
+      "nombre_comun": "Almendrón amazónico",
+      "nombre_comunes_regionales": [
+        "almendro silvestre",
+        "almendro de monte",
+        "cagüi",
+        "pequiá amazónico"
+      ],
+      "nombre_cientifico": "Caryocar amygdaliferum Mutis ex Cav.",
+      "familia_botanica": "Caryocaraceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "habito": "árbol perennifolio gigante 25-40 m con tronco recto cilíndrico, copa amplia, frutos drupáceos grandes con almendra oleaginosa",
+      "origen": "Sudamérica tropical (Amazonía colombiana, peruana, ecuatoriana, brasileña occidental; piedemonte amazónico); típica del bosque húmedo tropical bajo amazónico y orinoquense",
+      "roles_in_guild": [
+        "biomass_producer",
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "normativa_colombiana": "Nativa silvestre del piso cálido amazónico-orinocense colombiano (<1.000 msnm). Especie de uso múltiple custodia de comunidades indígenas amazónicas (Tikuna, Bora, Uitoto, Murui-Muinane, Yucuna) y campesino-ribereñas. NO en libro rojo nacional pero su almendra es producto NTFP (non-timber forest product) emergente en cadenas de valor amazónicas. Aprovechamiento sostenible permitido bajo manejo comunitario.",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 700,
+        "max_absoluto": 1100
+      },
+      "temperatura_c": {
+        "helada_letal": 14,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 85,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla grande dentro de endocarpo leñoso espinoso (pirena) del fruto drupáceo. Despulpado y escarificación mecánica del endocarpo. Germinación lenta 60-120 días en bandejas con sustrato orgánico. Trasplante a bolsa grande 5-10 L a los 4 meses. Plantación definitiva a los 8-12 meses. Crecimiento juvenil 0.8-1.5 m/año. Productivo de fruta desde los 10-15 años.",
+        "tiempo_a_establecimiento_dias": 240,
+        "notas": "Almendra oleaginosa muy rica en grasas (50-65% lípidos) y proteínas (15-20%) — análoga a Bertholletia excelsa (nuez de Brasil) pero menos comercializada. Pulpa carnosa amarillo-anaranjada alrededor del endocarpo comestible cocida (ligeramente astringente cruda)."
+      },
+      "scale_viability": [
+        "produccion",
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "produccion": {
+          "viable": true,
+          "nota": "Especie NTFP emergente en sistemas agroforestales amazónicos. Densidad baja 20-50 ind/ha. Manejo similar a Bertholletia excelsa (nuez de Brasil).",
+          "tips": [
+            "Asocio con copoazú, açaí y palma chontaduro",
+            "Cosecha de frutos caídos en estación lluviosa",
+            "Procesamiento de almendra como alternativa local a nueces importadas"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave restauración bosque húmedo tropical bajo amazónico y orinocense. Refugio de fauna granívora (agutíes, dantas, sahínos, primates).",
+          "tips": [
+            "Plantación 50-100 ind/ha en mosaicos restaurativos",
+            "Asocio con Inga, Ceiba, Hevea silvestres"
+          ]
+        }
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "sinchi-amazonia-colombiana",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El almendrón amazónico o pequiá amazónico (Caryocar amygdaliferum Mutis ex Cav., familia Caryocaraceae) es un árbol perennifolio gigante de 25-40 m de altura con tronco recto cilíndrico y copa amplia, nativo del bosque húmedo tropical bajo de la Amazonía colombiana, peruana, ecuatoriana, brasileña occidental y piedemonte amazónico-orinocense, en piso térmico CÁLIDO 0-1.100 msnm. En Colombia se distribuye en la Amazonía baja (Amazonas, Caquetá bajo, Putumayo bajo, Vaupés, Guainía, Guaviare) y piedemonte amazónico-orinocense. Pertenece a la familia Caryocaraceae —una pequeña familia de árboles oleaginosos neotropicales con ~25 especies en dos géneros (Caryocar y Anthodiscus)— y produce frutos drupáceos grandes (8-12 cm diámetro) con pulpa carnosa amarillo-anaranjada exterior y un endocarpo leñoso espinoso (pirena) que contiene 1-4 semillas-almendra oleaginosas comestibles muy ricas en grasas (50-65% lípidos saturados+insaturados) y proteínas (15-20%) —perfil nutricional análogo a la nuez de Brasil (Bertholletia excelsa) pero menos comercializada y poco conocida fuera de la región amazónica. Es producto NTFP (non-timber forest product) emergente en cadenas de valor de la Amazonía colombiana —pueblos indígenas Tikuna del trapecio amazónico, Bora, Uitoto, Murui-Muinane, Yucuna, Tanimuka del medio-bajo Caquetá-Apaporis-Vaupés, y comunidades campesino-ribereñas del eje Leticia-Puerto Nariño-Caballococha lo cosechan tradicionalmente del bosque silvestre (recolección de frutos caídos en estación lluviosa) y lo consumen tostado, cocido, en pulpa fresca, o procesado como aceite local. El epíteto específico \"amygdaliferum\" significa \"que lleva almendras\" (gr. amygdalon = almendra + lat. ferre = llevar). El fruto carnoso es dispersado naturalmente por agutíes (Dasyprocta fuliginosa), dantas (Tapirus terrestris), sahínos (Pecari tajacu, Tayassu pecari) y primates (mono lanudo Lagothrix lagothricha, churuco Lagothrix lagothricha lugens), animales que entierran los frutos como caché —dispersión zoocórica primaria con tasas de germinación post-paso digestivo. Manejo agroecológico amazónico: cosecha de frutos caídos en estación lluviosa, despulpado y escarificación mecánica del endocarpo leñoso, germinación lenta en vivero amazónico (60-120 días), plantación definitiva a los 8-12 meses, densidad 20-50 ind/ha en sistemas agroforestales multiestrato amazónicos asociados a copoazú (Theobroma grandiflorum), açaí (Euterpe oleracea), palma chontaduro (Bactris gasipaes), inga (Inga spp.) y plátano hartón; productivo de fruta a los 10-15 años; restauración 50-100 ind/ha en mosaicos del bosque húmedo tropical bajo amazónico. Lección viva sobre OLEAGINOSAS AMAZÓNICAS NATIVAS (alternativa a aceites importados), NTFP COMUNITARIOS (productos forestales no maderables custodiados por pueblos indígenas), DISPERSIÓN ZOOCÓRICA POR FAUNA AMAZÓNICA (agutíes, dantas, sahínos, primates) y SOBERANÍA ALIMENTARIA AMAZÓNICA basada en frutos silvestres del bosque vs. cultivos exógenos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, SINCHI Amazonía Colombiana, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH40_ARBOLES_NATIVOS_CALIDO",
+      "id": "parkia_pendula",
+      "nombre_comun": "Cutimbo",
+      "nombre_comunes_regionales": [
+        "acacia colgante",
+        "visgueiro",
+        "parkia colgante",
+        "ñongo amazónico"
+      ],
+      "nombre_cientifico": "Parkia pendula (Willd.) Benth. ex Walp.",
+      "familia_botanica": "Fabaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "habito": "árbol perennifolio gigante 25-40 m emergente con copa amplia umbeliforme y largas inflorescencias colgantes péndulas globosas",
+      "origen": "Sudamérica tropical (Amazonía colombiana, peruana, ecuatoriana, brasileña, venezolana, Guayanas; trapecio Caribe sur de Panamá); típica del bosque húmedo tropical bajo amazónico y orinocense",
+      "roles_in_guild": [
+        "nitrogen_fixer",
+        "biomass_producer",
+        "nurse_plant",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "normativa_colombiana": "Nativa silvestre del piso cálido amazónico-orinocense colombiano y Pacífico chocoano (<900 msnm). Leguminosa fijadora de N de gran porte. Custodia de comunidades indígenas amazónicas. NO en libro rojo. Aprovechamiento sostenible bajo manejo comunitario.",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 700,
+        "max_absoluto": 1000
+      },
+      "temperatura_c": {
+        "helada_letal": 14,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 85,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla pequeña con tegumento duro: escarificación con agua caliente 80°C 5 min o lijado mecánico. Germinación 70-85% a 15-25 días en bandejas con sustrato arenoso. Trasplante a bolsa 2-3 L a las 6 semanas. Plantación definitiva a los 5-7 meses (40-60 cm). Crecimiento juvenil rápido 1.5-2.5 m/año. Fijación biológica de N (50-80 kg/ha/año) desde año 2.",
+        "tiempo_a_establecimiento_dias": 150,
+        "notas": "Inflorescencias colgantes globosas espectaculares hasta 1 m de largo péndulas, polinizadas por murciélagos nectarívoros. Hojas bipinnadas finas similares a Albizia y Samanea. Hojarasca rica en N para fertilización biológica."
+      },
+      "scale_viability": [
+        "produccion",
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío disperso 20-50 ind/ha en sistemas agroforestales amazónicos y chocoanos. Madera ligera-media para construcción rural.",
+          "tips": [
+            "Asocio con cacao, copoazú y caucho",
+            "Poda de hojarasca años 3-6 para fertilización biológica",
+            "Cerca viva por estaca"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave restauración bosque húmedo tropical bajo amazónico, orinocense y chocoano. Leguminosa pionera fijadora de N.",
+          "tips": [
+            "Plantación 100-200 ind/ha en mosaicos restaurativos",
+            "Asocio con Cecropia, Ochroma, Inga pioneras",
+            "Recuperación de suelos degradados post-tala"
+          ]
+        }
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "sinchi-amazonia-colombiana",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El cutimbo o acacia colgante (Parkia pendula (Willd.) Benth. ex Walp., familia Fabaceae subfamilia Mimosoideae) es un árbol perennifolio gigante emergente de 25-40 m de altura con copa amplia umbeliforme inconfundible —que ocupa el sotosobredosel del bosque amazónico— y largas inflorescencias colgantes péndulas globosas hasta 1 m de longitud, nativo del bosque húmedo tropical bajo amazónico y orinocense neotropical, distribuido en Colombia en la Amazonía baja (Amazonas, Caquetá bajo, Putumayo bajo, Vaupés, Guainía, Guaviare), Orinoquía (piedemonte y bosques de galería del Vichada, Meta, Casanare), y Chocó-Darién (bosque pluvial chocoano), en piso térmico CÁLIDO 0-1.000 msnm. Pertenece al género Parkia —~35 especies pantropicales de leguminosas fijadoras de N con inflorescencias capituladas-péndulas espectaculares— y comparte la quiropterofilia (polinización por murciélagos nectarívoros) característica del grupo. Las inflorescencias globosas péndulas son uno de los rasgos morfológicos más espectaculares del bosque amazónico: cuelgan de pedúnculos largos sobre la copa-dosel, abren al anochecer y son visitadas masivamente por murciélagos nectarívoros (Phyllostomus discolor, Glossophaga soricina, Anoura geoffroyi) en una vista nocturna que ha sido documentada por la cinematografía natural (BBC Planet Earth, National Geographic). Las flores producen néctar abundante en cantidades que pueden generar lluvia de néctar sobre el sotobosque —\"flores que llueven néctar\"— observada por etnobotánicos amazónicos. Custodia de pueblos indígenas amazónicos (Tikuna, Bora, Uitoto, Murui-Muinane, Yucuna, Tanimuka, Sikuani de la Orinoquía, Embera-Wounaan del Chocó) y campesino-ribereños amazónicos que aprovechan la madera de densidad media para construcción rural, las vainas tostadas y molidas (similar al algarrobo) como suplemento proteico y a veces sustituto del café en algunas tradiciones (parientes botánicos cercanos como Parkia speciosa en Asia son cultivados por sus semillas comestibles), y la corteza-resina con usos medicinales tradicionales locales. Manejo agroecológico: vivero con escarificación de semilla (agua caliente 80°C 5 min o lijado mecánico), plantación definitiva a los 5-7 meses, densidad 20-50 ind/ha en sistemas agroforestales multiestrato amazónicos asociados a cacao, copoazú, caucho (Hevea brasiliensis), açaí, palma chontaduro; poda de hojarasca años 3-6 para fertilización biológica in-situ (50-80 kg N/ha/año); restauración 100-200 ind/ha en mosaicos de bosque húmedo tropical bajo amazónico-orinocense-chocoano junto a Cecropia, Ochroma, Inga. Lección viva sobre LEGUMINOSAS ARBÓREAS GIGANTES (Parkia, Albizia, Samanea como columna vertebral nitrogenada del bosque amazónico), QUIROPTEROFILIA AMAZÓNICA, FLORES NOCTURNAS PÉNDULAS, FIJACIÓN BIOLÓGICA DE NITRÓGENO en árboles emergentes, y CHAGRA AMAZÓNICA MULTIESTRATO custodia de comunidades indígenas. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, SINCHI Amazonía Colombiana, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH40_ARBOLES_NATIVOS_CALIDO",
+      "id": "simarouba_amara",
+      "nombre_comun": "Simaruba",
+      "nombre_comunes_regionales": [
+        "simarouba",
+        "palo blanco amazónico",
+        "cedro amargo",
+        "aceituno",
+        "paraíso amargo"
+      ],
+      "nombre_cientifico": "Simarouba amara Aubl.",
+      "familia_botanica": "Simaroubaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "habito": "árbol perennifolio mediano-alto 20-30 m, fuste recto cilíndrico, copa redondeada, corteza con principios amargos medicinales",
+      "origen": "Mesoamérica-norte de Sudamérica (Centroamérica, Colombia: Caribe, Pacífico, Amazonía, Orinoquía; Venezuela, Guayanas, Brasil amazónico, Perú); típica del bosque húmedo tropical bajo y bosques secundarios",
+      "roles_in_guild": [
+        "biomass_producer",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "normativa_colombiana": "Nativa silvestre del piso cálido colombiano (<1.000 msnm). Especie maderable-medicinal de aprovechamiento múltiple. NO en libro rojo. Madera \"palo blanco\" usada en cajonería, contraenchapados y construcción rural. Corteza con principios amargos medicinales (quassinoides) ha sido usada tradicionalmente contra disentería amebiana en medicina tradicional caribe-amazónica.",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 700,
+        "max_absoluto": 1100
+      },
+      "temperatura_c": {
+        "helada_letal": 12,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla dentro de drupa pequeña; despulpado y siembra inmediata. Germinación 60-80% a 20-40 días en bandejas con sustrato orgánico. Trasplante a bolsa 1.5-2 L a las 8 semanas. Plantación definitiva a los 5-6 meses (40-60 cm). Crecimiento juvenil rápido 1.5-2.5 m/año en condiciones óptimas. Pionera secundaria de claros y bordes de bosque.",
+        "tiempo_a_establecimiento_dias": 120,
+        "notas": "Madera blanca-amarillenta liviana (0.35-0.45 g/cm³) para cajonería, contraenchapados, fósforos artesanales, embalaje y construcción rural ligera. Corteza con quassinoides amargos (simaroubina, glaucarubina) con actividad antiprotozoaria documentada contra Entamoeba histolytica."
+      },
+      "scale_viability": [
+        "produccion",
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "produccion": {
+          "viable": true,
+          "nota": "Pionera apta para sistemas agroforestales del Caribe, Pacífico, Amazonía y Orinoquía baja. Densidad 100-200 ind/ha para producción maderable.",
+          "tips": [
+            "Asocio con cacao, café y plátano en piedemonte",
+            "Cosecha maderable turno 15-25 años",
+            "Corteza medicinal cosechable post año 5 sin matar el árbol (parches alternos)"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Pionera secundaria de claros y bordes del bosque húmedo tropical bajo. Especie clave restauración acelerada post-tala.",
+          "tips": [
+            "Plantación 200-400 ind/ha en mosaicos restaurativos",
+            "Asocio con Cecropia y Ochroma pioneras tempranas",
+            "Sucesión secundaria temprana-media"
+          ]
+        }
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "sinchi-amazonia-colombiana",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "jbb-plantas-medicinales"
+      ],
+      "valor_pedagogico": "La simaruba o palo blanco amazónico (Simarouba amara Aubl., familia Simaroubaceae) es un árbol perennifolio mediano-alto de 20-30 m de altura con fuste recto cilíndrico, copa redondeada y corteza con principios amargos medicinales (quassinoides), nativo del bosque húmedo tropical bajo y bosques secundarios neotropicales desde Mesoamérica hasta Bolivia. En Colombia tiene distribución muy amplia en piso térmico CÁLIDO (<1.100 msnm) en bosques húmedos del Caribe (Antioquia norte, Córdoba, Sucre, Bolívar, Magdalena, Cesar piedemonte), Pacífico (Chocó, Valle, Cauca, Nariño), Magdalena medio (Antioquia, Santander, Bolívar sur), Catatumbo (Norte de Santander), Orinoquía piedemonte-galería (Meta, Casanare, Vichada, Arauca) y Amazonía baja (Caquetá, Putumayo, Amazonas, Vaupés, Guainía, Guaviare). Es ÁRBOL DOBLE PROPÓSITO MADERABLE-MEDICINAL: la madera blanca-amarillenta liviana (densidad 0.35-0.45 g/cm³) es muy apreciada en cajonería, contraenchapados, fósforos artesanales, embalaje y construcción rural ligera (sustituye a especies maderables vulnerables); la corteza contiene QUASSINOIDES (simaroubina, glaucarubina, ailantina) —metabolitos secundarios amargos de la familia Simaroubaceae— con actividad antiprotozoaria documentada en literatura farmacéutica contra Entamoeba histolytica (amebiasis intestinal) y Plasmodium falciparum (malaria), usada tradicionalmente por curanderos del Caribe colombiano, Pacífico, Amazonía y Orinoquía como remedio contra disentería amebiana, parasitosis intestinales y fiebres palúdicas (preparación: cocción de corteza picada 30 min en agua, tomar 3 veces/día por 5-7 días bajo supervisión de curandero). Los quassinoides son una familia de metabolitos secundarios farmacológicamente activos que ha sido objeto de investigación bioprospectiva del Instituto SINCHI y de universidades colombianas (Universidad Nacional, Universidad de Antioquia, Universidad del Valle) por su potencial terapéutico. Custodia: comunidades indígenas amazónicas (Tikuna, Bora, Uitoto, Murui-Muinane), campesino-ribereños amazónicos, comunidades afrodescendientes del Pacífico (curanderos chocoanos y vallecaucanos) y campesinos costeros caribes. Manejo agroecológico: pionera secundaria de claros y bordes del bosque, vivero con semilla recalcitrante (siembra inmediata post-cosecha de drupa), plantación 100-200 ind/ha como sombrío productivo en sistemas agroforestales del Caribe-Pacífico-Amazonía-Orinoquía asociada a cacao, café, plátano, caucho, copoazú; cosecha maderable turno 15-25 años; cosecha medicinal de corteza por parches alternos no destructivos (rotación de 5 años por individuo); restauración 200-400 ind/ha en mosaicos pioneros junto a Cecropia, Ochroma e Inga. Lección viva sobre ÁRBOLES MEDICINALES MADERABLES BIODOBLE (cosecha doble propósito sin matar el árbol), QUASSINOIDES (metabolitos secundarios farmacéuticos), BIOPROSPECCIÓN AMAZÓNICA, MEDICINA TRADICIONAL CONTRA PARÁSITOS INTESTINALES (disentería, amebiasis), SUCESIÓN SECUNDARIA del bosque tropical bajo y SOBERANÍA FARMACÉUTICA basada en plantas medicinales nativas. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, SINCHI Amazonía Colombiana, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia, JBB Plantas Medicinales."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH40_ARBOLES_NATIVOS_CALIDO",
+      "id": "dipteryx_oleifera",
+      "nombre_comun": "Almendro de montaña",
+      "nombre_comunes_regionales": [
+        "almendro chocoano",
+        "tonka chocoano",
+        "almendro de Chocó",
+        "choibá"
+      ],
+      "nombre_cientifico": "Dipteryx oleifera Benth.",
+      "familia_botanica": "Fabaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "habito": "árbol perennifolio gigante 30-50 m emergente con tronco recto, copa amplia, semilla almendrada aromática rica en cumarina",
+      "origen": "Mesoamérica y Pacífico colombo-panameño (Chocó-Darién, Panamá, Costa Rica); endémica del bosque húmedo tropical chocoano-darienita",
+      "roles_in_guild": [
+        "nitrogen_fixer",
+        "biomass_producer",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "en_peligro",
+      "normativa_colombiana": "Especie endémica del Pacífico colombo-panameño y Caribe darienita, listada en categoría VULNERABLE (VU) en el Libro Rojo de Plantas de Colombia y en algunas regionales como EN PELIGRO (EN) por sobreexplotación maderera (madera \"almendro\" muy apreciada para mueblería fina) y deforestación severa del bosque pluvial chocoano. Aprovechamiento silvestre requiere permiso CAR/Ministerio Ambiente. Custodia de comunidades afrodescendientes chocoanas (consejos comunitarios cuenca del Atrato, San Juan, Baudó) e indígenas Embera-Wounaan. Plantaciones agroforestales y restauración aportan a recuperación poblacional.",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 700,
+        "max_absoluto": 1000
+      },
+      "temperatura_c": {
+        "helada_letal": 14,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "humedad_relativa_pct": {
+        "min": 75,
+        "optimo": 90,
+        "max": 98
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla grande almendrada recolectada de drupas caídas en estación de fructificación. Sin tratamiento pre-germinativo. Germinación 60-80% a 30-60 días en bandejas con sustrato orgánico bien drenado bajo sombra. Trasplante a bolsa grande 3-5 L a las 12 semanas. Plantación definitiva a los 8-10 meses (50-70 cm). Crecimiento juvenil moderado 1-1.5 m/año. Productivo de semilla desde los 12-18 años.",
+        "tiempo_a_establecimiento_dias": 240,
+        "notas": "Semilla \"choibá\" comestible cruda o tostada (similar a almendra de monte), muy rica en grasas (40-50% lípidos) y cumarina aromática (similar al tonka asiático Dipteryx odorata, prima genérica). Madera densísima (0.95-1.1 g/cm³) extremadamente durable para construcción naval, durmientes de ferrocarril, postes; sobreexplotada históricamente."
+      },
+      "scale_viability": [
+        "produccion",
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "produccion": {
+          "viable": true,
+          "nota": "Especie clave de agroforestería del Pacífico chocoano y Caribe darienita. Densidad baja 30-60 ind/ha por su porte emergente.",
+          "tips": [
+            "Asocio con cacao silvestre (chocoano), banano y caucho",
+            "Cosecha de semilla almendrada como NTFP comunitario",
+            "Madera maderable turno 50-70 años por crecimiento lento"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave restauración bosque pluvial chocoano y darienita. Refugio de fauna granívora (guacamayos, dantas, sahínos, primates).",
+          "tips": [
+            "Plantación 50-100 ind/ha en mosaicos restaurativos",
+            "Asocio con Carapa guianensis, Otoba lehmannii, Brosimum utile",
+            "Recuperación de bosque pluvial post-deforestación"
+          ]
+        }
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "uicn-red-list"
+      ],
+      "valor_pedagogico": "El almendro de montaña o choibá chocoano (Dipteryx oleifera Benth., familia Fabaceae subfamilia Papilionoideae) es un árbol perennifolio GIGANTE EMERGENTE de 30 hasta 50 m de altura con tronco recto cilíndrico, copa amplia y semilla almendrada aromática rica en cumarina, ENDÉMICO del bosque pluvial tropical del Pacífico colombo-panameño y Caribe darienita en piso térmico CÁLIDO (0-1.000 msnm). Distribución específica: en Colombia exclusivamente en el bosque pluvial chocoano (Chocó: cuenca alta-media-baja del Atrato, San Juan, Baudó; Darién panameño-colombiano), Pacífico norte vallecaucano y cauca-nariñense; en Panamá en la región del Darién y la cuenca del Canal. Es CUSTODIA de comunidades afrodescendientes del Pacífico colombiano —consejos comunitarios de la cuenca del Atrato (COCOMACIA, COCOMOPOCA, ASCOBA), San Juan (ACADESAN), Baudó (COCOMABA)— y de pueblos indígenas Embera-Wounaan y Embera-Katío del Chocó-Darién, quienes la han aprovechado tradicionalmente por más de cinco siglos como producto NTFP integral: la semilla almendrada \"choibá\" se consume cruda o tostada (perfil nutricional excepcional: 40-50% lípidos, 18-25% proteínas, aroma intenso a cumarina-vainilla-almendra dulce similar al haba tonka asiática Dipteryx odorata —prima genérica usada en perfumería y repostería de lujo francesa) y se ha posicionado en cadenas de valor de comercio justo y gastronomía colombiana de alta cocina; la madera densísima (0.95-1.1 g/cm³) es extremadamente durable y fue históricamente sobreexplotada para construcción naval (puentes, durmientes de ferrocarril, postes), lo que la llevó a estatus VULNERABLE (VU) en el Libro Rojo de Plantas de Colombia y EN PELIGRO (EN) en regionales chocoanas. La conservación de Dipteryx oleifera es indisociable de la conservación del bosque pluvial chocoano —uno de los HOTSPOTS DE BIODIVERSIDAD MÁS AMENAZADOS DEL PLANETA según Conservation International, con tasas de deforestación entre las más altas de Colombia por minería ilegal de oro, monocultivo de palma africana, y conflicto armado— y de los derechos territoriales colectivos de las comunidades afrochocoanas (titulación colectiva Ley 70 de 1993). La especie es polinizada principalmente por murciélagos nectarívoros (quiropterofilia) y abejas tropicales grandes (Eulaema, Euglossa, Bombus), y la dispersión de las semillas almendradas la realizan guacamayos (Ara ambiguus, A. macao, A. severus), dantas (Tapirus bairdii en Darién), sahínos (Pecari tajacu, Tayassu pecari), agutíes (Dasyprocta punctata) y primates (mono cariblanco Cebus capucinus, mono araña Ateles geoffroyi). Manejo agroecológico chocoano: vivero comunitario con semilla recalcitrante de drupas caídas, plantación a los 8-10 meses, densidad baja 30-60 ind/ha en sistemas agroforestales del Pacífico asociados a cacao silvestre chocoano (Theobroma cacao var. \"chocó\"), banano-plátano (Musa), caucho (Hevea brasiliensis), borojó (Alibertia patinoi), naidí (Euterpe oleracea); cosecha de semilla \"choibá\" como NTFP de comercio justo; turno maderable 50-70 años por crecimiento moderado; restauración 50-100 ind/ha en mosaicos del bosque pluvial chocoano asociada a Carapa guianensis (cedro macho), Otoba lehmannii (otobo), Brosimum utile (sande). Lección viva sobre BOSQUE PLUVIAL CHOCOANO (hotspot global de biodiversidad), CUSTODIA AFROCHOCOANA Y EMBERA-WOUNAAN del territorio, CUMARINA NATURAL ALMENDRADA (vainilla-almendra-tonka chocoano como alternativa a la vanilla industrial), CONSERVACIÓN ECOSISTÉMICA INDISOCIABLE DE DERECHOS TERRITORIALES COLECTIVOS (Ley 70/1993 y Constitución Política Art. 55 transitorio), QUIROPTEROFILIA, y ZOOCORIA POR MEGAFAUNA TROPICAL. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Libro Rojo de Plantas de Colombia, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, UICN Red List.",
+      "nota_conservacion": "Listada VULNERABLE (VU) en Libro Rojo Plantas Colombia y categoría EN PELIGRO (EN) en regionales chocoanas por sobreexplotación maderera histórica y deforestación severa del bosque pluvial chocoano (uno de los hotspots de biodiversidad más amenazados del planeta). Aprovechamiento silvestre requiere permiso CAR. Custodia de consejos comunitarios afrodescendientes (Atrato, San Juan, Baudó) e indígenas Embera-Wounaan del Chocó-Darién. Plantaciones agroforestales y restauración contribuyen a recuperación poblacional."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH40_ARBOLES_NATIVOS_CALIDO",
+      "id": "astronium_graveolens",
+      "nombre_comun": "Guayacán negro",
+      "nombre_comunes_regionales": [
+        "diomate",
+        "gusanero",
+        "urunday",
+        "palo de cera",
+        "jobillo"
+      ],
+      "nombre_cientifico": "Astronium graveolens Jacq.",
+      "familia_botanica": "Anacardiaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "habito": "árbol perennifolio-semicaducifolio 20-30 m, fuste recto, madera durísima jaspeada negro-rojiza muy apreciada",
+      "origen": "Mesoamérica-norte de Sudamérica (México sur, Centroamérica, Colombia: Caribe, Magdalena, Pacífico; Venezuela, Ecuador, Perú, Brasil); típica del bosque seco tropical y bosque húmedo tropical bajo",
+      "roles_in_guild": [
+        "biomass_producer",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "en_peligro",
+      "normativa_colombiana": "Listada VULNERABLE (VU) a casi amenazada en Colombia por sobreexplotación maderera intensiva (1900-1990) — madera \"diomate\" o \"guayacán negro\" muy apreciada en mueblería fina, parqué, ebanistería de lujo, esculturas, instrumentos musicales (vihuelas, charangos). Apéndice III CITES Colombia. Aprovechamiento silvestre requiere permiso CAR/Ministerio Ambiente. Plantaciones agroforestales y restauración contribuyen a recuperación poblacional.",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 800,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 38
+      },
+      "humedad_relativa_pct": {
+        "min": 50,
+        "optimo": 75,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla pequeña dentro de drupa-sámara con ala persistente del cáliz. Recolección de frutos maduros en estación seca. Sin tratamiento pre-germinativo. Germinación 50-70% a 20-40 días en bandejas con sustrato arenoso. Trasplante a bolsa 1.5-2 L a las 8 semanas. Plantación definitiva a los 5-6 meses (30-50 cm). Crecimiento juvenil lento 0.5-1 m/año. Productivo desde los 15-20 años. Turno maderable 60-80 años por densidad altísima (1-1.2 g/cm³).",
+        "tiempo_a_establecimiento_dias": 120,
+        "notas": "Madera durísima jaspeada negro-rojiza-amarilla con vetas espectaculares — una de las maderas más apreciadas del neotrópico para mueblería fina, ebanistería de lujo y artesanía. Resistente a termitas y hongos. Tolerante a sequía estacional severa."
+      },
+      "scale_viability": [
+        "produccion",
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío disperso 30-60 ind/ha en sistemas silvopastoriles del Caribe y Magdalena medio. Inversión patrimonial de largo plazo.",
+          "tips": [
+            "Asocio con potreros silvopastoriles",
+            "Plantar con protección los primeros 5 años (crece lento)",
+            "Cosecha maderable turno 60-80 años"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave restauración bosque seco tropical (bs-T) del Caribe colombiano y bosques semihúmedos del Magdalena medio.",
+          "tips": [
+            "Plantación 100-200 ind/ha en mosaicos restaurativos",
+            "Asocio con Tabebuia rosea, Pseudobombax septenatum, Bursera simaruba",
+            "Tolerancia notable a fuego"
+          ]
+        }
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "libro-rojo-plantas-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "El guayacán negro o diomate (Astronium graveolens Jacq., familia Anacardiaceae) es un árbol perennifolio-semicaducifolio de 20-30 m de altura con fuste recto cilíndrico y madera durísima jaspeada negro-rojiza-amarilla muy apreciada, nativo del bosque seco tropical (bs-T) y bosque húmedo tropical bajo neotropical desde el sur de México hasta Brasil-Paraguay. En Colombia se distribuye en piso térmico CÁLIDO (<1.200 msnm) en bs-T del Caribe (Bolívar, Sucre, Córdoba, Cesar, Magdalena, La Guajira sur), valle medio del Magdalena (Antioquia, Santander), Pacífico norte (Chocó-Darién, Valle), bosques semihúmedos del piedemonte llanero (Meta, Casanare) y Catatumbo (Norte de Santander). Pertenece a la familia Anacardiaceae —misma de mango, marañón, caracolí— con savia resinosa potencialmente irritante (urushiol-related). Es UNA DE LAS MADERAS MÁS APRECIADAS DEL NEOTRÓPICO por sus vetas espectaculares jaspeadas negro-rojizo-amarillas, densidad altísima (1-1.2 g/cm³), resistencia natural a termitas, hongos y agua, durabilidad excepcional (durmientes de ferrocarril y postes hasta 50 años de servicio sin tratamiento), y trabajabilidad fina con acabado pulido vidrioso. Aprovechamiento histórico (1900-1990) en mueblería fina, ebanistería de lujo, parqué patrimonial, esculturas, instrumentos musicales (vihuelas, charangos, requintos), artesanía de tornería, mangos de herramientas. La sobreexplotación llevó a su estatus VULNERABLE (VU) en el Libro Rojo de Plantas de Colombia y a su listado en el Apéndice III CITES Colombia, con aprovechamiento silvestre que requiere permiso CAR/Ministerio Ambiente. Custodia de comunidades campesinas costeñas del Caribe colombiano (Bolívar, Sucre, Córdoba, Magdalena, Cesar) que lo conservan como árbol patrimonial en potreros silvopastoriles, fincas ganaderas y reservas forestales protectoras. Su nombre \"diomate\" proviene del castellano costeño \"duro de matar\" — alusión a la dureza extrema de su madera y a su capacidad de rebrotar tras incendios y talas parciales. El epíteto específico \"graveolens\" significa \"de olor fuerte\" (lat. gravis = pesado, olens = oloroso), aludiendo al olor resinoso característico de la madera fresca. Manejo agroecológico: vivero con semilla pre-cosechada en estación seca, plantación 30-60 ind/ha disperso en potreros silvopastoriles del Caribe-Magdalena (densidad baja por porte y crecimiento lento), protección los primeros 5 años contra ganado y fuego, cosecha maderable turno 60-80 años a diámetros >50 cm (inversión patrimonial de largo plazo, valor económico por individuo muy alto), restauración 100-200 ind/ha en mosaicos del bs-T asociado a Tabebuia rosea, Pseudobombax septenatum, Bursera simaruba, Cordia alliodora, Gliricidia sepium. Lección viva sobre MADERAS PATRIMONIALES NEOTROPICALES (alternativa a maderas tropicales asiáticas y africanas importadas), SOBREEXPLOTACIÓN MADERERA HISTÓRICA y conservación, BOSQUE SECO TROPICAL EN PELIGRO CRÍTICO (<8% de cobertura original en Colombia según Pizano & García 2014), SILVOPASTOREO PATRIMONIAL (árboles de alto valor en potreros), e INVERSIÓN MADERABLE INTERGENERACIONAL (turno 60-80 años como capital natural heredado). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Libro Rojo de Plantas de Colombia, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia.",
+      "nota_conservacion": "Listada VULNERABLE (VU) en Libro Rojo Plantas Colombia y Apéndice III CITES Colombia por sobreexplotación maderera histórica intensiva (1900-1990). Aprovechamiento silvestre requiere permiso CAR. Plantaciones agroforestales en sistemas silvopastoriles del Caribe y Magdalena medio aportan a recuperación poblacional."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH40_ARBOLES_NATIVOS_CALIDO",
+      "id": "lecythis_minor",
+      "nombre_comun": "Olla de mono",
+      "nombre_comunes_regionales": [
+        "coquito",
+        "olleto",
+        "ollita de mono",
+        "cocuelo",
+        "monkey-pot pequeño"
+      ],
+      "nombre_cientifico": "Lecythis minor Jacq.",
+      "familia_botanica": "Lecythidaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "habito": "árbol perennifolio mediano-alto 15-25 m, fuste recto, frutos en cápsula leñosa con tapa (pyxidium) que abre como olla",
+      "origen": "Norte de Sudamérica (Colombia: Caribe, Magdalena, Pacífico, Catatumbo; Venezuela noroccidental, Panamá darienita); típica del bosque húmedo tropical bajo y bosque seco subhúmedo",
+      "roles_in_guild": [
+        "biomass_producer",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "normativa_colombiana": "Nativa silvestre del piso cálido del Caribe colombiano, Magdalena medio-bajo, Pacífico norte y Catatumbo (<1.000 msnm). Familia Lecythidaceae (misma de la nuez de Brasil Bertholletia excelsa). Especie frutal silvestre comunitaria. NO en libro rojo. Aprovechamiento doméstico permitido. Semillas comestibles ricas en selenio (cuidado con consumo excesivo — riesgo de selenosis si la semilla proviene de suelos seleníferos).",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 700,
+        "max_absoluto": 1100
+      },
+      "temperatura_c": {
+        "helada_letal": 12,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla grande dentro de cápsula leñosa pyxidium (olla con tapa). Recolección de cápsulas maduras caídas en estación de fructificación. Sin tratamiento pre-germinativo. Germinación 50-70% a 30-60 días en bandejas con sustrato orgánico. Trasplante a bolsa grande 3-5 L a las 12 semanas. Plantación definitiva a los 6-8 meses (40-60 cm). Crecimiento juvenil moderado 0.8-1.5 m/año. Productivo de fruta desde los 8-12 años.",
+        "tiempo_a_establecimiento_dias": 180,
+        "notas": "Semilla comestible (similar a nuez de Brasil pero más pequeña), aceitosa-mantequillosa, sabor agradable. Cápsula leñosa pyxidium con tapa-opérculo que cae al madurar y deja la \"olla\" colgando — los micos y guacamayos meten la mano-pico para sacar las semillas (de ahí \"olla de mono\"). Cápsula vacía usada artesanalmente como recipiente o adorno."
+      },
+      "scale_viability": [
+        "produccion",
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "produccion": {
+          "viable": true,
+          "nota": "Frutal silvestre semicultivado en sistemas agroforestales del Caribe-Magdalena. Densidad 30-60 ind/ha.",
+          "tips": [
+            "Asocio con cacao y plátano",
+            "Cosecha de semilla \"coquito\" como NTFP",
+            "Cápsulas usadas como artesanía"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave restauración bosque húmedo tropical bajo del Caribe-Magdalena. Refugio de fauna granívora (micos, guacamayos, sahínos).",
+          "tips": [
+            "Plantación 80-150 ind/ha en mosaicos restaurativos",
+            "Asocio con Inga, Cordia, Tabebuia"
+          ]
+        }
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "La olla de mono o coquito (Lecythis minor Jacq., familia Lecythidaceae) es un árbol perennifolio mediano-alto de 15-25 m de altura con fuste recto cilíndrico, copa redondeada y frutos en cápsula leñosa con tapa-opérculo (pyxidium) que abre como olla, nativo del bosque húmedo tropical bajo y bosque seco subhúmedo del norte de Sudamérica (Colombia, Venezuela noroccidental, Panamá darienita) en piso térmico CÁLIDO (<1.100 msnm). En Colombia se distribuye en bosques del Caribe (Bolívar, Sucre, Córdoba, Magdalena, Cesar, La Guajira sur), Magdalena medio-bajo (Antioquia, Santander, Bolívar sur), Pacífico norte (Chocó-Darién), y Catatumbo (Norte de Santander). Pertenece a la familia Lecythidaceae —que incluye también la nuez de Brasil (Bertholletia excelsa), la coco de mono grande (Lecythis pisonis), el cumbre (Couroupita guianensis \"cannonball tree\") y otras especies de frutos en pyxidium— una de las familias botánicas más espectaculares del Neotrópico por la morfología única de sus frutos: cápsulas leñosas pyxidiums grandes (5-15 cm en L. minor, hasta 25 cm en L. pisonis) que maduran en el árbol con una tapa-opérculo que cae al madurar y deja la \"olla\" colgando con las semillas adentro — los micos (Cebus, Saimiri, Alouatta), guacamayos (Ara, Amazona) y otros animales meten la mano-pico para sacar las semillas (de ahí el nombre vulgar \"olla de mono\" o \"monkey-pot\"). Las semillas comestibles son aceitosas-mantequillosas con sabor agradable (similar a la nuez de Brasil pero más pequeñas) y son tradicionalmente consumidas frescas o tostadas por comunidades campesinas costeñas del Caribe colombiano (Bolívar, Sucre, Córdoba, Magdalena) y por pueblos indígenas Zenú (Sucre-Córdoba) y Wayúu (La Guajira sur). NOTA TOXICOLÓGICA IMPORTANTE: las semillas del género Lecythis (especialmente L. ollaria, prima de L. minor en suelos seleníferos venezolanos) pueden acumular altísimas concentraciones de SELENIO si crecen en suelos seleníferos —concentraciones hasta 18.000 mg/kg han sido documentadas en literatura toxicológica— y consumo excesivo puede causar selenosis aguda (pérdida de cabello, uñas frágiles, neuropatía); en Colombia los suelos del Caribe generalmente NO son seleníferos, pero se recomienda consumo moderado y diversificado. Las cápsulas vacías pyxidiums son usadas artesanalmente como recipientes, ceniceros, jarrones decorativos y adornos por artesanos del Caribe. Custodia: comunidades campesinas costeñas afrodescendientes y mestizas del Caribe colombiano (Bolívar, Sucre, Córdoba, Magdalena), pueblos indígenas Zenú (resguardos San Andrés de Sotavento, Tucurinca) y Wayúu (La Guajira sur), comunidades chocoanas-darienitas. Manejo agroecológico: vivero con semilla recalcitrante recolectada de cápsulas caídas, plantación 30-60 ind/ha en sistemas agroforestales del Caribe asociada a cacao, plátano hartón, mango, guanábana, anón; cosecha de semilla \"coquito\" como NTFP comunitario; restauración 80-150 ind/ha en mosaicos del bosque húmedo tropical bajo Caribe asociada a Inga, Cordia, Tabebuia rosea, Anacardium excelsum (caracolí). Lección viva sobre LECYTHIDACEAE NEOTROPICALES (familia espectacular de frutos en pyxidium con tapa), DISPERSIÓN ZOOCÓRICA POR PRIMATES Y AVES, ACUMULACIÓN DE SELENIO en algunas especies del género (toxicología nutricional), NTFP COMUNITARIO CARIBE-CHOCÓ y ARTESANÍA DE FRUTOS LEÑOSOS (cápsulas pyxidiums como recipientes artesanales). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH40_ARBOLES_NATIVOS_CALIDO",
+      "id": "aspidosperma_polyneuron",
+      "nombre_comun": "Peroba rosada",
+      "nombre_comunes_regionales": [
+        "palo rosa",
+        "amargoso",
+        "peroba blanca",
+        "pequiá",
+        "amarillo de monte"
+      ],
+      "nombre_cientifico": "Aspidosperma polyneuron Müll.Arg.",
+      "familia_botanica": "Apocynaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "habito": "árbol perennifolio gigante 25-40 m, tronco recto-cilíndrico, copa estrecha, madera durísima rosada muy apreciada",
+      "origen": "Sudamérica tropical (Colombia: Amazonía, piedemonte; Brasil amazónico-cerrado, Bolivia, Perú, Argentina norte, Paraguay); típica del bosque húmedo tropical y bosque semicaducifolio",
+      "roles_in_guild": [
+        "biomass_producer",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "en_peligro",
+      "normativa_colombiana": "Listada en peligro (EN) por UICN globalmente por sobreexplotación maderera intensiva (1900-2000) — madera \"peroba rosa\" altamente cotizada en mueblería fina y construcción. En Colombia presente en Amazonía y piedemonte amazónico-orinocense. Aprovechamiento silvestre requiere permiso CAR/Ministerio Ambiente. Apéndice III CITES Colombia en consideración. Plantaciones agroforestales y restauración aportan a recuperación.",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 800,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 10,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla alada (sámara) recolectada de folículos dehiscentes en estación seca. Sin tratamiento pre-germinativo. Germinación 60-80% a 20-40 días en bandejas con sustrato orgánico. Trasplante a bolsa 2-3 L a las 8 semanas. Plantación definitiva a los 5-7 meses (40-60 cm). Crecimiento juvenil lento 0.6-1 m/año. Productivo de semilla desde los 15-20 años. Turno maderable 60-80 años por densidad alta (0.85-0.95 g/cm³).",
+        "tiempo_a_establecimiento_dias": 150,
+        "notas": "Madera durísima rosa-amarillenta con grano fino muy apreciada en mueblería fina, ebanistería de lujo, instrumentos musicales (guitarras, charangos), parqué patrimonial. Látex de Apocynaceae (tóxico). Crecimiento lento — inversión maderable patrimonial de largo plazo."
+      },
+      "scale_viability": [
+        "produccion",
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío disperso 30-60 ind/ha en sistemas agroforestales amazónicos. Inversión patrimonial de largo plazo.",
+          "tips": [
+            "Asocio con cacao silvestre amazónico y copoazú",
+            "Cosecha maderable turno 60-80 años",
+            "Plantar con protección los primeros 5 años (crece lento)"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave restauración bosque húmedo tropical bajo amazónico y piedemonte. Especie clímax.",
+          "tips": [
+            "Plantación 80-150 ind/ha en mosaicos restaurativos",
+            "Asocio con Cedrela odorata, Cariniana, Bertholletia"
+          ]
+        }
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "uicn-red-list",
+        "sinchi-amazonia-colombiana",
+        "libro-rojo-plantas-colombia"
+      ],
+      "valor_pedagogico": "La peroba rosada o palo rosa amazónico (Aspidosperma polyneuron Müll.Arg., familia Apocynaceae) es un árbol perennifolio GIGANTE de 25-40 m de altura con tronco recto cilíndrico, copa estrecha-cónica y madera durísima rosa-amarillenta muy apreciada, nativo del bosque húmedo tropical y bosque semicaducifolio neotropical desde el sur de Bolivia y norte de Argentina-Paraguay hasta la Amazonía colombiana en piso térmico CÁLIDO (<1.200 msnm). En Colombia se distribuye en la Amazonía baja (Amazonas, Caquetá, Putumayo, Vaupés, Guainía, Guaviare) y piedemonte amazónico-orinocense (Meta, Casanare). Pertenece a la familia Apocynaceae —misma de la jaca brava (Couma macrocarpa), el frangipán (Plumeria), el pervinca (Catharanthus roseus) y el caucho asiático (Hevea brasiliensis es Euphorbiaceae no Apocynaceae — corrección: el siringueiro es Euphorbiaceae)— con látex característico TÓXICO de la familia. Es UNA DE LAS MADERAS PATRIMONIALES MÁS COTIZADAS DEL CONO SUR Y AMAZONÍA por sus vetas finas rosa-amarillentas, densidad alta (0.85-0.95 g/cm³), excelente trabajabilidad y acabado pulido, gran durabilidad natural. Aprovechamiento histórico intensivo (1900-2000) en mueblería fina, ebanistería de lujo, instrumentos musicales (guitarras clásicas, charangos andinos, requintos, marimbas), parqué patrimonial, esculturas, tornería artística — especialmente en Brasil, Argentina, Paraguay y Bolivia donde la \"peroba rosa\" fue una de las cinco maderas más comercializadas del cono sur. La sobreexplotación llevó a su estatus EN PELIGRO (EN) en la UICN Red List globalmente, con poblaciones reducidas >70% en gran parte de su rango. En Colombia las poblaciones amazónicas están menos exploradas y mejor conservadas relativamente, pero el aprovechamiento silvestre requiere permiso CAR/Ministerio Ambiente. Custodia: comunidades indígenas amazónicas (Tikuna, Bora, Uitoto, Murui-Muinane, Yucuna, Tanimuka del medio-bajo Caquetá-Apaporis-Vaupés) y pueblos del piedemonte amazónico-orinocense. El nombre genérico \"Aspidosperma\" significa \"semilla escudada\" (gr. aspidos = escudo + sperma = semilla) por la sámara con ala persistente; el epíteto \"polyneuron\" significa \"de muchos nervios\" (gr. polys = muchos + neuron = nervio) por la nervadura foliar fina característica. Manejo agroecológico: vivero con semilla alada pre-cosechada en estación seca, plantación 30-60 ind/ha disperso en sistemas agroforestales amazónicos asociada a cacao silvestre amazónico (Theobroma cacao var. \"amazónico\"), copoazú (T. grandiflorum), caucho (Hevea brasiliensis), pijuayo-chontaduro (Bactris gasipaes), umarí (Poraqueiba sericea); protección los primeros 5 años contra ganado y fuego; cosecha maderable turno 60-80 años a diámetros >50 cm (inversión patrimonial intergeneracional, valor económico por individuo muy alto); restauración 80-150 ind/ha en mosaicos del bosque húmedo tropical bajo amazónico asociada a Cedrela odorata, Cariniana pyriformis, Bertholletia excelsa (donde aplique). Lección viva sobre MADERAS PATRIMONIALES AMAZÓNICAS EN PELIGRO (Aspidosperma como caso emblemático de sobreexplotación), CONSERVACIÓN POR USO SOSTENIBLE (plantaciones agroforestales y restauración como estrategia de recuperación), INSTRUMENTOS MUSICALES PATRIMONIALES (guitarras, charangos, marimbas de madera tropical nativa), CITES Y REGULACIÓN INTERNACIONAL DE MADERAS, y AGROFORESTERÍA INTERGENERACIONAL (turno 60-80 años como capital natural heredado). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, UICN Red List, SINCHI Amazonía Colombiana, Libro Rojo de Plantas de Colombia.",
+      "nota_conservacion": "Listada EN PELIGRO (EN) en UICN Red List globalmente por sobreexplotación maderera histórica intensiva en Brasil, Argentina, Paraguay y Bolivia. En Colombia presente en Amazonía y piedemonte amazónico-orinocense; aprovechamiento silvestre requiere permiso CAR/Ministerio Ambiente. Plantaciones agroforestales contribuyen a recuperación poblacional."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH40_ARBOLES_NATIVOS_CALIDO",
+      "id": "cariniana_estrellensis",
+      "nombre_comun": "Jequitibá",
+      "nombre_comunes_regionales": [
+        "jequitibá rosa",
+        "jequitibá blanco",
+        "cariniana brasileña",
+        "estopa de altura"
+      ],
+      "nombre_cientifico": "Cariniana estrellensis (Raddi) Kuntze",
+      "familia_botanica": "Lecythidaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "habito": "árbol perennifolio gigante 30-50 m emergente, fuste recto cilíndrico, copa amplia, frutos en pyxidium leñoso característico",
+      "origen": "Sudamérica tropical (Brasil sur-sudeste-Mata Atlántica-Cerrado, norte Argentina, Paraguay, este Bolivia, Colombia: Amazonía baja, Orinoquía piedemonte); típica del bosque semicaducifolio y húmedo tropical",
+      "roles_in_guild": [
+        "biomass_producer",
+        "nurse_plant",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "en_peligro",
+      "normativa_colombiana": "Listada VULNERABLE (VU) a EN PELIGRO (EN) en algunas regionales por sobreexplotación maderera histórica y deforestación del bosque amazónico-orinocense. En Colombia presente en Amazonía baja y piedemonte orinocense — distinta a Cariniana pyriformis del Pacífico-Magdalena. Aprovechamiento silvestre requiere permiso CAR/Ministerio Ambiente. Plantaciones agroforestales y restauración aportan a recuperación.",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 800,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 20,
+        "optimo_max": 28,
+        "max_tolerable": 35
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla alada dentro de cápsula pyxidium leñosa con opérculo. Recolección de cápsulas caídas en estación de fructificación. Sin tratamiento pre-germinativo. Germinación 50-70% a 25-50 días en bandejas con sustrato orgánico. Trasplante a bolsa grande 3-5 L a las 12 semanas. Plantación definitiva a los 7-9 meses (40-60 cm). Crecimiento juvenil moderado 0.8-1.5 m/año. Productivo desde los 12-18 años.",
+        "tiempo_a_establecimiento_dias": 210,
+        "notas": "Madera durable amarillo-rosada de densidad media-alta (0.6-0.8 g/cm³), apreciada en construcción civil, mueblería fina, ebanistería y carpintería de calidad. Cápsula pyxidium leñosa similar a otras Lecythidaceae — usada artesanalmente. Distinta a Cariniana pyriformis (abarco) del Pacífico-Magdalena en distribución y características."
+      },
+      "scale_viability": [
+        "produccion",
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío disperso 30-60 ind/ha en sistemas agroforestales amazónicos y orinocenses. Inversión maderable patrimonial.",
+          "tips": [
+            "Asocio con cacao silvestre y copoazú",
+            "Cosecha maderable turno 40-60 años",
+            "Plantar con protección los primeros 4 años"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave restauración bosque húmedo tropical bajo amazónico y bosques semicaducifolios del piedemonte orinocense.",
+          "tips": [
+            "Plantación 80-150 ind/ha en mosaicos restaurativos",
+            "Asocio con Cedrela odorata, Aspidosperma polyneuron, Bertholletia"
+          ]
+        }
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "uicn-red-list",
+        "sinchi-amazonia-colombiana",
+        "libro-rojo-plantas-colombia"
+      ],
+      "valor_pedagogico": "El jequitibá (Cariniana estrellensis (Raddi) Kuntze, familia Lecythidaceae) es un árbol perennifolio GIGANTE EMERGENTE de 30 hasta 50 m de altura con fuste recto cilíndrico, copa amplia y frutos en cápsula pyxidium leñoso característico de la familia, nativo del bosque semicaducifolio y bosque húmedo tropical neotropical desde el sur de Brasil (Mata Atlántica-Cerrado) hasta la Amazonía baja colombiana, en piso térmico CÁLIDO (<1.200 msnm). En Colombia se distribuye en la Amazonía baja (Amazonas, Caquetá bajo, Putumayo bajo) y piedemonte orinocense (Meta, Casanare, Vichada bordes de galería), distinto en distribución de su pariente Cariniana pyriformis (abarco) que es exclusivo del Pacífico-Magdalena. Pertenece a la familia Lecythidaceae —misma de la nuez de Brasil (Bertholletia excelsa), olla de mono (Lecythis), cumbre/cannonball tree (Couroupita guianensis)— una de las familias botánicas más espectaculares del Neotrópico por la morfología única de sus frutos en cápsulas pyxidiums leñosas con opérculo. Es UNO DE LOS ÁRBOLES MÁS GRANDES DEL BOSQUE BRASILEÑO Y SUDAMERICANO —con ejemplares documentados de hasta 50 m de altura y 3-4 m de diámetro en la Mata Atlántica brasileña, registrados como árboles patrimoniales centenarios— y forma parte del dosel emergente. Su nombre \"jequitibá\" proviene del tupí-guaraní brasileño \"yikitiba\" (árbol grande), y se ha extendido al castellano sudamericano. La madera color amarillo-rosado de densidad media-alta (0.6-0.8 g/cm³) es muy apreciada en construcción civil, mueblería fina, ebanistería y carpintería de calidad en Brasil, Argentina, Paraguay y Bolivia. Custodia: comunidades indígenas amazónicas colombianas (Tikuna, Bora, Uitoto, Murui-Muinane del trapecio amazónico y bajo Caquetá-Putumayo) y pueblos del piedemonte orinocense (Sikuani, Achagua en bordes de galería). Manejo agroecológico: vivero con semilla alada recolectada de cápsulas pyxidiums caídas, plantación 30-60 ind/ha en sistemas agroforestales amazónicos asociada a cacao silvestre amazónico, copoazú, caucho, palma chontaduro; cosecha maderable turno 40-60 años a diámetros >50 cm; restauración 80-150 ind/ha en mosaicos del bosque húmedo tropical bajo amazónico-orinocense asociada a Cedrela odorata, Aspidosperma polyneuron, Bertholletia excelsa (donde aplique), Cariniana micrantha. Lección viva sobre ÁRBOLES GIGANTES EMERGENTES (jequitibás centenarios como árboles patrimoniales del Neotrópico), LECYTHIDACEAE NEOTROPICALES (pyxidiums leñosos espectaculares), DIVERSIDAD DEL GÉNERO CARINIANA (16 especies neotropicales, con C. pyriformis del Pacífico-Magdalena, C. estrellensis amazónico-orinocense, C. micrantha amazónico, todas con maderas valiosas y conservación crítica), MATA ATLÁNTICA BRASILEÑA-AMAZONÍA COMO CONTINUO BIOGEOGRÁFICO y AGROFORESTERÍA INTERGENERACIONAL. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, UICN Red List, SINCHI Amazonía Colombiana, Libro Rojo de Plantas de Colombia.",
+      "nota_conservacion": "Listada VULNERABLE (VU) en regionales por sobreexplotación maderera y deforestación amazónica-orinocense. Aprovechamiento silvestre requiere permiso CAR/Ministerio Ambiente. Custodia de comunidades indígenas amazónicas y campesinas del piedemonte orinocense. Plantaciones agroforestales contribuyen a recuperación."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH40_ARBOLES_NATIVOS_CALIDO",
+      "id": "huberodendron_patinoi",
+      "nombre_comun": "Carrá",
+      "nombre_comunes_regionales": [
+        "carrá chocoano",
+        "huberodendro",
+        "carrá del Pacífico"
+      ],
+      "nombre_cientifico": "Huberodendron patinoi Cuatrec.",
+      "familia_botanica": "Malvaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "habito": "árbol perennifolio gigante 30-45 m emergente, tronco recto-cilíndrico con raíces tablares espectaculares, copa amplia",
+      "origen": "Endémica del Pacífico colombo-ecuatoriano y Chocó-Darién (Colombia: Chocó, Valle, Cauca, Nariño Pacífico; Panamá Darién; norte de Ecuador esmeraldeño); restringida al bosque pluvial chocoano",
+      "roles_in_guild": [
+        "biomass_producer",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "en_peligro",
+      "normativa_colombiana": "Especie ENDÉMICA del Pacífico colombiano-Chocó-Darién, listada EN PELIGRO (EN) en el Libro Rojo de Plantas de Colombia y por UICN Red List por sobreexplotación maderera intensiva (1950-2010) — madera \"carrá\" altamente cotizada para contraenchapados navales, construcción y mueblería — y deforestación severa del bosque pluvial chocoano. Aprovechamiento silvestre PROHIBIDO sin permiso especial CAR/Ministerio Ambiente. Custodia obligatoria por consejos comunitarios afrochocoanos (Ley 70/1993) e indígenas Embera-Wounaan.",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 600,
+        "max_absoluto": 900
+      },
+      "temperatura_c": {
+        "helada_letal": 14,
+        "optimo_min": 24,
+        "optimo_max": 30,
+        "max_tolerable": 34
+      },
+      "humedad_relativa_pct": {
+        "min": 80,
+        "optimo": 92,
+        "max": 98
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla con tegumento blando dentro de cápsula tomentosa. Recolección de frutos maduros caídos —difícil por crecimiento emergente y dispersión por viento+gravedad. Siembra inmediata (semilla recalcitrante). Germinación 50-65% a 30-60 días en bandejas con sustrato orgánico bajo sombra. Trasplante a bolsa grande 5-8 L a las 12 semanas. Plantación definitiva a los 10-14 meses (40-60 cm). Crecimiento juvenil lento 0.5-1 m/año. Productivo desde los 20-30 años.",
+        "tiempo_a_establecimiento_dias": 300,
+        "notas": "Madera \"carrá\" color crema-amarillento de densidad media (0.4-0.5 g/cm³), excelente para contraenchapados navales, construcción ligera, embalaje. Raíces tablares espectaculares hasta 3-4 m de altura. Crecimiento lento — inversión patrimonial de largo plazo. Plantaciones agroforestales chocoanas son críticas para recuperación."
+      },
+      "scale_viability": [
+        "produccion",
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "produccion": {
+          "viable": true,
+          "nota": "Plantaciones agroforestales chocoanas con manejo comunitario afrochocoano-embera. Densidad baja 30-60 ind/ha. Inversión patrimonial intergeneracional.",
+          "tips": [
+            "Asocio con cacao chocoano y plátano hartón",
+            "Cosecha maderable turno 40-60 años con manejo sostenible",
+            "Plantaciones con consejos comunitarios COCOMACIA-ACADESAN"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave restauración bosque pluvial chocoano-darienita. Hotspot global de biodiversidad amenazado por minería, palma africana y conflicto armado.",
+          "tips": [
+            "Plantación 50-100 ind/ha en mosaicos restaurativos",
+            "Asocio con Dipteryx oleifera, Carapa guianensis, Otoba lehmannii",
+            "Custodia obligatoria comunitaria Ley 70/1993"
+          ]
+        }
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "libro-rojo-plantas-colombia",
+        "uicn-red-list",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El carrá (Huberodendron patinoi Cuatrec., familia Malvaceae —antes Bombacaceae—) es un árbol perennifolio GIGANTE EMERGENTE de 30 hasta 45 m de altura con tronco recto cilíndrico, raíces tablares espectaculares (raíces zancudas-aletadas hasta 3-4 m de altura desde el suelo, contrafuertes adaptados a suelos saturados-anegadizos del bosque pluvial) y copa amplia, ESPECIE ENDÉMICA del bosque pluvial tropical chocoano-darienita-ecuatoriano-esmeraldeño en piso térmico CÁLIDO (0-900 msnm). En Colombia distribución estrictamente restringida al Pacífico (Chocó: cuencas del Atrato, San Juan, Baudó; Valle: cuenca del Naya, Calima; Cauca: Pacífico cauca-nariñense; Nariño: Pacífico nariñense) y Darién panameño-colombiano. El género Huberodendron es endémico del Neotrópico con apenas 5 especies (H. patinoi del Pacífico colombo-ecuatoriano, H. ingens de Brasil, H. duckei de la Amazonía, H. swietenioides de Bolivia-Brasil, H. mortinii de Ecuador-Perú), todas amenazadas por sobreexplotación y deforestación. H. patinoi es CUSTODIA OBLIGATORIA de las comunidades afrodescendientes del Pacífico colombiano —titulación colectiva Ley 70 de 1993 que reconoce derechos territoriales colectivos a comunidades negras del Pacífico— a través de los consejos comunitarios COCOMACIA, COCOMOPOCA, ASCOBA (Atrato), ACADESAN (San Juan), COCOMABA (Baudó), y de pueblos indígenas Embera, Wounaan, Embera-Katío y Embera-Chamí del Chocó-Darién. La madera \"carrá\" color crema-amarillento de densidad media (0.4-0.5 g/cm³) fue altamente cotizada entre 1950-2010 para contraenchapados navales (industria Cartón Colombia/Cartopel), construcción civil, mueblería ligera y embalaje, lo que llevó la especie a estatus EN PELIGRO (EN) tanto en el Libro Rojo de Plantas de Colombia como en la UICN Red List, con poblaciones reducidas >80% en gran parte de su rango histórico. La conservación de Huberodendron patinoi es INDISOCIABLE de la conservación del BOSQUE PLUVIAL CHOCOANO —uno de los HOTSPOTS DE BIODIVERSIDAD MÁS AMENAZADOS DEL PLANETA según Conservation International, con la mayor pluviosidad de las Américas (8.000-13.000 mm/año en Lloró, Quibdó, Andagoya, Tutunendo), endemismos masivos de orquídeas, palmas, anfibios y aves; amenazado por minería ilegal de oro (mercurio, dragado), monocultivo de palma africana, ganadería extensiva, conflicto armado interno, narcotráfico y debilidad estatal histórica— y de los derechos territoriales colectivos AFROCHOCOANOS (Ley 70/1993, Constitución Política Art. 55 transitorio, Convenio 169 OIT). Las raíces tablares espectaculares (contrafuertes que pueden alcanzar 3-4 m de altura) son una adaptación al suelo saturado-anegadizo del bosque pluvial: estabilizan el árbol gigante en sustrato hídrico inestable y aumentan el área de absorción de nutrientes en suelos pobres y lixiviados por la altísima pluviosidad. El epíteto específico \"patinoi\" honra al naturalista colombiano Víctor Manuel Patiño Rodríguez (1912-2001) —historiador y botánico del Valle del Cauca, especialista en plantas útiles del Pacífico y autor de las \"Plantas Cultivadas y Animales Domésticos en América Equinoccial\" (1963-1972)—. Manejo agroecológico chocoano: vivero comunitario con semilla recalcitrante recolectada de individuos remanentes, plantación 30-60 ind/ha en sistemas agroforestales chocoanos con manejo comunitario afrodescendiente-embera asociada a cacao chocoano (Theobroma cacao var. \"chocó\"), plátano hartón (Musa AAB), borojó (Alibertia patinoi), naidí (Euterpe oleracea), chontaduro (Bactris gasipaes); cosecha maderable turno 40-60 años con manejo sostenible bajo permisos especiales CAR; restauración 50-100 ind/ha en mosaicos del bosque pluvial chocoano asociada a Dipteryx oleifera (almendro choibá), Carapa guianensis (cedro macho), Otoba lehmannii (otobo), Brosimum utile (sande). Lección viva sobre ENDEMISMOS DEL CHOCÓ BIOGEOGRÁFICO (hotspot global), CONSERVACIÓN INDISOCIABLE DE DERECHOS TERRITORIALES COLECTIVOS AFROCOLOMBIANOS (Ley 70/1993), RAÍCES TABLARES como adaptación al bosque pluvial, BIOGEOGRAFÍA DEL CHOCÓ (la región más lluviosa de las Américas), CUSTODIA COMUNITARIA AFROCHOCOANA-EMBERA, y SOBREEXPLOTACIÓN MADERERA INDUSTRIAL HISTÓRICA (Cartón Colombia, contraenchapados navales) como advertencia para futuras políticas extractivas. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Libro Rojo de Plantas de Colombia, UICN Red List, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia.",
+      "nota_conservacion": "Especie ENDÉMICA del Pacífico colombiano-Chocó-Darién, listada EN PELIGRO (EN) en Libro Rojo Plantas Colombia y UICN Red List por sobreexplotación maderera histórica intensiva (1950-2010) y deforestación severa del bosque pluvial chocoano —uno de los hotspots de biodiversidad más amenazados del planeta. Aprovechamiento silvestre PROHIBIDO sin permiso especial CAR/Ministerio Ambiente. Custodia obligatoria por consejos comunitarios afrochocoanos (Ley 70/1993: COCOMACIA, COCOMOPOCA, ASCOBA, ACADESAN, COCOMABA) e indígenas Embera-Wounaan-Katío."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH40_ARBOLES_NATIVOS_CALIDO",
+      "id": "caryocar_glabrum",
+      "nombre_comun": "Almendro silvestre amazónico",
+      "nombre_comunes_regionales": [
+        "pequiá amazónico glabro",
+        "almendrito de monte",
+        "cagüi liso"
+      ],
+      "nombre_cientifico": "Caryocar glabrum (Aubl.) Pers.",
+      "familia_botanica": "Caryocaraceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "habito": "árbol perennifolio gigante 25-40 m emergente, fuste recto, frutos drupáceos grandes con almendra oleaginosa comestible",
+      "origen": "Sudamérica tropical (Amazonía colombiana, peruana, ecuatoriana, brasileña, venezolana, Guayanas); típica del bosque húmedo tropical bajo amazónico de tierra firme y vegas",
+      "roles_in_guild": [
+        "biomass_producer",
+        "pollinator_attractor",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "normativa_colombiana": "Nativa silvestre del piso cálido amazónico colombiano (<1.000 msnm); especie de uso múltiple custodia de comunidades indígenas amazónicas (Tikuna, Bora, Uitoto, Murui-Muinane, Yucuna, Tanimuka) y campesino-ribereñas. NO en libro rojo nacional pero su almendra es NTFP emergente. Distinta a Caryocar amygdaliferum (presente en mismo rango) por hojas glabras (no pubescentes), drupas más pequeñas y ecología de bosque de tierra firme.",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 700,
+        "max_absoluto": 1000
+      },
+      "temperatura_c": {
+        "helada_letal": 14,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "humedad_relativa_pct": {
+        "min": 65,
+        "optimo": 85,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla grande dentro de endocarpo leñoso espinoso (pirena) del fruto drupáceo —similar a C. amygdaliferum pero ligeramente más pequeño. Despulpado y escarificación mecánica del endocarpo. Germinación lenta 60-120 días en bandejas con sustrato orgánico. Trasplante a bolsa grande 5-10 L a los 4 meses. Plantación definitiva a los 8-12 meses. Crecimiento juvenil 0.8-1.5 m/año. Productivo de fruta desde los 10-15 años.",
+        "tiempo_a_establecimiento_dias": 240,
+        "notas": "Almendra oleaginosa muy rica en grasas (45-60% lípidos) y proteínas (15-20%) —similar a Caryocar amygdaliferum pero con perfil ligeramente más insaturado. Pulpa carnosa amarillo-anaranjada comestible. Hojas glabras (sin pubescencia) diferencian de C. amygdaliferum."
+      },
+      "scale_viability": [
+        "produccion",
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "produccion": {
+          "viable": true,
+          "nota": "Especie NTFP emergente en sistemas agroforestales amazónicos. Densidad baja 20-50 ind/ha. Pariente cercano de Caryocar amygdaliferum (presente en mismo catálogo).",
+          "tips": [
+            "Asocio con copoazú, açaí y palma chontaduro",
+            "Cosecha frutos caídos estación lluviosa",
+            "Almendra como alternativa local a nueces importadas"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave restauración bosque húmedo tropical bajo amazónico de tierra firme. Refugio de fauna granívora.",
+          "tips": [
+            "Plantación 50-100 ind/ha en mosaicos restaurativos",
+            "Asocio con Inga, Hevea silvestre, Bertholletia donde aplique"
+          ]
+        }
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "sinchi-amazonia-colombiana",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El almendro silvestre amazónico glabro o pequiá amazónico glabro (Caryocar glabrum (Aubl.) Pers., familia Caryocaraceae) es un árbol perennifolio GIGANTE EMERGENTE de 25-40 m de altura con fuste recto cilíndrico y frutos drupáceos grandes con almendra oleaginosa comestible, nativo del bosque húmedo tropical bajo amazónico de tierra firme y vegas de río de Sudamérica tropical (Amazonía colombiana, peruana, ecuatoriana, brasileña, venezolana, Guayanas) en piso térmico CÁLIDO (0-1.000 msnm). En Colombia se distribuye en la Amazonía baja (Amazonas, Caquetá bajo, Putumayo bajo, Vaupés, Guainía, Guaviare) y piedemonte amazónico, en el mismo rango que su pariente cercano Caryocar amygdaliferum (catálogo Chagra) del cual se distingue por las hojas GLABRAS (sin pubescencia, de ahí el epíteto \"glabrum\") versus las hojas pubescentes de C. amygdaliferum, y por drupas ligeramente más pequeñas (6-9 cm vs 8-12 cm) y por preferencia hábitat de tierra firme bien drenada frente a vegas y suelos hidromorfizados. Pertenece a la familia Caryocaraceae —pequeña familia oleaginosa neotropical de ~25 especies en 2 géneros— y produce frutos drupáceos con pulpa carnosa amarillo-anaranjada exterior comestible y endocarpo leñoso espinoso (pirena) que contiene 1-4 semillas-almendra oleaginosas muy ricas en grasas (45-60% lípidos saturados e insaturados, perfil ligeramente más insaturado que C. amygdaliferum) y proteínas (15-20%). Es PRODUCTO NTFP (non-timber forest product) emergente en cadenas de valor de la Amazonía colombiana —pueblos indígenas Tikuna del trapecio amazónico, Bora, Uitoto, Murui-Muinane, Yucuna, Tanimuka del medio-bajo Caquetá-Apaporis-Vaupés, y comunidades campesino-ribereñas del eje Leticia-Puerto Nariño cosechan tradicionalmente del bosque silvestre (recolección de frutos caídos en estación lluviosa) y consumen tostado, cocido, en pulpa fresca, o procesado como aceite local. La presencia paralela de C. amygdaliferum y C. glabrum en el mismo rango amazónico colombiano es un caso de PARES BOTÁNICOS HERMANOS (sister species) que ocupan microhabitats diferenciados (vegas/hidromorfismo vs. tierra firme bien drenada) — un ejemplo clásico de especiación ecológica por partición de hábitat. El fruto es dispersado por agutíes (Dasyprocta fuliginosa), dantas (Tapirus terrestris), sahínos (Pecari tajacu), monos lanudos (Lagothrix lagothricha) y churucos, en zoocoria primaria con caché y reentierro. Manejo agroecológico amazónico: vivero con semilla recalcitrante (siembra inmediata post-cosecha de drupa), despulpado y escarificación mecánica del endocarpo, germinación lenta 60-120 días, plantación 20-50 ind/ha en sistemas agroforestales amazónicos multiestrato asociada a copoazú (Theobroma grandiflorum), açaí (Euterpe oleracea), palma chontaduro (Bactris gasipaes), inga (Inga spp.), plátano hartón; productivo de fruta a los 10-15 años; restauración 50-100 ind/ha en mosaicos del bosque húmedo tropical bajo amazónico de tierra firme. Lección viva sobre PARES BOTÁNICOS HERMANOS (Caryocar amygdaliferum vs C. glabrum como especiación ecológica por partición de hábitat), OLEAGINOSAS AMAZÓNICAS NATIVAS (alternativa a aceites industriales importados), NTFP COMUNITARIOS, ZOOCORIA POR FAUNA AMAZÓNICA MEGAFAUNA TROPICAL y CARACTERES TAXONÓMICOS DIFERENCIALES (glabro vs pubescente, drupa pequeña vs grande, hidromorfo vs tierra firme). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, SINCHI Amazonía Colombiana, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia."
+    },
+    {
+      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH40_ARBOLES_NATIVOS_CALIDO",
+      "id": "terminalia_amazonia",
+      "nombre_comun": "Amarillo guayabillo",
+      "nombre_comunes_regionales": [
+        "amarillo",
+        "guayabillo",
+        "guayabón amazónico",
+        "roble amarillo",
+        "kanaak panameño"
+      ],
+      "nombre_cientifico": "Terminalia amazonia (J.F.Gmel.) Exell",
+      "familia_botanica": "Combretaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "habito": "árbol perennifolio gigante 25-45 m emergente, fuste recto largo cilíndrico, copa amplia, madera durable amarillo-rosada",
+      "origen": "Mesoamérica-norte de Sudamérica (México sur, Centroamérica, Colombia: Caribe, Pacífico, Amazonía, Magdalena; Venezuela, Ecuador, Perú, Brasil amazónico, Bolivia); típica del bosque húmedo tropical bajo y semihúmedo",
+      "roles_in_guild": [
+        "biomass_producer",
+        "nurse_plant",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "normativa_colombiana": "Nativa silvestre del piso cálido colombiano (<1.000 msnm) con distribución amplia. Madera \"amarillo\" muy apreciada en construcción, mueblería y pisos —ha sido sobreexplotada en algunas regionales del Caribe y Magdalena medio (catalogada Vulnerable a casi amenazada en regionales). Aprovechamiento maderable de individuos >40 cm DAP requiere permiso CAR. Plantaciones agroforestales y restauración contribuyen a recuperación poblacional.",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 800,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 12,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "humedad_relativa_pct": {
+        "min": 60,
+        "optimo": 80,
+        "max": 95
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "methods": [
+          "semilla"
+        ],
+        "best_method": "semilla",
+        "protocol_resumen": "Semilla pequeña dentro de drupa-sámara con ala persistente. Recolección de frutos caídos en estación seca. Sin tratamiento pre-germinativo. Germinación 60-80% a 15-30 días en bandejas con sustrato arenoso-orgánico. Trasplante a bolsa 1.5-2 L a las 6 semanas. Plantación definitiva a los 4-6 meses (40-60 cm). Crecimiento juvenil rápido 1.5-2.5 m/año en condiciones óptimas. Productivo de semilla desde los 10-15 años. Turno maderable 25-40 años por crecimiento moderado.",
+        "tiempo_a_establecimiento_dias": 120,
+        "notas": "Madera \"amarillo\" color amarillo-rosado con vetas finas, densidad media-alta (0.7-0.85 g/cm³), excelente trabajabilidad, durabilidad natural alta, muy apreciada en construcción civil, mueblería fina, ebanistería, parqué y pisos patrimoniales. Tolerante a sequía estacional moderada. Hospeda fauna del dosel y polinización por insectos diurnos."
+      },
+      "scale_viability": [
+        "produccion",
+        "restauracion"
+      ],
+      "manejo_por_escala": {
+        "produccion": {
+          "viable": true,
+          "nota": "Sombrío productivo 30-80 ind/ha en sistemas agroforestales del Caribe, Pacífico, Amazonía y Magdalena medio. Plantación maderable comercial 400-625 árb/ha (5x5 a 4x4 m).",
+          "tips": [
+            "Asocio con cacao y café piedemonte",
+            "Cosecha maderable turno 25-40 años a diámetros >40 cm",
+            "Plantar con podas de formación años 2-4"
+          ]
+        },
+        "restauracion": {
+          "viable": true,
+          "nota": "Especie clave restauración bosque húmedo tropical bajo y semihúmedo del Caribe, Pacífico, Amazonía y Magdalena medio.",
+          "tips": [
+            "Plantación 200-400 ind/ha en mosaicos restaurativos",
+            "Asocio con Cedrela odorata, Cordia alliodora, Tabebuia rosea",
+            "Tolerancia notable a fuego de pastizal post años 3"
+          ]
+        }
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "sinchi-amazonia-colombiana",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "El amarillo guayabillo (Terminalia amazonia (J.F.Gmel.) Exell, familia Combretaceae) es un árbol perennifolio GIGANTE EMERGENTE de 25-45 m de altura con fuste recto cilíndrico largo, copa amplia y madera durable amarillo-rosada muy apreciada, nativo del bosque húmedo tropical bajo y semihúmedo neotropical desde el sur de México hasta Bolivia. En Colombia tiene distribución muy amplia en piso térmico CÁLIDO (<1.200 msnm) en bosques húmedos del Caribe (Antioquia norte, Córdoba, Sucre, Bolívar, Magdalena, Cesar piedemonte), Pacífico (Chocó, Valle, Cauca, Nariño), Magdalena medio (Antioquia, Santander, Bolívar sur), Catatumbo (Norte de Santander), Orinoquía piedemonte-galería (Meta, Casanare, Vichada, Arauca) y Amazonía baja (Caquetá, Putumayo, Amazonas, Vaupés, Guainía, Guaviare). Pertenece a la familia Combretaceae —misma del almendro de playa (Terminalia catappa, introducido en costas tropicales), el guayabón colombiano (T. oblonga) y otros árboles maderables neotropicales del género Terminalia (~150 especies pantropicales)— y se distingue por sus hojas alternas obovado-elípticas agrupadas al final de las ramas, inflorescencias espigadas pequeñas blanco-verdosas melíferas, y frutos drupa-sámara con ala persistente del cáliz que permite dispersión anemocórica. Es UNA DE LAS MADERAS NATIVAS MÁS APRECIADAS EN COLOMBIA por sus vetas finas amarillo-rosadas, densidad media-alta (0.7-0.85 g/cm³), excelente trabajabilidad con acabado pulido, durabilidad natural alta (resistente a termitas e intemperie moderadamente), muy usada en construcción civil patrimonial (estructuras de techo, vigas), mueblería fina, ebanistería, parqué y pisos patrimoniales costeños, ventanería, marcos y embalaje. La sobreexplotación en algunas regionales del Caribe (Magdalena medio, Sierra Nevada de Santa Marta piedemonte) la ha llevado a estatus VULNERABLE a CASI AMENAZADA en libros rojos regionales, aunque a nivel nacional sigue como NATIVA SILVESTRE estable por su amplia distribución y excelente capacidad de regeneración natural en bosques secundarios y plantaciones. Custodia: comunidades campesinas costeñas del Caribe colombiano, comunidades afrodescendientes del Pacífico, comunidades indígenas amazónicas (Tikuna, Bora, Uitoto, Murui-Muinane, Yucuna), comunidades campesinas del piedemonte llanero y bajo Catatumbo. La especie es polinizada por abejas y otros insectos diurnos generalistas (Apis mellifera, Trigona, Melipona, Bombus, lepidópteros diurnos), y la dispersión por viento permite colonización rápida de claros de bosque (pionera secundaria-tardía). Manejo agroecológico: vivero con semilla pre-cosechada en estación seca, plantación 30-80 ind/ha disperso como sombrío productivo en sistemas agroforestales del Caribe, Pacífico, Amazonía, Magdalena medio asociada a cacao (Theobroma cacao), café piedemonte (Coffea arabica baja altitud), copoazú (T. grandiflorum), plátano hartón, caucho (Hevea brasiliensis), pimienta (Piper nigrum); plantaciones maderables comerciales 400-625 árb/ha (5x5 a 4x4 m); cosecha maderable turno 25-40 años a diámetros >40 cm (madera comercial alta calidad); restauración 200-400 ind/ha en mosaicos del bosque húmedo tropical bajo asociada a Cedrela odorata, Cordia alliodora, Tabebuia rosea, Anacardium excelsum, Bombacopsis quinata. Lección viva sobre MADERAS NATIVAS DE CALIDAD INDUSTRIAL (alternativa nacional a maderas tropicales asiáticas importadas), GÉNERO TERMINALIA PANTROPICAL (~150 especies, columna vertebral maderable de los trópicos), DISPERSIÓN ANEMOCÓRICA POR SÁMARA, AGROFORESTERÍA PRODUCTIVA-RESTAURATIVA (madera + sombrío + fauna), MANEJO COMUNITARIO MULTI-REGIONAL (Caribe + Pacífico + Amazonía + Magdalena medio + piedemonte llanero) y SOBERANÍA MADERERA NACIONAL. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, SINCHI Amazonía Colombiana, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia."
     }
   ],
   "biopreparados": [
