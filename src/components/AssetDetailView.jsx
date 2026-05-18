@@ -240,13 +240,14 @@ export const AssetDetailView = () => {
           {/* Bug 2026-05-18 operator: 'no es posible agregar foto a una planta
               ya creada' (cubio recién agregado). Botones para subir foto
               post-creación con dual options cámara/galería + captureAndCompress
-              + savePhoto. Refresh la galería al guardar. */}
-          {isPlantType && (
-            <AddPhotoSection
-              assetId={asset.id}
-              speciesSlug={deriveSpeciesSlug(name)}
-            />
-          )}
+              + savePhoto. Refresh la galería al guardar.
+              Update 2026-05-18: extendido a TODOS los tipos de asset (plant,
+              land/zona/propiedad, structure/túnel/invernadero, equipment),
+              no solo plants. Operator agregó zona y no podía ver fecha ni foto. */}
+          <AddPhotoSection
+            assetId={asset.id}
+            speciesSlug={isPlantType ? deriveSpeciesSlug(name) : null}
+          />
 
           <GeometrySection asset={asset} parentZoneName={parentZoneName} onEdit={() => setShowGeoPicker(true)} saving={geoSaving} />
 
