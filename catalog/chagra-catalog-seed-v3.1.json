@@ -10344,8 +10344,19 @@
       "proceso_resumen": "Aeración con bomba de pecera 24-36h. Uso dentro de 4h post-preparación. Aplicación foliar 1:5 o riego al pie 1:10.",
       "tiempo_elaboracion_dias": 1,
       "vida_util_dias": 1,
+      "uso": "Foliar al amanecer o atardecer cada 10-15 días en fase vegetativa, o como empapado al sustrato pre-trasplante; aplicar dentro de las 4 h posteriores a cortar la aireación para no perder la microbiota activa.",
+      "dosis": "Foliar: dilución 1:5 con agua declorada (≈200 ml de té por L de agua, 200-300 L/ha). Drench al pie: 1:10 (≈1 L por planta hortícola, 5 L por árbol joven).",
+      "target": [
+        "fertilizante_general",
+        "estimulante_microbiano_suelo",
+        "preventivo_mildeo_polvoso",
+        "preventivo_botrytis"
+      ],
+      "valor_pedagogico": "Inóculo microbiano vivo (10^8-10^9 UFC/ml de bacterias aerobias y esporas de hongos saprófitos) extraído del compost por aireación forzada con melaza como carbono lábil. Coloniza filoplano y rizosfera por exclusión competitiva contra patógenos (Ingham; Restrepo, ABC orgánico). Advertencias: si la aireación se detiene >2 h vira anaeróbico y produce ácidos fitotóxicos; no aplicar bajo sol del mediodía (UV mata 90% del inóculo en 30 min); no mezclar con caldo bordelés o sulfocálcico — el cobre/azufre esterilizan la microbiota.",
       "source_ids": [
-        "ingham-2000-compost-tea"
+        "ingham-2000-compost-tea",
+        "restrepo-1996-abc-agricultura-organica",
+        "agrosavia-manual-biopreparados-2015"
       ]
     },
     {
@@ -10363,8 +10374,19 @@
       "proceso_resumen": "Lixiviado por percolación 1kg humus/5L agua durante 24h. Aplicación foliar 1:10 o riego 1:5.",
       "tiempo_elaboracion_dias": 1,
       "vida_util_dias": 15,
+      "uso": "Foliar cada 7-15 días en fase vegetativa y vegetativa-reproductiva, preferentemente al amanecer; también drench al pie de plántulas recién trasplantadas para mitigar estrés de transplante.",
+      "dosis": "Foliar: 1:10 con agua (≈100 ml de lixiviado por L, ≈300 L de mezcla/ha). Drench: 1:5 (≈250 ml por planta hortícola, 1-2 L por árbol joven).",
+      "target": [
+        "fertilizante_general",
+        "bioestimulante_acidos_humicos",
+        "antiestres_transplante",
+        "preventivo_nematodos"
+      ],
+      "valor_pedagogico": "Lixiviado rico en ácidos húmicos y fúlvicos (3-8 g/L), reguladores tipo auxinas/citoquininas y microbiota aeróbica del tracto de Eisenia foetida (Pseudomonas, Bacillus, Actinomycetes). Los fúlvicos quelatan micronutrientes (Fe, Zn, Mn) facilitando absorción foliar — análogo orgánico a quelatos EDTA, biodegradable y de bajo costo (AGROSAVIA, Restrepo). Advertencias: dosis foliares >1:5 queman hojas tiernas por sales; olor a podredumbre indica anaerobiosis y descarte; conservar tapado en oscuridad <25°C — vida útil cae a 7 días si supera 30°C.",
       "source_ids": [
-        "agrosavia-manual-biopreparados-2015"
+        "agrosavia-manual-biopreparados-2015",
+        "restrepo-1996-abc-agricultura-organica",
+        "restrepo-2007-biopreparados"
       ]
     },
     {
@@ -10382,8 +10404,19 @@
       "proceso_resumen": "Fermentación aeróbica 20-30 días con revolver semanal. Rica en K y micronutrientes. Aplicación foliar 1:20 en fase reproductiva.",
       "tiempo_elaboracion_dias": 25,
       "vida_util_dias": 120,
+      "uso": "Foliar cada 10-15 días desde inicio de floración hasta llenado de fruto; especialmente útil en cucurbitáceas, solanáceas, frutales en cuaja y leguminosas en envainado.",
+      "dosis": "Foliar: 1:20 con agua (≈50 ml de lixiviado por L, 200-300 L/ha). Drench reproductivo: 1:10 al pie semanal en pleno cuajado.",
+      "target": [
+        "fertilizante_floracion_fructificacion",
+        "aporte_potasio",
+        "micronutrientes_B_Zn_Mn",
+        "mejora_brix_calidad_fruto"
+      ],
+      "valor_pedagogico": "Fermentación láctica-alcohólica: levaduras (Saccharomyces, Hanseniaspora) y lácticas (Lactobacillus) degradan azúcares liberando K soluble (4-12 g/L K2O), B, Zn, Mn y ácidos orgánicos que liberan cationes en suelos calcáreos. Restrepo y Pinheiro lo usan como análogo orgánico al KNO3 en floración, sin salinización. Advertencias: moho blanco (Geotrichum) es seguro; negro/verde (Aspergillus) obliga descarte por micotoxinas. pH final 3.5-4.0; >4.5 indica putrefacción. No aplicar en vegetativa temprana — K antagoniza N.",
       "source_ids": [
-        "restrepo-1996-bocashi"
+        "restrepo-1996-bocashi",
+        "restrepo-2007-biopreparados",
+        "agrosavia-manual-biopreparados-2015"
       ]
     },
     {
@@ -10404,8 +10437,19 @@
       "proceso_resumen": "Fermentación anaeróbica 90 días con adición escalonada de sulfatos minerales cada 7 días. Corrige micronutrientes. Aplicación foliar 1:20.",
       "tiempo_elaboracion_dias": 90,
       "vida_util_dias": 365,
+      "uso": "Foliar correctivo de micronutrientes cada 15-21 días durante todo el ciclo, intensificando frecuencia en cultivos con síntomas visibles de deficiencia (clorosis intervenal, brotes deformes, frutos pequeños) o en suelos pobres/calcáreos del altiplano cundiboyacense.",
+      "dosis": "Foliar: 1:20 con agua (≈50 ml/L, 200-400 L/ha). Preventivo: 1:50 cada 30 días. Nunca superar 100 ml/L — riesgo de fitotoxicidad por exceso de Cu/Zn.",
+      "target": [
+        "correccion_micronutrientes",
+        "deficiencia_boro_zinc_manganeso",
+        "estimulante_microbiano_filoplano",
+        "fertilizacion_complemento_NPK"
+      ],
+      "valor_pedagogico": "Receta de Restrepo (1996) y Pinheiro: fermentación anaeróbica láctica de estiércol + leche + melaza donde Lactobacillus y levaduras solubilizan sulfatos añadidos en 5-7 etapas semanales, quelándolos con ácidos orgánicos y aminoácidos biodisponibles. Análogo orgánico a quelatos EDTA/EDDHA, biodegradable y a 1/10 del costo. Cubre 7 deficiencias típicas en suelos andinos ácidos (Mg, Zn, Mn, Cu, Fe, B, Co). Advertencias: sulfatos de Cu/Zn >2% esterilizan el barril; fermentación <60 días deja sulfatos sin quelatar y quema follaje; pH 3.5-4.2; contraindicado en floración plena.",
       "source_ids": [
-        "restrepo-1996-bocashi"
+        "restrepo-1996-bocashi",
+        "restrepo-2005-agroecologia",
+        "restrepo-2007-biopreparados"
       ]
     },
     {
@@ -10422,8 +10466,22 @@
       "proceso_resumen": "Aplicación 1kg/ha mezclado con compost maduro, incorporado en los primeros 10cm del suelo. Control biológico de Rhizoctonia, Fusarium, Sclerotinia.",
       "tiempo_elaboracion_dias": 21,
       "vida_util_dias": 90,
+      "uso": "Al sustrato pre-siembra o pre-trasplante, incorporado a 0-15 cm de profundidad mezclado con compost maduro como vehículo; también en hoyos de plantación de frutales y forestales, y como drench preventivo cada 30-45 días en cultivos con historial de pudriciones radiculares.",
+      "dosis": "Sustrato/campo: 1-2 kg/ha de sustrato sólido (10^8 UFC/g). Hoyo de plantación: 5-10 g por hoyo. Drench preventivo: 50 g/100 L de agua, 1-2 L por planta. Repetir a los 30-45 días en cultivos susceptibles.",
+      "target": [
+        "control_rhizoctonia_solani",
+        "control_fusarium_oxysporum",
+        "control_sclerotinia_sclerotiorum",
+        "control_pythium",
+        "induccion_resistencia_sistemica",
+        "promocion_crecimiento_radicular"
+      ],
+      "valor_pedagogico": "Hongo antagonista saprófito que coloniza la rizosfera y controla patógenos vía: (1) micoparasitismo sobre Rhizoctonia, Fusarium, Sclerotinia y Pythium degradándolas con quitinasas/β-1,3-glucanasas; (2) competencia por exudados radiculares; (3) antibióticos volátiles (6-pentil-pirona, gliotoxina); (4) inducción de resistencia sistémica vía jasmonato/etileno. AGROSAVIA y Cenicafé validaron cepas locales ICA-registradas, análogo al carbendazim sin residuos. Advertencias: no aplicar a suelo seco (<30% humedad); incompatible con cúpricos y mancozeb; evitar pleno sol; pH >8.0 contraindicado.",
       "source_ids": [
-        "cenicafe-trichoderma-2010"
+        "cenicafe-trichoderma-2010",
+        "agrosavia-manual-biopreparados-2015",
+        "agrosavia-bacillus-2018",
+        "ica-resolucion-3168-2015"
       ]
     },
     {
