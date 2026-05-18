@@ -6806,11 +6806,14 @@
         "notas": "Siembra escalonada cada 4-6 semanas para cosecha continua. Las heladas mejoran el sabor al convertir almidones en azucares."
       },
       "source_ids": [
-        "gbif-taxonomic-backbone",
         "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "bernal-2015-plantas-liquenes-colombia",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Leccion de resiliencia al frio: el kale endulza con las heladas, ensenando como el estres termico transforma la quimica de la planta en la alta montana."
+      "valor_pedagogico": "La col rizada o kale (Brassica oleracea var. acephala L., familia Brassicaceae) es una brasicácea bienal a perenne herbácea originaria de la cuenca mediterránea occidental, ancestro silvestre común del repollo, brócoli y coliflor, cultivada extensamente en huertos campesinos colombianos de clima frío por sus hojas verde-azuladas crespas comestibles de alta densidad nutricional (vitamina K, A, C, calcio, hierro, glucosinolatos sulforafano-precursores). Se cultiva en Cundinamarca (Sabana de Bogotá, Cota, Subachoque, Sopó, Mosquera), Boyacá (Tunja, Villa de Leyva, Sotaquirá), Antioquia (oriente — La Ceja, Santa Rosa, Rionegro), Nariño (Pasto, Túquerres) y Eje cafetero alto entre 1.800 y 2.800 msnm en zona térmica fría. Ciclo bienal con producción foliar continua de 6-9 meses por planta. Rendimientos 15-25 t/ha hoja fresca. Lección viva de resiliencia al frío y química de la planta: el kale endulza con las heladas, enseñando cómo el estrés térmico transforma la química de la planta (conversión de almidón en azúcares solubles mono- y disacáridos como respuesta de criorresistencia), mejorando palatabilidad post-helada — fenómeno también observado en repollo, coles de Bruselas, brócoli morado y rábano de invierno. Es bioindicador de suelos bien estructurados ricos en materia orgánica. Manejo agroecológico: siembra escalonada cada 4-6 semanas para cosecha continua, asocio con tomillo y romero como repelentes de mariposa de la col (Pieris brassicae), control biológico de plutella xylostella con Bacillus thuringiensis kurstaki, cosecha de hojas externas tipo cut-and-come-again (recolección secuencial sin extracción de planta), rotación cada 3 años para evitar hernia de col Plasmodiophora brassicae. Fuentes Tier A: AGROSAVIA Manual Hortalizas, POWO Kew, GBIF Backbone Taxonomy, ICA Resolución 3168/2015, Bernal 2015 Catálogo Plantas Colombia."
     },
     {
       "id": "brassica_oleracea_var_capitata",
@@ -6888,11 +6891,15 @@
         "notas": "Siembra directa a chorrillo. Ciclo rapido (60-80 dias). Tanto la raiz como las hojas son comestibles."
       },
       "source_ids": [
-        "gbif-taxonomic-backbone",
         "powo-kew",
-        "ica-resolucion-3168-2015"
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "bernal-2015-plantas-liquenes-colombia",
+        "ica-resolucion-3168-2015",
+        "agrosavia-forrajeras-2022"
       ],
-      "valor_pedagogico": "Leccion de aprovechamiento integral: el nabo demuestra que una misma planta puede generar alimento de la raiz y de la hoja, minimizando el desperdicio."
+      "valor_pedagogico": "El nabo (Brassica rapa var. rapa L., familia Brassicaceae) es una brasicácea bienal cultivada de raíz hipocotílica engrosada blanca a violeta, originaria de Europa y norte de Asia, cultivada tradicionalmente en huertos andinos colombianos por su doble aprovechamiento alimentario y forrajero. La raíz globosa o aplanada (5-15 cm diámetro) contiene azúcares simples, glucosinolatos sinigrina-tipo (acción anticancerígena documentada) y vitamina C, mientras las hojas verde-oscuras pubescentes son ricas en calcio, hierro y β-caroteno. Se cultiva en Cundinamarca (Sabana de Bogotá, Subachoque, Tabio, Sopó, Madrid), Boyacá (Tunja, Sotaquirá, Sutamarchán, Villa de Leyva), Nariño (Pasto, Túquerres, Sapuyes) y zonas frías altoandinas entre 2.000 y 3.000 msnm en zona térmica fría. Ciclo rápido 60-80 días desde siembra a cosecha. Rendimientos 20-35 t/ha raíz fresca, 8-12 t/ha hoja. Lección viva de aprovechamiento integral y zero-waste agrícola: el nabo demuestra que una misma planta puede generar alimento de la raíz (cocción, encurtidos, sopas) y de la hoja (salteados, ensaladas, forraje animal), minimizando el desperdicio y maximizando aporte nutricional por área cultivada, principio clave en sistemas de seguridad alimentaria campesina. Manejo agroecológico: siembra directa a chorrillo o golpe a 25-30 cm entre plantas, raleo a los 25-30 días, asocio con zanahoria y lechuga para uso eficiente de suelo, rotación obligatoria 3 años con leguminosas para romper ciclo de Plasmodiophora brassicae (hernia de col), forraje verde para bovinos y ovinos en finca diversificada, cosecha pre-floración antes de fibrosa la raíz. Fuentes Tier A: AGROSAVIA Manual Hortalizas, POWO Kew, GBIF Backbone Taxonomy, ICA Resolución 3168/2015, Bernal 2015 Catálogo Plantas Colombia."
     },
     {
       "id": "daucus_carota_subsp_sativus",
@@ -6929,11 +6936,14 @@
         "notas": "Siembra directa en suelo suelto y profundo. Germinacion lenta (14-21 dias); requiere humedad constante en la capa superficial."
       },
       "source_ids": [
-        "gbif-taxonomic-backbone",
         "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "bernal-2015-plantas-liquenes-colombia",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Leccion de calidad del suelo: la zanahoria revela la estructura del suelo al desarrollarse; suelos compactos producen raices deformes, ensenando la importancia de la preparacion profunda."
+      "valor_pedagogico": "La zanahoria (Daucus carota L. subsp. sativus (Hoffm.) Arcang., familia Apiaceae) es una apiácea bienal cultivada de raíz pivotante engrosada anaranjada (variedad Chantenay, Nantes, Imperator) a violeta (variedades ancestrales), domesticada desde la zanahoria silvestre euroasiática y aclimatada exitosamente en huertos andinos colombianos por su riqueza en β-caroteno (provitamina A), α-caroteno, luteína, fibra dietaria y azúcares simples. Se cultiva en Cundinamarca (Sabana de Bogotá, Funza, Madrid, Mosquera, Subachoque, Sopó), Boyacá (Tunja, Sotaquirá, Sutamarchán, Villa de Leyva, Cucaita), Nariño (Pasto, Sapuyes, Túquerres) y Eje cafetero alto entre 1.500 y 2.700 msnm en zona térmica templada a fría. Ciclo 90-120 días desde siembra a cosecha. Rendimientos 25-45 t/ha raíz fresca, primer cultivo hortícola por área en sabana de Bogotá. Lección viva de calidad y estructura del suelo: la zanahoria revela la estructura física del suelo al desarrollarse — suelos compactos, pedregosos o con costras superficiales producen raíces deformes, bifurcadas o cortas, enseñando la importancia crítica de la preparación profunda de cama (25-30 cm), aireación y descompactación previa, y la incorporación de materia orgánica fina y compostada. Es bioindicador de calidad de labranza y fertilidad estructural. Manejo agroecológico: siembra directa a chorrillo en surcos a 25 cm con cubierta superficial 0.5 cm de tierra fina, germinación lenta 14-21 días requiere humedad constante en capa superficial (riego frecuente y poco volumen), raleo en dos pases a los 30 y 45 días dejando 4-5 cm entre plantas, asocio con cebolla larga (Allium fistulosum) que repele mosca de la zanahoria (Psila rosae), rotación obligatoria 3 años. Fuentes Tier A: AGROSAVIA Manual Hortalizas, POWO Kew, GBIF Backbone Taxonomy, ICA Resolución 3168/2015, Bernal 2015 Catálogo Plantas Colombia."
     },
     {
       "id": "allium_schoenoprasum",
@@ -6975,11 +6985,14 @@
         "notas": "Se propaga facilmente por division de macollos. Sus flores lilas atraen polinizadores. Las hojas tubulares son mas finas que las de allium fistulosum."
       },
       "source_ids": [
-        "gbif-taxonomic-backbone",
         "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-tibaitata",
+        "bernal-2015-plantas-liquenes-colombia",
         "ica-resolucion-3168-2015"
       ],
-      "valor_pedagogico": "Leccion de biodiversidad funcional: sus flores atraen abejas y sus hojas ahuyentan plagas, demostrando el principio de polycultura en bordes de cama."
+      "valor_pedagogico": "El cebollino o cebollín (Allium schoenoprasum L., familia Amaryllidaceae, subfamilia Allioideae) es una alliácea perenne herbácea bulbosa originaria de regiones templadas del hemisferio norte (Europa, Asia, América del Norte), aclimatada exitosamente en huertos andinos colombianos por sus hojas tubulares finas verde-azuladas aromáticas (más finas que las del Allium fistulosum cebolla larga), inflorescencias en umbela esférica con flores lilas-rosadas y crecimiento en macollos densos por bulbillos. Sus compuestos sulfurados volátiles (alicina, propil-disulfuros, sinpropanetial S-óxido) son responsables del aroma, sabor y propiedades insectifugas. Se cultiva en Cundinamarca (Sabana de Bogotá, Subachoque, Tabio, Cota, La Calera), Boyacá (Tunja, Villa de Leyva, Sutamarchán), Nariño (Pasto, Yacuanquer, Sapuyes), Antioquia (oriente, La Ceja, Rionegro) y Eje cafetero alto entre 1.800 y 2.800 msnm en zona térmica templada a fría. Ciclo perenne, producción foliar continua 3-4 años antes de renovar mata. Rendimientos 5-8 t/ha hoja fresca. Lección viva de biodiversidad funcional y policultivo de bordes: sus flores lilas atraen polinizadores nativos (Bombus rohweri, Apis mellifera, abejas Tetragonisca) y enemigos naturales de plagas (Chrysoperla externa, sírfidos depredadores de áfidos), mientras sus hojas con sulfurados volátiles ahuyentan pulgones (Myzus persicae), mosca de la zanahoria (Psila rosae) y polilla del tomate (Tuta absoluta), demostrando el principio agroecológico de policultivo funcional en bordes de cama (push-pull) que reduce hasta 60% la presión de plagas en cultivos asociados (lechuga, zanahoria, tomate). Manejo agroecológico: propagación facilísima por división de macollos cada 2-3 años (más confiable que semilla), siembra en bordes y caminos del huerto, asocio obligatorio con zanahoria, tomate y rosas, cosecha tipo cut-and-come-again a 3-4 cm sobre suelo, no requiere agroquímicos. Fuentes Tier A: AGROSAVIA Manual Hortalizas, POWO Kew, GBIF Backbone Taxonomy, ICA Resolución 3168/2015, Bernal 2015 Catálogo Plantas Colombia."
     },
     {
       "id": "avena_sativa",
@@ -7036,11 +7049,15 @@
         "raphanus_sativus_oleifer"
       ],
       "antagonists": [],
-      "valor_pedagogico": "El manto verde de la chagra: la avena forrajera protege el suelo desnudo entre cosechas, ensenando el valor de la cobertura permanente y el ciclo de materia organica en la rotacion altoandina.",
+      "valor_pedagogico": "La avena forrajera (Avena sativa L., familia Poaceae, subfamilia Pooideae) es una poácea anual herbácea cereal originaria del Oriente Medio fértil, domesticada hace ~3.000 años y aclimatada a los Andes desde la Conquista, cultivada extensamente en sistemas campesinos colombianos de alta montaña como cultivo de cobertura (cover crop), forraje verde de corte, ensilaje, fuente de grano para consumo humano (harina, hojuelas) y abono verde en rotaciones con papa, papa criolla, hortalizas y leguminosas andinas. Se cultiva en Boyacá (Tunja, Sotaquirá, Sutamarchán, Villa de Leyva, Toca, altiplano cundiboyacense), Cundinamarca (Sabana de Bogotá, Subachoque, Sumapaz, Choachí), Nariño (Pasto, Túquerres, Ipiales, Sapuyes), Cauca (Silvia, Totoró) y Antioquia (oriente lechero — La Unión, La Ceja) entre 2.200 y 3.000 msnm en zona térmica fría a páramo bajo. Ciclo corto 4-5 meses desde siembra a corte de forraje verde. Rendimientos 8-12 t/ha materia seca forrajera, 2-4 t/ha grano. Lección viva del manto verde de la chagra altoandina: la avena forrajera protege el suelo desnudo entre cosechas de papa y hortalizas, enseñando el valor crítico de la cobertura permanente del suelo (no-soil-bare), el aporte de biomasa carbonada (C/N 25-30:1) en la rotación altoandina, y la ruptura de ciclos de patógenos suelo-borne como Globodera spp. (nematodo dorado de la papa) y Rhizoctonia solani. Manejo agroecológico: siembra al voleo o a chorrillo 80-100 kg/ha semilla, asocio con vicia (Vicia atropurpurea) fijadora de nitrógeno para mejorar C/N y aporte de N biológico, incorporación en floración (pre-grano lechoso) como abono verde para máximo aporte de biomasa, corte para forraje cada 60-80 días con rebrote 2-3 cortes/ciclo. Fuentes Tier A: AGROSAVIA Forrajeras 2022, POWO Kew, GBIF Backbone Taxonomy, ICA Resolución 3168/2015, Bernal 2015 Catálogo Plantas Colombia.",
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
+        "gbif-colombia",
         "agrosavia-forrajeras-2022",
+        "agrosavia-tibaitata",
+        "bernal-2015-plantas-liquenes-colombia",
+        "ica-resolucion-3168-2015",
         "restrepo-2005-agroecologia"
       ],
       "validation_level": "claude_draft"
