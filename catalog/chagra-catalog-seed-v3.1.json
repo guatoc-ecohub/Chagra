@@ -20240,6 +20240,1671 @@
       ],
       "valor_pedagogico": "La siempreviva u hoja del aire (Kalanchoe pinnata (Lam.) Pers., Crassulaceae, sinónimo Bryophyllum pinnatum (Lam.) Oken — algunos autores la ubican aún en género Bryophyllum) es una planta suculenta perenne originaria de Madagascar y África Oriental tropical, ampliamente naturalizada pantropicalmente (incluida Colombia desde hace siglos) entre 0 y 2.200 msnm en zonas térmicas cálidas-templadas-moderadas en casi todo el país: Antioquia (Medellín, Suroeste cafetero, Oriente, Bajo Cauca), Valle del Cauca (cinturón frutícola y zonas urbanas), Cundinamarca (Sabana templada — La Mesa, Anolaima, Anapoima, Fusagasugá), Boyacá templada (Moniquirá, Santana, Chitaraque), Caldas, Risaralda, Quindío (Eje Cafetero), Tolima, Huila, Santander (Bucaramanga, San Gil, Barichara, Lebrija), Norte de Santander, Magdalena (Santa Marta), Atlántico (Barranquilla), Bolívar (Cartagena), Cesar (Valledupar), La Guajira (sur), Córdoba, Sucre, Chocó (Quibdó), Cauca, Nariño y zonas urbanas en general. Es lección viva PEDAGÓGICAMENTE EXCELENTE — entre las plantas más mágicas del catálogo de huerta escolar — de reproducción asexual vegetativa por apomixis foliar (también llamada reproducción foliar plantular o yemas foliares marginales), un fenómeno biológico extraordinario que enseña a niñas y niños cómo una sola hoja desprendida de Kalanchoe pinnata produce espontáneamente 5-15 plantulas en miniatura (propágulos foliares) en cada hendidura del margen serrado-crenado de la hoja — sin necesidad de semilla, sin floración, sin polinización, sin riego intensivo, en apenas 7-21 días — basta dejar una hoja sobre tierra apenas humedecida (o incluso pegada con cinta a una pared con humedad ambiental) para que emita docenas de hijos perfectos clonales con sus propias raíces y hojas listas para autopropagarse y formar nuevas plantas adultas en pocos meses. Goethe la estudió obsesivamente durante sus investigaciones de metamorfosis vegetal y la nombró 'Goethe-Pflanze' (planta de Goethe) en honor a esa capacidad regenerativa que parecía contradecir las leyes biológicas conocidas en su época (siglo XVIII-XIX) — fenómeno hoy entendido como meristemos epifilos pre-formados en el primordio foliar que se activan tras desconexión del flujo de auxinas-citokininas de la planta madre. Pertenece a la familia Crassulaceae (igual familia que Crassula ovata jade, sedum, echeveria), planta perenne arbustiva-herbácea de 0.6-1.8 m de altura con tallos suculentos huecos rojizo-verdosos, hojas suculentas opuestas decusadas pinnadas en las plantas adultas (3-5 folíolos elípticos crenado-aserrados) o simples ovalado-crenadas en plantas juveniles (3-15 cm largo x 2-8 cm ancho) verde-jade brillantes a veces con bordes rojizos en exposición sol, inflorescencia panícula terminal péndula vistosa con flores tubulares colgantes péndulas anaranjado-rojizo-purpúreas (2-5 cm largo) polinizadas por colibríes (Trochilidae — colibríes esmeralda, pico-de-hoz, ermitaños neotropicales) y polillas crepusculares, frutos folículos con muchas semillas pequeñas (rara vez forma fruto en Colombia — predomina reproducción foliar asexual). Patrón fotosintético CAM. Uso medicinal tradicional pantropical bien documentado: hojas frescas trituradas como cataplasma cicatrizante de heridas-quemaduras-úlceras cutáneas, jugo de hojas como antiinflamatorio-antitusivo-diurético-antilitiásico (uso popular muy difundido en Colombia, Caribe, Centroamérica, Brasil, África, India — 'leaf of life'), estudios fitoquímicos identifican bufadienólidos (cardenólidos similares a digitálicos — precaución cardíaca en dosis altas), flavonoides, esteroles, ácidos orgánicos. Considerada planta ritual-protectora en tradiciones afrocaribeñas-yorubas santería ('yerba bruja' protectora del hogar). Manejo agroecológico: PROPAGACIÓN PRÁCTICAMENTE GRATUITA E ILIMITADA — basta dejar una hoja madura desprendida sobre sustrato apenas humedecido (tierra + arena 1:1) o incluso colgada en una bolsa plástica transparente con poca humedad ambiental y a los 7-21 días emite plantulas marginales listas para trasplantar individualmente, distancia 30-50 cm en cobertura, sombra parcial a sol parcial filtrado (no sol pleno tropical), riego moderado-escaso, suelos bien drenados, tolera sequía moderada, asocio con menta, hierbabuena, hierbabuena, cilantro, ajenjo, ruda en huertos medicinales caseros. Función en chagra/huerto escolar como medicinal tradicional cosmopolita de soberanía alimentaria, planta PEDAGÓGICAMENTE EXCELENTE para enseñar reproducción asexual vegetativa por apomixis foliar a niñas y niños (la lección biológica más impactante y visual de toda la huerta — un solo experimento simple con una hoja sobre tierra muestra la magia de la propagación clonal), cobertura del suelo medicinal, atractora de colibríes y polillas, ornamental tropical. Fuentes Tier A: GBIF, POWO Kew, Pamplona-Roger 2006 Plantas Medicinales, JBB Plantas Medicinales Cundinamarca-Boyacá, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015.",
       "validation_level": "claude_draft"
+    },
+    {
+      "id": "capsicum_chinense_aji_panca",
+      "nombre_comun": "Ají panca",
+      "nombre_comunes_regionales": [
+        "ají panca colombiano",
+        "ají rojo seco",
+        "ají dulce-picante",
+        "panca"
+      ],
+      "nombre_cientifico": "Capsicum chinense Jacq. cv. 'Panca'",
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1800,
+        "max_absoluto": 2200
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 18,
+        "optimo_max": 28,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinación 8-15 días a 22-28°C. Trasplante a las 6-8 semanas con 4-6 hojas verdaderas. Distancia 50-60 cm. Ciclo 4-6 meses a primera cosecha."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "agrosavia-manual-frutales-tropicales",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "El ají panca (Capsicum chinense Jacq. cv. 'Panca', Solanaceae) es un cultivar de ají de fruto rojo intenso y picor moderado (10.000-30.000 SHU en escala Scoville, equivalente a ají cayena suave) tradicional de la región andina noroccidental de Suramérica con presencia ancestral en Colombia bajo el nombre 'ají panca colombiano' o 'ají rojo seco', particularmente en las regiones Andina (Cundinamarca, Boyacá clima medio, Santander, Norte de Santander, Tolima, Huila, Antioquia, Valle del Cauca, Cauca, Nariño) y Caribe (Magdalena, Bolívar, Sucre, Córdoba) entre 0 y 1.800 msnm en zonas térmicas cálidas y templadas. Pertenece a la familia Solanaceae (igual que tomate, papa, pimentón, lulo, tomate de árbol, uchuva, ají dulce, rocoto, ulluco) y al género Capsicum del que existen cinco especies domesticadas: C. annuum (pimentón, jalapeño, cayena), C. chinense (habanero, panca, ají charapita, ají amarillo de mar), C. baccatum (ají amarillo andino), C. pubescens (rocoto), C. frutescens (tabasco, chiltepín). El cultivar 'panca' se distingue por frutos alargados (8-12 cm) de color rojo oscuro a casi negro cuando maduros, secados al sol para uso culinario en pastas y aderezos, picor moderado equilibrado por dulzor afrutado, y aceites esenciales ricos en capsaicina (alcaloide responsable del picor con propiedades vasodilatadoras, analgésicas tópicas y antimicrobianas) y carotenoides (capsantina, capsorubina, beta-caroteno provitamina A). Es lección viva de domesticación precolombina y biodiversidad cultivada que enseña a niñas y niños cómo los pueblos andinos seleccionaron durante miles de años decenas de cultivares de ají con diferentes niveles de picor, color, sabor y uso culinario — patrimonio agrobiocultural irreemplazable. Manejo agroecológico: propagación por semilla (germinación 8-15 días a 22-28°C, no tolera heladas), trasplante a las 6-8 semanas con 4-6 hojas verdaderas, distancia 50-60 cm entre plantas y 80 cm entre surcos, riego regular pero sin encharcamiento (sensible a Phytophthora capsici), tutorado opcional para variedades altas, cosecha escalonada de frutos maduros rojos durante 2-4 meses, secado al sol para conservación de pasta picante. Companion plants ideales: albahaca (repele plagas), cebollín y cebolla larga (repele áfidos), zanahoria. Antagonistas: hinojo (alelopatía), brassicas en proximidad cercana. Función en chagra como hortaliza-condimento de alto valor culinario y atractora de polinizadores. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015 Catálogo Plantas y Líquenes Colombia, AGROSAVIA Manual Frutales Tropicales, Pérez-Arbeláez 1947 Plantas Útiles Colombia."
+    },
+    {
+      "id": "capsicum_baccatum_aji_amarillo",
+      "nombre_comun": "Ají amarillo andino",
+      "nombre_comunes_regionales": [
+        "ají amarillo",
+        "ají escabeche",
+        "ají kellu uchu",
+        "ají andino"
+      ],
+      "nombre_cientifico": "Capsicum baccatum L.",
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 600,
+        "optimo_min": 1500,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 15,
+        "optimo_max": 25,
+        "max_tolerable": 32
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinación 10-20 días a 20-25°C (más lenta que C. annuum). Trasplante a las 8 semanas. Distancia 60-80 cm. Ciclo 5-7 meses a primera cosecha. Más rústico al frío andino que otras especies de Capsicum."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "agrosavia-manual-frutales-tropicales",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "El ají amarillo andino (Capsicum baccatum L., Solanaceae) es una de las cinco especies de ají domesticadas en los Andes precolombinos, originaria del altiplano boliviano-peruano-noroeste argentino y cultivada ancestralmente en los Andes ecuatorianos y colombianos desde el sur de Nariño hasta Boyacá-Cundinamarca, con presencia documentada en las regiones Andina (Nariño, Cauca, Valle del Cauca, Huila, Tolima, Cundinamarca, Boyacá, Santander) entre 600 y 3.000 msnm en zonas térmicas templadas y frías — su adaptación al clima fresco-frío andino es su rasgo más distintivo frente a otras especies de Capsicum que prefieren climas cálidos. Pertenece a la familia Solanaceae (igual que tomate, papa, pimentón, lulo, tomate de árbol, uchuva, rocoto, ají dulce, ulluco) y al género Capsicum sección Baccatum, hermana evolutiva de C. pubescens (rocoto) con la que comparte adaptación a altitudes altas. El fruto característico es alargado-fusiforme (8-15 cm), color amarillo intenso a anaranjado cuando maduro, con picor moderado a alto (30.000-50.000 SHU equivalente a cayena), sabor afrutado-frutal distintivo con notas a piña-mango (debido a ésteres aromáticos únicos de la especie), excelente para conservas en escabeche, pastas, salsas y cocina andina tradicional. Carácter diagnóstico: corolas blanco-cremas con manchas amarillas en la base de los pétalos (única en el género Capsicum cultivado), distinto a las corolas blanco-puras de C. annuum/chinense. Su nombre quechua 'kellu uchu' significa literalmente 'ají amarillo' y constituye uno de los condimentos icónicos de la cocina peruano-boliviana (papa a la huancaína, ají de gallina, escabeche) que también se cultiva en Colombia andina. Es lección viva de bio-diversidad cultivada y soberanía alimentaria que enseña a niñas y niños cómo cada especie de ají se adaptó a un piso térmico distinto: el chinense al trópico cálido, el baccatum al andino fresco, el pubescens al frío. Manejo agroecológico: propagación por semilla (germinación 10-20 días a 20-25°C, más lenta que C. annuum por adaptación a clima fresco), trasplante a las 8 semanas, distancia 60-80 cm entre plantas, riego regular sin encharcamiento, tutorado obligatorio (planta puede alcanzar 1.5-2 m), cosecha escalonada 5-7 meses, frutos verdes para escabeche y maduros amarillos para pastas. Companion plants: albahaca, cebollín, zanahoria, lechuga. Función en chagra como hortaliza-condimento andina de alto valor agroalimentario y cultural. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015, AGROSAVIA Manual Frutales Tropicales, Pérez-Arbeláez 1947."
+    },
+    {
+      "id": "capsicum_pubescens_rocoto",
+      "nombre_comun": "Rocoto",
+      "nombre_comunes_regionales": [
+        "locoto",
+        "rocoto andino",
+        "ají de monte",
+        "uchu"
+      ],
+      "nombre_cientifico": "Capsicum pubescens Ruiz & Pav.",
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 3200,
+        "max_absoluto": 3500
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinación lenta 15-30 días a 18-22°C. Planta perenne arbustiva 2-3 m. Trasplante a las 10-12 semanas. Distancia 1-1.2 m. Primera cosecha 8-12 meses, productiva 3-5 años. Único Capsicum con semillas negras (carácter diagnóstico) y flores moradas."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "agrosavia-tibaitata"
+      ],
+      "valor_pedagogico": "El rocoto (Capsicum pubescens Ruiz & Pav., Solanaceae) es el único ají adaptado al clima frío de los Andes altos, una especie única en el género Capsicum por su rusticidad a altitudes superiores a 2.000 msnm donde otras especies de ají no prosperan, originaria del altiplano boliviano-peruano y cultivada ancestralmente desde la época precolombina en los Andes ecuatoriano-colombianos: en Colombia se cultiva en Nariño (Pasto, Ipiales, Cumbal), Cauca (Popayán, Silvia, Páez), Boyacá (Tunja, Garagoa, Sogamoso), Cundinamarca (Sabana, Tenjo, Cota) entre 1.200 y 3.500 msnm en zonas térmicas frías y templadas frías. Pertenece a la familia Solanaceae y al género Capsicum sección Pubescens, taxonómicamente más basal y evolutivamente más antigua que las otras especies del género. Tiene tres caracteres diagnósticos únicos en Capsicum: 1) semillas negras (todas las demás especies tienen semillas blanco-amarillas), 2) flores violeta-moradas con corola estrellada (las demás tienen flores blancas o crema), 3) hojas y tallos pubescentes (con pelos visibles, de allí el epíteto 'pubescens'). El fruto es globoso a piriforme (4-7 cm), color rojo-naranja a amarillo cuando maduro, picor alto a muy alto (30.000-100.000 SHU equivalente a habanero suave), pulpa carnosa más gruesa que otros ajíes (semejante a pimentón), sabor frutal con sutil amargor herbal, excelente para rellenar (rocoto relleno boliviano-peruano), salsas crudas (ají de rocoto) y conservas. Planta arbustiva-arborescente perenne de 2-3 m de altura que puede vivir 5-10 años produciendo en clima andino — característica única en el género que la convierte en cultivo permanente patio-huerto-shamba andino. Es lección extraordinaria de adaptación evolutiva al frío y de cómo los pueblos andinos seleccionaron una especie diferente a las del trópico para resolver el problema cultural de tener ají en clima frío: el rocoto demuestra que la biodiversidad agrícola no es uniformidad sino especialización ecológica, y enseña a niñas y niños que el clima frío también tiene su propio picante nativo. Manejo agroecológico: propagación por semilla (germinación lenta 15-30 días a 18-22°C, requiere paciencia), trasplante a las 10-12 semanas, distancia 1-1.2 m (planta grande), tutorado obligatorio (arbusto pesado), poda de formación al 2do año, riego regular sin exceso, primera cosecha 8-12 meses, productiva 3-5 años, sensible a heladas intensas (-2°C letal). Función en chagra andina como ají perenne patrimonial de clima frío, condimento patio y cosecha continua. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015, Pérez-Arbeláez 1947, AGROSAVIA Tibaitatá."
+    },
+    {
+      "id": "capsicum_annuum_aji_dulce_caribe",
+      "nombre_comun": "Ají dulce caribe",
+      "nombre_comunes_regionales": [
+        "ají dulce",
+        "ají de olor",
+        "ají gustoso",
+        "ajicito dulce"
+      ],
+      "nombre_cientifico": "Capsicum annuum L. cv. 'Dulce'",
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1500,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 20,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinación 7-12 días a 25-28°C. Trasplante a las 5-6 semanas. Distancia 40-50 cm. Ciclo 3-5 meses a primera cosecha. Sin picor por mutación recesiva del gen Pun1 — frutos aromáticos pero sin capsaicina."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "agrosavia-manual-frutales-tropicales",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "El ají dulce caribe (Capsicum annuum L. cv. 'Dulce', Solanaceae) es un cultivar emblemático de la cocina caribeña colombiana, venezolana y antillana caracterizado por la ausencia total de picor (0 SHU, mutación recesiva del gen Pun1 que desactiva la biosíntesis de capsaicina) pero con un aroma frutal-floral intenso y único que lo convierte en el condimento aromático base del sofrito caribeño, hogao y guisos costeños — patrimonio agroalimentario afro-caribeño irreemplazable. Se cultiva en toda la región Caribe colombiana (Atlántico, Magdalena, Bolívar, Cesar, Córdoba, Sucre, La Guajira, Arauca, Casanare en piedemonte llanero), Pacífico (Chocó, Valle), Andina baja (valles cálidos interandinos de Antioquia, Santander, Norte de Santander, Tolima, Huila, Valle del Cauca) y Orinoquía (Meta, Vichada) entre 0 y 1.500 msnm en zonas térmicas cálidas y templadas. Pertenece a la familia Solanaceae y al género Capsicum, especie C. annuum (la más cultivada globalmente, que incluye pimentón, jalapeño, cayena, paprika), cultivar 'Dulce' diferenciado del pimentón por su tamaño pequeño (3-6 cm), forma campanulada irregular o piriforme, colores variados al madurar (rojo, amarillo, naranja, verde-amarillento), pulpa delgada aromática y aroma intenso frutal-floral con notas a manzana-piña-floral distinto del aroma vegetal del pimentón. La mutación que elimina el picor mantiene íntegros los carotenoides (capsantina, capsorubina, beta-caroteno), flavonoides (quercetina, luteolina), vitamina C abundante y aceites esenciales aromáticos — convirtiéndolo en condimento de alta densidad nutricional sin la barrera sensorial del picante para niños y mayores. Es lección viva de domesticación selectiva por sabor y de cómo los pueblos afro-caribeños seleccionaron a través de generaciones una variante sin picor pero con aroma maximizado para construir una identidad culinaria distintiva: el sofrito caribeño con ají dulce, cebolla larga, ajo, cilantro y tomate es la base aromática de la cocina costeña colombiana, venezolana, cubana, dominicana y boricua. Manejo agroecológico: propagación por semilla (germinación 7-12 días a 25-28°C), trasplante a las 5-6 semanas, distancia 40-50 cm entre plantas, riego regular, sin tutorado en variedades compactas, cosecha escalonada 3-5 meses, primera cosecha temprana (más rápido que ajíes picantes). Companion plants ideales: albahaca, cilantro cimarrón, cebollín, tomate, plátano (estrato superior). Función en chagra costeña como hortaliza-condimento aromática insustituible. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015 Catálogo Plantas y Líquenes Colombia, AGROSAVIA Manual Frutales Tropicales, Pérez-Arbeláez 1947 Plantas Útiles Colombia."
+    },
+    {
+      "id": "tagetes_minuta",
+      "nombre_comun": "Chinchilla",
+      "nombre_comunes_regionales": [
+        "huacatay andino",
+        "chinchilla",
+        "anís de monte",
+        "muicle del sur",
+        "wakatay"
+      ],
+      "nombre_cientifico": "Tagetes minuta L.",
+      "familia_botanica": "Asteraceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 500,
+        "optimo_min": 1800,
+        "optimo_max": 3200,
+        "max_absoluto": 3600
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 10,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Germinación 5-10 días a 18-22°C. Anual. Resiembra espontánea abundante. Cosecha foliar para té anti-pulgones y uso culinario al inicio de la floración (5-6 meses). Aceite esencial concentrado en hojas y flores."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "jbb-plantas-medicinales",
+        "agrosavia-manual-biopreparados-2015"
+      ],
+      "valor_pedagogico": "La chinchilla o huacatay andino (Tagetes minuta L., Asteraceae) es una hierba aromática-medicinal-repelente nativa de los Andes suramericanos (originaria del altiplano peruano-boliviano-noroeste argentino) presente ancestralmente en Colombia andina como especie nativa silvestre y cultivada en los departamentos de Nariño (Pasto, Túquerres, Ipiales), Cauca (Popayán, Silvia, Páez), Putumayo (Sibundoy, Mocoa alto), Boyacá (Sogamoso, Belén, Cerinza), Cundinamarca (Sabana, Sumapaz), Antioquia (Oriente alto, Suroeste), Santander (páramos), entre 500 y 3.600 msnm en zonas térmicas frías y templadas. Pertenece a la familia Asteraceae (Compositae, igual que girasol, lechuga, calendula, manzanilla, ajenjo, achicoria, diente de león) y al género Tagetes — el mismo del cempasúchil mexicano (T. erecta) y del pericón (T. lucida) — que contiene >50 especies neotropicales caracterizadas por la producción de aceites esenciales con propiedades insecticidas, nematicidas y aromáticas. Planta herbácea anual de 1-2 m de altura con hojas pinnatisectas verde-grisáceas con glándulas oleíferas visibles (puntos translúcidos al trasluz), tallos erectos pubescentes con olor fuerte característico a anís-cítrico-resinoso al estrujar, capítulos pequeños amarillos en panículas terminales, frutos en aquenios cipsela ligeros dispersados por viento. Doble función patrimonial: 1) como **aromática culinaria andina** es el 'huacatay' icónico de la cocina peruano-boliviana (ocopa, pollo en salsa de huacatay, papas chorreadas) y se usa también en cocina nariñense colombiana en sopas y carnes; aceite esencial rico en tagetona, ocimeno, dihidrotagetona, limoneno y beta-cariofileno con notas aromáticas únicas no replicables por otra hierba; 2) como **repelente-nematicida agroecológico** es uno de los biopreparados clave de la agricultura andina: el 'té de huacatay' (infusión 10% p/v de hojas y flores frescas en agua tibia, 24 h maceración, filtrado, dilución 1:5, aspersión foliar) controla pulgones (Myzus persicae), trips (Frankliniella spp.), ácaros (Tetranychus urticae) y mosquita blanca (Bemisia tabaci) en cultivos vecinos sin daño a polinizadores; sembrada intercalada con papa, maíz, fríjol, hortalizas inhibe nemátodos del nudo (Meloidogyne spp.) a través de exudados radiculares con alfa-tertienilo y otros tiofenos nematicidas — biofumigante natural. Es lección extraordinaria de soberanía agroecológica y patrimonio biocultural andino que enseña a niñas y niños cómo una hierba nativa puede ser simultáneamente alimento, medicina y biopreparado, reemplazando insecticidas químicos por una decocción aromática. Manejo agroecológico: propagación por semilla (germinación 5-10 días a 18-22°C, resiembra espontánea abundante en cama), distancia 30-40 cm, ciclo 5-7 meses anual obligado, cosecha foliar al inicio de floración para máxima concentración de aceite esencial. Companion plants ideales: papa, maíz, fríjol, hortalizas en general. Función en chagra como aromática culinaria + repelente + nematicida + atractora de polinizadores. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015 Catálogo Plantas y Líquenes Colombia, JBB Plantas Medicinales, AGROSAVIA Manual Biopreparados 2015."
+    },
+    {
+      "id": "tagetes_lucida",
+      "nombre_comun": "Pericón",
+      "nombre_comunes_regionales": [
+        "hierba de Santa María",
+        "yerbanís",
+        "anís de monte",
+        "tagetes mexicano",
+        "estragón mexicano"
+      ],
+      "nombre_cientifico": "Tagetes lucida Cav.",
+      "familia_botanica": "Asteraceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "calido",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pest_repellent",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 500,
+        "optimo_min": 1200,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 14,
+        "optimo_max": 24,
+        "max_tolerable": 32
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Propagación por esqueje basal o división de cepa (más rápido) o semilla (germinación 8-15 días). Planta perenne herbácea 50-80 cm. Cosecha foliar continua tras los 4 meses de establecimiento."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "jbb-plantas-medicinales",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "valor_pedagogico": "El pericón o hierba de Santa María (Tagetes lucida Cav., Asteraceae) es una hierba aromática-medicinal perenne nativa de Mesoamérica (México, Guatemala, Honduras) cultivada ancestralmente y naturalizada en Colombia andina como alternativa al estragón europeo (Artemisia dracunculus) que no prospera en el trópico — su uso como 'estragón mexicano' o 'estragón colombiano' la convierte en el sustituto perfecto del tarragón para cocina internacional sin necesidad de importar la especie europea. Se cultiva en jardines, huertos caseros y zonas medicinales en los departamentos andinos de Cundinamarca, Boyacá, Antioquia, Santander, Valle del Cauca, Cauca, Nariño, Tolima, Huila, Risaralda, Quindío, Caldas entre 500 y 3.000 msnm en zonas térmicas templadas, cálidas y frías. Pertenece a la familia Asteraceae y al género Tagetes (mismo género del cempasúchil mexicano T. erecta, marigold francés T. patula y chinchilla T. minuta), con todas las especies del género caracterizadas por producir aceites esenciales con propiedades aromáticas-medicinales-insecticidas. Planta herbácea perenne de 50-80 cm de altura con hojas linear-lanceoladas verde brillante intenso con glándulas oleíferas visibles, tallos erectos glabros, capítulos pequeños amarillo-dorados en cimas terminales con 3-5 lígulas amarillas y disco amarillo, aroma fuerte característico a anís-estragón-vainilla al estrujar las hojas (debido al alto contenido de estragol, metileugenol, ocimeno y anetol). Sus usos son múltiples y patrimoniales: 1) **culinario** como sustituto del estragón europeo en preparaciones de pollo, pescado, ensaladas, vinagretas, mantequillas aromatizadas y cocina internacional (excelente para platos franceses como bearnaise y pollo a la estragón sin necesidad de importar tarragón europeo); 2) **medicinal** tradicional mexicano-mesoamericano como infusión digestiva-carminativa, antiespasmódica, ansiolítica suave, contra cólicos menstruales y como tranquilizante natural — uso milenario maya-azteca documentado en códices precolombinos como hierba sagrada utilizada en rituales y curaciones; 3) **agroecológico** como repelente de plagas (igual que otras Tagetes) intercalable en huerto, atractora de polinizadores y mariquitas. Es lección extraordinaria de adaptación cultural y soberanía culinaria que enseña a niñas y niños cómo una hierba mesoamericana resolvió en Colombia el problema cultural de tener 'estragón sin estragón': el pericón demuestra que no hace falta importar especies de clima templado europeo cuando el Neotrópico ofrece equivalentes funcionales superiores. Manejo agroecológico: propagación preferente por esqueje basal o división de cepa (perenne, rebrota cada año), o por semilla (germinación 8-15 días); distancia 40-50 cm; cosecha foliar continua tras los 4 meses de establecimiento; planta longeva 5-10 años en condiciones óptimas. Companion plants: hortalizas en general, plantas medicinales, frutales. Función en chagra como aromática culinaria + medicinal + repelente + atractora de polinizadores. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015, JBB Plantas Medicinales, Pamplona-Roger 2006 Plantas Medicinales."
+    },
+    {
+      "id": "anethum_graveolens",
+      "nombre_comun": "Eneldo",
+      "nombre_comunes_regionales": [
+        "dill",
+        "hinojo de hoja",
+        "eneldo común",
+        "anís bastardo"
+      ],
+      "nombre_cientifico": "Anethum graveolens L.",
+      "familia_botanica": "Apiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio",
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 1200,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 10,
+        "optimo_max": 22,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa preferente (raíz pivotante delicada que no tolera trasplante). Germinación 7-14 días a 18-22°C. Distancia 20-30 cm. Ciclo 3-4 meses a cosecha foliar, 5-6 meses a semillas. Anual."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "bernal-2015-plantas-liquenes-colombia",
+        "jbb-plantas-medicinales",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "valor_pedagogico": "El eneldo (Anethum graveolens L., Apiaceae) es una hierba aromática anual umbelífera originaria del Mediterráneo oriental y suroeste de Asia, naturalizada y cultivada en Colombia desde la Colonia como hierba culinaria-medicinal en huertos caseros y producción para mercado fresco. Se cultiva en zonas andinas de Cundinamarca (Sabana, Tena, Anolaima), Boyacá (Tunja, Sogamoso, Garagoa), Antioquia (Oriente, Suroeste), Nariño (Pasto, Túquerres), Santander (Mesa de los Santos), Valle del Cauca (Restrepo, Calima), Tolima y Huila entre 0 y 3.000 msnm en zonas térmicas templadas, frías y cálidas adaptables. Pertenece a la familia Apiaceae (Umbelliferae, igual que cilantro, perejil, zanahoria, apio, hinojo, comino, alcaravea, anís verde) y al género monoespecífico Anethum (única especie del género). Planta anual herbácea de 60-120 cm de altura con tallo erecto hueco glabro estriado verde-azulado, hojas alternas finamente divididas pinnatisectas filiformes (semejantes a las de hinojo pero más finas y de color verde-azuloso) con aroma característico a 'pepinillo encurtido', flores amarillas pequeñas en umbelas compuestas terminales muy atractoras de polinizadores y avispas parasitoides (control biológico de plagas), frutos esquizocárpicos en diaquenios ovales aplanados (las 'semillas de eneldo' culinarias) con aroma a alcaravea-anís-pepino. Tiene tres usos culinarios diferenciados según la parte cosechada: 1) hojas frescas (eneldo de hoja, 'dill weed') aromatizan pescados al horno, salmón gravlax, salsas blancas, ensaladas de papa, queso fresco, yogur, sopas frías; 2) semillas secas aromatizan encurtidos de pepinillo (carácter aromático icónico del 'pickle' anglosajón y germánico), panes, repostería, conservas; 3) inflorescencias frescas se usan junto con las semillas en fermentación láctica de pepinillos y chucrut. Es lección viva de migración culinaria y aromáticas mediterráneas que enseña a niñas y niños cómo una hierba del Mediterráneo se integró al huerto andino colombiano sin desplazar especies nativas, y cómo cada parte de la planta (hoja, flor, semilla) tiene un uso aromático distinto. Aceite esencial rico en carvona (50-60%), limoneno, felandreno y dilapiol con propiedades carminativas, digestivas, lactogogas (uso tradicional para estimular producción de leche materna en mujeres lactantes), antiespasmódicas y sedantes suaves; té de semillas para cólicos infantiles y digestiones lentas. Manejo agroecológico: siembra directa preferente (raíz pivotante delicada que no tolera trasplante), germinación 7-14 días a 18-22°C, distancia 20-30 cm, ciclo 3-4 meses a cosecha foliar, 5-6 meses a semillas, anual obligado. Companion plants: pepino (sinergia obligada para encurtidos), repollo (mejora sabor y repele orugas), cebolla, maíz. Antagonistas: zanahoria (compite por raíz pivotante e hibridación), hinojo (alelopatía). Función en chagra como aromática culinaria + medicinal + atractora de polinizadores + control biológico. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015, JBB Plantas Medicinales, Pamplona-Roger 2006."
+    },
+    {
+      "id": "levisticum_officinale",
+      "nombre_comun": "Apio de monte",
+      "nombre_comunes_regionales": [
+        "ligústico",
+        "levístico",
+        "perejil silvestre gigante",
+        "lovage",
+        "apio mata"
+      ],
+      "nombre_cientifico": "Levisticum officinale W.D.J.Koch",
+      "familia_botanica": "Apiaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -15,
+        "optimo_min": 8,
+        "optimo_max": 20,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno_a_moderado",
+      "propagation": {
+        "metodo_principal": "division",
+        "notas": "Propagación preferente por división de cepa o esqueje radical (más rápido). Semilla viable solo fresca (germinación 14-21 días a 15-20°C). Planta perenne herbácea de hasta 2 m. Productiva 5-10 años. Cosecha foliar continua tras el primer año."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "jbb-plantas-medicinales",
+        "pamplona-roger-2006-plantas-medicinales",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El apio de monte o ligústico (Levisticum officinale W.D.J.Koch, Apiaceae) es una hierba aromática-medicinal perenne robusta originaria del Mediterráneo y suroeste de Asia (probablemente Irán-Anatolia), cultivada en Europa desde la antigüedad romana y traída a Colombia durante la Colonia como hierba medicinal-culinaria de huertos andinos altos. Su presencia es escasa pero patrimonial en jardines tradicionales de Cundinamarca, Boyacá, Antioquia (Oriente alto), Nariño, Cauca andino, Santander (páramos) entre 800 y 3.200 msnm en zonas térmicas frías y templadas — su tolerancia a heladas hasta -15°C la convierte en una de las pocas aromáticas culinarias robustas para clima de páramo y altiplano frío. Pertenece a la familia Apiaceae (igual que cilantro, perejil, zanahoria, apio, hinojo, eneldo, comino) y al género monoespecífico Levisticum (única especie del género). Planta perenne herbácea robusta de hasta 2 m de altura con tallos huecos estriados glabros, hojas grandes pinnado-compuestas con folíolos romboidales lobulados verde-oscuro brillante (semejantes a las de apio común Apium graveolens pero más grandes), umbelas compuestas grandes de flores amarillo-verdosas muy atractoras de polinizadores y avispas parasitoides, frutos esquizocárpicos diaquenios con costillas marcadas. Toda la planta posee un aroma intenso y único a 'apio concentrado x10' (similar al de apio común pero mucho más fuerte, con notas a anís-curry-comino) debido a aceites esenciales ricos en ligustilido, butilftaleida, alfa-terpinilo y otros ftalidos. Sus usos son múltiples: 1) **culinario** como sustituto-amplificador del apio común — una hoja basta para sazonar una sopa entera, semillas para conservas, tallos blanqueados al sol para usar como apio gourmet, raíces tuberosas comestibles cocidas como hortaliza-condimento; 2) **medicinal** tradicional europeo (carminativo, diurético potente, emenagogo, expectorante, antibacteriano de vías urinarias) usado en infusiones de hoja, decocciones de raíz y tinturas; 3) **agroecológico** como planta perenne de alta biomasa atractora de polinizadores y enemigos naturales en jardín-huerto medicinal. Es lección extraordinaria de patrimonio etnobotánico europeo y soberanía culinaria que enseña a niñas y niños cómo una sola planta perenne puede reemplazar al apio anual (sin tener que resembrarlo cada año) y aromatizar toda la cocina de la familia durante décadas — una sola cepa puede vivir 10 años produciendo cada temporada. Manejo agroecológico: propagación por división de cepa o esqueje radical (más rápido que semilla), distancia 80-100 cm (planta grande), suelo profundo rico en materia orgánica, humedad constante (no tolera sequía prolongada), poda al final de temporada para rebrote vigoroso, cosecha foliar continua tras el primer año, productiva 5-10 años. Companion plants: rosa, tomate, fríjol, plantas medicinales. Función en chagra fría como aromática perenne robusta + medicinal + biomasa + atractora de polinizadores. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, JBB Plantas Medicinales, Pamplona-Roger 2006, Bernal 2015."
+    },
+    {
+      "id": "salvia_hispanica",
+      "nombre_comun": "Chía",
+      "nombre_comunes_regionales": [
+        "chía mexicana",
+        "chía blanca",
+        "chía negra",
+        "chía nutracéutica"
+      ],
+      "nombre_cientifico": "Salvia hispanica L.",
+      "familia_botanica": "Lamiaceae",
+      "category": "cereales",
+      "thermal_zones": [
+        "templado",
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 600,
+        "optimo_min": 1400,
+        "optimo_max": 2200,
+        "max_absoluto": 2500
+      },
+      "temperatura_c": {
+        "helada_letal": 2,
+        "optimo_min": 15,
+        "optimo_max": 25,
+        "max_tolerable": 32
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa al voleo o en líneas. Germinación 4-8 días a 20-25°C. Distancia 30-40 cm en línea, 50-60 cm entre líneas. Ciclo 4-6 meses a cosecha de semilla. Anual. Floración fotoperiódica de día corto — siembra en abril-mayo para floración octubre-noviembre en hemisferio norte tropical."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "agrosavia-manual-frutales-tropicales",
+        "bernal-2015-plantas-liquenes-colombia",
+        "pamplona-roger-2006-plantas-medicinales"
+      ],
+      "valor_pedagogico": "La chía (Salvia hispanica L., Lamiaceae) es una planta nutracéutica milenaria originaria de México central y Guatemala (no de los Andes a pesar del nombre 'hispanica' que se debe a un error de Linneo que creyó que provenía de España), cultivada ancestralmente por aztecas y mayas precolombinos como uno de los cuatro pilares alimentarios mesoamericanos junto a maíz, fríjol y amaranto. En Colombia se cultiva con creciente expansión comercial y huerto-casero en zonas andinas medias-cálidas de Cundinamarca (Tena, La Mesa), Tolima (Espinal, Guamo, Chaparral), Huila (Pitalito, La Plata, San Agustín), Antioquia (Suroeste, Oriente cálido), Santander (Mesa de los Santos), Valle del Cauca (Restrepo) entre 600 y 2.500 msnm en zonas térmicas templadas y cálidas, expandida significativamente desde 2010 por la demanda mundial de superalimentos. Pertenece a la familia Lamiaceae (igual que albahaca, orégano, romero, menta, hierbabuena, mejorana, salvia, tomillo) y al género Salvia (el más diverso de las Lamiaceae con >900 especies globales) — distinta evolutivamente de la salvia común (S. officinalis L.) aunque comparten género. Planta herbácea anual de 1-1.5 m de altura con tallos cuadrangulares pubescentes característicos de Lamiaceae, hojas opuestas decusadas ovales-lanceoladas dentadas verde-oscuro, espigas terminales de flores azul-violáceas o blancas pequeñas en verticilastros muy atractoras de abejas y abejorros (cultivo melífero adicional), frutos en tetraquenios de los que se cosechan las 'semillas de chía' — pequeñas (1-2 mm), ovaladas, color blanco-crema (chía blanca) o gris-negro moteado (chía negra), oleaginosas con altísimo contenido nutricional. La composición de la semilla la convierte en superalimento: 30-35% aceite (con 60-65% omega-3 alfa-linolénico, la mayor concentración vegetal conocida), 20-25% proteína completa (con todos los aminoácidos esenciales), 30-40% fibra dietaria (mucílagos hidrofílicos que absorben 10-12 veces su peso en agua formando gel — útil para regulación intestinal y saciedad), alta densidad de calcio, hierro, magnesio, zinc, antioxidantes (ácido cafeico, quercetina, miricetina). Es lección extraordinaria de domesticación nutricional precolombina y soberanía alimentaria recuperada que enseña a niñas y niños cómo los aztecas seleccionaron durante siglos una semilla milagrosa con propiedades nutricionales únicas y cómo Colombia puede recuperar esa joya mesoamericana en su huerto andino sin necesidad de importarla. Manejo agroecológico: siembra directa al voleo o en líneas, germinación 4-8 días a 20-25°C, distancia 30-40 cm en línea y 50-60 cm entre líneas, ciclo 4-6 meses a cosecha de semilla, anual obligado, floración fotoperiódica de día corto (siembra abril-mayo para floración octubre-noviembre en Colombia ecuatorial). Trilla manual sencilla. Companion plants: maíz, fríjol, amaranto (las 4 'milpa' mesoamericanas). Función en chagra como pseudocereal nutracéutico patrimonial y atractor melífero. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, AGROSAVIA Manual Frutales Tropicales, Bernal 2015, Pamplona-Roger 2006."
+    },
+    {
+      "id": "nigella_sativa",
+      "nombre_comun": "Comino negro",
+      "nombre_comunes_regionales": [
+        "kalonji",
+        "ajenuz",
+        "black cumin",
+        "habat al-barakah",
+        "comino negro de oriente"
+      ],
+      "nombre_cientifico": "Nigella sativa L.",
+      "familia_botanica": "Ranunculaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2600,
+        "max_absoluto": 2900
+      },
+      "temperatura_c": {
+        "helada_letal": -5,
+        "optimo_min": 12,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa preferente (raíz pivotante delicada). Germinación 10-15 días a 15-20°C. Distancia 15-25 cm. Ciclo 3-4 meses a floración, 4-5 meses a cosecha de semilla. Anual. Cosecha de cápsulas maduras secas y trilla manual."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "jbb-plantas-medicinales",
+        "pamplona-roger-2006-plantas-medicinales",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El comino negro o kalonji (Nigella sativa L., Ranunculaceae) es una hierba aromática-medicinal anual originaria del suroeste de Asia y norte de África (probablemente Anatolia-Mesopotamia) cultivada desde hace más de 3.000 años en Egipto, India, Medio Oriente y Mediterráneo oriental como semilla nutracéutica-medicinal sagrada — su uso ancestral fue documentado en la tumba de Tutankamón y en textos médicos hipocráticos, persas, ayurvédicos y proféticos islámicos (la tradición sufí lo llama 'habat al-barakah', semilla de la bendición). En Colombia su presencia es muy escasa pero creciente en huertos especializados de aromáticas-medicinales asiáticas en zonas andinas medias-frías de Cundinamarca (Sabana, Tena), Boyacá, Antioquia (Oriente alto), Nariño, Cauca andino entre 800 y 2.900 msnm en zonas térmicas templadas y frías. Pertenece a la familia Ranunculaceae (igual que el ranúnculo, anémona, peonía, aquilegia, ajenjo-acónito — familia primitiva de dicotiledóneas con muchas plantas medicinales potentes) y al género Nigella con >20 especies de las cuales N. sativa es la única cultivada por semilla comestible, distinta de la N. damascena (cultivada solo como ornamental). NO debe confundirse con el 'comino común' (Cuminum cyminum, Apiaceae) que es una umbelífera completamente diferente — son aromáticas distintas a pesar del nombre vernáculo coincidente. Planta herbácea anual de 20-40 cm de altura con tallos erectos ramificados glabros, hojas finamente divididas pinnatisectas filiformes verde-grisáceas, flores solitarias terminales hermosas azul-celestes o blanco-azuladas con 5 sépalos petaloides (los pétalos verdaderos son inconspicuos) atractoras de polinizadores, frutos en cápsulas infladas conspicuas con 5-7 carpelos persistentes que contienen las pequeñas semillas negras triangulares aromáticas. La semilla negra es el producto cosechable: aroma a comino-pimienta-orégano-nuez muy distintivo y sabor levemente picante-amargo aromático, rica en aceites esenciales (timoquinona principal compuesto bioactivo, p-cimeno, alfa-pineno, carvacrol) con propiedades antiinflamatorias, antimicrobianas, antioxidantes potentes, hipoglucemiantes (estudios clínicos modernos en diabetes tipo 2), inmunomoduladoras y antitumorales documentadas. Sus usos son patrimoniales: 1) **culinario** como semilla aromática para panes (icónica del 'naan' indio, 'pide' turco, 'borek' anatolio), encurtidos, quesos frescos, infusiones, mezclas de especias (panch phoron bengalí, dukkah egipcio); 2) **medicinal** tradicional con uso milenario (cardamomo de los pobres, semilla de la bendición islámica) en infusiones, decocciones, aceite prensado en frío para uso tópico (caspa, eczema, dolores articulares) y oral (digestiones, asma, diabetes); 3) **agroecológico** atractora de polinizadores con floración corta pero intensa. Es lección viva de patrimonio medicinal mediterráneo-asiático y soberanía nutricional que enseña a niñas y niños cómo una semilla del Medio Oriente puede integrarse al huerto andino colombiano y abrir puerta a tradiciones culinarias y medicinales milenarias de la humanidad. Manejo agroecológico: siembra directa preferente (raíz pivotante delicada), germinación 10-15 días a 15-20°C, distancia 15-25 cm, ciclo 3-4 meses a floración y 4-5 meses a cosecha, anual obligado, cosecha de cápsulas maduras secas y trilla manual sencilla. Companion plants: hortalizas en general, frutales aromáticos, otras Ranunculaceae. Función en chagra como aromática-medicinal patrimonial y atractora de polinizadores. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, JBB Plantas Medicinales, Pamplona-Roger 2006, Bernal 2015."
+    },
+    {
+      "id": "helianthus_annuus",
+      "nombre_comun": "Girasol",
+      "nombre_cientifico": "Helianthus annuus L.",
+      "nombre_comunes_regionales": [
+        "Mirasol",
+        "Maravilla",
+        "Acahual"
+      ],
+      "familia_botanica": "Asteraceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "crop",
+        "dynamic_accumulator",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 2200,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 18,
+        "optimo_max": 28,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa a sitio definitivo, 2-3 cm profundidad, distancia 30-60 cm entre plantas. Germinación 5-12 días. Ciclo 90-120 días. Cosecha de capítulo cuando reverso vira marrón y semillas se desprenden con presión leve."
+      },
+      "companions": [
+        "zea_mays",
+        "phaseolus_vulgaris",
+        "cucurbita_maxima"
+      ],
+      "antagonists": [],
+      "harvest_type": "semilla",
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "valor_pedagogico": "El Girasol (Helianthus annuus L., Asteraceae) es una especie anual originaria de Norteamérica (cuenca del Mississippi, México, suroeste de Estados Unidos) cultivada en Colombia y todo el Neotrópico como ornamental masivo, productora de semilla comestible y oleaginosa, y atrayente excepcional de polinizadores. Sus capítulos compuestos (inflorescencias) son uno de los íconos botánicos universales y su heliotropismo (seguimiento del sol por capítulos jóvenes, fenómeno reversible mediado por crecimiento diferencial del tallo bajo el control del reloj circadiano) es lección viva de fisiología vegetal para huerta escolar. En Colombia se cultiva entre 0 y 2.800 msnm en zonas térmicas cálida a fría: Sabana de Bogotá, valles interandinos del Magdalena y Cauca, Caribe seco, Eje Cafetero, Antioquia. Manejo agronómico: siembra directa a sitio definitivo en suelo bien drenado y soleado, 2-3 cm profundidad, distancia 30-60 cm entre plantas y 60-90 cm entre surcos, germinación 5-12 días, ciclo total 90-120 días según variedad (enanas 80 días, gigantes 130+ días). El capítulo puede albergar entre 100 y 2.000 flores tubulares (flósculos del disco) rodeadas por las flores liguladas amarillas vistosas (radio), cada flósculo polinizado produce una semilla (técnicamente cipsela). Atracción de polinizadores: una sola planta puede sostener decenas de abejas (Apis mellifera, Trigona spp., Melipona spp.) y abejorros nativos (Bombus spp.) simultáneamente durante la floración, y es flor visitada también por mariposas y aves granívoras (loros, pericos, jilgueros) que aprovechan las semillas maduras. Asociación clásica con la \"milpa mesoamericana\": maíz + frijol + calabaza + girasol como cuarta hermana en borde para atracción de polinizadores y defensa contra plagas (acumula áfidos lejos de las hortalizas). Producción de aceite: las variedades oleaginosas modernas alcanzan 40-50% de aceite en semilla (insaturado, rico en ácido linoleico y vitamina E), siendo el girasol uno de los tres aceites vegetales más consumidos en el mundo junto con palma y soya. Las semillas tostadas o crudas son consumo humano directo en muchas culturas (pipas en España, sunflower seeds en Estados Unidos, pepas de mirasol en México). La torta residual del prensado es alimento balanceado de alta calidad para aves y porcinos. Acumulador dinámico de potasio y fósforo del subsuelo (sistema radical pivotante profundo de 1.5-2 m), su biomasa al final del ciclo es excelente abono verde si se incorpora antes de la lignificación del tallo. Uso ancestral: pueblos originarios de Norteamérica lo cultivaban hace 4.000+ años como cuarto cultivo principal (maíz, frijol, calabaza, girasol), Aztecas y Mayas lo veneraban como flor solar simbólica (la flor mira al sol como el alma busca a Dios), llegada a Europa siglo XVI vía conquistadores españoles desde México (de ahí \"mirasol\" y \"girasol\"). Manejo en chagra: siembra perimetral o en hileras intercaladas con hortalizas, como planta atrayente y trampa, asociación con maíz-frijol-calabaza, cosecha del capítulo cuando reverso vira marrón claro y las brácteas se secan, secado al sol 1-2 semanas antes de desgrane manual. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pérez Arbeláez 1947 Plantas Útiles Colombia, JBB Plantas Medicinales.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "perez-arbelaez-1947-plantas-utiles",
+        "jbb-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "viola_tricolor",
+      "nombre_comun": "Pensamiento / Trinitaria",
+      "nombre_cientifico": "Viola tricolor L.",
+      "nombre_comunes_regionales": [
+        "Pensamiento silvestre",
+        "Hierba de la trinidad",
+        "Pensativa"
+      ],
+      "familia_botanica": "Violaceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 3000,
+        "max_absoluto": 3300
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 10,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra en semillero, germinación 10-20 días a 15-18°C, trasplante 4-6 semanas, distancia 15-20 cm. Auto-resiembra natural en jardines de clima frío. Floración 60-90 días post-siembra."
+      },
+      "companions": [
+        "fragaria_vesca",
+        "allium_schoenoprasum"
+      ],
+      "antagonists": [],
+      "harvest_type": "flor",
+      "scale_viability": [
+        "apartamento",
+        "huerto_casero",
+        "produccion"
+      ],
+      "valor_pedagogico": "El Pensamiento o Trinitaria (Viola tricolor L., Violaceae) es una especie herbácea anual o bienal originaria de Europa templada (regiones boreales hasta el Mediterráneo) y naturalizada-cultivada mundialmente como ornamental clásico de jardín, con la característica adicional de tener flores comestibles ampliamente usadas en gastronomía decorativa de alta gama. En Colombia se cultiva en clima frío y de páramo entre 2.000 y 3.300 msnm: Sabana de Bogotá, Boyacá altoandino, Nariño altoandino, Cundinamarca rural, Antioquia oriente frío, viveros y jardines de Tunja, Manizales, Pasto. Manejo agronómico: siembra en semillero protegido con sustrato bien drenado, germinación 10-20 días a temperatura 15-18°C, trasplante al sitio definitivo 4-6 semanas post-germinación con distancia 15-20 cm entre plantas, floración inicia 60-90 días post-siembra y se mantiene 4-6 meses continuos si se eliminan flores marchitas (deadheading). Florece masivamente en clima frío (10-20°C) con tolerancia a heladas leves de -5 a -8°C: especie ideal para jardín y huerta de páramo. Sus flores presentan el característico patrón tricolor (violeta, amarillo, blanco; de ahí el epíteto específico tricolor) y son comestibles crudas en ensaladas, decoración de tortas, repostería fina, gelatinas, té de flor, cubitos de hielo florales para cócteles, vinagretas perfumadas. Sabor suave, ligeramente dulce y herbáceo, textura aterciopelada delicada. Atracción de polinizadores: abejas pequeñas (Apis mellifera, Bombus spp.), mariposas (varias especies de Pieridae y Nymphalidae que la usan como planta hospedera para oviposición de larvas), sírfidos y abejorros nativos andinos. Uso medicinal tradicional documentado en farmacopeas europeas: flor seca infusión expectorante suave, diurética leve, depurativo sanguíneo tradicional (\"hierba de la trinidad\" por la triple coloración floral simbólica), uso en cosmética (mucílagos para pieles sensibles). Su pariente cultivado moderno Viola × wittrockiana (pensamiento de jardín) es híbrido del siglo XIX derivado en parte de V. tricolor con flores más grandes y multicolores. Manejo en huerta agroecológica: borde y franja perimetral de hortalizas como atrayente de polinizadores en clima frío, asociación con fresa (Fragaria vesca) y cebollín (Allium schoenoprasum), siembra en macetera vertical o jardín de balcón en apartamento bogotano (escala apartamento viable), cosecha de flores en mañana fresca para uso culinario inmediato. Auto-resiembra natural: en jardines bien manejados se naturaliza y reaparece año tras año sin intervención. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pamplona Roger 2006 Plantas Medicinales, JBB Plantas Medicinales.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "viola_odorata",
+      "nombre_comun": "Violeta perfumada",
+      "nombre_cientifico": "Viola odorata L.",
+      "nombre_comunes_regionales": [
+        "Violeta común",
+        "Violeta de olor",
+        "Violeta dulce"
+      ],
+      "familia_botanica": "Violaceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "estrato": "rastrero",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 8,
+        "optimo_max": 20,
+        "max_tolerable": 24
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "estolon",
+        "notas": "División de matas con estolones radicantes (método principal, más rápido y fiable). Alternativa por semilla con estratificación fría 4-6 semanas. Plantación en sombra parcial o filtrada, distancia 20 cm. Floración invierno-primavera fría andina."
+      },
+      "companions": [
+        "fragaria_vesca",
+        "mentha_spicata"
+      ],
+      "antagonists": [],
+      "harvest_type": "flor",
+      "scale_viability": [
+        "apartamento",
+        "huerto_casero",
+        "produccion"
+      ],
+      "valor_pedagogico": "La Violeta perfumada (Viola odorata L., Violaceae) es una especie herbácea perenne rastrera originaria de Europa, norte de África y Asia occidental templadas, cultivada mundialmente desde la antigüedad clásica greco-romana como planta ornamental aromática, medicinal y comestible. Su perfume floral característico —dulce, intenso, ligeramente almizclado— es uno de los aromas más antiguos de la perfumería: ya los griegos y romanos la cultivaban para coronas, perfumes y confituras, y es base del célebre \"absolu de violette\" de la perfumería moderna francesa. Distinta de V. tricolor (anual de flor tricolor visiblemente vistosa) por ser perenne, rastrera con estolones radicantes, hojas reniforme-cordadas y flores violeta-azuladas oscuras muy pequeñas pero intensamente perfumadas. En Colombia se cultiva en clima frío y templado entre 1.800 y 3.000 msnm: jardines de Sabana de Bogotá, Boyacá, Antioquia oriente frío, Eje Cafetero altoandino. Manejo agronómico: propagación principal por división de matas con estolones radicantes (método más rápido, fiable y predecible), alternativa por semilla con estratificación fría 4-6 semanas a 5°C para romper dormancia, plantación en sombra parcial o filtrada bajo árboles caducifolios o frutales, distancia 20 cm entre plantas, suelo rico en materia orgánica con buen drenaje, floración invierno-primavera fría andina (noviembre-febrero), expansión vegetativa por estolones formando alfombra densa. Sus flores son comestibles cristalizadas en azúcar (clásicas violetas de Toulouse francesas), perfumando pasteles, helados, jaleas, vinagretas, jarabes, licores tradicionales. Uso medicinal tradicional documentado por Dioscórides, Plinio, farmacopeas europeas medievales y la medicina tradicional europea: flor y hoja contienen ácido salicílico (precursor natural de la aspirina), saponinas, mucílagos, antocianinas; infusión de flor expectorante para bronquitis y tos seca, jarabe pectoral pediátrico tradicional (\"sirop de violettes\"), uso externo para irritaciones cutáneas. Atracción de polinizadores: abejas pequeñas (Apis mellifera, abejas solitarias), abejorros (Bombus spp.), mariposas pequeñas y sírfidos en clima frío andino, especie temprana de floración que provee néctar y polen cuando pocas otras flores están disponibles. Curiosamente produce dos tipos de flores: las visibles violetas perfumadas (chasmógamas, polinización abierta cruzada) y flores cleistógamas autopolinizantes ocultas cerca del suelo que aseguran semilla incluso sin polinizadores (estrategia evolutiva ingeniosa). Manejo en huerta agroecológica: cobertura viva bajo árboles frutales (sotobosque productivo), asociación con fresa y menta (consorcio aromático andino), siembra en jardín de sombra parcial, cosecha de flores en mañana fresca para uso culinario o medicinal inmediato. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pamplona Roger 2006 Plantas Medicinales, JBB Plantas Medicinales.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "lavandula_dentata",
+      "nombre_comun": "Lavanda dentada",
+      "nombre_cientifico": "Lavandula dentata L.",
+      "nombre_comunes_regionales": [
+        "Alhucema dentada",
+        "Cantueso dentado"
+      ],
+      "familia_botanica": "Lamiaceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "bajo",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "pest_repellent",
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1500,
+        "optimo_max": 2600,
+        "max_absoluto": 2900
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 12,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "excelente",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Esqueje semileñoso 10-15 cm de rama lateral, enraizamiento 4-6 semanas en sustrato arenoso bien drenado, distancia 80-100 cm entre plantas. Alternativa semilla pero germinación lenta e irregular. Floración casi continua en clima andino templado."
+      },
+      "companions": [
+        "rosmarinus_officinalis",
+        "salvia_officinalis",
+        "thymus_vulgaris"
+      ],
+      "antagonists": [],
+      "harvest_type": "flor",
+      "scale_viability": [
+        "apartamento",
+        "huerto_casero",
+        "produccion"
+      ],
+      "valor_pedagogico": "La Lavanda dentada (Lavandula dentata L., Lamiaceae) es un arbusto perenne aromático originario de la región mediterránea (sur de España, Marruecos, Argelia, islas Baleares) y naturalizado-cultivado mundialmente como ornamental aromático, medicinal y atrayente excepcional de polinizadores. Distinta de Lavandula angustifolia (lavanda inglesa o \"true lavender\" de clima frío montañoso con hojas lineares enteras y flores azul-violeta intensas) por sus hojas dentadas características pinnatipartidas (de ahí dentata), su tolerancia a clima más cálido y seco mediterráneo (vs. el clima alpino-templado de angustifolia), su floración casi continua a lo largo del año en clima andino templado (vs. floración estacional de angustifolia), y flores ligeramente más pálidas violeta-grisáceas con bráctea apical estéril vistosa coronando la espiga. En Colombia se cultiva en clima templado y frío seco entre 1.500 y 2.900 msnm: Sabana de Bogotá, Boyacá, Cundinamarca, Antioquia oriente, Eje Cafetero, Valle del Cauca andino, Nariño altoandino. Manejo agronómico: propagación principal por esqueje semileñoso de 10-15 cm de rama lateral (método más rápido y fiable, preserva características parentales), enraizamiento 4-6 semanas en sustrato arenoso bien drenado bajo invernadero o cama nebulizada, alternativa por semilla con germinación lenta e irregular (15-40 días) y variabilidad genética alta no recomendada para producción comercial, distancia de plantación 80-100 cm entre plantas en seto aromático, suelo calcáreo o neutro bien drenado (NO tolera encharcamiento ni suelos pesados), riego moderado a bajo (drought-tolerant), poda anual post-floración para estimular nuevos brotes y compacidad. Floración casi continua en clima andino templado (vs. estacional de L. angustifolia en clima frío). Atracción excepcional de polinizadores: una sola planta floreciente sostiene decenas de abejas (Apis mellifera, abejas solitarias, abejorros Bombus spp.) y mariposas a lo largo del día, es de las plantas mediterráneas más visitadas por himenópteros en jardines colombianos, planta apícola clave para apiarios urbanos y periurbanos andinos. Aceite esencial: las flores frescas o secas destiladas producen aceite esencial rico en linalool, alcanfor, cineol y acetato de linalilo (composición distinta de angustifolia, más cánfora-cineol, menos linalool puro), aroma alcanforado-floral característico, usos en aromaterapia (relajante, antiséptico aéreo, repelente de moscas y polillas), perfumería de gama media-alta, cosmética artesanal (jabones, sales de baño, cremas), repostería discreta (helados de lavanda, panaderías francesas, mieles aromatizadas). Uso medicinal tradicional documentado: infusión de flores sedante leve para nervios y ansiedad, antiespasmódico digestivo, antiséptico de heridas leves, repelente de polillas en armarios (saquitos de lavanda seca). Manejo en huerta agroecológica: seto perimetral aromático junto con romero (Rosmarinus officinalis), salvia (Salvia officinalis) y tomillo (Thymus vulgaris) como gremio mediterráneo repelente de plagas y atrayente de polinizadores, plantación en macetera grande en balcón o terraza (escala apartamento viable con sol pleno), poda anual de mantenimiento post-floración. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pamplona Roger 2006 Plantas Medicinales, JBB Plantas Medicinales.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "phacelia_tanacetifolia",
+      "nombre_comun": "Facelia",
+      "nombre_cientifico": "Phacelia tanacetifolia Benth.",
+      "nombre_comunes_regionales": [
+        "Facelia azul",
+        "Phacelia",
+        "Tansy phacelia"
+      ],
+      "familia_botanica": "Boraginaceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "ground_cover",
+        "biomass_producer",
+        "dynamic_accumulator"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -6,
+        "optimo_min": 12,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa al voleo o en hileras, 1-2 cm profundidad, densidad 8-12 kg/ha como abono verde, germinación 8-15 días, floración 45-60 días post-siembra, abono verde incorporado en plena floración (max biomasa + N residual). Auto-resiembra natural."
+      },
+      "companions": [
+        "brassica_napus",
+        "avena_sativa",
+        "vicia_sativa"
+      ],
+      "antagonists": [],
+      "harvest_type": "biomasa",
+      "scale_viability": [
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "valor_pedagogico": "La Facelia (Phacelia tanacetifolia Benth., Boraginaceae) es una especie herbácea anual originaria del suroeste de Estados Unidos y norte de México (desiertos del Mojave y Sonora, montañas de California, Arizona, Nuevo México, Sonora, Baja California), cultivada mundialmente desde mediados del siglo XX como uno de los abonos verdes y atrayentes de polinizadores más valiosos de la agroecología moderna. En Europa es la planta atrayente número uno para apicultura comercial junto con el girasol y la colza melífera. En Colombia su uso es aún reciente pero creciente en sistemas agroecológicos andinos entre 1.500 y 3.200 msnm: Sabana de Bogotá, Boyacá altoandino, Nariño altoandino, Cundinamarca rural, Eje Cafetero altoandino. Manejo agronómico: siembra directa al voleo o en hileras, 1-2 cm profundidad, densidad 8-12 kg/ha como abono verde o 4-6 kg/ha como cultivo apícola de banda perimetral, germinación 8-15 días a 12-20°C, ciclo total 90-120 días, floración inicia a los 45-60 días post-siembra y se mantiene 4-8 semanas continuas con flores azul-lavanda en inflorescencias escorpioides características (cima helicoidal típica de Boraginaceae). La floración es el momento clave del ciclo: cada espiga floral abre flores progresivamente desde la base al ápice durante 2-3 semanas, asegurando néctar y polen continuos para polinizadores. Atracción de polinizadores excepcional: estudios europeos (Alemania, Reino Unido, Francia) y norteamericanos demuestran que la facelia es UNA DE LAS 20 PLANTAS MÁS ATRACTIVAS PARA ABEJAS DEL MUNDO, sostiene poblaciones masivas de abejas (Apis mellifera, abejas solitarias, abejorros), sírfidos parasitoides de áfidos, mariposas, y atrae mariquitas (Coccinellidae) y crisopas (Chrysopidae) — depredadores claves del control biológico de áfidos. Una hectárea de facelia florecida puede sostener 400-1.000 kg de miel por temporada en condiciones óptimas, y atrae polinizadores hacia cultivos adyacentes de hortalizas, frutales y leguminosas mejorando significativamente la fructificación. Uso como abono verde: incorporación al suelo en plena floración (max biomasa antes de lignificación, alta relación C:N de 15-20:1, descomposición rápida), aporta 3-4 ton/ha de biomasa seca con 80-120 kg/ha de N residual al cultivo siguiente, mejora estructura del suelo por sistema radical fibroso superficial denso, supresión de malezas por sombreado y alelopatía suave (sin daño a cultivos siguientes), compatible con rotaciones brassicas (Brassica napus), avena (Avena sativa) y veza (Vicia sativa). NO COMPETITIVA: por ser de familia Boraginaceae (no es Poaceae, no es Brassicaceae, no es Fabaceae) es ROTACIONALMENTE NEUTRAL — no comparte plagas ni enfermedades con las familias mayoritarias de cultivos, lo que la hace abono verde universal compatible con cualquier rotación. Auto-resiembra natural si se deja semillar, pero NO ES INVASORA documentada en Colombia. Manejo agroecológico ideal: siembra en franjas perimetrales de huerta o entre líneas de frutales como banda apícola permanente, siembra de cobertura otoño-invernal en clima frío andino, siembra de rotación primavera-verano antes de hortalizas exigentes en N, cosecha apícola por abejorros y abejas durante 4-8 semanas continuas. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pamplona Roger 2006 Plantas Medicinales, AGROSAVIA Sol Andina.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "agrosavia-sol-andina"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "centaurea_cyanus",
+      "nombre_comun": "Aciano azul",
+      "nombre_cientifico": "Centaurea cyanus L.",
+      "nombre_comunes_regionales": [
+        "Azulejo",
+        "Botón de soltero",
+        "Cornflower",
+        "Aldiza"
+      ],
+      "familia_botanica": "Asteraceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 10,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa o semillero, 0.5-1 cm profundidad, distancia 20-30 cm, germinación 7-14 días, floración 60-90 días post-siembra, ciclo anual 120-150 días, auto-resiembra natural. Cosecha de flores en plena apertura para uso culinario y medicinal."
+      },
+      "companions": [
+        "triticum_aestivum",
+        "helianthus_annuus",
+        "calendula_officinalis"
+      ],
+      "antagonists": [],
+      "harvest_type": "flor",
+      "scale_viability": [
+        "apartamento",
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "valor_pedagogico": "El Aciano azul o Azulejo (Centaurea cyanus L., Asteraceae) es una especie herbácea anual originaria de Europa templada y mediterránea, históricamente acompañante característica de campos de trigo y cereales europeos (de ahí su nombre inglés \"cornflower\" — flor del cereal), cultivada mundialmente como ornamental clásico de jardín por sus inflorescencias en capítulo de color azul cobalto puro intenso (uno de los azules más vibrantes del reino vegetal, debido a antocianinas cianidínicas estabilizadas por complejos con metales) — color tan emblemático que dio nombre al \"azul aciano\" o \"cornflower blue\" en paletas de pintura, joyería y diseño. En Colombia se cultiva en clima templado y frío entre 1.500 y 3.000 msnm: jardines Sabana de Bogotá, Boyacá altoandino, Nariño altoandino, Eje Cafetero altoandino, Antioquia oriente frío, viveros ornamentales urbanos. Manejo agronómico: siembra directa al sitio definitivo o en semillero con trasplante 4 semanas post-germinación, 0.5-1 cm profundidad, distancia 20-30 cm entre plantas, germinación 7-14 días a 12-20°C, ciclo anual 120-150 días, floración inicia 60-90 días post-siembra y se mantiene 6-10 semanas continuas si se eliminan flores marchitas (deadheading), auto-resiembra natural si se deja semillar (estrategia de poblaciones perennizadas en jardín). Las flores son comestibles crudas en ensaladas decorativas, repostería, panes (pan azul aciano francés), cubitos de hielo florales para cócteles (mantienen el azul intenso), té de flor seca (jasmin-blue cornflower blend clásico de tés británicos), pigmento natural azul (los pétalos secos teñidos suavemente azulan agua y vinagres). Uso medicinal tradicional documentado en farmacopeas europeas medievales (Hildegard von Bingen, Dioscórides referenciado a Centaurea spp.): flor en infusión astringente suave para conjuntivitis y orzuelos (lavados oculares con infusión filtrada — uso documentado como \"agua de aciano\" de farmacopea francesa siglo XIX), diurético leve, tónico digestivo. Atracción de polinizadores excepcional: el capítulo presenta flores tubulares fértiles azul puro intenso UV-reflectantes (espectro visible para abejas que detectan UV) rodeadas por flores liguladas azules vistosas, sostiene poblaciones masivas de abejas (Apis mellifera, abejas solitarias, abejorros nativos Bombus spp.), sírfidos, mariposas pequeñas, en floración prolongada de 6-10 semanas. Histórico-cultural: flor nacional de Estonia y Bielorrusia, símbolo de Prusia siglo XIX, emblema de la I Guerra Mundial en Francia (recuerdo de los caídos), flor preferida del rey Luis II de Baviera, color emblemático y nombre dado al \"cornflower blue\" en gemología (variedad azul del zafiro). Manejo en huerta agroecológica: borde perimetral o en banda apícola intercalada con trigo (recreación del paisaje agrícola europeo tradicional), girasol (Helianthus annuus) y caléndula (Calendula officinalis) como gremio multi-color atrayente de polinizadores, siembra en macetera profunda en balcón (escala apartamento viable con sol pleno), cosecha de flores en mañana fresca para uso culinario inmediato o secado a la sombra para té e infusión. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pamplona Roger 2006 Plantas Medicinales, JBB Plantas Medicinales.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "hibiscus_sabdariffa",
+      "nombre_comun": "Jamaica / Flor de Jamaica",
+      "nombre_cientifico": "Hibiscus sabdariffa L.",
+      "nombre_comunes_regionales": [
+        "Rosa de Jamaica",
+        "Rosella",
+        "Roselle",
+        "Acedera de Guinea",
+        "Sereni"
+      ],
+      "familia_botanica": "Malvaceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1500,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 4,
+        "optimo_min": 20,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa post-último riesgo de heladas, 1-2 cm profundidad, distancia 80-100 cm entre plantas, germinación 7-14 días, floración 90-120 días post-siembra, cosecha de cálices carnosos 10-21 días post-fecundación (cuando alcanzan máximo tamaño y color rojo intenso pero antes de lignificarse), ciclo 150-180 días."
+      },
+      "companions": [
+        "zea_mays",
+        "cajanus_cajan",
+        "vigna_unguiculata"
+      ],
+      "antagonists": [],
+      "harvest_type": "flor",
+      "scale_viability": [
+        "huerto_casero",
+        "produccion"
+      ],
+      "valor_pedagogico": "La Jamaica o Flor de Jamaica (Hibiscus sabdariffa L., Malvaceae) es una especie herbácea-arbustiva anual originaria de África occidental (Sudán, Senegal, Nigeria, Guinea — donde existen las mayores diversidad genética y formas silvestres congenéricas) y dispersada en la diáspora africana a través del comercio transatlántico durante los siglos XVI-XVIII al Caribe, México, Centroamérica y Sudamérica donde se naturalizó y se convirtió en cultivo emblemático del Caribe (de ahí \"Jamaica\" — referencia a la isla caribeña, no al país asiático). En Colombia se cultiva en clima cálido y templado entre 0 y 1.800 msnm: Caribe (Bolívar, Magdalena, Cesar, Atlántico, La Guajira, Sucre, Córdoba), Pacífico (Chocó, Valle), valles interandinos cálidos del Magdalena y Cauca, Llanos Orientales, Amazonía, Eje Cafetero zona cafetera baja, Antioquia bajo, Santander. Manejo agronómico: siembra directa al sitio definitivo post-último riesgo de heladas, 1-2 cm profundidad, distancia 80-100 cm entre plantas (porte vigoroso 1.5-2.5 m alto), germinación 7-14 días a 22-30°C, ciclo total 150-180 días, floración inicia 90-120 días post-siembra con flores grandes amarillo-cremosas con centro purpúreo profundo característico del género Hibiscus (5 pétalos vistosos, columna estaminal larga característica de Malvaceae). Lo COSECHABLE NO ES LA FLOR EN SÍ SINO LOS CÁLICES carnosos rojo-purpúreo intensos que se forman post-fecundación rodeando la cápsula seminal: 10-21 días post-fecundación alcanzan máximo tamaño y color rojo intenso pero antes de lignificarse, momento crítico de cosecha manual. Los cálices frescos son la materia prima de la bebida emblemática del Caribe (agua de Jamaica, agua de Jamaica fría con limón y panela en México y Centroamérica, sorrel drink en Jamaica isla y Trinidad, bissap en Senegal y África Occidental, karkadeh en Egipto y Sudán) y se consumen también: secados al sol para infusión (té rojo cítrico-ácido refrescante rico en vitamina C, antocianinas, ácido hibíscico), mermeladas y jaleas (excelente cuajado natural por alto contenido de pectina), salsas agridulces, sirops y licores tradicionales, tinte alimentario natural rojo-rosado (estable a pH ácido), gelatinas, vinos de fruta artesanales. Uso medicinal tradicional documentado y respaldado por evidencia clínica moderna: cálices secos en infusión hipotensor leve (efecto antihipertensivo respaldado por ensayos clínicos controlados publicados en Journal of Human Hypertension y otros), diurético, antioxidante alto por antocianinas y polifenoles, hipocolesterolemiante leve, refrescante. Atracción de polinizadores: flores grandes vistosas atrayentes de abejorros nativos (Bombus spp.), abejas (Apis mellifera), polinizadores grandes, y aves (colibríes ocasionalmente en zonas cálidas). En África Occidental también es importante alimento de hoja: las hojas tiernas se consumen cocidas como verdura (sabor ácido suave por oxalatos similar a acedera, de ahí \"acedera de Guinea\"), aporte vitamínico significativo en dietas rurales sahelianas. Asociación clásica con maíz (Zea mays), gandul (Cajanus cajan), caupí (Vigna unguiculata) en sistemas agroforestales tropicales tradicionales africanos y caribeños. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pamplona Roger 2006 Plantas Medicinales, JBB Plantas Medicinales.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "dahlia_imperialis",
+      "nombre_comun": "Dahlia gigante / Dalia arbórea",
+      "nombre_cientifico": "Dahlia imperialis Roezl ex Ortgies",
+      "nombre_comunes_regionales": [
+        "Dahlia imperial",
+        "Árbol de Dahlia",
+        "Acocoxóchitl gigante",
+        "Mata de muerto"
+      ],
+      "familia_botanica": "Asteraceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "esqueje",
+        "notas": "Esqueje de caña de 30-60 cm con 2-3 nudos enterrados horizontalmente, brotación 2-4 semanas, plantación final marzo-mayo, distancia 1.5-2 m entre plantas. Alternativa por división de tubérculos (rizomas tuberosos crecen radialmente del cuello). NO sembrar por semilla (variabilidad alta + lento)."
+      },
+      "companions": [
+        "salvia_officinalis",
+        "lavandula_dentata",
+        "rosmarinus_officinalis"
+      ],
+      "antagonists": [],
+      "harvest_type": "tuberculo",
+      "scale_viability": [
+        "huerto_casero",
+        "produccion"
+      ],
+      "valor_pedagogico": "La Dahlia gigante o Dalia arbórea (Dahlia imperialis Roezl ex Ortgies, Asteraceae) es una especie herbácea-arbustiva gigante perenne originaria de México y Guatemala (montañas templadas de Oaxaca, Chiapas, Veracruz, Puebla, Michoacán entre 1.500 y 3.000 msnm) y de Centroamérica andina, naturalizada en Colombia desde su introducción ornamental por jardineros europeos del siglo XIX. Es la dalia más grande del género: tallos huecos cañiformes alcanzan 4-8 m de altura en ejemplares maduros con porte de árbol-bambú-asteráceo único en el mundo, capítulos terminales colgantes de hasta 15 cm de diámetro con lígulas color rosa-lila a magenta intenso o blanco según variedad, floración invierno-primavera fría andina (noviembre-marzo). Dahlia es el GÉNERO FLOR NACIONAL DE MÉXICO desde 1963 (decreto presidencial Adolfo López Mateos), reconocimiento del origen mesoamericano del género y de su importancia cultural milenaria: el pueblo Náhuatl (azteca) cultivaba dahlia (acocoxóchitl, \"flor del agua hueca\" en referencia a tallos huecos) en jardines reales tenochtitlanos, los registros de Hernández (siglo XVI) describen su cultivo con fines ornamentales, medicinales y alimentarios. En Colombia se cultiva en clima templado y frío andino entre 1.800 y 3.000 msnm: Sabana de Bogotá, Boyacá altoandino, Cundinamarca rural, Antioquia oriente frío, Eje Cafetero altoandino, Nariño altoandino, Santander, donde se ha naturalizado en bordes de caminos, jardines abandonados y áreas perturbadas montañas (hay poblaciones asilvestradas estables en Boyacá y Cundinamarca alrededor de fincas y haciendas viejas). Manejo agronómico: propagación principal por esqueje de caña de 30-60 cm con 2-3 nudos enterrados horizontalmente (cada nudo brota una nueva planta — método clásico mexicano), brotación 2-4 semanas, plantación final marzo-mayo en clima andino, distancia 1.5-2 m entre plantas, alternativa por división de tubérculos (rizomas tuberosos engrosados radian del cuello, similar a yacón Smallanthus sonchifolius en estructura), NO recomendable siembra por semilla (variabilidad genética alta y crecimiento lento), suelo rico bien drenado, riego moderado durante crecimiento, post-floración el tallo se seca y se corta a 50 cm sobre suelo para protección de yemas basales durante época seca (rebrota al inicio de siguiente temporada lluviosa). Doble propósito ornamental + comestible: ornamental masivo por porte único de \"árbol-bambú florecido\" y floración invernal vistosa rosa-lila colgante, COMESTIBLE POR LOS TUBÉRCULOS (rizomas tuberosos) que se forman al cuello de la planta — uso tradicional mesoamericano azteca-náhuatl pre-hispánico documentado por Hernández y otras crónicas, similares en uso al yacón andino (Smallanthus sonchifolius, también Asteraceae): tubérculos crudos dulces-acuosos (almacenan inulina, fructano de cadena corta de bajo índice glucémico, apto para diabéticos), cocidos en sopas y guisos (sabor suave-dulce similar a alcachofa de Jerusalén Helianthus tuberosus, también Asteraceae), tostados o asados, materia prima histórica de elaboración de bebidas fermentadas mexicanas y de jarabes endulzantes pre-hispánicos. Atracción excepcional de polinizadores: en floración invernal (cuando pocas otras flores están disponibles en clima andino frío) sostiene poblaciones masivas de colibríes (en Colombia: Coeligena spp., Boissonneaua spp., Lafresnaya lafresnayi), abejas (Apis mellifera, abejas solitarias), abejorros (Bombus spp.) y mariposas — siendo recurso melífero clave de invierno andino. Manejo en chagra: plantar en borde de huerta como \"árbol-flor\" multi-propósito (ornamental masivo + comestible patrimonial mexicano + atrayente polinizador invernal + biomasa al final de ciclo), asociación con seto aromático mediterráneo (Salvia officinalis, Lavandula dentata, Rosmarinus officinalis) en jardín polifuncional, cosecha de tubérculos en época seca cuando tallos se han secado, propagación vegetativa de caña post-floración para multiplicación. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pérez Arbeláez 1947 Plantas Útiles Colombia, JBB Plantas Medicinales.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "perez-arbelaez-1947-plantas-utiles",
+        "jbb-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "cosmos_sulphureus",
+      "nombre_comun": "Cosmos amarillo",
+      "nombre_cientifico": "Cosmos sulphureus Cav.",
+      "nombre_comunes_regionales": [
+        "Cosmos naranja",
+        "Mirasolillo",
+        "Yellow cosmos"
+      ],
+      "familia_botanica": "Asteraceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "calido",
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "crop",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 600,
+        "optimo_max": 2500,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 15,
+        "optimo_max": 28,
+        "max_tolerable": 34
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Siembra directa al voleo o en hileras post-último riesgo de heladas, 0.5-1 cm profundidad, distancia 30-40 cm entre plantas, germinación 5-10 días, floración 50-70 días post-siembra, ciclo anual 100-120 días, auto-resiembra natural abundante."
+      },
+      "companions": [
+        "helianthus_annuus",
+        "tagetes_minuta",
+        "zinnia_elegans"
+      ],
+      "antagonists": [],
+      "harvest_type": "flor",
+      "scale_viability": [
+        "apartamento",
+        "huerto_casero",
+        "produccion",
+        "restauracion"
+      ],
+      "valor_pedagogico": "El Cosmos amarillo (Cosmos sulphureus Cav., Asteraceae) es una especie herbácea anual originaria de México (mesetas centrales, Oaxaca, Chiapas, Veracruz) y Centroamérica, naturalizada y cultivada mundialmente como ornamental clásico de jardín tropical-subtropical por sus capítulos vistosos de color amarillo-anaranjado a rojo-naranja intenso característico (de ahí sulphureus — del color del sulfuro/azufre) y por su atractivo masivo de mariposas y otros polinizadores. Distinta de su congenérica Cosmos bipinnatus (cosmos rosado-blanco de clima frío, hojas bipinnadas finísimas, capítulos rosa-blanco-morado, mayor altitud) por su color cálido amarillo-anaranjado característico, hojas pinnadas más anchas (no bipinnadas finísimas), tolerancia a clima más cálido tropical (vs. preferencia de bipinnatus por clima frío), tamaño menor (1-2 m vs. bipinnatus 1.5-3 m). En Colombia se cultiva en clima cálido, templado y frío entre 0 y 2.800 msnm: Caribe, valles interandinos, Sabana de Bogotá, Eje Cafetero, Antioquia, Boyacá, Nariño, Llanos Orientales — especie de amplísimo rango altitudinal por adaptación termal flexible. Manejo agronómico: siembra directa al sitio definitivo al voleo o en hileras post-último riesgo de heladas (en clima frío andino esperar a final de febrero-marzo), 0.5-1 cm profundidad, distancia 30-40 cm entre plantas, germinación 5-10 días a 18-25°C, ciclo anual 100-120 días, floración inicia 50-70 días post-siembra y se mantiene 8-12 semanas continuas si se eliminan flores marchitas, auto-resiembra natural ABUNDANTE (se naturaliza en jardines y bordes de huerta tras una sola siembra). Atracción excepcional de polinizadores: especie reconocida mundialmente como UNA DE LAS PLANTAS MÁS ATRAYENTES DE MARIPOSAS del mundo (lepidópteros diurnos de varias familias: Pieridae, Nymphalidae, Hesperiidae, Lycaenidae), también atrae intensivamente abejas (Apis mellifera, abejas solitarias, abejorros Bombus spp.), sírfidos, escarabajos polinizadores y colibríes. La estructura del capítulo presenta abundante néctar accesible y polen abundante en disco amarillo central, en floración prolongada de 2-3 meses continuos. Pigmentos naturales: las flores secas son fuente de carotenoides (xantofilas, luteína, zeaxantina) usados como tintes alimentarios naturales amarillo-naranja en panadería, mantequillas, quesos, yemas de huevo de gallinas alimentadas con harina de flor seca (mejora pigmentación natural sin químicos), tinte textil natural amarillo-naranja tradicional mexicano. Uso medicinal tradicional documentado en farmacopeas mexicanas: infusión de flor diaforético, suavemente sedante, antimicrobiano. Manejo en chagra y huerta agroecológica: borde perimetral de huerta como banda atrayente de polinizadores y mariposas (mariposario de huerta — pedagogía infantil ideal), siembra en gremio con girasol (Helianthus annuus), tagetes (Tagetes minuta) y zinnia (Zinnia elegans) como combo \"jardín de mariposas mexicano\", siembra en macetera profunda en balcón con sol pleno (escala apartamento viable), cosecha de flores en mañana fresca para secado a la sombra y uso como pigmento o medicinal. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pamplona Roger 2006 Plantas Medicinales, JBB Plantas Medicinales.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "monarda_didyma",
+      "nombre_comun": "Bergamota silvestre / Té de Oswego",
+      "nombre_cientifico": "Monarda didyma L.",
+      "nombre_comunes_regionales": [
+        "Monarda escarlata",
+        "Bee balm",
+        "Oswego tea",
+        "Bálsamo de abejas"
+      ],
+      "familia_botanica": "Lamiaceae",
+      "category": "atractores_polinizadores",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "medio",
+      "roles_in_guild": [
+        "pollinator_attractor",
+        "crop",
+        "pest_repellent"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3000
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "division",
+        "notas": "División de matas en primavera (más rápido y fiable, preserva características parentales). Alternativa por esqueje de tallo en primavera o semilla con germinación irregular 15-25 días. Plantación a 40-60 cm entre plantas. Floración verano-otoño en clima andino frío."
+      },
+      "companions": [
+        "lavandula_dentata",
+        "salvia_officinalis",
+        "rosmarinus_officinalis"
+      ],
+      "antagonists": [],
+      "harvest_type": "flor",
+      "scale_viability": [
+        "huerto_casero",
+        "produccion"
+      ],
+      "valor_pedagogico": "La Bergamota silvestre o Té de Oswego (Monarda didyma L., Lamiaceae) es una especie herbácea perenne aromática originaria de Norteamérica oriental templada (bosques húmedos de los Apalaches, Pensilvania, Nueva York, Virginia, Carolina del Norte, Tennessee, Kentucky, Ontario), cultivada mundialmente como ornamental, medicinal y atrayente excepcional de polinizadores, con relevancia histórica como té sustituto consumido por los colonos rebeldes de las Trece Colonias norteamericanas tras el Boston Tea Party de 1773 (boicot al té británico — los colonos adoptaron el té de hojas de Monarda usado por los pueblos originarios Oswego de la región de Nueva York, de ahí \"Oswego tea\"). En Colombia se cultiva en clima templado y frío andino entre 1.800 y 3.000 msnm: Sabana de Bogotá, Boyacá altoandino, Antioquia oriente frío, Eje Cafetero altoandino, Nariño altoandino, viveros aromáticos urbanos especializados. Manejo agronómico: propagación principal por división de matas en primavera (método más rápido y fiable, preserva características parentales — Monarda forma touffes densas con rizomas superficiales que se separan fácilmente), alternativa por esqueje de tallo en primavera-verano con enraizamiento en 3-4 semanas, alternativa por semilla con germinación irregular 15-25 días a 18-22°C y variabilidad genética alta, plantación al sitio definitivo a 40-60 cm entre plantas, suelo rico bien drenado con humedad consistente (prefiere humedad media constante — no sequía ni encharcamiento), sol pleno o sombra parcial leve, riego moderado regular durante floración, poda de tallos secos al final de cada ciclo. Floración verano-otoño en clima andino frío (mayo-octubre), con espigas terminales en capitulillos esféricos densos de flores tubulares bilabiadas escarlata intenso (típicas de Lamiaceae, característica diagnóstica) muy vistosas. Atracción de polinizadores excepcional: COMÚNMENTE LLAMADA \"BEE BALM\" — BÁLSAMO DE ABEJAS — por su atracción masiva de abejas, abejorros (Bombus spp.), colibríes (en Norteamérica colibríes nativos, en Colombia atraería Coeligena spp., Boissonneaua spp.) y mariposas. La flor tubular larga escarlata es polinizada principalmente por colibríes (sintropía evolutiva clásica de ornitofilia: rojo vivo + flor tubular + néctar abundante + sin perfume), pero también recibe visitas masivas de abejas y abejorros que acceden al néctar perforando la base del tubo floral. Uso como té y comestible: las hojas aromáticas frescas o secas se usan para té herbal cítrico-floral aromático (sabor recordando vagamente a la bergamota cítrica del té Earl Grey — de ahí el nombre vulgar \"bergamota silvestre\", aunque NO es la bergamota cítrica Citrus bergamia: ambas comparten compuestos similares de timol, carvacrol y bergamotene), flores comestibles crudas en ensaladas decorativas (color escarlata vistoso + sabor herbáceo suave), repostería floral, decoración de postres. Uso medicinal tradicional documentado: la medicina tradicional indígena norteamericana (Oswego, Iroqueses, Cherokee, Algonquinos) usaba infusión de hojas para resfriados, dolor de garganta, problemas digestivos, expectorante, antiséptico aéreo; herbarios europeos del siglo XVIII-XIX la incorporaron tras la introducción. Composición fitoquímica rica en timol y carvacrol (mismos compuestos del orégano y tomillo, por convergencia química en Lamiaceae): aceite esencial con propiedades antimicrobianas, antisépticas y carminativas documentadas. Manejo en chagra: gremio aromático mediterráneo-anglosajón con lavanda dentada (Lavandula dentata), salvia (Salvia officinalis) y romero (Rosmarinus officinalis) como seto perenne atrayente de polinizadores, banda apícola perimetral de huerta en clima frío andino, jardín pedagógico de hierbas aromáticas. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pamplona Roger 2006 Plantas Medicinales, JBB Plantas Medicinales.",
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop",
+        "pamplona-roger-2006-plantas-medicinales",
+        "jbb-plantas-medicinales"
+      ],
+      "validation_level": "claude_draft"
+    },
+    {
+      "id": "pachyrhizus_tuberosus",
+      "nombre_comun": "Jícama amazónica",
+      "nombre_comunes_regionales": [
+        "ashipa",
+        "ahipa amazónica",
+        "yacuma",
+        "chuín",
+        "wayusa-jícama"
+      ],
+      "nombre_cientifico": "Pachyrhizus tuberosus (Lam.) Spreng.",
+      "familia_botanica": "Fabaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 800,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Leguminosa trepadora de raíz tuberosa amazónica, hermana de jícama mesoamericana pero adaptada a tierras bajas húmedas. Variedades 'ashipa' (Amazonía peruano-boliviana-brasileña) y 'chuin' (alto Ucayali). Semillas y vainas contienen rotenona y pterocarpina — TÓXICAS, no consumir. Solo la raíz tuberosa es comestible (cruda como fruta o cocida). Requiere tutorado (espaldera o tutor vivo de yuca/maíz). Despuntar inflorescencias para concentrar fotosintatos en raíz."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "sinchi-amazonia-colombiana",
+        "nrc-1989-cultivos-andinos",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "La jícama amazónica o ashipa (Pachyrhizus tuberosus (Lam.) Spreng., familia Fabaceae subfamilia Faboideae) es la especie hermana amazónica de la jícama mesoamericana (P. erosus), una leguminosa trepadora vigorosa nativa de las tierras bajas tropicales sudamericanas — específicamente del piedemonte amazónico (cuenca alta del Amazonas en Perú-Ecuador-Colombia-Brasil-Bolivia) — domesticada por pueblos indígenas amazónicos hace al menos 4.000-5.000 años según evidencia arqueobotánica del sitio de Real Alto (Ecuador). En Colombia se cultiva tradicionalmente en chagras amazónicas del trapecio amazónico (Leticia, Puerto Nariño, La Pedrera), Putumayo (piedemonte amazónico, Mocoa, Puerto Asís, Puerto Leguízamo), Caquetá (Florencia, San Vicente del Caguán), Vaupés (Mitú), Guainía (Inírida) y Vichada (Cumaribo) entre 0 y 1.200 msnm en zona térmica cálida húmeda. Existen dos grandes complejos varietales tradicionales: 'ashipa' o 'yacuma' (Amazonía peruano-boliviana-brasileña, raíces piriformes de 1-3 kg con piel parda y pulpa blanca crocante dulce-acuosa), y 'chuin' o 'wayusa-jícama' (alto Ucayali, Loreto, raíces más alargadas y dulces). La raíz tuberosa fresca es rica en agua (85-90%), almidón soluble, azúcares simples (sacarosa, fructosa), oligofructanos prebióticos (inulina) y vitamina C, consumida cruda como fruta-hortaliza refrescante o cocida en sopas y guisos amazónicos. Lección viva de toxicidad selectiva amazónica: como su prima mesoamericana, esta especie enseña magistralmente la separación evolutiva de partes comestibles (raíz tuberosa) y partes tóxicas (semillas, vainas verdes, flores) que contienen rotenona (5-10% peso seco) y pterocarpina, isoflavonoides insecticidas naturales que pueblos amazónicos han usado milenariamente para macerados acuosos contra plagas de chagra (Aphis spp., Bemisia tabaci) e incluso para pesca tradicional (envenenamiento controlado de pozas con masa machacada de vainas — técnica del 'barbasco' compartida con otras especies como Lonchocarpus utilis). Manejo agroecológico: propagación por semilla pre-tratada con escarificación mecánica (frotar con lija) para romper latencia, siembra a 30-50 cm entre plantas con tutorado obligatorio (espaldera, tutor vivo de yuca alta o maíz), asocio tradicional amazónico en chagras de tumba-pudre con yuca brava, plátano, piña, copoazú, ají y achiote. Cosecha de raíz a 6-9 meses antes de floración para máximo desarrollo de tubérculo. Las flores deben removerse (despunte sistemático) para concentrar fotosintatos en raíz. Las semillas y vainas se manejan rotuladas como tóxicas, no se consumen jamás, pero se aprovechan en macerados insecticidas orgánicos. Especie pilar de soberanía alimentaria amazónica subutilizada urgente de rescatar antes de erosión genética por pérdida de chagras tradicionales. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, SINCHI Amazonía Colombiana, NRC 1989 Lost Crops of the Incas, Bernal 2015 Catálogo Plantas Colombia."
+    },
+    {
+      "id": "colocasia_esculenta",
+      "nombre_comun": "Taro / Papa china",
+      "nombre_comunes_regionales": [
+        "papa china",
+        "malanga isleña",
+        "ñame chino",
+        "ocumo chino",
+        "dasheen",
+        "eddoe"
+      ],
+      "nombre_cientifico": "Colocasia esculenta (L.) Schott",
+      "familia_botanica": "Araceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1200,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 21,
+        "optimo_max": 30,
+        "max_tolerable": 35
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "cormo",
+        "notas": "Propagación por cormos hijos (cormelos) o porciones de cormo madre con yemas activas. Planta semiacuática de Araceae que tolera y prefiere suelos encharcados o de borde de humedal. Toda la planta contiene cristales de oxalato de calcio (rafidios) urticantes — los cormos y hojas DEBEN cocinarse mínimo 30-45 min para destruir oxalatos antes de consumir. Ciclo 6-12 meses. Asociar con plátano y yuca en zonas húmedas calientes."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "fao-ecocrop",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "El taro o papa china (Colocasia esculenta (L.) Schott, familia Araceae) es una de las plantas alimenticias más antiguas domesticadas por la humanidad — su domesticación se remonta a 9.000-10.000 años atrás en el sudeste asiático (norte de India, Birmania, sur de China) y Melanesia tropical, considerándose uno de los cinco cultivos pilar de los pueblos austronesios y polinesios (junto con ñame, banana, coco y caña), y llegó a América tropical durante el periodo colonial con el comercio esclavista transatlántico desde África occidental como alimento de subsistencia de las comunidades afrodescendientes esclavizadas, donde se naturalizó y se adoptó por comunidades indígenas, campesinas y palenqueras en todo el trópico húmedo americano. En Colombia se cultiva ampliamente en el Pacífico colombiano (Chocó, Valle del Cauca litoral, Cauca litoral, Nariño litoral — Tumaco, Buenaventura, Quibdó, Tadó, Istmina), Caribe húmedo (Magdalena medio, Antioquia bajo, Urabá, Bolívar, Sucre, Córdoba, San Andrés y Providencia), Amazonía (piedemonte amazónico Putumayo-Caquetá, trapecio amazónico Leticia) y zonas bajas inundables del Magdalena medio entre 0 y 1.200 msnm en zona térmica cálida húmeda. Es una de las plantas insignia de la soberanía alimentaria afrocolombiana del Pacífico — alimento ancestral que sostuvo a comunidades cimarronas, palenques y consejos comunitarios del Pacífico colombiano durante siglos. Existen dos grandes grupos varietales tradicionales: 'dasheen' (cormo central grande, cormos hijos pequeños, preferida para consumo directo) y 'eddoe' (cormos hijos múltiples bien desarrollados, preferida para reproducción y comercialización). El cormo central tuberoso (4-15 cm diámetro, 0.5-2 kg peso) y los cormelos hijos son ricos en almidón resistente, mucílagos, vitamina A, vitamina C, potasio y proteína vegetal moderada (3-4%), consumidos cocidos (hervidos, fritos, asados, en sancocho, en cremas, en sopa de queso del Pacífico). Las hojas grandes acorazonadas-peltadas son comestibles también como espinaca tropical ('callaloo' caribeño) tras cocción prolongada. Lección viva de bioseguridad alimentaria: TODA la planta contiene rafidios de oxalato de calcio — cristales aciculares microscópicos que provocan irritación urticante intensa en mucosas (boca, esófago) si se consume cruda — pero la cocción prolongada (mínimo 30-45 minutos a 100°C, o asado directo en brasas) destruye completamente los oxalatos solubles y desnaturaliza los cristales, transformando la planta tóxica cruda en alimento básico nutritivo. Esta lección de procesamiento culinario obligatorio para detoxificar plantas alimenticias es paralela a la nixtamalización del maíz mesoamericano y al procesamiento de yuca brava amazónica, y enseña que la cocina tradicional NO es solo cultura, sino tecnología etnoquímica milenaria de bioseguridad. Manejo agroecológico: propagación por cormos hijos o trozos de cormo madre con yemas activas, plantación a 60-80 cm entre plantas y 1 m entre surcos, prefiere suelos encharcados o de bordes de humedales tropicales (zona ribereña, manglares de transición, marismas), ciclo 6-12 meses a cosecha, rendimientos 8-25 t/ha cormos. Asocio tradicional con plátano hartón, yuca, piña, achiote, caña de azúcar y árboles frutales en finca pacífica colombiana ('azotea' o 'finca tradicional pacífica'). Plagas: barrenador del cormo (Papuana spp.), pudrición Pythium spp. en suelos mal drenados. Especie clave para reactivar como cultivo en humedales, zonas inundables y áreas con problemas de drenaje donde otros cultivos no prosperan. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, FAO EcoCrop, Bernal 2015 Catálogo Plantas Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia."
+    },
+    {
+      "id": "lepidium_meyenii",
+      "nombre_comun": "Maca",
+      "nombre_comunes_regionales": [
+        "maca andina",
+        "maca peruana",
+        "ginseng andino",
+        "maca-maca",
+        "ayak chichira"
+      ],
+      "nombre_cientifico": "Lepidium meyenii Walp.",
+      "familia_botanica": "Brassicaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 3500,
+        "optimo_min": 3800,
+        "optimo_max": 4400,
+        "max_absoluto": 4500
+      },
+      "temperatura_c": {
+        "helada_letal": -10,
+        "optimo_min": 4,
+        "optimo_max": 12,
+        "max_tolerable": 18
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Brasicácea de altiplano extremo (Meseta del Bombón, Junín-Pasco-Perú 4000-4500 msnm) — la planta cultivada a mayor altitud del mundo. Raíz pivotante tuberosa (5-8 cm diámetro) que se cosecha tras 7-9 meses. Tras cosecha, se asoliea durante 3-5 días para concentrar nutrientes y obtener 'maca seca' (forma comercial). Variedades por color: amarilla (común, energizante), roja (próstata, antioxidante), negra (memoria, fertilidad masculina), morada. En Colombia introducción experimental en altiplano cundiboyacense alto y Nariño-Putumayo páramos altos."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "nrc-1989-cultivos-andinos",
+        "fao-ecocrop",
+        "agrosavia-manual-tuberculos-andinos-2017"
+      ],
+      "valor_pedagogico": "La maca andina (Lepidium meyenii Walp., familia Brassicaceae) es una brasicácea altoandina de raíz tuberosa pivotante (4-8 cm diámetro, 50-200 g peso fresco) considerada la planta cultivada a mayor altitud del mundo — domesticada hace 2.000-2.500 años en la Meseta del Bombón (departamentos de Junín y Pasco, Perú central) entre 4.000-4.500 msnm, en condiciones climáticas que ninguna otra especie cultivada tolera: heladas nocturnas constantes (hasta -10°C), radiación UV extrema, vientos secos, suelos pobres ácidos volcánicos, oxígeno reducido (puna alta). En Colombia ha sido introducida experimentalmente desde 2010-2015 por AGROSAVIA y la Universidad Nacional sede Bogotá-Tibaitatá en altiplanos altos de Cundinamarca (Sumapaz, Chingaza, Cruz Verde, Iguaque-Boyacá), Boyacá (páramo de Pisba, Cocuy), Nariño (páramo de Las Ovejas, Chiles-Cumbal, La Cocha), Putumayo (páramos altos del Bordoncillo) y Cauca (páramo de Las Delicias, Sotará) entre 3.500-4.500 msnm como cultivo de altiplano frío extremo donde la papa criolla y la quinua ya no prosperan. Lección viva de adaptación extrema y bioquímica adaptógena: la maca es ejemplo magistral de cómo una crucífera (la misma familia botánica del repollo, la mostaza y el rábano) evolucionó hacia la altiplanicie altoandina extrema mediante acumulación en raíz de glucosinolatos andinos específicos (macamida, macaeno), alcaloides macaridina y N-bencil-amidas únicas a esta especie, y maca-glúcidos prebióticos, compuestos asociados a propiedades adaptógenas, energizantes, balanceadoras hormonales y mejoradoras de fertilidad humana (efectos documentados en estudios clínicos peruanos modernos). Existen variedades tradicionales clasificadas por color de raíz: maca amarilla (la más común, ~60% producción, energizante general), maca roja (preferida en estudios clínicos de próstata, antioxidante por betalaínas), maca negra (memoria, fertilidad masculina, libido), maca morada (intermedia). La maca recién cosechada NO se consume — debe asolearse durante 3-5 días al sol andino fuerte para concentrar fitoquímicos, deshidratar parcialmente y eliminar glucosinolatos indeseables, obteniendo 'maca seca' (forma comercial tradicional), de la cual se prepara harina, mazamorra, infusión, gelatinizado o licor andino. Manejo agroecológico: propagación por semilla, siembra al voleo o en surcos a 5-10 cm entre plantas en parcelas pequeñas de altiplano (en Junín-Perú se rotan parcelas cada 7-10 años para regeneración del suelo, un caso clásico de 'descanso largo' andino), ciclo 7-9 meses, rendimientos 5-15 t/ha raíz fresca o 1-3 t/ha raíz seca. Asocio con quinua, cañihua, papa amarga (Solanum juzepczukii), oca y olluco. Cultivo de soberanía alimentaria andina con potencial agrocomercial alto para Colombia altoandina como alternativa a la coca en zonas altas. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, NRC 1989 Lost Crops of the Incas, FAO EcoCrop, AGROSAVIA Manual Tubérculos Andinos 2017."
+    },
+    {
+      "id": "mirabilis_expansa",
+      "nombre_comun": "Mauka",
+      "nombre_comunes_regionales": [
+        "miso",
+        "chago",
+        "tazo",
+        "yuca inca",
+        "arracacha de toro"
+      ],
+      "nombre_cientifico": "Mirabilis expansa (Ruiz & Pav.) Standl.",
+      "familia_botanica": "Nyctaginaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "en_peligro",
+      "altitud_msnm": {
+        "min_absoluto": 2200,
+        "optimo_min": 2700,
+        "optimo_max": 3500,
+        "max_absoluto": 3800
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 10,
+        "optimo_max": 18,
+        "max_tolerable": 22
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "esqueje_tallo",
+        "notas": "Tubérculo andino casi extinto — relegado tradicionalmente a pequeños refugios en Ecuador (Cañar, Azuay), Perú (Cajamarca, Áncash) y Bolivia (Cochabamba). Se propaga por esquejes basales del tallo (30 cm) que rebrotan vigorosamente. Las raíces tuberosas dulces (300 g - 1.5 kg) requieren asoleo post-cosecha de 5-7 días para reducir sapogeninas amargas y dulcificarse. Ciclo 8-14 meses. Una de las plantas alimenticias más subutilizadas y olvidadas del mundo (NRC 1989)."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "nrc-1989-cultivos-andinos",
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "La mauka, miso o chago (Mirabilis expansa (Ruiz & Pav.) Standl., familia Nyctaginaceae) es uno de los cultivos andinos más fascinantes, raros y subutilizados del mundo según el National Research Council 1989 'Lost Crops of the Incas' — una nictagínea andina (misma familia botánica que el buganvil ornamental) de raíz tuberosa engrosada (300 g a 1.5 kg, hasta 15-30 cm largo, color blanco-amarillento o rosado-violáceo según variedad) que se cultivaba ampliamente en el imperio inca y que actualmente sobrevive solo en bolsones genéticos muy reducidos en Cañar y Azuay (Ecuador), Cajamarca y Áncash (Perú) y Cochabamba (Bolivia), estimándose que menos de 5.000 familias campesinas la cultivan actualmente en todos los Andes — un cultivo casi extinto que pueblos campesinos andinos sostienen como 'planta-memoria' de la agricultura precolombina. En Colombia tiene presencia histórica documentada en Nariño (resguardos de los Pastos en Cumbal, Túquerres, Guachucal, Ipiales, Aldea de María) y Cauca (resguardos Misak-Guambianos en Silvia y Totoró, resguardos Nasa en Inzá) entre 2.700-3.500 msnm en zona térmica fría, donde ha sido registrada como cultivo tradicional indígena reliquia por etnobotánicos colombianos (Bernal et al. 2015). Lección viva de erosión genética y conservación de cultivos olvidados: la mauka es ejemplo dramático de cómo la modernización agrícola y la presión del mercado por monocultivos comerciales (papa-cebada-trigo en altiplano) ha relegado a la extinción cultivos enteros que sostuvieron civilizaciones precolombinas durante milenios, y enseña la urgencia de programas activos de rescate genético, refugios in-situ con comunidades indígenas custodias, y bancos de germoplasma ex-situ como medidas complementarias. La raíz tuberosa fresca recién cosechada es amarga por contenido de sapogeninas triterpénicas defensivas y NO se consume así — requiere asoleo post-cosecha durante 5-7 días al sol andino fuerte (técnica idéntica a la del oca, ulluco y maca), proceso que hidroliza enzimáticamente las sapogeninas, concentra azúcares solubles (sacarosa, fructosa) y transforma la raíz amarga en alimento dulce-aromático similar al camote pero con textura más fibrosa y aroma distintivo, consumido cocido en sopas, asado, en chicha fermentada y como dulce campesino tradicional. Manejo agroecológico: propagación por esquejes basales del tallo (segmentos de 30 cm de tallos basales lignificados con 2-3 yemas activas), nunca por semilla (germinación errática), plantación a 50-80 cm entre plantas, ciclo 8-14 meses a primera cosecha (lento), rebrota de la corona varios años (cultivo semi-perenne 3-5 ciclos), rendimientos 10-25 t/ha raíz fresca. Asocio con maíz cabuya, papa criolla, quinua, oca, ulluco, ruda y borraja en sistemas de chagra tradicional misak-pasto-nasa. Especie pilar de soberanía alimentaria andina urgentísima de rescatar antes de extinción agrícola definitiva — un proyecto candidato perfecto para el Banco de Germoplasma AGROSAVIA y los programas de etnobotánica Universidad del Cauca. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, NRC 1989 Lost Crops of the Incas, AGROSAVIA Manual Tubérculos Andinos 2017, Bernal 2015 Catálogo Plantas Colombia."
+    },
+    {
+      "id": "arracacia_xanthorrhiza_amarilla",
+      "nombre_comun": "Arracacha amarilla",
+      "nombre_comunes_regionales": [
+        "racacha amarilla",
+        "apio criollo amarillo",
+        "zanahoria blanca amarilla",
+        "mandioquinha-salsa-amarela"
+      ],
+      "nombre_cientifico": "Arracacia xanthorrhiza Bancr. cv. 'Amarilla'",
+      "familia_botanica": "Apiaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1800,
+        "optimo_max": 2500,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 14,
+        "optimo_max": 21,
+        "max_tolerable": 25
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "esqueje_corona",
+        "notas": "Cultivar tradicional colombiano con raíz tuberosa de pulpa amarilla intensa (alto contenido de β-caroteno, 8-12 mg/100 g) — distinto de las variedades 'blanca' (pulpa marfil) y 'morada' (pulpa violácea por antocianinas). Cultivar más comercial y dulce. Centro genético colombiano: Boyacá (Cajicá, Tibaná, Boavita), Cundinamarca (Fómeque, Choachí), Antioquia (Oriente Antioqueño), Caldas (Aguadas), Eje cafetero alto. Propagación por colinos (cepas hijas) de corona, NUNCA por semilla. Ciclo 8-12 meses. AGROSAVIA mantiene banco de germoplasma con >50 accesiones de cultivares 'amarilla' colombianos."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "agrosavia-tibaitata",
+        "bernal-2015-plantas-liquenes-colombia",
+        "nrc-1989-cultivos-andinos"
+      ],
+      "valor_pedagogico": "La arracacha amarilla (Arracacia xanthorrhiza Bancr. cv. 'Amarilla', familia Apiaceae) es el cultivar colombiano más comercial y reconocido de arracacha — una apiácea andina (misma familia botánica que la zanahoria, el apio y el perejil) de raíz tuberosa lateral engrosada (15-25 cm largo, 200-800 g peso, pulpa amarilla intensa por alto contenido de β-caroteno provitamina A 8-12 mg/100 g), domesticada en los Andes del norte (Colombia-Ecuador-Venezuela) hace al menos 4.000 años. Colombia es uno de los centros de diversidad genética primaria de la especie según AGROSAVIA — el banco de germoplasma de Tibaitatá mantiene más de 150 accesiones nacionales clasificadas por color de pulpa: 'amarilla' (el cv. más comercial y dulce, β-caroteno alto), 'blanca' (pulpa marfil, almidón puro, menos dulce), 'morada' (pulpa violácea por antocianinas, especialidad). Se cultiva en Boyacá (Cajicá, Tibaná, Boavita, Sotaquirá), Cundinamarca (Fómeque, Choachí, Ubaque, Une, La Calera), Antioquia (Oriente Antioqueño — La Ceja, El Retiro, Marinilla, Rionegro), Caldas (Aguadas, Pácora, Salamina, Aranzazu), Eje cafetero alto (Sevilla en Valle, Filandia en Quindío, Anserma en Caldas), Nariño (Pasto, Sandoná, La Cruz), Cauca (Silvia, Totoró, Inzá) y Tolima (Cajamarca, Roncesvalles) entre 1.500-2.800 msnm en zona térmica templada a fría. Lección viva de germoplasma criollo y conservación in-situ por color-marker: el complejo varietal arracacha colombiano enseña magistralmente cómo el manejo tradicional campesino conserva diversidad fenotípica por color de pulpa (amarilla-blanca-morada) que corresponde a perfiles bioquímicos distintos (β-caroteno-almidón-antocianinas), permitiendo a la comunidad rural mantener una cartera genética resiliente que el mercado moderno tiende a colapsar a un solo cv. comercial — la pérdida de las arracachas blanca y morada en zonas modernizadas es un caso de erosión genética activo documentado por AGROSAVIA. La raíz tuberosa amarilla tiene textura mantecosa-harinosa al cocinar, sabor dulce-suave a nuez-castaña, aroma característico de apiácea, consumida en sopas, sancochos, ajiacos campesinos, cremas, croquetas, suflés y purés. Su almidón fino es ideal para alimentación complementaria infantil (bebés desde los 6 meses) e hipoalérgico. Manejo agroecológico: propagación por colinos (cepas hijas) de corona — nunca por semilla (germinación errática y descendencia heterogénea pierde el cv.); cada planta madre produce 4-8 colinos viables tras 9-12 meses de ciclo; siembra a 50-70 cm entre plantas, surcos a 1 m, en suelos sueltos bien drenados ricos en MO con pH 5.5-6.5; manejo orgánico tradicional con bocashi, gallinaza compostada y supermagro foliar; control biológico de gusano blanco (Premnotrypes vorax) con rotación trienal y trampas, manejo de pudrición de corona (Sclerotium rolfsii) con suelo bien drenado. AGROSAVIA Tibaitatá ha desarrollado material genético mejorado del cv. 'Amarilla' resistente a Erwinia carotovora (pudrición blanda) liberado en 2018. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Manual Tubérculos Andinos 2017, AGROSAVIA Tibaitatá, Bernal 2015 Catálogo Plantas Colombia, NRC 1989 Lost Crops of the Incas."
+    },
+    {
+      "id": "manihot_glaziovii",
+      "nombre_comun": "Yuca de árbol / Caucho de Ceará",
+      "nombre_comunes_regionales": [
+        "yuca borracha",
+        "mandioca-brava-do-Ceará",
+        "ceará-rubber",
+        "yuca caucho",
+        "árbol del manihot"
+      ],
+      "nombre_cientifico": "Manihot glaziovii Müll.Arg.",
+      "familia_botanica": "Euphorbiaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "calido"
+      ],
+      "estrato": "alto",
+      "roles_in_guild": [
+        "crop",
+        "biomass_producer",
+        "windbreak"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1200,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 38
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "bueno",
+      "habito": "árbol semicaducifolio resistente a sequía, 6-12 m altura, raíz secundaria tuberosa, látex blanco abundante",
+      "propagation": {
+        "metodo_principal": "estaca",
+        "notas": "ESPECIE DISTINTA de Manihot esculenta (yuca brava): es un árbol semicaducifolio del semiárido del NE brasileño (Ceará, Bahia, Pernambuco) que produce látex blanco (caucho de Ceará, hule natural histórico) y raíces secundarias tuberosas comestibles de menor calidad nutricional. Propagación por estacas leñosas de 30-40 cm. Hojas digitadas (5-7 lóbulos profundos) más recortadas que M. esculenta. Cosecha de látex por sangrado controlado (técnica caucho amazónico). Raíces tuberosas requieren procesamiento idéntico al de yuca brava por contenido cianogénico. Cultivo histórico de caucho en Magdalena medio y Casanare durante boom cauchero 1900-1920."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "fao-ecocrop",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "La yuca de árbol o caucho de Ceará (Manihot glaziovii Müll.Arg., familia Euphorbiaceae) es la especie arbórea hermana de la yuca brava amazónica (M. esculenta) — un árbol semicaducifolio de porte mediano (6-12 m altura, fuste recto, copa abierta, corteza grisácea-blanquecina) nativo de la caatinga semiárida del NE brasileño (Ceará, Bahia, Pernambuco, Piauí, Maranhão) donde es uno de los principales recursos forestales tradicionales, distinguible morfológicamente de la yuca herbácea (M. esculenta) por su porte arbóreo, sus hojas digitadas con 5-7 lóbulos profundos y angostos (más recortadas que las palmeadas de M. esculenta) y su látex blanco abundante que mana al herir corteza o pecíolos. Esta especie tiene una historia económica fascinante: durante el boom mundial del caucho natural (1880-1920) — antes del colapso de Manaos y la victoria de las plantaciones asiáticas de Hevea brasiliensis — el caucho de Ceará de M. glaziovii fue uno de los tres cauchos amazónicos exportados al mundo (junto con caucho de Hevea y caucho de Castilla), llegando a establecerse plantaciones experimentales en Magdalena medio colombiano (zona de Puerto Berrío-Cimitarra), Casanare (piedemonte llanero), Magdalena (Aracataca, Fundación), Tolima bajo y Santander durante 1900-1920 — algunos especímenes naturalizados sobreviven aún en linderos viejos de fincas de esas zonas como reliquias del boom cauchero. Lección viva multi-propósito de especie arbórea olvidada: M. glaziovii enseña magistralmente cómo una sola especie arbórea puede ofrecer simultáneamente cinco productos económicos diferenciados — (1) látex blanco para caucho natural extraído por sangrado controlado del tronco con técnica idéntica a la del caucho amazónico (Hevea), (2) raíces secundarias tuberosas comestibles (más pequeñas y fibrosas que M. esculenta, 200-600 g, requieren el mismo procesamiento etnoquímico por contenido de glucósidos cianogénicos — rallado-prensado-tostado), (3) hojas tiernas comestibles como espinaca tropical tras cocción prolongada (igual que M. esculenta), (4) madera ligera apta para construcción rural y empaques, y (5) servicios ecosistémicos en silvopastoreo del trópico seco (sombrío para ganado, fijación parcial de N euforbiácea, ramoneo controlado por cabras). Esta especie enseña además la lección de adaptación a sequía severa que su prima amazónica no posee: M. glaziovii es semicaducifolia, deja caer hojas en estación seca para reducir transpiración, y prospera con precipitaciones de 600-1.000 mm/año mientras M. esculenta requiere 1.000-2.000 mm. Cultivo candidato urgente para reactivar como recurso silvopastoril en el Caribe seco colombiano (Guajira, Cesar, sur de Bolívar, Magdalena medio bajo) y los Llanos orientales (Casanare, Vichada, Meta de altillanura) donde el cambio climático intensifica la sequía. Manejo agroecológico: propagación por estacas leñosas de 30-40 cm de ramas maduras de 1-2 años (técnica idéntica a yuca herbácea pero con segmentos más gruesos), plantación a 4-6 m entre árboles en silvopastoreo, ciclo a primer sangrado de látex 5-7 años, vida útil productiva 25-40 años, rendimientos de látex 1-3 kg/árbol/año + cosecha bianual de raíces secundarias 3-8 kg/árbol. Las raíces requieren el mismo procesamiento cianogénico de yuca brava (rallado, prensado, tostado para casabe/fariña). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO EcoCrop, Bernal 2015 Catálogo Plantas Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia."
+    },
+    {
+      "id": "dioscorea_japonica",
+      "nombre_comun": "Ñame japonés",
+      "nombre_comunes_regionales": [
+        "yamaimo",
+        "jinenjo",
+        "tororo-imo",
+        "ñame chino",
+        "ñame de montaña"
+      ],
+      "nombre_cientifico": "Dioscorea japonica Thunb.",
+      "familia_botanica": "Dioscoreaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1200,
+        "optimo_max": 2200,
+        "max_absoluto": 2600
+      },
+      "temperatura_c": {
+        "helada_letal": -3,
+        "optimo_min": 15,
+        "optimo_max": 24,
+        "max_tolerable": 30
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "tuberculo",
+        "notas": "Distinta de Dioscorea alata (ñame africano) y D. trifida (ñame amazónico): originaria de Japón y este de China, naturalizada en clima cafetero colombiano (Eje cafetero, Antioquia oriente, Cundinamarca-Boyacá piedemonte) gracias a colonización agraria asiática (1920-1950). Tubérculo subterráneo alargado (50-100 cm largo, 1-3 kg) con pulpa blanca-amarillenta crocante y mucilaginosa al rallar (mucílago alantoína). Hojas acorazonadas brillantes con sistema trepador vigoroso. Requiere tutorado alto (espaldera 2-3 m) o tutor vivo de café-cítrico-plátano. Ciclo 10-12 meses. Tolera bien climas templados con leves heladas."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "fao-ecocrop",
+        "bernal-2015-plantas-liquenes-colombia"
+      ],
+      "valor_pedagogico": "El ñame japonés o yamaimo (Dioscorea japonica Thunb., familia Dioscoreaceae) es una especie distinta de los ñames tropicales tradicionales colombianos (D. alata africano y D. trifida amazónico), originaria de Japón, Corea y este de China donde es alimento ancestral milenario consumido como 'yamaimo' (rallado crudo, hábito culinario único en el género Dioscorea), 'tororo-imo' (puré viscoso con mucílago, plato tradicional japonés sobre arroz) o 'jinenjo' en variedades silvestres. La especie llegó a Colombia con la inmigración agrícola asiática del siglo XX (1920-1950) — colonos japoneses establecidos en el Eje cafetero (Quindío, Risaralda, Caldas), colonos chinos en zonas cafeteras de Antioquia (Oriente, La Ceja-El Retiro) y Cundinamarca (Fómeque, Choachí, La Calera, Pacho), y posteriormente integración cultural con campesinos colombianos quienes la adoptaron en huertas familiares por su rusticidad y excelente sabor — y se ha naturalizado en clima cafetero colombiano entre 1.200-2.200 msnm donde tolera incluso heladas leves esporádicas (hasta -3°C) que los ñames tropicales no soportan. En Colombia se encuentra en Eje cafetero (Quindío, Risaralda, Caldas), Antioquia (Oriente, Suroeste), Cundinamarca (Sumapaz medio, Tequendama, Sabana central), Boyacá (Tenza, valle de Tenza), Santander (Mesa de los Santos, San Gil), Cauca (Popayán, Silvia), Valle (Sevilla, Caicedonia), Tolima (Cajamarca) y Nariño (Pasto, La Unión) entre 800-2.600 msnm en zona térmica templada a fría suave. Lección viva de intercambio bicultural agrícola y diversificación de cultivos andinos: el ñame japonés enseña magistralmente cómo flujos migratorios agrícolas asiáticos del siglo XX enriquecieron el repertorio campesino colombiano con especies adaptadas a nichos climáticos antes inutilizados (templado frío con heladas leves), aportando un cultivo de invierno que complementa el ciclo agrícola, y enseña la apropiación cultural mutua — los campesinos paisas y boyacenses adoptaron el ñame japonés bajo nombres criollos ('ñame chino', 'ñame de montaña'), mientras que las técnicas culinarias japonesas (rallado crudo con sabor a hierba fresca) NO se transfirieron — se consume cocido al estilo colombiano (sancocho, ajiaco, sudado, frito), una asimilación parcial fascinante. El tubérculo subterráneo (50-100 cm largo, 1-3 kg) tiene pulpa blanca-amarillenta crocante-mucilaginosa rica en almidón resistente, mucílago de alantoína (cicatrizante gastrointestinal natural), saponinas dioscinas y diosgenina (precursor esteroidal de interés farmacéutico — antes de la síntesis química de esteroides, especies Dioscorea fueron la fuente industrial de hormonas anticonceptivas), arginina, vitamina B1, B6 y potasio. Manejo agroecológico: propagación por trozos de tubérculo con yemas activas (1 yema por trozo de 100-200 g) o por bulbillos aéreos (cuando se forman en axilas), siembra a 60-80 cm entre plantas con tutorado alto obligatorio (espaldera de 2-3 m o tutor vivo de café-cítrico-plátano hartón), ciclo 10-12 meses, rendimientos 15-30 t/ha. Asocio tradicional en finca cafetera-cundiboyacense con café, plátano, frutales caducifolios (manzano, durazno, ciruelo), tomate de árbol, lulo, mora andina y caña panelera. Plagas: barrenador del tubérculo (Crioceris spp.), pudrición Pythium spp. y antracnosis Colletotrichum spp. en suelos mal drenados. Especie rústica, almacenamiento prolongado del tubérculo en suelo (cosecha escalonada hasta 4-6 meses), apta para sistemas de huerta familiar y soberanía alimentaria de finca cafetera-andina. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, FAO EcoCrop, Bernal 2015 Catálogo Plantas Colombia."
+    },
+    {
+      "id": "ipomoea_aquatica",
+      "nombre_comun": "Espinaca de agua / Cangkung",
+      "nombre_comunes_regionales": [
+        "kangkong",
+        "rau muống",
+        "water spinach",
+        "swamp morning glory",
+        "berro asiático"
+      ],
+      "nombre_cientifico": "Ipomoea aquatica Forssk.",
+      "familia_botanica": "Convolvulaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 50,
+        "optimo_max": 1000,
+        "max_absoluto": 1500
+      },
+      "temperatura_c": {
+        "helada_letal": 5,
+        "optimo_min": 22,
+        "optimo_max": 32,
+        "max_tolerable": 38
+      },
+      "radiacion": "sol_pleno",
+      "agua": "alto",
+      "drenaje_requerido": "pantanoso",
+      "propagation": {
+        "metodo_principal": "esqueje_tallo",
+        "notas": "Variante acuática del género Ipomoea (distinta de la batata I. batatas y la dondiego I. purpurea). Cultivo de hoja-tallo de uso masivo en SE asiático (China, Vietnam, Tailandia, Indonesia). Crece flotando en agua dulce o enraizada en lodo de humedal, también en suelo húmedo (variedad terrestre 'ching quat'). Propagación por esquejes de tallo 20-30 cm con nudos sumergidos. Cosecha continua de brotes tiernos cada 2-3 semanas. CUIDADO: NMRA-Australia y EE.UU. la consideran invasora acuática potencial en humedales tropicales — cultivar en estanque controlado, NO liberar a humedales naturales. En Colombia introducida por inmigración asiática reciente (Bogotá-Cali-Medellín), cultivo experimental en estanques de piscicultura y zonas inundables del Magdalena medio."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "fao-ecocrop",
+        "bernal-2015-plantas-liquenes-colombia",
+        "issg-uicn-invasoras"
+      ],
+      "valor_pedagogico": "La espinaca de agua o cangkung (Ipomoea aquatica Forssk., familia Convolvulaceae) es la variante acuática-semiacuática del género Ipomoea — pariente botánica directa de la batata o boniato (I. batatas) y la dondiego de día ornamental (I. purpurea), pero con biología radicalmente distinta: una enredadera herbácea acuática-semiacuática que crece flotando con tallos huecos en aguas dulces lentas o enraizada en lodos de humedales tropicales, con hojas alargadas lanceolado-sagitadas y flores blancas-violáceas características del género Ipomoea (corola en embudo). Es uno de los vegetales de hoja-tallo más consumidos del sudeste asiático tropical húmedo (China meridional, Vietnam, Tailandia, Indonesia, Filipinas, Malasia, Camboya, Laos) donde se llama 'kangkong', 'rau muống', 'ong choi', 'phak bung' o 'ching quat', formando parte central de la dieta diaria popular en sopas, stir-fry con ajo y chile, ensaladas tibias y curries vegetales. En Colombia es introducción muy reciente (post-2000) traída por inmigrantes vietnamitas, chinos y tailandeses establecidos en Bogotá, Cali, Medellín y Barranquilla, con cultivo experimental en estanques de piscicultura (asocio tilapia-cangkung como sistema acuapónico), zonas inundables del Magdalena medio (Puerto Boyacá, Puerto Berrío) y huertos asiáticos de Bogotá-Chía-Funza y Cali-Yumbo. Lección viva DOBLE: (1) potencial nutricional y soberanía alimentaria acuapónica — la espinaca de agua es uno de los vegetales de hoja más nutritivos del planeta tropical: hojas y tallos tiernos son ricos en hierro (8 mg/100 g), vitamina A (β-caroteno alto), vitamina C, calcio, fibra y proteína vegetal (3-4%), con productividad altísima en sistemas acuapónicos (cosecha cada 15-20 días tras corte por rebrote vigoroso, 25-40 t/ha/año en cultivo continuo), candidato perfecto para sistemas de finca pacífica colombiana en zonas inundables y para integración con piscicultura tilapia-bocachico-cachama; y (2) riesgo de invasión biológica acuática — esta misma especie está clasificada por la base de datos ISSG-UICN como una de las 100 plantas acuáticas invasoras más peligrosas del mundo, reportada como invasora agresiva en humedales naturales de EE.UU. (Florida, Texas), Australia (Queensland) y partes de África tropical donde forma esteras flotantes monoespecíficas que asfixian la biota acuática nativa, alteran flujos hídricos y eutrofizan cuerpos de agua. Esta lección de DOBLE rostro (alimento valioso vs invasor potencial) enseña magistralmente la responsabilidad agroecológica fundamental: cultivar especies con potencial invasor SOLO en sistemas controlados (estanques cerrados con tela, contenedores acuapónicos, suelos húmedos sin conexión a humedal natural), NUNCA liberar a humedales colombianos naturales (Ciénaga Grande, Sumapaz, La Cocha, Tota, planicies inundables del Magdalena-Cauca-Sinú-Atrato), y aplicar rigor preventivo equivalente al manejo de retamo espinoso y otras invasoras documentadas en Colombia. Manejo agroecológico controlado: propagación por esquejes de tallo de 20-30 cm con 2-3 nudos sumergidos en agua dulce limpia, plantación a 30-40 cm entre plantas en lecho acuático o suelo húmedo de zona inundable, cosecha continua de brotes tiernos cada 2-3 semanas, ciclo perenne en zona controlada. Asocio acuapónico con tilapia roja (Oreochromis sp.) o cachama blanca (Piaractus brachypomus) en sistemas cerrados — el cangkung absorbe amonio y nitratos del agua residual de la piscicultura y aporta sombra al estanque. Cultivo de alto potencial bajo manejo de bioseguridad estricta. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO EcoCrop, Bernal 2015 Catálogo Plantas Colombia, ISSG-UICN Base de Datos Invasoras."
+    },
+    {
+      "id": "xanthosoma_sagittifolium",
+      "nombre_comun": "Malanga blanca / Ocumo blanco",
+      "nombre_comunes_regionales": [
+        "ocumo",
+        "ocumo blanco",
+        "yautía",
+        "tannia",
+        "tiquisque",
+        "malanga isleña",
+        "mafafa",
+        "uncucha"
+      ],
+      "nombre_cientifico": "Xanthosoma sagittifolium (L.) Schott",
+      "familia_botanica": "Araceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1000,
+        "max_absoluto": 1500
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "moderado",
+      "propagation": {
+        "metodo_principal": "cormo",
+        "notas": "Aroidea tropical americana nativa de Centroamérica-Antillas-Sudamérica tropical húmeda (distinta de Colocasia esculenta que es asiática). Hojas grandes sagitado-hastadas (NO peltadas como Colocasia — diferencia diagnóstica clave). Cormo central + cormelos hijos comestibles, pulpa blanca-marfil (cv. blanco), almidón fino. Contiene cristales de oxalato de calcio — REQUIERE COCCIÓN obligatoria mín 30 min. Propagación por cormelos hijos o trozos de cormo madre. Ciclo 8-12 meses. Apta para sotobosque cafetalero-cacaotero y orillas de cuerpos de agua."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "fao-ecocrop",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sinchi-amazonia-colombiana"
+      ],
+      "valor_pedagogico": "La malanga blanca u ocumo blanco (Xanthosoma sagittifolium (L.) Schott, familia Araceae) es la aroidea tuberosa nativa neotropical por excelencia — domesticada en Centroamérica, Antillas y Amazonía sudamericana hace al menos 4.000-5.000 años por pueblos arawak, tainos, kuna, emberá y otros pueblos neotropicales antes del contacto europeo, distinguible morfológicamente de la papa china asiática (Colocasia esculenta) por sus hojas grandes sagitado-hastadas con peciolo inserto en el borde basal (NO peltadas con peciolo central como Colocasia — diferencia diagnóstica clave para identificación rápida en campo). En Colombia es ampliamente cultivada en el Pacífico colombiano (Chocó-Valle litoral-Cauca litoral-Nariño litoral: Buenaventura, Quibdó, Tadó, Tumaco, Guapi), Caribe húmedo (Magdalena medio, Antioquia bajo, Urabá, Bolívar, Sucre, Córdoba, San Andrés y Providencia), Amazonía (trapecio amazónico, Putumayo, Caquetá, Guaviare), Orinoquía (piedemonte llanero, Casanare, Meta) y zonas bajas inundables del Magdalena medio entre 0 y 1.000 msnm en zona térmica cálida húmeda, donde se conoce con nombres regionales diversos: 'ocumo' o 'mafafa' (Caribe), 'malanga' (Pacífico afrocolombiano), 'uncucha' (Amazonía) y 'tiquisque' (frontera con Centroamérica). Lección viva de identificación botánica precisa Colocasia vs Xanthosoma — la confusión campesina entre 'taro' (papa china asiática Colocasia esculenta) y 'malanga blanca' (ocumo americano Xanthosoma sagittifolium) es uno de los casos pedagógicos más útiles de etnobotánica neotropical: ambas Araceae se cultivan en humedad-calor tropical, ambas producen cormos comestibles, ambas contienen rafidios de oxalato que exigen cocción, pero son géneros distintos con orígenes geográficos opuestos (Asia vs Neotrópico), morfología foliar diferente (peltada vs sagitada-hastada), perfil culinario distinto (Colocasia más mucilaginosa, Xanthosoma más harinosa) y manejo agroecológico diferenciado (Colocasia tolera mejor encharcamiento permanente, Xanthosoma prefiere suelo húmedo pero drenado). Esta lección enseña magistralmente la importancia de la identificación botánica precisa por morfología foliar como herramienta de soberanía agrícola — el campesino que distingue entre las dos especies conserva mejor el germoplasma local y diferencia mejor las técnicas de cocina tradicional. El cormo central (5-15 cm diámetro, 0.5-3 kg) y los cormelos hijos múltiples bien desarrollados son ricos en almidón fácilmente digerible, mucílago, vitaminas B1-B6, vitamina C, potasio, magnesio y proteína vegetal moderada (2-3%), consumidos cocidos en sancocho, ajiaco bogotano (donde a veces sustituye a la papa criolla), sopa, frituras, croquetas y cremas. Las hojas grandes acorazonadas (peciolo de 1-2 m) son comestibles también como espinaca tropical tras cocción prolongada (cocción mín 30 min para destruir oxalatos) — el 'callaloo' caribeño afrocolombiano. Manejo agroecológico: propagación por cormelos hijos (preferencia) o trozos de cormo madre con yemas activas, plantación a 60-80 cm entre plantas en suelo húmedo bien drenado rico en MO con pH 5.5-6.5, ciclo 8-12 meses a cosecha, rendimientos 10-25 t/ha cormos. Asocio tradicional con plátano hartón, yuca dulce, piña, achiote, caña panelera y árboles frutales en finca pacífica-caribe-amazónica. Apta para sotobosque cafetalero-cacaotero (tolerante a sombra parcial 40-60%) y orillas de cuerpos de agua. Plagas: pudrición de cormo Pythium spp. y Erwinia spp. en suelos mal drenados, hormigas arrieras (Atta spp.). Especie pilar de soberanía alimentaria afrocolombiana del Pacífico y caribe húmedo. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, FAO EcoCrop, Bernal 2015 Catálogo Plantas Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia, SINCHI Amazonía Colombiana."
+    },
+    {
+      "id": "xanthosoma_violaceum",
+      "nombre_comun": "Malanga morada / Ocumo morado",
+      "nombre_comunes_regionales": [
+        "ocumo morado",
+        "yautía morada",
+        "blue taro",
+        "malanga lila",
+        "mafafa morada"
+      ],
+      "nombre_cientifico": "Xanthosoma violaceum Schott",
+      "familia_botanica": "Araceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1000,
+        "max_absoluto": 1500
+      },
+      "temperatura_c": {
+        "helada_letal": 8,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max_tolerable": 36
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "alto",
+      "drenaje_requerido": "moderado",
+      "propagation": {
+        "metodo_principal": "cormo",
+        "notas": "Especie hermana de X. sagittifolium con pulpa de cormo morada-violácea por antocianinas (cianidina-3-glucósido, peonidina-3-glucósido — antioxidantes potentes). Peciolos morados-violáceos diagnósticos. Hojas sagitado-hastadas con margen violáceo. Cormo y cormelos hijos comestibles, mismo manejo que ocumo blanco pero perfil antioxidante distintivo. Variedad neotropical de Caribe-Pacífico húmedo y Amazonía. Especialidad gastronómica afrocolombiana e indígena amazónica. Requiere cocción obligatoria mín 30 min por contenido de oxalato igual que su especie hermana."
+      },
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "gbif-colombia",
+        "fao-ecocrop",
+        "bernal-2015-plantas-liquenes-colombia",
+        "perez-arbelaez-1947-plantas-utiles",
+        "sinchi-amazonia-colombiana"
+      ],
+      "valor_pedagogico": "La malanga morada u ocumo morado (Xanthosoma violaceum Schott, familia Araceae) es la especie hermana pigmentada de la malanga blanca (X. sagittifolium) — una aroidea tuberosa neotropical de cormo central y cormelos hijos múltiples con pulpa morada-violácea intensa por acumulación de antocianinas (principalmente cianidina-3-glucósido y peonidina-3-glucósido, mismos pigmentos antioxidantes responsables del color de la mora andina, el maíz morado peruano y la batata morada), reconocible además por sus peciolos morados-violáceos diagnósticos en campo y por el margen foliar violáceo en hojas tiernas. Es una variedad gastronómica especial neotropical cultivada tradicionalmente en el Caribe (afrocaribe, Puerto Rico-Cuba-República Dominicana-Haití, donde se llama 'yautía morada' o 'blue taro') y en el Pacífico afrocolombiano-amazónico colombiano donde se conserva como cultivo de chagra-finca-azotea tradicional por su valor culinario especial, su color llamativo y su perfil nutricional enriquecido en antioxidantes respecto a la malanga blanca común. En Colombia se cultiva en el Pacífico colombiano (Chocó-Valle litoral-Cauca litoral-Nariño litoral: Buenaventura, Quibdó, Istmina, Tumaco, Guapi, López de Micay), Caribe húmedo (Magdalena, Bolívar, San Andrés y Providencia donde es alimento ancestral afrosanandresano del 'callaloo'), Amazonía (trapecio amazónico Leticia-Puerto Nariño, Putumayo-Caquetá piedemonte) y zonas bajas inundables del Magdalena medio entre 0 y 1.000 msnm en zona térmica cálida húmeda, bajo nombres locales 'ocumo morado' o 'mafafa morada' (Caribe), 'malanga lila' (Pacífico) y 'yautía morada' (San Andrés-Providencia). Lección viva de variabilidad genética intra-género y color-marker antioxidante: el par botánico Xanthosoma sagittifolium (blanco) y X. violaceum (morado) es ejemplo perfecto de cómo la diversidad fenotípica de un cultivo tradicional refleja diversidad bioquímica funcional importante — el color morado de la malanga violácea NO es un capricho ornamental sino un perfil antioxidante real (capacidad antioxidante ORAC 4-8 veces superior a malanga blanca, similar a batata morada y mora andina), lección magistral de cómo el manejo campesino tradicional conserva 'farmacias vivas' en los policultivos de la chagra-finca-azotea. Esta misma lógica de color-marker antioxidante aparece en otros pares de cultivos neotropicales tradicionales: batata blanca vs batata morada (Ipomoea batatas), arracacha blanca vs arracacha morada (Arracacia xanthorrhiza), maíz blanco vs maíz morado (Zea mays), papa criolla amarilla vs papa criolla negra (Solanum phureja). El cormo central (5-12 cm diámetro, 0.5-2 kg) y los cormelos hijos con pulpa morada-violácea son ricos en antocianinas antioxidantes, almidón fino, fibra dietaria, mucílagos prebióticos, vitaminas B1-B6, vitamina C, potasio y proteína vegetal moderada (2-3%), consumidos cocidos en sancocho de mariscos del Pacífico, ajiaco caribeño, sopa de queso del Pacífico, frituras dulces, croquetas, cremas espesas y como ingrediente especial en mesa gourmet por su color llamativo. Las hojas también son comestibles tras cocción prolongada (callaloo morado del Caribe insular). Manejo agroecológico: propagación por cormelos hijos preferentemente del mismo color (selección campesina de mantenimiento de cv.) o por trozos de cormo madre con yemas activas, plantación a 60-80 cm entre plantas en suelo húmedo bien drenado rico en MO con pH 5.5-6.5, ciclo 8-12 meses a cosecha, rendimientos 8-20 t/ha cormos (ligeramente menores que la blanca por menor vigor vegetativo). Asocio idéntico a malanga blanca con plátano hartón, yuca dulce, piña, achiote, caña panelera y árboles frutales en finca pacífica-caribe-amazónica. Cultivo especializado de soberanía alimentaria afrocolombiana e indígena amazónica con potencial gourmet altísimo para gastronomía colombiana moderna. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, FAO EcoCrop, Bernal 2015 Catálogo Plantas Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia, SINCHI Amazonía Colombiana."
     }
   ],
   "biopreparados": [
