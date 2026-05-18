@@ -10864,6 +10864,503 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El chacate, pucho o escalonia (Escallonia paniculata (Ruiz & Pav.) Schult., Escalloniaceae) es un árbol o arbusto andino nativo (3-8 m altura) propio del bosque alto-andino y bordes de páramo colombiano entre 2.500 y 3.200 msnm (Cundinamarca: Cruz Verde, Sumapaz, Chingaza, Verjón; Boyacá: páramo de Pisba, Iguaque; Santander: páramo de Berlín; Nariño y Cauca: páramos del macizo colombiano). Hojas pequeñas brillantes, panículas blanco-rosadas que atraen colibríes y abejas nativas, frutos en cápsula que dispersan aves. Es una lección viva de restauración ecológica y soberanía botánica que enseña a niñas y niños por qué las especies nativas son la mejor cerca viva del altoandino: a diferencia del retamo espinoso (Ulex europaeus) y del retamo liso (Genista monspessulana), invasoras introducidas que se vuelven plaga y desplazan flora nativa de páramo, el chacate cumple las mismas funciones de cercar potreros, frenar viento y marcar linderos pero conviviendo con la flora nativa, alimentando avifauna local y generando hojarasca compatible con los suelos andinos. Por eso aparece como sustituta documentada en planes de restauración ecológica de los páramos Cruz Verde-Sumapaz (IAvH + CAR Cundinamarca 2018), donde se siembra en bordes de fragmento de bosque y zonas de transición para acelerar la sucesión vegetal y bloquear el avance del retamo. Manejo agroecológico: propagación por semilla recolectada de frutos maduros, vivero 6-8 meses antes del trasplante en lluvias, distancia 1-2 m en cerca viva, tolerancia a podas, función ecológica como planta niñera (nurse plant) que da sombra a especies de sucesión tardía. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015 Catálogo Plantas y Líquenes de Colombia, IAvH Flora Alto Andina, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia."
+    },
+    {
+      "id": "solanum_tuberosum_carrera_negra",
+      "nombre_comun": "Papa Negra Carrera",
+      "nombre_comunes_regionales": [
+        "papa carrera",
+        "papa negra",
+        "papa carrera negra",
+        "papa morada de altura"
+      ],
+      "nombre_cientifico": "Solanum tuberosum L. subsp. andigenum cv. 'Carrera Negra'",
+      "familia_botanica": "Solanaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "variedad_tradicional",
+      "altitud_msnm": {
+        "min_absoluto": 2400,
+        "optimo_min": 2800,
+        "optimo_max": 3400,
+        "max_absoluto": 3700
+      },
+      "temperatura_c": {
+        "helada_letal": -4,
+        "optimo_min": 7,
+        "optimo_max": 15,
+        "max_tolerable": 20
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "tuberculo (semilla asexual)",
+        "notas": "Variedad nativa altoandina de piel oscura morado-negruzca y carne amarilla intensa. Ciclo largo de 6-8 meses, propia de zona fría y bordes de páramo. Tolera heladas moderadas y suelos pobres mejor que variedades comerciales. Resiembra con tubérculos pequeños (chumas) seleccionados de la cosecha anterior, dormancia natural 2-3 meses."
+      },
+      "source_ids": [
+        "perez-rodriguez-gomez-2008",
+        "nustez-rodriguez-2024-unal",
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "cip-2006-ghislain",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "La papa negra carrera (Solanum tuberosum L. subsp. andigenum cv. 'Carrera Negra') es una variedad nativa andina del altiplano colombiano, cultivada principalmente en Cundinamarca (Sumapaz, Une, Choachí, Carmen de Carupa), Boyacá (Toca, Siachoque, Aquitania, páramo de Pisba) y Nariño (Túquerres, Guachucal, Cumbal) entre 2.800 y 3.400 msnm, llegando a bordes de páramo a 3.700 msnm. Pertenece al grupo Andigenum, distinto del grupo Tuberosum europeo: tubérculos pequeños a medianos (40-120 g) de piel violeta oscuro casi negra, ojos profundos pigmentados y carne amarilla intensa rica en antocianinas y carotenoides. Es lección viva de soberanía alimentaria y resistencia genética: las variedades nativas Andigenum coevolucionaron por miles de años en suelos andinos con manejo campesino, conservando rusticidad frente a heladas, granizadas y suelos pobres donde la papa comercial (pastusa, parda) sucumbe. La carrera negra resiste mejor el tizón tardío (Phytophthora infestans) que las variedades industriales, requiere menos fertilización sintética y se conserva 4-6 meses post-cosecha sin refrigeración por su piel gruesa. Manejo agroecológico: rotación trienal con haba (Vicia faba), arveja andina (Pisum sativum) o cubio (Tropaeolum tuberosum); siembra al inicio de lluvias mayores (marzo-abril) o lluvias menores (septiembre-octubre); distancia 30 cm x 90 cm; aporque a los 60-90 días; biopreparados sugeridos: caldo bordelés diluido contra tizón, sulfocalcio contra polilla guatemalteca (Tecia solanivora), trichoderma al surco. Conservación de semilla en cuartos oscuros ventilados con paja seca de cebada. Conservar y multiplicar variedades como la carrera negra es un acto político-ecológico que niños y niñas pueden entender: cada tubérculo es un eslabón de memoria campesina que el mercado global no puede patentar. Fuentes Tier A: Pérez-Rodríguez-Gómez 2008, Núñez-Rodríguez 2024 UNAL, AGROSAVIA Manual Tubérculos Andinos 2017, CIP 2006 Ghislain, GBIF Backbone, POWO Kew."
+    },
+    {
+      "id": "solanum_tuberosum_pastusa_suprema",
+      "nombre_comun": "Papa Pastusa Suprema",
+      "nombre_comunes_regionales": [
+        "pastusa suprema",
+        "papa suprema",
+        "ICA-Pastusa Suprema"
+      ],
+      "nombre_cientifico": "Solanum tuberosum L. subsp. tuberosum cv. 'Pastusa Suprema'",
+      "familia_botanica": "Solanaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 2200,
+        "optimo_min": 2500,
+        "optimo_max": 3000,
+        "max_absoluto": 3300
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 10,
+        "optimo_max": 17,
+        "max_tolerable": 22
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "tuberculo (semilla asexual)",
+        "notas": "Variedad industrial moderna liberada por ICA-CORPOICA en 1996. Ciclo 5-6 meses. Alta productividad pero alta dependencia de insumos sintéticos y muy susceptible a Phytophthora infestans. Requiere semilla certificada cada 2-3 ciclos para mantener vigor. Resiembra con tubérculo entero o cortado con yemas, distancia 30 cm x 90 cm."
+      },
+      "source_ids": [
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "nustez-rodriguez-2024-unal",
+        "perez-rodriguez-gomez-2008",
+        "ica-resolucion-3168-2015",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "La papa Pastusa Suprema (Solanum tuberosum L. subsp. tuberosum cv. 'Pastusa Suprema') es la variedad comercial dominante en Colombia desde su liberación oficial por ICA-CORPOICA en 1996, surgida de un cruzamiento dirigido para combinar la calidad culinaria de la pastusa tradicional con mayor rendimiento agronómico. Se cultiva intensivamente en Nariño (Túquerres, Pupiales, Guachucal, Ipiales), Cundinamarca (Subachoque, Zipaquirá, Carmen de Carupa, Une), Boyacá (Ventaquemada, Toca, Soracá) y zona norte de Antioquia (La Unión, Sonsón) entre 2.500 y 3.000 msnm. Rendimientos comerciales 30-45 t/ha bajo manejo convencional, tubérculos grandes (150-250 g) oblongos de piel rosa-crema y carne crema con bajo contenido de azúcares reductores: ideal para fritura industrial (papas a la francesa) y mercados de plaza. Es una lección crítica sobre el modelo agroindustrial: aunque productiva, la pastusa suprema es extremadamente susceptible a Phytophthora infestans (tizón tardío) y polilla guatemalteca (Tecia solanivora), lo que ata su cultivo a 8-14 aplicaciones de fungicida/insecticida sintético por ciclo, costo que estrangula al pequeño productor y deja residuos en suelo, agua y tubérculo. En contraste con las nativas Andigenum (carrera negra, criolla, sabanera), depende totalmente de semilla certificada renovada cada 2-3 ciclos por degeneración viral (PVY, PLRV). Manejo agroecológico de transición: rotación obligatoria con haba o arveja para fijar nitrógeno, aplicación de compost o bocashi al surco, biopreparados como caldo bordelés preventivo (no curativo) y trichoderma, monitoreo semanal de adultos de polilla con feromonas, asociación con tagetes para repelencia. La pastusa suprema enseña por contraste el costo real de la dependencia a paquetes tecnológicos y por qué la conservación in situ de variedades nativas es seguro alimentario. Fuentes Tier A: AGROSAVIA Manual Tubérculos Andinos 2017, Núñez-Rodríguez 2024 UNAL, Pérez-Rodríguez-Gómez 2008, ICA Resolución 3168/2015, GBIF Backbone, POWO Kew."
+    },
+    {
+      "id": "solanum_tuberosum_argentina",
+      "nombre_comun": "Papa Argentina",
+      "nombre_comunes_regionales": [
+        "papa argentina",
+        "argentina blanca",
+        "argentina amarilla"
+      ],
+      "nombre_cientifico": "Solanum tuberosum L. subsp. tuberosum cv. 'Argentina'",
+      "familia_botanica": "Solanaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "variedad_tradicional",
+      "altitud_msnm": {
+        "min_absoluto": 2100,
+        "optimo_min": 2500,
+        "optimo_max": 3000,
+        "max_absoluto": 3300
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 10,
+        "optimo_max": 17,
+        "max_tolerable": 22
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "tuberculo (semilla asexual)",
+        "notas": "Variedad introducida a Colombia a principios del siglo XX desde el sur del continente, adaptada al altiplano cundiboyacense por selección campesina. Ciclo medio (5-6 meses). Más rústica que la pastusa moderna pero menos productiva. Conservada principalmente por pequeños productores tradicionales y mercados campesinos."
+      },
+      "source_ids": [
+        "perez-rodriguez-gomez-2008",
+        "nustez-rodriguez-2024-unal",
+        "agrosavia-manual-tuberculos-andinos-2017",
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "La papa argentina (Solanum tuberosum L. subsp. tuberosum cv. 'Argentina') es una variedad introducida a Colombia a principios del siglo XX (registrada como cultivo establecido por Pérez Arbeláez 1947 en su Plantas Útiles de Colombia), llegada desde Argentina-Chile vía intercambios entre estaciones agrícolas durante el periodo de modernización agrícola del altiplano cundiboyacense. A diferencia de las nativas Andigenum (criolla, sabanera, carrera negra), pertenece al grupo Tuberosum europeo-sureño con días largos, pero por más de un siglo de selección campesina en Boyacá (Tunja, Ventaquemada, Tibasosa), Cundinamarca (Subachoque, Pacho, Carmen de Carupa) y Nariño (Pasto, Túquerres) se ha adaptado lo suficiente para producir en condiciones colombianas entre 2.500 y 3.000 msnm. Tubérculo redondeado-oblongo de piel rosada o crema-amarilla, carne crema-blanquecina suave, sabor mantecoso apreciado para sancochos y purés. Rendimiento medio (20-30 t/ha), menor que pastusa suprema pero más estable bajo manejo de bajo insumo. Es lección viva de hibridación cultural agrícola: aunque introducida, la papa argentina lleva más de cuatro generaciones siendo conservada por familias campesinas que han preservado su semilla en sus propias chagras, convirtiéndola en patrimonio agrobiodiverso colombiano por adopción. Manejo agroecológico: rotación con haba, arveja andina o avena forrajera; siembra a inicio de lluvias; abono orgánico al surco (compost, bocashi, estiércol curado); aporque doble a 30 y 60 días; biopreparados caldo bordelés y sulfocalcio preventivos contra tizón tardío. La papa argentina demuestra que la soberanía alimentaria no requiere pureza genética originaria, sino continuidad de manejo campesino sobre el material genético disponible. Fuentes Tier A: Pérez-Rodríguez-Gómez 2008, Núñez-Rodríguez 2024 UNAL, AGROSAVIA Manual Tubérculos Andinos 2017, Pérez Arbeláez 1947 Plantas Útiles, GBIF Backbone, POWO Kew."
+    },
+    {
+      "id": "cucurbita_moschata",
+      "nombre_comun": "Ahuyama Amarilla",
+      "nombre_comunes_regionales": [
+        "zapallo cuello",
+        "zapallo de cuello",
+        "calabaza moscada",
+        "auyama",
+        "ahuyama común"
+      ],
+      "nombre_cientifico": "Cucurbita moschata Duchesne",
+      "familia_botanica": "Cucurbitaceae",
+      "category": "verduras_legumbres",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1800,
+        "max_absoluto": 2200
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 18,
+        "optimo_max": 28,
+        "max_tolerable": 35
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Especie distinta de Cucurbita maxima (zapallo de cabello/loche andino): C. moschata es la ahuyama tropical-templada de cuello largo o calabaza moscada de tierra caliente y media. Siembra directa al inicio de lluvias, 2-3 semillas por hoyo a 2-3 cm de profundidad, distancia 2-3 m entre matas por su porte rastrero expansivo. Ciclo 4-5 meses."
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "agrosavia-leguminosas-andinas",
+        "nrc-1989-cultivos-andinos",
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop"
+      ],
+      "valor_pedagogico": "La ahuyama amarilla o zapallo cuello (Cucurbita moschata Duchesne, Cucurbitaceae) es una de las tres cucurbitas domesticadas en Mesoamérica y Sudamérica (junto con Cucurbita maxima y Cucurbita pepo), distintiva por su fruto de cuello largo o piriforme, piel verde-ocre que vira a amarillo-crema al madurar, y carne anaranjada intensa rica en betacaroteno (precursor de vitamina A). En Colombia se cultiva ampliamente en clima cálido y templado de Caribe (Córdoba, Sucre, Bolívar), valles interandinos (Tolima, Huila, Valle), Llanos (Casanare, Meta) y zona andina hasta los 1.800-2.000 msnm. Es lección viva de las 'tres hermanas' mesoamericanas adaptadas al trópico colombiano: la ahuyama se asocia históricamente con maíz y fríjol en policultivo donde el maíz da soporte, el fríjol fija nitrógeno y la ahuyama cubre el suelo con su porte rastrero, suprime arvenses, conserva humedad y reduce evaporación. A diferencia de Cucurbita maxima (zapallo de cabello, loche, criollo andino) que prefiere clima frío de altura, la C. moschata es la calabaza de tierra caliente, más resistente a calor, humedad alta y a la mosca blanca. Fruto multifuncional: pulpa para sopas (sancocho, mute santandereano), dulces (dulce de ahuyama, conserva), purés y compotas; semillas tostadas como botana o como antiparasitario tradicional (cucurbitina); flores comestibles en frituras; hojas tiernas en cocidos. Manejo agroecológico: siembra directa al inicio de lluvias, distancia 2-3 m entre matas; asociación clásica con maíz (Zea mays) y fríjol voluble (Phaseolus vulgaris); abono orgánico al hoyo (compost o bocashi); biopreparados caldo de ceniza o caldo sulfocalcio contra oídio (Erysiphe cichoracearum). Conservación de semilla local fácil porque la planta es monoica y fácil de polinizar a mano, lo cual permite mantener variedades familiares por generaciones. Fuentes Tier A: Pérez Arbeláez 1947 Plantas Útiles, AGROSAVIA Leguminosas Andinas (manejo policultivo), NRC 1989 Cultivos Andinos, GBIF Backbone, POWO Kew, FAO EcoCrop."
+    },
+    {
+      "id": "zea_mays_negro_paramo",
+      "nombre_comun": "Maíz Negro de Páramo",
+      "nombre_comunes_regionales": [
+        "maíz negro",
+        "maíz morado andino",
+        "maíz negro cundiboyacense"
+      ],
+      "nombre_cientifico": "Zea mays L. cv. 'Negro de Páramo'",
+      "familia_botanica": "Poaceae",
+      "category": "cereales_pseudocereales",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "variedad_tradicional",
+      "altitud_msnm": {
+        "min_absoluto": 2200,
+        "optimo_min": 2600,
+        "optimo_max": 3200,
+        "max_absoluto": 3500
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 9,
+        "optimo_max": 18,
+        "max_tolerable": 24
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Variedad tradicional cundiboyacense de ciclo largo (7-9 meses), adaptada a zona fría y bordes de páramo. Granos pequeños a medianos de color morado oscuro a negro brillante, ricos en antocianinas. Se conserva en mazorca colgada en cocina campesina para protegerla del gorgojo (Sitophilus zeamais). Siembra directa con maquinaria manual (chuzo, palín)."
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "agrosavia-leguminosas-andinas",
+        "nrc-1989-cultivos-andinos",
+        "perez-rodriguez-gomez-2008",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "El maíz negro de páramo (Zea mays L. cv. 'Negro de Páramo') es una variedad nativa cundiboyacense del altiplano andino colombiano, conservada por comunidades campesinas e indígenas Muisca en el ramal oriental de los Andes entre 2.600 y 3.200 msnm (Cundinamarca: Sumapaz, Choachí, Une, Pasca; Boyacá: Cómbita, Tibasosa, Toca, páramo de Rabanal; Nariño: Ipiales, Cumbal). Es uno de los maíces de mayor altitud del mundo, junto con sus parientes peruano-bolivianos (kculli, morado de la sierra), y su pigmentación morado-negra intensa proviene de altas concentraciones de antocianinas (cianidina-3-glucósido) que cumplen función fotoprotectora frente a la radiación UV extrema del páramo. Es lección viva de coevolución cultural y climática: los Muisca seleccionaron por miles de años maíces capaces de granar bajo días cortos, fríos, heladas tardías y radiación UV alta del páramo, generando un acervo genético irrepetible. Hoy menos del 5% de los maíces sembrados en Colombia son variedades nativas (resto: híbridos comerciales tipo ICA V-115, V-305), por lo que cada chagra que conserva maíz negro de páramo es un acto de resistencia genética. Usos tradicionales: chicha de maíz negro (bebida ceremonial Muisca con maguey o yuca dulce), envueltos, arepas pigmentadas para festividades, tinte natural alimentario, harina rica en antioxidantes. Manejo agroecológico: siembra de 'tres hermanas' adaptada al frío (maíz + haba + cubio o ulluco en vez de fríjol y ahuyama tropicales); siembra a inicio lluvias mayores (marzo-abril); 2-3 granos por hoyo, distancia 70 cm x 70 cm; aporque a los 45-60 días; biopreparados: caldo de ceniza preventivo contra cogollero (Spodoptera frugiperda), trichoderma al surco. Conservación de semilla en mazorcas colgadas en cocina con humo de leña para repeler gorgojo. Fuentes Tier A: Pérez Arbeláez 1947, AGROSAVIA Leguminosas Andinas (policultivos), NRC 1989 Cultivos Andinos, Pérez-Rodríguez-Gómez 2008, GBIF Backbone, POWO Kew."
+    },
+    {
+      "id": "zea_mays_capio",
+      "nombre_comun": "Maíz Capio",
+      "nombre_comunes_regionales": [
+        "capio amarillo",
+        "maíz amarillo de altura",
+        "capio andino"
+      ],
+      "nombre_cientifico": "Zea mays L. cv. 'Capio'",
+      "familia_botanica": "Poaceae",
+      "category": "cereales_pseudocereales",
+      "thermal_zones": [
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "variedad_tradicional",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2400,
+        "optimo_max": 2900,
+        "max_absoluto": 3200
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 10,
+        "optimo_max": 19,
+        "max_tolerable": 25
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Variedad altoandina amarilla de grano grande harinoso, ciclo 6-8 meses. Granos amarillo-naranja apta para harinas, mazamorras y arepas. Mazorca larga de 12-18 cm con 8-12 hileras. Se siembra al inicio de lluvias y se cosecha en grano seco. Asociación tradicional con fríjol bola roja y ahuyama en policultivo 'tres hermanas' adaptado al altiplano."
+      },
+      "source_ids": [
+        "perez-arbelaez-1947-plantas-utiles",
+        "agrosavia-leguminosas-andinas",
+        "nrc-1989-cultivos-andinos",
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "fao-ecocrop"
+      ],
+      "valor_pedagogico": "El maíz capio (Zea mays L. cv. 'Capio') es una variedad nativa altoandina amarilla de grano grande harinoso, conservada por comunidades campesinas del altiplano cundiboyacense y nariñense entre 2.400 y 2.900 msnm. Es uno de los maíces tradicionales más apreciados por su calidad culinaria: grano amarillo-anaranjado de endospermo blando harinoso (no córneo como los maíces forrajeros), que al molerse rinde harinas finas para arepas de maíz pelado, envueltos, mazamorra, peto (sopa fría boyacense de granos cocidos con panela y canela) y chichas dulces ceremoniales. Mazorca grande de 12-18 cm con 8-12 hileras de granos prominentes. A diferencia del maíz negro de páramo (variedad ceremonial-tintórea) y del maíz amarillo comercial (híbridos forrajeros tipo ICA V-156), el capio es el maíz de mesa familiar boyacense por excelencia, sembrado por pequeños agricultores en milpa de subsistencia. Es lección viva de patrimonio alimentario: el capio está en riesgo de erosión genética por desplazamiento de híbridos comerciales y por abandono del policultivo tradicional, lo que pone en riesgo no solo el grano sino el conocimiento culinario asociado (arepa rellena boyacense, peto). Manejo agroecológico: siembra en asociación 'tres hermanas' altoandina con fríjol bola roja (Phaseolus vulgaris cv. 'bola roja') y ahuyama de altura (Cucurbita maxima) o haba (Vicia faba); distancia 70 cm x 70 cm a 2-3 semillas por hoyo; aporque a 45 y 75 días; abono orgánico al surco (bocashi, compost); biopreparados: caldo de ceniza contra cogollero (Spodoptera frugiperda), trichoderma al hoyo. Conservación de semilla en mazorca colgada en zarzo o solera de cocina con humo de leña. Cosecha en grano seco a los 7-8 meses, desgranado manual con tusa. Fuentes Tier A: Pérez Arbeláez 1947 Plantas Útiles, AGROSAVIA Leguminosas Andinas (policultivos), NRC 1989 Cultivos Andinos, GBIF Backbone, POWO Kew, FAO EcoCrop."
+    },
+    {
+      "id": "amaranthus_caudatus_kiwicha",
+      "nombre_comun": "Kiwicha",
+      "nombre_comunes_regionales": [
+        "kiwicha ceremonial",
+        "amaranto andino",
+        "achis",
+        "achita"
+      ],
+      "nombre_cientifico": "Amaranthus caudatus L. cv. 'Kiwicha'",
+      "familia_botanica": "Amaranthaceae",
+      "category": "cereales_pseudocereales",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "variedad_tradicional",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 3000,
+        "max_absoluto": 3400
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 12,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Pseudocereal andino ceremonial cultivado desde tiempos prehispánicos por culturas Inca, Aimara y Muisca. Variedad de inflorescencia colgante color rojizo-purpúreo. Semilla muy pequeña (0.8-1.2 mm) que requiere siembra al voleo o en línea a 0.5-1 cm de profundidad y posterior raleo. Ciclo 5-7 meses según altitud."
+      },
+      "source_ids": [
+        "nrc-1989-cultivos-andinos",
+        "fao-2013-quinua",
+        "perez-arbelaez-1947-plantas-utiles",
+        "mujica-1992-quinua",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "La kiwicha (Amaranthus caudatus L. cv. 'Kiwicha') es un pseudocereal andino ceremonial domesticado hace más de 4.000 años por las culturas Caral, Chavín, Wari, Inca, Aimara y Muisca en los Andes centrales y septentrionales, considerado uno de los cuatro 'granos perdidos' redescubiertos por NRC 1989 (junto con quinua, kañiwa y tarwi). Crece entre 1.500 y 3.000 msnm en clima templado y frío de Perú (Cuzco, Apurímac, Arequipa, Ayacucho), Bolivia (La Paz, Cochabamba), Ecuador (Imbabura, Chimborazo) y zonas reintroducidas en Colombia (Boyacá: Toca, Tunja; Nariño: Pasto, Túquerres; Cauca: Silvia, Totoró). Planta erecta de 1-2.5 m con inflorescencia colgante (de ahí 'caudatus', cola) color rojo-púrpura espectacular, semilla menudita (0.8-1.2 mm) blanca, dorada o rosa pálido. Su grano es nutricionalmente superior a cereales convencionales: proteína 14-18% con lisina abundante (aminoácido limitante en cereales como maíz y trigo), libre de gluten, rico en calcio, hierro, magnesio y antioxidantes. Es lección viva de soberanía alimentaria prehispánica: durante la Colonia los españoles prohibieron el cultivo de kiwicha (junto con quinua y amaranto) por su uso ceremonial en rituales precolombinos, lo que casi causó su extinción. Hoy es protagonista del rescate de la agroalimentación andina por su valor nutricional y resiliencia. Usos: grano reventado (popping) como cereal de desayuno, harina para tortas y galletas, hojas tiernas como verdura (similar a espinaca), tintes naturales rojizos. Manejo agroecológico: siembra al voleo o en líneas con poca tapada (0.5-1 cm) al inicio de lluvias; raleo a 30-40 cm; rotación con quinua, fríjol, papa; biopreparados: caldo sulfocalcio contra mosca minadora (Liriomyza), trichoderma al surco. Tolerante a sequía y suelos pobres. Fuentes Tier A: NRC 1989 Cultivos Andinos, FAO 2013 Quinua y andinos, Pérez Arbeláez 1947, Mujica 1992 Quinua y andinos, GBIF Backbone, POWO Kew."
+    },
+    {
+      "id": "phaseolus_vulgaris_bola_roja",
+      "nombre_comun": "Fríjol Bola Roja",
+      "nombre_comunes_regionales": [
+        "bola roja",
+        "fríjol bola roja boyacense",
+        "fríjol rojo boyacense"
+      ],
+      "nombre_cientifico": "Phaseolus vulgaris L. cv. 'Bola Roja'",
+      "familia_botanica": "Fabaceae",
+      "category": "verduras_legumbres",
+      "thermal_zones": [
+        "frio",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer"
+      ],
+      "cultivable": true,
+      "conservation_status": "variedad_tradicional",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 2800,
+        "max_absoluto": 3100
+      },
+      "temperatura_c": {
+        "helada_letal": -1,
+        "optimo_min": 12,
+        "optimo_max": 20,
+        "max_tolerable": 26
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Variedad nativa cundiboyacense voluble (trepadora), grano grande esférico color rojo brillante. Ciclo 5-7 meses. Siembra asociada con maíz capio que sirve de soporte natural. Fija nitrógeno atmosférico (Rhizobium leguminosarum) en simbiosis radicular, aporta 40-80 kg N/ha/ciclo al sistema."
+      },
+      "source_ids": [
+        "agrosavia-leguminosas-andinas",
+        "perez-arbelaez-1947-plantas-utiles",
+        "nrc-1989-cultivos-andinos",
+        "perez-rodriguez-gomez-2008",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "El fríjol bola roja (Phaseolus vulgaris L. cv. 'Bola Roja') es una variedad nativa cundiboyacense del altiplano andino colombiano, voluble (trepadora) de grano grande esférico color rojo brillante. Se cultiva por pequeños productores y campesinas tradicionales en Boyacá (Tunja, Ventaquemada, Ramiriquí, Tibasosa, Toca), Cundinamarca (Subachoque, Pacho, Une, Choachí) y zonas templadas de Nariño y Cauca entre 2.200 y 2.800 msnm. Su carácter voluble (trepa por tutor) lo hace pareja ideal del maíz capio en el policultivo 'tres hermanas' altoandino: el maíz da soporte vertical, el fríjol fija nitrógeno atmosférico vía simbiosis con Rhizobium leguminosarum (40-80 kg N/ha/ciclo), y la ahuyama de altura (Cucurbita maxima) o el cubio (Tropaeolum tuberosum) cubren el suelo. Es lección viva de la lógica policultivo prehispánica: el bola roja no es solo grano, es servicio ecosistémico de fertilidad del suelo, dependiente de la presencia del maíz como soporte (sin él se enreda en sí mismo y reduce producción). Grano apreciado para sopas espesas (sopa de mute boyacense, mazamorra de fríjol), guisos campesinos, fríjoles antioqueños 'paisas' (bandeja paisa), conserva seca tradicional. Comparado con variedades arbustivas comerciales (ICA Caraota), el bola roja conserva mejor sabor y textura mantecosa al cocinarse pero requiere más tiempo de cocción (45-90 min con remojo previo). Manejo agroecológico: siembra simultánea con maíz capio al inicio de lluvias mayores; 2-3 granos por hoyo a 20 cm del tallo del maíz; abono orgánico al surco (compost o bocashi); biopreparados: caldo sulfocalcio contra antracnosis (Colletotrichum lindemuthianum), trichoderma al inicio. Cosecha en seco a los 5-7 meses, vainas marchitadas; desvainado manual; conservación con ceniza de leña o piedras de cal en frasco hermético. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, Pérez Arbeláez 1947, NRC 1989 Cultivos Andinos, Pérez-Rodríguez-Gómez 2008, GBIF Backbone, POWO Kew."
+    },
+    {
+      "id": "phaseolus_lunatus_andino",
+      "nombre_comun": "Fríjol Lima Andino",
+      "nombre_comunes_regionales": [
+        "fríjol lima",
+        "torta",
+        "ibia (confusión)",
+        "fríjol pallar"
+      ],
+      "nombre_cientifico": "Phaseolus lunatus L. cv. andino",
+      "familia_botanica": "Fabaceae",
+      "category": "verduras_legumbres",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer"
+      ],
+      "cultivable": true,
+      "conservation_status": "variedad_tradicional",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 1800,
+        "optimo_max": 2600,
+        "max_absoluto": 2900
+      },
+      "temperatura_c": {
+        "helada_letal": 0,
+        "optimo_min": 14,
+        "optimo_max": 22,
+        "max_tolerable": 28
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Variedad andina voluble (trepadora) de grano grande aplanado en forma de luna creciente. Ciclo largo (6-8 meses) según altitud. Doble origen domesticación independiente: andino (granos grandes, llamado 'pallar' en Perú) y mesoamericano (granos pequeños, 'sieva'). El andino llegó a Colombia por intercambio prehispánico con culturas pre-Inca."
+      },
+      "source_ids": [
+        "agrosavia-leguminosas-andinas",
+        "nrc-1989-cultivos-andinos",
+        "perez-arbelaez-1947-plantas-utiles",
+        "fao-ecocrop",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "El fríjol lima andino (Phaseolus lunatus L. cv. andino) es una de las cinco especies del género Phaseolus domesticadas en América (junto con P. vulgaris, P. acutifolius, P. coccineus y P. polyanthus) y la única con doble centro de domesticación independiente: el linaje andino de grano grande (llamado 'pallar' en Perú, 'torta' en Colombia y Ecuador) domesticado hace 5-6.000 años en la costa peruana, y el linaje mesoamericano de grano pequeño ('sieva') domesticado en paralelo en México-Guatemala. El linaje andino llegó al territorio colombiano por intercambios prehispánicos con culturas Mochica, Wari e Inca, y hoy se conserva por familias campesinas en Nariño (Ipiales, Túquerres, Cumbal), Cauca (Silvia, Totoró), Boyacá (Tunja, Ramiriquí) y Cundinamarca (Une, Choachí) entre 1.800 y 2.600 msnm. Planta voluble (trepadora) de tallos largos, hojas trifolioladas grandes, vainas anchas con 2-4 granos por vaina, grano grande aplanado (1.5-2.5 cm) en forma de luna creciente (de ahí 'lunatus'), color blanco, crema, manchado morado, rojo o jaspeado. Es lección viva de domesticación dual y rescate de leguminosas marginadas: el fríjol lima andino, junto con el chocho/tarwi (Lupinus mutabilis), está en riesgo de erosión genética por dominio comercial del fríjol arbustivo P. vulgaris ICA. Su grano es nutricionalmente superior (proteína 20-25%, alto en hierro, magnesio, folato), aunque requiere remojo prolongado y descarte del agua de cocción para eliminar trazas de glucósidos cianogénicos (linamarina) presentes en algunas variedades. Manejo agroecológico: siembra con tutor (puede ser maíz, también caña o tutor seco), distancia 50-70 cm; abono al hoyo (compost); biopreparados: caldo sulfocalcio contra antracnosis, trichoderma; fija nitrógeno atmosférico 50-100 kg N/ha/ciclo, mejor que vulgaris en altura por sistema radicular profundo. Conservación de semilla en frascos secos con ceniza, vida útil 3-5 años. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, NRC 1989 Cultivos Andinos, Pérez Arbeláez 1947, FAO EcoCrop, GBIF Backbone, POWO Kew."
+    },
+    {
+      "id": "chenopodium_pallidicaule",
+      "nombre_comun": "Kañiwa",
+      "nombre_comunes_regionales": [
+        "kañihua",
+        "cañihua",
+        "kaniwa",
+        "cañahua",
+        "isualla"
+      ],
+      "nombre_cientifico": "Chenopodium pallidicaule Aellen",
+      "familia_botanica": "Amaranthaceae",
+      "category": "cereales_pseudocereales",
+      "thermal_zones": [
+        "frio",
+        "paramo"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "variedad_tradicional",
+      "altitud_msnm": {
+        "min_absoluto": 3000,
+        "optimo_min": 3500,
+        "optimo_max": 4200,
+        "max_absoluto": 4500
+      },
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 5,
+        "optimo_max": 14,
+        "max_tolerable": 22
+      },
+      "radiacion": "sol_pleno",
+      "agua": "bajo",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Pseudocereal sagrado del altiplano puneño-boliviano, sembrado entre 3.500 y 4.200 msnm donde ningún otro grano prospera. Ciclo corto a medio (4-6 meses), tolera heladas hasta -8°C, granizo, sequía y suelos salinos del altiplano. Reintroducido en Nariño (Cumbal, Túquerres) y Boyacá (páramo de Rabanal, Pisba) en proyectos de rescate andino. Semilla muy menuda (1 mm). Siembra al voleo poco enterrada (0.5-1 cm). Cosecha por arranque manual de la planta entera y trilla por golpeo."
+      },
+      "source_ids": [
+        "nrc-1989-cultivos-andinos",
+        "fao-2013-quinua",
+        "mujica-1992-quinua",
+        "perez-arbelaez-1947-plantas-utiles",
+        "gbif-taxonomic-backbone",
+        "powo-kew"
+      ],
+      "valor_pedagogico": "La kañiwa (Chenopodium pallidicaule Aellen, Amaranthaceae) es el pseudocereal más altitudinal del mundo y uno de los 'granos sagrados' del altiplano andino, cultivado entre 3.500 y 4.200 msnm en el altiplano peruano-boliviano (departamentos de Puno, La Paz, Oruro, Potosí) y reintroducido en zonas altoandinas de Nariño (Cumbal, Túquerres, páramo del Galeras) y Boyacá (páramo de Rabanal, Pisba) en proyectos de rescate de granos andinos. Es pariente cercano de la quinua (Chenopodium quinoa) pero más rústico, más pequeño (planta erecta de 30-70 cm vs. 1.5-2 m de la quinua), más resistente a heladas (-8°C vs. -4°C de la quinua), libre de saponinas (no requiere lavado pre-cocción a diferencia de la quinua), y de ciclo más corto (4-6 meses vs. 6-8 meses). Semilla menudita (1 mm) marrón oscuro a negruzca, con perfil nutricional excepcional: proteína 14-19% con aminoácidos esenciales completos (incluida lisina), alto contenido de hierro, calcio, magnesio y zinc, libre de gluten. Es lección viva de adaptación extrema y soberanía alimentaria altoandina: la kañiwa es el último cultivo viable en el límite altitudinal donde quinua, papa amarga (Solanum juzepczukii) y mauka apenas sobreviven, y para los pueblos Aimara y Quechua del altiplano fue por milenios el seguro alimentario contra las heladas que destruían los demás cultivos. NRC 1989 la incluyó en su lista de cultivos andinos perdidos a rescatar, y desde entonces FAO, INIA-Perú y AGROSAVIA-Colombia han impulsado su recuperación. Usos: pito de kañiwa (harina tostada en agua o leche, base proteica del desayuno altiplánico), galletas, panes integrales, mazamorras. Manejo agroecológico: siembra al voleo al inicio de lluvias del altiplano (octubre-noviembre); poca tapada (0.5-1 cm); tolera suelos pobres, salinos y ácidos; biopreparados: caldo de ceniza contra mildiu (Peronospora variabilis); cosecha por arranque manual de la planta entera, secado en parva, trilla por golpeo o pisoteo sobre lona. Conservación de semilla en cántaros de arcilla con ceniza. Fuentes Tier A: NRC 1989 Cultivos Andinos, FAO 2013 Quinua y andinos, Mujica 1992 Quinua y andinos, Pérez Arbeláez 1947, GBIF Backbone, POWO Kew."
     }
   ],
   "biopreparados": [
