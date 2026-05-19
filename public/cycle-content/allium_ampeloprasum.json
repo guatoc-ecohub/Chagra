@@ -16,6 +16,7 @@
     "crop",
     "pest_repellent"
   ],
+  "companions": [],
   "antagonists": [
     "phaseolus_vulgaris"
   ],
@@ -24,6 +25,9 @@
     "metodo_principal": "semilla",
     "notas": "Requiere trasplante profundo para favorecer el 'blanqueado' del tallo."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "El puerro (Allium ampeloprasum var. porrum) se cultiva en los departamentos andinos de Colombia como Cundinamarca y Boyacá entre 500 y 3400 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con trasplante profundo para favorecer el 'blanqueado' del tallo, ciclo vegetativo de 150-180 días, asociaciones beneficiosas con zanahoria y fresa que mejoran la salud del huerto, y requiere manejo de plagas como trips y minadores de hojas mediante monitoreo frecuente y biopreparados andinos. En el contexto campesino andino, esta verdura ha sido tradicionalmente utilizada en sopros y guisos como ingrediente esencial, preservando sabores prehispánicos en las cocinas rurales. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Allium ampeloprasum var. porrum (L.) J. Gay.",
+  "antagonists_text": "### Antagonistas (no asociar)\n- phaseolus_vulgaris — Frijol arbustivo / voluble (Phaseolus vulgaris L.)",
   "requirements": {
     "agua": "medio",
     "altitud_msnm": {
@@ -41,29 +45,32 @@
     "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "El puerro (Allium ampeloprasum var. porrum) se cultiva en los departamentos andinos de Colombia como Cundinamarca y Boyacá entre 500 y 3400 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con trasplante profundo para favorecer el 'blanqueado' del tallo, ciclo vegetativo de 150-180 días, asociaciones beneficiosas con zanahoria y fresa que mejoran la salud del huerto, y requiere manejo de plagas como trips y minadores de hojas mediante monitoreo frecuente y biopreparados andinos. En el contexto campesino andino, esta verdura ha sido tradicionalmente utilizada en sopros y guisos como ingrediente esencial, preservando sabores prehispánicos en las cocinas rurales. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Allium ampeloprasum var. porrum (L.) J. Gay.",
   "sources": [
     {
       "id": "gbif-taxonomic-backbone",
       "title": "gbif-taxonomic-backbone",
+      "tier": "A",
       "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
     },
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     },
     {
       "id": "agrosavia-sol-andina",
       "title": "agrosavia-sol-andina",
+      "tier": "A",
       "url": "https://www.agrosavia.co"
     },
     {
       "id": "ica-resolucion-3168-2015",
       "title": "ica-resolucion-3168-2015",
+      "tier": "A",
       "url": null
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.089Z"
+  "_generated_at": "2026-05-19T00:02:58.175Z"
 }

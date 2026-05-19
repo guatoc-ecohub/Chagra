@@ -15,6 +15,11 @@
     "crop",
     "ground_cover"
   ],
+  "companions": [
+    "alnus_acuminata",
+    "urtica_dioica",
+    "zea_mays"
+  ],
   "antagonists": [
     "solanum_lycopersicum_san_marzano"
   ],
@@ -23,6 +28,10 @@
     "metodo_principal": "tuberculo (semilla asexual)",
     "notas": "No tiene periodo de dormancia (latencia); su ciclo rápido exige una renovación constante de la semilla en la finca."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "La papa criolla (Solanum phureja) se distribuye en los departamentos de Cundinamarca y Boyacá entre 2500 y 3200 msnm en zonas térmicas frías, siendo un cultivo emblemático de la región andina. Su manejo agronómico utiliza el tubérculo como semilla con ciclos cortos de 90-120 días, ideal para rotaciones con leguminosas que mejoran la fijación de nitrógeno en el suelo. Este tubérculo tiene raíces profundas en la cultura muisca y andina, donde se consume diariamente en sopas y guisos como alimento básico desde la época prehispánica. Fuentes de información Tier A incluyen la ficha técnica Sol Andina de AGROSAVIA, investigaciones del Centro Internacional Papa (CIP), estudios de la Universidad Nacional de Colombia y el backbone taxonómico de GBIF.",
+  "companions_text": "### Especies asociadas favorables (companions)\n- alnus_acuminata — Aliso andino (Alnus acuminata Kunth)\n- urtica_dioica — Ortiga (Urtica dioica L.)\n- zea_mays — Maíz criollo (Zea mays L.)",
+  "antagonists_text": "### Antagonistas (no asociar)\n- solanum_lycopersicum_san_marzano — Tomate San Marzano (Solanum lycopersicum 'San Marzano')",
   "requirements": {
     "agua": "medio",
     "altitud_msnm": {
@@ -40,29 +49,32 @@
     "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "La papa criolla (Solanum phureja) se distribuye en los departamentos de Cundinamarca y Boyacá entre 2500 y 3200 msnm en zonas térmicas frías, siendo un cultivo emblemático de la región andina. Su manejo agronómico utiliza el tubérculo como semilla con ciclos cortos de 90-120 días, ideal para rotaciones con leguminosas que mejoran la fijación de nitrógeno en el suelo. Este tubérculo tiene raíces profundas en la cultura muisca y andina, donde se consume diariamente en sopas y guisos como alimento básico desde la época prehispánica. Fuentes de información Tier A incluyen la ficha técnica Sol Andina de AGROSAVIA, investigaciones del Centro Internacional Papa (CIP), estudios de la Universidad Nacional de Colombia y el backbone taxonómico de GBIF.",
   "sources": [
     {
       "id": "agrosavia-sol-andina",
       "title": "agrosavia-sol-andina",
+      "tier": "A",
       "url": "https://www.agrosavia.co"
     },
     {
       "id": "cip-2006-ghislain",
       "title": "cip-2006-ghislain",
+      "tier": "A",
       "url": null
     },
     {
       "id": "nustez-rodriguez-2024-unal",
       "title": "nustez-rodriguez-2024-unal",
+      "tier": "B",
       "url": null
     },
     {
       "id": "gbif-taxonomic-backbone",
       "title": "gbif-taxonomic-backbone",
+      "tier": "A",
       "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.096Z"
+  "_generated_at": "2026-05-19T00:02:58.195Z"
 }

@@ -16,12 +16,19 @@
     "nitrogen_fixer",
     "pest_repellent"
   ],
+  "companions": [
+    "alnus_acuminata",
+    "zea_mays"
+  ],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
     "metodo_principal": "semilla",
     "notas": "Sus raíces son fijadoras masivas de nitrógeno; excelente abono verde si se incorpora antes de florecer."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "El tarwi o chocho andino (Lupinus mutabilis Sweet) es una leguminosa nativa de los Andes con alto contenido proteico en grano (35-50%), tradicionalmente cultivada en sistemas campesinos altoandinos colombianos para autoconsumo (cosecha desamargada). Se cultiva en Boyacá (Tunja, Soatá, Ventaquemada), Cundinamarca (Sumapaz, Choachí), Nariño y Cauca entre 2.500 y 3.500 msnm en zona térmica fría a páramo bajo. Ciclo 6-8 meses, fijación N biológica ~100-160 kg N/ha. Granos con alcaloides amargos (quinolizidínicos) requieren desamargado tradicional (remojo + enjuagues). Manejo agroecológico: siembra al voleo en pre-cultivo (8-12 kg/ha), incorporación como abono verde o cosecha grano + restos al suelo, rotación con tubérculos andinos. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, NRC 1989 Cultivos Andinos, POWO Kew, GBIF Backbone Taxonomy.",
+  "companions_text": "### Especies asociadas favorables (companions)\n- alnus_acuminata — Aliso andino (Alnus acuminata Kunth)\n- zea_mays — Maíz criollo (Zea mays L.)",
   "requirements": {
     "agua": "bajo",
     "altitud_msnm": {
@@ -39,29 +46,32 @@
     "radiacion": "sol_pleno",
     "drenaje_requerido": "excelente"
   },
-  "valor_pedagogico": "El tarwi o chocho andino (Lupinus mutabilis Sweet) es una leguminosa nativa de los Andes con alto contenido proteico en grano (35-50%), tradicionalmente cultivada en sistemas campesinos altoandinos colombianos para autoconsumo (cosecha desamargada). Se cultiva en Boyacá (Tunja, Soatá, Ventaquemada), Cundinamarca (Sumapaz, Choachí), Nariño y Cauca entre 2.500 y 3.500 msnm en zona térmica fría a páramo bajo. Ciclo 6-8 meses, fijación N biológica ~100-160 kg N/ha. Granos con alcaloides amargos (quinolizidínicos) requieren desamargado tradicional (remojo + enjuagues). Manejo agroecológico: siembra al voleo en pre-cultivo (8-12 kg/ha), incorporación como abono verde o cosecha grano + restos al suelo, rotación con tubérculos andinos. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, NRC 1989 Cultivos Andinos, POWO Kew, GBIF Backbone Taxonomy.",
   "sources": [
     {
       "id": "agrosavia-manual-biopreparados-2015",
       "title": "agrosavia-manual-biopreparados-2015",
+      "tier": "A",
       "url": null
     },
     {
       "id": "cip-2006-ghislain",
       "title": "cip-2006-ghislain",
+      "tier": "A",
       "url": null
     },
     {
       "id": "gbif-taxonomic-backbone",
       "title": "gbif-taxonomic-backbone",
+      "tier": "A",
       "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
     },
     {
       "id": "agrosavia-leguminosas-andinas",
       "title": "agrosavia-leguminosas-andinas",
+      "tier": "A",
       "url": null
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.093Z"
+  "_generated_at": "2026-05-19T00:02:58.189Z"
 }

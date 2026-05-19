@@ -16,9 +16,15 @@
     "ground_cover",
     "biomass_producer"
   ],
+  "companions": [
+    "alnus_acuminata"
+  ],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": null,
+  "feeding_plan_template": null,
+  "valor_pedagogico": "Variedad manejada del kikuyo (Cenchrus clandestinus), pasto perenne ampliamente usado en ganadería extensiva andina. Bajo manejo agroecológico (cortes programados, asociaciones con Alnus acuminata, rotación de potreros) reduce su carácter invasor original.",
+  "companions_text": "### Especies asociadas favorables (companions)\n- alnus_acuminata — Aliso andino (Alnus acuminata Kunth)",
   "requirements": {
     "agua": null,
     "altitud_msnm": {
@@ -31,19 +37,20 @@
     "radiacion": null,
     "drenaje_requerido": null
   },
-  "valor_pedagogico": "Variedad manejada del kikuyo (Cenchrus clandestinus), pasto perenne ampliamente usado en ganadería extensiva andina. Bajo manejo agroecológico (cortes programados, asociaciones con Alnus acuminata, rotación de potreros) reduce su carácter invasor original.",
   "sources": [
     {
       "id": "gbif-taxonomic-backbone",
       "title": "gbif-taxonomic-backbone",
+      "tier": "A",
       "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
     },
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.102Z"
+  "_generated_at": "2026-05-19T00:02:58.213Z"
 }

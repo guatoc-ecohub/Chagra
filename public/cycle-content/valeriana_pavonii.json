@@ -15,12 +15,15 @@
   "roles_in_guild": [
     "crop"
   ],
+  "companions": [],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
     "metodo_principal": "semilla",
     "notas": "Germinación lenta; requiere estratificación en frío y suelos ricos en materia orgánica."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "Valeriana criolla endémica de los Andes colombianos (Valeriana pavonii, Caprifoliaceae) que habita páramos y bosques altoandinos entre 2.800 y 3.500 msnm. Sus raíces contienen valepotriatos sedantes usados en infusión tradicional para calmar nervios y mejorar el sueño, conocimiento conservado por campesinos de Cundinamarca, Boyacá y Santander. Enseña la relación entre altitud, compuestos activos y saber etnobotánico, y por qué conservar el páramo equivale a conservar una farmacopea viva.",
   "requirements": {
     "agua": "alto",
     "altitud_msnm": {
@@ -38,34 +41,38 @@
     "radiacion": "sombra_parcial",
     "drenaje_requerido": "bueno_a_moderado"
   },
-  "valor_pedagogico": "Valeriana criolla endémica de los Andes colombianos (Valeriana pavonii, Caprifoliaceae) que habita páramos y bosques altoandinos entre 2.800 y 3.500 msnm. Sus raíces contienen valepotriatos sedantes usados en infusión tradicional para calmar nervios y mejorar el sueño, conocimiento conservado por campesinos de Cundinamarca, Boyacá y Santander. Enseña la relación entre altitud, compuestos activos y saber etnobotánico, y por qué conservar el páramo equivale a conservar una farmacopea viva.",
   "sources": [
     {
       "id": "perez-arbelaez-1947-plantas-utiles",
       "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
       "url": null
     },
     {
       "id": "bernal-2015-plantas-liquenes-colombia",
       "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
       "url": "http://catalogoplantasdecolombia.unal.edu.co"
     },
     {
       "id": "gbif-taxonomic-backbone",
       "title": "gbif-taxonomic-backbone",
+      "tier": "A",
       "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
     },
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     },
     {
       "id": "jbb-plantas-medicinales",
       "title": "jbb-plantas-medicinales",
+      "tier": "A",
       "url": null
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.102Z"
+  "_generated_at": "2026-05-19T00:02:58.211Z"
 }

@@ -15,6 +15,7 @@
     "biomass_producer",
     "nurse_plant"
   ],
+  "companions": [],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
@@ -26,6 +27,8 @@
     "tiempo_a_establecimiento_dias": 180,
     "notas": "Protegida por Ley 1930/2018. Cualquier intervencion requiere permiso de autoridad ambiental."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "Frailejon de hojas plateadas que reflejan la radiacion UV extrema del paramo. Sus tricomas capturan agua de niebla y la fijan al suelo. Especie clave en la regulacion hidrica de la estrella fluvial Cruz Verde-Sumapaz.",
   "requirements": {
     "agua": "alto",
     "altitud_msnm": {
@@ -43,34 +46,38 @@
     "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "Frailejon de hojas plateadas que reflejan la radiacion UV extrema del paramo. Sus tricomas capturan agua de niebla y la fijan al suelo. Especie clave en la regulacion hidrica de la estrella fluvial Cruz Verde-Sumapaz.",
   "sources": [
     {
       "id": "humboldt-2016-frailejones",
       "title": "humboldt-2016-frailejones",
+      "tier": "A",
       "url": "https://www.humboldt.org.co"
     },
     {
       "id": "diazgranados-2012-espeletiinae",
       "title": "diazgranados-2012-espeletiinae",
+      "tier": "A",
       "url": "10.3897/phytokeys.16.3186"
     },
     {
       "id": "ley-1930-2018-paramos",
       "title": "ley-1930-2018-paramos",
+      "tier": "A",
       "url": null
     },
     {
       "id": "mads-res-383-2010",
       "title": "mads-res-383-2010",
+      "tier": "B",
       "url": null
     },
     {
       "id": "bernal-2015-plantas-liquenes-colombia",
       "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
       "url": "http://catalogoplantasdecolombia.unal.edu.co"
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.098Z"
+  "_generated_at": "2026-05-19T00:02:58.203Z"
 }

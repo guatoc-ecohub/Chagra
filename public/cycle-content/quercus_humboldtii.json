@@ -16,6 +16,13 @@
     "biomass_producer",
     "windbreak"
   ],
+  "companions": [
+    "alnus_acuminata",
+    "calamagrostis_effusa",
+    "prunus_serotina_capuli",
+    "viburnum_triphyllum",
+    "weinmannia_tomentosa"
+  ],
   "antagonists": [
     "pinus_patula"
   ],
@@ -24,6 +31,10 @@
     "metodo_principal": "semilla",
     "notas": "Las bellotas pierden viabilidad rápido; sembrar inmediatamente después de recolectar."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "El roble andino o roble negro (Quercus humboldtii Bonpl.) es una fagácea endémica de Colombia y Panamá, símbolo del bosque altoandino y especie ecológicamente clave para la restauración de la cordillera Oriental, incluyendo el complejo páramo Cruz Verde-Sumapaz. Se distribuye naturalmente en Cundinamarca (Sumapaz, Choachí, Ubaque, La Calera), Boyacá (Iguaque), Santander (Cordillera Yariguíes), Antioquia, Cauca y Nariño entre 1.800 y 3.200 msnm en zona térmica fría. Árbol grande hasta 25 m, copa amplia, hojas perennes coriáceas, bellotas alimento clave para fauna nativa (oso de anteojos, mamíferos pequeños, avifauna). Manejo agroecológico: propagación por bellota fresca (estratificación frío 60 días), planta nodriza Vallea stipularis o Buddleja bullata en primeras etapas, restauración riberas microcuencas. Protegido nacional. Fuentes Tier A: Catálogo de Plantas y Líquenes Colombia (Bernal et al.), Instituto Humboldt (IAvH), POWO Kew, GBIF Backbone Taxonomy.",
+  "companions_text": "### Especies asociadas favorables (companions)\n- alnus_acuminata — Aliso andino (Alnus acuminata Kunth)\n- calamagrostis_effusa — Paja de páramo (Calamagrostis effusa (Kunth) Steud.)\n- prunus_serotina_capuli — Capulí (Prunus serotina var. capuli (Cav.) McVaugh)\n- viburnum_triphyllum — Garrocho (Viburnum triphyllum Benth.)\n- weinmannia_tomentosa — Encenillo (Weinmannia tomentosa L. f.)",
+  "antagonists_text": "### Antagonistas (no asociar)\n- pinus_patula — Pino pátula (Pinus patula Schiede ex Schltdl. & Cham.)",
   "requirements": {
     "agua": "medio",
     "altitud_msnm": {
@@ -41,24 +52,26 @@
     "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "El roble andino o roble negro (Quercus humboldtii Bonpl.) es una fagácea endémica de Colombia y Panamá, símbolo del bosque altoandino y especie ecológicamente clave para la restauración de la cordillera Oriental, incluyendo el complejo páramo Cruz Verde-Sumapaz. Se distribuye naturalmente en Cundinamarca (Sumapaz, Choachí, Ubaque, La Calera), Boyacá (Iguaque), Santander (Cordillera Yariguíes), Antioquia, Cauca y Nariño entre 1.800 y 3.200 msnm en zona térmica fría. Árbol grande hasta 25 m, copa amplia, hojas perennes coriáceas, bellotas alimento clave para fauna nativa (oso de anteojos, mamíferos pequeños, avifauna). Manejo agroecológico: propagación por bellota fresca (estratificación frío 60 días), planta nodriza Vallea stipularis o Buddleja bullata en primeras etapas, restauración riberas microcuencas. Protegido nacional. Fuentes Tier A: Catálogo de Plantas y Líquenes Colombia (Bernal et al.), Instituto Humboldt (IAvH), POWO Kew, GBIF Backbone Taxonomy.",
   "sources": [
     {
       "id": "libro-rojo-plantas-colombia",
       "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
       "url": null
     },
     {
       "id": "humboldt-flora-alto-andina",
       "title": "humboldt-flora-alto-andina",
+      "tier": "A",
       "url": null
     },
     {
       "id": "gbif-taxonomic-backbone",
       "title": "gbif-taxonomic-backbone",
+      "tier": "A",
       "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.095Z"
+  "_generated_at": "2026-05-19T00:02:58.192Z"
 }

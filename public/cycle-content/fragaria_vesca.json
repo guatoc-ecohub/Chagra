@@ -16,12 +16,15 @@
     "crop",
     "ground_cover"
   ],
+  "companions": [],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
     "metodo_principal": "estolon",
     "notas": "Se reproduce vegetativamente por estolones; tambien por semilla pero con menor tasa de exito. Variantes andinas adaptadas a mayor altitud que la europea."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "El fruto escondido: la fresa silvestre crece a ras del suelo en los bordes del bosque andino, ensenando que los mejores alimentos a veces estan donde menos se espera. Su estolon es leccion de reproduccion asexual.",
   "requirements": {
     "agua": "medio",
     "altitud_msnm": {
@@ -39,24 +42,26 @@
     "radiacion": "sombra_parcial",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "El fruto escondido: la fresa silvestre crece a ras del suelo en los bordes del bosque andino, ensenando que los mejores alimentos a veces estan donde menos se espera. Su estolon es leccion de reproduccion asexual.",
   "sources": [
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     },
     {
       "id": "gbif-colombia",
       "title": "gbif-colombia",
+      "tier": "A",
       "url": "https://www.gbif.org/country/CO"
     },
     {
       "id": "humboldt-flora-alto-andina",
       "title": "humboldt-flora-alto-andina",
+      "tier": "A",
       "url": null
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.097Z"
+  "_generated_at": "2026-05-19T00:02:58.201Z"
 }

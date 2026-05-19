@@ -15,12 +15,15 @@
   "roles_in_guild": [
     "crop"
   ],
+  "companions": [],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
     "metodo_principal": "semilla",
     "notas": "Requiere trasplante y un suelo profundamente abonado con materia orgánica nitrogenada."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "El brócoli (Brassica oleracea var. italica) es una crucífera hortícola cultivada en el cinturón agrícola de Cundinamarca (Mosquera-Madrid-Bojacá) entre 1800-2800 msnm en zonas térmicas fría y templada. Su ciclo de cultivo varía entre 90-120 días, se propaga por semilla con trasplante y requiere suelos ricos en materia orgánica nitrogenada. Varietales comerciales como Avenger, Marathon y Calabrese se adaptan bien a estas condiciones. En el contexto andino campesino, se asocia frecuentemente con cultivos de papa y cebolla en rotaciones que mejoran la estructura del suelo. Principal plagas incluyen mosca blanca y lepidópteros que dañan los botones florales. Fuente: AGROSAVIA Sol Andina ficha técnica.",
   "requirements": {
     "agua": "alto",
     "altitud_msnm": {
@@ -38,29 +41,32 @@
     "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "El brócoli (Brassica oleracea var. italica) es una crucífera hortícola cultivada en el cinturón agrícola de Cundinamarca (Mosquera-Madrid-Bojacá) entre 1800-2800 msnm en zonas térmicas fría y templada. Su ciclo de cultivo varía entre 90-120 días, se propaga por semilla con trasplante y requiere suelos ricos en materia orgánica nitrogenada. Varietales comerciales como Avenger, Marathon y Calabrese se adaptan bien a estas condiciones. En el contexto andino campesino, se asocia frecuentemente con cultivos de papa y cebolla en rotaciones que mejoran la estructura del suelo. Principal plagas incluyen mosca blanca y lepidópteros que dañan los botones florales. Fuente: AGROSAVIA Sol Andina ficha técnica.",
   "sources": [
     {
       "id": "gbif-taxonomic-backbone",
       "title": "gbif-taxonomic-backbone",
+      "tier": "A",
       "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
     },
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     },
     {
       "id": "ica-resolucion-3168-2015",
       "title": "ica-resolucion-3168-2015",
+      "tier": "A",
       "url": null
     },
     {
       "id": "agrosavia-sol-andina",
       "title": "agrosavia-sol-andina",
+      "tier": "A",
       "url": "https://www.agrosavia.co"
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.092Z"
+  "_generated_at": "2026-05-19T00:02:58.184Z"
 }

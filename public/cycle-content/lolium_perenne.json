@@ -16,6 +16,11 @@
     "ground_cover",
     "biomass_producer"
   ],
+  "companions": [
+    "festuca_arundinacea",
+    "medicago_sativa",
+    "trifolium_repens"
+  ],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
@@ -28,6 +33,9 @@
     "notas": "La graminea forrajera mas usada en el altiplano cundiboyacense. Establecimiento rapido, alta produccion de biomasa en clima frio. Ideal asociada con trebol blanco para pradera permanente.",
     "fuente": "AGROSAVIA 2022. Gramineas forrajeras en sistemas ganaderos andinos"
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "El raigrás perenne o ballico inglés (Lolium perenne L., familia Poaceae, subfamilia Pooideae) es una poácea perenne herbácea cespitosa originaria de Europa templada y Asia occidental, considerada la gramínea forrajera más cultivada del altiplano cundiboyacense colombiano y referente productivo de la lechería especializada de zona fría. Forma macollos densos verde-oscuro brillantes con hojas planas glabras, panículas erectas con espiguillas multifloras dísticas opuestas al raquis (rasgo diagnóstico del género Lolium) y crecimiento rápido en clima frío húmedo. Se cultiva en Cundinamarca (Sabana de Bogotá, Mosquera, Madrid, Funza, Subachoque, Chocontá, Tabio), Boyacá (Tunja, Sotaquirá, Paipa, Duitama, Sogamoso, altiplano lechero), Nariño (Pasto, Túquerres, Ipiales, Sapuyes), Antioquia (oriente lechero — La Unión, La Ceja, El Carmen de Viboral) y Eje cafetero alto entre 2.200 y 3.000 msnm en zona térmica fría húmeda. Ciclo perenne, productividad sostenida 4-6 años antes de renovar pradera. Rendimientos 14-20 t/ha materia seca por año, base de la producción láctea industrial colombiana de hato Holstein y cruces (95% del altiplano cundiboyacense). Lección viva de la alfombra verde del altiplano: el raigrás perenne demuestra la sinergia entre gramíneas y leguminosas en la pradera (raigrás + trébol blanco Trifolium repens), enseñando el equilibrio forrajero que sostiene la ganadería altoandina lechera, con el trébol aportando 100-200 kg N biológico/ha/año y el raigrás aportando biomasa de alta digestibilidad (NDF 45-55%, proteína 18-22%). Manejo agroecológico: siembra al voleo 20-30 kg/ha asociada con trébol blanco 3-5 kg/ha, pastoreo rotacional intensivo con franjas eléctricas y descansos de 21-28 días, fertilización con abonos orgánicos (estiércol, compost) y encalado preventivo. Fuentes Tier A: AGROSAVIA Forrajeras 2022, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia.",
+  "companions_text": "### Especies asociadas favorables (companions)\n- festuca_arundinacea — Festuca (Festuca arundinacea Schreb.)\n- medicago_sativa — Alfalfa (Medicago sativa L.)\n- trifolium_repens — Trébol blanco (Trifolium repens L.)",
   "requirements": {
     "agua": "alto",
     "altitud_msnm": {
@@ -45,44 +53,50 @@
     "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "El raigrás perenne o ballico inglés (Lolium perenne L., familia Poaceae, subfamilia Pooideae) es una poácea perenne herbácea cespitosa originaria de Europa templada y Asia occidental, considerada la gramínea forrajera más cultivada del altiplano cundiboyacense colombiano y referente productivo de la lechería especializada de zona fría. Forma macollos densos verde-oscuro brillantes con hojas planas glabras, panículas erectas con espiguillas multifloras dísticas opuestas al raquis (rasgo diagnóstico del género Lolium) y crecimiento rápido en clima frío húmedo. Se cultiva en Cundinamarca (Sabana de Bogotá, Mosquera, Madrid, Funza, Subachoque, Chocontá, Tabio), Boyacá (Tunja, Sotaquirá, Paipa, Duitama, Sogamoso, altiplano lechero), Nariño (Pasto, Túquerres, Ipiales, Sapuyes), Antioquia (oriente lechero — La Unión, La Ceja, El Carmen de Viboral) y Eje cafetero alto entre 2.200 y 3.000 msnm en zona térmica fría húmeda. Ciclo perenne, productividad sostenida 4-6 años antes de renovar pradera. Rendimientos 14-20 t/ha materia seca por año, base de la producción láctea industrial colombiana de hato Holstein y cruces (95% del altiplano cundiboyacense). Lección viva de la alfombra verde del altiplano: el raigrás perenne demuestra la sinergia entre gramíneas y leguminosas en la pradera (raigrás + trébol blanco Trifolium repens), enseñando el equilibrio forrajero que sostiene la ganadería altoandina lechera, con el trébol aportando 100-200 kg N biológico/ha/año y el raigrás aportando biomasa de alta digestibilidad (NDF 45-55%, proteína 18-22%). Manejo agroecológico: siembra al voleo 20-30 kg/ha asociada con trébol blanco 3-5 kg/ha, pastoreo rotacional intensivo con franjas eléctricas y descansos de 21-28 días, fertilización con abonos orgánicos (estiércol, compost) y encalado preventivo. Fuentes Tier A: AGROSAVIA Forrajeras 2022, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia.",
   "sources": [
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     },
     {
       "id": "gbif-taxonomic-backbone",
       "title": "gbif-taxonomic-backbone",
+      "tier": "A",
       "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
     },
     {
       "id": "gbif-colombia",
       "title": "gbif-colombia",
+      "tier": "A",
       "url": "https://www.gbif.org/country/CO"
     },
     {
       "id": "agrosavia-forrajeras-2022",
       "title": "agrosavia-forrajeras-2022",
+      "tier": "A",
       "url": null
     },
     {
       "id": "agrosavia-silvopastoriles",
       "title": "agrosavia-silvopastoriles",
+      "tier": "A",
       "url": null
     },
     {
       "id": "bernal-2015-plantas-liquenes-colombia",
       "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
       "url": "http://catalogoplantasdecolombia.unal.edu.co"
     },
     {
       "id": "restrepo-2005-agroecologia",
       "title": "restrepo-2005-agroecologia",
+      "tier": "B",
       "url": null
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.099Z"
+  "_generated_at": "2026-05-19T00:02:58.205Z"
 }

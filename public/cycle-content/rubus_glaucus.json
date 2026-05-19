@@ -17,12 +17,18 @@
     "pollinator_attractor",
     "living_fence"
   ],
+  "companions": [
+    "urtica_dioica"
+  ],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
     "metodo_principal": "acodo",
     "notas": "Propagacion por acodo de punta o esqueje. La forma silvestre presenta espinas; requiere tutorado en espaldera. Produce frutos a partir del segundo ano."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "La espina que protege: la mora silvestre ensena que las defensas naturales de las plantas tienen un proposito. Su cultivo en espaldera muestra como la agricultura domestica sin eliminar la esencia silvestre.",
+  "companions_text": "### Especies asociadas favorables (companions)\n- urtica_dioica — Ortiga (Urtica dioica L.)",
   "requirements": {
     "agua": "medio",
     "altitud_msnm": {
@@ -40,29 +46,32 @@
     "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "La espina que protege: la mora silvestre ensena que las defensas naturales de las plantas tienen un proposito. Su cultivo en espaldera muestra como la agricultura domestica sin eliminar la esencia silvestre.",
   "sources": [
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     },
     {
       "id": "gbif-colombia",
       "title": "gbif-colombia",
+      "tier": "A",
       "url": "https://www.gbif.org/country/CO"
     },
     {
       "id": "agrosavia-tibaitata",
       "title": "agrosavia-tibaitata",
+      "tier": "A",
       "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1"
     },
     {
       "id": "sib-colombia",
       "title": "sib-colombia",
+      "tier": "A",
       "url": "https://sibcolombia.net"
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.097Z"
+  "_generated_at": "2026-05-19T00:02:58.201Z"
 }

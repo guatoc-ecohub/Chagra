@@ -15,12 +15,15 @@
     "crop",
     "pest_repellent"
   ],
+  "companions": [],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
     "metodo_principal": "tuberculo",
     "notas": "Posee propiedades nematicidas naturales; excelente para rotar terrenos tras la siembra de papa."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "La mashua (Tropaeolum tuberosum) se cultiva en los departamentos andinos de Colombia como Boyacá, Cundinamarca, Nariño y Cauca entre 2000 y 3600 msnm en zonas térmicas frías. Su manejo agronómico incluye propagación por tubérculos semilla, ciclo de cultivo de 8-9 meses, asociaciones beneficiosas con papa y maíz que reducen nemátodos y plagas del suelo, y requiere monitoreo de plagas como trips y áfidos mediante biopreparados andinos. En el contexto cultural muisca y andino, este tubérculo ha sido tradicionalmente utilizado en sopros y guisos como alimento esencial, preservando sabores prehispánicos en las cocinas rurales de los Andes colombianos. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Tropaeolum tuberosum Ruiz & Pav.",
   "requirements": {
     "agua": "medio",
     "altitud_msnm": {
@@ -38,29 +41,32 @@
     "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "La mashua (Tropaeolum tuberosum) se cultiva en los departamentos andinos de Colombia como Boyacá, Cundinamarca, Nariño y Cauca entre 2000 y 3600 msnm en zonas térmicas frías. Su manejo agronómico incluye propagación por tubérculos semilla, ciclo de cultivo de 8-9 meses, asociaciones beneficiosas con papa y maíz que reducen nemátodos y plagas del suelo, y requiere monitoreo de plagas como trips y áfidos mediante biopreparados andinos. En el contexto cultural muisca y andino, este tubérculo ha sido tradicionalmente utilizado en sopros y guisos como alimento esencial, preservando sabores prehispánicos en las cocinas rurales de los Andes colombianos. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Tropaeolum tuberosum Ruiz & Pav.",
   "sources": [
     {
       "id": "gbif-taxonomic-backbone",
       "title": "gbif-taxonomic-backbone",
+      "tier": "A",
       "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
     },
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     },
     {
       "id": "agrosavia-manual-tuberculos-andinos-2017",
       "title": "agrosavia-manual-tuberculos-andinos-2017",
+      "tier": "A",
       "url": null
     },
     {
       "id": "ica-resolucion-3168-2015",
       "title": "ica-resolucion-3168-2015",
+      "tier": "A",
       "url": null
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.096Z"
+  "_generated_at": "2026-05-19T00:02:58.196Z"
 }

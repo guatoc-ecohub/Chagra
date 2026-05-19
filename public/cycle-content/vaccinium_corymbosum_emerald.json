@@ -16,12 +16,18 @@
     "crop",
     "pollinator_attractor"
   ],
+  "companions": [
+    "vaccinium_corymbosum_biloxi"
+  ],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
     "metodo_principal": "esqueje",
     "notas": "Variedad vigorosa con baja necesidad de frío (low-chill); ideal para las etapas de transición climática en Choachí."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "El arándano azul variedad Emerald (Vaccinium corymbosum L. cv. Emerald, tipo southern highbush bush) es un cultivo de creciente expansión agroindustrial en Colombia con destino exportación y mercados gourmet. Se cultiva en Cundinamarca (Sabana Bogotá), Boyacá altiplano, Antioquia y Nariño entre 2.000 y 2.800 msnm en zona térmica fría a templada. Crítico requerimiento: suelos ácidos pH 4.5-5.5 con MO >5%, drenaje excelente, riego goteo constante. Productividad comercial a partir del 3er año, ciclo productivo 12-15 años. Manejo agroecológico: cama elevada con sustrato modificado (turba + corteza pino + virutas), mulch ácido (aserrín de pino), fertilización orgánica con compost ácido + harina de sangre, baja densidad de plantación (4×3 m). Fuentes Tier A: AGROSAVIA Manual Arándano 2018, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
+  "companions_text": "### Especies asociadas favorables (companions)\n- vaccinium_corymbosum_biloxi — Arándano Biloxi (Vaccinium corymbosum 'Biloxi')",
   "requirements": {
     "agua": "medio",
     "altitud_msnm": {
@@ -39,19 +45,20 @@
     "radiacion": "sol_pleno",
     "drenaje_requerido": "excelente"
   },
-  "valor_pedagogico": "El arándano azul variedad Emerald (Vaccinium corymbosum L. cv. Emerald, tipo southern highbush bush) es un cultivo de creciente expansión agroindustrial en Colombia con destino exportación y mercados gourmet. Se cultiva en Cundinamarca (Sabana Bogotá), Boyacá altiplano, Antioquia y Nariño entre 2.000 y 2.800 msnm en zona térmica fría a templada. Crítico requerimiento: suelos ácidos pH 4.5-5.5 con MO >5%, drenaje excelente, riego goteo constante. Productividad comercial a partir del 3er año, ciclo productivo 12-15 años. Manejo agroecológico: cama elevada con sustrato modificado (turba + corteza pino + virutas), mulch ácido (aserrín de pino), fertilización orgánica con compost ácido + harina de sangre, baja densidad de plantación (4×3 m). Fuentes Tier A: AGROSAVIA Manual Arándano 2018, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
   "sources": [
     {
       "id": "agrosavia-manual-arandano-2018",
       "title": "agrosavia-manual-arandano-2018",
+      "tier": "A",
       "url": null
     },
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.096Z"
+  "_generated_at": "2026-05-19T00:02:58.196Z"
 }

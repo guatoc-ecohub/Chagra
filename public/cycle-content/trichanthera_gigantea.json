@@ -17,6 +17,7 @@
     "biomass_producer",
     "nurse_plant"
   ],
+  "companions": [],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
@@ -28,6 +29,8 @@
     "notas": "Especie emblematica para proteccion de nacimientos de agua. Cerca viva tradicional en zonas cafeteras y ganaderas. Hojas forrajeras para rumiantes con alto contenido proteico.",
     "fuente": "Perez Arbelaez 1947; Instituto Humboldt flora alto andina"
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "El nacedero o yátago (Trichanthera gigantea (Bonpl.) Nees) es una acantácea árbol pequeño nativo de los Andes colombianos, ampliamente usado en sistemas silvopastoriles y agroforestales por su alto valor nutricional (proteína cruda 18-22% en hoja fresca) como forraje suplementario para bovinos, porcinos, conejos y aves. Se cultiva en Cundinamarca, Boyacá, Antioquia, Valle del Cauca, Tolima y Eje cafetero entre 0 y 2.000 msnm en zona térmica cálida a templada. Propagación por estaca leñosa (80-95% prendimiento), crecimiento rápido alcanza 3-4 m primer año. Vida productiva 15-25 años con cortes anuales o bianuales. Manejo agroecológico: cercas vivas en linderos, banco proteico forrajero (corte y acarreo), conservación riberas (raíces estabilizadoras), atrayente avifauna. Fuentes Tier A: AGROSAVIA, Catálogo Plantas y Líquenes Colombia (Bernal et al.), POWO Kew, GBIF Backbone Taxonomy.",
   "requirements": {
     "agua": "alto",
     "altitud_msnm": {
@@ -45,24 +48,26 @@
     "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno_a_moderado"
   },
-  "valor_pedagogico": "El nacedero o yátago (Trichanthera gigantea (Bonpl.) Nees) es una acantácea árbol pequeño nativo de los Andes colombianos, ampliamente usado en sistemas silvopastoriles y agroforestales por su alto valor nutricional (proteína cruda 18-22% en hoja fresca) como forraje suplementario para bovinos, porcinos, conejos y aves. Se cultiva en Cundinamarca, Boyacá, Antioquia, Valle del Cauca, Tolima y Eje cafetero entre 0 y 2.000 msnm en zona térmica cálida a templada. Propagación por estaca leñosa (80-95% prendimiento), crecimiento rápido alcanza 3-4 m primer año. Vida productiva 15-25 años con cortes anuales o bianuales. Manejo agroecológico: cercas vivas en linderos, banco proteico forrajero (corte y acarreo), conservación riberas (raíces estabilizadoras), atrayente avifauna. Fuentes Tier A: AGROSAVIA, Catálogo Plantas y Líquenes Colombia (Bernal et al.), POWO Kew, GBIF Backbone Taxonomy.",
   "sources": [
     {
       "id": "perez-arbelaez-1947-plantas-utiles",
       "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
       "url": null
     },
     {
       "id": "humboldt-flora-alto-andina",
       "title": "humboldt-flora-alto-andina",
+      "tier": "A",
       "url": null
     },
     {
       "id": "gbif-taxonomic-backbone",
       "title": "gbif-taxonomic-backbone",
+      "tier": "A",
       "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.101Z"
+  "_generated_at": "2026-05-19T00:02:58.209Z"
 }

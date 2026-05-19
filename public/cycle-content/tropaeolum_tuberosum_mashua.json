@@ -16,12 +16,15 @@
     "crop",
     "pest_repellent"
   ],
+  "companions": [],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
     "metodo_principal": "tuberculo",
     "notas": "Subespecie silvestre de mayor altitud y resistencia a heladas que el cubio. Contenido de isotiocianatos mas alto, lo que le confiere mayor accion nematicida."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "La mashua silvestre (Tropaeolum tuberosum Ruiz & Pav. subsp. silvestre, familia Tropaeolaceae) es una tropaeolácea andina perenne herbácea trepadora-rastrera que produce tubérculos pequeños amargos ricos en isotiocianatos (glucosinolatos hidrolizados) y alcaloides defensivos, considerada parental silvestre de la mashua cultivada precolombina muisca. Se distribuye en Boyacá altiplano (Tunja, Toca, Sotaquirá), Cundinamarca páramo (Sumapaz, Choachí, Cruz Verde), Nariño (Pasto, Yacuanquer) y Cauca entre 2.800 y 3.800 msnm en zona térmica fría a páramo. Ciclo perenne, brote vigoroso post-quema controlada (manejo muisca). Producción tubérculos 0.5-1.5 t/ha en sistemas silvestres. Lección viva: enseña adaptación altitudinal extrema (heladas nocturnas -5°C) y rol de compuestos alelopáticos naturales (isotiocianatos) como repelentes de nematodos del suelo y antifúngicos en la chagra de alta montaña, función ecosistémica clave en rotaciones papa-mashua-quinua. Manejo agroecológico: siembra por tubérculo-semilla a 30 cm sobre camas elevadas, asocio con papa nativa (Solanum tuberosum subsp. andigenum) y quinua (Chenopodium quinoa), cosecha post-floración 8-10 meses, no requiere fertilización química, control natural de patógenos de papa por alelopatía radical. Fuentes Tier A: NRC 1989 Lost Crops of the Incas, AGROSAVIA Tubérculos Andinos, SIB Colombia, POWO Kew, GBIF Backbone Taxonomy.",
   "requirements": {
     "agua": "medio",
     "altitud_msnm": {
@@ -39,19 +42,20 @@
     "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "La mashua silvestre (Tropaeolum tuberosum Ruiz & Pav. subsp. silvestre, familia Tropaeolaceae) es una tropaeolácea andina perenne herbácea trepadora-rastrera que produce tubérculos pequeños amargos ricos en isotiocianatos (glucosinolatos hidrolizados) y alcaloides defensivos, considerada parental silvestre de la mashua cultivada precolombina muisca. Se distribuye en Boyacá altiplano (Tunja, Toca, Sotaquirá), Cundinamarca páramo (Sumapaz, Choachí, Cruz Verde), Nariño (Pasto, Yacuanquer) y Cauca entre 2.800 y 3.800 msnm en zona térmica fría a páramo. Ciclo perenne, brote vigoroso post-quema controlada (manejo muisca). Producción tubérculos 0.5-1.5 t/ha en sistemas silvestres. Lección viva: enseña adaptación altitudinal extrema (heladas nocturnas -5°C) y rol de compuestos alelopáticos naturales (isotiocianatos) como repelentes de nematodos del suelo y antifúngicos en la chagra de alta montaña, función ecosistémica clave en rotaciones papa-mashua-quinua. Manejo agroecológico: siembra por tubérculo-semilla a 30 cm sobre camas elevadas, asocio con papa nativa (Solanum tuberosum subsp. andigenum) y quinua (Chenopodium quinoa), cosecha post-floración 8-10 meses, no requiere fertilización química, control natural de patógenos de papa por alelopatía radical. Fuentes Tier A: NRC 1989 Lost Crops of the Incas, AGROSAVIA Tubérculos Andinos, SIB Colombia, POWO Kew, GBIF Backbone Taxonomy.",
   "sources": [
     {
       "id": "agrosavia-manual-tuberculos-andinos-2017",
       "title": "agrosavia-manual-tuberculos-andinos-2017",
+      "tier": "A",
       "url": null
     },
     {
       "id": "gbif-taxonomic-backbone",
       "title": "gbif-taxonomic-backbone",
+      "tier": "A",
       "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.097Z"
+  "_generated_at": "2026-05-19T00:02:58.198Z"
 }

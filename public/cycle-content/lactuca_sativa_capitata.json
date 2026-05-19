@@ -16,12 +16,19 @@
     "crop",
     "ground_cover"
   ],
+  "companions": [
+    "phaseolus_vulgaris",
+    "solanum_lycopersicum_san_marzano"
+  ],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
     "metodo_principal": "semilla",
     "notas": "Requiere sustrato fino y riego por nebulización en etapas tempranas; trasplante a los 25-30 días."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "La lechuga cogollo morada (Lactuca sativa var. capitata) es una hortaliza de hoja ampliamente cultivada en Colombia, especialmente en departamentos como Cundinamarca (cinturón productivo Choachí-Fómeque), Boyacá, Nariño y Santander, entre 800-3200 msnm en zonas térmicas fría y templada. Su manejo agronómico incluye propagación por semilla en semillero con sustrato fino, riego por nebulización en etapas tempranas, trasplante a los 25-30 días, ciclo de 60-90 días hasta cosecha, y asociaciones beneficiosas con Brassicaceae y Allium para repelencia de pulguilla. Plagas principales: pulgones (Myzus persicae), babosas (Deroceras reticulatum) y minadores (Liriomyza spp.). Culturalmente, aunque no es originaria del contexto muisca, se ha integrado en la agricultura andina contemporánea como cultivo de ciclo corto para seguridad alimentaria. Los cogollos morados deben su pigmentación a las antocianinas, pigmentos que actúan como protección natural contra radiación UV y estrés térmico. Fuente: nrc-1989-cultivos-andinos.",
+  "companions_text": "### Especies asociadas favorables (companions)\n- phaseolus_vulgaris — Frijol arbustivo / voluble (Phaseolus vulgaris L.)\n- solanum_lycopersicum_san_marzano — Tomate San Marzano (Solanum lycopersicum 'San Marzano')",
   "requirements": {
     "agua": "medio",
     "altitud_msnm": {
@@ -39,29 +46,32 @@
     "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "La lechuga cogollo morada (Lactuca sativa var. capitata) es una hortaliza de hoja ampliamente cultivada en Colombia, especialmente en departamentos como Cundinamarca (cinturón productivo Choachí-Fómeque), Boyacá, Nariño y Santander, entre 800-3200 msnm en zonas térmicas fría y templada. Su manejo agronómico incluye propagación por semilla en semillero con sustrato fino, riego por nebulización en etapas tempranas, trasplante a los 25-30 días, ciclo de 60-90 días hasta cosecha, y asociaciones beneficiosas con Brassicaceae y Allium para repelencia de pulguilla. Plagas principales: pulgones (Myzus persicae), babosas (Deroceras reticulatum) y minadores (Liriomyza spp.). Culturalmente, aunque no es originaria del contexto muisca, se ha integrado en la agricultura andina contemporánea como cultivo de ciclo corto para seguridad alimentaria. Los cogollos morados deben su pigmentación a las antocianinas, pigmentos que actúan como protección natural contra radiación UV y estrés térmico. Fuente: nrc-1989-cultivos-andinos.",
   "sources": [
     {
       "id": "gbif-taxonomic-backbone",
       "title": "gbif-taxonomic-backbone",
+      "tier": "A",
       "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
     },
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     },
     {
       "id": "ica-resolucion-3168-2015",
       "title": "ica-resolucion-3168-2015",
+      "tier": "A",
       "url": null
     },
     {
       "id": "nrc-1989-cultivos-andinos",
       "title": "nrc-1989-cultivos-andinos",
+      "tier": "A",
       "url": null
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.093Z"
+  "_generated_at": "2026-05-19T00:02:58.188Z"
 }

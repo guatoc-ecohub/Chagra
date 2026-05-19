@@ -15,21 +15,34 @@
   "roles_in_guild": [
     "crop"
   ],
+  "companions": [
+    "calendula_officinalis",
+    "cymbopogon_citratus",
+    "lactuca_sativa_capitata",
+    "melissa_officinalis",
+    "petroselinum_crispum",
+    "tropaeolum_majus",
+    "urtica_dioica"
+  ],
   "antagonists": [
-    "foeniculum_vulgare",
-    "solanum_phureja",
-    "brassica_oleracea_capitata_alba",
-    "brassica_oleracea_sabauda",
-    "brassica_oleracea_capitata_rubra",
-    "brassica_oleracea_acephala_lacinato",
     "brassica_oleracea_acephala_curly",
-    "brassica_oleracea_acephala_red_russian"
+    "brassica_oleracea_acephala_lacinato",
+    "brassica_oleracea_acephala_red_russian",
+    "brassica_oleracea_capitata_alba",
+    "brassica_oleracea_capitata_rubra",
+    "brassica_oleracea_sabauda",
+    "foeniculum_vulgare",
+    "solanum_phureja"
   ],
   "especies_nativas_sustitutas": [],
   "propagation": {
     "metodo_principal": "semilla",
     "notas": "Crecimiento determinado; cosecha concentrada en un periodo corto."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "El tomate San Marzano (Solanum lycopersicum 'San Marzano') se cultiva en Colombia principalmente en los departamentos de Cundinamarca, Boyacá y Antioquia, entre 1500 y 2400 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con crecimiento determinado y cosecha concentrada en períodos de 5 meses, asociándose beneficiosamente con perejil, citronela, melisa, ortuga y lechuga para reducir presión de plagas como trips y helicoverpa, mientras requiere monitoreo de antagonistas como hinojo y papas andinas. En el contexto campesino andino, esta variedad ha sido adoptada por su alto contenido de sólidos solubles que lo hacen ideal para procesamiento artesanal de salsas y conservas, preservando técnicas de postcosecha transmitidas oralmente en comunidades de la Sabana de Bogotá. Según la taxonomía verificable de GBIF Backbone Taxonomy y Plants of the World Online (POWO), respaldada por el ICA Resolución 3168/2015 y el manual AGROSAVIA Sol Andina, su nombre científico válido es Solanum lycopersicum 'San Marzano'.",
+  "companions_text": "### Especies asociadas favorables (companions)\n- calendula_officinalis — Caléndula (Calendula officinalis L.)\n- cymbopogon_citratus — Limonaria (Cymbopogon citratus (DC.) Stapf)\n- lactuca_sativa_capitata — Lechuga cogollo morada (Lactuca sativa var. capitata L.)\n- melissa_officinalis — Toronjil (Melissa officinalis L.)\n- petroselinum_crispum — Perejil crespo (Petroselinum crispum (Mill.) Fuss)\n- tropaeolum_majus — Capuchina / Taco de reina (Tropaeolum majus L.)\n- urtica_dioica — Ortiga (Urtica dioica L.)",
+  "antagonists_text": "### Antagonistas (no asociar)\n- brassica_oleracea_acephala_curly — Kale rizado verde (Brassica oleracea var. acephala 'Curly')\n- brassica_oleracea_acephala_lacinato — Kale toscano / Cavolo nero (Brassica oleracea var. acephala 'Lacinato')\n- brassica_oleracea_acephala_red_russian — Kale morado / Red Russian (Brassica oleracea var. acephala 'Red Russian')\n- brassica_oleracea_capitata_alba — Repollo blanco (Brassica oleracea var. capitata L.)\n- brassica_oleracea_capitata_rubra — Repollo morado (Brassica oleracea var. capitata f. rubra)\n- brassica_oleracea_sabauda — Repollo rizado / Savoy (Brassica oleracea var. sabauda L.)\n- foeniculum_vulgare — Hinojo (Foeniculum vulgare Mill.)\n- solanum_phureja — Papa criolla (Solanum phureja Juz. & Bukasov)",
   "requirements": {
     "agua": "medio",
     "altitud_msnm": {
@@ -47,29 +60,32 @@
     "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "El tomate San Marzano (Solanum lycopersicum 'San Marzano') se cultiva en Colombia principalmente en los departamentos de Cundinamarca, Boyacá y Antioquia, entre 1500 y 2400 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con crecimiento determinado y cosecha concentrada en períodos de 5 meses, asociándose beneficiosamente con perejil, citronela, melisa, ortuga y lechuga para reducir presión de plagas como trips y helicoverpa, mientras requiere monitoreo de antagonistas como hinojo y papas andinas. En el contexto campesino andino, esta variedad ha sido adoptada por su alto contenido de sólidos solubles que lo hacen ideal para procesamiento artesanal de salsas y conservas, preservando técnicas de postcosecha transmitidas oralmente en comunidades de la Sabana de Bogotá. Según la taxonomía verificable de GBIF Backbone Taxonomy y Plants of the World Online (POWO), respaldada por el ICA Resolución 3168/2015 y el manual AGROSAVIA Sol Andina, su nombre científico válido es Solanum lycopersicum 'San Marzano'.",
   "sources": [
     {
       "id": "gbif-taxonomic-backbone",
       "title": "gbif-taxonomic-backbone",
+      "tier": "A",
       "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
     },
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     },
     {
       "id": "agrosavia-sol-andina",
       "title": "agrosavia-sol-andina",
+      "tier": "A",
       "url": "https://www.agrosavia.co"
     },
     {
       "id": "ica-resolucion-3168-2015",
       "title": "ica-resolucion-3168-2015",
+      "tier": "A",
       "url": null
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.095Z"
+  "_generated_at": "2026-05-19T00:02:58.194Z"
 }

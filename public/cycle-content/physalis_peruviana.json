@@ -16,6 +16,7 @@
     "crop",
     "pollinator_attractor"
   ],
+  "companions": [],
   "antagonists": [
     "vaccinium_corymbosum_biloxi"
   ],
@@ -24,6 +25,9 @@
     "metodo_principal": "semilla",
     "notas": "Planta perenne de corta vida (2-3 años productivos); requiere tutorado para facilitar la cosecha y evitar hongos por humedad."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "La uchuva (Physalis peruviana L.) es una solanácea perenne nativa de los Andes ahora cultivada comercialmente para exportación. Colombia es el principal exportador mundial con cerca de 1.000 hectáreas en Cundinamarca (Granada, Silvania, Pasca), Boyacá (Ventaquemada), Antioquia (Sonsón) y Nariño entre 1.800 y 2.800 msnm en zona térmica fría a templada. La variedad AGROSAVIA Andina es la más adoptada, con ciclo productivo 8-10 meses y rendimientos 18-25 t/ha. Crece como arbusto perenne con cáliz papiráceo que envuelve la baya naranja madura. Manejo agroecológico: tutorado vertical, poda de formación, manejo integrado de Tuta absoluta (polilla) y Liriomyza huidobrensis (minador hoja) con biopreparados como BT y purín de ortiga, fertilización con bocashi + biol. Fuentes Tier A: AGROSAVIA Manual Uchuva, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone.",
+  "antagonists_text": "### Antagonistas (no asociar)\n- vaccinium_corymbosum_biloxi — Arándano Biloxi (Vaccinium corymbosum 'Biloxi')",
   "requirements": {
     "agua": "medio",
     "altitud_msnm": {
@@ -41,24 +45,26 @@
     "radiacion": "sol_pleno",
     "drenaje_requerido": "excelente"
   },
-  "valor_pedagogico": "La uchuva (Physalis peruviana L.) es una solanácea perenne nativa de los Andes ahora cultivada comercialmente para exportación. Colombia es el principal exportador mundial con cerca de 1.000 hectáreas en Cundinamarca (Granada, Silvania, Pasca), Boyacá (Ventaquemada), Antioquia (Sonsón) y Nariño entre 1.800 y 2.800 msnm en zona térmica fría a templada. La variedad AGROSAVIA Andina es la más adoptada, con ciclo productivo 8-10 meses y rendimientos 18-25 t/ha. Crece como arbusto perenne con cáliz papiráceo que envuelve la baya naranja madura. Manejo agroecológico: tutorado vertical, poda de formación, manejo integrado de Tuta absoluta (polilla) y Liriomyza huidobrensis (minador hoja) con biopreparados como BT y purín de ortiga, fertilización con bocashi + biol. Fuentes Tier A: AGROSAVIA Manual Uchuva, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone.",
   "sources": [
     {
       "id": "agrosavia-manual-uchuva-2015",
       "title": "agrosavia-manual-uchuva-2015",
+      "tier": "A",
       "url": null
     },
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     },
     {
       "id": "agrosavia-leguminosas-andinas",
       "title": "agrosavia-leguminosas-andinas",
+      "tier": "A",
       "url": null
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.094Z"
+  "_generated_at": "2026-05-19T00:02:58.191Z"
 }

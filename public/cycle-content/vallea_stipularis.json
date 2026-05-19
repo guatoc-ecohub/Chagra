@@ -16,6 +16,7 @@
     "pollinator_attractor",
     "biomass_producer"
   ],
+  "companions": [],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
@@ -28,6 +29,8 @@
     "tiempo_a_establecimiento_dias": 90,
     "notas": "Arbol de crecimiento medio. Flores rosadas atraen polinizadores nativos. Madera usada tradicionalmente para cabos de herramientas."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "Arbol nativo del bosque alto andino. Sus flores rosadas alimentan colibries y abejas nativas. Madera usada tradicionalmente para herramientas rurales. Especie ideal para restauracion de bordes de paramo.",
   "requirements": {
     "agua": "medio",
     "altitud_msnm": {
@@ -45,29 +48,32 @@
     "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "Arbol nativo del bosque alto andino. Sus flores rosadas alimentan colibries y abejas nativas. Madera usada tradicionalmente para herramientas rurales. Especie ideal para restauracion de bordes de paramo.",
   "sources": [
     {
       "id": "humboldt-flora-alto-andina",
       "title": "humboldt-flora-alto-andina",
+      "tier": "A",
       "url": null
     },
     {
       "id": "bernal-2015-plantas-liquenes-colombia",
       "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
       "url": "http://catalogoplantasdecolombia.unal.edu.co"
     },
     {
       "id": "sib-colombia",
       "title": "sib-colombia",
+      "tier": "A",
       "url": "https://sibcolombia.net"
     },
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.099Z"
+  "_generated_at": "2026-05-19T00:02:58.204Z"
 }

@@ -16,12 +16,15 @@
     "biomass_producer",
     "ground_cover"
   ],
+  "companions": [],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
     "metodo_principal": "rizoma",
     "notas": "Se propaga por fragmentos de rizoma sembrados en sustrato humedo. Crece en bordes de rios y quebradas del tropico humedo. Usada como diuretico y antiinflamatorio en medicina tradicional."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "La caña agria o caña de jabalí (Costus spicatus (Jacq.) Sw., familia Costaceae) es una costácea herbácea perenne rizomatosa (1-2.5 m altura) nativa del Neotropico (Caribe, Mesoamérica, norte de Sudamérica), distribuida en sotobosques de selva húmeda tropical, bordes de ríos y quebradas del trópico húmedo colombiano. Su tallo aéreo helicoidal característico (filotaxia espiralada-monistica diagnóstica de Costaceae frente a la dística de Zingiberaceae), hojas elípticas oblongas con vaina ciliada y espigas terminales conspicuas con brácteas rojas y flores tubulares amarillas, son rasgos diagnósticos. Sus tallos jugosos contienen ácidos orgánicos (cítrico, málico), saponinas (diosgenina), flavonoides y mucílagos responsables del sabor ácido y propiedades medicinales documentadas (diurético, antiinflamatorio, hipotensor leve). Se distribuye en Chocó (Quibdó, Atrato, Baudó), Valle del Cauca (Buenaventura, Bajo Calima), Cauca (Guapi, Timbiquí), Nariño (Tumaco, Mosquera, Olaya Herrera), Amazonas (Leticia, Puerto Nariño), Vaupés, Caquetá (Florencia, Solano), Putumayo (Mocoa, Puerto Asís) y zonas del Magdalena medio bajas entre 50 y 400 msnm en zona térmica cálida húmeda. Ciclo perenne, floración continua en clima húmedo estable. Lección viva: planta medicinal emblemática del trópico húmedo colombiano cuyos tallos agrios se usan como diurético natural y antiinflamatorio en macerados acuosos, infusiones y cocciones por comunidades afrocolombianas e indígenas, enseñando el conocimiento botánico tradicional de las comunidades ribereñas del Pacífico y Amazonia colombiana y el rol del sotobosque húmedo como farmacopea viva. Manejo agroecológico: propagación facilísima por fragmentos de rizoma de 15-20 cm con yemas activas sembrados en sustrato rico en materia orgánica y humedad alta, tolerancia a sombra parcial (40-70%), asocio con plátano, cacao y heliconias en huerta tropical, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia, SINCHI Amazonia Colombiana.",
   "requirements": {
     "agua": "alto",
     "altitud_msnm": {
@@ -39,44 +42,50 @@
     "radiacion": "sombra_parcial",
     "drenaje_requerido": "bueno_a_moderado"
   },
-  "valor_pedagogico": "La caña agria o caña de jabalí (Costus spicatus (Jacq.) Sw., familia Costaceae) es una costácea herbácea perenne rizomatosa (1-2.5 m altura) nativa del Neotropico (Caribe, Mesoamérica, norte de Sudamérica), distribuida en sotobosques de selva húmeda tropical, bordes de ríos y quebradas del trópico húmedo colombiano. Su tallo aéreo helicoidal característico (filotaxia espiralada-monistica diagnóstica de Costaceae frente a la dística de Zingiberaceae), hojas elípticas oblongas con vaina ciliada y espigas terminales conspicuas con brácteas rojas y flores tubulares amarillas, son rasgos diagnósticos. Sus tallos jugosos contienen ácidos orgánicos (cítrico, málico), saponinas (diosgenina), flavonoides y mucílagos responsables del sabor ácido y propiedades medicinales documentadas (diurético, antiinflamatorio, hipotensor leve). Se distribuye en Chocó (Quibdó, Atrato, Baudó), Valle del Cauca (Buenaventura, Bajo Calima), Cauca (Guapi, Timbiquí), Nariño (Tumaco, Mosquera, Olaya Herrera), Amazonas (Leticia, Puerto Nariño), Vaupés, Caquetá (Florencia, Solano), Putumayo (Mocoa, Puerto Asís) y zonas del Magdalena medio bajas entre 50 y 400 msnm en zona térmica cálida húmeda. Ciclo perenne, floración continua en clima húmedo estable. Lección viva: planta medicinal emblemática del trópico húmedo colombiano cuyos tallos agrios se usan como diurético natural y antiinflamatorio en macerados acuosos, infusiones y cocciones por comunidades afrocolombianas e indígenas, enseñando el conocimiento botánico tradicional de las comunidades ribereñas del Pacífico y Amazonia colombiana y el rol del sotobosque húmedo como farmacopea viva. Manejo agroecológico: propagación facilísima por fragmentos de rizoma de 15-20 cm con yemas activas sembrados en sustrato rico en materia orgánica y humedad alta, tolerancia a sombra parcial (40-70%), asocio con plátano, cacao y heliconias en huerta tropical, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia, SINCHI Amazonia Colombiana.",
   "sources": [
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     },
     {
       "id": "gbif-taxonomic-backbone",
       "title": "gbif-taxonomic-backbone",
+      "tier": "A",
       "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
     },
     {
       "id": "gbif-colombia",
       "title": "gbif-colombia",
+      "tier": "A",
       "url": "https://www.gbif.org/country/CO"
     },
     {
       "id": "bernal-2015-plantas-liquenes-colombia",
       "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
       "url": "http://catalogoplantasdecolombia.unal.edu.co"
     },
     {
       "id": "sib-colombia",
       "title": "sib-colombia",
+      "tier": "A",
       "url": "https://sibcolombia.net"
     },
     {
       "id": "sinchi-amazonia-colombiana",
       "title": "sinchi-amazonia-colombiana",
+      "tier": "A",
       "url": null
     },
     {
       "id": "jbb-plantas-medicinales",
       "title": "jbb-plantas-medicinales",
+      "tier": "A",
       "url": null
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.100Z"
+  "_generated_at": "2026-05-19T00:02:58.207Z"
 }

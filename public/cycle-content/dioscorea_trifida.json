@@ -16,12 +16,15 @@
     "crop",
     "ground_cover"
   ],
+  "companions": [],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
     "metodo_principal": "tuberculo",
     "notas": "Propagacion por secciones de tuberculo con yemas o por bulbillos aereos. Requiere sustrato suelto y profundo."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "El ñame trifoliado o cush-cush (Dioscorea trifida L.f.) es una dioscoreácea perenne trepadora cultivada por sus tubérculos comestibles ricos en almidón (~20% peso fresco), tradicional en la cocina afrocolombiana de las costas Pacífica y Atlántica. Se cultiva en zonas cálidas y templadas bajas: Chocó (Quibdó, Tadó), Valle del Cauca, Cauca (Buenaventura), Magdalena, Bolívar y Cesar entre 0 y 1.500 msnm en zona térmica cálida. Propagación por trozos de tubérculo o cabeza. Ciclo 8-10 meses a cosecha; rendimientos 8-15 t/ha. Crecimiento trepador exige tutorado con varas o árboles vivos. Manejo agroecológico: asocio con yuca, plátano y maíz en sistemas multipiso, fertilización orgánica al fondo (bocashi), control de gorgojo (Cyrtomenus bergi) con manejo cultural y rotación. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy, Catálogo Plantas y Líquenes Colombia.",
   "requirements": {
     "agua": "medio",
     "altitud_msnm": {
@@ -39,19 +42,20 @@
     "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "El ñame trifoliado o cush-cush (Dioscorea trifida L.f.) es una dioscoreácea perenne trepadora cultivada por sus tubérculos comestibles ricos en almidón (~20% peso fresco), tradicional en la cocina afrocolombiana de las costas Pacífica y Atlántica. Se cultiva en zonas cálidas y templadas bajas: Chocó (Quibdó, Tadó), Valle del Cauca, Cauca (Buenaventura), Magdalena, Bolívar y Cesar entre 0 y 1.500 msnm en zona térmica cálida. Propagación por trozos de tubérculo o cabeza. Ciclo 8-10 meses a cosecha; rendimientos 8-15 t/ha. Crecimiento trepador exige tutorado con varas o árboles vivos. Manejo agroecológico: asocio con yuca, plátano y maíz en sistemas multipiso, fertilización orgánica al fondo (bocashi), control de gorgojo (Cyrtomenus bergi) con manejo cultural y rotación. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy, Catálogo Plantas y Líquenes Colombia.",
   "sources": [
     {
       "id": "agrosavia-manual-tuberculos-andinos-2017",
       "title": "agrosavia-manual-tuberculos-andinos-2017",
+      "tier": "A",
       "url": null
     },
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.097Z"
+  "_generated_at": "2026-05-19T00:02:58.198Z"
 }

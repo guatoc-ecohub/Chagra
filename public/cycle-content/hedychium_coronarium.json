@@ -4,7 +4,7 @@
   "common_names": [
     "Matandrea"
   ],
-  "family": "Parsing Zingiberaceae",
+  "family": "Zingiberaceae",
   "category": "especies_invasoras",
   "cultivable": false,
   "conservation_status": "invasor",
@@ -15,12 +15,21 @@
   "roles_in_guild": [
     "invasive"
   ],
+  "companions": [],
   "antagonists": [],
-  "especies_nativas_sustitutas": [],
+  "especies_nativas_sustitutas": [
+    "buddleja_americana",
+    "costus_spicatus",
+    "renealmia_alpinia",
+    "salix_humboldtiana",
+    "trichanthera_gigantea"
+  ],
   "propagation": {
     "metodo_principal": "rizoma",
-    "notas": "Extracción TOTAL del rizoma; cualquier fragmento puede iniciar una nueva invasión rí abajo."
+    "notas": "Extracción TOTAL del rizoma; cualquier fragmento puede iniciar una nueva invasión río abajo."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "SE BUSCA: La 'Invasora de Quebradas'. El lirio jengibre o mariposa blanca (Hedychium coronarium J. König, familia Zingiberaceae) es una invasora del SE Asia tropical introducida en Colombia como ornamental por sus flores blancas fragantes que recuerdan mariposas. Se naturaliza agresivamente en riberas, quebradas, humedales y bordes de bosque húmedo entre 800 y 2.800 msnm. Se distribuye invadiendo Cundinamarca (Choachí, La Calera, Sabana Bogotá), Antioquia, Eje cafetero, Valle del Cauca y Tolima en zona térmica templada a fría. Forma matas densas vía rizomas vigorosos que asfixian la regeneración nativa ribereña, alteran la dinámica hidrológica (acumulan sedimento y restringen flujo) y desplazan flora riparia clave para fauna acuática. Si ves una 'mariposa blanca' en la orilla de quebrada, ¡es una alarma ecológica! Manejo: arranque manual con rizoma completo (NUNCA dejar fragmentos viables) + monitoreo trianual, prohibición jardinería en zonas de quebrada. Listada Res. 684/2018 MADS. Fuentes Tier A: Humboldt Invasoras Andes, Resolución 684/2018 MADS, POWO Kew, GBIF Backbone Taxonomy.",
   "requirements": {
     "agua": "alto",
     "altitud_msnm": {
@@ -38,24 +47,44 @@
     "radiacion": "sombra_parcial",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "SE BUSCA: La 'Invasora de Quebradas'. El lirio jengibre o mariposa blanca (Hedychium coronarium J. König, familia Zingiberaceae) es una invasora del SE Asia tropical introducida en Colombia como ornamental por sus flores blancas fragantes que recuerdan mariposas. Se naturaliza agresivamente en riberas, quebradas, humedales y bordes de bosque húmedo entre 800 y 2.800 msnm. Se distribuye invadiendo Cundinamarca (Choachí, La Calera, Sabana Bogotá), Antioquia, Eje cafetero, Valle del Cauca y Tolima en zona térmica templada a fría. Forma matas densas vía rizomas vigorosos que asfixian la regeneración nativa ribereña, alteran la dinámica hidrológica (acumulan sedimento y restringen flujo) y desplazan flora riparia clave para fauna acuática. Si ves una 'mariposa blanca' en la orilla de quebrada, ¡es una alarma ecológica! Manejo: arranque manual con rizoma completo (NUNCA dejar fragmentos viables) + monitoreo trianual, prohibición jardinería en zonas de quebrada. Listada Res. 684/2018 MADS. Fuentes Tier A: Humboldt Invasoras Andes, Resolución 684/2018 MADS, POWO Kew, GBIF Backbone Taxonomy.",
   "sources": [
     {
       "id": "humboldt-invasoras-andes",
       "title": "humboldt-invasoras-andes",
+      "tier": "A",
       "url": null
     },
     {
       "id": "res-684-2018-mads",
       "title": "res-684-2018-mads",
+      "tier": "A",
       "url": null
+    },
+    {
+      "id": "issg-uicn-invasoras",
+      "title": "issg-uicn-invasoras",
+      "tier": "A",
+      "url": "http://www.iucngisd.org"
     },
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.093Z"
+  "_generated_at": "2026-05-19T00:02:58.188Z"
 }

@@ -17,6 +17,15 @@
     "crop",
     "biomass_producer"
   ],
+  "companions": [
+    "chenopodium_quinoa",
+    "lupinus_mutabilis",
+    "mucuna_pruriens",
+    "phaseolus_vulgaris",
+    "solanum_phureja",
+    "trifolium_repens",
+    "vicia_sativa"
+  ],
   "antagonists": [
     "foeniculum_vulgare"
   ],
@@ -28,6 +37,10 @@
     "best_method": "semilla sexual",
     "notas": "Siembra directa en sitio definitivo."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "Lección de Milpa: el maíz criollo andino (Zea mays L.) se cultiva en el altiplano cundiboyacense y Nariño entre 1800-2800 msnm en zonas frío-templadas. Las variedades 'Capio', 'Pira' y 'Cusco' son patrimonios genéticos muiscas. Ciclo de 6 meses, propagación por semilla directa. En asociación tradicional milpa (frijol+calabaza) se emplea manejo integrado de Spodoptera frugiperda y Puccinia sorghi. Fuente: NRC (1989) Cultivos Andinos, AGROSAVIA, ICA Res. 3168/2015.",
+  "companions_text": "### Especies asociadas favorables (companions)\n- chenopodium_quinoa — Quinua (Chenopodium quinoa Willd.)\n- lupinus_mutabilis — Chocho / Tarwi (Lupinus mutabilis Sweet)\n- mucuna_pruriens — Frijol terciopelo (Mucuna pruriens (L.) DC.)\n- phaseolus_vulgaris — Frijol arbustivo / voluble (Phaseolus vulgaris L.)\n- solanum_phureja — Papa criolla (Solanum phureja Juz. & Bukasov)\n- trifolium_repens — Trébol blanco (Trifolium repens L.)\n- vicia_sativa — Veza común (Vicia sativa L.)",
+  "antagonists_text": "### Antagonistas (no asociar)\n- foeniculum_vulgare — Hinojo (Foeniculum vulgare Mill.)",
   "requirements": {
     "agua": "medio",
     "altitud_msnm": {
@@ -45,34 +58,38 @@
     "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "Lección de Milpa: el maíz criollo andino (Zea mays L.) se cultiva en el altiplano cundiboyacense y Nariño entre 1800-2800 msnm en zonas frío-templadas. Las variedades 'Capio', 'Pira' y 'Cusco' son patrimonios genéticos muiscas. Ciclo de 6 meses, propagación por semilla directa. En asociación tradicional milpa (frijol+calabaza) se emplea manejo integrado de Spodoptera frugiperda y Puccinia sorghi. Fuente: NRC (1989) Cultivos Andinos, AGROSAVIA, ICA Res. 3168/2015.",
   "sources": [
     {
       "id": "agrosavia-manual-biopreparados-2015",
       "title": "agrosavia-manual-biopreparados-2015",
+      "tier": "A",
       "url": null
     },
     {
       "id": "gbif-taxonomic-backbone",
       "title": "gbif-taxonomic-backbone",
+      "tier": "A",
       "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
     },
     {
       "id": "ica-resolucion-3168-2015",
       "title": "ica-resolucion-3168-2015",
+      "tier": "A",
       "url": null
     },
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     },
     {
       "id": "nrc-1989-cultivos-andinos",
       "title": "nrc-1989-cultivos-andinos",
+      "tier": "A",
       "url": null
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.096Z"
+  "_generated_at": "2026-05-19T00:02:58.197Z"
 }

@@ -18,12 +18,18 @@
     "biomass_producer",
     "windbreak"
   ],
+  "companions": [
+    "solanum_lycopersicum_san_marzano"
+  ],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
     "metodo_principal": "division_rizoma",
     "notas": "Se propaga mediante el trasplante de 'hijos' (macollos) de la corona."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "Gramínea aromática tropical presente en departamentos cálidos y templados de Colombia como Cundinamarca (0-2400 msnm, zonas térmicas cálido, templado y frío). Se propaga fácilmente por división de matas o rizomas, formando densos tocuyos que requieren poda periódica para renovar tallos y maximizar producción de aceite esencial rico en citral (75-85%, compuesto por citronelal y geraniol). En contextos campesinos andinos, su infusión se usa tradicionalmente como antiespasmódico y digestivo, mientras su aroma cítrico actúa como repelente natural de mosquitos y otros insectos. Cultivada en asociación con hortalizas y como barrera antiviento en huertos familiares, contribuye al manejo ecológico de plagas sin insumos químicos. Fuente: GBIF Backbone Taxonomy y Plants of the World Online confirman su distribución neotropical y sinonimia taxonómica aceptada.",
+  "companions_text": "### Especies asociadas favorables (companions)\n- solanum_lycopersicum_san_marzano — Tomate San Marzano (Solanum lycopersicum 'San Marzano')",
   "requirements": {
     "agua": "medio",
     "altitud_msnm": {
@@ -41,24 +47,26 @@
     "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "Gramínea aromática tropical presente en departamentos cálidos y templados de Colombia como Cundinamarca (0-2400 msnm, zonas térmicas cálido, templado y frío). Se propaga fácilmente por división de matas o rizomas, formando densos tocuyos que requieren poda periódica para renovar tallos y maximizar producción de aceite esencial rico en citral (75-85%, compuesto por citronelal y geraniol). En contextos campesinos andinos, su infusión se usa tradicionalmente como antiespasmódico y digestivo, mientras su aroma cítrico actúa como repelente natural de mosquitos y otros insectos. Cultivada en asociación con hortalizas y como barrera antiviento en huertos familiares, contribuye al manejo ecológico de plagas sin insumos químicos. Fuente: GBIF Backbone Taxonomy y Plants of the World Online confirman su distribución neotropical y sinonimia taxonómica aceptada.",
   "sources": [
     {
       "id": "gbif-taxonomic-backbone",
       "title": "gbif-taxonomic-backbone",
+      "tier": "A",
       "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
     },
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     },
     {
       "id": "perez-arbelaez-1947-plantas-utiles",
       "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
       "url": null
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.092Z"
+  "_generated_at": "2026-05-19T00:02:58.186Z"
 }

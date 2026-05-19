@@ -16,12 +16,15 @@
     "pollinator_attractor",
     "nurse_plant"
   ],
+  "companions": [],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
     "metodo_principal": "semilla",
     "notas": "Especie nativa de crecimiento lento; no se cultiva comercialmente. Sus frutos son consumidos por aves y mamiferos dispersores del bosque altoandino."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "El falso durazno: sus frutos recuerdan al durazno europeo pero pertenecen a un genero nativo andino. Ensea la diferencia entre especies nativas y exoticas, y como los nombres populares a veces confunden.",
   "requirements": {
     "agua": "medio",
     "altitud_msnm": {
@@ -39,29 +42,32 @@
     "radiacion": "sol_pleno",
     "drenaje_requerido": "bueno"
   },
-  "valor_pedagogico": "El falso durazno: sus frutos recuerdan al durazno europeo pero pertenecen a un genero nativo andino. Ensea la diferencia entre especies nativas y exoticas, y como los nombres populares a veces confunden.",
   "sources": [
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     },
     {
       "id": "gbif-colombia",
       "title": "gbif-colombia",
+      "tier": "A",
       "url": "https://www.gbif.org/country/CO"
     },
     {
       "id": "humboldt-flora-alto-andina",
       "title": "humboldt-flora-alto-andina",
+      "tier": "A",
       "url": null
     },
     {
       "id": "uicn-red-list",
       "title": "uicn-red-list",
+      "tier": "A",
       "url": "https://www.iucnredlist.org"
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.098Z"
+  "_generated_at": "2026-05-19T00:02:58.201Z"
 }

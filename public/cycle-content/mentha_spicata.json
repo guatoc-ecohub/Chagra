@@ -18,12 +18,15 @@
     "pest_repellent",
     "ground_cover"
   ],
+  "companions": [],
   "antagonists": [],
   "especies_nativas_sustitutas": [],
   "propagation": {
     "metodo_principal": "estolon",
     "notas": "Muy invasiva; se recomienda controlar su crecimiento mediante barreras físicas o macetas."
   },
+  "feeding_plan_template": null,
+  "valor_pedagogico": "La Mentha spicata (Labiada aromática) se cultiva perenne en huertas de Cundinamarca entre 500-2600 msnm en zonas térmicas cálidas, templadas y frías. Su propagación se realiza mediante esquejes y estolones, requiere control de invasividad mediante barreras físicas y se asocia beneficiosamente con tomate y repollo al repeler pulgón. En contexto campesino andino, su infusión digestiva (té de menta) se usa tradicionalmente para aliviar molestias gastrointestinales, aprovechando su aceite esencial rico en carvona y limoneno. Fuente taxonómica validada por GBIF Backbone Taxonomy y Plants of the World Online (POWO).",
   "requirements": {
     "agua": "alto",
     "altitud_msnm": {
@@ -41,29 +44,32 @@
     "radiacion": "sombra_parcial",
     "drenaje_requerido": "medio"
   },
-  "valor_pedagogico": "La Mentha spicata (Labiada aromática) se cultiva perenne en huertas de Cundinamarca entre 500-2600 msnm en zonas térmicas cálidas, templadas y frías. Su propagación se realiza mediante esquejes y estolones, requiere control de invasividad mediante barreras físicas y se asocia beneficiosamente con tomate y repollo al repeler pulgón. En contexto campesino andino, su infusión digestiva (té de menta) se usa tradicionalmente para aliviar molestias gastrointestinales, aprovechando su aceite esencial rico en carvona y limoneno. Fuente taxonómica validada por GBIF Backbone Taxonomy y Plants of the World Online (POWO).",
   "sources": [
     {
       "id": "gbif-taxonomic-backbone",
       "title": "gbif-taxonomic-backbone",
+      "tier": "A",
       "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
     },
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     },
     {
       "id": "perez-arbelaez-1947-plantas-utiles",
       "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
       "url": null
     },
     {
       "id": "jbb-plantas-medicinales",
       "title": "jbb-plantas-medicinales",
+      "tier": "A",
       "url": null
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.094Z"
+  "_generated_at": "2026-05-19T00:02:58.190Z"
 }
