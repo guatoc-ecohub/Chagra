@@ -900,7 +900,7 @@ const PhotoGallery = ({ photos, onAdd, onRemove }) => {
   );
 };
 
-export default function CaseStudyDetail({ caseId, onBack }) {
+export default function CaseStudyDetail({ caseId, onBack, onHome }) {
   // 2026-05-18: NO usar `s.getById(caseId)` en selector — devuelve nuevo
   // objeto cada render (withExtendedDefaults hace spread) → React #185
   // (Maximum update depth). Seleccionar el raw case desde `cases` (ref
@@ -936,7 +936,7 @@ export default function CaseStudyDetail({ caseId, onBack }) {
 
   if (!c) {
     return (
-      <ScreenShell title="Caso no encontrado" icon={FileText} onBack={onBack}>
+      <ScreenShell title="Caso no encontrado" icon={FileText} onBack={onBack} onHome={onHome}>
         <div className="flex-1 flex items-center justify-center text-slate-500">
           ID inválido o caso eliminado.
         </div>
@@ -958,7 +958,7 @@ export default function CaseStudyDetail({ caseId, onBack }) {
   const subject = c.subject || {};
 
   return (
-    <ScreenShell title={c.title || 'Caso de estudio'} icon={FileText} onBack={onBack}>
+    <ScreenShell title={c.title || 'Caso de estudio'} icon={FileText} onBack={onBack} onHome={onHome}>
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {/* Header status */}
         <section className="p-4 rounded-xl bg-slate-900 border border-slate-800">

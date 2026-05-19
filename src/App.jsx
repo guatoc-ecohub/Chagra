@@ -370,13 +370,13 @@ export default function App() {
         return <TaskScreen onBack={() => navigate('task_log')} onSave={showToast} initialData={currentViewData?.task || currentViewData} />;
       case 'javier':
         return (
-          <ScreenShell title={`Campo, ${PRIMARY_WORKER_NAME}`} icon={Eye} onBack={() => navigate('dashboard')}>
+          <ScreenShell title={`Campo, ${PRIMARY_WORKER_NAME}`} icon={Eye} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
             <WorkerDashboard />
           </ScreenShell>
         );
       case 'mapa':
         return (
-          <ScreenShell title="Mapa de la Finca" icon={MapPin} onBack={() => navigate('dashboard')}>
+          <ScreenShell title="Mapa de la Finca" icon={MapPin} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
             <FarmMap onAssetClick={(id) => {
               useAssetStore.getState().setSelectedAsset(id);
               navigate('activos');
@@ -387,30 +387,31 @@ export default function App() {
         return <AssetsDashboard onBack={() => navigate('dashboard')} />;
       case 'bodega':
         return (
-          <ScreenShell title="Bodega" icon={Package} onBack={() => navigate('dashboard')}>
+          <ScreenShell title="Bodega" icon={Package} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
             <InventoryDashboard />
           </ScreenShell>
         );
       case 'informes':
-        return <InformesScreen onBack={() => navigate('dashboard')} />;
+        return <InformesScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />;
       case 'historial':
         return <WorkerHistory onBack={() => navigate('dashboard')} onEntryClick={(entry) => navigate('bitacora_detail', { entry })} />;
       case 'bitacora_detail':
         return <BitacoraEntryDetail entry={currentViewData?.entry || currentViewData} onBack={() => navigate('historial')} onEdit={(entry) => navigate('edit_task', { task: entry })} />;
       case 'biodiversidad':
-        return <BiodiversidadView onBack={() => navigate('dashboard')} />;
+        return <BiodiversidadView onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />;
       case 'voz':
         return (
-          <ScreenShell title="Registro por voz" icon={Mic} onBack={() => navigate('dashboard')}>
+          <ScreenShell title="Registro por voz" icon={Mic} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
             <VoiceCapture onSave={showToast} />
           </ScreenShell>
         );
       case 'perfil':
-        return <ProfileScreen onBack={() => navigate('dashboard')} />;
+        return <ProfileScreen onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />;
       case 'casos':
         return (
           <CaseStudyScreen
             onBack={() => navigate('dashboard')}
+            onHome={() => navigate('dashboard')}
             onSelectCase={(id) => navigate('caso_detail', { caseId: id })}
           />
         );
@@ -419,6 +420,7 @@ export default function App() {
           <CaseStudyDetail
             caseId={currentViewData?.caseId}
             onBack={() => navigate('casos')}
+            onHome={() => navigate('dashboard')}
           />
         );
       case 'help':

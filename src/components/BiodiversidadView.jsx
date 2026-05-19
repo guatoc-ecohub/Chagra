@@ -41,7 +41,7 @@ const STRATA = [
 // quedar en blanco.
 const CATALOG_LOAD_TIMEOUT_MS = 2000;
 
-export default function BiodiversidadView({ onBack }) {
+export default function BiodiversidadView({ onBack, onHome }) {
   const plants = useAssetStore((s) => s.plants || []);
   const [speciesIndex, setSpeciesIndex] = useState(() => new Map());
 
@@ -97,7 +97,7 @@ export default function BiodiversidadView({ onBack }) {
   };
 
   return (
-    <ScreenShell title="Biodiversidad" icon={Leaf} onBack={onBack}>
+    <ScreenShell title="Biodiversidad" icon={Leaf} onBack={onBack} onHome={onHome}>
       <div
         className="min-h-full p-4 flex flex-col gap-4"
         style={customBgStyle}
