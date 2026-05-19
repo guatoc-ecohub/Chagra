@@ -36,10 +36,10 @@
  * uno específico, borrarlo primero.
  */
 
-import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CATALOG_PATH = join(__dirname, '..', 'catalog', 'chagra-catalog-seed-v3.1.json');
@@ -145,8 +145,10 @@ function main() {
   if (skippedNoId > 0) console.log(`[cycle-content-etl] Skipped (sin id): ${skippedNoId}`);
 
   // Regenerar manifest tras agregar archivos.
+  // execFileSync con args array evita CodeQL js/shell-command-injection
+  // (MANIFEST_SCRIPT es path local controlado, pero shell interpolation gatilla alerta).
   console.log('[cycle-content-etl] Regenerando manifest.json...');
-  execSync(`node ${MANIFEST_SCRIPT}`, { stdio: 'inherit' });
+  execFileSync('node', [MANIFEST_SCRIPT], { stdio: 'inherit' });
 }
 
 main();
