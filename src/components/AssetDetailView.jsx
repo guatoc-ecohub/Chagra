@@ -26,7 +26,17 @@ function deriveSpeciesSlug(name) {
 
 // Bug 2026-05-18: agregar foto a planta ya creada (post-registro).
 // Dual options cámara + galería + savePhoto al assetId/speciesSlug.
-function AddPhotoSection({ assetId, speciesSlug }) {
+// 2026-05-18 (operator bug ~23h): 'me sale algo de planta cuando subo
+// foto al invernadero'. Causa: título hardcoded 'Agregar foto a esta
+// planta'. Fix: prop assetType para título dinámico según tipo.
+const PHOTO_LABELS = {
+  plant: 'Agregar foto a esta planta',
+  land: 'Agregar foto a esta zona',
+  structure: 'Agregar foto a esta estructura',
+  equipment: 'Agregar foto a este equipo',
+  default: 'Agregar foto',
+};
+function AddPhotoSection({ assetId, speciesSlug, assetType }) {
   const [busy, setBusy] = useState(false);
   const [success, setSuccess] = useState(false);
   const cameraRef = React.useRef(null);
@@ -54,7 +64,7 @@ function AddPhotoSection({ assetId, speciesSlug }) {
   return (
     <section className="rounded-xl border border-slate-700/50 bg-slate-800/40 p-4 space-y-3">
       <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-        <Images size={12} /> Agregar foto a esta planta
+        <Images size={12} /> {PHOTO_LABELS[assetType] || PHOTO_LABELS.default}
       </h3>
       <div className="grid grid-cols-2 gap-3">
         <input ref={cameraRef} type="file" accept="image/*" capture="environment" onChange={handleFile} className="hidden" />
@@ -414,6 +424,7 @@ export const AssetDetailView = () => {
           <AddPhotoSection
             assetId={asset.id}
             speciesSlug={isPlantType ? deriveSpeciesSlug(name) : null}
+            assetType={isPlantType ? 'plant' : asset.type?.replace('asset--', '') || 'default'}
           />
 
           <GeometrySection asset={asset} parentZoneName={parentZoneName} onEdit={() => setShowGeoPicker(true)} saving={geoSaving} />

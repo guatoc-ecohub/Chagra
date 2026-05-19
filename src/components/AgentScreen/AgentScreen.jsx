@@ -164,7 +164,21 @@ export default function AgentScreen({ onBack }) {
   }, [loadHistory]);
 
   const getSystemPrompt = useCallback(() => {
-    const plantNames = plants?.map((p) => p.attributes?.name).filter(Boolean).join(', ') || 'ninguna';
+    // Operator bug 2026-05-18: agente listaba "Fresa #02, Fresa #08, Fresa #02..."
+    // (cada planta individual con su número), molesto al escuchar por TTS.
+    // Fix: agrupar por species y dar conteo total. Plant name suele ser
+    // "Especie (cientifico) #NN" — extraemos el prefijo y agrupamos.
+    const stripPlantNumber = (name) => (name || '').replace(/\s*#\d+\s*$/, '').trim();
+    const groupedCounts = (plants || []).reduce((acc, p) => {
+      const base = stripPlantNumber(p.attributes?.name);
+      if (!base) return acc;
+      acc[base] = (acc[base] || 0) + 1;
+      return acc;
+    }, {});
+    const plantNames = Object.entries(groupedCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, n]) => (n > 1 ? `${name} ×${n}` : name))
+      .join(', ') || 'ninguna';
     // 062.6: inyectar contexto finca activa (slug, nombre, biocultural_zone, altitud)
     // + indoor override si aplica. El LLM responde con criterio agronómico ajustado
     // a la zona ecológica donde el operador está físicamente.
@@ -184,9 +198,11 @@ export default function AgentScreen({ onBack }) {
     // agresivo con respuesta literal exigida + ejemplo + bajar temperature
     // a 0.3. Bench 2026-05-17 con esta versión devolvió la respuesta
     // EXACTA esperada (no reconozco el término) en 27 tokens / 8s.
-    return `Eres un asistente agroecológico en Colombia. ${fincaContext}${indoorContext}El usuario tiene estas plantas: ${plantNames}.
+    return `Eres Chagra IA, un asistente agroecológico colombiano. ${fincaContext}${indoorContext}El usuario tiene estas plantas agrupadas por especie con su conteo: ${plantNames}.
 
-REGLA CRÍTICA ANTI-ALUCINACIÓN: si un término te suena raro, no es estándar agroecológico colombiano, o no estás 100% seguro de lo que significa, responde EXACTAMENTE: "No reconozco ese término. ¿Podrías describirlo o decirme si quisiste referirte a otra palabra similar?" NUNCA inventes definiciones de términos que no reconozcas. Es PREFERIBLE pedir aclaración que dar información incorrecta. Si sospechas que el operador escribió mal una palabra (typo), sugiere la palabra correcta como PREGUNTA, no como afirmación.
+REGLA DE FORMATO: cuando hables de las plantas del usuario, agrupá por especie y di cuántas tiene (ej. "tienes 15 fresas, 4 caléndulas, 1 tomate cherry"). NUNCA listes los números individuales de cada planta (#01, #02, etc.) — son identificadores internos, no info útil para el operador. Habla como agrónomo experimentado, no como sistema.
+
+REGLA CRÍTICA ANTI-ALUCINACIÓN: si un término te suena raro, no es estándar agroecológico colombiano, o no estás 100% seguro de lo que significa, responde EXACTAMENTE: "No reconozco ese término. ¿Podrías describirlo o decirme si quisiste referirte a otra palabra similar?" NUNCA inventes definiciones. Es PREFERIBLE pedir aclaración que dar información incorrecta. Si sospechas typo, sugiere la palabra correcta como PREGUNTA, no afirmación.
 
 Responde en español colombiano (tú/usted, sin voseo argentino). Sé específico y útil cuando tengas certeza; humilde y preguntón cuando no.`;
   }, [plants, fincas, activeFincaSlug, indoorZone]);
@@ -431,20 +447,27 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
 
   return (
     <div className="h-full flex flex-col bg-slate-950">
-      {/* Header */}
-      <div className="px-4 py-3 flex items-center gap-3 border-b border-slate-800 bg-slate-900/80 shrink-0">
+      {/* Header con avatar colibrí Chagra IA (operator bug #920 no aplicó el avatar al header) */}
+      <div className="px-4 py-3 flex items-center gap-3 border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm shrink-0">
         <button
           type="button"
           onClick={onBack}
           className="p-2 -ml-2 rounded-lg active:bg-slate-800"
+          aria-label="Volver"
         >
           <ArrowLeft size={20} className="text-amber-400" />
         </button>
-        <div className="flex-1">
-          <h1 className="text-base font-bold text-white flex items-center gap-2">
-            <Sparkles size={18} className="text-violet-400" />
-            Asistente IA
-          </h1>
+        <ChagraAgentAvatar
+          state={state === STATE_RECORDING ? 'listening' : state === STATE_THINKING ? 'thinking' : 'idle'}
+          size={40}
+        />
+        <div className="flex-1 min-w-0">
+          <h1 className="text-base font-bold text-white leading-tight">Chagra IA</h1>
+          <p className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+            {state === STATE_THINKING && 'pensando…'}
+            {state === STATE_RECORDING && 'escuchando…'}
+            {state === STATE_IDLE && 'agente agroecológico'}
+          </p>
         </div>
         <button
           type="button"
