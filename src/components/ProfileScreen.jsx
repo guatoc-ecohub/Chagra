@@ -34,7 +34,7 @@ const ROLES = [
   { id: 'otro', label: 'Otro' },
 ];
 
-export default function ProfileScreen({ onBack }) {
+export default function ProfileScreen({ onBack, onHome }) {
   const [name, setName] = useState(() =>
     typeof window !== 'undefined'
       ? localStorage.getItem('chagra:operator:name') || PRIMARY_WORKER_NAME
@@ -91,7 +91,7 @@ export default function ProfileScreen({ onBack }) {
   const currentRoleLabel = ROLES.find(r => r.id === role)?.label || 'Operador de Campo';
 
   return (
-    <ScreenShell title="Perfil de Usuario" icon={User} onBack={onBack}>
+    <ScreenShell title="Perfil de Usuario" icon={User} onBack={onBack} onHome={onHome}>
       <div className="flex flex-col gap-6 pb-8">
         {/* ID Card / User Info, header con datos sintetizados */}
         <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col items-center">

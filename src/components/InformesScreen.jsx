@@ -92,9 +92,9 @@ function ReportCard({ icon: IconComponent, title, description, onExport, helpTex
   );
 }
 
-export default function InformesScreen({ onBack }) {
+export default function InformesScreen({ onBack, onHome }) {
   return (
-    <ScreenShell title="Informes" icon={FileText} onBack={onBack}>
+    <ScreenShell title="Informes" icon={FileText} onBack={onBack} onHome={onHome}>
       <div className="flex flex-col gap-4 pb-8">
         <p className="text-sm text-slate-400 leading-relaxed">
           Reportes descargables consolidados de la finca. Cada uno se genera

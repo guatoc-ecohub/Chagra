@@ -500,7 +500,7 @@ const FilterTabs = ({ value, onChange, counts }) => (
   </nav>
 );
 
-export default function CaseStudyScreen({ onBack, onSelectCase }) {
+export default function CaseStudyScreen({ onBack, onHome, onSelectCase }) {
   const cases = useCaseStudyStore((s) => s.cases);
   const getTopActiveProblems = useCaseStudyStore((s) => s.getTopActiveProblems);
   const createCase = useCaseStudyStore((s) => s.createCase);
@@ -563,6 +563,7 @@ export default function CaseStudyScreen({ onBack, onSelectCase }) {
       title="Casos de Estudio"
       icon={FileText}
       onBack={onBack}
+      onHome={onHome}
       actions={
         !showForm && (
           <button
