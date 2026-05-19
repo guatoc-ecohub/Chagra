@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { FileText, AlertTriangle, AlertCircle, Activity, CheckCircle, XCircle, Beaker, Clock, MapPin, Camera, Sparkles, Loader2, Image as ImageIcon, Trash2, ShieldCheck, ShieldAlert, Globe, Lock, Users, Lightbulb, Plus, CalendarClock, Stethoscope } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import {
   useCaseStudyStore,
   CASE_VISIBILITIES,
   CASE_TIMELINE_EVENT_TYPES,
+  withExtendedDefaults,
 } from '../store/useCaseStudyStore';
 import PhotoCaptureField from './PhotoCaptureField';
 import { summarizeLessons } from '../services/caseStudyLessonsSummarizer';
@@ -900,7 +901,12 @@ const PhotoGallery = ({ photos, onAdd, onRemove }) => {
 };
 
 export default function CaseStudyDetail({ caseId, onBack }) {
-  const c = useCaseStudyStore((s) => s.getById(caseId));
+  // 2026-05-18: NO usar `s.getById(caseId)` en selector — devuelve nuevo
+  // objeto cada render (withExtendedDefaults hace spread) → React #185
+  // (Maximum update depth). Seleccionar el raw case desde `cases` (ref
+  // estable de zustand) y normalizar fuera del selector con useMemo.
+  const rawCase = useCaseStudyStore((s) => s.cases.find((cc) => cc.id === caseId));
+  const c = useMemo(() => (rawCase ? withExtendedDefaults(rawCase) : null), [rawCase]);
   const addTreatment = useCaseStudyStore((s) => s.addTreatment);
   const transitionState = useCaseStudyStore((s) => s.transitionState);
   const closeCase = useCaseStudyStore((s) => s.closeCase);
