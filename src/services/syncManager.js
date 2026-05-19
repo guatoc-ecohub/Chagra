@@ -4,6 +4,7 @@ import { logCache } from '../db/logCache';
 import { newId } from '../utils/id';
 import { getCompletedTaskIds } from '../utils/taskCompletionParser';
 import { recordEvent } from './voiceTelemetryService';
+import { tryGeneratePlanFromSeeding } from './planGeneratorService';
 
 const STORE_NAME = 'pending_transactions';
 const TASKS_STORE_NAME = 'pending_tasks';
@@ -176,11 +177,38 @@ class SyncManager {
         }
 
         try {
-          await this.syncTransaction(transaction);
-          await this.persistSyncedLog(transaction, null);
+          const syncResult = await this.syncTransaction(transaction);
+          await this.persistSyncedLog(transaction, syncResult);
           await this.deleteTransaction(transaction.id);
           synced++;
           console.info(`[SyncManager] Transacción ${transaction.id} completada y purgada.`);
+
+          // Audit finding #2 (2026-05-18): el path offline-then-sync no
+          // dispara generación de plan de alimentación. Si la transacción
+          // es seeding y vino con _planSeed (capturado al encolar), generar
+          // ahora que tenemos asset creado en FarmOS. Idempotente: el helper
+          // skipea si ya hay plan. NO bloquea el sync ante fallo.
+          const planSeed = this.extractPlanSeed(transaction, syncResult);
+          if (planSeed) {
+            const plan = await tryGeneratePlanFromSeeding(planSeed);
+            if (plan?.steps?.length > 0) {
+              window.dispatchEvent(new CustomEvent('syncCompleted', {
+                detail: {
+                  type: transaction.type,
+                  id: transaction.id,
+                  remoteId: transaction.remoteId,
+                  plantId: planSeed.assetId,
+                  planGenerated: {
+                    plantId: planSeed.assetId,
+                    plantName: planSeed.plantName,
+                    steps: plan.steps.length,
+                  },
+                },
+              }));
+              continue;
+            }
+          }
+
           window.dispatchEvent(new CustomEvent('syncCompleted', {
             detail: {
               type: transaction.type,
@@ -367,6 +395,69 @@ class SyncManager {
     } catch (err) {
       console.warn('[SyncManager] No se pudo persistir log sincronizado (no crítico):', err.message);
     }
+  }
+
+  /**
+   * extractPlanSeed — extrae los inputs necesarios para generar un plan de
+   * alimentación a partir de una transacción seeding ya sincronizada con
+   * FarmOS. Devuelve null si la transacción no es seeding o no contiene
+   * suficiente información (sin assetId remoto o sin speciesSlug).
+   *
+   * Reglas:
+   * - Solo aplica a `transaction.type === 'seeding'` o `log--seeding`.
+   * - assetId: primero intenta del syncResult (relaciones devueltas por
+   *   FarmOS), después del payload encolado (asset relationship si trae UUID).
+   * - speciesSlug: del inline `_speciesSlug` que VoiceCapture adjunta al
+   *   asset--plant. AssetsDashboard NO lo adjunta (genera el plan inline
+   *   en el componente), por lo que en ese path este helper retorna null
+   *   y el sync solo emite syncCompleted plano — comportamiento correcto.
+   * - plantingDate: del attributes.timestamp del log--seeding (segundos
+   *   epoch FarmOS).
+   *
+   * @param {object} transaction - registro pending_transactions
+   * @param {object} syncResult - respuesta de sendToFarmOS al POST seeding
+   * @returns {object|null} { assetId, speciesSlug, plantingDate, plantName } o null
+   */
+  extractPlanSeed(transaction, syncResult) {
+    const type = transaction?.type;
+    if (type !== 'seeding' && type !== 'log--seeding') return null;
+
+    const payload = transaction.payload || {};
+    const rels = payload?.data?.relationships || {};
+    const assetRel = rels.asset?.data;
+    const assetEntries = Array.isArray(assetRel) ? assetRel : (assetRel ? [assetRel] : []);
+
+    // Buscar inline con _speciesSlug (VoiceCapture path).
+    const inlineWithSpecies = assetEntries.find(
+      (a) => a && a.type === 'asset--plant' && a._speciesSlug
+    );
+    if (!inlineWithSpecies) return null;
+
+    const speciesSlug = inlineWithSpecies._speciesSlug;
+    const plantName = inlineWithSpecies.attributes?.name || 'planta';
+
+    // assetId: prioridad al syncResult (relaciones devueltas por FarmOS tras
+    // el POST). Fallback al payload si trae UUID directo en el inline.
+    let assetId = null;
+    const resultRels = syncResult?.data?.relationships?.asset?.data;
+    const resultAssetEntries = Array.isArray(resultRels) ? resultRels : (resultRels ? [resultRels] : []);
+    const isUUID = (id) => typeof id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+    const remoteWithId = resultAssetEntries.find((a) => isUUID(a?.id));
+    if (remoteWithId) {
+      assetId = remoteWithId.id;
+    } else if (isUUID(inlineWithSpecies.id)) {
+      assetId = inlineWithSpecies.id;
+    }
+
+    if (!assetId) return null;
+
+    const timestampSec = Number(payload?.data?.attributes?.timestamp);
+    const plantingDate = Number.isFinite(timestampSec)
+      ? new Date(timestampSec * 1000).toISOString()
+      : new Date().toISOString();
+
+    return { assetId, speciesSlug, plantingDate, plantName };
   }
 
   // Helper de retrocompatibilidad: resuelve endpoint por type cuando la transacción

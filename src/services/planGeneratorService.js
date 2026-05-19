@@ -271,6 +271,73 @@ async function savePlan(plan) {
     });
 }
 
+/**
+ * tryGeneratePlanFromSeeding — wrapper idempotente para conectar el resultado
+ * de un POST seeding exitoso (sea path online o sync diferido) a la
+ * generación del plan de alimentación.
+ *
+ * Diseño:
+ * - Si falta assetId o speciesSlug → no-op (retorna null sin error).
+ * - Si ya existe un plan en IDB para ese assetId → skip (idempotente).
+ * - Si la generación falla → log warning y retorna null. NUNCA throw — no
+ *   debe romper el flujo de sync ni el path online del payloadService.
+ *
+ * Audit finding #2 (2026-05-18): el path online ya generaba plan inline,
+ * pero el path offline-then-sync (syncManager.syncAll) dejaba la planta
+ * creada sin plan al volver la conexión. Este helper centraliza la lógica
+ * para ambos paths.
+ *
+ * @param {object} input
+ * @param {string} input.assetId - UUID FarmOS del asset--plant recién creado
+ * @param {string|null} input.speciesSlug - slug del catálogo (puede ser null)
+ * @param {string} input.plantingDate - ISO date string de siembra
+ * @param {string} [input.plantName] - nombre del asset para el evento
+ * @param {string} [input.climateZone] - opcional, modula offsets
+ * @param {string} [input.lunarPhase] - opcional, modula offsets
+ * @returns {Promise<object|null>} El plan generado, null si no aplica o falló
+ */
+export async function tryGeneratePlanFromSeeding({
+  assetId,
+  speciesSlug,
+  plantingDate,
+  plantName,
+  climateZone,
+  lunarPhase,
+} = {}) {
+  if (!assetId || !speciesSlug) return null;
+
+  // Idempotencia: si ya hay un plan persistido para este asset, no
+  // regeneramos. Esto evita planes duplicados cuando una transacción
+  // seeding se reintenta varias veces (retry con backoff exponencial) o
+  // cuando el path online ya generó plan y luego el sync diferido también
+  // intenta generar para la misma planta.
+  try {
+    const existing = await getPlanForAsset(assetId);
+    if (existing) return existing;
+  } catch (err) {
+    console.warn('[planGeneratorService] No se pudo consultar plan existente, intentando generar:', err);
+  }
+
+  try {
+    const plan = await generatePlanForPlant({
+      assetId,
+      speciesSlug,
+      plantingDate,
+      climateZone,
+      lunarPhase,
+    });
+    if (plan && plantName) {
+      // Atadura informativa para que consumers del result puedan emitir
+      // eventos toast con el nombre amigable.
+      plan._plantName = plantName;
+    }
+    return plan;
+  } catch (err) {
+    console.warn('[planGeneratorService] No se pudo generar plan post-seeding:', err);
+    return null;
+  }
+}
+
 export async function getPlanForAsset(assetId) {
     const db = await openDB();
     return new Promise((resolve, reject) => {
