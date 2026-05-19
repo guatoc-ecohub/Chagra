@@ -43,10 +43,17 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Verify Ollama reachable
+        continue-on-error: true
+        id: verify_ollama
         run: |
-          curl -fsS http://127.0.0.1:11434/api/tags > /tmp/ollama-tags.json
-          jq -e '.models[] | select(.name | startswith("qwen3-coder"))' /tmp/ollama-tags.json \
-            || { echo "qwen3-coder no disponible en Ollama"; exit 1; }
+          # nix-shell con curl + jq explícito: el runner alpha es NixOS y
+          # curl no está siempre en PATH del shell del job. continue-on-error
+          # garantiza soft-fail como dice el comentario del workflow.
+          nix-shell -p curl jq --run \
+            'curl -fsS http://127.0.0.1:11434/api/tags > /tmp/ollama-tags.json \
+            && jq -e ".models[] | select(.name | startswith(\"qwen3-coder\"))" /tmp/ollama-tags.json' \
+            || { echo "ollama_reachable=0" >> "$GITHUB_OUTPUT"; exit 0; }
+          echo "ollama_reachable=1" >> "$GITHUB_OUTPUT"
 
       - name: Compute diff (truncated)
         id: diff
@@ -138,16 +145,21 @@ jobs:
 
       - name: Run Ollama
         id: ollama
+        if: steps.verify_ollama.outputs.ollama_reachable == '1'
+        continue-on-error: true
         run: |
-          PROMPT=$(jq -Rs . < /tmp/prompt.txt)
-          REQ=$(jq -n --argjson p "$PROMPT" '{model:"qwen3-coder:7b", prompt:$p, stream:false, options:{temperature:0.2, num_ctx:16384}}')
-          echo "$REQ" | curl -fsS -X POST http://127.0.0.1:11434/api/generate \
-            -H 'Content-Type: application/json' \
-            --max-time 480 \
-            --data-binary @- \
-            > /tmp/ollama.json
-          jq -r '.response' /tmp/ollama.json > /tmp/review.md
-          REVIEW_LEN=$(wc -c < /tmp/review.md)
+          # nix-shell -p curl jq: explicitar dependencias del nix runner.
+          nix-shell -p curl jq --run '
+            PROMPT=$(jq -Rs . < /tmp/prompt.txt)
+            REQ=$(jq -n --argjson p "$PROMPT" "{model: \"qwen3-coder:7b\", prompt: \$p, stream: false, options: {temperature: 0.2, num_ctx: 16384}}")
+            echo "$REQ" | curl -fsS -X POST http://127.0.0.1:11434/api/generate \
+              -H "Content-Type: application/json" \
+              --max-time 480 \
+              --data-binary @- \
+              > /tmp/ollama.json
+            jq -r ".response" /tmp/ollama.json > /tmp/review.md
+          ' || { echo "skip=1" >> "$GITHUB_OUTPUT"; exit 0; }
+          REVIEW_LEN=$(wc -c < /tmp/review.md 2>/dev/null || echo 0)
           if [ "$REVIEW_LEN" -lt 50 ]; then
             echo "Review vacía, fail soft"
             echo "skip=1" >> "$GITHUB_OUTPUT"
