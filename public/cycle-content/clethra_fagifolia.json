@@ -1,0 +1,94 @@
+{
+  "species_slug": "clethra_fagifolia",
+  "scientific_name": "Clethra fagifolia Kunth",
+  "common_names": [
+    "Laurel hojiancho"
+  ],
+  "family": "Clethraceae",
+  "category": "arboles_sombra",
+  "cultivable": false,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "pollinator_attractor",
+    "nurse_plant",
+    "biomass_producer"
+  ],
+  "antagonists": [
+    "eucalyptus_globulus",
+    "pinus_patula"
+  ],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "esqueje"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Propagación por semilla fresca de cápsulas maduras (semillas pequeñas, siembra superficial en sustrato turba-arena 1:1). Germinación 45-90 días con sombra parcial 50%. Trasplante 5-7 meses. Plantación 15-20 meses. Esqueje semileñoso con AIB (enraizamiento 30-50%). Crecimiento moderado 40-60 cm/año.",
+    "tiempo_a_establecimiento_dias": 540,
+    "notas": "Familia Clethraceae es monogenérica (solo Clethra) — par botánico raro y didáctico. Sus inflorescencias blancas fragantes atraen abejas nativas Meliponini y sírfidos alto-andinos."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 2000,
+      "optimo_min": 2300,
+      "optimo_max": 2900,
+      "max_absoluto": 3100
+    },
+    "temperatura_c": {
+      "helada_letal": -5,
+      "optimo_min": 8,
+      "optimo_max": 15,
+      "max_tolerable": 22
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "Clethra fagifolia Kunth (laurel hojiancho, clethra colombiana — familia Clethraceae) es un árbol perennifolio (6-15 m altura) nativo de los Andes del norte de Sudamérica (Colombia, Ecuador, Venezuela, norte de Perú), distribuido en bosque alto andino entre 2000 y 3100 msnm en piso térmico FRÍO. En Colombia se encuentra en Cundinamarca, Boyacá, Antioquia, Nariño, Cauca y Santander. La familia CLETHRACEAE es botánicamente especial — es una FAMILIA MONOGENÉRICA, es decir, contiene UN SOLO GÉNERO (Clethra) con aproximadamente 75 especies distribuidas en las montañas tropicales y subtropicales de América, Asia (Malasia, Filipinas, China) y la isla de Madeira. Esta distribución biogeográfica DISYUNTA es típica de linajes antiguos gondwánicos-laurásicos que se fragmentaron con la deriva continental — Clethra es por tanto un 'fósil viviente' de las floras paleotropicales del Cretácico-Paleógeno. El epíteto 'fagifolia' significa 'hoja de haya' por la similitud morfológica con las hojas obovado-elípticas de Fagus sylvatica (haya europea) — pero NO hay relación filogenética (es convergencia evolutiva). Las flores blancas pequeñas en racimos terminales (15-30 cm de largo) son MASIVAMENTE FRAGANTES (aroma dulce a miel-cera-vainilla) y constituyen uno de los recursos florales más importantes para la avifauna polinizadora y las abejas nativas Meliponini (Trigona, Tetragonisca, Plebeia) del bosque alto andino en agosto-octubre. Lección viva sobre BIOGEOGRAFÍA DISYUNTA, FAMILIAS MONOGENÉRICAS y FLORES MELÍFERAS DEL BOSQUE ALTO ANDINO: la clethra es ejemplo paradigmático de cómo una especie aparentemente 'menor' del bosque colombiano pertenece a un linaje antiguo de distribución gondwánica-laurásica, y de cómo su floración masiva sostiene a las abejas sin aguijón Meliponini — polinizadores nativos críticos para la red ecológica de la Sabana de Bogotá, el altiplano cundiboyacense y la Cordillera Central. En restauración de Cruz Verde-Sumapaz, Chingaza, Iguaque y la Cordillera Central de Antioquia, la clethra se planta en interior de rodal restaurado con cobertura previa, asociada con gaque, encenillo y juco/sietecueros (Viburnum tinoides), formando corredores florales para polinizadores nativos. Manejo agroecológico: propagación por semilla fresca con sombra parcial 50%; trasplante 5-7 meses; plantación 15-20 meses; crecimiento 40-60 cm/año; densidades 200-300 ind/ha. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Bernal 2015 Catálogo Plantas Líquenes Colombia.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- clusia_multiflora — Gaque (Clusia multiflora Kunth)\n- viburnum_tinoides — Juco / Sietecueros (árbol) (Viburnum tinoides L. f.)\n- weinmannia_tomentosa — Encenillo (Weinmannia tomentosa L. f.)",
+  "antagonists_markdown": "### Antagonistas (no asociar)\n\nEvite sembrar estas especies cerca; compiten o comparten plagas/patógenos:\n- eucalyptus_globulus — Eucalipto blanco (Eucalyptus globulus Labill.)\n- pinus_patula — Pino pátula (Pinus patula Schiede ex Schltdl. & Cham.)",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.402Z"
+}

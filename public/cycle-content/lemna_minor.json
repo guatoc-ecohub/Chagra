@@ -1,0 +1,97 @@
+{
+  "species_slug": "lemna_minor",
+  "scientific_name": "Lemna minor L.",
+  "common_names": [
+    "Lenteja de agua"
+  ],
+  "family": "Araceae",
+  "category": "abonos_verdes_coberturas",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido",
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "dynamic_accumulator",
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "division_mata"
+    ],
+    "best_method": "division_mata",
+    "protocol_resumen": "Propagación vegetativa exclusiva por gemación de frondas hijas que se desprenden de la fronda madre. Una colonia duplica biomasa en 1.5-4 días en condiciones óptimas. Inoculación inicial: tomar 1-2 puñados de lenteja sana de un humedal o estanque limpio y dispersar en superficie de agua tranquila (no corriente) rica en N-P-K disuelto (estanque piscícola, biodigestor efluente, agua de lavado de lácteos). Cosecha con malla fina cada 7-14 días una vez establecida cobertura completa.",
+    "tiempo_a_establecimiento_dias": 14,
+    "notas": "Distribución cosmopolita en humedales colombianos entre 0 y 3.200 msnm: humedales Sabana de Bogotá, ciénagas Magdalena medio, jagüeyes Caribe seco, lagunas Boyacá-Cundinamarca. Excelente alimento proteico para tilapia, cachama, cerdos y aves de patio. Fitorremediador eficaz para N-P de efluentes piscícolas.",
+    "fuente": "IAvH Flora Alto Andina; POWO Kew; GBIF Colombia; Agrosavia"
+  },
+  "requirements": {
+    "agua": "pantanoso",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 500,
+      "optimo_max": 2800,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": 0,
+      "optimo_min": 15,
+      "optimo_max": 28,
+      "max_tolerable": 33
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "pantanoso"
+  },
+  "valor_pedagogico": "La lenteja de agua menor (Lemna minor L., Araceae subfamilia Lemnoideae) es una de las plantas más pequeñas y eficientes del reino vegetal: una lección viva de soberanía alimentaria proteica circular y de cómo integrar acuicultura, ganadería de patio y agricultura mediante una sola macrófita acuática microscópica. Nativa o cosmopolita en humedales templados y tropicales de todos los continentes (excepto Antártida), en Colombia se distribuye en humedales y cuerpos de agua tranquilos entre 0 y 3.200 msnm: humedales fríos de la Sabana de Bogotá (Jaboque, Juan Amarillo, Tibanica, Córdoba, La Conejera, Torca-Guaymaral, El Burro), lagunas y embalses de Boyacá-Cundinamarca (Tota, Iguaque, Tominé, Sisga, San Rafael), ciénagas del Magdalena medio (Zapatosa, Ayapel, El Sapo, Chilloa), humedales del Valle del Cauca (Sonso, La Guinea, Sonso, La Yuyos), jagüeyes y micro-humedales del Caribe seco (La Guajira, Sucre, Córdoba, Atlántico), lagunas altoandinas (Tota, Iguaque, Buitrera, Siecha, Tausa) y cuerpos de agua amazónicos y orinoquenses. Pertenece a la familia Araceae subfamilia Lemnoideae (reclasificada desde la antigua familia Lemnaceae por estudios moleculares 2003) y se reconoce por sus frondas diminutas (2-5 mm de diámetro), ovaladas, planas, verde brillante, con una sola raíz fibrosa colgante de 1-2 cm en el envés — son las plantas con flor más pequeñas del reino vegetal (sus flores son microscópicas, de 1 mm, raras de ver, dos estambres y un pistilo, lo que llevó a confusión taxonómica histórica entre botánica y ficología hasta el siglo XX). Propagación exclusivamente vegetativa por gemación de frondas hijas (cada fronda madre produce 2-4 frondas hijas que se desprenden cuando alcanzan tamaño adulto), tasa de duplicación de 1.5-4 días en condiciones óptimas (15-28°C, agua quieta, alta carga N-P-K disuelta), capacidad de cubrir 100% de un estanque pequeño en 2-3 semanas desde inóculo inicial. Su importancia agroecológica es enorme y subestimada en Colombia: como acumuladora dinámica de N acumula 25-45% de proteína cruda en materia seca (comparable o superior a la soja), 5-8% lípidos, 8-15% fibra cruda, 20-25% carbohidratos, perfil de aminoácidos completo incluyendo lisina, metionina y triptofano, alta digestibilidad >85% en monogástricos; como fitorremediadora capta N-amoniacal, P-soluble, K, Cu, Zn, Mn y metales pesados leves (Cd, Pb, Cr trazas) de efluentes piscícolas, biodigestores, aguas de lavado de lácteos y de procesamiento de frutas; como alimento es la base de sistemas integrados acuicultura-cerdo-aves clásicos en China, Vietnam y el sudeste asiático donde 1 m² de estanque con lemna produce 50-150 g de biomasa fresca/día (15-30 g materia seca, equivalente a 4-12 g de proteína vegetal de alta calidad/día/m²). En Colombia, Agrosavia y CIAT documentan su uso creciente en sistemas piscícolas integrados de pequeños productores del Caribe, Valle, Eje Cafetero y Llanos: estanque madre de tilapia produce efluente rico en N-P → alimenta estanque de lemna → biomasa cosechada cada 7-14 días con malla fina → alimenta cerdos, gallinas, peces secundarios o se aplica fresca como cobertura verde-mulching al cultivo. Manejo agroecológico: inóculo inicial con 1-2 puñados de lenteja sana de humedal limpio dispersada en superficie de agua tranquila (NO corriente, NO oxigenada por aireador fuerte) rica en N-P-K disuelto, mantener pH 6.5-7.5, temperatura 15-28°C, profundidad 30-80 cm, sombra parcial o sol pleno; cosecha con malla fina o tamiz cada 7-14 días una vez establecida cobertura completa, no agotar la cobertura (dejar >30% para regeneración); aplicar fresca al cultivo o secarla al sol para conservar; en sistemas integrados acuicultura-cerdo equivalente a sustituir 30-50% del concentrado proteico comercial. Es lección extraordinaria de soberanía alimentaria proteica, agricultura circular, integración acuicultura-cultivo, fitorremediación y eficiencia fotosintética (Lemna tiene la tasa de fotosíntesis y duplicación biomasa más alta del reino vegetal por unidad de superficie). Fuentes Tier A: IAvH Humboldt — Flora Alto Andina, POWO Kew, GBIF Colombia, Bernal 2015, Agrosavia Manuales, FAO Ecocrop.",
+  "sources": [
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "agrosavia-tibaitata",
+      "title": "agrosavia-tibaitata",
+      "tier": "A",
+      "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.391Z"
+}

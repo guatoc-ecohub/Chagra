@@ -1,0 +1,80 @@
+{
+  "species_slug": "arrabidaea_chica",
+  "scientific_name": "Fridericia chica (Bonpl.) L.G.Lohmann",
+  "common_names": [
+    "Carayurú"
+  ],
+  "family": "Bignoniaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 1000,
+      "max_absoluto": 1500
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "El carayurú o chica (Fridericia chica (Bonpl.) L.G.Lohmann, antes Arrabidaea chica (Bonpl.) B.Verl., Bignoniaceae) es una liana o bejuco trepador leñoso amazónico-pacífico nativo (5-15 m largo, trepa por zarcillos) propio del bosque húmedo tropical de Colombia entre 100 y 1.000 msnm, presente en Amazonía (Amazonas, Putumayo, Caquetá, Guaviare, Vaupés, Guainía), Pacífico (Chocó, Valle, Cauca, Nariño), Orinoquía (Vichada, Meta) y Magdalena Medio. Hojas opuestas trifolioladas o bifolioladas con zarcillo terminal característico de Bignoniaceae, inflorescencias panículas axilares de flores tubulares rosado-lilas-blanquecinas (3-5 cm) que atraen colibríes y abejas grandes, frutos en cápsulas alargadas dehiscentes con semillas aladas. Es lección viva de farmacopea y cosmética amazónica indígena que enseña a niñas y niños cómo los pueblos Tikuna, Huitoto, Yucuna, Kichwa, Bora, Yagua, Shuar, Awá y Embera-Katío de la Amazonía-Pacífico colombiano han usado las hojas como fuente del legendario tinte rojo carayurú durante milenios: las hojas frescas se machacan y fermentan en agua, liberando antocianinas rojo-anaranjadas-violáceas (carajurina y carajurona, pigmentos flavonoides únicos del género) que se concentran en pasta-polvo seco de color rojo-ladrillo intenso, usado en pintura corporal ritual y cosmética indígena, marcaje ceremonial de chamanes y guerreros, tinte natural para fibras vegetales (chambira, palma real, werregue, iraca) y artesanía, y como remedio tradicional antiinflamatorio-cicatrizante-antimicrobiano (validado farmacognosticamente para uso dermatológico). Reivindicada por colectivos amazónicos como tinte natural sostenible y cosmético tradicional. Manejo agroecológico: propagación por esqueje semileñoso de tallo (mejor método, enraizamiento 30-60 días bajo cámara húmeda) o semilla (menos común), vivero 6-12 meses, requiere tutor o soporte vivo (árbol nodriza), cosecha de hojas a partir de 12-18 meses con sistema de poda rotacional sostenible, función como liana medicinal-tintórea-cosmética en sistemas agroforestales pacífico-amazónicos, atractora de colibríes. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, Pérez Arbeláez 1947, SiB Colombia, JBB Plantas Medicinales, IAvH Flora.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.385Z"
+}

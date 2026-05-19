@@ -1,0 +1,83 @@
+{
+  "species_slug": "phaseolus_lunatus_andino",
+  "scientific_name": "Phaseolus lunatus L. cv. andino",
+  "common_names": [
+    "Fríjol Lima Andino"
+  ],
+  "family": "Fabaceae",
+  "category": "granos_legumbres",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "nitrogen_fixer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Variedad andina voluble (trepadora) de grano grande aplanado en forma de luna creciente. Ciclo largo (6-8 meses) según altitud. Doble origen domesticación independiente: andino (granos grandes, llamado 'pallar' en Perú) y mesoamericano (granos pequeños, 'sieva'). El andino llegó a Colombia por intercambio prehispánico con culturas pre-Inca."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1500,
+      "optimo_min": 1800,
+      "optimo_max": 2600,
+      "max_absoluto": 2900
+    },
+    "temperatura_c": {
+      "helada_letal": 0,
+      "optimo_min": 14,
+      "optimo_max": 22,
+      "max_tolerable": 28
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El fríjol lima andino (Phaseolus lunatus L. cv. andino) es una de las cinco especies del género Phaseolus domesticadas en América (junto con P. vulgaris, P. acutifolius, P. coccineus y P. polyanthus) y la única con doble centro de domesticación independiente: el linaje andino de grano grande (llamado 'pallar' en Perú, 'torta' en Colombia y Ecuador) domesticado hace 5-6.000 años en la costa peruana, y el linaje mesoamericano de grano pequeño ('sieva') domesticado en paralelo en México-Guatemala. El linaje andino llegó al territorio colombiano por intercambios prehispánicos con culturas Mochica, Wari e Inca, y hoy se conserva por familias campesinas en Nariño (Ipiales, Túquerres, Cumbal), Cauca (Silvia, Totoró), Boyacá (Tunja, Ramiriquí) y Cundinamarca (Une, Choachí) entre 1.800 y 2.600 msnm. Planta voluble (trepadora) de tallos largos, hojas trifolioladas grandes, vainas anchas con 2-4 granos por vaina, grano grande aplanado (1.5-2.5 cm) en forma de luna creciente (de ahí 'lunatus'), color blanco, crema, manchado morado, rojo o jaspeado. Es lección viva de domesticación dual y rescate de leguminosas marginadas: el fríjol lima andino, junto con el chocho/tarwi (Lupinus mutabilis), está en riesgo de erosión genética por dominio comercial del fríjol arbustivo P. vulgaris ICA. Su grano es nutricionalmente superior (proteína 20-25%, alto en hierro, magnesio, folato), aunque requiere remojo prolongado y descarte del agua de cocción para eliminar trazas de glucósidos cianogénicos (linamarina) presentes en algunas variedades. Manejo agroecológico: siembra con tutor (puede ser maíz, también caña o tutor seco), distancia 50-70 cm; abono al hoyo (compost); biopreparados: caldo sulfocalcio contra antracnosis, trichoderma; fija nitrógeno atmosférico 50-100 kg N/ha/ciclo, mejor que vulgaris en altura por sistema radicular profundo. Conservación de semilla en frascos secos con ceniza, vida útil 3-5 años. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, NRC 1989 Cultivos Andinos, Pérez Arbeláez 1947, FAO EcoCrop, GBIF Backbone, POWO Kew.",
+  "sources": [
+    {
+      "id": "agrosavia-leguminosas-andinas",
+      "title": "agrosavia-leguminosas-andinas",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "nrc-1989-cultivos-andinos",
+      "title": "nrc-1989-cultivos-andinos",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.382Z"
+}

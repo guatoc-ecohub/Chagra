@@ -1,0 +1,81 @@
+{
+  "species_slug": "miconia_squamulosa",
+  "scientific_name": "Miconia squamulosa Naudin",
+  "common_names": [
+    "Niguito"
+  ],
+  "family": "Melastomataceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "frio",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "nurse_plant",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 1800,
+      "optimo_min": 2200,
+      "optimo_max": 3000,
+      "max_absoluto": 3300
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "El niguito o tuno (Miconia squamulosa Naudin, familia Melastomataceae, tribu Miconieae) es una melastomatácea arbórea pequeña a mediana (5-12 m altura, hábito ramificado denso) perennifolia nativa de los bosques altoandinos y sub-páramo de Colombia, Venezuela y Ecuador, considerada una de las especies leñosas pioneras-tempranas más importantes en la sucesión ecológica secundaria del bosque alto-andino colombiano post-disturbio (potreros abandonados, deslizamientos, áreas de regeneración natural). Sus hojas opuestas decusadas elípticas-ovadas (8-15 cm largo) presentan el patrón característico de venación acródroma curvinervia (3-5 nervios principales paralelos partiendo de la base) diagnóstico inequívoco de la familia Melastomataceae, una sinapomorfía morfológica visible a simple vista que permite identificación de campo confiable. Su envés foliar es densamente escamoso-tomentoso (de ahí el epíteto squamulosa). Produce inflorescencias terminales en panículas densas con flores pequeñas blanco-rosadas pentámeras y frutos en baya pequeña (5-8 mm diámetro) morado-negros maduros, altamente apetecidos por avifauna frugívora. Se distribuye en bosque altoandino y sub-páramo de Cundinamarca (Chingaza, Sumapaz, Cruz Verde, La Calera, Guasca), Boyacá (Iguaque, Arcabuco, Santa Sofía), Santander (Yariguíes, Páramo del Almorzadero), Antioquia (oriente — San Rafael, Sonsón), Cauca (Puracé) y Eje cafetero (Los Nevados) entre 1.800 y 3.300 msnm en zona térmica fría a templada húmeda. Ciclo perenne de larga duración, longevidad 40-80 años, fructificación masiva escalonada todo el año con picos en lluvias. Lección viva: árbol andino nativo de bosque sub-páramo y sucesional pionero-temprano de alto valor para restauración ecológica — sus frutos morado-negros atraen avifauna frugívora andina (Turdus fuscater mirla patiamarilla, Tangara vassorii cuningui, Diglossa cyanea pinchaflor, Catamblyrhynchus diadema mielero gorra-castaña) que actúan como dispersores de semillas a sitios degradados (zoocoria), enseñando el rol crítico de las melastomatáceas pioneras como nurse plants facilitadoras frente a invasoras agresivas del altiplano cundiboyacense (Pteridium aquilinum helecho marranero, Ulex europaeus retamo espinoso, Cenchrus clandestinus kikuyo). Enseña tres conceptos críticos: sucesión ecológica secundaria con nurse plants nativas (mecanismo de facilitación de Connell-Slatyer 1977), zoocoria por avifauna como motor de regeneración de bosque altoandino, y restauración asistida por especies nativas en planes de la CAR-Cundinamarca y Cruz Verde-Sumapaz como alternativa documentada al control químico de invasoras. Manejo agroecológico: propagación por semilla recolectada de frutos maduros (germinación lenta 30-60 días, requiere sustrato ácido húmedo bajo sombra), trasplante con cepellón a sitio definitivo en lluvias, plantación en grupos densos de 5-10 plantas a 2 m entre individuos como núcleo de restauración, asocio con drimys, weinmannia y escalonia, no tolera agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, Humboldt Flora Alto-Andina, Restauración Cruz Verde-Sumapaz, SIB Colombia.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "restauracion-cruz-verde-sumapaz",
+      "title": "restauracion-cruz-verde-sumapaz",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.380Z"
+}

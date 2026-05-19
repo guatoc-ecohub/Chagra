@@ -1,0 +1,94 @@
+{
+  "species_slug": "eichhornia_crassipes",
+  "scientific_name": "Eichhornia crassipes (Mart.) Solms",
+  "common_names": [
+    "Taruya"
+  ],
+  "family": "Pontederiaceae",
+  "category": "especies_invasoras",
+  "cultivable": false,
+  "conservation_status": "invasor",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "invasive",
+    "dynamic_accumulator",
+    "biomass_producer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [
+    "pistia_stratiotes"
+  ],
+  "propagation": {
+    "methods": [
+      "estolon",
+      "semilla",
+      "division_mata"
+    ],
+    "best_method": "estolon",
+    "protocol_resumen": "Propagación vegetativa explosiva por estolones que producen rosetas hijas cada 5-15 días — una sola planta puede generar >1000 individuos en 50 días. Semillas viables hasta 20 años en sedimento. NO PROPAGAR: especie invasora prohibida fuera de sistemas de fitorremediación controlados.",
+    "tiempo_a_establecimiento_dias": 10,
+    "notas": "Listada por ISSG entre las 100 peores invasoras del mundo. En Colombia colapsa cuerpos de agua: embalse del Muña, ciénagas del Magdalena, humedales de Bogotá. Solo se permite manejo en biorreactores cerrados de fitorremediación, NUNCA en aguas abiertas.",
+    "fuente": "IAvH Humboldt — Catálogo Especies Invasoras Andes; ISSG-UICN; POWO Kew; GBIF"
+  },
+  "requirements": {
+    "agua": "pantanoso",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 1800,
+      "max_absoluto": 2600
+    },
+    "temperatura_c": {
+      "helada_letal": 1,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 35
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "pantanoso"
+  },
+  "valor_pedagogico": "La taruya, buchón de agua o jacinto de agua (Eichhornia crassipes (Mart.) Solms, Pontederiaceae) es la macrófita acuática flotante invasora más emblemática del trópico mundial y una lección viva de cómo una planta hermosa con flores violeta-azuladas espectaculares puede convertirse en catástrofe ecológica cuando colapsa un cuerpo de agua. Nativa del Amazonas y Orinoquia (cuenca alta del río Amazonas, Pantanal brasileño, llanos venezolanos y colombianos donde coevoluciona con peces, manatíes y caimanes que la consumen y controlan), está listada por ISSG/UICN entre las 100 peores especies invasoras del mundo y por IAvH-Humboldt como invasora prioritaria de humedales colombianos con impacto severo en cuerpos de agua entre 0 y 1.800 msnm: ciénagas del Magdalena medio y bajo (Zapatosa, El Sapo, Ayapel, Chilloa), humedales del Bogotá (Jaboque, Juan Amarillo, Tibanica, Córdoba — donde la liberación de aguas eutroficadas dispara crecimiento explosivo), embalse del Muña (caso paradigmático colombiano: la taruya cubrió >90% del espejo de agua durante décadas por contaminación con aguas residuales de Bogotá), humedales del Valle del Cauca (Sonso, La Guinea), planicie inundable de la Orinoquia (Casanare, Arauca, Meta) y lagunas costeras del Caribe. Pertenece a la familia Pontederiaceae y se reconoce por su roseta flotante con hojas redondeado-cordadas de 5-15 cm con pecíolos hinchados característicos (aerénquima espongioso lleno de aire que da flotabilidad), raíces fibrosas plumosas violetas-negruzcas sumergidas (10-50 cm de largo) e inflorescencia erecta espigada con 8-15 flores violeta-azuladas hermafroditas con un pétalo superior con mancha amarilla central rodeada de violeta — su belleza la convirtió en planta ornamental de exportación durante los siglos XIX-XX, lo cual disparó su invasión global. Su crecimiento explosivo (duplica biomasa en 5-15 días, una sola planta produce >1000 individuos en 50 días vía estolones más banco de semillas viable hasta 20 años) y su impacto destructor (sombreado total del agua, anoxia subsuperficial por descomposición de capas inferiores muertas, bloqueo de intercambio gaseoso aire-agua, colapso de fauna acuática nativa, obstrucción de navegación y compuertas hidroeléctricas, criadero de Anopheles vector de malaria y Mansonia vector de filariasis) la convierten en la pesadilla número uno de los humedales tropicales. Paradójicamente es una fitorremediadora extraordinaria: acumula nitrógeno, fósforo, metales pesados (cadmio, plomo, zinc, mercurio, cromo), colorantes industriales y compuestos orgánicos tóxicos en raíces y biomasa con eficiencia 5-10 veces superior a macrófitas nativas, lo cual ha llevado a su uso CONTROLADO en biorreactores cerrados de fitorremediación de aguas residuales industriales (curtiembres, textileras, papeleras) donde la cosecha programada cada 2-4 semanas y la deshidratación inmediata de biomasa permiten aprovecharla como compost activado, sustrato de biogás o alimento porcino-piscícola tratado. Manejo agroecológico: NO PROPAGAR jamás fuera de sistemas cerrados; en humedales invadidos remoción mecánica por extracción manual con rastrillos largos o cosechadora acuática (NUNCA con herbicidas glifosato/2,4-D: riesgo de eutrofización masiva post-descomposición que mata peces y agrava el problema), compostaje obligatorio del material removido a 60+°C por 6 meses fuera del cuerpo de agua para inactivar semillas, restauración con macrófitas nativas (Limnobium laevigatum, Nymphoides humboldtiana), y atacar la causa raíz: control de aportes de N y P aguas arriba (saneamiento básico, tratamiento de aguas residuales, prohibición de vertimientos industriales). Es lección viva de cómo las invasoras prosperan en sistemas degradados y de cómo restaurar humedales requiere sanear las cuencas que los alimentan, no solo arrancar la planta visible. Fuentes Tier A: IAvH Humboldt — Catálogo Especies Invasoras Andes, ISSG-UICN Global Invasive Species Database, POWO Kew, GBIF Backbone Taxonomy, Calderón-Sáenz 2003 Invasoras Colombia.",
+  "sources": [
+    {
+      "id": "humboldt-invasoras-andes",
+      "title": "humboldt-invasoras-andes",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "issg-uicn-invasoras",
+      "title": "issg-uicn-invasoras",
+      "tier": "A",
+      "url": "http://www.iucngisd.org"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "calderon-saenz-2003-invasoras",
+      "title": "calderon-saenz-2003-invasoras",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.391Z"
+}

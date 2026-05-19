@@ -1,0 +1,78 @@
+{
+  "species_slug": "myrcia_popayanensis",
+  "scientific_name": "Myrcia popayanensis Hieron.",
+  "common_names": [
+    "Arrayán de Popayán"
+  ],
+  "family": "Myrtaceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "templado"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "pollinator_attractor",
+    "living_fence"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semillas extraídas de drupas maduras (negro-violáceas), siembra inmediata en sustrato fino orgánico. Germinación 40-60% a 30-60 días bajo sombra 50%. Vivero a media sombra. Plantación definitiva a los 8-12 meses (30-40 cm altura).",
+    "tiempo_a_establecimiento_dias": 90,
+    "notas": "Arrayán nativo del valle interandino del Cauca y altiplano nariñense-caucano. Madera aromática rojiza usada en mueblería rural. Floración blanca-aromática atractora apícola. Frutos consumidos por aves frugívoras.",
+    "fuente": "Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia; POWO Kew; Lucas & Bünger 2015 Myrcia Neotropicales"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1200,
+      "optimo_min": 1500,
+      "optimo_max": 1900,
+      "max_absoluto": 2000
+    },
+    "temperatura_c": {
+      "helada_letal": 1,
+      "optimo_min": 14,
+      "optimo_max": 22,
+      "max_tolerable": 27
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El arrayán de Popayán (Myrcia popayanensis, Myrtaceae) es un árbol mediano característico de los bosques andinos premontanos del suroccidente colombiano, distribuido principalmente en los departamentos de Cauca (de donde toma su nombre, Popayán), Nariño, Valle del Cauca, Huila y Tolima entre 1.200 y 2.000 msnm. Árbol perennifolio de 8-15 metros de altura con copa densa globosa, fuste corto ramificado bajo y corteza rojiza característica que se descortezándose en placas finas (rasgo común en muchas mirtáceas neotropicales como las Myrcianthes), hojas opuestas elípticas-lanceoladas coriáceas verde oscuro brillantes glabras con glándulas oleíferas puntiformes visibles a contraluz (al estrujarlas desprenden aroma intenso aromático-mentolado característico de las Myrtaceae), flores blancas pequeñas en panículas axilares aromáticas atractoras masivas de abejas Apis mellifera y abejas nativas Meliponini durante la floración (julio-octubre en zona andina cafetera caucana-nariñense), drupas pequeñas globosas verde-negruzcas a violáceas al madurar muy buscadas por aves frugívoras del bosque andino (mirlas Turdus, tángaras Tangara, Atlapetes torquatus). Su madera —rojiza, aromática, de densidad alta— ha sido tradicionalmente apreciada en mueblería rural caucana y nariñense, artesanía, mangos de herramienta, postes de cerca y construcción patrimonial campesina del altiplano caucano-nariñense. Las hojas se usan localmente como aromática en cocción tradicional (sustituto del laurel mediterráneo) y en infusiones medicinales para problemas digestivos y respiratorios, aprovechando los aceites esenciales ricos en eugenol y otros fenoles propios de las Myrtaceae. Como árbol de cerca viva tradicional caucana-nariñense, junto a otros arrayanes nativos (Myrcianthes leucoxyla del altiplano cundiboyacense, Myrcianthes hallii ecuatoriano), configura los paisajes patrimoniales de cordillera andina suroccidental. Su mayor virtud agroecológica es la combinación de atractor de polinizadores nativos, sombrío parcial diversificado del café, biomasa hojarasca aromática y madera de calidad para usos rurales, lo que lo convierte en candidato ideal para sistemas agroforestales cafeteros del Cauca y Nariño. La región del valle del Patía y la cordillera central nariñense conserva poblaciones silvestres importantes que son fuente genética crítica para la propagación regional. Es lección de soberanía botánica regional: revalorizar las mirtáceas nativas del bosque andino premontano suroccidental colombiano en cafetales, huertos patrimoniales y restauración fortalece la apicultura agroecológica, la conservación de polinizadores y el patrimonio botánico cauca-nariñense. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, Lucas & Bünger 2015 revisiones Myrcia Neotropicales, Cenicafé manuales sombrío cafetero.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- clethra_revoluta — Laurel iguá (Clethra revoluta (Ruiz & Pav.) Spreng.)\n- coffea_arabica — Café caturra / Castillo / Cenicafé 1 (Coffea arabica L.)\n- inga_densiflora — Guamo macheto (Inga densiflora Benth.)\n- myrcianthes_leucoxyla — Arrayán de Bogotá (Myrcianthes leucoxyla (Ortega) McVaugh)",
+  "sources": [
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "cenicafe-manual-cafetero-2013",
+      "title": "cenicafe-manual-cafetero-2013",
+      "tier": "A",
+      "url": "https://www.cenicafe.org/es/index.php/nuestras_publicaciones"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.405Z"
+}

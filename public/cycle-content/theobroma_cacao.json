@@ -1,0 +1,76 @@
+{
+  "species_slug": "theobroma_cacao",
+  "scientific_name": "Theobroma cacao L.",
+  "common_names": [
+    "Cacao"
+  ],
+  "family": "Malvaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "shade_lover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Se propaga por semilla recién extraída del fruto (recalcitrante: pierde viabilidad en 1-2 semanas si se seca) o por injerto de yema/púa de clones élite ICA/FEDECACAO sobre patrón franco. El injerto es estándar comercial: garantiza productividad, tolerancia a monilia y uniformidad."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 200,
+      "optimo_max": 900,
+      "max_absoluto": 1200
+    },
+    "temperatura_c": {
+      "helada_letal": 10,
+      "optimo_min": 22,
+      "optimo_max": 28,
+      "max_tolerable": 32
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El cacao (Theobroma cacao L.) es un árbol perenne de la familia Malvaceae nativo de la cuenca amazónica, cultivado en Colombia entre 0 y 1.200 msnm en zona térmica cálida húmeda. Se siembra en Santander (San Vicente de Chucurí, Rionegro, Landázuri — primer productor nacional), Antioquia (Magdalena Medio), Huila, Tolima, Arauca, Meta y la región Pacífica (Tumaco, Buenaventura) bajo sombra parcial de plátano, cítricos o maderables nativos (Cordia alliodora, Cedrela odorata, Erythrina poeppigiana). Árbol cauliflor (flores y frutos en el tronco), 4-8 m, ciclo a primera cosecha 3-5 años por injerto. Manejo agroecológico: poda sanitaria + de mantenimiento dos veces al año, recolección semanal de mazorcas enfermas (monilia, escoba de bruja, mazorca negra) y entierro o composteo lejos del cultivo, fertilización con compost + pulpa fermentada del propio cacao + ceniza. Asociar con leguminosas arbóreas (Inga edulis, Erythrina poeppigiana) para sombra + fijación de N, y plátano (Musa AAB) como sombra provisional los primeros 3 años. Fermentación post-cosecha 5-7 días en cajones de madera (no plástico) define el perfil de sabor exportable. Colombia es origen de cacaos finos de aroma reconocidos por ICCO. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, AGROSAVIA Tibaitatá, ICA Resolución 3168/2015.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "agrosavia-tibaitata",
+      "title": "agrosavia-tibaitata",
+      "tier": "A",
+      "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1"
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.366Z"
+}

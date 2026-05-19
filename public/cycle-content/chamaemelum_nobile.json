@@ -1,0 +1,99 @@
+{
+  "species_slug": "chamaemelum_nobile",
+  "scientific_name": "Chamaemelum nobile (L.) All.",
+  "common_names": [
+    "Manzanilla romana"
+  ],
+  "family": "Asteraceae",
+  "category": "atractores_polinizadores",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor",
+    "ground_cover",
+    "pest_repellent"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "division_mata",
+      "esqueje"
+    ],
+    "best_method": "division_mata",
+    "protocol_resumen": "División de mata madura en otoño-invierno andino o primavera temprana: extraer la planta completa, separar manualmente en hijuelos enraizados de 5-10 cm de diámetro y replantar inmediatamente a 25-30 cm de distancia. También por semilla superficial (luz-germinante, no cubrir) en semillero — más lenta. Esquejes estoloníferos de tallos rastreros enraízan en contacto con suelo húmedo. Establecimiento de cobertura rastrera 60-90 días.",
+    "tiempo_a_establecimiento_dias": 75,
+    "notas": "DISTINTA DE Matricaria chamomilla (manzanilla común alemana anual ya en catálogo): Chamaemelum nobile es PERENNE rastrera (mata persistente 4-8 años), forma cobertura del suelo densa, hojas más finamente pinnadas-bipinnadas. Ambas comparten capítulos blanco-amarillos pero el aroma de C. nobile es más dulce-amanzanado-frutal y el aceite esencial dominado por ésteres de ácido angélico (no por bisabolol-camazuleno como M. chamomilla).",
+    "fuente": "POWO Kew; Pamplona-Roger 2006; JBB Plantas Medicinales"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1000,
+      "optimo_min": 1800,
+      "optimo_max": 2800,
+      "max_absoluto": 3100
+    },
+    "temperatura_c": {
+      "helada_letal": -7,
+      "optimo_min": 10,
+      "optimo_max": 22,
+      "max_tolerable": 28
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La manzanilla romana o manzanilla perenne (Chamaemelum nobile (L.) All., Asteraceae, sinónimos antiguos Anthemis nobilis L., Ormenis nobilis (L.) J.Gay) es una asterácea perenne rastrera medicinal-aromática originaria de Europa occidental-Mediterráneo (Inglaterra, Portugal, España, Francia atlántica) introducida en Colombia hace siglos por colonos europeos y bien establecida en altiplanos andinos colombianos entre 1.800 y 2.800 msnm en zonas térmicas templadas-frías-moderadas: Cundinamarca (Sabana de Bogotá, Subachoque, Cota, Chía, Tabio, Tenjo, Cajicá, Tocancipá, Sopó, Sesquilé), Boyacá (Tunja, Cómbita, Sotaquirá, Villa de Leyva, Paipa, Tibasosa, Sogamoso, Duitama, Iza, Tota), Nariño (Pasto, Túquerres, Ipiales, Cumbal, Yacuanquer, La Cruz), Cauca alto (Popayán, Silvia, Totoró, Coconuco, Puracé), Antioquia oriental fría (Sonsón, La Unión, El Retiro alto, San Vicente alto, Abejorral, La Ceja alta), Quindío alto (Salento, Filandia, Pijao alto, Calarcá alto), Risaralda alta (Santa Rosa de Cabal, Marsella alta, Belén de Umbría alta), Caldas (Manizales, Villamaría, Aguadas, Salamina, Pácora), Santander alto (Mogotes, San José de Miranda, Cerrito, Vélez alto, Onzaga, Concepción) y Norte de Santander alto (Pamplona, Pamplonita, Chitagá, Toledo, Mutiscua, Silos, Cucutilla). DIFERENCIACIÓN CRÍTICA con Matricaria chamomilla L. (manzanilla común alemana anual ya presente en catálogo desde Sprint 2): Chamaemelum nobile es PERENNE (vive 4-8 años continuos) frente a Matricaria chamomilla ANUAL (ciclo 90-120 días tras siembra-cosecha), tiene hábito RASTRERO formando cobertura tapizante de 15-30 cm altura frente a Matricaria erecta de 30-60 cm, hojas finamente pinnadas-bipinnadas casi 'plumosas' frente a Matricaria pinnatipartidas más sueltas, capítulos sólo levemente más grandes (15-25 mm vs 10-20 mm) con receptáculo CÓNICO HUECO (no macizo — diferencia diagnóstica tradicional), aceite esencial DIFERENTE QUÍMICAMENTE: dominado por ésteres del ácido angélico (isobutil-angelato, 2-metilbutil-angelato — hasta 80% del aceite esencial) y NO por α-bisabolol/camazuleno como Matricaria. Esta diferencia química explica por qué las dos manzanillas tienen aromas distinguibles: la romana es más dulce-amanzanado-frutal con notas a manzana madura, mientras la alemana es más herbácea-floral. Pertenece a la familia Asteraceae junto con Matricaria, Achillea millefolium (milenrama), Tanacetum, Calendula officinalis, Tagetes, Helianthus y demás compositas medicinales-ornamentales. Hierba perenne rastrera estolonífera con tallos rastreros radicantes que forman cobertura densa tapizante perenne 15-30 cm altura, hojas alternas finamente bipinnadas verde-claras-grisáceas casi plumosas (1.5-5 cm largo) muy aromáticas al frotar (aroma a manzana fresca), capítulos solitarios terminales pedunculados largos (15-25 mm diámetro) con flores liguladas blanco-marfil dispuestas alrededor de disco central amarillo cónico hueco, flores tubulares amarillas internas, fruto aquenio sin vilano. Uso medicinal tradicional europeo y colonial pos-colombiano: infusión de capítulos secos como sedante suave nocturno, digestiva post-comida (carminativa, antiespasmódica gástrica), antiinflamatoria sistémica suave, analgésica leve, antiséptica tópica (lavados oftálmicos suaves, gárgaras), cosmética capilar (aclarante natural de cabellos rubios). En aromaterapia el aceite esencial de C. nobile (más caro que el de Matricaria por menor rendimiento y mayor exclusividad europea — Inglaterra es productora histórica desde el siglo XVII) se usa en relajantes-ansiolíticos-sedantes premium. Manejo agroecológico: propagación clonal por división de mata madura (más rápida), semilla superficial sin cubrir (luz-germinante, más lenta) o esqueje estolonífero radicante, distancia 25-30 cm para formar cobertura del suelo densa tapizante, sol pleno preferido (tolera sombra parcial leve), riego moderado regular sin encharcamiento, suelos pobres a moderadamente fértiles arenoso-arcillosos bien drenados pH 6.0-7.5, muy resistente a heladas (-7 °C), tolera pisoteo moderado (puede usarse como césped aromático ornamental tradicional inglés), poda con cortacésped a 5-10 cm altura tras floración estimula rebrote y cobertura más densa, cosecha de capítulos en plena floración (mayor concentración aromática), secado a la sombra. Función en chagra/huerto medicinal-ornamental como cobertura del suelo perenne aromática complementaria a manzanilla común anual (ofrece producción continua perenne mientras Matricaria es ciclo corto), atractora extraordinaria de polinizadores nativos y domesticados (abejas, sírfidos, mariposas pequeñas) y enemigos naturales de plagas (Chrysoperla externa, microhimenópteros parasitoides), repelente moderado de mosca blanca y trips por liberación de ésteres angélicos volátiles. Fuentes Tier A: GBIF, POWO Kew, Pamplona-Roger 2006, JBB Plantas Medicinales, Pérez Arbeláez 1947, Bernal 2015, SiB Colombia.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "pamplona-roger-2006-plantas-medicinales",
+      "title": "pamplona-roger-2006-plantas-medicinales",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.397Z"
+}

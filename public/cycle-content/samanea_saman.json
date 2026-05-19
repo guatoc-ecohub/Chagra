@@ -1,0 +1,85 @@
+{
+  "species_slug": "samanea_saman",
+  "scientific_name": "Samanea saman (Jacq.) Merr.",
+  "common_names": [
+    "Samán"
+  ],
+  "family": "Fabaceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "nitrogen_fixer",
+    "windbreak",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semilla dura escarificación: agua hirviendo + remojo 24 h o lima. Germinación 75-90% a 10-15 días. Vivero 4-5 meses. Plantación a 30-40 cm. Crecimiento muy rápido.",
+    "tiempo_a_establecimiento_dias": 55,
+    "notas": "Emblema natural Tolima y Valle del Cauca (departamento Tolima lo declara árbol patrimonial). Foliolos plegantes nocturnos comportamiento nictinástico llamativo. Vainas dulces forraje bovino. Símbolo cultural costeño-vallecaucano.",
+    "fuente": "Bernal 2015; POWO; FAO Ecocrop; Agrosavia silvopastoriles; emblema departamental Tolima"
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 1200,
+      "max_absoluto": 1500
+    },
+    "temperatura_c": {
+      "helada_letal": 8,
+      "optimo_min": 24,
+      "optimo_max": 30,
+      "max_tolerable": 36
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El samán o campano (Samanea saman (Jacq.) Merr., Fabaceae subfamilia Mimosoideae) es uno de los árboles más emblemáticos y patrimoniales del bosque seco tropical (bs-T) colombiano, declarado árbol símbolo del departamento del Tolima (Asamblea Departamental ordenanza 1985) y emblema natural-cultural del Valle del Cauca, Caribe colombiano y Llanos Orientales. El nombre \"samán\" proviene del taíno antillano, y \"campano\" o \"cenízaro\" del español colonial-vallecaucano. Nativo del Neotrópico desde Centroamérica hasta Venezuela-Colombia-Perú, en Colombia se distribuye dominante en el bs-T de los valles interandinos del Magdalena (Tolima, Huila, Cundinamarca, Cesar), Cauca (Valle, Cauca), Patía, Sinú (Córdoba, Sucre), Caribe (Magdalena, Bolívar, Atlántico, La Guajira, Cesar) y piedemonte llanero (Casanare, Arauca, Meta) entre 0-1.200 msnm en zona térmica cálida. Árbol semicaducifolio de 20-30 m de altura con copa hemisférica enorme y muy regular hasta 40 m de diámetro (junto con el orejero, la copa más amplia del bs-T americano), fuste corto a menudo ramificado desde baja altura, corteza grisácea fisurada, hojas bipinnadas con 4-8 folíolos elípticos obtusos, flores rosado-blancas en cabezuelas globulosas espectaculares (apariencia de pompones) con estambres largos rosa intenso melíferos, frutos vaina recta linear marrón-negra dehiscente con 15-25 semillas inmersas en pulpa dulce. Su característica botánica más fascinante es la nictinastia foliar: al atardecer y bajo lluvia, los folíolos se pliegan sincrónicamente reduciendo la transpiración y permitiendo que la lluvia atraviese la copa hasta el suelo (de ahí el nombre \"rain tree\" en inglés y \"lluvia de oro\"), un comportamiento educativo extraordinario para enseñar fisiología vegetal a niños y agricultores. Como leguminosa Mimosoideae fija nitrógeno biológico mediante rizobios y bacterias diazotróficas asociadas, aporte crítico en bs-T degradado. Las vainas dulces (contienen sacarosa 35-45% MS, proteína 12-16% MS) caen desde septiembre hasta febrero y son el forraje suplementario más apreciado del Caribe-Valle: bovinos, equinos y porcinos las consumen 5-10 kg/día en patio, sustituyendo melaza y concentrado, mejorando ganancia de peso y producción lechera en estación seca crítica. Su sombrío hemisférico denso provee refugio térmico a ganado en climas 35-38°C reduciendo estrés calórico y aumentando productividad. Es además árbol urbano emblemático del Caribe colombiano: plazas, parques y avenidas de Cartagena, Barranquilla, Montería, Valledupar, Sincelejo, Ibagué, Cali, Buga, Palmira tienen samanes centenarios protegidos como patrimonio natural-cultural. Manejo agroecológico: propagación por semilla con escarificación (agua hirviendo + remojo 24 h o lima mecánica, germinación 75-90% a 10-15 días), vivero 4-5 meses, plantación definitiva a 30-40 cm, distancia 25-40 árb/ha en silvopastoril, crecimiento muy rápido (10-15 m en 8-10 años), turno maderable 20-30 años. Es lección extraordinaria de patrimonio bio-cultural: un árbol que simultáneamente es símbolo del Tolima vallecaucano-costeño, sombrío de ganadería extensiva, forraje suplementario gratuito, fijador biológico de N, atractor de polinizadores nativos, refugio térmico bovino y demostración viva de nictinastia. Defenderlo es defender el bs-T amenazado, la memoria cultural colombiana del trópico seco, y un servicio ecosistémico que el mercado no paga pero la finca cobra todos los días en kilos de carne y litros de leche. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Agrosavia silvopastoriles bs-T.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- coffea_arabica — Café caturra / Castillo / Cenicafé 1 (Coffea arabica L.)\n- cordia_alliodora — Nogal cafetero (Cordia alliodora (Ruiz & Pav.) Oken)\n- enterolobium_cyclocarpum — Orejero (Enterolobium cyclocarpum (Jacq.) Griseb.)\n- gliricidia_sepium — Matarratón (Gliricidia sepium (Jacq.) Kunth ex Walp.)\n- tabebuia_rosea — Guayacán rosado (Tabebuia rosea (Bertol.) DC.)",
+  "sources": [
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "agrosavia-silvopastoriles",
+      "title": "agrosavia-silvopastoriles",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.389Z"
+}

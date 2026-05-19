@@ -1,0 +1,85 @@
+{
+  "species_slug": "enterolobium_cyclocarpum",
+  "scientific_name": "Enterolobium cyclocarpum (Jacq.) Griseb.",
+  "common_names": [
+    "Orejero"
+  ],
+  "family": "Fabaceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "nitrogen_fixer",
+    "windbreak",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semilla muy dura requiere escarificación: lima, ácido sulfúrico 30 min o agua hirviendo + remojo 24 h. Germinación 80-95% a 7-14 días. Vivero 4-5 meses. Plantación definitiva a 30 cm. Crecimiento rápido.",
+    "tiempo_a_establecimiento_dias": 50,
+    "notas": "Árbol más grande del bosque seco tropical americano. Fruto característico vaina circular curvada en forma de oreja humana (origen del nombre). Forraje suplementario crítico ganadería seca: vainas dulces alto contenido proteína.",
+    "fuente": "Bernal 2015; POWO; FAO Ecocrop; Agrosavia silvopastoriles; CIAT manuales bosque seco"
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 1000,
+      "max_absoluto": 1300
+    },
+    "temperatura_c": {
+      "helada_letal": 8,
+      "optimo_min": 24,
+      "optimo_max": 32,
+      "max_tolerable": 38
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El orejero, carito o piñón de oreja (Enterolobium cyclocarpum (Jacq.) Griseb., Fabaceae subfamilia Mimosoideae) es el árbol más grande y emblemático del bosque seco tropical (bs-T) americano, conocido como \"guanacaste\" en Centroamérica (árbol nacional de Costa Rica), \"conacaste\" en El Salvador, y \"orejero\" o \"carito\" en Colombia. Su nombre español proviene del fruto característico: una vaina circular curvada y aplanada en forma de oreja humana, marrón-negra brillante a la madurez, contiene 6-15 semillas duras inmersas en pulpa dulce y aromática. Nativo del Neotrópico desde México hasta Brasil-Perú, en Colombia se distribuye en el bosque seco tropical de los valles interandinos del Magdalena (Tolima, Huila, Cundinamarca, Boyacá, Santander), Cauca (Valle, Cauca), Patía, Sinú-San Jorge (Córdoba, Sucre, Bolívar), Caribe seco (La Guajira, Cesar, Magdalena, Atlántico) y piedemonte llanero (Casanare, Arauca) entre 0-1.000 msnm en zona térmica exclusivamente cálida (>24°C promedio anual). Árbol caducifolio de 25-40 m de altura con copa hemisférica muy amplia hasta 50 m de diámetro (la copa más extensa del bs-T), fuste recto cilíndrico hasta 3-4 m DAP, corteza grisácea con lenticelas, hojas bipinnadas con folíolos pequeños caducas en estación seca, flores blanco-verdosas en cabezuelas globulosas, frutos vaina circular curvada característica. Su rol ecológico es triple: (1) sombrío extremo para ganadería extensiva — un solo árbol provee sombra a 50-100 cabezas de ganado bovino reduciendo estrés térmico crítico en climas 35-38°C; (2) forraje suplementario en estación seca: las vainas dulces caen desde septiembre-noviembre, son apetentes para bovinos, equinos y porcinos, contienen 16-20% proteína MS y 65% TND, sustituyendo concentrado comercial en finca; (3) fijación biológica de N como Mimosoideae mediante rizobios, aporte crítico en suelos pobres compactados del bs-T. Como leguminosa pionera de gran porte y crecimiento rápido (10-15 m en 8-10 años) es especie clave en restauración de bs-T y atractor crítico para mamíferos dispersores nativos como sahínos (Tayassu pecari, T. tajacu), dantas (Tapirus bairdii), ñeques (Dasyprocta), micos aulladores (Alouatta seniculus) y avifauna granívora (Aratinga, Brotogeris, Forpus). Su madera blanco-cremosa medianamente densa es apreciada en tornería, ebanistería, embarcaciones tradicionales (canoas dugout precolombinas), construcción rural ligera. Manejo agroecológico: propagación por semilla con escarificación crítica (semilla muy dura: lima mecánica, ácido sulfúrico 30 min, o agua hirviendo + remojo 24 h, germinación 80-95% a 7-14 días), vivero 4-5 meses a sol pleno, plantación definitiva a 30 cm, distancia 25-40 árb/ha en silvopastoril extensivo (densidad baja por tamaño extraordinario), cosecha de vainas septiembre-noviembre 50-80 kg/árb/año. Es lección extraordinaria de cómo un árbol nativo gigante puede transformar la ganadería extensiva del bs-T en sistema silvopastoril sostenible: reduce estrés calórico bovino, provee forraje suplementario gratuito que ahorra concentrado importado, fija N al suelo, atrae fauna dispersora restauradora, y produce madera de calidad — todo en un solo árbol patrimonial. Es además testimonio vivo de los bosques secos pre-coloniales, donde estos gigantes eran abundantes y dispersaban sus vainas a través de la megafauna pleistocénica extinta (gomphoteres, gliptodontes): hoy el ganado bovino doméstico cumple el rol dispersor co-evolutivo, manteniendo el árbol vivo en el paisaje. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Agrosavia silvopastoriles bs-T.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- coffea_arabica — Café caturra / Castillo / Cenicafé 1 (Coffea arabica L.)\n- cordia_alliodora — Nogal cafetero (Cordia alliodora (Ruiz & Pav.) Oken)\n- gliricidia_sepium — Matarratón (Gliricidia sepium (Jacq.) Kunth ex Walp.)\n- pseudosamanea_guachapele — Igua (Pseudosamanea guachapele (Kunth) Harms)\n- samanea_saman — Samán (Samanea saman (Jacq.) Merr.)",
+  "sources": [
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "agrosavia-silvopastoriles",
+      "title": "agrosavia-silvopastoriles",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.389Z"
+}

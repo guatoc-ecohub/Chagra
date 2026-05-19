@@ -42,24 +42,28 @@
     {
       "id": "perez-rodriguez-gomez-2008",
       "title": "perez-rodriguez-gomez-2008",
+      "tier": "B",
       "url": null
     },
     {
       "id": "nustez-rodriguez-2024-unal",
       "title": "nustez-rodriguez-2024-unal",
+      "tier": "B",
       "url": null
     },
     {
       "id": "gbif-taxonomic-backbone",
       "title": "gbif-taxonomic-backbone",
+      "tier": "A",
       "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
     },
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.097Z"
+  "_generated_at": "2026-05-19T00:42:57.369Z"
 }

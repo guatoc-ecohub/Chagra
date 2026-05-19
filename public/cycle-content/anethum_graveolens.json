@@ -1,0 +1,79 @@
+{
+  "species_slug": "anethum_graveolens",
+  "scientific_name": "Anethum graveolens L.",
+  "common_names": [
+    "Eneldo"
+  ],
+  "family": "Apiaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio",
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor",
+    "pest_repellent"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Siembra directa preferente (raíz pivotante delicada que no tolera trasplante). Germinación 7-14 días a 18-22°C. Distancia 20-30 cm. Ciclo 3-4 meses a cosecha foliar, 5-6 meses a semillas. Anual."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 1200,
+      "optimo_max": 2600,
+      "max_absoluto": 3000
+    },
+    "temperatura_c": {
+      "helada_letal": -5,
+      "optimo_min": 10,
+      "optimo_max": 22,
+      "max_tolerable": 30
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El eneldo (Anethum graveolens L., Apiaceae) es una hierba aromática anual umbelífera originaria del Mediterráneo oriental y suroeste de Asia, naturalizada y cultivada en Colombia desde la Colonia como hierba culinaria-medicinal en huertos caseros y producción para mercado fresco. Se cultiva en zonas andinas de Cundinamarca (Sabana, Tena, Anolaima), Boyacá (Tunja, Sogamoso, Garagoa), Antioquia (Oriente, Suroeste), Nariño (Pasto, Túquerres), Santander (Mesa de los Santos), Valle del Cauca (Restrepo, Calima), Tolima y Huila entre 0 y 3.000 msnm en zonas térmicas templadas, frías y cálidas adaptables. Pertenece a la familia Apiaceae (Umbelliferae, igual que cilantro, perejil, zanahoria, apio, hinojo, comino, alcaravea, anís verde) y al género monoespecífico Anethum (única especie del género). Planta anual herbácea de 60-120 cm de altura con tallo erecto hueco glabro estriado verde-azulado, hojas alternas finamente divididas pinnatisectas filiformes (semejantes a las de hinojo pero más finas y de color verde-azuloso) con aroma característico a 'pepinillo encurtido', flores amarillas pequeñas en umbelas compuestas terminales muy atractoras de polinizadores y avispas parasitoides (control biológico de plagas), frutos esquizocárpicos en diaquenios ovales aplanados (las 'semillas de eneldo' culinarias) con aroma a alcaravea-anís-pepino. Tiene tres usos culinarios diferenciados según la parte cosechada: 1) hojas frescas (eneldo de hoja, 'dill weed') aromatizan pescados al horno, salmón gravlax, salsas blancas, ensaladas de papa, queso fresco, yogur, sopas frías; 2) semillas secas aromatizan encurtidos de pepinillo (carácter aromático icónico del 'pickle' anglosajón y germánico), panes, repostería, conservas; 3) inflorescencias frescas se usan junto con las semillas en fermentación láctica de pepinillos y chucrut. Es lección viva de migración culinaria y aromáticas mediterráneas que enseña a niñas y niños cómo una hierba del Mediterráneo se integró al huerto andino colombiano sin desplazar especies nativas, y cómo cada parte de la planta (hoja, flor, semilla) tiene un uso aromático distinto. Aceite esencial rico en carvona (50-60%), limoneno, felandreno y dilapiol con propiedades carminativas, digestivas, lactogogas (uso tradicional para estimular producción de leche materna en mujeres lactantes), antiespasmódicas y sedantes suaves; té de semillas para cólicos infantiles y digestiones lentas. Manejo agroecológico: siembra directa preferente (raíz pivotante delicada que no tolera trasplante), germinación 7-14 días a 18-22°C, distancia 20-30 cm, ciclo 3-4 meses a cosecha foliar, 5-6 meses a semillas, anual obligado. Companion plants: pepino (sinergia obligada para encurtidos), repollo (mejora sabor y repele orugas), cebolla, maíz. Antagonistas: zanahoria (compite por raíz pivotante e hibridación), hinojo (alelopatía). Función en chagra como aromática culinaria + medicinal + atractora de polinizadores + control biológico. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015, JBB Plantas Medicinales, Pamplona-Roger 2006.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "pamplona-roger-2006-plantas-medicinales",
+      "title": "pamplona-roger-2006-plantas-medicinales",
+      "tier": "B",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.393Z"
+}

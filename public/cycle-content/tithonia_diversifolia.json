@@ -1,0 +1,76 @@
+{
+  "species_slug": "tithonia_diversifolia",
+  "scientific_name": "Tithonia diversifolia (Hemsl.) A.Gray",
+  "common_names": [
+    "Botón de oro"
+  ],
+  "family": "Asteraceae",
+  "category": "abonos_verdes_coberturas",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "dynamic_accumulator",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 800,
+      "optimo_max": 1800,
+      "max_absoluto": 2300
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "El botón de oro o suncho amarillo (Tithonia diversifolia (Hemsl.) A.Gray, Asteraceae) es un arbusto perenne mesoamericano (México-Centroamérica) naturalizado y ampliamente difundido en Colombia entre 800 y 1.800 msnm (Cauca, Valle del Cauca, Tolima, Huila, Caldas, Quindío, Risaralda, Antioquia, Santander, Boyacá zona cafetera, Putumayo) como una de las especies más versátiles del agroecosistema tropical-andino colombiano. Arbusto de 2-4 m altura (ocasionalmente 6 m), crecimiento rápido (1-2 m primer año), tallos fistulosos verde-claros suculentos, hojas alternas grandes (15-30 cm) palmatilobadas o trilobadas pubescentes serradas, capítulos solitarios o agrupados de flores amarillo-anaranjadas intenso (8-15 cm diámetro, lígulas radiadas amarillo-oro, disco amarillo-anaranjado) muy llamativas tipo girasol. Fitoextractor extraordinario de fósforo (P) y potasio (K) del subsuelo: biomasa fresca contiene 3-4% N, 0.3-0.4% P y 3-4% K — equivalente a una fórmula NPK orgánica completa. Producción de biomasa explosiva: 30-80 ton MS/ha/año en cortes de 60-90 días, hasta 6-8 cortes anuales. Usos múltiples: (1) abono verde mulch en cultivos perennes (café, cacao, frutales), (2) forraje proteico para bovinos lecheros (CIPAV-AGROSAVIA: 20-25% PC, complemento de pastos), (3) banco de biomasa para compostaje y biopreparados (té de tithonia: 1 kg biomasa fresca + 10 L agua + 7 días = abono foliar líquido), (4) cerca viva agroecológica, (5) atractor masivo de polinizadores y enemigos naturales (avispas parasitoides, sírfidos, mariposas), (6) restauración de suelos degradados y compactados (raíces profundas que rompen capas duras). Manejo agroecológico: propagación por estaca semileñosa (30-50 cm, prendimiento >90%, sin hormonas) o semilla, distancia 0.5-1 m en franjas, poda de igualación a 50 cm post-floración, incorporación al suelo o mulch superficial. Lección viva de agroecología tropical: enseña a niñas, niños y campesinos que una sola especie puede reemplazar fertilizantes sintéticos costosos (P-K importados de Marruecos-Canadá) cosechando biomasa de su propio jardín — soberanía nutricional vegetal en cuatro meses. Reivindicado por escuelas agroecológicas de CIPAV, AGROSAVIA Palmira, y movimientos agroecológicos Colombia-Brasil. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Silvopastoriles, AGROSAVIA Forrajeras 2022, IAvH Flora, Restrepo 2005 Agroecología.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-silvopastoriles",
+      "title": "agrosavia-silvopastoriles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-forrajeras-2022",
+      "title": "agrosavia-forrajeras-2022",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "restrepo-2005-agroecologia",
+      "title": "restrepo-2005-agroecologia",
+      "tier": "B",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.387Z"
+}

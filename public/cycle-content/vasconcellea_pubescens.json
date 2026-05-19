@@ -44,19 +44,22 @@
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     },
     {
       "id": "gbif-colombia",
       "title": "gbif-colombia",
+      "tier": "A",
       "url": "https://www.gbif.org/country/CO"
     },
     {
       "id": "agrosavia-tibaitata",
       "title": "agrosavia-tibaitata",
+      "tier": "A",
       "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1"
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.097Z"
+  "_generated_at": "2026-05-19T00:42:57.369Z"
 }

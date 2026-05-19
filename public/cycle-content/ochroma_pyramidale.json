@@ -1,0 +1,85 @@
+{
+  "species_slug": "ochroma_pyramidale",
+  "scientific_name": "Ochroma pyramidale (Cav. ex Lam.) Urb.",
+  "common_names": [
+    "Balso"
+  ],
+  "family": "Malvaceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "nurse_plant",
+    "pollinator_attractor",
+    "windbreak"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Cápsulas leñosas dehiscentes liberan semillas envueltas en pelos algodonosos (lana). Escarificación leve con agua caliente 60°C por 1 minuto o lijado opcional. Germinación 80-95% a 7-15 días. Crecimiento muy rápido en vivero (15-25 cm/mes), plantación a 3-4 meses (40-60 cm).",
+    "tiempo_a_establecimiento_dias": 30,
+    "notas": "Pionera por excelencia de bosque húmedo tropical: una de las especies de crecimiento más rápido del Neotrópico (3-5 m/año primeros años), corta vida (15-25 años), prepara sitios para sucesión secundaria. Madera más liviana del mundo comercial (densidad 0.1-0.2 g/cm³).",
+    "fuente": "Bernal 2015; POWO; Sinchi; CIAT manuales agroforestales tropicales"
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 1000,
+      "max_absoluto": 1500
+    },
+    "temperatura_c": {
+      "helada_letal": 8,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 36
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El balso o palo balso (Ochroma pyramidale (Cav. ex Lam.) Urb., sinónimo Ochroma lagopus, Malvaceae subfamilia Bombacoideae) es la pionera por excelencia del bosque húmedo tropical neotropical y una de las especies de crecimiento más rápido del mundo. Nativo del Neotrópico, en Colombia se distribuye en bosques húmedos tropicales bajos del Pacífico (Chocó, Valle, Cauca, Nariño), Caribe húmedo (Antioquia bajo, Córdoba, Urabá, sierra Nevada), Magdalena medio, Catatumbo, Amazonía (piedemonte caqueteño, putumayense, amazonense) y Orinoquía (piedemonte Casanare, Meta) entre 0 y 1.000 msnm en zona térmica cálida muy húmeda. Árbol siempreverde de 15-25 m de altura con fuste recto y copa abierta, hojas alternas grandes palmaticompuestas o palmadas pubescentes, flores grandes blanco-amarillentas crepusculares-nocturnas polinizadas por murciélagos y polillas grandes, cápsulas leñosas largas (15-25 cm) dehiscentes que liberan semillas envueltas en abundante lana o pelos algodonosos (de ahí 'lano' o 'lana' en algunas regiones) útil tradicionalmente para rellenos artesanales de almohadas, juguetes y aislamientos. Su característica más extraordinaria es el crecimiento exponencial en juventud: 3-5 metros por año los primeros 5 años, alcanzando 10-15 m a los 4 años (el árbol comercial de crecimiento más rápido del trópico), con corta vida útil (15-25 años) propia de pioneras. La madera comercial del balso es la más liviana del mundo con densidad de 0.1-0.2 g/cm³ (comparable al corcho), usada mundialmente para aeromodelismo profesional (alas y fuselajes), tablas de surf (núcleos), modelado arquitectónico, juguetería educativa, aislamiento térmico de buques, equipos de salvamento (chalecos), embalajes ligeros frágiles y trabajos de bricolaje. Su rol ecológico como pionera de sucesión secundaria es crítico: coloniza rápidamente claros del bosque, potreros abandonados o quemas; aporta hojarasca abundante mejorando suelos degradados; provee sombrío rápido temporal que protege la germinación de especies climácicas de sucesión tardía como cedro, caoba o abarco; y muere naturalmente a los 15-25 años liberando dosel para que las climácicas tomen el espacio. En sistemas agroforestales tropicales este rol se aprovecha conscientemente: se planta balso en cacaotales jóvenes a 150-300 árb/ha como sombrío rápido temporal mientras crecen los maderables nobles asociados, y a los 6-8 años se cosecha el balso para madera y se libera el dosel para la siguiente fase. Manejo agroecológico: escarificación leve de semilla con agua caliente 60°C por 1 minuto o lijado opcional, germinación 7-15 días, vivero a sol pleno 3-4 meses con crecimiento muy rápido (15-25 cm/mes), plantación definitiva a 40-60 cm de altura. Es lección clave de sucesión ecológica tropical: la naturaleza no construye un bosque maduro de golpe, lo construye en capas temporales donde el balso prepara la cama para el cedro, y entender esto es entender cómo restaurar selva en lugar de monocultivar. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, Sinchi Amazonía, CIAT manuales agroforestales tropicales.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- cedrela_odorata — Cedro real (Cedrela odorata L.)\n- cordia_alliodora — Nogal cafetero (Cordia alliodora (Ruiz & Pav.) Oken)\n- inga_edulis — Guamo (Inga edulis Mart.)\n- swietenia_macrophylla — Caoba andina (Swietenia macrophylla King)",
+  "sources": [
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "sinchi-amazonia-colombiana",
+      "title": "sinchi-amazonia-colombiana",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.388Z"
+}

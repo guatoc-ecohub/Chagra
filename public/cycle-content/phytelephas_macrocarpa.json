@@ -1,0 +1,74 @@
+{
+  "species_slug": "phytelephas_macrocarpa",
+  "scientific_name": "Phytelephas macrocarpa Ruiz & Pav.",
+  "common_names": [
+    "Tagua"
+  ],
+  "family": "Arecaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 800,
+      "max_absoluto": 1500
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "La tagua o palma marfil vegetal (Phytelephas macrocarpa Ruiz & Pav., Arecaceae-Phytelepheae) es una palma nativa neotropical de la región amazónica occidental, presente en la Amazonía colombiana (Putumayo, Caquetá, Amazonas, Guaviare), Pacífico colombiano (con la especie hermana Phytelephas seemannii dominante en Chocó-Valle-Nariño) y a lo largo del piedemonte amazónico Andino entre 100 y 800 msnm en bosque húmedo tropical, várzeas y bosques de galería. Palma acaule o de estípite muy corto (hasta 2 m, mayormente subterráneo o procumbente), corona basal de 8-15 hojas pinnadas grandes (5-8 m largo) verde-medias con raquis arqueado y foliolos numerosos lanceolados regularmente dispuestos, dioica (plantas masculinas y femeninas separadas), inflorescencias densas globosas de coloración crema y aroma dulce intenso muy atractor de abejas-orquídeas Euglossini y escarabajos polinizadores, infrutescencias compuestas en cabezuelas pesadas (10-25 kg) con 6-20 frutos drupáceos espinosos exteriores (cabeza-de-negro) cada uno conteniendo 5-9 semillas endurísimas blanco-marfil del tamaño de un huevo de gallina — endospermo cristalino-translúcido al madurar que da el nombre \"marfil vegetal\" o \"ivory nut\" por su parecido al marfil animal en dureza, color y tallabilidad. Importancia económica histórica y contemporánea EXCEPCIONAL: el endospermo seco y curado de las semillas (la \"tagua\") es uno de los productos forestales no maderables más emblemáticos de Colombia y Ecuador. Tallada artesanalmente en botones, joyería, figuras, dijes, esculturas miniatura — sustituye éticamente el marfil animal de elefante (prohibido por CITES) en aplicaciones de lujo, moda y arte. La tagua colombiana del Pacífico (Phytelephas seemannii) abasteció gran parte de la industria mundial de botones entre 1900-1940 antes del plástico (Manizales-Pereira-Chocó), industria que ha resurgido en el siglo XXI como producto sostenible certificable. Frutos jóvenes con endospermo lechoso comestible (sabor a coco), maduros con endospermo durísimo no comestible humano. Manejo agroecológico-extractivista sostenible: propagación por semilla (germinación lenta 6-18 meses con latencia profunda, plántulas crecen 20-30 cm/año), vivero 2-4 años, trasplante a SAF o enriquecimiento de bosque, distancia 5-8 m, fructificación 10-15 años (palma de inversión generacional), cosecha sostenible de cabezuelas caídas naturalmente cada 3-4 meses por planta hembra productiva durante 50-80 años (longevidad excepcional). Lección viva de bioeconomía sostenible y conservación de biodiversidad: la tagua es ejemplo paradigmático de producto forestal no maderable (PFNM) que enseña cómo un bosque colombiano conservado en pie produce más valor económico de largo plazo (productos artesanales de exportación, ecoturismo, captura de carbono, agua) que un bosque tumbado para ganadería extensiva — modelo de economía verde de comunidades afro y campesinas del Pacífico-Amazonía. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015 Plantas y Líquenes de Colombia, IAvH Flora, Pérez Arbeláez 1947, SiB Colombia.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.387Z"
+}

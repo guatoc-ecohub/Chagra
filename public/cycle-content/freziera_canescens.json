@@ -1,0 +1,93 @@
+{
+  "species_slug": "freziera_canescens",
+  "scientific_name": "Freziera canescens Bonpl.",
+  "common_names": [
+    "Freziera"
+  ],
+  "family": "Pentaphylacaceae",
+  "category": "arboles_sombra",
+  "cultivable": false,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "nurse_plant",
+    "pollinator_attractor",
+    "biomass_producer"
+  ],
+  "antagonists": [
+    "eucalyptus_globulus",
+    "pinus_patula"
+  ],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Propagación por semilla fresca de bayas maduras negro-violáceas, despulpadas y sembradas inmediatamente en sustrato turba-musgo con sombra densa 75% y humedad atmosférica alta 90%. Germinación 60-120 días. Trasplante 6-8 meses. Plantación 18-24 meses. Esqueje muy difícil (enraizamiento <20%). Crecimiento lento 20-40 cm/año.",
+    "tiempo_a_establecimiento_dias": 600,
+    "notas": "Especie INDICADORA de bosque nublado andino bien conservado. Requiere niebla persistente y humedad atmosférica >85%. NO se establece en sitios secos o expuestos."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 2000,
+      "optimo_min": 2300,
+      "optimo_max": 2900,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -5,
+      "optimo_min": 8,
+      "optimo_max": 15,
+      "max_tolerable": 22
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "Freziera canescens Bonpl. (freziera, cucharo de bosque nublado — familia Pentaphylacaceae, antes clasificada en Theaceae) es un árbol perennifolio (5-15 m altura) nativo de los Andes del norte de Sudamérica (Colombia, Ecuador, Perú, Venezuela), distribuido en BOSQUE NUBLADO alto andino entre 2000 y 3200 msnm en piso térmico FRÍO HÚMEDO con niebla persistente. En Colombia se encuentra en Cundinamarca, Boyacá, Antioquia, Nariño, Cauca y Santander, con poblaciones notables en Chingaza, en el flanco oriental húmedo de Cruz Verde-Sumapaz, en Tatamá, en el Parque Otún-Quimbaya y en reservas del Eje Cafetero alto. Es reconocible por sus hojas alternas elípticas con PUBESCENCIA BLANQUECINA EN EL ENVÉS (rasgo distintivo — al voltear la hoja se ve plateada-blanquecina por los tricomas finos que atrapan gotas de niebla y reducen la transpiración foliar), por sus flores blancas pequeñas axilares cuatrímeras-pentámeras y por sus bayas globosas pequeñas negro-violáceas (alimento de avifauna nublada — atrapamoscas, mirlas pequeñas, semilleros). Lección viva sobre BOSQUE NUBLADO ANDINO, ADAPTACIONES ANATÓMICAS A LA NIEBLA y BIOINDICACIÓN ECOLÓGICA: la freziera es ESPECIE INDICADORA de bosque nublado andino bien conservado — su presencia testifica un rodal con niebla persistente >150 días/año, humedad relativa atmosférica >85% y red micorrízica fúngica funcional. Su pubescencia foliar blanquecina es una adaptación anatómica fina para capturar agua de niebla por intercepción foliar (un fenómeno que en ingeniería ecológica se llama 'horizontal precipitation' o 'fog drip' — los bosques de freziera y otras especies de hoja pubescente AUMENTAN el aporte hídrico local de un 15-30% sobre la precipitación medida en pluviómetros, dato relevante para el balance hídrico de cuencas abastecedoras como la del río Tunjuelo en Sumapaz o la del río Teusacá en Chingaza). En restauración, la freziera se planta en FASE TARDÍA del bosque nublado, después de pioneras y sucesionales intermedias, en sitios con niebla persistente — fracasa si se planta en bordes secos o cortafuegos. Manejo agroecológico: propagación por semilla fresca con sombra densa 75% y humedad alta; trasplante 6-8 meses; plantación 18-24 meses; crecimiento lento 20-40 cm/año; asocio con gaque, encenillo y pino romerón (Prumnopitys montana); densidades 100-200 ind/ha; restauración del bosque nublado húmedo de Chingaza, Cruz Verde-Sumapaz oriental, Tatamá, Otún-Quimbaya. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Bernal 2015 Catálogo Plantas Líquenes Colombia.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- clusia_multiflora — Gaque (Clusia multiflora Kunth)\n- prumnopitys_montana — Pino romerón / Chaquiro (Prumnopitys montana (Humb. & Bonpl. ex Willd.) de Laub.)\n- weinmannia_tomentosa — Encenillo (Weinmannia tomentosa L. f.)",
+  "antagonists_markdown": "### Antagonistas (no asociar)\n\nEvite sembrar estas especies cerca; compiten o comparten plagas/patógenos:\n- eucalyptus_globulus — Eucalipto blanco (Eucalyptus globulus Labill.)\n- pinus_patula — Pino pátula (Pinus patula Schiede ex Schltdl. & Cham.)",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.402Z"
+}

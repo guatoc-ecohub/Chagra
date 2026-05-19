@@ -1,0 +1,77 @@
+{
+  "species_slug": "nigella_sativa",
+  "scientific_name": "Nigella sativa L.",
+  "common_names": [
+    "Comino negro"
+  ],
+  "family": "Ranunculaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Siembra directa preferente (raíz pivotante delicada). Germinación 10-15 días a 15-20°C. Distancia 15-25 cm. Ciclo 3-4 meses a floración, 4-5 meses a cosecha de semilla. Anual. Cosecha de cápsulas maduras secas y trilla manual."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 800,
+      "optimo_min": 1500,
+      "optimo_max": 2600,
+      "max_absoluto": 2900
+    },
+    "temperatura_c": {
+      "helada_letal": -5,
+      "optimo_min": 12,
+      "optimo_max": 24,
+      "max_tolerable": 30
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El comino negro o kalonji (Nigella sativa L., Ranunculaceae) es una hierba aromática-medicinal anual originaria del suroeste de Asia y norte de África (probablemente Anatolia-Mesopotamia) cultivada desde hace más de 3.000 años en Egipto, India, Medio Oriente y Mediterráneo oriental como semilla nutracéutica-medicinal sagrada — su uso ancestral fue documentado en la tumba de Tutankamón y en textos médicos hipocráticos, persas, ayurvédicos y proféticos islámicos (la tradición sufí lo llama 'habat al-barakah', semilla de la bendición). En Colombia su presencia es muy escasa pero creciente en huertos especializados de aromáticas-medicinales asiáticas en zonas andinas medias-frías de Cundinamarca (Sabana, Tena), Boyacá, Antioquia (Oriente alto), Nariño, Cauca andino entre 800 y 2.900 msnm en zonas térmicas templadas y frías. Pertenece a la familia Ranunculaceae (igual que el ranúnculo, anémona, peonía, aquilegia, ajenjo-acónito — familia primitiva de dicotiledóneas con muchas plantas medicinales potentes) y al género Nigella con >20 especies de las cuales N. sativa es la única cultivada por semilla comestible, distinta de la N. damascena (cultivada solo como ornamental). NO debe confundirse con el 'comino común' (Cuminum cyminum, Apiaceae) que es una umbelífera completamente diferente — son aromáticas distintas a pesar del nombre vernáculo coincidente. Planta herbácea anual de 20-40 cm de altura con tallos erectos ramificados glabros, hojas finamente divididas pinnatisectas filiformes verde-grisáceas, flores solitarias terminales hermosas azul-celestes o blanco-azuladas con 5 sépalos petaloides (los pétalos verdaderos son inconspicuos) atractoras de polinizadores, frutos en cápsulas infladas conspicuas con 5-7 carpelos persistentes que contienen las pequeñas semillas negras triangulares aromáticas. La semilla negra es el producto cosechable: aroma a comino-pimienta-orégano-nuez muy distintivo y sabor levemente picante-amargo aromático, rica en aceites esenciales (timoquinona principal compuesto bioactivo, p-cimeno, alfa-pineno, carvacrol) con propiedades antiinflamatorias, antimicrobianas, antioxidantes potentes, hipoglucemiantes (estudios clínicos modernos en diabetes tipo 2), inmunomoduladoras y antitumorales documentadas. Sus usos son patrimoniales: 1) **culinario** como semilla aromática para panes (icónica del 'naan' indio, 'pide' turco, 'borek' anatolio), encurtidos, quesos frescos, infusiones, mezclas de especias (panch phoron bengalí, dukkah egipcio); 2) **medicinal** tradicional con uso milenario (cardamomo de los pobres, semilla de la bendición islámica) en infusiones, decocciones, aceite prensado en frío para uso tópico (caspa, eczema, dolores articulares) y oral (digestiones, asma, diabetes); 3) **agroecológico** atractora de polinizadores con floración corta pero intensa. Es lección viva de patrimonio medicinal mediterráneo-asiático y soberanía nutricional que enseña a niñas y niños cómo una semilla del Medio Oriente puede integrarse al huerto andino colombiano y abrir puerta a tradiciones culinarias y medicinales milenarias de la humanidad. Manejo agroecológico: siembra directa preferente (raíz pivotante delicada), germinación 10-15 días a 15-20°C, distancia 15-25 cm, ciclo 3-4 meses a floración y 4-5 meses a cosecha, anual obligado, cosecha de cápsulas maduras secas y trilla manual sencilla. Companion plants: hortalizas en general, frutales aromáticos, otras Ranunculaceae. Función en chagra como aromática-medicinal patrimonial y atractora de polinizadores. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, JBB Plantas Medicinales, Pamplona-Roger 2006, Bernal 2015.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "pamplona-roger-2006-plantas-medicinales",
+      "title": "pamplona-roger-2006-plantas-medicinales",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.393Z"
+}

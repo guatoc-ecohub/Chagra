@@ -50,34 +50,40 @@
     {
       "id": "humboldt-flora-alto-andina",
       "title": "humboldt-flora-alto-andina",
+      "tier": "A",
       "url": null
     },
     {
       "id": "libro-rojo-plantas-colombia",
       "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
       "url": null
     },
     {
       "id": "bernal-2015-plantas-liquenes-colombia",
       "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
       "url": "http://catalogoplantasdecolombia.unal.edu.co"
     },
     {
       "id": "uicn-red-list",
       "title": "uicn-red-list",
+      "tier": "A",
       "url": "https://www.iucnredlist.org"
     },
     {
       "id": "mads-res-383-2010",
       "title": "mads-res-383-2010",
+      "tier": "B",
       "url": null
     },
     {
       "id": "restauracion-cruz-verde-sumapaz",
       "title": "restauracion-cruz-verde-sumapaz",
+      "tier": "B",
       "url": null
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.099Z"
+  "_generated_at": "2026-05-19T00:42:57.372Z"
 }

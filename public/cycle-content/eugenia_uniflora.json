@@ -1,0 +1,92 @@
+{
+  "species_slug": "eugenia_uniflora",
+  "scientific_name": "Eugenia uniflora L.",
+  "common_names": [
+    "Pitanga"
+  ],
+  "family": "Myrtaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor",
+    "living_fence"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "esqueje",
+      "acodo"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semilla recalcitrante viable 2-4 semanas; germinación 30-60 días. Esquejes semileñosos con hormona enraízan moderadamente (40-60% éxito) en cama de propagación con humedad alta. Acodo aéreo en ramas semileñosas. Árboles productivos a 3-5 años — uno de los frutales de PRECOCIDAD ALTA. Plantación a 3-4 m para cerca viva-seto frutal, 5-6 m para árboles aislados.",
+    "tiempo_a_establecimiento_dias": 60,
+    "notas": "SETO FRUTAL PEDAGÓGICO IDEAL: tolera podas frecuentes, mantiene tamaño compacto (2-4 m), produce frutos rojo-brillantes acanalados muy ornamentales durante meses. Frutos pequeños (1-2 cm) rojo-naranja-purpúreos sabor ácido-dulce-resinoso característico Myrtaceae.",
+    "fuente": "POWO Kew; GBIF; SiB Colombia; Pérez Arbeláez 1947; AGROSAVIA"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 200,
+      "optimo_max": 1800,
+      "max_absoluto": 2200
+    },
+    "temperatura_c": {
+      "helada_letal": 0,
+      "optimo_min": 18,
+      "optimo_max": 28,
+      "max_tolerable": 34
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La pitanga, ñangapirí o cerezo de Cayena (Eugenia uniflora L., Myrtaceae) es un árbol frutal perenne nativo del Cono Sur sudamericano y noreste sudamericano (sur de Brasil — donde se llama \"pitanga\" del tupí-guaraní \"pi-tang\" = \"rojo-brillante\", Uruguay, noreste de Argentina, Paraguay, Bolivia, sur de Venezuela, Guayanas, Suriname — donde se llama \"cereza de Surinam\"), naturalizado y cultivado ampliamente en todo el Neotrópico cálido-templado y en muchas regiones subtropicales del mundo (Florida, California sur, sur de China, India, África subtropical, Mediterráneo cálido). En Colombia se cultiva y naturaliza en zonas cálidas-templadas-moderadas en casi todo el país (Antioquia, Valle del Cauca, Cundinamarca templada — Sabana Bogotá hasta 2.200 msnm, Boyacá templada, Caldas-Risaralda-Quindío Eje Cafetero, Tolima-Huila, Santander-Norte de Santander, Magdalena-Atlántico-Bolívar costa Caribe, Chocó biogeográfico, Llanos bajos cálidos, Putumayo-Caquetá-Amazonas pie de monte y bosque húmedo) entre 0 y 1.800 msnm con temperaturas 18-28 °C, sol pleno-sombra parcial filtrada, suelos bien drenados ligeramente ácidos, riego moderado y tolerante a heladas leves (a diferencia de la mayoría de Myrtaceae tropicales). Arbusto-árbol pequeño-mediano siempreverde de 2-8 m altura (raramente hasta 12 m) con copa densa-globosa muy ornamental, corteza fina gris-marrón fisurada. Hojas opuestas-simples-elípticas pequeñas (3-7 cm) verde-oscuro brillante por el haz y verde-claro por el envés con puntos translúcidos visibles al trasluz (glándulas oleíferas características de Myrtaceae que liberan aroma resinoso-frutal al frotarse — carácter pedagógico-sensorial excelente). Flores pequeñas blanco-cremosas (1.5-2 cm) con cuatro pétalos y muchos estambres prominentes blancos (característica florística típica Myrtaceae) muy perfumadas atrayentes a abejas nativas (Meliponini), abejas exóticas y mariposas. Frutos baya pequeña (1.5-2.5 cm) ACANALADA con 7-10 costillas longitudinales muy características (carácter taxonómico inmediato — \"pitanga\" = \"rojo acanalado\"), color verde inmaduro pasando a amarillo, naranja, rojo-cereza-brillante y maduro oscuro purpúreo-negro según madurez progresiva (lección visual de maduración secuencial), pulpa rojo-purpúrea jugosa ácido-dulce-resinosa (10-13 °Brix) con sabor único frutal-resinoso característico Myrtaceae (mezcla cereza-jamaica-resina) que algunos describen como \"ligeramente medicinal\" — proviene de los terpenos volátiles de la familia. SETO FRUTAL PEDAGÓGICO PERFECTO para huertas escolares: tolera podas frecuentes, mantiene tamaño compacto manejable (2-4 m con podas anuales), produce frutos rojo-brillantes acanalados muy ornamentales durante varios meses (febrero-mayo en zonas cálidas, septiembre-noviembre en zonas templadas), no requiere injerto, fructifica precozmente (3-5 años desde semilla — uno de los frutales de PRECOCIDAD MÁS ALTA), atrae abejas y mariposas (jardín de polinizadores escolar), hojas aromáticas para clases sensoriales sobre glándulas oleíferas Myrtaceae. Manejo: plantación a 3-4 m para cerca viva-seto frutal escolar, asocio con guayaba (Psidium guajava), arrayán (Myrcianthes leucoxyla), feijoa (Acca sellowiana) — multidiverso seto Myrtaceae —, café como sotobosque pedagógico, podas anuales formativas-mantenedoras, riego moderado. Las hojas se usan en medicina tradicional Brasil-Argentina-Paraguay como infusión digestiva-hipotensora-antiinflamatoria. Función pedagógica excepcional: enseña (1) familia MYRTACEAE neotropical diversa (junto con guayaba, arrayán, feijoa, eucalipto, clavo, mirto), (2) glándulas oleíferas translúcidas visibles al trasluz como carácter taxonómico (frotar hoja → aroma resinoso → genera curiosidad inmediata en niñas-niños), (3) frutos acanalados como carácter morfológico distintivo (compárese con otros frutos lisos), (4) maduración progresiva por colores visible verde→amarillo→naranja→rojo→purpúreo-negro (lección sobre madurez y cosecha), (5) atracción de polinizadores y biodiversidad de jardín escolar. Fuentes Tier A: GBIF, POWO Kew, SiB Colombia, Pérez Arbeláez 1947, Bernal 2015, AGROSAVIA.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.399Z"
+}

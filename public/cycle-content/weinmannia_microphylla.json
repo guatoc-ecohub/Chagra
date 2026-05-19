@@ -1,0 +1,93 @@
+{
+  "species_slug": "weinmannia_microphylla",
+  "scientific_name": "Weinmannia microphylla Kunth",
+  "common_names": [
+    "Encenillo de hoja menuda"
+  ],
+  "family": "Cunoniaceae",
+  "category": "arboles_sombra",
+  "cultivable": false,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "nurse_plant",
+    "windbreak",
+    "biomass_producer"
+  ],
+  "antagonists": [
+    "eucalyptus_globulus",
+    "pinus_patula"
+  ],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Propagación por semilla fresca de cápsulas dehiscentes (semillas diminutas dispersadas por viento). Germinación 30-60 días en sustrato turba-musgo con sombra parcial 60% e inoculación micorrízica con sustrato de bosque nativo. Trasplante 5-7 meses. Plantación 12-18 meses. Crecimiento moderado 40-60 cm/año.",
+    "tiempo_a_establecimiento_dias": 540,
+    "notas": "Especie de la franja superior de transición bosque alto andino — subpáramo (2800-3500 msnm). Tolera heladas fuertes y vientos de páramo gracias a su hábito compacto y hojas pequeñas xerofíticas."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 2200,
+      "optimo_min": 2500,
+      "optimo_max": 3200,
+      "max_absoluto": 3500
+    },
+    "temperatura_c": {
+      "helada_letal": -10,
+      "optimo_min": 5,
+      "optimo_max": 13,
+      "max_tolerable": 20
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "Weinmannia microphylla Kunth (encenillo de hoja menuda, miconcillo — familia Cunoniaceae) es un árbol pequeño (4-10 m altura) nativo de los Andes (Colombia, Ecuador, Venezuela), distribuido en bosque alto andino y franja de transición a subpáramo entre 2200 y 3500 msnm en piso térmico FRÍO con tolerancia a heladas fuertes (-10°C). En Colombia se encuentra en Cundinamarca, Boyacá, Antioquia, Nariño, Cauca y Santander. Es la tercera especie del complejo de encenillos Weinmannia presente en Chagra (junto con W. tomentosa y W. pubescens) — y la más especializada en la franja SUPERIOR del bosque alto andino-subpáramo, donde el viento, las heladas y la radiación UV intensa son los limitantes ecológicos dominantes. Sus FOLIOLOS DIMINUTOS (3-8 mm cada uno) son adaptación XEROFÍTICA-CRIOTOLERANTE — la pequeñez de la lámina foliar reduce la superficie expuesta al viento y a la pérdida hídrica por transpiración, una estrategia compartida con las queñoas (Polylepis quadrijuga, P. sericea), con los frailejones (Espeletia spp.) y con los chuscales (Chusquea tessellata) que dominan el subpáramo de Cruz Verde-Sumapaz, Chingaza e Iguaque. Lección viva sobre ESPECIALIZACIÓN ALTITUDINAL EN UN GÉNERO, ADAPTACIONES XEROFÍTICAS-CRIOTOLERANTES y RESTAURACIÓN DE FRANJA SUPERIOR DE BOSQUE: el complejo de encenillos Weinmannia en Colombia ilustra paradigmáticamente cómo un género se especializa altitudinalmente — W. tomentosa y W. pubescens dominan la franja 2000-3000 msnm (bosque alto andino central), W. microphylla domina la franja superior 2800-3500 msnm (bosque alto andino-subpáramo) — y juntas forman un MOSAICO ESTRUCTURAL que protege la cabecera de cuenca de los acueductos abastecedores de Bogotá (Chingaza-Sumapaz), Tunja (Iguaque) y Pasto (Galeras-Azufral). Su plantación en la franja superior junto con queñoa (Polylepis quadrijuga), encenillo común (W. tomentosa), encenillo pubescente (W. pubescens) y mano de oso (Oreopanax incisus) reconstruye el bosque-enano de transición — esencial para la regulación hídrica y la protección del páramo. Manejo agroecológico: propagación por semilla fresca con sombra parcial 60% e inoculación micorrízica; trasplante 5-7 meses; plantación 12-18 meses; crecimiento 40-60 cm/año; asocio con queñoa y otros encenillos; densidades 300-500 ind/ha; cortavientos vivos para protección anti-heladas el primer año. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Bernal 2015 Catálogo Plantas Líquenes Colombia.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- polylepis_quadrijuga — Coloradito, queñoa de páramo Cruz Verde (Polylepis quadrijuga Bitter)\n- weinmannia_pubescens — Encenillo pubescente (Weinmannia pubescens Kunth)\n- weinmannia_tomentosa — Encenillo (Weinmannia tomentosa L. f.)",
+  "antagonists_markdown": "### Antagonistas (no asociar)\n\nEvite sembrar estas especies cerca; compiten o comparten plagas/patógenos:\n- eucalyptus_globulus — Eucalipto blanco (Eucalyptus globulus Labill.)\n- pinus_patula — Pino pátula (Pinus patula Schiede ex Schltdl. & Cham.)",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.403Z"
+}

@@ -1,0 +1,77 @@
+{
+  "species_slug": "manihot_glaziovii",
+  "scientific_name": "Manihot glaziovii Müll.Arg.",
+  "common_names": [
+    "Yuca de árbol / Caucho de Ceará"
+  ],
+  "family": "Euphorbiaceae",
+  "category": "tuberculos_raices",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "biomass_producer",
+    "windbreak"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "estaca",
+    "notas": "ESPECIE DISTINTA de Manihot esculenta (yuca brava): es un árbol semicaducifolio del semiárido del NE brasileño (Ceará, Bahia, Pernambuco) que produce látex blanco (caucho de Ceará, hule natural histórico) y raíces secundarias tuberosas comestibles de menor calidad nutricional. Propagación por estacas leñosas de 30-40 cm. Hojas digitadas (5-7 lóbulos profundos) más recortadas que M. esculenta. Cosecha de látex por sangrado controlado (técnica caucho amazónico). Raíces tuberosas requieren procesamiento idéntico al de yuca brava por contenido cianogénico. Cultivo histórico de caucho en Magdalena medio y Casanare durante boom cauchero 1900-1920."
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 200,
+      "optimo_max": 1200,
+      "max_absoluto": 1800
+    },
+    "temperatura_c": {
+      "helada_letal": 5,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 38
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La yuca de árbol o caucho de Ceará (Manihot glaziovii Müll.Arg., familia Euphorbiaceae) es la especie arbórea hermana de la yuca brava amazónica (M. esculenta) — un árbol semicaducifolio de porte mediano (6-12 m altura, fuste recto, copa abierta, corteza grisácea-blanquecina) nativo de la caatinga semiárida del NE brasileño (Ceará, Bahia, Pernambuco, Piauí, Maranhão) donde es uno de los principales recursos forestales tradicionales, distinguible morfológicamente de la yuca herbácea (M. esculenta) por su porte arbóreo, sus hojas digitadas con 5-7 lóbulos profundos y angostos (más recortadas que las palmeadas de M. esculenta) y su látex blanco abundante que mana al herir corteza o pecíolos. Esta especie tiene una historia económica fascinante: durante el boom mundial del caucho natural (1880-1920) — antes del colapso de Manaos y la victoria de las plantaciones asiáticas de Hevea brasiliensis — el caucho de Ceará de M. glaziovii fue uno de los tres cauchos amazónicos exportados al mundo (junto con caucho de Hevea y caucho de Castilla), llegando a establecerse plantaciones experimentales en Magdalena medio colombiano (zona de Puerto Berrío-Cimitarra), Casanare (piedemonte llanero), Magdalena (Aracataca, Fundación), Tolima bajo y Santander durante 1900-1920 — algunos especímenes naturalizados sobreviven aún en linderos viejos de fincas de esas zonas como reliquias del boom cauchero. Lección viva multi-propósito de especie arbórea olvidada: M. glaziovii enseña magistralmente cómo una sola especie arbórea puede ofrecer simultáneamente cinco productos económicos diferenciados — (1) látex blanco para caucho natural extraído por sangrado controlado del tronco con técnica idéntica a la del caucho amazónico (Hevea), (2) raíces secundarias tuberosas comestibles (más pequeñas y fibrosas que M. esculenta, 200-600 g, requieren el mismo procesamiento etnoquímico por contenido de glucósidos cianogénicos — rallado-prensado-tostado), (3) hojas tiernas comestibles como espinaca tropical tras cocción prolongada (igual que M. esculenta), (4) madera ligera apta para construcción rural y empaques, y (5) servicios ecosistémicos en silvopastoreo del trópico seco (sombrío para ganado, fijación parcial de N euforbiácea, ramoneo controlado por cabras). Esta especie enseña además la lección de adaptación a sequía severa que su prima amazónica no posee: M. glaziovii es semicaducifolia, deja caer hojas en estación seca para reducir transpiración, y prospera con precipitaciones de 600-1.000 mm/año mientras M. esculenta requiere 1.000-2.000 mm. Cultivo candidato urgente para reactivar como recurso silvopastoril en el Caribe seco colombiano (Guajira, Cesar, sur de Bolívar, Magdalena medio bajo) y los Llanos orientales (Casanare, Vichada, Meta de altillanura) donde el cambio climático intensifica la sequía. Manejo agroecológico: propagación por estacas leñosas de 30-40 cm de ramas maduras de 1-2 años (técnica idéntica a yuca herbácea pero con segmentos más gruesos), plantación a 4-6 m entre árboles en silvopastoreo, ciclo a primer sangrado de látex 5-7 años, vida útil productiva 25-40 años, rendimientos de látex 1-3 kg/árbol/año + cosecha bianual de raíces secundarias 3-8 kg/árbol. Las raíces requieren el mismo procesamiento cianogénico de yuca brava (rallado, prensado, tostado para casabe/fariña). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO EcoCrop, Bernal 2015 Catálogo Plantas Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.395Z"
+}

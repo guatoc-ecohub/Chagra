@@ -1,0 +1,85 @@
+{
+  "species_slug": "cassia_grandis",
+  "scientific_name": "Cassia grandis L.f.",
+  "common_names": [
+    "Cañafístula"
+  ],
+  "family": "Fabaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "pollinator_attractor",
+    "windbreak"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semilla dura escarificación mecánica o agua hirviendo + remojo 24 h. Germinación 70-85% a 10-20 días. Vivero 5-6 meses. Plantación a 30-40 cm.",
+    "tiempo_a_establecimiento_dias": 70,
+    "notas": "Vainas leñosas grandes (cañafístula) con pulpa dulce-aromática uso medicinal tradicional (laxante suave) y nutracéutico. Floración rosada espectacular ornamental. NO confundir con Cassia fistula asiática (introducida ornamental).",
+    "fuente": "Bernal 2015; POWO; Pamplona-Roger 2006 Plantas Medicinales; JBB plantas medicinales"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 1200,
+      "max_absoluto": 1500
+    },
+    "temperatura_c": {
+      "helada_letal": 6,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 36
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La cañafístula, cañandonga o caraqueño (Cassia grandis L.f., Fabaceae subfamilia Caesalpinioideae) es uno de los árboles medicinales-ornamentales más patrimoniales del bosque seco tropical (bs-T) y bosque húmedo tropical colombiano, distinguible y diagnóstico por sus vainas leñosas cilíndricas grandes de 30-60 cm de largo y 3-5 cm de diámetro (las vainas más grandes del género Cassia americano), de donde proviene el nombre \"cañafístula\" (literalmente \"caña-flauta\" por la similitud morfológica con una caña tubular). Es importante NO CONFUNDIR esta cañafístula americana con la \"cañafístula asiática\" (Cassia fistula L.) introducida en Colombia como ornamental urbana, que es otra especie del mismo género originaria de India-Asia con vainas similares pero flores amarillas (la C. grandis colombiana tiene flores rosado intenso, característica diagnóstica). Nativo del Neotrópico desde México hasta Brasil-Perú, en Colombia se distribuye en bs-T y bosque húmedo tropical de los valles del Magdalena (Tolima, Huila, Cundinamarca, Santander), Cauca (Valle, Cauca), Patía, Sinú-San Jorge (Córdoba, Sucre), Caribe (Magdalena, Bolívar, Atlántico, La Guajira), Pacífico bajo (Chocó), Orinoquía y Amazonía baja entre 0-1.200 msnm en zona térmica cálida a templada. Árbol caducifolio de 15-25 m de altura con copa amplia abierta hasta 15 m de diámetro, fuste recto cilíndrico, corteza grisácea fisurada, hojas paripinnadas con 8-20 pares de folíolos elípticos obtusos verde-oscuros brillantes caducas en estación seca, flores rosado intenso a magenta espectaculares en racimos terminales grandes (panículas) de 20-40 cm de largo melíferas, frutos vaina leñosa cilíndrica indehiscente marrón-negra característica con pulpa dulce-aromática que rodea las semillas planas brillantes. Su uso medicinal tradicional más extendido es la pulpa de las vainas como laxante suave y regulador intestinal: las vainas maduras se parten y se hierve la pulpa en agua o leche para obtener un jarabe oscuro dulce-aromático efectivo en estreñimiento crónico (contiene antraquinonas: emodina, reína, crisofanol, sennósidos), parasitismo intestinal leve, y dispepsia. La medicina tradicional caribeña-vallecaucana también usa la decocción de hojas para diabetes leve, infecciones urinarias y heridas externas (lavados antisépticos). La industria nutracéutica moderna ha desarrollado extractos estandarizados de Cassia grandis como suplemento gastrointestinal natural, con mercado creciente en Colombia, México y Brasil. Además del uso medicinal, la cañafístula es uno de los árboles ornamentales más espectaculares del trópico americano: la floración rosado-magenta intensa al inicio de las lluvias (marzo-mayo) cubre completamente la copa pre-foliación con racimos colgantes de hasta 40 cm de largo, un espectáculo visual comparable a los cerezos japoneses (sakura) pero adaptado al trópico. Es ampliamente plantada en plazas, parques, avenidas y caminos rurales del Caribe, Valle y piedemonte llanero como ornamental nativa que sustituye exitosamente especies exóticas (Tabebuia rosea, Jacaranda mimosifolia se complementan con la cañafístula en jardinería patrimonial colombiana). En sistemas agroforestales acepta densidades 80-120 árb/ha como sombrío cafetalero-cacaotero, con la ventaja adicional de generar ingreso complementario por venta de vainas medicinales en mercados naturales (precios estables 5-15 USD/kg seca según calidad). Su madera marrón clara de densidad media (0.65-0.75 g/cm³) es apreciada en ebanistería complementaria, mangos de herramienta y leña, aunque el valor principal está en los servicios ecosistémicos y la producción medicinal. Como Caesalpinioideae fija nitrógeno biológico parcialmente (subfamilia con baja capacidad nodulante comparada con Mimosoideae). Atrae polinizadores nativos clave: abejas Apidae Apis mellifera, Meliponini (Tetragonisca, Melipona), abejorros Bombus, mariposas, aves nectarívoras (Coereba flaveola, Thraupis, Tangara), murciélagos nectarívoros (Glossophaga, Anoura). Manejo agroecológico: propagación por semilla con escarificación mecánica o agua hirviendo + remojo 24 h (germinación 70-85% a 10-20 días), vivero 5-6 meses a sol parcial, plantación definitiva a 30-40 cm, distancia 8×8 m en sombrío o 10×10 m en restauración, primera floración año 5-6, primera cosecha de vainas año 6-8 con producción estable 20-40 kg/árb/año a partir del año 10. Es lección extraordinaria de cómo la flora medicinal patrimonial nativa colombiana puede simultáneamente cumplir función ornamental urbana espectacular, producir un medicamento natural seguro y eficaz (laxante suave reconocido mundialmente), generar ingreso campesino vía mercado nutracéutico, proveer sombrío cafetalero y atraer polinizadores nativos. Defenderla es defender la soberanía sanitaria frente a laxantes farmacéuticos sintéticos importados, la diversidad ornamental urbana frente a la monotonía de especies exóticas, y la memoria cultural de la medicina tradicional caribeño-vallecaucana. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, Pamplona-Roger 2006 Plantas Medicinales, JBB Plantas Medicinales.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- coffea_arabica — Café caturra / Castillo / Cenicafé 1 (Coffea arabica L.)\n- cordia_alliodora — Nogal cafetero (Cordia alliodora (Ruiz & Pav.) Oken)\n- gliricidia_sepium — Matarratón (Gliricidia sepium (Jacq.) Kunth ex Walp.)\n- tabebuia_rosea — Guayacán rosado (Tabebuia rosea (Bertol.) DC.)",
+  "sources": [
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "pamplona-roger-2006-plantas-medicinales",
+      "title": "pamplona-roger-2006-plantas-medicinales",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.390Z"
+}

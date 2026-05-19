@@ -1,0 +1,75 @@
+{
+  "species_slug": "solanum_betaceum_naranja",
+  "scientific_name": "Solanum betaceum Cav. (cultivar naranja-amarillo)",
+  "common_names": [
+    "Tomate de árbol naranja"
+  ],
+  "family": "Solanaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 1500,
+      "optimo_min": 1800,
+      "optimo_max": 2500,
+      "max_absoluto": 2800
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "El tomate de árbol naranja (Solanum betaceum Cav., cultivar naranja-amarillo, Solanaceae) es la variedad o forma cromática anaranjada-amarilla del tomate de árbol andino tradicional (registrado en este catálogo como `solanum_betaceum`, donde el cultivar dominante comercializado es el rojo-púrpura), nativa de los Andes (Colombia, Ecuador, Perú, Bolivia) y cultivada en Colombia entre 1.800 y 2.500 msnm en clima templado-frío con cultivos comerciales notables en Antioquia (Oriente — La Unión, La Ceja, Sonsón, Abejorral), Cundinamarca (Sabana de Bogotá, Subachoque, Tausa, Pacho), Boyacá (Garagoa, Tenza, Sutatenza, Pachavita), Caldas (Manizales rural, Villamaría, Marulanda), Risaralda (Pereira rural, Belén de Umbría) y Nariño (Pasto, Yacuanquer, Tangua). Misma familia Solanaceae y mismo género Solanum sección Cyphomandra (igual que el tomate de árbol rojo-púrpura, lulo, naranjilla y otros tamarillos cordilleranos). Arbolito perenne semileñoso de copa redondeada (2-4 m altura, vida útil productiva 4-8 años), hojas alternas grandes acorazonadas pubescentes verde grisáceo, flores pequeñas rosa-blancas con anteras amarillas (estructura solanácea típica) en cimas axilares, fruto baya ovoide (5-10 cm) con piel lisa anaranjado-amarillo brillante (en contraste con el rojo-púrpura intenso del cultivar tradicional), pulpa jugosa anaranjada con semillas pardas envueltas en gel translúcido — perfil sensorial menos ácido y más dulce-aromático que el rojo-púrpura, mayor contenido de carotenoides (β-caroteno, criptoxantina — provitamina A). Es lección viva de diversidad cromática intraespecífica, agrobiodiversidad andina y bioeconomía pigmentaria que enseña a niñas y niños cómo dentro de UNA misma especie domesticada (Solanum betaceum) los pueblos andinos seleccionaron por miles de años diferentes cultivares cromáticos: rojo-púrpura, anaranjado-amarillo y morado oscuro (este último registrado como `solanum_betaceum_morado`), cada uno con perfil nutricional y sensorial propio (carotenoides vs antocianinas vs licopeno). Consumido fresco, en jugos pulpa-leche, mermeladas, salsas dulces, sorbetes y cocteles de fruta tropical fría. Manejo agroecológico: propagación por semilla seleccionada de plantas madre productivas (germinación 21-30 días a 18-22°C, requiere 6-12 meses en vivero antes de trasplante) o por injerto sobre patrón resistente a Phytophthora cinnamomi y a nematodos (mejor longevidad), distancia 3x3 m o 4x2.5 m, tutoreo en estaca para soporte mecánico del fuste delgado, fertilización balanceada con micorrizas, plena producción a partir de año 2, manejo integrado de antracnosis, mildew velloso, virus del tomate de árbol y mosca de la fruta (Anastrepha). Función en chagra como frutal andino de pigmento naranja, sustituto/complemento del cultivar rojo-púrpura para diversificación de mercado y nutricional. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Sol Andina, Bernal 2015, NRC 1989 Cultivos Andinos, SiB Colombia.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-sol-andina",
+      "title": "agrosavia-sol-andina",
+      "tier": "A",
+      "url": "https://www.agrosavia.co"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "nrc-1989-cultivos-andinos",
+      "title": "nrc-1989-cultivos-andinos",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.384Z"
+}

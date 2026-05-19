@@ -1,0 +1,70 @@
+{
+  "species_slug": "loricaria_complanata",
+  "scientific_name": "Loricaria complanata (Sch.Bip.) Wedd.",
+  "common_names": [
+    "Escobilla paramuna"
+  ],
+  "family": "Asteraceae",
+  "category": "ornamentales_nativas",
+  "cultivable": false,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "paramo"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "nurse_plant"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Arbusto paramuno típico de superpáramo de las cordilleras colombianas con hojas escamiformes diminutas imbricadas que dan apariencia de junípero o ciprés enano (de ahí el nombre vernáculo 'ciprés paramuno'), porte denso con ramas aplanadas, hojas pequeñas verde-grisáceas, e inflorescencias pequeñas con capítulos amarillos en panículas terminales. Crecimiento muy lento. Indicador de superpáramo bien conservado. Protección indirecta por Ley 1930/2018 dentro de páramos delimitados."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 3000,
+      "optimo_min": 3400,
+      "optimo_max": 4100,
+      "max_absoluto": 4400
+    },
+    "temperatura_c": {
+      "helada_letal": -14,
+      "optimo_min": 2,
+      "optimo_max": 10,
+      "max_tolerable": 17
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La escobilla paramuna o ciprés de páramo (Loricaria complanata (Sch.Bip.) Wedd., familia Asteraceae) es un arbusto característico del superpáramo colombiano y de la línea altitudinal alta del páramo medio, una de las plantas más distintivas y morfológicamente curiosas del paisaje paramuno andino por su aspecto ericoide-cupresoide que la hace parecer un junípero o ciprés enano más que una Asteraceae típica. Es un arbusto perenne erecto-ramoso de 30-150 cm altura con tallos densamente ramificados, ramas aplanadas (de ahí el epíteto específico 'complanata' = aplanada), hojas escamiformes diminutas (1-3 mm largo) imbricadas en disposición decussada apretada cubriendo completamente los tallos verde-grisáceos plateados, e inflorescencias pequeñas con capítulos amarillos discretos agrupados en panículas terminales típicas de Asteraceae. La morfología foliar escamiforme imbricada — muy distinta de la morfología foliar típica de Asteraceae herbáceas — es un excelente ejemplo de CONVERGENCIA EVOLUTIVA con coníferas (Cupressaceae como Juniperus, Cupressus, Chamaecyparis) y con ericáceas reducidas (Erica, Calluna, Empetrum, Disterigma, Pernettya): adaptación morfológica al estrés climático de alta montaña (xericidad fisiológica por viento permanente, radiación UV-B intensa, helada nocturna, baja presión parcial de CO₂ por altitud) que se manifiesta repetidamente en linajes filogenéticamente distintos como solución estructural similar (hojas pequeñas escamiformes que minimizan superficie de transpiración y maximizan resistencia mecánica al viento). En Colombia se distribuye principalmente en superpáramo y páramo alto de la cordillera Central (Los Nevados, Las Hermosas, Doña Juana, Puracé) y Oriental (Sumapaz, Cocuy, Pisba, Santurbán) entre 3.000 y 4.400 msnm, con óptimo en 3.400-4.100 msnm en superpáramo zonal-azonal de tipo rocoso o turboso, en pajonal-frailejonal de transición a superpáramo, y en afloramientos rocosos de páramo alto. Es indicador robusto de superpáramo bien conservado: solo persiste en sitios con cobertura paramuna funcional poco perturbada por ganadería-quema-minería. Lección viva de convergencia evolutiva morfológica en alta montaña y de diversidad de Asteraceae paramunas colombianas: el género Loricaria (con ~20 especies neotropicales andinas y centroamericanas) es uno de los géneros más fascinantes de Asteraceae andinas por su morfología engañosa que ha confundido a botánicos por más de un siglo — el primer autor que describió el género fue Weddell en 1856 en su 'Chloris Andina'. La revisión taxonómica moderna del género por Cuatrecasas confirmó su pertenencia a Asteraceae tribu Gnaphalieae (subtribu Loricariinae) — el mismo grupo de las inmortales (Helichrysum, Anaphalis) y de las cespitosas paramunas (Antennaria, Belloa, Lucilia, Mniodes). El cortejo florístico paramuno colombiano incluye múltiples Asteraceae con morfologías especializadas a alta montaña: Espeletia (frailejones, roseta caulescente), Diplostephium (arbustos ericoides), Pentacalia (arbustos pubescentes), Senecio (rosetas herbáceas), Baccharis (chilcas), Aphanactis (postradas), Werneria (rosetas acolchonadas), Belloa-Lucilia (cespitosas plateadas) y Loricaria (escamiformes ericoides) — una diversificación adaptativa espectacular dentro de la familia Asteraceae en el ecosistema paramuno. El crecimiento extremadamente lento de Loricaria (estimado en 0.3-0.6 cm/año, individuos de 1 m con ~200 años de edad) y su distribución restringida al superpáramo bien conservado hacen que sea especie sensible a degradación: declina rápidamente con quema, pisoteo ganadero excesivo, minería ilegal de superpáramo, y especialmente con cambio climático que está moviendo el ecotono páramo-glaciar hacia arriba en respuesta al deshielo glaciar acelerado de los nevados colombianos (Pan de Azúcar-Cocuy, Ruiz-Tolima, Huila, Santa Isabel, Cisne, Quindío, Puracé, Chiles). Servicio ecosistémico: regulación hídrica en superpáramo (captura niebla por superficie foliar imbricada), planta nodriza para regeneración de otras especies superparamunas en sitios degradados, indicador biogeográfico de integridad ecosistémica paramuna alta. Manejo (no cultivo doméstico recomendado por carácter silvestre paramuno protegido por Ley 1930/2018, crecimiento extremadamente lento y dependencia de condiciones de superpáramo): observación in-situ, valor ornamental in-situ, valor ecológico en proyectos de restauración paramuna autorizados por CAR. Si se requiere propagación para restauración (con permiso CAR-CORPORINOQUIA-CORPOAMAZONIA), semilla recolectada de inflorescencias maduras (febrero-mayo), siembra en sustrato turba superparamuna + arena gruesa, germinación 30-90 días en invernadero alta montaña, plantación definitiva >12 meses a 30-50 cm, asocio con Espeletia, Calamagrostis, Hypericum, Disterigma, Pernettya, otras especies superparamunas. Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, Humboldt Flora de Páramos, Cuatrecasas Loricaria Revision, JBB Jardín Botánico de Bogotá.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.399Z"
+}
