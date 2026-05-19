@@ -84,8 +84,8 @@ const extractChunk = (parsed) => {
  *        total_duration, eval_count, prompt_eval_count, etc.
  * @param {Object}      [options.meta]   campos extra propagados al
  *        `recordLLMEvent` final (solo en `success`). Ej.
- *        `{ rag_passages_used: 3 }` para análisis hit-rate RAG en
- *        `LLMTelemetryScreen`. Privacy-safe: no debe contener prompt/respuesta.
+ *        `{ rag_passages_used: 3 }` para análisis hit-rate RAG en el
+ *        dashboard privado HYTA. Privacy-safe: no debe contener prompt/respuesta.
  * @returns {Promise<string>} texto completo concatenado al terminar.
  * @throws {Error} si el fetch falla, el servidor responde no-2xx o el body no es streameable.
  * @example
