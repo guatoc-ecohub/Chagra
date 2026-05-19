@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { FileText, AlertTriangle, AlertCircle, Activity, CheckCircle, XCircle, Beaker, Clock, MapPin, Camera, Sparkles, Loader2, Image as ImageIcon, Trash2 } from 'lucide-react';
+import { FileText, AlertTriangle, AlertCircle, Activity, CheckCircle, XCircle, Beaker, Clock, MapPin, Camera, Sparkles, Loader2, Image as ImageIcon, Trash2, ShieldCheck, ShieldAlert, Globe, Lock, Users, Lightbulb, Plus, CalendarClock, Stethoscope } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
-import { useCaseStudyStore } from '../store/useCaseStudyStore';
+import {
+  useCaseStudyStore,
+  CASE_VISIBILITIES,
+  CASE_TIMELINE_EVENT_TYPES,
+} from '../store/useCaseStudyStore';
 import PhotoCaptureField from './PhotoCaptureField';
 import { summarizeLessons } from '../services/caseStudyLessonsSummarizer';
 import { recommendTreatments } from '../services/caseStudyTreatmentRecommender';
@@ -40,6 +44,582 @@ const formatDT = (iso) => {
   if (!iso) return '—';
   const d = new Date(iso);
   return `${d.toLocaleDateString('es-CO')} ${d.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}`;
+};
+
+// 2026-05-18 — meta para timeline (línea narrativa user-facing) y
+// visibility (modo foro Capa 2 federación).
+const TIMELINE_EVENT_META = {
+  observation: { color: 'text-sky-400', bg: 'bg-sky-950/40', label: 'Observación', icon: AlertCircle },
+  intervention: { color: 'text-orange-300', bg: 'bg-orange-950/40', label: 'Intervención', icon: Beaker },
+  result: { color: 'text-emerald-400', bg: 'bg-emerald-950/40', label: 'Resultado', icon: CheckCircle },
+  note: { color: 'text-slate-300', bg: 'bg-slate-900/60', label: 'Nota', icon: FileText },
+};
+
+const VISIBILITY_META = {
+  private: { label: 'Privado', icon: Lock, color: 'text-slate-300', desc: 'Solo tú lo ves.' },
+  finca: { label: 'Compartir finca', icon: Users, color: 'text-sky-400', desc: 'Visible para tu equipo de finca.' },
+  public: { label: 'Compartir red Chagra', icon: Globe, color: 'text-blue-400', desc: 'Esta finca contribuye su caso a la red. Operador da consentimiento.' },
+};
+
+// Hace "hace 3 días" / "hoy" / "hace 2h".
+const formatRelative = (iso) => {
+  if (!iso) return '—';
+  const diff = Date.now() - new Date(iso).getTime();
+  if (diff < 0) return formatDT(iso);
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'ahora';
+  if (mins < 60) return `hace ${mins}m`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `hace ${hours}h`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return 'ayer';
+  if (days < 30) return `hace ${days}d`;
+  if (days < 365) return `hace ${Math.floor(days / 30)}m`;
+  return `hace ${Math.floor(days / 365)}a`;
+};
+
+// Form para agregar evento al timeline (DR-044 sub-ix Feature 6).
+const TimelineEventForm = ({ onSubmit, onCancel }) => {
+  const [eventType, setEventType] = useState('observation');
+  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 16));
+  const [description, setDescription] = useState('');
+  const [actor, setActor] = useState('Operador campo');
+  const [photoUrl, setPhotoUrl] = useState('');
+  const [showCapture, setShowCapture] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  const handlePhoto = async (blob) => {
+    if (!blob) return;
+    setBusy(true);
+    try {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoUrl(reader.result);
+        setShowCapture(false);
+        setBusy(false);
+      };
+      reader.onerror = () => setBusy(false);
+      reader.readAsDataURL(blob);
+    } catch {
+      setBusy(false);
+    }
+  };
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (!description.trim()) return;
+    onSubmit({
+      event_type: eventType,
+      date: new Date(date).toISOString(),
+      description: description.trim(),
+      actor: actor.trim() || undefined,
+      photo_url: photoUrl || undefined,
+    });
+  };
+
+  return (
+    <form onSubmit={submit} className="space-y-2 p-3 rounded-lg bg-slate-900 border border-slate-700">
+      <div className="grid grid-cols-2 gap-2">
+        <select
+          value={eventType}
+          onChange={(e) => setEventType(e.target.value)}
+          className="px-3 py-2 rounded bg-slate-800 border border-slate-700 text-white text-sm"
+        >
+          {CASE_TIMELINE_EVENT_TYPES.map((t) => (
+            <option key={t} value={t}>
+              {TIMELINE_EVENT_META[t]?.label || t}
+            </option>
+          ))}
+        </select>
+        <input
+          type="datetime-local"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          className="px-3 py-2 rounded bg-slate-800 border border-slate-700 text-white text-sm"
+        />
+      </div>
+      <textarea
+        placeholder="Describe lo que viste / hiciste / resultado"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        rows={3}
+        required
+        className="w-full px-3 py-2 rounded bg-slate-800 border border-slate-700 text-white text-sm"
+      />
+      <input
+        type="text"
+        placeholder="Actor (ej. Operador campo, Ing. Pérez)"
+        value={actor}
+        onChange={(e) => setActor(e.target.value)}
+        className="w-full px-3 py-2 rounded bg-slate-800 border border-slate-700 text-white text-xs"
+      />
+      {!showCapture && !photoUrl && (
+        <button
+          type="button"
+          onClick={() => setShowCapture(true)}
+          className="w-full py-1.5 rounded bg-slate-800 text-slate-300 text-xs flex items-center justify-center gap-1 hover:bg-slate-700"
+        >
+          <Camera className="w-3 h-3" /> Agregar foto (opcional)
+        </button>
+      )}
+      {showCapture && (
+        <div className="p-2 rounded bg-slate-950 border border-slate-800">
+          <PhotoCaptureField onPhoto={handlePhoto} onRemove={() => setShowCapture(false)} label="Foto del evento" />
+          {busy && <p className="text-slate-400 text-xs mt-2">Procesando…</p>}
+          <button
+            type="button"
+            onClick={() => setShowCapture(false)}
+            disabled={busy}
+            className="mt-2 w-full py-1.5 rounded bg-slate-800 text-slate-400 text-xs"
+          >
+            Cancelar foto
+          </button>
+        </div>
+      )}
+      {photoUrl && (
+        <div className="relative">
+          <img src={photoUrl} alt="Preview" className="w-full h-32 object-cover rounded border border-slate-700" />
+          <button
+            type="button"
+            onClick={() => setPhotoUrl('')}
+            className="absolute top-1 right-1 p-1 rounded bg-red-900/80 text-red-200 hover:bg-red-800"
+            aria-label="Quitar foto"
+          >
+            <Trash2 className="w-3 h-3" />
+          </button>
+        </div>
+      )}
+      <div className="flex gap-2">
+        <button type="button" onClick={onCancel} className="flex-1 py-2 rounded bg-slate-800 text-slate-300 text-sm">
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          disabled={!description.trim()}
+          className="flex-1 py-2 rounded bg-emerald-600 text-white text-sm font-bold disabled:opacity-50"
+        >
+          Agregar evento
+        </button>
+      </div>
+    </form>
+  );
+};
+
+// Form para agregar una recomendación (operador o agente).
+const RecommendationForm = ({ onSubmit, onCancel, defaultSuggester = 'Operador' }) => {
+  const [text, setText] = useState('');
+  const [suggester, setSuggester] = useState(defaultSuggester);
+  const [validationRequired, setValidationRequired] = useState(true);
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (!text.trim()) return;
+    onSubmit({
+      text: text.trim(),
+      suggested_by: suggester.trim() || defaultSuggester,
+      validation_required: validationRequired,
+    });
+  };
+
+  return (
+    <form onSubmit={submit} className="space-y-2 p-3 rounded-lg bg-slate-900 border border-slate-700">
+      <textarea
+        placeholder="Recomendación accionable (ej. Aplicar caldo bordelés 0.5%…)"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        rows={3}
+        required
+        className="w-full px-3 py-2 rounded bg-slate-800 border border-slate-700 text-white text-sm"
+      />
+      <input
+        type="text"
+        placeholder="Quién la sugiere (ej. Agente Chagra, Operador, Ing. Pérez)"
+        value={suggester}
+        onChange={(e) => setSuggester(e.target.value)}
+        className="w-full px-3 py-2 rounded bg-slate-800 border border-slate-700 text-white text-xs"
+      />
+      <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer select-none">
+        <input
+          type="checkbox"
+          checked={validationRequired}
+          onChange={(e) => setValidationRequired(e.target.checked)}
+          className="rounded border-slate-600"
+        />
+        Requiere validación de un agrónomo/profesional
+      </label>
+      <div className="flex gap-2">
+        <button type="button" onClick={onCancel} className="flex-1 py-2 rounded bg-slate-800 text-slate-300 text-sm">
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          disabled={!text.trim()}
+          className="flex-1 py-2 rounded bg-emerald-600 text-white text-sm font-bold disabled:opacity-50"
+        >
+          Agregar
+        </button>
+      </div>
+    </form>
+  );
+};
+
+// Form para validar recomendación como profesional certificado.
+const ValidatorForm = ({ onSubmit, onCancel, target = 'recomendación' }) => {
+  const [name, setName] = useState('');
+  const [creds, setCreds] = useState('');
+  const [notes, setNotes] = useState('');
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+    onSubmit({
+      validator_name: name.trim(),
+      validator_credentials: creds.trim() || undefined,
+      notes: notes.trim() || undefined,
+    });
+  };
+
+  return (
+    <form onSubmit={submit} className="space-y-2 p-3 rounded-lg bg-slate-900 border border-emerald-800">
+      <p className="text-[10px] uppercase font-black tracking-wider text-emerald-300 flex items-center gap-1.5">
+        <Stethoscope className="w-3 h-3" /> Validar {target} como profesional
+      </p>
+      <input
+        type="text"
+        placeholder="Nombre del validador (ej. Ing. Diana Pérez)"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        required
+        className="w-full px-3 py-2 rounded bg-slate-800 border border-slate-700 text-white text-sm"
+      />
+      <input
+        type="text"
+        placeholder="Credenciales (ej. Ing. Agrónoma UNAL · Reg. ICA AG-2018-3421)"
+        value={creds}
+        onChange={(e) => setCreds(e.target.value)}
+        className="w-full px-3 py-2 rounded bg-slate-800 border border-slate-700 text-white text-xs"
+      />
+      <textarea
+        placeholder="Notas de validación (opcional)"
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+        rows={2}
+        className="w-full px-3 py-2 rounded bg-slate-800 border border-slate-700 text-white text-xs"
+      />
+      <div className="flex gap-2">
+        <button type="button" onClick={onCancel} className="flex-1 py-2 rounded bg-slate-800 text-slate-300 text-sm">
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          disabled={!name.trim()}
+          className="flex-1 py-2 rounded bg-emerald-600 text-white text-sm font-bold disabled:opacity-50 flex items-center justify-center gap-1.5"
+        >
+          <ShieldCheck className="w-3.5 h-3.5" /> Certificar
+        </button>
+      </div>
+    </form>
+  );
+};
+
+// Sección de visibilidad / modo foro.
+const VisibilitySection = ({ value, onChange }) => {
+  const current = VISIBILITY_META[value] || VISIBILITY_META.private;
+  const CurrentIcon = current.icon;
+  return (
+    <section>
+      <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 flex items-center gap-2">
+        <CurrentIcon className={`w-3 h-3 ${current.color}`} /> Visibilidad
+      </h3>
+      <div className="p-3 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
+        <div className="grid grid-cols-3 gap-1">
+          {CASE_VISIBILITIES.map((v) => {
+            const meta = VISIBILITY_META[v];
+            const Icon = meta.icon;
+            const active = v === value;
+            return (
+              <button
+                key={v}
+                type="button"
+                onClick={() => onChange(v)}
+                className={`px-2 py-2 rounded text-[11px] font-bold flex flex-col items-center gap-1 transition-colors ${
+                  active ? 'bg-slate-700 text-white ring-1 ring-emerald-500/60' : 'bg-slate-800 text-slate-400 hover:bg-slate-750'
+                }`}
+              >
+                <Icon className={`w-3.5 h-3.5 ${active ? meta.color : 'text-slate-500'}`} />
+                {meta.label}
+              </button>
+            );
+          })}
+        </div>
+        <p className="text-[10px] text-slate-500 leading-relaxed">{current.desc}</p>
+        {value === 'public' && (
+          <div className="mt-1 p-2 rounded bg-blue-950/40 border border-blue-900 flex items-start gap-2">
+            <Globe className="w-3 h-3 text-blue-300 mt-0.5 shrink-0" />
+            <p className="text-[10px] text-blue-200 leading-snug">
+              Compartido en la red Chagra. Otros operadores ven el caso anonimizado (sin datos sensibles de la finca) como referencia.
+            </p>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
+
+// Sección validation a nivel caso.
+const ValidationBlock = ({ validation, onCertify, onReject }) => {
+  const [showValidator, setShowValidator] = useState(false);
+  const status = validation?.status || 'pending';
+  const isCertified = status === 'certified';
+  const isRejected = status === 'rejected';
+
+  const STATUS_BADGE = {
+    pending: { label: 'Sin validar', color: 'text-slate-400', bg: 'bg-slate-800', icon: ShieldAlert },
+    'self-reported': { label: 'Auto-reportado', color: 'text-yellow-300', bg: 'bg-yellow-950/30', icon: ShieldAlert },
+    certified: { label: 'Certificado', color: 'text-emerald-300', bg: 'bg-emerald-950/40', icon: ShieldCheck },
+    rejected: { label: 'Rechazado', color: 'text-red-300', bg: 'bg-red-950/40', icon: XCircle },
+  };
+  const meta = STATUS_BADGE[status] || STATUS_BADGE.pending;
+  const Icon = meta.icon;
+
+  return (
+    <section>
+      <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 flex items-center gap-2">
+        <Icon className={`w-3 h-3 ${meta.color}`} /> Validación profesional
+      </h3>
+      <div className={`p-3 rounded-lg border ${meta.bg} ${isCertified ? 'border-emerald-800' : isRejected ? 'border-red-800' : 'border-slate-800'}`}>
+        <div className="flex items-center justify-between mb-2">
+          <span className={`text-xs font-bold ${meta.color}`}>{meta.label}</span>
+          {validation?.validated_at && (
+            <span className="text-[10px] text-slate-500">{formatDT(validation.validated_at)}</span>
+          )}
+        </div>
+        {validation?.validator_name && (
+          <p className="text-xs text-slate-200 font-semibold">{validation.validator_name}</p>
+        )}
+        {validation?.validator_credentials && (
+          <p className="text-[10px] text-slate-400 italic">{validation.validator_credentials}</p>
+        )}
+        {validation?.notes && (
+          <p className="text-[11px] text-slate-300 mt-1.5 whitespace-pre-wrap">{validation.notes}</p>
+        )}
+        {!isCertified && !showValidator && (
+          <div className="flex gap-2 mt-3">
+            <button
+              type="button"
+              onClick={() => setShowValidator(true)}
+              className="flex-1 py-1.5 rounded bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-600 flex items-center justify-center gap-1"
+            >
+              <ShieldCheck className="w-3 h-3" /> Validar como agrónomo
+            </button>
+            {status !== 'rejected' && onReject && (
+              <button
+                type="button"
+                onClick={onReject}
+                className="px-3 py-1.5 rounded bg-slate-800 text-slate-300 text-xs hover:bg-slate-700"
+                title="Marcar caso como rechazado por validación"
+              >
+                Rechazar
+              </button>
+            )}
+          </div>
+        )}
+        {showValidator && (
+          <div className="mt-2">
+            <ValidatorForm
+              target="el caso"
+              onSubmit={(payload) => {
+                onCertify(payload);
+                setShowValidator(false);
+              }}
+              onCancel={() => setShowValidator(false)}
+            />
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
+
+// Sección recomendaciones.
+const RecommendationsSection = ({ recs, onAdd, onValidate }) => {
+  const [showAdd, setShowAdd] = useState(false);
+  const [validatingId, setValidatingId] = useState(null);
+
+  return (
+    <section>
+      <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 flex items-center gap-2">
+        <Lightbulb className="w-3 h-3" /> Recomendaciones ({recs.length})
+        {!showAdd && (
+          <button
+            type="button"
+            onClick={() => setShowAdd(true)}
+            className="ml-auto text-[10px] px-2 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center gap-1"
+          >
+            <Plus className="w-3 h-3" /> Agregar
+          </button>
+        )}
+      </h3>
+      {showAdd && (
+        <div className="mb-2">
+          <RecommendationForm
+            onSubmit={(rec) => {
+              onAdd(rec);
+              setShowAdd(false);
+            }}
+            onCancel={() => setShowAdd(false)}
+          />
+        </div>
+      )}
+      {recs.length === 0 && !showAdd && (
+        <p className="text-slate-600 text-xs italic">Sin recomendaciones aún.</p>
+      )}
+      <div className="space-y-2">
+        {recs.map((r) => {
+          const validated = !!r.validated_by;
+          const requiresValidation = !!r.validation_required;
+          let badge;
+          if (validated) {
+            badge = (
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-300 bg-emerald-950/50 border border-emerald-800 px-1.5 py-0.5 rounded">
+                <ShieldCheck className="w-2.5 h-2.5" /> Validada por {r.validated_by}
+              </span>
+            );
+          } else if (requiresValidation) {
+            badge = (
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-yellow-300 bg-yellow-950/40 border border-yellow-800 px-1.5 py-0.5 rounded">
+                <ShieldAlert className="w-2.5 h-2.5" /> Pendiente validación profesional
+              </span>
+            );
+          } else {
+            badge = (
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-400 bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded">
+                Auto-reportada
+              </span>
+            );
+          }
+          return (
+            <div key={r.id} className="p-3 rounded-lg bg-slate-900 border border-slate-800">
+              <div className="flex items-start justify-between gap-2 mb-1">
+                {badge}
+                {!validated && requiresValidation && (
+                  <button
+                    type="button"
+                    onClick={() => setValidatingId(validatingId === r.id ? null : r.id)}
+                    className="text-[10px] px-2 py-0.5 rounded bg-emerald-800 text-emerald-100 hover:bg-emerald-700"
+                  >
+                    Validar
+                  </button>
+                )}
+              </div>
+              <p className="text-slate-200 text-xs leading-relaxed whitespace-pre-wrap">{r.text}</p>
+              <p className="text-[10px] text-slate-500 mt-1.5">
+                <span className="font-mono">{r.suggested_by}</span>
+                {r.validated_at && <span className="ml-2">· validada {formatDT(r.validated_at)}</span>}
+              </p>
+              {validatingId === r.id && (
+                <div className="mt-2">
+                  <ValidatorForm
+                    target="la recomendación"
+                    onSubmit={(payload) => {
+                      onValidate(r.id, payload);
+                      setValidatingId(null);
+                    }}
+                    onCancel={() => setValidatingId(null)}
+                  />
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+};
+
+// Sección timeline narrativa (DR-044 sub-ix F6).
+const NarrativeTimeline = ({ events, onAdd }) => {
+  const [showAdd, setShowAdd] = useState(false);
+  const [fullPhoto, setFullPhoto] = useState(null);
+  const ordered = [...events].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  return (
+    <section>
+      <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 flex items-center gap-2">
+        <CalendarClock className="w-3 h-3" /> Bitácora del caso ({events.length})
+        {!showAdd && (
+          <button
+            type="button"
+            onClick={() => setShowAdd(true)}
+            className="ml-auto text-[10px] px-2 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center gap-1"
+          >
+            <Plus className="w-3 h-3" /> Evento
+          </button>
+        )}
+      </h3>
+      {showAdd && (
+        <div className="mb-3">
+          <TimelineEventForm
+            onSubmit={(evt) => {
+              onAdd(evt);
+              setShowAdd(false);
+            }}
+            onCancel={() => setShowAdd(false)}
+          />
+        </div>
+      )}
+      {ordered.length === 0 && !showAdd && (
+        <p className="text-slate-600 text-xs italic">Sin eventos. Documenta observaciones, intervenciones y resultados.</p>
+      )}
+      <div className="space-y-2">
+        {ordered.map((e) => {
+          const meta = TIMELINE_EVENT_META[e.event_type] || TIMELINE_EVENT_META.note;
+          const Icon = meta.icon;
+          return (
+            <div key={e.id} className={`p-3 rounded-lg border border-slate-800 ${meta.bg}`}>
+              <div className="flex items-start gap-3">
+                <Icon className={`shrink-0 w-4 h-4 mt-0.5 ${meta.color}`} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className={`text-[10px] font-black uppercase tracking-wider ${meta.color}`}>{meta.label}</span>
+                    <span className="text-slate-500 text-[10px]" title={formatDT(e.date)}>{formatRelative(e.date)}</span>
+                  </div>
+                  <p className="text-slate-200 text-xs leading-relaxed mt-1 whitespace-pre-wrap">{e.description}</p>
+                  {e.actor && (
+                    <p className="text-[10px] text-slate-500 mt-1">— {e.actor}</p>
+                  )}
+                  {(e.photo_url || e.photo_id) && (
+                    <button
+                      type="button"
+                      onClick={() => setFullPhoto(e.photo_url || e.photo_id)}
+                      className="mt-2 block w-full max-w-[200px]"
+                      aria-label="Ver foto en grande"
+                    >
+                      <img
+                        src={e.photo_url || e.photo_id}
+                        alt="Foto del evento"
+                        className="w-full h-24 object-cover rounded border border-slate-700 hover:border-slate-500"
+                      />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {fullPhoto && (
+        <button
+          type="button"
+          onClick={() => setFullPhoto(null)}
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          aria-label="Cerrar"
+        >
+          <img src={fullPhoto} alt="Foto a tamaño completo" className="max-w-full max-h-full object-contain" />
+        </button>
+      )}
+    </section>
+  );
 };
 
 const TreatmentForm = ({ onSubmit, onCancel, caseObj }) => {
@@ -324,6 +904,12 @@ export default function CaseStudyDetail({ caseId, onBack }) {
   const addTreatment = useCaseStudyStore((s) => s.addTreatment);
   const transitionState = useCaseStudyStore((s) => s.transitionState);
   const closeCase = useCaseStudyStore((s) => s.closeCase);
+  // 2026-05-18 — extensión foro/validación/timeline
+  const linkTimelineEvent = useCaseStudyStore((s) => s.linkTimelineEvent);
+  const setValidation = useCaseStudyStore((s) => s.setValidation);
+  const setVisibility = useCaseStudyStore((s) => s.setVisibility);
+  const addRecommendation = useCaseStudyStore((s) => s.addRecommendation);
+  const validateRecommendation = useCaseStudyStore((s) => s.validateRecommendation);
 
   const [showTreatment, setShowTreatment] = useState(false);
   const [showClose, setShowClose] = useState(false);
@@ -377,6 +963,29 @@ export default function CaseStudyDetail({ caseId, onBack }) {
                   <span>{c.subject.count_affected ?? 0}/{c.subject.count_total} afectadas</span>
                 )}
                 <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDT(c.problem.detected_at || c.created_at)}</span>
+              </div>
+              {/* Badges visibility + validation (2026-05-18) */}
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {c.visibility === 'public' && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-200 bg-blue-950/60 border border-blue-800 px-1.5 py-0.5 rounded">
+                    <Globe className="w-2.5 h-2.5" /> Compartido en la red
+                  </span>
+                )}
+                {c.visibility === 'finca' && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-sky-200 bg-sky-950/60 border border-sky-800 px-1.5 py-0.5 rounded">
+                    <Users className="w-2.5 h-2.5" /> Compartido finca
+                  </span>
+                )}
+                {c.validation?.status === 'certified' && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-200 bg-emerald-950/60 border border-emerald-800 px-1.5 py-0.5 rounded">
+                    <ShieldCheck className="w-2.5 h-2.5" /> Certificado
+                  </span>
+                )}
+                {c.validation?.status === 'pending' && (c.recommendations || []).some((r) => r.validation_required && !r.validated_by) && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-yellow-200 bg-yellow-950/60 border border-yellow-800 px-1.5 py-0.5 rounded">
+                    <ShieldAlert className="w-2.5 h-2.5" /> Pendiente validación
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -453,6 +1062,41 @@ export default function CaseStudyDetail({ caseId, onBack }) {
           onRemove={removePhoto}
         />
 
+        {/* 2026-05-18 — Modo foro: visibilidad del caso */}
+        <VisibilitySection
+          value={c.visibility || 'private'}
+          onChange={(v) => setVisibility(c.id, v)}
+        />
+
+        {/* 2026-05-18 — Validación profesional del caso */}
+        <ValidationBlock
+          validation={c.validation}
+          onCertify={(payload) =>
+            setValidation(c.id, { status: 'certified', ...payload })
+          }
+          onReject={() =>
+            setValidation(c.id, {
+              status: 'rejected',
+              notes: 'Marcado como rechazado por el operador.',
+            })
+          }
+        />
+
+        {/* 2026-05-18 — Bitácora narrativa con fotos */}
+        <NarrativeTimeline
+          events={c.timeline || []}
+          onAdd={(evt) => linkTimelineEvent(c.id, evt)}
+        />
+
+        {/* 2026-05-18 — Recomendaciones validadas */}
+        <RecommendationsSection
+          recs={c.recommendations || []}
+          onAdd={(rec) => addRecommendation(c.id, rec)}
+          onValidate={(recId, payload) =>
+            validateRecommendation(c.id, recId, payload)
+          }
+        />
+
         {/* Treatments applied */}
         {c.treatments_applied.length > 0 && (
           <section>
@@ -474,10 +1118,11 @@ export default function CaseStudyDetail({ caseId, onBack }) {
           </section>
         )}
 
-        {/* State history timeline */}
+        {/* State history timeline (transiciones de máquina de estados; la
+            bitácora narrativa user-facing vive arriba en NarrativeTimeline) */}
         <section>
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 flex items-center gap-2">
-            <Clock className="w-3 h-3" /> Línea de tiempo ({c.state_history.length})
+            <Clock className="w-3 h-3" /> Cambios de estado ({c.state_history.length})
           </h3>
           <div className="space-y-2">
             {[...c.state_history].reverse().map((h, idx) => {
