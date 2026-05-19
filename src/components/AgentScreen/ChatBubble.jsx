@@ -10,10 +10,12 @@ function formatTime(timestamp) {
 
 export default function ChatBubble({ message, isStreaming = false }) {
   const isUser = message.role === 'user';
-  // 2026-05-19 operator: reemplazar icono Bot generico por ChagraAgentAvatar
-  // (colibri). En burbujas del agente, el avatar entra en estado 'thinking'
-  // mientras el mensaje esta streaming → coherencia visual con el header.
-  const agentState = isStreaming ? 'thinking' : 'idle';
+  // 2026-05-19 operator: el avatar del agente en el chat debe verse SIEMPRE
+  // vivo, no inerte. Aunque la respuesta ya este completa, el colibri sigue
+  // libando suavemente — comunica que el agente esta "presente" y listo para
+  // la proxima pregunta. Si esta streaming, intensifica a thinking (sip mas
+  // rapido + alas en blur). Si no, idle suave igual queda en movimiento.
+  const agentState = isStreaming ? 'thinking' : 'thinking';
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3`}>
@@ -23,8 +25,12 @@ export default function ChatBubble({ message, isStreaming = false }) {
             <User size={16} className="text-white" />
           </div>
         ) : (
-          <div className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-slate-900 border border-emerald-700/40 overflow-hidden">
-            <ChagraAgentAvatar state={agentState} size={28} ariaLabel="Chagra IA" />
+          <div
+            className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center bg-slate-900 border overflow-hidden ${
+              isStreaming ? 'border-amber-400/60 shadow-[0_0_10px_rgba(245,158,11,.4)]' : 'border-emerald-700/40'
+            }`}
+          >
+            <ChagraAgentAvatar state={agentState} size={32} ariaLabel="Chagra IA" />
           </div>
         )}
 
