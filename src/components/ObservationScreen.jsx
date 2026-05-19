@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from 'react';
-import { ArrowLeft, AlertCircle, Camera } from 'lucide-react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { ArrowLeft, AlertCircle, Camera, Sparkles } from 'lucide-react';
 import DateField from './DateField';
 import CaseLinkModal from './CaseLinkModal';
 import { syncManager } from '../services/syncManager';
 import useAssetStore from '../store/useAssetStore';
 import { getParentLandIdFromAsset } from '../utils/assetRelationships';
+import { retrieve as ragRetrieve } from '../services/ragRetriever';
 
 // Bug 069.10 — observation requiere descripción mínima útil + ubicación.
 // Mínimo de 5 caracteres descarta entries vacíos tipo "ok" o "test".
@@ -20,6 +21,17 @@ const MAX_DESCRIPTION_LEN = 2000;
 // resultante para que el operador linke a caso existente o cree uno nuevo
 // (pre-fill species_slug + timeline[0]).
 const SEVERITY_TRIGGER_CASE_BRIDGE = new Set(['high', 'critical']);
+
+// L1.5 — sugerencia proactiva de tratamientos vía RAG.
+// Cuando el operador describe una observación con severity media-alta,
+// disparamos `retrieve(description + species_name, 5)` tras 3s de inactividad
+// (debounce) y mostramos top 2-3 passages en sección colapsada NO bloqueante.
+// La sugerencia es informativa: el operador puede ignorarla y guardar igual.
+const SEVERITY_TRIGGER_RAG_SUGGEST = new Set(['medium', 'high', 'critical']);
+const RAG_SUGGEST_DEBOUNCE_MS = 3000;
+const RAG_SUGGEST_TOP_K = 5;
+const RAG_SUGGEST_SHOW_LIMIT = 3;
+const RAG_PASSAGE_EXCERPT_LEN = 220;
 
 function ObservationScreen({ onBack, onSave }) {
   const [formData, setFormData] = useState({
@@ -65,6 +77,64 @@ function ObservationScreen({ onBack, onSave }) {
 
   const hasErrors = Object.keys(errors).length > 0;
   const markTouched = (field) => setTouched((t) => ({ ...t, [field]: true }));
+
+  // L1.5 — sugerencias proactivas RAG (debounced, no bloqueante).
+  const [ragSuggestions, setRagSuggestions] = useState([]);
+  const [ragLoading, setRagLoading] = useState(false);
+  const ragRequestIdRef = useRef(0);
+
+  // Nombre de la especie seleccionada (si hay plant). Usado para enriquecer
+  // la query RAG con contexto botánico. Cae a '' cuando no hay match.
+  const selectedSpeciesName = useMemo(() => {
+    if (!formData.plantId) return '';
+    const plant = (plants || []).find((p) => p.id === formData.plantId);
+    return (
+      plant?.attributes?.species_slug
+      || plant?.attributes?.species?.name
+      || plant?.attributes?.name
+      || ''
+    );
+  }, [formData.plantId, plants]);
+
+  useEffect(() => {
+    const desc = (formData.description || '').trim();
+    const triggers = SEVERITY_TRIGGER_RAG_SUGGEST.has(formData.severity);
+
+    // Reset si no se cumplen condiciones (mantiene UI limpia entre cambios
+    // de severity o descripción vaciada).
+    if (!triggers || desc.length < MIN_DESCRIPTION_LEN) {
+      setRagSuggestions([]);
+      setRagLoading(false);
+      return undefined;
+    }
+
+    const requestId = ++ragRequestIdRef.current;
+    setRagLoading(true);
+
+    const timerId = setTimeout(async () => {
+      try {
+        const query = selectedSpeciesName
+          ? `${desc} ${selectedSpeciesName}`
+          : desc;
+        const results = await ragRetrieve(query, RAG_SUGGEST_TOP_K);
+        // Race-guard: si entre el debounce y el resolve otro cambio disparó
+        // un nuevo request, descartamos este resultado.
+        if (requestId !== ragRequestIdRef.current) return;
+        const filtered = Array.isArray(results)
+          ? results.filter((r) => r && typeof r.score === 'number' && r.score > 0)
+          : [];
+        setRagSuggestions(filtered.slice(0, RAG_SUGGEST_SHOW_LIMIT));
+      } catch (err) {
+        // Graceful: RAG falla → sección NO se renderiza, sin error UI.
+        console.warn('[ObservationScreen] RAG retrieve failed:', err);
+        if (requestId === ragRequestIdRef.current) setRagSuggestions([]);
+      } finally {
+        if (requestId === ragRequestIdRef.current) setRagLoading(false);
+      }
+    }, RAG_SUGGEST_DEBOUNCE_MS);
+
+    return () => clearTimeout(timerId);
+  }, [formData.description, formData.severity, selectedSpeciesName]);
 
   const handleInput = (e) => {
     setFormData(prev => {
@@ -257,6 +327,49 @@ function ObservationScreen({ onBack, onSave }) {
             <option value="critical">Critica</option>
           </select>
         </label>
+
+        {/* L1.5 — sugerencias RAG no bloqueantes. Solo renderiza si hay
+            resultados con score>0. Colapsada por defecto para no robar foco
+            del flujo de guardado. Operador puede ignorarla. */}
+        {ragSuggestions.length > 0 && (
+          <details
+            data-testid="rag-treatment-suggestions"
+            className="rounded-xl bg-slate-900 border border-purple-700/40 overflow-hidden"
+          >
+            <summary className="p-4 cursor-pointer flex items-center gap-2 text-lg font-bold text-purple-200">
+              <Sparkles size={20} aria-hidden="true" className="text-purple-300" />
+              Tratamientos sugeridos por la red Chagra
+              <span className="text-sm font-normal text-slate-400 ml-1">
+                ({ragSuggestions.length})
+              </span>
+            </summary>
+            <ul className="px-4 pb-4 flex flex-col gap-3" role="list">
+              {ragSuggestions.map((suggestion, idx) => {
+                const excerpt = (suggestion.text || '').slice(0, RAG_PASSAGE_EXCERPT_LEN);
+                const truncated = (suggestion.text || '').length > RAG_PASSAGE_EXCERPT_LEN;
+                return (
+                  <li
+                    key={`${suggestion.species || 'unknown'}-${suggestion.key || idx}`}
+                    data-testid="rag-suggestion-item"
+                    className="rounded-lg bg-slate-950/60 border border-slate-800 p-3 text-base"
+                  >
+                    {suggestion.species && (
+                      <p className="text-purple-300 text-sm font-semibold italic mb-1">
+                        {suggestion.species}
+                      </p>
+                    )}
+                    <p className="text-slate-200 leading-relaxed">
+                      {excerpt}{truncated ? '…' : ''}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+            <p className="px-4 pb-3 text-xs text-slate-500">
+              Sugerencia informativa. Puedes ignorarla y guardar la observación.
+            </p>
+          </details>
+        )}
 
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Zona (Land)</span>
