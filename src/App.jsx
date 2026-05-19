@@ -142,10 +142,12 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
   ], [plantsCount, landsCount, structuresCount, materialsCount]);
 
   return (
-    <div className="h-[100dvh] w-full bg-slate-950 text-white flex flex-col overflow-hidden">
+    <div className="h-[100dvh] w-full bg-slate-950/82 text-white flex flex-col overflow-hidden">
       {/* DR-030 QW2: TopBar persistente con identidad operador + acciones
           globales. Reemplaza el header inline previo. La info ambiental
-          (msnm/luna/sol) pasó al EnvironmentalCard colapsable bajo el TopBar. */}
+          (msnm/luna/sol) pasó al EnvironmentalCard colapsable bajo el TopBar.
+          2026-05-18: wrapper translúcido (bg-slate-950/82) para que se vea
+          la imagen de fondo agroecológica aplicada al body en App.jsx. */}
       <TopBar onNavigate={onNavigate} onLogout={onLogout} />
 
       {/* Lili #116: estadísticas al header (siempre visibles).
@@ -171,7 +173,7 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
         </button>
       )}
 
-      <main className="flex-1 px-4 pt-3 pb-4 flex flex-col overflow-y-auto gap-3 bg-biopunk-pattern">
+      <main className="flex-1 px-4 pt-3 pb-4 flex flex-col overflow-y-auto gap-3">
         {/* Bug 2026-05-18 (operator): TelemetryAlerts mostraba errores IoT +
             sync no resueltos como PRIMERA cosa visible post-login. Mal first
             impression — Chagra debe arrancar con stats positivos (especies,
@@ -302,6 +304,20 @@ export default function App() {
       console.warn('[App] Catálogo no se pudo preload (los componentes lo reintentarán al usarlos):', err);
     });
   }, []);
+
+  // 2026-05-18 (operator request): la imagen de fondo agroecológica de
+  // /biodiversidad-bg.jpg que está en la pestaña Biodiversidad se aplica
+  // a TODA la app excepto login + loading. Body className toggled según
+  // currentView. Estilos en src/index.css clase .app-bg-biodiversidad.
+  useEffect(() => {
+    const showBg = currentView !== 'loading' && currentView !== 'login';
+    if (showBg) {
+      document.body.classList.add('app-bg-biodiversidad');
+    } else {
+      document.body.classList.remove('app-bg-biodiversidad');
+    }
+    return () => document.body.classList.remove('app-bg-biodiversidad');
+  }, [currentView]);
 
   const showToast = useCallback((message, isError = false) => {
     setToast({ message, isError });
