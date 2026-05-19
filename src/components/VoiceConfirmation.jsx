@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Check, X, Trash2, AlertTriangle, Wand2, Sprout, FlaskConical, Ban } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import { FARM_CONFIG } from '../config/defaults';
@@ -102,34 +102,66 @@ export default function VoiceConfirmation({
     };
   };
 
-  const [rows, setRows] = useState(() =>
-    (initialEntities || []).map((e) => {
-      const resolvedLoc = resolveLocation(e.location);
-      const resolvedCrop = resolveCrop(e.crop || '');
-      return {
-        crop: resolvedCrop.crop,
-        cropOriginal: e.crop || '',
-        cropCanonical: resolvedCrop.canonical,
-        cropSlug: resolvedCrop.cropSlug,
-        farmosTermId: resolvedCrop.farmosTermId,
-        cropScore: resolvedCrop.score,
-        cropGroup: resolvedCrop.group,
-        quantity: e.quantity || 1,
-        rawLocation: e.location || '',
-        locationId: resolvedLoc?.id || '',
-        locationType: resolvedLoc?.type || 'asset--land',
-        locationMatchedName: resolvedLoc?.matchedName || null,
-        locationScore: resolvedLoc?.score || null,
-        // Insights del RAG post-extracción (audit 2026-05-18). Opcional: si
-        // el RAG no encontró hits o el corpus está cold, queda null y la UI
-        // omite la sección. Ver voiceRagEnricher.js.
-        ragInsights: e._ragInsights || null,
-      };
-    })
-  );
+  // Build inicial de rows: resuelve cultivo + ubicacion contra catalogos.
+  // 2026-05-19 bug operador: si useAssetStore aun estaba hidratando IndexedDB
+  // cuando este componente monta, locationOptions=[] y resolveLocation()
+  // siempre devolvia null -> locationId='' -> allValid=false -> boton Guardar
+  // disabled -> operador percibe "form vacio sin info". Fix: useEffect que
+  // recompute rows cuando los stores cargan, preservando ediciones del usuario.
+  const buildRows = (entities) => (entities || []).map((e) => {
+    const resolvedLoc = resolveLocation(e.location);
+    const resolvedCrop = resolveCrop(e.crop || '');
+    return {
+      crop: resolvedCrop.crop,
+      cropOriginal: e.crop || '',
+      cropCanonical: resolvedCrop.canonical,
+      cropSlug: resolvedCrop.cropSlug,
+      farmosTermId: resolvedCrop.farmosTermId,
+      cropScore: resolvedCrop.score,
+      cropGroup: resolvedCrop.group,
+      quantity: e.quantity || 1,
+      rawLocation: e.location || '',
+      locationId: resolvedLoc?.id || '',
+      locationType: resolvedLoc?.type || 'asset--land',
+      locationMatchedName: resolvedLoc?.matchedName || null,
+      locationScore: resolvedLoc?.score || null,
+      ragInsights: e._ragInsights || null,
+    };
+  });
 
-  const updateRow = (i, patch) => setRows((prev) => prev.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
-  const removeRow = (i) => setRows((prev) => prev.filter((_, idx) => idx !== i));
+  const [rows, setRows] = useState(() => buildRows(initialEntities));
+
+  // Flag de "el usuario empezo a editar" para no pisar ediciones cuando los
+  // stores async terminan de hidratar. Si dirty=true, mantenemos las rows
+  // actuales aunque locationOptions cambie. Si dirty=false (acaba de
+  // entrar a STATE_REVIEW), recomputamos en caso de stores recien hidratados.
+  const dirtyRef = useRef(false);
+  const storesReady = locationOptions.length > 0 && allCropSpecies.length > 0;
+  const lastEntitiesRef = useRef(initialEntities);
+  useEffect(() => {
+    // Cambio de initialEntities (nueva extraccion) -> reset dirty + rebuild.
+    if (initialEntities !== lastEntitiesRef.current) {
+      lastEntitiesRef.current = initialEntities;
+      dirtyRef.current = false;
+      setRows(buildRows(initialEntities));
+      return;
+    }
+    // Mismo initialEntities pero stores acaban de cargar -> re-resolver
+    // ubicacion y cultivo si el usuario aun no edito.
+    if (!dirtyRef.current && storesReady) {
+      setRows(buildRows(initialEntities));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialEntities, storesReady]);
+
+  const updateRow = (i, patch) => {
+    dirtyRef.current = true;
+    setRows((prev) => prev.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
+  };
+  const removeRow = (i) => {
+    dirtyRef.current = true;
+    setRows((prev) => prev.filter((_, idx) => idx !== i));
+  };
 
   // Agrega una nueva fila a partir de un "compañero sugerido" (capas de
   // GuildSuggestions). Resuelve la especie contra CROP_TAXONOMY para
