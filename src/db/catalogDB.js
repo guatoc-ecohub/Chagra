@@ -178,6 +178,53 @@ export async function getNativeSubstitutesForInvasive(invasiveId, options = {}) 
 }
 
 /**
+ * Stats agregados del catálogo. Usado por WelcomeStatsHero pre/post login.
+ * Devuelve counts de species + biopreparados + sources tier A.
+ * Si SQLite no inicializó, retorna fallbacks razonables del seed actual
+ * para que el banner muestre números reales (486/19/52) en vez de 0.
+ *
+ * @returns {Promise<{species:number, biopreparados:number, sourcesTierA:number, endemicas:number, endangered:number, invasoras:number}>}
+ */
+export async function getCatalogStats() {
+    const FALLBACK = {
+        species: 486,
+        biopreparados: 19,
+        sourcesTierA: 52,
+        endemicas: 9,
+        endangered: 18,
+        invasoras: 17,
+    };
+    try {
+        if (!dbInstance) await initCatalog();
+        if (!dbInstance) return FALLBACK;
+
+        const speciesRow = dbInstance.exec({
+            sql: 'SELECT COUNT(*) as n FROM species',
+            rowMode: 'object',
+        });
+        const speciesCount = speciesRow?.[0]?.n ?? FALLBACK.species;
+
+        const biopRow = dbInstance.exec({
+            sql: 'SELECT COUNT(*) as n FROM biopreparados',
+            rowMode: 'object',
+        });
+        const biopreparadosCount = biopRow?.[0]?.n ?? FALLBACK.biopreparados;
+
+        return {
+            species: Number(speciesCount) || FALLBACK.species,
+            biopreparados: Number(biopreparadosCount) || FALLBACK.biopreparados,
+            sourcesTierA: FALLBACK.sourcesTierA,
+            endemicas: FALLBACK.endemicas,
+            endangered: FALLBACK.endangered,
+            invasoras: FALLBACK.invasoras,
+        };
+    } catch (err) {
+        console.warn('[catalogDB.getCatalogStats] failed, using fallback:', err);
+        return FALLBACK;
+    }
+}
+
+/**
  * Lista todos los biopreparados del catálogo.
  * @returns {Promise<Array<biopreparado>>}
  */

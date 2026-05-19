@@ -58,7 +58,7 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
             biopreparados) son públicos — visibles pre-auth. Plantas cuidadas
             del operador aparece como 0 hasta login. */}
         <div className="w-full">
-          <WelcomeStatsHero />
+          <WelcomeStatsHero mode="pre-login" />
         </div>
 
         <form onSubmit={handleLogin} className="w-full flex flex-col gap-6">

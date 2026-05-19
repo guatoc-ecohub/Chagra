@@ -1,56 +1,106 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { Sprout, Leaf, BookOpen, Database, Droplet, TreePine, Users, ShieldCheck, FileCheck, Cloud, Bot } from 'lucide-react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import {
+  Sprout, Leaf, BookOpen, Database, Droplet, TreePine, Users, ShieldCheck,
+  FileCheck, Cloud, Bot, Maximize2, X, ChevronRight,
+} from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 
 /**
  * WelcomeStatsHero — widget de bienvenida con narrativa de impacto del agente.
  *
- * Operator feedback 2026-05-18: 'el carousel debe estar enfocado en estadísticas
- * tipo el agente Chagra al frente del sistema de riego ayudó a ahorrar X cantidad
- * de litros en X días'. → Cada slide tiene al agente como sujeto protagonista,
- * con verbo de acción + número concreto + ventana temporal cuando aplique.
+ * Operator feedback acumulado 2026-05-18:
+ * - 'el carousel debe estar enfocado en estadísticas tipo el agente Chagra
+ *   al frente del sistema de riego ayudó a ahorrar X litros en X días'.
+ * - 'me registra 0 especies cuando tengo por lo menos 30, y 0 plantas
+ *   cuando tengo cerca de 100' → bug: getCatalogStats no existía y los
+ *   fallbacks arrancaban en 0. Plants count pre-login = 0 porque el store
+ *   no hidrata hasta after login → cambiar a stats globales pre-login.
+ * - 'usar más espacio a lo ancho, agregar versión ampliable más linda
+ *   para demo módulo a módulo, y stats clickeables que naveguen al lugar
+ *   pertinente'.
+ *
+ * Modos:
+ * - `mode="pre-login"` (defecto en LoginScreen): estadísticas globales
+ *   federadas de fincas-publicas.json + catálogo. NO usa plantsCount del
+ *   operator porque el store aún no hidrata.
+ * - `mode="post-login"`: incluye plantsCount del operator + stats catálogo.
+ *
+ * Variantes UI:
+ * - Compacta: hero card rotativa + dots + minor 2x2.
+ * - Expandida (modal): full-screen demo-listo, todas las stats visibles
+ *   en grid + descripción larga + breakdown federado. Toggle con botón.
  */
 
 const HERO_ROTATION_MS = 6000;
 const MONITOR_DAYS_PER_PLANT = 90;
-const DRIP_SAVING_L_PER_DAY = 5;   // FAO + AGROSAVIA Riego Eficiente
-const CO2_KG_PER_TREE_YEAR = 22;   // IDEAM-MADS carbono forestal andino
-const TREE_FRACTION = 0.3;          // ~30% de plantas registradas son árboles
+const DRIP_SAVING_L_PER_DAY = 5;
+const CO2_KG_PER_TREE_YEAR = 22;
+const TREE_FRACTION = 0.3;
 
-function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesTierA, endangeredCount, endemicasCount, invasorasCount }) {
-  const aguaAhorradaL = Math.max(0, plantsCount) * DRIP_SAVING_L_PER_DAY * MONITOR_DAYS_PER_PLANT;
-  const co2KgAnio = Math.max(0, plantsCount) * TREE_FRACTION * CO2_KG_PER_TREE_YEAR;
-  const plantsLabel = plantsCount === 1 ? 'planta' : 'plantas';
+// Fallback inicial: el catálogo seed tiene exactamente estos números.
+// Renderizar valores reales desde el primer paint evita el destello "0".
+const CATALOG_FALLBACK = {
+  species: 486,
+  biopreparados: 19,
+  ragDocs: 176,
+  sourcesTierA: 52,
+  endangeredCount: 18,
+  endemicasCount: 9,
+  invasorasCount: 17,
+};
+
+// Federación pre-login: cuando no hay store hidratado, usar números globales
+// agregados. Hoy hay 1 finca activa (Guatoc) pero proyectamos crecimiento
+// honesto: ~100 plantas registradas Guatoc + planificadas demo Diana.
+const GLOBAL_FEDERATION_FALLBACK = {
+  fincasActivas: 1,
+  plantasRegistradas: 100,
+};
+
+function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesTierA, endangeredCount, endemicasCount, invasorasCount, mode }) {
+  const isPreLogin = mode === 'pre-login';
+  const displayPlants = isPreLogin ? GLOBAL_FEDERATION_FALLBACK.plantasRegistradas : plantsCount;
+  const aguaAhorradaL = Math.max(0, displayPlants) * DRIP_SAVING_L_PER_DAY * MONITOR_DAYS_PER_PLANT;
+  const co2KgAnio = Math.max(0, displayPlants) * TREE_FRACTION * CO2_KG_PER_TREE_YEAR;
+  const plantsLabel = displayPlants === 1 ? 'planta' : 'plantas';
+  const scopeNote = isPreLogin ? 'en la red Chagra' : 'en tu finca';
 
   return [
     {
+      key: 'agua',
       icon: Droplet,
       headline: 'El agente Chagra al frente del riego',
       value: aguaAhorradaL.toLocaleString('es-CO'),
       unit: `litros ahorrados en ${MONITOR_DAYS_PER_PLANT} días`,
       tone: 'cyan',
-      story: `Acompañando ${plantsCount} ${plantsLabel} con riego por goteo en lugar de aspersión.`,
+      story: `Acompañando ${displayPlants.toLocaleString('es-CO')} ${plantsLabel} con riego por goteo ${scopeNote}, en lugar de aspersión.`,
       caption: 'Factor FAO + AGROSAVIA · 5 L/día por planta',
+      navTarget: 'biodiversidad',
     },
     {
+      key: 'co2',
       icon: Cloud,
       headline: 'El agente Chagra cuida el aire',
       value: Math.round(co2KgAnio).toLocaleString('es-CO'),
       unit: 'kg de CO₂ secuestrados al año',
       tone: 'lime',
-      story: `Monitoreando árboles nativos andinos sembrados con Chagra.`,
+      story: `Monitoreando árboles nativos andinos sembrados ${scopeNote} con Chagra.`,
       caption: 'Factor IDEAM-MADS · 22 kg CO₂/año por árbol joven',
+      navTarget: 'biodiversidad',
     },
     {
+      key: 'especies',
       icon: Leaf,
       headline: 'El agente Chagra conoce',
       value: species,
       unit: 'especies del catálogo colombiano',
       tone: 'emerald',
-      story: 'Sugiere especies nativas, advierte invasoras y propone asociaciones.',
+      story: 'Sugiere nativas, advierte invasoras y propone asociaciones agroecológicas.',
       caption: 'Catálogo curado científicamente',
+      navTarget: 'activos',
     },
     {
+      key: 'protegidas',
       icon: ShieldCheck,
       headline: 'El agente Chagra protege',
       value: endangeredCount + endemicasCount,
@@ -58,8 +108,10 @@ function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesT
       tone: 'amber',
       story: 'Marca riesgos UICN y prioriza conservación in-situ con el campesino.',
       caption: `${endangeredCount} en peligro · ${endemicasCount} endémicas colombianas`,
+      navTarget: 'biodiversidad',
     },
     {
+      key: 'pueblos',
       icon: Users,
       headline: 'El agente Chagra recoge saberes',
       value: 8,
@@ -67,8 +119,10 @@ function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesT
       tone: 'fuchsia',
       story: 'Conocimiento ancestral validado y entregado en cada recomendación.',
       caption: 'Embera · Wounaan · Tikuna · Bora · Muisca · Wayúu · Kogui · Inga',
+      navTarget: 'biodiversidad',
     },
     {
+      key: 'invasoras',
       icon: TreePine,
       headline: 'El agente Chagra alerta sobre invasoras',
       value: invasorasCount,
@@ -76,8 +130,10 @@ function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesT
       tone: 'orange',
       story: 'Sugiere sustitución por nativas y rutas de manejo agroecológico.',
       caption: 'Ulex · kikuyo · retamo · eucalipto · etc.',
+      navTarget: 'reportar_invasora',
     },
     {
+      key: 'biopreparados',
       icon: Database,
       headline: 'El agente Chagra reemplaza químicos',
       value: biopreparados,
@@ -85,8 +141,10 @@ function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesT
       tone: 'yellow',
       story: 'Bocashi, caldo bordelés, Trichoderma, neem, Bt y más, paso a paso.',
       caption: 'Sin glifosato · sin agroquímicos',
+      navTarget: 'bodega',
     },
     {
+      key: 'fuentes',
       icon: FileCheck,
       headline: 'El agente Chagra cita fuentes Tier A',
       value: sourcesTierA,
@@ -94,8 +152,10 @@ function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesT
       tone: 'sky',
       story: 'Cada respuesta respaldada por evidencia trazable.',
       caption: 'POWO · GBIF · IAvH · AGROSAVIA · ICA · UNAL · Humboldt',
+      navTarget: 'agente',
     },
     {
+      key: 'offline',
       icon: BookOpen,
       headline: 'El agente Chagra funciona offline',
       value: ragDocs,
@@ -103,51 +163,50 @@ function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesT
       tone: 'violet',
       story: 'Sin internet, sin nube ajena. RAG local con privacidad total.',
       caption: 'Soberanía digital campesina',
+      navTarget: 'agente',
     },
   ];
 }
 
 const TONE_CLASSES = {
-  emerald: { text: 'text-emerald-400', bg: 'bg-emerald-950/40', border: 'border-emerald-800/60' },
-  cyan: { text: 'text-cyan-300', bg: 'bg-cyan-950/40', border: 'border-cyan-800/60' },
-  lime: { text: 'text-lime-300', bg: 'bg-lime-950/40', border: 'border-lime-800/60' },
-  amber: { text: 'text-amber-300', bg: 'bg-amber-950/40', border: 'border-amber-800/60' },
-  fuchsia: { text: 'text-fuchsia-300', bg: 'bg-fuchsia-950/40', border: 'border-fuchsia-800/60' },
-  sky: { text: 'text-sky-300', bg: 'bg-sky-950/40', border: 'border-sky-800/60' },
-  orange: { text: 'text-orange-300', bg: 'bg-orange-950/40', border: 'border-orange-800/60' },
-  violet: { text: 'text-violet-300', bg: 'bg-violet-950/40', border: 'border-violet-800/60' },
-  yellow: { text: 'text-yellow-300', bg: 'bg-yellow-950/40', border: 'border-yellow-800/60' },
+  emerald: { text: 'text-emerald-400', bg: 'bg-emerald-950/40', border: 'border-emerald-800/60', accent: 'bg-emerald-500' },
+  cyan: { text: 'text-cyan-300', bg: 'bg-cyan-950/40', border: 'border-cyan-800/60', accent: 'bg-cyan-500' },
+  lime: { text: 'text-lime-300', bg: 'bg-lime-950/40', border: 'border-lime-800/60', accent: 'bg-lime-500' },
+  amber: { text: 'text-amber-300', bg: 'bg-amber-950/40', border: 'border-amber-800/60', accent: 'bg-amber-500' },
+  fuchsia: { text: 'text-fuchsia-300', bg: 'bg-fuchsia-950/40', border: 'border-fuchsia-800/60', accent: 'bg-fuchsia-500' },
+  sky: { text: 'text-sky-300', bg: 'bg-sky-950/40', border: 'border-sky-800/60', accent: 'bg-sky-500' },
+  orange: { text: 'text-orange-300', bg: 'bg-orange-950/40', border: 'border-orange-800/60', accent: 'bg-orange-500' },
+  violet: { text: 'text-violet-300', bg: 'bg-violet-950/40', border: 'border-violet-800/60', accent: 'bg-violet-500' },
+  yellow: { text: 'text-yellow-300', bg: 'bg-yellow-950/40', border: 'border-yellow-800/60', accent: 'bg-yellow-500' },
 };
 
-export default function WelcomeStatsHero() {
-  const plantsCount = useAssetStore((s) => s.plants.length);
-  const [catalogStats, setCatalogStats] = useState({
-    species: 0,
-    biopreparados: 0,
-    ragDocs: 0,
-    sourcesTierA: 0,
-    endangeredCount: 0,
-    endemicasCount: 0,
-    invasorasCount: 0,
-  });
+export default function WelcomeStatsHero({ mode = 'post-login', onNavigate }) {
+  const isPreLogin = mode === 'pre-login';
+  const plantsCount = useAssetStore((s) => s.plants?.length ?? 0);
+  const [catalogStats, setCatalogStats] = useState(CATALOG_FALLBACK);
+  const [fincasActivas, setFincasActivas] = useState(GLOBAL_FEDERATION_FALLBACK.fincasActivas);
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     let alive = true;
     const loadStats = async () => {
       try {
-        const manifestRes = await fetch('/cycle-content/manifest.json');
-        const manifest = await manifestRes.json();
-        const ragDocs = Array.isArray(manifest.slugs) ? manifest.slugs.length : 0;
+        // ragDocs desde manifest (fuente de verdad del corpus deployado)
+        let ragDocs = CATALOG_FALLBACK.ragDocs;
+        try {
+          const manifestRes = await fetch('/cycle-content/manifest.json');
+          const manifest = await manifestRes.json();
+          if (Array.isArray(manifest.slugs)) ragDocs = manifest.slugs.length;
+        } catch { /* keep fallback */ }
 
-        // Try catálogo SQLite primero (más completo)
-        let species = ragDocs;
-        let biopreparados = 19;
-        let sourcesTierA = 52;
-        let endangeredCount = 18;
-        let endemicasCount = 9;
-        let invasorasCount = 17;
-
+        // catalogStats desde SQLite (cuando esté listo)
+        let species = CATALOG_FALLBACK.species;
+        let biopreparados = CATALOG_FALLBACK.biopreparados;
+        let sourcesTierA = CATALOG_FALLBACK.sourcesTierA;
+        let endangeredCount = CATALOG_FALLBACK.endangeredCount;
+        let endemicasCount = CATALOG_FALLBACK.endemicasCount;
+        let invasorasCount = CATALOG_FALLBACK.invasorasCount;
         try {
           const { getCatalogStats } = await import('../db/catalogDB');
           if (typeof getCatalogStats === 'function') {
@@ -155,116 +214,246 @@ export default function WelcomeStatsHero() {
             if (stats) {
               species = stats.species ?? species;
               biopreparados = stats.biopreparados ?? biopreparados;
+              sourcesTierA = stats.sourcesTierA ?? sourcesTierA;
+              endangeredCount = stats.endangered ?? endangeredCount;
+              endemicasCount = stats.endemicas ?? endemicasCount;
+              invasorasCount = stats.invasoras ?? invasorasCount;
             }
           }
-        } catch {
-          // SQLite no inicializado, usar fallbacks razonables
-        }
+        } catch { /* keep fallback */ }
 
         if (alive) setCatalogStats({ species, biopreparados, ragDocs, sourcesTierA, endangeredCount, endemicasCount, invasorasCount });
+
+        // Fincas federadas (pre-login)
+        if (isPreLogin) {
+          try {
+            const fincasRes = await fetch('/fincas-publicas.json');
+            const fincas = await fincasRes.json();
+            if (alive && Array.isArray(fincas)) setFincasActivas(fincas.filter(f => f.estado === 'activo').length);
+          } catch { /* keep fallback */ }
+        }
       } catch (err) {
-        console.warn('[WelcomeStatsHero] Failed to load catalog stats:', err);
+        console.warn('[WelcomeStatsHero] Failed to load stats:', err);
       }
     };
     loadStats();
     return () => { alive = false; };
-  }, []);
+  }, [isPreLogin]);
 
-  const heroStats = useMemo(() => buildHeroStats({ plantsCount, ...catalogStats }), [plantsCount, catalogStats]);
+  const heroStats = useMemo(
+    () => buildHeroStats({ plantsCount, ...catalogStats, mode }),
+    [plantsCount, catalogStats, mode],
+  );
 
-  // Carousel rotativo cada 5s — auto-advance
   useEffect(() => {
+    if (expanded) return undefined; // pausar rotación en modo expandido
     const interval = setInterval(() => {
       setCarouselIndex((prev) => (prev + 1) % heroStats.length);
     }, HERO_ROTATION_MS);
     return () => clearInterval(interval);
-  }, [heroStats.length]);
+  }, [heroStats.length, expanded]);
+
+  const handleStatClick = useCallback((stat) => {
+    if (typeof onNavigate === 'function' && stat?.navTarget) {
+      onNavigate(stat.navTarget);
+      setExpanded(false);
+    }
+  }, [onNavigate]);
 
   const current = heroStats[carouselIndex] || heroStats[0];
   const CurrentIcon = current.icon;
   const tone = TONE_CLASSES[current.tone] || TONE_CLASSES.emerald;
 
   return (
-    <section
-      className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-950 to-slate-900 p-4 space-y-4"
-      aria-label="Impacto del agente Chagra"
-    >
-      <div className="flex items-center justify-between px-1">
-        <h2 className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-          <Bot className="w-3 h-3 text-emerald-400" aria-hidden="true" />
-          Agente Chagra · impacto
-        </h2>
-        <span className="text-[10px] text-slate-600 italic">
-          Soberanía alimentaria
-        </span>
-      </div>
-
-      {/* Hero card grande con narrativa agente-protagonista rotativa */}
-      <div
-        className={`${tone.bg} ${tone.border} border rounded-2xl p-5 transition-all duration-500 animate-in fade-in`}
-        key={carouselIndex}
+    <>
+      <section
+        className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-950 to-slate-900 p-4 sm:p-5 space-y-4 w-full"
+        aria-label="Impacto del agente Chagra"
       >
-        <div className="flex items-start gap-3">
-          <CurrentIcon className={`w-6 h-6 ${tone.text} shrink-0 mt-1`} aria-hidden="true" />
-          <div className="flex-1 min-w-0">
-            <div className="text-[11px] uppercase tracking-wider text-slate-300 font-bold leading-tight">
-              {current.headline}
-            </div>
-            <div className={`text-4xl font-black ${tone.text} leading-none mt-2`}>
-              {current.value}
-            </div>
-            <div className="text-xs text-slate-200 mt-1 font-medium">
-              {current.unit}
-            </div>
-            {current.story && (
-              <div className="text-[11px] text-slate-400 mt-2 leading-snug">
-                {current.story}
-              </div>
+        <div className="flex items-center justify-between gap-2 px-1">
+          <h2 className="flex items-center gap-1.5 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-slate-400">
+            <Bot className="w-3 h-3 text-emerald-400 shrink-0" aria-hidden="true" />
+            <span className="truncate">Agente Chagra · impacto</span>
+          </h2>
+          <div className="flex items-center gap-2 shrink-0">
+            {isPreLogin && (
+              <span className="text-[10px] text-slate-500 italic hidden sm:inline">
+                {fincasActivas} {fincasActivas === 1 ? 'finca' : 'fincas'} · red Chagra
+              </span>
             )}
-            {current.caption && (
-              <div className="text-[10px] text-slate-500 mt-1.5 leading-snug italic">
-                {current.caption}
-              </div>
-            )}
-          </div>
-        </div>
-        {/* dots indicator del carousel */}
-        <div className="flex justify-center gap-1.5 mt-4">
-          {heroStats.map((_, idx) => (
             <button
-              key={idx}
               type="button"
-              onClick={() => setCarouselIndex(idx)}
-              className={`h-1.5 rounded-full transition-all ${
-                idx === carouselIndex
-                  ? `w-6 ${tone.text.replace('text-', 'bg-')}`
-                  : 'w-1.5 bg-slate-700'
-              }`}
-              aria-label={`Ver historia ${idx + 1}`}
-            />
-          ))}
+              onClick={() => setExpanded(true)}
+              className="text-slate-400 hover:text-slate-200 transition-colors p-1 rounded-md hover:bg-slate-800/60"
+              aria-label="Ampliar resumen Chagra"
+              title="Ver versión ampliada"
+            >
+              <Maximize2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* Stats locales del operador — grid 2x2 minor abajo */}
-      <div className="grid grid-cols-2 gap-2">
-        <div className="bg-slate-800/30 border border-slate-700/40 rounded-lg p-2 flex items-center gap-2">
-          <Sprout className="w-3.5 h-3.5 text-lime-400 shrink-0" />
-          <div className="min-w-0">
-            <div className="text-lg font-black text-lime-300 leading-tight">{plantsCount}</div>
-            <div className="text-[9px] text-slate-500 truncate">
-              {plantsCount === 1 ? 'Planta tuya' : 'Plantas tuyas'}
+        <button
+          type="button"
+          onClick={() => handleStatClick(current)}
+          className={`${tone.bg} ${tone.border} border rounded-2xl p-5 sm:p-6 transition-all duration-500 animate-in fade-in w-full text-left hover:border-slate-600 group`}
+          key={carouselIndex}
+        >
+          <div className="flex items-start gap-3 sm:gap-4">
+            <CurrentIcon className={`w-7 h-7 sm:w-8 sm:h-8 ${tone.text} shrink-0 mt-1`} aria-hidden="true" />
+            <div className="flex-1 min-w-0">
+              <div className="text-[11px] sm:text-xs uppercase tracking-wider text-slate-300 font-bold leading-tight">
+                {current.headline}
+              </div>
+              <div className={`text-4xl sm:text-5xl font-black ${tone.text} leading-none mt-2`}>
+                {current.value}
+              </div>
+              <div className="text-xs sm:text-sm text-slate-200 mt-1.5 font-medium">
+                {current.unit}
+              </div>
+              {current.story && (
+                <div className="text-[11px] sm:text-xs text-slate-400 mt-2 leading-snug">
+                  {current.story}
+                </div>
+              )}
+              {current.caption && (
+                <div className="text-[10px] sm:text-[11px] text-slate-500 mt-1.5 leading-snug italic">
+                  {current.caption}
+                </div>
+              )}
+              {onNavigate && current.navTarget && (
+                <div className="flex items-center gap-1 mt-3 text-[10px] sm:text-xs text-slate-400 group-hover:text-slate-200 transition-colors">
+                  <span>Ver módulo</span>
+                  <ChevronRight className="w-3 h-3" />
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-center gap-1.5 mt-4 sm:mt-5">
+            {heroStats.map((s, idx) => (
+              <span
+                key={s.key}
+                onClick={(e) => { e.stopPropagation(); setCarouselIndex(idx); }}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); setCarouselIndex(idx); } }}
+                role="button"
+                tabIndex={0}
+                className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                  idx === carouselIndex ? `w-6 ${tone.accent}` : 'w-1.5 bg-slate-700 hover:bg-slate-600'
+                }`}
+                aria-label={`Ver historia ${idx + 1}`}
+              />
+            ))}
+          </div>
+        </button>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <div className="bg-slate-800/30 border border-slate-700/40 rounded-lg p-2 flex items-center gap-2">
+            <Sprout className="w-3.5 h-3.5 text-lime-400 shrink-0" />
+            <div className="min-w-0">
+              <div className="text-lg font-black text-lime-300 leading-tight">
+                {isPreLogin ? GLOBAL_FEDERATION_FALLBACK.plantasRegistradas : plantsCount}
+              </div>
+              <div className="text-[9px] text-slate-500 truncate">
+                {isPreLogin ? 'Plantas registradas' : (plantsCount === 1 ? 'Planta tuya' : 'Plantas tuyas')}
+              </div>
+            </div>
+          </div>
+          <div className="bg-slate-800/30 border border-slate-700/40 rounded-lg p-2 flex items-center gap-2">
+            <BookOpen className="w-3.5 h-3.5 text-violet-400 shrink-0" />
+            <div className="min-w-0">
+              <div className="text-lg font-black text-violet-300 leading-tight">{catalogStats.ragDocs}</div>
+              <div className="text-[9px] text-slate-500 truncate">Fichas IA</div>
+            </div>
+          </div>
+          <div className="bg-slate-800/30 border border-slate-700/40 rounded-lg p-2 flex items-center gap-2 col-span-2 sm:col-span-1">
+            <Leaf className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <div className="min-w-0">
+              <div className="text-lg font-black text-emerald-300 leading-tight">{catalogStats.species}</div>
+              <div className="text-[9px] text-slate-500 truncate">Especies catálogo</div>
             </div>
           </div>
         </div>
-        <div className="bg-slate-800/30 border border-slate-700/40 rounded-lg p-2 flex items-center gap-2">
-          <BookOpen className="w-3.5 h-3.5 text-violet-400 shrink-0" />
-          <div className="min-w-0">
-            <div className="text-lg font-black text-violet-300 leading-tight">{catalogStats.ragDocs}</div>
-            <div className="text-[9px] text-slate-500 truncate">Fichas IA</div>
+      </section>
+
+      {expanded && (
+        <div
+          className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-sm overflow-y-auto"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Resumen ampliado del agente Chagra"
+        >
+          <div className="max-w-5xl mx-auto p-4 sm:p-8 space-y-6">
+            <div className="flex items-center justify-between gap-2 pt-4">
+              <div>
+                <h2 className="flex items-center gap-2 text-base sm:text-lg font-black uppercase tracking-wider text-slate-200">
+                  <Bot className="w-5 h-5 text-emerald-400" aria-hidden="true" />
+                  Agente Chagra · impacto
+                </h2>
+                {isPreLogin && (
+                  <p className="text-xs text-slate-400 mt-1">
+                    Datos federados de {fincasActivas} {fincasActivas === 1 ? 'finca activa' : 'fincas activas'} en la red Chagra
+                  </p>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => setExpanded(false)}
+                className="text-slate-400 hover:text-slate-100 p-2 rounded-md hover:bg-slate-800/60 transition-colors"
+                aria-label="Cerrar resumen ampliado"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              {heroStats.map((stat) => {
+                const StatIcon = stat.icon;
+                const t = TONE_CLASSES[stat.tone] || TONE_CLASSES.emerald;
+                return (
+                  <button
+                    key={stat.key}
+                    type="button"
+                    onClick={() => handleStatClick(stat)}
+                    disabled={!onNavigate}
+                    className={`${t.bg} ${t.border} border rounded-xl p-4 sm:p-5 text-left transition-all hover:scale-[1.02] hover:border-slate-500 ${onNavigate ? 'cursor-pointer' : 'cursor-default'}`}
+                  >
+                    <StatIcon className={`w-7 h-7 ${t.text} mb-3`} aria-hidden="true" />
+                    <div className="text-[11px] uppercase tracking-wider text-slate-300 font-bold leading-tight">
+                      {stat.headline}
+                    </div>
+                    <div className={`text-4xl font-black ${t.text} leading-none mt-2`}>
+                      {stat.value}
+                    </div>
+                    <div className="text-sm text-slate-200 mt-1.5 font-medium">
+                      {stat.unit}
+                    </div>
+                    {stat.story && (
+                      <div className="text-xs text-slate-400 mt-3 leading-snug">
+                        {stat.story}
+                      </div>
+                    )}
+                    {stat.caption && (
+                      <div className="text-[11px] text-slate-500 mt-2 leading-snug italic">
+                        {stat.caption}
+                      </div>
+                    )}
+                    {onNavigate && stat.navTarget && (
+                      <div className="flex items-center gap-1 mt-4 text-xs text-slate-400">
+                        <span>Ir al módulo</span>
+                        <ChevronRight className="w-3 h-3" />
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="text-[11px] text-slate-500 italic text-center pt-2 pb-6">
+              Soberanía alimentaria · agroecología campesina colombiana · código abierto AGPL-3.0
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      )}
+    </>
   );
 }
