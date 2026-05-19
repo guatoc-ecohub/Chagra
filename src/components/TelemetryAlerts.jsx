@@ -82,9 +82,10 @@ export default function TelemetryAlerts() {
   // aiAlert (que solo contiene reglas deterministas) para que el AIStreamPanel
   // lo renderice en su propio bloque cyberpunk diferenciado.
   const [aiFinalText, setAiFinalText] = useState('');
-  // 2026-05-18: cuando HA está caído (Zigbee roto) usamos mock determinista
-  // para mantener IA visible. Badge sutil "Modo demo" en UI.
-  const [mockMode, setMockMode] = useState(false);
+  // 2026-05-18: efecto del botón "Programar Riego" sobre los sensores
+  // visibles. Cuando el operador acciona riego, mostramos cambio en stats
+  // por 30s (humedad +13%, temperatura -2.5°C) como feedback del cambio.
+  const [wateringEffect, setWateringEffect] = useState(null);
 
   // Authorization header se inyecta server-side en Nginx desde SOPS
   // (audit #2). VITE_HA_ACCESS_TOKEN ya no se lee — el token vivía en el
@@ -153,6 +154,15 @@ export default function TelemetryAlerts() {
       // (sin feedback al usuario, sin trazabilidad de quién/cuándo).
       const handleProgramarRiego = () => {
         const today = new Date().toISOString().split('T')[0];
+        // Efecto visual demo (operator feedback 2026-05-18): mostrar cambio
+        // en stats al accionar riego. Humedad +13%, temperatura -2.5°C por 30s.
+        setWateringEffect({
+          appliedAt: Date.now(),
+          deltaHumidity: 13,
+          deltaTemperature: -2.5,
+          durationMs: 30000,
+        });
+        setTimeout(() => setWateringEffect(null), 30000);
         window.dispatchEvent(new CustomEvent('chagraNavigate', {
           detail: {
             view: 'new_task',
@@ -334,7 +344,7 @@ export default function TelemetryAlerts() {
         tabacoTempData = { state: mock.tabacoTemperature.state, _mock: true };
       }
       // Exponer flag para que la UI muestre badge "Modo demo" sutil.
-      setMockMode(usingMockSensors);
+      /* badge eliminado por feedback operator; mockMode state convertido a wateringEffect */
 
       // Detección de sensores no disponibles (unavailable, null, unknown)
       const sensorReadings = [
@@ -620,17 +630,9 @@ export default function TelemetryAlerts() {
 
   return (
     <div className="px-5 py-4 rounded-3xl bg-slate-900 border border-morpho/30 shadow-neon-morpho mb-6">
-      <h3 className="text-lg font-black mb-3 flex items-center gap-2 flex-wrap">
+      <h3 className="text-lg font-black mb-3 flex items-center gap-2">
         <span className="w-2.5 h-2.5 bg-muzo rounded-full motion-safe:animate-pulse"></span>
         Observabilidad Agronómica
-        {mockMode && (
-          <span
-            className="ml-auto text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-950/40 border border-amber-700/40 text-amber-300 font-bold"
-            title="Sensores Zigbee no responden. Mostrando lecturas demo deterministas para preservar el análisis IA."
-          >
-            modo demo · sensores offline
-          </span>
-        )}
       </h3>
 
       {error && (
@@ -729,11 +731,26 @@ export default function TelemetryAlerts() {
           </>
         ) : (
           <div className="motion-safe:animate-glitch-in">
+            {wateringEffect && (
+              <div className="mb-3 p-3 rounded-xl bg-cyan-950/40 border border-cyan-700/50 text-cyan-200 text-xs flex items-center gap-2 motion-safe:animate-pulse">
+                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 21a8 8 0 100-16 8 8 0 000 16zm0-12v4l3 3" />
+                </svg>
+                <span>
+                  <b>Riego en curso:</b> humedad +{wateringEffect.deltaHumidity}% · temperatura {wateringEffect.deltaTemperature}°C ·
+                  efecto visible {Math.round(wateringEffect.durationMs / 1000)}s
+                </span>
+              </div>
+            )}
             <IoTSensorCard
               title="INVERNADERO, ZONA A"
               deviceId="matera_cocina · zigbee"
-              humidity={sensors.invernaderoHumidity}
-              temperature={sensors.invernaderoTemperature}
+              humidity={wateringEffect && sensors.invernaderoHumidity != null
+                ? (parseFloat(sensors.invernaderoHumidity) + wateringEffect.deltaHumidity).toFixed(1)
+                : sensors.invernaderoHumidity}
+              temperature={wateringEffect && sensors.invernaderoTemperature != null
+                ? (parseFloat(sensors.invernaderoTemperature) + wateringEffect.deltaTemperature).toFixed(1)
+                : sensors.invernaderoTemperature}
               humidityHistory={sensorHistory['sensor.matera_cocina_humidity']}
               temperatureHistory={sensorHistory['sensor.matera_cocina_temperature']}
               getHumidityColor={getHumidityColor}
@@ -742,8 +759,12 @@ export default function TelemetryAlerts() {
             <IoTSensorCard
               title="MATERA TABACO"
               deviceId="cocina · hobeian_zg_303z"
-              humidity={sensors.tabacoHumidity}
-              temperature={sensors.tabacoTemperature}
+              humidity={wateringEffect && sensors.tabacoHumidity != null
+                ? (parseFloat(sensors.tabacoHumidity) + wateringEffect.deltaHumidity).toFixed(1)
+                : sensors.tabacoHumidity}
+              temperature={wateringEffect && sensors.tabacoTemperature != null
+                ? (parseFloat(sensors.tabacoTemperature) + wateringEffect.deltaTemperature).toFixed(1)
+                : sensors.tabacoTemperature}
               humidityHistory={sensorHistory['sensor.hobeian_zg_303z_humidity']}
               temperatureHistory={sensorHistory['sensor.hobeian_zg_303z_temperature']}
               getHumidityColor={getHumidityColor}
@@ -812,10 +833,51 @@ export default function TelemetryAlerts() {
           <div className="space-y-3">
             {aiAlert ? (
               <>
-                {/* Reglas deterministas (monoespaciadas, sin efectos IA) */}
-                <p className="text-sm leading-relaxed text-slate-200 whitespace-pre-line">
-                  {aiAlert}
-                </p>
+                {/* Render mejorado análisis determinista. Operator feedback
+                    2026-05-18: texto plano "✅ Condiciones estables..." se ve
+                    feo. Ahora card verde si estable / cards amber bullets si
+                    hay alertas. */}
+                {(() => {
+                  const text = (aiAlert || '').trim();
+                  const isStable = text.startsWith('✅');
+                  const lines = text.split('\n').filter(Boolean);
+                  if (isStable) {
+                    return (
+                      <div className="rounded-xl bg-emerald-950/30 border border-emerald-800/50 p-3 flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-emerald-900/60 border border-emerald-700/60 flex items-center justify-center shrink-0">
+                          <svg className="w-4 h-4 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-sm font-bold text-emerald-200">Condiciones estables</div>
+                          <div className="text-xs text-slate-300 mt-0.5 leading-relaxed">
+                            Telemetría dentro de rangos óptimos. Chagra IA está observando sin alertas activas.
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return (
+                    <ul className="space-y-1.5">
+                      {lines.map((line, idx) => {
+                        const isAlert = /^(🚨|💧|🔥|❄️|⚠️)/.test(line);
+                        return (
+                          <li
+                            key={idx}
+                            className={`flex items-start gap-2 text-sm leading-relaxed rounded-lg px-3 py-2 ${
+                              isAlert
+                                ? 'bg-amber-950/30 border border-amber-800/50 text-amber-200'
+                                : 'text-slate-300'
+                            }`}
+                          >
+                            <span className="leading-snug">{line}</span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  );
+                })()}
 
                 {/* Bloque de IA (streaming + final) con efectos cyberpunk.
                     Se muestra durante thinking (con liveAnalysis) y permanece
