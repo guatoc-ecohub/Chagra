@@ -29,10 +29,16 @@
  *                           metadata — modelo, latencia, tokens, processor
  *                           gpu/cpu — NUNCA prompt ni respuesta. keyPath: id;
  *                           indexes: model, flujo, created_at, status, synced)
+ *   - rag_telemetry        (v14 2026-05-19 L1.10: telemetría RAG-by-surface.
+ *                           Captura por evento de retrieve: surface (pantalla),
+ *                           query (hash truncado por privacidad), topScore,
+ *                           latencyMs, resultCount, error. Sampleable vía
+ *                           VITE_RAG_TELEMETRY_RATE. keyPath: id; indexes:
+ *                           surface, created_at, has_results, error_kind)
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 13;
+export const DB_VERSION = 14;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -49,6 +55,7 @@ export const STORES = {
   VOICE_TELEMETRY: 'voice_telemetry',
   CONVERSATION_MEMORY: 'conversation_memory',
   LLM_TELEMETRY: 'llm_telemetry',
+  RAG_TELEMETRY: 'rag_telemetry',
 };
 
 let dbInstance = null;
@@ -198,6 +205,23 @@ export const openDB = async () => {
           store.createIndex('created_at', 'created_at', { unique: false });
           store.createIndex('status', 'status', { unique: false });
           store.createIndex('synced', 'synced', { unique: false });
+        }
+      }
+
+      // v14: rag_telemetry — telemetría RAG-by-surface (L1.10).
+      // Captura por cada llamada a `ragRetriever.retrieve`: superficie de
+      // origen (agente, foliage, voice, species…), latencia, topScore,
+      // resultCount y error_kind. Privacy: el `query` se persiste truncado
+      // (primeros 60 chars) — no se hace hash porque el corpus es público y
+      // las queries del usuario no contienen PII relevante a este contexto.
+      // Aún así, evita persistir queries largas para no acumular texto libre.
+      if (event.oldVersion < 14) {
+        if (!db.objectStoreNames.contains(STORES.RAG_TELEMETRY)) {
+          const store = db.createObjectStore(STORES.RAG_TELEMETRY, { keyPath: 'id' });
+          store.createIndex('surface', 'surface', { unique: false });
+          store.createIndex('created_at', 'created_at', { unique: false });
+          store.createIndex('has_results', 'has_results', { unique: false });
+          store.createIndex('error_kind', 'error_kind', { unique: false });
         }
       }
     };

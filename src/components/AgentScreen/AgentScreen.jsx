@@ -355,7 +355,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       await addTurn(operatorId, { role: 'user', content: text.trim() });
 
       const contextMemory = await getContextString(operatorId, 10);
-      const contextCorpus = await retrieve(text, 3);
+      const contextCorpus = await retrieve(text, 3, 'agente');
 
       const response = await callLLM(text, contextMemory, contextCorpus);
       agentSounds.chime();

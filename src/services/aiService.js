@@ -152,7 +152,7 @@ const blobToBase64 = (blob) =>
 export const __retrieveRagContextForFoliage = async (speciesSlug) => {
   try {
     const query = buildRagQuery(speciesSlug);
-    const passages = await retrieve(query, 3);
+    const passages = await retrieve(query, 3, 'foliage');
     return Array.isArray(passages) ? passages : [];
   } catch (err) {
     console.warn('[aiService] RAG retrieve failed, falling back to base prompt:', err?.message);
