@@ -9,6 +9,11 @@ import { streamOllama } from '../services/ollamaStream';
 import ExternalAiButton from './common/ExternalAiButton';
 import { buildDiagnosticExternalPrompt } from '../services/externalAiPromptBuilder';
 import { detectAndTruncateRepetition } from '../utils/repetitionGuard';
+import {
+  generateMockSensorReadings,
+  generateMockHistory,
+  isSensorUnavailable,
+} from '../services/iotMockService';
 
 /**
  * TelemetryAlerts, análisis agronómico de telemetría IoT con asistencia LLM.
@@ -77,6 +82,9 @@ export default function TelemetryAlerts() {
   // aiAlert (que solo contiene reglas deterministas) para que el AIStreamPanel
   // lo renderice en su propio bloque cyberpunk diferenciado.
   const [aiFinalText, setAiFinalText] = useState('');
+  // 2026-05-18: cuando HA está caído (Zigbee roto) usamos mock determinista
+  // para mantener IA visible. Badge sutil "Modo demo" en UI.
+  const [mockMode, setMockMode] = useState(false);
 
   // Authorization header se inyecta server-side en Nginx desde SOPS
   // (audit #2). VITE_HA_ACCESS_TOKEN ya no se lee — el token vivía en el
@@ -275,28 +283,58 @@ export default function TelemetryAlerts() {
     try {
       // 1. Ingesta de Datos Domóticos (Home Assistant) - IDs Zigbee físicos.
       // Authorization se inyecta server-side via Nginx (audit #2 leak fix).
+      //
+      // Bug 2026-05-18: USB Zigbee físico roto → HA devuelve 'unavailable' o
+      // el fetch falla con 5xx. Antes esto generaba early return y NUNCA se
+      // disparaba AIStreamPanel → operador no veía la inferencia IA en home.
+      // Fallback: cuando HA está caído o sensores en unavailable, usar mock
+      // determinista de iotMockService para mantener flujo IA visible
+      // (especialmente para demo Diana 2026-05-19).
       const haOpts = { method: 'GET', headers: { 'Content-Type': 'application/json' }, signal: parentSignal };
-      const [invernaderoHum, invernaderoTemp, tabacoHum, tabacoTemp] = await Promise.all([
-        fetch(`${HA_URL}/states/sensor.matera_cocina_humidity`, haOpts),
-        fetch(`${HA_URL}/states/sensor.matera_cocina_temperature`, haOpts),
-        fetch(`${HA_URL}/states/sensor.hobeian_zg_303z_humidity`, haOpts),
-        fetch(`${HA_URL}/states/sensor.hobeian_zg_303z_temperature`, haOpts)
-      ]);
+      let invernaderoHumData;
+      let invernaderoTempData;
+      let tabacoHumData;
+      let tabacoTempData;
+      let usingMockSensors = false;
 
-      if (!invernaderoHum.ok || !invernaderoTemp.ok || !tabacoHum.ok || !tabacoTemp.ok) {
-        const failedSensor = !invernaderoHum.ok ? 'Invernadero Zona A Humedad' :
-          !invernaderoTemp.ok ? 'Invernadero Zona A Temperatura' :
-            !tabacoHum.ok ? 'Matera Tabaco Humedad' :
-              'Matera Tabaco Temperatura';
-        throw new Error(`Fallo al conectar con sensor: ${failedSensor}. Verifique Home Assistant.`);
+      try {
+        const [invernaderoHum, invernaderoTemp, tabacoHum, tabacoTemp] = await Promise.all([
+          fetch(`${HA_URL}/states/sensor.matera_cocina_humidity`, haOpts),
+          fetch(`${HA_URL}/states/sensor.matera_cocina_temperature`, haOpts),
+          fetch(`${HA_URL}/states/sensor.hobeian_zg_303z_humidity`, haOpts),
+          fetch(`${HA_URL}/states/sensor.hobeian_zg_303z_temperature`, haOpts)
+        ]);
+
+        if (!invernaderoHum.ok || !invernaderoTemp.ok || !tabacoHum.ok || !tabacoTemp.ok) {
+          throw new Error('Fetch HA falló (status no OK), fallback a mock.');
+        }
+
+        [invernaderoHumData, invernaderoTempData, tabacoHumData, tabacoTempData] = await Promise.all([
+          invernaderoHum.json(),
+          invernaderoTemp.json(),
+          tabacoHum.json(),
+          tabacoTemp.json()
+        ]);
+
+        const haReadings = [invernaderoHumData, invernaderoTempData, tabacoHumData, tabacoTempData];
+        const allUnavailable = haReadings.every(isSensorUnavailable);
+        if (allUnavailable) {
+          throw new Error('Todos los sensores HA en unavailable, fallback a mock.');
+        }
+      } catch (haErr) {
+        usingMockSensors = true;
+        logTelemetryEvent('telemetry:ha_offline_mock_fallback', {
+          message: 'HA inaccesible o sensores unavailable, usando mock realistas',
+          reason: haErr.message,
+        }, 'warn');
+        const mock = generateMockSensorReadings();
+        invernaderoHumData = { state: mock.invernaderoHumidity.state, _mock: true };
+        invernaderoTempData = { state: mock.invernaderoTemperature.state, _mock: true };
+        tabacoHumData = { state: mock.tabacoHumidity.state, _mock: true };
+        tabacoTempData = { state: mock.tabacoTemperature.state, _mock: true };
       }
-
-      const [invernaderoHumData, invernaderoTempData, tabacoHumData, tabacoTempData] = await Promise.all([
-        invernaderoHum.json(),
-        invernaderoTemp.json(),
-        tabacoHum.json(),
-        tabacoTemp.json()
-      ]);
+      // Exponer flag para que la UI muestre badge "Modo demo" sutil.
+      setMockMode(usingMockSensors);
 
       // Detección de sensores no disponibles (unavailable, null, unknown)
       const sensorReadings = [
@@ -374,9 +412,10 @@ export default function TelemetryAlerts() {
           tabacoTemperature: tabacoTempData.state !== 'unavailable' ? tabacoTempData.state : null,
         });
 
-        // Si TODOS los sensores están caídos, sí hacemos early return, no hay
-        // datos agronómicos que analizar.
-        if (unavailableSensors.length === sensorReadings.length) {
+        // Si TODOS los sensores están caídos Y NO estamos en mock mode, sí
+        // hacemos early return. En mock mode los valores ya son válidos →
+        // continuamos al análisis + IA.
+        if (unavailableSensors.length === sensorReadings.length && !usingMockSensors) {
           setAiAlert(offlineNotice);
           setLoading(false);
           return;
@@ -398,21 +437,28 @@ export default function TelemetryAlerts() {
         'sensor.hobeian_zg_303z_humidity',
         'sensor.hobeian_zg_303z_temperature'
       ];
-      try {
-        const histResp = await fetch(
-          `${HA_URL}/history/period/${historyStart}?filter_entity_id=${entityIds.join(',')}&minimal_response&no_attributes`,
-          { headers: { 'Content-Type': 'application/json' }, signal: parentSignal }
-        );
-        if (histResp.ok) {
-          const histData = await histResp.json();
-          const histMap = {};
-          for (const series of histData) {
-            if (series.length > 0) histMap[series[0].entity_id] = series;
+      if (usingMockSensors) {
+        // En mock mode usamos histórico determinista para sparklines
+        setSensorHistory(generateMockHistory());
+      } else {
+        try {
+          const histResp = await fetch(
+            `${HA_URL}/history/period/${historyStart}?filter_entity_id=${entityIds.join(',')}&minimal_response&no_attributes`,
+            { headers: { 'Content-Type': 'application/json' }, signal: parentSignal }
+          );
+          if (histResp.ok) {
+            const histData = await histResp.json();
+            const histMap = {};
+            for (const series of histData) {
+              if (series.length > 0) histMap[series[0].entity_id] = series;
+            }
+            setSensorHistory(histMap);
           }
-          setSensorHistory(histMap);
+        } catch (histErr) {
+          console.warn('[Telemetry] Histórico 24h no disponible:', histErr.message);
+          // Fallback al mock para mantener sparklines visibles en demo
+          setSensorHistory(generateMockHistory());
         }
-      } catch (histErr) {
-        console.warn('[Telemetry] Histórico 24h no disponible:', histErr.message);
       }
 
       // 2. Análisis determinista por reglas (siempre se ejecuta)
@@ -574,9 +620,17 @@ export default function TelemetryAlerts() {
 
   return (
     <div className="px-5 py-4 rounded-3xl bg-slate-900 border border-morpho/30 shadow-neon-morpho mb-6">
-      <h3 className="text-lg font-black mb-3 flex items-center gap-2">
+      <h3 className="text-lg font-black mb-3 flex items-center gap-2 flex-wrap">
         <span className="w-2.5 h-2.5 bg-muzo rounded-full motion-safe:animate-pulse"></span>
         Observabilidad Agronómica
+        {mockMode && (
+          <span
+            className="ml-auto text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-950/40 border border-amber-700/40 text-amber-300 font-bold"
+            title="Sensores Zigbee no responden. Mostrando lecturas demo deterministas para preservar el análisis IA."
+          >
+            modo demo · sensores offline
+          </span>
+        )}
       </h3>
 
       {error && (
