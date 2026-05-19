@@ -1,6 +1,6 @@
 import { sendToFarmOS } from './apiService';
 import { syncManager } from './syncManager';
-import { generatePlanForPlant } from './planGeneratorService';
+import { tryGeneratePlanFromSeeding } from './planGeneratorService';
 
 /** @typedef {import('../types').ChagraAsset} ChagraAsset */
 /** @typedef {import('../types').ChagraLog} ChagraLog */
@@ -147,10 +147,14 @@ export const savePayload = async (type, payload) => {
           detail.plantId = candidate.assetId;
 
           if (candidate.assetId && candidate.speciesSlug) {
-            generatePlanForPlant({
+            // Delegado al helper compartido (planGeneratorService) para que
+            // path online y path offline-then-sync queden alineados. El
+            // helper es idempotente (skip si ya hay plan) y nunca throws.
+            tryGeneratePlanFromSeeding({
               assetId: candidate.assetId,
               speciesSlug: candidate.speciesSlug,
               plantingDate: candidate.plantingDate,
+              plantName: candidate.plantName,
             }).then((plan) => {
               if (plan?.steps?.length > 0) {
                 window.dispatchEvent(new CustomEvent('syncCompleted', {
@@ -166,9 +170,6 @@ export const savePayload = async (type, payload) => {
               } else {
                 window.dispatchEvent(new CustomEvent('syncCompleted', { detail }));
               }
-            }).catch((err) => {
-              console.warn('[payloadService] No se pudo generar plan post-seeding:', err);
-              window.dispatchEvent(new CustomEvent('syncCompleted', { detail }));
             });
             return { success: true, message: 'Guardado y sincronizado con servidor', data: result };
           }
