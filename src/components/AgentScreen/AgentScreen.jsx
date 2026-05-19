@@ -85,6 +85,19 @@ export default function AgentScreen({ onBack }) {
   const loadHistory = useCallback(async () => {
     try {
       const history = await getFullHistory(operatorId, 50);
+      // 2026-05-19: detectar pregunta huérfana — si el último turn es del
+      // usuario sin respuesta del agente, agregar mensaje informativo para
+      // que el operator entienda que la respuesta anterior se perdió
+      // (timeout, unmount accidental, etc.) y pueda re-preguntar.
+      const lastTurn = history[history.length - 1];
+      if (lastTurn && lastTurn.role === 'user') {
+        history.push({
+          role: 'assistant',
+          content: 'Tu pregunta anterior no recibió respuesta (timeout o sesión interrumpida). Vuelve a preguntarla si quieres seguir.',
+          timestamp: Date.now(),
+          _orphan_recovery: true,
+        });
+      }
       setMessages(history);
     } catch (e) {
       console.warn('[Agent] Failed to load history:', e);
@@ -204,6 +217,8 @@ REGLA DE FORMATO: cuando hables de las plantas del usuario, agrupá por especie 
 
 REGLA CRÍTICA ANTI-ALUCINACIÓN: si un término te suena raro, no es estándar agroecológico colombiano, o no estás 100% seguro de lo que significa, responde EXACTAMENTE: "No reconozco ese término. ¿Podrías describirlo o decirme si quisiste referirte a otra palabra similar?" NUNCA inventes definiciones. Es PREFERIBLE pedir aclaración que dar información incorrecta. Si sospechas typo, sugiere la palabra correcta como PREGUNTA, no afirmación.
 
+REGLA CRÍTICA ANTI-INVENCIÓN-DE-SÍNTOMAS: NUNCA describas síntomas, problemas, observaciones o estados de las plantas del usuario que NO haya escrito explícitamente en su mensaje actual. PROHIBIDO frases como "dice que las hojas se ponen amarillas y se enrollan" o "los tomates no se forman bien" si el usuario no lo dijo. Si el corpus de información agronómica menciona síntomas genéricos, NO los atribuyas al usuario. Para preguntar sobre síntomas, hazlo como pregunta abierta: "¿Ha notado cambios en las hojas?" NO como afirmación. La pregunta del usuario es exactamente lo que dice; no agregues contexto inventado.
+
 Responde en español colombiano (tú/usted, sin voseo argentino). Sé específico y útil cuando tengas certeza; humilde y preguntón cuando no.`;
   }, [plants, fincas, activeFincaSlug, indoorZone]);
 
@@ -242,16 +257,30 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
   // "thinking" indefinido si la red/proxy colgaba sin emitir tokens.
   // Solución v2 (2026-05-18): AbortController con timeout 30s + ref externo
   // para botón Cancelar + warning visible a los 20s ("Aún pensando…").
-  // Antes era 90s silent — UX inaceptable cuando bench muestra latencia
-  // típica de 5-15s (p95 22s). 30s captura el outlier raro sin congelar
-  // la UI tanto. Si el operador necesita seguir esperando, ve mensaje +
-  // botón Cancelar para reintentar.
-  const LLM_TIMEOUT_MS = 30000;
+  //
+  // 2026-05-19 ajuste timeout 30s→60s: operator perdió respuesta porque
+  // el agente tardaba >30s (cold-load qwen2.5vl/gemma3 + RAG context).
+  // Bench p95 22s, pero outliers post-cold-load 40s+. 60s cubre p99
+  // sin sacrificar UX (el warning a 20s ya le dice al operator que algo
+  // está lento). Pre-condicion: OLLAMA_KEEP_ALIVE=24h en alpha para que
+  // modelos no hagan cold-load entre conversaciones.
+  const LLM_TIMEOUT_MS = 60000;
 
   const callLLM = async (query, contextMemory, contextCorpus) => {
     const systemPrompt = getSystemPrompt();
+    // 2026-05-19: incidente alucinación tomate — gemma3:4b confundía el
+    // corpus RAG con lo que el usuario dijo (atribuía síntomas "hojas
+    // amarillas" del documento de referencia al operador). Fix: delimitar
+    // EXPLÍCITAMENTE el corpus + instrucción literal de no citarlo como
+    // si fuera del usuario.
     const corpusContext = contextCorpus.length > 0
-      ? `\n\nInformación del corpus:\n${contextCorpus.map((c) => c.text).join('\n\n')}`
+      ? `
+
+=== INFORMACIÓN DE REFERENCIA AGRONÓMICA (NO viene del usuario, NO citarla como si el usuario te lo hubiera contado) ===
+${contextCorpus.map((c) => c.text).join('\n\n---\n\n')}
+=== FIN REFERENCIA ===
+
+Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el usuario te preguntó. NO menciones síntomas ni observaciones que no estén explícitamente en el mensaje del usuario.`
       : '';
 
     const messages = [
