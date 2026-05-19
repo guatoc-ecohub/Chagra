@@ -12,6 +12,8 @@ import { executeAction, setActionGateCallback } from '../../services/actionExecu
 import ChatHistory from './ChatHistory';
 import SuggestedActions from './SuggestedActions';
 import ActionConfirmModal from '../ActionConfirmModal';
+import ChagraAgentAvatar from '../ChagraAgentAvatar';
+import { agentSounds } from '../../services/agentSoundService';
 import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
 import useFincaActiveStore from '../../services/fincaActiveStore';
@@ -62,9 +64,23 @@ export default function AgentScreen({ onBack }) {
   // edit puedan resolverlo cuando el operador interactúa.
   const actionGateResolverRef = useRef(null);
 
+  // Scroll fix 2026-05-18 operator feedback: 'scroll complicado a veces'.
+  // Auto-scroll al fondo cuando hay mensaje nuevo o stream en curso, pero
+  // SOLO si el usuario ya estaba cerca del bottom (no interrumpir lectura
+  // de mensajes antiguos). Threshold 120px del fondo. Behavior smooth.
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages.length, streamingContent]);
+    const el = chatEndRef.current;
+    if (!el) return;
+    const container = el.parentElement;
+    if (!container) {
+      el.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    const distFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+    if (distFromBottom < 120 || state === STATE_THINKING) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages.length, streamingContent, state]);
 
   const loadHistory = useCallback(async () => {
     try {
@@ -106,6 +122,7 @@ export default function AgentScreen({ onBack }) {
       console.warn('[Agent] User cancelled LLM inference manually');
       activeControllerRef.current.abort();
     }
+    agentSounds.cancel();
     setState(STATE_IDLE);
     setStreamingContent('');
     setError('Cancelado. Toca de nuevo si quieres reintentar.');
@@ -287,6 +304,7 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
     setStreamingContent('');
     setState(STATE_THINKING);
     setError('');
+    agentSounds.start();
 
     try {
       await addTurn(operatorId, { role: 'user', content: text.trim() });
@@ -295,6 +313,7 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
       const contextCorpus = await retrieve(text, 3);
 
       const response = await callLLM(text, contextMemory, contextCorpus);
+      agentSounds.chime();
 
       const { intent } = parseIntent(text);
 
@@ -396,6 +415,7 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
       startRecord();
       setState(STATE_RECORDING);
       setError('');
+      agentSounds.listen();
     }
   };
 
@@ -519,7 +539,7 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
         {state === STATE_THINKING && (
           <div className="flex flex-col items-center gap-2 mt-2">
             <p className={`text-center text-xs ${showSlowWarning ? 'text-amber-400' : 'text-violet-400'}`}>
-              {showSlowWarning ? 'Aún pensando — toca Cancelar si quieres reintentar' : 'Pensando...'}
+              {showSlowWarning ? 'Chagra IA sigue pensando — toca Cancelar si quieres reintentar' : 'Chagra IA está pensando…'}
             </p>
             <button
               type="button"
