@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, Trash2, RefreshCw, Building2, Leaf, Search, WifiOff, TreePine, Map as MapIcon, List } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, RefreshCw, Building2, Leaf, Search, WifiOff, TreePine, Map as MapIcon, List, Warehouse, Square } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import { Virtuoso } from 'react-virtuoso';
 import { fetchFromFarmOS } from '../services/apiService';
@@ -372,11 +372,34 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
   };
 
   const getAssetsForTab = () => {
-    let list = activeTab === 'plant' ? plants
-      : activeTab === 'land' ? lands
-        : activeTab === 'structure' ? structures
-          : activeTab === 'equipment' ? equipment
-            : materials;
+    let list;
+    if (activeTab === 'plant') {
+      list = plants;
+    } else if (activeTab === 'land') {
+      list = lands;
+    } else if (activeTab === 'structure') {
+      // Bug pre-demo Diana 2026-05-19: el operador percibe "Infraestructura"
+      // como un único concepto físico/espacial (lotes, túneles, invernaderos,
+      // bodegas). Reportó ver solo guatoc + "sin nombre" (lands) y no el
+      // "tunel de la producción" (structure) que SÍ aparecía en el dropdown
+      // de VoiceConfirmation (lands + structures combinados). Fix mínimo:
+      // unificar lands + structures en este tab, dedupe por id priorizando
+      // entradas con name no vacío. Los iconos por item se diferencian en
+      // el render del Virtuoso (Warehouse vs Square).
+      const byId = new Map();
+      const hasName = (a) => Boolean((a.attributes?.name || a.name || '').trim());
+      [...structures, ...lands].forEach((a) => {
+        const existing = byId.get(a.id);
+        if (!existing || (!hasName(existing) && hasName(a))) {
+          byId.set(a.id, a);
+        }
+      });
+      list = Array.from(byId.values());
+    } else if (activeTab === 'equipment') {
+      list = equipment;
+    } else {
+      list = materials;
+    }
 
     // Cementerio (queue/038 + spine educativo): si zona === '__cemetery__'
     // mostramos solo plants status='dead'. Modo dedicado para reflexionar
@@ -1387,11 +1410,22 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
               style={{ height: '100%', width: '100%' }}
               overscan={400}
               itemContent={(index, asset) => {
-                const name = asset.attributes?.name || asset.name || 'Sin nombre';
+                // Bug pre-demo Diana 2026-05-19: en tab 'structure' ahora
+                // conviven lands + structures. Diferenciamos icono y label
+                // fallback según el `type` del asset para que el operador
+                // pueda distinguir un terreno (land) de una construcción
+                // (structure) aun cuando ambos carecen de nombre.
+                const rawName = (asset.attributes?.name || asset.name || '').trim();
+                const isLand = asset.type === 'asset--land';
+                const isStructure = asset.type === 'asset--structure';
+                const typeLabel = isLand ? 'zona' : isStructure ? 'infraestructura' : '';
+                const name = rawName || (typeLabel ? `(sin nombre · ${typeLabel})` : '(sin nombre)');
                 const notes = asset.attributes?.notes;
                 const notesText = typeof notes === 'object' ? notes?.value : notes;
                 const isPending = asset._pending;
-                const TabIcon = tabConfig.icon;
+                const TabIcon = activeTab === 'structure'
+                  ? (isLand ? Square : Warehouse)
+                  : tabConfig.icon;
 
                 return (
                   <div className="pb-2 px-1">
