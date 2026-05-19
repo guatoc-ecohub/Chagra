@@ -305,6 +305,7 @@ export default function LLMTelemetryScreen({ onBack }) {
                       <th className="text-right px-3 py-2">Total</th>
                       <th className="text-right px-3 py-2">Tokens</th>
                       <th className="text-right px-3 py-2">t/s</th>
+                      <th className="text-center px-3 py-2" title="Passages RAG inyectados al prompt">RAG</th>
                       <th className="text-center px-3 py-2">GPU</th>
                       <th className="text-center px-3 py-2">Estado</th>
                     </tr>
@@ -321,6 +322,9 @@ export default function LLMTelemetryScreen({ onBack }) {
                           <td className="px-3 py-1.5 text-right text-slate-300">{formatMs(e.total_ms)}</td>
                           <td className="px-3 py-1.5 text-right text-slate-500">{e.eval_count ?? '-'}</td>
                           <td className="px-3 py-1.5 text-right text-amber-400">{formatRate(e.eval_rate)}</td>
+                          <td className="px-3 py-1.5 text-center text-emerald-400 font-mono">
+                            {typeof e.rag_passages_used === 'number' ? e.rag_passages_used : '—'}
+                          </td>
                           <td className="px-3 py-1.5 text-center">
                             <span className={`text-[9px] px-1.5 py-0.5 rounded-full border font-mono ${proc.color}`}>{proc.label}</span>
                           </td>

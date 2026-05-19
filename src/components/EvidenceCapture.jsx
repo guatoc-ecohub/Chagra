@@ -13,10 +13,16 @@ import { useGeolocation } from '../hooks/useGeolocation';
 /**
  * EvidenceCapture, Captura con diagnóstico IA y evolución histórica (Fase 20.2b).
  *
+ * Audit 2026-05-18 #4: cuando el caller conoce `speciesSlug`, lo propaga a
+ * `analyzeFoliage` para que el RAG inyecte passages específicos de esa
+ * especie al prompt vision (vs. diagnóstico genérico sin catálogo).
+ *
  * Props:
  *   - logId:          UUID del log
  *   - assetId:        UUID del activo relacionado (para historial)
  *   - assetGeometry:  WKT o GeoJSON de la ubicación del activo
+ *   - speciesSlug:    slug catálogo (ej. `fragaria_ananassa_monterrey`).
+ *                     Opcional — sin él, el RAG usa fallback genérico.
  *   - onCountChange:  callback(count)
  *   - onDiagnosis:    callback(diagnosis), para toast externo
  *   - disabled:       boolean
@@ -25,6 +31,7 @@ export const EvidenceCapture = ({
   logId,
   assetId = null,
   assetGeometry = null,
+  speciesSlug = null,
   onCountChange,
   onDiagnosis,
   disabled = false,
@@ -131,6 +138,8 @@ export const EvidenceCapture = ({
         try {
           const result = await analyzeFoliage(optimized, {
             onToken: (_chunk, full) => setLiveDiagnosis(full),
+            speciesSlug,
+            assetId,
           });
           if (result) {
             setDiagnosis(result);

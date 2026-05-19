@@ -91,11 +91,46 @@ function isEditableTask(entry) {
   return status === 'pending' || status === 'in_progress' || entry?._pending === true;
 }
 
+// Audit 2026-05-18 #4: extrae el asset_id (UUID asset--plant) de la entry
+// para luego derivar `speciesSlug` y enriquecer el RAG en `analyzeFoliage`.
+// Soporta los múltiples shapes que llegan a esta vista (payload pending,
+// log persistido, attributes JSON:API, etc).
+function getEntryAssetId(entry) {
+  if (!entry) return null;
+  const rels = entry.relationships
+    || entry.attributes?.relationships
+    || entry.payload?.data?.relationships;
+  const assetData = rels?.asset?.data;
+  if (Array.isArray(assetData) && assetData[0]?.id) return assetData[0].id;
+  if (assetData?.id) return assetData.id;
+  return entry.asset_id || entry.attributes?.asset_id || null;
+}
+
+// Patrón compartido con AssetDetailView/WorkerDashboard: slug-ify el name.
+function deriveSpeciesSlug(name) {
+  if (!name || typeof name !== 'string') return null;
+  return name.replace(/\s+#\d+$/, '').toLowerCase().replace(/\s+/g, '_').trim() || null;
+}
+
 export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
   const attachPhotoToLog = useAssetStore((s) => s.attachPhotoToLog);
+  const plants = useAssetStore((s) => s.plants);
   const [photoState, setPhotoState] = useState('idle'); // idle | uploading | success | error
   const [photoMsg, setPhotoMsg] = useState('');
   const fileInputRef = useRef(null);
+
+  // Audit 2026-05-18 #4: derivar speciesSlug del asset relacionado al log
+  // para que `analyzeFoliage` consulte RAG con contexto específico de la
+  // especie. Si la entry no tiene asset linkado (logs huérfanos) o el plant
+  // no está en store (eventual consistency), `analyzeFoliage` cae a fallback
+  // genérico — no rompe.
+  const entrySpeciesSlug = (() => {
+    const assetId = getEntryAssetId(entry);
+    if (!assetId) return null;
+    const plant = (plants || []).find((p) => p.id === assetId);
+    if (!plant) return null;
+    return plant.speciesSlug || deriveSpeciesSlug(plant.attributes?.name || plant.name);
+  })();
 
   // High-impact #3 (2026-05-03): analyzeFoliage post-attach experimental.
   // Mantenemos el blob en state tras attach exitoso para permitir analizar
@@ -174,6 +209,8 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
     try {
       const result = await analyzeFoliage(lastBlob, {
         onToken: (_chunk, fullText) => setAiStream(fullText),
+        speciesSlug: entrySpeciesSlug,
+        assetId: getEntryAssetId(entry),
       });
       if (result) {
         setAiResult(result);
