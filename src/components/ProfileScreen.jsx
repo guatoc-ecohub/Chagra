@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Palette, Briefcase, Save, Check, Mic, Eye, MapPin, Home, Cpu } from 'lucide-react';
+import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import ThemeSelector from './common/ThemeSelector';
 import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
@@ -33,7 +33,7 @@ const ROLES = [
   { id: 'otro', label: 'Otro' },
 ];
 
-export default function ProfileScreen({ onBack, onNavigate }) {
+export default function ProfileScreen({ onBack }) {
   const [name, setName] = useState(() =>
     typeof window !== 'undefined'
       ? localStorage.getItem('chagra:operator:name') || PRIMARY_WORKER_NAME
@@ -197,31 +197,10 @@ export default function ProfileScreen({ onBack, onNavigate }) {
             </select>
           </label>
 
-          <button
-            type="button"
-            onClick={() => onNavigate && onNavigate('voice_telemetry')}
-            className="w-full p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 font-bold text-sm text-slate-200 flex items-center justify-center gap-2 min-h-[48px] transition-colors"
-          >
-            <Eye size={16} /> Ver telemetría
-          </button>
-        </div>
-
-        {/* Oracle LLM/GPU Section (v13 2026-05-17 — ADR-023 Eco-Oracle) */}
-        <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
-          <div className="flex items-center gap-2 px-1">
-            <Cpu size={18} className="text-emerald-400" />
-            <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Oracle LLM / GPU</h3>
-          </div>
-          <p className="text-[11px] text-slate-500 px-1">
-            Estado del modelo de IA, uso de GPU/CPU, latencias y errores. Privacy-safe: NUNCA guarda prompt ni respuesta.
+          <p className="text-[10px] text-slate-500 px-1 leading-relaxed">
+            La telemetría sigue grabándose en el dispositivo (privacy-safe, NUNCA prompt ni respuesta).
+            El dashboard de visualización se migró al panel privado del operador (ADR-020 anti-leak / ADR-029 Capa C).
           </p>
-          <button
-            type="button"
-            onClick={() => onNavigate && onNavigate('llm_telemetry')}
-            className="w-full p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 font-bold text-sm text-slate-200 flex items-center justify-center gap-2 min-h-[48px] transition-colors"
-          >
-            <Cpu size={16} /> Abrir Oracle LLM/GPU
-          </button>
         </div>
 
         {/* Multifinca + GPS Section (062.7 indoor override + 062.8 privacy) */}

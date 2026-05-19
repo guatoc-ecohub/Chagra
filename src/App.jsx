@@ -405,7 +405,7 @@ export default function App() {
           </ScreenShell>
         );
       case 'perfil':
-        return <ProfileScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />;
+        return <ProfileScreen onBack={() => navigate('dashboard')} />;
       case 'casos':
         return (
           <CaseStudyScreen
