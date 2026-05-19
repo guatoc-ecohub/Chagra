@@ -93,6 +93,15 @@ const useAssetStore = create((set, get) => ({
         let hasMore = true;
         let totalFetched = 0;
         let estimatedTotal = null;
+        // 2026-05-19 — acumula TODOS los ids remotos del tipo a lo largo
+        // de las páginas. La purga de locales (GC) corre UNA vez al final
+        // del sync completo del tipo, no por página, para evitar borrar
+        // assets legítimos que aparecerán en páginas posteriores.
+        const allRemoteIdsForType = new Set();
+        // Si el sync se aborta o falla parcialmente, NO purgar: el universo
+        // remoto no es confiable. `syncCompletedForType` solo se vuelve true
+        // cuando todas las páginas se procesaron sin signal aborted.
+        let syncCompletedForType = false;
 
         while (hasMore && !signal?.aborted) {
           const offset = page * pageLimit;
@@ -101,7 +110,9 @@ const useAssetStore = create((set, get) => ({
           const res = await fetchFn(url, { signal });
           const list = res.data || [];
 
+          // bulkPut SIN allowInlineGC: solo upsert, sin purgar (data-loss fix).
           await assetCache.bulkPut(t, list);
+          for (const r of list) allRemoteIdsForType.add(r.id);
           totalFetched += list.length;
 
           estimatedTotal = res.meta?.count || estimatedTotal;
@@ -123,6 +134,16 @@ const useAssetStore = create((set, get) => ({
         if (signal?.aborted) {
           syncProgress.isCancelled = true;
           break;
+        }
+        // Universo completo del tipo recolectado → ahora sí, GC final.
+        syncCompletedForType = true;
+        if (syncCompletedForType) {
+          try {
+            await assetCache.purgeAbsent(t, allRemoteIdsForType);
+          } catch (purgeErr) {
+            // Si la purga falla, mejor preservar datos: log y continuar.
+            console.warn(`[Sync] purgeAbsent(${t}) falló — preservando local:`, purgeErr);
+          }
         }
       }
 

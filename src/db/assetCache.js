@@ -34,10 +34,24 @@ export const assetCache = {
    * Inserta múltiples activos preservando aquellos que tienen cambios locales pendientes.
    * Regla: si `local._pending === true`, la versión remota se ignora.
    * Los datos del servidor siempre nacen confirmados (`_pending: false`).
+   *
+   * 2026-05-19 — DATA LOSS FIX: el GC NO se ejecuta dentro de bulkPut por
+   * defecto. Antes purgaba assets locales que no estuvieran en `remoteAssets`,
+   * pero como el sync llama bulkPut **por página**, las plantas de páginas
+   * posteriores se borraban tras procesar la primera página → operator
+   * perdió plantas creadas hoy. El GC ahora vive en `purgeAbsent(...)` que
+   * `syncFromServer` invoca UNA vez al final con todos los ids remotos del
+   * tipo. Para no romper callers que dependían del comportamiento anterior,
+   * el flag `allowInlineGC: true` mantiene la semántica vieja.
+   *
    * @param {string} assetType - Tipo de activo (plant, equipment, etc.)
    * @param {Array} remoteAssets - Lista de activos provenientes del servidor
+   * @param {object} [opts]
+   * @param {boolean} [opts.allowInlineGC=false] - Si true, purga locales no
+   *   presentes en `remoteAssets`. ÚSALO solo cuando `remoteAssets` representa
+   *   el universo completo del tipo. NUNCA dentro de un loop paginado.
    */
-  async bulkPut(assetType, remoteAssets) {
+  async bulkPut(assetType, remoteAssets, { allowInlineGC = false } = {}) {
     const db = await openDB();
     const tx = db.transaction(STORES.ASSETS, 'readwrite');
     const store = tx.objectStore(STORES.ASSETS);
@@ -92,12 +106,18 @@ export const assetCache = {
       });
     }
 
-    // 3. Garbage Collection: purgar locales confirmados que el servidor ya no tiene
-    const remoteIds = new Set(remoteAssets.map((r) => r.id));
-    for (const local of localAssets) {
-      if (!remoteIds.has(local.id) && !local._pending) {
-        store.delete(local.id);
-        console.warn(`[Cache] Purgando activo eliminado en servidor: ${local.id}`);
+    // 3. Garbage Collection: solo cuando el caller garantiza que
+    // `remoteAssets` es el universo COMPLETO del tipo (no una página).
+    // Sin este guard, un sync paginado purgaba plantas legítimas que aún
+    // no habían aparecido en una página previa (data loss reportado
+    // 2026-05-19). Para sync paginado, ver `purgeAbsent(...)` al cierre.
+    if (allowInlineGC) {
+      const remoteIds = new Set(remoteAssets.map((r) => r.id));
+      for (const local of localAssets) {
+        if (!remoteIds.has(local.id) && !local._pending) {
+          store.delete(local.id);
+          console.warn(`[Cache] Purgando activo eliminado en servidor: ${local.id}`);
+        }
       }
     }
 
@@ -116,6 +136,47 @@ export const assetCache = {
           );
         }
         resolve();
+      };
+      tx.onabort = () => reject(tx.error);
+      tx.onerror = () => reject(tx.error);
+    });
+  },
+
+  /**
+   * Purga assets locales no-pending que NO están en el universo completo
+   * del servidor. Llamar UNA sola vez al final de un sync paginado, con
+   * el Set de TODOS los ids retornados sumando todas las páginas.
+   *
+   * @param {string} assetType
+   * @param {Set<string>} allRemoteIds - universo completo del sync
+   * @returns {Promise<number>} cantidad purgada
+   */
+  async purgeAbsent(assetType, allRemoteIds) {
+    if (!(allRemoteIds instanceof Set)) {
+      throw new Error('purgeAbsent: allRemoteIds debe ser un Set');
+    }
+    const db = await openDB();
+    const tx = db.transaction(STORES.ASSETS, 'readwrite');
+    const store = tx.objectStore(STORES.ASSETS);
+    const index = store.index('asset_type');
+    const localAssets = await new Promise((res, rej) => {
+      const req = index.getAll(IDBKeyRange.only(assetType));
+      req.onsuccess = () => res(req.result || []);
+      req.onerror = () => rej(req.error);
+    });
+    let purged = 0;
+    for (const local of localAssets) {
+      if (!allRemoteIds.has(local.id) && !local._pending) {
+        store.delete(local.id);
+        purged++;
+      }
+    }
+    return new Promise((resolve, reject) => {
+      tx.oncomplete = () => {
+        if (purged > 0) {
+          console.warn(`[Cache] purgeAbsent(${assetType}): ${purged} purgados (post-sync completo)`);
+        }
+        resolve(purged);
       };
       tx.onabort = () => reject(tx.error);
       tx.onerror = () => reject(tx.error);
