@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import ThemeSelector from './common/ThemeSelector';
+import BackupExportButton from './BackupExportButton';
 import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 import useFincaActiveStore from '../services/fincaActiveStore';
 
@@ -202,6 +203,12 @@ export default function ProfileScreen({ onBack }) {
             El dashboard de visualización se migró al panel privado del operador (ADR-020 anti-leak / ADR-029 Capa C).
           </p>
         </div>
+
+        {/* Copia de seguridad (2026-05-19): operador perdió plantas + 100
+            species + túnel por un "Clear cache" en Chrome Android. Botón
+            visible y prominente para que descargue snapshot JSON cuando
+            quiera. */}
+        <BackupExportButton />
 
         {/* Multifinca + GPS Section (062.7 indoor override + 062.8 privacy) */}
         <MultifincaGpsSection />

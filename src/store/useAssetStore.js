@@ -5,6 +5,7 @@ import { useLogStore } from './useLogStore';
 import { newId } from '../utils/id';
 import { savePayload, updatePayload } from '../services/payloadService';
 import { getAccessToken } from '../services/authService';
+import { markHadData } from '../services/emptyDbDetector';
 
 /** @typedef {import('../types').ChagraAsset} ChagraAsset */
 /** @typedef {import('../types').ChagraLog} ChagraLog */
@@ -52,6 +53,15 @@ const useAssetStore = create((set, get) => ({
       ]);
       const lastSync = await assetCache.getLastSync();
       set({ plants, structures, equipment, materials, lands, taxonomyTerms, lastSync });
+
+      // emptyDbDetector: si hidratamos con assets reales, dejamos huella en
+      // localStorage de "este dispositivo tuvo datos". Sirve para detectar
+      // luego un "Clear cache" de Chrome Android (que borra IDB pero no
+      // localStorage) y mostrar DataLossBanner.
+      const totalAssets = plants.length + structures.length + equipment.length + materials.length + lands.length;
+      if (totalAssets > 0) {
+        markHadData(totalAssets);
+      }
     } catch (err) {
       console.error('Error rehidratando asset store desde IndexedDB:', err);
     }
@@ -163,6 +173,19 @@ const useAssetStore = create((set, get) => ({
         isLoading: false,
         syncProgress: { ...syncProgress },
       });
+      // emptyDbDetector: tras sync exitoso, dejamos huella con el conteo
+      // total. Si después el operador hace "Clear cache" en Chrome Android
+      // (borra IDB pero no localStorage), DataLossBanner aparece.
+      const finalState = get();
+      const totalAfterSync =
+        finalState.plants.length +
+        finalState.structures.length +
+        finalState.equipment.length +
+        finalState.materials.length +
+        finalState.lands.length;
+      if (totalAfterSync > 0) {
+        markHadData(totalAfterSync);
+      }
       onProgress?.({ ...syncProgress, isComplete: true });
     } catch (err) {
       console.error('Error sincronizando activos:', err);
@@ -202,6 +225,9 @@ const useAssetStore = create((set, get) => ({
               : 'materials';
         return { [key]: [...state[key], asset] };
       });
+      // emptyDbDetector: huella para post-clear-cache detection.
+      const totalNow = get().plants.length + get().structures.length + get().equipment.length + get().materials.length + get().lands.length;
+      markHadData(totalNow);
       navigator.serviceWorker?.controller?.postMessage({ type: 'SYNC_REQUESTED' });
     } catch (error) {
       console.error('[Store] Fallo en addAsset atómico:', error);
