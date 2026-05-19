@@ -1,11 +1,12 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { X, Calendar, Tag, Activity, MapPin, AlertCircle, Images, Skull, Layers } from 'lucide-react';
+import { X, Calendar, Tag, Activity, MapPin, AlertCircle, Images, Skull, Layers, Sprout } from 'lucide-react';
 import { SplitFlow } from './SplitFlow';
 import PlantCemeteryModal from './PlantCemeteryModal';
 import useAssetStore from '../store/useAssetStore';
 import AssetTimeline from './AssetTimeline';
 import { InputLogForm } from './InputLogForm';
 import MapPicker from './MapPicker';
+import PlanEditor from './PlanEditor';
 import { useAssetPerformance } from '../hooks/useAssetPerformance';
 import { MATERIAL_CATEGORIES } from '../config/materials';
 import { FARM_CONFIG } from '../config/defaults';
@@ -15,6 +16,7 @@ import { ExternalAiButton } from './common/ExternalAiButton';
 import { buildOpenExternalPrompt } from '../services/externalAiPromptBuilder';
 import { listUserPhotosBySpecies, captureAndCompress, savePhoto } from '../services/photoService';
 import { ETAPA_FENOLOGICA_LABELS } from '../utils/plantMeta';
+import { getAllSpecies } from '../db/catalogDB';
 
 // Derive speciesSlug from asset name.
 function deriveSpeciesSlug(name) {
@@ -171,6 +173,125 @@ const PlantMetaPanel = ({ asset }) => {
   );
 };
 
+// Audit finding 070.7 (2026-05-18): PlanEditor wrapper. Verifica si la
+// species de la planta tiene `feeding_plan_template` en el catálogo:
+//   - Si sí → monta PlanEditor (que se auto-fetchea de IDB store `plans`).
+//   - Si no → muestra placeholder "Sin plan disponible" con botón mock
+//     "Solicitar al equipo Chagra agregar plan" (sin envío real, queda
+//     como hook UX para una futura iteración de feedback al catálogo).
+// Resolución de speciesSlug:
+//   1. asset.attributes._speciesSlug explícito (camino VoiceCapture / seeding).
+//   2. asset.attributes._chagra_plant_meta.species_slug si existe.
+//   3. deriveSpeciesSlug(name) como fallback.
+// plantingDate viene de attributes._chagra_plant_meta.fecha_germinacion (post
+// PR #918) o Date.now() si la planta aún no tiene metadata sembrada.
+const resolveSpeciesSlug = (asset) => {
+  if (!asset) return null;
+  const explicit = asset.attributes?._speciesSlug || asset._speciesSlug;
+  if (explicit && typeof explicit === 'string') return explicit;
+  const metaSlug = asset.attributes?._chagra_plant_meta?.species_slug;
+  if (metaSlug && typeof metaSlug === 'string') return metaSlug;
+  const name = asset.attributes?.name || asset.name || '';
+  return deriveSpeciesSlug(name);
+};
+
+const resolvePlantingDate = (asset) => {
+  const fecha = asset?.attributes?._chagra_plant_meta?.fecha_germinacion;
+  if (fecha) {
+    const t = new Date(fecha).getTime();
+    if (Number.isFinite(t)) return t;
+  }
+  return Date.now();
+};
+
+const PlanSection = ({ asset }) => {
+  const speciesSlug = useMemo(() => resolveSpeciesSlug(asset), [asset]);
+  const plantingDate = useMemo(() => resolvePlantingDate(asset), [asset]);
+  // status: 'idle' (sin slug, nada que buscar), 'loading', 'present', 'absent', 'error'.
+  // Inicialización lazy (function form) garantiza que React no llame al
+  // initializer en re-renders y respeta la regla react-hooks/set-state-in-effect.
+  const [status, setStatus] = useState(() => (speciesSlug ? 'loading' : 'idle'));
+
+  useEffect(() => {
+    if (!speciesSlug) return undefined;
+    let cancelled = false;
+    getAllSpecies()
+      .then((list) => {
+        if (cancelled) return;
+        const match = (list || []).find(
+          (s) => s?.id === speciesSlug || s?.slug === speciesSlug,
+        );
+        const tpl = match?.feeding_plan_template;
+        const present = !!(tpl && tpl.primary_steps && tpl.primary_steps.length > 0);
+        setStatus(present ? 'present' : 'absent');
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.warn('[PlanSection] getAllSpecies falló:', err);
+        setStatus('error');
+      });
+    return () => { cancelled = true; };
+  }, [speciesSlug]);
+
+  if (!speciesSlug) {
+    return (
+      <section data-testid="plan-section-no-slug" className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50">
+        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+          <Sprout size={12} /> Plan de alimentación
+        </h3>
+        <p className="text-sm text-slate-400">
+          Sin especie reconocida; no es posible asociar un plan.
+        </p>
+      </section>
+    );
+  }
+
+  if (status === 'loading') {
+    return (
+      <section data-testid="plan-section-loading" className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50">
+        <p className="text-sm text-slate-400 italic">Buscando plan en el catálogo…</p>
+      </section>
+    );
+  }
+
+  if (status !== 'present') {
+    return (
+      <section data-testid="plan-section-empty" className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50 space-y-3">
+        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+          <Sprout size={12} /> Plan de alimentación
+        </h3>
+        <p className="text-sm text-slate-300">
+          {status === 'error'
+            ? 'No se pudo consultar el catálogo de planes. Inténtalo de nuevo más tarde.'
+            : 'Sin plan disponible para esta especie.'}
+        </p>
+        <button
+          type="button"
+          onClick={() => window.alert(
+            'Tu solicitud quedó anotada localmente. El equipo Chagra revisará agregar un plan para esta especie.',
+          )}
+          className="w-full px-3 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold"
+        >
+          Solicitar al equipo Chagra agregar plan
+        </button>
+      </section>
+    );
+  }
+
+  return (
+    <section data-testid="plan-section-editor" className="space-y-2">
+      <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1 flex items-center gap-1">
+        <Sprout size={12} /> Plan de alimentación
+      </h3>
+      <PlanEditor
+        assetId={asset.id}
+        speciesSlug={speciesSlug}
+        plantingDate={plantingDate}
+      />
+    </section>
+  );
+};
+
 // Bio-efficiency metrics panel.
 const PerformancePanel = ({ assetId }) => {
   const { globalRatio, byCategory, totalHarvestWeight, totalInputWeight, hasData } = useAssetPerformance(assetId);
@@ -305,6 +426,8 @@ export const AssetDetailView = () => {
                 <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 px-1">Acciones de Campo</h3>
                 <InputLogForm assetId={asset.id} onComplete={() => { }} />
               </section>
+
+              <PlanSection asset={asset} />
 
               <section className="pt-2">
                 <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Historial de la planta</h3>
