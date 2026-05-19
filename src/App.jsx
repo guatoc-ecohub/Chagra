@@ -20,6 +20,7 @@ import ChagraGrowLoader from './components/ChagraGrowLoader';
 import IosInstallBanner from './components/IosInstallBanner';
 import UpdateAvailableBanner from './components/UpdateAvailableBanner';
 import GpsFincaBanner from './components/GpsFincaBanner';
+import DataLossBanner from './components/DataLossBanner';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Lazy-loaded route components
@@ -439,6 +440,13 @@ export default function App() {
       <IosInstallBanner />
       <UpdateAvailableBanner />
       <GpsFincaBanner />
+      {/* Detector de vaciado IDB (post clear-cache).
+          2026-05-19: el operador perdió plantas con foto + 100 species por
+          un "Clear cache" en Chrome Android. El banner se muestra solo si
+          detectamos huella `chagra:had-data-once` en localStorage + IDB
+          vacío. NO se muestra en loading/login para no asustar antes de
+          que la app pueda confirmar estado. */}
+      {currentView !== 'loading' && currentView !== 'login' && <DataLossBanner />}
       <Suspense fallback={<LoadingFallback />}>
         {renderView()}
       </Suspense>
