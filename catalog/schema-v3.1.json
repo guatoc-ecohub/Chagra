@@ -710,6 +710,62 @@
             null
           ],
           "description": "ADR-030: individual (perennes/árboles trackeados uno por uno) | aggregate (hortalizas cultivo masivo) | null (invasoras / no aplica)"
+        },
+        "feeding_plan_template": {
+          "type": "object",
+          "description": "Plantilla consumida por src/services/planGeneratorService.js → generatePlanForPlant() para emitir steps reales con scheduled_date = plantingDate + offset_days * 86400000. offset_days se modula por climateZone (frio/paramo ×1.2, calido ×0.8) y lunarPhase (creciente/llena +1d). action queda en step.action_type; biofertilizer_slug se cruza contra inventory_stock_snapshot y marca stock_unavailable cuando aplica. Resuelve audit 2026-05-18: sin template el agente queda mudo.",
+          "required": [
+            "source",
+            "primary_steps"
+          ],
+          "properties": {
+            "source": {
+              "type": "string",
+              "description": "Citación legible humana (no ref a sources[].id estructural). Las refs estructurales viven en species.source_ids."
+            },
+            "primary_steps": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "offset_days",
+                  "action"
+                ],
+                "properties": {
+                  "offset_days": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Días desde plantación (0 = día de siembra)."
+                  },
+                  "action": {
+                    "type": "string",
+                    "description": "Acción accionable corta — termina como step.action_type en el plan generado."
+                  },
+                  "biofertilizer_slug": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]+$",
+                    "description": "Ref opcional a biopreparados[].id. Si presente, planGenerator consulta stock y marca stock_unavailable."
+                  },
+                  "dose_ml": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Dosis en ml. Mutuamente exclusivo con dose_g (usar el aplicable según tipo de biopreparado)."
+                  },
+                  "dose_g": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Dosis en gramos. Para biopreparados sólidos (bocashi, compost, ceniza, roca fosfórica)."
+                  },
+                  "notes": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
         }
       },
       "allOf": [

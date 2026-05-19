@@ -253,6 +253,51 @@
         "ica-resolucion-3168-2015"
       ],
       "valor_pedagogico": "La cebolla cabezona (Allium cepa L.) se cultiva en diversos departamentos de Colombia, incluyendo Cundinamarca, Boyacá, Nariño y Antioquia, entre 0 y 3500 msnm, con óptimo entre 1500 y 2800 msnm en zonas térmicas frías y templadas. Su manejo agronómico incluye propagación por semilla o bulbitos (cebollín de siembra) para acelerar el ciclo, con un ciclo vegetativo de 90-120 días, asociaciones beneficiosas con zanahoria y lechuga que mejoran la salud del huerto, y requiere manejo de plagas como trips, minadores de hojas y áfidos mediante monitoreo frecuente y biopreparados andinos. En el contexto campesino andino, esta hortaliza ha sido tradicionalmente utilizada en guisos, sopros y ensaladas como ingrediente esencial, preservando sabores prehispánicos en las cocinas rurales. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Allium cepa L.",
+      "feeding_plan_template": {
+        "source": "ICA Guía fertilizantes (2019) + Restrepo (1996). Cebolla cabezona clima frío altiplano cundiboyacense, ciclo 5-6 meses.",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Incorporar bocashi + ceniza al surco",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 100,
+            "notes": "Surco preparado 0-15 cm. Complementar con 50 g/m² de ceniza_madera para aporte K y prevención de mildiú."
+          },
+          {
+            "offset_days": 20,
+            "action": "Foliar con biol fase macollamiento",
+            "biofertilizer_slug": "biol",
+            "dose_ml": 100,
+            "notes": "Dilución 1:10. Estimula desarrollo foliar antes de inicio de bulbificación."
+          },
+          {
+            "offset_days": 45,
+            "action": "Foliar con purín de ortiga preventivo",
+            "biofertilizer_slug": "purin_ortiga",
+            "dose_ml": 100,
+            "notes": "Dilución 1:10. Repelente preventivo de trips (Thrips tabaci) — vector de virus IYSV en cebolla."
+          },
+          {
+            "offset_days": 75,
+            "action": "Drench con humus líquido inicio bulbificación",
+            "biofertilizer_slug": "humus_liquido",
+            "dose_ml": 150,
+            "notes": "Dilución 1:7. Aporte de aminoácidos para llenado de bulbo."
+          },
+          {
+            "offset_days": 105,
+            "action": "Foliar con caldo bordelés preventivo",
+            "biofertilizer_slug": "caldo_bordeles",
+            "dose_ml": 100,
+            "notes": "Concentración 0.5%. Preventivo Peronospora destructor (mildiú velloso) en época lluviosa."
+          },
+          {
+            "offset_days": 135,
+            "action": "Suspender riego para curado de bulbo",
+            "notes": "Reducir riego 70% en últimas 3 semanas antes de cosecha. Curado in situ mejora conservación post-cosecha."
+          }
+        ]
+      },
       "tracking_mode": "aggregate"
     },
     {
@@ -344,6 +389,51 @@
         "ica-resolucion-3168-2015"
       ],
       "valor_pedagogico": "El ajo (Allium sativum L.) se cultiva en diversos departamentos de Colombia incluyendo Cundinamarca, Boyacá, Nariño y Antioquia entre 0 y 3400 msnm en zonas térmicas frías y templadas. Su manejo agronómico incluye propagación por clavos bulbillos (dientes) sembrados con el ápice hacia arriba, ciclo vegetativo de 90-120 días, asociaciones beneficiosas con zanahoria, lechuga y fresas que repelen plagas como áfidos y ácaros, y requiere monitoreo de plagas como el nemátodo del tallo y enfermedades como la pudrición blanca. En el contexto cultural muisca y andino, este bulbo ha sido tradicionalmente utilizado tanto en preparaciones culinarias como en remedios medicinales por sus propiedades antibacterianas y antifúngicas, formando parte esencial de la dieta y la medicina tradicional andina. Según fuentes taxonómicas verificadas de GBIF Backbone Taxonomy, Plants of the World Online (POWO), AGROSAVIA Sol Andina y la ICA Resolución 3168/2015, su nombre científico válido es Allium sativum L.",
+      "feeding_plan_template": {
+        "source": "Pinheiro-Machado (2017) Biofertilizantes + Restrepo (2007) Biopreparados. Ajo clima frío altiplano, ciclo 6-7 meses.",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Aplicar bocashi + ceniza al surco",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 150,
+            "notes": "Surco 0-15 cm. Sembrar dientes con punta hacia arriba. Ajo requiere suelo bien drenado y rico en MO."
+          },
+          {
+            "offset_days": 25,
+            "action": "Foliar con biol fase de brotación",
+            "biofertilizer_slug": "biol",
+            "dose_ml": 100,
+            "notes": "Dilución 1:10. Estimula desarrollo foliar inicial post-emergencia."
+          },
+          {
+            "offset_days": 60,
+            "action": "Drench con humus líquido",
+            "biofertilizer_slug": "humus_liquido",
+            "dose_ml": 200,
+            "notes": "Dilución 1:5. Aporte de aminoácidos antes de inicio de bulbificación."
+          },
+          {
+            "offset_days": 100,
+            "action": "Foliar con supermagro inicio bulbificación",
+            "biofertilizer_slug": "supermagro",
+            "dose_ml": 50,
+            "notes": "Dilución 1:20. Corrección micronutrientes — S y Zn críticos para llenado de bulbo."
+          },
+          {
+            "offset_days": 130,
+            "action": "Foliar con caldo bordelés preventivo",
+            "biofertilizer_slug": "caldo_bordeles",
+            "dose_ml": 80,
+            "notes": "Concentración 0.5%. Preventivo roya (Puccinia allii) en épocas húmedas."
+          },
+          {
+            "offset_days": 165,
+            "action": "Suspender riego para maduración",
+            "notes": "Reducir riego 70% últimas 3 semanas. Tumbado de follaje = señal de cosecha próxima (180-210 días)."
+          }
+        ]
+      },
       "antagonists": [
         "vicia_sativa"
       ],
@@ -1376,6 +1466,60 @@
         "notas": "Requiere germinador en arena y posterior embolsado."
       },
       "valor_pedagogico": "El café arábica (Coffea arabica L.) es el cultivo agroindustrial emblemático de Colombia y la principal fuente de ingresos de la economía campesina cafetera, con cerca de 850.000 hectáreas distribuidas en Caldas, Quindío, Risaralda, Antioquia, Tolima, Huila, Cundinamarca y Santander entre 1.200 y 2.000 msnm en zona térmica templada. Las variedades Caturra, Castillo y Cenicafé 1 son las más adoptadas en Colombia por su resistencia a roya (Hemileia vastatrix) y broca (Hypothenemus hampei) según Cenicafé. Requiere sombra parcial 35-50%, suelos francos con pH 5.0-5.5, y precipitación 1.800-2.800 mm anuales. Sistemas agroecológicos asocian café con plátano (Musa spp.), guandul (Cajanus cajan) y nogal cafetero (Cordia alliodora) para sombra estratificada. Fuentes Tier A: Cenicafé Manual del Cafetero 2013, AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone.",
+      "feeding_plan_template": {
+        "source": "Cenicafé — Manual del Cafetero Colombiano (2013) + Cenicafé — Trichoderma spp. en manejo integrado (2010). Programa nutricional café tradicional Caturra/Castillo zona cafetera.",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Aplicar bocashi al hoyo de siembra",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 500,
+            "notes": "Hoyo 40x40x40 cm. Cenicafé recomienda fertilización inicial al establecimiento. Mezclar con suelo del hoyo."
+          },
+          {
+            "offset_days": 30,
+            "action": "Inocular Trichoderma harzianum al sustrato",
+            "biofertilizer_slug": "trichoderma_harzianum_suelo",
+            "dose_g": 20,
+            "notes": "Preventivo contra Fusarium oxysporum f.sp. coffeae (llaga macana) y Rhizoctonia. Cenicafé 2010."
+          },
+          {
+            "offset_days": 90,
+            "action": "Drench con biol fase vegetativa",
+            "biofertilizer_slug": "biol",
+            "dose_ml": 1000,
+            "notes": "Dilución 1:5, 1 L por planta al pie. Refuerzo N orgánico fase de crecimiento foliar activo."
+          },
+          {
+            "offset_days": 180,
+            "action": "Foliar con caldo bordelés preventivo",
+            "biofertilizer_slug": "caldo_bordeles",
+            "dose_ml": 100,
+            "notes": "Concentración 1%. Preventivo roya (Hemileia vastatrix) en época de lluvias antes de iniciar floración."
+          },
+          {
+            "offset_days": 365,
+            "action": "Refuerzo anual con bocashi en banda",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 1500,
+            "notes": "Año 1 establecimiento completo. Aplicar en corona radicular antes de inicio de lluvias."
+          },
+          {
+            "offset_days": 540,
+            "action": "Foliar con supermagro pre-floración",
+            "biofertilizer_slug": "supermagro",
+            "dose_ml": 80,
+            "notes": "Dilución 1:12. Corrige B y Zn críticos para cuajado de chereza. Aplicar 30 días antes de floración esperada."
+          },
+          {
+            "offset_days": 720,
+            "action": "Aplicar Bacillus subtilis foliar en cosecha",
+            "biofertilizer_slug": "bacillus_subtilis_foliar",
+            "dose_ml": 25,
+            "notes": "Año 2 primera cosecha. Control biológico de Cercospora coffeicola y Mycena citricolor (gotera)."
+          }
+        ]
+      },
       "plagas_criticas": [
         "Hypothenemus hampei (broca)",
         "Hemileia vastatrix (roya)",
@@ -1896,6 +2040,60 @@
         "agrosavia-manual-biopreparados-2015"
       ],
       "valor_pedagogico": "La fresa Monterrey (Fragaria × ananassa Duchesne ex Rozier cv. Monterrey) es una rosácea perenne híbrida productiva (day-neutral) muy adoptada en cultivos comerciales colombianos por su precocidad, fruto grande y firme, y producción extendida primavera-otoño. Se cultiva en Cundinamarca (Sabana Bogotá, Sopó, Choachí, Sibaté), Boyacá (Sotaquirá, Toca), Nariño y Antioquia entre 1.800 y 2.800 msnm en zona térmica fría. Ciclo a primera cosecha 60-90 días desde trasplante, productividad sostenida 8-12 meses con manejo adecuado. Rendimientos 25-45 t/ha en sistema agroecológico mulching. Manejo: cama elevada con MO abundante, mulch plástico o paja, fertilización con biol foliar y bocashi al fondo, control de Botrytis cinerea con caldo bordelés + bacillus_subtilis, manejo de ácaros con caldo sulfocálcico. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
+      "feeding_plan_template": {
+        "source": "Agrosavia — Manual de biopreparados (2015) + ICA Guía de fertilización (2019). Ciclo fresa Monterrey clima frío altiplano cundiboyacense.",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Aplicar bocashi al hoyo de trasplante",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 200,
+            "notes": "Incorporar 200 g/planta en hoyo + mezclar con suelo nativo. Establece microbiota inicial."
+          },
+          {
+            "offset_days": 15,
+            "action": "Drench con humus líquido al pie",
+            "biofertilizer_slug": "humus_liquido",
+            "dose_ml": 250,
+            "notes": "Dilución 1:5. Mitiga estrés post-trasplante y enraizamiento activo."
+          },
+          {
+            "offset_days": 30,
+            "action": "Aplicar Trichoderma harzianum al sustrato",
+            "biofertilizer_slug": "trichoderma_harzianum_suelo",
+            "dose_g": 10,
+            "notes": "Preventivo contra Phytophthora cactorum y Verticillium en raíces — patógenos crónicos en fresa altiplano."
+          },
+          {
+            "offset_days": 45,
+            "action": "Foliar con biol pre-floración",
+            "biofertilizer_slug": "biol",
+            "dose_ml": 150,
+            "notes": "Dilución 1:7. Estimula formación de yemas florales antes de inicio reproductivo."
+          },
+          {
+            "offset_days": 60,
+            "action": "Foliar con supermagro inicio fructificación",
+            "biofertilizer_slug": "supermagro",
+            "dose_ml": 50,
+            "notes": "Dilución 1:20. Corrige micronutrientes (Cu, Zn, B) críticos para cuajado de frutos."
+          },
+          {
+            "offset_days": 90,
+            "action": "Aplicar lixiviado de frutas durante cosecha",
+            "biofertilizer_slug": "lixiviado_frutas",
+            "dose_ml": 50,
+            "notes": "Dilución 1:20 foliar. Mantiene producción durante cosecha sostenida 2-4 meses."
+          },
+          {
+            "offset_days": 120,
+            "action": "Refuerzo con bocashi en banda",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 100,
+            "notes": "Banda lateral 10 cm de la planta. Cultivo en plena producción."
+          }
+        ]
+      },
       "estrato": "rastrero",
       "tracking_mode": "individual"
     },
@@ -2314,6 +2512,46 @@
         "powo-kew"
       ],
       "valor_pedagogico": "La lechuga crespa verde (Lactuca sativa L. var. crispa, cultivares Vera, Verónica, Salinas) es una hortaliza de hoja anual ampliamente cultivada en Colombia, principalmente en el cinturón hortícola de la Sabana de Bogotá (Mosquera, Madrid, Funza, Tenjo, Cota), Boyacá altiplano y Nariño entre 2.000 y 2.900 msnm en zona térmica fría. Ciclo corto 50-70 días desde trasplante, rendimientos 18-25 t/ha cabezas. Crece bien en suelos francos con materia orgánica abundante (>4%), pH 6.0-7.0, riego constante. Sensible a heladas; aprecia días frescos (10-22°C). Manejo agroecológico: rotación con leguminosas (frijol, haba), siembra densa para sombreo entre filas, biopreparados como biol foliar y compost al fondo, control de áfidos (Myzus persicae) con purín de ortiga + lavanderas. Fuentes Tier A: AGROSAVIA Sol Andina, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
+      "feeding_plan_template": {
+        "source": "Restrepo (1996) ABC agricultura orgánica + Agrosavia Manual biopreparados (2015). Ciclo lechuga 60-75 días huerto casero clima frío/templado.",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Incorporar bocashi al sustrato pre-siembra",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 150,
+            "notes": "1-2 kg/m² al voleo incorporado 0-15 cm. Cama de siembra establecida 7 días antes del trasplante."
+          },
+          {
+            "offset_days": 7,
+            "action": "Drench con humus líquido post-trasplante",
+            "biofertilizer_slug": "humus_liquido",
+            "dose_ml": 100,
+            "notes": "Dilución 1:10. Reduce shock de trasplante y acelera prendimiento."
+          },
+          {
+            "offset_days": 20,
+            "action": "Foliar con biol fase de roseta",
+            "biofertilizer_slug": "biol",
+            "dose_ml": 100,
+            "notes": "Dilución 1:10. Estimula formación de hojas en plena fase vegetativa."
+          },
+          {
+            "offset_days": 35,
+            "action": "Foliar con purín de ortiga pre-acogollado",
+            "biofertilizer_slug": "purin_ortiga",
+            "dose_ml": 100,
+            "notes": "Dilución 1:10. Repelente preventivo de pulgón (Myzus persicae) + aporte N foliar."
+          },
+          {
+            "offset_days": 50,
+            "action": "Aplicar Bacillus subtilis foliar",
+            "biofertilizer_slug": "bacillus_subtilis_foliar",
+            "dose_ml": 3,
+            "notes": "Preventivo Sclerotinia y Botrytis cerca de cosecha. Suspender riego foliar 3 días antes."
+          }
+        ]
+      },
       "tracking_mode": "aggregate"
     },
     {
@@ -2933,15 +3171,58 @@
       ],
       "valor_pedagogico": "La gulupa (Passiflora edulis f. edulis) se cultiva en Colombia principalmente en los departamentos de Cundinamarca, Boyacá y Antioquia entre 1600 y 2600 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con uso de micorrizas en el trasplante, ciclo productivo de 12-18 meses, associations beneficiosas con cultivos de sombra como plátano y requerimiento de control de plagas como áfidos, trips y enfermedades foliares mediante monitoreo integrado. En el contexto andino campesino, se valora por su sabor aromático y se consume tradicionalmente en jugos y postres, contribuyendo a la diversificación de ingresos familiares en zonas de mediana altitud. Según fuentes técnicas validadas por AGROSAVIA y taxónomicamente confirmada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Passiflora edulis f. edulis Sims.",
       "feeding_plan_template": {
-        "source": "Agrosavia - Manual de Gulupa",
+        "source": "Agrosavia — Manual de Gulupa (preserva citación original) + Agrosavia Manual frutales tropicales. Gulupa clima frío-templado 1800-2200 msnm.",
         "primary_steps": [
-          "offset_days: 0"
-        ],
-        "action": "compost",
-        "biofertilizer_slug": "humus-lombriz",
-        "dose_ml": 500,
-        "notes": "Establecimiento",
-        "- offset_days": 30
+          {
+            "offset_days": 0,
+            "action": "Aplicar bocashi al hoyo de siembra",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 500,
+            "notes": "Hoyo 40x40x40 cm. Mezclar con suelo nativo. Gulupa requiere tutorado en espaldera desde el establecimiento."
+          },
+          {
+            "offset_days": 30,
+            "action": "Inocular Trichoderma harzianum",
+            "biofertilizer_slug": "trichoderma_harzianum_suelo",
+            "dose_g": 20,
+            "notes": "Preventivo Fusarium oxysporum f.sp. passiflorae (marchitez vascular) — principal enfermedad de la pasifloráceas."
+          },
+          {
+            "offset_days": 60,
+            "action": "Drench con humus líquido fase vegetativa",
+            "biofertilizer_slug": "humus_liquido",
+            "dose_ml": 500,
+            "notes": "Dilución 1:4. Crecimiento foliar activo de bejucos. Aporte de aminoácidos."
+          },
+          {
+            "offset_days": 120,
+            "action": "Foliar con biol pre-floración",
+            "biofertilizer_slug": "biol",
+            "dose_ml": 200,
+            "notes": "Dilución 1:5. Promueve formación de yemas florales y polinización efectiva."
+          },
+          {
+            "offset_days": 180,
+            "action": "Foliar con caldo bordelés preventivo",
+            "biofertilizer_slug": "caldo_bordeles",
+            "dose_ml": 100,
+            "notes": "Concentración 1%. Preventivo antracnosis (Colletotrichum gloeosporioides) y roña (Cladosporium herbarum) en frutos."
+          },
+          {
+            "offset_days": 240,
+            "action": "Drench con lixiviado de frutas durante cuajado",
+            "biofertilizer_slug": "lixiviado_frutas",
+            "dose_ml": 200,
+            "notes": "Dilución 1:10. Llenado y maduración de frutos. Cosecha esperada 270-300 días post-siembra."
+          },
+          {
+            "offset_days": 300,
+            "action": "Foliar con supermagro durante cosecha",
+            "biofertilizer_slug": "supermagro",
+            "dose_ml": 80,
+            "notes": "Dilución 1:12. Cosecha sostenida — mantiene calidad de frutos en producción continua."
+          }
+        ]
       },
       "estrato": "alto",
       "companions": [
@@ -4495,6 +4776,60 @@
         "notas": "Crecimiento determinado; cosecha concentrada en un periodo corto."
       },
       "valor_pedagogico": "El tomate San Marzano (Solanum lycopersicum 'San Marzano') se cultiva en Colombia principalmente en los departamentos de Cundinamarca, Boyacá y Antioquia, entre 1500 y 2400 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con crecimiento determinado y cosecha concentrada en períodos de 5 meses, asociándose beneficiosamente con perejil, citronela, melisa, ortuga y lechuga para reducir presión de plagas como trips y helicoverpa, mientras requiere monitoreo de antagonistas como hinojo y papas andinas. En el contexto campesino andino, esta variedad ha sido adoptada por su alto contenido de sólidos solubles que lo hacen ideal para procesamiento artesanal de salsas y conservas, preservando técnicas de postcosecha transmitidas oralmente en comunidades de la Sabana de Bogotá. Según la taxonomía verificable de GBIF Backbone Taxonomy y Plants of the World Online (POWO), respaldada por el ICA Resolución 3168/2015 y el manual AGROSAVIA Sol Andina, su nombre científico válido es Solanum lycopersicum 'San Marzano'.",
+      "feeding_plan_template": {
+        "source": "Restrepo-Rivera (2005) Agroecología + Agrosavia Manual biopreparados (2015). Tomate San Marzano clima templado bajo invernadero o campo abierto sin heladas.",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Aplicar bocashi + Trichoderma al hoyo",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 300,
+            "notes": "Hoyo 30x30 cm. Mezclar 10 g de Trichoderma harzianum al sustrato como preventivo Fusarium."
+          },
+          {
+            "offset_days": 15,
+            "action": "Drench con humus líquido al pie",
+            "biofertilizer_slug": "humus_liquido",
+            "dose_ml": 250,
+            "notes": "Dilución 1:5. Fase vegetativa activa post-trasplante."
+          },
+          {
+            "offset_days": 30,
+            "action": "Foliar con biol pre-floración",
+            "biofertilizer_slug": "biol",
+            "dose_ml": 150,
+            "notes": "Dilución 1:7. Promueve formación de racimos florales en tomate indeterminado."
+          },
+          {
+            "offset_days": 45,
+            "action": "Foliar con supermagro inicio cuajado",
+            "biofertilizer_slug": "supermagro",
+            "dose_ml": 60,
+            "notes": "Dilución 1:15. Aporte de Ca + B preventivo de pudrición apical (blossom end rot)."
+          },
+          {
+            "offset_days": 60,
+            "action": "Aplicar caldo bordelés preventivo",
+            "biofertilizer_slug": "caldo_bordeles",
+            "dose_ml": 100,
+            "notes": "Concentración 1%. Preventivo tizón tardío (Phytophthora infestans) en época húmeda. Suspender en floración plena."
+          },
+          {
+            "offset_days": 75,
+            "action": "Drench con lixiviado de frutas",
+            "biofertilizer_slug": "lixiviado_frutas",
+            "dose_ml": 100,
+            "notes": "Dilución 1:10. Refuerzo K + P durante llenado de frutos."
+          },
+          {
+            "offset_days": 90,
+            "action": "Foliar con Bacillus subtilis cerca de cosecha",
+            "biofertilizer_slug": "bacillus_subtilis_foliar",
+            "dose_ml": 5,
+            "notes": "Preventivo Botrytis en racimos maduros. Tolera aplicación hasta 1 día antes de cosecha."
+          }
+        ]
+      },
       "plagas_criticas": [
         "Trps",
         "Heliothis"
@@ -6430,6 +6765,53 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "La espina que protege: la mora silvestre ensena que las defensas naturales de las plantas tienen un proposito. Su cultivo en espaldera muestra como la agricultura domestica sin eliminar la esencia silvestre.",
+      "feeding_plan_template": {
+        "source": "Agrosavia Tibaitatá — fichas frutales andinos + Pinheiro-Machado (2017) Biofertilizantes. Manejo mora castilla clima frío 1800-2600 msnm.",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Aplicar bocashi + roca fosfórica al hoyo",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 400,
+            "notes": "Hoyo 40x40 cm. Mora requiere P alto al establecimiento — combinar con roca_fosforica si suelo deficiente."
+          },
+          {
+            "offset_days": 30,
+            "action": "Foliar con biol fase de brotación",
+            "biofertilizer_slug": "biol",
+            "dose_ml": 150,
+            "notes": "Dilución 1:7. Estimula brotación lateral de cañas productivas."
+          },
+          {
+            "offset_days": 60,
+            "action": "Drench con humus líquido al pie",
+            "biofertilizer_slug": "humus_liquido",
+            "dose_ml": 300,
+            "notes": "Dilución 1:4. Aporta micro flora y aminoácidos antes de cuajado."
+          },
+          {
+            "offset_days": 90,
+            "action": "Foliar con caldo bordelés preventivo",
+            "biofertilizer_slug": "caldo_bordeles",
+            "dose_ml": 100,
+            "notes": "Concentración 1%. Preventivo Botrytis cinerea y Peronospora — críticos en mora altiplano lluvioso."
+          },
+          {
+            "offset_days": 120,
+            "action": "Aplicar lixiviado de frutas en fructificación",
+            "biofertilizer_slug": "lixiviado_frutas",
+            "dose_ml": 100,
+            "notes": "Dilución 1:10 drench. Mora produce cosecha sostenida — refuerza llenado de fruto."
+          },
+          {
+            "offset_days": 180,
+            "action": "Refuerzo con bocashi post-poda",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 200,
+            "notes": "Después de poda sanitaria. Renueva tejido productivo para próximo flush."
+          }
+        ]
+      },
       "validation_level": "claude_draft",
       "companions": [
         "urtica_dioica"
@@ -11558,6 +11940,58 @@
         "powo-kew"
       ],
       "valor_pedagogico": "La papa Pastusa Suprema (Solanum tuberosum L. subsp. tuberosum cv. 'Pastusa Suprema') es la variedad comercial dominante en Colombia desde su liberación oficial por ICA-CORPOICA en 1996, surgida de un cruzamiento dirigido para combinar la calidad culinaria de la pastusa tradicional con mayor rendimiento agronómico. Se cultiva intensivamente en Nariño (Túquerres, Pupiales, Guachucal, Ipiales), Cundinamarca (Subachoque, Zipaquirá, Carmen de Carupa, Une), Boyacá (Ventaquemada, Toca, Soracá) y zona norte de Antioquia (La Unión, Sonsón) entre 2.500 y 3.000 msnm. Rendimientos comerciales 30-45 t/ha bajo manejo convencional, tubérculos grandes (150-250 g) oblongos de piel rosa-crema y carne crema con bajo contenido de azúcares reductores: ideal para fritura industrial (papas a la francesa) y mercados de plaza. Es una lección crítica sobre el modelo agroindustrial: aunque productiva, la pastusa suprema es extremadamente susceptible a Phytophthora infestans (tizón tardío) y polilla guatemalteca (Tecia solanivora), lo que ata su cultivo a 8-14 aplicaciones de fungicida/insecticida sintético por ciclo, costo que estrangula al pequeño productor y deja residuos en suelo, agua y tubérculo. En contraste con las nativas Andigenum (carrera negra, criolla, sabanera), depende totalmente de semilla certificada renovada cada 2-3 ciclos por degeneración viral (PVY, PLRV). Manejo agroecológico de transición: rotación obligatoria con haba o arveja para fijar nitrógeno, aplicación de compost o bocashi al surco, biopreparados como caldo bordelés preventivo (no curativo) y trichoderma, monitoreo semanal de adultos de polilla con feromonas, asociación con tagetes para repelencia. La pastusa suprema enseña por contraste el costo real de la dependencia a paquetes tecnológicos y por qué la conservación in situ de variedades nativas es seguro alimentario. Fuentes Tier A: AGROSAVIA Manual Tubérculos Andinos 2017, Núñez-Rodríguez 2024 UNAL, Pérez-Rodríguez-Gómez 2008, ICA Resolución 3168/2015, GBIF Backbone, POWO Kew.",
+      "feeding_plan_template": {
+        "source": "Agrosavia — Manual tubérculos andinos (2017) + Pérez-Rodríguez-Gómez (2008) Plan fertilización papa criolla altiplano. Papa pastusa ciclo 5-6 meses clima frío 2000-3000 msnm.",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Aplicar bocashi al surco",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 250,
+            "notes": "Surco preparado 0-20 cm. Tubérculos-semilla pre-brotados con yemas activas. Suelo bien drenado."
+          },
+          {
+            "offset_days": 25,
+            "action": "Inocular Trichoderma harzianum al sustrato",
+            "biofertilizer_slug": "trichoderma_harzianum_suelo",
+            "dose_g": 15,
+            "notes": "Preventivo Rhizoctonia solani y Spongospora subterranea — patógenos críticos en papa altiplano."
+          },
+          {
+            "offset_days": 45,
+            "action": "Aporque + drench con humus líquido",
+            "biofertilizer_slug": "humus_liquido",
+            "dose_ml": 200,
+            "notes": "Dilución 1:5. Aporque obligatorio para tuberización. Aporte de NPK orgánico antes de bulbificación."
+          },
+          {
+            "offset_days": 60,
+            "action": "Foliar con biol fase pre-tuberización",
+            "biofertilizer_slug": "biol",
+            "dose_ml": 150,
+            "notes": "Dilución 1:7. Etapa crítica — papa define número de tubérculos en los 10-20 días pre-tuberización."
+          },
+          {
+            "offset_days": 80,
+            "action": "Foliar con caldo bordelés preventivo gota",
+            "biofertilizer_slug": "caldo_bordeles",
+            "dose_ml": 100,
+            "notes": "Concentración 1%. Preventivo Phytophthora infestans (gota o tizón) — enemigo principal de la papa. Cada 14 días en lluvia activa."
+          },
+          {
+            "offset_days": 100,
+            "action": "Foliar con supermagro durante llenado",
+            "biofertilizer_slug": "supermagro",
+            "dose_ml": 60,
+            "notes": "Dilución 1:15. K crítico para llenado de tubérculo y materia seca final."
+          },
+          {
+            "offset_days": 130,
+            "action": "Suspender riego para maduración piel",
+            "notes": "Reducir riego 80% últimas 3 semanas. Maduración piel = mejor conservación post-cosecha. Cosecha 150-180 días."
+          }
+        ]
+      },
       "tracking_mode": "aggregate"
     },
     {
@@ -31568,6 +32002,60 @@
       "drenaje_requerido": "excelente",
       "tracking_mode": "individual",
       "valor_pedagogico": "El aguacate (Persea americana Mill., Lauraceae) es uno de los frutales nativos americanos más importantes y emblemáticos de la agricultura colombiana, con producción concentrada en Antioquia, Tolima, Caldas, Quindío, Risaralda, Valle del Cauca y Cundinamarca. Variedades dominantes en Colombia: Hass (mayoritaria exportación), Lorena, Choquette, Booth, Trapp, criollos antillanos. Cultivo perenne 3-30 m altura con sistema radical superficial sensible a encharcamiento — requiere drenaje EXCELENTE (suelos francos a franco-arenosos, pH 5.5-6.5). Floración tipo A/B con dicogamia (mecanismo de polinización cruzada que requiere coexistencia de tipos florales A y B para fructificación máxima — lección agroecológica de biodiversidad funcional). Manejo: trasplante 6-8 meses post-vivero, distancia 7x7 m (Hass) a 9x9 m (criollos), tutorado primer año, poda de formación años 2-4, cosecha desde año 3-5 hasta año 25+. Plagas: trips (Frankliniella), ácaros, monalonion. Enfermedades graves: Phytophthora cinnamomi (muerte de la raíz), antracnosis, mancha negra. Manejo agroecológico: Trichoderma harzianum + sombrío de guamo (Inga edulis) reduce 70% Phytophthora. Asocio clásico: café-aguacate-plátano en sistema multiestrato cafetero.",
+      "feeding_plan_template": {
+        "source": "Agrosavia — Manual frutales tropicales + Pérez-Arbeláez (1947) Plantas útiles de Colombia. Aguacate clima templado-cálido 1000-2200 msnm.",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Aplicar bocashi al hoyo de siembra",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 2000,
+            "notes": "Hoyo 60x60x60 cm. Mezclar 2 kg de bocashi con suelo del hoyo. Aguacate sensible a encharcamiento — drenaje crítico."
+          },
+          {
+            "offset_days": 30,
+            "action": "Inocular Trichoderma harzianum al sustrato",
+            "biofertilizer_slug": "trichoderma_harzianum_suelo",
+            "dose_g": 30,
+            "notes": "Preventivo crítico contra Phytophthora cinnamomi (tristeza del aguacate) — patógeno principal de la especie."
+          },
+          {
+            "offset_days": 90,
+            "action": "Drench con biol fase vegetativa",
+            "biofertilizer_slug": "biol",
+            "dose_ml": 1500,
+            "notes": "Dilución 1:5, 1.5 L al pie. Año 1 establecimiento — crecimiento foliar activo."
+          },
+          {
+            "offset_days": 180,
+            "action": "Foliar con caldo bordelés preventivo",
+            "biofertilizer_slug": "caldo_bordeles",
+            "dose_ml": 100,
+            "notes": "Concentración 1%. Preventivo antracnosis (Colletotrichum gloeosporioides) en hojas y frutos."
+          },
+          {
+            "offset_days": 365,
+            "action": "Refuerzo anual con bocashi en corona",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 3000,
+            "notes": "Año 1 completo. Aplicar bajo la corona en banda, no contra el tronco. Cubrir con mulch."
+          },
+          {
+            "offset_days": 730,
+            "action": "Foliar con supermagro pre-floración",
+            "biofertilizer_slug": "supermagro",
+            "dose_ml": 100,
+            "notes": "Año 2 — preparar floración. Dilución 1:10. Aporte Zn y B críticos para cuajado de aguacate."
+          },
+          {
+            "offset_days": 1095,
+            "action": "Aplicar Bacillus subtilis foliar fructificación",
+            "biofertilizer_slug": "bacillus_subtilis_foliar",
+            "dose_ml": 30,
+            "notes": "Año 3 primera cosecha esperada. Control biológico antracnosis post-cuajado."
+          }
+        ]
+      },
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
@@ -31662,6 +32150,60 @@
       "drenaje_requerido": "bueno",
       "tracking_mode": "aggregate",
       "valor_pedagogico": "El plátano (Musa × paradisiaca, Musaceae) es híbrido cultivado entre Musa acuminata × Musa balbisiana, base alimentaria del campesinado colombiano. Variedades clave: Hartón (Caribe-Pacífico), Dominico Hartón (Eje cafetero), Cachaco (Antioquia), Comino, Pelipita, Manzano, Topocho. Hierba gigante 4-8 m altura (NO árbol — el tronco es pseudotallo formado por vainas foliares enrolladas), reproducción asexual por hijuelos basales (yemas del rizoma o cormo). Lección agroecológica de bioarquitectura única: el plátano se reproduce SOLO clonalmente desde siglo XIX (pérdida de semilla viable por triploidía estéril) — todas las matas son clones genéticos vulnerables a una sola plaga. Sigatoka negra (Mycosphaerella fijiensis) y Fusarium oxysporum f. sp. cubense raza 4 (Foc R4T) son amenazas globales. Manejo agroecológico: distancias 3x3 m a 4x4 m según variedad, sombrío con guamo en cafetal, deshije a 1 planta + 1 hijo + 1 nieto (cosecha continua), aplicación Trichoderma + bocashi al cuello del rizoma. Asocio multiestrato cafetero clásico.",
+      "feeding_plan_template": {
+        "source": "Agrosavia — Manual frutales tropicales + Cenicafé Manual cafetero (2013, asociación café-plátano). Plátano clima templado-cálido 0-1800 msnm.",
+        "primary_steps": [
+          {
+            "offset_days": 0,
+            "action": "Aplicar bocashi al hoyo de siembra",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 1500,
+            "notes": "Hoyo 40x40x40 cm. Sembrar colino con yema hacia arriba. Plátano gran demandante de K y MO."
+          },
+          {
+            "offset_days": 30,
+            "action": "Inocular Trichoderma harzianum",
+            "biofertilizer_slug": "trichoderma_harzianum_suelo",
+            "dose_g": 20,
+            "notes": "Preventivo Fusarium oxysporum f.sp. cubense (Mal de Panamá) — amenaza principal del cultivo a nivel global."
+          },
+          {
+            "offset_days": 60,
+            "action": "Drench con biol al pie",
+            "biofertilizer_slug": "biol",
+            "dose_ml": 1000,
+            "notes": "Dilución 1:5. Fase vegetativa activa — emisión de hojas verdaderas."
+          },
+          {
+            "offset_days": 120,
+            "action": "Foliar con supermagro fase reproductiva",
+            "biofertilizer_slug": "supermagro",
+            "dose_ml": 80,
+            "notes": "Dilución 1:12. K y Mg críticos para llenado de racimo. Aportar también ceniza_madera al pie (100 g/planta)."
+          },
+          {
+            "offset_days": 180,
+            "action": "Refuerzo con bocashi pre-floración",
+            "biofertilizer_slug": "bocashi",
+            "dose_g": 1000,
+            "notes": "Aplicar en corona radicular antes de emisión de la inflorescencia (bellota)."
+          },
+          {
+            "offset_days": 240,
+            "action": "Foliar con caldo bordelés preventivo Sigatoka",
+            "biofertilizer_slug": "caldo_bordeles",
+            "dose_ml": 100,
+            "notes": "Concentración 1%. Preventivo Sigatoka negra (Mycosphaerella fijiensis) — aplicar cada 21 días en época lluviosa."
+          },
+          {
+            "offset_days": 330,
+            "action": "Drench con lixiviado de frutas durante llenado",
+            "biofertilizer_slug": "lixiviado_frutas",
+            "dose_ml": 200,
+            "notes": "Dilución 1:10. Llenado de racimo activo — cosecha esperada 360-390 días post-siembra."
+          }
+        ]
+      },
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
