@@ -110,6 +110,21 @@ export default function TopBar({ onNavigate, onLogout }) {
         <div className="flex-1" />
 
         {/* Acciones globales */}
+        {/* Manual de uso — primer lugar tras el spacer para máxima
+            visibilidad (feedback Lili 2026-05-19: "debería ser un icono
+            principal mejor ubicado"). Fondo amber distintivo para romper
+            con la tira de iconos secundarios y comunicar "ayuda" antes de
+            la lectura. Tamaño 24px (vs 20-22px del resto) refuerza la
+            jerarquía. */}
+        <button
+          type="button"
+          onClick={() => onNavigate('help')}
+          aria-label="Manual de uso: cómo usar Chagra"
+          title="Manual de uso"
+          className="p-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 active:bg-amber-500/40 border border-amber-500/40 text-amber-300 min-h-[44px] min-w-[44px] flex items-center justify-center"
+        >
+          <HelpCircle size={24} aria-hidden="true" strokeWidth={2.5} />
+        </button>
         <button
           type="button"
           onClick={() => onNavigate('voz')}
@@ -125,15 +140,6 @@ export default function TopBar({ onNavigate, onLogout }) {
           className="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 active:bg-slate-700 text-purple-400 min-h-[44px] min-w-[44px] flex items-center justify-center"
         >
           <Plus size={22} aria-hidden="true" strokeWidth={2.5} />
-        </button>
-        <button
-          type="button"
-          onClick={() => onNavigate('help')}
-          aria-label="Manual de ayuda"
-          title="Cómo usar Chagra"
-          className="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 active:bg-slate-700 text-emerald-400 min-h-[44px] min-w-[44px] flex items-center justify-center"
-        >
-          <HelpCircle size={22} aria-hidden="true" strokeWidth={2.5} />
         </button>
         {/* Botón Settings (icono ⚙) eliminado, Lili #115: era duplicado del
             botón operator name de arriba (ambos onNavigate('perfil')). El
