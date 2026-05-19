@@ -1,0 +1,80 @@
+{
+  "species_slug": "cosmos_sulphureus",
+  "scientific_name": "Cosmos sulphureus Cav.",
+  "common_names": [
+    "Cosmos amarillo"
+  ],
+  "family": "Asteraceae",
+  "category": "atractores_polinizadores",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido",
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "pollinator_attractor",
+    "crop",
+    "biomass_producer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Siembra directa al voleo o en hileras post-último riesgo de heladas, 0.5-1 cm profundidad, distancia 30-40 cm entre plantas, germinación 5-10 días, floración 50-70 días post-siembra, ciclo anual 100-120 días, auto-resiembra natural abundante."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 600,
+      "optimo_max": 2500,
+      "max_absoluto": 2800
+    },
+    "temperatura_c": {
+      "helada_letal": -2,
+      "optimo_min": 15,
+      "optimo_max": 28,
+      "max_tolerable": 34
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El Cosmos amarillo (Cosmos sulphureus Cav., Asteraceae) es una especie herbácea anual originaria de México (mesetas centrales, Oaxaca, Chiapas, Veracruz) y Centroamérica, naturalizada y cultivada mundialmente como ornamental clásico de jardín tropical-subtropical por sus capítulos vistosos de color amarillo-anaranjado a rojo-naranja intenso característico (de ahí sulphureus — del color del sulfuro/azufre) y por su atractivo masivo de mariposas y otros polinizadores. Distinta de su congenérica Cosmos bipinnatus (cosmos rosado-blanco de clima frío, hojas bipinnadas finísimas, capítulos rosa-blanco-morado, mayor altitud) por su color cálido amarillo-anaranjado característico, hojas pinnadas más anchas (no bipinnadas finísimas), tolerancia a clima más cálido tropical (vs. preferencia de bipinnatus por clima frío), tamaño menor (1-2 m vs. bipinnatus 1.5-3 m). En Colombia se cultiva en clima cálido, templado y frío entre 0 y 2.800 msnm: Caribe, valles interandinos, Sabana de Bogotá, Eje Cafetero, Antioquia, Boyacá, Nariño, Llanos Orientales — especie de amplísimo rango altitudinal por adaptación termal flexible. Manejo agronómico: siembra directa al sitio definitivo al voleo o en hileras post-último riesgo de heladas (en clima frío andino esperar a final de febrero-marzo), 0.5-1 cm profundidad, distancia 30-40 cm entre plantas, germinación 5-10 días a 18-25°C, ciclo anual 100-120 días, floración inicia 50-70 días post-siembra y se mantiene 8-12 semanas continuas si se eliminan flores marchitas, auto-resiembra natural ABUNDANTE (se naturaliza en jardines y bordes de huerta tras una sola siembra). Atracción excepcional de polinizadores: especie reconocida mundialmente como UNA DE LAS PLANTAS MÁS ATRAYENTES DE MARIPOSAS del mundo (lepidópteros diurnos de varias familias: Pieridae, Nymphalidae, Hesperiidae, Lycaenidae), también atrae intensivamente abejas (Apis mellifera, abejas solitarias, abejorros Bombus spp.), sírfidos, escarabajos polinizadores y colibríes. La estructura del capítulo presenta abundante néctar accesible y polen abundante en disco amarillo central, en floración prolongada de 2-3 meses continuos. Pigmentos naturales: las flores secas son fuente de carotenoides (xantofilas, luteína, zeaxantina) usados como tintes alimentarios naturales amarillo-naranja en panadería, mantequillas, quesos, yemas de huevo de gallinas alimentadas con harina de flor seca (mejora pigmentación natural sin químicos), tinte textil natural amarillo-naranja tradicional mexicano. Uso medicinal tradicional documentado en farmacopeas mexicanas: infusión de flor diaforético, suavemente sedante, antimicrobiano. Manejo en chagra y huerta agroecológica: borde perimetral de huerta como banda atrayente de polinizadores y mariposas (mariposario de huerta — pedagogía infantil ideal), siembra en gremio con girasol (Helianthus annuus), tagetes (Tagetes minuta) y zinnia (Zinnia elegans) como combo \"jardín de mariposas mexicano\", siembra en macetera profunda en balcón con sol pleno (escala apartamento viable), cosecha de flores en mañana fresca para secado a la sombra y uso como pigmento o medicinal. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, Pamplona Roger 2006 Plantas Medicinales, JBB Plantas Medicinales.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- helianthus_annuus — Girasol (Helianthus annuus L.)\n- tagetes_minuta — Chinchilla (Tagetes minuta L.)",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "pamplona-roger-2006-plantas-medicinales",
+      "title": "pamplona-roger-2006-plantas-medicinales",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.394Z"
+}

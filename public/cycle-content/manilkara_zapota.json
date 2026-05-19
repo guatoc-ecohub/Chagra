@@ -1,0 +1,97 @@
+{
+  "species_slug": "manilkara_zapota",
+  "scientific_name": "Manilkara zapota (L.) P.Royen",
+  "common_names": [
+    "Níspero"
+  ],
+  "family": "Sapotaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor",
+    "windbreak"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "injerto",
+      "acodo"
+    ],
+    "best_method": "injerto",
+    "protocol_resumen": "Semilla viable 1-2 meses (recalcitrante); germinación lenta 30-60 días. Árboles francos demoran 7-10 años en producir; injerto de yema (T-budding o parche) sobre patrón franco baja a 4-5 años. Plantación a 8-12 m, tolera suelos calcáreos y arenosos pobres, muy tolerante a sequía y vientos costeros (carácter caribeño-yucateco).",
+    "tiempo_a_establecimiento_dias": 120,
+    "notas": "Frutos cosechados duros y madurados en planta o postcosecha (climatérico). Verdes son astringentes por latex; maduros pulpa marrón-translúcida granulosa muy dulce sabor a azúcar moreno y miel.",
+    "fuente": "POWO Kew; GBIF; AGROSAVIA frutales tropicales; Pérez Arbeláez 1947; FAO Ecocrop"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 50,
+      "optimo_max": 900,
+      "max_absoluto": 1400
+    },
+    "temperatura_c": {
+      "helada_letal": 4,
+      "optimo_min": 22,
+      "optimo_max": 32,
+      "max_tolerable": 38
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El níspero o sapote (Manilkara zapota (L.) P.Royen, Sapotaceae — sinónimos botánicos históricos Achras zapota L., Achras sapota, Manilkara achras (Mill.) Fosberg) es un árbol frutal perenne neotropical originario de la península de Yucatán-Belice-Guatemala-sur de México (centro mesoamericano), domesticado por civilizaciones mayas desde hace al menos 2500 años por su doble valor económico histórico extraordinario: (1) fruto comestible delicioso de pulpa marrón-translúcida granulosa dulce sabor a azúcar moreno-miel-caramelo (15-22 °Brix maduro), y (2) látex lechoso espeso \"chicle\" exudado al sangrar la corteza con cortes en zig-zag — materia prima histórica indispensable de la goma de mascar industrial moderna (Wrigley, Adams, primera mitad del siglo XX cuando todavía no existía la goma sintética petroquímica) y antes durante miles de años de los chicleros mayas-yucatecos que mascaban \"tzictli\" como práctica cultural-ritual cotidiana. En Colombia se cultiva ampliamente en zonas cálidas costeras del Caribe (Atlántico, Bolívar, Magdalena, Córdoba, Sucre, Cesar, La Guajira sur), Chocó, Valle medio y bajo Magdalena, zonas bajas de Antioquia (Urabá, Bajo Cauca), Tolima y Huila bajos, Llanos bajos (Casanare-Meta-Arauca cálidos) y zonas urbanas en general entre 0 y 900 msnm. Árbol siempreverde de 18-30 m altura con copa piramidal-globosa densa, corteza gris-marrón fisurada longitudinalmente que al cortarse exuda latex blanco abundante (la herida cierra naturalmente sin pudrirse — adaptación de Sapotaceae frente a herbivoría y patógenos, principio biotecnológico estudiado para biopolímeros). Hojas alternas elípticas-coriáceas 7-15 cm verde-brillante. Flores pequeñas blanco-cremosas en axilas de hojas terminales polinizadas por abejas nativas (Meliponini), mariposas nocturnas y murciélagos pequeños polinizadores. Frutos baya esférica-aovada 5-9 cm con cáscara marrón-clara áspera tipo \"papel de lija fino\" (carácter distintivo del taxón), pulpa marrón-translúcida cristalina granulosa fundente muy dulce con 1-6 semillas grandes lustrosas negras de testa lisa con cicatriz blanca-amarillenta (las semillas contienen sapotinina amarga — no consumir entera, principio educativo de defensas químicas en semillas). Muy resistente a sequías estacionales costeras, vientos salinos, suelos calcáreos pobres (carácter yucateco) y plagas — uno de los frutales más resilientes y de menor mantenimiento del Caribe. Manejo agroecológico tradicional: plantación a 8-12 m intercalado en patios tropicales con mango, aguacate, anón, guanábana, papaya, plátano, cacao en multiestrato, asocio con coberturas de leguminosas (Arachis pintoi, Desmodium spp.) para control de arvenses y aporte de nitrógeno. Función pedagógica excepcional: enseña a niñas y niños (1) la historia precolombina del chicle como producto cultural maya milenario (anterior por miles de años al chicle sintético petroquímico Wrigley/Adams del siglo XX), (2) extracción tradicional sustentable de látex en árboles vivos por sangrado en zig-zag (técnica chiclera de Yucatán-Petén) que NO mata al árbol y permite cosechas periódicas multidecenales, (3) doble función económica fruto-látex característica de árboles polifuncionales mesoamericanos, (4) carácter Sapotaceae de exudar látex blanco al cortarse (compartido con Pouteria, Chrysophyllum, Mimusops), (5) maduración postcosecha climatérica con frutos cosechados duros que ablandan en almacenaje, (6) astringencia de frutos verdes por taninos-latex como defensa química anti-herbivoría. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA manual frutales tropicales, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015, FAO Ecocrop.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.398Z"
+}

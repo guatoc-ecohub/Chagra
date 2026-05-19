@@ -1,0 +1,95 @@
+{
+  "species_slug": "cannabis_sativa_indica_cbd",
+  "scientific_name": "Cannabis sativa L. subsp. sativa (var. industrial CBD-dominante <1% THC)",
+  "common_names": [
+    "Cáñamo industrial / Cannabis CBD medicinal"
+  ],
+  "family": "Cannabaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "biomass_producer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "esqueje"
+    ],
+    "best_method": "esqueje",
+    "protocol_resumen": "Para conservar variedad CBD-dominante: propagación clonal por esqueje apical de plantas madre certificadas (5-10 cm con 2-3 nudos en jiffy o lana de roca, enraizamiento 14-21 días). Siembra por semilla certificada feminizada CBD <1% THC en huerto medicinal con licencia. Ciclo 90-150 días según fotoperíodo.",
+    "tiempo_a_establecimiento_dias": 30,
+    "notas": "Cultivo doméstico para autoconsumo medicinal con prescripción requiere registro de variedad CBD-dominante <1% THC y máximo 20 plantas según Resolución 577/2017. Producción comercial requiere licencia MinJusticia."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 500,
+      "optimo_max": 2200,
+      "max_absoluto": 2800
+    },
+    "temperatura_c": {
+      "helada_letal": 0,
+      "optimo_min": 15,
+      "optimo_max": 28,
+      "max_tolerable": 35
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El cáñamo industrial o cannabis CBD medicinal (Cannabis sativa L. subsp. sativa, variedad industrial CBD-dominante con <1% THC, familia Cannabaceae) es una herbácea anual dioica originaria de Asia Central (Hindukush, Tian Shan, Pamir), domesticada en el Neolítico hace 10.000+ años y reintroducida en América por colonización española siglo XVI principalmente como fuente de FIBRA (cordelería, sacos, velas náuticas, ropa rústica) y de aceite vegetal alimentario de las semillas (cañamones — alto en ácidos grasos esenciales omega-3 y omega-6 en proporción 3:1, proteína completa con todos los aminoácidos esenciales, vitamina E, magnesio). La variedad industrial CBD-dominante con <1% THC es la base del actual sector colombiano de cannabis medicinal regulado, marco normativo establecido por la Resolución 577/2017 MADS, el Decreto 613/2017, la Ley 1787/2016 y refinado por la sentencia T-095/2022 de la Corte Constitucional que reconoce el derecho fundamental al acceso medicinal. Se cultiva en Colombia bajo licencias MinJusticia en regiones de Cundinamarca (Sopó, Tenjo), Antioquia (Rionegro, Medellín), Valle del Cauca, Tolima (Ibagué), Cauca y Quindío entre 500 y 2.800 msnm, en zonas térmicas templadas-frías con suelos bien drenados pH 6-7. Lección viva sobre BOTÁNICA UTILITARIA, MARCO REGULATORIO BIOÉTICO y SOBERANÍA TERAPÉUTICA: el cannabis es uno de los cultivos más versátiles documentados (fibra industrial textil-cordelera, aceite alimentario premium, biomasa para construcción \"hempcrete\", fitorremediación de suelos contaminados con metales pesados que la planta acumula, sumideros de CO₂, y cannabinoides terapéuticos no-psicoactivos como CBD, CBG, CBC con evidencia clínica creciente en epilepsia refractaria, dolor crónico neuropático, ansiedad clínica, inflamación crónica y enfermedades neurodegenerativas). El marco regulatorio colombiano de Cannabis medicinal-industrial es uno de los más avanzados de Latinoamérica y reconoce la diferencia farmacológica entre variedades CBD-dominantes (no psicoactivas, perfil terapéutico) y THC-dominantes (psicoactivas, regulación estricta). Manejo agroecológico: propagación clonal por esqueje apical para conservar variedad CBD certificada; siembra por semilla feminizada certificada en sustrato bien drenado con micorrizas; ciclo 90-150 días según fotoperíodo; asocio con caléndula (Calendula officinalis) y ajenjo (Artemisia absinthium) como repelentes naturales; cosecha foliar y floral con secado lento <25°C para preservar terpenos. ESTA FICHA describe variedad industrial CBD-dominante DENTRO del marco legal colombiano vigente para uso medicinal y para fines de educación agroecológica; NO promueve uso recreativo ni variedades THC-dominantes (sujetas a marco legal restrictivo). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, FAO EcoCrop, Pamplona-Roger 2006 Plantas Medicinales, JBB Plantas Medicinales, Pérez-Arbeláez 1947 Plantas Útiles Colombia.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "pamplona-roger-2006-plantas-medicinales",
+      "title": "pamplona-roger-2006-plantas-medicinales",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.400Z"
+}

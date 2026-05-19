@@ -1,0 +1,82 @@
+{
+  "species_slug": "espeletia_killipii",
+  "scientific_name": "Espeletia killipii Cuatrec.",
+  "common_names": [
+    "Frailejón Killip"
+  ],
+  "family": "Asteraceae",
+  "category": "ornamentales_nativas",
+  "cultivable": false,
+  "conservation_status": "nativo_protegido",
+  "thermal_zones": [
+    "paramo"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "nurse_plant"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Frailejón típico del Páramo de Chingaza (Cundinamarca-Meta), nombrado en honor al botánico estadounidense Ellsworth Paine Killip (1890-1968) colector clave de la flora colombiana en el siglo XX. Roseta caulescente de tallo erecto que alcanza 1-3 m, con hojas oblongo-lanceoladas plateadas pubescentes en roseta apical compacta. Inflorescencia en panícula amarilla terminal. Germinación 30-90 días, crecimiento ~1 cm/año, individuos de 2 m con ~200 años. Protegido por Ley 1930/2018 (páramos) y Resolución 383/2010 MADS. Restauración ecológica autorizada únicamente por CAR Cundinamarca o CORPORINOQUIA según jurisdicción."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 3000,
+      "optimo_min": 3300,
+      "optimo_max": 3800,
+      "max_absoluto": 4100
+    },
+    "temperatura_c": {
+      "helada_letal": -14,
+      "optimo_min": 2,
+      "optimo_max": 10,
+      "max_tolerable": 17
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El frailejón Killip (Espeletia killipii Cuatrec., familia Asteraceae) es uno de los frailejones diagnósticos del Páramo de Chingaza — el complejo paramuno que abastece >80% del agua potable de Bogotá a través del sistema de embalses Chuza-San Rafael-Chingaza operado por la EAAB (Empresa de Acueducto y Alcantarillado de Bogotá). Nombrado en honor al botánico estadounidense Ellsworth Paine Killip (1890-1968), curador del U.S. National Herbarium (Smithsonian) y colector pionero de la flora colombiana junto con Pennell, Cuatrecasas, García-Barriga y Schultes en las expediciones botánicas de las primeras décadas del siglo XX que documentaron la riqueza florística andino-amazónica colombiana. Es una roseta caulescente del subgénero Espeletia s.s. con tallo erecto que alcanza 1-3 m de altura (uno de los frailejones de talla mediana-alta), hojas oblongo-lanceoladas plateadas densamente pubescentes (15-25 cm largo) dispuestas en roseta apical compacta, e inflorescencia en panícula amarilla terminal con capítulos típicos de la subtribu Espeletiinae. En Colombia se distribuye principalmente en el complejo paramuno Chingaza-Cruz Verde-Sumapaz-Guerrero-Guasca-Guatavita-Guacheneque entre 3.000 y 4.100 msnm, con óptimo en 3.300-3.800 msnm en frailejonales-pajonales del subpáramo-páramo medio dominados por Calamagrostis effusa, Calamagrostis bogotensis, Espeletia grandiflora, E. killipii, E. uribei (en Sumapaz) y otras especies del cortejo florístico paramuno. Lección viva de servicio ecosistémico hídrico estratégico nacional: el complejo Chingaza protege ~76.600 ha de páramos, bosques altoandinos y subpáramos, regula la oferta hídrica de la cuenca del río Bogotá y la cuenca del río Guavio, y abastece el sistema Chingaza que entrega 14 m³/s de agua potable a Bogotá (>80% del consumo metropolitano). La densidad de frailejones de Chingaza (estimada en 4.000-8.000 individuos/ha en frailejonal puro) es indicador de salud ecosistémica y de capacidad de captura-regulación hídrica del páramo. E. killipii es uno de los frailejones más estudiados en proyectos de restauración liderados por la EAAB, CAR Cundinamarca, CORPORINOQUIA, PNN Chingaza, Universidad Nacional de Colombia (grupo Restauración Ecológica), Instituto Humboldt y Fundación Conservación Internacional Colombia. El crecimiento lento (~1 cm/año) y la regeneración natural extremadamente baja (5-15% de germinación, alta mortalidad de plántulas) hacen que la conservación dependa esencialmente de la protección activa del hábitat: exclusión ganadera, prevención de quemas, control de minería ilegal, vigilancia comunitaria y restauración asistida en sitios degradados. Protección legal: Ley 1930/2018 (Gestión Integral de Páramos) prohíbe agricultura, ganadería extensiva, minería, hidrocarburos e infraestructura nueva en páramos delimitados; Resolución 383/2010 MADS declara TODOS los frailejones especies amenazadas con prohibición absoluta de aprovechamiento sin permiso CAR; Sentencia C-035/2016 Corte Constitucional confirma constitucionalidad de la prohibición de minería en páramos. Manejo legal restringido EXCLUSIVAMENTE a proyectos de restauración autorizados: recolección de aquenios maduros (octubre-febrero según altitud) con permiso CAR, siembra en sustrato de turba de páramo + tierra de subpáramo + arena + MO, germinación 30-90 días en invernadero alta montaña, trasplante a bolsa 4-6 meses, plantación definitiva >12 meses, densidad 100-400 ind/ha según degradación, asocio con Calamagrostis, Hypericum, Senecio, Bartsia, Disterigma, Pernettya y otras especies nativas paramunas. La protección de E. killipii es indisociable de la protección del recurso hídrico estratégico nacional y de la viabilidad del sistema de acueducto de Bogotá D.C. Fuentes Tier A: Humboldt 2016 Frailejones de Colombia, Diazgranados 2012 Revisión Espeletiinae, Ley 1930/2018, Resolución 383/2010 MADS, Libro Rojo de Plantas de Colombia, Bernal 2015 Catálogo Plantas Colombia, Plan de Manejo PNN Chingaza.",
+  "sources": [
+    {
+      "id": "humboldt-2016-frailejones",
+      "title": "humboldt-2016-frailejones",
+      "tier": "A",
+      "url": "https://www.humboldt.org.co"
+    },
+    {
+      "id": "diazgranados-2012-espeletiinae",
+      "title": "diazgranados-2012-espeletiinae",
+      "tier": "A",
+      "url": "10.3897/phytokeys.16.3186"
+    },
+    {
+      "id": "ley-1930-2018-paramos",
+      "title": "ley-1930-2018-paramos",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "mads-res-383-2010",
+      "title": "mads-res-383-2010",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.399Z"
+}

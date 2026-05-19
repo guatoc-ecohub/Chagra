@@ -1,0 +1,86 @@
+{
+  "species_slug": "tabebuia_rosea",
+  "scientific_name": "Tabebuia rosea (Bertol.) DC.",
+  "common_names": [
+    "Guayacán rosado"
+  ],
+  "family": "Bignoniaceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "pollinator_attractor",
+    "windbreak"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "esqueje"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semilla alada recolectada de cápsulas dehiscentes en estación seca (enero-marzo en Caribe). Sin tratamiento pre-germinativo. Germinación 80-95% a 8-15 días, una de las germinaciones más rápidas de los maderables tropicales. Vivero a sol parcial, trasplante definitivo a 30-40 cm.",
+    "tiempo_a_establecimiento_dias": 50,
+    "notas": "Floración masiva sincrónica en estación seca (febrero-marzo Andes/Caribe) tras estrés hídrico: árbol totalmente desnudo de hojas se cubre de flores rosado-violáceas que tapizan el suelo al caer. Espectáculo paisajístico icónico del paisaje cafetero y de pueblos del Caribe.",
+    "fuente": "Bernal 2015; Cárdenas-Salinas 2007; Trees of Antioquia; arbolado urbano municipios Andes-Caribe"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 1600,
+      "max_absoluto": 2000
+    },
+    "temperatura_c": {
+      "helada_letal": 4,
+      "optimo_min": 18,
+      "optimo_max": 28,
+      "max_tolerable": 34
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El guayacán rosado u ocobo (Tabebuia rosea (Bertol.) DC., sinónimo válido Handroanthus roseus, Bignoniaceae) es uno de los árboles más patrimoniales del paisaje colombiano. Nativo desde el sur de México hasta Ecuador, en Colombia se distribuye prácticamente en todas las regiones bajas y medias: Caribe (Sucre, Córdoba, Bolívar, Magdalena, La Guajira), Andina (valles del Magdalena, Cauca y Patía, piedemonte llanero en Cundinamarca, Tolima, Huila, Antioquia, Santander, Norte de Santander, Caldas, Risaralda, Quindío, Valle), Pacífico (Chocó, Valle), Orinoquía (Casanare, Meta) entre 0 y 1.600 msnm en zona térmica cálida a templada. Árbol caducifolio de 15-25 m de altura con fuste recto y copa abierta hemisférica, hojas opuestas palmaticompuestas con 5 folíolos elípticos, su característica más espectacular es la floración masiva sincrónica en estación seca (febrero-marzo en Andes, enero-marzo en Caribe): tras estrés hídrico el árbol pierde totalmente las hojas y se cubre de grandes flores tubulares rosado-violáceas (5-8 cm) en panículas terminales que tapizan el suelo al caer convirtiendo calles y veredas en alfombras rosadas. Este fenómeno paisajístico es ícono cultural de pueblos cafeteros (Pueblo Tapao, Filandia, Salento), municipios del Caribe (Sincelejo, Valledupar), Ibagué, Bogotá (avenidas), y aparece en pinturas, poesía y postales turísticas. Su madera amarillo-marrón dura y resistente a la pudrición es apreciada para construcción rural (vigas, postes, durmientes), ebanistería e instrumentos musicales artesanales. Es importante en arbolado urbano municipal porque tolera mejor que el roble (Quercus) la contaminación urbana, los suelos compactados y las podas eléctricas, además provee néctar y polen para abejas y colibríes urbanos durante semanas de floración masiva. En sistemas agroforestales cafetales templados acepta densidades 80-150 árb/ha como sombrío estético-productivo. En restauración de bosque seco tropical (Caribe, valle del Magdalena) es pionera valiosa por tolerancia a suelos pedregosos y pendientes. La floración masiva sincrónica es tema clásico de fenología tropical: dispara la dehiscencia de cápsulas y la dispersión de semillas aladas justo al inicio de lluvias, maximizando germinación. Manejo agroecológico: propagación por semilla recién recolectada con germinación rápida (8-15 días), vivero al sol parcial, plantación definitiva a 30-40 cm, podas de formación años 1-3, tolera podas urbanas anuales. Es lección de soberanía paisajística: en lugar de plantar jacaranda exótica de Argentina-Brasil o cerezos japoneses ornamentales, el ocobo nativo provee la misma magia floral en su versión rosada colombiana, con valor maderable adicional. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, Cárdenas & Salinas 2007, Trees of Antioquia, POWO Kew, GBIF Backbone Taxonomy.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- coffea_arabica — Café caturra / Castillo / Cenicafé 1 (Coffea arabica L.)\n- cordia_alliodora — Nogal cafetero (Cordia alliodora (Ruiz & Pav.) Oken)\n- erythrina_edulis — Chachafruto / Balú (Erythrina edulis Triana ex Micheli)\n- inga_edulis — Guamo (Inga edulis Mart.)",
+  "sources": [
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.388Z"
+}

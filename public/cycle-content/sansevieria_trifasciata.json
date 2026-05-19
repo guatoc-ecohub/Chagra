@@ -1,0 +1,85 @@
+{
+  "species_slug": "sansevieria_trifasciata",
+  "scientific_name": "Dracaena trifasciata (Prain) Mabb.",
+  "common_names": [
+    "Lengua de suegra"
+  ],
+  "family": "Asparagaceae",
+  "category": "ornamentales_nativas",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "ground_cover",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "division_mata",
+      "esqueje",
+      "rizoma"
+    ],
+    "best_method": "division_mata",
+    "protocol_resumen": "Propagación por división de mata (separar rizomas con 2-3 hojas y raíces propias) o por esqueje foliar (cortar hoja en secciones de 5-10 cm, cicatrizar 2-3 días, enterrar 1/3 vertical en sustrato bien drenado — pierde variegado en cultivares amarillos). Establecimiento 30-60 días.",
+    "tiempo_a_establecimiento_dias": 45,
+    "notas": "Reclasificada taxonómicamente: anteriormente Sansevieria trifasciata Prain (1903) — desde 2017 (Mabberley) se ubica en género Dracaena como D. trifasciata, aunque el nombre vernáculo 'sansevieria' persiste en cultivo y comercio. Famosa por filtración nocturna de toxinas del aire interior (formaldehído, benceno, tricloroetileno) estudio NASA Clean Air 1989 — purificadora aire interior por excelencia.",
+    "fuente": "POWO Kew; Mabberley 2017; NASA Clean Air Study 1989; JBB Plantas Medicinales"
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 200,
+      "optimo_max": 1800,
+      "max_absoluto": 2400
+    },
+    "temperatura_c": {
+      "helada_letal": 5,
+      "optimo_min": 18,
+      "optimo_max": 30,
+      "max_tolerable": 38
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "La lengua de suegra o espada de San Jorge (Dracaena trifasciata (Prain) Mabb., Asparagaceae subfamilia Nolinoideae, basónimo y sinónimo de cultivo Sansevieria trifasciata Prain) es una planta suculenta-rizomatosa perenne nativa de África occidental tropical (Nigeria, Camerún, República Democrática del Congo) ampliamente naturalizada en Colombia desde hace décadas como ornamental cosmopolita de interior y exterior entre 0 y 1.800 msnm en zonas térmicas cálidas-templadas: prácticamente ubicua en huertos caseros, antejardines, materas urbanas, oficinas, hospitales y escuelas de todo el país (Bogotá, Medellín, Cali, Barranquilla, Cartagena, Bucaramanga, Pereira, Manizales, Ibagué, Neiva, Pasto, Cúcuta, Tunja, Villavicencio). Reclasificación taxonómica reciente importante: el género Sansevieria fue fusionado al género Dracaena por Mabberley (2017) basándose en estudios moleculares y morfológicos modernos, por lo que el nombre científico válido actual es Dracaena trifasciata (Prain) Mabb. — aunque el nombre vernáculo comercial 'sansevieria' persiste universalmente en horticultura y comercio. Pertenece a la familia Asparagaceae subfamilia Nolinoideae (taxonomía APG IV — antes en Ruscaceae, antes en Dracaenaceae, antes en Agavaceae, antes en Liliaceae — historia perfecta para enseñar a niñas y niños cómo la taxonomía botánica cambia con evidencia molecular contemporánea), planta rizomatosa con hojas suculentas erguidas rígidas lanceolado-lineales aplanadas (40-120 cm largo x 4-7 cm ancho) verde oscuro brillante con bandas transversales irregulares verde-claro-grisáceas (en el tipo silvestre) o variegado amarillo-marginal (cultivares ornamentales 'Laurentii', 'Hahnii', 'Moonshine'), inflorescencia racimo terminal cilíndrico erecto con flores blanco-cremas pequeñas perfumadas nocturnas melíferas-polinizadas por polillas. Patrón fotosintético CAM como suculenta xerofítica adaptada — característica clave que la hace excepcional para interiores: a diferencia de la mayoría de plantas C3-C4 que toman CO2 de día y liberan O2 de día, las plantas CAM (Sansevieria, Aloe, Agave, cactos, piñas, orquídeas-CAM) abren estomas y absorben CO2 de noche para fijar carbono mediante ácido málico almacenado en vacuolas y procesar en Ciclo Calvin durante el día con estomas cerrados (reducción pérdida de agua), por lo que la lengua de suegra libera O2 de noche dentro de la habitación-dormitorio — perfecta planta de interior nocturna. Es lección viva extraordinaria de purificación del aire interior (estudio histórico NASA Clean Air Study 1989 — coordinado por B.C. Wolverton — identificó a Dracaena trifasciata entre las 10 plantas más eficientes para filtrar formaldehído, benceno, tricloroetileno, xileno, tolueno y otros COV de aire interior, datos relevantes en arquitectura sostenible y bienestar laboral-domiciliario), taxonomía botánica contemporánea-molecular y patrón fotosintético CAM. Uso medicinal tradicional caribeño africano: rizoma rallado en infusión como adyuvante antiparasitario (uso popular sin validación clínica fuerte), fibra muy fuerte de hojas trituradas se ha usado tradicionalmente en África Occidental para arcos-y-flechas y tejidos rurales (nombre vernáculo inglés 'viper bowstring hemp' = cáñamo cuerda-de-arco-de-víbora). Manejo agroecológico: propagación principal por división de mata (separar rizomas con 2-3 hojas y raíces propias) o por esqueje foliar (cortar hoja en secciones de 5-10 cm — vertical en sustrato seco — pierde variegado amarillo en cultivares variegados que revierten a verde plain), sustrato muy drenado tipo cactos (tierra + arena gruesa + perlita 1:1:1), sombra parcial a sol parcial filtrado (no sol pleno tropical — quema hojas), riego escaso quincenal o mensual (es planta extremadamente tolerante a olvido — sobrevive 4-8 semanas sin riego). Función en chagra/huerto urbano-interior como ornamental purificadora aire interior por excelencia (dormitorio-oficina-aula escolar), cobertura del suelo seca, atractora de polillas polinizadoras nocturnas, plantilla ideal para enseñar fotosíntesis CAM y taxonomía molecular a niñas y niños en huertas escolares. Fuentes Tier A: GBIF, POWO Kew, Mabberley 2017, NASA Clean Air Study 1989, JBB Plantas Medicinales, Bernal 2015, Pérez Arbeláez 1947.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.392Z"
+}

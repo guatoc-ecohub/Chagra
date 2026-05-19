@@ -1,0 +1,106 @@
+{
+  "species_slug": "prumnopitys_montana",
+  "scientific_name": "Prumnopitys montana (Humb. & Bonpl. ex Willd.) de Laub.",
+  "common_names": [
+    "Pino romerón / Chaquiro"
+  ],
+  "family": "Podocarpaceae",
+  "category": "arboles_sombra",
+  "cultivable": false,
+  "conservation_status": "nativo_protegido",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "nurse_plant",
+    "biomass_producer",
+    "windbreak"
+  ],
+  "antagonists": [
+    "eucalyptus_globulus",
+    "pinus_patula"
+  ],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "esqueje"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Propagación por semilla fresca de 'frutos' (técnicamente semillas envueltas en arilo púrpura-violáceo carnoso) maduros recolectados en febrero-mayo. Despulpado inmediato (el arilo carnoso inhibe la germinación), estratificación fría 4°C por 60-90 días y siembra en sustrato turba-arena con sombra parcial 60% e inoculación con micorrizas arbusculares de bosque nativo. Germinación 90-180 días. Trasplante 6-12 meses. Plantación definitiva 24-36 meses. Esqueje semileñoso muy difícil (enraizamiento <30%). Crecimiento MUY LENTO 15-30 cm/año en los primeros 5 años (típico de coníferas Podocarpaceae andinas).",
+    "tiempo_a_establecimiento_dias": 900,
+    "notas": "Especie DIOICA — requiere proporción 1 macho : 4-5 hembras para producción de semillas. Es la ÚNICA CONÍFERA NATIVA de la familia Podocarpaceae presente en altiplanos colombianos (junto con Podocarpus oleifolius y Retrophyllum rospigliosii), grupo botánico de origen gondwánico relictual."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 1800,
+      "optimo_min": 2100,
+      "optimo_max": 2800,
+      "max_absoluto": 3000
+    },
+    "temperatura_c": {
+      "helada_letal": -5,
+      "optimo_min": 8,
+      "optimo_max": 16,
+      "max_tolerable": 22
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El pino romerón o chaquiro (Prumnopitys montana (Humb. & Bonpl. ex Willd.) de Laub., familia Podocarpaceae) es uno de los árboles MÁS EXTRAORDINARIAMENTE INTERESANTES de la flora colombiana — es CONÍFERA NATIVA SUDAMERICANA, perennifolia, dioica, de gran porte (15-25 m altura) con copa cónica-piramidal, distribuida en los Andes (Colombia, Ecuador, Venezuela, Perú, Bolivia). En Colombia se encuentra en bosque alto andino y subandino entre 1800 y 3000 msnm en piso térmico FRÍO, en los departamentos de Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander y Tolima. La familia PODOCARPACEAE es una RAREZA BOTÁNICA EXTRAORDINARIA — es una familia de coníferas de ORIGEN GONDWÁNICO RELICTUAL, es decir, sus ancestros vivieron en el supercontinente Gondwana hace más de 200 millones de años (Triásico-Jurásico) y se distribuyeron por Sudamérica, África, Australia, Nueva Zelanda y la Antártida cuando estos formaban un solo continente. Tras la fragmentación de Gondwana en el Cretácico-Cenozoico, las Podocarpaceae se mantuvieron en los refugios montañosos del hemisferio sur — y los Andes tropicales son uno de los pocos enclaves de Podocarpaceae en el hemisferio norte tropical (refugio relictual). En Colombia hay TRES especies de Podocarpaceae nativas: Prumnopitys montana (pino romerón, este), Podocarpus oleifolius (chaquiro real) y Retrophyllum rospigliosii (chaquiro de hoja menuda) — todas son CONÍFERAS NATIVAS SUDAMERICANAS, dato que rompe la idea popular de que 'todas las coníferas son del hemisferio norte' (Pinus, Abies, Picea, Cedrus son del norte; pero Araucaria, Podocarpus, Prumnopitys, Retrophyllum, Saxegothaea, Pilgerodendron son del hemisferio sur de origen gondwánico). El pino romerón se distingue MORFOLÓGICAMENTE de los pinos verdaderos (Pinus, género del hemisferio norte) por: (1) hojas LINEARES PLANAS dispuestas DÍSTICAMENTE en ramillas planas (NO acículas en mechón como Pinus); (2) NO produce conos típicos sino SEMILLAS DRUPÁCEAS envueltas en arilo carnoso púrpura-violáceo (dispersión ORNITÓCORA por aves frugívoras alto-andinas — pavas, tucanetas, mirlas grandes, atrapamoscas grandes — no por viento como los pinos verdaderos); (3) es DIOICA (separación de sexos en árboles distintos, raro en Pinus). Estado de conservación: VULNERABLE (VU) en el Libro Rojo de Plantas de Colombia (2007) por sobreexplotación maderera histórica (la madera del pino romerón es de excelente calidad — rojiza, aromática, durable, codiciada para carpintería fina, instrumentos musicales, mástiles, postes y muebles desde la colonia hasta el siglo XX). Su aprovechamiento maderable comercial está PROHIBIDO en bosque natural y regulado estrictamente por las CAR (CAR Cundinamarca, Corpoboyacá, Cornare, Corantioquia, Corponariño) y por el SINAP. Lección viva sobre BIOGEOGRAFÍA GONDWÁNICA, CONÍFERAS NATIVAS SUDAMERICANAS, RAREZAS BOTÁNICAS y RESTAURACIÓN PRIORITARIA DEL BOSQUE ALTO ANDINO: el pino romerón es ejemplo paradigmático de cómo una especie nativa colombiana pertenece a un linaje botánico antiguo de distribución gondwánica relictual, y de cómo la sobreexplotación maderera del siglo XIX-XX la llevó al estado VU — la restauración prioritaria con romerón en Cruz Verde-Sumapaz, Chingaza, Iguaque, Tatamá y Otún-Quimbaya es ESTRATÉGICA tanto ecológica (estructura de dosel, alimento de avifauna alto-andina en estación seca) como simbólica (recuperación de patrimonio genético gondwánico). Manejo agroecológico: propagación por semilla fresca con despulpado inmediato, estratificación fría 60-90 días e inoculación micorrízica obligatoria; trasplante 6-12 meses; plantación 24-36 meses; CRECIMIENTO MUY LENTO 15-30 cm/año (paciencia 5-10 años); proporción dioica 1M:4-5H; asocio con roble andino (Quercus humboldtii), encenillo (Weinmannia tomentosa), gaque (Clusia multiflora) y freziera (Freziera canescens); densidades 100-200 ind/ha como especie estructural de dosel. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Libro Rojo Plantas Colombia, Humboldt Flora Alto-Andina, Bernal 2015 Catálogo Plantas Líquenes Colombia, IUCN Red List, Pérez-Arbeláez 1947 Plantas Útiles Colombia.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- clusia_multiflora — Gaque (Clusia multiflora Kunth)\n- quercus_humboldtii — Roble negro andino (Quercus humboldtii Bonpl.)\n- weinmannia_tomentosa — Encenillo (Weinmannia tomentosa L. f.)",
+  "antagonists_markdown": "### Antagonistas (no asociar)\n\nEvite sembrar estas especies cerca; compiten o comparten plagas/patógenos:\n- eucalyptus_globulus — Eucalipto blanco (Eucalyptus globulus Labill.)\n- pinus_patula — Pino pátula (Pinus patula Schiede ex Schltdl. & Cham.)",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "uicn-red-list",
+      "title": "uicn-red-list",
+      "tier": "A",
+      "url": "https://www.iucnredlist.org"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.403Z"
+}

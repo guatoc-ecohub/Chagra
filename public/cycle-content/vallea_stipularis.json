@@ -50,24 +50,28 @@
     {
       "id": "humboldt-flora-alto-andina",
       "title": "humboldt-flora-alto-andina",
+      "tier": "A",
       "url": null
     },
     {
       "id": "bernal-2015-plantas-liquenes-colombia",
       "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
       "url": "http://catalogoplantasdecolombia.unal.edu.co"
     },
     {
       "id": "sib-colombia",
       "title": "sib-colombia",
+      "tier": "A",
       "url": "https://sibcolombia.net"
     },
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.099Z"
+  "_generated_at": "2026-05-19T00:42:57.373Z"
 }

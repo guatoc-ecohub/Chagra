@@ -1,0 +1,70 @@
+{
+  "species_slug": "cratylia_argentea",
+  "scientific_name": "Cratylia argentea (Desv.) Kuntze",
+  "common_names": [
+    "Cratylia"
+  ],
+  "family": "Fabaceae",
+  "category": "abonos_verdes_coberturas",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "nitrogen_fixer",
+    "biomass_producer",
+    "living_fence"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 200,
+      "optimo_max": 1200,
+      "max_absoluto": 1600
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "La cratylia o veranera forrajera (Cratylia argentea (Desv.) Kuntze, Fabaceae-Faboideae) es una leguminosa arbustiva perenne nativa de la cuenca amazónica sur (Brasil, Bolivia, Perú) ampliamente introducida y validada en Colombia para sistemas ganaderos del Caribe seco (Cesar, La Guajira, Magdalena, Córdoba, Sucre, Bolívar), Llanos Orientales (Casanare, Meta, Arauca) y valles interandinos secos (Patía, Huila, Tolima), entre 0 y 1.200 msnm. Su característica distintiva agroclimática: es la leguminosa forrajera tropical de mayor tolerancia a sequía estacional prolongada (3-6 meses sin lluvia), mantiene follaje verde y palatable durante el verano cuando los pastos megatérmicos se secan completamente, llenando el déficit forrajero crítico de la ganadería trópico-seca colombiana. Arbusto de 2-4 m altura, copa densa, tallos múltiples desde la base, hojas alternas trifoliadas con foliolos elípticos (8-15 cm) verde-grisáceos en el haz y plateado-pubescentes en el envés (de ahí \"argentea\"), inflorescencias en racimos terminales con flores papilionadas malva-lila vistosas, frutos en legumbres lineares (10-15 cm) con 6-10 semillas oblongas pardo-claras. Fija nitrógeno biológico atmosférico (~150-200 kg N/ha/año) con Bradyrhizobium específico. Forraje de alta calidad: hojas con 18-25% proteína cruda, digestibilidad 55-65%, alta palatabilidad a bovinos, ovinos y caprinos. Validación colombiana: AGROSAVIA La Libertad (Villavicencio) y CIPAV-Cauca evaluaron cratylia en bancos de proteína para ceba bovina, demostrando ganancias diarias de 600-800 g/animal en sistemas mejorados con pasto Brachiaria + 20% cratylia. Manejo agroecológico: propagación por semilla escarificada (agua caliente 80°C/3 min o lija manual, germinación 70-85% en 7-15 días) o estaca semileñosa, distancia 0.5-1 m en franjas para banco de proteína (densidad 10.000-20.000 plantas/ha), establecimiento 4-6 meses, primer corte a los 8-12 meses, podas de cosecha cada 60-90 días a 50-70 cm altura, persistencia productiva 10-15 años. Otros usos: leña, sombra para café/cacao en márgenes secos, cerca viva forrajera, mejorador de suelos degradados. Lección viva de adaptación climática: enseña cómo seleccionar especies nativas amazónicas para mitigar el cambio climático en zonas trópico-secas donde las sequías se intensifican — la cratylia es seguro forrajero campesino frente al cambio climático. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Silvopastoriles, AGROSAVIA Forrajeras 2022, AGROSAVIA Leguminosas Andinas.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-silvopastoriles",
+      "title": "agrosavia-silvopastoriles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-forrajeras-2022",
+      "title": "agrosavia-forrajeras-2022",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-leguminosas-andinas",
+      "title": "agrosavia-leguminosas-andinas",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.387Z"
+}

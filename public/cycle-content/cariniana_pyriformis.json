@@ -1,0 +1,89 @@
+{
+  "species_slug": "cariniana_pyriformis",
+  "scientific_name": "Cariniana pyriformis Miers",
+  "common_names": [
+    "Abarco"
+  ],
+  "family": "Lecythidaceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "en_peligro",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "nurse_plant"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Pixidio (cápsula con tapa operculada característica) libera semillas aladas a finales estación seca. Sin tratamiento pre-germinativo. Germinación 60-80% a 20-30 días. Vivero a sombra 60% durante 8-12 meses. Plantación definitiva a 50-60 cm.",
+    "tiempo_a_establecimiento_dias": 90,
+    "notas": "Especie clave del bosque húmedo tropical Catatumbo, Magdalena medio y Pacífico. Categoría CRÍTICA (CR) en Libro Rojo Plantas Colombia por sobreexplotación maderera y deforestación regional severa.",
+    "fuente": "Cárdenas-Salinas 2007 Libro Rojo CR; IUCN EN; CONIF; Sinchi Catatumbo"
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 800,
+      "max_absoluto": 1200
+    },
+    "temperatura_c": {
+      "helada_letal": 8,
+      "optimo_min": 22,
+      "optimo_max": 28,
+      "max_tolerable": 34
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El abarco (Cariniana pyriformis Miers, Lecythidaceae) es uno de los árboles maderables más patrimoniales, más gigantes y más amenazados del bosque húmedo tropical colombiano. Nativo del norte de Sudamérica, en Colombia se distribuye en bosques húmedos tropicales de baja altitud en la región del Catatumbo (Norte de Santander), Magdalena medio (Santander, Cesar, Antioquia bajo), Pacífico (Chocó, Valle, Cauca) y Amazonía baja (Caquetá, Putumayo) entre 0 y 800 msnm en zona térmica cálida muy húmeda con precipitación >2000 mm/año. Árbol siempreverde gigante que alcanza 35-50 m de altura emergente del dosel forestal, fuste recto cilíndrico de hasta 1.8 m de diámetro con contrafuertes basales tabulares prominentes, copa amplia hemisférica, hojas alternas elípticas coriáceas brillantes, flores blanco-amarillentas pequeñas en panículas terminales, su característica más distintiva es el fruto: un pixidio (cápsula leñosa con tapa operculada que se abre como una bombonera) en forma de pera invertida (de ahí 'pyriformis' = en forma de pera) que libera semillas aladas dispersadas por viento, fruto típico de la familia Lecythidaceae (igual familia que la castaña amazónica Bertholletia excelsa y el sapucayá). ALERTA CONSERVACIÓN CRÍTICA: categorizada EN PELIGRO (EN) en la Lista Roja IUCN y CRÍTICAMENTE AMENAZADA / CRÍTICA (CR) en el Libro Rojo Plantas Colombia (Cárdenas & Salinas 2007), una de las categorías más alarmantes para un árbol nativo colombiano. La sobreexplotación maderera histórica para construcción naval y obras civiles pesadas, combinada con la deforestación masiva de las regiones del Catatumbo (frontera con Venezuela), Magdalena medio y Pacífico chocoano, han reducido las poblaciones silvestres en >85% del rango original. Sinchi y CAR Norte de Santander mantienen programas prioritarios de conservación in situ del abarco en la serranía de los Motilones. Su madera marrón-rojiza extremadamente densa (>0.85 g/cm³), durable y resistente a la pudrición, los hongos y los xilófagos marinos es considerada una de las maderas finas más valiosas del Neotrópico para construcción naval (cuadernas, quillas, costillas de barcos), durmientes ferroviarios, puentes de carga pesada, vigas estructurales y ebanistería patrimonial; en la región del Catatumbo es la madera tradicional para construcciones rurales históricas. El cultivo agroforestal asociado a cacao o bajo dosel residual es la principal alternativa de conservación productiva: aporta sombrío ligero al cacaotal y permite cosecha de madera a 40-60 años como legado generacional. Manejo agroecológico: vivero a sombra 60% por 8-12 meses, plantación definitiva a 50-60 cm con espacio amplio (mínimo 8x8 m), asocio bajo dosel de árboles pioneros, crecimiento moderado, sólo plantación con permiso de autoridad ambiental. Es lección crítica de conservación: el abarco es uno de los árboles más emblemáticos del bosque húmedo tropical colombiano y simultáneamente uno de los más cerca de la extinción comercial; plantar abarco hoy en sistema agroforestal o programa de restauración es acto urgente de reparación con la selva. Fuentes Tier A: Cárdenas & Salinas 2007 Libro Rojo Plantas Colombia (CR), IUCN Red List (EN), Bernal et al. 2015, POWO Kew, GBIF, Sinchi Amazonía/Catatumbo.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- cedrela_odorata — Cedro real (Cedrela odorata L.)\n- cordia_alliodora — Nogal cafetero (Cordia alliodora (Ruiz & Pav.) Oken)\n- myroxylon_balsamum — Bálsamo de Tolú (Myroxylon balsamum (L.) Harms)\n- swietenia_macrophylla — Caoba andina (Swietenia macrophylla King)",
+  "sources": [
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "uicn-red-list",
+      "title": "uicn-red-list",
+      "tier": "A",
+      "url": "https://www.iucnredlist.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "sinchi-amazonia-colombiana",
+      "title": "sinchi-amazonia-colombiana",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.388Z"
+}

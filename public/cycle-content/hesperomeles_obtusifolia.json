@@ -44,24 +44,28 @@
     {
       "id": "powo-kew",
       "title": "powo-kew",
+      "tier": "A",
       "url": "https://powo.science.kew.org"
     },
     {
       "id": "gbif-colombia",
       "title": "gbif-colombia",
+      "tier": "A",
       "url": "https://www.gbif.org/country/CO"
     },
     {
       "id": "humboldt-flora-alto-andina",
       "title": "humboldt-flora-alto-andina",
+      "tier": "A",
       "url": null
     },
     {
       "id": "uicn-red-list",
       "title": "uicn-red-list",
+      "tier": "A",
       "url": "https://www.iucnredlist.org"
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.098Z"
+  "_generated_at": "2026-05-19T00:42:57.370Z"
 }

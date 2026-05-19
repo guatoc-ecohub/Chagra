@@ -49,23 +49,27 @@
     "drenaje_requerido": "bueno_a_moderado"
   },
   "valor_pedagogico": "El aliso andino (Alnus acuminata Kunth) es una betulácea árbol nativo de los Andes ampliamente usada en sistemas agroforestales colombianos por su capacidad fijadora de nitrógeno (~150-200 kg N/ha/año mediante simbiosis con Frankia, actinorrhizas). Se distribuye naturalmente en Cundinamarca, Boyacá (cordillera Oriental), Antioquia, Cauca, Nariño y Tolima entre 1.500 y 3.200 msnm en zona térmica fría. Árbol caducifolio puede alcanzar 20-25 m, copa rala que permite paso de luz a cultivos asociados. Vida productiva 30-50 años. Manejo agroecológico: asocio café (sombra + N), sistemas silvopastoriles con pasturas naturalizadas, riberas microcuencas (estabilización suelo + sombra agua), barreras rompevientos en franjas anchas, restauración bosque altoandino. Madera blanda para artesanías locales. Fuentes Tier A: AGROSAVIA, Catálogo Plantas y Líquenes Colombia (Bernal et al.), POWO Kew, GBIF Backbone Taxonomy.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- cenchrus_clandestinus_manejado — Kikuyo manejado (Cenchrus clandestinus (Hochst. ex Chiov.) Morrone)\n- coffea_arabica — Café caturra / Castillo / Cenicafé 1 (Coffea arabica L.)\n- erythrina_edulis — Chachafruto / Balú (Erythrina edulis Triana ex Micheli)\n- lupinus_mutabilis — Chocho / Tarwi (Lupinus mutabilis Sweet)\n- passiflora_tripartita_mollissima — Curuba de Castilla (Passiflora tripartita var. mollissima (Kunth) Holm-Niels. & Jørg.)\n- quercus_humboldtii — Roble negro andino (Quercus humboldtii Bonpl.)\n- solanum_phureja — Papa criolla (Solanum phureja Juz. & Bukasov)\n- trifolium_repens — Trébol blanco (Trifolium repens L.)\n- vicia_faba — Haba (Vicia faba L.)\n- weinmannia_tomentosa — Encenillo (Weinmannia tomentosa L. f.)",
   "sources": [
     {
       "id": "ciat-1995-alnus",
       "title": "ciat-1995-alnus",
+      "tier": "A",
       "url": null
     },
     {
       "id": "agrosavia-silvopastoriles",
       "title": "agrosavia-silvopastoriles",
+      "tier": "A",
       "url": null
     },
     {
       "id": "humboldt-flora-alto-andina",
       "title": "humboldt-flora-alto-andina",
+      "tier": "A",
       "url": null
     }
   ],
   "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
-  "_generated_at": "2026-05-18T03:26:41.091Z"
+  "_generated_at": "2026-05-19T00:42:57.357Z"
 }

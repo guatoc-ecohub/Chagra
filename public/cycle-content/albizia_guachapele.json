@@ -1,0 +1,86 @@
+{
+  "species_slug": "albizia_guachapele",
+  "scientific_name": "Albizia niopoides (Spruce ex Benth.) Burkart",
+  "common_names": [
+    "Iguá hoja menuda"
+  ],
+  "family": "Fabaceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "nitrogen_fixer",
+    "pollinator_attractor",
+    "windbreak"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semilla escarificación mecánica o agua caliente 70°C remojo 12 h. Germinación 70-85% a 7-15 días. Vivero 4-6 meses. Plantación a 30-40 cm.",
+    "tiempo_a_establecimiento_dias": 60,
+    "notas": "Especie congénere del iguá clásico pero con folíolos significativamente más menudos (rasgo diagnóstico). Distribuida bs-T y bosque húmedo premontano. Madera blanca apreciada construcción rural.",
+    "fuente": "Bernal 2015; POWO; GBIF; Agrosavia silvopastoriles"
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 1500,
+      "max_absoluto": 1800
+    },
+    "temperatura_c": {
+      "helada_letal": 5,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 36
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El iguá de hoja menuda o guachapelí blanco (Albizia niopoides (Spruce ex Benth.) Burkart, Fabaceae subfamilia Mimosoideae) es una de las leguminosas arbóreas más versátiles del bosque seco tropical (bs-T) y bosque húmedo premontano colombiano, congénere del iguá clásico (Pseudosamanea guachapele) pero distinguible diagnósticamente por sus folíolos significativamente más menudos (8-15 pares de folíolos secundarios de 5-10 mm vs los folíolos más grandes y menos numerosos del iguá clásico). Este rasgo morfológico no es solo taxonómico: tiene implicaciones funcionales importantes en sistemas agroforestales: la copa fina con folíolos menudos produce sombra filtrada de alta calidad, óptima para sotobosques de café (Coffea arabica) que requieren 40-60% de transmisión lumínica, cacao (Theobroma cacao) y plátano (Musa). Nativo del Neotrópico desde Centroamérica hasta Brasil-Argentina, en Colombia se distribuye ampliamente en el bs-T de los valles interandinos del Magdalena (Tolima, Huila, Cundinamarca, Santander, Norte de Santander), Cauca (Valle, Cauca), Patía, Sinú (Córdoba, Sucre), Caribe (Cesar, Magdalena, Bolívar, La Guajira), bosque premontano de los Andes (Antioquia, Caldas, Quindío, Risaralda, Valle), y piedemonte llanero entre 0-1.500 msnm en zona térmica cálida a templada. Árbol caducifolio de 15-25 m de altura con copa amplia abierta hasta 15 m de diámetro, fuste recto cilíndrico, corteza grisácea lisa a finamente fisurada, hojas bipinnadas finas con 12-25 pares de pinnas y folíolos secundarios muy pequeños (5-10 mm), flores blanco-crema en cabezuelas globulosas pequeñas con estambres prominentes melíferos, frutos vaina linear plana marrón dehiscente con 6-12 semillas pequeñas. Como leguminosa Mimosoideae fija nitrógeno biológico mediante rizobios, aporte crítico en suelos pobres del bs-T y rastrojos cafetaleros degradados. Su madera blanco-cremosa a amarillenta de densidad media (0.55-0.65 g/cm³) es apreciada en construcción rural, encofrado, tornería, leña y carbón doméstico — sustituye importación de pino radiata en muchas fincas cafeteras del Eje Cafetero. En sistemas silvopastoriles del Tolima, Cesar y Caribe acepta densidades 100-150 árb/ha proveyendo sombrío filtrado al ganado, forraje suplementario por rebrote tierno (proteína 18-22% MS), y fijación de N que reduce dependencia de fertilizante sintético urea. En sistemas cafetaleros del piedemonte oriental y andino se planta a 8-10 m de distancia (100-130 árb/ha) como sombrío de regulación con doble corona — la copa fina permite el manejo del fotoperíodo de floración del café Cenicafé Variedad Castillo y Tabi. Su floración blanca masiva al inicio de las lluvias (marzo-abril y septiembre-octubre) es atractor crítico para abejas nativas sin aguijón Meliponini (Tetragonisca, Melipona, Trigona), abejorros Bombus, mariposas Lepidoptera, y avifauna nectarívora del bs-T, fortaleciendo cadenas tróficas locales. Manejo agroecológico: propagación por semilla con escarificación mecánica o agua caliente 70°C remojo 12 h (germinación 70-85% a 7-15 días), vivero 4-6 meses, plantación definitiva a 30-40 cm, distancia 8-10 m en cafetal o 8×8 m en silvopastoril, poda formativa primeros 3 años, rebrota vigoroso tras corte controlado, turno maderable 15-20 años. Es lección extraordinaria de cómo distinguir morfológicamente especies cercanas (Pseudosamanea guachapele vs Albizia niopoides) tiene consecuencias prácticas: el iguá clásico funciona mejor en silvopastoril extensivo por su copa más densa y forraje abundante, mientras que el iguá hoja menuda es óptimo para sombrío cafetalero por su sombra filtrada — la observación botánica fina del agricultor determina la elección correcta. Defenderlo es defender la diversidad funcional del bs-T y la soberanía técnica frente al sombrío exótico de leucaena promovido masivamente sin considerar especies nativas equivalentes o superiores. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, Agrosavia silvopastoriles bs-T, Cenicafé manual cafetero sombrío.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- coffea_arabica — Café caturra / Castillo / Cenicafé 1 (Coffea arabica L.)\n- cordia_alliodora — Nogal cafetero (Cordia alliodora (Ruiz & Pav.) Oken)\n- gliricidia_sepium — Matarratón (Gliricidia sepium (Jacq.) Kunth ex Walp.)\n- pseudosamanea_guachapele — Igua (Pseudosamanea guachapele (Kunth) Harms)\n- tabebuia_rosea — Guayacán rosado (Tabebuia rosea (Bertol.) DC.)",
+  "sources": [
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "agrosavia-silvopastoriles",
+      "title": "agrosavia-silvopastoriles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "cenicafe-manual-cafetero-2013",
+      "title": "cenicafe-manual-cafetero-2013",
+      "tier": "A",
+      "url": "https://www.cenicafe.org/es/index.php/nuestras_publicaciones"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.389Z"
+}

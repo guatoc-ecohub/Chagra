@@ -1,0 +1,91 @@
+{
+  "species_slug": "aloe_arborescens",
+  "scientific_name": "Aloe arborescens Mill.",
+  "common_names": [
+    "Sábila árbol"
+  ],
+  "family": "Asphodelaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor",
+    "living_fence"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "esqueje",
+      "division_mata"
+    ],
+    "best_method": "esqueje",
+    "protocol_resumen": "Esquejes de tallo o ramas laterales de 20-40 cm cicatrizados 7-15 días a la sombra antes de enterrar 8-12 cm en suelo arenoso bien drenado. Sin riego primera semana. Establecimiento 30-45 días. Alternativa: división de mata con hijuelos basales.",
+    "tiempo_a_establecimiento_dias": 40,
+    "notas": "Distinta de Aloe vera (acaule, hojas en roseta basal, sin tallo aéreo): A. arborescens es arbustivo con tallo leñoso y ramificado de hasta 3-4 m, hojas en rosetas terminales múltiples, flores rojo-anaranjadas brillantes en racimos terminales. Usada en medicina tradicional italiana (Padre Romano Zago) como inmunoestimulante, antitumoral adyuvante (estudios clínicos preliminares).",
+    "fuente": "POWO Kew; Pamplona-Roger 2006 Plantas Medicinales; JBB Plantas Medicinales"
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 800,
+      "optimo_max": 2400,
+      "max_absoluto": 2800
+    },
+    "temperatura_c": {
+      "helada_letal": -3,
+      "optimo_min": 14,
+      "optimo_max": 28,
+      "max_tolerable": 36
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "La sábila árbol o aloe arborescente (Aloe arborescens Mill., Asphodelaceae subfamilia Asphodeloideae) es una asphodelácea suculenta arbustiva-arborescente perenne originaria del sur de África (provincia del Cabo y KwaZulu-Natal, Sudáfrica, Mozambique, Zimbabue, Malawi — especie comúnmente llamada 'krantz aloe' por crecer en farallones rocosos sudafricanos), introducida y cultivada en Colombia desde hace décadas como ornamental, medicinal y cerca viva entre 800 y 2.400 msnm en zonas térmicas templadas-frías-moderadas: Cundinamarca (Sabana de Bogotá — Funza, Mosquera, Chía, Cota, Tocancipá, Cajicá, Sopó; Sumapaz cafetero — Tibacuy, Pasca; Tequendama — La Mesa, Anolaima, Anapoima), Boyacá (Tunja, Duitama, Sogamoso, Villa de Leyva), Antioquia (Oriente — Marinilla, Rionegro, La Ceja, Guarne; Suroeste cafetero), Valle del Cauca (cinturón frutícola), Quindío, Risaralda, Caldas (Eje Cafetero), Tolima, Huila, Santander (Bucaramanga, Floridablanca, Piedecuesta, Lebrija), Norte de Santander (Pamplona, Chinácota), Nariño (Pasto) y Cesar (Valledupar). Es lección viva extraordinaria de farmacopea botánica casera, contraste taxonómico con Aloe vera y bioeconomía medicinal artesanal que enseña a niñas y niños cómo el género Aloe tiene más de 600 especies sudafricanas-arábigas con biodiversidad funcional distinta: Aloe vera (acaule, hojas en roseta basal sin tallo aéreo, flores amarillas) usada principalmente como cicatrizante de quemaduras y demulcente digestivo; Aloe arborescens (arbustivo-arborescente de 2-4 m con tallo leñoso ramificado, hojas en rosetas terminales múltiples, flores rojo-anaranjadas brillantes melíferas) usada como inmunoestimulante general en la medicina tradicional italiana popularizada por el Padre Romano Zago O.F.M. (Franciscano brasileño-italiano, 1932-2025) con su fórmula 'tres ingredientes': hojas frescas trituradas con piel + miel pura + aguardiente o cachaza, en proporciones tradicionales como adyuvante inmunoestimulante (existen estudios clínicos preliminares italianos en oncología como coadyuvante, sin reemplazar tratamientos convencionales). Pertenece a la familia Asphodelaceae subfamilia Asphodeloideae (taxonomía APG IV — separada de Liliaceae y Aloeaceae tradicionales), planta arbustiva-arborescente perenne suculenta con tallo principal leñoso y ramificado de 2-4 m de altura, rosetas terminales múltiples de hojas suculentas verde-grisáceo-azuladas lanceoladas-falcadas (curvadas como hoz) de 40-60 cm con dientes marginales prominentes triangulares blanquecinos, inflorescencia racimo terminal cilíndrico erecto vistoso de 30-50 cm con flores tubulares rojo-anaranjado-brillantes melíferas que florece predominantemente en invierno-primavera atrayendo polinizadores diurnos (colibríes — el género Trochilidae se siente atraído por flores tubulares rojas, abejas Apis y nativas Meliponini) y nocturnos (murciélagos en algunas localidades). Patrón fotosintético CAM como toda Aloe. Manejo agroecológico: propagación por esqueje de tallo o ramas laterales de 20-40 cm (cicatrizar la herida 7-15 días a la sombra antes de enterrar 8-12 cm en suelo arenoso bien drenado sin riego primera semana) o por división de mata con hijuelos basales, distancia 1-1.5 m en cerca o 2-3 m disperso, sol pleno a sombra parcial leve, tolera sequía extrema, suelos pobres pedregosos arenosos, tolera heladas suaves (-3 °C breves), prácticamente sin manejo durante 20-40 años de vida productiva, asocio con Aloe vera, cactáceas, agaves, romero, lavanda en huertos secos templados-fríos andinos. Función en chagra como medicinal complementaria a Aloe vera, ornamental floración vistosa invernal, cerca viva espinosa moderada, atractora de colibríes y abejas. Fuentes Tier A: GBIF, POWO Kew, Pamplona-Roger 2006 Plantas Medicinales, JBB Plantas Medicinales Cundinamarca-Boyacá, Pérez Arbeláez 1947, SiB Colombia.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "pamplona-roger-2006-plantas-medicinales",
+      "title": "pamplona-roger-2006-plantas-medicinales",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.392Z"
+}

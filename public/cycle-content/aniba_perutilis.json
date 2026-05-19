@@ -1,0 +1,84 @@
+{
+  "species_slug": "aniba_perutilis",
+  "scientific_name": "Aniba perutilis Hemsl.",
+  "common_names": [
+    "Aniba comino"
+  ],
+  "family": "Lauraceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "en_peligro",
+  "thermal_zones": [
+    "templado"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "nurse_plant",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semillas recalcitrantes (sin tolerancia a desecación), siembra inmediata en sustrato orgánico forestal bajo sombra 70-80%. Germinación 30-50% a 60-90 días. Vivero a sombra densa con riego constante. Plantación definitiva a los 12-18 meses (40-60 cm) bajo dosel forestal. Crecimiento muy lento, especie de bosque maduro climácico.",
+    "tiempo_a_establecimiento_dias": 180,
+    "notas": "Especie EN PELIGRO (Libro Rojo Plantas Colombia, UICN). Madera 'comino crespo' una de las más finas del país, sobreexplotada históricamente para ebanistería de lujo. Aprovechamiento silvestre prohibido sin permiso CAR. Propagación esencial para conservación ex situ.",
+    "fuente": "Cárdenas & Salinas 2007 Libro Rojo Plantas Colombia (categoría EN); Bernal et al. 2015; IUCN Red List"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1000,
+      "optimo_min": 1300,
+      "optimo_max": 1800,
+      "max_absoluto": 2000
+    },
+    "temperatura_c": {
+      "helada_letal": 2,
+      "optimo_min": 16,
+      "optimo_max": 22,
+      "max_tolerable": 28
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El aniba comino o comino crespo (Aniba perutilis, Lauraceae) es uno de los árboles maderables más emblemáticos y críticamente amenazados del bosque andino colombiano, listado como EN PELIGRO en el Libro Rojo de Plantas de Colombia (Cárdenas & Salinas 2007) y en la lista roja de la UICN. Es nativo de los bosques húmedos premontanos andinos entre 1.000 y 2.000 msnm, distribuido en la región Andina especialmente en Antioquia, Caldas, Risaralda, Quindío, Valle del Cauca, Cauca, Tolima, Huila, Chocó, Nariño y Cundinamarca. Árbol perennifolio de bosque maduro climácico de 20-30 metros de altura con fuste cilíndrico recto, copa redondeada densa y corteza pardo-grisácea fina con aroma intenso característico a comino y canela cuando se raspa; hojas alternas elípticas coriáceas verde oscuro brillantes en haz, flores pequeñas blanco-amarillentas en panículas axilares atractoras de abejas Meliponini, drupas elipsoidales verde-negruzcas dispersadas por aves frugívoras del bosque andino. Su madera —conocida comercialmente como 'comino crespo' o 'comino real'— ha sido históricamente considerada una de las más finas del país: densidad alta, veteado ondulado característico, aroma persistente a canela-comino, durabilidad excepcional, lo que la convirtió en madera predilecta para ebanistería de lujo, mueblería patrimonial, puertas talladas, instrumentos musicales, cofres y altares en arquitectura colonial y republicana colombiana del siglo XVIII al XX. Esta sobreexplotación maderera por más de 200 años redujo las poblaciones silvestres hasta el estado crítico actual, con árboles maduros prácticamente extintos en muchas zonas de su rango histórico. Su recuperación es lenta y compleja: especie de bosque maduro con semillas recalcitrantes que no toleran desecación (siembra inmediata obligatoria), crecimiento muy lento (turnos >40 años para diámetros comerciales), esciófita estricta (requiere dosel forestal continuo) y baja regeneración natural fuera de bosques maduros. El aprovechamiento silvestre está prohibido sin permiso especial de la autoridad ambiental (CAR/Ministerio de Ambiente). Su conservación ex situ en cafetales con sombrío diversificado y huertos patrimoniales rurales constituye una de las estrategias más viables para mantener su acervo genético y evitar la extinción comercial completa. Es lección de soberanía botánica y advertencia ecológica: la 'sobreexplotación silenciosa' de maderas finas del bosque andino —comino, cedro, nogal andino, ceroxylon— es paralela a la deforestación amazónica pero con menor visibilidad pública. Recuperar el aniba comino en los cafetales colombianos es acto de restauración cultural y patrimonio botánico nacional. Fuentes Tier A: Cárdenas & Salinas 2007 Libro Rojo Plantas Colombia (categoría EN — En Peligro), Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, IUCN Red List, Pérez-Arbeláez 1947 Plantas Útiles de Colombia.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- cedrela_odorata — Cedro real (Cedrela odorata L.)\n- coffea_arabica — Café caturra / Castillo / Cenicafé 1 (Coffea arabica L.)\n- inga_edulis — Guamo (Inga edulis Mart.)\n- ocotea_calophylla — Laurel comino (Ocotea calophylla Mez)",
+  "sources": [
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.404Z"
+}

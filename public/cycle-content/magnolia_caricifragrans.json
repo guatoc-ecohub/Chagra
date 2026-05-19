@@ -1,0 +1,78 @@
+{
+  "species_slug": "magnolia_caricifragrans",
+  "scientific_name": "Magnolia caricifragrans (Lozano) Govaerts",
+  "common_names": [
+    "Magnolia colombiana"
+  ],
+  "family": "Magnoliaceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "endemica_colombia",
+  "thermal_zones": [
+    "templado"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "pollinator_attractor",
+    "nurse_plant"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semillas recalcitrantes recolectadas de conos folicíferos maduros (rojo-anaranjados). Siembra inmediata tras limpieza de arilo rojo. Germinación 30-50% a 30-60 días bajo sombra 70%. Vivero a sombra densa con humedad alta. Trasplante a los 6 meses. Plantación definitiva a los 12-15 meses bajo dosel forestal parcial.",
+    "tiempo_a_establecimiento_dias": 150,
+    "notas": "Magnolia endémica de Colombia (Antioquia, Caldas, Risaralda, Quindío principalmente). Poblaciones silvestres muy reducidas por deforestación bosque andino. Florecimiento espectacular con flores blanco-cremas aromáticas. Conservación ex situ prioritaria en JBB y arboretos cafeteros.",
+    "fuente": "Lozano-Contreras 2003 Magnoliaceae Colombia; Calderón-Sáenz et al. 2007 Libro Rojo Magnoliaceae; Bernal et al. 2015"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1200,
+      "optimo_min": 1500,
+      "optimo_max": 1900,
+      "max_absoluto": 2000
+    },
+    "temperatura_c": {
+      "helada_letal": 1,
+      "optimo_min": 14,
+      "optimo_max": 22,
+      "max_tolerable": 27
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La magnolia colombiana o molinillo (Magnolia caricifragrans, Magnoliaceae) es una de las magnolias endémicas más representativas de los bosques andinos premontanos cafeteros de Colombia, distribuida exclusivamente en las cordilleras Central y Occidental colombianas, principalmente en Antioquia, Caldas, Risaralda, Quindío y Valle del Cauca entre 1.200 y 2.000 msnm. Árbol perennifolio de 15-25 metros de altura con fuste cilíndrico recto, copa piramidal-redondeada, corteza gris lisa con lenticelas características, hojas alternas grandes coriáceas oblongo-elípticas verde oscuro brillantes en haz y pálidas pubescentes en envés, flores solitarias terminales grandes (10-15 cm) blanco-cremas con tépalos carnosos y aroma intenso a frutas frescas o cítricos característicos de las Magnoliaceae primitivas, conos folicíferos rojo-anaranjados al madurar con semillas rodeadas de arilo carnoso rojo dispersadas por aves frugívoras. La familia Magnoliaceae es uno de los linajes más antiguos de plantas con flores (130-140 millones de años de antigüedad, Cretácico inferior) y conserva características florales primitivas: tépalos no diferenciados en pétalos y sépalos, ovario apocárpico (carpelos libres), polinización por escarabajos primitivos Coleoptera anteriores a la diversificación de las abejas. Esto la convierte en una de las plantas vivas más interesantes para la enseñanza de la evolución vegetal. Colombia es uno de los países con mayor diversidad de magnolias del Neotrópico (33 especies conocidas, la mayoría endémicas) pero también con el mayor número de magnolias amenazadas: M. caricifragrans está categorizada como endémica colombiana con poblaciones silvestres altamente reducidas por la deforestación histórica del bosque andino premontano cafetero (especialmente en el Eje Cafetero entre 1900-1970 cuando se transformaron millones de hectáreas a cafetal y potrero). Su conservación ex situ depende hoy de jardines botánicos (Jardín Botánico de Bogotá, JB Quindío, JB Joaquín Antonio Uribe Medellín), arboretos cafeteros y huertos patrimoniales rurales. Es lección de soberanía botánica y biogeografía: cada cordillera de los Andes colombianos alberga magnolias endémicas únicas (M. caricifragrans en zona cafetera, M. yarumalensis en Antioquia, M. hernandezii en Quindío, M. mahechae en Valle, M. wolfii en Quindío) que constituyen patrimonio genético irreemplazable del país y de la humanidad. Recuperar las magnolias colombianas en cafetales con sombrío diversificado, huertos patrimoniales y programas de restauración bosque andino es acto de conservación cultural y genética. Fuentes Tier A: Lozano-Contreras 2003 Magnoliaceae Colombia, Calderón-Sáenz et al. 2007 Libro Rojo Magnoliaceae Colombia, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- cedrela_montana — Cedro de montaña (Cedrela montana Moritz ex Turcz.)\n- coffea_arabica — Café caturra / Castillo / Cenicafé 1 (Coffea arabica L.)\n- inga_densiflora — Guamo macheto (Inga densiflora Benth.)\n- ocotea_calophylla — Laurel comino (Ocotea calophylla Mez)",
+  "sources": [
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.405Z"
+}

@@ -1,0 +1,72 @@
+{
+  "species_slug": "morus_nigra_mora_de_arbol",
+  "scientific_name": "Morus nigra L.",
+  "common_names": [
+    "Mora de árbol negra"
+  ],
+  "family": "Moraceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor",
+    "windbreak"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "esqueje",
+    "notas": "Propagación por esqueje leñoso de invierno (25-40 cm, 3-4 yemas) o semilla (variabilidad alta); entrada en producción 3-5 años; árbol longevo (>100 años) con frutas anuales abundantes."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1200,
+      "optimo_min": 1800,
+      "optimo_max": 2500,
+      "max_absoluto": 2800
+    },
+    "temperatura_c": {
+      "helada_letal": -6,
+      "optimo_min": 12,
+      "optimo_max": 22,
+      "max_tolerable": 30
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La mora de árbol negra (Morus nigra L., Moraceae) es un frutal templado caducifolio originario del suroeste asiático (Persia-Mesopotamia) introducido en Colombia desde la época colonial y naturalizado en altiplanos templados y templado-fríos. Crece entre 1.800 y 2.500 msnm en zonas térmicas templadas y frías, presente en Cundinamarca (Sasaima, La Mesa, Anolaima, Sopó, Tabio, Subachoque, Tenjo, La Calera), Boyacá (Villa de Leyva, Moniquirá, Arcabuco, Sutamarchán, Paipa), Santander (San Gil, Barichara, Charalá), Antioquia (Santa Rosa de Osos, La Ceja, Rionegro) y Norte de Santander (Pamplona). Es importantísimo distinguir esta especie de la mora andina (Rubus glaucus): Morus nigra es un ÁRBOL de 6-12 m con frutos compuestos en sorosis (no en agregado de drupas como Rubus), mientras Rubus glaucus es un arbusto sarmentoso con espinas y frutos en agregado de drupas pequeñas. Lección biológica fundamental para niñas y niños. Hojas alternas ovaladas-cordadas con margen aserrado, ásperas al tacto, caedizas en zonas frías. Flores en amentos colgantes verde-amarillentos (anemofilia parcial + entomofilia). Frutos en sorosis cilíndrica de 2-3.5 cm, color rojo-vino a negro-púrpura al madurar, jugo muy intenso (manchador), sabor dulce-acidulado complejo (15-18° Brix) con altísimo contenido de antocianinas y vitamina C. Lección viva de patrimonio frutícola colonial y nutrición funcional: enseña a niñas y niños que la mora de árbol colombiana es superfruta nativa-naturalizada de antioxidantes y que su jugo manchador era usado tradicionalmente como tinta vegetal. Manejo agroecológico: poda fuerte invernal de renovación, distancia 6×6 m (278 árboles/ha), prácticamente no requiere fertilización (rústica), cosecha extendida 6-8 semanas con caída natural al suelo (recolectar con malla bajo el árbol), control de Drosophila suzukii con trampas vinagre-azúcar, manejo casi nulo de enfermedades. Asocios: tagasaste cortavientos, gallinas en pradera bajo el árbol que comen frutas caídas (sinergia avícola), café variedades de sombra parcial en zona templada. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Pérez-Arbeláez 1947 Plantas Útiles, AGROSAVIA Manual Frutales Tropicales.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.387Z"
+}
