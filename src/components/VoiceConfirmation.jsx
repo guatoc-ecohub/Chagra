@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Check, X, Trash2, AlertTriangle, Wand2 } from 'lucide-react';
+import { Check, X, Trash2, AlertTriangle, Wand2, Sprout, FlaskConical, Ban } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import { FARM_CONFIG } from '../config/defaults';
 import { CROP_TAXONOMY } from '../config/taxonomy';
@@ -120,6 +120,10 @@ export default function VoiceConfirmation({
         locationType: resolvedLoc?.type || 'asset--land',
         locationMatchedName: resolvedLoc?.matchedName || null,
         locationScore: resolvedLoc?.score || null,
+        // Insights del RAG post-extracción (audit 2026-05-18). Opcional: si
+        // el RAG no encontró hits o el corpus está cold, queda null y la UI
+        // omite la sección. Ver voiceRagEnricher.js.
+        ragInsights: e._ragInsights || null,
       };
     })
   );
@@ -150,6 +154,11 @@ export default function VoiceConfirmation({
         locationType: source.locationType || 'asset--land',
         locationMatchedName: source.locationMatchedName || null,
         locationScore: source.locationScore || null,
+        // Rows agregadas por sugerencia de compañeros no traen pre-fetch
+        // del RAG; la pantalla solo muestra ragInsights para las extraídas
+        // por el LLM. Si en el futuro se requiere, se puede invocar
+        // enrichEntity(name) on-demand aquí.
+        ragInsights: null,
       },
     ]);
   };
@@ -311,6 +320,75 @@ export default function VoiceConfirmation({
               </div>
             );
           })()}
+
+          {/* Insights RAG post-extracción (audit 2026-05-18). Renderiza
+              companions/antagonists/biopreparados/warnings extraídos del
+              corpus en public/cycle-content/ vía voiceRagEnricher. Si
+              ragInsights es null (RAG cold, sin hits, o sección sin datos),
+              esta sección no se muestra — degrade gracefully. */}
+          {row.ragInsights && (
+            <div className="mt-2 pt-3 border-t border-slate-800 flex flex-col gap-2">
+              <p className="text-2xs uppercase font-bold text-slate-500 flex items-center gap-1">
+                <Sprout size={11} className="text-emerald-400" />
+                Catálogo dice
+                {row.ragInsights.sourceSlug && (
+                  <span className="normal-case font-mono text-slate-600 text-2xs">
+                    · {row.ragInsights.sourceSlug}
+                  </span>
+                )}
+              </p>
+
+              {row.ragInsights.invasive && (
+                <div className="bg-red-900/30 border border-red-800/60 rounded-lg p-2 text-xs text-red-200 flex items-start gap-2">
+                  <AlertTriangle size={14} className="text-red-400 shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="font-bold">Especie marcada invasora</p>
+                    {row.ragInsights.warnings.map((w, wi) => (
+                      <p key={wi} className="text-2xs mt-0.5 text-red-300/90">{w}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {row.ragInsights.companions.length > 0 && (
+                <div className="text-xs text-emerald-200/90">
+                  <span className="font-bold inline-flex items-center gap-1">
+                    <Sprout size={12} className="text-emerald-400" /> Va bien con:
+                  </span>{' '}
+                  <span className="text-slate-300">
+                    {row.ragInsights.companions.slice(0, 4).map((c) => c.especie).join(', ')}
+                  </span>
+                </div>
+              )}
+
+              {row.ragInsights.antagonists.length > 0 && (
+                <div className="text-xs text-amber-200/90">
+                  <span className="font-bold inline-flex items-center gap-1">
+                    <Ban size={12} className="text-amber-400" /> Evitar junto a:
+                  </span>{' '}
+                  <span className="text-slate-300">
+                    {row.ragInsights.antagonists.slice(0, 4).map((a) => a.especie).join(', ')}
+                  </span>
+                </div>
+              )}
+
+              {row.ragInsights.biopreparados.length > 0 && (
+                <div className="text-xs text-sky-200/90">
+                  <span className="font-bold inline-flex items-center gap-1">
+                    <FlaskConical size={12} className="text-sky-400" /> Plan típico:
+                  </span>
+                  <ul className="mt-1 ml-4 list-disc text-2xs text-slate-300 space-y-0.5">
+                    {row.ragInsights.biopreparados.slice(0, 4).map((b, bi) => (
+                      <li key={bi}>
+                        <span className="text-slate-200">{b.nombre}</span>
+                        {b.uso && <span className="text-slate-400"> — {b.uso}</span>}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Compañeros sugeridos (motor de gremios). Solo aparece cuando
               la especie matcheo contra CROP_TAXONOMY (cropSlug presente),
