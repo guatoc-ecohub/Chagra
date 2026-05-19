@@ -182,7 +182,7 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
             TelemetryAlerts se mueve más abajo (problemas técnicos visibles
             pero no como hero). */}
         <ErrorBoundary>
-          <WelcomeStatsHero />
+          <WelcomeStatsHero mode="post-login" onNavigate={onNavigate} />
         </ErrorBoundary>
 
         {plantsCount === 0 && (
