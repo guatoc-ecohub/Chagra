@@ -1,4 +1,5 @@
 import { CROP_TAXONOMY } from '../config/taxonomy';
+import { recordRagEvent } from './ragTelemetry';
 
 const CORPUS_PATH = '/cycle-content/';
 
@@ -142,28 +143,75 @@ async function loadCorpus() {
 }
 
 /**
+ * Implementación interna del retrieve BM25. Separada de `retrieve` para que
+ * el wrapper de telemetría pueda medir latencia sin contaminar la lógica
+ * de scoring.
+ */
+async function retrieveInternal(query, topK) {
+  const { docs, idf } = await loadCorpus();
+  const queryTerms = tokenize(query);
+
+  if (queryTerms.length === 0) return [];
+
+  const scored = docs.map((doc) => ({
+    ...doc,
+    score: scoreBM25(doc, queryTerms, idf, avgDocLen),
+  }));
+
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, topK).filter((d) => d.score > 0);
+}
+
+/**
  * Recupera los top-K passages más relevantes al query usando BM25.
+ *
+ * @param {string} query - texto a buscar (se tokeniza con normalización NFD).
+ * @param {number} [topK=5] - cantidad máxima de passages a devolver.
+ * @param {string} [surface='unknown'] - identificador de la pantalla/servicio
+ *   que dispara el RAG, usado solo para telemetría (L1.10). No afecta la
+ *   lógica de scoring ni los resultados. Valores convenidos: 'agente',
+ *   'foliage', 'voice', 'species'. Si no se pasa, default `'unknown'`.
  *
  * @returns {Promise<Array>} top-K passages con score>0, o [] si falla la carga
  *   del corpus (caller debe tratar [] como "sin contexto RAG disponible").
  */
-export async function retrieve(query, topK = 5) {
+export async function retrieve(query, topK = 5, surface = 'unknown') {
+  const startedAt = (typeof performance !== 'undefined' && performance.now)
+    ? performance.now()
+    : Date.now();
+  let results = [];
+  let errorKind = null;
   try {
-    const { docs, idf } = await loadCorpus();
-    const queryTerms = tokenize(query);
-
-    if (queryTerms.length === 0) return [];
-
-    const scored = docs.map((doc) => ({
-      ...doc,
-      score: scoreBM25(doc, queryTerms, idf, avgDocLen),
-    }));
-
-    scored.sort((a, b) => b.score - a.score);
-    return scored.slice(0, topK).filter((d) => d.score > 0);
+    results = await retrieveInternal(query, topK);
+    return results;
   } catch (err) {
+    errorKind = 'unknown';
     console.error('[RAG] retrieve failed, returning empty result:', err);
-    return [];
+    results = [];
+    return results;
+  } finally {
+    // Telemetría: nunca debe romper el camino feliz. recordRagEvent ya falla
+    // silente, pero envolvemos en try/catch defensivo por si alguien
+    // monkey-patchea el módulo.
+    try {
+      const endedAt = (typeof performance !== 'undefined' && performance.now)
+        ? performance.now()
+        : Date.now();
+      const latencyMs = endedAt - startedAt;
+      const topScore = results.length > 0 && typeof results[0].score === 'number'
+        ? results[0].score
+        : null;
+      // No await: fire-and-forget. La promesa que retorna recordRagEvent ya
+      // captura su propio error.
+      recordRagEvent({
+        surface,
+        query: typeof query === 'string' ? query : String(query ?? ''),
+        topScore,
+        latencyMs,
+        resultCount: results.length,
+        error: errorKind,
+      });
+    } catch (_) { /* noop — telemetría nunca rompe la UX */ }
   }
 }
 

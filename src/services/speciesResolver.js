@@ -116,7 +116,7 @@ export async function resolveSpecies(name, opts = {}) {
   //    species_slug (cada passage trae su slug).
   let scoredPassages;
   try {
-    scoredPassages = await retrieve(name, ragTopK);
+    scoredPassages = await retrieve(name, ragTopK, 'species');
   } catch (e) {
     console.warn('[speciesResolver] RAG falló:', e?.message || e);
     return null;

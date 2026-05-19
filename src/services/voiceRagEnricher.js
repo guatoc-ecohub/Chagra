@@ -186,7 +186,7 @@ export async function enrichEntity(entity) {
 
   let hits = [];
   try {
-    hits = await retrieve(query, 6);
+    hits = await retrieve(query, 6, 'voice');
   } catch (err) {
     console.warn('[voiceRagEnricher] retrieve failed:', err);
     return null;
