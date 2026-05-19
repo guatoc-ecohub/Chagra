@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, Trash2, RefreshCw, Building2, Leaf, Search, WifiOff, TreePine, Map as MapIcon, List } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, RefreshCw, Building2, Leaf, Search, WifiOff, TreePine, Map as MapIcon, List, Sprout, FlaskConical, Ban, AlertTriangle } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import { Virtuoso } from 'react-virtuoso';
 import { fetchFromFarmOS } from '../services/apiService';
@@ -17,6 +17,7 @@ import { useGeolocation } from '../hooks/useGeolocation';
 import { usePhotoUrl } from '../hooks/usePhotoUrl';
 import { findBiopreparadosByIngredient } from '../db/catalogDB';
 import { generatePlanForPlant } from '../services/planGeneratorService';
+import { enrichEntity } from '../services/voiceRagEnricher';
 import { getAccessToken } from '../services/authService';
 import { useFincaActiveStore } from '../services/fincaActiveStore';
 import { savePhoto } from '../services/photoService';
@@ -312,6 +313,36 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
   const [showForm, setShowForm] = useState(initialShowForm);
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState(buildInitialFormState);
+
+  // Insights RAG del manual plant form (paridad con VoiceConfirmation, audit
+  // 2026-05-19). Cuando el operador selecciona una species real del catálogo
+  // (speciesId != null), enriquece async vía voiceRagEnricher para mostrar
+  // companions/antagonists/biopreparados/warnings. Si la entrada es libre
+  // (sin speciesId), no se dispara. Errores silenciosos por diseño.
+  const [ragInsights, setRagInsights] = useState(null);
+  const [ragLoading, setRagLoading] = useState(false);
+  useEffect(() => {
+    if (!formData.speciesId || !formData.name) {
+      setRagInsights(null);
+      setRagLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setRagLoading(true);
+    (async () => {
+      try {
+        const insights = await enrichEntity({ crop: formData.name });
+        if (cancelled) return;
+        setRagInsights(insights || null);
+      } catch (err) {
+        if (!cancelled) setRagInsights(null);
+        console.warn('[AssetsDashboard] RAG enrich failed:', err);
+      } finally {
+        if (!cancelled) setRagLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [formData.speciesId, formData.name]);
 
   // Bug 2026-05-18 operator: 'agregué 50 plantas dentro de Túnel +100 especies
   // y siguen sin aparecer ahí'. Causa: si el operador navega DENTRO de una
@@ -780,6 +811,80 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
       {formData.photoBlob && (
         <p className="text-[10px] text-emerald-400 -mt-2 px-1">
           Foto adjunta — se guardará junto a la siembra.
+        </p>
+      )}
+
+      {/* Insights RAG del manual plant form (paridad con VoiceConfirmation,
+          audit 2026-05-19). Solo aparece cuando el operador seleccionó una
+          especie del catálogo (speciesId != null) y el enricher devolvió
+          datos. Degrade gracefully: si falla o no hay coincidencia, no se
+          muestra nada. */}
+      {formData.speciesId && ragInsights && (
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
+          <p className="text-2xs uppercase font-bold text-slate-500 flex items-center gap-1">
+            <Sprout size={11} className="text-emerald-400" />
+            Catálogo dice
+            {ragInsights.sourceSlug && (
+              <span className="normal-case font-mono text-slate-600 text-2xs">
+                · {ragInsights.sourceSlug}
+              </span>
+            )}
+          </p>
+
+          {ragInsights.invasive && (
+            <div className="bg-red-900/30 border border-red-800/60 rounded-lg p-2 text-xs text-red-200 flex items-start gap-2">
+              <AlertTriangle size={14} className="text-red-400 shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="font-bold">Especie marcada invasora</p>
+                {ragInsights.warnings.map((w, wi) => (
+                  <p key={wi} className="text-2xs mt-0.5 text-red-300/90">{w}</p>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {ragInsights.companions.length > 0 && (
+            <div className="text-xs text-emerald-200/90">
+              <span className="font-bold inline-flex items-center gap-1">
+                <Sprout size={12} className="text-emerald-400" /> Va bien con:
+              </span>{' '}
+              <span className="text-slate-300">
+                {ragInsights.companions.slice(0, 4).map((c) => c.especie).join(', ')}
+              </span>
+            </div>
+          )}
+
+          {ragInsights.antagonists.length > 0 && (
+            <div className="text-xs text-amber-200/90">
+              <span className="font-bold inline-flex items-center gap-1">
+                <Ban size={12} className="text-amber-400" /> Evitar junto a:
+              </span>{' '}
+              <span className="text-slate-300">
+                {ragInsights.antagonists.slice(0, 4).map((a) => a.especie).join(', ')}
+              </span>
+            </div>
+          )}
+
+          {ragInsights.biopreparados.length > 0 && (
+            <div className="text-xs text-sky-200/90">
+              <span className="font-bold inline-flex items-center gap-1">
+                <FlaskConical size={12} className="text-sky-400" /> Plan típico:
+              </span>
+              <ul className="mt-1 ml-4 list-disc text-2xs text-slate-300 space-y-0.5">
+                {ragInsights.biopreparados.slice(0, 4).map((b, bi) => (
+                  <li key={bi}>
+                    <span className="text-slate-200">{b.nombre}</span>
+                    {b.uso && <span className="text-slate-400"> — {b.uso}</span>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+      {formData.speciesId && ragLoading && !ragInsights && (
+        <p className="text-[10px] text-slate-500 -mt-1 px-1">
+          Consultando catálogo agroecológico…
         </p>
       )}
 
