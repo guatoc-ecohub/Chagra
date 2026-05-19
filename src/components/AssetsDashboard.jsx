@@ -21,6 +21,7 @@ import { getAccessToken } from '../services/authService';
 import { useFincaActiveStore } from '../services/fincaActiveStore';
 import { savePhoto } from '../services/photoService';
 import { wktToGeoJson } from '../utils/geo';
+import { buildPlantMeta, formatPlantMetaFallbackLine, ETAPA_FENOLOGICA_OPTIONS } from '../utils/plantMeta';
 import MultiFincaModal from './MultiFincaModal';
 
 // Note: fincaNombre constant removed. Now derived from useFincaActiveStore inside the component.
@@ -85,6 +86,11 @@ const GREMIO_OPTIONS = [
   { value: 'productor_biomasa', label: 'Productor de biomasa' },
   { value: 'productivo_principal', label: 'Productivo principal' },
 ];
+
+// Audit finding 070.3 (2026-05-18): los helpers buildPlantMeta /
+// formatPlantMetaFallbackLine y las opciones ETAPA_FENOLOGICA_OPTIONS
+// viven en src/utils/plantMeta.js para mantener este componente liviano
+// y permitir tests unitarios sin cargar todo el árbol de imports JSX.
 
 // Lili #111 #112 #114, clarificar tabs:
 // - 'Zonas' (land): áreas geográficas con polígono, tab mantenida con
@@ -243,6 +249,13 @@ const INITIAL_FORM_STATE = {
   // El blob comprimido viaja en el form state hasta handleSave, donde
   // se persiste en media_cache (IndexedDB) atado al assetId recién creado.
   photoBlob: null,
+  // Audit finding 070.3 (2026-05-18): estado actual de la planta opcional
+  // (sembrada hace tiempo / altura conocida / etapa fenológica). Se persiste
+  // en attributes._chagra_plant_meta (JSON) o, como fallback, dentro de
+  // attributes.notes serializado para no romper el schema FarmOS.
+  fechaGerminacion: '',  // yyyy-mm-dd (input type=date)
+  alturaCm: '',          // string numérica (input type=number)
+  etapaFenologica: '',   // '' | 'semillero' | 'vegetativo' | 'floracion' | ...
 };
 
 const buildInitialFormState = () => ({
@@ -505,6 +518,30 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
       baseAttributes.land_type = formData.landType;
     }
 
+    // Audit finding 070.3 (2026-05-18): persistir estado actual de la planta
+    // (fecha siembra/germinación, altura, etapa fenológica) cuando el
+    // operador llena la sección colapsable opcional. Se guarda en
+    // attributes._chagra_plant_meta (objeto JSON) — campo namespaced para
+    // no chocar con el schema oficial FarmOS. Fallback: si _chagra_plant_meta
+    // termina siendo ignorado por el server, también se serializa una línea
+    // legible al final de attributes.notes para no perder la información.
+    const plantMeta = activeTab === 'plant' ? buildPlantMeta(formData) : null;
+    if (plantMeta) {
+      baseAttributes._chagra_plant_meta = plantMeta;
+      // Fallback notes: agrega una línea legible solo si NO está ya
+      // contenida (evita duplicado en re-renders u optimistic UI).
+      const metaLine = formatPlantMetaFallbackLine(plantMeta);
+      if (metaLine) {
+        const existingNotes = baseAttributes.notes;
+        const existingText = existingNotes
+          ? (typeof existingNotes === 'string' ? existingNotes : existingNotes.value || '')
+          : '';
+        if (!existingText.includes(metaLine)) {
+          baseAttributes.notes = existingText ? `${existingText}\n${metaLine}` : metaLine;
+        }
+      }
+    }
+
     // Relaciones compartidas (location + parent + plant_type)
     let baseRels = null;
     if (activeTab !== 'material') {
@@ -623,10 +660,16 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
           })
           .catch((err) => console.warn('[AssetsDashboard] biopreparado suggestion failed:', err));
       } else if (activeTab === 'plant' && formData.speciesId) {
+        // Audit finding 070.3 (2026-05-18): si el operador declaró fecha de
+        // siembra/germinación, anclamos el plan a esa fecha (los offsets se
+        // calculan retro/prospectivamente desde ahí). Caso por defecto: hoy.
+        const plantingDateIso = formData.fechaGerminacion
+          ? new Date(formData.fechaGerminacion).toISOString()
+          : new Date().toISOString();
         generatePlanForPlant({
           assetId: assetUUIDs[0],
           speciesSlug: formData.speciesId,
-          plantingDate: new Date().toISOString(),
+          plantingDate: plantingDateIso,
         }).then((plan) => {
           if (plan?.steps?.length > 0) {
             window.dispatchEvent(new CustomEvent('chagraToast', {
@@ -856,6 +899,96 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
         rows="2"
         className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm min-h-[56px]"
       />
+
+      {/*
+        Audit finding 070.3 (2026-05-18): sección colapsable opcional para
+        registrar el estado actual de la planta. Aplica tanto a siembras
+        nuevas (default = hoy) como a plantas que el operador inscribe en
+        Chagra después de haberlas sembrado hace tiempo. Persiste en
+        attributes._chagra_plant_meta + fallback en notes (ver handleSave).
+        Default colapsado para no saturar el flujo rápido de siembra.
+      */}
+      <details className="rounded-xl bg-slate-900 border border-slate-700">
+        <summary
+          className="cursor-pointer p-3 flex items-center gap-2 hover:bg-slate-800/60 active:bg-slate-800 rounded-xl min-h-[48px]"
+          data-testid="plant-meta-toggle"
+        >
+          <span className="text-xs uppercase tracking-wider text-slate-400 font-bold flex-1 text-left">
+            Estado actual de la planta (opcional)
+          </span>
+          <span className="text-[10px] text-slate-500">Tóquelo para abrir</span>
+        </summary>
+        <div className="p-3 space-y-3 border-t border-slate-800">
+          {/* Fecha de siembra/germinación */}
+          <div className="space-y-1.5">
+            <label
+              htmlFor="plant-fecha-germinacion"
+              className="text-xs font-bold text-slate-400 uppercase tracking-wider"
+            >
+              Fecha de siembra/germinación (opcional)
+            </label>
+            <input
+              id="plant-fecha-germinacion"
+              name="fecha_germinacion"
+              type="date"
+              value={formData.fechaGerminacion}
+              onChange={(e) => setFormData({ ...formData, fechaGerminacion: e.target.value })}
+              className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white min-h-[48px]"
+            />
+            <p className="text-[10px] text-slate-500 leading-snug">
+              Si la planta lleva tiempo en la chagra, ponga la fecha real para que el plan de
+              alimentación calcule los pasos desde esa fecha.
+            </p>
+          </div>
+
+          {/* Altura actual en cm */}
+          <div className="space-y-1.5">
+            <label
+              htmlFor="plant-altura-cm"
+              className="text-xs font-bold text-slate-400 uppercase tracking-wider"
+            >
+              Altura actual (cm, opcional)
+            </label>
+            <input
+              id="plant-altura-cm"
+              name="altura_cm"
+              type="number"
+              inputMode="numeric"
+              min="0"
+              max="2000"
+              step="1"
+              value={formData.alturaCm}
+              onChange={(e) => setFormData({ ...formData, alturaCm: e.target.value })}
+              placeholder="Ej: 35"
+              className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white min-h-[48px]"
+            />
+          </div>
+
+          {/* Etapa fenológica */}
+          <div className="space-y-1.5">
+            <label
+              htmlFor="plant-etapa-fenologica"
+              className="text-xs font-bold text-slate-400 uppercase tracking-wider"
+            >
+              Etapa fenológica (opcional)
+            </label>
+            <select
+              id="plant-etapa-fenologica"
+              name="etapa_fenologica"
+              value={formData.etapaFenologica}
+              onChange={(e) => setFormData({ ...formData, etapaFenologica: e.target.value })}
+              className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white min-h-[48px] focus:ring-lime-500 focus:border-lime-500"
+            >
+              <option value="">— Sin definir —</option>
+              {ETAPA_FENOLOGICA_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </details>
 
       {/* Geometría (POINT para frutales dispersos) */}
       {renderGeometryField('point')}

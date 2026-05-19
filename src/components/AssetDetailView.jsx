@@ -14,6 +14,7 @@ import { proximityCheck, findNearestLand, checkInvasiveProximity, getCoords } fr
 import { ExternalAiButton } from './common/ExternalAiButton';
 import { buildOpenExternalPrompt } from '../services/externalAiPromptBuilder';
 import { listUserPhotosBySpecies, captureAndCompress, savePhoto } from '../services/photoService';
+import { ETAPA_FENOLOGICA_LABELS } from '../utils/plantMeta';
 
 // Derive speciesSlug from asset name.
 function deriveSpeciesSlug(name) {
@@ -124,6 +125,51 @@ function SpeciesPhotoGallery({ speciesSlug, currentAssetId }) {
     </div>
   );
 }
+
+// Audit finding 070.3 (2026-05-18): muestra el estado actual de la planta
+// (fecha de siembra/germinación, altura, etapa fenológica) cuando AssetsDashboard
+// los persistió en attributes._chagra_plant_meta. Renderiza nada si no hay
+// metadata — permite siembras rápidas sin saturar la vista.
+const formatDaysAgo = (isoDate) => {
+  if (!isoDate) return null;
+  const t = new Date(isoDate).getTime();
+  if (!Number.isFinite(t)) return null;
+  const diffMs = Date.now() - t;
+  if (diffMs < 0) return 'Programada a futuro';
+  const days = Math.floor(diffMs / 86400000);
+  if (days === 0) return 'Sembrada hoy';
+  if (days === 1) return 'Sembrada hace 1 día';
+  return `Sembrada hace ${days} días`;
+};
+
+const PlantMetaPanel = ({ asset }) => {
+  const meta = asset?.attributes?._chagra_plant_meta;
+  if (!meta || typeof meta !== 'object') return null;
+
+  const fechaLabel = formatDaysAgo(meta.fecha_germinacion);
+  const alturaLabel =
+    meta.altura_cm != null && Number.isFinite(Number(meta.altura_cm))
+      ? `Altura: ${Number(meta.altura_cm)} cm`
+      : null;
+  const etapaRaw = meta.etapa_fenologica;
+  const etapaLabel = etapaRaw ? `Etapa: ${ETAPA_FENOLOGICA_LABELS[etapaRaw] || etapaRaw}` : null;
+
+  if (!fechaLabel && !alturaLabel && !etapaLabel) return null;
+
+  return (
+    <section
+      data-testid="plant-meta-panel"
+      className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50 space-y-2"
+    >
+      <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Estado actual</h3>
+      <ul className="space-y-1 text-sm text-white">
+        {fechaLabel && <li>{fechaLabel}</li>}
+        {alturaLabel && <li>{alturaLabel}</li>}
+        {etapaLabel && <li>{etapaLabel}</li>}
+      </ul>
+    </section>
+  );
+};
 
 // Bio-efficiency metrics panel.
 const PerformancePanel = ({ assetId }) => {
@@ -253,6 +299,7 @@ export const AssetDetailView = () => {
 
           {isPlantType && (
             <>
+              <PlantMetaPanel asset={asset} />
               <PerformancePanel assetId={asset.id} />
               <section>
                 <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 px-1">Acciones de Campo</h3>

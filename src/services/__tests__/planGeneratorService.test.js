@@ -119,3 +119,129 @@ describe('tryGeneratePlanFromSeeding — helper compartido (audit finding #2)', 
         expect(inMemoryPlansById.size).toBe(1);
     });
 });
+
+// ─── generatePlanForPlant — plantingDate custom (audit finding 070.3, 2026-05-18) ─────
+// Verifica que cuando el form pasa fechaGerminacion (operador inscribió una
+// planta que lleva tiempo sembrada), los offsets del template se calculan
+// desde esa fecha y no desde Date.now(). Backward-compat: si no se pasa
+// plantingDate, debe seguir anclando a Date.now() sin romper.
+describe('generatePlanForPlant — plantingDate custom (audit finding 070.3)', () => {
+    const PLANT_UUID_2 = 'cccccccc-dddd-eeee-ffff-000000000000';
+    let generatePlanForPlant;
+    let inMemoryPlansById;
+
+    beforeEach(async () => {
+        vi.resetModules();
+        vi.clearAllMocks();
+
+        inMemoryPlansById = new Map();
+
+        const stubStore = {
+            put: (plan) => {
+                const req = { onsuccess: null, onerror: null };
+                Promise.resolve().then(() => {
+                    inMemoryPlansById.set(plan.id, plan);
+                    req.result = plan;
+                    req.onsuccess?.({ target: req });
+                });
+                return req;
+            },
+            index: () => ({
+                getAll: () => {
+                    const req = { onsuccess: null, onerror: null };
+                    Promise.resolve().then(() => {
+                        req.result = [];
+                        req.onsuccess?.({ target: req });
+                    });
+                    return req;
+                },
+            }),
+        };
+        const stubDb = { transaction: () => ({ objectStore: () => stubStore }) };
+
+        vi.doMock('../../db/dbCore.js', () => ({
+            openDB: vi.fn().mockResolvedValue(stubDb),
+            STORES: { PLANS: 'plans' },
+        }));
+        vi.doMock('../inventoryService.js', () => ({
+            appendEvent: vi.fn(),
+            getStock: vi.fn().mockResolvedValue(null),
+        }));
+        vi.doMock('../inventoryEvents.js', () => ({
+            createInventoryEvent: vi.fn(),
+            EVENT_TYPES: {},
+        }));
+        vi.doMock('../../db/catalogDB.js', () => ({
+            initCatalog: vi.fn().mockResolvedValue({
+                exec: () => [{
+                    data: JSON.stringify({
+                        id: 'tomate',
+                        feeding_plan_template: {
+                            primary_steps: [
+                                { offset_days: 0, action: 'apply_biofertilizer', biofertilizer_slug: 'humus', dose_ml: 100, notes: 'siembra' },
+                                { offset_days: 30, action: 'apply_biofertilizer', biofertilizer_slug: 'humus', dose_ml: 100, notes: 'mes 1' },
+                                { offset_days: 60, action: 'apply_biofertilizer', biofertilizer_slug: 'humus', dose_ml: 100, notes: 'mes 2' },
+                            ],
+                        },
+                    }),
+                }],
+            }),
+        }));
+
+        ({ generatePlanForPlant } = await import('../planGeneratorService.js'));
+    });
+
+    it('plantingDate custom: ancla offsets desde la fecha pasada (NO Date.now())', async () => {
+        // 2024-03-15 00:00 UTC — fecha conocida claramente anterior a Date.now().
+        const plantingIso = '2024-03-15T00:00:00.000Z';
+        const plantingTs = new Date(plantingIso).getTime();
+
+        const plan = await generatePlanForPlant({
+            assetId: PLANT_UUID_2,
+            speciesSlug: 'tomate',
+            plantingDate: plantingIso,
+        });
+
+        expect(plan).toBeTruthy();
+        expect(plan.steps).toHaveLength(3);
+
+        // Step 0: offset_days=0 → scheduled = plantingTs.
+        expect(plan.steps[0].scheduled_date).toBe(plantingTs);
+        // Step 1: offset_days=30 → scheduled = plantingTs + 30d.
+        expect(plan.steps[1].scheduled_date).toBe(plantingTs + 30 * 86400000);
+        // Step 2: offset_days=60 → scheduled = plantingTs + 60d.
+        expect(plan.steps[2].scheduled_date).toBe(plantingTs + 60 * 86400000);
+    });
+
+    it('plantingDate omitido: fallback a Date.now() (backward-compat)', async () => {
+        const before = Date.now();
+        const plan = await generatePlanForPlant({
+            assetId: PLANT_UUID_2,
+            speciesSlug: 'tomate',
+            // plantingDate intencionalmente omitido
+        });
+        const after = Date.now();
+
+        expect(plan).toBeTruthy();
+        // El step 0 (offset_days=0) debe quedar entre before y after — anclado
+        // a Date.now() interno, no a NaN ni a un valor del pasado lejano.
+        expect(plan.steps[0].scheduled_date).toBeGreaterThanOrEqual(before);
+        expect(plan.steps[0].scheduled_date).toBeLessThanOrEqual(after);
+    });
+
+    it('plantingDate inválido (string basura): fallback a Date.now() sin throw', async () => {
+        const before = Date.now();
+        const plan = await generatePlanForPlant({
+            assetId: PLANT_UUID_2,
+            speciesSlug: 'tomate',
+            plantingDate: 'no-es-una-fecha',
+        });
+        const after = Date.now();
+
+        expect(plan).toBeTruthy();
+        // Verifica que no quedó NaN (NaN no es ≥ before).
+        expect(Number.isFinite(plan.steps[0].scheduled_date)).toBe(true);
+        expect(plan.steps[0].scheduled_date).toBeGreaterThanOrEqual(before);
+        expect(plan.steps[0].scheduled_date).toBeLessThanOrEqual(after);
+    });
+});

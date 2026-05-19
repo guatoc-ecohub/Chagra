@@ -191,7 +191,13 @@ export async function generatePlanForPlant({ assetId, speciesSlug, plantingDate,
 
     const planId = ulid();
     const generatedAt = Date.now();
-    const pDate = new Date(plantingDate).getTime();
+    // Audit finding 070.3 (2026-05-18): aceptar plantingDate opcional.
+    // Backward-compat: si no se pasa o no parsea, anclamos los offsets a
+    // Date.now() (comportamiento previo). Si SÍ se pasa (form llenó
+    // fechaGerminacion), los offsets se calculan desde esa fecha — útil
+    // para inscribir plantas ya sembradas hace tiempo.
+    let pDate = plantingDate ? new Date(plantingDate).getTime() : NaN;
+    if (!Number.isFinite(pDate)) pDate = Date.now();
 
     // Default to 'huerto_casero' or whichever has notes
     let scaleNotes = '';
