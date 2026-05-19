@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 // Audit 070.5 + 070.6 — tests del selector plant opcional y el bridge
 // case_study en severidad high/critical.
@@ -45,6 +45,13 @@ if (typeof globalThis.crypto?.randomUUID !== 'function') {
     randomUUID: () => 'uuid-test-stub',
   };
 }
+
+// L1.5 — mock ragRetriever.retrieve para no tocar el corpus real durante los
+// tests unitarios. Default empty; se sobrescribe per-test cuando hace falta.
+const ragRetrieveMock = vi.fn().mockResolvedValue([]);
+vi.mock('../../services/ragRetriever', () => ({
+  retrieve: (...args) => ragRetrieveMock(...args),
+}));
 
 import ObservationScreen from '../ObservationScreen';
 import { getParentLandIdFromAsset } from '../../utils/assetRelationships';
@@ -251,5 +258,166 @@ describe('ObservationScreen — audit 070.6 bridge case_study', () => {
     const rels = callArg.payload.data.relationships;
     expect(rels.location.data[0]).toEqual({ type: 'asset--land', id: 'land-2' });
     expect(rels.asset).toBeUndefined();
+  });
+});
+
+// L1.5 — sugerencias RAG de tratamientos. Verifica:
+//   1. Debounce ≥3s antes de invocar retrieve().
+//   2. Severity info/low NO disparan retrieve.
+//   3. Render condicional: solo si hay resultados con score>0.
+//   4. Falla graceful: retrieve throws → sección no se renderiza.
+describe('ObservationScreen — L1.5 sugerencias RAG de tratamientos', () => {
+  beforeEach(() => {
+    saveTransactionMock.mockClear();
+    ragRetrieveMock.mockClear();
+    ragRetrieveMock.mockResolvedValue([]);
+    resetCaseStore();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+  });
+
+  afterEach(() => {
+    // Limpiar fake timers para no contaminar otros describes que asumen
+    // timers reales (caso bridge usa setTimeout legítimo).
+    vi.useRealTimers();
+  });
+
+  // Usamos act+advanceTimersByTimeAsync para el debounce de 3s.
+
+  const seedDescriptionAndSeverity = (description, severity) => {
+    fireEvent.change(screen.getByPlaceholderText(/Describe la observacion/i), {
+      target: { value: description },
+    });
+    const severitySelect = screen.getAllByRole('combobox').find((s) => s.name === 'severity');
+    fireEvent.change(severitySelect, { target: { value: severity } });
+  };
+
+  it('NO llama retrieve antes de los 3s de debounce', async () => {
+    render(<ObservationScreen onBack={vi.fn()} onSave={vi.fn()} />);
+    seedDescriptionAndSeverity('Hojas con manchas oscuras tipo antracnosis', 'medium');
+
+    // Antes del debounce: NO se invocó retrieve aún.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2000);
+    });
+    expect(ragRetrieveMock).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('rag-treatment-suggestions')).toBeNull();
+  });
+
+  it('llama retrieve después de 3s con severity=medium y descripción válida', async () => {
+    ragRetrieveMock.mockResolvedValue([
+      { species: 'phaseolus_vulgaris', key: 'pest', text: 'Antracnosis foliar — aplicar caldo bordelés cada 7 días en follaje seco.', score: 4.2 },
+      { species: 'lycopersicon_esculentum', key: 'biocontrol', text: 'Bacillus subtilis foliar previene establecimiento de Colletotrichum y otros hongos.', score: 3.1 },
+    ]);
+
+    render(<ObservationScreen onBack={vi.fn()} onSave={vi.fn()} />);
+    seedDescriptionAndSeverity('Hojas con manchas oscuras tipo antracnosis', 'medium');
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(3100);
+    });
+
+    await waitFor(() => expect(ragRetrieveMock).toHaveBeenCalledTimes(1));
+    expect(ragRetrieveMock.mock.calls[0][0]).toMatch(/antracnosis/i);
+    expect(ragRetrieveMock.mock.calls[0][1]).toBe(5);
+
+    await waitFor(() =>
+      expect(screen.getByTestId('rag-treatment-suggestions')).toBeTruthy()
+    );
+    const items = screen.getAllByTestId('rag-suggestion-item');
+    expect(items.length).toBe(2);
+    expect(screen.getByText(/caldo bordelés/i)).toBeTruthy();
+  });
+
+  it('severity=info NO dispara retrieve aunque pasen 3s', async () => {
+    render(<ObservationScreen onBack={vi.fn()} onSave={vi.fn()} />);
+    seedDescriptionAndSeverity('Observación rutinaria sin anomalías', 'info');
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(4000);
+    });
+    expect(ragRetrieveMock).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('rag-treatment-suggestions')).toBeNull();
+  });
+
+  it('descripción demasiado corta NO dispara retrieve aunque severity sea high', async () => {
+    render(<ObservationScreen onBack={vi.fn()} onSave={vi.fn()} />);
+    seedDescriptionAndSeverity('ok', 'high');
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(4000);
+    });
+    expect(ragRetrieveMock).not.toHaveBeenCalled();
+  });
+
+  it('retrieve devuelve [] → sección NO se renderiza (graceful empty)', async () => {
+    ragRetrieveMock.mockResolvedValue([]);
+    render(<ObservationScreen onBack={vi.fn()} onSave={vi.fn()} />);
+    seedDescriptionAndSeverity('Marchitez súbita en plántulas jóvenes', 'high');
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(3100);
+    });
+
+    await waitFor(() => expect(ragRetrieveMock).toHaveBeenCalled());
+    expect(screen.queryByTestId('rag-treatment-suggestions')).toBeNull();
+  });
+
+  it('retrieve lanza error → sección NO se renderiza (graceful failure)', async () => {
+    ragRetrieveMock.mockRejectedValue(new Error('corpus offline'));
+    const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(<ObservationScreen onBack={vi.fn()} onSave={vi.fn()} />);
+    seedDescriptionAndSeverity('Defoliación severa en cultivo de tomate', 'critical');
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(3100);
+    });
+
+    await waitFor(() => expect(ragRetrieveMock).toHaveBeenCalled());
+    expect(screen.queryByTestId('rag-treatment-suggestions')).toBeNull();
+    spy.mockRestore();
+  });
+
+  it('cambios rápidos en descripción cancelan retrieve previo (debounce reset)', async () => {
+    ragRetrieveMock.mockResolvedValue([
+      { species: 'capsicum_annuum', key: 'pest', text: 'Pulgones en brotes tiernos — control con extracto de neem y jabón potásico.', score: 5.1 },
+    ]);
+    render(<ObservationScreen onBack={vi.fn()} onSave={vi.fn()} />);
+    seedDescriptionAndSeverity('Manchas en hojas', 'medium');
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1500);
+    });
+    // Reescribimos antes de cumplirse el debounce; debe reiniciar el timer.
+    fireEvent.change(screen.getByPlaceholderText(/Describe la observacion/i), {
+      target: { value: 'Pulgones cubriendo brotes nuevos' },
+    });
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2000);
+    });
+    // Aún no debió pasar el debounce completo desde el cambio.
+    expect(ragRetrieveMock).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1500);
+    });
+    await waitFor(() => expect(ragRetrieveMock).toHaveBeenCalledTimes(1));
+    expect(ragRetrieveMock.mock.calls[0][0]).toMatch(/pulgones/i);
+  });
+
+  it('passage muy largo se trunca con elipsis en el render', async () => {
+    const longText = 'Lorem ipsum dolor sit amet '.repeat(40); // > 220 chars
+    ragRetrieveMock.mockResolvedValue([
+      { species: 'zea_mays', key: 'long_passage', text: longText, score: 2.5 },
+    ]);
+    render(<ObservationScreen onBack={vi.fn()} onSave={vi.fn()} />);
+    seedDescriptionAndSeverity('Plagas múltiples en maíz', 'high');
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(3100);
+    });
+    await waitFor(() => expect(screen.getByTestId('rag-treatment-suggestions')).toBeTruthy());
+    const items = screen.getAllByTestId('rag-suggestion-item');
+    expect(items[0].textContent).toMatch(/…$/);
   });
 });
