@@ -14,6 +14,8 @@ import { proximityCheck, findNearestLand, checkInvasiveProximity, getCoords } fr
 import { ExternalAiButton } from './common/ExternalAiButton';
 import { buildOpenExternalPrompt } from '../services/externalAiPromptBuilder';
 import { listUserPhotosBySpecies, captureAndCompress, savePhoto } from '../services/photoService';
+import PlanEditor from './PlanEditor';
+import { getAllSpecies } from '../db/catalogDB';
 
 // Derive speciesSlug from asset name.
 function deriveSpeciesSlug(name) {
@@ -122,6 +124,85 @@ function SpeciesPhotoGallery({ speciesSlug, currentAssetId }) {
         </div>
       ))}
     </div>
+  );
+}
+
+// Plan de alimentación section: monta PlanEditor cuando la especie tiene
+// feeding_plan_template en el catálogo. Si la especie existe pero NO tiene
+// template (species pre-pipeline o sin curaduría agronómica), muestra un
+// placeholder pidiendo al equipo Chagra que agregue el plan. Audit finding
+// 070.7 (2026-05-18): PlanEditor estaba orphan — la UI existía pero no se
+// montaba en ninguna parte. Esta sección hace el wiring sin tocar la lógica
+// interna de PlanEditor.
+function PlanSection({ assetId, speciesSlug, plantingDate }) {
+  // 'loading' | 'has_template' | 'no_template' | 'no_species'
+  const [status, setStatus] = useState('loading');
+  const [requested, setRequested] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    if (!speciesSlug) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setStatus('no_species');
+      return () => { alive = false; };
+    }
+    (async () => {
+      try {
+        const species = await getAllSpecies();
+        if (!alive) return;
+        const entry = species.find((s) => s.id === speciesSlug);
+        if (!entry) {
+          setStatus('no_species');
+          return;
+        }
+        const hasTpl = !!(entry.feeding_plan_template && entry.feeding_plan_template.primary_steps?.length);
+        setStatus(hasTpl ? 'has_template' : 'no_template');
+      } catch (err) {
+        console.warn('[PlanSection] No se pudo leer el catálogo:', err);
+        if (alive) setStatus('no_template');
+      }
+    })();
+    return () => { alive = false; };
+  }, [speciesSlug]);
+
+  if (status === 'loading') {
+    return (
+      <section className="rounded-xl border border-slate-700/50 bg-slate-800/40 p-4">
+        <p className="text-xs text-slate-500 italic">Cargando plan de alimentación…</p>
+      </section>
+    );
+  }
+
+  if (status === 'no_species' || status === 'no_template') {
+    return (
+      <section className="rounded-xl border border-slate-700/50 bg-slate-800/40 p-4 space-y-3">
+        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Plan de Alimentación</h3>
+        <p className="text-sm text-slate-300">Sin plan disponible para esta especie</p>
+        <button
+          type="button"
+          disabled={requested}
+          onClick={() => setRequested(true)}
+          className="px-3 py-2 rounded-lg bg-amber-700/30 hover:bg-amber-700/50 active:scale-95 text-amber-200 border border-amber-700/40 text-xs font-bold disabled:opacity-60"
+        >
+          {requested ? 'Solicitud anotada' : 'Solicitar al equipo Chagra agregar plan'}
+        </button>
+        {requested && (
+          <p className="text-[11px] text-slate-400 italic">
+            Tu solicitud quedó registrada localmente. Pronto el equipo evaluará agregar el plan al catálogo.
+          </p>
+        )}
+      </section>
+    );
+  }
+
+  return (
+    <section className="rounded-xl border border-slate-700/50 bg-slate-800/40 p-1">
+      <PlanEditor
+        assetId={assetId}
+        speciesSlug={speciesSlug}
+        plantingDate={plantingDate}
+      />
+    </section>
   );
 }
 
@@ -258,6 +339,14 @@ export const AssetDetailView = () => {
                 <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 px-1">Acciones de Campo</h3>
                 <InputLogForm assetId={asset.id} onComplete={() => { }} />
               </section>
+
+              {deriveSpeciesSlug(name) && (
+                <PlanSection
+                  assetId={asset.id}
+                  speciesSlug={deriveSpeciesSlug(name)}
+                  plantingDate={asset.attributes?.created ? asset.attributes.created * 1000 : asset._createdAt || Date.now()}
+                />
+              )}
 
               <section className="pt-2">
                 <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Historial de la planta</h3>
