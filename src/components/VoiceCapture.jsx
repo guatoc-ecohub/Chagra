@@ -3,6 +3,7 @@ import { Mic, MicOff, AlertTriangle, Save, RotateCcw, Ear, BrainCircuit } from '
 import useVoiceRecorder from '../hooks/useVoiceRecorder';
 import { transcribe, queueForRetry } from '../services/voiceService';
 import { extractEntities } from '../services/entityExtractor';
+import { enrichEntitiesWithRag } from '../services/voiceRagEnricher';
 import { syncManager } from '../services/syncManager';
 import { savePayload } from '../services/payloadService';
 import { applyRegionalismOverlay, getRegionFromDepartment } from '../services/regionalismsService';
@@ -177,8 +178,22 @@ export default function VoiceCapture({ onSave }) {
         const extracted = await extractEntities(text, {
           onToken: (_chunk, full) => setLiveStream(full),
         });
-        setEntities(extracted);
-        logVoiceEvent('voice:extraction_done', { entityCount: extracted.length });
+        // Enriquecimiento RAG post-extracción (audit 2026-05-18). No bloqueante
+        // a nivel de error: si falla, las entidades quedan sin _ragInsights y
+        // la UI degrada gracefully.
+        const { entities: enriched, summary } = await enrichEntitiesWithRag(extracted)
+          .catch((err) => {
+            console.warn('[VoiceCapture] enrichEntitiesWithRag failed (reprocess):', err);
+            return { entities: extracted, summary: { enriched: 0, total: extracted.length, slugs: [] } };
+          });
+        setEntities(enriched);
+        logVoiceEvent('voice:extraction_done', { entityCount: enriched.length });
+        logVoiceEvent('voice:rag_enriched', {
+          rag_enriched: summary.enriched > 0,
+          enriched: summary.enriched,
+          total: summary.total,
+          slugs: summary.slugs,
+        });
         recordEvent({
           event_type: 'voice_extraction_success',
           flujo: 'voice_capture',
@@ -243,8 +258,22 @@ export default function VoiceCapture({ onSave }) {
       const extracted = await extractEntities(text, {
         onToken: (_chunk, full) => setLiveStream(full),
       });
-      setEntities(extracted);
-      logVoiceEvent('voice:extraction_done', { entityCount: extracted.length });
+      // Enriquecimiento RAG post-extracción (audit 2026-05-18). Tolerante a
+      // fallas: si el corpus no carga o no hay hits, se devuelven entidades
+      // sin _ragInsights y VoiceConfirmation oculta la sección.
+      const { entities: enriched, summary } = await enrichEntitiesWithRag(extracted)
+        .catch((err) => {
+          console.warn('[VoiceCapture] enrichEntitiesWithRag failed:', err);
+          return { entities: extracted, summary: { enriched: 0, total: extracted.length, slugs: [] } };
+        });
+      setEntities(enriched);
+      logVoiceEvent('voice:extraction_done', { entityCount: enriched.length });
+      logVoiceEvent('voice:rag_enriched', {
+        rag_enriched: summary.enriched > 0,
+        enriched: summary.enriched,
+        total: summary.total,
+        slugs: summary.slugs,
+      });
       setView(STATE_REVIEW);
     } catch (err) {
       logVoiceEvent('voice:extraction_failed', { error: err.message }, 'warn');
