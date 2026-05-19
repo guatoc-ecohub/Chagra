@@ -442,8 +442,10 @@ export default function App() {
       <Suspense fallback={<LoadingFallback />}>
         {renderView()}
       </Suspense>
-      {/* FAB feedback inline para field testing, siempre visible salvo loading */}
-      {currentView !== 'loading' && currentView !== 'login' && <FieldFeedback />}
+      {/* FAB feedback inline para field testing. Operator bug 2026-05-18:
+          FieldFeedback FAB bottom-right tapaba el botón "enviar" en AgentScreen
+          y el textarea voice en VoiceCapture. Excluido en agente + voz. */}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'agente' && currentView !== 'voz' && <FieldFeedback />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'voz' && currentView !== 'agente' && <MicFab onNavigate={navigate} />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'voz' && currentView !== 'agente' && <AgentFab onNavigate={navigate} />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
