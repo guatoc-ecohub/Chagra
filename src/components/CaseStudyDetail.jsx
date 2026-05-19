@@ -938,13 +938,21 @@ export default function CaseStudyDetail({ caseId, onBack }) {
     );
   }
 
-  const sevMeta = SEVERITY_META[c.problem.severity] || SEVERITY_META.medium;
+  // Operator bug 2026-05-18: click en caso de estudio → error 'recargar
+  // vista'. Causa: casos con shape antiguo o demo seed sin nested
+  // `problem` rompían acceso directo a c.problem.severity etc.
+  // Fix: optional chaining + fallbacks defensivos. ErrorBoundary capturaba
+  // el throw y mostraba "recargar app".
+  const sevMeta = SEVERITY_META[c.problem?.severity] || SEVERITY_META.medium;
   const stateMeta = STATE_META[c.state] || STATE_META.open;
   const StateIcon = stateMeta.icon;
   const isClosed = ['closed_resolved', 'closed_failed'].includes(c.state);
+  const problemName = c.problem?.name_freetext || c.title || 'Caso de estudio';
+  const detectedAt = c.problem?.detected_at || c.created_at;
+  const subject = c.subject || {};
 
   return (
-    <ScreenShell title={c.title} icon={FileText} onBack={onBack}>
+    <ScreenShell title={c.title || 'Caso de estudio'} icon={FileText} onBack={onBack}>
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {/* Header status */}
         <section className="p-4 rounded-xl bg-slate-900 border border-slate-800">
@@ -956,13 +964,13 @@ export default function CaseStudyDetail({ caseId, onBack }) {
                 <span className="text-slate-600">·</span>
                 <span className={`text-xs font-bold uppercase ${sevMeta.color}`}>{sevMeta.label}</span>
               </div>
-              <h2 className="text-white text-base font-semibold">{c.problem.name_freetext}</h2>
+              <h2 className="text-white text-base font-semibold">{problemName}</h2>
               <div className="text-xs text-slate-400 mt-1 flex flex-wrap gap-x-3">
-                <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{c.finca_slug}{c.zone_freetext ? ` · ${c.zone_freetext}` : ''}</span>
-                {c.subject.count_total && (
-                  <span>{c.subject.count_affected ?? 0}/{c.subject.count_total} afectadas</span>
+                <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{c.finca_slug || 'finca'}{c.zone_freetext ? ` · ${c.zone_freetext}` : ''}</span>
+                {subject.count_total && (
+                  <span>{subject.count_affected ?? 0}/{subject.count_total} afectadas</span>
                 )}
-                <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDT(c.problem.detected_at || c.created_at)}</span>
+                <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDT(detectedAt)}</span>
               </div>
               {/* Badges visibility + validation (2026-05-18) */}
               <div className="flex flex-wrap gap-1.5 mt-2">
@@ -1045,7 +1053,7 @@ export default function CaseStudyDetail({ caseId, onBack }) {
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Cierre del caso</h3>
             <CloseCaseForm
               caseObj={c}
-              currentAffected={c.subject.count_affected}
+              currentAffected={c.subject?.count_affected}
               onSubmit={(payload) => {
                 closeCase(c.id, payload);
                 setShowClose(false);
