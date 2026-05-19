@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import {
   Sprout, Leaf, BookOpen, Database, Droplet, TreePine, Users, ShieldCheck,
-  FileCheck, Cloud, Bot, Maximize2, X, ChevronLeft, ChevronRight,
+  FileCheck, Cloud, Maximize2, X, ChevronLeft, ChevronRight,
 } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
+import ChagraAgentAvatar from './ChagraAgentAvatar';
 
 /**
  * WelcomeStatsHero — widget de bienvenida con narrativa de impacto del agente.
@@ -185,6 +186,52 @@ const TONE_CLASSES = {
   yellow: { text: 'text-yellow-300', bg: 'bg-yellow-950/40', border: 'border-yellow-800/60', accent: 'bg-yellow-500' },
 };
 
+/**
+ * AgentColibriChip — colibri clickable que abre el agente desde el home.
+ * Default idle (vuelo estacionario), hover thinking (libando), click navega.
+ * Se anima en mouse over para invitar al click y en touch press en mobile.
+ */
+function AgentColibriChip({ onNavigate, size = 26 }) {
+  const [hover, setHover] = useState(false);
+  const [pressed, setPressed] = useState(false);
+  const interactive = typeof onNavigate === 'function';
+  const state = pressed ? 'speaking' : hover ? 'thinking' : 'idle';
+
+  const handleClick = () => { if (interactive) onNavigate('agente'); };
+  const enter = () => setHover(true);
+  const leave = () => { setHover(false); setPressed(false); };
+  const down = () => setPressed(true);
+  const up = () => setPressed(false);
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      disabled={!interactive}
+      aria-label="Abrir Chagra IA"
+      title={interactive ? 'Abrir Chagra IA' : 'Chagra IA'}
+      onMouseEnter={enter}
+      onMouseLeave={leave}
+      onMouseDown={down}
+      onMouseUp={up}
+      onTouchStart={() => { setHover(true); setPressed(true); }}
+      onTouchEnd={() => { setHover(false); setPressed(false); }}
+      onFocus={enter}
+      onBlur={leave}
+      className={`shrink-0 inline-flex items-center justify-center rounded-full bg-slate-900 border ${
+        hover ? 'border-emerald-400/70 shadow-[0_0_10px_rgba(16,185,129,.45)]' : 'border-emerald-700/40'
+      } ${interactive ? 'cursor-pointer' : 'cursor-default opacity-90'} overflow-hidden transition-all duration-200`}
+      style={{
+        width: size + 6,
+        height: size + 6,
+        transform: pressed ? 'scale(0.94)' : hover ? 'scale(1.08)' : 'scale(1)',
+      }}
+    >
+      <ChagraAgentAvatar state={state} size={size} ariaLabel="Chagra IA" />
+    </button>
+  );
+}
+
 export default function WelcomeStatsHero({ mode = 'post-login', onNavigate }) {
   const isPreLogin = mode === 'pre-login';
   const plantsCount = useAssetStore((s) => s.plants?.length ?? 0);
@@ -308,8 +355,12 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate }) {
         aria-label="Impacto del agente Chagra"
       >
         <div className="flex items-center justify-between gap-2 px-1">
-          <h2 className="flex items-center gap-1.5 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-slate-400">
-            <Bot className="w-3 h-3 text-emerald-400 shrink-0" aria-hidden="true" />
+          {/* Header con colibri clickable → abre el agente desde el home.
+              Hover anima a state thinking (libando), click navega y muestra el
+              tap feedback con scale. Si no hay onNavigate, queda inerte como
+              header decorativo (ej. en pre-login). */}
+          <h2 className="flex items-center gap-2 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-slate-400 min-w-0">
+            <AgentColibriChip onNavigate={onNavigate} size={26} />
             <span className="truncate">Agente Chagra · impacto</span>
           </h2>
           <div className="flex items-center gap-2 shrink-0">
@@ -451,8 +502,8 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate }) {
           <div className="max-w-5xl mx-auto p-4 sm:p-8 space-y-6">
             <div className="flex items-center justify-between gap-2 pt-4">
               <div>
-                <h2 className="flex items-center gap-2 text-base sm:text-lg font-black uppercase tracking-wider text-slate-200">
-                  <Bot className="w-5 h-5 text-emerald-400" aria-hidden="true" />
+                <h2 className="flex items-center gap-2.5 text-base sm:text-lg font-black uppercase tracking-wider text-slate-200">
+                  <AgentColibriChip onNavigate={onNavigate} size={38} />
                   Agente Chagra · impacto
                 </h2>
                 {isPreLogin && (
