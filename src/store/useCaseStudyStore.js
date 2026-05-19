@@ -129,7 +129,12 @@ const DEFAULT_VALIDATION = Object.freeze({
 // Normaliza un case legacy (sin campos extendidos) para garantizar
 // que UI siempre lee shape estable. Idempotente: si ya tiene los
 // campos, no los pisa.
-const withExtendedDefaults = (c) => {
+//
+// Exportado en línea 572. NO debe llamarse dentro de un selector zustand
+// (siempre devuelve nuevo objeto → re-render loop / React #185). Usar
+// `cases.find` en el selector + `useMemo(() => withExtendedDefaults(c), [c])`
+// en el componente.
+export const withExtendedDefaults = (c) => {
   if (!c) return c;
   return {
     ...c,
