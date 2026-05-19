@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import {
   Sprout, Leaf, BookOpen, Database, Droplet, TreePine, Users, ShieldCheck,
-  FileCheck, Cloud, Bot, Maximize2, X, ChevronRight,
+  FileCheck, Cloud, Bot, Maximize2, X, ChevronLeft, ChevronRight,
 } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 
@@ -31,7 +31,12 @@ import useAssetStore from '../store/useAssetStore';
  *   en grid + descripción larga + breakdown federado. Toggle con botón.
  */
 
-const HERO_ROTATION_MS = 6000;
+// Lili (UX) feedback 2026-05-19: 6s era muy poco para leer el card.
+// 9s da tiempo cómodo de lectura sin sentir el carrusel "atascado".
+const HERO_ROTATION_MS = 9000;
+// Tras click manual (flecha/dot) damos 5s extra antes de retomar el auto-advance,
+// para que el usuario pueda leer el card que acaba de elegir sin interrupciones.
+const HERO_PAUSE_AFTER_INTERACTION_MS = 5000;
 const MONITOR_DAYS_PER_PLANT = 90;
 const DRIP_SAVING_L_PER_DAY = 5;
 const CO2_KG_PER_TREE_YEAR = 22;
@@ -187,6 +192,12 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate }) {
   const [fincasActivas, setFincasActivas] = useState(GLOBAL_FEDERATION_FALLBACK.fincasActivas);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [expanded, setExpanded] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  // Pausa temporal tras interacción manual (flecha/dot click). Guardamos
+  // un timestamp en ref para no re-renderizar al setearlo; el effect de
+  // auto-advance lo lee al armar el setTimeout.
+  const pausedUntilRef = useRef(0);
+  const [pauseTick, setPauseTick] = useState(0);
 
   useEffect(() => {
     let alive = true;
@@ -247,11 +258,37 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate }) {
 
   useEffect(() => {
     if (expanded) return undefined; // pausar rotación en modo expandido
-    const interval = setInterval(() => {
+    if (isHovered) return undefined; // pausar mientras el mouse está encima
+    const now = Date.now();
+    const remainingPause = pausedUntilRef.current - now;
+    // Si estamos dentro de la ventana de pausa post-interacción, esperar
+    // ese tiempo extra antes del próximo avance; si no, ROTATION_MS normal.
+    const delay = remainingPause > 0 ? remainingPause + HERO_ROTATION_MS : HERO_ROTATION_MS;
+    const timeout = setTimeout(() => {
       setCarouselIndex((prev) => (prev + 1) % heroStats.length);
-    }, HERO_ROTATION_MS);
-    return () => clearInterval(interval);
-  }, [heroStats.length, expanded]);
+    }, delay);
+    return () => clearTimeout(timeout);
+  }, [heroStats.length, expanded, isHovered, carouselIndex, pauseTick]);
+
+  const pauseAutoAdvance = useCallback(() => {
+    pausedUntilRef.current = Date.now() + HERO_PAUSE_AFTER_INTERACTION_MS;
+    setPauseTick((t) => t + 1); // dispara re-run del effect con el nuevo delay
+  }, []);
+
+  const goToIndex = useCallback((idx) => {
+    setCarouselIndex(idx);
+    pauseAutoAdvance();
+  }, [pauseAutoAdvance]);
+
+  const goPrev = useCallback(() => {
+    setCarouselIndex((prev) => (prev - 1 + heroStats.length) % heroStats.length);
+    pauseAutoAdvance();
+  }, [heroStats.length, pauseAutoAdvance]);
+
+  const goNext = useCallback(() => {
+    setCarouselIndex((prev) => (prev + 1) % heroStats.length);
+    pauseAutoAdvance();
+  }, [heroStats.length, pauseAutoAdvance]);
 
   const handleStatClick = useCallback((stat) => {
     if (typeof onNavigate === 'function' && stat?.navTarget) {
@@ -293,58 +330,87 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate }) {
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => handleStatClick(current)}
-          className={`${tone.bg} ${tone.border} border rounded-2xl p-5 sm:p-6 transition-all duration-500 animate-in fade-in w-full text-left hover:border-slate-600 group`}
+        <div
+          className={`${tone.bg} ${tone.border} border rounded-2xl p-5 sm:p-6 transition-all duration-500 animate-in fade-in w-full hover:border-slate-600 group relative`}
           key={carouselIndex}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          role="region"
+          aria-roledescription="carrusel"
+          aria-label={`Historia ${carouselIndex + 1} de ${heroStats.length}: ${current.headline}`}
         >
-          <div className="flex items-start gap-3 sm:gap-4">
-            <CurrentIcon className={`w-7 h-7 sm:w-8 sm:h-8 ${tone.text} shrink-0 mt-1`} aria-hidden="true" />
-            <div className="flex-1 min-w-0">
-              <div className="text-[11px] sm:text-xs uppercase tracking-wider text-slate-300 font-bold leading-tight">
-                {current.headline}
-              </div>
-              <div className={`text-4xl sm:text-5xl font-black ${tone.text} leading-none mt-2`}>
-                {current.value}
-              </div>
-              <div className="text-xs sm:text-sm text-slate-200 mt-1.5 font-medium">
-                {current.unit}
-              </div>
-              {current.story && (
-                <div className="text-[11px] sm:text-xs text-slate-400 mt-2 leading-snug">
-                  {current.story}
+          {/* Flecha izquierda: discreta, opacity sube en hover (desktop) y
+              full-opacity siempre en touch para descubribilidad mobile. */}
+          <button
+            type="button"
+            onClick={goPrev}
+            aria-label="Historia anterior"
+            title="Anterior"
+            className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-10 p-1.5 rounded-full bg-slate-900/70 text-slate-300 hover:text-slate-100 hover:bg-slate-800/90 opacity-70 sm:opacity-0 sm:group-hover:opacity-80 focus-visible:opacity-100 hover:opacity-100 transition-opacity"
+          >
+            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={goNext}
+            aria-label="Historia siguiente"
+            title="Siguiente"
+            className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-10 p-1.5 rounded-full bg-slate-900/70 text-slate-300 hover:text-slate-100 hover:bg-slate-800/90 opacity-70 sm:opacity-0 sm:group-hover:opacity-80 focus-visible:opacity-100 hover:opacity-100 transition-opacity"
+          >
+            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={() => handleStatClick(current)}
+            className="block w-full text-left"
+            aria-label={current.navTarget ? `Ver módulo ${current.navTarget}` : current.headline}
+          >
+            <div className="flex items-start gap-3 sm:gap-4">
+              <CurrentIcon className={`w-7 h-7 sm:w-8 sm:h-8 ${tone.text} shrink-0 mt-1`} aria-hidden="true" />
+              <div className="flex-1 min-w-0">
+                <div className="text-[11px] sm:text-xs uppercase tracking-wider text-slate-300 font-bold leading-tight">
+                  {current.headline}
                 </div>
-              )}
-              {current.caption && (
-                <div className="text-[10px] sm:text-[11px] text-slate-500 mt-1.5 leading-snug italic">
-                  {current.caption}
+                <div className={`text-4xl sm:text-5xl font-black ${tone.text} leading-none mt-2`}>
+                  {current.value}
                 </div>
-              )}
-              {onNavigate && current.navTarget && (
-                <div className="flex items-center gap-1 mt-3 text-[10px] sm:text-xs text-slate-400 group-hover:text-slate-200 transition-colors">
-                  <span>Ver módulo</span>
-                  <ChevronRight className="w-3 h-3" />
+                <div className="text-xs sm:text-sm text-slate-200 mt-1.5 font-medium">
+                  {current.unit}
                 </div>
-              )}
+                {current.story && (
+                  <div className="text-[11px] sm:text-xs text-slate-400 mt-2 leading-snug">
+                    {current.story}
+                  </div>
+                )}
+                {current.caption && (
+                  <div className="text-[10px] sm:text-[11px] text-slate-500 mt-1.5 leading-snug italic">
+                    {current.caption}
+                  </div>
+                )}
+                {onNavigate && current.navTarget && (
+                  <div className="flex items-center gap-1 mt-3 text-[10px] sm:text-xs text-slate-400 group-hover:text-slate-200 transition-colors">
+                    <span>Ver módulo</span>
+                    <ChevronRight className="w-3 h-3" />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          </button>
           <div className="flex justify-center gap-1.5 mt-4 sm:mt-5">
             {heroStats.map((s, idx) => (
-              <span
+              <button
                 key={s.key}
-                onClick={(e) => { e.stopPropagation(); setCarouselIndex(idx); }}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); setCarouselIndex(idx); } }}
-                role="button"
-                tabIndex={0}
+                type="button"
+                onClick={() => goToIndex(idx)}
                 className={`h-1.5 rounded-full transition-all cursor-pointer ${
                   idx === carouselIndex ? `w-6 ${tone.accent}` : 'w-1.5 bg-slate-700 hover:bg-slate-600'
                 }`}
                 aria-label={`Ver historia ${idx + 1}`}
+                aria-current={idx === carouselIndex ? 'true' : undefined}
               />
             ))}
           </div>
-        </button>
+        </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           <div className="bg-slate-800/30 border border-slate-700/40 rounded-lg p-2 flex items-center gap-2">
