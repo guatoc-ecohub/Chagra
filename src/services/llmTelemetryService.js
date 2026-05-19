@@ -23,6 +23,10 @@
  *     eval_rate: 118.18,          // tokens/s calculado (eval_count / eval_ms*1000)
  *     processor: 'gpu' | 'cpu' | 'unknown',
  *     error_kind: null | 'timeout' | 'http_4xx' | 'http_5xx' | 'abort' | 'network' | 'parse',
+ *     rag_passages_used: 3,       // # passages prepended by RAG (0 = no context).
+ *                                 // Audit 2026-05-18 #4: tracking hit-rate del
+ *                                 // RAG en `analyzeFoliage` y futuros consumers.
+ *                                 // null cuando el call no consultó RAG.
  *     created_at: ISO,
  *     synced: false,
  *   }
@@ -69,6 +73,9 @@ export const recordLLMEvent = async (event) => {
     eval_rate: typeof event.eval_rate === 'number' ? event.eval_rate : null,
     processor: event.processor || 'unknown',
     error_kind: event.error_kind || null,
+    // Audit 2026-05-18 #4: # passages que el RAG inyectó al prompt.
+    // 0 = consultó RAG pero no encontró matches. null = call no usó RAG.
+    rag_passages_used: typeof event.rag_passages_used === 'number' ? event.rag_passages_used : null,
     created_at: new Date().toISOString(),
     synced: false,
   };
@@ -246,7 +253,8 @@ export const exportLLMTelemetry = async (format = 'json') => {
   if (format === 'csv') {
     const headers = ['id', 'created_at', 'model', 'endpoint', 'flujo', 'status',
                      'processor', 'total_ms', 'load_ms', 'eval_count',
-                     'prompt_eval_count', 'eval_rate', 'error_kind'];
+                     'prompt_eval_count', 'eval_rate', 'error_kind',
+                     'rag_passages_used'];
     const rows = events.map((e) => headers.map((h) => e[h] ?? '').join(','));
     return [headers.join(','), ...rows].join('\n');
   }

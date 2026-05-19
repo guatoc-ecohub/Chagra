@@ -82,13 +82,17 @@ const extractChunk = (parsed) => {
  * @param {Function}    [options.onDone] callback invocado con el ultimo objeto
  *        del stream (done:true). Expone metadata de Ollama: model,
  *        total_duration, eval_count, prompt_eval_count, etc.
+ * @param {Object}      [options.meta]   campos extra propagados al
+ *        `recordLLMEvent` final (solo en `success`). Ej.
+ *        `{ rag_passages_used: 3 }` para análisis hit-rate RAG en
+ *        `LLMTelemetryScreen`. Privacy-safe: no debe contener prompt/respuesta.
  * @returns {Promise<string>} texto completo concatenado al terminar.
  * @throws {Error} si el fetch falla, el servidor responde no-2xx o el body no es streameable.
  * @example
  * const full = await streamOllama('/api/ollama/api/generate', { model: 'gemma3:4b', prompt: 'hola' }, tok => setText(tok));
  * // full => "Hola, en que puedo ayudarte?"
  */
-export async function streamOllama(url, body, onToken, { signal, onDone } = {}) {
+export async function streamOllama(url, body, onToken, { signal, onDone, meta } = {}) {
   const t0 = Date.now();
   const modelHint = body?.model || 'unknown';
   const flujoHint = inferFlujo(url, body);
@@ -224,6 +228,10 @@ export async function streamOllama(url, body, onToken, { signal, onDone } = {}) 
       eval_count,
       eval_rate,
       processor,
+      // Meta extra del caller (ej. rag_passages_used para audit hit-rate RAG).
+      // `recordLLMEvent` filtra a campos whitelisted del schema; cualquier
+      // otra prop se descarta. Privacy-safe enforced en service layer.
+      ...(meta && typeof meta === 'object' ? meta : {}),
     });
   });
 

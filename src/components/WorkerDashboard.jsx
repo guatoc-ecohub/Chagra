@@ -36,6 +36,14 @@ const formatDistance = (m) => {
   return `${(m / 1000).toFixed(1)}km`;
 };
 
+// Audit 2026-05-18 #4: deriva slug del catálogo desde el `name` del asset
+// para que `EvidenceCapture` lo propague a `analyzeFoliage` y el RAG inyecte
+// passages específicos. Patrón ya usado en `AssetDetailView.deriveSpeciesSlug`.
+const deriveSpeciesSlug = (name) => {
+  if (!name || typeof name !== 'string') return null;
+  return name.replace(/\s+#\d+$/, '').toLowerCase().replace(/\s+/g, '_').trim() || null;
+};
+
 export const WorkerDashboard = () => {
   const plants = useAssetStore((s) => s.plants);
   const lands = useAssetStore((s) => s.lands);
@@ -226,6 +234,14 @@ export const WorkerDashboard = () => {
                   logId={task.id}
                   assetId={task.asset_id || task.attributes?.asset_id}
                   assetGeometry={task.attributes?.intrinsic_geometry}
+                  speciesSlug={(() => {
+                    const aId = task.asset_id || task.attributes?.asset_id;
+                    if (!aId) return null;
+                    const plant = plants.find((p) => p.id === aId);
+                    return plant
+                      ? (plant.speciesSlug || deriveSpeciesSlug(plant.attributes?.name || plant.name))
+                      : null;
+                  })()}
                   disabled={isCompleting}
                   onCountChange={(count) => {
                     setEvidenceCounts((prev) => ({ ...prev, [task.id]: count }));
