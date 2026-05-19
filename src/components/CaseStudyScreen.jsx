@@ -1,11 +1,12 @@
-import React, { useState, useMemo } from 'react';
-import { FileText, Plus, AlertTriangle, AlertCircle, Activity, CheckCircle, XCircle, ChevronRight, Sparkles, Loader2, Mic, MicOff } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { FileText, Plus, AlertTriangle, AlertCircle, Activity, CheckCircle, ChevronRight, Sparkles, Loader2, Mic, MicOff, Globe, Users, Lock, ShieldCheck, ShieldAlert } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { useCaseStudyStore, CASE_SEVERITIES } from '../store/useCaseStudyStore';
 import { useFincaActiveStore } from '../services/fincaActiveStore';
 import { extractCaseFromText } from '../services/caseStudyVoiceExtractor';
 import useVoiceRecorder from '../hooks/useVoiceRecorder';
 import { transcribe } from '../services/voiceService';
+import { loadCaseStudyDemos } from '../services/caseStudyDemoLoader';
 
 /**
  * CaseStudyScreen — vista lista de casos de estudio agronómicos
@@ -60,6 +61,11 @@ const CaseCard = ({ caseObj, onSelect }) => {
   const stateMeta = STATE_META[caseObj.state] || STATE_META.open;
   const SevIcon = sevMeta.icon;
   const treated = (caseObj.treatments_applied || []).length > 0;
+  const visibility = caseObj.visibility || 'private';
+  const validationStatus = caseObj.validation?.status || 'pending';
+  const pendingRecs = (caseObj.recommendations || []).some(
+    (r) => r.validation_required && !r.validated_by
+  );
 
   return (
     <button
@@ -69,10 +75,31 @@ const CaseCard = ({ caseObj, onSelect }) => {
     >
       <SevIcon className={`shrink-0 w-5 h-5 mt-0.5 ${sevMeta.color}`} />
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1">
+        <div className="flex items-center gap-2 mb-1 flex-wrap">
           <span className={`text-[10px] font-black uppercase tracking-wider ${sevMeta.color}`}>{sevMeta.label}</span>
           <span className="text-slate-600">·</span>
           <span className={`text-[10px] font-bold uppercase tracking-wide ${stateMeta.color}`}>{stateMeta.label}</span>
+          {/* Badges visibility + validación (2026-05-18) */}
+          {visibility === 'public' && (
+            <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-blue-300" title="Compartido en la red Chagra">
+              <Globe className="w-2.5 h-2.5" />
+            </span>
+          )}
+          {visibility === 'finca' && (
+            <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-sky-300" title="Compartido con la finca">
+              <Users className="w-2.5 h-2.5" />
+            </span>
+          )}
+          {validationStatus === 'certified' && (
+            <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-emerald-300" title="Caso certificado por profesional">
+              <ShieldCheck className="w-2.5 h-2.5" />
+            </span>
+          )}
+          {pendingRecs && validationStatus !== 'certified' && (
+            <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-yellow-300" title="Recomendaciones pendientes de validación">
+              <ShieldAlert className="w-2.5 h-2.5" />
+            </span>
+          )}
         </div>
         <h3 className="text-white font-semibold text-sm truncate">{caseObj.title}</h3>
         <div className="text-xs text-slate-400 mt-1 flex flex-wrap gap-x-3 gap-y-1">
@@ -430,15 +457,100 @@ const EmptyState = ({ onNew }) => (
   </div>
 );
 
+// 2026-05-18 — Tabs/filtros para modo foro + validación.
+// "Todos" muestra el layout original (top activos + histórico). Los
+// demás filtran cases por visibility/validation con un único listado.
+const FILTERS = [
+  { id: 'all', label: 'Todos', icon: FileText },
+  { id: 'private', label: 'Privados', icon: Lock },
+  { id: 'shared', label: 'Compartidos red', icon: Globe },
+  { id: 'pending', label: 'Pendiente validación', icon: ShieldAlert },
+];
+
+const FilterTabs = ({ value, onChange, counts }) => (
+  <nav
+    aria-label="Filtros de casos"
+    className="flex gap-1 overflow-x-auto -mx-4 px-4 pb-1"
+  >
+    {FILTERS.map((f) => {
+      const Icon = f.icon;
+      const active = value === f.id;
+      const count = counts?.[f.id];
+      return (
+        <button
+          key={f.id}
+          type="button"
+          onClick={() => onChange(f.id)}
+          className={`shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold flex items-center gap-1.5 transition-colors ${
+            active
+              ? 'bg-emerald-700 text-white'
+              : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+          }`}
+        >
+          <Icon className="w-3 h-3" />
+          {f.label}
+          {typeof count === 'number' && count > 0 && (
+            <span className={`text-[10px] px-1 rounded ${active ? 'bg-emerald-900' : 'bg-slate-700'}`}>
+              {count}
+            </span>
+          )}
+        </button>
+      );
+    })}
+  </nav>
+);
+
 export default function CaseStudyScreen({ onBack, onSelectCase }) {
   const cases = useCaseStudyStore((s) => s.cases);
   const getTopActiveProblems = useCaseStudyStore((s) => s.getTopActiveProblems);
   const createCase = useCaseStudyStore((s) => s.createCase);
   const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
   const [showForm, setShowForm] = useState(false);
+  const [filter, setFilter] = useState('all');
+
+  // 2026-05-18 — Hidrata casos demo public/case-studies-demo/manifest.json
+  // on mount. Idempotente: si los ids ya están en LS, no re-insertan.
+  // Silent-fail: si offline o sin manifest, simplemente no hay demo.
+  useEffect(() => {
+    loadCaseStudyDemos(useCaseStudyStore).catch(() => {});
+  }, []);
 
   const topActive = getTopActiveProblems(10);
   const closed = cases.filter((c) => ['closed_resolved', 'closed_failed'].includes(c.state));
+
+  // Conteos por filtro para las tabs (fuente de verdad: cases del store
+  // tal cual están, sin normalización extendida; los flags opcionales se
+  // leen con defaults defensivos).
+  const counts = useMemo(() => {
+    const priv = cases.filter((c) => (c.visibility || 'private') === 'private').length;
+    const shared = cases.filter((c) => (c.visibility || 'private') === 'public').length;
+    const pending = cases.filter((c) => {
+      const v = c.validation?.status || 'pending';
+      if (v === 'pending' || v === 'self-reported') return true;
+      const recs = c.recommendations || [];
+      return recs.some((r) => r.validation_required && !r.validated_by);
+    }).length;
+    return { all: cases.length, private: priv, shared, pending };
+  }, [cases]);
+
+  const filteredCases = useMemo(() => {
+    if (filter === 'all') return null; // null = usa el layout dual original
+    if (filter === 'private') {
+      return cases.filter((c) => (c.visibility || 'private') === 'private');
+    }
+    if (filter === 'shared') {
+      return cases.filter((c) => (c.visibility || 'private') === 'public');
+    }
+    if (filter === 'pending') {
+      return cases.filter((c) => {
+        const v = c.validation?.status || 'pending';
+        if (v === 'pending' || v === 'self-reported') return true;
+        const recs = c.recommendations || [];
+        return recs.some((r) => r.validation_required && !r.validated_by);
+      });
+    }
+    return cases;
+  }, [filter, cases]);
 
   const handleCreate = (data) => {
     const id = createCase(data);
@@ -473,7 +585,13 @@ export default function CaseStudyScreen({ onBack, onSelectCase }) {
 
         {cases.length === 0 && !showForm && <EmptyState onNew={() => setShowForm(true)} />}
 
-        {topActive.length > 0 && (
+        {/* Tabs de filtros (2026-05-18) — sólo cuando hay cases */}
+        {cases.length > 0 && (
+          <FilterTabs value={filter} onChange={setFilter} counts={counts} />
+        )}
+
+        {/* Vista "Todos" — layout dual original (top activos + histórico) */}
+        {filter === 'all' && topActive.length > 0 && (
           <section>
             <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 flex items-center gap-2">
               <AlertTriangle className="w-3 h-3" />
@@ -487,7 +605,7 @@ export default function CaseStudyScreen({ onBack, onSelectCase }) {
           </section>
         )}
 
-        {closed.length > 0 && (
+        {filter === 'all' && closed.length > 0 && (
           <section>
             <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 mb-2 flex items-center gap-2">
               <CheckCircle className="w-3 h-3" />
@@ -498,6 +616,27 @@ export default function CaseStudyScreen({ onBack, onSelectCase }) {
                 <CaseCard key={c.id} caseObj={c} onSelect={onSelectCase} />
               ))}
             </div>
+          </section>
+        )}
+
+        {/* Vistas filtradas — listado plano */}
+        {filter !== 'all' && filteredCases && (
+          <section>
+            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2 flex items-center gap-2">
+              {filter === 'private' && <Lock className="w-3 h-3" />}
+              {filter === 'shared' && <Globe className="w-3 h-3" />}
+              {filter === 'pending' && <ShieldAlert className="w-3 h-3" />}
+              {FILTERS.find((f) => f.id === filter)?.label} ({filteredCases.length})
+            </h2>
+            {filteredCases.length === 0 ? (
+              <p className="text-slate-600 text-xs italic px-2">Sin casos en este filtro.</p>
+            ) : (
+              <div className="space-y-2">
+                {filteredCases.map((c) => (
+                  <CaseCard key={c.id} caseObj={c} onSelect={onSelectCase} />
+                ))}
+              </div>
+            )}
           </section>
         )}
       </div>
