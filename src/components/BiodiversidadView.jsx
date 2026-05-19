@@ -5,11 +5,28 @@
  * flora del bosque alto-andino colombiano (oso andino, quetzal, morpho,
  * frailejón, maíz, armadillo, entre otros). Aplicada con gradient overlay
  * para legibilidad de las tarjetas de estadísticas encima.
+ *
+ * Bug operator 2026-05-18: estratos y gremios siempre mostraban 0 aunque
+ * las 37 species reales del operator cubrían 4 estratos y >3 gremios. El
+ * cálculo previo solo parseaba `attributes.notes` ("Estrato: X | Gremio: Y"
+ * — formato AssetsDashboard.formatNotes), pero plants creadas por
+ * VoiceCapture o sincronizadas desde FarmOS no llevan ese inline. El nuevo
+ * cálculo resuelve estrato + gremio vía lookup contra el catálogo SQLite
+ * por nombre normalizado (con fallback al parser legacy de notes para
+ * compatibilidad con plants viejas que SÍ tengan el inline).
+ *
+ * Lógica extraída a `src/utils/biodiversityStats.js` (función pura, tests
+ * en `biodiversityStats.test.js`).
  */
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Leaf } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import useAssetStore from '../store/useAssetStore';
+import { getAllSpecies } from '../db/catalogDB';
+import {
+  buildSpeciesIndex,
+  computeBiodiversityStats,
+} from '../utils/biodiversityStats';
 
 const STRATA = [
   { key: 'emergente', label: 'Emergente', color: 'text-emerald-300' },
@@ -18,48 +35,55 @@ const STRATA = [
   { key: 'bajo',      label: 'Bajo',      color: 'text-orange-300'  },
 ];
 
+// Timeout duro del load del catálogo: igual al de SpeciesSelect. Si SQLite
+// WASM se cuelga (OPFS bloqueado, cold boot offline), seguimos renderizando
+// con índice vacío → los stats caen al parser de notes legacy en vez de
+// quedar en blanco.
+const CATALOG_LOAD_TIMEOUT_MS = 2000;
+
 export default function BiodiversidadView({ onBack }) {
   const plants = useAssetStore((s) => s.plants || []);
+  const [speciesIndex, setSpeciesIndex] = useState(() => new Map());
 
-  const { speciesCount, strataCount, guildsCount, byStratum } = useMemo(() => {
-    const species = new Set();
-    const guilds = new Set();
-    const strata = new Set();
-    const perStratum = Object.fromEntries(STRATA.map((s) => [s.key, 0]));
-
-    // formatNotes() en AssetsDashboard guarda así:
-    //   "Notas usuario | Estrato: Medio (2-10m) | Gremio: Productivo principal"
-    // Delimitador: " | " (NO saltos de línea). El regex debe detenerse en "|".
-    const FIELD_RE = (key) => new RegExp(`${key}:\\s*([^|]+?)\\s*(?:\\||$)`, 'i');
-
-    for (const p of plants) {
-      const attrs = p.attributes || {};
-      // Especie se guarda en attributes.name (no en notes).
-      const name = (attrs.name || '').trim();
-      if (name) species.add(name.toLowerCase());
-
-      const notesValue =
-        (typeof attrs.notes === 'object' ? attrs.notes?.value : attrs.notes) || '';
-
-      const gremio = notesValue.match(FIELD_RE('Gremio'))?.[1]?.trim();
-      if (gremio) guilds.add(gremio.toLowerCase());
-
-      const stratumRaw = notesValue.match(FIELD_RE('Estrato'))?.[1]?.trim().toLowerCase();
-      if (stratumRaw) {
-        strata.add(stratumRaw);
-        // El label guardado es "Medio (2-10m)"; comparamos por prefijo de la palabra clave.
-        const key = STRATA.find((s) => stratumRaw.startsWith(s.key) || stratumRaw.includes(` ${s.key} `))?.key;
-        if (key) perStratum[key] += 1;
+  // Catálogo SQLite (v3.1+ ≈480 species con estrato + gremio curados). Se
+  // pre-carga en App.jsx pero leemos defensivamente: si tarda >2s o falla,
+  // dejamos el índice vacío y el stats calc cae a notes parsing.
+  useEffect(() => {
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      if (!cancelled) {
+        console.warn('[BiodiversidadView] catalogDB timeout >2s, stats con índice vacío');
       }
-    }
+    }, CATALOG_LOAD_TIMEOUT_MS);
 
-    return {
-      speciesCount: species.size,
-      strataCount: strata.size,
-      guildsCount: guilds.size,
-      byStratum: perStratum,
+    Promise.race([
+      getAllSpecies(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('catalog_timeout')), CATALOG_LOAD_TIMEOUT_MS)),
+    ])
+      .then((rows) => {
+        if (cancelled) return;
+        if (!Array.isArray(rows) || rows.length === 0) return;
+        setSpeciesIndex(buildSpeciesIndex(rows));
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.warn('[BiodiversidadView] catalogDB load failed:', err?.message || err);
+      })
+      .finally(() => clearTimeout(timer));
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
     };
-  }, [plants]);
+  }, []);
+
+  // useMemo: con 100+ plants el lookup contra el índice (O(N·log N) en
+  // promedio por los prefix matches) es barato pero igual conviene no
+  // re-computarlo en cada render de scroll/resize.
+  const { speciesCount, strataCount, guildsCount, byStratum } = useMemo(
+    () => computeBiodiversityStats(plants, speciesIndex),
+    [plants, speciesIndex]
+  );
 
   // Lili #119: "mejorar la imagen del background". Overlay reducido
   // (de 0.55-0.82 a 0.45-0.78) para que la ilustración curada del bosque
