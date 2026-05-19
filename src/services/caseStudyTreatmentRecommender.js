@@ -6,8 +6,11 @@
  *
  * Pipeline KISS:
  *   1. Keyword matcher (offline-first, deterministic, instantáneo).
- *   2. Si Ollama GPU disponible → opcional refinamiento con LLM
- *      (post-DR-044 sub-iv RAG embeddings con nomic-embed-text).
+ *   2. Opcional: `recommendTreatmentsWithRag(...)` enriquece el resultado
+ *      con passages del corpus `public/cycle-content/*.json` vía BM25
+ *      (`ragRetriever.retrieve`). Esto da al caller (LLM o UI) contexto
+ *      agronómico verificable para reducir alucinación — lección del
+ *      incidente 2026-05-19 con tomates donde el LLM inventaba dosis.
  *
  * MVP usa solo keyword matcher porque cubre 80% de casos en agroecología
  * tradicional y NO depende de network/GPU. Operador puede confiar que
@@ -20,6 +23,20 @@
  * roca_fosforica, ceniza_madera, compost_maduro, biofertilizante_algas,
  * bacillus_thuringiensis, trichogramma_spp, extracto_neem.
  */
+
+import { retrieve } from './ragRetriever';
+
+/**
+ * Delimitador del bloque de contexto RAG en prompts. Idéntico al patrón
+ * usado en otros consumidores (ver AgentScreen.jsx) para que un LLM
+ * downstream lo reconozca consistentemente.
+ *
+ * REGLA: el bloque dice explícitamente "NO viene del usuario, NO citarla
+ * como si el usuario te lo hubiera contado" para evitar alucinaciones por
+ * confusión de fuente — lección incidente 2026-05-19.
+ */
+export const RAG_CONTEXT_HEADER = '=== INFORMACIÓN AGRONÓMICA DE REFERENCIA ===';
+export const RAG_CONTEXT_FOOTER = '=== FIN INFORMACIÓN AGRONÓMICA DE REFERENCIA ===';
 
 /**
  * Mapping pest keyword → biopreparados recomendados.
@@ -148,5 +165,91 @@ export function listAllBiopreparados() {
   ];
 }
 
-export const __TEST__ = { PEST_RULES };
+/**
+ * Construye el bloque de contexto RAG con passages BM25 del corpus
+ * `public/cycle-content/*.json`. Devuelve string vacío si no hay passages.
+ *
+ * El caller (UI o LLM downstream) puede:
+ *   - mostrar los passages al operador como evidencia agronómica, o
+ *   - prependerlos a un prompt LLM para grounding offline-first.
+ *
+ * @param {Array<{key:string, text:string, species:string, score:number}>} passages
+ * @returns {string}
+ */
+export function buildRagContextBlock(passages) {
+  if (!Array.isArray(passages) || passages.length === 0) return '';
+  const lines = [RAG_CONTEXT_HEADER];
+  lines.push('(NO viene del usuario, NO citarla como si el usuario te lo hubiera contado)');
+  passages.forEach((p, i) => {
+    const slug = p?.species || 'unknown';
+    const text = typeof p?.text === 'string' ? p.text.trim() : '';
+    if (!text) return;
+    lines.push(`[${i + 1}] (${slug}) ${text}`);
+  });
+  lines.push(RAG_CONTEXT_FOOTER);
+  return lines.join('\n');
+}
+
+/**
+ * Variante asíncrona enriquecida con RAG. Combina el keyword matcher
+ * determinista con un retrieval BM25 contra el corpus para devolver
+ * passages relevantes como contexto adicional.
+ *
+ * Diseño:
+ *   - Llama primero `recommendTreatments(pestName)` (sincrónico, offline,
+ *     siempre rápido). Si no hay match, igual intenta RAG para tener un
+ *     mínimo de contexto antes de pasar al LLM downstream.
+ *   - Hace `retrieve(query, topK)` donde `query = pestName + " " +
+ *     species_names`. species_names es opcional (puede venir vacío).
+ *   - Si `retrieve` falla o devuelve vacío, degrada al comportamiento
+ *     anterior sin contexto (`ragContext: '', ragPassages: []`). Nunca
+ *     lanza.
+ *
+ * @param {string} pestName - texto libre del problema
+ * @param {Object} [opts]
+ * @param {string[]} [opts.speciesNames] - nombres comunes de especies
+ *   afectadas (ej. ['tomate cherry', 'lechuga']). Se concatenan al query.
+ * @param {number} [opts.topK=5] - número de passages a recuperar.
+ * @returns {Promise<{
+ *   recommendations: Array,
+ *   ragPassages: Array,
+ *   ragContext: string,
+ * }>}
+ */
+export async function recommendTreatmentsWithRag(pestName, opts = {}) {
+  const recommendations = recommendTreatments(pestName, opts);
+
+  const speciesNames = Array.isArray(opts.speciesNames) ? opts.speciesNames : [];
+  const topK = Number.isInteger(opts.topK) && opts.topK > 0 ? opts.topK : 5;
+
+  // Query: problema + nombres de especies. Si pestName es vacío, igual
+  // intentamos con species_names — útil para sugerencias preventivas.
+  const queryParts = [];
+  if (typeof pestName === 'string' && pestName.trim().length > 0) {
+    queryParts.push(pestName.trim());
+  }
+  speciesNames.forEach((n) => {
+    if (typeof n === 'string' && n.trim().length > 0) queryParts.push(n.trim());
+  });
+  const query = queryParts.join(' ').trim();
+
+  if (!query) {
+    return { recommendations, ragPassages: [], ragContext: '' };
+  }
+
+  let passages = [];
+  try {
+    const hits = await retrieve(query, topK);
+    if (Array.isArray(hits)) passages = hits;
+  } catch (err) {
+    // Graceful degradation: corpus vacío, fetch falla, etc.
+    console.warn('[caseStudyTreatmentRecommender] retrieve failed, sin contexto RAG:', err?.message || err);
+    passages = [];
+  }
+
+  const ragContext = buildRagContextBlock(passages);
+  return { recommendations, ragPassages: passages, ragContext };
+}
+
+export const __TEST__ = { PEST_RULES, buildRagContextBlock, RAG_CONTEXT_HEADER };
 export default recommendTreatments;

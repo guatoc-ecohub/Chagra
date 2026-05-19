@@ -1,5 +1,24 @@
-import { describe, it, expect } from 'vitest';
-import { recommendTreatments, listAllBiopreparados, __TEST__ } from '../caseStudyTreatmentRecommender';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+// Mock del RAG retriever — los tests sincrónicos de recommendTreatments
+// NO lo usan, pero los tests async de recommendTreatmentsWithRag sí.
+vi.mock('../ragRetriever', () => ({
+  retrieve: vi.fn(),
+}));
+
+import { retrieve } from '../ragRetriever';
+import {
+  recommendTreatments,
+  recommendTreatmentsWithRag,
+  buildRagContextBlock,
+  listAllBiopreparados,
+  RAG_CONTEXT_HEADER,
+  __TEST__,
+} from '../caseStudyTreatmentRecommender';
+
+beforeEach(() => {
+  retrieve.mockReset();
+});
 
 describe('caseStudyTreatmentRecommender — recommendTreatments', () => {
   it('trozador (Agrotis) → BT + Trichogramma + neem', () => {
@@ -138,5 +157,120 @@ describe('caseStudyTreatmentRecommender — PEST_RULES integrity', () => {
         expect(validPriorities).toContain(rec.priority);
       }
     }
+  });
+});
+
+describe('caseStudyTreatmentRecommender — buildRagContextBlock', () => {
+  it('passages vacíos → string vacío', () => {
+    expect(buildRagContextBlock([])).toBe('');
+    expect(buildRagContextBlock(null)).toBe('');
+    expect(buildRagContextBlock(undefined)).toBe('');
+  });
+
+  it('inserta header + footer + warning anti-alucinación', () => {
+    const out = buildRagContextBlock([
+      { species: 'solanum_lycopersicum_cherry', text: 'BT 1g/L foliar al atardecer.', score: 1.2 },
+    ]);
+    expect(out).toContain(RAG_CONTEXT_HEADER);
+    expect(out).toContain('NO viene del usuario');
+    expect(out).toContain('solanum_lycopersicum_cherry');
+    expect(out).toContain('BT 1g/L foliar al atardecer.');
+    expect(out).toContain('=== FIN INFORMACIÓN AGRONÓMICA DE REFERENCIA ===');
+  });
+
+  it('numera los passages y mantiene orden', () => {
+    const out = buildRagContextBlock([
+      { species: 'a', text: 'primero' },
+      { species: 'b', text: 'segundo' },
+    ]);
+    expect(out).toMatch(/\[1\] \(a\) primero/);
+    expect(out).toMatch(/\[2\] \(b\) segundo/);
+  });
+
+  it('omite passages sin texto', () => {
+    const out = buildRagContextBlock([
+      { species: 'a', text: '   ' },
+      { species: 'b', text: 'útil' },
+    ]);
+    expect(out).not.toMatch(/\(a\)/);
+    expect(out).toMatch(/\(b\) útil/);
+  });
+});
+
+describe('caseStudyTreatmentRecommender — recommendTreatmentsWithRag', () => {
+  it('combina recomendaciones deterministas + passages RAG', async () => {
+    retrieve.mockResolvedValue([
+      { species: 'solanum_lycopersicum_cherry', text: 'Bacillus thuringiensis es bioinsecticida específico para Lepidoptera.', score: 1.5, key: 'biopreparados[0].nombre' },
+      { species: 'solanum_lycopersicum_cherry', text: 'Aplicar BT al atardecer cuando las larvas salen a alimentarse.', score: 1.1, key: 'biopreparados[0].uso' },
+    ]);
+    const result = await recommendTreatmentsWithRag('Trozador (Agrotis ipsilon)', {
+      speciesNames: ['tomate cherry'],
+    });
+
+    // Determinista intacto
+    expect(result.recommendations.map((x) => x.id)).toContain('bacillus_thuringiensis');
+
+    // RAG context populado
+    expect(result.ragPassages).toHaveLength(2);
+    expect(result.ragContext).toContain(RAG_CONTEXT_HEADER);
+    expect(result.ragContext).toContain('Bacillus thuringiensis');
+
+    // retrieve fue llamado con pest + species en la query
+    expect(retrieve).toHaveBeenCalledTimes(1);
+    const [calledQuery, calledTopK] = retrieve.mock.calls[0];
+    expect(calledQuery.toLowerCase()).toContain('trozador');
+    expect(calledQuery.toLowerCase()).toContain('tomate cherry');
+    expect(calledTopK).toBe(5);
+  });
+
+  it('respeta opts.topK', async () => {
+    retrieve.mockResolvedValue([]);
+    await recommendTreatmentsWithRag('oídio', { topK: 3 });
+    expect(retrieve.mock.calls[0][1]).toBe(3);
+  });
+
+  it('topK inválido → default 5', async () => {
+    retrieve.mockResolvedValue([]);
+    await recommendTreatmentsWithRag('oídio', { topK: 0 });
+    expect(retrieve.mock.calls[0][1]).toBe(5);
+  });
+
+  it('si retrieve falla → degrade gracefully, sin contexto pero con recomendaciones', async () => {
+    retrieve.mockRejectedValue(new Error('corpus down'));
+    const result = await recommendTreatmentsWithRag('mildiu');
+    expect(result.recommendations.map((x) => x.id)).toContain('caldo_bordeles');
+    expect(result.ragPassages).toEqual([]);
+    expect(result.ragContext).toBe('');
+  });
+
+  it('si retrieve devuelve [] → ragContext vacío pero objeto bien formado', async () => {
+    retrieve.mockResolvedValue([]);
+    const result = await recommendTreatmentsWithRag('cogollero');
+    expect(result.recommendations.map((x) => x.id)).toContain('bacillus_thuringiensis');
+    expect(result.ragPassages).toEqual([]);
+    expect(result.ragContext).toBe('');
+  });
+
+  it('si retrieve devuelve no-array (defensa) → ragPassages=[]', async () => {
+    retrieve.mockResolvedValue(null);
+    const result = await recommendTreatmentsWithRag('cogollero');
+    expect(result.ragPassages).toEqual([]);
+    expect(result.ragContext).toBe('');
+  });
+
+  it('pestName vacío + sin speciesNames → no llama retrieve y devuelve recs vacías', async () => {
+    const result = await recommendTreatmentsWithRag('');
+    expect(retrieve).not.toHaveBeenCalled();
+    expect(result.recommendations).toEqual([]);
+    expect(result.ragPassages).toEqual([]);
+    expect(result.ragContext).toBe('');
+  });
+
+  it('pestName vacío pero con speciesNames → sí consulta RAG (uso preventivo)', async () => {
+    retrieve.mockResolvedValue([{ species: 'lechuga', text: 'companions con caléndula', score: 0.8 }]);
+    const result = await recommendTreatmentsWithRag('', { speciesNames: ['lechuga'] });
+    expect(retrieve).toHaveBeenCalledTimes(1);
+    expect(retrieve.mock.calls[0][0]).toContain('lechuga');
+    expect(result.ragPassages).toHaveLength(1);
   });
 });
