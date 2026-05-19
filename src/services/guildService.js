@@ -21,6 +21,7 @@
 import { SPECIES_DEFAULTS } from '../config/speciesDefaults';
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { FARM_CONFIG } from '../config/defaults';
+import { retrieve } from './ragRetriever';
 
 const DEFAULT_MAX_ASSETS = parseInt(import.meta.env.VITE_LLM_CONTEXT_MAX_ASSETS || '50', 10);
 
@@ -336,6 +337,368 @@ export function buildAssetContext(query, allAssets, maxN = DEFAULT_MAX_ASSETS) {
       return `- ${name} (${species}) [zona: ${zone}]`;
     })
     .join('\n');
+}
+
+// ============================================================================
+// L1.9 — Sugerencia de gremios y policultivos vía RAG
+// ============================================================================
+//
+// El motor `getSuggestedCompanions` (Capas 1+2) opera sobre datos curados a
+// mano en `speciesDefaults.js`. Es exacto pero limitado al subset validado
+// (~165 species). Las siguientes funciones complementan ese path con consultas
+// RAG sobre `public/cycle-content/*.json` (~500+ species), que sí cubre todo
+// el catálogo. Quien consume decide qué capa usa:
+//
+//   - UI síncrona / sin red               → getSuggestedCompanions (estática)
+//   - UI con corpus disponible / detalle  → suggestGuildsFor (asíncrona)
+//
+// No se reemplaza la capa estática: complemento ortogonal.
+
+const CYCLE_CONTENT_PATH = '/cycle-content/';
+
+// Cache de docs JSON ya fetcheados durante la sesión para evitar
+// re-fetch del mismo species entre llamadas a suggestGuildsFor /
+// suggestPolyculture.
+const _cycleDocCache = new Map();
+
+/**
+ * Carga el JSON de `public/cycle-content/<slug>.json` con cache de sesión.
+ * Devuelve `null` si falla, no lanza.
+ *
+ * Misma defensa que voiceRagEnricher: validar content-type para evitar que
+ * el fallback SPA del Vite dev server devuelva HTML disfrazado de JSON.
+ */
+async function _loadCycleDoc(slug) {
+  if (!slug || typeof slug !== 'string') return null;
+  if (_cycleDocCache.has(slug)) return _cycleDocCache.get(slug);
+  try {
+    const res = await fetch(`${CYCLE_CONTENT_PATH}${slug}.json`);
+    if (!res.ok) {
+      _cycleDocCache.set(slug, null);
+      return null;
+    }
+    const ct = res.headers.get('content-type') || '';
+    if (!ct.includes('json')) {
+      _cycleDocCache.set(slug, null);
+      return null;
+    }
+    const data = await res.json();
+    _cycleDocCache.set(slug, data);
+    return data;
+  } catch (err) {
+    console.warn(`[guildService] failed to load cycle-content for ${slug}:`, err);
+    _cycleDocCache.set(slug, null);
+    return null;
+  }
+}
+
+/**
+ * Parsea bloques markdown del corpus con formato:
+ *   - slug_species — Nombre común (Nombre científico)
+ *
+ * Tolerante: acepta tanto guión largo (—) como guión simple (-). Si no
+ * encuentra el separador, devuelve el slug como nombre. Pierde silenciosamente
+ * líneas que no comiencen con "- ".
+ */
+export function parseCompanionsMarkdown(md) {
+  if (typeof md !== 'string' || !md) return [];
+  const lines = md.split('\n');
+  const out = [];
+  for (const line of lines) {
+    const m = line.match(/^\s*-\s+([a-z][a-z0-9_]+)\s*(?:[—-]\s*(.+))?\s*$/i);
+    if (!m) continue;
+    const slug = m[1].toLowerCase();
+    // Heurística: descarta tokens que no parecen species_slug (ej. items de
+    // listas no-companion en bullet points encadenados).
+    if (!slug.includes('_')) continue;
+    const name = (m[2] || '').trim() || slug;
+    out.push({ slug, name });
+  }
+  return out;
+}
+
+/**
+ * Resuelve el nombre legible de un species_slug a partir de CROP_TAXONOMY,
+ * cycle-content cacheado o el propio slug como último recurso.
+ */
+function _resolveSpeciesName(slug, doc = null) {
+  const fromTaxonomy = speciesById.get(slug);
+  if (fromTaxonomy?.name) return fromTaxonomy.name;
+  if (doc) {
+    if (Array.isArray(doc.common_names) && doc.common_names[0]) return doc.common_names[0];
+    if (doc.scientific_name) return doc.scientific_name;
+  }
+  return slug;
+}
+
+/**
+ * Compone `strata` (capas verticales) para el gremio sugerido. El estrato
+ * viene de `speciesDefaults` cuando existe (más confiable) y se infiere del
+ * cycle-content como fallback usando `roles_in_guild` y `radiacion`.
+ *
+ * Cobertura intencionalmente conservadora: si no hay señal clara, omitir.
+ */
+function _inferStratum(slug, doc) {
+  const defaults = SPECIES_DEFAULTS[slug];
+  if (defaults?.estrato) return defaults.estrato;
+  if (!doc) return null;
+  const roles = Array.isArray(doc.roles_in_guild) ? doc.roles_in_guild : [];
+  if (roles.includes('canopy') || roles.includes('emergent')) return 'alto';
+  if (roles.includes('shrub') || roles.includes('understory')) return 'medio';
+  if (roles.includes('groundcover') || roles.includes('herb')) return 'bajo';
+  if (doc.requirements?.radiacion === 'sombra' || doc.requirements?.radiacion === 'sombra_parcial') {
+    return 'medio';
+  }
+  return null;
+}
+
+/**
+ * Sugiere gremios (companions + antagonists + capas verticales) para una
+ * species apoyándose en el RAG y el JSON estructurado del catálogo.
+ *
+ * Pipeline:
+ *   1. `retrieve("companion antagonist " + species, 10)` para localizar el
+ *      species_slug correcto vía BM25 (mismo truco que voiceRagEnricher).
+ *   2. Por cada species_slug presente en los hits (con prioridad al que más
+ *      cobertura tenga), fetch del JSON completo y extracción estructurada
+ *      de `companions_markdown` + `antagonists` + `antagonists_markdown`.
+ *   3. Estratos: una entrada por cada species mencionada (target + companions
+ *      + antagonists conocidos), usando `_inferStratum`.
+ *   4. Dedup por slug — un species solo aparece una vez en cada lista.
+ *
+ * Si el RAG no tiene cobertura (corpus cold / offline), degrada al curado de
+ * `getSuggestedCompanions` para no devolver vacío. La forma de salida sigue
+ * siendo `{ companions, antagonists, strata }`.
+ *
+ * @param {string} speciesSlug - slug del catálogo (ej. 'coffea_arabica')
+ * @returns {Promise<{
+ *   companions: Array<{slug:string, name:string, reason:string}>,
+ *   antagonists: Array<{slug:string, name:string, reason:string}>,
+ *   strata: Array<{species:string, layer:string}>
+ * }>}
+ */
+export async function suggestGuildsFor(speciesSlug) {
+  if (!speciesSlug || typeof speciesSlug !== 'string') {
+    return { companions: [], antagonists: [], strata: [] };
+  }
+
+  // 1. Recuperar passages relevantes. El query busca tanto companions como
+  //    antagonists para que BM25 priorice los docs que tienen ambos campos.
+  let hits = [];
+  try {
+    hits = await retrieve(`companion antagonist ${speciesSlug}`, 10);
+  } catch (err) {
+    console.warn('[guildService] retrieve failed, falling back to static:', err);
+    hits = [];
+  }
+
+  // 2. Construir el conjunto de slugs candidatos: target + todos los species
+  //    que aparecen en los hits con score > 0. Damos preferencia al target
+  //    pidiendo su JSON aunque no esté en los hits (puede no tener docs largos).
+  const candidateSlugs = new Set([speciesSlug]);
+  for (const h of hits) {
+    if (h?.species && h.score > 0) candidateSlugs.add(h.species);
+  }
+
+  const companionsMap = new Map();    // slug → { slug, name, reason }
+  const antagonistsMap = new Map();
+  const strataMap = new Map();        // species → layer
+
+  // El target siempre tiene su estrato si está en defaults
+  const targetDoc = await _loadCycleDoc(speciesSlug);
+  const targetStratum = _inferStratum(speciesSlug, targetDoc);
+  if (targetStratum) strataMap.set(speciesSlug, targetStratum);
+
+  // 3. Por cada candidato, parsear companions/antagonists markdown
+  for (const slug of candidateSlugs) {
+    const doc = slug === speciesSlug ? targetDoc : await _loadCycleDoc(slug);
+    if (!doc) continue;
+
+    // El doc del propio target define companions y antagonists "directos".
+    // Los docs de OTRAS species solo contribuyen estratos (no merge cruzado
+    // de companions para no diluir la sugerencia al target).
+    if (slug === speciesSlug) {
+      // Companions desde markdown
+      const compEntries = parseCompanionsMarkdown(doc.companions_markdown);
+      for (const c of compEntries) {
+        if (c.slug === speciesSlug) continue;
+        if (companionsMap.has(c.slug)) continue;
+        const name = _resolveSpeciesName(c.slug) || c.name;
+        companionsMap.set(c.slug, {
+          slug: c.slug,
+          name,
+          reason: 'Asociación favorable documentada en el catálogo',
+        });
+      }
+
+      // Antagonists: campo estructurado (array de slugs) + markdown (fallback)
+      const antSlugs = Array.isArray(doc.antagonists) ? doc.antagonists : [];
+      for (const aSlug of antSlugs) {
+        if (typeof aSlug !== 'string' || aSlug === speciesSlug) continue;
+        if (antagonistsMap.has(aSlug)) continue;
+        antagonistsMap.set(aSlug, {
+          slug: aSlug,
+          name: _resolveSpeciesName(aSlug),
+          reason: 'Antagonista (comparte plagas o compite por recursos)',
+        });
+      }
+      const antMdEntries = parseCompanionsMarkdown(doc.antagonists_markdown);
+      for (const a of antMdEntries) {
+        if (a.slug === speciesSlug) continue;
+        if (antagonistsMap.has(a.slug)) continue;
+        antagonistsMap.set(a.slug, {
+          slug: a.slug,
+          name: _resolveSpeciesName(a.slug) || a.name,
+          reason: 'Antagonista (comparte plagas o compite por recursos)',
+        });
+      }
+    }
+
+    // Estratos: registrar layer del candidato (incluyendo target ya hecho)
+    if (!strataMap.has(slug)) {
+      const layer = _inferStratum(slug, doc);
+      if (layer) strataMap.set(slug, layer);
+    }
+  }
+
+  // 4. Fallback al curado si el RAG no devolvió companions ni antagonists.
+  //    Reusa los datos validados a mano para evitar pantalla vacía cuando
+  //    el corpus está cold o la red está offline en la primera carga.
+  if (companionsMap.size === 0 && antagonistsMap.size === 0) {
+    const fallback = getSuggestedCompanions(speciesSlug);
+    for (const c of fallback.companions) {
+      companionsMap.set(c.id, {
+        slug: c.id,
+        name: c.name,
+        reason: c.reason || 'Compañero validado en catálogo curado',
+      });
+    }
+    for (const a of fallback.antagonists) {
+      antagonistsMap.set(a.id, {
+        slug: a.id,
+        name: a.name,
+        reason: a.reason || 'Antagonista validado en catálogo curado',
+      });
+    }
+  }
+
+  // Asegurar estrato para companions/antagonists conocidos en defaults
+  // aunque no hayan tenido doc cargado.
+  for (const slug of [...companionsMap.keys(), ...antagonistsMap.keys()]) {
+    if (strataMap.has(slug)) continue;
+    const layer = _inferStratum(slug, null);
+    if (layer) strataMap.set(slug, layer);
+  }
+
+  const strata = Array.from(strataMap.entries()).map(([species, layer]) => ({ species, layer }));
+
+  return {
+    companions: Array.from(companionsMap.values()),
+    antagonists: Array.from(antagonistsMap.values()),
+    strata,
+  };
+}
+
+/**
+ * Sugiere otras species que complementen un conjunto de cultivos ya plantados.
+ *
+ * Lógica:
+ *   1. Para cada species en el array, obtener su `suggestGuildsFor`.
+ *   2. Acumular companions con un contador (votos): species sugerida por
+ *      varios cultivos pesa más.
+ *   3. Excluir las species que ya están en el array de entrada.
+ *   4. Excluir species que aparecen como antagonista de ALGUNO de los
+ *      cultivos del array (incompatibilidad veto).
+ *   5. Ordenar por número de votos descendente y devolver top 8.
+ *
+ * Devuelve la misma forma que `suggestGuildsFor` para mantener consistencia
+ * con consumidores existentes: el array `strata` une los estratos de todas
+ * las species evaluadas.
+ *
+ * @param {Array<string>} speciesSlugs - cultivos ya plantados
+ * @returns {Promise<{
+ *   companions: Array<{slug:string, name:string, reason:string, votes:number}>,
+ *   antagonists: Array<{slug:string, name:string, reason:string}>,
+ *   strata: Array<{species:string, layer:string}>
+ * }>}
+ */
+export async function suggestPolyculture(speciesSlugs) {
+  if (!Array.isArray(speciesSlugs) || speciesSlugs.length === 0) {
+    return { companions: [], antagonists: [], strata: [] };
+  }
+
+  const planted = new Set(speciesSlugs.filter((s) => typeof s === 'string' && s));
+  if (planted.size === 0) return { companions: [], antagonists: [], strata: [] };
+
+  // Pull guilds en paralelo (cada uno hace su propio retrieve + loadCycleDoc,
+  // que están cacheados). Promise.all es seguro porque ningún branch lanza.
+  const guilds = await Promise.all(
+    Array.from(planted).map((slug) => suggestGuildsFor(slug).catch(() => null))
+  );
+
+  const voteMap = new Map();           // slug → { slug, name, votes, reasons:Set }
+  const antagonistVeto = new Set();    // slug → bloqueado por ser antagonista de cualquiera
+  const antagonistDetails = new Map(); // slug → { slug, name, reason }
+  const strataMap = new Map();
+
+  for (const g of guilds) {
+    if (!g) continue;
+    for (const a of g.antagonists) {
+      antagonistVeto.add(a.slug);
+      if (!antagonistDetails.has(a.slug)) antagonistDetails.set(a.slug, a);
+    }
+    for (const { species, layer } of g.strata) {
+      if (!strataMap.has(species)) strataMap.set(species, layer);
+    }
+  }
+
+  for (const g of guilds) {
+    if (!g) continue;
+    for (const c of g.companions) {
+      if (planted.has(c.slug)) continue;        // ya está plantada
+      if (antagonistVeto.has(c.slug)) continue; // veto cruzado
+      const cur = voteMap.get(c.slug) || {
+        slug: c.slug,
+        name: c.name,
+        votes: 0,
+        reasons: new Set(),
+      };
+      cur.votes += 1;
+      if (c.reason) cur.reasons.add(c.reason);
+      voteMap.set(c.slug, cur);
+    }
+  }
+
+  const companions = Array.from(voteMap.values())
+    .map((v) => ({
+      slug: v.slug,
+      name: v.name,
+      votes: v.votes,
+      reason:
+        v.votes > 1
+          ? `Compañero de ${v.votes} cultivos plantados`
+          : Array.from(v.reasons)[0] || 'Compañero sugerido por el catálogo',
+    }))
+    .sort((a, b) => b.votes - a.votes)
+    .slice(0, 8);
+
+  const strata = Array.from(strataMap.entries()).map(([species, layer]) => ({ species, layer }));
+
+  return {
+    companions,
+    antagonists: Array.from(antagonistDetails.values()),
+    strata,
+  };
+}
+
+/**
+ * Reset del cache de cycle-content. Solo expuesto para tests; en runtime el
+ * cache vive lo que vive la sesión y se purga al recargar la PWA.
+ *
+ * @private
+ */
+export function _resetGuildCache() {
+  _cycleDocCache.clear();
 }
 
 export default getSuggestedCompanions;
