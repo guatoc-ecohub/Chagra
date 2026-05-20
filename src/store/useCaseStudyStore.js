@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { getActiveTenantId } from '../services/tenantContext';
 
 /**
  * useCaseStudyStore — Módulo "Casos de Estudio"
@@ -147,6 +148,17 @@ export const withExtendedDefaults = (c) => {
   };
 };
 
+// ADR-036 MVP multi-finca: predicate de visibilidad por tenant. Mismo
+// criterio que assetCache/logCache: cases sin `_tenant_id` (creados antes
+// de 2026-05-20 o sin login) son tratados como legacy single-tenant y
+// quedan visibles al tenant activo. Cuando NO hay tenant activo (dev sin
+// login), todos los cases son visibles — preserva flujos de demo previos.
+const belongsToActiveTenant = (c) => {
+  const tenantId = getActiveTenantId();
+  if (!tenantId) return true;
+  return !c._tenant_id || c._tenant_id === tenantId;
+};
+
 // ULID-lite (timestamp-sortable) sin dependency externa
 const makeId = () => {
   const ts = Date.now().toString(36).toUpperCase().padStart(10, '0');
@@ -166,15 +178,30 @@ export const useCaseStudyStore = create(
       // ─── Selectors (computed, no setters) ───
       // Selectors normalizan defaults extendidos (foro/validación/timeline)
       // para cases legacy almacenados antes de 2026-05-18.
-      getById: (id) => withExtendedDefaults(get().cases.find((c) => c.id === id)),
+      //
+      // ADR-036 MVP multi-finca: TODO selector aplica `belongsToActiveTenant`
+      // ANTES del normalize/map para que el operador solo vea sus propios
+      // cases. Los cases de otros tenants quedan en localStorage pero
+      // ocultos del read-path — comparable al filtrado en read de
+      // assetCache. Cuando did:key + UCAN cierre ADR-036, este filtro
+      // pasará a ser redundante con la cap-based access.
+      getById: (id) => {
+        const c = get().cases.find((x) => x.id === id);
+        if (!c || !belongsToActiveTenant(c)) return undefined;
+        return withExtendedDefaults(c);
+      },
 
       getByFinca: (slug) =>
-        get().cases.filter((c) => c.finca_slug === slug).map(withExtendedDefaults),
+        get()
+          .cases.filter((c) => c.finca_slug === slug && belongsToActiveTenant(c))
+          .map(withExtendedDefaults),
 
       getActive: () =>
         get()
           .cases.filter(
-            (c) => !['closed_resolved', 'closed_failed'].includes(c.state)
+            (c) =>
+              !['closed_resolved', 'closed_failed'].includes(c.state) &&
+              belongsToActiveTenant(c)
           )
           .map(withExtendedDefaults),
 
@@ -182,7 +209,10 @@ export const useCaseStudyStore = create(
       // "Compartidos en red".
       getByVisibility: (visibility) =>
         get()
-          .cases.filter((c) => (c.visibility || 'private') === visibility)
+          .cases.filter(
+            (c) =>
+              (c.visibility || 'private') === visibility && belongsToActiveTenant(c)
+          )
           .map(withExtendedDefaults),
 
       // Casos cuya recomendación o validation_status reclama un agrónomo.
@@ -190,6 +220,7 @@ export const useCaseStudyStore = create(
       getPendingValidation: () =>
         get()
           .cases.filter((c) => {
+            if (!belongsToActiveTenant(c)) return false;
             const v = c.validation?.status || 'pending';
             if (v === 'pending' || v === 'self-reported') return true;
             const recs = c.recommendations || [];
@@ -203,7 +234,11 @@ export const useCaseStudyStore = create(
         const severityWeight = { critical: 4, high: 3, medium: 2, low: 1 };
         const now = Date.now();
         return [...get().cases]
-          .filter((c) => !['closed_resolved', 'closed_failed'].includes(c.state))
+          .filter(
+            (c) =>
+              !['closed_resolved', 'closed_failed'].includes(c.state) &&
+              belongsToActiveTenant(c)
+          )
           .map((c) => {
             const ageMs = now - new Date(c.problem.detected_at || c.created_at).getTime();
             const ageDays = Math.max(1, ageMs / 86400000);
@@ -264,6 +299,9 @@ export const useCaseStudyStore = create(
           recommendations: [],
           created_at: ts,
           created_by_did: null, // ADR-036 lo llenará en multi-finca real
+          // ADR-036 MVP multi-finca: stamp el tenant activo al crear. Si no
+          // hay login (dev sin tenant), queda null y se trata como legacy.
+          _tenant_id: getActiveTenantId() || null,
           updated_at: ts,
         };
         set((s) => ({ cases: [...s.cases, newCase] }));
@@ -534,8 +572,14 @@ export const useCaseStudyStore = create(
 
       // Hidrata casos demo desde un payload externo (público demo seed).
       // Idempotente: solo agrega cases cuyo id NO existe ya.
+      //
+      // ADR-036 MVP multi-finca: los demo cases se stampean con el tenant
+      // activo si lo hay. Si el seed JSON ya trae `_tenant_id` se preserva
+      // (permite seeds compartidos públicos sin owner). Si no hay login,
+      // queda null → legacy (visible a todos hasta que alguien lo "adopte").
       hydrateDemoCases: (demoCases = []) => {
         if (!Array.isArray(demoCases) || demoCases.length === 0) return 0;
+        const activeTenant = getActiveTenantId() || null;
         let added = 0;
         set((s) => {
           const existing = new Set(s.cases.map((c) => c.id));
@@ -549,6 +593,7 @@ export const useCaseStudyStore = create(
               treatments_applied: [],
               outcome: { closed_at: null, final_count_affected: null, lessons_learned: '' },
               created_by_did: null,
+              _tenant_id: activeTenant,
               ...d,
             }));
           added = toAdd.length;
@@ -573,5 +618,17 @@ export const CASE_SEVERITIES = SEVERITY_VALID;
 export const CASE_VISIBILITIES = VISIBILITY_VALID;
 export const CASE_VALIDATION_STATUSES = VALIDATION_STATUS_VALID;
 export const CASE_TIMELINE_EVENT_TYPES = TIMELINE_EVENT_TYPES;
+
+// ADR-036 MVP multi-finca: al cambiar el tenant activo (re-login con otro
+// usuario sobre el mismo device), forzar re-evaluación de los selectors
+// que filtran por tenant. No purga el array `cases` (los datos del tenant
+// anterior siguen en localStorage para que vuelvan a aparecer cuando ese
+// usuario re-loguee), solo reasigna la referencia para que zustand emita
+// notificación a los subscribers de la UI.
+if (typeof window !== 'undefined') {
+  window.addEventListener('tenantChanged', () => {
+    useCaseStudyStore.setState((s) => ({ cases: [...s.cases] }));
+  });
+}
 
 export default useCaseStudyStore;
