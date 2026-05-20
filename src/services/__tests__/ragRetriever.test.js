@@ -151,3 +151,85 @@ describe('ragRetriever — corpus extendido v2', () => {
     });
   });
 });
+
+/**
+ * Cobertura del fix de pre-tokenize (perf BM25, 2026-05-20).
+ *
+ * El refactor mueve `tokenize(doc.text)` desde scoreBM25 (hot path, una vez
+ * por query × por doc) a loadCorpus (cold path, una vez por boot). Estos
+ * tests verifican:
+ *   - retrieve sigue devolviendo docs con shape público esperado.
+ *   - score > 0 cuando hay match.
+ *   - El shape devuelto NO incluye las estructuras internas de scoring
+ *     (`tokenized`, `termCounts`, `docLen`) — solo species/text/key/score.
+ *   - retrieve es determinístico (mismo input → mismo output).
+ */
+describe('ragRetriever — pre-tokenize perf fix', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    setupFetchMock();
+  });
+
+  afterEach(() => {
+    delete globalThis.fetch;
+    vi.clearAllMocks();
+  });
+
+  it('retrieve("fresa") devuelve docs con score>0 y shape público {species, text, key, score}', async () => {
+    const { retrieve } = await import('../ragRetriever.js');
+    const hits = await retrieve('fresa rosácea perenne estolones', 5, 'voice');
+    expect(hits.length).toBeGreaterThan(0);
+    hits.forEach((h) => {
+      expect(h.score).toBeGreaterThan(0);
+      expect(typeof h.species).toBe('string');
+      expect(typeof h.text).toBe('string');
+      expect(typeof h.key).toBe('string');
+      // El refactor cambió `{...doc, score}` por proyección explícita.
+      // No deben filtrarse estructuras internas de scoring.
+      expect(h).not.toHaveProperty('tokenized');
+      expect(h).not.toHaveProperty('termCounts');
+      expect(h).not.toHaveProperty('docLen');
+    });
+  });
+
+  it('retrieve es determinístico — dos llamadas con el mismo query devuelven mismos hits y mismo orden', async () => {
+    const { retrieve } = await import('../ragRetriever.js');
+    const q = 'café arábica sombra parcial altitud roya';
+    const a = await retrieve(q, 5);
+    const b = await retrieve(q, 5);
+    expect(a.length).toBe(b.length);
+    a.forEach((hit, i) => {
+      expect(b[i].species).toBe(hit.species);
+      expect(b[i].key).toBe(hit.key);
+      expect(b[i].score).toBe(hit.score);
+    });
+  });
+
+  it('retrieve respeta topK y ordena por score descendente', async () => {
+    const { retrieve } = await import('../ragRetriever.js');
+    const hits = await retrieve('fresa café lechuga clima frío hortaliza', 3);
+    expect(hits.length).toBeLessThanOrEqual(3);
+    for (let i = 1; i < hits.length; i++) {
+      expect(hits[i - 1].score).toBeGreaterThanOrEqual(hits[i].score);
+    }
+  });
+
+  it('retrieve con query vacío o solo stopwords devuelve []', async () => {
+    const { retrieve } = await import('../ragRetriever.js');
+    const empty = await retrieve('', 5);
+    expect(empty).toEqual([]);
+    // tokens <=2 chars son filtrados por tokenize.
+    const tiny = await retrieve('a b c', 5);
+    expect(tiny).toEqual([]);
+  });
+
+  it('getCorpusStats refleja avgDocLen pre-computado', async () => {
+    const { retrieve, getCorpusStats } = await import('../ragRetriever.js');
+    // Forzar carga de corpus.
+    await retrieve('fresa', 1);
+    const stats = await getCorpusStats();
+    expect(stats.totalDocs).toBeGreaterThan(0);
+    expect(stats.uniqueTerms).toBeGreaterThan(0);
+    expect(stats.avgDocLen).toBeGreaterThan(0);
+  });
+});
