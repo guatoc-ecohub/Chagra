@@ -908,6 +908,31 @@ const useAssetStore = create((set, get) => ({
   },
 }));
 
+// ADR-036 MVP multi-finca: al cambiar el tenantId activo (re-login con otro
+// usuario sobre el mismo device), limpiar el state in-memory para no exponer
+// assets del tenant anterior. La IDB no se borra — sigue scoped por
+// `_tenant_id` y un re-hydrate la repuebla con los del nuevo tenant.
+if (typeof window !== 'undefined') {
+  window.addEventListener('tenantChanged', () => {
+    useAssetStore.setState({
+      plants: [],
+      structures: [],
+      equipment: [],
+      materials: [],
+      lands: [],
+      taxonomyTerms: [],
+      lastSync: null,
+      selectedAssetId: null,
+      syncProgress: null,
+      error: null,
+    });
+    // Re-hidratar desde IDB ya scoped al nuevo tenant.
+    useAssetStore.getState().hydrate().catch((err) => {
+      console.error('[Store] Falló hydrate post-tenantChanged:', err);
+    });
+  });
+}
+
 // Listener global: al recibir confirmación de sincronización exitosa,
 // liberar el flag _pending del asset y disparar un pull dirigido que lo
 // sobrescriba con el objeto oficial del servidor (Hotfix 10.3 — Opción C).
