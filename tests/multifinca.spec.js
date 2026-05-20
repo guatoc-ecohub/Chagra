@@ -142,15 +142,18 @@ test.describe('multifinca client-side scoping (ADR-036 MVP)', () => {
     });
 
     await page.evaluate(async () => {
-      // Setear tenant + token persistido antes de importar apiService.
+      // Login real vía authService (OAuth mockeado en beforeEach con
+      // context.route('**/oauth/token')). authenticateUser persiste el token
+      // en localforage internamente, evitando que el test tenga que importar
+      // 'localforage' como bare specifier (no resuelve en page.evaluate sin
+      // bundler context).
+      const authMod = await import('/src/services/authService.js');
+      const result = await authMod.authenticateUser('alice', 'e2e-pwd');
+      if (!result.success) {
+        throw new Error('OAuth mock no respondió OK: ' + result.error);
+      }
       const tenantMod = await import('/src/services/tenantContext.js');
       tenantMod.setActiveTenantId('alice');
-      const { default: localforage } = await import('localforage');
-      await localforage.setItem('farmos_access_token', 'e2e-multifinca-token');
-      await localforage.setItem(
-        'farmos_token_expiry',
-        Date.now() + 60 * 60 * 1000
-      );
       const apiMod = await import('/src/services/apiService.js');
       window.__apiE2E = apiMod;
     });
