@@ -25,7 +25,10 @@ function tokenize(text) {
 function buildInvertedIndex(docs) {
   const df = new Map();
   docs.forEach((doc) => {
-    const terms = new Set(tokenize(doc.text));
+    // Cada doc trae `tokenized` ya pre-computado en loadCorpus.
+    // Usamos Set para contar document frequency (DF) — un término que
+    // aparece N veces en el mismo doc cuenta como 1 para DF.
+    const terms = new Set(doc.tokenized);
     terms.forEach((term) => {
       df.set(term, (df.get(term) || 0) + 1);
     });
@@ -41,13 +44,19 @@ function computeIDF(df, N) {
   return idf;
 }
 
+/**
+ * Calcula score BM25 contra un doc.
+ *
+ * Requiere que `doc` traiga pre-computados `termCounts: Map<term, count>` y
+ * `docLen: number` (lo hace `loadCorpus` una sola vez en carga del corpus).
+ * Antes esta función re-tokenizaba el texto del doc en cada query × cada doc,
+ * generando 500ms–2s de bloqueo del main thread con 5K–15K passages y query
+ * de 4 términos. El pre-tokenize bajó el costo a O(|queryTerms|) por doc.
+ */
 function scoreBM25(doc, queryTerms, idf, avgLen) {
-  const docTerms = tokenize(doc.text);
-  const docLen = docTerms.length;
-  const termCounts = new Map();
-  docTerms.forEach((t) => termCounts.set(t, (termCounts.get(t) || 0) + 1));
-
   let score = 0;
+  const docLen = doc.docLen;
+  const termCounts = doc.termCounts;
   queryTerms.forEach((term) => {
     const tf = termCounts.get(term) || 0;
     if (tf > 0) {
@@ -126,6 +135,17 @@ async function loadCorpus() {
       const data = await res.json();
       const passages = flattenDoc(data);
       passages.forEach((p) => {
+        // Pre-tokenize cada passage una sola vez en carga del corpus.
+        // Trade-off de memoria: ~2-5MB extra para 10K docs con ~50 tokens promedio
+        // (tokenized[] + termCounts Map). Aceptable a cambio de evitar re-tokenizar
+        // 5K-15K docs × cada query (que bloqueaba el main thread 500ms-2s y
+        // generaba la latencia post-voz que motivó este fix).
+        const tokenized = tokenize(p.text);
+        const termCounts = new Map();
+        tokenized.forEach((t) => termCounts.set(t, (termCounts.get(t) || 0) + 1));
+        p.tokenized = tokenized;
+        p.termCounts = termCounts;
+        p.docLen = tokenized.length;
         docs.push(p);
       });
     } catch (e) {
@@ -133,7 +153,7 @@ async function loadCorpus() {
     }
   }
 
-  const totalLen = docs.reduce((sum, d) => sum + tokenize(d.text).length, 0);
+  const totalLen = docs.reduce((sum, d) => sum + d.docLen, 0);
   avgDocLen = docs.length > 0 ? totalLen / docs.length : 1;
 
   const df = buildInvertedIndex(docs);
@@ -153,8 +173,13 @@ async function retrieveInternal(query, topK) {
 
   if (queryTerms.length === 0) return [];
 
+  // Project explícito: NO spreedeamos `...doc` porque ahora trae `tokenized`,
+  // `termCounts` y `docLen` (estructuras de scoring interno). Devolvemos solo
+  // los campos públicos que los callers consumen (species, text, key, score).
   const scored = docs.map((doc) => ({
-    ...doc,
+    species: doc.species,
+    text: doc.text,
+    key: doc.key,
     score: scoreBM25(doc, queryTerms, idf, avgDocLen),
   }));
 
