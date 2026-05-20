@@ -22,8 +22,9 @@
 // El segundo arg (schema) se acepta para consistencia con validate-catalog.mjs
 // pero no se usa hoy — el script no necesita schema para esta operación.
 
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
 import { resolve, basename, dirname, join } from 'node:path';
+import { tmpdir } from 'node:os';
 
 const args = process.argv.slice(2);
 if (args.length < 1) {
@@ -37,7 +38,10 @@ const CATALOG_PATH = resolve(args[0]);
 // dejaba 3 quinas/vismia esperando entrar a coffea_arabica — todas legítimas
 // SAF cafetalero. Subido a 30 para drenar el residual a 0.
 const MAX_COMPANIONS = 30;
-const LOG_PATH = '/tmp/amb10-symmetrize-log.json';
+// mkdtempSync evita CodeQL js/insecure-temporary-file: un path hardcoded en
+// /tmp es vector de symlink attack. mkdtempSync crea un dir único O_EXCL.
+const LOG_DIR = mkdtempSync(join(tmpdir(), 'amb10-symmetrize-'));
+const LOG_PATH = join(LOG_DIR, 'log.json');
 
 console.log('Chagra AMB-10 Symmetrize Tool');
 console.log(`  input:  ${CATALOG_PATH}`);
