@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Sprout } from 'lucide-react';
 import { authenticateUser } from '../services/authService';
 import { setCurrentOperator } from '../services/operatorIdentityService';
+import { setActiveTenantId } from '../services/tenantContext';
 import { version as APP_VERSION } from '../../package.json';
 import ChagraGrowLoader from './ChagraGrowLoader';
 import LegalLinks from './LegalLinks';
@@ -32,6 +33,15 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
         // No bloquear login si falla crypto (browser sin Web Crypto API).
         // Componentes hacen fallback a default-hash. Tracking warning silenciosa.
         console.warn('[LoginScreen] setCurrentOperator failed:', err);
+      }
+      // ADR-036 MVP multi-finca: persistir el username como tenantId activo.
+      // Lo consumen apiService (filter[uid.name]) y useAssetStore (scope IDB).
+      // Si el tenantId cambia respecto al previo (re-login con otro usuario),
+      // setActiveTenantId emite `tenantChanged` y los stores limpian su caché.
+      try {
+        setActiveTenantId(creds.username);
+      } catch (err) {
+        console.warn('[LoginScreen] setActiveTenantId failed:', err);
       }
       setLoading(false);
       onLoginSuccess();
