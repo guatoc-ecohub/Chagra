@@ -12,7 +12,12 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "3.1"
+      "type": "string",
+      "enum": [
+        "3.1",
+        "3.2"
+      ],
+      "description": "v3.2 (2026-05-21) formaliza variedades_registradas_ica + valida normativa contra enum cerrado de autoridades. Compatible con v3.1 — el seed.json puede declararse en cualquiera de las dos versiones durante la transición."
     },
     "seed_version": {
       "type": "string"
@@ -198,8 +203,308 @@
         },
         "variedades_registradas_ica": {
           "type": "array",
+          "description": "Variedades vegetales registradas ICA/AGROSAVIA asociadas a esta species. Schema v3.2 (2026-05-21) formaliza la estructura tras DR consolidado 3-LLMs (`dr-variedades-ica-CONSOLIDADO-3LLMs-2026-05-21.md`). Disclaimer obligatorio: información referencial recopilada de fuentes públicas, sin convenio formal AGROSAVIA/ICA. Datos fácticos (no protegibles por copyright); nunca copiar texto literal del repositorio AGROSAVIA por conflicto CC-BY-NC-SA.",
           "items": {
-            "type": "object"
+            "type": "object",
+            "required": [
+              "id_canonico",
+              "nombre_comercial",
+              "obtentor",
+              "resolucion_ica",
+              "nota_editorial"
+            ],
+            "properties": {
+              "id_canonico": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]+$",
+                "description": "Slug estable. Convención: <obtentor>-<variedad>-<cultivo>-<año>. Ej: 'agrosavia-la22-arracacha-2019'."
+              },
+              "nombre_comercial": {
+                "type": "string",
+                "description": "Nombre comercial de la variedad. Ej: 'AGROSAVIA La 22', 'Sol Andina'."
+              },
+              "codigo_experimental": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Código pre-comercial del programa de mejoramiento (CIP-XXXX, COL-XXX), si aplica."
+              },
+              "nombre_botanico": {
+                "type": "string",
+                "description": "Binomial + autor + cv. (cultivar). Ej: 'Arracacia xanthorrhiza Bancr.'"
+              },
+              "species_id_chagra": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]+$",
+                "description": "Ref a species.id chagra de la species base (sin el sufijo de variedad). Ej: 'arracacia_xanthorrhiza'."
+              },
+              "obtentor": {
+                "type": "object",
+                "required": [
+                  "nombre"
+                ],
+                "properties": {
+                  "nombre": {
+                    "type": "string",
+                    "description": "Nombre corto del obtentor. Ej: 'AGROSAVIA', 'CIAT', 'UNAL Palmira'."
+                  },
+                  "denominacion_legal": {
+                    "type": "string",
+                    "description": "Razón social formal. Ej: 'Corporación Colombiana de Investigación Agropecuaria'."
+                  },
+                  "centro_investigacion": {
+                    "type": "string",
+                    "description": "C.I. donde se desarrolló. Ej: 'C.I. Tibaitatá', 'C.I. Obonuco'."
+                  }
+                },
+                "additionalProperties": false
+              },
+              "resolucion_ica": {
+                "type": "object",
+                "required": [
+                  "numero"
+                ],
+                "properties": {
+                  "numero": {
+                    "type": "string",
+                    "pattern": "^[0-9]{5,6}/[0-9]{4}$",
+                    "description": "Formato 'NNNNNN/AAAA' (5-6 dígitos / 4 dígitos año). Ej: '00015201/2019', '17702/2019'. Validador AMB-21 enforces."
+                  },
+                  "fecha": {
+                    "type": "string",
+                    "description": "ISO date completa si conocida (YYYY-MM-DD), o solo año."
+                  },
+                  "url_oficial": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "URL .gov.co al texto oficial de la resolución."
+                  }
+                },
+                "additionalProperties": false
+              },
+              "estado_registro": {
+                "type": "string",
+                "enum": [
+                  "vigente",
+                  "derogada",
+                  "en_renovacion",
+                  "desconocido"
+                ],
+                "description": "Default 'desconocido' si no se ha verificado."
+              },
+              "resoluciones_relacionadas": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Otras resoluciones ICA/MADS vinculadas a la variedad (enmiendas, renovaciones)."
+              },
+              "subregiones_naturales_ica": {
+                "type": "array",
+                "description": "ICA inscribe variedades por subregión natural (no por departamentos). Enum cerrado validado por AMB-22.",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "nombre"
+                  ],
+                  "properties": {
+                    "nombre": {
+                      "type": "string",
+                      "enum": [
+                        "Region Andina",
+                        "Caribe Seco",
+                        "Caribe Humedo",
+                        "Pacifica",
+                        "Valles Interandinos",
+                        "Amazonia",
+                        "Orinoquia",
+                        "Nudo de los Pastos",
+                        "Altiplano Cundiboyacense"
+                      ]
+                    },
+                    "estratos_altitudinales_msnm": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "min"
+                        ],
+                        "properties": {
+                          "min": {
+                            "type": "number"
+                          },
+                          "max": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "etiqueta": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "departamentos_inferidos": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Departamentos donde la variedad se cultiva (inferencia chagra, no parte del registro ICA oficial)."
+              },
+              "productividad": {
+                "type": "object",
+                "properties": {
+                  "rendimiento_promedio_t_ha": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "desviacion_estandar_t_ha": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "rendimiento_tradicional_t_ha_comparado": {
+                    "type": "object",
+                    "properties": {
+                      "min": {
+                        "type": "number"
+                      },
+                      "max": {
+                        "type": "number"
+                      },
+                      "fuente_comparacion": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "ciclo_meses": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "tipo_dato": {
+                    "type": "string",
+                    "enum": [
+                      "experimental",
+                      "comercial",
+                      "campo_productores",
+                      "modelo_estimado"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "caracteristicas_distintivas": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "resistencias_documentadas": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "disponibilidad_semilla": {
+                "type": "object",
+                "properties": {
+                  "tipo_propagacion": {
+                    "type": "string",
+                    "enum": [
+                      "sexual_semilla",
+                      "asexual_propagulo",
+                      "asexual_tuberculo_semilla",
+                      "asexual_estaca",
+                      "asexual_rizoma",
+                      "asexual_microprop",
+                      "mixto"
+                    ]
+                  },
+                  "puntos_venta_oficiales": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "nombre"
+                      ],
+                      "properties": {
+                        "nombre": {
+                          "type": "string"
+                        },
+                        "ciudad": {
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "requiere_licencia_multiplicador": {
+                    "type": "boolean"
+                  },
+                  "norma_aplicable": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "ano_liberacion": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "source_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "fuente_principal": {
+                "type": "object",
+                "properties": {
+                  "tipo": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "fecha_acceso": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "nota_editorial": {
+                "type": "string",
+                "description": "Disclaimer obligatorio. Texto canónico: 'Información referencial recopilada de fuentes públicas (ICA, AGROSAVIA). Sin convenio formal entre Chagra y estas instituciones. La PEA y el registro real corresponden a ICA; consultar resolución oficial antes de tomar decisiones comerciales.'"
+              },
+              "fecha_ingreso_chagra": {
+                "type": "string"
+              },
+              "ultima_revision_chagra": {
+                "type": "string"
+              },
+              "_curation_status": {
+                "type": "string"
+              },
+              "_revisor": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
           }
         },
         "altitud_msnm": {
