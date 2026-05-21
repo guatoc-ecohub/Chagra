@@ -7,6 +7,7 @@
  */
 
 import { getAccessToken } from './authService';
+import { getActiveTenantId } from './tenantContext';
 
 /**
  * @typedef {Object} FetchOptions
@@ -98,6 +99,51 @@ const remapLegacyBundleUrl = (endpoint) => {
   return endpoint;
 };
 
+/**
+ * ADR-036 MVP multi-finca — inyecta `filter[uid.name]=<tenantId>` en GET a
+ * /api/asset/* y /api/log/* cuando hay un tenant activo y la URL aún no trae
+ * un filtro de owner. Defense-in-depth cliente-side: si el backend ya restringe
+ * por OAuth scope esto es redundante; si NO, evita IDOR latente cuando dos
+ * pilotos comparten backend.
+ *
+ * Reglas:
+ *  - Solo aplica a /api/asset/* (sin sub-id, ej /api/asset/plant) y /api/log/*.
+ *    Para GET por id (/api/asset/plant/<uuid>) NO inyectamos — farmOS valida
+ *    por id directo y romper acceso a un id propio sería peor que dejar pasar.
+ *  - Solo en URLs sin filter[uid|owner] ya presente — respetar callers que
+ *    fijan filtros explícitos (assetService.findPersonByName usa filter[name]).
+ *  - Si no hay tenant activo (pre-login, dev sin login), no se toca la URL —
+ *    preserva el comportamiento single-tenant histórico.
+ *
+ * Limitación conocida: farmOS expone `uid` (autor del asset) en asset--*; si
+ * el operador hereda assets creados por otro usuario, este filtro los
+ * ocultaría. Aceptable en MVP — los pilotos arrancan con bases vacías.
+ *
+ * TODO(multifinca-backend): cuando did:key + UCAN estén en farmOS (ADR-036
+ * sub-i + sub-iv), sustituir `filter[uid.name]` por validación UCAN cap +
+ * `filter[finca_did]` en assets y dejar este shim como deprecated.
+ */
+const injectTenantFilter = (endpoint, method) => {
+  if (method && method !== 'GET') return endpoint;
+  const tenantId = getActiveTenantId();
+  if (!tenantId) return endpoint;
+
+  // Solo bundles de asset/log de lista (no por id concreto).
+  const listLikeMatch = endpoint.match(/^\/api\/(asset|log)\/[a-z_]+(?:\?|$)/);
+  if (!listLikeMatch) return endpoint;
+  // Excluir GET por id: /api/asset/plant/<uuid>
+  const afterBundle = endpoint.slice(listLikeMatch[0].length - (listLikeMatch[0].endsWith('?') ? 1 : 0));
+  if (afterBundle && afterBundle.startsWith('/')) return endpoint;
+
+  // No pisar filtros pre-existentes de owner/uid (ej. callers que ya saben).
+  if (/[?&]filter\[(uid|owner)/.test(endpoint)) return endpoint;
+
+  const sep = endpoint.includes('?') ? '&' : '?';
+  // farmOS JSON:API: filter[uid.name]=<username> matchea el autor del asset.
+  // Encode para usernames con caracteres no-ASCII.
+  return `${endpoint}${sep}filter[uid.name]=${encodeURIComponent(tenantId)}`;
+};
+
 // Endpoints que NO existen en FarmOS 4.x — devolver respuesta vacía graceful
 // en lugar de 404 que confunde al operador con error rojo en consola.
 const FARMOS_BUNDLE_GONE = [
@@ -121,6 +167,8 @@ export const fetchFromFarmOS = async (endpoint, options = {}) => {
 
   // Mapping de bundles renombrados FarmOS 3.x → 4.x.
   const mappedEndpoint = remapLegacyBundleUrl(endpoint);
+  // ADR-036 MVP multi-finca: scoping cliente-side por owner (uid.name).
+  const scopedEndpoint = injectTenantFilter(mappedEndpoint, options.method || 'GET');
 
   const token = await getAccessToken();
   if (!token) {
@@ -160,7 +208,7 @@ export const fetchFromFarmOS = async (endpoint, options = {}) => {
   try {
     const { useFincaActiveStore } = await import('./fincaActiveStore.js');
     const baseUrl = useFincaActiveStore.getState().getActiveEndpoint();
-    const response = await fetchWithTimeout(`${baseUrl}${mappedEndpoint}`, {
+    const response = await fetchWithTimeout(`${baseUrl}${scopedEndpoint}`, {
       ...options,
       method: options.method || 'GET',
       body: outgoingBody,

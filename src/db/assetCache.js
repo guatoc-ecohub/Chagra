@@ -11,8 +11,25 @@
 // assetCache re-exporta openDB/STORES para preservar la API consumida por
 // el resto de los módulos (useAssetStore, logCache).
 import { openDB, STORES } from './dbCore';
+import { getActiveTenantId } from '../services/tenantContext';
 
 export { openDB, STORES };
+
+// ADR-036 MVP multi-finca: filtra una lista de assets ya leídos de IDB para
+// dejar pasar solo los del tenant activo (o los legacy sin _tenant_id, que
+// se consideran heredados pre-multifinca y se le asignan al tenant que los
+// hidrate primero — comportamiento conservador para no esconder datos del
+// operador single-tenant histórico).
+//
+// Mantener este filtro en el read-path (no en un IDB index) tiene un costo
+// O(n) por query pero evita una migración de schema v14→v15 forzada hoy.
+// Si la base supera ~5k assets por tenant, considerar índice compuesto
+// [asset_type, _tenant_id] en una versión futura.
+const filterByActiveTenant = (assets) => {
+  const tenantId = getActiveTenantId();
+  if (!tenantId) return assets; // sin login: comportamiento single-tenant.
+  return assets.filter((a) => !a._tenant_id || a._tenant_id === tenantId);
+};
 
 export const assetCache = {
   /**
@@ -21,10 +38,14 @@ export const assetCache = {
    */
   async put(assetType, asset) {
     const db = await openDB();
+    // ADR-036 MVP multi-finca: stamp del tenant activo. Si el asset ya trae
+    // un `_tenant_id` (rehidratación desde syncFromServer con asset remoto),
+    // preservarlo — el caller sabe a qué tenant pertenece.
+    const tenantId = asset._tenant_id || getActiveTenantId() || null;
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.ASSETS, 'readwrite');
       const store = tx.objectStore(STORES.ASSETS);
-      store.put({ ...asset, asset_type: assetType, cached_at: Date.now() });
+      store.put({ ...asset, asset_type: assetType, _tenant_id: tenantId, cached_at: Date.now() });
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
     });
@@ -101,6 +122,10 @@ export const assetCache = {
       store.put({
         ...remote,
         asset_type: assetType,
+        // ADR-036 MVP: assets recién recibidos pertenecen al tenant que los
+        // descargó. Si no hay tenant activo (dev sin login), queda null y se
+        // trata como legacy pre-multifinca.
+        _tenant_id: getActiveTenantId() || null,
         cached_at: Date.now(),
         _pending: false,
       });
@@ -164,8 +189,16 @@ export const assetCache = {
       req.onsuccess = () => res(req.result || []);
       req.onerror = () => rej(req.error);
     });
+    // ADR-036 MVP multi-finca: el GC opera solo dentro del tenant activo.
+    // Si un usuario A sincroniza, NO debe purgar assets que pertenezcan al
+    // tenant B en el mismo device — el universo `allRemoteIds` solo cubre A.
+    // Assets legacy sin _tenant_id también se purgan (mismo criterio que
+    // filterByActiveTenant: se asumen del tenant activo).
+    const activeTenant = getActiveTenantId();
     let purged = 0;
     for (const local of localAssets) {
+      const belongsToActive = !local._tenant_id || !activeTenant || local._tenant_id === activeTenant;
+      if (!belongsToActive) continue;
       if (!allRemoteIds.has(local.id) && !local._pending) {
         store.delete(local.id);
         purged++;
@@ -206,7 +239,8 @@ export const assetCache = {
       const store = tx.objectStore(STORES.ASSETS);
       const index = store.index('asset_type');
       const request = index.getAll(IDBKeyRange.only(assetType));
-      request.onsuccess = () => resolve(request.result || []);
+      // ADR-036 MVP multi-finca: scope por tenant activo en read-path.
+      request.onsuccess = () => resolve(filterByActiveTenant(request.result || []));
       request.onerror = () => reject(request.error);
     });
   },
@@ -345,8 +379,17 @@ export const assetCache = {
 
       if (assetUpdates.length > 0) {
         const assetStore = tx.objectStore(STORES.ASSETS);
+        const activeTenant = getActiveTenantId() || null;
         assetUpdates.forEach(({ assetType, asset }) => {
-          assetStore.put({ ...asset, asset_type: assetType, cached_at: Date.now() });
+          // ADR-036 MVP: stamp `_tenant_id` para que las queries scoped puedan
+          // filtrarlo. Preserva el del asset si ya viene marcado (refill,
+          // updates desde otro tenant en device compartido, etc).
+          assetStore.put({
+            ...asset,
+            asset_type: assetType,
+            _tenant_id: asset._tenant_id || activeTenant,
+            cached_at: Date.now(),
+          });
         });
       }
 

@@ -6,6 +6,7 @@
  */
 
 import localforage from 'localforage';
+import { clearActiveTenantId } from './tenantContext';
 
 const FARMOS_URL = import.meta.env.VITE_FARMOS_URL;
 const CLIENT_ID = import.meta.env.VITE_FARMOS_CLIENT_ID;
@@ -89,6 +90,14 @@ export const logoutUser = async () => {
         await localforage.removeItem('farmos_token_expiry');
     } catch (err) {
         console.error('[Auth] logoutUser failed (tokens may persist):', err);
+    }
+    // ADR-036 MVP multi-finca: limpiar tenantId asegura que un re-login con
+    // otro usuario no herede el scope del anterior. NO purgamos IDB acá —
+    // useAssetStore decide qué hacer al detectar el cambio de tenantId.
+    try {
+        clearActiveTenantId();
+    } catch (err) {
+        console.warn('[Auth] clearActiveTenantId failed:', err);
     }
 };
 

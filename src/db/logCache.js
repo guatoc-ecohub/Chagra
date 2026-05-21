@@ -17,12 +17,25 @@
  */
 
 import { openDB, STORES } from './dbCore';
+import { getActiveTenantId } from '../services/tenantContext';
 
 // Extrae asset_id desde la relación JSON:API (soporta to-one y to-many)
 const extractAssetId = (log) => {
   const rel = log.relationships?.asset?.data;
   if (Array.isArray(rel)) return rel[0]?.id || null;
   return rel?.id || null;
+};
+
+// ADR-036 MVP multi-finca: filtra una lista de logs ya leídos de IDB para
+// dejar pasar solo los del tenant activo (o los legacy sin _tenant_id, que
+// se consideran heredados pre-multifinca, mismo criterio que assetCache).
+// Read-path O(n) por query — barato porque los logs ya pasan por el filtro
+// server-side de `filter[uid.name]` en apiService; el filtrado en IDB es
+// defense-in-depth para el caso de re-login en device compartido.
+const filterLogsByActiveTenant = (logs) => {
+  const tenantId = getActiveTenantId();
+  if (!tenantId) return logs; // sin login: comportamiento single-tenant.
+  return logs.filter((l) => !l._tenant_id || l._tenant_id === tenantId);
 };
 
 // Resuelve la cantidad (quantity--standard) desde el array `included` del JSON:API.
@@ -75,6 +88,10 @@ const normalizeRemoteLog = (remote, fallbackType, included = null) => {
       quantity: resolvedQuantity,
     },
     relationships: remote.relationships || {},
+    // ADR-036 MVP: logs descargados pertenecen al tenant activo en el
+    // momento del pull. Si no hay tenant activo (dev sin login), queda
+    // null y se trata como legacy pre-multifinca.
+    _tenant_id: getActiveTenantId() || null,
     cached_at: Date.now(),
     _pending: false,
   };
@@ -83,25 +100,40 @@ const normalizeRemoteLog = (remote, fallbackType, included = null) => {
 export const logCache = {
   /**
    * Obtener un log individual por id.
+   * ADR-036 MVP: si el log pertenece a OTRO tenant, devolvemos null (oculto).
+   * Legacy (sin `_tenant_id`) sigue visible para el tenant activo — mismo
+   * criterio que assetCache.
    */
   async getLog(id) {
     const db = await openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.LOGS, 'readonly');
       const request = tx.objectStore(STORES.LOGS).get(id);
-      request.onsuccess = () => resolve(request.result || null);
+      request.onsuccess = () => {
+        const log = request.result || null;
+        if (!log) return resolve(null);
+        const tenantId = getActiveTenantId();
+        if (tenantId && log._tenant_id && log._tenant_id !== tenantId) {
+          return resolve(null);
+        }
+        resolve(log);
+      };
       request.onerror = () => reject(request.error);
     });
   },
 
   /**
    * Insertar/actualizar un log individual (usado por mutaciones locales con _pending).
+   * ADR-036 MVP: stamp `_tenant_id` con el tenant activo, salvo que el log ya
+   * traiga uno (preserva la propiedad cuando se vuelve a normalizar desde el
+   * pull remoto o cuando otro flujo lo marca explícitamente).
    */
   async put(log) {
     const db = await openDB();
+    const tenantId = log._tenant_id || getActiveTenantId() || null;
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.LOGS, 'readwrite');
-      tx.objectStore(STORES.LOGS).put({ ...log, cached_at: Date.now() });
+      tx.objectStore(STORES.LOGS).put({ ...log, _tenant_id: tenantId, cached_at: Date.now() });
       tx.oncomplete = () => resolve();
       tx.onabort = () => reject(tx.error);
       tx.onerror = () => reject(tx.error);
@@ -113,6 +145,8 @@ export const logCache = {
    * Usa índice compuesto asset_id_timestamp (v9) para evitar sort en memoria.
    * Fallback a índice asset_id + sort JS si el compuesto no existe
    * (e.g. durante migración parcial).
+   *
+   * ADR-036 MVP: filtra por tenant activo post-query (read-path scoping).
    */
   async getLogsByAsset(assetId) {
     const db = await openDB();
@@ -125,7 +159,7 @@ export const logCache = {
         const req = index.getAll(range);
         req.onsuccess = () => {
           const results = req.result || [];
-          resolve(results.reverse());
+          resolve(filterLogsByActiveTenant(results.reverse()));
         };
         req.onerror = () => reject(req.error);
       } else {
@@ -133,7 +167,7 @@ export const logCache = {
         const req = index.getAll(IDBKeyRange.only(assetId));
         req.onsuccess = () => {
           const sorted = (req.result || []).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-          resolve(sorted);
+          resolve(filterLogsByActiveTenant(sorted));
         };
         req.onerror = () => reject(req.error);
       }
@@ -141,20 +175,20 @@ export const logCache = {
   },
 
   /**
-   * Obtener todos los logs del store, sin filtro.
+   * Obtener todos los logs del store. ADR-036: scope al tenant activo.
    */
   async getAll() {
     const db = await openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORES.LOGS, 'readonly');
       const req = tx.objectStore(STORES.LOGS).getAll();
-      req.onsuccess = () => resolve(req.result || []);
+      req.onsuccess = () => resolve(filterLogsByActiveTenant(req.result || []));
       req.onerror = () => reject(req.error);
     });
   },
 
   /**
-   * Obtener todos los logs de un tipo (p.ej. log--harvest).
+   * Obtener todos los logs de un tipo (p.ej. log--harvest). ADR-036: scope.
    */
   async getByType(type) {
     const db = await openDB();
@@ -162,7 +196,7 @@ export const logCache = {
       const tx = db.transaction(STORES.LOGS, 'readonly');
       const index = tx.objectStore(STORES.LOGS).index('type');
       const req = index.getAll(IDBKeyRange.only(type));
-      req.onsuccess = () => resolve(req.result || []);
+      req.onsuccess = () => resolve(filterLogsByActiveTenant(req.result || []));
       req.onerror = () => reject(req.error);
     });
   },
@@ -196,8 +230,16 @@ export const logCache = {
     }
 
     // GC: purgar logs confirmados de este type que el servidor ya no devuelve.
+    // ADR-036 MVP multi-finca: el GC opera solo dentro del tenant activo —
+    // si user A sincroniza, NO debe purgar logs de user B en el mismo device.
+    // Logs legacy (sin _tenant_id) se barren con el activo, mismo criterio
+    // que filterLogsByActiveTenant. El universo `remoteLogs` está scoped por
+    // server-side filter[uid.name] (apiService) así que solo cubre al activo.
     const remoteIds = new Set(remoteLogs.map((r) => r.id));
+    const activeTenant = getActiveTenantId();
     for (const local of localLogs) {
+      const belongsToActive = !local._tenant_id || !activeTenant || local._tenant_id === activeTenant;
+      if (!belongsToActive) continue;
       if (!remoteIds.has(local.id) && !local._pending) {
         store.delete(local.id);
       }
@@ -213,6 +255,7 @@ export const logCache = {
   /**
    * Obtener logs sincronizados de las últimas 24h, ordenados por timestamp desc.
    * Para WorkerHistory "Recientes" (bitácora Parte C).
+   * ADR-036 MVP: scope al tenant activo en read-path.
    */
   async getRecent24h() {
     const db = await openDB();
@@ -221,7 +264,7 @@ export const logCache = {
       const tx = db.transaction(STORES.LOGS, 'readonly');
       const req = tx.objectStore(STORES.LOGS).getAll();
       req.onsuccess = () => {
-        const recent = (req.result || [])
+        const recent = filterLogsByActiveTenant(req.result || [])
           .filter((log) => !log._pending && log.timestamp && log.timestamp * 1000 >= cutoff)
           .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
         resolve(recent);

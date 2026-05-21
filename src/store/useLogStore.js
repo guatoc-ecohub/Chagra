@@ -89,6 +89,20 @@ export const useLogStore = create((set, get) => ({
   }
 }));
 
+// ADR-036 MVP multi-finca: al cambiar el tenantId activo (re-login con otro
+// usuario sobre el mismo device), limpiar el state in-memory para no exponer
+// logs del tenant anterior. La IDB no se borra — logCache filtra por
+// `_tenant_id` en read-path y el próximo pullRecentLogs los repuebla scoped.
+if (typeof window !== 'undefined') {
+  window.addEventListener('tenantChanged', () => {
+    useLogStore.setState({
+      logsByAsset: {},
+      isSyncing: false,
+      lastPullAt: null,
+    });
+  });
+}
+
 // Listener global: libera el flag _pending de logs confirmados por el servidor
 // y rehidrata el estado scoped por asset (Hotfix 11.5 — análogo a Fase 10.3).
 if (typeof window !== 'undefined') {
