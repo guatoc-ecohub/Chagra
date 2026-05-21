@@ -1,0 +1,4 @@
+Tests del importer `catalog-to-age.mjs` (POC Apache AGE — feat/apache-age-poc-2026-05-20).
+
+El test principal `catalog-to-age.test.mjs` se ejecuta con vitest (incluye
+`scripts/__tests__/**/*.test.{js,mjs}` en `vitest.config.js`).
