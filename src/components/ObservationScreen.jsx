@@ -80,7 +80,10 @@ function ObservationScreen({ onBack, onSave }) {
 
   // L1.5 — sugerencias proactivas RAG (debounced, no bloqueante).
   const [ragSuggestions, setRagSuggestions] = useState([]);
-  const [ragLoading, setRagLoading] = useState(false);
+  // _ragLoading: prefijo `_` para satisfacer eslint (state actualizado pero
+  // no leído en este componente — el UI loading lo refleja vía ragSuggestions
+  // length + skeleton fallback. Mantener el setter para futuro indicator).
+  const [_ragLoading, setRagLoading] = useState(false);
   const ragRequestIdRef = useRef(0);
 
   // Nombre de la especie seleccionada (si hay plant). Usado para enriquecer
