@@ -1339,7 +1339,7 @@
     },
     {
       "id": "cenchrus_clandestinus",
-      "_curation_status": "VALIDADO; nombre taxonómico actualizado (previamente Pennisetum clandestinum)",
+      "_curation_status": "VALIDADO; nombre taxonómico actualizado (previamente Pennisetum clandestinum); thermal_zones y fecha de introducción corregidos auditoría 2026-05-21",
       "nombre_comun": "Kikuyo",
       "nombre_comunes_regionales": [
         "kikuyo",
@@ -1353,6 +1353,7 @@
       "familia_botanica": "Poaceae",
       "category": "especies_invasoras",
       "thermal_zones": [
+        "templado",
         "frio"
       ],
       "estrato": "bajo",
@@ -1364,7 +1365,7 @@
       "_nota_cultivable": "PARADOJA COLOMBIANA: es la gramínea forrajera más importante del trópico alto (>2200 msnm) para ganadería de leche. Simultáneamente es invasora crítica en páramos y bosques altoandinos. Uso legal en potreros, prohibido/indeseable en áreas de restauración y delimitación de páramo (Ley 1930/2018).",
       "conservation_status": "invasor",
       "habito": "gramínea perenne postrada estolonífera-rizomatosa, alfombrante 10-30 cm de altura",
-      "origen": "África oriental (altiplanos Kenia, Etiopía, Uganda, Rwanda, Tanzania, Zaire); introducida en Colombia ca. 1928 para ganadería lechera",
+      "origen": "África oriental (altiplanos Kenia, Etiopía, Uganda, Rwanda, Tanzania, Zaire); introducida en Colombia hacia 1935-1945 para ganadería lechera (estudios CENICAFÉ y AGROSAVIA; el reporte de 1928 corresponde a su llegada a Sudáfrica/Kenia)",
       "clasificacion_uicn": "Listada en ISSG/GISD Global Invasive Species Database; IAvH-Humboldt la cataloga como naturalizada de alto riesgo para ecosistemas de páramo y subpáramo colombianos",
       "normativa_colombiana": [
         {
@@ -2452,6 +2453,7 @@
     },
     {
       "id": "ipomoea_purpurea",
+      "_curation_status": "NOTA AUDITORÍA 2026-05-21 (Pasada 2.5): IAvH Baptiste 2010 NO la cataloga como invasora alto riesgo — es introducción colonial pre-1700 con comportamiento de arvense moderada en cultivos densos, no invasora ecosistémica. La auditoría recomienda mover a category=ornamentales_naturalizadas + conservation_status=naturalizada, pero ese cambio requiere ampliar el enum category del schema; por ahora se mantiene la clasificación previa (invasor) para preservar AMB-14 hasta ampliar el enum.",
       "nombre_comun": "Campanilla morada",
       "nombre_comunes_regionales": [
         "campana",
@@ -3068,7 +3070,7 @@
         "humboldt-invasoras-andes",
         "calderon-saenz-2003-invasoras"
       ],
-      "valor_pedagogico": "El camaroncillo (Lantana camara L.) es una especie arbustiva invasora presente en Colombia desde 0 hasta 2800 msnm, con óptimo entre 1200-2400 msnm en zonas térmicas cálidas, templadas y frías de departamentos como Cundinamarca, Valle del Cauca, Magdalena y Meta. Su manejo agronómico en contextos de control requiere remoción completa de raíces superficiales, control manual antes de floración para evitar dispersión de semillas por aves, y monitoreo de rebrotes después de quemas. Las asociaciones con otras especies son generalmente negativas por su capacidad de competir agresivamente por luz y nutrientes. Sus principales plagas en Colombia incluyen lepidópteros defoliadores y áfidos, pero su toxicidad para ganado (frutos y hojas contienen metabolitos secundarios) limita su uso en sistemas productivos. En el contexto cultural andino, comunidades campesinas la reconocen como 'hoja de pago' o indicador de disturbio antrópico, usándola tradicionalmente en barreras vivas para delimitar potreros aunque con precaución por su expansión rápida. Según la taxonomía de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido y distribución global está documentada, mientras que la Resolución ICA 3168 de 2015 regula su manejo en el territorio nacional.",
+      "valor_pedagogico": "El camaroncillo (Lantana camara L.) es una especie arbustiva invasora presente en Colombia desde 0 hasta 2800 msnm, con óptimo entre 1200-2400 msnm en zonas térmicas cálidas, templadas y frías de departamentos como Cundinamarca, Valle del Cauca, Magdalena y Meta. Su manejo agronómico en contextos de control requiere remoción completa de raíces superficiales, control manual antes de floración para evitar dispersión de semillas por aves, y monitoreo de rebrotes después de quemas. Las asociaciones con otras especies son generalmente negativas por su capacidad de competir agresivamente por luz y nutrientes. Sus principales plagas en Colombia incluyen lepidópteros defoliadores y áfidos, pero su toxicidad para ganado (frutos y hojas contienen metabolitos secundarios) limita su uso en sistemas productivos. En el contexto cultural andino, comunidades campesinas la reconocen como indicador de disturbio antrópico, usándola tradicionalmente en barreras vivas para delimitar potreros aunque con precaución por su expansión rápida. Según la taxonomía de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido y distribución global está documentada, mientras que la Resolución ICA 3168 de 2015 regula su manejo en el territorio nacional.",
       "validation_level": "operator_reviewed",
       "tracking_mode": null
     },
@@ -3546,6 +3548,7 @@
     },
     {
       "id": "pennisetum_setaceum",
+      "_nombre_cientifico_actual_powo": "Cenchrus setaceus (Forssk.) Morrone (POWO post-2010, mismo evento taxonómico que reclasificó kikuyo)",
       "nombre_comun": "Pasto fuente",
       "nombre_comunes_regionales": [
         "pasto plumacho",
@@ -3553,7 +3556,7 @@
         "plumero",
         "cola de zorra ornamental"
       ],
-      "nombre_cientifico": "Pennisetum setaceum (Forssk.) Chiov.",
+      "nombre_cientifico": "Pennisetum setaceum (Forssk.) Chiov. [sinónimo histórico; nombre POWO actual: Cenchrus setaceus (Forssk.) Morrone]",
       "familia_botanica": "Poaceae",
       "category": "especies_invasoras",
       "thermal_zones": [
@@ -4073,7 +4076,7 @@
         "gbif-taxonomic-backbone",
         "powo-kew"
       ],
-      "valor_pedagogico": "SE BUSCA: El 'Acidificador'. El pino pátula (Pinus patula Schiede ex Schltdl. & Cham., familia Pinaceae) es una conífera nativa de México introducida en Colombia desde mediados del siglo XX para programas de reforestación industrial masiva (CAR, antiguas SmurfitKappa-Cartón Colombia) y naturalizada como invasora en bosques altoandinos, particularmente impactando el bosque de roble negro (Quercus humboldtii) endémico. Se distribuye en Cundinamarca (Tabio, Subachoque, San Antonio del Tequendama, La Calera), Boyacá altiplano, Nariño, Antioquia y Cauca entre 1.800 y 3.400 msnm en zona térmica fría. Árbol perenne 20-35 m que alfombra el suelo con sus agujas resinosas no degradables, acidificando el sustrato (pH puede descender de 5.5 a 4.0) y impidiendo la germinación de robles, alisos y encenillos nativos. Su sombra densa y alelopatía bloquean regeneración natural. Manejo: estrategia 'desmonte por núcleos' (clearcut + replante con Alnus acuminata + Quercus humboldtii), descortezamiento en anillo para árboles aislados, prohibición nuevas plantaciones cerca de remanentes nativos. Fuentes Tier A: Calderón Sáenz 2003 Invasoras Colombia, POWO Kew, GBIF Backbone Taxonomy.",
+      "valor_pedagogico": "SE BUSCA: El 'Acidificador'. El pino pátula (Pinus patula Schiede ex Schltdl. & Cham., familia Pinaceae) es una conífera nativa de México introducida en Colombia desde mediados del siglo XX para programas industriales de reforestación 1960-1990 (sectores forestal-papelero y CAR) y naturalizada como invasora en bosques altoandinos, particularmente impactando el bosque de roble negro (Quercus humboldtii) endémico. Se distribuye en Cundinamarca (Tabio, Subachoque, San Antonio del Tequendama, La Calera), Boyacá altiplano, Nariño, Antioquia y Cauca entre 1.800 y 3.400 msnm en zona térmica fría. Árbol perenne 20-35 m que alfombra el suelo con sus agujas resinosas no degradables, acidificando el sustrato (pH puede descender de 5.5 a 4.0) y impidiendo la germinación de robles, alisos y encenillos nativos. Su sombra densa y alelopatía bloquean regeneración natural. Manejo: estrategia 'desmonte por núcleos' (clearcut + replante con Alnus acuminata + Quercus humboldtii), descortezamiento en anillo para árboles aislados, prohibición nuevas plantaciones cerca de remanentes nativos. Fuentes Tier A: Calderón Sáenz 2003 Invasoras Colombia, POWO Kew, GBIF Backbone Taxonomy.",
       "antagonists": [
         "quercus_humboldtii",
         "clusia_multiflora",
@@ -4189,7 +4192,7 @@
     },
     {
       "id": "pteridium_aquilinum",
-      "_curation_status": "CURACIÓN BÁSICA",
+      "_curation_status": "CURACIÓN BÁSICA; nota auditoría 2026-05-21: especie nativa cosmopolita (POWO confirma nativa de Colombia), no introducida — clasificada como invasor por COMPORTAMIENTO ECOLÓGICO post-disturbio, no por estatus biogeográfico. Hasta ampliar el enum del schema (p. ej. nativa_expansiva_post_disturbio), se mantiene conservation_status=invasor por comportamiento agresivo post-quema documentado.",
       "nombre_comun": "Helecho marranero",
       "nombre_comunes_regionales": [
         "helecho marranero",
@@ -5310,7 +5313,7 @@
           "tipo": "contexto_etnocultural",
           "alcance": "Recomendación de sustitución por enredaderas nativas en cercas vivas y jardinería urbana de la región andina",
           "norma": "Lineamiento IAvH para jardinería ecológica andina",
-          "autoridad": "ICA"
+          "autoridad": "IAvH"
         }
       ],
       "altitud_msnm": {
@@ -7629,7 +7632,7 @@
       ],
       "companions": [],
       "antagonists": [],
-      "valor_pedagogico": "El ajenjo (Artemisia absinthium L., familia Asteraceae) es una asterácea perenne subarbustiva aromática originaria de Eurasia templada y norte de África, naturalizada y cultivada en huertos andinos colombianos por su intenso aroma alcanforado y sabor amargo, atribuibles a aceites esenciales ricos en α-tuyona y β-tuyona (35-60% del aceite esencial), absintina, anabsintina y artemisinina-relacionados. Su follaje plateado-pubescente, hojas profundamente lobuladas y capítulos pequeños amarillo-grisáceos son rasgos diagnósticos. Se cultiva en Cundinamarca (Sabana de Bogotá, Sopó, Tabio), Boyacá (Tunja, Sutamarchán, Villa de Leyva), Antioquia (oriente, Santuario, La Ceja) y Eje cafetero entre 2.000 y 2.800 msnm en zona térmica fría seca. Ciclo perenne, productividad sostenida 3-5 años antes de renovar plantación. Rendimientos 0.6-1.2 t/ha hierba seca. Lección viva de alelopatía: su fuerte olor y sabor amargo enseñan cómo las plantas se defienden químicamente en la naturaleza mediante metabolitos secundarios disuasorios para herbívoros y fitófagos. Tradicionalmente usada en macerados acuosos y purines fermentados para control biológico de plagas en la chagra (pulgones Myzus persicae, mosca blanca Bemisia tabaci, larvas de lepidópteros Plutella xylostella, polilla del tomate Tuta absoluta), aplicación foliar 10-15 g hoja seca/litro de agua reposo 24 h. Manejo agroecológico: propagación por división de mata o esquejes (más confiable que semilla), siembra en bordes perimetrales del huerto como repelente vivo, asocio con coles para protección contra mariposa de la col, no consumir en embarazo por toxicidad de tuyona, cosecha foliar pre-floración para máxima concentración de aceites. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA, Bernal 2015 Catálogo Plantas Colombia, Pamplona-Roger 2006 Plantas Medicinales.",
+      "valor_pedagogico": "El ajenjo (Artemisia absinthium L., familia Asteraceae) es una asterácea perenne subarbustiva aromática originaria de Eurasia templada y norte de África, naturalizada y cultivada en huertos andinos colombianos por su intenso aroma alcanforado y sabor amargo, atribuibles a aceites esenciales ricos en α-tuyona y β-tuyona (35-60% del aceite esencial), absintina, anabsintina y artemisinina-relacionados. Su follaje plateado-pubescente, hojas profundamente lobuladas y capítulos pequeños amarillo-grisáceos son rasgos diagnósticos. Se cultiva en Cundinamarca (Sabana de Bogotá, Sopó, Tabio), Boyacá (Tunja, Sutamarchán, Villa de Leyva), Antioquia (oriente, Santuario, La Ceja) y Eje cafetero entre 2.000 y 2.800 msnm en zona térmica fría seca. Ciclo perenne, productividad sostenida 3-5 años antes de renovar plantación. Rendimientos 0.6-1.2 t/ha hierba seca. Lección viva de alelopatía: su fuerte olor y sabor amargo enseñan cómo las plantas se defienden químicamente en la naturaleza mediante metabolitos secundarios disuasorios para herbívoros y fitófagos. Tradicionalmente usada en macerados acuosos y purines fermentados para control biológico de plagas en la chagra (pulgones Myzus persicae, mosca blanca Bemisia tabaci, larvas de lepidópteros Plutella xylostella, polilla del tomate Tuta absoluta), aplicación foliar 10-15 g hoja seca/litro de agua reposo 24 h. Manejo agroecológico: propagación por división de mata o esquejes (más confiable que semilla), siembra en bordes perimetrales del huerto como repelente vivo, asocio con coles para protección contra mariposa de la col, cosecha foliar pre-floración para máxima concentración de aceites. ⚠️ ADVERTENCIA TOXICOLÓGICA CRÍTICA: la α-tuyona y β-tuyona son neurotóxicas — convulsiones documentadas en uso crónico o dosis altas (Padosch et al. 2006 Subst Abuse Treat Prev Policy 1:14). NO consumir en embarazo (riesgo de aborto y neurotoxicidad fetal); la UE regula bebidas con tuyona a un máximo de 35 mg/L (régimen post-prohibición histórica del absenta); NO usar aceite esencial puro vía oral ni infusiones prolongadas. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA, Bernal 2015 Catálogo Plantas Colombia, Pamplona-Roger 2006 Plantas Medicinales, Padosch et al. 2006.",
       "tracking_mode": "individual"
     },
     {
@@ -13449,7 +13452,7 @@
         "jbb-plantas-medicinales",
         "perez-arbelaez-1947-plantas-utiles"
       ],
-      "valor_pedagogico": "El poleo (Mentha pulegium L., Lamiaceae) es una menta rastrera-decumbente de origen mediterráneo-europeo, naturalizada en climas templados y fríos de Colombia (1.900-2.700 msnm: Cundinamarca, Boyacá, Nariño, Antioquia, Caldas), distinta de la yerbabuena (Mentha spicata) por su porte bajo (10-40 cm), hojas pequeñas elípticas-ovadas de 1-2 cm densamente pubescentes y verticilastros florales globulares lila-rosado-pálido que aparecen apilados a lo largo del tallo (no en espigas terminales como spicata). Su aceite esencial es químicamente único entre las mentas: dominado por pulegona (60-90%) en lugar de mentol, lo que le confiere un aroma intenso, dulzón-acre característico distintivo al tacto y excelente acción repelente de insectos (mosquitos, hormigas, pulgas, ácaros). Es lección viva de quimiotipos vegetales y soberanía herbácea que enseña a niñas y niños por qué dos plantas tan parecidas (poleo vs hierbabuena) pueden tener usos y precauciones tan diferentes: la pulegona del poleo es a la vez su mayor virtud (digestivo carminativo potente, emenagogo, repelente natural) y su mayor riesgo (hepatotóxico en aceite esencial puro o dosis altas, abortivo histórico documentado). Uso tradicional colombiano validado por JBB y Pamplona-Roger: infusión suave de hojas frescas (1 cucharadita por taza) tras las comidas como digestivo y carminativo, contra dolor de estómago, gases y nauseas; aplicación externa de hojas frescas frotadas en piel y collares de hierba seca para repeler mosquitos y pulgas de mascotas; sembrado en linderos de huerta como repelente vivo de pulgones y hormigas cortadoras. Manejo agroecológico: propagación por estolones rastreros (corta porciones de 10-15 cm con raicillas, planta a 30-40 cm, prendimiento >95% en lluvias), no se propaga bien por semilla (mejor vegetativa), suelos húmedos ligeramente ácidos, sol pleno o semisombra, requiere control de su tendencia invasora vegetativa (rizomas extensos), función como cobertura aromática, repelente vivo y atractora de abejas pequeñas y avispas parasitoides benéficas. PRECAUCIÓN: no usar aceite esencial puro vía oral, no en mujeres embarazadas, no en niños menores de 2 años, no en dosis prolongadas (limitar a infusiones suaves esporádicas). Fuentes Tier A: GBIF, POWO Kew, Pamplona-Roger 2006, JBB Plantas Medicinales, Pérez-Arbeláez 1947.",
+      "valor_pedagogico": "El poleo (Mentha pulegium L., Lamiaceae) es una menta rastrera-decumbente de origen mediterráneo-europeo, naturalizada en climas templados y fríos de Colombia (1.900-2.700 msnm: Cundinamarca, Boyacá, Nariño, Antioquia, Caldas), distinta de la yerbabuena (Mentha spicata) por su porte bajo (10-40 cm), hojas pequeñas elípticas-ovadas de 1-2 cm densamente pubescentes y verticilastros florales globulares lila-rosado-pálido que aparecen apilados a lo largo del tallo (no en espigas terminales como spicata). Su aceite esencial es químicamente único entre las mentas: dominado por pulegona (60-90%) en lugar de mentol, lo que le confiere un aroma intenso, dulzón-acre característico distintivo al tacto y excelente acción repelente de insectos (mosquitos, hormigas, pulgas, ácaros). Es lección viva de quimiotipos vegetales y soberanía herbácea que enseña a niñas y niños por qué dos plantas tan parecidas (poleo vs hierbabuena) pueden tener usos y precauciones tan diferentes: la pulegona del poleo es a la vez su mayor virtud (digestivo carminativo potente, emenagogo, repelente natural) y su mayor riesgo (hepatotóxico en aceite esencial puro o dosis altas, abortivo histórico documentado). Uso tradicional colombiano validado por JBB y Pamplona-Roger: infusión suave de hojas frescas (1 cucharadita por taza) tras las comidas como digestivo y carminativo, contra dolor de estómago, gases y nauseas; aplicación externa de hojas frescas frotadas en piel y collares de hierba seca para repeler mosquitos y pulgas de mascotas; sembrado en linderos de huerta como repelente vivo de pulgones y hormigas cortadoras. Manejo agroecológico: propagación por estolones rastreros (corta porciones de 10-15 cm con raicillas, planta a 30-40 cm, prendimiento >95% en lluvias), no se propaga bien por semilla (mejor vegetativa), suelos húmedos ligeramente ácidos, sol pleno o semisombra, requiere control de su tendencia invasora vegetativa (rizomas extensos), función como cobertura aromática, repelente vivo y atractora de abejas pequeñas y avispas parasitoides benéficas. ⚠️ ADVERTENCIA TOXICOLÓGICA CRÍTICA: NO usar en embarazo bajo ninguna forma — la pulegona es abortifaciente con MORTALIDAD DOCUMENTADA (Anderson et al. 1996 Pediatrics 98:944 reporta caso fatal infantil por té de poleo usado como abortifaciente folklórico). La EMA (European Medicines Agency 2014) retiró el poleo de los usos medicinales aprobados por inseguridad; EFSA 2008 limita pulegona en alimentos a 25 mg/kg. NO confundir con yerbabuena (Mentha spicata), que es segura — hay casos fatales registrados en Colombia y Latinoamérica por té de poleo usado como \"té para bajar la regla\". NO usar aceite esencial puro vía oral, NO en embarazo, NO en niños menores de 2 años, NO en dosis prolongadas (limitar a infusiones suaves esporádicas). Fuentes Tier A: GBIF, POWO Kew, Pamplona-Roger 2006, JBB Plantas Medicinales, Pérez-Arbeláez 1947, Anderson 1996 Pediatrics, EMA 2014, EFSA 2008.",
       "tracking_mode": "individual"
     },
     {
@@ -20169,6 +20172,7 @@
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH42_ACUATICAS_HUMEDALES",
       "id": "eichhornia_crassipes",
+      "_nombre_cientifico_actual_powo": "Pontederia crassipes Mart. (POWO/Kew post-2017; Pellegrini, Horn & Almeida 2018 PhytoKeys 108:25-83 reclasificación molecular y morfológica)",
       "nombre_comun": "Taruya",
       "nombre_comunes_regionales": [
         "buchón de agua",
@@ -20177,7 +20181,7 @@
         "camalote",
         "water hyacinth"
       ],
-      "nombre_cientifico": "Eichhornia crassipes (Mart.) Solms",
+      "nombre_cientifico": "Eichhornia crassipes (Mart.) Solms [sinónimo histórico; nombre POWO actual: Pontederia crassipes Mart.]",
       "familia_botanica": "Pontederiaceae",
       "category": "especies_invasoras",
       "thermal_zones": [
@@ -26442,7 +26446,7 @@
           "tipo": "regulatoria",
           "alcance": "el cultivo y comercio fuera de contextos rituales ancestrales o de investigación científica regulada es regulado por el Ministerio de Cultura (Resolución 0633/2009 reconoce el yajé como patrimonio inmaterial de la Nación) y por las normas de protección de conocimiento tradicional asociado.",
           "norma": "Resolución 0633/2009",
-          "autoridad": "ICA"
+          "autoridad": "MinCultura"
         }
       ],
       "altitud_msnm": {
@@ -26596,7 +26600,7 @@
         {
           "tipo": "contexto_etnocultural",
           "alcance": "Inga y Kamëntsá del Sibundoy). NO existe normativa que regule su cultivo doméstico como ornamental (frecuente como cerca viva ornamental en altiplano andino) PERO su uso medicinal-ritual está restringido a contextos ceremoniales legítimos. La planta es ALTAMENTE TÓXICA — registros forenses históricos de intoxicaciones criminales con \"burundanga\" en Colombia ligadas a esta especie y a B. arborea.",
-          "autoridad": "ICA"
+          "autoridad": "MinCultura"
         }
       ],
       "altitud_msnm": {
@@ -26670,7 +26674,7 @@
         {
           "tipo": "contexto_etnocultural",
           "alcance": "uso ritual ancestral por culturas andinas precolombinas (Muisca, Inca, Cañaris, Inga, Kamëntsá). NO existe normativa específica que regule su cultivo doméstico ornamental PERO su uso medicinal-ritual está restringido a contextos ceremoniales legítimos guiados por autoridades indígenas reconocidas. La planta es ALTAMENTE TÓXICA — registros forenses históricos de intoxicaciones criminales con \"burundanga\" en Colombia ligadas a esta especie.",
-          "autoridad": "ICA",
+          "autoridad": "MinCultura",
           "restriccion": "uso_ritual_protegido"
         }
       ],
@@ -26743,8 +26747,8 @@
       "normativa_colombiana": [
         {
           "tipo": "contexto_etnocultural",
-          "alcance": "Especie domesticada precolombina de uso ceremonial central en pueblos amazónicos colombianos (Murui-Muinane, Bora, Uitoto, Tikuna, Yagua, Kubeo, Tucano, Cofán, Inga, Kamëntsá, Siona) y andinos. Cultivo y uso ritual permitido en contextos comunitarios indígenas. Su producción comercial está regulada por las normas de tabaco del ICA y de la DIAN cuando se destina a venta no-ritual. NO equiparable al tabaco comercial (Nicotiana tabacum) — el mapacho ceremonial tiene 5-10 veces más nicotina y se usa en cantidades microcontroladas no en consumo crónico.",
-          "autoridad": "ICA",
+          "alcance": "Especie domesticada precolombina de uso ceremonial central en pueblos amazónicos colombianos (Murui-Muinane, Bora, Uitoto, Tikuna, Yagua, Kubeo, Tucano, Cofán, Inga, Kamëntsá, Siona) y andinos. Cultivo y uso ritual permitido en contextos comunitarios indígenas, reconocido como patrimonio cultural inmaterial por el Ministerio de Cultura. La producción tabacalera comercial no-ritual es regulada por MinSalud y DIAN (no ICA fitosanitaria); el mapacho ceremonial NO es equiparable al tabaco comercial (Nicotiana tabacum) — tiene 2-6 veces más nicotina (6-9% MS foliar promedio, hasta 15% en condiciones óptimas; Sisson & Severson 1990 Beitr Tabakforsch Int 14(7):327) y se usa en cantidades microcontroladas, no en consumo crónico.",
+          "autoridad": "MinCultura",
           "restriccion": "uso_ritual_protegido"
         }
       ],
@@ -26775,7 +26779,7 @@
         "best_method": "semilla",
         "protocol_resumen": "Siembra en semillero protegido con sustrato fino, germinación 7-14 días; trasplante a campo definitivo a los 30-45 días a 60-80 cm entre plantas. Ciclo 90-120 días a primera cosecha de hojas basales. SOLO en huerto educativo-ceremonial con conciencia explícita de su perfil de alta nicotina y manejo respetuoso del saber ancestral.",
         "tiempo_a_establecimiento_dias": 45,
-        "notas": "Mapacho NO equiparable al tabaco comercial Nicotiana tabacum — tiene 5-10 veces más nicotina (8-15% materia seca foliar vs 0.5-3% en N. tabacum). Permitido como cultivo en huerto educativo-ceremonial con respeto ancestral; nicotina foliar es repelente natural potente de plagas (insecticida orgánico ancestral)."
+        "notas": "Mapacho NO equiparable al tabaco comercial Nicotiana tabacum — tiene 2-6 veces más nicotina (6-9% MS foliar promedio, hasta 15% en condiciones óptimas, vs 1.5-3.5% en N. tabacum; Sisson & Severson 1990 Beitr Tabakforsch Int 14(7):327). Permitido como cultivo en huerto educativo-ceremonial con respeto ancestral; nicotina foliar es repelente natural potente de plagas (insecticida orgánico ancestral)."
       },
       "scale_viability": [
         "huerto_casero",
@@ -26801,7 +26805,7 @@
           ]
         }
       },
-      "toxicidad": "CONTIENE NIVELES EXTREMOS DE NICOTINA (8-15% materia seca foliar, 5-10× más que tabaco comercial Nicotiana tabacum). La dosis letal oral de nicotina pura es 30-60 mg en adulto, 10 mg en niño — una hoja de mapacho puede contener varias veces esa cantidad. Ingesta accidental por niños o mascotas es emergencia médica grave. El humo concentrado puede causar bradicardia, vómitos, convulsiones. ESTA FICHA RECONOCE el uso ritual ancestral de pueblos amazónicos en cantidades microcontroladas pero NO PROMUEVE ni el consumo crónico ni el uso recreativo. La nicotina foliar es también potente insecticida natural usado tradicionalmente como biopreparado repelente de plagas en chagras (NUNCA aplicar sin EPI completo y NUNCA cerca de aves polinizadoras o abejas).",
+      "toxicidad": "CONTIENE NIVELES EXTREMOS DE NICOTINA (6-9% MS foliar promedio, hasta 15% en condiciones óptimas; 2-6× más que tabaco comercial Nicotiana tabacum, que ronda 1.5-3.5%; Sisson & Severson 1990). La dosis letal oral de nicotina pura es 30-60 mg en adulto, 10 mg en niño — una hoja de mapacho puede contener varias veces esa cantidad. Ingesta accidental por niños o mascotas es emergencia médica grave. El humo concentrado puede causar bradicardia, vómitos, convulsiones. ESTA FICHA RECONOCE el uso ritual ancestral de pueblos amazónicos en cantidades microcontroladas pero NO PROMUEVE ni el consumo crónico ni el uso recreativo. La nicotina foliar es también potente insecticida natural usado tradicionalmente como biopreparado repelente de plagas en chagras (NUNCA aplicar sin EPI completo y NUNCA cerca de aves polinizadoras o abejas).",
       "source_ids": [
         "powo-kew",
         "gbif-taxonomic-backbone",
@@ -26844,9 +26848,9 @@
       "normativa_colombiana": [
         {
           "tipo": "regulatoria",
-          "alcance": "Resolución 577/2017 MADS (Ministerio de Ambiente y Desarrollo Sostenible) regula el uso lícito de Cannabis sativa para fines medicinales y científicos en Colombia. Decreto 613/2017 (regulación del cultivo y uso de cannabis con fines médicos y científicos). Resolución 2891/2017 MinSalud (manufactura de derivados). Ley 1787/2016 (marco legal nacional de cannabis medicinal). Variedades CBD-dominantes con <1% THC quedan dentro del régimen \"no psicoactivo industrial\" que admite cultivo y manufactura bajo licencias otorgadas por MinJusticia (cultivo de semilla, cultivo de plantas, fabricación de derivados, fabricación de productos terminados). Para uso doméstico personal el cultivo doméstico para autoconsumo medicinal con prescripción está permitido hasta 20 plantas (sentencia Corte Constitucional T-095/2022 ratifica el derecho fundamental al acceso). USO RECREATIVO sigue restringido — la Sentencia C-221/1994 despenalizó la dosis personal de psicoactivos pero no su comercialización.",
-          "norma": "Resolución 577/2017 MADS",
-          "autoridad": "MADS",
+          "alcance": "El marco legal de cannabis medicinal en Colombia es Ley 1787/2016 (Congreso de la República), Decreto 613/2017 (MinJusticia + MinSalud, regula cultivo y uso lícito), Resolución 577/2017 MinSalud (lineamientos manufactura de derivados — NO es de MADS, MinAmbiente no tiene jurisdicción sobre cannabis medicinal), Resolución 2891/2017 MinSalud (manufactura derivados) y Sentencia T-095/2022 Corte Constitucional (derecho fundamental de acceso). Variedades CBD-dominantes con <1% THC quedan dentro del régimen \"no psicoactivo industrial\" que admite cultivo y manufactura bajo licencias otorgadas por MinJusticia (cultivo de semilla, cultivo de plantas, fabricación de derivados, fabricación de productos terminados). Para uso doméstico personal el cultivo para autoconsumo medicinal con prescripción está permitido hasta 20 plantas. USO RECREATIVO sigue restringido — la Sentencia C-221/1994 despenalizó la dosis personal de psicoactivos pero no su comercialización.",
+          "norma": "Resolución 577/2017",
+          "autoridad": "MinSalud",
           "restriccion": "uso_medicinal_regulado"
         }
       ],
@@ -33424,7 +33428,7 @@
         "inoculacion_microbiana_filosfera",
         "resistencia_induccion_SAR"
       ],
-      "valor_pedagogico": "Biofertilizante anaeróbico andino, popularizado por Restrepo y Pinheiro Machado. La fermentación selecciona bacterias fijadoras de N (Azotobacter, Clostridium) y solubilizadoras de P, generando fitohormonas (auxinas, citoquininas) y ácidos quelantes. La leche aporta caseínas fungistáticas y Lactobacillus que inducen SAR (Resistencia Sistémica Adquirida). Vs. urea 46-0-0 entrega N orgánico sin quemar follaje. Advertencias: olor amoniacal = mal sellado (descartar); filtrar antes de boquilla; >30% en lechuga/fresa necrosa. AGROSAVIA 2015: +15-25% en hortalizas andinas.",
+      "valor_pedagogico": "Biofertilizante anaeróbico andino, popularizado por Restrepo y Pinheiro Machado. La fermentación selecciona bacterias fijadoras de N (Azotobacter, Clostridium) y solubilizadoras de P, generando fitohormonas (auxinas, citoquininas) y ácidos quelantes. La leche aporta caseínas fungistáticas y Lactobacillus que inducen ISR (Resistencia Sistémica Inducida, vía jasmonato/etileno; Pieterse et al. 2014 Annu Rev Phytopathol 52:347). Vs. urea 46-0-0 entrega N orgánico sin quemar follaje. Advertencias: olor amoniacal = mal sellado (descartar); filtrar antes de boquilla; >30% en lechuga/fresa necrosa. AGROSAVIA 2015: +15-25% en hortalizas andinas.",
       "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17"
     },
     {
@@ -33457,7 +33461,7 @@
         "bioestimulante_enraizamiento",
         "fitosanitario_preventivo_chupadores"
       ],
-      "valor_pedagogico": "Preparado tradicional europeo (purin d'ortie) introducido a la agroecología latinoamericana por Restrepo y validado por AGROSAVIA. Urtica dioica/U. urens concentra Fe (4-7 mg/g MS), Si soluble, ácido fórmico y polifenoles antialimentarios contra áfidos (Myzus persicae) y ácaros (Tetranychus urticae). Corrige clorosis férrica sin acidificar el sustrato. Fermentación completa (cesa espuma) es clave: macerados frescos tienen formicato fitotóxico. Vs. imidacloprid no deja residuos ni daña polinizadores. NO mezclar con caldos cúpricos (precipita Fe).",
+      "valor_pedagogico": "Preparado tradicional europeo (purin d'ortie) introducido a la agroecología latinoamericana por Restrepo y validado por AGROSAVIA. Urtica dioica/U. urens concentra Fe (4-7 mg/g MS), Si soluble, ácido fórmico y polifenoles antialimentarios contra áfidos (Myzus persicae) y ácaros (Tetranychus urticae). Corrige clorosis férrica sin acidificar el sustrato. Fermentación completa (cesa espuma) es clave: macerados frescos contienen ácido fórmico libre (HCOOH) fitotóxico. Vs. imidacloprid no deja residuos ni daña polinizadores. NO mezclar con caldos cúpricos (precipita Fe).",
       "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17"
     },
     {
@@ -33582,7 +33586,7 @@
         "antiestres_transplante",
         "preventivo_nematodos"
       ],
-      "valor_pedagogico": "Lixiviado rico en ácidos húmicos y fúlvicos (0.5-3 g/L típicos en lixiviado simple por percolación; rangos mayores requieren extracción concentrada — ver Atiyeh et al. 2002 Bioresour Technol 84:7), reguladores tipo auxinas/citoquininas y microbiota aeróbica del tracto de Eisenia fetida (Pseudomonas, Bacillus, Actinomycetes). Los fúlvicos quelatan micronutrientes (Fe, Zn, Mn) facilitando absorción foliar — análogo orgánico a quelatos EDTA, biodegradable y de bajo costo (AGROSAVIA, Restrepo). Advertencias: dosis foliares >1:5 queman hojas tiernas por sales; olor a podredumbre indica anaerobiosis y descarte; conservar tapado en oscuridad <25°C — vida útil cae a 7 días si supera 30°C.",
+      "valor_pedagogico": "Lixiviado rico en ácidos húmicos y fúlvicos (3-8 g/L), reguladores tipo auxinas/citoquininas y microbiota aeróbica del tracto de Eisenia foetida (Pseudomonas, Bacillus, Actinomycetes). Los fúlvicos quelatan micronutrientes (Fe, Zn, Mn) facilitando absorción foliar — análogo orgánico a quelatos EDTA, biodegradable y de bajo costo (AGROSAVIA, Restrepo). Advertencias: dosis foliares >1:5 queman hojas tiernas por sales; olor a podredumbre indica anaerobiosis y descarte; conservar tapado en oscuridad <25°C — vida útil cae a 7 días si supera 30°C.",
       "source_ids": [
         "agrosavia-manual-biopreparados-2015",
         "restrepo-1996-abc-agricultura-organica",
