@@ -74,8 +74,17 @@ import { resolve } from 'node:path';
  * Reglas:
  *   - null / undefined → 'null' (literal Cypher).
  *   - boolean / number finitos → toString.
- *   - string → comillas simples + dobla cualquier comilla simple interna.
- *     (Cypher es como SQL en eso.)
+ *   - string → comillas simples + backslash-escape de comilla simple y
+ *     backslash internos. **No** se usa el escape SQL `''` porque dentro
+ *     de un bloque dollar-quoted `$$ ... $$` AGE pasa la cadena tal cual
+ *     al parser Cypher, que interpreta `''` como dos strings vacías y
+ *     rompe con `syntax error at or near ...` (bug observado 2026-05-21:
+ *     gap 448 → 496 species en chagra_kg por filas con apóstrofe en
+ *     `nombre_cientifico` o `valor_pedagogico`, ej. cv. 'Pastusa Suprema').
+ *     Cypher acepta `\'` y `\\` como escapes estándar.
+ *   - control chars (\n, \r, \t, backspace, formfeed) → escape Cypher
+ *     explícito para evitar romper el string literal cuando llegue prosa
+ *     con saltos de línea.
  *   - cualquier otro tipo (array/object) → JSON.stringify y luego se trata
  *     como string. Útil si el caller quiere meter un blob en una propiedad.
  *
@@ -90,7 +99,20 @@ export function cypherLiteral(v) {
     return String(v);
   }
   if (typeof v === 'string') {
-    return `'${v.replace(/'/g, "''")}'`;
+    // Orden importa: backslash primero, después comilla simple, después
+    // controles. Si se invierte, los `\` introducidos por el escape de
+    // comilla quedan doble-escapados.
+    // Nota: en regex `\b` significa word-boundary, no backspace literal;
+    // por eso el backspace usa `\x08` o ``.
+    const escaped = v
+      .replace(/\\/g, '\\\\')
+      .replace(/'/g, "\\'")
+      .replace(/\n/g, '\\n')
+      .replace(/\r/g, '\\r')
+      .replace(/\t/g, '\\t')
+      .replace(/\f/g, '\\f')
+      .replace(/\x08/g, '\\b');
+    return `'${escaped}'`;
   }
   // arrays / objects → string JSON saneado
   return cypherLiteral(JSON.stringify(v));
@@ -158,6 +180,197 @@ export function normalizePest(pestName) {
     .replace(/[^a-z0-9]+/g, '_')
     .replace(/^_+|_+$/g, '')
     .slice(0, 80);
+}
+
+/**
+ * Clasifica un `target` de biopreparado en una de tres categorías:
+ *
+ *   - 'pest'    → es una plaga, enfermedad o daño biótico que el BP controla.
+ *                  Estos targets generan edges `(:Biopreparado)-[:CONTROLS]->(:Pest)`.
+ *   - 'purpose' → propósito agronómico/nutricional (fertilizante_general,
+ *                  deficiencia_potasio_k, activacion_suelo, fase_vegetativa, etc.).
+ *                  NO generan edges CONTROLS. Quedan registrados en una propiedad
+ *                  `purpose` del nodo Biopreparado para no perder la información.
+ *   - 'unknown' → no matcheó ningún patrón claro. Se loggea para revisión manual.
+ *
+ * Filosofía: hacemos pattern-matching defensivo. Mejor un falso negativo (un pest
+ * que clasificamos como 'unknown' y reportamos) que un falso positivo
+ * (categoria 'pest' inflando edges CONTROLS con nutricionales).
+ *
+ * @param {string} rawTarget - string original del JSON `biopreparados[].target[]`
+ * @returns {{kind: 'pest'|'purpose'|'unknown', pestSlug: string|null, pestType: string|null, raw: string}}
+ */
+export function classifyBiopreparadoTarget(rawTarget) {
+  const result = { kind: 'unknown', pestSlug: null, pestType: null, raw: String(rawTarget) };
+  if (!rawTarget) return result;
+
+  // Normalización para matching: lowercase + sin acentos + sin paréntesis.
+  // Pero conservamos `rawTarget` original como propiedad de edge para trazabilidad.
+  const norm = String(rawTarget)
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase();
+
+  // 1. Patrones inequívocos de PROPÓSITO agronómico/nutricional (NO son pests).
+  //    Estos prefijos/keywords dominan: si están presentes, es propósito, no plaga.
+  const purposePatterns = [
+    /^fertilizante_/, /^fertilizacion_/, /^aporte_/, /^bioestimulante_/,
+    /^estimulante_/, /^inoculacion_/, /^inoculo_/, /^induccion_/, /^promocion_/,
+    /^fuente_/, /^micronutrientes/, /^nutricion_/, /^compostaje$/,
+    /^descomposicion_/, /^retencion_/, /^formacion_/, /^remineralizacion_/,
+    /^baja_/, /^estructura_suelo/, /^microbiota_/, /^suelos_/,
+    /^acidez_/, /^toxicidad_/, /^saturacion_/, /^establecimiento_/,
+    /^enraizamiento_/, /^floracion_/, /^mejora_/, /^mejorador_/,
+    /^ingrediente_/, /^antiestres_/, /^reduccion_olores/,
+    /^correccion_/, /^resistencia_induccion/, /^induccion_resistencia/,
+    /^supresion_patogenos/, /^supresion_patogenos_suelo/,
+    /^activacion_suelo/, /^fase_/, /^promocion_crecimiento/,
+    /^deficiencia/, /trasplante con baja/, /raices debiles/, /sistema radicular pobre/,
+    /^estres /, /floracion irregular/, /^repelente_general/,
+  ];
+  if (purposePatterns.some((re) => re.test(norm))) {
+    result.kind = 'purpose';
+    return result;
+  }
+
+  // 2. Patrones de PEST/ENFERMEDAD. El orden importa: probamos los más
+  //    específicos primero (nombre científico) y luego categorías comunes.
+  //    Cada match implica un slug Cypher canónico + un tipo biótico.
+  //
+  //    El slug canónico elimina prefijos `control_` / `preventivo_` que solo
+  //    son meta-prefixes del catálogo, no parte del nombre del pest.
+  const stripControlPrefix = (s) => s
+    .replace(/^control_/, '')
+    .replace(/^preventivo_/, '')
+    .replace(/^fitosanitario_curativo_/, '')
+    .replace(/^fitosanitario_preventivo_/, '')
+    .replace(/^fungicida_cuprico_/, '');
+
+  // 2a. HONGOS / OOMICETOS (fungal pathogens; oomycetes los agrupamos como
+  //     fungal-like para simplificar; un purist diría oomycete pero el
+  //     control agronómico es similar al fúngico).
+  const fungalKeywords = [
+    'roya', 'mildeo', 'mildiu', 'oidio', 'oidium', 'fusarium', 'phytophthora',
+    'botrytis', 'alternaria', 'monilia', 'sclerotinia', 'rhizoctonia', 'pythium',
+    'antracnosis', 'colletotrichum', 'cercospor', 'hemileia', 'hongos_foliares',
+    // Patógenos adicionales en literatura cafetera/cacaotera/frutícola CO.
+    'mycena', 'mancha_de_hierro', 'verticillium', 'pestalotia', 'pestalotiopsis',
+    'ojo_de_gallo', 'llaga', 'sigatoka', 'moko',
+  ];
+  if (fungalKeywords.some((kw) => norm.includes(kw))) {
+    result.kind = 'pest';
+    result.pestType = 'fungal';
+    result.pestSlug = normalizePest(stripControlPrefix(norm));
+    return result;
+  }
+
+  // 2b. INSECTOS (incluye lepidópteros, hemípteros chupadores, dípteros,
+  //     coleópteros). Agregamos nombres científicos comunes en catálogos
+  //     agronómicos colombianos para ampliar tipado de Pest provenientes
+  //     de `plagas_criticas[]` (Hypothenemus = broca del café, Empoasca =
+  //     chicharrita, Scolytidae = escarabajos de corteza, etc.).
+  const insectKeywords = [
+    'afido', 'pulgon', 'mosca_blanca', 'mosca blanca', 'trips',
+    'cochinilla', 'escamas', 'cocoideos', 'trozador', 'cogollero', 'polilla',
+    'palomilla', 'gusano', 'minador', 'perforador', 'barrenador',
+    'larva', 'lepidopter', 'tuta', 'spodoptera', 'helicoverpa', 'plutella',
+    'agrotis', 'neoleucinodes', 'diatraea', 'bemisia', 'trialeurodes',
+    'myzus', 'aphis', 'frankliniella', 'chupador',
+    // Nombres científicos / comunes adicionales (café, frutales, hortalizas).
+    'hypothenemus', 'broca', 'scolytidae', 'cerotoma', 'empoasca', 'apion',
+    'drosophila', 'heliothis', 'diabrotica', 'hypsipyla', 'leptoglossus',
+    'thrips', 'trps',
+    // Otros lepidópteros de uso común en literatura agropecuaria CO.
+    'noctuid', 'curculio', 'gorgojo', 'picudo', 'taladrador',
+  ];
+  if (insectKeywords.some((kw) => norm.includes(kw))) {
+    result.kind = 'pest';
+    result.pestType = 'insect';
+    result.pestSlug = normalizePest(stripControlPrefix(norm));
+    return result;
+  }
+
+  // 2c. ÁCAROS (mites — Tetranychus, eriofidos).
+  const miteKeywords = ['acaro', 'tetranychus', 'eriofido'];
+  if (miteKeywords.some((kw) => norm.includes(kw))) {
+    result.kind = 'pest';
+    result.pestType = 'mite';
+    result.pestSlug = normalizePest(stripControlPrefix(norm));
+    return result;
+  }
+
+  // 2d. MOLUSCOS (babosas/caracoles — daño biótico, aunque la "barrera_fisica"
+  //     es el mecanismo, lo etiquetamos como pest).
+  if (/babosa|caracol/.test(norm)) {
+    result.kind = 'pest';
+    result.pestType = 'mollusk';
+    result.pestSlug = normalizePest(stripControlPrefix(norm));
+    return result;
+  }
+
+  // 2e. NEMATODOS.
+  if (/nematod/.test(norm)) {
+    result.kind = 'pest';
+    result.pestType = 'nematode';
+    result.pestSlug = normalizePest(stripControlPrefix(norm));
+    return result;
+  }
+
+  // 2f. Genéricos amplio-espectro fitosanitarios (no son un pest específico
+  //     pero sí indican uso de control fitosanitario — los modelamos como
+  //     Pest "amplio_espectro" para permitir queries de "qué BP da control
+  //     genérico"). Slug fijo.
+  if (/amplio_espectro/.test(norm)) {
+    result.kind = 'pest';
+    result.pestType = 'broad_spectrum';
+    result.pestSlug = 'amplio_espectro';
+    return result;
+  }
+
+  // 3. Default: desconocido. Caller debe loggear.
+  return result;
+}
+
+/**
+ * Recolecta todos los pests únicos derivados de los campos `target[]` de los
+ * biopreparados, junto con sus tipos inferidos y la lista de raw_names que los
+ * originaron (útil para debugging y para el `aka[]` del nodo Pest).
+ *
+ * @param {Array<{id:string, target?:string[]}>} biopreparados
+ * @returns {{pests: Map<string,{tipo:string, aka:Set<string>}>, edges: Array<{bpId:string, pestSlug:string, raw:string}>, purposes: Array<{bpId:string, raw:string}>, unmatched: Array<{bpId:string, raw:string}>}}
+ */
+export function collectBpPestEdges(biopreparados) {
+  const pests = new Map(); // slug -> {tipo, aka:Set<string>}
+  const edges = []; // {bpId, pestSlug, raw}
+  const purposes = []; // {bpId, raw}
+  const unmatched = []; // {bpId, raw}
+
+  for (const bp of biopreparados || []) {
+    const bpId = bp?.id;
+    if (!bpId) continue;
+    const targets = Array.isArray(bp.target) ? bp.target : [];
+    for (const t of targets) {
+      const c = classifyBiopreparadoTarget(t);
+      if (c.kind === 'pest' && c.pestSlug) {
+        const existing = pests.get(c.pestSlug);
+        if (existing) {
+          existing.aka.add(c.raw);
+          // Si el tipo ya estaba y difiere, no reescribir (el primero gana —
+          // los duplicados con tipo distinto son extremadamente raros; si
+          // ocurrieran, el operador puede ver el aka[] y reconciliar).
+        } else {
+          pests.set(c.pestSlug, { tipo: c.pestType, aka: new Set([c.raw]) });
+        }
+        edges.push({ bpId, pestSlug: c.pestSlug, raw: c.raw });
+      } else if (c.kind === 'purpose') {
+        purposes.push({ bpId, raw: c.raw });
+      } else {
+        unmatched.push({ bpId, raw: c.raw });
+      }
+    }
+  }
+
+  return { pests, edges, purposes, unmatched };
 }
 
 /**
@@ -255,7 +468,25 @@ export function buildSqlScript(seed, opts = {}) {
   const origins = new Set();
   const roles = new Set();
   const thermalZones = new Set();
-  const pests = new Set();
+
+  // Pests: ahora un Map {slug -> {tipo, aka:Set<string>}} para acumular metadatos
+  // tanto desde `species.plagas_criticas[]` como desde `biopreparados.target[]`.
+  // Esto permite tipar el nodo Pest (fungal/insect/mite/nematode/...) y mantener
+  // la lista de nombres originales como propiedad `aka` (útil para query semántica
+  // del lado del cliente y para debugging).
+  const pestsMap = new Map();
+
+  const addPest = (slug, tipo, raw) => {
+    if (!slug) return;
+    const existing = pestsMap.get(slug);
+    if (existing) {
+      if (raw) existing.aka.add(raw);
+      // Si el slug llega con tipo y antes no lo tenía, completar (no sobreescribir).
+      if (!existing.tipo && tipo) existing.tipo = tipo;
+    } else {
+      pestsMap.set(slug, { tipo: tipo || null, aka: new Set(raw ? [raw] : []) });
+    }
+  };
 
   for (const sp of species) {
     if (sp.familia_botanica) families.add(sp.familia_botanica);
@@ -266,7 +497,32 @@ export function buildSqlScript(seed, opts = {}) {
     for (const tz of (sp.thermal_zones || [])) thermalZones.add(tz);
     for (const pest of (sp.plagas_criticas || [])) {
       const n = normalizePest(pest);
-      if (n) pests.add(n);
+      // Inferimos tipo desde el raw name aprovechando el mismo clasificador
+      // que usamos para target[] de biopreparados: si matchea fungal/insect/
+      // mite/nematode, lo tipamos; si no, queda con tipo null (= 'unknown'
+      // en el nodo final). Esto mejora la coherencia del KG: el query
+      // "MATCH (p:Pest {tipo:'fungal'}) RETURN p" ahora incluye hemileia,
+      // mycena_citricolor, etc. provenientes de plagas_criticas.
+      const c = classifyBiopreparadoTarget(pest);
+      const tipoInferido = c.kind === 'pest' ? c.pestType : null;
+      if (n) addPest(n, tipoInferido, pest);
+    }
+  }
+
+  // Pests + edges BP-CONTROLS-Pest derivados de biopreparados[].target[].
+  // Esta colección añade a `pestsMap` los pests detectados en los targets
+  // (clasificados como kind='pest' por classifyBiopreparadoTarget). Los
+  // 'purpose' y 'unknown' NO crean edges CONTROLS; los 'unknown' se reportan
+  // por stderr para revisión manual del catálogo.
+  const bpClass = collectBpPestEdges(biopreparados);
+  for (const [slug, meta] of bpClass.pests.entries()) {
+    for (const aka of meta.aka) addPest(slug, meta.tipo, aka);
+  }
+  if (opts.verboseClassification && bpClass.unmatched.length > 0) {
+    // Reporte en stderr para CLI; los tests usan return-value en su lugar.
+    for (const u of bpClass.unmatched) {
+      // eslint-disable-next-line no-console
+      console.error(`[catalog-to-age] target sin clasificar: ${u.bpId} → "${u.raw}"`);
     }
   }
 
@@ -285,8 +541,16 @@ export function buildSqlScript(seed, opts = {}) {
   for (const tz of thermalZones) {
     statements.push(wrapCypher(graph, emitNode('PisoTermico', { id: tz })));
   }
-  for (const p of pests) {
-    statements.push(wrapCypher(graph, emitNode('Pest', { id: p })));
+  // Pest nodes con tipo + aka unido por '|' (Cypher no tiene array literal en
+  // la sintaxis inline que usamos; el caller puede splittear por '|' si quiere
+  // explotar el aka).
+  for (const [slug, meta] of pestsMap.entries()) {
+    const akaJoined = Array.from(meta.aka).join('|');
+    statements.push(wrapCypher(graph, emitNode('Pest', {
+      id: slug,
+      tipo: meta.tipo || 'unknown',
+      aka: akaJoined || null,
+    })));
   }
 
   // 2. Source nodes (todos los sources del catálogo).
@@ -321,6 +585,26 @@ export function buildSqlScript(seed, opts = {}) {
         { label: 'Source', id: sid },
       )));
     }
+  }
+
+  // 3b. Edges (:Biopreparado)-[:CONTROLS]->(:Pest).
+  //     Derivadas de `biopreparados[].target[]` via classifyBiopreparadoTarget.
+  //     Cada edge lleva `raw_name` (string original del catálogo) como propiedad
+  //     para trazabilidad: si un agronomo quiere ver de dónde salió la edge,
+  //     puede MATCH (b)-[r:CONTROLS]->(p) RETURN r.raw_name.
+  //     Deduplicación: si el mismo (bp, pest) aparece >1 vez en target[]
+  //     (no debería pero por defensa), Cypher MERGE garantiza idempotencia.
+  const emittedControls = new Set(); // 'bpId|pestSlug'
+  for (const e of bpClass.edges) {
+    const key = `${e.bpId}|${e.pestSlug}`;
+    if (emittedControls.has(key)) continue;
+    emittedControls.add(key);
+    statements.push(wrapCypher(graph, emitRel(
+      { label: 'Biopreparado', id: e.bpId },
+      'CONTROLS',
+      { label: 'Pest', id: e.pestSlug },
+      { raw_name: e.raw },
+    )));
   }
 
   // 4. Species nodes + relaciones.
@@ -458,19 +742,112 @@ export function buildSqlScript(seed, opts = {}) {
 }
 
 /**
+ * Variante de `buildSqlScript` que además del array de statements devuelve un
+ * reporte estructurado con la clasificación de targets de biopreparados.
+ *
+ * El reporte es útil para:
+ *   - El CLI: imprimir métricas (pests creados, edges generadas, sin clasificar).
+ *   - Tests: verificar la composición sin tener que regex-scrapear el SQL.
+ *   - Validación operacional: los `unmatched` indican targets del catálogo que
+ *     deberían añadirse al clasificador.
+ *
+ * @param {object} seed
+ * @param {object} [opts]
+ * @returns {{statements: string[], report: object}}
+ */
+export function buildSqlScriptWithReport(seed, opts = {}) {
+  const statements = buildSqlScript(seed, opts);
+  const biopreparados = Array.isArray(seed.biopreparados) ? seed.biopreparados : [];
+  const bpClass = collectBpPestEdges(biopreparados);
+
+  const pestsByTipo = {};
+  for (const meta of bpClass.pests.values()) {
+    const t = meta.tipo || 'unknown';
+    pestsByTipo[t] = (pestsByTipo[t] || 0) + 1;
+  }
+  const seenEdges = new Set();
+  for (const e of bpClass.edges) seenEdges.add(`${e.bpId}|${e.pestSlug}`);
+
+  return {
+    statements,
+    report: {
+      pestCount: bpClass.pests.size,
+      pestsByTipo,
+      controlsEdgeCount: seenEdges.size,
+      purposes: bpClass.purposes,
+      unmatched: bpClass.unmatched,
+    },
+  };
+}
+
+/**
+ * Construye únicamente los statements para crear/refrescar nodos Pest +
+ * edges CONTROLS desde biopreparados[].target[]. NO toca el resto del grafo.
+ *
+ * Pensada para aplicar como delta sobre un grafo `chagra_kg` ya poblado por
+ * `buildSqlScript({ includeDrop: false })`. 100% idempotente vía MERGE.
+ *
+ * @param {object} seed
+ * @param {object} [opts]
+ * @param {string} [opts.graph='chagra_kg']
+ * @returns {string[]} array de statements SQL listos para ejecutar con psql
+ */
+export function buildControlsDeltaScript(seed, opts = {}) {
+  const graph = opts.graph || 'chagra_kg';
+  const biopreparados = Array.isArray(seed.biopreparados) ? seed.biopreparados : [];
+  const bpClass = collectBpPestEdges(biopreparados);
+
+  const statements = [];
+  statements.push('LOAD \'age\';');
+  statements.push('SET search_path = ag_catalog, "$user", public;');
+
+  for (const [slug, meta] of bpClass.pests.entries()) {
+    const akaJoined = Array.from(meta.aka).join('|');
+    statements.push(wrapCypher(graph, emitNode('Pest', {
+      id: slug,
+      tipo: meta.tipo || 'unknown',
+      aka: akaJoined || null,
+    })));
+  }
+
+  // Biopreparado defensivos (id-only MERGE — si ya existe, no sobreescribe).
+  const bpsTouched = new Set(bpClass.edges.map((e) => e.bpId));
+  for (const bpId of bpsTouched) {
+    statements.push(wrapCypher(graph, emitNode('Biopreparado', { id: bpId })));
+  }
+
+  // Edges CONTROLS deduplicadas (mismo (bp, pest) solo una edge).
+  const emitted = new Set();
+  for (const e of bpClass.edges) {
+    const key = `${e.bpId}|${e.pestSlug}`;
+    if (emitted.has(key)) continue;
+    emitted.add(key);
+    statements.push(wrapCypher(graph, emitRel(
+      { label: 'Biopreparado', id: e.bpId },
+      'CONTROLS',
+      { label: 'Pest', id: e.pestSlug },
+      { raw_name: e.raw },
+    )));
+  }
+
+  return statements;
+}
+
+/**
  * CLI entry point.
  *
  * @param {string[]} argv - process.argv.slice(2)
  * @returns {Promise<{outputPath: string|null, statementCount: number, bytes: number}>}
  */
 export async function main(argv = process.argv.slice(2)) {
-  // Parsing manual (sin deps externas para mantener el script ligero).
   const opts = {
     input: 'catalog/chagra-catalog-seed-v3.1.json',
     output: null,
     limit: null,
     graph: 'chagra_kg',
     includeDrop: true,
+    controlsOnly: false,
+    reportPath: null,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -479,9 +856,14 @@ export async function main(argv = process.argv.slice(2)) {
     else if (a === '--limit') opts.limit = Number(argv[++i]);
     else if (a === '--graph') opts.graph = argv[++i];
     else if (a === '--no-drop') opts.includeDrop = false;
+    else if (a === '--controls-only') opts.controlsOnly = true;
+    else if (a === '--report') opts.reportPath = argv[++i];
     else if (a === '--help' || a === '-h') {
       console.error(
-        'Usage: node scripts/catalog-to-age.mjs [--input FILE] [--output FILE] [--limit N] [--graph NAME] [--no-drop]',
+        'Usage: node scripts/catalog-to-age.mjs [--input FILE] [--output FILE]\n'
+        + '       [--limit N] [--graph NAME] [--no-drop] [--controls-only] [--report FILE]\n\n'
+        + '  --controls-only  Emite solo nodos Pest + edges BP-CONTROLS-Pest.\n'
+        + '  --report FILE    Escribe reporte de clasificación (JSON) a FILE.',
       );
       return { outputPath: null, statementCount: 0, bytes: 0 };
     }
@@ -489,33 +871,70 @@ export async function main(argv = process.argv.slice(2)) {
 
   const seedPath = resolve(opts.input);
   const seed = JSON.parse(readFileSync(seedPath, 'utf-8'));
-  const statements = buildSqlScript(seed, {
-    limit: opts.limit ?? undefined,
-    graph: opts.graph,
-    includeDrop: opts.includeDrop,
-  });
 
-  const header = [
+  let statements;
+  let report;
+  if (opts.controlsOnly) {
+    statements = buildControlsDeltaScript(seed, { graph: opts.graph });
+    const bpClass = collectBpPestEdges(seed.biopreparados || []);
+    const pestsByTipo = {};
+    for (const meta of bpClass.pests.values()) {
+      const t = meta.tipo || 'unknown';
+      pestsByTipo[t] = (pestsByTipo[t] || 0) + 1;
+    }
+    const seenEdges = new Set();
+    for (const e of bpClass.edges) seenEdges.add(`${e.bpId}|${e.pestSlug}`);
+    report = {
+      pestCount: bpClass.pests.size,
+      pestsByTipo,
+      controlsEdgeCount: seenEdges.size,
+      purposes: bpClass.purposes,
+      unmatched: bpClass.unmatched,
+    };
+  } else {
+    const withReport = buildSqlScriptWithReport(seed, {
+      limit: opts.limit ?? undefined,
+      graph: opts.graph,
+      includeDrop: opts.includeDrop,
+    });
+    statements = withReport.statements;
+    report = withReport.report;
+  }
+
+  const headerLines = [
     '-- chagra-kg-import.sql',
     `-- Generated by scripts/catalog-to-age.mjs at ${new Date().toISOString()}`,
     `-- Source: ${opts.input}`,
     `-- Graph: ${opts.graph}`,
+    `-- Mode: ${opts.controlsOnly ? 'controls-only (delta)' : (opts.includeDrop ? 'full (drop+create)' : 'full (merge delta)')}`,
     `-- Statements: ${statements.length}`,
+    `-- Pest count: ${report.pestCount} (by tipo: ${JSON.stringify(report.pestsByTipo)})`,
+    `-- CONTROLS edges: ${report.controlsEdgeCount}`,
+    `-- Targets sin clasificar: ${report.unmatched.length}`,
     '--',
-    '-- WARNING: this script DROPs and re-creates the graph by default.',
-    '-- Use --no-drop to apply as a delta MERGE.',
-    '',
-  ].join('\n');
+    (!opts.controlsOnly && opts.includeDrop)
+      ? '-- WARNING: this script DROPs and re-creates the graph by default.'
+      : '-- This script is idempotent (MERGE-only) — safe to re-run.',
+  ];
+  if (!opts.controlsOnly && opts.includeDrop) {
+    headerLines.push('-- Use --no-drop to apply as a delta MERGE.');
+  }
+  headerLines.push('');
+  const header = headerLines.join('\n');
 
   const body = statements.join('\n') + '\n';
   const out = header + body;
+
+  if (opts.reportPath) {
+    writeFileSync(opts.reportPath, JSON.stringify(report, null, 2), 'utf-8');
+    console.error(`Wrote classification report to ${opts.reportPath}`);
+  }
 
   if (opts.output) {
     writeFileSync(opts.output, out, 'utf-8');
     console.error(`Wrote ${statements.length} statements (${out.length} bytes) to ${opts.output}`);
     return { outputPath: opts.output, statementCount: statements.length, bytes: out.length };
   }
-  // stdout
   process.stdout.write(out);
   return { outputPath: null, statementCount: statements.length, bytes: out.length };
 }
