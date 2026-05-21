@@ -480,7 +480,6 @@ export async function main(argv = process.argv.slice(2)) {
     else if (a === '--graph') opts.graph = argv[++i];
     else if (a === '--no-drop') opts.includeDrop = false;
     else if (a === '--help' || a === '-h') {
-      // eslint-disable-next-line no-console
       console.error(
         'Usage: node scripts/catalog-to-age.mjs [--input FILE] [--output FILE] [--limit N] [--graph NAME] [--no-drop]',
       );
@@ -513,7 +512,6 @@ export async function main(argv = process.argv.slice(2)) {
 
   if (opts.output) {
     writeFileSync(opts.output, out, 'utf-8');
-    // eslint-disable-next-line no-console
     console.error(`Wrote ${statements.length} statements (${out.length} bytes) to ${opts.output}`);
     return { outputPath: opts.output, statementCount: statements.length, bytes: out.length };
   }
@@ -525,7 +523,6 @@ export async function main(argv = process.argv.slice(2)) {
 // ESM-friendly entry-point check.
 if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch((err) => {
-    // eslint-disable-next-line no-console
     console.error('catalog-to-age failed:', err);
     process.exit(1);
   });
