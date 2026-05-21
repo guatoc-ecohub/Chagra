@@ -111,6 +111,19 @@ export default {
                     '0%': { strokeDashoffset: '0' },
                     '100%': { strokeDashoffset: '-1' },
                 },
+                // Fade-in suave para placeholders del chat al aparecer
+                // (Pensando, sugerencias post-stream). 200ms ease-out.
+                fadeIn: {
+                    '0%': { opacity: '0', transform: 'translateY(4px)' },
+                    '100%': { opacity: '1', transform: 'translateY(0)' },
+                },
+                // Pulso de los puntos suspensivos del estado "Pensando…"
+                // del agente. Cada punto usa el mismo keyframe pero con
+                // delay distinto (0ms / 200ms / 400ms) → onda secuencial.
+                thinkingDot: {
+                    '0%, 100%': { opacity: '0.3', transform: 'scale(0.85)' },
+                    '50%': { opacity: '1', transform: 'scale(1.05)' },
+                },
             },
             animation: {
                 'scanline': 'scanline 2.4s linear infinite',
@@ -127,6 +140,12 @@ export default {
                 // Destello que recorre el borde del panel, sincronizado con
                 // negative-breath: 30s linear infinite.
                 'border-march': 'borderMarch 30s linear infinite',
+                // Aparición suave del placeholder "Pensando…" del agente.
+                'fadeIn': 'fadeIn 200ms ease-out forwards',
+                // Puntos suspensivos del estado "Pensando…". Cada punto
+                // hereda esta animación + delay distinto via arbitrary
+                // values (animation-delay:200ms / 400ms).
+                'thinkingDot': 'thinkingDot 1.4s ease-in-out infinite',
             },
         },
     },
