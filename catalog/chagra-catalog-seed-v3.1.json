@@ -32986,6 +32986,372 @@
         "agrosavia-manual-frutales-tropicales",
         "cenicafe-manual-cafetero-2013"
       ]
+    },
+    {
+      "id": "inga_punctata",
+      "nombre_comun": "guamo churimo",
+      "nombre_cientifico": "Inga punctata Willd.",
+      "familia_botanica": "Fabaceae",
+      "category": "arboles_sombra",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "nurse_plant",
+        "nitrogen_fixer"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1200,
+        "max_absoluto": 1700
+      },
+      "propagation": {
+        "methods": [
+          "semilla"
+        ]
+      },
+      "valor_pedagogico": "Inga de tierras bajas — sombrío rápido en cacaotales del piedemonte amazónico y Magdalena Medio. Fija nitrógeno atmosférico vía nódulos en raíces, mejorando suelos degradados. Vainas dulces aprovechadas por la avifauna; podas anuales generan biomasa para mulch superficial y reciclaje de nutrientes en agroforestería.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-colombia",
+        "pennington-1997-genus-inga"
+      ],
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA",
+      "estrato": "alto"
+    },
+    {
+      "id": "arracacia_xanthorrhiza_agrosavia_la22",
+      "nombre_comun": "arracacha Agrosavia La 22",
+      "nombre_cientifico": "Arracacia xanthorrhiza Bancr.",
+      "familia_botanica": "Apiaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1400,
+        "optimo_min": 1800,
+        "optimo_max": 2400,
+        "max_absoluto": 2800
+      },
+      "temperatura_c": {
+        "min": 10,
+        "optimo_min": 15,
+        "optimo_max": 22,
+        "max": 26
+      },
+      "ph_suelo": {
+        "min": 5,
+        "optimo_min": 5.5,
+        "optimo_max": 6.8,
+        "max": 7.5
+      },
+      "propagation": {
+        "methods": [
+          "division_mata"
+        ]
+      },
+      "saber_origen": {
+        "pueblo": "campesinos del Tolima (Cajamarca), Boyacá, Huila, Cauca",
+        "region": "Andes colombianos (Cajamarca-Tolima es el principal productor)",
+        "practica_original": "Selección campesina por color amarillo intenso de la raíz tuberosa y ausencia de pigmentación morada en nabos; siete materiales regionales cultivados tradicionalmente",
+        "validacion_cientifica_source_ids": [
+          "agrosavia-arracacha-la22-2021",
+          "agrosavia-modelo-arracacha-2024"
+        ]
+      },
+      "valor_pedagogico": "Primera variedad de arracacha registrada en ICA para Colombia.  AGROSAVIA (ficha oficial 549): 'The arracacha cultivar AGROSAVIA - La 22 has a production of 34.8 tons per hectare (± 13.8 tons per hectare) with completely yellow tuberous roots and no presence of purple tones',  vs 7-13 t/ha de materiales tradicionales.",
+      "source_ids": [
+        "agrosavia-arracacha-la22-2021",
+        "agrosavia-modelo-arracacha-2024",
+        "powo-kew",
+        "ica-resolucion-3168-2015"
+      ],
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "justicia_pectoralis",
+      "nombre_comun": "curia / tilo amazónico / chambá",
+      "nombre_cientifico": "Justicia pectoralis Jacq.",
+      "familia_botanica": "Acanthaceae",
+      "category": "medicinales_alelopaticas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "pollinator_attractor"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1200,
+        "max_absoluto": 1800
+      },
+      "propagation": {
+        "methods": [
+          "esqueje",
+          "semilla"
+        ]
+      },
+      "saber_origen": {
+        "pueblo": "pueblos del oriente colombiano y cuenca amazónica (registros etnobotánicos en Nukak orientales)",
+        "region": "Amazonia, Orinoquia, Pacífico colombiano",
+        "practica_original": "Infusión sedante-pectoral (gripe, tos, ansiedad); aroma a vainilla por cumarinas; hojas secas añadidas al rapé de Virola en algunos grupos Waika",
+        "validacion_cientifica_source_ids": [
+          "powo-kew",
+          "tramil-justicia-pectoralis"
+        ]
+      },
+      "valor_pedagogico": "Contiene cumarina  y umbeliferona — efectos analgésicos y antiinflamatorios documentados (Lino et al. 1997 Phytother Res 11(3):211-215). Citada en el Vademécum Colombiano de Plantas Medicinales (MinSalud 2008).",
+      "source_ids": [
+        "powo-kew",
+        "gbif-taxonomic-backbone",
+        "tramil-justicia-pectoralis",
+        "sib-colombia",
+        "ministerio-proteccion-2008-vademecum"
+      ],
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "sicana_odorifera",
+      "nombre_comun": "calabaza melón / cassabanana / pepino socato",
+      "nombre_cientifico": "Sicana odorifera (Vell.) Naudin",
+      "familia_botanica": "Cucurbitaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "naturalizada",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1500,
+        "max_absoluto": 1800
+      },
+      "propagation": {
+        "methods": [
+          "semilla"
+        ]
+      },
+      "valor_pedagogico": "Liana perenne tropical — uso como cerca viva productiva en patios y huertas. Cáscara muy aromática (compuestos terpénicos) usada tradicionalmente como ambientador natural en armarios y repelente de polillas. Frutos de pulpa anaranjada consumidos frescos o en dulces; cultivada en el Caribe colombiano y valles cálidos andinos.",
+      "source_ids": [
+        "powo-kew",
+        "gbif-colombia"
+      ],
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA",
+      "estrato": "alto"
+    },
+    {
+      "id": "cucurbita_moschata_agrosavia_la_plata",
+      "nombre_comun": "ahuyama Agrosavia La Plata",
+      "nombre_cientifico": "Cucurbita moschata Duchesne ex Poir.",
+      "familia_botanica": "Cucurbitaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 1500,
+        "max_absoluto": 2600
+      },
+      "temperatura_c": {
+        "min": 15,
+        "optimo_min": 22,
+        "optimo_max": 30,
+        "max": 35
+      },
+      "ph_suelo": {
+        "min": 5.5,
+        "optimo_min": 6,
+        "optimo_max": 7,
+        "max": 7.5
+      },
+      "propagation": {
+        "methods": [
+          "semilla"
+        ]
+      },
+      "saber_origen": {
+        "pueblo": "campesinos del Caribe colombiano",
+        "region": "Caribe colombiano (Magdalena, Bolívar, Atlántico, Córdoba)",
+        "practica_original": "Variedad obtenida por AGROSAVIA a partir de 57 accesiones colectadas en 7 departamentos del Caribe colombiano  (Correa-Álvarez et al. 2019, Bioagro)",
+        "validacion_cientifica_source_ids": [
+          "agrosavia-ahuyama-la-plata",
+          "agrosavia-manual-ahuyama-semilla"
+        ]
+      },
+      "valor_pedagogico": "Cucurbita con mayor diversidad genética reportada en Colombia (Zhiteneva 1930 cita registros hasta 2631 msnm). C.I. Caribia (Zona Bananera, Magdalena) custodia la colección activa de AGROSAVIA. Variedad seleccionada por adaptación al Caribe colombiano, alto contenido de β-caroteno y tolerancia a virus del mosaico amarillo del zucchini (ZYMV).",
+      "source_ids": [
+        "agrosavia-ahuyama-la-plata",
+        "agrosavia-manual-ahuyama-semilla",
+        "powo-kew"
+      ],
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "cucurbita_maxima_landrace_andino",
+      "nombre_comun": "zapallo / calabaza andina",
+      "nombre_cientifico": "Cucurbita maxima Duchesne",
+      "familia_botanica": "Cucurbitaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "ground_cover"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2600,
+        "max_absoluto": 3000
+      },
+      "propagation": {
+        "methods": [
+          "semilla"
+        ]
+      },
+      "valor_pedagogico": "C. maxima es la cucurbita mejor adaptada a tierras frías andinas (vs C. moschata tropical). Landraces colombianos persisten en huertas de Boyacá, Cundinamarca y Nariño bajo el nombre genérico 'zapallo'.",
+      "source_ids": [
+        "powo-kew",
+        "nrc-1989-cultivos-andinos",
+        "gbif-colombia"
+      ],
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "genista_monspessulana",
+      "nombre_comun": "retamo liso / retamo de teñir",
+      "nombre_cientifico": "Genista monspessulana (L.) L.A.S.Johnson",
+      "familia_botanica": "Fabaceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "templado",
+        "frio",
+        "paramo"
+      ],
+      "roles_in_guild": [
+        "invasive"
+      ],
+      "cultivable": false,
+      "conservation_status": "invasor",
+      "altitud_msnm": {
+        "min_absoluto": 2000,
+        "optimo_min": 2400,
+        "optimo_max": 3000,
+        "max_absoluto": 3300
+      },
+      "propagation": {
+        "methods": [
+          "semilla"
+        ]
+      },
+      "valor_pedagogico": "Sinónimo: Teline monspessulana (L.) C.Koch. Sujeta a Resolución 684 de 2018 del MinAmbiente (lineamientos manejo complejo retamos). Co-invasor con Ulex europaeus en Cerros Orientales y Sabana de Bogotá.",
+      "source_ids": [
+        "res-684-2018-mads",
+        "calderon-saenz-2003-invasoras",
+        "humboldt-beltran-barrera-2014-ulex",
+        "issg-uicn-invasoras",
+        "powo-kew"
+      ],
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "bactris_gasipaes_pacifico_chocoana",
+      "nombre_comun": "chontaduro accesión Pacífico (palmito-fruto)",
+      "nombre_cientifico": "Bactris gasipaes Kunth",
+      "familia_botanica": "Arecaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "calido"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "nurse_plant"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 100,
+        "optimo_max": 800,
+        "max_absoluto": 1200
+      },
+      "temperatura_c": {
+        "min": 20,
+        "optimo_min": 24,
+        "optimo_max": 28,
+        "max": 32
+      },
+      "ph_suelo": {
+        "min": 4,
+        "optimo_min": 4.5,
+        "optimo_max": 6,
+        "max": 6.8
+      },
+      "propagation": {
+        "methods": [
+          "semilla",
+          "division_mata"
+        ]
+      },
+      "saber_origen": {
+        "pueblo": "comunidades afrocolombianas e indígenas Embera, Wounaan del Pacífico colombiano; comunidades del Putumayo-Caquetá",
+        "region": "Pacífico colombiano (Buenaventura, Tumaco), Putumayo, Caquetá",
+        "practica_original": "Palma semi-domesticada  hace milenios; sistemas agroforestales para fruto (cocido) y palmito. Programa PLANTE-CORPOICA Puerto Asís/Orito 1998-2002 con sustitución de cultivos lícitos",
+        "validacion_cientifica_source_ids": [
+          "agrosavia-chontaduro-palmito-2002",
+          "agrosavia-chontaduro-1998"
+        ]
+      },
+      "valor_pedagogico": "Variedades sin espinas seleccionadas por CORPOICA-AGROSAVIA para producción de palmito en Putumayo (Puerto Asís, Orito). Fruto requiere cocción de ≥1h para inactivar inhibidor de tripsina (factor antinutricional). Base de la dieta proteica del Pacífico colombiano; palmito de calidad export como alternativa lícita en programa PLANTE-CORPOICA 1998-2002.",
+      "source_ids": [
+        "agrosavia-chontaduro-palmito-2002",
+        "agrosavia-chontaduro-1998",
+        "powo-kew",
+        "sib-colombia"
+      ],
+      "validation_level": "claude_draft",
+      "_curation_status": "BORRADOR_IA",
+      "estrato": "alto"
     }
   ],
   "biopreparados": [
@@ -33107,7 +33473,7 @@
         "cal viva o hidratada",
         "agua"
       ],
-      "proceso_resumen": "Cocción de azufre + cal 2:1 en 10L agua por 45-60 min hasta color ámbar. Aplicación foliar 1:100 preventivo, 1:20 curativo. Evitar en frutales durante floración.",
+      "proceso_resumen": "Cocción de azufre + cal 2:1 en 10L agua por 45-60 min hasta color vino tinto/teja (28-32° Baumé). Aplicación foliar 1:100 preventivo, 1:20 curativo. Evitar en frutales durante floración.",
       "tiempo_elaboracion_dias": 1,
       "vida_util_dias": 180,
       "source_ids": [
@@ -33602,6 +33968,390 @@
         "gbif-taxonomic-backbone",
         "powo-kew"
       ]
+    },
+    {
+      "id": "caldo_visosa",
+      "nombre": "caldo Viçosa (visosa) — variante nutricional-fungicida",
+      "tipo": "caldo",
+      "proposito": [
+        "fertilizacion",
+        "fitosanitario_preventivo"
+      ],
+      "ingredientes": [
+        "sulfato de cobre",
+        "sulfato de zinc",
+        "sulfato de magnesio",
+        "ácido bórico",
+        "cal",
+        "estiércol fresco",
+        "agua sin cloro"
+      ],
+      "proceso_resumen": "Variante del caldo bordelés con sulfatos de Zn, Mg y bórax; añade estiércol fresco. Mezcla y aplicación tras 1-2 horas de reposo.",
+      "tiempo_elaboracion_dias": 1,
+      "vida_util_dias": 3,
+      "source_ids": [
+        "restrepo-2007-caldos-minerales"
+      ],
+      "uso": "Aspersión foliar en cafetales para corrección de microelementos + control fungicida.",
+      "dosis": "Variable según cultivo; consultar protocolo Restrepo 2007 capítulo 3.",
+      "target": [
+        "roya_cafe",
+        "deficiencia_zn_mg_b"
+      ],
+      "valor_pedagogico": "Originaria de la Universidad Federal de Viçosa (Brasil) para cafetales; combina nutrición foliar con efecto fungicida cúprico suave.",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "supermagro_restrepo",
+      "nombre": "supermagro (biofertilizante anaeróbico de Restrepo)",
+      "tipo": "fermentado",
+      "proposito": [
+        "fertilizacion",
+        "estimulante_microbiano"
+      ],
+      "ingredientes": [
+        "50 kg estiércol vacuno fresco",
+        "100-140 L agua sin cloro",
+        "2-12 L leche cruda o suero",
+        "2-10 L melaza",
+        "3-5 kg ceniza de leña",
+        "sulfatos minerales (Zn, Mg, Mn, Cu, Fe, Co)",
+        "bórax",
+        "cloruro de calcio",
+        "molibdato de sodio",
+        "harina de roca fosfórica"
+      ],
+      "proceso_resumen": "Mezcla inicial estiércol+agua+leche+melaza en caneca plástica de 200 L con tapa hermética y válvula de fermentación; adición semanal escalonada de sales minerales disueltas en agua tibia con melaza; fermentación anaeróbica.",
+      "tiempo_elaboracion_dias": 75,
+      "vida_util_dias": 365,
+      "source_ids": [
+        "restrepo-2007-biopreparados",
+        "restrepo-1996-abc-agricultura-organica"
+      ],
+      "uso": "Aspersión foliar al amanecer o atardecer; aplicación al suelo en drench.",
+      "dosis": "Foliar 1-5%; suelo 10-30%.",
+      "target": [
+        "nutricion_micronutrientes",
+        "induccion_resistencia"
+      ],
+      "valor_pedagogico": "60-90 días anaeróbico según temperatura ambiente (60 en tierra caliente, 90 en altiplano). A menos de 60 días los sulfatos NO terminan de quelar y queman follaje (Restrepo 2007, capítulo biofertilizantes). Color final ámbar-marrón con olor a chicha; descartar si huele a putrefacción. Origen brasileño (Delvino Magro / Pinheiro Machado) adaptado por Jairo Restrepo en Colombia.",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "caldo_m5_restrepo",
+      "nombre": "caldo M5 de Restrepo (bioinsecticida-bioestimulante)",
+      "tipo": "fermentado",
+      "proposito": [
+        "fertilizacion",
+        "estimulante_microbiano",
+        "repelente_insectos"
+      ],
+      "ingredientes": [
+        "estiércol vacuno fresco",
+        "leche cruda o suero",
+        "melaza",
+        "harinas (trigo, maíz)",
+        "ceniza de leña",
+        "sulfatos minerales",
+        "agua sin cloro"
+      ],
+      "proceso_resumen": "Fermentación anaeróbica en caneca de 200 L similar a supermagro pero con énfasis en harinas y ceniza para densificación microbiana; uso anti-insectos chupadores.",
+      "tiempo_elaboracion_dias": 30,
+      "vida_util_dias": 180,
+      "source_ids": [
+        "restrepo-2007-biopreparados"
+      ],
+      "uso": "Aspersión foliar contra áfidos, mosca blanca, trips.",
+      "dosis": "Foliar 2-5%.",
+      "target": [
+        "afidos",
+        "mosca_blanca",
+        "trips"
+      ],
+      "valor_pedagogico": "Variante densificada del supermagro. La formulación exacta varía según edición de Restrepo — verificar capítulo 'biofertilizantes especiales' en edición física 2007.",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "microorganismos_montana_solido",
+      "nombre": "microorganismos de montaña (MM) sólido",
+      "tipo": "microbiano",
+      "proposito": [
+        "estimulante_microbiano",
+        "fertilizacion"
+      ],
+      "ingredientes": [
+        "60 L hojarasca de bosque maduro (capa M2/M3 con micelio blanco)",
+        "50 kg salvado o pulido de arroz",
+        "agua sin cloro al 30-40% humedad de campo"
+      ],
+      "proceso_resumen": "Recolectar hojarasca bajo bosque maduro nativo (no plantaciones); mezclar con salvado humedecido con agua sin cloro al 30-40% — SIN melaza (la melaza se reserva para la activación líquida MMA); compactar en barril hermético de 200 L; fermentación anaeróbica sin remover.",
+      "tiempo_elaboracion_dias": 30,
+      "vida_util_dias": 365,
+      "source_ids": [
+        "vasquez-solano-2021-mm-agronomia-cr",
+        "restrepo-2007-biopreparados"
+      ],
+      "uso": "Base para activación líquida (MM líquido) o como inoculante para bocashi y compostaje.",
+      "dosis": "5-10 kg por m³ de compost; 1 kg/m² al suelo.",
+      "target": [
+        "activacion_suelo",
+        "descomposicion_materia_organica"
+      ],
+      "valor_pedagogico": "La calidad depende del bosque madre — recolectar en bosques con dosel cerrado, suelo con hojarasca blanca (micelio activo) y sin perturbación reciente. Método Restrepo & Hensel 2015 validado por Vásquez-Solano et al. 2021 Agronomía Costarricense.",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "microorganismos_montana_liquido",
+      "nombre": "microorganismos de montaña (MM) líquido",
+      "tipo": "microbiano",
+      "proposito": [
+        "estimulante_microbiano"
+      ],
+      "ingredientes": [
+        "10 kg MM sólido",
+        "200 L agua sin cloro",
+        "5 L melaza",
+        "barril hermético con válvula de fermentación"
+      ],
+      "proceso_resumen": "Disolver MM sólido en agua con melaza dentro de barril hermético; fermentación anaeróbica con válvula de escape; cosechar al estabilizar burbujeo.",
+      "tiempo_elaboracion_dias": 10,
+      "vida_util_dias": 30,
+      "source_ids": [
+        "vasquez-solano-2021-mm-agronomia-cr",
+        "restrepo-2007-biopreparados"
+      ],
+      "uso": "Aspersión foliar y al suelo; activador de compostaje.",
+      "dosis": "Foliar 1-5%; suelo 5-10%.",
+      "target": [
+        "activacion_suelo",
+        "supresion_patogenos_suelo"
+      ],
+      "valor_pedagogico": "Vida útil corta (~30 días) — usar fresco. Olor agridulce a chicha indica calidad; rechazar si huele a putrefacción.",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "jadam_microbial_solution_jms",
+      "nombre": "JADAM Microbial Solution (JMS)",
+      "tipo": "microbiano",
+      "proposito": [
+        "estimulante_microbiano",
+        "fitosanitario_preventivo"
+      ],
+      "ingredientes": [
+        "1-2 puñados de hojarasca de bosque nativo local (leaf-mold con micelio blanco)",
+        "1 papa mediana cocida y triturada",
+        "1 cucharada (~15 g) sal marina sin refinar",
+        "20 L agua sin cloro a 25-30°C"
+      ],
+      "proceso_resumen": "Colocar hojarasca en bolsa de tela dentro del agua; añadir papa cocida + sal; fermentación aeróbica a 25-30°C; cosechar al formar espuma blanca densa.",
+      "tiempo_elaboracion_dias": 2,
+      "vida_util_dias": 3,
+      "source_ids": [
+        "cho-2016-jadam-organic-farming"
+      ],
+      "uso": "Aspersión foliar y al suelo fresco; no almacenar.",
+      "dosis": "Dilución 1:10 a 1:500 según uso (drench o foliar).",
+      "target": [
+        "activacion_suelo",
+        "supresion_patogenos"
+      ],
+      "valor_pedagogico": "Vida útil EXTREMADAMENTE corta — aplicar dentro de 24-72h tras pico de actividad microbiana. Reemplaza compra de inoculantes comerciales. Receta canónica Cho 2016 ISBN 9788989220206.",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "jadam_wetting_agent_jwa",
+      "nombre": "JADAM Wetting Agent (JWA)",
+      "tipo": "compuesto",
+      "proposito": [
+        "fitosanitario_curativo"
+      ],
+      "ingredientes": [
+        "aceite de canola o coco",
+        "hidróxido de potasio (KOH, potasa cáustica)",
+        "agua sin cloro"
+      ],
+      "proceso_resumen": "Saponificación de aceite con KOH a temperatura ambiente (reacción exotérmica) en proporción precisa según tabla JADAM (Cho 2016/2021); reposo 24h.",
+      "tiempo_elaboracion_dias": 1,
+      "vida_util_dias": 365,
+      "source_ids": [
+        "cho-2016-jadam-organic-farming",
+        "cho-2021-jadam-pest-disease"
+      ],
+      "uso": "Surfactante natural y bioinsecticida de contacto. Mezclar con caldos foliares para mejorar adherencia.",
+      "dosis": "1:30 a 1:100 según objetivo.",
+      "target": [
+        "afidos",
+        "cochinilla_harinosa",
+        "mosca_blanca"
+      ],
+      "valor_pedagogico": "PRECAUCIÓN: KOH es corrosivo — usar guantes y gafas. Producto final tipo jabón potásico líquido. Compatible con caldo sulfocálcico y JMS.",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "vinagre_madera_pirolenoso",
+      "nombre": "vinagre de madera (ácido piroleñoso)",
+      "tipo": "extracto",
+      "proposito": [
+        "fitosanitario_preventivo",
+        "estimulante_microbiano",
+        "repelente_insectos"
+      ],
+      "ingredientes": [
+        "ramas y leña de especies leñosas (acacia, bambú, leucaena) de 2-5 cm de diámetro",
+        "horno o tambor de carbonización lenta con condensador"
+      ],
+      "proceso_resumen": "Pirólisis lenta de leña a 300-500°C en horno cerrado con condensador; recuperar condensado por enfriamiento; reposo de 3-6 meses para separar tres fases (alquitrán pesado / vinagre clarificado central / aceite ligero); decantar fase central.",
+      "tiempo_elaboracion_dias": 120,
+      "vida_util_dias": 1095,
+      "source_ids": [
+        "cho-2016-jadam-organic-farming"
+      ],
+      "uso": "Aspersión foliar y al suelo; coadyuvante de otros biopreparados.",
+      "dosis": "1:200 a 1:1000 según uso (germinación 1:500; foliar 1:300).",
+      "target": [
+        "hongos_foliares",
+        "nematodos",
+        "repelente_general"
+      ],
+      "valor_pedagogico": "NO USAR FRESCO — contiene alquitranes (PAHs) fitotóxicos. Reposo mínimo 90 días obligatorio para separación de fases.",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "fermento_fpj_brotes",
+      "nombre": "FPJ — Fermented Plant Juice de brotes (Cho/KNF)",
+      "tipo": "fermentado",
+      "proposito": [
+        "fertilizacion",
+        "estimulante_microbiano"
+      ],
+      "ingredientes": [
+        "7 partes (peso) de brotes tiernos cosechados al amanecer (ortiga, consuelda, alfalfa, bambú joven, ipomoea)",
+        "3 partes azúcar morena cruda"
+      ],
+      "proceso_resumen": "Picar brotes en trozos pequeños; mezclar con azúcar en vasija de barro o vidrio; cubrir con papel poroso; fermentar a la sombra a temperatura ambiente.",
+      "tiempo_elaboracion_dias": 7,
+      "vida_util_dias": 365,
+      "source_ids": [
+        "park-duponte-2008-lab-ctahr"
+      ],
+      "uso": "Aspersión foliar en fase vegetativa (estimulante hormonal).",
+      "dosis": "1:500 a 1:1000.",
+      "target": [
+        "fase_vegetativa",
+        "induccion_brotacion"
+      ],
+      "valor_pedagogico": "Proporción correcta 7:3 planta:azúcar según Cho Han-Kyu (KNF) — no 1:1 como suele simplificarse. Cosechar brotes antes del sol para maximizar actividad enzimática.",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "fermento_faa_pescado",
+      "nombre": "FAA — Fish Amino Acids (Cho/KNF)",
+      "tipo": "fermentado",
+      "proposito": [
+        "fertilizacion"
+      ],
+      "ingredientes": [
+        "1 parte (peso) restos de pescado (vísceras, cabezas, espinas)",
+        "1 parte azúcar morena cruda"
+      ],
+      "proceso_resumen": "Mezclar pescado picado con azúcar en vasija de barro o plástico no metálico; cubrir con papel; fermentar a temperatura ambiente con remoción ocasional.",
+      "tiempo_elaboracion_dias": 120,
+      "vida_util_dias": 730,
+      "source_ids": [
+        "park-duponte-2008-lab-ctahr"
+      ],
+      "uso": "Aspersión foliar como fuente de N orgánico y aminoácidos libres.",
+      "dosis": "1:500 a 1:1000.",
+      "target": [
+        "fase_crecimiento_vegetativo",
+        "fuente_nitrogeno"
+      ],
+      "valor_pedagogico": "Fermentación 3-6 meses para hidrólisis completa. Líquido final ámbar oscuro con olor sui generis (NO putrefacto).",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "fermento_lab_lactobacilos",
+      "nombre": "LAB — cultivo de lactobacilos (Cho/KNF)",
+      "tipo": "microbiano",
+      "proposito": [
+        "estimulante_microbiano"
+      ],
+      "ingredientes": [
+        "agua del lavado de arroz integral",
+        "leche fresca (cruda preferible) en proporción 1:10 respecto al sobrenadante",
+        "azúcar morena (conservante 1:1 al final)"
+      ],
+      "proceso_resumen": "Paso 1: Reposar agua del lavado de arroz 2-3 días hasta separación. Paso 2: Tomar sobrenadante y mezclar con leche fresca en proporción 1:10; reposar 5-7 días hasta separación curd/suero amarillo. Cosechar suero (LAB); conservar con azúcar morena 1:1.",
+      "tiempo_elaboracion_dias": 10,
+      "vida_util_dias": 365,
+      "source_ids": [
+        "park-duponte-2008-lab-ctahr"
+      ],
+      "uso": "Inoculación de letrinas, compostera, suelo; reducción de olores; supresión patógenos.",
+      "dosis": "1:1000 foliar; 1:500 suelo y compostera.",
+      "target": [
+        "supresion_patogenos_suelo",
+        "compostaje",
+        "reduccion_olores"
+      ],
+      "valor_pedagogico": "Procedimiento de dos etapas; rendimiento ~10% del volumen de leche. Mezclar con FPJ y FAA en aspersiones combinadas.",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "biofertilizante_purin_rumen",
+      "nombre": "biofertilizante a base de contenido ruminal (biol ruminal)",
+      "tipo": "fermentado",
+      "proposito": [
+        "fertilizacion",
+        "estimulante_microbiano"
+      ],
+      "ingredientes": [
+        "4-6 kg contenido ruminal fresco bovino",
+        "10-15 kg estiércol fresco",
+        "2-4 L melaza",
+        "1-2 L leche cruda o suero",
+        "agua sin cloro hasta 100 L"
+      ],
+      "proceso_resumen": "Mezclar en caneca hermética con válvula de fermentación; fermentación anaeróbica.",
+      "tiempo_elaboracion_dias": 40,
+      "vida_util_dias": 180,
+      "source_ids": [
+        "mamani-2015-biol-ruminal"
+      ],
+      "uso": "Aspersión foliar y aplicación al suelo (drench).",
+      "dosis": "Foliar 5-10%; suelo 10-20%.",
+      "target": [
+        "nutricion_nitrogenada",
+        "inoculo_microbiano_anaerobio"
+      ],
+      "valor_pedagogico": "Aprovecha residuo de mataderos. Mamani-Pati et al. 2015 (J Selva Andina Res Soc 6(1)) reportan 123-256 mg/L de N según cantidad de contenido ruminal añadido.",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "harina_rocas_basalto",
+      "nombre": "harina de rocas basálticas (remineralización)",
+      "tipo": "mineral",
+      "proposito": [
+        "fertilizacion",
+        "enmienda_ca"
+      ],
+      "ingredientes": [
+        "roca basáltica molida (granulometría <100 mesh / <0.15 mm)"
+      ],
+      "proceso_resumen": "Molienda fina de basalto fresco; sin proceso fermentativo. Aplicación directa o incorporada a bocashi y biofertilizantes.",
+      "tiempo_elaboracion_dias": 0,
+      "vida_util_dias": 3650,
+      "source_ids": [
+        "pinheiro-restrepo-2009-remineralizacion"
+      ],
+      "uso": "Voleo al suelo; incorporación a compost y bocashi; adición a biopreparados líquidos.",
+      "dosis": "300 g/m² al voleo; 3 t/ha;  2-5 kg por 200 L de biofertilizante.",
+      "target": [
+        "remineralizacion_suelo",
+        "formacion_complejo_arcilla_humus"
+      ],
+      "valor_pedagogico": "Composición típica SiO₂ 45-52%, Fe 3.4%, Mg 2.1%, Ca 3.8%, >70 oligoelementos.  Liberación lenta — efectos visibles a partir de 6-12 meses. Heredero de Julius Hensel 'Brot aus Steinen' (1894), reeditado por Pinheiro-Restrepo 2009.",
+      "_curation_status": "BORRADOR_IA"
     }
   ],
   "sources": [
@@ -34238,6 +34988,338 @@
       "titulo": "Cartilha da saúde do solo — agricultura orgânica e biodinâmica: o uso correto da cal e das enmendas minerais",
       "institucion": "Fundação Juquira Candiru / MAELA",
       "observaciones": "Texto de divulgación agroecológica latinoamericana que sistematiza las advertencias sobre cal viva/hidratada en sistemas orgánicos y defiende criterios técnicos de aplicación basados en análisis de suelo.",
+      "tier": "B"
+    },
+    {
+      "id": "colplanta-2021",
+      "tipo": "base_datos",
+      "autores": "Diazgranados, M.; Allkin, B.; Black, N.; Cámara-Leret, R.; et al. (Useful Plants and Fungi of Colombia project)",
+      "año": 2021,
+      "titulo": "ColPlantA — Catalogue of Useful Plants of Colombia",
+      "institucion": "Royal Botanic Gardens, Kew & Universidad Nacional de Colombia",
+      "url": "https://colplanta.org",
+      "tier": "A"
+    },
+    {
+      "id": "pennington-1997-genus-inga",
+      "tipo": "libro",
+      "autores": "Pennington, T.D.",
+      "año": 1997,
+      "titulo": "The genus Inga: botany",
+      "revista_o_editorial": "Royal Botanic Gardens, Kew",
+      "paginas": "1-488",
+      "isbn": "9781900347266",
+      "tier": "A"
+    },
+    {
+      "id": "agrosavia-yacon-eje-cafetero",
+      "tipo": "articulo_revista",
+      "autores": "Lobo Arias, M.; Medina Cano, C.I.; Delgado Paz, O.A.",
+      "año": 2007,
+      "titulo": "Caracterización morfológica y molecular de materiales de yacón (Smallanthus sonchifolius) colectados en la ecorregión Eje Cafetero de Colombia",
+      "revista_o_editorial": "Plant Genetic Resources Newsletter — IPGRI / AGROSAVIA",
+      "institucion": "Corporación Colombiana de Investigación Agropecuaria",
+      "url": "https://repository.agrosavia.co",
+      "tier": "B"
+    },
+    {
+      "id": "agrosavia-uva-caimarona",
+      "tipo": "ficha_tecnica_institucional",
+      "autores": "Escobar Acevedo, C.J.; Zuluaga Peláez, J.J.; Montealegre R., L.A.; Criollo Cruz, D.",
+      "año": null,
+      "titulo": "Uva caimarona (Pourouma cecropiifolia): fruta exótica de la Amazonía",
+      "institucion": "Corporación Colombiana de Investigación Agropecuaria — CORPOICA, C.I. Macagual",
+      "url": "https://repository.agrosavia.co/handle/20.500.12324/17209",
+      "tier": "A"
+    },
+    {
+      "id": "iiap-2002-uvilla",
+      "tipo": "articulo_revista",
+      "autores": "Imán Correa, S.A.; Limachi, J.; Sotero Solís, V.",
+      "año": 2002,
+      "titulo": "Pourouma cecropiifolia C. Martius 'uvilla' en la Amazonía peruana",
+      "revista_o_editorial": "Folia Amazónica",
+      "volumen_numero": "13(1-2)",
+      "institucion": "Instituto de Investigaciones de la Amazonía Peruana (IIAP)",
+      "url": "http://www.iiap.org.pe/upload/publicacion/Folia13_articulo1.pdf",
+      "tier": "B"
+    },
+    {
+      "id": "javeriana-fiorentino-anamu",
+      "tipo": "articulo_revista",
+      "autores": "Urueña, C.; Cifuentes, C.; Castañeda, D.; Arango, A.; Kaur, P.; Asea, A.; Fiorentino, S.",
+      "año": 2008,
+      "titulo": "Petiveria alliacea extracts uses multiple mechanisms to inhibit growth of human and mouse tumoral cells",
+      "revista_o_editorial": "BMC Complementary and Alternative Medicine",
+      "volumen_numero": "8:60",
+      "doi": "10.1186/1472-6882-8-60",
+      "tier": "A"
+    },
+    {
+      "id": "ministerio-proteccion-2008-vademecum",
+      "tipo": "manual_tecnico",
+      "autores": "Ministerio de la Protección Social de Colombia",
+      "año": 2008,
+      "titulo": "Vademécum Colombiano de Plantas Medicinales",
+      "institucion": "Ministerio de la Protección Social, Bogotá D.C.",
+      "tier": "A"
+    },
+    {
+      "id": "tramil-justicia-pectoralis",
+      "tipo": "base_datos",
+      "autores": "TRAMIL — Programa de Investigación Aplicada a la Medicina Tradicional",
+      "año": null,
+      "titulo": "Ficha técnica Justicia pectoralis Jacq.",
+      "institucion": "enda-caribe / TRAMIL",
+      "url": "https://www.tramil.net/es/plant/justicia-pectoralis",
+      "tier": "B"
+    },
+    {
+      "id": "agrosavia-arracacha-la22-2021",
+      "tipo": "articulo_revista",
+      "autores": "Garnica-Montaña, J.P.; Villamil-Carvajal, J.E.; Atencio-Solano, L.M.; Rodríguez-Rodríguez, O.J.; Vargas-Berdugo, A.M.",
+      "año": 2021,
+      "titulo": "Agrosavia La 22: primera variedad de arracacha en Colombia",
+      "revista_o_editorial": "Revista Mexicana de Ciencias Agrícolas",
+      "volumen_numero": "12(2)",
+      "paginas": "355-362",
+      "url": "https://www.scielo.org.mx/scielo.php?script=sci_arttext&pid=S2007-09342021000200355",
+      "tier": "A"
+    },
+    {
+      "id": "agrosavia-modelo-arracacha-2024",
+      "tipo": "libro",
+      "autores": "Garnica-Montaña, J.P.; Villamil-Carvajal, J.E.; Vargas-Berdugo, A.M.; Rodríguez-Rodríguez, O.J.; Atencio-Solano, L.M.",
+      "año": 2024,
+      "titulo": "Modelo productivo de arracacha (Arracacia xanthorrhiza Bancr.): Agrosavia La 22 para la región andina de Colombia",
+      "revista_o_editorial": "Editorial AGROSAVIA",
+      "institucion": "Corporación Colombiana de Investigación Agropecuaria",
+      "url": "https://editorial.agrosavia.co/index.php/publicaciones/catalog/book/185",
+      "tier": "A"
+    },
+    {
+      "id": "ocampo-2013-seje-orinoquia",
+      "tipo": "articulo_revista",
+      "autores": "Ocampo-Durán, Á.; Fernández-Lavado, A.P.; Castro-Lima, F.",
+      "año": 2013,
+      "titulo": "Aceite de la palma de seje Oenocarpus bataua Mart. por su calidad nutricional puede contribuir a la conservación y uso sostenible de los bosques de galería en la Orinoquia colombiana",
+      "revista_o_editorial": "Orinoquia",
+      "tier": "B"
+    },
+    {
+      "id": "bernal-2013-cosechar-sin-destruir",
+      "tipo": "libro",
+      "autores": "Bernal, R.; Galeano, G. (eds.)",
+      "año": 2013,
+      "titulo": "Cosechar sin destruir — Aprovechamiento sostenible de palmas colombianas",
+      "revista_o_editorial": "Facultad de Ciencias, Instituto de Ciencias Naturales, Universidad Nacional de Colombia",
+      "paginas": "244 pp",
+      "url": "https://bdigital.unal.edu.co",
+      "tier": "A"
+    },
+    {
+      "id": "agrosavia-descriptores-guandul-2022",
+      "tipo": "libro",
+      "autores": "Arenas-Rubio, I.; Moreno-Pérez, S.; Montero-Cantillo, Y.D.; Gutiérrez-Berdugo, I.A.",
+      "año": 2022,
+      "titulo": "Descriptores de guandul (Cajanus cajan [L.] Huth.): guía ilustrada y catálogo técnico",
+      "revista_o_editorial": "Editorial AGROSAVIA",
+      "institucion": "Corporación Colombiana de Investigación Agropecuaria",
+      "url": "https://editorial.agrosavia.co/index.php/publicaciones/catalog/book/292",
+      "tier": "A"
+    },
+    {
+      "id": "agrosavia-manual-guandul-2022",
+      "tipo": "manual_tecnico",
+      "autores": "Arenas-Rubio, I.; Moreno-Pérez, S.; et al.",
+      "año": 2022,
+      "titulo": "Manual técnico para la producción de semilla de guandul (Cajanus cajan (L.) Huth) en Colombia",
+      "revista_o_editorial": "Editorial AGROSAVIA",
+      "isbn": "978-958-740-525-5",
+      "url": "https://repository.agrosavia.co/items/4281954a-b8dd-4544-807b-f6bd76abda23",
+      "tier": "A"
+    },
+    {
+      "id": "humboldt-beltran-barrera-2014-ulex",
+      "tipo": "articulo_revista",
+      "autores": "Beltrán-G., H.E.; Barrera-Cataño, J.I.",
+      "año": 2014,
+      "titulo": "Caracterización de invasiones de Ulex europaeus L. de diferentes edades como herramienta para la restauración ecológica de bosques altoandinos, Colombia",
+      "revista_o_editorial": "Biota Colombiana",
+      "volumen_numero": "15",
+      "institucion": "Instituto de Investigación de Recursos Biológicos Alexander von Humboldt",
+      "url": "https://revistas.humboldt.org.co/index.php/biota/article/view/353",
+      "tier": "A"
+    },
+    {
+      "id": "car-helecho-marranero-2020",
+      "tipo": "manual_tecnico",
+      "autores": "Corporación Autónoma Regional de Cundinamarca — CAR",
+      "año": 2020,
+      "titulo": "Plan de Prevención, Manejo y Control del helecho marranero (Pteridium aquilinum (L.) Kuhn) para la jurisdicción de la CAR",
+      "institucion": "CAR Cundinamarca",
+      "url": "https://sie.car.gov.co/items/5b2902b8-e7dc-4f51-82d2-4f07787b7c66",
+      "tier": "A"
+    },
+    {
+      "id": "humboldt-yariguies-2020",
+      "tipo": "articulo_revista",
+      "autores": "Avella, A.; Cárdenas-López, D.; et al.",
+      "año": 2020,
+      "titulo": "Vegetación asociada con helechales en el Parque Nacional Natural Serranía de Los Yariguíes, Colombia",
+      "revista_o_editorial": "Revista de Biología Tropical",
+      "volumen_numero": "68(4)",
+      "paginas": "1107-1115",
+      "tier": "A"
+    },
+    {
+      "id": "scielo-correa-kikuyo-2018",
+      "tipo": "articulo_revista",
+      "autores": "Correa, H.J.; Cuéllar, A.E.; Pabón, M.L.; Carulla, J.E.",
+      "año": 2018,
+      "titulo": "El kikuyo, una gramínea presente en los sistemas de rumiantes en trópico alto colombiano",
+      "revista_o_editorial": "Revista CES Medicina Veterinaria y Zootecnia",
+      "url": "http://www.scielo.org.co/scielo.php?script=sci_arttext&pid=S1900-96072018000200137",
+      "tier": "B"
+    },
+    {
+      "id": "garcia-2013-chambira",
+      "tipo": "manual_tecnico",
+      "autores": "García, N.; Galeano, G.; Bernal, R.; Nacimiento, A.; Noriega, H.; Ángel, V.",
+      "año": 2013,
+      "titulo": "Cartilla para el manejo y aprovechamiento de la palma de chambira (Astrocaryum chambira)",
+      "revista_o_editorial": "Grupo de Investigación en Palmas Silvestres Neotropicales, Instituto de Ciencias Naturales, Universidad Nacional de Colombia",
+      "url": "https://bdigital.unal.edu.co",
+      "tier": "A"
+    },
+    {
+      "id": "jbb-caryocar-amygdaliferum",
+      "tipo": "base_datos",
+      "autores": "Jardín Botánico de Bogotá José Celestino Mutis — Herbario JBB",
+      "año": 2024,
+      "titulo": "Ficha de especimen Caryocar amygdaliferum Mutis ex Cav. (especimen 40112)",
+      "institucion": "Jardín Botánico José Celestino Mutis",
+      "url": "https://herbario.jbb.gov.co/especimen/57605",
+      "tier": "B"
+    },
+    {
+      "id": "res-126-2024-mads",
+      "tipo": "resolucion_oficial",
+      "autores": "Ministerio de Ambiente y Desarrollo Sostenible de Colombia",
+      "año": 2024,
+      "titulo": "Resolución 0126 del 6 de febrero de 2024 — Actualización del listado de las especies silvestres amenazadas de la diversidad biológica continental y marino-costera del territorio nacional",
+      "institucion": "MinAmbiente Colombia",
+      "url": "https://www.minambiente.gov.co/normativa",
+      "tier": "A"
+    },
+    {
+      "id": "agrosavia-ahuyama-la-plata",
+      "tipo": "articulo_revista",
+      "autores": "Correa-Álvarez, E.; Martínez-Reina, A.; Orozco, A.; Silva, G.; Tordecilla, L.; Rodríguez, M.",
+      "año": 2019,
+      "titulo": "Morpho-agronomical characterization of squash (Cucurbita moschata Duchesne) accessions in the Caribbean region of Colombia",
+      "revista_o_editorial": "Bioagro",
+      "url": "https://revistas.uclave.org/index.php/bioagro/article/view/5061",
+      "tier": "A"
+    },
+    {
+      "id": "agrosavia-manual-ahuyama-semilla",
+      "tipo": "manual_tecnico",
+      "autores": "Muñoz Falcon, J.E.; et al. (AGROSAVIA)",
+      "año": 2024,
+      "titulo": "Manual de producción de semilla de ahuyama (Cucurbita moschata Duchesne ex Poir.) a pequeña escala",
+      "revista_o_editorial": "Editorial AGROSAVIA",
+      "url": "https://editorial.agrosavia.co/index.php/publicaciones/catalog/book/523",
+      "tier": "A"
+    },
+    {
+      "id": "agrosavia-chontaduro-palmito-2002",
+      "tipo": "manual_tecnico",
+      "autores": "Escobar Acevedo, C.J.; Zuluaga Peláez, J.J.",
+      "año": 2002,
+      "titulo": "El cultivo de chontaduro (Bactris gasipaes H.B.K.) para palmito con manejo agroforestal — Manual",
+      "institucion": "CORPOICA / PLANTE",
+      "url": "https://repository.agrosavia.co/handle/20.500.12324/18602",
+      "tier": "A"
+    },
+    {
+      "id": "agrosavia-chontaduro-1998",
+      "tipo": "manual_tecnico",
+      "autores": "Rojas Molina, J.; Yasno Cabrera, C.A.; Cárdenas Guzmán, C.A.; Escobar Acevedo, C.J.; Zuluaga Peláez, J.J.",
+      "año": 1998,
+      "titulo": "El cultivo de chontaduro (Bactris gasipaes H.B.K) para fruto y palmito",
+      "institucion": "CORPOICA",
+      "tier": "A"
+    },
+    {
+      "id": "restrepo-2007-caldos-minerales",
+      "tipo": "libro",
+      "autores": "Restrepo Rivera, J.",
+      "año": 2007,
+      "titulo": "El ABC de la agricultura orgánica y harina de rocas — Vol. 2: Caldos Minerales",
+      "revista_o_editorial": "Editorial Feriva, Cali",
+      "isbn": "978-958-44-1280-5",
+      "tier": "A"
+    },
+    {
+      "id": "vasquez-solano-2021-mm-agronomia-cr",
+      "tipo": "articulo_revista",
+      "autores": "Vásquez-Solano, A.; et al.",
+      "año": 2021,
+      "titulo": "Microorganismos de montaña (MM): poblaciones microbianas durante su activación líquida",
+      "revista_o_editorial": "Agronomía Costarricense",
+      "volumen_numero": "45(1)",
+      "paginas": "81-92",
+      "tier": "A"
+    },
+    {
+      "id": "cho-2016-jadam-organic-farming",
+      "tipo": "libro",
+      "autores": "Cho, Youngsang",
+      "año": 2016,
+      "titulo": "JADAM Organic Farming: The Way to Ultra-Low-Cost Agriculture",
+      "revista_o_editorial": "JADAM, Daejeon, South Korea",
+      "isbn": "9788989220206",
+      "tier": "A"
+    },
+    {
+      "id": "cho-2021-jadam-pest-disease",
+      "tipo": "libro",
+      "autores": "Cho, Youngsang",
+      "año": 2021,
+      "titulo": "JADAM Organic Pest and Disease Control",
+      "revista_o_editorial": "JADAM, Daejeon, South Korea",
+      "isbn": "9788989220473",
+      "tier": "A"
+    },
+    {
+      "id": "park-duponte-2008-lab-ctahr",
+      "tipo": "manual_tecnico",
+      "autores": "Park, H.-L.; DuPonte, M.W.",
+      "año": 2008,
+      "titulo": "Natural Farming: Lactic Acid Bacteria / Fish Amino Acid / Fermented Plant Juice — Sustainable Agriculture factsheets",
+      "institucion": "University of Hawaii — College of Tropical Agriculture and Human Resources (CTAHR)",
+      "tier": "B"
+    },
+    {
+      "id": "mamani-2015-biol-ruminal",
+      "tipo": "articulo_revista",
+      "autores": "Mamani-Pati, F.; Quenta, E.; Mamani, G.",
+      "año": 2015,
+      "titulo": "Elementos nutricionales en la producción de fertilizante biol con diferentes tipos de insumos y cantidades de contenido ruminal de bovino",
+      "revista_o_editorial": "Journal of the Selva Andina Research Society",
+      "volumen_numero": "6(1)",
+      "url": "http://www.scielo.org.bo/scielo.php?pid=S2409-16182015000100011",
+      "tier": "A"
+    },
+    {
+      "id": "pinheiro-restrepo-2009-remineralizacion",
+      "tipo": "libro",
+      "autores": "Pinheiro Machado, S.; Restrepo Rivera, J.",
+      "año": 2009,
+      "titulo": "Agricultura orgánica: La remineralización de los alimentos y la salud a partir de la regeneración mineral del suelo",
+      "revista_o_editorial": "Fundación Juquira Candirú, Cali",
+      "observaciones": "Reedición ampliada de Julius Hensel 'Brot aus Steinen' (1894); ISBN no localizado de manera firme en bases bibliográficas estándar.",
       "tier": "B"
     }
   ]
