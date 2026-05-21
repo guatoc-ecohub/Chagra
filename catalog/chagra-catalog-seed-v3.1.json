@@ -50,7 +50,27 @@
       "cultivable": false,
       "conservation_status": "invasor",
       "clasificacion_uicn": "Listada en ISSG/GISD Global Invasive Species Database; categorizada por IAvH-Humboldt como invasora de alto riesgo en bosque altoandino colombiano",
-      "normativa_colombiana": "Resolución 684/2018 MADS (lineamientos nacionales prevención manejo y restauración invasoras); ICA Resolución 3168/2015 (cuarentena de propágulos forestales); incluida en listados regionales de CAR Cundinamarca y CORPOBOYACÁ como especie de manejo prioritario",
+      "normativa_colombiana": [
+        {
+          "tipo": "regulatoria",
+          "alcance": "Resolución 684/2018 MADS (lineamientos nacionales prevención manejo y restauración invasoras)",
+          "norma": "Resolución 684/2018 MADS",
+          "autoridad": "MADS",
+          "restriccion": "control_obligatorio_invasoras"
+        },
+        {
+          "tipo": "regulatoria",
+          "alcance": "ICA Resolución 3168/2015 (cuarentena de propágulos forestales)",
+          "norma": "Resolución 3168/2015",
+          "autoridad": "ICA",
+          "restriccion": "cuarentena_fitosanitaria"
+        },
+        {
+          "tipo": "regulatoria",
+          "alcance": "incluida en listados regionales de CAR Cundinamarca y CORPOBOYACÁ como especie de manejo prioritario",
+          "autoridad": "CAR Cundinamarca"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 1500,
         "optimo_min": 2200,
@@ -1346,7 +1366,30 @@
       "habito": "gramínea perenne postrada estolonífera-rizomatosa, alfombrante 10-30 cm de altura",
       "origen": "África oriental (altiplanos Kenia, Etiopía, Uganda, Rwanda, Tanzania, Zaire); introducida en Colombia ca. 1928 para ganadería lechera",
       "clasificacion_uicn": "Listada en ISSG/GISD Global Invasive Species Database; IAvH-Humboldt la cataloga como naturalizada de alto riesgo para ecosistemas de páramo y subpáramo colombianos",
-      "normativa_colombiana": "Ley 1930/2018 prohíbe su siembra y manejo agropecuario en áreas delimitadas de páramo; Resolución 684/2018 MADS la incluye en lineamientos de control en áreas de restauración; ICA Resolución 3168/2015 regula su comercialización como forrajera; el conflicto regulatorio (forrajera legal en potreros vs. invasora prohibida en páramo) requiere validar la cota y el ecosistema antes de toda intervención",
+      "normativa_colombiana": [
+        {
+          "tipo": "regulatoria",
+          "alcance": "Ley 1930/2018 prohíbe su siembra y manejo agropecuario en áreas delimitadas de páramo",
+          "norma": "Ley 1930/2018",
+          "restriccion": "prohibida_paramos"
+        },
+        {
+          "tipo": "regulatoria",
+          "alcance": "Resolución 684/2018 MADS la incluye en lineamientos de control en áreas de restauración",
+          "norma": "Resolución 684/2018 MADS",
+          "autoridad": "MADS"
+        },
+        {
+          "tipo": "regulatoria",
+          "alcance": "ICA Resolución 3168/2015 regula su comercialización como forrajera",
+          "norma": "Resolución 3168/2015",
+          "autoridad": "ICA"
+        },
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "el conflicto regulatorio (forrajera legal en potreros vs. invasora prohibida en páramo) requiere validar la cota y el ecosistema antes de toda intervención"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 1800,
         "optimo_min": 2200,
@@ -1735,7 +1778,32 @@
       "cultivable": false,
       "conservation_status": "invasor",
       "clasificacion_uicn": "Listada en ISSG/GISD Global Invasive Species Database como invasora ambiental global; IAvH-Humboldt la clasifica como invasora prioritaria del altiplano cundiboyacense junto con Ulex europaeus",
-      "normativa_colombiana": "Resolución 684/2018 MADS (lineamientos nacionales prevención manejo y restauración para U. europaeus y Genista monspessulana, sinonimia de C. monspessulanus); Resolución 7615/2009 Secretaría Distrital de Ambiente de Bogotá (prohíbe su uso en Distrito Capital); Protocolo CAR Cundinamarca 2019 (prevención y control en jurisdicción CAR); Ley 1930/2018 (prohibida en áreas delimitadas de páramo)",
+      "normativa_colombiana": [
+        {
+          "tipo": "regulatoria",
+          "alcance": "Resolución 684/2018 MADS (lineamientos nacionales prevención manejo y restauración para U. europaeus y Genista monspessulana, sinonimia de C. monspessulanus)",
+          "norma": "Resolución 684/2018 MADS",
+          "autoridad": "MADS",
+          "restriccion": "control_obligatorio_invasoras"
+        },
+        {
+          "tipo": "regulatoria",
+          "alcance": "Resolución 7615/2009 Secretaría Distrital de Ambiente de Bogotá (prohíbe su uso en Distrito Capital)",
+          "norma": "Resolución 7615/2009",
+          "autoridad": "Secretaría Distrital de Ambiente Bogotá"
+        },
+        {
+          "tipo": "regulatoria",
+          "alcance": "Protocolo CAR Cundinamarca 2019 (prevención y control en jurisdicción CAR)",
+          "autoridad": "CAR Cundinamarca"
+        },
+        {
+          "tipo": "regulatoria",
+          "alcance": "Ley 1930/2018 (prohibida en áreas delimitadas de páramo)",
+          "norma": "Ley 1930/2018",
+          "restriccion": "prohibida_paramos"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 1800,
         "optimo_min": 2400,
@@ -1959,7 +2027,34 @@
       "cultivable": false,
       "conservation_status": "invasor",
       "clasificacion_uicn": "Listada en ISSG/GISD Global Invasive Species Database; IAvH-Humboldt la cataloga como especie con alto impacto hídrico y alelopático en cuencas altoandinas colombianas",
-      "normativa_colombiana": "Resolución 684/2018 MADS (lineamientos nacionales de prevención y manejo de invasoras forestales); Ley 1930/2018 (prohibida en áreas delimitadas de páramo y zonas de recarga hídrica); Resoluciones de CAR Cundinamarca y CORPOBOYACÁ que restringen su siembra en zonas de protección de nacederos y rondas hídricas; ICA Resolución 3168/2015 (regulación fitosanitaria de propágulos forestales)",
+      "normativa_colombiana": [
+        {
+          "tipo": "regulatoria",
+          "alcance": "Resolución 684/2018 MADS (lineamientos nacionales de prevención y manejo de invasoras forestales)",
+          "norma": "Resolución 684/2018 MADS",
+          "autoridad": "MADS",
+          "restriccion": "control_obligatorio_invasoras"
+        },
+        {
+          "tipo": "regulatoria",
+          "alcance": "Ley 1930/2018 (prohibida en áreas delimitadas de páramo y zonas de recarga hídrica)",
+          "norma": "Ley 1930/2018",
+          "autoridad": "ICA",
+          "restriccion": "prohibida_paramos"
+        },
+        {
+          "tipo": "regulatoria",
+          "alcance": "Resoluciones de CAR Cundinamarca y CORPOBOYACÁ que restringen su siembra en zonas de protección de nacederos y rondas hídricas",
+          "autoridad": "CAR Cundinamarca"
+        },
+        {
+          "tipo": "regulatoria",
+          "alcance": "ICA Resolución 3168/2015 (regulación fitosanitaria de propágulos forestales)",
+          "norma": "Resolución 3168/2015",
+          "autoridad": "ICA",
+          "restriccion": "cuarentena_fitosanitaria"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 1200,
         "optimo_min": 1800,
@@ -2222,8 +2317,10 @@
       "clasificacion_uicn": "Invasora reconocida por ISSG (Global Invasive Species Database) en ambientes ribereños neotropicales",
       "normativa_colombiana": [
         {
+          "tipo": "regulatoria",
+          "alcance": "Listada como especie con alto riesgo de invasión en Colombia; lineamientos de prevención, manejo integral y restauración en áreas afectadas",
           "norma": "Resolución 684 de 2018 del Ministerio de Ambiente y Desarrollo Sostenible",
-          "alcance": "Listada como especie con alto riesgo de invasión en Colombia; lineamientos de prevención, manejo integral y restauración en áreas afectadas"
+          "autoridad": "MADS"
         }
       ],
       "altitud_msnm": {
@@ -2382,12 +2479,17 @@
       "clasificacion_uicn": "No incluida en lista UICN de peores invasoras; categorizada por IAvH (Baptiste et al. 2010) como naturalizada con riesgo bajo-moderado en agroecosistemas",
       "normativa_colombiana": [
         {
+          "tipo": "regulatoria",
+          "alcance": "No incluida en listado prioritario nacional; manejo a nivel predial bajo lineamientos generales de prevención de invasoras",
           "norma": "Resolución 684 de 2018 del Ministerio de Ambiente y Desarrollo Sostenible",
-          "alcance": "No incluida en listado prioritario nacional; manejo a nivel predial bajo lineamientos generales de prevención de invasoras"
+          "autoridad": "MADS",
+          "restriccion": "control_obligatorio_invasoras"
         },
         {
+          "tipo": "contexto_etnocultural",
+          "alcance": "Manejo fitosanitario como arvense facultativa en cultivos comerciales con potencial maleza en monocultivos",
           "norma": "Resolución ICA 3168 de 2015",
-          "alcance": "Manejo fitosanitario como arvense facultativa en cultivos comerciales con potencial maleza en monocultivos"
+          "autoridad": "ICA"
         }
       ],
       "altitud_msnm": {
@@ -2871,12 +2973,16 @@
       "clasificacion_uicn": "Listada entre las 100 peores especies invasoras del mundo (ISSG/UICN)",
       "normativa_colombiana": [
         {
+          "tipo": "regulatoria",
+          "alcance": "Cultivares ornamentales exóticos listados; manejo diferenciado de poblaciones naturalizadas vs. silvestres tropicales",
           "norma": "Resolución 684 de 2018 del Ministerio de Ambiente y Desarrollo Sostenible",
-          "alcance": "Cultivares ornamentales exóticos listados; manejo diferenciado de poblaciones naturalizadas vs. silvestres tropicales"
+          "autoridad": "MADS"
         },
         {
+          "tipo": "contexto_etnocultural",
+          "alcance": "Regulación fitosanitaria por toxicidad a ganado bovino, equino y ovino (triterpenos pentacíclicos: lantadenos A y B causan hepatotoxicidad y fotosensibilización)",
           "norma": "Resolución ICA 3168 de 2015",
-          "alcance": "Regulación fitosanitaria por toxicidad a ganado bovino, equino y ovino (triterpenos pentacíclicos: lantadenos A y B causan hepatotoxicidad y fotosensibilización)"
+          "autoridad": "ICA"
         }
       ],
       "altitud_msnm": {
@@ -3466,8 +3572,10 @@
       "clasificacion_uicn": "Listada entre las 100 peores especies invasoras del mundo (ISSG/UICN); reconocida como invasora prioritaria en sistemas insulares (Hawái, Canarias, Galápagos) y áreas secas continentales",
       "normativa_colombiana": [
         {
+          "tipo": "regulatoria",
+          "alcance": "Listada como especie con alto riesgo de invasión en Colombia; lineamientos de prevención, manejo integral y restauración. Prohibida su comercialización como ornamental en viveros.",
           "norma": "Resolución 684 de 2018 del Ministerio de Ambiente y Desarrollo Sostenible",
-          "alcance": "Listada como especie con alto riesgo de invasión en Colombia; lineamientos de prevención, manejo integral y restauración. Prohibida su comercialización como ornamental en viveros."
+          "autoridad": "MADS"
         }
       ],
       "altitud_msnm": {
@@ -3858,16 +3966,24 @@
       "clasificacion_uicn": "No listada en ISSG-100; categorizada como invasora regional por IAvH y CAR Cundinamarca en ecosistemas altoandinos colombianos",
       "normativa_colombiana": [
         {
+          "tipo": "regulatoria",
+          "alcance": "Lineamientos nacionales para prevención, manejo integral y restauración de áreas afectadas por especies exóticas con potencial invasor; coníferas exóticas referenciadas en anexos técnicos",
           "norma": "Resolución 684 de 2018 del Ministerio de Ambiente y Desarrollo Sostenible",
-          "alcance": "Lineamientos nacionales para prevención, manejo integral y restauración de áreas afectadas por especies exóticas con potencial invasor; coníferas exóticas referenciadas en anexos técnicos"
+          "autoridad": "MADS",
+          "restriccion": "control_obligatorio_invasoras"
         },
         {
+          "tipo": "regulatoria",
+          "alcance": "Restricción de nuevas plantaciones de coníferas exóticas en áreas de importancia ambiental y obligatoriedad de manejo de remanentes en restauración",
           "norma": "Resolución CAR Cundinamarca lineamientos restauración cerros orientales y subpáramo",
-          "alcance": "Restricción de nuevas plantaciones de coníferas exóticas en áreas de importancia ambiental y obligatoriedad de manejo de remanentes en restauración"
+          "autoridad": "CAR Cundinamarca",
+          "restriccion": "prohibida_paramos"
         },
         {
+          "tipo": "regulatoria",
+          "alcance": "Prohíbe plantaciones forestales con especies exóticas en complejos paramunos y áreas de transición bosque-páramo",
           "norma": "Ley 1930 de 2018 (Páramos)",
-          "alcance": "Prohíbe plantaciones forestales con especies exóticas en complejos paramunos y áreas de transición bosque-páramo"
+          "restriccion": "prohibida_paramos"
         }
       ],
       "altitud_msnm": {
@@ -4100,16 +4216,23 @@
       "clasificacion_uicn": "Categorizada como 'invasora transformadora' (transformer species) por la categoría Richardson et al. en literatura ecológica internacional; IAvH la lista en plataformas de invasoras de Colombia por su agresividad post-fuego en ecosistemas andinos",
       "normativa_colombiana": [
         {
+          "tipo": "regulatoria",
+          "alcance": "Lineamientos nacionales para prevención, manejo integral y restauración de áreas afectadas; P. aquilinum referenciado en protocolos de restauración post-incendio en bosque altoandino y subpáramo",
           "norma": "Resolución 684 de 2018 del Ministerio de Ambiente y Desarrollo Sostenible",
-          "alcance": "Lineamientos nacionales para prevención, manejo integral y restauración de áreas afectadas; P. aquilinum referenciado en protocolos de restauración post-incendio en bosque altoandino y subpáramo"
+          "autoridad": "MADS",
+          "restriccion": "prohibida_paramos"
         },
         {
+          "tipo": "regulatoria",
+          "alcance": "Marco regulatorio para restauración de complejos paramunos donde el helecho marranero es invasora prioritaria post-disturbio (incendios, ganadería)",
           "norma": "Ley 1930 de 2018 (Páramos)",
-          "alcance": "Marco regulatorio para restauración de complejos paramunos donde el helecho marranero es invasora prioritaria post-disturbio (incendios, ganadería)"
+          "restriccion": "control_obligatorio_invasoras"
         },
         {
+          "tipo": "contexto_etnocultural",
+          "alcance": "Riesgo sanitario reconocido para ganado bovino (intoxicación enzoótica hematúrica, carcinogénesis); recomendación de erradicación en potreros activos",
           "norma": "ICA - normativa sanitaria pecuaria",
-          "alcance": "Riesgo sanitario reconocido para ganado bovino (intoxicación enzoótica hematúrica, carcinogénesis); recomendación de erradicación en potreros activos"
+          "autoridad": "ICA"
         }
       ],
       "altitud_msnm": {
@@ -4370,12 +4493,17 @@
       "clasificacion_uicn": "Listada por ISSG-UICN como especie invasora de alto impacto en regiones tropicales y subtropicales (impacto demostrado en La Réunion, Madagascar, Australia, Sudamérica); referenciada en res-684/2018 MADS",
       "normativa_colombiana": [
         {
+          "tipo": "regulatoria",
+          "alcance": "Listada en anexos técnicos como especie con potencial invasor en zonas andinas y subandinas; lineamientos para prevención y manejo",
           "norma": "Resolución 684 de 2018 del Ministerio de Ambiente y Desarrollo Sostenible",
-          "alcance": "Listada en anexos técnicos como especie con potencial invasor en zonas andinas y subandinas; lineamientos para prevención y manejo"
+          "autoridad": "MADS",
+          "restriccion": "control_obligatorio_invasoras"
         },
         {
+          "tipo": "regulatoria",
+          "alcance": "Manejo prioritario en bordes de quebrada, cercas vivas y áreas de regeneración natural en jurisdicción CAR",
           "norma": "Resolución CAR Cundinamarca - lineamientos restauración cuencas",
-          "alcance": "Manejo prioritario en bordes de quebrada, cercas vivas y áreas de regeneración natural en jurisdicción CAR"
+          "autoridad": "CAR Cundinamarca"
         }
       ],
       "altitud_msnm": {
@@ -5166,16 +5294,23 @@
       "clasificacion_uicn": "Listada por ISSG-UICN como especie invasora de ámbito global (Global Invasive Species Database); IAvH la clasifica como invasora de alta amenaza para ecosistemas andinos colombianos",
       "normativa_colombiana": [
         {
+          "tipo": "regulatoria",
+          "alcance": "Listada en anexos técnicos como especie con potencial invasor; lineamientos para prevención, control de comercialización ornamental y manejo en áreas naturales",
           "norma": "Resolución 684 de 2018 del Ministerio de Ambiente y Desarrollo Sostenible",
-          "alcance": "Listada en anexos técnicos como especie con potencial invasor; lineamientos para prevención, control de comercialización ornamental y manejo en áreas naturales"
+          "autoridad": "MADS",
+          "restriccion": "control_obligatorio_invasoras"
         },
         {
+          "tipo": "regulatoria",
+          "alcance": "Restricción de uso ornamental en jardinería urbana adyacente a áreas de importancia ambiental; obligatoriedad de remoción en restauración",
           "norma": "Resolución CAR Cundinamarca lineamientos cerros orientales",
-          "alcance": "Restricción de uso ornamental en jardinería urbana adyacente a áreas de importancia ambiental; obligatoriedad de remoción en restauración"
+          "autoridad": "CAR Cundinamarca"
         },
         {
+          "tipo": "contexto_etnocultural",
+          "alcance": "Recomendación de sustitución por enredaderas nativas en cercas vivas y jardinería urbana de la región andina",
           "norma": "Lineamiento IAvH para jardinería ecológica andina",
-          "alcance": "Recomendación de sustitución por enredaderas nativas en cercas vivas y jardinería urbana de la región andina"
+          "autoridad": "ICA"
         }
       ],
       "altitud_msnm": {
@@ -5433,16 +5568,22 @@
       "clasificacion_uicn": "Entre las 100 peores especies invasoras del mundo (ISSG/UICN)",
       "normativa_colombiana": [
         {
+          "tipo": "regulatoria",
+          "alcance": "Lineamientos nacionales para prevención, manejo integral y restauración de áreas afectadas por U. europaeus y Genista monspessulana",
           "norma": "Resolución 684 de 2018 del Ministerio de Ambiente y Desarrollo Sostenible",
-          "alcance": "Lineamientos nacionales para prevención, manejo integral y restauración de áreas afectadas por U. europaeus y Genista monspessulana"
+          "autoridad": "MADS"
         },
         {
+          "tipo": "regulatoria",
+          "alcance": "Prohíbe uso de retamo espinoso en Distrito Capital",
           "norma": "Resolución 7615 de 2009 Secretaría Distrital de Ambiente de Bogotá",
-          "alcance": "Prohíbe uso de retamo espinoso en Distrito Capital"
+          "autoridad": "Secretaría Distrital de Ambiente Bogotá"
         },
         {
+          "tipo": "regulatoria",
+          "alcance": "Prevención, manejo y control de U. europaeus y Genista monspessulana en jurisdicción CAR",
           "norma": "Protocolo CAR Cundinamarca 2019",
-          "alcance": "Prevención, manejo y control de U. europaeus y Genista monspessulana en jurisdicción CAR"
+          "autoridad": "CAR Cundinamarca"
         }
       ],
       "altitud_msnm": {
@@ -17361,7 +17502,19 @@
       "habito": "gramínea perenne cespitosa-decumbente, 60-100 cm de altura, hojas pegajosas aromáticas",
       "origen": "África tropical y subtropical; introducida en Brasil siglo XIX como forrajera y de allí difundida a Colombia",
       "clasificacion_uicn": "Listada en ISSG/GISD Global Invasive Species Database; IAvH-Humboldt la cataloga como naturalizada de alto riesgo invasor en bosque seco tropical colombiano, bosque sub-andino y matorrales xerofíticos",
-      "normativa_colombiana": "Resolución 684/2018 MADS la incluye en lineamientos de control en áreas de restauración del bosque seco tropical; IAvH-Humboldt la considera prioridad de manejo en BST y bosque sub-andino. Su siembra deliberada en áreas protegidas, zonas de amortiguamiento de PNN y áreas de restauración está desaconsejada técnicamente.",
+      "normativa_colombiana": [
+        {
+          "tipo": "regulatoria",
+          "alcance": "Resolución 684/2018 MADS la incluye en lineamientos de control en áreas de restauración del bosque seco tropical",
+          "norma": "Resolución 684/2018 MADS",
+          "autoridad": "MADS"
+        },
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "IAvH-Humboldt la considera prioridad de manejo en BST y bosque sub-andino. Su siembra deliberada en áreas protegidas, zonas de amortiguamiento de PNN y áreas de restauración está desaconsejada técnicamente.",
+          "autoridad": "IAvH"
+        }
+      ],
       "impacto_ecologico": "Forma masas densas que alteran el régimen de fuego en bosque seco tropical y matorrales xerofíticos colombianos: las hojas pegajosas-aromáticas son altamente inflamables y aumentan la intensidad y frecuencia de incendios estacionales, eliminando regeneración de árboles nativos del BST (Tabebuia, Caesalpinia, Bursera, Cordia, Pithecellobium) y favoreciendo sucesión hacia pradera dominada por la propia M. minutiflora; en bosque sub-andino del piedemonte (1.000-2.000 msnm) compite con sotobosque nativo y desplaza Calamagrostis, Festuca y otras gramíneas autóctonas; tras incendios el rebrote por estolones es masivo, generando bucle de retroalimentación fuego-invasión que es uno de los principales motores de degradación del BST y del piedemonte tropical en Colombia.",
       "ecosistemas_afectados": [
         "bosque_seco_tropical",
@@ -26275,7 +26428,23 @@
       ],
       "cultivable": false,
       "conservation_status": "nativo_protegido",
-      "normativa_colombiana": "Patrimonio cultural inmaterial de los pueblos indígenas del Putumayo, Caquetá y Amazonas; uso ritual restringido a contextos ceremoniales ancestrales y centros de medicina tradicional autorizados por autoridades indígenas (Cofán, Inga, Siona, Kofán, Kamëntsá). NO existe registro legal para uso recreativo en Colombia; el cultivo y comercio fuera de contextos rituales ancestrales o de investigación científica regulada es regulado por el Ministerio de Cultura (Resolución 0633/2009 reconoce el yajé como patrimonio inmaterial de la Nación) y por las normas de protección de conocimiento tradicional asociado.",
+      "normativa_colombiana": [
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "Patrimonio cultural inmaterial de los pueblos indígenas del Putumayo, Caquetá y Amazonas"
+        },
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "uso ritual restringido a contextos ceremoniales ancestrales y centros de medicina tradicional autorizados por autoridades indígenas (Cofán, Inga, Siona, Kofán, Kamëntsá). NO existe registro legal para uso recreativo en Colombia",
+          "restriccion": "uso_ritual_protegido"
+        },
+        {
+          "tipo": "regulatoria",
+          "alcance": "el cultivo y comercio fuera de contextos rituales ancestrales o de investigación científica regulada es regulado por el Ministerio de Cultura (Resolución 0633/2009 reconoce el yajé como patrimonio inmaterial de la Nación) y por las normas de protección de conocimiento tradicional asociado.",
+          "norma": "Resolución 0633/2009",
+          "autoridad": "ICA"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 100,
@@ -26337,7 +26506,17 @@
       ],
       "cultivable": false,
       "conservation_status": "nativo_protegido",
-      "normativa_colombiana": "Planta compañera ceremonial del yajé/ayahuasca; uso ritual ancestral restringido a contextos ceremoniales de medicina tradicional de pueblos amazónicos (Cofán, Inga, Siona, Kamëntsá, Kofán, Murui-Muinane). Sujeta al mismo marco de patrimonio cultural inmaterial (Resolución 0633/2009 MinCultura) y normas de conocimiento tradicional asociado al recurso genético. NO se promueve uso recreativo ni doméstico.",
+      "normativa_colombiana": [
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "Planta compañera ceremonial del yajé/ayahuasca"
+        },
+        {
+          "tipo": "regulatoria",
+          "alcance": "uso ritual ancestral restringido a contextos ceremoniales de medicina tradicional de pueblos amazónicos (Cofán, Inga, Siona, Kamëntsá, Kofán, Murui-Muinane). Sujeta al mismo marco de patrimonio cultural inmaterial (Resolución 0633/2009 MinCultura) y normas de conocimiento tradicional asociado al recurso genético. NO se promueve uso recreativo ni doméstico.",
+          "norma": "Resolución 0633/2009"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 100,
@@ -26400,7 +26579,26 @@
       ],
       "cultivable": false,
       "conservation_status": "nativo_protegido",
-      "normativa_colombiana": "Planta sagrada de la cultura Muisca (cundiboyacense) y de las culturas andinas precolombinas; uso ritual ancestral por taitas y mamos (Kogui, Arhuaco, Wiwa, Kankuamo de Sierra Nevada de Santa Marta; Muisca de Cundinamarca-Boyacá; Inga y Kamëntsá del Sibundoy). NO existe normativa que regule su cultivo doméstico como ornamental (frecuente como cerca viva ornamental en altiplano andino) PERO su uso medicinal-ritual está restringido a contextos ceremoniales legítimos. La planta es ALTAMENTE TÓXICA — registros forenses históricos de intoxicaciones criminales con \"burundanga\" en Colombia ligadas a esta especie y a B. arborea.",
+      "normativa_colombiana": [
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "Planta sagrada de la cultura Muisca (cundiboyacense) y de las culturas andinas precolombinas"
+        },
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "uso ritual ancestral por taitas y mamos (Kogui, Arhuaco, Wiwa, Kankuamo de Sierra Nevada de Santa Marta",
+          "restriccion": "uso_ritual_protegido"
+        },
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "Muisca de Cundinamarca-Boyacá"
+        },
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "Inga y Kamëntsá del Sibundoy). NO existe normativa que regule su cultivo doméstico como ornamental (frecuente como cerca viva ornamental en altiplano andino) PERO su uso medicinal-ritual está restringido a contextos ceremoniales legítimos. La planta es ALTAMENTE TÓXICA — registros forenses históricos de intoxicaciones criminales con \"burundanga\" en Colombia ligadas a esta especie y a B. arborea.",
+          "autoridad": "ICA"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 1800,
         "optimo_min": 2200,
@@ -26464,7 +26662,18 @@
       ],
       "cultivable": false,
       "conservation_status": "nativo_protegido",
-      "normativa_colombiana": "Planta ornamental común en altiplano andino colombiano como cerca viva-ornamental; uso ritual ancestral por culturas andinas precolombinas (Muisca, Inca, Cañaris, Inga, Kamëntsá). NO existe normativa específica que regule su cultivo doméstico ornamental PERO su uso medicinal-ritual está restringido a contextos ceremoniales legítimos guiados por autoridades indígenas reconocidas. La planta es ALTAMENTE TÓXICA — registros forenses históricos de intoxicaciones criminales con \"burundanga\" en Colombia ligadas a esta especie.",
+      "normativa_colombiana": [
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "Planta ornamental común en altiplano andino colombiano como cerca viva-ornamental"
+        },
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "uso ritual ancestral por culturas andinas precolombinas (Muisca, Inca, Cañaris, Inga, Kamëntsá). NO existe normativa específica que regule su cultivo doméstico ornamental PERO su uso medicinal-ritual está restringido a contextos ceremoniales legítimos guiados por autoridades indígenas reconocidas. La planta es ALTAMENTE TÓXICA — registros forenses históricos de intoxicaciones criminales con \"burundanga\" en Colombia ligadas a esta especie.",
+          "autoridad": "ICA",
+          "restriccion": "uso_ritual_protegido"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 1800,
         "optimo_min": 2200,
@@ -26531,7 +26740,14 @@
       ],
       "cultivable": true,
       "conservation_status": "naturalizada",
-      "normativa_colombiana": "Especie domesticada precolombina de uso ceremonial central en pueblos amazónicos colombianos (Murui-Muinane, Bora, Uitoto, Tikuna, Yagua, Kubeo, Tucano, Cofán, Inga, Kamëntsá, Siona) y andinos. Cultivo y uso ritual permitido en contextos comunitarios indígenas. Su producción comercial está regulada por las normas de tabaco del ICA y de la DIAN cuando se destina a venta no-ritual. NO equiparable al tabaco comercial (Nicotiana tabacum) — el mapacho ceremonial tiene 5-10 veces más nicotina y se usa en cantidades microcontroladas no en consumo crónico.",
+      "normativa_colombiana": [
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "Especie domesticada precolombina de uso ceremonial central en pueblos amazónicos colombianos (Murui-Muinane, Bora, Uitoto, Tikuna, Yagua, Kubeo, Tucano, Cofán, Inga, Kamëntsá, Siona) y andinos. Cultivo y uso ritual permitido en contextos comunitarios indígenas. Su producción comercial está regulada por las normas de tabaco del ICA y de la DIAN cuando se destina a venta no-ritual. NO equiparable al tabaco comercial (Nicotiana tabacum) — el mapacho ceremonial tiene 5-10 veces más nicotina y se usa en cantidades microcontroladas no en consumo crónico.",
+          "autoridad": "ICA",
+          "restriccion": "uso_ritual_protegido"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 200,
@@ -26625,7 +26841,15 @@
       ],
       "cultivable": true,
       "conservation_status": "cultivo_comun",
-      "normativa_colombiana": "Resolución 577/2017 MADS (Ministerio de Ambiente y Desarrollo Sostenible) regula el uso lícito de Cannabis sativa para fines medicinales y científicos en Colombia. Decreto 613/2017 (regulación del cultivo y uso de cannabis con fines médicos y científicos). Resolución 2891/2017 MinSalud (manufactura de derivados). Ley 1787/2016 (marco legal nacional de cannabis medicinal). Variedades CBD-dominantes con <1% THC quedan dentro del régimen \"no psicoactivo industrial\" que admite cultivo y manufactura bajo licencias otorgadas por MinJusticia (cultivo de semilla, cultivo de plantas, fabricación de derivados, fabricación de productos terminados). Para uso doméstico personal el cultivo doméstico para autoconsumo medicinal con prescripción está permitido hasta 20 plantas (sentencia Corte Constitucional T-095/2022 ratifica el derecho fundamental al acceso). USO RECREATIVO sigue restringido — la Sentencia C-221/1994 despenalizó la dosis personal de psicoactivos pero no su comercialización.",
+      "normativa_colombiana": [
+        {
+          "tipo": "regulatoria",
+          "alcance": "Resolución 577/2017 MADS (Ministerio de Ambiente y Desarrollo Sostenible) regula el uso lícito de Cannabis sativa para fines medicinales y científicos en Colombia. Decreto 613/2017 (regulación del cultivo y uso de cannabis con fines médicos y científicos). Resolución 2891/2017 MinSalud (manufactura de derivados). Ley 1787/2016 (marco legal nacional de cannabis medicinal). Variedades CBD-dominantes con <1% THC quedan dentro del régimen \"no psicoactivo industrial\" que admite cultivo y manufactura bajo licencias otorgadas por MinJusticia (cultivo de semilla, cultivo de plantas, fabricación de derivados, fabricación de productos terminados). Para uso doméstico personal el cultivo doméstico para autoconsumo medicinal con prescripción está permitido hasta 20 plantas (sentencia Corte Constitucional T-095/2022 ratifica el derecho fundamental al acceso). USO RECREATIVO sigue restringido — la Sentencia C-221/1994 despenalizó la dosis personal de psicoactivos pero no su comercialización.",
+          "norma": "Resolución 577/2017 MADS",
+          "autoridad": "MADS",
+          "restriccion": "uso_medicinal_regulado"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 500,
@@ -26727,7 +26951,12 @@
       ],
       "cultivable": false,
       "conservation_status": "no_evaluada",
-      "normativa_colombiana": "No tiene marco legal específico en Colombia. NO incluida en listados oficiales de sustancias controladas del Ministerio de Salud ni del Ministerio de Justicia colombiano. SIN EMBARGO, su uso ritual fuera de contexto ceremonial mazateco mexicano (donde es planta sagrada de la médica tradicional mazateca María Sabina y linajes anteriores) es considerado apropiación cultural inaceptable, y su comercialización como producto recreativo es éticamente reprobable y potencialmente regulable por sus efectos psicoactivos potentes. RECOMENDACIÓN: NO cultivo doméstico recreativo; conservación SOLO en jardines botánicos especializados con propósito de investigación científica autorizada o conservación de germoplasma vegetal con consentimiento de la comunidad mazateca custodia.",
+      "normativa_colombiana": [
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "No tiene marco legal específico en Colombia. NO incluida en listados oficiales de sustancias controladas del Ministerio de Salud ni del Ministerio de Justicia colombiano. SIN EMBARGO, su uso ritual fuera de contexto ceremonial mazateco mexicano (donde es planta sagrada de la médica tradicional mazateca María Sabina y linajes anteriores) es considerado apropiación cultural inaceptable, y su comercialización como producto recreativo es éticamente reprobable y potencialmente regulable por sus efectos psicoactivos potentes. RECOMENDACIÓN: NO cultivo doméstico recreativo; conservación SOLO en jardines botánicos especializados con propósito de investigación científica autorizada o conservación de germoplasma vegetal con consentimiento de la comunidad mazateca custodia."
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 300,
         "optimo_min": 800,
@@ -26790,7 +27019,12 @@
       ],
       "cultivable": false,
       "conservation_status": "naturalizada",
-      "normativa_colombiana": "No tiene marco legal específico en Colombia. La planta es naturalizada en zonas térmicas cálidas-templadas como ornamental ocasional, pero su SEMILLA contiene amidas del ácido lisérgico que sí pueden caer bajo la regulación general de psicoactivos. SIN EMBARGO, su uso fuera del contexto ayurvédico medicinal tradicional indio (donde la raíz es \"vidhara\" — tónico nervino y afrodisíaco) es éticamente discutible y potencialmente peligroso. RECOMENDACIÓN: conservación únicamente en jardines botánicos o como ornamental sin propagación de semillas.",
+      "normativa_colombiana": [
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "No tiene marco legal específico en Colombia. La planta es naturalizada en zonas térmicas cálidas-templadas como ornamental ocasional, pero su SEMILLA contiene amidas del ácido lisérgico que sí pueden caer bajo la regulación general de psicoactivos. SIN EMBARGO, su uso fuera del contexto ayurvédico medicinal tradicional indio (donde la raíz es \"vidhara\" — tónico nervino y afrodisíaco) es éticamente discutible y potencialmente peligroso. RECOMENDACIÓN: conservación únicamente en jardines botánicos o como ornamental sin propagación de semillas."
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 200,
@@ -26851,7 +27085,12 @@
       ],
       "cultivable": false,
       "conservation_status": "naturalizada",
-      "normativa_colombiana": "No tiene marco legal específico en Colombia. La planta es naturalizada esporádicamente en zonas térmicas cálidas secas (Caribe seco, Guajira, Magdalena medio bajo, Tolima seco) como árbol ornamental-ritual en iglesias y conventos católicos coloniales — la resina (olíbano) se usa litúrgicamente en la Iglesia Católica desde el primer milenio cristiano, en la Iglesia Ortodoxa, en el Judaísmo (ketoret bíblico), en el Islam y en muchas tradiciones rituales colombianas (misas, procesiones de Semana Santa, \"limpias\" sincréticas afro-católicas en Cartagena y Caribe).",
+      "normativa_colombiana": [
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "No tiene marco legal específico en Colombia. La planta es naturalizada esporádicamente en zonas térmicas cálidas secas (Caribe seco, Guajira, Magdalena medio bajo, Tolima seco) como árbol ornamental-ritual en iglesias y conventos católicos coloniales — la resina (olíbano) se usa litúrgicamente en la Iglesia Católica desde el primer milenio cristiano, en la Iglesia Ortodoxa, en el Judaísmo (ketoret bíblico), en el Islam y en muchas tradiciones rituales colombianas (misas, procesiones de Semana Santa, \"limpias\" sincréticas afro-católicas en Cartagena y Caribe)."
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 100,
@@ -26912,7 +27151,12 @@
       ],
       "cultivable": true,
       "conservation_status": "naturalizada",
-      "normativa_colombiana": "Especie naturalizada en Caribe colombiano y Magdalena medio; cultivable como árbol agroforestal y maderable. NO está en listados de especies amenazadas en Colombia (a diferencia de M. balsamum var. balsamum — bálsamo de Tolú, que sí ha sido sobreexplotado históricamente). Su resina (bálsamo de Perú) es regulada como producto medicinal-cosmético por INVIMA cuando se comercializa como producto farmacéutico o cosmético.",
+      "normativa_colombiana": [
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "Especie naturalizada en Caribe colombiano y Magdalena medio; cultivable como árbol agroforestal y maderable. NO está en listados de especies amenazadas en Colombia (a diferencia de M. balsamum var. balsamum — bálsamo de Tolú, que sí ha sido sobreexplotado históricamente). Su resina (bálsamo de Perú) es regulada como producto medicinal-cosmético por INVIMA cuando se comercializa como producto farmacéutico o cosmético."
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 100,
@@ -27005,7 +27249,12 @@
       ],
       "cultivable": true,
       "conservation_status": "nativo_silvestre",
-      "normativa_colombiana": "Nativa silvestre del piso cálido amazónico colombiano (<800 msnm); palma de uso múltiple custodia de comunidades indígenas (Tikuna, Uitoto, Murui-Muinane, Bora) y campesino-ribereñas del trapecio amazónico. NO listada en libros rojos. Aprovechamiento sostenible permitido bajo planes de manejo comunitario.",
+      "normativa_colombiana": [
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "Nativa silvestre del piso cálido amazónico colombiano (<800 msnm); palma de uso múltiple custodia de comunidades indígenas (Tikuna, Uitoto, Murui-Muinane, Bora) y campesino-ribereñas del trapecio amazónico. NO listada en libros rojos. Aprovechamiento sostenible permitido bajo planes de manejo comunitario."
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 100,
@@ -27097,7 +27346,13 @@
       ],
       "cultivable": true,
       "conservation_status": "nativo_silvestre",
-      "normativa_colombiana": "Nativa silvestre del bosque seco tropical (bs-T) del Caribe colombiano (Bolívar, Sucre, Córdoba, Cesar, Magdalena, La Guajira sur) y bosque húmedo tropical bajo del Pacífico norte (Chocó, Valle, Cauca) y valle medio del Magdalena. NO en libro rojo individual pero su ecosistema (bs-T) está catalogado en peligro crítico — protección por habitat. Tala y aprovechamiento de individuos en bs-T requieren permiso CAR.",
+      "normativa_colombiana": [
+        {
+          "tipo": "estatus_conservacion",
+          "alcance": "Nativa silvestre del bosque seco tropical (bs-T) del Caribe colombiano (Bolívar, Sucre, Córdoba, Cesar, Magdalena, La Guajira sur) y bosque húmedo tropical bajo del Pacífico norte (Chocó, Valle, Cauca) y valle medio del Magdalena. NO en libro rojo individual pero su ecosistema (bs-T) está catalogado en peligro crítico — protección por habitat. Tala y aprovechamiento de individuos en bs-T requieren permiso CAR.",
+          "restriccion": "conservacion_priorizada"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 0,
@@ -27190,7 +27445,14 @@
       ],
       "cultivable": true,
       "conservation_status": "nativo_silvestre",
-      "normativa_colombiana": "Nativa silvestre y emblemática del piso cálido colombiano (<1.000 msnm). Listada como Vulnerable (VU) en algunas regionales por sobreexplotación maderera (madera caracolí muy apreciada para construcción y mueblería rústica costeña). Aprovechamiento maderable de individuos >40 cm DAP requiere permiso CAR. Especie protegida en áreas de manejo en Cesar, Antioquia y Chocó.",
+      "normativa_colombiana": [
+        {
+          "tipo": "estatus_conservacion",
+          "alcance": "Nativa silvestre y emblemática del piso cálido colombiano (<1.000 msnm). Listada como Vulnerable (VU) en algunas regionales por sobreexplotación maderera (madera caracolí muy apreciada para construcción y mueblería rústica costeña). Aprovechamiento maderable de individuos >40 cm DAP requiere permiso CAR. Especie protegida en áreas de manejo en Cesar, Antioquia y Chocó.",
+          "autoridad": "ICA",
+          "restriccion": "conservacion_priorizada"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 0,
@@ -27282,7 +27544,12 @@
       ],
       "cultivable": true,
       "conservation_status": "nativo_silvestre",
-      "normativa_colombiana": "Nativa silvestre del piso cálido amazónico colombiano (<800 msnm); especie cultivada y semicultivada por comunidades indígenas amazónicas (Tikuna, Yagua, Bora, Uitoto, Murui-Muinane) como sombrío para cacao silvestre, copoazú y huertos selváticos. NO en libro rojo. Aprovechamiento doméstico permitido sin restricción.",
+      "normativa_colombiana": [
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "Nativa silvestre del piso cálido amazónico colombiano (<800 msnm); especie cultivada y semicultivada por comunidades indígenas amazónicas (Tikuna, Yagua, Bora, Uitoto, Murui-Muinane) como sombrío para cacao silvestre, copoazú y huertos selváticos. NO en libro rojo. Aprovechamiento doméstico permitido sin restricción."
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 100,
@@ -27372,7 +27639,12 @@
       ],
       "cultivable": true,
       "conservation_status": "nativo_silvestre",
-      "normativa_colombiana": "Nativa silvestre del piso cálido amazónico-orinocense colombiano (<1.000 msnm). Especie de uso múltiple custodia de comunidades indígenas amazónicas (Tikuna, Bora, Uitoto, Murui-Muinane, Yucuna) y campesino-ribereñas. NO en libro rojo nacional pero su almendra es producto NTFP (non-timber forest product) emergente en cadenas de valor amazónicas. Aprovechamiento sostenible permitido bajo manejo comunitario.",
+      "normativa_colombiana": [
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "Nativa silvestre del piso cálido amazónico-orinocense colombiano (<1.000 msnm). Especie de uso múltiple custodia de comunidades indígenas amazónicas (Tikuna, Bora, Uitoto, Murui-Muinane, Yucuna) y campesino-ribereñas. NO en libro rojo nacional pero su almendra es producto NTFP (non-timber forest product) emergente en cadenas de valor amazónicas. Aprovechamiento sostenible permitido bajo manejo comunitario."
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 100,
@@ -27462,7 +27734,12 @@
       ],
       "cultivable": true,
       "conservation_status": "nativo_silvestre",
-      "normativa_colombiana": "Nativa silvestre del piso cálido amazónico-orinocense colombiano y Pacífico chocoano (<900 msnm). Leguminosa fijadora de N de gran porte. Custodia de comunidades indígenas amazónicas. NO en libro rojo. Aprovechamiento sostenible bajo manejo comunitario.",
+      "normativa_colombiana": [
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "Nativa silvestre del piso cálido amazónico-orinocense colombiano y Pacífico chocoano (<900 msnm). Leguminosa fijadora de N de gran porte. Custodia de comunidades indígenas amazónicas. NO en libro rojo. Aprovechamiento sostenible bajo manejo comunitario."
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 100,
@@ -27552,7 +27829,12 @@
       ],
       "cultivable": true,
       "conservation_status": "nativo_silvestre",
-      "normativa_colombiana": "Nativa silvestre del piso cálido colombiano (<1.000 msnm). Especie maderable-medicinal de aprovechamiento múltiple. NO en libro rojo. Madera \"palo blanco\" usada en cajonería, contraenchapados y construcción rural. Corteza con principios amargos medicinales (quassinoides) ha sido usada tradicionalmente contra disentería amebiana en medicina tradicional caribe-amazónica.",
+      "normativa_colombiana": [
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "Nativa silvestre del piso cálido colombiano (<1.000 msnm). Especie maderable-medicinal de aprovechamiento múltiple. NO en libro rojo. Madera \"palo blanco\" usada en cajonería, contraenchapados y construcción rural. Corteza con principios amargos medicinales (quassinoides) ha sido usada tradicionalmente contra disentería amebiana en medicina tradicional caribe-amazónica."
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 0,
@@ -27644,7 +27926,15 @@
       ],
       "cultivable": true,
       "conservation_status": "en_peligro",
-      "normativa_colombiana": "Especie endémica del Pacífico colombo-panameño y Caribe darienita, listada en categoría VULNERABLE (VU) en el Libro Rojo de Plantas de Colombia y en algunas regionales como EN PELIGRO (EN) por sobreexplotación maderera (madera \"almendro\" muy apreciada para mueblería fina) y deforestación severa del bosque pluvial chocoano. Aprovechamiento silvestre requiere permiso CAR/Ministerio Ambiente. Custodia de comunidades afrodescendientes chocoanas (consejos comunitarios cuenca del Atrato, San Juan, Baudó) e indígenas Embera-Wounaan. Plantaciones agroforestales y restauración aportan a recuperación poblacional.",
+      "normativa_colombiana": [
+        {
+          "tipo": "estatus_conservacion",
+          "alcance": "Especie endémica del Pacífico colombo-panameño y Caribe darienita, listada en categoría VULNERABLE (VU) en el Libro Rojo de Plantas de Colombia y en algunas regionales como EN PELIGRO (EN) por sobreexplotación maderera (madera \"almendro\" muy apreciada para mueblería fina) y deforestación severa del bosque pluvial chocoano. Aprovechamiento silvestre requiere permiso CAR/Ministerio Ambiente. Custodia de comunidades afrodescendientes chocoanas (consejos comunitarios cuenca del Atrato, San Juan, Baudó) e indígenas Embera-Wounaan. Plantaciones agroforestales y restauración aportan a recuperación poblacional.",
+          "norma": "Libro Rojo de Plantas de Colombia",
+          "autoridad": "ICA",
+          "restriccion": "conservacion_priorizada"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 50,
@@ -27736,7 +28026,13 @@
       ],
       "cultivable": true,
       "conservation_status": "en_peligro",
-      "normativa_colombiana": "Listada VULNERABLE (VU) a casi amenazada en Colombia por sobreexplotación maderera intensiva (1900-1990) — madera \"diomate\" o \"guayacán negro\" muy apreciada en mueblería fina, parqué, ebanistería de lujo, esculturas, instrumentos musicales (vihuelas, charangos). Apéndice III CITES Colombia. Aprovechamiento silvestre requiere permiso CAR/Ministerio Ambiente. Plantaciones agroforestales y restauración contribuyen a recuperación poblacional.",
+      "normativa_colombiana": [
+        {
+          "tipo": "estatus_conservacion",
+          "alcance": "Listada VULNERABLE (VU) a casi amenazada en Colombia por sobreexplotación maderera intensiva (1900-1990) — madera \"diomate\" o \"guayacán negro\" muy apreciada en mueblería fina, parqué, ebanistería de lujo, esculturas, instrumentos musicales (vihuelas, charangos). Apéndice III CITES Colombia. Aprovechamiento silvestre requiere permiso CAR/Ministerio Ambiente. Plantaciones agroforestales y restauración contribuyen a recuperación poblacional.",
+          "restriccion": "conservacion_priorizada"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 50,
@@ -27828,7 +28124,12 @@
       ],
       "cultivable": true,
       "conservation_status": "nativo_silvestre",
-      "normativa_colombiana": "Nativa silvestre del piso cálido del Caribe colombiano, Magdalena medio-bajo, Pacífico norte y Catatumbo (<1.000 msnm). Familia Lecythidaceae (misma de la nuez de Brasil Bertholletia excelsa). Especie frutal silvestre comunitaria. NO en libro rojo. Aprovechamiento doméstico permitido. Semillas comestibles ricas en selenio (cuidado con consumo excesivo — riesgo de selenosis si la semilla proviene de suelos seleníferos).",
+      "normativa_colombiana": [
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "Nativa silvestre del piso cálido del Caribe colombiano, Magdalena medio-bajo, Pacífico norte y Catatumbo (<1.000 msnm). Familia Lecythidaceae (misma de la nuez de Brasil Bertholletia excelsa). Especie frutal silvestre comunitaria. NO en libro rojo. Aprovechamiento doméstico permitido. Semillas comestibles ricas en selenio (cuidado con consumo excesivo — riesgo de selenosis si la semilla proviene de suelos seleníferos)."
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 50,
@@ -27917,7 +28218,14 @@
       ],
       "cultivable": true,
       "conservation_status": "en_peligro",
-      "normativa_colombiana": "Listada en peligro (EN) por UICN globalmente por sobreexplotación maderera intensiva (1900-2000) — madera \"peroba rosa\" altamente cotizada en mueblería fina y construcción. En Colombia presente en Amazonía y piedemonte amazónico-orinocense. Aprovechamiento silvestre requiere permiso CAR/Ministerio Ambiente. Apéndice III CITES Colombia en consideración. Plantaciones agroforestales y restauración aportan a recuperación.",
+      "normativa_colombiana": [
+        {
+          "tipo": "estatus_conservacion",
+          "alcance": "Listada en peligro (EN) por UICN globalmente por sobreexplotación maderera intensiva (1900-2000) — madera \"peroba rosa\" altamente cotizada en mueblería fina y construcción. En Colombia presente en Amazonía y piedemonte amazónico-orinocense. Aprovechamiento silvestre requiere permiso CAR/Ministerio Ambiente. Apéndice III CITES Colombia en consideración. Plantaciones agroforestales y restauración aportan a recuperación.",
+          "autoridad": "IUCN",
+          "restriccion": "conservacion_priorizada"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 100,
@@ -28008,7 +28316,14 @@
       ],
       "cultivable": true,
       "conservation_status": "en_peligro",
-      "normativa_colombiana": "Listada VULNERABLE (VU) a EN PELIGRO (EN) en algunas regionales por sobreexplotación maderera histórica y deforestación del bosque amazónico-orinocense. En Colombia presente en Amazonía baja y piedemonte orinocense — distinta a Cariniana pyriformis del Pacífico-Magdalena. Aprovechamiento silvestre requiere permiso CAR/Ministerio Ambiente. Plantaciones agroforestales y restauración aportan a recuperación.",
+      "normativa_colombiana": [
+        {
+          "tipo": "estatus_conservacion",
+          "alcance": "Listada VULNERABLE (VU) a EN PELIGRO (EN) en algunas regionales por sobreexplotación maderera histórica y deforestación del bosque amazónico-orinocense. En Colombia presente en Amazonía baja y piedemonte orinocense — distinta a Cariniana pyriformis del Pacífico-Magdalena. Aprovechamiento silvestre requiere permiso CAR/Ministerio Ambiente. Plantaciones agroforestales y restauración aportan a recuperación.",
+          "autoridad": "ICA",
+          "restriccion": "conservacion_priorizada"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 100,
@@ -28097,7 +28412,14 @@
       ],
       "cultivable": true,
       "conservation_status": "en_peligro",
-      "normativa_colombiana": "Especie ENDÉMICA del Pacífico colombiano-Chocó-Darién, listada EN PELIGRO (EN) en el Libro Rojo de Plantas de Colombia y por UICN Red List por sobreexplotación maderera intensiva (1950-2010) — madera \"carrá\" altamente cotizada para contraenchapados navales, construcción y mueblería — y deforestación severa del bosque pluvial chocoano. Aprovechamiento silvestre PROHIBIDO sin permiso especial CAR/Ministerio Ambiente. Custodia obligatoria por consejos comunitarios afrochocoanos (Ley 70/1993) e indígenas Embera-Wounaan.",
+      "normativa_colombiana": [
+        {
+          "tipo": "regulatoria",
+          "alcance": "Especie ENDÉMICA del Pacífico colombiano-Chocó-Darién, listada EN PELIGRO (EN) en el Libro Rojo de Plantas de Colombia y por UICN Red List por sobreexplotación maderera intensiva (1950-2010) — madera \"carrá\" altamente cotizada para contraenchapados navales, construcción y mueblería — y deforestación severa del bosque pluvial chocoano. Aprovechamiento silvestre PROHIBIDO sin permiso especial CAR/Ministerio Ambiente. Custodia obligatoria por consejos comunitarios afrochocoanos (Ley 70/1993) e indígenas Embera-Wounaan.",
+          "norma": "Ley 70/1993",
+          "autoridad": "ICA"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 50,
@@ -28188,7 +28510,12 @@
       ],
       "cultivable": true,
       "conservation_status": "nativo_silvestre",
-      "normativa_colombiana": "Nativa silvestre del piso cálido amazónico colombiano (<1.000 msnm); especie de uso múltiple custodia de comunidades indígenas amazónicas (Tikuna, Bora, Uitoto, Murui-Muinane, Yucuna, Tanimuka) y campesino-ribereñas. NO en libro rojo nacional pero su almendra es NTFP emergente. Distinta a Caryocar amygdaliferum (presente en mismo rango) por hojas glabras (no pubescentes), drupas más pequeñas y ecología de bosque de tierra firme.",
+      "normativa_colombiana": [
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "Nativa silvestre del piso cálido amazónico colombiano (<1.000 msnm); especie de uso múltiple custodia de comunidades indígenas amazónicas (Tikuna, Bora, Uitoto, Murui-Muinane, Yucuna, Tanimuka) y campesino-ribereñas. NO en libro rojo nacional pero su almendra es NTFP emergente. Distinta a Caryocar amygdaliferum (presente en mismo rango) por hojas glabras (no pubescentes), drupas más pequeñas y ecología de bosque de tierra firme."
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 100,
@@ -28278,7 +28605,12 @@
       ],
       "cultivable": true,
       "conservation_status": "nativo_silvestre",
-      "normativa_colombiana": "Nativa silvestre del piso cálido colombiano (<1.000 msnm) con distribución amplia. Madera \"amarillo\" muy apreciada en construcción, mueblería y pisos —ha sido sobreexplotada en algunas regionales del Caribe y Magdalena medio (catalogada Vulnerable a casi amenazada en regionales). Aprovechamiento maderable de individuos >40 cm DAP requiere permiso CAR. Plantaciones agroforestales y restauración contribuyen a recuperación poblacional.",
+      "normativa_colombiana": [
+        {
+          "tipo": "contexto_etnocultural",
+          "alcance": "Nativa silvestre del piso cálido colombiano (<1.000 msnm) con distribución amplia. Madera \"amarillo\" muy apreciada en construcción, mueblería y pisos —ha sido sobreexplotada en algunas regionales del Caribe y Magdalena medio (catalogada Vulnerable a casi amenazada en regionales). Aprovechamiento maderable de individuos >40 cm DAP requiere permiso CAR. Plantaciones agroforestales y restauración contribuyen a recuperación poblacional."
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 50,
@@ -29703,7 +30035,19 @@
       ],
       "cultivable": false,
       "conservation_status": "nativo_protegido",
-      "normativa_colombiana": "Especie en categoría VULNERABLE (VU) según el Libro Rojo de Plantas de Colombia (2007). Su tala está regulada por las CAR (Corporaciones Autónomas Regionales) en Cundinamarca (CAR Cundinamarca), Boyacá (Corpoboyacá), Antioquia (Cornare, Corantioquia) y Nariño (Corponariño). Aprovechamiento maderable comercial PROHIBIDO en bosque natural; permitido únicamente de plantaciones registradas. Especie incluida en planes de restauración prioritaria del SINAP (Sistema Nacional de Áreas Protegidas) para Chingaza, Iguaque, Tatamá y Otún-Quimbaya. Resolución MADS específica de protección como bosque protector-productor en cuencas abastecedoras (Tunjuelo, Teusacá, Bogotá, Pasto).",
+      "normativa_colombiana": [
+        {
+          "tipo": "regulatoria",
+          "alcance": "Especie en categoría VULNERABLE (VU) según el Libro Rojo de Plantas de Colombia (2007). Su tala está regulada por las CAR (Corporaciones Autónomas Regionales) en Cundinamarca (CAR Cundinamarca), Boyacá (Corpoboyacá), Antioquia (Cornare, Corantioquia) y Nariño (Corponariño). Aprovechamiento maderable comercial PROHIBIDO en bosque natural",
+          "norma": "Libro Rojo de Plantas de Colombia",
+          "autoridad": "CAR Cundinamarca"
+        },
+        {
+          "tipo": "regulatoria",
+          "alcance": "permitido únicamente de plantaciones registradas. Especie incluida en planes de restauración prioritaria del SINAP (Sistema Nacional de Áreas Protegidas) para Chingaza, Iguaque, Tatamá y Otún-Quimbaya. Resolución MADS específica de protección como bosque protector-productor en cuencas abastecedoras (Tunjuelo, Teusacá, Bogotá, Pasto).",
+          "autoridad": "MADS"
+        }
+      ],
       "altitud_msnm": {
         "min_absoluto": 1800,
         "optimo_min": 2100,

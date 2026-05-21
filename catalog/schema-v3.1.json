@@ -604,6 +604,73 @@
         "clasificacion_uicn": {
           "type": "string"
         },
+        "normativa_colombiana": {
+          "description": "Marco legal/cultural/conservacionista que aplica a la species en Colombia. Schema v3.2 (2026-05-21) formaliza el campo con discriminator `tipo` (3 valores: regulatoria | contexto_etnocultural | estatus_conservacion). Legacy: el campo aceptaba string libre o array semi-estructurado — la migración 2026-05-21 normaliza al array de objetos canónicos. Cuando aplique: chamánicas controladas (Ley 30/1986), invasoras (Res. 684/2018 MADS), páramo (Ley 1930/2018), endémicas (Libro Rojo IAvH), patrimonio cultural inmaterial (pueblos indígenas).",
+          "anyOf": [
+            {
+              "type": "string",
+              "description": "FORMATO LEGACY (deprecated) — string libre. Aceptado durante transición v3.1→v3.2. Script migrate-normativa-v32.mjs lo convierte al array canónico."
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "discriminator": {
+                  "propertyName": "tipo"
+                },
+                "required": ["tipo", "alcance"],
+                "properties": {
+                  "tipo": {
+                    "type": "string",
+                    "enum": ["regulatoria", "contexto_etnocultural", "estatus_conservacion"],
+                    "description": "regulatoria = norma vigente con obligación. contexto_etnocultural = patrimonio/uso ritual/saber comunidad sin norma específica. estatus_conservacion = categoría IUCN/Libro Rojo/etc."
+                  },
+                  "norma": {
+                    "type": "string",
+                    "description": "Nombre formal de la norma o instrumento. Requerido cuando tipo=regulatoria o tipo=estatus_conservacion. Ej: 'Ley 30 de 1986', 'Resolución 684/2018 MADS', 'Libro Rojo Plantas Colombia 2007'."
+                  },
+                  "autoridad": {
+                    "type": "string",
+                    "description": "Entidad emisora de la norma. Ej: 'MADS', 'ICA', 'Consejo Nacional de Estupefacientes', 'IAvH', 'CAR Cundinamarca'."
+                  },
+                  "fecha_vigor": {
+                    "type": "string",
+                    "description": "Fecha de entrada en vigor (ISO date o solo año). Opcional."
+                  },
+                  "alcance": {
+                    "type": "string",
+                    "description": "Texto operativo corto que el operador debe conocer en campo. OBLIGATORIO en cualquier tipo."
+                  },
+                  "restriccion": {
+                    "type": "string",
+                    "enum": [
+                      "control_obligatorio_invasoras",
+                      "cultivo_restringido_indigenas",
+                      "prohibida_paramos",
+                      "cuarentena_fitosanitaria",
+                      "conservacion_priorizada",
+                      "uso_ritual_protegido",
+                      "uso_medicinal_regulado",
+                      "comercio_restringido",
+                      "ninguna_explicita"
+                    ],
+                    "description": "Restricción/obligación concreta que aplica. Enum cerrado para queryability. Opcional pero recomendado en tipo=regulatoria."
+                  },
+                  "url_oficial": {
+                    "type": "string",
+                    "description": "URL del texto oficial de la norma (.gov.co preferido). Opcional."
+                  },
+                  "aplica_a_chagra": {
+                    "type": "boolean",
+                    "description": "Default true. Si false, la norma existe pero no afecta el uso doméstico/chagra (ej. norma comercial)."
+                  }
+                },
+                "additionalProperties": false
+              },
+              "minItems": 1
+            }
+          ]
+        },
         "protocolo_post_remocion": {
           "type": "string"
         },
