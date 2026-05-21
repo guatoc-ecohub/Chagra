@@ -36,14 +36,23 @@ const formatDuration = (ms) => {
   return `${s}s`;
 };
 
-export default function FieldFeedback() {
-  const [open, setOpen] = useState(false);
+/**
+ * Props:
+ *   embedded?: boolean   — si true, renderea solo el form (sin FAB ni modal).
+ *                          Usado en HelpUsoScreen donde el feedback vive
+ *                          dentro de la sección "Reportar problema" en lugar
+ *                          de ser un FAB global. Decisión 2026-05-21 tras
+ *                          feedback Lili #5 (FABs tapaban contenido).
+ */
+export default function FieldFeedback({ embedded = false } = {}) {
+  // En modo embedded el form siempre está "abierto" (no hay FAB que abrir).
+  const [open, setOpen] = useState(embedded);
   const [text, setText] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   // Auto-hide tras 2s sin interacción (feedback usuario externo 2026-05-06,
   // bug #2: FAB tapaba widgets en home). El modal abierto NO se ve afectado
-  // — solo el FAB fab-button colapsado es lo que se oculta.
+  // — solo el FAB fab-button colapsado es lo que se oculta. No aplica en embedded.
   const isFabVisible = useIdleVisibility(2000);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -98,7 +107,9 @@ export default function FieldFeedback() {
   const handleClose = () => {
     if (isRecording) stop();
     handleDiscardAudio();
-    setOpen(false);
+    // En modo embedded el form NO se "cierra", solo se limpia (no hay modal
+    // que ocultar — vive permanente dentro de Ayuda).
+    if (!embedded) setOpen(false);
     setText('');
     setSubmitted(false);
     setErrorMsg('');
@@ -213,44 +224,52 @@ export default function FieldFeedback() {
 
   return (
     <>
-      {/* FAB button (auto-hide 2s idle) */}
-      <button
-        type="button"
-        aria-label="Reportar feedback"
-        title="Reportar feedback de campo"
-        onClick={() => setOpen(true)}
-        style={{
-          position: 'fixed',
-          bottom: 18,
-          right: 18,
-          width: FAB_SIZE,
-          height: FAB_SIZE,
-          borderRadius: '50%',
-          border: `2px solid ${COLOR_ACCENT}`,
-          background: `linear-gradient(135deg, ${COLOR_PRIMARY} 0%, #075f6e 100%)`,
-          color: '#fff',
-          fontSize: 22,
-          cursor: 'pointer',
-          boxShadow: `0 4px 16px rgba(0,0,0,0.4), 0 0 14px ${COLOR_ACCENT}55`,
-          zIndex: 9000,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 0,
-          opacity: isFabVisible ? 1 : 0,
-          pointerEvents: isFabVisible ? 'auto' : 'none',
-          transition: 'opacity 250ms ease',
-        }}
-      >
-        💬
-      </button>
-
-      {open && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          onClick={(e) => e.target === e.currentTarget && handleClose()}
+      {/* FAB button (auto-hide 2s idle). Solo en modo NO embedded — en
+          embedded el form vive dentro de HelpUsoScreen y no necesita FAB. */}
+      {!embedded && (
+        <button
+          type="button"
+          aria-label="Reportar feedback"
+          title="Reportar feedback de campo"
+          onClick={() => setOpen(true)}
           style={{
+            position: 'fixed',
+            bottom: 18,
+            right: 18,
+            width: FAB_SIZE,
+            height: FAB_SIZE,
+            borderRadius: '50%',
+            border: `2px solid ${COLOR_ACCENT}`,
+            background: `linear-gradient(135deg, ${COLOR_PRIMARY} 0%, #075f6e 100%)`,
+            color: '#fff',
+            fontSize: 22,
+            cursor: 'pointer',
+            boxShadow: `0 4px 16px rgba(0,0,0,0.4), 0 0 14px ${COLOR_ACCENT}55`,
+            zIndex: 9000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 0,
+            opacity: isFabVisible ? 1 : 0,
+            pointerEvents: isFabVisible ? 'auto' : 'none',
+            transition: 'opacity 250ms ease',
+          }}
+        >
+          💬
+        </button>
+      )}
+
+      {/* En modo NO embedded: dialog modal fixed con overlay. En modo
+          embedded: el form vive en flujo normal del documento (sin
+          overlay/fixed/zIndex), porque está adentro de Ayuda. */}
+      {(open || embedded) && (
+        <div
+          {...(!embedded && { role: 'dialog', 'aria-modal': 'true' })}
+          onClick={!embedded ? (e) => e.target === e.currentTarget && handleClose() : undefined}
+          style={embedded ? {
+            display: 'flex',
+            justifyContent: 'center',
+          } : {
             position: 'fixed',
             inset: 0,
             background: 'rgba(0,0,0,0.65)',
@@ -265,12 +284,13 @@ export default function FieldFeedback() {
           <form
             onSubmit={handleSubmit}
             style={{
-              width: 'min(420px, 92vw)',
-              background: '#0a0e14',
-              border: `1px solid ${COLOR_ACCENT}55`,
-              borderRadius: 8,
-              padding: '1.2rem',
-              boxShadow: `0 12px 40px rgba(0,0,0,0.6), 0 0 24px ${COLOR_ACCENT}33`,
+              width: embedded ? '100%' : 'min(420px, 92vw)',
+              maxWidth: embedded ? '100%' : 'min(420px, 92vw)',
+              background: embedded ? 'transparent' : '#0a0e14',
+              border: embedded ? 'none' : `1px solid ${COLOR_ACCENT}55`,
+              borderRadius: embedded ? 0 : 8,
+              padding: embedded ? 0 : '1.2rem',
+              boxShadow: embedded ? 'none' : `0 12px 40px rgba(0,0,0,0.6), 0 0 24px ${COLOR_ACCENT}33`,
               display: 'flex',
               flexDirection: 'column',
               gap: '0.8rem',
@@ -278,18 +298,39 @@ export default function FieldFeedback() {
               color: '#e6edf3',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ fontSize: '0.7rem', letterSpacing: '0.22em', color: COLOR_ACCENT, textTransform: 'uppercase', fontWeight: 700 }}>
-                Field feedback
+            {/* Header con título + close button. Solo en modo modal —
+                en embedded el título lo da la sección de Ayuda. */}
+            {!embedded && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ fontSize: '0.7rem', letterSpacing: '0.22em', color: COLOR_ACCENT, textTransform: 'uppercase', fontWeight: 700 }}>
+                  Field feedback
+                </div>
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  style={{ background: 'transparent', border: 'none', color: '#8b9cab', fontSize: 18, cursor: 'pointer' }}
+                >
+                  ×
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={handleClose}
-                style={{ background: 'transparent', border: 'none', color: '#8b9cab', fontSize: 18, cursor: 'pointer' }}
-              >
-                ×
-              </button>
-            </div>
+            )}
+            {/* Copy amigable solo en embedded. Decisión 2026-05-21: en
+                lugar de "Field feedback" técnico, contar al operador qué
+                tipo de feedback nos sirve y por qué. */}
+            {embedded && (
+              <div className="text-sm text-slate-300 leading-relaxed mb-1 space-y-2">
+                <p>
+                  ¿Algo del agente te respondió raro, viste información errónea
+                  o algo no se comporta como esperás?
+                </p>
+                <p>
+                  <strong>Grabá un audio</strong> contando qué hiciste y qué fue lo
+                  raro (es más rápido que tipear en el campo). Si querés adjuntar
+                  el contexto en texto también, mejor todavía. Cada reporte ayuda
+                  a hacer Chagra más poderoso.
+                </p>
+              </div>
+            )}
 
             <div style={{ fontSize: '0.7rem', color: '#8b9cab', letterSpacing: '0.05em', lineHeight: 1.4 }}>
               Pantalla: <span style={{ color: COLOR_ACCENT }}>{window.location.pathname || '/'}</span>

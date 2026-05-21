@@ -12,7 +12,10 @@ import { initCatalog } from './db/catalogDB';
 import NetworkStatusBar from './components/NetworkStatusBar';
 import PendingTasksWidget from './components/PendingTasksWidget';
 import SyncProgressIndicator from './components/common/SyncProgressIndicator';
-import FieldFeedback from './components/FieldFeedback';
+// FieldFeedback ya no se monta globalmente en App; vive embebido en
+// HelpUsoScreen como sección de Ayuda (decisión 2026-05-21, ver
+// comentario abajo donde se removió el render).
+// import FieldFeedback from './components/FieldFeedback';
 import MicFab from './components/MicFab';
 import AgentFab from './components/AgentFab';
 import { ScreenShell } from './components/common/ScreenShell';
@@ -479,10 +482,12 @@ export default function App() {
       <Suspense fallback={<LoadingFallback />}>
         {renderView()}
       </Suspense>
-      {/* FAB feedback inline para field testing. Operator bug 2026-05-18:
-          FieldFeedback FAB bottom-right tapaba el botón "enviar" en AgentScreen
-          y el textarea voice en VoiceCapture. Excluido en agente + voz. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'agente' && currentView !== 'voz' && <FieldFeedback />}
+      {/* FAB feedback flotante REMOVIDO 2026-05-21: el reporte de errores
+          ahora vive embebido dentro de HelpUsoScreen (sección "Reportar
+          problema con Chagra") en lugar de un FAB global. Decisión user
+          tras Lili UX feedback: FAB tapaba contenido + no era discoverable.
+          El form sigue siendo el mismo componente, instanciado con prop
+          `embedded` desde HelpUsoScreen. */}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'voz' && currentView !== 'agente' && <MicFab onNavigate={navigate} />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'voz' && currentView !== 'agente' && <AgentFab onNavigate={navigate} />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}

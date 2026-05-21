@@ -3,6 +3,7 @@ import {
   ArrowLeft, ChevronDown, ChevronRight, Sprout, Camera, MapPin, Bug, Apple,
   MessageCircle, Wrench,
 } from 'lucide-react';
+import FieldFeedback from './FieldFeedback';
 
 /**
  * Sub-vista del Manual: cómo usar Chagra (FAQs reorganizadas).
@@ -183,18 +184,19 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
           </div>
         </Section>
 
-        {/* 5. Reportar bug / sugerir mejora — incluido aquí (no cuarto botón) */}
-        <Section icon={MessageCircle} title="💬 Reportar bug o sugerir mejora">
-          <p>Botón flotante 💬 abajo a la <strong>derecha</strong>, siempre visible. Puedes:</p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>Escribir texto explicando qué pasó</li>
-            <li>Grabar audio (botón 🎤 dentro del modal): &ldquo;hice click acá y pasó X&rdquo;, sin tener que escribir en la pantalla</li>
-            <li>Ambos: texto + audio</li>
-          </ul>
-          <p>Tu feedback queda guardado localmente y se sincroniza después.</p>
-          <p className="text-xs text-slate-500 italic mt-2">
-            Cada reporte importa: la app aprende contigo. Si algo es confuso, decirlo es la forma más rápida de arreglarlo.
-          </p>
+        {/* 5. Reportar problema / sugerir mejora — embed del FieldFeedback
+            form. Antes vivía como FAB flotante 💬 global; movido acá
+            2026-05-21 por feedback usuario (más discoverable + no tapa
+            contenido). isNew=true para resaltar la nueva ubicación. */}
+        <Section
+          icon={MessageCircle}
+          title="💬 Reportar problema con Chagra"
+          isNew
+          defaultOpen
+        >
+          <div className="bg-slate-950/50 border border-cyan-800/40 rounded-lg p-4">
+            <FieldFeedback embedded />
+          </div>
         </Section>
 
         {/* 6. Problemas comunes */}
@@ -202,7 +204,65 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
           <div className="space-y-3">
             <div>
               <p className="font-bold text-amber-300">📍 GPS no encuentra mi ubicación</p>
-              <p className="text-xs text-slate-400 leading-relaxed">El mapa centra automático al abrir el modal. Si tarda más de 15s o cae en error, toca &ldquo;Reintentar&rdquo;. En Brave: revisa que la opción de bloqueo de huellas digitales esté desactivada.</p>
+              <p className="text-xs text-slate-400 leading-relaxed mb-2">
+                El mapa centra automático al abrir el modal. Si tarda más
+                de 15s o cae en error, toca &ldquo;Reintentar&rdquo;.
+              </p>
+              <details className="text-xs text-slate-400 leading-relaxed">
+                <summary className="cursor-pointer text-cyan-400 hover:text-cyan-300 font-bold mb-1">
+                  📱 En iPhone (iOS Safari)
+                </summary>
+                <ol className="list-decimal pl-5 space-y-1 mt-1">
+                  <li>
+                    Ajustes (la app del engranaje gris) → busca &ldquo;Safari&rdquo;
+                    en la lista de apps → entrá ahí.
+                  </li>
+                  <li>
+                    Bajá hasta encontrar <strong>&ldquo;Ubicación&rdquo;</strong> y
+                    tocá. Si dice &ldquo;Denegar&rdquo;, cambialo a
+                    &ldquo;Preguntar&rdquo; o &ldquo;Permitir&rdquo;.
+                  </li>
+                  <li>
+                    Volvé a Ajustes → &ldquo;Privacidad y seguridad&rdquo; →
+                    &ldquo;Localización&rdquo; → confirmá que la
+                    <strong> localización general esté activada</strong> (al
+                    principio de la pantalla).
+                  </li>
+                  <li>
+                    Volvé a Chagra, recargá la página (cerrá la pestaña en
+                    Safari y volvé a entrar), y aceptá el popup de permiso
+                    cuando aparezca.
+                  </li>
+                </ol>
+                <p className="mt-2 text-slate-500 italic">
+                  Si instalaste Chagra como app desde &ldquo;Añadir a pantalla
+                  de inicio&rdquo;, la primera vez te va a preguntar de nuevo
+                  el permiso — es esperado, aceptá.
+                </p>
+              </details>
+              <details className="text-xs text-slate-400 leading-relaxed mt-2">
+                <summary className="cursor-pointer text-cyan-400 hover:text-cyan-300 font-bold mb-1">
+                  🤖 En Android (Chrome o Brave)
+                </summary>
+                <ol className="list-decimal pl-5 space-y-1 mt-1">
+                  <li>
+                    En Chrome: barra de URL → ícono del candado o tres
+                    puntos → &ldquo;Configuración del sitio&rdquo; o
+                    &ldquo;Permisos&rdquo; → &ldquo;Ubicación&rdquo; → permitir
+                    para chagra.guatoc.co.
+                  </li>
+                  <li>
+                    En Brave: lo mismo + revisar que la opción de
+                    <strong> bloqueo de huellas digitales esté desactivada</strong>
+                    {' '}solo para este sitio (Brave bloquea geolocation por defecto).
+                  </li>
+                  <li>
+                    A nivel sistema: Ajustes Android → Ubicación → activada
+                    + el navegador con permiso en &ldquo;Permitir todo el
+                    tiempo&rdquo; o &ldquo;Solo mientras se usa&rdquo;.
+                  </li>
+                </ol>
+              </details>
             </div>
             <div>
               <p className="font-bold text-amber-300">🎤 Voz no transcribe</p>
