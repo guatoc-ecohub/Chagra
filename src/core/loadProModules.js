@@ -28,7 +28,7 @@ const PRO_MODULES_ENV = (import.meta.env && import.meta.env.VITE_PRO_MODULES_PAT
 
 // Lista explícita de módulos Pro que conocemos. Añadir aquí cuando
 // el equipo Pro confirme el id y capability del nuevo módulo.
-const KNOWN_PRO_MODULES = ['gremios-receta-pro'];
+const KNOWN_PRO_MODULES = ['gremios-receta-pro', 'voice-entity-extractor-pro'];
 
 export async function loadProModules() {
   if (!PRO_MODULES_ENV) {
