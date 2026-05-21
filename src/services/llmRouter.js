@@ -2,10 +2,8 @@
  * llmRouter.js — Selector de modelo LLM según tarea (Multi-LLM routing).
  *
  * Decisión de modelo basada en bench empírico CPU 2026-05-15/16 + bench
- * GPU Quadro M6000 sm_52 2026-05-17 (alpha, Ollama 0.23.1 + driver 580.142).
- * Resultados completos en `Chagra-strategy/ops/bench-ollama-2026-05-15.md`,
- * `bench-llamacpp-puro-2026-05-16.md` y
- * `bench-results/2026-05-17-gpu-m6000-sm52-summary.md`.
+ * GPU Quadro M6000 sm_52 2026-05-17. Resultados detallados en docs
+ * operacionales internos (no en este repo).
  *
  * Estado actual: GPU offload 35/35 layers para todos los modelos listados.
  * Eval rate chat gemma3:4b 13.5 t/s CPU → 118 t/s GPU (+8.7×); load time
@@ -28,7 +26,7 @@
  * - llava:13b vision alt (22.94 t/s GPU)
  *
  * Modelos DESCARTADOS por bench:
- * - qwen3.5:4b: qwen35 arch hang en Ollama 0.23.1
+ * - qwen3.5:4b: qwen35 arch hang en Ollama 0.23.x
  * - qwen3:8b: output vacío con prompts JSON estrictos
  */
 

@@ -37,7 +37,7 @@ function TaskScreen({ onBack, onSave, initialData }) {
     ], [plants, structures, lands]);
 
     // Modo edición: si initialData trae .id, estamos editando una tarea
-    // existente. Si no, crear nueva. Lili #106.
+    // existente. Si no, crear nueva. Feedback piloto #106.
     const isEdit = !!initialData?.id;
 
     const [formData, setFormData] = useState(() => {

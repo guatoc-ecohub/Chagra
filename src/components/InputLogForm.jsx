@@ -75,7 +75,7 @@ export const InputLogForm = ({ assetId, onComplete }) => {
         localStorage.setItem(RECENT_KEY, formData.material);
       } catch { /* localStorage quota / no disponible, silent */ }
       setFormData((prev) => ({ ...prev, value: '', notes: '' }));
-      // Lili #108: feedback explícito de dónde queda guardada la info.
+      // Feedback piloto #108: feedback explícito de dónde queda guardada la info.
       // Antes el form solo limpiaba sin decir nada → user no sabía si
       // realmente se guardó ni dónde verlo.
       window.dispatchEvent(new CustomEvent('syncSuccess', {

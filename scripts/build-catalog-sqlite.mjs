@@ -6,7 +6,7 @@ import Database from 'better-sqlite3';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = path.join(__dirname, '../public/catalog.sqlite');
 // Bug 069.1 fix 2026-05-18: builder ahora apunta al catálogo canónico v3.1
-// en el repo público chagra (480 species). La v3.2 en Chagra-strategy
+// en el repo público chagra (480 species). La v3.2 en el repo interno
 // (60 species + tracking_mode ADR-030) está stale y desincronizada con
 // el trabajo de las últimas 24h.
 //
@@ -80,7 +80,7 @@ db.exec(`
 // Bug 069.1 fix 2026-05-18: v3.1 tiene biopreparados[] + sources[] INLINE en
 // el mismo seed file. Cargar todo desde un único parse para evitar mismatch
 // (los archivos separados biopreparados-seed.json/sources-seed.json en
-// Chagra-strategy son legacy v3.0 con 16/54 entries vs v3.1 inline 19/66).
+// el repo interno son legacy v3.0 con 16/54 entries vs v3.1 inline 19/66).
 const seedJson = JSON.parse(fs.readFileSync(path.join(CATALOG_DIR, SEED_FILE), 'utf8'));
 const speciesData = seedJson.species || [];
 const biopreparadosData = seedJson.biopreparados || [];

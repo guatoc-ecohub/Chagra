@@ -10,7 +10,7 @@
  * apareciendo carácter-a-carácter mientras el modelo genera.
  *
  * 2026-05-13: swap qwen3.5:4b → gemma3:4b. qwen35 architecture cuelga
- * determinísticamente en Ollama 0.23.1 (timeout >120s, retorna 500).
+ * determinísticamente en Ollama 0.23.x (timeout >120s, retorna 500).
  * gemma3:4b responde ~10s con calidad equivalente para extracción JSON.
  */
 
@@ -129,7 +129,7 @@ const parseJsonTolerant = (raw) => {
   const cleaned = raw.replace(/```json\s*/gi, '').replace(/```/g, '').trim();
   const cleanedParsed = (() => { try { return JSON.parse(cleaned); } catch (_) { return null; } })();
   if (cleanedParsed !== null) return cleanedParsed;
-  // Bench gemma3:4b 2026-05-15 (Ollama 0.23.1): cuando el modelo es chico
+  // Bench gemma3:4b 2026-05-15 (Ollama 0.23.x): cuando el modelo es chico
   // a veces emite texto antes/después del JSON. Última red: extraer el
   // primer [...] balanceado del raw. Solo soporta arrays top-level (que
   // es el schema esperado del SYSTEM_PROMPT).

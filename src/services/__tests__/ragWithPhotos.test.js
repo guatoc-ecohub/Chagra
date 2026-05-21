@@ -1,6 +1,6 @@
 /**
  * ragWithPhotos.test.js — cobertura del service que combina passages del RAG
- * con fotos del operador (L1.6, pre-Diana 2026-05-19).
+ * con fotos del operador (L1.6, pre-demo-institucional 2026-05-19).
  *
  * Estrategia:
  *   - Mockeamos `../ragRetriever` (retrieve) y `../photoService`

@@ -5,7 +5,7 @@
  * Operator reporte 2026-05-18: USB Zigbee físico roto → HA devuelve
  * state="unavailable" para todos los sensores → TelemetryAlerts hace early
  * return → AIStreamPanel nunca se ejecuta → operador no ve la inferencia IA
- * que es valor diferencial demo Diana 2026-05-19.
+ * que es valor diferencial demo institucional 2026-05-19.
  *
  * Solución: cuando detectemos unavailable mass, sustituimos los valores con
  * mock realista (Guatoc invernadero altitud 2400m biocultural páramo) que

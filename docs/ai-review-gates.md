@@ -40,7 +40,7 @@ git diff main..HEAD -- ':(exclude)*.lock' > /tmp/pr.diff
 cat /tmp/pr.diff | ollama run qwen3-coder:7b "Revisa este diff contra ADR-019 + ADR-020"
 ```
 
-**Soft-fail**: si Ollama caído o timeout 8min, job falla silencioso → merge sigue. Healthcheck (`guatoc-nixos/modules/ai/ollama-healthcheck.nix`) avisa Telegram si Ollama down >10min.
+**Soft-fail**: si Ollama caído o timeout 8min, job falla silencioso → merge sigue. Un healthcheck declarativo (config NixOS privado) avisa Telegram si Ollama down >10min.
 
 ## Gate 6 — OpenCode QA (planeado 2026-05-30)
 
@@ -54,7 +54,4 @@ Cuando se valide el SDK contract de OpenCode.
 > failure modes**. CodeQL (regex-based SAST) ≠ Playwright (runtime) ≠
 > LLM review (semantic). Cada gate atrapa lo que los otros no.
 
-ADRs de referencia:
-- `Chagra-strategy/deepresearch/operations/defense-in-depth-validation-chain.md`
-- `Chagra-strategy/deepresearch/data-model/adr-019-asset-log-3-reglas-inviolables.md`
-- `Chagra-strategy/deepresearch/architecture/ADR-020-anti-leak-content-boundary.md`
+ADRs de referencia: documentación interna del proyecto (defense-in-depth validation chain, asset/log 3 reglas inviolables, anti-leak content boundary). No en este repo.

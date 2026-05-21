@@ -4,14 +4,14 @@ import { syncManager } from '../services/syncManager';
 import useFincaActiveStore from '../services/fincaActiveStore';
 
 /**
- * PendingTasksWidget, Lili #102 + #106.
+ * PendingTasksWidget, Feedback piloto #102 + #106.
  *
- * Refactor 2026-05-02 (post field test Lili):
+ * Refactor 2026-05-02 (post field test piloto):
  * - **Footer collapsable** (sticky bottom) en lugar de bloque fijo en
  *   medio del Dashboard. Por default colapsado mostrando solo count;
  *   tap para expandir.
  * - **Sort por severity** (critical → high → medium → low) y luego
- *   por fecha. Lili: "ordenar por urgencia, urgent rojo arriba".
+ *   por fecha. usuaria piloto: "ordenar por urgencia, urgent rojo arriba".
  * - **Edit button** (lápiz) en cada item para editar tareas pendientes.
  *   Closes #106, onEdit prop dispatcha navigate('edit_task', {task}).
  * - **Empty state** simple cuando 0 pendientes.

@@ -147,7 +147,7 @@ export default function TelemetryAlerts() {
     const alertText = aiAlert.toLowerCase();
 
     if (alertText.includes('estrés hídrico') || alertText.includes('humedad') || alertText.includes('humedad crítica')) {
-      // Lili #105: "Ejecutar Riego no realiza ninguna acción".
+      // Feedback piloto #105: "Ejecutar Riego no realiza ninguna acción".
       // Reemplazado por "Programar Riego" → abre TaskScreen pre-llenado
       // con título, prioridad y notas. Operario confirma + persiste.
       // El handle anterior (handleTelemetryAction → log--input) era opaco
@@ -299,7 +299,7 @@ export default function TelemetryAlerts() {
       // disparaba AIStreamPanel → operador no veía la inferencia IA en home.
       // Fallback: cuando HA está caído o sensores en unavailable, usar mock
       // determinista de iotMockService para mantener flujo IA visible
-      // (especialmente para demo Diana 2026-05-19).
+      // (especialmente para demo institucional 2026-05-19).
       const haOpts = { method: 'GET', headers: { 'Content-Type': 'application/json' }, signal: parentSignal };
       let invernaderoHumData;
       let invernaderoTempData;
@@ -911,7 +911,7 @@ export default function TelemetryAlerts() {
         )}
       </div>
 
-      {/* Lili #105: "Sincronizar Telemetría" propósito unclear.
+      {/* Feedback piloto #105: "Sincronizar Telemetría" propósito unclear.
           Renombrado a "Sincronizar Sensores" + tooltip explicativo.
           Feedback "Cargando..." durante el fetch. */}
       <button

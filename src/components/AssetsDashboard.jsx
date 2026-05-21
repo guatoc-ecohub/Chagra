@@ -93,12 +93,12 @@ const GREMIO_OPTIONS = [
 // viven en src/utils/plantMeta.js para mantener este componente liviano
 // y permitir tests unitarios sin cargar todo el árbol de imports JSX.
 
-// Lili #111 #112 #114, clarificar tabs:
+// Feedback piloto #111 #112 #114, clarificar tabs:
 // - 'Zonas' (land): áreas geográficas con polígono, tab mantenida con
 //   descripción explícita en hover/aria.
 // - 'Infraestructura' (structure): construcciones físicas (invernaderos,
 //   bodegas), diferente de Zonas (que son polígonos abiertos).
-// - 'Herramientas' (equipment): ELIMINADA, Lili "qué finalidad cumple?
+// - 'Herramientas' (equipment): ELIMINADA, usuaria piloto "qué finalidad cumple?
 //   sin agregar ubicación, sin contexto". Sin caso de uso MVP claro,
 //   removed hasta que se valide demanda real. Si necesario re-agregar
 //   en v1.x con scope definido (asignación a tasks, inventario físico).
@@ -303,7 +303,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
   const [currentZoneId, setCurrentZoneId] = useState(null); // drill-down Fase 17.2
   const [viewMode, setViewMode] = useState('list'); // 'list' | 'map' (Fase 17.3)
 
-  // Lili #113 + decisión 2026-05-02 (deprecar PlantAssetLog plano):
+  // Feedback piloto #113 + decisión 2026-05-02 (deprecar PlantAssetLog plano):
   // initialTab + initialShowForm permiten que App.jsx case 'plant_asset' redirija
   // aquí con el form rich abierto directo en tab=plant. Antes el TopBar `+`
   // navegaba al PlantAssetLog plano que NO usaba SpeciesSelect/GuildSuggestions/
@@ -409,7 +409,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     } else if (activeTab === 'land') {
       list = lands;
     } else if (activeTab === 'structure') {
-      // Bug pre-demo Diana 2026-05-19: el operador percibe "Infraestructura"
+      // Bug pre-demo-institucional 2026-05-19: el operador percibe "Infraestructura"
       // como un único concepto físico/espacial (lotes, túneles, invernaderos,
       // bodegas). Reportó ver solo guatoc + "sin nombre" (lands) y no el
       // "tunel de la producción" (structure) que SÍ aparecía en el dropdown
@@ -1515,7 +1515,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
               style={{ height: '100%', width: '100%' }}
               overscan={400}
               itemContent={(index, asset) => {
-                // Bug pre-demo Diana 2026-05-19: en tab 'structure' ahora
+                // Bug pre-demo-institucional 2026-05-19: en tab 'structure' ahora
                 // conviven lands + structures. Diferenciamos icono y label
                 // fallback según el `type` del asset para que el operador
                 // pueda distinguir un terreno (land) de una construcción

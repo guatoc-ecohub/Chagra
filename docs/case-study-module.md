@@ -25,7 +25,7 @@ Seguimiento estructurado de problemas agronómicos (plagas, enfermedades, défic
 ❌ Sync con FarmOS (cases viven solo localStorage por ahora; DR-044 sub-i decide entity formal).
 ❌ Vinculación a `cohort_id` formal (DR-041 lo modela; pre-DR-041 usa `count_total`/`count_affected` libres).
 ❌ Vinculación a `pest_id` formal (DR-040 lo modela; pre-DR-040 usa `problem.name_freetext`).
-❌ Export PDF para MinAmbiente / agrónomo / Lili.
+❌ Export PDF para MinAmbiente / agrónomo / usuaria piloto.
 ❌ Cross-case similarity ("muestra casos similares pasados" RAG).
 ❌ Multi-finca aggregation cross-finca con privacy (depende ADR-036 MF-1..5 + DR-042).
 ❌ Push notifications de alta severidad.
@@ -195,7 +195,7 @@ npm run test:unit -- src/store/__tests__/useCaseStudyStore.test.js
 - `src/App.jsx:51` — lazy import + routes `casos` y `caso_detail`
 - `src/App.jsx:79` — NAV_TILES entry
 - `catalog/chagra-catalog-seed-v3.1.json` — biopreparados refs (post Track C: BT, Trichogramma, neem agregados)
-- `Chagra-strategy/audit/2026-05-17-walk-through-trozador-case.md` — gap análisis caso David
-- `Chagra-strategy/deepresearch/catalog/dr-040-pest-catalog-firstclass-PROMPT-2026-05.md`
-- `Chagra-strategy/deepresearch/catalog/dr-041-cohort-tracking-PROMPT-2026-05.md`
-- `Chagra-strategy/deepresearch/catalog/dr-044-case-study-module-PROMPT-2026-05.md`
+- Audit walk-through caso "trozador" (gap análisis, doc interno)
+- Deep research: pest catalog first-class (doc interno)
+- Deep research: cohort tracking (doc interno)
+- Deep research: case study module (doc interno)

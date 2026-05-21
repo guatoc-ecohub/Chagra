@@ -85,7 +85,7 @@ export default function BiodiversidadView({ onBack, onHome }) {
     [plants, speciesIndex]
   );
 
-  // Lili #119: "mejorar la imagen del background". Overlay reducido
+  // Feedback piloto #119: "mejorar la imagen del background". Overlay reducido
   // (de 0.55-0.82 a 0.45-0.78) para que la ilustración curada del bosque
   // alto-andino sea más visible sin sacrificar legibilidad de las cards.
   const customBgStyle = {
@@ -102,7 +102,7 @@ export default function BiodiversidadView({ onBack, onHome }) {
         className="min-h-full p-4 flex flex-col gap-4"
         style={customBgStyle}
       >
-        {/* Lili #119: agregado intro contextual. Antes solo había stats
+        {/* Feedback piloto #119: agregado intro contextual. Antes solo había stats
             sin explicación de qué significaban (Estratos? Gremios?). */}
         <section className="bg-slate-900/85 backdrop-blur-sm border border-emerald-800/30 rounded-xl p-4">
           <p className="text-sm text-slate-200 leading-snug mb-2">

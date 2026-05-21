@@ -13,7 +13,7 @@ export const ENV = {
   FARMOS_URL: import.meta.env.VITE_FARMOS_URL || '',
   FARMOS_CLIENT_ID: import.meta.env.VITE_FARMOS_CLIENT_ID || '',
   // HA_ACCESS_TOKEN removido del bundle (audit #2). Authorization se
-  // inyecta server-side por Nginx desde SOPS (ver guatoc-nixos PR #91).
+  // inyecta server-side por Nginx desde el store de secretos del servidor.
   DEFAULT_LOCATION_ID: import.meta.env.VITE_DEFAULT_LOCATION_ID || '',
   DEFAULT_FARM_NAME: import.meta.env.VITE_DEFAULT_FARM_NAME || 'Finca Principal',
   // Modelos de inferencia (configurables sin recompilar).

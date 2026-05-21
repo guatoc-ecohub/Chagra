@@ -95,7 +95,7 @@ function flattenDoc(doc, prefix = '') {
  * existen físicamente. Sin manifest, el loader iteraba el CROP_TAXONOMY
  * entero (~30+ species) haciendo fetch a cada slug → mayoría 404 +
  * fallback SPA HTML (mitigado por content-type guard) → latencia mobile
- * rural. Audit pre-Diana hallazgo #8.
+ * rural. Audit pre-demo-institucional hallazgo #8.
  *
  * El manifest se genera en build time (scripts/generate-cycle-content-manifest.mjs).
  * Si el manifest no existe o falla la carga, fallback al comportamiento

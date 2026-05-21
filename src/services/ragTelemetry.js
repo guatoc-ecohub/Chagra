@@ -4,7 +4,7 @@
  * Captura, por cada llamada a `ragRetriever.retrieve`, qué superficie
  * (pantalla / servicio) pidió el RAG, qué query disparó la búsqueda, el
  * score top-1 obtenido, la latencia y el conteo de resultados. La meta
- * principal es alimentar el análisis post-demo Diana 2026-05-19: qué
+ * principal es alimentar el análisis post-demo institucional 2026-05-19: qué
  * pantallas usan RAG y con qué calidad (hit-rate, latencia móvil, queries
  * que devuelven score=0).
  *
@@ -18,7 +18,7 @@
  *
  * Sampling:
  * - `VITE_RAG_TELEMETRY_RATE` (0..1) controla qué fracción de eventos se
- *   persiste. Default 1.0 (100%) para demo Diana; en prod se baja a 0.1.
+ *   persiste. Default 1.0 (100%) para demo institucional; en prod se baja a 0.1.
  * - Decisión por evento via `Math.random()` — sin sticky-session: simple
  *   y suficiente para esta señal.
  *
