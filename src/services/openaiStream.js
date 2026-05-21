@@ -22,7 +22,7 @@
  *   proxy_buffering off;
  *   proxy_cache off;
  *   chunked_transfer_encoding on;
- * (configurado en hosts/alpha/default.nix, mismo patrón que /api/ollama/).
+ * (configurado server-side en el proxy Nginx, mismo patrón que /api/ollama/).
  *
  * Telemetría (v13 2026-05-17): cada call registra evento privacy-safe en
  * IDB `llm_telemetry` con modelo, latencia, tokens, processor (gpu/cpu).

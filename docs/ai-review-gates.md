@@ -40,7 +40,7 @@ git diff main..HEAD -- ':(exclude)*.lock' > /tmp/pr.diff
 cat /tmp/pr.diff | ollama run qwen3-coder:7b "Revisa este diff contra ADR-019 + ADR-020"
 ```
 
-**Soft-fail**: si Ollama caído o timeout 8min, job falla silencioso → merge sigue. Healthcheck (`guatoc-nixos/modules/ai/ollama-healthcheck.nix`) avisa Telegram si Ollama down >10min.
+**Soft-fail**: si Ollama caído o timeout 8min, job falla silencioso → merge sigue. Un healthcheck declarativo (config NixOS privado) avisa Telegram si Ollama down >10min.
 
 ## Gate 6 — OpenCode QA (planeado 2026-05-30)
 
