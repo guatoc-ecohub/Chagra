@@ -152,9 +152,33 @@ export default function Sparkline({
         opacity="0.98"
       />
 
-      {/* Ultimo punto con glow */}
-      <circle cx={lastX} cy={lastY} r="3.2" fill={color} opacity="0.25" />
-      <circle cx={lastX} cy={lastY} r="2.2" fill={color} />
+      {/* Ultimo punto con glow latente — pulso 2s sugiere "datos vivos en
+          tiempo real". El outer glow late en radio + opacity, el inner se
+          mantiene visible con leve fade. Pausable via prefers-reduced-motion:
+          si el usuario activó "reducir movimiento" en el OS, el navegador
+          ignora los <animate> SVG según spec, dejando la sparkline estática. */}
+      <circle cx={lastX} cy={lastY} r="3.2" fill={color} opacity="0.25">
+        <animate
+          attributeName="r"
+          values="3.2;6.8;3.2"
+          dur="2s"
+          repeatCount="indefinite"
+        />
+        <animate
+          attributeName="opacity"
+          values="0.28;0.05;0.28"
+          dur="2s"
+          repeatCount="indefinite"
+        />
+      </circle>
+      <circle cx={lastX} cy={lastY} r="2.2" fill={color}>
+        <animate
+          attributeName="opacity"
+          values="1;0.55;1"
+          dur="2s"
+          repeatCount="indefinite"
+        />
+      </circle>
 
       {/* Chip del valor actual (recuadro contrastado arriba-derecha) */}
       {showLastValue && (
