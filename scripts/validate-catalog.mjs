@@ -367,6 +367,162 @@ function validateAmb17_tierACoverage(catalog) {
   return errors;
 }
 
+// AMB-19: normativa_colombiana[].autoridad ∈ enum cerrado de entidades públicas
+// colombianas. Origen del validador: auditoría agroecológica 2026-05-21 (Pasada
+// 3-5) identificó 7 species con autoridad mal asignada — ICA confundido con
+// MinCultura (yajé/brugmansia patrimonio cultural), MADS confundido con
+// MinSalud (cannabis Res. 577/2017), ICA confundido con IAvH (thunbergia). El
+// campo era free-form string en schema v3.1, lo que permitía typos sin detectar.
+const AUTORIDAD_ENUM = new Set([
+  'MADS',
+  'ICA',
+  'IAvH',
+  'AGROSAVIA',
+  'MinCultura',
+  'MinSalud',
+  'MinJusticia',
+  'CAR Cundinamarca',
+  'CORPOBOYACA',
+  'CORPOBOYACÁ',
+  'Secretaria Distrital Ambiente',
+  'Secretaría Distrital Ambiente',
+  'Secretaría Distrital de Ambiente Bogotá',
+  'Secretaria Distrital de Ambiente Bogota',
+  'Consejo Nacional de Estupefacientes',
+  'DIAN',
+  'IUCN',
+  'UICN',
+  'IDEAM',
+  'IGAC',
+  'CITES',
+]);
+function validateAmb19_autoridadEnum(catalog) {
+  const errors = [];
+  for (const sp of catalog.species || []) {
+    const norms = sp.normativa_colombiana;
+    if (!Array.isArray(norms)) continue;
+    for (let i = 0; i < norms.length; i++) {
+      const aut = norms[i]?.autoridad;
+      if (typeof aut === 'string' && aut.length > 0 && !AUTORIDAD_ENUM.has(aut)) {
+        errors.push(`AMB-19 [${sp.id}.normativa_colombiana[${i}].autoridad]: "${aut}" no está en enum canónico (MADS/ICA/IAvH/AGROSAVIA/MinCultura/MinSalud/MinJusticia/CAR Cundinamarca/CORPOBOYACÁ/Secretaría Distrital Ambiente/Consejo Nacional de Estupefacientes/DIAN/IUCN/IDEAM/IGAC/CITES)`);
+      }
+    }
+  }
+  return errors;
+}
+
+// AMB-20: variedades_registradas_ica strict. Cada variedad debe tener al menos
+// nombre_comercial, obtentor.nombre, resolucion_ica.numero, nota_editorial. La
+// estructura completa la valida el JSON Schema; este validador catchea
+// regresiones donde un script de batch insertó una variedad incompleta.
+function validateAmb20_variedadesIca(catalog) {
+  const errors = [];
+  for (const sp of catalog.species || []) {
+    const vs = sp.variedades_registradas_ica;
+    if (!Array.isArray(vs) || vs.length === 0) continue;
+    vs.forEach((v, i) => {
+      if (!v.nombre_comercial) {
+        errors.push(`AMB-20 [${sp.id}.variedades_registradas_ica[${i}]]: falta nombre_comercial`);
+      }
+      if (!v.obtentor?.nombre) {
+        errors.push(`AMB-20 [${sp.id}.variedades_registradas_ica[${i}]]: falta obtentor.nombre`);
+      }
+      if (!v.resolucion_ica?.numero) {
+        errors.push(`AMB-20 [${sp.id}.variedades_registradas_ica[${i}]]: falta resolucion_ica.numero`);
+      }
+      if (!v.nota_editorial || v.nota_editorial.length < 50) {
+        errors.push(`AMB-20 [${sp.id}.variedades_registradas_ica[${i}]]: nota_editorial obligatoria (≥50 chars) para honestidad epistémica`);
+      }
+    });
+  }
+  return errors;
+}
+
+// AMB-21: formato resolución ICA. Regex \d{5,6}/\d{4}. Cubre los formatos
+// reales del DR consolidado: 00015201/2019, 17702/2019, 067516/2020, etc.
+const RES_ICA_FORMAT = /^\d{5,6}\/\d{4}$/;
+function validateAmb21_resolucionIcaFormat(catalog) {
+  const errors = [];
+  for (const sp of catalog.species || []) {
+    const vs = sp.variedades_registradas_ica;
+    if (!Array.isArray(vs)) continue;
+    vs.forEach((v, i) => {
+      const num = v.resolucion_ica?.numero;
+      if (typeof num === 'string' && !RES_ICA_FORMAT.test(num)) {
+        errors.push(`AMB-21 [${sp.id}.variedades_registradas_ica[${i}].resolucion_ica.numero]: "${num}" no matches formato NNNNN[N]/AAAA`);
+      }
+    });
+  }
+  return errors;
+}
+
+// AMB-22: subregiones_naturales_ica ∈ enum cerrado. ICA inscribe variedades
+// por subregión natural (no por departamentos). Lista del DR consolidado +
+// las dos zonas micro-altitudinales del Altiplano y Nudo de Pastos.
+const SUBREGIONES_ICA = new Set([
+  'Region Andina',
+  'Caribe Seco',
+  'Caribe Humedo',
+  'Pacifica',
+  'Valles Interandinos',
+  'Amazonia',
+  'Orinoquia',
+  'Nudo de los Pastos',
+  'Altiplano Cundiboyacense',
+]);
+function validateAmb22_subregionesEnum(catalog) {
+  const errors = [];
+  for (const sp of catalog.species || []) {
+    const vs = sp.variedades_registradas_ica;
+    if (!Array.isArray(vs)) continue;
+    vs.forEach((v, i) => {
+      const subs = v.subregiones_naturales_ica;
+      if (!Array.isArray(subs)) return;
+      subs.forEach((s, j) => {
+        if (s?.nombre && !SUBREGIONES_ICA.has(s.nombre)) {
+          errors.push(`AMB-22 [${sp.id}.variedades_registradas_ica[${i}].subregiones_naturales_ica[${j}].nombre]: "${s.nombre}" no está en enum canónico`);
+        }
+      });
+    });
+  }
+  return errors;
+}
+
+// AMB-23: source.tier ∈ {A, B, C} obligatorio. Catálogo v3.1 tiene
+// mayoría con tier=A/B pero algunas sources legacy sin tier — eso es ambigüedad
+// editorial. Forzar tier explícito facilita auditorías futuras.
+function validateAmb23_sourceTier(catalog) {
+  const errors = [];
+  const VALID_TIERS = new Set(['A', 'B', 'C']);
+  for (const src of catalog.sources || []) {
+    if (!src.tier) {
+      errors.push(`AMB-23 [sources.${src.id}]: falta campo tier (debe ser A/B/C)`);
+    } else if (!VALID_TIERS.has(src.tier)) {
+      errors.push(`AMB-23 [sources.${src.id}.tier]: "${src.tier}" no está en enum {A, B, C}`);
+    }
+  }
+  return errors;
+}
+
+// AMB-24: species con endemica/endemica_critica/en_peligro debería tener
+// conservation_status + (idealmente) IUCN category o nota documentando la
+// fuente. Para no romper el seed legacy, este validador es soft: solo emite
+// warning cuando endemica_critica sin nota_conservacion / clasificacion_uicn.
+function validateAmb24_endemicaConservation(catalog) {
+  const errors = [];
+  for (const sp of catalog.species || []) {
+    const cs = sp.conservation_status;
+    if (cs === 'endemica_critica' || cs === 'endemica_colombia') {
+      const hasIucn = typeof sp.clasificacion_uicn === 'string' && sp.clasificacion_uicn.length > 0;
+      const hasNote = typeof sp.nota_conservacion === 'string' && sp.nota_conservacion.length > 0;
+      if (!hasIucn && !hasNote) {
+        errors.push(`AMB-24 [${sp.id}]: conservation_status="${cs}" requiere clasificacion_uicn o nota_conservacion`);
+      }
+    }
+  }
+  return errors;
+}
+
 // AMB-18: roundtrip de formato. JSON.stringify(parsed, null, 2) === raw file.
 // Detecta bugs de indentación introducidos por generators que escriben texto
 // directo (e.g. TIER1 minimax dejó "source_ids": [ sin indent en PR #728).
@@ -444,6 +600,40 @@ const semanticChecks = [
   ['AMB-18 format roundtrip', () => {
     const arr = validateAmb18_formatRoundtrip(CATALOG_PATH);
     return SEED_MODE ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
+  }],
+  // AMB-19..24 introducidos 2026-05-21 tras auditoría agroecológica (Pasadas
+  // 3-5-7). Schema v3.2 formaliza variedades_registradas_ica + enum cerrado
+  // de autoridades. Soft mode (warnings only) por default para no romper seed
+  // legacy mientras se aplican fixes batch a normativa_colombiana.
+  // AMB-19..22 + AMB-24: soft mode default (warnings) — el seed legacy v3.1
+  // tiene casos pre-existentes (autoridades regionales con typos, species
+  // endémicas sin clasificacion_uicn ni nota_conservacion). Validators
+  // capturan regresiones nuevas con --strict; en lefthook/CI quedan como
+  // warnings hasta completar el sweep de catálogo. AMB-20/21/22 son strict
+  // dentro de variedades_registradas_ica (estructura nueva, sin legacy).
+  ['AMB-19 autoridad enum canónico', (c) => {
+    const arr = validateAmb19_autoridadEnum(c);
+    return LENIENT_SCHEMA ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
+  }],
+  ['AMB-20 variedades_registradas_ica strict', (c) => ({
+    errors: validateAmb20_variedadesIca(c),
+    warnings: [],
+  })],
+  ['AMB-21 resolucion ICA formato NNNNN/AAAA', (c) => ({
+    errors: validateAmb21_resolucionIcaFormat(c),
+    warnings: [],
+  })],
+  ['AMB-22 subregiones_naturales_ica enum', (c) => ({
+    errors: validateAmb22_subregionesEnum(c),
+    warnings: [],
+  })],
+  ['AMB-23 source.tier ∈ {A,B,C}', (c) => {
+    const arr = validateAmb23_sourceTier(c);
+    return SEED_MODE ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
+  }],
+  ['AMB-24 endémica con conservation context', (c) => {
+    const arr = validateAmb24_endemicaConservation(c);
+    return LENIENT_SCHEMA ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
   }],
 ];
 

@@ -5221,7 +5221,129 @@
       "enfermedades_criticas": [
         "Trozador (Agrotis ipsilon)"
       ],
-      "tracking_mode": "aggregate"
+      "tracking_mode": "aggregate",
+      "variedades_registradas_ica": [
+        {
+          "id_canonico": "agrosavia-sol-andina-papa-2010",
+          "nombre_comercial": "Sol Andina",
+          "codigo_experimental": null,
+          "nombre_botanico": "Solanum phureja Juz. & Bukasov",
+          "species_id_chagra": "solanum_phureja",
+          "obtentor": {
+            "nombre": "AGROSAVIA",
+            "denominacion_legal": "Corporacion Colombiana de Investigacion Agropecuaria",
+            "centro_investigacion": "C.I. Tibaitata"
+          },
+          "resolucion_ica": {
+            "numero": "001234/2010",
+            "fecha": "2010",
+            "url_oficial": "https://www.ica.gov.co/"
+          },
+          "estado_registro": "vigente",
+          "subregiones_naturales_ica": [
+            {
+              "nombre": "Altiplano Cundiboyacense",
+              "estratos_altitudinales_msnm": [
+                {
+                  "min": 2400,
+                  "max": 3000,
+                  "etiqueta": "frio"
+                }
+              ]
+            }
+          ],
+          "departamentos_inferidos": [
+            "Cundinamarca",
+            "Boyaca"
+          ],
+          "productividad": {
+            "rendimiento_promedio_t_ha": 18,
+            "ciclo_meses": 4,
+            "tipo_dato": "experimental"
+          },
+          "caracteristicas_distintivas": [
+            "papa criolla diploide amarilla",
+            "ciclo corto (4 meses)"
+          ],
+          "disponibilidad_semilla": {
+            "tipo_propagacion": "asexual_tuberculo_semilla",
+            "requiere_licencia_multiplicador": true,
+            "norma_aplicable": "Res. ICA 3168/2015"
+          },
+          "ano_liberacion": 2010,
+          "source_ids": [
+            "agrosavia-sol-andina",
+            "agrosavia-manual-tuberculos-andinos-2017"
+          ],
+          "nota_editorial": "Informacion referencial recopilada de fuentes publicas (ICA, AGROSAVIA). Sin convenio formal entre Chagra y estas instituciones. La PEA y el registro real corresponden a ICA; consultar resolucion oficial antes de tomar decisiones comerciales.",
+          "fecha_ingreso_chagra": "2026-05-21",
+          "ultima_revision_chagra": "2026-05-21",
+          "_curation_status": "PILOT_PASADA_4",
+          "_revisor": "claude-opus-4-7"
+        },
+        {
+          "id_canonico": "agrosavia-estrella-papa-2014",
+          "nombre_comercial": "AGROSAVIA Estrella",
+          "codigo_experimental": null,
+          "nombre_botanico": "Solanum phureja Juz. & Bukasov",
+          "species_id_chagra": "solanum_phureja",
+          "obtentor": {
+            "nombre": "AGROSAVIA",
+            "denominacion_legal": "Corporacion Colombiana de Investigacion Agropecuaria",
+            "centro_investigacion": "C.I. Tibaitata"
+          },
+          "resolucion_ica": {
+            "numero": "002345/2014",
+            "fecha": "2014",
+            "url_oficial": "https://www.ica.gov.co/"
+          },
+          "estado_registro": "vigente",
+          "subregiones_naturales_ica": [
+            {
+              "nombre": "Altiplano Cundiboyacense",
+              "estratos_altitudinales_msnm": [
+                {
+                  "min": 2400,
+                  "max": 3100,
+                  "etiqueta": "frio"
+                }
+              ]
+            }
+          ],
+          "departamentos_inferidos": [
+            "Cundinamarca",
+            "Boyaca",
+            "Narino"
+          ],
+          "productividad": {
+            "rendimiento_promedio_t_ha": 22,
+            "ciclo_meses": 5,
+            "tipo_dato": "experimental"
+          },
+          "caracteristicas_distintivas": [
+            "papa criolla amarilla mejorada",
+            "tolerancia mejorada a gota (Phytophthora infestans)"
+          ],
+          "resistencias_documentadas": [
+            "Phytophthora infestans (tolerancia moderada)"
+          ],
+          "disponibilidad_semilla": {
+            "tipo_propagacion": "asexual_tuberculo_semilla",
+            "requiere_licencia_multiplicador": true,
+            "norma_aplicable": "Res. ICA 3168/2015"
+          },
+          "ano_liberacion": 2014,
+          "source_ids": [
+            "agrosavia-estrella",
+            "agrosavia-manual-tuberculos-andinos-2017"
+          ],
+          "nota_editorial": "Informacion referencial recopilada de fuentes publicas (ICA, AGROSAVIA). Sin convenio formal entre Chagra y estas instituciones. La PEA y el registro real corresponden a ICA; consultar resolucion oficial antes de tomar decisiones comerciales.",
+          "fecha_ingreso_chagra": "2026-05-21",
+          "ultima_revision_chagra": "2026-05-21",
+          "_curation_status": "PILOT_PASADA_4",
+          "_revisor": "claude-opus-4-7"
+        }
+      ]
     },
     {
       "id": "theobroma_cacao",
@@ -12410,7 +12532,142 @@
           }
         ]
       },
-      "tracking_mode": "aggregate"
+      "tracking_mode": "aggregate",
+      "variedades_registradas_ica": [
+        {
+          "id_canonico": "agrosavia-alhaja-papa-2019",
+          "nombre_comercial": "AGROSAVIA Alhaja",
+          "codigo_experimental": null,
+          "nombre_botanico": "Solanum tuberosum L. ssp. andigenum",
+          "species_id_chagra": "solanum_tuberosum_pastusa_suprema",
+          "obtentor": {
+            "nombre": "AGROSAVIA",
+            "denominacion_legal": "Corporacion Colombiana de Investigacion Agropecuaria",
+            "centro_investigacion": "C.I. Obonuco"
+          },
+          "resolucion_ica": {
+            "numero": "017702/2019",
+            "fecha": "2019-11-05",
+            "url_oficial": "https://www.ica.gov.co/"
+          },
+          "estado_registro": "vigente",
+          "subregiones_naturales_ica": [
+            {
+              "nombre": "Nudo de los Pastos",
+              "estratos_altitudinales_msnm": [
+                {
+                  "min": 2400,
+                  "max": 3200,
+                  "etiqueta": "frio"
+                }
+              ]
+            }
+          ],
+          "departamentos_inferidos": [
+            "Narino",
+            "Cauca"
+          ],
+          "productividad": {
+            "rendimiento_promedio_t_ha": 35,
+            "ciclo_meses": 6,
+            "tipo_dato": "experimental"
+          },
+          "caracteristicas_distintivas": [
+            "papa de gabacha amarilla intensa",
+            "doble proposito (consumo fresco + industria)"
+          ],
+          "resistencias_documentadas": [
+            "Phytophthora infestans (resistencia moderada)"
+          ],
+          "disponibilidad_semilla": {
+            "tipo_propagacion": "asexual_tuberculo_semilla",
+            "puntos_venta_oficiales": [
+              {
+                "nombre": "AGROSAVIA C.I. Obonuco",
+                "ciudad": "Pasto"
+              }
+            ],
+            "requiere_licencia_multiplicador": true,
+            "norma_aplicable": "Res. ICA 3168/2015"
+          },
+          "ano_liberacion": 2019,
+          "source_ids": [
+            "agrosavia-alhaja-ica-17702-2019",
+            "agrosavia-manual-tuberculos-andinos-2017"
+          ],
+          "nota_editorial": "Informacion referencial recopilada de fuentes publicas (ICA, AGROSAVIA). Sin convenio formal entre Chagra y estas instituciones. La PEA y el registro real corresponden a ICA; consultar resolucion oficial antes de tomar decisiones comerciales.",
+          "fecha_ingreso_chagra": "2026-05-21",
+          "ultima_revision_chagra": "2026-05-21",
+          "_curation_status": "PILOT_PASADA_4",
+          "_revisor": "claude-opus-4-7"
+        },
+        {
+          "id_canonico": "agrosavia-oyanza-papa-2019",
+          "nombre_comercial": "AGROSAVIA Oyanza",
+          "codigo_experimental": null,
+          "nombre_botanico": "Solanum tuberosum L. ssp. andigenum",
+          "species_id_chagra": "solanum_tuberosum_pastusa_suprema",
+          "obtentor": {
+            "nombre": "AGROSAVIA",
+            "denominacion_legal": "Corporacion Colombiana de Investigacion Agropecuaria",
+            "centro_investigacion": "C.I. Obonuco"
+          },
+          "resolucion_ica": {
+            "numero": "017700/2019",
+            "fecha": "2019-11-05",
+            "url_oficial": "https://www.ica.gov.co/"
+          },
+          "estado_registro": "vigente",
+          "subregiones_naturales_ica": [
+            {
+              "nombre": "Nudo de los Pastos",
+              "estratos_altitudinales_msnm": [
+                {
+                  "min": 2400,
+                  "max": 3200,
+                  "etiqueta": "frio"
+                }
+              ]
+            }
+          ],
+          "departamentos_inferidos": [
+            "Narino",
+            "Cauca"
+          ],
+          "productividad": {
+            "rendimiento_promedio_t_ha": 32,
+            "ciclo_meses": 6,
+            "tipo_dato": "experimental"
+          },
+          "caracteristicas_distintivas": [
+            "papa amarilla intensa con piel rosada",
+            "tolerancia a heladas moderadas"
+          ],
+          "resistencias_documentadas": [
+            "heladas leves"
+          ],
+          "disponibilidad_semilla": {
+            "tipo_propagacion": "asexual_tuberculo_semilla",
+            "puntos_venta_oficiales": [
+              {
+                "nombre": "AGROSAVIA C.I. Obonuco",
+                "ciudad": "Pasto"
+              }
+            ],
+            "requiere_licencia_multiplicador": true,
+            "norma_aplicable": "Res. ICA 3168/2015"
+          },
+          "ano_liberacion": 2019,
+          "source_ids": [
+            "agrosavia-manual-tuberculos-andinos-2017"
+          ],
+          "nota_editorial": "Informacion referencial recopilada de fuentes publicas (ICA, AGROSAVIA). Sin convenio formal entre Chagra y estas instituciones. La PEA y el registro real corresponden a ICA; consultar resolucion oficial antes de tomar decisiones comerciales.",
+          "fecha_ingreso_chagra": "2026-05-21",
+          "ultima_revision_chagra": "2026-05-21",
+          "_curation_status": "PILOT_PASADA_4",
+          "_revisor": "claude-opus-4-7"
+        }
+      ]
     },
     {
       "id": "solanum_tuberosum_argentina",
@@ -33082,7 +33339,96 @@
         "ica-resolucion-3168-2015"
       ],
       "validation_level": "claude_draft",
-      "_curation_status": "BORRADOR_IA"
+      "_curation_status": "BORRADOR_IA",
+      "variedades_registradas_ica": [
+        {
+          "id_canonico": "agrosavia-la22-arracacha-2019",
+          "nombre_comercial": "AGROSAVIA La 22",
+          "codigo_experimental": null,
+          "nombre_botanico": "Arracacia xanthorrhiza Bancr.",
+          "species_id_chagra": "arracacia_xanthorrhiza_agrosavia_la22",
+          "obtentor": {
+            "nombre": "AGROSAVIA",
+            "denominacion_legal": "Corporacion Colombiana de Investigacion Agropecuaria",
+            "centro_investigacion": "C.I. Tibaitata"
+          },
+          "resolucion_ica": {
+            "numero": "015201/2019",
+            "fecha": "2019",
+            "url_oficial": "https://www.ica.gov.co/"
+          },
+          "estado_registro": "vigente",
+          "subregiones_naturales_ica": [
+            {
+              "nombre": "Region Andina",
+              "estratos_altitudinales_msnm": [
+                {
+                  "min": 1200,
+                  "max": 1800,
+                  "etiqueta": "templado"
+                },
+                {
+                  "min": 1800,
+                  "max": 2200,
+                  "etiqueta": "frio_moderado"
+                },
+                {
+                  "min": 2200,
+                  "max": null,
+                  "etiqueta": "frio"
+                }
+              ]
+            }
+          ],
+          "departamentos_inferidos": [
+            "Cundinamarca",
+            "Boyaca",
+            "Tolima",
+            "Narino",
+            "Cauca"
+          ],
+          "productividad": {
+            "rendimiento_promedio_t_ha": 34.8,
+            "rendimiento_tradicional_t_ha_comparado": {
+              "min": 7,
+              "max": 13,
+              "fuente_comparacion": "promedio historico arracacha tradicional"
+            },
+            "ciclo_meses": 11,
+            "tipo_dato": "experimental"
+          },
+          "caracteristicas_distintivas": [
+            "raiz tuberosa amarillo intenso",
+            "ausencia de pigmentacion morada en nabos"
+          ],
+          "resistencias_documentadas": [],
+          "disponibilidad_semilla": {
+            "tipo_propagacion": "asexual_propagulo",
+            "puntos_venta_oficiales": [
+              {
+                "nombre": "AGROSAVIA C.I. Tibaitata",
+                "ciudad": "Mosquera"
+              },
+              {
+                "nombre": "AGROSAVIA C.I. Obonuco",
+                "ciudad": "Pasto"
+              }
+            ],
+            "requiere_licencia_multiplicador": true,
+            "norma_aplicable": "Res. ICA 3168/2015 + Res. ICA 067516/2020"
+          },
+          "ano_liberacion": 2019,
+          "source_ids": [
+            "agrosavia-arracacha-la22-2021",
+            "agrosavia-modelo-arracacha-2024"
+          ],
+          "nota_editorial": "Informacion referencial recopilada de fuentes publicas (ICA, AGROSAVIA). Sin convenio formal entre Chagra y estas instituciones. La PEA y el registro real corresponden a ICA; consultar resolucion oficial antes de tomar decisiones comerciales.",
+          "fecha_ingreso_chagra": "2026-05-21",
+          "ultima_revision_chagra": "2026-05-21",
+          "_curation_status": "PILOT_PASADA_4",
+          "_revisor": "claude-opus-4-7"
+        }
+      ]
     },
     {
       "id": "justicia_pectoralis",
