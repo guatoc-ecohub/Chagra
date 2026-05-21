@@ -2,7 +2,9 @@
 
 > Reglas para cualquier agente (humano o AI) que toque código de persistencia, sync, o UI que consuma estado de Assets/Logs.
 >
-> El modelo de datos completo (decisiones, alternativas evaluadas, plan de migración por fases) está documentado en un ADR técnico mantenido en repo privado interno. Las reglas inviolables resumidas a continuación son lectura obligatoria antes del primer edit.
+> Las **3 reglas inviolables del modelo de datos** abajo son la fuente normativa para todo contributor externo. No requieren acceso a ningún repo privado.
+>
+> Existe un ADR técnico mantenido en un repositorio privado interno con la justificación extendida (alternativas evaluadas, plan de migración por fases). Su lectura es **opcional y reservada a mantenedores** con acceso a ese repo; no es requisito para contribuir desde el público.
 
 ## Modelo de datos: las 3 reglas inviolables
 
@@ -43,12 +45,20 @@ Una operación masiva = UN Log con `relationships.asset = [id1, id2, ..., idN]`.
 
 ## Antes de tocar código de persistencia o sync
 
-Lectura obligatoria:
+Lectura obligatoria (público, basta para contribuir):
 
-- ADR técnico del modelo de datos Asset+Log (privado) — decisiones, plan de migración por fases.
-- ADR del boundary OSS / extensión comercial (privado).
-- ADR del schema del catálogo de especies (privado).
-- `CONTRIBUTING.md` (este repo) — anti-leak rules 1-7, hooks lefthook, merge gates.
+- Las 3 reglas inviolables del modelo de datos (arriba).
+- `CONTRIBUTING.md` (este repo) — anti-leak rules 1-7, hooks lefthook, merge gates, CLA.
+- `CLA.md` — firma requerida antes del primer PR.
+
+Lectura **opcional para mantenedores** con acceso al repositorio privado de estrategia (`guatoc-ecohub/Chagra-strategy`):
+
+- ADR técnico del modelo de datos Asset+Log — decisiones extendidas, plan de migración por fases.
+- ADR del boundary OSS / extensión comercial — razonamiento de la asimetría de imports (ver `src/core/moduleRegistry.js`).
+- ADR del schema del catálogo de especies — criterio de aceptación de fuentes y tier.
+- `ops/INFRA_FACTS.md` — fuente de verdad sobre el setup técnico real (hosts, services, versions, ports) **para operadores con acceso al repo privado**. No es necesario para contribuir al PWA público.
+
+Si no tenés acceso al repo privado y necesitás clarificación sobre alguna decisión histórica, abrí un Issue con la etiqueta `question-arch` y un mantenedor extraerá el contexto público relevante.
 
 ## Archivos clave del modelo
 
@@ -137,7 +147,13 @@ Reportes "completed" sin estos outputs son inválidos. El operador debe rechazar
 
 ## Boundary con extensión comercial
 
-Este repo es público AGPL-3.0. Existe una extensión comercial privada que **NO** se importa estáticamente desde aquí. La integración entre ambos planos ocurre en runtime mediante `src/core/moduleRegistry.js`.
+Este repo es público AGPL-3.0. Existe una capa comercial privada en un repositorio hermano (acceso restringido a mantenedores) que **NO** se importa estáticamente desde aquí. La integración entre ambos planos ocurre en runtime mediante `src/core/moduleRegistry.js` + `src/core/loadProModules.js`.
+
+Para contributors del público:
+
+- El bundle se construye con o sin la capa comercial; sin ella, la UI degrada elegantemente.
+- Los hooks de `lefthook.yml` bloquean cualquier import estático que cruce el límite.
+- No hace falta acceso al repo privado para contribuir a Chagra; el contrato de extensión está completamente expresado en `src/core/moduleRegistry.js`.
 
 ## Anti-leak
 
