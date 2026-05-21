@@ -1,7 +1,7 @@
 /**
  * ragWithPhotos — combinación no destructiva de RAG de texto + fotos del operador.
  *
- * Motivación (L1.6, pre-Diana 2026-05-19):
+ * Motivación (L1.6, pre-demo-institucional 2026-05-19):
  *   El RAG actual (`ragRetriever.retrieve`) devuelve passages de texto del corpus
  *   `public/cycle-content/*.json`. Pero el operador ya capturó fotos reales de su
  *   finca atadas a `speciesSlug` en IndexedDB store `media_cache` (ver

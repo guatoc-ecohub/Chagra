@@ -243,13 +243,13 @@ describe('useCaseStudyStore', () => {
       });
       useCaseStudyStore.getState().setValidation(id, {
         status: 'certified',
-        validator_name: 'Ing. Diana Pérez',
+        validator_name: 'Ing. Ana Pérez',
         validator_credentials: 'Ing. Agrónoma UNAL',
         notes: 'Diagnóstico correcto',
       });
       const c = useCaseStudyStore.getState().getById(id);
       expect(c.validation.status).toBe('certified');
-      expect(c.validation.validator_name).toBe('Ing. Diana Pérez');
+      expect(c.validation.validator_name).toBe('Ing. Ana Pérez');
       expect(c.validation.validated_at).toBeTruthy();
       // Status inválido rechaza
       expect(() =>
@@ -290,10 +290,10 @@ describe('useCaseStudyStore', () => {
 
       // Validador certifica
       useCaseStudyStore.getState().validateRecommendation(id, recId, {
-        validator_name: 'Ing. Diana Pérez',
+        validator_name: 'Ing. Ana Pérez',
       });
       const c2 = useCaseStudyStore.getState().getById(id);
-      expect(c2.recommendations[0].validated_by).toBe('Ing. Diana Pérez');
+      expect(c2.recommendations[0].validated_by).toBe('Ing. Ana Pérez');
       expect(c2.recommendations[0].validated_at).toBeTruthy();
 
       // Rechazo si falta validator_name
@@ -397,12 +397,12 @@ describe('useCaseStudyStore', () => {
         subject: { species_ids: ['fragaria_ananassa_monterrey'], count_total: 100, count_affected: 3 },
         state: 'monitoring',
         visibility: 'public',
-        validation: { status: 'certified', validator_name: 'Ing. Diana Pérez', validator_credentials: 'UNAL', validated_at: '2026-05-17T14:00:00Z', notes: 'ok' },
+        validation: { status: 'certified', validator_name: 'Ing. Ana Pérez', validator_credentials: 'UNAL', validated_at: '2026-05-17T14:00:00Z', notes: 'ok' },
         timeline: [
           { id: 'tl-1', event_type: 'observation', date: '2026-05-15T08:00:00Z', description: 'Manchas circulares', actor: 'Operador' },
         ],
         recommendations: [
-          { id: 'rec-1', text: 'Caldo bordelés', suggested_by: 'RAG', validation_required: true, validated_by: 'Ing. Diana Pérez', validated_at: '2026-05-17T14:00:00Z' },
+          { id: 'rec-1', text: 'Caldo bordelés', suggested_by: 'RAG', validation_required: true, validated_by: 'Ing. Ana Pérez', validated_at: '2026-05-17T14:00:00Z' },
         ],
         created_at: '2026-05-15T08:00:00Z',
         updated_at: '2026-05-17T14:00:00Z',
@@ -416,7 +416,7 @@ describe('useCaseStudyStore', () => {
       // Defensivos: timeline y recommendations cargan.
       const got = useCaseStudyStore.getState().getById(demo.id);
       expect(got.timeline).toHaveLength(1);
-      expect(got.recommendations[0].validated_by).toBe('Ing. Diana Pérez');
+      expect(got.recommendations[0].validated_by).toBe('Ing. Ana Pérez');
       expect(got.validation.status).toBe('certified');
     });
 

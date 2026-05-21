@@ -299,7 +299,7 @@ export default function TelemetryAlerts() {
       // disparaba AIStreamPanel → operador no veía la inferencia IA en home.
       // Fallback: cuando HA está caído o sensores en unavailable, usar mock
       // determinista de iotMockService para mantener flujo IA visible
-      // (especialmente para demo Diana 2026-05-19).
+      // (especialmente para demo institucional 2026-05-19).
       const haOpts = { method: 'GET', headers: { 'Content-Type': 'application/json' }, signal: parentSignal };
       let invernaderoHumData;
       let invernaderoTempData;

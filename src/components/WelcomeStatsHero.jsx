@@ -57,7 +57,7 @@ const CATALOG_FALLBACK = {
 
 // Federación pre-login: cuando no hay store hidratado, usar números globales
 // agregados. Hoy hay 1 finca activa (Guatoc) pero proyectamos crecimiento
-// honesto: ~100 plantas registradas Guatoc + planificadas demo Diana.
+// honesto: ~100 plantas registradas Guatoc + planificadas demo institucional.
 const GLOBAL_FEDERATION_FALLBACK = {
   fincasActivas: 1,
   plantasRegistradas: 100,

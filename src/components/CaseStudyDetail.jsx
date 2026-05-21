@@ -287,7 +287,7 @@ const ValidatorForm = ({ onSubmit, onCancel, target = 'recomendación' }) => {
       </p>
       <input
         type="text"
-        placeholder="Nombre del validador (ej. Ing. Diana Pérez)"
+        placeholder="Nombre del validador (ej. Ing. Ana Pérez)"
         value={name}
         onChange={(e) => setName(e.target.value)}
         required

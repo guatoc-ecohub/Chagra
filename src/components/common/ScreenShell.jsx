@@ -11,7 +11,7 @@ import { ArrowLeft, Home } from 'lucide-react';
  * Props:
  *   - title:    string (obligatorio)
  *   - onBack:   handler del botón de regreso (un paso atrás)
- *   - onHome:   handler opcional para "ir al inicio" (Lili pre-demo Diana
+ *   - onHome:   handler opcional para "ir al inicio" (UX feedback pre-demo-institucional
  *               2026-05-19): "El devolverse y retornar al inicio de la app
  *               es desgastante para continuar en cada sección. La
  *               navegación debe ser más amigable y permitir volver a la

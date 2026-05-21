@@ -49,7 +49,7 @@ const fetchWithTimeout = async (resource, options = {}) => {
  * Este mapping es transición: el cliente sigue usando los nombres viejos
  * internamente (log--task, log--planting) por compatibilidad con código
  * existente; sólo la URL outgoing se traduce. Roadmap: migrar el cliente
- * a los nombres canónicos FarmOS 4.x en sprint post-Diana.
+ * a los nombres canónicos FarmOS 4.x en sprint post-demo-institucional.
  */
 const FARMOS_BUNDLE_RENAMES = [
   { legacy: '/api/log/task',     modern: '/api/log/activity' },

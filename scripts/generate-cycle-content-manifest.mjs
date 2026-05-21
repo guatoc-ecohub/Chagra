@@ -11,7 +11,7 @@
  * a /cycle-content/{slug}.json sin verificación previa. Solo 3-N
  * archivos existen físicamente (fresa, lechuga, tomate_chonto), las
  * demás devolvían 404 mitigado con content-type guard (PR #277) pero
- * con latencia importante en mobile rural. Audit pre-Diana hallazgo #8.
+ * con latencia importante en mobile rural. Audit pre-demo-institucional hallazgo #8.
  *
  * Script idempotente. Corre antes de `vite build` vía npm prebuild.
  */
