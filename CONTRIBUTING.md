@@ -1,5 +1,19 @@
 # Contribuir a Chagra
 
+## Antes de contribuir: CLA requerido
+
+Toda contribución de código, documentación, traducciones o entradas de catálogo a este repositorio requiere la firma previa del **Contributor License Agreement (CLA)** ([`CLA.md`](./CLA.md)), basado en el Apache ICLA v2.0.
+
+El workflow `.github/workflows/cla.yml` verifica automáticamente la firma en cada Pull Request abierto por un autor externo. Si todavía no firmaste, el bot dejará un comentario con las instrucciones (un comentario de una línea en el PR basta). Los bots conocidos (`dependabot`, `renovate`, `github-actions`) están en la `allowlist` y no requieren firma.
+
+Si tu PR no avanza por estar pendiente de firma del CLA, lee primero [`CLA.md`](./CLA.md) y luego comentá en el PR:
+
+> `I have read the CLA Document and I hereby sign the CLA`
+
+Una vez firmado, el CLA aplica a todas tus contribuciones futuras bajo el mismo login de GitHub — no necesitás refirmar PR por PR.
+
+## Reglas anti-leak (innegociables)
+
 Chagra es un repositorio público. Las siguientes reglas son **absolutas e innegociables**:
 
 1. **Prohibido hardcodear URLs** de infraestructura privada (hostnames, puertos internos, dominios operativos).

@@ -3,7 +3,15 @@
  *
  * Toma una transcripción en español y devuelve un array estricto de
  * { crop, quantity, location }. Aplica AbortController (timeout 20s) y
- * system prompt inmutable definido en ARCHITECTURE_VOICE_0.5.0.md §4.
+ * resuelve el SYSTEM_PROMPT dinámicamente.
+ *
+ * SYSTEM_PROMPT en este archivo es un STUB OSS mínimo (3 few-shots
+ * genéricos, estructura del schema, reglas básicas). Las normalizaciones
+ * avanzadas de Whisper (es-CO) y los 13 few-shots colombianos curados
+ * viven en la capa privada `chagra-pro` y se resuelven en runtime vía
+ * `moduleRegistry.byCapability('voice-entity-extractor-prompt')`. Si el
+ * módulo Pro está disponible, su prompt reemplaza al stub; si no, el
+ * stub OSS funciona estandalone.
  *
  * Desde v0.6.0 consume la respuesta en streaming NDJSON a través de
  * `streamOllama` y acepta `onToken` para que la UI muestre el JSON
@@ -15,6 +23,7 @@
  */
 
 import { streamOllama } from './ollamaStream';
+import { registry } from '../core/moduleRegistry';
 
 const OLLAMA_CHAT_URL = '/api/ollama/api/chat';
 const MODEL = 'gemma3:4b';
@@ -22,7 +31,17 @@ const MODEL = 'gemma3:4b';
 // Nginx permite hasta 120s en /api/ollama/; 60s cliente es el punto medio seguro.
 const TIMEOUT_MS = 60000;
 
-const SYSTEM_PROMPT = `Eres un extractor de entidades agricolas. Recibes una transcripcion en espanol de un operador registrando siembras. Devuelves EXCLUSIVAMENTE un array JSON valido, sin texto adicional, sin markdown.
+/**
+ * Stub OSS del SYSTEM_PROMPT.
+ *
+ * Estructura idéntica al prompt full (schema + reglas básicas + 3
+ * few-shots genéricos) para que el contrato de entrada/salida del
+ * extractor sea estable independientemente de si la capa Pro está
+ * presente. NO contiene las normalizaciones Whisper específicas ni los
+ * few-shots colombianos curados — esas viven en la capa privada Pro
+ * (ventaja competitiva, derivada de bench sobre audio del operador).
+ */
+const SYSTEM_PROMPT_STUB_OSS = `Eres un extractor de entidades agricolas. Recibes una transcripcion en espanol de un operador registrando siembras. Devuelves EXCLUSIVAMENTE un array JSON valido, sin texto adicional, sin markdown.
 
 Schema:
 [
@@ -34,85 +53,57 @@ Schema:
 ]
 
 Reglas:
-- Convierte numerales en palabra a entero: "dos"=2, "tres"=3, "diez"=10, "veinte"=20, "cien"=100, "doscientos"=200, "mil"=1000.
+- Convierte numerales en palabra a entero: "dos"=2, "tres"=3, "diez"=10, "veinte"=20, "cien"=100.
 - Si la cantidad no se menciona, omite la entrada completa.
 - Si el lugar no se menciona, usa "" como location (NO omitas la entrada por eso).
-- VERBOS: el operador puede decir "sembré", "planté", "puse", "trasplante", "metí", "agregué" — todos se interpretan como registro de planta nueva. El verbo en sí no es la entidad; lo que importa es {cultivo, cantidad, lugar}.
-- MULTI-ESPECIE en una grabacion: si el operador menciona varios cultivos separados por "y", "luego", "tambien", "ademas", devuelve UN OBJETO POR CADA CULTIVO. Cada uno hereda la location si solo se menciona al final aplicable a todos.
-- Nombres de frutas y cultivos son LITERALES. Si el operador dice "banano", el crop debe ser "banano". Si dice "manzana", el crop debe ser "manzana". NO cambiar, traducir ni sustituir nunca.
-- Cultivos comunes colombianos: banano, platano, cafe, yuca, papaya, mango, limon, mandarina, naranja, aguacate, tomate, lechuga, cilantro, yerbabuena, albahaca, cebolla, ajo, zanahoria, remolacha, espinaca, acelga, rabano, pepino, ahuyama, calabacin, frijol, maiz, papa, quinua, cubio, ulluco, oca, arracacha, mora, fresa, uchuva, lulo, tomate de arbol, curuba, granadilla, maracuya, guayaba, guanabana, anon, chirimoya.
-- NORMALIZACIÓN de errores comunes de transcripción (Whisper a veces parte palabras o las distorsiona). Mapea SIEMPRE a la forma canónica:
-    "al vacas" → "albahaca"     (Whisper parte alba+haca en "al"+"vacas")
-    "al baca"  → "albahaca"
-    "alvahaca" → "albahaca"
-    "abahaca"  → "albahaca"
-    "habahaca" → "albahaca"
-    "agua acate" → "aguacate"   (no "agua acate" como dos palabras)
-    "yer ba buena" → "yerbabuena"
-    "ye va buena" → "yerbabuena"
-    "ce bolla"  → "cebolla"
-    "papa ya"   → "papaya"
-    "uchu va"   → "uchuva"
-    "ma raca" / "maracuya" tienen la misma raíz; usa "maracuya".
-  Cuando hay duda sobre dos palabras pegadas o separadas, prefiere la
-  forma de UN cultivo conocido si suena similar.
+- VERBOS: "sembré", "planté", "puse" se interpretan como registro de planta nueva.
+- MULTI-ESPECIE: si el operador menciona varios cultivos separados por "y" o "luego", devuelve UN OBJETO POR CADA CULTIVO. Hereda la location si aplica a todos.
+- Nombres de cultivos son LITERALES (no traducir ni sustituir).
 - Nunca inventes datos que no estan en la transcripcion.
 - Si no puedes extraer ninguna entidad valida, devuelve [].
 
-Ejemplos de cultivos colombianos:
+Ejemplos:
 Input: "Sembre cinco tomates en el invernadero"
 Output: [{"crop":"tomate","quantity":5,"location":"invernadero"}]
 
-Input: "Sembre tres arandanos"
-Output: [{"crop":"arandano","quantity":3,"location":""}]
+Input: "Sembre tres bananos"
+Output: [{"crop":"banano","quantity":3,"location":""}]
 
-Input: "Sembre cien cafes en la parcela tres"
-Output: [{"crop":"cafe","quantity":100,"location":"parcela tres"}]
+Input: "Plante dos guayabos en la entrada y cinco mangos"
+Output: [{"crop":"guayabo","quantity":2,"location":"entrada"},{"crop":"mango","quantity":5,"location":"entrada"}]`;
 
-Input: "Sembre cinco cafes y treinta lechugas en el balcon"
-Output: [{"crop":"cafe","quantity":5,"location":"balcon"},{"crop":"lechuga","quantity":30,"location":"balcon"}]
+/**
+ * Resuelve el SYSTEM_PROMPT activo: Pro full si está registrado, stub OSS
+ * en caso contrario. Cachea el resultado por proceso para evitar repetir
+ * dynamic imports en cada extracción.
+ *
+ * @returns {Promise<string>}
+ */
+let _cachedPrompt = null;
+export async function resolveSystemPrompt() {
+  if (_cachedPrompt !== null) return _cachedPrompt;
+  const mods = registry.byCapability('voice-entity-extractor-prompt');
+  if (mods.length > 0) {
+    try {
+      const mounted = await mods[0].mount();
+      const api = mounted?.default;
+      if (api && typeof api.systemPrompt === 'string' && api.systemPrompt.length > 0) {
+        _cachedPrompt = api.systemPrompt;
+        return _cachedPrompt;
+      }
+    } catch (_e) {
+      // Fallback silencioso al stub OSS si el módulo Pro falla al cargar.
+    }
+  }
+  _cachedPrompt = SYSTEM_PROMPT_STUB_OSS;
+  return _cachedPrompt;
+}
 
-Input: "Sembre veinte fresas en la cama uno y luego diez tomates en la cama dos"
-Output: [{"crop":"fresa","quantity":20,"location":"cama uno"},{"crop":"tomate","quantity":10,"location":"cama dos"}]
-
-Input: "Plante dos guayabos en la entrada"
-Output: [{"crop":"guayabo","quantity":2,"location":"entrada"}]
-
-Input: "Puse cinco aguacates en el patio"
-Output: [{"crop":"aguacate","quantity":5,"location":"patio"}]
-
-Input: "Sembre quince bananos"
-Output: [{"crop":"banano","quantity":15,"location":""}]
-
-Input: "Plante tres platanos en la zona norte"
-Output: [{"crop":"platano","quantity":3,"location":"zona norte"}]
-
-Input: "Sembre diez mangos y veinte papayas"
-Output: [{"crop":"mango","quantity":10,"location":""},{"crop":"papaya","quantity":20,"location":""}]
-
-Input: "Puse cuatro limones en el huerto"
-Output: [{"crop":"limon","quantity":4,"location":"huerto"}]
-
-Input: "Sembre dos yucas en el solar"
-Output: [{"crop":"yuca","quantity":2,"location":"solar"}]
-
-Input: "Sembre cuatro al vacas, siete pepinos y ocho naranjas en guatoc"
-Output: [{"crop":"albahaca","quantity":4,"location":"guatoc"},{"crop":"pepino","quantity":7,"location":"guatoc"},{"crop":"naranja","quantity":8,"location":"guatoc"}]
-
-Input: "Plante diez abahaca"
-Output: [{"crop":"albahaca","quantity":10,"location":""}]
-
-Input: "Sembre tres agua acates en el patio"
-Output: [{"crop":"aguacate","quantity":3,"location":"patio"}]
-
-Input: "Sembre seis yer ba buena y cinco ce bolla"
-Output: [{"crop":"yerbabuena","quantity":6,"location":""},{"crop":"cebolla","quantity":5,"location":""}]
-
-Input: "Plante doce ulluco y diez cubio en la cama tres"
-Output: [{"crop":"ulluco","quantity":12,"location":"cama tres"},{"crop":"cubio","quantity":10,"location":"cama tres"}]
-
-Input: "Hoy tive un buen dia"
-Output: []`;
+// Permite invalidar el cache en tests unitarios que registren módulos Pro
+// mock después del primer uso.
+export function _resetSystemPromptCache() {
+  _cachedPrompt = null;
+}
 
 // location puede venir vacia cuando el operador no menciona el lugar;
 // la UI resuelve al DEFAULT_LOCATION_ID en ese caso (ver VoiceConfirmation).
@@ -156,6 +147,7 @@ export async function extractEntities(text, { onToken } = {}) {
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
   try {
+    const systemPrompt = await resolveSystemPrompt();
     // Bench 2026-05-15 en gemma3:4b: con `format: 'json'` Ollama fuerza
     // un objeto JSON top-level único, lo que colapsa la salida a UN solo
     // `{crop, quantity, location}` incluso cuando el operador menciona
@@ -167,7 +159,7 @@ export async function extractEntities(text, { onToken } = {}) {
       {
         model: MODEL,
         messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'system', content: systemPrompt },
           { role: 'user', content: text },
         ],
         options: { temperature: 0.1, num_predict: 2048 },
@@ -208,4 +200,8 @@ export async function extractEntities(text, { onToken } = {}) {
   }
 }
 
-export { SYSTEM_PROMPT, MODEL };
+// Exporto el stub OSS como SYSTEM_PROMPT para preservar la API previa
+// (consumidores legacy que imported { SYSTEM_PROMPT }). Sigue siendo el
+// stub público — no el full Pro. Para usar el full, llamar
+// `resolveSystemPrompt()` que respeta el moduleRegistry.
+export { SYSTEM_PROMPT_STUB_OSS as SYSTEM_PROMPT, MODEL };
