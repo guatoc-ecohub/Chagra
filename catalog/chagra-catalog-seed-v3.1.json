@@ -33370,7 +33370,7 @@
         "carbón vegetal triturado",
         "afrecho",
         "melaza",
-        "levadura",
+        "levadura activa de panadería o cervecera (Saccharomyces cerevisiae)",
         "agua"
       ],
       "proceso_resumen": "Fermentación aeróbica 15-21 días con volteo diario hasta bajar temperatura a <40°C. Humedad 'prueba de puño': al apretar un puñado, el agua no gotea pero la mano queda húmeda.",
@@ -33389,7 +33389,7 @@
         "mejorador_estructura_suelo",
         "aporte_materia_organica"
       ],
-      "valor_pedagogico": "Tecnología japonesa (boka-shi, 'materia orgánica fermentada') adaptada a Latinoamérica por Jairo Restrepo. Fermentación aeróbica 45-55°C selecciona microbiota termófila (Bacillus, actinomicetos, levaduras) y estabiliza N orgánico no lixiviable, a diferencia de la urea sintética. La cascarilla aporta Si bioactivo; el carbón vegetal actúa como biochar (CEC + hábitat microbiano). Advertencias: >5 kg/m² en hortalizas de hoja → exceso N atrae áfidos y mildeo; humedad >65% vira a pútrida y pierde N. AGROSAVIA 2015 documenta respuestas equivalentes a 50% NPK sintético en papa criolla y maíz andino.",
+      "valor_pedagogico": "Tecnología japonesa (bokashi 暈し, del verbo bokasu — 'mezclar/atenuar'; refiere al proceso de dilución/mezcla del compost en sustrato. La fermentación en japonés agrícola se llama hakkō 発酵 — distinción técnica importante) popularizada en la línea de agricultura natural Fukuoka-Higa y adaptada a Latinoamérica por Jairo Restrepo. Fermentación aeróbica 45-55°C selecciona microbiota termófila (Bacillus, actinomicetos, levaduras) y estabiliza N orgánico no lixiviable, a diferencia de la urea sintética. La cascarilla aporta Si bioactivo; el carbón vegetal actúa como biochar (CEC + hábitat microbiano). Advertencias: >5 kg/m² en hortalizas de hoja → exceso N atrae áfidos y mildeo; humedad >65% vira a pútrida y pierde N. AGROSAVIA 2015 documenta respuestas equivalentes a 50% NPK sintético en papa criolla y maíz andino.",
       "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17"
     },
     {
@@ -33424,7 +33424,7 @@
         "inoculacion_microbiana_filosfera",
         "resistencia_induccion_SAR"
       ],
-      "valor_pedagogico": "Biofertilizante anaeróbico andino, popularizado por Restrepo y Pinheiro Machado. La fermentación selecciona bacterias fijadoras de N (Azotobacter, Clostridium) y solubilizadoras de P, generando fitohormonas (auxinas, citoquininas) y ácidos quelantes. La leche aporta caseínas fungistáticas y Lactobacillus que inducen ISR (Resistencia Sistémica Adquirida). Vs. urea 46-0-0 entrega N orgánico sin quemar follaje. Advertencias: olor amoniacal = mal sellado (descartar); filtrar antes de boquilla; >30% en lechuga/fresa necrosa. AGROSAVIA 2015: +15-25% en hortalizas andinas.",
+      "valor_pedagogico": "Biofertilizante anaeróbico andino, popularizado por Restrepo y Pinheiro Machado. La fermentación selecciona bacterias fijadoras de N (Azotobacter, Clostridium) y solubilizadoras de P, generando fitohormonas (auxinas, citoquininas) y ácidos quelantes. La leche aporta caseínas fungistáticas y Lactobacillus que inducen SAR (Resistencia Sistémica Adquirida). Vs. urea 46-0-0 entrega N orgánico sin quemar follaje. Advertencias: olor amoniacal = mal sellado (descartar); filtrar antes de boquilla; >30% en lechuga/fresa necrosa. AGROSAVIA 2015: +15-25% en hortalizas andinas.",
       "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17"
     },
     {
@@ -33457,7 +33457,7 @@
         "bioestimulante_enraizamiento",
         "fitosanitario_preventivo_chupadores"
       ],
-      "valor_pedagogico": "Preparado tradicional europeo (purin d'ortie) introducido a la agroecología latinoamericana por Restrepo y validado por AGROSAVIA. Urtica dioica/U. urens concentra Fe (4-7 mg/g MS), Si soluble, ácido fórmico y polifenoles antialimentarios contra áfidos (Myzus persicae) y ácaros (Tetranychus urticae). Corrige clorosis férrica sin acidificar el sustrato. Fermentación completa (cesa espuma) es clave: macerados frescos tienen ácido fórmico libre fitotóxico. Vs. imidacloprid no deja residuos ni daña polinizadores. NO mezclar con caldos cúpricos (precipita Fe).",
+      "valor_pedagogico": "Preparado tradicional europeo (purin d'ortie) introducido a la agroecología latinoamericana por Restrepo y validado por AGROSAVIA. Urtica dioica/U. urens concentra Fe (4-7 mg/g MS), Si soluble, ácido fórmico y polifenoles antialimentarios contra áfidos (Myzus persicae) y ácaros (Tetranychus urticae). Corrige clorosis férrica sin acidificar el sustrato. Fermentación completa (cesa espuma) es clave: macerados frescos tienen formicato fitotóxico. Vs. imidacloprid no deja residuos ni daña polinizadores. NO mezclar con caldos cúpricos (precipita Fe).",
       "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17"
     },
     {
@@ -33552,7 +33552,7 @@
         "preventivo_mildeo_polvoso",
         "preventivo_botrytis"
       ],
-      "valor_pedagogico": "Inóculo microbiano vivo (10^8-10^9 UFC/ml de bacterias aerobias y esporas de hongos saprófitos) extraído del compost por aireación forzada con melaza como carbono lábil. Coloniza filoplano y rizosfera por exclusión competitiva contra patógenos (Ingham; Restrepo, ABC orgánico). Advertencias: si la aireación se detiene >2 h vira anaeróbico y produce ácidos fitotóxicos; no aplicar bajo sol del mediodía (UV mata 90% del inóculo en 30 min); no mezclar con caldo bordelés o sulfocálcico — el cobre/azufre esterilizan la microbiota.",
+      "valor_pedagogico": "Inóculo microbiano vivo (10^5-10^7 UFC/ml en preparación de finca; máximos 10^8-10^9 UFC/ml solo bajo condiciones óptimas de compost activo + glucosa suplementaria, según Scheuerell & Mahaffee 2002 Compost Sci Util 10:313) de bacterias aerobias y esporas de hongos saprófitos extraído del compost por aireación forzada con melaza como carbono lábil. Coloniza filoplano y rizosfera por exclusión competitiva contra patógenos (Ingham; Restrepo, ABC orgánico — la eficacia es variable según calidad del compost madre y presión de inóculo patogénico, ver Litterick et al. 2004 CRC Critical Reviews 23:453). Advertencias: si la aireación se detiene >2 h vira anaeróbico y produce ácidos fitotóxicos; no aplicar bajo sol del mediodía (UV mata 90% del inóculo en 30 min); no mezclar con caldo bordelés o sulfocálcico — el cobre/azufre esterilizan la microbiota.",
       "source_ids": [
         "ingham-2000-compost-tea",
         "restrepo-1996-abc-agricultura-organica",
@@ -33582,7 +33582,7 @@
         "antiestres_transplante",
         "preventivo_nematodos"
       ],
-      "valor_pedagogico": "Lixiviado rico en ácidos húmicos y fúlvicos (3-8 g/L), reguladores tipo auxinas/citoquininas y microbiota aeróbica del tracto de Eisenia fetida (Pseudomonas, Bacillus, Actinomycetes). Los fúlvicos quelatan micronutrientes (Fe, Zn, Mn) facilitando absorción foliar — análogo orgánico a quelatos EDTA, biodegradable y de bajo costo (AGROSAVIA, Restrepo). Advertencias: dosis foliares >1:5 queman hojas tiernas por sales; olor a podredumbre indica anaerobiosis y descarte; conservar tapado en oscuridad <25°C — vida útil cae a 7 días si supera 30°C.",
+      "valor_pedagogico": "Lixiviado rico en ácidos húmicos y fúlvicos (0.5-3 g/L típicos en lixiviado simple por percolación; rangos mayores requieren extracción concentrada — ver Atiyeh et al. 2002 Bioresour Technol 84:7), reguladores tipo auxinas/citoquininas y microbiota aeróbica del tracto de Eisenia fetida (Pseudomonas, Bacillus, Actinomycetes). Los fúlvicos quelatan micronutrientes (Fe, Zn, Mn) facilitando absorción foliar — análogo orgánico a quelatos EDTA, biodegradable y de bajo costo (AGROSAVIA, Restrepo). Advertencias: dosis foliares >1:5 queman hojas tiernas por sales; olor a podredumbre indica anaerobiosis y descarte; conservar tapado en oscuridad <25°C — vida útil cae a 7 días si supera 30°C.",
       "source_ids": [
         "agrosavia-manual-biopreparados-2015",
         "restrepo-1996-abc-agricultura-organica",
@@ -33612,7 +33612,7 @@
         "micronutrientes_B_Zn_Mn",
         "mejora_brix_calidad_fruto"
       ],
-      "valor_pedagogico": "Fermentación láctica-alcohólica: levaduras (Saccharomyces, Hanseniaspora) y lácticas (Lactobacillus) degradan azúcares liberando K soluble (4-12 g/L K2O), B, Zn, Mn y ácidos orgánicos que liberan cationes en suelos calcáreos. Restrepo y Pinheiro lo usan como análogo orgánico al KNO3 en floración, sin salinización. Advertencias: moho blanco (Geotrichum) es seguro; negro/verde (Aspergillus) obliga descarte por micotoxinas. pH final 3.5-4.0; >4.5 indica putrefacción. No aplicar en vegetativa temprana — K antagoniza N.",
+      "valor_pedagogico": "Fermentación láctica-alcohólica: levaduras (Saccharomyces, Hanseniaspora) y lácticas (Lactobacillus) degradan azúcares liberando K soluble (1-4 g/L K2O típico según fruta; hasta 8-12 g/L con frutas de alto K como mango maduro o banano), B, Zn, Mn y ácidos orgánicos que liberan cationes en suelos calcáreos. Restrepo y Pinheiro lo usan como análogo orgánico al KNO3 en floración, sin salinización. Advertencias: moho blanco (Geotrichum candidum) en la superficie sin afectar la fermentación es aceptable — descartar si crece masivamente o cubre toda la superficie; moho negro/verde olivo (probable Aspergillus flavus/niger) obliga descarte por aflatoxinas hepatotóxicas. pH final 3.5-4.0; >4.5 indica putrefacción. No aplicar en vegetativa temprana — K antagoniza N.",
       "source_ids": [
         "restrepo-1996-bocashi",
         "restrepo-2007-biopreparados",
@@ -33645,7 +33645,7 @@
         "estimulante_microbiano_filoplano",
         "fertilizacion_complemento_NPK"
       ],
-      "valor_pedagogico": "Receta de Restrepo (1996) y Pinheiro: fermentación anaeróbica láctica de estiércol + leche + melaza donde Lactobacillus y levaduras solubilizan sulfatos añadidos en 5-7 etapas semanales, quelándolos con ácidos orgánicos y aminoácidos biodisponibles. Análogo orgánico a quelatos EDTA/EDDHA, biodegradable y a 1/10 del costo. Cubre 7 deficiencias típicas en suelos andinos ácidos (Mg, Zn, Mn, Cu, Fe, B, Co). Advertencias: sulfatos de Cu/Zn >2% esterilizan el barril; fermentación <60 días deja sulfatos sin quelatar y quema follaje; pH 3.5-4.2; contraindicado en floración plena.",
+      "valor_pedagogico": "Receta de Restrepo (1996) y Pinheiro: fermentación anaeróbica láctica de estiércol + leche + melaza donde Lactobacillus y levaduras solubilizan sulfatos añadidos en 5-7 etapas semanales, quelándolos con ácidos orgánicos y aminoácidos biodisponibles. Análogo orgánico a quelatos EDTA/EDDHA, biodegradable y a 1/10 del costo. Cubre 7 deficiencias típicas en suelos andinos ácidos (Mg, Zn, Mn, Cu, Fe, B, Co). Advertencias: sulfatos de Cu/Zn por encima de ~2 g/L (~0.2% p/v) inhiben la microbiota láctica del barril y detienen la fermentación (Reed 2010 J Environ Qual 39:1257); fermentación <60 días deja sulfatos sin quelatar y quema follaje; pH 3.5-4.2; contraindicado en floración plena.",
       "source_ids": [
         "restrepo-1996-bocashi",
         "restrepo-2005-agroecologia",
@@ -33676,7 +33676,7 @@
         "induccion_resistencia_sistemica",
         "promocion_crecimiento_radicular"
       ],
-      "valor_pedagogico": "Hongo antagonista saprófito que coloniza la rizosfera y controla patógenos vía: (1) micoparasitismo sobre Rhizoctonia, Fusarium, Sclerotinia y Pythium degradándolas con quitinasas/β-1,3-glucanasas; (2) competencia por exudados radiculares; (3) antibióticos volátiles (6-pentil-pirona, gliotoxina); (4) inducción de resistencia sistémica vía jasmonato/etileno. AGROSAVIA y Cenicafé validaron cepas locales ICA-registradas, análogo al carbendazim sin residuos. Advertencias: no aplicar a suelo seco (<30% humedad); incompatible con cúpricos y mancozeb; evitar pleno sol; pH >8.0 contraindicado.",
+      "valor_pedagogico": "Hongo antagonista saprófito Trichoderma harzianum sensu lato (la cepa T-22 y la mayoría de cepas comerciales en Colombia fueron reclasificadas como Trichoderma afroharzianum tras Chaverri & Samuels 2015 Mycologia 107(3):558; AGROSAVIA e ICA Res. 3168/2015 mantienen el nombre histórico) que coloniza la rizosfera y controla patógenos vía: (1) micoparasitismo sobre Rhizoctonia, Fusarium, Sclerotinia y Pythium degradándolas con quitinasas/β-1,3-glucanasas; (2) competencia por exudados radiculares; (3) antibióticos volátiles (6-pentil-pirona, gliotoxina); (4) inducción de resistencia sistémica vía jasmonato/etileno. AGROSAVIA y Cenicafé validaron cepas locales ICA-registradas, análogo al carbendazim sin residuos. Advertencias: no aplicar a suelo seco (<30% humedad); incompatible con cúpricos y mancozeb; evitar pleno sol; óptimo pH 4.5-6.5; pH >8.5 reduce viabilidad significativamente (Singh et al. 2014 Front Microbiol 5:1).",
       "source_ids": [
         "cenicafe-trichoderma-2010",
         "agrosavia-manual-biopreparados-2015",
@@ -33713,7 +33713,7 @@
         "mildiu_velloso",
         "oidio_temprano"
       ],
-      "valor_pedagogico": "Bacteria Gram+ esporulada que coloniza la filosfera por exclusión competitiva y secreta lipopéptidos cíclicos (iturina, fengicina, surfactina) que perforan membranas fúngicas y disparan resistencia sistémica inducida (ISR) vía jasmonato/etileno. AGROSAVIA 2018 reporta cepas nativas con 60-80% de eficacia contra Botrytis en fresa/mora —equiparable a azoxistrobina, sin resistencia cruzada ni residuos. Restrepo lo combina con bocashi: éste siembra microbiota en suelo, B. subtilis la extiende al follaje. ADVERTENCIA: esporas fotosensibles (UV degrada en 2-4 h) → aplicar SIEMPRE al atardecer con adherente; incompatible con cobre y caldo sulfocálcico (alternar 48 h)."
+      "valor_pedagogico": "Bacteria Gram+ esporulada Bacillus subtilis / B. velezensis (cepas comerciales de biocontrol como QST713 y FZB42 históricamente etiquetadas como B. subtilis fueron reclasificadas como B. velezensis o B. amyloliquefaciens tras Borriss et al. 2011 IJSEM 61:1786 y Dunlap et al. 2016 Syst Appl Microbiol 39:6; algunas cepas nativas AGROSAVIA conservan el nombre histórico) que coloniza la filosfera por exclusión competitiva y secreta lipopéptidos cíclicos (iturina, fengicina, surfactina) que perforan membranas fúngicas y disparan resistencia sistémica inducida (ISR) vía jasmonato/etileno. Estudios de campo con cepas tipo QST713 reportan 40-70% de control de Botrytis en fresa/mora según presión de inóculo y manejo (Punja & Utkhede 2003 Trends Biotechnol 21:400); AGROSAVIA 2018 reporta eficacias comparables con cepas nativas, sin resistencia cruzada ni residuos. Restrepo lo combina con bocashi: éste siembra microbiota en suelo, B. subtilis la extiende al follaje. ADVERTENCIA: esporas fotosensibles (UV degrada en 2-4 h) → aplicar SIEMPRE al atardecer con adherente; incompatible con cobre y caldo sulfocálcico (alternar 48 h)."
     },
     {
       "id": "cal_dolomita",
