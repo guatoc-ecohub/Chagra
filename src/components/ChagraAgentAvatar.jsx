@@ -85,15 +85,23 @@ export default function ChagraAgentAvatar({
             <stop offset="40%" stopColor="#f59e0b" />
             <stop offset="100%" stopColor="#dc2626" />
           </radialGradient>
-          {/* Corola del abutilón: coral-naranja */}
-          <linearGradient id={`corola-${uid}`} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#fbbf24" />
-            <stop offset="50%" stopColor="#f97316" />
-            <stop offset="100%" stopColor="#dc2626" />
+          {/* Corola del abutilón: coral-naranja con depth radial */}
+          <radialGradient id={`corola-${uid}`} cx="50%" cy="30%" r="80%">
+            <stop offset="0%" stopColor="#fef3c7" />
+            <stop offset="20%" stopColor="#fbbf24" />
+            <stop offset="55%" stopColor="#f97316" />
+            <stop offset="85%" stopColor="#dc2626" />
+            <stop offset="100%" stopColor="#7c2d12" />
+          </radialGradient>
+          {/* Highlight especular del borde superior de la flor */}
+          <linearGradient id={`corola-highlight-${uid}`} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#fffbeb" stopOpacity="0.6" />
+            <stop offset="60%" stopColor="#fffbeb" stopOpacity="0" />
           </linearGradient>
-          {/* Hojas verdes oliva */}
+          {/* Hojas verdes oliva con depth */}
           <linearGradient id={`hoja-${uid}`} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#65a30d" />
+            <stop offset="0%" stopColor="#84cc16" />
+            <stop offset="50%" stopColor="#65a30d" />
             <stop offset="100%" stopColor="#15803d" />
           </linearGradient>
           {/* Glow sutil debajo del colibrí */}
@@ -116,32 +124,75 @@ export default function ChagraAgentAvatar({
 
         {/* ===== RAMA DEL ABUTILÓN (lado derecho) ===== */}
         <g className="chagra-rama">
-          {/* tallo curvo */}
+          {/* tallo curvo con textura sutil */}
           <path
             d="M 165 18 Q 158 50 162 80 Q 165 105 158 125"
-            fill="none" stroke="#365314" strokeWidth="2.5" strokeLinecap="round"
+            fill="none" stroke="#3f6212" strokeWidth="3" strokeLinecap="round" opacity="0.9"
           />
-          {/* hoja superior */}
+          <path
+            d="M 165 18 Q 158 50 162 80 Q 165 105 158 125"
+            fill="none" stroke="#4d7c0f" strokeWidth="1.2" strokeLinecap="round" opacity="0.7"
+          />
+          {/* hoja superior con nervaduras */}
           <g transform="translate(154 38) rotate(-35)">
             <ellipse cx="0" cy="0" rx="14" ry="7" fill={`url(#hoja-${uid})`} />
-            <path d="M -14 0 L 14 0" stroke="#365314" strokeWidth="0.6" opacity="0.7" />
+            <path d="M -14 0 L 14 0" stroke="#365314" strokeWidth="0.7" opacity="0.7" />
+            <path d="M -10 -2 L -2 0" stroke="#365314" strokeWidth="0.4" opacity="0.45" />
+            <path d="M -10 2 L -2 0" stroke="#365314" strokeWidth="0.4" opacity="0.45" />
+            <path d="M 2 0 L 10 -2" stroke="#365314" strokeWidth="0.4" opacity="0.45" />
+            <path d="M 2 0 L 10 2" stroke="#365314" strokeWidth="0.4" opacity="0.45" />
+            {/* highlight sutil borde superior */}
+            <path d="M -13 -1.5 Q 0 -4.5 13 -1.5" fill="none" stroke="#bef264" strokeWidth="0.8" opacity="0.5" />
           </g>
-          {/* hoja media */}
+          {/* hoja media con nervaduras */}
           <g transform="translate(176 72) rotate(35)">
             <ellipse cx="0" cy="0" rx="12" ry="6" fill={`url(#hoja-${uid})`} opacity="0.95" />
-            <path d="M -12 0 L 12 0" stroke="#365314" strokeWidth="0.6" opacity="0.7" />
+            <path d="M -12 0 L 12 0" stroke="#365314" strokeWidth="0.7" opacity="0.7" />
+            <path d="M -8 -1.5 L -1 0" stroke="#365314" strokeWidth="0.35" opacity="0.45" />
+            <path d="M -8 1.5 L -1 0" stroke="#365314" strokeWidth="0.35" opacity="0.45" />
+            <path d="M 1 0 L 8 -1.5" stroke="#365314" strokeWidth="0.35" opacity="0.45" />
+            <path d="M 1 0 L 8 1.5" stroke="#365314" strokeWidth="0.35" opacity="0.45" />
+            <path d="M -11 -1.2 Q 0 -3.8 11 -1.2" fill="none" stroke="#bef264" strokeWidth="0.7" opacity="0.5" />
           </g>
-          {/* hoja inferior */}
+          {/* hoja inferior con nervaduras */}
           <g transform="translate(150 105) rotate(-25)">
             <ellipse cx="0" cy="0" rx="10" ry="5" fill={`url(#hoja-${uid})`} opacity="0.9" />
-            <path d="M -10 0 L 10 0" stroke="#365314" strokeWidth="0.5" opacity="0.7" />
+            <path d="M -10 0 L 10 0" stroke="#365314" strokeWidth="0.6" opacity="0.7" />
+            <path d="M -7 -1.3 L -1 0" stroke="#365314" strokeWidth="0.35" opacity="0.45" />
+            <path d="M -7 1.3 L -1 0" stroke="#365314" strokeWidth="0.35" opacity="0.45" />
+            <path d="M 1 0 L 7 -1.3" stroke="#365314" strokeWidth="0.35" opacity="0.45" />
+            <path d="M 1 0 L 7 1.3" stroke="#365314" strokeWidth="0.35" opacity="0.45" />
           </g>
 
-          {/* FLOR DEL ABUTILÓN — campana colgante */}
+          {/* FLOR DEL ABUTILÓN — campana colgante con pétalos individuales,
+              venas marcadas, brillo especular y pistilo detallado. El Abutilon
+              real tiene 5 pétalos translúcidos solapados; aproximamos con 3
+              paths visibles (los laterales se ven parcialmente). */}
           <g className="chagra-flor" transform="translate(160 130)">
-            {/* sépalos verdes en la base */}
-            <path d="M -8 -2 Q 0 -6 8 -2 L 6 4 Q 0 6 -6 4 Z" fill="#65a30d" />
-            {/* corola: forma de farolito/campana */}
+            {/* sépalos verdes en la base, ahora con highlight */}
+            <path d="M -8 -2 Q 0 -6 8 -2 L 6 4 Q 0 6 -6 4 Z" fill="#4d7c0f" />
+            <path d="M -7 -2.5 Q 0 -5 7 -2.5" fill="none" stroke="#84cc16" strokeWidth="0.6" opacity="0.7" />
+            {/* pétalo lateral izquierdo (atrás) */}
+            <path
+              d="M -9 0
+                 Q -13 12 -10 24
+                 Q -7 30 -3 31
+                 L -3 4 Q -6 3 -9 0 Z"
+              fill={`url(#corola-${uid})`}
+              opacity="0.85"
+              stroke="#92400e" strokeWidth="0.4"
+            />
+            {/* pétalo lateral derecho (atrás) */}
+            <path
+              d="M 9 0
+                 Q 13 12 10 24
+                 Q 7 30 3 31
+                 L 3 4 Q 6 3 9 0 Z"
+              fill={`url(#corola-${uid})`}
+              opacity="0.85"
+              stroke="#92400e" strokeWidth="0.4"
+            />
+            {/* corola principal: forma de farolito/campana (al frente) */}
             <path
               d="M -10 0
                  Q -14 12 -10 26
@@ -151,18 +202,35 @@ export default function ChagraAgentAvatar({
                  Q 5 4 0 4
                  Q -5 4 -10 0 Z"
               fill={`url(#corola-${uid})`}
-              stroke="#7c2d12" strokeWidth="0.8"
+              stroke="#7c2d12" strokeWidth="0.9"
               className="chagra-corola"
             />
-            {/* venas de la corola */}
-            <path d="M -6 4 Q -7 18 -6 28" fill="none" stroke="#7c2d12" strokeWidth="0.5" opacity="0.6" />
-            <path d="M 0 4 Q 0 18 0 30" fill="none" stroke="#7c2d12" strokeWidth="0.5" opacity="0.6" />
-            <path d="M 6 4 Q 7 18 6 28" fill="none" stroke="#7c2d12" strokeWidth="0.5" opacity="0.6" />
-            {/* pistilo amarillo asomando */}
-            <line x1="0" y1="33" x2="0" y2="45" stroke="#fbbf24" strokeWidth="1.5" />
-            <circle cx="0" cy="45.5" r="2.2" fill="#fef3c7" stroke="#f59e0b" strokeWidth="0.5" />
-            <circle cx="-1.5" cy="44" r="0.8" fill="#fbbf24" />
-            <circle cx="1.5" cy="44" r="0.8" fill="#fbbf24" />
+            {/* highlight especular borde superior — capa luminosa que da
+                volumen 3D a la flor sin recargar */}
+            <path
+              d="M -9 2 Q 0 -1 9 2 Q 11 4 9 6 Q 0 3 -9 6 Q -11 4 -9 2 Z"
+              fill={`url(#corola-highlight-${uid})`}
+              opacity="0.85"
+            />
+            {/* venas radiales de la corola — ahora más finas y más cantidad */}
+            <path d="M -7 4 Q -8 18 -7 28" fill="none" stroke="#7c2d12" strokeWidth="0.45" opacity="0.55" />
+            <path d="M -4 4 Q -4.5 18 -4 29" fill="none" stroke="#7c2d12" strokeWidth="0.35" opacity="0.4" />
+            <path d="M 0 4 Q 0 18 0 30" fill="none" stroke="#7c2d12" strokeWidth="0.45" opacity="0.55" />
+            <path d="M 4 4 Q 4.5 18 4 29" fill="none" stroke="#7c2d12" strokeWidth="0.35" opacity="0.4" />
+            <path d="M 7 4 Q 8 18 7 28" fill="none" stroke="#7c2d12" strokeWidth="0.45" opacity="0.55" />
+            {/* pistilo amarillo asomando con estambres detallados */}
+            <line x1="0" y1="33" x2="0" y2="47" stroke="#fbbf24" strokeWidth="1.6" />
+            {/* estambres adicionales */}
+            <line x1="-2" y1="34" x2="-2" y2="44" stroke="#fbbf24" strokeWidth="0.8" opacity="0.75" />
+            <line x1="2" y1="34" x2="2" y2="44" stroke="#fbbf24" strokeWidth="0.8" opacity="0.75" />
+            {/* anteras (puntas de los estambres) */}
+            <circle cx="0" cy="47.5" r="2.4" fill="#fef3c7" stroke="#f59e0b" strokeWidth="0.6" />
+            <circle cx="-2" cy="44.5" r="0.9" fill="#fbbf24" />
+            <circle cx="2" cy="44.5" r="0.9" fill="#fbbf24" />
+            {/* polen — puntitos amarillos pálidos alrededor del estigma */}
+            <circle cx="0" cy="46.5" r="0.4" fill="#fef9c3" />
+            <circle cx="-1" cy="48" r="0.35" fill="#fef9c3" />
+            <circle cx="1" cy="48" r="0.35" fill="#fef9c3" />
           </g>
         </g>
 
