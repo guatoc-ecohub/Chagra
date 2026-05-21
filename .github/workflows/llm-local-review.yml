@@ -166,11 +166,25 @@ jobs:
           fi
 
       - name: Upsert PR comment
+        # Soft-fail por contrato (ver docs/ai-review-gates.md): si Ollama
+        # caído, timeout, o el step de inferencia no generó /tmp/review.md,
+        # NO bloqueamos el merge — el job termina success silencioso.
+        # Bug 2026-05-20 (PR #965+966): este step hacía `cat /tmp/review.md`
+        # sin guard y exit 1 cuando el archivo no existía, contradiciendo
+        # el contrato de soft-fail. Fix: skip el step si el archivo no
+        # existe + continue-on-error para defensa en profundidad.
         if: steps.ollama.outputs.skip != '1'
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUM: ${{ github.event.pull_request.number }}
         run: |
+          # Guard de existencia: si Ollama no produjo el archivo de review,
+          # salimos con success y log al stderr (no spam GH UI con error).
+          if [ ! -s /tmp/review.md ]; then
+            echo "::warning::/tmp/review.md no existe o está vacío — soft-fail (Ollama down, timeout o sin diff útil)."
+            exit 0
+          fi
           MARKER='<!-- llm-review-bot -->'
           {
             echo "$MARKER"
