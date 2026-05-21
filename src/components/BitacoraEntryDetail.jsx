@@ -8,7 +8,7 @@ import { analyzeFoliage } from '../services/aiService';
 /**
  * BitacoraEntryDetail, vista detalle de una entrada de Bitácora/Historial.
  *
- * Lili #104: "Bitácora / Historial: Aquí no permite ingresar a ninguno de
+ * Feedback piloto #104: "Bitácora / Historial: Aquí no permite ingresar a ninguno de
  * los registros pendientes." Faltaba la screen detalle al tap en cualquier
  * item del historial.
  *
@@ -357,7 +357,7 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
           </section>
         )}
 
-        {/* Lili #88: agregar foto a evento timeline.
+        {/* Feedback piloto #88: agregar foto a evento timeline.
             Crea un log--task con marker [PHOTO_ATTACHMENT] + target_log_id
             (patrón append-only consistente con [TASK_COMPLETION]). */}
         {entry?.id && (

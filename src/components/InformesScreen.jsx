@@ -5,8 +5,8 @@ import { exportTraceabilityCsv } from '../services/exportService';
 
 /**
  * InformesScreen, sección dedicada para descargar reportes de la finca
- * (Lili #118). Antes los downloads vivían dentro de InventoryDashboard
- * como acción secundaria; Lili pidió: "el informe que se descarga
+ * (Feedback piloto #118). Antes los downloads vivían dentro de InventoryDashboard
+ * como acción secundaria; usuaria piloto pidió: "el informe que se descarga
  * debería ir en otra sección de INFORMES a detalle y especificando todo
  * por cada iconos o segmento."
  *

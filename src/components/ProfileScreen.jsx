@@ -16,7 +16,7 @@ const TTL_OPTIONS = [
 /**
  * ProfileScreen, perfil del operador.
  *
- * Lili #120: "debería poderse registrar los datos del 'Trabajador -
+ * Feedback piloto #120: "debería poderse registrar los datos del 'Trabajador -
  * Operador de Campo'". Antes era display-only con nombre hardcoded.
  * Ahora editable con persistencia localStorage:
  *   - chagra:operator:name (string, ya leído por TopBar)

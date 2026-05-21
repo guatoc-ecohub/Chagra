@@ -41,7 +41,7 @@ export const RAG_CONTEXT_FOOTER = '=== FIN INFORMACIÓN AGRONÓMICA DE REFERENCI
 /**
  * Mapping pest keyword → biopreparados recomendados.
  * KISS: pattern matching simple, no embeddings. Fácil de auditar
- * por agrónomo (Lili). Cada entry: { match: regex|substring, recs: [...] }.
+ * por agrónomo piloto. Cada entry: { match: regex|substring, recs: [...] }.
  *
  * Post-DR-040 (pest catalog first-class), esta tabla se reemplaza por
  * lookup directo a catalog.pests_diseases[X].biopreparados_curativos[].

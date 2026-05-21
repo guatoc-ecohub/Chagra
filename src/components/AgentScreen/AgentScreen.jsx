@@ -20,7 +20,7 @@ import useFincaActiveStore from '../../services/fincaActiveStore';
 
 // 2026-05-16: migrado a llmRouter (Multi-LLM por tarea). AgentScreen usa
 // `chat` route → gemma3:4b 15 t/s con keep_alive=5m (hot model). Bench
-// completo en Chagra-strategy/ops/bench-llamacpp-puro-2026-05-16.md.
+// completo en docs operativos internos del proyecto.
 // Para NLU/tools usar llmRouter('nlu') → qwen2.5-coder:7b.
 
 const STATE_IDLE = 'idle';

@@ -10,7 +10,7 @@ import {
  * Reorganización 2026-05-08: 6 temas en lugar de 12 secciones planas.
  * Tono migrado a "tú" cercano (P1). "Reportar bug" dentro de FAQs (no
  * cuarto botón). "Field test cases" + "Novedades mayo 2026" salieron
- * del Manual público (movidos a Chagra-strategy/ops/ + CHANGELOG.md).
+ * del Manual público (movidos a docs operativos internos + CHANGELOG.md).
  */
 
 // eslint-disable-next-line no-unused-vars -- Icon SE USA en JSX, eslint react-jsx detection falla con destructuring rename

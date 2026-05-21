@@ -1118,7 +1118,7 @@ export const DICTIONARY = [
     categoria: 'informatica',
     emoji: '🛰️',
     definicion_simple: 'Diseño donde la app funciona PRIMERO sin internet. Cuando hay conexión, se sincroniza. Lo opuesto a apps que se mueren si no hay señal.',
-    definicion_ampliada: 'Offline-first es filosofía de diseño donde la aplicación está construida asumiendo que la conectividad es opcional o intermitente, no requisito. Datos se guardan localmente (IndexedDB, OPFS, SQLite) y se sincronizan oportunisticamente cuando hay red.\n\nCrítico para Chagra porque las fincas reales colombianas (especialmente rurales) tienen conectividad inestable. Lili en Choachí, Steve en Naranjalia, David en Los Sitios — ninguno tiene WiFi 5G pleno. La app debe funcionar caminando entre matas con el celular sin señal y sincronizar al volver a casa.',
+    definicion_ampliada: 'Offline-first es filosofía de diseño donde la aplicación está construida asumiendo que la conectividad es opcional o intermitente, no requisito. Datos se guardan localmente (IndexedDB, OPFS, SQLite) y se sincronizan oportunisticamente cuando hay red.\n\nCrítico para Chagra porque las fincas reales colombianas (especialmente rurales) tienen conectividad inestable: muchos pilotos en zonas de minifundio sabanero, ladera cundiboyacense y zonas de transición no tienen WiFi 5G pleno. La app debe funcionar caminando entre matas con el celular sin señal y sincronizar al volver a casa.',
     ver_tambien: ['pwa', 'sync', 'indexeddb'],
     fuentes: ['Hood 2015 — Designing Offline-First Web Apps'],
   },

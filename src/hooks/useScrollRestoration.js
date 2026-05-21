@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 /**
  * useScrollRestoration — preserva scroll position al navegar entre vistas.
  *
- * Lili reportó (#103, field test 2026-05-01):
+ * usuaria piloto reportó (#103, field test 2026-05-01):
  * > "Al devolverme me envía al inicio de la app y debo realizar scroll
  * >  nuevamente a la parte de los iconos. Mejorar esto."
  *

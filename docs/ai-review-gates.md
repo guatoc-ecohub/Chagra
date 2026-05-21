@@ -54,7 +54,4 @@ Cuando se valide el SDK contract de OpenCode.
 > failure modes**. CodeQL (regex-based SAST) ≠ Playwright (runtime) ≠
 > LLM review (semantic). Cada gate atrapa lo que los otros no.
 
-ADRs de referencia:
-- `Chagra-strategy/deepresearch/operations/defense-in-depth-validation-chain.md`
-- `Chagra-strategy/deepresearch/data-model/adr-019-asset-log-3-reglas-inviolables.md`
-- `Chagra-strategy/deepresearch/architecture/ADR-020-anti-leak-content-boundary.md`
+ADRs de referencia: documentación interna del proyecto (defense-in-depth validation chain, asset/log 3 reglas inviolables, anti-leak content boundary). No en este repo.

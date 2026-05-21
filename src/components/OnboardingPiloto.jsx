@@ -2,26 +2,25 @@ import React, { useState, useMemo } from 'react';
 import { Sprout, Copy, MessageCircle, Mail, Check, AlertCircle, ChevronRight, Lock } from 'lucide-react';
 
 /**
- * OnboardingPiloto — formulario para pilotos validadores de Chagra
- * (David Los Sitios, Steve Naranjalia/Roca Blanca, futuros amigos devops).
+ * OnboardingPiloto — formulario para pilotos validadores de Chagra.
  *
  * SEGURIDAD por DISEÑO:
- *   - Gate de password compartido (Miguel manda invitación con la pass por
- *     canal de confianza). Sin password → el form no se renderea.
+ *   - Gate de password compartido (el operador manda invitación con la pass
+ *     por canal de confianza). Sin password → el form no se renderea.
  *   - El password vive en el bundle JS. NO es secreto criptográfico,
  *     es disuasión vs randoms del internet. Si el password se filtra,
- *     Miguel lo rota cambiando la constante PASSWORD_PILOTO abajo.
+ *     el operador lo rota cambiando la constante PASSWORD_PILOTO abajo.
  *   - Aceptación explícita de condiciones (Habeas Data Ley 1581) antes
  *     de habilitar el envío.
  *   - Form NO postea a ningún backend. Output: YAML que el pilot copia
- *     y manda a Miguel por WhatsApp/email. Miguel hace el merge manual.
+ *     y manda al operador por WhatsApp/email. El operador hace el merge manual.
  *   - Filosofía `no inventes datos`: campos sin proveer salen como `null`
- *     o `TODO_*` para que Miguel los complete con criterio agronómico.
+ *     o `TODO_*` para que el operador los complete con criterio agronómico.
  *
- * Cómo rotar la pass (Miguel):
- *   1. Cambia PASSWORD_PILOTO abajo a otro valor.
+ * Cómo rotar la pass:
+ *   1. Cambiar PASSWORD_PILOTO abajo a otro valor.
  *   2. npm run build && deploy a chagra.guatoc.co.
- *   3. Avisa por WhatsApp/email a los pilotos pending con el nuevo valor.
+ *   3. Avisar por WhatsApp/email a los pilotos pending con el nuevo valor.
  */
 
 const PASSWORD_PILOTO = 'guatoc-piloto-2026';   // Miguel: rota cuando quieras

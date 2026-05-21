@@ -209,12 +209,12 @@ export const savePayload = async (type, payload) => {
 
 /**
  * updatePayload — PATCH a una entidad existente. Necesario para edición de
- * tareas pendientes (Lili #106). Misma resolución de endpoint + manejo
+ * tareas pendientes (Feedback piloto #106). Misma resolución de endpoint + manejo
  * online/offline que savePayload, pero PATCH en lugar de POST + endpoint
  * incluye el ID del recurso target.
  *
  * Scope justificado para CONTRIBUTING.md regla #1: feature edit task del
- * field test Lili requiere endpoint PATCH explícito que no existía. NO
+ * field test usuaria piloto requiere endpoint PATCH explícito que no existía. NO
  * modifica savePayload existente.
  *
  * @param {string} type - mismo enum que savePayload (task, observation, etc.)

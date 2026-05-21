@@ -22,7 +22,7 @@
  *     // renderizar <Comp ... />
  *   }
  *
- * Ver ADR-011 (guatoc-ecohub/Chagra-strategy).
+ * Ver ADR-011 (privado).
  */
 
 class ModuleRegistry {

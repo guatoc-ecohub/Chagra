@@ -32,7 +32,7 @@ import ChagraAgentAvatar from './ChagraAgentAvatar';
  *   en grid + descripción larga + breakdown federado. Toggle con botón.
  */
 
-// Lili (UX) feedback 2026-05-19: 6s era muy poco para leer el card.
+// Feedback UX usuaria piloto 2026-05-19: 6s era muy poco para leer el card.
 // 9s da tiempo cómodo de lectura sin sentir el carrusel "atascado".
 const HERO_ROTATION_MS = 9000;
 // Tras click manual (flecha/dot) damos 5s extra antes de retomar el auto-advance,

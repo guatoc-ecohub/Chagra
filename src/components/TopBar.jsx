@@ -72,9 +72,9 @@ export default function TopBar({ onNavigate, onLogout }) {
         style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top))' }}
         role="banner"
       >
-        {/* Logo clickable → Home (DR-030 + Lili #16: botón claro a inicio).
-            Patrón estándar PWA: el logo siempre vuelve al dashboard. Lili
-            reportó "navegación rocosa, falta botón claro a inicio", el
+        {/* Logo clickable → Home (DR-030 + Feedback piloto #16: botón claro a inicio).
+            Patrón estándar PWA: el logo siempre vuelve al dashboard. La
+            usuaria piloto reportó "navegación rocosa, falta botón claro a inicio", el
             logo discreto sin affordance hacía que no se descubriera. Ahora
             es <button> con cursor + hover + icono Home explícito. */}
         <button
@@ -111,7 +111,7 @@ export default function TopBar({ onNavigate, onLogout }) {
 
         {/* Acciones globales */}
         {/* Manual de uso — primer lugar tras el spacer para máxima
-            visibilidad (feedback Lili 2026-05-19: "debería ser un icono
+            visibilidad (feedback usuaria piloto 2026-05-19: "debería ser un icono
             principal mejor ubicado"). Fondo amber distintivo para romper
             con la tira de iconos secundarios y comunicar "ayuda" antes de
             la lectura. Tamaño 24px (vs 20-22px del resto) refuerza la
@@ -141,7 +141,7 @@ export default function TopBar({ onNavigate, onLogout }) {
         >
           <Plus size={22} aria-hidden="true" strokeWidth={2.5} />
         </button>
-        {/* Botón Settings (icono ⚙) eliminado, Lili #115: era duplicado del
+        {/* Botón Settings (icono ⚙) eliminado, Feedback piloto #115: era duplicado del
             botón operator name de arriba (ambos onNavigate('perfil')). El
             operator name button es más explícito + el NAV_TILE Perfil del
             dashboard sigue accesible. */}

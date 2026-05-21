@@ -714,7 +714,7 @@ const useAssetStore = create((set, get) => ({
     return savePayload('task', payload);
   },
 
-  // updateTaskLog — editar tarea pendiente (Lili #106). Solo permite edit
+  // updateTaskLog — editar tarea pendiente (Feedback piloto #106). Solo permite edit
   // de tareas con _pending=true (no sincronizadas aún) o pending status en
   // backend. Mismo patrón optimistic local que addTaskLog: actualiza
   // logCache inmediato + envía PATCH al backend.
@@ -771,7 +771,7 @@ const useAssetStore = create((set, get) => ({
   // estado actual sin necesidad de mutar el primero.
   //
   // verdict: 'completed' | 'cancelled' | 'rescheduled'
-  // attachPhotoToLog — Lili #88: agregar foto a un evento de timeline existente
+  // attachPhotoToLog — Feedback piloto #88: agregar foto a un evento de timeline existente
   // (siembras, cosechas, observaciones, aplicaciones, etc.) sin mutar el log
   // original (Regla 1 ADR-019).
   //

@@ -1,8 +1,8 @@
 /**
  * LegalLinks.jsx, Acceso a Términos, Privacidad, Soberanía Comunitaria
  * y Licencias mediante modales nativos <dialog>. Reutilizable desde Login,
- * Dashboard footer u otros puntos. Texto integral en Chagra-strategy/legal/
- * TERMINOS_Y_CONDICIONES_v0.1_DRAFT.md (pendiente revisión legal).
+ * Dashboard footer u otros puntos. Texto integral pendiente de publicarse
+ * en chagra.bio/legal/ (en revisión legal).
  *
  * AGPL-3.0 © Chagra
  */

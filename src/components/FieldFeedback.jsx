@@ -1,5 +1,5 @@
 /**
- * FieldFeedback, botón flotante 💬 + modal para que Lili (o cualquier
+ * FieldFeedback, botón flotante 💬 + modal para que usuaria piloto (o cualquier
  * field tester) reporte fricciones UX inline durante el test.
  *
  * - Botón fixed bottom-right, no intrusivo
@@ -10,12 +10,12 @@
  * - Bulk export futuro: script `npm run export:feedback` extrae todo
  *   y crea GitHub Issues en repo Chagra
  *
- * Audio capture (Lili, voto operador 2026-05-02): grabar es más rápido
+ * Audio capture (usuaria piloto, voto operador 2026-05-02): grabar es más rápido
  * que tipear "hice click acá y pasó X" en el campo. Reusa useVoiceRecorder
  * (mismo hook que VoiceCapture), sin pipeline Whisper/qwen, solo Blob
  * crudo persistido para review humano post-sesión.
  *
- * Sin dependencia de html2canvas, Lili saca screenshot iPhone manual y
+ * Sin dependencia de html2canvas, usuaria piloto saca screenshot iPhone manual y
  * adjunta luego si quiere. Mantiene bundle liviano.
  */
 import { useState, useEffect } from 'react';
@@ -175,7 +175,7 @@ export default function FieldFeedback() {
       setSubmitted(true);
       setText('');
       handleDiscardAudio();
-      // No auto-cierre: Lili reportó 2026-05-01 que el modal cerraba
+      // No auto-cierre: usuaria piloto reportó 2026-05-01 que el modal cerraba
       // antes de que pudiera leer "Guardado", se sentía como bug. Ahora
       // el botón vuelve a "Enviar" pero el modal persiste hasta que el
       // user cierre con × o tap fuera (permite enviar feedback en cadena).

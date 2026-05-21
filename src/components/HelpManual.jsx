@@ -22,7 +22,7 @@ import HelpVoiceRegionalDemo from './HelpVoiceRegionalDemo.jsx';
  *   Ciclo       → wrapper de HelpCycleSection (accordion por especie, PR #201)
  *   Diccionario → ~70 términos curados (identidad/microorg/biopreparados/...)
  *
- * Principios aplicados (Workspace/Chagra-strategy/ops/chagra-ux-principles.md):
+ * Principios aplicados (UX guidelines internos del proyecto):
  *   P1 tono "tú" cercano (anti-ladrillo)
  *   P2 densidad — pantalla en campo, tap targets ≥48px (≥80px en home CTAs)
  *   P3 sin disculpas — cuando no hay red no se nota, todo sigue funcionando igual
@@ -31,7 +31,7 @@ import HelpVoiceRegionalDemo from './HelpVoiceRegionalDemo.jsx';
  *   P6 identidad sin postureo — somos campo, no startup
  *
  * Movimientos:
- *   - "Field test cases para Lili" → Workspace/Chagra-strategy/ops/field-test-cases.md
+ *   - "Field test cases operadora piloto" → docs operativos internos
  *   - "Novedades mayo 2026"        → Chagra/CHANGELOG.md (root)
  */
 export default function HelpManual({ onBack, onNavigate }) {

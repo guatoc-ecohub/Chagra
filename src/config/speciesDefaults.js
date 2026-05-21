@@ -123,7 +123,7 @@ export const CATEGORY_FALLBACKS = {
 };
 
 // ADR-030 Bloque A Regla 1 — tracking_mode default per category.
-// Espejo del mapping en Chagra-strategy/scripts/migrate-v31-to-v32.mjs.
+// Espejo del mapping del script interno de migración v31→v32.
 // Se aplica si el catálogo SQLite no expone tracking_mode (ej. species
 // inserción libre fuera del catálogo). Mantener sincronizado con el
 // catalog seed v3.2.

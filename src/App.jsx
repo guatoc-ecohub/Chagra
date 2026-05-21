@@ -103,7 +103,7 @@ const ACCENT_CLASSES = {
 // useAssetStore() (hook) dispara re-render cuando hydrate()/syncFromServer() actualizan
 // el estado, a diferencia de useAssetStore.getState() que es una lectura snapshot.
 const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, lastLogMessage }) {
-  // Lili #103: preservar scroll al volver de Voz/FieldFeedback/sub-screens.
+  // Feedback piloto #103: preservar scroll al volver de Voz/FieldFeedback/sub-screens.
   // Sin esto, navegar dashboard → vista_X → dashboard volvía siempre al top.
   useScrollRestoration('dashboard');
 
@@ -149,9 +149,9 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
           la imagen de fondo agroecológica aplicada al body en App.jsx. */}
       <TopBar onNavigate={onNavigate} onLogout={onLogout} />
 
-      {/* Lili #116: estadísticas al header (siempre visibles).
+      {/* Feedback piloto #116: estadísticas al header (siempre visibles).
           Antes: el bloque assetCounts vivía dentro del <main scrollable>,
-          se perdía al scrollear hacia abajo. Lili pidió "deberían ir al
+          se perdía al scrollear hacia abajo. usuaria piloto pidió "deberían ir al
           inicio en el header", ahora es hermano del TopBar (queda fuera
           del overflow del main, sticky de facto al top siempre). */}
       {plantsCount > 0 && (
@@ -345,7 +345,7 @@ export default function App() {
       case 'insumos':
         return <InputLog onBack={() => navigate('dashboard')} onSave={showToast} />;
       case 'plant_asset':
-        // Lili #113, desaparece el form plano. Redirige al rich form de
+        // Feedback piloto #113, desaparece el form plano. Redirige al rich form de
         // AssetsDashboard tab=plant que ya tiene SpeciesSelect, GuildSuggestions
         // y autofill estrato/gremio/producción (mismo modelo que el flujo voz).
         return <AssetsDashboard onBack={() => navigate('dashboard')} initialTab="plant" initialShowForm />;

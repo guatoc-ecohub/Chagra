@@ -21,7 +21,7 @@
  *
  * Dependencias: ninguna fuera de stdlib Node. Implementa un subset
  * mínimo de JSON Schema (enough para v3.1) para evitar requerir npm
- * install en Chagra-strategy (que no tiene package.json). Si el
+ * install en el repo de schemas (que no tiene package.json). Si el
  * schema crece en complejidad, migrar a AJV:
  *   npm i -D ajv
  * y reemplazar validateAgainstSchema() por ajv.compile(schema).
