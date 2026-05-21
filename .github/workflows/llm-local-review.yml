@@ -46,14 +46,21 @@ jobs:
         continue-on-error: true
         id: verify_ollama
         run: |
-          # nix-shell con curl + jq explícito: el runner alpha es NixOS y
-          # curl no está siempre en PATH del shell del job. continue-on-error
-          # garantiza soft-fail como dice el comentario del workflow.
-          nix-shell -p curl jq --run \
-            'curl -fsS http://127.0.0.1:11434/api/tags > /tmp/ollama-tags.json \
-            && jq -e ".models[] | select(.name | startswith(\"qwen3-coder\"))" /tmp/ollama-tags.json' \
-            || { echo "ollama_reachable=0" >> "$GITHUB_OUTPUT"; exit 0; }
-          echo "ollama_reachable=1" >> "$GITHUB_OUTPUT"
+          # NixOS system PATH (curl, jq, etc viven acá). Antes intentábamos
+          # `nix-shell -p curl jq --run '...'` pero el runner self-hosted
+          # `alpha-chagra` no tiene NIX_PATH apuntando a un canal `nixpkgs`
+          # válido — fallaba con "file 'nixpkgs' was not found in the Nix
+          # search path" y el step pegaba `ollama_reachable=0` aunque Ollama
+          # estuviera arriba. Resultado: review SIEMPRE vacío (Task #76).
+          # Fix: usar /run/current-system/sw/bin (system-wide en NixOS).
+          export PATH="/run/current-system/sw/bin:$PATH"
+          if curl -fsS --max-time 10 http://127.0.0.1:11434/api/tags > /tmp/ollama-tags.json \
+              && jq -e '.models[] | select(.name | startswith("qwen3-coder"))' /tmp/ollama-tags.json > /dev/null; then
+            echo "ollama_reachable=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Ollama no reachable o modelo qwen3-coder no instalado — LLM review se omitirá (soft-fail)."
+            echo "ollama_reachable=0" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Compute diff (truncated)
         id: diff
@@ -148,55 +155,95 @@ jobs:
         if: steps.verify_ollama.outputs.ollama_reachable == '1'
         continue-on-error: true
         run: |
-          # nix-shell -p curl jq: explicitar dependencias del nix runner.
-          nix-shell -p curl jq --run '
-            PROMPT=$(jq -Rs . < /tmp/prompt.txt)
-            REQ=$(jq -n --argjson p "$PROMPT" "{model: \"qwen3-coder:7b\", prompt: \$p, stream: false, options: {temperature: 0.2, num_ctx: 16384}}")
-            echo "$REQ" | curl -fsS -X POST http://127.0.0.1:11434/api/generate \
+          # NixOS system PATH para curl/jq. Ver comentario en `Verify Ollama
+          # reachable` arriba: nix-shell -p falla en este runner por NIX_PATH
+          # sin nixpkgs. Usamos /run/current-system/sw/bin directamente.
+          export PATH="/run/current-system/sw/bin:$PATH"
+          PROMPT=$(jq -Rs . < /tmp/prompt.txt)
+          REQ=$(jq -n --argjson p "$PROMPT" '{model: "qwen3-coder:7b", prompt: $p, stream: false, options: {temperature: 0.2, num_ctx: 16384}}')
+          if ! echo "$REQ" | curl -fsS -X POST http://127.0.0.1:11434/api/generate \
               -H "Content-Type: application/json" \
               --max-time 480 \
               --data-binary @- \
-              > /tmp/ollama.json
-            jq -r ".response" /tmp/ollama.json > /tmp/review.md
-          ' || { echo "skip=1" >> "$GITHUB_OUTPUT"; exit 0; }
+              > /tmp/ollama.json; then
+            echo "::warning::curl a Ollama /api/generate falló (timeout o conexión rota) — soft-fail."
+            echo "skip=1" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Extraer .response. Si Ollama devolvió error JSON (200 con body
+          # {"error": ...}), jq -r ".response" produce "null\n" (5 bytes) y
+          # el guard de longitud abajo lo captura.
+          jq -r '.response // ""' /tmp/ollama.json > /tmp/review.md
           REVIEW_LEN=$(wc -c < /tmp/review.md 2>/dev/null || echo 0)
           if [ "$REVIEW_LEN" -lt 50 ]; then
-            echo "Review vacía, fail soft"
+            echo "::warning::Review de Ollama vacía o demasiado corta (${REVIEW_LEN} bytes) — soft-fail."
             echo "skip=1" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
+          echo "skip=0" >> "$GITHUB_OUTPUT"
 
       - name: Upsert PR comment
         # Soft-fail por contrato (ver docs/ai-review-gates.md): si Ollama
         # caído, timeout, o el step de inferencia no generó /tmp/review.md,
-        # NO bloqueamos el merge — el job termina success silencioso.
-        # Bug 2026-05-20 (PR #965+966): este step hacía `cat /tmp/review.md`
-        # sin guard y exit 1 cuando el archivo no existía, contradiciendo
-        # el contrato de soft-fail. Fix: skip el step si el archivo no
-        # existe + continue-on-error para defensa en profundidad.
-        if: steps.ollama.outputs.skip != '1'
+        # NO bloqueamos el merge — el job termina success.
+        # Historial del bug:
+        #   - 2026-05-20 (PR #965+966): este step hacía `cat /tmp/review.md`
+        #     sin guard y exit 1 cuando el archivo no existía, contradiciendo
+        #     el contrato de soft-fail. Fix parcial: skip si archivo vacío.
+        #   - 2026-05-21 (Task #76): el step `Verify Ollama reachable` fallaba
+        #     por `nix-shell` sin NIX_PATH, dejando review SIEMPRE vacía. El
+        #     operador no veía warning visible en el PR → confundía soft-fail
+        #     con "review limpio sin hallazgos". Fix: corre siempre (no `if:`)
+        #     y postea comentario explícito de skip con causa para que el
+        #     operador sepa que la inferencia se omitió.
+        if: always() && github.event.pull_request.draft == false
         continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUM: ${{ github.event.pull_request.number }}
+          OLLAMA_REACHABLE: ${{ steps.verify_ollama.outputs.ollama_reachable }}
+          OLLAMA_SKIP: ${{ steps.ollama.outputs.skip }}
         run: |
-          # Guard de existencia: si Ollama no produjo el archivo de review,
-          # salimos con success y log al stderr (no spam GH UI con error).
-          if [ ! -s /tmp/review.md ]; then
-            echo "::warning::/tmp/review.md no existe o está vacío — soft-fail (Ollama down, timeout o sin diff útil)."
-            exit 0
-          fi
+          export PATH="/run/current-system/sw/bin:$PATH"
           MARKER='<!-- llm-review-bot -->'
-          {
-            echo "$MARKER"
-            echo "## 🤖 Local LLM review (Gate 5, no bloqueante)"
-            echo ""
-            echo "Modelo: \`qwen3-coder:7b\` · runner: \`alpha\` self-hosted · diff: ${{ steps.diff.outputs.lines }} líneas · ADRs: ${{ steps.adrs.outputs.list }}"
-            echo ""
-            cat /tmp/review.md
-            echo ""
-            echo "---"
-            echo "_Comentario generado por workflow .github/workflows/llm-local-review.yml. Falsos positivos esperados ~20-30%. Operador decide qué accionar._"
-          } > /tmp/comment.md
+
+          # Decisión: ¿posteamos review real o nota de skip?
+          if [ "$OLLAMA_REACHABLE" != "1" ] || [ "$OLLAMA_SKIP" = "1" ] || [ ! -s /tmp/review.md ]; then
+            # Soft-fail visible: deja comentario explícito para que el
+            # operador no confunda "review skipped" con "review limpio".
+            if [ "$OLLAMA_REACHABLE" != "1" ]; then
+              CAUSA="Ollama no reachable o modelo \`qwen3-coder:7b\` no disponible en el runner."
+            elif [ "$OLLAMA_SKIP" = "1" ]; then
+              CAUSA="Ollama respondió vacío o curl timeout (>480s) durante la inferencia."
+            else
+              CAUSA="\`/tmp/review.md\` no existe o está vacío post-inferencia (causa no clasificada)."
+            fi
+            {
+              echo "$MARKER"
+              echo "## 🤖 Local LLM review (Gate 5) — **SKIPPED (soft-fail)**"
+              echo ""
+              echo "**Causa:** $CAUSA"
+              echo ""
+              echo "Este gate es no-bloqueante por diseño: el merge NO se detiene. Sin embargo, se perdió el review automático para esta corrida — si el PR toca catálogo, prompts o data-model, considera review manual extra."
+              echo ""
+              echo "Diff procesado: ${{ steps.diff.outputs.lines }} líneas · ADRs detectados: ${{ steps.adrs.outputs.list }}"
+              echo ""
+              echo "---"
+              echo "_Comentario generado por workflow .github/workflows/llm-local-review.yml. Para diagnosticar: ver job logs y \`systemctl status ollama\` en alpha._"
+            } > /tmp/comment.md
+          else
+            {
+              echo "$MARKER"
+              echo "## 🤖 Local LLM review (Gate 5, no bloqueante)"
+              echo ""
+              echo "Modelo: \`qwen3-coder:7b\` · runner: \`alpha\` self-hosted · diff: ${{ steps.diff.outputs.lines }} líneas · ADRs: ${{ steps.adrs.outputs.list }}"
+              echo ""
+              cat /tmp/review.md
+              echo ""
+              echo "---"
+              echo "_Comentario generado por workflow .github/workflows/llm-local-review.yml. Falsos positivos esperados ~20-30%. Operador decide qué accionar._"
+            } > /tmp/comment.md
+          fi
 
           # Upsert: si existe comentario con marker, lo actualiza; si no, crea uno nuevo.
           EXISTING_ID=$(gh api "repos/${{ github.repository }}/issues/$PR_NUM/comments" \
