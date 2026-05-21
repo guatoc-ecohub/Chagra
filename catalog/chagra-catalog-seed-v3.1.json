@@ -34356,6 +34356,150 @@
       ],
       "valor_pedagogico": "Composición típica SiO₂ 45-52%, Fe 3.4%, Mg 2.1%, Ca 3.8%, >70 oligoelementos.  Liberación lenta — efectos visibles a partir de 6-12 meses. Heredero de Julius Hensel 'Brot aus Steinen' (1894), reeditado por Pinheiro-Restrepo 2009.",
       "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "biofertilizante_super_4",
+      "nombre": "biofertilizante Super 4 — sulfatos Cu/Zn/Mg/Fe en estiércol fermentado",
+      "tipo": "fermentado",
+      "proposito": [
+        "fertilizacion",
+        "estimulante_microbiano",
+        "fitosanitario_preventivo"
+      ],
+      "ingredientes": [
+        "50 kg estiércol vacuno fresco",
+        "100 L agua sin cloro",
+        "4 L leche cruda o suero",
+        "4 L melaza o panela diluida",
+        "300 g sulfato de cobre (CuSO4·5H2O)",
+        "600 g sulfato de zinc (ZnSO4·7H2O)",
+        "600 g sulfato de magnesio (MgSO4·7H2O)",
+        "400 g sulfato de hierro (FeSO4·7H2O)",
+        "2 kg ceniza de leña limpia"
+      ],
+      "proceso_resumen": "Mezcla base estiércol+agua+leche+melaza en caneca plástica de 200 L con tapa hermética y válvula trampa de agua (botella PET con manguera). Adición escalonada semanal de un sulfato por semana, disuelto previo en 2 L agua tibia con 250 mL melaza para favorecer quelación con ácidos orgánicos producidos por Lactobacillus y levaduras. Fermentación anaeróbica 60-90 días según T° ambiente (60 días en tierra caliente >22°C, 90 días en altiplano <16°C).",
+      "tiempo_elaboracion_dias": 75,
+      "vida_util_dias": 365,
+      "source_ids": [
+        "restrepo-2007-biopreparados",
+        "restrepo-1996-abc-agricultura-organica",
+        "pinheiro-machado-2017-biofertilizantes",
+        "agrosavia-manual-biopreparados-2015"
+      ],
+      "uso": "Aspersión foliar al amanecer o atardecer en cultivos con deficiencia diagnosticada de microelementos; aplicación en drench al suelo en frutales y café. Compatible con MM líquido y biol en rotación, NO en tanque mezcla con caldos cúpricos ni sulfocálcicos.",
+      "dosis": "Foliar 1-3% (10-30 mL/L) en hortalizas y café; 3-5% (30-50 mL/L) en frutales adultos. Suelo/drench 10-20%. NUNCA aplicar antes de 60 días de fermentación: sulfatos sin quelar son fitotóxicos y queman follaje.",
+      "target": [
+        "nutricion_micronutrientes",
+        "deficiencia_zn_mg_b",
+        "correccion_micronutrientes",
+        "induccion_resistencia",
+        "estimulante_microbiano_filoplano"
+      ],
+      "valor_pedagogico": "Variante reducida y \"low-cost\" del Supermagro Restrepo-Pinheiro: usa solo 4 sulfatos críticos (Cu/Zn/Mg/Fe) en vez de los 10+ del Supermagro completo, lo que la hace viable para finca campesina sin acceso a químicas industriales. El proceso anaeróbico de 60-90 días es clave: Lactobacillus y Saccharomyces secretan ácidos orgánicos (láctico, acético, cítrico) y aminoácidos libres que quelan los sulfatos minerales en complejos biodisponibles análogos a EDTA/EDDHA pero biológicos (Restrepo 1996 ABC agricultura orgánica; Pinheiro Machado 2017 Manual biofertilizantes). A menos de 60 días los sulfatos NO terminan de quelar y queman follaje (caso documentado AGROSAVIA Manual Biopreparados 2015). Color final ámbar-marrón con olor a chicha fermentada; descartar si huele a putrefacción amoniacal (descomposición anaeróbica fallida). Origen brasileño (Delvino Magro / Pinheiro Machado), adaptado por Jairo Restrepo en Colombia para fincas cafeteras y hortícolas de altiplano. NO confundir con el Supermagro Restrepo (10 minerales) ni con el supermagro_restrepo del catálogo: este Super 4 es la formulación introductoria para productores sin experiencia previa en biofermentos.",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "purin_helecho",
+      "nombre": "Purín de helecho macho (Pteridium aquilinum)",
+      "tipo": "fermentado",
+      "proposito": [
+        "repelente_insectos",
+        "fitosanitario_preventivo",
+        "fitosanitario_curativo"
+      ],
+      "ingredientes": [
+        "1 kg frondes frescos de Pteridium aquilinum (helecho marranero, helecho macho)",
+        "10 L agua sin cloro"
+      ],
+      "proceso_resumen": "Cortar frondes maduros (no báculos juveniles altamente tóxicos). Picar grueso y sumergir en agua sin cloro 1:10 en recipiente plástico tapado con tela respirable. Fermentación aeróbica 10-14 días con agitación cada 2-3 días, hasta cesar la espuma (indicador de fermentación completa). Color final marrón oscuro con olor herbáceo intenso. Filtrar antes de uso.",
+      "tiempo_elaboracion_dias": 12,
+      "vida_util_dias": 45,
+      "source_ids": [
+        "pinheiro-restrepo-2003-purines",
+        "restrepo-2007-biopreparados",
+        "pinheiro-1990-trofobiosis"
+      ],
+      "uso": "Aspersión foliar y al suelo en horas frescas (amanecer/atardecer) en cultivos con presión de babosas (Limax, Deroceras), caracoles (Helix), áfidos (Myzus persicae) y pulgón lanigero. Particularmente útil en lechugas, repollos, fresa y ornamentales en zonas húmedas frías. Aplicación al pie como anti-babosa preventivo en almácigos. NO aplicar a cosecha de hoja fresca menos de 14 días antes (precaución por ptaquilósido residual).",
+      "dosis": "Foliar 1:10 (puro/macerado a 100 mL/L de agua) preventivo; 1:5 (200 mL/L) curativo en alta presión. Aplicación al suelo en barrera anti-babosa 1:3 alrededor de almácigos al atardecer.",
+      "target": [
+        "babosas_caracoles_barrera_fisica",
+        "control_pulgon",
+        "repelente_general",
+        "fitosanitario_preventivo_chupadores"
+      ],
+      "valor_pedagogico": "Receta tradicional campesina europea (Francia, Suiza) recogida por Pinheiro Machado y Restrepo Rivera para el contexto latinoamericano (Pinheiro & Restrepo 2003 Cartilha de purines). Pteridium aquilinum contiene ptaquilósido (norsesquiterpenoide), tianinasa y polifenoles que actúan como antialimentarios contra moluscos y áfidos (Vetter 2009 Food Chem Toxicol 47:3185). En Colombia el helecho marranero es nativo cosmopolita y abundante post-disturbio en zonas templadas-frías, por lo que es un recurso gratuito accesible para el productor — NO requiere cultivar la especie (auditoría agroecológica 2026-05-21 advierte: Pteridium NO es cultivable, solo recolectar de poblaciones naturales pero NO en páramo según Res. 684/2018 MADS). ADVERTENCIA: ptaquilósido es cancerígeno por exposición crónica (Smith et al. 2000 Nat Toxins 8:233); el productor debe usar guantes nitrilo al manipular frondes y NO ingerir agua de remojo. Diferencia con purín de ortiga: Pteridium ataca moluscos (babosas/caracoles); Urtica ataca artrópodos (áfidos/ácaros). En la trofobiosis de Chaboussou-Pinheiro 1990, el purín de helecho regula el equilibrio Ca/N foliar haciendo la planta menos atractiva a moluscos sin tóxicos sistémicos.",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "caldo_ortiga_consuelda",
+      "nombre": "Caldo mineralizante de ortiga y consuelda",
+      "tipo": "fermentado",
+      "proposito": [
+        "fertilizacion",
+        "estimulante_microbiano",
+        "fitosanitario_preventivo"
+      ],
+      "ingredientes": [
+        "500 g ortiga fresca (Urtica dioica, U. urens o U. ballotifolia nativa andina)",
+        "500 g hojas de consuelda (Symphytum officinale o S. uplandicum)",
+        "10 L agua sin cloro",
+        "100 mL melaza o panela diluida (opcional, para acelerar fermentación láctica)"
+      ],
+      "proceso_resumen": "Cortar hojas frescas pre-floración (mayor concentración de hormonas vegetales). Mezclar 1:1 en recipiente plástico (NO metal — corrosión por ácido fórmico de la ortiga y silicatos). Cubrir con agua, agregar melaza opcional, tapar con tela respirable. Fermentación aeróbica 10-14 días con agitación cada 2 días, hasta cesar la espuma. Color final marrón-verdoso con olor a hierba fermentada. Filtrar antes de uso.",
+      "tiempo_elaboracion_dias": 12,
+      "vida_util_dias": 60,
+      "source_ids": [
+        "pinheiro-restrepo-2003-purines",
+        "pinheiro-1990-trofobiosis",
+        "restrepo-2007-biopreparados"
+      ],
+      "uso": "Aspersión foliar al amanecer o atardecer en fase vegetativa y pre-floración de hortalizas de hoja, tomate, fresa, mora y ornamentales. Aplicación al suelo en plántulas para acelerar enraizamiento. NO mezclar con caldos cúpricos (Cu precipita con Fe y silicatos del extracto).",
+      "dosis": "Foliar 1:10 (100 mL/L) cada 7-10 días en fase vegetativa; 1:20 (50 mL/L) en plántulas y trasplante reciente. Drench al suelo 1:5 en surcos de fresa y hortalizas de hoja.",
+      "target": [
+        "fertilizante_foliar_N",
+        "fertilizante_foliar_Fe_Si",
+        "bioestimulante_fitohormonal",
+        "bioestimulante_enraizamiento",
+        "induccion_resistencia",
+        "fase_crecimiento_vegetativo"
+      ],
+      "valor_pedagogico": "Combinación clásica de la agroecología europea (Hans-Peter Rusch, alemán; Maria Thun, biodinámica) introducida a Latinoamérica por Pinheiro Machado y Restrepo Rivera (Pinheiro & Restrepo 2003 Cartilha purines). Urtica dioica aporta Fe (4-7 mg/g MS), Si soluble, ácido fórmico antialimentario y polifenoles inductores de resistencia (ISR mediada por jasmonato/etileno — Pieterse et al. 2014 Annu Rev Phytopathol 52:347). Symphytum officinale aporta allantoina (estimulante de división celular vegetal), K soluble (3-7% MS) y proteínas con alto contenido de aminoácidos libres tras fermentación. La sinergia produce un estimulante foliar fitohormonal natural — Pinheiro Machado 1990 (teoria da trofobiose) demostró que plantas con balance Fe/K/Si adecuado producen menos aminoácidos libres en savia, lo que reduce ataques de áfidos y trips porque estos requieren N-amino disponible en floema. ADVERTENCIA: NO ingerir ni aplicar a cosecha de hoja menos de 14 días antes — consuelda contiene alcaloides pirrolizidínicos (PA) con hepatotoxicidad documentada en uso oral crónico (EMA 2013, restricción europea). Para uso agrícola foliar es seguro. NO mezclar con caldos cúpricos (Cu precipita Fe + Si del extracto como Cu(OH)2 + FeSiO3). Diferencia con purín de ortiga simple: la consuelda agrega allantoina y K — pasa de repelente-mineralizador a estimulante de crecimiento completo.",
+      "_curation_status": "BORRADOR_IA"
+    },
+    {
+      "id": "abono_verde_avena_vicia",
+      "nombre": "Abono verde de avena + vicia (cobertura biocida + fijación N)",
+      "tipo": "residuo",
+      "proposito": [
+        "fertilizacion",
+        "estimulante_microbiano",
+        "enmienda_p"
+      ],
+      "ingredientes": [
+        "40-60 kg/ha semilla avena (Avena sativa)",
+        "20-40 kg/ha semilla vicia (Vicia sativa o V. villosa)",
+        "inoculante Rhizobium leguminosarum biovar viciae (opcional, sí en suelos sin historial leguminosas)"
+      ],
+      "proceso_resumen": "Siembra al voleo o en surcos de mezcla avena:vicia (2:1 a 3:1 en peso) al inicio de la temporada de lluvias. Avena crece rápido como tutor estructural; vicia trepadora fija N₂ atmosférico vía nodulación con Rhizobium. Crecimiento 60-90 días hasta floración de la vicia (momento de máximo aporte N). Corte con guadaña o pisado con rolo-faca; incorporación superficial a 10-15 cm con arado de cinceles o azadón, o dejado como mulch en siembra directa. Descomposición 30-60 días previo a siembra del cultivo comercial.",
+      "tiempo_elaboracion_dias": 90,
+      "vida_util_dias": 90,
+      "source_ids": [
+        "agrosavia-abonos-verdes-boyaca-2018",
+        "restrepo-1996-abc-agricultura-organica",
+        "pinheiro-machado-2017-biofertilizantes"
+      ],
+      "uso": "Rotación pre-cultivo de papa, hortalizas de hoja, maíz, fresa y café joven en zonas templado-frías (1800-3000 msnm, Cundinamarca y Boyacá). Aplicación como cobertura en calles de frutales adultos. NO usar como abono verde si el cultivo siguiente es leguminosa (no aporta el ciclo Rhizobium-leguminosa).",
+      "dosis": "Densidad siembra avena 40-60 kg/ha, vicia 20-40 kg/ha (densidades menores en zonas con buena humedad). Incorporación a 10-15 cm para maximizar descomposición sin perder N por volatilización (Cherr et al. 2006 Agron J 98:302).",
+      "target": [
+        "aporte_materia_organica",
+        "fuente_nitrogeno",
+        "mejorador_estructura_suelo",
+        "preventivo_nematodos",
+        "establecimiento_perennes",
+        "baja_materia_organica_suelo"
+      ],
+      "valor_pedagogico": "Tecnología agroecológica clásica de cobertura biocida documentada en Colombia por AGROSAVIA-CI Tibaitatá (Modelo productivo de abonos verdes en sistemas de papa y hortalizas en Cundinamarca y Boyacá, 2018) y promovida por Restrepo Rivera (ABC de la agricultura orgánica, 1996) y Pinheiro Machado (Manual biofertilizantes, 2017). La mezcla avena+vicia integra dos servicios ecosistémicos complementarios: Avena sativa aporta biomasa estructural (4-8 t MS/ha), root system fibroso que mejora porosidad y estructura del suelo, y exudados radiculares alelopáticos (avenacina, escopoletina) supresores de Pratylenchus y Meloidogyne (nematodos fitoparásitos — Mojtahedi et al. 1991 J Nematol 23:170). Vicia sativa/villosa fija N₂ atmosférico vía simbiosis con Rhizobium leguminosarum bv. viciae aportando 80-150 kg N/ha disponible tras incorporación (AGROSAVIA 2018, dato verificado en CI Tibaitatá-La Selva para zona alta cundiboyacense). En conjunto: avena protege suelo de erosión y compactación + vicia carga N biológico — equivalente fertilizante a 200-350 kg urea/ha sin aporte exógeno. Incorporación al inicio floración vicia maximiza N (relación C:N ~15-20:1, ideal para descomposición rápida sin inmovilización). REGLA AGROECOLÓGICA: rotar siempre antes de cultivo NO-leguminoso. NO sembrar después de otra Vicia o Pisum (saturación nodulación, riesgo enfermedades radiculares).",
+      "_curation_status": "BORRADOR_IA"
     }
   ],
   "sources": [
@@ -35325,6 +35469,52 @@
       "revista_o_editorial": "Fundación Juquira Candirú, Cali",
       "observaciones": "Reedición ampliada de Julius Hensel 'Brot aus Steinen' (1894); ISBN no localizado de manera firme en bases bibliográficas estándar.",
       "tier": "B"
+    },
+    {
+      "id": "higa-1991-em-tecnology",
+      "tipo": "libro",
+      "autores": "Higa T.",
+      "año": 1991,
+      "titulo": "Effective microorganisms — a biotechnology for mankind",
+      "revista_o_editorial": "University of the Ryukyus Press, Okinawa",
+      "institucion": "University of the Ryukyus",
+      "isbn": "978-4-8389-6045-1",
+      "tier": "B",
+      "observaciones": "Texto fundacional EM/MM popularizado por Restrepo en Latinoamérica; consorcio Lactobacillus + levaduras + fototróficas."
+    },
+    {
+      "id": "pinheiro-1990-trofobiosis",
+      "tipo": "libro",
+      "autores": "Pinheiro Machado L.C.",
+      "año": 1990,
+      "titulo": "A teoria da trofobiose — novos rumos para a agricultura",
+      "revista_o_editorial": "L.C. Pinheiro Machado (auto-edição), Porto Alegre",
+      "institucion": "EMBRAPA / UFRGS (autor afiliado)",
+      "tier": "B",
+      "observaciones": "Teoría trofobiose Chaboussou aplicada a fitoiatría — base conceptual de Restrepo para purines de ortiga, consuelda, helecho. Plantas equilibradas nutricionalmente son menos atacadas por insectos."
+    },
+    {
+      "id": "agrosavia-abonos-verdes-boyaca-2018",
+      "tipo": "manual_tecnico",
+      "autores": "AGROSAVIA — CI Tibaitatá",
+      "año": 2018,
+      "titulo": "Modelo productivo de abonos verdes en sistemas de papa y hortalizas en Cundinamarca y Boyacá",
+      "revista_o_editorial": "Corporación Colombiana de Investigación Agropecuaria (AGROSAVIA)",
+      "institucion": "AGROSAVIA",
+      "isbn": "978-958-740-280-7",
+      "tier": "A",
+      "observaciones": "Avena strigosa/sativa + vicia sativa/villosa como cobertura biocida — 60-90 días al floración, incorporación a 10-15 cm. Aporte N biológico vicia 80-150 kg/ha."
+    },
+    {
+      "id": "pinheiro-restrepo-2003-purines",
+      "tipo": "libro",
+      "autores": "Pinheiro Machado L.C., Restrepo Rivera J.",
+      "año": 2003,
+      "titulo": "Cartilha de purines, biofertilizantes e caldos minerais",
+      "revista_o_editorial": "Pinheiro Machado y Editora Aldeia do Futuro, Porto Alegre",
+      "institucion": "PRV Pasto Racional Voisin",
+      "tier": "B",
+      "observaciones": "Recopilación canónica de purines de ortiga, consuelda, helecho, cola de caballo — proporciones, vidas útiles, advertencias de mezcla."
     }
   ]
 }
