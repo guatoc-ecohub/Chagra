@@ -19,25 +19,34 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
     }
 
     setLoading(true);
-    const result = await authenticateUser(creds.username, creds.password);
+    try {
+      const result = await authenticateUser(creds.username, creds.password);
 
-    if (result.success) {
-      // Activar Capa 1 HMAC (ADR-027.v): computa operator_id_hash determinista
-      // vía HMAC-SHA256(username, PBKDF2(account_uuid_master, "chagra-salt-v1"))
-      // y persiste en localStorage. Los consumidores (InventoryDashboard,
-      // RecountDrawer, PlanEditor) dejan de usar 'default-hash-0...' fallback.
-      try {
-        await setCurrentOperator(creds.username);
-      } catch (err) {
-        // No bloquear login si falla crypto (browser sin Web Crypto API).
-        // Componentes hacen fallback a default-hash. Tracking warning silenciosa.
-        console.warn('[LoginScreen] setCurrentOperator failed:', err);
+      if (result.success) {
+        // Activar Capa 1 HMAC (ADR-027.v): computa operator_id_hash determinista
+        // vía HMAC-SHA256(username, PBKDF2(account_uuid_master, "chagra-salt-v1"))
+        // y persiste en localStorage. Los consumidores (InventoryDashboard,
+        // RecountDrawer, PlanEditor) dejan de usar 'default-hash-0...' fallback.
+        try {
+          await setCurrentOperator(creds.username);
+        } catch (err) {
+          // No bloquear login si falla crypto (browser sin Web Crypto API).
+          // Componentes hacen fallback a default-hash. Tracking warning silenciosa.
+          console.warn('[LoginScreen] setCurrentOperator failed:', err);
+        }
+        onLoginSuccess();
+      } else {
+        onSave(result.error || 'Error autenticando', true);
       }
+    } catch (err) {
+      // Auditoría agroecológica 2026-05-21 Pasada 9: sin este try/catch, si
+      // authenticateUser lanza excepción (red rota, CORS, FarmOS 5xx no parsado),
+      // setLoading(true) queda activo indefinido y la app se "congela" en
+      // "Iniciando sesión...". El finally garantiza que loading siempre baje.
+      console.error('[LoginScreen] handleLogin failed:', err);
+      onSave('Error de red o servidor. Intenta de nuevo.', true);
+    } finally {
       setLoading(false);
-      onLoginSuccess();
-    } else {
-      setLoading(false);
-      onSave(result.error || 'Error autenticando', true);
     }
   };
 
