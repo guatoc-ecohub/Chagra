@@ -174,13 +174,15 @@ test.describe('multifinca client-side scoping (ADR-036 MVP)', () => {
       u.includes('/api/asset/plant?sort=-created')
     );
     expect(listUrl).toBeDefined();
-    expect(listUrl).toContain('filter%5Buid.name%5D=alice');
-    // [..uid.name..]=alice URL-encoded como filter%5Buid.name%5D=alice
+    // apiService.injectTenantFilter concatena literal `filter[uid.name]=<id>`
+    // (sin URL-encode de los corchetes). Playwright reporta la URL tal cual el
+    // browser la envía — en Chromium los corchetes sobreviven sin escapar.
+    expect(listUrl).toContain('filter[uid.name]=alice');
 
     const byIdUrl = seenUrls.find((u) =>
       u.includes('/api/asset/plant/some-uuid')
     );
     expect(byIdUrl).toBeDefined();
-    expect(byIdUrl).not.toContain('filter%5Buid');
+    expect(byIdUrl).not.toContain('filter[uid');
   });
 });
