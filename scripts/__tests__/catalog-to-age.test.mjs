@@ -19,6 +19,10 @@ import {
   emitRel,
   wrapCypher,
   buildSqlScript,
+  classifyBiopreparadoTarget,
+  collectBpPestEdges,
+  buildSqlScriptWithReport,
+  buildControlsDeltaScript,
 } from '../catalog-to-age.mjs';
 
 describe('cypherLiteral', () => {
@@ -43,9 +47,26 @@ describe('cypherLiteral', () => {
     expect(cypherLiteral(Infinity)).toBe('null');
   });
 
-  it('escapa comillas simples doblándolas (regla SQL/Cypher)', () => {
-    expect(cypherLiteral("d'agua")).toBe("'d''agua'");
-    expect(cypherLiteral("Restrepo's bocashi")).toBe("'Restrepo''s bocashi'");
+  it('escapa comillas simples con backslash (no doblando, ver fix 2026-05-21)', () => {
+    // Regresión: el escape SQL `''` rompía dentro de bloques $$...$$ del
+    // dialecto cypher() de AGE — 48 species se perdían silenciosamente.
+    // Cypher acepta `\'` como escape estándar.
+    expect(cypherLiteral("d'agua")).toBe("'d\\'agua'");
+    expect(cypherLiteral("Restrepo's bocashi")).toBe("'Restrepo\\'s bocashi'");
+    expect(cypherLiteral("cv. 'Pastusa Suprema'")).toBe("'cv. \\'Pastusa Suprema\\''");
+  });
+
+  it('escapa backslash doblándolo (antes que las comillas)', () => {
+    expect(cypherLiteral('path\\to\\file')).toBe("'path\\\\to\\\\file'");
+    // Backslash seguido de apóstrofe: el orden debe dejar `\\` y `\'`,
+    // no `\\\\` por doble paso.
+    expect(cypherLiteral("a\\b'c")).toBe("'a\\\\b\\'c'");
+  });
+
+  it('escapa control chars (\\n, \\r, \\t, \\f, \\b)', () => {
+    expect(cypherLiteral('linea1\nlinea2')).toBe("'linea1\\nlinea2'");
+    expect(cypherLiteral('col1\tcol2')).toBe("'col1\\tcol2'");
+    expect(cypherLiteral('a\rb')).toBe("'a\\rb'");
   });
 
   it('serializa arrays/objetos como string JSON saneado', () => {
