@@ -55,7 +55,11 @@ export const ScreenShell = ({ title, onBack, onHome, icon: Icon, children, actio
       </div>
       {actions && <div className="flex gap-2 shrink-0">{actions}</div>}
     </header>
-    <main className="flex-1 overflow-y-auto bg-slate-950 bg-biopunk-pattern">{children}</main>
+    {/* Feedback piloto #5 (Lili 2026-05-18): los FABs flotantes (MicFab,
+        FieldFeedback, AgentFab, banners) tapaban los CTAs del final de
+        cada screen. Padding-bottom defensivo que respeta safe-area iOS
+        + alto suficiente para los 3 FABs apilados verticalmente. */}
+    <main className="flex-1 overflow-y-auto bg-slate-950 bg-biopunk-pattern pb-[max(env(safe-area-inset-bottom),0px)_+_120px]">{children}</main>
   </div>
 );
 

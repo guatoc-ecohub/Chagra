@@ -172,7 +172,11 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
         </button>
       )}
 
-      <main className="flex-1 px-4 pt-3 pb-4 flex flex-col overflow-y-auto gap-3">
+      {/* Feedback piloto #5 (Lili 2026-05-18): pb-4 no era suficiente —
+          los FABs flotantes (Mic/FieldFeedback/Agent) tapaban el final
+          del scroll. Cambio a calc seguro con safe-area iOS notch + 120px
+          para que el último widget quede accesible al tap. */}
+      <main className="flex-1 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+120px)] flex flex-col overflow-y-auto gap-3">
         {/* Bug 2026-05-18 (operator): TelemetryAlerts mostraba errores IoT +
             sync no resueltos como PRIMERA cosa visible post-login. Mal first
             impression — Chagra debe arrancar con stats positivos (especies,
@@ -265,6 +269,29 @@ export default function App() {
     const handler = (e) => setLastLogMessage(e.detail);
     window.addEventListener('farmosLog', handler);
     return () => window.removeEventListener('farmosLog', handler);
+  }, []);
+
+  // Bug Lili #4: el InputLogForm dispatcha 'syncSuccess' tras registrar una
+  // aplicación de bio-insumo, pero nadie escuchaba el evento → el operador
+  // no veía feedback de dónde quedó guardada la info. Listener acá que
+  // alimenta el toast con CTA "Ver Bitácora" cuando el evento trae action.
+  // detail: { message: string, actionLabel?: string, actionView?: string }
+  useEffect(() => {
+    const handler = (e) => {
+      const detail = e.detail || {};
+      setToast({
+        message: detail.message || 'Registrado',
+        isError: false,
+        actionLabel: detail.actionLabel,
+        actionView: detail.actionView,
+      });
+      // Toast con CTA persiste 6s (más tiempo para que el operador alcance
+      // a tocar el botón). Sin CTA, auto-dismiss a 4s (igual que showToast).
+      const ttl = detail.actionLabel ? 6000 : 4000;
+      setTimeout(() => setToast(null), ttl);
+    };
+    window.addEventListener('syncSuccess', handler);
+    return () => window.removeEventListener('syncSuccess', handler);
   }, []);
 
   useEffect(() => {
@@ -464,10 +491,22 @@ export default function App() {
         <div
           role={toast.isError ? 'alert' : 'status'}
           aria-live={toast.isError ? 'assertive' : 'polite'}
-          className={`fixed bottom-8 left-1/2 -translate-x-1/2 p-4 rounded-xl shadow-2xl flex items-center gap-4 z-50 w-11/12 max-w-sm border-2 pb-[max(2rem,env(safe-area-inset-bottom))] ${toast.isError ? 'bg-amber-700 border-amber-500' : 'bg-green-700 border-green-500'}`}
+          className={`fixed bottom-8 left-1/2 -translate-x-1/2 p-4 rounded-xl shadow-2xl flex items-center gap-3 z-50 w-11/12 max-w-md border-2 pb-[max(2rem,env(safe-area-inset-bottom))] ${toast.isError ? 'bg-amber-700 border-amber-500' : 'bg-green-700 border-green-500'}`}
         >
-          {toast.isError ? <WifiOff size={32} className="shrink-0" aria-hidden="true" /> : <CheckCircle size={32} className="shrink-0" aria-hidden="true" />}
-          <p className="text-lg font-bold text-white leading-tight">{toast.message}</p>
+          {toast.isError ? <WifiOff size={28} className="shrink-0" aria-hidden="true" /> : <CheckCircle size={28} className="shrink-0" aria-hidden="true" />}
+          <p className="text-base font-bold text-white leading-tight flex-1">{toast.message}</p>
+          {toast.actionLabel && toast.actionView && (
+            <button
+              type="button"
+              onClick={() => {
+                navigate(toast.actionView);
+                setToast(null);
+              }}
+              className="shrink-0 px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 active:scale-95 transition-all text-white text-xs font-bold uppercase tracking-wide border border-white/30"
+            >
+              {toast.actionLabel}
+            </button>
+          )}
         </div>
       )}
     </>
