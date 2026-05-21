@@ -20,7 +20,14 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./tests/unit/setup.js'],
-    include: ['src/**/*.test.{js,jsx}', 'tests/unit/**/*.test.{js,jsx}'],
+    include: [
+      'src/**/*.test.{js,jsx}',
+      'tests/unit/**/*.test.{js,jsx}',
+      // POC Apache AGE (feat/apache-age-poc-2026-05-20): tests del importer
+      // viven junto al script para mantener cohesión local. Incluye .mjs
+      // porque el importer es ESM nativo.
+      'scripts/__tests__/**/*.test.{js,mjs}',
+    ],
     exclude: ['node_modules', 'dist', 'tests/*.spec.js'],
     css: false,
   },
