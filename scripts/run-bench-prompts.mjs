@@ -19,8 +19,9 @@
 // Para correr el bench con un sistema alternativo (Apache AGE futuro):
 //   cambiar OLLAMA_URL + SYSTEM_PROMPT, mantener el resto.
 
-import { readFileSync, writeFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 
 const PROMPTS_FILE = '/home/kortux/Workspace/Chagra-strategy/benchmarks/prompts-grafos-2026-05-20.md';
 const OLLAMA_URL = 'http://localhost:11434/api/generate';
@@ -142,8 +143,9 @@ async function main() {
     await new Promise((r) => setTimeout(r, 500));
   }
 
-  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const outFile = `/tmp/bench-prompts-${stamp}.json`;
+  // mkdtempSync evita CodeQL js/insecure-temporary-file (path predecible en /tmp).
+  const outDir = mkdtempSync(join(tmpdir(), 'bench-prompts-'));
+  const outFile = join(outDir, 'results.json');
   const summary = {
     timestamp: new Date().toISOString(),
     model: MODEL,
