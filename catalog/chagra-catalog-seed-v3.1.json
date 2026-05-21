@@ -33424,7 +33424,7 @@
         "inoculacion_microbiana_filosfera",
         "resistencia_induccion_SAR"
       ],
-      "valor_pedagogico": "Biofertilizante anaeróbico andino, popularizado por Restrepo y Pinheiro Machado. La fermentación selecciona bacterias fijadoras de N (Azotobacter, Clostridium) y solubilizadoras de P, generando fitohormonas (auxinas, citoquininas) y ácidos quelantes. La leche aporta caseínas fungistáticas y Lactobacillus que inducen SAR (Resistencia Sistémica Adquirida). Vs. urea 46-0-0 entrega N orgánico sin quemar follaje. Advertencias: olor amoniacal = mal sellado (descartar); filtrar antes de boquilla; >30% en lechuga/fresa necrosa. AGROSAVIA 2015: +15-25% en hortalizas andinas.",
+      "valor_pedagogico": "Biofertilizante anaeróbico andino, popularizado por Restrepo y Pinheiro Machado. La fermentación selecciona bacterias fijadoras de N (Azotobacter, Clostridium) y solubilizadoras de P, generando fitohormonas (auxinas, citoquininas) y ácidos quelantes. La leche aporta caseínas fungistáticas y Lactobacillus que inducen ISR (Resistencia Sistémica Adquirida). Vs. urea 46-0-0 entrega N orgánico sin quemar follaje. Advertencias: olor amoniacal = mal sellado (descartar); filtrar antes de boquilla; >30% en lechuga/fresa necrosa. AGROSAVIA 2015: +15-25% en hortalizas andinas.",
       "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17"
     },
     {
@@ -33457,7 +33457,7 @@
         "bioestimulante_enraizamiento",
         "fitosanitario_preventivo_chupadores"
       ],
-      "valor_pedagogico": "Preparado tradicional europeo (purin d'ortie) introducido a la agroecología latinoamericana por Restrepo y validado por AGROSAVIA. Urtica dioica/U. urens concentra Fe (4-7 mg/g MS), Si soluble, ácido fórmico y polifenoles antialimentarios contra áfidos (Myzus persicae) y ácaros (Tetranychus urticae). Corrige clorosis férrica sin acidificar el sustrato. Fermentación completa (cesa espuma) es clave: macerados frescos tienen formicato fitotóxico. Vs. imidacloprid no deja residuos ni daña polinizadores. NO mezclar con caldos cúpricos (precipita Fe).",
+      "valor_pedagogico": "Preparado tradicional europeo (purin d'ortie) introducido a la agroecología latinoamericana por Restrepo y validado por AGROSAVIA. Urtica dioica/U. urens concentra Fe (4-7 mg/g MS), Si soluble, ácido fórmico y polifenoles antialimentarios contra áfidos (Myzus persicae) y ácaros (Tetranychus urticae). Corrige clorosis férrica sin acidificar el sustrato. Fermentación completa (cesa espuma) es clave: macerados frescos tienen ácido fórmico libre fitotóxico. Vs. imidacloprid no deja residuos ni daña polinizadores. NO mezclar con caldos cúpricos (precipita Fe).",
       "_curation_status": "ENRICHED_BATCH_BP-A_2026-05-17"
     },
     {
@@ -33582,7 +33582,7 @@
         "antiestres_transplante",
         "preventivo_nematodos"
       ],
-      "valor_pedagogico": "Lixiviado rico en ácidos húmicos y fúlvicos (3-8 g/L), reguladores tipo auxinas/citoquininas y microbiota aeróbica del tracto de Eisenia foetida (Pseudomonas, Bacillus, Actinomycetes). Los fúlvicos quelatan micronutrientes (Fe, Zn, Mn) facilitando absorción foliar — análogo orgánico a quelatos EDTA, biodegradable y de bajo costo (AGROSAVIA, Restrepo). Advertencias: dosis foliares >1:5 queman hojas tiernas por sales; olor a podredumbre indica anaerobiosis y descarte; conservar tapado en oscuridad <25°C — vida útil cae a 7 días si supera 30°C.",
+      "valor_pedagogico": "Lixiviado rico en ácidos húmicos y fúlvicos (3-8 g/L), reguladores tipo auxinas/citoquininas y microbiota aeróbica del tracto de Eisenia fetida (Pseudomonas, Bacillus, Actinomycetes). Los fúlvicos quelatan micronutrientes (Fe, Zn, Mn) facilitando absorción foliar — análogo orgánico a quelatos EDTA, biodegradable y de bajo costo (AGROSAVIA, Restrepo). Advertencias: dosis foliares >1:5 queman hojas tiernas por sales; olor a podredumbre indica anaerobiosis y descarte; conservar tapado en oscuridad <25°C — vida útil cae a 7 días si supera 30°C.",
       "source_ids": [
         "agrosavia-manual-biopreparados-2015",
         "restrepo-1996-abc-agricultura-organica",
