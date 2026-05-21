@@ -331,3 +331,238 @@ describe('buildSqlScript — fixture real (subset del seed v3.1)', () => {
     expect(total).toBeLessThan(200_000);
   });
 });
+
+// =============================================================================
+// Edges BP-CONTROLS-Pest (Task #97, 2026-05-21)
+// =============================================================================
+
+describe('classifyBiopreparadoTarget', () => {
+  it('clasifica patrones nutricionales / agronómicos como purpose', () => {
+    expect(classifyBiopreparadoTarget('fertilizante_general').kind).toBe('purpose');
+    expect(classifyBiopreparadoTarget('deficiencia_potasio_k').kind).toBe('purpose');
+    expect(classifyBiopreparadoTarget('activacion_suelo').kind).toBe('purpose');
+    expect(classifyBiopreparadoTarget('inoculacion_microbiana_filosfera').kind).toBe('purpose');
+    expect(classifyBiopreparadoTarget('fase_vegetativa').kind).toBe('purpose');
+    expect(classifyBiopreparadoTarget('compostaje').kind).toBe('purpose');
+    expect(classifyBiopreparadoTarget('bioestimulante_enraizamiento').kind).toBe('purpose');
+    expect(classifyBiopreparadoTarget('remineralizacion_suelo').kind).toBe('purpose');
+  });
+
+  it('clasifica hongos / oomicetos como fungal', () => {
+    expect(classifyBiopreparadoTarget('roya_foliar').pestType).toBe('fungal');
+    expect(classifyBiopreparadoTarget('mildeo_velloso').pestType).toBe('fungal');
+    expect(classifyBiopreparadoTarget('phytophthora_infestans').pestType).toBe('fungal');
+    expect(classifyBiopreparadoTarget('botrytis_cinerea').pestType).toBe('fungal');
+    expect(classifyBiopreparadoTarget('roya_cafe_hemileia').pestType).toBe('fungal');
+    expect(classifyBiopreparadoTarget('antracnosis_colletotrichum').pestType).toBe('fungal');
+  });
+
+  it('clasifica insectos como insect', () => {
+    expect(classifyBiopreparadoTarget('afidos').pestType).toBe('insect');
+    expect(classifyBiopreparadoTarget('mosca_blanca').pestType).toBe('insect');
+    expect(classifyBiopreparadoTarget('trips').pestType).toBe('insect');
+    expect(classifyBiopreparadoTarget('cogollero (Spodoptera frugiperda) en maíz').pestType).toBe('insect');
+    expect(classifyBiopreparadoTarget('Hypothenemus hampei (broca)').pestType).toBe('insect');
+  });
+
+  it('clasifica ácaros como mite', () => {
+    expect(classifyBiopreparadoTarget('acaros_eriofidos').pestType).toBe('mite');
+    expect(classifyBiopreparadoTarget('ácaros (Tetranychus urticae) — leve').pestType).toBe('mite');
+  });
+
+  it('clasifica nematodos como nematode (no como purpose)', () => {
+    const c = classifyBiopreparadoTarget('preventivo_nematodos');
+    expect(c.kind).toBe('pest');
+    expect(c.pestType).toBe('nematode');
+  });
+
+  it('clasifica babosas/caracoles como mollusk', () => {
+    expect(classifyBiopreparadoTarget('babosas_caracoles_barrera_fisica').pestType).toBe('mollusk');
+  });
+
+  it('clasifica amplio_espectro como broad_spectrum con slug fijo', () => {
+    const c = classifyBiopreparadoTarget('fungicida_cuprico_preventivo_amplio_espectro');
+    expect(c.kind).toBe('pest');
+    expect(c.pestType).toBe('broad_spectrum');
+    expect(c.pestSlug).toBe('amplio_espectro');
+  });
+
+  it('stripea prefijos control_ / preventivo_ del slug pero conserva el raw', () => {
+    const c = classifyBiopreparadoTarget('control_pulgon');
+    expect(c.kind).toBe('pest');
+    expect(c.pestSlug).toBe('pulgon');
+    expect(c.raw).toBe('control_pulgon');
+    const c2 = classifyBiopreparadoTarget('preventivo_botrytis');
+    expect(c2.pestSlug).toBe('botrytis');
+  });
+
+  it('devuelve unknown si el target es null/empty', () => {
+    expect(classifyBiopreparadoTarget(null).kind).toBe('unknown');
+    expect(classifyBiopreparadoTarget('').kind).toBe('unknown');
+  });
+});
+
+describe('collectBpPestEdges', () => {
+  const bps = [
+    { id: 'caldo_bordeles', target: ['phytophthora_infestans', 'roya_cafe_hemileia'] },
+    { id: 'extracto_neem', target: ['áfidos (Myzus persicae, Aphis gossypii)', 'trips (Frankliniella occidentalis)'] },
+    { id: 'bocashi', target: ['fertilizante_general', 'aporte_materia_organica'] },
+    { id: 'caldo_m5_restrepo', target: ['afidos', 'mosca_blanca'] },
+  ];
+
+  it('extrae solo pests reales (descarta purposes)', () => {
+    const { edges } = collectBpPestEdges(bps);
+    expect(edges).toHaveLength(6);
+  });
+
+  it('crea entrada en pestsMap por cada pest único', () => {
+    const { pests } = collectBpPestEdges(bps);
+    expect(pests.size).toBe(6);
+    expect(pests.get('phytophthora_infestans').tipo).toBe('fungal');
+    expect(pests.get('afidos').tipo).toBe('insect');
+    expect(pests.get('mosca_blanca').tipo).toBe('insect');
+  });
+
+  it('registra los purposes para inspección manual', () => {
+    const { purposes } = collectBpPestEdges(bps);
+    const bocashiP = purposes.filter((p) => p.bpId === 'bocashi');
+    expect(bocashiP).toHaveLength(2);
+  });
+
+  it('no genera edges para un BP sin target[]', () => {
+    const { edges } = collectBpPestEdges([{ id: 'huerfano' }]);
+    expect(edges).toHaveLength(0);
+  });
+});
+
+describe('buildSqlScript — integración Pest+CONTROLS', () => {
+  const fixture = {
+    species: [
+      {
+        id: 'coffea_arabica',
+        familia_botanica: 'Rubiaceae',
+        plagas_criticas: ['Hemileia vastatrix (roya)', 'Hypothenemus hampei (broca)'],
+      },
+    ],
+    biopreparados: [
+      { id: 'caldo_bordeles', nombre: 'Caldo bordelés', target: ['roya_cafe_hemileia'] },
+      { id: 'caldo_m5_restrepo', nombre: 'M5', target: ['afidos', 'fertilizante_general'] },
+    ],
+    sources: [],
+  };
+
+  it('emite edges CONTROLS desde biopreparados.target[]', () => {
+    const stmts = buildSqlScript(fixture);
+    const controls = stmts.filter((s) => s.includes('[r:CONTROLS'));
+    expect(controls).toHaveLength(2);
+    expect(controls.some((s) => s.includes("'caldo_bordeles'") && s.includes("'roya_cafe_hemileia'"))).toBe(true);
+    expect(controls.some((s) => s.includes("'caldo_m5_restrepo'") && s.includes("'afidos'"))).toBe(true);
+  });
+
+  it('NO emite CONTROLS para purposes (fertilizante/deficiencia/etc.)', () => {
+    const stmts = buildSqlScript(fixture);
+    expect(stmts.some((s) => s.includes('fertilizante_general') && s.includes('CONTROLS'))).toBe(false);
+  });
+
+  it('fusiona pests de plagas_criticas + target[] en un solo pestsMap', () => {
+    const stmts = buildSqlScript(fixture);
+    const pestNodes = stmts.filter((s) => /MERGE \(n:Pest /.test(s));
+    expect(pestNodes.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('tipa nodos Pest con la categoría inferida desde el raw_name', () => {
+    const stmts = buildSqlScript(fixture);
+    const pestNodes = stmts.filter((s) => /MERGE \(n:Pest /.test(s));
+    expect(pestNodes.some((s) => s.includes("tipo: 'fungal'"))).toBe(true);
+    expect(pestNodes.some((s) => s.includes("tipo: 'insect'"))).toBe(true);
+  });
+
+  it('deduplica edges CONTROLS si el mismo target aparece dos veces', () => {
+    const dupFixture = {
+      species: [],
+      biopreparados: [{ id: 'bp_x', target: ['afidos', 'afidos'] }],
+      sources: [],
+    };
+    const stmts = buildSqlScript(dupFixture);
+    const controls = stmts.filter((s) => s.includes('[r:CONTROLS'));
+    expect(controls).toHaveLength(1);
+  });
+});
+
+describe('buildSqlScriptWithReport', () => {
+  const fixture = {
+    species: [],
+    biopreparados: [
+      { id: 'caldo_bordeles', target: ['phytophthora_infestans', 'roya_cafe_hemileia'] },
+      { id: 'extracto_neem', target: ['trips (Frankliniella occidentalis)'] },
+      { id: 'bocashi', target: ['fertilizante_general'] },
+    ],
+    sources: [],
+  };
+
+  it('reporta pestCount, edges y distribución por tipo', () => {
+    const { report } = buildSqlScriptWithReport(fixture);
+    expect(report.pestCount).toBe(3);
+    expect(report.controlsEdgeCount).toBe(3);
+    expect(report.pestsByTipo.fungal).toBe(2);
+    expect(report.pestsByTipo.insect).toBe(1);
+  });
+
+  it('reporta purposes separados', () => {
+    const { report } = buildSqlScriptWithReport(fixture);
+    expect(report.purposes).toHaveLength(1);
+    expect(report.purposes[0].bpId).toBe('bocashi');
+  });
+
+  it('reporta unmatched cuando un target no clasifica', () => {
+    const f = {
+      species: [],
+      biopreparados: [{ id: 'bp_y', target: ['xyz_no_match_pattern_inventado'] }],
+      sources: [],
+    };
+    const { report } = buildSqlScriptWithReport(f);
+    expect(report.unmatched).toHaveLength(1);
+  });
+});
+
+describe('buildControlsDeltaScript', () => {
+  const fixture = {
+    species: [],
+    biopreparados: [
+      { id: 'caldo_bordeles', target: ['roya_cafe_hemileia', 'fertilizante_general'] },
+    ],
+    sources: [],
+  };
+
+  it('NO incluye drop_graph / create_graph (es delta puro)', () => {
+    const stmts = buildControlsDeltaScript(fixture);
+    expect(stmts.some((s) => s.includes('drop_graph'))).toBe(false);
+    expect(stmts.some((s) => s.includes('create_graph'))).toBe(false);
+  });
+
+  it('arranca con LOAD age + SET search_path', () => {
+    const stmts = buildControlsDeltaScript(fixture);
+    expect(stmts[0]).toContain("LOAD 'age'");
+    expect(stmts[1]).toContain('search_path = ag_catalog');
+  });
+
+  it('emite MERGE defensivo del Biopreparado (id-only)', () => {
+    const stmts = buildControlsDeltaScript(fixture);
+    const bpMerge = stmts.filter((s) => /MERGE \(n:Biopreparado /.test(s));
+    expect(bpMerge.length).toBe(1);
+  });
+
+  it('emite solo edges CONTROLS (sin USED_AS_BIOPREPARADO/COMPATIBLE_WITH/etc.)', () => {
+    const stmts = buildControlsDeltaScript(fixture);
+    const controls = stmts.filter((s) => s.includes('[r:CONTROLS'));
+    const otros = stmts.filter((s) => /\[r:(USED_AS_BIOPREPARADO|COMPATIBLE_WITH|ANTAGONIST_OF|TARGETS_PEST|REFERENCED_BY|HAS_FAMILY|GROWS_IN|HAS_ROLE|HAS_ORIGIN|HAS_HABIT)/.test(s));
+    expect(controls.length).toBeGreaterThan(0);
+    expect(otros).toHaveLength(0);
+  });
+
+  it('es idempotente — mismo input genera mismo output', () => {
+    const a = buildControlsDeltaScript(fixture);
+    const b = buildControlsDeltaScript(fixture);
+    expect(a.join('\n')).toBe(b.join('\n'));
+  });
+});
