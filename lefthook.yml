@@ -105,14 +105,13 @@ pre-commit:
 
     catalog-validator:
       # Valida catalog/chagra-catalog-seed-v3.1.json contra schema v3.1 + 8
-      # validadores semánticos (AMB-05/10/13/14/15/16/17/18). Modo lenient+seed:
-      # schema errors legacy son warnings (cleanup pendiente), AMB-16/17 (vp +
-      # Tier A coverage) son warnings sobre species pre-pipeline, pero AMB-11
-      # (source_id sin entrada en sources[]) y AMB-18 (format roundtrip) son
-      # HARD ERRORS — esos son los que catchean bugs de generate al momento de
-      # commit. Solo corre si cambian catalog/ o schema/.
+      # validadores semánticos (AMB-05/10/13/14/15/16/17/18). Modo lenient
+      # (sin --seed-mode tras el fix del 2026-05-20): schema errors legacy son
+      # warnings (cleanup pendiente), pero AMB-10/11/13/18 son HARD ERRORS —
+      # eso es lo que catchea bugs de generate al momento de commit. Solo corre
+      # si cambian catalog/ o schema/.
       glob: "catalog/*.json"
-      run: node scripts/validate-catalog.mjs --lenient-schema --seed-mode
+      run: node scripts/validate-catalog.mjs --lenient-schema
 
 commit-msg:
   commands:

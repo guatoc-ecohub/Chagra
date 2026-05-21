@@ -546,7 +546,16 @@
         "solanum_phureja",
         "trifolium_repens",
         "vicia_faba",
-        "weinmannia_tomentosa"
+        "weinmannia_tomentosa",
+        "juglans_neotropica",
+        "morella_pubescens",
+        "cedrela_montana",
+        "magnolia_yarumalensis",
+        "clethra_revoluta",
+        "escallonia_pendula",
+        "oreopanax_floribundum",
+        "bocconia_frutescens",
+        "myrsine_coriacea"
       ],
       "antagonists": [],
       "recommended_covers": [
@@ -1293,7 +1302,8 @@
         "notas": "Se resiembra sola con facilidad; sus raíces secretan sustancias que controlan nematodos en el suelo."
       },
       "companions": [
-        "solanum_lycopersicum_san_marzano"
+        "solanum_lycopersicum_san_marzano",
+        "centaurea_cyanus"
       ],
       "antagonists": [],
       "valor_pedagogico": "La Caléndula (Calendula officinalis L.) es una especie ornamental-medicinal originaria del Mediterráneo, ampliamente cultivada en jardines campesinos de Cundinamarca entre 0-2800 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación por semilla con ciclo de floración de 75-90 días, asociándose beneficiosamente con cultivos como el tomate (Solanum lycopersicum) mientras actúa como repelente natural de trips y nemátodos mediante secreciones radiculares. En el contexto cultural andino-campesino, sus flores se utilizan tradicionalmente en preparaciones de crema cicatrizante por sus propiedades flavonoides, saponinas y aceites esenciales. Según GBIF Backbone Taxonomy y Plants of the World Online (POWO), esta especie destaca por su valor ecológico en atracción de polinizadores y manejo integrado de plagas en sistemas agroecológicos de montaña.",
@@ -1500,7 +1510,33 @@
       },
       "companions": [
         "alnus_acuminata",
-        "erythrina_edulis"
+        "erythrina_edulis",
+        "cedrela_odorata",
+        "cordia_alliodora",
+        "swietenia_macrophylla",
+        "tabebuia_rosea",
+        "tabebuia_chrysantha",
+        "juglans_neotropica",
+        "myroxylon_balsamum",
+        "pseudosamanea_guachapele",
+        "enterolobium_cyclocarpum",
+        "samanea_saman",
+        "albizia_guachapele",
+        "pithecellobium_dulce",
+        "cassia_grandis",
+        "ceiba_pentandra",
+        "byrsonima_crassifolia",
+        "nectandra_acutifolia",
+        "ocotea_calophylla",
+        "aniba_perutilis",
+        "cedrela_montana",
+        "magnolia_caricifragrans",
+        "clethra_revoluta",
+        "myrcia_popayanensis",
+        "oreopanax_floribundum",
+        "vismia_baccifera",
+        "cinchona_pubescens",
+        "cinchona_officinalis"
       ],
       "antagonists": [
         "foeniculum_vulgare"
@@ -1822,7 +1858,10 @@
       },
       "companions": [
         "alnus_acuminata",
-        "coffea_arabica"
+        "coffea_arabica",
+        "cedrela_odorata",
+        "cordia_alliodora",
+        "tabebuia_rosea"
       ],
       "antagonists": [
         "ulex_europaeus"
@@ -1989,7 +2028,22 @@
       "valor_pedagogico": "SE BUSCA: El 'Sediento de los Andes'. El eucalipto azul australiano (Eucalyptus globulus Labill., familia Myrtaceae) fue introducido en Colombia desde fines del siglo XIX para programas de reforestación industrial (madera y pulpa de papel) y se expandió como especie naturalizada problemática en altiplanos andinos. Se distribuye en Cundinamarca (Sabana de Bogotá), Boyacá (Tunja, Duitama, Sogamoso), Nariño, Antioquia y Eje cafetero entre 1.800 y 3.000 msnm. Árbol perenne 30-50 m altura, alta demanda hídrica (~200-400 L/día por árbol maduro) seca quebradas y nacederos en cuencas altas. Alelopatía severa por aceites esenciales (1,8-cineol, citronelal) inhibe germinación de flora nativa generando 'desierto verde' bajo dosel. Banco de semillas resistente al fuego. Estrategia de manejo agroecológico: anillado (ring-barking) sin cosecha + remplazo progresivo por Alnus acuminata (aliso andino nativo) o Polylepis quadrijuga (colorado) en sistemas silvopastoriles. Listada Res. 684/2018 MADS. Fuentes Tier A: Humboldt Invasoras Andes, ISSG-UICN Invasoras Globales, Resolución 684/2018 MADS, GBIF Backbone Taxonomy.",
       "validation_level": "operator_reviewed",
       "antagonists": [
-        "weinmannia_tomentosa"
+        "weinmannia_tomentosa",
+        "clusia_multiflora",
+        "clusia_grandiflora",
+        "viburnum_tinoides",
+        "myrcianthes_rhopaloides",
+        "morella_pubescens",
+        "freziera_canescens",
+        "oreopanax_incisus",
+        "axinaea_macrophylla",
+        "clethra_fagifolia",
+        "ilex_kunthiana",
+        "weinmannia_pubescens",
+        "weinmannia_microphylla",
+        "gaiadendron_punctatum",
+        "myrcianthes_ferreyrae",
+        "prumnopitys_montana"
       ],
       "tracking_mode": null
     },
@@ -2464,7 +2518,21 @@
       ],
       "valor_pedagogico": "El guamo (Inga edulis) se cultiva en departamentos colombianos como Valle del Cauca, Antioquia, Caldas, Quindío, Tolima y Huila entre 0 y 2000 msnm en zonas térmicas cálidas y templadas. Su manejo agronómico incluye propagación por semilla recalcitrante (sembrar inmediatamente post-recolección) con emergencia rápida de 7-14 días, ciclo productivo de 3-5 años hasta primera cosecha significativa, asociaciones tradicionales con cacao y café como especie sombreadora que fija nitrógeno atmosférico mediante simbiosis con rizobios, y requiere manejo de plagas como barrenadores de tallos y mosca de la fruta mediante monitoreo y poda fitosanitaria. En el contexto cultural campesino andino, esta leguminosa ha sido tradicionalmente utilizada como sombra de cacao y café, sus vainas contienen pulpa dulce comestible rica en azúcares naturales, y forma parte de sistemas agroforestales tradicionales que combinan producción con conservación de suelo. Según las fuentes taxonómicas verificadas de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Inga edulis Mart.",
       "estrato": "alto",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "companions": [
+        "cedrela_odorata",
+        "cordia_alliodora",
+        "swietenia_macrophylla",
+        "tabebuia_rosea",
+        "tabebuia_chrysantha",
+        "bombacopsis_quinata",
+        "ochroma_pyramidale",
+        "myroxylon_balsamum",
+        "nectandra_acutifolia",
+        "ocotea_calophylla",
+        "aniba_perutilis",
+        "vismia_baccifera"
+      ]
     },
     {
       "id": "lactuca_sativa_capitata",
@@ -3038,7 +3106,10 @@
         "jbb-plantas-medicinales"
       ],
       "valor_pedagogico": "La Mentha spicata (Labiada aromática) se cultiva perenne en huertas de Cundinamarca entre 500-2600 msnm en zonas térmicas cálidas, templadas y frías. Su propagación se realiza mediante esquejes y estolones, requiere control de invasividad mediante barreras físicas y se asocia beneficiosamente con tomate y repollo al repeler pulgón. En contexto campesino andino, su infusión digestiva (té de menta) se usa tradicionalmente para aliviar molestias gastrointestinales, aprovechando su aceite esencial rico en carvona y limoneno. Fuente taxonómica validada por GBIF Backbone Taxonomy y Plants of the World Online (POWO).",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "companions": [
+        "viola_odorata"
+      ]
     },
     {
       "id": "origanum_vulgare",
@@ -3639,7 +3710,8 @@
       },
       "companions": [
         "lactuca_sativa_capitata",
-        "zea_mays"
+        "zea_mays",
+        "helianthus_annuus"
       ],
       "antagonists": [
         "allium_ampeloprasum",
@@ -3887,7 +3959,22 @@
       ],
       "valor_pedagogico": "SE BUSCA: El 'Acidificador'. El pino pátula (Pinus patula Schiede ex Schltdl. & Cham., familia Pinaceae) es una conífera nativa de México introducida en Colombia desde mediados del siglo XX para programas de reforestación industrial masiva (CAR, antiguas SmurfitKappa-Cartón Colombia) y naturalizada como invasora en bosques altoandinos, particularmente impactando el bosque de roble negro (Quercus humboldtii) endémico. Se distribuye en Cundinamarca (Tabio, Subachoque, San Antonio del Tequendama, La Calera), Boyacá altiplano, Nariño, Antioquia y Cauca entre 1.800 y 3.400 msnm en zona térmica fría. Árbol perenne 20-35 m que alfombra el suelo con sus agujas resinosas no degradables, acidificando el sustrato (pH puede descender de 5.5 a 4.0) y impidiendo la germinación de robles, alisos y encenillos nativos. Su sombra densa y alelopatía bloquean regeneración natural. Manejo: estrategia 'desmonte por núcleos' (clearcut + replante con Alnus acuminata + Quercus humboldtii), descortezamiento en anillo para árboles aislados, prohibición nuevas plantaciones cerca de remanentes nativos. Fuentes Tier A: Calderón Sáenz 2003 Invasoras Colombia, POWO Kew, GBIF Backbone Taxonomy.",
       "antagonists": [
-        "quercus_humboldtii"
+        "quercus_humboldtii",
+        "clusia_multiflora",
+        "clusia_grandiflora",
+        "viburnum_tinoides",
+        "myrcianthes_rhopaloides",
+        "morella_pubescens",
+        "freziera_canescens",
+        "oreopanax_incisus",
+        "axinaea_macrophylla",
+        "clethra_fagifolia",
+        "ilex_kunthiana",
+        "weinmannia_pubescens",
+        "weinmannia_microphylla",
+        "gaiadendron_punctatum",
+        "myrcianthes_ferreyrae",
+        "prumnopitys_montana"
       ],
       "tracking_mode": null
     },
@@ -4143,7 +4230,10 @@
         "calamagrostis_effusa",
         "prunus_serotina_capuli",
         "viburnum_triphyllum",
-        "weinmannia_tomentosa"
+        "weinmannia_tomentosa",
+        "clusia_multiflora",
+        "clusia_grandiflora",
+        "prumnopitys_montana"
       ],
       "antagonists": [
         "pinus_patula"
@@ -4246,7 +4336,10 @@
       ],
       "valor_pedagogico": "El romero (Rosmarinus officinalis L., sinonimo Salvia rosmarinus Schleid. según APG IV) es una labiada perenne aromática originaria del Mediterráneo, ampliamente naturalizada y cultivada en Colombia para uso culinario, medicinal y ornamental. Se cultiva en Sabana de Bogotá, Boyacá, Antioquia y Quindío entre 1.500 y 2.800 msnm en zona térmica templada a fría. Propagación por estaca leñosa (60-80% prendimiento) o acodos. Arbusto perenne 1-2 m, ciclo de vida 8-12 años. Aceite esencial con cineol, alcanfor y borneol confiere propiedades antioxidantes y antimicrobianas. Manejo agroecológico: suelos calcáreos con drenaje excelente, riego escaso (sequía-tolerante), poda formación copa abierta, asocio con manzanilla y caléndula en jardín herbal, atrayente de polinizadores. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "companions": [
-        "urtica_dioica"
+        "urtica_dioica",
+        "lavandula_dentata",
+        "dahlia_imperialis",
+        "monarda_didyma"
       ],
       "tracking_mode": "individual"
     },
@@ -4551,7 +4644,12 @@
         "ica-resolucion-3168-2015"
       ],
       "valor_pedagogico": "La Salvia officinalis L. se cultiva en los departamentos andinos de Colombia como Cundinamarca, Boyacá y Nariño entre 800 y 3200 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación mediante esquejes semileñosos que enraízan con facilidad en suelos ligeros, con un ciclo de producción de 6-8 meses para cosecha de hojas. Se asocia beneficiosamente con repollo y zanahoria para reducir plagas como áfidos y trips, requiere monitoreo de arañuelas y oidio en condiciones de alta humedad. En el contexto cultural andino-campesino, sus hojas se utilizan tradicionalmente en infusiones digestivas y como antiséptico natural para heridas leves, conocimiento que tiene raíces en las prácticas muiscas de medicina tradicional. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), y respaldada por el Manual de Biopreparados de AGROSAVIA (2015) y la ICA Resolución 3168/2015, su nombre científico válido es Salvia officinalis L.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "companions": [
+        "lavandula_dentata",
+        "dahlia_imperialis",
+        "monarda_didyma"
+      ]
     },
     {
       "id": "sambucus_nigra_peruviana",
@@ -5945,7 +6043,8 @@
         "brassica_rapa_rapifera",
         "chenopodium_quinoa",
         "raphanus_sativus_oleifer",
-        "zea_mays"
+        "zea_mays",
+        "phacelia_tanacetifolia"
       ],
       "antagonists": [
         "allium_sativum"
@@ -6000,7 +6099,20 @@
       },
       "companions": [
         "alnus_acuminata",
-        "quercus_humboldtii"
+        "quercus_humboldtii",
+        "clusia_multiflora",
+        "clusia_grandiflora",
+        "myrcianthes_rhopaloides",
+        "freziera_canescens",
+        "oreopanax_incisus",
+        "axinaea_macrophylla",
+        "clethra_fagifolia",
+        "ilex_kunthiana",
+        "weinmannia_pubescens",
+        "weinmannia_microphylla",
+        "gaiadendron_punctatum",
+        "myrcianthes_ferreyrae",
+        "prumnopitys_montana"
       ],
       "antagonists": [
         "eucalyptus_globulus"
@@ -6074,7 +6186,9 @@
         "phaseolus_vulgaris",
         "solanum_phureja",
         "trifolium_repens",
-        "vicia_sativa"
+        "vicia_sativa",
+        "helianthus_annuus",
+        "hibiscus_sabdariffa"
       ],
       "antagonists": [
         "foeniculum_vulgare"
@@ -6486,7 +6600,10 @@
       "enfermedades_criticas": [
         "Trozador (Agrotis ipsilon)"
       ],
-      "tracking_mode": "aggregate"
+      "tracking_mode": "aggregate",
+      "antagonists": [
+        "juglans_neotropica"
+      ]
     },
     {
       "id": "canna_edulis",
@@ -6808,7 +6925,11 @@
       ],
       "valor_pedagogico": "El fruto escondido: la fresa silvestre crece a ras del suelo en los bordes del bosque andino, ensenando que los mejores alimentos a veces estan donde menos se espera. Su estolon es leccion de reproduccion asexual.",
       "validation_level": "claude_draft",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "companions": [
+        "viola_tricolor",
+        "viola_odorata"
+      ]
     },
     {
       "id": "rubus_glaucus",
@@ -7096,7 +7217,10 @@
       ],
       "valor_pedagogico": "El tomillo (Thymus vulgaris L., familia Lamiaceae) es una lamiácea subarbustiva perenne aromática originaria de la cuenca mediterránea occidental (España, Italia, sur de Francia), aclimatada exitosamente en huertos andinos colombianos como planta medicinal y condimentaria multipropósito. Sus tallos leñosos rastreros producen hojas pequeñas grisáceas ricas en aceites esenciales fenólicos (timol 20-50%, carvacrol 5-15%, p-cimeno 10-20%), responsables de su acción antibacteriana, antifúngica y expectorante documentada. Se cultiva en Cundinamarca (Subachoque, Cota, Tabio, sabana de Bogotá), Boyacá (Tunja, Villa de Leyva, Sutamarchán), Antioquia (Santuario, La Ceja, Rionegro) y Eje cafetero entre 800 y 2.600 msnm en zona térmica templada a fría seca. Ciclo perenne, producción comercial 3-4 años antes de renovar plantación. Rendimientos 0.8-1.5 t/ha hierba seca. Lección viva: muestra la rusticidad mediterránea adaptada a los Andes — cómo una planta con aceites esenciales volátiles sobrevive en suelos pobres, pedregosos y secos, y repele plagas del huerto (pulgones Myzus persicae, mosca blanca Bemisia tabaci, polilla del tomate Tuta absoluta) por efecto alelopático aéreo. Manejo agroecológico: propagación por esquejes semileñosos o división de mata (más confiable que semilla por germinación lenta 14-21 días), siembra en bordes y caminos del huerto como repelente natural, poda post-floración para mantener compacidad, no requiere riego frecuente ni fertilización, asocio con tomate y pimentón. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA, Bernal 2015 Catálogo Plantas Colombia, Pamplona-Roger 2006 Plantas Medicinales.",
       "validation_level": "operator_reviewed",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "companions": [
+        "lavandula_dentata"
+      ]
     },
     {
       "id": "eryngium_foetidum",
@@ -7203,7 +7327,10 @@
         "bernal-2015-plantas-liquenes-colombia"
       ],
       "valor_pedagogico": "La calabaza o auyama (Cucurbita maxima Duchesne, familia Cucurbitaceae) es una cucurbitácea anual herbácea rastrera-trepadora originaria de los Andes sudamericanos (Bolivia, Perú, Argentina), domesticada hace más de 8.000 años y dispersada precolombinamente por toda América, cultivada tradicionalmente en sistemas campesinos colombianos como uno de los tres pilares del sistema mesoamericano-andino de las tres hermanas (maíz-fríjol-calabaza). Produce frutos grandes (3-15 kg, hasta 50 kg en variedades gigantes) de pulpa amarillo-anaranjada rica en betacaroteno, vitamina A y fibra. Se cultiva en Cundinamarca (Pacho, Subachoque, sabana de Bogotá), Boyacá (Tunja, Villa de Leyva), Nariño (Pasto, Ipiales), Cauca, Antioquia (oriente, Suroeste) y Eje cafetero entre 1.000 y 2.600 msnm en zona térmica cálida a fría. Ciclo anual de 4-6 meses. Rendimientos 15-30 t/ha fruto. Lección viva: en la milpa andina-mesoamericana enseña el sistema de las tres hermanas — el maíz aporta soporte estructural a la guía rastrera, el fríjol fija nitrógeno biológico (Rhizobium spp.) y la calabaza cubre el suelo con sus hojas amplias reduciendo evapotranspiración y suprimiendo arvenses. Las flores masculinas rellenas de queso y huevo son patrimonio culinario de Cundinamarca y Boyacá. Manejo agroecológico: siembra directa en sitio definitivo a 1.5-2 m entre golpes, asocio obligatorio en milpa, polinización por abejas nativas (Peponapis pruinosa, Apis mellifera), cosecha post-marchitamiento de guía, almacenamiento en bodega ventilada hasta 6 meses, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA, FAO Ecocrop, Bernal 2015 Catálogo Plantas Colombia.",
-      "tracking_mode": "aggregate"
+      "tracking_mode": "aggregate",
+      "companions": [
+        "helianthus_annuus"
+      ]
     },
     {
       "id": "matricaria_chamomilla",
@@ -7732,7 +7859,14 @@
       ],
       "valor_pedagogico": "La esmeralda chiquita o mortiño de monte (Hesperomeles goudotiana (Decne.) Killip, familia Rosaceae) es una rosácea arbustiva a arbórea pequeña perenne (3-8 m altura) nativa endémica del bosque altoandino y subpáramo colombiano, considerada especie clave de la transición ecotono bosque-páramo. Produce hojas coriáceas brillantes ovaladas, racimos de flores blancas pentámeras y frutos pequeños globosos rojos a negro-violáceos (5-8 mm) carnosos. Se distribuye en cordilleras Oriental y Central colombianas: Cundinamarca (Cruz Verde, Sumapaz, Chingaza), Boyacá (Páramo de la Rusia, El Cocuy), Nariño (Volcán Galeras), Cauca (Macizo Colombiano) y Antioquia (Páramo de Belmira) entre 2.800 y 3.400 msnm en zona térmica fría a páramo bajo. Ciclo perenne, longevidad 30-50 años, floración bianual. Cultivable no recomendado, especie silvestre protegida bajo categoría Vulnerable UICN regional y Resoluciones MADS de páramos. Lección viva ecosistémica: pequeño árbol nativo del bosque alto andino y subpáramo, sus frutos rojos alimentan aves dispersoras del bosque de niebla (Catharus ustulatus, Turdus fuscater, Anisognathus igniventris, Conirostrum cinereum), siendo especie ideal para enseñar la conectividad ecológica entre bosque andino y páramo, su rol en la cadena trófica de dispersión zoócora y la importancia de los relictos arbóreos altoandinos en la regulación hídrica y captura de carbono. Manejo agroecológico: aprovechamiento únicamente por restauración ecológica activa con propagación por semilla (estratificación fría 2 meses) o esqueje semileñoso, asocio con encenillos (Weinmannia tomentosa), arrayanes (Myrcianthes leucoxyla) y romeros de páramo (Diplostephium spp.), prohibida tala con fines comerciales. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Humboldt Flora Alto-Andina, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia.",
       "validation_level": "claude_draft",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "companions": [
+        "viburnum_tinoides",
+        "myrcianthes_rhopaloides",
+        "oreopanax_incisus",
+        "ilex_kunthiana",
+        "gaiadendron_punctatum"
+      ]
     },
     {
       "id": "polylepis_sericea",
@@ -7859,7 +7993,11 @@
       ],
       "valor_pedagogico": "El Coloradito es una especie emblemática de los páramos de la Cordillera Oriental colombiana, fundamental para la regulación hídrica y la fijación de carbono en ecosistemas de alta montaña. Sus raíces fibrosas y ramificación densa permiten estabilizar suelos frágiles y prevenir la erosión en laderas pronunciadas. En el contexto cultural andino, aunque no tiene usos específicos documentados en la tradición muisca, su presencia indica la salud del ecosistema paramuno que ha sido sagrado para las culturas indígenas desde tiempos prehispánicos. La propagación asistida requiere sustrato específico de turba de páramo descompuesta mezclada con arena gruesa y materia orgánica en proporción 2:1:1, manteniendo constante humedad pero sin encharcamiento según protocolos del Instituto Humboldt. Fuentes primarias: GBIF Taxonomic Backbone confirma la distribución andina; POWO-Kew valida el nombre científico y autoría; Libro Rojo de Plantas de Colombia clasifica su estado de conservación; estudios del Instituto Alexander von Humboldt detallan su ecología de páramo y requerimientos de manejo para restauración.",
       "validation_level": "claude_draft",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "companions": [
+        "weinmannia_microphylla",
+        "gaiadendron_punctatum"
+      ]
     },
     {
       "id": "salix_humboldtiana",
@@ -8033,7 +8171,14 @@
       ],
       "valor_pedagogico": "Arbol nativo del bosque alto andino. Sus flores rosadas alimentan colibries y abejas nativas. Madera usada tradicionalmente para herramientas rurales. Especie ideal para restauracion de bordes de paramo.",
       "validation_level": "claude_draft",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "companions": [
+        "clusia_multiflora",
+        "viburnum_tinoides",
+        "morella_pubescens",
+        "escallonia_pendula",
+        "bocconia_frutescens"
+      ]
     },
     {
       "id": "beta_vulgaris_var_cicla",
@@ -8307,7 +8452,10 @@
         "ica-resolucion-3168-2015"
       ],
       "valor_pedagogico": "El cebollino o cebollín (Allium schoenoprasum L., familia Amaryllidaceae, subfamilia Allioideae) es una alliácea perenne herbácea bulbosa originaria de regiones templadas del hemisferio norte (Europa, Asia, América del Norte), aclimatada exitosamente en huertos andinos colombianos por sus hojas tubulares finas verde-azuladas aromáticas (más finas que las del Allium fistulosum cebolla larga), inflorescencias en umbela esférica con flores lilas-rosadas y crecimiento en macollos densos por bulbillos. Sus compuestos sulfurados volátiles (alicina, propil-disulfuros, sinpropanetial S-óxido) son responsables del aroma, sabor y propiedades insectifugas. Se cultiva en Cundinamarca (Sabana de Bogotá, Subachoque, Tabio, Cota, La Calera), Boyacá (Tunja, Villa de Leyva, Sutamarchán), Nariño (Pasto, Yacuanquer, Sapuyes), Antioquia (oriente, La Ceja, Rionegro) y Eje cafetero alto entre 1.800 y 2.800 msnm en zona térmica templada a fría. Ciclo perenne, producción foliar continua 3-4 años antes de renovar mata. Rendimientos 5-8 t/ha hoja fresca. Lección viva de biodiversidad funcional y policultivo de bordes: sus flores lilas atraen polinizadores nativos (Bombus rohweri, Apis mellifera, abejas Tetragonisca) y enemigos naturales de plagas (Chrysoperla externa, sírfidos depredadores de áfidos), mientras sus hojas con sulfurados volátiles ahuyentan pulgones (Myzus persicae), mosca de la zanahoria (Psila rosae) y polilla del tomate (Tuta absoluta), demostrando el principio agroecológico de policultivo funcional en bordes de cama (push-pull) que reduce hasta 60% la presión de plagas en cultivos asociados (lechuga, zanahoria, tomate). Manejo agroecológico: propagación facilísima por división de macollos cada 2-3 años (más confiable que semilla), siembra en bordes y caminos del huerto, asocio obligatorio con zanahoria, tomate y rosas, cosecha tipo cut-and-come-again a 3-4 cm sobre suelo, no requiere agroquímicos. Fuentes Tier A: AGROSAVIA Manual Hortalizas, POWO Kew, GBIF Backbone Taxonomy, ICA Resolución 3168/2015, Bernal 2015 Catálogo Plantas Colombia.",
-      "tracking_mode": "aggregate"
+      "tracking_mode": "aggregate",
+      "companions": [
+        "viola_tricolor"
+      ]
     },
     {
       "id": "avena_sativa",
@@ -8361,7 +8509,8 @@
         "raphanus_sativus_oleifer",
         "trifolium_repens",
         "vicia_faba",
-        "vicia_sativa"
+        "vicia_sativa",
+        "phacelia_tanacetifolia"
       ],
       "antagonists": [],
       "valor_pedagogico": "La avena forrajera (Avena sativa L., familia Poaceae, subfamilia Pooideae) es una poácea anual herbácea cereal originaria del Oriente Medio fértil, domesticada hace ~3.000 años y aclimatada a los Andes desde la Conquista, cultivada extensamente en sistemas campesinos colombianos de alta montaña como cultivo de cobertura (cover crop), forraje verde de corte, ensilaje, fuente de grano para consumo humano (harina, hojuelas) y abono verde en rotaciones con papa, papa criolla, hortalizas y leguminosas andinas. Se cultiva en Boyacá (Tunja, Sotaquirá, Sutamarchán, Villa de Leyva, Toca, altiplano cundiboyacense), Cundinamarca (Sabana de Bogotá, Subachoque, Sumapaz, Choachí), Nariño (Pasto, Túquerres, Ipiales, Sapuyes), Cauca (Silvia, Totoró) y Antioquia (oriente lechero — La Unión, La Ceja) entre 2.200 y 3.000 msnm en zona térmica fría a páramo bajo. Ciclo corto 4-5 meses desde siembra a corte de forraje verde. Rendimientos 8-12 t/ha materia seca forrajera, 2-4 t/ha grano. Lección viva del manto verde de la chagra altoandina: la avena forrajera protege el suelo desnudo entre cosechas de papa y hortalizas, enseñando el valor crítico de la cobertura permanente del suelo (no-soil-bare), el aporte de biomasa carbonada (C/N 25-30:1) en la rotación altoandina, y la ruptura de ciclos de patógenos suelo-borne como Globodera spp. (nematodo dorado de la papa) y Rhizoctonia solani. Manejo agroecológico: siembra al voleo o a chorrillo 80-100 kg/ha semilla, asocio con vicia (Vicia atropurpurea) fijadora de nitrógeno para mejorar C/N y aporte de N biológico, incorporación en floración (pre-grano lechoso) como abono verde para máximo aporte de biomasa, corte para forraje cada 60-80 días con rebrote 2-3 cortes/ciclo. Fuentes Tier A: AGROSAVIA Forrajeras 2022, POWO Kew, GBIF Backbone Taxonomy, ICA Resolución 3168/2015, Bernal 2015 Catálogo Plantas Colombia.",
@@ -9872,7 +10021,19 @@
       "rol_ecologico": "Fijador de nitrogeno simbiotico con Rhizobium. Forrajera de alto valor proteico. Sombra ligera para cafe y cacao. Madera para leña y construcciones rurales.",
       "valor_pedagogico": "El matarratón (Gliricidia sepium (Jacq.) Walp.) es una leguminosa arbórea nativa de Mesoamérica naturalizada y ampliamente usada en sistemas agroforestales colombianos. Fija nitrógeno biológico (~100-200 kg N/ha/año) por simbiosis con Rhizobium, sirviendo como cerca viva, sombra ganadera, banco proteico forrajero y especie pionera en restauración. Se cultiva en zonas templadas y cálidas: Tolima, Huila, Valle del Cauca, Antioquia, Cauca, Magdalena y Llanos Orientales entre 0 y 1.700 msnm en zona térmica cálida a templada. Propagación por estaca leñosa (60-80% prendimiento), crecimiento rápido alcanza 3-4 m primer año. Manejo agroecológico: poda anual a 1.5 m altura, biomasa cortada se usa como mulch verde o forraje (proteína 20-25%). Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "validation_level": "claude_draft",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "companions": [
+        "pseudosamanea_guachapele",
+        "enterolobium_cyclocarpum",
+        "samanea_saman",
+        "albizia_guachapele",
+        "prosopis_juliflora",
+        "pithecellobium_dulce",
+        "cassia_grandis",
+        "bursera_graveolens",
+        "ceiba_pentandra",
+        "byrsonima_crassifolia"
+      ]
     },
     {
       "id": "trichanthera_gigantea",
@@ -11301,7 +11462,16 @@
       "valor_pedagogico": "El guamo macheto (Inga densiflora Benth.) se cultiva en departamentos andinos y amazónicos de Colombia como Putumayo, Caquetá, Meta, Amazonas y parte de la cordillera oriental entre 0 y 2200 msnm, con óptimo entre 500 y 1800 msnm en zonas térmicas templadas. Su manejo agronómico incluye propagación por semilla fresca (recalcitrante) con germinación de 15-30 días, ciclo de establecimiento de 6-12 meses hasta primera producción de vainas, se asocia beneficiosamente con café y cacao como sombra temporal en sistemas agroforestales, y fija nitrógeno atmosférico mediante nodulación con rhizobios, mejorando la fertilidad del suelo. En el contexto cultural muisca y campesino andino, los frutos (vainas) se consumen tradicionalmente como snack dulce y la madera se usa para postes y leña. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Inga densiflora Benth.",
       "validation_level": "claude_draft",
       "estrato": "alto",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "companions": [
+        "cedrela_montana",
+        "magnolia_caricifragrans",
+        "magnolia_yarumalensis",
+        "clethra_revoluta",
+        "myrcia_popayanensis",
+        "cinchona_pubescens",
+        "cinchona_officinalis"
+      ]
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -11337,7 +11507,8 @@
       ],
       "valor_pedagogico": "Variedad manejada del kikuyo (Cenchrus clandestinus), pasto perenne ampliamente usado en ganadería extensiva andina. Bajo manejo agroecológico (cortes programados, asociaciones con Alnus acuminata, rotación de potreros) reduce su carácter invasor original.",
       "companions": [
-        "alnus_acuminata"
+        "alnus_acuminata",
+        "juglans_neotropica"
       ],
       "tracking_mode": "aggregate"
     },
@@ -11374,7 +11545,11 @@
         "powo-kew"
       ],
       "valor_pedagogico": "El sauco peruano o tilo andino (Sambucus peruviana Kunth, Adoxaceae) es un árbol/arbusto nativo andino (3-8 m) endémico del norte de Sudamérica (Colombia, Ecuador, Perú, Bolivia) entre 1800 y 3400 msnm, distinto del Sambucus nigra europeo. Crece en bosque alto andino y subpáramo, frecuente en cercas vivas tradicionales del altiplano cundiboyacense y Nariño. Lección viva de sustitución nativa frente al retamo espinoso invasor (Ulex europaeus): cumple las MISMAS funciones de cerca viva (espinosidad moderada, denso, perenne) sin los problemas de banco de semillas longevo, alelopatía severa ni alteración del régimen de fuego. Floración blanca en panículas atrae abejas nativas (Bombus atratus, abejas sin aguijón Meliponini), polinizadores cruciales para tomate, papa criolla, mora y curuba. Frutos pequeños negro-purpúreos comestibles cocidos (NO crudos, contienen glicósidos cianogénicos que se neutralizan con cocción) usados en jaleas y vinos artesanales. Hojas medicinales en infusión para diaforesis en resfriados (uso en farmacopea Muisca y Chibcha). Manejo agroecológico: propagación por estaca de 30-40 cm directa al sitio, primer año riego, después tolera sequía moderada. Excelente para programas de restauración Cruz Verde-Sumapaz.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "companions": [
+        "viburnum_tinoides",
+        "morella_pubescens"
+      ]
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -11485,7 +11660,10 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El niguito o tuno (Miconia squamulosa Naudin, familia Melastomataceae, tribu Miconieae) es una melastomatácea arbórea pequeña a mediana (5-12 m altura, hábito ramificado denso) perennifolia nativa de los bosques altoandinos y sub-páramo de Colombia, Venezuela y Ecuador, considerada una de las especies leñosas pioneras-tempranas más importantes en la sucesión ecológica secundaria del bosque alto-andino colombiano post-disturbio (potreros abandonados, deslizamientos, áreas de regeneración natural). Sus hojas opuestas decusadas elípticas-ovadas (8-15 cm largo) presentan el patrón característico de venación acródroma curvinervia (3-5 nervios principales paralelos partiendo de la base) diagnóstico inequívoco de la familia Melastomataceae, una sinapomorfía morfológica visible a simple vista que permite identificación de campo confiable. Su envés foliar es densamente escamoso-tomentoso (de ahí el epíteto squamulosa). Produce inflorescencias terminales en panículas densas con flores pequeñas blanco-rosadas pentámeras y frutos en baya pequeña (5-8 mm diámetro) morado-negros maduros, altamente apetecidos por avifauna frugívora. Se distribuye en bosque altoandino y sub-páramo de Cundinamarca (Chingaza, Sumapaz, Cruz Verde, La Calera, Guasca), Boyacá (Iguaque, Arcabuco, Santa Sofía), Santander (Yariguíes, Páramo del Almorzadero), Antioquia (oriente — San Rafael, Sonsón), Cauca (Puracé) y Eje cafetero (Los Nevados) entre 1.800 y 3.300 msnm en zona térmica fría a templada húmeda. Ciclo perenne de larga duración, longevidad 40-80 años, fructificación masiva escalonada todo el año con picos en lluvias. Lección viva: árbol andino nativo de bosque sub-páramo y sucesional pionero-temprano de alto valor para restauración ecológica — sus frutos morado-negros atraen avifauna frugívora andina (Turdus fuscater mirla patiamarilla, Tangara vassorii cuningui, Diglossa cyanea pinchaflor, Catamblyrhynchus diadema mielero gorra-castaña) que actúan como dispersores de semillas a sitios degradados (zoocoria), enseñando el rol crítico de las melastomatáceas pioneras como nurse plants facilitadoras frente a invasoras agresivas del altiplano cundiboyacense (Pteridium aquilinum helecho marranero, Ulex europaeus retamo espinoso, Cenchrus clandestinus kikuyo). Enseña tres conceptos críticos: sucesión ecológica secundaria con nurse plants nativas (mecanismo de facilitación de Connell-Slatyer 1977), zoocoria por avifauna como motor de regeneración de bosque altoandino, y restauración asistida por especies nativas en planes de la CAR-Cundinamarca y Cruz Verde-Sumapaz como alternativa documentada al control químico de invasoras. Manejo agroecológico: propagación por semilla recolectada de frutos maduros (germinación lenta 30-60 días, requiere sustrato ácido húmedo bajo sombra), trasplante con cepellón a sitio definitivo en lluvias, plantación en grupos densos de 5-10 plantas a 2 m entre individuos como núcleo de restauración, asocio con drimys, weinmannia y escalonia, no tolera agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia, Humboldt Flora Alto-Andina, Restauración Cruz Verde-Sumapaz, SIB Colombia.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "companions": [
+        "axinaea_macrophylla"
+      ]
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-17 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -11565,7 +11743,10 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El siete cueros (Tibouchina lepidota (Bonpl.) Baill., Melastomataceae) es un arbolito o arbusto andino nativo (4-12 m altura) emblemático del bosque alto-andino colombiano entre 2.200 y 3.000 msnm, propio de Cundinamarca (cerros orientales de Bogotá, Cruz Verde, Sumapaz, Chingaza, Verjón), Boyacá (Iguaque, Pisba), Antioquia (San Félix, Belmira), Tolima, Caldas y Nariño. Su nombre alude a las siete capas de corteza papirácea que se desprenden con la edad. Hojas elípticas de nervadura paralela característica (3-5 nervios convergentes), flores grandes (5-8 cm) púrpura-violeta intenso que florecen en panículas terminales casi todo el año, atrayendo abejorros nativos (Bombus rubicundus, B. funebris), abejas sin aguijón y avispas polinizadoras. Es lección viva de restauración ecológica y soberanía botánica que enseña a niñas y niños por qué las especies nativas son la mejor estrategia para revegetar laderas degradadas del altoandino: a diferencia del eucalipto (Eucalyptus globulus) y pino pátula (Pinus patula), introducidas que acidifican y desecan suelos de páramo, el siete cueros estabiliza taludes con su raíz pivotante, alimenta polinizadores nativos, genera hojarasca compatible con los hongos micorrízicos andinos y sucesionaliza bosque secundario. Por eso aparece como especie prioritaria en planes de restauración ecológica de los páramos Cruz Verde-Sumapaz (IAvH + CAR Cundinamarca 2018) y en los corredores de conservación del Distrito Capital. Manejo agroecológico: propagación por semilla (germinación 30-60 días, requiere luz) o esqueje semileñoso bajo cámara húmeda, vivero 8-12 meses antes de trasplante en lluvias (abril-mayo, octubre-noviembre), distancia 3-5 m, tolera podas formativas, función ecológica como planta niñera (nurse plant) que protege plántulas de sucesión tardía y como árbol melífero clave. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015 Catálogo Plantas y Líquenes de Colombia, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "companions": [
+        "escallonia_pendula"
+      ]
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -11725,7 +11906,11 @@
         "sib-colombia"
       ],
       "valor_pedagogico": "El arrayán de Bogotá (Myrcianthes leucoxyla (Ortega) McVaugh, Myrtaceae) es un árbol andino nativo emblemático del bosque alto-andino colombiano (8-15 m altura, hasta 25 m en bosques maduros bien conservados) entre 2.500 y 3.200 msnm, presente en Cundinamarca (cerros orientales de Bogotá, Cruz Verde, Sumapaz, Chingaza, Verjón, Guasca, La Calera), Boyacá (Iguaque, Arcabuco, Tota), Santander, Tolima y Nariño. Es árbol patrimonial del Distrito Capital y especie protegida por la Resolución 1923 de 2017 (SDA-Bogotá) que prohíbe su tala salvo emergencia fitosanitaria. Corteza rojiza-anaranjada papirácea característica que se desprende en placas, hojas pequeñas ovales lustrosas aromáticas (aceites esenciales con eucaliptol), flores blancas con muchos estambres dorados que atraen abejas (excelente meliferal) y otros polinizadores, frutos en baya pequeña púrpura-negro comestible (sabor dulce-aromático, alto en taninos, antioxidantes). Es lección viva de soberanía botánica y restauración ecológica que enseña a niñas y niños por qué los árboles patrimoniales nativos son irreemplazables: a diferencia del eucalipto y pino pátula introducidos que acidifican suelos paramunos y dan sombra estéril, el arrayán de Bogotá fue el dosel original de los bosques de la Sabana, alberga avifauna nativa (mirla, cucarachero, copetón, tángaras), genera hojarasca compatible con suelos andinos y produce frutos comestibles que pueden integrarse a chagra agroforestal. Por eso es especie prioritaria en planes de restauración Cruz Verde-Sumapaz (IAvH + CAR) y en programas de arborización urbana de Bogotá. Manejo agroecológico: propagación por semilla recién recolectada (germinación 40-90 días, no tolera deshidratación), vivero 12-18 meses antes de trasplante en lluvias, distancia 4-6 m en agroforestería o cerca viva alta, fructificación a partir de 6-8 años, función como árbol multifuncional (sombra, frutal, melífero, nurse plant, patrimonio). Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "companions": [
+        "myrcia_popayanensis",
+        "myrsine_coriacea"
+      ]
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -13296,7 +13481,12 @@
         "jbb-plantas-medicinales"
       ],
       "valor_pedagogico": "El totumo (Crescentia cujete L., Bignoniaceae) es un árbol pequeño nativo del Neotrópico (Caribe, América Central, norte de Sudamérica) emblema cultural y agroecológico del Caribe colombiano y los valles interandinos cálidos (0-1.200 msnm: Atlántico, Bolívar, Sucre, Córdoba, Magdalena, Cesar, Tolima, Huila, Valle del Cauca, Llanos Orientales), de 4-8 m de altura, con copa irregular extendida, tronco corto retorcido de corteza grisácea y ramas largas casi horizontales que sostienen fascículos densos de hojas obovadas-espatuladas (8-20 cm) agrupadas en braquiblastos cortos. Sus flores son uno de los espectáculos botánicos tropicales más notables: emergen directamente del tronco y ramas gruesas (cauliflora), grandes acampanadas (4-6 cm), amarillo-verdosas con venas rojo-vinotinto, abriendo al atardecer y exudando un olor fuerte y agrio que atrae específicamente murciélagos polinizadores (familia Phyllostomidae: Glossophaga, Carollia), en una de las coevoluciones planta-murciélago más estudiadas del Neotrópico. Los frutos son los famosos calabazos lisos esféricos u ovoides (10-30 cm de diámetro), con pericarpio leñoso duro impermeable y pulpa blanca-amarillenta interior que se oscurece al madurar. Es lección viva de etnobotánica afro-indígena y bioeconomía tropical que enseña a niñas y niños cómo un solo árbol provee cultura material completa a comunidades caribes y llaneras: las totumas son las cucharas, cuencos, totumas para café tinto, maracas de cumbia y vallenato, recipientes para mote y mazamorra, lámparas tradicionales (huingos en Llanos), y juguetes infantiles desde tiempos precolombinos hasta hoy. Uso medicinal tradicional documentado por JBB, Pérez-Arbeláez (1947) y farmacopea cubana-caribeña: el jarabe casero del cogollo y la pulpa madura del totumo (cocinada lentamente con miel o panela) es uno de los remedios afrocolombianos más usados para bronquitis crónica, tos rebelde, asma y catarros — los principios activos son taninos, alcaloides indólicos, naftoquinonas y mucílagos con acción expectorante y antimicrobiana. Las hojas en cataplasma se usan para inflamaciones e hipertensión. Manejo agroecológico: propagación por semilla (germinación 30-60 días) o esqueje grueso semileñoso (>70% prendimiento), suelos arcilloso-pedregosos drenados o arenosos con riego en establecimiento, sol pleno, fructificación a partir de 4-6 años, función como árbol multipropósito en patios productivos caribes, cerco vivo, sombra ligera para ganado, atractor de murciélagos polinizadores (servicio ecosistémico clave para otros frutales nocturnos), recurso de cultura material y botiquín pectoral. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, SiB Colombia, Pérez-Arbeláez 1947, JBB Plantas Medicinales.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "companions": [
+        "pithecellobium_dulce",
+        "bursera_graveolens",
+        "byrsonima_crassifolia"
+      ]
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -14222,7 +14412,10 @@
         "jbb-plantas-medicinales"
       ],
       "valor_pedagogico": "El yarumo plateado (Cecropia telealba Cuatrec., Urticaceae) es un árbol pionero andino nativo (8-20 m altura, ocasionalmente hasta 25 m, tronco recto hueco entrenudoso característico del género Cecropia que aloja hormigas Azteca en simbiosis) propio del bosque subandino y alto-andino colombiano entre 1.200 y 2.400 msnm, presente en cordilleras Oriental, Central y Occidental: Cundinamarca, Boyacá, Antioquia, Caldas, Risaralda, Quindío, Valle, Cauca, Nariño, Santander y Tolima. Hojas grandes peltadas digitalmente lobuladas (7-11 lóbulos, 25-50 cm de diámetro) con envés característico blanco-plateado tomentoso (de ahí el nombre 'telealba' = paño blanco) que crea efecto plateado visible a distancia en el dosel, inflorescencias amentos cilíndricos colgantes con flores diminutas dioicas, frutos numerosos en infrutescencias amentiformes amarillo-rojizas muy buscadas por tucanes, perezosos de tres dedos (Bradypus variegatus), monos y aves frugívoras. Es lección viva de ecología de bosques pioneros andinos y mutualismos planta-animal que enseña a niñas y niños cómo el yarumo plateado es uno de los pilares de la restauración de bosques alto-andinos colombianos por ser una especie pionera de crecimiento muy rápido (2-4 m/año), que abre dosel y crea sombra ligera bajo la cual germinan especies de sucesión tardía (robles, encenillos, gaques), aloja una de las simbiosis hormiga-planta mejor documentadas de los neotrópicos (las hormigas Azteca habitan los entrenudos huecos y defienden la planta contra herbívoros recibiendo a cambio cuerpos müllerianos ricos en glucógeno producidos en las trichilias de la base del peciolo), alimenta perezosos y tucanes en redes ecológicas críticas, produce fibra de corteza usada artesanalmente, sus hojas grandes y secas se usan tradicionalmente como papel-cartón biodegradable y como medicina (diurética, antiasmática, hipoglucemiante validada farmacognosticamente), y aparece como especie estratégica en planes de restauración Cruz Verde-Sumapaz, Chingaza y cuenca del río Bogotá. Manejo agroecológico: propagación por semilla (germinación 30-60 días, requiere luz) o esqueje semileñoso, vivero 6-12 meses, distancia 4-6 m, crecimiento juvenil muy rápido pero vida útil de árbol corta (30-50 años), función como árbol pionero de sombra ligera-restauración-nodriza-medicinal en sistemas agroforestales andinos y planes de restauración de cuencas. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora, SiB Colombia, Plan Restauración Cruz Verde-Sumapaz, JBB Plantas Medicinales.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "companions": [
+        "vismia_baccifera"
+      ]
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -14360,7 +14553,10 @@
         "perez-arbelaez-1947-plantas-utiles"
       ],
       "valor_pedagogico": "El manzano de Sabana (Malus domestica (Suckow) Borkh. cv. Sabanera, Rosaceae) es un frutal templado caducifolio de la Sabana Bogotá y altiplano cundiboyacense, cultivado tradicionalmente entre 2.300 y 2.800 msnm en zona térmica fría con acumulación natural de horas frío (300-600 h <7°C). Presente en Cundinamarca (Sopó, Chía, Cota, Tenjo, Subachoque, Choachí, Ubaté), Boyacá (Paipa, Duitama, Sotaquirá, Tibasosa, Tunja), Nariño (Ipiales, Túquerres, Pasto) y altiplano antioqueño (Santa Rosa de Osos, Belmira). Árbol de 4-8 m de altura, copa redondeada, follaje caducifolio que reposa en periodo seco. Flores blanco-rosadas en corimbo que aparecen antes que las hojas, atrayendo abejas (Apis mellifera) y polinizadores nativos (Bombus rubicundus, Xylocopa). Frutos en pomo globoso de 5-8 cm, piel verde-amarilla con chapa rosa-rojiza al sol, pulpa blanca crujiente dulce-acidulada (12-14° Brix). Lección viva de soberanía alimentaria templada andina: enseña a niñas y niños que Colombia sí produce manzana propia, adaptada al clima frío de altura, sin necesidad de importar manzana chilena/argentina/estadounidense de menor frescura y mayor huella de carbono. Manejo agroecológico: poda de formación en vaso o eje central, distancia 4×5 m (500 árboles/ha), fertilización con compost + biol foliar, control de Cydia pomonella (gusano de la manzana) con trampas de feromona + Bacillus thuringiensis, manejo de Venturia inaequalis (sarna del manzano) con caldo bordelés + caldo sulfocálcico preventivo. Asocios productivos en altiplano: tagasaste (Cytisus proliferus) como cortavientos y aporte N, papa criolla en calles primeros 2 años, fresa Monterrey como cobertura productiva, trébol blanco fijador. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA Manual Frutales Tropicales, ICA Resolución 3168/2015, Pérez-Arbeláez 1947 Plantas Útiles.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "antagonists": [
+        "juglans_neotropica"
+      ]
     },
     {
       "id": "pyrus_communis_anjou",
@@ -15295,7 +15491,14 @@
         "coffea_arabica",
         "cordia_alliodora",
         "erythrina_edulis",
-        "inga_edulis"
+        "inga_edulis",
+        "swietenia_macrophylla",
+        "cariniana_pyriformis",
+        "ochroma_pyramidale",
+        "myroxylon_balsamum",
+        "nectandra_acutifolia",
+        "ocotea_calophylla",
+        "aniba_perutilis"
       ],
       "antagonists": [],
       "manejo_por_escala": {
@@ -15413,7 +15616,25 @@
         "cedrela_odorata",
         "coffea_arabica",
         "erythrina_edulis",
-        "inga_edulis"
+        "inga_edulis",
+        "swietenia_macrophylla",
+        "tabebuia_rosea",
+        "tabebuia_chrysantha",
+        "bombacopsis_quinata",
+        "cariniana_pyriformis",
+        "ochroma_pyramidale",
+        "myroxylon_balsamum",
+        "pseudosamanea_guachapele",
+        "enterolobium_cyclocarpum",
+        "samanea_saman",
+        "albizia_guachapele",
+        "prosopis_juliflora",
+        "pithecellobium_dulce",
+        "cassia_grandis",
+        "bursera_graveolens",
+        "ceiba_pentandra",
+        "nectandra_acutifolia",
+        "vismia_baccifera"
       ],
       "antagonists": [],
       "manejo_por_escala": {
@@ -15525,7 +15746,9 @@
         "cedrela_odorata",
         "coffea_arabica",
         "cordia_alliodora",
-        "inga_edulis"
+        "inga_edulis",
+        "cariniana_pyriformis",
+        "ochroma_pyramidale"
       ],
       "antagonists": [],
       "manejo_por_escala": {
@@ -15644,7 +15867,13 @@
         "coffea_arabica",
         "cordia_alliodora",
         "erythrina_edulis",
-        "inga_edulis"
+        "inga_edulis",
+        "tabebuia_chrysantha",
+        "bombacopsis_quinata",
+        "pseudosamanea_guachapele",
+        "samanea_saman",
+        "albizia_guachapele",
+        "cassia_grandis"
       ],
       "antagonists": [],
       "manejo_por_escala": {
@@ -15989,12 +16218,13 @@
       "companions": [
         "alnus_acuminata",
         "cenchrus_clandestinus_manejado",
-        "coffea_arabica"
+        "coffea_arabica",
+        "cedrela_montana",
+        "magnolia_yarumalensis"
       ],
       "antagonists": [
         "malus_domestica_sabanera",
-        "solanum_tuberosum_sabanera",
-        "tomate_chonto"
+        "solanum_tuberosum_sabanera"
       ],
       "manejo_por_escala": {
         "apartamento": {
@@ -16342,7 +16572,8 @@
         "cedrela_odorata",
         "coffea_arabica",
         "cordia_alliodora",
-        "inga_edulis"
+        "inga_edulis",
+        "cariniana_pyriformis"
       ],
       "antagonists": [],
       "manejo_por_escala": {
@@ -17482,7 +17713,9 @@
         "coffea_arabica",
         "cordia_alliodora",
         "gliricidia_sepium",
-        "tabebuia_rosea"
+        "tabebuia_rosea",
+        "enterolobium_cyclocarpum",
+        "albizia_guachapele"
       ],
       "antagonists": [],
       "manejo_por_escala": {
@@ -17710,7 +17943,8 @@
         "cordia_alliodora",
         "enterolobium_cyclocarpum",
         "gliricidia_sepium",
-        "tabebuia_rosea"
+        "tabebuia_rosea",
+        "ceiba_pentandra"
       ],
       "antagonists": [],
       "manejo_por_escala": {
@@ -17937,7 +18171,8 @@
       "companions": [
         "cordia_alliodora",
         "gliricidia_sepium",
-        "pithecellobium_dulce"
+        "pithecellobium_dulce",
+        "bursera_graveolens"
       ],
       "antagonists": [],
       "manejo_por_escala": {
@@ -18057,7 +18292,8 @@
         "cordia_alliodora",
         "crescentia_cujete",
         "gliricidia_sepium",
-        "prosopis_juliflora"
+        "prosopis_juliflora",
+        "byrsonima_crassifolia"
       ],
       "antagonists": [],
       "manejo_por_escala": {
@@ -21329,7 +21565,10 @@
         "agrosavia-manual-biopreparados-2015"
       ],
       "valor_pedagogico": "La chinchilla o huacatay andino (Tagetes minuta L., Asteraceae) es una hierba aromática-medicinal-repelente nativa de los Andes suramericanos (originaria del altiplano peruano-boliviano-noroeste argentino) presente ancestralmente en Colombia andina como especie nativa silvestre y cultivada en los departamentos de Nariño (Pasto, Túquerres, Ipiales), Cauca (Popayán, Silvia, Páez), Putumayo (Sibundoy, Mocoa alto), Boyacá (Sogamoso, Belén, Cerinza), Cundinamarca (Sabana, Sumapaz), Antioquia (Oriente alto, Suroeste), Santander (páramos), entre 500 y 3.600 msnm en zonas térmicas frías y templadas. Pertenece a la familia Asteraceae (Compositae, igual que girasol, lechuga, calendula, manzanilla, ajenjo, achicoria, diente de león) y al género Tagetes — el mismo del cempasúchil mexicano (T. erecta) y del pericón (T. lucida) — que contiene >50 especies neotropicales caracterizadas por la producción de aceites esenciales con propiedades insecticidas, nematicidas y aromáticas. Planta herbácea anual de 1-2 m de altura con hojas pinnatisectas verde-grisáceas con glándulas oleíferas visibles (puntos translúcidos al trasluz), tallos erectos pubescentes con olor fuerte característico a anís-cítrico-resinoso al estrujar, capítulos pequeños amarillos en panículas terminales, frutos en aquenios cipsela ligeros dispersados por viento. Doble función patrimonial: 1) como **aromática culinaria andina** es el 'huacatay' icónico de la cocina peruano-boliviana (ocopa, pollo en salsa de huacatay, papas chorreadas) y se usa también en cocina nariñense colombiana en sopas y carnes; aceite esencial rico en tagetona, ocimeno, dihidrotagetona, limoneno y beta-cariofileno con notas aromáticas únicas no replicables por otra hierba; 2) como **repelente-nematicida agroecológico** es uno de los biopreparados clave de la agricultura andina: el 'té de huacatay' (infusión 10% p/v de hojas y flores frescas en agua tibia, 24 h maceración, filtrado, dilución 1:5, aspersión foliar) controla pulgones (Myzus persicae), trips (Frankliniella spp.), ácaros (Tetranychus urticae) y mosquita blanca (Bemisia tabaci) en cultivos vecinos sin daño a polinizadores; sembrada intercalada con papa, maíz, fríjol, hortalizas inhibe nemátodos del nudo (Meloidogyne spp.) a través de exudados radiculares con alfa-tertienilo y otros tiofenos nematicidas — biofumigante natural. Es lección extraordinaria de soberanía agroecológica y patrimonio biocultural andino que enseña a niñas y niños cómo una hierba nativa puede ser simultáneamente alimento, medicina y biopreparado, reemplazando insecticidas químicos por una decocción aromática. Manejo agroecológico: propagación por semilla (germinación 5-10 días a 18-22°C, resiembra espontánea abundante en cama), distancia 30-40 cm, ciclo 5-7 meses anual obligado, cosecha foliar al inicio de floración para máxima concentración de aceite esencial. Companion plants ideales: papa, maíz, fríjol, hortalizas en general. Función en chagra como aromática culinaria + repelente + nematicida + atractora de polinizadores. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015 Catálogo Plantas y Líquenes Colombia, JBB Plantas Medicinales, AGROSAVIA Manual Biopreparados 2015.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "companions": [
+        "cosmos_sulphureus"
+      ]
     },
     {
       "id": "tagetes_lucida",
@@ -21641,7 +21880,9 @@
       "companions": [
         "cucurbita_maxima",
         "phaseolus_vulgaris",
-        "zea_mays"
+        "zea_mays",
+        "centaurea_cyanus",
+        "cosmos_sulphureus"
       ],
       "antagonists": [],
       "harvest_type": "semilla",
@@ -21833,7 +22074,9 @@
       "companions": [
         "rosmarinus_officinalis",
         "salvia_officinalis",
-        "thymus_vulgaris"
+        "thymus_vulgaris",
+        "dahlia_imperialis",
+        "monarda_didyma"
       ],
       "antagonists": [],
       "harvest_type": "flor",
@@ -24091,7 +24334,10 @@
       ],
       "valor_pedagogico": "El caupí o fríjol vaca (Vigna unguiculata (L.) Walp., familia Fabaceae, subtribu Phaseolinae) es una leguminosa anual herbácea originaria del África Occidental tropical (Sahel-Sudán-Nigeria) domesticada hace ~5000 años y diseminada pantropicalmente, introducida en América durante el comercio transatlántico de esclavos como cultivo de subsistencia afrocolombiano. Se cultiva tradicionalmente en Caribe colombiano (Córdoba — Montería, Cereté, San Pelayo; Sucre — Sincelejo, Corozal, Sampués; Bolívar — María La Baja, San Juan Nepomuceno; Magdalena — Ciénaga, Plato; Cesar — Valledupar, San Diego; La Guajira — Riohacha, Maicao), Valle del Cauca (Patía, Norte del Valle), Antioquia (Urabá, Bajo Cauca), Tolima (Espinal, Saldaña), Huila (Neiva), Santander (Lebrija, Girón) y Llanos Orientales (Casanare, Meta) entre 0 y 1.800 msnm en zonas térmicas cálidas-templadas. Lección viva PEDAGÓGICAMENTE EXCELENTE de adaptación africana al trópico americano: alta proteína (22-28% peso seco en grano), ciclo cortísimo (60-90 días grano verde, 90-120 días grano seco — la leguminosa tropical de ciclo más rápido), tolerancia a sequía moderada (sobrevive estiajes de 4-8 semanas), tolerancia a suelos ácidos pobres (pH 5-7, Al sat hasta 30%), fijación biológica de N (80-150 kg N/ha por simbiosis con Bradyrhizobium sp. cowpea) — propiedades que lo convierten en cultivo de seguridad alimentaria de poblaciones afrocaribeñas costeñas. Planta herbácea de hábito polimórfico (erecto, semierecto, postrado o trepador según variedad — variedades erectas para grano, postradas para forraje-cobertura) de 0.3-2 m de altura, hojas trifoliadas alternas con foliolo terminal romboide-ovado y foliolos laterales asimétricos, flores grandes papilionadas blanco-violáceas en racimos axilares péndulos, frutos legumbres alargadas cilíndricas (10-25 cm largo) verdes a amarillas a maduras, semillas reniformes (cabecita negra o blanca o moteada según cultivar) — la variedad 'cabecita negra' (blackeye pea) es la más cultivada en Colombia. Uso alimenticio múltiple: grano seco (sopas, sancochos, fríjoles guisados afrocaribeños como el 'arroz con fríjol cabecita negra' costeño), grano verde tierno (vainitas-judias verdes), hojas tiernas como hortaliza (espinaca tropical africana), raíces como medicinales tradicionales (antiparasitarias). Manejo agroecológico: siembra directa a 2-4 cm profundidad, distancia 30-40 cm x 60-80 cm, densidad 25-40 kg/ha semilla, inoculación con Bradyrhizobium específico para suelos vírgenes (no usar inóculo de fríjol común — son rizobios distintos), asocio tradicional con maíz (la milpa caribeña) y yuca, rotación con cereales-tubérculos para romper ciclos de Macrophomina phaseolina y antracnosis, control biológico de pulgón Aphis craccivora con purín de ortiga + caldo sulfocálcico, cosecha grano verde 60-75 días, grano seco 90-110 días, rendimientos 0.8-2.5 t/ha grano seco según variedad y manejo, doble función como cultivo de cobertura-abono verde y grano alimenticio. Función en chagra/huerto escolar afrocaribeño como leguminosa proteica de ciclo corto adaptada a sequía, ideal para asocio en milpa caribeña, abono verde tropical, ground cover, fijador N suelos pobres, soberanía alimentaria afrocolombiana ancestral. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, NRC 1989 Lost Crops Africa, FAO Ecocrop Vigna unguiculata, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "validation_level": "claude_draft",
-      "tracking_mode": "aggregate"
+      "tracking_mode": "aggregate",
+      "companions": [
+        "hibiscus_sabdariffa"
+      ]
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH49_LEGUMINOSAS_NAMES",
@@ -24230,7 +24476,10 @@
       ],
       "valor_pedagogico": "El gandul o guandú (Cajanus cajan (L.) Huth, familia Fabaceae, tribu Phaseoleae) es una leguminosa arbustiva semi-perenne erecta de 2-4 m de altura originaria del subcontinente indio (Ghats Occidentales — Maharashtra, Karnataka, Andhra Pradesh) donde fue domesticada hace ~3500 años y diseminada vía África e introducida en América durante el comercio transatlántico como cultivo de subsistencia afroamericano profundamente arraigado en el Caribe colombiano. Se cultiva tradicionalmente en Caribe colombiano (Bolívar — Cartagena, San Juan Nepomuceno, María La Baja; Córdoba — Montería, Lorica, Cereté; Sucre — Sincelejo, Sampués; Magdalena — Santa Marta, Ciénaga, Plato; Cesar — Valledupar, San Diego; La Guajira — Riohacha, Maicao, San Juan del Cesar), Antioquia (Urabá — Apartadó, Turbo, Chigorodó; Bajo Cauca), Chocó (Quibdó, Bajo Baudó), Valle del Cauca (Buenaventura, Norte del Valle), Tolima (Espinal, Ibagué), Huila (Neiva, Garzón), Norte de Santander (Cúcuta, Ocaña) y Santander (Bucaramanga, Barrancabermeja) entre 0 y 2.000 msnm en zonas térmicas cálidas-templadas-secas-húmedas. Lección viva PEDAGÓGICAMENTE EXCELENTE de cultivo multipropósito-multiestrato: combina simultáneamente grano alimenticio proteico (semillas maduras grano seco — 19-24% proteína — para sopas, sancochos costeños, arroz con gandules), grano tierno verde como hortaliza (vainitas y semillas verdes — gastronomía afrocaribeña ancestral 'gandules verdes'), abono verde-cobertura por su rica biomasa hojosa, fijación biológica de N (100-200 kg N/ha por simbiosis con Bradyrhizobium sp. cajani), forraje arbustivo proteico para ganadería rumiante (vacas, ovejas, cabras costeñas) ramoneando hojas tiernas y vainas verdes, cerca viva-living fence productiva en bordes de chagras campesinas, leña de tallos lignificados al final del ciclo, atractor de polinizadores nativos (Apidae, Megachilidae). Planta arbustiva erecta con tallos lignificados rojizos pubescentes, hojas trifoliadas alternas pubescentes plateadas-grisáceas (foliolos elípticos), inflorescencia racimo terminal y axilar de flores grandes amarillas papilionadas (a veces con estandarte rayado rojizo), frutos legumbres alargadas planas (5-9 cm largo) verdes a maduras marrón-paja pubescentes, semillas redondeadas-ovales (cremas, marrones, rojas, negras moteadas según landrace — diversidad genética enorme de cultivares africanos-asiáticos-caribeños). Tolerancia extraordinaria a sequía severa (sobrevive estiajes de 3-5 meses por sistema radicular profundo pivotante 1-2 m), suelos pobres degradados ácidos (pH 5-7, Al sat hasta 30%), alta temperatura, salinidad moderada. Manejo agroecológico: siembra directa de semilla a 3-5 cm profundidad, distancia 60-100 cm entre plantas x 1-1.5 m entre surcos (8-15 kg/ha semilla), inoculación con Bradyrhizobium cajani opcional (ya hay cepas nativas en Caribe colombiano por siglos de cultivo), asocio tradicional con maíz-yuca-plátano-papaya en milpas afrocaribeñas, no requiere fertilización N (autosuficiente por fijación), poda anual tras cosecha para estimular rebrote (planta semi-perenne 2-5 años productiva), control de barrenadores de vainas Maruca vitrata con purín de tabaco + ajo y trampas de feromonas, cosecha grano verde 5-6 meses, grano seco 7-9 meses, rendimientos 0.8-2.5 t/ha grano seco según landrace y manejo. Función en chagra/huerto escolar afrocaribeño como leguminosa arbustiva multipropósito de soberanía alimentaria, cerca viva productiva, abono verde-cobertura biomasa, fijador N suelos pobres, forraje rumiante costeño, atractor polinizadores, cultivo afrocolombiano patrimonial. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, NRC 1989, FAO Ecocrop Cajanus cajan, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "validation_level": "claude_draft",
-      "tracking_mode": "aggregate"
+      "tracking_mode": "aggregate",
+      "companions": [
+        "hibiscus_sabdariffa"
+      ]
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH49_LEGUMINOSAS_NAMES",
@@ -28167,7 +28416,17 @@
       "companions": [
         "quercus_humboldtii",
         "vallea_stipularis",
-        "weinmannia_tomentosa"
+        "weinmannia_tomentosa",
+        "clusia_grandiflora",
+        "myrcianthes_rhopaloides",
+        "freziera_canescens",
+        "oreopanax_incisus",
+        "axinaea_macrophylla",
+        "clethra_fagifolia",
+        "ilex_kunthiana",
+        "weinmannia_pubescens",
+        "myrcianthes_ferreyrae",
+        "prumnopitys_montana"
       ],
       "antagonists": [
         "eucalyptus_globulus",
@@ -28361,7 +28620,8 @@
       "companions": [
         "hesperomeles_goudotiana",
         "sambucus_peruviana",
-        "vallea_stipularis"
+        "vallea_stipularis",
+        "clethra_fagifolia"
       ],
       "antagonists": [
         "eucalyptus_globulus",
@@ -28462,7 +28722,8 @@
       "companions": [
         "clusia_multiflora",
         "hesperomeles_goudotiana",
-        "weinmannia_tomentosa"
+        "weinmannia_tomentosa",
+        "myrcianthes_ferreyrae"
       ],
       "antagonists": [
         "eucalyptus_globulus",
@@ -29492,7 +29753,8 @@
       "companions": [
         "clusia_multiflora",
         "quercus_humboldtii",
-        "weinmannia_tomentosa"
+        "weinmannia_tomentosa",
+        "freziera_canescens"
       ],
       "antagonists": [
         "eucalyptus_globulus",
@@ -30438,7 +30700,8 @@
         "cedrela_odorata",
         "coffea_arabica",
         "cordia_alliodora",
-        "inga_edulis"
+        "inga_edulis",
+        "ocotea_calophylla"
       ],
       "antagonists": [],
       "manejo_por_escala": {
@@ -30547,7 +30810,9 @@
         "cedrela_odorata",
         "coffea_arabica",
         "inga_edulis",
-        "nectandra_acutifolia"
+        "nectandra_acutifolia",
+        "aniba_perutilis",
+        "magnolia_caricifragrans"
       ],
       "antagonists": [],
       "manejo_por_escala": {
@@ -30774,7 +31039,15 @@
         "alnus_acuminata",
         "coffea_arabica",
         "inga_densiflora",
-        "juglans_neotropica"
+        "juglans_neotropica",
+        "magnolia_caricifragrans",
+        "magnolia_yarumalensis",
+        "clethra_revoluta",
+        "escallonia_pendula",
+        "oreopanax_floribundum",
+        "cinchona_pubescens",
+        "cinchona_officinalis",
+        "myrsine_coriacea"
       ],
       "antagonists": [],
       "manejo_por_escala": {
@@ -31110,7 +31383,10 @@
         "alnus_acuminata",
         "cedrela_montana",
         "coffea_arabica",
-        "inga_densiflora"
+        "inga_densiflora",
+        "myrcia_popayanensis",
+        "oreopanax_floribundum",
+        "cinchona_pubescens"
       ],
       "antagonists": [],
       "manejo_por_escala": {
@@ -31333,7 +31609,9 @@
         "alnus_acuminata",
         "cedrela_montana",
         "tibouchina_lepidota",
-        "vallea_stipularis"
+        "vallea_stipularis",
+        "bocconia_frutescens",
+        "myrsine_coriacea"
       ],
       "antagonists": [],
       "manejo_por_escala": {
@@ -31781,7 +32059,8 @@
         "cedrela_montana",
         "clethra_revoluta",
         "coffea_arabica",
-        "inga_densiflora"
+        "inga_densiflora",
+        "cinchona_officinalis"
       ],
       "antagonists": [],
       "manejo_por_escala": {

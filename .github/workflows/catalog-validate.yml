@@ -5,10 +5,11 @@ name: Catalog Validate
 # de los gates pesados (CodeQL + Playwright) para feedback rápido a species
 # refiners.
 #
-# Modo CI: --lenient-schema --seed-mode. Schema errors legacy quedan como
-# warnings (cleanup pendiente fuera de este workflow). Pero AMB-11 (source_id
-# refs sin entrada), AMB-18 (format roundtrip) y otros checks duros sí
-# fallan — ahí es donde catchea bugs nuevos.
+# Modo CI: --lenient-schema (sin --seed-mode). Schema errors legacy quedan como
+# warnings (cleanup pendiente fuera de este workflow). AMB-10/11/13/18 y demás
+# checks duros SÍ fallan — ahí es donde catchea bugs nuevos. El --seed-mode
+# fue removido el 2026-05-20 (regresión AMB-10 0→234 entre 2026-05-17/18 lo
+# expuso: degradaba asimetrías de companions de error a warning).
 
 on:
   pull_request:
@@ -42,8 +43,8 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Run catalog validator (lenient + seed)
-        run: node scripts/validate-catalog.mjs --lenient-schema --seed-mode
+      - name: Run catalog validator (lenient, strict semantic)
+        run: node scripts/validate-catalog.mjs --lenient-schema
 
       # Comentario informativo en el PR cuando hay warnings significativos.
       # Si AMB-16 sigue creciendo (vp <200 chars), señala que el batch de
@@ -53,5 +54,5 @@ jobs:
         run: |
           echo "## Validator summary" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          node scripts/validate-catalog.mjs --lenient-schema --seed-mode 2>&1 | tail -30 >> $GITHUB_STEP_SUMMARY || true
+          node scripts/validate-catalog.mjs --lenient-schema 2>&1 | tail -30 >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
