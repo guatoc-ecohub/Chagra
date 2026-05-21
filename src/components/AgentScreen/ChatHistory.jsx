@@ -25,6 +25,12 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
     );
   }
 
+  // Loading state mientras el LLM genera el primer token: colibrí libando del
+  // abutilón en estado `thinking` (alas en blur rápido + sip motion hacia la
+  // flor + corola vibra). Reemplaza el "loading plano" para que la espera
+  // se sienta viva.
+  const showThinkingAvatar = isStreaming && !streamingContent;
+
   return (
     <div className="flex-1 overflow-y-auto p-4 pb-2">
       {messages.map((msg, idx) => (
