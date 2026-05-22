@@ -46,7 +46,7 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
           aparición del primer token — el indicador del header pasa
           desapercibido porque el ojo del operador está en la ventana de
           diálogo. Acá el colibrí late en thinking + texto "Pensando…". */}
-      {isStreaming && !streamingContent && (
+      {showThinkingAvatar && (
         <div className="flex items-end gap-3 mb-4 animate-fadeIn">
           <ChagraAgentAvatar
             state="thinking"
