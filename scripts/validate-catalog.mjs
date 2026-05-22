@@ -546,118 +546,242 @@ function validateAmb18_formatRoundtrip(catalogPath) {
   return [`AMB-18: formato no normalizado (length diff: raw=${rawLines.length} líneas vs fmt=${fmtLines.length})`];
 }
 
-// ----------------------------------------------------------------
-// Main
-// ----------------------------------------------------------------
-
-console.log('Chagra Catalog Validator v3.1');
-console.log(`  catalog: ${CATALOG_PATH}`);
-console.log(`  schema:  ${SCHEMA_PATH}`);
-console.log('');
-
-const schema = loadJSON(SCHEMA_PATH);
-const catalog = loadJSON(CATALOG_PATH);
-
-// 1. JSON Schema
-const schemaErrors = [];
-validate(catalog, schema, schema, '$', schemaErrors);
-if (schemaErrors.length) {
-  if (LENIENT_SCHEMA) {
-    warn(`JSON Schema v3.1: ${schemaErrors.length} warning(s) (lenient)`);
-    for (const e of schemaErrors.slice(0, 10)) console.warn(`    ${e}`);
-    if (schemaErrors.length > 10) console.warn(`    ... +${schemaErrors.length - 10} más`);
-  } else {
-    for (const e of schemaErrors) console.error(`  ✗ schema: ${e}`);
-    die(1, `${schemaErrors.length} errores de JSON Schema (usa --lenient-schema para downgrade a warnings)`);
+// AMB-25: autoridad ∈ enum canónico ESTRICTO (Batch 7A Pasada 7). Distinto de
+// AMB-19 (legacy laxo con variantes regionales: 'CAR Cundinamarca',
+// 'Secretaría Distrital de Ambiente Bogotá', 'IUCN'). Schema v3.1 cierra el
+// enum a 12 valores canónicos:
+//   MADS, ICA, IAvH, AGROSAVIA, MinCultura, MinSalud, MinJusticia,
+//   CAR, CORPOBOYACA, SDA-Bogota, UICN, IDEAM
+// Variantes legacy quedan fuera — el sweep de datos lo hace Batch 3A. Este
+// validador SOLO reporta hallazgos (no rompe build); en CI/lefthook corre
+// dentro de --lenient-schema para emitir warnings hasta completar el sweep.
+export const AUTORIDAD_ENUM_CANONICA_ESTRICTA = new Set([
+  'MADS',
+  'ICA',
+  'IAvH',
+  'AGROSAVIA',
+  'MinCultura',
+  'MinSalud',
+  'MinJusticia',
+  'CAR',
+  'CORPOBOYACA',
+  'SDA-Bogota',
+  'UICN',
+  'IDEAM',
+]);
+export function validateAmb25_autoridadCanonicaEstricta(catalog) {
+  const errors = [];
+  for (const sp of catalog.species || []) {
+    const norms = sp.normativa_colombiana;
+    if (!Array.isArray(norms)) continue;
+    for (let i = 0; i < norms.length; i++) {
+      const aut = norms[i]?.autoridad;
+      if (typeof aut === 'string' && aut.length > 0 && !AUTORIDAD_ENUM_CANONICA_ESTRICTA.has(aut)) {
+        errors.push(`AMB-25 [${sp.id}.normativa_colombiana[${i}].autoridad]: "${aut}" no está en enum canónico estricto (MADS/ICA/IAvH/AGROSAVIA/MinCultura/MinSalud/MinJusticia/CAR/CORPOBOYACA/SDA-Bogota/UICN/IDEAM). Sweep migración: Batch 3A.`);
+      }
+    }
   }
-} else {
-  ok('JSON Schema v3.1 — PASS');
+  return errors;
 }
 
-// 2. Validadores semánticos
-// Nota: AMB-16/17/18 introducidos 2026-05-16 tras detectar bugs en species PRs
-// auto-generados (vp corto, source_ids sin Tier A, formato sin roundtrip).
-// SEED_MODE relaja AMB-16/17 a warnings: el catálogo seed legacy aún tiene
-// entradas pre-pipeline con vp/sources incompletos que se completan progresivo
-// vía batches. main no debe REGRESAR — el guard es para PRs nuevos, no existing.
-const semanticChecks = [
-  ['AMB-05 altitud chain', (c) => ({ errors: validateAmb05_altitudChain(c), warnings: [] })],
-  ['AMB-10 companions/antagonists symmetry', (c) => {
-    const arr = validateAmb10_companionsSymmetry(c);
-    return SEED_MODE ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
-  }],
-  ['AMB-13 cross-refs existencia', (c) => validateAmb13_crossRefs(c, SEED_MODE)],
-  ['AMB-14 invasor consistency', (c) => ({ errors: validateAmb14_invasorConsistency(c), warnings: [] })],
-  ['AMB-15 scale_viability ↔ manejo_por_escala', (c) => ({ errors: validateAmb15_scaleCoherence(c), warnings: [] })],
-  ['AMB-16 valor_pedagogico ≥200 chars', (c) => {
-    const arr = validateAmb16_vpLength(c);
-    return SEED_MODE ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
-  }],
-  ['AMB-17 source_ids ≥2 Tier A', (c) => {
-    const arr = validateAmb17_tierACoverage(c);
-    return SEED_MODE ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
-  }],
-  ['AMB-18 format roundtrip', () => {
-    const arr = validateAmb18_formatRoundtrip(CATALOG_PATH);
-    return SEED_MODE ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
-  }],
-  // AMB-19..24 introducidos 2026-05-21 tras auditoría agroecológica (Pasadas
-  // 3-5-7). Schema v3.2 formaliza variedades_registradas_ica + enum cerrado
-  // de autoridades. Soft mode (warnings only) por default para no romper seed
-  // legacy mientras se aplican fixes batch a normativa_colombiana.
-  // AMB-19..22 + AMB-24: soft mode default (warnings) — el seed legacy v3.1
-  // tiene casos pre-existentes (autoridades regionales con typos, species
-  // endémicas sin clasificacion_uicn ni nota_conservacion). Validators
-  // capturan regresiones nuevas con --strict; en lefthook/CI quedan como
-  // warnings hasta completar el sweep de catálogo. AMB-20/21/22 son strict
-  // dentro de variedades_registradas_ica (estructura nueva, sin legacy).
-  ['AMB-19 autoridad enum canónico', (c) => {
-    const arr = validateAmb19_autoridadEnum(c);
-    return LENIENT_SCHEMA ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
-  }],
-  ['AMB-20 variedades_registradas_ica strict', (c) => ({
-    errors: validateAmb20_variedadesIca(c),
-    warnings: [],
-  })],
-  ['AMB-21 resolucion ICA formato NNNNN/AAAA', (c) => ({
-    errors: validateAmb21_resolucionIcaFormat(c),
-    warnings: [],
-  })],
-  ['AMB-22 subregiones_naturales_ica enum', (c) => ({
-    errors: validateAmb22_subregionesEnum(c),
-    warnings: [],
-  })],
-  ['AMB-23 source.tier ∈ {A,B,C}', (c) => {
-    const arr = validateAmb23_sourceTier(c);
-    return SEED_MODE ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
-  }],
-  ['AMB-24 endémica con conservation context', (c) => {
-    const arr = validateAmb24_endemicaConservation(c);
-    return LENIENT_SCHEMA ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
-  }],
+// AMB-26: validation_level ∈ enum canónico ampliado (Batch 7A Pasada 7).
+// Reemplaza el legacy {claude_draft, operator_reviewed, agronomist_validated,
+// community_attested} por la escala nueva alineada al pipeline POWO/AGROSAVIA:
+//   claude_draft, powo_validated, agrosavia_verified, expert_reviewed, published
+// Solo verifica cuando el campo está presente (es opcional en species).
+export const VALIDATION_LEVEL_ENUM = new Set([
+  'claude_draft',
+  'powo_validated',
+  'agrosavia_verified',
+  'expert_reviewed',
+  'published',
+]);
+export function validateAmb26_validationLevelCanonico(catalog) {
+  const errors = [];
+  for (const sp of catalog.species || []) {
+    const vl = sp.validation_level;
+    if (typeof vl === 'string' && vl.length > 0 && !VALIDATION_LEVEL_ENUM.has(vl)) {
+      errors.push(`AMB-26 [${sp.id}.validation_level]: "${vl}" no está en enum canónico (claude_draft/powo_validated/agrosavia_verified/expert_reviewed/published). Sweep migración: Batch 3A/5A.`);
+    }
+  }
+  return errors;
+}
+
+// AMB-27 (WARN): species con menciones de toxicidad en valor_pedagogico pero
+// SIN advertencia_toxicologica explícita. Guía Batch 3A para poblar el campo
+// nuevo (advertencia_toxicologica) de forma sistemática. Match case-insensitive
+// por keywords agroecológicas reales: "tóxico", "abortifaciente",
+// "fotosensibilidad", "neurotoxic" (cubre neurotóxico/neurotoxic), "alcaloide
+// letal". Tildes opcionales (regex con tolerancia). Soft mode siempre — este
+// validador NUNCA emite errors, solo warnings.
+export const TOXICO_KEYWORDS = [
+  /t[oó]xic[oa]s?/i,
+  /abortifacient[eo]s?/i,
+  /fotosensibilidad/i,
+  /neurot[oó]xic[oa]s?/i,
+  /neurotoxic/i,
+  /alcaloide[s]?\s+letal[es]?/i,
 ];
-
-if (SEED_MODE) console.log('  mode:    SEED (refs a species ausentes = warnings)\n');
-
-const allSemanticErrors = [];
-for (const [label, fn] of semanticChecks) {
-  const { errors, warnings } = fn(catalog);
-  if (errors.length) {
-    console.error(`  ✗ ${label}: ${errors.length} error(es)`);
-    for (const e of errors) console.error(`    ${e}`);
-    allSemanticErrors.push(...errors);
-  } else if (warnings.length) {
-    warn(`${label}: ${warnings.length} warning(s) — refs a species aún no migradas`);
-    for (const w of warnings.slice(0, 5)) console.warn(`    ${w}`);
-    if (warnings.length > 5) console.warn(`    ... +${warnings.length - 5} más`);
-  } else {
-    ok(label);
+export function validateAmb27_toxicoSinAdvertencia(catalog) {
+  const warnings = [];
+  for (const sp of catalog.species || []) {
+    const vp = typeof sp.valor_pedagogico === 'string' ? sp.valor_pedagogico : '';
+    if (!vp) continue;
+    const hits = TOXICO_KEYWORDS.filter((rx) => rx.test(vp)).map((rx) => rx.source);
+    if (hits.length === 0) continue;
+    const hasAdvertencia = typeof sp.advertencia_toxicologica === 'string' && sp.advertencia_toxicologica.trim().length > 0;
+    if (!hasAdvertencia) {
+      warnings.push(`AMB-27 [${sp.id}]: valor_pedagogico menciona toxicidad [${hits.join(', ')}] pero falta advertencia_toxicologica. Sweep poblamiento: Batch 3A.`);
+    }
   }
+  return warnings;
 }
 
-if (allSemanticErrors.length) die(2, `${allSemanticErrors.length} errores semánticos`);
+// ----------------------------------------------------------------
+// Main (CLI). Gated por `import.meta.url === file://${process.argv[1]}` para
+// permitir importar las funciones validador desde tests (scripts/__tests__/
+// validate-catalog.test.mjs) sin que se dispare process.exit(). Patrón usado
+// también en scripts/catalog-to-age.mjs.
+// ----------------------------------------------------------------
 
-console.log('');
-console.log('\x1b[32m✓ Catálogo válido\x1b[0m');
-console.log(`  ${(catalog.species || []).length} especies, ${(catalog.biopreparados || []).length} biopreparados, ${(catalog.sources || []).length} sources`);
-process.exit(0);
+const IS_CLI = import.meta.url === `file://${process.argv[1]}`;
+
+if (IS_CLI) {
+  runCli();
+}
+
+function runCli() {
+  console.log('Chagra Catalog Validator v3.1');
+  console.log(`  catalog: ${CATALOG_PATH}`);
+  console.log(`  schema:  ${SCHEMA_PATH}`);
+  console.log('');
+
+  const schema = loadJSON(SCHEMA_PATH);
+  const catalog = loadJSON(CATALOG_PATH);
+
+  // 1. JSON Schema
+  const schemaErrors = [];
+  validate(catalog, schema, schema, '$', schemaErrors);
+  if (schemaErrors.length) {
+    if (LENIENT_SCHEMA) {
+      warn(`JSON Schema v3.1: ${schemaErrors.length} warning(s) (lenient)`);
+      for (const e of schemaErrors.slice(0, 10)) console.warn(`    ${e}`);
+      if (schemaErrors.length > 10) console.warn(`    ... +${schemaErrors.length - 10} más`);
+    } else {
+      for (const e of schemaErrors) console.error(`  ✗ schema: ${e}`);
+      die(1, `${schemaErrors.length} errores de JSON Schema (usa --lenient-schema para downgrade a warnings)`);
+    }
+  } else {
+    ok('JSON Schema v3.1 — PASS');
+  }
+
+  // 2. Validadores semánticos
+  // Nota: AMB-16/17/18 introducidos 2026-05-16 tras detectar bugs en species PRs
+  // auto-generados (vp corto, source_ids sin Tier A, formato sin roundtrip).
+  // SEED_MODE relaja AMB-16/17 a warnings: el catálogo seed legacy aún tiene
+  // entradas pre-pipeline con vp/sources incompletos que se completan progresivo
+  // vía batches. main no debe REGRESAR — el guard es para PRs nuevos, no existing.
+  const semanticChecks = [
+    ['AMB-05 altitud chain', (c) => ({ errors: validateAmb05_altitudChain(c), warnings: [] })],
+    ['AMB-10 companions/antagonists symmetry', (c) => {
+      const arr = validateAmb10_companionsSymmetry(c);
+      return SEED_MODE ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
+    }],
+    ['AMB-13 cross-refs existencia', (c) => validateAmb13_crossRefs(c, SEED_MODE)],
+    ['AMB-14 invasor consistency', (c) => ({ errors: validateAmb14_invasorConsistency(c), warnings: [] })],
+    ['AMB-15 scale_viability ↔ manejo_por_escala', (c) => ({ errors: validateAmb15_scaleCoherence(c), warnings: [] })],
+    ['AMB-16 valor_pedagogico ≥200 chars', (c) => {
+      const arr = validateAmb16_vpLength(c);
+      return SEED_MODE ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
+    }],
+    ['AMB-17 source_ids ≥2 Tier A', (c) => {
+      const arr = validateAmb17_tierACoverage(c);
+      return SEED_MODE ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
+    }],
+    ['AMB-18 format roundtrip', () => {
+      const arr = validateAmb18_formatRoundtrip(CATALOG_PATH);
+      return SEED_MODE ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
+    }],
+    // AMB-19..24 introducidos 2026-05-21 tras auditoría agroecológica (Pasadas
+    // 3-5-7). Schema v3.2 formaliza variedades_registradas_ica + enum cerrado
+    // de autoridades. Soft mode (warnings only) por default para no romper seed
+    // legacy mientras se aplican fixes batch a normativa_colombiana.
+    // AMB-19..22 + AMB-24: soft mode default (warnings) — el seed legacy v3.1
+    // tiene casos pre-existentes (autoridades regionales con typos, species
+    // endémicas sin clasificacion_uicn ni nota_conservacion). Validators
+    // capturan regresiones nuevas con --strict; en lefthook/CI quedan como
+    // warnings hasta completar el sweep de catálogo. AMB-20/21/22 son strict
+    // dentro de variedades_registradas_ica (estructura nueva, sin legacy).
+    ['AMB-19 autoridad enum canónico', (c) => {
+      const arr = validateAmb19_autoridadEnum(c);
+      return LENIENT_SCHEMA ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
+    }],
+    ['AMB-20 variedades_registradas_ica strict', (c) => ({
+      errors: validateAmb20_variedadesIca(c),
+      warnings: [],
+    })],
+    ['AMB-21 resolucion ICA formato NNNNN/AAAA', (c) => ({
+      errors: validateAmb21_resolucionIcaFormat(c),
+      warnings: [],
+    })],
+    ['AMB-22 subregiones_naturales_ica enum', (c) => ({
+      errors: validateAmb22_subregionesEnum(c),
+      warnings: [],
+    })],
+    ['AMB-23 source.tier ∈ {A,B,C}', (c) => {
+      const arr = validateAmb23_sourceTier(c);
+      return SEED_MODE ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
+    }],
+    ['AMB-24 endémica con conservation context', (c) => {
+      const arr = validateAmb24_endemicaConservation(c);
+      return LENIENT_SCHEMA ? { errors: [], warnings: arr } : { errors: arr, warnings: [] };
+    }],
+    // AMB-25/26/27 introducidos 2026-05-22 (Batch 7A Pasada 7 — auditoría
+    // agroecológica). Soft mode default: AMB-25/26 reportan como warnings hasta
+    // que Batch 3A/5A complete el sweep de datos legacy (CAR Cundinamarca →
+    // CAR, IUCN → UICN, operator_reviewed → expert_reviewed, etc.). AMB-27
+    // siempre es warning-only (guía de poblamiento del campo nuevo
+    // advertencia_toxicologica).
+    ['AMB-25 autoridad canónica estricta', (c) => {
+      const arr = validateAmb25_autoridadCanonicaEstricta(c);
+      return LENIENT_SCHEMA || SEED_MODE
+        ? { errors: [], warnings: arr }
+        : { errors: arr, warnings: [] };
+    }],
+    ['AMB-26 validation_level canónico', (c) => {
+      const arr = validateAmb26_validationLevelCanonico(c);
+      return LENIENT_SCHEMA || SEED_MODE
+        ? { errors: [], warnings: arr }
+        : { errors: arr, warnings: [] };
+    }],
+    ['AMB-27 toxico_sin_advertencia (WARN)', (c) => ({
+      errors: [],
+      warnings: validateAmb27_toxicoSinAdvertencia(c),
+    })],
+  ];
+
+  if (SEED_MODE) console.log('  mode:    SEED (refs a species ausentes = warnings)\n');
+
+  const allSemanticErrors = [];
+  for (const [label, fn] of semanticChecks) {
+    const { errors, warnings } = fn(catalog);
+    if (errors.length) {
+      console.error(`  ✗ ${label}: ${errors.length} error(es)`);
+      for (const e of errors) console.error(`    ${e}`);
+      allSemanticErrors.push(...errors);
+    } else if (warnings.length) {
+      warn(`${label}: ${warnings.length} warning(s) — refs a species aún no migradas`);
+      for (const w of warnings.slice(0, 5)) console.warn(`    ${w}`);
+      if (warnings.length > 5) console.warn(`    ... +${warnings.length - 5} más`);
+    } else {
+      ok(label);
+    }
+  }
+
+  if (allSemanticErrors.length) die(2, `${allSemanticErrors.length} errores semánticos`);
+
+  console.log('');
+  console.log('\x1b[32m✓ Catálogo válido\x1b[0m');
+  console.log(`  ${(catalog.species || []).length} especies, ${(catalog.biopreparados || []).length} biopreparados, ${(catalog.sources || []).length} sources`);
+  process.exit(0);
+}

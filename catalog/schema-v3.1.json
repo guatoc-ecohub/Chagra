@@ -936,7 +936,21 @@
                   },
                   "autoridad": {
                     "type": "string",
-                    "description": "Entidad emisora de la norma. Ej: 'MADS', 'ICA', 'Consejo Nacional de Estupefacientes', 'IAvH', 'CAR Cundinamarca'."
+                    "enum": [
+                      "MADS",
+                      "ICA",
+                      "IAvH",
+                      "AGROSAVIA",
+                      "MinCultura",
+                      "MinSalud",
+                      "MinJusticia",
+                      "CAR",
+                      "CORPOBOYACA",
+                      "SDA-Bogota",
+                      "UICN",
+                      "IDEAM"
+                    ],
+                    "description": "Entidad emisora de la norma. Enum cerrado (Batch 7A Pasada 7) — 12 valores canónicos. Variantes regionales colapsadas: 'CAR Cundinamarca' → 'CAR', 'Secretaría Distrital de Ambiente Bogotá' → 'SDA-Bogota', 'IUCN' → 'UICN'. Sweep de datos legacy queda para Batch 3A. Validador AMB-25 enforces strict."
                   },
                   "fecha_vigor": {
                     "type": "string",
@@ -979,15 +993,20 @@
         "protocolo_post_remocion": {
           "type": "string"
         },
+        "advertencia_toxicologica": {
+          "type": "string",
+          "description": "Campo opcional añadido en Batch 7A (Pasada 7). Recomendado para species cuyo valor_pedagogico menciona toxicidad (alcaloides letales, fotosensibilidad, abortifacientes, neurotóxicos). El validador AMB-27 emite warning (no error) para sugerir documentación explícita del riesgo — el sweep de poblamiento se hace en Batch 3A. Texto sugerido: contraindicación principal + dosis crítica si conocida + via de exposición + audiencia en riesgo (niños, gestantes, animales)."
+        },
         "validation_level": {
           "type": "string",
           "enum": [
             "claude_draft",
-            "operator_reviewed",
-            "agronomist_validated",
-            "community_attested"
+            "powo_validated",
+            "agrosavia_verified",
+            "expert_reviewed",
+            "published"
           ],
-          "description": "Nivel de validación. Default 'claude_draft' para entradas generadas por LLM sin revisión humana. Sube cuando el operador revisa, cuando un agrónomo con identidad registrada valida, o cuando la comunidad custodio atestigua el saber ancestral. Consumido por el módulo Pro de curación (ver ADR-016)."
+          "description": "Nivel de validación (Batch 7A Pasada 7 — enum canónico ampliado). Escala ascendente de rigor: 'claude_draft' (LLM sin revisión) → 'powo_validated' (taxonomía cruzada contra POWO/Kew) → 'agrosavia_verified' (validada contra fichas AGROSAVIA / variedades ICA) → 'expert_reviewed' (revisada por agrónomo con identidad registrada) → 'published' (apto para distribución pública del catálogo). Valores legacy 'operator_reviewed', 'agronomist_validated', 'community_attested' quedan fuera del enum nuevo — sweep migración en Batch 3A/5A. Validador AMB-26 enforces strict. Consumido por el módulo Pro de curación (ver ADR-016)."
         },
         "validated_by": {
           "type": "array",
