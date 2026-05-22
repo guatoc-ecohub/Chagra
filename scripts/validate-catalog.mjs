@@ -373,6 +373,13 @@ function validateAmb17_tierACoverage(catalog) {
 // MinCultura (yajé/brugmansia patrimonio cultural), MADS confundido con
 // MinSalud (cannabis Res. 577/2017), ICA confundido con IAvH (thunbergia). El
 // campo era free-form string en schema v3.1, lo que permitía typos sin detectar.
+// Batch 3A (2026-05-22) amplió este enum laxo para aceptar TANTO los valores
+// legacy (CAR Cundinamarca, Secretaría Distrital de Ambiente Bogotá, IUCN)
+// como los canónicos del schema v3.1 estricto (CAR, SDA-Bogota, UICN). Esto
+// permite el sweep gradual: AMB-19 sigue siendo laxo (super-set), AMB-25 es
+// el guard estricto que reporta cuando se introduce un valor fuera del
+// canónico. Tras completar Batch 3A los valores legacy quedan migrados y
+// AMB-19 podría retirarse en una pasada futura (post-Batch 7B).
 const AUTORIDAD_ENUM = new Set([
   'MADS',
   'ICA',
@@ -381,9 +388,11 @@ const AUTORIDAD_ENUM = new Set([
   'MinCultura',
   'MinSalud',
   'MinJusticia',
+  'CAR',
   'CAR Cundinamarca',
   'CORPOBOYACA',
   'CORPOBOYACÁ',
+  'SDA-Bogota',
   'Secretaria Distrital Ambiente',
   'Secretaría Distrital Ambiente',
   'Secretaría Distrital de Ambiente Bogotá',
