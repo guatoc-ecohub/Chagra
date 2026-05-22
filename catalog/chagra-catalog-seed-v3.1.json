@@ -1754,126 +1754,6 @@
       "tracking_mode": "individual"
     },
     {
-      "id": "cytisus_monspessulanus",
-      "nombre_comun": "Retamo liso",
-      "nombre_comunes_regionales": [
-        "retamo liso",
-        "retamo francés",
-        "retama",
-        "escobón"
-      ],
-      "nombre_cientifico": "Cytisus monspessulanus L.",
-      "_nombre_cientifico_sinonimia": "Genista monspessulana (L.) L.A.S.Johnson",
-      "familia_botanica": "Fabaceae",
-      "category": "especies_invasoras",
-      "thermal_zones": [
-        "frio"
-      ],
-      "estrato": "medio",
-      "habito": "arbusto leguminoso perenne 1-3 m, ramas finas estriadas con hojas trifoliadas y flores amarillas vistosas",
-      "origen": "Cuenca mediterránea occidental (sur de Francia, Iberia, Marruecos); introducida en Colombia hacia 1950 como ornamental y estabilizadora de taludes",
-      "roles_in_guild": [
-        "invasive",
-        "nitrogen_fixer"
-      ],
-      "cultivable": false,
-      "conservation_status": "invasor",
-      "clasificacion_uicn": "Listada en ISSG/GISD Global Invasive Species Database como invasora ambiental global; IAvH-Humboldt la clasifica como invasora prioritaria del altiplano cundiboyacense junto con Ulex europaeus",
-      "normativa_colombiana": [
-        {
-          "tipo": "regulatoria",
-          "alcance": "Resolución 684/2018 MADS (lineamientos nacionales prevención manejo y restauración para U. europaeus y Genista monspessulana, sinonimia de C. monspessulanus)",
-          "norma": "Resolución 684/2018 MADS",
-          "autoridad": "MADS",
-          "restriccion": "control_obligatorio_invasoras"
-        },
-        {
-          "tipo": "regulatoria",
-          "alcance": "Resolución 7615/2009 Secretaría Distrital de Ambiente de Bogotá (prohíbe su uso en Distrito Capital)",
-          "norma": "Resolución 7615/2009",
-          "autoridad": "SDA-Bogota"
-        },
-        {
-          "tipo": "regulatoria",
-          "alcance": "Protocolo CAR Cundinamarca 2019 (prevención y control en jurisdicción CAR)",
-          "autoridad": "CAR"
-        },
-        {
-          "tipo": "regulatoria",
-          "alcance": "Ley 1930/2018 (prohibida en áreas delimitadas de páramo)",
-          "norma": "Ley 1930/2018",
-          "restriccion": "prohibida_paramos"
-        }
-      ],
-      "altitud_msnm": {
-        "min_absoluto": 1800,
-        "optimo_min": 2400,
-        "optimo_max": 2800,
-        "max_absoluto": 3200
-      },
-      "temperatura_c": {
-        "helada_letal": -8,
-        "optimo_min": 10,
-        "optimo_max": 18,
-        "max_tolerable": 24
-      },
-      "radiacion": "sol_pleno",
-      "agua": "medio",
-      "drenaje_requerido": "bueno",
-      "propagation": {
-        "metodo_principal": "semilla",
-        "notas": "Especial cuidado con el banco de semillas; el fuego estimula la germinación masiva."
-      },
-      "impacto_ecologico": "Fija nitrógeno (~50-100 kg N/ha/año) que altera la condición oligotrófica natural del suelo paramuno y favorece sucesión hacia especies nitrófilas exóticas; banco de semillas longevo (10-25 años viables en el suelo) con dormancia física rota por fuego, escarificación y fluctuación térmica; forma matorrales monoespecíficos densos que desplazan frailejones (Espeletia spp.), pajonales nativos (Calamagrostis effusa) y especies de borde de bosque alto andino; sus flores amarillas y producción de néctar atraen polinizadores nativos pero desincronizan la fenología local de polinización; sinergiza con Ulex europaeus en cerros bogotanos formando complejos invasores difíciles de erradicar.",
-      "ecosistemas_afectados": [
-        "subparamo",
-        "paramo",
-        "bosque_alto_andino",
-        "bordes_de_via",
-        "areas_quemadas",
-        "taludes_y_canteras_abandonadas"
-      ],
-      "mecanismos_invasion": [
-        "banco_semillas_longevo_decadal",
-        "dormancia_rota_por_fuego_y_escarificación",
-        "fijación_nitrógeno_alteradora_suelo",
-        "rebrote_vegetativo_desde_tocón",
-        "dispersión_balística_por_dehiscencia_de_legumbres",
-        "dispersión_secundaria_por_hormigas_mirmecocoria",
-        "germinación_masiva_post_disturbio"
-      ],
-      "metodos_extraccion": [
-        "desenraice_completo_con_palanca_o_extractor_weed_wrench",
-        "corte_bajo_repetido_cada_3-4_meses",
-        "anillado_de_tallos_principales",
-        "extracción_manual_de_plántulas_post_lluvia",
-        "solarización_de_parches_pequeños"
-      ],
-      "epoca_optima_remocion": "Temporada seca del altiplano (diciembre-febrero y junio-agosto) ANTES de la floración (marzo-mayo y septiembre-noviembre) para evitar dispersión de semillas; el desenraice es más eficaz tras lluvias ligeras cuando el suelo está blando pero no encharcado.",
-      "especies_nativas_sustitutas": [
-        "erythrina_edulis",
-        "hesperomeles_goudotiana",
-        "miconia_squamulosa",
-        "vallea_stipularis",
-        "viburnum_triphyllum",
-        "weinmannia_tomentosa"
-      ],
-      "manejo_biomasa_extraida": "Compostaje NO recomendado: las semillas sobreviven temperaturas del compost doméstico. Incineración controlada en sitio autorizado, o trituración fina + disposición en relleno sanitario. Material sin frutos puede usarse como mulch tras secado al sol; material con flores o legumbres debe quemarse o enterrarse a >50 cm. NUNCA dispersar restos en bosque, páramo ni nacederos.",
-      "riesgo_rebrote": "alto — rebrota desde tocón si no se desenraiza completo, y el banco de semillas decadal garantiza emergencia de plántulas durante 10-25 años post-intervención",
-      "protocolo_post_remocion": "Restauración activa con nativas sustitutas (Weinmannia tomentosa, Vallea stipularis, Hesperomeles goudotiana, Viburnum triphyllum, Miconia squamulosa) a 1100-1600 ind/ha al siguiente semestre lluvioso; mulching con hojarasca nativa para suprimir banco de semillas residual; monitoreo trimestral de plántulas durante los primeros 2 años y semestral durante 5-10 años; eliminación manual inmediata de plántulas antes de que produzcan flores; ciclos de control bianual durante la primera década por la persistencia del banco de semillas; reporte al SIB Colombia y a la CAR/Corporación Autónoma Regional jurisdiccional con coordenadas y área tratada.",
-      "source_ids": [
-        "humboldt-invasoras-andes",
-        "mongabay-retamo-2024",
-        "res-684-2018-mads",
-        "car-cundi-2019",
-        "issg-uicn-invasoras",
-        "gbif-taxonomic-backbone"
-      ],
-      "valor_pedagogico": "SE BUSCA: El 'Falso Nativo'. El retamo liso (Cytisus monspessulanus L., sinonimia Genista monspessulana, familia Fabaceae) es un arbusto leguminoso mediterráneo introducido en Colombia que invade páramos y bosques altoandinos perturbados, particularmente en Cundinamarca (Páramo de Sumapaz, Chingaza, Cruz Verde), Boyacá (Iguaque), Antioquia y Nariño entre 2.500 y 3.500 msnm. Arbusto 1-3 m altura con flores amarillas vistosas que lo disfrazan de planta ornamental inofensiva. Fija nitrógeno (~50-100 kg N/ha/año) y altera el equilibrio nutricional del suelo paramuno (oligotrófico por naturaleza), desplazando flora nativa adaptada a baja fertilidad como frailejones y pajonales. Su erradicación es acto de soberanía hídrica porque protege la función reguladora hídrica del páramo. Manejo: arranque mecánico anterior a floración (pre-banco de semillas) + monitoreo trienal del banco residual (semillas viables 10-25 años en suelo). Listada Res. 684/2018 MADS. Fuentes Tier A: Humboldt Invasoras Andes, Mongabay reporte retamo 2024, Resolución 684/2018 MADS, GBIF Backbone Taxonomy.",
-      "validation_level": "expert_reviewed",
-      "tracking_mode": null
-    },
-    {
       "id": "erythrina_edulis",
       "nombre_comun": "Chachafruto / Balú",
       "nombre_cientifico": "Erythrina edulis Triana ex Micheli",
@@ -2453,7 +2333,9 @@
     },
     {
       "id": "ipomoea_purpurea",
-      "_curation_status": "NOTA AUDITORÍA 2026-05-21 (Pasada 2.5): IAvH Baptiste 2010 NO la cataloga como invasora alto riesgo — es introducción colonial pre-1700 con comportamiento de arvense moderada en cultivos densos, no invasora ecosistémica. La auditoría recomienda mover a category=ornamentales_naturalizadas + conservation_status=naturalizada, pero ese cambio requiere ampliar el enum category del schema; por ahora se mantiene la clasificación previa (invasor) para preservar AMB-14 hasta ampliar el enum.",
+      "_curation_status": "BATCH_2A_PASADA_2_RESIDUAL_2026-05-22 — IAvH Baptiste 2010 NO la cataloga como invasora alto riesgo (introducción colonial pre-1700, arvense moderada en cultivos densos, no ecosistémica). Schema enum category todavía no soporta `ornamentales_naturalizadas`; mantenemos category=especies_invasoras + conservation_status=invasor para preservar AMB-14, pero formalizamos el matiz vía clasificacion_matiz.",
+      "_revisor": "claude-opus-4-7",
+      "clasificacion_matiz": "ornamental_naturalizada_arvense_moderada",
       "nombre_comun": "Campanilla morada",
       "nombre_comunes_regionales": [
         "campana",
@@ -3548,7 +3430,13 @@
     },
     {
       "id": "pennisetum_setaceum",
+      "_curation_status": "BATCH_2A_PASADA_2_RESIDUAL_2026-05-22 — sinonimia POWO formalizada. Id histórico `pennisetum_setaceum` se mantiene por refs cruzadas y familiaridad del usuario campesino colombiano. POWO post-2010 reclasificó el género (mismo evento que kikuyo).",
+      "_revisor": "claude-opus-4-7",
       "_nombre_cientifico_actual_powo": "Cenchrus setaceus (Forssk.) Morrone (POWO post-2010, mismo evento taxonómico que reclasificó kikuyo)",
+      "nombre_cientifico_powo": "Cenchrus setaceus (Forssk.) Morrone",
+      "sinonimia_powo": [
+        "Pennisetum setaceum (Forssk.) Chiov. (basónimo histórico)"
+      ],
       "nombre_comun": "Pasto fuente",
       "nombre_comunes_regionales": [
         "pasto plumacho",
@@ -4192,7 +4080,9 @@
     },
     {
       "id": "pteridium_aquilinum",
-      "_curation_status": "CURACIÓN BÁSICA; nota auditoría 2026-05-21: especie nativa cosmopolita (POWO confirma nativa de Colombia), no introducida — clasificada como invasor por COMPORTAMIENTO ECOLÓGICO post-disturbio, no por estatus biogeográfico. Hasta ampliar el enum del schema (p. ej. nativa_expansiva_post_disturbio), se mantiene conservation_status=invasor por comportamiento agresivo post-quema documentado.",
+      "_curation_status": "BATCH_2A_PASADA_2_RESIDUAL_2026-05-22 — reclasificación matiz: nativa pantropical (NO introducida); clasificacion_matiz=nativa_expansiva_post_disturbio. Mantiene category=especies_invasoras + conservation_status=invasor para no romper AMB-14 (enum schema todavía no soporta nativa_expansiva). Auditoría 2026-05-21 confirmó POWO nativa de Colombia.",
+      "_revisor": "claude-opus-4-7",
+      "clasificacion_matiz": "nativa_expansiva_post_disturbio",
       "nombre_comun": "Helecho marranero",
       "nombre_comunes_regionales": [
         "helecho marranero",
@@ -4310,7 +4200,7 @@
         "gbif-taxonomic-backbone",
         "powo-kew"
       ],
-      "valor_pedagogico": "El helecho marranero (Pteridium aquilinum var. caudatum) es nativo cosmopolita pero se comporta como invasor agresivo post-quema en potreros andinos colombianos (1500-3200 msnm). Tras incendios o tala, sus rizomas profundos rebrotan y forman monocultivos densos que impiden regeneración de bosque andino. Toxicidad: contiene ptaquilósido (carcinogénico para ganado y humanos por leche contaminada). En Cruz Verde-Sumapaz, ocupa hectáreas de bordes de páramo degradado. Manejo: NO quemar (estimula rebrote), corte mecánico repetido durante 3-5 años + siembra de especies nativas competidoras (Weinmannia, Hesperomeles). Resolución 684/2018 MADS lo lista como prioridad de manejo en restauración paramuna.",
+      "valor_pedagogico": "El helecho marranero (Pteridium aquilinum (L.) Kuhn, Dennstaedtiaceae) es NATIVA pantropical (cosmopolita). NO es introducida — POWO confirma estatus nativo en Colombia. Tendencia expansiva en suelos degradados post-fuego, sobrepastoreo y deforestación, particularmente en potreros andinos (1500-3200 msnm) donde rizomas profundos rebrotan post-disturbio y forman monocultivos densos que impiden regeneración del bosque andino. La Resolución 684/2018 MADS la lista para control en áreas protegidas (Cruz Verde-Sumapaz, Iguaque, bordes de páramo degradado) PORQUE desplaza la regeneración natural del bosque, NO porque sea invasora exótica. Distinción crítica: el comportamiento expansivo es post-disturbio biogeografíamente nativo, no introducción exógena. Manejo: restauración ecológica activa (siembra de especies nativas competidoras: Weinmannia tomentosa, Hesperomeles goudotiana, Miconia squamulosa, Alnus acuminata, Vallea stipularis a 1600 ind/ha), NO erradicación; corte mecánico repetido 3-5 años + sombra forzada por dosel arbóreo; NUNCA fuego controlado (estimula rebrote del rizoma). RIESGO SANITARIO ELEVADO: ptaquilósido carcinogénico para ganado y humanos por exposición directa o leche contaminada — no permitir pastoreo bovino en zonas con invasión consolidada, manipulación SIEMPRE con EPP (guantes, mascarilla N95). Fuentes Tier A: POWO Kew (nativo Colombia), IAvH Humboldt Invasoras Andes (control post-disturbio), Resolución 684/2018 MADS, GBIF Backbone Taxonomy, Flora Colombia Pteridophyta.",
       "tracking_mode": null
     },
     {
@@ -17821,7 +17711,8 @@
       "tracking_mode": "aggregate"
     },
     {
-      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH39_GRAMINEAS_FORRAJERAS",
+      "_curation_status": "BATCH_2A_PASADA_2_RESIDUAL_2026-05-22 — valor_pedagogico truncado de 4806 a ~1900 chars con resto en nota_extendida.",
+      "_revisor": "claude-opus-4-7",
       "id": "melinis_minutiflora",
       "nombre_comun": "Pasto gordura",
       "nombre_comunes_regionales": [
@@ -17958,7 +17849,8 @@
       "harvest_type": "biomasa",
       "validation_level": "claude_draft",
       "rol_ecologico": "Gramínea africana invasora de altísimo impacto en bosque seco tropical (BST), bosque sub-andino y matorrales xerofíticos colombianos. Modifica régimen de fuego: hojas pegajosas-aromáticas altamente inflamables generan bucle de retroalimentación fuego-invasión que degrada ecosistemas. Listada IAvH-Humboldt como prioridad de manejo.",
-      "valor_pedagogico": "El pasto gordura o melao (Melinis minutiflora P.Beauv., Poaceae, subfamilia Panicoideae, tribu Paniceae) es una de las gramíneas invasoras más problemáticas del Neotrópico y, en Colombia, uno de los principales motores de degradación del bosque seco tropical (BST, ecosistema en categoría crítica nacional con apenas 8% de cobertura remanente) y del bosque sub-andino del piedemonte tropical. Originaria del África tropical y subtropical (desde Etiopía y Tanzania hasta Sudáfrica), fue introducida a Brasil en el siglo XIX como forrajera prometedora por su aroma característico a melao (de ahí el nombre común \"molasses grass\") y su buen palatabilidad aparente para ganado, y de allí difundida a Colombia y otros países latinoamericanos durante el siglo XX, particularmente promovida entre 1950 y 1970 como \"forrajera de altura\" para zonas templadas y sub-cálidas donde las brachiarias del piso cálido aún no llegaban. Hoy se ha naturalizado agresivamente en gran parte del territorio nacional entre 500 y 2.400 msnm en zona térmica cálida y templada, con presencia masiva e invasora en bosque seco tropical (Caribe seco-húmedo, valles interandinos del Magdalena, Cauca, Patía), bosque sub-andino del piedemonte (Antioquia, Cundinamarca, Boyacá, Tolima, Huila, Santander, Valle del Cauca), matorrales xerofíticos (La Guajira, Tatacoa, alta Boyacá) y bordes del bosque alto-andino en algunas regiones del eje cafetero. Es gramínea perenne cespitosa-decumbente de 60-100 cm de altura con macollas medianas, hojas lineares-lanceoladas con pubescencia glandular pegajosa que produce el aroma característico a melao-canela (de ahí \"pasto gordura\": las hojas se sienten pegajosas-grasosas al tacto), inflorescencia en panícula amplia con espiguillas pequeñas vellosas, semillas pequeñas con pelos largos sedosos (caracter diagnóstico) que se dispersan por viento (anemocoria) a distancias de cientos de metros, propagación también por estolones rastreros post-disturbio. Su característica ecológica más perversa y diferenciadora de otras invasoras es la modificación del régimen de fuego en los ecosistemas que invade: las hojas pegajosas contienen aceites volátiles aromáticos (compuestos terpénicos) altamente inflamables que aumentan dramáticamente la intensidad, velocidad de propagación y frecuencia de los incendios estacionales en BST y bosque sub-andino, donde los árboles nativos (Tabebuia rosea, Caesalpinia ebano, Pithecellobium dulce, Bursera simarouba, Cordia gerascanthus, Albizia spp.) no están adaptados a regímenes de fuego intenso y son eliminados, mientras M. minutiflora rebrota masivamente desde sus estolones y banco de semillas post-fuego antes que las nativas, estableciéndose como dominante en pradera invadida. Este bucle de retroalimentación fuego-invasión convierte progresivamente bosque seco tropical en sabana monoespecífica dominada por M. minutiflora, fenómeno documentado por IAvH-Humboldt como uno de los principales motores de degradación del BST en Colombia (junto con la deforestación directa para ganadería) y por el cual la especie está listada como naturalizada de alto riesgo invasor en bases de datos como ISSG/GISD (Global Invasive Species Database) e IAvH-Humboldt Invasoras Andes. La Resolución 684/2018 del MADS la incluye en lineamientos de control en áreas de restauración del BST, y su siembra deliberada en áreas protegidas, zonas de amortiguamiento de PNN y áreas de restauración está desaconsejada técnicamente. Métodos de control: el desenraice manual repetido es efectivo en parches pequeños pero requiere extraer mata completa con sistema radicular; el fuego controlado NO se recomienda como método de control porque favorece a la propia especie sobre las nativas (error frecuente de quienes intentan \"limpiar\" el pasto con fuego); el método de mayor efectividad a largo plazo es la restauración activa con plantación densa de árboles nativos del BST que cierran dosel y suprimen el pasto por sombreo, complementado con mulching grueso y monitoreo trimestral durante 3-5 años. Es lección ecológica fundamental de la invasión biológica neotropical: una gramínea africana introducida con buenas intenciones forrajeras hace siglo y medio se ha convertido en uno de los principales motores de degradación del bosque seco tropical colombiano, ecosistema en categoría crítica nacional, demostrando que la introducción de especies exóticas para fines productivos puede tener costos ecológicos de larga duración que superan ampliamente sus beneficios iniciales. Su control y la restauración del BST invadido es prioridad nacional de conservación ambiental. Fuentes Tier A: IAvH-Humboldt Invasoras Andes, ISSG/UICN Global Invasive Species Database, POWO Kew, GBIF Backbone Taxonomy, MADS Resolución 684/2018, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia.",
+      "valor_pedagogico": "El pasto gordura o melao (Melinis minutiflora P.Beauv., Poaceae) es una de las gramíneas invasoras más problemáticas del Neotrópico y, en Colombia, uno de los principales motores de degradación del bosque seco tropical (BST — ecosistema en categoría crítica nacional con apenas 8% de cobertura remanente) y del bosque sub-andino del piedemonte tropical. Originaria del África tropical (Etiopía-Tanzania-Sudáfrica), introducida a Brasil en el siglo XIX como forrajera por su aroma a melao y su palatabilidad aparente, difundida a Colombia entre 1950-1970 como 'forrajera de altura'. Hoy naturalizada agresivamente entre 500 y 2.400 msnm en BST (Caribe seco-húmedo, valles interandinos del Magdalena, Cauca, Patía), bosque sub-andino del piedemonte (Antioquia, Cundinamarca, Boyacá, Tolima, Huila, Santander, Valle del Cauca), matorrales xerofíticos (La Guajira, Tatacoa) y bordes del bosque alto-andino. Característica ecológica diferenciadora: modificación del régimen de fuego. Las hojas pegajosas contienen aceites terpénicos altamente inflamables que aumentan intensidad, velocidad de propagación y frecuencia de incendios estacionales; los árboles nativos del BST (Tabebuia, Caesalpinia, Pithecellobium, Bursera, Cordia) no están adaptados a regímenes de fuego intenso y son eliminados, mientras M. minutiflora rebrota masivamente desde estolones y banco de semillas post-fuego. Bucle de retroalimentación fuego-invasión convierte BST en sabana monoespecífica. Listada ISSG/GISD e IAvH-Humboldt; Res. 684/2018 MADS la incluye en lineamientos de control. Métodos: el desenraice manual repetido es efectivo en parches pequeños; el fuego controlado NO se recomienda (favorece a la especie); el método de mayor efectividad a largo plazo es la restauración activa con plantación densa de árboles nativos del BST que cierran dosel y suprimen el pasto por sombreo, complementado con mulching grueso y monitoreo trimestral 3-5 años. Lección ecológica fundamental: introducción exótica forrajera del siglo XIX se convierte en motor de degradación del BST, ecosistema en categoría crítica nacional. Fuentes Tier A: IAvH-Humboldt Invasoras Andes, ISSG/UICN, POWO Kew, GBIF, MADS Res. 684/2018, Bernal et al. 2015.",
+      "nota_extendida": "Detalle morfológico: gramínea perenne cespitosa-decumbente de 60-100 cm con macollas medianas, hojas lineares-lanceoladas con pubescencia glandular pegajosa que produce aroma a melao-canela (de ahí 'pasto gordura' — las hojas se sienten pegajosas-grasosas al tacto); inflorescencia en panícula amplia con espiguillas pequeñas vellosas; semillas pequeñas con pelos largos sedosos (carácter diagnóstico) que se dispersan por viento (anemocoria) a distancias de cientos de metros; propagación también por estolones rastreros post-disturbio. Contexto histórico forrajero: fue promovida entre 1950 y 1970 como 'forrajera de altura' para zonas templadas y sub-cálidas donde las brachiarias del piso cálido aún no llegaban. Hoy su siembra deliberada en áreas protegidas, zonas de amortiguamiento de PNN y áreas de restauración está desaconsejada técnicamente. Demuestra que la introducción de especies exóticas para fines productivos puede tener costos ecológicos de larga duración que superan ampliamente sus beneficios iniciales. Su control y la restauración del BST invadido es prioridad nacional de conservación ambiental.",
       "source_ids": [
         "humboldt-invasoras-andes",
         "issg-uicn-invasoras",
@@ -20528,9 +20420,15 @@
       "tracking_mode": "individual"
     },
     {
-      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH42_ACUATICAS_HUMEDALES",
+      "_curation_status": "BATCH_2A_PASADA_2_RESIDUAL_2026-05-22 — reclasificación matiz nativa naturalizada problemática por eutrofización; sinonimia POWO formalizada; valor_pedagogico truncado a ~1900 chars (resto en nota_extendida).",
+      "_revisor": "claude-opus-4-7",
       "id": "eichhornia_crassipes",
       "_nombre_cientifico_actual_powo": "Pontederia crassipes Mart. (POWO/Kew post-2017; Pellegrini, Horn & Almeida 2018 PhytoKeys 108:25-83 reclasificación molecular y morfológica)",
+      "nombre_cientifico_powo": "Pontederia crassipes (Mart.) Solms",
+      "sinonimia_powo": [
+        "Eichhornia crassipes (Mart.) Solms (basónimo histórico)"
+      ],
+      "clasificacion_matiz": "nativa_naturalizada_problemática_por_eutrofización",
       "nombre_comun": "Taruya",
       "nombre_comunes_regionales": [
         "buchón de agua",
@@ -20586,7 +20484,8 @@
       "clasificacion_uicn": "Listada entre las 100 peores especies invasoras del mundo por ISSG/UICN (Global Invasive Species Database); IAvH-Humboldt la cataloga como invasora prioritaria de humedales colombianos con impacto severo en cuerpos de agua tropicales y subtropicales",
       "protocolo_post_remocion": "Remoción mecánica por extracción manual o cosechadora acuática (NUNCA con herbicidas: riesgo de eutrofización masiva post-descomposición). Compostaje obligatorio del material removido fuera del cuerpo de agua durante 6 meses para garantizar inactivación de semillas y estolones residuales. Restauración activa del cuerpo de agua: re-oxigenación, control de aportes de N y P aguas arriba (causa raíz del crecimiento explosivo), reintroducción de macrófitas nativas (Limnobium laevigatum, Nymphoides humboldtiana). Monitoreo trimestral durante 5 años post-remoción para arrancar rosetas residuales antes de floración. Reporte obligatorio al SIB Colombia, IDEAM y CAR/Corporación Autónoma Regional jurisdiccional con coordenadas, área tratada y biomasa extraída.",
       "rol_ecologico": "Macrófita flotante invasora de origen amazónico-orinoquense. Fitorremediadora poderosa (acumula N, P, metales pesados Cd-Pb-Zn-Hg en raíces y biomasa) PERO de crecimiento explosivo descontrolado en aguas eutroficadas: duplica su biomasa en 5-15 días. Colapsa la fauna acuática por sombreado total, anoxia subsuperficial y bloqueo de intercambio gaseoso aire-agua. Solo aprovechable en sistemas cerrados de fitorremediación con cosecha programada y deshidratación inmediata de biomasa para uso como compost activado, biogás o alimento porcino-piscícola controlado.",
-      "valor_pedagogico": "La taruya, buchón de agua o jacinto de agua (Eichhornia crassipes (Mart.) Solms, Pontederiaceae) es la macrófita acuática flotante invasora más emblemática del trópico mundial y una lección viva de cómo una planta hermosa con flores violeta-azuladas espectaculares puede convertirse en catástrofe ecológica cuando colapsa un cuerpo de agua. Nativa del Amazonas y Orinoquia (cuenca alta del río Amazonas, Pantanal brasileño, llanos venezolanos y colombianos donde coevoluciona con peces, manatíes y caimanes que la consumen y controlan), está listada por ISSG/UICN entre las 100 peores especies invasoras del mundo y por IAvH-Humboldt como invasora prioritaria de humedales colombianos con impacto severo en cuerpos de agua entre 0 y 1.800 msnm: ciénagas del Magdalena medio y bajo (Zapatosa, El Sapo, Ayapel, Chilloa), humedales del Bogotá (Jaboque, Juan Amarillo, Tibanica, Córdoba — donde la liberación de aguas eutroficadas dispara crecimiento explosivo), embalse del Muña (caso paradigmático colombiano: la taruya cubrió >90% del espejo de agua durante décadas por contaminación con aguas residuales de Bogotá), humedales del Valle del Cauca (Sonso, La Guinea), planicie inundable de la Orinoquia (Casanare, Arauca, Meta) y lagunas costeras del Caribe. Pertenece a la familia Pontederiaceae y se reconoce por su roseta flotante con hojas redondeado-cordadas de 5-15 cm con pecíolos hinchados característicos (aerénquima espongioso lleno de aire que da flotabilidad), raíces fibrosas plumosas violetas-negruzcas sumergidas (10-50 cm de largo) e inflorescencia erecta espigada con 8-15 flores violeta-azuladas hermafroditas con un pétalo superior con mancha amarilla central rodeada de violeta — su belleza la convirtió en planta ornamental de exportación durante los siglos XIX-XX, lo cual disparó su invasión global. Su crecimiento explosivo (duplica biomasa en 5-15 días, una sola planta produce >1000 individuos en 50 días vía estolones más banco de semillas viable hasta 20 años) y su impacto destructor (sombreado total del agua, anoxia subsuperficial por descomposición de capas inferiores muertas, bloqueo de intercambio gaseoso aire-agua, colapso de fauna acuática nativa, obstrucción de navegación y compuertas hidroeléctricas, criadero de Anopheles vector de malaria y Mansonia vector de filariasis) la convierten en la pesadilla número uno de los humedales tropicales. Paradójicamente es una fitorremediadora extraordinaria: acumula nitrógeno, fósforo, metales pesados (cadmio, plomo, zinc, mercurio, cromo), colorantes industriales y compuestos orgánicos tóxicos en raíces y biomasa con eficiencia 5-10 veces superior a macrófitas nativas, lo cual ha llevado a su uso CONTROLADO en biorreactores cerrados de fitorremediación de aguas residuales industriales (curtiembres, textileras, papeleras) donde la cosecha programada cada 2-4 semanas y la deshidratación inmediata de biomasa permiten aprovecharla como compost activado, sustrato de biogás o alimento porcino-piscícola tratado. Manejo agroecológico: NO PROPAGAR jamás fuera de sistemas cerrados; en humedales invadidos remoción mecánica por extracción manual con rastrillos largos o cosechadora acuática (NUNCA con herbicidas glifosato/2,4-D: riesgo de eutrofización masiva post-descomposición que mata peces y agrava el problema), compostaje obligatorio del material removido a 60+°C por 6 meses fuera del cuerpo de agua para inactivar semillas, restauración con macrófitas nativas (Limnobium laevigatum, Nymphoides humboldtiana), y atacar la causa raíz: control de aportes de N y P aguas arriba (saneamiento básico, tratamiento de aguas residuales, prohibición de vertimientos industriales). Es lección viva de cómo las invasoras prosperan en sistemas degradados y de cómo restaurar humedales requiere sanear las cuencas que los alimentan, no solo arrancar la planta visible. Fuentes Tier A: IAvH Humboldt — Catálogo Especies Invasoras Andes, ISSG-UICN Global Invasive Species Database, POWO Kew, GBIF Backbone Taxonomy, Calderón-Sáenz 2003 Invasoras Colombia.",
+      "valor_pedagogico": "La taruya, buchón de agua o jacinto de agua (Pontederia crassipes (Mart.) Solms — basónimo Eichhornia crassipes (Mart.) Solms; Pontederiaceae) es nativa amazónica (cuenca alta Brasil/Bolivia/Colombia/Venezuela, Pantanal brasileño, llanos orinoquenses) donde coevoluciona con peces, manatíes y caimanes que la consumen y controlan. NO es invasora estricta: es nativa naturalizada que se vuelve problemática en cuerpos de agua eutrofizados por nutrientes urbanos/agrícolas, no por su naturaleza propia. Listada ISSG/UICN entre las 100 peores invasoras del mundo y por IAvH-Humboldt como prioridad de manejo en humedales colombianos eutroficados entre 0 y 1.800 msnm: ciénagas del Magdalena (Zapatosa, Ayapel), humedales de Bogotá (Jaboque, Juan Amarillo, Tibanica), embalse del Muña (caso paradigmático por contaminación con aguas residuales), humedales del Valle del Cauca, planicie inundable de la Orinoquia y lagunas costeras del Caribe. Su crecimiento explosivo (duplica biomasa en 5-15 días, una planta produce >1000 individuos en 50 días vía estolones + banco de semillas viable 20 años) provoca sombreado total, anoxia subsuperficial, colapso de fauna acuática y criadero de Anopheles/Mansonia. Paradójicamente es fitorremediadora extraordinaria de N, P y metales pesados (Cd, Pb, Zn, Hg, Cr) en biorreactores cerrados controlados. Manejo: REDUCIR N+P del agua aguas arriba (saneamiento básico, tratamiento de aguas residuales, prohibición de vertimientos industriales) — NO atacar la planta como problema raíz. Remoción mecánica en humedales invadidos (NUNCA herbicidas: riesgo de eutrofización masiva post-descomposición), compostaje termofílico 60°C × 6 meses, restauración con macrófitas nativas (Limnobium laevigatum, Nymphoides humboldtiana). Es lección viva de cómo las invasoras prosperan en sistemas degradados y de cómo restaurar humedales requiere sanear las cuencas. Fuentes Tier A: IAvH Humboldt Invasoras Andes, ISSG-UICN Global Invasive Species Database, POWO Kew, GBIF Backbone Taxonomy, Calderón-Sáenz 2003, Pellegrini Horn & Almeida 2018 PhytoKeys 108:25-83.",
+      "nota_extendida": "Detalle morfológico: pertenece a la familia Pontederiaceae y se reconoce por su roseta flotante con hojas redondeado-cordadas de 5-15 cm con pecíolos hinchados característicos (aerénquima espongioso lleno de aire que da flotabilidad), raíces fibrosas plumosas violetas-negruzcas sumergidas (10-50 cm de largo) e inflorescencia erecta espigada con 8-15 flores violeta-azuladas hermafroditas con un pétalo superior con mancha amarilla central rodeada de violeta — su belleza la convirtió en planta ornamental de exportación durante los siglos XIX-XX, lo cual disparó su naturalización global más allá de su rango nativo neotropical. Impactos destructores en humedales eutroficados: obstrucción de navegación y compuertas hidroeléctricas; criadero de Anopheles vector de malaria y Mansonia vector de filariasis. Uso CONTROLADO en biorreactores cerrados: acumula N, P, metales pesados (cadmio, plomo, zinc, mercurio, cromo), colorantes industriales y compuestos orgánicos tóxicos en raíces y biomasa con eficiencia 5-10 veces superior a macrófitas nativas; aplicable a fitorremediación de aguas residuales industriales (curtiembres, textileras, papeleras) con cosecha programada cada 2-4 semanas y deshidratación inmediata de biomasa para uso como compost activado, sustrato de biogás o alimento porcino-piscícola tratado. Aclaración taxonómica: Pellegrini, Horn & Almeida 2018 (PhytoKeys 108:25-83) recombinaron molecularmente Eichhornia → Pontederia. POWO/Kew adopta Pontederia crassipes como nombre canónico post-2017. El id `eichhornia_crassipes` se mantiene por refs cruzadas y familiaridad del usuario campesino colombiano.",
       "advertencia_toxicologica": "NO consumir biomasa de cuerpos eutroficados ni biorreactores de fitorremediación: bioacumulación de metales pesados (Cd, Pb, Hg, Cr) y compuestos orgánicos tóxicos. Uso seguro restringido a compostaje termofílico 60+°C × 6 meses o biogás.",
       "source_ids": [
         "humboldt-invasoras-andes",
@@ -20788,7 +20687,9 @@
       "tracking_mode": "aggregate"
     },
     {
-      "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH42_ACUATICAS_HUMEDALES",
+      "_curation_status": "BATCH_2A_PASADA_2_RESIDUAL_2026-05-22 — reclasificación matiz nativa naturalizada problemática por eutrofización (paralela a eichhornia); valor_pedagogico truncado a ~1700 chars con resto en nota_extendida.",
+      "_revisor": "claude-opus-4-7",
+      "clasificacion_matiz": "nativa_naturalizada",
       "id": "pistia_stratiotes",
       "nombre_comun": "Lechuga de agua",
       "nombre_comunes_regionales": [
@@ -20843,7 +20744,8 @@
       "clasificacion_uicn": "Listada por ISSG/GISD Global Invasive Species Database como invasora ambiental en aguas tropicales y subtropicales; IAvH-Humboldt la clasifica como especie de manejo controlado en humedales colombianos por su potencial invasor en aguas eutroficadas",
       "protocolo_post_remocion": "Remoción mecánica por extracción manual con rastrillos largos o cosechadora acuática (NUNCA con herbicidas: riesgo eutrofización masiva post-descomposición). Compostaje obligatorio del material removido a 60+°C por 4-6 meses fuera del cuerpo de agua. Restauración con macrófitas nativas (Limnobium laevigatum, Nymphoides humboldtiana, Lemna minor). Atacar causa raíz: control de aportes de N y P aguas arriba. Monitoreo bimensual durante 3 años post-remoción para arrancar rosetas residuales. Reporte al SIB Colombia y autoridad ambiental jurisdiccional.",
       "rol_ecologico": "Macrófita flotante en roseta de hojas aterciopeladas verde-grisáceas (10-25 cm de diámetro) con nervaduras paralelas longitudinales prominentes y pubescencia hidrófoba que repele el agua. Fitorremediadora eficaz para N, P, metales pesados leves (acumula Cd, Zn, Cu en raíces fibrosas plumosas sumergidas). Crecimiento explosivo en aguas eutroficadas — comportamiento invasor similar a Eichhornia crassipes aunque algo menos agresivo. Solo aprovechable en sistemas cerrados de fitorremediación con cosecha programada.",
-      "valor_pedagogico": "La lechuga de agua o repollito de agua (Pistia stratiotes L., Araceae) es una macrófita acuática flotante de comportamiento ambiguo en Colombia: técnicamente cosmopolita pantropical con estatus nativo controversial (algunos autores la consideran nativa neotropical antigua, otros una introducción muy temprana), pero catalogada por IAvH-Humboldt como especie de manejo controlado por su potencial invasor en aguas eutroficadas colombianas, paralelo al de la taruya (Eichhornia crassipes) aunque algo menos destructora. Distribuida en cuerpos de agua tranquilos entre 0 y 1.500 msnm en zona térmica cálida a templada: ciénagas del Magdalena medio y bajo (Zapatosa, El Sapo, Ayapel, Chilloa), humedales del Valle del Cauca (Sonso, La Guinea), humedales y embalses de la Sabana de Bogotá donde llega ocasionalmente (Embalse del Muña, humedales calientes asociados a aguas residuales), planicie inundable de la Orinoquia (Casanare, Arauca, Meta), lagunas costeras del Caribe (La Guajira, Atlántico, Sucre, Córdoba) y cuerpos de agua amazónicos. Pertenece a la familia Araceae (igual que arracacha, aro, ñame y la propia Lemna minor) y se reconoce por su roseta flotante característica de hojas aterciopeladas verde-grisáceas (10-25 cm de diámetro) con nervaduras paralelas longitudinales prominentes y pubescencia hidrófoba que repele el agua (las gotas resbalan sin mojar la hoja, propiedad similar a la del loto sagrado y a la del repollo), y por sus raíces fibrosas plumosas sumergidas (10-50 cm de largo) blanquecino-violáceas. Inflorescencia diminuta dentro de la roseta (espádice oculto en una espata blanco-verdosa de <2 cm, característica diagnóstica de Araceae) raramente visible, con polinización por moscas pequeñas. Reproducción vegetativa explosiva por estolones cortos que producen rosetas hijas cada 7-15 días y semillas viables hasta 4-8 años en sedimento — una sola roseta puede generar >500 individuos en 80-90 días en aguas eutroficadas cálidas. Su comportamiento invasor en aguas eutroficadas colombianas (sombreado total del agua, anoxia subsuperficial, colapso de fauna acuática nativa, obstrucción de compuertas y canales de riego, criadero de Anopheles y Mansonia) la convierte en problema serio aunque algo más manejable que la taruya por su menor tasa de crecimiento explosivo. Paradójicamente, como Eichhornia, es fitorremediadora eficaz: acumula N, P, K, metales pesados leves (cadmio, zinc, cobre, plomo trazas) y compuestos orgánicos tóxicos en raíces fibrosas plumosas y biomasa con eficiencia 4-6 veces superior a macrófitas nativas, uso aprovechable solo en biorreactores cerrados de fitorremediación con cosecha programada cada 2-3 semanas y deshidratación inmediata de biomasa para uso como compost activado o sustrato de biogás. Manejo agroecológico: NO PROPAGAR jamás fuera de sistemas cerrados de fitorremediación controlados (decisión IAvH-Humboldt 2010 y Resolución MADS 684/2018); en humedales colombianos donde está establecida, manejo controlado por remoción mecánica con rastrillos largos o cosechadora acuática (NUNCA herbicidas), compostaje obligatorio del material removido a 60+°C por 4-6 meses fuera del cuerpo de agua, restauración con macrófitas nativas (Limnobium laevigatum macrófita flotante nativa neotropical preferida para sustitución, Nymphoides humboldtiana, Lemna minor para cobertura ligera), control de aportes de N y P aguas arriba (causa raíz), monitoreo bimensual durante 3 años post-remoción para arrancar rosetas residuales antes de floración, reporte obligatorio al SIB Colombia, IDEAM y autoridad ambiental jurisdiccional. Es lección viva de cómo la frontera taxonómica entre nativa-naturalizada-invasora es borrosa para especies pantropicales antiguas, de cómo la eutrofización dispara crecimiento explosivo de macrófitas oportunistas, y de cómo la restauración de humedales requiere atacar la causa raíz (aportes de N y P aguas arriba) y no solo arrancar la planta visible. Fuentes Tier A: IAvH Humboldt — Catálogo Invasoras Andes, ISSG-UICN Global Invasive Species Database, POWO Kew, GBIF Backbone Taxonomy, Calderón-Sáenz 2003 Invasoras Colombia.",
+      "valor_pedagogico": "La lechuga de agua o repollito de agua (Pistia stratiotes L., Araceae) es macrófita acuática flotante NATIVA pantropical similar a eichhornia: técnicamente cosmopolita con estatus nativo neotropical antiguo, no invasora estricta. Problemática en aguas eutrofizadas colombianas por nutrientes urbanos/agrícolas, no por su naturaleza. IAvH-Humboldt la cataloga como especie de manejo controlado en humedales colombianos eutroficados entre 0 y 1.500 msnm: ciénagas del Magdalena (Zapatosa, Ayapel), humedales del Valle del Cauca, embalse del Muña, planicie inundable de la Orinoquia, lagunas costeras del Caribe y cuerpos de agua amazónicos. Familia Araceae (igual que Lemna minor) — roseta flotante de hojas aterciopeladas verde-grisáceas (10-25 cm) con nervaduras paralelas y pubescencia hidrófoba; raíces fibrosas plumosas violáceas. Reproducción vegetativa explosiva por estolones (rosetas hijas cada 7-15 días, >500 individuos en 80-90 días en aguas eutroficadas cálidas). Comportamiento invasor en aguas eutroficadas: sombreado total, anoxia subsuperficial, obstrucción de compuertas y canales, criadero Anopheles/Mansonia — aunque menos destructora que Eichhornia. Como esta, fitorremediadora eficaz (N, P, K, metales pesados leves) en biorreactores cerrados con cosecha programada cada 2-3 semanas. Manejo: NO PROPAGAR fuera de sistemas cerrados (Res. 684/2018 MADS); remoción mecánica con rastrillos (NUNCA herbicidas), compostaje 60°C × 4-6 meses, restauración con Limnobium laevigatum + Nymphoides humboldtiana + Lemna minor. CAUSA RAÍZ: reducir N y P aguas arriba (saneamiento), no atacar la planta visible. Lección viva: la frontera taxonómica nativa-naturalizada-invasora es borrosa para especies pantropicales antiguas, y la eutrofización es el motor real. Fuentes Tier A: IAvH Humboldt Invasoras Andes, ISSG-UICN, POWO Kew, GBIF, Calderón-Sáenz 2003.",
+      "nota_extendida": "Detalle morfológico-reproductivo: pubescencia hidrófoba similar a la del loto sagrado y el repollo (las gotas resbalan sin mojar la hoja). Inflorescencia diminuta dentro de la roseta (espádice oculto en una espata blanco-verdosa de <2 cm, característica diagnóstica de Araceae) raramente visible, polinizada por moscas pequeñas. Semillas viables hasta 4-8 años en sedimento — banco persistente. Aclaración taxonómica: la frontera entre nativa neotropical y naturalizada pantropical es debate abierto en literatura científica; algunos autores la consideran nativa neotropical antigua, otros una introducción humana muy temprana (pre-colombina). IAvH-Humboldt 2010 prefiere el enfoque de manejo controlado por comportamiento ecológico en aguas eutroficadas, no clasificación biogeográfica estricta. Protocolo control: monitoreo bimensual durante 3 años post-remoción para arrancar rosetas residuales antes de floración, reporte obligatorio al SIB Colombia, IDEAM y autoridad ambiental jurisdiccional. Distinción con Eichhornia (Pontederia) crassipes: tasa de duplicación menor (7-15 días vs 5-15), semilla más corta (4-8 años vs 20), por lo cual el control es más alcanzable.",
       "advertencia_toxicologica": "NO consumir biomasa de cuerpos eutroficados ni biorreactores: bioacumulador de metales pesados leves (Cd, Pb, Zn, Cu). Manejo seguro post-cosecha: deshidratación inmediata + compostaje termofílico 60+°C × 4-6 meses fuera del cuerpo de agua.",
       "source_ids": [
         "humboldt-invasoras-andes",
@@ -33731,8 +33633,21 @@
     },
     {
       "id": "genista_monspessulana",
-      "nombre_comun": "retamo liso / retamo de teñir",
+      "_curation_status": "BATCH_2A_PASADA_2_RESIDUAL_2026-05-22 — consolidación POWO: id histórico `cytisus_monspessulanus` eliminado (sinónimo desactualizado) y contenido fusionado aquí bajo el nombre canónico POWO actual `Genista monspessulana (L.) L.A.S.Johnson`.",
+      "_revisor": "claude-opus-4-7",
+      "nombre_comun": "Retamo liso",
+      "nombre_comunes_regionales": [
+        "retamo liso",
+        "retamo francés",
+        "retamo de teñir",
+        "retama",
+        "escobón"
+      ],
       "nombre_cientifico": "Genista monspessulana (L.) L.A.S.Johnson",
+      "sinonimia_powo": [
+        "Cytisus monspessulanus L.",
+        "Teline monspessulana (L.) C.Koch"
+      ],
       "familia_botanica": "Fabaceae",
       "category": "especies_invasoras",
       "thermal_zones": [
@@ -33740,32 +33655,112 @@
         "frio",
         "paramo"
       ],
+      "estrato": "medio",
+      "habito": "arbusto leguminoso perenne 1-3 m, ramas finas estriadas con hojas trifoliadas y flores amarillas vistosas",
+      "origen": "Cuenca mediterránea occidental (sur de Francia, Iberia, Marruecos); introducida en Colombia hacia 1950 como ornamental y estabilizadora de taludes",
       "roles_in_guild": [
-        "invasive"
+        "invasive",
+        "nitrogen_fixer"
       ],
       "cultivable": false,
       "conservation_status": "invasor",
+      "clasificacion_uicn": "Listada en ISSG/GISD Global Invasive Species Database como invasora ambiental global; IAvH-Humboldt la clasifica como invasora prioritaria del altiplano cundiboyacense junto con Ulex europaeus",
+      "normativa_colombiana": [
+        {
+          "tipo": "regulatoria",
+          "alcance": "Resolución 684/2018 MADS (lineamientos nacionales prevención manejo y restauración para U. europaeus y Genista monspessulana)",
+          "norma": "Resolución 684/2018 MADS",
+          "autoridad": "MADS",
+          "restriccion": "control_obligatorio_invasoras"
+        },
+        {
+          "tipo": "regulatoria",
+          "alcance": "Resolución 7615/2009 Secretaría Distrital de Ambiente de Bogotá (prohíbe su uso en Distrito Capital)",
+          "norma": "Resolución 7615/2009",
+          "autoridad": "SDA-Bogota"
+        },
+        {
+          "tipo": "regulatoria",
+          "alcance": "Protocolo CAR Cundinamarca 2019 (prevención y control en jurisdicción CAR)",
+          "autoridad": "CAR"
+        },
+        {
+          "tipo": "regulatoria",
+          "alcance": "Ley 1930/2018 (prohibida en áreas delimitadas de páramo)",
+          "norma": "Ley 1930/2018",
+          "restriccion": "prohibida_paramos"
+        }
+      ],
       "altitud_msnm": {
-        "min_absoluto": 2000,
+        "min_absoluto": 1800,
         "optimo_min": 2400,
-        "optimo_max": 3000,
+        "optimo_max": 2800,
         "max_absoluto": 3300
       },
-      "propagation": {
-        "methods": [
-          "semilla"
-        ]
+      "temperatura_c": {
+        "helada_letal": -8,
+        "optimo_min": 10,
+        "optimo_max": 18,
+        "max_tolerable": 24
       },
-      "valor_pedagogico": "Sinónimo: Teline monspessulana (L.) C.Koch. Sujeta a Resolución 684 de 2018 del MinAmbiente (lineamientos manejo complejo retamos). Co-invasor con Ulex europaeus en Cerros Orientales y Sabana de Bogotá.",
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Especial cuidado con el banco de semillas; el fuego estimula la germinación masiva."
+      },
+      "impacto_ecologico": "Fija nitrógeno (~50-100 kg N/ha/año) que altera la condición oligotrófica natural del suelo paramuno y favorece sucesión hacia especies nitrófilas exóticas; banco de semillas longevo (10-25 años viables en el suelo) con dormancia física rota por fuego, escarificación y fluctuación térmica; forma matorrales monoespecíficos densos que desplazan frailejones (Espeletia spp.), pajonales nativos (Calamagrostis effusa) y especies de borde de bosque alto andino; sus flores amarillas y producción de néctar atraen polinizadores nativos pero desincronizan la fenología local de polinización; sinergiza con Ulex europaeus en cerros bogotanos formando complejos invasores difíciles de erradicar.",
+      "ecosistemas_afectados": [
+        "subparamo",
+        "paramo",
+        "bosque_alto_andino",
+        "bordes_de_via",
+        "areas_quemadas",
+        "taludes_y_canteras_abandonadas"
+      ],
+      "mecanismos_invasion": [
+        "banco_semillas_longevo_decadal",
+        "dormancia_rota_por_fuego_y_escarificación",
+        "fijación_nitrógeno_alteradora_suelo",
+        "rebrote_vegetativo_desde_tocón",
+        "dispersión_balística_por_dehiscencia_de_legumbres",
+        "dispersión_secundaria_por_hormigas_mirmecocoria",
+        "germinación_masiva_post_disturbio"
+      ],
+      "metodos_extraccion": [
+        "desenraice_completo_con_palanca_o_extractor_weed_wrench",
+        "corte_bajo_repetido_cada_3-4_meses",
+        "anillado_de_tallos_principales",
+        "extracción_manual_de_plántulas_post_lluvia",
+        "solarización_de_parches_pequeños"
+      ],
+      "epoca_optima_remocion": "Temporada seca del altiplano (diciembre-febrero y junio-agosto) ANTES de la floración (marzo-mayo y septiembre-noviembre) para evitar dispersión de semillas; el desenraice es más eficaz tras lluvias ligeras cuando el suelo está blando pero no encharcado.",
+      "especies_nativas_sustitutas": [
+        "erythrina_edulis",
+        "hesperomeles_goudotiana",
+        "miconia_squamulosa",
+        "vallea_stipularis",
+        "viburnum_triphyllum",
+        "weinmannia_tomentosa"
+      ],
+      "manejo_biomasa_extraida": "Compostaje NO recomendado: las semillas sobreviven temperaturas del compost doméstico. Incineración controlada en sitio autorizado, o trituración fina + disposición en relleno sanitario. Material sin frutos puede usarse como mulch tras secado al sol; material con flores o legumbres debe quemarse o enterrarse a >50 cm. NUNCA dispersar restos en bosque, páramo ni nacederos.",
+      "riesgo_rebrote": "alto — rebrota desde tocón si no se desenraiza completo, y el banco de semillas decadal garantiza emergencia de plántulas durante 10-25 años post-intervención",
+      "protocolo_post_remocion": "Restauración activa con nativas sustitutas (Weinmannia tomentosa, Vallea stipularis, Hesperomeles goudotiana, Viburnum triphyllum, Miconia squamulosa) a 1100-1600 ind/ha al siguiente semestre lluvioso; mulching con hojarasca nativa para suprimir banco de semillas residual; monitoreo trimestral de plántulas durante los primeros 2 años y semestral durante 5-10 años; eliminación manual inmediata de plántulas antes de que produzcan flores; ciclos de control bianual durante la primera década por la persistencia del banco de semillas; reporte al SIB Colombia y a la CAR/Corporación Autónoma Regional jurisdiccional con coordenadas y área tratada.",
+      "valor_pedagogico": "SE BUSCA: El 'Falso Nativo'. El retamo liso (Genista monspessulana (L.) L.A.S.Johnson, sinonimia histórica Cytisus monspessulanus L., familia Fabaceae) es un arbusto leguminoso mediterráneo introducido en Colombia que invade páramos y bosques altoandinos perturbados, particularmente en Cundinamarca (Páramo de Sumapaz, Chingaza, Cruz Verde), Boyacá (Iguaque), Antioquia y Nariño entre 2.500 y 3.500 msnm. Arbusto 1-3 m altura con flores amarillas vistosas que lo disfrazan de planta ornamental inofensiva. Fija nitrógeno (~50-100 kg N/ha/año) y altera el equilibrio nutricional del suelo paramuno (oligotrófico por naturaleza), desplazando flora nativa adaptada a baja fertilidad como frailejones y pajonales. Su erradicación es acto de soberanía hídrica porque protege la función reguladora hídrica del páramo. Manejo: arranque mecánico anterior a floración (pre-banco de semillas) + monitoreo trienal del banco residual (semillas viables 10-25 años en suelo). Listada Res. 684/2018 MADS. Co-invasor con Ulex europaeus en Cerros Orientales y Sabana de Bogotá. Fuentes Tier A: Humboldt Invasoras Andes, Mongabay reporte retamo 2024, Resolución 684/2018 MADS, GBIF Backbone Taxonomy.",
       "source_ids": [
+        "humboldt-invasoras-andes",
+        "mongabay-retamo-2024",
         "res-684-2018-mads",
+        "car-cundi-2019",
+        "issg-uicn-invasoras",
+        "gbif-taxonomic-backbone",
         "calderon-saenz-2003-invasoras",
         "humboldt-beltran-barrera-2014-ulex",
-        "issg-uicn-invasoras",
         "powo-kew"
       ],
-      "validation_level": "claude_draft",
-      "_curation_status": "BORRADOR_IA"
+      "validation_level": "expert_reviewed",
+      "tracking_mode": null
     },
     {
       "id": "bactris_gasipaes_pacifico_chocoana",
