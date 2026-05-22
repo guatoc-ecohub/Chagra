@@ -51,7 +51,40 @@ jobs:
         name: Lint
         # max-warnings 20 ya es el cap; si excede, debe BLOQUEAR el deploy.
         # Removido continue-on-error: true que silenciaba errores fatales.
-        run: npm run lint -- --max-warnings 20
+        #
+        # Visibilidad (2026-05-21 — Task #77): el lint step NO es required
+        # check del PR (corre solo `on: push` a main), así que un PR puede
+        # mergearse verde y romper deploy aquí sin warning visible en la UI
+        # del PR — prod queda atrás N versiones hasta que alguien revise
+        # `gh run list --workflow=deploy.yml`. Para mitigar el silent-block:
+        #   1) Capturamos stdout+stderr a un archivo.
+        #   2) En fail, lo volcamos al $GITHUB_STEP_SUMMARY así aparece en
+        #      la home del run como banner rojo legible (no enterrado en logs).
+        #   3) Re-emitimos como ::error:: para que GitHub muestre annotations
+        #      inline en el commit y mande email con detalle (no solo
+        #      "Deploy failed" genérico).
+        run: |
+          set -o pipefail
+          if ! npm run lint -- --max-warnings 20 2>&1 | tee /tmp/lint.log; then
+            {
+              echo "## Deploy bloqueado: lint failed"
+              echo ""
+              echo "Prod chagra.guatoc.co queda atrasado hasta que el lint pase."
+              echo "Fix recomendado: rama \`fix/lint-deploy-<fecha>\` con el PR pequeño que corrige los warnings."
+              echo ""
+              echo "<details><summary>Output completo del lint</summary>"
+              echo ""
+              echo '```'
+              cat /tmp/lint.log
+              echo '```'
+              echo "</details>"
+            } >> "$GITHUB_STEP_SUMMARY"
+            # Annotations inline por cada error de eslint (aparecen en commit + email).
+            grep -E "^\s+[0-9]+:[0-9]+\s+error" /tmp/lint.log | head -20 | while read -r line; do
+              echo "::error::deploy lint: $line"
+            done
+            exit 1
+          fi
 
       - if: env.SKIP_DEPLOY != '1'
         name: Verify secrets
