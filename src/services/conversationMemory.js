@@ -185,10 +185,73 @@ export async function clearMemory(operatorId) {
   }
 }
 
+/**
+ * Computar metadata de "fuente" del mensaje del assistant a partir del
+ * toolEvidence que devolvió el sidecar NLU + chagra-agro-mcp.
+ *
+ * Promesa visual del Manual (HelpAgentSection): "respuestas con fondo
+ * verde son del catálogo verificado". Esa promesa requiere persistir
+ * en cada turn del assistant si se invocó un tool MCP y si el tool
+ * devolvió un match real del catálogo (grounded=true) o un miss
+ * (grounded=false). Mensajes sin tool_used quedan como "respuesta
+ * generativa" (solo LLM, sin verificación catálogo).
+ *
+ * Reglas de grounded (alineadas con `formatToolEvidence` en AgentScreen):
+ *   - found === true                  → grounded
+ *   - available === true              → grounded
+ *   - matches_count > 0               → grounded
+ *   - found:false / available:false   → no grounded (tool corrió pero
+ *     no hay datos en catálogo)
+ *   - matches_count === 0             → no grounded
+ *   - otros casos (result presente sin estos flags, e.g. lista no
+ *     vacía como get_companions devolviendo array)  → grounded
+ *     (asumimos que devolver payload con datos es match útil)
+ *
+ * @param {{tool: string, args: object, result: any} | null | undefined} toolEvidence
+ * @returns {{tool_used: string|null, grounded: boolean}}
+ */
+export function computeSourceMetadata(toolEvidence) {
+  if (!toolEvidence || !toolEvidence.tool) {
+    return { tool_used: null, grounded: false };
+  }
+  const result = toolEvidence.result;
+  if (!result || typeof result !== 'object') {
+    return { tool_used: toolEvidence.tool, grounded: false };
+  }
+
+  // Miss explícito: el tool indicó que no hay match en catálogo.
+  if (result.found === false || result.available === false) {
+    return { tool_used: toolEvidence.tool, grounded: false };
+  }
+  if (typeof result.matches_count === 'number' && result.matches_count === 0) {
+    return { tool_used: toolEvidence.tool, grounded: false };
+  }
+
+  // Match explícito.
+  if (result.found === true || result.available === true) {
+    return { tool_used: toolEvidence.tool, grounded: true };
+  }
+  if (typeof result.matches_count === 'number' && result.matches_count > 0) {
+    return { tool_used: toolEvidence.tool, grounded: true };
+  }
+
+  // Sin flags explícitos: si el tool devolvió un payload no vacío
+  // (e.g. get_companions con array), lo consideramos grounded.
+  const hasArrayPayload = Object.values(result).some(
+    (v) => Array.isArray(v) && v.length > 0
+  );
+  if (hasArrayPayload) {
+    return { tool_used: toolEvidence.tool, grounded: true };
+  }
+  // Fallback: tool corrió, result presente pero sin señal clara.
+  return { tool_used: toolEvidence.tool, grounded: true };
+}
+
 export default {
   addTurn,
   getRecentContext,
   getContextString,
   getFullHistory,
   clearMemory,
+  computeSourceMetadata,
 };
