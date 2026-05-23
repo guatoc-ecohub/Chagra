@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mic, BookOpen, Sprout, ChevronRight, Library } from 'lucide-react';
+import { Mic, BookOpen, Sprout, ChevronRight, Library, Bot } from 'lucide-react';
 import HelpRegionSelector from './HelpRegionSelector.jsx';
 
 /**
@@ -56,6 +56,20 @@ export default function HelpHomeScreen({ onSelect }) {
       iconColor: 'text-violet-300',
       titleColor: 'text-violet-100',
       subColor: 'text-violet-200/70',
+    },
+    {
+      // Task #123: sección Ayuda > "Sobre el agente Chagra".
+      // Cero hype, lo que SÍ y lo que NO puede el agente, auditable.
+      key: 'agente',
+      icon: Bot,
+      title: 'Sobre el agente Chagra',
+      sub: 'Qué SÍ puede y qué NO puede. Sin promesas mágicas. Con fuentes.',
+      accent: 'from-sky-900/40 to-slate-950/80',
+      border: 'border-sky-600/40 hover:border-sky-400/70',
+      iconBg: 'bg-sky-700/30 border-sky-500/40',
+      iconColor: 'text-sky-300',
+      titleColor: 'text-sky-100',
+      subColor: 'text-sky-200/70',
     },
   ];
 

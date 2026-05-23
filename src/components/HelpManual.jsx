@@ -7,6 +7,7 @@ import HelpUsoScreen from './HelpUsoScreen.jsx';
 import HelpCicloScreen from './HelpCicloScreen.jsx';
 import HelpDictionary from './HelpDictionary.jsx';
 import HelpVoiceRegionalDemo from './HelpVoiceRegionalDemo.jsx';
+import HelpAgentSection from './HelpAgentSection.jsx';
 
 /**
  * HelpManual — Manual de usuario integrado en la PWA.
@@ -16,11 +17,12 @@ import HelpVoiceRegionalDemo from './HelpVoiceRegionalDemo.jsx';
  * Rediseño 2026-05-08 (queue/039 + UX feedback): router interno con 3
  * sub-vistas grandes en lugar de 12 secciones planas apiladas.
  *
- *   Home        → 4 botones grandes (voz / uso / ciclo / diccionario)
+ *   Home        → 5 botones grandes (voz / uso / ciclo / diccionario / agente)
  *   Voz         → tutorial híbrido + CTA "Probar voz ahora"
  *   Uso         → FAQs reorganizadas en 6 temas (incluye Reportar bug)
  *   Ciclo       → wrapper de HelpCycleSection (accordion por especie, PR #201)
  *   Diccionario → ~70 términos curados (identidad/microorg/biopreparados/...)
+ *   Agente      → "Sobre el agente Chagra" cero hype, qué SÍ y qué NO puede (task #123)
  *
  * Principios aplicados (UX guidelines internos del proyecto):
  *   P1 tono "tú" cercano (anti-ladrillo)
@@ -35,7 +37,7 @@ import HelpVoiceRegionalDemo from './HelpVoiceRegionalDemo.jsx';
  *   - "Novedades mayo 2026"        → Chagra/CHANGELOG.md (root)
  */
 export default function HelpManual({ onBack, onNavigate }) {
-  // 'home' | 'voz' | 'uso' | 'ciclo' | 'diccionario'
+  // 'home' | 'voz' | 'uso' | 'ciclo' | 'diccionario' | 'agente' | 'voz-regional-demo'
   const [section, setSection] = useState('home');
 
   // CTAs híbridas (P5): cierran el manual y navegan al flow real.
@@ -85,6 +87,9 @@ export default function HelpManual({ onBack, onNavigate }) {
       )}
       {section === 'diccionario' && (
         <HelpDictionary onBackToHome={goHome} />
+      )}
+      {section === 'agente' && (
+        <HelpAgentSection onBackToHome={goHome} onNavigate={closeAndNavigate} />
       )}
     </div>
   );
