@@ -53,7 +53,7 @@ export const ROUTES = {
     model: 'gemma3:4b',
     keep_alive_min: 30,
     temperature: 0.3,
-    max_tokens: 80,
+    max_tokens: 512,
     url: '/api/ollama/v1/chat/completions',
     rationale:
       'Bench GPU 2026-05-17: 118 t/s, 4 GB VRAM, load 3s. keep_alive=30m. ' +
@@ -62,11 +62,13 @@ export const ROUTES = {
       'definición con más confianza. La fix real es system prompt agresivo ' +
       '(ver AgentScreen.getSystemPrompt) + temperature baja. Mantener 4b ' +
       'por velocidad y VRAM (vision cabe on-demand). Solución modelo-agnóstica. ' +
-      'max_tokens 512→80 2026-05-20 (Task #45 fix latencia TTS): ' +
-      'kokoro-82m CPU escala lineal con caracteres, 512 tokens ≈ 23s audio. ' +
-      '80 tokens ≈ 30 palabras ≈ 3-4s audio = sustentable para UX rural por voz. ' +
-      'system prompt agroecológico ya tiene REGLA 6 que pide concisión + ' +
-      'pregunta de seguimiento si necesita detalle.',
+      'max_tokens 80→512 2026-05-23 (principio intelligence-first): el cap ' +
+      'de 80 introducido en Task #45 para mitigar latencia kokoro-tts cortaba ' +
+      'respuestas a media oración y disfrazaba un fix de TTS como límite ' +
+      'cognitivo. La solución correcta es TTS chunked streaming (task #69), ' +
+      'no truncar capacidad de razonamiento. system prompt sigue pidiendo ' +
+      'concisión + follow-up; el modelo elige longitud por contenido, no por ' +
+      'hard cap. Si TTS sigue siendo bottleneck, mitigar ahí, no aquí.',
   },
   nlu: {
     model: 'qwen2.5-coder:7b',
