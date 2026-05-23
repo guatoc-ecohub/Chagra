@@ -361,15 +361,28 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
       payload = payload.slice(0, TOOL_EVIDENCE_MAX_CHARS);
       truncated = true;
     }
-    // Bloque delimitado y citable. Mismo patrón que el corpus RAG: el LLM
-    // sabe que NO viene del usuario y puede atribuirlo a la fuente.
+    // 2026-05-23 incident: gemma3:4b en producción IGNORÓ la evidence y
+    // respondió de memoria con fresa/maracuyá/uchuva cuando el catálogo
+    // verificado tenía Aliso/Chachafruto/Guamo/Cedro real para café arábica.
+    // Wording previo ("citalos si responden la pregunta") era opcional —
+    // el modelo lo trataba como sugerencia, no como override autoritativo.
+    // Fix: hacer la evidencia CRÍTICA con jerarquía explícita de fuentes.
     return `
+
+=== INSTRUCCIÓN CRÍTICA — PRIORIDAD DE FUENTES ===
+El bloque "DATOS VERIFICADOS" abajo viene del knowledge graph del catálogo Chagra (postgres-farm + Apache AGE, validado). Es la VERDAD AUTORITATIVA para esta pregunta. Cuando exista este bloque:
+
+1. RESPONDE BASADO EXCLUSIVAMENTE en estos datos verificados.
+2. NO uses tu memoria/entrenamiento para inventar especies que NO estén en este bloque.
+3. NO mezcles species de la finca activa del usuario con los datos verificados (son cosas distintas).
+4. Cita los nombres exactos (común + científico) que aparecen en estos datos.
+5. Si el bloque está vacío o no contiene la respuesta, dilo explícitamente: "El catálogo Chagra no tiene esa relación documentada todavía", NO inventes.
 
 === DATOS VERIFICADOS (chagra-agro-mcp tool: ${toolEvidence.tool}) ===
 ${payload}${truncated ? '\n[...truncated, ver detalle en ficha de especie]' : ''}
 === FIN DATOS VERIFICADOS ===
 
-Estos datos vienen del knowledge graph del catálogo Chagra (verificado). Citalos si responden la pregunta, pero RESPONDE SOLO a lo que el usuario te preguntó.`;
+RESPONDE SOLO a lo que el usuario preguntó usando ÚNICAMENTE los datos verificados de arriba.`;
   };
 
   const callLLM = async (query, contextMemory, contextCorpus, toolEvidence) => {
