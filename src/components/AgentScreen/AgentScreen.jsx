@@ -350,9 +350,48 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
 
   const formatToolEvidence = (toolEvidence) => {
     if (!toolEvidence || !toolEvidence.tool || !toolEvidence.result) return '';
+
+    // 2026-05-23 incidente test #4: usuario preguntó por "mareñongoño del
+    // Tolima" (especie NO en catálogo). El tool devolvió {found:false,
+    // hint:"..."} pero gemma3:4b IGNORÓ el flag found:false y mapeó
+    // creativamente "mareñongoño" → "Ullucus tuberosus" inventando una
+    // equivalencia, luego listó companions reales de Ullucus pretendiendo
+    // que eran de mareñongoño. Alucinación creativa grave.
+    //
+    // Fix: detectar found:false en el frontend ANTES del LLM call y
+    // formatear un bloque hyper-explícito que prohíbe el mapeo creativo.
+    const result = toolEvidence.result;
+    const isNotFound =
+      result &&
+      typeof result === 'object' &&
+      (result.found === false ||
+        result.available === false ||
+        (result.matches_count !== undefined && result.matches_count === 0));
+
+    if (isNotFound) {
+      const hint = (result && (result.hint || result.reason)) || '';
+      const queryStr = JSON.stringify(toolEvidence.args || {});
+      return `
+
+=== ESPECIE / RELACIÓN NO ENCONTRADA EN CATÁLOGO ===
+El usuario preguntó por algo que NO existe en el catálogo Chagra. El tool ${toolEvidence.tool} fue invocado con args ${queryStr} y devolvió found:false.
+
+INSTRUCCIÓN OBLIGATORIA — anti-alucinación creativa:
+
+1. NO mapees el nombre que preguntó el usuario a otra especie "parecida" que sí exista en el catálogo (eso es ALUCINACIÓN CREATIVA grave).
+2. NO listes companions/biopreparados/relaciones de OTRA especie pretendiendo que son de la que preguntó.
+3. NO inventes nombres científicos como sinónimos del término del usuario.
+4. RESPONDE textualmente algo como: "El catálogo Chagra no tiene esa especie/relación documentada todavía. ¿Podrías describir la planta o decir su nombre científico? Si te referís a una especie conocida con otro nombre, decímelo y la busco."
+5. Si querés sugerir, SOLO podés decir: "Si te referís a [especie real del catálogo], avísame y consulto sus compañeros". Pero NUNCA afirmar la equivalencia.
+
+Hint del tool: ${hint}
+=== FIN ===
+`;
+    }
+
     let payload;
     try {
-      payload = JSON.stringify(toolEvidence.result);
+      payload = JSON.stringify(result);
     } catch (_) {
       return '';
     }
@@ -361,12 +400,9 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
       payload = payload.slice(0, TOOL_EVIDENCE_MAX_CHARS);
       truncated = true;
     }
-    // 2026-05-23 incident: gemma3:4b en producción IGNORÓ la evidence y
-    // respondió de memoria con fresa/maracuyá/uchuva cuando el catálogo
-    // verificado tenía Aliso/Chachafruto/Guamo/Cedro real para café arábica.
-    // Wording previo ("citalos si responden la pregunta") era opcional —
-    // el modelo lo trataba como sugerencia, no como override autoritativo.
-    // Fix: hacer la evidencia CRÍTICA con jerarquía explícita de fuentes.
+    // Caso "found:true" — wording autoritativo de PR #998. El bloque
+    // "DATOS VERIFICADOS" reemplaza la memoria del modelo cuando se cita
+    // companions / biopreparados / pest controllers / multihop / visual.
     return `
 
 === INSTRUCCIÓN CRÍTICA — PRIORIDAD DE FUENTES ===
