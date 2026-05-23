@@ -30,6 +30,12 @@ import React from 'react';
  *   - `size`: number en px (default 56). Mínimo recomendado 40px.
  *   - `withLabel`: muestra "Chagra IA" + sub-estado bajo el avatar
  *   - `onClick`: opcional, hace clickable
+ *   - `onDoubleClick`: opcional, double-click handler (task #122). Si está
+ *     presente, el wrapper button maneja también `onDoubleClick`. Operator
+ *     usa para silenciar/re-reproducir TTS sin abrir AgentScreen.
+ *   - `glow`: boolean (default false). Si true, el avatar pulsa con
+ *     drop-shadow amber (#FFB700) anunciando "respuesta lista". Tono
+ *     honesto, sin confetti.
  *   - `className`, `ariaLabel`: passthrough
  */
 
@@ -52,12 +58,14 @@ export default function ChagraAgentAvatar({
   size = 56,
   withLabel = false,
   onClick,
+  onDoubleClick,
+  glow = false,
   className = '',
   ariaLabel,
 }) {
   const tone = STATE_TONE_TEXT[state] || STATE_TONE_TEXT.idle;
   const label = STATE_LABEL[state] || STATE_LABEL.idle;
-  const interactive = typeof onClick === 'function';
+  const interactive = typeof onClick === 'function' || typeof onDoubleClick === 'function';
   // ID único por instancia para que múltiples avatares no colisionen en gradients
   const uid = React.useId();
 
@@ -67,7 +75,7 @@ export default function ChagraAgentAvatar({
         viewBox="0 0 200 200"
         width={size}
         height={size}
-        className={`chagra-agent-avatar chagra-state-${state}`}
+        className={`chagra-agent-avatar chagra-state-${state}${glow ? ' chagra-glow' : ''}`}
         role="img"
         aria-label={ariaLabel || label}
       >
@@ -427,10 +435,32 @@ export default function ChagraAgentAvatar({
             100% { opacity: 0; transform: scale(1.3); }
           }
 
+          /* ===== GLOW (task #122): respuesta lista, brilla pulsando ====
+             drop-shadow amber #FFB700 1.5s ease-in-out infinite. NO confetti,
+             NO bouncing — tono honesto del avatar. Activo en TODA la app
+             cuando responseReady=true en useAgentNotificationStore. */
+          .chagra-agent-avatar.chagra-glow {
+            animation: chagra-glow-pulse 1.5s ease-in-out infinite;
+          }
+          @keyframes chagra-glow-pulse {
+            0%, 100% {
+              filter: drop-shadow(0 0 2px rgba(255, 183, 0, .35))
+                      drop-shadow(0 0 6px rgba(255, 183, 0, .25));
+            }
+            50% {
+              filter: drop-shadow(0 0 6px rgba(255, 183, 0, .9))
+                      drop-shadow(0 0 14px rgba(255, 183, 0, .55));
+            }
+          }
+
           /* ===== Reduced motion ===== */
           @media (prefers-reduced-motion: reduce) {
             .chagra-agent-avatar * {
               animation: none !important;
+            }
+            .chagra-agent-avatar.chagra-glow {
+              animation: none !important;
+              filter: drop-shadow(0 0 4px rgba(255, 183, 0, .6));
             }
           }
         `}</style>
@@ -450,8 +480,10 @@ export default function ChagraAgentAvatar({
     <button
       type="button"
       onClick={onClick}
-      className="rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-400/50 transition-all hover:scale-105"
+      onDoubleClick={onDoubleClick}
+      className="rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-400/50 transition-all hover:scale-105 active:scale-95"
       aria-label={ariaLabel || `Abrir ${label}`}
+      title={onDoubleClick ? 'Doble click silencia o reactiva la voz' : undefined}
     >
       {content}
     </button>

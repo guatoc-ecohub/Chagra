@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home } from 'lucide-react';
+import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import ThemeSelector from './common/ThemeSelector';
 import BackupExportButton from './BackupExportButton';
 import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 import useFincaActiveStore from '../services/fincaActiveStore';
+import usePrefsStore from '../store/usePrefsStore';
+import { stop as stopTTS } from '../services/ttsService';
 
 const TTL_OPTIONS = [
   { id: '1d', label: '1 día' },
@@ -156,6 +158,12 @@ export default function ProfileScreen({ onBack, onHome }) {
           <ThemeSelector />
         </div>
 
+        {/* Task #122 (2026-05-23): toggle global TTS del agente Chagra.
+            Persiste en usePrefsStore (localStorage `chagra:prefs:tts-enabled`).
+            Default ON. Operador puede silenciar también con doble-click en
+            el avatar colibrí (header AgentScreen o FAB global). */}
+        <AgentVoiceSection />
+
         {/* Telemetry Section */}
         <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
           <div className="flex items-center gap-2 px-1">
@@ -224,6 +232,66 @@ export default function ProfileScreen({ onBack, onHome }) {
         </div>
       </div>
     </ScreenShell>
+  );
+}
+
+/**
+ * AgentVoiceSection — Task #122 (2026-05-23).
+ *
+ * Toggle "Voz del agente activa" persistido en usePrefsStore (key
+ * `chagra:prefs:tts-enabled`). Cuando se desactiva, se llama stop()
+ * inmediato del ttsService para silenciar cualquier playback en curso.
+ *
+ * Equivalente al doble-click del avatar colibrí, pero accesible desde
+ * Perfil para operadores que prefieran control explícito UI.
+ */
+function AgentVoiceSection() {
+  const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);
+  const setTtsEnabled = usePrefsStore((s) => s.setTtsEnabled);
+
+  const handleToggle = () => {
+    const next = !ttsEnabled;
+    if (!next) {
+      // Si desactivamos, cortamos cualquier audio actual de inmediato
+      stopTTS();
+    }
+    setTtsEnabled(next);
+  };
+
+  return (
+    <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+      <div className="flex items-center gap-2 px-1">
+        <Volume2 size={18} className="text-violet-400" />
+        <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Voz del agente</h3>
+      </div>
+
+      <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
+        <div className="flex flex-col gap-0.5 flex-1">
+          <span className="text-sm font-bold text-slate-200">Voz del agente activa</span>
+          <span className="text-[10px] text-slate-500 leading-snug">
+            Cuando está activa, Chagra IA lee en voz alta sus respuestas (Kokoro TTS,
+            con respaldo al sintetizador del navegador). Doble click en el avatar
+            colibrí silencia o reactiva sin abrir esta pantalla.
+          </span>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={ttsEnabled}
+          aria-label="Activar o silenciar la voz del agente"
+          onClick={handleToggle}
+          className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+            ttsEnabled ? 'bg-violet-600' : 'bg-slate-700'
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+              ttsEnabled ? 'translate-x-5' : 'translate-x-0'
+            }`}
+          />
+        </button>
+      </label>
+    </div>
   );
 }
 

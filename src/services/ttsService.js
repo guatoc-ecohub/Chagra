@@ -62,6 +62,14 @@ let voicesLoaded = false;
 let kokoroAvailable = null;
 let currentKokoroAudio = null;
 let currentKokoroUrl = null;
+// Task #122 (2026-05-23): cache del último texto que se mandó a hablar
+// (Kokoro o Web Speech). Permite el "double-click avatar global → re-
+// reproducir último mensaje del agente" cuando TTS está habilitado.
+// El cache se llena cada vez que speakKokoro/speak corre con texto
+// no vacío. Se preserva entre stop()s para que el operador silencie y
+// luego pueda re-escuchar lo mismo.
+let lastSpoken = null;
+let lastSpokenOptions = null;
 
 function loadVoices() {
   return new Promise((resolve) => {
@@ -151,6 +159,13 @@ export function speak(text, options = {}) {
 
   utterance.lang = 'es-CO';
 
+  // Task #122: guardar para replayLast(). Texto vacío no se cachea para
+  // evitar replayLast() repitiendo nada cuando el operador hizo speak('').
+  if (typeof text === 'string' && text.trim().length > 0) {
+    lastSpoken = text;
+    lastSpokenOptions = { ...options };
+  }
+
   window.speechSynthesis.speak(utterance);
 
   return utterance;
@@ -214,6 +229,13 @@ export async function speakKokoro(text, options = {}) {
   // task #125: "como peye no?").
   const cleanText = sanitizeForTTS(text);
 
+  // Task #122: guardar el texto original (no sanitizado) para replayLast()
+  // — replayLast vuelve a llamar speakKokoro que re-sanitiza idempotente.
+  if (typeof text === 'string' && text.trim().length > 0) {
+    lastSpoken = text;
+    lastSpokenOptions = { ...options };
+  }
+
   try {
     const res = await fetch('/api/kokoro/tts', {
       method: 'POST',
@@ -255,6 +277,45 @@ export function isPaused() {
   return window.speechSynthesis?.paused || false;
 }
 
+/**
+ * Task #122 (2026-05-23): re-reproduce el último texto sintetizado.
+ *
+ * Usado por el doble-click del avatar global colibrí cuando TTS está
+ * silenciado y el operador quiere volver a escuchar el último mensaje
+ * del agente. Si nunca se habló, no-op silencioso (no throw, devuelve
+ * false para que el caller decida feedback).
+ *
+ * Estrategia: si Kokoro estaba ready (sabemos porque lastSpokenOptions
+ * existe), re-feed por Kokoro. Sino, Web Speech. Acepta override de
+ * `useKokoro` para casos donde el caller ya sabe el estado del backend.
+ */
+export async function replayLast({ useKokoro = null } = {}) {
+  if (!lastSpoken) return false;
+  const opts = lastSpokenOptions || {};
+  // Decisión por defecto: probar Kokoro si la última vez fue Kokoro
+  // (heurística: opts trae `voice` ef_*). Sino Web Speech.
+  const shouldUseKokoro =
+    useKokoro !== null
+      ? useKokoro
+      : typeof opts.voice === 'string' && opts.voice.startsWith('ef_');
+  try {
+    if (shouldUseKokoro) {
+      await speakKokoro(lastSpoken, opts);
+    } else {
+      speak(lastSpoken, opts);
+    }
+    return true;
+  } catch (_) {
+    // speakKokoro ya hace fallback interno a speak() en error, así que si
+    // tira hasta acá es algo raro. No bloquear el caller.
+    return false;
+  }
+}
+
+export function getLastSpoken() {
+  return lastSpoken;
+}
+
 export function init() {
   loadVoices();
 }
@@ -271,5 +332,7 @@ export default {
   isKokoroAvailable,
   getVoices,
   getSpanishVoice,
+  replayLast,
+  getLastSpoken,
   init,
 };
