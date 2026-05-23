@@ -5,22 +5,18 @@ import Database from 'better-sqlite3';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = path.join(__dirname, '../public/catalog.sqlite');
-// OSS→Pro step 2 (2026-05-23): el build OSS empaqueta el subset 50 species
-// (chagra-catalog-oss-subset-v3.1.json) como seed canónico para la PWA pública.
-// El corpus full 496 species queda disponible en repo solo para scripts
-// editoriales (batch-Xa, migrate-*, validate-*); NO se incluye en la sqlite
-// que va al usuario PWA OSS.
+// REVERT 2026-05-23: el subset 50 species (PR #1011) cortó species críticas
+// (aguacate, tomate, lechuga, acelga, tomate árbol) y rompió casos de uso
+// reales del agente en producción. Vuelve al corpus full 496 mientras
+// curamos un subset que incluya top-N species por uso real efectivo.
 //
-// Override para regenerar sqlite con corpus full (build interno / herramientas):
-//   CHAGRA_SEED=chagra-catalog-seed-v3.1.json npm run build-catalog
-//
-// Campos v3.2-only (tracking_mode, dli_optimo_mol_m2_dia, fotoperiodo_*,
-// tolerancia_sombra_neta_pct) quedan NULL cuando no existen.
+// Override env (contrato preservado): CHAGRA_SEED=<filename> regenera con
+// otro seed. Útil cuando esté el subset bien curado.
 const CATALOG_DIR = path.join(__dirname, '../catalog');
-const DEFAULT_SEED_OSS = 'chagra-catalog-oss-subset-v3.1.json';
+const DEFAULT_SEED = 'chagra-catalog-seed-v3.1.json';
 const SEED_FILE = process.env.CHAGRA_SEED
   ? path.basename(process.env.CHAGRA_SEED)
-  : DEFAULT_SEED_OSS;
+  : DEFAULT_SEED;
 
 if (fs.existsSync(DB_PATH)) {
   fs.unlinkSync(DB_PATH);
