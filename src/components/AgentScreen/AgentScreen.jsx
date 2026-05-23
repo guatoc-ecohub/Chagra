@@ -7,6 +7,10 @@ import { retrieve } from '../../services/ragRetriever';
 import { parseIntent, formatIntentDescription } from '../../services/agentIntentParser';
 import { streamOpenAI } from '../../services/openaiStream';
 import { buildLLMRequest } from '../../services/llmRouter';
+// Sidecar agro-mcp (ADR-045 Fase 2 Step B/C). Detrás de feature flag
+// `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
+// y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
+import { isSidecarEnabled, planNlu, callTool } from '../../services/sidecarClient';
 import { speak, speakKokoro, stop, init as initTTS, isSupported, isKokoroAvailable } from '../../services/ttsService';
 import { executeAction, setActionGateCallback } from '../../services/actionExecutor';
 import ChatHistory from './ChatHistory';
@@ -339,7 +343,36 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
   // modelos no hagan cold-load entre conversaciones.
   const LLM_TIMEOUT_MS = 60000;
 
-  const callLLM = async (query, contextMemory, contextCorpus) => {
+  // Cap defensivo para inyectar evidencia del sidecar como context turn
+  // sin reventar la ventana 4096 tokens. ~1500 chars ≈ 400-500 tokens —
+  // deja sitio cómodo para system prompt + corpus RAG + historial + query.
+  const TOOL_EVIDENCE_MAX_CHARS = 1500;
+
+  const formatToolEvidence = (toolEvidence) => {
+    if (!toolEvidence || !toolEvidence.tool || !toolEvidence.result) return '';
+    let payload;
+    try {
+      payload = JSON.stringify(toolEvidence.result);
+    } catch (_) {
+      return '';
+    }
+    let truncated = false;
+    if (payload.length > TOOL_EVIDENCE_MAX_CHARS) {
+      payload = payload.slice(0, TOOL_EVIDENCE_MAX_CHARS);
+      truncated = true;
+    }
+    // Bloque delimitado y citable. Mismo patrón que el corpus RAG: el LLM
+    // sabe que NO viene del usuario y puede atribuirlo a la fuente.
+    return `
+
+=== DATOS VERIFICADOS (chagra-agro-mcp tool: ${toolEvidence.tool}) ===
+${payload}${truncated ? '\n[...truncated, ver detalle en ficha de especie]' : ''}
+=== FIN DATOS VERIFICADOS ===
+
+Estos datos vienen del knowledge graph del catálogo Chagra (verificado). Citalos si responden la pregunta, pero RESPONDE SOLO a lo que el usuario te preguntó.`;
+  };
+
+  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence) => {
     const systemPrompt = getSystemPrompt();
     // 2026-05-19: incidente alucinación tomate — gemma3:4b confundía el
     // corpus RAG con lo que el usuario dijo (atribuía síntomas "hojas
@@ -356,8 +389,10 @@ ${contextCorpus.map((c) => c.text).join('\n\n---\n\n')}
 Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el usuario te preguntó. NO menciones síntomas ni observaciones que no estén explícitamente en el mensaje del usuario.`
       : '';
 
+    const evidenceContext = formatToolEvidence(toolEvidence);
+
     const messages = [
-      { role: 'system', content: systemPrompt + corpusContext },
+      { role: 'system', content: systemPrompt + corpusContext + evidenceContext },
       ...(contextMemory ? [{ role: 'user', content: contextMemory }] : []),
       { role: 'user', content: query },
     ];
@@ -430,7 +465,49 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       const contextMemory = await getContextString(operatorId, 10);
       const contextCorpus = await retrieve(text, 3, 'agente');
 
-      const response = await callLLM(text, contextMemory, contextCorpus);
+      // ADR-045 Fase 2 Step B/C — sidecar NLU + MCP tool grounding.
+      // Solo si flag VITE_USE_SIDECAR_AGRO_MCP=true Y estamos online.
+      // Si sidecar falla / no aplica, sigue al chat con RAG-only (no
+      // degrada UX). El planNlu/callTool wrappers son no-throw: devuelven
+      // null en error/timeout. La evidencia se inyecta como bloque
+      // delimitado en el system prompt para grounding citable.
+      let toolEvidence = null;
+      if (isOnline && isSidecarEnabled()) {
+        try {
+          const tNlu0 = performance.now();
+          const plan = await planNlu(text, contextMemory);
+          const tNlu1 = performance.now();
+          if (plan?.useTool && plan.tool && plan.args) {
+            const tTool0 = performance.now();
+            const result = await callTool(plan.tool, plan.args);
+            const tTool1 = performance.now();
+            if (result) {
+              toolEvidence = { tool: plan.tool, args: plan.args, result };
+              const evidenceBytes = (() => {
+                try { return JSON.stringify(result).length; } catch (_) { return 0; }
+              })();
+              console.debug('[sidecar]', {
+                tool: plan.tool,
+                latencyNlu: Math.round(tNlu1 - tNlu0),
+                latencyTool: Math.round(tTool1 - tTool0),
+                toolEvidenceBytes: evidenceBytes,
+              });
+            }
+          } else if (plan) {
+            console.debug('[sidecar]', {
+              tool: null,
+              latencyNlu: Math.round(tNlu1 - tNlu0),
+              reason: plan.reason || 'no_tool',
+            });
+          }
+        } catch (sidecarErr) {
+          // Defensa extra: planNlu/callTool ya son no-throw, pero si algo
+          // raro pasa NO bloqueamos el chat.
+          console.debug('[sidecar] inesperado, sigo con RAG-only:', sidecarErr?.message);
+        }
+      }
+
+      const response = await callLLM(text, contextMemory, contextCorpus, toolEvidence);
       agentSounds.chime();
 
       const { intent } = parseIntent(text);
