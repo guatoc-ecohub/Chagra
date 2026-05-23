@@ -5,6 +5,58 @@
  * Si Kokoro no está disponible, fallback transparente a window.speechSynthesis.
  */
 
+/**
+ * Limpia markdown del texto antes de mandarlo al TTS. Sin esto, kokoro y
+ * SpeechSynthesis leen literal los caracteres de formato:
+ *   "asterisco asterisco bold asterisco asterisco" en lugar de "bold",
+ *   "guion espacio item" en lugar de "item".
+ *
+ * Bug reportado por operador 2026-05-23 (task #125): el agente Chagra
+ * emite respuestas en markdown con listas (`*`), negrita (`**`),
+ * encabezados (`#`), inline code (`` ` ``), y links `[txt](url)`. El TTS
+ * los leía literal, generando UX muy fea ("peye" según operador).
+ *
+ * Mantenemos las transformaciones simples + idempotentes. Si el texto NO
+ * tiene markdown, devuelve el texto sin cambios.
+ */
+export function sanitizeForTTS(text) {
+  if (typeof text !== 'string' || text.length === 0) return text;
+  return text
+    // Negrita ** o __ (procesar antes que cursiva para evitar romper la pareja)
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/__([^_]+)__/g, '$1')
+    // Cursiva * o _
+    .replace(/\*([^*\n]+)\*/g, '$1')
+    .replace(/(?<![A-Za-z0-9])_([^_\n]+)_(?![A-Za-z0-9])/g, '$1')
+    // Inline code `texto`
+    .replace(/`([^`\n]+)`/g, '$1')
+    // Code fences ```lang\n...\n```
+    .replace(/```[a-z]*\n?([\s\S]*?)```/gi, '$1')
+    // Encabezados markdown # ## ### al inicio de línea
+    .replace(/^#{1,6}\s+/gm, '')
+    // Viñetas - * + al inicio de línea
+    .replace(/^[\s]*[-*+]\s+/gm, '')
+    // Numeración 1. 2. etc al inicio de línea
+    .replace(/^[\s]*\d+[.)]\s+/gm, '')
+    // Links [texto](url) → solo el texto visible
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    // Citas blockquote > al inicio de línea
+    .replace(/^[\s]*>\s+/gm, '')
+    // Separadores horizontales ---, ===, ***
+    .replace(/^[\s]*[-=*]{3,}[\s]*$/gm, '')
+    // Tablas (filas con |) — borrar carácter pipe
+    .replace(/\|/g, ' ')
+    // Caracteres residuales * y ` (NO _ — esos forman parte de snake_case ids
+    // como coffea_arabica que el agente cita literalmente). Si el LLM emite
+    // __ o * sueltos, los limpio; pero un _ entre dos letras de un id NO.
+    .replace(/[*`]/g, '')
+    // Espacios múltiples consecutivos → 1
+    .replace(/[ \t]+/g, ' ')
+    // Líneas en blanco múltiples → 1
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 let voices = [];
 let voicesLoaded = false;
 let kokoroAvailable = null;
@@ -72,7 +124,10 @@ export function speak(text, options = {}) {
 
   stop();
 
-  const utterance = new SpeechSynthesisUtterance(text);
+  // Strip markdown antes de sintetizar. Sin esto, SpeechSynthesis lee
+  // literal "asterisco asterisco" cuando el texto trae **negrita**.
+  const cleanText = sanitizeForTTS(text);
+  const utterance = new SpeechSynthesisUtterance(cleanText);
 
   const {
     rate = 0.9,
@@ -153,11 +208,17 @@ export async function speakKokoro(text, options = {}) {
 
   stop();
 
+  // Strip markdown antes de mandar al server Kokoro. Sin esto, el TTS
+  // neuronal lee literal "asterisco asterisco" cuando el texto trae
+  // **negrita**, "guion item" para viñetas, etc. (operador 2026-05-23,
+  // task #125: "como peye no?").
+  const cleanText = sanitizeForTTS(text);
+
   try {
     const res = await fetch('/api/kokoro/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, voice, format, lang }),
+      body: JSON.stringify({ text: cleanText, voice, format, lang }),
     });
 
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
