@@ -20,7 +20,23 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
     }
 
     setLoading(true);
-    const result = await authenticateUser(creds.username, creds.password);
+    // 2026-05-23 auditoría Antigravity bug #10: si `authenticateUser` throw
+    // (network error, JSON parse fail, CORS, AbortError) sin try/catch, el
+    // botón quedaba en "Procesando..." infinito sin feedback al usuario.
+    // Fix: try/catch + finally garantizan que setLoading(false) corra siempre
+    // y que el operador reciba un toast con la razón del fallo.
+    let result;
+    try {
+      result = await authenticateUser(creds.username, creds.password);
+    } catch (err) {
+      // Errores de red, timeout, CORS, JSON malformado, fetch abortado.
+      setLoading(false);
+      const msg = err?.message
+        ? `Error de conexión: ${err.message}. Revisa tu internet y vuelve a intentar.`
+        : 'Error de conexión. Revisa tu internet y vuelve a intentar.';
+      onSave(msg, true);
+      return;
+    }
 
     if (result.success) {
       // Activar Capa 1 HMAC (ADR-027.v): computa operator_id_hash determinista
@@ -47,7 +63,12 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
       onLoginSuccess();
     } else {
       setLoading(false);
-      onSave(result.error || 'Error autenticando', true);
+      // Mensaje contextual: si el servidor devolvió razón clara, mostrarla;
+      // si no, mensaje amigable que sugiere acción (credenciales incorrectas).
+      const errorMsg = result.error
+        ? `${result.error}. Verifica usuario y contraseña.`
+        : 'Usuario o contraseña incorrectos. Verifica e intenta de nuevo.';
+      onSave(errorMsg, true);
     }
   };
 
