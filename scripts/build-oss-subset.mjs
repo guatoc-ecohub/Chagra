@@ -47,7 +47,7 @@
  * subset (porque los 50 IDs son hardcoded y la fuente full es estable).
  */
 
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -55,15 +55,27 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 
 // Resolución de input: prioridad argv[2] > chagra-pro/data/catalog/full > seed local.
+// Patrón sin existsSync() para evitar la race TOCTOU que flagueaba CodeQL
+// (js/file-system-race): hacemos un único `readFileSync` con fallback en catch
+// si ENOENT. El consumidor único de este script es CLI, no servicio, pero la
+// regla pública del repo es no introducir alertas SAST nuevas.
 const FALLBACK_FULL = resolve(ROOT, '../chagra-pro/data/catalog/chagra-catalog-full-v3.1.json');
 const LOCAL_SEED = join(ROOT, 'catalog/chagra-catalog-seed-v3.1.json');
 
-const INPUT = process.argv[2]
-  ? resolve(process.argv[2])
-  : existsSync(FALLBACK_FULL)
-    ? FALLBACK_FULL
-    : LOCAL_SEED;
+function readInputWithFallback(primary, secondary) {
+  try {
+    const buf = readFileSync(primary, 'utf8');
+    return { path: primary, content: buf };
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      const buf = readFileSync(secondary, 'utf8');
+      return { path: secondary, content: buf };
+    }
+    throw e;
+  }
+}
 
+const EXPLICIT_INPUT = process.argv[2] ? resolve(process.argv[2]) : null;
 const OUTPUT = process.argv[3]
   ? resolve(process.argv[3])
   : LOCAL_SEED;
@@ -175,16 +187,31 @@ function main() {
     die(`OSS_SUBSET_IDS tiene ${OSS_SUBSET_IDS.size}, esperaba 50`);
   }
 
+  let inputPath;
+  let inputContent;
+  if (EXPLICIT_INPUT) {
+    inputPath = EXPLICIT_INPUT;
+    try {
+      inputContent = readFileSync(inputPath, 'utf8');
+    } catch (e) {
+      die(`No pude leer input ${inputPath}: ${e.message}`, 3);
+    }
+  } else {
+    try {
+      const r = readInputWithFallback(FALLBACK_FULL, LOCAL_SEED);
+      inputPath = r.path;
+      inputContent = r.content;
+    } catch (e) {
+      die(`No pude resolver input (probé ${FALLBACK_FULL} y ${LOCAL_SEED}): ${e.message}`, 3);
+    }
+  }
+
   console.log('build-oss-subset.mjs');
-  console.log(`  input:  ${INPUT}`);
+  console.log(`  input:  ${inputPath}`);
   console.log(`  output: ${OUTPUT}`);
   console.log('');
 
-  if (!existsSync(INPUT)) {
-    die(`Input no existe: ${INPUT}. Pasá explícitamente la ruta al catálogo full como argv[2].`, 3);
-  }
-
-  const full = JSON.parse(readFileSync(INPUT, 'utf8'));
+  const full = JSON.parse(inputContent);
   const fullSpeciesCount = (full.species || []).length;
   const fullIds = new Set((full.species || []).map((s) => s.id));
 
@@ -250,12 +277,14 @@ function main() {
     seed_version: typeof full.seed_version === 'string' && !full.seed_version.includes('oss-subset')
       ? `${full.seed_version}-oss-subset`
       : full.seed_version,
-    generated_at: new Date().toISOString(),
+    // generated_at puede inyectarse con --stamp (no por default para que el
+    // output sea determinístico y los diffs git no sean ruidosos en re-runs).
+    ...(process.argv.includes('--stamp') ? { generated_at: new Date().toISOString() } : {}),
     generated_by: 'scripts/build-oss-subset.mjs',
     _subset_meta: {
       subset_name: 'oss-subset-50',
       criterio: 'editorial-v2-2026-05-23',
-      source_file_basename: INPUT.split('/').pop(),
+      source_file_basename: inputPath.split('/').pop(),
       source_species_count: fullSpeciesCount,
       subset_species_count: species.length,
       sources_kept: sources.length,

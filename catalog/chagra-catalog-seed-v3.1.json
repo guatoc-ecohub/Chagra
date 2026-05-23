@@ -22,7 +22,6 @@
   },
   "schema_version": "3.1",
   "seed_version": "0.2.0-oss-subset",
-  "generated_at": "2026-05-23T18:01:16.372Z",
   "generated_by": "scripts/build-oss-subset.mjs",
   "_subset_meta": {
     "subset_name": "oss-subset-50",
