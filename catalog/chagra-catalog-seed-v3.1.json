@@ -362,6 +362,12 @@
           }
         ]
       },
+      "antagonists": [
+        "phaseolus_vulgaris"
+      ],
+      "companions": [
+        "solanum_tuberosum_sabanera"
+      ],
       "tracking_mode": "aggregate"
     },
     {
@@ -499,7 +505,8 @@
         ]
       },
       "antagonists": [
-        "vicia_sativa"
+        "vicia_sativa",
+        "phaseolus_vulgaris"
       ],
       "tracking_mode": "aggregate"
     },
@@ -1555,6 +1562,11 @@
       "companions": [
         "alnus_acuminata",
         "erythrina_edulis",
+        "erythrina_rubrinervia",
+        "inga_edulis",
+        "inga_densiflora",
+        "inga_punctata",
+        "inga_vera",
         "cedrela_odorata",
         "cordia_alliodora",
         "swietenia_macrophylla",
@@ -1580,7 +1592,16 @@
         "oreopanax_floribundum",
         "vismia_baccifera",
         "cinchona_pubescens",
-        "cinchona_officinalis"
+        "cinchona_officinalis",
+        "musa_paradisiaca",
+        "cajanus_cajan"
+      ],
+      "companions_con_advertencia": [
+        "aniba_perutilis",
+        "swietenia_macrophylla",
+        "cedrela_odorata",
+        "cedrela_montana",
+        "magnolia_caricifragrans"
       ],
       "antagonists": [
         "foeniculum_vulgare"
@@ -1589,7 +1610,7 @@
         "metodo_principal": "semilla",
         "notas": "Requiere germinador en arena y posterior embolsado."
       },
-      "valor_pedagogico": "El café arábica (Coffea arabica L.) es el cultivo agroindustrial emblemático de Colombia y la principal fuente de ingresos de la economía campesina cafetera, con cerca de 850.000 hectáreas distribuidas en Caldas, Quindío, Risaralda, Antioquia, Tolima, Huila, Cundinamarca y Santander entre 1.200 y 2.000 msnm en zona térmica templada. Las variedades Caturra, Castillo y Cenicafé 1 son las más adoptadas en Colombia por su resistencia a roya (Hemileia vastatrix) y broca (Hypothenemus hampei) según Cenicafé. Requiere sombra parcial 35-50%, suelos francos con pH 5.0-5.5, y precipitación 1.800-2.800 mm anuales. Sistemas agroecológicos asocian café con plátano (Musa spp.), guandul (Cajanus cajan) y nogal cafetero (Cordia alliodora) para sombra estratificada. Fuentes Tier A: Cenicafé Manual del Cafetero 2013, AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone.",
+      "valor_pedagogico": "El café arábica (Coffea arabica L.) es el cultivo agroindustrial emblemático de Colombia y la principal fuente de ingresos de la economía campesina cafetera, con cerca de 850.000 hectáreas distribuidas en Caldas, Quindío, Risaralda, Antioquia, Tolima, Huila, Cundinamarca y Santander entre 1.200 y 2.000 msnm en zona térmica templada. Las variedades Caturra, Castillo y Cenicafé 1 son las más adoptadas en Colombia por su resistencia a roya (Hemileia vastatrix) y broca (Hypothenemus hampei) según Cenicafé. Requiere sombra parcial 35-50%, suelos francos con pH 5.0-5.5, y precipitación 1.800-2.800 mm anuales. Sistemas agroecológicos asocian café con plátano (Musa spp.), guandul (Cajanus cajan) y nogal cafetero (Cordia alliodora) para sombra estratificada. ⚠️ El sombrío histórico incluyó species hoy amenazadas (Aniba perutilis CR, Swietenia macrophylla EN/CITES II, Cedrela odorata CITES II). En cafetales nuevos, priorizar Inga spp + Erythrina + Cordia alliodora (rápido crecimiento, no amenazadas) sobre maderables CR. Fuentes Tier A: Cenicafé Manual del Cafetero 2013, AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone.",
       "feeding_plan_template": {
         "source": "Cenicafé — Manual del Cafetero Colombiano (2013) + Cenicafé — Trichoderma spp. en manejo integrado (2010). Programa nutricional café tradicional Caturra/Castillo zona cafetera.",
         "primary_steps": [
@@ -2517,7 +2538,8 @@
         "nectandra_acutifolia",
         "ocotea_calophylla",
         "aniba_perutilis",
-        "vismia_baccifera"
+        "vismia_baccifera",
+        "coffea_arabica"
       ]
     },
     {
@@ -3186,6 +3208,12 @@
         "agrosavia-sol-andina"
       ],
       "valor_pedagogico": "La oca (Oxalis tuberosa) se cultiva en Colombia principalmente en los departamentos de Cundinamarca, Boyacá, Nariño y Cauca, entre 2400-3400 msnm en zona térmica fría, con propagación por tubérculos semilla y un ciclo de crecimiento de 8-9 meses, asociándose frecuentemente con papa y maíz en sistemas de policultivo andino, mientras enfrenta desafíos por plagas como el gusano blanco y la mosca de la oca; su cultivo tiene profundas raíces culturales en la tradición muisca y campesina andina, donde se reconocen variedades de tubérculo blanco, rosado, morado y amarillo, utilizándose tradicionalmente cocido en sopas y aplicándose la técnica ancestral de 'qollotear' (exposición al sol post-cosecha) para reducir el contenido de ácido oxálico y aumentar el dulzor, tal como documenta el National Research Council en su obra de 1989 'Lost Crops of the Incas' que identifica a la oca como uno de los tubérculos andinos subutilizados con gran potencial para cultivo mundial.",
+      "companions": [
+        "solanum_tuberosum_sabanera",
+        "zea_mays",
+        "tropaeolum_tuberosum",
+        "arracacia_xanthorrhiza"
+      ],
       "tracking_mode": "aggregate"
     },
     {
@@ -3710,11 +3738,19 @@
       "companions": [
         "lactuca_sativa_capitata",
         "zea_mays",
-        "helianthus_annuus"
+        "helianthus_annuus",
+        "cucurbita_maxima",
+        "cucurbita_moschata",
+        "musa_paradisiaca",
+        "manihot_esculenta",
+        "solanum_tuberosum_sabanera"
       ],
       "antagonists": [
         "allium_ampeloprasum",
         "allium_fistulosum",
+        "allium_cepa",
+        "allium_sativum",
+        "allium_schoenoprasum",
         "foeniculum_vulgare"
       ],
       "propagation": {
@@ -4814,6 +4850,9 @@
       "companions": [
         "urtica_dioica"
       ],
+      "antagonists": [
+        "juglans_neotropica"
+      ],
       "enfermedades_criticas": [
         "Trozador (Agrotis ipsilon)"
       ],
@@ -4932,7 +4971,8 @@
         "brassica_oleracea_capitata_rubra",
         "brassica_oleracea_sabauda",
         "foeniculum_vulgare",
-        "solanum_phureja"
+        "solanum_phureja",
+        "juglans_neotropica"
       ],
       "propagation": {
         "metodo_principal": "semilla",
@@ -5053,6 +5093,9 @@
       "valor_pedagogico": "El tomate cherry Sungold (Solanum lycopersicum L. cv. 'Sungold', familia Solanaceae) es un híbrido determinado dorado-naranja de tamaño cherry desarrollado para invernadero comercial y huerta agroecológica colombiana, valorado por su altísimo dulzor (Brix 9-12, vs cherry rojo 6-7) y producción extendida bajo cobertura plástica. Se cultiva en Sabana de Bogotá (Mosquera, Madrid, Sopó), Boyacá altiplano, Cundinamarca templada (Sopó, La Calera), Eje cafetero y Antioquia entre 500 y 2.900 msnm en zona térmica cálida a fría bajo invernadero. Ciclo 90-120 días desde trasplante a primera cosecha, productividad sostenida 6-8 meses. Rendimientos 8-15 kg/planta en sistema vertical entutorado. Lección viva de sabor y color: enseña cómo el color naranja intenso indica altos niveles de azúcares solubles y betacarotenos (precursores vitamina A), siendo el referente mundial de dulzor en tomates cherry. Manejo agroecológico: entutorado vertical individual, podas semanales de chupones, fertilización con biol foliar + bocashi al fondo, control de tuta absoluta (Phthorimaea absoluta) con Bacillus thuringiensis + trampas feromonales, control de mosca blanca con neem + ortiga. Fuentes Tier A: ICA Resolución 3168/2015, AGROSAVIA Manual Biopreparados 2015, POWO Kew, GBIF Backbone Taxonomy.",
       "companions": [
         "urtica_dioica"
+      ],
+      "antagonists": [
+        "juglans_neotropica"
       ],
       "enfermedades_criticas": [
         "Trozador (Agrotis ipsilon)"
@@ -5553,6 +5596,12 @@
         "ica-resolucion-3168-2015"
       ],
       "valor_pedagogico": "La mashua (Tropaeolum tuberosum) se cultiva en los departamentos andinos de Colombia como Boyacá, Cundinamarca, Nariño y Cauca entre 2000 y 3600 msnm en zonas térmicas frías. Su manejo agronómico incluye propagación por tubérculos semilla, ciclo de cultivo de 8-9 meses, asociaciones beneficiosas con papa y maíz que reducen nemátodos y plagas del suelo, y requiere monitoreo de plagas como trips y áfidos mediante biopreparados andinos. En el contexto cultural muisca y andino, este tubérculo ha sido tradicionalmente utilizado en sopros y guisos como alimento esencial, preservando sabores prehispánicos en las cocinas rurales de los Andes colombianos. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Tropaeolum tuberosum Ruiz & Pav.",
+      "companions": [
+        "solanum_tuberosum_sabanera",
+        "zea_mays",
+        "oxalis_tuberosa",
+        "arracacia_xanthorrhiza"
+      ],
       "tracking_mode": "aggregate"
     },
     {
@@ -6344,7 +6393,15 @@
         "trifolium_repens",
         "vicia_sativa",
         "helianthus_annuus",
-        "hibiscus_sabdariffa"
+        "hibiscus_sabdariffa",
+        "cajanus_cajan",
+        "musa_paradisiaca",
+        "cucurbita_maxima",
+        "cucurbita_moschata",
+        "manihot_esculenta",
+        "oxalis_tuberosa",
+        "tropaeolum_tuberosum",
+        "arracacia_xanthorrhiza"
       ],
       "antagonists": [
         "foeniculum_vulgare"
@@ -6757,6 +6814,15 @@
         "Trozador (Agrotis ipsilon)"
       ],
       "tracking_mode": "aggregate",
+      "companions": [
+        "phaseolus_vulgaris",
+        "cucurbita_maxima",
+        "cucurbita_moschata",
+        "allium_cepa",
+        "oxalis_tuberosa",
+        "tropaeolum_tuberosum",
+        "arracacia_xanthorrhiza"
+      ],
       "antagonists": [
         "juglans_neotropica"
       ]
@@ -6900,6 +6966,12 @@
         "powo-kew"
       ],
       "valor_pedagogico": "La arracacha o zanahoria blanca (Arracacia xanthorrhiza Bancr., familia Apiaceae) es una apiácea perenne herbácea cultivada como tubérculo andino por excelencia de la chagra muisca colombiana, producida tradicionalmente por comunidades campesinas de Boyacá, Cundinamarca y Cauca por sus raíces tuberosas amarillo-pálidas a crema de textura suave, alta digestibilidad y bajo contenido de antinutrientes, recomendadas en dietas de destete infantil tradicional. Se cultiva en Boyacá (Sutamarchán, Tunja, Saboyá, Cucaita), Cundinamarca (Sumapaz, Pacho, Subachoque), Cauca (Silvia, Totoró), Nariño (Pasto, Yacuanquer) y Eje cafetero entre 1.500 y 2.800 msnm en zona térmica templada a fría. Ciclo largo 10-14 meses a cosecha, requiere paciencia y planificación de la chagra. Rendimientos 8-15 t/ha raíz fresca. Lección viva: enseña el manejo de cultivos de ciclo largo (vs hortalizas de ciclo corto 90-120 días), raíces de alta digestibilidad para alimentación infantil y adultos mayores, y valor económico campesino como cultivo comercial estable. Manejo agroecológico: siembra por hijuelos del cuello (propágulo vegetativo) en hoyos profundos 30 cm con compost al fondo, asocio con maíz y fríjol, aporque a los 4 meses, cosecha cuando follaje amarillea, almacenamiento en pozo fresco hasta 60 días. Fuentes Tier A: NRC 1989 Lost Crops of the Incas, AGROSAVIA Manual Tubérculos Andinos, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
+      "companions": [
+        "solanum_tuberosum_sabanera",
+        "oxalis_tuberosa",
+        "tropaeolum_tuberosum",
+        "zea_mays"
+      ],
       "tracking_mode": "aggregate",
       "variedades_registradas_ica": [
         {
@@ -7575,7 +7647,11 @@
       "valor_pedagogico": "La calabaza o auyama (Cucurbita maxima Duchesne, familia Cucurbitaceae) es una cucurbitácea anual herbácea rastrera-trepadora originaria de los Andes sudamericanos (Bolivia, Perú, Argentina), domesticada hace más de 8.000 años y dispersada precolombinamente por toda América, cultivada tradicionalmente en sistemas campesinos colombianos como uno de los tres pilares del sistema mesoamericano-andino de las tres hermanas (maíz-fríjol-calabaza). Produce frutos grandes (3-15 kg, hasta 50 kg en variedades gigantes) de pulpa amarillo-anaranjada rica en betacaroteno, vitamina A y fibra. Se cultiva en Cundinamarca (Pacho, Subachoque, sabana de Bogotá), Boyacá (Tunja, Villa de Leyva), Nariño (Pasto, Ipiales), Cauca, Antioquia (oriente, Suroeste) y Eje cafetero entre 1.000 y 2.600 msnm en zona térmica cálida a fría. Ciclo anual de 4-6 meses. Rendimientos 15-30 t/ha fruto. Lección viva: en la milpa andina-mesoamericana enseña el sistema de las tres hermanas — el maíz aporta soporte estructural a la guía rastrera, el fríjol fija nitrógeno biológico (Rhizobium spp.) y la calabaza cubre el suelo con sus hojas amplias reduciendo evapotranspiración y suprimiendo arvenses. Las flores masculinas rellenas de queso y huevo son patrimonio culinario de Cundinamarca y Boyacá. Manejo agroecológico: siembra directa en sitio definitivo a 1.5-2 m entre golpes, asocio obligatorio en milpa, polinización por abejas nativas (Peponapis pruinosa, Apis mellifera), cosecha post-marchitamiento de guía, almacenamiento en bodega ventilada hasta 6 meses, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA, FAO Ecocrop, Bernal 2015 Catálogo Plantas Colombia.",
       "tracking_mode": "aggregate",
       "companions": [
-        "helianthus_annuus"
+        "helianthus_annuus",
+        "zea_mays",
+        "phaseolus_vulgaris",
+        "solanum_tuberosum_sabanera",
+        "manihot_esculenta"
       ]
     },
     {
@@ -8702,6 +8778,9 @@
       "tracking_mode": "aggregate",
       "companions": [
         "viola_tricolor"
+      ],
+      "antagonists": [
+        "phaseolus_vulgaris"
       ]
     },
     {
@@ -10409,7 +10488,10 @@
       "rol_ecologico": "Fijador de nitrogeno simbiotico. Sombra regulada para cultivos asociados. Atraccion de polinizadores (colibries, abejas). Aporte de biomasa foliar rica en N.",
       "valor_pedagogico": "El chiló (Erythrina rubrinervia Kunth, Fabaceae) es un árbol nativo andino de cerca viva tradicional en Cundinamarca, Boyacá, Antioquia y Eje cafetero (1.200-2.800 msnm). Propagación facilísima por estaca leñosa de 2 m: se entierra 40 cm en suelo húmedo y prende sin riego. Sus flores rojo-coral (año 2-3) atraen colibríes y abejas nativas — comedero aéreo de fauna polinizadora. Como leguminosa, fija nitrógeno atmosférico vía simbiosis con Rhizobium en nódulos radiculares, enriqueciendo el suelo del lindero sin abono químico. Lección viva: una cerca puede ser árbol vivo, alimento para colibríes y fábrica gratis de nitrógeno al mismo tiempo. Fuentes Tier A: Pérez Arbeláez 1947, Bernal 2015 Catálogo Plantas Colombia, GBIF Backbone.",
       "validation_level": "claude_draft",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "companions": [
+        "coffea_arabica"
+      ]
     },
     {
       "id": "tigridia_pavonia",
@@ -11670,7 +11752,10 @@
       ],
       "valor_pedagogico": "El guamo de monte (Inga vera Willd.) es un árbol nativo de la familia Fabaceae distribución en la Amazonía colombiana, particularmente en los departamentos de Amazonas, Caquetá, Putumayo, Guainía y Vaupés, entre 0 y 1200 msnm en zonas térmicas cálidas. Su manejo agronómico incluye propagación por semilla recalcitrante que debe sembrarse inmediatamente após recolección, con germinación rápida de 7-15 días, aunque también se reproduce por esquejes semi-leñosos. Como especie fijadora de nitrógeno, forma nodulaciones con rizobios simbiontes que enriquecen el suelo, siendo utilizada传统的 en sistemas agroforestales amazónicos como sombra para cultivos como café y cacao. En el contexto cultural indigenous amazonico, sus frutos vainas carnosas son consumidos directamente y sus semillas sirven para propagación de sistemas agroforestales tradicionales. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Inga vera Willd., especie nativa de la región tropical americana.",
       "validation_level": "claude_draft",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "companions": [
+        "coffea_arabica"
+      ]
     },
     {
       "id": "inga_densiflora",
@@ -11722,7 +11807,8 @@
         "clethra_revoluta",
         "myrcia_popayanensis",
         "cinchona_pubescens",
-        "cinchona_officinalis"
+        "cinchona_officinalis",
+        "coffea_arabica"
       ]
     },
     {
@@ -12417,6 +12503,9 @@
         "powo-kew"
       ],
       "valor_pedagogico": "La papa negra carrera (Solanum tuberosum L. subsp. andigenum cv. 'Carrera Negra') es una variedad nativa andina del altiplano colombiano, cultivada principalmente en Cundinamarca (Sumapaz, Une, Choachí, Carmen de Carupa), Boyacá (Toca, Siachoque, Aquitania, páramo de Pisba) y Nariño (Túquerres, Guachucal, Cumbal) entre 2.800 y 3.400 msnm, llegando a bordes de páramo a 3.700 msnm. Pertenece al grupo Andigenum, distinto del grupo Tuberosum europeo: tubérculos pequeños a medianos (40-120 g) de piel violeta oscuro casi negra, ojos profundos pigmentados y carne amarilla intensa rica en antocianinas y carotenoides. Es lección viva de soberanía alimentaria y resistencia genética: las variedades nativas Andigenum coevolucionaron por miles de años en suelos andinos con manejo campesino, conservando rusticidad frente a heladas, granizadas y suelos pobres donde la papa comercial (pastusa, parda) sucumbe. La carrera negra resiste mejor el tizón tardío (Phytophthora infestans) que las variedades industriales, requiere menos fertilización sintética y se conserva 4-6 meses post-cosecha sin refrigeración por su piel gruesa. Manejo agroecológico: rotación trienal con haba (Vicia faba), arveja andina (Pisum sativum) o cubio (Tropaeolum tuberosum); siembra al inicio de lluvias mayores (marzo-abril) o lluvias menores (septiembre-octubre); distancia 30 cm x 90 cm; aporque a los 60-90 días; biopreparados sugeridos: caldo bordelés diluido contra tizón, sulfocalcio contra polilla guatemalteca (Tecia solanivora), trichoderma al surco. Conservación de semilla en cuartos oscuros ventilados con paja seca de cebada. Conservar y multiplicar variedades como la carrera negra es un acto político-ecológico que niños y niñas pueden entender: cada tubérculo es un eslabón de memoria campesina que el mercado global no puede patentar. Fuentes Tier A: Pérez-Rodríguez-Gómez 2008, Núñez-Rodríguez 2024 UNAL, AGROSAVIA Manual Tubérculos Andinos 2017, CIP 2006 Ghislain, GBIF Backbone, POWO Kew.",
+      "antagonists": [
+        "juglans_neotropica"
+      ],
       "tracking_mode": "aggregate"
     },
     {
@@ -12518,6 +12607,9 @@
           }
         ]
       },
+      "antagonists": [
+        "juglans_neotropica"
+      ],
       "tracking_mode": "aggregate",
       "variedades_registradas_ica": [
         {
@@ -12755,6 +12847,12 @@
         "fao-ecocrop"
       ],
       "valor_pedagogico": "La ahuyama amarilla o zapallo cuello (Cucurbita moschata Duchesne, Cucurbitaceae) es una de las tres cucurbitas domesticadas en Mesoamérica y Sudamérica (junto con Cucurbita maxima y Cucurbita pepo), distintiva por su fruto de cuello largo o piriforme, piel verde-ocre que vira a amarillo-crema al madurar, y carne anaranjada intensa rica en betacaroteno (precursor de vitamina A). En Colombia se cultiva ampliamente en clima cálido y templado de Caribe (Córdoba, Sucre, Bolívar), valles interandinos (Tolima, Huila, Valle), Llanos (Casanare, Meta) y zona andina hasta los 1.800-2.000 msnm. Es lección viva de las 'tres hermanas' mesoamericanas adaptadas al trópico colombiano: la ahuyama se asocia históricamente con maíz y fríjol en policultivo donde el maíz da soporte, el fríjol fija nitrógeno y la ahuyama cubre el suelo con su porte rastrero, suprime arvenses, conserva humedad y reduce evaporación. A diferencia de Cucurbita maxima (zapallo de cabello, loche, criollo andino) que prefiere clima frío de altura, la C. moschata es la calabaza de tierra caliente, más resistente a calor, humedad alta y a la mosca blanca. Fruto multifuncional: pulpa para sopas (sancocho, mute santandereano), dulces (dulce de ahuyama, conserva), purés y compotas; semillas tostadas como botana o como antiparasitario tradicional (cucurbitina); flores comestibles en frituras; hojas tiernas en cocidos. Manejo agroecológico: siembra directa al inicio de lluvias, distancia 2-3 m entre matas; asociación clásica con maíz (Zea mays) y fríjol voluble (Phaseolus vulgaris); abono orgánico al hoyo (compost o bocashi); biopreparados caldo de ceniza o caldo sulfocalcio contra oídio (Erysiphe cichoracearum). Conservación de semilla local fácil porque la planta es monoica y fácil de polinizar a mano, lo cual permite mantener variedades familiares por generaciones. Fuentes Tier A: Pérez Arbeláez 1947 Plantas Útiles, AGROSAVIA Leguminosas Andinas (manejo policultivo), NRC 1989 Cultivos Andinos, GBIF Backbone, POWO Kew, FAO EcoCrop. Variedad documentada AGROSAVIA La Plata Caribe (desarrollada por AGROSAVIA C.I. Caribia + C.I. La Libertad, Meta; cultivar tropical de bajío adaptado a costa Caribe y Orinoquia, fruto ~5 kg, pulpa naranja, alto beta-caroteno). Resolución ICA no localizada en catalogo publico 2026-05-22 — entrada estructurada en variedades_registradas_ica pendiente de verificacion. Ver species_id chagra `cucurbita_moschata_agrosavia_la_plata` para detalle cultivar.",
+      "companions": [
+        "zea_mays",
+        "phaseolus_vulgaris",
+        "manihot_esculenta",
+        "solanum_tuberosum_sabanera"
+      ],
       "tracking_mode": "aggregate"
     },
     {
@@ -13447,6 +13545,14 @@
       ],
       "valor_pedagogico": "La yuca brava amazónica o mandioca amarga (Manihot esculenta Crantz, familia Euphorbiaceae) es un arbusto leñoso (2-4 m altura) nativo de las tierras bajas de Sudamérica tropical, domesticada hace 8.000-10.000 años en el sudoeste de la cuenca amazónica (frontera Brasil-Bolivia, área de Rondônia) según evidencia arqueobotánica y genética (Olsen & Schaal 1999), considerada la cuarta fuente de carbohidratos para la humanidad después del arroz, el trigo y el maíz, y la base alimentaria milenaria de los pueblos amazónicos colombianos (tikuna, huitoto, bora, miraña, muinane, andoke, ocaina, yagua, kichwa, siona, kofán, secoya, inga, kamëntsá, makuna, yukpa, sikuani, piaroa). Existen dos grupos varietales tradicionales bien diferenciados: yuca dulce (mansa, bajo contenido de glucósidos cianogénicos <50 mg HCN/kg, consumo directo cocida) y yuca brava o amarga (alto contenido cianogénico 100-500 mg HCN/kg, requiere procesamiento elaborado para eliminar el ácido cianhídrico y transformarse en casabe, fariña o manicuera fermentada). El proceso tradicional indígena para procesar la yuca brava — rallado en tabla de aserrín de palma o concha, prensado en sebucán (cilindro tejido de palma con torsión gravitacional) para extraer el manipueira o yare (líquido amarillo cianhídrico tóxico), tamizado de la masa, tostado en budare o tiesto cerámico para hacer casabe (torta delgada) o fariña (granulado seco) — es uno de los logros etnoquímicos más sofisticados de la humanidad precolombina, comparable al procesamiento del maíz por nixtamalización mesoamericana. Lección viva: planta-pilar de la chagra amazónica colombiana que enseña cinco conceptos críticos: (1) la domesticación temprana de plantas tóxicas (yuca amarga) por pueblos amazónicos como ejemplo magistral de coevolución cultura-naturaleza, donde un cultivo venenoso se vuelve alimento básico mediante una tecnología procesual milenaria; (2) la diferencia entre yuca dulce y yuca brava como caso de selección artificial divergente — la yuca brava conserva su defensa cianogénica natural contra herbívoros y la cultura humana la procesa, mientras la yuca dulce ha perdido esa defensa por selección y se cultiva en zonas con menor presión de saqueo (ej. periurbano colombiano); (3) la chagra amazónica de yuca como sistema rotatorio milenario sostenible: tumba-pudre o slash-and-mulch, ciclo de 1-3 años de cultivo seguido de barbecho de 8-15 años, lección magistral de agricultura itinerante de bosque tropical sin uso de fuego en muchas variantes; (4) la soberanía alimentaria amazónica — el casabe y la fariña son alimentos vivos de la identidad cultural de pueblos como los huitoto, tikuna y bora, y la pérdida del manejo tradicional implica erosión cultural y genética simultánea (>200 variedades locales documentadas en chagras del trapecio amazónico colombiano por SINCHI); (5) la bioquímica defensiva vegetal: los glucósidos cianogénicos (linamarina, lotaustralina) liberan HCN al ser hidrolizados por la enzima linamarasa, lección de bioquímica de defensa estructural disociada espacialmente (los glucósidos en vacuola, la enzima en citoplasma, contacto solo al daño mecánico). Manejo agroecológico: siembra en chagras nuevas (tumba-pudre tradicional), asocio con plátano, piña, copoazú, ají, achiote, cocona; cosecha escalonada manual; cero agroquímicos; control biológico de Phenacoccus manihoti (cochinilla de la yuca) con Anagyrus lopezi (avispita brasileña). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Manual Frutales Tropicales, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía, FAO EcoCrop, Pérez-Arbeláez 1947.",
       "advertencia_toxicologica": "NUNCA consumir cruda variedades amargas (HCN 100-500 mg/kg → neurotoxicidad konzo, tropic ataxic neuropathy). Procesamiento tradicional obligatorio (rallado + prensado + tostado) elimina glucósidos cianogénicos. Variedades dulces (<50 mg HCN/kg) seguras tras cocción.",
+      "companions": [
+        "zea_mays",
+        "phaseolus_vulgaris",
+        "cajanus_cajan",
+        "musa_paradisiaca",
+        "cucurbita_maxima",
+        "cucurbita_moschata"
+      ],
       "tracking_mode": "aggregate"
     },
     {
@@ -16619,7 +16725,16 @@
       ],
       "antagonists": [
         "malus_domestica_sabanera",
-        "solanum_tuberosum_sabanera"
+        "solanum_tuberosum_sabanera",
+        "solanum_tuberosum_carrera_negra",
+        "solanum_tuberosum_pastusa_suprema",
+        "solanum_lycopersicum_cerasiforme",
+        "solanum_lycopersicum_san_marzano",
+        "solanum_lycopersicum_sungold",
+        "capsicum_chinense_aji_panca",
+        "capsicum_baccatum_aji_amarillo",
+        "capsicum_pubescens_rocoto",
+        "capsicum_annuum_aji_dulce_caribe"
       ],
       "manejo_por_escala": {
         "apartamento": {
@@ -21785,6 +21900,9 @@
         "perez-arbelaez-1947-plantas-utiles"
       ],
       "valor_pedagogico": "El ají panca (Capsicum chinense Jacq. cv. 'Panca', Solanaceae) es un cultivar de ají de fruto rojo intenso y picor moderado (10.000-30.000 SHU en escala Scoville, equivalente a ají cayena suave) tradicional de la región andina noroccidental de Suramérica con presencia ancestral en Colombia bajo el nombre 'ají panca colombiano' o 'ají rojo seco', particularmente en las regiones Andina (Cundinamarca, Boyacá clima medio, Santander, Norte de Santander, Tolima, Huila, Antioquia, Valle del Cauca, Cauca, Nariño) y Caribe (Magdalena, Bolívar, Sucre, Córdoba) entre 0 y 1.800 msnm en zonas térmicas cálidas y templadas. Pertenece a la familia Solanaceae (igual que tomate, papa, pimentón, lulo, tomate de árbol, uchuva, ají dulce, rocoto, ulluco) y al género Capsicum del que existen cinco especies domesticadas: C. annuum (pimentón, jalapeño, cayena), C. chinense (habanero, panca, ají charapita, ají amarillo de mar), C. baccatum (ají amarillo andino), C. pubescens (rocoto), C. frutescens (tabasco, chiltepín). El cultivar 'panca' se distingue por frutos alargados (8-12 cm) de color rojo oscuro a casi negro cuando maduros, secados al sol para uso culinario en pastas y aderezos, picor moderado equilibrado por dulzor afrutado, y aceites esenciales ricos en capsaicina (alcaloide responsable del picor con propiedades vasodilatadoras, analgésicas tópicas y antimicrobianas) y carotenoides (capsantina, capsorubina, beta-caroteno provitamina A). Es lección viva de domesticación precolombina y biodiversidad cultivada que enseña a niñas y niños cómo los pueblos andinos seleccionaron durante miles de años decenas de cultivares de ají con diferentes niveles de picor, color, sabor y uso culinario — patrimonio agrobiocultural irreemplazable. Manejo agroecológico: propagación por semilla (germinación 8-15 días a 22-28°C, no tolera heladas), trasplante a las 6-8 semanas con 4-6 hojas verdaderas, distancia 50-60 cm entre plantas y 80 cm entre surcos, riego regular pero sin encharcamiento (sensible a Phytophthora capsici), tutorado opcional para variedades altas, cosecha escalonada de frutos maduros rojos durante 2-4 meses, secado al sol para conservación de pasta picante. Companion plants ideales: albahaca (repele plagas), cebollín y cebolla larga (repele áfidos), zanahoria. Antagonistas: hinojo (alelopatía), brassicas en proximidad cercana. Función en chagra como hortaliza-condimento de alto valor culinario y atractora de polinizadores. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015 Catálogo Plantas y Líquenes Colombia, AGROSAVIA Manual Frutales Tropicales, Pérez-Arbeláez 1947 Plantas Útiles Colombia.",
+      "antagonists": [
+        "juglans_neotropica"
+      ],
       "tracking_mode": "aggregate"
     },
     {
@@ -21836,6 +21954,9 @@
         "perez-arbelaez-1947-plantas-utiles"
       ],
       "valor_pedagogico": "El ají amarillo andino (Capsicum baccatum L., Solanaceae) es una de las cinco especies de ají domesticadas en los Andes precolombinos, originaria del altiplano boliviano-peruano-noroeste argentino y cultivada ancestralmente en los Andes ecuatorianos y colombianos desde el sur de Nariño hasta Boyacá-Cundinamarca, con presencia documentada en las regiones Andina (Nariño, Cauca, Valle del Cauca, Huila, Tolima, Cundinamarca, Boyacá, Santander) entre 600 y 3.000 msnm en zonas térmicas templadas y frías — su adaptación al clima fresco-frío andino es su rasgo más distintivo frente a otras especies de Capsicum que prefieren climas cálidos. Pertenece a la familia Solanaceae (igual que tomate, papa, pimentón, lulo, tomate de árbol, uchuva, rocoto, ají dulce, ulluco) y al género Capsicum sección Baccatum, hermana evolutiva de C. pubescens (rocoto) con la que comparte adaptación a altitudes altas. El fruto característico es alargado-fusiforme (8-15 cm), color amarillo intenso a anaranjado cuando maduro, con picor moderado a alto (30.000-50.000 SHU equivalente a cayena), sabor afrutado-frutal distintivo con notas a piña-mango (debido a ésteres aromáticos únicos de la especie), excelente para conservas en escabeche, pastas, salsas y cocina andina tradicional. Carácter diagnóstico: corolas blanco-cremas con manchas amarillas en la base de los pétalos (única en el género Capsicum cultivado), distinto a las corolas blanco-puras de C. annuum/chinense. Su nombre quechua 'kellu uchu' significa literalmente 'ají amarillo' y constituye uno de los condimentos icónicos de la cocina peruano-boliviana (papa a la huancaína, ají de gallina, escabeche) que también se cultiva en Colombia andina. Es lección viva de bio-diversidad cultivada y soberanía alimentaria que enseña a niñas y niños cómo cada especie de ají se adaptó a un piso térmico distinto: el chinense al trópico cálido, el baccatum al andino fresco, el pubescens al frío. Manejo agroecológico: propagación por semilla (germinación 10-20 días a 20-25°C, más lenta que C. annuum por adaptación a clima fresco), trasplante a las 8 semanas, distancia 60-80 cm entre plantas, riego regular sin encharcamiento, tutorado obligatorio (planta puede alcanzar 1.5-2 m), cosecha escalonada 5-7 meses, frutos verdes para escabeche y maduros amarillos para pastas. Companion plants: albahaca, cebollín, zanahoria, lechuga. Función en chagra como hortaliza-condimento andina de alto valor agroalimentario y cultural. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015, AGROSAVIA Manual Frutales Tropicales, Pérez-Arbeláez 1947.",
+      "antagonists": [
+        "juglans_neotropica"
+      ],
       "tracking_mode": "aggregate"
     },
     {
@@ -21887,6 +22008,9 @@
         "agrosavia-tibaitata"
       ],
       "valor_pedagogico": "El rocoto (Capsicum pubescens Ruiz & Pav., Solanaceae) es el único ají adaptado al clima frío de los Andes altos, una especie única en el género Capsicum por su rusticidad a altitudes superiores a 2.000 msnm donde otras especies de ají no prosperan, originaria del altiplano boliviano-peruano y cultivada ancestralmente desde la época precolombina en los Andes ecuatoriano-colombianos: en Colombia se cultiva en Nariño (Pasto, Ipiales, Cumbal), Cauca (Popayán, Silvia, Páez), Boyacá (Tunja, Garagoa, Sogamoso), Cundinamarca (Sabana, Tenjo, Cota) entre 1.200 y 3.500 msnm en zonas térmicas frías y templadas frías. Pertenece a la familia Solanaceae y al género Capsicum sección Pubescens, taxonómicamente más basal y evolutivamente más antigua que las otras especies del género. Tiene tres caracteres diagnósticos únicos en Capsicum: 1) semillas negras (todas las demás especies tienen semillas blanco-amarillas), 2) flores violeta-moradas con corola estrellada (las demás tienen flores blancas o crema), 3) hojas y tallos pubescentes (con pelos visibles, de allí el epíteto 'pubescens'). El fruto es globoso a piriforme (4-7 cm), color rojo-naranja a amarillo cuando maduro, picor alto a muy alto (30.000-100.000 SHU equivalente a habanero suave), pulpa carnosa más gruesa que otros ajíes (semejante a pimentón), sabor frutal con sutil amargor herbal, excelente para rellenar (rocoto relleno boliviano-peruano), salsas crudas (ají de rocoto) y conservas. Planta arbustiva-arborescente perenne de 2-3 m de altura que puede vivir 5-10 años produciendo en clima andino — característica única en el género que la convierte en cultivo permanente patio-huerto-shamba andino. Es lección extraordinaria de adaptación evolutiva al frío y de cómo los pueblos andinos seleccionaron una especie diferente a las del trópico para resolver el problema cultural de tener ají en clima frío: el rocoto demuestra que la biodiversidad agrícola no es uniformidad sino especialización ecológica, y enseña a niñas y niños que el clima frío también tiene su propio picante nativo. Manejo agroecológico: propagación por semilla (germinación lenta 15-30 días a 18-22°C, requiere paciencia), trasplante a las 10-12 semanas, distancia 1-1.2 m (planta grande), tutorado obligatorio (arbusto pesado), poda de formación al 2do año, riego regular sin exceso, primera cosecha 8-12 meses, productiva 3-5 años, sensible a heladas intensas (-2°C letal). Función en chagra andina como ají perenne patrimonial de clima frío, condimento patio y cosecha continua. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015, Pérez-Arbeláez 1947, AGROSAVIA Tibaitatá.",
+      "antagonists": [
+        "juglans_neotropica"
+      ],
       "tracking_mode": "aggregate"
     },
     {
@@ -21939,6 +22063,9 @@
         "perez-arbelaez-1947-plantas-utiles"
       ],
       "valor_pedagogico": "El ají dulce caribe (Capsicum annuum L. cv. 'Dulce', Solanaceae) es un cultivar emblemático de la cocina caribeña colombiana, venezolana y antillana caracterizado por la ausencia total de picor (0 SHU, mutación recesiva del gen Pun1 que desactiva la biosíntesis de capsaicina) pero con un aroma frutal-floral intenso y único que lo convierte en el condimento aromático base del sofrito caribeño, hogao y guisos costeños — patrimonio agroalimentario afro-caribeño irreemplazable. Se cultiva en toda la región Caribe colombiana (Atlántico, Magdalena, Bolívar, Cesar, Córdoba, Sucre, La Guajira, Arauca, Casanare en piedemonte llanero), Pacífico (Chocó, Valle), Andina baja (valles cálidos interandinos de Antioquia, Santander, Norte de Santander, Tolima, Huila, Valle del Cauca) y Orinoquía (Meta, Vichada) entre 0 y 1.500 msnm en zonas térmicas cálidas y templadas. Pertenece a la familia Solanaceae y al género Capsicum, especie C. annuum (la más cultivada globalmente, que incluye pimentón, jalapeño, cayena, paprika), cultivar 'Dulce' diferenciado del pimentón por su tamaño pequeño (3-6 cm), forma campanulada irregular o piriforme, colores variados al madurar (rojo, amarillo, naranja, verde-amarillento), pulpa delgada aromática y aroma intenso frutal-floral con notas a manzana-piña-floral distinto del aroma vegetal del pimentón. La mutación que elimina el picor mantiene íntegros los carotenoides (capsantina, capsorubina, beta-caroteno), flavonoides (quercetina, luteolina), vitamina C abundante y aceites esenciales aromáticos — convirtiéndolo en condimento de alta densidad nutricional sin la barrera sensorial del picante para niños y mayores. Es lección viva de domesticación selectiva por sabor y de cómo los pueblos afro-caribeños seleccionaron a través de generaciones una variante sin picor pero con aroma maximizado para construir una identidad culinaria distintiva: el sofrito caribeño con ají dulce, cebolla larga, ajo, cilantro y tomate es la base aromática de la cocina costeña colombiana, venezolana, cubana, dominicana y boricua. Manejo agroecológico: propagación por semilla (germinación 7-12 días a 25-28°C), trasplante a las 5-6 semanas, distancia 40-50 cm entre plantas, riego regular, sin tutorado en variedades compactas, cosecha escalonada 3-5 meses, primera cosecha temprana (más rápido que ajíes picantes). Companion plants ideales: albahaca, cilantro cimarrón, cebollín, tomate, plátano (estrato superior). Función en chagra costeña como hortaliza-condimento aromática insustituible. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, Bernal 2015 Catálogo Plantas y Líquenes Colombia, AGROSAVIA Manual Frutales Tropicales, Pérez-Arbeláez 1947 Plantas Útiles Colombia.",
+      "antagonists": [
+        "juglans_neotropica"
+      ],
       "tracking_mode": "aggregate"
     },
     {
@@ -24913,7 +25040,11 @@
       "validation_level": "claude_draft",
       "tracking_mode": "aggregate",
       "companions": [
-        "hibiscus_sabdariffa"
+        "hibiscus_sabdariffa",
+        "coffea_arabica",
+        "zea_mays",
+        "manihot_esculenta",
+        "musa_paradisiaca"
       ]
     },
     {
@@ -33218,6 +33349,13 @@
         "gbif-taxonomic-backbone",
         "agrosavia-manual-frutales-tropicales",
         "cenicafe-manual-cafetero-2013"
+      ],
+      "companions": [
+        "coffea_arabica",
+        "zea_mays",
+        "phaseolus_vulgaris",
+        "manihot_esculenta",
+        "cajanus_cajan"
       ]
     },
     {
@@ -33318,7 +33456,10 @@
       ],
       "validation_level": "claude_draft",
       "_curation_status": "BORRADOR_IA",
-      "estrato": "alto"
+      "estrato": "alto",
+      "companions": [
+        "coffea_arabica"
+      ]
     },
     {
       "id": "arracacia_xanthorrhiza_agrosavia_la22",
