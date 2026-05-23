@@ -1,12 +1,12 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, ChevronDown, X, Clock, Sparkles, Camera, ImagePlus, Loader2, Bug } from 'lucide-react';
+import { Search, ChevronDown, X, Clock, Sparkles, Camera, ImagePlus, Loader2, Bug, Check, AlertCircle } from 'lucide-react';
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { resolveSpeciesDefaults } from '../config/speciesDefaults';
 import { fuzzyFilter } from '../utils/fuzzySearch';
 import { usePhotoUrl } from '../hooks/usePhotoUrl';
 import useAssetStore from '../store/useAssetStore';
 import { captureAndCompress } from '../services/photoService';
-import { recognizeSpecies } from '../services/aiService';
+import { recognizeSpeciesGrounded } from '../services/aiService';
 import { getAllSpecies } from '../db/catalogDB';
 
 /**
@@ -166,7 +166,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
           console.warn('[SpeciesSelect] onPhoto callback failed:', err);
         }
       }
-      const result = await recognizeSpecies(blob);
+      const result = await recognizeSpeciesGrounded(blob);
       if (!result) {
         setAiState('error');
         return;
@@ -497,6 +497,28 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
               <p className="text-[10px] uppercase tracking-wider text-emerald-500 font-bold mb-0.5">
                 Especie sugerida ({Math.round((aiResult.confidence || 0) * 100)}% confianza)
               </p>
+              {/* Badge grounded contra catálogo (PR #114 — anti-alucinación).
+                  _grounded === true  → verde "Verificado catálogo".
+                  _grounded === false → amber "No verificado — revisar manualmente".
+                  _grounded === null  → sidecar offline o no aplica, sin badge. */}
+              {aiResult._grounded === true && (
+                <span
+                  data-testid="grounded-badge-verified"
+                  className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 bg-green-600/20 text-green-300 border border-green-700 mb-1"
+                >
+                  <Check size={14} aria-hidden="true" />
+                  Verificado catálogo
+                </span>
+              )}
+              {aiResult._grounded === false && (
+                <span
+                  data-testid="grounded-badge-unverified"
+                  className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 bg-amber-600/20 text-amber-300 border border-amber-700 mb-1"
+                >
+                  <AlertCircle size={14} aria-hidden="true" />
+                  No verificado — revisar manualmente
+                </span>
+              )}
               <p className="text-sm text-emerald-200 font-bold">
                 {aiResult.common_name_es || '—'}
               </p>
@@ -506,6 +528,34 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
                 </p>
               )}
             </div>
+            {/* Si el primario NO está verificado pero el sidecar encontró
+                candidates alternativos válidos en el catálogo, ofrecerlos
+                como sugerencias confiables. */}
+            {aiResult._grounded === false && Array.isArray(aiResult._all_validations) && (() => {
+              const validCandidates = aiResult._all_validations.filter(
+                (v) => v && v.valid === true && v.species_id
+              );
+              if (validCandidates.length === 0) return null;
+              return (
+                <div data-testid="grounded-valid-candidates">
+                  <p className="text-[10px] uppercase tracking-wider text-green-400 font-bold mb-1">
+                    Coincidencias en catálogo
+                  </p>
+                  <div className="flex flex-wrap gap-1">
+                    {validCandidates.slice(0, 4).map((v, i) => (
+                      <button
+                        key={v.species_id || i}
+                        type="button"
+                        onClick={() => handleAiPickAlternative(v.source_label || v.species_id || '')}
+                        className="text-[11px] px-2 py-0.5 rounded bg-green-900/30 hover:bg-green-800/40 text-green-200 border border-green-700"
+                      >
+                        {v.source_label || v.species_id}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
             {Array.isArray(aiResult.alternatives) && aiResult.alternatives.length > 0 && (
               <div>
                 <p className="text-[10px] uppercase tracking-wider text-emerald-500 font-bold mb-1">
