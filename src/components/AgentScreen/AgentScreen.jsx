@@ -11,7 +11,7 @@ import { buildLLMRequest } from '../../services/llmRouter';
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
 import { isSidecarEnabled, planNlu, callTool } from '../../services/sidecarClient';
-import { speak, speakKokoro, stop, init as initTTS, isSupported, isKokoroAvailable } from '../../services/ttsService';
+import { speak, speakKokoro, stop, init as initTTS, isSupported, isKokoroAvailable, replayLast, isSpeaking } from '../../services/ttsService';
 import { executeAction, setActionGateCallback } from '../../services/actionExecutor';
 import ChatHistory from './ChatHistory';
 import SuggestedActions from './SuggestedActions';
@@ -20,6 +20,7 @@ import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import { agentSounds } from '../../services/agentSoundService';
 import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
+import useAgentNotificationStore from '../../store/useAgentNotificationStore';
 import useFincaActiveStore from '../../services/fincaActiveStore';
 
 // 2026-05-16: migrado a llmRouter (Multi-LLM por tarea). AgentScreen usa
@@ -33,6 +34,14 @@ const STATE_THINKING = 'thinking';
 
 export default function AgentScreen({ onBack }) {
   const operatorId = usePrefsStore((s) => s.operatorId) || 'default-operator';
+  // Task #122 (2026-05-23): ttsEnabled global persistido en usePrefsStore.
+  // Antes era useState local — al cambiarlo en otra pantalla (header
+  // colibrí dblclick) AgentScreen no se enteraba.
+  const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);
+  const setTtsEnabled = usePrefsStore((s) => s.setTtsEnabled);
+  const setResponseReady = useAgentNotificationStore((s) => s.setResponseReady);
+  const setLastNotificationMessage = useAgentNotificationStore((s) => s.setLastMessage);
+  const markRead = useAgentNotificationStore((s) => s.markRead);
   const plants = useAssetStore((s) => s.plants);
   // 062.6: contexto finca activa para system prompt (zona biocultural,
   // altitud, override indoor invernadero).
@@ -47,7 +56,6 @@ export default function AgentScreen({ onBack }) {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [error, setError] = useState('');
   const [actionModal, setActionModal] = useState({ isOpen: false, intent: null, llmResponse: '' });
-  const [ttsEnabled, setTtsEnabled] = useState(true);
   const ttsSupported = isSupported();
   const [kokoroReady, setKokoroReady] = useState(false);
   // Bug 2026-05-18 (Karen reportó stuck-pensando): tras 20s sin token visible,
@@ -149,6 +157,10 @@ export default function AgentScreen({ onBack }) {
     initTTS();
     isKokoroAvailable().then(setKokoroReady);
     loadHistory();
+    // Task #122: al entrar a AgentScreen, apaga el glow del avatar global.
+    // El operador ya está mirando la conversación, no necesita el "reluce"
+    // de "respuesta nueva".
+    markRead();
     // 057.4 integration: registrar el callback del actionExecutor. Cuando el
     // LLM proponga una tool con requiresGate=true, actionExecutor llamará
     // este callback que abre el ActionConfirmModal y retorna un Promise.
@@ -178,7 +190,7 @@ export default function AgentScreen({ onBack }) {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [loadHistory]);
+  }, [loadHistory, markRead]);
 
   const getSystemPrompt = useCallback(() => {
     // Operator bug 2026-05-18: agente listaba "Fresa #02, Fresa #08, Fresa #02..."
@@ -604,6 +616,18 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       await addTurn(operatorId, { role: 'assistant', content: response });
       setMessages((prev) => [...prev, assistantMessage]);
 
+      // Task #122: cachear el último mensaje del agente en el store global
+      // para que el doble-click del avatar (cualquier pantalla) pueda re-
+      // reproducirlo via replayLast(). responseReady NO se setea acá porque
+      // el usuario ESTÁ en AgentScreen — el glow se activa cuando alguien
+      // sale a otra pantalla mid-stream y vuelve a recibir respuesta tarde.
+      // Para cubrir ese caso, también lo seteamos pero igualmente markRead
+      // se dispara al ver el componente activo (efecto cancelado al volver).
+      if (response) {
+        setLastNotificationMessage(response);
+        setResponseReady(true);
+      }
+
       if (ttsEnabled && response) {
         stop();
         if (kokoroReady) {
@@ -722,6 +746,22 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         <ChagraAgentAvatar
           state={state === STATE_RECORDING ? 'listening' : state === STATE_THINKING ? 'thinking' : 'idle'}
           size={40}
+          onDoubleClick={async () => {
+            // Task #122: doble-click avatar header silencia/reactiva audio.
+            // Espejo del comportamiento del AgentFab global, pero acá ya
+            // estamos en AgentScreen así que solo tocamos TTS.
+            if (isSpeaking() || ttsEnabled) {
+              stop();
+              setTtsEnabled(false);
+              agentSounds.cancel();
+              return;
+            }
+            // Reactivar + replay último mensaje
+            setTtsEnabled(true);
+            const ok = await replayLast({ useKokoro: kokoroReady });
+            if (ok) agentSounds.chime();
+          }}
+          ariaLabel="Avatar Chagra IA, doble click para silenciar o reactivar la voz"
         />
         <div className="flex-1 min-w-0">
           <h1 className="text-base font-bold text-white leading-tight">Chagra IA</h1>
