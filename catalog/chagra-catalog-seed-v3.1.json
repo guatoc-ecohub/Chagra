@@ -11433,7 +11433,8 @@
         "bernal-2015-plantas-liquenes-colombia"
       ],
       "valor_pedagogico": "La vainilla (Vanilla planifolia Jacks. ex Andrews, familia Orchidaceae) es una orquídea epífita trepadora hemiepifítica nativa de Mesoamérica (México y Centroamérica), naturalizada y con poblaciones silvestres reconocidas en Colombia (Amazonas, Putumayo, Vaupés, Caquetá, Magdalena medio, Chocó), cultivada en sistemas agroforestales tropicales como fuente del aroma natural más apreciado del mundo. Sus vainas (cápsulas dehiscentes mal llamadas frutos) concentran vainillina (3-metoxi-4-hidroxibenzaldehído), piperonal y centenares de compuestos aromáticos que solo se desarrollan tras el curado fermentativo de 3-6 meses post-cosecha (sudado, secado, condicionado), proceso bioquímico clave del beneficio tradicional. En su hábitat natural mexicano es polinizada exclusivamente por abejas Euglossini (Eulaema, Euglossa) ausentes en cultivos colombianos, lo que obliga a la polinización manual flor por flor durante el breve período de receptividad (una mañana al amanecer) usando una astilla de bambú, técnica desarrollada por Edmond Albius en 1841 que democratizó el cultivo mundial. Se cultiva en clima cálido húmedo entre 0 y 1.000 msnm con sombra parcial 50-70%, sustrato rico orgánico de drenaje rápido y tutor vivo (árbol espaldera). Lección viva: la vainilla enseña la relación simbiótica entre orquídeas y polinizadores nativos (coevolución mutualista altamente especializada), la fragilidad del servicio ecosistémico de polinización cuando se desplaza el cultivo de su hábitat original, la técnica tradicional de beneficio del fruto aromático que transforma una vaina inodora en el aroma del chocolate, helados y reposterías del mundo, y el valor de los sistemas agroforestales tropicales como conservadores de biodiversidad y proveedores de productos no maderables de alto valor. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, FAO EcoCrop, SINCHI Amazonia Colombiana, Bernal 2015 Catálogo Plantas Colombia, Pérez Arbeláez 1947 Plantas Útiles.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "cites_appendix": "II"
     },
     {
       "id": "illicium_verum",
@@ -15948,7 +15949,9 @@
         "gbif-taxonomic-backbone",
         "perez-arbelaez-1947-plantas-utiles"
       ],
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "cites_appendix": "II",
+      "_cites_history_note": "Cedrela odorata: Apéndice III (Colombia, 2001) → Apéndice II (todas las poblaciones neotropicales, CoP18/2019, efectivo 2020). Valor actual: II."
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH38_MADERABLES_SOMBRIO",
@@ -16199,7 +16202,8 @@
         "gbif-taxonomic-backbone",
         "sinchi-amazonia-colombiana"
       ],
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "cites_appendix": "II"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH38_MADERABLES_SOMBRIO",
@@ -19339,7 +19343,8 @@
         "jbb-plantas-medicinales",
         "libro-rojo-plantas-colombia"
       ],
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "cites_appendix": "I"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH41_EPIFITAS_ANDES_RETRY",
@@ -19455,7 +19460,8 @@
         "sib-colombia",
         "libro-rojo-plantas-colombia"
       ],
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "cites_appendix": "II"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH41_EPIFITAS_ANDES_RETRY",
@@ -19570,7 +19576,8 @@
         "sib-colombia",
         "libro-rojo-plantas-colombia"
       ],
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "cites_appendix": "II"
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH41_EPIFITAS_ANDES_RETRY",
@@ -23455,7 +23462,7 @@
         "pollinator_attractor"
       ],
       "cultivable": true,
-      "conservation_status": "en_peligro",
+      "conservation_status": "nativo_silvestre",
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 50,
@@ -23489,7 +23496,8 @@
       ],
       "valor_pedagogico": "La tagua del Pacífico (Phytelephas seemannii O.F.Cook, familia Arecaceae) es una palma dioica acaule a subterránea endémica del bioma chocoano biogeográfico — Pacífico colombiano (Chocó: Bajo Atrato, San Juan, Baudó, Quibdó, Nuquí, Bahía Solano; Valle del Cauca pacífico: Buenaventura, Bajo Calima; Cauca pacífico: Guapi, Timbiquí, López de Micay; Nariño pacífico: Tumaco, Barbacoas, Mosquera) y Pacífico panameño (Darién) — entre 0 y 1.200 msnm en bosque húmedo tropical y bosque muy húmedo tropical (>4000 mm precipitación anual) con suelos ácidos lateríticos derivados de aluviones de los ríos Atrato, San Juan, Baudó, Mira y Patía. Es PEDAGÓGICAMENTE EXCELENTE como lección viva del manejo ancestral del bosque chocoano por parte de las COMUNIDADES AFROCOLOMBIANAS del Pacífico colombiano (consejos comunitarios Cocomacia, Acadesan, Cocomasur del Bajo Atrato y San Juan que tienen titulación colectiva de territorios desde Ley 70/1993) y los pueblos indígenas EMBERA (Embera-Dóbida, Embera-Chamí, Embera-Katío) y WOUNAAN del bajo Atrato y San Juan, que durante siglos han manejado rodales naturales (taguales) en sistemas agroforestales tradicionales con extracción rotacional sostenible de la 'pepa' (semilla endurecida que al madurar se vuelve marfil vegetal de dureza similar a la del marfil animal) para tallar botones, joyería, esculturas miniatura y artesanía exportable. Palma acaule de tallo postrado subterráneo a corto emergente (0.5-3 m), hojas pinnadas erectas de 5-9 m con folíolos de 1-1.5 m, infrutescencias compactas globosas en cabezuela de 15-30 cm con 4-10 frutos drupáceos cubiertos de espinas blandas conteniendo 4-9 semillas cada uno (endospermo marfil vegetal). Polinización por escarabajos curculiónidos y derelómidos. Pertenece a tribu Phytelepheae junto a P. macrocarpa, P. tenuicaulis y P. tumacana. Distinta a Phytelephas macrocarpa (tagua amazónica) por su distribución pacífica estricta, infrutescencias más pequeñas y manejo cultural específico afrochocoano. Manejo agroecológico: regeneración natural por escarabajo dispersor; siembra enriquecimiento bajo dosel a 8-12 m entre plantas; tolerante a sombra del 60-80%; resiliente a inundación temporal de orillas. Función en chagra/agroforestal del Pacífico como sustento económico de comunidades afrocolombianas y Embera-Wounaan (cadena de valor de artesanía marfil vegetal con certificación FairTrade), conservación de palma casi-amenazada por sobreextracción histórica, restauración de bosques chocoanos degradados, banco genético del bioma con mayor biodiversidad endémica de Colombia. Fuentes Tier A: POWO Kew, GBIF, Bernal & Galeano 2010 Palmas de Colombia (referencia obligada para palmas colombianas), Sinchi, IIAP Pacífico (Instituto de Investigaciones Ambientales del Pacífico Chocó), Cárdenas-Salinas frutales amazónicos.",
       "validation_level": "claude_draft",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "_pasada_5_conservation_note": "NT (Near Threatened) en revisiones recientes UICN — uso sostenible regulado por COCOMACIA y otros consejos comunitarios Pacífico colombiano. La cosecha de semilla NO requiere tala. Downgrade desde EN tras revisión Pasada 5."
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18_BATCH47_CHOCO_BIOGEOGRAFICO",
@@ -26077,7 +26085,7 @@
         "nurse_plant"
       ],
       "cultivable": false,
-      "conservation_status": "nativo_protegido",
+      "conservation_status": "endemica_critica",
       "altitud_msnm": {
         "min_absoluto": 3200,
         "optimo_min": 3500,
@@ -26117,7 +26125,8 @@
         "bernal-2015-plantas-liquenes-colombia"
       ],
       "valor_pedagogico": "El frailejón de Uribe (Espeletia uribei Cuatrec., familia Asteraceae) es un frailejón endémico del Páramo de Sumapaz — el complejo paramuno más extenso del mundo (333.420 hectáreas entre Cundinamarca, Meta y Huila), corazón hídrico de Bogotá y la región andina central colombiana. Nombrado en honor al sacerdote-botánico Lorenzo Uribe-Uribe S.J. (1900-1980), pionero del estudio florístico colombiano y autor de la 'Flora de Colombia'. Es una roseta caulescente típica del subgénero Espeletia s.s., con tallo corto subterráneo o emergente bajo, hojas lanceoladas plateadas (15-30 cm largo) densamente cubiertas por tricomas blanco-grisáceos que cumplen función termorreguladora (reducen pérdida de calor nocturna y captan agua de niebla matinal por condensación capilar), e inflorescencia en racimo terminal con capítulos amarillos grandes característicos de la subtribu Espeletiinae. En Colombia se distribuye exclusivamente en el complejo paramuno Sumapaz-Cruz Verde-Chingaza-Guerrero-Guacheneque en zona térmica de páramo entre 3.200 y 4.200 msnm, con óptimo en 3.500-3.900 msnm en pajonales-frailejonales del subpáramo-páramo medio dominados por Calamagrostis effusa, Calamagrostis bogotensis y otras especies de Espeletia (E. grandiflora, E. argentea, E. killipii, E. uribei, E. summapacis). Lección viva de endemismo paramuno colombiano y biogeografía de altísima montaña tropical: el género Espeletia, con ~140 especies descritas (Diazgranados-2012), es uno de los radiados evolutivos más espectaculares de la flora andina, con cada complejo paramuno (Sumapaz, Chingaza, Iguaque, Pisba, Cocuy, Santurbán, Belmira, Tatamá, Frontino-Urrao, Las Hermosas) albergando especies endémicas exclusivas — patrón biogeográfico de 'islas en el cielo' (sky islands) donde el aislamiento geográfico entre páramos separados por valles interandinos cálidos ha promovido especiación alopátrica. E. uribei es uno de los frailejones diagnósticos del páramo de Sumapaz junto con E. grandiflora y E. killipii (este último más típico de Chingaza). El crecimiento extremadamente lento (~0.8 cm/año, individuos de 1.5 m con ~180 años de edad) y la baja tasa de germinación natural (5-15%) hacen que la regeneración poblacional sea extraordinariamente vulnerable a cualquier disturbio: quemas para ampliar potreros, pisoteo ganadero, minería ilegal, expansión de frontera papera, cambio climático y deshielo glaciar son amenazas reales y críticas. Protección legal: Ley 1930 de 2018 (Gestión Integral de Páramos) prohíbe TODA actividad agropecuaria, minera, de hidrocarburos y de infraestructura nueva en ecosistemas de páramo delimitados por el Ministerio de Ambiente y el Instituto Humboldt. Resolución 383/2010 MADS declara TODOS los frailejones (todas las especies del género Espeletia y géneros relacionados de Espeletiinae) como especies amenazadas con prohibición absoluta de aprovechamiento, tránsito, comercialización y movilización sin permiso CAR. Sentencia T-361/2017 Corte Constitucional ordena la delimitación participativa del Páramo de Santurbán y por extensión sienta precedente para todos los páramos colombianos. La manipulación legal del frailejón se restringe EXCLUSIVAMENTE a proyectos de restauración ecológica autorizados por la autoridad ambiental competente (CAR Cundinamarca, CORPORINOQUIA, CORPOAMAZONIA según jurisdicción) bajo protocolos validados (Rojas-Zamora 2013, Vargas-Ríos 2007, PNN Sumapaz). Manejo agroecológico (solo restauración): recolección de aquenios maduros (diciembre-febrero, temporada seca cordillera oriental) con autorización CAR, siembra en sustrato turba de páramo + tierra subpáramo 50% + arena gruesa 30% + MO 20%, germinación en invernadero de alta montaña 30-90 días, trasplante a bolsa 4-6 meses, plantación definitiva >12 meses a 15-20 cm en sitios degradados con exclusión ganadera obligatoria mínimo 3 años, densidad 100-400 individuos/ha según grado de degradación, monitoreo anual de supervivencia, asocio con Calamagrostis effusa, Hypericum juniperinum, Senecio formosus y otras especies nativas del cortejo florístico paramuno. La regulación hídrica del frailejón es servicio ecosistémico estratégico: la pubescencia foliar captura agua de niebla y rocío matutino, escurrimiento foliar dirige el agua al cuello de la roseta y al suelo orgánico turboso de páramo (almacenamiento prolongado), regulando caudales base de las cuencas que abastecen >70% del agua potable de las ciudades andinas colombianas (Bogotá, Cundinamarca, Boyacá, Meta). Fuentes Tier A: Humboldt 2016 Frailejones de Colombia, Diazgranados 2012 Revisión Espeletiinae, Ley 1930/2018, Resolución 383/2010 MADS, Libro Rojo de Plantas de Colombia, Bernal 2015 Catálogo Plantas Colombia, Plan de Manejo PNN Sumapaz.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "nota_conservacion": "Endémica colombiana restringida (frailejón). conservation_status endemica_critica aplicado en Batch 5A por rango limitado y endemismo paramuno estricto. Páramos altoandinos en riesgo por cambio climático + ganadería + minería. Estrategia: conservación in situ áreas protegidas PNN (Sumapaz/Chingaza/Chiles-Cumbal/Cocuy según species). Sin propagación masiva — solo restauración ecológica en sitio."
     },
     {
       "id": "espeletia_killipii",
@@ -26139,7 +26148,7 @@
         "nurse_plant"
       ],
       "cultivable": false,
-      "conservation_status": "nativo_protegido",
+      "conservation_status": "endemica_critica",
       "altitud_msnm": {
         "min_absoluto": 3000,
         "optimo_min": 3300,
@@ -26179,7 +26188,8 @@
         "bernal-2015-plantas-liquenes-colombia"
       ],
       "valor_pedagogico": "El frailejón Killip (Espeletia killipii Cuatrec., familia Asteraceae) es uno de los frailejones diagnósticos del Páramo de Chingaza — el complejo paramuno que abastece >80% del agua potable de Bogotá a través del sistema de embalses Chuza-San Rafael-Chingaza operado por la EAAB (Empresa de Acueducto y Alcantarillado de Bogotá). Nombrado en honor al botánico estadounidense Ellsworth Paine Killip (1890-1968), curador del U.S. National Herbarium (Smithsonian) y colector pionero de la flora colombiana junto con Pennell, Cuatrecasas, García-Barriga y Schultes en las expediciones botánicas de las primeras décadas del siglo XX que documentaron la riqueza florística andino-amazónica colombiana. Es una roseta caulescente del subgénero Espeletia s.s. con tallo erecto que alcanza 1-3 m de altura (uno de los frailejones de talla mediana-alta), hojas oblongo-lanceoladas plateadas densamente pubescentes (15-25 cm largo) dispuestas en roseta apical compacta, e inflorescencia en panícula amarilla terminal con capítulos típicos de la subtribu Espeletiinae. En Colombia se distribuye principalmente en el complejo paramuno Chingaza-Cruz Verde-Sumapaz-Guerrero-Guasca-Guatavita-Guacheneque entre 3.000 y 4.100 msnm, con óptimo en 3.300-3.800 msnm en frailejonales-pajonales del subpáramo-páramo medio dominados por Calamagrostis effusa, Calamagrostis bogotensis, Espeletia grandiflora, E. killipii, E. uribei (en Sumapaz) y otras especies del cortejo florístico paramuno. Lección viva de servicio ecosistémico hídrico estratégico nacional: el complejo Chingaza protege ~76.600 ha de páramos, bosques altoandinos y subpáramos, regula la oferta hídrica de la cuenca del río Bogotá y la cuenca del río Guavio, y abastece el sistema Chingaza que entrega 14 m³/s de agua potable a Bogotá (>80% del consumo metropolitano). La densidad de frailejones de Chingaza (estimada en 4.000-8.000 individuos/ha en frailejonal puro) es indicador de salud ecosistémica y de capacidad de captura-regulación hídrica del páramo. E. killipii es uno de los frailejones más estudiados en proyectos de restauración liderados por la EAAB, CAR Cundinamarca, CORPORINOQUIA, PNN Chingaza, Universidad Nacional de Colombia (grupo Restauración Ecológica), Instituto Humboldt y Fundación Conservación Internacional Colombia. El crecimiento lento (~1 cm/año) y la regeneración natural extremadamente baja (5-15% de germinación, alta mortalidad de plántulas) hacen que la conservación dependa esencialmente de la protección activa del hábitat: exclusión ganadera, prevención de quemas, control de minería ilegal, vigilancia comunitaria y restauración asistida en sitios degradados. Protección legal: Ley 1930/2018 (Gestión Integral de Páramos) prohíbe agricultura, ganadería extensiva, minería, hidrocarburos e infraestructura nueva en páramos delimitados; Resolución 383/2010 MADS declara TODOS los frailejones especies amenazadas con prohibición absoluta de aprovechamiento sin permiso CAR; Sentencia C-035/2016 Corte Constitucional confirma constitucionalidad de la prohibición de minería en páramos. Manejo legal restringido EXCLUSIVAMENTE a proyectos de restauración autorizados: recolección de aquenios maduros (octubre-febrero según altitud) con permiso CAR, siembra en sustrato de turba de páramo + tierra de subpáramo + arena + MO, germinación 30-90 días en invernadero alta montaña, trasplante a bolsa 4-6 meses, plantación definitiva >12 meses, densidad 100-400 ind/ha según degradación, asocio con Calamagrostis, Hypericum, Senecio, Bartsia, Disterigma, Pernettya y otras especies nativas paramunas. La protección de E. killipii es indisociable de la protección del recurso hídrico estratégico nacional y de la viabilidad del sistema de acueducto de Bogotá D.C. Fuentes Tier A: Humboldt 2016 Frailejones de Colombia, Diazgranados 2012 Revisión Espeletiinae, Ley 1930/2018, Resolución 383/2010 MADS, Libro Rojo de Plantas de Colombia, Bernal 2015 Catálogo Plantas Colombia, Plan de Manejo PNN Chingaza.",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "nota_conservacion": "Endémica colombiana restringida (frailejón). conservation_status endemica_critica aplicado en Batch 5A por rango limitado y endemismo paramuno estricto. Páramos altoandinos en riesgo por cambio climático + ganadería + minería. Estrategia: conservación in situ áreas protegidas PNN (Sumapaz/Chingaza/Chiles-Cumbal/Cocuy según species). Sin propagación masiva — solo restauración ecológica en sitio."
     },
     {
       "id": "senecio_formosus",
@@ -30534,7 +30544,7 @@
         "nurse_plant"
       ],
       "cultivable": false,
-      "conservation_status": "endemica_colombia",
+      "conservation_status": "endemica_critica",
       "altitud_msnm": {
         "min_absoluto": 3100,
         "optimo_min": 3400,
@@ -30575,7 +30585,8 @@
       ],
       "valor_pedagogico": "El frailejón de Nariño (Espeletia pycnophylla Cuatrec., familia Asteraceae) es la especie diagnóstica del complejo paramuno binacional Chiles-Cumbal-Azufral-Quitasol (Nariño, frontera con Ecuador-Carchi), el sistema paramuno volcánico activo del sur colombiano. Endémico restringido del complejo Chiles-Cumbal con presencia ecuatoriana marginal en el Carchi; nombrado por Cuatrecasas en honor a su pubescencia foliar excepcionalmente densa (\"pycno-phyllum\" = hoja densa). Roseta caulescente acaule a corto-caulescente (0.5-2.5 m altura) con hojas lanceoladas-espatuladas (20-40 cm largo) densamente cubiertas por tricomas blanco-plateados que cumplen función termorreguladora doble: refractan radiación UV-B intensa (>10 mW/cm² en 3.800 msnm tropical) y forman capa límite que reduce pérdida convectiva de calor nocturna, manteniendo el meristemo apical 4-7°C por encima de la temperatura ambiente en heladas radiativas (-5 a -10°C). Inflorescencia en racimo terminal con capítulos amarillo-dorados grandes y brácteas tomentosas. Polinización por himenópteros andinos (Bombus funebris, B. rohweri) y avifauna nectarívora (Eriocnemis derbyi colibrí endémico amenazado). Distribución colombiana: complejo paramuno Chiles-Cumbal-Azufral-Quitasol (3.100-4.300 msnm) en municipios Cumbal, Mallama, Túquerres, Guachucal del departamento Nariño. Lección viva de endemismo paramuno y biogeografía de \"sky islands\" andinos: cada complejo paramuno colombiano alberga especies endémicas exclusivas (E. pycnophylla en Chiles-Cumbal, E. uribei en Sumapaz, E. killipii en Chingaza, E. lopezii en Sierra Nevada del Cocuy, E. perijaensis en Serranía del Perijá) — patrón biogeográfico que documenta especiación alopátrica por aislamiento geográfico entre páramos separados por valles interandinos cálidos infranqueables. Amenazas críticas: quema para ampliar potreros y siembra de papa pastusa, pisoteo ganadero bovino, expansión de frontera papera más allá del límite agronómico, minería de azufre tradicional en el Volcán Azufral, conflicto armado histórico que limitó conservación efectiva 1990-2016, cambio climático y desecación de turberas asociadas. Protección legal: Ley 1930/2018 prohíbe TODA actividad agropecuaria, minera y de hidrocarburos en páramo delimitado; Resolución 383/2010 MADS declara especies amenazadas todo el género Espeletia y géneros relacionados (Espeletiinae) con prohibición absoluta de aprovechamiento, tránsito y movilización sin permiso CAR (CORPONARIÑO en este caso); estado de conservación: En Peligro (EN) según Libro Rojo de Plantas de Colombia por endemismo restringido + amenaza activa. Manejo agroecológico (solo restauración con autorización CORPONARIÑO): recolección aquenios maduros temporada seca diciembre-febrero, germinación en vivero de altura municipal con sustrato turba de páramo + tierra subpáramo + arena gruesa 50:30:20, plantación 100-400 ind/ha en sitios degradados con exclusión ganadera obligatoria 5 años, asocio con Calamagrostis effusa, Hypericum juniperinum, Diplostephium rosmarinifolium, Loricaria complanata, Bartsia santolinifolia. Monitoreo bianual supervivencia + crecimiento foliar. Fuentes Tier A: Humboldt 2016 Frailejones, Diazgranados 2012 Revisión Espeletiinae, Libro Rojo Plantas Colombia, Bernal 2015 Catálogo, Ley 1930/2018, Resolución 383/2010 MADS.",
       "validation_level": "claude_draft",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "nota_conservacion": "Endémica colombiana restringida (frailejón). conservation_status endemica_critica aplicado en Batch 5A por rango limitado y endemismo paramuno estricto. Páramos altoandinos en riesgo por cambio climático + ganadería + minería. Estrategia: conservación in situ áreas protegidas PNN (Sumapaz/Chingaza/Chiles-Cumbal/Cocuy según species). Sin propagación masiva — solo restauración ecológica en sitio."
     },
     {
       "id": "espeletia_lopezii",
@@ -30596,7 +30607,7 @@
         "nurse_plant"
       ],
       "cultivable": false,
-      "conservation_status": "endemica_colombia",
+      "conservation_status": "endemica_critica",
       "altitud_msnm": {
         "min_absoluto": 3300,
         "optimo_min": 3600,
@@ -30637,7 +30648,8 @@
       ],
       "valor_pedagogico": "El frailejón de López (Espeletia lopezii Cuatrec., familia Asteraceae) es un frailejón endémico del complejo paramuno Cocuy-Pisba (Boyacá), nombrado por el botánico colombiano José Cuatrecasas en honor a Hernando López G., colector nariñense que aportó al herbario nacional las primeras colecciones del macizo de El Cocuy en los años 1940-1950. Distribución exclusivamente en la Sierra Nevada del Cocuy-Güicán-Chita (Parque Nacional Natural El Cocuy, 306.000 hectáreas) y porciones aledañas del Páramo de Pisba, Boyacá, entre 3.300 y 4.500 msnm — uno de los rangos altitudinales más altos del género Espeletia, asociado a las morrenas glaciares y bofedales periglaciares del último macizo nevado del norte de Colombia (las cumbres Pan de Azúcar, El Castillo, Ritacuba Blanco aún con glaciares vivos pero en retroceso acelerado por cambio climático: pérdida >50% del área glaciar 1980-2020). Roseta caulescente acaule a corto-caulescente con tallo subterráneo y hojas lanceoladas (15-30 cm) densamente cubiertas por tricomas blanco-grisáceos. Adaptación foliar a temperaturas mínimas absolutas <-12°C: cutícula gruesa, mesófilo compacto con escasos espacios intercelulares (reduce daño por congelamiento intracelular), pubescencia plateada (refracción UV-B + aislamiento térmico). Inflorescencia en racimo terminal con capítulos amarillos. Polinización por himenópteros andinos (Bombus rohweri) y dispersión anemócora limitada (aquenios con vilano). Lección viva: endemismo paramuno restringido + biogeografía del macizo glacial del Cocuy. La especiación de Espeletia en el complejo Cocuy-Pisba-Sierra Nevada del Cocuy ilustra el patrón \"sky islands\" donde cada macizo paramuno aislado por valles interandinos cálidos infranqueables desarrolla su propia fauna y flora endémica — E. lopezii (Cocuy), E. estanislana (Pisba), E. tunjana (Tota-Bijagual), E. boyacensis (Iguaque). Amenazas críticas: quema para ampliar pastoreo ovino y bovino, pisoteo, expansión de papa criolla sobre límite agronómico (3.500 msnm), retroceso glaciar y secado de bofedales asociados, turismo no regulado en el corredor PNN Cocuy con pisoteo masivo de la Laguna de la Plaza y senderos paramunos (cerrado al público 2013-2016 por presiones U'wa + conservación). Protección legal: Ley 1930/2018 (Páramos), Resolución 383/2010 MADS (frailejones especies amenazadas), Plan de Manejo PNN El Cocuy (jurisdicción Parques Nacionales Naturales de Colombia + Pueblo U'wa territorio ancestral con jurisdicción compartida según Acuerdo Resguardo Indígena U'wa 2002 y sentencia T-849/2014). Estado conservación Libro Rojo Plantas Colombia: Vulnerable (VU) a En Peligro (EN). Manejo agroecológico (restauración exclusivamente con autorización CORPOBOYACÁ + Parques Nacionales + consulta previa U'wa): recolección aquenios maduros enero-marzo, germinación en vivero municipal Güicán/El Cocuy con sustrato turba + tierra subpáramo + arena gruesa, plantación 100-400 ind/ha exclusión ganadera 5 años, asocio con Loricaria complanata, Hypericum juniperinum, Diplostephium rosmarinifolium. Fuentes Tier A: Humboldt 2016, Diazgranados 2012, Libro Rojo Plantas Colombia, Bernal 2015, Ley 1930/2018, Resolución 383/2010 MADS.",
       "validation_level": "claude_draft",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "nota_conservacion": "Endémica colombiana restringida (frailejón). conservation_status endemica_critica aplicado en Batch 5A por rango limitado y endemismo paramuno estricto. Páramos altoandinos en riesgo por cambio climático + ganadería + minería. Estrategia: conservación in situ áreas protegidas PNN (Sumapaz/Chingaza/Chiles-Cumbal/Cocuy según species). Sin propagación masiva — solo restauración ecológica en sitio."
     },
     {
       "id": "paragynoxys_uribei",
@@ -31518,7 +31530,7 @@
         "pollinator_attractor"
       ],
       "cultivable": true,
-      "conservation_status": "en_peligro",
+      "conservation_status": "en_peligro_critico",
       "altitud_msnm": {
         "min_absoluto": 1000,
         "optimo_min": 1300,

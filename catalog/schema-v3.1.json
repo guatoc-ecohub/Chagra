@@ -166,6 +166,7 @@
           "enum": [
             "cultivo_comun",
             "en_peligro",
+            "en_peligro_critico",
             "endemica_colombia",
             "endemica_critica",
             "invasor",
@@ -174,6 +175,11 @@
             "naturalizada",
             "no_evaluada"
           ]
+        },
+        "cites_appendix": {
+          "type": "string",
+          "enum": ["I", "II", "III", "NO_APLICA"],
+          "description": "CITES Appendix listing if applicable. I=most restrictive, II=trade-regulated, III=country-specific, NO_APLICA=not in CITES."
         },
         "harvest_type": {
           "type": "string",
