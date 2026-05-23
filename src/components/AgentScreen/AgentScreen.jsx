@@ -400,9 +400,43 @@ Hint del tool: ${hint}
       payload = payload.slice(0, TOOL_EVIDENCE_MAX_CHARS);
       truncated = true;
     }
-    // Caso "found:true" — wording autoritativo de PR #998. El bloque
-    // "DATOS VERIFICADOS" reemplaza la memoria del modelo cuando se cita
-    // companions / biopreparados / pest controllers / multihop / visual.
+    // 2026-05-23 incidente Test B (tomate de árbol temp/altitud) + Test A
+    // (aguacate Hass companions): el tool devolvió found:true pero con
+    // CAMPOS NULL (temp_min:null, altitud_min:null, companions:null). El
+    // LLM ignoró los null y RELLENÓ DE MEMORIA con valores inventados
+    // (tomate árbol "0-1200 msnm" cuando es 1500-2800 msnm).
+    //
+    // Detección de campos críticos vacíos. Si el record viene con null
+    // en data que el usuario claramente pidió, agregar warning explícito
+    // al system prompt para que el LLM NO invente esos valores.
+    const criticalEmptyFields = [];
+    if (result && typeof result === 'object') {
+      const sp = result.species || result;
+      if (sp && typeof sp === 'object') {
+        if (sp.temp_min === null && sp.temp_max === null) {
+          criticalEmptyFields.push('temperatura (temp_min y temp_max son null)');
+        }
+        if (sp.altitud_min === null && sp.altitud_max === null) {
+          criticalEmptyFields.push('altitud (altitud_min y altitud_max son null)');
+        }
+        if (sp.companions === null || (Array.isArray(sp.companions) && sp.companions.length === 0)) {
+          criticalEmptyFields.push('companions (vacío o null)');
+        }
+        if (sp.antagonists === null || (Array.isArray(sp.antagonists) && sp.antagonists.length === 0)) {
+          criticalEmptyFields.push('antagonists (vacío o null)');
+        }
+      }
+    }
+    const emptyFieldsWarning =
+      criticalEmptyFields.length > 0
+        ? `
+
+⚠️ CAMPOS CRÍTICOS VACÍOS EN ESTOS DATOS: ${criticalEmptyFields.join(', ')}.
+NO INVENTES valores numéricos (temperatura, altitud) ni listas (companions, antagonists) cuando el campo viene null o vacío. Responde literal: "El catálogo Chagra todavía no tiene documentados los valores de [campo] para [especie]. Tu consulta queda como pendiente de curaduría editorial."`
+        : '';
+
+    // Caso "found:true" — wording autoritativo de PR #998 + warning campos
+    // críticos vacíos (PR del 2026-05-23 tras tests A-E).
     return `
 
 === INSTRUCCIÓN CRÍTICA — PRIORIDAD DE FUENTES ===
@@ -416,7 +450,7 @@ El bloque "DATOS VERIFICADOS" abajo viene del knowledge graph del catálogo Chag
 
 === DATOS VERIFICADOS (chagra-agro-mcp tool: ${toolEvidence.tool}) ===
 ${payload}${truncated ? '\n[...truncated, ver detalle en ficha de especie]' : ''}
-=== FIN DATOS VERIFICADOS ===
+=== FIN DATOS VERIFICADOS ===${emptyFieldsWarning}
 
 RESPONDE SOLO a lo que el usuario preguntó usando ÚNICAMENTE los datos verificados de arriba.`;
   };
