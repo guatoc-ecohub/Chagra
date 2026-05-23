@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { transcribe } from '../../services/voiceService';
-import { addTurn, getFullHistory, getContextString } from '../../services/conversationMemory';
+import { addTurn, getFullHistory, getContextString, computeSourceMetadata } from '../../services/conversationMemory';
 import { retrieve } from '../../services/ragRetriever';
 import { parseIntent, formatIntentDescription } from '../../services/agentIntentParser';
 import { streamOpenAI } from '../../services/openaiStream';
@@ -607,13 +607,24 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
 
       const { intent } = parseIntent(text);
 
+      // 2026-05-23: badge de "fuente" — persistimos en metadata si el turno
+      // del assistant fue grounded contra el catálogo (tool MCP devolvió
+      // match) o fue solo generativo del LLM. ChatBubble lee este metadata
+      // para renderizar el badge verde/amber/gris (ver computeSourceMetadata).
+      const sourceMetadata = computeSourceMetadata(toolEvidence);
+
       const assistantMessage = {
         role: 'assistant',
         content: response,
         timestamp: Date.now(),
+        metadata: sourceMetadata,
       };
 
-      await addTurn(operatorId, { role: 'assistant', content: response });
+      await addTurn(operatorId, {
+        role: 'assistant',
+        content: response,
+        metadata: sourceMetadata,
+      });
       setMessages((prev) => [...prev, assistantMessage]);
 
       // Task #122: cachear el último mensaje del agente en el store global

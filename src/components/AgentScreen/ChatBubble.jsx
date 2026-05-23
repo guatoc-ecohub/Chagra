@@ -1,8 +1,9 @@
 import React from 'react';
-import { User } from 'lucide-react';
+import { User, BadgeCheck, Info, Sparkles } from 'lucide-react';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import { speak, speakKokoro, stop, isSpeaking, isKokoroAvailable } from '../../services/ttsService';
 import { agentSounds } from '../../services/agentSoundService';
+import usePrefsStore from '../../store/usePrefsStore';
 
 function formatTime(timestamp) {
   if (!timestamp) return '';
@@ -10,8 +11,92 @@ function formatTime(timestamp) {
   return d.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
 }
 
+/**
+ * Mapa de nombres "humanizados" de tools del sidecar agro-mcp. Cuando un
+ * tool no está mapeado, mostramos el nombre técnico tal cual (e.g.
+ * "get_pest_controllers" si no lo tradujimos todavía). Wording cero hype:
+ * "compañeras", "biopreparados", no "perfectos", "garantizados".
+ */
+const TOOL_LABELS = {
+  get_species: 'especie',
+  get_companions: 'compañeras',
+  get_biopreparados: 'biopreparados',
+  get_pest_controllers: 'controladores de plagas',
+  get_multihop_companions: 'compañeras multi-salto',
+  validate_visual_match: 'visión',
+};
+
+function toolLabel(toolName) {
+  if (!toolName) return '';
+  return TOOL_LABELS[toolName] || toolName;
+}
+
+/**
+ * Renderiza el badge de "fuente" según el metadata del turno del assistant:
+ *   - grounded === true             → verde "Catálogo verificado · <tool>"
+ *   - tool_used && !grounded        → amber "Tool sin match · <tool>"
+ *   - !tool_used (LLM only)         → gris "Respuesta generativa"
+ *
+ * Wording deliberadamente sobrio (cero hype). Sin "garantizado", "100%",
+ * "perfecto" — el catálogo Chagra está en construcción, el badge solo dice
+ * "esta respuesta viene del catálogo verificado vs solo del modelo".
+ */
+function SourceBadge({ metadata }) {
+  const md = metadata || {};
+  const toolUsed = md.tool_used || null;
+  const grounded = md.grounded === true;
+
+  if (toolUsed && grounded) {
+    return (
+      <span
+        className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-green-600/20 text-green-300 border border-green-700"
+        data-testid="source-badge"
+        data-source="catalog"
+      >
+        <BadgeCheck size={12} aria-hidden="true" />
+        <span>Catálogo verificado · {toolLabel(toolUsed)}</span>
+      </span>
+    );
+  }
+
+  if (toolUsed && !grounded) {
+    return (
+      <span
+        className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-amber-600/20 text-amber-300 border border-amber-700"
+        data-testid="source-badge"
+        data-source="tool-no-match"
+      >
+        <Info size={12} aria-hidden="true" />
+        <span>Tool sin match · {toolLabel(toolUsed)}</span>
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-slate-700/40 text-slate-400 border border-slate-600"
+      data-testid="source-badge"
+      data-source="generative"
+    >
+      <Sparkles size={12} aria-hidden="true" />
+      <span>Respuesta generativa</span>
+    </span>
+  );
+}
+
 export default function ChatBubble({ message, isStreaming = false }) {
   const isUser = message.role === 'user';
+  const showSourceBadges = usePrefsStore((s) => s.showSourceBadges);
+  // Badge "fuente" solo aplica a respuestas del agente, no del usuario, y
+  // no durante streaming (se muestra cuando el turn está estabilizado).
+  // Mensajes _orphan_recovery (recuperación de pregunta sin respuesta) no
+  // llevan badge — no son una respuesta real del agente. Backward compat:
+  // mensajes assistant viejos sin metadata se renderizan como "generativa".
+  const shouldShowBadge =
+    !isUser &&
+    !isStreaming &&
+    showSourceBadges &&
+    !message._orphan_recovery;
   // 2026-05-19 operator: el avatar del agente en el chat debe verse SIEMPRE
   // vivo, no inerte. Aunque la respuesta ya este completa, el colibri sigue
   // libando suavemente — comunica que el agente esta "presente" y listo para
@@ -73,6 +158,11 @@ export default function ChatBubble({ message, isStreaming = false }) {
           title={!isUser && !isStreaming ? 'Doble click reproduce o silencia esta respuesta' : undefined}
         >
           <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+          {shouldShowBadge && (
+            <div className="mt-1">
+              <SourceBadge metadata={message.metadata} />
+            </div>
+          )}
           {message.timestamp && (
             <p className={`text-[10px] mt-1 ${isUser ? 'text-emerald-300/60' : 'text-slate-500'}`}>
               {formatTime(message.timestamp)}

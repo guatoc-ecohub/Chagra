@@ -6,6 +6,12 @@ const STORAGE_KEY_VOICE_INTENSITY = 'chagra:prefs:voice-intensity';
 // el avatar colibrí es voz primaria del agente; el operador puede
 // silenciarlo via doble-click en el avatar header o en Perfil/Settings.
 const STORAGE_KEY_TTS_ENABLED = 'chagra:prefs:tts-enabled';
+// 2026-05-23: badge de "fuente" en cada respuesta del agente (verificado
+// catálogo vs generativo). Default ON cumple la promesa visual del Manual
+// (HelpAgentSection): "respuestas con fondo verde son del catálogo
+// verificado". Operadores en modo "expert" pueden ocultarlos para reducir
+// ruido visual sin perder la información (queda en metadata del turn).
+const STORAGE_KEY_SOURCE_BADGES = 'chagra:prefs:show-source-badges';
 
 function load(key, fallback) {
   try {
@@ -24,6 +30,7 @@ const usePrefsStore = create((set, _get) => ({
   voiceRegion: load(STORAGE_KEY_VOICE_REGION, 'auto'),
   voiceRegionIntensity: load(STORAGE_KEY_VOICE_INTENSITY, 1),
   ttsEnabled: load(STORAGE_KEY_TTS_ENABLED, true),
+  showSourceBadges: load(STORAGE_KEY_SOURCE_BADGES, true),
 
   setVoiceRegion: (region) => {
     save(STORAGE_KEY_VOICE_REGION, region);
@@ -39,6 +46,12 @@ const usePrefsStore = create((set, _get) => ({
     const bool = Boolean(flag);
     save(STORAGE_KEY_TTS_ENABLED, bool);
     set({ ttsEnabled: bool });
+  },
+
+  setShowSourceBadges: (flag) => {
+    const bool = Boolean(flag);
+    save(STORAGE_KEY_SOURCE_BADGES, bool);
+    set({ showSourceBadges: bool });
   },
 }));
 
