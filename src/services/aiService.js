@@ -20,6 +20,7 @@
 
 import { streamOllama } from './ollamaStream';
 import { retrieve } from './ragRetriever';
+import { callTool, isSidecarEnabled } from './sidecarClient';
 
 // Ruta relativa: Nginx proxea /api/ollama/ → http://localhost:11434/
 // Ruta final: /api/ollama/api/generate → http://localhost:11434/api/generate
@@ -259,6 +260,108 @@ const runSpeciesRecognition = async (model, base64, { onToken, signal }) => {
     confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0,
     alternatives: Array.isArray(parsed.alternatives) ? parsed.alternatives : [],
     _model: model,
+  };
+};
+
+/**
+ * Convierte un nombre científico binomial ("Coffea arabica L.") a un
+ * `species_id` snake_case canónico ("coffea_arabica") compatible con el
+ * catálogo Chagra. Quita autoría taxonómica (L., Mart., Kunth, etc.) y
+ * cualquier sufijo descriptivo después del epíteto específico.
+ *
+ * Ejemplos:
+ *   "Coffea arabica L."                       → "coffea_arabica"
+ *   "Solanum betaceum"                        → "solanum_betaceum"
+ *   "Erythrina edulis Triana ex Micheli"      → "erythrina_edulis"
+ *   "Solanum tuberosum Grupo Phureja"         → "solanum_tuberosum"  (sin Grupo)
+ *
+ * Esto es heurística, no taxonomía perfecta. La validación final la hace
+ * el catálogo: si el id derivado no existe, validate_visual_match lo
+ * rechaza con `valid:false`.
+ */
+function scientificToSpeciesId(scientific) {
+  if (typeof scientific !== 'string' || scientific.trim().length === 0) return null;
+  // Tomar primeras 2 palabras (género + epíteto). Resto es autoría/notas.
+  const parts = scientific.trim().split(/\s+/);
+  if (parts.length < 2) return null;
+  const genus = parts[0];
+  const species = parts[1];
+  // Solo aceptar palabras con letras + (opcional) guión. Rechazar autoría
+  // que tipicamente empieza con mayúsculas pero no es epíteto científico.
+  if (!/^[A-Za-z-]+$/.test(genus) || !/^[a-z-]+$/.test(species)) return null;
+  return `${genus}_${species}`.toLowerCase();
+}
+
+/**
+ * Versión grounded de recognizeSpecies. Llama al modelo de visión Y
+ * después valida el resultado contra el catálogo Chagra usando el tool
+ * `validate_visual_match` del sidecar agro-mcp.
+ *
+ * Anti-alucinación: si el modelo vision devuelve "Mangosteenia colombiana"
+ * (especie inexistente), el catálogo lo rechaza con `valid:false`. El
+ * caller puede usar el campo `_grounded` para decidir:
+ *   - _grounded === true  → mostrar al usuario con confianza alta
+ *   - _grounded === false → mostrar advertencia "no verificado en catálogo"
+ *
+ * Si el sidecar no está disponible (feature flag off o offline),
+ * recognizeSpeciesGrounded degrada al comportamiento de recognizeSpecies
+ * (sin validación). Caller obtiene _grounded:null para distinguir.
+ *
+ * @param {Blob} imageBlob — foto del usuario.
+ * @param {Object} options — { onToken, signal } pasados al modelo vision.
+ * @returns {Promise<Object|null>} estructura igual a recognizeSpecies +
+ *   `_grounded: boolean|null`,
+ *   `_validation: { valid, confidence_adjusted, ... }` cuando aplique.
+ */
+export const recognizeSpeciesGrounded = async (imageBlob, options = {}) => {
+  const visionResult = await recognizeSpecies(imageBlob, options);
+  if (!visionResult) return null;
+
+  // Si sidecar disabled / offline, devolver lo del vision sin validar.
+  if (!isSidecarEnabled() || !navigator.onLine) {
+    return { ...visionResult, _grounded: null };
+  }
+
+  // Derive species_id from scientific_name. Si no podemos derivar (binomial
+  // ausente o malformado), tampoco podemos validar — degradamos.
+  const speciesId = scientificToSpeciesId(visionResult.scientific_name);
+  if (!speciesId) {
+    return { ...visionResult, _grounded: null };
+  }
+
+  // Construir lista de candidates: el principal + alternatives si vienen.
+  const candidates = [
+    {
+      species_id: speciesId,
+      confidence: visionResult.confidence,
+      source_label: visionResult.scientific_name,
+    },
+  ];
+  for (const alt of (visionResult.alternatives || []).slice(0, 4)) {
+    const altSci = alt.scientific_name || alt;
+    const altId = scientificToSpeciesId(altSci);
+    if (altId && altId !== speciesId) {
+      candidates.push({
+        species_id: altId,
+        confidence: typeof alt.confidence === 'number' ? alt.confidence : 0.3,
+        source_label: altSci,
+      });
+    }
+  }
+
+  const result = await callTool('validate_visual_match', { candidates });
+  if (!result) {
+    // Sidecar timeout / 5xx — fallback al resultado vision sin validar.
+    return { ...visionResult, _grounded: null };
+  }
+
+  // Buscar el match del candidato primario en results.
+  const primary = (result.results || []).find((r) => r.species_id === speciesId);
+  return {
+    ...visionResult,
+    _grounded: primary?.valid === true,
+    _validation: primary || null,
+    _all_validations: result.results || [],
   };
 };
 
