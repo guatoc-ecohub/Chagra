@@ -1349,6 +1349,7 @@
             "articulo_revista",
             "libro",
             "manual_tecnico",
+            "informe_tecnico",
             "tesis",
             "resolucion_oficial",
             "ficha_tecnica_institucional",
@@ -1356,7 +1357,8 @@
             "base_datos",
             "capitulo_libro",
             "comunicacion_personal"
-          ]
+          ],
+          "description": "Tipo de fuente bibliográfica. informe_tecnico añadido en Batch 6A (Pasada 6, 2026-05-22) para acomodar reportes institucionales no peer-review (e.g., evaluaciones de impacto, planes de manejo)."
         },
         "autores": {
           "type": "string"
@@ -1402,7 +1404,7 @@
             "B",
             "C"
           ],
-          "description": "Calidad de la fuente: A=papers/institucionales, B=manuales divulgativos, C=web/blog"
+          "description": "Calidad de la fuente (criterios formalizados en Batch 6A Pasada 6, 2026-05-22). A=peer-review/oficial gobierno (CR/EN/ICA/MADS/AGROSAVIA/IAvH/MinCultura/MinSalud/UICN); B=técnico/divulgación (Restrepo, manuales práctica, cartillas asociaciones); C=blogs/wikis no peer-review (excluir de catálogo strict)."
         }
       },
       "additionalProperties": false

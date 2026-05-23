@@ -34987,7 +34987,9 @@
       "año": 2019,
       "titulo": "Resolución 00017702 de 2019 — Registro variedad AGROSAVIA Alhaja",
       "institucion": "ICA",
+      "observaciones": "_audit_note: resolución registro variedad ICA 017702/2019; buscar PDF en ica.gov.co/getdoc o ica.gov.co/areas/agricola/servicios/registro-de-semillas — variedades registradas.",
       "tier": "A",
+      "_url_pendiente": true,
       "_referenced_by_audit_2026_05_22": "solanum_tuberosum_pastusa_suprema.variedades_registradas_ica[agrosavia-alhaja-papa-2019].source_ids — verificado Batch 4A Pasada 4 residual"
     },
     {
@@ -34997,7 +34999,9 @@
       "año": 2018,
       "titulo": "Control biológico con Bacillus subtilis en cultivos hortícolas andinos",
       "institucion": "AGROSAVIA",
-      "tier": "A"
+      "observaciones": "_audit_note: buscar handle en repository.agrosavia.co por 'Bacillus subtilis hortícolas 2018'.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "agrosavia-estrella",
@@ -35006,7 +35010,9 @@
       "año": 2018,
       "titulo": "Ficha técnica Estrella — papa criolla",
       "institucion": "AGROSAVIA",
-      "tier": "A"
+      "observaciones": "_audit_note: buscar handle en repository.agrosavia.co por variedad 'Estrella' papa criolla — ficha técnica institucional.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "agrosavia-forrajeras-2022",
@@ -35015,8 +35021,9 @@
       "año": 2022,
       "titulo": "Gramíneas forrajeras en sistemas ganaderos andinos",
       "institucion": "AGROSAVIA",
-      "observaciones": "STUB migrado de v3.0.",
-      "tier": "A"
+      "observaciones": "STUB migrado de v3.0. _audit_note: buscar handle en repository.agrosavia.co por 'gramíneas forrajeras 2022' — cita STUB requiere precisión.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "agrosavia-leguminosas-andinas",
@@ -35025,8 +35032,9 @@
       "año": null,
       "titulo": "Fichas técnicas de leguminosas andinas (haba, arveja, lenteja, frijol)",
       "institucion": "Corporación Colombiana de Investigación Agropecuaria (AGROSAVIA)",
-      "observaciones": "Compilación de fichas técnicas de AGROSAVIA para leguminosas de clima frío. Año y volumen pendientes de consolidación.",
-      "tier": "A"
+      "observaciones": "Compilación de fichas técnicas de AGROSAVIA para leguminosas de clima frío. Año y volumen pendientes de consolidación. _audit_note: cita aglutinadora; buscar fichas individuales en repository.agrosavia.co o agrosavia.co/productos-y-servicios/oferta-tecnologica.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "agrosavia-manual-arandano-2018",
@@ -35035,7 +35043,9 @@
       "año": 2018,
       "titulo": "Manual técnico para el cultivo de arándano (Vaccinium corymbosum) en Colombia",
       "institucion": "AGROSAVIA",
-      "tier": "A"
+      "observaciones": "_audit_note: buscar handle en repository.agrosavia.co por 'arándano Vaccinium 2018'.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "agrosavia-manual-biopreparados-2015",
@@ -35044,7 +35054,9 @@
       "año": 2015,
       "titulo": "Manual de biopreparados para la agricultura colombiana",
       "institucion": "AGROSAVIA",
-      "tier": "A"
+      "observaciones": "_audit_note: buscar handle en repository.agrosavia.co por 'manual biopreparados 2015' — referencia clave para fichas de bocashi/biol/supermagro.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "agrosavia-manual-chachafruto-2015",
@@ -35053,7 +35065,9 @@
       "año": 2015,
       "titulo": "Manual técnico para el cultivo de chachafruto (Erythrina edulis) en sistemas agroforestales andinos",
       "institucion": "AGROSAVIA",
-      "tier": "A"
+      "observaciones": "_audit_note: buscar handle en repository.agrosavia.co por 'chachafruto Erythrina edulis 2015'.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "agrosavia-manual-frutales-tropicales",
@@ -35062,7 +35076,9 @@
       "año": 2017,
       "titulo": "Manual técnico para el cultivo de frutales tropicales en Colombia",
       "institucion": "AGROSAVIA",
-      "tier": "A"
+      "observaciones": "_audit_note: buscar handle en repository.agrosavia.co por 'frutales tropicales 2017' o número de colección AGROSAVIA.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "agrosavia-manual-tuberculos-andinos-2017",
@@ -35071,7 +35087,9 @@
       "año": 2017,
       "titulo": "Manual técnico para el cultivo de tubérculos andinos (oca, ulluco, mashua) en Colombia",
       "institucion": "AGROSAVIA",
-      "tier": "A"
+      "observaciones": "_audit_note: buscar handle en repository.agrosavia.co por 'tubérculos andinos oca ulluco mashua 2017'.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "agrosavia-manual-uchuva-2015",
@@ -35080,7 +35098,9 @@
       "año": 2015,
       "titulo": "Manual técnico para el cultivo de uchuva (Physalis peruviana) bajo condiciones colombianas",
       "institucion": "AGROSAVIA",
-      "tier": "A"
+      "observaciones": "_audit_note: buscar handle en repository.agrosavia.co por 'manual técnico uchuva 2015'.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "agrosavia-silvopastoriles",
@@ -35089,8 +35109,9 @@
       "año": null,
       "titulo": "Sistemas silvopastoriles en el altoandino colombiano",
       "institucion": "AGROSAVIA",
-      "observaciones": "STUB migrado de v3.0. Año y publicación específica pendientes.",
-      "tier": "A"
+      "observaciones": "STUB migrado de v3.0. Año y publicación específica pendientes. _audit_note: buscar en repository.agrosavia.co por 'silvopastoriles altoandino' — múltiples publicaciones AGROSAVIA candidatas.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "agrosavia-sol-andina",
@@ -35129,7 +35150,9 @@
       "año": 2003,
       "titulo": "Las especies invasoras en Colombia (diez peores)",
       "revista_o_editorial": "Biota Colombiana",
-      "tier": "A"
+      "observaciones": "_audit_note: buscar en revistas.humboldt.org.co/index.php/biota — Biota Colombiana es journal IAvH con acceso abierto.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "car-cundi-2019",
@@ -35138,8 +35161,9 @@
       "año": 2019,
       "titulo": "Protocolos de manejo de especies invasoras en jurisdicción CAR",
       "institucion": "CAR Cundinamarca",
-      "observaciones": "STUB migrado de v3.0 — número de resolución pendiente.",
-      "tier": "A"
+      "observaciones": "STUB migrado de v3.0 — número de resolución pendiente. _audit_note: cita STUB sin número resolución; buscar en car.gov.co/normatividad o sigam.ambientebogota.gov.co — múltiples resoluciones CAR 2019 sobre invasoras.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "cenicafe-manual-cafetero-2013",
@@ -35158,7 +35182,9 @@
       "año": 2010,
       "titulo": "Uso de Trichoderma spp. en el manejo integrado de enfermedades del café",
       "institucion": "Centro Nacional de Investigaciones de Café (Cenicafé)",
-      "tier": "A"
+      "observaciones": "_audit_note: buscar en biblioteca.cenicafe.org o publicaciones.cenicafe.org — Cenicafé publica series Avances Técnicos y Boletines con handle propio.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "ciat-1995-alnus",
@@ -35167,8 +35193,9 @@
       "año": 1995,
       "titulo": "Alnus acuminata en sistemas agroforestales andinos",
       "institucion": "CIAT Palmira",
-      "observaciones": "STUB migrado de v3.0 — título y paginación pendientes de confirmación.",
-      "tier": "A"
+      "observaciones": "STUB migrado de v3.0 — título y paginación pendientes de confirmación. _audit_note: buscar en repository.cgiar.org (handle CIAT) por 'Alnus acuminata' — pre-Web era requiere búsqueda específica.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "cip-2006-ghislain",
@@ -35176,19 +35203,11 @@
       "autores": "Ghislain, M.; Andrade, D.; Rodríguez, F.; Hijmans, R.J.; Spooner, D.M.",
       "año": 2006,
       "titulo": "Genetic analysis of the cultivated potato Solanum tuberosum L. Phureja Group using RAPDs",
+      "revista_o_editorial": "Theoretical and Applied Genetics",
       "institucion": "CIP — International Potato Center",
-      "tier": "A"
-    },
-    {
-      "id": "cip-potatoes-americas",
-      "tipo": "base_datos",
-      "autores": "International Potato Center (CIP)",
-      "año": null,
-      "titulo": "Catalogue of potato varieties and germplasm collections",
-      "institucion": "CIP",
-      "url": "https://cipotato.org",
+      "observaciones": "_audit_note: paper publicado en TAG 113:1515-1527 (2006); DOI canónico 10.1007/s00122-006-0399-7 — agregar DOI tras verificación final por agronomista.",
       "tier": "A",
-      "_orphan_audit_2026_05_18": "no_referenced_by_species_or_biopreparados — keep as historical reference until referenced"
+      "_url_pendiente": true
     },
     {
       "id": "correa-pabon-carulla-2008",
@@ -35196,8 +35215,9 @@
       "autores": "Correa, R.; Pabón, R.; Carulla, J.",
       "año": 2008,
       "titulo": "Valor nutricional del kikuyo (Cenchrus clandestinus) y respuestas productivas en ganadería lechera andina",
-      "observaciones": "STUB migrado de v3.0 — revista y paginación pendientes.",
-      "tier": "A"
+      "observaciones": "STUB migrado de v3.0 — revista y paginación pendientes. _audit_note: candidato a deduplicar con scielo-correa-kikuyo-2018 (mismos autores serie kikuyo) — requiere curadura bibliográfica.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "diazgranados-2012-espeletiinae",
@@ -35236,8 +35256,10 @@
       "autores": "Murillo-A., J.; Polanía, C.; et al.",
       "año": null,
       "titulo": "Flora de Colombia — Pteridophyta (helechos)",
-      "observaciones": "STUB migrado de v3.0 — editorial y año pendientes.",
-      "tier": "A"
+      "observaciones": "STUB migrado de v3.0 — editorial y año pendientes. _audit_note: serie Flora de Colombia editada por ICN-UNAL; buscar volumen Pteridophyta en biblioteca ICN o repositorio UNAL.",
+      "tier": "A",
+      "_url_pendiente": true,
+      "_isbn_pendiente": true
     },
     {
       "id": "gbif-colombia",
@@ -35275,8 +35297,9 @@
       "año": null,
       "titulo": "Flora del bosque alto andino colombiano",
       "institucion": "Instituto Humboldt",
-      "observaciones": "STUB migrado de v3.0.",
-      "tier": "A"
+      "observaciones": "STUB migrado de v3.0. _audit_note: cita STUB sin año; buscar en repository.humboldt.org.co por 'flora alto-andina' — múltiples publicaciones IAvH candidatas.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "humboldt-invasoras-andes",
@@ -35285,8 +35308,9 @@
       "año": null,
       "titulo": "Plantas invasoras en los Andes colombianos",
       "institucion": "Instituto Humboldt",
-      "observaciones": "STUB migrado de v3.0 — año y referencia específica pendientes.",
-      "tier": "A"
+      "observaciones": "STUB migrado de v3.0 — año y referencia específica pendientes. _audit_note: cita ambigua; buscar en repository.humboldt.org.co por 'plantas invasoras Andes' — varias publicaciones IAvH candidatas requieren curadura.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "ica-fertilizantes-2019",
@@ -35295,7 +35319,9 @@
       "año": 2019,
       "titulo": "Guía de uso racional de fertilizantes y enmiendas en Colombia",
       "institucion": "ICA",
-      "tier": "A"
+      "observaciones": "_audit_note: publicación ICA Subgerencia Protección Vegetal; buscar en ica.gov.co/publicaciones o ica.gov.co/getdoc por título.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "ica-resolucion-3168-2015",
@@ -35304,17 +35330,9 @@
       "año": 2015,
       "titulo": "Resolución 3168 de 2015 — Reglamenta la producción, importación y exportación de semillas",
       "institucion": "Instituto Colombiano Agropecuario (ICA)",
-      "tier": "A"
-    },
-    {
-      "id": "ifoam-normativa-organica",
-      "tipo": "manual_tecnico",
-      "autores": "IFOAM — Organics International",
-      "año": null,
-      "titulo": "IFOAM Norms for Organic Production and Processing",
-      "url": "https://www.ifoam.bio/our-work/how/standards-certification/organic-guarantee-system/ifoam-norms",
+      "observaciones": "_audit_note: buscar PDF oficial en ica.gov.co/normatividad o vinculo SUIN-Juriscol — norma vigente fundamental para semillas en Colombia.",
       "tier": "A",
-      "_orphan_audit_2026_05_18": "no_referenced_by_species_or_biopreparados — keep as historical reference until referenced"
+      "_url_pendiente": true
     },
     {
       "id": "ingham-2000-compost-tea",
@@ -35323,8 +35341,10 @@
       "año": 2000,
       "titulo": "The Compost Tea Brewing Manual",
       "revista_o_editorial": "Soil Foodweb Inc.",
-      "observaciones": "Fuente internacional; validada contra condiciones colombianas por AGROSAVIA 2015.",
-      "tier": "A"
+      "observaciones": "Fuente internacional; validada contra condiciones colombianas por AGROSAVIA 2015. _audit_note: publicación Soil Foodweb Inc. (Corvallis, OR); múltiples ediciones (2000, 2002, 2005) con ISBNs distintos — verificar edición específica usada en validación AGROSAVIA 2015.",
+      "tier": "A",
+      "_url_pendiente": true,
+      "_isbn_pendiente": true
     },
     {
       "id": "issg-uicn-invasoras",
@@ -35342,7 +35362,9 @@
       "año": 2010,
       "titulo": "Plantas medicinales de Cundinamarca y Boyacá",
       "institucion": "Jardín Botánico de Bogotá José Celestino Mutis",
-      "tier": "A"
+      "observaciones": "_audit_note: publicación JBB; buscar en jbb.gov.co/publicaciones o catálogo Biblioteca JBB.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "khan-2009-seaweed-extracts",
@@ -35363,7 +35385,9 @@
       "año": 2018,
       "titulo": "Ley 1930 de 2018 — Por medio de la cual se dictan disposiciones para la gestión integral de los páramos en Colombia",
       "institucion": "República de Colombia",
-      "tier": "A"
+      "observaciones": "_audit_note: norma vigente publicada en Diario Oficial 50.667 (27-jul-2018); buscar en suin-juriscol.gov.co o funcionpublica.gov.co/eva/gestornormativo por 'Ley 1930 2018'.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "libro-rojo-plantas-colombia",
@@ -35372,7 +35396,9 @@
       "año": 2006,
       "titulo": "Libro Rojo de Plantas de Colombia. Volumen 4 — Especies maderables amenazadas (y volúmenes sucesivos)",
       "institucion": "Instituto Amazónico de Investigaciones Científicas SINCHI / Instituto Humboldt / MADS",
-      "tier": "A"
+      "observaciones": "_audit_note: serie multi-volumen Libro Rojo Plantas Colombia; buscar volúmenes en repository.humboldt.org.co o sinchi.org.co (cada volumen tiene handle distinto).",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "mads-res-383-2010",
@@ -35381,7 +35407,9 @@
       "año": 2010,
       "titulo": "Resolución 383 de 2010 — Listado de especies silvestres amenazadas de la diversidad biológica colombiana",
       "institucion": "MADS Colombia",
-      "tier": "B"
+      "observaciones": "_audit_note: buscar PDF en minambiente.gov.co/normativa o SUIN-Juriscol; nota: actualizada por Res. 192/2014.",
+      "tier": "B",
+      "_url_pendiente": true
     },
     {
       "id": "mongabay-retamo-2024",
@@ -35399,8 +35427,9 @@
       "autores": "Mujica, A.",
       "año": 1992,
       "titulo": "Revisión bibliográfica sobre el cultivo de la quinua (Chenopodium quinoa Willd.) y el amaranto (Amaranthus caudatus L.) en los Andes",
-      "observaciones": "Publicación del Instituto Nacional de Investigaciones Agropecuarias (INIAP), Ecuador. Revisión exhaustiva de germoplasma, agronomía y usos tradicionales.",
-      "tier": "B"
+      "observaciones": "Publicación del Instituto Nacional de Investigaciones Agropecuarias (INIAP), Ecuador. Revisión exhaustiva de germoplasma, agronomía y usos tradicionales. _audit_note: buscar en repositorio.iniap.gob.ec o FAO ECOPORT (Mujica autor afiliado UNAP Puno + INIAP).",
+      "tier": "B",
+      "_url_pendiente": true
     },
     {
       "id": "nrc-1989-cultivos-andinos",
@@ -35428,8 +35457,9 @@
       "autores": "Ocampo, D.; Solorza, J.",
       "año": 2017,
       "titulo": "Manejo de retamo espinoso (Ulex europaeus) en zonas altoandinas de Cundinamarca",
-      "observaciones": "STUB migrado de v3.0 — revista y paginación pendientes.",
-      "tier": "B"
+      "observaciones": "STUB migrado de v3.0 — revista y paginación pendientes. _audit_note: cita incompleta, requiere localizar revista (posibles candidatos: Colombia Forestal, Caldasia, boletín IAvH).",
+      "tier": "B",
+      "_url_pendiente": true
     },
     {
       "id": "pamplona-roger-2006-plantas-medicinales",
@@ -35438,8 +35468,10 @@
       "año": 2006,
       "titulo": "Enciclopedia de las plantas medicinales",
       "revista_o_editorial": "Safeliz",
-      "observaciones": "STUB migrado de v3.0 — confirmar ISBN.",
-      "tier": "B"
+      "observaciones": "STUB migrado de v3.0 — confirmar ISBN. _audit_note: editorial Safeliz (Madrid); requiere verificación bibliotecaria para ISBN (existen ediciones 1997/2006/2010 con ISBNs distintos).",
+      "tier": "B",
+      "_url_pendiente": true,
+      "_isbn_pendiente": true
     },
     {
       "id": "perez-arbelaez-1947-plantas-utiles",
@@ -35448,8 +35480,10 @@
       "año": 1947,
       "titulo": "Plantas Útiles de Colombia",
       "revista_o_editorial": "Librería Colombiana / Camacho Roldán",
-      "observaciones": "Obra clásica de la botánica económica colombiana; múltiples reediciones posteriores.",
-      "tier": "A"
+      "observaciones": "Obra clásica de la botánica económica colombiana; múltiples reediciones posteriores. _audit_note: edición pre-ISBN; copias digitalizadas pueden buscarse en archive.org o Biblioteca Nacional de Colombia.",
+      "tier": "A",
+      "_url_pendiente": true,
+      "_isbn_pendiente": true
     },
     {
       "id": "perez-rodriguez-gomez-2008",
@@ -35460,7 +35494,9 @@
       "revista_o_editorial": "Agronomía Colombiana",
       "volumen_numero": "26(3)",
       "paginas": "477-486",
-      "tier": "B"
+      "observaciones": "_audit_note: Agronomía Colombiana revista UNAL — buscar artículo en revistas.unal.edu.co/index.php/agrocol por autor Pérez L. + año 2008.",
+      "tier": "B",
+      "_url_pendiente": true
     },
     {
       "id": "pinheiro-machado-2017-biofertilizantes",
@@ -35469,8 +35505,10 @@
       "año": 2017,
       "titulo": "Manual de Agricultura Orgánica y Biofertilizantes — fundamentos de la trofobiosis y nutrición vegetal agroecológica",
       "institucion": "Fundación Juquira Candiru / MAELA",
-      "observaciones": "Referencia continental para biol, supermagro y caldos minerales bajo enfoque trofobiótico de Chaboussou.",
-      "tier": "B"
+      "observaciones": "Referencia continental para biol, supermagro y caldos minerales bajo enfoque trofobiótico de Chaboussou. _audit_note: buscar en catálogo MAELA o Fundación Juquira Candiru — ISBN no localizado.",
+      "tier": "B",
+      "_url_pendiente": true,
+      "_isbn_pendiente": true
     },
     {
       "id": "powo-kew",
@@ -35488,7 +35526,9 @@
       "año": 2018,
       "titulo": "Resolución 684 de 2018 — Lista nacional de especies invasoras",
       "institucion": "MADS Colombia",
-      "tier": "A"
+      "observaciones": "_audit_note: buscar PDF oficial en minambiente.gov.co/normativa o SUIN-Juriscol; complementa Resolución 207/2010 (catálogo invasoras).",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "restauracion-cruz-verde-sumapaz",
@@ -35497,7 +35537,9 @@
       "año": 2018,
       "titulo": "Plan de restauración ecológica páramos Cruz Verde — Sumapaz",
       "institucion": "IAvH / CAR Cundinamarca",
-      "tier": "B"
+      "observaciones": "_audit_note: buscar handle en repository.humboldt.org.co o portal CAR Cundinamarca por título 'Cruz Verde Sumapaz'.",
+      "tier": "B",
+      "_url_pendiente": true
     },
     {
       "id": "restrepo-1996-abc-agricultura-organica",
@@ -35505,8 +35547,10 @@
       "autores": "Restrepo, J.",
       "año": 1996,
       "titulo": "ABC de la agricultura orgánica (variante de cita usada en v3.0)",
-      "observaciones": "STUB — posiblemente misma obra que restrepo-1996-bocashi. Verificar y dedupear.",
-      "tier": "B"
+      "observaciones": "STUB — posiblemente misma obra que restrepo-1996-bocashi. Verificar y dedupear. _audit_note: requiere curadura bibliotecaria para deduplicar contra restrepo-1996-bocashi.",
+      "tier": "B",
+      "_url_pendiente": true,
+      "_isbn_pendiente": true
     },
     {
       "id": "restrepo-1996-bocashi",
@@ -35515,7 +35559,10 @@
       "año": 1996,
       "titulo": "Abonos orgánicos fermentados — experiencias de agricultores en Centroamérica y Brasil",
       "revista_o_editorial": "OIT",
-      "tier": "B"
+      "observaciones": "_audit_note: publicación OIT/ILO en programa PROCMD Centroamérica; buscar en ilo.org/publns o catálogo OIT San José Costa Rica.",
+      "tier": "B",
+      "_url_pendiente": true,
+      "_isbn_pendiente": true
     },
     {
       "id": "restrepo-2005-agroecologia",
@@ -35524,7 +35571,10 @@
       "año": 2005,
       "titulo": "Manual práctico ABC de la agricultura orgánica y panes de piedra",
       "institucion": "Editorial Feriva",
-      "tier": "B"
+      "observaciones": "_audit_note: edición Cali (Editorial Feriva); ISBN no verificado — posible duplicado conceptual con restrepo-rivera-2005, requiere curadura bibliotecaria.",
+      "tier": "B",
+      "_url_pendiente": true,
+      "_isbn_pendiente": true
     },
     {
       "id": "restrepo-2007-biopreparados",
@@ -35533,7 +35583,10 @@
       "año": 2007,
       "titulo": "Manual práctico de biopreparados aplicados a la agricultura orgánica",
       "institucion": "Fundación Juquira Candiru",
-      "tier": "B"
+      "observaciones": "_audit_note: publicación Fundación Juquira Candiru; URL canónica no localizable — buscar en catálogo MAELA o bibliotecas universitarias agroecológicas.",
+      "tier": "B",
+      "_url_pendiente": true,
+      "_isbn_pendiente": true
     },
     {
       "id": "restrepo-rivera-2005",
@@ -35542,29 +35595,10 @@
       "año": 2005,
       "titulo": "Agroecología — principios y aplicación en el manejo de fincas tropicales",
       "institucion": "Editorial Feriva",
-      "tier": "B"
-    },
-    {
-      "id": "rodriguez-nustez-2009",
-      "tipo": "articulo_revista",
-      "autores": "Rodríguez, L.E.; Ñústez, C.E.",
-      "año": 2009,
-      "titulo": "(Variante de cita usada en v3.0; curadura pendiente — probablemente idéntica a rodriguez-nustez-estrada-2009)",
-      "observaciones": "STUB migrado de v3.0. Verificar si es la misma fuente que rodriguez-nustez-estrada-2009 y dedupear.",
-      "tier": "A",
-      "_orphan_audit_2026_05_18": "no_referenced_by_species_or_biopreparados — keep as historical reference until referenced"
-    },
-    {
-      "id": "rodriguez-nustez-estrada-2009",
-      "tipo": "articulo_revista",
-      "autores": "Rodríguez, L.E.; Ñústez, C.E.; Estrada, N.",
-      "año": 2009,
-      "titulo": "Variedades colombianas de papa criolla (Solanum phureja Juz. et Buk.)",
-      "revista_o_editorial": "Agronomía Colombiana",
-      "volumen_numero": "27(3)",
-      "paginas": "289-303",
-      "tier": "A",
-      "_orphan_audit_2026_05_18": "no_referenced_by_species_or_biopreparados — keep as historical reference until referenced"
+      "observaciones": "_audit_note: edición Cali (Editorial Feriva); ISBN no localizado en catálogos estándar — requiere verificación bibliotecaria.",
+      "tier": "B",
+      "_url_pendiente": true,
+      "_isbn_pendiente": true
     },
     {
       "id": "sib-colombia",
@@ -35582,6 +35616,7 @@
       "año": null,
       "titulo": "Publicaciones científicas sobre especies de la Amazonía colombiana",
       "institucion": "Instituto Amazónico de Investigaciones Científicas SINCHI",
+      "url": "https://www.sinchi.org.co",
       "tier": "A"
     },
     {
@@ -35602,8 +35637,9 @@
       "revista_o_editorial": "Tropical Agriculture (Trinidad)",
       "volumen_numero": "57(2)",
       "paginas": "133-140",
-      "observaciones": "Referencia clásica para el cálculo de dosis de cal en suelos ácidos tropicales basado en saturación de aluminio (Al sat %), criterio operativo central en agroecología andina y trópico bajo colombiano.",
-      "tier": "A"
+      "observaciones": "Referencia clásica para el cálculo de dosis de cal en suelos ácidos tropicales basado en saturación de aluminio (Al sat %), criterio operativo central en agroecología andina y trópico bajo colombiano. _audit_note: pre-DOI era; Tropical Agriculture (Trinidad) journal — buscar en CABI Abstracts o repositorio CIAT (autor Sánchez P.A. afiliado NCSU/IFDC).",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "pinheiro-2003-cartilha-cal",
@@ -35612,8 +35648,10 @@
       "año": 2003,
       "titulo": "Cartilha da saúde do solo — agricultura orgânica e biodinâmica: o uso correto da cal e das enmendas minerais",
       "institucion": "Fundação Juquira Candiru / MAELA",
-      "observaciones": "Texto de divulgación agroecológica latinoamericana que sistematiza las advertencias sobre cal viva/hidratada en sistemas orgánicos y defiende criterios técnicos de aplicación basados en análisis de suelo.",
-      "tier": "B"
+      "observaciones": "Texto de divulgación agroecológica latinoamericana que sistematiza las advertencias sobre cal viva/hidratada en sistemas orgánicos y defiende criterios técnicos de aplicación basados en análisis de suelo. _audit_note: cartilha self-published Brasil, sin ISBN ni DOI; consultar catálogo MAELA o Fundação Juquira Candiru.",
+      "tier": "B",
+      "_url_pendiente": true,
+      "_isbn_pendiente": true
     },
     {
       "id": "colplanta-2021",
@@ -35687,7 +35725,9 @@
       "año": 2008,
       "titulo": "Vademécum Colombiano de Plantas Medicinales",
       "institucion": "Ministerio de la Protección Social, Bogotá D.C.",
-      "tier": "A"
+      "observaciones": "_audit_note: publicado por Min. Protección Social (predecesor MinSalud); buscar PDF oficial en minsalud.gov.co o INVIMA — sustituye Resolución 2834/2008.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "tramil-justicia-pectoralis",
@@ -35729,7 +35769,9 @@
       "año": 2013,
       "titulo": "Aceite de la palma de seje Oenocarpus bataua Mart. por su calidad nutricional puede contribuir a la conservación y uso sostenible de los bosques de galería en la Orinoquia colombiana",
       "revista_o_editorial": "Orinoquia",
-      "tier": "B"
+      "observaciones": "_audit_note: revista Orinoquia (Universidad de los Llanos); buscar por título en orinoquia.unillanos.edu.co o SciELO Colombia.",
+      "tier": "B",
+      "_url_pendiente": true
     },
     {
       "id": "bernal-2013-cosechar-sin-destruir",
@@ -35795,7 +35837,9 @@
       "revista_o_editorial": "Revista de Biología Tropical",
       "volumen_numero": "68(4)",
       "paginas": "1107-1115",
-      "tier": "A"
+      "observaciones": "_audit_note: RBT vol 68(4) — buscar DOI canónico en revistas.ucr.ac.cr o SciELO (patrón 10.15517/rbt.v68i4.NNNNN).",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "scielo-correa-kikuyo-2018",
@@ -35874,7 +35918,9 @@
       "año": 1998,
       "titulo": "El cultivo de chontaduro (Bactris gasipaes H.B.K) para fruto y palmito",
       "institucion": "CORPOICA",
-      "tier": "A"
+      "observaciones": "_audit_note: manual CORPOICA 1998 (pre-merge AGROSAVIA); buscar handle en repository.agrosavia.co por título o por autor Rojas Molina.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "restrepo-2007-caldos-minerales",
@@ -35895,7 +35941,9 @@
       "revista_o_editorial": "Agronomía Costarricense",
       "volumen_numero": "45(1)",
       "paginas": "81-92",
-      "tier": "A"
+      "observaciones": "_audit_note: artículo en Agronomía Costarricense vol 45(1); URL canónica vía portal revistas.ucr.ac.cr o SciELO Costa Rica — DOI no localizado con certeza, requiere búsqueda directa por título.",
+      "tier": "A",
+      "_url_pendiente": true
     },
     {
       "id": "cho-2016-jadam-organic-farming",
@@ -35924,7 +35972,9 @@
       "año": 2008,
       "titulo": "Natural Farming: Lactic Acid Bacteria / Fish Amino Acid / Fermented Plant Juice — Sustainable Agriculture factsheets",
       "institucion": "University of Hawaii — College of Tropical Agriculture and Human Resources (CTAHR)",
-      "tier": "B"
+      "observaciones": "_audit_note: factsheet set publicado por CTAHR Sustainable Agriculture program (SA-7, SA-8, SA-9); URLs canónicas en repository.ctahr.hawaii.edu — requiere localizar handle específico por factsheet.",
+      "tier": "B",
+      "_url_pendiente": true
     },
     {
       "id": "mamani-2015-biol-ruminal",
@@ -35944,8 +35994,10 @@
       "año": 2009,
       "titulo": "Agricultura orgánica: La remineralización de los alimentos y la salud a partir de la regeneración mineral del suelo",
       "revista_o_editorial": "Fundación Juquira Candirú, Cali",
-      "observaciones": "Reedición ampliada de Julius Hensel 'Brot aus Steinen' (1894); ISBN no localizado de manera firme en bases bibliográficas estándar.",
-      "tier": "B"
+      "observaciones": "Reedición ampliada de Julius Hensel 'Brot aus Steinen' (1894); ISBN no localizado de manera firme en bases bibliográficas estándar. _audit_note: requiere verificación bibliotecaria en catálogo Fundación Juquira Candirú o ediciones MAELA.",
+      "tier": "B",
+      "_url_pendiente": true,
+      "_isbn_pendiente": true
     },
     {
       "id": "higa-1991-em-tecnology",
@@ -35968,7 +36020,9 @@
       "revista_o_editorial": "L.C. Pinheiro Machado (auto-edição), Porto Alegre",
       "institucion": "EMBRAPA / UFRGS (autor afiliado)",
       "tier": "B",
-      "observaciones": "Teoría trofobiose Chaboussou aplicada a fitoiatría — base conceptual de Restrepo para purines de ortiga, consuelda, helecho. Plantas equilibradas nutricionalmente son menos atacadas por insectos."
+      "observaciones": "Teoría trofobiose Chaboussou aplicada a fitoiatría — base conceptual de Restrepo para purines de ortiga, consuelda, helecho. Plantas equilibradas nutricionalmente son menos atacadas por insectos. _audit_note: auto-edição brasileña 1990 sin ISBN ni DOI registrado; verificar copia en biblioteca UFRGS o catálogo EMBRAPA.",
+      "_url_pendiente": true,
+      "_isbn_pendiente": true
     },
     {
       "id": "agrosavia-abonos-verdes-boyaca-2018",
@@ -35991,7 +36045,9 @@
       "revista_o_editorial": "Pinheiro Machado y Editora Aldeia do Futuro, Porto Alegre",
       "institucion": "PRV Pasto Racional Voisin",
       "tier": "B",
-      "observaciones": "Recopilación canónica de purines de ortiga, consuelda, helecho, cola de caballo — proporciones, vidas útiles, advertencias de mezcla."
+      "observaciones": "Recopilación canónica de purines de ortiga, consuelda, helecho, cola de caballo — proporciones, vidas útiles, advertencias de mezcla. _audit_note: edición latinoamericana auto-publicada sin DOI ni ISBN reconocido; verificar disponibilidad en bibliotecas de FAO/MAELA o catálogo Editora Aldeia do Futuro.",
+      "_url_pendiente": true,
+      "_isbn_pendiente": true
     }
   ]
 }
