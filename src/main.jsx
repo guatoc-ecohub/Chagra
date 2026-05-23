@@ -11,6 +11,11 @@ import { fetchFromFarmOS } from './services/apiService'
 import { PRIMARY_WORKER_NAME } from './config/workerConfig'
 import { renameWorker } from './services/assetService'
 import { getAccessToken } from './services/authService'
+import {
+  shouldShowUpdateBanner,
+  readAckedVersion,
+  seedFirstInstallAck,
+} from './services/swUpdateAck'
 
 import { loadDemoSeedData } from '../scripts/seed-demo';
 import { bootstrapOssModules } from './core/bootstrap-oss';
@@ -87,21 +92,91 @@ if ('serviceWorker' in navigator) {
   // Banner "nueva version disponible" cuando SW cambia (controllerchange) o
   // cuando un nuevo SW esta en waiting (updatefound). Reemplaza auto-reload:
   // el operador decide cuando actualizar via UpdateAvailableBanner.
+  //
+  // Fix Antigravity QA #18: persistimos el ack en localStorage
+  // (`sw:last-acked-version`) para no repetir el toast cada reload. Antes
+  // de disparar `chagra:update-available` preguntamos al SW su CACHE_NAME
+  // via MessageChannel y comparamos con el acked. Si coincide → suprimir.
+  // First install (no ack previo) → suprimir tambien y sembrar el ack para
+  // que la primera notif real (al actualizar) si dispare.
+  const maybeDispatchUpdateAvailable = async (sw) => {
+    if (!sw) return;
+    try {
+      const version = await getSwVersion(sw);
+      if (!version) return;
+      const lastAcked = readAckedVersion();
+      // Seed first-install: nunca hubo ack previo → guardamos current y
+      // suprimimos el toast. Asi en la proxima version real (CACHE_NAME
+      // distinto) el banner si dispara.
+      if (lastAcked === null) {
+        seedFirstInstallAck(version);
+        return;
+      }
+      if (shouldShowUpdateBanner(version, lastAcked)) {
+        window.dispatchEvent(
+          new CustomEvent('chagra:update-available', { detail: { version } })
+        );
+      }
+    } catch (_) {
+      // SW no responde / MessageChannel timeout → no spammear toast.
+    }
+  };
+
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    window.dispatchEvent(new CustomEvent('chagra:update-available'));
+    maybeDispatchUpdateAvailable(navigator.serviceWorker.controller);
   });
 
   // Tambien detectar SW en waiting por si el controllerchange no se dispara
   // (ej. si el SW no hace skipWaiting automaticamente en el futuro).
   navigator.serviceWorker.ready.then((registration) => {
+    // Estado inicial: si ya hay un SW controlador, sembrar ack para suprimir
+    // toast en cargas siguientes.
+    if (navigator.serviceWorker.controller) {
+      maybeDispatchUpdateAvailable(navigator.serviceWorker.controller);
+    }
     if (registration.waiting) {
-      window.dispatchEvent(new CustomEvent('chagra:update-available'));
+      maybeDispatchUpdateAvailable(registration.waiting);
     }
     registration.addEventListener('updatefound', () => {
-      if (registration.waiting) {
-        window.dispatchEvent(new CustomEvent('chagra:update-available'));
+      const installing = registration.installing;
+      if (installing) {
+        installing.addEventListener('statechange', () => {
+          if (installing.state === 'installed' && registration.waiting) {
+            maybeDispatchUpdateAvailable(registration.waiting);
+          }
+        });
+      } else if (registration.waiting) {
+        maybeDispatchUpdateAvailable(registration.waiting);
       }
     });
+  });
+}
+
+// Pregunta CACHE_NAME al SW via MessageChannel con timeout corto. Devuelve
+// null si no responde (no bloquear UI ni spammear toast).
+function getSwVersion(sw, timeoutMs = 1500) {
+  return new Promise((resolve) => {
+    if (!sw || typeof MessageChannel === 'undefined') {
+      resolve(null);
+      return;
+    }
+    const channel = new MessageChannel();
+    const timer = setTimeout(() => {
+      channel.port1.close();
+      resolve(null);
+    }, timeoutMs);
+    channel.port1.onmessage = (event) => {
+      clearTimeout(timer);
+      channel.port1.close();
+      resolve(event.data?.version ?? null);
+    };
+    try {
+      sw.postMessage({ type: 'GET_VERSION' }, [channel.port2]);
+    } catch (_) {
+      clearTimeout(timer);
+      channel.port1.close();
+      resolve(null);
+    }
   });
 }
 

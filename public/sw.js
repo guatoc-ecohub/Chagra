@@ -219,4 +219,22 @@ self.addEventListener('message', (event) => {
       self.registration.sync.register('voice-telemetry-flush');
     }
   }
+
+  // SKIP_WAITING: el cliente (UpdateAvailableBanner) lo manda cuando el
+  // usuario click "Actualizar". Activa el SW en waiting → dispara
+  // controllerchange → el cliente recarga (window.location.reload()).
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+
+  // GET_VERSION: el cliente pregunta la version del SW activo para
+  // comparar con `sw:last-acked-version` en localStorage y decidir si
+  // mostrar el banner "nueva version disponible". Respondemos por
+  // MessageChannel (event.ports[0]) para evitar broadcast a otros clients.
+  // Fix Antigravity QA #18.
+  if (event.data && event.data.type === 'GET_VERSION') {
+    if (event.ports && event.ports[0]) {
+      event.ports[0].postMessage({ type: 'VERSION', version: CACHE_NAME });
+    }
+  }
 });
