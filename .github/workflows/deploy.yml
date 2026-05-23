@@ -104,6 +104,16 @@ jobs:
           VITE_FARMOS_URL: ""
           VITE_FARMOS_CLIENT_ID: farm
           VITE_HA_ACCESS_TOKEN: ${{ secrets.VITE_HA_ACCESS_TOKEN }}
+          # Sidecar agro-mcp (ADR-045 fase 2) activado en produccion 2026-05-23.
+          # Con flag true, AgentScreen rutea cada turno por NLU del sidecar y,
+          # si el planner detecta agro-query, llama al tool MCP antes del chat.
+          # Si sidecar timeout/5xx/red caida, sidecarClient devuelve null y el
+          # comportamiento es identico al pre-wiring.
+          VITE_USE_SIDECAR_AGRO_MCP: "true"
+          # Token X-Chagra-Token shared-secret. NOTA: termina en bundle JS
+          # publico - defense-in-depth, NO auth real (auth real = nginx CORS
+          # lockdown). Sincronizado con SOPS de alpha; rotacion coordinada.
+          VITE_CHAGRA_MCP_TOKEN: ${{ secrets.VITE_CHAGRA_MCP_TOKEN }}
 
       - if: env.SKIP_DEPLOY != '1'
         name: Deploy to production
