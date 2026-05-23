@@ -5,16 +5,22 @@ import Database from 'better-sqlite3';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = path.join(__dirname, '../public/catalog.sqlite');
-// Bug 069.1 fix 2026-05-18: builder ahora apunta al catálogo canónico v3.1
-// en el repo público chagra (480 species). La v3.2 en el repo interno
-// (60 species + tracking_mode ADR-030) está stale y desincronizada con
-// el trabajo de las últimas 24h.
+// OSS→Pro step 2 (2026-05-23): el build OSS empaqueta el subset 50 species
+// (chagra-catalog-oss-subset-v3.1.json) como seed canónico para la PWA pública.
+// El corpus full 496 species queda disponible en repo solo para scripts
+// editoriales (batch-Xa, migrate-*, validate-*); NO se incluye en la sqlite
+// que va al usuario PWA OSS.
+//
+// Override para regenerar sqlite con corpus full (build interno / herramientas):
+//   CHAGRA_SEED=chagra-catalog-seed-v3.1.json npm run build-catalog
 //
 // Campos v3.2-only (tracking_mode, dli_optimo_mol_m2_dia, fotoperiodo_*,
-// tolerancia_sombra_neta_pct) quedan NULL cuando no existen en v3.1.
-// Cuando se migre catálogo a v3.2, basta bump SEED_FILE y poblará automáticamente.
+// tolerancia_sombra_neta_pct) quedan NULL cuando no existen.
 const CATALOG_DIR = path.join(__dirname, '../catalog');
-const SEED_FILE = 'chagra-catalog-seed-v3.1.json';
+const DEFAULT_SEED_OSS = 'chagra-catalog-oss-subset-v3.1.json';
+const SEED_FILE = process.env.CHAGRA_SEED
+  ? path.basename(process.env.CHAGRA_SEED)
+  : DEFAULT_SEED_OSS;
 
 if (fs.existsSync(DB_PATH)) {
   fs.unlinkSync(DB_PATH);
