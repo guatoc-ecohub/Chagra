@@ -134,3 +134,59 @@ VITE_HA_ACCESS_TOKEN=             # Long-lived token de Home Assistant
 VITE_DEFAULT_LOCATION_ID=         # UUID de la ubicación principal
 VITE_DEFAULT_FARM_NAME=           # Nombre visible de la finca
 ```
+
+---
+
+## 8. Sidecar agro-mcp (ADR-045 Fase 2 — wiring del AgentScreen)
+
+El AgentScreen consume opcionalmente un sidecar HTTP (`chagra-agro-mcp`) que
+expone un planner NLU + un set de MCP tools sobre el knowledge graph de
+especies (catálogo Chagra). El wiring vive en `src/services/sidecarClient.js`
++ una integración corta en `src/components/AgentScreen/AgentScreen.jsx`,
+detrás de un feature flag para que el deploy del sidecar y la activación en
+cliente sean independientes.
+
+**Pipeline cuando flag=true + online:**
+
+```
+userMessage → planNlu(message, contextMemory)
+              → { useTool, tool, args, ... }
+              ↓ (si useTool)
+              callTool(tool, args) → result (ficha species, companions, etc.)
+              ↓
+   AgentScreen inyecta el JSON del result como bloque delimitado en el
+   system prompt ("=== DATOS VERIFICADOS (chagra-agro-mcp tool: X) ===")
+   antes del chat LLM, dándole grounding citable. Truncado a 1500 chars
+   para no reventar la ventana 4096 tokens.
+```
+
+Si el sidecar falla (timeout, 5xx, 401), si `navigator.onLine=false` o si
+la flag está apagada → `planNlu`/`callTool` devuelven `null` y el chat
+sigue con el flujo RAG-only previo. El cliente nunca arroja: contract
+`T | null` para el caller.
+
+**Tools disponibles en el sidecar:** `get_species`, `get_companions`,
+`get_biopreparados`, `get_pest_controllers`, `get_multihop_companions`,
+`validate_visual_match` (las últimas 3 vía AGE 2nd-degree; NLU planner aún
+no las routea automáticamente, pero quedan invocables por nombre).
+
+**Variables de entorno (todas opcionales — default seguro = sidecar off):**
+
+| Var | Default | Notas |
+|---|---|---|
+| `VITE_USE_SIDECAR_AGRO_MCP` | `false` | Master switch. `"true"` o `"1"` lo habilitan. |
+| `VITE_SIDECAR_URL` | `/api/mcp/agro` | Relativo → nginx proxia a :7880 en el nodo productor. |
+| `VITE_CHAGRA_MCP_TOKEN` | (vacío) | Build-time only. NUNCA commitear el valor real. |
+
+**Activación post-deploy del sidecar:**
+
+1. Mergear el PR de despliegue del sidecar en el repo de infra del nodo
+   productor (NixOS gestiona el systemd unit + el route nginx).
+2. Setear `VITE_USE_SIDECAR_AGRO_MCP=true` y `VITE_CHAGRA_MCP_TOKEN=<token>`
+   en el entorno del runner de GHA (secret) y rebuild.
+3. Observar `console.debug('[sidecar]', { tool, latencyNlu, latencyTool,
+   toolEvidenceBytes })` en DevTools de Chrome para medir adopción y p95.
+
+Con flag off (estado por defecto del repo público), el comportamiento del
+AgentScreen es idéntico al pipeline RAG-only — no hay cambio para usuarios
+hasta que el operador active explícitamente.
