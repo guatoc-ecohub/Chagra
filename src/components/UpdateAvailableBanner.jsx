@@ -1,16 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { RefreshCw } from 'lucide-react';
+import { writeAckedVersion } from '../services/swUpdateAck';
 
 export default function UpdateAvailableBanner() {
   const [updateAvailable, setUpdateAvailable] = useState(false);
+  // Capturamos la version reportada por el SW (via event.detail) para
+  // persistir el ack en click "Actualizar". Fix Antigravity QA #18.
+  const announcedVersionRef = useRef(null);
 
   useEffect(() => {
-    const handler = () => setUpdateAvailable(true);
+    const handler = (event) => {
+      const version = event?.detail?.version ?? null;
+      if (version) announcedVersionRef.current = version;
+      setUpdateAvailable(true);
+    };
     window.addEventListener('chagra:update-available', handler);
     return () => window.removeEventListener('chagra:update-available', handler);
   }, []);
 
   const handleUpdate = async () => {
+    // Persistimos el ack ANTES del reload: si el reload falla o el usuario
+    // cierra la pestaña, no queremos repetir el toast en la proxima sesion
+    // para una version que ya acepto.
+    if (announcedVersionRef.current) {
+      writeAckedVersion(announcedVersionRef.current);
+    }
     try {
       const reg = await navigator.serviceWorker.ready;
       if (reg.waiting) {
