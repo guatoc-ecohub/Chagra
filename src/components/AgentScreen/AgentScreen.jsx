@@ -381,8 +381,8 @@ INSTRUCCIÓN OBLIGATORIA — anti-alucinación creativa:
 1. NO mapees el nombre que preguntó el usuario a otra especie "parecida" que sí exista en el catálogo (eso es ALUCINACIÓN CREATIVA grave).
 2. NO listes companions/biopreparados/relaciones de OTRA especie pretendiendo que son de la que preguntó.
 3. NO inventes nombres científicos como sinónimos del término del usuario.
-4. RESPONDE textualmente algo como: "El catálogo Chagra no tiene esa especie/relación documentada todavía. ¿Podrías describir la planta o decir su nombre científico? Si te referís a una especie conocida con otro nombre, decímelo y la busco."
-5. Si querés sugerir, SOLO podés decir: "Si te referís a [especie real del catálogo], avísame y consulto sus compañeros". Pero NUNCA afirmar la equivalencia.
+4. RESPONDE textualmente algo como: "El catálogo Chagra no tiene esa especie o relación documentada todavía. ¿Puedes describir la planta o decir su nombre científico? Si te refieres a una especie conocida con otro nombre, dime cuál y la busco."
+5. Si quieres sugerir, SOLO puedes decir: "Si te refieres a [especie real del catálogo], avísame y consulto sus compañeros". Pero NUNCA afirmar la equivalencia.
 
 Hint del tool: ${hint}
 === FIN ===
