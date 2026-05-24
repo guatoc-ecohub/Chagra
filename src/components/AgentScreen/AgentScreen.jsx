@@ -343,17 +343,23 @@ Glosario plagas regionales colombianas (usa nombre común + científico cuando E
 
 Para términos NO en este glosario, NO inventes — usá CASO B (pedí aclaración).
 
-Glosario taxonómico colombiano (usalo, NO inventes):
-- maracuyá = Passiflora edulis f. flavicarpa (NO Mangifera indica — eso es mango)
-- gulupa = Passiflora edulis f. edulis (morada)
+Glosario taxonómico colombiano (usalo LITERAL, NO inventes ni sustituyas):
+- maracuyá = Passiflora edulis f. flavicarpa (amarilla, NO Mangifera indica — eso es mango)
+- gulupa = Passiflora edulis f. edulis (morada — NO confundir con guayaba Psidium guajava, NO con Cucurbita moschata, NO con Musa; gulupa es PASSIFLORA, una pasionaria)
 - granadilla = Passiflora ligularis
+- curuba = Passiflora tripartita f. mollissima (Passifloraceae andina, NO confundir con curuba-de-monte ni otras Passiflora)
+- chulupa = Passiflora maliformis
+- badea = Passiflora quadrangularis
 - mango = Mangifera indica
-- mora andina = Rubus glaucus (NO Morus nigra — eso es mora de árbol)
+- mora andina = Rubus glaucus (NO Morus nigra — eso es mora de árbol; NO confundir con zarzamora europea Rubus fruticosus)
+- frambuesa andina = Rubus glaucus var. (a veces dicen "mora frambuesa")
 - lulo = Solanum quitoense (NO Solanum lycopersicum — eso es tomate)
 - uchuva = Physalis peruviana
-- tomate de árbol = Solanum betaceum
-- guayaba = Psidium guajava
-- chachafruto = Erythrina edulis (NO Theobroma cacao — eso es cacao)
+- tomate común = Solanum lycopersicum (tomate de mesa, hortaliza)
+- tomate de árbol/tomate de palo = Solanum betaceum (frutal perenne, distinta especie a tomate de mesa)
+- guayaba = Psidium guajava (NO Pouteria, NO confundir con feijoa Acca sellowiana)
+- feijoa/guayaba del Brasil = Acca sellowiana
+- chachafruto/balú = Erythrina edulis (NO Theobroma cacao — eso es cacao)
 - cubio = Tropaeolum tuberosum (NO Lupinus — eso es chocho/tarwi)
 - chocho/tarwi = Lupinus mutabilis
 - oca = Oxalis tuberosa
@@ -368,6 +374,46 @@ Glosario taxonómico colombiano (usalo, NO inventes):
 - copoazú = Theobroma grandiflorum
 - camu camu = Myrciaria dubia
 - cocotero/coco = Cocos nucifera
+- aguacate = Persea americana Mill. (Lauraceae — NO Psidium guajava, NO Mangifera, NO Pouteria)
+- aguacate Hass = Persea americana var. Hass (cultivar comercial)
+- café arábica = Coffea arabica (NO Coffea canephora — eso es robusta)
+- café robusta = Coffea canephora
+- plátano = Musa AAB (clones plátano hartón, dominico)
+- banano = Musa AAA (Cavendish y otros)
+- papa criolla = Solanum phureja (subespecie distinta a papa común Solanum tuberosum)
+- papa común = Solanum tuberosum
+- quinua = Chenopodium quinoa Willd.
+- arveja = Pisum sativum (NO Phaseolus — eso es frijol)
+- frijol común = Phaseolus vulgaris
+- haba = Vicia faba
+- frailejón = Espeletia spp. (Asteraceae endémica páramo, NO confundir con frailejón uribense vs santandereano)
+
+REGLA ESPECIAL ANTI-CONFUSIÓN PASSIFLORACEAE: cuando el usuario diga "gulupa", "maracuyá", "granadilla", "curuba", "chulupa", "badea", "passiflora" o cualquier pasionaria, el género es SIEMPRE **Passiflora** (familia Passifloraceae). NUNCA respondas con Psidium, Mangifera, Musa, Cucurbita, Pouteria u otro género. Estas confusiones son falsos positivos comunes del LLM y constituyen alucinación grave.
+
+REGLA ESPECIAL ANTI-CONFUSIÓN TOMATES: "tomate" sin más contexto = Solanum lycopersicum (hortaliza). "Tomate de árbol" o "tomate de palo" = Solanum betaceum (frutal perenne, ESPECIE DISTINTA). Cuando el usuario menciona uno, NO mezcles con el otro.
+
+Glosario regionalismos campesinos (Boyacá / Caldas / Choachí / agroecología tradicional):
+- matas = plantas individuales
+- mata madre = planta progenitora
+- palo = árbol grande (tronco principal)
+- almácigo = vivero / semillero
+- soca = rebrote del café después de cosecha o poda fuerte
+- encerrar = cosechar (uso Boyacá, también "recoger")
+- trillar = separar grano de cáscara
+- chamizo = ramas secas / Chusquea (bambú andino) que invade lote
+- chusque = Chusquea sp. (bambú andino, frecuente en cafetales)
+- pulchón = agujero / hueco (e.g. en tronco por barrenador)
+- chapola = larva de la broca del café (Hypothenemus hampei en estadio larval)
+- gota = Phytophthora infestans (en papa, tomate; mildiu velloso del solanáceo)
+- rondón = barrenador del aguacate (Steirastoma breve y/o Heilipus lauri según contexto)
+- brava = intensa / fuerte (ej. "plaga brava")
+- finquero = dueño o trabajador de finca
+- jode/jodieron = daña/dañaron (no traducir literal — entender contexto)
+- barbecho = descanso de la tierra entre cultivos
+- cuajar = formar fruto tras polinización (verbo agronómico)
+- cucha = mujer / recolectora (Caldas, también "abuela")
+- guayabero = recolector de café (jergón Caldas)
+- panela = azúcar de caña sin refinar (no confundir con "panel")
 
 Si te preguntan por una planta fuera de este glosario y NO estás 100% seguro del binomio, responde con el nombre común sin inventar el científico. Ej. "el coco" en lugar de "el coco (Mangifera indica)" si dudás.
 
