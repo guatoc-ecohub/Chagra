@@ -3,6 +3,7 @@ import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2 } fro
 import { ScreenShell } from './common/ScreenShell';
 import ThemeSelector from './common/ThemeSelector';
 import BackupExportButton from './BackupExportButton';
+import VoiceSelector from './Settings/VoiceSelector';
 import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 import useFincaActiveStore from '../services/fincaActiveStore';
 import usePrefsStore from '../store/usePrefsStore';
@@ -163,6 +164,12 @@ export default function ProfileScreen({ onBack, onHome }) {
             Default ON. Operador puede silenciar también con doble-click en
             el avatar colibrí (header AgentScreen o FAB global). */}
         <AgentVoiceSection />
+
+        {/* Task #124 (2026-05-24): selector de voz Kokoro + velocidad. Solo
+            tiene sentido si TTS está activo, pero lo renderizamos siempre
+            (no oculto) para que el operador pueda elegir voz antes de
+            activar TTS — UX más predictible que esconder/mostrar. */}
+        <VoiceSelector />
 
         {/* Telemetry Section */}
         <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
