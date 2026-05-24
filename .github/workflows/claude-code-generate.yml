@@ -254,11 +254,26 @@ jobs:
           TIER0_EOF
 
           cat > "$TIER1_CMD" <<'TIER1_EOF'
-          # TIER1: opencode/minimax-m2.5-free. Free tier opencode.ai, sin auth.
+          # TIER1: GLM-4.6 vía z.ai (Z.ai API directa, cuenta del operador).
+          # Reemplazó a opencode/minimax-m2.5-free el 2026-05-24 (promotion
+          # MiniMax expiró → 401 "Free promotion has ended"). GLM-4.6 tiene
+          # cuenta paga operator (subutilizada en el bot Telegram), 200K
+          # context, $0.6/M in / $2.2/M out — barato para species-stubs
+          # batch processing.
+          #
+          # Provider `glm` configurado en ~/.config/opencode/opencode.json
+          # con baseURL https://api.z.ai/api/paas/v4 (OpenAI-compat). Auth
+          # vive en ~/.local/share/opencode/auth.json (one-time `opencode
+          # auth login -p glm` con la API key z.ai).
+          #
+          # System prompt operacional: ~/.config/opencode/GLM_OPERATOR_
+          # INSTRUCTIONS.md (acceso a MCP chagra-agro + chagra-dev). Para
+          # workflows CI desktop tasks (species-stubs), las MCP tools no
+          # son críticas — el catálogo va embebido en el PROMPT_FILE.
           opencode run \
             --dir "$GITHUB_WORKSPACE" \
             --dangerously-skip-permissions \
-            -m opencode/minimax-m2.5-free \
+            -m glm/glm-4.6 \
             --format json \
             "$(cat "$PROMPT_FILE")"
           TIER1_EOF
@@ -283,12 +298,12 @@ jobs:
 
           # ─── TIER1 (default) ────────────────────────────────────────────────
           if [ -z "$WINNER" ] && [ "${CLAUDE_NEEDS_CLARIFICATION:-false}" != "true" ]; then
-            if run_tier "1-minimax-m2.5-free" "$TIER1_CMD" "$TIER1_OUT" 1500; then
+            if run_tier "1-glm-4.6-zai" "$TIER1_CMD" "$TIER1_OUT" 1500; then
               cp "$TIER1_OUT" "$OUTPUT_FILE"
-              WINNER="tier1-minimax-m2.5-free"
+              WINNER="tier1-glm-4.6-zai"
             else
               rc=$?
-              [ "$rc" = "10" ] && QUOTA_HIT="${QUOTA_HIT}tier1(minimax) "
+              [ "$rc" = "10" ] && QUOTA_HIT="${QUOTA_HIT}tier1(glm-4.6) "
               echo "TIER1 falló (rc=$rc)." >&2
             fi
           fi
