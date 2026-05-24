@@ -17,7 +17,8 @@ import { buildLLMRequest, selectChatRoute } from '../../services/llmRouter';
 // Sidecar agro-mcp (ADR-045 Fase 2 Step B/C). Detrás de feature flag
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
-import { isSidecarEnabled, planNlu, callTool, resolveEntities } from '../../services/sidecarClient';
+import { isSidecarEnabled, planNlu, callTool, resolveEntities, getClimaIdeam } from '../../services/sidecarClient';
+import { FARM_CONFIG } from '../../config/defaults';
 import { speak, speakKokoro, stop, init as initTTS, isSupported, isKokoroAvailable, replayLast, isSpeaking } from '../../services/ttsService';
 import { executeAction, setActionGateCallback } from '../../services/actionExecutor';
 import ChatHistory from './ChatHistory';
@@ -505,6 +506,27 @@ HEURÍSTICA FINAL CASO C: ¿la query DICE LITERALMENTE "variedades", "clases", "
 
 CAMPOS NULL EN TOOL RESULT: si get_species devuelve found:true PERO companions:[] o un campo X:null, NO defaultes a CASO C. Responde explícitamente "El catálogo confirma [especie] pero el campo [X] aún no está documentado", y usa el resto del data útil (altitud, manejo, valor_pedagogico, etc.).
 
+HERRAMIENTAS NORMATIVA SOLO PARA VALIDACIÓN, NUNCA PRESCRIPCIÓN:
+
+- get_normativa_ica (agroquímicos registrados ICA): úselo SOLO cuando
+  el usuario menciona explícitamente un producto químico/sintético O
+  pregunta si algo está prohibido/registrado/restringido. NUNCA lo
+  use para responder "¿qué le pongo a la plaga X?" — para eso use
+  get_biopreparados + get_pest_controllers primero (agroecológico).
+  Si la respuesta incluye sintéticos, contextualice con biopreparados
+  alternativos y advertencia de impacto agroecológico.
+
+- get_clima_ideam (estaciones IDEAM nacional): úselo para preguntas
+  sobre clima histórico/actual del municipio del usuario. Si el user
+  no ha mencionado municipio, pregúntele antes. No invente datos de
+  lluvia/temperatura — si IDEAM no responde, dígalo plano.
+
+- get_precio_sipsa (precios mayoristas SIPSA): el dataset hoy está
+  publicado como ZIP federated (no consulta directa). El tool devuelve
+  metadata + URL del ZIP DANE. Si el user pregunta precio, oriente al
+  ZIP DANE o sugiera consulta directa en Corabastos. Nunca invente
+  precios.
+
 Responde en español colombiano (tú/usted, sin voseo argentino). Sé específico y útil cuando tengas certeza; humilde y preguntón cuando no.`;
   }, [plants, fincas, activeFincaSlug, indoorZone]);
 
@@ -914,6 +936,48 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
               latencyNlu: Math.round(tNlu1 - tNlu0),
               reason: plan.reason || 'no_tool',
             });
+          }
+
+          // PASO 3 — detección heurística frontend de intent climática
+          // mientras NLU sidecar no se actualiza (TODO en nlu.ts del sidecar).
+          // Si el user pregunta por clima/lluvia/temperatura → llamar
+          // get_clima_ideam('monthly_avg', { municipio, metric, desde }) para
+          // grounding macro. Optimista no-estricto: si falla → seguimos sin
+          // clima inyectado (graceful degrade — el LLM tira de RAG y dice
+          // "no tengo IDEAM" en último caso). Solo se ejecuta si NO hubo
+          // tool ya invocado vía NLU para no inflar contexto.
+          if (!toolEvidence) {
+            const climaKeywords = /clima|lluvia|llueve|llover|temperatura|sequ[íi]a|fr[íi]o|calor|estaci[óo]n\s+meteorol[óo]gica|ideam|precipitaci[óo]n/i;
+            const municipio = FARM_CONFIG?.MUNICIPIO || null;
+            if (climaKeywords.test(text) && municipio) {
+              try {
+                const tClima0 = performance.now();
+                const desdeDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+                  .toISOString()
+                  .slice(0, 10);
+                const climaResult = await getClimaIdeam('monthly_avg', {
+                  municipio,
+                  metric: 'precipitation',
+                  desde: desdeDate,
+                });
+                const tClima1 = performance.now();
+                if (climaResult) {
+                  toolEvidence = {
+                    tool: 'get_clima_ideam',
+                    args: { action: 'monthly_avg', municipio, metric: 'precipitation', desde: desdeDate },
+                    result: climaResult,
+                  };
+                  console.debug('[sidecar] clima_ideam heuristic hit', {
+                    municipio,
+                    latencyMs: Math.round(tClima1 - tClima0),
+                  });
+                } else {
+                  console.debug('[sidecar] clima_ideam heuristic null', { municipio });
+                }
+              } catch (climaErr) {
+                console.debug('[sidecar] clima_ideam fail', climaErr?.message);
+              }
+            }
           }
         } catch (sidecarErr) {
           // Defensa extra: planNlu/callTool/resolveEntities ya son no-throw,

@@ -171,8 +171,14 @@ export async function planNlu(userMessage, context) {
  * el endpoint del sidecar es trusted, pero acotamos el set para que un
  * planner buggy/comprometido no pueda pedir paths arbitrarios.
  *
- * Las últimas 3 son nuevas (PR chagra-pro #48 — wire AGE). NLU planner aún
- * no las routea automáticamente; quedan disponibles para invocación manual.
+ * Las últimas 3 (`get_normativa_ica`, `get_clima_ideam`, `get_precio_sipsa`)
+ * vienen de los merges chagra-pro #64/#65/#66 + hotfix #67 — exponen
+ * normativa ICA defensiva, clima IDEAM nacional y precios SIPSA DANE.
+ *
+ * TODO(NLU): add keywords agroquimico/clima/precio in chagra-pro nlu.ts
+ * (sidecar repo, NO acá) para que el planner las routee automáticamente.
+ * Mientras tanto el frontend hace detection por keywords + invocación
+ * directa de los wrappers (ver AgentScreen handleSubmit).
  */
 const ALLOWED_TOOLS = new Set([
   'get_species',
@@ -182,6 +188,26 @@ const ALLOWED_TOOLS = new Set([
   'get_multihop_companions',
   'validate_visual_match',
   'validate_taxonomy',
+  'get_normativa_ica',
+  'get_clima_ideam',
+  'get_precio_sipsa',
+]);
+
+const NORMATIVA_ICA_ACTIONS = new Set([
+  'latest_active_ingredients',
+  'extract_resolutions',
+  'full_sync',
+]);
+const CLIMA_IDEAM_ACTIONS = new Set([
+  'stations_near',
+  'climate_series',
+  'monthly_avg',
+  'anomalies',
+]);
+const PRECIO_SIPSA_ACTIONS = new Set([
+  'latest_price',
+  'dataset_metadata',
+  'related_resources',
 ]);
 
 /**
@@ -229,6 +255,70 @@ export async function callTool(toolName, args) {
   return postJson(`/tools/${toolName}`, args || {}, TOOL_TIMEOUT_MS);
 }
 
+/**
+ * Wrapper defensivo de `get_normativa_ica`. Validá la action localmente
+ * para que el frontend NO pueda pedir paths arbitrarios al sidecar.
+ *
+ * USO DEFENSIVO ÚNICAMENTE: este tool sirve para validar si un producto
+ * agroquímico está registrado/restringido por el ICA. NUNCA debe usarse
+ * para responder "¿qué le pongo a la plaga X?" — para eso primero
+ * `get_biopreparados` + `get_pest_controllers` (agroecológico). El system
+ * prompt del agente debe explicitar esta restricción.
+ *
+ * @param {string} action — uno de NORMATIVA_ICA_ACTIONS
+ * @param {object} [args] — body adicional pasado al tool
+ * @returns {Promise<null | object>}
+ */
+export async function getNormativaIca(action, args) {
+  if (!action || typeof action !== 'string' || !NORMATIVA_ICA_ACTIONS.has(action)) {
+    console.debug('[sidecar] get_normativa_ica action inválida', action);
+    return null;
+  }
+  return callTool('get_normativa_ica', { action, ...(args || {}) });
+}
+
+/**
+ * Wrapper de `get_clima_ideam`. Estaciones IDEAM nacional para grounding
+ * climático histórico. El sidecar devuelve null si IDEAM no responde
+ * (graceful degrade — caller debe seguir sin clima inyectado).
+ *
+ * @param {string} action — uno de CLIMA_IDEAM_ACTIONS
+ * @param {object} [args] — body adicional (municipio, metric, desde, etc.)
+ * @returns {Promise<null | object>}
+ */
+export async function getClimaIdeam(action, args) {
+  if (!action || typeof action !== 'string' || !CLIMA_IDEAM_ACTIONS.has(action)) {
+    console.debug('[sidecar] get_clima_ideam action inválida', action);
+    return null;
+  }
+  return callTool('get_clima_ideam', { action, ...(args || {}) });
+}
+
+/**
+ * Wrapper de `get_precio_sipsa`. Precios mayoristas SIPSA — hoy el dataset
+ * DANE está publicado como ZIP federated (no consulta directa), así que
+ * el tool devuelve metadata + URL del ZIP en vez de precio puntual. El
+ * agente debe orientar al usuario al ZIP DANE o sugerir Corabastos.
+ *
+ * @param {string} action — uno de PRECIO_SIPSA_ACTIONS
+ * @param {object} [args] — body adicional (producto, fecha, etc.)
+ * @returns {Promise<null | object>}
+ */
+export async function getPrecioSipsa(action, args) {
+  if (!action || typeof action !== 'string' || !PRECIO_SIPSA_ACTIONS.has(action)) {
+    console.debug('[sidecar] get_precio_sipsa action inválida', action);
+    return null;
+  }
+  return callTool('get_precio_sipsa', { action, ...(args || {}) });
+}
+
 // Export interno para testabilidad — los tests pueden assertear el set
 // sin tener que reflectar la closure.
-export const __TEST__ = { ALLOWED_TOOLS, getBaseUrl, getToken };
+export const __TEST__ = {
+  ALLOWED_TOOLS,
+  NORMATIVA_ICA_ACTIONS,
+  CLIMA_IDEAM_ACTIONS,
+  PRECIO_SIPSA_ACTIONS,
+  getBaseUrl,
+  getToken,
+};
