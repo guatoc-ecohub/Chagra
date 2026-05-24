@@ -62,29 +62,37 @@ import { analyzeQueryComplexity } from './queryComplexityAnalyzer';
 /** @type {Record<LLMTask, ModelRoute>} */
 export const ROUTES = {
   chat: {
-    // Bench nocturno 2026-05-24 (DR bench-modelos-nocturno-2026-05-24.md):
-    // llama3.1:8b ranked #2 con tools (44% anti-halluc, 0 halluc flags, 12.9s lat),
-    // mientras gemma3:4b quedó #4 (40% AH). Sin sacrificar latencia significativa
-    // (mismo orden de magnitud) ganamos 4 puntos AH. Override via env
-    // VITE_LLM_CHAT_MODEL para volver a gemma3:4b si necesitamos comparar.
+    // Swap 2026-05-24 (post-bug "Shoeachi"/Choachí + recomendaciones erradas):
+    // promoviendo granite3.1-dense:8b (#1 bench Phase C con tools, 56% AH) al
+    // baseline chat. llama3.1:8b (#2, 44% AH) se retira — diferencia 12 puntos
+    // AH es la única solución para mitigar alucinaciones geográficas + piso
+    // térmico observadas en producción. Plus: usar el mismo modelo para chat
+    // simple y complex elimina el cold-start cuando router escala (no hay 2do
+    // modelo que cargar). Tradeoff: +11.8s latencia (24.7s vs 12.9s),
+    // amortizado por UX queueing PR #1031 + tip flotante (próximo PR).
+    // Override via env VITE_LLM_CHAT_MODEL para experimentos.
     model:
       (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_LLM_CHAT_MODEL) ||
-      'llama3.1:8b',
+      'granite3.1-dense:8b',
     keep_alive_min: 30,
     temperature: 0.3,
     max_tokens: 512,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Bench nocturno 2026-05-24 (8h, 100 prompts × 8 finalistas con tools+AGE): ' +
-      'llama3.1:8b ranked #2 (44% anti-halluc, 0 halluc flags, 12.9s avg). ' +
-      'gemma3:4b ranked #4 (40% AH, 11.7s) — diferencia 4 puntos AH a costo ' +
-      '~1s latencia. Aplicación de intelligence-first principle: priorizar ' +
-      'anti-alucinación sobre velocidad marginal. ~5 GB VRAM (vs 4 GB gemma3:4b), ' +
-      'aún cabe vision on-demand. keep_alive=30m. ' +
-      'Override env: VITE_LLM_CHAT_MODEL para experimentos. ' +
-      'Routing dual 2026-05-23: queries "complex" (plagas regionales, ' +
-      'pasifloras, planes multi-aspecto, queries largas) caen a `chat_complex` ' +
-      'route con granite3.1-dense:8b (#1 ranking bench, 56% AH).',
+      'Swap 2026-05-24 post-bug producción: granite3.1-dense:8b promovido a ' +
+      'baseline chat. Bench nocturno Phase C (100 prompts con tools+AGE): ' +
+      'granite3.1-dense:8b #1 (56% AH, 0 halluc flags, 24.7s lat) vs ' +
+      'llama3.1:8b #2 (44% AH, 12.9s) y gemma3:4b #4 (40% AH, 11.7s). ' +
+      '12 puntos AH de mejora justifican +11.8s latencia bajo intelligence-first ' +
+      'principle (memoria feedback-intelligence-first-never-shrink-models). ' +
+      'Mismo modelo chat + chat_complex evita cold-start en escalado complex. ' +
+      'VRAM: ~5 GB (más chico que llama 6.2 GB) → libera ~1.2 GB para Kokoro ' +
+      'CUDA cuando se re-active (PR #112 rollback temporal hasta este swap). ' +
+      'keep_alive=30m. Override env: VITE_LLM_CHAT_MODEL para experimentos. ' +
+      'Bugs que mitiga: Choachí confundido con "Shoeachi" + Sibundoy, café ' +
+      'supremo asumido como variedad, mango como sombra a 2400 msnm, ' +
+      'Tabebuia rosea como "roble", Inga edulis como "guayabo". Todos ' +
+      'derivados de llama ignorando evidence de tools.',
   },
   chat_complex: {
     // Override por env para que el operador pueda probar gemma3:12b u otros
