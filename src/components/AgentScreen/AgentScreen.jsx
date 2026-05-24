@@ -28,6 +28,7 @@ import { agentSounds } from '../../services/agentSoundService';
 import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
 import useAgentNotificationStore from '../../store/useAgentNotificationStore';
+import useOllamaWarmStore from '../../store/useOllamaWarmStore';
 import useFincaActiveStore from '../../services/fincaActiveStore';
 
 // 2026-05-16: migrado a llmRouter (Multi-LLM por tarea). AgentScreen usa
@@ -49,6 +50,13 @@ export default function AgentScreen({ onBack }) {
   const setResponseReady = useAgentNotificationStore((s) => s.setResponseReady);
   const setLastNotificationMessage = useAgentNotificationStore((s) => s.setLastMessage);
   const markRead = useAgentNotificationStore((s) => s.markRead);
+  // NN4 fix 2026-05-23: subscripción al store warm-up. Si el modelo todavía
+  // no está caliente cuando el operador llega al agente, mostramos banner
+  // pequeño "Preparando agente IA". El banner desaparece automáticamente
+  // cuando status pasa a 'warm'. En status 'failed' tampoco mostramos el
+  // banner — la primera query caerá al cold-start clásico con su propio
+  // indicador ("pensando...") que ya cubre la espera percibida.
+  const ollamaWarmStatus = useOllamaWarmStore((s) => s.status);
   const plants = useAssetStore((s) => s.plants);
   // 062.6: contexto finca activa para system prompt (zona biocultural,
   // altitud, override indoor invernadero).
@@ -1058,6 +1066,29 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
           <p className="text-xs text-slate-300" data-testid="fresh-session-badge">
             Nueva conversación. El historial anterior queda guardado pero no se
             incluye en el contexto.
+          </p>
+        </div>
+      )}
+
+      {/* NN4 fix 2026-05-23: banner pequeño cuando el modelo Ollama todavía
+          se está calentando (warm-up disparado en login pero aún no completó).
+          Aparece solo en status 'unknown' o 'warming' — en 'warm' o 'failed'
+          queda oculto. Se mostraría típicamente si el operador navega al
+          agente MUY rápido tras login antes que termine el warm-up (~25-40s
+          en GPU M6000). Spinner CSS con animación spin de Tailwind. */}
+      {(ollamaWarmStatus === 'warming' || ollamaWarmStatus === 'unknown') && (
+        <div
+          className="px-4 py-2 mx-4 mt-2 rounded-lg bg-amber-900/30 border border-amber-800/50 flex items-center gap-2"
+          data-testid="ollama-warming-banner"
+          role="status"
+          aria-live="polite"
+        >
+          <span
+            className="w-3 h-3 rounded-full border-2 border-amber-400 border-t-transparent animate-spin shrink-0"
+            aria-hidden="true"
+          />
+          <p className="text-xs text-amber-300">
+            Preparando agente IA (~20s)…
           </p>
         </div>
       )}
