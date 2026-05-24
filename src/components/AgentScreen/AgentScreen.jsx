@@ -30,6 +30,7 @@ import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
 import useAgentNotificationStore from '../../store/useAgentNotificationStore';
 import useOllamaWarmStore from '../../store/useOllamaWarmStore';
+import useAgentQueueStore from '../../store/useAgentQueueStore';
 import useFincaActiveStore from '../../services/fincaActiveStore';
 
 // 2026-05-16: migrado a llmRouter (Multi-LLM por tarea). AgentScreen usa
@@ -58,6 +59,12 @@ export default function AgentScreen({ onBack }) {
   // banner — la primera query caerá al cold-start clásico con su propio
   // indicador ("pensando...") que ya cubre la espera percibida.
   const ollamaWarmStatus = useOllamaWarmStore((s) => s.status);
+  // Task #121: queue UX del agente. Permite 2 preguntas max (1 procesando +
+  // 1 pendiente). 3ra rechazada con toast claro. ETA dinámico basado en
+  // EMA de latencia por modelo (llama3.1:8b ~12.9s, granite3.1-dense:8b
+  // ~24.7s — bench nocturno 2026-05-24).
+  const queueProcessing = useAgentQueueStore((s) => s.processing);
+  const queuePending = useAgentQueueStore((s) => s.pending);
   const plants = useAssetStore((s) => s.plants);
   // 062.6: contexto finca activa para system prompt (zona biocultural,
   // altitud, override indoor invernadero).
@@ -80,6 +87,19 @@ export default function AgentScreen({ onBack }) {
   // token, abortamos automáticamente con error visible.
   const [showSlowWarning, setShowSlowWarning] = useState(false);
   const [llmHealthy, setLlmHealthy] = useState(true);
+  // Task #121: countdown ETA. Lo guardamos en state aparte porque
+  // re-renderea cada segundo via setInterval mientras hay processing —
+  // si lo leyéramos directo del store con selector, no se re-evalúa
+  // hasta que el store hace `set()`. Aquí: el store es la fuente del
+  // expectedEtaMs; este state local es solo el snapshot del tick actual.
+  const [remainingMs, setRemainingMs] = useState(null);
+  // Hint "puedes hacer X mientras esperas" dismissible. Si el operador
+  // lo cierra una vez, no se lo volvemos a mostrar en esta sesión —
+  // ya entendió la idea. Se resetea solo al re-mount del componente.
+  const [hintDismissed, setHintDismissed] = useState(false);
+  // Toast de rechazo de la 3ra pregunta. Auto-dismiss a 4s para no
+  // bloquear el input visualmente.
+  const [queueRejectedToast, setQueueRejectedToast] = useState('');
 
   const { durationMs, start: startRecord, stop: stopRecord, reset: resetRecord } = useVoiceRecorder();
   const chatEndRef = useRef(null);
@@ -186,6 +206,12 @@ export default function AgentScreen({ onBack }) {
     setError('');
     setStreamingContent('');
     setShowFreshSessionBadge(true);
+    // Task #121: reset también el queue. Si el operador pide nueva
+    // conversación, cualquier pregunta pendiente queda huérfana — el
+    // contexto cambió y procesarla en serie respondería con system
+    // prompt distinto al esperado.
+    useAgentQueueStore.getState().reset();
+    setQueueRejectedToast('');
   }, [operatorId]);
 
   // Bug 2026-05-18: warning timer cuando STATE_THINKING dura >20s sin tokens
@@ -200,6 +226,30 @@ export default function AgentScreen({ onBack }) {
     const slowTimer = setTimeout(() => setShowSlowWarning(true), 20000);
     return () => clearTimeout(slowTimer);
   }, [state]);
+
+  // Task #121: countdown ETA. Tick cada 1s mientras haya processing.
+  // Se desmonta automáticamente cuando processing pasa a null o el
+  // componente se desmonta.
+  useEffect(() => {
+    if (!queueProcessing) {
+      setRemainingMs(null);
+      return undefined;
+    }
+    const tick = () => {
+      const r = useAgentQueueStore.getState().getRemainingMs();
+      setRemainingMs(r);
+    };
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [queueProcessing]);
+
+  // Task #121: auto-dismiss del toast de rechazo a 4s.
+  useEffect(() => {
+    if (!queueRejectedToast) return undefined;
+    const t = setTimeout(() => setQueueRejectedToast(''), 4000);
+    return () => clearTimeout(t);
+  }, [queueRejectedToast]);
 
   // Bug 2026-05-18: health check del LLM al mount. Si /api/ollama/api/tags
   // no responde en 5s, marcamos llmHealthy=false y avisamos al operador
@@ -223,6 +273,11 @@ export default function AgentScreen({ onBack }) {
     setState(STATE_IDLE);
     setStreamingContent('');
     setError('Cancelado. Toca de nuevo si quieres reintentar.');
+    // Task #121: al cancelar manualmente, descartamos también la pregunta
+    // pendiente (si la hubiera) — el operador puede re-encolarla, pero
+    // si presionó Cancelar es porque quiere cortar la cadena, no que
+    // sigamos con la siguiente automáticamente.
+    useAgentQueueStore.getState().reset();
   };
 
   useEffect(() => {
@@ -259,6 +314,11 @@ export default function AgentScreen({ onBack }) {
       // Limpiar callback al desmontar para evitar referencias stale
       setActionGateCallback(null);
       actionGateResolverRef.current = null;
+      // Task #121: el queue es efímero por mount del AgentScreen. Si el
+      // operador sale a otra pantalla, las preguntas pendientes se
+      // descartan — pretender que las respondemos minutos después con
+      // contexto distinto sería peor UX que pedir reformular.
+      useAgentQueueStore.getState().reset();
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
@@ -574,6 +634,12 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
   // modelos no hagan cold-load entre conversaciones.
   const LLM_TIMEOUT_MS = 60000;
 
+  // Task #121: safety cap del while loop que drena el queue. Con QUEUE_MAX=2
+  // (1 processing + 1 pending) jamás debería haber más de 2 iteraciones,
+  // pero ponemos 10 como guard defensivo contra cualquier bug futuro que
+  // permita encolar más sin detectar (evita loops infinitos en producción).
+  const QUEUE_DRAIN_MAX = 10;
+
   // Cap defensivo para inyectar evidencia del sidecar como context turn
   // sin reventar la ventana 4096 tokens. ~1500 chars ≈ 400-500 tokens —
   // deja sitio cómodo para system prompt + corpus RAG + historial + query.
@@ -842,16 +908,11 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     }
   };
 
-  const handleSubmit = async (text, { fromVoice = false } = {}) => {
-    if (!text.trim()) return;
-    // Re-entry guard: rechaza submits concurrentes. Permitimos `fromVoice`
-    // como excepción porque `handleVoiceRecord` ya seteó STATE_THINKING
-    // antes de await transcribe(blob), por lo que cuando llega acá `state`
-    // NO es IDLE (closure capturó STATE_RECORDING). Bug previo: el guard
-    // `state !== STATE_IDLE` rechazaba la llamada → UI quedaba en pensando
-    // sin disparar el LLM (race de closure + async state).
-    if (!fromVoice && state !== STATE_IDLE) return;
-
+  // Task #121: pipeline LLM extraído de handleSubmit. Ejecuta el flow
+  // completo (RAG, sidecar, LLM, TTS, action gate) para UN solo texto.
+  // No toca el queue store — eso lo hace handleSubmit antes/después.
+  // Tampoco hace re-entry guard porque el queue ya garantiza serialización.
+  const runAgentPipeline = async (text) => {
     const userMessage = {
       role: 'user',
       content: text.trim(),
@@ -1069,6 +1130,82 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     } finally {
       setState(STATE_IDLE);
       setStreamingContent('');
+    }
+  };
+
+  // Task #121: puerta de entrada al pipeline. Gestiona queueing (max 2),
+  // ETA, hint paralelo, rechazo de 3ras. Si la pregunta entra como
+  // processing, ejecuta runAgentPipeline + al terminar promueve cualquier
+  // pending. Si entra como queued, solo agrega visualmente el mensaje al
+  // chat (lo procesará la promoción cuando termine el actual). Si entra
+  // rejected, muestra toast.
+  const handleSubmit = async (text, { fromVoice = false } = {}) => {
+    if (!text || !text.trim()) return;
+    const trimmed = text.trim();
+
+    // El queue ya serializa. NO replicamos el guard `state !== STATE_IDLE`
+    // del flow previo — eso hacía que la 2da pregunta se perdiera sin
+    // feedback. El parámetro `fromVoice` queda como hint semántico para
+    // futuras políticas (e.g. voice → priority? hoy no se usa).
+    void fromVoice;
+
+    const route = selectChatRoute(trimmed);
+    const result = useAgentQueueStore.getState().enqueue(trimmed, route);
+
+    if (result.status === 'rejected') {
+      if (result.reason === 'queue_full') {
+        setQueueRejectedToast(result.message);
+        agentSounds.cancel();
+      }
+      return;
+    }
+
+    if (result.status === 'queued') {
+      // El operador ya escribió la pregunta — mostrarla en el chat como
+      // burbuja "pending" para que sienta que el sistema la escuchó. El
+      // procesamiento real arrancará cuando termine la actual via
+      // promoción en el finally del pipeline.
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'user',
+          content: trimmed,
+          timestamp: Date.now(),
+          _queued: true,
+        },
+      ]);
+      return;
+    }
+
+    // status === 'started' → arrancar pipeline para este texto y luego
+    // drenar el pending (si hay) en serie.
+    let currentText = trimmed;
+    let safety = 0;
+    while (currentText && safety < QUEUE_DRAIN_MAX) {
+      safety += 1;
+      let pipelineFailed = false;
+      try {
+        await runAgentPipeline(currentText);
+      } catch (pipelineErr) {
+        // runAgentPipeline ya captura todo internamente; este catch es
+        // defensivo (e.g. error fuera del try interno). Marcamos failed
+        // explícito para no contaminar EMA con latencias de muestras
+        // que no representan inferencia exitosa.
+        pipelineFailed = true;
+        console.warn('[Agent] pipeline outer catch (defensive):', pipelineErr?.message);
+      }
+      const promoted = useAgentQueueStore.getState().completeProcessing({
+        failed: pipelineFailed,
+      });
+      if (!promoted) {
+        currentText = null;
+        break;
+      }
+      // Corregir el route del promoted con su query real (al promover
+      // lo pusimos como 'chat' por default).
+      const promotedRoute = selectChatRoute(promoted.prompt);
+      useAgentQueueStore.getState().updateProcessingRoute(promoted.id, promotedRoute);
+      currentText = promoted.prompt;
     }
   };
 
@@ -1293,14 +1430,26 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Escribe tu pregunta..."
-            disabled={state !== STATE_IDLE}
+            placeholder={
+              queuePending.length >= 1
+                ? 'Espera — ya hay una en cola'
+                : queueProcessing
+                  ? 'Adelanta otra pregunta (cola: 1 más)'
+                  : 'Escribe tu pregunta...'
+            }
+            disabled={state === STATE_RECORDING || queuePending.length >= 1}
+            data-testid="agent-input"
             className="flex-1 px-4 py-3 rounded-full bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-violet-500/50 disabled:opacity-50"
           />
 
           <button
             type="submit"
-            disabled={!inputText.trim() || state !== STATE_IDLE}
+            disabled={
+              !inputText.trim() ||
+              state === STATE_RECORDING ||
+              queuePending.length >= 1
+            }
+            data-testid="agent-submit"
             className="shrink-0 w-12 h-12 rounded-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
           >
             <Send size={18} className="text-white" />
@@ -1315,15 +1464,90 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
 
         {state === STATE_THINKING && (
           <div className="flex flex-col items-center gap-2 mt-2">
-            <p className={`text-center text-xs ${showSlowWarning ? 'text-amber-400' : 'text-violet-400'}`}>
-              {showSlowWarning ? 'Chagra IA sigue pensando — toca Cancelar si quieres reintentar' : 'Chagra IA está pensando…'}
+            <p
+              className={`text-center text-xs ${showSlowWarning ? 'text-amber-400' : 'text-violet-400'}`}
+              data-testid="eta-label"
+            >
+              {(() => {
+                if (showSlowWarning) {
+                  return 'Chagra IA sigue pensando — toca Cancelar si quieres reintentar';
+                }
+                // ETA visible. Si remainingMs es null o el item recién arrancó
+                // sin haber medido aún, caemos a "Procesando tu pregunta…".
+                if (remainingMs !== null && queueProcessing) {
+                  const expected = queueProcessing.expectedEtaMs;
+                  const elapsed = expected - remainingMs;
+                  const overshoot = elapsed > expected * 1.5;
+                  const stretching = elapsed > expected;
+                  // Verde si < ema, ámbar si entre 1x-1.5x ema, rojo si > 1.5x.
+                  // El color lo aplicamos a un span aparte para mantener el
+                  // texto general en violeta.
+                  const secsLeft = Math.max(0, Math.ceil(remainingMs / 1000));
+                  if (overshoot) {
+                    return `Tardando más de lo normal (${Math.floor(elapsed / 1000)}s ya)`;
+                  }
+                  if (stretching) {
+                    return `Casi listo… (${Math.floor(elapsed / 1000)}s)`;
+                  }
+                  return `Procesando tu pregunta… ~${secsLeft}s`;
+                }
+                return 'Chagra IA está pensando…';
+              })()}
             </p>
+            {queuePending.length >= 1 && (
+              <p
+                className="text-center text-[10px] text-violet-300"
+                data-testid="queue-pending-badge"
+              >
+                Tienes 1 pregunta en cola — te respondo después de la actual.
+              </p>
+            )}
+            {!hintDismissed && (
+              <div
+                className="mt-1 px-3 py-2 rounded-lg bg-slate-800/60 border border-slate-700/60 flex items-start gap-2 max-w-sm"
+                data-testid="parallel-hint"
+              >
+                <Sparkles size={14} className="text-violet-400 shrink-0 mt-0.5" />
+                <p className="text-[11px] text-slate-300 leading-snug flex-1">
+                  Mientras espero, puedes registrar una planta, revisar tu
+                  historial o tomar una foto IoT — sigues sin perder esta
+                  respuesta.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setHintDismissed(true)}
+                  aria-label="Cerrar sugerencia"
+                  className="text-[10px] text-slate-500 hover:text-slate-300 shrink-0 leading-none"
+                >
+                  ×
+                </button>
+              </div>
+            )}
             <button
               type="button"
               onClick={handleCancelLLM}
               className="text-[10px] px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 active:scale-95 transition-all"
             >
               Cancelar
+            </button>
+          </div>
+        )}
+
+        {queueRejectedToast && (
+          <div
+            className="mt-2 px-3 py-2 rounded-lg bg-amber-900/40 border border-amber-700/60 flex items-center gap-2"
+            data-testid="queue-rejected-toast"
+            role="status"
+            aria-live="polite"
+          >
+            <p className="text-xs text-amber-300 flex-1">{queueRejectedToast}</p>
+            <button
+              type="button"
+              onClick={() => setQueueRejectedToast('')}
+              aria-label="Cerrar aviso"
+              className="text-amber-400 hover:text-amber-200 text-sm leading-none"
+            >
+              ×
             </button>
           </div>
         )}
