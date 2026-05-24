@@ -10,10 +10,16 @@ const DB_PATH = path.join(__dirname, '../public/catalog.sqlite');
 // reales del agente en producción. Vuelve al corpus full 496 mientras
 // curamos un subset que incluya top-N species por uso real efectivo.
 //
+// 2026-05-24: re-curado completado. Subset v3.2 (105 species) cubre frutales
+// mayor + pasifloras + hortalizas comunes + tubérculos andinos + cereales/
+// leguminosas + medicinales base familiar + asocios + sombrío café + páramo
+// + amazónicos estratégicos. v3.1 conservado para rollback. Ver
+// catalog/SUBSET_OSS_V3.2_RATIONALE.md.
+//
 // Override env (contrato preservado): CHAGRA_SEED=<filename> regenera con
-// otro seed. Útil cuando esté el subset bien curado.
+// otro seed (ej. corpus full para chagra-pro o rollback al subset v3.1).
 const CATALOG_DIR = path.join(__dirname, '../catalog');
-const DEFAULT_SEED = 'chagra-catalog-seed-v3.1.json';
+const DEFAULT_SEED = 'chagra-catalog-oss-subset-v3.2.json';
 const SEED_FILE = process.env.CHAGRA_SEED
   ? path.basename(process.env.CHAGRA_SEED)
   : DEFAULT_SEED;
