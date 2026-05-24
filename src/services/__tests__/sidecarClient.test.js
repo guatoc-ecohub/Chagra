@@ -295,6 +295,13 @@ describe('sidecarClient — feature flag on', () => {
       expect(fetchMock.mock.calls[0][0]).toBe('/api/mcp/agro/tools/get_pest_controllers');
     });
 
+    it('tools nuevos chagra-pro #64/#65/#66 (ICA/IDEAM/SIPSA) están en whitelist', async () => {
+      const { __TEST__ } = await importFresh();
+      expect(__TEST__.ALLOWED_TOOLS.has('get_normativa_ica')).toBe(true);
+      expect(__TEST__.ALLOWED_TOOLS.has('get_clima_ideam')).toBe(true);
+      expect(__TEST__.ALLOWED_TOOLS.has('get_precio_sipsa')).toBe(true);
+    });
+
     it('5xx → null sin throw', async () => {
       fetchMock.mockResolvedValueOnce(jsonResponse(500, { error: 'kg down' }));
       const { callTool } = await importFresh();
@@ -335,6 +342,74 @@ describe('sidecarClient — feature flag on', () => {
       await planNlu('test');
       const headers = fetchMock.mock.calls[0][1].headers;
       expect('X-Chagra-Token' in headers).toBe(false);
+    });
+  });
+
+  describe('wrappers ICA / IDEAM / SIPSA (chagra-pro #64/#65/#66)', () => {
+    it('getNormativaIca rechaza action inválida sin fetch', async () => {
+      const { getNormativaIca } = await importFresh();
+      expect(await getNormativaIca('delete_database', {})).toBeNull();
+      expect(await getNormativaIca('', {})).toBeNull();
+      expect(await getNormativaIca(null, {})).toBeNull();
+      expect(await getNormativaIca(42, {})).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('getNormativaIca con action válida hace POST a /tools/get_normativa_ica con action en body', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, { resolutions: [] }));
+      const { getNormativaIca } = await importFresh();
+      const res = await getNormativaIca('latest_active_ingredients', { limit: 10 });
+      expect(res).toEqual({ resolutions: [] });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const [url, opts] = fetchMock.mock.calls[0];
+      expect(url).toBe('/api/mcp/agro/tools/get_normativa_ica');
+      expect(JSON.parse(opts.body)).toEqual({ action: 'latest_active_ingredients', limit: 10 });
+    });
+
+    it('getClimaIdeam valida shape de action (rechaza inválidas, acepta válidas)', async () => {
+      const { getClimaIdeam, __TEST__ } = await importFresh();
+      // Inválidas → null sin fetch
+      expect(await getClimaIdeam('drop_table', { municipio: 'Bogotá' })).toBeNull();
+      expect(await getClimaIdeam(undefined, {})).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+      // Set autoritativo de actions
+      expect(__TEST__.CLIMA_IDEAM_ACTIONS.has('monthly_avg')).toBe(true);
+      expect(__TEST__.CLIMA_IDEAM_ACTIONS.has('stations_near')).toBe(true);
+      expect(__TEST__.CLIMA_IDEAM_ACTIONS.has('climate_series')).toBe(true);
+      expect(__TEST__.CLIMA_IDEAM_ACTIONS.has('anomalies')).toBe(true);
+      // Válida → hace fetch
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, { avg_precipitation_mm: 142.3 }));
+      const res = await getClimaIdeam('monthly_avg', {
+        municipio: 'Mosquera',
+        metric: 'precipitation',
+        desde: '2026-04-24',
+      });
+      expect(res).toEqual({ avg_precipitation_mm: 142.3 });
+      const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+      expect(body.action).toBe('monthly_avg');
+      expect(body.municipio).toBe('Mosquera');
+    });
+
+    it('getPrecioSipsa devuelve null si flag off (no fetch)', async () => {
+      disableFlag();
+      const { getPrecioSipsa } = await importFresh();
+      const res = await getPrecioSipsa('latest_price', { producto: 'tomate' });
+      expect(res).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('getPrecioSipsa happy path con action válida pasa metadata-ZIP del DANE', async () => {
+      const sipsaMeta = {
+        action: 'dataset_metadata',
+        dataset: 'precios-mayoristas-sipsa',
+        zip_url: 'https://www.dane.gov.co/files/.../sipsa.zip',
+        notes: 'federated, ZIP only',
+      };
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, sipsaMeta));
+      const { getPrecioSipsa } = await importFresh();
+      const res = await getPrecioSipsa('dataset_metadata', {});
+      expect(res).toEqual(sipsaMeta);
+      expect(fetchMock.mock.calls[0][0]).toBe('/api/mcp/agro/tools/get_precio_sipsa');
     });
   });
 });
