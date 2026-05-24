@@ -12,6 +12,7 @@ import { initCatalog } from './db/catalogDB';
 import NetworkStatusBar from './components/NetworkStatusBar';
 import PendingTasksWidget from './components/PendingTasksWidget';
 import SyncProgressIndicator from './components/common/SyncProgressIndicator';
+import useOllamaWarmStore from './store/useOllamaWarmStore';
 // FieldFeedback ya no se monta globalmente en App; vive embebido en
 // HelpUsoScreen como sección de Ayuda (decisión 2026-05-21, ver
 // comentario abajo donde se removió el render).
@@ -334,42 +335,25 @@ export default function App() {
     });
   }, []);
 
-  // N5 fix 2026-05-23: pre-warm Ollama gemma3:4b al boot post-dashboard.
-  // Playwright detectó cold-start de 116s en la primera query del agente
-  // porque Ollama carga el modelo en GPU bajo demanda (4.6 GB VRAM). Pre-warm
-  // dispara POST silente con prompt mínimo + keep_alive=30m → modelo queda
-  // hot. Si falla, transparente (degrada al cold-start clásico). Solo
-  // post-dashboard (no login) para no consumir GPU si user no llega a usar
-  // el agente. Una sola vez por sesión de tab (useEffect deps cuidadas).
-  const [ollamaPrewarmed, setOllamaPrewarmed] = useState(false);
+  // NN4 fix 2026-05-23: pre-warm Ollama gemma3:4b se dispara al LOGIN
+  // SUCCESS (LoginScreen → useOllamaWarmStore.startWarmup()), NO al
+  // dashboard. Esto da ~15-30s de margen humano antes que el operador
+  // llegue al agente, eliminando el cold-start 116s observado en
+  // Playwright Q1 curuba 2026-05-23.
+  //
+  // Este useEffect es FALLBACK para el caso de re-mount sin login (ej.
+  // tab refresh con sesión persistida en localStorage que arranca directo
+  // al dashboard). Solo dispara si status==='unknown'. Si LoginScreen ya
+  // disparó el warm-up (caso normal), el store devuelve early y no se
+  // hace request duplicado. Si Ollama falla o tarda, el banner del agente
+  // muestra "Preparando agente IA" hasta que warm-up complete.
   useEffect(() => {
-    if (currentView !== 'dashboard' || ollamaPrewarmed) return;
-    let cancelled = false;
-    const prewarm = async () => {
-      try {
-        await fetch('/api/ollama/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'gemma3:4b',
-            prompt: 'ok',
-            stream: false,
-            keep_alive: '30m',
-            options: { num_predict: 1 },
-          }),
-          signal: AbortSignal.timeout(150000),
-        });
-        if (!cancelled) {
-          console.debug('[App] ollama gemma3:4b pre-warm OK');
-          setOllamaPrewarmed(true);
-        }
-      } catch (err) {
-        if (!cancelled) console.debug('[App] ollama pre-warm degradó (cold-start clásico):', err?.message);
-      }
-    };
-    prewarm();
-    return () => { cancelled = true; };
-  }, [currentView, ollamaPrewarmed]);
+    if (currentView !== 'dashboard') return;
+    const { status, startWarmup } = useOllamaWarmStore.getState();
+    if (status === 'unknown') {
+      startWarmup();
+    }
+  }, [currentView]);
 
   // 2026-05-18 (operator request): la imagen de fondo agroecológica de
   // /biodiversidad-bg.jpg que está en la pestaña Biodiversidad se aplica

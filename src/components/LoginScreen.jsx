@@ -7,6 +7,7 @@ import { version as APP_VERSION } from '../../package.json';
 import ChagraGrowLoader from './ChagraGrowLoader';
 import LegalLinks from './LegalLinks';
 import WelcomeStatsHero from './WelcomeStatsHero';
+import useOllamaWarmStore from '../store/useOllamaWarmStore';
 
 export default function LoginScreen({ onLoginSuccess, onSave }) {
   const [creds, setCreds] = useState({ username: '', password: '' });
@@ -58,6 +59,21 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
         setActiveTenantId(creds.username);
       } catch (err) {
         console.warn('[LoginScreen] setActiveTenantId failed:', err);
+      }
+      // NN4 fix 2026-05-23: disparar pre-warm Ollama gemma3:4b ANTES de
+      // navegar al dashboard. Esto da ~15-30s de margen humano (el operador
+      // mira el dashboard, escoge una tile, abre el agente) durante los
+      // cuales el modelo se carga en GPU en background. Sin esto, la
+      // primera query al agente caía al cold-start 116s. Fire-and-forget:
+      // el store maneja el estado, AgentScreen lo lee y muestra banner si
+      // todavía está warming cuando el operador llega al agente.
+      // Idempotente: si por alguna razón se llama 2 veces, el store
+      // dedupea internamente.
+      try {
+        useOllamaWarmStore.getState().startWarmup();
+      } catch (err) {
+        // No bloquear login si falla (ej. tests sin fetch global).
+        console.warn('[LoginScreen] ollama warm-up dispatch failed:', err);
       }
       setLoading(false);
       onLoginSuccess();
