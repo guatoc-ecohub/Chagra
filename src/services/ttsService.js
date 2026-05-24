@@ -6,6 +6,148 @@
  */
 
 /**
+ * Task #124 (2026-05-24): voces Kokoro curadas para español.
+ *
+ * Kokoro-82M expone 53 voces. Las que llevan prefix `ef_` (English Female)
+ * o `em_` (English Male) sintetizan español tomando el modelo fonético
+ * inglés como base, por lo que tienden a sonar con "acento gringo" al
+ * hablar castellano. El operador reportó que el default `ef_dora` no
+ * suena naturalmente colombiana en finca.
+ *
+ * NO podemos verificar acento real desde el cliente (eso es operator-
+ * action: probar samples y elegir). Curamos un set acotado de candidatas
+ * que la comunidad upstream (kokoro/VOICES.md) reporta como las más
+ * neutras / menos marcadamente anglo al sintetizar lenguas romances:
+ *
+ *   - `ef_dora`   : default histórico, voz femenina suave. Operador la
+ *                   reporta como "gringa". La dejamos como opción porque
+ *                   algunos usuarios ya se acostumbraron a su tono.
+ *   - `ef_aoede`  : reportada como una de las voces femeninas más
+ *                   neutras/musicales (Aoede = musa griega). Buen
+ *                   candidato para "acento más neutro hispano".
+ *   - `ef_kore`   : voz femenina firme, articulación clara. Buena para
+ *                   instrucciones de campo donde se necesita claridad
+ *                   por ruido ambiente (motosierra, viento).
+ *   - `em_alex`   : voz masculina cálida, articulación clara. Alternativa
+ *                   para operadores que prefieren voz masculina.
+ *
+ * Esta lista NO es exhaustiva; el operador puede experimentar con las
+ * otras voces ef_ / em_ en futuras iteraciones. Si descubrimos una voz
+ * específicamente colombiana en upstream, la agregamos acá.
+ */
+export const KOKORO_VOICES = Object.freeze([
+  {
+    id: 'ef_dora',
+    label: 'Dora (femenina, default)',
+    description: 'Voz por defecto. Tono suave. Puede sentirse con acento anglo.',
+    gender: 'femenina',
+  },
+  {
+    id: 'ef_aoede',
+    label: 'Aoede (femenina, más neutra)',
+    description: 'Voz femenina musical. Acento hispano más neutro según comunidad.',
+    gender: 'femenina',
+  },
+  {
+    id: 'ef_kore',
+    label: 'Kore (femenina, articulación firme)',
+    description: 'Voz femenina con articulación clara. Buena para campo con ruido.',
+    gender: 'femenina',
+  },
+  {
+    id: 'em_alex',
+    label: 'Alex (masculina, cálida)',
+    description: 'Voz masculina cálida. Alternativa al perfil femenino.',
+    gender: 'masculina',
+  },
+]);
+
+export const DEFAULT_KOKORO_VOICE = 'ef_dora';
+export const DEFAULT_KOKORO_RATE = 0.9;
+export const KOKORO_RATE_MIN = 0.85;
+export const KOKORO_RATE_MAX = 1.1;
+
+const STORAGE_KEY_VOICE = 'chagra:tts:voice';
+const STORAGE_KEY_RATE = 'chagra:tts:rate';
+
+const VALID_VOICE_IDS = new Set(KOKORO_VOICES.map((v) => v.id));
+
+/**
+ * Task #124: lee la voz Kokoro preferida persistida en localStorage.
+ * Fallback al default si:
+ *   - localStorage no disponible (SSR, jsdom estricto, etc.)
+ *   - clave vacía / null
+ *   - valor no está en KOKORO_VOICES (defensivo contra valores corruptos
+ *     o de futuras versiones que removamos una voz)
+ */
+export function getPreferredVoice() {
+  try {
+    if (typeof localStorage === 'undefined') return DEFAULT_KOKORO_VOICE;
+    const stored = localStorage.getItem(STORAGE_KEY_VOICE);
+    if (stored && VALID_VOICE_IDS.has(stored)) return stored;
+    return DEFAULT_KOKORO_VOICE;
+  } catch (_) {
+    return DEFAULT_KOKORO_VOICE;
+  }
+}
+
+/**
+ * Task #124: persiste la voz Kokoro preferida en localStorage.
+ * Valida contra KOKORO_VOICES antes de guardar — silenciosamente
+ * descarta ids desconocidos para evitar persistir basura.
+ *
+ * @returns {boolean} true si guardó, false si voz inválida o storage falló.
+ */
+export function setPreferredVoice(voiceId) {
+  if (!VALID_VOICE_IDS.has(voiceId)) return false;
+  try {
+    if (typeof localStorage === 'undefined') return false;
+    localStorage.setItem(STORAGE_KEY_VOICE, voiceId);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
+ * Task #124: lee la velocidad TTS preferida (rate) persistida.
+ * Clamp a [KOKORO_RATE_MIN, KOKORO_RATE_MAX] para defensa contra valores
+ * corruptos. Fallback a DEFAULT_KOKORO_RATE.
+ */
+export function getPreferredRate() {
+  try {
+    if (typeof localStorage === 'undefined') return DEFAULT_KOKORO_RATE;
+    const stored = localStorage.getItem(STORAGE_KEY_RATE);
+    if (stored === null) return DEFAULT_KOKORO_RATE;
+    const parsed = Number.parseFloat(stored);
+    if (!Number.isFinite(parsed)) return DEFAULT_KOKORO_RATE;
+    if (parsed < KOKORO_RATE_MIN) return KOKORO_RATE_MIN;
+    if (parsed > KOKORO_RATE_MAX) return KOKORO_RATE_MAX;
+    return parsed;
+  } catch (_) {
+    return DEFAULT_KOKORO_RATE;
+  }
+}
+
+/**
+ * Task #124: persiste la velocidad TTS preferida.
+ * Clamp + valida finito antes de guardar.
+ *
+ * @returns {boolean} true si guardó, false si valor inválido o storage falló.
+ */
+export function setPreferredRate(rate) {
+  if (!Number.isFinite(rate)) return false;
+  const clamped = Math.min(KOKORO_RATE_MAX, Math.max(KOKORO_RATE_MIN, rate));
+  try {
+    if (typeof localStorage === 'undefined') return false;
+    localStorage.setItem(STORAGE_KEY_RATE, String(clamped));
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
  * Limpia markdown del texto antes de mandarlo al TTS. Sin esto, kokoro y
  * SpeechSynthesis leen literal los caracteres de formato:
  *   "asterisco asterisco bold asterisco asterisco" en lugar de "bold",
@@ -219,7 +361,15 @@ export async function isKokoroAvailable() {
 }
 
 export async function speakKokoro(text, options = {}) {
-  const { voice = 'ef_dora', format = 'opus', lang = 'es' } = options;
+  // Task #124: si el caller NO pasa `voice` explícito, usar la voz
+  // preferida del operador desde localStorage (fallback ef_dora si
+  // no hay preferencia o storage inaccesible). Callers que pasan voice
+  // explícito (tests, casos avanzados) conservan ese override.
+  const {
+    voice = getPreferredVoice(),
+    format = 'opus',
+    lang = 'es',
+  } = options;
 
   stop();
 
@@ -335,4 +485,11 @@ export default {
   replayLast,
   getLastSpoken,
   init,
+  // Task #124: preferencias persistidas de voz Kokoro.
+  getPreferredVoice,
+  setPreferredVoice,
+  getPreferredRate,
+  setPreferredRate,
+  KOKORO_VOICES,
+  DEFAULT_KOKORO_VOICE,
 };
