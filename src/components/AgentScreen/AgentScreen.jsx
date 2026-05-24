@@ -1,8 +1,15 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX } from 'lucide-react';
+import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { transcribe } from '../../services/voiceService';
-import { addTurn, getFullHistory, getContextString, computeSourceMetadata } from '../../services/conversationMemory';
+import {
+  addTurn,
+  getFullHistory,
+  getContextString,
+  computeSourceMetadata,
+  clearMemory,
+  shouldStartNewSession,
+} from '../../services/conversationMemory';
 import { retrieve } from '../../services/ragRetriever';
 import { parseIntent, formatIntentDescription } from '../../services/agentIntentParser';
 import { streamOpenAI } from '../../services/openaiStream';
@@ -75,6 +82,20 @@ export default function AgentScreen({ onBack }) {
   // un Promise; el resolver vive aquí para que los handlers approve/reject/
   // edit puedan resolverlo cuando el operador interactúa.
   const actionGateResolverRef = useRef(null);
+  // Bug N3 (2026-05-23, Playwright Q8): cross-conversation contamination.
+  // Cuando el operador hace "Volver" y reabre AgentScreen, el remount cargaba
+  // history desde IndexedDB y `getContextString(operatorId, 10)` inyectaba
+  // turns viejos como contextMemory del LLM. Resultado: respuesta nueva
+  // mezclaba residuos de la pregunta anterior (Q3 broca café → Q8 flor
+  // aguacate respondía sobre broca).
+  //
+  // Fix: si gap temporal > SESSION_GAP_MS (30 min) desde último turn → arranca
+  // como "sesión nueva" silenciosa con badge UI + NO inyecta contextMemory en
+  // los primeros turns de esta mount. Si el operador prefiere reset explícito,
+  // el botón "Nueva conversación" en el header llama `clearMemory(operatorId)`
+  // y setea esta ref a true.
+  const isFreshSessionRef = useRef(false);
+  const [showFreshSessionBadge, setShowFreshSessionBadge] = useState(false);
 
   // Scroll fix 2026-05-18 operator feedback: 'scroll complicado a veces'.
   // Auto-scroll al fondo cuando hay mensaje nuevo o stream en curso, pero
@@ -96,6 +117,24 @@ export default function AgentScreen({ onBack }) {
 
   const loadHistory = useCallback(async () => {
     try {
+      // Bug N3 fix: detectar gap temporal > 30min ANTES de cargar history.
+      // Si pasó suficiente tiempo desde el último turn, esto es una nueva
+      // sesión — NO cargues history previo y marca el flag para suprimir
+      // contextMemory en los próximos submits del LLM.
+      const fresh = await shouldStartNewSession(operatorId);
+      if (fresh) {
+        isFreshSessionRef.current = true;
+        setMessages([]);
+        // Solo mostramos badge si HUBO historial previo. Si es el primer
+        // encuentro del operador con el agente, no inventamos UI sobre
+        // "nueva sesión" que no tendría referente.
+        const history = await getFullHistory(operatorId, 1);
+        setShowFreshSessionBadge(history.length > 0);
+        return;
+      }
+
+      isFreshSessionRef.current = false;
+      setShowFreshSessionBadge(false);
       const history = await getFullHistory(operatorId, 50);
       // 2026-05-19: detectar pregunta huérfana — si el último turn es del
       // usuario sin respuesta del agente, agregar mensaje informativo para
@@ -114,6 +153,30 @@ export default function AgentScreen({ onBack }) {
     } catch (e) {
       console.warn('[Agent] Failed to load history:', e);
     }
+  }, [operatorId]);
+
+  /**
+   * Reset explícito de conversación. Llamado por el botón "Nueva
+   * conversación" del header. Borra la memoria persistente del operador
+   * en IndexedDB, vacía el state local y marca esta sesión como fresca
+   * para que el próximo submit NO inyecte contextMemory residual.
+   *
+   * Decisión Opción A híbrida (PR fix/n3-cross-conv-contamination):
+   * gap temporal automático cubre el caso natural; el botón explícito
+   * cubre el caso N3 exacto del Playwright (Volver + reabrir RÁPIDO con
+   * tópico distinto) donde el gap es <30min.
+   */
+  const handleNewConversation = useCallback(async () => {
+    try {
+      await clearMemory(operatorId);
+    } catch (e) {
+      console.warn('[Agent] clearMemory failed (continuing with in-memory reset):', e);
+    }
+    isFreshSessionRef.current = true;
+    setMessages([]);
+    setError('');
+    setStreamingContent('');
+    setShowFreshSessionBadge(true);
   }, [operatorId]);
 
   // Bug 2026-05-18: warning timer cuando STATE_THINKING dura >20s sin tokens
@@ -635,9 +698,19 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     agentSounds.start();
 
     try {
+      // Bug N3 fix: en sesión fresca (gap >30min o reset explícito) NO
+      // inyectamos history previo como contextMemory del LLM. Tomamos
+      // snapshot del flag ANTES de addTurn para que la condición no
+      // dependa del orden de writes a IndexedDB. Tras este submit, los
+      // turns subsiguientes en esta mount sí incluyen contextMemory
+      // (que en ese punto sólo contiene los turns nuevos de la sesión).
+      const wasFreshSession = isFreshSessionRef.current;
+      isFreshSessionRef.current = false;
+      setShowFreshSessionBadge(false);
+
       await addTurn(operatorId, { role: 'user', content: text.trim() });
 
-      const contextMemory = await getContextString(operatorId, 10);
+      const contextMemory = wasFreshSession ? '' : await getContextString(operatorId, 10);
       const contextCorpus = await retrieve(text, 3, 'agente');
 
       // ADR-045 Fase 2 Step B/C — sidecar NLU + MCP tool grounding.
@@ -862,6 +935,27 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
             {state === STATE_IDLE && 'agente agroecológico'}
           </p>
         </div>
+        {/* Bug N3 fix (PR fix/n3-cross-conv-contamination 2026-05-23):
+            botón explícito "Nueva conversación". Llama clearMemory(operatorId)
+            + reset state + marca sesión fresca. Cubre el caso N3 exacto donde
+            el operador hace Volver + reabre rápido (<30min) con tópico distinto
+            y el gap temporal automático NO se dispararía. Sólo habilitado en
+            STATE_IDLE para no interrumpir streaming en curso. */}
+        <button
+          type="button"
+          onClick={handleNewConversation}
+          disabled={state !== STATE_IDLE || messages.length === 0}
+          className={`p-2 rounded-full transition-colors ${
+            state !== STATE_IDLE || messages.length === 0
+              ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
+              : 'bg-slate-800 text-slate-300 hover:bg-slate-700 active:scale-95'
+          }`}
+          title="Nueva conversación (borra historial)"
+          aria-label="Iniciar nueva conversación"
+          data-testid="new-conversation-btn"
+        >
+          <RotateCcw size={16} />
+        </button>
         <button
           type="button"
           disabled={!ttsSupported}
@@ -889,6 +983,19 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
           {isOnline ? 'Online' : 'Offline'}
         </div>
       </div>
+
+      {/* Bug N3 fix: badge "nueva sesión" cuando reseteamos por gap temporal
+          o por botón explícito. Sin esto el operador no entendería por qué su
+          history desapareció. Ephemeral — se borra al primer submit. */}
+      {showFreshSessionBadge && (
+        <div className="px-4 py-2 mx-4 mt-2 rounded-lg bg-slate-800/60 border border-slate-700/60 flex items-center gap-2">
+          <Sparkles size={14} className="text-violet-400 shrink-0" />
+          <p className="text-xs text-slate-300" data-testid="fresh-session-badge">
+            Nueva conversación. El historial anterior queda guardado pero no se
+            incluye en el contexto.
+          </p>
+        </div>
+      )}
 
       {/* Chat */}
       <ChatHistory
