@@ -21,6 +21,7 @@ import { isSidecarEnabled, planNlu, callTool, resolveEntities, getClimaIdeam } f
 import { FARM_CONFIG } from '../../config/defaults';
 import { speak, speakKokoro, stop, init as initTTS, isSupported, isKokoroAvailable, replayLast, isSpeaking } from '../../services/ttsService';
 import { executeAction, setActionGateCallback } from '../../services/actionExecutor';
+import { useRotatingTip } from '../../services/tipsService';
 import ChatHistory from './ChatHistory';
 import SuggestedActions from './SuggestedActions';
 import ActionConfirmModal from '../ActionConfirmModal';
@@ -97,6 +98,11 @@ export default function AgentScreen({ onBack }) {
   // lo cierra una vez, no se lo volvemos a mostrar en esta sesión —
   // ya entendió la idea. Se resetea solo al re-mount del componente.
   const [hintDismissed, setHintDismissed] = useState(false);
+  // Tip rotativo educativo mientras procesa. Reemplaza el hint estático
+  // "puedes registrar planta..." con tips cortos rotando 8s, dismissable.
+  // Bug 2026-05-24 operador reportó 4min de espera sin feedback útil.
+  const isThinking = state === STATE_THINKING;
+  const { tip: rotatingTip, dismiss: dismissTip } = useRotatingTip(isThinking);
   // Toast de rechazo de la 3ra pregunta. Auto-dismiss a 4s para no
   // bloquear el input visualmente.
   const [queueRejectedToast, setQueueRejectedToast] = useState('');
@@ -1502,22 +1508,30 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
                 Tienes 1 pregunta en cola — te respondo después de la actual.
               </p>
             )}
-            {!hintDismissed && (
+            {rotatingTip && !hintDismissed && (
               <div
-                className="mt-1 px-3 py-2 rounded-lg bg-slate-800/60 border border-slate-700/60 flex items-start gap-2 max-w-sm"
-                data-testid="parallel-hint"
+                className="mt-1 px-3 py-2 rounded-lg bg-slate-800/60 border border-slate-700/60 flex items-start gap-2 max-w-sm transition-opacity duration-300"
+                data-testid="rotating-tip"
+                key={rotatingTip.id}
               >
-                <Sparkles size={14} className="text-violet-400 shrink-0 mt-0.5" />
+                <span className="text-base shrink-0 leading-none mt-0.5" aria-hidden="true">
+                  {rotatingTip.icon}
+                </span>
                 <p className="text-[11px] text-slate-300 leading-snug flex-1">
-                  Mientras espero, puedes registrar una planta, revisar tu
-                  historial o tomar una foto IoT — sigues sin perder esta
-                  respuesta.
+                  <span className="text-violet-400 font-medium block mb-0.5">
+                    💡 Tip mientras espero
+                  </span>
+                  {rotatingTip.text}
                 </p>
                 <button
                   type="button"
-                  onClick={() => setHintDismissed(true)}
+                  onClick={() => {
+                    dismissTip();
+                    setHintDismissed(true);
+                  }}
                   aria-label="Cerrar sugerencia"
-                  className="text-[10px] text-slate-500 hover:text-slate-300 shrink-0 leading-none"
+                  className="text-[10px] text-slate-500 hover:text-slate-300 shrink-0 leading-none px-1"
+                  data-testid="dismiss-tip"
                 >
                   ×
                 </button>
