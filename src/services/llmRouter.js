@@ -62,28 +62,29 @@ import { analyzeQueryComplexity } from './queryComplexityAnalyzer';
 /** @type {Record<LLMTask, ModelRoute>} */
 export const ROUTES = {
   chat: {
-    model: 'gemma3:4b',
+    // Bench nocturno 2026-05-24 (DR bench-modelos-nocturno-2026-05-24.md):
+    // llama3.1:8b ranked #2 con tools (44% anti-halluc, 0 halluc flags, 12.9s lat),
+    // mientras gemma3:4b quedó #4 (40% AH). Sin sacrificar latencia significativa
+    // (mismo orden de magnitud) ganamos 4 puntos AH. Override via env
+    // VITE_LLM_CHAT_MODEL para volver a gemma3:4b si necesitamos comparar.
+    model:
+      (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_LLM_CHAT_MODEL) ||
+      'llama3.1:8b',
     keep_alive_min: 30,
     temperature: 0.3,
     max_tokens: 512,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Bench GPU 2026-05-17: 118 t/s, 4 GB VRAM, load 3s. keep_alive=30m. ' +
-      'temperature 0.7→0.3 tras incidente alucinación "chorcho" 2026-05-17: ' +
-      'gemma3:12b (probado en PR #809, cerrado) NO resolvió — inventó OTRA ' +
-      'definición con más confianza. La fix real es system prompt agresivo ' +
-      '(ver AgentScreen.getSystemPrompt) + temperature baja. Mantener 4b ' +
-      'por velocidad y VRAM (vision cabe on-demand). Solución modelo-agnóstica. ' +
-      'max_tokens 80→512 2026-05-23 (principio intelligence-first): el cap ' +
-      'de 80 introducido en Task #45 para mitigar latencia kokoro-tts cortaba ' +
-      'respuestas a media oración y disfrazaba un fix de TTS como límite ' +
-      'cognitivo. La solución correcta es TTS chunked streaming (task #69), ' +
-      'no truncar capacidad de razonamiento. system prompt sigue pidiendo ' +
-      'concisión + follow-up; el modelo elige longitud por contenido, no por ' +
-      'hard cap. Si TTS sigue siendo bottleneck, mitigar ahí, no aquí. ' +
+      'Bench nocturno 2026-05-24 (8h, 100 prompts × 8 finalistas con tools+AGE): ' +
+      'llama3.1:8b ranked #2 (44% anti-halluc, 0 halluc flags, 12.9s avg). ' +
+      'gemma3:4b ranked #4 (40% AH, 11.7s) — diferencia 4 puntos AH a costo ' +
+      '~1s latencia. Aplicación de intelligence-first principle: priorizar ' +
+      'anti-alucinación sobre velocidad marginal. ~5 GB VRAM (vs 4 GB gemma3:4b), ' +
+      'aún cabe vision on-demand. keep_alive=30m. ' +
+      'Override env: VITE_LLM_CHAT_MODEL para experimentos. ' +
       'Routing dual 2026-05-23: queries "complex" (plagas regionales, ' +
       'pasifloras, planes multi-aspecto, queries largas) caen a `chat_complex` ' +
-      'route. Ver `selectChatRoute` + `queryComplexityAnalyzer.js`.',
+      'route con granite3.1-dense:8b (#1 ranking bench, 56% AH).',
   },
   chat_complex: {
     // Override por env para que el operador pueda probar gemma3:12b u otros
