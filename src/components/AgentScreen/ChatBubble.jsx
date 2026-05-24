@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, BadgeCheck, Info, Sparkles } from 'lucide-react';
+import { User, BadgeCheck, Info, Sparkles, AlertTriangle } from 'lucide-react';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import { speak, speakKokoro, stop, isSpeaking, isKokoroAvailable } from '../../services/ttsService';
 import { agentSounds } from '../../services/agentSoundService';
@@ -74,12 +74,14 @@ function SourceBadge({ metadata }) {
 
   return (
     <span
-      className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-slate-700/40 text-slate-400 border border-slate-600"
+      className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-amber-900/30 text-amber-300 border border-amber-700/50"
       data-testid="source-badge"
       data-source="generative"
+      title="Respuesta del modelo de IA SIN consulta al catálogo Chagra. Puede contener errores; verifica antes de aplicar al cultivo."
     >
+      <AlertTriangle size={12} aria-hidden="true" />
       <Sparkles size={12} aria-hidden="true" />
-      <span>Respuesta generativa</span>
+      <span>Respuesta generativa · verifica</span>
     </span>
   );
 }
