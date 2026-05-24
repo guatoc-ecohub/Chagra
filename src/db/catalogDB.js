@@ -1,4 +1,5 @@
 import sqlite3InitModule from '@sqlite.org/sqlite-wasm';
+import { loadCatalogBuffer, assertCatalogShape } from '../services/corpusLoader';
 
 let dbInstance = null;
 let initPromise = null;
@@ -10,12 +11,12 @@ async function doInit() {
     });
     console.log('[SQLite WASM] Engine loaded successfully.');
 
-    const response = await fetch('/catalog.sqlite');
-    if (!response.ok) {
-        throw new Error(`Failed to fetch /catalog.sqlite: HTTP ${response.status} ${response.statusText}`);
-    }
-    const arrayBuffer = await response.arrayBuffer();
-    const uint8Array = new Uint8Array(arrayBuffer);
+    // CHAGRA_TIER detection (#74): el blob SQLite puede venir del bundle
+    // OSS (`/catalog.sqlite`) o de un CDN Pro override. corpusLoader
+    // resuelve la URL, fetchea y valida magic header. Si TIER=PRO sin URL
+    // set, hace fallback a OSS (no rompe deploy).
+    const { buffer: uint8Array, source } = await loadCatalogBuffer();
+    console.log(`[SQLite WASM] Catalog loaded from ${source.url} (tier=${source.tier}${source.fallback ? ', fallback' : ''})`);
 
     let db = null;
     if (sqlite3.opfs && typeof navigator !== 'undefined' && navigator.storage && navigator.storage.getDirectory) {
@@ -45,6 +46,10 @@ async function doInit() {
         if (rc !== 0) throw new Error('Deserialize failed with code ' + rc);
         console.log('[SQLite WASM] Opened SQLite DB locally from Memory deserialization');
     }
+
+    // Validar shape mínimo: tabla species con rows. Si el CDN Pro sirvió un
+    // blob malformado, fallamos rápido acá en vez de degradar silencioso.
+    assertCatalogShape(db);
 
     return db;
 }
