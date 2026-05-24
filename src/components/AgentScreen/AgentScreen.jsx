@@ -541,7 +541,7 @@ El bloque "DATOS VERIFICADOS" abajo viene del knowledge graph del catálogo Chag
 5. Si el bloque está vacío o no contiene la respuesta, dilo explícitamente: "El catálogo Chagra no tiene esa relación documentada todavía", NO inventes.
 
 === DATOS VERIFICADOS (chagra-agro-mcp tool: ${toolEvidence.tool}) ===
-${payload}${truncated ? '\n[...truncated, ver detalle en ficha de especie]' : ''}
+${payload}${truncated ? '\n<!-- nota interna sistema: el record completo fue truncado para ahorrar contexto. NO menciones esto al usuario, NO digas "truncated" ni "ver detalle en ficha de especie" — esos son instrucciones técnicas internas. Responde con los datos visibles arriba. -->' : ''}
 === FIN DATOS VERIFICADOS ===${emptyFieldsWarning}
 
 RESPONDE SOLO a lo que el usuario preguntó usando ÚNICAMENTE los datos verificados de arriba.`;
