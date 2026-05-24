@@ -17,6 +17,23 @@ const MAX_TURNS = 100;
 const MAX_DAYS = 30;
 const THIRTY_DAYS_MS = MAX_DAYS * 24 * 60 * 60 * 1000;
 
+/**
+ * Umbral de inactividad para considerar que una nueva apertura de
+ * AgentScreen es una "nueva sesión" en vez de continuación de la previa.
+ *
+ * Caso N3 (Playwright Q8, 2026-05-23): operador hace Q3 sobre broca del
+ * café → "Volver" al dashboard → re-abre AgentScreen → Q8 sobre flor del
+ * aguacate. Sin reset, `loadHistory()` recupera Q3+A3 desde IndexedDB y
+ * `getContextString(operatorId, 10)` los inyecta como `contextMemory` del
+ * LLM. El modelo entonces mezcla residuos de la respuesta sobre broca con
+ * la query nueva (cross-conversation contamination).
+ *
+ * 30 minutos cubre el caso natural: si vuelves rápido (<30min) seguís en
+ * la misma conversación útil; si pasaste haciendo otras cosas (registros,
+ * fotos, observación), tu próxima visita es nueva sesión.
+ */
+export const SESSION_GAP_MS = 30 * 60 * 1000;
+
 function generateTurnId() {
   return `turn_${Date.now().toString(36)}_${Math.random().toString(36).substr(2, 9)}`;
 }
@@ -156,6 +173,45 @@ export async function getFullHistory(operatorId, limit = 100) {
 }
 
 /**
+ * Timestamp del último turn registrado para un operator (cualquier role).
+ * Usado por AgentScreen para detectar gap temporal y decidir si arrancar
+ * en modo "nueva sesión" (sin cargar history previo + sin contextMemory).
+ *
+ * @param {string} operatorId
+ * @returns {Promise<number|null>} timestamp ms del último turn, o null si
+ *   no hay turns persistidos (o IndexedDB falló — comportamiento defensivo
+ *   tipo "tratá como sesión nueva").
+ */
+export async function getLastTurnTimestamp(operatorId) {
+  try {
+    const turns = await getRecentContext(operatorId, 1);
+    if (turns.length === 0) return null;
+    return turns[turns.length - 1].timestamp || null;
+  } catch (_) {
+    return null;
+  }
+}
+
+/**
+ * Decide si una nueva apertura de la conversación debe tratarse como sesión
+ * nueva (gap temporal mayor a SESSION_GAP_MS desde el último turn). Si no
+ * hay historial previo, también responde true — un primer encuentro siempre
+ * es sesión nueva.
+ *
+ * Helper testeable separado del componente AgentScreen para que el bug N3
+ * (cross-conv contamination) tenga unit test sin necesidad de montar React.
+ *
+ * @param {string} operatorId
+ * @param {number} [now=Date.now()] inyectable para testing.
+ * @returns {Promise<boolean>}
+ */
+export async function shouldStartNewSession(operatorId, now = Date.now()) {
+  const last = await getLastTurnTimestamp(operatorId);
+  if (last === null) return true;
+  return (now - last) > SESSION_GAP_MS;
+}
+
+/**
  * Limpiar toda la memoria de un operador (para reset/privacy).
  */
 export async function clearMemory(operatorId) {
@@ -254,4 +310,7 @@ export default {
   getFullHistory,
   clearMemory,
   computeSourceMetadata,
+  getLastTurnTimestamp,
+  shouldStartNewSession,
+  SESSION_GAP_MS,
 };
