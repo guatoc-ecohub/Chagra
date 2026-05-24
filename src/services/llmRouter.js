@@ -30,9 +30,21 @@
  * - qwen3:8b: output vacío con prompts JSON estrictos
  */
 
+import { analyzeQueryComplexity } from './queryComplexityAnalyzer';
+
 /**
  * Tipos de tarea soportadas por el router.
- * @typedef {'chat' | 'nlu' | 'reasoning' | 'vision'} LLMTask
+ *
+ * `chat`         → modelo rápido para queries simples del agente Chagra IA.
+ * `chat_complex` → modelo con mayor capacidad anti-alucinación para queries
+ *                  complejas (plagas regionales, pasifloras confundibles,
+ *                  planes multi-aspecto, queries largas). Bench 2026-05-23:
+ *                  granite3.1-dense:8b clavó "Monalonion velezangeli" donde
+ *                  gemma3:4b alucinaba. Override via env VITE_LLM_COMPLEX_MODEL.
+ *                  Routing se decide en frontend con `selectChatRoute(query)`
+ *                  (importable desde `./queryComplexityAnalyzer`).
+ *
+ * @typedef {'chat' | 'chat_complex' | 'nlu' | 'reasoning' | 'vision'} LLMTask
  */
 
 /**
@@ -68,7 +80,35 @@ export const ROUTES = {
       'cognitivo. La solución correcta es TTS chunked streaming (task #69), ' +
       'no truncar capacidad de razonamiento. system prompt sigue pidiendo ' +
       'concisión + follow-up; el modelo elige longitud por contenido, no por ' +
-      'hard cap. Si TTS sigue siendo bottleneck, mitigar ahí, no aquí.',
+      'hard cap. Si TTS sigue siendo bottleneck, mitigar ahí, no aquí. ' +
+      'Routing dual 2026-05-23: queries "complex" (plagas regionales, ' +
+      'pasifloras, planes multi-aspecto, queries largas) caen a `chat_complex` ' +
+      'route. Ver `selectChatRoute` + `queryComplexityAnalyzer.js`.',
+  },
+  chat_complex: {
+    // Override por env para que el operador pueda probar gemma3:12b u otros
+    // sin redeploy de código. Si VITE_LLM_COMPLEX_MODEL no está seteado,
+    // default a granite3.1-dense:8b (bench 2026-05-23: única opción que
+    // clavó Monalonion velezangeli sin alucinación + cupo VRAM razonable).
+    model:
+      (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_LLM_COMPLEX_MODEL) ||
+      'granite3.1-dense:8b',
+    keep_alive_min: 5,
+    temperature: 0.3,
+    max_tokens: 768,
+    url: '/api/ollama/v1/chat/completions',
+    rationale:
+      'Bench 2026-05-23 anti-alucinación: granite3.1-dense:8b 37 t/s, ' +
+      '~6 GB VRAM, ~37s avg con context completo. Más lento que gemma3:4b ' +
+      'pero clavó "Monalonion velezangeli" sin pifia donde 4b derivaba a ' +
+      'Fusarium genéricos. keep_alive_min=5 (no 30): el chat hot sigue ' +
+      'siendo gemma3:4b → no mantener dos modelos calientes simultáneos ' +
+      'para no presionar VRAM contra vision (qwen2.5vl 11.8 GB). ' +
+      'max_tokens 768 (vs 512 del chat simple) porque queries complejas ' +
+      'tienden a respuestas más estructuradas (planes, asocios, ' +
+      'enumeraciones). temperature mantenida en 0.3 — la regla ' +
+      'intelligence-first aplica igual: temperature baja + prompt ' +
+      'agresivo > modelo más grande con temperature alta.',
   },
   nlu: {
     model: 'qwen2.5-coder:7b',
@@ -166,9 +206,38 @@ export function buildLLMRequest(task, messages, overrides = {}) {
  */
 export const DEFAULT_MODEL = ROUTES.chat.model;
 
+/**
+ * Selector de ruta de chat para el agente Chagra IA basado en análisis
+ * de complejidad de la query (ver `queryComplexityAnalyzer.js`). Devuelve
+ * el nombre de task ('chat' o 'chat_complex') que el caller pasa a
+ * `buildLLMRequest`. Mantiene el contrato existente (`buildLLMRequest`
+ * sigue recibiendo un LLMTask) — sólo agrega un paso de decisión.
+ *
+ * Logging: emite `console.debug` con la decisión para facilitar diagnóstico
+ * de routing en field testing. Si el operador reporta latencias raras o
+ * respuestas pobres, el log permite confirmar qué modelo se eligió sin
+ * añadir telemetría adicional.
+ *
+ * @param {string} query - Query del usuario.
+ * @returns {LLMTask} - 'chat' (simple) o 'chat_complex' (compleja).
+ */
+export function selectChatRoute(query) {
+  // Import estático arriba (no dinámico) — el analyzer no depende de
+  // ROUTES, así que no hay ciclo. Si en el futuro el analyzer necesitara
+  // leer ROUTES, romper el ciclo moviendo este selector a un módulo
+  // tercero o invirtiendo la dependencia.
+  const complexity = analyzeQueryComplexity(query);
+  const task = complexity === 'complex' ? 'chat_complex' : 'chat';
+  const route = ROUTES[task];
+  const preview = typeof query === 'string' ? query.slice(0, 60) : '<no-string>';
+  console.debug(`[router] query "${preview}" → ${complexity} → ${route.model}`);
+  return task;
+}
+
 export default {
   ROUTES,
   getModelFor,
   buildLLMRequest,
+  selectChatRoute,
   DEFAULT_MODEL,
 };

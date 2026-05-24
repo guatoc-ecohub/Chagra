@@ -13,7 +13,7 @@ import {
 import { retrieve } from '../../services/ragRetriever';
 import { parseIntent, formatIntentDescription } from '../../services/agentIntentParser';
 import { streamOpenAI } from '../../services/openaiStream';
-import { buildLLMRequest } from '../../services/llmRouter';
+import { buildLLMRequest, selectChatRoute } from '../../services/llmRouter';
 // Sidecar agro-mcp (ADR-045 Fase 2 Step B/C). Detrás de feature flag
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
@@ -762,8 +762,16 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     }, LLM_TIMEOUT_MS);
 
     try {
-      const { url, body } = buildLLMRequest('chat', messages);
-      console.warn('[Agent] LLM call start', { url, queryLen: query.length });
+      // Routing dual 2026-05-23: queries complejas (plagas regionales,
+      // pasifloras confundibles, planes multi-aspecto, queries largas)
+      // se enrutan a `chat_complex` (granite3.1-dense:8b por default)
+      // que es ~2× más lento pero clavó Monalonion velezangeli sin
+      // pifia en bench anti-alucinación. Resto sigue en gemma3:4b
+      // (hot, 118 t/s). `selectChatRoute` emite console.debug con
+      // la decisión para diagnóstico en field testing.
+      const chatRoute = selectChatRoute(query);
+      const { url, body } = buildLLMRequest(chatRoute, messages);
+      console.warn('[Agent] LLM call start', { url, queryLen: query.length, route: chatRoute, model: body.model });
       const result = await streamOpenAI(
         url,
         body,
