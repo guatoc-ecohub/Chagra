@@ -17,7 +17,7 @@ import { buildLLMRequest, selectChatRoute } from '../../services/llmRouter';
 // Sidecar agro-mcp (ADR-045 Fase 2 Step B/C). Detrás de feature flag
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
-import { isSidecarEnabled, planNlu, callTool } from '../../services/sidecarClient';
+import { isSidecarEnabled, planNlu, callTool, resolveEntities } from '../../services/sidecarClient';
 import { speak, speakKokoro, stop, init as initTTS, isSupported, isKokoroAvailable, replayLast, isSpeaking } from '../../services/ttsService';
 import { executeAction, setActionGateCallback } from '../../services/actionExecutor';
 import ChatHistory from './ChatHistory';
@@ -713,9 +713,27 @@ RESPONDE SOLO a lo que el usuario preguntó usando ÚNICAMENTE los datos verific
     return { isEnum, pestsMentioned, topic };
   };
 
-  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence) => {
+  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities) => {
     const systemPrompt = getSystemPrompt();
     const analysis = analyzeQuery(query);
+
+    // ENTIDADES RESUELTAS (DR taxonómico Tier 1 B). El sidecar /resolve-entities
+    // ya verificó contra Apache AGE qué plantas/plagas menciona el usuario y
+    // resolvió los binomios canónicos. El LLM DEBE usar estos nombres
+    // exactos — anular cualquier instinto de inventar Psidium/Cucurbita/Musa
+    // por similitud fonética. Esta capa es DETERMINÍSTICA — bypassea el
+    // problema de que el LLM ignora reglas generales del prompt.
+    const resolvedEntitiesBlock = (Array.isArray(resolvedEntities) && resolvedEntities.length > 0)
+      ? `
+
+=== ENTIDADES RESUELTAS DEL CATÁLOGO (autoritativo, verificado en Apache AGE) ===
+El usuario mencionó las siguientes entidades. Para cada una, el catálogo Chagra confirma estos binomios CANÓNICOS. JAMÁS uses otro nombre científico, JAMÁS las confundas con géneros parecidos por sonido (gulupa NO es Psidium ni Cucurbita; aguacate NO es Psidium).
+
+${resolvedEntities.map((e) => `- "${e.mentioned}" (${e.kind}) → ${e.nombre_comun} = ${e.nombre_cientifico} [id: ${e.canonical_id}, confidence: ${e.confidence}]`).join('\n')}
+
+REGLA: si tu respuesta menciona cualquiera de estas entidades, USÁ el nombre científico EXACTO listado arriba. NO traduzcas, NO sustituyas, NO completes con otro género. Si dudas entre alternativas listadas, elige la de mayor confidence.
+=== FIN ENTIDADES RESUELTAS ===`
+      : '';
 
     // NN2+NN3 bloque dinámico de análisis. Va al final del system prompt
     // para que sea lo último que el LLM lee antes de la query — máxima
@@ -749,7 +767,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     const evidenceContext = formatToolEvidence(toolEvidence);
 
     const messages = [
-      { role: 'system', content: systemPrompt + corpusContext + evidenceContext + queryAnalysisBlock },
+      { role: 'system', content: systemPrompt + corpusContext + evidenceContext + resolvedEntitiesBlock + queryAnalysisBlock },
       ...(contextMemory ? [{ role: 'user', content: contextMemory }] : []),
       { role: 'user', content: query },
     ];
@@ -847,8 +865,30 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       // null en error/timeout. La evidencia se inyecta como bloque
       // delimitado en el system prompt para grounding citable.
       let toolEvidence = null;
+      let resolvedEntities = null;
       if (isOnline && isSidecarEnabled()) {
         try {
+          // PASO 1 — pre-validation AGE (DR taxonómico Tier 1 B, PR #59).
+          // Resuelve entidades vegetales/plagas a binomio canónico autoritativo
+          // ANTES del LLM. El LLM ya no puede inventar "gulupa = Psidium".
+          const tRE0 = performance.now();
+          const resolved = await resolveEntities(text);
+          const tRE1 = performance.now();
+          if (resolved && Array.isArray(resolved.entities) && resolved.entities.length > 0) {
+            // Solo nos quedamos con confidence >= 0.7 para no contaminar con
+            // matches dudosos (resolve-entities devuelve hasta confidence 0.5).
+            const filtered = resolved.entities.filter((e) => (e.confidence ?? 0) >= 0.7);
+            if (filtered.length > 0) {
+              resolvedEntities = filtered;
+              console.debug('[sidecar] resolve-entities', {
+                count: filtered.length,
+                latencyMs: Math.round(tRE1 - tRE0),
+                entities: filtered.map((e) => `${e.mentioned}→${e.canonical_id}`),
+              });
+            }
+          }
+
+          // PASO 2 — NLU planner + tool call (flow original).
           const tNlu0 = performance.now();
           const plan = await planNlu(text, contextMemory);
           const tNlu1 = performance.now();
@@ -876,13 +916,13 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
             });
           }
         } catch (sidecarErr) {
-          // Defensa extra: planNlu/callTool ya son no-throw, pero si algo
-          // raro pasa NO bloqueamos el chat.
+          // Defensa extra: planNlu/callTool/resolveEntities ya son no-throw,
+          // pero si algo raro pasa NO bloqueamos el chat.
           console.debug('[sidecar] inesperado, sigo con RAG-only:', sidecarErr?.message);
         }
       }
 
-      const response = await callLLM(text, contextMemory, contextCorpus, toolEvidence);
+      const response = await callLLM(text, contextMemory, contextCorpus, toolEvidence, resolvedEntities);
       agentSounds.chime();
 
       const { intent } = parseIntent(text);

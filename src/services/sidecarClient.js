@@ -181,7 +181,36 @@ const ALLOWED_TOOLS = new Set([
   'get_pest_controllers',
   'get_multihop_companions',
   'validate_visual_match',
+  'validate_taxonomy',
 ]);
+
+/**
+ * Resuelve entidades vegetales/plagas mencionadas en el user_message contra
+ * Apache AGE (chagra_kg). Sirve como capa pre-validation anti-alucinación
+ * (DR taxonómico Tier 1 B): el binomio canónico autoritativo se inyecta al
+ * system prompt del LLM ANTES de que responda, así no puede inventar
+ * "gulupa = Psidium guajava".
+ *
+ * Returns null si: flag off, offline, AGE down (graceful), timeout.
+ * Returns { entities: [...] } con entidades resueltas (puede ser []).
+ *
+ * @param {string} userMessage
+ * @returns {Promise<null | { entities: Array<{
+ *   mentioned: string,
+ *   kind: 'species' | 'pest' | 'biopreparado',
+ *   canonical_id: string,
+ *   nombre_comun: string,
+ *   nombre_cientifico: string,
+ *   confidence: number,
+ * }> }>}
+ */
+export async function resolveEntities(userMessage) {
+  if (!userMessage || typeof userMessage !== 'string') return null;
+  const raw = await postJson('/resolve-entities', { user_message: userMessage }, NLU_TIMEOUT_MS);
+  if (!raw || typeof raw !== 'object') return null;
+  if (!Array.isArray(raw.entities)) return { entities: [] };
+  return { entities: raw.entities };
+}
 
 /**
  * Llama `POST ${BASE}/tools/<toolName>` con los args dados.
