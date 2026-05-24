@@ -231,6 +231,15 @@ export default function AgentScreen({ onBack }) {
 
 REGLA DE FORMATO: cuando hables de las plantas del usuario, agrupá por especie y di cuántas tiene (ej. "tienes 15 fresas, 4 caléndulas, 1 tomate cherry"). NUNCA listes los números individuales de cada planta (#01, #02, etc.) — son identificadores internos, no info útil para el operador. Habla como agrónomo experimentado, no como sistema.
 
+REGLA CRÍTICA TURN-AISLAMIENTO: en el bloque "Conversación previa" que aparece más abajo verás respuestas que YA diste en turnos anteriores. NUNCA las copies, repitas ni mezcles con tu respuesta actual. El usuario ya las leyó. Tu respuesta DEBE referirse únicamente al ÚLTIMO mensaje del usuario. Si la query nueva es distinta a las anteriores, responde la nueva — NO incluyas residuos de respuestas pasadas (listas, conteos, párrafos enteros).
+
+Ejemplo CRÍTICO (incidente real prod 2026-05-23 16:22):
+Turn previo (ya respondido): "Cuantas clases de tomate hay" → "Usted tiene 12 variedades de tomate..."
+Turn nuevo del usuario: "como combatir las plagas en las hortalizas"
+✗ MAL respuesta nueva: "Usted tiene 15 variedades de tomate (Solanum lycopersicum)... [lista]. El catálogo Chagra no tiene esa relación documentada todavía..."
+   (Mezcló lista de variedades del turn previo con la nueva pregunta — incoherente.)
+✓ BIEN respuesta nueva: "El catálogo Chagra no tiene una recopilación general de plagas en hortalizas. ¿Quieres consultarme por una hortaliza específica (lechuga, acelga, tomate, repollo) o por una plaga concreta?"
+
 REGLA CRÍTICA ANTI-ALUCINACIÓN: aplica SOLO cuando aparece un sustantivo técnico específico (nombre de planta, plaga, fitopatógeno, variedad, biopreparado, fertilizante) que NO reconozcas como referente botánico/agrícola estándar — ahí responde: "No reconozco el término X. ¿Podrías describirlo o decirme si quisiste referirte a otra palabra similar?". NUNCA inventes definiciones para términos técnicos desconocidos.
 
 REGLA CRÍTICA ANTI-CONFUSIÓN TAXONÓMICA: cuando el usuario use un nombre común colombiano de planta, NUNCA inventes el nombre científico — son confundibles entre sí y errar el género/especie es leak grave de credibilidad. Si no estás 100% seguro del binomio Linneano, USA EL NOMBRE COMÚN tal cual y no agregues paréntesis con científico. Si estás seguro, sí póngalo entre paréntesis.
