@@ -610,8 +610,73 @@ ${payload}${truncated ? '\n<!-- nota interna sistema: el record completo fue tru
 RESPONDE SOLO a lo que el usuario preguntó usando ÚNICAMENTE los datos verificados de arriba.`;
   };
 
+  // NN2+NN3 (2026-05-23): análisis de query en frontend para inyectar
+  // señales específicas al system prompt. El LLM gemma3:4b ignora reglas
+  // generales bajo presión — necesita instrucción concreta sobre ESTA
+  // query.
+  const analyzeQuery = (q) => {
+    const lower = (q || '').toLowerCase();
+    // NN2: detección estricta de query enumerativa. Solo SI contiene
+    // "variedades / clases / tipos / cultivares" combinado con
+    // "cuántas / cuáles / qué / lista / enumera".
+    const enumNoun = /\b(variedades|clases|tipos|cultivares)\b/.test(lower);
+    const enumVerb = /\b(cu[áa]ntas?|cu[áa]les|qu[ée]|lista|enumera|hay)\b/.test(lower);
+    const isEnum = enumNoun && enumVerb;
+
+    // NN3: detección de plagas conocidas mencionadas en la query.
+    // Mapping canónico glosario PR #1016 — usar EXACTO en respuesta.
+    const PEST_GLOSSARY = {
+      chiza: 'Phyllophaga spp. (escarabajos rizófagos, larvas que comen raíces)',
+      'broca del café': 'Hypothenemus hampei',
+      broca: 'Hypothenemus hampei',
+      monalonion: 'Monalonion velezangeli (chinche del aguacate, Hemiptera — NO es hongo, NO es Fusarium)',
+      'mosca del aguacate': 'Heilipus lauri',
+      'mosca de la fruta': 'Anastrepha spp. / Ceratitis capitata',
+      'picudo del plátano': 'Cosmopolites sordidus',
+      'roya del café': 'Hemileia vastatrix (hongo, royas)',
+      roya: 'Hemileia vastatrix',
+      'sigatoka negra': 'Mycosphaerella fijiensis (hongo, plátano/banano)',
+      sigatoka: 'Mycosphaerella fijiensis',
+      antracnosis: 'Colletotrichum spp.',
+      trips: 'Frankliniella spp. / Thrips spp.',
+      'gusano cogollero': 'Spodoptera frugiperda (lepidóptero, maíz)',
+      'ácaro del tomate': 'Aculops lycopersici / Tetranychus urticae',
+    };
+    const pestsMentioned = [];
+    for (const [name, canonical] of Object.entries(PEST_GLOSSARY)) {
+      if (lower.includes(name)) pestsMentioned.push({ name, canonical });
+    }
+
+    // Tema principal (heurística simple): manejo, atributo, descripción.
+    let topic = 'general';
+    if (/c[óo]mo\s+(podo|cosecho|riego|abono|fertilizo|controlo|combato|preparo|hago|manejo)/.test(lower)) topic = 'manejo';
+    else if (/c[áa]nd?o\s+(podo|cosecho|riego|abono|siembro)/.test(lower)) topic = 'manejo';
+    else if (/a\s+qu[ée]\s+altitud|qu[ée]\s+(temperatura|altitud|luz|drenaje|suelo)/.test(lower)) topic = 'atributo';
+    else if (/qu[ée]\s+compa[ñn]eros|qu[ée]\s+biopreparado|asocia|companions/.test(lower)) topic = 'relación';
+    else if (/h[áa]blame|qu[ée]\s+es|c[óo]ntame/.test(lower)) topic = 'descripción';
+    else if (pestsMentioned.length > 0) topic = 'plaga/enfermedad';
+
+    return { isEnum, pestsMentioned, topic };
+  };
+
   const callLLM = async (query, contextMemory, contextCorpus, toolEvidence) => {
     const systemPrompt = getSystemPrompt();
+    const analysis = analyzeQuery(query);
+
+    // NN2+NN3 bloque dinámico de análisis. Va al final del system prompt
+    // para que sea lo último que el LLM lee antes de la query — máxima
+    // proximidad. Le dice EXACTAMENTE qué tipo de query es y qué plagas
+    // canónicas usar.
+    const queryAnalysisBlock = `
+
+=== ANÁLISIS DE LA QUERY ACTUAL (frontend) ===
+- Tipo: ${analysis.topic}
+- Es enumerativa (CASO C aplica): ${analysis.isEnum ? 'SÍ — usa respuesta CASO C' : 'NO — IGNORA CASO C completamente, responde normal con tool evidence o conocimiento'}
+${analysis.pestsMentioned.length > 0 ? `- Plagas mencionadas (USA NOMBRE CIENTÍFICO EXACTO de abajo, NO inventes):
+${analysis.pestsMentioned.map((p) => `  · "${p.name}" → ${p.canonical}`).join('\n')}` : '- Plagas mencionadas: ninguna'}
+
+REGLA CRÍTICA SOBRE ESTE BLOQUE: este análisis es autoritativo para ESTA query. Si dice "Es enumerativa: NO", el CASO C del system prompt NO aplica aunque tu instinto te diga lo contrario. Si lista plagas, usa ESOS nombres científicos exactos (jamás otros, jamás "Fusarium spp" para chinches, jamás géneros inventados).
+=== FIN ANÁLISIS ===`;
     // 2026-05-19: incidente alucinación tomate — gemma3:4b confundía el
     // corpus RAG con lo que el usuario dijo (atribuía síntomas "hojas
     // amarillas" del documento de referencia al operador). Fix: delimitar
@@ -630,7 +695,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     const evidenceContext = formatToolEvidence(toolEvidence);
 
     const messages = [
-      { role: 'system', content: systemPrompt + corpusContext + evidenceContext },
+      { role: 'system', content: systemPrompt + corpusContext + evidenceContext + queryAnalysisBlock },
       ...(contextMemory ? [{ role: 'user', content: contextMemory }] : []),
       { role: 'user', content: query },
     ];
