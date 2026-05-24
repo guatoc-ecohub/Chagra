@@ -334,6 +334,43 @@ export default function App() {
     });
   }, []);
 
+  // N5 fix 2026-05-23: pre-warm Ollama gemma3:4b al boot post-dashboard.
+  // Playwright detectó cold-start de 116s en la primera query del agente
+  // porque Ollama carga el modelo en GPU bajo demanda (4.6 GB VRAM). Pre-warm
+  // dispara POST silente con prompt mínimo + keep_alive=30m → modelo queda
+  // hot. Si falla, transparente (degrada al cold-start clásico). Solo
+  // post-dashboard (no login) para no consumir GPU si user no llega a usar
+  // el agente. Una sola vez por sesión de tab (useEffect deps cuidadas).
+  const [ollamaPrewarmed, setOllamaPrewarmed] = useState(false);
+  useEffect(() => {
+    if (currentView !== 'dashboard' || ollamaPrewarmed) return;
+    let cancelled = false;
+    const prewarm = async () => {
+      try {
+        await fetch('/api/ollama/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'gemma3:4b',
+            prompt: 'ok',
+            stream: false,
+            keep_alive: '30m',
+            options: { num_predict: 1 },
+          }),
+          signal: AbortSignal.timeout(150000),
+        });
+        if (!cancelled) {
+          console.debug('[App] ollama gemma3:4b pre-warm OK');
+          setOllamaPrewarmed(true);
+        }
+      } catch (err) {
+        if (!cancelled) console.debug('[App] ollama pre-warm degradó (cold-start clásico):', err?.message);
+      }
+    };
+    prewarm();
+    return () => { cancelled = true; };
+  }, [currentView, ollamaPrewarmed]);
+
   // 2026-05-18 (operator request): la imagen de fondo agroecológica de
   // /biodiversidad-bg.jpg que está en la pestaña Biodiversidad se aplica
   // a TODA la app excepto login + loading. Body className toggled según
