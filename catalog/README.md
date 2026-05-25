@@ -9,12 +9,39 @@
 | Archivo | Rol |
 |---------|-----|
 | `schema-v3.1.json` | JSON Schema draft-07 con definición formal de `species`, `biopreparado`, `source` |
-| `chagra-catalog-seed-v3.1.json` | Seed canónico — consumido por la PWA via `npm run build:catalog` → `public/catalog.sqlite` |
+| `chagra-catalog-seed-v3.1.json` | **Subset OSS público (50 species)** — consumido por la PWA via `npm run build:catalog` → `public/catalog.sqlite`. Es un subset estricto del catálogo full curado. |
+| `chagra-catalog-oss-subset-v3.1.json` | Snapshot histórico del primer subset OSS (cobertura multi-piso térmico, generado por `scripts/extract-oss-subset.mjs` el 2026-05-20). Preservado por trazabilidad. |
 | `chagra-catalog-seed-v3.0.json` | Versión histórica preservada (referencia para `migrate-v30-to-v31.mjs`) |
 | `biopreparados-seed.json` | Catálogo de biopreparados agroecológicos |
 | `sources-seed.json` | Fuentes científicas referenciadas por `species[].source_ids` |
 | `AMBIGUITIES_RESOLUTION.md` | Las 11 ambigüedades del schema v3 resueltas (ADR-013) |
 | `LICENSE.md` | CC BY-NC-SA 4.0 con atribución requerida (migrado 2026-05-14) |
+
+### Subset OSS vs catálogo full
+
+Desde 2026-05-23 (cutover step 2, ADR-024) el `chagra-catalog-seed-v3.1.json` que vive aquí es un **subset curado de ~50 species** apto para divulgación pública bajo CC-BY-NC-SA 4.0. El catálogo **full** (~495 species, con curaduría editorial diferencial: variedades ICA detalladas, endemismos paramunos, cultivares específicos) vive en repo privado hermano y se aplica solo en modo Pro (`CHAGRA_TIER=PRO`, contractual).
+
+Composición del subset OSS (50 species, criterio editorial-v2):
+
+| Categoría editorial | Count |
+|---------------------|------:|
+| Cultivos comerciales colombianos | 12 |
+| Árboles de sombra (companions café) | 8 |
+| Medicinales tradicionales | 8 |
+| Leguminosas / abonos verdes | 6 |
+| Invasoras prioritarias (valor pedagógico de advertencia) | 6 |
+| Hortalizas básicas | 5 |
+| Species especiales (demos: quinoa, amaranto, chía, uchuva, mora) | 5 |
+
+`biopreparados-seed.json` **queda íntegro en OSS** (36 biopreparados públicos — decisión 2026-05-23, valor pedagógico inmediato + sin curaduría editorial Pro diferencial).
+
+Para reconstruir el subset desde el full Pro (idempotente):
+
+```bash
+node scripts/build-oss-subset.mjs <ruta-al-full> catalog/chagra-catalog-seed-v3.1.json
+```
+
+El script poda automáticamente `companions[]` / `antagonists[]` / `recommended_covers[]` / `recommended_fences[]` / `especies_nativas_sustitutas[]` para que solo apunten a IDs presentes en el subset, manteniendo AMB-10 (simetría) y AMB-13 (cross-refs) verdes.
 
 ## Pipeline ADR-025 (markdown frontmatter → JSON)
 
@@ -54,10 +81,14 @@ Las contribuciones externas vía PR DEBEN venir con `validation_level: claude_dr
 
 Al usar, modificar o redistribuir este catálogo, cite:
 
-> Chagra (2026). Chagra species catalog v3.1. CC-BY-SA 4.0. https://github.com/guatoc-ecohub/Chagra
+> Chagra (2026). Chagra species catalog v3.1 (OSS subset 50 species). CC-BY-NC-SA 4.0. https://github.com/guatoc-ecohub/Chagra
 
 ## Boundary OSS / Pro
 
-Este catálogo (capas 1-2 de ADR-026) es **OSS público**. Los componentes Pro (gremios receta curados, planes nutrición optimizados, casos exitosos documentados, presets certificación) viven en repo privado `chagra-pro` cuando se construyan, NO aquí.
+Este catálogo (capas 1-2 de ADR-026) es **OSS público**. Los componentes Pro (catálogo full ~495 species, gremios receta curados, planes nutrición optimizados, casos exitosos documentados, presets certificación) viven en repo privado hermano `chagra-pro`, NO aquí. Específicamente:
+
+- Subset OSS (50 species) → este repo, `chagra-catalog-seed-v3.1.json`.
+- Catálogo full (~495 species) → repo privado, `data/catalog/chagra-catalog-full-v3.1.json`. Diferencial editorial: variedades ICA detalladas, endemismos paramunos (Espeletia, Aragoa, Diplostephium), cultivares con curaduría profunda.
+- `biopreparados-seed.json` → este repo (decisión 2026-05-23, queda OSS por valor pedagógico inmediato).
 
 Test rápido para saber si un campo nuevo va aquí o a Pro: ver ADR-026 §regla nuclear y §sub-i 5 reglas operativas.
