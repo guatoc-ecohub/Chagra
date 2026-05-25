@@ -6,6 +6,14 @@
  * /asr acepta task/language/output como query params y el audio como campo
  * multipart `audio_file`. Si Whisper no responde o hay fallo de red, el
  * audio se persiste en pending_voice_recordings para reintento posterior.
+ *
+ * NOTA: Este servicio usa Whisper (modelo local), NO Web Speech API del navegador.
+ * SpeechGrammarList solo está disponible en Web Speech API y está deprecado en
+ * Chromium moderno. Whisper es superior para español colombiano porque:
+ * - Soporta lang='es-CO' (español Colombia) explícito
+ * - Tiene mejor precisión en toponímicos (Choachí, Fómeque, Ubaque, Guatoc, etc.)
+ * - Entiende términos agro (café arábica, Borbón, Castillo, Cenicafé, biopreparado)
+ * - No requiere listas de gramática explícitas (aprende del contexto del audio)
  */
 
 import { syncManager } from './syncManager';
@@ -18,7 +26,7 @@ const TIMEOUT_MS = 15000;
  *
  * @param {Blob} blob - audio/webm;codecs=opus (tipicamente de MediaRecorder).
  * @param {Object} [options]
- * @param {string} [options.language='es']
+ * @param {string} [options.language='es-CO']
  * @returns {Promise<string>} texto transcrito (trim).
  * @throws {Error} si la red falla, el servidor responde no-2xx o el texto esta vacio.
  * @example
@@ -35,7 +43,7 @@ export async function transcribe(blob, options = {}) {
 
   const params = new URLSearchParams({
     task: 'transcribe',
-    language: options.language || 'es',
+    language: options.language || 'es-CO',
     output: 'json',
     encode: 'true',
   });
