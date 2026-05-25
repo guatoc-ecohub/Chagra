@@ -1,4 +1,35 @@
 import { defineConfig, devices } from '@playwright/test';
+import { execSync } from 'node:child_process';
+
+// El chromium bundled de Playwright falla en NixOS por libs faltantes
+// (libglib-2.0.so.0). Usar el chromium del nix-store via executablePath.
+// Si `PLAYWRIGHT_CHROMIUM_PATH` se setea, usar ese (CI puede pasar uno).
+// Si no, buscar en el PATH (cualquier OS no-NixOS) o caer al bundled
+// estándar de Playwright como último recurso.
+function detectChromiumPath() {
+  if (process.env.PLAYWRIGHT_CHROMIUM_PATH) {
+    return process.env.PLAYWRIGHT_CHROMIUM_PATH;
+  }
+  try {
+    const which = execSync('which chromium 2>/dev/null', { encoding: 'utf8' }).trim();
+    if (which) return which;
+  } catch {
+    // ignore
+  }
+  try {
+    // NixOS sin chromium en PATH: usar nix-shell para resolverlo.
+    const nixResult = execSync(
+      "nix-shell -p chromium --run 'which chromium' 2>/dev/null | tail -1",
+      { encoding: 'utf8' },
+    ).trim();
+    if (nixResult && nixResult.startsWith('/nix/store')) return nixResult;
+  } catch {
+    // ignore
+  }
+  return undefined; // dejar que Playwright use su bundled
+}
+
+const CHROMIUM_PATH = detectChromiumPath();
 
 export default defineConfig({
   testDir: './tests',
@@ -19,7 +50,10 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        ...(CHROMIUM_PATH ? { launchOptions: { executablePath: CHROMIUM_PATH } } : {}),
+      },
     },
   ],
   webServer: {
