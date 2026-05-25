@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chagra-v229';
+const CACHE_NAME = 'chagra-v230';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

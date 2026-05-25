@@ -4,6 +4,7 @@ import { ScreenShell } from './common/ScreenShell';
 import ThemeSelector from './common/ThemeSelector';
 import BackupExportButton from './BackupExportButton';
 import VoiceSelector from './Settings/VoiceSelector';
+import HytaPanel from './HytaPanel';
 import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 import useFincaActiveStore from '../services/fincaActiveStore';
 import usePrefsStore from '../store/usePrefsStore';
@@ -218,6 +219,9 @@ export default function ProfileScreen({ onBack, onHome }) {
             El dashboard de visualización se migró al panel privado del operador (ADR-020 anti-leak / ADR-029 Capa C).
           </p>
         </div>
+
+        {/* HYTA GPU Section (Task #117, 2026-05-25) */}
+        <HytaPanel />
 
         {/* Copia de seguridad (2026-05-19): operador perdió plantas + 100
             species + túnel por un "Clear cache" en Chrome Android. Botón
