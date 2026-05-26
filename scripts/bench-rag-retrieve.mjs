@@ -66,6 +66,35 @@ const QUERIES = [
   'yuca propagación esquejes suelos arcillosos',
 ];
 
+// Queries adicionales para benchmark qwen3 vs granite (20 prompts representativos)
+const COMPARATIVE_QUERIES = [
+  // Species (8)
+  'fresa cuidados clima frío',
+  'café arábica sombra parcial roya',
+  'lechuga bolting hortaliza',
+  'maíz siembra suelo asociación frijol',
+  'aguacate poda fertilización clima cálido',
+  'banano sigatoka manejo sombra',
+  'plátano hartón cosecha tiempo',
+  'tomate plagas mosca blanca control biológico',
+
+  // Biopreparados (6)
+  'caldo bordelés preparación aplicación',
+  'biol fertilizante líquido preparación',
+  'purín de ortigas uso abono',
+  'extracto de ajo insecticida',
+  'jabón potásico áfidos preparación',
+  'trapiche compost lombriz preparación',
+
+  // Plagas (6)
+  'mosca blanca control biológico',
+  'áfidoss control sin agroquímicos',
+  'roya café manejo orgánico',
+  'sigatoka negra banano tratamiento',
+  'gusano cogollero maíz control',
+  'pulgón del tomate identificación manejo',
+];
+
 function percentile(sorted, p) {
   if (sorted.length === 0) return 0;
   const idx = Math.min(sorted.length - 1, Math.floor((p / 100) * sorted.length));
