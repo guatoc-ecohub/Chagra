@@ -26,7 +26,7 @@ const TIMEOUT_MS = 15000;
  *
  * @param {Blob} blob - audio/webm;codecs=opus (tipicamente de MediaRecorder).
  * @param {Object} [options]
- * @param {string} [options.language='es-CO']
+ * @param {string} [options.language='es'] — códigos ISO-639-1 sin región (whisper rechaza 'es-CO', solo acepta 'es')
  * @returns {Promise<string>} texto transcrito (trim).
  * @throws {Error} si la red falla, el servidor responde no-2xx o el texto esta vacio.
  * @example
@@ -41,9 +41,13 @@ export async function transcribe(blob, options = {}) {
   const filename = `recording.${blob.type.includes('mp4') ? 'mp4' : 'webm'}`;
   form.append('audio_file', blob, filename);
 
+  // Whisper acepta solo códigos ISO-639-1 sin región. 'es-CO' lanza HTTP 500
+  // ValueError: Unsupported language. Normalizar a base.
+  const lang = (options.language || 'es').split('-')[0];
+
   const params = new URLSearchParams({
     task: 'transcribe',
-    language: options.language || 'es-CO',
+    language: lang,
     output: 'json',
     encode: 'true',
   });
