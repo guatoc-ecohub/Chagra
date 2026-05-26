@@ -25,6 +25,7 @@ import { useRotatingTip } from '../../services/tipsService';
 import ChatHistory from './ChatHistory';
 import SuggestedActions from './SuggestedActions';
 import ActionConfirmModal from '../ActionConfirmModal';
+import FeedbackConsentModal from '../FeedbackConsentModal';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import { agentSounds } from '../../services/agentSoundService';
 import usePrefsStore from '../../store/usePrefsStore';
@@ -80,6 +81,8 @@ export default function AgentScreen({ onBack }) {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [error, setError] = useState('');
   const [actionModal, setActionModal] = useState({ isOpen: false, intent: null, llmResponse: '' });
+  // Task #194: Modal de consentimiento para feedback
+  const [feedbackConsentModal, setFeedbackConsentModal] = useState({ isOpen: false, pendingAction: null });
   const ttsSupported = isSupported();
   const [kokoroReady, setKokoroReady] = useState(false);
   // Bug 2026-05-18 (Karen reportó stuck-pensando): tras 20s sin token visible,
@@ -625,6 +628,25 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
 
   const handleActionEdit = (params) => {
     handleActionApprove(params);
+  };
+
+  // Task #194: Handlers para el modal de consentimiento de feedback
+  const handleFeedbackConsentNeeded = () => {
+    setFeedbackConsentModal({
+      isOpen: true,
+      pendingAction: 'give_feedback',
+    });
+  };
+
+  const handleFeedbackConsentAccept = () => {
+    setFeedbackConsentModal({ isOpen: false, pendingAction: null });
+    // El usuario aceptó, puede dar feedback
+    // FeedbackButtons intentará enviar nuevamente
+  };
+
+  const handleFeedbackConsentDecline = () => {
+    setFeedbackConsentModal({ isOpen: false, pendingAction: null });
+    // El usuario rechazó, no dar feedback
   };
 
   // Bug reportado 2026-05-15 + 2026-05-18 (Karen): el botón quedaba en
@@ -1399,6 +1421,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         messages={messages}
         streamingContent={streamingContent}
         isStreaming={state === STATE_THINKING}
+        onConsentNeeded={handleFeedbackConsentNeeded}
       />
 
       {/* Error */}
@@ -1586,6 +1609,13 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         onApprove={handleActionApprove}
         onReject={handleActionReject}
         onEdit={handleActionEdit}
+      />
+
+      {/* Task #194: Feedback Consent Modal — muestra la primera vez que el usuario intenta dar feedback */}
+      <FeedbackConsentModal
+        isOpen={feedbackConsentModal.isOpen}
+        onAccept={handleFeedbackConsentAccept}
+        onDecline={handleFeedbackConsentDecline}
       />
     </div>
   );
