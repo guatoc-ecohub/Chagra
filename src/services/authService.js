@@ -1,5 +1,6 @@
 /**
- * authService — Autenticación OAuth2 password-credential contra FarmOS.
+ * authService — Autenticación OAuth2 contra FarmOS.
+ * Soporta Authorization Code + PKCE (recomendado) y Password Grant (legacy).
  * Persiste tokens en localforage (offline-first).
  *
  * @module authService
@@ -10,9 +11,163 @@ import { clearActiveTenantId } from './tenantContext';
 
 const FARMOS_URL = import.meta.env.VITE_FARMOS_URL;
 const CLIENT_ID = import.meta.env.VITE_FARMOS_CLIENT_ID;
+const REDIRECT_URI = `${window.location.origin}/callback`;
 
+/**
+ * DEPRECATION NOTICE: Password grant será removido después de 2026-06-25.
+ * Usar Authorization Code + PKCE en su lugar.
+ */
+const PASSWORD_GRANT_DEPRECATION_DATE = new Date('2026-06-25');
+const PASSWORD_GRANT_DEPRECATED = Date.now() > PASSWORD_GRANT_DEPRECATION_DATE.getTime();
+
+/**
+ * Genera un code_verifier random para PKCE (43-128 caracteres).
+ * @returns {string} code_verifier en base64url sin padding
+ */
+export const generateCodeVerifier = () => {
+    const array = new Uint8Array(32);
+    crypto.getRandomValues(array);
+    return base64UrlEncode(array);
+};
+
+/**
+ * Genera el code_challenge SHA256 para PKCE.
+ * @param {string} codeVerifier
+ * @returns {Promise<string>} code_challenge en base64url sin padding
+ */
+export const generateCodeChallenge = async (codeVerifier) => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(codeVerifier);
+    const hash = await crypto.subtle.digest('SHA-256', data);
+    return base64UrlEncode(new Uint8Array(hash));
+};
+
+/**
+ * Helper para codificar en base64url sin padding (RFC 4648 §5).
+ * @param {Uint8Array} buffer
+ * @returns {string}
+ */
+const base64UrlEncode = (buffer) => {
+    const base64 = btoa(String.fromCharCode(...buffer));
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+};
+
+/**
+ * Inicia el flujo Authorization Code + PKCE redirigiendo a FarmOS.
+ * @param {string} state - string aleatorio para CSRF protection
+ */
+export const initiateAuthorizationCodeFlow = async (state) => {
+    const codeVerifier = generateCodeVerifier();
+    const codeChallenge = await generateCodeChallenge(codeVerifier);
+
+    // Persistir code_verifier para usarlo en el callback
+    await localforage.setItem('oauth_code_verifier', codeVerifier);
+    await localforage.setItem('oauth_state', state);
+
+    const params = new URLSearchParams({
+        response_type: 'code',
+        client_id: CLIENT_ID,
+        redirect_uri: REDIRECT_URI,
+        state: state,
+        code_challenge: codeChallenge,
+        code_challenge_method: 'S256',
+        scope: 'farm_manager',
+    });
+
+    const authUrl = `${FARMOS_URL}/oauth/authorize?${params.toString()}`;
+    window.location.href = authUrl;
+};
+
+/**
+ * Intercambia el authorization code por tokens (PKCE flow).
+ * @param {string} code - authorization code del callback
+ * @param {string} state - state del callback para validación
+ * @returns {Promise<{success: boolean, error?: string}>}
+ */
+export const exchangeCodeForToken = async (code, state) => {
+    console.log('[Auth] Intercambiando code por token (PKCE)');
+
+    // Validar state
+    const savedState = await localforage.getItem('oauth_state');
+    if (state !== savedState) {
+        return { success: false, error: 'State inválido. Posible ataque CSRF.' };
+    }
+
+    const codeVerifier = await localforage.getItem('oauth_code_verifier');
+    if (!codeVerifier) {
+        return { success: false, error: 'Code verifier no encontrado. Flujo inválido.' };
+    }
+
+    const url = `${FARMOS_URL}/oauth/token`;
+    const payload = new URLSearchParams({
+        grant_type: 'authorization_code',
+        code: code,
+        client_id: CLIENT_ID,
+        redirect_uri: REDIRECT_URI,
+        code_verifier: codeVerifier,
+    });
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: payload.toString(),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error de Autenticación: ${response.status}`);
+        }
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('json')) {
+            throw new Error('Backend FarmOS no disponible (modo instalacion detectado)');
+        }
+
+        const data = await response.json();
+
+        // Almacenamiento Offline-First del Token JWT
+        await localforage.setItem('farmos_access_token', data.access_token);
+        await localforage.setItem('farmos_refresh_token', data.refresh_token);
+        await localforage.setItem('farmos_token_expiry', Date.now() + (data.expires_in * 1000));
+
+        // Limpiar PKCE state
+        await localforage.removeItem('oauth_code_verifier');
+        await localforage.removeItem('oauth_state');
+
+        return { success: true };
+    } catch (error) {
+        console.error("Fallo en el intercambio del token:", error);
+        return { success: false, error: error.message };
+    }
+};
+
+/**
+ * Autenticación OAuth2 Password Grant (LEGACY - DEPRECATED).
+ *
+ * ⚠️ DEPRECATION NOTICE: Este método será removido después de 2026-06-25.
+ * Usar initiateAuthorizationCodeFlow + exchangeCodeForToken en su lugar.
+ *
+ * @param {string} username
+ * @param {string} password
+ * @returns {Promise<{success: boolean, error?: string, deprecation?: string}>}
+ */
 export const authenticateUser = async (username, password) => {
-    console.log('[Auth] Intentando login para:', username);
+    console.log('[Auth] Intentando login password grant (DEPRECATED) para:', username);
+
+    // Aviso de deprecation
+    const daysUntilDeprecation = Math.max(0, Math.ceil(
+        (PASSWORD_GRANT_DEPRECATION_DATE - Date.now()) / (1000 * 60 * 60 * 24)
+    ));
+
+    if (PASSWORD_GRANT_DEPRECATED) {
+        return {
+            success: false,
+            error: 'Password Grant ha sido removido. Usa Authorization Code + PKCE.'
+        };
+    }
+
     const url = `${FARMOS_URL}/oauth/token`;
 
     const payload = new URLSearchParams({
@@ -48,7 +203,12 @@ export const authenticateUser = async (username, password) => {
         await localforage.setItem('farmos_refresh_token', data.refresh_token);
         await localforage.setItem('farmos_token_expiry', Date.now() + (data.expires_in * 1000));
 
-        return { success: true };
+        return {
+            success: true,
+            deprecation: daysUntilDeprecation > 0
+                ? `Password Grant será removido en ${daysUntilDeprecation} días. Migra a Authorization Code + PKCE.`
+                : undefined
+        };
     } catch (error) {
         console.error("Fallo en la negociación del token:", error);
         return { success: false, error: error.message };
@@ -108,4 +268,36 @@ export const logoutUser = async () => {
 export const isAuthenticated = async () => {
     const token = await getAccessToken();
     return !!token;
+};
+
+/**
+ * Genera un state random para protección CSRF en OAuth flow.
+ * @returns {string} state en base64url
+ */
+export const generateOAuthState = () => {
+    const array = new Uint8Array(16);
+    crypto.getRandomValues(array);
+    return base64UrlEncode(array);
+};
+
+/**
+ * Procesa el callback de OAuth desde la URL (después de redirect).
+ * @param {URLSearchParams} params - URL search params del callback
+ * @returns {Promise<{success: boolean, error?: string}>}
+ */
+export const handleOAuthCallback = async (params) => {
+    const code = params.get('code');
+    const state = params.get('state');
+    const error = params.get('error');
+
+    if (error) {
+        const errorDescription = params.get('error_description') || error;
+        return { success: false, error: `Error de autorización: ${errorDescription}` };
+    }
+
+    if (!code || !state) {
+        return { success: false, error: 'Parámetros inválidos en callback' };
+    }
+
+    return await exchangeCodeForToken(code, state);
 };
