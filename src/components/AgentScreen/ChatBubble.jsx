@@ -4,6 +4,7 @@ import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import { speak, speakKokoro, stop, isSpeaking, isKokoroAvailable } from '../../services/ttsService';
 import { agentSounds } from '../../services/agentSoundService';
 import usePrefsStore from '../../store/usePrefsStore';
+import FeedbackButtons from '../FeedbackButtons';
 
 function formatTime(timestamp) {
   if (!timestamp) return '';
@@ -86,7 +87,7 @@ function SourceBadge({ metadata }) {
   );
 }
 
-export default function ChatBubble({ message, isStreaming = false }) {
+export default function ChatBubble({ message, isStreaming = false, promptText, onConsentNeeded }) {
   const isUser = message.role === 'user';
   const showSourceBadges = usePrefsStore((s) => s.showSourceBadges);
   // Badge "fuente" solo aplica a respuestas del agente, no del usuario, y
@@ -172,6 +173,16 @@ export default function ChatBubble({ message, isStreaming = false }) {
           )}
           {isStreaming && (
             <span className="inline-block w-2 h-2 bg-violet-400 rounded-full ml-1 animate-pulse" />
+          )}
+          {/* Task #194: Botones de feedback 👍/👎 para respuestas del agente */}
+          {!isUser && !isStreaming && !message._orphan_recovery && (
+            <div className="mt-2 pt-2 border-t border-slate-700/50">
+              <FeedbackButtons
+                prompt={promptText || ''}
+                response={message.content || ''}
+                onConsentNeeded={onConsentNeeded}
+              />
+            </div>
           )}
         </div>
       </div>

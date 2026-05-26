@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import ChatBubble from './ChatBubble';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 
-export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false }) {
+export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, onConsentNeeded }) {
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -31,6 +31,18 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
   // se sienta viva.
   const showThinkingAvatar = isStreaming && !streamingContent;
 
+  // Función para encontrar el prompt (pregunta del usuario) correspondiente
+  // a cada respuesta del agente. Busca el mensaje anterior más reciente
+  // que sea del usuario.
+  const findPromptForResponse = (responseIndex) => {
+    for (let i = responseIndex - 1; i >= 0; i--) {
+      if (messages[i].role === 'user') {
+        return messages[i].content;
+      }
+    }
+    return '';
+  };
+
   return (
     <div className="flex-1 overflow-y-auto p-4 pb-2">
       {messages.map((msg, idx) => (
@@ -38,6 +50,8 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
           key={msg.id || idx}
           message={msg}
           isStreaming={false}
+          promptText={msg.role === 'assistant' ? findPromptForResponse(idx) : undefined}
+          onConsentNeeded={onConsentNeeded}
         />
       ))}
 
@@ -67,6 +81,7 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
         <ChatBubble
           message={{ role: 'assistant', content: streamingContent }}
           isStreaming={true}
+          onConsentNeeded={onConsentNeeded}
         />
       )}
 
