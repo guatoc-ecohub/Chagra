@@ -4,6 +4,11 @@ Todas las novedades user-facing de Chagra. Formato basado en [Keep a Changelog](
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-05-26
+
+### Changed
+- **OSS->Pro cutover step 4**: Preparación de arquitectura para separación OSS/Pro. Separación de MCP servers (`chagra-dev-mcp` vs `chagra-agro-mcp`) para evitar leak de info interna en PWA. (ADR-044, task #75)
+
 ### Added
 - **Manual rediseñado**: 3 sub-vistas grandes (voz / uso / aprende sembrando) en lugar de 12 secciones planas apiladas. Tap targets ≥80px en home, tono `tú` cercano, anti-ladrillo. (PR #202, queue/039 + UX feedback 2026-05-08)
 - **Ayuda interactiva por especie**: accordion individual para lechuga, fresa, tomate chonto. Aguacate y café aparecen con badge `Por agregar` + nota educativa contextual sobre cómo contribuir corpus desde Bitácora. (PR #201)
