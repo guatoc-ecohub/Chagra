@@ -67,6 +67,17 @@ export const DEFAULT_KOKORO_RATE = 0.9;
 export const KOKORO_RATE_MIN = 0.85;
 export const KOKORO_RATE_MAX = 1.1;
 
+/**
+ * Task #124: configuración XTTS-v2 para voz colombiana.
+ *
+ * XTTS-v2 requiere una URL de audio sample (10s) para voice cloning.
+ * Por defecto apuntamos a un asset local que el operador debe proporcionar
+ * (voz colombiana neutra, grabada en condiciones controladas).
+ */
+export const DEFAULT_COLOMBIAN_VOICE = '/voices/colombiana-neutra-10s.wav';
+export const XTTS_TIMEOUT_MS = 30000; // 30s timeout antes de fallback a Kokoro
+export const XTTS_ENABLED_KEY = 'chagra:tts:xtts_enabled';
+
 const STORAGE_KEY_VOICE = 'chagra:tts:voice';
 const STORAGE_KEY_RATE = 'chagra:tts:rate';
 
@@ -141,6 +152,35 @@ export function setPreferredRate(rate) {
   try {
     if (typeof localStorage === 'undefined') return false;
     localStorage.setItem(STORAGE_KEY_RATE, String(clamped));
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
+ * Task #124: lee si XTTS-v2 (voz colombiana) está habilitado.
+ * Fallback a false (desactivado por defecto) si storage no disponible.
+ */
+export function getXTTSEnabled() {
+  try {
+    if (typeof localStorage === 'undefined') return false;
+    const stored = localStorage.getItem(XTTS_ENABLED_KEY);
+    return stored === 'true';
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
+ * Task #124: persiste la preferencia de XTTS-v2.
+ *
+ * @returns {boolean} true si guardó, false si storage falló.
+ */
+export function setXTTSEnabled(enabled) {
+  try {
+    if (typeof localStorage === 'undefined') return false;
+    localStorage.setItem(XTTS_ENABLED_KEY, String(enabled));
     return true;
   } catch (_) {
     return false;
@@ -419,6 +459,82 @@ export async function speakKokoro(text, options = {}) {
   }
 }
 
+/**
+ * Task #124: TTS con voz colombiana vía XTTS-v2 (voice cloning).
+ *
+ * XTTS-v2 (Coqui TTS) soporta voice cloning con un sample de 10s.
+ * A diferencia de Kokoro (que usa voces pre-entrenadas con acento anglo),
+ * XTTS-v2 preserva el acento del speaker en el sample de audio.
+ *
+ * Esta función implementa un fallback robusto:
+ *   1. Intenta XTTS-v2 con timeout XTTS_TIMEOUT_MS (30s default)
+ *   2. Si timeout, error HTTP, o XTTS no disponible → fallback a speakKokoro
+ *   3. Si Kokoro también falla → fallback a speak() Web Speech API
+ *
+ * @param {string} text - Texto a sintetizar (puede tener markdown)
+ * @param {Object} options - Opciones adicionales
+ * @param {string} options.voiceUrl - URL del audio sample colombiano (10s)
+ * @param {string} options.format - Formato de audio output (mp3, wav)
+ * @param {string} options.lang - Idioma (default 'es')
+ * @returns {Promise<Audio|null>} - Audio element o null si todos fallan
+ */
+export async function speakXTTS(text, options = {}) {
+  const {
+    voiceUrl = DEFAULT_COLOMBIAN_VOICE,
+    format = 'mp3',
+    lang = 'es',
+  } = options;
+
+  stop();
+  const cleanText = sanitizeForTTS(text);
+
+  // Task #122: guardar el texto original (no sanitizado) para replayLast()
+  if (typeof text === 'string' && text.trim().length > 0) {
+    lastSpoken = text;
+    lastSpokenOptions = { ...options };
+  }
+
+  try {
+    // Implementar timeout manual para XTTS (AbortSignal.timeout no está
+    // disponible en todos los browsers)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), XTTS_TIMEOUT_MS);
+
+    const res = await fetch('/api/xtts/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: cleanText, voice_url: voiceUrl, format, lang }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+
+    currentKokoroUrl = url;
+    currentKokoroAudio = audio;
+
+    audio.onended = () => {
+      if (currentKokoroUrl === url) {
+        URL.revokeObjectURL(currentKokoroUrl);
+        currentKokoroAudio = null;
+        currentKokoroUrl = null;
+      }
+    };
+
+    await audio.play();
+    return audio;
+  } catch (e) {
+    // Fallback a Kokoro si XTTS falla (timeout, error HTTP, XTTS not available)
+    console.warn('[TTS] XTTS failed, fallback to Kokoro:', e.message);
+    return await speakKokoro(text, options);
+  }
+}
+
 export function isSpeaking() {
   return window.speechSynthesis?.speaking || false;
 }
@@ -473,6 +589,7 @@ export function init() {
 export default {
   speak,
   speakKokoro,
+  speakXTTS,
   stop,
   pause,
   resume,
@@ -485,11 +602,15 @@ export default {
   replayLast,
   getLastSpoken,
   init,
-  // Task #124: preferencias persistidas de voz Kokoro.
+  // Task #124: preferencias persistidas de voz Kokoro + XTTS.
   getPreferredVoice,
   setPreferredVoice,
   getPreferredRate,
   setPreferredRate,
+  getXTTSEnabled,
+  setXTTSEnabled,
   KOKORO_VOICES,
   DEFAULT_KOKORO_VOICE,
+  DEFAULT_COLOMBIAN_VOICE,
+  XTTS_TIMEOUT_MS,
 };
