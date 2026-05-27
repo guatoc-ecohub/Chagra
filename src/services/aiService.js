@@ -21,6 +21,7 @@
 import { streamOllama } from './ollamaStream';
 import { retrieve } from './ragRetriever';
 import { callTool, isSidecarEnabled } from './sidecarClient';
+import { parseJsonTolerant } from '../utils/parseJsonTolerant';
 
 // Ruta relativa: Nginx proxea /api/ollama/ → http://localhost:11434/
 // Ruta final: /api/ollama/api/generate → http://localhost:11434/api/generate
@@ -216,9 +217,14 @@ export const analyzeFoliage = async (imageBlob, { onToken, signal, speciesSlug, 
       { signal, meta: { rag_passages_used: passages.length } },
     )).trim();
 
-    // Parsear JSON (Gemma puede envolver en markdown fences)
-    const cleaned = text.replace(/```json\s*/g, '').replace(/```/g, '').trim();
-    const parsed = JSON.parse(cleaned);
+    // Parser tolerante (QUICK-6 #269): repair_json fallback contra fences,
+    // prosa antes/después, trailing commas, cierres faltantes por num_predict.
+    const r = parseJsonTolerant(text);
+    if (!r.ok) {
+      console.warn('[aiService.analyzeFoliage] JSON irrecuperable:', r.error);
+      return null;
+    }
+    const parsed = r.value;
 
     // Validación y normalización del shape
     if (typeof parsed.score !== 'number') parsed.score = 0;
@@ -273,8 +279,14 @@ const runSpeciesRecognition = async (model, base64, { onToken, signal, telemetry
     onToken,
     { signal, meta: metaThunk },
   )).trim();
-  const cleaned = text.replace(/```json\s*/g, '').replace(/```/g, '').trim();
-  const parsed = JSON.parse(cleaned);
+  // Parser tolerante (QUICK-6 #269): repair_json fallback. Si falla
+  // completo, throw para que el caller maneje (recognizeSpecies tiene try
+  // externo que decide fallback texto).
+  const r = parseJsonTolerant(text);
+  if (!r.ok) {
+    throw new Error(`runSpeciesRecognition: ${r.error}`);
+  }
+  const parsed = r.value;
   const confidence = typeof parsed.confidence === 'number' ? parsed.confidence : 0;
 
   // Mutar telemetryState (si el caller pasó uno) ANTES de que
