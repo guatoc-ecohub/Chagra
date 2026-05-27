@@ -2,6 +2,10 @@
  * Tests para `recognizeSpeciesGrounded` y `scientificToSpeciesId` —
  * wiring de validate_visual_match al pipeline de foto. Anti-hallucination
  * visión (PR chagra-pro #48 expuso la tool, este PR la consume).
+ *
+ * V-05 (audit-vision-chagra-2026-05-26): `_grounded` ahora es objeto
+ * estructurado `{ status, reason, validation }` con 6 statuses posibles:
+ *   verified, rejected, sidecar-disabled, offline, no-binomial, sidecar-error.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
@@ -44,7 +48,7 @@ describe('recognizeSpeciesGrounded', () => {
     vi.restoreAllMocks();
   });
 
-  it('cuando el vision identifica species válida del catálogo, marca _grounded:true', async () => {
+  it('status:verified cuando el vision identifica species válida del catálogo', async () => {
     mockVisionResponse({
       common_name_es: 'café',
       scientific_name: 'Coffea arabica L.',
@@ -69,7 +73,11 @@ describe('recognizeSpeciesGrounded', () => {
     const result = await recognizeSpeciesGrounded(blob);
 
     expect(result).toBeTruthy();
-    expect(result._grounded).toBe(true);
+    expect(result._grounded.status).toBe('verified');
+    expect(result._grounded.reason).toMatch(/catálogo/i);
+    expect(result._grounded.validation).toBeTruthy();
+    expect(result._grounded.validation.valid).toBe(true);
+    // backwards-compat alias
     expect(result._validation.valid).toBe(true);
     expect(sidecarClient.callTool).toHaveBeenCalledWith(
       'validate_visual_match',
@@ -81,7 +89,7 @@ describe('recognizeSpeciesGrounded', () => {
     );
   });
 
-  it('cuando el vision alucina una especie inexistente, marca _grounded:false', async () => {
+  it('status:rejected cuando el vision alucina una especie inexistente', async () => {
     mockVisionResponse({
       common_name_es: 'planta inventada',
       scientific_name: 'Mangosteenia colombiana',
@@ -104,12 +112,14 @@ describe('recognizeSpeciesGrounded', () => {
     const blob = new Blob(['fake'], { type: 'image/jpeg' });
     const result = await recognizeSpeciesGrounded(blob);
 
-    expect(result._grounded).toBe(false);
+    expect(result._grounded.status).toBe('rejected');
+    expect(result._grounded.reason).toMatch(/no encontrada/i);
+    expect(result._grounded.validation.valid).toBe(false);
     expect(result._validation.valid).toBe(false);
     expect(result._validation.confidence_adjusted).toBe(0);
   });
 
-  it('si el sidecar está disabled, degrada a recognizeSpecies sin validar', async () => {
+  it('status:sidecar-disabled si el sidecar está apagado vía feature flag', async () => {
     sidecarClient.isSidecarEnabled.mockReturnValue(false);
     mockVisionResponse({
       common_name_es: 'tomate',
@@ -121,11 +131,13 @@ describe('recognizeSpeciesGrounded', () => {
     const blob = new Blob(['fake'], { type: 'image/jpeg' });
     const result = await recognizeSpeciesGrounded(blob);
 
-    expect(result._grounded).toBeNull();
+    expect(result._grounded.status).toBe('sidecar-disabled');
+    expect(result._grounded.reason).toMatch(/deshabilitada/i);
+    expect(result._grounded.validation).toBeNull();
     expect(sidecarClient.callTool).not.toHaveBeenCalled();
   });
 
-  it('si offline, degrada sin validar', async () => {
+  it('status:offline si el browser no tiene conexión', async () => {
     Object.defineProperty(globalThis, 'navigator', {
       value: { onLine: false },
       configurable: true,
@@ -140,11 +152,13 @@ describe('recognizeSpeciesGrounded', () => {
     const blob = new Blob(['fake'], { type: 'image/jpeg' });
     const result = await recognizeSpeciesGrounded(blob);
 
-    expect(result._grounded).toBeNull();
+    expect(result._grounded.status).toBe('offline');
+    expect(result._grounded.reason).toMatch(/conexión/i);
+    expect(result._grounded.validation).toBeNull();
     expect(sidecarClient.callTool).not.toHaveBeenCalled();
   });
 
-  it('si scientific_name está vacío o malformado, no llama al sidecar', async () => {
+  it('status:no-binomial si scientific_name está vacío o malformado', async () => {
     mockVisionResponse({
       common_name_es: 'desconocido',
       scientific_name: '', // vacío
@@ -155,7 +169,9 @@ describe('recognizeSpeciesGrounded', () => {
     const blob = new Blob(['fake'], { type: 'image/jpeg' });
     const result = await recognizeSpeciesGrounded(blob);
 
-    expect(result._grounded).toBeNull();
+    expect(result._grounded.status).toBe('no-binomial');
+    expect(result._grounded.reason).toMatch(/ambiguo/i);
+    expect(result._grounded.validation).toBeNull();
     expect(sidecarClient.callTool).not.toHaveBeenCalled();
   });
 
@@ -181,7 +197,7 @@ describe('recognizeSpeciesGrounded', () => {
     const blob = new Blob(['fake'], { type: 'image/jpeg' });
     const result = await recognizeSpeciesGrounded(blob);
 
-    expect(result._grounded).toBe(true);
+    expect(result._grounded.status).toBe('verified');
     expect(result._all_validations).toHaveLength(3);
     expect(sidecarClient.callTool).toHaveBeenCalledWith(
       'validate_visual_match',
@@ -195,7 +211,7 @@ describe('recognizeSpeciesGrounded', () => {
     );
   });
 
-  it('si el sidecar tool falla (devuelve null), degrada', async () => {
+  it('status:sidecar-error si el sidecar tool falla (devuelve null)', async () => {
     mockVisionResponse({
       common_name_es: 'aguacate',
       scientific_name: 'Persea americana',
@@ -207,7 +223,9 @@ describe('recognizeSpeciesGrounded', () => {
     const blob = new Blob(['fake'], { type: 'image/jpeg' });
     const result = await recognizeSpeciesGrounded(blob);
 
-    expect(result._grounded).toBeNull();
+    expect(result._grounded.status).toBe('sidecar-error');
+    expect(result._grounded.reason).toMatch(/temporal/i);
+    expect(result._grounded.validation).toBeNull();
     expect(result.scientific_name).toBe('Persea americana');
   });
 });

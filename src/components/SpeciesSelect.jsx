@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, ChevronDown, X, Clock, Sparkles, Camera, ImagePlus, Loader2, Bug, Check, AlertCircle } from 'lucide-react';
+import { Search, ChevronDown, X, Clock, Sparkles, Camera, ImagePlus, Loader2, Bug, Check, AlertCircle, AlertTriangle, HelpCircle, Info, WifiOff } from 'lucide-react';
 import VisionLoadingState from './common/VisionLoadingState';
 import { warmVisionModel } from '../services/visionWarmService';
 import { CROP_TAXONOMY } from '../config/taxonomy';
@@ -504,26 +504,72 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
               <p className="text-[10px] uppercase tracking-wider text-emerald-500 font-bold mb-0.5">
                 Especie sugerida ({Math.round((aiResult.confidence || 0) * 100)}% confianza)
               </p>
-              {/* Badge grounded contra catálogo (PR #114 — anti-alucinación).
-                  _grounded === true  → verde "Verificado catálogo".
-                  _grounded === false → amber "No verificado — revisar manualmente".
-                  _grounded === null  → sidecar offline o no aplica, sin badge. */}
-              {aiResult._grounded === true && (
+              {/* Badge grounded contra catálogo (V-05 — anti-alucinación con
+                  shape estructurado). `_grounded.status` distingue 6 estados:
+                    verified         → verde, sugerencia confirmada.
+                    rejected         → amber, sugerencia rechazada por catálogo.
+                    sidecar-disabled → slate info, validación desactivada.
+                    offline          → slate info, sin red para verificar.
+                    no-binomial      → amber, nombre científico ambiguo.
+                    sidecar-error    → amber, error temporal del catálogo. */}
+              {aiResult._grounded?.status === 'verified' && (
                 <span
                   data-testid="grounded-badge-verified"
                   className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 bg-green-600/20 text-green-300 border border-green-700 mb-1"
+                  title={aiResult._grounded.reason}
                 >
                   <Check size={14} aria-hidden="true" />
-                  Verificado catálogo
+                  Verificado en catálogo
                 </span>
               )}
-              {aiResult._grounded === false && (
+              {aiResult._grounded?.status === 'rejected' && (
                 <span
-                  data-testid="grounded-badge-unverified"
+                  data-testid="grounded-badge-rejected"
                   className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 bg-amber-600/20 text-amber-300 border border-amber-700 mb-1"
+                  title={aiResult._grounded.reason}
                 >
                   <AlertCircle size={14} aria-hidden="true" />
-                  No verificado — revisar manualmente
+                  No encontrado en catálogo
+                </span>
+              )}
+              {aiResult._grounded?.status === 'sidecar-disabled' && (
+                <span
+                  data-testid="grounded-badge-sidecar-disabled"
+                  className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 bg-slate-600/20 text-slate-300 border border-slate-700 mb-1"
+                  title={aiResult._grounded.reason}
+                >
+                  <Info size={14} aria-hidden="true" />
+                  Validación deshabilitada
+                </span>
+              )}
+              {aiResult._grounded?.status === 'offline' && (
+                <span
+                  data-testid="grounded-badge-offline"
+                  className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 bg-slate-600/20 text-slate-300 border border-slate-700 mb-1"
+                  title={aiResult._grounded.reason}
+                >
+                  <WifiOff size={14} aria-hidden="true" />
+                  Sin conexión
+                </span>
+              )}
+              {aiResult._grounded?.status === 'no-binomial' && (
+                <span
+                  data-testid="grounded-badge-no-binomial"
+                  className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 bg-amber-600/20 text-amber-300 border border-amber-700 mb-1"
+                  title={aiResult._grounded.reason}
+                >
+                  <HelpCircle size={14} aria-hidden="true" />
+                  Nombre ambiguo
+                </span>
+              )}
+              {aiResult._grounded?.status === 'sidecar-error' && (
+                <span
+                  data-testid="grounded-badge-sidecar-error"
+                  className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 bg-amber-600/20 text-amber-300 border border-amber-700 mb-1"
+                  title={aiResult._grounded.reason}
+                >
+                  <AlertTriangle size={14} aria-hidden="true" />
+                  Error temporal
                 </span>
               )}
               <p className="text-sm text-emerald-200 font-bold">
@@ -535,10 +581,11 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
                 </p>
               )}
             </div>
-            {/* Si el primario NO está verificado pero el sidecar encontró
-                candidates alternativos válidos en el catálogo, ofrecerlos
-                como sugerencias confiables. */}
-            {aiResult._grounded === false && Array.isArray(aiResult._all_validations) && (() => {
+            {/* Si el primario fue rechazado por el catálogo pero el sidecar
+                encontró candidates alternativos válidos, ofrecerlos como
+                sugerencias confiables. Solo aplica al status 'rejected'
+                (no a 'sidecar-error'/'no-binomial' donde no hubo validación). */}
+            {aiResult._grounded?.status === 'rejected' && Array.isArray(aiResult._all_validations) && (() => {
               const validCandidates = aiResult._all_validations.filter(
                 (v) => v && v.valid === true && v.species_id
               );

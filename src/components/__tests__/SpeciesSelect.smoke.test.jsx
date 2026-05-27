@@ -3,13 +3,16 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 // Smoke tests para la migración de SpeciesSelect a recognizeSpeciesGrounded
-// (PR #114). Cubre los tres valores observables de `_grounded`:
-//   - true  → badge VERDE "Verificado catálogo".
-//   - false → badge AMBER "No verificado — revisar manualmente" + bloque
-//             "Coincidencias en catálogo" cuando hay alternativas válidas
-//             en `_all_validations`.
-//   - null  → sidecar offline o no aplica → ningún badge se renderiza
-//             (degradación graceful).
+// (PR #114) + V-05 (audit-vision-chagra-2026-05-26): shape estructurado.
+// Cubre los 6 statuses observables de `_grounded.status`:
+//   verified         → badge VERDE "Verificado en catálogo".
+//   rejected         → badge AMBER "No encontrado en catálogo" + bloque
+//                      "Coincidencias en catálogo" cuando hay alternativas
+//                      válidas en `_all_validations`.
+//   sidecar-disabled → badge SLATE "Validación deshabilitada" (info).
+//   offline          → badge SLATE "Sin conexión" (info).
+//   no-binomial      → badge AMBER "Nombre ambiguo".
+//   sidecar-error    → badge AMBER "Error temporal".
 
 // Mock del store: lista vacía para evitar el chip "Recientes" (no toca el badge).
 vi.mock('../../store/useAssetStore', () => ({
@@ -33,8 +36,8 @@ vi.mock('../../hooks/usePhotoUrl', () => ({
   usePhotoUrl: () => ({ url: null, source: null, loading: false }),
 }));
 
-// Mock aiService.recognizeSpeciesGrounded — se reescribe per-test con el valor
-// de `_grounded` que queremos validar.
+// Mock aiService.recognizeSpeciesGrounded — se reescribe per-test con el
+// status de `_grounded` que queremos validar.
 const mockRecognizeSpeciesGrounded = vi.fn();
 vi.mock('../../services/aiService', () => ({
   recognizeSpeciesGrounded: (...args) => mockRecognizeSpeciesGrounded(...args),
@@ -42,12 +45,16 @@ vi.mock('../../services/aiService', () => ({
 
 import SpeciesSelect from '../SpeciesSelect';
 
-const buildResult = (grounded, extra = {}) => ({
+const buildResult = (status, extra = {}) => ({
   common_name_es: 'Tomate',
   scientific_name: 'Solanum lycopersicum',
   confidence: 0.85,
   alternatives: [],
-  _grounded: grounded,
+  _grounded: {
+    status,
+    reason: extra.reason ?? 'mock reason',
+    validation: extra.validation ?? null,
+  },
   _validation: extra.validation ?? null,
   _all_validations: extra.all_validations ?? [],
 });
@@ -62,14 +69,15 @@ const triggerCapture = async () => {
   await fireEvent.change(fileInput, { target: { files: [file] } });
 };
 
-describe('SpeciesSelect — badges grounded (PR #114)', () => {
+describe('SpeciesSelect — badges grounded (V-05 structured status)', () => {
   beforeEach(() => {
     mockRecognizeSpeciesGrounded.mockReset();
   });
 
-  it('renderiza badge VERDE "Verificado catálogo" cuando _grounded === true', async () => {
+  it('status:verified → badge VERDE "Verificado en catálogo"', async () => {
     mockRecognizeSpeciesGrounded.mockResolvedValue(
-      buildResult(true, {
+      buildResult('verified', {
+        reason: 'Verificado en catálogo Chagra.',
         validation: { valid: true, species_id: 'solanum_lycopersicum', confidence_adjusted: 0.92 },
       })
     );
@@ -78,15 +86,20 @@ describe('SpeciesSelect — badges grounded (PR #114)', () => {
     await waitFor(() => {
       const badge = screen.getByTestId('grounded-badge-verified');
       expect(badge).toBeTruthy();
-      expect(badge.textContent).toMatch(/Verificado catálogo/i);
+      expect(badge.textContent).toMatch(/Verificado en catálogo/i);
     });
-    // El badge unverified NO debe estar.
-    expect(screen.queryByTestId('grounded-badge-unverified')).toBeNull();
+    // Ningún otro badge debe estar.
+    expect(screen.queryByTestId('grounded-badge-rejected')).toBeNull();
+    expect(screen.queryByTestId('grounded-badge-sidecar-disabled')).toBeNull();
+    expect(screen.queryByTestId('grounded-badge-offline')).toBeNull();
+    expect(screen.queryByTestId('grounded-badge-no-binomial')).toBeNull();
+    expect(screen.queryByTestId('grounded-badge-sidecar-error')).toBeNull();
   });
 
-  it('renderiza badge AMBER "No verificado" cuando _grounded === false', async () => {
+  it('status:rejected → badge AMBER "No encontrado en catálogo"', async () => {
     mockRecognizeSpeciesGrounded.mockResolvedValue(
-      buildResult(false, {
+      buildResult('rejected', {
+        reason: 'Sugerencia no encontrada en catálogo.',
         validation: { valid: false, species_id: 'mangosteenia_colombiana', reason: 'not_in_catalog' },
         all_validations: [
           { valid: false, species_id: 'mangosteenia_colombiana', source_label: 'Mangosteenia colombiana' },
@@ -96,17 +109,16 @@ describe('SpeciesSelect — badges grounded (PR #114)', () => {
     render(<SpeciesSelect value="" onChange={() => {}} />);
     await triggerCapture();
     await waitFor(() => {
-      const badge = screen.getByTestId('grounded-badge-unverified');
+      const badge = screen.getByTestId('grounded-badge-rejected');
       expect(badge).toBeTruthy();
-      expect(badge.textContent).toMatch(/No verificado/i);
-      expect(badge.textContent).toMatch(/revisar manualmente/i);
+      expect(badge.textContent).toMatch(/No encontrado/i);
     });
     expect(screen.queryByTestId('grounded-badge-verified')).toBeNull();
   });
 
-  it('muestra "Coincidencias en catálogo" si _grounded === false y _all_validations trae candidates válidos', async () => {
+  it('status:rejected con candidates válidos → muestra "Coincidencias en catálogo"', async () => {
     mockRecognizeSpeciesGrounded.mockResolvedValue(
-      buildResult(false, {
+      buildResult('rejected', {
         validation: { valid: false, species_id: 'mangosteenia_colombiana' },
         all_validations: [
           { valid: false, species_id: 'mangosteenia_colombiana', source_label: 'Mangosteenia colombiana' },
@@ -124,17 +136,57 @@ describe('SpeciesSelect — badges grounded (PR #114)', () => {
     });
   });
 
-  it('NO renderiza badge cuando _grounded === null (degradación graceful)', async () => {
-    mockRecognizeSpeciesGrounded.mockResolvedValue(buildResult(null));
+  it('status:sidecar-disabled → badge SLATE "Validación deshabilitada"', async () => {
+    mockRecognizeSpeciesGrounded.mockResolvedValue(
+      buildResult('sidecar-disabled', { reason: 'Validación catálogo deshabilitada.' })
+    );
     render(<SpeciesSelect value="" onChange={() => {}} />);
     await triggerCapture();
-    // Esperamos a que el resultado AI aparezca (Especie sugerida) para
-    // confirmar que llegamos al render del bloque 'done'.
     await waitFor(() => {
-      expect(screen.getByText(/Especie sugerida/i)).toBeTruthy();
+      const badge = screen.getByTestId('grounded-badge-sidecar-disabled');
+      expect(badge).toBeTruthy();
+      expect(badge.textContent).toMatch(/Validación deshabilitada/i);
     });
     expect(screen.queryByTestId('grounded-badge-verified')).toBeNull();
-    expect(screen.queryByTestId('grounded-badge-unverified')).toBeNull();
-    expect(screen.queryByTestId('grounded-valid-candidates')).toBeNull();
+    expect(screen.queryByTestId('grounded-badge-rejected')).toBeNull();
+  });
+
+  it('status:offline → badge SLATE "Sin conexión"', async () => {
+    mockRecognizeSpeciesGrounded.mockResolvedValue(
+      buildResult('offline', { reason: 'Sin conexión, no se pudo verificar.' })
+    );
+    render(<SpeciesSelect value="" onChange={() => {}} />);
+    await triggerCapture();
+    await waitFor(() => {
+      const badge = screen.getByTestId('grounded-badge-offline');
+      expect(badge).toBeTruthy();
+      expect(badge.textContent).toMatch(/Sin conexión/i);
+    });
+  });
+
+  it('status:no-binomial → badge AMBER "Nombre ambiguo"', async () => {
+    mockRecognizeSpeciesGrounded.mockResolvedValue(
+      buildResult('no-binomial', { reason: 'Nombre científico ambiguo.' })
+    );
+    render(<SpeciesSelect value="" onChange={() => {}} />);
+    await triggerCapture();
+    await waitFor(() => {
+      const badge = screen.getByTestId('grounded-badge-no-binomial');
+      expect(badge).toBeTruthy();
+      expect(badge.textContent).toMatch(/Nombre ambiguo/i);
+    });
+  });
+
+  it('status:sidecar-error → badge AMBER "Error temporal"', async () => {
+    mockRecognizeSpeciesGrounded.mockResolvedValue(
+      buildResult('sidecar-error', { reason: 'Error temporal del catálogo.' })
+    );
+    render(<SpeciesSelect value="" onChange={() => {}} />);
+    await triggerCapture();
+    await waitFor(() => {
+      const badge = screen.getByTestId('grounded-badge-sidecar-error');
+      expect(badge).toBeTruthy();
+      expect(badge.textContent).toMatch(/Error temporal/i);
+    });
   });
 });
