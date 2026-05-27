@@ -45,14 +45,24 @@ const TREE_FRACTION = 0.3;
 
 // Fallback inicial: el catálogo seed tiene exactamente estos números.
 // Renderizar valores reales desde el primer paint evita el destello "0".
+//
+// Sincronizado 2026-05-27 con `catalog/chagra-catalog-oss-subset-v3.2.json`
+// (production seed bundled en el PWA) + `public/cycle-content/manifest.json`:
+//   - species: 204 (subset v3.2)
+//   - biopreparados: 36
+//   - ragDocs: 491 (slugs del manifest, fichas pedagógicas embebidas)
+//   - sourcesTierA: 50 (sources con tier === 'A')
+//   - endangeredCount: 5 (conservation_status === 'nativo_protegido')
+//   - endemicasCount: 1 (conservation_status === 'endemica_colombia')
+//   - invasorasCount: 10 (category === 'especies_invasoras')
 const CATALOG_FALLBACK = {
-  species: 486,
-  biopreparados: 19,
-  ragDocs: 176,
-  sourcesTierA: 52,
-  endangeredCount: 18,
-  endemicasCount: 9,
-  invasorasCount: 17,
+  species: 204,
+  biopreparados: 36,
+  ragDocs: 491,
+  sourcesTierA: 50,
+  endangeredCount: 5,
+  endemicasCount: 1,
+  invasorasCount: 10,
 };
 
 // Federación pre-login: cuando no hay store hidratado, usar números globales

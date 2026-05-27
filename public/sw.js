@@ -1,4 +1,17 @@
+// CACHE_NAME mantiene formato `chagra-v\d+` para compatibilidad con el
+// auto-bump pre-commit (scripts/auto-bump-version.mjs match regex).
+// A partir de QUICK-10 2026-05-27 derivamos CACHE_VERSION concatenando
+// BUILD_VERSION (timestamp inyectado por vite.config.js plugin
+// `viteSwBuildVersion` en cada `vite build`). Esto garantiza que la cache
+// se invalide incluso cuando el deploy ocurre SIN bump de version (ej. solo
+// cambia public/deploy-marker.txt, redeploy CI sobre el mismo commit, o
+// hot-fix urgente sin pre-commit hook).
+//
+// `__BUILD_VERSION__` es un placeholder reemplazado en build. En modo dev
+// (vite serve) queda con el literal y no afecta porque devtools usa no-cache.
 const CACHE_NAME = 'chagra-v240';
+const BUILD_VERSION = '__BUILD_VERSION__';
+const CACHE_VERSION = `${CACHE_NAME}-${BUILD_VERSION}`;
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -13,7 +26,7 @@ const ASSETS_TO_CACHE = [
 // Instalación del Service Worker
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
+    caches.open(CACHE_VERSION)
       .then(cache => cache.addAll(ASSETS_TO_CACHE))
       .then(() => self.skipWaiting())
   );
@@ -26,7 +39,7 @@ self.addEventListener('activate', (event) => {
     caches.keys()
       .then(cacheNames => Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
+          if (cacheName !== CACHE_VERSION) {
             return caches.delete(cacheName);
           }
           return undefined;
@@ -38,7 +51,7 @@ self.addEventListener('activate', (event) => {
         // Notifica a clients que hay un SW nuevo activo. El cliente decide
         // si recarga (típicamente sí, para asegurar bundle/chunks frescos).
         clients.forEach(client => {
-          client.postMessage({ type: 'SW_UPDATED', version: CACHE_NAME });
+          client.postMessage({ type: 'SW_UPDATED', version: CACHE_VERSION });
         });
       })
   );
@@ -69,7 +82,7 @@ self.addEventListener('fetch', (event) => {
         const networkFetch = fetch(event.request).then(response => {
           if (event.request.method === 'GET' && response.ok) {
             const respClone = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(event.request, respClone));
+            caches.open(CACHE_VERSION).then(cache => cache.put(event.request, respClone));
           }
           return response;
         }).catch(() => cachedResponse);
@@ -86,7 +99,7 @@ self.addEventListener('fetch', (event) => {
         .then(response => {
           if (response.ok) {
             const respClone = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(event.request, respClone));
+            caches.open(CACHE_VERSION).then(cache => cache.put(event.request, respClone));
           }
           return response;
         })
@@ -234,7 +247,7 @@ self.addEventListener('message', (event) => {
   // Fix Antigravity QA #18.
   if (event.data && event.data.type === 'GET_VERSION') {
     if (event.ports && event.ports[0]) {
-      event.ports[0].postMessage({ type: 'VERSION', version: CACHE_NAME });
+      event.ports[0].postMessage({ type: 'VERSION', version: CACHE_VERSION });
     }
   }
 });

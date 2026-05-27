@@ -5,9 +5,10 @@ import { test, expect } from '@playwright/test';
  *
  * Componente: src/components/BiodiversidadView.jsx
  *
- * El catálogo es la pieza más visible del producto. Hay 486+ species, 19
- * biopreparados, 176+ plagas, etc. (cifras del WelcomeStatsHero). Este
- * spec verifica que el catálogo carga + permite búsqueda + abre fichas.
+ * El catálogo es la pieza más visible del producto. Hay 204 species, 36
+ * biopreparados, 491 fichas pedagógicas, etc. (cifras del WelcomeStatsHero,
+ * sincronizado con seed v3.2 el 2026-05-27). Este spec verifica que el
+ * catálogo carga + permite búsqueda + abre fichas.
  */
 
 const ORIGIN = 'http://localhost:5173';

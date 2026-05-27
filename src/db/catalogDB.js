@@ -186,18 +186,20 @@ export async function getNativeSubstitutesForInvasive(invasiveId, options = {}) 
  * Stats agregados del catálogo. Usado por WelcomeStatsHero pre/post login.
  * Devuelve counts de species + biopreparados + sources tier A.
  * Si SQLite no inicializó, retorna fallbacks razonables del seed actual
- * para que el banner muestre números reales (486/19/52) en vez de 0.
+ * para que el banner muestre números reales (204/36/50) en vez de 0.
+ *
+ * Sincronizado 2026-05-27 con `catalog/chagra-catalog-oss-subset-v3.2.json`.
  *
  * @returns {Promise<{species:number, biopreparados:number, sourcesTierA:number, endemicas:number, endangered:number, invasoras:number}>}
  */
 export async function getCatalogStats() {
     const FALLBACK = {
-        species: 486,
-        biopreparados: 19,
-        sourcesTierA: 52,
-        endemicas: 9,
-        endangered: 18,
-        invasoras: 17,
+        species: 204,
+        biopreparados: 36,
+        sourcesTierA: 50,
+        endemicas: 1,
+        endangered: 5,
+        invasoras: 10,
     };
     try {
         if (!dbInstance) await initCatalog();
