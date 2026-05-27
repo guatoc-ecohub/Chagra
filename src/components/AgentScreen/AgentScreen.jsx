@@ -18,6 +18,7 @@ import { buildLLMRequest, selectChatRoute } from '../../services/llmRouter';
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
 import { isSidecarEnabled, planNlu, callTool, resolveEntities, getClimaIdeam } from '../../services/sidecarClient';
+import { buildProfileContext } from '../../services/agentService';
 import { FARM_CONFIG } from '../../config/defaults';
 import { speak, speakKokoro, stop, init as initTTS, isSupported, isKokoroAvailable, replayLast, isSpeaking } from '../../services/ttsService';
 import { executeAction, setActionGateCallback } from '../../services/actionExecutor';
@@ -596,7 +597,9 @@ HERRAMIENTAS NORMATIVA SOLO PARA VALIDACIÓN, NUNCA PRESCRIPCIÓN:
   ZIP DANE o sugiera consulta directa en Corabastos. Nunca invente
   precios.
 
-Responde en español colombiano (tú/usted, sin voseo argentino). Sé específico y útil cuando tengas certeza; humilde y preguntón cuando no.`;
+Responde en español colombiano (tú/usted, sin voseo argentino). Sé específico y útil cuando tengas certeza; humilde y preguntón cuando no.
+
+${buildProfileContext(finca)}`;
   }, [plants, fincas, activeFincaSlug, indoorZone]);
 
   // 057.4 integration: los handlers ya NO ejecutan addLog directo. Solo

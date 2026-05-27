@@ -1,0 +1,288 @@
+/**
+ * agentService — Contexto de perfil y system prompt extensions para el agente Chagra.
+ *
+ * Task #202: Integrar profile.json del onboarding en system prompt con:
+ * 1. Tono de lenguaje regional según profile.region
+ * 2. Recomendaciones según región específica (no solo piso térmico)
+ * 3. Info técnica SIEMPRE cita fuente
+ * 4. Datos de finca SOLO si user pregunta
+ * 5. Alertas clima inteligentes (IDEAM + ENSO)
+ * 6. Origen obligatorio cada dato técnico
+ *
+ * @module agentService
+ */
+
+import { getRegionFromDepartment } from './regionalismsService.js';
+
+/**
+ * Mapeo de zonas bioculturales a regiones lingüísticas.
+ * Basado en correlación geográfica y cultural de Colombia.
+ */
+const ZONE_TO_REGION_MAP = {
+  'andino_alto_páramo': 'cundiboyacense',
+  'andino_alto': 'cundiboyacense',
+  'andino_medio': 'cundiboyacense', // podría ser paisa dependiendo del departamento
+  'andino_medio_invernadero': 'cundiboyacense',
+  'valle_caucano': 'paisa', // Valle del Cauca es eje cafetero
+  'cafetero': 'paisa',
+  'caribe': 'caribe',
+  'llanos': 'llanero',
+  'amazonia': 'amazonica',
+  'pacifico': 'pacifico',
+  'nariño': 'pastuso',
+  'santander': 'santandereano',
+  'tolima_huila': 'opita',
+};
+
+/**
+ * Mapeo de zonas bioculturales a departamentos para detectar región.
+ * Usado cuando biocultural_zone no está mapeada directamente.
+ */
+const ZONE_TO_DEPARTMENTS = {
+  'andino_alto_páramo': ['boyaca', 'cundinamarca', 'bogota_dc'],
+  'andino_alto': ['cundinamarca', 'boyaca'],
+  'andino_medio': ['cundinamarca', 'boyaca', 'antioquia', 'caldas', 'risaralda', 'quindio'],
+  'andino_medio_invernadero': ['cundinamarca', 'antioquia', 'caldas'],
+  'valle_caucano': ['valle_del_cauca', 'cauca'],
+  'cafetero': ['antioquia', 'caldas', 'risaralda', 'quindio'],
+  'caribe': ['atlantico', 'bolivar', 'cesar', 'cordoba', 'guajira', 'magdalena', 'sucre'],
+  'llanos': ['meta', 'casanare', 'vichada', 'arauca'],
+  'amazonia': ['putumayo', 'caqueta', 'amazonas', 'vaupes'],
+  'pacifico': ['choco', 'valle_del_cauca', 'cauca', 'narino'],
+  'nariño': ['narino'],
+  'santander': ['santander', 'norte_de_santander'],
+  'tolima_huila': ['tolima', 'huila'],
+};
+
+/**
+ * Alertas específicas por región basadas en riesgos climáticos.
+ */
+const REGIONAL_CLIMATE_ALERTS = {
+  'andino_alto_páramo': {
+    riesgos: ['heladas', 'granizadas', 'vientos fuertes', 'radiación UV extrema'],
+    recomendaciones: 'Proteger cultivos con cubierta plástica o mantas térmicas durante noches despejadas. Evitar riego en horas de la tarde para reducir riesgo de heladas.',
+    fuentes: ['IDEAM 2024 - Pronóstico de heladas en zonas altoandinas', 'Corporación Autónoma Regional'],
+  },
+  'andino_alto': {
+    riesgos: ['heladas ocasionales', 'granizadas', 'lluvias torrenciales'],
+    recomendaciones: 'Monitorear pronóstico IDEAM para alertas de helada. Usar cobertores temporales en cultivos sensibles durante temporales de frío.',
+    fuentes: ['IDEAM - Estudio de heladas en Sabana de Bogotá 2020-2023'],
+  },
+  'andino_medio': {
+    riesgos: ['exceso de lluvias', 'enfermedades fúngicas', 'erosión'],
+    recomendaciones: 'Implementar drenajes adecuados. Rotar fungicidas preventivamente. Usar cobertura vegetal para controlar erosión.',
+    fuentes: ['ICA - Manual de manejo fitosanitario zona andina', 'IDEAM - Análisis de precipitación 2023'],
+  },
+  'valle_caucano': {
+    riesgos: ['sequías estacionales', 'temperaturas extremas', 'fenómenos de El Niño/La Niña'],
+    recomendaciones: 'Implementar riego por goteo eficiente. Usar mulch para conservar humedad. Sembrar variedades tolerantes a estrés hídrico.',
+    fuentes: ['IDEAM - Boletín ENSO 2024', 'CENICAÑA - Recomendaciones cultivo de caña', 'Corporación Autónoma Regional del Valle del Cauca'],
+  },
+  'caribe': {
+    riesgos: ['salinidad en suelos', 'sequías prolongadas', 'huracanes'],
+    recomendaciones: 'Usar cultivos tolerantes a salinidad. Implementar sistemas de riego con agua de calidad controlada. Monitorear ciclones tropicales.',
+    fuentes: ['IDEAM - Monitor de sequía Caribe', 'ICA - Recomendaciones zonas costeras'],
+  },
+  'llanos': {
+    riesgos: ['sequías marcadas', 'incendios forestales', 'periodos de inundación'],
+    recomendaciones: 'Implementar sistema de防守 contra incendios. Usar cultivos adaptados a periodos de estrés hídrico. Planificar siembras según régimen de lluvias.',
+    fuentes: ['IDEAM - Alerta de incendios 2024', 'Corporinoquia - Plan de manejo del fuego'],
+  },
+  'pacifico': {
+    riesgos: ['exceso de lluvias', 'humedad extrema', 'enfermedades tropicales'],
+    recomendaciones: 'Espaciamiento amplio entre plantas para ventilación. Control preventivo de hongos. Usar especies nativas adaptadas a condiciones de humedad.',
+    fuentes: ['IDEAM - Análisis precipitación Pacífico', 'Codechocó - Guía agroforestal'],
+  },
+  'amazonica': {
+    riesgos: ['deforestación', 'pérdida de biodiversidad', 'cambio climático global'],
+    recomendaciones: 'Priorizar sistemas agroforestales con especies nativas. Conservar corredores biológicos. Evitar monocultivos extensivos.',
+    fuentes: ['SINCHI - Guía agroecológica amazónica', 'IDEAM - Monitor de deforestación'],
+  },
+  'nariño': {
+    riesgos: ['heladas andinas', 'sequías en valles interandinos', 'erupciones volcánicas'],
+    recomendaciones: 'Usar variedades locales adaptadas (frejol, maíz nativo). Implementar terrazas para reducir erosión. Monitorear ceniza volcánica.',
+    fuentes: ['IDEAM Pasto', 'Corporación Autónoma Regional de Nariño'],
+  },
+  'santandereano': {
+    riesgos: ['erosión severa', 'sequías en cañones', 'lluvias torrenciales'],
+    recomendaciones: 'Practicar labranza mínima. Construir zanjas de infiltración. Usar coberturas vegetales permanentes.',
+    fuentes: ['CAS - Guía de conservación de suelos', 'IDEAM Bucaramanga'],
+  },
+  'tolima_huila': {
+    riesgos: ['deslizamientos', 'heladas en zonas altas', 'sequías estacionales'],
+    recomendaciones: 'Evitar cultivos en laderas pronunciadas sin obras de conservación. Monitorear alertas de remoción en masa.',
+    fuentes: ['Cortolima - Plan de gestión del riesgo', 'IDEAM Neiva'],
+  },
+};
+
+/**
+ * Detecta la región lingüística basada en la zona biocultural de la finca.
+ *
+ * @param {string} bioculturalZone - Zona biocultural (ej: "andino_alto_páramo")
+ * @returns {string|null} Región lingüística (ej: "cundiboyacense") o null
+ */
+export function detectRegionFromBioculturalZone(bioculturalZone) {
+  if (!bioculturalZone) return null;
+  
+  // Mapeo directo
+  if (ZONE_TO_REGION_MAP[bioculturalZone]) {
+    return ZONE_TO_REGION_MAP[bioculturalZone];
+  }
+  
+  // Mapeo por departamento
+  const departments = ZONE_TO_DEPARTMENTS[bioculturalZone];
+  if (departments && departments.length > 0) {
+    // Retornar región del primer departamento
+    return getRegionFromDepartment(departments[0]);
+  }
+  
+  return null;
+}
+
+/**
+ * Genera contexto de tono regional para el system prompt.
+ *
+ * @param {string} region - Región lingüística (ej: "cundiboyacense")
+ * @returns {string} Contexto de tono regional para inyectar en prompt
+ */
+export function generateRegionalToneContext(region) {
+  if (!region) {
+    return 'Usa español neutro colombiano (tú/usted, sin regionalismos marcados).';
+  }
+  
+  const toneMap = {
+    'cundiboyacense': 'Usa español cundiboyacense: "sumercé", "quibo", "pues". Tono respetuoso pero cercano, típico del altiplano.',
+    'paisa': 'Usa español paisa: "¿qui más?", "pues", "vea", "parce". Tono amable y conversacional del eje cafetero.',
+    'caribe': 'Usa español costeño: "ajá parce", "vé pue", "hermano". Tono cálido y directo del Caribe.',
+    'llanero': 'Usa español llanero: "quibo ome", "mire mocho", "compadre". Tono de sabana.',
+    'opita': 'Usa español opita/tolimense: "paisano", "jue", "ah pues". Tono tolima-huila.',
+    'pastuso': 'Usa español pastuso: "taita", "guagua", "pues si". Tono nariñense.',
+    'pacifico': 'Usa español del Pacífico: "compadre", "hermano de la mar". Tono afrocolombiano.',
+    'santandereano': 'Usa español santandereano: "¿qui whopping?", "mano". Tono canchón.',
+    'amazonica': 'Usa español suave amazónico. Reconoce diversidad cultural. Evita imitar acentos específicos.',
+  };
+  
+  return toneMap[region] || 'Usa español neutro colombiano.';
+}
+
+/**
+ * Genera alertas climáticas contextuales según zona biocultural.
+ *
+ * @param {string} bioculturalZone - Zona biocultural de la finca
+ * @returns {string} Alertas climáticas para inyectar en prompt
+ */
+export function generateClimateAlertsContext(bioculturalZone) {
+  if (!bioculturalZone) {
+    return 'Cuando menciones clima, cita siempre la fuente (IDEAM, estación meteorológica, etc.). Si no hay datos, recomiendo consultar pronóstico IDEAM.';
+  }
+
+  const alerts = REGIONAL_CLIMATE_ALERTS[bioculturalZone];
+  if (!alerts) {
+    return `Para la zona ${bioculturalZone}, cuando menciones clima, cita siempre la fuente (IDEAM, Corporación Autónoma Regional, etc.). Si no tienes datos actualizados, recomiendo consultar el pronóstico IDEAM más reciente.`;
+  }
+  
+  return `ALERTAS CLIMÁTICAS PARA TU ZONA (${bioculturalZone}):
+Riesgos principales: ${alerts.riesgos.join(', ')}.
+Recomendación general: ${alerts.recomendaciones}
+Fuentes: ${alerts.fuentes.join(', ')}.
+
+Cuando el usuario pregunte sobre clima o riesgo, SIEMPRE menciona estos riesgos y cita las fuentes. Si no tienes datos actualizados, recomienda consultar el pronóstico IDEAM más reciente.`;
+}
+
+/**
+ * Genera reglas de citas de fuentes para el system prompt.
+ *
+ * @returns {string} Reglas de citación para inyectar en prompt
+ */
+export function generateSourceCitationRules() {
+  return `REGLA CRÍTICA DE CITACIÓN DE FUENTES:
+Toda información técnica (altitud, siembra, cosecha, manejo, plagas, clima, etc.) DEBE citar su origen. Formatos válitos:
+
+- "según Restrepo & Rivera (1994)" → para conocimiento agronómico clásico
+- "ICA Resolución [número]" → para normativa fitosanitaria
+- "Agrosavia [año]" → para investigación científica
+- "IDEAM [año]" → para datos climáticos
+- "SENA [curso/título]" → para formación técnica
+- "Papel técnico [título]" → para estudios específicos
+- "El catálogo Chagra indica..." → para datos del sistema
+
+Si NO tienes una fuente verificable para un dato, di explícitamente:
+"No tengo una fuente confiable para este dato específico. Te recomiendo consultar con [técnico local/agrónomo/IDEAM]."
+
+NUNCA inventes datos ni fuentes. Es preferible decir "no tengo el dato" que fabricar una cita.`;
+}
+
+/**
+ * Genera reglas de uso de datos de finca del usuario.
+ *
+ * @returns {string} Reglas de privacidad de datos para inyectar en prompt
+ */
+export function generateUserDataRules() {
+  return `REGLA DE PRIVACIDAD DE DATOS DE FINCA:
+Los datos de plantas, cultivos y finca del usuario SOLO deben mencionarse cuando:
+1. El usuario pregunte explícitamente: "¿qué tengo?", "mis plantas", "mi finca", "mi cultivo", "cuántas plantas tengo", "qué plantas hay"
+2. La consulta SEA sobre inventario: "¿qué especies cultivo?", "¿cuántos [cultivo] tengo?"
+
+NO preambules respuestas con "Tienes X plantas..." si la pregunta es sobre otra cosa.
+NO listes inventario en preguntas generales de manejo, plagas, clima, etc.
+
+Ejemplo CORRECTO:
+Usuario: "cómo podo el café"
+✓ "Para la poda del café (Coffea arabica), según Restrepo & Rivera (1994)..." (NO menciona inventario)
+
+Usuario: "qué tengo plantado"
+✓ "Tienes 15 fresas, 4 caléndulas, 1 tomate cherry..." (SÍ menciona inventario)`;
+}
+
+/**
+ * Construye el contexto de perfil completo para inyectar en el system prompt.
+ *
+ * @param {Object} finca - Objeto finca activa
+ * @returns {string} Contexto de perfil para system prompt
+ */
+export function buildProfileContext(finca) {
+  if (!finca) {
+    return generateSourceCitationRules() + '\n\n' + generateUserDataRules();
+  }
+  
+  const bioculturalZone = finca.biocultural_zone;
+  const region = detectRegionFromBioculturalZone(bioculturalZone);
+  const toneContext = generateRegionalToneContext(region);
+  const climateContext = generateClimateAlertsContext(bioculturalZone);
+  const citationRules = generateSourceCitationRules();
+  const userDataRules = generateUserDataRules();
+  
+  return `${toneContext}
+
+${climateContext}
+
+${citationRules}
+
+${userDataRules}`;
+}
+
+/**
+ * Formatea una alerta climática inteligente para el usuario.
+ * Debe usarse cuando se detecte riesgo climático en la consulta.
+ *
+ * @param {string} bioculturalZone - Zona biocultural
+ * @param {Object} climateData - Datos de clima (si disponibles)
+ * @returns {string} Alerta formateada para el usuario
+ */
+export function formatClimateAlert(bioculturalZone, climateData = null) {
+  const alerts = REGIONAL_CLIMATE_ALERTS[bioculturalZone];
+  if (!alerts) {
+    return '';
+  }
+  
+  let alertText = `⚠️ ALERTA CLIMÁTICA - ${bioculturalZone.replace(/_/g, ' ')}:\n`;
+  alertText += `Riesgos: ${alerts.riesgos.join(', ')}.\n`;
+  alertText += `Recomendación: ${alerts.recomendaciones}\n`;
+  alertText += `Fuentes: ${alerts.fuentes.join(', ')}`;
+  
+  if (climateData) {
+    alertText += `\n\nPronóstico actual: ${JSON.stringify(climateData)}`;
+  }
+  
+  return alertText;
+}
