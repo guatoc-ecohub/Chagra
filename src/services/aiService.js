@@ -29,13 +29,17 @@ const OLLAMA_URL = `${OLLAMA_BASE}/api/generate`;
 // Gemma 3 4B (oficial Google, multimodal nativo). Reemplaza paligemma
 // porque el runner Llama de Ollama crashea con arquitectura PaliGemma.
 const DIAGNOSIS_MODEL = 'gemma3:4b';
-// Vision-specialized model para species recognition. Bench Quadro M6000
-// 2026-05-17: qwen2.5vl:7b da 78 t/s GPU + identificación notablemente
-// mejor que gemma3:4b en frutales/hortalizas latam (11.8 GB VRAM, calza
-// holgado con 24 GB de la Quadro). Caller hace fallback a gemma3:4b si
-// qwen falla (modelo no cargado, OOM transitorio, etc.).
-const VISION_SPECIES_MODEL = 'qwen2.5vl:7b';
+// Vision-specialized model para species recognition. Bench 2026-05-26
+// bench-vision-flora 16 fixtures: llama3.2-vision:11b = 0 parse errors,
+// 18.8% nombre común, 68.8% familia botánica, 18.6s p50; qwen2.5vl:7b
+// = 16/16 parse errors a pesar de format:"json"; llava:13b 15/16 errors.
+// Cambio primary qwen2.5vl → llama3.2-vision por confiabilidad JSON.
+// qwen sigue como segundo fallback porque latencia p50 es 3.3s (5x más
+// rápido que llama32) — útil si llama32 OOM o timeout en hardware
+// constrained.
+const VISION_SPECIES_MODEL = 'llama3.2-vision:11b';
 const VISION_SPECIES_FALLBACK_MODEL = 'gemma3:4b';
+const VISION_SPECIES_FALLBACK_2_MODEL = 'qwen2.5vl:7b';
 
 // Prompt base sin contexto RAG. Fallback usado cuando el corpus no cargó
 // o el retrieve no devolvió passages relevantes.
@@ -374,18 +378,25 @@ export const recognizeSpecies = async (imageBlob, { onToken, signal } = {}) => {
     return null;
   }
 
-  // Primary: qwen2.5vl:7b (vision-specialized, mejor identificación).
+  // Primary: llama3.2-vision:11b (0 parse errors bench 2026-05-26).
   try {
     return await runSpeciesRecognition(VISION_SPECIES_MODEL, base64, { onToken, signal });
   } catch (err) {
     console.warn(`[aiService] ${VISION_SPECIES_MODEL} failed, fallback to ${VISION_SPECIES_FALLBACK_MODEL}:`, err.message);
   }
 
-  // Fallback: gemma3:4b (modelo de diagnóstico, ya cargado en VRAM normalmente).
+  // Fallback 1: gemma3:4b (modelo de diagnóstico, ya cargado en VRAM normalmente).
   try {
     return await runSpeciesRecognition(VISION_SPECIES_FALLBACK_MODEL, base64, { onToken, signal });
   } catch (err) {
-    console.warn('[aiService] Species recognition no disponible (fallback también falló):', err.message);
+    console.warn(`[aiService] ${VISION_SPECIES_FALLBACK_MODEL} failed, fallback 2 to ${VISION_SPECIES_FALLBACK_2_MODEL}:`, err.message);
+  }
+
+  // Fallback 2: qwen2.5vl:7b (rápido pero parse errors frecuentes — último recurso).
+  try {
+    return await runSpeciesRecognition(VISION_SPECIES_FALLBACK_2_MODEL, base64, { onToken, signal });
+  } catch (err) {
+    console.warn('[aiService] Species recognition no disponible (3 fallbacks fallaron):', err.message);
     return null;
   }
 };
