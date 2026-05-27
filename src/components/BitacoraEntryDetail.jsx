@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Edit2, Calendar, MapPin, FileText, Cpu, Hash, Camera, Loader2, Sparkles, AlertTriangle, Bug } from 'lucide-react';
+import { ArrowLeft, Edit2, Calendar, MapPin, FileText, Cpu, Hash, Camera, Image as ImageIcon, Loader2, Sparkles, AlertTriangle, Bug } from 'lucide-react';
 import StatusBadge from './StatusBadge';
 import useAssetStore from '../store/useAssetStore';
 import { captureAndCompress, getPhotoForLog } from '../services/photoService';
+import { compressImage, IMAGE_TOO_LARGE_MESSAGE } from '../utils/imageCompress';
 import { analyzeFoliage } from '../services/aiService';
 
 /**
@@ -117,7 +118,9 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
   const plants = useAssetStore((s) => s.plants);
   const [photoState, setPhotoState] = useState('idle'); // idle | uploading | success | error
   const [photoMsg, setPhotoMsg] = useState('');
-  const fileInputRef = useRef(null);
+  // Dual capture (2026-05-27): cámara + galería para post-attach a entry.
+  const cameraInputRef = useRef(null);
+  const galleryInputRef = useRef(null);
 
   // Audit 2026-05-18 #4: derivar speciesSlug del asset relacionado al log
   // para que `analyzeFoliage` consulte RAG con contexto específico de la
@@ -180,7 +183,19 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
     setAiStream('');
     setAiState('idle');
     try {
-      const { blob } = await captureAndCompress(file);
+      // Pre-compresión cliente-lado (operador 2026-05-27): 1600 px / JPEG 0.85
+      // → fallback 0.7 → reject > 2 MB antes de persistir + analizar.
+      const preCompressed = await compressImage(file);
+      if (!preCompressed.ok) {
+        setPhotoState('error');
+        setPhotoMsg(
+          preCompressed.reason === 'too_large'
+            ? IMAGE_TOO_LARGE_MESSAGE
+            : 'No se pudo procesar la foto',
+        );
+        return;
+      }
+      const { blob } = await captureAndCompress(preCompressed.blob);
       const result = await attachPhotoToLog(entry.id, blob);
       if (result?.success === false) {
         setPhotoState('error');
@@ -196,8 +211,9 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
       setPhotoState('error');
       setPhotoMsg(err?.message || 'Error procesando foto');
     } finally {
-      // Reset input para permitir re-attach mismo archivo si user reintenta
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      // Reset inputs para permitir re-attach mismo archivo si user reintenta
+      if (cameraInputRef.current) cameraInputRef.current.value = '';
+      if (galleryInputRef.current) galleryInputRef.current.value = '';
     }
   };
 
@@ -372,30 +388,53 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
               La foto se asocia a este evento sin modificarlo (append-only).
               Útil para documentar evidencia post-registro.
             </p>
-            <label className={`w-full p-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all min-h-[44px] ${
-              photoState === 'uploading'
-                ? 'bg-slate-800 text-slate-500 cursor-wait'
-                : photoState === 'success'
-                  ? 'bg-emerald-900/40 text-emerald-300 border border-emerald-700'
-                  : photoState === 'error'
-                    ? 'bg-red-900/30 text-red-300 border border-red-800'
-                    : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
-            }`}>
-              {photoState === 'uploading' ? (
-                <><Loader2 size={18} className="animate-spin" /> Procesando…</>
-              ) : (
-                <><Camera size={18} /> {photoState === 'success' ? 'Adjuntar otra' : 'Tomar / elegir foto'}</>
-              )}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-               
-                onChange={handlePhotoCapture}
-                disabled={photoState === 'uploading'}
-                className="hidden"
-              />
-            </label>
+            {/* Dual capture (2026-05-27): cámara prominente + galería. El estado
+                de upload se refleja en color de borde del contenedor. */}
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handlePhotoCapture}
+              disabled={photoState === 'uploading'}
+              className="hidden"
+            />
+            <input
+              ref={galleryInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoCapture}
+              disabled={photoState === 'uploading'}
+              className="hidden"
+            />
+            {photoState === 'uploading' ? (
+              <div className="w-full p-3 rounded-xl flex items-center justify-center gap-2 min-h-[44px] bg-slate-800 text-slate-500">
+                <Loader2 size={18} className="animate-spin" /> Procesando…
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => cameraInputRef.current?.click()}
+                  className={`p-3 rounded-xl flex items-center justify-center gap-2 min-h-[44px] border transition-all ${
+                    photoState === 'success'
+                      ? 'bg-emerald-900/40 text-emerald-300 border-emerald-700'
+                      : photoState === 'error'
+                        ? 'bg-red-900/30 text-red-300 border-red-800'
+                        : 'bg-emerald-900/30 hover:bg-emerald-800/40 text-emerald-100 border-emerald-700/60'
+                  }`}
+                >
+                  <Camera size={18} /> Tomar foto
+                </button>
+                <button
+                  type="button"
+                  onClick={() => galleryInputRef.current?.click()}
+                  className="p-3 rounded-xl flex items-center justify-center gap-2 min-h-[44px] border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200"
+                >
+                  <ImageIcon size={18} /> Subir desde galería
+                </button>
+              </div>
+            )}
             {photoMsg && (
               <p className={`text-xs ${photoState === 'error' ? 'text-red-400' : 'text-emerald-400'}`}>
                 {photoMsg}

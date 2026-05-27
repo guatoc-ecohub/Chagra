@@ -31,6 +31,22 @@ vi.mock('../../services/photoService', () => ({
   }),
 }));
 
+// Mock imageCompress.compressImage → blob sintético sin tocar canvas. jsdom
+// no implementa Canvas realmente, así que la compresión real fallaría —
+// devolvemos el "blob" tal cual para que el flow llegue a captureAndCompress.
+vi.mock('../../utils/imageCompress', () => ({
+  compressImage: vi.fn().mockImplementation(async (blob) => ({
+    ok: true,
+    blob,
+    width: 1600,
+    height: 1200,
+    quality: 0.85,
+    size: typeof blob?.size === 'number' ? blob.size : 1024,
+    originalSize: typeof blob?.size === 'number' ? blob.size : 1024,
+  })),
+  IMAGE_TOO_LARGE_MESSAGE: 'La foto es muy grande, intentá una más liviana',
+}));
+
 // Mock hook usePhotoUrl — sin foto, no relevante para el badge.
 vi.mock('../../hooks/usePhotoUrl', () => ({
   usePhotoUrl: () => ({ url: null, source: null, loading: false }),

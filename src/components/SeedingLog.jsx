@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { ArrowLeft, AlertCircle, Camera, MapPin, CheckCircle } from 'lucide-react';
+import { ArrowLeft, AlertCircle, Camera, Image as ImageIcon, MapPin, CheckCircle } from 'lucide-react';
 import { savePayload } from '../services/payloadService';
 import { captureAndCompress, savePhoto } from '../services/photoService';
+import { compressImage, IMAGE_TOO_LARGE_MESSAGE } from '../utils/imageCompress';
 import { sanitizeBlobUrl } from '../utils/blobUrl';
 import DateField from './DateField';
 
@@ -62,6 +63,9 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const cameraInputRef = useRef(null);
+  const galleryInputRef = useRef(null);
+
   const handlePhotoCapture = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -70,13 +74,28 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
       return;
     }
     try {
-      const { blob } = await captureAndCompress(file);
+      // Pre-compresión cliente-lado (operador 2026-05-27): 1600 px / JPEG 0.85
+      // → fallback 0.7 → reject > 2 MB.
+      const preCompressed = await compressImage(file);
+      if (!preCompressed.ok) {
+        if (preCompressed.reason === 'too_large') {
+          window.dispatchEvent(new CustomEvent('chagraToast', {
+            detail: { message: IMAGE_TOO_LARGE_MESSAGE },
+          }));
+        } else {
+          onSave('Error procesando foto', true);
+        }
+        return;
+      }
+      const { blob } = await captureAndCompress(preCompressed.blob);
       setPhoto(blob);
       if (photoUrl) URL.revokeObjectURL(photoUrl);
       setPhotoUrl(URL.createObjectURL(blob));
     } catch (err) {
       console.error('Error comprimir foto:', err);
       onSave('Error procesando foto', true);
+    } finally {
+      if (e.target) e.target.value = '';
     }
   };
 
@@ -236,16 +255,33 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
         {/* Hero foto, primer paso del flujo (DR-030 QW3) */}
         <div className="flex flex-col gap-2">
           <span className="text-xl font-bold">Foto de la planta</span>
-          <label className="flex flex-col items-center justify-center gap-3 p-6 rounded-xl bg-slate-900 border-2 border-dashed border-slate-600 active:bg-slate-800 cursor-pointer min-h-[140px] overflow-hidden relative">
-            {sanitizeBlobUrl(photoUrl) ? (
-              <img src={sanitizeBlobUrl(photoUrl)} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-60" />
-            ) : null}
-            <div className="z-10 flex flex-col items-center gap-2 drop-shadow-md">
-              <Camera size={48} />
-              <span className="text-xl font-bold">{photo ? '📸 Cambiar foto' : '📸 Foto de la planta'}</span>
+          {/* Dual capture (2026-05-27): cámara con capture="environment" +
+              galería. La preview vive arriba; los botones abajo. */}
+          {sanitizeBlobUrl(photoUrl) && (
+            <div className="relative w-full h-40 rounded-xl overflow-hidden border-2 border-slate-700">
+              <img src={sanitizeBlobUrl(photoUrl)} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
             </div>
-            <input type="file" accept="image/*" onChange={handlePhotoCapture} className="hidden" />
-          </label>
+          )}
+          <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handlePhotoCapture} className="hidden" />
+          <input ref={galleryInputRef} type="file" accept="image/*" onChange={handlePhotoCapture} className="hidden" />
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => cameraInputRef.current?.click()}
+              className="p-4 rounded-xl text-lg font-bold flex justify-center items-center gap-2 shadow-md min-h-[80px] bg-emerald-900/40 border-2 border-emerald-700/60 text-emerald-100 active:bg-emerald-800/60"
+            >
+              <Camera size={28} />
+              <span>{photo ? 'Cambiar' : 'Tomar foto'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => galleryInputRef.current?.click()}
+              className="p-4 rounded-xl text-lg font-bold flex justify-center items-center gap-2 shadow-md min-h-[80px] bg-slate-800 border-2 border-slate-600 active:bg-slate-700"
+            >
+              <ImageIcon size={28} />
+              <span>Subir desde galería</span>
+            </button>
+          </div>
         </div>
 
         <DateField
