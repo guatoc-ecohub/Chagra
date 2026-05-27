@@ -82,10 +82,13 @@ const extractChunk = (parsed) => {
  * @param {Function}    [options.onDone] callback invocado con el ultimo objeto
  *        del stream (done:true). Expone metadata de Ollama: model,
  *        total_duration, eval_count, prompt_eval_count, etc.
- * @param {Object}      [options.meta]   campos extra propagados al
+ * @param {Object|Function} [options.meta] campos extra propagados al
  *        `recordLLMEvent` final (solo en `success`). Ej.
  *        `{ rag_passages_used: 3 }` para análisis hit-rate RAG en el
  *        dashboard privado HYTA. Privacy-safe: no debe contener prompt/respuesta.
+ *        V-12 2026-05-27: también acepta función `() => Object` resuelta en
+ *        background al momento de grabar. Útil para campos derivados del
+ *        resultado parseado (ej. `confidence` de visión).
  * @returns {Promise<string>} texto completo concatenado al terminar.
  * @throws {Error} si el fetch falla, el servidor responde no-2xx o el body no es streameable.
  * @example
@@ -217,6 +220,18 @@ export async function streamOllama(url, body, onToken, { signal, onDone, meta } 
     : null;
   // Detección processor non-blocking (no esperamos, schedule en background)
   detectProcessorFor(lastDoneObj?.model || modelHint).then((processor) => {
+    // V-12: si `meta` es función, resolverla al momento de grabar para que
+    // el caller pueda enriquecer con datos derivados del parse (ej.
+    // `confidence`, `grounded_status` del flujo visión). Falla silente.
+    let resolvedMeta = {};
+    if (typeof meta === 'function') {
+      try {
+        const out = meta();
+        if (out && typeof out === 'object') resolvedMeta = out;
+      } catch (_) { /* meta thunk no debe romper telemetría */ }
+    } else if (meta && typeof meta === 'object') {
+      resolvedMeta = meta;
+    }
     recordLLMEvent({
       model: lastDoneObj?.model || modelHint,
       endpoint: url,
@@ -231,7 +246,7 @@ export async function streamOllama(url, body, onToken, { signal, onDone, meta } 
       // Meta extra del caller (ej. rag_passages_used para audit hit-rate RAG).
       // `recordLLMEvent` filtra a campos whitelisted del schema; cualquier
       // otra prop se descarta. Privacy-safe enforced en service layer.
-      ...(meta && typeof meta === 'object' ? meta : {}),
+      ...resolvedMeta,
     });
   });
 
