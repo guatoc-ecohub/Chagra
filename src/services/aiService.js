@@ -249,19 +249,44 @@ export const analyzeFoliage = async (imageBlob, { onToken, signal, speciesSlug, 
  * const species = await recognizeSpecies(imageBlob);
  * // species => { common_name_es: "cafe", scientific_name: "Coffea arabica", confidence: 0.92, alternatives: [] }
  */
-const runSpeciesRecognition = async (model, base64, { onToken, signal }) => {
+const runSpeciesRecognition = async (model, base64, { onToken, signal, telemetryState }) => {
+  // V-12 2026-05-27: thunk-meta resuelto en `recordLLMEvent` por
+  // `streamOllama`. Lee el state mutado tras parsear el JSON (confidence)
+  // y tras validar contra catálogo (grounded_status, set por
+  // `recognizeSpeciesGrounded`). Falla silente si `telemetryState` es null.
+  const metaThunk = telemetryState
+    ? () => {
+      const out = {};
+      if (typeof telemetryState.confidence === 'number') {
+        out.confidence = telemetryState.confidence;
+      }
+      if (telemetryState.grounded_status !== undefined) {
+        out.grounded_status = telemetryState.grounded_status;
+      }
+      return out;
+    }
+    : undefined;
+
   const text = (await streamOllama(
     OLLAMA_URL,
     { model, prompt: SPECIES_PROMPT, images: [base64] },
     onToken,
-    { signal },
+    { signal, meta: metaThunk },
   )).trim();
   const cleaned = text.replace(/```json\s*/g, '').replace(/```/g, '').trim();
   const parsed = JSON.parse(cleaned);
+  const confidence = typeof parsed.confidence === 'number' ? parsed.confidence : 0;
+
+  // Mutar telemetryState (si el caller pasó uno) ANTES de que
+  // `detectProcessorFor` resuelva en streamOllama y dispare recordLLMEvent.
+  // Best-effort: si la grabación dispara antes (carrera microtasks), simplemente
+  // omitirá el campo. Telemetría nunca debe bloquear el caller.
+  if (telemetryState) telemetryState.confidence = confidence;
+
   return {
     common_name_es: (parsed.common_name_es || '').toLowerCase().trim(),
     scientific_name: parsed.scientific_name || '',
-    confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0,
+    confidence,
     alternatives: Array.isArray(parsed.alternatives) ? parsed.alternatives : [],
     _model: model,
   };
@@ -324,48 +349,42 @@ function scientificToSpeciesId(scientific) {
  *   `_all_validations` cuando hubo callTool exitoso.
  */
 export const recognizeSpeciesGrounded = async (imageBlob, options = {}) => {
-  const visionResult = await recognizeSpecies(imageBlob, options);
+  // V-12 2026-05-27: state compartido con `recognizeSpecies` para que la
+  // telemetría de la inferencia vision capture `confidence` y
+  // `grounded_status`. Se llena en orden: confidence tras parsear el JSON
+  // del modelo, grounded_status tras validar (o degradar) contra catálogo.
+  const telemetryState = {};
+  const visionResult = await recognizeSpecies(imageBlob, { ...options, _telemetryState: telemetryState });
   if (!visionResult) return null;
+
+  // Helper: anota grounded_status para telemetría y devuelve el visionResult
+  // con la estructura _grounded rica (status, reason, validation). Mutar el
+  // state es best-effort porque la grabación de telemetría corre en background.
+  const finalize = (status, reason, validation = null, extras = {}) => {
+    telemetryState.grounded_status = status;
+    return {
+      ...visionResult,
+      _grounded: { status, reason, validation },
+      _validation: validation,
+      ...extras,
+    };
+  };
 
   // Si sidecar disabled, devolver lo del vision sin validar.
   if (!isSidecarEnabled()) {
-    return {
-      ...visionResult,
-      _grounded: {
-        status: 'sidecar-disabled',
-        reason: 'Validación catálogo deshabilitada.',
-        validation: null,
-      },
-      _validation: null,
-    };
+    return finalize('sidecar-disabled', 'Validación catálogo deshabilitada.');
   }
 
   // Si offline, no podemos pegar al sidecar.
   if (!navigator.onLine) {
-    return {
-      ...visionResult,
-      _grounded: {
-        status: 'offline',
-        reason: 'Sin conexión, no se pudo verificar.',
-        validation: null,
-      },
-      _validation: null,
-    };
+    return finalize('offline', 'Sin conexión, no se pudo verificar.');
   }
 
   // Derive species_id from scientific_name. Si no podemos derivar (binomial
   // ausente o malformado), tampoco podemos validar — degradamos.
   const speciesId = scientificToSpeciesId(visionResult.scientific_name);
   if (!speciesId) {
-    return {
-      ...visionResult,
-      _grounded: {
-        status: 'no-binomial',
-        reason: 'Nombre científico ambiguo.',
-        validation: null,
-      },
-      _validation: null,
-    };
+    return finalize('no-binomial', 'Nombre científico ambiguo.');
   }
 
   // Construir lista de candidates: el principal + alternatives si vienen.
@@ -391,35 +410,23 @@ export const recognizeSpeciesGrounded = async (imageBlob, options = {}) => {
   const result = await callTool('validate_visual_match', { candidates });
   if (!result) {
     // Sidecar timeout / 5xx — fallback al resultado vision sin validar.
-    return {
-      ...visionResult,
-      _grounded: {
-        status: 'sidecar-error',
-        reason: 'Error temporal del catálogo.',
-        validation: null,
-      },
-      _validation: null,
-    };
+    return finalize('sidecar-error', 'Error temporal del catálogo.');
   }
 
   // Buscar el match del candidato primario en results.
   const primary = (result.results || []).find((r) => r.species_id === speciesId);
   const verified = primary?.valid === true;
-  return {
-    ...visionResult,
-    _grounded: {
-      status: verified ? 'verified' : 'rejected',
-      reason: verified
-        ? 'Verificado en catálogo Chagra.'
-        : 'Sugerencia no encontrada en catálogo.',
-      validation: primary || null,
-    },
-    _validation: primary || null,
-    _all_validations: result.results || [],
-  };
+  return finalize(
+    verified ? 'verified' : 'rejected',
+    verified
+      ? 'Verificado en catálogo Chagra.'
+      : 'Sugerencia no encontrada en catálogo.',
+    primary || null,
+    { _all_validations: result.results || [] },
+  );
 };
 
-export const recognizeSpecies = async (imageBlob, { onToken, signal } = {}) => {
+export const recognizeSpecies = async (imageBlob, { onToken, signal, _telemetryState } = {}) => {
   let base64;
   try {
     base64 = await blobToBase64(imageBlob);
@@ -428,23 +435,30 @@ export const recognizeSpecies = async (imageBlob, { onToken, signal } = {}) => {
     return null;
   }
 
+  // V-12 2026-05-27: state compartido para enriquecer telemetría vision con
+  // `confidence` (parseado del modelo) y `grounded_status` (set por el
+  // wrapper `recognizeSpeciesGrounded` tras validar contra catálogo).
+  // `_telemetryState` es param interno opcional — wrappers como
+  // `recognizeSpeciesGrounded` lo pasan para extender la grabación.
+  const telemetryState = _telemetryState || {};
+
   // Primary: llama3.2-vision:11b (0 parse errors bench 2026-05-26).
   try {
-    return await runSpeciesRecognition(VISION_SPECIES_MODEL, base64, { onToken, signal });
+    return await runSpeciesRecognition(VISION_SPECIES_MODEL, base64, { onToken, signal, telemetryState });
   } catch (err) {
     console.warn(`[aiService] ${VISION_SPECIES_MODEL} failed, fallback to ${VISION_SPECIES_FALLBACK_MODEL}:`, err.message);
   }
 
   // Fallback 1: gemma3:4b (modelo de diagnóstico, ya cargado en VRAM normalmente).
   try {
-    return await runSpeciesRecognition(VISION_SPECIES_FALLBACK_MODEL, base64, { onToken, signal });
+    return await runSpeciesRecognition(VISION_SPECIES_FALLBACK_MODEL, base64, { onToken, signal, telemetryState });
   } catch (err) {
     console.warn(`[aiService] ${VISION_SPECIES_FALLBACK_MODEL} failed, fallback 2 to ${VISION_SPECIES_FALLBACK_2_MODEL}:`, err.message);
   }
 
   // Fallback 2: qwen2.5vl:7b (rápido pero parse errors frecuentes — último recurso).
   try {
-    return await runSpeciesRecognition(VISION_SPECIES_FALLBACK_2_MODEL, base64, { onToken, signal });
+    return await runSpeciesRecognition(VISION_SPECIES_FALLBACK_2_MODEL, base64, { onToken, signal, telemetryState });
   } catch (err) {
     console.warn('[aiService] Species recognition no disponible (3 fallbacks fallaron):', err.message);
     return null;

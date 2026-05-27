@@ -27,6 +27,18 @@
  *                                 // Audit 2026-05-18 #4: tracking hit-rate del
  *                                 // RAG en `analyzeFoliage` y futuros consumers.
  *                                 // null cuando el call no consultó RAG.
+ *     confidence: 0.92,           // V-12 2026-05-27: confianza self-reported por
+ *                                 // el modelo de visión (campo `confidence` del
+ *                                 // JSON parseado en `recognizeSpecies`). Solo
+ *                                 // emitido por callers vision; resto omite.
+ *                                 // Rango esperado 0-1, sin coerción.
+ *     grounded_status: 'verified' // V-12 2026-05-27: resultado de validar contra
+ *                                 // catálogo Chagra vía `validate_visual_match`
+ *                                 // (sidecar agro-mcp). Valores:
+ *                                 //   'verified' → match estricto catálogo
+ *                                 //   'rejected' → modelo alucinó (not_in_catalog)
+ *                                 //   null       → sidecar offline / disabled
+ *                                 //                / call no usó grounding
  *     created_at: ISO,
  *     synced: false,
  *   }
@@ -79,6 +91,18 @@ export const recordLLMEvent = async (event) => {
     created_at: new Date().toISOString(),
     synced: false,
   };
+
+  // V-12 2026-05-27: campos opcionales del flujo visión. Omitir del payload
+  // cuando el caller no los provee (backward-compat strict — eventos no-vision
+  // como chat/extract no deben acarrear keys nulas innecesarias).
+  if (typeof event.confidence === 'number') {
+    record.confidence = event.confidence;
+  }
+  if (event.grounded_status !== undefined) {
+    // Acepta string ('verified'|'rejected'|otros) o null explícito (sidecar off).
+    // Solo omitimos si el caller no pasó la key.
+    record.grounded_status = event.grounded_status;
+  }
 
   try {
     const db = await openDB();
@@ -254,7 +278,7 @@ export const exportLLMTelemetry = async (format = 'json') => {
     const headers = ['id', 'created_at', 'model', 'endpoint', 'flujo', 'status',
                      'processor', 'total_ms', 'load_ms', 'eval_count',
                      'prompt_eval_count', 'eval_rate', 'error_kind',
-                     'rag_passages_used'];
+                     'rag_passages_used', 'confidence', 'grounded_status'];
     const rows = events.map((e) => headers.map((h) => e[h] ?? '').join(','));
     return [headers.join(','), ...rows].join('\n');
   }

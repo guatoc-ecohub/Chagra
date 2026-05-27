@@ -228,4 +228,73 @@ describe('recognizeSpeciesGrounded', () => {
     expect(result._grounded.validation).toBeNull();
     expect(result.scientific_name).toBe('Persea americana');
   });
+
+  // V-12 2026-05-27: telemetría de audit visión.
+  describe('telemetryState V-12 — meta thunk a streamOllama', () => {
+    it('pasa meta como función (thunk) que resuelve confidence + grounded_status="verified"', async () => {
+      mockVisionResponse({
+        common_name_es: 'café',
+        scientific_name: 'Coffea arabica',
+        confidence: 0.88,
+        alternatives: [],
+      });
+      sidecarClient.callTool.mockResolvedValueOnce({
+        available: true,
+        results: [{ species_id: 'coffea_arabica', valid: true, confidence_adjusted: 0.88 }],
+      });
+
+      const blob = new Blob(['fake'], { type: 'image/jpeg' });
+      await recognizeSpeciesGrounded(blob);
+
+      // El 4to argumento de streamOllama es options. meta debe ser función.
+      const [, , , opts] = ollamaStream.streamOllama.mock.calls[0];
+      expect(typeof opts.meta).toBe('function');
+
+      // Resolver el thunk DESPUÉS del flujo completo: debe contener
+      // confidence (set por runSpeciesRecognition) y grounded_status='verified'
+      // (set por recognizeSpeciesGrounded tras validar).
+      const resolved = opts.meta();
+      expect(resolved.confidence).toBeCloseTo(0.88);
+      expect(resolved.grounded_status).toBe('verified');
+    });
+
+    it('thunk resuelve grounded_status="rejected" cuando el catálogo rechaza la especie', async () => {
+      mockVisionResponse({
+        common_name_es: 'inventada',
+        scientific_name: 'Mangosteenia colombiana',
+        confidence: 0.7,
+        alternatives: [],
+      });
+      sidecarClient.callTool.mockResolvedValueOnce({
+        available: true,
+        results: [{ species_id: 'mangosteenia_colombiana', valid: false, confidence_adjusted: 0, reason: 'not_in_catalog' }],
+      });
+
+      const blob = new Blob(['fake'], { type: 'image/jpeg' });
+      await recognizeSpeciesGrounded(blob);
+
+      const [, , , opts] = ollamaStream.streamOllama.mock.calls[0];
+      const resolved = opts.meta();
+      expect(resolved.confidence).toBeCloseTo(0.7);
+      expect(resolved.grounded_status).toBe('rejected');
+    });
+
+    it('thunk resuelve grounded_status=null cuando sidecar disabled (degraded path)', async () => {
+      sidecarClient.isSidecarEnabled.mockReturnValue(false);
+      mockVisionResponse({
+        common_name_es: 'tomate',
+        scientific_name: 'Solanum lycopersicum',
+        confidence: 0.6,
+        alternatives: [],
+      });
+
+      const blob = new Blob(['fake'], { type: 'image/jpeg' });
+      await recognizeSpeciesGrounded(blob);
+
+      const [, , , opts] = ollamaStream.streamOllama.mock.calls[0];
+      const resolved = opts.meta();
+      expect(resolved.confidence).toBeCloseTo(0.6);
+      expect(resolved.grounded_status).toBeNull();
+    });
+  });
 });
