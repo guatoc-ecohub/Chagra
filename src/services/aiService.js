@@ -6,11 +6,18 @@
  * respuesta en streaming NDJSON via `streamOllama`, permitiendo a la UI
  * mostrar el diagnóstico token-por-token con efecto typewriter.
  *
- * Audit 2026-05-18 finding #4 (P2): `analyzeFoliage` ahora consume RAG
- * (`ragRetriever.retrieve`) para pre-pendear top-3 passages del corpus
- * `cycle-content/*.json` al prompt. Resultado: diagnóstico contextualizado
- * con `valor_pedagogico`, manejo agroecológico y fuentes del catálogo
- * (AGROSAVIA / IDEAM / POWO) en lugar de respuesta genérica.
+ * Audit 2026-05-18 finding #4 (P2): `analyzeFoliage` originalmente consumía
+ * RAG (`ragRetriever.retrieve`) para pre-pendear top-3 passages del corpus
+ * `cycle-content/*.json` al prompt del modelo de visión.
+ *
+ * V-03 follow-up 2026-05-27 — INVALIDA decisión #4 para visión: el bench A/B
+ * (bench-foliage-ab-rag) demostró que inyectar contexto RAG al prompt del
+ * modelo multimodal PERJUDICA: 5x más latencia, 62.5% vs 50% halluc proxy,
+ * treatments verbose alucinatorios (342 vs 53 chars). El bench V-03 paralelo
+ * sobre `recognizeSpecies` mostró -18.8pp accuracy con catalog hint. Por eso
+ * `analyzeFoliage` ahora usa `DIAGNOSIS_BASE_PROMPT` crudo. El corpus RAG
+ * sigue intacto (`ragRetriever.js`) y útil para post-validate, resolve-entities
+ * y agent text chat — la regresión solo aplica al prompt del modelo de visión.
  *
  * @typedef {import('../types').ChagraAsset} ChagraAsset
  * @typedef {import('../types').ChagraLog} ChagraLog
@@ -41,8 +48,9 @@ const VISION_SPECIES_MODEL = 'llama3.2-vision:11b';
 const VISION_SPECIES_FALLBACK_MODEL = 'gemma3:4b';
 const VISION_SPECIES_FALLBACK_2_MODEL = 'qwen2.5vl:7b';
 
-// Prompt base sin contexto RAG. Fallback usado cuando el corpus no cargó
-// o el retrieve no devolvió passages relevantes.
+// Prompt base del modelo de visión. Desde V-03 follow-up 2026-05-27 es el
+// único prompt usado por `analyzeFoliage` en producción — inyectar contexto
+// RAG en el prompt degrada accuracy/latencia (ver docblock superior).
 const DIAGNOSIS_BASE_PROMPT = 'detect disease, nutrient deficiency, and overall plant health. Output JSON: {"score": 0-100, "issues": [], "treatment": ""}';
 
 // Query genérica para fallback cuando no conocemos la especie. Apunta a
@@ -150,7 +158,13 @@ const blobToBase64 = (blob) =>
  * Recupera contexto RAG para `analyzeFoliage` con tolerancia total a fallos.
  * Cualquier excepción (corpus no cargado, fetch failure, BM25 vacío) retorna
  * `[]` para que el caller use el prompt base sin contexto. Audit finding #4
- * exige degrade graceful: vision diagnóstico nunca debe romperse por RAG.
+ * exigía degrade graceful: vision diagnóstico nunca debe romperse por RAG.
+ *
+ * @deprecated V-03 follow-up 2026-05-27 — RAG perjudica en prompt visión.
+ *   Ya no se invoca desde `analyzeFoliage` en producción. Se mantiene exportada
+ *   porque tests internos y benches A/B (`bench-foliage-ab-rag`) la referencian.
+ *   NO usar en nuevo código de visión; el corpus sigue siendo válido para
+ *   `voiceRagEnricher`, post-validate y agent text chat.
  *
  * @internal exportado solo para tests.
  */
@@ -168,12 +182,15 @@ export const __retrieveRagContextForFoliage = async (speciesSlug) => {
 /**
  * Analiza una imagen de follaje via Ollama (modelo multimodal) en streaming.
  *
- * Desde audit 2026-05-18 #4: pre-pende top-3 passages del RAG (`ragRetriever`)
- * al `DIAGNOSIS_BASE_PROMPT` para que el modelo cite catálogo agroecológico
- * (`valor_pedagogico`, manejo plagas, etc.) en lugar de alucinar treatments.
- * Si `speciesSlug` está disponible, el RAG query es específico; si no, usa
- * fallback genérico. Cold-start o fallo RAG → degrade transparente al prompt
- * estático original.
+ * V-03 follow-up 2026-05-27 — invalida la integración RAG en prompt visión
+ * introducida por audit 2026-05-18 #4. El bench A/B (`bench-foliage-ab-rag`)
+ * demostró que inyectar passages al prompt del modelo multimodal degrada el
+ * resultado: 5x más latencia, halluc proxy 62.5% vs 50%, treatments verbose
+ * alucinatorios. Por eso `analyzeFoliage` ahora usa SIEMPRE el prompt base
+ * crudo (`DIAGNOSIS_BASE_PROMPT`). El parámetro `speciesSlug` se mantiene en
+ * la firma porque varios callers lo pasan, pero ya no se usa internamente
+ * para RAG. El corpus sigue intacto para post-validate, resolve-entities y
+ * agent text chat — la regresión solo aplica al prompt del modelo de visión.
  *
  * @param {Blob} imageBlob - imagen optimizada (WebP)
  * @param {Object} [options]
@@ -181,31 +198,31 @@ export const __retrieveRagContextForFoliage = async (speciesSlug) => {
  *        por cada token emitido por el modelo. La UI lo usa para mostrar el
  *        diagnóstico apareciendo caracter-a-caracter.
  * @param {AbortSignal} [options.signal] - cancelación externa.
- * @param {string} [options.speciesSlug] - slug del catálogo (ej.
- *        `fragaria_ananassa_monterrey`). Cuando se conoce, el retrieve apunta
- *        al passage de esa especie. Si es null/undefined, fallback genérico.
+ * @param {string} [options.speciesSlug] - slug del catálogo. Aceptado por
+ *        compatibilidad con callers existentes pero NO se usa internamente
+ *        desde V-03 follow-up. Reservado para futuros experimentos no-prompt.
  * @param {string} [options.assetId] - solo telemetría, opcional. No se
  *        persiste (privacy-safe).
  * @returns {Promise<{score: number, issues: string[], treatment_suggestion: string} | null>}
  *          null si el modelo no responde o no es multimodal.
  * @example
  * const result = await analyzeFoliage(imageBlob, {
- *   speciesSlug: 'fragaria_ananassa_monterrey',
  *   onToken: (chunk, text) => setDiagnosis(text),
  * });
- * // result => { score: 85, issues: ["mancha foliar"], treatment_suggestion: "aplicar caldo bordelés (Fuente 1)" }
+ * // result => { score: 85, issues: ["mancha foliar"], treatment_suggestion: "aplicar caldo bordelés" }
  */
 // eslint-disable-next-line no-unused-vars
 export const analyzeFoliage = async (imageBlob, { onToken, signal, speciesSlug, assetId } = {}) => {
   try {
     const base64 = await blobToBase64(imageBlob);
 
-    // 1) RAG context (graceful degrade — nunca rompe el call si falla)
-    const passages = await __retrieveRagContextForFoliage(speciesSlug);
-    const ragContext = formatRagContext(passages);
-    const prompt = buildDiagnosisPrompt(ragContext);
+    // V-03 follow-up 2026-05-27: prompt base crudo, sin contexto RAG. El bench
+    // A/B demostró que inyectar passages al prompt visión degrada accuracy y
+    // latencia. `speciesSlug` queda en la firma pero no se usa acá.
+    const prompt = DIAGNOSIS_BASE_PROMPT;
 
-    // 2) Vision call con telemetría enriquecida (`rag_passages_used`).
+    // Vision call. Telemetría reporta `rag_passages_used:0` siempre para que
+    // el dashboard distinga claramente este régimen del histórico pre-V-03.
     // streamOllama hace fetch con stream:true y procesa el NDJSON del body.
     // No usa fetchFromFarmOS para evitar inyección de headers OAuth — Ollama
     // local no requiere autenticación.
@@ -213,7 +230,7 @@ export const analyzeFoliage = async (imageBlob, { onToken, signal, speciesSlug, 
       OLLAMA_URL,
       { model: DIAGNOSIS_MODEL, prompt, images: [base64] },
       onToken,
-      { signal, meta: { rag_passages_used: passages.length } },
+      { signal, meta: { rag_passages_used: 0 } },
     )).trim();
 
     // Parsear JSON (Gemma puede envolver en markdown fences)

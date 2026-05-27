@@ -1,9 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mocks DEBEN declararse antes del import del módulo bajo test.
-// Audit 2026-05-18 #4: integramos RAG en analyzeFoliage; estos tests
-// aíslan el flujo de retrieval + prompt building + propagación de
-// rag_passages_used a la telemetría.
+//
+// Audit 2026-05-18 #4 integró RAG en `analyzeFoliage` (pre-pendiendo passages
+// al prompt). V-03 follow-up 2026-05-27 INVALIDA esa decisión para visión:
+// el bench A/B demostró que el RAG-en-prompt degrada accuracy/latencia. Estos
+// tests reflejan el nuevo régimen:
+//   - `analyzeFoliage` SIEMPRE usa `DIAGNOSIS_BASE_PROMPT` crudo (no RAG).
+//   - Los helpers `buildRagQuery`/`formatRagContext`/`buildDiagnosisPrompt` y
+//     `__retrieveRagContextForFoliage` siguen exportados (benches A/B los
+//     referencian) pero su `describe` block está marcado .skip — ya no son
+//     parte del flujo de producción.
 
 const streamOllamaMock = vi.fn();
 const retrieveMock = vi.fn();
@@ -44,7 +51,10 @@ beforeEach(() => {
   retrieveMock.mockReset();
 });
 
-describe('aiService — buildRagQuery (helper)', () => {
+// V-03 follow-up 2026-05-27: helpers RAG ya no se usan en prod. Tests skipped
+// pero preservados para que benches A/B (`bench-foliage-ab-rag`) tengan
+// referencia ejecutable si alguien los reactiva en experimentación.
+describe.skip('aiService — buildRagQuery (helper, deprecated en prod)', () => {
   it('con speciesSlug → query especifica + tokens fitosanitarios', () => {
     const q = __TEST__.buildRagQuery('fragaria_ananassa_monterrey');
     expect(q).toContain('fragaria ananassa monterrey');
@@ -65,7 +75,7 @@ describe('aiService — buildRagQuery (helper)', () => {
   });
 });
 
-describe('aiService — formatRagContext (helper)', () => {
+describe.skip('aiService — formatRagContext (helper, deprecated en prod)', () => {
   it('passages vacíos → string vacío (caller usa prompt base)', () => {
     expect(__TEST__.formatRagContext([])).toBe('');
     expect(__TEST__.formatRagContext(null)).toBe('');
@@ -104,7 +114,7 @@ describe('aiService — formatRagContext (helper)', () => {
   });
 });
 
-describe('aiService — buildDiagnosisPrompt (helper)', () => {
+describe.skip('aiService — buildDiagnosisPrompt (helper, deprecated en prod)', () => {
   it('sin contexto → usa DIAGNOSIS_BASE_PROMPT crudo (degrade graceful)', () => {
     expect(__TEST__.buildDiagnosisPrompt('')).toBe(__TEST__.DIAGNOSIS_BASE_PROMPT);
     expect(__TEST__.buildDiagnosisPrompt(null)).toBe(__TEST__.DIAGNOSIS_BASE_PROMPT);
@@ -120,7 +130,7 @@ describe('aiService — buildDiagnosisPrompt (helper)', () => {
   });
 });
 
-describe('aiService — __retrieveRagContextForFoliage (graceful degrade)', () => {
+describe.skip('aiService — __retrieveRagContextForFoliage (graceful degrade, deprecated en prod)', () => {
   it('retrieve falla → retorna [] sin propagar la excepción', async () => {
     retrieveMock.mockRejectedValueOnce(new Error('corpus boom'));
     const result = await __retrieveRagContextForFoliage('cualquier');
@@ -141,30 +151,22 @@ describe('aiService — __retrieveRagContextForFoliage (graceful degrade)', () =
   });
 });
 
-describe('aiService — analyzeFoliage integración RAG', () => {
-  it('con speciesSlug → retrieve query incluye el slug + 3 passages al prompt', async () => {
-    retrieveMock.mockResolvedValueOnce([
-      { text: 'Mancha foliar en fresa por Mycosphaerella fragariae.', species: 'fragaria_ananassa_monterrey', key: 'valor_pedagogico' },
-      { text: 'Manejo: caldo bordelés 1%, podar foliolos enfermos.', species: 'fragaria_ananassa_monterrey', key: 'manejo_agroecologico' },
-      { text: 'AGROSAVIA recomienda inspección semanal en clima frío húmedo.', species: 'fragaria_ananassa_monterrey', key: 'monitoreo' },
-    ]);
+describe('aiService — analyzeFoliage (V-03 follow-up: sin RAG en prompt visión)', () => {
+  it('con speciesSlug → NO invoca retrieve y usa DIAGNOSIS_BASE_PROMPT crudo', async () => {
     streamOllamaMock.mockResolvedValueOnce(happyDiagnosisJson);
 
     const result = await analyzeFoliage(makeBlob(), { speciesSlug: 'fragaria_ananassa_monterrey' });
 
-    expect(retrieveMock).toHaveBeenCalledTimes(1);
-    const [retrieveQuery, retrieveK] = retrieveMock.mock.calls[0];
-    expect(retrieveQuery).toContain('fragaria ananassa monterrey');
-    expect(retrieveK).toBe(3);
+    // V-03 follow-up: retrieve NO debe invocarse desde analyzeFoliage en prod.
+    expect(retrieveMock).not.toHaveBeenCalled();
 
     expect(streamOllamaMock).toHaveBeenCalledTimes(1);
     const [, body, , options] = streamOllamaMock.mock.calls[0];
     expect(body.model).toBe('gemma3:4b');
-    expect(body.prompt).toContain('<CONTEXTO_CIENTÍFICO>');
-    expect(body.prompt).toContain('Mycosphaerella fragariae');
-    expect(body.prompt).toContain('caldo bordelés');
-    expect(body.prompt).toMatch(/cit.*fuente/i);
-    expect(options.meta).toEqual({ rag_passages_used: 3 });
+    expect(body.prompt).toBe(__TEST__.DIAGNOSIS_BASE_PROMPT);
+    expect(body.prompt).not.toContain('<CONTEXTO_CIENTÍFICO>');
+    // Telemetría siempre 0 ahora: facilita distinguir el régimen post-V-03.
+    expect(options.meta).toEqual({ rag_passages_used: 0 });
 
     expect(result).toEqual({
       score: 78,
@@ -174,50 +176,28 @@ describe('aiService — analyzeFoliage integración RAG', () => {
     });
   });
 
-  it('sin speciesSlug → fallback query genérica + prompt aún incluye contexto si RAG matchea', async () => {
-    retrieveMock.mockResolvedValueOnce([
-      { text: 'Pautas generales de manejo agroecológico colombiano.', species: 'general', key: 'guía' },
-    ]);
+  it('sin speciesSlug → mismo régimen, prompt base crudo, sin retrieve', async () => {
     streamOllamaMock.mockResolvedValueOnce(happyDiagnosisJson);
 
     await analyzeFoliage(makeBlob(), {});
 
-    const [retrieveQuery] = retrieveMock.mock.calls[0];
-    expect(retrieveQuery).toBe(__TEST__.RAG_FALLBACK_QUERY);
-
+    expect(retrieveMock).not.toHaveBeenCalled();
     const [, body, , options] = streamOllamaMock.mock.calls[0];
-    expect(body.prompt).toContain('<CONTEXTO_CIENTÍFICO>');
-    expect(options.meta).toEqual({ rag_passages_used: 1 });
+    expect(body.prompt).toBe(__TEST__.DIAGNOSIS_BASE_PROMPT);
+    expect(options.meta).toEqual({ rag_passages_used: 0 });
   });
 
-  it('RAG retorna [] (cold-start / sin matches) → usa DIAGNOSIS_BASE_PROMPT crudo', async () => {
-    retrieveMock.mockResolvedValueOnce([]);
+  it('ignora speciesSlug aunque venga válido (parámetro aceptado por compat)', async () => {
     streamOllamaMock.mockResolvedValueOnce(happyDiagnosisJson);
 
     await analyzeFoliage(makeBlob(), { speciesSlug: 'planta_inexistente' });
 
-    const [, body, , options] = streamOllamaMock.mock.calls[0];
+    expect(retrieveMock).not.toHaveBeenCalled();
+    const [, body] = streamOllamaMock.mock.calls[0];
     expect(body.prompt).toBe(__TEST__.DIAGNOSIS_BASE_PROMPT);
-    expect(body.prompt).not.toContain('<CONTEXTO_CIENTÍFICO>');
-    expect(options.meta).toEqual({ rag_passages_used: 0 });
-  });
-
-  it('RAG lanza excepción → degrade graceful al prompt base sin romper analyzeFoliage', async () => {
-    retrieveMock.mockRejectedValueOnce(new Error('boom corpus'));
-    streamOllamaMock.mockResolvedValueOnce(happyDiagnosisJson);
-
-    const result = await analyzeFoliage(makeBlob(), { speciesSlug: 'cualquier' });
-
-    expect(result).not.toBeNull();
-    expect(result.score).toBe(78);
-
-    const [, body, , options] = streamOllamaMock.mock.calls[0];
-    expect(body.prompt).toBe(__TEST__.DIAGNOSIS_BASE_PROMPT);
-    expect(options.meta).toEqual({ rag_passages_used: 0 });
   });
 
   it('streamOllama falla → retorna null sin romper (contrato legacy preservado)', async () => {
-    retrieveMock.mockResolvedValueOnce([]);
     streamOllamaMock.mockRejectedValueOnce(new Error('ollama down'));
 
     const result = await analyzeFoliage(makeBlob(), {});
@@ -225,7 +205,6 @@ describe('aiService — analyzeFoliage integración RAG', () => {
   });
 
   it('response con markdown fences → JSON.parse robusto', async () => {
-    retrieveMock.mockResolvedValueOnce([]);
     streamOllamaMock.mockResolvedValueOnce('```json\n' + happyDiagnosisJson + '\n```');
 
     const result = await analyzeFoliage(makeBlob(), {});
@@ -234,7 +213,6 @@ describe('aiService — analyzeFoliage integración RAG', () => {
   });
 
   it('legacy: respuesta sin field treatment → treatment_suggestion vacío', async () => {
-    retrieveMock.mockResolvedValueOnce([]);
     streamOllamaMock.mockResolvedValueOnce(JSON.stringify({ score: 95, issues: [] }));
     const result = await analyzeFoliage(makeBlob(), {});
     expect(result.treatment_suggestion).toBe('');
