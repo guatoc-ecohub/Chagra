@@ -303,34 +303,69 @@ function scientificToSpeciesId(scientific) {
  *
  * Anti-alucinación: si el modelo vision devuelve "Mangosteenia colombiana"
  * (especie inexistente), el catálogo lo rechaza con `valid:false`. El
- * caller puede usar el campo `_grounded` para decidir:
- *   - _grounded === true  → mostrar al usuario con confianza alta
- *   - _grounded === false → mostrar advertencia "no verificado en catálogo"
+ * caller obtiene `_grounded.status` para decidir qué UX mostrar:
+ *   - 'verified'         → catálogo confirma la sugerencia (verde).
+ *   - 'rejected'         → catálogo rechaza la sugerencia (amber).
+ *   - 'sidecar-disabled' → feature flag off (info).
+ *   - 'offline'          → sin conexión, no se pudo verificar (info).
+ *   - 'no-binomial'      → modelo no produjo binomial parseable (amber).
+ *   - 'sidecar-error'    → sidecar timeout / 5xx (amber).
  *
- * Si el sidecar no está disponible (feature flag off o offline),
- * recognizeSpeciesGrounded degrada al comportamiento de recognizeSpecies
- * (sin validación). Caller obtiene _grounded:null para distinguir.
+ * V-05: shape estructurado reemplaza el ambiguo `_grounded: boolean|null`
+ * que mezclaba 3 modos de "no validable" en un solo `null`. Cada early-return
+ * ahora trae `reason` en español colombiano para mostrar al operador rural.
  *
  * @param {Blob} imageBlob — foto del usuario.
  * @param {Object} options — { onToken, signal } pasados al modelo vision.
  * @returns {Promise<Object|null>} estructura igual a recognizeSpecies +
- *   `_grounded: boolean|null`,
- *   `_validation: { valid, confidence_adjusted, ... }` cuando aplique.
+ *   `_grounded: { status, reason, validation }`,
+ *   `_validation: { valid, confidence_adjusted, ... }` cuando aplique
+ *   (alias backwards-compat con `_grounded.validation`),
+ *   `_all_validations` cuando hubo callTool exitoso.
  */
 export const recognizeSpeciesGrounded = async (imageBlob, options = {}) => {
   const visionResult = await recognizeSpecies(imageBlob, options);
   if (!visionResult) return null;
 
-  // Si sidecar disabled / offline, devolver lo del vision sin validar.
-  if (!isSidecarEnabled() || !navigator.onLine) {
-    return { ...visionResult, _grounded: null };
+  // Si sidecar disabled, devolver lo del vision sin validar.
+  if (!isSidecarEnabled()) {
+    return {
+      ...visionResult,
+      _grounded: {
+        status: 'sidecar-disabled',
+        reason: 'Validación catálogo deshabilitada.',
+        validation: null,
+      },
+      _validation: null,
+    };
+  }
+
+  // Si offline, no podemos pegar al sidecar.
+  if (!navigator.onLine) {
+    return {
+      ...visionResult,
+      _grounded: {
+        status: 'offline',
+        reason: 'Sin conexión, no se pudo verificar.',
+        validation: null,
+      },
+      _validation: null,
+    };
   }
 
   // Derive species_id from scientific_name. Si no podemos derivar (binomial
   // ausente o malformado), tampoco podemos validar — degradamos.
   const speciesId = scientificToSpeciesId(visionResult.scientific_name);
   if (!speciesId) {
-    return { ...visionResult, _grounded: null };
+    return {
+      ...visionResult,
+      _grounded: {
+        status: 'no-binomial',
+        reason: 'Nombre científico ambiguo.',
+        validation: null,
+      },
+      _validation: null,
+    };
   }
 
   // Construir lista de candidates: el principal + alternatives si vienen.
@@ -356,14 +391,29 @@ export const recognizeSpeciesGrounded = async (imageBlob, options = {}) => {
   const result = await callTool('validate_visual_match', { candidates });
   if (!result) {
     // Sidecar timeout / 5xx — fallback al resultado vision sin validar.
-    return { ...visionResult, _grounded: null };
+    return {
+      ...visionResult,
+      _grounded: {
+        status: 'sidecar-error',
+        reason: 'Error temporal del catálogo.',
+        validation: null,
+      },
+      _validation: null,
+    };
   }
 
   // Buscar el match del candidato primario en results.
   const primary = (result.results || []).find((r) => r.species_id === speciesId);
+  const verified = primary?.valid === true;
   return {
     ...visionResult,
-    _grounded: primary?.valid === true,
+    _grounded: {
+      status: verified ? 'verified' : 'rejected',
+      reason: verified
+        ? 'Verificado en catálogo Chagra.'
+        : 'Sugerencia no encontrada en catálogo.',
+      validation: primary || null,
+    },
     _validation: primary || null,
     _all_validations: result.results || [],
   };
