@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Search, ChevronDown, X, Clock, Sparkles, Camera, ImagePlus, Loader2, Bug, Check, AlertCircle } from 'lucide-react';
 import VisionLoadingState from './common/VisionLoadingState';
+import { warmVisionModel } from '../services/visionWarmService';
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { resolveSpeciesDefaults } from '../config/speciesDefaults';
 import { fuzzyFilter } from '../utils/fuzzySearch';
@@ -461,7 +462,11 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
           // Side-by-side en grid 2 columnas. Ambos delegan al mismo handler
           // que (#2) re-emite el blob al parent via onPhoto si está conectado.
           <div className="grid grid-cols-2 gap-2">
-            <label className="w-full p-2.5 rounded-lg bg-amber-900/20 hover:bg-amber-800/30 active:bg-amber-800/50 text-amber-300 border border-amber-800/50 cursor-pointer flex items-center justify-center gap-2 text-xs min-h-[40px] transition-colors">
+            <label
+              className="w-full p-2.5 rounded-lg bg-amber-900/20 hover:bg-amber-800/30 active:bg-amber-800/50 text-amber-300 border border-amber-800/50 cursor-pointer flex items-center justify-center gap-2 text-xs min-h-[40px] transition-colors"
+              onMouseDown={() => warmVisionModel().catch(() => {})}
+              onTouchStart={() => warmVisionModel().catch(() => {})}
+            >
               <Camera size={14} /> Tomar foto
               <input
                 ref={aiCameraRef}
@@ -472,7 +477,11 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
                 className="hidden"
               />
             </label>
-            <label className="w-full p-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-amber-300 border border-amber-800/50 cursor-pointer flex items-center justify-center gap-2 text-xs min-h-[40px] transition-colors">
+            <label
+              className="w-full p-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-amber-300 border border-amber-800/50 cursor-pointer flex items-center justify-center gap-2 text-xs min-h-[40px] transition-colors"
+              onMouseDown={() => warmVisionModel().catch(() => {})}
+              onTouchStart={() => warmVisionModel().catch(() => {})}
+            >
               <ImagePlus size={14} /> Elegir foto
               <input
                 ref={aiGalleryRef}
