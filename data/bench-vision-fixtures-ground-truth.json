@@ -1,0 +1,120 @@
+{
+  "version": "1.0",
+  "generated_at": "2026-05-27T00:00:00Z",
+  "source": "/home/kortux/Workspace/Chagra-strategy/ops/antigravity/fixtures-fotos/",
+  "note": "16 fotos JPG aportadas por operador para test Antigravity. Ground-truth derivado del filename + catálogo Chagra v3.2 cuando aplica. Species sin match en catálogo (frambuesa, papayuela) usan binomial científico estándar GBIF/POWO.",
+  "fixtures": [
+    {
+      "file": "aguacate.jpg",
+      "species_id": "persea_americana",
+      "nombre_comun": "aguacate",
+      "scientific": "Persea americana",
+      "in_catalog": true
+    },
+    {
+      "file": "arracacha.jpg",
+      "species_id": "arracacia_xanthorrhiza",
+      "nombre_comun": "arracacha",
+      "scientific": "Arracacia xanthorrhiza",
+      "in_catalog": true
+    },
+    {
+      "file": "cafe.jpg",
+      "species_id": "coffea_arabica",
+      "nombre_comun": "cafe",
+      "scientific": "Coffea arabica",
+      "in_catalog": true
+    },
+    {
+      "file": "cubio.jpg",
+      "species_id": "tropaeolum_tuberosum",
+      "nombre_comun": "cubio",
+      "scientific": "Tropaeolum tuberosum",
+      "in_catalog": true
+    },
+    {
+      "file": "durazno.jpg",
+      "species_id": "prunus_persica",
+      "nombre_comun": "durazno",
+      "scientific": "Prunus persica",
+      "in_catalog": true
+    },
+    {
+      "file": "frambuesa.jpg",
+      "species_id": "rubus_idaeus",
+      "nombre_comun": "frambuesa",
+      "scientific": "Rubus idaeus",
+      "in_catalog": false
+    },
+    {
+      "file": "fresa.jpg",
+      "species_id": "fragaria_ananassa_monterrey",
+      "nombre_comun": "fresa",
+      "scientific": "Fragaria ananassa",
+      "in_catalog": true
+    },
+    {
+      "file": "frijol.jpg",
+      "species_id": "phaseolus_vulgaris",
+      "nombre_comun": "frijol",
+      "scientific": "Phaseolus vulgaris",
+      "in_catalog": true
+    },
+    {
+      "file": "guayaba brasilera.jpg",
+      "species_id": "acca_sellowiana",
+      "nombre_comun": "feijoa",
+      "scientific": "Acca sellowiana",
+      "in_catalog": true
+    },
+    {
+      "file": "limon.jpg",
+      "species_id": "citrus_latifolia",
+      "nombre_comun": "limon tahiti",
+      "scientific": "Citrus latifolia",
+      "in_catalog": true
+    },
+    {
+      "file": "lulo.jpg",
+      "species_id": "solanum_quitoense",
+      "nombre_comun": "lulo",
+      "scientific": "Solanum quitoense",
+      "in_catalog": true
+    },
+    {
+      "file": "mora.jpg",
+      "species_id": "rubus_glaucus",
+      "nombre_comun": "mora",
+      "scientific": "Rubus glaucus",
+      "in_catalog": true
+    },
+    {
+      "file": "papayuela.jpg",
+      "species_id": "vasconcellea_pubescens",
+      "nombre_comun": "papayuela",
+      "scientific": "Vasconcellea pubescens",
+      "in_catalog": false
+    },
+    {
+      "file": "romero.jpg",
+      "species_id": "rosmarinus_officinalis",
+      "nombre_comun": "romero",
+      "scientific": "Rosmarinus officinalis",
+      "in_catalog": true
+    },
+    {
+      "file": "tomate.jpg",
+      "species_id": "solanum_lycopersicum_cherry_estandar",
+      "nombre_comun": "tomate",
+      "scientific": "Solanum lycopersicum",
+      "in_catalog": true
+    },
+    {
+      "file": "uchuva.jpg",
+      "species_id": "physalis_peruviana",
+      "nombre_comun": "uchuva",
+      "scientific": "Physalis peruviana",
+      "in_catalog": true
+    }
+  ]
+}

@@ -201,15 +201,17 @@ async function inferVisionOnce(model, prompt, imageBase64) {
 async function inferVision(model, prompt, imagePath) {
   const buf = fs.readFileSync(imagePath);
   const imageBase64 = buf.toString("base64");
-  // Retry hasta 3 veces si Ollama devuelve HTTP 5xx (típico cuando swap
-  // de modelos en VRAM o backend bajo carga concurrente con bench texto).
+  // Retry hasta 6 veces si Ollama devuelve HTTP 5xx ("model failed to load,
+  // resource limitations"). Pasa cuando otro bench paralelo (texto) hace
+  // swap de modelos en VRAM. Backoff 5s/10s/20s/40s/60s/90s.
   let last = null;
-  for (let i = 0; i < 3; i += 1) {
+  const backoffs = [5000, 10000, 20000, 40000, 60000, 90000];
+  for (let i = 0; i < backoffs.length; i += 1) {
     const r = await inferVisionOnce(model, prompt, imageBase64);
     last = r;
     if (!r.error || !/^HTTP 5/.test(r.error)) return r;
-    // Backoff 2s, 5s
-    await new Promise((res) => setTimeout(res, 2000 + i * 3000));
+    process.stdout.write(`    [retry ${i + 1}] ${r.error.slice(0, 60)} → waiting ${backoffs[i] / 1000}s\n`);
+    await new Promise((res) => setTimeout(res, backoffs[i]));
   }
   return last;
 }
