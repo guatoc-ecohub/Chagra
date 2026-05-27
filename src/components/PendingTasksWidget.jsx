@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AlertTriangle, Clock, RefreshCw, Wifi, WifiOff, ChevronUp, ChevronDown, Edit2 } from 'lucide-react';
 import { syncManager } from '../services/syncManager';
 import useFincaActiveStore from '../services/fincaActiveStore';
@@ -28,6 +28,11 @@ export default function PendingTasksWidget({ onEdit }) {
   const [error, setError] = useState(null);
   const [cacheAgeMinutes, setCacheAgeMinutes] = useState(null);
   const [expanded, setExpanded] = useState(false);
+  // 2026-05-27 fix: si el widget está al final del scroll del home y el user
+  // toca el header, el contenido expandido quedaba fuera del viewport.
+  // El ref lo scrollea hasta hacerse visible y el max-height interno permite
+  // scroll propio cuando hay muchas tareas.
+  const contentRef = useRef(null);
   // 062.5: re-fetch al cambiar de finca activa para que las tasks reflejen
   // el endpoint farmOS de la finca donde el operador está físicamente.
   // apiService.js:161 ya hace el routing dinámico; aquí solo nos enganchamos
@@ -82,6 +87,16 @@ export default function PendingTasksWidget({ onEdit }) {
     };
   }, [activeFincaSlug]);
 
+  // 2026-05-27 fix: al expandir, scrollear el contenido al viewport si está
+  // fuera de pantalla. `block:'nearest'` evita scroll si ya es visible.
+  useEffect(() => {
+    if (expanded && contentRef.current) {
+      requestAnimationFrame(() => {
+        contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    }
+  }, [expanded]);
+
   const getSeverityConfig = (severity) => {
     switch (severity) {
       case 'critical': return { color: 'bg-red-600', text: 'text-red-400', badge: 'CRÍTICA', icon: AlertTriangle };
@@ -133,7 +148,11 @@ export default function PendingTasksWidget({ onEdit }) {
       </button>
 
       {expanded && (
-        <div id="pending-tasks-content" className="px-4 pb-4 border-t border-slate-800">
+        <div
+          ref={contentRef}
+          id="pending-tasks-content"
+          className="px-4 pb-4 border-t border-slate-800 max-h-[60vh] overflow-y-auto overscroll-contain"
+        >
           {!isOnline && cacheAgeMinutes !== null && (
             <p className="text-xs text-amber-400 mt-2">
               Caché de hace {cacheAgeMinutes} {cacheAgeMinutes === 1 ? 'minuto' : 'minutos'}
