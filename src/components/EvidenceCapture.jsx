@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Camera, Trash2, Loader2, Image as ImageIcon, Brain, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { optimizeImage, blobToDataUrl } from '../utils/imageProcessor';
+import { compressImage, IMAGE_TOO_LARGE_MESSAGE } from '../utils/imageCompress';
 import { mediaCache } from '../db/mediaCache';
 import { analyzeFoliage } from '../services/aiService';
 import { proximityCheck } from '../utils/spatialAnalysis';
@@ -45,6 +46,12 @@ export const EvidenceCapture = ({
   // muestra con efecto typewriter mientras `diagnosing` es true.
   const [liveDiagnosis, setLiveDiagnosis] = useState('');
   const { request: requestGeo } = useGeolocation();
+  // Dual capture (2026-05-27): cámara prominente (capture="environment") +
+  // galería. Mobile abre cámara nativa con el primero, picker SO con el segundo.
+  const cameraInputRef = useRef(null);
+  const galleryInputRef = useRef(null);
+  // Alias para retro-compat con handlers que limpian el input tras procesar.
+  // Apunta a "el último input que disparó el change" — set en handleCapture.
   const inputRef = useRef(null);
 
   // Cargar evidencias existentes + historial anterior del asset
@@ -91,6 +98,9 @@ export const EvidenceCapture = ({
   const handleCapture = async (e) => {
     const file = e.target.files?.[0];
     if (!file || !logId) return;
+    // Marca cuál input disparó el change para que el cleanup `value=''` toque
+    // el correcto (cualquiera de los dos: cámara o galería).
+    inputRef.current = e.target;
 
     // Proximity gate: verificar que el operario esté cerca del activo
     if (assetGeometry) {
@@ -121,7 +131,22 @@ export const EvidenceCapture = ({
 
     setProcessing(true);
     try {
-      const optimized = await optimizeImage(file);
+      // Pre-compresión cliente-lado (operador 2026-05-27): 1600 px / JPEG 0.85
+      // → fallback 0.7 → reject > 2 MB. Aplica ANTES de optimizeImage para
+      // bajar el insumo del WebP optimizer y proteger al sidecar de payloads
+      // que excedan su bodyLimit.
+      const preCompressed = await compressImage(file);
+      if (!preCompressed.ok) {
+        if (preCompressed.reason === 'too_large') {
+          window.dispatchEvent(new CustomEvent('chagraToast', {
+            detail: { message: IMAGE_TOO_LARGE_MESSAGE },
+          }));
+        }
+        setProcessing(false);
+        if (inputRef.current) inputRef.current.value = '';
+        return;
+      }
+      const optimized = await optimizeImage(preCompressed.blob);
       const mediaId = await mediaCache.save(logId, optimized, { assetId });
       const dataUrl = await blobToDataUrl(optimized);
 
@@ -309,28 +334,47 @@ export const EvidenceCapture = ({
         </ErrorBoundary>
       )}
 
-      {/* Botón de captura */}
-      <button
-        type="button"
-        onClick={() => inputRef.current?.click()}
-        disabled={disabled || processing}
-        className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 disabled:bg-slate-900 disabled:text-slate-600 text-slate-200 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors min-h-[44px] border border-slate-700"
-      >
-        {processing ? (
-          <Loader2 size={16} className="animate-spin" />
-        ) : previews.length === 0 ? (
-          <Camera size={16} />
-        ) : (
-          <ImageIcon size={16} />
-        )}
-        {processing ? 'Optimizando…' : previews.length === 0 ? 'Capturar Evidencia' : 'Agregar otra foto'}
-      </button>
+      {/* Dual capture (2026-05-27): cámara prominente + galería. Mientras
+          procesa, un único bloque muestra el spinner. */}
+      {processing ? (
+        <div className="w-full py-2.5 bg-slate-900 text-slate-500 rounded-lg text-sm font-bold flex items-center justify-center gap-2 min-h-[44px] border border-slate-800">
+          <Loader2 size={16} className="animate-spin" /> Optimizando…
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => cameraInputRef.current?.click()}
+            disabled={disabled}
+            className="py-2.5 bg-emerald-900/40 hover:bg-emerald-800/50 disabled:bg-slate-900 disabled:text-slate-600 text-emerald-100 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors min-h-[44px] border border-emerald-700/60"
+          >
+            <Camera size={16} />
+            Tomar foto
+          </button>
+          <button
+            type="button"
+            onClick={() => galleryInputRef.current?.click()}
+            disabled={disabled}
+            className="py-2.5 bg-slate-800 hover:bg-slate-700 disabled:bg-slate-900 disabled:text-slate-600 text-slate-200 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors min-h-[44px] border border-slate-700"
+          >
+            <ImageIcon size={16} />
+            Subir desde galería
+          </button>
+        </div>
+      )}
 
       <input
-        ref={inputRef}
+        ref={cameraInputRef}
         type="file"
         accept="image/*"
-       
+        capture="environment"
+        className="hidden"
+        onChange={handleCapture}
+      />
+      <input
+        ref={galleryInputRef}
+        type="file"
+        accept="image/*"
         className="hidden"
         onChange={handleCapture}
       />

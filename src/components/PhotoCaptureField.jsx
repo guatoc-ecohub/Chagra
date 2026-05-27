@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, RotateCcw, Trash2, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
+import { Camera, Image as ImageIcon, RotateCcw, Trash2, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 import { captureAndCompress } from '../services/photoService';
+import { compressImage, IMAGE_TOO_LARGE_MESSAGE } from '../utils/imageCompress';
 import { sanitizeBlobUrl } from '../utils/blobUrl';
 import { warmVisionModel } from '../services/visionWarmService';
 
@@ -20,7 +21,11 @@ const PhotoCaptureField = ({ onPhoto, onRemove, label = "Capturar Foto", value =
     const [previewUrl, setPreviewUrl] = useState(null);
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState(null);
-    const fileInputRef = useRef(null);
+    // Dual capture (2026-05-27): cámara prominente (capture=environment) +
+    // galería como secundario. En mobile el `capture` fuerza la cámara nativa
+    // sin picker intermedio; en desktop solo se renderiza el de galería.
+    const cameraInputRef = useRef(null);
+    const galleryInputRef = useRef(null);
 
     // Sincronizar preview con el valor prop
     useEffect(() => {
@@ -58,15 +63,29 @@ const PhotoCaptureField = ({ onPhoto, onRemove, label = "Capturar Foto", value =
         setError(null);
 
         try {
-            const { blob } = await captureAndCompress(file);
+            // Pre-compresión cliente-lado (operador 2026-05-27): 1600 px / JPEG
+            // 0.85 → fallback 0.7 → reject > 2 MB. Aplica ANTES de
+            // captureAndCompress para garantizar que el blob persistido nunca
+            // venga del path full-size de la cámara.
+            const preCompressed = await compressImage(file);
+            if (!preCompressed.ok) {
+                if (preCompressed.reason === 'too_large') {
+                    setError(IMAGE_TOO_LARGE_MESSAGE);
+                } else {
+                    setError('No se pudo procesar la foto. Reintenta.');
+                }
+                return;
+            }
+            const { blob } = await captureAndCompress(preCompressed.blob);
             onPhoto(blob);
         } catch (err) {
             console.error('[PhotoField] Error procesando foto:', err);
             setError('Error al procesar la foto. Reintenta.');
         } finally {
             setIsProcessing(false);
-            // Reset input para permitir seleccionar la misma foto si se desea tras eliminar
-            if (fileInputRef.current) fileInputRef.current.value = '';
+            // Reset inputs para permitir seleccionar la misma foto si se desea tras eliminar
+            if (cameraInputRef.current) cameraInputRef.current.value = '';
+            if (galleryInputRef.current) galleryInputRef.current.value = '';
         }
     };
 
@@ -78,7 +97,8 @@ const PhotoCaptureField = ({ onPhoto, onRemove, label = "Capturar Foto", value =
     };
 
     const handleRetake = () => {
-        fileInputRef.current?.click();
+        // Por defecto re-tomar usa la cámara — coherente con el botón primario.
+        cameraInputRef.current?.click();
     };
 
     /**
@@ -87,30 +107,61 @@ const PhotoCaptureField = ({ onPhoto, onRemove, label = "Capturar Foto", value =
      * toca el botón cámara. Mientras enfoca foto/galería (3-5s humano), el
      * modelo carga en GPU. Idempotente + fire-and-forget.
      */
-    const handleClickCapture = () => {
+    const handleClickCamera = () => {
         warmVisionModel().catch(() => {}); // fire-and-forget, ignora errores
-        fileInputRef.current?.click();
+        cameraInputRef.current?.click();
+    };
+
+    const handleClickGallery = () => {
+        warmVisionModel().catch(() => {}); // fire-and-forget, ignora errores
+        galleryInputRef.current?.click();
     };
 
     return (
         <div className={`flex flex-col gap-2 ${className}`}>
+            {/* Dual input (2026-05-27): cámara con capture="environment" (mobile
+                abre cámara nativa) + galería sin capture (picker SO). */}
+            <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handleFileChange}
+                ref={cameraInputRef}
+                className="hidden"
+            />
             <input
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
-                ref={fileInputRef}
+                ref={galleryInputRef}
                 className="hidden"
             />
 
             {!previewUrl && !isProcessing && (
-                <button
-                    type="button"
-                    onClick={handleClickCapture}
-                    className="flex flex-col items-center justify-center gap-3 p-8 rounded-2xl bg-slate-900 border-2 border-dashed border-slate-700 hover:border-slate-500 active:bg-slate-800 transition-all min-h-[160px] text-slate-400"
-                >
-                    <Camera size={48} className="opacity-50" />
-                    <span className="text-xl font-bold">{label}</span>
-                </button>
+                // Mobile-first: dos botones lado a lado. Cámara primario (más
+                // grande visualmente, color brand) + galería secundario.
+                // Se mantienen ambos en desktop — algunos navegadores ignoran
+                // `capture` y el de cámara cae a picker normal igual.
+                <div className="grid grid-cols-2 gap-2">
+                    <button
+                        type="button"
+                        onClick={handleClickCamera}
+                        className="flex flex-col items-center justify-center gap-2 p-6 rounded-2xl bg-emerald-900/30 hover:bg-emerald-800/40 active:bg-emerald-800/60 border-2 border-emerald-700/60 transition-all min-h-[160px] text-emerald-200"
+                    >
+                        <Camera size={40} className="text-emerald-300" />
+                        <span className="text-base font-bold leading-tight text-center">Tomar foto</span>
+                        <span className="text-[10px] text-emerald-400/80 uppercase tracking-wider">Cámara</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleClickGallery}
+                        className="flex flex-col items-center justify-center gap-2 p-6 rounded-2xl bg-slate-900 hover:bg-slate-800 active:bg-slate-700 border-2 border-dashed border-slate-700 transition-all min-h-[160px] text-slate-400"
+                    >
+                        <ImageIcon size={40} className="opacity-60" />
+                        <span className="text-base font-bold leading-tight text-center">Subir desde galería</span>
+                        <span className="text-[10px] text-slate-500 uppercase tracking-wider">{label}</span>
+                    </button>
+                </div>
             )}
 
             {isProcessing && (
@@ -158,7 +209,7 @@ const PhotoCaptureField = ({ onPhoto, onRemove, label = "Capturar Foto", value =
                     <AlertCircle size={16} />
                     <span>{error}</span>
                     <button
-                        onClick={handleClickCapture}
+                        onClick={handleClickCamera}
                         className="ml-auto underline font-bold"
                     >
                         Reintentar

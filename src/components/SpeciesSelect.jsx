@@ -8,6 +8,7 @@ import { fuzzyFilter } from '../utils/fuzzySearch';
 import { usePhotoUrl } from '../hooks/usePhotoUrl';
 import useAssetStore from '../store/useAssetStore';
 import { captureAndCompress } from '../services/photoService';
+import { compressImage, IMAGE_TOO_LARGE_MESSAGE } from '../utils/imageCompress';
 import { recognizeSpeciesGrounded } from '../services/aiService';
 import { getAllSpecies } from '../db/catalogDB';
 import AIBetaBadge from './AIBetaBadge';
@@ -157,7 +158,21 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
     setAiState('running');
     setAiResult(null);
     try {
-      const { blob } = await captureAndCompress(file);
+      // Pre-compresión cliente-lado (operador 2026-05-27): forzamos lado mayor
+      // ≤1600 px y JPEG q=0.85 antes de mandar al sidecar / agente. Esto evita
+      // payloads gigantes hacia /judge-vision y similares. Si NI con quality
+      // 0.7 entra en 2 MB, abortamos con toast y no subimos nada.
+      const compressed = await compressImage(file);
+      if (!compressed.ok) {
+        setAiState('idle');
+        if (compressed.reason === 'too_large') {
+          window.dispatchEvent(new CustomEvent('chagraToast', {
+            detail: { message: IMAGE_TOO_LARGE_MESSAGE },
+          }));
+        }
+        return;
+      }
+      const { blob } = await captureAndCompress(compressed.blob);
       // Bug fix #2 (2026-05-18): la foto sirve tanto para identificar como
       // para persistirse como foto de la planta. Si el parent pasó onPhoto,
       // le delegamos el blob ya comprimido (mismo blob que enviamos a Ollama)
