@@ -130,6 +130,30 @@ const buildDiagnosisPrompt = (ragContext) => {
  */
 const SPECIES_PROMPT = 'Identify the plant species in the image. Output JSON ONLY, no markdown: {"common_name_es": "<nombre comun en español, lowercase>", "scientific_name": "<binomial>", "confidence": <0-1>, "alternatives": [{"common_name_es": "...", "scientific_name": "...", "confidence": <0-1>}]}. If you cannot identify confidently (confidence < 0.5), set common_name_es to empty string and provide alternatives. Limit alternatives to 2.';
 
+// QUICK-16 (Tier S iter 2, 2026-05-27): guard de tamaño antes de pegar a
+// Ollama. PWA comprime con `optimizeImage` (WebP @ 0.8 quality, maxWidth 1280)
+// pero Samsung HDR raw o screenshots de alta resolución a veces entran al
+// pipeline sin pasar por la compresión (ej. share-to-app, formularios sin
+// optimizer). Si llegan >2MB, Ollama vision encola ~30s antes de devolver
+// error de payload — UX malo. Mejor catchear local con mensaje claro.
+const MAX_IMAGE_BYTES = 2_000_000; // 2 MB
+
+/**
+ * Lanza si el blob excede MAX_IMAGE_BYTES. Caller (UI camera flow) atrapa el
+ * error y muestra toast user-friendly + sugiere reducir calidad.
+ * @param {Blob} blob
+ * @throws {Error} con message en español colombiano para el operador rural.
+ */
+export const validateImageSize = (blob) => {
+  // Defensa: si el caller pasa null/undefined o algo sin .size (no-blob),
+  // no validamos — dejamos que blobToBase64 falle con su mensaje propio.
+  if (!blob || typeof blob.size !== 'number') return;
+  if (blob.size > MAX_IMAGE_BYTES) {
+    const sizeMb = (blob.size / 1_000_000).toFixed(1);
+    throw new Error(`Imagen muy grande (${sizeMb} MB), reduce calidad antes de enviar.`);
+  }
+};
+
 /**
  * Convierte un Blob a string Base64 (sin prefijo data:).
  */
@@ -197,6 +221,12 @@ export const __retrieveRagContextForFoliage = async (speciesSlug) => {
  */
 // eslint-disable-next-line no-unused-vars
 export const analyzeFoliage = async (imageBlob, { onToken, signal, speciesSlug, assetId } = {}) => {
+  // QUICK-16: fail-fast antes del network call si la imagen supera 2 MB.
+  // Throw INTENCIONAL — el caller UI lo atrapa para mostrar toast claro.
+  // No usamos el try/catch interno (que retorna null) porque queremos que
+  // el usuario sepa POR QUÉ no se generó diagnóstico (no es un fallo de IA,
+  // es prevenible reduciendo calidad de cámara).
+  validateImageSize(imageBlob);
   try {
     const base64 = await blobToBase64(imageBlob);
 
@@ -321,6 +351,15 @@ function scientificToSpeciesId(scientific) {
   return `${genus}_${species}`.toLowerCase();
 }
 
+// QUICK-17 (Tier S iter 2, 2026-05-27): defensa frente a species_id no ASCII
+// snake_case. El sidecar `validate_visual_match` espera `^[a-z0-9_]+$` y
+// rechaza con HTTP 400 después del network roundtrip (~150-400ms desperdiciados
+// + log noise). Pre-validamos en frontend: si el id derivado del binomial
+// contiene caracteres fuera de ese alfabeto (ej. `×` hybrid, espacios,
+// mayúsculas que filtraron del modelo), degradamos a `no-binomial` sin pegar
+// al sidecar. Bench V-03 detectó este caso con `Fragaria × ananassa`.
+const VALID_SPECIES_ID = /^[a-z0-9_]+$/;
+
 /**
  * Versión grounded de recognizeSpecies. Llama al modelo de visión Y
  * después valida el resultado contra el catálogo Chagra usando el tool
@@ -386,6 +425,13 @@ export const recognizeSpeciesGrounded = async (imageBlob, options = {}) => {
   if (!speciesId) {
     return finalize('no-binomial', 'Nombre científico ambiguo.');
   }
+  // QUICK-17: defensa extra antes del network call al sidecar. Si por alguna
+  // razón scientificToSpeciesId produjo un id con caracteres no ASCII (ej.
+  // future refactor o input borderline), evitamos el 400 sidecar y damos UX
+  // honesto al operador.
+  if (!VALID_SPECIES_ID.test(speciesId)) {
+    return finalize('no-binomial', 'Nombre científico ambiguo (caracteres no válidos).');
+  }
 
   // Construir lista de candidates: el principal + alternatives si vienen.
   const candidates = [
@@ -427,6 +473,9 @@ export const recognizeSpeciesGrounded = async (imageBlob, options = {}) => {
 };
 
 export const recognizeSpecies = async (imageBlob, { onToken, signal, _telemetryState } = {}) => {
+  // QUICK-16: fail-fast si la imagen supera 2 MB. Mismo throw intencional
+  // que en analyzeFoliage — el caller UI muestra toast user-friendly.
+  validateImageSize(imageBlob);
   let base64;
   try {
     base64 = await blobToBase64(imageBlob);
@@ -475,4 +524,6 @@ export const __TEST__ = {
   DIAGNOSIS_BASE_PROMPT,
   RAG_FALLBACK_QUERY,
   PASSAGE_CHAR_CAP,
+  scientificToSpeciesId,
+  VALID_SPECIES_ID,
 };

@@ -201,6 +201,19 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
     } catch (err) {
       console.warn('[SpeciesSelect] AI recognition failed:', err);
       setAiState('error');
+      // QUICK-16: si el throw vino de validateImageSize (mensaje "muy grande"),
+      // mostramos toast user-friendly. Otros errores (vision fail, parse fail)
+      // ya van al estado 'error' visual del componente.
+      const msg = err?.message || '';
+      if (/muy grande/i.test(msg)) {
+        try {
+          window.dispatchEvent(
+            new CustomEvent('chagraToast', { detail: { message: msg } }),
+          );
+        } catch {
+          /* test env sin window.dispatchEvent — ignorar */
+        }
+      }
     } finally {
       if (aiCameraRef.current) aiCameraRef.current.value = '';
       if (aiGalleryRef.current) aiGalleryRef.current.value = '';

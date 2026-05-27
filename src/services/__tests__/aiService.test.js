@@ -240,3 +240,99 @@ describe('aiService — analyzeFoliage integración RAG', () => {
     expect(result.treatment_suggestion).toBe('');
   });
 });
+
+describe('aiService — scientificToSpeciesId (QUICK-17 ASCII snake_case)', () => {
+  it('binomial limpio → snake_case lowercase', () => {
+    expect(__TEST__.scientificToSpeciesId('Coffea arabica')).toBe('coffea_arabica');
+    expect(__TEST__.scientificToSpeciesId('Solanum lycopersicum')).toBe('solanum_lycopersicum');
+  });
+
+  it('descarta autoría taxonómica (L., Mart., Triana ex Micheli)', () => {
+    expect(__TEST__.scientificToSpeciesId('Coffea arabica L.')).toBe('coffea_arabica');
+    expect(__TEST__.scientificToSpeciesId('Erythrina edulis Triana ex Micheli')).toBe('erythrina_edulis');
+  });
+
+  it('hybrid notation Fragaria × ananassa → null (× no es ASCII letra)', () => {
+    // parts[0]='Fragaria', parts[1]='×' → falla regex epíteto.
+    expect(__TEST__.scientificToSpeciesId('Fragaria × ananassa')).toBeNull();
+  });
+
+  it('input vacío o no-string → null', () => {
+    expect(__TEST__.scientificToSpeciesId('')).toBeNull();
+    expect(__TEST__.scientificToSpeciesId('   ')).toBeNull();
+    expect(__TEST__.scientificToSpeciesId(null)).toBeNull();
+    expect(__TEST__.scientificToSpeciesId(undefined)).toBeNull();
+    expect(__TEST__.scientificToSpeciesId(42)).toBeNull();
+  });
+
+  it('una sola palabra (sin epíteto) → null', () => {
+    expect(__TEST__.scientificToSpeciesId('Coffea')).toBeNull();
+  });
+});
+
+describe('aiService — validateImageSize (QUICK-16 guard pre-Ollama)', () => {
+  // Importamos en este describe para no contaminar el resto de describes con
+  // la dependencia (validateImageSize es export adicional del módulo).
+  let validateImageSize;
+  beforeEach(async () => {
+    ({ validateImageSize } = await import('../aiService'));
+  });
+
+  it('blob pequeño (<2MB) no lanza', () => {
+    const blob = new Blob(['x'.repeat(1024)], { type: 'image/webp' }); // 1 KB
+    expect(() => validateImageSize(blob)).not.toThrow();
+  });
+
+  it('blob límite (2MB exactos) no lanza (umbral inclusive)', () => {
+    // Exactamente MAX_IMAGE_BYTES → no throw (>2MB es el corte).
+    const blob = new Blob([new Uint8Array(2_000_000)], { type: 'image/webp' });
+    expect(() => validateImageSize(blob)).not.toThrow();
+  });
+
+  it('blob >2MB lanza Error con mensaje en español + tamaño', () => {
+    const blob = new Blob([new Uint8Array(2_500_000)], { type: 'image/webp' }); // 2.5 MB
+    expect(() => validateImageSize(blob)).toThrow(/muy grande/i);
+    expect(() => validateImageSize(blob)).toThrow(/2\.5 MB/);
+    expect(() => validateImageSize(blob)).toThrow(/reduce calidad/i);
+  });
+
+  it('null/undefined → no lanza (defer al caller propio handling)', () => {
+    expect(() => validateImageSize(null)).not.toThrow();
+    expect(() => validateImageSize(undefined)).not.toThrow();
+  });
+
+  it('objeto sin .size → no lanza (no es blob válido)', () => {
+    expect(() => validateImageSize({})).not.toThrow();
+    expect(() => validateImageSize({ size: 'huge' })).not.toThrow();
+  });
+
+  it('analyzeFoliage con blob >2MB → throw bubble-up al caller (no swallow)', async () => {
+    const { analyzeFoliage } = await import('../aiService');
+    const bigBlob = new Blob([new Uint8Array(3_000_000)], { type: 'image/webp' });
+    // No mockeamos retrieve/streamOllama porque la validación debe fallar ANTES.
+    await expect(analyzeFoliage(bigBlob, {})).rejects.toThrow(/muy grande/i);
+  });
+
+  it('recognizeSpecies con blob >2MB → throw bubble-up al caller', async () => {
+    const { recognizeSpecies } = await import('../aiService');
+    const bigBlob = new Blob([new Uint8Array(2_500_000)], { type: 'image/webp' });
+    await expect(recognizeSpecies(bigBlob, {})).rejects.toThrow(/muy grande/i);
+  });
+});
+
+describe('aiService — VALID_SPECIES_ID regex (QUICK-17 sidecar pre-check)', () => {
+  it('acepta snake_case ASCII puro', () => {
+    expect(__TEST__.VALID_SPECIES_ID.test('coffea_arabica')).toBe(true);
+    expect(__TEST__.VALID_SPECIES_ID.test('fragaria_ananassa_monterrey')).toBe(true);
+    expect(__TEST__.VALID_SPECIES_ID.test('zea_mays_var_24')).toBe(true);
+  });
+
+  it('rechaza mayúsculas, espacios, unicode, caracteres especiales', () => {
+    expect(__TEST__.VALID_SPECIES_ID.test('Coffea_arabica')).toBe(false); // mayúscula
+    expect(__TEST__.VALID_SPECIES_ID.test('coffea arabica')).toBe(false); // espacio
+    expect(__TEST__.VALID_SPECIES_ID.test('fragaria_×_ananassa')).toBe(false); // ×
+    expect(__TEST__.VALID_SPECIES_ID.test('solanum-tuberosum')).toBe(false); // guión
+    expect(__TEST__.VALID_SPECIES_ID.test('solanum.tuberosum')).toBe(false); // punto
+    expect(__TEST__.VALID_SPECIES_ID.test('')).toBe(false); // vacío
+  });
+});

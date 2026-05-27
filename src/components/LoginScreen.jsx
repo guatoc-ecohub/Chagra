@@ -8,6 +8,7 @@ import ChagraGrowLoader from './ChagraGrowLoader';
 import LegalLinks from './LegalLinks';
 import WelcomeStatsHero from './WelcomeStatsHero';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
+import { warmTextModels } from '../services/textWarmService';
 
 export default function LoginScreen({ onLoginSuccess, onSave }) {
   const [creds, setCreds] = useState({ username: '', password: '' });
@@ -74,6 +75,16 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
       } catch (err) {
         // No bloquear login si falla (ej. tests sin fetch global).
         console.warn('[LoginScreen] ollama warm-up dispatch failed:', err);
+      }
+      // QUICK-4 (Tier S iter 2, 2026-05-27): pre-warm adicional de modelos
+      // texto (gemma3:4b + granite3.1-dense:8b) con keep_alive=10m. Esto
+      // complementa el `useOllamaWarmStore` (gemma3 a 30m): cubre `granite`
+      // que el llmRouter usa cuando la query es sensible a alucinación.
+      // Fire-and-forget — degrada silencioso si Ollama no responde.
+      try {
+        warmTextModels().catch(() => {});
+      } catch (err) {
+        console.warn('[LoginScreen] text models warm dispatch failed:', err);
       }
       setLoading(false);
       onLoginSuccess();

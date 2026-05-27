@@ -175,6 +175,44 @@ describe('recognizeSpeciesGrounded', () => {
     expect(sidecarClient.callTool).not.toHaveBeenCalled();
   });
 
+  // QUICK-17 (Tier S iter 2, 2026-05-27): pre-validate species_id ASCII +
+  // snake_case ANTES de pegar al sidecar. Bench V-03 detectó `Fragaria ×
+  // ananassa` (hybrid notation) que produce HTTP 400 después de un network
+  // roundtrip desperdiciado.
+  it('status:no-binomial cuando scientific_name tiene hybrid notation (Fragaria × ananassa)', async () => {
+    mockVisionResponse({
+      common_name_es: 'fresa',
+      scientific_name: 'Fragaria × ananassa', // × no es ASCII letra
+      confidence: 0.8,
+      alternatives: [],
+    });
+
+    const blob = new Blob(['fake'], { type: 'image/jpeg' });
+    const result = await recognizeSpeciesGrounded(blob);
+
+    expect(result._grounded.status).toBe('no-binomial');
+    expect(result._grounded.reason).toMatch(/ambiguo/i);
+    expect(result._grounded.validation).toBeNull();
+    // No debe haber llamado al sidecar — la pre-validación en frontend lo
+    // evita y ahorra el roundtrip + el 400 del sidecar.
+    expect(sidecarClient.callTool).not.toHaveBeenCalled();
+  });
+
+  it('status:no-binomial cuando scientific_name tiene caracteres unicode (Solanum tubérosum)', async () => {
+    mockVisionResponse({
+      common_name_es: 'papa',
+      scientific_name: 'Solanum tubérosum', // tilde en é
+      confidence: 0.75,
+      alternatives: [],
+    });
+
+    const blob = new Blob(['fake'], { type: 'image/jpeg' });
+    const result = await recognizeSpeciesGrounded(blob);
+
+    expect(result._grounded.status).toBe('no-binomial');
+    expect(sidecarClient.callTool).not.toHaveBeenCalled();
+  });
+
   it('incluye alternativas en candidates cuando el vision las devuelve', async () => {
     mockVisionResponse({
       common_name_es: 'café',
