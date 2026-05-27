@@ -28,6 +28,7 @@ import SuggestedActions from './SuggestedActions';
 import ActionConfirmModal from '../ActionConfirmModal';
 import FeedbackConsentModal from '../FeedbackConsentModal';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
+import QuickChipsBar from '../QuickChipsBar';
 import { agentSounds } from '../../services/agentSoundService';
 import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
@@ -1478,6 +1479,13 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       {/* Suggestions */}
       {state === STATE_IDLE && messages.length < 3 && (
         <SuggestedActions onSelect={handleSuggestion} />
+      )}
+
+      {/* UX-5 (#286): chips de preguntas rápidas. Solo en pantalla nueva
+          (chat vacío) e idle — al primer turn desaparecen para no llenar la
+          UI con sugerencias mientras hay conversación visible. */}
+      {state === STATE_IDLE && messages.length === 0 && (
+        <QuickChipsBar onSelect={handleSuggestion} />
       )}
 
       {/* Input */}
