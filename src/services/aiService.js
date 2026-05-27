@@ -322,16 +322,32 @@ const runSpeciesRecognition = async (model, base64, { onToken, signal, telemetry
  */
 function scientificToSpeciesId(scientific) {
   if (typeof scientific !== 'string' || scientific.trim().length === 0) return null;
-  // Tomar primeras 2 palabras (género + epíteto). Resto es autoría/notas.
-  const parts = scientific.trim().split(/\s+/);
+
+  // QUICK-17 (#280) 2026-05-27: normalizar Unicode + quitar diacríticos
+  // ANTES del regex. Permite que vision-model que emite "Niño" como token
+  // colateral o nombres científicos con acentos (raros, pero pasan) no
+  // sean rechazados. NFD descompone á→a+combining-acute, luego strip
+  // del bloque ̀-ͯ deja solo ASCII letter base.
+  const ascii = scientific.normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+
+  // QUICK-17: hybrid mark `×` o `x` separador (ej. "Citrus × paradisi" o
+  // "Fragaria x ananassa") se omite. Tomar primeras 2 palabras NO-`×`.
+  const parts = ascii.split(/\s+/).filter((w) => w !== '×' && w !== 'x' && w !== 'X');
   if (parts.length < 2) return null;
   const genus = parts[0];
   const species = parts[1];
   // Solo aceptar palabras con letras + (opcional) guión. Rechazar autoría
   // que tipicamente empieza con mayúsculas pero no es epíteto científico.
   if (!/^[A-Za-z-]+$/.test(genus) || !/^[a-z-]+$/.test(species)) return null;
-  return `${genus}_${species}`.toLowerCase();
+  const id = `${genus}_${species}`.toLowerCase();
+  // QUICK-17 post-validate: doble check que el id final sea snake_case
+  // ASCII estricto (sin underscore inicial, sin caracteres raros).
+  if (!/^[a-z][a-z0-9_]*$/.test(id)) return null;
+  return id;
 }
+
+// Export para tests (no usar en runtime fuera de aiService).
+export { scientificToSpeciesId as _scientificToSpeciesId };
 
 /**
  * Versión grounded de recognizeSpecies. Llama al modelo de visión Y
