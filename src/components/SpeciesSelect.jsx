@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Search, ChevronDown, X, Clock, Sparkles, Camera, ImagePlus, Loader2, Bug, Check, AlertCircle } from 'lucide-react';
+import VisionLoadingState from './common/VisionLoadingState';
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { resolveSpeciesDefaults } from '../config/speciesDefaults';
 import { fuzzyFilter } from '../utils/fuzzySearch';
@@ -485,10 +486,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
         )}
 
         {aiState === 'running' && (
-          <div className="p-2.5 rounded-lg bg-slate-800 border border-slate-700 flex items-center gap-2 text-amber-400">
-            <Loader2 size={14} className="animate-spin" />
-            <span className="text-xs">Analizando foto…</span>
-          </div>
+          <VisionLoadingState label="Analizando foto" />
         )}
 
         {aiState === 'done' && aiResult && (
