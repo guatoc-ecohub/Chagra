@@ -10,6 +10,7 @@ import useAssetStore from '../store/useAssetStore';
 import { captureAndCompress } from '../services/photoService';
 import { recognizeSpeciesGrounded } from '../services/aiService';
 import { getAllSpecies } from '../db/catalogDB';
+import AIBetaBadge from './AIBetaBadge';
 
 /**
  * SpeciesSelect, Selector de especie con fuzzy search y autocompletado de defaults.
@@ -580,6 +581,10 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
                   {aiResult.scientific_name}
                 </p>
               )}
+              {/* UX-1 (#284): badge "beta" debajo del nombre sugerido por
+                  el modelo de visión. Recordatorio sutil de que la
+                  identificación es generativa, aun cuando esté grounded. */}
+              <AIBetaBadge className="mt-1" title="Identificación generada por IA — verifica antes de actuar." />
             </div>
             {/* Si el primario fue rechazado por el catálogo pero el sidecar
                 encontró candidates alternativos válidos, ofrecerlos como

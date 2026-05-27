@@ -5,6 +5,7 @@ import { speak, speakKokoro, stop, isSpeaking, isKokoroAvailable } from '../../s
 import { agentSounds } from '../../services/agentSoundService';
 import usePrefsStore from '../../store/usePrefsStore';
 import FeedbackButtons from '../FeedbackButtons';
+import AIBetaBadge from '../AIBetaBadge';
 
 function formatTime(timestamp) {
   if (!timestamp) return '';
@@ -161,6 +162,13 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
           title={!isUser && !isStreaming ? 'Doble click reproduce o silencia esta respuesta' : undefined}
         >
           <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+          {/* UX-1 (#284): badge "beta" permanente cerca de cualquier respuesta
+              IA del agente. NO reemplaza a SourceBadge (que es la fuente
+              grounded vs generativa) — convive. Suprimido para mensajes de
+              recuperación huérfana porque no son respuesta real del modelo. */}
+          {!isUser && !isStreaming && !message._orphan_recovery && (
+            <AIBetaBadge className="mt-1" />
+          )}
           {shouldShowBadge && (
             <div className="mt-1">
               <SourceBadge metadata={message.metadata} />
