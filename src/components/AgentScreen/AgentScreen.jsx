@@ -29,6 +29,7 @@ import ActionConfirmModal from '../ActionConfirmModal';
 import FeedbackConsentModal from '../FeedbackConsentModal';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import QuickChipsBar from '../QuickChipsBar';
+import AgentDemoExample from '../AgentDemoExample';
 import { agentSounds } from '../../services/agentSoundService';
 import usePrefsStore from '../../store/usePrefsStore';
 import useAssetStore from '../../store/useAssetStore';
@@ -111,6 +112,11 @@ export default function AgentScreen({ onBack }) {
   // Toast de rechazo de la 3ra pregunta. Auto-dismiss a 4s para no
   // bloquear el input visualmente.
   const [queueRejectedToast, setQueueRejectedToast] = useState('');
+  // UX-4 (#285): demo predefinida del agente para operadores que abren la
+  // pantalla por primera vez (sin historial). Toggle local — NO se persiste
+  // ni se inyecta al messages real. Aparece junto a QuickChipsBar cuando
+  // chat está vacío e idle.
+  const [showAgentDemo, setShowAgentDemo] = useState(false);
 
   const { durationMs, start: startRecord, stop: stopRecord, reset: resetRecord } = useVoiceRecorder();
   const chatEndRef = useRef(null);
@@ -1486,6 +1492,27 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
           UI con sugerencias mientras hay conversación visible. */}
       {state === STATE_IDLE && messages.length === 0 && (
         <QuickChipsBar onSelect={handleSuggestion} />
+      )}
+
+      {/* UX-4 (#285): botón "Ver ejemplo" para operadores nuevos sin
+          historial. Monta una demo simulada (mensaje user + respuesta
+          predefinida con delay 1s) sin llamar al LLM — cero costo, cero
+          alucinación. Solo en pantalla nueva e idle, alineado con la
+          ventana donde QuickChipsBar también vive. */}
+      {state === STATE_IDLE && messages.length === 0 && !showAgentDemo && (
+        <div className="px-4 pb-2 pt-1 bg-slate-900/40">
+          <button
+            type="button"
+            onClick={() => setShowAgentDemo(true)}
+            data-testid="agent-demo-trigger"
+            className="w-full px-3 py-2 rounded-lg bg-slate-800/60 hover:bg-slate-700/70 active:scale-[0.99] border border-slate-700/50 text-xs text-slate-300 transition-all"
+          >
+            Ver ejemplo (sin foto)
+          </button>
+        </div>
+      )}
+      {state === STATE_IDLE && messages.length === 0 && showAgentDemo && (
+        <AgentDemoExample onClose={() => setShowAgentDemo(false)} />
       )}
 
       {/* Input */}
