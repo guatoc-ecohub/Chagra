@@ -178,14 +178,21 @@ export default function AgentScreen({ onBack }) {
       // 2026-05-19: detectar pregunta huérfana — si el último turn es del
       // usuario sin respuesta del agente, agregar mensaje informativo para
       // que el operator entienda que la respuesta anterior se perdió
-      // (timeout, unmount accidental, etc.) y pueda re-preguntar.
+      // (timeout, unmount accidental, app cerrada en mobile, etc.). El
+      // mensaje incluye el prompt original via `_orphan_prompt` para que
+      // ChatBubble pueda renderizar un botón "Reintentar" que dispare
+      // handleSubmit automáticamente sin que el operador re-tipee.
+      // Bug 2026-05-27: testers móviles cambian de app durante inferencia
+      // y al volver re-tipear es fricción alta. Botón retry one-click es
+      // significativamente mejor UX que el copy anterior.
       const lastTurn = history[history.length - 1];
       if (lastTurn && lastTurn.role === 'user') {
         history.push({
           role: 'assistant',
-          content: 'Tu pregunta anterior no recibió respuesta (timeout o sesión interrumpida). Vuelve a preguntarla si quieres seguir.',
+          content: 'No alcancé a responderte la anterior. ¿Querés que lo intente de nuevo?',
           timestamp: Date.now(),
           _orphan_recovery: true,
+          _orphan_prompt: lastTurn.content || '',
         });
       }
       setMessages(history);
@@ -1170,6 +1177,39 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
   // pending. Si entra como queued, solo agrega visualmente el mensaje al
   // chat (lo procesará la promoción cuando termine el actual). Si entra
   // rejected, muestra toast.
+  /**
+   * Retry de pregunta huérfana — botón "Reintentar" en mensaje
+   * `_orphan_recovery`. Re-envía el prompt original via handleSubmit
+   * sin que el operador tenga que re-tipear. Antes del retry limpia
+   * los dos mensajes huérfanos (user original + orphan_recovery) para
+   * que el nuevo turno quede limpio.
+   *
+   * Bug fix 2026-05-27: el copy anterior pedía "Vuelve a preguntarla"
+   * sin acción asociada. Testers móviles cambian de app durante
+   * inferencia y al volver el re-tipear es fricción alta.
+   */
+  const handleRetryOrphan = useCallback(async (prompt) => {
+    if (typeof prompt !== 'string' || prompt.trim().length === 0) return;
+    setMessages((prev) => {
+      const clone = [...prev];
+      // Quitar el orphan_recovery + el user message que lo originó.
+      while (clone.length > 0) {
+        const last = clone[clone.length - 1];
+        if (last._orphan_recovery) {
+          clone.pop();
+          continue;
+        }
+        if (last.role === 'user') {
+          clone.pop();
+          break;
+        }
+        break;
+      }
+      return clone;
+    });
+    await handleSubmit(prompt);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleSubmit = async (text, { fromVoice = false } = {}) => {
     if (!text || !text.trim()) return;
     const trimmed = text.trim();
@@ -1425,6 +1465,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         streamingContent={streamingContent}
         isStreaming={state === STATE_THINKING}
         onConsentNeeded={handleFeedbackConsentNeeded}
+        onRetryOrphan={handleRetryOrphan}
       />
 
       {/* Error */}

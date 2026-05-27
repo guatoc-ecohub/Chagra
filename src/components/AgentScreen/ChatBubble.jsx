@@ -87,7 +87,7 @@ function SourceBadge({ metadata }) {
   );
 }
 
-export default function ChatBubble({ message, isStreaming = false, promptText, onConsentNeeded }) {
+export default function ChatBubble({ message, isStreaming = false, promptText, onConsentNeeded, onRetryOrphan }) {
   const isUser = message.role === 'user';
   const showSourceBadges = usePrefsStore((s) => s.showSourceBadges);
   // Badge "fuente" solo aplica a respuestas del agente, no del usuario, y
@@ -182,6 +182,28 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
                 response={message.content || ''}
                 onConsentNeeded={onConsentNeeded}
               />
+            </div>
+          )}
+          {/* Bug fix 2026-05-27: botón Reintentar en mensaje _orphan_recovery.
+              Re-envía el prompt original via onRetryOrphan sin re-tipear.
+              Si no hay handler o no hay prompt original, no se renderiza
+              el botón (fallback al copy estático). */}
+          {!isUser && !isStreaming && message._orphan_recovery
+            && typeof onRetryOrphan === 'function'
+            && typeof message._orphan_prompt === 'string'
+            && message._orphan_prompt.length > 0 && (
+            <div className="mt-2 pt-2 border-t border-slate-700/50">
+              <button
+                type="button"
+                onClick={() => onRetryOrphan(message._orphan_prompt)}
+                className="w-full px-3 py-2 rounded-lg bg-emerald-700/40 hover:bg-emerald-700/60 active:bg-emerald-700/80 text-emerald-200 text-sm font-bold border border-emerald-700/60 min-h-[44px] transition-colors"
+                data-testid="orphan-recovery-retry"
+              >
+                Reintentar
+              </button>
+              <p className="text-[10px] text-slate-500 mt-1 italic">
+                Volvemos a procesar tu pregunta anterior.
+              </p>
             </div>
           )}
         </div>

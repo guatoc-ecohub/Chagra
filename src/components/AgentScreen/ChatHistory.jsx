@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import ChatBubble from './ChatBubble';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 
-export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, onConsentNeeded }) {
+export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, onConsentNeeded, onRetryOrphan }) {
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -52,6 +52,7 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
           isStreaming={false}
           promptText={msg.role === 'assistant' ? findPromptForResponse(idx) : undefined}
           onConsentNeeded={onConsentNeeded}
+          onRetryOrphan={onRetryOrphan}
         />
       ))}
 
