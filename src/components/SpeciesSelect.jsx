@@ -499,7 +499,54 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
           <VisionLoadingState label="Analizando foto" />
         )}
 
-        {aiState === 'done' && aiResult && (
+        {/* UX-7 (#287) 2026-05-27: fallback texto cuando la confianza es
+            muy baja (<0.2). En vez del bloque verde "Especie sugerida" que
+            puede engañar al user, mostramos un bloque amber neutro con
+            sugerencias accionables: tomar otra foto / escribir el nombre.
+            Esto previene que el operador acepte una identificación con
+            confianza casi-nula pensando que la app sí sabe. */}
+        {aiState === 'done' && aiResult && (aiResult.confidence ?? 0) < 0.2 && (
+          <div
+            data-testid="vision-low-confidence-fallback"
+            className="p-3 rounded-lg bg-amber-900/15 border border-amber-700/40 space-y-2"
+          >
+            <div className="flex items-start gap-2">
+              <AlertTriangle size={16} className="text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-amber-200">
+                  No logré identificar con suficiente claridad
+                </p>
+                <p className="text-xs text-amber-300/80 mt-0.5">
+                  La confianza fue muy baja ({Math.round((aiResult.confidence || 0) * 100)}%). Te sugiero:
+                </p>
+                <ul className="text-xs text-amber-200/90 mt-1 list-disc list-inside space-y-0.5">
+                  <li>Toma otra foto con buena luz, sin sombra fuerte.</li>
+                  <li>Acércate más a la hoja o fruto, en foco.</li>
+                  <li>O escribe el nombre directamente en el buscador de arriba.</li>
+                </ul>
+              </div>
+            </div>
+            <div className="flex gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => { setAiResult(null); setAiState('idle'); }}
+                className="flex-1 text-[11px] px-2 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700"
+              >
+                Tomar otra foto
+              </button>
+              <button
+                type="button"
+                onClick={handleAiReportBug}
+                className="text-[11px] px-2 py-1.5 rounded bg-red-900/20 hover:bg-red-800/30 text-red-300 border border-red-800/40 flex items-center gap-1"
+                title="Registrar diagnóstico defectuoso"
+              >
+                <Bug size={11} />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {aiState === 'done' && aiResult && (aiResult.confidence ?? 0) >= 0.2 && (
           <div className="p-2.5 rounded-lg bg-emerald-900/20 border border-emerald-800/50 space-y-2">
             <div>
               <p className="text-[10px] uppercase tracking-wider text-emerald-500 font-bold mb-0.5">
