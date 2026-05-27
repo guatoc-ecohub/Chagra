@@ -38,7 +38,7 @@
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 14;
+export const DB_VERSION = 15;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -56,6 +56,7 @@ export const STORES = {
   CONVERSATION_MEMORY: 'conversation_memory',
   LLM_TELEMETRY: 'llm_telemetry',
   RAG_TELEMETRY: 'rag_telemetry',
+  FAILED_TX: 'failed_transactions',
 };
 
 let dbInstance = null;
@@ -205,6 +206,21 @@ export const openDB = async () => {
           store.createIndex('created_at', 'created_at', { unique: false });
           store.createIndex('status', 'status', { unique: false });
           store.createIndex('synced', 'synced', { unique: false });
+        }
+      }
+
+      // v15: failed_transactions — quarantine bucket post-rechazo HTTP del
+      // servidor. Reemplaza el `deleteTransaction()` silencioso que purgaba
+      // pendientes con 4xx. El user ve un banner "X transacciones bloqueadas"
+      // y puede revisar/reintentar/descartar manualmente. Spec en
+      // Chagra-strategy/ops/specs/sync-error-handling-spec.md.
+      if (event.oldVersion < 15) {
+        if (!db.objectStoreNames.contains(STORES.FAILED_TX)) {
+          const store = db.createObjectStore(STORES.FAILED_TX, { keyPath: 'id', autoIncrement: true });
+          store.createIndex('original_tx_id', 'original_tx_id', { unique: false });
+          store.createIndex('error_status', 'error_status', { unique: false });
+          store.createIndex('failed_at', 'failed_at', { unique: false });
+          store.createIndex('error_class', 'error_class', { unique: false });
         }
       }
 

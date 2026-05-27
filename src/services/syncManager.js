@@ -129,6 +129,107 @@ class SyncManager {
     });
   }
 
+  // Bug-critical fix (2026-05-27): clasificación de errores HTTP para
+  // decidir strategy (quarantine vs auto-retry). Ver
+  // Chagra-strategy/ops/specs/sync-error-handling-spec.md.
+  classifyHttpError(status) {
+    if (status === 401) return 'auth_expired';
+    if (status === 403) return 'forbidden';
+    if (status === 404) return 'not_found';
+    if (status === 409) return 'conflict';
+    if (status === 422) return 'validation';
+    if (status === 429) return 'rate_limit';
+    if (status >= 400 && status < 500) return 'client_other';
+    if (status >= 500) return 'server';
+    return 'unknown';
+  }
+
+  // Mover transacción a `failed_transactions` (quarantine bucket). El user
+  // ve un banner "X transacciones bloqueadas" y puede revisar/reintentar/
+  // descartar manual. Reemplaza el `deleteTransaction()` silencioso.
+  async quarantineTransaction(transaction, error) {
+    if (!this.db) await this.initDB();
+    const errorClass = this.classifyHttpError(error.status || 0);
+
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction([STORES.FAILED_TX], 'readwrite');
+      const store = tx.objectStore(STORES.FAILED_TX);
+      const record = {
+        original_tx_id: transaction.id,
+        type: transaction.type,
+        endpoint: transaction.endpoint || null,
+        payload: transaction.payload,
+        error_status: error.status || 0,
+        error_class: errorClass,
+        error_message: error.message || String(error),
+        retries: transaction.retries || 0,
+        failed_at: Date.now(),
+        original_timestamp: transaction.timestamp || null,
+      };
+      store.add(record);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  // Obtener todas las transacciones en quarantine. Para UI "Sincronización
+  // bloqueada" donde el user revisa/reintenta/descarta.
+  async getFailedTransactions() {
+    if (!this.db) await this.initDB();
+
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction([STORES.FAILED_TX], 'readonly');
+      const store = tx.objectStore(STORES.FAILED_TX);
+      const req = store.getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  // Reintentar una transacción quarantine: la mueve de vuelta a
+  // pending_transactions con retries=0 y dispara syncAll. Útil para 422
+  // donde el user editó el payload, o 401 donde refrescó el token.
+  async requeueFailedTransaction(failedId, mutatedPayload = null) {
+    if (!this.db) await this.initDB();
+
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction([STORES.FAILED_TX, STORE_NAME], 'readwrite');
+      const failedStore = tx.objectStore(STORES.FAILED_TX);
+      const pendingStore = tx.objectStore(STORE_NAME);
+      const getReq = failedStore.get(failedId);
+      getReq.onsuccess = () => {
+        const failed = getReq.result;
+        if (!failed) return resolve(false);
+        pendingStore.add({
+          type: failed.type,
+          endpoint: failed.endpoint,
+          payload: mutatedPayload || failed.payload,
+          timestamp: Date.now(),
+          synced: false,
+          retries: 0,
+        });
+        failedStore.delete(failedId);
+      };
+      getReq.onerror = () => reject(getReq.error);
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  // Descartar definitivamente una transacción en quarantine (decisión del
+  // user en UI). El payload se loguea por privacidad pero el record se
+  // elimina del IDB.
+  async discardFailedTransaction(failedId) {
+    if (!this.db) await this.initDB();
+
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction([STORES.FAILED_TX], 'readwrite');
+      tx.objectStore(STORES.FAILED_TX).delete(failedId);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
   // Marcar retries en una transacción
   async markRetry(id, errorMsg) {
     if (!this.db) await this.initDB();
@@ -218,21 +319,41 @@ class SyncManager {
           }));
         } catch (error) {
           if (error.status && error.status >= 400 && error.status < 500) {
-            console.error(`[SyncManager] Error no recuperable HTTP ${error.status}. Descartando transacción ${transaction.id}.`, error);
+            // Bug-critical fix (2026-05-27): el `deleteTransaction()` previo
+            // descartaba el payload del usuario sin manera de recuperarlo.
+            // Ahora movemos la transacción a `failed_transactions` (quarantine
+            // bucket) donde el user puede revisar/reintentar/descartar manual.
+            // Spec: Chagra-strategy/ops/specs/sync-error-handling-spec.md.
+            const errorClass = this.classifyHttpError(error.status);
+            console.error(`[SyncManager] HTTP ${error.status} (${errorClass}). Moviendo transacción ${transaction.id} a quarantine.`, error);
+            await this.quarantineTransaction(transaction, error);
             await this.deleteTransaction(transaction.id);
             failed++;
             const name = transaction.payload?.data?.attributes?.name || transaction.type;
             window.dispatchEvent(new CustomEvent('syncError', {
-              detail: { message: `Transacción "${name}" descartada (HTTP ${error.status}).` },
+              detail: {
+                message: `Transacción "${name}" bloqueada (HTTP ${error.status}). Revisa en "Sincronización" para reintentar.`,
+                status: error.status,
+                errorClass,
+                quarantined: true,
+              },
             }));
           } else {
             const retries = await this.markRetry(transaction.id, error.message);
             console.warn(`[SyncManager] Fallo de red/servidor en transacción ${transaction.id} (intento ${retries}/${MAX_RETRIES}). Marcando para reintento.`, error);
             if (retries >= MAX_RETRIES) {
+              // Max retries con 5xx — también quarantine para que el user vea.
+              await this.quarantineTransaction(transaction, error);
+              await this.deleteTransaction(transaction.id);
               failed++;
               const name = transaction.payload?.data?.attributes?.name || transaction.type;
               window.dispatchEvent(new CustomEvent('syncError', {
-                detail: { message: `Fallo permanente al sincronizar "${name}". Verifique conexión con FarmOS.` },
+                detail: {
+                  message: `Fallo permanente al sincronizar "${name}". Bloqueada en "Sincronización".`,
+                  status: error.status || 0,
+                  errorClass: 'max_retries',
+                  quarantined: true,
+                },
               }));
             }
           }
