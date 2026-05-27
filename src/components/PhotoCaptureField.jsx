@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Camera, RotateCcw, Trash2, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 import { captureAndCompress } from '../services/photoService';
 import { sanitizeBlobUrl } from '../utils/blobUrl';
+import { warmVisionModel } from '../services/visionWarmService';
 
 /**
  * PhotoCaptureField, Componente reutilizable para captura de fotos en campo.
@@ -80,6 +81,17 @@ const PhotoCaptureField = ({ onPhoto, onRemove, label = "Capturar Foto", value =
         fileInputRef.current?.click();
     };
 
+    /**
+     * Warm vision on-click (decisión operador 2026-05-27 opción A).
+     * Dispara warm del modelo de visión en background cuando el operador
+     * toca el botón cámara. Mientras enfoca foto/galería (3-5s humano), el
+     * modelo carga en GPU. Idempotente + fire-and-forget.
+     */
+    const handleClickCapture = () => {
+        warmVisionModel().catch(() => {}); // fire-and-forget, ignora errores
+        fileInputRef.current?.click();
+    };
+
     return (
         <div className={`flex flex-col gap-2 ${className}`}>
             <input
@@ -93,7 +105,7 @@ const PhotoCaptureField = ({ onPhoto, onRemove, label = "Capturar Foto", value =
             {!previewUrl && !isProcessing && (
                 <button
                     type="button"
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={handleClickCapture}
                     className="flex flex-col items-center justify-center gap-3 p-8 rounded-2xl bg-slate-900 border-2 border-dashed border-slate-700 hover:border-slate-500 active:bg-slate-800 transition-all min-h-[160px] text-slate-400"
                 >
                     <Camera size={48} className="opacity-50" />
@@ -146,7 +158,7 @@ const PhotoCaptureField = ({ onPhoto, onRemove, label = "Capturar Foto", value =
                     <AlertCircle size={16} />
                     <span>{error}</span>
                     <button
-                        onClick={() => fileInputRef.current?.click()}
+                        onClick={handleClickCapture}
                         className="ml-auto underline font-bold"
                     >
                         Reintentar
