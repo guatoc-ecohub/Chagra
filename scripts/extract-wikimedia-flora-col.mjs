@@ -95,10 +95,18 @@ function pickBestImage(pages) {
       .replace(/[^a-z0-9\-. ]/g, " ")
       .trim();
     if (!ALLOWED_LICENSES.some((ok) => license.startsWith(ok) || license.includes(ok))) continue;
-    const artist = (ii.extmetadata?.Artist?.value || "Wikimedia Commons")
-      .replace(/<[^>]*>/g, "")
+    const rawArtist = ii.extmetadata?.Artist?.value || "Wikimedia Commons";
+    // CodeQL: sanitize aggressive — strip ALL non-printable-safe ASCII chars.
+    // Regex-stripping HTML is not bulletproof against nested payloads (`<sc<script>ript>`);
+    // whitelist alpha-num + safe punctuation only. Manifest.json is consumed by
+    // bench scripts (no HTML render), but defense-in-depth.
+    const artist = rawArtist
+      .replace(/<[^>]*>/g, " ")
+      .replace(/&[a-z]+;/gi, " ")
+      .replace(/[^a-zA-Z0-9\s\-.,'()áéíóúñüÁÉÍÓÚÑÜ]/g, "")
       .replace(/\s+/g, " ")
-      .trim();
+      .trim()
+      .slice(0, 200);
     return {
       url: ii.thumburl || ii.url,
       title: page.title,
@@ -112,11 +120,26 @@ function pickBestImage(pages) {
 }
 
 async function downloadImage(url, targetPath) {
+  // CodeQL anti path-traversal: enforce targetPath lives inside OUT_DIR.
+  const resolved = path.resolve(targetPath);
+  const allowedRoot = path.resolve(OUT_DIR);
+  if (!resolved.startsWith(allowedRoot + path.sep)) {
+    throw new Error(`Refusing write outside OUT_DIR: ${resolved}`);
+  }
+  // Validate basename: only species_id format (alphanum, underscore, hyphen, dot).
+  const base = path.basename(resolved);
+  if (!/^[a-zA-Z0-9_\-.]+\.jpg$/.test(base)) {
+    throw new Error(`Invalid basename: ${base}`);
+  }
   const res = await fetch(url, { headers: { "User-Agent": UA } });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const buf = Buffer.from(await res.arrayBuffer());
   if (buf.length > MAX_BYTES) throw new Error(`File too large: ${buf.length}b`);
-  fs.writeFileSync(targetPath, buf);
+  // Verify JPEG magic bytes to avoid writing arbitrary payload disguised as .jpg.
+  if (buf.length < 3 || buf[0] !== 0xff || buf[1] !== 0xd8 || buf[2] !== 0xff) {
+    throw new Error(`Not a JPEG (magic mismatch)`);
+  }
+  fs.writeFileSync(resolved, buf);
   return buf.length;
 }
 
