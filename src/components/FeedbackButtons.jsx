@@ -35,13 +35,10 @@ export default function FeedbackButtons({
 
     setSelectedThumb(thumb);
 
-    if (thumb === 'down') {
-      // Para 👎, mostrar caja de comentario
-      setShowCommentBox(true);
-    } else {
-      // Para 👍, enviar inmediatamente
-      await submitFeedback('up', null);
-    }
+    // UX-8 (#288) 2026-05-27: ambos pulgares disparan envío inmediato
+    // (1-click), sin obligar comentario. El comment box queda disponible
+    // como opt-in tras el feedback rápido si el user quiere ampliar.
+    await submitFeedback(thumb, null);
   };
 
   const submitFeedback = async (thumb, commentText) => {
@@ -66,109 +63,112 @@ export default function FeedbackButtons({
     }
   };
 
-  const handleSubmitComment = async () => {
-    await submitFeedback('down', comment.trim() || null);
-  };
-
-  const handleCancelComment = () => {
-    setShowCommentBox(false);
-    setComment('');
-    setSelectedThumb(null);
-  };
-
-  // Si ya envió feedback, mostrar estado final
+  // Si ya envió feedback rápido, mostrar estado final + opción opt-in para
+  // agregar comentario después (UX-8 #288). Mantiene el flujo 1-click pero
+  // deja una puerta abierta para detalle adicional sin friction.
   if (feedbackSent) {
     return (
-      <div className="flex items-center gap-2 text-xs text-slate-500">
-        {selectedThumb === 'up' ? (
-          <>
-            <ThumbsUp size={14} className="text-emerald-400" />
-            <span>Gracias por tu feedback</span>
-          </>
-        ) : (
-          <>
-            <ThumbsDown size={14} className="text-red-400" />
-            <span>Gracias por tu feedback</span>
-          </>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2 text-xs text-slate-500">
+          {selectedThumb === 'up' ? (
+            <>
+              <ThumbsUp size={14} className="text-emerald-400" />
+              <span>Gracias por tu feedback</span>
+            </>
+          ) : (
+            <>
+              <ThumbsDown size={14} className="text-red-400" />
+              <span>Gracias por tu feedback</span>
+            </>
+          )}
+          {!showCommentBox && (
+            <button
+              type="button"
+              onClick={() => setShowCommentBox(true)}
+              className="text-xs text-slate-400 hover:text-slate-200 underline underline-offset-2"
+            >
+              Agregar detalle
+            </button>
+          )}
+        </div>
+        {showCommentBox && (
+          <div className="bg-slate-800/50 rounded-lg p-3 space-y-2">
+            <p className="text-xs text-slate-400">
+              ¿Qué mejorarías de esta respuesta? (opcional)
+            </p>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Cuéntanos qué falta o está incorrecto…"
+              className="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 resize-none"
+              rows={2}
+              disabled={isSending}
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={() => { setShowCommentBox(false); setComment(''); }}
+                disabled={isSending}
+                className="flex-1 py-2 px-3 rounded-lg text-xs font-medium bg-slate-700/50 text-slate-400 hover:bg-slate-700 disabled:opacity-50"
+              >
+                Listo
+              </button>
+              <button
+                onClick={async () => {
+                  // Resend con comentario para enriquecer el feedback ya enviado.
+                  await submitFeedback(selectedThumb, comment.trim() || null);
+                  setShowCommentBox(false);
+                }}
+                disabled={isSending || comment.trim().length === 0}
+                className="flex-1 py-2 px-3 rounded-lg text-xs font-medium bg-amber-600 text-white hover:bg-amber-500 disabled:opacity-50 flex items-center justify-center gap-1"
+              >
+                {isSending ? (
+                  <>
+                    <Loader2 size={12} className="animate-spin" />
+                    Enviando…
+                  </>
+                ) : (
+                  <>
+                    <Send size={12} />
+                    Enviar
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         )}
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      {/* Botones de thumbs */}
-      {!showCommentBox && (
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => handleThumbClick('up')}
-            disabled={isSending || feedbackSent}
-            className={`p-1.5 rounded-lg transition-all ${
-              selectedThumb === 'up'
-                ? 'bg-emerald-600/30 text-emerald-400'
-                : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/50 hover:text-slate-300'
-            } disabled:opacity-50`}
-            title="Esta respuesta fue útil"
-          >
-            <ThumbsUp size={16} />
-          </button>
-          <button
-            onClick={() => handleThumbClick('down')}
-            disabled={isSending || feedbackSent}
-            className={`p-1.5 rounded-lg transition-all ${
-              selectedThumb === 'down'
-                ? 'bg-red-600/30 text-red-400'
-                : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/50 hover:text-slate-300'
-            } disabled:opacity-50`}
-            title="Esta respuesta necesita mejorar"
-          >
-            <ThumbsDown size={16} />
-          </button>
-        </div>
-      )}
-
-      {/* Caja de comentario para 👎 */}
-      {showCommentBox && (
-        <div className="bg-slate-800/50 rounded-lg p-3 space-y-2">
-          <p className="text-xs text-slate-400">
-            ¿Qué mejoraría esta respuesta? (opcional)
-          </p>
-          <textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder="Describe qué falta o qué está incorrecto..."
-            className="w-full px-3 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 resize-none"
-            rows={2}
-            disabled={isSending}
-          />
-          <div className="flex gap-2">
-            <button
-              onClick={handleCancelComment}
-              disabled={isSending}
-              className="flex-1 py-2 px-3 rounded-lg text-xs font-medium bg-slate-700/50 text-slate-400 hover:bg-slate-700 disabled:opacity-50"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleSubmitComment}
-              disabled={isSending}
-              className="flex-1 py-2 px-3 rounded-lg text-xs font-medium bg-amber-600 text-white hover:bg-amber-500 disabled:opacity-50 flex items-center justify-center gap-1"
-            >
-              {isSending ? (
-                <>
-                  <Loader2 size={12} className="animate-spin" />
-                  Enviando...
-                </>
-              ) : (
-                <>
-                  <Send size={12} />
-                  Enviar
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      )}
+    <div className="flex items-center gap-2">
+      <button
+        onClick={() => handleThumbClick('up')}
+        disabled={isSending || feedbackSent}
+        className={`p-1.5 rounded-lg transition-all ${
+          selectedThumb === 'up'
+            ? 'bg-emerald-600/30 text-emerald-400'
+            : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/50 hover:text-slate-300'
+        } disabled:opacity-50`}
+        title="Esta respuesta fue útil"
+        aria-label="Marcar respuesta como útil"
+      >
+        <ThumbsUp size={16} />
+      </button>
+      <button
+        onClick={() => handleThumbClick('down')}
+        disabled={isSending || feedbackSent}
+        className={`p-1.5 rounded-lg transition-all ${
+          selectedThumb === 'down'
+            ? 'bg-red-600/30 text-red-400'
+            : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/50 hover:text-slate-300'
+        } disabled:opacity-50`}
+        title="Esta respuesta necesita mejorar"
+        aria-label="Marcar respuesta como mejorable"
+      >
+        <ThumbsDown size={16} />
+      </button>
+      {isSending && <Loader2 size={12} className="animate-spin text-slate-400" />}
     </div>
   );
 }
