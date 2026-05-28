@@ -5,6 +5,28 @@
  * Si Kokoro no está disponible, fallback transparente a window.speechSynthesis.
  */
 
+import { filterVoseo } from './voseoFilter.js';
+
+/**
+ * DR-LANG-1: guarda defensiva anti-voseo aplicada a la entrada de los
+ * speakers. AgentScreen ya filtra antes de pasar el texto, pero el TTS
+ * también es invocado desde ChatBubble (re-speak), AgentFab (replayLast)
+ * y posibles surfaces futuras. filterVoseo es idempotente — un doble
+ * pase es no-op y mantiene la garantía de que el campesino NUNCA escuche
+ * vos/tenés/querés/dale en voz alta.
+ *
+ * @param {string} text
+ * @returns {string}
+ */
+function applyVoseoGuard(text) {
+  if (typeof text !== 'string' || text.length === 0) return text;
+  try {
+    return filterVoseo(text, { formality: 'usted', telemetry: false });
+  } catch (_) {
+    return text;
+  }
+}
+
 /**
  * Task #124 (2026-05-24): voces Kokoro curadas para español.
  *
@@ -395,6 +417,10 @@ function playSentenceBlob(url) {
  *   con éxito (Kokoro o Web Speech fallback), false si todo falló.
  */
 export async function speakSentences(text, options = {}) {
+  // DR-LANG-1: guarda defensiva anti-voseo. Idempotente; no afecta texto
+  // ya filtrado por agentService.applyVoseoFilter.
+  text = applyVoseoGuard(text);
+
   const {
     voice = getPreferredVoice(),
     format = 'opus',
@@ -546,6 +572,9 @@ export function speak(text, options = {}) {
 
   stop();
 
+  // DR-LANG-1: guarda defensiva anti-voseo. Idempotente.
+  text = applyVoseoGuard(text);
+
   // Strip markdown antes de sintetizar. Sin esto, SpeechSynthesis lee
   // literal "asterisco asterisco" cuando el texto trae **negrita**.
   const cleanText = sanitizeForTTS(text);
@@ -647,6 +676,10 @@ export async function speakKokoro(text, options = {}) {
 
   stop();
 
+  // DR-LANG-1: guarda defensiva anti-voseo. Idempotente; texto ya
+  // filtrado por agentService.applyVoseoFilter pasa por aquí sin cambios.
+  text = applyVoseoGuard(text);
+
   // Strip markdown antes de mandar al server Kokoro. Sin esto, el TTS
   // neuronal lee literal "asterisco asterisco" cuando el texto trae
   // **negrita**, "guion item" para viñetas, etc. (operador 2026-05-23,
@@ -720,6 +753,8 @@ export async function speakXTTS(text, options = {}) {
   } = options;
 
   stop();
+  // DR-LANG-1: guarda defensiva anti-voseo. Idempotente.
+  text = applyVoseoGuard(text);
   const cleanText = sanitizeForTTS(text);
 
   // Task #122: guardar el texto original (no sanitizado) para replayLast()

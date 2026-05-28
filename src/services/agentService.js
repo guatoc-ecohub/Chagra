@@ -18,6 +18,7 @@ import {
   normalizeUserInput as _normalizeCauca,
   localizeAgentOutput as _localizeCauca,
 } from './glosarioCaucaService.js';
+import { filterVoseo as _filterVoseo } from './voseoFilter.js';
 
 /**
  * Free 7→10 fix-pack #5: re-exporta los helpers de glosario regional Cauca
@@ -47,6 +48,39 @@ export function localizeAgentOutputForRegion(text, finca) {
 
 export function isFincaInCaucaRegion(finca) {
   return _isInCaucaRegion(finca);
+}
+
+/**
+ * DR-LANG-1 (2026-05-28): aplica el filtro post-process anti-voseo
+ * argentino sobre la salida del LLM. Se usa como última etapa antes de
+ * exponer el texto al ChatScreen y al TTS, garantizando que ningún
+ * marcador voseo llegue al usuario campesino colombiano independientemente
+ * de lo que el modelo decida emitir.
+ *
+ * Default formality='usted' (target campesino piloto Free). El caller
+ * puede pasar 'tu' si la región del usuario lo prefiere.
+ *
+ * Telemetría on por defecto: incrementa contador local
+ * `chagra:voseo_filter_triggers` por marker_id. Útil para detectar
+ * regresiones del modelo aguas arriba.
+ *
+ * Wire en AgentScreen:
+ *   const response = await callLLM(...);
+ *   const safe = applyVoseoFilter(response);
+ *   // → render(safe), speak(safe), persist(safe)
+ *
+ * @param {string} text  texto crudo del LLM
+ * @param {object} [opts]
+ * @param {'tu' | 'usted'} [opts.formality='usted']
+ * @returns {string}
+ */
+export function applyVoseoFilter(text, opts = {}) {
+  const { formality = 'usted' } = opts;
+  return _filterVoseo(text, {
+    formality,
+    telemetry: true,
+    ...opts,
+  });
 }
 
 /**
