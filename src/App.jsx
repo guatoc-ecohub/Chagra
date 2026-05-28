@@ -4,6 +4,7 @@ import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
 import { useScrollRestoration } from './hooks/useScrollRestoration';
 import useIdleDetection from './hooks/useIdleDetection';
+import useGlobalKeyboardShortcuts from './hooks/useGlobalKeyboardShortcuts';
 import BiopunkBackground from './components/dashboard/BiopunkBackground';
 
 import { isAuthenticated, logoutUser } from './services/authService';
@@ -302,7 +303,11 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
 
 export default function App() {
   useTheme();
+  // Atajos teclado globales (?, g+h). Quick-win UX 2026-05-28 demo Diana.
+  // Solo activos post-login (no en loading ni login para no atrapar shift+?
+  // accidental al escribir password).
   const [currentView, setCurrentView] = useState('loading');
+  useGlobalKeyboardShortcuts({ enabled: currentView !== 'loading' && currentView !== 'login' });
   const [currentViewData, setCurrentViewData] = useState(null);
   const [toast, setToast] = useState(null);
   const [lastLogMessage, setLastLogMessage] = useState('');
