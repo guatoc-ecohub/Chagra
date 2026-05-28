@@ -27,6 +27,25 @@ const FADED_OPACITY = 0.4;
 const COLOMBIA_VIEW = { center: [4.5, -74.5], zoom: 6 };
 const CHOACHI_VIEW = { center: [4.5167, -73.9333], zoom: 9 };
 
+// Etiquetas legibles para `biocultural_zone` en la UI pública del globo de fincas.
+// El dato interno conserva el slug (snake_case); aquí lo presentamos como "tu
+// zona ecológica" para evitar leak de jerga.
+const ZONE_LABELS = {
+    andino_alto_páramo: 'Alto Andino - Páramo',
+    andino_alto: 'Alto Andino',
+    andino_medio: 'Andino Medio',
+    andino_medio_invernadero: 'Andino Medio (invernadero)',
+    valle_caucano: 'Valle del Cauca',
+    cafetero: 'Eje Cafetero',
+    caribe: 'Caribe',
+    llanos: 'Llanos',
+    amazonia: 'Amazonía',
+    pacifico: 'Pacífico',
+    nariño: 'Nariño',
+    santander: 'Santanderes',
+    tolima_huila: 'Tolima - Huila',
+};
+
 function MapEntryFlyTo({ phase }) {
     const map = useMap();
     useEffect(() => {
@@ -146,7 +165,7 @@ export const MultiFincaGlobe = ({ onSelect }) => {
                                     <div>
                                         <h3 className="font-bold text-lg leading-tight text-white">{finca.nombre}</h3>
                                         <p className="text-[10px] text-emerald-500 uppercase font-bold tracking-widest mt-0.5">
-                                            {finca.biocultural_zone?.replace(/_/g, ' ')}
+                                            {ZONE_LABELS[finca.biocultural_zone] || finca.biocultural_zone?.replace(/_/g, ' ')}
                                         </p>
                                     </div>
 
