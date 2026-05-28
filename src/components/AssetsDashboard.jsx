@@ -72,14 +72,8 @@ const EQUIPMENT_EXAMPLES = [
   'Rastrillo',
 ];
 
-// UX-15 (#286) 2026-05-27: helper urbano local (la PR UX-13 introdujo
-// `src/utils/landTypes.js` con el set canónico; cuando esa PR mergee a
-// main esta constante se reemplaza por el import). Mantenido inline para
-// que UX-15 sea independiente de UX-13 en orden de merge.
-const URBAN_LAND_TYPES_LOCAL = new Set([
-  'balcony', 'terrace', 'window_sill', 'indoor_pot', 'urban_garden',
-]);
-const isUrbanLandType = (lt) => URBAN_LAND_TYPES_LOCAL.has(lt);
+// UX-15 (#286) 2026-05-27: helper urbano importado del módulo canónico
+// `src/utils/landTypes.js` (introducido por UX-13 PR #1088, ya en main).
 
 // UX-15 (#286) 2026-05-27: copy replanteado sin jerga forestal técnica.
 // El operador reportó "dosel" como confuso ("ni yo sé qué es"). Reemplazos:
