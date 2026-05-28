@@ -61,7 +61,24 @@ export function setDemoSeedHelada(enabled) {
 }
 
 export function isDemoSeedHeladaActive() {
-    try { return localStorage.getItem(STORAGE_DEMO_SEED) === '1'; }
+    try {
+        // Acepta ?demo=helada en la URL como activador efímero — útil para
+        // mostrar la alerta a un usuario en vivo sin tocarle el localStorage
+        // a mano. Si el query param está presente, también se persiste para
+        // sobrevivir reloads del SW.
+        if (typeof window !== 'undefined' && window.location?.search) {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('demo') === 'helada') {
+                try { localStorage.setItem(STORAGE_DEMO_SEED, '1'); } catch { /* ignore */ }
+                return true;
+            }
+            if (params.get('demo') === 'off') {
+                try { localStorage.removeItem(STORAGE_DEMO_SEED); } catch { /* ignore */ }
+                return false;
+            }
+        }
+        return localStorage.getItem(STORAGE_DEMO_SEED) === '1';
+    }
     catch { return false; }
 }
 
