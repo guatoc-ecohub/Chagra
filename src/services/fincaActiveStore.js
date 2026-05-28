@@ -1,6 +1,17 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
+// Fallback estable para getActiveFinca cuando el array fincas está vacío
+// (cold boot antes de que se hidrate desde fincas-publicas.json). Definido
+// OUT del closure del store para mantener referencial-equal en cada call
+// → evita React error #185 (infinite update loop) cuando se consume vía
+// useFincaActiveStore((s) => s.getActiveFinca()) en componentes.
+const FALLBACK_FINCA = Object.freeze({
+    slug: 'guatoc',
+    nombre: 'Guatoc',
+    biocultural_zone: 'andino_alto_páramo',
+});
+
 /**
  * fincaActiveStore
  * ================================================================
@@ -80,11 +91,19 @@ const useFincaActiveStore = create(
 
             getActiveFinca: () => {
                 const state = get();
-                return state.fincas.find(f => f.slug === state.activeFincaSlug) || {
-                    slug: 'guatoc',
-                    nombre: 'Guatoc',
-                    biocultural_zone: 'andino_alto_páramo'
-                };
+                // BUGFIX 2026-05-28 React error #185 infinite loop: el fallback
+                // estaba inline `|| {...}` lo cual creaba un NUEVO objeto en
+                // cada call. Cuando un componente usaba el selector
+                // `useFincaActiveStore((s) => s.getActiveFinca())` y NO había
+                // match, el selector retornaba refs distintos cada render →
+                // Zustand strict-equal cache miss → re-render → loop infinito.
+                // Fix: usar la primera finca del array como fallback, o el
+                // objeto FALLBACK_FINCA estable (definido fuera del store).
+                return (
+                    state.fincas.find(f => f.slug === state.activeFincaSlug)
+                    || state.fincas[0]
+                    || FALLBACK_FINCA
+                );
             }
         }),
         {
