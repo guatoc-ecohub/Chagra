@@ -47,6 +47,13 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
+  // QUARANTINE-MULTIPLATFORM #299 (2026-05-28): el data-loss de iPhone
+  // (PR #1106) NO está cubierto por tests cross-browser. Agregamos 3
+  // projects para validar que el quarantine flow funciona en viewports
+  // PC + Android + iOS. Todos usan chromium engine (webkit no instalado
+  // en NixOS alpha) — el iPhone project es viewport + user-agent only,
+  // suficiente para reproducir bugs de capacity/storage IDB iOS-specific
+  // que se pasaban por alto en chromium PC.
   projects: [
     {
       name: 'chromium',
@@ -54,6 +61,30 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         ...(CHROMIUM_PATH ? { launchOptions: { executablePath: CHROMIUM_PATH } } : {}),
       },
+    },
+    {
+      name: 'mobile-chrome',
+      use: {
+        ...devices['Pixel 5'],
+        ...(CHROMIUM_PATH ? { launchOptions: { executablePath: CHROMIUM_PATH } } : {}),
+      },
+      // Solo correr tests con tag @cross-platform — la suite completa
+      // (login + cycle + observation + offline + multifinca) ya pasa en
+      // chromium desktop. Agregar todos a mobile-chrome triplica la
+      // duración del CI sin pillar bugs nuevos del UX flow normal.
+      grep: /@cross-platform/,
+    },
+    {
+      name: 'mobile-safari-emulated',
+      use: {
+        // iPhone 12 viewport + user agent. Engine sigue siendo chromium
+        // (webkit real no instalado en NixOS alpha). Útil para pillar bugs
+        // de viewport / safe-area / user agent gating; NO sirve para bugs
+        // de webkit engine puro (IDB quirks específicos de Safari).
+        ...devices['iPhone 12'],
+        ...(CHROMIUM_PATH ? { launchOptions: { executablePath: CHROMIUM_PATH } } : {}),
+      },
+      grep: /@cross-platform/,
     },
   ],
   webServer: {
