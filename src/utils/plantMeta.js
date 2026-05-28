@@ -18,7 +18,7 @@
 /**
  * Opciones de "momento de la planta" (antes "etapa fenológica").
  *
- * UX-17 (#286) 2026-05-27 — operador y feedback Lili: "etapa fenológica
+ * UX-17 (#286) 2026-05-27 — operador piloto: "etapa fenológica
  * es muy técnico yo entiendo el sentido pero debe ser más amigable
  * revisa eso en TODA la app porque debe ser amigable para gente del
  * campo y niños desde los 11 años".
