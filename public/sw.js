@@ -238,3 +238,56 @@ self.addEventListener('message', (event) => {
     }
   }
 });
+
+// FEAT-B #293: push notifications proactivas. Cuando el sidecar dispatcha
+// payload via web-push, este handler muestra la notification en el OS.
+// click → openWindow al AgentScreen con prefill si el payload trae uno.
+self.addEventListener('push', (event) => {
+  let payload = {};
+  try {
+    payload = event.data ? event.data.json() : {};
+  } catch {
+    payload = { title: 'Chagra', body: event.data ? event.data.text() : '' };
+  }
+
+  const title = payload.title || 'Chagra';
+  const options = {
+    body: payload.body || '',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    tag: payload.tag || 'chagra-notif',
+    requireInteraction: payload.severity === 'critical',
+    data: {
+      url: payload.url || '/',
+      prefill: payload.prefill || null,
+      ts: Date.now(),
+    },
+    vibrate: payload.severity === 'critical' ? [200, 100, 200, 100, 200] : [100],
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const data = event.notification.data || {};
+  const targetUrl = data.url || '/';
+
+  event.waitUntil((async () => {
+    if (data.prefill) {
+      try {
+        const cs = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+        for (const client of cs) {
+          client.postMessage({ type: 'NOTIF_PREFILL', prefill: data.prefill });
+        }
+      } catch { /* ignore */ }
+    }
+    const clientList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of clientList) {
+      if (client.url.includes(self.location.origin) && 'focus' in client) {
+        return client.focus();
+      }
+    }
+    return self.clients.openWindow(targetUrl);
+  })());
+});
