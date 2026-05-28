@@ -3,6 +3,8 @@ import { Sprout, MapPin, Eye, Package, Clock, NotebookPen, CheckCircle, WifiOff,
 import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
 import { useScrollRestoration } from './hooks/useScrollRestoration';
+import useIdleDetection from './hooks/useIdleDetection';
+import BiopunkBackground from './components/dashboard/BiopunkBackground';
 
 import { isAuthenticated, logoutUser } from './services/authService';
 import useAssetStore from './store/useAssetStore';
@@ -117,6 +119,7 @@ const DashboardLiveView = React.memo(function DashboardLiveView({ onNavigate, on
   useScrollRestoration('dashboard-live');
   const hydrate = useAssetStore((s) => s.hydrate);
   const syncFromServer = useAssetStore((s) => s.syncFromServer);
+  const idle = useIdleDetection(12000);
   useEffect(() => {
     hydrate().then(() => {
       if (navigator.onLine) syncFromServer(fetchFromFarmOS);
@@ -124,10 +127,33 @@ const DashboardLiveView = React.memo(function DashboardLiveView({ onNavigate, on
   }, [hydrate, syncFromServer]);
 
   return (
-    <div className="h-[100dvh] w-full bg-slate-950/82 text-white flex flex-col overflow-hidden">
-      <TopBar onNavigate={onNavigate} onLogout={onLogout} />
-      <HomeRegionalGreeting />
-      <DashboardLive onNavigate={onNavigate} />
+    <div className="relative h-[100dvh] w-full bg-slate-950 text-white flex flex-col overflow-hidden">
+      {/* Capa biopunk viva — sutil siempre, salvaje en idle */}
+      <BiopunkBackground intense={idle} />
+      {/* Contenido del dashboard, fade-out cuando idle para resaltar fondo */}
+      <div
+        className="relative z-10 flex flex-col h-full transition-opacity duration-[1500ms] ease-out"
+        style={{ opacity: idle ? 0.18 : 1 }}
+      >
+        <TopBar onNavigate={onNavigate} onLogout={onLogout} />
+        <HomeRegionalGreeting />
+        <DashboardLive onNavigate={onNavigate} />
+      </div>
+      {/* Hint subliminal cuando idle — "toca para volver" */}
+      {idle && (
+        <div
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 pointer-events-none text-emerald-300/70 text-xs uppercase tracking-[0.3em] font-mono"
+          style={{ animation: 'biopunk-hint 2.5s ease-in-out infinite' }}
+        >
+          ⊹ toca para volver ⊹
+          <style>{`
+            @keyframes biopunk-hint {
+              0%, 100% { opacity: 0.4; }
+              50% { opacity: 0.95; }
+            }
+          `}</style>
+        </div>
+      )}
     </div>
   );
 });
