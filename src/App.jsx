@@ -58,6 +58,7 @@ const HelpManual = lazy(() => import('./components/HelpManual'));
 const OnboardingHero = lazy(() => import('./components/OnboardingHero'));
 const WelcomeStatsHero = lazy(() => import('./components/WelcomeStatsHero'));
 const TopBar = lazy(() => import('./components/TopBar'));
+const DashboardLive = lazy(() => import('./components/dashboard/DashboardLive'));
 import HomeRegionalGreeting from './components/HomeRegionalGreeting';
 
 localforage.config({
@@ -108,6 +109,29 @@ const ACCENT_CLASSES = {
 // T2: Dashboard como componente propio con suscripción reactiva al store.
 // useAssetStore() (hook) dispara re-render cuando hydrate()/syncFromServer() actualizan
 // el estado, a diferencia de useAssetStore.getState() que es una lectura snapshot.
+// DashboardLiveView — el dashboard rediseñado 2026-05-28 cervezas-test:
+// agente Chagra protagonista + clima IDEAM + secciones drag-reorder.
+// Mantiene shell (TopBar + HomeRegionalGreeting) y delega contenido a
+// DashboardLive (src/components/dashboard/DashboardLive.jsx).
+const DashboardLiveView = React.memo(function DashboardLiveView({ onNavigate, onLogout }) {
+  useScrollRestoration('dashboard-live');
+  const hydrate = useAssetStore((s) => s.hydrate);
+  const syncFromServer = useAssetStore((s) => s.syncFromServer);
+  useEffect(() => {
+    hydrate().then(() => {
+      if (navigator.onLine) syncFromServer(fetchFromFarmOS);
+    });
+  }, [hydrate, syncFromServer]);
+
+  return (
+    <div className="h-[100dvh] w-full bg-slate-950/82 text-white flex flex-col overflow-hidden">
+      <TopBar onNavigate={onNavigate} onLogout={onLogout} />
+      <HomeRegionalGreeting />
+      <DashboardLive onNavigate={onNavigate} />
+    </div>
+  );
+});
+
 const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, lastLogMessage }) {
   // Feedback piloto #103: preservar scroll al volver de Voz/FieldFeedback/sub-screens.
   // Sin esto, navegar dashboard → vista_X → dashboard volvía siempre al top.
@@ -391,7 +415,7 @@ export default function App() {
       case 'onboarding-piloto':
         return <OnboardingPiloto />;
       case 'dashboard':
-        return <DashboardView onNavigate={navigate} onLogout={handleLogout} lastLogMessage={lastLogMessage} />;
+        return <DashboardLiveView onNavigate={navigate} onLogout={handleLogout} lastLogMessage={lastLogMessage} />;
       case 'sembrar':
         return <SeedingLog onBack={() => navigate('dashboard')} onSave={showToast} initialData={currentViewData} />;
       case 'cosechar':

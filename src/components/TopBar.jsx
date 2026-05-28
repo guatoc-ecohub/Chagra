@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { CircleUser, Mic, Sprout, ChevronDown, ChevronUp, Home, HelpCircle, LogOut } from 'lucide-react';
+import { CircleUser, ChevronDown, ChevronUp, HelpCircle, LogOut, MapPin } from 'lucide-react';
 import { version as APP_VERSION } from '../../package.json';
 import EnvironmentalCard from './EnvironmentalCard';
 import AltitudeBadge from './AltitudeBadge';
 import OfflineChip from './OfflineChip';
+import ChagraAgentAvatar from './ChagraAgentAvatar';
+import NotificationsBell from './NotificationsBell';
+import useFincaActiveStore from '../services/fincaActiveStore';
+import { FARM_CONFIG } from '../config/defaults';
 
 /**
  * TopBar, header persistente con identidad del operador (DR-030 QW2).
@@ -41,9 +45,15 @@ export default function TopBar({ onNavigate, onLogout }) {
   const [envOpen, setEnvOpen] = useState(false);
   const [operatorName, setOperatorName] = useState(() =>
     typeof window !== 'undefined'
-      ? localStorage.getItem('chagra:operator:name') || 'Operador'
-      : 'Operador'
+      ? localStorage.getItem('chagra:operator:name') || 'Mi finca'
+      : 'Mi finca'
   );
+  const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
+  const fincas = useFincaActiveStore((s) => s.fincas);
+  const activeFinca = fincas.find((f) => f.slug === activeFincaSlug);
+  const municipio = activeFinca?.municipio || FARM_CONFIG?.MUNICIPIO || null;
+  const vereda = activeFinca?.vereda || null;
+  const altitud = activeFinca?.altitud || FARM_CONFIG?.ALTITUD_MSNM || null;
 
   // Re-leer si cambia desde otro tab (storage event nativo) O desde el mismo
   // tab via ProfileScreen (chagra:operator-update CustomEvent).
@@ -73,45 +83,47 @@ export default function TopBar({ onNavigate, onLogout }) {
         style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top))' }}
         role="banner"
       >
-        {/* Logo clickable → Home (DR-030 + Feedback piloto #16: botón claro a inicio).
-            Patrón estándar PWA: el logo siempre vuelve al dashboard. La
-            usuaria piloto reportó "navegación rocosa, falta botón claro a inicio", el
-            logo discreto sin affordance hacía que no se descubriera. Ahora
-            es <button> con cursor + hover + icono Home explícito. */}
+        {/* Avatar agente (colibrí o maíz según pref) reemplaza el logo casa.
+            Click → dashboard. Operador 2026-05-28: "quita el icono de casa y
+            pon el colibrí". El avatar comunica que Chagra ES un ser vivo
+            (no un app con header genérico). */}
         <button
           type="button"
           onClick={() => onNavigate('dashboard')}
           aria-label="Volver al inicio"
           title="Volver al inicio"
-          className="font-bold text-lg flex items-baseline gap-1.5 shrink-0 rounded-lg px-2 py-1 -mx-2 hover:bg-slate-800/60 active:bg-slate-700 transition-colors min-h-[44px]"
+          className="font-bold flex items-center gap-2 shrink-0 rounded-lg px-1 py-1 hover:bg-slate-800/60 active:bg-slate-700 transition-colors min-h-[44px]"
         >
-          <Home size={16} aria-hidden="true" className="text-muzo self-center" />
-          <span>Chagra</span>
-          {/* Version badge: oculto en mobile estrecho (<sm = 640px) para evitar
-              que se solape con iconos de acción a la derecha. Visible desde sm.
-              Feedback usuario externo 2026-05-06 (bug #4 baseline). */}
-          <span className="hidden sm:inline text-[10px] text-slate-500 font-mono font-normal">v{APP_VERSION}</span>
+          <ChagraAgentAvatar size={32} state="idle" />
+          <span className="hidden sm:inline text-base">Chagra</span>
+          <span className="hidden md:inline text-[10px] text-slate-500 font-mono font-normal">v{APP_VERSION}</span>
         </button>
 
-        {/* Operador (tap → perfil). max-w más restrictivo en mobile para
-            preservar espacio de iconos de acción. */}
+        {/* Operador + ubicación (tap → perfil). Nombre real grande + ubicación
+            municipio · vereda · msnm en pill pequeño debajo. */}
         <button
           type="button"
           onClick={() => onNavigate('perfil')}
           aria-label={`Perfil del operador: ${operatorName}`}
-          className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 active:bg-slate-700 text-slate-200 min-h-[44px] truncate"
+          className="flex flex-col items-start gap-0.5 px-2 py-1 rounded-lg bg-slate-800/40 hover:bg-slate-700/50 active:bg-slate-700 text-slate-200 min-h-[44px] flex-1 min-w-0"
         >
-          <CircleUser size={20} aria-hidden="true" className="shrink-0 text-teal-400" />
-          <span className="text-sm font-semibold truncate max-w-[5rem] sm:max-w-[8rem]">{operatorName}</span>
+          <div className="flex items-center gap-1.5 w-full">
+            <CircleUser size={16} aria-hidden="true" className="shrink-0 text-teal-400" />
+            <span className="text-sm font-bold truncate flex-1 text-left">{operatorName}</span>
+          </div>
+          {(municipio || altitud) && (
+            <div className="flex items-center gap-1 text-[10px] text-slate-400 font-medium leading-none w-full">
+              <MapPin size={10} className="shrink-0 text-slate-500" aria-hidden="true" />
+              <span className="truncate">
+                {municipio && <span>{municipio.split(',')[0]}</span>}
+                {vereda && <span> · {vereda}</span>}
+                {altitud && <span> · {altitud}m</span>}
+              </span>
+            </div>
+          )}
         </button>
 
-        {/* UX-2 (#286) 2026-05-27: indicador ambient persistente del estado
-            offline. Vive justo al lado del nombre del operador para que sea
-            descubrible sin invadir el header. Solo se renderiza cuando
-            navigator.onLine === false (auto-hide al recuperar conexión). */}
         <OfflineChip />
-
-        <AltitudeBadge />
 
         {/* Spacer */}
         <div className="flex-1" />
@@ -152,24 +164,11 @@ export default function TopBar({ onNavigate, onLogout }) {
               - aria-label explícito "Agregar planta por voz".
               - Navega a 'voz' (el flow de voz YA permite registrar
                 plantas; ver VoiceCapture + VoiceConfirmation). */}
-        <button
-          type="button"
-          onClick={() => onNavigate('voz')}
-          aria-label="Agregar planta por voz"
-          title="Agregar planta por voz"
-          data-testid="topbar-add-plant-voice"
-          className="relative p-2 rounded-lg bg-gradient-to-br from-lime-900/40 to-emerald-900/30 hover:from-lime-800/50 hover:to-emerald-800/40 active:from-lime-700/60 active:to-emerald-700/50 border border-lime-700/50 text-lime-300 min-h-[44px] min-w-[44px] flex items-center justify-center shadow-[0_0_0_1px_rgba(132,204,22,0.15)]"
-        >
-          <Mic size={20} aria-hidden="true" strokeWidth={2.25} />
-          {/* Sprout decorativo abajo-derecha, sobre un disco oscuro para
-              que se lea claro sobre el fondo del Mic + del header. */}
-          <span
-            aria-hidden="true"
-            className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-slate-950 border border-lime-600/60 flex items-center justify-center"
-          >
-            <Sprout size={10} className="text-emerald-400" strokeWidth={2.5} />
-          </span>
-        </button>
+        {/* NotificationsBell — vivo. Pulsa rojo si crítico, ámbar si warning,
+            slate si info/empty. Reemplaza el mic+sprout del TopBar
+            (operador 2026-05-28: el agregar-planta-por-voz lo hace ahora
+            el agente Chagra directamente). */}
+        <NotificationsBell onNavigate={onNavigate} />
         {/* Botón Settings (icono ⚙) eliminado, Feedback piloto #115: era duplicado del
             botón operator name de arriba (ambos onNavigate('perfil')). El
             operator name button es más explícito + el NAV_TILE Perfil del

@@ -57,7 +57,7 @@ const ZONE_TO_DEPARTMENTS = {
 /**
  * Alertas específicas por región basadas en riesgos climáticos.
  */
-const REGIONAL_CLIMATE_ALERTS = {
+export const REGIONAL_CLIMATE_ALERTS = {
   'andino_alto_páramo': {
     riesgos: ['heladas', 'granizadas', 'vientos fuertes', 'radiación UV extrema'],
     recomendaciones: 'Proteger cultivos con cubierta plástica o mantas térmicas durante noches despejadas. Evitar riego en horas de la tarde para reducir riesgo de heladas.',
