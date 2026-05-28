@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "node scripts/generate-cycle-content-manifest.mjs",
+    "prebuild": "node scripts/build-catalog-sqlite.mjs && node scripts/generate-cycle-content-manifest.mjs",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
