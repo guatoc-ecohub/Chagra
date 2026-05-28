@@ -18,6 +18,7 @@ import { usePhotoUrl } from '../hooks/usePhotoUrl';
 import { findBiopreparadosByIngredient } from '../db/catalogDB';
 import { generatePlanForPlant } from '../services/planGeneratorService';
 import { enrichEntity } from '../services/voiceRagEnricher';
+import { LAND_TYPES, isUrbanLandType } from '../utils/landTypes';
 import { getAccessToken } from '../services/authService';
 import { useFincaActiveStore } from '../services/fincaActiveStore';
 import { savePhoto } from '../services/photoService';
@@ -109,13 +110,10 @@ const ASSET_TABS = [
   { id: 'material', label: 'Insumos', icon: Leaf, color: 'sky', desc: 'Stock de biopreparados, semillas, fertilizantes' },
 ];
 
-const LAND_TYPES = [
-  { value: 'field', label: 'Lote / Campo abierto' },
-  { value: 'bed', label: 'Cama / Huerta' },
-  { value: 'greenhouse', label: 'Invernadero' },
-  { value: 'paddock', label: 'Pastizal' },
-  { value: 'building', label: 'Edificación' },
-];
+// UX-13 (#286) 2026-05-27: LAND_TYPES + helpers urban-aware extraídos a
+// src/utils/landTypes.js para cumplir react-refresh/only-export-components
+// y permitir reuso desde otros componentes (UX-15/UX-16) sin acoplarse al
+// dashboard. La data sigue siendo single-source-of-truth allí.
 
 const DEFAULT_LOCATION_ID = FARM_CONFIG.LOCATION_ID;
 
@@ -775,6 +773,17 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
 
   const getPlaceholder = () => {
     if (activeTab === 'plant') return 'Ej: Café, Aguacate, Guanábana...';
+    // UX-13 (#286): placeholder contextual según tipo de zona.
+    if (activeTab === 'land' && isUrbanLandType(formData.landType)) {
+      const urbanExamples = {
+        balcony: 'Ej: Balcón cocina, Balcón principal...',
+        terrace: 'Ej: Terraza norte, Terraza azotea...',
+        window_sill: 'Ej: Ventana cocina, Ventana sala...',
+        indoor_pot: 'Ej: Matera sala, Matera comedor...',
+        urban_garden: 'Ej: Huerta patio, Huerta vecinos...',
+      };
+      return urbanExamples[formData.landType] || 'Ej: Mi zona urbana...';
+    }
     if (activeTab === 'structure') return 'Ej: ' + STRUCTURE_EXAMPLES[Math.floor(Math.random() * STRUCTURE_EXAMPLES.length)];
     if (activeTab === 'equipment') return 'Ej: ' + EQUIPMENT_EXAMPLES[Math.floor(Math.random() * EQUIPMENT_EXAMPLES.length)];
     return 'Ej: Bokashi, Biol, Purín de Ortiga...';
@@ -1227,8 +1236,17 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
         className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm min-h-[56px]"
       />
 
-      {/* Geometría obligatoria para land y structure (polygon); point para equipment */}
-      {activeTab === 'land' && renderGeometryField('polygon')}
+      {/* Geometría obligatoria para land y structure (polygon); point para equipment.
+          UX-13 (#286): para land URBANO (balcón/terraza/ventana/matera/jardín
+          urbano) no mostramos el picker de polígono — un balcón no tiene
+          contorno cartográfico útil. El operador puede igual agregar GPS
+          después editando el asset si quiere. */}
+      {activeTab === 'land' && !isUrbanLandType(formData.landType) && renderGeometryField('polygon')}
+      {activeTab === 'land' && isUrbanLandType(formData.landType) && (
+        <p className="text-xs text-slate-500 italic px-1">
+          Zona urbana: no necesitas marcar un área en el mapa.
+        </p>
+      )}
       {activeTab === 'structure' && renderGeometryField('polygon')}
       {activeTab === 'equipment' && renderGeometryField('point')}
     </>
