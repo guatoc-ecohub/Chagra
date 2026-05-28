@@ -360,6 +360,27 @@ export const AssetDetailView = () => {
   const [showCemeteryModal, setShowCemeteryModal] = useState(false);
   const [showSplitFlow, setShowSplitFlow] = useState(false);
 
+  // UX-19 (#286) 2026-05-27 — bug crítico operador: "después de que entro a
+  // una planta es casi imposible salir de ahí el botón de cerrar no funciona".
+  // Fixes:
+  //   1. Escape key handler global mientras el panel está abierto.
+  //   2. Touch targets ampliados a 44x44 (iOS minimum) — eran ~32px.
+  //   3. aria-label en X para screenreaders.
+  //   4. Header sticky para que el X NO se pierda cuando el operador
+  //      scrolea por el contenido largo.
+  //   5. Botón secundario "Cerrar" al final del scroll, gigante y obvio.
+  useEffect(() => {
+    if (!selectedAssetId) return undefined;
+    const handleKey = (e) => {
+      // Solo si no hay un modal hijo abierto (cemetery / split / geo picker).
+      if (e.key === 'Escape' && !showCemeteryModal && !showSplitFlow && !showGeoPicker) {
+        clearSelectedAsset();
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [selectedAssetId, clearSelectedAsset, showCemeteryModal, showSplitFlow, showGeoPicker]);
+
   const asset = useMemo(() => {
     if (!selectedAssetId) return null;
     return [...plants, ...structures, ...equipment, ...materials, ...lands].find((a) => a.id === selectedAssetId);
@@ -388,16 +409,32 @@ export const AssetDetailView = () => {
   const parentZoneName = parentRef ? [...structures, ...lands].find((a) => a.id === parentRef.id)?.attributes?.name : null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-sm" onClick={clearSelectedAsset}>
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Detalle del activo ${name}`}
+      className="fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-sm"
+      onClick={clearSelectedAsset}
+    >
       <div className="w-full max-w-2xl bg-slate-900 h-full shadow-2xl flex flex-col" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
-        <div className="p-6 border-b border-slate-800 flex justify-between items-start">
+        {/* Header — UX-19 (#286) 2026-05-27: sticky para que el botón cerrar
+            NUNCA se pierda cuando el operador scrolea contenido largo.
+            Touch targets ampliados a 44x44 (iOS minimum) — eran ~32px.
+            aria-label explícito para screenreaders. */}
+        <div className="p-6 border-b border-slate-800 flex justify-between items-start bg-slate-900 sticky top-0 z-10">
           <div className="min-w-0">
             <h2 className="text-2xl font-bold text-white truncate">{name}</h2>
             <p className="text-slate-500 text-xs font-mono">ID: {asset.id}</p>
           </div>
-          <button onClick={clearSelectedAsset} className="p-2 hover:bg-slate-800 rounded-full text-slate-400">
-            <X size={24} />
+          <button
+            type="button"
+            onClick={clearSelectedAsset}
+            aria-label="Cerrar detalle"
+            title="Cerrar (Esc)"
+            data-testid="asset-detail-close"
+            className="p-3 hover:bg-slate-800 active:bg-slate-700 rounded-full text-slate-300 hover:text-white min-h-[44px] min-w-[44px] flex items-center justify-center shrink-0"
+          >
+            <X size={24} aria-hidden="true" />
           </button>
         </div>
 
@@ -485,6 +522,22 @@ export const AssetDetailView = () => {
             <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4 px-1">Línea de Tiempo</h3>
             <AssetTimeline assetId={asset.id} />
           </section>
+
+          {/* UX-19 (#286) 2026-05-27: botón secundario "Cerrar" al final del
+              scroll. El header sticky ya tiene el X chiquito arriba, pero si
+              el operador scrollea contenido largo y se desorienta, este
+              botón gigante al fondo es una salida obvia. */}
+          <div className="pt-6 pb-[max(2rem,env(safe-area-inset-bottom))] border-t border-slate-800">
+            <button
+              type="button"
+              onClick={clearSelectedAsset}
+              data-testid="asset-detail-close-bottom"
+              className="w-full p-4 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-base min-h-[56px] flex items-center justify-center gap-2"
+            >
+              <X size={20} aria-hidden="true" />
+              Cerrar
+            </button>
+          </div>
         </div>
       </div>
 
