@@ -15,6 +15,7 @@ import { proximityCheck, findNearestLand, checkInvasiveProximity, getCoords } fr
 import { ExternalAiButton } from './common/ExternalAiButton';
 import { buildOpenExternalPrompt } from '../services/externalAiPromptBuilder';
 import { listUserPhotosBySpecies, captureAndCompress, savePhoto } from '../services/photoService';
+import { usePhotoUrl } from '../hooks/usePhotoUrl';
 import { ETAPA_FENOLOGICA_LABELS } from '../utils/plantMeta';
 import { getAllSpecies } from '../db/catalogDB';
 
@@ -24,22 +25,30 @@ function deriveSpeciesSlug(name) {
   return name.replace(/\s+#\d+$/, '').toLowerCase().replace(/\s+/g, '_').trim() || null;
 }
 
-// Bug 2026-05-18: agregar foto a planta ya creada (post-registro).
-// Dual options cámara + galería + savePhoto al assetId/speciesSlug.
-// 2026-05-18 (operator bug ~23h): 'me sale algo de planta cuando subo
-// foto al invernadero'. Causa: título hardcoded 'Agregar foto a esta
-// planta'. Fix: prop assetType para título dinámico según tipo.
-const PHOTO_LABELS = {
-  plant: 'Agregar foto a esta planta',
-  land: 'Agregar foto a esta zona',
-  structure: 'Agregar foto a esta estructura',
-  equipment: 'Agregar foto a este equipo',
-  default: 'Agregar foto',
+// UX-26 (#286) 2026-05-27 — bug operador: la sección de foto era una
+// caja gris separada al final del scroll, fea, descontextualizada. Pidió
+// que la foto se integrara al hero principal del activo "bellamente".
+//
+// Rediseño: PhotoHeroSection es ahora el HERO del detail panel.
+//   - Si hay foto: imagen 4:3 full-width como portada, con overlay
+//     gradient + botón pequeño "Cambiar foto" abajo-derecha.
+//   - Si NO hay foto: card grande con CTA prominente "Agregar foto" +
+//     icono de cámara + copy contextual según assetType.
+//   - Cuenta con el evento `chagra:photo:saved` para refrescar el
+//     thumb inmediato sin volver a montar.
+//
+// Copy contextual por tipo de asset.
+const PHOTO_HERO_LABELS = {
+  plant: { title: 'Foto de la planta', cta: 'Agregar foto de la planta' },
+  land: { title: 'Foto de la zona', cta: 'Agregar foto de la zona' },
+  structure: { title: 'Foto de la estructura', cta: 'Agregar foto de la estructura' },
+  equipment: { title: 'Foto del equipo', cta: 'Agregar foto del equipo' },
+  default: { title: 'Foto', cta: 'Agregar foto' },
 };
 
-// UX-21 (#286) 2026-05-27 — bug operador: "agrego una foto y al hacerlo
-// me dice 'foto agregada para esta planta' cuando claramente no lo es"
-// (era zona/building). Copy success contextual según tipo de asset.
+// UX-21 (#286) 2026-05-27 — copy success contextual según tipo de asset
+// (operador: "me dice 'foto agregada para esta planta' cuando es zona").
+// UX-26 (#286) 2026-05-27 — usados también por PhotoHeroSection.
 const PHOTO_SUCCESS_LABELS = {
   plant: '✓ Foto guardada para esta planta.',
   land: '✓ Foto guardada para esta zona.',
@@ -48,11 +57,14 @@ const PHOTO_SUCCESS_LABELS = {
   default: '✓ Foto guardada.',
 };
 
-function AddPhotoSection({ assetId, speciesSlug, assetType }) {
+function PhotoHeroSection({ assetId, speciesSlug, assetType }) {
   const [busy, setBusy] = useState(false);
   const [success, setSuccess] = useState(false);
   const cameraRef = React.useRef(null);
   const galleryRef = React.useRef(null);
+
+  // Foto actual del asset (si la hay) — se refresca via chagra:photo:saved.
+  const photo = usePhotoUrl({ assetId, speciesSlug: speciesSlug || undefined });
 
   const handleFile = async (e) => {
     const file = e.target.files?.[0];
@@ -65,50 +77,102 @@ function AddPhotoSection({ assetId, speciesSlug, assetType }) {
       await savePhoto({ blob, assetId, speciesSlug });
       // UX-20/22 (#286): notificar a todos los hooks usePhotoUrl que
       // matcheen este asset/species, para que actualicen su URL sin
-      // esperar a un remount. Sin esto, AssetCardThumb / SpeciesPhotoGallery
-      // quedaban en placeholder hasta refresh manual aunque la foto ya
-      // viviera en media_cache.
+      // esperar a un remount (AssetCardThumb, SpeciesPhotoGallery, y
+      // el propio hero del PhotoHeroSection se refrescan en tiempo
+      // real). Sin esto, quedaban en placeholder hasta refresh manual.
       window.dispatchEvent(new CustomEvent('chagra:photo:saved', {
         detail: { assetId: assetId || null, speciesSlug: speciesSlug || null },
       }));
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      console.warn('[AddPhotoSection] save failed:', err);
+      console.warn('[PhotoHeroSection] save failed:', err);
     } finally {
       setBusy(false);
       if (e.target) e.target.value = '';
     }
   };
 
+  const labels = PHOTO_HERO_LABELS[assetType] || PHOTO_HERO_LABELS.default;
+  const hasPhoto = photo.url && photo.source !== 'placeholder' && photo.source !== 'missing' && !photo.loading;
+
   return (
-    <section className="rounded-xl border border-slate-700/50 bg-slate-800/40 p-4 space-y-3">
-      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-        <Images size={12} /> {PHOTO_LABELS[assetType] || PHOTO_LABELS.default}
-      </h3>
-      <div className="grid grid-cols-2 gap-3">
-        <input ref={cameraRef} type="file" accept="image/*" capture="environment" onChange={handleFile} className="hidden" />
-        <input ref={galleryRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
-        <button
-          type="button"
-          onClick={() => cameraRef.current?.click()}
-          disabled={busy}
-          className="p-3 rounded-xl bg-emerald-700 hover:bg-emerald-600 active:scale-95 text-white text-sm font-bold disabled:opacity-50"
-        >
-          📷 Tomar foto
-        </button>
-        <button
-          type="button"
-          onClick={() => galleryRef.current?.click()}
-          disabled={busy}
-          className="p-3 rounded-xl bg-slate-700 hover:bg-slate-600 active:scale-95 text-white text-sm font-bold disabled:opacity-50"
-        >
-          🖼️ Elegir foto
-        </button>
-      </div>
-      {busy && <p className="text-xs text-slate-400 italic">Procesando...</p>}
+    <section className="rounded-2xl overflow-hidden border border-slate-700/50 bg-slate-900" data-testid="photo-hero-section">
+      <input ref={cameraRef} type="file" accept="image/*" capture="environment" onChange={handleFile} className="hidden" />
+      <input ref={galleryRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
+
+      {hasPhoto ? (
+        // Hero con foto: imagen 4:3 + overlay gradient + botones flotantes.
+        <div className="relative w-full aspect-[4/3] bg-slate-900">
+          <img
+            src={photo.url}
+            alt={labels.title}
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
+          />
+          {/* Gradient para legibilidad de los botones overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-transparent pointer-events-none" />
+          {/* Botones overlay abajo */}
+          <div className="absolute bottom-0 inset-x-0 p-3 flex gap-2">
+            <button
+              type="button"
+              onClick={() => cameraRef.current?.click()}
+              disabled={busy}
+              data-testid="photo-hero-retake-camera"
+              className="flex-1 py-2.5 rounded-xl bg-slate-900/85 hover:bg-slate-800 active:scale-95 backdrop-blur-md border border-slate-700 text-white text-sm font-bold disabled:opacity-50"
+            >
+              📷 Cambiar
+            </button>
+            <button
+              type="button"
+              onClick={() => galleryRef.current?.click()}
+              disabled={busy}
+              className="py-2.5 px-3 rounded-xl bg-slate-900/85 hover:bg-slate-800 active:scale-95 backdrop-blur-md border border-slate-700 text-white text-sm font-bold disabled:opacity-50"
+              aria-label="Elegir foto de galería"
+            >
+              🖼️
+            </button>
+          </div>
+          {busy && (
+            <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center">
+              <span className="text-sm text-slate-200 italic">Procesando…</span>
+            </div>
+          )}
+        </div>
+      ) : (
+        // Hero sin foto: card grande con CTA prominente.
+        <div className="p-6 bg-gradient-to-br from-emerald-900/20 to-slate-800/40 flex flex-col items-center gap-3 text-center">
+          <div className="w-16 h-16 rounded-full bg-emerald-900/40 border border-emerald-700/50 flex items-center justify-center">
+            <Images size={28} className="text-emerald-400" aria-hidden="true" />
+          </div>
+          <h3 className="text-base font-bold text-white">{labels.title}</h3>
+          <p className="text-xs text-slate-400 max-w-xs">
+            Aún no hay foto. Tomarla ayuda a identificar y recordar este activo.
+          </p>
+          <div className="grid grid-cols-2 gap-2 w-full max-w-sm mt-1">
+            <button
+              type="button"
+              onClick={() => cameraRef.current?.click()}
+              disabled={busy}
+              data-testid="photo-hero-add-camera"
+              className="py-3 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-600 active:scale-95 text-white text-sm font-bold disabled:opacity-50 min-h-[48px]"
+            >
+              📷 Tomar foto
+            </button>
+            <button
+              type="button"
+              onClick={() => galleryRef.current?.click()}
+              disabled={busy}
+              className="py-3 px-4 rounded-xl bg-slate-700 hover:bg-slate-600 active:scale-95 text-white text-sm font-bold disabled:opacity-50 min-h-[48px]"
+            >
+              🖼️ Galería
+            </button>
+          </div>
+          {busy && <p className="text-xs text-slate-400 italic mt-1">Procesando…</p>}
+        </div>
+      )}
       {success && (
-        <p className="text-xs text-emerald-400" data-testid="photo-success">
+        <p className="text-xs text-emerald-400 px-4 py-2 bg-emerald-900/20 border-t border-emerald-800/40" data-testid="photo-hero-success">
           {PHOTO_SUCCESS_LABELS[assetType] || PHOTO_SUCCESS_LABELS.default}
         </p>
       )}
@@ -463,7 +527,18 @@ export const AssetDetailView = () => {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-8">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* UX-26 (#286) 2026-05-27: foto AHORA es el primer elemento del
+              scroll content (hero card). Operador reportó que la sección
+              de foto "sale al final separado feo". Solución: integrarla al
+              hero como portada visual del activo. Si hay foto, se ve como
+              imagen 4:3 con botones overlay; si no, card grande con CTA. */}
+          <PhotoHeroSection
+            assetId={asset.id}
+            speciesSlug={isPlantType ? deriveSpeciesSlug(name) : null}
+            assetType={isPlantType ? 'plant' : asset.type?.replace('asset--', '') || 'default'}
+          />
+
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50">
               <span className="text-xs text-slate-500 flex items-center gap-1 italic mb-1"><Calendar size={12} /> Registro</span>
@@ -474,19 +549,6 @@ export const AssetDetailView = () => {
               <p className="text-white text-sm font-medium capitalize">{status}</p>
             </div>
           </div>
-
-          {/* Bug 2026-05-18 operator: 'no es posible agregar foto a una planta
-              ya creada' (cubio recién agregado). Botones para subir foto
-              post-creación con dual options cámara/galería + captureAndCompress
-              + savePhoto. Refresh la galería al guardar.
-              Update 2026-05-18: extendido a TODOS los tipos de asset (plant,
-              land/zona/propiedad, structure/túnel/invernadero, equipment),
-              no solo plants. Operator agregó zona y no podía ver fecha ni foto. */}
-          <AddPhotoSection
-            assetId={asset.id}
-            speciesSlug={isPlantType ? deriveSpeciesSlug(name) : null}
-            assetType={isPlantType ? 'plant' : asset.type?.replace('asset--', '') || 'default'}
-          />
 
           <GeometrySection asset={asset} parentZoneName={parentZoneName} onEdit={() => setShowGeoPicker(true)} saving={geoSaving} />
 
