@@ -7,6 +7,8 @@ import OfflineChip from './OfflineChip';
 import ChagraAgentAvatar from './ChagraAgentAvatar';
 import NotificationsBell from './NotificationsBell';
 import useFincaActiveStore from '../services/fincaActiveStore';
+import useOllamaWarmStore from '../store/useOllamaWarmStore';
+import useAssetStore from '../store/useAssetStore';
 import { FARM_CONFIG } from '../config/defaults';
 
 /**
@@ -55,6 +57,13 @@ export default function TopBar({ onNavigate, onLogout }) {
   const vereda = activeFinca?.vereda || null;
   const altitud = activeFinca?.altitud || FARM_CONFIG?.ALTITUD_MSNM || null;
 
+  // "Respira" animación del logo Chagra cuando hay actividad de fondo
+  // (warm-up del agente IA o sync con FarmOS). Sensación de "agente vivo
+  // está pensando" estilo iconos pulsantes Apple. Quick-win UX 2026-05-28.
+  const warmupStatus = useOllamaWarmStore((s) => s.status);
+  const syncProgress = useAssetStore((s) => s.syncProgress);
+  const isBreathing = warmupStatus === 'warming' || (syncProgress && !syncProgress.isComplete && !syncProgress.isCancelled);
+
   // Re-leer si cambia desde otro tab (storage event nativo) O desde el mismo
   // tab via ProfileScreen (chagra:operator-update CustomEvent).
   useEffect(() => {
@@ -90,14 +99,30 @@ export default function TopBar({ onNavigate, onLogout }) {
         <button
           type="button"
           onClick={() => onNavigate('dashboard')}
-          aria-label="Volver al inicio"
-          title="Volver al inicio"
+          aria-label={isBreathing ? 'Chagra está procesando' : 'Volver al inicio'}
+          title={isBreathing ? 'Chagra está pensando…' : 'Volver al inicio'}
           className="font-bold flex items-center gap-2 shrink-0 rounded-lg px-1 py-1 hover:bg-slate-800/60 active:bg-slate-700 transition-colors min-h-[44px]"
         >
-          <ChagraAgentAvatar size={32} state="idle" />
+          <span
+            className={isBreathing ? 'chagra-topbar-breathe' : ''}
+            style={{ display: 'inline-flex' }}
+            aria-hidden="true"
+          >
+            <ChagraAgentAvatar size={32} state={isBreathing ? 'thinking' : 'idle'} />
+          </span>
           <span className="hidden sm:inline text-base">Chagra</span>
           <span className="hidden md:inline text-[10px] text-slate-500 font-mono font-normal">v{APP_VERSION}</span>
         </button>
+        <style>{`
+          @keyframes chagra-topbar-breathe {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(16,185,129,0)); }
+            50% { transform: scale(1.06); filter: drop-shadow(0 0 6px rgba(16,185,129,.55)); }
+          }
+          .chagra-topbar-breathe { animation: chagra-topbar-breathe 2.4s ease-in-out infinite; }
+          @media (prefers-reduced-motion: reduce) {
+            .chagra-topbar-breathe { animation: none; }
+          }
+        `}</style>
 
         {/* Operador + ubicación (tap → perfil). Nombre real grande + ubicación
             municipio · vereda · msnm en pill pequeño debajo. */}
