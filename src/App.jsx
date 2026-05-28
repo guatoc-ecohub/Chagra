@@ -322,6 +322,23 @@ export default function App() {
     return () => window.removeEventListener('chagraNavigate', handleNavigate);
   }, [navigate]);
 
+  // 2026-05-28: ScreenShell despacha 'chagra:nav' (formato simplificado) cuando
+  // user clickea Home/Alertas/Ayuda en pantallas secundarias. Sin esto, los
+  // botones globales del ScreenShell no navegan a ningún lado. Acepta string
+  // simple o objeto {view, data}.
+  useEffect(() => {
+    const handleNavSimple = (e) => {
+      const payload = e.detail;
+      if (typeof payload === 'string') {
+        navigate(payload, null);
+      } else if (payload && typeof payload === 'object' && payload.view) {
+        navigate(payload.view, payload.data || null);
+      }
+    };
+    window.addEventListener('chagra:nav', handleNavSimple);
+    return () => window.removeEventListener('chagra:nav', handleNavSimple);
+  }, [navigate]);
+
   useEffect(() => {
     const handler = (e) => setLastLogMessage(e.detail);
     window.addEventListener('farmosLog', handler);
