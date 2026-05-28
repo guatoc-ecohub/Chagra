@@ -13,6 +13,41 @@
  */
 
 import { getRegionFromDepartment } from './regionalismsService.js';
+import {
+  isInCaucaRegion as _isInCaucaRegion,
+  normalizeUserInput as _normalizeCauca,
+  localizeAgentOutput as _localizeCauca,
+} from './glosarioCaucaService.js';
+
+/**
+ * Free 7→10 fix-pack #5: re-exporta los helpers de glosario regional Cauca
+ * para que los callers (AgentScreen, VoiceCapture, etc.) puedan invocarlos
+ * sin conocer el archivo internal del glosario.
+ *
+ * Wire sugerido para callers (Free 7→10 fix-pack):
+ *   1. Antes de mandar el input al LLM:
+ *        const finca = useFincaActiveStore.getState().getActiveFinca();
+ *        const normalized = normalizeUserInputForRegion(userText, finca);
+ *        // → mandar `normalized` al LLM
+ *   2. Después de recibir la respuesta del LLM (opcional):
+ *        const localized = localizeAgentOutputForRegion(llmResponse, finca);
+ *        // → mostrar/hablar `localized`
+ *
+ * Si la finca no está en región Cauca, ambas funciones son no-op
+ * (passthrough), así que es seguro llamarlas siempre — el gate por región
+ * vive en glosarioCaucaService.
+ */
+export function normalizeUserInputForRegion(text, finca) {
+  return _normalizeCauca(text, { finca });
+}
+
+export function localizeAgentOutputForRegion(text, finca) {
+  return _localizeCauca(text, { finca });
+}
+
+export function isFincaInCaucaRegion(finca) {
+  return _isInCaucaRegion(finca);
+}
 
 /**
  * Mapeo de zonas bioculturales a regiones lingüísticas.
