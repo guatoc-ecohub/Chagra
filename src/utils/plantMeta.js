@@ -16,16 +16,33 @@
  */
 
 /**
- * Opciones canónicas de etapa fenológica. UI las usa para el `<select>`
- * y AssetDetailView las usa para etiquetar legibles.
+ * Opciones de "momento de la planta" (antes "etapa fenológica").
+ *
+ * UX-17 (#286) 2026-05-27 — operador y feedback Lili: "etapa fenológica
+ * es muy técnico yo entiendo el sentido pero debe ser más amigable
+ * revisa eso en TODA la app porque debe ser amigable para gente del
+ * campo y niños desde los 11 años".
+ *
+ * Reemplazos (los `value` se MANTIENEN para compat backend/FarmOS y
+ * datos persistidos en `attributes._chagra_plant_meta`):
+ *   - 'semillero'       → "Recién nacida (semillero)"
+ *   - 'vegetativo'      → "Creciendo (sin flores)"
+ *   - 'floracion'       → "Con flores"
+ *   - 'fructificacion'  → "Con frutos / semillas"
+ *   - 'madurez'         → "Lista para cosechar"
+ *   - 'senescencia'     → "Vieja / acabándose"
+ *
+ * El sub-label `technical` queda como tooltip discreto para agrónomos
+ * que sí conocen el vocabulario técnico, sin imponerlo al niño/usuario
+ * de campo.
  */
 export const ETAPA_FENOLOGICA_OPTIONS = [
-    { value: 'semillero', label: 'Semillero' },
-    { value: 'vegetativo', label: 'Vegetativo' },
-    { value: 'floracion', label: 'Floración' },
-    { value: 'fructificacion', label: 'Fructificación' },
-    { value: 'madurez', label: 'Madurez' },
-    { value: 'senescencia', label: 'Senescencia' },
+    { value: 'semillero', label: 'Recién nacida (semillero)', technical: 'Semillero / plántula' },
+    { value: 'vegetativo', label: 'Creciendo (sin flores)', technical: 'Vegetativo' },
+    { value: 'floracion', label: 'Con flores', technical: 'Floración' },
+    { value: 'fructificacion', label: 'Con frutos / semillas', technical: 'Fructificación' },
+    { value: 'madurez', label: 'Lista para cosechar', technical: 'Madurez' },
+    { value: 'senescencia', label: 'Vieja / acabándose', technical: 'Senescencia' },
 ];
 
 /**

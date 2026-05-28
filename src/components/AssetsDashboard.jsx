@@ -1172,13 +1172,16 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
             />
           </div>
 
-          {/* Etapa fenológica */}
+          {/* UX-17 (#286) 2026-05-27: "etapa fenológica" → "¿En qué momento
+              está la planta?" — copy amigable para gente de campo y niños 11+.
+              Los `value` técnicos se mantienen (compat backend). El sub-label
+              "technical" queda como title hover para agrónomos. */}
           <div className="space-y-1.5">
             <label
               htmlFor="plant-etapa-fenologica"
               className="text-xs font-bold text-slate-400 uppercase tracking-wider"
             >
-              Etapa fenológica (opcional)
+              ¿En qué momento está la planta? (opcional)
             </label>
             <select
               id="plant-etapa-fenologica"
@@ -1187,9 +1190,9 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
               onChange={(e) => setFormData({ ...formData, etapaFenologica: e.target.value })}
               className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white min-h-[48px] focus:ring-lime-500 focus:border-lime-500"
             >
-              <option value="">— Sin definir —</option>
+              <option value="">— No sé / aún no aplica —</option>
               {ETAPA_FENOLOGICA_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
+                <option key={opt.value} value={opt.value} title={opt.technical}>
                   {opt.label}
                 </option>
               ))}
