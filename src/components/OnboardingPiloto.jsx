@@ -32,6 +32,11 @@ const VOCACIONES = [
   { value: 'invernadero', label: 'Invernadero hortícola' },
   { value: 'bosque',      label: 'Bosque / restauración / agroforestal' },
   { value: 'paramo',      label: 'Páramo / alto andino / conservación' },
+  // UX-13 (#286) 2026-05-27: vocación urbana / apartamento — cubre el caso
+  // de usuarios que cultivan en balcón, terraza, ventana o matera interior
+  // sin acceso a terreno rural. Defaults downstream: zonas urbanas sin GPS
+  // ni polígono, estrato condicional, sin gremios agroforestales.
+  { value: 'urbana',      label: 'Urbana / apartamento (balcón, terraza, matera)' },
   { value: 'mixto',       label: 'Mixto (más de una vocación)' },
   { value: 'otro',        label: 'Otro (especifica en notas)' },
 ];
