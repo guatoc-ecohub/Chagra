@@ -686,19 +686,25 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
       });
     }
 
-    // Ejecución atómica vía store (bulk si N>1, single si N=1)
+    // UX-20 (#286) 2026-05-27 — bug operador: "se registra la fresa ya
+    // tiene toda la información pero no veo en el índice de plantas la
+    // foto a pesar de que ya la tiene".
+    //
+    // Root cause: el orden previo era addAsset() → savePhoto(). Pero
+    // `addAsset` updateaba el store → PlantCardThumb re-render → su
+    // `usePhotoUrl(assetId)` se montaba ANTES de que savePhoto hubiera
+    // persistido la foto, devolvía null + caía a placeholder. Como
+    // useEffect solo re-corre cuando cambian sus deps `[assetId, ...]`,
+    // nunca re-fetcheaba aunque la foto llegara después → la card
+    // quedaba para siempre sin imagen hasta refresh manual.
+    //
+    // Fix: PRIMERO guardar la foto (assetId está pre-asignado vía
+    // crypto.randomUUID() arriba, no necesita el store), DESPUÉS crear
+    // el asset. Así cuando PlantCardThumb monta, la foto ya está en
+    // media_cache y se ve inmediato. Bonus: emitimos `chagra:photo:saved`
+    // por si algún componente quiere refrescar listas de fotos
+    // (SpeciesPhotoGallery, etc.).
     try {
-      if (assetCount > 1) {
-        await addAssetsBulk(activeTab, optimisticAssets, pendingTxs);
-      } else {
-        await addAsset(activeTab, optimisticAssets[0], pendingTxs);
-      }
-
-      // Bug fix #2 (2026-05-18): persistir la foto capturada por
-      // SpeciesSelect. La foto sirve doble: identificar especie + quedar
-      // como referencia de la planta. Se ata al primer asset creado y
-      // al speciesSlug para que el resolver de usePhotoUrl la encuentre
-      // por assetId (prioridad alta) o por especie (fallback).
       if (activeTab === 'plant' && formData.photoBlob instanceof Blob) {
         try {
           await savePhoto({
@@ -706,9 +712,23 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
             assetId: assetUUIDs[0],
             speciesSlug: formData.speciesId || null,
           });
+          window.dispatchEvent(new CustomEvent('chagra:photo:saved', {
+            detail: {
+              assetId: assetUUIDs[0],
+              speciesSlug: formData.speciesId || null,
+            },
+          }));
         } catch (err) {
           console.warn('[AssetsDashboard] savePhoto falló (no bloquea siembra):', err);
         }
+      }
+
+      // Ahora sí: guardar el asset. PlantCardThumb monta con la foto
+      // ya disponible → render con thumb correcta sin refresh manual.
+      if (assetCount > 1) {
+        await addAssetsBulk(activeTab, optimisticAssets, pendingTxs);
+      } else {
+        await addAsset(activeTab, optimisticAssets[0], pendingTxs);
       }
 
       // Limpiar zona persistida — siembra guardada, próxima abrirá vacía

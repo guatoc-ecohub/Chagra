@@ -30,6 +30,27 @@ export function usePhotoUrl({ assetId, speciesSlug, photoId } = {}) {
     source: null,
     loading: true,
   });
+  // UX-20 (#286) 2026-05-27: tick para forzar re-fetch sin cambiar deps.
+  // Lo bumpea el listener de `chagra:photo:saved` cuando un componente
+  // externo (AssetsDashboard post-siembra o AddPhotoSection) acaba de
+  // guardar una foto que matchea este hook. Sin esto, el thumb queda en
+  // placeholder hasta refresh manual.
+  const [refetchTick, setRefetchTick] = useState(0);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const handler = (e) => {
+      const d = e.detail || {};
+      if (photoId != null) return; // photoId es específico, no usa cache
+      const matchesAsset = assetId && d.assetId && d.assetId === assetId;
+      const matchesSpecies = speciesSlug && d.speciesSlug && d.speciesSlug === speciesSlug;
+      if (matchesAsset || matchesSpecies) {
+        setRefetchTick((t) => t + 1);
+      }
+    };
+    window.addEventListener('chagra:photo:saved', handler);
+    return () => window.removeEventListener('chagra:photo:saved', handler);
+  }, [assetId, speciesSlug, photoId]);
 
   useEffect(() => {
     let alive = true;
@@ -74,7 +95,7 @@ export function usePhotoUrl({ assetId, speciesSlug, photoId } = {}) {
       alive = false;
       if (revokeFn) revokeFn();
     };
-  }, [assetId, speciesSlug, photoId]);
+  }, [assetId, speciesSlug, photoId, refetchTick]);
 
   return state;
 }

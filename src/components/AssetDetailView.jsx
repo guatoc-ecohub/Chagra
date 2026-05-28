@@ -36,6 +36,18 @@ const PHOTO_LABELS = {
   equipment: 'Agregar foto a este equipo',
   default: 'Agregar foto',
 };
+
+// UX-21 (#286) 2026-05-27 — bug operador: "agrego una foto y al hacerlo
+// me dice 'foto agregada para esta planta' cuando claramente no lo es"
+// (era zona/building). Copy success contextual según tipo de asset.
+const PHOTO_SUCCESS_LABELS = {
+  plant: '✓ Foto guardada para esta planta.',
+  land: '✓ Foto guardada para esta zona.',
+  structure: '✓ Foto guardada para esta estructura.',
+  equipment: '✓ Foto guardada para este equipo.',
+  default: '✓ Foto guardada.',
+};
+
 function AddPhotoSection({ assetId, speciesSlug, assetType }) {
   const [busy, setBusy] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -51,6 +63,14 @@ function AddPhotoSection({ assetId, speciesSlug, assetType }) {
     try {
       const { blob } = await captureAndCompress(file);
       await savePhoto({ blob, assetId, speciesSlug });
+      // UX-20/22 (#286): notificar a todos los hooks usePhotoUrl que
+      // matcheen este asset/species, para que actualicen su URL sin
+      // esperar a un remount. Sin esto, AssetCardThumb / SpeciesPhotoGallery
+      // quedaban en placeholder hasta refresh manual aunque la foto ya
+      // viviera en media_cache.
+      window.dispatchEvent(new CustomEvent('chagra:photo:saved', {
+        detail: { assetId: assetId || null, speciesSlug: speciesSlug || null },
+      }));
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
@@ -87,7 +107,11 @@ function AddPhotoSection({ assetId, speciesSlug, assetType }) {
         </button>
       </div>
       {busy && <p className="text-xs text-slate-400 italic">Procesando...</p>}
-      {success && <p className="text-xs text-emerald-400">✓ Foto guardada para esta planta.</p>}
+      {success && (
+        <p className="text-xs text-emerald-400" data-testid="photo-success">
+          {PHOTO_SUCCESS_LABELS[assetType] || PHOTO_SUCCESS_LABELS.default}
+        </p>
+      )}
     </section>
   );
 }
