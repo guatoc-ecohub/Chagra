@@ -230,11 +230,22 @@ export default function VoiceConfirmation({
       </section>
 
       {rows.length === 0 && (
-        <div className="bg-amber-900/20 border border-amber-800/50 rounded-xl p-4 flex items-start gap-2">
-          <AlertTriangle size={18} className="text-amber-400 shrink-0 mt-0.5" />
-          <p className="text-sm text-amber-200">
-            No se extrajo ninguna entidad. Cancela y repite el registro con una frase más clara.
-          </p>
+        <div className="bg-amber-900/20 border border-amber-800/50 rounded-xl p-4 flex flex-col gap-3">
+          <div className="flex items-start gap-2">
+            <AlertTriangle size={18} className="text-amber-400 shrink-0 mt-0.5" />
+            <div className="text-sm text-amber-200 space-y-2">
+              <p className="font-bold">No alcancé a identificar el cultivo o la cantidad en tu audio.</p>
+              <p className="text-amber-200/80">
+                Revisa la transcripción arriba. Si Chagra escuchó bien pero el cultivo es una variedad nueva o regional (ej. una cepa específica, una variedad local), todavía no la tengo en mi catálogo.
+              </p>
+              <p className="text-amber-200/80">Tienes 3 opciones:</p>
+              <ul className="list-disc pl-5 space-y-1 text-amber-200/80">
+                <li><strong>Agregar manual abajo</strong>: toca el botón "+" y escribe el cultivo + cantidad directamente.</li>
+                <li><strong>Re-grabar más simple</strong>: cierra esto y vuelve a grabar diciendo solo el nombre común (ej. "5 plantas de tomate") sin variedades.</li>
+                <li><strong>Cancelar</strong>: si era una prueba o no querías registrar nada.</li>
+              </ul>
+            </div>
+          </div>
         </div>
       )}
 
