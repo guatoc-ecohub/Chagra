@@ -12,7 +12,13 @@ import { extractVarieties, varietyHelpText } from '../utils/speciesVariety';
 const MAX_QUANTITY = 100000; // sanity cap: 100k plántulas en una siembra es ya raro
 const MIN_CROP_LEN = 2;
 
-export default function SeedingLog({ onBack, onSave, initialData = {} }) {
+export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw }) {
+  // Bug B4 piloto 2026-05-28: QuickActionsPanel "Agregar planta" navega a
+  // 'sembrar' sin pasar currentViewData → App.jsx pasa initialData={null} →
+  // default param `= {}` NO aplica con null (solo con undefined) → línea 18
+  // intentaba leer `null.crop` y crasheaba el ErrorBoundary del componente.
+  // Coalesce explícito null/undefined → {}.
+  const initialData = initialDataRaw || {};
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     crop: initialData.crop || '', // String para UI legacy o label
