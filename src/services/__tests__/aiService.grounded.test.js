@@ -4,8 +4,13 @@
  * visión (PR chagra-pro #48 expuso la tool, este PR la consume).
  *
  * V-05 (audit-vision-chagra-2026-05-26): `_grounded` ahora es objeto
- * estructurado `{ status, reason, validation }` con 6 statuses posibles:
- *   verified, rejected, sidecar-disabled, offline, no-binomial, sidecar-error.
+ * estructurado `{ status, reason, validation }` con 7 statuses posibles:
+ *   verified, partial-match, rejected, sidecar-disabled, offline,
+ *   no-binomial, sidecar-error.
+ *
+ * V-03 #241/#242 (2026-05-28): partial-match cubre el caso "catálogo dice
+ * valid:true pero el binomial input tenía variedad/cultivar/híbrido que se
+ * stripó al resolver el species_id" — el badge "verificado" sería engañoso.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
@@ -211,6 +216,89 @@ describe('recognizeSpeciesGrounded', () => {
     );
   });
 
+  it('status:partial-match cuando catálogo valida la base pero input tenía variedad stripped (V-03 #241)', async () => {
+    mockVisionResponse({
+      common_name_es: 'papa pastusa',
+      scientific_name: "Solanum tuberosum 'Pastusa'",
+      confidence: 0.86,
+      alternatives: [],
+    });
+    sidecarClient.callTool.mockResolvedValueOnce({
+      available: true,
+      results: [
+        {
+          species_id: 'solanum_tuberosum',
+          valid: true,
+          confidence_input: 0.86,
+          confidence_adjusted: 0.86,
+          nombre_comun: 'Papa',
+          nombre_cientifico: 'Solanum tuberosum',
+        },
+      ],
+    });
+
+    const blob = new Blob(['fake'], { type: 'image/jpeg' });
+    const result = await recognizeSpeciesGrounded(blob);
+
+    expect(result._grounded.status).toBe('partial-match');
+    expect(result._grounded.reason).toMatch(/variedad|cultivar/i);
+    expect(result._grounded.validation).toBeTruthy();
+    expect(result._grounded.validation.valid).toBe(true);
+    expect(result._match_type).toBe('stripped-variety');
+  });
+
+  it('status:partial-match cuando vision emite híbrido pero catálogo solo tiene base (V-03 #242)', async () => {
+    mockVisionResponse({
+      common_name_es: 'toronja',
+      scientific_name: 'Citrus × paradisi',
+      confidence: 0.91,
+      alternatives: [],
+    });
+    sidecarClient.callTool.mockResolvedValueOnce({
+      available: true,
+      results: [
+        {
+          species_id: 'citrus_paradisi',
+          valid: true,
+          confidence_input: 0.91,
+          confidence_adjusted: 0.91,
+          nombre_comun: 'Toronja',
+          nombre_cientifico: 'Citrus paradisi',
+        },
+      ],
+    });
+
+    const blob = new Blob(['fake'], { type: 'image/jpeg' });
+    const result = await recognizeSpeciesGrounded(blob);
+
+    expect(result._grounded.status).toBe('partial-match');
+    expect(result._grounded.reason).toMatch(/híbrido/i);
+    expect(result._match_type).toBe('stripped-hybrid');
+  });
+
+  it('status:verified (no partial-match) cuando se quita SOLO autoría taxonómica', async () => {
+    // Autoría "L." es parte del binomial científico oficial, no afecta la
+    // identidad de la especie. Por lo tanto sigue siendo "verified" pleno.
+    mockVisionResponse({
+      common_name_es: 'café',
+      scientific_name: 'Coffea arabica L.',
+      confidence: 0.93,
+      alternatives: [],
+    });
+    sidecarClient.callTool.mockResolvedValueOnce({
+      available: true,
+      results: [
+        { species_id: 'coffea_arabica', valid: true, confidence_adjusted: 0.93 },
+      ],
+    });
+
+    const blob = new Blob(['fake'], { type: 'image/jpeg' });
+    const result = await recognizeSpeciesGrounded(blob);
+
+    expect(result._grounded.status).toBe('verified');
+    expect(result._match_type).toBe('stripped-authority');
+  });
+
   it('status:sidecar-error si el sidecar tool falla (devuelve null)', async () => {
     mockVisionResponse({
       common_name_es: 'aguacate',
@@ -279,7 +367,32 @@ describe('recognizeSpeciesGrounded', () => {
       expect(resolved.grounded_status).toBe('rejected');
     });
 
-    it('thunk resuelve grounded_status=null cuando sidecar disabled (degraded path)', async () => {
+    it('thunk resuelve grounded_status="partial-match" cuando hubo variedad stripped (V-03 #241)', async () => {
+      mockVisionResponse({
+        common_name_es: 'papa pastusa',
+        scientific_name: "Solanum tuberosum 'Pastusa'",
+        confidence: 0.81,
+        alternatives: [],
+      });
+      sidecarClient.callTool.mockResolvedValueOnce({
+        available: true,
+        results: [{ species_id: 'solanum_tuberosum', valid: true, confidence_adjusted: 0.81 }],
+      });
+
+      const blob = new Blob(['fake'], { type: 'image/jpeg' });
+      await recognizeSpeciesGrounded(blob);
+
+      const [, , , opts] = ollamaStream.streamOllama.mock.calls[0];
+      const resolved = opts.meta();
+      expect(resolved.confidence).toBeCloseTo(0.81);
+      expect(resolved.grounded_status).toBe('partial-match');
+    });
+
+    it('thunk resuelve grounded_status="sidecar-disabled" cuando sidecar off (degraded path)', async () => {
+      // V-03 2026-05-28: el finalize marca explícitamente el status de
+      // cualquier early-return en la telemetría (incluido degraded). El
+      // test legacy esperaba null porque asumía que finalize no escribía
+      // en degraded paths — pero sí lo hace desde V-05.
       sidecarClient.isSidecarEnabled.mockReturnValue(false);
       mockVisionResponse({
         common_name_es: 'tomate',
@@ -294,7 +407,7 @@ describe('recognizeSpeciesGrounded', () => {
       const [, , , opts] = ollamaStream.streamOllama.mock.calls[0];
       const resolved = opts.meta();
       expect(resolved.confidence).toBeCloseTo(0.6);
-      expect(resolved.grounded_status).toBeNull();
+      expect(resolved.grounded_status).toBe('sidecar-disabled');
     });
   });
 });

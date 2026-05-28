@@ -306,29 +306,46 @@ const runSpeciesRecognition = async (model, base64, { onToken, signal, telemetry
 
 /**
  * Convierte un nombre científico binomial ("Coffea arabica L.") a un
- * `species_id` snake_case canónico ("coffea_arabica") compatible con el
- * catálogo Chagra. Quita autoría taxonómica (L., Mart., Kunth, etc.) y
- * cualquier sufijo descriptivo después del epíteto específico.
+ * `species_id` snake_case canónico ("coffea_arabica") + metadata del match
+ * (qué tanto se stripó del input para llegar al binomial base). Esto permite
+ * al caller distinguir cuándo el species_id derivado representa exactamente
+ * lo que dijo el modelo vs. cuándo es una aproximación (variedad → base).
+ *
+ * Retorna `{ id, matchType }` donde `matchType`:
+ *   - 'exact'             — el binomial input es exactamente `Genus species`
+ *                           (con autoría opcional pero sin variedad/grupo/×).
+ *   - 'stripped-authority'— se quitó autoría taxonómica (L., Mart., etc.),
+ *                           pero el binomial base es el mismo.
+ *   - 'stripped-variety'  — se quitó variedad/cultivar/grupo (ej. 'Pastusa',
+ *                           Grupo Phureja). El id base puede no representar
+ *                           bien la entidad del input.
+ *   - 'stripped-hybrid'   — se quitó el marcador de híbrido (× / x). El id
+ *                           ignora que la planta es híbrida formal.
  *
  * Ejemplos:
- *   "Coffea arabica L."                       → "coffea_arabica"
- *   "Solanum betaceum"                        → "solanum_betaceum"
- *   "Erythrina edulis Triana ex Micheli"      → "erythrina_edulis"
- *   "Solanum tuberosum Grupo Phureja"         → "solanum_tuberosum"  (sin Grupo)
+ *   "Coffea arabica"                          → { id: "coffea_arabica",   matchType: "exact" }
+ *   "Coffea arabica L."                       → { id: "coffea_arabica",   matchType: "stripped-authority" }
+ *   "Solanum tuberosum 'Pastusa'"             → { id: "solanum_tuberosum", matchType: "stripped-variety" }
+ *   "Solanum tuberosum Grupo Phureja"         → { id: "solanum_tuberosum", matchType: "stripped-variety" }
+ *   "Citrus × paradisi"                       → { id: "citrus_paradisi",   matchType: "stripped-hybrid" }
  *
- * Esto es heurística, no taxonomía perfecta. La validación final la hace
- * el catálogo: si el id derivado no existe, validate_visual_match lo
- * rechaza con `valid:false`.
+ * V-03 #241/#242 (2026-05-28): el caller usa `matchType` para downgrade el
+ * status de grounded de 'verified' a 'partial-match' cuando el id resuelto
+ * NO representa fielmente el binomial input (variedad o hybrid stripped).
+ *
+ * Si el input no es parseable retorna `null`.
  */
-function scientificToSpeciesId(scientific) {
+function scientificToMatchInfo(scientific) {
   if (typeof scientific !== 'string' || scientific.trim().length === 0) return null;
 
   // QUICK-17 (#280) 2026-05-27: normalizar Unicode + quitar diacríticos
-  // ANTES del regex. Permite que vision-model que emite "Niño" como token
-  // colateral o nombres científicos con acentos (raros, pero pasan) no
-  // sean rechazados. NFD descompone á→a+combining-acute, luego strip
-  // del bloque ̀-ͯ deja solo ASCII letter base.
+  // ANTES del regex.
   const ascii = scientific.normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+
+  // Detectar marcador de híbrido (× explícito o `x` como separador entre
+  // 2 epítetos válidos). NO confundir con `x` parte de un nombre.
+  const hasHybridMark = /(^|\s)[×]($|\s)/.test(ascii)
+    || /(^|\s)x($|\s)/.test(ascii.toLowerCase().split(/\s+/).slice(0, 3).join(' '));
 
   // QUICK-17: hybrid mark `×` o `x` separador (ej. "Citrus × paradisi" o
   // "Fragaria x ananassa") se omite. Tomar primeras 2 palabras NO-`×`.
@@ -341,13 +358,48 @@ function scientificToSpeciesId(scientific) {
   if (!/^[A-Za-z-]+$/.test(genus) || !/^[a-z-]+$/.test(species)) return null;
   const id = `${genus}_${species}`.toLowerCase();
   // QUICK-17 post-validate: doble check que el id final sea snake_case
-  // ASCII estricto (sin underscore inicial, sin caracteres raros).
+  // ASCII estricto.
   if (!/^[a-z][a-z0-9_]*$/.test(id)) return null;
-  return id;
+
+  // Clasificar matchType. Orden de prioridad: hybrid > variety > authority > exact.
+  let matchType = 'exact';
+  if (hasHybridMark) {
+    matchType = 'stripped-hybrid';
+  } else if (parts.length > 2) {
+    // Hay tokens después del epíteto. Distinguir variedad/grupo vs autoría.
+    // Heurística: variedad/cultivar suele venir con marcador explícito
+    // (`var.`, `cv.`, `subsp.`, `ssp.`, `f.`) o nombre entre comillas
+    // simples (`'Pastusa'`) o la palabra "Grupo". Autoría suele ser nombre
+    // propio capitalizado SIN esos marcadores (L., Mart., Kunth, etc.).
+    // Nota: `\b...\.\b` no funciona porque `\b` después de `.` no es
+    // word boundary. Anclamos por inicio de token (espacio o ^).
+    const rest = parts.slice(2).join(' ');
+    const varietyMarkers = /(?:^|\s)(var|cv|subsp|ssp|f)\.(?=\s|$)|(?:^|\s)(grupo|group)(?=\s|$)|['‘]/i;
+    if (varietyMarkers.test(rest)) {
+      matchType = 'stripped-variety';
+    } else {
+      matchType = 'stripped-authority';
+    }
+  }
+
+  return { id, matchType };
+}
+
+/**
+ * Convierte un nombre científico binomial a `species_id` snake_case.
+ * Wrapper backwards-compat de `scientificToMatchInfo` que solo devuelve el id.
+ *
+ * Mantenido para callers existentes y tests. Para grounding granular,
+ * usar `scientificToMatchInfo` directamente.
+ */
+function scientificToSpeciesId(scientific) {
+  const info = scientificToMatchInfo(scientific);
+  return info ? info.id : null;
 }
 
 // Export para tests (no usar en runtime fuera de aiService).
 export { scientificToSpeciesId as _scientificToSpeciesId };
+export { scientificToMatchInfo as _scientificToMatchInfo };
 
 /**
  * Versión grounded de recognizeSpecies. Llama al modelo de visión Y
@@ -357,7 +409,12 @@ export { scientificToSpeciesId as _scientificToSpeciesId };
  * Anti-alucinación: si el modelo vision devuelve "Mangosteenia colombiana"
  * (especie inexistente), el catálogo lo rechaza con `valid:false`. El
  * caller obtiene `_grounded.status` para decidir qué UX mostrar:
- *   - 'verified'         → catálogo confirma la sugerencia (verde).
+ *   - 'verified'         → catálogo confirma la sugerencia exacta (verde).
+ *   - 'partial-match'    → catálogo encontró el binomial base pero el input
+ *                          incluía variedad/cultivar/marcador híbrido que se
+ *                          stripó (amber-tibio). V-03 #241/#242: el mensaje
+ *                          "verificado" sería engañoso porque el id resuelto
+ *                          no representa fielmente lo que dijo el modelo.
  *   - 'rejected'         → catálogo rechaza la sugerencia (amber).
  *   - 'sidecar-disabled' → feature flag off (info).
  *   - 'offline'          → sin conexión, no se pudo verificar (info).
@@ -408,12 +465,13 @@ export const recognizeSpeciesGrounded = async (imageBlob, options = {}) => {
     return finalize('offline', 'Sin conexión, no se pudo verificar.');
   }
 
-  // Derive species_id from scientific_name. Si no podemos derivar (binomial
-  // ausente o malformado), tampoco podemos validar — degradamos.
-  const speciesId = scientificToSpeciesId(visionResult.scientific_name);
-  if (!speciesId) {
+  // Derive species_id + match metadata desde scientific_name. Si no podemos
+  // derivar (binomial ausente o malformado), tampoco podemos validar.
+  const matchInfo = scientificToMatchInfo(visionResult.scientific_name);
+  if (!matchInfo) {
     return finalize('no-binomial', 'Nombre científico ambiguo.');
   }
+  const speciesId = matchInfo.id;
 
   // Construir lista de candidates: el principal + alternatives si vienen.
   const candidates = [
@@ -443,14 +501,40 @@ export const recognizeSpeciesGrounded = async (imageBlob, options = {}) => {
 
   // Buscar el match del candidato primario en results.
   const primary = (result.results || []).find((r) => r.species_id === speciesId);
-  const verified = primary?.valid === true;
+  const validInCatalog = primary?.valid === true;
+  if (!validInCatalog) {
+    return finalize(
+      'rejected',
+      'Sugerencia no encontrada en catálogo.',
+      primary || null,
+      { _all_validations: result.results || [] },
+    );
+  }
+
+  // V-03 #241/#242 (2026-05-28): el catálogo dice "valid:true" pero el
+  // binomial input incluía variedad/cultivar/híbrido que se stripó para
+  // resolver el id base. Marcar como 'partial-match' para que UX no muestre
+  // "verificado" engañoso. Solo 'exact' y 'stripped-authority' (autoría
+  // taxonómica como "L.", "Mart.") cuentan como verificación plena, porque
+  // el binomial taxonómico subyacente sigue siendo el mismo.
+  if (matchInfo.matchType === 'stripped-variety' || matchInfo.matchType === 'stripped-hybrid') {
+    const reasonByType = {
+      'stripped-variety': 'Base verificada; variedad o cultivar específico no validado.',
+      'stripped-hybrid': 'Base verificada; el catálogo no distingue el híbrido formal.',
+    };
+    return finalize(
+      'partial-match',
+      reasonByType[matchInfo.matchType],
+      primary,
+      { _all_validations: result.results || [], _match_type: matchInfo.matchType },
+    );
+  }
+
   return finalize(
-    verified ? 'verified' : 'rejected',
-    verified
-      ? 'Verificado en catálogo Chagra.'
-      : 'Sugerencia no encontrada en catálogo.',
-    primary || null,
-    { _all_validations: result.results || [] },
+    'verified',
+    'Verificado en catálogo Chagra.',
+    primary,
+    { _all_validations: result.results || [], _match_type: matchInfo.matchType },
   );
 };
 

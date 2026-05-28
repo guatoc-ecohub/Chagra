@@ -637,8 +637,10 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
                 Especie sugerida ({Math.round((aiResult.confidence || 0) * 100)}% confianza)
               </p>
               {/* Badge grounded contra catálogo (V-05 — anti-alucinación con
-                  shape estructurado). `_grounded.status` distingue 6 estados:
-                    verified         → verde, sugerencia confirmada.
+                  shape estructurado). `_grounded.status` distingue 7 estados:
+                    verified         → verde, sugerencia confirmada exacta.
+                    partial-match    → amber tibio, base verificada pero
+                                       variedad/híbrido no validado (V-03 #241/#242).
                     rejected         → amber, sugerencia rechazada por catálogo.
                     sidecar-disabled → slate info, validación desactivada.
                     offline          → slate info, sin red para verificar.
@@ -652,6 +654,16 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
                 >
                   <Check size={14} aria-hidden="true" />
                   Verificado en catálogo
+                </span>
+              )}
+              {aiResult._grounded?.status === 'partial-match' && (
+                <span
+                  data-testid="grounded-badge-partial-match"
+                  className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 bg-amber-500/20 text-amber-200 border border-amber-600 mb-1"
+                  title={aiResult._grounded.reason}
+                >
+                  <AlertCircle size={14} aria-hidden="true" />
+                  Coincidencia parcial
                 </span>
               )}
               {aiResult._grounded?.status === 'rejected' && (
