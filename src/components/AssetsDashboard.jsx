@@ -1025,13 +1025,32 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
         );
       })()}
 
-      {/* Gremio / Función en el sistema */}
-      <div className="space-y-1.5">
+      {/* UX-16 (#286) 2026-05-27: gremio condicional urbano. La jerga
+          "fijador de nitrógeno", "atrayente de polinizadores",
+          "productor de biomasa" es agroecología de sistemas grandes —
+          no aplica a balcón / matera / ventana. Si la zona parent es
+          urbana, ocultamos el bloque entero (mismo patrón que UX-15
+          hizo para Capa del cultivo). */}
+      {(() => {
+        const parentLand = formData.parentLandId
+          ? lands.find((l) => l.id === formData.parentLandId)
+          : null;
+        const parentLandType = parentLand?.attributes?.land_type;
+        if (isUrbanLandType(parentLandType)) {
+          return (
+            <p className="text-xs text-slate-500 italic px-1" data-testid="gremio-hidden-urban">
+              Zona urbana: no necesitas indicar función ecológica.
+            </p>
+          );
+        }
+        return (
+      <div className="space-y-1.5" data-testid="gremio-field">
         <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Gremio / Función ecológica</label>
         <div className="flex flex-wrap gap-1.5">
           {GREMIO_OPTIONS.map(opt => (
             <button
               key={opt.value}
+              type="button"
               onClick={() => setFormData({ ...formData, gremio: formData.gremio === opt.value ? '' : opt.value })}
               className={`text-xs px-3 py-2 rounded-full transition-all active:scale-95 min-h-[36px] ${formData.gremio === opt.value
                 ? 'bg-lime-600/30 text-lime-300 border border-lime-500 font-bold'
@@ -1043,6 +1062,8 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
           ))}
         </div>
       </div>
+        );
+      })()}
 
       {/* Cantidad de plantas (ADR-030: visible/editable según tracking_mode).
           - aggregate: input grande prominente (cama corrida, qty=N en 1 asset)
