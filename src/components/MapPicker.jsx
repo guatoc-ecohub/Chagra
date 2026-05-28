@@ -179,11 +179,27 @@ export const MapPicker = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Toggle del modo "trazar caminando": al activar, arranca un watchPosition
-  // con alta precision que va anadiendo vertices al polygon a medida que el
-  // GPS reporta nuevas coordenadas (tipicamente cada 1-3s segun el dispositivo).
-  // Desactivar detiene la captura, el polygon queda con los vertices
-  // acumulados y el usuario puede editarlo con Undo / Cerrar polígono.
+  // UX-23 (#286) 2026-05-27 — bug operador iPhone: "cuando doy clic en
+  // una propiedad caminar para registrarla el botón no funciona ni el
+  // de mi ubicación me devuelve".
+  //
+  // Root cause: iOS Safari es estricto con geolocation:
+  //   - watchPosition con enableHighAccuracy=true + timeout 15s a veces
+  //     se cuelga silenciosamente sin disparar success ni error si el
+  //     usuario no aceptó el prompt o si el permiso está "Solo una vez".
+  //   - getCurrentPosition con highAccuracy tarda 30-60s en cold-start
+  //     A-GPS en iPhone — timeout 15s es muy agresivo.
+  //   - Si el permiso está denied, navigator.geolocation existe pero
+  //     toda llamada devuelve error code=1 — la UI debe mostrar copy
+  //     accionable ("Abre Ajustes > Safari > Ubicación").
+  //
+  // Fixes:
+  //   1. Pre-flight check con getCurrentPosition para asegurar permiso
+  //      antes de arrancar watchPosition (iOS confiable así).
+  //   2. Timeout extendido a 30s (iOS A-GPS realista).
+  //   3. Mensajes de error específicos por err.code con guía iOS.
+  //   4. Fallback enableHighAccuracy=false si el primer intento falla
+  //      por timeout (algunos iPhones viejos no capturan high-accuracy).
   const toggleWalkRecording = () => {
     if (mode !== 'polygon') return;
     if (isWalking) {
@@ -195,39 +211,82 @@ export const MapPicker = ({
       return;
     }
     if (!navigator.geolocation) {
-      console.warn('[MapPicker] Geolocalización no disponible para modo walk');
+      setGpsStatus('failed');
+      setGpsError('Geolocalización no disponible en este navegador.');
       return;
     }
-    // Limpia cualquier vertice previo y arranca la captura
-    setPoints([]);
-    const map = mapRef.current;
-    if (layerRef.current) {
-      map.removeLayer(layerRef.current);
-      layerRef.current = null;
-    }
-    setIsWalking(true);
-    watchIdRef.current = navigator.geolocation.watchPosition(
-      (pos) => {
-        const latlng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        setPoints((prev) => {
-          const next = [...prev, latlng];
-          if (layerRef.current) map.removeLayer(layerRef.current);
-          if (next.length >= 2) {
-            layerRef.current = L.polyline(next, { color: '#10b981', weight: 4, opacity: 0.85 }).addTo(map);
+
+    const startWatch = (highAccuracy) => {
+      // Limpia cualquier vertice previo y arranca la captura
+      setPoints([]);
+      const map = mapRef.current;
+      if (layerRef.current) {
+        map.removeLayer(layerRef.current);
+        layerRef.current = null;
+      }
+      setIsWalking(true);
+      setGpsError(null);
+      watchIdRef.current = navigator.geolocation.watchPosition(
+        (pos) => {
+          const latlng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          setPoints((prev) => {
+            const next = [...prev, latlng];
+            if (layerRef.current) map.removeLayer(layerRef.current);
+            if (next.length >= 2) {
+              layerRef.current = L.polyline(next, { color: '#10b981', weight: 4, opacity: 0.85 }).addTo(map);
+            }
+            map.panTo([latlng.lat, latlng.lng]);
+            return next;
+          });
+        },
+        (err) => {
+          let msg = 'Error capturando GPS al caminar.';
+          if (err.code === 1) msg = 'Permiso de ubicación denegado. Abre Ajustes > Safari > Ubicación para permitirlo.';
+          else if (err.code === 2) msg = 'GPS no disponible (sin señal o desactivado).';
+          else if (err.code === 3) msg = 'Tiempo agotado esperando GPS. Sal al exterior y vuelve a intentar.';
+          console.error('[MapPicker] Error watchPosition:', err.code, err.message);
+          setGpsStatus('failed');
+          setGpsError(msg);
+          setIsWalking(false);
+          if (watchIdRef.current !== null) {
+            navigator.geolocation.clearWatch(watchIdRef.current);
+            watchIdRef.current = null;
           }
-          map.panTo([latlng.lat, latlng.lng]);
-          return next;
-        });
+        },
+        {
+          enableHighAccuracy: highAccuracy,
+          maximumAge: 0,
+          // Extendido de 15s a 30s — iOS A-GPS cold-start típico.
+          timeout: 30000,
+        },
+      );
+    };
+
+    // Pre-flight con getCurrentPosition para asegurar permiso iOS antes
+    // de arrancar watchPosition. Si el permiso no está, fallamos rápido
+    // con mensaje claro en lugar de un watchPosition colgado.
+    setGpsStatus('locating');
+    navigator.geolocation.getCurrentPosition(
+      () => {
+        setGpsStatus('located');
+        startWatch(true);
       },
       (err) => {
-        console.error('[MapPicker] Error watchPosition:', err.message);
-        setIsWalking(false);
+        // Primer intento high-accuracy falló — si fue timeout, reintentar
+        // sin highAccuracy (iPhone viejo / Android sin GPS asistido).
+        if (err.code === 3) {
+          console.warn('[MapPicker] Timeout high-accuracy, reintento low-accuracy');
+          startWatch(false);
+          return;
+        }
+        let msg = 'No se pudo iniciar la captura GPS.';
+        if (err.code === 1) msg = 'Permiso de ubicación denegado. En iPhone: Ajustes > Safari > Ubicación.';
+        else if (err.code === 2) msg = 'GPS no disponible. Sal al exterior y verifica que el GPS esté activo.';
+        console.error('[MapPicker] Error pre-flight GPS:', err.code, err.message);
+        setGpsStatus('failed');
+        setGpsError(msg);
       },
-      {
-        enableHighAccuracy: true,
-        maximumAge: 0,
-        timeout: 15000
-      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 },
     );
   };
 
@@ -289,17 +348,25 @@ export const MapPicker = ({
         }
       },
       (err) => {
+        // UX-23 (#286) 2026-05-27: copy iOS-aware. iOS Safari requiere
+        // permiso explícito vía Ajustes si fue denegado una vez.
         let msg = 'No se pudo obtener tu ubicación.';
-        if (err.code === 1) msg = 'Permiso de ubicación denegado por el navegador.';
-        else if (err.code === 2) msg = 'GPS no disponible (sin señal o desactivado).';
-        else if (err.code === 3) msg = 'Tiempo agotado esperando al GPS (15s).';
+        if (err.code === 1) {
+          msg = 'Permiso de ubicación denegado. En iPhone: Ajustes > Safari > Ubicación. En Android: toca el candado de la barra de URL.';
+        } else if (err.code === 2) {
+          msg = 'GPS no disponible. Verifica que el GPS esté activo y que estés al exterior (no en sótano / lejos de ventana).';
+        } else if (err.code === 3) {
+          msg = 'Tiempo agotado esperando al GPS (30s). En iPhone, el GPS puede tardar más al aire libre — espera unos segundos y vuelve a tocar "Mi ubicación".';
+        }
         console.error('[MapPicker] Error GPS:', err.code, err.message);
         setGpsStatus('failed');
         setGpsError(msg);
       },
       {
         enableHighAccuracy: true,
-        timeout: 15000,
+        // UX-23: timeout extendido de 15s a 30s — A-GPS de iPhone tarda
+        // 20-60s en cold-start.
+        timeout: 30000,
         maximumAge: 30000
       }
     );
@@ -406,7 +473,7 @@ export const MapPicker = ({
           {gpsStatus === 'failed' && (
             <>
               <AlertTriangle size={14} className="shrink-0" />
-              <span className="flex-1">{gpsError || 'GPS no disponible.'} Podés marcar el punto haciendo click en el mapa.</span>
+              <span className="flex-1">{gpsError || 'GPS no disponible.'} Puedes marcar el punto tocando el mapa.</span>
               <button
                 type="button"
                 onClick={() => captureGps(true)}
