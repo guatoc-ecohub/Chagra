@@ -517,7 +517,8 @@ export default function App() {
         <div
           role={toast.isError ? 'alert' : 'status'}
           aria-live={toast.isError ? 'assertive' : 'polite'}
-          className={`fixed bottom-8 left-1/2 -translate-x-1/2 p-4 rounded-xl shadow-2xl flex items-center gap-3 z-50 w-11/12 max-w-md border-2 pb-[max(2rem,env(safe-area-inset-bottom))] pointer-events-none ${toast.isError ? 'bg-amber-700 border-amber-500' : 'bg-green-700 border-green-500'}`}
+          className={`fixed left-1/2 -translate-x-1/2 p-4 rounded-xl shadow-2xl flex items-center gap-3 z-[100] w-11/12 max-w-md border-2 pointer-events-none ${toast.isError ? 'bg-amber-700 border-amber-500' : 'bg-green-700 border-green-500'}`}
+          style={{ bottom: 'calc(96px + env(safe-area-inset-bottom))' }}
         >
           {toast.isError ? <WifiOff size={28} className="shrink-0" aria-hidden="true" /> : <CheckCircle size={28} className="shrink-0" aria-hidden="true" />}
           <p className="text-base font-bold text-white leading-tight flex-1">{toast.message}</p>
