@@ -253,6 +253,238 @@ let currentKokoroUrl = null;
 let lastSpoken = null;
 let lastSpokenOptions = null;
 
+// ──────────────────────────────────────────────────────────────────────────
+// Streaming sentence-by-sentence (Free 7→10 fix-pack)
+// ──────────────────────────────────────────────────────────────────────────
+// Bug observado: Kokoro TTS CPU es lineal con el largo del texto. Una
+// respuesta de 7KB tarda ~3s; una de 145KB tarda ~23s. El usuario espera
+// en silencio todo el tiempo porque speakKokoro(text) hace UNA llamada al
+// backend con el texto entero y solo después arranca audio.
+//
+// Solución: cortar el texto en frases, sintetizar la primera AHORA, y
+// encadenar las siguientes a medida que terminan. La latencia perceptual
+// pasa de "esperar la respuesta entera" a "esperar la PRIMERA frase",
+// que típicamente es 30-80 chars (subsegundo a 2s).
+//
+// Esto es backward-compatible: speakKokoro / speak siguen existiendo y
+// haciéndose con texto entero. AgentScreen opta in pasando por
+// speakSentences (Free 7→10 fix-pack #4).
+
+// Estado del playback en cadena para poder cancelarlo con stop().
+let sentenceQueueCancelled = false;
+let sentenceQueueController = null;
+
+const MIN_SENTENCE_CHARS = 40;  // bufferamos chunks <40 chars hasta cerrar
+const SENTENCE_END_RE = /([.!?…])([\s\n]+|$)/;
+
+/**
+ * Corta un texto en frases para streaming TTS.
+ *
+ * Heurística simple — busca boundaries [.!?…] seguidos de whitespace o EOL.
+ * Frases muy cortas (<MIN_SENTENCE_CHARS) se concatenan con la siguiente
+ * para evitar audios pico-cortos que cortan la entonación natural.
+ *
+ * No es un parser perfecto (no maneja "Sr. González" perfectamente), pero
+ * para respuestas del LLM en español funciona suficiente. El fallback en
+ * caso de texto sin boundaries es tratar todo como UNA frase.
+ *
+ * Idempotente: splitIntoSentences("a. b.") = ["a.", "b."], y juntando
+ * vuelve a quedar equivalente con el separador whitespace original.
+ *
+ * @param {string} text
+ * @returns {string[]} array de frases (sin separadores extra), nunca vacío
+ *   si text es non-empty.
+ */
+export function splitIntoSentences(text) {
+  if (typeof text !== 'string' || text.length === 0) return [];
+  const sentences = [];
+  let buffer = '';
+  let remaining = text;
+  while (remaining.length > 0) {
+    const match = SENTENCE_END_RE.exec(remaining);
+    if (!match) {
+      // No más boundaries — el resto va como una frase final.
+      // Acumulamos y dejamos el push final fuera del loop.
+      buffer += remaining;
+      break;
+    }
+    const idx = match.index + match[1].length;  // incluye el puntuador
+    buffer += remaining.slice(0, idx);
+    remaining = remaining.slice(idx + (match[2] === '' ? 0 : match[2].length));
+    // Si el buffer es muy corto (ej. "Sí." 3 chars), acumular con la
+    // siguiente frase para evitar audios picados.
+    if (buffer.trim().length >= MIN_SENTENCE_CHARS) {
+      sentences.push(buffer.trim());
+      buffer = '';
+    } else {
+      buffer += ' ';
+    }
+  }
+  if (buffer.trim().length > 0) sentences.push(buffer.trim());
+  return sentences.filter((s) => s.length > 0);
+}
+
+/**
+ * Sintetiza una sola frase con Kokoro y devuelve un blob URL listo para Audio.
+ * Internamente reusa el endpoint /api/kokoro/tts.
+ *
+ * Lanza si HTTP no-OK o si la frase está vacía. El caller (speakSentences)
+ * captura el error y decide si fallback a speak() Web Speech.
+ *
+ * @returns {Promise<string|null>} blob URL o null si frase vacía.
+ */
+async function synthesizeSentence(sentence, voice, format, lang, signal) {
+  const clean = sanitizeForTTS(sentence);
+  if (!clean || clean.length === 0) return null;
+  const res = await fetch('/api/kokoro/tts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: clean, voice, format, lang }),
+    signal,
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const blob = await res.blob();
+  return URL.createObjectURL(blob);
+}
+
+/**
+ * Reproduce un blob URL como Audio, retorna Promise que resuelve al onended.
+ * Setea currentKokoroAudio/currentKokoroUrl para que stop() pueda matarlo.
+ */
+function playSentenceBlob(url) {
+  return new Promise((resolve, reject) => {
+    const audio = new Audio(url);
+    currentKokoroAudio = audio;
+    currentKokoroUrl = url;
+    const cleanup = () => {
+      if (currentKokoroUrl === url) {
+        URL.revokeObjectURL(url);
+        currentKokoroAudio = null;
+        currentKokoroUrl = null;
+      }
+    };
+    audio.onended = () => { cleanup(); resolve(); };
+    audio.onerror = (e) => { cleanup(); reject(e); };
+    audio.play().catch((e) => { cleanup(); reject(e); });
+  });
+}
+
+/**
+ * Free 7→10 fix-pack #4: TTS streaming frase-por-frase.
+ *
+ * En vez de mandar un único request /api/kokoro/tts con el texto entero
+ * (latencia lineal con chars), parte el texto en frases y las sintetiza
+ * en pipeline: mientras suena la frase N, prefetchea la frase N+1.
+ *
+ * Eso reduce la latencia hasta-primer-audio de "esperar toda la respuesta"
+ * a "esperar la primera frase" (típicamente <2s).
+ *
+ * Fallbacks:
+ *   - Si Kokoro falla en alguna frase, fallback a speak() Web Speech
+ *     para esa frase específica (no aborta toda la cadena).
+ *   - Si Kokoro falla en LA PRIMERA frase, fallback completo a
+ *     speakKokoro/speak con texto entero (preserva behavior viejo).
+ *   - stop() cancela toda la cadena vía AbortController.
+ *
+ * @param {string} text - texto completo a sintetizar.
+ * @param {Object} options
+ *   - voice (string): id Kokoro voice, default getPreferredVoice().
+ *   - format (string): default 'opus'.
+ *   - lang (string): default 'es'.
+ * @returns {Promise<boolean>} true si al menos una frase se reprodujo
+ *   con éxito (Kokoro o Web Speech fallback), false si todo falló.
+ */
+export async function speakSentences(text, options = {}) {
+  const {
+    voice = getPreferredVoice(),
+    format = 'opus',
+    lang = 'es',
+  } = options;
+
+  stop();
+  sentenceQueueCancelled = false;
+  sentenceQueueController = new AbortController();
+
+  // Cache para replayLast: texto original + opts.
+  if (typeof text === 'string' && text.trim().length > 0) {
+    lastSpoken = text;
+    lastSpokenOptions = { ...options };
+  }
+
+  const sentences = splitIntoSentences(text);
+  if (sentences.length === 0) return false;
+
+  // Si solo hay 1 frase corta, no vale la pena el pipeline — usar
+  // speakKokoro directo (que también hace fallback Web Speech internamente).
+  if (sentences.length === 1 && sentences[0].length < MIN_SENTENCE_CHARS * 2) {
+    const r = await speakKokoro(text, options);
+    return r !== null;
+  }
+
+  let prefetched = null;
+  let firstFrameSucceeded = false;
+
+  // Prefetch async de la siguiente frase mientras la actual suena.
+  const prefetch = (idx) => {
+    if (idx >= sentences.length || sentenceQueueCancelled) return null;
+    return synthesizeSentence(
+      sentences[idx], voice, format, lang, sentenceQueueController.signal
+    ).catch((e) => {
+      if (e?.name !== 'AbortError') {
+        console.warn('[TTS streaming] sentence prefetch failed:', e.message);
+      }
+      return null;
+    });
+  };
+
+  try {
+    prefetched = await prefetch(0);
+  } catch (_) {
+    prefetched = null;
+  }
+
+  // Si la primera frase falla en Kokoro, fallback total al texto entero
+  // por speakKokoro (que internamente cae a Web Speech). Preserva UX vieja.
+  if (!prefetched && !sentenceQueueCancelled) {
+    const r = await speakKokoro(text, options);
+    return r !== null;
+  }
+
+  for (let i = 0; i < sentences.length; i++) {
+    if (sentenceQueueCancelled) break;
+    // Disparar prefetch de la siguiente mientras suena la actual
+    const next = i + 1 < sentences.length ? prefetch(i + 1) : null;
+    if (prefetched) {
+      try {
+        await playSentenceBlob(prefetched);
+        firstFrameSucceeded = true;
+      } catch (e) {
+        console.warn('[TTS streaming] playback error frase', i, ':', e?.message || e);
+        // Para frases tardías que fallan, fallback Web Speech por frase.
+        if (i > 0 && !sentenceQueueCancelled) {
+          try { speak(sentences[i], options); } catch (_) { /* ignore */ }
+        }
+      }
+    }
+    prefetched = next ? await next : null;
+  }
+
+  sentenceQueueController = null;
+  return firstFrameSucceeded;
+}
+
+/**
+ * Cancela la cadena de speakSentences en curso. Idempotente.
+ * Llamada desde stop() para mantener un único punto de cancelación.
+ */
+function cancelSentenceQueue() {
+  sentenceQueueCancelled = true;
+  if (sentenceQueueController) {
+    try { sentenceQueueController.abort(); } catch (_) { /* ignore */ }
+    sentenceQueueController = null;
+  }
+}
+
 function loadVoices() {
   return new Promise((resolve) => {
     if (voicesLoaded) {
@@ -354,6 +586,8 @@ export function speak(text, options = {}) {
 }
 
 export function stop() {
+  // Cancel cualquier cadena de speakSentences activa (Free 7→10 fix-pack #4)
+  cancelSentenceQueue();
   if (window.speechSynthesis) {
     window.speechSynthesis.cancel();
   }
@@ -590,6 +824,8 @@ export default {
   speak,
   speakKokoro,
   speakXTTS,
+  speakSentences,
+  splitIntoSentences,
   stop,
   pause,
   resume,
