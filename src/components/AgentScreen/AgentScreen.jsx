@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw, X } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { transcribe } from '../../services/voiceService';
 import {
@@ -58,7 +58,7 @@ const STATE_IDLE = 'idle';
 const STATE_RECORDING = 'recording';
 const STATE_THINKING = 'thinking';
 
-export default function AgentScreen({ onBack }) {
+export default function AgentScreen({ onBack, initialContext }) {
   const operatorId = usePrefsStore((s) => s.operatorId) || 'default-operator';
   // Task #122 (2026-05-23): ttsEnabled global persistido en usePrefsStore.
   // Antes era useState local — al cambiarlo en otra pantalla (header
@@ -128,6 +128,13 @@ export default function AgentScreen({ onBack }) {
   // ni se inyecta al messages real. Aparece junto a QuickChipsBar cuando
   // chat está vacío e idle.
   const [showAgentDemo, setShowAgentDemo] = useState(false);
+  // 2026-05-28 UX: cuando el operador llega al agente desde una notificación
+  // climática (NotificationsBell), recibimos `initialContext` con prompt
+  // pre-cargado + cita de la entidad emisora (IDEAM/NOAA/CIIFEN/Open-Meteo).
+  // Mostramos un banner discreto arriba del input con la cita y el link al
+  // informe oficial. El banner es dismissable — al primer submit, o cuando
+  // el operador cierra, desaparece. NO se persiste entre mounts.
+  const [alertContextBanner, setAlertContextBanner] = useState(null);
 
   const { durationMs, start: startRecord, stop: stopRecord, reset: resetRecord } = useVoiceRecorder();
   const chatEndRef = useRef(null);
@@ -302,6 +309,28 @@ export default function AgentScreen({ onBack }) {
       }
     });
     return () => { alive = false; };
+  }, []);
+
+  // 2026-05-28: aplicar initialContext de notificación climática.
+  // Si el operador llega desde NotificationsBell con prefilledPrompt + cita
+  // de entidad emisora, prellenamos el input y mostramos un banner con el
+  // link al informe oficial. Solo corre al primer mount (deps vacías) — el
+  // initialContext es de un solo uso. Re-entrar al agente desde el menú
+  // normal NO debe re-disparar el prompt.
+  useEffect(() => {
+    if (!initialContext) return;
+    const { prefilledPrompt, sourceLabel, sourceUrl, alertContext } = initialContext;
+    if (typeof prefilledPrompt === 'string' && prefilledPrompt.trim().length > 0) {
+      setInputText(prefilledPrompt);
+    }
+    if (sourceUrl || sourceLabel || alertContext) {
+      setAlertContextBanner({
+        sourceLabel: sourceLabel || null,
+        sourceUrl: sourceUrl || null,
+        alertContext: alertContext || null,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Bug 2026-05-18: health check del LLM al mount. Si /api/ollama/api/tags
@@ -1463,6 +1492,10 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     e.preventDefault();
     handleSubmit(inputText);
     setInputText('');
+    // El banner de contexto de alerta es de un solo uso — al primer submit
+    // el operador ya está conversando con el agente y el banner queda
+    // redundante. Se reabre solo si vuelve a entrar desde la notificación.
+    setAlertContextBanner(null);
   };
 
   const handleSuggestion = (text) => {
@@ -1641,6 +1674,58 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       )}
       {state === STATE_IDLE && messages.length === 0 && showAgentDemo && (
         <AgentDemoExample onClose={() => setShowAgentDemo(false)} />
+      )}
+
+      {/* 2026-05-28 UX: banner de contexto de alerta climática. Aparece
+          cuando el operador llega desde una notificación con prompt
+          pre-cargado + cita de la entidad emisora (IDEAM/NOAA/CIIFEN/
+          Open-Meteo). Banner discreto arriba del input — el operador ve la
+          fuente del aviso antes de mandar la pregunta. Dismissable. */}
+      {alertContextBanner && (
+        <div
+          className="mx-4 mb-2 p-3 rounded-lg bg-sky-950/40 border border-sky-800/50 flex items-start gap-3"
+          data-testid="agent-alert-context-banner"
+          role="status"
+        >
+          <div className="flex-1 min-w-0">
+            {alertContextBanner.alertContext?.title && (
+              <p className="text-xs font-bold text-sky-200 leading-tight">
+                {alertContextBanner.alertContext.title}
+              </p>
+            )}
+            {alertContextBanner.alertContext?.body && (
+              <p className="text-[11px] text-sky-300/85 mt-0.5 leading-snug">
+                {alertContextBanner.alertContext.body}
+              </p>
+            )}
+            {(alertContextBanner.sourceLabel || alertContextBanner.sourceUrl) && (
+              <p className="text-[10px] text-slate-400 mt-1.5 leading-tight">
+                Fuente:{' '}
+                {alertContextBanner.sourceUrl ? (
+                  <a
+                    href={alertContextBanner.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sky-300 hover:text-sky-200 underline"
+                    data-testid="agent-alert-source-link"
+                  >
+                    {alertContextBanner.sourceLabel || 'Ver informe oficial'}
+                  </a>
+                ) : (
+                  <span className="text-slate-300">{alertContextBanner.sourceLabel}</span>
+                )}
+              </p>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => setAlertContextBanner(null)}
+            className="shrink-0 p-1 rounded-md hover:bg-white/10 text-slate-400"
+            aria-label="Cerrar contexto de alerta"
+          >
+            <X size={14} />
+          </button>
+        </div>
       )}
 
       {/* Input */}

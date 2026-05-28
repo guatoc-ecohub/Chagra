@@ -139,10 +139,86 @@ export default function NotificationsBell({ onNavigate }) {
             return;
         }
         if (notif.cta_view) {
-            onNavigate?.(notif.cta_view);
+            // 2026-05-28: si la notificación va al agente y trae prompt
+            // pre-cargado + fuente, lo pasamos como initialContext para
+            // que AgentScreen prellene el textarea y muestre la cita de
+            // la entidad emisora. Para otros destinos (perfil, task_log,
+            // mapa, etc.) onNavigate se llama sin payload — backwards
+            // compatible.
+            const goingToAgent = notif.cta_view === 'agente';
+            const hasContext = !!(notif.prefilled_prompt || notif.source_url || notif.alert_context);
+            if (goingToAgent && hasContext) {
+                onNavigate?.('agente', {
+                    prefilledPrompt: notif.prefilled_prompt || '',
+                    sourceLabel: notif.source_label || null,
+                    sourceUrl: notif.source_url || null,
+                    alertContext: notif.alert_context || {
+                        title: notif.title || '',
+                        body: notif.body || '',
+                        severity: notif.severity || 'info',
+                        type: notif.type || null,
+                    },
+                });
+            } else {
+                onNavigate?.(notif.cta_view);
+            }
         }
         setOpen(false);
     }, [onNavigate]);
+
+    // 2026-05-28: handler para alertas dentro del ClimaPanel. Cada alerta
+    // local (helada/lluvia/calor/etc.) puede saltar al agente con un prompt
+    // pre-cargado y cita Open-Meteo. La fuente Open-Meteo siempre se cita
+    // como respaldo institucional ("respaldado por IDEAM via Open-Meteo").
+    const handleClimaAlertAction = useCallback((alerta) => {
+        if (!onNavigate) return;
+        const tipoHumano = (alerta.tipo || '').replace(/_/g, ' ');
+        const diasTxt = Array.isArray(alerta.dias) && alerta.dias.length > 0
+            ? ` en ${alerta.dias.slice(0, 3).join(', ')}`
+            : '';
+        const prompt = `Tengo alerta de ${tipoHumano}${diasTxt} (${alerta.mensaje || 'sin detalle adicional'}). ¿Qué hago para proteger mi cultivo?`;
+        const sourceUrl = clima?.openmeteo?.source_url
+            || 'https://open-meteo.com/en/docs';
+        onNavigate('agente', {
+            prefilledPrompt: prompt,
+            sourceLabel: 'Open-Meteo (umbrales agroecológicos Chagra)',
+            sourceUrl,
+            alertContext: {
+                title: `Alerta: ${tipoHumano}`,
+                body: alerta.mensaje || '',
+                severity: alerta.severity || 'warning',
+                type: 'climate_local_alert',
+            },
+        });
+        setOpen(false);
+    }, [onNavigate, clima]);
+
+    // 2026-05-28: handler para ENSO badge → agente con prompt situado.
+    // El operador puede preguntar "qué significa para mi finca" sin re-tipear,
+    // citando NOAA/IDEAM/CIIFEN como fuente.
+    const handleEnsoAction = useCallback(() => {
+        if (!onNavigate || !clima?.enso_status) return;
+        const phase = clima.enso_status.phase || 'neutral';
+        const phaseLabel = describePhase(phase);
+        const sources = Array.isArray(clima.enso_status.sources) ? clima.enso_status.sources.join(', ') : '';
+        const prompt = `Estoy con fase ENSO actual: ${phaseLabel}${sources ? ` (fuentes: ${sources})` : ''}. ¿Cómo afecta a mi finca en los próximos meses y qué medidas tomo?`;
+        // IDEAM es la fuente preferida para Colombia; si no, NOAA CPC global.
+        const sourceUrl = phase === 'neutral'
+            ? 'http://www.pronosticosyalertas.gov.co/clima/condiciones-globales'
+            : 'https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_advisory/';
+        onNavigate('agente', {
+            prefilledPrompt: prompt,
+            sourceLabel: phase === 'neutral' ? 'IDEAM · Condiciones globales' : 'NOAA CPC · ENSO Advisory',
+            sourceUrl,
+            alertContext: {
+                title: `ENSO: ${phaseLabel}`,
+                body: '',
+                severity: clima.enso_status.severity || 'info',
+                type: 'enso_phase',
+            },
+        });
+        setOpen(false);
+    }, [onNavigate, clima]);
 
     const handleDismiss = useCallback((id, e) => {
         e?.stopPropagation();
@@ -314,6 +390,8 @@ export default function NotificationsBell({ onNavigate }) {
                                 loading={climaLoading}
                                 onRefresh={handleClimaRefresh}
                                 climaInfo={climaInfo}
+                                onAlertAction={handleClimaAlertAction}
+                                onEnsoAction={handleEnsoAction}
                             />
                         )}
                     </div>
@@ -388,7 +466,7 @@ function formatDayLabel(isoDate, i) {
  *      vive en el chat del agente, que ya tiene el bloque inyectado).
  *   5. Atribuciones de fuente.
  */
-function ClimaPanel({ snapshot, loading, onRefresh, climaInfo }) {
+function ClimaPanel({ snapshot, loading, onRefresh, climaInfo, onAlertAction, onEnsoAction }) {
     if (!snapshot) {
         return (
             <div className="p-6 text-center text-slate-500 text-sm">
@@ -459,6 +537,23 @@ function ClimaPanel({ snapshot, loading, onRefresh, climaInfo }) {
                         <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
                     </button>
                 </div>
+                {/* 2026-05-28 UX: CTA al agente con ENSO context pre-cargado */}
+                {typeof onEnsoAction === 'function' && (
+                    <div className="mt-3 flex items-center gap-2 flex-wrap">
+                        <button
+                            type="button"
+                            onClick={onEnsoAction}
+                            className="text-xs font-bold px-3 py-1.5 rounded-md bg-white/10 hover:bg-white/20 active:bg-white/30 text-white"
+                        >
+                            Preguntar al agente
+                        </button>
+                        {sources.length > 0 && (
+                            <span className="text-[10px] opacity-70 italic">
+                                Cita: {sources[0]}
+                            </span>
+                        )}
+                    </div>
+                )}
             </section>
 
             {/* Alertas locales */}
@@ -474,6 +569,19 @@ function ClimaPanel({ snapshot, loading, onRefresh, climaInfo }) {
                             <div key={`${a.tipo}-${i}`} className={`text-xs p-2.5 rounded-lg border ${sevClass}`}>
                                 <p className="font-bold capitalize mb-0.5">{a.tipo.replace(/_/g, ' ')}</p>
                                 <p className="opacity-90 leading-relaxed">{a.mensaje}</p>
+                                {/* 2026-05-28 UX: salto al agente con prompt
+                                    contextualizado + cita Open-Meteo */}
+                                {typeof onAlertAction === 'function' && (
+                                    <div className="mt-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => onAlertAction(a)}
+                                            className="text-[11px] font-bold px-2.5 py-1 rounded-md bg-white/10 hover:bg-white/20 active:bg-white/30 text-white"
+                                        >
+                                            Preguntar al agente
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         );
                     })}

@@ -103,6 +103,12 @@ export function aggregateNotifications(sources = {}) {
             body: 'Cubre cultivos sensibles antes de las 7 PM. Riesgo papas, tomate y hortalizas en zona andina alta.',
             cta_view: 'agente',
             cta_label: 'Preguntar al agente',
+            // UX 2026-05-28: cuando la notificación crítica viaja al agente,
+            // pasamos un prompt pre-cargado + cita de la entidad emisora para
+            // que el operador no re-tipee y vea de dónde viene la alerta.
+            prefilled_prompt: 'Tengo alerta de helada esta noche con mínima de −2 °C. ¿Qué debo proteger primero y cómo lo cubro? Considera papas, tomate y hortalizas en zona andina alta.',
+            source_label: 'IDEAM · Pronósticos y Alertas',
+            source_url: 'http://www.pronosticosyalertas.gov.co/clima/condiciones-globales',
             created_at: now,
         });
     }
@@ -175,14 +181,19 @@ export function aggregateNotifications(sources = {}) {
     if (sources.bioculturalZone && REGIONAL_CLIMATE_ALERTS) {
         const zoneAlerts = REGIONAL_CLIMATE_ALERTS[sources.bioculturalZone];
         if (zoneAlerts && Array.isArray(zoneAlerts.riesgos) && zoneAlerts.riesgos.length > 0) {
+            const zonaLabel = sources.bioculturalZone.replace(/_/g, ' ');
+            const riesgosTop = zoneAlerts.riesgos.slice(0, 3).join(', ');
             out.push({
                 id: `climate_zone_${sources.bioculturalZone}`,
                 type: 'climate_zone',
                 severity: 'info',
-                title: `Tu zona: ${sources.bioculturalZone.replace(/_/g, ' ')}`,
-                body: `Riesgos típicos: ${zoneAlerts.riesgos.slice(0, 3).join(', ')}.`,
+                title: `Tu zona: ${zonaLabel}`,
+                body: `Riesgos típicos: ${riesgosTop}.`,
                 cta_view: 'agente',
                 cta_label: 'Preguntar',
+                prefilled_prompt: `Mi zona es ${zonaLabel} y los riesgos típicos son: ${riesgosTop}. ¿Cómo me preparo para mi cultivo?`,
+                source_label: 'IDEAM · Atlas climatológico',
+                source_url: 'http://atlas.ideam.gov.co/visorAtlasClimatologico.html',
                 created_at: now,
             });
         }
@@ -199,6 +210,7 @@ export function aggregateNotifications(sources = {}) {
             body: `Para tu piso térmico: ${cultivosTop}…`,
             cta_view: 'agente',
             cta_label: 'Más info',
+            prefilled_prompt: `Este mes podría sembrar ${cultivosTop}. ¿Cuál me recomiendas según mi finca y cómo lo arranco?`,
             created_at: now,
         });
     }

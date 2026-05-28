@@ -23,7 +23,7 @@ function formatDay(date) {
     return DAY_LABELS[date.getDay()];
 }
 
-export default function ClimaStrip() {
+export default function ClimaStrip({ onNavigate }) {
     const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
     const fincas = useFincaActiveStore((s) => s.fincas);
     const [data, setData] = useState(null);
@@ -72,8 +72,26 @@ export default function ClimaStrip() {
                 <p className="text-sm text-slate-300 leading-relaxed">
                     Cuéntame en qué municipio queda tu finca y te traigo el pronóstico real del IDEAM.
                 </p>
+                {/* Bug fix 2026-05-28 (Brave laptop): el botón no tenía
+                    onClick — operador clickeaba y nada pasaba. Ahora navega
+                    a `perfil` donde MultifincaGpsSection permite editar la
+                    finca activa (que incluye municipio). Si no hay onNavigate
+                    (uso aislado en tests o storybook), el handler degrada
+                    a un dispatch del event global `chagra:navigate` que el
+                    App.jsx escucha. Evita el listener inline-string del
+                    feedback CSP-strict (memoria feedback-csp-strict-inline-handlers-bloqueados). */}
                 <button
                     type="button"
+                    onClick={() => {
+                        if (typeof onNavigate === 'function') {
+                            onNavigate('perfil');
+                            return;
+                        }
+                        try {
+                            // App.jsx escucha 'chagra:nav' (string o {view,data})
+                            window.dispatchEvent(new CustomEvent('chagra:nav', { detail: 'perfil' }));
+                        } catch (_) { /* noop */ }
+                    }}
                     className="mt-3 px-4 py-2 rounded-xl bg-sky-700/30 hover:bg-sky-600/40 border border-sky-500/40 text-sky-200 text-sm font-bold transition-colors flex items-center gap-2"
                 >
                     <MapPin size={14} aria-hidden="true" />

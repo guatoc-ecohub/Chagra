@@ -554,9 +554,19 @@ export default function App() {
       case 'help':
         return <HelpManual onBack={() => navigate('dashboard')} onNavigate={navigate} />;
       case 'agente':
+        // 2026-05-28: pasamos currentViewData como initialContext para que
+        // notificaciones críticas (helada, alerta clima) lleguen al agente
+        // con prompt pre-cargado + cita de la fuente (IDEAM/NOAA/CIIFEN/
+        // Open-Meteo) — operador no tiene que re-tipear "tengo alerta de
+        // helada, ¿qué hago?". Si el usuario entra al agente normal (FAB,
+        // tile, etc.), currentViewData es null y el comportamiento previo
+        // se preserva sin cambios.
         return (
           <ErrorBoundary>
-            <AgentScreen onBack={() => navigate('dashboard')} />
+            <AgentScreen
+              onBack={() => navigate('dashboard')}
+              initialContext={currentViewData}
+            />
           </ErrorBoundary>
         );
       default:
