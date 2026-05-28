@@ -317,15 +317,65 @@ export function formatClimateAlert(bioculturalZone, climateData = null) {
   if (!alerts) {
     return '';
   }
-  
+
   let alertText = `⚠️ ALERTA CLIMÁTICA - ${bioculturalZone.replace(/_/g, ' ')}:\n`;
   alertText += `Riesgos: ${alerts.riesgos.join(', ')}.\n`;
   alertText += `Recomendación: ${alerts.recomendaciones}\n`;
   alertText += `Fuentes: ${alerts.fuentes.join(', ')}`;
-  
+
   if (climateData) {
     alertText += `\n\nPronóstico actual: ${JSON.stringify(climateData)}`;
   }
-  
+
   return alertText;
+}
+
+/**
+ * Construye el bloque CLIMA TIEMPO REAL que se inyecta en el system prompt
+ * del LLM cuando hay un snapshot vivo (PoC alertas meteorológicas #316).
+ *
+ * Convierte el snapshot del sidecar en un bloque corto y autoritativo. El
+ * agente debe:
+ *   - Mencionar la fase ENSO cuando sea relevante para el cultivo del user
+ *   - Citar IDEAM/NOAA/CIIFEN por nombre (no inventar atribuciones)
+ *   - Adelantar alertas locales críticas en respuestas agronómicas
+ *
+ * Si el snapshot no está disponible, devuelve string vacío — el agente
+ * sigue funcionando como antes.
+ *
+ * @param {object | null} snapshot — payload de climaService.getCachedClimaSnapshot
+ * @returns {string}
+ */
+export function buildClimaContext(snapshot) {
+  if (!snapshot || typeof snapshot !== 'object') return '';
+  const enso = snapshot.enso_status;
+  if (!enso || typeof enso !== 'object') return '';
+
+  const lines = [];
+  lines.push('=== CLIMA TIEMPO REAL (autoritativo — cítalo cuando sea relevante) ===');
+  lines.push(`Fase ENSO actual: ${enso.label || enso.phase || 'desconocida'} (severidad: ${enso.severity || 'neutral'}).`);
+  if (typeof enso.oni_value === 'number') {
+    lines.push(`ONI NOAA observado: ${enso.oni_value.toFixed(2)}°C — tendencia ${enso.trend || 'estable'}.`);
+  }
+  if (enso.ideam_probabilidades || enso.ideam_probabilities) {
+    const p = enso.ideam_probabilidades || enso.ideam_probabilities;
+    lines.push(`Probabilidad IDEAM próximos meses: ${p.nino_pct}% El Niño / ${p.neutral_pct}% Neutro / ${p.nina_pct}% La Niña.`);
+  }
+  if (Array.isArray(enso.sources) && enso.sources.length > 0) {
+    lines.push(`Fuentes ENSO: ${enso.sources.join(', ')}.`);
+  }
+  const alertas = Array.isArray(snapshot.alertas_locales) ? snapshot.alertas_locales : [];
+  if (alertas.length > 0) {
+    lines.push('');
+    lines.push('Alertas locales activas (Open-Meteo + umbrales agroecológicos):');
+    for (const a of alertas.slice(0, 6)) {
+      const sev = a.severity === 'critical' ? '🔴' : a.severity === 'warning' ? '🟠' : '🔵';
+      lines.push(`  ${sev} ${a.tipo}: ${a.mensaje}`);
+    }
+  }
+  lines.push('');
+  lines.push('REGLA: si tu recomendación depende del clima de los próximos días o del fenómeno ENSO, menciónalo CITANDO las fuentes de arriba. Si El Niño / La Niña activo cambia la recomendación de manejo, dilo plano. Si el dato no aplica al cultivo de la pregunta, no lo fuerces.');
+  lines.push('=== FIN CLIMA TIEMPO REAL ===');
+
+  return lines.join('\n');
 }

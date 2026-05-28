@@ -18,7 +18,10 @@ import { buildLLMRequest, selectChatRoute } from '../../services/llmRouter';
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
 import { isSidecarEnabled, planNlu, callTool, resolveEntities, getClimaIdeam } from '../../services/sidecarClient';
-import { buildProfileContext, normalizeUserInputForRegion } from '../../services/agentService';
+import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext } from '../../services/agentService';
+// PoC alertas meteorológicas tiempo real (#316) — el bell + el agente
+// comparten el mismo snapshot via `climaService` (cache 30 min).
+import { getCachedClimaSnapshot, fetchClimaSnapshot } from '../../services/climaService';
 import { FARM_CONFIG } from '../../config/defaults';
 import { speak, speakSentences, stop, init as initTTS, isSupported, isKokoroAvailable, replayLast, isSpeaking } from '../../services/ttsService';
 import { executeAction, setActionGateCallback } from '../../services/actionExecutor';
@@ -274,6 +277,24 @@ export default function AgentScreen({ onBack }) {
     const t = setTimeout(() => setQueueRejectedToast(''), 4000);
     return () => clearTimeout(t);
   }, [queueRejectedToast]);
+
+  // PoC alertas meteorológicas (#316) — warm-up de la cache de clima al mount
+  // del AgentScreen para que el primer LLM call ya tenga el bloque ENSO en
+  // el system prompt. NO bloquea el render: fetchClimaSnapshot degrada a null
+  // silencioso si el sidecar está off o offline.
+  useEffect(() => {
+    let alive = true;
+    if (!isSidecarEnabled()) return undefined;
+    fetchClimaSnapshot().then((payload) => {
+      if (alive && payload) {
+        console.debug('[Agent] clima snapshot pre-warmed', {
+          phase: payload?.enso_status?.phase,
+          alertas: payload?.alertas_locales?.length || 0,
+        });
+      }
+    });
+    return () => { alive = false; };
+  }, []);
 
   // Bug 2026-05-18: health check del LLM al mount. Si /api/ollama/api/tags
   // no responde en 5s, marcamos llmHealthy=false y avisamos al operador
@@ -905,8 +926,15 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
 
     const evidenceContext = formatToolEvidence(toolEvidence);
 
+    // PoC clima tiempo real (#316) — bloque autoritativo del snapshot del
+    // sidecar. Cero coste si el snapshot no está en cache: getCachedClimaSnapshot
+    // devuelve null y buildClimaContext degrada a ''. El refresh real lo hace
+    // NotificationsBell + el systemd timer (chagra-clima-refresh.service).
+    const climaSnapshot = getCachedClimaSnapshot();
+    const climaContext = climaSnapshot ? `\n\n${buildClimaContext(climaSnapshot)}` : '';
+
     const messages = [
-      { role: 'system', content: systemPrompt + corpusContext + evidenceContext + resolvedEntitiesBlock + queryAnalysisBlock },
+      { role: 'system', content: systemPrompt + corpusContext + evidenceContext + resolvedEntitiesBlock + climaContext + queryAnalysisBlock },
       ...(contextMemory ? [{ role: 'user', content: contextMemory }] : []),
       { role: 'user', content: query },
     ];
