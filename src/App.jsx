@@ -25,6 +25,7 @@ import AgentFab from './components/AgentFab';
 import QuickActionsPanel from './components/QuickActionsPanel';
 import { ScreenShell } from './components/common/ScreenShell';
 import ChagraGrowLoader from './components/ChagraGrowLoader';
+import Confetti from './components/common/Confetti';
 import IosInstallBanner from './components/IosInstallBanner';
 import UpdateAvailableBanner from './components/UpdateAvailableBanner';
 import GpsFincaBanner from './components/GpsFincaBanner';
@@ -568,6 +569,7 @@ export default function App() {
       <NetworkStatusBar />
       <IosInstallBanner />
       <UpdateAvailableBanner />
+      <Confetti />
       <GpsFincaBanner />
       {/* Detector de vaciado IDB (post clear-cache).
           2026-05-19: el operador perdió plantas con foto + 100 species por

@@ -225,6 +225,9 @@ const useAssetStore = create((set, get) => ({
 
   // Crear asset con commit atómico: IDB (assets + pending_transactions) en una sola tx
   addAsset: async (assetType, asset, pendingTxs = []) => {
+    // Snapshot pre-commit para detectar "primera planta" (count 0 → 1).
+    // Quick-win UX 2026-05-28: dispara confetti celebratorio.
+    const prevPlantsCount = get().plants.length;
     try {
       await assetCache.commitOptimisticUpdate([{ assetType, asset }], pendingTxs);
       set((state) => {
@@ -238,6 +241,17 @@ const useAssetStore = create((set, get) => ({
       const totalNow = get().plants.length + get().structures.length + get().equipment.length + get().materials.length + get().lands.length;
       markHadData(totalNow);
       navigator.serviceWorker?.controller?.postMessage({ type: 'SYNC_REQUESTED' });
+
+      // Celebración primera planta (count 0 → 1). El listener vive en
+      // Confetti (montado global en App.jsx). Wrap try/catch defensivo:
+      // window/CustomEvent puede no existir en SSR o tests sin jsdom event.
+      if (assetType === 'plant' && prevPlantsCount === 0) {
+        try {
+          window.dispatchEvent(new CustomEvent('chagra:celebrate', {
+            detail: { reason: 'first-plant', durationMs: 2800 },
+          }));
+        } catch (_) { /* test env may not support */ }
+      }
     } catch (error) {
       console.error('[Store] Fallo en addAsset atómico:', error);
       throw error;
