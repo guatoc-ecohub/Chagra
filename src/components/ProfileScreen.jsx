@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2 } from 'lucide-react';
+import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import ThemeSelector from './common/ThemeSelector';
 import AgentAvatarSelector from './Settings/AgentAvatarSelector';
@@ -61,6 +61,20 @@ export default function ProfileScreen({ onBack, onHome }) {
       ? localStorage.getItem('chagra:voice:telemetry:ttl') || '7d'
       : '7d'
   );
+
+  // Free 7→10 fix-pack: HYTA (info GPU/Ollama) detrás de un toggle "Modo
+  // técnico". Default OFF para que el campesino-target no vea jerga técnica
+  // que le haga sentir que la app no es para él (hipótesis #4 del análisis
+  // project-free-7-10-analysis-2026-05-28). Persiste en localStorage.
+  const [modoTecnico, setModoTecnico] = useState(() =>
+    typeof window !== 'undefined'
+      ? localStorage.getItem('chagra:profile:modo-tecnico:v1') === '1'
+      : false
+  );
+
+  useEffect(() => {
+    localStorage.setItem('chagra:profile:modo-tecnico:v1', modoTecnico ? '1' : '0');
+  }, [modoTecnico]);
 
   useEffect(() => {
     localStorage.setItem('chagra:voice:telemetry:enabled', telemetryEnabled ? '1' : '0');
@@ -222,8 +236,48 @@ export default function ProfileScreen({ onBack, onHome }) {
           </p>
         </div>
 
-        {/* HYTA GPU Section (Task #117, 2026-05-25) */}
-        <HytaPanel />
+        {/* Modo técnico toggle — Free 7→10 fix-pack (hipótesis #4).
+            HYTA (GPU/Ollama) es jerga ingenieril que asusta al campesino
+            target. Lo ocultamos detrás de un switch off-by-default para
+            usuarios curiosos sin imponerlo a la mayoría. */}
+        <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+          <div className="flex items-center gap-2 px-1">
+            <Wrench size={18} className="text-slate-400" />
+            <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Modo técnico</h3>
+          </div>
+
+          <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
+            <div className="flex flex-col gap-0.5 flex-1">
+              <span className="text-sm font-bold text-slate-200">Mostrar información GPU</span>
+              <span className="text-[10px] text-slate-500 leading-snug">
+                Para curiosos: muestra qué modelos de IA están cargados en GPU
+                y cuánta memoria usan. No es necesario para usar Chagra.
+              </span>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={modoTecnico}
+              aria-label="Activar o desactivar modo técnico"
+              onClick={() => setModoTecnico((v) => !v)}
+              className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+                modoTecnico ? 'bg-slate-500' : 'bg-slate-700'
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                  modoTecnico ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+            </button>
+          </label>
+
+          {modoTecnico && (
+            <div className="mt-2">
+              <HytaPanel />
+            </div>
+          )}
+        </div>
 
         {/* Copia de seguridad (2026-05-19): operador perdió plantas + 100
             species + túnel por un "Clear cache" en Chrome Android. Botón
