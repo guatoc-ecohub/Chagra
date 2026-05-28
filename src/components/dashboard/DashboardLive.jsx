@@ -19,6 +19,8 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import AgentHero from './AgentHero';
 import ClimaStrip from './ClimaStrip';
+import SensorInsightCard from './SensorInsightCard';
+import useAssetStore from '../../store/useAssetStore';
 import {
     PlantasCard,
     ZonasCard,
@@ -138,6 +140,7 @@ function SortableSection({ id, onNavigate }) {
 
 export default function DashboardLive({ onNavigate }) {
     const [order, setOrder] = useState(readOrder);
+    const iotAlerts = useAssetStore((s) => s.iotAlerts) || [];
 
     useEffect(() => {
         writeOrder(order);
@@ -180,6 +183,10 @@ export default function DashboardLive({ onNavigate }) {
                         </div>
                     </SortableContext>
                 </DndContext>
+
+                {/* Insight IA de sensores — JUSTO debajo del grid de cards.
+                    No draggable. Resumen breve curado con icono pulse cyan. */}
+                <SensorInsightCard sensors={iotAlerts} onNavigate={onNavigate} />
 
                 <p className="text-[10px] text-slate-600 text-center mt-4 italic">
                     Mantén presionado el ⋮⋮ para reorganizar a tu gusto
