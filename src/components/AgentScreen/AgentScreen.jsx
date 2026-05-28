@@ -1437,8 +1437,8 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         <div className="px-4 py-2 mx-4 mt-2 rounded-lg bg-slate-800/60 border border-slate-700/60 flex items-center gap-2">
           <Sparkles size={14} className="text-violet-400 shrink-0" />
           <p className="text-xs text-slate-300" data-testid="fresh-session-badge">
-            Nueva conversación. El historial anterior queda guardado pero no se
-            incluye en el contexto.
+            Empezamos fresco. Tu historial sigue guardado en tu finca; este
+            chat arranca limpio para que el agente se concentre en lo nuevo.
           </p>
         </div>
       )}
