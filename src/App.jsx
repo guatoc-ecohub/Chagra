@@ -19,6 +19,7 @@ import useOllamaWarmStore from './store/useOllamaWarmStore';
 // import FieldFeedback from './components/FieldFeedback';
 import MicFab from './components/MicFab';
 import AgentFab from './components/AgentFab';
+import QuickActionsPanel from './components/QuickActionsPanel';
 import { ScreenShell } from './components/common/ScreenShell';
 import ChagraGrowLoader from './components/ChagraGrowLoader';
 import IosInstallBanner from './components/IosInstallBanner';
@@ -511,6 +512,7 @@ export default function App() {
           `embedded` desde HelpUsoScreen. */}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'voz' && currentView !== 'agente' && <MicFab onNavigate={navigate} />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'voz' && currentView !== 'agente' && <AgentFab onNavigate={navigate} />}
+      {currentView === 'dashboard' && <QuickActionsPanel onNavigate={navigate} />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
       {currentView !== 'loading' && currentView !== 'login' && <SyncProgressIndicator />}
       {toast && (
