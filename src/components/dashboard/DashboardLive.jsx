@@ -19,7 +19,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import AgentHero from './AgentHero';
 import ClimaStrip from './ClimaStrip';
-import SensorInsightCard from './SensorInsightCard';
+import AIStatusFooter from './AIStatusFooter';
 import useAssetStore from '../../store/useAssetStore';
 import {
     PlantasCard,
@@ -184,13 +184,17 @@ export default function DashboardLive({ onNavigate }) {
                     </SortableContext>
                 </DndContext>
 
-                {/* Insight IA de sensores — JUSTO debajo del grid de cards.
-                    No draggable. Resumen breve curado con icono pulse cyan. */}
-                <SensorInsightCard sensors={iotAlerts} onNavigate={onNavigate} />
-
                 <p className="text-[10px] text-slate-600 text-center mt-4 italic">
                     Mantén presionado el ⋮⋮ para reorganizar a tu gusto
                 </p>
+
+                {/* AIStatusFooter — barra inferior con status proactivo IA:
+                    SENSORES + CLIMA + AGENTE. Operador 2026-05-28: "el analisis
+                    de ia que da el status proactivo en general ponlo en la parte
+                    de abajo e integralo de la mejor manera acorde a los ultimos
+                    cambios aplicados". Movido del medio del scroll al footer +
+                    expandido de solo-sensores a 3 ejes IA. */}
+                <AIStatusFooter sensors={iotAlerts} onNavigate={onNavigate} />
             </div>
         </div>
     );
