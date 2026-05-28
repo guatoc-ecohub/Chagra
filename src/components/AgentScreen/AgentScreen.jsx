@@ -18,7 +18,7 @@ import { buildLLMRequest, selectChatRoute } from '../../services/llmRouter';
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
 import { isSidecarEnabled, planNlu, callTool, resolveEntities, getClimaIdeam } from '../../services/sidecarClient';
-import { buildProfileContext } from '../../services/agentService';
+import { buildProfileContext, normalizeUserInputForRegion } from '../../services/agentService';
 import { FARM_CONFIG } from '../../config/defaults';
 import { speak, speakKokoro, stop, init as initTTS, isSupported, isKokoroAvailable, replayLast, isSpeaking } from '../../services/ttsService';
 import { executeAction, setActionGateCallback } from '../../services/actionExecutor';
@@ -976,6 +976,18 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     setError('');
     agentSounds.start();
 
+    // Free 7→10 fix-pack #5: normalización léxica regional Cauca.
+    // Si la finca activa es del Cauca andino/pacífico, reemplazamos
+    // términos rurales locales ("papa runa", "rascadero", "jelao", ...)
+    // por sus equivalentes estándar antes de mandar al LLM. La UI sigue
+    // mostrando el texto original del usuario (userMessage.content arriba),
+    // pero el LLM recibe la versión normalizada para que la respuesta sea
+    // sobre el concepto correcto.
+    //
+    // En regiones no-Cauca o sin finca activa, esto es no-op (passthrough).
+    const fincaActiva = fincas.find((f) => f.slug === activeFincaSlug);
+    const textForLLM = normalizeUserInputForRegion(text, fincaActiva);
+
     try {
       // Bug N3 fix: en sesión fresca (gap >30min o reset explícito) NO
       // inyectamos history previo como contextMemory del LLM. Tomamos
@@ -990,7 +1002,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       await addTurn(operatorId, { role: 'user', content: text.trim() });
 
       const contextMemory = wasFreshSession ? '' : await getContextString(operatorId, 10);
-      const contextCorpus = await retrieve(text, 3, 'agente');
+      const contextCorpus = await retrieve(textForLLM, 3, 'agente');
 
       // ADR-045 Fase 2 Step B/C — sidecar NLU + MCP tool grounding.
       // Solo si flag VITE_USE_SIDECAR_AGRO_MCP=true Y estamos online.
@@ -1006,7 +1018,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
           // Resuelve entidades vegetales/plagas a binomio canónico autoritativo
           // ANTES del LLM. El LLM ya no puede inventar "gulupa = Psidium".
           const tRE0 = performance.now();
-          const resolved = await resolveEntities(text);
+          const resolved = await resolveEntities(textForLLM);
           const tRE1 = performance.now();
           if (resolved && Array.isArray(resolved.entities) && resolved.entities.length > 0) {
             // Solo nos quedamos con confidence >= 0.7 para no contaminar con
@@ -1024,7 +1036,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
 
           // PASO 2 — NLU planner + tool call (flow original).
           const tNlu0 = performance.now();
-          const plan = await planNlu(text, contextMemory);
+          const plan = await planNlu(textForLLM, contextMemory);
           const tNlu1 = performance.now();
           if (plan?.useTool && plan.tool && plan.args) {
             const tTool0 = performance.now();
@@ -1120,7 +1132,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         }
       }
 
-      const response = await callLLM(text, contextMemory, contextCorpus, toolEvidence, resolvedEntities);
+      const response = await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities);
       agentSounds.chime();
 
       const { intent } = parseIntent(text);
