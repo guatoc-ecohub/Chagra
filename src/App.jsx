@@ -117,7 +117,8 @@ const ACCENT_CLASSES = {
 // Mantiene shell (TopBar + HomeRegionalGreeting) y delega contenido a
 // DashboardLive (src/components/dashboard/DashboardLive.jsx).
 const DashboardLiveView = React.memo(function DashboardLiveView({ onNavigate, onLogout }) {
-  useScrollRestoration('dashboard-live');
+  // Scroll restoration vive DENTRO de DashboardLive (apunta a su propio
+  // scroller — no hay <main> en DashboardLiveView).
   const hydrate = useAssetStore((s) => s.hydrate);
   const syncFromServer = useAssetStore((s) => s.syncFromServer);
   const idle = useIdleDetection(12000);

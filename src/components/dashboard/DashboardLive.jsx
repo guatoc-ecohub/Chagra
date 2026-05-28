@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useScrollRestoration } from '../../hooks/useScrollRestoration';
 import {
     DndContext,
     closestCenter,
@@ -142,6 +143,10 @@ export default function DashboardLive({ onNavigate }) {
     const [order, setOrder] = useState(readOrder);
     const iotAlerts = useAssetStore((s) => s.iotAlerts) || [];
 
+    // Persist scroll position al volver de detalle (mismo bug que App.jsx
+    // resolvió para Dashboard clásico). Quick-win UX 2026-05-28 demo Diana.
+    useScrollRestoration('dashboard-live', '[data-scroll-key="dashboard-live"]');
+
     useEffect(() => {
         writeOrder(order);
     }, [order]);
@@ -164,7 +169,10 @@ export default function DashboardLive({ onNavigate }) {
     }, []);
 
     return (
-        <div className="flex flex-col w-full h-full overflow-y-auto pb-24">
+        <div
+            className="flex flex-col w-full h-full overflow-y-auto pb-24"
+            data-scroll-key="dashboard-live"
+        >
             {/* Agente: fijo arriba, no draggable. Protagonista. */}
             <AgentHero onNavigate={onNavigate} />
 
