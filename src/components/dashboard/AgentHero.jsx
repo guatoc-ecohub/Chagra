@@ -1,6 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { Mic, Sparkles, ArrowRight } from 'lucide-react';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
+import useAgentAvatarType from '../../hooks/useAgentAvatarType';
+
+// Lazy-load del modelo 3D: ~600KB extra (three + R3F + drei). Solo se
+// descarga si el usuario está en home y NO seleccionó avatar maíz. El
+// Service Worker lo cachea desde la primera carga. Mientras llega, el
+// Suspense fallback muestra el SVG actual sin que se note.
+const ChagraAgentAvatarColibri3D = lazy(() => import('../ChagraAgentAvatarColibri3D'));
 
 /**
  * AgentHero — protagonista del dashboard. El agente Chagra como ser vivo,
@@ -32,6 +39,8 @@ const QUICK_CHIPS = [
 export default function AgentHero({ onNavigate }) {
     const [tipIndex, setTipIndex] = useState(0);
     const [pressed, setPressed] = useState(false);
+    const [avatarType] = useAgentAvatarType();
+    const use3D = avatarType !== 'maiz';
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -110,10 +119,26 @@ export default function AgentHero({ onNavigate }) {
                     <div className="chagra-hero-halo" aria-hidden="true" />
                     <div className="chagra-hero-halo-inner" aria-hidden="true" />
                     <div className="chagra-hero-avatar-wrap relative">
-                        <ChagraAgentAvatar
-                            state={pressed ? 'thinking' : 'idle'}
-                            size={120}
-                        />
+                        {use3D ? (
+                            <Suspense
+                                fallback={
+                                    <ChagraAgentAvatar
+                                        state={pressed ? 'thinking' : 'idle'}
+                                        size={120}
+                                    />
+                                }
+                            >
+                                <ChagraAgentAvatarColibri3D
+                                    state={pressed ? 'thinking' : 'idle'}
+                                    size={140}
+                                />
+                            </Suspense>
+                        ) : (
+                            <ChagraAgentAvatar
+                                state={pressed ? 'thinking' : 'idle'}
+                                size={120}
+                            />
+                        )}
                     </div>
                 </div>
 
