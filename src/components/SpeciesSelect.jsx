@@ -148,6 +148,25 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
   const [aiState, setAiState] = useState('idle'); // idle | running | done | error
   const [aiResult, setAiResult] = useState(null);
 
+  // UX-3 (#285 hermano) 2026-05-27: cuando la inferencia visión está
+  // corriendo (~6-30s), prevenir cierre accidental de la pestaña. El
+  // amigo A puede tocar el botón "atrás" del Android sin querer y perder
+  // la captura. El listener pide confirmación nativa al user antes de
+  // cerrar/navegar. Sólo activo durante aiState='running'.
+  useEffect(() => {
+    if (aiState !== 'running') return undefined;
+    const handler = (e) => {
+      e.preventDefault();
+      // Mensaje custom es ignorado por browsers modernos (Chrome 51+,
+      // Firefox 44+) por seguridad. Pero la confirmación nativa SÍ aparece
+      // con el simple preventDefault + returnValue.
+      e.returnValue = 'Estamos analizando tu foto. Si sales ahora perderás el resultado.';
+      return e.returnValue;
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [aiState]);
+
   const handleAiCapture = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
