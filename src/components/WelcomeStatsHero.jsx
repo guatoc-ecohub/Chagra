@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import {
   Sprout, Leaf, BookOpen, Database, Droplet, TreePine, Users, ShieldCheck,
-  FileCheck, Cloud, Maximize2, X, ChevronLeft, ChevronRight,
+  FileCheck, Cloud, Maximize2, X, ChevronLeft, ChevronRight, ChevronUp, ChevronDown,
 } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import ChagraAgentAvatar from './ChagraAgentAvatar';
@@ -75,7 +75,7 @@ function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesT
     {
       key: 'agua',
       icon: Droplet,
-      headline: 'El agente Chagra al frente del riego',
+      headline: 'Chagra al frente del riego',
       value: aguaAhorradaL.toLocaleString('es-CO'),
       unit: `litros ahorrados en ${MONITOR_DAYS_PER_PLANT} días`,
       tone: 'cyan',
@@ -86,7 +86,7 @@ function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesT
     {
       key: 'co2',
       icon: Cloud,
-      headline: 'El agente Chagra cuida el aire',
+      headline: 'Chagra cuida el aire',
       value: Math.round(co2KgAnio).toLocaleString('es-CO'),
       unit: 'kg de CO₂ secuestrados al año',
       tone: 'lime',
@@ -97,7 +97,7 @@ function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesT
     {
       key: 'especies',
       icon: Leaf,
-      headline: 'El agente Chagra conoce',
+      headline: 'Chagra conoce',
       value: species,
       unit: 'especies del catálogo colombiano',
       tone: 'emerald',
@@ -108,7 +108,7 @@ function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesT
     {
       key: 'protegidas',
       icon: ShieldCheck,
-      headline: 'El agente Chagra protege',
+      headline: 'Chagra protege',
       value: endangeredCount + endemicasCount,
       unit: 'especies endémicas y en peligro',
       tone: 'amber',
@@ -119,7 +119,7 @@ function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesT
     {
       key: 'pueblos',
       icon: Users,
-      headline: 'El agente Chagra recoge saberes',
+      headline: 'Chagra recoge saberes',
       value: 8,
       unit: 'pueblos custodios documentados',
       tone: 'fuchsia',
@@ -130,7 +130,7 @@ function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesT
     {
       key: 'invasoras',
       icon: TreePine,
-      headline: 'El agente Chagra alerta sobre invasoras',
+      headline: 'Chagra alerta sobre invasoras',
       value: invasorasCount,
       unit: 'especies invasoras vigiladas',
       tone: 'orange',
@@ -141,7 +141,7 @@ function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesT
     {
       key: 'biopreparados',
       icon: Database,
-      headline: 'El agente Chagra reemplaza químicos',
+      headline: 'Chagra reemplaza químicos',
       value: biopreparados,
       unit: 'biopreparados orgánicos sugeridos',
       tone: 'yellow',
@@ -152,7 +152,7 @@ function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesT
     {
       key: 'fuentes',
       icon: FileCheck,
-      headline: 'El agente Chagra cita fuentes Tier A',
+      headline: 'Chagra cita fuentes Tier A',
       value: sourcesTierA,
       unit: 'papers y guías institucionales',
       tone: 'sky',
@@ -163,7 +163,7 @@ function buildHeroStats({ plantsCount, species, ragDocs, biopreparados, sourcesT
     {
       key: 'offline',
       icon: BookOpen,
-      headline: 'El agente Chagra funciona offline',
+      headline: 'Chagra funciona offline',
       value: ragDocs,
       unit: 'fichas pedagógicas embebidas',
       tone: 'violet',
@@ -232,6 +232,19 @@ function AgentColibriChip({ onNavigate, size = 26 }) {
   );
 }
 
+const HERO_COLLAPSED_KEY = 'chagra:welcome-hero-collapsed:v1';
+
+function readCollapsedPref(plantsCount) {
+  try {
+    const raw = localStorage.getItem(HERO_COLLAPSED_KEY);
+    if (raw === '1') return true;
+    if (raw === '0') return false;
+  } catch { /* private mode */ }
+  // Sin preferencia explícita: colapsado si user ya tiene contexto (plants > 0).
+  // Operator 2026-05-27: "un campesino entra de afán a cualquier cosa, esa info estorba".
+  return plantsCount > 0;
+}
+
 export default function WelcomeStatsHero({ mode = 'post-login', onNavigate }) {
   const isPreLogin = mode === 'pre-login';
   const plantsCount = useAssetStore((s) => s.plants?.length ?? 0);
@@ -240,6 +253,16 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate }) {
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [expanded, setExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  // Collapse toggle: default colapsado si ya hay plants, expandido si state cero.
+  // PreLogin siempre expandido (es la home pública). Persist en localStorage.
+  const [collapsed, setCollapsed] = useState(() => (isPreLogin ? false : readCollapsedPref(plantsCount)));
+  const toggleCollapsed = useCallback(() => {
+    setCollapsed((prev) => {
+      const next = !prev;
+      try { localStorage.setItem(HERO_COLLAPSED_KEY, next ? '1' : '0'); } catch { /* ignore */ }
+      return next;
+    });
+  }, []);
   // Pausa temporal tras interacción manual (flecha/dot click). Guardamos
   // un timestamp en ref para no re-renderizar al setearlo; el effect de
   // auto-advance lo lee al armar el setTimeout.
@@ -351,8 +374,8 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate }) {
   return (
     <>
       <section
-        className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-950 to-slate-900 p-4 sm:p-5 space-y-4 w-full"
-        aria-label="Impacto del agente Chagra"
+        className={`rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-950 to-slate-900 w-full ${collapsed ? 'p-2 sm:p-3' : 'p-4 sm:p-5 space-y-4'}`}
+        aria-label="Impacto de Chagra"
       >
         <div className="flex items-center justify-between gap-2 px-1">
           {/* Header con colibri clickable → abre el agente desde el home.
@@ -360,28 +383,42 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate }) {
               tap feedback con scale. Si no hay onNavigate, queda inerte como
               header decorativo (ej. en pre-login). */}
           <h2 className="flex items-center gap-2 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-slate-400 min-w-0">
-            <AgentColibriChip onNavigate={onNavigate} size={26} />
-            <span className="truncate">Agente Chagra · impacto</span>
+            <AgentColibriChip onNavigate={onNavigate} size={collapsed ? 20 : 26} />
+            <span className="truncate">Chagra · impacto</span>
           </h2>
           <div className="flex items-center gap-2 shrink-0">
-            {isPreLogin && (
+            {isPreLogin && !collapsed && (
               <span className="text-[10px] text-slate-500 italic hidden sm:inline">
                 {fincasActivas} {fincasActivas === 1 ? 'finca' : 'fincas'} · red Chagra
               </span>
             )}
-            <button
-              type="button"
-              onClick={() => setExpanded(true)}
-              className="text-slate-400 hover:text-slate-200 transition-colors p-1 rounded-md hover:bg-slate-800/60"
-              aria-label="Ampliar resumen Chagra"
-              title="Ver versión ampliada"
-            >
-              <Maximize2 className="w-3.5 h-3.5" />
-            </button>
+            {!isPreLogin && (
+              <button
+                type="button"
+                onClick={toggleCollapsed}
+                aria-pressed={collapsed}
+                aria-label={collapsed ? 'Mostrar resumen Chagra' : 'Ocultar resumen Chagra'}
+                title={collapsed ? 'Mostrar' : 'Ocultar'}
+                className="text-slate-400 hover:text-slate-200 transition-colors p-1 rounded-md hover:bg-slate-800/60"
+              >
+                {collapsed ? <ChevronDown className="w-4 h-4" aria-hidden="true" /> : <ChevronUp className="w-4 h-4" aria-hidden="true" />}
+              </button>
+            )}
+            {!collapsed && (
+              <button
+                type="button"
+                onClick={() => setExpanded(true)}
+                className="text-slate-400 hover:text-slate-200 transition-colors p-1 rounded-md hover:bg-slate-800/60"
+                aria-label="Ampliar resumen Chagra"
+                title="Ver versión ampliada"
+              >
+                <Maximize2 className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         </div>
 
-        <div
+        {!collapsed && <div
           className={`${tone.bg} ${tone.border} border rounded-2xl p-5 sm:p-6 transition-all duration-500 animate-in fade-in w-full hover:border-slate-600 group relative`}
           key={carouselIndex}
           onMouseEnter={() => setIsHovered(true)}
@@ -461,9 +498,9 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate }) {
               />
             ))}
           </div>
-        </div>
+        </div>}
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        {!collapsed && (<div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           <div className="bg-slate-800/30 border border-slate-700/40 rounded-lg p-2 flex items-center gap-2">
             <Sprout className="w-3.5 h-3.5 text-lime-400 shrink-0" />
             <div className="min-w-0">
@@ -489,7 +526,7 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate }) {
               <div className="text-[9px] text-slate-500 truncate">Especies catálogo</div>
             </div>
           </div>
-        </div>
+        </div>)}
       </section>
 
       {expanded && (
@@ -497,14 +534,14 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate }) {
           className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-sm overflow-y-auto"
           role="dialog"
           aria-modal="true"
-          aria-label="Resumen ampliado del agente Chagra"
+          aria-label="Resumen ampliado de Chagra"
         >
           <div className="max-w-5xl mx-auto p-4 sm:p-8 space-y-6">
             <div className="flex items-center justify-between gap-2 pt-4">
               <div>
                 <h2 className="flex items-center gap-2.5 text-base sm:text-lg font-black uppercase tracking-wider text-slate-200">
                   <AgentColibriChip onNavigate={onNavigate} size={38} />
-                  Agente Chagra · impacto
+                  Chagra · impacto
                 </h2>
                 {isPreLogin && (
                   <p className="text-xs text-slate-400 mt-1">
