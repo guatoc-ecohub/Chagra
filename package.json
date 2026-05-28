@@ -1,7 +1,7 @@
 {
   "name": "chagra",
   "private": true,
-  "version": "0.13.24",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
