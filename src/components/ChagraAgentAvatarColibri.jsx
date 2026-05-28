@@ -121,6 +121,39 @@ export default function ChagraAgentAvatarColibri({
           <filter id={`wing-blur-${uid}`} x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="1.5" />
           </filter>
+          {/* 3D specular highlight para el cuerpo del colibrí — pequeño
+              detalle de coquetería que sugiere volumen sin caer en kitsch.
+              Operador 2026-05-28: "fina coquetería que todos amarían". */}
+          <radialGradient id={`body-3d-${uid}`} cx="35%" cy="30%" r="65%">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.55" />
+            <stop offset="35%" stopColor="#ffffff" stopOpacity="0.18" />
+            <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+          </radialGradient>
+          {/* Sombra interna del lado opuesto al highlight, sugiere
+              volumen redondeado. */}
+          <radialGradient id={`body-shadow-${uid}`} cx="75%" cy="80%" r="55%">
+            <stop offset="0%" stopColor="#020617" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="#020617" stopOpacity="0" />
+          </radialGradient>
+          {/* Ojo iridiscente — pupila negra brillante con catchlight blanco
+              que hace que el ave parezca mirarte. */}
+          <radialGradient id={`eye-${uid}`} cx="35%" cy="30%" r="70%">
+            <stop offset="0%" stopColor="#fefce8" />
+            <stop offset="15%" stopColor="#0c0a09" />
+            <stop offset="100%" stopColor="#000000" />
+          </radialGradient>
+          {/* Soft drop shadow general — da despegue del fondo. */}
+          <filter id={`avatar-shadow-${uid}`} x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="2.5" />
+            <feOffset dx="0" dy="2" result="offsetblur" />
+            <feComponentTransfer>
+              <feFuncA type="linear" slope="0.35" />
+            </feComponentTransfer>
+            <feMerge>
+              <feMergeNode />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
         </defs>
 
         {/* Halo de fondo, animado por estado */}
@@ -259,11 +292,24 @@ export default function ChagraAgentAvatarColibri({
             />
           </g>
 
-          {/* Cuerpo del colibrí — elipse curva */}
+          {/* Cuerpo del colibrí — elipse curva con highlight 3D */}
           <g className="chagra-cuerpo">
             <ellipse
               cx="80" cy="110" rx="22" ry="13"
               fill={`url(#plumaje-${uid})`}
+              transform="rotate(-18 80 110)"
+            />
+            {/* Sombra inferior del cuerpo — sugiere volumen redondeado */}
+            <ellipse
+              cx="80" cy="110" rx="22" ry="13"
+              fill={`url(#body-shadow-${uid})`}
+              transform="rotate(-18 80 110)"
+            />
+            {/* Highlight especular superior — toque 3D que da brillo
+                sutil al plumaje iridiscente. */}
+            <ellipse
+              cx="80" cy="110" rx="22" ry="13"
+              fill={`url(#body-3d-${uid})`}
               transform="rotate(-18 80 110)"
             />
             {/* Cola — plumas timoneras */}
@@ -284,6 +330,8 @@ export default function ChagraAgentAvatarColibri({
           {/* Cabeza */}
           <g className="chagra-cabeza">
             <circle cx="100" cy="98" r="11" fill={`url(#plumaje-${uid})`} />
+            {/* Highlight 3D en la cabeza — cápsula brillante arriba-izquierda */}
+            <circle cx="100" cy="98" r="11" fill={`url(#body-3d-${uid})`} />
             {/* gorget (garganta carmesí) */}
             <ellipse cx="102" cy="104" rx="6" ry="4" fill={`url(#gorget-${uid})`} opacity="0.92" />
             {/* Pico — largo y delgado, apuntando a la flor */}
@@ -292,9 +340,11 @@ export default function ChagraAgentAvatarColibri({
               fill="none" stroke="#1e293b" strokeWidth="2.2" strokeLinecap="round"
               className="chagra-pico"
             />
-            {/* Ojo */}
-            <circle cx="103" cy="95" r="2.6" fill="#0f172a" />
-            <circle cx="104" cy="94" r="0.9" fill="#f8fafc" />
+            {/* Ojo iridiscente 3D — gradient que da profundidad + catchlight
+                blanco que hace que parezca mirar al usuario. */}
+            <circle cx="103" cy="95" r="2.9" fill={`url(#eye-${uid})`} />
+            <circle cx="102.4" cy="94.3" r="0.85" fill="#ffffff" opacity="0.95" />
+            <circle cx="103.6" cy="95.2" r="0.35" fill="#ffffff" opacity="0.6" />
           </g>
 
           {/* Ala FRONTAL (más arriba) — sobre el cuerpo */}
