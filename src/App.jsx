@@ -57,6 +57,7 @@ const HelpManual = lazy(() => import('./components/HelpManual'));
 const OnboardingHero = lazy(() => import('./components/OnboardingHero'));
 const WelcomeStatsHero = lazy(() => import('./components/WelcomeStatsHero'));
 const TopBar = lazy(() => import('./components/TopBar'));
+import HomeRegionalGreeting from './components/HomeRegionalGreeting';
 
 localforage.config({
   name: 'Chagra',
@@ -152,6 +153,7 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
           2026-05-18: wrapper translúcido (bg-slate-950/82) para que se vea
           la imagen de fondo agroecológica aplicada al body en App.jsx. */}
       <TopBar onNavigate={onNavigate} onLogout={onLogout} />
+      <HomeRegionalGreeting />
 
       {/* Feedback piloto #116: estadísticas al header (siempre visibles).
           Antes: el bloque assetCounts vivía dentro del <main scrollable>,
