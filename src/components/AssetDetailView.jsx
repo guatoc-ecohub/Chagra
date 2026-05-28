@@ -188,7 +188,9 @@ const PlantMetaPanel = ({ asset }) => {
       ? `Altura: ${Number(meta.altura_cm)} cm`
       : null;
   const etapaRaw = meta.etapa_fenologica;
-  const etapaLabel = etapaRaw ? `Etapa: ${ETAPA_FENOLOGICA_LABELS[etapaRaw] || etapaRaw}` : null;
+  // UX-17 (#286) 2026-05-27: "Etapa: ..." → "Momento: ..." con label
+  // amigable. Los labels mapean a copy de campo (ver plantMeta.js).
+  const etapaLabel = etapaRaw ? `Momento: ${ETAPA_FENOLOGICA_LABELS[etapaRaw] || etapaRaw}` : null;
 
   if (!fechaLabel && !alturaLabel && !etapaLabel) return null;
 

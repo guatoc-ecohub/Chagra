@@ -106,3 +106,49 @@ describe('ETAPA_FENOLOGICA_LABELS — labels legibles para AssetDetailView', () 
         }
     });
 });
+
+describe('UX-17 — copy amigable de "momento de la planta"', () => {
+    // El operador pidió evitar jerga técnica para "gente del campo y niños
+    // desde los 11 años". Verificamos que los labels nuevos están en lenguaje
+    // accesible y los técnicos están en `technical` (sub-label tooltip).
+    it('los 6 labels visibles NO usan palabras técnicas', () => {
+        const technicalWords = [
+            // exact match con boundary para no atrapar derivaciones legítimas.
+            /\bfenolog/i,
+            /\bsenescencia\b/i,
+            /\bvegetativo\b/i,
+            /\bfructificación\b/i,
+            /\bantesis\b/i,
+        ];
+        for (const opt of ETAPA_FENOLOGICA_OPTIONS) {
+            for (const re of technicalWords) {
+                // 'semillero' es lo suficiente común (no técnica jerga) y
+                // aparece entre paréntesis como aclaración → permitido.
+                expect(opt.label).not.toMatch(re);
+            }
+        }
+    });
+
+    it('cada opción tiene un sub-label "technical" con el término agrónomo', () => {
+        for (const opt of ETAPA_FENOLOGICA_OPTIONS) {
+            expect(opt.technical).toBeTruthy();
+            expect(typeof opt.technical).toBe('string');
+        }
+    });
+
+    it('los `value` técnicos se mantienen — compat backend FarmOS', () => {
+        const values = ETAPA_FENOLOGICA_OPTIONS.map((o) => o.value).sort();
+        expect(values).toEqual([
+            'floracion', 'fructificacion', 'madurez',
+            'semillero', 'senescencia', 'vegetativo',
+        ]);
+    });
+
+    it('labels mencionan acciones / estados accesibles (flores, frutos, cosechar)', () => {
+        const allLabels = ETAPA_FENOLOGICA_OPTIONS.map((o) => o.label.toLowerCase()).join(' | ');
+        expect(allLabels).toMatch(/flores/);
+        expect(allLabels).toMatch(/frutos|semillas/);
+        expect(allLabels).toMatch(/cosechar/);
+        expect(allLabels).toMatch(/creciendo|nacida/);
+    });
+});
