@@ -14,11 +14,19 @@ import { retrieve } from '../../services/ragRetriever';
 import { parseIntent, formatIntentDescription } from '../../services/agentIntentParser';
 import { streamOpenAI } from '../../services/openaiStream';
 import { buildLLMRequest, selectChatRoute } from '../../services/llmRouter';
+// SPEED-1: streaming end-to-end PWA → sidecar → Ollama. Feature flag
+// `VITE_AGENT_STREAMING` (default off). Cuando esté activo + sidecar
+// habilitado + online, se rutea por el endpoint POST /chat/stream del
+// sidecar (SSE custom) en lugar del path directo OpenAI compat. Si falla,
+// el catch del runner se encarga (mensaje genérico "IA no disponible"),
+// igual que con cualquier otro fallo del LLM. Para forzar fallback al
+// path directo en un sólo turn → desactivar la flag y recargar.
+import { streamChatViaSidecar, isAgentStreamingEnabled } from '../../services/streamChatViaSidecar';
 // Sidecar agro-mcp (ADR-045 Fase 2 Step B/C). Detrás de feature flag
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
 import { isSidecarEnabled, planNlu, callTool, resolveEntities, getClimaIdeam } from '../../services/sidecarClient';
-import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext } from '../../services/agentService';
+import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, applyVoseoFilter } from '../../services/agentService';
 // PoC alertas meteorológicas tiempo real (#316) — el bell + el agente
 // comparten el mismo snapshot via `climaService` (cache 30 min).
 import { getCachedClimaSnapshot, fetchClimaSnapshot } from '../../services/climaService';
@@ -956,6 +964,47 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       // la decisión para diagnóstico en field testing.
       const chatRoute = selectChatRoute(query);
       const { url, body } = buildLLMRequest(chatRoute, messages);
+
+      // SPEED-1: streaming end-to-end PWA→sidecar→Ollama. Solo si flag
+      // VITE_AGENT_STREAMING=true Y sidecar habilitado Y online. Sin esto,
+      // mantenemos el path directo `streamOpenAI` → /api/ollama/v1/chat/completions
+      // (idéntico al baseline pre-SPEED-1). El sidecar emite SSE con shape
+      // typed (start/delta/done) y AbortController propaga upstream para
+      // cancellation (QUICK-5).
+      const useStreamSidecar = isAgentStreamingEnabled() && isSidecarEnabled() && isOnline;
+
+      if (useStreamSidecar) {
+        console.warn('[Agent] LLM call start (sidecar stream)', {
+          path: '/chat/stream',
+          queryLen: query.length,
+          route: chatRoute,
+          model: body.model,
+        });
+        // Cualquier fallo del sidecar (502 ollama down, network) cae al
+        // catch externo del runner. NO hacemos fallback automático al path
+        // directo: mezclar paths en el mismo turn complica diagnóstico y
+        // telemetría. El operador apaga la flag VITE_AGENT_STREAMING si
+        // quiere bajar al baseline.
+        const { fullText, stats } = await streamChatViaSidecar({
+          model: body.model,
+          messages,
+          options: {
+            temperature: body.temperature,
+            num_predict: body.max_tokens,
+          },
+          keep_alive: body.keep_alive,
+          onToken: (_chunk, full) => setStreamingContent(full),
+          signal: controller.signal,
+        });
+        console.warn('[Agent] LLM call complete (sidecar stream)', {
+          responseLen: fullText?.length || 0,
+          first_token_ms: stats?.first_token_ms,
+          sidecar_first_token_ms: stats?.sidecar_first_token_ms,
+          eval_rate: stats?.eval_rate,
+        });
+        return fullText;
+      }
+
       console.warn('[Agent] LLM call start', { url, queryLen: query.length, route: chatRoute, model: body.model });
       const result = await streamOpenAI(
         url,
@@ -1160,7 +1209,14 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         }
       }
 
-      const response = await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities);
+      const rawResponse = await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities);
+      // DR-LANG-1: filtro post-process anti-voseo argentino. Es la última
+      // línea de defensa estructural — garantiza que ningún marcador
+      // voseo (vos, tenés, querés, dale, acá con contexto fuerte, etc.)
+      // llegue al usuario campesino colombiano, independientemente de lo
+      // que el modelo decida emitir. Default formality='usted'. La
+      // función es idempotente y O(n) sobre el largo del texto.
+      const response = applyVoseoFilter(rawResponse, { formality: 'usted' });
       agentSounds.chime();
 
       const { intent } = parseIntent(text);
