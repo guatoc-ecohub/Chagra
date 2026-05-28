@@ -5,6 +5,8 @@ import { captureAndCompress, savePhoto } from '../services/photoService';
 import { compressImage, IMAGE_TOO_LARGE_MESSAGE } from '../utils/imageCompress';
 import { sanitizeBlobUrl } from '../utils/blobUrl';
 import DateField from './DateField';
+import { getAllSpecies } from '../db/catalogDB';
+import { extractVarieties, varietyHelpText } from '../utils/speciesVariety';
 
 // Bug 069.10 — validación client-side: límites razonables para evitar
 // payloads inválidos sincronizándose con FarmOS.
@@ -29,6 +31,46 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
   const [view, setView] = useState('form');
   const [touched, setTouched] = useState({});
   const watchIdRef = useRef(null);
+
+  // UX-14 (#286) 2026-05-27: variedad dinámica desde catalogDB.
+  // Cargamos el catálogo una sola vez al montar. Si el operador escribió
+  // un nombre que matchea una species del catálogo CON variedades ICA,
+  // mostramos dropdown; si no matchea o la especie no tiene variedades
+  // registradas, OCULTAMOS el campo (no pedimos algo sin contexto).
+  const [allSpecies, setAllSpecies] = useState([]);
+  useEffect(() => {
+    let cancelled = false;
+    getAllSpecies()
+      .then((rows) => { if (!cancelled && Array.isArray(rows)) setAllSpecies(rows); })
+      .catch(() => { /* graceful: si falla, varieties queda en [] y campo se oculta */ });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Resuelve la species del catálogo a partir del free-text `crop`.
+  // Match orden: nombre_comun exact (case-insensitive) → id exact →
+  // startsWith (para tolerar "Café arábico" vs "Café"). Si no hay match,
+  // retorna null (varieties = [] → campo oculto).
+  const matchedSpecies = useMemo(() => {
+    const q = (formData.crop || '').trim().toLowerCase();
+    if (!q || allSpecies.length === 0) return null;
+    return (
+      allSpecies.find((s) => (s.nombre_comun || '').toLowerCase() === q) ||
+      allSpecies.find((s) => (s.id || '').toLowerCase() === q) ||
+      allSpecies.find((s) => (s.nombre_comun || '').toLowerCase().startsWith(q) && q.length >= 3) ||
+      null
+    );
+  }, [formData.crop, allSpecies]);
+
+  const varieties = useMemo(() => extractVarieties(matchedSpecies), [matchedSpecies]);
+  const showVarietyField = varieties.length > 0;
+  const varietyHelp = useMemo(() => varietyHelpText(varieties), [varieties]);
+
+  // Si la variedad guardada NO está en la lista actual del catálogo, mostramos
+  // toggle "Otra (escribir)" para fallback texto libre. Estado del toggle
+  // persistente para el ciclo de vida del componente.
+  const [varietyCustom, setVarietyCustom] = useState(
+    !!(formData.variety && !varieties.find((v) => v.value === formData.variety))
+  );
 
   // Bug 069.10 — validación inline (no bloquea submit existente, pero deshabilita el botón
   // y muestra errores para que el operador corrija antes de guardar).
@@ -317,10 +359,61 @@ export default function SeedingLog({ onBack, onSave, initialData = {} }) {
           )}
         </label>
 
-        <label className="flex flex-col gap-2">
-          <span className="text-xl font-bold">Variedad</span>
-          <input type="text" name="variety" value={formData.variety} onChange={handleInput} className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-2xl text-white min-h-[64px]" />
-        </label>
+        {/* UX-14 (#286) 2026-05-27: variedad dinámica.
+            - Si la especie del catálogo trae variedades_registradas_ica → dropdown.
+            - Si no → campo OCULTO (no pedimos algo sin contexto).
+            - Toggle "Otra" para texto libre cuando la variedad del operador no
+              esté en la lista ICA. */}
+        {showVarietyField && (
+          <label className="flex flex-col gap-2" data-testid="variety-field">
+            <span className="text-xl font-bold">Variedad</span>
+            {!varietyCustom ? (
+              <select
+                name="variety"
+                value={formData.variety}
+                onChange={(e) => {
+                  if (e.target.value === '__custom__') {
+                    setVarietyCustom(true);
+                    setFormData((prev) => ({ ...prev, variety: '' }));
+                  } else {
+                    handleInput(e);
+                  }
+                }}
+                className="p-4 rounded-xl bg-slate-900 border border-slate-700 text-2xl text-white min-h-[64px]"
+              >
+                <option value="">Seleccionar variedad…</option>
+                {varieties.map((v) => (
+                  <option key={v.value} value={v.value}>
+                    {v.label}{v.obtentor ? ` — ${v.obtentor}` : ''}
+                  </option>
+                ))}
+                <option value="__custom__">Otra (escribir nombre)</option>
+              </select>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  name="variety"
+                  value={formData.variety}
+                  onChange={handleInput}
+                  placeholder="Nombre de la variedad"
+                  className="flex-1 p-4 rounded-xl bg-slate-900 border border-slate-700 text-2xl text-white min-h-[64px]"
+                />
+                <button
+                  type="button"
+                  onClick={() => { setVarietyCustom(false); setFormData((prev) => ({ ...prev, variety: '' })); }}
+                  className="px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-bold min-h-[64px]"
+                  aria-label="Volver al listado del catálogo"
+                >
+                  Lista
+                </button>
+              </div>
+            )}
+            {varietyHelp && !varietyCustom && (
+              <p className="text-xs text-slate-500">{varietyHelp}</p>
+            )}
+          </label>
+        )}
 
         <label className="flex flex-col gap-2">
           <span className="text-xl font-bold">Notas</span>
