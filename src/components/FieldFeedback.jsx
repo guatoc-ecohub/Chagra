@@ -321,11 +321,11 @@ export default function FieldFeedback({ embedded = false } = {}) {
               <div className="text-sm text-slate-300 leading-relaxed mb-1 space-y-2">
                 <p>
                   ¿Algo del agente te respondió raro, viste información errónea
-                  o algo no se comporta como esperás?
+                  o algo no se comporta como esperas?
                 </p>
                 <p>
-                  <strong>Grabá un audio</strong> contando qué hiciste y qué fue lo
-                  raro (es más rápido que tipear en el campo). Si querés adjuntar
+                  <strong>Graba un audio</strong> contando qué hiciste y qué fue lo
+                  raro (es más rápido que tipear en el campo). Si quieres adjuntar
                   el contexto en texto también, mejor todavía. Cada reporte ayuda
                   a hacer Chagra más poderoso.
                 </p>

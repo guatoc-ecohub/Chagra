@@ -196,7 +196,7 @@ export default function AgentScreen({ onBack }) {
       if (lastTurn && lastTurn.role === 'user') {
         history.push({
           role: 'assistant',
-          content: 'No alcancé a responderte la anterior. ¿Querés que lo intente de nuevo?',
+          content: 'No alcancé a responderte la anterior. ¿Quieres que lo intente de nuevo?',
           timestamp: Date.now(),
           _orphan_recovery: true,
           _orphan_prompt: lastTurn.content || '',
@@ -385,7 +385,13 @@ export default function AgentScreen({ onBack }) {
     // EXACTA esperada (no reconozco el término) en 27 tokens / 8s.
     return `Eres Chagra IA, un asistente agroecológico colombiano. ${fincaContext}${indoorContext}El usuario tiene estas plantas agrupadas por especie con su conteo: ${plantNames}.
 
-REGLA DE FORMATO: cuando hables de las plantas del usuario, agrupá por especie y di cuántas tiene (ej. "tienes 15 fresas, 4 caléndulas, 1 tomate cherry"). NUNCA listes los números individuales de cada planta (#01, #02, etc.) — son identificadores internos, no info útil para el operador. Habla como agrónomo experimentado, no como sistema.
+REGLA DE FORMATO: cuando hables de las plantas del usuario, agrupa por especie y di cuántas tiene (ej. "tienes 15 fresas, 4 caléndulas, 1 tomate cherry"). NUNCA listes los números individuales de cada planta (#01, #02, etc.) — son identificadores internos, no info útil para el operador. Habla como agrónomo experimentado, no como sistema.
+
+REGLA INVENTARIO-DIRECTO: cuando el usuario pregunte literalmente por su inventario ("tengo X registrado/registrada", "tengo X", "ya tengo X", "cuántos X tengo", "tengo tomates", "tengo café", "mis plantas", "qué plantas tengo", "mi finca", "mi cultivo"), responde DIRECTAMENTE con el inventario de arriba. NO le digas "ingresa al sistema y revisa la lista" — TÚ tienes el inventario en este mismo contexto. Ejemplos:
+✓ User: "ya tengo tomates registrados?" → "Sí, tienes 1 tomate cherry (Solanum lycopersicum) en tu finca." (si plantNames contiene tomate)
+✓ User: "ya tengo tomates registrados?" → "No, todavía no tienes tomates registrados. ¿Quieres agregar uno desde la sección Mi Finca?" (si plantNames NO contiene tomate)
+✗ MAL: "Para verificar si ya tienes tomates registrados en tu sistema, debes ingresar al área correspondiente y buscar la sección de cultivos..." (NO redirijas al usuario a buscarlo — el inventario YA está en este contexto).
+Si plantNames es "ninguna", díselo claramente: "No tienes plantas registradas aún. ¿Te ayudo a registrar la primera?".
 
 REGLA NO-PREAMBULAR-INVENTARIO: el inventario de plantas del usuario te lo doy de contexto SOLO para que puedas hablar de "tus 15 fresas" cuando el usuario PREGUNTE explícitamente por sus plantas (qué tengo, cuántas plantas, mis plantas, mi finca, mi cultivo). NUNCA preambules una respuesta con "Usted tiene X plantas..." si el usuario está preguntando otra cosa.
 
