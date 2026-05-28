@@ -12,6 +12,7 @@ import {
   generateUserDataRules,
   buildProfileContext,
   formatClimateAlert,
+  buildClimaContext,
 } from '../agentService.js';
 
 describe('agentService — Task #202 Profile Context', () => {
@@ -383,6 +384,71 @@ describe('agentService — Task #202 Profile Context', () => {
       expect(context).toContain('salinidad');
       expect(context).toContain('IDEAM - Monitor de sequía');
       expect(context).toContain('ICA - Recomendaciones zonas costeras');
+    });
+  });
+
+  // PoC alertas meteorológicas tiempo real (#316) — integración del snapshot
+  // del sidecar en el system prompt del agente al máximo nivel.
+  describe('buildClimaContext', () => {
+    it('devuelve string vacío cuando snapshot es null', () => {
+      expect(buildClimaContext(null)).toBe('');
+      expect(buildClimaContext(undefined)).toBe('');
+      expect(buildClimaContext({})).toBe('');
+    });
+
+    it('renderiza fase ENSO + ONI + IDEAM probs + alertas críticas', () => {
+      const snap = {
+        fetched_at: '2026-05-28T18:00:00Z',
+        enso_status: {
+          phase: 'nino_fuerte',
+          label: 'El Niño fuerte',
+          severity: 'critical',
+          oni_value: 1.72,
+          trend: 'rising',
+          ideam_probabilities: { nino_pct: 70, neutral_pct: 25, nina_pct: 5 },
+          sources: ['NOAA CPC (ONI)', 'IDEAM (boletín)'],
+        },
+        alertas_locales: [
+          {
+            tipo: 'helada',
+            severity: 'critical',
+            dias: ['2026-05-29'],
+            mensaje: 'Helada probable el 2026-05-29 (mín -1°C).',
+            valor_observado: -1,
+            umbral: 2,
+          },
+        ],
+      };
+      const ctx = buildClimaContext(snap);
+      expect(ctx).toContain('El Niño fuerte');
+      expect(ctx).toContain('1.72');
+      expect(ctx).toContain('rising');
+      expect(ctx).toContain('70%');
+      expect(ctx).toContain('NOAA CPC (ONI)');
+      expect(ctx).toContain('IDEAM');
+      expect(ctx).toContain('helada');
+      expect(ctx).toContain('Helada probable');
+      // Aún incluye la regla de cierre
+      expect(ctx).toContain('CITANDO las fuentes');
+    });
+
+    it('omite ONI/IDEAM cuando no hay valor numérico', () => {
+      const snap = {
+        enso_status: {
+          phase: 'neutral',
+          label: 'Neutral ENSO',
+          severity: 'neutral',
+          oni_value: null,
+          trend: null,
+          ideam_probabilities: null,
+          sources: [],
+        },
+        alertas_locales: [],
+      };
+      const ctx = buildClimaContext(snap);
+      expect(ctx).toContain('Neutral ENSO');
+      expect(ctx).not.toContain('ONI NOAA');
+      expect(ctx).not.toContain('Probabilidad IDEAM');
     });
   });
 });

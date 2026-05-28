@@ -81,6 +81,58 @@ function getToken() {
 }
 
 /**
+ * Wrapper interno: GET con timeout + headers + degrade-to-null. Espejo
+ * defensivo de `postJson`. Usado por `/clima/snapshot` (#316). NO exportado.
+ */
+async function getJson(path, query, timeoutMs) {
+  if (!isSidecarEnabled()) return null;
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    console.debug('[sidecar] offline — skip', path);
+    return null;
+  }
+
+  const base = getBaseUrl();
+  const qs = query && Object.keys(query).length > 0
+    ? '?' + new URLSearchParams(
+        Object.entries(query)
+          .filter(([, v]) => v !== undefined && v !== null && v !== '')
+          .map(([k, v]) => [k, String(v)]),
+      ).toString()
+    : '';
+  const url = `${base}${path}${qs}`;
+  const token = getToken();
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  const headers = {};
+  if (token) headers['X-Chagra-Token'] = token;
+
+  const t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+  try {
+    const res = await fetch(url, {
+      method: 'GET',
+      headers,
+      signal: controller.signal,
+    });
+    if (!res.ok) {
+      console.debug('[sidecar] non-2xx', { path, status: res.status });
+      return null;
+    }
+    const json = await res.json();
+    const latency = Math.round(((typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now()) - t0);
+    console.debug('[sidecar] ok', { path, latency_ms: latency });
+    return json;
+  } catch (err) {
+    const reason = err?.name === 'AbortError' ? 'timeout' : (err?.message || 'unknown');
+    console.debug('[sidecar] fail', { path, reason });
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
  * Wrapper interno: POST con timeout + headers + degrade-to-null.
  * No exportado — el contrato público son planNlu y callTool.
  */
@@ -191,6 +243,10 @@ const ALLOWED_TOOLS = new Set([
   'get_normativa_ica',
   'get_clima_ideam',
   'get_precio_sipsa',
+  // PoC alertas meteorológicas (#316) — resueltas por el sidecar (NO MCP child).
+  // Cache compartida con `/clima/snapshot` y refrescada por systemd timer.
+  'get_enso_status',
+  'get_alertas_clima_zona',
 ]);
 
 const NORMATIVA_ICA_ACTIONS = new Set([
@@ -310,6 +366,52 @@ export async function getPrecioSipsa(action, args) {
     return null;
   }
   return callTool('get_precio_sipsa', { action, ...(args || {}) });
+}
+
+/**
+ * GET `${BASE}/clima/snapshot` con lat/lng opcionales (#316).
+ *
+ * Devuelve el snapshot completo: ENSO + 7d forecast + alertas. Si no se pasan
+ * coords, el sidecar responde solo el bloque ENSO (NOAA + IDEAM + CIIFEN) y
+ * deja `openmeteo: null` + `alertas_locales: []`.
+ *
+ * Reglas: flag off → null. Offline → null. HTTP ≥400 → null. Nunca throw.
+ *
+ * @param {{ lat?: number, lng?: number }} [opts]
+ * @returns {Promise<null | object>}
+ */
+export async function getClimaSnapshot(opts = {}) {
+  const query = {};
+  if (typeof opts.lat === 'number' && Number.isFinite(opts.lat)) query.lat = opts.lat;
+  if (typeof opts.lng === 'number' && Number.isFinite(opts.lng)) query.lng = opts.lng;
+  return getJson('/clima/snapshot', query, TOOL_TIMEOUT_MS);
+}
+
+/**
+ * POST `${BASE}/tools/get_enso_status` — narrow shape ENSO-only (#316).
+ *
+ * Útil cuando el agente solo necesita el bloque ENSO sin pronóstico local.
+ * El sidecar ya lo expone como tool al planner, así que esto es un atajo
+ * para wireos directos desde el frontend (ej. badge del bell).
+ *
+ * @returns {Promise<null | object>}
+ */
+export async function getEnsoStatus() {
+  return callTool('get_enso_status', {});
+}
+
+/**
+ * POST `${BASE}/tools/get_alertas_clima_zona` — alertas + forecast local (#316).
+ *
+ * @param {{ lat: number, lng: number }} args
+ * @returns {Promise<null | object>}
+ */
+export async function getAlertasClimaZona(args) {
+  if (!args || typeof args.lat !== 'number' || typeof args.lng !== 'number') {
+    console.debug('[sidecar] get_alertas_clima_zona lat/lng requeridos');
+    return null;
+  }
+  return callTool('get_alertas_clima_zona', { lat: args.lat, lng: args.lng });
 }
 
 // Export interno para testabilidad — los tests pueden assertear el set
