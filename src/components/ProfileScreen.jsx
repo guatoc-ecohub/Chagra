@@ -4,6 +4,7 @@ import { ScreenShell } from './common/ScreenShell';
 import ThemeSelector from './common/ThemeSelector';
 import AgentAvatarSelector from './Settings/AgentAvatarSelector';
 import BackupExportButton from './BackupExportButton';
+import CuadernoPDFButton from './CuadernoPDFButton';
 import VoiceSelector from './Settings/VoiceSelector';
 import HytaPanel from './HytaPanel';
 import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
@@ -284,6 +285,11 @@ export default function ProfileScreen({ onBack, onHome }) {
             visible y prominente para que descargue snapshot JSON cuando
             quiera. */}
         <BackupExportButton />
+
+        {/* Cuaderno de campo PDF (FEAT-D #295, 2026-05-28): diferenciador
+            agronómico para SNIA / EPSEA / certificación orgánica. PDF
+            imprimible con inventario + bitácora + cosechas + insumos. */}
+        <CuadernoPDFButton />
 
         {/* Multifinca + GPS Section (062.7 indoor override + 062.8 privacy) */}
         <MultifincaGpsSection />

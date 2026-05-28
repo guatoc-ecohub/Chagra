@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FileText, Download, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { exportTraceabilityCsv } from '../services/exportService';
+import CuadernoPDFButton from './CuadernoPDFButton';
 
 /**
  * InformesScreen, sección dedicada para descargar reportes de la finca
@@ -110,11 +111,16 @@ export default function InformesScreen({ onBack, onHome }) {
           onExport={exportTraceabilityCsv}
         />
 
+        {/* Cuaderno de campo PDF (FEAT-D #295, 2026-05-28).
+            Diferenciador agronómico para SNIA / EPSEA / certificación
+            orgánica (ICA, ECOCERT, FLO-CERT). Renderiza su propio panel
+            con resumen pre-generación + estado de descarga. */}
+        <CuadernoPDFButton />
+
         {/* Placeholders próximos reportes, comentado hasta tener implementación */}
         <div className="rounded-2xl border border-dashed border-slate-700/60 p-5 bg-slate-900/30">
           <h3 className="text-sm font-bold text-slate-500 mb-2">Próximamente</h3>
           <ul className="space-y-1.5 text-xs text-slate-500">
-            <li>• Inventario por categoría (PDF con gráficas)</li>
             <li>• Bitácora completa con fotos (ZIP)</li>
             <li>• Resumen mensual con métricas de bio-eficiencia</li>
             <li>• Reporte de plagas reportadas + tratamientos</li>
