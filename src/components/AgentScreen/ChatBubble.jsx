@@ -167,7 +167,10 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
               grounded vs generativa) — convive. Suprimido para mensajes de
               recuperación huérfana porque no son respuesta real del modelo. */}
           {!isUser && !isStreaming && !message._orphan_recovery && (
-            <AIBetaBadge className="mt-1" />
+            <AIBetaBadge
+              className="mt-1"
+              confidence={message._grounded?.confidence ?? message.metadata?.confidence}
+            />
           )}
           {shouldShowBadge && (
             <div className="mt-1">
