@@ -18,8 +18,13 @@ describe('HomeRegionalGreeting smoke', () => {
     });
 
     it('muestra saludo default cuando no hay finca activa', () => {
+        // El saludo ahora interpola period-of-day ("Buenos días" / "Buenas
+        // tardes" / "Buenas noches"). Test agnostic a la hora del runner: el
+        // patrón "Lo del día en tu chagra" sí es invariante del default.
         render(<HomeRegionalGreeting />);
-        expect(screen.getByRole('banner')).toHaveTextContent('Hola, lo del día en tu chagra');
+        const text = screen.getByRole('banner').textContent;
+        expect(text).toMatch(/Buenos días|Buenas tardes|Buenas noches/);
+        expect(text).toContain('Lo del día en tu chagra');
     });
 
     it('saludo regional según biocultural_zone andino_alto_páramo', () => {

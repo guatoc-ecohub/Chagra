@@ -4,6 +4,7 @@ import localforage from 'localforage';
 import { useTheme } from './hooks/useTheme';
 import { useScrollRestoration } from './hooks/useScrollRestoration';
 import useIdleDetection from './hooks/useIdleDetection';
+import useGlobalKeyboardShortcuts from './hooks/useGlobalKeyboardShortcuts';
 import BiopunkBackground from './components/dashboard/BiopunkBackground';
 
 import { isAuthenticated, logoutUser } from './services/authService';
@@ -24,6 +25,7 @@ import AgentFab from './components/AgentFab';
 import QuickActionsPanel from './components/QuickActionsPanel';
 import { ScreenShell } from './components/common/ScreenShell';
 import ChagraGrowLoader from './components/ChagraGrowLoader';
+import Confetti from './components/common/Confetti';
 import IosInstallBanner from './components/IosInstallBanner';
 import UpdateAvailableBanner from './components/UpdateAvailableBanner';
 import GpsFincaBanner from './components/GpsFincaBanner';
@@ -116,7 +118,8 @@ const ACCENT_CLASSES = {
 // Mantiene shell (TopBar + HomeRegionalGreeting) y delega contenido a
 // DashboardLive (src/components/dashboard/DashboardLive.jsx).
 const DashboardLiveView = React.memo(function DashboardLiveView({ onNavigate, onLogout }) {
-  useScrollRestoration('dashboard-live');
+  // Scroll restoration vive DENTRO de DashboardLive (apunta a su propio
+  // scroller — no hay <main> en DashboardLiveView).
   const hydrate = useAssetStore((s) => s.hydrate);
   const syncFromServer = useAssetStore((s) => s.syncFromServer);
   const idle = useIdleDetection(12000);
@@ -302,7 +305,11 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
 
 export default function App() {
   useTheme();
+  // Atajos teclado globales (?, g+h). Quick-win UX 2026-05-28 demo Diana.
+  // Solo activos post-login (no en loading ni login para no atrapar shift+?
+  // accidental al escribir password).
   const [currentView, setCurrentView] = useState('loading');
+  useGlobalKeyboardShortcuts({ enabled: currentView !== 'loading' && currentView !== 'login' });
   const [currentViewData, setCurrentViewData] = useState(null);
   const [toast, setToast] = useState(null);
   const [lastLogMessage, setLastLogMessage] = useState('');
@@ -562,6 +569,7 @@ export default function App() {
       <NetworkStatusBar />
       <IosInstallBanner />
       <UpdateAvailableBanner />
+      <Confetti />
       <GpsFincaBanner />
       {/* Detector de vaciado IDB (post clear-cache).
           2026-05-19: el operador perdió plantas con foto + 100 species por

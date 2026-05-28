@@ -27,12 +27,15 @@ import { useEffect, useRef } from 'react';
  * minimizar writes (sessionStorage es sync). Restore es instantáneo en
  * mount.
  */
-export function useScrollRestoration(viewKey) {
+export function useScrollRestoration(viewKey, selector = 'main') {
   const restoredRef = useRef(false);
 
   useEffect(() => {
     const key = `chagra:scroll:${viewKey}`;
-    const mainEl = document.querySelector('main');
+    // selector: 'main' por defecto (ScreenShell). Para vistas custom como
+    // DashboardLive que no usan ScreenShell, pasar otro selector
+    // (ej. `[data-scroll-restore="dashboard-live"]`).
+    const mainEl = document.querySelector(selector);
     if (!mainEl) return;
 
     // Restore en mount (single shot por mount)
@@ -69,5 +72,5 @@ export function useScrollRestoration(viewKey) {
         sessionStorage.setItem(key, String(mainEl.scrollTop));
       }
     };
-  }, [viewKey]);
+  }, [viewKey, selector]);
 }

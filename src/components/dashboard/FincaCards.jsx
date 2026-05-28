@@ -1,5 +1,6 @@
 import { Sprout, MapPin, Package, NotebookPen, Eye, AlertCircle, FileText, ChevronRight, Leaf } from 'lucide-react';
 import useAssetStore from '../../store/useAssetStore';
+import Skeleton from '../common/Skeleton';
 
 /**
  * FincaCards — secciones del dashboard re-organizadas con sensibilidad
@@ -76,8 +77,11 @@ const SECTION_STYLES = {
     },
 };
 
-function Card({ section, title, subtitle, value, onClick, badge, variant = 'list' }) {
+function Card({ section, title, subtitle, value, onClick, badge, variant = 'list', loading = false, tooltip }) {
     const style = SECTION_STYLES[section] || SECTION_STYLES.plantas;
+    // Tooltip nativo (title) funciona bien en desktop hover y NO bloquea
+    // touch en mobile (Safari/Chrome lo muestran on long-press). Sin libs.
+    const titleAttr = tooltip || (subtitle ? `${title} — ${subtitle}` : title);
 
     // GRID variant: layout cuadrado, emoji grande centrado arriba, title abajo,
     // value en corner top-right. Optimizado para cuadrícula 2-col/3-col que
@@ -87,10 +91,16 @@ function Card({ section, title, subtitle, value, onClick, badge, variant = 'list
             <button
                 type="button"
                 onClick={onClick}
+                title={titleAttr}
+                aria-label={titleAttr}
                 className={`group relative w-full text-left rounded-2xl bg-gradient-to-br ${style.accent} backdrop-blur-xl border ${style.border} p-4 ring-2 ${style.ring} transition-all active:scale-[0.96] hover:-translate-y-0.5 aspect-square flex flex-col items-center justify-between min-h-[120px]`}
             >
                 {/* Badge / value top-right */}
-                {(value != null || badge != null) && (
+                {loading ? (
+                    <div className="absolute top-2 right-2">
+                        <Skeleton variant="rect" width={28} height={16} rounded="md" ariaLabel="Cargando contador" />
+                    </div>
+                ) : (value != null || badge != null) && (
                     <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[11px] font-black bg-black/35 backdrop-blur text-white tabular-nums">
                         {value != null ? value : badge}
                     </div>
@@ -111,6 +121,8 @@ function Card({ section, title, subtitle, value, onClick, badge, variant = 'list
         <button
             type="button"
             onClick={onClick}
+            title={titleAttr}
+            aria-label={titleAttr}
             className={`group relative w-full text-left rounded-2xl bg-gradient-to-br ${style.accent} backdrop-blur-xl border ${style.border} p-4 ring-2 ${style.ring} transition-all active:scale-[0.98]`}
         >
             <div className="flex items-center gap-3">
@@ -126,11 +138,19 @@ function Card({ section, title, subtitle, value, onClick, badge, variant = 'list
                             </span>
                         )}
                     </div>
-                    {subtitle && (
+                    {loading ? (
+                        <div className="mt-1.5">
+                            <Skeleton variant="line" width="80%" height={10} ariaLabel="Cargando descripción" />
+                        </div>
+                    ) : subtitle && (
                         <p className="text-xs text-slate-300/80 mt-0.5 truncate">{subtitle}</p>
                     )}
                 </div>
-                {value != null && (
+                {loading ? (
+                    <div className="shrink-0">
+                        <Skeleton variant="rect" width={32} height={28} rounded="md" ariaLabel="Cargando contador" />
+                    </div>
+                ) : value != null && (
                     <div className="shrink-0 text-right">
                         <div className="text-2xl font-black text-white leading-none tabular-nums">{value}</div>
                     </div>
@@ -143,14 +163,23 @@ function Card({ section, title, subtitle, value, onClick, badge, variant = 'list
 
 export function PlantasCard({ onNavigate, variant }) {
     const plants = useAssetStore((s) => s.plants);
+    const isHydrated = useAssetStore((s) => s.isHydrated);
     const count = plants.length;
+    // Empty-state amistoso cuando ya hidrato y sigue en cero (no esperar más).
+    const subtitle = !isHydrated
+        ? 'Cargando…'
+        : count > 0
+            ? (count === 1 ? 'planta sembrada' : 'plantas sembradas')
+            : '¡Agrega tu primera planta!';
     return (
         <Card
             variant={variant}
             section="plantas"
             title="Mis plantas"
-            subtitle={count > 0 ? `${count === 1 ? 'planta sembrada' : 'plantas sembradas'}` : 'Aún no has registrado nada'}
-            value={count}
+            subtitle={subtitle}
+            value={isHydrated ? count : null}
+            loading={!isHydrated}
+            tooltip="Cultivos registrados en tu chagra. Tócalo para ver el inventario, agregar o consultar el detalle."
             onClick={() => onNavigate('activos')}
         />
     );
@@ -158,14 +187,22 @@ export function PlantasCard({ onNavigate, variant }) {
 
 export function ZonasCard({ onNavigate, variant }) {
     const lands = useAssetStore((s) => s.lands);
+    const isHydrated = useAssetStore((s) => s.isHydrated);
     const count = lands.length;
+    const subtitle = !isHydrated
+        ? 'Cargando…'
+        : count > 0
+            ? (count === 1 ? 'área de tu finca' : 'áreas de tu finca')
+            : 'Define dónde cultivas';
     return (
         <Card
             variant={variant}
             section="zonas"
             title="Mis zonas"
-            subtitle={count > 0 ? `${count === 1 ? 'área de tu finca' : 'áreas de tu finca'}` : 'Define dónde cultivas'}
-            value={count}
+            subtitle={subtitle}
+            value={isHydrated ? count : null}
+            loading={!isHydrated}
+            tooltip="Parcelas, camas, invernaderos y áreas de tu finca. Define dónde está cada cultivo."
             onClick={() => onNavigate('mapa')}
         />
     );
@@ -173,14 +210,22 @@ export function ZonasCard({ onNavigate, variant }) {
 
 export function InsumosCard({ onNavigate, variant }) {
     const materials = useAssetStore((s) => s.materials);
+    const isHydrated = useAssetStore((s) => s.isHydrated);
     const count = materials.length;
+    const subtitle = !isHydrated
+        ? 'Cargando…'
+        : count > 0
+            ? 'Biopreparados y materiales'
+            : 'Lleva control de lo que tienes';
     return (
         <Card
             variant={variant}
             section="insumos"
             title="Insumos"
-            subtitle={count > 0 ? 'Biopreparados y materiales' : 'Lleva control de lo que tienes'}
-            value={count}
+            subtitle={subtitle}
+            value={isHydrated ? count : null}
+            loading={!isHydrated}
+            tooltip="Bioinsumos (bocashi, biol, caldos), semillas, herramientas. Stock disponible en bodega."
             onClick={() => onNavigate('bodega')}
         />
     );
@@ -193,6 +238,7 @@ export function BitacoraCard({ onNavigate, variant }) {
             section="bitacora"
             title="Bitácora"
             subtitle="Todo lo que has hecho en tu finca"
+            tooltip="Historial cronológico: siembras, cosechas, aplicaciones de bioinsumo, observaciones."
             onClick={() => onNavigate('historial')}
         />
     );
@@ -205,6 +251,7 @@ export function HoyCard({ onNavigate, variant }) {
             section="hoy"
             title="Hoy en finca"
             subtitle="Lo que toca hacer cerca tuyo"
+            tooltip="Tareas pendientes ordenadas por cercanía a tu ubicación actual."
             onClick={() => onNavigate('javier')}
         />
     );
@@ -217,6 +264,7 @@ export function PlagasCard({ onNavigate, variant }) {
             section="plagas"
             title="Plagas"
             subtitle="Reporta y consulta"
+            tooltip="Reporta una plaga o invasora con foto. Chagra sugiere manejo agroecológico sin químicos."
             onClick={() => onNavigate('reportar_invasora')}
         />
     );
@@ -229,6 +277,7 @@ export function BiodiversidadCard({ onNavigate, variant }) {
             section="biodiversidad"
             title="Flora y fauna"
             subtitle="Ecosistema de tu chagra"
+            tooltip="Catálogo de especies nativas, endémicas y polinizadores que viven en tu finca."
             onClick={() => onNavigate('biodiversidad')}
         />
     );
@@ -241,6 +290,7 @@ export function InformesCard({ onNavigate, variant }) {
             section="informes"
             title="Informes"
             subtitle="Descarga reportes en CSV"
+            tooltip="Exporta cuaderno de campo, inventario, registros de cosecha y aplicaciones a CSV/PDF."
             onClick={() => onNavigate('informes')}
         />
     );
