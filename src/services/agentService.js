@@ -172,21 +172,29 @@ export function generateRegionalToneContext(region) {
  * @returns {string} Alertas climáticas para inyectar en prompt
  */
 export function generateClimateAlertsContext(bioculturalZone) {
+  // Bug piloto 2026-05-27: el LLM respondía "no tengo acceso a datos
+  // meteorológicos, consulta IDEAM/AccuWeather" cuando el sidecar SÍ tiene
+  // tool get_clima_ideam funcional. El leak venía de las instrucciones
+  // "recomienda consultar pronóstico IDEAM más reciente" que invitaban al
+  // redirect. Reemplazadas por instrucción CLIMA-DIRECTO honesta: si Chagra
+  // no logró consultar, DECIRLO sin redirigir al user a apps externas.
+  const baseClimateRule = 'REGLA CLIMA: cuando el usuario pregunte por clima, lluvia, temperatura, pronóstico o "reporte del tiempo" para su zona, el sistema DEBE consultar IDEAM vía el tool get_clima_ideam (Chagra lo hace por el usuario). Si en este mensaje no se inyectó evidencia clima del tool, NO inventes datos NI redirijas al usuario a IDEAM/AccuWeather/Weather Channel — dile honestamente: "No logré consultar el reporte del IDEAM para tu zona en este momento, inténtalo en unos minutos". NUNCA digas "no tengo acceso a datos meteorológicos" porque sí lo tenemos; di "no logré consultarlo ahora".';
+
   if (!bioculturalZone) {
-    return 'Cuando menciones clima, cita siempre la fuente (IDEAM, estación meteorológica, etc.). Si no hay datos, recomiendo consultar pronóstico IDEAM.';
+    return baseClimateRule;
   }
 
   const alerts = REGIONAL_CLIMATE_ALERTS[bioculturalZone];
   if (!alerts) {
-    return `Para la zona ${bioculturalZone}, cuando menciones clima, cita siempre la fuente (IDEAM, Corporación Autónoma Regional, etc.). Si no tienes datos actualizados, recomiendo consultar el pronóstico IDEAM más reciente.`;
+    return `${baseClimateRule}\n\nZona biocultural del operador: ${bioculturalZone}.`;
   }
-  
+
   return `ALERTAS CLIMÁTICAS PARA TU ZONA (${bioculturalZone}):
 Riesgos principales: ${alerts.riesgos.join(', ')}.
 Recomendación general: ${alerts.recomendaciones}
 Fuentes: ${alerts.fuentes.join(', ')}.
 
-Cuando el usuario pregunte sobre clima o riesgo, SIEMPRE menciona estos riesgos y cita las fuentes. Si no tienes datos actualizados, recomienda consultar el pronóstico IDEAM más reciente.`;
+${baseClimateRule}`;
 }
 
 /**

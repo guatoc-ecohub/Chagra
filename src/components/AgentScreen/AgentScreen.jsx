@@ -1059,8 +1059,30 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
           // "no tengo IDEAM" en último caso). Solo se ejecuta si NO hubo
           // tool ya invocado vía NLU para no inflar contexto.
           if (!toolEvidence) {
-            const climaKeywords = /clima|lluvia|llueve|llover|temperatura|sequ[íi]a|fr[íi]o|calor|estaci[óo]n\s+meteorol[óo]gica|ideam|precipitaci[óo]n/i;
-            const municipio = FARM_CONFIG?.MUNICIPIO || null;
+            const climaKeywords = /clima|lluvia|llueve|llover|temperatura|sequ[íi]a|fr[íi]o|calor|estaci[óo]n\s+meteorol[óo]gica|ideam|precipitaci[óo]n|pron[óo]stico|reporte\s+(del\s+)?tiempo/i;
+            // Bug piloto 2026-05-27: FARM_CONFIG.MUNICIPIO viene de build-time
+            // env (VITE_FARM_MUNICIPIO). En prod sin esa env queda null y
+            // el tool jamás se llamaba → LLM respondía "no tengo acceso a
+            // datos meteorológicos, consulta IDEAM". Cascade: 1) finca
+            // activa, 2) FARM_CONFIG demo, 3) null + tool con flag
+            // no_municipio para que el LLM PIDA el municipio al usuario.
+            const activeFinca = fincas.find((f) => f.slug === activeFincaSlug);
+            const municipio = activeFinca?.municipio || FARM_CONFIG?.MUNICIPIO || null;
+            if (climaKeywords.test(text) && !municipio) {
+              // Inyectar evidencia explícita "no_municipio" — el LLM
+              // debe pedirle al user su municipio, NO redirigirlo a IDEAM
+              // externo.
+              toolEvidence = {
+                tool: 'get_clima_ideam',
+                args: { action: 'monthly_avg' },
+                result: {
+                  available: false,
+                  reason: 'no_municipio',
+                  hint: 'pedirle al usuario su municipio para consultar IDEAM',
+                },
+              };
+              console.debug('[sidecar] clima sin municipio — evidence no_municipio inyectada');
+            }
             if (climaKeywords.test(text) && municipio) {
               try {
                 const tClima0 = performance.now();
