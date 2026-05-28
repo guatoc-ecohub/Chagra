@@ -5,6 +5,7 @@ import { newId } from '../utils/id';
 import { getCompletedTaskIds } from '../utils/taskCompletionParser';
 import { recordEvent } from './voiceTelemetryService';
 import { tryGeneratePlanFromSeeding } from './planGeneratorService';
+import { friendlyMessage } from '../utils/friendlyErrors';
 
 const STORE_NAME = 'pending_transactions';
 const TASKS_STORE_NAME = 'pending_tasks';
@@ -330,9 +331,15 @@ class SyncManager {
             await this.deleteTransaction(transaction.id);
             failed++;
             const name = transaction.payload?.data?.attributes?.name || transaction.type;
+            // UX-12 (#286) 2026-05-27: mensaje friendly contextualizado en
+            // lugar de exponer "HTTP 422" al operador. La info técnica queda
+            // en `errorClass` + `status` por si la UI quiere mostrar detalle.
+            const friendly = friendlyMessage(error);
             window.dispatchEvent(new CustomEvent('syncError', {
               detail: {
-                message: `Transacción "${name}" bloqueada (HTTP ${error.status}). Revisa en "Sincronización" para reintentar.`,
+                message: `"${name}": ${friendly} Revisa en "Sincronización" para reintentar.`,
+                friendlyMessage: friendly,
+                rawMessage: `Transacción "${name}" bloqueada (HTTP ${error.status}). Revisa en "Sincronización" para reintentar.`,
                 status: error.status,
                 errorClass,
                 quarantined: true,
@@ -347,9 +354,12 @@ class SyncManager {
               await this.deleteTransaction(transaction.id);
               failed++;
               const name = transaction.payload?.data?.attributes?.name || transaction.type;
+              const friendly = friendlyMessage(error);
               window.dispatchEvent(new CustomEvent('syncError', {
                 detail: {
-                  message: `Fallo permanente al sincronizar "${name}". Bloqueada en "Sincronización".`,
+                  message: `"${name}": ${friendly} Quedó bloqueada en "Sincronización".`,
+                  friendlyMessage: friendly,
+                  rawMessage: `Fallo permanente al sincronizar "${name}". Bloqueada en "Sincronización".`,
                   status: error.status || 0,
                   errorClass: 'max_retries',
                   quarantined: true,

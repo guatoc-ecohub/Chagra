@@ -11,6 +11,7 @@ import { captureAndCompress } from '../services/photoService';
 import { compressImage, IMAGE_TOO_LARGE_MESSAGE } from '../utils/imageCompress';
 import { recognizeSpeciesGrounded } from '../services/aiService';
 import { getAllSpecies } from '../db/catalogDB';
+import { friendlyMessage } from '../utils/friendlyErrors';
 import AIBetaBadge from './AIBetaBadge';
 
 /**
@@ -97,6 +98,10 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
   const [open, setOpen] = useState(false);
   const [selectedSpeciesId, setSelectedSpeciesId] = useState(null);
   const wrapperRef = useRef(null);
+  // UX-6 (#286) 2026-05-27: ref al input principal del fuzzy search para
+  // que el botón "Mejor escribo el nombre" pueda darle foco al cancelar el
+  // flow de visión.
+  const queryInputRef = useRef(null);
 
   // Catálogo dinámico (v3.1 ≈480 species) con fallback legacy (~77).
   // Se carga async desde catalogDB al mount; si tarda >2s o falla, queda
@@ -147,6 +152,10 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
   const aiGalleryRef = useRef(null);
   const [aiState, setAiState] = useState('idle'); // idle | running | done | error
   const [aiResult, setAiResult] = useState(null);
+  // UX-12 (#286) 2026-05-27: mensaje user-friendly del último error de
+  // visión, mostrado en el bloque aiState='error' en lugar del texto
+  // técnico "El modelo Ollama puede no estar disponible".
+  const [aiErrorMessage, setAiErrorMessage] = useState('');
 
   // UX-3 (#285 hermano) 2026-05-27: cuando la inferencia visión está
   // corriendo (~6-30s), prevenir cierre accidental de la pestaña. El
@@ -171,11 +180,13 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
+      setAiErrorMessage('El archivo seleccionado no es una imagen.');
       setAiState('error');
       return;
     }
     setAiState('running');
     setAiResult(null);
+    setAiErrorMessage('');
     try {
       // Pre-compresión cliente-lado (operador 2026-05-27): forzamos lado mayor
       // ≤1600 px y JPEG q=0.85 antes de mandar al sidecar / agente. Esto evita
@@ -205,6 +216,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
       }
       const result = await recognizeSpeciesGrounded(blob);
       if (!result) {
+        setAiErrorMessage(friendlyMessage('vision returned empty result'));
         setAiState('error');
         return;
       }
@@ -235,6 +247,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
       }
     } catch (err) {
       console.warn('[SpeciesSelect] AI recognition failed:', err);
+      setAiErrorMessage(friendlyMessage(err));
       setAiState('error');
     } finally {
       if (aiCameraRef.current) aiCameraRef.current.value = '';
@@ -259,6 +272,22 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
       setAiResult(null);
       setAiState('idle');
     }
+  };
+
+  // UX-6 (#286) 2026-05-27: cancela el flow de visión y enfoca el input
+  // principal del fuzzy search para que el operador escriba el nombre.
+  // Se usa desde los estados aiState='running' y aiState='done' (independiente
+  // de la confianza). KISS: reset aiResult/aiState + abrir dropdown + focus.
+  const handleForceTextSearch = () => {
+    setAiResult(null);
+    setAiState('idle');
+    setOpen(true);
+    // setTimeout 0 para que React renderice el <input> antes de pedir focus.
+    setTimeout(() => {
+      if (queryInputRef.current) {
+        try { queryInputRef.current.focus(); } catch (_e) { /* noop */ }
+      }
+    }, 0);
   };
 
   const handleAiReportBug = () => {
@@ -379,6 +408,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
         <Search size={16} className="text-slate-500 shrink-0" />
         {open ? (
           <input
+            ref={queryInputRef}
             autoFocus
             type="text"
             value={query}
@@ -530,7 +560,19 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
         )}
 
         {aiState === 'running' && (
-          <VisionLoadingState label="Analizando foto" />
+          <>
+            <VisionLoadingState label="Analizando foto" />
+            {/* UX-6 (#286): el modelo puede tardar — el operador siempre
+                puede saltarse el flow y escribir el nombre directo. */}
+            <button
+              type="button"
+              onClick={handleForceTextSearch}
+              data-testid="force-text-search-running"
+              className="mt-2 w-full text-[11px] px-2 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700"
+            >
+              Mejor escribo el nombre
+            </button>
+          </>
         )}
 
         {/* UX-7 (#287) 2026-05-27: fallback texto cuando la confianza es
@@ -567,6 +609,14 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
                 className="flex-1 text-[11px] px-2 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700"
               >
                 Tomar otra foto
+              </button>
+              <button
+                type="button"
+                onClick={handleForceTextSearch}
+                data-testid="force-text-search-low-confidence"
+                className="flex-1 text-[11px] px-2 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700"
+              >
+                Mejor escribo el nombre
               </button>
               <button
                 type="button"
@@ -725,6 +775,14 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
               </button>
               <button
                 type="button"
+                onClick={handleForceTextSearch}
+                data-testid="force-text-search-done"
+                className="flex-1 text-[11px] px-2 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700"
+              >
+                Mejor escribo el nombre
+              </button>
+              <button
+                type="button"
                 onClick={handleAiReportBug}
                 className="text-[11px] px-2 py-1.5 rounded bg-red-900/20 hover:bg-red-800/30 text-red-300 border border-red-800/40 flex items-center gap-1"
                 title="Registrar diagnóstico defectuoso"
@@ -738,14 +796,29 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
         {aiState === 'error' && (
           <div className="p-2.5 rounded-lg bg-red-900/20 border border-red-800/50 text-xs text-red-300">
             <p className="font-bold mb-0.5">No se pudo identificar</p>
-            <p className="text-[11px] text-red-400/80">El modelo Ollama puede no estar disponible o la imagen no pudo procesarse.</p>
-            <button
-              type="button"
-              onClick={() => setAiState('idle')}
-              className="mt-1.5 text-[11px] underline text-red-300"
-            >
-              Reintentar
-            </button>
+            {/* UX-12 (#286): copy friendly mapeado por friendlyErrors.js.
+                Si no hubo mensaje calculado (caso fallback), usamos un
+                texto neutro. */}
+            <p className="text-[11px] text-red-400/80">
+              {aiErrorMessage || 'Algo no funcionó. Intenta de nuevo.'}
+            </p>
+            <div className="mt-1.5 flex gap-3">
+              <button
+                type="button"
+                onClick={() => { setAiState('idle'); setAiErrorMessage(''); }}
+                className="text-[11px] underline text-red-300"
+              >
+                Reintentar
+              </button>
+              <button
+                type="button"
+                onClick={handleForceTextSearch}
+                data-testid="force-text-search-error"
+                className="text-[11px] underline text-red-300"
+              >
+                Mejor escribo el nombre
+              </button>
+            </div>
           </div>
         )}
       </div>
