@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import ThemeSelector from './common/ThemeSelector';
+import AgentAvatarSelector from './Settings/AgentAvatarSelector';
 import BackupExportButton from './BackupExportButton';
 import VoiceSelector from './Settings/VoiceSelector';
 import HytaPanel from './HytaPanel';
@@ -158,6 +159,7 @@ export default function ProfileScreen({ onBack, onHome }) {
             <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Personalización</h3>
           </div>
           <ThemeSelector />
+          <AgentAvatarSelector />
         </div>
 
         {/* Task #122 (2026-05-23): toggle global TTS del agente Chagra.
