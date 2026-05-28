@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { Sprout, Copy, MessageCircle, Mail, Check, AlertCircle, ChevronRight, Lock } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Sprout, Copy, MessageCircle, Mail, Check, AlertCircle, ChevronRight, Lock, Clock, Info } from 'lucide-react';
 
 /**
  * OnboardingPiloto — formulario para pilotos validadores de Chagra.
@@ -152,6 +152,26 @@ function FormPiloto() {
   const [aceptaCompromiso, setAceptaCompromiso] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  // Free 7→10 fix-pack: "Saltar por ahora — solo lo esencial" para usuarios
+  // sin tiempo (campesino rural sin conexión estable, sin link de Maps a
+  // mano, sin clara vocación todavía). En modo skip:
+  //   - Solo se exigen 3 campos: nombre_finca, operador_nombre, operador_email.
+  //   - maps_url y vocacion se vuelven opcionales y se envían como TODOs
+  //     para que Miguel los pida en la llamada de seguimiento.
+  //   - El YAML incluye `via_skip: true` para que Miguel sepa que el
+  //     usuario pidió modo mínimo (atención prioritaria + contacto voz).
+  //   - Se persiste el flag en localStorage para que la próxima vez que
+  //     el usuario regrese a configurar perfil, el cliente lo recuerde.
+  // Persistencia + tracking: ver `chagra:onboarding:skipped:v1`.
+  const [skipMode, setSkipMode] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (skipMode) {
+      localStorage.setItem('chagra:onboarding:skipped:v1', '1');
+    }
+  }, [skipMode]);
+
   const setField = (k, v) => setData((d) => ({ ...d, [k]: v }));
 
   const errors = useMemo(() => {
@@ -160,9 +180,16 @@ function FormPiloto() {
     if (!data.operador_nombre.trim()) e.operador_nombre = 'Requerido';
     if (!data.operador_email.trim()) e.operador_email = 'Requerido';
     else if (!/^\S+@\S+\.\S+$/.test(data.operador_email)) e.operador_email = 'Email inválido';
-    if (!data.maps_url.trim()) e.maps_url = 'Requerido';
-    else if (!/(maps|goo\.gl|google\.com)/i.test(data.maps_url)) e.maps_url = 'Pegá un link de Google Maps';
-    if (!data.vocacion) e.vocacion = 'Selecciona vocación';
+    // En skipMode, maps_url y vocacion son opcionales — Miguel los completa
+    // en la llamada de seguimiento. En modo completo siguen siendo *.
+    if (!skipMode) {
+      if (!data.maps_url.trim()) e.maps_url = 'Requerido';
+      else if (!/(maps|goo\.gl|google\.com)/i.test(data.maps_url)) e.maps_url = 'Pega un link de Google Maps';
+      if (!data.vocacion) e.vocacion = 'Selecciona vocación';
+    } else if (data.maps_url.trim() && !/(maps|goo\.gl|google\.com)/i.test(data.maps_url)) {
+      // Si en skipMode el usuario igual pegó algo, validamos que sea Maps.
+      e.maps_url = 'Pega un link de Google Maps (o déjalo vacío)';
+    }
     // Bug 069.10 — rangos para campos numéricos opcionales (si están presentes)
     if (data.altitud_msnm !== '') {
       const alt = Number(data.altitud_msnm);
@@ -176,7 +203,7 @@ function FormPiloto() {
       else if (area > 100_000_000) e.area_m2 = 'Máximo 100.000.000 m² (10.000 ha)';
     }
     return e;
-  }, [data]);
+  }, [data, skipMode]);
 
   const camposCompletos = Object.keys(errors).length === 0;
   const isReadyToSend = camposCompletos && aceptaCondiciones && aceptaCompromiso;
@@ -187,37 +214,53 @@ function FormPiloto() {
     const operador_id = operadorIdFrom(slug, data.operador_email);
     const today = new Date().toISOString().slice(0, 10);
 
+    const mapsLine = data.maps_url.trim()
+      ? `maps_url: "${data.maps_url}"`
+      : `maps_url: null  # TODO Miguel: pedir en llamada de seguimiento (vino via skip)`;
+    const vocacionLine = data.vocacion
+      ? `vocacion: ${data.vocacion}`
+      : `vocacion: "TODO_vocacion"  # TODO Miguel: pedir en llamada de seguimiento (vino via skip)`;
+    const descCorta = (data.notas
+      || (data.vocacion ? `Finca piloto fase 1. Vocación: ${data.vocacion}.` : 'Finca piloto fase 1. Modo skip — vocación pendiente.')
+    ).replace(/"/g, "'");
+
     return `  - slug: ${slug}
     nombre: ${data.nombre_finca}
     operador_id: ${operador_id}
     operador_nombre: "${data.operador_nombre}"
     operador_email: "${data.operador_email}"
-    maps_url: "${data.maps_url}"
+    ${mapsLine}
     coords: [TODO_lat, TODO_lon]  # Miguel: extraer del maps_url
     altitud_msnm: ${data.altitud_msnm ? Number(data.altitud_msnm) : 'null  # TODO operador o GPS'}
     biocultural_zone: "TODO_zona"  # Miguel: andino_alto_páramo | andino_alto | andino_medio | andino_medio_invernadero | valle_caucano
     area_m2: ${data.area_m2 ? Number(data.area_m2) : 'null'}
-    vocacion: ${data.vocacion}
+    ${vocacionLine}
     estado: "piloto"
     visibility: "unlisted"
     farmos_endpoint: null
-    descripcion_corta: "${(data.notas || `Finca piloto fase 1. Vocación: ${data.vocacion}.`).replace(/"/g, "'")}"
+    descripcion_corta: "${descCorta}"
     creada: "${today}"
+    via_skip: ${skipMode ? 'true  # Miguel: usuario pidió modo mínimo, llamar para completar' : 'false'}
     consent_ley1581: { aceptado: true, fecha: "${today}" }
     compromiso_piloto: { aceptado: true, duracion_meses: 6, feedback: "semanal", fecha: "${today}" }
 `;
-  }, [data, camposCompletos]);
+  }, [data, camposCompletos, skipMode]);
 
   const messageBody = useMemo(() => {
     if (!camposCompletos) return '';
-    return `Hola Miguel, te paso mis datos para el piloto Chagra:
+    const skipNote = skipMode
+      ? `\n\n(Te envío SOLO los datos esenciales por ahora. Cuando podamos hablar te paso el link de Maps, la vocación y demás detalles.)\n`
+      : '';
+    const mapsLine = data.maps_url.trim()
+      ? `\nLink de Maps del centro del predio: ${data.maps_url}`
+      : '';
+    return `Hola Miguel, te paso mis datos para el piloto Chagra:${skipNote}
 
-${yamlOutput}
-Link de Maps del centro del predio: ${data.maps_url}
+${yamlOutput}${mapsLine}
 ${data.notas ? `\nNotas: ${data.notas}\n` : ''}
 Saludos,
 ${data.operador_nombre}`;
-  }, [data, yamlOutput, camposCompletos]);
+  }, [data, yamlOutput, camposCompletos, skipMode]);
 
   const whatsappUrl = useMemo(() => {
     if (!isReadyToSend) return '#';
@@ -259,12 +302,55 @@ ${data.operador_nombre}`;
           </div>
           <h1 className="text-2xl font-bold text-white">Onboarding piloto Chagra</h1>
         </div>
-        <p className="text-sm text-slate-400 mb-6 leading-relaxed">
+        <p className="text-sm text-slate-400 mb-4 leading-relaxed">
           Llena los datos de tu finca y te creamos tu acceso al sistema. Esta
           página no envía nada automático — al final copias un mensaje y se lo
           pasas a Miguel por WhatsApp o email. Él lo procesa manualmente y te
           contacta con tus credenciales.
         </p>
+
+        {/* Free 7→10 fix-pack: "Saltar por ahora — solo lo esencial" para
+            campesinos sin tiempo o sin Maps link a mano. Reduce el formulario
+            a 3 campos (nombre finca + nombre operador + email) y manda un
+            YAML con TODOs explícitos para que Miguel haga seguimiento por voz. */}
+        {!skipMode ? (
+          <div className="mb-6 rounded-xl bg-slate-900/60 border border-slate-800 p-3 flex items-start gap-3">
+            <Clock size={16} className="text-amber-400 mt-0.5 shrink-0" />
+            <div className="flex-1">
+              <p className="text-xs text-slate-300 leading-relaxed">
+                <span className="font-bold text-amber-300">¿Sin tiempo o sin link de Maps?</span>{' '}
+                Puedes enviar solo lo esencial (nombre, contacto) y completar
+                después por WhatsApp.
+              </p>
+              <button
+                type="button"
+                onClick={() => setSkipMode(true)}
+                className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-amber-300 hover:text-amber-200 underline underline-offset-2"
+              >
+                Saltar por ahora — solo lo esencial
+                <ChevronRight size={12} />
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="mb-6 rounded-xl bg-amber-900/20 border border-amber-700/40 p-3 flex items-start gap-3">
+            <Info size={16} className="text-amber-300 mt-0.5 shrink-0" />
+            <div className="flex-1">
+              <p className="text-xs text-amber-100 leading-relaxed">
+                <span className="font-bold">Modo esencial activo.</span>{' '}
+                Solo se requieren tu nombre, email y nombre de la finca. Miguel
+                te contactará para completar el resto.
+              </p>
+              <button
+                type="button"
+                onClick={() => setSkipMode(false)}
+                className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-amber-200 hover:text-white underline underline-offset-2"
+              >
+                Cambiar a formulario completo
+              </button>
+            </div>
+          </div>
+        )}
 
         <form className="space-y-4">
           <div>
@@ -321,7 +407,9 @@ ${data.operador_nombre}`;
           </div>
 
           <div>
-            <label htmlFor="maps_url" className={labelClass}>Link de Google Maps del centro del predio *</label>
+            <label htmlFor="maps_url" className={labelClass}>
+              Link de Google Maps del centro del predio {skipMode ? '(opcional, lo pides después)' : '*'}
+            </label>
             <input
               id="maps_url"
               type="url"
@@ -391,7 +479,9 @@ ${data.operador_nombre}`;
           </div>
 
           <div>
-            <label htmlFor="vocacion" className={labelClass}>Vocación principal de la finca *</label>
+            <label htmlFor="vocacion" className={labelClass}>
+              Vocación principal de la finca {skipMode ? '(opcional, lo pides después)' : '*'}
+            </label>
             <select
               id="vocacion"
               value={data.vocacion}
