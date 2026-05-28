@@ -72,11 +72,29 @@ const EQUIPMENT_EXAMPLES = [
   'Rastrillo',
 ];
 
+// UX-15 (#286) 2026-05-27: helper urbano local (la PR UX-13 introdujo
+// `src/utils/landTypes.js` con el set canónico; cuando esa PR mergee a
+// main esta constante se reemplaza por el import). Mantenido inline para
+// que UX-15 sea independiente de UX-13 en orden de merge.
+const URBAN_LAND_TYPES_LOCAL = new Set([
+  'balcony', 'terrace', 'window_sill', 'indoor_pot', 'urban_garden',
+]);
+const isUrbanLandType = (lt) => URBAN_LAND_TYPES_LOCAL.has(lt);
+
+// UX-15 (#286) 2026-05-27: copy replanteado sin jerga forestal técnica.
+// El operador reportó "dosel" como confuso ("ni yo sé qué es"). Reemplazos:
+//   - "Dosel"             → "Capa superior" / "Árboles altos"
+//   - "Emergente (>25m)"  → "Árboles muy altos" (poco común fuera de bosque)
+//   - "Alto (10-25m)"     → "Árboles altos" (frutales, maderables)
+//   - "Medio (2-10m)"     → "Arbustos" (café, cítricos)
+//   - "Bajo (<2m)"        → "Plantas bajas" (hortalizas, hierbas, rastreras)
+// Lenguaje accesible para usuarios de campo + niños 11+. Las alturas
+// quedan como sub-label gris discreto para quien sí las quiera ver.
 const ESTRATO_OPTIONS = [
-  { value: 'emergente', label: 'Emergente (>25m)', desc: 'Capa superior del dosel' },
-  { value: 'alto', label: 'Alto (10-25m)', desc: 'Árboles frutales, maderables' },
-  { value: 'medio', label: 'Medio (2-10m)', desc: 'Arbustos, café, cítricos' },
-  { value: 'bajo', label: 'Bajo (<2m)', desc: 'Hortalizas, rastreras, cobertura' },
+  { value: 'emergente', label: 'Árboles muy altos', height: 'más de 25 m', desc: 'Solo en bosque o agroforestal de altura' },
+  { value: 'alto', label: 'Árboles altos', height: '10 a 25 m', desc: 'Frutales, maderables' },
+  { value: 'medio', label: 'Arbustos', height: '2 a 10 m', desc: 'Café, cítricos, mora' },
+  { value: 'bajo', label: 'Plantas bajas', height: 'menos de 2 m', desc: 'Hortalizas, hierbas, rastreras, cobertura' },
 ];
 
 const GREMIO_OPTIONS = [
@@ -940,25 +958,58 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
         className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white min-h-[48px]"
       />
 
-      {/* Estrato */}
-      <div className="space-y-1.5">
-        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Estrato en el sistema</label>
-        <div className="grid grid-cols-2 gap-2">
-          {ESTRATO_OPTIONS.map(opt => (
-            <button
-              key={opt.value}
-              onClick={() => setFormData({ ...formData, estrato: formData.estrato === opt.value ? '' : opt.value })}
-              className={`p-3 rounded-xl text-left transition-all min-h-[56px] active:scale-[0.98] ${formData.estrato === opt.value
-                ? 'bg-lime-600/20 border-2 border-lime-500 text-lime-300'
-                : 'bg-slate-800 border border-slate-700 text-slate-300'
-                }`}
-            >
-              <span className="font-bold text-sm block">{opt.label}</span>
-              <span className="text-xs text-slate-500">{opt.desc}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* UX-15 (#286) 2026-05-27: Capa del cultivo (antes "Estrato en el
+          sistema"). Replanteo:
+          - Copy sin jerga forestal (sin "dosel", sin "emergente >25m").
+          - Si la zona parent es URBANA (balcón/terraza/ventana/matera) →
+            OCULTAR el campo entero. Un balcón no tiene estructura por
+            estratos forestales.
+          - Si la especie del catálogo ya resolvió un estrato sugerido,
+            mostramos badge "Sugerido por catálogo" con opción de cambiar.
+          - Resto de casos: mismas opciones con copy nuevo.
+          - Sub-label con la altura aproximada (gris discreto) para quien
+            la quiera ver. */}
+      {(() => {
+        const parentLand = formData.parentLandId
+          ? lands.find((l) => l.id === formData.parentLandId)
+          : null;
+        const parentLandType = parentLand?.attributes?.land_type;
+        const isUrbanContext = isUrbanLandType(parentLandType);
+        if (isUrbanContext) {
+          return (
+            <p className="text-xs text-slate-500 italic px-1" data-testid="estrato-hidden-urban">
+              Zona urbana: no necesitas indicar capa del cultivo.
+            </p>
+          );
+        }
+        return (
+          <div className="space-y-1.5" data-testid="estrato-field">
+            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+              Capa del cultivo
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {ESTRATO_OPTIONS.map(opt => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, estrato: formData.estrato === opt.value ? '' : opt.value })}
+                  className={`p-3 rounded-xl text-left transition-all min-h-[56px] active:scale-[0.98] ${formData.estrato === opt.value
+                    ? 'bg-lime-600/20 border-2 border-lime-500 text-lime-300'
+                    : 'bg-slate-800 border border-slate-700 text-slate-300'
+                    }`}
+                >
+                  <span className="font-bold text-sm block">{opt.label}</span>
+                  <span className="text-[10px] text-slate-500 block">{opt.height}</span>
+                  <span className="text-xs text-slate-500">{opt.desc}</span>
+                </button>
+              ))}
+            </div>
+            <p className="text-[10px] text-slate-500 italic px-1">
+              ¿Qué tan alta crece? Si la dudas, déjala en "Plantas bajas" o vacía.
+            </p>
+          </div>
+        );
+      })()}
 
       {/* Gremio / Función en el sistema */}
       <div className="space-y-1.5">
