@@ -20,7 +20,7 @@ import { buildLLMRequest, selectChatRoute } from '../../services/llmRouter';
 import { isSidecarEnabled, planNlu, callTool, resolveEntities, getClimaIdeam } from '../../services/sidecarClient';
 import { buildProfileContext } from '../../services/agentService';
 import { FARM_CONFIG } from '../../config/defaults';
-import { speak, speakKokoro, stop, init as initTTS, isSupported, isKokoroAvailable, replayLast, isSpeaking } from '../../services/ttsService';
+import { speak, speakSentences, stop, init as initTTS, isSupported, isKokoroAvailable, replayLast, isSpeaking } from '../../services/ttsService';
 import { executeAction, setActionGateCallback } from '../../services/actionExecutor';
 import { useRotatingTip } from '../../services/tipsService';
 import ChatHistory from './ChatHistory';
@@ -1160,7 +1160,11 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       if (ttsEnabled && response) {
         stop();
         if (kokoroReady) {
-          speakKokoro(response, { rate: 0.9, pitch: 1.0 });
+          // Free 7→10 fix-pack #4: streaming frase-por-frase reduce la
+          // latencia hasta-primer-audio de "esperar respuesta entera"
+          // (3-23s) a "esperar primera frase" (<2s). Internamente fallback
+          // a speakKokoro/speak en caso de error en la primera frase.
+          speakSentences(response, { rate: 0.9, pitch: 1.0 });
         } else {
           speak(response, { rate: 0.9, pitch: 1.0 });
         }
