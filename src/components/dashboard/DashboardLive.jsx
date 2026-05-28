@@ -13,7 +13,7 @@ import {
     SortableContext,
     sortableKeyboardCoordinates,
     useSortable,
-    verticalListSortingStrategy,
+    rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
@@ -96,16 +96,17 @@ function SortableSection({ id, onNavigate }) {
         isDragging,
     } = useSortable({ id });
 
+    const entry = SECTION_COMPONENTS[id];
+    if (!entry) return null;
+    const { Component, full } = entry;
+
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
         opacity: isDragging ? 0.6 : 1,
         zIndex: isDragging ? 20 : 'auto',
+        gridColumn: full ? '1 / -1' : undefined,
     };
-
-    const entry = SECTION_COMPONENTS[id];
-    if (!entry) return null;
-    const { Component } = entry;
 
     return (
         <div
@@ -113,19 +114,23 @@ function SortableSection({ id, onNavigate }) {
             style={style}
             className={`relative ${isDragging ? 'cursor-grabbing' : 'cursor-default'}`}
         >
-            {/* Drag handle — visible siempre pero discreto, agarra-y-mueve */}
+            {/* Drag handle — visible siempre pero discreto. En grid cards
+                cuadrados, el handle vive arriba a la izquierda en lugar
+                del lateral, para no comerle ancho a la celda. */}
             <button
                 type="button"
                 {...attributes}
                 {...listeners}
                 aria-label="Mover sección"
-                className="absolute top-1/2 -translate-y-1/2 -left-1.5 z-10 p-1 rounded-md text-slate-600 hover:text-slate-300 hover:bg-white/5 active:bg-white/10 cursor-grab active:cursor-grabbing touch-none"
+                className={`${full
+                    ? 'absolute top-1/2 -translate-y-1/2 -left-1.5'
+                    : 'absolute top-1 left-1'} z-10 p-1 rounded-md text-slate-500/70 hover:text-slate-300 hover:bg-white/10 active:bg-white/20 cursor-grab active:cursor-grabbing touch-none`}
                 style={{ touchAction: 'none' }}
             >
-                <GripVertical size={16} aria-hidden="true" />
+                <GripVertical size={14} aria-hidden="true" />
             </button>
-            <div className="pl-3">
-                <Component onNavigate={onNavigate} />
+            <div className={full ? 'pl-3' : ''}>
+                <Component onNavigate={onNavigate} variant={full ? 'list' : 'grid'} />
             </div>
         </div>
     );
@@ -167,8 +172,8 @@ export default function DashboardLive({ onNavigate }) {
                     collisionDetection={closestCenter}
                     onDragEnd={handleDragEnd}
                 >
-                    <SortableContext items={order} strategy={verticalListSortingStrategy}>
-                        <div className="flex flex-col gap-3">
+                    <SortableContext items={order} strategy={rectSortingStrategy}>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             {order.map((id) => (
                                 <SortableSection key={id} id={id} onNavigate={onNavigate} />
                             ))}

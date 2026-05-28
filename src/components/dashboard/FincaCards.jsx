@@ -76,8 +76,37 @@ const SECTION_STYLES = {
     },
 };
 
-function Card({ section, title, subtitle, value, onClick, badge }) {
+function Card({ section, title, subtitle, value, onClick, badge, variant = 'list' }) {
     const style = SECTION_STYLES[section] || SECTION_STYLES.plantas;
+
+    // GRID variant: layout cuadrado, emoji grande centrado arriba, title abajo,
+    // value en corner top-right. Optimizado para cuadrícula 2-col/3-col que
+    // deja respirar el fondo biopunk entre cards.
+    if (variant === 'grid') {
+        return (
+            <button
+                type="button"
+                onClick={onClick}
+                className={`group relative w-full text-left rounded-2xl bg-gradient-to-br ${style.accent} backdrop-blur-xl border ${style.border} p-4 ring-2 ${style.ring} transition-all active:scale-[0.96] hover:-translate-y-0.5 aspect-square flex flex-col items-center justify-between min-h-[120px]`}
+            >
+                {/* Badge / value top-right */}
+                {(value != null || badge != null) && (
+                    <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[11px] font-black bg-black/35 backdrop-blur text-white tabular-nums">
+                        {value != null ? value : badge}
+                    </div>
+                )}
+                {/* Emoji grande centrado */}
+                <div className="flex-1 flex items-center justify-center text-5xl sm:text-6xl select-none filter drop-shadow-md group-hover:scale-110 transition-transform">
+                    {style.emoji}
+                </div>
+                {/* Title abajo */}
+                <h3 className="text-sm font-bold text-white text-center leading-tight w-full truncate">
+                    {title}
+                </h3>
+            </button>
+        );
+    }
+
     return (
         <button
             type="button"
@@ -112,11 +141,12 @@ function Card({ section, title, subtitle, value, onClick, badge }) {
     );
 }
 
-export function PlantasCard({ onNavigate }) {
+export function PlantasCard({ onNavigate, variant }) {
     const plants = useAssetStore((s) => s.plants);
     const count = plants.length;
     return (
         <Card
+            variant={variant}
             section="plantas"
             title="Mis plantas"
             subtitle={count > 0 ? `${count === 1 ? 'planta sembrada' : 'plantas sembradas'}` : 'Aún no has registrado nada'}
@@ -126,11 +156,12 @@ export function PlantasCard({ onNavigate }) {
     );
 }
 
-export function ZonasCard({ onNavigate }) {
+export function ZonasCard({ onNavigate, variant }) {
     const lands = useAssetStore((s) => s.lands);
     const count = lands.length;
     return (
         <Card
+            variant={variant}
             section="zonas"
             title="Mis zonas"
             subtitle={count > 0 ? `${count === 1 ? 'área de tu finca' : 'áreas de tu finca'}` : 'Define dónde cultivas'}
@@ -140,11 +171,12 @@ export function ZonasCard({ onNavigate }) {
     );
 }
 
-export function InsumosCard({ onNavigate }) {
+export function InsumosCard({ onNavigate, variant }) {
     const materials = useAssetStore((s) => s.materials);
     const count = materials.length;
     return (
         <Card
+            variant={variant}
             section="insumos"
             title="Insumos"
             subtitle={count > 0 ? 'Biopreparados y materiales' : 'Lleva control de lo que tienes'}
@@ -154,9 +186,10 @@ export function InsumosCard({ onNavigate }) {
     );
 }
 
-export function BitacoraCard({ onNavigate }) {
+export function BitacoraCard({ onNavigate, variant }) {
     return (
         <Card
+            variant={variant}
             section="bitacora"
             title="Bitácora"
             subtitle="Todo lo que has hecho en tu finca"
@@ -165,9 +198,10 @@ export function BitacoraCard({ onNavigate }) {
     );
 }
 
-export function HoyCard({ onNavigate }) {
+export function HoyCard({ onNavigate, variant }) {
     return (
         <Card
+            variant={variant}
             section="hoy"
             title="Hoy en finca"
             subtitle="Lo que toca hacer cerca tuyo"
@@ -176,9 +210,10 @@ export function HoyCard({ onNavigate }) {
     );
 }
 
-export function PlagasCard({ onNavigate }) {
+export function PlagasCard({ onNavigate, variant }) {
     return (
         <Card
+            variant={variant}
             section="plagas"
             title="Plagas"
             subtitle="Reporta y consulta"
@@ -187,9 +222,10 @@ export function PlagasCard({ onNavigate }) {
     );
 }
 
-export function BiodiversidadCard({ onNavigate }) {
+export function BiodiversidadCard({ onNavigate, variant }) {
     return (
         <Card
+            variant={variant}
             section="biodiversidad"
             title="Flora y fauna"
             subtitle="Ecosistema de tu chagra"
@@ -198,9 +234,10 @@ export function BiodiversidadCard({ onNavigate }) {
     );
 }
 
-export function InformesCard({ onNavigate }) {
+export function InformesCard({ onNavigate, variant }) {
     return (
         <Card
+            variant={variant}
             section="informes"
             title="Informes"
             subtitle="Descarga reportes en CSV"
