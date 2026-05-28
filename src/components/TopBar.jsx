@@ -3,6 +3,7 @@ import { CircleUser, Mic, Plus, ChevronDown, ChevronUp, Home, HelpCircle, LogOut
 import { version as APP_VERSION } from '../../package.json';
 import EnvironmentalCard from './EnvironmentalCard';
 import AltitudeBadge from './AltitudeBadge';
+import OfflineChip from './OfflineChip';
 
 /**
  * TopBar, header persistente con identidad del operador (DR-030 QW2).
@@ -103,6 +104,12 @@ export default function TopBar({ onNavigate, onLogout }) {
           <CircleUser size={20} aria-hidden="true" className="shrink-0 text-teal-400" />
           <span className="text-sm font-semibold truncate max-w-[5rem] sm:max-w-[8rem]">{operatorName}</span>
         </button>
+
+        {/* UX-2 (#286) 2026-05-27: indicador ambient persistente del estado
+            offline. Vive justo al lado del nombre del operador para que sea
+            descubrible sin invadir el header. Solo se renderiza cuando
+            navigator.onLine === false (auto-hide al recuperar conexión). */}
+        <OfflineChip />
 
         <AltitudeBadge />
 
