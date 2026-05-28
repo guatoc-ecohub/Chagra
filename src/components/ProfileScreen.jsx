@@ -148,7 +148,7 @@ export default function ProfileScreen({ onBack, onHome }) {
             {savedFlash ? <><Check size={18} /> Guardado</> : <><Save size={18} /> Guardar cambios</>}
           </button>
           <p className="text-[10px] text-slate-500 text-center leading-relaxed">
-            Los cambios se persisten localmente. Sin sincronización con FarmOS aún (planeado v1.x).
+            Los cambios se guardan en tu dispositivo. Subida al servidor pendiente (planeado v1.x).
           </p>
         </div>
 
@@ -237,7 +237,7 @@ export default function ProfileScreen({ onBack, onHome }) {
         {/* App Info Footer */}
         <div className="mt-8 pt-6 border-t border-slate-800/50 text-center">
           <p className="text-[10px] text-slate-600 font-mono tracking-tighter uppercase">
-            Chagra Eco-OS • v0.8.4
+            Chagra • v1.0.0
           </p>
           <p className="text-[9px] text-slate-700 mt-1 max-w-[200px] mx-auto leading-tight">
             Diseñado para la soberanía alimentaria y la regeneración ecosistémica.

@@ -7,10 +7,23 @@ const estadoColors = {
     pendiente: 'bg-slate-800 text-slate-400 border-slate-700/30',
 };
 
+// Etiquetas legibles para `biocultural_zone`. La clave del dato sigue siendo
+// el slug interno (snake_case), pero al usuario público le mostramos un
+// nombre natural de "tu zona ecológica" para evitar leak de jerga.
 const zoneLabels = {
     andino_alto_páramo: 'Alto Andino - Páramo',
+    andino_alto: 'Alto Andino',
     andino_medio: 'Andino Medio',
-    valle_caucano: 'Valle Cauca',
+    andino_medio_invernadero: 'Andino Medio (invernadero)',
+    valle_caucano: 'Valle del Cauca',
+    cafetero: 'Eje Cafetero',
+    caribe: 'Caribe',
+    llanos: 'Llanos',
+    amazonia: 'Amazonía',
+    pacifico: 'Pacífico',
+    nariño: 'Nariño',
+    santander: 'Santanderes',
+    tolima_huila: 'Tolima - Huila',
 };
 
 export function FincaCard({finca, onSelect, onConfigure}) {

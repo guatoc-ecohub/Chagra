@@ -317,7 +317,7 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
           </span>
           {entry?._pending && (
             <span className="text-xs font-bold text-amber-400 px-2 py-1 rounded-full bg-amber-900/30 border border-amber-800/50">
-              Sin sincronizar
+              Pendiente de subir
             </span>
           )}
         </section>
