@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CircleUser, Mic, Plus, ChevronDown, ChevronUp, Home, HelpCircle, LogOut } from 'lucide-react';
+import { CircleUser, Mic, Sprout, ChevronDown, ChevronUp, Home, HelpCircle, LogOut } from 'lucide-react';
 import { version as APP_VERSION } from '../../package.json';
 import EnvironmentalCard from './EnvironmentalCard';
 import AltitudeBadge from './AltitudeBadge';
@@ -132,21 +132,43 @@ export default function TopBar({ onNavigate, onLogout }) {
         >
           <HelpCircle size={24} aria-hidden="true" strokeWidth={2.5} />
         </button>
+        {/* UX-27 (#286) 2026-05-27: botón unificado "Agregar planta por
+            voz". Reemplaza los dos botones previos (Mic solo + Plus solo)
+            que eran:
+              - Mic → onNavigate('voz')         → captura genérica por voz
+              - Plus → onNavigate('plant_asset') → form planta manual
+            Ambos llevaban al MISMO flow de fondo (registro de planta),
+            solo cambiaba la modalidad. Feedback operador 2026-05-27:
+            "borra el + en su lugar mejora el del micrófono con un icono
+            de + y una planta o algo lindo que le permita inferir que es
+            para agregar una planta con voz".
+
+            Diseño:
+              - Mic (lime) como icono principal — comunica "voz".
+              - Sprout decorativo abajo-derecha — comunica "planta".
+              - Halo lime sutil + bg degrado de lime-900/40 → emerald-900/40
+                para que destaque del resto de iconos slate.
+              - Tamaño botón mantenido en 44x44 (touch target iOS).
+              - aria-label explícito "Agregar planta por voz".
+              - Navega a 'voz' (el flow de voz YA permite registrar
+                plantas; ver VoiceCapture + VoiceConfirmation). */}
         <button
           type="button"
           onClick={() => onNavigate('voz')}
-          aria-label="Captura por voz"
-          className="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 active:bg-slate-700 text-lime-400 min-h-[44px] min-w-[44px] flex items-center justify-center"
+          aria-label="Agregar planta por voz"
+          title="Agregar planta por voz"
+          data-testid="topbar-add-plant-voice"
+          className="relative p-2 rounded-lg bg-gradient-to-br from-lime-900/40 to-emerald-900/30 hover:from-lime-800/50 hover:to-emerald-800/40 active:from-lime-700/60 active:to-emerald-700/50 border border-lime-700/50 text-lime-300 min-h-[44px] min-w-[44px] flex items-center justify-center shadow-[0_0_0_1px_rgba(132,204,22,0.15)]"
         >
-          <Mic size={20} aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          onClick={() => onNavigate('plant_asset')}
-          aria-label="Capturar planta"
-          className="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 active:bg-slate-700 text-purple-400 min-h-[44px] min-w-[44px] flex items-center justify-center"
-        >
-          <Plus size={22} aria-hidden="true" strokeWidth={2.5} />
+          <Mic size={20} aria-hidden="true" strokeWidth={2.25} />
+          {/* Sprout decorativo abajo-derecha, sobre un disco oscuro para
+              que se lea claro sobre el fondo del Mic + del header. */}
+          <span
+            aria-hidden="true"
+            className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-slate-950 border border-lime-600/60 flex items-center justify-center"
+          >
+            <Sprout size={10} className="text-emerald-400" strokeWidth={2.5} />
+          </span>
         </button>
         {/* Botón Settings (icono ⚙) eliminado, Feedback piloto #115: era duplicado del
             botón operator name de arriba (ambos onNavigate('perfil')). El
