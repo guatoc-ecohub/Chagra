@@ -30,10 +30,14 @@ export default function useIdleDetection(delayMs = 12000, enabled = true) {
         }
 
         const reset = () => {
-            if (idle) setIdle(false);
+            // BUGFIX 2026-05-28 operador: `if (idle) setIdle(false)` tenía closure
+            // stale — `idle` quedaba capturado del primer render. Después de que
+            // el timer disparaba setIdle(true), los siguientes mousemove/touch
+            // ejecutaban el reset con el `idle=false` viejo del closure y NUNCA
+            // desactivaban el screen saver. Fix: setIdle(false) siempre — React
+            // skipea el re-render si el valor no cambió.
+            setIdle(false);
             if (timerRef.current) clearTimeout(timerRef.current);
-            // Solo arranca timer si la pestaña está visible — sin esto,
-            // background tabs marcaban idle inmediatamente al volver
             if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
                 timerRef.current = setTimeout(() => setIdle(true), delayMs);
             }
