@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench } from 'lucide-react';
+import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench, Sprout, ChevronRight } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import ThemeSelector from './common/ThemeSelector';
 import AgentAvatarSelector from './Settings/AgentAvatarSelector';
@@ -120,6 +120,50 @@ export default function ProfileScreen({ onBack, onHome }) {
           </div>
           <h2 className="text-2xl font-black text-white">{name}</h2>
           <p className="text-xs text-slate-500 uppercase tracking-widest font-bold mt-1">{currentRoleLabel}</p>
+        </div>
+
+        {/* #200/#201: CTAs para personalizar el agente y configurar ubicación.
+            Navegan vía 'chagra:nav' (patrón CSP-safe, sin onClick inline-string).
+            ProfileScreen no recibe onNavigate, así que despacha el evento global
+            que App.jsx escucha. */}
+        <div className="grid sm:grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              try {
+                window.dispatchEvent(new CustomEvent('chagra:nav', { detail: { view: 'onboarding-perfil', data: { back: 'perfil' } } }));
+              } catch (_) { /* noop */ }
+            }}
+            className="text-left rounded-2xl bg-emerald-900/20 border border-emerald-800/40 p-4 hover:bg-emerald-900/30 transition-colors flex items-center gap-3"
+          >
+            <div className="p-2 rounded-xl bg-emerald-900/40 border border-emerald-700/40">
+              <Sprout size={20} className="text-emerald-400" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-bold text-white">Personalizar mi agente</p>
+              <p className="text-xs text-slate-400">Cuéntale de tu cultivo para respuestas a tu medida</p>
+            </div>
+            <ChevronRight size={18} className="text-slate-500" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              try {
+                window.dispatchEvent(new CustomEvent('chagra:nav', { detail: { view: 'ubicacion-detectada', data: { back: 'perfil' } } }));
+              } catch (_) { /* noop */ }
+            }}
+            className="text-left rounded-2xl bg-sky-900/20 border border-sky-800/40 p-4 hover:bg-sky-900/30 transition-colors flex items-center gap-3"
+          >
+            <div className="p-2 rounded-xl bg-sky-900/40 border border-sky-700/40">
+              <MapPin size={20} className="text-sky-400" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-bold text-white">Configurar ubicación</p>
+              <p className="text-xs text-slate-400">Mapa, piso térmico y cultivos de tu zona</p>
+            </div>
+            <ChevronRight size={18} className="text-slate-500" />
+          </button>
         </div>
 
         {/* Edit Form */}

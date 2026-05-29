@@ -53,6 +53,8 @@ const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m
 const BiodiversidadView = lazy(() => import('./components/BiodiversidadView'));
 const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
 const OnboardingPiloto = lazy(() => import('./components/OnboardingPiloto'));
+const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
+const LocationDetectedScreen = lazy(() => import('./components/LocationDetectedScreen'));
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
 const ProfileScreen = lazy(() => import('./components/ProfileScreen'));
 const CaseStudyScreen = lazy(() => import('./components/CaseStudyScreen'));
@@ -464,6 +466,28 @@ export default function App() {
         return <LoginScreen onLoginSuccess={() => navigate('dashboard')} onSave={showToast} />;
       case 'onboarding-piloto':
         return <OnboardingPiloto />;
+      case 'onboarding-perfil':
+        // #200: onboarding extendido de 18 preguntas condicionales → perfil.
+        // Al terminar/saltar va al detector de ubicación; tras confirmar,
+        // al dashboard. currentViewData.next permite override del destino.
+        return (
+          <OnboardingProfile
+            onComplete={() => navigate('ubicacion-detectada', { next: 'dashboard' })}
+            onClose={() => navigate(currentViewData?.back || 'dashboard')}
+          />
+        );
+      case 'ubicacion-detectada':
+        // #201: pantalla "ubicación detectada" con mini mapa + piso térmico.
+        // Acepta coords/altitud/municipio iniciales vía currentViewData.
+        return (
+          <LocationDetectedScreen
+            coords={currentViewData?.coords || null}
+            altitud={currentViewData?.altitud ?? null}
+            initialMunicipio={currentViewData?.municipio || ''}
+            onConfirm={() => navigate(currentViewData?.next || 'dashboard')}
+            onBack={() => navigate(currentViewData?.back || 'dashboard')}
+          />
+        );
       case 'dashboard':
         return <DashboardLiveView onNavigate={navigate} onLogout={handleLogout} lastLogMessage={lastLogMessage} />;
       case 'sembrar':
