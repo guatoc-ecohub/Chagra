@@ -25,7 +25,7 @@ import { streamChatViaSidecar, isAgentStreamingEnabled } from '../../services/st
 // Sidecar agro-mcp (ADR-045 Fase 2 Step B/C). Detrás de feature flag
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
-import { isSidecarEnabled, planNlu, callTool, resolveEntities, getClimaIdeam } from '../../services/sidecarClient';
+import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, getClimaIdeam } from '../../services/sidecarClient';
 import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, applyVoseoFilter } from '../../services/agentService';
 // PoC alertas meteorológicas tiempo real (#316) — el bell + el agente
 // comparten el mismo snapshot via `climaService` (cache 30 min).
@@ -755,6 +755,18 @@ ${buildProfileContext(finca)}`;
   const TOOL_EVIDENCE_MAX_CHARS = 1500;
 
   const formatToolEvidence = (toolEvidence) => {
+    // D2 (#246): si llega un array de evidences (tool_chain ejecutado),
+    // concatenar bloques individuales. El LLM recibe un bloque "DATOS
+    // VERIFICADOS" por cada tool, en orden de ejecución. Los miss
+    // explícitos (found:false / available:false) se marcan igual que
+    // en el modo simple.
+    if (Array.isArray(toolEvidence)) {
+      if (toolEvidence.length === 0) return '';
+      const blocks = toolEvidence
+        .map((ev) => formatToolEvidence(ev))
+        .filter((b) => b && b.trim().length > 0);
+      return blocks.join('\n');
+    }
     if (!toolEvidence || !toolEvidence.tool || !toolEvidence.result) return '';
 
     // 2026-05-23 incidente test #4: usuario preguntó por "mareñongoño del
@@ -1144,7 +1156,33 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
           const tNlu0 = performance.now();
           const plan = await planNlu(textForLLM, contextMemory);
           const tNlu1 = performance.now();
-          if (plan?.useTool && plan.tool && plan.args) {
+          // D2 (#246) — modo cadena: si el sidecar devolvió `tool_chain`
+          // (array no vacío), ejecutamos cada paso en orden y usamos el
+          // array de evidences como toolEvidence. El formatter y el
+          // computeSourceMetadata ya soportan arrays.
+          if (plan?.useTool && Array.isArray(plan.toolChain) && plan.toolChain.length > 0) {
+            const tTool0 = performance.now();
+            const chainEvidences = await executeToolChain(plan.toolChain);
+            const tTool1 = performance.now();
+            const useful = chainEvidences.filter((ev) => ev && ev.result != null);
+            if (useful.length > 0) {
+              toolEvidence = useful;
+              const evidenceBytes = (() => {
+                try { return JSON.stringify(useful.map((e) => e.result)).length; } catch (_) { return 0; }
+              })();
+              console.debug('[sidecar]', {
+                chain: useful.map((e) => e.tool),
+                latencyNlu: Math.round(tNlu1 - tNlu0),
+                latencyChain: Math.round(tTool1 - tTool0),
+                toolEvidenceBytes: evidenceBytes,
+              });
+            } else {
+              console.debug('[sidecar] tool_chain todos null', {
+                latencyNlu: Math.round(tNlu1 - tNlu0),
+                latencyChain: Math.round(tTool1 - tTool0),
+              });
+            }
+          } else if (plan?.useTool && plan.tool && plan.args) {
             const tTool0 = performance.now();
             const result = await callTool(plan.tool, plan.args);
             const tTool1 = performance.now();

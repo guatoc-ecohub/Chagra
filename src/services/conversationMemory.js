@@ -267,6 +267,21 @@ export async function clearMemory(operatorId) {
  * @returns {{tool_used: string|null, grounded: boolean}}
  */
 export function computeSourceMetadata(toolEvidence) {
+  // D2 (#246): si llega un array de evidences (chain), agrega — grounded
+  // si CUALQUIERA de los tools devolvió payload útil; tool_used reporta
+  // la cadena como "toolA+toolB".
+  if (Array.isArray(toolEvidence)) {
+    if (toolEvidence.length === 0) return { tool_used: null, grounded: false };
+    const inners = toolEvidence
+      .map((ev) => computeSourceMetadata(ev))
+      .filter((m) => m.tool_used != null);
+    if (inners.length === 0) return { tool_used: null, grounded: false };
+    return {
+      tool_used: inners.map((m) => m.tool_used).join('+'),
+      grounded: inners.some((m) => m.grounded === true),
+    };
+  }
+
   if (!toolEvidence || !toolEvidence.tool) {
     return { tool_used: null, grounded: false };
   }
