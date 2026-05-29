@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -67,74 +67,150 @@ function PisoTermicoBadge({ info }) {
 // Pisos térmicos colombianos en orden ascendente para la barra hero visual.
 // Rangos coinciden con deriveThermalZoneFromAltitud / PISO_TERMICO_INFO.
 const ALTITUDE_STOPS = [
-  { slug: 'cálido', max: 1000, color: 'bg-orange-500', label: 'Cálido' },
-  { slug: 'templado', max: 2000, color: 'bg-amber-400', label: 'Templado' },
-  { slug: 'frío', max: 3000, color: 'bg-emerald-500', label: 'Frío' },
-  { slug: 'páramo', max: 3600, color: 'bg-indigo-400', label: 'Páramo' },
-  { slug: 'glacial', max: 5000, color: 'bg-sky-300', label: 'Glacial' },
+  { slug: 'cálido', max: 1000, color: 'bg-orange-500', hex: '#f97316', label: 'Cálido' },
+  { slug: 'templado', max: 2000, color: 'bg-amber-400', hex: '#fbbf24', label: 'Templado' },
+  { slug: 'frío', max: 3000, color: 'bg-emerald-500', hex: '#10b981', label: 'Frío' },
+  { slug: 'páramo', max: 3600, color: 'bg-indigo-400', hex: '#818cf8', label: 'Páramo' },
+  { slug: 'glacial', max: 5000, color: 'bg-sky-300', hex: '#7dd3fc', label: 'Glacial' },
 ];
 const ALTITUDE_BAR_MAX = 5000;
 
+// Geometría de la montaña (viewBox 240×160). Base ancha cálida, pico glacial.
+const MTN = { baseY: 148, peakY: 14, apexX: 120, leftX: 16, rightX: 224 };
+const altToY = (alt) => {
+  const clamped = Math.max(0, Math.min(ALTITUDE_BAR_MAX, alt));
+  return MTN.baseY - (clamped / ALTITUDE_BAR_MAX) * (MTN.baseY - MTN.peakY);
+};
+
 /**
- * AltitudeGradientBar — barra horizontal coloreada por piso térmico con
- * marcador de la altitud actual (#201). Es el "hero visual" del onboarding:
- * el campesino ve de un vistazo dónde cae su finca en el espectro Colombia.
+ * ThermalMountain — "hero visual" del onboarding (#201 + #333): una montaña
+ * colombiana estratificada en sus pisos térmicos (cálido en la base →
+ * glacial en el pico), con un marcador blanco en la altitud de la finca del
+ * usuario. El campesino ve de un vistazo en qué piso cae su tierra dentro
+ * del espectro completo del país.
  *
- * Stops fijos cálido→templado→frío→páramo→glacial; ancho proporcional al
- * rango (no al ancho de pantalla — un Cundinamarca alto se diferencia
- * visualmente de un Caribe bajo).
+ * Implementación: triángulo recortado (clipPath) sobre el cual se pintan
+ * bandas horizontales — una por piso — con altura proporcional a su rango
+ * de altitud real. Marcador opcional si hay altitud conocida.
  *
- * Si no hay altitud, no renderiza el indicador (solo la escala).
+ * Conserva data-testid="altitude-gradient-bar" por compatibilidad con los
+ * tests #201 existentes, y agrega data-testid="thermal-mountain".
  */
-function AltitudeGradientBar({ altitud, pisoSlug }) {
-  const indicatorPct = useMemo(() => {
-    if (typeof altitud !== 'number' || Number.isNaN(altitud)) return null;
-    return Math.max(0, Math.min(100, (altitud / ALTITUDE_BAR_MAX) * 100));
-  }, [altitud]);
+function ThermalMountain({ altitud, pisoSlug }) {
+  const hasAlt = typeof altitud === 'number' && !Number.isNaN(altitud);
+  const yUser = hasAlt ? altToY(altitud) : null;
+  const trianglePath = `M${MTN.leftX} ${MTN.baseY} L${MTN.apexX} ${MTN.peakY} L${MTN.rightX} ${MTN.baseY} Z`;
 
   return (
-    <div className="space-y-2" data-testid="altitude-gradient-bar">
-      <div className="flex items-center justify-between text-2xs text-slate-500 font-mono">
-        <span>0 msnm</span>
-        <span className="text-slate-400">Pisos térmicos Colombia</span>
-        <span>{ALTITUDE_BAR_MAX}+</span>
-      </div>
-      <div className="relative h-8 rounded-full overflow-hidden border border-slate-700 bg-slate-900">
-        <div className="absolute inset-0 flex">
-          {ALTITUDE_STOPS.map((stop, idx) => {
-            const prev = idx === 0 ? 0 : ALTITUDE_STOPS[idx - 1].max;
-            const widthPct = ((stop.max - prev) / ALTITUDE_BAR_MAX) * 100;
-            const active = stop.slug === pisoSlug;
-            return (
-              <div
-                key={stop.slug}
-                style={{ width: `${widthPct}%` }}
-                className={`${stop.color} ${active ? 'opacity-100' : 'opacity-50'} transition-opacity`}
-                title={`${stop.label} hasta ${stop.max} msnm`}
+    <div
+      className="space-y-2"
+      data-testid="altitude-gradient-bar"
+      data-testid-alt="thermal-mountain"
+    >
+      <p className="text-2xs text-slate-400 text-center font-medium">
+        Pisos térmicos de Colombia
+      </p>
+      <div className="flex items-stretch gap-3">
+        {/* Montaña SVG */}
+        <svg
+          viewBox="0 0 240 160"
+          className="w-1/2 max-w-[200px] shrink-0"
+          role="img"
+          aria-label={
+            hasAlt
+              ? `Tu finca a ${altitud} msnm, piso ${pisoSlug || ''}`
+              : 'Montaña de pisos térmicos'
+          }
+        >
+          <defs>
+            <clipPath id="mtn-clip">
+              <path d={trianglePath} />
+            </clipPath>
+          </defs>
+          {/* cielo sutil */}
+          <rect x="0" y="0" width="240" height="160" fill="#0f172a" />
+          {/* bandas por piso, recortadas al triángulo */}
+          <g clipPath="url(#mtn-clip)">
+            {ALTITUDE_STOPS.map((stop, idx) => {
+              const prev = idx === 0 ? 0 : ALTITUDE_STOPS[idx - 1].max;
+              const yTop = altToY(stop.max);
+              const yBot = altToY(prev);
+              const active = stop.slug === pisoSlug;
+              return (
+                <rect
+                  key={stop.slug}
+                  x="0"
+                  y={yTop}
+                  width="240"
+                  height={Math.max(0, yBot - yTop)}
+                  fill={stop.hex}
+                  opacity={active ? 1 : 0.5}
+                />
+              );
+            })}
+          </g>
+          {/* contorno */}
+          <path
+            d={trianglePath}
+            fill="none"
+            stroke="#1e293b"
+            strokeWidth="2"
+            strokeLinejoin="round"
+          />
+          {/* marcador de la finca */}
+          {yUser != null && (
+            <g>
+              <line
+                x1={MTN.leftX - 4}
+                y1={yUser}
+                x2={MTN.rightX + 4}
+                y2={yUser}
+                stroke="#ffffff"
+                strokeWidth="1"
+                strokeDasharray="3 3"
+                opacity="0.5"
               />
+              <circle
+                cx={MTN.apexX}
+                cy={yUser}
+                r="6"
+                fill="#ffffff"
+                stroke="#0f172a"
+                strokeWidth="2"
+              />
+            </g>
+          )}
+        </svg>
+
+        {/* Leyenda vertical (pico arriba → base abajo) */}
+        <ul className="flex-1 flex flex-col justify-between text-2xs py-0.5">
+          {[...ALTITUDE_STOPS].reverse().map((stop, ridx) => {
+            const realIdx = ALTITUDE_STOPS.length - 1 - ridx;
+            const prev = realIdx === 0 ? 0 : ALTITUDE_STOPS[realIdx - 1].max;
+            const active = stop.slug === pisoSlug;
+            const rango = stop.slug === 'glacial' ? `${prev}+ msnm` : `${prev}–${stop.max} msnm`;
+            return (
+              <li
+                key={stop.slug}
+                className={`flex items-center gap-1.5 ${active ? 'text-white font-bold' : 'text-slate-500'}`}
+              >
+                <span
+                  className="inline-block w-2.5 h-2.5 rounded-sm shrink-0"
+                  style={{ backgroundColor: stop.hex, opacity: active ? 1 : 0.6 }}
+                />
+                <span className="truncate">{stop.label}</span>
+                <span className="ml-auto font-mono opacity-70 whitespace-nowrap">{rango}</span>
+              </li>
             );
           })}
-        </div>
-        {indicatorPct != null && (
-          <div
-            className="absolute top-0 bottom-0 flex items-center"
-            style={{ left: `calc(${indicatorPct}% - 8px)` }}
-            aria-label={`Tu finca a ${altitud} msnm`}
-          >
-            <div className="w-4 h-4 rounded-full bg-white border-2 border-slate-900 shadow-lg" />
-          </div>
-        )}
+        </ul>
       </div>
-      <div className="flex items-center justify-between text-2xs text-slate-600">
-        {ALTITUDE_STOPS.map((stop) => (
-          <span
-            key={stop.slug}
-            className={stop.slug === pisoSlug ? 'text-white font-bold' : ''}
-          >
-            {stop.label}
-          </span>
-        ))}
-      </div>
+      {hasAlt && (
+        <p className="text-2xs text-center text-slate-400">
+          <span className="inline-block w-2 h-2 rounded-full bg-white border border-slate-900 align-middle mr-1" />
+          Tu finca: <span className="font-mono text-white">{altitud} msnm</span>
+        </p>
+      )}
     </div>
   );
 }
@@ -201,51 +277,49 @@ export default function LocationDetectedScreen({
   }, [coords, altitud]);
 
   /**
-   * Auto-detección via navigator.geolocation cuando el usuario no llegó
-   * con coords ni texto inicial. Se dispara on-mount una sola vez. Falla
-   * graceful: el usuario siempre puede usar el cascade o la búsqueda.
+   * Geolocalización real del usuario. Reusable: la dispara tanto el auto-
+   * detect on-mount como el botón "Usar mi ubicación real" (#334).
+   *
+   * `maximumAge: 0` fuerza una lectura GPS fresca. Antes usábamos 60s de
+   * caché, lo que en Brave/Chromium (con permiso ya concedido) devolvía una
+   * posición cacheada o por-defecto y el usuario nunca veía su ubicación
+   * real ni tenía forma de re-disparar la detección.
    */
-  useEffect(() => {
-    if (coords || initialMunicipio || loc) return;
+  const detectMyLocation = useCallback(() => {
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
       setGeoState('unavailable');
       return;
     }
-    let alive = true;
     setGeoState('detecting');
     setLoading(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        if (!alive) return;
         const { latitude, longitude, altitude } = pos.coords;
-        resolveUbicacion({
-          lat: latitude,
-          lng: longitude,
-          altitud: altitude ?? null,
-        })
+        resolveUbicacion({ lat: latitude, lng: longitude, altitud: altitude ?? null })
           .then((r) => {
-            if (!alive) return;
             setLoc(r);
             setGeoState('idle');
           })
-          .catch(() => {
-            if (alive) setGeoState('idle');
-          })
-          .finally(() => {
-            if (alive) setLoading(false);
-          });
+          .catch(() => setGeoState('idle'))
+          .finally(() => setLoading(false));
       },
       (err) => {
-        if (!alive) return;
         console.warn('[LocationDetected] geolocation:', err?.message || err);
         setGeoState(err?.code === 1 ? 'denied' : 'unavailable');
         setLoading(false);
       },
-      { enableHighAccuracy: true, timeout: 12000, maximumAge: 60_000 },
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 },
     );
-    return () => {
-      alive = false;
-    };
+  }, []);
+
+  /**
+   * Auto-detección on-mount SOLO si el usuario no llegó con coords/municipio
+   * preseteados. Si llegó con un default, NO lo pisamos automáticamente —
+   * pero el botón "Usar mi ubicación real" queda siempre disponible (#334).
+   */
+  useEffect(() => {
+    if (coords || initialMunicipio || loc) return;
+    detectMyLocation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -511,6 +585,27 @@ export default function LocationDetectedScreen({
           )}
         </div>
 
+        {/* Usar mi ubicación real (#334) — SIEMPRE visible. En Brave/Chromium
+            con permiso ya concedido, fuerza una lectura GPS fresca y
+            sobrescribe cualquier ubicación por defecto preseteada. */}
+        <button
+          type="button"
+          onClick={detectMyLocation}
+          disabled={geoState === 'detecting'}
+          data-testid="use-my-location"
+          className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium text-white transition-colors"
+        >
+          {geoState === 'detecting' ? (
+            <>
+              <Loader2 size={16} className="animate-spin" /> Detectando tu ubicación…
+            </>
+          ) : (
+            <>
+              <LocateFixed size={16} /> Usar mi ubicación real
+            </>
+          )}
+        </button>
+
         {/* Mini mapa con marcador arrastrable (#201 NO ajustar) */}
         {hasPoint && (
           <div className="space-y-1.5">
@@ -590,7 +685,7 @@ export default function LocationDetectedScreen({
 
             {loc.altitud != null && (
               <div className="pt-2 border-t border-slate-800">
-                <AltitudeGradientBar
+                <ThermalMountain
                   altitud={loc.altitud}
                   pisoSlug={pisoInfo?.slug}
                 />
