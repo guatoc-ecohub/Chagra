@@ -27,6 +27,8 @@ export default defineConfig({
       // viven junto al script para mantener cohesión local. Incluye .mjs
       // porque el importer es ESM nativo.
       'scripts/__tests__/**/*.test.{js,mjs}',
+      // task #199: regional labels v3.3 tests (TypeScript)
+      'data/catalog/__tests__/**/*.test.{ts,js,mjs}',
     ],
     exclude: ['node_modules', 'dist', 'tests/*.spec.js'],
     css: false,

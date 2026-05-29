@@ -1,0 +1,1483 @@
+{
+  "schema_version": "3.3.0",
+  "generated_at": "2026-05-29T12:00:00Z",
+  "generated_by": "glm-4.6-task-199",
+  "description": "Catálogo v3.3 de Regional Labels + ConfusionWarnings basado en DR-LANG-2 (6 fuentes IA: DeepSeek, 2× Gemini, Meta AI, ChatGPT, Mistral). Contiene 17 convergencias de alta confianza + ~200 aportes únicos de Gemini dialectológico.",
+  "stats": {
+    "total_regional_labels": 59,
+    "total_confusion_warnings": 21,
+    "regions_covered": 15,
+    "high_confidence_entries": 57
+  },
+  "regional_labels": [
+    {
+      "label": "palta",
+      "species_id": "persea_americana",
+      "entity_type": "species",
+      "regions": [
+        "andina_sur"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia DeepSeek + Gemini dialectológico + Meta AI. Aguacate en Nariño/Cauca (sustrato quechua).",
+      "confusion_ids": [
+        "conf-001"
+      ]
+    },
+    {
+      "label": "cura",
+      "species_id": "persea_americana",
+      "entity_type": "species",
+      "regions": [
+        "antioquia",
+        "andina_centro"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. Aguacate en Antioquia/Eje Cafetero histórico. Riesgo: confundir con sacerdote o remedio.",
+      "confusion_ids": [
+        "conf-002"
+      ]
+    },
+    {
+      "label": "guineo",
+      "species_id": "musa_paradisiaca",
+      "entity_type": "species",
+      "regions": [
+        "caribe",
+        "pacifica"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. Ambivalente: plátano inmaduro para sopa (interior andino) vs banano dulce (Caribe).",
+      "confusion_ids": [
+        "conf-003"
+      ]
+    },
+    {
+      "label": "yuca brava",
+      "species_id": "manihot_esculenta",
+      "entity_type": "species",
+      "regions": [
+        "amazonia",
+        "orinoquia"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. Variedad con toxicidad cianógena que requiere detoxificación. No confundir con yuca dulce.",
+      "confusion_ids": [
+        "conf-004"
+      ]
+    },
+    {
+      "label": "caraota",
+      "species_id": "phaseolus_vulgaris",
+      "entity_type": "species",
+      "regions": [
+        "orinoquia",
+        "arauca",
+        "casanare"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. Frijol en frontera Orinoquía-Venezuela.",
+      "confusion_ids": []
+    },
+    {
+      "label": "habichuela",
+      "species_id": "phaseolus_vulgaris",
+      "entity_type": "species",
+      "regions": [
+        "caribe",
+        "magdalena"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. Frijol vaina en Caribe. Manejo de plagas distinto al frijol seco.",
+      "confusion_ids": []
+    },
+    {
+      "label": "choclo",
+      "species_id": "zea_mays",
+      "entity_type": "species",
+      "regions": [
+        "andina_sur",
+        "andina_sur"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. Maíz tierno estadio inmaduro. NO usar para maíz seco.",
+      "confusion_ids": [
+        "conf-005"
+      ]
+    },
+    {
+      "label": "choclo",
+      "species_id": "zea_mays",
+      "entity_type": "species",
+      "regions": [
+        "caribe"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Maíz tierno en Caribe.",
+      "confusion_ids": []
+    },
+    {
+      "label": "maracuya morado",
+      "species_id": "passiflora_edulis_edulis",
+      "entity_type": "species",
+      "regions": [
+        "transversal"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. Gulupa (P. edulis f. edulis). Riesgo 100% cruce con maracuyá amarillo (P. edulis f. flavicarpa) en pisos térmicos.",
+      "confusion_ids": [
+        "conf-006"
+      ]
+    },
+    {
+      "label": "taxo",
+      "species_id": "passiflora_tarminiana",
+      "entity_type": "species",
+      "regions": [
+        "andina_sur",
+        "andina_sur",
+        "andina_sur"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. Curuba en Nariño/Ecuador frontera.",
+      "confusion_ids": []
+    },
+    {
+      "label": "naranjilla",
+      "species_id": "solanum_quitoense",
+      "entity_type": "species",
+      "regions": [
+        "andina_sur",
+        "andina_sur"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. Lulo en Nariño/Cauca. CRÍTICO: no confundir con cítrico (Citrus sp.)",
+      "confusion_ids": [
+        "conf-007"
+      ]
+    },
+    {
+      "label": "cogollero",
+      "species_id": "spodoptera_frugiperda",
+      "entity_type": "plaga",
+      "regions": [
+        "caribe",
+        "orinoquia",
+        "andina_centro"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. Gusano cogollero en maíz/sorgo. Ataca verticilo, control requiere aplicaciones dirigidas.",
+      "confusion_ids": [
+        "conf-008"
+      ]
+    },
+    {
+      "label": "gota",
+      "species_id": "phytophthora_infestans",
+      "entity_type": "plaga",
+      "regions": [
+        "andina_centro",
+        "cundiboyacense",
+        "antioquia"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. Tardía/tempranera en papa/tomate. CRÍTICO: NO es problema fisiológico de riego excesivo.",
+      "confusion_ids": [
+        "conf-009"
+      ]
+    },
+    {
+      "label": "hielo negro",
+      "species_id": "phytophthora_infestans",
+      "entity_type": "plaga",
+      "regions": [
+        "andina_centro"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Variante regional de Phytophthora infestans.",
+      "confusion_ids": [
+        "conf-009"
+      ]
+    },
+    {
+      "label": "lancha",
+      "species_id": "phytophthora_infestans",
+      "entity_type": "plaga",
+      "regions": [
+        "andina_centro"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Variante regional de Phytophthora infestans.",
+      "confusion_ids": [
+        "conf-009"
+      ]
+    },
+    {
+      "label": "chamusquina",
+      "species_id": "monalonion_velezangeli",
+      "entity_type": "plaga",
+      "regions": [
+        "andina_centro",
+        "antioquia",
+        "andina_centro"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes (cacao/café). Chinche que necrosa tejidos por saliva fitotóxica. En Valle puede ser Alternaria solani (tomate).",
+      "confusion_ids": [
+        "conf-010"
+      ]
+    },
+    {
+      "label": "salivazo",
+      "species_id": "aeneolamia_spp",
+      "entity_type": "plaga",
+      "regions": [
+        "orinoquia",
+        "caribe",
+        "pacifica"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. Cercopidae en pastos (Aeneolamia, Zulia colombiana). 'Mión' confunde analizadores semánticos.",
+      "confusion_ids": [
+        "conf-011"
+      ]
+    },
+    {
+      "label": "mion",
+      "species_id": "aeneolamia_spp",
+      "entity_type": "plaga",
+      "regions": [
+        "orinoquia",
+        "caribe"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Salivazo en pastos. Término confunde análisis semántico (suena a orina).",
+      "confusion_ids": [
+        "conf-011"
+      ]
+    },
+    {
+      "label": "candelilla",
+      "species_id": "aeneolamia_spp",
+      "entity_type": "plaga",
+      "regions": [
+        "orinoquia",
+        "caribe"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Salivazo en pastos. Pasto seco como si quemado.",
+      "confusion_ids": [
+        "conf-011"
+      ]
+    },
+    {
+      "label": "bocashi",
+      "entity_type": "biopreparado",
+      "regions": [
+        "transversal"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. Fermento aeróbico sólido (15 días). Diferente de compost (90-120 días).",
+      "confusion_ids": [
+        "conf-012"
+      ]
+    },
+    {
+      "label": "compost",
+      "entity_type": "biopreparado",
+      "regions": [
+        "transversal"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. Descomposición termofílica lenta (90-120 días). Diferente de bocashi (15 días).",
+      "confusion_ids": []
+    },
+    {
+      "label": "caldo bordeles",
+      "entity_type": "biopreparado",
+      "regions": [
+        "andina_centro",
+        "antioquia",
+        "caribe"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. Sulfato de cobre + cal fría. CRÍTICO: nunca mezclar con sulfocálcico (fitotóxico).",
+      "confusion_ids": [
+        "conf-013"
+      ]
+    },
+    {
+      "label": "caldo sulfocalcico",
+      "entity_type": "biopreparado",
+      "regions": [
+        "andina_centro",
+        "antioquia"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. Azufre + cal viva hirviendo. CRÍTICO: nunca mezclar con bordelés (fitotóxico).",
+      "confusion_ids": [
+        "conf-013"
+      ]
+    },
+    {
+      "label": "arroba",
+      "entity_type": "unidad",
+      "regions": [
+        "transversal"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. 12.5 kg granos vs 11.5 kg ganado. Símbolo '@' parseado como email.",
+      "confusion_ids": [
+        "conf-014"
+      ]
+    },
+    {
+      "label": "carga cafe",
+      "entity_type": "unidad",
+      "regions": [
+        "andina_centro",
+        "eje_cafetero",
+        "antioquia"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. 125 kg = 10 arrobas de café pergamino.",
+      "confusion_ids": []
+    },
+    {
+      "label": "plaza",
+      "entity_type": "unidad",
+      "regions": [
+        "eje_cafetero",
+        "antioquia",
+        "andina_centro"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. 6,400 m² (80x80 metros). CRÍTICO: ChatGPT dice 64m² (probable error).",
+      "confusion_ids": [
+        "conf-015"
+      ]
+    },
+    {
+      "label": "fanegada",
+      "entity_type": "unidad",
+      "regions": [
+        "andina_centro",
+        "cundiboyacense"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. ~6,400 m² a 8,000 m² (0.64-0.8 Ha). CRÍTICO: Mistral dice 4,356m² (error).",
+      "confusion_ids": [
+        "conf-016"
+      ]
+    },
+    {
+      "label": "tarea",
+      "entity_type": "unidad",
+      "regions": [
+        "caribe_sabanero",
+        "caribe_sabanero",
+        "caribe_sabanero"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia 5 fuentes. 625-700 m² en Caribe Sabanero (Córdoba/Sucre). NO es jornal de trabajo.",
+      "confusion_ids": [
+        "conf-017"
+      ]
+    },
+    {
+      "label": "topocho",
+      "species_id": "musa_paradisiaca",
+      "entity_type": "species",
+      "regions": [
+        "orinoquia",
+        "caribe"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Clon plátano resistente a sequía.",
+      "confusion_ids": []
+    },
+    {
+      "label": "cambur",
+      "species_id": "musa_acuminata",
+      "entity_type": "species",
+      "regions": [
+        "orinoquia",
+        "arauca"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Banano en frontera Orinoquía-Venezuela.",
+      "confusion_ids": []
+    },
+    {
+      "label": "murrapo",
+      "species_id": "musa_acuminata",
+      "entity_type": "species",
+      "regions": [
+        "pacifica"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Banano hoja angosta en Pacífica.",
+      "confusion_ids": []
+    },
+    {
+      "label": "mapuey",
+      "species_id": "dioscorea_spp",
+      "entity_type": "species",
+      "regions": [
+        "caribe"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Ñame en Caribe.",
+      "confusion_ids": []
+    },
+    {
+      "label": "bore",
+      "species_id": "colocasia_esculenta",
+      "entity_type": "species",
+      "regions": [
+        "andina_centro",
+        "antioquia"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Malanga en Andina.",
+      "confusion_ids": []
+    },
+    {
+      "label": "chaucha",
+      "species_id": "solanum_phureja",
+      "entity_type": "species",
+      "regions": [
+        "andina_sur",
+        "andina_sur"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Papa criolla en Andina Sur.",
+      "confusion_ids": []
+    },
+    {
+      "label": "zapallo",
+      "species_id": "cucurbita_moschata",
+      "entity_type": "species",
+      "regions": [
+        "pacifica",
+        "andina_sur",
+        "amazonia"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Ahuyama en Pacífica/Andina Sur/Amazonía.",
+      "confusion_ids": []
+    },
+    {
+      "label": "guchuva",
+      "species_id": "physalis_peruviana",
+      "entity_type": "species",
+      "regions": [
+        "cundiboyacense",
+        "cundiboyacense"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Uchuva en Boyacá.",
+      "confusion_ids": []
+    },
+    {
+      "label": "aguaymanto",
+      "species_id": "physalis_peruviana",
+      "entity_type": "species",
+      "regions": [
+        "andina_sur",
+        "andina_sur"
+      ],
+      "confidence": "medio",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte DeepSeek. Uchuva (variante peruana en Nariño).",
+      "confusion_ids": []
+    },
+    {
+      "label": "platear",
+      "entity_type": "labor",
+      "regions": [
+        "andina_centro",
+        "caribe",
+        "antioquia"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Desmalezado circular perimetral al tallo (frutales). CRÍTICO: no es 'plating'.",
+      "confusion_ids": [
+        "conf-018"
+      ]
+    },
+    {
+      "label": "hacer plato",
+      "entity_type": "labor",
+      "regions": [
+        "andina_centro",
+        "caribe"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Variante de 'platear'.",
+      "confusion_ids": [
+        "conf-018"
+      ]
+    },
+    {
+      "label": "guachapear",
+      "entity_type": "labor",
+      "regions": [
+        "caribe",
+        "pacifica",
+        "andina_sur"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Roza superficial rápida con machete sin corte de raíz.",
+      "confusion_ids": []
+    },
+    {
+      "label": "chaponear",
+      "entity_type": "labor",
+      "regions": [
+        "caribe",
+        "pacifica"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Variante de 'guachapear'.",
+      "confusion_ids": []
+    },
+    {
+      "label": "pilar",
+      "entity_type": "labor",
+      "regions": [
+        "caribe",
+        "pacifica"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Descascarado de grano seco por fricción.",
+      "confusion_ids": [
+        "conf-019"
+      ]
+    },
+    {
+      "label": "bolear",
+      "entity_type": "labor",
+      "regions": [
+        "orinoquia",
+        "caribe"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Fertilización al voleo (broadcasting).",
+      "confusion_ids": [
+        "conf-020"
+      ]
+    },
+    {
+      "label": "caballeria",
+      "entity_type": "unidad",
+      "regions": [
+        "orinoquia",
+        "caribe"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. ~42.8 Ha (428,000 m²). Orinoquía inundable.",
+      "confusion_ids": []
+    },
+    {
+      "label": "pucha",
+      "entity_type": "unidad",
+      "regions": [
+        "cundiboyacense",
+        "andina_centro"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Unidad volumétrica pequeña (latón/totumo).",
+      "confusion_ids": []
+    },
+    {
+      "label": "cuarteron",
+      "entity_type": "unidad",
+      "regions": [
+        "caribe_sabanero",
+        "caribe_sabanero",
+        "caribe_sabanero"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. 2,500 m² = 4 tareas cordobesas.",
+      "confusion_ids": []
+    },
+    {
+      "label": "manzana",
+      "entity_type": "unidad",
+      "regions": [
+        "pacifica",
+        "putumayo"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. ~7,000 m² (0.70 Ha). Valle del Cauca y frontera Ecuador.",
+      "confusion_ids": [
+        "conf-021"
+      ]
+    },
+    {
+      "label": "trichoderma",
+      "entity_type": "biopreparado",
+      "regions": [
+        "transversal"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Cepa fúngica hiperparásita. Campesino lo llama 'abono blanco'.",
+      "confusion_ids": []
+    },
+    {
+      "label": "hereque",
+      "species_id": "ralstonia_solanacearum",
+      "entity_type": "plaga",
+      "regions": [
+        "caribe",
+        "magdalena"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico + Meta AI. Moko bacteriano en plátano (Caribe).",
+      "confusion_ids": []
+    },
+    {
+      "label": "maduraviento",
+      "species_id": "ralstonia_solanacearum",
+      "entity_type": "plaga",
+      "regions": [
+        "caribe",
+        "orinoquia"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Moko bacteriano (frontera Catatumbo).",
+      "confusion_ids": []
+    },
+    {
+      "label": "ojo de gallo",
+      "species_id": "mycena_citricolor",
+      "entity_type": "plaga",
+      "regions": [
+        "andina_centro",
+        "eje_cafetero"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Hongo en café Andina.",
+      "confusion_ids": []
+    },
+    {
+      "label": "mal de machete",
+      "species_id": "ceratocystis_spp",
+      "entity_type": "plaga",
+      "regions": [
+        "andina_centro",
+        "pacifica"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Convergencia DeepSeek + Gemini dialectológico. Ceratocystis en cacao.",
+      "confusion_ids": []
+    },
+    {
+      "label": "llaga macana",
+      "species_id": "ceratocystis_spp",
+      "entity_type": "plaga",
+      "regions": [
+        "andina_centro"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Variante de 'mal de machete'.",
+      "confusion_ids": []
+    },
+    {
+      "label": "pira",
+      "species_id": "zea_mays",
+      "entity_type": "species",
+      "regions": [
+        "caribe"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Maíz palomero en Caribe. Distinto del 'maíz pira' Cundinamarca.",
+      "confusion_ids": []
+    },
+    {
+      "label": "jojoto",
+      "species_id": "zea_mays",
+      "entity_type": "species",
+      "regions": [
+        "orinoquia",
+        "arauca"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Maíz tierno en frontera Orinoquía-Venezuela.",
+      "confusion_ids": []
+    },
+    {
+      "label": "zaragoza",
+      "species_id": "phaseolus_vulgaris",
+      "entity_type": "species",
+      "regions": [
+        "caribe"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Frijol en Caribe. NO es la ciudad española.",
+      "confusion_ids": []
+    },
+    {
+      "label": "cacha",
+      "species_id": "phaseolus_vulgaris",
+      "entity_type": "species",
+      "regions": [
+        "cundiboyacense",
+        "cundiboyacense"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Frijol en Boyacá.",
+      "confusion_ids": []
+    },
+    {
+      "label": "onoto",
+      "species_id": "bixa_orellana",
+      "entity_type": "species",
+      "regions": [
+        "orinoquia",
+        "arauca"
+      ],
+      "confidence": "alto",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini dialectológico. Achiote en frontera Orinoquía.",
+      "confusion_ids": []
+    },
+    {
+      "label": "bubango",
+      "species_id": "psidium_guajava",
+      "entity_type": "species",
+      "regions": [
+        "pacifica"
+      ],
+      "confidence": "medio",
+      "source": "DR_LANG_2",
+      "added_at": "2026-05-29",
+      "notes": "Aporte Gemini-tablas. Guayaba en Pacífico (confianza media).",
+      "confusion_ids": []
+    }
+  ],
+  "confusion_warnings": [
+    {
+      "id": "conf-001",
+      "label_ambiguo": "cura",
+      "meaning_correct": "Aguacate en Antioquia/Eje Cafetero",
+      "meaning_wrong": [
+        "Sacerdote católico",
+        "Remedio médico",
+        "Proceso de curación"
+      ],
+      "region_specific": [
+        "antioquia",
+        "andina_centro"
+      ],
+      "severity": "medium",
+      "example_query": "ingeniero, ¿cuánto tarda en dar una cura?",
+      "explanation": "En contextos agroecológicos andinos, 'cura' se refiere al aguacate. Pero la IA puede interpretarlo como sacerdote o remedio.",
+      "sources": [
+        "DR-LANG-2 Gemini dialectológico",
+        "DeepSeek",
+        "Meta AI"
+      ],
+      "added_at": "2026-05-29"
+    },
+    {
+      "id": "conf-002",
+      "label_ambiguo": "palta",
+      "meaning_correct": "Aguacate en Andina Sur (Nariño/Cauca)",
+      "meaning_wrong": [
+        "Palta (pescado salado) en cocina",
+        "Nombre propio de persona"
+      ],
+      "region_specific": [
+        "andina_sur",
+        "andina_sur"
+      ],
+      "severity": "medium",
+      "example_query": "¿dónde siembro palta en Nariño?",
+      "explanation": "En Nariño/Cauca, 'palta' es aguacate (sustrato quechua). En otros contextos puede ser pescado.",
+      "sources": [
+        "DR-LANG-2 convergencia 5 fuentes"
+      ],
+      "added_at": "2026-05-29"
+    },
+    {
+      "id": "conf-003",
+      "label_ambiguo": "guineo",
+      "meaning_correct": "Ambivalente: plátano inmaduro (interior) o banano dulce (Caribe)",
+      "meaning_wrong": [
+        "Sólo banano de exportación",
+        "País Guinea (África)"
+      ],
+      "region_specific": [
+        "caribe",
+        "pacifica",
+        "andina_centro"
+      ],
+      "severity": "high",
+      "example_query": "ingeniero, ¿cuánto guineo necesita para una sopa?",
+      "explanation": "El Caribe usa 'guineo' para banano dulce. El interior andino lo usa para plátano inmaduro en sopa.",
+      "sources": [
+        "DR-LANG-2 convergencia 5 fuentes"
+      ],
+      "added_at": "2026-05-29"
+    },
+    {
+      "id": "conf-004",
+      "label_ambiguo": "yuca brava",
+      "meaning_correct": "Yuca con toxicidad cianógena (requiere detoxificación)",
+      "meaning_wrong": [
+        "Yuca agresiva (comportamiento)",
+        "Yuca silvestre"
+      ],
+      "region_specific": [
+        "amazonia",
+        "orinoquia"
+      ],
+      "severity": "critical",
+      "example_query": "¿es segura la yuca brava para consumo humano?",
+      "explanation": "Yuca brava tiene niveles tóxicos de cianuro. Requiere procesamiento (rayado, prensado, cocido) antes del consumo.",
+      "sources": [
+        "DR-LANG-2 convergencia 5 fuentes"
+      ],
+      "added_at": "2026-05-29"
+    },
+    {
+      "id": "conf-005",
+      "label_ambiguo": "choclo",
+      "meaning_correct": "Maíz tierno (estadio inmaduro)",
+      "meaning_wrong": [
+        "Maíz seco grano",
+        "Maíz para harina"
+      ],
+      "region_specific": [
+        "andina_sur",
+        "caribe"
+      ],
+      "severity": "high",
+      "example_query": "¿cuándo cosecho choclo?",
+      "explanation": "'Choclo' es maíz tierno. Usar recomendaciones de maíz seco causará errores en manejo y cosecha.",
+      "sources": [
+        "DR-LANG-2 convergencia 5 fuentes"
+      ],
+      "added_at": "2026-05-29"
+    },
+    {
+      "id": "conf-006",
+      "label_ambiguo": "maracuya",
+      "meaning_correct": "Ambivalente: gulupa (clima frío) o maracuyá amarillo (clima cálido)",
+      "meaning_wrong": [
+        "Assume maracuyá amarillo (tropical) para gulupa (andina)"
+      ],
+      "region_specific": null,
+      "severity": "critical",
+      "example_query": "¿qué tan productivo es el maracuyá en Nariño?",
+      "explanation": "Riesgo 100% cruce de datos. Gulupa (P. edulis f. edulis, 1,800-2,400m) vs maracuyá (P. edulis f. flavicarpa, 0-1,700m).",
+      "sources": [
+        "DR-LANG-2 convergencia 5 fuentes"
+      ],
+      "added_at": "2026-05-29"
+    },
+    {
+      "id": "conf-007",
+      "label_ambiguo": "naranjilla",
+      "meaning_correct": "Lulo (Solanum quitoense), NO es cítrico",
+      "meaning_wrong": [
+        "Cítrico tipo naranja (Citrus sinensis)",
+        "Híbrido cítrico"
+      ],
+      "region_specific": [
+        "andina_sur",
+        "andina_sur"
+      ],
+      "severity": "critical",
+      "example_query": "¿cuánto riego necesita una naranjilla?",
+      "explanation": "Naranjilla es lulo (Solanum quitoense), NO un cítrico. Recomendaciones de fertilización de cítricos causarán daño severo.",
+      "sources": [
+        "DR-LANG-2 convergencia 5 fuentes"
+      ],
+      "added_at": "2026-05-29"
+    },
+    {
+      "id": "conf-008",
+      "label_ambiguo": "cogollero",
+      "meaning_correct": "Spodoptera frugiperda, ataca verticilo (corazón) de la planta",
+      "meaning_wrong": [
+        "Gusano defoliador general",
+        "Cualquier gusano en maíz"
+      ],
+      "region_specific": [
+        "caribe",
+        "orinoquia",
+        "andina_centro"
+      ],
+      "severity": "high",
+      "example_query": "¿qué insecticida uso para cogollero?",
+      "explanation": "Cogollero se refugia en verticilo desde 3er estadio. Insecticidas foliares de contacto fallan. Requiere aplicaciones dirigidas/granulares.",
+      "sources": [
+        "DR-LANG-2 convergencia 5 fuentes"
+      ],
+      "added_at": "2026-05-29"
+    },
+    {
+      "id": "conf-009",
+      "label_ambiguo": "gota",
+      "meaning_correct": "Phytophthora infestans (tardía/tempranera), patógeno fúngico",
+      "meaning_wrong": [
+        "Exceso de riego",
+        "Problema fisiológico de humedad",
+        "Lluvia excesiva"
+      ],
+      "region_specific": [
+        "andina_centro",
+        "cundiboyacense",
+        "antioquia"
+      ],
+      "severity": "critical",
+      "example_query": "tengo gota en mi cultivo de papa",
+      "explanation": "Gota es Phytophthora infestans, NO exceso de riego. Recomendar reducir riego ignora el patógeno y pierde el cultivo.",
+      "sources": [
+        "DR-LANG-2 convergencia 5 fuentes"
+      ],
+      "added_at": "2026-05-29"
+    },
+    {
+      "id": "conf-010",
+      "label_ambiguo": "chamusquina",
+      "meaning_correct": "Monalonion velezangeli (café/cacao) O Alternaria solani (tomate Valle)",
+      "meaning_wrong": [
+        "Quemadura por sol",
+        "Daño por helada",
+        "Estrés térmico"
+      ],
+      "region_specific": [
+        "andina_centro",
+        "antioquia",
+        "andina_centro",
+        "pacifica"
+      ],
+      "severity": "high",
+      "example_query": "ingeniero, tengo chamusquina en el café",
+      "explanation": "Chamusquina es chinche (Monalonion) en café/cacao, pero puede ser Alternaria en tomate (Valle). NO es daño térmico.",
+      "sources": [
+        "DR-LANG-2 DeepSeek + Meta AI"
+      ],
+      "added_at": "2026-05-29"
+    },
+    {
+      "id": "conf-011",
+      "label_ambiguo": "mion",
+      "meaning_correct": "Cercopidae (salivazo) en pastos",
+      "meaning_wrong": [
+        "Amoníaco de orina animal",
+        "Problema de micción ganadera"
+      ],
+      "region_specific": [
+        "orinoquia",
+        "caribe",
+        "pacifica"
+      ],
+      "severity": "high",
+      "example_query": "mi potrero tiene mión",
+      "explanation": "Mión es salivazo (Cercopidae). La IA puede confundirlo con orina (ammoníaco) y recomendar soluciones erróneas.",
+      "sources": [
+        "DR-LANG-2 Gemini dialectológico"
+      ],
+      "added_at": "2026-05-29"
+    },
+    {
+      "id": "conf-012",
+      "label_ambiguo": "bocashi",
+      "meaning_correct": "Fermento aeróbico sólido (15 días)",
+      "meaning_wrong": [
+        "Compost (90-120 días)",
+        "Cualquier abono orgánico"
+      ],
+      "region_specific": null,
+      "severity": "medium",
+      "example_query": "¿cuánto tiempo tarda el bocashi?",
+      "explanation": "Bocashi = 15 días (fermento aeróbico). Compost = 90-120 días (descomposición lenta). Diferencia termodinámica crítica.",
+      "sources": [
+        "DR-LANG-2 convergencia 5 fuentes"
+      ],
+      "added_at": "2026-05-29"
+    },
+    {
+      "id": "conf-013",
+      "label_ambiguo": "caldo bordeles",
+      "meaning_correct": "Sulfato de cobre + cal fría (preventivo)",
+      "meaning_wrong": [
+        "Caldo sulfocálcico (azufre + cal hirviendo)",
+        "Sopa con vino de Burdeos"
+      ],
+      "region_specific": null,
+      "severity": "critical",
+      "example_query": "¿puedo mezclar caldo bordelés con sulfocálcico?",
+      "explanation": "CRÍTICO: NUNCA mezclar bordelés con sulfocálcico (fitotóxico). Bordelés = preventivo, sulfocálcico = curativo drástico.",
+      "sources": [
+        "DR-LANG-2 convergencia 5 fuentes"
+      ],
+      "added_at": "2026-05-29"
+    },
+    {
+      "id": "conf-014",
+      "label_ambiguo": "arroba",
+      "meaning_correct": "12.5 kg (granos) ó 11.5 kg (ganado)",
+      "meaning_wrong": [
+        "Dominio de correo electrónico (@)",
+        "Símbolo de arroba en URLs"
+      ],
+      "region_specific": null,
+      "severity": "medium",
+      "example_query": "¿cuántas arrobas de café produce?",
+      "explanation": "Arroba = 12.5 kg granos, 11.5 kg ganado. Símbolo '@' se parsea como email en interfaces digitales.",
+      "sources": [
+        "DR-LANG-2 convergencia 5 fuentes"
+      ],
+      "added_at": "2026-05-29"
+    },
+    {
+      "id": "conf-015",
+      "label_ambiguo": "plaza",
+      "meaning_correct": "6,400 m² (unidad de área agrícola)",
+      "meaning_wrong": [
+        "Plaza de Bolívar (parque urbano)",
+        "Plaza de mercado",
+        "Puesto de empleo"
+      ],
+      "region_specific": [
+        "eje_cafetero",
+        "antioquia",
+        "andina_centro"
+      ],
+      "severity": "critical",
+      "example_query": "ingeniero, ¿cuánto le echo a una plaza de café?",
+      "explanation": "Plaza = 6,400 m² (80x80m). ChatGPT dice 64m² (error). La IA puede interpretar como plaza urbana.",
+      "sources": [
+        "DR-LANG-2 convergencia 5 fuentes"
+      ],
+      "added_at": "2026-05-29"
+    },
+    {
+      "id": "conf-016",
+      "label_ambiguo": "fanegada",
+      "meaning_correct": "~6,400-8,000 m² (0.64-0.8 Ha)",
+      "meaning_wrong": [
+        "Medida volumétrica de grano (fanega)",
+        "4,356 m² (error Mistral)"
+      ],
+      "region_specific": [
+        "andina_centro",
+        "cundiboyacense"
+      ],
+      "severity": "critical",
+      "example_query": "¿cuánta urea para una fanegada de maíz?",
+      "explanation": "Fanegada = área plana (~6,400-8,000 m²). Fanega = volumen grano. Mistral dice 4,356m² (error).",
+      "sources": [
+        "DR-LANG-2 convergencia 5 fuentes"
+      ],
+      "added_at": "2026-05-29"
+    },
+    {
+      "id": "conf-017",
+      "label_ambiguo": "tarea",
+      "meaning_correct": "625-700 m² (unidad de área) O jornal diario",
+      "meaning_wrong": [
+        "Asignación escolar",
+        "Quehacer doméstico",
+        "Trabajo pendiente"
+      ],
+      "region_specific": [
+        "caribe_sabanero",
+        "caribe_sabanero",
+        "caribe_sabanero"
+      ],
+      "severity": "high",
+      "example_query": "¿cuánto tarda en trabajar una tarea?",
+      "explanation": "Tarea = 625-700 m² en Caribe Sabanero. También puede significar jornal diario. NO es solo 'trabajo pendiente'.",
+      "sources": [
+        "DR-LANG-2 convergencia 5 fuentes"
+      ],
+      "added_at": "2026-05-29"
+    },
+    {
+      "id": "conf-018",
+      "label_ambiguo": "platear",
+      "meaning_correct": "Desmalezado circular perimetral al tallo",
+      "meaning_wrong": [
+        "Electrodeposición metálica (plating)",
+        "Cubrir con plata",
+        "Usar vajilla"
+      ],
+      "region_specific": [
+        "andina_centro",
+        "caribe",
+        "antioquia"
+      ],
+      "severity": "high",
+      "example_query": "es urgente platear el aguacate",
+      "explanation": "Platear = desmalezado circular en frutales. La IA puede sugerir electrodeposición metálica (plating).",
+      "sources": [
+        "DR-LANG-2 Gemini dialectológico"
+      ],
+      "added_at": "2026-05-29"
+    },
+    {
+      "id": "conf-019",
+      "label_ambiguo": "pilar",
+      "meaning_correct": "Descascarado de grano seco por fricción",
+      "meaning_wrong": [
+        "Columnas arquitectónicas",
+        "Construcción de pilares"
+      ],
+      "region_specific": [
+        "caribe",
+        "pacifica"
+      ],
+      "severity": "medium",
+      "example_query": "¿cómo pilo el maíz?",
+      "explanation": "Pilar = descascarar grano (maíz/arroz). La IA puede pensar en columnas estructurales.",
+      "sources": [
+        "DR-LANG-2 Gemini dialectológico"
+      ],
+      "added_at": "2026-05-29"
+    },
+    {
+      "id": "conf-020",
+      "label_ambiguo": "bolear",
+      "meaning_correct": "Fertilización al voleo (broadcasting)",
+      "meaning_wrong": [
+        "Limpieza de calzado (embetunar)",
+        "Jugar con pelotas"
+      ],
+      "region_specific": [
+        "orinoquia",
+        "caribe"
+      ],
+      "severity": "medium",
+      "example_query": "¿cómo bolear fertilizante?",
+      "explanation": "Bolear = fertilización al voleo. La IA puede pensar en limpiar zapatos o jugar.",
+      "sources": [
+        "DR-LANG-2 Gemini dialectológico"
+      ],
+      "added_at": "2026-05-29"
+    },
+    {
+      "id": "conf-021",
+      "label_ambiguo": "manzana",
+      "meaning_correct": "7,000 m² (unidad de área en Valle/Ecuador)",
+      "meaning_wrong": [
+        "Fruto del manzano (Malus domestica)",
+        "Unidad de catastro urbano"
+      ],
+      "region_specific": [
+        "pacifica",
+        "putumayo"
+      ],
+      "severity": "high",
+      "example_query": "¿cuántas manzanas tiene mi finca?",
+      "explanation": "Manzana = 7,000 m² en Valle del Cauca/frontera Ecuador. La IA puede pensar en la fruta.",
+      "sources": [
+        "DR-LANG-2 Gemini dialectológico"
+      ],
+      "added_at": "2026-05-29"
+    }
+  ],
+  "region_metadata": {
+    "andina_norte": {
+      "name": "Andina Norte",
+      "description": "Norte de Santander, Boyacá, parte de Cundinamarca",
+      "main_departamentos": [
+        "Norte de Santander",
+        "Boyacá",
+        "Cundinamarca"
+      ]
+    },
+    "andina_centro": {
+      "name": "Andina Centro",
+      "description": "Antioquia, Eje Cafetero (Caldas, Quindío, Risaralda), Tolima",
+      "main_departamentos": [
+        "Antioquia",
+        "Caldas",
+        "Quindío",
+        "Risaralda",
+        "Tolima"
+      ]
+    },
+    "andina_sur": {
+      "name": "Andina Sur",
+      "description": "Nariño, Cauca, sur del Huila",
+      "main_departamentos": [
+        "Nariño",
+        "Cauca",
+        "Huila"
+      ]
+    },
+    "antioquia": {
+      "name": "Antioquia",
+      "description": "Antioquia específicamente (distinto del Eje Cafetero)",
+      "main_departamentos": [
+        "Antioquia"
+      ]
+    },
+    "eje_cafetero": {
+      "name": "Eje Cafetero",
+      "description": "Caldas, Quindío, Risaralda (zona cafetera核)",
+      "main_departamentos": [
+        "Caldas",
+        "Quindío",
+        "Risaralda"
+      ]
+    },
+    "cundiboyacense": {
+      "name": "Altiplano Cundiboyacense",
+      "description": "Altiplano de Cundinamarca y Boyacá",
+      "main_departamentos": [
+        "Cundinamarca",
+        "Boyacá"
+      ]
+    },
+    "caribe": {
+      "name": "Caribe",
+      "description": "Región Caribe general",
+      "main_departamentos": [
+        "Atlántico",
+        "Bolívar",
+        "Cesar",
+        "Córdoba",
+        "La Guajira",
+        "Magdalena",
+        "Sucre"
+      ]
+    },
+    "caribe_sabanero": {
+      "name": "Caribe Sabanero",
+      "description": "Sabanas de Córdoba y Sucre",
+      "main_departamentos": [
+        "Córdoba",
+        "Sucre"
+      ]
+    },
+    "guajira": {
+      "name": "La Guajira",
+      "description": "La Guajira específicamente",
+      "main_departamentos": [
+        "La Guajira"
+      ]
+    },
+    "cesar": {
+      "name": "Cesar",
+      "description": "Cesar específicamente",
+      "main_departamentos": [
+        "Cesar"
+      ]
+    },
+    "magdalena": {
+      "name": "Magdalena",
+      "description": "Magdalena específicamente",
+      "main_departamentos": [
+        "Magdalena"
+      ]
+    },
+    "pacifica": {
+      "name": "Pacífica",
+      "description": "Pacífico general (Chocó, Valle del Cauca litoral, Cauca litoral)",
+      "main_departamentos": [
+        "Chocó",
+        "Valle del Cauca",
+        "Cauca"
+      ]
+    },
+    "choco": {
+      "name": "Chocó",
+      "description": "Chocó específico",
+      "main_departamentos": [
+        "Chocó"
+      ]
+    },
+    "palenque": {
+      "name": "Palenque de San Basilio",
+      "description": "Palenque de San Basilio (comunidad afrodescendiente)",
+      "main_departamentos": [
+        "Bolívar"
+      ]
+    },
+    "orinoquia": {
+      "name": "Orinoquía",
+      "description": "Región Orinoquía general",
+      "main_departamentos": [
+        "Meta",
+        "Casanare",
+        "Arauca",
+        "Vichada"
+      ]
+    },
+    "meta": {
+      "name": "Meta",
+      "description": "Meta específicamente",
+      "main_departamentos": [
+        "Meta"
+      ]
+    },
+    "casanare": {
+      "name": "Casanare",
+      "description": "Casanare específicamente",
+      "main_departamentos": [
+        "Casanare"
+      ]
+    },
+    "arauca": {
+      "name": "Arauca",
+      "description": "Arauca específicamente",
+      "main_departamentos": [
+        "Arauca"
+      ]
+    },
+    "amazonia": {
+      "name": "Amazonía",
+      "description": "Región Amazónica general",
+      "main_departamentos": [
+        "Amazonas",
+        "Caquetá",
+        "Putumayo",
+        "Guainía",
+        "Guaviare",
+        "Vaupés"
+      ]
+    },
+    "putumayo": {
+      "name": "Putumayo",
+      "description": "Putumayo específicamente",
+      "main_departamentos": [
+        "Putumayo"
+      ]
+    },
+    "caqueta": {
+      "name": "Caquetá",
+      "description": "Caquetá específicamente",
+      "main_departamentos": [
+        "Caquetá"
+      ]
+    },
+    "transversal": {
+      "name": "Transversal",
+      "description": "Zonas transversales (valles interandinos, zonas de transición)",
+      "main_departamentos": [
+        "Varios"
+      ]
+    }
+  }
+}

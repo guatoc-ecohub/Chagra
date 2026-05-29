@@ -5,7 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'data/catalog/**']),
   {
     // Configs Node (playwright/vite/etc.) — requieren globals.node.
     files: ['*.config.{js,mjs,ts}', 'playwright.config.js', 'vite.config.js'],
