@@ -31,6 +31,7 @@ import IosInstallBanner from './components/IosInstallBanner';
 import UpdateAvailableBanner from './components/UpdateAvailableBanner';
 import GpsFincaBanner from './components/GpsFincaBanner';
 import DataLossBanner from './components/DataLossBanner';
+import CriticalAlertBanner from './components/CriticalAlertBanner';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Lazy-loaded route components
@@ -638,6 +639,9 @@ export default function App() {
           vacío. NO se muestra en loading/login para no asustar antes de
           que la app pueda confirmar estado. */}
       {currentView !== 'loading' && currentView !== 'login' && <DataLossBanner />}
+      {/* #315 — banner crítico global: surfacea alertas graves (helada, sensor
+          crítico) sin abrir la campana. Imposible de ignorar. */}
+      {currentView !== 'loading' && currentView !== 'login' && <CriticalAlertBanner onNavigate={navigate} />}
       <Suspense fallback={<LoadingFallback />}>
         {renderView()}
       </Suspense>
