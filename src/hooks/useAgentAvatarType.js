@@ -2,7 +2,17 @@ import { useEffect, useState, useCallback } from 'react';
 
 const STORAGE_KEY = 'chagra:agent-avatar-type';
 
-export const AVATAR_TYPES = ['colibri', 'maiz'];
+// 'colibri' = avatar foto-realista (foto biopunk Lili). Es el nuevo
+// default 2026-05-28 ("reemplazar el 3D R3F" — operador). Los usuarios
+// que ya tenían 'colibri' en localStorage automáticamente ven la foto
+// sin migration (mismo slug, distinta implementación).
+//
+// 'colibri_svg' = ilustración SVG (Amazilia libando del abutilón). Antes
+// era el componente detrás de 'colibri'; ahora vive bajo su propio slug
+// para quien prefiera estilo botánico ilustrado.
+//
+// 'maiz' = planta de maíz, alternativa cultural ancestral.
+export const AVATAR_TYPES = ['colibri', 'colibri_svg', 'maiz'];
 export const DEFAULT_AVATAR_TYPE = 'colibri';
 
 function readPref() {

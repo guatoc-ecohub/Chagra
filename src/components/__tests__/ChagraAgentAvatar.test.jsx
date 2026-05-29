@@ -6,14 +6,25 @@
  *   - `onDoubleClick` se invoca al doble-click del wrapper button.
  *   - a11y: aria-label custom + role="img" + tooltip title presente cuando
  *     hay onDoubleClick.
+ *
+ * 2026-05-28: el avatar default del wrapper cambió a la foto-realista
+ * (ChagraAgentAvatarColibriPhoto). Estos tests verifican la rama SVG, así
+ * que el beforeEach fuerza `colibri_svg` en localStorage. La rama foto
+ * tiene su propio smoke test (ChagraAgentAvatarColibriPhoto si se añade).
  */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { describe, test, expect, vi } from 'vitest';
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 
 describe('ChagraAgentAvatar — task #122 glow + double-click', () => {
+  beforeEach(() => {
+    localStorage.setItem('chagra:agent-avatar-type', 'colibri_svg');
+  });
+  afterEach(() => {
+    localStorage.clear();
+  });
   test('por defecto NO incluye clase chagra-glow', () => {
     const { container } = render(<ChagraAgentAvatar state="idle" />);
     const svg = container.querySelector('svg.chagra-agent-avatar');
