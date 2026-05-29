@@ -113,7 +113,12 @@ export function aggregateNotifications(sources = {}) {
         });
     }
 
-    // 1. Onboarding incompleto
+    // 1. Onboarding incompleto.
+    // Bug fix 2026-05-28 (operador): cta_view era 'onboarding-piloto' (el
+    // formulario de invitados externos sin cuenta — "registro de mis amigos"),
+    // debe ser 'onboarding-perfil' (el onboarding extendido del usuario real,
+    // #200 OnboardingProfile.jsx) que es el que efectivamente completa el
+    // perfil que la notif pide completar.
     if (sources.onboardingComplete === false) {
         out.push({
             id: 'onboarding_incomplete',
@@ -121,7 +126,7 @@ export function aggregateNotifications(sources = {}) {
             severity: 'warning',
             title: 'Completa tu perfil',
             body: 'Cuéntame de tu finca y zona para darte mejor asesoría.',
-            cta_view: 'onboarding-piloto',
+            cta_view: 'onboarding-perfil',
             cta_label: 'Continuar',
             created_at: now,
         });

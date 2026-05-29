@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench, Sprout, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench, Sprout, ChevronRight, Camera, Trash2 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import ThemeSelector from './common/ThemeSelector';
 import AgentAvatarSelector from './Settings/AgentAvatarSelector';
@@ -63,6 +63,37 @@ const TABS = [
   { id: 'avanzado', emoji: '⚙️', label: 'Avanzado' },
 ];
 
+// Foto del operador: persiste en localStorage como data-URL JPEG. Resize a
+// 256x256 + calidad 0.82 → suele quedar 15-40KB, holgado dentro del límite
+// de 5MB que el navegador da por origen. Si la imagen original es muy
+// pesada, el resize ocurre client-side antes de guardar.
+const PHOTO_STORAGE_KEY = 'chagra:operator:photo:v1';
+const PHOTO_MAX_DIMENSION = 256;
+
+async function resizePhotoToDataUrl(file) {
+  const fileDataUrl = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error || new Error('FileReader falló'));
+    reader.readAsDataURL(file);
+  });
+  const img = await new Promise((resolve, reject) => {
+    const i = new Image();
+    i.onload = () => resolve(i);
+    i.onerror = () => reject(new Error('Imagen inválida'));
+    i.src = fileDataUrl;
+  });
+  const scale = Math.min(1, PHOTO_MAX_DIMENSION / Math.max(img.width, img.height));
+  const w = Math.round(img.width * scale);
+  const h = Math.round(img.height * scale);
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0, w, h);
+  return canvas.toDataURL('image/jpeg', 0.82);
+}
+
 export default function ProfileScreen({ onBack, onHome }) {
   const [activeTab, setActiveTab] = useState('perfil');
 
@@ -71,6 +102,46 @@ export default function ProfileScreen({ onBack, onHome }) {
       ? localStorage.getItem('chagra:operator:name') || PRIMARY_WORKER_NAME
       : PRIMARY_WORKER_NAME
   );
+
+  // Feature 2026-05-28 (operador): foto de perfil del usuario.
+  const [photoData, setPhotoData] = useState(() =>
+    typeof window !== 'undefined' ? localStorage.getItem(PHOTO_STORAGE_KEY) || '' : ''
+  );
+  const [photoError, setPhotoError] = useState(null);
+  const photoInputRef = useRef(null);
+
+  const handlePhotoSelected = async (e) => {
+    setPhotoError(null);
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setPhotoError('El archivo no parece una imagen.');
+      return;
+    }
+    try {
+      const dataUrl = await resizePhotoToDataUrl(file);
+      localStorage.setItem(PHOTO_STORAGE_KEY, dataUrl);
+      setPhotoData(dataUrl);
+      window.dispatchEvent(new CustomEvent('chagra:operator-update', {
+        detail: { key: PHOTO_STORAGE_KEY, value: dataUrl },
+      }));
+    } catch (err) {
+      console.warn('[ProfileScreen] photo upload falló:', err);
+      setPhotoError('No pudimos procesar la imagen. Intenta otra.');
+    } finally {
+      // Reset para permitir re-elegir el mismo archivo si quiere.
+      if (photoInputRef.current) photoInputRef.current.value = '';
+    }
+  };
+
+  const handlePhotoRemove = () => {
+    localStorage.removeItem(PHOTO_STORAGE_KEY);
+    setPhotoData('');
+    setPhotoError(null);
+    window.dispatchEvent(new CustomEvent('chagra:operator-update', {
+      detail: { key: PHOTO_STORAGE_KEY, value: '' },
+    }));
+  };
   const [role, setRole] = useState(() =>
     typeof window !== 'undefined'
       ? localStorage.getItem('chagra:operator:role') || 'operador_campo'
@@ -178,11 +249,56 @@ export default function ProfileScreen({ onBack, onHome }) {
             aria-labelledby="profile-tab-perfil"
             className="flex flex-col gap-6"
           >
-            {/* ID Card / User Info, header con datos sintetizados */}
+            {/* ID Card / User Info, header con datos sintetizados.
+                2026-05-28: avatar editable — el operador puede subir foto.
+                La imagen vive solo en localStorage (sin sync server). */}
             <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col items-center">
-              <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mb-4 border-2 border-emerald-500/30">
-                <User size={40} className="text-emerald-400" />
+              <div className="relative mb-4">
+                <div
+                  className="w-24 h-24 bg-slate-800 rounded-full overflow-hidden flex items-center justify-center border-2 border-emerald-500/30"
+                  aria-hidden={photoData ? 'true' : undefined}
+                >
+                  {photoData ? (
+                    <img
+                      src={photoData}
+                      alt={`Foto de ${name}`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User size={44} className="text-emerald-400" />
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => photoInputRef.current?.click()}
+                  className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white flex items-center justify-center shadow-lg border-2 border-slate-900"
+                  aria-label={photoData ? 'Cambiar foto de perfil' : 'Agregar foto de perfil'}
+                  title={photoData ? 'Cambiar foto' : 'Agregar foto'}
+                >
+                  <Camera size={16} />
+                </button>
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="user"
+                  onChange={handlePhotoSelected}
+                  className="hidden"
+                  aria-hidden="true"
+                />
               </div>
+              {photoError && (
+                <p className="text-xs text-amber-400 mb-2">{photoError}</p>
+              )}
+              {photoData && (
+                <button
+                  type="button"
+                  onClick={handlePhotoRemove}
+                  className="text-[10px] text-slate-500 hover:text-slate-300 inline-flex items-center gap-1 mb-2"
+                >
+                  <Trash2 size={11} /> Quitar foto
+                </button>
+              )}
               <h2 className="text-2xl font-black text-white">{name}</h2>
               <p className="text-xs text-slate-500 uppercase tracking-widest font-bold mt-1">{currentRoleLabel}</p>
             </div>

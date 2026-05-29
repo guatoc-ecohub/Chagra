@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Sprout,
   ChevronRight,
@@ -6,6 +6,8 @@ import {
   SkipForward,
   Check,
   Clock,
+  MapPin,
+  Loader2,
 } from 'lucide-react';
 import {
   getApplicableQuestions,
@@ -14,6 +16,7 @@ import {
   markProfileDone,
   markProfileSkipped,
 } from '../services/userProfileService';
+import { resolveUbicacion } from '../services/locationService';
 
 /**
  * OnboardingProfile — flujo de onboarding extendido (#200).
@@ -43,9 +46,64 @@ export default function OnboardingProfile({ onComplete, onClose }) {
   const [answers, setAnswers] = useState(() => getProfile());
   const [index, setIndex] = useState(0);
 
+  // Bug fix 2026-05-28 (operador): el onboarding no detecta posición ni
+  // municipio. Auto-detectar al montar SI los campos region/finca_altitud
+  // están vacíos, sin pisar nunca lo que el usuario ya tipeó. Si el GPS
+  // niega permiso o falla la red, el flow sigue igual (degradación graceful).
+  const [geoStatus, setGeoStatus] = useState('idle'); // idle|detecting|detected|failed
+  const [geoDetected, setGeoDetected] = useState(null); // {municipio, departamento, altitud}
+
   // Lista de preguntas aplicables según respuestas acumuladas. Se
   // recalcula en cada render para soportar condicionales.
   const questions = useMemo(() => getApplicableQuestions(answers), [answers]);
+
+  // Auto-detect de ubicación. Solo se dispara una vez si NO hay region ni
+  // altitud previas (no machaca respuestas existentes). Persiste vía
+  // saveProfile como cualquier otra respuesta.
+  useEffect(() => {
+    if (typeof window === 'undefined' || !navigator.geolocation) return;
+    if (answers.region && answers.finca_altitud) return;
+    if (geoStatus !== 'idle') return;
+
+    let alive = true;
+    setGeoStatus('detecting');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        if (!alive) return;
+        const { latitude, longitude } = pos.coords;
+        resolveUbicacion({ lat: latitude, lng: longitude })
+          .then((r) => {
+            if (!alive || !r) {
+              setGeoStatus('failed');
+              return;
+            }
+            const region = [r.municipio, r.departamento].filter(Boolean).join(', ');
+            const updates = {};
+            if (region && !answers.region) updates.region = region;
+            if (r.altitud != null && !answers.finca_altitud) {
+              updates.finca_altitud = String(Math.round(r.altitud));
+            }
+            if (r.lat != null) updates.ubicacion_lat = r.lat;
+            if (r.lng != null) updates.ubicacion_lng = r.lng;
+            if (Object.keys(updates).length > 0) {
+              setAnswers((prev) => ({ ...prev, ...updates }));
+              saveProfile(updates);
+            }
+            setGeoDetected({
+              municipio: r.municipio || null,
+              departamento: r.departamento || null,
+              altitud: r.altitud != null ? Math.round(r.altitud) : null,
+            });
+            setGeoStatus('detected');
+          })
+          .catch(() => { if (alive) setGeoStatus('failed'); });
+      },
+      () => { if (alive) setGeoStatus('failed'); },
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 5 * 60 * 1000 },
+    );
+    return () => { alive = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const total = questions.length;
   const current = questions[Math.min(index, total - 1)];
@@ -134,6 +192,27 @@ export default function OnboardingProfile({ onComplete, onClose }) {
             style={{ width: `${progress}%` }}
           />
         </div>
+
+        {/* Banner detección automática de ubicación (2026-05-28 bug fix) */}
+        {geoStatus === 'detecting' && (
+          <div className="mt-3 flex items-center gap-2 text-xs text-slate-400">
+            <Loader2 size={13} className="animate-spin text-emerald-500" />
+            Detectando tu ubicación…
+          </div>
+        )}
+        {geoStatus === 'detected' && geoDetected && (
+          <div className="mt-3 flex items-start gap-2 text-xs text-emerald-300 bg-emerald-900/20 border border-emerald-800/40 rounded-lg p-2">
+            <MapPin size={13} className="mt-0.5 shrink-0" />
+            <span className="leading-snug">
+              Detecté:{' '}
+              <strong>
+                {[geoDetected.municipio, geoDetected.departamento].filter(Boolean).join(', ') || 'tu ubicación'}
+              </strong>
+              {geoDetected.altitud != null && <> · <strong>{geoDetected.altitud} msnm</strong></>}
+              . Puedes editar las respuestas si algo no encaja.
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Pregunta actual */}

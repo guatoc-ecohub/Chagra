@@ -21,7 +21,10 @@ import useThemeBackgroundStore, { getBackgroundSrc } from './store/useThemeBackg
 // HelpUsoScreen como sección de Ayuda (decisión 2026-05-21, ver
 // comentario abajo donde se removió el render).
 // import FieldFeedback from './components/FieldFeedback';
-import MicFab from './components/MicFab';
+// MicFab removido 2026-05-28 (operador): el FAB de voz flotante sobra en
+// toda la app — la captura por voz vive dentro de AgentScreen + el tile "Voz"
+// del nav. El FAB tapaba contenido y duplicaba un affordance ya accesible.
+// import MicFab from './components/MicFab';
 import AgentFab from './components/AgentFab';
 import QuickActionsPanel from './components/QuickActionsPanel';
 import { ScreenShell } from './components/common/ScreenShell';
@@ -647,7 +650,7 @@ export default function App() {
           tras Lili UX feedback: FAB tapaba contenido + no era discoverable.
           El form sigue siendo el mismo componente, instanciado con prop
           `embedded` desde HelpUsoScreen. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'voz' && currentView !== 'agente' && <MicFab onNavigate={navigate} />}
+      {/* MicFab removido 2026-05-28 (operador): FAB de voz flotante sobra. */}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'voz' && currentView !== 'agente' && <AgentFab onNavigate={navigate} />}
       {currentView === 'dashboard' && <QuickActionsPanel onNavigate={navigate} />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
