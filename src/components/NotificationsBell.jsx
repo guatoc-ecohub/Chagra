@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Bell, X, AlertTriangle, Info, AlertCircle, Sprout, Cloud, Wifi, Droplets, ListChecks, Sparkles, Snowflake, CloudRain, Sun, CloudSun, Thermometer, Wind, Activity, RefreshCw } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
+import useAlertStore from '../store/useAlertStore';
 import useFincaActiveStore from '../services/fincaActiveStore';
 import { aggregateNotifications, dismissNotification } from '../services/notificationsService';
 // PoC alertas meteorológicas (#316) — fuente de verdad ENSO + alertas locales.
@@ -53,6 +54,24 @@ function readUpdateAvailable() {
     }
 }
 
+// #308 — el motor de alertas (useAlertStore) emite alertas de sensor IoT
+// (severity danger/warning) vía el evento `alertTriggered`. Las mapeamos a la
+// shape `iotAlerts` que ya entiende aggregateNotifications, para que el centro
+// de notificaciones unifique IoT + clima + tareas + sistema en un solo lugar.
+// 'danger' → 'critical' (el sistema de notificaciones usa critical/warning/info)
+// y se inyecta timestamp si falta para pasar el filtro de frescura (<24h).
+function mapSensorAlertsToIot(alerts) {
+  if (!Array.isArray(alerts)) return [];
+  return alerts.map((a) => ({
+    id: a.type || a.id,
+    sensor: a.sensor || a.type || 'sensor',
+    title: a.title || a.label || 'Alerta de sensor',
+    message: a.message || a.body || a.detail || '',
+    severity: a.severity === 'danger' ? 'critical' : (a.severity || 'warning'),
+    timestamp: a.timestamp || a.created_at || Date.now(),
+  }));
+}
+
 export default function NotificationsBell({ onNavigate }) {
     const [open, setOpen] = useState(false);
     const [tick, setTick] = useState(0);
@@ -64,6 +83,7 @@ export default function NotificationsBell({ onNavigate }) {
     const [climaLoading, setClimaLoading] = useState(false);
 
     const plants = useAssetStore((s) => s.plants);
+    const sensorAlerts = useAlertStore((s) => s.activeAlerts);
     const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
     const fincas = useFincaActiveStore((s) => s.fincas);
 
@@ -112,10 +132,10 @@ export default function NotificationsBell({ onNavigate }) {
             onboardingComplete: readOnboardingComplete(),
             bioculturalZone: finca?.biocultural_zone || null,
             calendarMonth: null,
-            iotAlerts: [],
+            iotAlerts: mapSensorAlertsToIot(sensorAlerts),
         });
         // tick force re-run on dismiss event
-    }, [plants, activeFincaSlug, fincas, tick]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [plants, sensorAlerts, activeFincaSlug, fincas, tick]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // PoC #316 — el clima cuenta para los badges del bell. Las alertas
     // locales de Open-Meteo (helada/calor/torrencial/etc) escalan severity;
