@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -14,6 +14,8 @@ import {
   AlertCircle,
   List,
   ChevronDown,
+  LocateFixed,
+  Move,
 } from 'lucide-react';
 import {
   resolveUbicacion,
@@ -62,6 +64,81 @@ function PisoTermicoBadge({ info }) {
   );
 }
 
+// Pisos térmicos colombianos en orden ascendente para la barra hero visual.
+// Rangos coinciden con deriveThermalZoneFromAltitud / PISO_TERMICO_INFO.
+const ALTITUDE_STOPS = [
+  { slug: 'cálido', max: 1000, color: 'bg-orange-500', label: 'Cálido' },
+  { slug: 'templado', max: 2000, color: 'bg-amber-400', label: 'Templado' },
+  { slug: 'frío', max: 3000, color: 'bg-emerald-500', label: 'Frío' },
+  { slug: 'páramo', max: 3600, color: 'bg-indigo-400', label: 'Páramo' },
+  { slug: 'glacial', max: 5000, color: 'bg-sky-300', label: 'Glacial' },
+];
+const ALTITUDE_BAR_MAX = 5000;
+
+/**
+ * AltitudeGradientBar — barra horizontal coloreada por piso térmico con
+ * marcador de la altitud actual (#201). Es el "hero visual" del onboarding:
+ * el campesino ve de un vistazo dónde cae su finca en el espectro Colombia.
+ *
+ * Stops fijos cálido→templado→frío→páramo→glacial; ancho proporcional al
+ * rango (no al ancho de pantalla — un Cundinamarca alto se diferencia
+ * visualmente de un Caribe bajo).
+ *
+ * Si no hay altitud, no renderiza el indicador (solo la escala).
+ */
+function AltitudeGradientBar({ altitud, pisoSlug }) {
+  const indicatorPct = useMemo(() => {
+    if (typeof altitud !== 'number' || Number.isNaN(altitud)) return null;
+    return Math.max(0, Math.min(100, (altitud / ALTITUDE_BAR_MAX) * 100));
+  }, [altitud]);
+
+  return (
+    <div className="space-y-2" data-testid="altitude-gradient-bar">
+      <div className="flex items-center justify-between text-2xs text-slate-500 font-mono">
+        <span>0 msnm</span>
+        <span className="text-slate-400">Pisos térmicos Colombia</span>
+        <span>{ALTITUDE_BAR_MAX}+</span>
+      </div>
+      <div className="relative h-8 rounded-full overflow-hidden border border-slate-700 bg-slate-900">
+        <div className="absolute inset-0 flex">
+          {ALTITUDE_STOPS.map((stop, idx) => {
+            const prev = idx === 0 ? 0 : ALTITUDE_STOPS[idx - 1].max;
+            const widthPct = ((stop.max - prev) / ALTITUDE_BAR_MAX) * 100;
+            const active = stop.slug === pisoSlug;
+            return (
+              <div
+                key={stop.slug}
+                style={{ width: `${widthPct}%` }}
+                className={`${stop.color} ${active ? 'opacity-100' : 'opacity-50'} transition-opacity`}
+                title={`${stop.label} hasta ${stop.max} msnm`}
+              />
+            );
+          })}
+        </div>
+        {indicatorPct != null && (
+          <div
+            className="absolute top-0 bottom-0 flex items-center"
+            style={{ left: `calc(${indicatorPct}% - 8px)` }}
+            aria-label={`Tu finca a ${altitud} msnm`}
+          >
+            <div className="w-4 h-4 rounded-full bg-white border-2 border-slate-900 shadow-lg" />
+          </div>
+        )}
+      </div>
+      <div className="flex items-center justify-between text-2xs text-slate-600">
+        {ALTITUDE_STOPS.map((stop) => (
+          <span
+            key={stop.slug}
+            className={stop.slug === pisoSlug ? 'text-white font-bold' : ''}
+          >
+            {stop.label}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /**
  * LocationDetectedScreen — pantalla de confirmación visual de ubicación (#201).
  *
@@ -101,6 +178,8 @@ export default function LocationDetectedScreen({
   // usuario no tiene buena ortografía. 32 dptos × municipios curados.
   const [cascadeOpen, setCascadeOpen] = useState(false);
   const [cascadeDpto, setCascadeDpto] = useState('');
+  const [geoState, setGeoState] = useState('idle'); // idle | detecting | denied | unavailable
+  const markerRef = useRef(null);
   const setFincaIndoorZone = useFincaActiveStore((s) => s.setIndoorZone);
 
   // Resolver inicial si vienen coords.
@@ -120,6 +199,82 @@ export default function LocationDetectedScreen({
       alive = false;
     };
   }, [coords, altitud]);
+
+  /**
+   * Auto-detección via navigator.geolocation cuando el usuario no llegó
+   * con coords ni texto inicial. Se dispara on-mount una sola vez. Falla
+   * graceful: el usuario siempre puede usar el cascade o la búsqueda.
+   */
+  useEffect(() => {
+    if (coords || initialMunicipio || loc) return;
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      setGeoState('unavailable');
+      return;
+    }
+    let alive = true;
+    setGeoState('detecting');
+    setLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        if (!alive) return;
+        const { latitude, longitude, altitude } = pos.coords;
+        resolveUbicacion({
+          lat: latitude,
+          lng: longitude,
+          altitud: altitude ?? null,
+        })
+          .then((r) => {
+            if (!alive) return;
+            setLoc(r);
+            setGeoState('idle');
+          })
+          .catch(() => {
+            if (alive) setGeoState('idle');
+          })
+          .finally(() => {
+            if (alive) setLoading(false);
+          });
+      },
+      (err) => {
+        if (!alive) return;
+        console.warn('[LocationDetected] geolocation:', err?.message || err);
+        setGeoState(err?.code === 1 ? 'denied' : 'unavailable');
+        setLoading(false);
+      },
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 60_000 },
+    );
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /**
+   * Ajuste manual via drag del marcador (#201 "NO ajustar"). Al soltar:
+   *   - Toma la nueva lat/lng del marcador
+   *   - Re-resuelve municipio + altitud + piso térmico
+   * Optimistic UI: setea coords inmediato, refresca enriquecimiento.
+   */
+  const handleMarkerDragEnd = async (event) => {
+    const marker = event?.target;
+    if (!marker) return;
+    const { lat, lng } = marker.getLatLng();
+    setLoading(true);
+    try {
+      const enriched = await resolveUbicacion({ lat, lng });
+      setLoc((prev) => ({
+        ...(prev || {}),
+        ...enriched,
+        lat,
+        lng,
+      }));
+    } catch (e) {
+      console.warn('[LocationDetected] drag resolve falló:', e);
+      setLoc((prev) => ({ ...(prev || {}), lat, lng }));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearch = async () => {
     const q = query.trim();
@@ -356,22 +511,48 @@ export default function LocationDetectedScreen({
           )}
         </div>
 
-        {/* Mini mapa */}
+        {/* Mini mapa con marcador arrastrable (#201 NO ajustar) */}
         {hasPoint && (
-          <div className="rounded-2xl overflow-hidden border border-slate-800 h-56">
-            <MapContainer
-              center={center}
-              zoom={12}
-              scrollWheelZoom={false}
-              style={{ height: '100%', width: '100%' }}
-              attributionControl={false}
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                maxZoom={19}
-              />
-              <Marker position={center} />
-            </MapContainer>
+          <div className="space-y-1.5">
+            <div className="rounded-2xl overflow-hidden border border-slate-800 h-56">
+              <MapContainer
+                center={center}
+                zoom={12}
+                scrollWheelZoom={false}
+                style={{ height: '100%', width: '100%' }}
+                attributionControl={false}
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  maxZoom={19}
+                />
+                <Marker
+                  position={center}
+                  draggable
+                  eventHandlers={{ dragend: handleMarkerDragEnd }}
+                  ref={markerRef}
+                />
+              </MapContainer>
+            </div>
+            <p className="text-2xs text-slate-500 flex items-center gap-1.5 px-1">
+              <Move size={11} /> Arrastra el pin si la ubicación no es exacta.
+            </p>
+          </div>
+        )}
+
+        {/* Estado geoloc cuando no hay coords iniciales */}
+        {!hasPoint && geoState === 'detecting' && (
+          <div className="flex items-center justify-center gap-2 text-slate-400 py-6">
+            <LocateFixed size={18} className="animate-pulse text-emerald-400" />
+            Detectando tu ubicación...
+          </div>
+        )}
+        {!hasPoint && geoState === 'denied' && (
+          <div className="rounded-xl bg-amber-950/30 border border-amber-800/40 p-3 text-xs text-amber-300 flex gap-2">
+            <AlertCircle size={14} className="shrink-0 mt-0.5" />
+            <span>
+              Permiso de ubicación denegado. Puedes elegir tu municipio en la lista o escribirlo arriba.
+            </span>
           </div>
         )}
 
@@ -406,6 +587,15 @@ export default function LocationDetectedScreen({
               </span>
               <PisoTermicoBadge info={pisoInfo} />
             </div>
+
+            {loc.altitud != null && (
+              <div className="pt-2 border-t border-slate-800">
+                <AltitudeGradientBar
+                  altitud={loc.altitud}
+                  pisoSlug={pisoInfo?.slug}
+                />
+              </div>
+            )}
 
             {pisoInfo && pisoInfo.cultivos?.length > 0 && (
               <div className="pt-2 border-t border-slate-800">
