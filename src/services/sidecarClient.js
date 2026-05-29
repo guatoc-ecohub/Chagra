@@ -188,6 +188,7 @@ async function postJson(path, body, timeoutMs) {
  *   useTool: boolean,
  *   tool: string | null,
  *   args: object | null,
+ *   toolChain: Array<{tool: string, args: object}> | null,
  *   latencyMs: number | null,
  *   modelUsed: string | null,
  *   heuristicSkipped: boolean,
@@ -197,6 +198,11 @@ async function postJson(path, body, timeoutMs) {
  *
  * Normaliza el snake_case del API a camelCase JS-idiomatic. Devuelve null
  * si: flag off, offline, timeout, non-2xx, body inválido.
+ *
+ * D2 (#246) tool composition: cuando el sidecar NLU devuelve `tool_chain`
+ * (array no vacío), se expone como `toolChain` camelCase para que el
+ * cliente ejecute la cadena con `executeToolChain()`. El modo simple
+ * (`tool` + `args`) sigue siendo soportado en paralelo.
  */
 export async function planNlu(userMessage, context) {
   if (!userMessage || typeof userMessage !== 'string') return null;
@@ -206,16 +212,54 @@ export async function planNlu(userMessage, context) {
   const raw = await postJson('/nlu', body, NLU_TIMEOUT_MS);
   if (!raw || typeof raw !== 'object') return null;
 
+  let toolChain = null;
+  if (Array.isArray(raw.tool_chain) && raw.tool_chain.length > 0) {
+    toolChain = raw.tool_chain
+      .filter((step) => step && typeof step === 'object' && typeof step.tool === 'string')
+      .map((step) => ({
+        tool: step.tool,
+        args: (step.args && typeof step.args === 'object') ? step.args : {},
+      }));
+    if (toolChain.length === 0) toolChain = null;
+  }
+
   return {
     useTool: Boolean(raw.use_tool),
     tool: typeof raw.tool === 'string' ? raw.tool : null,
     args: (raw.args && typeof raw.args === 'object') ? raw.args : null,
+    toolChain,
     latencyMs: Number.isFinite(raw.latency_ms) ? raw.latency_ms : null,
     modelUsed: typeof raw.model_used === 'string' ? raw.model_used : null,
     heuristicSkipped: Boolean(raw.heuristic_skipped),
     reason: typeof raw.reason === 'string' ? raw.reason : null,
     error: typeof raw.error === 'string' ? raw.error : null,
   };
+}
+
+/**
+ * D2 (#246) — ejecuta una cadena de tools secuencialmente. Devuelve un
+ * array de evidences (uno por tool), preservando el orden. Tools con
+ * resultado null (timeout/error) se devuelven con `result: null` para
+ * que el formatter pueda señalar el gap al LLM.
+ *
+ * Cap máximo de pasos: 3 (alineado con el contrato NLU del sidecar). Pasos
+ * extra se ignoran para evitar inflar el contexto del LLM.
+ *
+ * @param {Array<{tool: string, args?: object}>} chain
+ * @returns {Promise<Array<{tool: string, args: object, result: any}>>}
+ */
+export async function executeToolChain(chain) {
+  if (!Array.isArray(chain) || chain.length === 0) return [];
+  const MAX_STEPS = 3;
+  const limited = chain.slice(0, MAX_STEPS);
+  const evidences = [];
+  for (const step of limited) {
+    if (!step || typeof step.tool !== 'string') continue;
+    const args = (step.args && typeof step.args === 'object') ? step.args : {};
+    const result = await callTool(step.tool, args);
+    evidences.push({ tool: step.tool, args, result });
+  }
+  return evidences;
 }
 
 /**
