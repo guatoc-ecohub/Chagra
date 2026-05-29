@@ -21,7 +21,7 @@ import {
  * Flujo:
  *   1. Suscripción WebSocket a Home Assistant para sensores configurados.
  *   2. Detección de valor anormal (umbral por especie/zona).
- *   3. Streaming de análisis agronómico via Ollama (gemma3:4b).
+ *   3. Streaming de análisis agronómico via Ollama (modelo configurado).
  *   4. Acción dispatched por operador → log--maintenance + cooldown idempotente.
  *
  * LLM constraints (v0.7.2):

@@ -144,7 +144,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
   const recentSpecies = useMemo(() => computeRecentSpecies(plants, allSpecies), [plants, allSpecies]);
 
   // Autopilot H (2026-05-03): identificación de especie por foto.
-  // Vision model qwen2.5vl:7b (con fallback gemma3:4b en aiService).
+  // Modelo de visión configurado (con fallback definido en aiService).
   // confidence ≥0.7 auto-selecciona si match en catálogo, sino muestra
   // alternativas + bug report button para validar.
   // Dual capture (2026-05-18): camera (capture=environment) + gallery.
@@ -506,7 +506,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
         Búsqueda aproximada. Los campos de estrato y gremio se sugieren al seleccionar.
       </p>
 
-      {/* Autopilot H, Identificación por foto (experimental gemma3:4b) */}
+      {/* Autopilot H, Identificación por foto (experimental) */}
       <div className="mt-3 pt-3 border-t border-slate-800">
         <div className="flex items-center gap-2 mb-2">
           <Sparkles size={12} className="text-amber-400" />

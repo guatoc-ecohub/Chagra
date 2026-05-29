@@ -1,33 +1,20 @@
 /**
  * llmRouter.js — Selector de modelo LLM según tarea (Multi-LLM routing).
  *
- * Decisión de modelo basada en bench empírico CPU 2026-05-15/16 + bench
- * GPU Quadro M6000 sm_52 2026-05-17. Resultados detallados en docs
+ * Decisión de modelo basada en bench interno. Resultados detallados en docs
  * operacionales internos (no en este repo).
  *
- * Estado actual: GPU offload 35/35 layers para todos los modelos listados.
- * Eval rate chat gemma3:4b 13.5 t/s CPU → 118 t/s GPU (+8.7×); load time
- * 7.6s → 3.0s (2.5× más rápido).
+ * Estado actual: los modelos listados corren con offload completo en GPU
+ * local, con mejoras de throughput y de tiempo de carga frente a CPU.
  *
- * Estrategia: 1 modelo "hot" para chat (gemma3:4b keep_alive=30m, viable
- * post-GPU porque load es barato y VRAM 4 GB) + 2 modelos "on-demand"
- * para tareas especializadas (qwen2.5-coder:7b NLU/JSON, gemma2:9b
- * reasoning) + 1 vision (qwen2.5vl:7b on-demand, nuevo post-GPU).
+ * Estrategia: 1 modelo "hot" para chat (keep_alive prolongado) + modelos
+ * "on-demand" para tareas especializadas (NLU/JSON, reasoning) + 1 de
+ * visión on-demand.
  *
- * Budget VRAM M6000 (12 GB): gemma3:4b hot (4.0 GB) + cualquier 7B/8B
- * on-demand (~5-7 GB). gemma3:12b (9.6 GB) y llava:13b (11.6 GB) caben
- * solos pero requieren unload de hot. nlu/reasoning unload tras request
- * (keep_alive=0) para liberar VRAM al siguiente turno chat.
- *
- * Modelos HABILITADOS post-GPU (antes inviables en CPU):
- * - qwen2.5vl:7b vision (78 t/s GPU, 11.8 GB VRAM)
- * - gemma3:12b reasoning (37.6 t/s GPU, 9.6 GB VRAM)
- * - deepseek-r1:8b reasoning chain-of-thought (46 t/s GPU)
- * - llava:13b vision alt (22.94 t/s GPU)
- *
- * Modelos DESCARTADOS por bench:
- * - qwen3.5:4b: qwen35 arch hang en Ollama 0.23.x
- * - qwen3:8b: output vacío con prompts JSON estrictos
+ * Presupuesto de GPU local: el modelo de chat queda caliente y los modelos
+ * on-demand se cargan según necesidad. Los modelos más grandes caben solos
+ * pero requieren liberar el hot. nlu/reasoning hacen unload tras la request
+ * (keep_alive=0) para liberar memoria al siguiente turno de chat.
  */
 
 import { analyzeQueryComplexity } from './queryComplexityAnalyzer';
@@ -38,11 +25,12 @@ import { analyzeQueryComplexity } from './queryComplexityAnalyzer';
  * `chat`         → modelo rápido para queries simples del agente Chagra IA.
  * `chat_complex` → modelo con mayor capacidad anti-alucinación para queries
  *                  complejas (plagas regionales, pasifloras confundibles,
- *                  planes multi-aspecto, queries largas). Bench 2026-05-23:
- *                  granite3.1-dense:8b clavó "Monalonion velezangeli" donde
- *                  gemma3:4b alucinaba. Override via env VITE_LLM_COMPLEX_MODEL.
- *                  Routing se decide en frontend con `selectChatRoute(query)`
- *                  (importable desde `./queryComplexityAnalyzer`).
+ *                  planes multi-aspecto, queries largas). Según bench interno,
+ *                  el modelo complex evita confusiones taxonómicas donde el
+ *                  modelo simple alucinaba. Override via env
+ *                  VITE_LLM_COMPLEX_MODEL. Routing se decide en frontend con
+ *                  `selectChatRoute(query)` (importable desde
+ *                  `./queryComplexityAnalyzer`).
  *
  * @typedef {'chat' | 'chat_complex' | 'nlu' | 'reasoning' | 'vision'} LLMTask
  */
@@ -50,7 +38,7 @@ import { analyzeQueryComplexity } from './queryComplexityAnalyzer';
 /**
  * Configuración por tarea.
  * @typedef {Object} ModelRoute
- * @property {string} model           - Nombre del modelo en Ollama (ej. "gemma3:4b").
+ * @property {string} model           - Nombre del modelo en Ollama.
  * @property {number} keep_alive_min  - Minutos que Ollama mantiene el modelo cargado tras última request.
  *                                       0 = unload inmediato; 5 = caliente para próxima petición.
  * @property {number} temperature     - Default per task.
@@ -62,14 +50,12 @@ import { analyzeQueryComplexity } from './queryComplexityAnalyzer';
 /** @type {Record<LLMTask, ModelRoute>} */
 export const ROUTES = {
   chat: {
-    // Swap 2026-05-24 (post-bug "Shoeachi"/Choachí + recomendaciones erradas):
-    // promoviendo granite3.1-dense:8b (#1 bench Phase C con tools, 56% AH) al
-    // baseline chat. llama3.1:8b (#2, 44% AH) se retira — diferencia 12 puntos
-    // AH es la única solución para mitigar alucinaciones geográficas + piso
-    // térmico observadas en producción. Plus: usar el mismo modelo para chat
-    // simple y complex elimina el cold-start cuando router escala (no hay 2do
-    // modelo que cargar). Tradeoff: +11.8s latencia (24.7s vs 12.9s),
-    // amortizado por UX queueing PR #1031 + tip flotante (próximo PR).
+    // Swap post-bug producción: se promueve el modelo de chat configurado al
+    // baseline. La selección prioriza anti-alucinación (factor decisivo para
+    // mitigar errores geográficos + piso térmico observados en producción).
+    // Plus: usar el mismo modelo para chat simple y complex elimina el
+    // cold-start cuando el router escala (no hay 2do modelo que cargar).
+    // Tradeoff de latencia amortizado por UX queueing + tip flotante.
     // Override via env VITE_LLM_CHAT_MODEL para experimentos.
     model:
       (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_LLM_CHAT_MODEL) ||
@@ -95,10 +81,10 @@ export const ROUTES = {
       'derivados de llama ignorando evidence de tools.',
   },
   chat_complex: {
-    // Override por env para que el operador pueda probar gemma3:12b u otros
+    // Override por env para que el operador pueda probar otros modelos
     // sin redeploy de código. Si VITE_LLM_COMPLEX_MODEL no está seteado,
-    // default a granite3.1-dense:8b (bench 2026-05-23: única opción que
-    // clavó Monalonion velezangeli sin alucinación + cupo VRAM razonable).
+    // usa el modelo complex configurado (según bench interno, la opción que
+    // evita confusiones taxonómicas con cupo de GPU razonable).
     model:
       (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_LLM_COMPLEX_MODEL) ||
       'granite3.1-dense:8b',

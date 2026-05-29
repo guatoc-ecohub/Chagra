@@ -66,7 +66,7 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
       } catch (err) {
         console.warn('[LoginScreen] setActiveTenantId failed:', err);
       }
-      // NN4 fix 2026-05-23: disparar pre-warm Ollama gemma3:4b ANTES de
+      // NN4 fix 2026-05-23: disparar pre-warm del modelo Ollama configurado ANTES de
       // navegar al dashboard. Esto da ~15-30s de margen humano (el operador
       // mira el dashboard, escoge una tile, abre el agente) durante los
       // cuales el modelo se carga en GPU en background. Sin esto, la

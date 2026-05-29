@@ -16,7 +16,7 @@
  *
  * `size_vram > 0` con `size_vram == size` => 100% GPU offload.
  * `size_vram == 0` => CPU only.
- * `0 < size_vram < size` => parcial (warning para nuestro caso M6000 12GB).
+ * `0 < size_vram < size` => parcial (warning para nuestra GPU local).
  */
 
 const OLLAMA_PS_URL = '/api/ollama/api/ps';

@@ -50,9 +50,9 @@ import useAgentQueueStore from '../../store/useAgentQueueStore';
 import useFincaActiveStore from '../../services/fincaActiveStore';
 
 // 2026-05-16: migrado a llmRouter (Multi-LLM por tarea). AgentScreen usa
-// `chat` route → gemma3:4b 15 t/s con keep_alive=5m (hot model). Bench
+// la `chat` route con el modelo de chat configurado como hot model. Bench
 // completo en docs operativos internos del proyecto.
-// Para NLU/tools usar llmRouter('nlu') → qwen2.5-coder:7b.
+// Para NLU/tools usar llmRouter('nlu') → modelo NLU configurado.
 
 const STATE_IDLE = 'idle';
 const STATE_RECORDING = 'recording';
@@ -77,8 +77,8 @@ export default function AgentScreen({ onBack, initialContext }) {
   const ollamaWarmStatus = useOllamaWarmStore((s) => s.status);
   // Task #121: queue UX del agente. Permite 2 preguntas max (1 procesando +
   // 1 pendiente). 3ra rechazada con toast claro. ETA dinámico basado en
-  // EMA de latencia por modelo (llama3.1:8b ~12.9s, granite3.1-dense:8b
-  // ~24.7s — bench nocturno 2026-05-24).
+  // EMA de latencia por modelo (ruta simple más rápida, ruta complex más
+  // lenta — según bench interno).
   const queueProcessing = useAgentQueueStore((s) => s.processing);
   const queuePending = useAgentQueueStore((s) => s.pending);
   const plants = useAssetStore((s) => s.plants);
@@ -435,9 +435,9 @@ export default function AgentScreen({ onBack, initialContext }) {
     // REGLA ANTI-ALUCINACIÓN: "Si no sabes algo, dilo honestamente" (versión
     // previa) era demasiado débil — el modelo lo ignoraba y rellenaba con
     // confianza. Incidente 2026-05-17: operador escribió "chorcho" (typo de
-    // chocho/Lupinus mutabilis) y gemma3:4b inventó "sistema de agricultura
-    // de bajo impacto". Probado en bench: 12b inventó OTRA cosa distinta
-    // (Alternaria solani). Subir parámetros no ayuda. Solución: prompt
+    // chocho/Lupinus mutabilis) y el modelo inventó "sistema de agricultura
+    // de bajo impacto". Probado en bench: un modelo más grande inventó OTRA
+    // cosa distinta (Alternaria solani). Subir parámetros no ayuda. Solución: prompt
     // agresivo con respuesta literal exigida + ejemplo + bajar temperature
     // a 0.3. Bench 2026-05-17 con esta versión devolvió la respuesta
     // EXACTA esperada (no reconozco el término) en 27 tokens / 8s.
@@ -736,8 +736,8 @@ ${buildProfileContext(finca)}`;
   // para botón Cancelar + warning visible a los 20s ("Aún pensando…").
   //
   // 2026-05-19 ajuste timeout 30s→60s: operator perdió respuesta porque
-  // el agente tardaba >30s (cold-load qwen2.5vl/gemma3 + RAG context).
-  // Bench p95 22s, pero outliers post-cold-load 40s+. 60s cubre p99
+  // el agente tardaba demasiado (cold-load del modelo + RAG context).
+  // Según bench interno hay outliers post-cold-load altos. 60s los cubre
   // sin sacrificar UX (el warning a 20s ya le dice al operator que algo
   // está lento). Pre-condicion: OLLAMA_KEEP_ALIVE=24h en alpha para que
   // modelos no hagan cold-load entre conversaciones.
@@ -771,7 +771,7 @@ ${buildProfileContext(finca)}`;
 
     // 2026-05-23 incidente test #4: usuario preguntó por "mareñongoño del
     // Tolima" (especie NO en catálogo). El tool devolvió {found:false,
-    // hint:"..."} pero gemma3:4b IGNORÓ el flag found:false y mapeó
+    // hint:"..."} pero el modelo IGNORÓ el flag found:false y mapeó
     // creativamente "mareñongoño" → "Ullucus tuberosus" inventando una
     // equivalencia, luego listó companions reales de Ullucus pretendiendo
     // que eran de mareñongoño. Alucinación creativa grave.
@@ -874,7 +874,7 @@ RESPONDE SOLO a lo que el usuario preguntó usando ÚNICAMENTE los datos verific
   };
 
   // NN2+NN3 (2026-05-23): análisis de query en frontend para inyectar
-  // señales específicas al system prompt. El LLM gemma3:4b ignora reglas
+  // señales específicas al system prompt. El LLM configurado ignora reglas
   // generales bajo presión — necesita instrucción concreta sobre ESTA
   // query.
   const analyzeQuery = (q) => {
@@ -958,7 +958,7 @@ ${analysis.pestsMentioned.map((p) => `  · "${p.name}" → ${p.canonical}`).join
 
 REGLA CRÍTICA SOBRE ESTE BLOQUE: este análisis es autoritativo para ESTA query. Si dice "Es enumerativa: NO", el CASO C del system prompt NO aplica aunque tu instinto te diga lo contrario. Si lista plagas, usa ESOS nombres científicos exactos (jamás otros, jamás "Fusarium spp" para chinches, jamás géneros inventados).
 === FIN ANÁLISIS ===`;
-    // 2026-05-19: incidente alucinación tomate — gemma3:4b confundía el
+    // 2026-05-19: incidente alucinación tomate — el modelo confundía el
     // corpus RAG con lo que el usuario dijo (atribuía síntomas "hojas
     // amarillas" del documento de referencia al operador). Fix: delimitar
     // EXPLÍCITAMENTE el corpus + instrucción literal de no citarlo como
@@ -998,10 +998,10 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     try {
       // Routing dual 2026-05-23: queries complejas (plagas regionales,
       // pasifloras confundibles, planes multi-aspecto, queries largas)
-      // se enrutan a `chat_complex` (granite3.1-dense:8b por default)
-      // que es ~2× más lento pero clavó Monalonion velezangeli sin
-      // pifia en bench anti-alucinación. Resto sigue en gemma3:4b
-      // (hot, 118 t/s). `selectChatRoute` emite console.debug con
+      // se enrutan a `chat_complex` (modelo complex configurado por default)
+      // que es más lento pero evita confusiones taxonómicas en bench
+      // anti-alucinación. Resto sigue en el modelo de chat configurado
+      // (hot). `selectChatRoute` emite console.debug con
       // la decisión para diagnóstico en field testing.
       const chatRoute = selectChatRoute(query);
       const { url, body } = buildLLMRequest(chatRoute, messages);

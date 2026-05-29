@@ -4,8 +4,8 @@
  * Implementa el patrón de registry paralelo a moduleRegistry.js.
  * Herramientas mínimas para DR-034 + tool use básico.
  *
- * Pre-requisito: GLM-4.6 (z.ai) o modelo que soporte function calling.
- * Los modelos locales (qwen2.5:4b, OLMoE) NO soportan function calling.
+ * Pre-requisito: un modelo que soporte function calling.
+ * Algunos modelos locales NO soportan function calling.
  */
 
 import useAssetStore from '../store/useAssetStore';

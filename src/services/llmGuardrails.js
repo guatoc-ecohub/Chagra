@@ -206,7 +206,7 @@ const OLLAMA_GENERATE_URL = `${OLLAMA_BASE}/api/generate`;
  *
  * @param {string} userPrompt - Pregunta del operador en texto libre.
  * @param {Object} options
- * @param {string}   [options.model='qwen2.5:3b']       - Modelo Ollama a usar.
+ * @param {string}   [options.model]                     - Modelo Ollama a usar.
  * @param {string}   [options.domain='general']          - Dominio para heurísticas.
  * @param {Object}   [options.catalogContext]             - { species: string[] }
  * @param {Function} [options.onToken]                   - Streaming token callback.
