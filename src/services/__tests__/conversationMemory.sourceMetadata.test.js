@@ -105,4 +105,115 @@ describe('computeSourceMetadata', () => {
     });
     expect(md).toEqual({ tool_used: 'get_species', grounded: false });
   });
+
+  describe('chain #246: array de evidences', () => {
+    test('array vacío → no tool, no grounded', () => {
+      expect(computeSourceMetadata([])).toEqual({ tool_used: null, grounded: false });
+    });
+
+    test('array con todos null → no tool, no grounded', () => {
+      expect(computeSourceMetadata([null, null, null])).toEqual({
+        tool_used: null,
+        grounded: false,
+      });
+    });
+
+    test('array con mix de null y evidences válidas → ignora nulls, grounded si alguno útil', () => {
+      const md = computeSourceMetadata([
+        null,
+        {
+          tool: 'get_species',
+          args: { name: 'aguacate' },
+          result: { found: true, species: { name: 'Persea americana' } },
+        },
+        undefined,
+      ]);
+      expect(md).toEqual({ tool_used: 'get_species', grounded: true });
+    });
+
+    test('array con múltiples tools → tool_used concatenados con +', () => {
+      const md = computeSourceMetadata([
+        {
+          tool: 'get_species',
+          args: { name: 'maíz' },
+          result: { found: true, species: { name: 'Zea mays' } },
+        },
+        {
+          tool: 'get_companions',
+          args: { species: 'maíz' },
+          result: { companions: [{ name: 'frijol' }] },
+        },
+      ]);
+      expect(md).toEqual({
+        tool_used: 'get_species+get_companions',
+        grounded: true,
+      });
+    });
+
+    test('array chain: grounded=true si CUALQUIERA tool devuelve payload útil', () => {
+      const md = computeSourceMetadata([
+        {
+          tool: 'get_species',
+          args: { name: 'inexistente' },
+          result: { found: false },
+        },
+        {
+          tool: 'get_companions',
+          args: { species: 'maíz' },
+          result: { companions: [{ name: 'frijol' }] },
+        },
+      ]);
+      expect(md.grounded).toBe(true);
+      expect(md.tool_used).toBe('get_species+get_companions');
+    });
+
+    test('array chain: grounded=false si NINGUNO tool devuelve payload útil', () => {
+      const md = computeSourceMetadata([
+        {
+          tool: 'get_species',
+          args: { name: 'inexistente' },
+          result: { found: false },
+        },
+        {
+          tool: 'get_companions',
+          args: { species: 'inexistente' },
+          result: { matches_count: 0 },
+        },
+      ]);
+      expect(md.grounded).toBe(false);
+      expect(md.tool_used).toBe('get_species+get_companions');
+    });
+
+    test('array chain: un tool con matches_count >0 hace grounded=true', () => {
+      const md = computeSourceMetadata([
+        {
+          tool: 'get_species',
+          args: { name: 'inexistente' },
+          result: { found: false },
+        },
+        {
+          tool: 'get_multihop_companions',
+          args: { species: 'maíz' },
+          result: { matches_count: 3, matches: [{ name: 'frijol' }] },
+        },
+      ]);
+      expect(md.grounded).toBe(true);
+    });
+
+    test('array chain: un tool con available:true hace grounded=true', () => {
+      const md = computeSourceMetadata([
+        {
+          tool: 'get_biopreparados',
+          args: { species: 'inexistente' },
+          result: { available: false },
+        },
+        {
+          tool: 'get_species',
+          args: { name: 'aguacate' },
+          result: { available: true, species: { name: 'Persea americana' } },
+        },
+      ]);
+      expect(md.grounded).toBe(true);
+    });
+  });
 });
