@@ -83,8 +83,9 @@ const LoadingFallback = () => (
 );
 
 // NAV tiles, vocabulario user-facing post DR-030 QW2 (decisión D3+D4 del DR).
-// Tile "Voz" eliminada: ya está accesible global vía MicFab abajo-izquierda
-// (QW4). Iconos canónicos: Sprout para plantas, NotebookPen para bitácora.
+// Tile "Voz" eliminada del grid: la captura por voz vive en el botón
+// dedicado dentro de AgentScreen (MicFab flotante quitado 2026-05-28).
+// Iconos canónicos: Sprout para plantas, NotebookPen para bitácora.
 // Card-sort n>=5 con usuarios 0-contexto colombianos pendiente para
 // validar empíricamente, esta release ships con hipótesis cultural
 // (lenguaje agronómico colombiano) y se itera post-feedback.
