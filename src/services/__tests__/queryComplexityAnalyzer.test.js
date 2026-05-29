@@ -30,6 +30,14 @@ describe('queryComplexityAnalyzer — analyzeQueryComplexity', () => {
     test('string sólo whitespace → simple', () => {
       expect(analyzeQueryComplexity('   \n\t  ')).toBe('simple');
     });
+
+    test('string sólo emojis → simple', () => {
+      expect(analyzeQueryComplexity('🌱🌿🍅🥔')).toBe('simple');
+    });
+
+    test('query con emoji y texto simple → simple', () => {
+      expect(analyzeQueryComplexity('¿qué hago con 🍅?')).toBe('simple');
+    });
   });
 
   describe('queries cortas y planas → simple', () => {
