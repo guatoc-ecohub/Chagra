@@ -1,6 +1,6 @@
 /**
  * voiceRagEnricher.js — Conecta la salida del entityExtractor (voz / Whisper +
- * gemma3:4b) con el corpus RAG en `public/cycle-content/` para enriquecer
+ * modelo configurado) con el corpus RAG en `public/cycle-content/` para enriquecer
  * cada entidad reconocida con contexto agronómico del catálogo.
  *
  * Motivación (audit deep finding 2026-05-18):
@@ -35,7 +35,7 @@
  *   con `_ragInsights` opcional. Nunca lanza: errores se loguean con
  *   `console.warn` y la entidad queda sin enriquecer.
  *
- * NO toca el LLM prompt de gemma3:4b ni la integración Whisper. Es estrictamente
+ * NO toca el LLM prompt del modelo configurado ni la integración Whisper. Es estrictamente
  * post-procesamiento sobre el array de entidades ya extraído.
  */
 

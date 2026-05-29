@@ -12,7 +12,7 @@
  * Schema del evento:
  *   {
  *     id: 'lm_<ts36><rand36>',
- *     model: 'gemma3:4b',
+ *     model: '<modelo-configurado>',
  *     endpoint: '/api/ollama/api/chat',
  *     flujo: 'chat' | 'extract' | 'vision' | 'summarize' | 'recommend' | 'help' | 'other',
  *     status: 'success' | 'error' | 'abort',

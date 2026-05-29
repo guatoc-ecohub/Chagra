@@ -2,13 +2,13 @@ import { create } from 'zustand';
 
 /**
  * useOllamaWarmStore — bus global de estado warm-up del modelo Ollama
- * (gemma3:4b) que usa el agente Chagra IA.
+ * configurado que usa el agente Chagra IA.
  *
  * Problema (NN4, Playwright 2026-05-23 Q1 curuba): la primera query al
- * agente tras una sesión fresca tardaba 116s porque Ollama carga el modelo
- * en GPU bajo demanda (~4.6 GB VRAM). PR #1020 introdujo pre-warm al entrar
+ * agente tras una sesión fresca tardaba mucho porque Ollama carga el modelo
+ * en GPU bajo demanda. PR #1020 introdujo pre-warm al entrar
  * al dashboard, pero el `keep_alive=30m` se mide desde el último request:
- * si entre sesiones de Playwright el modelo se descargó del VRAM, el
+ * si entre sesiones de Playwright el modelo se descargó de la GPU, el
  * pre-warm al dashboard llegaba tarde si el operador iba directo al agente.
  *
  * Solución (este PR): disparar el pre-warm al login success ANTES de
@@ -42,9 +42,9 @@ import { create } from 'zustand';
  * resuelve el estado real al primer intento.
  */
 
-// Timeout total del pre-warm. La primera carga gemma3:4b en GPU M6000
-// tarda ~25-40s. 180s es defensivo para casos de Ollama recuperándose
-// de un crash de runner o swap en disco.
+// Timeout total del pre-warm. La primera carga del modelo en GPU local
+// puede tardar varias decenas de segundos. 180s es defensivo para casos de
+// Ollama recuperándose de un crash de runner o swap en disco.
 const WARMUP_TIMEOUT_MS = 180000;
 
 const useOllamaWarmStore = create((set, get) => ({

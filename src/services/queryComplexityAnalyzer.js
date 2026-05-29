@@ -2,24 +2,19 @@
  * queryComplexityAnalyzer.js — Routing dinámico de modelo LLM según
  * complejidad de la query del agente Chagra IA.
  *
- * Contexto bench 2026-05-23 (alpha, GPU M6000 sm_52):
- *  - gemma3:4b      → 118 t/s, 4 GB VRAM. Rápido (~20s avg) pero confunde
- *                     plagas regionales conocidas-confundibles (chiza vs
- *                     larvas defoliadoras genéricas, monalonion vs Fusarium)
- *                     y mete pifias taxonómicas en pasifloras (gulupa /
- *                     curuba / chulupa).
- *  - granite3.1-dense:8b → 37 t/s, ~6 GB VRAM. ~2× más lento (~37s avg)
- *                     pero clavó "Monalonion velezangeli" sin pestañear
- *                     en bench anti-alucinación.
- *  - gemma3:12b     → 37 t/s pero 9.6 GB VRAM (apretado contra hot model)
- *                     y latencia percibida 3× (~53s con context completo
- *                     RAG + tool evidence).
+ * Contexto (según bench interno en GPU local):
+ *  - Modelo "simple" configurado → más rápido pero confunde plagas
+ *    regionales conocidas-confundibles (chiza vs larvas defoliadoras
+ *    genéricas, monalonion vs Fusarium) y mete pifias taxonómicas en
+ *    pasifloras (gulupa / curuba / chulupa).
+ *  - Modelo "complex" configurado → más lento pero clavó "Monalonion
+ *    velezangeli" sin pestañear en bench anti-alucinación.
  *
  * Estrategia: queries simples (atributo puntual, planta conocida sin
- * confundibles, manejo estándar) → gemma3:4b → respuesta rápida. Queries
- * complejas (plagas regionales, pasifloras confundibles, planes
- * multi-aspecto, queries largas) → granite3.1-dense:8b → vale la pena
- * pagar latencia para no alucinar.
+ * confundibles, manejo estándar) → modelo simple → respuesta rápida.
+ * Queries complejas (plagas regionales, pasifloras confundibles, planes
+ * multi-aspecto, queries largas) → modelo complex → vale la pena pagar
+ * latencia para no alucinar.
  *
  * Diseño pure-function: el módulo no toca DOM, no hace I/O y no depende
  * de stores — sólo recibe el string de la query y devuelve un veredicto.
@@ -28,7 +23,7 @@
  */
 
 /**
- * Plagas regionales colombianas que gemma3:4b confunde en bench. La sola
+ * Plagas regionales colombianas que el modelo simple confunde en bench. La sola
  * mención de cualquiera de éstas dispara routing a modelo "complex" porque
  * el costo de equivocar el binomio (e.g. chiza → "Neolepidopteron daquila"
  * inventado) es peor que pagar 2× latencia.
@@ -58,7 +53,7 @@ const REGIONAL_PESTS = [
 
 /**
  * Plantas colombianas con alta tasa de confusión taxonómica observada en
- * bench gemma3:4b. Pasifloras (gulupa/curuba/chulupa/badea) son el caso
+ * bench interno. Pasifloras (gulupa/curuba/chulupa/badea) son el caso
  * clásico — el modelo intercambia familias y géneros con confianza alta.
  * Tubérculos andinos (cubio/oca/ulluco) y subutilizadas (chachafruto)
  * también disparan errores frecuentes.
@@ -93,7 +88,7 @@ const CONFUSABLE_PLANTS = [
 /**
  * Triggers léxicos de queries multi-aspecto. Una "asocia X con Y" o
  * "plan de manejo integral para Z" requiere conectar varios nodos del
- * KG y reflexionar — gemma3:4b tiende a saltar pasos o inventar relaciones
+ * KG y reflexionar — el modelo simple tiende a saltar pasos o inventar relaciones
  * que el catálogo no documenta. Granite reflexiona mejor antes de
  * comprometer la respuesta.
  *

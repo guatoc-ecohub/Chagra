@@ -9,7 +9,7 @@ import ChagraAgentAvatarColibri from './ChagraAgentAvatarColibri';
  *
  * Diseñado para ser DIGNO del HUD de HYTA (oracle-lab MainHud con sistema
  * solar 3D). Mismo nivel de profundidad visual, render en GPU del cliente
- * (no la M6000 del servidor — esa es para Ollama).
+ * (no la GPU del servidor — esa es para Ollama).
  *
  * Geometría:
  *   - Cuerpo: SphereGeometry escalada en X (torpedo aerodinámico).

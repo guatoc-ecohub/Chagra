@@ -1,5 +1,5 @@
 /**
- * entityExtractor.js — Extracción de entidades agrícolas vía Ollama / gemma3:4b.
+ * entityExtractor.js — Extracción de entidades agrícolas vía Ollama.
  *
  * Toma una transcripción en español y devuelve un array estricto de
  * { crop, quantity, location }. Aplica AbortController (timeout 20s) y
@@ -17,9 +17,8 @@
  * `streamOllama` y acepta `onToken` para que la UI muestre el JSON
  * apareciendo carácter-a-carácter mientras el modelo genera.
  *
- * 2026-05-13: swap qwen3.5:4b → gemma3:4b. qwen35 architecture cuelga
- * determinísticamente en Ollama 0.23.x (timeout >120s, retorna 500).
- * gemma3:4b responde ~10s con calidad equivalente para extracción JSON.
+ * El modelo configurado se eligió por estabilidad en Ollama y por calidad
+ * equivalente para extracción JSON frente a alternativas que colgaban.
  */
 
 import { streamOllama } from './ollamaStream';
@@ -27,7 +26,7 @@ import { registry } from '../core/moduleRegistry';
 
 const OLLAMA_CHAT_URL = '/api/ollama/api/chat';
 const MODEL = 'gemma3:4b';
-// gemma3:4b en CPU responde ~10-15s para extracción JSON con format:json.
+// El modelo configurado responde en pocos segundos para extracción JSON con format:json.
 // Nginx permite hasta 120s en /api/ollama/; 60s cliente es el punto medio seguro.
 const TIMEOUT_MS = 60000;
 
@@ -120,7 +119,7 @@ const parseJsonTolerant = (raw) => {
   const cleaned = raw.replace(/```json\s*/gi, '').replace(/```/g, '').trim();
   const cleanedParsed = (() => { try { return JSON.parse(cleaned); } catch (_) { return null; } })();
   if (cleanedParsed !== null) return cleanedParsed;
-  // Bench gemma3:4b 2026-05-15 (Ollama 0.23.x): cuando el modelo es chico
+  // Según bench interno: cuando el modelo es chico
   // a veces emite texto antes/después del JSON. Última red: extraer el
   // primer [...] balanceado del raw. Solo soporta arrays top-level (que
   // es el schema esperado del SYSTEM_PROMPT).
@@ -148,7 +147,7 @@ export async function extractEntities(text, { onToken } = {}) {
 
   try {
     const systemPrompt = await resolveSystemPrompt();
-    // Bench 2026-05-15 en gemma3:4b: con `format: 'json'` Ollama fuerza
+    // Según bench interno: con `format: 'json'` Ollama fuerza
     // un objeto JSON top-level único, lo que colapsa la salida a UN solo
     // `{crop, quantity, location}` incluso cuando el operador menciona
     // múltiples cultivos ("dos arvejas y tres papas" → solo extrae arvejas).
@@ -177,7 +176,7 @@ export async function extractEntities(text, { onToken } = {}) {
       if (Array.isArray(parsed?.entities)) parsed = parsed.entities;
       else if (Array.isArray(parsed?.data)) parsed = parsed.data;
       // Fallback: un único objeto {crop, quantity, location} → wrap en array.
-      // Algunos modelos chicos (gemma3:4b sin format:json en edge cases)
+      // Algunos modelos chicos (sin format:json en edge cases)
       // emiten una sola entidad como objeto plano.
       else if (parsed && typeof parsed === 'object' && 'crop' in parsed) parsed = [parsed];
       else parsed = [];

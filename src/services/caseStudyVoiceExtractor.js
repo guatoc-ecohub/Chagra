@@ -6,12 +6,12 @@
  *
  * Pipeline (referenced en DR-044 sub-viii Feature 1):
  *   1. Operator dicta caso → Whisper transcribe.
- *   2. extractCaseFromText(transcript) → Ollama qwen2.5:7b structured JSON.
+ *   2. extractCaseFromText(transcript) → Ollama, structured JSON.
  *   3. UI pre-fill form, operator confirma.
  *
- * Patrón espejado de `entityExtractor.js` (gemma3:4b para extracción simple).
- * Para casos de estudio elegimos `qwen2.5:7b` por mejor razonamiento con
- * campos múltiples + reasoning sobre pest taxonomy + count parsing.
+ * Patrón espejado de `entityExtractor.js` (modelo de extracción simple).
+ * Para casos de estudio se usa el modelo configurado por su mejor razonamiento
+ * con campos múltiples + reasoning sobre pest taxonomy + count parsing.
  *
  * Privacy: el prompt + transcripción NUNCA salen del host alpha. Si
  * Ollama no responde (down, timeout), retorna `null` y la UI cae a modo
@@ -24,9 +24,9 @@
 import { streamOllama } from './ollamaStream';
 
 const OLLAMA_CHAT_URL = '/api/ollama/api/chat';
-// qwen2.5:7b: mejor estructura JSON sobre campos múltiples vs gemma3:4b.
-// Bench 2026-05-15 (CPU): ~25-35s. Post-GPU sm_52 target ~5-10s.
-// Fallback: gemma3:4b si qwen2.5:7b no responde (ver llmRouter pattern).
+// Modelo configurado: mejor estructura JSON sobre campos múltiples que el
+// modelo de extracción simple. Fallback al modelo simple si no responde
+// (ver llmRouter pattern).
 const MODEL = 'qwen2.5:7b';
 const TIMEOUT_MS = 90000; // 90s CPU; ajustar post-GPU
 const PROMPT_VERSION = 'v1.0-2026-05-17';

@@ -54,7 +54,7 @@ const STATE_DONE = 'done';
 /**
  * VoiceCapture, UI principal del módulo de ingreso acústico.
  *
- * Pipeline: grabar → transcribir (Whisper) → extraer (gemma3:4b) → revisar
+ * Pipeline: grabar → transcribir (Whisper) → extraer (modelo configurado) → revisar
  * humano (VoiceConfirmation) → encolar en pending_transactions.
  *
  * Si transcripción o extracción fallan con error de red, ofrece encolar el

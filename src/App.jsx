@@ -422,7 +422,7 @@ export default function App() {
     });
   }, []);
 
-  // NN4 fix 2026-05-23: pre-warm Ollama gemma3:4b se dispara al LOGIN
+  // NN4 fix 2026-05-23: pre-warm del modelo Ollama configurado se dispara al LOGIN
   // SUCCESS (LoginScreen → useOllamaWarmStore.startWarmup()), NO al
   // dashboard. Esto da ~15-30s de margen humano antes que el operador
   // llegue al agente, eliminando el cold-start 116s observado en

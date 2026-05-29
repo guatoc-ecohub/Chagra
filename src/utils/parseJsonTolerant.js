@@ -4,7 +4,7 @@
 /**
  * parseJsonTolerant — parser JSON robusto para output de LLMs locales.
  *
- * Los modelos Ollama (gemma3:4b, llama3.2-vision, granite3.1-dense) a veces
+ * Los modelos locales en Ollama a veces
  * envuelven el JSON en markdown fences, agregan prosa antes/después, truncan
  * por num_predict, o emiten trailing commas. `JSON.parse` directo rompe en
  * esos casos y la respuesta del agente se pierde, aunque el contenido sea

@@ -27,17 +27,11 @@ import { parseJsonTolerant } from '../utils/parseJsonTolerant';
 // Ruta final: /api/ollama/api/generate → http://localhost:11434/api/generate
 const OLLAMA_BASE = '/api/ollama';
 const OLLAMA_URL = `${OLLAMA_BASE}/api/generate`;
-// Gemma 3 4B (oficial Google, multimodal nativo). Reemplaza paligemma
-// porque el runner Llama de Ollama crashea con arquitectura PaliGemma.
+// Modelo de diagnóstico multimodal configurado.
 const DIAGNOSIS_MODEL = 'gemma3:4b';
-// Vision-specialized model para species recognition. Bench 2026-05-26
-// bench-vision-flora 16 fixtures: llama3.2-vision:11b = 0 parse errors,
-// 18.8% nombre común, 68.8% familia botánica, 18.6s p50; qwen2.5vl:7b
-// = 16/16 parse errors a pesar de format:"json"; llava:13b 15/16 errors.
-// Cambio primary qwen2.5vl → llama3.2-vision por confiabilidad JSON.
-// qwen sigue como segundo fallback porque latencia p50 es 3.3s (5x más
-// rápido que llama32) — útil si llama32 OOM o timeout en hardware
-// constrained.
+// Modelo de visión configurado para reconocimiento de especies. La
+// selección de primary y de los fallbacks se basa en bench interno de
+// confiabilidad del parseo JSON y de latencia en GPU local.
 const VISION_SPECIES_MODEL = 'llama3.2-vision:11b';
 const VISION_SPECIES_FALLBACK_MODEL = 'gemma3:4b';
 const VISION_SPECIES_FALLBACK_2_MODEL = 'qwen2.5vl:7b';
@@ -114,7 +108,7 @@ const buildDiagnosisPrompt = (ragContext) => {
 };
 
 // Species recognition (EXPERIMENTAL — feature flag operador 2026-05-03 Miguel).
-// Mismo modelo gemma3:4b multimodal pero distinto prompt. Output JSON
+// Mismo modelo multimodal configurado pero distinto prompt. Output JSON
 // estructurado para que la UI pueda autocompletar SpeciesSelect con la
 // sugerencia + confidence. Scope esperado: vegetales y frutales latinoamericanos
 // comunes (café, gulupa, mora, fresa, lechuga, tomate, papa, plátano, etc.).
@@ -241,7 +235,7 @@ export const analyzeFoliage = async (imageBlob, { onToken, signal, speciesSlug, 
 
 /**
  * Reconoce especie de planta a partir de una foto (EXPERIMENTAL - Miguel
- * 2026-05-03). Mismo backend gemma3:4b multimodal pero prompt distinto.
+ * 2026-05-03). Mismo backend multimodal configurado pero prompt distinto.
  *
  * @param {Blob} imageBlob - foto JPEG/WebP comprimida
  * @param {Object} [options]
@@ -554,21 +548,21 @@ export const recognizeSpecies = async (imageBlob, { onToken, signal, _telemetryS
   // `recognizeSpeciesGrounded` lo pasan para extender la grabación.
   const telemetryState = _telemetryState || {};
 
-  // Primary: llama3.2-vision:11b (0 parse errors bench 2026-05-26).
+  // Primary: modelo de visión configurado.
   try {
     return await runSpeciesRecognition(VISION_SPECIES_MODEL, base64, { onToken, signal, telemetryState });
   } catch (err) {
     console.warn(`[aiService] ${VISION_SPECIES_MODEL} failed, fallback to ${VISION_SPECIES_FALLBACK_MODEL}:`, err.message);
   }
 
-  // Fallback 1: gemma3:4b (modelo de diagnóstico, ya cargado en VRAM normalmente).
+  // Fallback 1: modelo de diagnóstico configurado (normalmente ya cargado en GPU).
   try {
     return await runSpeciesRecognition(VISION_SPECIES_FALLBACK_MODEL, base64, { onToken, signal, telemetryState });
   } catch (err) {
     console.warn(`[aiService] ${VISION_SPECIES_FALLBACK_MODEL} failed, fallback 2 to ${VISION_SPECIES_FALLBACK_2_MODEL}:`, err.message);
   }
 
-  // Fallback 2: qwen2.5vl:7b (rápido pero parse errors frecuentes — último recurso).
+  // Fallback 2: modelo de visión alterno configurado (último recurso).
   try {
     return await runSpeciesRecognition(VISION_SPECIES_FALLBACK_2_MODEL, base64, { onToken, signal, telemetryState });
   } catch (err) {

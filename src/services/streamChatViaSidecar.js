@@ -109,7 +109,7 @@ function parseSseLine(line) {
  * Stream chat from the sidecar.
  *
  * @param {Object}   params
- * @param {string}   params.model     — Ollama tag (e.g. "granite3.1-dense:8b")
+ * @param {string}   params.model     — Ollama tag (e.g. "<modelo-configurado>")
  * @param {Array}    params.messages  — OpenAI-style [{role, content}, ...]
  * @param {string}   [params.system]  — optional system prepended by sidecar
  *                                       if first message isn't already system

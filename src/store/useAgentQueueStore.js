@@ -5,8 +5,8 @@ import { create } from 'zustand';
  * (task #121, 2026-05-24).
  *
  * Problema (UX 2026-05-23 testing manual con operadora real):
- * Cuando una pregunta al agente tarda 12-25s en responder (router dual
- * model: llama3.1:8b ~12.9s simple, granite3.1-dense:8b ~24.7s complex),
+ * Cuando una pregunta al agente tarda varios segundos en responder (router
+ * dual model: una ruta simple más rápida y una ruta complex más lenta),
  * el operador no espera quieto: dispara 2-3 preguntas seguidas. Con el
  * guard `state !== STATE_IDLE` actual en `handleSubmit`, las preguntas
  * 2 y 3 se ignoraban silenciosamente (`return` mudo). El operador veía
@@ -27,7 +27,7 @@ import { create } from 'zustand';
  *   - pending:      Array de { id, prompt, enqueuedAt }; max 1 elemento
  *                   (allow 2 total = 1 processing + 1 pending).
  *   - latencyEma:   Object { [model]: emaMs }. Init defaults por modelo
- *                   del bench nocturno 2026-05-24. Se actualiza con
+ *                   según bench interno. Se actualiza con
  *                   alpha 0.3 cada `completeProcessing`.
  *   - rejectedCount: contador defensivo para telemetría (cuántas veces
  *                   el operador trató de mandar una 3ra mientras había 2).
@@ -39,11 +39,11 @@ import { create } from 'zustand';
  */
 
 /**
- * Defaults de latencia inicial por route del router (selectChatRoute).
- * Bench nocturno 2026-05-24 (DR bench-modelos-nocturno-2026-05-24.md):
- *   - 'chat' (llama3.1:8b)             ≈ 12.9s avg
- *   - 'chat_complex' (granite3.1-dense:8b) ≈ 24.7s avg
- *   - 'unknown' (fallback defensivo)   ≈ 15.0s
+ * Defaults de latencia inicial por route del router (selectChatRoute),
+ * según bench interno:
+ *   - 'chat' (ruta simple)            → latencia menor
+ *   - 'chat_complex' (ruta complex)   → latencia mayor
+ *   - 'unknown' (fallback defensivo)  → valor intermedio
  * Si en el futuro se agrega otro route al router, se cae al fallback
  * limpio en lugar de explotar.
  */
@@ -57,7 +57,7 @@ export const DEFAULT_EMA_MS = {
  * Alpha del Exponential Moving Average. 0.3 da peso suave al sample
  * nuevo (30%) preservando inercia histórica (70%). Equilibrio entre
  * reaccionar a degradaciones reales del modelo (cold-start tras swap
- * de VRAM) y no oscilar ante un single outlier.
+ * en GPU) y no oscilar ante un single outlier.
  */
 const EMA_ALPHA = 0.3;
 

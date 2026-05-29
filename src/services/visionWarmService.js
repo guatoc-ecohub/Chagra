@@ -2,21 +2,22 @@
  * visionWarmService.js — pre-warm del modelo vision on-click cámara.
  *
  * Estrategia "warm-on-click" (decisión operador 2026-05-27): NO pre-warmear
- * el modelo de visión al login (riesgo VRAM: gemma3:4b + llama3.2-vision:11b
- * suman ~11.6 GB, justo al límite de 12 GB de la Quadro M6000). En su lugar,
- * disparar el warm cuando el operador toca el botón "Tomar foto" — mientras
- * enfoca cámara/galería (3-5 segundos humanos), el modelo carga en GPU.
+ * el modelo de visión al login (riesgo de presión sobre la GPU local: el
+ * modelo de chat más el de visión juntos quedan cerca del tope de memoria).
+ * En su lugar, disparar el warm cuando el operador toca el botón "Tomar
+ * foto" — mientras enfoca cámara/galería (3-5 segundos humanos), el modelo
+ * carga en GPU.
  *
- * Si gemma3:4b ya está cargado, Ollama gestiona el swap automáticamente.
- * Cuando el operador vuelve al chat texto después, gemma se re-cargará en
- * cold-start (~25s), pero ese tradeoff es aceptable: la primera identificación
+ * Si el modelo de chat ya está cargado, Ollama gestiona el swap
+ * automáticamente. Cuando el operador vuelve al chat texto después, se
+ * re-cargará en cold-start, pero ese tradeoff es aceptable: la primera identificación
  * de visión es lo que percibe el operador como "el agente respondió rápido"
  * y eso impacta más la primera impresión (los testers Android+iOS que pruebas
  * mañana 2026-05-27).
  *
  * Idempotente: usar `warmVisionModel()` múltiples veces no dispara N requests
  * — un internal lock previene calls concurrentes mientras una request está
- * en vuelo. El segundo click rápido no quema VRAM extra.
+ * en vuelo. El segundo click rápido no quema memoria de GPU extra.
  *
  * Fire-and-forget: el caller NO debe esperar la promesa. Si falla (Ollama
  * down, red intermitente, modelo no instalado), degrada silencioso al
@@ -27,7 +28,7 @@ const OLLAMA_URL = '/api/ollama/api/generate';
 const VISION_MODEL = 'llama3.2-vision:11b';
 // keep_alive 5min: si user demora entre click cámara y submit, el modelo
 // sigue caliente. Si user abandona el flow, Ollama lo desaloja en 5min y
-// libera VRAM. Más corto causaría re-warm si el flow toma >2min.
+// libera memoria de GPU. Más corto causaría re-warm si el flow toma >2min.
 const KEEP_ALIVE = '5m';
 const WARMUP_TIMEOUT_MS = 30000;
 
