@@ -133,7 +133,13 @@ const DashboardLiveView = React.memo(function DashboardLiveView({ onNavigate, on
   }, [hydrate, syncFromServer]);
 
   return (
-    <div className="relative h-[100dvh] w-full bg-slate-950 text-white flex flex-col overflow-hidden">
+    // bg-slate-950/55 (no sólido) 2026-05-28: el dashboard principal tenía
+    // bg-slate-950 opaco que tapaba al 100% el fondo-foto elegido en el
+    // selector (--app-bg-image en el body, clase .app-bg-biodiversidad).
+    // El operador veía la foto en pantallas con ScreenShell pero NO en la
+    // principal. Scrim semi-opaco deja ver la foto detrás; BiopunkBackground
+    // (capa animada) + contenido z-10 mantienen legibilidad.
+    <div className="relative h-[100dvh] w-full bg-slate-950/55 text-white flex flex-col overflow-hidden">
       {/* Capa biopunk viva — sutil siempre, salvaje en idle */}
       <BiopunkBackground intense={idle} />
       {/* Contenido del dashboard, fade-out cuando idle para resaltar fondo */}
