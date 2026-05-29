@@ -17,10 +17,48 @@ import { markHadData } from '../services/emptyDbDetector';
  * Patrón Offline-First: memoria (Zustand) ← IndexedDB ← FarmOS API
  *
  * Tipos de activos FarmOS v2:
+ *   - plant:     Siembras y cultivos
+ *   - land:      Zonas geográficas (lotes, potreros, balcones)
  *   - structure: Invernaderos, Composteras, Infraestructura bioclimática
  *   - equipment: Azadones, Carretillas, Herramientas manuales
  *   - material:  Biol, Lombricompost, Insumos orgánicos
  */
+
+/**
+ * BUG FIX CRITICAL 2026-05-28 (operador): "al agregar una nueva zona en
+ * zonas la información se guarda en insumos arregla eso y revisa el flujo
+ * de todo lo que se guarda para que no tengan líos similares".
+ *
+ * Root cause: las 4 funciones mutadoras (addAsset, addAssetsBulk,
+ * updateAsset, removeAsset) tenían un mapping inline assetType→storeKey
+ * con cascada ternary, y FALTABA el caso 'land'. El fallback default
+ * ':materials' atrapaba silenciosamente cualquier tipo no listado, así
+ * que toda Zona nueva se guardaba en el array `materials` (insumos).
+ *
+ * Fix: tabla central + helper con validación estricta + warn explícito.
+ * Si algún caller pasa un tipo desconocido (futura regresión), no se hace
+ * el set y queda log visible en consola en lugar de corromper datos.
+ */
+const ASSET_TYPE_TO_STORE_KEY = Object.freeze({
+  plant: 'plants',
+  land: 'lands',
+  structure: 'structures',
+  equipment: 'equipment',
+  material: 'materials',
+});
+
+function getStoreKeyForAssetType(assetType) {
+  const key = ASSET_TYPE_TO_STORE_KEY[assetType];
+  if (!key) {
+    console.warn(
+      `[useAssetStore] assetType desconocido "${assetType}"; no se actualiza el store local. ` +
+      `Tipos válidos: ${Object.keys(ASSET_TYPE_TO_STORE_KEY).join(', ')}. ` +
+      `Esto es un bug del caller — el asset igual puede haberse encolado en pendingTxs.`
+    );
+    return null;
+  }
+  return key;
+}
 
 const useAssetStore = create((set, get) => ({
   // Estado
@@ -231,10 +269,12 @@ const useAssetStore = create((set, get) => ({
     try {
       await assetCache.commitOptimisticUpdate([{ assetType, asset }], pendingTxs);
       set((state) => {
-        const key = assetType === 'plant' ? 'plants'
-          : assetType === 'structure' ? 'structures'
-            : assetType === 'equipment' ? 'equipment'
-              : 'materials';
+        // BUG FIX 2026-05-28: ver comentario sobre ASSET_TYPE_TO_STORE_KEY
+        // arriba del create(). Helper centralizado garantiza que 'land' y
+        // cualquier tipo futuro se ruteen al array correcto en vez de
+        // caer silenciosamente al fallback 'materials'.
+        const key = getStoreKeyForAssetType(assetType);
+        if (!key) return state;
         return { [key]: [...state[key], asset] };
       });
       // emptyDbDetector: huella para post-clear-cache detection.
@@ -270,10 +310,12 @@ const useAssetStore = create((set, get) => ({
       const updates = assets.map((asset) => ({ assetType, asset }));
       await assetCache.commitOptimisticUpdate(updates, pendingTxs);
       set((state) => {
-        const key = assetType === 'plant' ? 'plants'
-          : assetType === 'structure' ? 'structures'
-            : assetType === 'equipment' ? 'equipment'
-              : 'materials';
+        // BUG FIX 2026-05-28: ver comentario sobre ASSET_TYPE_TO_STORE_KEY
+        // arriba del create(). Helper centralizado garantiza que 'land' y
+        // cualquier tipo futuro se ruteen al array correcto en vez de
+        // caer silenciosamente al fallback 'materials'.
+        const key = getStoreKeyForAssetType(assetType);
+        if (!key) return state;
         return { [key]: [...state[key], ...assets] };
       });
       navigator.serviceWorker?.controller?.postMessage({ type: 'SYNC_REQUESTED' });
@@ -288,10 +330,12 @@ const useAssetStore = create((set, get) => ({
     try {
       await assetCache.commitOptimisticUpdate([{ assetType, asset }], pendingTxs);
       set((state) => {
-        const key = assetType === 'plant' ? 'plants'
-          : assetType === 'structure' ? 'structures'
-            : assetType === 'equipment' ? 'equipment'
-              : 'materials';
+        // BUG FIX 2026-05-28: ver comentario sobre ASSET_TYPE_TO_STORE_KEY
+        // arriba del create(). Helper centralizado garantiza que 'land' y
+        // cualquier tipo futuro se ruteen al array correcto en vez de
+        // caer silenciosamente al fallback 'materials'.
+        const key = getStoreKeyForAssetType(assetType);
+        if (!key) return state;
         return { [key]: state[key].map((a) => a.id === asset.id ? asset : a) };
       });
       navigator.serviceWorker?.controller?.postMessage({ type: 'SYNC_REQUESTED' });
@@ -330,10 +374,12 @@ const useAssetStore = create((set, get) => ({
       });
 
       set((state) => {
-        const key = assetType === 'plant' ? 'plants'
-          : assetType === 'structure' ? 'structures'
-            : assetType === 'equipment' ? 'equipment'
-              : 'materials';
+        // BUG FIX 2026-05-28: ver comentario sobre ASSET_TYPE_TO_STORE_KEY
+        // arriba del create(). Helper centralizado garantiza que 'land' y
+        // cualquier tipo futuro se ruteen al array correcto en vez de
+        // caer silenciosamente al fallback 'materials'.
+        const key = getStoreKeyForAssetType(assetType);
+        if (!key) return state;
         return { [key]: state[key].filter((a) => a.id !== assetId) };
       });
       navigator.serviceWorker?.controller?.postMessage({ type: 'SYNC_REQUESTED' });
