@@ -12,6 +12,8 @@ import {
   Loader2,
   Search,
   AlertCircle,
+  List,
+  ChevronDown,
 } from 'lucide-react';
 import {
   resolveUbicacion,
@@ -20,6 +22,7 @@ import {
 } from '../services/locationService';
 import { useFincaActiveStore } from '../services/fincaActiveStore';
 import { saveProfile } from '../services/userProfileService';
+import { getDepartamentos, getMunicipios } from '../utils/colombiaLocations';
 
 // Fix del marcador por defecto de Leaflet (bundlers no resuelven las URLs
 // relativas del CSS). Mismo patrón que MultiFincaGlobe.
@@ -94,6 +97,10 @@ export default function LocationDetectedScreen({
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState(initialMunicipio);
   const [searchError, setSearchError] = useState(null);
+  // PR4 (#187) — cascade dropdown offline para cuando Nominatim falla o el
+  // usuario no tiene buena ortografía. 32 dptos × municipios curados.
+  const [cascadeOpen, setCascadeOpen] = useState(false);
+  const [cascadeDpto, setCascadeDpto] = useState('');
   const setFincaIndoorZone = useFincaActiveStore((s) => s.setIndoorZone);
 
   // Resolver inicial si vienen coords.
@@ -138,6 +145,50 @@ export default function LocationDetectedScreen({
     } catch (e) {
       console.warn('[LocationDetected] búsqueda falló:', e);
       setSearchError('Hubo un problema buscando ese lugar. Intenta de nuevo.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * PR4 (#187) — selección de un municipio del cascade hardcoded. No usa
+   * Nominatim, resuelve directo con las coordenadas+altitud que vienen en
+   * el dataset. resolveUbicacion sigue corriendo en background para enriquecer
+   * con piso térmico + recomendaciones de cultivo, pero si falla la red el
+   * fallback local en getPisoTermicoInfo ya cubre lo esencial.
+   */
+  const handleCascadeSelect = async (dpto, mun) => {
+    setLoading(true);
+    setSearchError(null);
+    setCascadeOpen(false);
+    try {
+      const enriched = await resolveUbicacion({
+        lat: mun.lat,
+        lng: mun.lng,
+        altitud: mun.altitud,
+      });
+      setLoc({
+        ...enriched,
+        // Preferir SIEMPRE los datos de la lista curada — Nominatim
+        // a veces devuelve nombres con tildes raras o variantes.
+        municipio: mun.name,
+        departamento: dpto,
+        altitud: mun.altitud,
+        lat: mun.lat,
+        lng: mun.lng,
+      });
+    } catch (e) {
+      console.warn('[LocationDetected] cascade resolve falló (degradación):', e);
+      // Fallback local — al menos el piso térmico se deriva de altitud
+      // sin red. Marca location with piso info via memo.
+      setLoc({
+        lat: mun.lat,
+        lng: mun.lng,
+        altitud: mun.altitud,
+        municipio: mun.name,
+        departamento: dpto,
+        pisoTermico: getPisoTermicoInfo(mun.altitud),
+      });
     } finally {
       setLoading(false);
     }
@@ -231,6 +282,77 @@ export default function LocationDetectedScreen({
             <p className="text-xs text-amber-400 mt-2 flex items-center gap-1">
               <AlertCircle size={12} /> {searchError}
             </p>
+          )}
+        </div>
+
+        {/* PR4 (#187) — cascade dropdown offline. Toggle por defecto cerrado
+            para no agregar ruido a la búsqueda. El usuario abre solo si la
+            búsqueda libre falla o prefiere elegir de lista. */}
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/40 overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setCascadeOpen((v) => !v)}
+            className="w-full px-4 py-3 flex items-center justify-between text-sm text-slate-300 hover:bg-slate-800/40"
+            aria-expanded={cascadeOpen}
+          >
+            <span className="flex items-center gap-2">
+              <List size={16} className="text-emerald-400" />
+              <span>{cascadeOpen ? 'Cerrar lista de municipios' : 'Elegir desde lista de municipios'}</span>
+            </span>
+            <ChevronDown
+              size={16}
+              className={`text-slate-500 transition-transform ${cascadeOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+
+          {cascadeOpen && (
+            <div className="px-4 pb-4 space-y-3 border-t border-slate-800">
+              <p className="text-2xs text-slate-500 leading-relaxed pt-3">
+                Funciona sin internet. Datos curados para 32 departamentos.
+              </p>
+              <label className="block">
+                <span className="text-xs font-medium text-slate-400 block mb-1.5">
+                  Departamento
+                </span>
+                <select
+                  value={cascadeDpto}
+                  onChange={(e) => setCascadeDpto(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-emerald-500/60 appearance-none"
+                >
+                  <option value="">— Selecciona departamento —</option>
+                  {getDepartamentos().map((dpto) => (
+                    <option key={dpto} value={dpto}>
+                      {dpto}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              {cascadeDpto && (
+                <label className="block">
+                  <span className="text-xs font-medium text-slate-400 block mb-1.5">
+                    Municipio
+                  </span>
+                  <select
+                    onChange={(e) => {
+                      const munName = e.target.value;
+                      if (!munName) return;
+                      const mun = getMunicipios(cascadeDpto).find((m) => m.name === munName);
+                      if (mun) handleCascadeSelect(cascadeDpto, mun);
+                    }}
+                    defaultValue=""
+                    className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-emerald-500/60 appearance-none"
+                  >
+                    <option value="">— Selecciona municipio —</option>
+                    {getMunicipios(cascadeDpto).map((m) => (
+                      <option key={m.name} value={m.name}>
+                        {m.name} · {m.altitud} msnm
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+            </div>
           )}
         </div>
 
