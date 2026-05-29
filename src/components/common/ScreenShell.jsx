@@ -39,7 +39,13 @@ function navigateGlobal(view) {
 export const ScreenShell = ({ title, onBack, onHome, icon: Icon, children, actions }) => {
     const handleHome = onHome || (() => navigateGlobal('dashboard'));
     return (
-        <div className="h-[100dvh] bg-slate-950 text-white flex flex-col overflow-hidden">
+        // FIX fondo (2026-05-28): el wrapper era `bg-slate-950` SÓLIDO y tapaba
+        // por completo la imagen `--app-bg-image` que App.jsx escribe en el
+        // <body> (el operador "no veía la foto del fondo" al elegirla en Perfil).
+        // Ahora el wrapper es transparente y el <main> usa un scrim semi-opaco
+        // (bg-slate-950/55) en vez de slate-950 sólido, dejando que la foto del
+        // body se vea claramente detrás del contenido sin perder legibilidad.
+        <div className="h-[100dvh] text-white flex flex-col overflow-hidden">
             <header className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/50 backdrop-blur-md shrink-0 gap-2">
                 <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                     {onBack && (
@@ -83,7 +89,7 @@ export const ScreenShell = ({ title, onBack, onHome, icon: Icon, children, actio
                 FieldFeedback, AgentFab, banners) tapaban los CTAs del final de
                 cada screen. Padding-bottom defensivo que respeta safe-area iOS
                 + alto suficiente para los 3 FABs apilados verticalmente. */}
-            <main className="flex-1 overflow-y-auto bg-slate-950 bg-biopunk-pattern pb-[max(env(safe-area-inset-bottom),0px)_+_120px]">{children}</main>
+            <main className="flex-1 overflow-y-auto bg-slate-950/55 bg-biopunk-pattern pb-[max(env(safe-area-inset-bottom),0px)_+_120px]">{children}</main>
         </div>
     );
 };
