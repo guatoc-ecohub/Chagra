@@ -1,14 +1,20 @@
 import { Check } from 'lucide-react';
 import useAgentAvatarType from '../../hooks/useAgentAvatarType';
 import ChagraAgentAvatarColibri from '../ChagraAgentAvatarColibri';
+import ChagraAgentAvatarColibriPhoto from '../ChagraAgentAvatarColibriPhoto';
 import ChagraAgentAvatarMaiz from '../ChagraAgentAvatarMaiz';
 
 /**
  * AgentAvatarSelector — selector visual para el avatar del agente IA.
  *
- * 2 opciones: colibrí (default) o planta de maíz. Persiste vía
- * useAgentAvatarType (localStorage `chagra:agent-avatar-type`). Cambio
- * inmediato — afecta a todas las instancias del avatar en la app.
+ * 3 opciones: colibrí foto-realista (default), colibrí ilustrado SVG,
+ * o planta de maíz. Persiste vía useAgentAvatarType (localStorage
+ * `chagra:agent-avatar-type`). Cambio inmediato — afecta a todas las
+ * instancias del avatar en la app.
+ *
+ * 2026-05-28: la opción 'colibri' foto-realista reemplaza al R3F que
+ * el operador rechazó. La ilustración SVG sigue accesible bajo
+ * 'colibri_svg' para quien prefiera el estilo botánico anterior.
  */
 export default function AgentAvatarSelector() {
     const [type, setType] = useAgentAvatarType();
@@ -16,8 +22,14 @@ export default function AgentAvatarSelector() {
     const OPTIONS = [
         {
             id: 'colibri',
-            label: 'Colibrí libando',
-            sub: 'Ave nacional polinizadora',
+            label: 'Colibrí real',
+            sub: 'Foto biopunk (recomendado)',
+            Component: ChagraAgentAvatarColibriPhoto,
+        },
+        {
+            id: 'colibri_svg',
+            label: 'Colibrí ilustrado',
+            sub: 'SVG botánico animado',
             Component: ChagraAgentAvatarColibri,
         },
         {
@@ -36,7 +48,7 @@ export default function AgentAvatarSelector() {
                     Elige cómo se ve la IA en la app. Cambio inmediato.
                 </p>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-2.5">
                 {OPTIONS.map((opt) => {
                     const selected = type === opt.id;
                     return (
@@ -45,7 +57,7 @@ export default function AgentAvatarSelector() {
                             type="button"
                             onClick={() => setType(opt.id)}
                             aria-pressed={selected}
-                            className={`relative flex flex-col items-center gap-2 px-3 py-4 rounded-xl border-2 transition-all active:scale-95 ${
+                            className={`relative flex flex-col items-center gap-2 px-2 py-4 rounded-xl border-2 transition-all active:scale-95 ${
                                 selected
                                     ? 'border-emerald-500 bg-emerald-900/20 ring-2 ring-emerald-500/40'
                                     : 'border-slate-700 bg-slate-900 hover:border-slate-600'
@@ -56,10 +68,10 @@ export default function AgentAvatarSelector() {
                                     <Check size={12} strokeWidth={3} aria-hidden="true" />
                                 </span>
                             )}
-                            <opt.Component state={selected ? 'thinking' : 'idle'} size={64} />
+                            <opt.Component state={selected ? 'thinking' : 'idle'} size={60} />
                             <div className="text-center">
-                                <p className="text-sm font-bold text-slate-100">{opt.label}</p>
-                                <p className="text-2xs text-slate-500 mt-0.5">{opt.sub}</p>
+                                <p className="text-xs sm:text-sm font-bold text-slate-100 leading-tight">{opt.label}</p>
+                                <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">{opt.sub}</p>
                             </div>
                         </button>
                     );

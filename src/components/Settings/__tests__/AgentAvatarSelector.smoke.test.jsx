@@ -7,15 +7,16 @@ describe('AgentAvatarSelector smoke', () => {
         localStorage.clear();
     });
 
-    it('renderiza 2 opciones colibri + maiz', () => {
+    it('renderiza 3 opciones colibri-real + colibri-svg + maiz', () => {
         render(<AgentAvatarSelector />);
-        expect(screen.getByText('Colibrí libando')).toBeInTheDocument();
+        expect(screen.getByText('Colibrí real')).toBeInTheDocument();
+        expect(screen.getByText('Colibrí ilustrado')).toBeInTheDocument();
         expect(screen.getByText('Planta de maíz')).toBeInTheDocument();
     });
 
-    it('colibri seleccionado por default', () => {
+    it('colibri-real seleccionado por default', () => {
         render(<AgentAvatarSelector />);
-        const colibriBtn = screen.getByText('Colibrí libando').closest('button');
+        const colibriBtn = screen.getByText('Colibrí real').closest('button');
         expect(colibriBtn).toHaveAttribute('aria-pressed', 'true');
     });
 
@@ -25,8 +26,16 @@ describe('AgentAvatarSelector smoke', () => {
         fireEvent.click(maizBtn);
         expect(maizBtn).toHaveAttribute('aria-pressed', 'true');
         expect(localStorage.getItem('chagra:agent-avatar-type')).toBe('maiz');
-        const colibriBtn = screen.getByText('Colibrí libando').closest('button');
+        const colibriBtn = screen.getByText('Colibrí real').closest('button');
         expect(colibriBtn).toHaveAttribute('aria-pressed', 'false');
+    });
+
+    it('click en colibri-svg cambia la preferencia y persiste', () => {
+        render(<AgentAvatarSelector />);
+        const svgBtn = screen.getByText('Colibrí ilustrado').closest('button');
+        fireEvent.click(svgBtn);
+        expect(svgBtn).toHaveAttribute('aria-pressed', 'true');
+        expect(localStorage.getItem('chagra:agent-avatar-type')).toBe('colibri_svg');
     });
 
     it('localStorage maiz preselecciona maiz al montar', () => {
@@ -34,5 +43,12 @@ describe('AgentAvatarSelector smoke', () => {
         render(<AgentAvatarSelector />);
         const maizBtn = screen.getByText('Planta de maíz').closest('button');
         expect(maizBtn).toHaveAttribute('aria-pressed', 'true');
+    });
+
+    it('localStorage colibri_svg preselecciona el ilustrado al montar', () => {
+        localStorage.setItem('chagra:agent-avatar-type', 'colibri_svg');
+        render(<AgentAvatarSelector />);
+        const svgBtn = screen.getByText('Colibrí ilustrado').closest('button');
+        expect(svgBtn).toHaveAttribute('aria-pressed', 'true');
     });
 });
