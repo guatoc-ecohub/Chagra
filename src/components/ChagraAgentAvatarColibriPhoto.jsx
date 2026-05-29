@@ -21,12 +21,13 @@ import React, { useState } from 'react';
  * del wrapper ChagraAgentAvatar. Mismas props.
  */
 
-// Flip a `true` cuando el video transición foto#4 metal → foto#5 vivo esté
-// en /public/avatar/colibri-transition.webm (generado con Runway Gen-3 o
-// Kling AI usando los anchors `colibri-anchor-metal.jpg` y
-// `colibri-anchor-organic.jpg`). Mientras tanto, fallback al still es la
-// misma foto Lili biopunk, así que la estética ya queda alineada.
-const HAS_TRANSITION_VIDEO = false;
+// 2026-05-29: video transición Kling vía Magnific entregado por Lili.
+// Generado image-to-image-to-video desde anchors `colibri-anchor-metal.jpg`
+// → `colibri-anchor-organic.jpg`. WebM VP9 480x480 30fps ~930KB en
+// /public/avatar/colibri-transition.webm. Si el navegador no soporta WebM
+// o el fetch falla, onError dispara fallback al still hero (foto#2 pose
+// icónica) sin breaking change visual.
+const HAS_TRANSITION_VIDEO = true;
 
 const STATE_RING = {
   idle:      { color: '#10b981', shadow: 'rgba(16,185,129,0.45)', speed: '3s' },
