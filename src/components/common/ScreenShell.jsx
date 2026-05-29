@@ -89,7 +89,14 @@ export const ScreenShell = ({ title, onBack, onHome, icon: Icon, children, actio
                 FieldFeedback, AgentFab, banners) tapaban los CTAs del final de
                 cada screen. Padding-bottom defensivo que respeta safe-area iOS
                 + alto suficiente para los 3 FABs apilados verticalmente. */}
-            <main className="flex-1 overflow-y-auto bg-slate-950/55 bg-biopunk-pattern pb-[max(env(safe-area-inset-bottom),0px)_+_120px]">{children}</main>
+            {/* BUGFIX 2026-05-28 operador: el main tenía `bg-biopunk-pattern`
+                hardcoded que TAPABA la imagen del catálogo seleccionada desde
+                Perfil (el operador veía la foto solo en dashboard, no en
+                screens secundarias). El bg vivo ya está aplicado al body
+                vía `body.app-bg-biodiversidad` (App.jsx escribe --app-bg-image).
+                Aquí solo dejamos el scrim semi-transparente para legibilidad
+                del contenido — la imagen del body se ve a través del scrim. */}
+            <main className="flex-1 overflow-y-auto bg-slate-950/55 pb-[max(env(safe-area-inset-bottom),0px)_+_120px]">{children}</main>
         </div>
     );
 };

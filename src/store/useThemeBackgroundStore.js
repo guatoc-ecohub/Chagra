@@ -64,6 +64,12 @@ export const BACKGROUND_CATALOG = Object.freeze([
     sub: 'Osos, armadillo, quetzal, raíces',
     src: '/fondo-biopunk-3.jpg',
   }),
+  Object.freeze({
+    id: 'biopunk-4',
+    label: 'Cosecha mística',
+    sub: 'Maíz raíces, colibrí en orbe, jaguar',
+    src: '/fondo-biopunk-4.jpg',
+  }),
 ]);
 
 /** Imagen clásica original — fallback estable para 'default'. */
