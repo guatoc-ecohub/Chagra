@@ -8,10 +8,16 @@ import ChagraGrowLoader from './ChagraGrowLoader';
 import LegalLinks from './LegalLinks';
 import WelcomeStatsHero from './WelcomeStatsHero';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
+import useThemeBackgroundStore, { getBackgroundSrc } from '../store/useThemeBackgroundStore';
 
 export default function LoginScreen({ onLoginSuccess, onSave }) {
   const [creds, setCreds] = useState({ username: '', password: '' });
   const [loading, setLoading] = useState(false);
+  // Selector de fondos: en login mostramos el fondo curado elegido como
+  // capa de foto detrás del patrón biopunk. Suscribimos solo el id (string)
+  // para evitar React #185. 'default' sigue mostrando solo slate + biopunk.
+  const selectedBackground = useThemeBackgroundStore((s) => s.selected);
+  const loginBgSrc = selectedBackground === 'default' ? null : getBackgroundSrc(selectedBackground);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -89,8 +95,20 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
   };
 
   return (
-    <div className="min-h-[100dvh] w-full bg-slate-950 bg-biopunk-pattern flex flex-col justify-start items-center p-6 text-slate-100 overflow-y-auto">
-      <div className="w-full max-w-sm flex flex-col items-center gap-6 pt-8">
+    <div className="relative min-h-[100dvh] w-full bg-slate-950 bg-biopunk-pattern flex flex-col justify-start items-center p-6 text-slate-100 overflow-y-auto">
+      {/* Capa de foto del fondo curado (si el operador eligió uno distinto
+          al clásico). Detrás del contenido, con overlay de legibilidad. El
+          patrón biopunk del wrapper queda encima reforzando cohesión. */}
+      {loginBgSrc && (
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none bg-cover bg-center"
+          style={{
+            backgroundImage: `linear-gradient(rgba(2,6,23,0.62), rgba(2,6,23,0.86)), url('${loginBgSrc}')`,
+          }}
+        />
+      )}
+      <div className="relative z-10 w-full max-w-sm flex flex-col items-center gap-6 pt-8">
         <div className="w-24 h-24 bg-muzo/20 rounded-full flex items-center justify-center shadow-neon-muzo">
           <Sprout size={56} className="text-muzo-glow" />
         </div>

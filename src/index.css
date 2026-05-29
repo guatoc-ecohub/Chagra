@@ -29,11 +29,18 @@
    * App.jsx toggles esta clase según currentView. Los wrappers principales
    * usan opacidad sm/82-95 sobre slate-950 para revelar el bg sutilmente
    * sin sacrificar legibilidad de cards y formularios.
+   *
+   * Selector de fondos 2026-05-28: la URL de la imagen es ahora la variable
+   * CSS `--app-bg-image`, escrita por useThemeBackgroundStore cuando el
+   * operador elige otro fondo curado desde Perfil. El fallback de `var()`
+   * es la imagen clásica original → 'default' = comportamiento idéntico al
+   * anterior aunque el store nunca escriba la variable. El overlay de
+   * gradiente (legibilidad) se mantiene intacto encima de cualquier imagen.
    */
   body.app-bg-biodiversidad {
     background-image:
       linear-gradient(rgba(2, 6, 23, 0.55), rgba(2, 6, 23, 0.82)),
-      url('/biodiversidad-bg.jpg');
+      var(--app-bg-image, url('/biodiversidad-bg.jpg'));
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;

@@ -3,6 +3,7 @@ import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wren
 import { ScreenShell } from './common/ScreenShell';
 import ThemeSelector from './common/ThemeSelector';
 import AgentAvatarSelector from './Settings/AgentAvatarSelector';
+import BackgroundSelector from './Settings/BackgroundSelector';
 import BackupExportButton from './BackupExportButton';
 import CuadernoPDFButton from './CuadernoPDFButton';
 import VoiceSelector from './Settings/VoiceSelector';
@@ -218,6 +219,7 @@ export default function ProfileScreen({ onBack, onHome }) {
             <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Personalización</h3>
           </div>
           <ThemeSelector />
+          <BackgroundSelector />
           <AgentAvatarSelector />
         </div>
 

@@ -16,6 +16,7 @@ import NetworkStatusBar from './components/NetworkStatusBar';
 import PendingTasksWidget from './components/PendingTasksWidget';
 import SyncProgressIndicator from './components/common/SyncProgressIndicator';
 import useOllamaWarmStore from './store/useOllamaWarmStore';
+import useThemeBackgroundStore, { getBackgroundSrc } from './store/useThemeBackgroundStore';
 // FieldFeedback ya no se monta globalmente en App; vive embebido en
 // HelpUsoScreen como sección de Ayuda (decisión 2026-05-21, ver
 // comentario abajo donde se removió el render).
@@ -447,6 +448,25 @@ export default function App() {
     }
     return () => document.body.classList.remove('app-bg-biodiversidad');
   }, [currentView]);
+
+  // Selector de fondos 2026-05-28: el operador elige el fondo curado desde
+  // Perfil. Suscribimos SOLO el id (string) — nunca un objeto inline — para
+  // no disparar React #185. Escribimos la variable CSS --app-bg-image en el
+  // body (la consume .app-bg-biodiversidad) y precargamos únicamente el
+  // full seleccionado. 'default' limpia la variable → cae al fallback CSS
+  // clásico, sin breaking change.
+  const selectedBackground = useThemeBackgroundStore((s) => s.selected);
+  useEffect(() => {
+    if (selectedBackground === 'default') {
+      document.body.style.removeProperty('--app-bg-image');
+      return;
+    }
+    const src = getBackgroundSrc(selectedBackground);
+    // Precargar solo el full elegido para que el cambio sea inmediato.
+    const img = new Image();
+    img.src = src;
+    document.body.style.setProperty('--app-bg-image', `url('${src}')`);
+  }, [selectedBackground]);
 
   const showToast = useCallback((message, isError = false) => {
     setToast({ message, isError });
