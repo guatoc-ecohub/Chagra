@@ -131,12 +131,18 @@ export default function BiopunkBackground({ intense = false }) {
             aria-hidden="true"
             data-biopunk-intense={intense ? 'on' : 'off'}
         >
-            {/* Capa A — biopunk-pattern SVG tiled (siempre, sutil) */}
+            {/* Capa A — biopunk-pattern SVG tiled.
+                BUGFIX 2026-05-28 operador: en modo screen saver (idle) este
+                SVG vintage aparecía SOBRE la imagen nueva de Lili seleccionada
+                desde Perfil. El operador veía dos fondos compitiendo. Quitamos
+                el SVG cuando intense → solo se ve la imagen del catálogo +
+                el conic gradient + partículas. En estado normal sutil (0.08)
+                porque el fondo de Lili es el héroe visual. */}
             <div
                 className="absolute inset-0 bg-biopunk-pattern transition-opacity duration-[1500ms] ease-out"
                 style={{
-                    opacity: intense ? 0.55 : 0.18,
-                    animation: intense ? 'biopunk-pulse 8s ease-in-out infinite' : 'none',
+                    opacity: intense ? 0 : 0.08,
+                    animation: 'none',
                 }}
             />
             {/* Capa B — gradient mesh conic rotating */}
