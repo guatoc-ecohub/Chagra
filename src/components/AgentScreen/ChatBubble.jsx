@@ -347,6 +347,17 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
               className="mb-2 rounded-xl max-h-56 w-auto object-cover border border-white/15"
             />
           )}
+          {/* FEAT-2 (#291): foto adjunta por el usuario al chat (ID +
+              diagnóstico inline). Se renderiza como thumbnail dentro de la
+              burbuja del usuario, encima del texto/caption. */}
+          {message.photo && (
+            <img
+              src={message.photo}
+              alt="Foto enviada"
+              className="mb-2 rounded-lg max-h-48 w-auto object-cover border border-emerald-800/50"
+              data-testid="chat-bubble-photo"
+            />
+          )}
           {/* #339: fallback visible si el contenido del assistant llega vacío
               (respuesta degradada del LLM, stream sin tokens, etc.). Nunca
               dejamos la burbuja en blanco — el usuario campesino no debe ver
