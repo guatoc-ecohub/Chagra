@@ -21,6 +21,7 @@ import { GripVertical } from 'lucide-react';
 import AgentHero from './AgentHero';
 import ClimaStrip from './ClimaStrip';
 import AIStatusFooter from './AIStatusFooter';
+import AnalisisProactivoIA from './AnalisisProactivoIA';
 import useAssetStore from '../../store/useAssetStore';
 import {
     PlantasCard,
@@ -203,6 +204,15 @@ export default function DashboardLive({ onNavigate }) {
                     cambios aplicados". Movido del medio del scroll al footer +
                     expandido de solo-sensores a 3 ejes IA. */}
                 <AIStatusFooter sensors={iotAlerts} onNavigate={onNavigate} />
+
+                {/* AnalisisProactivoIA (#331) — Operador 2026-05-29: "extraño
+                    el texto de análisis IA basado en sensores de la versión
+                    vieja". Panel narrativo contextual que teje: piso térmico,
+                    plantas registradas, tareas pendientes, sensores y alertas
+                    activas. Local-only por ahora (templating determinístico
+                    sobre stores); Fase 2 wire al sidecar /agent/proactive
+                    para narrativa LLM real. */}
+                <AnalisisProactivoIA sensors={iotAlerts} onNavigate={onNavigate} />
             </div>
         </div>
     );
