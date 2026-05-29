@@ -38,8 +38,15 @@
    * gradiente (legibilidad) se mantiene intacto encima de cualquier imagen.
    */
   body.app-bg-biodiversidad {
+    /* FIX fondo (2026-05-28): el overlay anterior (0.55 → 0.82 sobre slate-950)
+     * era demasiado opaco y, combinado con los wrappers sólidos de ScreenShell,
+     * tapaba la foto curada que el operador elegía en Perfil ("no veo la foto
+     * del fondo"). Lo bajamos a 0.45 → 0.62 para que la imagen se VEA claramente
+     * detrás del contenido. La legibilidad del texto la garantizan ahora los
+     * scrims semi-opacos de cada card/superficie (bg-slate-900/40-60), no este
+     * overlay global. */
     background-image:
-      linear-gradient(rgba(2, 6, 23, 0.55), rgba(2, 6, 23, 0.82)),
+      linear-gradient(rgba(2, 6, 23, 0.45), rgba(2, 6, 23, 0.62)),
       var(--app-bg-image, url('/biodiversidad-bg.jpg'));
     background-size: cover;
     background-position: center center;

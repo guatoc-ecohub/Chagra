@@ -30,6 +30,16 @@ const TTL_OPTIONS = [
  *   - chagra:operator:role (enum)
  *
  * TopBar muestra el rol además del nombre cuando está disponible.
+ *
+ * Reorganización en PESTAÑAS (2026-05-28): el operador reportó "está difícil
+ * de navegar, muchas opciones" — todo vivía en una sola columna scrolleable
+ * larga. Ahora se agrupa en 4 pestañas con una tab bar sticky arriba (sin
+ * librería nueva: estado local `activeTab` + render condicional):
+ *   - 👤 Perfil:     nombre, rol, CTAs onboarding + ubicación.
+ *   - 🎨 Apariencia: tema, fondo, avatar del agente.
+ *   - 🔊 Voz y finca: voz del agente + selector de voz + multifinca/GPS.
+ *   - ⚙️ Avanzado:   modo técnico (HYTA), telemetría, copia de seguridad, PDF.
+ * Ningún breaking change funcional: todas las opciones siguen accesibles.
  */
 
 const ROLES = [
@@ -41,7 +51,21 @@ const ROLES = [
   { id: 'otro', label: 'Otro' },
 ];
 
+/**
+ * Definición de las pestañas. El emoji acompaña al label corto para que se
+ * reconozcan de un vistazo en la tab bar (especialmente en móvil donde el
+ * espacio es escaso). El icono lucide se usa en el encabezado de la sección.
+ */
+const TABS = [
+  { id: 'perfil', emoji: '👤', label: 'Perfil' },
+  { id: 'apariencia', emoji: '🎨', label: 'Apariencia' },
+  { id: 'voz', emoji: '🔊', label: 'Voz y finca' },
+  { id: 'avanzado', emoji: '⚙️', label: 'Avanzado' },
+];
+
 export default function ProfileScreen({ onBack, onHome }) {
+  const [activeTab, setActiveTab] = useState('perfil');
+
   const [name, setName] = useState(() =>
     typeof window !== 'undefined'
       ? localStorage.getItem('chagra:operator:name') || PRIMARY_WORKER_NAME
@@ -113,234 +137,303 @@ export default function ProfileScreen({ onBack, onHome }) {
 
   return (
     <ScreenShell title="Perfil de Usuario" icon={User} onBack={onBack} onHome={onHome}>
-      <div className="flex flex-col gap-6 pb-8">
-        {/* ID Card / User Info, header con datos sintetizados */}
-        <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col items-center">
-          <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mb-4 border-2 border-emerald-500/30">
-            <User size={40} className="text-emerald-400" />
-          </div>
-          <h2 className="text-2xl font-black text-white">{name}</h2>
-          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold mt-1">{currentRoleLabel}</p>
-        </div>
-
-        {/* #200/#201: CTAs para personalizar el agente y configurar ubicación.
-            Navegan vía 'chagra:nav' (patrón CSP-safe, sin onClick inline-string).
-            ProfileScreen no recibe onNavigate, así que despacha el evento global
-            que App.jsx escucha. */}
-        <div className="grid sm:grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              try {
-                window.dispatchEvent(new CustomEvent('chagra:nav', { detail: { view: 'onboarding-perfil', data: { back: 'perfil' } } }));
-              } catch (_) { /* noop */ }
-            }}
-            className="text-left rounded-2xl bg-emerald-900/20 border border-emerald-800/40 p-4 hover:bg-emerald-900/30 transition-colors flex items-center gap-3"
-          >
-            <div className="p-2 rounded-xl bg-emerald-900/40 border border-emerald-700/40">
-              <Sprout size={20} className="text-emerald-400" />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-bold text-white">Personalizar mi agente</p>
-              <p className="text-xs text-slate-400">Cuéntale de tu cultivo para respuestas a tu medida</p>
-            </div>
-            <ChevronRight size={18} className="text-slate-500" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              try {
-                window.dispatchEvent(new CustomEvent('chagra:nav', { detail: { view: 'ubicacion-detectada', data: { back: 'perfil' } } }));
-              } catch (_) { /* noop */ }
-            }}
-            className="text-left rounded-2xl bg-sky-900/20 border border-sky-800/40 p-4 hover:bg-sky-900/30 transition-colors flex items-center gap-3"
-          >
-            <div className="p-2 rounded-xl bg-sky-900/40 border border-sky-700/40">
-              <MapPin size={20} className="text-sky-400" />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-bold text-white">Configurar ubicación</p>
-              <p className="text-xs text-slate-400">Mapa, piso térmico y cultivos de tu zona</p>
-            </div>
-            <ChevronRight size={18} className="text-slate-500" />
-          </button>
-        </div>
-
-        {/* Edit Form */}
-        <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
-          <div className="flex items-center gap-2 px-1">
-            <Briefcase size={18} className="text-emerald-400" />
-            <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Datos del trabajador</h3>
-          </div>
-
-          <label className="flex flex-col gap-2">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">Nombre completo</span>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Ej: Javier Andrés Rojas"
-              className="p-3 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-white text-base min-h-[48px]"
-            />
-          </label>
-
-          <label className="flex flex-col gap-2">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">Rol</span>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="p-3 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-white text-base min-h-[48px] appearance-none"
-            >
-              {ROLES.map(r => (
-                <option key={r.id} value={r.id}>{r.label}</option>
-              ))}
-            </select>
-          </label>
-
-          <button
-            type="button"
-            onClick={handleSave}
-            className={`w-full p-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all min-h-[48px] ${
-              savedFlash ? 'bg-emerald-600 text-white' : 'bg-slate-800 hover:bg-slate-700 text-emerald-400'
-            }`}
-          >
-            {savedFlash ? <><Check size={18} /> Guardado</> : <><Save size={18} /> Guardar cambios</>}
-          </button>
-          <p className="text-[10px] text-slate-500 text-center leading-relaxed">
-            Los cambios se guardan en tu dispositivo. Subida al servidor pendiente (planeado v1.x).
-          </p>
-        </div>
-
-        {/* Theme Section */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 px-1">
-            <Palette size={18} className="text-emerald-400" />
-            <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Personalización</h3>
-          </div>
-          <ThemeSelector />
-          <BackgroundSelector />
-          <AgentAvatarSelector />
-        </div>
-
-        {/* Task #122 (2026-05-23): toggle global TTS del agente Chagra.
-            Persiste en usePrefsStore (localStorage `chagra:prefs:tts-enabled`).
-            Default ON. Operador puede silenciar también con doble-click en
-            el avatar colibrí (header AgentScreen o FAB global). */}
-        <AgentVoiceSection />
-
-        {/* Task #124 (2026-05-24): selector de voz Kokoro + velocidad. Solo
-            tiene sentido si TTS está activo, pero lo renderizamos siempre
-            (no oculto) para que el operador pueda elegir voz antes de
-            activar TTS — UX más predictible que esconder/mostrar. */}
-        <VoiceSelector />
-
-        {/* Telemetry Section */}
-        <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
-          <div className="flex items-center gap-2 px-1">
-            <Mic size={18} className="text-morpho" />
-            <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Telemetría de Voz</h3>
-          </div>
-
-          <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
-            <div className="flex flex-col gap-0.5">
-              <span className="text-sm font-bold text-slate-200">Habilitar telemetría</span>
-              <span className="text-[10px] text-slate-500">Registrar eventos del pipeline de voz</span>
-            </div>
+      {/* Tab bar sticky arriba. Scroll horizontal en móvil si no caben los 4
+          (overflow-x-auto + whitespace-nowrap). La pestaña activa lleva ring +
+          texto emerald como indicador visual. role=tablist para a11y. */}
+      <div
+        role="tablist"
+        aria-label="Secciones del perfil"
+        className="sticky top-0 z-20 flex gap-2 overflow-x-auto bg-slate-950/80 backdrop-blur-md border-b border-slate-800 px-3 py-2 -mx-0"
+      >
+        {TABS.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
             <button
+              key={tab.id}
               type="button"
-              role="switch"
-              aria-checked={telemetryEnabled}
-              onClick={() => setTelemetryEnabled((v) => !v)}
-              className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
-                telemetryEnabled ? 'bg-emerald-600' : 'bg-slate-700'
+              role="tab"
+              aria-selected={isActive}
+              aria-controls={`profile-panel-${tab.id}`}
+              id={`profile-tab-${tab.id}`}
+              onClick={() => setActiveTab(tab.id)}
+              className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-xl text-sm font-bold transition-all min-h-[44px] flex items-center gap-1.5 ${
+                isActive
+                  ? 'bg-emerald-900/30 text-emerald-300 ring-2 ring-emerald-500/50'
+                  : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-slate-200'
               }`}
             >
-              <span
-                className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
-                  telemetryEnabled ? 'translate-x-5' : 'translate-x-0'
-                }`}
-              />
+              <span aria-hidden="true">{tab.emoji}</span>
+              {tab.label}
             </button>
-          </label>
+          );
+        })}
+      </div>
 
-          <label className="flex flex-col gap-2">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">Período de retención</span>
-            <select
-              value={telemetryTtl}
-              onChange={(e) => setTelemetryTtl(e.target.value)}
-              className="p-3 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-white text-base min-h-[48px] appearance-none"
-            >
-              {TTL_OPTIONS.map((o) => (
-                <option key={o.id} value={o.id}>{o.label}</option>
-              ))}
-            </select>
-          </label>
+      <div className="flex flex-col gap-6 px-4 pt-4 pb-8">
+        {/* ── PESTAÑA: PERFIL ───────────────────────────────────────── */}
+        {activeTab === 'perfil' && (
+          <div
+            role="tabpanel"
+            id="profile-panel-perfil"
+            aria-labelledby="profile-tab-perfil"
+            className="flex flex-col gap-6"
+          >
+            {/* ID Card / User Info, header con datos sintetizados */}
+            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col items-center">
+              <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mb-4 border-2 border-emerald-500/30">
+                <User size={40} className="text-emerald-400" />
+              </div>
+              <h2 className="text-2xl font-black text-white">{name}</h2>
+              <p className="text-xs text-slate-500 uppercase tracking-widest font-bold mt-1">{currentRoleLabel}</p>
+            </div>
 
-          <p className="text-[10px] text-slate-500 px-1 leading-relaxed">
-            La telemetría sigue grabándose en el dispositivo (privacy-safe, NUNCA prompt ni respuesta).
-            El dashboard de visualización se migró al panel privado del operador (ADR-020 anti-leak / ADR-029 Capa C).
-          </p>
-        </div>
+            {/* #200/#201: CTAs para personalizar el agente y configurar ubicación.
+                Navegan vía 'chagra:nav' (patrón CSP-safe, sin onClick inline-string).
+                ProfileScreen no recibe onNavigate, así que despacha el evento global
+                que App.jsx escucha. */}
+            <div className="grid sm:grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    window.dispatchEvent(new CustomEvent('chagra:nav', { detail: { view: 'onboarding-perfil', data: { back: 'perfil' } } }));
+                  } catch (_) { /* noop */ }
+                }}
+                className="text-left rounded-2xl bg-emerald-900/20 border border-emerald-800/40 p-4 hover:bg-emerald-900/30 transition-colors flex items-center gap-3"
+              >
+                <div className="p-2 rounded-xl bg-emerald-900/40 border border-emerald-700/40">
+                  <Sprout size={20} className="text-emerald-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-white">Personalizar mi agente</p>
+                  <p className="text-xs text-slate-400">Cuéntale de tu cultivo para respuestas a tu medida</p>
+                </div>
+                <ChevronRight size={18} className="text-slate-500" />
+              </button>
 
-        {/* Modo técnico toggle — Free 7→10 fix-pack (hipótesis #4).
-            HYTA (GPU/Ollama) es jerga ingenieril que asusta al campesino
-            target. Lo ocultamos detrás de un switch off-by-default para
-            usuarios curiosos sin imponerlo a la mayoría. */}
-        <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
-          <div className="flex items-center gap-2 px-1">
-            <Wrench size={18} className="text-slate-400" />
-            <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Modo técnico</h3>
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    window.dispatchEvent(new CustomEvent('chagra:nav', { detail: { view: 'ubicacion-detectada', data: { back: 'perfil' } } }));
+                  } catch (_) { /* noop */ }
+                }}
+                className="text-left rounded-2xl bg-sky-900/20 border border-sky-800/40 p-4 hover:bg-sky-900/30 transition-colors flex items-center gap-3"
+              >
+                <div className="p-2 rounded-xl bg-sky-900/40 border border-sky-700/40">
+                  <MapPin size={20} className="text-sky-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-white">Configurar ubicación</p>
+                  <p className="text-xs text-slate-400">Mapa, piso térmico y cultivos de tu zona</p>
+                </div>
+                <ChevronRight size={18} className="text-slate-500" />
+              </button>
+            </div>
+
+            {/* Edit Form */}
+            <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+              <div className="flex items-center gap-2 px-1">
+                <Briefcase size={18} className="text-emerald-400" />
+                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Datos del trabajador</h3>
+              </div>
+
+              <label className="flex flex-col gap-2">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">Nombre completo</span>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Ej: Javier Andrés Rojas"
+                  className="p-3 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-white text-base min-h-[48px]"
+                />
+              </label>
+
+              <label className="flex flex-col gap-2">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">Rol</span>
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="p-3 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-white text-base min-h-[48px] appearance-none"
+                >
+                  {ROLES.map(r => (
+                    <option key={r.id} value={r.id}>{r.label}</option>
+                  ))}
+                </select>
+              </label>
+
+              <button
+                type="button"
+                onClick={handleSave}
+                className={`w-full p-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all min-h-[48px] ${
+                  savedFlash ? 'bg-emerald-600 text-white' : 'bg-slate-800 hover:bg-slate-700 text-emerald-400'
+                }`}
+              >
+                {savedFlash ? <><Check size={18} /> Guardado</> : <><Save size={18} /> Guardar cambios</>}
+              </button>
+              <p className="text-[10px] text-slate-500 text-center leading-relaxed">
+                Los cambios se guardan en tu dispositivo. Subida al servidor pendiente (planeado v1.x).
+              </p>
+            </div>
           </div>
+        )}
 
-          <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
-            <div className="flex flex-col gap-0.5 flex-1">
-              <span className="text-sm font-bold text-slate-200">Mostrar información GPU</span>
-              <span className="text-[10px] text-slate-500 leading-snug">
-                Para curiosos: muestra qué modelos de IA están cargados en GPU
-                y cuánta memoria usan. No es necesario para usar Chagra.
-              </span>
+        {/* ── PESTAÑA: APARIENCIA ───────────────────────────────────── */}
+        {activeTab === 'apariencia' && (
+          <div
+            role="tabpanel"
+            id="profile-panel-apariencia"
+            aria-labelledby="profile-tab-apariencia"
+            className="space-y-4"
+          >
+            <div className="flex items-center gap-2 px-1">
+              <Palette size={18} className="text-emerald-400" />
+              <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Personalización</h3>
             </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={modoTecnico}
-              aria-label="Activar o desactivar modo técnico"
-              onClick={() => setModoTecnico((v) => !v)}
-              className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
-                modoTecnico ? 'bg-slate-500' : 'bg-slate-700'
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
-                  modoTecnico ? 'translate-x-5' : 'translate-x-0'
-                }`}
-              />
-            </button>
-          </label>
+            <ThemeSelector />
+            <BackgroundSelector />
+            <AgentAvatarSelector />
+          </div>
+        )}
 
-          {modoTecnico && (
-            <div className="mt-2">
-              <HytaPanel />
+        {/* ── PESTAÑA: VOZ Y FINCA ──────────────────────────────────── */}
+        {activeTab === 'voz' && (
+          <div
+            role="tabpanel"
+            id="profile-panel-voz"
+            aria-labelledby="profile-tab-voz"
+            className="flex flex-col gap-6"
+          >
+            {/* Task #122 (2026-05-23): toggle global TTS del agente Chagra.
+                Persiste en usePrefsStore (localStorage `chagra:prefs:tts-enabled`).
+                Default ON. Operador puede silenciar también con doble-click en
+                el avatar colibrí (header AgentScreen o FAB global). */}
+            <AgentVoiceSection />
+
+            {/* Task #124 (2026-05-24): selector de voz Kokoro + velocidad. Solo
+                tiene sentido si TTS está activo, pero lo renderizamos siempre
+                (no oculto) para que el operador pueda elegir voz antes de
+                activar TTS — UX más predictible que esconder/mostrar. */}
+            <VoiceSelector />
+
+            {/* Multifinca + GPS Section (062.7 indoor override + 062.8 privacy) */}
+            <MultifincaGpsSection />
+          </div>
+        )}
+
+        {/* ── PESTAÑA: AVANZADO ─────────────────────────────────────── */}
+        {activeTab === 'avanzado' && (
+          <div
+            role="tabpanel"
+            id="profile-panel-avanzado"
+            aria-labelledby="profile-tab-avanzado"
+            className="flex flex-col gap-6"
+          >
+            {/* Modo técnico toggle — Free 7→10 fix-pack (hipótesis #4).
+                HYTA (GPU/Ollama) es jerga ingenieril que asusta al campesino
+                target. Lo ocultamos detrás de un switch off-by-default para
+                usuarios curiosos sin imponerlo a la mayoría. */}
+            <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+              <div className="flex items-center gap-2 px-1">
+                <Wrench size={18} className="text-slate-400" />
+                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Modo técnico</h3>
+              </div>
+
+              <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
+                <div className="flex flex-col gap-0.5 flex-1">
+                  <span className="text-sm font-bold text-slate-200">Mostrar información GPU</span>
+                  <span className="text-[10px] text-slate-500 leading-snug">
+                    Para curiosos: muestra qué modelos de IA están cargados en GPU
+                    y cuánta memoria usan. No es necesario para usar Chagra.
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={modoTecnico}
+                  aria-label="Activar o desactivar modo técnico"
+                  onClick={() => setModoTecnico((v) => !v)}
+                  className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+                    modoTecnico ? 'bg-slate-500' : 'bg-slate-700'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                      modoTecnico ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </label>
+
+              {modoTecnico && (
+                <div className="mt-2">
+                  <HytaPanel />
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
-        {/* Copia de seguridad (2026-05-19): operador perdió plantas + 100
-            species + túnel por un "Clear cache" en Chrome Android. Botón
-            visible y prominente para que descargue snapshot JSON cuando
-            quiera. */}
-        <BackupExportButton />
+            {/* Telemetry Section */}
+            <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+              <div className="flex items-center gap-2 px-1">
+                <Mic size={18} className="text-morpho" />
+                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Telemetría de Voz</h3>
+              </div>
 
-        {/* Cuaderno de campo PDF (FEAT-D #295, 2026-05-28): diferenciador
-            agronómico para SNIA / EPSEA / certificación orgánica. PDF
-            imprimible con inventario + bitácora + cosechas + insumos. */}
-        <CuadernoPDFButton />
+              <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-sm font-bold text-slate-200">Habilitar telemetría</span>
+                  <span className="text-[10px] text-slate-500">Registrar eventos del pipeline de voz</span>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={telemetryEnabled}
+                  onClick={() => setTelemetryEnabled((v) => !v)}
+                  className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+                    telemetryEnabled ? 'bg-emerald-600' : 'bg-slate-700'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                      telemetryEnabled ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </label>
 
-        {/* Multifinca + GPS Section (062.7 indoor override + 062.8 privacy) */}
-        <MultifincaGpsSection />
+              <label className="flex flex-col gap-2">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">Período de retención</span>
+                <select
+                  value={telemetryTtl}
+                  onChange={(e) => setTelemetryTtl(e.target.value)}
+                  className="p-3 rounded-xl bg-slate-800 border border-slate-700 focus:border-emerald-500 outline-none text-white text-base min-h-[48px] appearance-none"
+                >
+                  {TTL_OPTIONS.map((o) => (
+                    <option key={o.id} value={o.id}>{o.label}</option>
+                  ))}
+                </select>
+              </label>
 
-        {/* App Info Footer */}
+              <p className="text-[10px] text-slate-500 px-1 leading-relaxed">
+                La telemetría sigue grabándose en el dispositivo (privacy-safe, NUNCA prompt ni respuesta).
+                El dashboard de visualización se migró al panel privado del operador (ADR-020 anti-leak / ADR-029 Capa C).
+              </p>
+            </div>
+
+            {/* Copia de seguridad (2026-05-19): operador perdió plantas + 100
+                species + túnel por un "Clear cache" en Chrome Android. Botón
+                visible y prominente para que descargue snapshot JSON cuando
+                quiera. */}
+            <BackupExportButton />
+
+            {/* Cuaderno de campo PDF (FEAT-D #295, 2026-05-28): diferenciador
+                agronómico para SNIA / EPSEA / certificación orgánica. PDF
+                imprimible con inventario + bitácora + cosechas + insumos. */}
+            <CuadernoPDFButton />
+          </div>
+        )}
+
+        {/* App Info Footer — común a todas las pestañas */}
         <div className="mt-8 pt-6 border-t border-slate-800/50 text-center">
           <p className="text-[10px] text-slate-600 font-mono tracking-tighter uppercase">
             Chagra • v1.0.0
