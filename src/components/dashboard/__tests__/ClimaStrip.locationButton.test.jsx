@@ -46,13 +46,14 @@ describe('ClimaStrip — botón "Configurar ubicación" (bug fix Brave 2026-05-2
         expect(cta).toBeInTheDocument();
     });
 
-    test('click "Configurar ubicación" invoca onNavigate("perfil")', async () => {
+    test('click "Configurar ubicación" invoca onNavigate("ubicacion-detectada")', async () => {
         const onNavigate = vi.fn();
         render(<ClimaStrip onNavigate={onNavigate} />);
         const cta = await screen.findByText('Configurar ubicación');
         fireEvent.click(cta);
         expect(onNavigate).toHaveBeenCalledTimes(1);
-        expect(onNavigate).toHaveBeenCalledWith('perfil');
+        // #201: navega a la pantalla dedicada de ubicación (mini mapa + piso térmico).
+        expect(onNavigate).toHaveBeenCalledWith('ubicacion-detectada');
     });
 
     test('si no hay onNavigate, despacha evento global "chagra:nav"', async () => {
@@ -63,7 +64,7 @@ describe('ClimaStrip — botón "Configurar ubicación" (bug fix Brave 2026-05-2
         fireEvent.click(cta);
         await waitFor(() => expect(eventSpy).toHaveBeenCalledTimes(1));
         const event = eventSpy.mock.calls[0][0];
-        expect(event.detail).toBe('perfil');
+        expect(event.detail).toBe('ubicacion-detectada');
         window.removeEventListener('chagra:nav', eventSpy);
     });
 

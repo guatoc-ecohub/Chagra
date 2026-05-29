@@ -73,23 +73,25 @@ export default function ClimaStrip({ onNavigate }) {
                     Cuéntame en qué municipio queda tu finca y te traigo el pronóstico real del IDEAM.
                 </p>
                 {/* Bug fix 2026-05-28 (Brave laptop): el botón no tenía
-                    onClick — operador clickeaba y nada pasaba. Ahora navega
-                    a `perfil` donde MultifincaGpsSection permite editar la
-                    finca activa (que incluye municipio). Si no hay onNavigate
-                    (uso aislado en tests o storybook), el handler degrada
-                    a un dispatch del event global `chagra:navigate` que el
-                    App.jsx escucha. Evita el listener inline-string del
-                    feedback CSP-strict (memoria feedback-csp-strict-inline-handlers-bloqueados). */}
+                    onClick — operador clickeaba y nada pasaba.
+                    #201 (2026-05-28): ahora navega a `ubicacion-detectada`,
+                    la pantalla dedicada con mini mapa + piso térmico +
+                    cultivos recomendados, que resuelve municipio y lo guarda
+                    en el perfil. Si no hay onNavigate (uso aislado en tests
+                    o storybook), el handler degrada a un dispatch del event
+                    global `chagra:nav` que App.jsx escucha. Evita el listener
+                    inline-string del feedback CSP-strict (memoria
+                    feedback-csp-strict-inline-handlers-bloqueados). */}
                 <button
                     type="button"
                     onClick={() => {
                         if (typeof onNavigate === 'function') {
-                            onNavigate('perfil');
+                            onNavigate('ubicacion-detectada');
                             return;
                         }
                         try {
                             // App.jsx escucha 'chagra:nav' (string o {view,data})
-                            window.dispatchEvent(new CustomEvent('chagra:nav', { detail: 'perfil' }));
+                            window.dispatchEvent(new CustomEvent('chagra:nav', { detail: 'ubicacion-detectada' }));
                         } catch (_) { /* noop */ }
                     }}
                     className="mt-3 px-4 py-2 rounded-xl bg-sky-700/30 hover:bg-sky-600/40 border border-sky-500/40 text-sky-200 text-sm font-bold transition-colors flex items-center gap-2"

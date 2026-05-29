@@ -19,6 +19,7 @@ import {
   localizeAgentOutput as _localizeCauca,
 } from './glosarioCaucaService.js';
 import { filterVoseo as _filterVoseo } from './voseoFilter.js';
+import { buildUserProfileBlock } from './userProfileService.js';
 
 /**
  * Free 7→10 fix-pack #5: re-exporta los helpers de glosario regional Cauca
@@ -318,24 +319,35 @@ Usuario: "qué tengo plantado"
  * @returns {string} Contexto de perfil para system prompt
  */
 export function buildProfileContext(finca) {
-  if (!finca) {
-    return generateSourceCitationRules() + '\n\n' + generateUserDataRules();
+  // #200: bloque de perfil enriquecido del onboarding (localStorage
+  // chagra:profile:*). Vacío si el usuario no completó el onboarding —
+  // sin breaking change, el agente sigue como antes.
+  let userProfileBlock = '';
+  try {
+    userProfileBlock = buildUserProfileBlock();
+  } catch (e) {
+    console.warn('[agentService] buildUserProfileBlock falló:', e);
   }
-  
+  const profileSuffix = userProfileBlock ? `\n\n${userProfileBlock}` : '';
+
+  if (!finca) {
+    return generateSourceCitationRules() + '\n\n' + generateUserDataRules() + profileSuffix;
+  }
+
   const bioculturalZone = finca.biocultural_zone;
   const region = detectRegionFromBioculturalZone(bioculturalZone);
   const toneContext = generateRegionalToneContext(region);
   const climateContext = generateClimateAlertsContext(bioculturalZone);
   const citationRules = generateSourceCitationRules();
   const userDataRules = generateUserDataRules();
-  
+
   return `${toneContext}
 
 ${climateContext}
 
 ${citationRules}
 
-${userDataRules}`;
+${userDataRules}${profileSuffix}`;
 }
 
 /**
