@@ -38,7 +38,7 @@
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 15;
+export const DB_VERSION = 16;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -57,6 +57,7 @@ export const STORES = {
   LLM_TELEMETRY: 'llm_telemetry',
   RAG_TELEMETRY: 'rag_telemetry',
   FAILED_TX: 'failed_transactions',
+  VISION_QUEUE: 'vision_queue',
 };
 
 let dbInstance = null;
@@ -238,6 +239,21 @@ export const openDB = async () => {
           store.createIndex('created_at', 'created_at', { unique: false });
           store.createIndex('has_results', 'has_results', { unique: false });
           store.createIndex('error_kind', 'error_kind', { unique: false });
+        }
+      }
+
+      // v16: vision_queue (V-07 #228) — cola offline de fotos de visión.
+      // Cuando el operario captura una foto para diagnóstico foliar o ID de
+      // especie SIN conexión, el blob + metadata se encolan aquí en vez de
+      // perderse. Al volver la conexión, visionQueueService.flushVisionQueue()
+      // corre la inferencia y deja el resultado en el propio registro.
+      // Blobs grandes → IndexedDB (NO localStorage). keyPath autoIncrement.
+      if (event.oldVersion < 16) {
+        if (!db.objectStoreNames.contains(STORES.VISION_QUEUE)) {
+          const store = db.createObjectStore(STORES.VISION_QUEUE, { keyPath: 'id', autoIncrement: true });
+          store.createIndex('status', 'status', { unique: false });
+          store.createIndex('createdAt', 'createdAt', { unique: false });
+          store.createIndex('kind', 'kind', { unique: false });
         }
       }
     };

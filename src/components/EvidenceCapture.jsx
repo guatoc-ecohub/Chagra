@@ -4,6 +4,7 @@ import { optimizeImage, blobToDataUrl } from '../utils/imageProcessor';
 import { compressImage, IMAGE_TOO_LARGE_MESSAGE } from '../utils/imageCompress';
 import { mediaCache } from '../db/mediaCache';
 import { analyzeFoliage } from '../services/aiService';
+import { enqueuePhoto } from '../services/visionQueueService';
 import { proximityCheck } from '../utils/spatialAnalysis';
 import { wktToGeoJson } from '../utils/geo';
 import AIStreamPanel from './common/AIStreamPanel';
@@ -212,6 +213,23 @@ export const EvidenceCapture = ({
         }
       } else if (diagnosis) {
         console.info('[Evidence] Diagnóstico cacheado, omitiendo inferencia.');
+      } else if (!navigator.onLine) {
+        // V-07 #228: offline → encolar la foto en vez de perder la captura.
+        // visionQueueService corre el diagnóstico al volver la conexión
+        // (syncManager dispara flushVisionQueue en el evento 'online').
+        try {
+          await enqueuePhoto({
+            imageBlob: optimized,
+            kind: 'foliage',
+            meta: { speciesSlug, assetId },
+          });
+          console.info('[Evidence] Sin conexión — foto encolada para diagnóstico diferido.');
+          window.dispatchEvent(new CustomEvent('chagraToast', {
+            detail: { message: 'Sin conexión: la foto se diagnosticará al reconectar.' },
+          }));
+        } catch (qErr) {
+          console.warn('[Evidence] No se pudo encolar la foto offline:', qErr?.message || qErr);
+        }
       }
     } catch (err) {
       console.error('[EvidenceCapture] Error procesando imagen:', err);
