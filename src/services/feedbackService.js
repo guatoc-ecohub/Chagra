@@ -11,6 +11,11 @@
  *   response: string,     // Respuesta del agente
  *   thumb: 'up' | 'down', // 👍 o 👎
  *   comment?: string,     // Comentario opcional (solo para 👎)
+ *   edges: Array<{        // A-15 (#248): aristas del grafo AGE usadas en el
+ *     species_id: string, //   turno (café→guamo COMPATIBLE_WITH, etc.). El
+ *     edge_type: string,  //   motor E3 del sidecar las mapea a r.confidence.
+ *     target_id: string,  //   [] si el turno no tocó relaciones del grafo
+ *   }>,                   //   (sin regresión / back-compat).
  *   consentGiven: true,   // Siempre true si se envía
  *   timestamp: number     // Unix timestamp
  * }
@@ -28,6 +33,7 @@ const FEEDBACK_TIMEOUT_MS = 8000;
 const CONSENT_STORAGE_KEY = 'chagra_feedback_consent_v1';
 const QUEUE_STORAGE_KEY = 'chagra_feedback_queue_v1';
 const QUEUE_MAX = 50; // cota: el feedback es chico, pero no crece sin límite
+const EDGES_MAX = 50; // A-15 (#248): cota de edges por feedback (evita payload inflado)
 
 /**
  * Obtiene el operatorId desde localStorage o genera uno temporal.
@@ -104,10 +110,39 @@ export function saveConsent(consent) {
  * @param {string} params.response - Respuesta del agente
  * @param {'up' | 'down'} params.thumb - 👍 o 👎
  * @param {string} [params.comment] - Comentario opcional (solo para thumb down)
+ * @param {Array<{species_id: string, edge_type: string, target_id: string}>} [params.edges]
+ *        - A-15 (#248): aristas del grafo AGE usadas en el turno (default []).
  * @returns {Promise<boolean>} - true si se envió correctamente
  */
+/**
+ * Sanitiza el array de edges que viene del UI a la forma canónica que el
+ * motor E3 espera: solo objetos `{species_id, edge_type, target_id}` con los
+ * tres campos string no vacíos. Deduplica y cota a EDGES_MAX. Defensivo:
+ * cualquier input no-array o entrada malformada → se ignora (devuelve []).
+ */
+function sanitizeEdges(edges) {
+  if (!Array.isArray(edges)) return [];
+  const seen = new Set();
+  const out = [];
+  for (const e of edges) {
+    if (!e || typeof e !== 'object') continue;
+    const { species_id, edge_type, target_id } = e;
+    if (
+      typeof species_id !== 'string' || !species_id ||
+      typeof edge_type !== 'string' || !edge_type ||
+      typeof target_id !== 'string' || !target_id
+    ) continue;
+    const k = `${species_id}|${edge_type}|${target_id}`;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    out.push({ species_id, edge_type, target_id });
+    if (out.length >= EDGES_MAX) break;
+  }
+  return out;
+}
+
 /** Construye el objeto de feedback canónico a partir de los params del UI. */
-function buildFeedback({ prompt, response, thumb, comment }) {
+function buildFeedback({ prompt, response, thumb, comment, edges }) {
   return {
     id: ulid(),
     sessionId: getOperatorId() || 'unknown',
@@ -115,6 +150,7 @@ function buildFeedback({ prompt, response, thumb, comment }) {
     response,
     thumb,
     comment: comment || null,
+    edges: sanitizeEdges(edges),
     consentGiven: true,
     timestamp: Date.now(),
   };
@@ -202,8 +238,8 @@ export async function flushFeedbackQueue() {
   return flushed;
 }
 
-export async function sendFeedback({ prompt, response, thumb, comment }) {
-  const feedback = buildFeedback({ prompt, response, thumb, comment });
+export async function sendFeedback({ prompt, response, thumb, comment, edges }) {
+  const feedback = buildFeedback({ prompt, response, thumb, comment, edges });
 
   if (typeof navigator !== 'undefined' && navigator.onLine === false) {
     console.debug('[feedback] offline — encolado para envío diferido:', feedback.id);

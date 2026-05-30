@@ -318,6 +318,107 @@ export function computeSourceMetadata(toolEvidence) {
   return { tool_used: toolEvidence.tool, grounded: true };
 }
 
+/**
+ * A-15 (#248) — extrae los edges del grafo AGE que un turno del agente usó
+ * como evidencia, en el shape que el motor E3 (`feedback-to-confidence.mjs`
+ * del sidecar) necesita para mapear la señal 👍👎 a aristas reales:
+ *
+ *   { species_id: string, edge_type: string, target_id: string }
+ *
+ * Esto es DISTINTO del grounding de visión (`recognizeSpeciesGrounded`): acá
+ * nos importan las RELACIONES del chat (café→guamo COMPATIBLE_WITH, plaga
+ * controlada por biopreparado, etc.), no la validación de una especie.
+ *
+ * Mapeo por tool (todos los edge_type devueltos son de los que E3 sabe
+ * ajustar: COMPATIBLE_WITH, CONTROLS, TARGETS_PEST):
+ *   - get_companions / get_multihop_companions →
+ *       (species_id) -[COMPATIBLE_WITH]-> (companion.id)
+ *   - get_pest_controllers →
+ *       (biopreparado.id) -[CONTROLS]-> (pest_id)
+ *       (target_species.id) -[TARGETS_PEST]-> (pest_id)
+ *
+ * Acepta un toolEvidence simple `{tool, args, result}` o un array (tool_chain).
+ * Si el turno no usó relaciones del grafo, devuelve `[]` (sin regresión: el
+ * payload de feedback lleva `edges: []` y E3 simplemente no recibe señal).
+ *
+ * Defensivo: ignora entradas malformadas, deduplica, y cota el total a
+ * MAX_EDGES para no inflar el payload de feedback.
+ *
+ * @param {object|object[]|null|undefined} toolEvidence
+ * @returns {Array<{species_id: string, edge_type: string, target_id: string}>}
+ */
+export function extractEdges(toolEvidence) {
+  const MAX_EDGES = 50;
+  if (!toolEvidence) return [];
+
+  // Array (tool_chain): agregamos los edges de cada evidence, en orden.
+  if (Array.isArray(toolEvidence)) {
+    const all = [];
+    for (const ev of toolEvidence) {
+      for (const e of extractEdges(ev)) all.push(e);
+    }
+    return dedupeEdges(all).slice(0, MAX_EDGES);
+  }
+
+  const tool = toolEvidence.tool;
+  const result = toolEvidence.result;
+  if (typeof tool !== 'string' || !result || typeof result !== 'object') return [];
+
+  const edges = [];
+  const pushEdge = (species_id, edge_type, target_id) => {
+    if (
+      typeof species_id === 'string' && species_id &&
+      typeof target_id === 'string' && target_id &&
+      species_id !== target_id
+    ) {
+      edges.push({ species_id, edge_type, target_id });
+    }
+  };
+
+  if (tool === 'get_companions' || tool === 'get_multihop_companions') {
+    const src = typeof result.species_id === 'string' ? result.species_id : null;
+    const companions = Array.isArray(result.companions) ? result.companions : [];
+    if (src) {
+      for (const c of companions) {
+        const tid = c && typeof c.id === 'string' ? c.id : null;
+        if (tid) pushEdge(src, 'COMPATIBLE_WITH', tid);
+      }
+    }
+  } else if (tool === 'get_pest_controllers') {
+    const matches = Array.isArray(result.matches) ? result.matches : [];
+    for (const m of matches) {
+      if (!m || typeof m !== 'object') continue;
+      const pestId = typeof m.pest_id === 'string' ? m.pest_id : null;
+      if (!pestId) continue;
+      const bios = Array.isArray(m.biopreparados) ? m.biopreparados : [];
+      for (const b of bios) {
+        const bid = b && typeof b.id === 'string' ? b.id : null;
+        if (bid) pushEdge(bid, 'CONTROLS', pestId);
+      }
+      const targets = Array.isArray(m.target_species) ? m.target_species : [];
+      for (const t of targets) {
+        const sid = t && typeof t.id === 'string' ? t.id : null;
+        if (sid) pushEdge(sid, 'TARGETS_PEST', pestId);
+      }
+    }
+  }
+
+  return dedupeEdges(edges).slice(0, MAX_EDGES);
+}
+
+/** Deduplica edges por la tupla (species_id, edge_type, target_id). */
+function dedupeEdges(edges) {
+  const seen = new Set();
+  const out = [];
+  for (const e of edges) {
+    const k = `${e.species_id}|${e.edge_type}|${e.target_id}`;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    out.push(e);
+  }
+  return out;
+}
+
 export default {
   addTurn,
   getRecentContext,
@@ -325,6 +426,7 @@ export default {
   getFullHistory,
   clearMemory,
   computeSourceMetadata,
+  extractEdges,
   getLastTurnTimestamp,
   shouldStartNewSession,
   SESSION_GAP_MS,
