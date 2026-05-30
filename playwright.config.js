@@ -46,6 +46,12 @@ export default defineConfig({
     baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
+    // Congela las animaciones que ya respetan `prefers-reduced-motion: reduce`
+    // (colibrí 3D del agente, BiopunkBackground, Confetti, GrowLoader, Sparkline).
+    // Reduce el flake de los E2E actuales y es prerequisito de las capturas de
+    // regresión visual (toHaveScreenshot) — usa el mecanismo CSS ya existente,
+    // sin flags nuevos. Ver feedback-tdd-test-first-dentro-estructura.
+    reducedMotion: 'reduce',
   },
   // QUARANTINE-MULTIPLATFORM #299 (2026-05-28): el data-loss de iPhone
   // (PR #1106) NO está cubierto por tests cross-browser. Agregamos 3
