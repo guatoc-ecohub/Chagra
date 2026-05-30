@@ -11,11 +11,12 @@ import { sendFeedback, hasConsent } from '../services/feedbackService';
  *
  * Si no hay consentimiento, muestra el modal de consentimiento primero.
  */
-export default function FeedbackButtons({ 
-  prompt, 
-  response, 
+export default function FeedbackButtons({
+  prompt,
+  response,
+  edges = [],
   onConsentNeeded,
-  onFeedbackSent 
+  onFeedbackSent
 }) {
   const [selectedThumb, setSelectedThumb] = useState(null);
   const [isSending, setIsSending] = useState(false);
@@ -49,6 +50,9 @@ export default function FeedbackButtons({
         response,
         thumb,
         comment: commentText,
+        // A-15 (#248): edges del grafo AGE usados en este turno. El motor E3
+        // (sidecar) los mapea a aristas reales para ajustar r.confidence.
+        edges: Array.isArray(edges) ? edges : [],
       });
 
       if (success) {
