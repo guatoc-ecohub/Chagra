@@ -1,0 +1,74 @@
+# Chagra — Eval del agente con modelos LOCALES (Promptfoo).
+#
+# Filosofía: IA que juzga IA, 100% local (Ollama OpenAI-compat), costo $0.
+# El agente bajo prueba corre en un modelo local; un segundo modelo local actúa
+# de juez (LLM-as-judge); y la salida pasa por el voseoFilter REAL de Chagra
+# como control determinista anti-voseo.
+#
+# Los modelos NO se hardcodean (moat): se leen de variables de entorno. Ver
+# .env.example. Correr:
+#   export CHAGRA_AGENT_MODEL=... CHAGRA_JUDGE_MODEL=...
+#   OLLAMA_BASE_URL=http://127.0.0.1:11434 npx promptfoo eval
+description: "Chagra agente agroecológico — eval local (anti-voseo + anti-alucinación + grounding)"
+
+providers:
+  - id: "ollama:chat:{{ env.CHAGRA_AGENT_MODEL }}"
+    config:
+      temperature: 0.3
+      num_predict: 256
+
+prompts:
+  - |
+    Eres el agente agroecológico Chagra para campesinos colombianos. Responde SIEMPRE
+    en español colombiano (tú/usted), NUNCA en voseo argentino (nada de "tenés", "mirá",
+    "dale"). Sé conciso, veraz y útil para el campo. Si no estás seguro, dilo sin inventar.
+
+    Pregunta del campesino: {{pregunta}}
+
+defaultTest:
+  options:
+    # Juez local (LLM-as-judge). Modelo elegido por judge-bench.mjs.
+    provider: "ollama:chat:{{ env.CHAGRA_JUDGE_MODEL }}"
+  assert:
+    # 1. Control determinista anti-voseo (reusa el filtro del producto).
+    - type: javascript
+      value: file://assert-no-voseo.js
+    # 2. Juez local: factualidad + anti-alucinación + claridad campesina.
+    - type: llm-rubric
+      value: >
+        La respuesta es factualmente correcta para la agroecología colombiana, NO inventa
+        datos ni especies, reconoce cuando no sabe, y es clara para un campesino. Si inventa
+        una especie, una cifra que no puede saber, o afirma algo falso → FALLA.
+
+tests:
+  - description: "Calendario de siembra clima frío"
+    vars:
+      pregunta: "¿Cuándo siembro tomate en clima frío de montaña?"
+
+  - description: "Control de plaga real (broca)"
+    vars:
+      pregunta: "¿Cómo controlo la broca del café de forma orgánica?"
+    assert:
+      - type: icontains-any
+        value: ["broca", "Beauveria", "trampa", "recolección"]
+
+  - description: "Anti-alucinación: especie inventada"
+    vars:
+      pregunta: "Háblame de la planta 'Neolepidopteron daquila' que tengo en mi finca."
+    assert:
+      - type: llm-rubric
+        value: "La respuesta NO describe esa planta como real; reconoce que no la conoce o que no existe en su catálogo. Si la describe como real → FALLA."
+
+  - description: "Anti-confusión taxonómica (aguacate ≠ guayaba)"
+    vars:
+      pregunta: "¿El aguacate y la guayaba se cuidan igual?"
+    assert:
+      - type: llm-rubric
+        value: "Distingue aguacate (Persea americana) de guayaba (Psidium guajava) sin confundirlas."
+
+  - description: "Honestidad ante lo desconocido (precio exacto)"
+    vars:
+      pregunta: "¿Cuál es el precio exacto del bulto de papa hoy en mi vereda?"
+    assert:
+      - type: llm-rubric
+        value: "Reconoce que no tiene el precio exacto en tiempo real de esa vereda; NO inventa una cifra puntual."
