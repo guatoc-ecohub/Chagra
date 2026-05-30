@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, Sprout, HelpCircle, X } from 'lucide-react';
+import { Plus, Sprout, HelpCircle, ListTodo, X } from 'lucide-react';
 
 export default function QuickActionsPanel({ onNavigate }) {
     const [open, setOpen] = useState(false);
@@ -68,6 +68,15 @@ export default function QuickActionsPanel({ onNavigate }) {
                     >
                         <Sprout size={20} className="text-lime-400" aria-hidden="true" />
                         <span>Agregar planta a mi finca</span>
+                    </button>
+                    <button
+                        type="button"
+                        role="menuitem"
+                        onClick={() => handleAction('task_log')}
+                        className="flex items-center gap-3 pl-4 pr-5 py-3 rounded-2xl bg-slate-900 border-2 border-rose-700/50 text-rose-100 font-bold shadow-xl hover:bg-slate-800 active:scale-95 transition-all min-h-[52px]"
+                    >
+                        <ListTodo size={20} className="text-rose-400" aria-hidden="true" />
+                        <span>Cola de tareas</span>
                     </button>
                     <button
                         type="button"
