@@ -252,14 +252,23 @@ export async function executeToolChain(chain) {
   if (!Array.isArray(chain) || chain.length === 0) return [];
   const MAX_STEPS = 3;
   const limited = chain.slice(0, MAX_STEPS);
-  const evidences = [];
+  // SPEED-5 (#257): los pasos del chain son lecturas INDEPENDIENTES — sus args
+  // vienen del query del usuario, no del resultado de un paso previo (ver
+  // synthesizeToolChain en el sidecar nlu.ts, que sintetiza p.ej.
+  // [get_companions, get_biopreparados] ambos con args del mensaje). Por eso
+  // los disparamos en paralelo: la latencia del chain pasa de sum(pasos) a
+  // max(pasos). callTool() se invoca AHORA (inicia el fetch en orden → el orden
+  // de mock.calls / requests se preserva) y guardamos la promesa; reensamblamos
+  // las evidences en el mismo orden del chain. callTool ya tolera errores
+  // (devuelve null), así que Promise.all nunca rechaza.
+  const pending = [];
   for (const step of limited) {
     if (!step || typeof step.tool !== 'string') continue;
     const args = (step.args && typeof step.args === 'object') ? step.args : {};
-    const result = await callTool(step.tool, args);
-    evidences.push({ tool: step.tool, args, result });
+    pending.push({ tool: step.tool, args, promise: callTool(step.tool, args) });
   }
-  return evidences;
+  const results = await Promise.all(pending.map((p) => p.promise));
+  return pending.map((p, i) => ({ tool: p.tool, args: p.args, result: results[i] }));
 }
 
 /**

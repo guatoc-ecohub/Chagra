@@ -469,6 +469,45 @@ describe('executeToolChain — ejecución secuencial con MAX_STEPS=3', () => {
     expect(result[1].result).toBeNull();
   });
 
+  it('SPEED-5 (#257): ejecuta los pasos en PARALELO (no secuencial)', async () => {
+    // fetch que resuelve tras un delay, rastreando concurrencia in-flight.
+    let inFlight = 0;
+    let maxConcurrent = 0;
+    const delayedFetch = vi.fn(() => {
+      inFlight += 1;
+      maxConcurrent = Math.max(maxConcurrent, inFlight);
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          inFlight -= 1;
+          resolve(jsonResponse(200, { ok: true }));
+        }, 20);
+      });
+    });
+    globalThis.fetch = delayedFetch;
+
+    const { executeToolChain } = await importFresh();
+
+    const chain = [
+      { tool: 'get_species', args: { id_or_name: 'cafe' } },
+      { tool: 'get_companions', args: { species_id: 'coffea_arabica' } },
+      { tool: 'get_biopreparados', args: { species_id_or_pest: 'coffea_arabica' } },
+    ];
+
+    const result = await executeToolChain(chain);
+
+    // Los 3 estuvieron en vuelo a la vez → paralelo, no secuencial.
+    expect(maxConcurrent).toBe(3);
+    expect(result).toHaveLength(3);
+    expect(result.map((e) => e.tool)).toEqual([
+      'get_species',
+      'get_companions',
+      'get_biopreparados',
+    ]);
+    // El orden de las requests se preserva (se inician en orden del chain).
+    expect(delayedFetch.mock.calls[0][0]).toBe('/api/mcp/agro/tools/get_species');
+    expect(delayedFetch.mock.calls[2][0]).toBe('/api/mcp/agro/tools/get_biopreparados');
+  });
+
   it('ejecuta exactamente 3 steps cuando chain tiene 3', async () => {
     fetchMock
       .mockResolvedValueOnce(jsonResponse(200, { step: 1 }))
