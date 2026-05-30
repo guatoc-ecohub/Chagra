@@ -15,7 +15,7 @@ const VOICE_STORE_NAME = STORES.PENDING_VOICE;
 const MAX_RETRIES = 3;
 const BASE_BACKOFF_MS = 1000;
 
-class SyncManager {
+export class SyncManager {
   constructor() {
     this.db = null;
     this.isOnline = navigator.onLine;
