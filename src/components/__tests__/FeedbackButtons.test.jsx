@@ -70,39 +70,48 @@ describe('FeedbackButtons', () => {
     });
   });
 
-  it('debe mostrar caja de comentario al hacer clic en thumbs down', async () => {
-    vi.mocked(feedbackService.hasConsent).mockReturnValue(true);
-
-    render(<FeedbackButtons {...defaultProps} />);
-
-    const thumbsDownButton = screen.getByTitle('Esta respuesta necesita mejorar');
-    fireEvent.click(thumbsDownButton);
-
-    await waitFor(() => {
-      expect(screen.getByPlaceholderText(/Describe qué falta/)).toBeInTheDocument();
-    });
-  });
-
-  it('debe enviar feedback con comentario', async () => {
+  // UX-8 (#288) 2026-05-27: ambos pulgares envían en 1-click. El comentario
+  // es opt-in tras enviar — se abre con "Agregar detalle", no al pulsar 👎.
+  it('debe ofrecer caja de comentario opt-in tras enviar feedback (thumbs down)', async () => {
     vi.mocked(feedbackService.hasConsent).mockReturnValue(true);
     vi.mocked(feedbackService.sendFeedback).mockResolvedValue(true);
 
     render(<FeedbackButtons {...defaultProps} />);
 
-    // Click en thumbs down
     const thumbsDownButton = screen.getByTitle('Esta respuesta necesita mejorar');
     fireEvent.click(thumbsDownButton);
 
-    // Esperar a que aparezca la caja de comentario
-    await waitFor(() => {
-      expect(screen.getByPlaceholderText(/Describe qué falta/)).toBeInTheDocument();
-    });
+    // El 👎 envía de inmediato; aparece el agradecimiento + "Agregar detalle".
+    const addDetailButton = await screen.findByText('Agregar detalle');
+    fireEvent.click(addDetailButton);
 
-    // Escribir comentario
-    const textarea = screen.getByPlaceholderText(/Describe qué falta/);
+    await waitFor(() => {
+      expect(
+        screen.getByPlaceholderText(/Cuéntanos qué falta o está incorrecto/)
+      ).toBeInTheDocument();
+    });
+  });
+
+  it('debe enriquecer el feedback con comentario opt-in', async () => {
+    vi.mocked(feedbackService.hasConsent).mockReturnValue(true);
+    vi.mocked(feedbackService.sendFeedback).mockResolvedValue(true);
+
+    render(<FeedbackButtons {...defaultProps} />);
+
+    // Click en thumbs down → envía 1-click.
+    const thumbsDownButton = screen.getByTitle('Esta respuesta necesita mejorar');
+    fireEvent.click(thumbsDownButton);
+
+    // Abrir la caja opt-in.
+    const addDetailButton = await screen.findByText('Agregar detalle');
+    fireEvent.click(addDetailButton);
+
+    const textarea = await screen.findByPlaceholderText(
+      /Cuéntanos qué falta o está incorrecto/
+    );
     fireEvent.change(textarea, { target: { value: 'Falta información sobre el riego' } });
 
-    // Click en enviar
+    // Click en enviar (reenvía enriquecido con el comentario).
     const sendButton = screen.getByText('Enviar');
     fireEvent.click(sendButton);
 
@@ -116,27 +125,34 @@ describe('FeedbackButtons', () => {
     });
   });
 
-  it('debe cancelar comentario al hacer clic en Cancelar', async () => {
+  it('debe cerrar la caja de comentario al hacer clic en Listo', async () => {
     vi.mocked(feedbackService.hasConsent).mockReturnValue(true);
+    vi.mocked(feedbackService.sendFeedback).mockResolvedValue(true);
 
     render(<FeedbackButtons {...defaultProps} />);
 
-    // Click en thumbs down
+    // Click en thumbs down → envía 1-click.
     const thumbsDownButton = screen.getByTitle('Esta respuesta necesita mejorar');
     fireEvent.click(thumbsDownButton);
 
-    // Esperar a que aparezca la caja de comentario
+    // Abrir la caja opt-in.
+    const addDetailButton = await screen.findByText('Agregar detalle');
+    fireEvent.click(addDetailButton);
+
     await waitFor(() => {
-      expect(screen.getByPlaceholderText(/Describe qué falta/)).toBeInTheDocument();
+      expect(
+        screen.getByPlaceholderText(/Cuéntanos qué falta o está incorrecto/)
+      ).toBeInTheDocument();
     });
 
-    // Click en cancelar
-    const cancelButton = screen.getByText('Cancelar');
-    fireEvent.click(cancelButton);
+    // Click en Listo (cierra la caja).
+    const doneButton = screen.getByText('Listo');
+    fireEvent.click(doneButton);
 
-    // Verificar que la caja de comentario desapareció
     await waitFor(() => {
-      expect(screen.queryByPlaceholderText(/Describe qué falta/)).not.toBeInTheDocument();
+      expect(
+        screen.queryByPlaceholderText(/Cuéntanos qué falta o está incorrecto/)
+      ).not.toBeInTheDocument();
     });
   });
 

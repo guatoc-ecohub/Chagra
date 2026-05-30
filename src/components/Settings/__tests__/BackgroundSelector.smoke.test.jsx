@@ -1,7 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import BackgroundSelector from '../BackgroundSelector';
-import useThemeBackgroundStore from '../../../store/useThemeBackgroundStore';
+import useThemeBackgroundStore, {
+  BACKGROUND_CATALOG,
+} from '../../../store/useThemeBackgroundStore';
 
 describe('BackgroundSelector smoke', () => {
   beforeEach(() => {
@@ -47,7 +49,7 @@ describe('BackgroundSelector smoke', () => {
   it('cada opción muestra un thumbnail img', () => {
     render(<BackgroundSelector />);
     const imgs = document.querySelectorAll('img');
-    expect(imgs.length).toBe(4);
+    expect(imgs.length).toBe(BACKGROUND_CATALOG.length);
     imgs.forEach((img) => expect(img).toHaveAttribute('loading', 'lazy'));
   });
 });

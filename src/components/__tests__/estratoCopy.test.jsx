@@ -60,10 +60,17 @@ describe('UX-15 — copy de "Capa del cultivo" sin dosel', () => {
     expect(source).not.toMatch(/label:\s*'Bajo \(/);
   });
 
-  it('declara los 5 tipos urbanos en URBAN_LAND_TYPES_LOCAL', () => {
-    expect(source).toMatch(/URBAN_LAND_TYPES_LOCAL\s*=\s*new Set\(/);
+  it('declara los 5 tipos urbanos en URBAN_LAND_TYPES (utils/landTypes)', () => {
+    // UX-13 (#286): el set urbano se extrajo de AssetsDashboard.jsx a
+    // utils/landTypes.js (regla react-refresh/only-export-components).
+    // La fuente de verdad ahora es URBAN_LAND_TYPES, derivado de LAND_TYPES.
+    const landTypesSource = readFileSync(
+      resolve(__dirname, '..', '..', 'utils', 'landTypes.js'),
+      'utf-8'
+    );
+    expect(landTypesSource).toMatch(/URBAN_LAND_TYPES\s*=\s*new Set\(/);
     for (const v of ['balcony', 'terrace', 'window_sill', 'indoor_pot', 'urban_garden']) {
-      expect(source).toContain(`'${v}'`);
+      expect(landTypesSource).toContain(`'${v}'`);
     }
   });
 

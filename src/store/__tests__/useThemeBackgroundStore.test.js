@@ -46,13 +46,14 @@ describe('useThemeBackgroundStore', () => {
     expect(useThemeBackgroundStore.getState().selected).toBe('default');
   });
 
-  it('catálogo tiene 4 fondos (default + 3 biopunk) y está congelado', () => {
-    expect(BACKGROUND_CATALOG).toHaveLength(4);
+  it('catálogo tiene default + biopunk y está congelado', () => {
+    expect(BACKGROUND_CATALOG).toHaveLength(5);
     expect(BACKGROUND_CATALOG.map((b) => b.id)).toEqual([
       'default',
       'biopunk-1',
       'biopunk-2',
       'biopunk-3',
+      'biopunk-4',
     ]);
     expect(Object.isFrozen(BACKGROUND_CATALOG)).toBe(true);
     expect(Object.isFrozen(BACKGROUND_CATALOG[0])).toBe(true);

@@ -131,14 +131,18 @@ describe('agentService — Task #202 Profile Context', () => {
     });
 
     it('debería recomendar IDEAM para zona desconocida', () => {
+      // Bug piloto 2026-05-27: la regla CLIMA ahora consulta IDEAM vía el
+      // tool get_clima_ideam y prohíbe redirigir al user a apps externas.
       const context = generateClimateAlertsContext('zona_inexistente');
       expect(context).toContain('IDEAM');
-      expect(context).toContain('pronóstico IDEAM');
+      expect(context).toContain('get_clima_ideam');
+      // Zona desconocida igual deja constancia de la zona del operador.
+      expect(context).toContain('zona_inexistente');
     });
 
     it('debería recomendar IDEAM para null', () => {
       const context = generateClimateAlertsContext(null);
-      expect(context).toContain('cita siempre la fuente');
+      expect(context).toContain('REGLA CLIMA');
       expect(context).toContain('IDEAM');
     });
   });
