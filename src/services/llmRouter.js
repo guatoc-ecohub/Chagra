@@ -20,6 +20,36 @@
 import { analyzeQueryComplexity } from './queryComplexityAnalyzer';
 
 /**
+ * BUG A (fuga de roles, incidente prod 2026-05-30) — stop sequences anti
+ * "turno falso". `conversationMemory.getContextString` inyecta el historial
+ * con etiquetas `Usuario:` / `Asistente:`. Sin `stop` tokens, el modelo de
+ * chat (granite/gemma) autocompleta el patrón del diálogo y emite un turno
+ * inventado del usuario ("Usuario: Hola Dante, gracias por tu consulta...").
+ * Estos tokens cortan la generación EN CUANTO el modelo intenta abrir un
+ * turno nuevo. Cubrimos: inicio-de-línea (\n + etiqueta), variantes con
+ * espacio antes de los dos puntos, ES + EN, y el marcador de chat-template
+ * de Ollama/llama.cpp (`<|im_start|>`, `<|im_end|>`, `<|user|>`).
+ *
+ * Nota: es defensa estructural #1. La defensa #2 (post-proceso que trunca
+ * cualquier turno falso que igual se cuele, p.ej. por el path de streaming
+ * del sidecar que no reenvía `stop`) vive en `agentService.stripRoleLeak`.
+ */
+export const CHAT_STOP_SEQUENCES = Object.freeze([
+  '\nUsuario:',
+  '\nUsuario :',
+  '\nAsistente:',
+  '\nAsistente :',
+  '\nUser:',
+  '\nAssistant:',
+  '\n\nUsuario:',
+  '\n\nAsistente:',
+  '<|im_start|>',
+  '<|im_end|>',
+  '<|user|>',
+  '<|assistant|>',
+]);
+
+/**
  * Tipos de tarea soportadas por el router.
  *
  * `chat`         → modelo rápido para queries simples del agente Chagra IA.
@@ -63,6 +93,8 @@ export const ROUTES = {
     keep_alive_min: 30,
     temperature: 0.3,
     max_tokens: 512,
+    // BUG A fix (2026-05-30): corta turnos falsos "Usuario:"/"Asistente:".
+    stop: CHAT_STOP_SEQUENCES,
     url: '/api/ollama/v1/chat/completions',
     rationale:
       'Swap 2026-05-24 post-bug producción: granite3.1-dense:8b promovido a ' +
@@ -91,6 +123,8 @@ export const ROUTES = {
     keep_alive_min: 5,
     temperature: 0.3,
     max_tokens: 768,
+    // BUG A fix (2026-05-30): corta turnos falsos "Usuario:"/"Asistente:".
+    stop: CHAT_STOP_SEQUENCES,
     url: '/api/ollama/v1/chat/completions',
     rationale:
       'Bench 2026-05-23 anti-alucinación: granite3.1-dense:8b 37 t/s, ' +
@@ -181,18 +215,23 @@ export function getModelFor(task) {
  */
 export function buildLLMRequest(task, messages, overrides = {}) {
   const route = getModelFor(task);
-  return {
-    url: route.url,
-    body: {
-      model: route.model,
-      messages,
-      temperature: overrides.temperature ?? route.temperature,
-      max_tokens: overrides.max_tokens ?? route.max_tokens,
-      // keep_alive controla cuánto Ollama mantiene el modelo en RAM tras
-      // esta request. Formato Ollama: número en segundos o sufijo "m"/"h".
-      keep_alive: `${route.keep_alive_min}m`,
-    },
+  const body = {
+    model: route.model,
+    messages,
+    temperature: overrides.temperature ?? route.temperature,
+    max_tokens: overrides.max_tokens ?? route.max_tokens,
+    // keep_alive controla cuánto Ollama mantiene el modelo en RAM tras
+    // esta request. Formato Ollama: número en segundos o sufijo "m"/"h".
+    keep_alive: `${route.keep_alive_min}m`,
   };
+  // BUG A fix (2026-05-30): forward stop sequences (de la ruta o del
+  // override). Ollama OpenAI-compat respeta `stop` (string[]). Solo se
+  // setea cuando hay algo que cortar, para no enviar `stop: undefined`.
+  const stop = overrides.stop ?? route.stop;
+  if (Array.isArray(stop) && stop.length > 0) {
+    body.stop = stop;
+  }
+  return { url: route.url, body };
 }
 
 /**

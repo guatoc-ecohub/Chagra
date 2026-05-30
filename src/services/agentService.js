@@ -85,6 +85,59 @@ export function applyVoseoFilter(text, opts = {}) {
 }
 
 /**
+ * BUG A (fuga de roles, incidente prod 2026-05-30) — defensa #2 (post-proceso).
+ *
+ * `conversationMemory.getContextString` inyecta el historial al prompt con
+ * etiquetas "Usuario:" / "Asistente:". Si el modelo no se detiene a tiempo
+ * (la defensa #1 son las stop sequences de `llmRouter`, pero el path de
+ * streaming del sidecar NO reenvía `stop`), sigue generando PASADO su turno
+ * e inventa un turno falso del usuario, p.ej.:
+ *
+ *   "El tomate de árbol se siembra a 1800 msnm.
+ *    Usuario: Hola Dante, gracias por tu consulta..."
+ *
+ * Esta función TRUNCA la respuesta en el primer marcador de turno falso —
+ * etiqueta de rol al INICIO de línea (ES/EN) o marcador de chat-template de
+ * Ollama/llama.cpp. Es determinística, idempotente y O(n).
+ *
+ * Diseño conservador para no mutilar respuestas legítimas:
+ *   - Solo corta etiquetas de rol al inicio de línea (`^` o tras `\n`), NO
+ *     a mitad de oración ("Soy tu Asistente: ..." se respeta).
+ *   - Los marcadores de chat-template (`<|im_start|>`, etc.) sí cortan en
+ *     cualquier posición — nunca aparecen en prosa legítima.
+ *
+ * @param {string} text  texto crudo del LLM (idealmente ya pos-voseo)
+ * @returns {string} texto truncado y trim. '' si entrada vacía/no-string.
+ */
+export function stripRoleLeak(text) {
+  if (typeof text !== 'string' || text.length === 0) return '';
+
+  let cut = text.length;
+
+  // 1) Marcadores de chat-template: cortan en cualquier posición.
+  const templateMarkers = ['<|im_start|>', '<|im_end|>', '<|user|>', '<|assistant|>'];
+  for (const marker of templateMarkers) {
+    const idx = text.indexOf(marker);
+    if (idx !== -1 && idx < cut) cut = idx;
+  }
+
+  // 2) Etiquetas de rol SOLO al inicio de línea (inicio del texto o tras
+  //    newline). Tolera espacios antes de los dos puntos ("Usuario :").
+  //    `m` flag → ^ matchea inicio de cada línea.
+  const roleAtLineStart =
+    /(^|\n)[ \t]*(?:Usuario|Asistente|User|Assistant)[ \t]*:/m;
+  const m = roleAtLineStart.exec(text);
+  if (m) {
+    // Si el match es al inicio absoluto (m[1] === ''), cut = 0.
+    // Si arranca tras un newline, cortamos en la posición del newline.
+    const idx = m.index + (m[1] ? m[1].length : 0);
+    if (idx < cut) cut = idx;
+  }
+
+  return text.slice(0, cut).trim();
+}
+
+/**
  * Mapeo de zonas bioculturales a regiones lingüísticas.
  * Basado en correlación geográfica y cultural de Colombia.
  */
