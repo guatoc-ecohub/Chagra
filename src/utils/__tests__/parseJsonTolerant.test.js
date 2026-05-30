@@ -69,6 +69,62 @@ describe('parseJsonTolerant', () => {
     expect(r.raw.length).toBeLessThanOrEqual(501);
   });
 
+  it('expone repaired=false en parse directo y true cuando reparó', () => {
+    expect(parseJsonTolerant('{"a":1}').repaired).toBe(false);
+    expect(parseJsonTolerant('{"a":1,').repaired).toBe(true);
+    expect(parseJsonTolerant('{"a":1,"b":2,}').repaired).toBe(true);
+  });
+
+  it('cierra string abierto truncado sin inventar más campos', () => {
+    const r = parseJsonTolerant('{"crop":"papa","location":"lote nort');
+    expect(r.ok).toBe(true);
+    expect(r.value).toEqual({ crop: 'papa', location: 'lote nort' });
+    // NO inventó quantity ni completó la palabra truncada.
+    expect(r.value.quantity).toBeUndefined();
+  });
+
+  it('cierra array sin cerrar (corte de stream)', () => {
+    const r = parseJsonTolerant('[{"crop":"papa","quantity":3,"location":"norte"');
+    expect(r.ok).toBe(true);
+    expect(r.value).toEqual([{ crop: 'papa', quantity: 3, location: 'norte' }]);
+    expect(r.strategy).toBe('auto_close_braces');
+  });
+
+  it('coma colgante con objeto abierto a la vez', () => {
+    const r = parseJsonTolerant('{"a":1,');
+    expect(r.ok).toBe(true);
+    expect(r.value).toEqual({ a: 1 });
+  });
+
+  it('doble objeto pegado: toma el primero balanceado (no inventa fusión)', () => {
+    const r = parseJsonTolerant('{"x":1}{"y":2}');
+    expect(r.ok).toBe(true);
+    expect(r.value).toEqual({ x: 1 });
+  });
+
+  it('basura tras el último valor válido: recorta y parsea', () => {
+    const r = parseJsonTolerant('{"ok":true} <fin del turno del modelo>');
+    expect(r.ok).toBe(true);
+    expect(r.value).toEqual({ ok: true });
+  });
+
+  it('clave sin valor (truncado en `:`) NO se rellena → falla limpio', () => {
+    const r = parseJsonTolerant('{"crop":"papa","quantity":');
+    // El repair recorta el `:` colgante pero queda `"quantity"` sin valor →
+    // inválido. NO inventa quantity. ok puede ser false, o true sólo si el
+    // recorte dejó un objeto coherente SIN la clave incompleta.
+    if (r.ok) {
+      expect(r.value.quantity).toBeUndefined();
+    } else {
+      expect(r.ok).toBe(false);
+    }
+  });
+
+  it('basura totalmente irreparable → ok:false (no inventa data)', () => {
+    const r = parseJsonTolerant('}{][ esto no es json ][}{');
+    expect(r.ok).toBe(false);
+  });
+
   it('caso real Gemma con prosa + json + cierre faltante', () => {
     const realLLMOutput = `Voy a analizar la foto.
 \`\`\`json
