@@ -143,6 +143,8 @@ describe('sidecarClient — feature flag on', () => {
         useTool: true,
         tool: 'get_species',
         args: { id_or_name: 'maracuya' },
+        // D2 (#246): sin tool_chain en la respuesta → toolChain queda null.
+        toolChain: null,
         latencyMs: 187,
         modelUsed: 'gemma3:4b',
         heuristicSkipped: false,

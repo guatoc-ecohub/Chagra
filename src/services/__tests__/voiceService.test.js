@@ -33,7 +33,7 @@ describe('voiceService', () => {
   });
 
   describe('transcribe', () => {
-    it('usa lang=es-CO por defecto', async () => {
+    it('usa lang=es por defecto (whisper rechaza es-CO con HTTP 500)', async () => {
       const mockFetch = vi.fn();
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -49,7 +49,9 @@ describe('voiceService', () => {
       expect(mockFetch).toHaveBeenCalledTimes(1);
       
       const url = mockFetch.mock.calls[0][0];
-      expect(url).toContain('language=es-CO');
+      // Whisper acepta solo ISO-639-1 sin región; 'es-CO' se normaliza a 'es'.
+      expect(url).toContain('language=es');
+      expect(url).not.toContain('language=es-CO');
       expect(url).toContain('task=transcribe');
       expect(url).toContain('output=json');
     });
