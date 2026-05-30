@@ -64,7 +64,11 @@ test.describe('ADR-019 Fase 5: log--task & Inmutabilidad', () => {
         // de pendientes" es el que abre TaskLogScreen donde vive el botón "+".
         // El botón "+" ahora tiene aria-label="Nueva tarea" (el span '+' es
         // aria-hidden) — accessible name calculation con sólo `+` era frágil.
-        await page.getByLabel('Tareas: Cola de pendientes').click();
+        // Post-rediseño DashboardLive (#310): los NAV_TILES ya no están en el
+        // dashboard. La pantalla de Tareas se alcanza vía el FAB de acciones
+        // rápidas (QuickActionsPanel) → "Cola de tareas".
+        await page.getByLabel('Abrir acciones rápidas').click();
+        await page.getByRole('menuitem', { name: /cola de tareas/i }).click();
         await page.getByRole('button', { name: 'Nueva tarea' }).click();
 
         // 2. Llenar formulario — TaskScreen.jsx:83 usa placeholder

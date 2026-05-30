@@ -10,6 +10,14 @@ function detectChromiumPath() {
   if (process.env.PLAYWRIGHT_CHROMIUM_PATH) {
     return process.env.PLAYWRIGHT_CHROMIUM_PATH;
   }
+  // En CI (ubuntu-latest) usar el chromium BUNDLED de Playwright — instalado por
+  // `npx playwright install chromium` y que es el build parcheado correcto. El
+  // `/usr/bin/chromium` que trae el runner NO es compatible con el protocolo de
+  // Playwright y cierra con "Target page, context or browser has been closed".
+  // La deteccion por `which`/nix-shell de abajo solo hace falta en NixOS local.
+  if (process.env.CI) {
+    return undefined;
+  }
   try {
     const which = execSync('which chromium 2>/dev/null', { encoding: 'utf8' }).trim();
     if (which) return which;
@@ -30,6 +38,18 @@ function detectChromiumPath() {
 }
 
 const CHROMIUM_PATH = detectChromiumPath();
+
+// launchOptions compartido para los 3 projects (todos engine chromium).
+// `--no-sandbox`: en CI (ubuntu-latest) el chromium del sistema (/usr/bin/
+// chromium) NO tiene el SUID sandbox helper instalado y Ubuntu 23.10+
+// deshabilita los unprivileged user namespaces vía AppArmor → el zygote
+// host aborta con "No usable sandbox!" (SIGABRT) al lanzar. Es el fix
+// canónico de Playwright en GitHub Actions; inofensivo en local (corremos
+// como usuario normal). Sin esto los projects mobile-* crashean al launch.
+const CHROMIUM_LAUNCH = {
+  args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  ...(CHROMIUM_PATH ? { executablePath: CHROMIUM_PATH } : {}),
+};
 
 export default defineConfig({
   testDir: './tests',
@@ -65,14 +85,14 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        ...(CHROMIUM_PATH ? { launchOptions: { executablePath: CHROMIUM_PATH } } : {}),
+        launchOptions: CHROMIUM_LAUNCH,
       },
     },
     {
       name: 'mobile-chrome',
       use: {
         ...devices['Pixel 5'],
-        ...(CHROMIUM_PATH ? { launchOptions: { executablePath: CHROMIUM_PATH } } : {}),
+        launchOptions: CHROMIUM_LAUNCH,
       },
       // Solo correr tests con tag @cross-platform — la suite completa
       // (login + cycle + observation + offline + multifinca) ya pasa en
@@ -88,7 +108,13 @@ export default defineConfig({
         // de viewport / safe-area / user agent gating; NO sirve para bugs
         // de webkit engine puro (IDB quirks específicos de Safari).
         ...devices['iPhone 12'],
-        ...(CHROMIUM_PATH ? { launchOptions: { executablePath: CHROMIUM_PATH } } : {}),
+        // `devices['iPhone 12']` trae defaultBrowserType:'webkit', pero webkit
+        // NO está instalado (el workflow solo hace `playwright install chromium`,
+        // y NixOS alpha tampoco lo tiene). Forzamos engine chromium manteniendo
+        // viewport + user-agent de iPhone — el project es viewport/UA-gating, no
+        // engine-quirks de Safari. Sin esto: "Executable doesn't exist .../webkit".
+        defaultBrowserType: 'chromium',
+        launchOptions: CHROMIUM_LAUNCH,
       },
       grep: /@cross-platform/,
     },
