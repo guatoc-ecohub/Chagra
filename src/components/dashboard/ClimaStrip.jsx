@@ -3,6 +3,7 @@ import { Cloud, CloudRain, Sun, CloudSun, Droplets, Wind, Thermometer, MapPin } 
 import { getClimaIdeam } from '../../services/sidecarClient';
 import { FARM_CONFIG } from '../../config/defaults';
 import useFincaActiveStore from '../../services/fincaActiveStore';
+import { getProfile } from '../../services/userProfileService';
 
 /**
  * ClimaStrip — pronóstico IDEAM 7 días debajo del agente.
@@ -28,11 +29,24 @@ export default function ClimaStrip({ onNavigate }) {
     const fincas = useFincaActiveStore((s) => s.fincas);
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    // Bug fix 2026-05-30: el municipio que el usuario confirma en
+    // LocationDetectedScreen se guarda en el perfil (userProfileService), NO en
+    // fincaActiveStore. Si no lo leemos de ahí, este card sigue mostrando
+    // "Configurar ubicación" aunque el usuario ya la haya confirmado. `tick`
+    // fuerza re-lectura del perfil al recibir 'chagra:location-updated'.
+    const [tick, setTick] = useState(0);
+    useEffect(() => {
+        const onLocUpdated = () => setTick((t) => t + 1);
+        window.addEventListener('chagra:location-updated', onLocUpdated);
+        return () => window.removeEventListener('chagra:location-updated', onLocUpdated);
+    }, []);
 
     const municipio = useMemo(() => {
         const activeFinca = fincas.find((f) => f.slug === activeFincaSlug);
-        return activeFinca?.municipio || FARM_CONFIG?.MUNICIPIO || null;
-    }, [activeFincaSlug, fincas]);
+        const profileMunicipio = getProfile()?.municipio || null;
+        return activeFinca?.municipio || profileMunicipio || FARM_CONFIG?.MUNICIPIO || null;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeFincaSlug, fincas, tick]);
 
     useEffect(() => {
         let alive = true;

@@ -433,15 +433,36 @@ export default function LocationDetectedScreen({
   const handleConfirm = () => {
     if (!loc) return;
     // Persistir en el perfil del usuario (#200) — ubicación enriquecida.
+    //
+    // Bug fix 2026-05-30: además de `region` (texto "Municipio, Depto" para el
+    // system prompt), guardamos `municipio`/`departamento` LIMPIOS por separado.
+    // El card "Configurar ubicación" (ClimaStrip) deriva su municipio de este
+    // campo: antes solo escribíamos en el perfil y el card leía de
+    // fincaActiveStore/FARM_CONFIG → nunca se enteraba de la confirmación y el
+    // menú reaparecía "como si no lo hubieras hecho". Ahora el card lo ve.
     saveProfile({
       ubicacion_lat: loc.lat,
       ubicacion_lng: loc.lng,
+      municipio: loc.municipio || undefined,
+      departamento: loc.departamento || undefined,
       region: loc.municipio
         ? [loc.municipio, loc.departamento].filter(Boolean).join(', ')
         : undefined,
       finca_altitud: loc.altitud != null ? String(loc.altitud) : undefined,
       piso_termico: pisoInfo?.slug,
     });
+    // Avisar a la UI montada (ClimaStrip, dashboard) que la ubicación cambió,
+    // por si no hay remount completo al navegar. Refresca el pronóstico sin
+    // recargar la app.
+    try {
+      window.dispatchEvent(
+        new CustomEvent('chagra:location-updated', {
+          detail: { municipio: loc.municipio || null },
+        }),
+      );
+    } catch (_) {
+      /* no-op (SSR / tests sin window) */
+    }
     // Recordar zona para fallback de contexto (no sincroniza a server).
     if (typeof setFincaIndoorZone === 'function' && pisoInfo?.slug) {
       try {
@@ -537,7 +558,9 @@ export default function LocationDetectedScreen({
           {cascadeOpen && (
             <div className="px-4 pb-4 space-y-3 border-t border-slate-800">
               <p className="text-2xs text-slate-500 leading-relaxed pt-3">
-                Funciona sin internet. Datos curados para 32 departamentos.
+                Lista rápida sin internet (municipios principales). ¿No está el
+                tuyo? Escríbelo arriba en la búsqueda — encontramos cualquier
+                municipio de Colombia.
               </p>
               <label className="block">
                 <span className="text-xs font-medium text-slate-400 block mb-1.5">
@@ -605,6 +628,14 @@ export default function LocationDetectedScreen({
             </>
           )}
         </button>
+        {/* Hint navegador (#2, 2026-05-30): Brave bloquea la Geolocation API
+            con Shields/anti-fingerprint a nivel de navegador — ninguna app web
+            puede forzarla. En vez de prometer algo imposible, guiamos al
+            usuario a la entrada manual (que sí funciona en todos lados). */}
+        <p className="text-2xs text-slate-500 leading-relaxed px-1 -mt-1">
+          ¿No detecta tu ubicación? En Brave baja los Shields de este sitio
+          (icono del león) o, más fácil, escribe tu municipio arriba.
+        </p>
 
         {/* Mini mapa con marcador arrastrable (#201 NO ajustar) */}
         {hasPoint && (
