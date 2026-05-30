@@ -133,9 +133,20 @@ async function mockBaseRoutes(context) {
  * Mock del endpoint LLM principal. Devuelve `content` como respuesta SSE.
  * Acepta `delayMs` para simular latencia (útil para los tests que necesitan
  * que la 1ra siga procesando mientras observamos UX intermedio del queue).
+ *
+ * IMPORTANTE — Service Worker (#339): la PWA registra `sw.js`, que en su
+ * handler `fetch` re-emite las requests POST con `fetch(event.request)`.
+ * Las requests originadas DENTRO del Service Worker NO son interceptadas
+ * por `page.route()` (Playwright solo aplica page routes al contexto de la
+ * página, no al del SW); SÍ las intercepta `context.route()`. Si registramos
+ * este mock como page route, el catch-all de api en mockBaseRoutes (context
+ * route) gana y la app recibe `{ data: [] }` en vez del SSE →
+ * `streamOpenAI` parsea 0 tokens → la burbuja del assistant queda VACÍA.
+ * Por eso el mock del LLM se registra en el CONTEXT y, al ser el último
+ * context route en registrarse con esta URL, gana sobre el catch-all.
  */
 async function mockLLM(page, { content, delayMs = 0 }) {
-  await page.route('**/api/ollama/v1/chat/completions', async (route) => {
+  await page.context().route('**/api/ollama/v1/chat/completions', async (route) => {
     if (delayMs > 0) {
       await new Promise((r) => setTimeout(r, delayMs));
     }
@@ -153,8 +164,12 @@ async function mockLLM(page, { content, delayMs = 0 }) {
  * caiga al flow RAG-only sin tool grounding.
  */
 async function mockSidecar(page, opts = {}) {
+  // #339: igual que mockLLM, los endpoints del sidecar son POST que pasan
+  // por el Service Worker (`sw.js`). Registramos en CONTEXT para que el
+  // catch-all `**/api/**` no se los coma cuando la flag sidecar esté activa.
+  const ctx = page.context();
   // /resolve-entities — pre-validation AGE.
-  await page.route('**/api/mcp/agro/resolve-entities', (route) =>
+  await ctx.route('**/api/mcp/agro/resolve-entities', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -165,7 +180,7 @@ async function mockSidecar(page, opts = {}) {
   );
 
   // /nlu — planner de tools.
-  await page.route('**/api/mcp/agro/nlu', (route) =>
+  await ctx.route('**/api/mcp/agro/nlu', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -186,7 +201,7 @@ async function mockSidecar(page, opts = {}) {
 
   // /tools/<name> — devuelve lo que opts.toolResults[<name>] indique, o
   // `{ found: false }` si no está mockeado (el caller queda sin grounding).
-  await page.route('**/api/mcp/agro/tools/*', (route) => {
+  await ctx.route('**/api/mcp/agro/tools/*', (route) => {
     const url = route.request().url();
     const toolName = url.split('/').pop();
     const result = opts.toolResults?.[toolName];
@@ -362,29 +377,48 @@ test.describe('AgentScreen — pipeline anti-halluc + queue UX (task #171)', () 
     await expect(badge.last()).not.toHaveAttribute('data-source', 'catalog');
   });
 
-  // TODO(e2e): Caso F skippeado — tras el rediseño del pipeline de chat la
-  // burbuja del assistant renderiza vacía SOLO para este caso (A-E ok). El
-  // contenido del mockLLM no llega al render; necesita investigar el path de
-  // streaming/voseo. Los otros 5 casos cubren el anti-halluc. Tarea trackeada.
-  test.skip('Caso F — voseo argentino del LLM se renderiza pero sin enriquecimiento (no hay flag tone aún)', async ({ page }) => {
+  // Caso F — des-skipeado (#339). La causa del skip NO era voseo ni
+  // streaming del LLM: era fidelidad del mock. La PWA registra un Service
+  // Worker (`sw.js`) que re-emite los POST con `fetch(event.request)`.
+  // Playwright NO aplica `page.route()` a las requests originadas en el SW
+  // (sólo `context.route()`), así que el mock del LLM (antes page route)
+  // quedaba sombreado por el catch-all `**/api/**` y la app recibía
+  // `{ data: [] }` → `streamOpenAI` parseaba 0 tokens → burbuja del assistant
+  // VACÍA. Los casos D/E "pasaban" porque sólo asertan el badge (que se
+  // renderiza con o sin contenido), nunca el texto. Fix: `mockLLM` ahora
+  // registra el mock en el CONTEXT (ver mockLLM). Este caso valida el camino
+  // real end-to-end: el contenido del LLM llega al render.
+  test('Caso F — voseo argentino del LLM se renderiza pero sin enriquecimiento (no hay flag tone aún)', async ({ page }) => {
     // No existe (todavía) una feature que detecte voseo argentino y emita
     // toast warning. Documentamos el comportamiento esperado actual: el
-    // output se muestra tal cual, sin badge especial de tono. Si más
-    // adelante se implementa la feature, este test debe actualizarse para
-    // assertear el toast. Por ahora lo importante es que la respuesta NO
-    // crashee el render aunque venga con voseo (caso degradado del modelo).
+    // output se muestra tal cual (con el filtro anti-voseo aplicado por
+    // agentService), sin badge especial de tono. Si más adelante se
+    // implementa la feature, este test debe actualizarse para assertear el
+    // toast. Por ahora lo importante es que la respuesta NO crashee el
+    // render aunque venga con voseo (caso degradado del modelo) y que el
+    // texto efectivamente llegue a la burbuja.
     await mockSidecar(page);
     await mockLLM(page, {
-      content: 'Mirá, vos tenés que aplicar el biopreparado en la tarde, así no se quema.', // el filtro de voseo (agentService) corrige el voseo; asertamos la parte sin voseo que NO cambia
+      // El filtro de voseo (agentService.applyVoseoFilter) corrige "Mirá, vos
+      // tenés" → "Mire, usted tiene"; asertamos la parte SIN voseo que NO
+      // cambia y que confirma que el contenido del LLM llegó al render.
+      content: 'Mirá, vos tenés que aplicar el biopreparado en la tarde, así no se quema.',
     });
     await gotoAgentScreen(page);
     await askAgent(page, '¿cuándo aplico el bioles?');
 
-    // Solo verificamos que la respuesta llegó (la bubble del assistant
-    // aparece en el chat) y que el render no crasheó.
-    await expect(page.getByText(/aplicar el biopreparado en la tarde/)).toBeVisible({
-      timeout: 30_000,
-    });
+    // La respuesta llegó y se renderizó: el texto del LLM (post-filtro) es
+    // visible en la burbuja del assistant. Esto prueba que el contenido NO
+    // queda vacío (regresión #339) y que el render no crashea con voseo.
+    await expect(
+      page.getByText(/aplicar el biopreparado en la tarde/)
+    ).toBeVisible({ timeout: 30_000 });
+
+    // El filtro anti-voseo corrigió el voseo argentino: NO debe quedar
+    // "Mirá" ni "vos tenés" visibles en la UI (DR-LANG-1 / español
+    // colombiano). Verificamos la sustitución a usted colombiano.
+    await expect(page.getByText(/Mire, usted tiene/)).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText(/vos tenés/)).toHaveCount(0);
   });
 });
 
@@ -420,7 +454,8 @@ test.describe('AgentScreen — sidecar pipeline (flag-dependent)', () => {
     // aiService.grounded.test.js); aquí verificamos que el flow E2E no
     // crashea y que el LLM efectivamente recibe la llamada.
     let llmSeen = false;
-    await page.route('**/api/ollama/v1/chat/completions', (route) => {
+    // #339: registrar en context (SW re-emite los POST; page.route no los ve).
+    await page.context().route('**/api/ollama/v1/chat/completions', (route) => {
       llmSeen = true;
       route.fulfill({
         status: 200,
