@@ -10,6 +10,14 @@ function detectChromiumPath() {
   if (process.env.PLAYWRIGHT_CHROMIUM_PATH) {
     return process.env.PLAYWRIGHT_CHROMIUM_PATH;
   }
+  // En CI (ubuntu-latest) usar el chromium BUNDLED de Playwright — instalado por
+  // `npx playwright install chromium` y que es el build parcheado correcto. El
+  // `/usr/bin/chromium` que trae el runner NO es compatible con el protocolo de
+  // Playwright y cierra con "Target page, context or browser has been closed".
+  // La deteccion por `which`/nix-shell de abajo solo hace falta en NixOS local.
+  if (process.env.CI) {
+    return undefined;
+  }
   try {
     const which = execSync('which chromium 2>/dev/null', { encoding: 'utf8' }).trim();
     if (which) return which;
