@@ -31,6 +31,18 @@ function detectChromiumPath() {
 
 const CHROMIUM_PATH = detectChromiumPath();
 
+// launchOptions compartido para los 3 projects (todos engine chromium).
+// `--no-sandbox`: en CI (ubuntu-latest) el chromium del sistema (/usr/bin/
+// chromium) NO tiene el SUID sandbox helper instalado y Ubuntu 23.10+
+// deshabilita los unprivileged user namespaces vía AppArmor → el zygote
+// host aborta con "No usable sandbox!" (SIGABRT) al lanzar. Es el fix
+// canónico de Playwright en GitHub Actions; inofensivo en local (corremos
+// como usuario normal). Sin esto los projects mobile-* crashean al launch.
+const CHROMIUM_LAUNCH = {
+  args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  ...(CHROMIUM_PATH ? { executablePath: CHROMIUM_PATH } : {}),
+};
+
 export default defineConfig({
   testDir: './tests',
   // Excluir vitest unit tests (#100): viven en tests/unit/ y usan
@@ -65,14 +77,14 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        ...(CHROMIUM_PATH ? { launchOptions: { executablePath: CHROMIUM_PATH } } : {}),
+        launchOptions: CHROMIUM_LAUNCH,
       },
     },
     {
       name: 'mobile-chrome',
       use: {
         ...devices['Pixel 5'],
-        ...(CHROMIUM_PATH ? { launchOptions: { executablePath: CHROMIUM_PATH } } : {}),
+        launchOptions: CHROMIUM_LAUNCH,
       },
       // Solo correr tests con tag @cross-platform — la suite completa
       // (login + cycle + observation + offline + multifinca) ya pasa en
@@ -88,7 +100,7 @@ export default defineConfig({
         // de viewport / safe-area / user agent gating; NO sirve para bugs
         // de webkit engine puro (IDB quirks específicos de Safari).
         ...devices['iPhone 12'],
-        ...(CHROMIUM_PATH ? { launchOptions: { executablePath: CHROMIUM_PATH } } : {}),
+        launchOptions: CHROMIUM_LAUNCH,
       },
       grep: /@cross-platform/,
     },
