@@ -20,7 +20,7 @@
 
 import { streamOllama } from './ollamaStream';
 import { retrieve } from './ragRetriever';
-import { callTool, isSidecarEnabled } from './sidecarClient';
+import { callTool, isSidecarEnabled, judgeVision } from './sidecarClient';
 import { parseJsonTolerant } from '../utils/parseJsonTolerant';
 
 // Ruta relativa: Nginx proxea /api/ollama/ → http://localhost:11434/
@@ -439,14 +439,28 @@ export const recognizeSpeciesGrounded = async (imageBlob, options = {}) => {
   // Helper: anota grounded_status para telemetría y devuelve el visionResult
   // con la estructura _grounded rica (status, reason, validation). Mutar el
   // state es best-effort porque la grabación de telemetría corre en background.
-  const finalize = (status, reason, validation = null, extras = {}) => {
+  const finalize = (status, reason, validation = null, extras = {}, judge = null) => {
     telemetryState.grounded_status = status;
     return {
       ...visionResult,
-      _grounded: { status, reason, validation },
+      _grounded: { status, reason, validation, ...(judge ? { judge } : {}) },
       _validation: validation,
       ...extras,
     };
+  };
+
+  // V-08 (#229): cross-verify anti-alucinación — pregunta al juez multimodal
+  // si la FOTO realmente muestra `speciesId`. `validate_visual_match` ya
+  // confirmó que el NOMBRE existe en catálogo, pero no que la imagen coincida
+  // (el modelo de visión pudo alucinar el binomial). Best-effort: el sidecar
+  // capa a 500 ms y nunca bloquea; cualquier fallo → null (no degrada la UX).
+  const runJudge = async (speciesId) => {
+    try {
+      const b64 = await blobToBase64(imageBlob);
+      return await judgeVision(speciesId, b64);
+    } catch (_) {
+      return null;
+    }
   };
 
   // Si sidecar disabled, devolver lo del vision sin validar.
@@ -516,19 +530,23 @@ export const recognizeSpeciesGrounded = async (imageBlob, options = {}) => {
       'stripped-variety': 'Base verificada; variedad o cultivar específico no validado.',
       'stripped-hybrid': 'Base verificada; el catálogo no distingue el híbrido formal.',
     };
+    const judge = await runJudge(speciesId);
     return finalize(
       'partial-match',
       reasonByType[matchInfo.matchType],
       primary,
       { _all_validations: result.results || [], _match_type: matchInfo.matchType },
+      judge,
     );
   }
 
+  const judge = await runJudge(speciesId);
   return finalize(
     'verified',
     'Verificado en catálogo Chagra.',
     primary,
     { _all_validations: result.results || [], _match_type: matchInfo.matchType },
+    judge,
   );
 };
 

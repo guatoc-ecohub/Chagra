@@ -365,6 +365,34 @@ export async function callTool(toolName, args) {
 }
 
 /**
+ * V-08 (#229) — LLM-as-judge anti-alucinación de visión. Pregunta al modelo
+ * multimodal si la FOTO realmente muestra `speciesId` (complementa a
+ * `validate_visual_match`, que solo verifica que el NOMBRE exista en catálogo).
+ * El sidecar tiene timeout duro de 500 ms y nunca bloquea: si no puede juzgar
+ * devuelve `{plausible: null, ...}`.
+ *
+ * @param {string} speciesId — id snake_case canónico del catálogo.
+ * @param {string} imageB64 — base64 crudo de la foto (sin prefijo data:).
+ * @returns {Promise<null | {plausible: boolean|null, confidence: number|null, motivo: string}>}
+ *   null si flag off / offline / sin args / sidecar falla.
+ */
+export async function judgeVision(speciesId, imageB64) {
+  if (!speciesId || typeof speciesId !== 'string') return null;
+  if (!imageB64 || typeof imageB64 !== 'string') return null;
+  const raw = await postJson(
+    '/judge-vision',
+    { species_id: speciesId, image_b64: imageB64 },
+    TOOL_TIMEOUT_MS,
+  );
+  if (!raw || typeof raw !== 'object') return null;
+  return {
+    plausible: typeof raw.plausible === 'boolean' ? raw.plausible : null,
+    confidence: typeof raw.confidence === 'number' ? raw.confidence : null,
+    motivo: typeof raw.motivo === 'string' ? raw.motivo : '',
+  };
+}
+
+/**
  * Wrapper defensivo de `get_normativa_ica`. Validá la action localmente
  * para que el frontend NO pueda pedir paths arbitrarios al sidecar.
  *
