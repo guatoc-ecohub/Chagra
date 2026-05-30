@@ -158,8 +158,13 @@ export function aggregateNotifications(sources = {}) {
     // 4. Tareas vencidas
     if (Array.isArray(sources.tasks) && sources.tasks.length > 0) {
         const overdue = sources.tasks.filter((t) => {
-            if (!t.due_date) return false;
-            return new Date(t.due_date).getTime() < now;
+            // Los logs FarmOS (log--task) traen `timestamp` (Unix en segundos)
+            // en vez de `due_date`; aceptamos ambos para que las tareas reales
+            // que llegan desde useLogStore.getPendingTasks() se reporten.
+            const dueMs = t.due_date
+                ? new Date(t.due_date).getTime()
+                : (typeof t.timestamp === 'number' ? t.timestamp * 1000 : NaN);
+            return Number.isFinite(dueMs) && dueMs < now;
         });
         if (overdue.length > 0) {
             out.push({
