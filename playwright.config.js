@@ -108,6 +108,12 @@ export default defineConfig({
         // de viewport / safe-area / user agent gating; NO sirve para bugs
         // de webkit engine puro (IDB quirks específicos de Safari).
         ...devices['iPhone 12'],
+        // `devices['iPhone 12']` trae defaultBrowserType:'webkit', pero webkit
+        // NO está instalado (el workflow solo hace `playwright install chromium`,
+        // y NixOS alpha tampoco lo tiene). Forzamos engine chromium manteniendo
+        // viewport + user-agent de iPhone — el project es viewport/UA-gating, no
+        // engine-quirks de Safari. Sin esto: "Executable doesn't exist .../webkit".
+        defaultBrowserType: 'chromium',
         launchOptions: CHROMIUM_LAUNCH,
       },
       grep: /@cross-platform/,
