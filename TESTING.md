@@ -1,6 +1,6 @@
 # Testing — Estado y Deuda E2E
 
-Documento canónico del estado de cobertura testing en Chagra. Auditado 2026-05-14 (master audit valor real producto).
+Documento canónico del estado de cobertura testing en Chagra. Auditado 2026-05-30 (sweep de cobertura test-first servicios/utils/stores puros).
 
 ---
 
@@ -13,29 +13,35 @@ Documento canónico del estado de cobertura testing en Chagra. Auditado 2026-05-
 
 ## Cobertura Vitest unit
 
-12 archivos test, ~708 líneas. Foco infraestructural:
+**137 archivos test unit (~2360 tests pasando).** Cobertura amplia en servicios,
+utils y stores. Patrón establecido: test-first para toda funcionalidad nueva
+(política XP), foco en lógica pura verificable sin Ollama/red.
 
-| Servicio | Spec |
-|---|---|
-| `fincaActiveStore` | `fincaActiveStore.test.js` |
-| `guildService` | `guildService.test.js` |
-| `inventoryReconcile` | `inventoryReconcile.test.js`, `inventoryService.fixture.test.js` |
-| `llmGuardrails` | `llmGuardrails.test.js` |
-| `regionalismsService` | `regionalismsService.test.js` |
-| `splitService` | `splitService.test.js` |
-| `HelpVoiceRegionalDemo` smoke | `HelpVoiceRegionalDemo.smoke.test.jsx` |
+Áreas con cobertura sólida (no exhaustivo):
+- **Servicios IA/agente:** `llmGuardrails`, `llmRouter`, `agentIntentParser`,
+  `externalAiPromptBuilder`, `voseoFilter`, `queryComplexityAnalyzer`,
+  `aiInferenceParser`, `entityMatcher`, `regionalismsService`
+- **Voz/telemetría:** `visionWarmService`, `llmTelemetryService`,
+  `gpuTelemetryService`, `caseStudyVoiceExtractor`
+- **Datos/sync:** `inventoryService`, `inventoryEvents`, `notificationsService`,
+  `operatorIdentityService` (HMAC ADR-027.v, cubierto), `fincaActiveStore`,
+  `splitService`, `iotMockService`
+- **Utils puros:** `fuzzySearch`, `dateFormatter`, `assetRelationships`,
+  `blobUrl`, `tipsService`, `agentSoundService`, `pushService`, `usePrefsStore`
 
-**Cobertura precaria en core:**
-- `voiceService` (Whisper STT) — sin tests dedicados
-- `entityExtractor` (gemma3:4b JSON output) — sin tests dedicados
-- `VoiceCapture` (flow voz → review) — sin tests dedicados
-- `TelemetryAlerts` (HA proxy) — sin tests dedicados
-- `AgentScreen` (RAG LLM conversational) — sin tests dedicados
-- `operatorIdentityService` (HMAC Capa 1 ADR-027.v) — sin tests dedicados
+**Cobertura aún precaria (IO/red-coupled, requieren mocks pesados):**
+- `voiceService` (Whisper STT) — flujo de red
+- `entityExtractor` (JSON output) — acoplado a prompt/system cache
+- `payloadService` / `assetService` — escriben a FarmOS (sendToFarmOS)
+- `voiceTelemetryService` — IndexedDB-coupled (parte pura de agregación pendiente)
+- `VoiceCapture` / `AgentScreen` (componentes RAG) — sin tests de componente dedicados
 
 ## Cobertura Playwright E2E
 
-15 spec files total. **2 active + 13 con `.skip` / `.fixme`**.
+30 spec files total. Gate CI: **Playwright Offline-first E2E (bloqueante)**. Desde
+2026-05-30 corren con `reducedMotion: 'reduce'` global (congela colibrí 3D +
+animaciones que respetan `prefers-reduced-motion`) para reducir flake y habilitar
+regresión visual futura (`toHaveScreenshot`).
 
 ### Specs ACTIVOS (2)
 
