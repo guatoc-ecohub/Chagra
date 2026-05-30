@@ -1,0 +1,15 @@
+{
+  "name": "chagra-agent-eval",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Eval del agente Chagra con modelos locales (Promptfoo + LLM-as-judge + anti-voseo).",
+  "scripts": {
+    "eval": "promptfoo eval -c promptfooconfig.yaml",
+    "view": "promptfoo view",
+    "judge-bench": "node judge-bench.mjs"
+  },
+  "dependencies": {
+    "promptfoo": "*"
+  }
+}

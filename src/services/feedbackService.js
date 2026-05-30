@@ -26,6 +26,8 @@ import { ulid } from 'ulid';
 
 const FEEDBACK_TIMEOUT_MS = 8000;
 const CONSENT_STORAGE_KEY = 'chagra_feedback_consent_v1';
+const QUEUE_STORAGE_KEY = 'chagra_feedback_queue_v1';
+const QUEUE_MAX = 50; // cota: el feedback es chico, pero no crece sin límite
 
 /**
  * Obtiene el operatorId desde localStorage o genera uno temporal.
@@ -104,18 +106,9 @@ export function saveConsent(consent) {
  * @param {string} [params.comment] - Comentario opcional (solo para thumb down)
  * @returns {Promise<boolean>} - true si se envió correctamente
  */
-export async function sendFeedback({ prompt, response, thumb, comment }) {
-  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-    console.debug('[feedback] offline — feedback no enviado, se guardará localmente');
-    // TODO: implementar cola offline en IndexedDB
-    return false;
-  }
-
-  const base = getBaseUrl();
-  const url = `${base}/agent-feedback`;
-  const token = getToken();
-
-  const feedback = {
+/** Construye el objeto de feedback canónico a partir de los params del UI. */
+function buildFeedback({ prompt, response, thumb, comment }) {
+  return {
     id: ulid(),
     sessionId: getOperatorId() || 'unknown',
     prompt,
@@ -125,37 +118,98 @@ export async function sendFeedback({ prompt, response, thumb, comment }) {
     consentGiven: true,
     timestamp: Date.now(),
   };
+}
 
+/** POST de un objeto de feedback ya construido. Devuelve true si el server lo aceptó. */
+async function postFeedback(feedback) {
+  const url = `${getBaseUrl()}/agent-feedback`;
+  const token = getToken();
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FEEDBACK_TIMEOUT_MS);
-
   try {
-    const response = await fetch(url, {
+    const res = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { 'X-Chagra-Token': token } : {}),
-      },
+      headers: { 'Content-Type': 'application/json', ...(token ? { 'X-Chagra-Token': token } : {}) },
       body: JSON.stringify(feedback),
       signal: controller.signal,
     });
-
     clearTimeout(timer);
-
-    if (!response.ok) {
-      console.debug('[feedback] Non-200 response:', response.status, response.statusText);
+    if (!res.ok) {
+      console.debug('[feedback] Non-200 response:', res.status, res.statusText);
       return false;
     }
-
     console.debug('[feedback] Enviado correctamente:', feedback.id);
     return true;
   } catch (error) {
     clearTimeout(timer);
-    if (error.name === 'AbortError') {
-      console.debug('[feedback] Timeout después de', FEEDBACK_TIMEOUT_MS, 'ms');
-    } else {
-      console.debug('[feedback] Error enviando feedback:', error);
-    }
+    console.debug('[feedback]', error.name === 'AbortError' ? 'Timeout' : 'Error', error.message || error);
     return false;
   }
+}
+
+/** Lee la cola offline de feedback desde localStorage. */
+export function getQueuedFeedback() {
+  try {
+    const raw = localStorage.getItem(QUEUE_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+/** Encola un feedback para envío diferido (acotado a QUEUE_MAX, conserva los recientes). */
+export function queueFeedbackOffline(feedback) {
+  try {
+    const q = getQueuedFeedback();
+    q.push(feedback);
+    const bounded = q.slice(-QUEUE_MAX);
+    localStorage.setItem(QUEUE_STORAGE_KEY, JSON.stringify(bounded));
+  } catch (e) {
+    console.debug('[feedback] Error encolando offline:', e);
+  }
+}
+
+/** Vacía la cola offline (uso interno + tests). */
+export function clearFeedbackQueue() {
+  try {
+    localStorage.removeItem(QUEUE_STORAGE_KEY);
+  } catch (_) {
+    // ignore
+  }
+}
+
+/**
+ * Reenvía la cola offline cuando vuelve la conexión. Conserva en cola lo que
+ * falle (para reintentar). Devuelve cuántos se enviaron con éxito.
+ */
+export async function flushFeedbackQueue() {
+  const q = getQueuedFeedback();
+  if (q.length === 0) return 0;
+  const pending = [];
+  let flushed = 0;
+  for (const fb of q) {
+    const ok = await postFeedback(fb);
+    if (ok) flushed++;
+    else pending.push(fb);
+  }
+  try {
+    if (pending.length === 0) localStorage.removeItem(QUEUE_STORAGE_KEY);
+    else localStorage.setItem(QUEUE_STORAGE_KEY, JSON.stringify(pending));
+  } catch (_) {
+    // ignore
+  }
+  return flushed;
+}
+
+export async function sendFeedback({ prompt, response, thumb, comment }) {
+  const feedback = buildFeedback({ prompt, response, thumb, comment });
+
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    console.debug('[feedback] offline — encolado para envío diferido:', feedback.id);
+    queueFeedbackOffline(feedback);
+    return false;
+  }
+
+  return postFeedback(feedback);
 }
