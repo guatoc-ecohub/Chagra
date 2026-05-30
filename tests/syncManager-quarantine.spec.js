@@ -123,7 +123,7 @@ const seedPendingAndSync = async (page, { errorStatus }) =>
       // Disparar syncAll. El mock route 4xx hará que la transacción vaya
       // a quarantine.
       const mod = await import('/src/services/syncManager.js');
-      const sm = new mod.default();
+      const sm = new mod.SyncManager();
       return sm.syncAll();
     },
     { pendingStore: PENDING_STORE, errorStatusInner: errorStatus },
@@ -162,11 +162,9 @@ test.describe('@cross-platform SyncManager quarantine — 4xx farmOS', () => {
       }),
     );
 
-    const result = await seedPendingAndSync(page, { errorStatus: 422 });
+    await seedPendingAndSync(page, { errorStatus: 422 });
 
     // El sync debe reportar 1 quarantined (la transacción 4xx).
-    expect(result).toBeTruthy();
-    expect(result.quarantined).toBeGreaterThanOrEqual(1);
 
     // Verificar IDB: pending vacío, failed_transactions tiene 1 record.
     const pending = await readStoreAll(page, PENDING_STORE);
@@ -194,8 +192,7 @@ test.describe('@cross-platform SyncManager quarantine — 4xx farmOS', () => {
       }),
     );
 
-    const result = await seedPendingAndSync(page, { errorStatus: 404 });
-    expect(result.quarantined).toBeGreaterThanOrEqual(1);
+    await seedPendingAndSync(page, { errorStatus: 404 });
 
     const failed = await readStoreAll(page, FAILED_STORE);
     expect(failed).toHaveLength(1);
@@ -218,12 +215,15 @@ test.describe('@cross-platform SyncManager quarantine — 4xx farmOS', () => {
       }),
     );
 
-    const result = await seedPendingAndSync(page, { errorStatus: 503 });
-    // 5xx en el primer intento NO debería ir a quarantine — debe quedar
-    // en pending con retries incrementado. Si max_retries=0, sí va.
-    expect(result).toBeTruthy();
-    // Validamos shape, no strict en counts (depende de la config retries).
-    expect(typeof result.synced).toBe('number');
+    await seedPendingAndSync(page, { errorStatus: 503 });
+    // 5xx en el primer intento NO debe clasificarse como quarantine 4xx
+    // (validation/not_found). Si tras retries va a quarantine, sería class
+    // 'server'. syncAll ya no retorna breakdown (refactor #300) → verificamos
+    // por el store, no por el return.
+    const failed = await readStoreAll(page, FAILED_STORE);
+    for (const f of failed) {
+      expect(['validation', 'not_found']).not.toContain(f.error_class);
+    }
   });
 });
 
