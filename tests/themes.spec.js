@@ -27,8 +27,9 @@ test.describe('Themes — Perfil de usuario y persistencia', () => {
         await page.getByRole('button', { name: /ingresar/i }).click();
 
         // Entrar a Perfil
-        await page.click('button:has-text("Perfil")');
-        await expect(page.getByText(/Personalización/i)).toBeVisible();
+        await page.getByRole('button', { name: /perfil del operador/i }).click();
+        await page.getByRole('tab', { name: /apariencia/i }).click();
+        await expect(page.getByText(/Oscuro sobrio/i)).toBeVisible();
 
         // Seleccionar tema "Claro"
         await page.click('button:has-text("Claro")');
@@ -41,7 +42,8 @@ test.describe('Themes — Perfil de usuario y persistencia', () => {
         await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
 
         // Volver a Biopunk
-        await page.click('button:has-text("Perfil")');
+        await page.getByRole('button', { name: /perfil del operador/i }).click();
+        await page.getByRole('tab', { name: /apariencia/i }).click();
         await page.click('button:has-text("Biopunk")');
         await expect(page.locator('html')).not.toHaveAttribute('data-theme');
     });
@@ -52,7 +54,8 @@ test.describe('Themes — Perfil de usuario y persistencia', () => {
         await page.getByLabel(/contraseña/i).fill('e2e-pass');
         await page.getByRole('button', { name: /ingresar/i }).click();
 
-        await page.click('button:has-text("Perfil")');
+        await page.getByRole('button', { name: /perfil del operador/i }).click();
+        await page.getByRole('tab', { name: /apariencia/i }).click();
         await page.click('button:has-text("Oscuro sobrio")');
 
         await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark-sober');
