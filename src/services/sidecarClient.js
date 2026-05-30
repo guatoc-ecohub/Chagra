@@ -252,14 +252,23 @@ export async function executeToolChain(chain) {
   if (!Array.isArray(chain) || chain.length === 0) return [];
   const MAX_STEPS = 3;
   const limited = chain.slice(0, MAX_STEPS);
-  const evidences = [];
+  // SPEED-5 (#257): los pasos del chain son lecturas INDEPENDIENTES — sus args
+  // vienen del query del usuario, no del resultado de un paso previo (ver
+  // synthesizeToolChain en el sidecar nlu.ts, que sintetiza p.ej.
+  // [get_companions, get_biopreparados] ambos con args del mensaje). Por eso
+  // los disparamos en paralelo: la latencia del chain pasa de sum(pasos) a
+  // max(pasos). callTool() se invoca AHORA (inicia el fetch en orden → el orden
+  // de mock.calls / requests se preserva) y guardamos la promesa; reensamblamos
+  // las evidences en el mismo orden del chain. callTool ya tolera errores
+  // (devuelve null), así que Promise.all nunca rechaza.
+  const pending = [];
   for (const step of limited) {
     if (!step || typeof step.tool !== 'string') continue;
     const args = (step.args && typeof step.args === 'object') ? step.args : {};
-    const result = await callTool(step.tool, args);
-    evidences.push({ tool: step.tool, args, result });
+    pending.push({ tool: step.tool, args, promise: callTool(step.tool, args) });
   }
-  return evidences;
+  const results = await Promise.all(pending.map((p) => p.promise));
+  return pending.map((p, i) => ({ tool: p.tool, args: p.args, result: results[i] }));
 }
 
 /**
@@ -353,6 +362,34 @@ export async function callTool(toolName, args) {
     return null;
   }
   return postJson(`/tools/${toolName}`, args || {}, TOOL_TIMEOUT_MS);
+}
+
+/**
+ * V-08 (#229) — LLM-as-judge anti-alucinación de visión. Pregunta al modelo
+ * multimodal si la FOTO realmente muestra `speciesId` (complementa a
+ * `validate_visual_match`, que solo verifica que el NOMBRE exista en catálogo).
+ * El sidecar tiene timeout duro de 500 ms y nunca bloquea: si no puede juzgar
+ * devuelve `{plausible: null, ...}`.
+ *
+ * @param {string} speciesId — id snake_case canónico del catálogo.
+ * @param {string} imageB64 — base64 crudo de la foto (sin prefijo data:).
+ * @returns {Promise<null | {plausible: boolean|null, confidence: number|null, motivo: string}>}
+ *   null si flag off / offline / sin args / sidecar falla.
+ */
+export async function judgeVision(speciesId, imageB64) {
+  if (!speciesId || typeof speciesId !== 'string') return null;
+  if (!imageB64 || typeof imageB64 !== 'string') return null;
+  const raw = await postJson(
+    '/judge-vision',
+    { species_id: speciesId, image_b64: imageB64 },
+    TOOL_TIMEOUT_MS,
+  );
+  if (!raw || typeof raw !== 'object') return null;
+  return {
+    plausible: typeof raw.plausible === 'boolean' ? raw.plausible : null,
+    confidence: typeof raw.confidence === 'number' ? raw.confidence : null,
+    motivo: typeof raw.motivo === 'string' ? raw.motivo : '',
+  };
 }
 
 /**

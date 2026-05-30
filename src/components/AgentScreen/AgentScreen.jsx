@@ -7,6 +7,7 @@ import {
   getFullHistory,
   getContextString,
   computeSourceMetadata,
+  extractEdges,
   clearMemory,
   shouldStartNewSession,
 } from '../../services/conversationMemory';
@@ -1294,11 +1295,18 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       // para renderizar el badge verde/amber/gris (ver computeSourceMetadata).
       const sourceMetadata = computeSourceMetadata(toolEvidence);
 
+      // A-15 (#248): extraer los edges del grafo AGE que ESTE turno usó como
+      // evidencia (café→guamo COMPATIBLE_WITH, plaga→biopreparado CONTROLS,
+      // etc.) para que el feedback 👍👎 los lleve al motor E3. Si el turno no
+      // tocó relaciones del grafo → [] (sin regresión).
+      const turnEdges = extractEdges(toolEvidence);
+
       const assistantMessage = {
         role: 'assistant',
         content: response,
         timestamp: Date.now(),
         metadata: sourceMetadata,
+        _edges: turnEdges,
       };
 
       await addTurn(operatorId, {

@@ -12,26 +12,35 @@ import { test, expect } from '@playwright/test';
  * Mockea sidecar (/nlu, /resolve-entities, /api/chat, /post-validate) para
  * no depender de Ollama. Esto es lo que faltaba al agente: cobertura del
  * flow completo mockeado.
+ *
+ * A-19 (2026-05-30): TODOS los mocks van en `page.context().route(...)`,
+ * NO en `page.route(...)`. La app pega a estos endpoints same-origin (POST)
+ * y el Service Worker (public/sw.js) los re-emite con `fetch(event.request)`
+ * → page.route queda sombreado y el mock NO aplica (la app recibe la red
+ * real: 404/SSE vacío). Es el bug del #339 Caso F. El describe sigue .skip
+ * (requiere mock OAuth backend completo) pero cuando se active, los mocks
+ * ya quedan en context.route para no dar cobertura ilusoria.
+ * Ver feedback-sw-shadows-playwright-route.
  */
 
 const ORIGIN = 'http://localhost:5173';
 
 async function mockSidecar(page) {
-  await page.route('**/resolve-entities', route =>
+  await page.context().route('**/resolve-entities', route =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify({ entities: [] }),
     })
   );
-  await page.route('**/nlu', route =>
+  await page.context().route('**/nlu', route =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify({ use_tool: false }),
     })
   );
-  await page.route('**/api/chat', async route => {
+  await page.context().route('**/api/chat', async route => {
     await new Promise(r => setTimeout(r, 300));
     await route.fulfill({
       status: 200,
@@ -42,7 +51,7 @@ async function mockSidecar(page) {
       }),
     });
   });
-  await page.route('**/post-validate', route =>
+  await page.context().route('**/post-validate', route =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -58,7 +67,7 @@ async function mockSidecar(page) {
 
 async function loginIfNeeded(page) {
   // Stub OAuth: 200 con tokens fake
-  await page.route('**/oauth/token', route =>
+  await page.context().route('**/oauth/token', route =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -118,7 +127,7 @@ test.describe.skip('AgentScreen — flujo completo (skipped por default — requ
 
   test('badge "Respuesta generativa" aparece cuando post-validate flagea (N7)', async ({ page }) => {
     // Override post-validate para devolver una alucinación
-    await page.route('**/post-validate', route =>
+    await page.context().route('**/post-validate', route =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',

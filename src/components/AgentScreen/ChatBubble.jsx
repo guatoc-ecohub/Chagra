@@ -201,6 +201,7 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
               <FeedbackButtons
                 prompt={promptText || ''}
                 response={message.content || ''}
+                edges={Array.isArray(message._edges) ? message._edges : []}
                 onConsentNeeded={onConsentNeeded}
               />
             </div>

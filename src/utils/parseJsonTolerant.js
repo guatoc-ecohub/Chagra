@@ -25,8 +25,17 @@
  *
  * NO usa eval ni Function — todo es parser puro.
  *
+ * ⚠️ ANTI-ALUCINACIÓN (QUICK-6 #269): las reparaciones SOLO cierran/recortan
+ * estructura — NUNCA inventan campos ni valores. Si el modelo trunca un par
+ * `"clave":` sin valor, el resultado queda inválido y el parse FALLA
+ * (`ok:false`); jamás se rellena con `null`/`""` para "salvar" el objeto. El
+ * caller DEBE validar que los campos requeridos existan tras un parse
+ * reparado y tratar la ausencia como fallo, no como dato. El flag `repaired`
+ * (true cuando `strategy !== 'direct'`) permite loguear telemetría y, si se
+ * desea, ser más estricto en la validación de un objeto reparado.
+ *
  * @param {string} text - output del LLM (potencialmente "sucio")
- * @returns {{ ok: true, value: unknown, strategy: string } | { ok: false, error: string, raw: string }}
+ * @returns {{ ok: true, value: unknown, strategy: string, repaired: boolean } | { ok: false, error: string, raw: string }}
  */
 export function parseJsonTolerant(text) {
   if (typeof text !== 'string' || text.length === 0) {
@@ -37,7 +46,7 @@ export function parseJsonTolerant(text) {
 
   const tryParse = (s, strategy) => {
     try {
-      return { ok: true, value: JSON.parse(s), strategy };
+      return { ok: true, value: JSON.parse(s), strategy, repaired: strategy !== 'direct' };
     } catch {
       return null;
     }
@@ -172,16 +181,27 @@ function autoCloseBraces(s) {
     else if (ch === ']' && stack[stack.length - 1] === '[') stack.pop();
   }
 
-  if (stack.length === 0) return s;
+  if (stack.length === 0 && !inString) return s;
 
-  // Si quedó un string abierto, cerrarlo primero
+  let body = s;
   let suffix = '';
-  if (inString) suffix += '"';
-  // Si terminó con coma o dos puntos colgando, recortar
-  let trimmed = s.replace(/[,:\s]+$/, '');
+
+  if (inString) {
+    // Quedó un string abierto (truncado mid-value). Lo cerramos tal cual:
+    // los caracteres finales son contenido legítimo del string, así que NO
+    // recortamos coma/dos-puntos/espacios (estarían DENTRO del string).
+    suffix += '"';
+  } else {
+    // Fuera de string: si terminó con coma o dos puntos colgando (clave sin
+    // valor, último elemento truncado), recortar para no dejar sintaxis rota.
+    // NOTA: si tras recortar queda un `:` (clave sin valor), el JSON seguirá
+    // siendo inválido y el parse fallará — correcto: NO inventamos el valor.
+    body = body.replace(/[,:\s]+$/, '');
+  }
+
   while (stack.length > 0) {
     const opener = stack.pop();
     suffix += opener === '{' ? '}' : ']';
   }
-  return trimmed + suffix;
+  return body + suffix;
 }

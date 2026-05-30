@@ -30,6 +30,10 @@ if (typeof globalThis.FileReader === 'undefined') {
 }
 
 const { analyzeFoliage, __TEST__, __retrieveRagContextForFoliage } = await import('../aiService');
+// V-11 (#231): analyzeFoliage ahora cachea por hash de contenido. Como estos
+// tests reusan los MISMOS bytes (`makeBlob`), hay que limpiar el cache entre
+// casos o el 2do análisis serviría el resultado del 1ro en vez del mock.
+const { clearCache } = await import('../visionCacheService');
 
 const makeBlob = () => new Blob(['fake image bytes'], { type: 'image/webp' });
 
@@ -42,6 +46,7 @@ const happyDiagnosisJson = JSON.stringify({
 beforeEach(() => {
   streamOllamaMock.mockReset();
   retrieveMock.mockReset();
+  clearCache();
 });
 
 describe('aiService — buildRagQuery (helper)', () => {

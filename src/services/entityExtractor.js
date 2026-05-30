@@ -23,6 +23,7 @@
 
 import { streamOllama } from './ollamaStream';
 import { registry } from '../core/moduleRegistry';
+import { parseJsonTolerant as parseJsonTolerantUtil } from '../utils/parseJsonTolerant';
 
 const OLLAMA_CHAT_URL = '/api/ollama/api/chat';
 const MODEL = 'gemma3:4b';
@@ -112,20 +113,32 @@ const isValidEntity = (e) =>
   Number.isInteger(e.quantity) && e.quantity > 0 &&
   typeof e.location === 'string';
 
+/**
+ * Parser tolerante de la salida NLU del modelo (QUICK-6 #269).
+ *
+ * Delega en el util canónico `parseJsonTolerant` (src/utils), que además de
+ * limpiar fences y prosa, REPARA truncados del stream (corte por
+ * num_predict / stream cortado): cierra llaves/corchetes abiertos, cierra
+ * string abierto, recorta coma/dos-puntos colgantes. Antes este módulo tenía
+ * un parser local más débil que sólo extraía el primer `[...]` y se rendía
+ * ante un array truncado — perdiendo la entidad completa.
+ *
+ * Devuelve el valor parseado o `null`. Loguea (debug) cuando hubo reparación
+ * para telemetría sin romper la UX. ANTI-ALUCINACIÓN: el repair sólo cierra
+ * estructura, nunca inventa campos; el validador `isValidEntity` de más abajo
+ * descarta cualquier entidad reparada a la que le falten campos requeridos.
+ *
+ * @param {string} raw
+ * @returns {unknown|null}
+ */
 const parseJsonTolerant = (raw) => {
   if (typeof raw !== 'string') return null;
-  const direct = (() => { try { return JSON.parse(raw); } catch (_) { return null; } })();
-  if (direct !== null) return direct;
-  const cleaned = raw.replace(/```json\s*/gi, '').replace(/```/g, '').trim();
-  const cleanedParsed = (() => { try { return JSON.parse(cleaned); } catch (_) { return null; } })();
-  if (cleanedParsed !== null) return cleanedParsed;
-  // Según bench interno: cuando el modelo es chico
-  // a veces emite texto antes/después del JSON. Última red: extraer el
-  // primer [...] balanceado del raw. Solo soporta arrays top-level (que
-  // es el schema esperado del SYSTEM_PROMPT).
-  const arrMatch = cleaned.match(/\[[\s\S]*\]/);
-  if (arrMatch) { try { return JSON.parse(arrMatch[0]); } catch (_) { /* noop */ } }
-  return null;
+  const r = parseJsonTolerantUtil(raw);
+  if (!r.ok) return null;
+  if (r.repaired) {
+    console.debug('[entityExtractor] NLU JSON reparado vía', r.strategy);
+  }
+  return r.value;
 };
 
 /**

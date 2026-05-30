@@ -1,0 +1,111 @@
+/**
+ * @vitest-environment jsdom
+ */
+
+/* eslint-disable no-undef */
+
+/**
+ * Tests del threading de `edges` en el payload de feedback (A-15 #248).
+ *
+ * El feedback 👍👎 debe llevar las aristas del grafo AGE usadas en el turno
+ * ({species_id, edge_type, target_id}) para que el motor E3 del sidecar mapee
+ * la señal a aristas reales. Verifica: inclusión, sanitización (drop de
+ * entradas malformadas), dedup, default [] (sin regresión) y back-compat
+ * cuando el caller no pasa edges.
+ */
+
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { sendFeedback } from '../feedbackService';
+
+describe('feedbackService — edges (A-15 #248)', () => {
+  const originalLocalStorage = global.localStorage;
+  const originalFetch = global.fetch;
+
+  beforeEach(() => {
+    global.localStorage = { getItem: vi.fn(), setItem: vi.fn() };
+    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) });
+  });
+
+  afterEach(() => {
+    global.localStorage = originalLocalStorage;
+    global.fetch = originalFetch;
+  });
+
+  function sentBody() {
+    return JSON.parse(global.fetch.mock.calls[0][1].body);
+  }
+
+  it('incluye edges válidos en el payload', async () => {
+    await sendFeedback({
+      prompt: '¿compañeros del café?',
+      response: 'guamo, plátano',
+      thumb: 'up',
+      edges: [
+        { species_id: 'coffea_arabica', edge_type: 'COMPATIBLE_WITH', target_id: 'inga_edulis' },
+      ],
+    });
+    expect(sentBody().edges).toEqual([
+      { species_id: 'coffea_arabica', edge_type: 'COMPATIBLE_WITH', target_id: 'inga_edulis' },
+    ]);
+  });
+
+  it('default [] cuando el caller no pasa edges (back-compat)', async () => {
+    await sendFeedback({ prompt: 'x', response: 'y', thumb: 'up' });
+    expect(sentBody().edges).toEqual([]);
+  });
+
+  it('sanitiza: descarta entradas malformadas y conserva las válidas', async () => {
+    await sendFeedback({
+      prompt: 'x',
+      response: 'y',
+      thumb: 'down',
+      edges: [
+        { species_id: 'a', edge_type: 'COMPATIBLE_WITH', target_id: 'b' }, // válido
+        { species_id: 'a', edge_type: 'COMPATIBLE_WITH' },                  // falta target_id
+        { species_id: '', edge_type: 'CONTROLS', target_id: 'p' },          // species vacío
+        { species_id: 'c', edge_type: 'CONTROLS', target_id: 5 },           // target no string
+        null,                                                              // no objeto
+        'nope',                                                            // no objeto
+      ],
+    });
+    expect(sentBody().edges).toEqual([
+      { species_id: 'a', edge_type: 'COMPATIBLE_WITH', target_id: 'b' },
+    ]);
+  });
+
+  it('deduplica edges repetidos', async () => {
+    await sendFeedback({
+      prompt: 'x',
+      response: 'y',
+      thumb: 'up',
+      edges: [
+        { species_id: 'a', edge_type: 'COMPATIBLE_WITH', target_id: 'b' },
+        { species_id: 'a', edge_type: 'COMPATIBLE_WITH', target_id: 'b' },
+        { species_id: 'a', edge_type: 'COMPATIBLE_WITH', target_id: 'c' },
+      ],
+    });
+    expect(sentBody().edges).toEqual([
+      { species_id: 'a', edge_type: 'COMPATIBLE_WITH', target_id: 'b' },
+      { species_id: 'a', edge_type: 'COMPATIBLE_WITH', target_id: 'c' },
+    ]);
+  });
+
+  it('edges no-array → [] (defensivo)', async () => {
+    await sendFeedback({ prompt: 'x', response: 'y', thumb: 'up', edges: 'oops' });
+    expect(sentBody().edges).toEqual([]);
+  });
+
+  it('drops extra keys de cada edge — solo el shape canónico viaja', async () => {
+    await sendFeedback({
+      prompt: 'x',
+      response: 'y',
+      thumb: 'up',
+      edges: [
+        { species_id: 'a', edge_type: 'COMPATIBLE_WITH', target_id: 'b', confidence: 0.9, extra: 'x' },
+      ],
+    });
+    expect(sentBody().edges).toEqual([
+      { species_id: 'a', edge_type: 'COMPATIBLE_WITH', target_id: 'b' },
+    ]);
+  });
+});

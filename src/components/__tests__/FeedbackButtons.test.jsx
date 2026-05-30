@@ -66,7 +66,26 @@ describe('FeedbackButtons', () => {
         response: 'El café es una planta...',
         thumb: 'up',
         comment: null,
+        edges: [],
       });
+    });
+  });
+
+  it('A-15 (#248): forwardea los edges del mensaje al payload de feedback', async () => {
+    vi.mocked(feedbackService.hasConsent).mockReturnValue(true);
+    vi.mocked(feedbackService.sendFeedback).mockResolvedValue(true);
+
+    const edges = [
+      { species_id: 'coffea_arabica', edge_type: 'COMPATIBLE_WITH', target_id: 'inga_edulis' },
+    ];
+    render(<FeedbackButtons {...defaultProps} edges={edges} />);
+
+    fireEvent.click(screen.getByTitle('Esta respuesta fue útil'));
+
+    await waitFor(() => {
+      expect(feedbackService.sendFeedback).toHaveBeenCalledWith(
+        expect.objectContaining({ edges }),
+      );
     });
   });
 
@@ -121,6 +140,7 @@ describe('FeedbackButtons', () => {
         response: 'El café es una planta...',
         thumb: 'down',
         comment: 'Falta información sobre el riego',
+        edges: [],
       });
     });
   });

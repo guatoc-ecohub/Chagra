@@ -20,8 +20,9 @@
 
 import { streamOllama } from './ollamaStream';
 import { retrieve } from './ragRetriever';
-import { callTool, isSidecarEnabled } from './sidecarClient';
+import { callTool, isSidecarEnabled, judgeVision } from './sidecarClient';
 import { parseJsonTolerant } from '../utils/parseJsonTolerant';
+import { hashImage, getCached, setCached } from './visionCacheService';
 
 // Ruta relativa: Nginx proxea /api/ollama/ → http://localhost:11434/
 // Ruta final: /api/ollama/api/generate → http://localhost:11434/api/generate
@@ -191,7 +192,7 @@ export const __retrieveRagContextForFoliage = async (speciesSlug) => {
  * // result => { score: 85, issues: ["mancha foliar"], treatment_suggestion: "aplicar caldo bordelés (Fuente 1)" }
  */
 // eslint-disable-next-line no-unused-vars
-export const analyzeFoliage = async (imageBlob, { onToken, signal, speciesSlug, assetId } = {}) => {
+const analyzeFoliageUncached = async (imageBlob, { onToken, signal, speciesSlug, assetId } = {}) => {
   try {
     const base64 = await blobToBase64(imageBlob);
 
@@ -231,6 +232,40 @@ export const analyzeFoliage = async (imageBlob, { onToken, signal, speciesSlug, 
     console.warn('[aiService] Diagnóstico no disponible:', err.message);
     return null;
   }
+};
+
+/**
+ * V-11 (#231): wrapper de cache por hash de contenido para `analyzeFoliage`.
+ *
+ * Re-analizar la MISMA foto (mismos bytes) sirve el resultado cacheado al
+ * instante en vez de re-llamar al modelo multimodal (varios segundos en GPU
+ * Maxwell). El hit trae `_cached: true` para telemetría/debug. Resultados
+ * null/error NUNCA se cachean (la siguiente llamada reintenta). La firma
+ * pública es idéntica a la implementación original — no rompe callers.
+ *
+ * El hashing es best-effort: si `hashImage` falla (ej. blob no leíble) se
+ * degrada a la inferencia directa sin cache. El streaming `onToken` solo se
+ * emite en miss (cache hit es instantáneo, no hay tokens que emitir).
+ */
+export const analyzeFoliage = async (imageBlob, options = {}) => {
+  let hash = null;
+  try {
+    hash = await hashImage(imageBlob);
+    const cached = await getCached(hash);
+    if (cached) return { ...cached, _cached: true };
+  } catch (err) {
+    console.debug('[aiService.analyzeFoliage] cache lookup skipped:', err?.message);
+  }
+
+  const result = await analyzeFoliageUncached(imageBlob, options);
+  if (result && hash) {
+    try {
+      await setCached(hash, result);
+    } catch (err) {
+      console.debug('[aiService.analyzeFoliage] cache write skipped:', err?.message);
+    }
+  }
+  return result;
 };
 
 /**
@@ -439,14 +474,28 @@ export const recognizeSpeciesGrounded = async (imageBlob, options = {}) => {
   // Helper: anota grounded_status para telemetría y devuelve el visionResult
   // con la estructura _grounded rica (status, reason, validation). Mutar el
   // state es best-effort porque la grabación de telemetría corre en background.
-  const finalize = (status, reason, validation = null, extras = {}) => {
+  const finalize = (status, reason, validation = null, extras = {}, judge = null) => {
     telemetryState.grounded_status = status;
     return {
       ...visionResult,
-      _grounded: { status, reason, validation },
+      _grounded: { status, reason, validation, ...(judge ? { judge } : {}) },
       _validation: validation,
       ...extras,
     };
+  };
+
+  // V-08 (#229): cross-verify anti-alucinación — pregunta al juez multimodal
+  // si la FOTO realmente muestra `speciesId`. `validate_visual_match` ya
+  // confirmó que el NOMBRE existe en catálogo, pero no que la imagen coincida
+  // (el modelo de visión pudo alucinar el binomial). Best-effort: el sidecar
+  // capa a 500 ms y nunca bloquea; cualquier fallo → null (no degrada la UX).
+  const runJudge = async (speciesId) => {
+    try {
+      const b64 = await blobToBase64(imageBlob);
+      return await judgeVision(speciesId, b64);
+    } catch (_) {
+      return null;
+    }
   };
 
   // Si sidecar disabled, devolver lo del vision sin validar.
@@ -516,23 +565,27 @@ export const recognizeSpeciesGrounded = async (imageBlob, options = {}) => {
       'stripped-variety': 'Base verificada; variedad o cultivar específico no validado.',
       'stripped-hybrid': 'Base verificada; el catálogo no distingue el híbrido formal.',
     };
+    const judge = await runJudge(speciesId);
     return finalize(
       'partial-match',
       reasonByType[matchInfo.matchType],
       primary,
       { _all_validations: result.results || [], _match_type: matchInfo.matchType },
+      judge,
     );
   }
 
+  const judge = await runJudge(speciesId);
   return finalize(
     'verified',
     'Verificado en catálogo Chagra.',
     primary,
     { _all_validations: result.results || [], _match_type: matchInfo.matchType },
+    judge,
   );
 };
 
-export const recognizeSpecies = async (imageBlob, { onToken, signal, _telemetryState } = {}) => {
+const recognizeSpeciesUncached = async (imageBlob, { onToken, signal, _telemetryState } = {}) => {
   let base64;
   try {
     base64 = await blobToBase64(imageBlob);
@@ -569,6 +622,41 @@ export const recognizeSpecies = async (imageBlob, { onToken, signal, _telemetryS
     console.warn('[aiService] Species recognition no disponible (3 fallbacks fallaron):', err.message);
     return null;
   }
+};
+
+/**
+ * V-11 (#231): wrapper de cache por hash de contenido para `recognizeSpecies`.
+ *
+ * Misma política que `analyzeFoliage`: re-identificar la MISMA foto sirve el
+ * resultado cacheado (con `_cached: true`) sin re-llamar al modelo de visión
+ * ni a sus fallbacks. Resultados null NUNCA se cachean.
+ *
+ * Nota grounding/telemetría: `recognizeSpeciesGrounded` llama a esta función
+ * pasando `_telemetryState`. En un cache hit no hay inferencia nueva → no se
+ * graba un evento de telemetría LLM nuevo (correcto: no hubo call al modelo).
+ * El objeto cacheado preserva `scientific_name`, `confidence`, `alternatives`,
+ * por lo que el wrapper grounded sigue validando contra catálogo normalmente.
+ * La firma pública es idéntica — no rompe callers.
+ */
+export const recognizeSpecies = async (imageBlob, options = {}) => {
+  let hash = null;
+  try {
+    hash = await hashImage(imageBlob);
+    const cached = await getCached(hash);
+    if (cached) return { ...cached, _cached: true };
+  } catch (err) {
+    console.debug('[aiService.recognizeSpecies] cache lookup skipped:', err?.message);
+  }
+
+  const result = await recognizeSpeciesUncached(imageBlob, options);
+  if (result && hash) {
+    try {
+      await setCached(hash, result);
+    } catch (err) {
+      console.debug('[aiService.recognizeSpecies] cache write skipped:', err?.message);
+    }
+  }
+  return result;
 };
 
 export default analyzeFoliage;
