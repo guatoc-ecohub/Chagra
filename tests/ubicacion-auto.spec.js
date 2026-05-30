@@ -12,6 +12,14 @@ import { test, expect } from '@playwright/test';
  *
  * Muchos tests están skipped hasta que el PR 4/4 esté en main. Los activos
  * cubren lo que ya está en producción: sidecar accesible + payload shape.
+ *
+ * A-19 (2026-05-30): los mocks de /resolve-ubicacion van en
+ * `page.context().route(...)`, NO en `page.route(...)`. El Service Worker
+ * (public/sw.js) re-emite los POST con `fetch(event.request)` → page.route
+ * queda sombreado y la app recibe la respuesta REAL (404 sidecar ausente),
+ * dando cobertura ilusoria dependiente de la carrera de activación del SW.
+ * context.route sí intercepta requests originadas dentro del SW.
+ * Ver feedback-sw-shadows-playwright-route.
  */
 
 const ORIGIN = 'http://localhost:5173';
@@ -19,7 +27,7 @@ const CHOACHI = { lat: 4.5266, lng: -73.923 };
 
 test.describe('Feature ubicación — sidecar accesible (smoke)', () => {
   test('mock /resolve-ubicacion responde con payload válido', async ({ page }) => {
-    await page.route('**/resolve-ubicacion', async route => {
+    await page.context().route('**/resolve-ubicacion', async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -52,7 +60,7 @@ test.describe('Feature ubicación — sidecar accesible (smoke)', () => {
   });
 
   test('mock graceful degrade cuando sidecar devuelve no_match', async ({ page }) => {
-    await page.route('**/resolve-ubicacion', async route => {
+    await page.context().route('**/resolve-ubicacion', async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -85,7 +93,7 @@ test.describe.skip('Feature ubicación — cascade PWA (skipped hasta PR 4/4 mer
       window.localStorage.setItem('finca-activa-coords', JSON.stringify({ lat, lng }));
     }, CHOACHI);
 
-    await page.route('**/resolve-ubicacion', async route => {
+    await page.context().route('**/resolve-ubicacion', async route => {
       const body = JSON.parse(route.request().postData() || '{}');
       expect(body.source).toBe('finca_registrada');
       expect(body.lat).toBeCloseTo(CHOACHI.lat, 3);
@@ -108,7 +116,7 @@ test.describe.skip('Feature ubicación — cascade PWA (skipped hasta PR 4/4 mer
     await context.grantPermissions(['geolocation']);
     await context.setGeolocation(CHOACHI);
 
-    await page.route('**/resolve-ubicacion', async route => {
+    await page.context().route('**/resolve-ubicacion', async route => {
       const body = JSON.parse(route.request().postData() || '{}');
       expect(body.source).toBe('browser_geolocation');
       await route.fulfill({
@@ -130,7 +138,7 @@ test.describe.skip('Feature ubicación — cascade PWA (skipped hasta PR 4/4 mer
     await context.grantPermissions(['geolocation']);
     await context.setGeolocation({ lat: 52.52, lng: 13.405 });
 
-    await page.route('**/resolve-ubicacion', async route => {
+    await page.context().route('**/resolve-ubicacion', async route => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',

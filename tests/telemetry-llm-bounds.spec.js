@@ -11,6 +11,13 @@ import { test, expect } from '@playwright/test';
 // Marcado .skip hasta que el harness se complete. La cobertura unitaria del
 // regex de repetitionGuard.js puede activarse independiente cuando se añada
 // vitest/jest al proyecto (Playwright es E2E, no unit).
+//
+// A-19 (2026-05-30): el mock de Ollama (/api/ollama/api/chat) va en
+// `page.context().route(...)`, NO en `page.route(...)`. La app pega a ese
+// endpoint same-origin (POST) y el Service Worker (public/sw.js) lo re-emite
+// con fetch() → page.route queda sombreado y el mock NO aplica (la app
+// recibe la red real). OAuth/HA ya estaban correctamente en context.route.
+// Ver feedback-sw-shadows-playwright-route.
 
 test.describe.skip('Repetition Guard & LLM Constraints (v0.7.2)', () => {
     test.beforeEach(async ({ context }) => {
@@ -35,7 +42,7 @@ test.describe.skip('Repetition Guard & LLM Constraints (v0.7.2)', () => {
 
     test('debe truncar respuesta repetitiva de la IA', async ({ page }) => {
         // Mock Ollama with repetition
-        await page.route('**/api/ollama/api/chat', (route) => {
+        await page.context().route('**/api/ollama/api/chat', (route) => {
             const chunks = [
                 JSON.stringify({ message: { content: 'Excelente ' }, done: false }) + '\n',
                 JSON.stringify({ message: { content: 'excelente ' }, done: false }) + '\n',
@@ -57,7 +64,7 @@ test.describe.skip('Repetition Guard & LLM Constraints (v0.7.2)', () => {
 
     test('debe enviar repeat_penalty en la request a Ollama', async ({ page }) => {
         let capturedBody = null;
-        await page.route('**/api/ollama/api/chat', async (route) => {
+        await page.context().route('**/api/ollama/api/chat', async (route) => {
             capturedBody = JSON.parse(route.request().postData());
             route.fulfill({ status: 200, body: JSON.stringify({ done: true }) });
         });

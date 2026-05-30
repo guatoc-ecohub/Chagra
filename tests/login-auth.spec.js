@@ -48,8 +48,15 @@ test.describe('LoginScreen — paint inicial', () => {
 
 test.describe('LoginScreen — submit y errores', () => {
   test('credenciales inválidas muestran error sin lanzar a otra pantalla', async ({ page }) => {
-    // Interceptar OAuth backend para devolver 401
-    await page.route('**/oauth/token', async route => {
+    // Interceptar OAuth backend para devolver 401.
+    // A-19 (2026-05-30): context.route (NO page.route). authService hace
+    // fetch(`${FARMOS_URL}/oauth/token`) que es same-origin → el Service
+    // Worker (public/sw.js, POST passthrough) lo re-emite con fetch() y
+    // sombrea page.route. Con page.route el mock NO aplicaba: la app pegaba
+    // a la red real (404) y el test "pasaba en falso" porque solo asertaba
+    // que el botón seguía visible (cierto con 401 mockeado O con 404 real).
+    // Ver feedback-sw-shadows-playwright-route.
+    await page.context().route('**/oauth/token', async route => {
       await route.fulfill({
         status: 401,
         contentType: 'application/json',
@@ -62,7 +69,12 @@ test.describe('LoginScreen — submit y errores', () => {
     await page.locator('input[type="password"]').fill('clave-mala');
     await page.getByRole('button', { name: /Ingresar/i }).click();
 
-    // Debe seguir en LoginScreen
+    // Assert reforzado A-19: el mock 401 SÍ se ejerce. authService lanza
+    // "Error de Autenticación: 401" → handleLogin lo captura → toast de error
+    // (role="alert"). El toast auto-dismiss a 4s, por eso se asserta primero.
+    await expect(page.getByRole('alert')).toBeVisible({ timeout: 5000 });
+
+    // Y debe seguir en LoginScreen (no navegar al dashboard).
     await expect(page.getByRole('button', { name: /Ingresar/i })).toBeVisible({ timeout: 5000 });
   });
 
