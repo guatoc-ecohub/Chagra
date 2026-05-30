@@ -6,6 +6,7 @@ import { getCompletedTaskIds } from '../utils/taskCompletionParser';
 import { recordEvent } from './voiceTelemetryService';
 import { tryGeneratePlanFromSeeding } from './planGeneratorService';
 import { friendlyMessage } from '../utils/friendlyErrors';
+import { flushVisionQueue } from './visionQueueService';
 
 const STORE_NAME = 'pending_transactions';
 const TASKS_STORE_NAME = 'pending_tasks';
@@ -645,6 +646,11 @@ export class SyncManager {
       this.isOnline = true;
       this.syncAll();
       this.notifyPendingVoiceRecordings();
+      // V-07 #228: al reconectar, correr el diagnóstico de las fotos de visión
+      // encoladas offline. Tolerante a fallos — no debe romper el resto del sync.
+      flushVisionQueue().catch((e) =>
+        console.debug('[sync] flushVisionQueue error:', e?.message || e)
+      );
       recordEvent({
         event_type: 'connectivity_state',
         flujo: 'sync_manager',
