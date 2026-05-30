@@ -4,6 +4,7 @@ import useAssetStore from '../store/useAssetStore';
 import useAlertStore from '../store/useAlertStore';
 import useFincaActiveStore from '../services/fincaActiveStore';
 import { aggregateNotifications, dismissNotification } from '../services/notificationsService';
+import { syncManager } from '../services/syncManager';
 // PoC alertas meteorológicas (#316) — fuente de verdad ENSO + alertas locales.
 import {
     getCachedClimaSnapshot,
@@ -81,6 +82,11 @@ export default function NotificationsBell({ onNavigate }) {
     const [activeTab, setActiveTab] = useState('notif');
     const [clima, setClima] = useState(() => getCachedClimaSnapshot());
     const [climaLoading, setClimaLoading] = useState(false);
+    // #308 — conteo real de transacciones en quarantine (cambios sin sincronizar),
+    // cargado async desde syncManager. Antes estaba hardcodeado a 0, así que el
+    // bell nunca mostraba "sync stuck". Conecta el estado de sincronización al
+    // centro de notificaciones.
+    const [failedTxCount, setFailedTxCount] = useState(0);
 
     const plants = useAssetStore((s) => s.plants);
     const sensorAlerts = useAlertStore((s) => s.activeAlerts);
@@ -99,6 +105,17 @@ export default function NotificationsBell({ onNavigate }) {
             window.removeEventListener('chagra:clima:updated', onClimaUpdated);
         };
     }, []);
+
+    // #308 — carga el conteo de quarantine al montar y cada vez que se abre el
+    // panel o se descarta una notif. setState dentro del .then() para no
+    // disparar set-state-in-effect sincrónico.
+    useEffect(() => {
+        let alive = true;
+        syncManager.getFailedTransactions()
+            .then((txs) => { if (alive) setFailedTxCount(Array.isArray(txs) ? txs.length : 0); })
+            .catch(() => {});
+        return () => { alive = false; };
+    }, [open, tick]);
 
     // PoC #316 — pide snapshot fresco al abrir el panel. El sidecar tiene su
     // propia cache de 30 min, así que esto es un "ping" barato. setState va
@@ -127,7 +144,7 @@ export default function NotificationsBell({ onNavigate }) {
         return aggregateNotifications({
             plants,
             tasks: [],
-            failedTxCount: 0,
+            failedTxCount,
             hasUpdate: readUpdateAvailable(),
             onboardingComplete: readOnboardingComplete(),
             bioculturalZone: finca?.biocultural_zone || null,
@@ -135,7 +152,7 @@ export default function NotificationsBell({ onNavigate }) {
             iotAlerts: mapSensorAlertsToIot(sensorAlerts),
         });
         // tick force re-run on dismiss event
-    }, [plants, sensorAlerts, activeFincaSlug, fincas, tick]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [plants, sensorAlerts, activeFincaSlug, fincas, tick, failedTxCount]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // PoC #316 — el clima cuenta para los badges del bell. Las alertas
     // locales de Open-Meteo (helada/calor/torrencial/etc) escalan severity;
