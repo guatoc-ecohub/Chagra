@@ -5,6 +5,7 @@ import useAlertStore from '../store/useAlertStore';
 import useFincaActiveStore from '../services/fincaActiveStore';
 import { aggregateNotifications, dismissNotification } from '../services/notificationsService';
 import { syncManager } from '../services/syncManager';
+import { useLogStore } from '../store/useLogStore';
 // PoC alertas meteorológicas (#316) — fuente de verdad ENSO + alertas locales.
 import {
     getCachedClimaSnapshot,
@@ -87,6 +88,9 @@ export default function NotificationsBell({ onNavigate }) {
     // bell nunca mostraba "sync stuck". Conecta el estado de sincronización al
     // centro de notificaciones.
     const [failedTxCount, setFailedTxCount] = useState(0);
+    // tasks vencidas reales desde useLogStore (log--task pending). Antes estaba
+    // hardcodeado a [], así que el bell nunca mostraba "tareas vencidas".
+    const [pendingTasks, setPendingTasks] = useState([]);
 
     const plants = useAssetStore((s) => s.plants);
     const sensorAlerts = useAlertStore((s) => s.activeAlerts);
@@ -113,6 +117,9 @@ export default function NotificationsBell({ onNavigate }) {
         let alive = true;
         syncManager.getFailedTransactions()
             .then((txs) => { if (alive) setFailedTxCount(Array.isArray(txs) ? txs.length : 0); })
+            .catch(() => {});
+        useLogStore.getState().getPendingTasks()
+            .then((tasks) => { if (alive) setPendingTasks(Array.isArray(tasks) ? tasks : []); })
             .catch(() => {});
         return () => { alive = false; };
     }, [open, tick]);
@@ -143,7 +150,7 @@ export default function NotificationsBell({ onNavigate }) {
         const finca = fincas.find((f) => f.slug === activeFincaSlug);
         return aggregateNotifications({
             plants,
-            tasks: [],
+            tasks: pendingTasks,
             failedTxCount,
             hasUpdate: readUpdateAvailable(),
             onboardingComplete: readOnboardingComplete(),
@@ -152,7 +159,7 @@ export default function NotificationsBell({ onNavigate }) {
             iotAlerts: mapSensorAlertsToIot(sensorAlerts),
         });
         // tick force re-run on dismiss event
-    }, [plants, sensorAlerts, activeFincaSlug, fincas, tick, failedTxCount]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [plants, sensorAlerts, activeFincaSlug, fincas, tick, failedTxCount, pendingTasks]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // PoC #316 — el clima cuenta para los badges del bell. Las alertas
     // locales de Open-Meteo (helada/calor/torrencial/etc) escalan severity;
