@@ -31,6 +31,7 @@ vi.mock('../ragRetriever', () => ({
 }));
 
 import { recognizeSpeciesGrounded } from '../aiService.js';
+import { clearCache } from '../visionCacheService.js';
 import * as sidecarClient from '../sidecarClient.js';
 import * as ollamaStream from '../ollamaStream.js';
 
@@ -41,6 +42,9 @@ function mockVisionResponse(json) {
 describe('recognizeSpeciesGrounded', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // V-11 (#231): recognizeSpecies cachea por hash; los tests reusan los
+    // mismos bytes de blob → limpiar para que cada caso pegue al mock.
+    clearCache();
     sidecarClient.isSidecarEnabled.mockReturnValue(true);
     // Browser online por default.
     Object.defineProperty(globalThis, 'navigator', {
