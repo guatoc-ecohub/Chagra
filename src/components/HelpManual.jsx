@@ -8,6 +8,7 @@ import HelpCicloScreen from './HelpCicloScreen.jsx';
 import HelpDictionary from './HelpDictionary.jsx';
 import HelpVoiceRegionalDemo from './HelpVoiceRegionalDemo.jsx';
 import HelpAgentSection from './HelpAgentSection.jsx';
+import HelpDatosScreen from './HelpDatosScreen.jsx';
 
 /**
  * HelpManual — Manual de usuario integrado en la PWA.
@@ -37,7 +38,7 @@ import HelpAgentSection from './HelpAgentSection.jsx';
  *   - "Novedades mayo 2026"        → Chagra/CHANGELOG.md (root)
  */
 export default function HelpManual({ onBack, onNavigate }) {
-  // 'home' | 'voz' | 'uso' | 'ciclo' | 'diccionario' | 'agente' | 'voz-regional-demo'
+  // 'home' | 'voz' | 'uso' | 'ciclo' | 'diccionario' | 'agente' | 'datos' | 'voz-regional-demo'
   const [section, setSection] = useState('home');
 
   // CTAs híbridas (P5): cierran el manual y navegan al flow real.
@@ -90,6 +91,18 @@ export default function HelpManual({ onBack, onNavigate }) {
       )}
       {section === 'agente' && (
         <HelpAgentSection onBackToHome={goHome} onNavigate={closeAndNavigate} />
+      )}
+      {section === 'datos' && (
+        <HelpDatosScreen
+          onBackToHome={goHome}
+          onNavigate={(route) => {
+            // 'agente' navega DENTRO del manual a la sección del agente
+            // (task #123), no cierra el manual. Otras rutas siguen el
+            // comportamiento de CTA híbrida (cerrar + navegar la app).
+            if (route === 'agente') setSection('agente');
+            else closeAndNavigate(route);
+          }}
+        />
       )}
     </div>
   );
