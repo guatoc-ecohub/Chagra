@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, BadgeCheck, Info, Sparkles, AlertTriangle } from 'lucide-react';
+import { User, BadgeCheck, Info, Sparkles, AlertTriangle, ExternalLink, ShieldCheck } from 'lucide-react';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import { speak, speakKokoro, stop, isSpeaking, isKokoroAvailable } from '../../services/ttsService';
 import { agentSounds } from '../../services/agentSoundService';
@@ -129,6 +129,111 @@ function SourceBadge({ metadata }) {
   );
 }
 
+/**
+ * #18 — FuenteBadge: link clickeable a la fuente verificable del grounding curado
+ * (p.ej. una dosis de biopreparado respaldada por Agrosavia / FAO). Aparece solo
+ * cuando el turno trae `metadata.fuente_url` (URL http/https). CSP-safe: es un
+ * `<a href target="_blank">` nativo (NO onclick inline) — no requiere
+ * 'unsafe-inline' ni viola `script-src 'self'`. `rel="noopener noreferrer"`
+ * evita fuga de window.opener al sitio externo.
+ *
+ * El label es `metadata.fuente` (ej. "Agrosavia"); si no viene, cae a un texto
+ * genérico. Wording cero hype: "Fuente verificable".
+ */
+function FuenteBadge({ metadata }) {
+  const md = metadata || {};
+  const url = typeof md.fuente_url === 'string' ? md.fuente_url.trim() : '';
+  if (!/^https?:\/\//i.test(url)) return null;
+  const label = (typeof md.fuente === 'string' && md.fuente.trim()) || 'fuente externa';
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      data-testid="fuente-badge"
+      data-source="verifiable-source"
+      title={`Esta respuesta cita una fuente verificable (${label}). Abre el documento original en una pestaña nueva.`}
+      className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-sky-600/20 text-sky-300 border border-sky-700 hover:bg-sky-600/30 underline-offset-2 hover:underline"
+    >
+      <ShieldCheck size={12} aria-hidden="true" />
+      <span>Fuente verificable: {label}</span>
+      <ExternalLink size={11} aria-hidden="true" />
+    </a>
+  );
+}
+
+/**
+ * #19 — AutoCorrectedBadge: aviso sutil de que los guards deterministas
+ * (applyOutputGuards) modificaron la respuesta del modelo (corrigieron una
+ * viabilidad invertida, anexaron la ruta orgánica a un agroquímico, advirtieron
+ * una invasora, etc.). Aparece solo si `metadata.auto_corrected === true`.
+ * Reusa el patrón de badge con AlertTriangle. Wording honesto, no alarmista.
+ */
+function AutoCorrectedBadge({ metadata }) {
+  const md = metadata || {};
+  if (md.auto_corrected !== true) return null;
+  return (
+    <span
+      className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-violet-600/20 text-violet-300 border border-violet-700"
+      data-testid="auto-corrected-badge"
+      data-source="auto-corrected"
+      title="El sistema ajustó automáticamente esta respuesta para corregir un posible error del modelo (viabilidad, agroquímico sintético, especie invasora, dosis sin fuente). El contenido mostrado ya está corregido."
+    >
+      <AlertTriangle size={12} aria-hidden="true" />
+      <span>Respuesta auto-corregida</span>
+    </span>
+  );
+}
+
+/**
+ * #20 — ConfianzaBadge: refleja en la UX cuán firme es un dato CURADO del
+ * grounding (p.ej. la dosis de un biopreparado). El nivel `metadata.confianza`
+ * ∈ {alta,media,baja} viene del catálogo. Color para que el campesino lo capte
+ * sin leer:
+ *   - alta  → verde   (dato respaldado/curado, alta confianza)
+ *   - media → ámbar   (referencia útil, contrastar)
+ *   - baja  → gris     (tentativo, no actuar sin verificar)
+ * Aparece solo si el turno trae un nivel reconocible.
+ */
+const _CONFIANZA_BADGE = {
+  alta: {
+    label: 'Confianza alta',
+    classes: 'bg-emerald-600/20 text-emerald-300 border-emerald-700',
+    title: 'Dato del catálogo con alta confianza (curado / respaldado por fuente).',
+    Icon: BadgeCheck,
+  },
+  media: {
+    label: 'Confianza media',
+    classes: 'bg-amber-600/20 text-amber-300 border-amber-700',
+    title: 'Dato del catálogo con confianza media — útil de referencia, contrástalo antes de aplicar.',
+    Icon: Info,
+  },
+  baja: {
+    label: 'Confianza baja',
+    classes: 'bg-slate-600/20 text-slate-300 border-slate-600',
+    title: 'Dato del catálogo con confianza baja — tentativo, no actúes sin verificar con un técnico.',
+    Icon: AlertTriangle,
+  },
+};
+
+function ConfianzaBadge({ metadata }) {
+  const md = metadata || {};
+  const cfg = _CONFIANZA_BADGE[md.confianza];
+  if (!cfg) return null;
+  const { Icon } = cfg;
+  return (
+    <span
+      className={`text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 border ${cfg.classes}`}
+      data-testid="confianza-badge"
+      data-confianza={md.confianza}
+      title={cfg.title}
+    >
+      <Icon size={12} aria-hidden="true" />
+      <span>{cfg.label}</span>
+    </span>
+  );
+}
+
 export default function ChatBubble({ message, isStreaming = false, promptText, onConsentNeeded, onRetryOrphan }) {
   const isUser = message.role === 'user';
   const showSourceBadges = usePrefsStore((s) => s.showSourceBadges);
@@ -238,8 +343,14 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
             />
           )}
           {shouldShowBadge && (
-            <div className="mt-1">
+            <div className="mt-1 flex flex-wrap items-center gap-1.5">
               <SourceBadge metadata={message.metadata} />
+              {/* #20: confianza del dato curado (alta/media/baja → verde/ámbar/gris). */}
+              <ConfianzaBadge metadata={message.metadata} />
+              {/* #18: fuente verificable clickeable (Agrosavia/FAO), CSP-safe. */}
+              <FuenteBadge metadata={message.metadata} />
+              {/* #19: aviso de que los guards deterministas corrigieron la respuesta. */}
+              <AutoCorrectedBadge metadata={message.metadata} />
             </div>
           )}
           {message.timestamp && (

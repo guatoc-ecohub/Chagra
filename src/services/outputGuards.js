@@ -278,6 +278,63 @@ const SUFFIX_EXCEPTIONS = new Set([
 ]);
 
 /**
+ * #17 — ALLOWLIST de biopreparados / caldos minerales AGROECOLOGICOS permitidos.
+ *
+ * Estos son los preparados que Chagra SI recomienda (caldo bordeles, caldo
+ * sulfocalcico, ceniza, bocashi, supermagro, biol, etc.). Aunque no son
+ * agroquimicos sinteticos, algunos de sus nombres (o de sus ingredientes
+ * minerales) podrian colisionar con la denylist exacta o con el detector de
+ * sufijos de familia quimica (p.ej. "sulfocalcico" termina parecido a un i.a.,
+ * "biol" es corto). Esta lista cerrada GARANTIZA que un biopreparado legitimo
+ * NUNCA se marque como sintetico: cualquier hit que caiga DENTRO de un termino
+ * de esta allowlist se descarta antes de disparar el guard.
+ *
+ * Normalizada sin diacriticos/case. Cubre variantes ortograficas comunes del
+ * campo (bordeles/bordeles, sulfocalcico, supermagro/super magro). Es ADITIVA al
+ * guard, no sustituye su logica: glifosato, mancozeb y demas sinteticos siguen
+ * bloqueandose igual.
+ */
+const ALLOWED_BIOPREPARADO_TERMS = [
+  'caldo bordeles',
+  'bordeles',
+  'caldo sulfocalcico',
+  'sulfocalcico',
+  'sulfocalcio',
+  'polisulfuro de calcio',
+  'ceniza',
+  'cenizas',
+  'caldo de ceniza',
+  'caldo ceniza',
+  'bocashi',
+  'supermagro',
+  'super magro',
+  'biol',
+  'bioles',
+  'biofermento',
+  'biofertilizante',
+  'caldo mineral',
+  'lixiviado de lombriz',
+  'purin',
+  'purines',
+].map(_stripDiacritics);
+
+/**
+ * #17 — el termino/token detectado como "sintetico" es en realidad un
+ * biopreparado permitido (o parte de su nombre)? Compara el hit normalizado
+ * contra la allowlist: coincide si el hit ES un termino permitido o si esta
+ * contenido en uno (p.ej. el sufijo dispara sobre "sulfocalcico", que pertenece
+ * a "caldo sulfocalcico"). Best-effort: hit vacio -> no es permitido.
+ *
+ * @param {string} hit  termino/token candidato a sintetico (puede traer tildes).
+ * @returns {boolean}
+ */
+function _isAllowedBiopreparado(hit) {
+  const h = _stripDiacritics(hit);
+  if (!h) return false;
+  return ALLOWED_BIOPREPARADO_TERMS.some((allowed) => allowed === h || allowed.includes(h));
+}
+
+/**
  * Regex que extrae tokens alfabéticos (con guion interno, p.ej. "lambda-
  * cihalotrina") del texto normalizado, para evaluar su terminación contra los
  * sufijos de familia química.
@@ -377,6 +434,8 @@ export function guardSyntheticAgrochemical(responseText, _resolvedEntities = nul
   const hits = [];
   for (const term of SYNTHETIC_AGROCHEM_TERMS) {
     const t = _stripDiacritics(term);
+    // #17: nunca tratamos un biopreparado permitido como sintético.
+    if (_isAllowedBiopreparado(term)) continue;
     // límite de palabra a ambos lados sobre el texto normalizado.
     const re = new RegExp(`(^|[^a-z0-9])${t.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}([^a-z0-9]|$)`);
     if (re.test(norm)) hits.push(term);
@@ -391,7 +450,9 @@ export function guardSyntheticAgrochemical(responseText, _resolvedEntities = nul
   let tok;
   while ((tok = WORD_TOKEN_RE.exec(norm)) !== null) {
     const suf = _agrochemBySuffix(tok[0]);
-    if (suf) hits.push(tok[0]);
+    // #17: un biopreparado permitido (o parte de su nombre) nunca dispara por
+    // sufijo, aunque su terminación colisione con una familia química.
+    if (suf && !_isAllowedBiopreparado(tok[0])) hits.push(tok[0]);
   }
 
   // Códigos inventados SOLO cuentan si hay contexto de aplicación/dosis (para

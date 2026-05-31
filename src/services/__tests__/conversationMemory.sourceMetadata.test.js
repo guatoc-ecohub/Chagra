@@ -10,7 +10,7 @@
  * El ChatBubble renderiza el badge a partir de este metadata.
  */
 import { describe, test, expect } from 'vitest';
-import { computeSourceMetadata, mergePostValidateMetadata } from '../conversationMemory';
+import { computeSourceMetadata, mergePostValidateMetadata, extractGroundingBadges } from '../conversationMemory';
 
 describe('computeSourceMetadata', () => {
   test('null / undefined toolEvidence → no tool, no grounded', () => {
@@ -297,5 +297,72 @@ describe('mergePostValidateMetadata (FIX 2 — surfacea hallucinated)', () => {
       age_available: true,
     });
     expect(original).toEqual(snapshot);
+  });
+});
+
+
+describe('extractGroundingBadges (#18 fuente_url + #20 confianza)', () => {
+  test('entrada no-array / vacía → {}', () => {
+    expect(extractGroundingBadges(null)).toEqual({});
+    expect(extractGroundingBadges(undefined)).toEqual({});
+    expect(extractGroundingBadges([])).toEqual({});
+    expect(extractGroundingBadges('x')).toEqual({});
+  });
+
+  test('biopreparado con fuente_url + fuente + confianza → surfacéa los tres', () => {
+    const ents = [
+      {
+        mentioned: 'caldo bordelés',
+        kind: 'biopreparado',
+        nombre_comun: 'Caldo bordelés',
+        fuente: 'Agrosavia / FAO',
+        fuente_url: 'https://repository.agrosavia.co/bitstreams/abc/download',
+        confianza: 'alta',
+      },
+    ];
+    const out = extractGroundingBadges(ents);
+    expect(out.fuente_url).toContain('agrosavia.co');
+    expect(out.fuente).toBe('Agrosavia / FAO');
+    expect(out.confianza).toBe('alta');
+  });
+
+  test('normaliza confianza con tildes/case y sinónimos', () => {
+    expect(extractGroundingBadges([{ confianza: 'Alta' }]).confianza).toBe('alta');
+    expect(extractGroundingBadges([{ confianza: 'MEDIA' }]).confianza).toBe('media');
+    expect(extractGroundingBadges([{ confianza: 'baja' }]).confianza).toBe('baja');
+    expect(extractGroundingBadges([{ confianza: 'verificada' }]).confianza).toBe('alta');
+    expect(extractGroundingBadges([{ confianza: 'desconocida' }]).confianza).toBeUndefined();
+  });
+
+  test('elige la confianza MÁS ALTA del turno', () => {
+    const ents = [
+      { kind: 'species', confianza: 'baja' },
+      { kind: 'biopreparado', confianza: 'alta' },
+      { kind: 'biopreparado', confianza: 'media' },
+    ];
+    expect(extractGroundingBadges(ents).confianza).toBe('alta');
+  });
+
+  test('ignora fuente_url no http(s) (no inyecta link inseguro)', () => {
+    const out = extractGroundingBadges([
+      { fuente: 'X', fuente_url: 'javascript:alert(1)', confianza: 'media' },
+    ]);
+    expect(out.fuente_url).toBeUndefined();
+    expect(out.fuente).toBeUndefined();
+    expect(out.confianza).toBe('media');
+  });
+
+  test('prioriza la fuente_url del biopreparado sobre la de otra entidad', () => {
+    const ents = [
+      { kind: 'species', fuente: 'Wiki', fuente_url: 'https://es.wikipedia.org/x' },
+      { kind: 'biopreparado', fuente: 'Agrosavia', fuente_url: 'https://agrosavia.co/y' },
+    ];
+    const out = extractGroundingBadges(ents);
+    expect(out.fuente_url).toContain('agrosavia.co');
+    expect(out.fuente).toBe('Agrosavia');
+  });
+
+  test('sin fuente_url ni confianza → {} (graceful, sin badge)', () => {
+    expect(extractGroundingBadges([{ kind: 'species', nombre_comun: 'Lulo' }])).toEqual({});
   });
 });
