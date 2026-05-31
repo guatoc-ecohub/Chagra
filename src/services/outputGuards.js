@@ -517,6 +517,214 @@ export function guardDoseWithoutSource(responseText, _resolvedEntities = null, _
   return { text, modified: true, reason: `dosis_sin_fuente: ${[...new Set(doses)].slice(0, 5).join(', ')}` };
 }
 
+// ── GUARD 5: sustitución de especie ─────────────────────────────────────────
+
+/**
+ * Extrae el binomio canónico "genero epibeto" (sin autoría ni rango infra-
+ * específico) de un `nombre_cientifico`. Ej.:
+ *   "Solanum quitoense Lam."                                  → "solanum quitoense"
+ *   "Passiflora tripartita var. mollissima (Kunth) Holm-Niels."→ "passiflora tripartita"
+ *   "Alnus acuminata Kunth"                                   → "alnus acuminata"
+ * Devuelve null si no parece un binomio (una sola palabra, vacío).
+ *
+ * @param {string} sci
+ * @returns {string|null}
+ */
+function _binomial(sci) {
+  if (!sci || typeof sci !== 'string') return null;
+  const cleaned = _stripDiacritics(sci)
+    // quita paréntesis de autoría y rangos infra-específicos.
+    .replace(/\(.*?\)/g, ' ')
+    .replace(/\b(var|subsp|ssp|f|cv|forma|variedad)\.?\b/g, ' ')
+    .replace(/[^a-z\s×x-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const parts = cleaned.split(' ').filter(Boolean);
+  if (parts.length < 2) return null;
+  // género + epíteto (los dos primeros tokens alfabéticos).
+  return `${parts[0]} ${parts[1]}`;
+}
+
+/**
+ * Patrón de binomio científico en texto libre: "Genero epiteto" con género
+ * capitalizado. Acepta un tercer token de rango (var./subsp.) que ignoramos al
+ * normalizar. Captura el binomio crudo para luego normalizarlo con `_binomial`.
+ *
+ * Diseño anti-ruido: exige inicial mayúscula en el género y minúscula en el
+ * epíteto (convención binomial), evitando capturar pares de palabras comunes.
+ */
+const SCI_BINOMIAL_RE = /\b([A-Z][a-zé]+)\s+([a-zé][a-zé-]+)\b/g;
+
+/**
+ * Stopwords del español que NO pueden ser epíteto específico válido. Evita que
+ * "Lulo de Castilla", "Café del eje", "Maíz para grano" se lean como binomios
+ * ("Lulo de", "Café del", "Maíz para"). Un epíteto botánico real nunca es una
+ * preposición/artículo/conjunción.
+ */
+const EPITHET_STOPWORDS = new Set([
+  'de', 'del', 'la', 'el', 'los', 'las', 'un', 'una', 'unos', 'unas',
+  'y', 'o', 'u', 'que', 'con', 'sin', 'por', 'para', 'en', 'al', 'a',
+  'su', 'sus', 'es', 'son', 'como', 'mas', 'pero', 'este', 'esta', 'ese', 'esa',
+]);
+
+/**
+ * Recolecta TODOS los binomios canónicos que el grounding considera válidos:
+ * el de cada entidad resuelta (cultivo, companions top-level, plagas,
+ * alternativas) MÁS los anidados en sub-arrays comunes (companions,
+ * antagonists, alternativas_viables, pest_controllers). Cualquier binomio del
+ * texto que esté en este set es legítimo y NO debe disparar el guard.
+ *
+ * @param {Array<object>} entities
+ * @returns {Set<string>}
+ */
+function _groundedBinomials(entities) {
+  const set = new Set();
+  const addSci = (sci) => {
+    const b = _binomial(sci);
+    if (b) set.add(b);
+  };
+  const addArr = (arr) => {
+    if (!Array.isArray(arr)) return;
+    for (const a of arr) {
+      if (a && typeof a === 'object') addSci(a.nombre_cientifico || a.nombre_científico);
+    }
+  };
+  for (const e of entities) {
+    if (!e || typeof e !== 'object') continue;
+    addSci(e.nombre_cientifico || e.nombre_científico);
+    addArr(e.companions);
+    addArr(e.antagonists);
+    addArr(e.alternativas_viables);
+    addArr(e.alternativas);
+    addArr(e.pest_controllers);
+  }
+  return set;
+}
+
+/**
+ * Guard 5 — sustitución de especie (TRUTH del catálogo sobre el cultivo
+ * preguntado). Caso prod (2026-05-30): usuario pidió "sembrar lulo", el
+ * grounding resolvió lulo=Solanum quitoense CORRECTO, pero el LLM respondió con
+ * el binomio de la CURUBA (Passiflora tripartita). El grounding estaba bien; el
+ * modelo razonó mal sobre hechos correctos.
+ *
+ * Doctrina: el agente NO puede atribuirle al cultivo PRINCIPAL preguntado un
+ * binomio que el grounding NO le asignó. Por cada entidad-cultivo resuelta cuyo
+ * `nombre_comun` aparece en el texto, si el texto contiene un binomio científico
+ * que NO está en el conjunto de binomios autoritativos del grounding
+ * (companions/antagonists/alternativas incluidos), y ese binomio errado aparece
+ * CERCA del nombre del cultivo, se ANEXA una corrección honesta liderando con el
+ * binomio correcto del catálogo.
+ *
+ * Anti-falsos-positivos:
+ *  - Solo binomios que NO pertenecen al grounding disparan (companions y plagas
+ *    legítimos quedan exentos).
+ *  - Requiere que el nombre común del cultivo aparezca en el texto (si no, no
+ *    podemos atribuir la sustitución a ese cultivo → no dispara).
+ *  - Si el binomio correcto del cultivo ya está en el texto, ese cultivo se
+ *    considera bien atribuido y no dispara por él.
+ *  - Idempotente: no re-corrige si la corrección ya está aplicada.
+ *
+ * @param {string} responseText
+ * @param {Array<object>|null} resolvedEntities
+ * @param {number|string|null} _fincaAltitud  (no usado)
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardSpeciesSubstitution(responseText, resolvedEntities = null, _fincaAltitud = null) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (!Array.isArray(resolvedEntities) || resolvedEntities.length === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const grounded = _groundedBinomials(resolvedEntities);
+  if (grounded.size === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const norm = _stripDiacritics(responseText);
+
+  // Binomios presentes en el texto pero NO autoritativos del grounding.
+  const foreign = new Set();
+  let m;
+  SCI_BINOMIAL_RE.lastIndex = 0;
+  while ((m = SCI_BINOMIAL_RE.exec(responseText)) !== null) {
+    // Descarta "Género preposición" (ej. "Lulo de Castilla" → "Lulo de"): un
+    // epíteto botánico nunca es una stopword del español.
+    if (EPITHET_STOPWORDS.has(_stripDiacritics(m[2]))) continue;
+    const raw = `${m[1]} ${m[2]}`;
+    const bin = _binomial(raw);
+    if (bin && !grounded.has(bin)) foreign.add(bin);
+  }
+  if (foreign.size === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const correcciones = [];
+  const disparadas = [];
+
+  for (const e of resolvedEntities) {
+    if (!_isSpecies(e)) continue;
+    const correctBin = _binomial(e.nombre_cientifico || e.nombre_científico);
+    if (!correctBin) continue;
+
+    const nombre = (e.nombre_comun || e.mentioned || '').toString();
+    if (!nombre) continue;
+    // El cultivo debe ser nombrado en el texto para atribuirle una sustitución.
+    // Usamos el primer token del nombre común (ej. "Lulo" de "Lulo / Naranjilla").
+    const nombreNorm = _stripDiacritics(nombre.split('/')[0]);
+    const firstWord = nombreNorm.split(/\s+/)[0];
+    if (!firstWord || firstWord.length < 3 || !norm.includes(firstWord)) continue;
+
+    // Si el binomio correcto ya está en el texto, el cultivo está bien atribuido.
+    if (norm.includes(correctBin)) continue;
+
+    // ¿Hay un binomio foráneo CERCA del nombre del cultivo? Tomamos el primer
+    // foráneo que aparezca dentro de una ventana del nombre. Si el cultivo no
+    // está cerca de ningún binomio foráneo, no atribuimos (conservador).
+    const idxNombre = norm.indexOf(firstWord);
+    let culprit = null;
+    for (const fb of foreign) {
+      const idxBin = norm.indexOf(fb);
+      if (idxBin < 0) continue;
+      // ventana laxa: el binomio errado y el nombre del cultivo en el mismo
+      // tramo (≤ 160 chars) — típico de "El lulo (Passiflora tripartita)...".
+      if (Math.abs(idxBin - idxNombre) <= 160) {
+        culprit = fb;
+        break;
+      }
+    }
+    if (!culprit) continue;
+
+    // Idempotencia: no re-corregir si ya pusimos la corrección de este cultivo.
+    const yaCorregido = new RegExp(
+      `seg[uú]n el cat[aá]logo[^.]*${firstWord}[^.]*${correctBin.replace(/ /g, '\\s+')}`,
+      'i',
+    ).test(norm);
+    if (yaCorregido) continue;
+
+    disparadas.push(`${nombre.split('/')[0].trim()}: ${culprit}→${correctBin}`);
+    const nombreLegible = nombre.split('/')[0].trim();
+    const sciCorrecto = (e.nombre_cientifico || e.nombre_científico || correctBin).toString().trim();
+    correcciones.push(
+      `Corrección importante: según el catálogo, el ${nombreLegible.toLowerCase()} es ${sciCorrecto}, ` +
+        `no ${culprit.charAt(0).toUpperCase() + culprit.slice(1)}. ` +
+        `Esa otra especie es una planta distinta; lo que sigue se refiere al ${nombreLegible.toLowerCase()} real.`,
+    );
+  }
+
+  if (correcciones.length === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('species_substitution');
+  // La corrección lidera para no enterrar el binomio correcto bajo datos de
+  // otra especie.
+  const text = `${correcciones.join('\n\n')}\n\n${responseText.trim()}`;
+  return { text, modified: true, reason: `sustitución_especie: ${disparadas.join('; ')}` };
+}
+
 // ── orquestador ─────────────────────────────────────────────────────────────
 
 /**
@@ -524,9 +732,14 @@ export function guardDoseWithoutSource(responseText, _resolvedEntities = null, _
  * SAFETY), luego invasoras, viabilidad y por último la suavización de dosis.
  */
 const GUARD_CHAIN = [
-  // El de dosis va PRIMERO en detección: el guard agroquímico anexa un bloque
-  // que menciona "etiqueta" (cita de fuente), lo que apagaría la suavización
-  // de dosis si corriera después. Correr dosis primero evita ese
+  // Sustitución de especie va PRIMERO: si el modelo confundió el cultivo
+  // (lulo→curuba), corregir la identidad ANTES que cualquier otro guard, para
+  // que la corrección lidere y los demás guards no razonen sobre la especie
+  // equivocada. Solo añade una corrección al frente; no altera el resto.
+  guardSpeciesSubstitution,
+  // El de dosis va antes que el agroquímico en detección: el guard agroquímico
+  // anexa un bloque que menciona "etiqueta" (cita de fuente), lo que apagaría
+  // la suavización de dosis si corriera después. Correr dosis primero evita ese
   // enmascaramiento. El orden de detección no cambia la urgencia: el bloque
   // agroquímico igual se anexa al final del texto.
   guardDoseWithoutSource,

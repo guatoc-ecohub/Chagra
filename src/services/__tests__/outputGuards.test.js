@@ -16,6 +16,7 @@ import {
   guardInvasiveSpecies,
   guardInvertedViability,
   guardDoseWithoutSource,
+  guardSpeciesSubstitution,
   applyOutputGuards,
   getOutputGuardTelemetry,
   resetOutputGuardTelemetry,
@@ -288,6 +289,116 @@ describe('guardDoseWithoutSource', () => {
 });
 
 // ──────────────────────────────────────────────────────────────────────────
+// GUARD 5 — sustitución de especie (binomio del cultivo principal contradice
+// su resolución del grounding). Caso real prod (2026-05-30): el usuario pidió
+// "sembrar lulo", el grounding resolvió lulo=Solanum quitoense CORRECTO, pero
+// el LLM respondió "Lulo de Castilla (Passiflora tripartita var. mollissima)"
+// — eso es CURUBA. El guard corrige con el binomio autoritativo del catálogo.
+// ──────────────────────────────────────────────────────────────────────────
+describe('guardSpeciesSubstitution', () => {
+  const luloResolved = [
+    {
+      mentioned: 'lulo',
+      kind: 'species',
+      nombre_comun: 'Lulo / Naranjilla / Chuva',
+      nombre_cientifico: 'Solanum quitoense Lam.',
+      canonical_id: 'solanum_quitoense',
+      confidence: 0.95,
+    },
+  ];
+
+  it('CASO REAL: corrige "Passiflora tripartita" cuando lulo=Solanum quitoense', () => {
+    const llmFail =
+      'El Lulo de Castilla (Passiflora tripartita var. mollissima) es una fruta andina. ' +
+      'Para sembrarlo necesitas un clima frío entre 2200 y 2800 msnm.';
+    const out = guardSpeciesSubstitution(llmFail, luloResolved);
+    expect(out.modified).toBe(true);
+    expect(out.reason).toMatch(/sustituci/i);
+    expect(out.reason).toMatch(/passiflora tripartita/i);
+    // la corrección debe nombrar el binomio correcto del catálogo.
+    expect(out.text).toMatch(/Solanum quitoense/);
+    expect(out.text).toMatch(/seg[uú]n el cat[aá]logo/i);
+  });
+
+  it('NO dispara si el binomio coincide con la resolución del cultivo', () => {
+    const ok =
+      'El lulo (Solanum quitoense) prospera entre 1600 y 2400 msnm. Necesita sombra parcial.';
+    const out = guardSpeciesSubstitution(ok, luloResolved);
+    expect(out.modified).toBe(false);
+    expect(out.text).toBe(ok);
+  });
+
+  it('NO dispara con binomios de plagas/compañías que SÍ vienen en el grounding', () => {
+    // El grounding trae el cultivo (lulo) + un companion con su propio binomio.
+    const resolved = [
+      ...luloResolved,
+      {
+        mentioned: 'aliso',
+        kind: 'species',
+        nombre_comun: 'Aliso andino',
+        nombre_cientifico: 'Alnus acuminata Kunth',
+        canonical_id: 'alnus_acuminata',
+        confidence: 0.9,
+      },
+    ];
+    const txt =
+      'El lulo (Solanum quitoense) se asocia bien con el aliso andino (Alnus acuminata), ' +
+      'que fija nitrógeno y da sombra.';
+    const out = guardSpeciesSubstitution(txt, resolved);
+    expect(out.modified).toBe(false);
+  });
+
+  it('NO dispara con binomios de companions presentes en el sub-objeto companions[]', () => {
+    // companion binomial llega anidado en la entidad del cultivo, no como entidad top-level.
+    const resolved = [
+      {
+        ...luloResolved[0],
+        companions: [
+          { canonical_id: 'alnus_acuminata', nombre_comun: 'Aliso andino', nombre_cientifico: 'Alnus acuminata Kunth' },
+        ],
+      },
+    ];
+    const txt = 'El lulo (Solanum quitoense) va bien con aliso (Alnus acuminata).';
+    const out = guardSpeciesSubstitution(txt, resolved);
+    expect(out.modified).toBe(false);
+  });
+
+  it('NO dispara sin resolvedEntities (no hay verdad de catálogo que enforcer)', () => {
+    const txt = 'El lulo de castilla (Passiflora tripartita) es una fruta andina.';
+    expect(guardSpeciesSubstitution(txt, null).modified).toBe(false);
+    expect(guardSpeciesSubstitution(txt, []).modified).toBe(false);
+  });
+
+  it('NO dispara si el texto no menciona el nombre común del cultivo principal', () => {
+    // El binomio errado aparece pero NO está ligado al cultivo preguntado.
+    const txt = 'En general las pasifloras como Passiflora tripartita crecen en clima frío.';
+    const out = guardSpeciesSubstitution(txt, luloResolved);
+    // No menciona "lulo" → no podemos atribuir la sustitución al cultivo. Conservador.
+    expect(out.modified).toBe(false);
+  });
+
+  it('tolera el binomio del catálogo con autoría/variedad (compara solo Género epíteto)', () => {
+    // nombre_cientifico del grounding trae "Lam." de autoría; el texto trae el binomio puro.
+    const txt = 'El lulo es en realidad Passiflora tripartita, una fruta de clima frío.';
+    const out = guardSpeciesSubstitution(txt, luloResolved);
+    expect(out.modified).toBe(true);
+    expect(out.text).toMatch(/Solanum quitoense/);
+  });
+
+  it('idempotente: no re-corrige si la corrección ya está aplicada', () => {
+    const llmFail = 'El Lulo de Castilla (Passiflora tripartita var. mollissima) es andino.';
+    const once = guardSpeciesSubstitution(llmFail, luloResolved);
+    const twice = guardSpeciesSubstitution(once.text, luloResolved);
+    expect(twice.modified).toBe(false);
+  });
+
+  it('maneja entrada vacía / no-string', () => {
+    expect(guardSpeciesSubstitution('', luloResolved).modified).toBe(false);
+    expect(guardSpeciesSubstitution(null, luloResolved).text).toBe('');
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────
 // ORQUESTADOR + telemetría
 // ──────────────────────────────────────────────────────────────────────────
 describe('applyOutputGuards (cadena)', () => {
@@ -298,6 +409,23 @@ describe('applyOutputGuards (cadena)', () => {
     expect(out.reasons.length).toBeGreaterThanOrEqual(2);
     expect(out.reasons.some((r) => /agroquímico/.test(r))).toBe(true);
     expect(out.reasons.some((r) => /dosis/.test(r))).toBe(true);
+  });
+
+  it('cadena: corrige sustitución de especie (lulo→Passiflora) vía applyOutputGuards', () => {
+    const resolved = [
+      {
+        mentioned: 'lulo',
+        kind: 'species',
+        nombre_comun: 'Lulo',
+        nombre_cientifico: 'Solanum quitoense Lam.',
+        canonical_id: 'solanum_quitoense',
+      },
+    ];
+    const llmFail = 'El lulo (Passiflora tripartita var. mollissima) crece en clima frío.';
+    const out = applyOutputGuards(llmFail, { resolvedEntities: resolved });
+    expect(out.modified).toBe(true);
+    expect(out.reasons.some((r) => /sustituci/i.test(r))).toBe(true);
+    expect(out.text).toMatch(/Solanum quitoense/);
   });
 
   it('texto limpio pasa sin modificar', () => {
