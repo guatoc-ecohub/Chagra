@@ -2,6 +2,21 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw, X } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { transcribe } from '../../services/voiceService';
+// Outbox DURABLE (compositor multimodal del home). El AgentScreen es el
+// CONSUMIDOR: al montar, drena las consultas que el usuario disparó desde
+// AgentHero. Cada item aparece como burbuja "ya enviada" + se procesa
+// (texto→LLM, audio→whisper→LLM, foto→visión). Claim atómico anti-duplicado
+// y recuperación de items huérfanos (app cerrada mid-flight) — cero pérdida.
+import {
+  claimNext as outboxClaimNext,
+  markAnswered as outboxMarkAnswered,
+  markError as outboxMarkError,
+  recoverStaleProcessing as outboxRecoverStale,
+} from '../../services/agentOutboxService';
+// Visión: reuso del flujo existente (NO reimplemento). analyzeFoliage corre
+// el diagnóstico foliar multimodal con cache por hash; la foto del home se
+// despacha por aquí al aterrizar.
+import { analyzeFoliage } from '../../services/aiService';
 import {
   addTurn,
   getFullHistory,
@@ -1761,6 +1776,147 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
   const handleSuggestion = (text) => {
     handleSubmit(text);
   };
+
+  // ── Consumo de la OUTBOX DURABLE del compositor del home ───────────────────
+  // El usuario disparó una consulta multimodal desde AgentHero; el item ya
+  // está persistido en IndexedDB. Aquí la procesamos como "ya enviada":
+  // aparece la burbuja de usuario + el agente arranca a procesar. NO esperamos
+  // a que el operador toque "enviar" otra vez.
+  //
+  // Garantías de integridad (todas demostradas en agentOutboxService.test):
+  //  - claimNext() es atómico → ningún item se procesa dos veces aunque el
+  //    efecto corra dos veces (React StrictMode) o haya dos montajes.
+  //  - recoverStaleProcessing() rescata items que quedaron 'processing' porque
+  //    la app se cerró a mitad → vuelven a 'queued' y se reintentan (el LLM no
+  //    confirmó respuesta, reintentar es correcto). Cero pérdida.
+  const outboxDrainingRef = useRef(false);
+
+  /**
+   * Procesa UN item ya reclamado (status='processing') según su modalidad y
+   * lo cierra (answered/error). Reusa el pipeline existente:
+   *   - text       → handleSubmit(texto)
+   *   - voice      → transcribe(blob) → handleSubmit(transcripción)
+   *   - photo      → analyzeFoliage(blob) → handleSubmit(prompt con hallazgo)
+   *   - attachment → handleSubmit(caption + nota del adjunto)
+   * Devuelve true si se despachó algo al pipeline (para encadenar el drenado).
+   */
+  const processOutboxItem = useCallback(async (item) => {
+    const caption = (item.text || '').trim();
+    try {
+      if (item.kind === 'text') {
+        if (!caption) { await outboxMarkError(item.id, 'item de texto vacío'); return false; }
+        await handleSubmit(caption);
+        await outboxMarkAnswered(item.id);
+        return true;
+      }
+
+      if (item.kind === 'voice') {
+        // Mostrar de inmediato un placeholder "ya enviado" (audio) mientras se
+        // transcribe — el usuario ve que su voz llegó, no una pantalla muerta.
+        setMessages((prev) => [
+          ...prev,
+          { role: 'user', content: '🎤 Audio enviado…', timestamp: Date.now(), _outboxPending: true, _outboxId: item.id },
+        ]);
+        if (!ttsEnabled) setTtsEnabled(true);
+        const text = item.blob ? await transcribe(item.blob) : '';
+        // Sustituir el placeholder por la transcripción real (sin duplicar).
+        setMessages((prev) => prev.filter((m) => m._outboxId !== item.id));
+        if (text && text.trim()) {
+          await handleSubmit(text.trim());
+          await outboxMarkAnswered(item.id, { answeredText: text.trim() });
+          return true;
+        }
+        setError('No entendí el audio. Prueba de nuevo desde el agente.');
+        await outboxMarkError(item.id, 'transcripción vacía');
+        return false;
+      }
+
+      if (item.kind === 'photo') {
+        // Burbuja de foto "ya enviada" con el caption del usuario.
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'user',
+            content: caption || '📷 Foto enviada para análisis',
+            timestamp: Date.now(),
+            _outboxPhoto: true,
+          },
+        ]);
+        let finding = null;
+        try {
+          finding = item.blob ? await analyzeFoliage(item.blob) : null;
+        } catch (visErr) {
+          console.debug('[Agent] analyzeFoliage falló, sigo con texto:', visErr?.message);
+        }
+        // Construir el prompt que despacha el pipeline normal. Si hubo
+        // diagnóstico de visión, lo inyectamos como contexto para que el LLM
+        // responda conversacionalmente y aterrizado.
+        let prompt;
+        if (finding && (Array.isArray(finding.issues) || finding.treatment_suggestion)) {
+          const issues = Array.isArray(finding.issues) && finding.issues.length > 0
+            ? finding.issues.join(', ')
+            : 'sin problemas evidentes';
+          const treat = finding.treatment_suggestion ? ` Sugerencia preliminar: ${finding.treatment_suggestion}.` : '';
+          prompt = `Analicé una foto de mi planta. Hallazgos del diagnóstico visual: ${issues} (estado ${finding.score ?? 'n/d'}/100).${treat} ${caption || '¿Qué me recomiendas hacer?'}`.trim();
+        } else {
+          prompt = caption
+            ? `Te envié una foto de mi planta. ${caption}`
+            : 'Te envié una foto de mi planta para que me ayudes a identificar qué tiene. No pude obtener un diagnóstico visual automático; guíame por descripción.';
+        }
+        await handleSubmit(prompt);
+        await outboxMarkAnswered(item.id);
+        return true;
+      }
+
+      // attachment (no-imagen): no hay análisis automático, despachamos el
+      // caption + nota del adjunto.
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'user',
+          content: caption ? `${caption}\n\n(📎 adjunto: ${item.fileName || 'archivo'})` : `📎 Adjunté un archivo: ${item.fileName || 'archivo'}`,
+          timestamp: Date.now(),
+          _outboxAttachment: true,
+        },
+      ]);
+      const attachPrompt = caption
+        ? caption
+        : `Adjunté un archivo (${item.fileName || 'archivo'}). Por ahora no puedo leer archivos directamente; cuéntame qué necesitas y te ayudo.`;
+      await handleSubmit(attachPrompt);
+      await outboxMarkAnswered(item.id);
+      return true;
+    } catch (e) {
+      console.warn('[Agent] processOutboxItem falló:', e?.message);
+      await outboxMarkError(item.id, e?.message || 'fallo procesando item');
+      return false;
+    }
+  }, [ttsEnabled, setTtsEnabled]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const drainOutbox = useCallback(async () => {
+    if (outboxDrainingRef.current) return;
+    outboxDrainingRef.current = true;
+    try {
+      // Rescatar primero cualquier item huérfano en 'processing' (app cerrada
+      // a mitad). Vuelven a 'queued' para reintento — no se pierden.
+      await outboxRecoverStale();
+      let item = await outboxClaimNext();
+      let guard = 0;
+      while (item && guard < 25) {
+        guard += 1;
+        await processOutboxItem(item);
+        item = await outboxClaimNext();
+      }
+    } finally {
+      outboxDrainingRef.current = false;
+    }
+  }, [processOutboxItem]);
+
+  // Drenar la outbox al montar el AgentScreen. Corre una sola vez por montaje
+  // efectivo; claimNext garantiza que StrictMode (doble efecto) no duplique.
+  useEffect(() => {
+    drainOutbox();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="h-full flex flex-col bg-slate-950">

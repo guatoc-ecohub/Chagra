@@ -38,7 +38,7 @@
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 16;
+export const DB_VERSION = 17;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -58,6 +58,13 @@ export const STORES = {
   RAG_TELEMETRY: 'rag_telemetry',
   FAILED_TX: 'failed_transactions',
   VISION_QUEUE: 'vision_queue',
+  // v17 (compositor multimodal del home): outbox DURABLE de consultas al
+  // agente disparadas desde el dashboard. El item (texto / blob de audio /
+  // foto / adjunto + metadata) se persiste ANTES de navegar al AgentScreen,
+  // sobrevive a un "atrás" o a un cierre de app a mitad de camino, y se
+  // procesa exactamente UNA vez (claim atómico anti-duplicado). NUNCA se
+  // pierde el dato del usuario — ese es el contrato.
+  AGENT_OUTBOX: 'agent_outbox',
 };
 
 let dbInstance = null;
@@ -251,6 +258,22 @@ export const openDB = async () => {
       if (event.oldVersion < 16) {
         if (!db.objectStoreNames.contains(STORES.VISION_QUEUE)) {
           const store = db.createObjectStore(STORES.VISION_QUEUE, { keyPath: 'id', autoIncrement: true });
+          store.createIndex('status', 'status', { unique: false });
+          store.createIndex('createdAt', 'createdAt', { unique: false });
+          store.createIndex('kind', 'kind', { unique: false });
+        }
+      }
+
+      // v17: agent_outbox — cola DURABLE de consultas multimodales al agente
+      // disparadas desde el compositor del dashboard (AgentHero). Antes de
+      // navegar al AgentScreen, el item (texto / audio / foto / adjunto) se
+      // persiste con status='queued'. Si el usuario da "atrás" o CIERRA la
+      // app a mitad → al volver el item sigue intacto con su estado y NO se
+      // pierde ni se duplica (claim atómico via status='processing'). Blobs
+      // grandes → IndexedDB (NO localStorage). keyPath autoIncrement.
+      if (event.oldVersion < 17) {
+        if (!db.objectStoreNames.contains(STORES.AGENT_OUTBOX)) {
+          const store = db.createObjectStore(STORES.AGENT_OUTBOX, { keyPath: 'id', autoIncrement: true });
           store.createIndex('status', 'status', { unique: false });
           store.createIndex('createdAt', 'createdAt', { unique: false });
           store.createIndex('kind', 'kind', { unique: false });
