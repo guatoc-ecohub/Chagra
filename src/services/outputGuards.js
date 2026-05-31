@@ -725,6 +725,118 @@ export function guardSpeciesSubstitution(responseText, resolvedEntities = null, 
   return { text, modified: true, reason: `sustitución_especie: ${disparadas.join('; ')}` };
 }
 
+// ── GUARD 6: diagnóstico visual fabricado SIN foto real ─────────────────────
+
+/**
+ * Frases con las que el modelo AFIRMA haber analizado/observado una imagen.
+ * Capturadas del caso real de producción (2026-05-31): el agente respondía
+ * "Analicé una foto ... estado 95/100" e inventaba hallazgos de Mapacho /
+ * Nicotiana attenuata que en realidad venían del RAG textual de un biopreparado
+ * de tabaco, NO de un análisis de visión. Normalizado sin tildes/case.
+ */
+const VISION_CLAIM_PATTERNS = [
+  /analic[eé]\s+(?:una?\s+|la\s+|tu\s+|esta\s+)?(?:foto|imagen|fotografia)/,
+  /(?:se\s+observa|se\s+aprecia|se\s+ve|se\s+nota|observo|aprecio|veo|noto)\s+(?:en\s+|que\s+en\s+)?(?:la|tu|esta)\s+(?:foto|imagen|fotografia)/,
+  /en\s+(?:la|tu|esta)\s+(?:foto|imagen|fotografia)\s+se\s+(?:observa|aprecia|ve|nota)/,
+  /seg[uú]n\s+(?:la|tu|esta)\s+(?:foto|imagen|fotografia)/,
+  /(?:en|de)\s+(?:la|tu|esta)\s+(?:foto|imagen|fotografia)\s+(?:que\s+(?:me\s+)?(?:enviaste|mandaste|subiste|compartiste|adjuntaste))/,
+  /hallazgos?\s+visuales?/,
+  /diagn[oó]stico\s+visual/,
+  /an[aá]lisis\s+(?:de\s+)?(?:la\s+)?(?:foto|imagen)/,
+  /estado\s+\d{1,3}\s*\/\s*100/,
+];
+
+/** ¿El texto afirma un análisis visual? (sobre texto normalizado). */
+function _afirmaVision(textNorm) {
+  return VISION_CLAIM_PATTERNS.some((re) => re.test(textNorm));
+}
+
+/**
+ * Mensaje honesto que reemplaza una afirmación de diagnóstico visual fabricado:
+ * deja claro que NO llegó ninguna foto y guía al usuario a usar la cámara.
+ */
+const NO_PHOTO_MESSAGE =
+  'No recibí ninguna foto en este mensaje, así que no puedo darte un diagnóstico visual de tu planta. ' +
+  'Si quieres que la revise por imagen, toca el botón de cámara y envíame la foto; mientras tanto, ' +
+  'cuéntame con palabras qué le ves (color de las hojas, manchas, plagas) y te ayudo igual.';
+
+/**
+ * Nota de cautela cuando SÍ hubo foto pero la visión no fue concluyente y el
+ * modelo igual afirma hallazgos detallados. SUAVIZA, no borra.
+ */
+const LOW_CONFIDENCE_VISION_NOTE =
+  'Nota: el análisis visual de la foto no fue concluyente (la cámara/el modelo no logró una lectura ' +
+  'clara), así que toma estos hallazgos como una primera impresión y no como un diagnóstico cerrado. ' +
+  'Si puedes, mándame una foto más nítida y con buena luz, o descríbeme lo que ves.';
+
+/**
+ * Guard 6 — diagnóstico visual fabricado SIN foto real (P0, prod 2026-05-31).
+ *
+ * El agente NUNCA debe afirmar que analizó/observó una imagen ("Analicé una
+ * foto", "se observa en la imagen", "estado X/100", "hallazgos visuales") si en
+ * el turno NO hubo una imagen real (no fue un item de foto, no corrió
+ * `analyzeFoliage`). El bug se produce porque el RAG textual de un biopreparado
+ * (p.ej. tabaco → Mapacho / Nicotiana attenuata) se cuela y el modelo lo
+ * presenta como "lo que vio".
+ *
+ * Comportamiento (determinista):
+ *   - hadVision === false  Y  el texto afirma visión  → REEMPLAZA el texto por
+ *     un mensaje honesto que pide la foto (botón de cámara). No se intenta
+ *     cirugía de frase (frágil); se sustituye porque una respuesta que afirma
+ *     ver algo inexistente no tiene parte rescatable.
+ *   - hadVision === true   Y  visionConfidence muy baja/nula  Y  el texto
+ *     afirma hallazgos visuales → SUAVIZA (anexa nota de cautela). No borra.
+ *   - hadVision === true con confianza razonable → NO toca (diagnóstico
+ *     legítimo: NO bloquear cuando SÍ hubo foto real).
+ *
+ * PURA y SÍNCRONA. Firma propia (recibe el contexto de visión, no
+ * resolvedEntities/altitud), por eso se invoca directamente desde
+ * applyOutputGuards y no desde GUARD_CHAIN.
+ *
+ * @param {string} responseText
+ * @param {object} [ctx]
+ * @param {boolean} [ctx.hadVision=false]  ¿hubo una imagen real en el turno?
+ * @param {number|null} [ctx.visionConfidence=null]  confianza de analyzeFoliage.
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardVisionWithoutPhoto(responseText, { hadVision = false, visionConfidence = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+
+  const norm = _stripDiacritics(responseText);
+  if (!_afirmaVision(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // No hubo foto en el turno pero el modelo afirma haber analizado una → la
+  // afirmación es 100% fabricada: la reemplazamos por el mensaje honesto.
+  if (!hadVision) {
+    // Idempotencia: si ya es nuestro mensaje, no re-disparar.
+    if (/No recib[ií] ninguna foto en este mensaje/i.test(responseText)) {
+      return { text: responseText, modified: false, reason: null };
+    }
+    bumpGuardTelemetry('vision_without_photo');
+    return { text: NO_PHOTO_MESSAGE, modified: true, reason: 'visión_sin_foto' };
+  }
+
+  // Sí hubo foto, pero la visión no fue concluyente (confianza nula/baja) y el
+  // modelo igual afirma hallazgos: SUAVIZAMOS (no borramos un posible acierto).
+  const conf = Number(visionConfidence);
+  const lowConfidence = Number.isFinite(conf) && conf <= 0.2;
+  if (lowConfidence) {
+    if (/an[aá]lisis visual de la foto no fue concluyente/i.test(responseText)) {
+      return { text: responseText, modified: false, reason: null };
+    }
+    bumpGuardTelemetry('vision_low_confidence');
+    const text = `${responseText.trim()}\n\n${LOW_CONFIDENCE_VISION_NOTE}`;
+    return { text, modified: true, reason: 'visión_confianza_baja' };
+  }
+
+  // hadVision con confianza razonable (o desconocida) → diagnóstico legítimo.
+  return { text: responseText, modified: false, reason: null };
+}
+
 // ── orquestador ─────────────────────────────────────────────────────────────
 
 /**
@@ -758,15 +870,35 @@ const GUARD_CHAIN = [
  * @param {object} [ctx]
  * @param {Array<object>|null} [ctx.resolvedEntities] — grounding AGE del turno.
  * @param {number|string|null} [ctx.fincaAltitud] — msnm de la finca activa.
+ * @param {boolean} [ctx.hadVision=false] — ¿hubo una imagen real (item foto /
+ *   analyzeFoliage corrido) en ESTE turno? Sin esto el guard de visión asume
+ *   que NO hubo foto y corrige cualquier diagnóstico visual fabricado.
+ * @param {number|null} [ctx.visionConfidence=null] — confianza de analyzeFoliage
+ *   (para suavizar hallazgos detallados cuando la visión no fue concluyente).
  * @returns {{text:string, modified:boolean, reasons:string[]}}
  */
-export function applyOutputGuards(responseText, { resolvedEntities = null, fincaAltitud = null } = {}) {
+export function applyOutputGuards(
+  responseText,
+  { resolvedEntities = null, fincaAltitud = null, hadVision = false, visionConfidence = null } = {},
+) {
   if (typeof responseText !== 'string' || responseText.length === 0) {
     return { text: responseText ?? '', modified: false, reasons: [] };
   }
   let text = responseText;
   let modified = false;
   const reasons = [];
+
+  // GUARD de visión PRIMERO: si la respuesta afirma un diagnóstico visual sin
+  // foto real en el turno, no tiene sentido correr los demás guards sobre un
+  // texto que vamos a reemplazar entero. Firma propia (contexto de visión), por
+  // eso va fuera de GUARD_CHAIN.
+  const vis = guardVisionWithoutPhoto(text, { hadVision, visionConfidence });
+  if (vis && vis.modified) {
+    text = vis.text;
+    modified = true;
+    if (vis.reason) reasons.push(vis.reason);
+  }
+
   for (const guard of GUARD_CHAIN) {
     const res = guard(text, resolvedEntities, fincaAltitud);
     if (res && res.modified) {

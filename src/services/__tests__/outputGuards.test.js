@@ -17,6 +17,7 @@ import {
   guardInvertedViability,
   guardDoseWithoutSource,
   guardSpeciesSubstitution,
+  guardVisionWithoutPhoto,
   applyOutputGuards,
   getOutputGuardTelemetry,
   resetOutputGuardTelemetry,
@@ -401,6 +402,85 @@ describe('guardSpeciesSubstitution', () => {
 // ──────────────────────────────────────────────────────────────────────────
 // ORQUESTADOR + telemetría
 // ──────────────────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────────
+// GUARD 6 — diagnóstico visual fabricado SIN foto real (P0, prod 2026-05-31)
+// ──────────────────────────────────────────────────────────────────────────
+// El operador cazó 2 veces que el agente FABRICA un diagnóstico visual cuando
+// NO hubo imagen en el turno: respondía "Analicé una foto, estado 95/100" e
+// inventaba hallazgos de Mapacho/Nicotiana attenuata (que venían del RAG textual
+// de un biopreparado de tabaco, NO de visión). Este guard corrige eso de forma
+// determinista cuando hadVision=false.
+describe('guardVisionWithoutPhoto', () => {
+  it('CASO REAL (prod): corrige "Analicé una foto ... estado 95/100" SIN foto en el turno', () => {
+    const llmFail =
+      'Analicé una foto de tu planta de Mapacho (Nicotiana attenuata) y se observa en la imagen ' +
+      'un estado fitosanitario excelente, estado 95/100, sin hallazgos visuales de plagas.';
+    const out = guardVisionWithoutPhoto(llmFail, { hadVision: false });
+    expect(out.modified).toBe(true);
+    expect(out.reason).toMatch(/visi[oó]n_sin_foto|sin_foto/i);
+    // NO debe seguir afirmando que analizó una foto / dio un puntaje visual.
+    expect(out.text).not.toMatch(/Analic[eé] una foto/i);
+    expect(out.text).not.toMatch(/95\/100/);
+    expect(out.text).not.toMatch(/se observa en la imagen/i);
+    // Debe pedir la foto explícitamente (botón de cámara).
+    expect(out.text).toMatch(/No recib[ií] ninguna foto/i);
+    expect(out.text).toMatch(/c[aá]mara/i);
+  });
+
+  it('corrige variantes: "en la imagen se aprecia" / "según la foto" / "hallazgos visuales"', () => {
+    for (const claim of [
+      'En la imagen se aprecia clorosis en las hojas inferiores.',
+      'Según la foto que me enviaste, la planta tiene buen vigor.',
+      'Los hallazgos visuales indican un estado 88/100.',
+      'Observo en la imagen manchas necróticas.',
+    ]) {
+      const out = guardVisionWithoutPhoto(claim, { hadVision: false });
+      expect(out.modified, claim).toBe(true);
+      expect(out.text).toMatch(/No recib[ií] ninguna foto/i);
+    }
+  });
+
+  it('NO toca la respuesta cuando SÍ hubo foto real con diagnóstico legítimo', () => {
+    const ok =
+      'Analicé la foto de tu planta de café y en la imagen se observa roya en las hojas, ' +
+      'estado 70/100. Te recomiendo caldo bordelés preventivo.';
+    const out = guardVisionWithoutPhoto(ok, { hadVision: true, visionConfidence: 0.82 });
+    expect(out.modified).toBe(false);
+    expect(out.text).toBe(ok);
+  });
+
+  it('NO dispara en texto normal sin afirmación visual (aunque hadVision=false)', () => {
+    const ok =
+      'Para sembrar maíz a 2200 msnm te recomiendo variedades de clima frío y preparar el suelo ' +
+      'con abono orgánico.';
+    const out = guardVisionWithoutPhoto(ok, { hadVision: false });
+    expect(out.modified).toBe(false);
+    expect(out.text).toBe(ok);
+  });
+
+  it('SUAVIZA cuando hubo foto pero la confianza de visión fue nula y el modelo afirma hallazgos detallados', () => {
+    const detailed =
+      'Analicé la foto y en la imagen se observa un estado 96/100 con hallazgos visuales precisos: ' +
+      'ausencia total de plagas y nutrición óptima.';
+    const out = guardVisionWithoutPhoto(detailed, { hadVision: true, visionConfidence: 0 });
+    expect(out.modified).toBe(true);
+    expect(out.reason).toMatch(/confianza|baja/i);
+    // No borra la respuesta: anexa una nota de cautela.
+    expect(out.text).toMatch(/no fue concluyente|baja|confirma|descripci[oó]n/i);
+  });
+
+  it('por defecto (sin ctx) asume que NO hubo foto y corrige una afirmación visual', () => {
+    const llmFail = 'Analicé una foto y se observa en la imagen un estado 95/100.';
+    const out = guardVisionWithoutPhoto(llmFail);
+    expect(out.modified).toBe(true);
+  });
+
+  it('maneja entrada vacía / no-string', () => {
+    expect(guardVisionWithoutPhoto('', { hadVision: false }).modified).toBe(false);
+    expect(guardVisionWithoutPhoto(null, { hadVision: false }).text).toBe('');
+  });
+});
+
 describe('applyOutputGuards (cadena)', () => {
   it('encadena varios guards en un mismo texto (agroquímico + dosis)', () => {
     const llmFail = 'Para el tizón aplica Mancozeb 30 ml/L cada semana.';
@@ -446,5 +526,20 @@ describe('applyOutputGuards (cadena)', () => {
     const tel = getOutputGuardTelemetry();
     expect(tel.synthetic_agrochemical).toBeGreaterThanOrEqual(1);
     expect(tel.__total).toBeGreaterThanOrEqual(1);
+  });
+
+  it('cablea hadVision=false: corrige diagnóstico visual fabricado sin foto', () => {
+    const llmFail = 'Analicé una foto de tu Mapacho y se observa en la imagen un estado 95/100.';
+    const out = applyOutputGuards(llmFail, { hadVision: false });
+    expect(out.modified).toBe(true);
+    expect(out.reasons.some((r) => /visi[oó]n_sin_foto|sin_foto/i.test(r))).toBe(true);
+    expect(out.text).toMatch(/No recib[ií] ninguna foto/i);
+  });
+
+  it('cablea hadVision=true: NO toca un diagnóstico visual legítimo con foto real', () => {
+    const ok = 'Analicé la foto y en la imagen se observa roya, estado 70/100.';
+    const out = applyOutputGuards(ok, { hadVision: true, visionConfidence: 0.8 });
+    expect(out.modified).toBe(false);
+    expect(out.text).toBe(ok);
   });
 });
