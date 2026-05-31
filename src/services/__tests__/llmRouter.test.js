@@ -68,6 +68,46 @@ describe('buildLLMRequest', () => {
   it('lanza para tarea desconocida (vía getModelFor)', () => {
     expect(() => buildLLMRequest('nope', messages)).toThrow(/Tarea desconocida/);
   });
+
+  // BUG A (fuga de roles, 2026-05-30): el modelo generaba turnos falsos
+  // ("Usuario: ...", "Asistente: ...") porque conversationMemory inyecta el
+  // historial con esas etiquetas y la request NO pasaba stop sequences. Sin
+  // stop tokens el modelo autocompleta el patrón del diálogo y "alucina" un
+  // turno del usuario. Estructura mínima: toda ruta de CHAT debe traer stops.
+  describe('BUG A — stop sequences anti fuga-de-roles', () => {
+    it('las rutas de chat incluyen body.stop con las etiquetas de rol', () => {
+      for (const task of ['chat', 'chat_complex']) {
+        const { body } = buildLLMRequest(task, messages);
+        expect(Array.isArray(body.stop), task).toBe(true);
+        // Debe cortar tanto al inicio de línea como tras newline, ES y EN,
+        // y el marcador de chat-template de Ollama.
+        expect(body.stop, task).toEqual(
+          expect.arrayContaining([
+            '\nUsuario:',
+            '\nAsistente:',
+            '\nUser:',
+            '\nUsuario :',
+          ]),
+        );
+      }
+    });
+
+    it('ROUTES.chat.stop está definido y es no vacío', () => {
+      expect(Array.isArray(ROUTES.chat.stop)).toBe(true);
+      expect(ROUTES.chat.stop.length).toBeGreaterThan(0);
+    });
+
+    it('un override de stop reemplaza el de la ruta', () => {
+      const { body } = buildLLMRequest('chat', messages, { stop: ['###'] });
+      expect(body.stop).toEqual(['###']);
+    });
+
+    it('las rutas no-chat (nlu) no rompen si no definen stop', () => {
+      const { body } = buildLLMRequest('nlu', messages);
+      // nlu puede no traer stop; si lo trae, debe ser array.
+      if (body.stop !== undefined) expect(Array.isArray(body.stop)).toBe(true);
+    });
+  });
 });
 
 describe('selectChatRoute', () => {
