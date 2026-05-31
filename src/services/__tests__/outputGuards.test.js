@@ -19,6 +19,7 @@ import {
   guardSpeciesSubstitution,
   guardCompanionBinomial,
   guardVisionWithoutPhoto,
+  guardThermalViability,
   applyOutputGuards,
   filterNoiseEntities,
   getOutputGuardTelemetry,
@@ -91,6 +92,96 @@ describe('guardSyntheticAgrochemical', () => {
   it('redirige a manejo de plaga cuando el texto habla de gusanos/cogollero', () => {
     const out = guardSyntheticAgrochemical('Para el gusano cogollero aplica cipermetrina.');
     expect(out.text).toMatch(/Bacillus thuringiensis|Bt/);
+  });
+
+  // ── HARDENING 1 (audit #21): detección por SUFIJOS de familia química ──
+  // La denylist exacta dejaba pasar cualquier agroquímico no enumerado. Ahora
+  // se detectan también por el sufijo de su familia química (word-boundary +
+  // longitud mínima + excepciones para palabras legítimas).
+  describe('detección por sufijos de familia química (no solo denylist exacta)', () => {
+    it('triazoles fuera de la lista (-azol/-conazol): ciproconazol, epoxiconazol, tetraconazol', () => {
+      for (const term of ['ciproconazol', 'epoxiconazol', 'tetraconazol']) {
+        const out = guardSyntheticAgrochemical(`Para el hongo aplica ${term} en dosis foliar.`);
+        expect(out.modified, term).toBe(true);
+        expect(out.reason, term).toMatch(/agroqu/i);
+      }
+    });
+
+    it('organofosforados (-fos/-tion): profenofos, fention, paration', () => {
+      for (const term of ['profenofos', 'fention', 'paration']) {
+        const out = guardSyntheticAgrochemical(`Aplica ${term} contra el gusano del cultivo.`);
+        expect(out.modified, term).toBe(true);
+      }
+    });
+
+    it('piretroides (-trina/-metrina) fuera de la lista: bifentrina, permetrina, teflutrina', () => {
+      for (const term of ['bifentrina', 'permetrina', 'teflutrina']) {
+        const out = guardSyntheticAgrochemical(`Para el insecto aplica ${term}.`);
+        expect(out.modified, term).toBe(true);
+      }
+    });
+
+    it('neonicotinoides (-cloprid): tiacloprid', () => {
+      const out = guardSyntheticAgrochemical('Aplica tiacloprid contra el pulgón.');
+      expect(out.modified).toBe(true);
+    });
+
+    it('organoclorados (-clor/-cloro): metoxicloro, heptacloro', () => {
+      for (const term of ['metoxicloro', 'heptacloro']) {
+        const out = guardSyntheticAgrochemical(`Aplica ${term} como tratamiento.`);
+        expect(out.modified, term).toBe(true);
+      }
+    });
+
+    it('carbamatos (-carb): aldicarb, metiocarb', () => {
+      for (const term of ['aldicarb', 'metiocarb']) {
+        const out = guardSyntheticAgrochemical(`Aplica ${term} como insecticida.`);
+        expect(out.modified, term).toBe(true);
+      }
+    });
+
+    // ── ANTI-FALSOS-POSITIVOS: palabras legítimas que terminan parecido ──
+    it('NO bloquea biopreparados permitidos: sulfocálcico / sulfocalcio', () => {
+      const ok =
+        'Para el ácaro y la roya usa caldo sulfocálcico (azufre + cal), un biopreparado tradicional, ' +
+        'aplicado en luna menguante. El sulfocalcio es seguro y agroecológico.';
+      const out = guardSyntheticAgrochemical(ok);
+      expect(out.modified).toBe(false);
+      expect(out.text).toBe(ok);
+    });
+
+    it('NO bloquea caldo bordelés ni ceniza (caldos minerales tradicionales)', () => {
+      const ok =
+        'Para el tizón aplica caldo bordelés (cal + sulfato de cobre) y espolvorea ceniza de fogón ' +
+        'alrededor de la mata.';
+      const out = guardSyntheticAgrochemical(ok);
+      expect(out.modified).toBe(false);
+    });
+
+    it('NO bloquea palabras comunes que terminan parecido: metro, ajo, diablo', () => {
+      const out = guardSyntheticAgrochemical(
+        'Siembra el ajo a un metro de distancia y cuida el riego; no dejes el suelo como un diablo de seco.',
+      );
+      expect(out.modified).toBe(false);
+    });
+
+    it('NO bloquea "control" / "controlar" (no es -clor con límite de palabra)', () => {
+      const out = guardSyntheticAgrochemical('Haz control biológico y controla la plaga con trampas.');
+      expect(out.modified).toBe(false);
+    });
+
+    it('NO bloquea palabras cortas (< longitud mínima) que casualmente terminen en sufijo', () => {
+      // "fos", "carb", "azol" sueltos / nombres cortos no superan el umbral de longitud.
+      const out = guardSyntheticAgrochemical('El pasto está fos; la señora Trina riega temprano.');
+      expect(out.modified).toBe(false);
+    });
+
+    it('sigue detectando los términos exactos de la denylist original (no regresión)', () => {
+      for (const term of ['mancozeb', 'glifosato', 'imidacloprid', 'clorpirifos']) {
+        const out = guardSyntheticAgrochemical(`Aplica ${term}.`);
+        expect(out.modified, term).toBe(true);
+      }
+    });
   });
 });
 
@@ -861,7 +952,160 @@ describe('guardVisionWithoutPhoto', () => {
   });
 });
 
+// ──────────────────────────────────────────────────────────────────────────
+// HARDENING 2 (audit #23) — viabilidad TÉRMICA (helada / golpe de calor)
+// ──────────────────────────────────────────────────────────────────────────
+describe('guardThermalViability', () => {
+  // Cultivo de clima cálido: muere con frío (temp_min alta). Si el pronóstico
+  // baja por debajo de su temp_min → riesgo de helada.
+  const tomateEntity = {
+    kind: 'species',
+    mentioned: 'tomate',
+    nombre_comun: 'Tomate',
+    nombre_cientifico: 'Solanum lycopersicum',
+    temp_min: 12,
+    temp_max: 30,
+  };
+  // Cultivo de clima frío: se estresa con calor (temp_max baja).
+  const papaEntity = {
+    kind: 'species',
+    mentioned: 'papa',
+    nombre_comun: 'Papa',
+    nombre_cientifico: 'Solanum tuberosum',
+    temp_min: 5,
+    temp_max: 20,
+  };
+
+  it('detecta riesgo de HELADA: el pronóstico baja por debajo de temp_min del cultivo recomendado', () => {
+    const txt = 'El tomate va muy bien en tu finca, siémbralo ahora que está la temporada.';
+    const out = guardThermalViability(txt, [tomateEntity], null, {
+      forecastTempMin: 4,
+      forecastTempMax: 18,
+    });
+    expect(out.modified).toBe(true);
+    expect(out.reason).toMatch(/helada|frio|t[eé]rmic/i);
+    expect(out.text).toMatch(/helada|frío|protec/i);
+  });
+
+  it('detecta riesgo de GOLPE DE CALOR: el pronóstico sube por encima de temp_max del cultivo', () => {
+    const txt = 'La papa es buena opción, plántala en este lote.';
+    const out = guardThermalViability(txt, [papaEntity], null, {
+      forecastTempMin: 10,
+      forecastTempMax: 28,
+    });
+    expect(out.modified).toBe(true);
+    expect(out.reason).toMatch(/calor|t[eé]rmic/i);
+    expect(out.text).toMatch(/calor|sombra|protec/i);
+  });
+
+  it('tono HUMILDE / zona gris: ADVIERTE, no bloquea ni borra el texto del modelo', () => {
+    const txt = 'El tomate va muy bien, siémbralo ahora.';
+    const out = guardThermalViability(txt, [tomateEntity], null, {
+      forecastTempMin: 4,
+      forecastTempMax: 18,
+    });
+    // El texto original se conserva; solo se ANEXA la advertencia.
+    expect(out.text).toContain('El tomate va muy bien');
+    expect(out.text).toMatch(/ojo|riesgo/i);
+  });
+
+  it('NO dispara si el cultivo NO se está recomendando sembrar (solo se menciona)', () => {
+    const txt = 'El tomate es una solanácea originaria de los Andes; tiene muchas variedades.';
+    const out = guardThermalViability(txt, [tomateEntity], null, {
+      forecastTempMin: 4,
+      forecastTempMax: 18,
+    });
+    expect(out.modified).toBe(false);
+  });
+
+  it('NO dispara si el pronóstico está dentro del rango térmico del cultivo (margen OK)', () => {
+    const txt = 'Siembra el tomate, va perfecto en tu clima.';
+    const out = guardThermalViability(txt, [tomateEntity], null, {
+      forecastTempMin: 16,
+      forecastTempMax: 26,
+    });
+    expect(out.modified).toBe(false);
+  });
+
+  it('NO-OP graceful sin temperatura de pronóstico en el contexto', () => {
+    const txt = 'Siembra el tomate, va perfecto.';
+    expect(guardThermalViability(txt, [tomateEntity], null, {}).modified).toBe(false);
+    expect(guardThermalViability(txt, [tomateEntity], null).modified).toBe(false);
+    expect(
+      guardThermalViability(txt, [tomateEntity], null, { forecastTempMin: null, forecastTempMax: null })
+        .modified,
+    ).toBe(false);
+  });
+
+  it('NO-OP sin entidades resueltas', () => {
+    const out = guardThermalViability('Siembra el tomate.', [], null, {
+      forecastTempMin: 4,
+      forecastTempMax: 18,
+    });
+    expect(out.modified).toBe(false);
+  });
+
+  it('NO-OP si la entidad no trae temp_min/temp_max (grounding incompleto)', () => {
+    const sinTemp = { kind: 'species', mentioned: 'yuca', nombre_comun: 'Yuca' };
+    const out = guardThermalViability('Siembra la yuca, va muy bien.', [sinTemp], null, {
+      forecastTempMin: 4,
+      forecastTempMax: 40,
+    });
+    expect(out.modified).toBe(false);
+  });
+
+  it('maneja entrada vacía / no-string', () => {
+    expect(guardThermalViability('', [tomateEntity], null, { forecastTempMin: 4 }).modified).toBe(false);
+    expect(guardThermalViability(null, [tomateEntity], null, { forecastTempMin: 4 }).text).toBe('');
+  });
+
+  it('idempotente: no re-anexa la advertencia si ya está aplicada', () => {
+    const txt = 'El tomate va muy bien, siémbralo ahora.';
+    const once = guardThermalViability(txt, [tomateEntity], null, {
+      forecastTempMin: 4,
+      forecastTempMax: 18,
+    });
+    const twice = guardThermalViability(once.text, [tomateEntity], null, {
+      forecastTempMin: 4,
+      forecastTempMax: 18,
+    });
+    expect(twice.modified).toBe(false);
+  });
+});
+
 describe('applyOutputGuards (cadena)', () => {
+  it('cablea forecastTempMin/Max: advierte helada para cultivo recomendado vía applyOutputGuards', () => {
+    const resolved = [
+      {
+        kind: 'species',
+        mentioned: 'tomate',
+        nombre_comun: 'Tomate',
+        nombre_cientifico: 'Solanum lycopersicum',
+        temp_min: 12,
+        temp_max: 30,
+      },
+    ];
+    const llmFail = 'El tomate va muy bien en tu finca, siémbralo ahora.';
+    const out = applyOutputGuards(llmFail, {
+      resolvedEntities: resolved,
+      forecastTempMin: 3,
+      forecastTempMax: 17,
+    });
+    expect(out.modified).toBe(true);
+    expect(out.reasons.some((r) => /helada|t[eé]rmic|calor/i.test(r))).toBe(true);
+    expect(out.text).toMatch(/helada|protec/i);
+  });
+
+  it('cadena: sin forecastTemp el guard térmico es no-op (no rompe la cadena)', () => {
+    const resolved = [
+      { kind: 'species', mentioned: 'tomate', nombre_comun: 'Tomate', temp_min: 12, temp_max: 30 },
+    ];
+    const ok = 'El tomate es una buena opción para tu clima templado.';
+    const out = applyOutputGuards(ok, { resolvedEntities: resolved });
+    expect(out.modified).toBe(false);
+    expect(out.text).toBe(ok);
+  });
+
   it('encadena varios guards en un mismo texto (agroquímico + dosis)', () => {
     const llmFail = 'Para el tizón aplica Mancozeb 30 ml/L cada semana.';
     const out = applyOutputGuards(llmFail, {});

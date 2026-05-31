@@ -215,6 +215,99 @@ const SYNTHETIC_AGROCHEM_TERMS = [
 ];
 
 /**
+ * HARDENING 1 (audit #21) — SUFIJOS de familias químicas sintéticas. La denylist
+ * exacta de arriba es CERRADA: cualquier ingrediente activo no enumerado se
+ * colaba. Estos sufijos capturan FAMILIAS enteras por la terminación del nombre
+ * común del i.a. (convención de nomenclatura química), no por una lista cerrada:
+ *
+ *   -azol / -conazol  → triazoles fungicidas (ciproconazol, epoxiconazol…)
+ *   -fos              → organofosforados (profenofos, clorpirifos…)
+ *   -tion             → organofosforados -tión (paratión, malatión, fentión…)
+ *   -trina / -metrina → piretroides (cipermetrina, bifentrina, deltametrina…)
+ *   -cloprid          → neonicotinoides (imidacloprid, tiacloprid…)
+ *   -clor / -cloro    → organoclorados (metoxicloro, heptacloro…)
+ *   -carb             → carbamatos (aldicarb, metiocarb, carbofurano≈carb…)
+ *
+ * Anti-falsos-positivos (3 capas):
+ *  1. word-boundary: la palabra debe TERMINAR en el sufijo (`\b…sufijo\b`),
+ *     no contenerlo (así "control"/"controlar" no matchea -clor).
+ *  2. longitud mínima del token (≥6 chars): descarta colisiones cortas como
+ *     "fos", "carb", "trina" (nombre propio), "azol" sueltos.
+ *  3. lista de EXCEPCIONES (`SUFFIX_EXCEPTIONS`): palabras legítimas que terminan
+ *     igual. Incluye biopreparados PERMITIDOS (sulfocálcico/sulfocalcio) y, sobre
+ *     todo, los sustantivos españoles en -stión (gestión, digestión, combustión)
+ *     que colisionan con -tion. Además, el sufijo -tion exige que el carácter
+ *     previo NO sea 's' (los químicos son -atión/-otión/-ntión; el ruido español
+ *     es -stión), reforzando la capa de excepciones.
+ */
+const SYNTHETIC_AGROCHEM_SUFFIXES = [
+  'conazol', // específico antes que 'azol' (no cambia el match, documental)
+  'azol',
+  'metrina', // específico antes que 'trina'
+  'trina',
+  'cloprid',
+  'cloro',
+  'clor',
+  'fos',
+  'tion',
+  'carb',
+];
+
+/** Longitud mínima del token para que un sufijo cuente (anti-colisión corta). */
+const SUFFIX_MIN_LEN = 6;
+
+/**
+ * Palabras legítimas (sin diacríticos) que terminan en alguno de los sufijos
+ * pero NO son agroquímicos. Biopreparados permitidos + sustantivos españoles
+ * comunes en -stión/-tión que no deben bloquearse.
+ */
+const SUFFIX_EXCEPTIONS = new Set([
+  // biopreparados / caldos minerales PERMITIDOS
+  'sulfocalcico',
+  'sulfocalcio',
+  // sustantivos españoles en -stion (colisionan con -tion)
+  'gestion',
+  'digestion',
+  'indigestion',
+  'autogestion',
+  'combustion',
+  'cuestion',
+  'congestion',
+  'sugestion',
+  'autocombustion',
+]);
+
+/**
+ * Regex que extrae tokens alfabéticos (con guion interno, p.ej. "lambda-
+ * cihalotrina") del texto normalizado, para evaluar su terminación contra los
+ * sufijos de familia química.
+ */
+const WORD_TOKEN_RE = /[a-z]+(?:-[a-z]+)*/g;
+
+/**
+ * ¿El token (normalizado, sin diacríticos) es un agroquímico sintético inferido
+ * por el sufijo de su familia química? Aplica las 3 capas anti-falso-positivo.
+ *
+ * @param {string} token  palabra normalizada (minúsculas, sin tildes).
+ * @returns {string|null} el sufijo que disparó, o null si no aplica.
+ */
+function _agrochemBySuffix(token) {
+  if (!token || token.length < SUFFIX_MIN_LEN) return null;
+  if (SUFFIX_EXCEPTIONS.has(token)) return null;
+  for (const suf of SYNTHETIC_AGROCHEM_SUFFIXES) {
+    if (!token.endsWith(suf)) continue;
+    // El sufijo -tion solo cuenta si NO viene precedido de 's' (los químicos son
+    // -atión/-otión/-ntión; el ruido español es -stión).
+    if (suf === 'tion') {
+      const prev = token.charAt(token.length - suf.length - 1);
+      if (prev === 's') return null;
+    }
+    return suf;
+  }
+  return null;
+}
+
+/**
  * Códigos de catálogo INVENTADOS tipo "M-02", "I-05", "M-03" que el modelo
  * fabricó en CPX-005 para dar apariencia de receta oficial. Patrón: una letra
  * mayúscula (M/I/F/H), guion, 1-3 dígitos, como token suelto. Defensivo: solo
@@ -287,6 +380,18 @@ export function guardSyntheticAgrochemical(responseText, _resolvedEntities = nul
     // límite de palabra a ambos lados sobre el texto normalizado.
     const re = new RegExp(`(^|[^a-z0-9])${t.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}([^a-z0-9]|$)`);
     if (re.test(norm)) hits.push(term);
+  }
+
+  // HARDENING 1 (audit #21): además de la denylist exacta, detecta agroquímicos
+  // por el SUFIJO de su familia química (token que TERMINA en -azol/-fos/-tion/
+  // -trina/-cloprid/-clor/-carb), con longitud mínima + excepciones. Captura i.a.
+  // sintéticos que no están enumerados arriba sin bloquear biopreparados ni
+  // palabras comunes (ver `_agrochemBySuffix`).
+  WORD_TOKEN_RE.lastIndex = 0;
+  let tok;
+  while ((tok = WORD_TOKEN_RE.exec(norm)) !== null) {
+    const suf = _agrochemBySuffix(tok[0]);
+    if (suf) hits.push(tok[0]);
   }
 
   // Códigos inventados SOLO cuentan si hay contexto de aplicación/dosis (para
@@ -652,6 +757,125 @@ export function guardInvertedViability(responseText, resolvedEntities = null, fi
   const correccion = correcciones.join('\n\n');
   const text = restoLimpio ? `${correccion}\n\n${restoLimpio}` : correccion;
   return { text, modified: true, reason: `viabilidad_invertida: ${disparadas.join(', ')}` };
+}
+
+// ── GUARD 3b: viabilidad TÉRMICA (helada / golpe de calor) ──────────────────
+
+/** Margen °C de seguridad para el cruce pronóstico × tolerancia de la especie. */
+const THERMAL_MARGIN_C = 2;
+
+/** Idempotencia: marca textual que deja este guard al anexar su advertencia. */
+const THERMAL_NOTE_MARK = /ojo[^.]*riesgo de (helada|golpe de calor)/i;
+
+/**
+ * Guard 3b — viabilidad TÉRMICA (audit #23). Análogo a `guardInvertedViability`
+ * pero para TEMPERATURA: cruza la tolerancia térmica de la especie
+ * (`temp_min`/`temp_max` que ya vienen en el grounding / resolvedEntities) contra
+ * la temperatura esperada del PRONÓSTICO (forecastTempMin / forecastTempMax,
+ * derivadas de `climaSnapshot.openmeteo.forecast_7d` en la pantalla y pasadas por
+ * ctx — el grounding NO trae la temp del pronóstico, solo la tolerancia de la
+ * especie; ver gap documentado abajo).
+ *
+ * Lógica (solo para especies que el texto FOMENTA sembrar):
+ *   - Si la mínima pronosticada ≤ (temp_min + margen) → riesgo de HELADA/frío que
+ *     puede matar el cultivo.
+ *   - Si la máxima pronosticada ≥ (temp_max - margen) → riesgo de GOLPE DE CALOR.
+ *
+ * Doctrina zona-gris (intelligence-first, tono HUMILDE): ADVIERTE, no bloquea ni
+ * borra. Anexa una nota ("ojo, riesgo de helada, requiere protección") sin tocar
+ * el texto del modelo. La experiencia del campesino manda; esto solo alerta.
+ *
+ * GRACEFUL: si no hay temp del pronóstico (forecastTempMin/Max ausentes o no
+ * numéricas), o la especie no trae temp_min/temp_max, o el texto no fomenta
+ * sembrarla, el guard es NO-OP.
+ *
+ * Firma extendida: recibe un 4º arg `ctx` con la temp del pronóstico, porque la
+ * cadena estándar `(text, entities, altitud)` no la transporta. Se invoca aparte
+ * en `applyOutputGuards` (como los guards de visión/nombre), no dentro de
+ * GUARD_CHAIN.
+ *
+ * @param {string} responseText
+ * @param {Array<object>|null} resolvedEntities  cada una puede traer temp_min/temp_max.
+ * @param {number|string|null} _fincaAltitud      (no usado: la temp viene del pronóstico)
+ * @param {object} [ctx]
+ * @param {number|null} [ctx.forecastTempMin]  mínima esperada del pronóstico (°C).
+ * @param {number|null} [ctx.forecastTempMax]  máxima esperada del pronóstico (°C).
+ * @param {number} [ctx.marginC=2]              margen de seguridad °C.
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardThermalViability(
+  responseText,
+  resolvedEntities = null,
+  _fincaAltitud = null,
+  { forecastTempMin = null, forecastTempMax = null, marginC = THERMAL_MARGIN_C } = {},
+) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (!Array.isArray(resolvedEntities) || resolvedEntities.length === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const fMin = forecastTempMin != null && forecastTempMin !== '' ? Number(forecastTempMin) : NaN;
+  const fMax = forecastTempMax != null && forecastTempMax !== '' ? Number(forecastTempMax) : NaN;
+  const haveMin = Number.isFinite(fMin);
+  const haveMax = Number.isFinite(fMax);
+  // Sin NINGÚN dato de pronóstico → no-op graceful (gap documentado).
+  if (!haveMin && !haveMax) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Idempotencia: si ya anexamos una advertencia térmica, no repetir.
+  if (THERMAL_NOTE_MARK.test(responseText)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const norm = _stripDiacritics(responseText);
+  const advertencias = [];
+  const disparadas = [];
+
+  for (const e of resolvedEntities) {
+    if (!_isSpecies(e)) continue;
+    const tMin = e.temp_min != null && e.temp_min !== '' ? Number(e.temp_min) : NaN;
+    const tMax = e.temp_max != null && e.temp_max !== '' ? Number(e.temp_max) : NaN;
+    if (!Number.isFinite(tMin) && !Number.isFinite(tMax)) continue; // grounding sin temp.
+
+    const nombre = _entityName(e);
+    const nombreNorm = _stripDiacritics(nombre);
+    // Solo advierte si el texto está FOMENTANDO sembrar este cultivo (no si solo
+    // lo menciona). Reusa el detector directo de fomento.
+    if (!_fomentaSiembra(norm, nombreNorm)) continue;
+
+    const partes = [];
+    if (Number.isFinite(tMin) && haveMin && fMin <= tMin + marginC) {
+      partes.push(
+        `riesgo de helada: ${nombre} sufre por debajo de ~${tMin}°C y el pronóstico baja a ` +
+          `${Math.round(fMin)}°C`,
+      );
+    }
+    if (Number.isFinite(tMax) && haveMax && fMax >= tMax - marginC) {
+      partes.push(
+        `riesgo de golpe de calor: ${nombre} se estresa por encima de ~${tMax}°C y el pronóstico sube a ` +
+          `${Math.round(fMax)}°C`,
+      );
+    }
+    if (partes.length === 0) continue;
+
+    disparadas.push(nombre);
+    advertencias.push(
+      `Ojo con ${nombre}: ${partes.join('; y ')}. No te digo que no lo siembres —hay quien lo logra con ` +
+        `cuidados— pero requiere protección (cobertor/manta térmica en las noches frías, o sombra y mulch ` +
+        `para el calor). Tenlo en cuenta antes de arriesgar la semilla.`,
+    );
+  }
+
+  if (advertencias.length === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('thermal_viability');
+  const text = `${responseText.trim()}\n\n${advertencias.join('\n\n')}`;
+  return { text, modified: true, reason: `viabilidad_térmica: ${disparadas.join(', ')}` };
 }
 
 // ── GUARD 4: dosis sin fuente (suaviza, no borra) ───────────────────────────
@@ -1311,6 +1535,11 @@ const GUARD_CHAIN = [
  *   (para suavizar hallazgos detallados cuando la visión no fue concluyente).
  * @param {string|null} [ctx.profileName] — nombre del usuario (getProfile().nombre)
  *   para el guard de nombre inventado. Si falta, cualquier saludo con nombre se remueve.
+ * @param {number|null} [ctx.forecastTempMin] — mínima esperada del pronóstico (°C),
+ *   derivada de climaSnapshot.openmeteo.forecast_7d. Habilita el guard térmico
+ *   (riesgo de helada). Sin esto, el guard térmico es no-op.
+ * @param {number|null} [ctx.forecastTempMax] — máxima esperada del pronóstico (°C)
+ *   para el riesgo de golpe de calor. Mismo origen.
  * @returns {{text:string, modified:boolean, reasons:string[]}}
  */
 export function applyOutputGuards(
@@ -1321,6 +1550,8 @@ export function applyOutputGuards(
     hadVision = false,
     visionConfidence = null,
     profileName = null,
+    forecastTempMin = null,
+    forecastTempMax = null,
   } = {},
 ) {
   if (typeof responseText !== 'string' || responseText.length === 0) {
@@ -1351,6 +1582,20 @@ export function applyOutputGuards(
       modified = true;
       if (res.reason) reasons.push(res.reason);
     }
+  }
+  // Guard TÉRMICO (audit #23): tras viabilidad por altitud, advierte riesgo de
+  // helada / golpe de calor cruzando temp_min/temp_max de la especie (grounding)
+  // contra la temp del PRONÓSTICO (ctx). Va después de la cadena (después de
+  // viabilidad) y antes de inventedName. Firma propia porque la cadena estándar
+  // no transporta la temp del pronóstico. No-op si no hay forecastTemp.
+  const thermalRes = guardThermalViability(text, entities, fincaAltitud, {
+    forecastTempMin,
+    forecastTempMax,
+  });
+  if (thermalRes && thermalRes.modified) {
+    text = thermalRes.text;
+    modified = true;
+    if (thermalRes.reason) reasons.push(thermalRes.reason);
   }
   // Guard de nombre inventado: firma propia (necesita el nombre del perfil).
   const nameRes = guardInventedName(text, { profileName });
