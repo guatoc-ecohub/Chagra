@@ -13,6 +13,9 @@ import {
   buildProfileContext,
   formatClimateAlert,
   buildClimaContext,
+  buildFincaContext,
+  pisoTermicoFromAltitud,
+  temporadaColombiana,
 } from '../agentService.js';
 
 describe('agentService — Task #202 Profile Context', () => {
@@ -476,6 +479,171 @@ describe('agentService — Task #202 Profile Context', () => {
       expect(ctx).toContain('Neutral ENSO');
       expect(ctx).not.toContain('ONI NOAA');
       expect(ctx).not.toContain('Probabilidad IDEAM');
+    });
+  });
+
+  describe('pisoTermicoFromAltitud', () => {
+    it('mapea altitud a piso térmico colombiano', () => {
+      expect(pisoTermicoFromAltitud(3200)).toBe('páramo');
+      expect(pisoTermicoFromAltitud(2580)).toBe('frío');
+      expect(pisoTermicoFromAltitud(1500)).toBe('templado');
+      expect(pisoTermicoFromAltitud(400)).toBe('cálido');
+    });
+    it('acepta string y devuelve null si no es numérico', () => {
+      expect(pisoTermicoFromAltitud('2580')).toBe('frío');
+      expect(pisoTermicoFromAltitud(null)).toBeNull();
+      expect(pisoTermicoFromAltitud(undefined)).toBeNull();
+      expect(pisoTermicoFromAltitud('abc')).toBeNull();
+    });
+  });
+
+  describe('temporadaColombiana', () => {
+    it('régimen bimodal andino por mes', () => {
+      expect(temporadaColombiana(1).nombre).toContain('seca');
+      expect(temporadaColombiana(4).nombre).toContain('primera temporada de lluvias');
+      expect(temporadaColombiana(7).nombre).toContain('segunda temporada seca');
+      expect(temporadaColombiana(10).nombre).toContain('segunda temporada de lluvias');
+    });
+    it('sin argumento usa el mes actual sin lanzar', () => {
+      const t = temporadaColombiana();
+      expect(typeof t.nombre).toBe('string');
+      expect(t.nombre.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('buildFincaContext (#202 contexto ambiental)', () => {
+    const choachiProfile = {
+      municipio: 'Choachí',
+      departamento: 'Cundinamarca',
+      finca_altitud: '2580',
+      ubicacion_lat: 4.529,
+      ubicacion_lng: -73.923,
+    };
+    const cultivosMaiz = [
+      { name: 'Maíz', count: 2 },
+      { name: 'Café', count: 1 },
+      { name: 'Frijol', count: 1 },
+    ];
+
+    it('siempre incluye la temporada y el wrapper, aun sin nada', () => {
+      const ctx = buildFincaContext({ month: 5 });
+      expect(ctx).toContain('=== CONTEXTO AMBIENTAL DE LA FINCA');
+      expect(ctx).toContain('Temporada actual');
+      expect(ctx).toContain('=== FIN CONTEXTO AMBIENTAL ===');
+      expect(ctx).toContain('NO lo recites salvo que sea relevante');
+    });
+
+    it('inyecta ubicación, altitud y piso térmico derivado', () => {
+      const ctx = buildFincaContext({ profile: choachiProfile, month: 5 });
+      expect(ctx).toContain('Choachí');
+      expect(ctx).toContain('Cundinamarca');
+      expect(ctx).toContain('2580 msnm');
+      expect(ctx).toContain('piso frío'); // derivado de 2580
+      expect(ctx).toContain('4.529');
+    });
+
+    it('usa el nombre de la finca activa si está presente', () => {
+      const ctx = buildFincaContext({
+        profile: choachiProfile,
+        finca: { nombre: 'La Esperanza', slug: 'la-esperanza' },
+        month: 5,
+      });
+      expect(ctx).toContain('Finca activa: "La Esperanza"');
+    });
+
+    it('resume cultivos registrados de forma compacta', () => {
+      const ctx = buildFincaContext({ groupedCultivos: cultivosMaiz, month: 5 });
+      expect(ctx).toContain('Cultivos registrados en la finca: Maíz ×2, Café, Frijol');
+    });
+
+    it('colapsa el inventario largo con "y N más"', () => {
+      const muchos = Array.from({ length: 12 }, (_, i) => ({ name: `c${i}`, count: 1 }));
+      const ctx = buildFincaContext({ groupedCultivos: muchos, month: 5 });
+      expect(ctx).toContain('y 4 más');
+    });
+
+    it('reutiliza el snapshot de clima cacheado (hoy + resumen 7d)', () => {
+      const snapshot = {
+        enso_status: { phase: 'nino_moderado', label: 'El Niño moderado' },
+        openmeteo: {
+          available: true,
+          forecast_7d: [
+            { date: '2026-05-30', temp_max_c: 19, temp_min_c: 8, precip_mm: 0 },
+            { date: '2026-05-31', temp_max_c: 18, temp_min_c: 2, precip_mm: 12 },
+            { date: '2026-06-01', temp_max_c: 17, temp_min_c: 3, precip_mm: 5 },
+          ],
+        },
+      };
+      const ctx = buildFincaContext({ climaSnapshot: snapshot, month: 5 });
+      expect(ctx).toContain('Clima local hoy: 8°/19°C');
+      expect(ctx).toContain('El Niño moderado');
+      expect(ctx).toContain('2/7 días con lluvia');
+      expect(ctx).toContain('mínima de la semana 2°C');
+    });
+
+    it('omite el bloque clima si el snapshot no tiene forecast disponible', () => {
+      const ctx = buildFincaContext({
+        climaSnapshot: { openmeteo: { available: false, reason: 'offline' } },
+        month: 5,
+      });
+      expect(ctx).not.toContain('Clima local hoy');
+      expect(ctx).not.toContain('Pronóstico 7d');
+    });
+
+    it('lista alertas activas del alertStore', () => {
+      const ctx = buildFincaContext({
+        activeAlerts: [
+          { type: 'helada', severity: 'danger', title: 'Riesgo de helada', message: 'mín 2°C' },
+        ],
+        month: 5,
+      });
+      expect(ctx).toContain('Alertas activas: Riesgo de helada');
+    });
+
+    it('cruza entidades resueltas (AGE) con el inventario y marca lo que el usuario tiene', () => {
+      const ctx = buildFincaContext({
+        groupedCultivos: cultivosMaiz,
+        resolvedEntities: [
+          { mentioned: 'maíz', kind: 'planta', nombre_comun: 'Maíz', nombre_cientifico: 'Zea mays' },
+        ],
+        month: 5,
+      });
+      expect(ctx).toContain('YA TIENE registrado');
+      expect(ctx).toContain('Maíz');
+    });
+
+    it('NO marca cruce si la entidad mencionada no está en el inventario', () => {
+      const ctx = buildFincaContext({
+        groupedCultivos: cultivosMaiz,
+        resolvedEntities: [
+          { mentioned: 'aguacate', kind: 'planta', nombre_comun: 'Aguacate', nombre_cientifico: 'Persea americana' },
+        ],
+        month: 5,
+      });
+      expect(ctx).not.toContain('YA TIENE registrado');
+    });
+
+    it('ignora plagas en el cruce de inventario', () => {
+      const ctx = buildFincaContext({
+        groupedCultivos: [{ name: 'Café', count: 3 }],
+        resolvedEntities: [
+          { mentioned: 'broca', kind: 'plaga', nombre_comun: 'Broca', nombre_cientifico: 'Hypothenemus hampei' },
+        ],
+        month: 5,
+      });
+      expect(ctx).not.toContain('YA TIENE registrado');
+    });
+
+    it('match laxo: "maíz" mencionado contra "Maíz amarillo" registrado', () => {
+      const ctx = buildFincaContext({
+        groupedCultivos: [{ name: 'Maíz amarillo', count: 4 }],
+        resolvedEntities: [
+          { mentioned: 'maiz', kind: 'planta', nombre_comun: 'Maíz', nombre_cientifico: 'Zea mays' },
+        ],
+        month: 5,
+      });
+      expect(ctx).toContain('YA TIENE registrado');
+      expect(ctx).toContain('Maíz amarillo');
     });
   });
 });

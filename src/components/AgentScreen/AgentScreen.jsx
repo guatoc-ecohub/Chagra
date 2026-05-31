@@ -27,7 +27,7 @@ import { streamChatViaSidecar, isAgentStreamingEnabled } from '../../services/st
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
 import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, postValidate, getClimaIdeam } from '../../services/sidecarClient';
-import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, applyVoseoFilter, stripRoleLeak } from '../../services/agentService';
+import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, applyVoseoFilter, stripRoleLeak } from '../../services/agentService';
 import { getProfile } from '../../services/userProfileService';
 import { regionFromProfile } from '../../services/ensoContext';
 // Bug UX 2026-05-30: preservar respuesta parcial ante abort/timeout/cancel.
@@ -55,6 +55,7 @@ import useAgentNotificationStore from '../../store/useAgentNotificationStore';
 import useOllamaWarmStore from '../../store/useOllamaWarmStore';
 import useAgentQueueStore from '../../store/useAgentQueueStore';
 import useFincaActiveStore from '../../services/fincaActiveStore';
+import useAlertStore from '../../store/useAlertStore';
 
 // 2026-05-16: migrado a llmRouter (Multi-LLM por tarea). AgentScreen usa
 // la `chat` route con el modelo de chat configurado como hot model. Bench
@@ -94,6 +95,9 @@ export default function AgentScreen({ onBack, initialContext }) {
   const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
   const fincas = useFincaActiveStore((s) => s.fincas);
   const indoorZone = useFincaActiveStore((s) => s.indoorZone);
+  // Contexto ambiental de la finca (#202 mejora inteligencia): alertas activas
+  // del alertEngine para que el agente las tenga en cuenta sin pedir fetch.
+  const activeAlerts = useAlertStore((s) => s.activeAlerts);
 
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
@@ -1019,8 +1023,35 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     })();
     const climaContext = climaSnapshot ? `\n\n${buildClimaContext(climaSnapshot, { region: ensoRegion })}` : '';
 
+    // CONTEXTO AMBIENTAL DE LA FINCA (#202 mejora inteligencia). Bloque PURO
+    // armado de datos YA disponibles localmente o en cache — CERO latencia:
+    //   - profile / finca: localStorage + store en memoria (síncronos)
+    //   - climaSnapshot: el mismo cache ya leído arriba (NO se re-pide)
+    //   - groupedCultivos: `plants` del asset store (memoria), agrupados aquí
+    //   - resolvedEntities: grounding AGE del turno (ya resuelto, se reutiliza)
+    //   - activeAlerts: useAlertStore (memoria)
+    // Si algún dato no está, buildFincaContext omite su línea (degrada).
+    const fincaActivaCtx = fincas.find((f) => f.slug === activeFincaSlug) || null;
+    const groupedCultivos = (() => {
+      const strip = (name) => (name || '').replace(/\s*#\d+\s*$/, '').trim();
+      const counts = (plants || []).reduce((acc, pl) => {
+        const base = strip(pl.attributes?.name);
+        if (base) acc[base] = (acc[base] || 0) + 1;
+        return acc;
+      }, {});
+      return Object.entries(counts).map(([name, count]) => ({ name, count }));
+    })();
+    const fincaContext = `\n\n${buildFincaContext({
+      profile: (() => { try { return getProfile(); } catch (_) { return null; } })(),
+      finca: fincaActivaCtx,
+      climaSnapshot,
+      groupedCultivos,
+      resolvedEntities,
+      activeAlerts,
+    })}`;
+
     const messages = [
-      { role: 'system', content: systemPrompt + corpusContext + evidenceContext + resolvedEntitiesBlock + climaContext + queryAnalysisBlock },
+      { role: 'system', content: systemPrompt + corpusContext + evidenceContext + resolvedEntitiesBlock + climaContext + fincaContext + queryAnalysisBlock },
       ...(contextMemory ? [{ role: 'user', content: contextMemory }] : []),
       { role: 'user', content: query },
     ];
