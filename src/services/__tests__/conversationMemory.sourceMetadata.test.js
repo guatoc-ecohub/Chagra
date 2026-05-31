@@ -10,7 +10,7 @@
  * El ChatBubble renderiza el badge a partir de este metadata.
  */
 import { describe, test, expect } from 'vitest';
-import { computeSourceMetadata } from '../conversationMemory';
+import { computeSourceMetadata, mergePostValidateMetadata } from '../conversationMemory';
 
 describe('computeSourceMetadata', () => {
   test('null / undefined toolEvidence → no tool, no grounded', () => {
@@ -215,5 +215,87 @@ describe('computeSourceMetadata', () => {
       ]);
       expect(md.grounded).toBe(true);
     });
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────
+// FIX 2 (2026-05-31): mergePostValidateMetadata — surfacea suspect[] Y
+// hallucinated[] del post-validate. El bug vivo: el PWA solo leía suspect, así
+// que un binomio 100% inventado por el modelo se detectaba y se tiraba en
+// silencio. Ahora ambos quedan en metadata para que el ChatBubble los muestre.
+// ──────────────────────────────────────────────────────────────────────────
+describe('mergePostValidateMetadata (FIX 2 — surfacea hallucinated)', () => {
+  const base = { tool_used: 'get_pest_controllers', grounded: true };
+
+  test('pv null → devuelve base sin tocar (no advierte si no se pudo verificar)', () => {
+    expect(mergePostValidateMetadata(base, null)).toEqual(base);
+    expect(mergePostValidateMetadata(base, undefined)).toEqual(base);
+  });
+
+  test('age_available !== true → no confía en el veredicto, devuelve base intacto', () => {
+    const pv = { hallucinated: ['Neolepidopteron daquila'], suspect: [], age_available: false };
+    expect(mergePostValidateMetadata(base, pv)).toEqual(base);
+  });
+
+  test('FUGA CERRADA: hallucinated[] con un binomio inventado → hallucinated_names en metadata', () => {
+    const pv = {
+      hallucinated: ['Neolepidopteron daquila'],
+      suspect: [],
+      validated: [],
+      age_available: true,
+      detected_count: 1,
+    };
+    const md = mergePostValidateMetadata(base, pv);
+    expect(md.hallucinated_names).toEqual(['Neolepidopteron daquila']);
+    // No pierde el metadata de fuente original.
+    expect(md.tool_used).toBe('get_pest_controllers');
+    expect(md.grounded).toBe(true);
+  });
+
+  test('suspect[] sigue surfaceándose (no regresión del badge previo)', () => {
+    const pv = { hallucinated: [], suspect: ['Solanum lycopersicum'], age_available: true };
+    const md = mergePostValidateMetadata(base, pv);
+    expect(md.suspect_names).toEqual(['Solanum lycopersicum']);
+    expect(md.hallucinated_names).toBeUndefined();
+  });
+
+  test('hallucinated Y suspect a la vez → ambos campos presentes', () => {
+    const pv = {
+      hallucinated: ['Neolepidopteron daquila'],
+      suspect: ['Solanum lycopersicum'],
+      age_available: true,
+    };
+    const md = mergePostValidateMetadata(base, pv);
+    expect(md.hallucinated_names).toEqual(['Neolepidopteron daquila']);
+    expect(md.suspect_names).toEqual(['Solanum lycopersicum']);
+  });
+
+  test('arrays vacíos → no añade campos (sin badge espurio)', () => {
+    const pv = { hallucinated: [], suspect: [], age_available: true };
+    const md = mergePostValidateMetadata(base, pv);
+    expect(md.hallucinated_names).toBeUndefined();
+    expect(md.suspect_names).toBeUndefined();
+    expect(md).toEqual(base);
+  });
+
+  test('filtra entradas no-string / vacías del reporte del sidecar', () => {
+    const pv = {
+      hallucinated: ['Neolepidopteron daquila', '', '   ', null, 42],
+      suspect: [],
+      age_available: true,
+    };
+    const md = mergePostValidateMetadata(base, pv);
+    expect(md.hallucinated_names).toEqual(['Neolepidopteron daquila']);
+  });
+
+  test('no muta el objeto base recibido (puro)', () => {
+    const original = { tool_used: 'get_species', grounded: true };
+    const snapshot = { ...original };
+    mergePostValidateMetadata(original, {
+      hallucinated: ['X inventado'],
+      suspect: [],
+      age_available: true,
+    });
+    expect(original).toEqual(snapshot);
   });
 });

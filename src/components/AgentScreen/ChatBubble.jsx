@@ -53,6 +53,27 @@ function SourceBadge({ metadata }) {
   // Badge no intrusivo, convive con el badge de fuente: avisa sin bloquear.
   const suspectNames = Array.isArray(md.suspect_names) ? md.suspect_names : [];
   const hasSuspect = suspectNames.length > 0;
+  // FIX 2 (2026-05-31): nombres científicos INVENTADOS — el post-validate los
+  // detectó como binomios que NO existen en el catálogo/AGE (ni en la realidad,
+  // ej. "Neolepidopteron daquila"). Antes el PWA solo consumía `suspect` y el
+  // inventado se tiraba en silencio. Es la señal MÁS fuerte (riesgo mayor que un
+  // nombre real mal atribuido), así que tiene prioridad sobre el resto.
+  const hallucinatedNames = Array.isArray(md.hallucinated_names) ? md.hallucinated_names : [];
+  const hasHallucinated = hallucinatedNames.length > 0;
+
+  if (hasHallucinated) {
+    return (
+      <span
+        className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-red-700/25 text-red-200 border border-red-700"
+        data-testid="hallucinated-name-badge"
+        data-source="hallucinated-scientific-name"
+        title={`La respuesta menciona un nombre científico que NO está verificado en el catálogo y podría estar inventado por el modelo: ${hallucinatedNames.join(', ')}. No lo uses sin confirmarlo.`}
+      >
+        <AlertTriangle size={12} aria-hidden="true" />
+        <span>Nombre científico sin verificar</span>
+      </span>
+    );
+  }
 
   if (hasSuspect) {
     return (
