@@ -27,7 +27,7 @@ import { streamChatViaSidecar, isAgentStreamingEnabled } from '../../services/st
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
 import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, postValidate, getClimaIdeam } from '../../services/sidecarClient';
-import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, generateViabilityRules, applyVoseoFilter, stripRoleLeak } from '../../services/agentService';
+import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, stripRoleLeak } from '../../services/agentService';
 import { getProfile } from '../../services/userProfileService';
 import { regionFromProfile } from '../../services/ensoContext';
 // Bug UX 2026-05-30: preservar respuesta parcial ante abort/timeout/cancel.
@@ -706,6 +706,8 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
 
 ${generateViabilityRules()}
 
+${generateAgronomicGuidanceRules()}
+
 ${buildProfileContext(finca)}`;
   }, [plants, fincas, activeFincaSlug, indoorZone]);
 
@@ -1064,8 +1066,25 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     const viabilidadBlock = buildViabilityContext({ fincaAltitud, resolvedEntities });
     const viabilidadContext = viabilidadBlock ? `\n\n${viabilidadBlock}` : '';
 
+    // RIESGO TÉRMICO POR CULTIVO (heladas/calor en vivo). Cruza temp_min/temp_max
+    // de la especie resuelta × la mínima/máxima del pronóstico ya cacheado (el
+    // mismo climaSnapshot — NO se re-pide). Cero latencia. Degrada si no hay
+    // temp_min/temp_max o no hay forecast.
+    const frostHeatBlock = buildFrostHeatContext({ resolvedEntities, climaSnapshot });
+    const frostHeatContext = frostHeatBlock ? `\n\n${frostHeatBlock}` : '';
+
+    // ASOCIACIONES / POLICULTIVO. companions/antagonists del grounding cruzados
+    // con el inventario del usuario (prioriza lo que ya tiene). Cero red.
+    const asociacionBlock = buildAssociationContext({ resolvedEntities, groupedCultivos });
+    const asociacionContext = asociacionBlock ? `\n\n${asociacionBlock}` : '';
+
+    // SEGURIDAD: invasoras / conservación sensible. Bloqueo determinístico de
+    // recomendación de siembra. Cero red.
+    const seguridadBlock = buildInvasiveSafetyContext({ resolvedEntities });
+    const seguridadContext = seguridadBlock ? `\n\n${seguridadBlock}` : '';
+
     const messages = [
-      { role: 'system', content: systemPrompt + corpusContext + evidenceContext + resolvedEntitiesBlock + viabilidadContext + climaContext + fincaContext + queryAnalysisBlock },
+      { role: 'system', content: systemPrompt + corpusContext + evidenceContext + resolvedEntitiesBlock + seguridadContext + viabilidadContext + frostHeatContext + asociacionContext + climaContext + fincaContext + queryAnalysisBlock },
       ...(contextMemory ? [{ role: 'user', content: contextMemory }] : []),
       { role: 'user', content: query },
     ];
@@ -1252,8 +1271,14 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
           // PASO 1 — pre-validation AGE (DR taxonómico Tier 1 B, PR #59).
           // Resuelve entidades vegetales/plagas a binomio canónico autoritativo
           // ANTES del LLM. El LLM ya no puede inventar "gulupa = Psidium".
+          // Pasamos finca_altitud (mismo request, CERO latencia) para que el
+          // grounding traiga viabilidad 3-niveles + alternativas por especie.
+          const reAltitud = (() => {
+            try { const p = getProfile(); if (p && p.finca_altitud != null) return p.finca_altitud; } catch (_) { /* noop */ }
+            return (fincaActiva && fincaActiva.altitud) || null;
+          })();
           const tRE0 = performance.now();
-          const resolved = await resolveEntities(textForLLM);
+          const resolved = await resolveEntities(textForLLM, { fincaAltitud: reAltitud });
           const tRE1 = performance.now();
           if (resolved && Array.isArray(resolved.entities) && resolved.entities.length > 0) {
             // Solo nos quedamos con confidence >= 0.7 para no contaminar con

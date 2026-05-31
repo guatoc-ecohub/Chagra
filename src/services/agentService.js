@@ -535,38 +535,83 @@ Cuando cites datos de la finca del usuario, deja claro que son SUYOS y LOCALES, 
 }
 
 /**
- * buildViabilityContext — bloque DETERMINÍSTICO de viabilidad por especie.
+ * Lista hasta `max` alternativas de un array del grounding en línea compacta.
+ * Acepta items string ("curuba") u objetos ({ nombre_comun } / { nombre }).
+ * @param {Array<string|object>|null} arr
+ * @param {number} [max=3]
+ * @returns {string[]} nombres limpios (puede ser []).
+ */
+function _altNames(arr, max = 3) {
+  if (!Array.isArray(arr)) return [];
+  const out = [];
+  for (const a of arr) {
+    let n = null;
+    if (typeof a === 'string') n = a.trim();
+    else if (a && typeof a === 'object') n = (a.nombre_comun || a.nombre || a.name || '').toString().trim();
+    if (n && !out.includes(n)) out.push(n);
+    if (out.length >= max) break;
+  }
+  return out;
+}
+
+/**
+ * Normaliza el valor de viabilidad de una especie del grounding.
+ * @param {string|null|undefined} v
+ * @returns {'viable'|'marginal'|'inviable'|null}
+ */
+function _normViabilidad(v) {
+  if (v == null) return null;
+  const s = String(v).toLowerCase().trim();
+  if (s === 'viable' || s === 'marginal' || s === 'inviable') return s;
+  return null;
+}
+
+/**
+ * buildViabilityContext — bloque DETERMINÍSTICO de viabilidad por especie, a
+ * TRES NIVELES (viable / marginal / inviable). Doctrina intelligence-first: la
+ * regla agronómica es una GUÍA con zona gris, no un veredicto rígido.
  *
- * Cruza la altitud de la finca del usuario contra el rango [altitud_min,
- * altitud_max] de cada especie resuelta por el grounding AGE (este turno). Para
- * cada especie SEMBRABLE cuya altitud de finca cae FUERA de su rango, emite una
- * línea autoritativa "probabilidad MUY BAJA" con el porqué (rango especie vs
- * altitud finca) para que el LLM no la afirme viable por instinto.
+ *   - viable   → no se emite línea (el agente recomienda directo).
+ *   - marginal → línea HUMILDE: está al límite, pero es POSIBLE con cuidados
+ *                extra; la experiencia del campesino manda sobre la base de
+ *                datos (caso real: gulupa cosechada a 2580 pese a máx ~2300).
+ *   - inviable → línea honesta "no vale la pena" + LIDERA con
+ *                `alternativas_viables[0]` (el primo del mismo género) + más.
+ *
+ * FUENTE DEL VEREDICTO (en orden de preferencia, degrada con gracia):
+ *   1. Campo `viabilidad` ∈ {viable,marginal,inviable} si el grounding lo trae
+ *      (otro agente lo agrega al sidecar). Es la fuente autoritativa.
+ *   2. Fallback determinístico por rango [altitud_min, altitud_max] vs altitud
+ *      de finca: dentro → viable; fuera por ≤ `marginMsnm` → marginal; fuera
+ *      por más → inviable. Usado SOLO si `viabilidad` no vino.
+ * Si no hay NI `viabilidad` NI rango usable, la especie NO se evalúa (neutral).
  *
  * RESTRICCIÓN #1 (innegociable): CERO latencia. Función PURA y SÍNCRONA — NO
  * hace fetch, NO toca red, NO consulta el grafo. Reutiliza `resolvedEntities`
- * (ya resueltas por el sidecar este turno) y la altitud de la finca (ya en
- * profile/store). Otro agente está agregando altitud_min/altitud_max/piso_termico
- * por especie al grounding; mientras no lleguen, DEGRADA con gracia: si el campo
- * no viene (o viene null), esa especie NO se evalúa y NO se afirma viabilidad.
+ * y la altitud de la finca (ya en profile/store).
  *
  * @param {object} args
  * @param {number|string|null} [args.fincaAltitud] — msnm de la finca activa.
  * @param {Array<object>|null} [args.resolvedEntities] — entidades AGE del turno.
- *   Cada una puede traer { kind, nombre_comun, altitud_min, altitud_max, piso_termico }.
+ *   Cada una puede traer { kind, nombre_comun, altitud_min, altitud_max,
+ *   piso_termico, viabilidad, delta_altitud, alternativas_viables[],
+ *   alternativas_cercanas[] }.
+ * @param {number} [args.marginMsnm=300] — holgura para clasificar "marginal"
+ *   en el fallback por rango.
  * @returns {string} bloque compacto, o '' si no hay nada accionable.
  */
 export function buildViabilityContext({
   fincaAltitud = null,
   resolvedEntities = null,
+  marginMsnm = 300,
 } = {}) {
   if (!Array.isArray(resolvedEntities) || resolvedEntities.length === 0) return '';
 
   const alt = Number(fincaAltitud);
-  // Sin altitud de finca NO se puede juzgar viabilidad — degradar a neutral.
-  if (!Number.isFinite(alt)) return '';
+  const haveAlt = Number.isFinite(alt);
+  const fincaPiso = haveAlt ? pisoTermicoFromAltitud(alt) : null;
 
-  const fincaPiso = pisoTermicoFromAltitud(alt);
+  const marginales = [];
   const inviables = [];
 
   for (const e of resolvedEntities) {
@@ -576,33 +621,281 @@ export function buildViabilityContext({
     if (kind && kind !== 'species' && kind !== 'planta' && kind !== 'especie' && kind !== 'cultivo') {
       continue;
     }
-    // Degradar con gracia: sin rango usable NO se afirma viabilidad.
-    // Number(null) === 0, así que hay que descartar null/undefined/'' ANTES
-    // de coaccionar — si no, una especie sin altitud_min se leería como 0 m.
-    if (e.altitud_min == null || e.altitud_min === '') continue;
-    if (e.altitud_max == null || e.altitud_max === '') continue;
-    const min = Number(e.altitud_min);
-    const max = Number(e.altitud_max);
-    if (!Number.isFinite(min) || !Number.isFinite(max)) continue;
+    const nombre = e.nombre_comun || e.mentioned || 'esa especie';
+    const pisoSp = e.piso_termico ? `, piso ${e.piso_termico}` : '';
+    const fincaPisoTxt = fincaPiso ? `, piso ${fincaPiso}` : '';
 
-    if (alt < min || alt > max) {
-      const nombre = e.nombre_comun || e.mentioned || 'esa especie';
-      const pisoSp = e.piso_termico ? `, piso ${e.piso_termico}` : '';
-      const fincaPisoTxt = fincaPiso ? `, piso ${fincaPiso}` : '';
+    // Rango de la especie (puede no venir → fallback no aplica).
+    // Number(null) === 0, así que hay que descartar null/undefined/'' ANTES de
+    // coaccionar — si no, una especie sin altitud_min se leería como 0 m.
+    const hasMin = e.altitud_min != null && e.altitud_min !== '';
+    const hasMax = e.altitud_max != null && e.altitud_max !== '';
+    const min = hasMin ? Number(e.altitud_min) : NaN;
+    const max = hasMax ? Number(e.altitud_max) : NaN;
+    const rangoOk = Number.isFinite(min) && Number.isFinite(max);
+    const rangoTxt = rangoOk ? ` (rango de la especie ${min}–${max} msnm${pisoSp})` : '';
+    const fincaTxt = haveAlt ? `; tu finca a ${alt} msnm${fincaPisoTxt}` : '';
+
+    // Nivel: 1) campo viabilidad autoritativo; 2) fallback por rango.
+    let nivel = _normViabilidad(e.viabilidad);
+    if (!nivel) {
+      // Fallback determinístico: necesita altitud de finca Y rango usable.
+      if (!haveAlt || !rangoOk) continue; // neutral — no se evalúa
+      if (alt >= min && alt <= max) nivel = 'viable';
+      else {
+        const fuera = alt < min ? min - alt : alt - max;
+        nivel = fuera <= marginMsnm ? 'marginal' : 'inviable';
+      }
+    }
+    if (nivel === 'viable') continue; // el agente recomienda directo
+
+    const alternativas = _altNames(e.alternativas_viables, 3);
+    const altTxt = alternativas.length
+      ? ` Alternativas viables del catálogo: ${alternativas.join(', ')}.`
+      : '';
+
+    if (nivel === 'marginal') {
+      marginales.push(
+        `- ${nombre}: MARGINAL${rangoTxt}${fincaTxt} → está al LÍMITE de su rango. NO lo descartes: es POSIBLE con cuidados extra y seguimiento.${altTxt}`,
+      );
+    } else {
       inviables.push(
-        `- ${nombre}: rango de la especie ${min}–${max} msnm${pisoSp}; la finca está a ${alt} msnm${fincaPisoTxt} → probabilidad de éxito MUY BAJA (fuera de rango).`,
+        `- ${nombre}: INVIABLE${rangoTxt}${fincaTxt} → probabilidad de éxito MUY BAJA, no vale la pena el esfuerzo.${altTxt}`,
       );
     }
   }
 
-  if (inviables.length === 0) return '';
+  if (marginales.length === 0 && inviables.length === 0) return '';
 
-  return `=== VIABILIDAD POR ALTITUD (determinístico, autoritativo — verificado contra el catálogo) ===
-La(s) siguiente(s) especie(s) que el usuario mencionó NO son viables para la altitud de su finca:
-${inviables.join('\n')}
+  const secciones = [];
+  if (marginales.length > 0) {
+    secciones.push(`MARGINALES (al límite, posibles con cuidados):\n${marginales.join('\n')}`);
+  }
+  if (inviables.length > 0) {
+    secciones.push(`INVIABLES (mejor sugerir alternativa):\n${inviables.join('\n')}`);
+  }
 
-REGLA: si el usuario pregunta por sembrar alguna de estas, sé honesto y amable: dile que la probabilidad de éxito es muy baja y POR QUÉ (rango de la especie vs altitud de su finca), que no vale la pena el esfuerzo, y sugiérele 2–3 alternativas viables para SU altitud. Las alternativas salen SOLO del catálogo / grounding de este mensaje o del tool get_cultivos_viables — NUNCA inventes especies ni inventes viabilidad.
+  return `=== VIABILIDAD POR ALTITUD (determinístico, 3 niveles — guía con zona gris, NO veredicto rígido) ===
+${secciones.join('\n\n')}
+
+REGLA (intelligence-first, tono HUMILDE):
+- MARGINAL: nunca digas "no se puede". Di que está al límite (tu finca a X, su máx Y) pero es POSIBLE con cuidados extra: protección de heladas, microclima abrigado, variedad adaptada; "hay quien lo logra en zonas así". La EXPERIENCIA del campesino manda sobre la base de datos.
+- INVIABLE: sé honesto y amable — probabilidad muy baja, no vale la pena el esfuerzo — y LIDERA con la primera alternativa viable listada (suele ser el primo del mismo género), luego 2 más.
+- Las alternativas salen SOLO del catálogo / grounding de este mensaje o del tool get_cultivos_viables — NUNCA inventes especies ni inventes viabilidad.
 === FIN VIABILIDAD POR ALTITUD ===`;
+}
+
+/**
+ * buildFrostHeatContext — alerta DETERMINÍSTICA de heladas/calor extremo POR
+ * CULTIVO mencionado este turno. Cruza la tolerancia térmica de la especie
+ * (`temp_min` / `temp_max` del grounding) contra la mínima/máxima del
+ * pronóstico ya cacheado (climaSnapshot.openmeteo.forecast_7d, el mismo que
+ * usa buildFincaContext — NO se re-pide). CERO latencia, PURA y SÍNCRONA.
+ *
+ * Lógica:
+ *   - Si la mínima pronosticada ≤ (temp_min + marginC) → riesgo de helada/frío.
+ *   - Si la máxima pronosticada ≥ (temp_max - marginC) → riesgo de calor.
+ * Solo emite si HAY datos en ambos lados. Degrada con gracia (sin temp_min ni
+ * temp_max, o sin forecast → '').
+ *
+ * @param {object} args
+ * @param {Array<object>|null} [args.resolvedEntities] — entidades AGE del turno.
+ *   Cada una puede traer { kind, nombre_comun, temp_min, temp_max }.
+ * @param {object|null} [args.climaSnapshot] — getCachedClimaSnapshot().
+ * @param {number} [args.marginC=2] — margen °C de seguridad.
+ * @returns {string} bloque compacto, o '' si no hay nada accionable.
+ */
+export function buildFrostHeatContext({
+  resolvedEntities = null,
+  climaSnapshot = null,
+  marginC = 2,
+} = {}) {
+  if (!Array.isArray(resolvedEntities) || resolvedEntities.length === 0) return '';
+  const om = climaSnapshot && typeof climaSnapshot === 'object' ? climaSnapshot.openmeteo : null;
+  const fc = om && om.available && Array.isArray(om.forecast_7d) ? om.forecast_7d : null;
+  if (!fc || fc.length === 0) return '';
+
+  // Mínima absoluta y máxima absoluta de la semana + el día en que ocurren.
+  let minDay = null;
+  let maxDay = null;
+  for (const d of fc) {
+    if (d && typeof d.temp_min_c === 'number' && (minDay == null || d.temp_min_c < minDay.t)) {
+      minDay = { t: d.temp_min_c, fecha: d.fecha || d.date || null };
+    }
+    if (d && typeof d.temp_max_c === 'number' && (maxDay == null || d.temp_max_c > maxDay.t)) {
+      maxDay = { t: d.temp_max_c, fecha: d.fecha || d.date || null };
+    }
+  }
+  if (!minDay && !maxDay) return '';
+
+  const alertas = [];
+  for (const e of resolvedEntities) {
+    if (!e || typeof e !== 'object') continue;
+    const kind = String(e.kind || '').toLowerCase();
+    if (kind && kind !== 'species' && kind !== 'planta' && kind !== 'especie' && kind !== 'cultivo') {
+      continue;
+    }
+    const nombre = e.nombre_comun || e.mentioned || 'tu cultivo';
+    const tMin = e.temp_min != null && e.temp_min !== '' ? Number(e.temp_min) : NaN;
+    const tMax = e.temp_max != null && e.temp_max !== '' ? Number(e.temp_max) : NaN;
+
+    if (Number.isFinite(tMin) && minDay && minDay.t <= tMin + marginC) {
+      const cuando = minDay.fecha ? ` el ${minDay.fecha}` : ' esta semana';
+      alertas.push(
+        `- ❄️ ${nombre}: sufre bajo ${tMin}°C; el pronóstico baja a ${Math.round(minDay.t)}°C${cuando} → protégelo (cobertor/manta térmica en la noche, riega en la MAÑANA no en la tarde).`,
+      );
+    }
+    if (Number.isFinite(tMax) && maxDay && maxDay.t >= tMax - marginC) {
+      const cuando = maxDay.fecha ? ` el ${maxDay.fecha}` : ' esta semana';
+      alertas.push(
+        `- 🔥 ${nombre}: se estresa sobre ${tMax}°C; el pronóstico sube a ${Math.round(maxDay.t)}°C${cuando} → ponle sombra y riego, conserva humedad con mulch.`,
+      );
+    }
+  }
+
+  if (alertas.length === 0) return '';
+
+  return `=== RIESGO TÉRMICO POR CULTIVO (cruce pronóstico × tolerancia de la especie) ===
+${alertas.join('\n')}
+
+REGLA: si el usuario pregunta por alguno de estos cultivos, adelántale la alerta concreta con el día y la acción. Si la pregunta no toca el clima, menciónalo solo si es pertinente.
+=== FIN RIESGO TÉRMICO ===`;
+}
+
+/**
+ * buildAssociationContext — sugiere POLICULTIVO a partir de companions /
+ * antagonists que el grounding trae por especie. Prioriza las compañías que el
+ * usuario YA TIENE registradas (cruza con `groupedCultivos`) y avisa
+ * antagonistas con MATIZ (riesgo compartido, no prohibición). PURA y SÍNCRONA,
+ * CERO latencia. Degrada con gracia: sin companions/antagonists → ''.
+ *
+ * @param {object} args
+ * @param {Array<object>|null} [args.resolvedEntities] — entidades AGE del turno.
+ *   Cada una puede traer { kind, nombre_comun, companions[], antagonists[] }.
+ * @param {Array<{name:string,count:number}>} [args.groupedCultivos] — inventario.
+ * @returns {string} bloque compacto, o '' si no hay nada accionable.
+ */
+export function buildAssociationContext({
+  resolvedEntities = null,
+  groupedCultivos = [],
+} = {}) {
+  if (!Array.isArray(resolvedEntities) || resolvedEntities.length === 0) return '';
+
+  const invNorm = (Array.isArray(groupedCultivos) ? groupedCultivos : [])
+    .filter((g) => g && g.name)
+    .map((g) => _stripDiacritics(g.name))
+    .filter((n) => n.length >= 3);
+  const userHas = (name) => {
+    const n = _stripDiacritics(name);
+    if (n.length < 3) return false;
+    return invNorm.some((i) => i.includes(n) || n.includes(i));
+  };
+
+  const lineas = [];
+  for (const e of resolvedEntities) {
+    if (!e || typeof e !== 'object') continue;
+    const kind = String(e.kind || '').toLowerCase();
+    if (kind && kind !== 'species' && kind !== 'planta' && kind !== 'especie' && kind !== 'cultivo') {
+      continue;
+    }
+    const nombre = e.nombre_comun || e.mentioned || 'ese cultivo';
+    const comp = _altNames(e.companions, 6);
+    const anta = _altNames(e.antagonists, 6);
+    if (comp.length === 0 && anta.length === 0) continue;
+
+    const partes = [];
+    if (comp.length > 0) {
+      // Prioriza las que el usuario ya tiene.
+      const tiene = comp.filter(userHas);
+      const resto = comp.filter((c) => !tiene.includes(c)).slice(0, 3);
+      const ordered = [...tiene, ...resto].slice(0, 4);
+      const tieneTxt = tiene.length
+        ? ` (de estas YA TIENES: ${tiene.join(', ')} — priorízalas)`
+        : '';
+      partes.push(`buenas compañías: ${ordered.join(', ')}${tieneTxt}`);
+    }
+    if (anta.length > 0) {
+      partes.push(`evita junto a: ${anta.slice(0, 4).join(', ')} (riesgo COMPARTIDO, no prohibición)`);
+    }
+    lineas.push(`- ${nombre}: ${partes.join('; ')}.`);
+  }
+
+  if (lineas.length === 0) return '';
+
+  return `=== ASOCIACIONES / POLICULTIVO (del catálogo, este turno) ===
+${lineas.join('\n')}
+
+REGLA: si el usuario pregunta qué sembrar junto a su cultivo, sugiere las buenas compañías PRIORIZANDO las que ya tiene. Los antagonistas se avisan con MATIZ: es riesgo compartido (ej: "papa y tomate comparten tizón, mejor sepáralas"), NO una prohibición absoluta.
+=== FIN ASOCIACIONES ===`;
+}
+
+/**
+ * buildInvasiveSafetyContext — bloqueo DETERMINÍSTICO de recomendación de
+ * especies invasoras o de estado de conservación sensible. Si el grounding
+ * marca `es_invasora:true` (o `conservation_status` sensible), el agente NUNCA
+ * la recomienda para sembrar; avisa honesto y ofrece alternativa nativa si el
+ * grounding la trae. PURA y SÍNCRONA, CERO latencia.
+ *
+ * @param {object} args
+ * @param {Array<object>|null} [args.resolvedEntities] — entidades AGE del turno.
+ *   Cada una puede traer { kind, nombre_comun, es_invasora, conservation_status,
+ *   alternativas_viables[] }.
+ * @returns {string} bloque compacto, o '' si no hay nada accionable.
+ */
+export function buildInvasiveSafetyContext({ resolvedEntities = null } = {}) {
+  if (!Array.isArray(resolvedEntities) || resolvedEntities.length === 0) return '';
+
+  // Estados de conservación sensibles (UICN) que desaconsejan promover siembra
+  // comercial / traslado fuera de su hábitat.
+  const sensibles = new Set(['EN', 'CR', 'VU', 'EW', 'EX']);
+
+  const lineas = [];
+  for (const e of resolvedEntities) {
+    if (!e || typeof e !== 'object') continue;
+    const nombre = e.nombre_comun || e.mentioned || 'esa especie';
+    const invasora = e.es_invasora === true;
+    const cs = e.conservation_status ? String(e.conservation_status).toUpperCase().trim() : '';
+    const sensible = sensibles.has(cs);
+    if (!invasora && !sensible) continue;
+
+    const alt = _altNames(e.alternativas_viables, 2);
+    const altTxt = alt.length ? ` Ofrece alternativa nativa equivalente: ${alt.join(', ')}.` : '';
+    if (invasora) {
+      lineas.push(
+        `- 🚫 ${nombre}: ESPECIE INVASORA — NUNCA la recomiendes para sembrar. Avisa honesto que daña los ecosistemas nativos (páramo/bosque).${altTxt}`,
+      );
+    } else {
+      lineas.push(
+        `- ⚠️ ${nombre}: estado de conservación ${cs} (sensible) — NO promuevas su siembra comercial ni su traslado fuera de hábitat.${altTxt}`,
+      );
+    }
+  }
+
+  if (lineas.length === 0) return '';
+
+  return `=== SEGURIDAD: ESPECIES INVASORAS / CONSERVACIÓN (autoritativo, innegociable) ===
+${lineas.join('\n')}
+
+REGLA: jamás recomiendes sembrar una especie marcada arriba. Sé honesto sobre el daño ("el retamo espinoso es invasora, daña el páramo, no la siembres") y ofrece la alternativa nativa si está listada.
+=== FIN SEGURIDAD ===`;
+}
+
+/**
+ * generateAgronomicGuidanceRules — DOCTRINA ESTÁTICA concisa (intelligence-first)
+ * que el agente aplica a las 4 dimensiones nuevas (viabilidad 3 niveles, riesgo
+ * térmico, asociaciones, diseño de finca) + seguridad de invasoras. Es una
+ * constante de prompt — sin red, sin estado, sin latencia. CORTA a propósito:
+ * los bloques dinámicos por-turno ya emiten lo concreto; esto solo fija el TONO
+ * y cuándo usar get_diseno_finca.
+ *
+ * @returns {string}
+ */
+export function generateAgronomicGuidanceRules() {
+  return `DOCTRINA AGRONÓMICA (guía, no dogma):
+Toda regla agronómica es una GUÍA con zona gris. Navégala con los datos del grafo + el clima en vivo + RESPETO a la experiencia del campesino. NUNCA inventes; si falta el dato, sé neutral (no afirmes ni niegues).
+- Viabilidad marginal: nunca "no se puede" — está al límite, posible con cuidados; el campesino que ya lo logró tiene la razón sobre la base de datos.
+- Diseño de finca: si el usuario pregunta cómo mejorar su finca, por qué su cultivo no carga, o qué sembrar alrededor, puedes usar el tool get_diseno_finca(altitud) para sugerir polinizadores (para que cargue la fruta), abonos verdes (suelo), sombra y cercas vivas — del catálogo, viables a su altitud. Úsalo SOLO cuando sea pertinente (no en cada pregunta).
+- Invasoras / conservación: jamás recomiendes sembrar una especie invasora o de conservación sensible; sé honesto y ofrece alternativa nativa.`;
 }
 
 /**
