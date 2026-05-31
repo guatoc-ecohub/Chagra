@@ -47,6 +47,26 @@ function SourceBadge({ metadata }) {
   const md = metadata || {};
   const toolUsed = md.tool_used || null;
   const grounded = md.grounded === true;
+  // Capa 2 cross-check (operador 2026-05-30): nombres científicos que el
+  // modelo citó y que existen en el catálogo PERO no corresponden a la entidad
+  // que el usuario preguntó (ej. Solanum lycopersicum para 'tomate de árbol').
+  // Badge no intrusivo, convive con el badge de fuente: avisa sin bloquear.
+  const suspectNames = Array.isArray(md.suspect_names) ? md.suspect_names : [];
+  const hasSuspect = suspectNames.length > 0;
+
+  if (hasSuspect) {
+    return (
+      <span
+        className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-amber-600/20 text-amber-300 border border-amber-700"
+        data-testid="suspect-name-badge"
+        data-source="suspect-scientific-name"
+        title={`El nombre científico citado existe en el catálogo pero podría no corresponder a lo que preguntaste: ${suspectNames.join(', ')}. Verifícalo antes de aplicarlo.`}
+      >
+        <AlertTriangle size={12} aria-hidden="true" />
+        <span>Verifica el nombre científico</span>
+      </span>
+    );
+  }
 
   if (toolUsed && grounded) {
     return (

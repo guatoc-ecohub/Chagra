@@ -348,6 +348,45 @@ export async function resolveEntities(userMessage) {
 }
 
 /**
+ * Capa 2 anti-alucinación (cross-check de contexto). Llama
+ * `POST ${BASE}/post-validate` con el TEXTO que el LLM ya generó y, opcional,
+ * los `nombre_cientifico` de las entidades que la capa 1 resolvió para el turno
+ * (`expected`). El sidecar:
+ *   - extrae los binomios Linneanos del texto,
+ *   - los valida contra Apache AGE (los inexistentes → `hallucinated`),
+ *   - y si pasás `expected`, marca como `suspect` los binomios que SÍ existen
+ *     pero NO corresponden a la entidad que el usuario mencionó (caso "nombre
+ *     correcto, especie equivocada": dice Solanum lycopersicum para 'tomate de
+ *     árbol', que en realidad es Solanum betaceum).
+ *
+ * Se invoca DESPUÉS de `callLLM` (no antes — necesita la respuesta). NUNCA
+ * bloquea: el PWA usa el resultado solo para un badge no intrusivo. Devuelve
+ * null si flag off / offline / sidecar falla / timeout → el caller degrada a
+ * "sin advertencia" (política conservadora: no advertir si no se pudo verificar).
+ *
+ * @param {string} text — respuesta del LLM ya generada.
+ * @param {string[]} [expected] — nombre_cientifico de las entidades resueltas.
+ * @returns {Promise<null | {hallucinated: string[], validated: Array<{scientific_name: string, canonical_id: string}>, suspect: string[], age_available: boolean, detected_count: number}>}
+ */
+export async function postValidate(text, expected) {
+  if (!text || typeof text !== 'string') return null;
+  const body = { text };
+  if (Array.isArray(expected) && expected.length > 0) {
+    const clean = expected.filter((e) => typeof e === 'string' && e.trim().length > 0);
+    if (clean.length > 0) body.expected = clean;
+  }
+  const raw = await postJson('/post-validate', body, NLU_TIMEOUT_MS);
+  if (!raw || typeof raw !== 'object') return null;
+  return {
+    hallucinated: Array.isArray(raw.hallucinated) ? raw.hallucinated : [],
+    validated: Array.isArray(raw.validated) ? raw.validated : [],
+    suspect: Array.isArray(raw.suspect) ? raw.suspect : [],
+    age_available: raw.age_available === true,
+    detected_count: typeof raw.detected_count === 'number' ? raw.detected_count : 0,
+  };
+}
+
+/**
  * Llama `POST ${BASE}/tools/<toolName>` con los args dados.
  *
  * @param {string} toolName — uno de ALLOWED_TOOLS

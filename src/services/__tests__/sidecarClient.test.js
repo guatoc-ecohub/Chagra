@@ -414,4 +414,84 @@ describe('sidecarClient — feature flag on', () => {
       expect(fetchMock.mock.calls[0][0]).toBe('/api/mcp/agro/tools/get_precio_sipsa');
     });
   });
+
+  describe('postValidate — capa 2 cross-check', () => {
+    it('devuelve null sin fetch cuando flag off', async () => {
+      disableFlag();
+      const { postValidate } = await importFresh();
+      const res = await postValidate('Solanum betaceum es bueno', ['Solanum betaceum Cav.']);
+      expect(res).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('devuelve null sin fetch cuando offline', async () => {
+      Object.defineProperty(navigator, 'onLine', { configurable: true, value: false });
+      const { postValidate } = await importFresh();
+      const res = await postValidate('Solanum betaceum es bueno', ['Solanum betaceum Cav.']);
+      expect(res).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('devuelve null sin fetch cuando text vacío/no-string', async () => {
+      const { postValidate } = await importFresh();
+      expect(await postValidate('', ['x'])).toBeNull();
+      expect(await postValidate(null, ['x'])).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('POST /post-validate con expected mapea el report y conserva suspect[]', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, {
+        hallucinated: [],
+        validated: [{ scientific_name: 'Solanum lycopersicum', canonical_id: 'solanum_lycopersicum_cerasiforme' }],
+        suspect: ['Solanum lycopersicum'],
+        age_available: true,
+        detected_count: 1,
+      }));
+      const { postValidate } = await importFresh();
+      const res = await postValidate(
+        'Para el tomate de árbol, Solanum lycopersicum.',
+        ['Solanum betaceum Cav.'],
+      );
+      expect(res.suspect).toEqual(['Solanum lycopersicum']);
+      expect(res.age_available).toBe(true);
+      expect(res.detected_count).toBe(1);
+      // El cuerpo enviado lleva text + expected.
+      const [url, opts] = fetchMock.mock.calls[0];
+      expect(url).toBe('/api/mcp/agro/post-validate');
+      const body = JSON.parse(opts.body);
+      expect(body.text).toContain('Solanum lycopersicum');
+      expect(body.expected).toEqual(['Solanum betaceum Cav.']);
+    });
+
+    it('NO envía expected cuando el array está vacío (sin cross-check)', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, {
+        hallucinated: [], validated: [], suspect: [], age_available: true, detected_count: 0,
+      }));
+      const { postValidate } = await importFresh();
+      await postValidate('texto sin binomios', []);
+      const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+      expect(body.expected).toBeUndefined();
+    });
+
+    it('normaliza un report parcial del sidecar a la forma contractual', async () => {
+      // Sidecar viejo sin campo suspect → el cliente lo rellena a [].
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, {
+        hallucinated: ['Inventus fakeus'],
+        validated: [],
+        age_available: true,
+        detected_count: 1,
+      }));
+      const { postValidate } = await importFresh();
+      const res = await postValidate('Inventus fakeus no existe.', ['Solanum betaceum Cav.']);
+      expect(res.suspect).toEqual([]);
+      expect(res.hallucinated).toEqual(['Inventus fakeus']);
+    });
+
+    it('devuelve null cuando el fetch falla (sidecar caído)', async () => {
+      fetchMock.mockRejectedValueOnce(new Error('network'));
+      const { postValidate } = await importFresh();
+      const res = await postValidate('Solanum betaceum.', ['Solanum betaceum Cav.']);
+      expect(res).toBeNull();
+    });
+  });
 });
