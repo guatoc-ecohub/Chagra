@@ -329,7 +329,15 @@ const PRECIO_SIPSA_ACTIONS = new Set([
  * Returns null si: flag off, offline, AGE down (graceful), timeout.
  * Returns { entities: [...] } con entidades resueltas (puede ser []).
  *
+ * Si se pasa `fincaAltitud` (msnm), se reenvía como `finca_altitud` para que el
+ * sidecar enriquezca cada entidad con viabilidad/alternativas a esa altitud
+ * (viabilidad ∈ {viable,marginal,inviable}, delta_altitud, alternativas_viables,
+ * alternativas_cercanas). Es el MISMO request — CERO latencia añadida. El
+ * sidecar lo ignora si no soporta el campo (degrada con gracia).
+ *
  * @param {string} userMessage
+ * @param {object} [opts]
+ * @param {number|string|null} [opts.fincaAltitud] — msnm de la finca activa.
  * @returns {Promise<null | { entities: Array<{
  *   mentioned: string,
  *   kind: 'species' | 'pest' | 'biopreparado',
@@ -337,11 +345,20 @@ const PRECIO_SIPSA_ACTIONS = new Set([
  *   nombre_comun: string,
  *   nombre_cientifico: string,
  *   confidence: number,
+ *   altitud_min?: number, altitud_max?: number, piso_termico?: string,
+ *   temp_min?: number, temp_max?: number, categoria?: string,
+ *   es_invasora?: boolean, conservation_status?: string,
+ *   viabilidad?: 'viable' | 'marginal' | 'inviable', delta_altitud?: number,
+ *   companions?: Array<string|object>, antagonists?: Array<string|object>,
+ *   alternativas_viables?: Array<string|object>, alternativas_cercanas?: Array<string|object>,
  * }> }>}
  */
-export async function resolveEntities(userMessage) {
+export async function resolveEntities(userMessage, opts = {}) {
   if (!userMessage || typeof userMessage !== 'string') return null;
-  const raw = await postJson('/resolve-entities', { user_message: userMessage }, NLU_TIMEOUT_MS);
+  const body = { user_message: userMessage };
+  const alt = opts && opts.fincaAltitud != null ? Number(opts.fincaAltitud) : NaN;
+  if (Number.isFinite(alt)) body.finca_altitud = alt;
+  const raw = await postJson('/resolve-entities', body, NLU_TIMEOUT_MS);
   if (!raw || typeof raw !== 'object') return null;
   if (!Array.isArray(raw.entities)) return { entities: [] };
   return { entities: raw.entities };

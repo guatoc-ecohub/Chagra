@@ -16,6 +16,10 @@ import {
   buildFincaContext,
   generateViabilityRules,
   buildViabilityContext,
+  buildFrostHeatContext,
+  buildAssociationContext,
+  buildInvasiveSafetyContext,
+  generateAgronomicGuidanceRules,
   pisoTermicoFromAltitud,
   temporadaColombiana,
 } from '../agentService.js';
@@ -820,6 +824,271 @@ describe('agentService — Task #202 Profile Context', () => {
         ],
       });
       expect(ctx).toContain('MUY BAJA');
+    });
+  });
+
+  describe('buildViabilityContext — 3 niveles (viable/marginal/inviable)', () => {
+    it('campo viabilidad="marginal" del grounding → línea MARGINAL humilde, NO MUY BAJA', () => {
+      const ctx = buildViabilityContext({
+        fincaAltitud: 2580,
+        resolvedEntities: [
+          {
+            mentioned: 'gulupa', kind: 'species', nombre_comun: 'Gulupa',
+            nombre_cientifico: 'Passiflora edulis f. edulis',
+            altitud_min: 1500, altitud_max: 2300, viabilidad: 'marginal',
+          },
+        ],
+      });
+      expect(ctx).toContain('Gulupa');
+      expect(ctx).toContain('MARGINAL');
+      expect(ctx).toContain('al LÍMITE');
+      expect(ctx).toContain('POSIBLE con cuidados');
+      expect(ctx).not.toContain('MUY BAJA');
+    });
+
+    it('caso real gulupa@2580 SIN campo viabilidad pero rango 1500–2300 → fallback MARGINAL (delta 280 ≤ 300)', () => {
+      const ctx = buildViabilityContext({
+        fincaAltitud: 2580,
+        resolvedEntities: [
+          {
+            mentioned: 'gulupa', kind: 'species', nombre_comun: 'Gulupa',
+            nombre_cientifico: 'Passiflora edulis f. edulis',
+            altitud_min: 1500, altitud_max: 2300,
+          },
+        ],
+      });
+      expect(ctx).toContain('MARGINAL');
+      // No debe clasificarse como inviable: sin sección de inviables.
+      expect(ctx).not.toContain('INVIABLES (mejor sugerir alternativa)');
+    });
+
+    it('inviable LIDERA con alternativas_viables[0] (el primo del género)', () => {
+      const ctx = buildViabilityContext({
+        fincaAltitud: 2580,
+        resolvedEntities: [
+          {
+            mentioned: 'maracuyá', kind: 'species', nombre_comun: 'Maracuyá',
+            nombre_cientifico: 'Passiflora edulis f. flavicarpa',
+            altitud_min: 0, altitud_max: 1300, viabilidad: 'inviable',
+            alternativas_viables: ['curuba', 'gulupa', 'granadilla'],
+          },
+        ],
+      });
+      expect(ctx).toContain('INVIABLE');
+      expect(ctx).toContain('curuba');
+      // primera alternativa listada de primera
+      expect(ctx.indexOf('curuba')).toBeLessThan(ctx.indexOf('granadilla'));
+    });
+
+    it('viabilidad="viable" explícita → no se emite línea para esa especie', () => {
+      const ctx = buildViabilityContext({
+        fincaAltitud: 2580,
+        resolvedEntities: [
+          {
+            mentioned: 'papa', kind: 'species', nombre_comun: 'Papa',
+            altitud_min: 2000, altitud_max: 3500, viabilidad: 'viable',
+          },
+        ],
+      });
+      expect(ctx).toBe('');
+    });
+
+    it('viabilidad del grounding aplica incluso SIN altitud de finca conocida', () => {
+      const ctx = buildViabilityContext({
+        fincaAltitud: null,
+        resolvedEntities: [
+          {
+            mentioned: 'coco', kind: 'species', nombre_comun: 'Coco',
+            viabilidad: 'inviable', alternativas_viables: ['chontaduro'],
+          },
+        ],
+      });
+      expect(ctx).toContain('INVIABLE');
+      expect(ctx).toContain('chontaduro');
+    });
+  });
+
+  describe('buildFrostHeatContext', () => {
+    const snapFrost = {
+      openmeteo: {
+        available: true,
+        forecast_7d: [
+          { fecha: '2026-06-01', temp_min_c: 8, temp_max_c: 19 },
+          { fecha: '2026-06-02', temp_min_c: 2, temp_max_c: 18 },
+          { fecha: '2026-06-03', temp_min_c: 6, temp_max_c: 20 },
+        ],
+      },
+    };
+
+    it('devuelve string vacío sin entidades o sin forecast', () => {
+      expect(buildFrostHeatContext({ resolvedEntities: null, climaSnapshot: snapFrost })).toBe('');
+      expect(buildFrostHeatContext({ resolvedEntities: [{ kind: 'species', temp_min: 10 }], climaSnapshot: null })).toBe('');
+      expect(buildFrostHeatContext({ resolvedEntities: [{ kind: 'species', temp_min: 10 }], climaSnapshot: {} })).toBe('');
+    });
+
+    it('helada pronosticada: mínima 2°C ≤ temp_min 5 + margen → alerta concreta con día y acción', () => {
+      const ctx = buildFrostHeatContext({
+        resolvedEntities: [
+          { kind: 'species', nombre_comun: 'Tomate', temp_min: 5, temp_max: 30 },
+        ],
+        climaSnapshot: snapFrost,
+      });
+      expect(ctx).toContain('Tomate');
+      expect(ctx).toContain('2°C');
+      expect(ctx).toContain('2026-06-02');
+      expect(ctx).toContain('protég');
+      expect(ctx).toContain('MAÑANA');
+    });
+
+    it('degrada con gracia: especie sin temp_min/temp_max no genera alerta', () => {
+      const ctx = buildFrostHeatContext({
+        resolvedEntities: [{ kind: 'species', nombre_comun: 'X' }],
+        climaSnapshot: snapFrost,
+      });
+      expect(ctx).toBe('');
+    });
+
+    it('calor extremo: máxima alta ≥ temp_max - margen → alerta de calor', () => {
+      const snapHot = {
+        openmeteo: { available: true, forecast_7d: [{ fecha: '2026-06-04', temp_min_c: 18, temp_max_c: 34 }] },
+      };
+      const ctx = buildFrostHeatContext({
+        resolvedEntities: [{ kind: 'species', nombre_comun: 'Lechuga', temp_min: 5, temp_max: 33 }],
+        climaSnapshot: snapHot,
+      });
+      expect(ctx).toContain('Lechuga');
+      expect(ctx).toContain('sombra');
+    });
+
+    it('ignora plagas (solo cultivos)', () => {
+      const ctx = buildFrostHeatContext({
+        resolvedEntities: [{ kind: 'pest', nombre_comun: 'Broca', temp_min: 5 }],
+        climaSnapshot: snapFrost,
+      });
+      expect(ctx).toBe('');
+    });
+
+    it('cero voseo argentino', () => {
+      const ctx = buildFrostHeatContext({
+        resolvedEntities: [{ kind: 'species', nombre_comun: 'Tomate', temp_min: 5 }],
+        climaSnapshot: snapFrost,
+      });
+      expect(ctx).not.toMatch(/\btenés\b/);
+      expect(ctx).not.toMatch(/\bpodés\b/);
+      expect(ctx).not.toMatch(/\bmirá\b/);
+      expect(ctx).not.toMatch(/\bacá\b/);
+      expect(ctx).not.toMatch(/\bprotegé\b/);
+    });
+  });
+
+  describe('buildAssociationContext', () => {
+    it('devuelve vacío sin companions/antagonists', () => {
+      expect(buildAssociationContext({ resolvedEntities: [{ kind: 'species', nombre_comun: 'Maíz' }] })).toBe('');
+      expect(buildAssociationContext({ resolvedEntities: null })).toBe('');
+    });
+
+    it('sugiere buenas compañías y prioriza lo que el usuario YA TIENE', () => {
+      const ctx = buildAssociationContext({
+        resolvedEntities: [
+          { kind: 'species', nombre_comun: 'Maíz', companions: ['frijol', 'calabaza', 'caléndula'] },
+        ],
+        groupedCultivos: [{ name: 'frijol', count: 2 }],
+      });
+      expect(ctx).toContain('Maíz');
+      expect(ctx).toContain('frijol');
+      expect(ctx).toContain('YA TIENES');
+      // la que ya tiene aparece antes que las demás
+      expect(ctx.indexOf('frijol')).toBeLessThan(ctx.indexOf('calabaza'));
+    });
+
+    it('avisa antagonistas con MATIZ (riesgo compartido, no prohibición)', () => {
+      const ctx = buildAssociationContext({
+        resolvedEntities: [
+          { kind: 'species', nombre_comun: 'Papa', antagonists: ['tomate'] },
+        ],
+      });
+      expect(ctx).toContain('tomate');
+      expect(ctx).toContain('COMPARTIDO');
+      expect(ctx).toContain('no prohibición');
+    });
+
+    it('cero voseo argentino', () => {
+      const ctx = buildAssociationContext({
+        resolvedEntities: [{ kind: 'species', nombre_comun: 'Maíz', companions: ['frijol'] }],
+      });
+      expect(ctx).not.toMatch(/\btenés\b/);
+      expect(ctx).not.toMatch(/\bsembrá\b/);
+    });
+  });
+
+  describe('buildInvasiveSafetyContext', () => {
+    it('vacío si ninguna especie es invasora ni sensible', () => {
+      expect(buildInvasiveSafetyContext({ resolvedEntities: [{ kind: 'species', nombre_comun: 'Papa' }] })).toBe('');
+      expect(buildInvasiveSafetyContext({ resolvedEntities: null })).toBe('');
+    });
+
+    it('especie invasora: NUNCA recomendar + alternativa nativa si existe', () => {
+      const ctx = buildInvasiveSafetyContext({
+        resolvedEntities: [
+          {
+            kind: 'species', nombre_comun: 'Retamo espinoso', es_invasora: true,
+            alternativas_viables: ['aliso', 'arrayán'],
+          },
+        ],
+      });
+      expect(ctx).toContain('Retamo espinoso');
+      expect(ctx).toContain('INVASORA');
+      expect(ctx).toContain('NUNCA');
+      expect(ctx).toContain('aliso');
+    });
+
+    it('conservation_status sensible (EN) → no promover siembra comercial', () => {
+      const ctx = buildInvasiveSafetyContext({
+        resolvedEntities: [
+          { kind: 'species', nombre_comun: 'Palma de cera', conservation_status: 'EN' },
+        ],
+      });
+      expect(ctx).toContain('Palma de cera');
+      expect(ctx).toContain('EN');
+      expect(ctx).toContain('sensible');
+    });
+
+    it('cero voseo argentino', () => {
+      const ctx = buildInvasiveSafetyContext({
+        resolvedEntities: [{ kind: 'species', nombre_comun: 'Retamo', es_invasora: true }],
+      });
+      expect(ctx).not.toMatch(/\btenés\b/);
+      expect(ctx).not.toMatch(/\bsembrá\b/);
+    });
+  });
+
+  describe('generateAgronomicGuidanceRules', () => {
+    const rules = generateAgronomicGuidanceRules();
+
+    it('es regla estática concisa (costo cero de red)', () => {
+      expect(typeof rules).toBe('string');
+      expect(rules.length).toBeGreaterThan(100);
+      // CORTA a propósito (restricción anti-bloat): que no se infle.
+      expect(rules.length).toBeLessThan(1200);
+    });
+
+    it('fija doctrina guía-no-dogma + respeto a la experiencia del campesino', () => {
+      expect(rules).toContain('GUÍA');
+      expect(rules).toContain('campesino');
+      expect(rules).toContain('NUNCA inventes');
+    });
+
+    it('menciona get_diseno_finca SOLO cuando pertinente', () => {
+      expect(rules).toContain('get_diseno_finca');
+      expect(rules.toLowerCase()).toContain('pertinente');
+    });
+
+    it('cero voseo argentino', () => {
+      expect(rules).not.toMatch(/\btenés\b/);
+      expect(rules).not.toMatch(/\bpodés\b/);
+      expect(rules).not.toMatch(/\bmirá\b/);
+      expect(rules).not.toMatch(/\bacá\b/);
+      expect(rules).not.toMatch(/\bsembrá\b/);
     });
   });
 });
