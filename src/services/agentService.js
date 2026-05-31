@@ -498,3 +498,244 @@ export function buildClimaContext(snapshot, opts = {}) {
 
   return lines.join('\n');
 }
+
+/**
+ * Deriva el piso térmico colombiano a partir de la altitud en msnm.
+ * Cotas clásicas (Caldas-Lang / IDEAM) usadas en el resto del código.
+ *
+ * @param {number|string|null|undefined} altitud — msnm
+ * @returns {'cálido'|'templado'|'frío'|'páramo'|null}
+ */
+export function pisoTermicoFromAltitud(altitud) {
+  if (altitud == null || altitud === '') return null;
+  const alt = Number(altitud);
+  if (!Number.isFinite(alt)) return null;
+  if (alt >= 3000) return 'páramo';
+  if (alt >= 2000) return 'frío';
+  if (alt >= 1000) return 'templado';
+  return 'cálido';
+}
+
+/**
+ * Resuelve la temporada climática del régimen bimodal andino colombiano para
+ * un mes dado (1-12). Las dos temporadas secas (DEF y JJA) y las dos lluviosas
+ * (MAM y SON) son el patrón dominante en la región Andina y buena parte del
+ * país. Es una aproximación calendárica — el ENSO la modula y eso lo aporta el
+ * bloque clima. NO hace fetch: solo aritmética del mes local.
+ *
+ * @param {number} [month] — mes 1-12; por defecto el mes actual local.
+ * @returns {{ nombre: string, detalle: string }}
+ */
+export function temporadaColombiana(month) {
+  const m = Number.isFinite(month) ? month : new Date().getMonth() + 1;
+  // Régimen bimodal andino (IDEAM): dos secas + dos lluviosas al año.
+  if (m === 12 || m === 1 || m === 2) {
+    return { nombre: 'temporada seca (diciembre–febrero)', detalle: 'primer veranillo del año' };
+  }
+  if (m >= 3 && m <= 5) {
+    return { nombre: 'primera temporada de lluvias (marzo–mayo)', detalle: 'pico de siembra principal en zona andina' };
+  }
+  if (m >= 6 && m <= 8) {
+    return { nombre: 'segunda temporada seca (junio–agosto)', detalle: 'veranillo de mitad de año (San Juan)' };
+  }
+  return { nombre: 'segunda temporada de lluvias (septiembre–noviembre)', detalle: 'segunda ventana de siembra del año' };
+}
+
+/**
+ * Resume el inventario agrupado de cultivos/plantas del usuario en una línea
+ * compacta. Recibe el array YA agrupado por especie con { name, count }.
+ *
+ * @param {Array<{name:string,count:number}>} grouped
+ * @param {number} [max=8] — cuántas especies listar antes de "y N más".
+ * @returns {string} ej. "maíz ×2, café, frijol y 3 más" o '' si vacío.
+ */
+function summarizeCultivos(grouped, max = 8) {
+  if (!Array.isArray(grouped) || grouped.length === 0) return '';
+  const items = grouped
+    .filter((g) => g && typeof g.name === 'string' && g.name.trim())
+    .map((g) => ({ name: g.name.trim(), count: Number(g.count) || 1 }))
+    .sort((a, b) => b.count - a.count);
+  if (items.length === 0) return '';
+  const shown = items.slice(0, max).map((g) => (g.count > 1 ? `${g.name} ×${g.count}` : g.name));
+  const rest = items.length - shown.length;
+  return rest > 0 ? `${shown.join(', ')} y ${rest} más` : shown.join(', ');
+}
+
+const _stripDiacritics = (s) =>
+  (s || '')
+    .toString()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .trim();
+
+/**
+ * Cruza las entidades resueltas por el grounding AGE (este turno) contra el
+ * inventario local del usuario. NO hace queries — `resolvedEntities` ya viene
+ * resuelto por el sidecar y `groupedCultivos` ya está en memoria (asset store).
+ * Marca qué especies mencionadas el usuario YA TIENE registradas para que el
+ * agente personalice ("usted ya tiene X en la finca…").
+ *
+ * Match laxo por substring de nombre común normalizado (sin tildes,
+ * minúsculas) en ambas direcciones, suficiente para "maíz" ↔ "Maíz amarillo".
+ *
+ * @param {Array<object>|null} resolvedEntities — de /resolve-entities (AGE).
+ * @param {Array<{name:string,count:number}>} groupedCultivos
+ * @returns {Array<{nombre:string,count:number}>} especies mencionadas que el
+ *   usuario tiene registradas (deduplicadas).
+ */
+function crossResolvedWithInventory(resolvedEntities, groupedCultivos) {
+  if (!Array.isArray(resolvedEntities) || resolvedEntities.length === 0) return [];
+  if (!Array.isArray(groupedCultivos) || groupedCultivos.length === 0) return [];
+  const inv = groupedCultivos
+    .filter((g) => g && g.name)
+    .map((g) => ({ name: g.name, count: Number(g.count) || 1, norm: _stripDiacritics(g.name) }))
+    .filter((g) => g.norm.length >= 3);
+  const hits = new Map();
+  for (const e of resolvedEntities) {
+    if (!e || e.kind === 'plaga') continue; // solo plantas/cultivos
+    const cands = [e.nombre_comun, e.mentioned].map(_stripDiacritics).filter((s) => s.length >= 3);
+    for (const item of inv) {
+      const match = cands.some((c) => item.norm.includes(c) || c.includes(item.norm));
+      if (match && !hits.has(item.name)) {
+        hits.set(item.name, { nombre: item.name, count: item.count });
+      }
+    }
+  }
+  return Array.from(hits.values());
+}
+
+/**
+ * buildFincaContext — bloque AMBIENTAL COMPACTO que da al agente conciencia
+ * implícita del contexto físico de la finca: dónde está, qué clima/temporada
+ * vive y qué tiene sembrado, SIN que el usuario lo tenga que repetir.
+ *
+ * RESTRICCIÓN #1 (innegociable): CERO latencia añadida. Esta función es PURA y
+ * SÍNCRONA — NO hace fetch, NO toca red, NO consulta el grafo. Todos sus
+ * insumos ya están disponibles localmente o en cache cuando el chat corre:
+ *   - profile       → localStorage (userProfileService.getProfile, síncrono)
+ *   - finca         → fincaActiveStore (memoria)
+ *   - climaSnapshot → climaService.getCachedClimaSnapshot (cache 30 min, ya se
+ *                     lee en el path del chat; aquí se REUTILIZA, no se re-pide)
+ *   - groupedCultivos → asset store en memoria (plants ya agrupadas)
+ *   - resolvedEntities → grounding AGE del turno (ya resuelto, se REUTILIZA)
+ *   - activeAlerts  → useAlertStore (memoria)
+ * Si algún insumo falta, se OMITE su línea (degradar, no esperar).
+ *
+ * Filosofía de uso (memoria #202): el agente TIENE el contexto para razonar de
+ * forma específica a la finca, pero NO debe recitar estos datos salvo que sean
+ * relevantes a la pregunta. El bloque lo instruye explícitamente.
+ *
+ * @param {object} args
+ * @param {object|null} [args.profile] — userProfileService.getProfile()
+ * @param {object|null} [args.finca] — finca activa (fincaActiveStore)
+ * @param {object|null} [args.climaSnapshot] — getCachedClimaSnapshot()
+ * @param {Array<{name:string,count:number}>} [args.groupedCultivos] — inventario agrupado
+ * @param {Array<object>|null} [args.resolvedEntities] — entidades AGE del turno
+ * @param {Array<object>} [args.activeAlerts] — useAlertStore activeAlerts
+ * @param {number} [args.month] — override de mes para tests (1-12)
+ * @returns {string} bloque compacto (siempre incluye al menos la temporada).
+ */
+export function buildFincaContext({
+  profile = null,
+  finca = null,
+  climaSnapshot = null,
+  groupedCultivos = [],
+  resolvedEntities = null,
+  activeAlerts = [],
+  month,
+} = {}) {
+  const p = profile && typeof profile === 'object' ? profile : {};
+  const lines = [];
+
+  // ── Ubicación ───────────────────────────────────────────────────────────
+  const municipio = p.municipio || null;
+  const departamento = p.departamento || null;
+  const altitud = p.finca_altitud || (finca && finca.altitud) || null;
+  const piso =
+    (p.piso_termico && String(p.piso_termico).trim()) ||
+    pisoTermicoFromAltitud(altitud) ||
+    null;
+  const lat = Number(p.ubicacion_lat);
+  const lng = Number(p.ubicacion_lng);
+  const ubic = [];
+  const lugar = [municipio, departamento].filter(Boolean).join(', ');
+  if (lugar) ubic.push(lugar);
+  if (altitud) ubic.push(`~${altitud} msnm`);
+  if (piso) ubic.push(`piso ${piso}`);
+  if (Number.isFinite(lat) && Number.isFinite(lng)) {
+    ubic.push(`(${lat.toFixed(3)}, ${lng.toFixed(3)})`);
+  }
+  if (finca && finca.nombre) {
+    lines.push(`Finca activa: "${finca.nombre}"${ubic.length ? ` — ${ubic.join(', ')}` : ''}.`);
+  } else if (ubic.length) {
+    lines.push(`Ubicación: ${ubic.join(', ')}.`);
+  }
+
+  // ── Temporada (calendárica, local — sin red) ────────────────────────────
+  const temporada = temporadaColombiana(month);
+  lines.push(`Temporada actual: ${temporada.nombre} — ${temporada.detalle}.`);
+
+  // ── Clima (reutiliza el snapshot YA cacheado) ───────────────────────────
+  if (climaSnapshot && typeof climaSnapshot === 'object') {
+    const enso = climaSnapshot.enso_status;
+    if (enso && typeof enso === 'object' && enso.phase && enso.phase !== 'neutral') {
+      lines.push(`Fenómeno ENSO en curso: ${enso.label || enso.phase} (modula la temporada de arriba).`);
+    }
+    const om = climaSnapshot.openmeteo;
+    const fc = om && om.available && Array.isArray(om.forecast_7d) ? om.forecast_7d : null;
+    if (fc && fc.length > 0) {
+      const hoy = fc[0];
+      const tmax = typeof hoy.temp_max_c === 'number' ? `${Math.round(hoy.temp_max_c)}°` : null;
+      const tmin = typeof hoy.temp_min_c === 'number' ? `${Math.round(hoy.temp_min_c)}°` : null;
+      const lluviaHoy = typeof hoy.precip_mm === 'number' && hoy.precip_mm >= 1
+        ? `, lluvia ~${Math.round(hoy.precip_mm)}mm`
+        : '';
+      const tempHoy = tmax && tmin ? `${tmin}/${tmax}C` : tmax || tmin || '';
+      // Resumen 7d: días con lluvia y mínima absoluta de la semana (heladas).
+      const diasLluvia = fc.filter((d) => typeof d.precip_mm === 'number' && d.precip_mm >= 1).length;
+      const minimas = fc.map((d) => d.temp_min_c).filter((v) => typeof v === 'number');
+      const minAbs = minimas.length ? Math.round(Math.min(...minimas)) : null;
+      const resumen7d = [
+        diasLluvia > 0 ? `${diasLluvia}/7 días con lluvia` : 'semana sin lluvia significativa',
+        minAbs != null ? `mínima de la semana ${minAbs}°C` : null,
+      ].filter(Boolean).join(', ');
+      if (tempHoy) {
+        lines.push(`Clima local hoy: ${tempHoy}${lluviaHoy}. Pronóstico 7d (Open-Meteo / IDEAM): ${resumen7d}.`);
+      } else {
+        lines.push(`Pronóstico 7d (Open-Meteo / IDEAM): ${resumen7d}.`);
+      }
+    }
+  }
+
+  // ── Alertas activas (memoria, sin red) ──────────────────────────────────
+  const alerts = Array.isArray(activeAlerts) ? activeAlerts.filter(Boolean) : [];
+  if (alerts.length > 0) {
+    const top = alerts
+      .slice(0, 3)
+      .map((a) => a.title || a.message || a.type)
+      .filter(Boolean);
+    if (top.length) lines.push(`Alertas activas: ${top.join('; ')}.`);
+  }
+
+  // ── Finca / inventario (resumen compacto, NO el detalle) ────────────────
+  const cultivos = summarizeCultivos(groupedCultivos);
+  if (cultivos) {
+    lines.push(`Cultivos registrados en la finca: ${cultivos}.`);
+  }
+
+  // ── Cruce grounding × inventario (sin queries nuevas) ───────────────────
+  const tieneRegistrado = crossResolvedWithInventory(resolvedEntities, groupedCultivos);
+  if (tieneRegistrado.length > 0) {
+    const nombres = tieneRegistrado.map((t) => t.nombre).join(', ');
+    lines.push(
+      `RELEVANTE A ESTA PREGUNTA: el usuario YA TIENE registrado en su finca lo que mencionó: ${nombres}. Personaliza la respuesta a SUS plantas (no hables en genérico si puedes referirte a las que tiene).`,
+    );
+  }
+
+  return `=== CONTEXTO AMBIENTAL DE LA FINCA (para razonar específico — NO lo recites salvo que sea relevante a la pregunta) ===
+${lines.join('\n')}
+
+INSTRUCCIÓN: usa este contexto para responder específico a la finca del usuario SIN pedirle que repita dónde está, qué clima tiene o qué siembra. Si menciona una planta/cultivo que ya tiene registrado, tenlo en cuenta. Ajusta siembra, manejo y recomendaciones a su altitud, piso térmico, temporada y clima. NO enumeres estos datos como preámbulo: solo menciona los que la pregunta concreta requiera.
+=== FIN CONTEXTO AMBIENTAL ===`;
+}
