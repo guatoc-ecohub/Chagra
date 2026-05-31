@@ -1,0 +1,8033 @@
+{
+  "_meta": {
+    "source": "DANE DIVIPOLA (Marco Geoestadistico Nacional)",
+    "dataset": "datos.gov.co resource gdxc-w37w",
+    "generatedBy": "scripts/gen-colombia-locations.mjs (#338)",
+    "generatedAt": "2026-05-30",
+    "departamentos": 33,
+    "municipios": 1122,
+    "conAltitudCurada": 110,
+    "sinAltitud": 1012
+  },
+  "departamentos": {
+    "Amazonas": {
+      "codigo": "91",
+      "municipios": [
+        {
+          "codigo": "91263",
+          "name": "El Encanto",
+          "lat": -1.74806,
+          "lng": -73.207114,
+          "altitud": null
+        },
+        {
+          "codigo": "91405",
+          "name": "La Chorrera",
+          "lat": -1.442617,
+          "lng": -72.791889,
+          "altitud": null
+        },
+        {
+          "codigo": "91407",
+          "name": "La Pedrera",
+          "lat": -1.320301,
+          "lng": -69.585499,
+          "altitud": null
+        },
+        {
+          "codigo": "91430",
+          "name": "La Victoria",
+          "lat": 0.054936,
+          "lng": -71.223208,
+          "altitud": null
+        },
+        {
+          "codigo": "91001",
+          "name": "Leticia",
+          "lat": -4.19895,
+          "lng": -69.941721,
+          "altitud": 96
+        },
+        {
+          "codigo": "91460",
+          "name": "Mirití - Paraná",
+          "lat": -0.888833,
+          "lng": -70.98893,
+          "altitud": null
+        },
+        {
+          "codigo": "91530",
+          "name": "Puerto Alegría",
+          "lat": -1.005674,
+          "lng": -74.014461,
+          "altitud": null
+        },
+        {
+          "codigo": "91536",
+          "name": "Puerto Arica",
+          "lat": -2.147039,
+          "lng": -71.752186,
+          "altitud": null
+        },
+        {
+          "codigo": "91540",
+          "name": "Puerto Nariño",
+          "lat": -3.779934,
+          "lng": -70.364937,
+          "altitud": null
+        },
+        {
+          "codigo": "91669",
+          "name": "Puerto Santander",
+          "lat": -0.621184,
+          "lng": -72.384213,
+          "altitud": null
+        },
+        {
+          "codigo": "91798",
+          "name": "Tarapacá",
+          "lat": -2.890126,
+          "lng": -69.741745,
+          "altitud": null
+        }
+      ]
+    },
+    "Antioquia": {
+      "codigo": "05",
+      "municipios": [
+        {
+          "codigo": "05002",
+          "name": "Abejorral",
+          "lat": 5.789315,
+          "lng": -75.428739,
+          "altitud": null
+        },
+        {
+          "codigo": "05004",
+          "name": "Abriaquí",
+          "lat": 6.632282,
+          "lng": -76.064304,
+          "altitud": null
+        },
+        {
+          "codigo": "05021",
+          "name": "Alejandría",
+          "lat": 6.376061,
+          "lng": -75.141346,
+          "altitud": null
+        },
+        {
+          "codigo": "05030",
+          "name": "Amagá",
+          "lat": 6.038708,
+          "lng": -75.702188,
+          "altitud": null
+        },
+        {
+          "codigo": "05031",
+          "name": "Amalfi",
+          "lat": 6.909655,
+          "lng": -75.077501,
+          "altitud": null
+        },
+        {
+          "codigo": "05034",
+          "name": "Andes",
+          "lat": 5.657194,
+          "lng": -75.878828,
+          "altitud": null
+        },
+        {
+          "codigo": "05036",
+          "name": "Angelópolis",
+          "lat": 6.109719,
+          "lng": -75.711389,
+          "altitud": null
+        },
+        {
+          "codigo": "05038",
+          "name": "Angostura",
+          "lat": 6.885175,
+          "lng": -75.335116,
+          "altitud": null
+        },
+        {
+          "codigo": "05040",
+          "name": "Anorí",
+          "lat": 7.074703,
+          "lng": -75.148355,
+          "altitud": null
+        },
+        {
+          "codigo": "05044",
+          "name": "Anzá",
+          "lat": 6.302641,
+          "lng": -75.854442,
+          "altitud": null
+        },
+        {
+          "codigo": "05045",
+          "name": "Apartadó",
+          "lat": 7.882968,
+          "lng": -76.625279,
+          "altitud": null
+        },
+        {
+          "codigo": "05051",
+          "name": "Arboletes",
+          "lat": 8.849317,
+          "lng": -76.426708,
+          "altitud": null
+        },
+        {
+          "codigo": "05055",
+          "name": "Argelia",
+          "lat": 5.731474,
+          "lng": -75.14107,
+          "altitud": null
+        },
+        {
+          "codigo": "05059",
+          "name": "Armenia",
+          "lat": 6.155667,
+          "lng": -75.786647,
+          "altitud": null
+        },
+        {
+          "codigo": "05079",
+          "name": "Barbosa",
+          "lat": 6.439195,
+          "lng": -75.331627,
+          "altitud": null
+        },
+        {
+          "codigo": "05088",
+          "name": "Bello",
+          "lat": 6.333587,
+          "lng": -75.555245,
+          "altitud": null
+        },
+        {
+          "codigo": "05086",
+          "name": "Belmira",
+          "lat": 6.606319,
+          "lng": -75.667779,
+          "altitud": null
+        },
+        {
+          "codigo": "05091",
+          "name": "Betania",
+          "lat": 5.74615,
+          "lng": -75.97679,
+          "altitud": null
+        },
+        {
+          "codigo": "05093",
+          "name": "Betulia",
+          "lat": 6.115208,
+          "lng": -75.984452,
+          "altitud": null
+        },
+        {
+          "codigo": "05107",
+          "name": "Briceño",
+          "lat": 7.112803,
+          "lng": -75.55036,
+          "altitud": null
+        },
+        {
+          "codigo": "05113",
+          "name": "Buriticá",
+          "lat": 6.720759,
+          "lng": -75.907,
+          "altitud": null
+        },
+        {
+          "codigo": "05120",
+          "name": "Cáceres",
+          "lat": 7.578366,
+          "lng": -75.35205,
+          "altitud": null
+        },
+        {
+          "codigo": "05125",
+          "name": "Caicedo",
+          "lat": 6.405607,
+          "lng": -75.98293,
+          "altitud": null
+        },
+        {
+          "codigo": "05129",
+          "name": "Caldas",
+          "lat": 6.091077,
+          "lng": -75.633673,
+          "altitud": null
+        },
+        {
+          "codigo": "05134",
+          "name": "Campamento",
+          "lat": 6.979771,
+          "lng": -75.298091,
+          "altitud": null
+        },
+        {
+          "codigo": "05138",
+          "name": "Cañasgordas",
+          "lat": 6.753859,
+          "lng": -76.028228,
+          "altitud": null
+        },
+        {
+          "codigo": "05142",
+          "name": "Caracolí",
+          "lat": 6.409829,
+          "lng": -74.757421,
+          "altitud": null
+        },
+        {
+          "codigo": "05145",
+          "name": "Caramanta",
+          "lat": 5.54853,
+          "lng": -75.643868,
+          "altitud": null
+        },
+        {
+          "codigo": "05147",
+          "name": "Carepa",
+          "lat": 7.755148,
+          "lng": -76.652652,
+          "altitud": null
+        },
+        {
+          "codigo": "05150",
+          "name": "Carolina",
+          "lat": 6.725995,
+          "lng": -75.283192,
+          "altitud": null
+        },
+        {
+          "codigo": "05154",
+          "name": "Caucasia",
+          "lat": 7.977278,
+          "lng": -75.197996,
+          "altitud": null
+        },
+        {
+          "codigo": "05172",
+          "name": "Chigorodó",
+          "lat": 7.666147,
+          "lng": -76.681531,
+          "altitud": null
+        },
+        {
+          "codigo": "05190",
+          "name": "Cisneros",
+          "lat": 6.537829,
+          "lng": -75.087047,
+          "altitud": null
+        },
+        {
+          "codigo": "05101",
+          "name": "Ciudad Bolívar",
+          "lat": 5.850273,
+          "lng": -76.021509,
+          "altitud": null
+        },
+        {
+          "codigo": "05197",
+          "name": "Cocorná",
+          "lat": 6.058295,
+          "lng": -75.185483,
+          "altitud": null
+        },
+        {
+          "codigo": "05206",
+          "name": "Concepción",
+          "lat": 6.394348,
+          "lng": -75.257587,
+          "altitud": null
+        },
+        {
+          "codigo": "05209",
+          "name": "Concordia",
+          "lat": 6.045738,
+          "lng": -75.908448,
+          "altitud": 2000
+        },
+        {
+          "codigo": "05212",
+          "name": "Copacabana",
+          "lat": 6.348557,
+          "lng": -75.509384,
+          "altitud": null
+        },
+        {
+          "codigo": "05234",
+          "name": "Dabeiba",
+          "lat": 6.998112,
+          "lng": -76.261614,
+          "altitud": null
+        },
+        {
+          "codigo": "05237",
+          "name": "Donmatías",
+          "lat": 6.485603,
+          "lng": -75.39263,
+          "altitud": null
+        },
+        {
+          "codigo": "05240",
+          "name": "Ebéjico",
+          "lat": 6.325615,
+          "lng": -75.766413,
+          "altitud": null
+        },
+        {
+          "codigo": "05250",
+          "name": "El Bagre",
+          "lat": 7.5975,
+          "lng": -74.799097,
+          "altitud": null
+        },
+        {
+          "codigo": "05148",
+          "name": "El Carmen de Viboral",
+          "lat": 6.082885,
+          "lng": -75.333901,
+          "altitud": null
+        },
+        {
+          "codigo": "05697",
+          "name": "El Santuario",
+          "lat": 6.136871,
+          "lng": -75.265465,
+          "altitud": null
+        },
+        {
+          "codigo": "05264",
+          "name": "Entrerríos",
+          "lat": 6.566273,
+          "lng": -75.517685,
+          "altitud": null
+        },
+        {
+          "codigo": "05266",
+          "name": "Envigado",
+          "lat": 6.166695,
+          "lng": -75.582192,
+          "altitud": null
+        },
+        {
+          "codigo": "05282",
+          "name": "Fredonia",
+          "lat": 5.928039,
+          "lng": -75.675072,
+          "altitud": null
+        },
+        {
+          "codigo": "05284",
+          "name": "Frontino",
+          "lat": 6.776066,
+          "lng": -76.130765,
+          "altitud": null
+        },
+        {
+          "codigo": "05306",
+          "name": "Giraldo",
+          "lat": 6.680808,
+          "lng": -75.952158,
+          "altitud": null
+        },
+        {
+          "codigo": "05308",
+          "name": "Girardota",
+          "lat": 6.379472,
+          "lng": -75.444238,
+          "altitud": null
+        },
+        {
+          "codigo": "05310",
+          "name": "Gómez Plata",
+          "lat": 6.683269,
+          "lng": -75.220018,
+          "altitud": null
+        },
+        {
+          "codigo": "05313",
+          "name": "Granada",
+          "lat": 6.142892,
+          "lng": -75.184446,
+          "altitud": null
+        },
+        {
+          "codigo": "05315",
+          "name": "Guadalupe",
+          "lat": 6.815069,
+          "lng": -75.239862,
+          "altitud": null
+        },
+        {
+          "codigo": "05318",
+          "name": "Guarne",
+          "lat": 6.27787,
+          "lng": -75.441612,
+          "altitud": null
+        },
+        {
+          "codigo": "05321",
+          "name": "Guatapé",
+          "lat": 6.232461,
+          "lng": -75.160041,
+          "altitud": null
+        },
+        {
+          "codigo": "05347",
+          "name": "Heliconia",
+          "lat": 6.206757,
+          "lng": -75.734322,
+          "altitud": null
+        },
+        {
+          "codigo": "05353",
+          "name": "Hispania",
+          "lat": 5.799461,
+          "lng": -75.906587,
+          "altitud": null
+        },
+        {
+          "codigo": "05360",
+          "name": "Itagüí",
+          "lat": 6.175079,
+          "lng": -75.612056,
+          "altitud": null
+        },
+        {
+          "codigo": "05361",
+          "name": "Ituango",
+          "lat": 7.171629,
+          "lng": -75.764673,
+          "altitud": null
+        },
+        {
+          "codigo": "05364",
+          "name": "Jardín",
+          "lat": 5.597542,
+          "lng": -75.818982,
+          "altitud": 1750
+        },
+        {
+          "codigo": "05368",
+          "name": "Jericó",
+          "lat": 5.789748,
+          "lng": -75.785499,
+          "altitud": null
+        },
+        {
+          "codigo": "05376",
+          "name": "La Ceja",
+          "lat": 6.028062,
+          "lng": -75.429433,
+          "altitud": null
+        },
+        {
+          "codigo": "05380",
+          "name": "La Estrella",
+          "lat": 6.145238,
+          "lng": -75.637708,
+          "altitud": null
+        },
+        {
+          "codigo": "05390",
+          "name": "La Pintada",
+          "lat": 5.743808,
+          "lng": -75.60781,
+          "altitud": null
+        },
+        {
+          "codigo": "05400",
+          "name": "La Unión",
+          "lat": 5.973845,
+          "lng": -75.360874,
+          "altitud": null
+        },
+        {
+          "codigo": "05411",
+          "name": "Liborina",
+          "lat": 6.677316,
+          "lng": -75.812838,
+          "altitud": null
+        },
+        {
+          "codigo": "05425",
+          "name": "Maceo",
+          "lat": 6.552116,
+          "lng": -74.78716,
+          "altitud": null
+        },
+        {
+          "codigo": "05440",
+          "name": "Marinilla",
+          "lat": 6.173995,
+          "lng": -75.339345,
+          "altitud": null
+        },
+        {
+          "codigo": "05001",
+          "name": "Medellín",
+          "lat": 6.246631,
+          "lng": -75.581775,
+          "altitud": 1495
+        },
+        {
+          "codigo": "05467",
+          "name": "Montebello",
+          "lat": 5.946313,
+          "lng": -75.523455,
+          "altitud": null
+        },
+        {
+          "codigo": "05475",
+          "name": "Murindó",
+          "lat": 6.97771,
+          "lng": -76.817485,
+          "altitud": null
+        },
+        {
+          "codigo": "05480",
+          "name": "Mutatá",
+          "lat": 7.242875,
+          "lng": -76.435875,
+          "altitud": null
+        },
+        {
+          "codigo": "05483",
+          "name": "Nariño",
+          "lat": 5.610777,
+          "lng": -75.176262,
+          "altitud": null
+        },
+        {
+          "codigo": "05495",
+          "name": "Nechí",
+          "lat": 8.094129,
+          "lng": -74.77647,
+          "altitud": null
+        },
+        {
+          "codigo": "05490",
+          "name": "Necoclí",
+          "lat": 8.434526,
+          "lng": -76.787271,
+          "altitud": null
+        },
+        {
+          "codigo": "05501",
+          "name": "Olaya",
+          "lat": 6.626492,
+          "lng": -75.811773,
+          "altitud": null
+        },
+        {
+          "codigo": "05541",
+          "name": "Peñol",
+          "lat": 6.219349,
+          "lng": -75.242693,
+          "altitud": null
+        },
+        {
+          "codigo": "05543",
+          "name": "Peque",
+          "lat": 7.021029,
+          "lng": -75.910357,
+          "altitud": null
+        },
+        {
+          "codigo": "05576",
+          "name": "Pueblorrico",
+          "lat": 5.79158,
+          "lng": -75.839903,
+          "altitud": null
+        },
+        {
+          "codigo": "05579",
+          "name": "Puerto Berrío",
+          "lat": 6.487028,
+          "lng": -74.410016,
+          "altitud": null
+        },
+        {
+          "codigo": "05585",
+          "name": "Puerto Nare",
+          "lat": 6.186025,
+          "lng": -74.583012,
+          "altitud": null
+        },
+        {
+          "codigo": "05591",
+          "name": "Puerto Triunfo",
+          "lat": 5.871318,
+          "lng": -74.64119,
+          "altitud": null
+        },
+        {
+          "codigo": "05604",
+          "name": "Remedios",
+          "lat": 7.029424,
+          "lng": -74.698135,
+          "altitud": null
+        },
+        {
+          "codigo": "05607",
+          "name": "Retiro",
+          "lat": 6.062454,
+          "lng": -75.501301,
+          "altitud": null
+        },
+        {
+          "codigo": "05615",
+          "name": "Rionegro",
+          "lat": 6.147148,
+          "lng": -75.377316,
+          "altitud": null
+        },
+        {
+          "codigo": "05628",
+          "name": "Sabanalarga",
+          "lat": 6.850028,
+          "lng": -75.816645,
+          "altitud": null
+        },
+        {
+          "codigo": "05631",
+          "name": "Sabaneta",
+          "lat": 6.149903,
+          "lng": -75.615479,
+          "altitud": null
+        },
+        {
+          "codigo": "05642",
+          "name": "Salgar",
+          "lat": 5.964198,
+          "lng": -75.976807,
+          "altitud": 1250
+        },
+        {
+          "codigo": "05647",
+          "name": "San Andrés de Cuerquía",
+          "lat": 6.916676,
+          "lng": -75.674564,
+          "altitud": null
+        },
+        {
+          "codigo": "05649",
+          "name": "San Carlos",
+          "lat": 6.187746,
+          "lng": -74.988097,
+          "altitud": null
+        },
+        {
+          "codigo": "05652",
+          "name": "San Francisco",
+          "lat": 5.963476,
+          "lng": -75.101562,
+          "altitud": null
+        },
+        {
+          "codigo": "05656",
+          "name": "San Jerónimo",
+          "lat": 6.44809,
+          "lng": -75.726975,
+          "altitud": null
+        },
+        {
+          "codigo": "05658",
+          "name": "San José de la Montaña",
+          "lat": 6.85009,
+          "lng": -75.683352,
+          "altitud": null
+        },
+        {
+          "codigo": "05659",
+          "name": "San Juan de Urabá",
+          "lat": 8.758964,
+          "lng": -76.52857,
+          "altitud": null
+        },
+        {
+          "codigo": "05660",
+          "name": "San Luis",
+          "lat": 6.043017,
+          "lng": -74.993619,
+          "altitud": null
+        },
+        {
+          "codigo": "05664",
+          "name": "San Pedro de los Milagros",
+          "lat": 6.46012,
+          "lng": -75.556743,
+          "altitud": null
+        },
+        {
+          "codigo": "05665",
+          "name": "San Pedro de Urabá",
+          "lat": 8.276884,
+          "lng": -76.380567,
+          "altitud": null
+        },
+        {
+          "codigo": "05667",
+          "name": "San Rafael",
+          "lat": 6.293759,
+          "lng": -75.02849,
+          "altitud": null
+        },
+        {
+          "codigo": "05670",
+          "name": "San Roque",
+          "lat": 6.485939,
+          "lng": -75.019109,
+          "altitud": null
+        },
+        {
+          "codigo": "05674",
+          "name": "San Vicente Ferrer",
+          "lat": 6.282164,
+          "lng": -75.332616,
+          "altitud": null
+        },
+        {
+          "codigo": "05679",
+          "name": "Santa Bárbara",
+          "lat": 5.875527,
+          "lng": -75.567351,
+          "altitud": null
+        },
+        {
+          "codigo": "05042",
+          "name": "Santa Fé de Antioquia",
+          "lat": 6.556484,
+          "lng": -75.826648,
+          "altitud": null
+        },
+        {
+          "codigo": "05686",
+          "name": "Santa Rosa de Osos",
+          "lat": 6.643366,
+          "lng": -75.460723,
+          "altitud": null
+        },
+        {
+          "codigo": "05690",
+          "name": "Santo Domingo",
+          "lat": 6.473032,
+          "lng": -75.164903,
+          "altitud": null
+        },
+        {
+          "codigo": "05736",
+          "name": "Segovia",
+          "lat": 7.079648,
+          "lng": -74.701596,
+          "altitud": null
+        },
+        {
+          "codigo": "05756",
+          "name": "Sonsón",
+          "lat": 5.714851,
+          "lng": -75.309596,
+          "altitud": null
+        },
+        {
+          "codigo": "05761",
+          "name": "Sopetrán",
+          "lat": 6.500745,
+          "lng": -75.747378,
+          "altitud": null
+        },
+        {
+          "codigo": "05789",
+          "name": "Támesis",
+          "lat": 5.664645,
+          "lng": -75.714429,
+          "altitud": null
+        },
+        {
+          "codigo": "05790",
+          "name": "Tarazá",
+          "lat": 7.580127,
+          "lng": -75.401407,
+          "altitud": null
+        },
+        {
+          "codigo": "05792",
+          "name": "Tarso",
+          "lat": 5.864542,
+          "lng": -75.822956,
+          "altitud": null
+        },
+        {
+          "codigo": "05809",
+          "name": "Titiribí",
+          "lat": 6.062391,
+          "lng": -75.791887,
+          "altitud": null
+        },
+        {
+          "codigo": "05819",
+          "name": "Toledo",
+          "lat": 7.010328,
+          "lng": -75.692281,
+          "altitud": null
+        },
+        {
+          "codigo": "05837",
+          "name": "Turbo",
+          "lat": 8.089929,
+          "lng": -76.728858,
+          "altitud": null
+        },
+        {
+          "codigo": "05842",
+          "name": "Uramita",
+          "lat": 6.898393,
+          "lng": -76.173284,
+          "altitud": null
+        },
+        {
+          "codigo": "05847",
+          "name": "Urrao",
+          "lat": 6.317343,
+          "lng": -76.133951,
+          "altitud": null
+        },
+        {
+          "codigo": "05854",
+          "name": "Valdivia",
+          "lat": 7.1652,
+          "lng": -75.439274,
+          "altitud": null
+        },
+        {
+          "codigo": "05856",
+          "name": "Valparaíso",
+          "lat": 5.614555,
+          "lng": -75.624452,
+          "altitud": null
+        },
+        {
+          "codigo": "05858",
+          "name": "Vegachí",
+          "lat": 6.773525,
+          "lng": -74.798714,
+          "altitud": null
+        },
+        {
+          "codigo": "05861",
+          "name": "Venecia",
+          "lat": 5.964693,
+          "lng": -75.735544,
+          "altitud": null
+        },
+        {
+          "codigo": "05873",
+          "name": "Vigía del Fuerte",
+          "lat": 6.588164,
+          "lng": -76.896004,
+          "altitud": null
+        },
+        {
+          "codigo": "05885",
+          "name": "Yalí",
+          "lat": 6.676554,
+          "lng": -74.840059,
+          "altitud": null
+        },
+        {
+          "codigo": "05887",
+          "name": "Yarumal",
+          "lat": 6.963832,
+          "lng": -75.418828,
+          "altitud": 2265
+        },
+        {
+          "codigo": "05890",
+          "name": "Yolombó",
+          "lat": 6.594511,
+          "lng": -75.013385,
+          "altitud": null
+        },
+        {
+          "codigo": "05893",
+          "name": "Yondó",
+          "lat": 7.00396,
+          "lng": -73.912445,
+          "altitud": null
+        },
+        {
+          "codigo": "05895",
+          "name": "Zaragoza",
+          "lat": 7.488583,
+          "lng": -74.867075,
+          "altitud": null
+        }
+      ]
+    },
+    "Arauca": {
+      "codigo": "81",
+      "municipios": [
+        {
+          "codigo": "81001",
+          "name": "Arauca",
+          "lat": 7.072726,
+          "lng": -70.747408,
+          "altitud": null
+        },
+        {
+          "codigo": "81065",
+          "name": "Arauquita",
+          "lat": 7.02702,
+          "lng": -71.426733,
+          "altitud": null
+        },
+        {
+          "codigo": "81220",
+          "name": "Cravo Norte",
+          "lat": 6.303913,
+          "lng": -70.204286,
+          "altitud": null
+        },
+        {
+          "codigo": "81300",
+          "name": "Fortul",
+          "lat": 6.796695,
+          "lng": -71.76877,
+          "altitud": null
+        },
+        {
+          "codigo": "81591",
+          "name": "Puerto Rondón",
+          "lat": 6.281461,
+          "lng": -71.10339,
+          "altitud": null
+        },
+        {
+          "codigo": "81736",
+          "name": "Saravena",
+          "lat": 6.953926,
+          "lng": -71.872812,
+          "altitud": null
+        },
+        {
+          "codigo": "81794",
+          "name": "Tame",
+          "lat": 6.453324,
+          "lng": -71.754427,
+          "altitud": null
+        }
+      ]
+    },
+    "Archipiélago de San Andrés, Providencia y Santa Catalina": {
+      "codigo": "88",
+      "municipios": [
+        {
+          "codigo": "88564",
+          "name": "Providencia",
+          "lat": 13.373185,
+          "lng": -81.368386,
+          "altitud": null
+        },
+        {
+          "codigo": "88001",
+          "name": "San Andrés",
+          "lat": 12.578108,
+          "lng": -81.707181,
+          "altitud": null
+        }
+      ]
+    },
+    "Atlántico": {
+      "codigo": "08",
+      "municipios": [
+        {
+          "codigo": "08078",
+          "name": "Baranoa",
+          "lat": 10.79445,
+          "lng": -74.916077,
+          "altitud": null
+        },
+        {
+          "codigo": "08001",
+          "name": "Barranquilla",
+          "lat": 10.977961,
+          "lng": -74.815546,
+          "altitud": 18
+        },
+        {
+          "codigo": "08137",
+          "name": "Campo de la Cruz",
+          "lat": 10.378291,
+          "lng": -74.880847,
+          "altitud": null
+        },
+        {
+          "codigo": "08141",
+          "name": "Candelaria",
+          "lat": 10.461903,
+          "lng": -74.879717,
+          "altitud": null
+        },
+        {
+          "codigo": "08296",
+          "name": "Galapa",
+          "lat": 10.919033,
+          "lng": -74.870385,
+          "altitud": null
+        },
+        {
+          "codigo": "08372",
+          "name": "Juan de Acosta",
+          "lat": 10.83254,
+          "lng": -75.041032,
+          "altitud": null
+        },
+        {
+          "codigo": "08421",
+          "name": "Luruaco",
+          "lat": 10.610491,
+          "lng": -75.14199,
+          "altitud": null
+        },
+        {
+          "codigo": "08433",
+          "name": "Malambo",
+          "lat": 10.857086,
+          "lng": -74.776923,
+          "altitud": null
+        },
+        {
+          "codigo": "08436",
+          "name": "Manatí",
+          "lat": 10.449089,
+          "lng": -74.956867,
+          "altitud": null
+        },
+        {
+          "codigo": "08520",
+          "name": "Palmar de Varela",
+          "lat": 10.738591,
+          "lng": -74.754765,
+          "altitud": null
+        },
+        {
+          "codigo": "08549",
+          "name": "Piojó",
+          "lat": 10.749216,
+          "lng": -75.107592,
+          "altitud": null
+        },
+        {
+          "codigo": "08558",
+          "name": "Polonuevo",
+          "lat": 10.777363,
+          "lng": -74.852981,
+          "altitud": null
+        },
+        {
+          "codigo": "08560",
+          "name": "Ponedera",
+          "lat": 10.641779,
+          "lng": -74.753885,
+          "altitud": null
+        },
+        {
+          "codigo": "08573",
+          "name": "Puerto Colombia",
+          "lat": 11.015322,
+          "lng": -74.888627,
+          "altitud": null
+        },
+        {
+          "codigo": "08606",
+          "name": "Repelón",
+          "lat": 10.493357,
+          "lng": -75.125534,
+          "altitud": null
+        },
+        {
+          "codigo": "08634",
+          "name": "Sabanagrande",
+          "lat": 10.792453,
+          "lng": -74.759496,
+          "altitud": null
+        },
+        {
+          "codigo": "08638",
+          "name": "Sabanalarga",
+          "lat": 10.632091,
+          "lng": -74.921256,
+          "altitud": null
+        },
+        {
+          "codigo": "08675",
+          "name": "Santa Lucía",
+          "lat": 10.324303,
+          "lng": -74.959204,
+          "altitud": null
+        },
+        {
+          "codigo": "08685",
+          "name": "Santo Tomás",
+          "lat": 10.758735,
+          "lng": -74.757859,
+          "altitud": null
+        },
+        {
+          "codigo": "08758",
+          "name": "Soledad",
+          "lat": 10.909921,
+          "lng": -74.786054,
+          "altitud": null
+        },
+        {
+          "codigo": "08770",
+          "name": "Suan",
+          "lat": 10.335432,
+          "lng": -74.881687,
+          "altitud": null
+        },
+        {
+          "codigo": "08832",
+          "name": "Tubará",
+          "lat": 10.873586,
+          "lng": -74.978704,
+          "altitud": null
+        },
+        {
+          "codigo": "08849",
+          "name": "Usiacurí",
+          "lat": 10.74298,
+          "lng": -74.976985,
+          "altitud": null
+        }
+      ]
+    },
+    "Bogotá, D.C.": {
+      "codigo": "11",
+      "municipios": [
+        {
+          "codigo": "11001",
+          "name": "Bogotá, D.C.",
+          "lat": 4.649251,
+          "lng": -74.106992,
+          "altitud": null
+        }
+      ]
+    },
+    "Bolívar": {
+      "codigo": "13",
+      "municipios": [
+        {
+          "codigo": "13006",
+          "name": "Achí",
+          "lat": 8.570107,
+          "lng": -74.557676,
+          "altitud": null
+        },
+        {
+          "codigo": "13030",
+          "name": "Altos del Rosario",
+          "lat": 8.791865,
+          "lng": -74.164905,
+          "altitud": null
+        },
+        {
+          "codigo": "13042",
+          "name": "Arenal",
+          "lat": 8.458865,
+          "lng": -73.941099,
+          "altitud": null
+        },
+        {
+          "codigo": "13052",
+          "name": "Arjona",
+          "lat": 10.25666,
+          "lng": -75.344332,
+          "altitud": null
+        },
+        {
+          "codigo": "13062",
+          "name": "Arroyohondo",
+          "lat": 10.250075,
+          "lng": -75.019215,
+          "altitud": null
+        },
+        {
+          "codigo": "13074",
+          "name": "Barranco de Loba",
+          "lat": 8.947787,
+          "lng": -74.104391,
+          "altitud": null
+        },
+        {
+          "codigo": "13140",
+          "name": "Calamar",
+          "lat": 10.250431,
+          "lng": -74.916144,
+          "altitud": null
+        },
+        {
+          "codigo": "13160",
+          "name": "Cantagallo",
+          "lat": 7.378678,
+          "lng": -73.914605,
+          "altitud": null
+        },
+        {
+          "codigo": "13001",
+          "name": "Cartagena de Indias",
+          "lat": 10.385126,
+          "lng": -75.496269,
+          "altitud": null
+        },
+        {
+          "codigo": "13188",
+          "name": "Cicuco",
+          "lat": 9.274281,
+          "lng": -74.645981,
+          "altitud": null
+        },
+        {
+          "codigo": "13222",
+          "name": "Clemencia",
+          "lat": 10.567452,
+          "lng": -75.328469,
+          "altitud": null
+        },
+        {
+          "codigo": "13212",
+          "name": "Córdoba",
+          "lat": 9.586942,
+          "lng": -74.827399,
+          "altitud": null
+        },
+        {
+          "codigo": "13244",
+          "name": "El Carmen de Bolívar",
+          "lat": 9.718653,
+          "lng": -75.121178,
+          "altitud": 196
+        },
+        {
+          "codigo": "13248",
+          "name": "El Guamo",
+          "lat": 10.030958,
+          "lng": -74.976084,
+          "altitud": null
+        },
+        {
+          "codigo": "13268",
+          "name": "El Peñón",
+          "lat": 8.988271,
+          "lng": -73.949274,
+          "altitud": null
+        },
+        {
+          "codigo": "13300",
+          "name": "Hatillo de Loba",
+          "lat": 8.956014,
+          "lng": -74.077912,
+          "altitud": null
+        },
+        {
+          "codigo": "13430",
+          "name": "Magangué",
+          "lat": 9.263799,
+          "lng": -74.766742,
+          "altitud": null
+        },
+        {
+          "codigo": "13433",
+          "name": "Mahates",
+          "lat": 10.233285,
+          "lng": -75.191643,
+          "altitud": null
+        },
+        {
+          "codigo": "13440",
+          "name": "Margarita",
+          "lat": 9.15784,
+          "lng": -74.285137,
+          "altitud": null
+        },
+        {
+          "codigo": "13442",
+          "name": "María la Baja",
+          "lat": 9.982402,
+          "lng": -75.300516,
+          "altitud": null
+        },
+        {
+          "codigo": "13458",
+          "name": "Montecristo",
+          "lat": 8.297234,
+          "lng": -74.471176,
+          "altitud": null
+        },
+        {
+          "codigo": "13473",
+          "name": "Morales",
+          "lat": 8.276558,
+          "lng": -73.868172,
+          "altitud": null
+        },
+        {
+          "codigo": "13490",
+          "name": "Norosí",
+          "lat": 8.526259,
+          "lng": -74.038003,
+          "altitud": null
+        },
+        {
+          "codigo": "13549",
+          "name": "Pinillos",
+          "lat": 8.914947,
+          "lng": -74.462279,
+          "altitud": null
+        },
+        {
+          "codigo": "13580",
+          "name": "Regidor",
+          "lat": 8.666258,
+          "lng": -73.821638,
+          "altitud": null
+        },
+        {
+          "codigo": "13600",
+          "name": "Río Viejo",
+          "lat": 8.58795,
+          "lng": -73.840466,
+          "altitud": null
+        },
+        {
+          "codigo": "13620",
+          "name": "San Cristóbal",
+          "lat": 10.392836,
+          "lng": -75.065076,
+          "altitud": null
+        },
+        {
+          "codigo": "13647",
+          "name": "San Estanislao",
+          "lat": 10.398602,
+          "lng": -75.153101,
+          "altitud": null
+        },
+        {
+          "codigo": "13650",
+          "name": "San Fernando",
+          "lat": 9.214183,
+          "lng": -74.323811,
+          "altitud": null
+        },
+        {
+          "codigo": "13654",
+          "name": "San Jacinto",
+          "lat": 9.830275,
+          "lng": -75.12105,
+          "altitud": null
+        },
+        {
+          "codigo": "13655",
+          "name": "San Jacinto del Cauca",
+          "lat": 8.25158,
+          "lng": -74.721156,
+          "altitud": null
+        },
+        {
+          "codigo": "13657",
+          "name": "San Juan Nepomuceno",
+          "lat": 9.953751,
+          "lng": -75.081761,
+          "altitud": null
+        },
+        {
+          "codigo": "13667",
+          "name": "San Martín de Loba",
+          "lat": 8.937485,
+          "lng": -74.039134,
+          "altitud": null
+        },
+        {
+          "codigo": "13670",
+          "name": "San Pablo",
+          "lat": 7.476747,
+          "lng": -73.924602,
+          "altitud": null
+        },
+        {
+          "codigo": "13673",
+          "name": "Santa Catalina",
+          "lat": 10.605294,
+          "lng": -75.287855,
+          "altitud": null
+        },
+        {
+          "codigo": "13468",
+          "name": "Santa Cruz de Mompox",
+          "lat": 9.244241,
+          "lng": -74.42818,
+          "altitud": null
+        },
+        {
+          "codigo": "13683",
+          "name": "Santa Rosa",
+          "lat": 10.444396,
+          "lng": -75.369824,
+          "altitud": null
+        },
+        {
+          "codigo": "13688",
+          "name": "Santa Rosa del Sur",
+          "lat": 7.963938,
+          "lng": -74.052243,
+          "altitud": null
+        },
+        {
+          "codigo": "13744",
+          "name": "Simití",
+          "lat": 7.953916,
+          "lng": -73.947264,
+          "altitud": null
+        },
+        {
+          "codigo": "13760",
+          "name": "Soplaviento",
+          "lat": 10.38839,
+          "lng": -75.136404,
+          "altitud": null
+        },
+        {
+          "codigo": "13780",
+          "name": "Talaigua Nuevo",
+          "lat": 9.30403,
+          "lng": -74.567479,
+          "altitud": null
+        },
+        {
+          "codigo": "13810",
+          "name": "Tiquisio",
+          "lat": 8.558666,
+          "lng": -74.262922,
+          "altitud": null
+        },
+        {
+          "codigo": "13836",
+          "name": "Turbaco",
+          "lat": 10.348316,
+          "lng": -75.427249,
+          "altitud": null
+        },
+        {
+          "codigo": "13838",
+          "name": "Turbaná",
+          "lat": 10.274585,
+          "lng": -75.44265,
+          "altitud": null
+        },
+        {
+          "codigo": "13873",
+          "name": "Villanueva",
+          "lat": 10.444089,
+          "lng": -75.275613,
+          "altitud": null
+        },
+        {
+          "codigo": "13894",
+          "name": "Zambrano",
+          "lat": 9.746306,
+          "lng": -74.817879,
+          "altitud": null
+        }
+      ]
+    },
+    "Boyacá": {
+      "codigo": "15",
+      "municipios": [
+        {
+          "codigo": "15022",
+          "name": "Almeida",
+          "lat": 4.970857,
+          "lng": -73.378933,
+          "altitud": null
+        },
+        {
+          "codigo": "15047",
+          "name": "Aquitania",
+          "lat": 5.518602,
+          "lng": -72.88399,
+          "altitud": null
+        },
+        {
+          "codigo": "15051",
+          "name": "Arcabuco",
+          "lat": 5.755673,
+          "lng": -73.437503,
+          "altitud": null
+        },
+        {
+          "codigo": "15087",
+          "name": "Belén",
+          "lat": 5.98923,
+          "lng": -72.911641,
+          "altitud": null
+        },
+        {
+          "codigo": "15090",
+          "name": "Berbeo",
+          "lat": 5.227451,
+          "lng": -73.12721,
+          "altitud": null
+        },
+        {
+          "codigo": "15092",
+          "name": "Betéitiva",
+          "lat": 5.909978,
+          "lng": -72.809014,
+          "altitud": null
+        },
+        {
+          "codigo": "15097",
+          "name": "Boavita",
+          "lat": 6.330703,
+          "lng": -72.584905,
+          "altitud": null
+        },
+        {
+          "codigo": "15104",
+          "name": "Boyacá",
+          "lat": 5.454578,
+          "lng": -73.361945,
+          "altitud": null
+        },
+        {
+          "codigo": "15106",
+          "name": "Briceño",
+          "lat": 5.690879,
+          "lng": -73.92326,
+          "altitud": null
+        },
+        {
+          "codigo": "15109",
+          "name": "Buenavista",
+          "lat": 5.512594,
+          "lng": -73.94217,
+          "altitud": null
+        },
+        {
+          "codigo": "15114",
+          "name": "Busbanzá",
+          "lat": 5.831393,
+          "lng": -72.884158,
+          "altitud": null
+        },
+        {
+          "codigo": "15131",
+          "name": "Caldas",
+          "lat": 5.55458,
+          "lng": -73.865553,
+          "altitud": null
+        },
+        {
+          "codigo": "15135",
+          "name": "Campohermoso",
+          "lat": 5.031676,
+          "lng": -73.104173,
+          "altitud": null
+        },
+        {
+          "codigo": "15162",
+          "name": "Cerinza",
+          "lat": 5.955939,
+          "lng": -72.947918,
+          "altitud": null
+        },
+        {
+          "codigo": "15172",
+          "name": "Chinavita",
+          "lat": 5.167486,
+          "lng": -73.368476,
+          "altitud": null
+        },
+        {
+          "codigo": "15176",
+          "name": "Chiquinquirá",
+          "lat": 5.61379,
+          "lng": -73.818745,
+          "altitud": null
+        },
+        {
+          "codigo": "15232",
+          "name": "Chíquiza",
+          "lat": 5.639834,
+          "lng": -73.449463,
+          "altitud": null
+        },
+        {
+          "codigo": "15180",
+          "name": "Chiscas",
+          "lat": 6.553136,
+          "lng": -72.500957,
+          "altitud": null
+        },
+        {
+          "codigo": "15183",
+          "name": "Chita",
+          "lat": 6.187083,
+          "lng": -72.471892,
+          "altitud": null
+        },
+        {
+          "codigo": "15185",
+          "name": "Chitaraque",
+          "lat": 6.027425,
+          "lng": -73.4471,
+          "altitud": null
+        },
+        {
+          "codigo": "15187",
+          "name": "Chivatá",
+          "lat": 5.558949,
+          "lng": -73.282529,
+          "altitud": null
+        },
+        {
+          "codigo": "15236",
+          "name": "Chivor",
+          "lat": 4.888173,
+          "lng": -73.368398,
+          "altitud": null
+        },
+        {
+          "codigo": "15189",
+          "name": "Ciénega",
+          "lat": 5.408694,
+          "lng": -73.296049,
+          "altitud": null
+        },
+        {
+          "codigo": "15204",
+          "name": "Cómbita",
+          "lat": 5.634545,
+          "lng": -73.323957,
+          "altitud": null
+        },
+        {
+          "codigo": "15212",
+          "name": "Coper",
+          "lat": 5.475074,
+          "lng": -74.045636,
+          "altitud": null
+        },
+        {
+          "codigo": "15215",
+          "name": "Corrales",
+          "lat": 5.828064,
+          "lng": -72.844795,
+          "altitud": null
+        },
+        {
+          "codigo": "15218",
+          "name": "Covarachía",
+          "lat": 6.500177,
+          "lng": -72.738978,
+          "altitud": null
+        },
+        {
+          "codigo": "15223",
+          "name": "Cubará",
+          "lat": 6.997275,
+          "lng": -72.107939,
+          "altitud": null
+        },
+        {
+          "codigo": "15224",
+          "name": "Cucaita",
+          "lat": 5.544452,
+          "lng": -73.454338,
+          "altitud": null
+        },
+        {
+          "codigo": "15226",
+          "name": "Cuítiva",
+          "lat": 5.580367,
+          "lng": -72.965923,
+          "altitud": null
+        },
+        {
+          "codigo": "15238",
+          "name": "Duitama",
+          "lat": 5.822964,
+          "lng": -73.03063,
+          "altitud": 2540
+        },
+        {
+          "codigo": "15244",
+          "name": "El Cocuy",
+          "lat": 6.407738,
+          "lng": -72.444537,
+          "altitud": null
+        },
+        {
+          "codigo": "15248",
+          "name": "El Espino",
+          "lat": 6.483027,
+          "lng": -72.497007,
+          "altitud": null
+        },
+        {
+          "codigo": "15272",
+          "name": "Firavitoba",
+          "lat": 5.668885,
+          "lng": -72.993392,
+          "altitud": null
+        },
+        {
+          "codigo": "15276",
+          "name": "Floresta",
+          "lat": 5.859519,
+          "lng": -72.918111,
+          "altitud": null
+        },
+        {
+          "codigo": "15293",
+          "name": "Gachantivá",
+          "lat": 5.751891,
+          "lng": -73.549092,
+          "altitud": null
+        },
+        {
+          "codigo": "15296",
+          "name": "Gámeza",
+          "lat": 5.802333,
+          "lng": -72.80553,
+          "altitud": null
+        },
+        {
+          "codigo": "15299",
+          "name": "Garagoa",
+          "lat": 5.083234,
+          "lng": -73.364413,
+          "altitud": null
+        },
+        {
+          "codigo": "15317",
+          "name": "Guacamayas",
+          "lat": 6.459667,
+          "lng": -72.500812,
+          "altitud": null
+        },
+        {
+          "codigo": "15322",
+          "name": "Guateque",
+          "lat": 5.007321,
+          "lng": -73.471207,
+          "altitud": null
+        },
+        {
+          "codigo": "15325",
+          "name": "Guayatá",
+          "lat": 4.967122,
+          "lng": -73.489698,
+          "altitud": null
+        },
+        {
+          "codigo": "15332",
+          "name": "Güicán de la Sierra",
+          "lat": 6.462864,
+          "lng": -72.411763,
+          "altitud": null
+        },
+        {
+          "codigo": "15362",
+          "name": "Iza",
+          "lat": 5.611577,
+          "lng": -72.979559,
+          "altitud": null
+        },
+        {
+          "codigo": "15367",
+          "name": "Jenesano",
+          "lat": 5.385813,
+          "lng": -73.363738,
+          "altitud": null
+        },
+        {
+          "codigo": "15368",
+          "name": "Jericó",
+          "lat": 6.145735,
+          "lng": -72.571122,
+          "altitud": null
+        },
+        {
+          "codigo": "15380",
+          "name": "La Capilla",
+          "lat": 5.095687,
+          "lng": -73.444347,
+          "altitud": null
+        },
+        {
+          "codigo": "15403",
+          "name": "La Uvita",
+          "lat": 6.31616,
+          "lng": -72.559982,
+          "altitud": null
+        },
+        {
+          "codigo": "15401",
+          "name": "La Victoria",
+          "lat": 5.523792,
+          "lng": -74.234393,
+          "altitud": null
+        },
+        {
+          "codigo": "15377",
+          "name": "Labranzagrande",
+          "lat": 5.562687,
+          "lng": -72.57777,
+          "altitud": null
+        },
+        {
+          "codigo": "15425",
+          "name": "Macanal",
+          "lat": 4.972464,
+          "lng": -73.319593,
+          "altitud": null
+        },
+        {
+          "codigo": "15442",
+          "name": "Maripí",
+          "lat": 5.550091,
+          "lng": -74.00405,
+          "altitud": null
+        },
+        {
+          "codigo": "15455",
+          "name": "Miraflores",
+          "lat": 5.196515,
+          "lng": -73.14563,
+          "altitud": null
+        },
+        {
+          "codigo": "15464",
+          "name": "Mongua",
+          "lat": 5.754242,
+          "lng": -72.79809,
+          "altitud": 2975
+        },
+        {
+          "codigo": "15466",
+          "name": "Monguí",
+          "lat": 5.723486,
+          "lng": -72.849292,
+          "altitud": null
+        },
+        {
+          "codigo": "15469",
+          "name": "Moniquirá",
+          "lat": 5.876331,
+          "lng": -73.573374,
+          "altitud": null
+        },
+        {
+          "codigo": "15476",
+          "name": "Motavita",
+          "lat": 5.5777,
+          "lng": -73.367841,
+          "altitud": null
+        },
+        {
+          "codigo": "15480",
+          "name": "Muzo",
+          "lat": 5.532758,
+          "lng": -74.10269,
+          "altitud": null
+        },
+        {
+          "codigo": "15491",
+          "name": "Nobsa",
+          "lat": 5.768046,
+          "lng": -72.937042,
+          "altitud": null
+        },
+        {
+          "codigo": "15494",
+          "name": "Nuevo Colón",
+          "lat": 5.355317,
+          "lng": -73.456759,
+          "altitud": null
+        },
+        {
+          "codigo": "15500",
+          "name": "Oicatá",
+          "lat": 5.595235,
+          "lng": -73.308399,
+          "altitud": null
+        },
+        {
+          "codigo": "15507",
+          "name": "Otanche",
+          "lat": 5.657536,
+          "lng": -74.180965,
+          "altitud": null
+        },
+        {
+          "codigo": "15511",
+          "name": "Pachavita",
+          "lat": 5.140065,
+          "lng": -73.396953,
+          "altitud": null
+        },
+        {
+          "codigo": "15514",
+          "name": "Páez",
+          "lat": 5.097319,
+          "lng": -73.052737,
+          "altitud": null
+        },
+        {
+          "codigo": "15516",
+          "name": "Paipa",
+          "lat": 5.779894,
+          "lng": -73.11782,
+          "altitud": 2525
+        },
+        {
+          "codigo": "15518",
+          "name": "Pajarito",
+          "lat": 5.293783,
+          "lng": -72.703231,
+          "altitud": null
+        },
+        {
+          "codigo": "15522",
+          "name": "Panqueba",
+          "lat": 6.443416,
+          "lng": -72.459424,
+          "altitud": null
+        },
+        {
+          "codigo": "15531",
+          "name": "Pauna",
+          "lat": 5.656323,
+          "lng": -73.978449,
+          "altitud": null
+        },
+        {
+          "codigo": "15533",
+          "name": "Paya",
+          "lat": 5.625699,
+          "lng": -72.423775,
+          "altitud": null
+        },
+        {
+          "codigo": "15537",
+          "name": "Paz de Río",
+          "lat": 5.987645,
+          "lng": -72.749137,
+          "altitud": null
+        },
+        {
+          "codigo": "15542",
+          "name": "Pesca",
+          "lat": 5.558808,
+          "lng": -73.050872,
+          "altitud": null
+        },
+        {
+          "codigo": "15550",
+          "name": "Pisba",
+          "lat": 5.72141,
+          "lng": -72.486023,
+          "altitud": null
+        },
+        {
+          "codigo": "15572",
+          "name": "Puerto Boyacá",
+          "lat": 5.976646,
+          "lng": -74.587782,
+          "altitud": null
+        },
+        {
+          "codigo": "15580",
+          "name": "Quípama",
+          "lat": 5.52055,
+          "lng": -74.180033,
+          "altitud": null
+        },
+        {
+          "codigo": "15599",
+          "name": "Ramiriquí",
+          "lat": 5.400303,
+          "lng": -73.334839,
+          "altitud": null
+        },
+        {
+          "codigo": "15600",
+          "name": "Ráquira",
+          "lat": 5.539136,
+          "lng": -73.632543,
+          "altitud": null
+        },
+        {
+          "codigo": "15621",
+          "name": "Rondón",
+          "lat": 5.357378,
+          "lng": -73.208474,
+          "altitud": null
+        },
+        {
+          "codigo": "15632",
+          "name": "Saboyá",
+          "lat": 5.697756,
+          "lng": -73.764456,
+          "altitud": null
+        },
+        {
+          "codigo": "15638",
+          "name": "Sáchica",
+          "lat": 5.584305,
+          "lng": -73.542539,
+          "altitud": null
+        },
+        {
+          "codigo": "15646",
+          "name": "Samacá",
+          "lat": 5.492161,
+          "lng": -73.485589,
+          "altitud": null
+        },
+        {
+          "codigo": "15660",
+          "name": "San Eduardo",
+          "lat": 5.22401,
+          "lng": -73.077747,
+          "altitud": null
+        },
+        {
+          "codigo": "15664",
+          "name": "San José de Pare",
+          "lat": 6.018924,
+          "lng": -73.545397,
+          "altitud": null
+        },
+        {
+          "codigo": "15667",
+          "name": "San Luis de Gaceno",
+          "lat": 4.81976,
+          "lng": -73.168076,
+          "altitud": null
+        },
+        {
+          "codigo": "15673",
+          "name": "San Mateo",
+          "lat": 6.401683,
+          "lng": -72.555264,
+          "altitud": null
+        },
+        {
+          "codigo": "15676",
+          "name": "San Miguel de Sema",
+          "lat": 5.518083,
+          "lng": -73.722009,
+          "altitud": null
+        },
+        {
+          "codigo": "15681",
+          "name": "San Pablo de Borbur",
+          "lat": 5.650743,
+          "lng": -74.069963,
+          "altitud": null
+        },
+        {
+          "codigo": "15690",
+          "name": "Santa María",
+          "lat": 4.857193,
+          "lng": -73.263518,
+          "altitud": null
+        },
+        {
+          "codigo": "15693",
+          "name": "Santa Rosa de Viterbo",
+          "lat": 5.874547,
+          "lng": -72.982461,
+          "altitud": null
+        },
+        {
+          "codigo": "15696",
+          "name": "Santa Sofía",
+          "lat": 5.713269,
+          "lng": -73.602707,
+          "altitud": null
+        },
+        {
+          "codigo": "15686",
+          "name": "Santana",
+          "lat": 6.056866,
+          "lng": -73.481639,
+          "altitud": null
+        },
+        {
+          "codigo": "15720",
+          "name": "Sativanorte",
+          "lat": 6.131132,
+          "lng": -72.708458,
+          "altitud": null
+        },
+        {
+          "codigo": "15723",
+          "name": "Sativasur",
+          "lat": 6.093183,
+          "lng": -72.712435,
+          "altitud": null
+        },
+        {
+          "codigo": "15740",
+          "name": "Siachoque",
+          "lat": 5.511811,
+          "lng": -73.24466,
+          "altitud": null
+        },
+        {
+          "codigo": "15753",
+          "name": "Soatá",
+          "lat": 6.331945,
+          "lng": -72.684051,
+          "altitud": null
+        },
+        {
+          "codigo": "15757",
+          "name": "Socha",
+          "lat": 5.996717,
+          "lng": -72.691963,
+          "altitud": null
+        },
+        {
+          "codigo": "15755",
+          "name": "Socotá",
+          "lat": 6.041162,
+          "lng": -72.636653,
+          "altitud": null
+        },
+        {
+          "codigo": "15759",
+          "name": "Sogamoso",
+          "lat": 5.723976,
+          "lng": -72.924355,
+          "altitud": null
+        },
+        {
+          "codigo": "15761",
+          "name": "Somondoco",
+          "lat": 4.985726,
+          "lng": -73.433393,
+          "altitud": null
+        },
+        {
+          "codigo": "15762",
+          "name": "Sora",
+          "lat": 5.56684,
+          "lng": -73.450153,
+          "altitud": null
+        },
+        {
+          "codigo": "15764",
+          "name": "Soracá",
+          "lat": 5.500898,
+          "lng": -73.332804,
+          "altitud": null
+        },
+        {
+          "codigo": "15763",
+          "name": "Sotaquirá",
+          "lat": 5.764986,
+          "lng": -73.246585,
+          "altitud": null
+        },
+        {
+          "codigo": "15774",
+          "name": "Susacón",
+          "lat": 6.230332,
+          "lng": -72.690289,
+          "altitud": null
+        },
+        {
+          "codigo": "15776",
+          "name": "Sutamarchán",
+          "lat": 5.619781,
+          "lng": -73.620536,
+          "altitud": null
+        },
+        {
+          "codigo": "15778",
+          "name": "Sutatenza",
+          "lat": 5.022989,
+          "lng": -73.452317,
+          "altitud": null
+        },
+        {
+          "codigo": "15790",
+          "name": "Tasco",
+          "lat": 5.909821,
+          "lng": -72.781011,
+          "altitud": null
+        },
+        {
+          "codigo": "15798",
+          "name": "Tenza",
+          "lat": 5.076781,
+          "lng": -73.421176,
+          "altitud": null
+        },
+        {
+          "codigo": "15804",
+          "name": "Tibaná",
+          "lat": 5.317251,
+          "lng": -73.396457,
+          "altitud": null
+        },
+        {
+          "codigo": "15806",
+          "name": "Tibasosa",
+          "lat": 5.74723,
+          "lng": -72.999449,
+          "altitud": null
+        },
+        {
+          "codigo": "15808",
+          "name": "Tinjacá",
+          "lat": 5.579713,
+          "lng": -73.646847,
+          "altitud": null
+        },
+        {
+          "codigo": "15810",
+          "name": "Tipacoque",
+          "lat": 6.419203,
+          "lng": -72.691729,
+          "altitud": null
+        },
+        {
+          "codigo": "15814",
+          "name": "Toca",
+          "lat": 5.566464,
+          "lng": -73.184794,
+          "altitud": null
+        },
+        {
+          "codigo": "15816",
+          "name": "Togüí",
+          "lat": 5.937438,
+          "lng": -73.513655,
+          "altitud": null
+        },
+        {
+          "codigo": "15820",
+          "name": "Tópaga",
+          "lat": 5.768201,
+          "lng": -72.832245,
+          "altitud": null
+        },
+        {
+          "codigo": "15822",
+          "name": "Tota",
+          "lat": 5.560497,
+          "lng": -72.985898,
+          "altitud": null
+        },
+        {
+          "codigo": "15001",
+          "name": "Tunja",
+          "lat": 5.53988,
+          "lng": -73.355539,
+          "altitud": 2810
+        },
+        {
+          "codigo": "15832",
+          "name": "Tununguá",
+          "lat": 5.730582,
+          "lng": -73.933155,
+          "altitud": null
+        },
+        {
+          "codigo": "15835",
+          "name": "Turmequé",
+          "lat": 5.323261,
+          "lng": -73.491825,
+          "altitud": null
+        },
+        {
+          "codigo": "15837",
+          "name": "Tuta",
+          "lat": 5.689082,
+          "lng": -73.230285,
+          "altitud": null
+        },
+        {
+          "codigo": "15839",
+          "name": "Tutazá",
+          "lat": 6.032608,
+          "lng": -72.856035,
+          "altitud": null
+        },
+        {
+          "codigo": "15842",
+          "name": "Úmbita",
+          "lat": 5.221176,
+          "lng": -73.456917,
+          "altitud": null
+        },
+        {
+          "codigo": "15861",
+          "name": "Ventaquemada",
+          "lat": 5.368739,
+          "lng": -73.522368,
+          "altitud": null
+        },
+        {
+          "codigo": "15407",
+          "name": "Villa de Leyva",
+          "lat": 5.632455,
+          "lng": -73.524948,
+          "altitud": 2143
+        },
+        {
+          "codigo": "15879",
+          "name": "Viracachá",
+          "lat": 5.436833,
+          "lng": -73.296894,
+          "altitud": null
+        },
+        {
+          "codigo": "15897",
+          "name": "Zetaquira",
+          "lat": 5.283443,
+          "lng": -73.17098,
+          "altitud": null
+        }
+      ]
+    },
+    "Caldas": {
+      "codigo": "17",
+      "municipios": [
+        {
+          "codigo": "17013",
+          "name": "Aguadas",
+          "lat": 5.610244,
+          "lng": -75.45487,
+          "altitud": 2214
+        },
+        {
+          "codigo": "17042",
+          "name": "Anserma",
+          "lat": 5.236471,
+          "lng": -75.784343,
+          "altitud": 1796
+        },
+        {
+          "codigo": "17050",
+          "name": "Aranzazu",
+          "lat": 5.271195,
+          "lng": -75.49129,
+          "altitud": null
+        },
+        {
+          "codigo": "17088",
+          "name": "Belalcázar",
+          "lat": 4.993785,
+          "lng": -75.811918,
+          "altitud": null
+        },
+        {
+          "codigo": "17174",
+          "name": "Chinchiná",
+          "lat": 4.985227,
+          "lng": -75.607529,
+          "altitud": 1378
+        },
+        {
+          "codigo": "17272",
+          "name": "Filadelfia",
+          "lat": 5.297091,
+          "lng": -75.562474,
+          "altitud": null
+        },
+        {
+          "codigo": "17380",
+          "name": "La Dorada",
+          "lat": 5.460834,
+          "lng": -74.668819,
+          "altitud": null
+        },
+        {
+          "codigo": "17388",
+          "name": "La Merced",
+          "lat": 5.39647,
+          "lng": -75.546486,
+          "altitud": null
+        },
+        {
+          "codigo": "17001",
+          "name": "Manizales",
+          "lat": 5.057657,
+          "lng": -75.491025,
+          "altitud": 2150
+        },
+        {
+          "codigo": "17433",
+          "name": "Manzanares",
+          "lat": 5.255699,
+          "lng": -75.152829,
+          "altitud": null
+        },
+        {
+          "codigo": "17442",
+          "name": "Marmato",
+          "lat": 5.47422,
+          "lng": -75.600049,
+          "altitud": null
+        },
+        {
+          "codigo": "17444",
+          "name": "Marquetalia",
+          "lat": 5.297525,
+          "lng": -75.053097,
+          "altitud": null
+        },
+        {
+          "codigo": "17446",
+          "name": "Marulanda",
+          "lat": 5.284304,
+          "lng": -75.259721,
+          "altitud": null
+        },
+        {
+          "codigo": "17486",
+          "name": "Neira",
+          "lat": 5.166895,
+          "lng": -75.520006,
+          "altitud": null
+        },
+        {
+          "codigo": "17495",
+          "name": "Norcasia",
+          "lat": 5.574796,
+          "lng": -74.889543,
+          "altitud": null
+        },
+        {
+          "codigo": "17513",
+          "name": "Pácora",
+          "lat": 5.527172,
+          "lng": -75.459621,
+          "altitud": null
+        },
+        {
+          "codigo": "17524",
+          "name": "Palestina",
+          "lat": 5.017879,
+          "lng": -75.624577,
+          "altitud": null
+        },
+        {
+          "codigo": "17541",
+          "name": "Pensilvania",
+          "lat": 5.383281,
+          "lng": -75.160299,
+          "altitud": null
+        },
+        {
+          "codigo": "17614",
+          "name": "Riosucio",
+          "lat": 5.423673,
+          "lng": -75.702104,
+          "altitud": null
+        },
+        {
+          "codigo": "17616",
+          "name": "Risaralda",
+          "lat": 5.164509,
+          "lng": -75.76722,
+          "altitud": null
+        },
+        {
+          "codigo": "17653",
+          "name": "Salamina",
+          "lat": 5.403025,
+          "lng": -75.487223,
+          "altitud": 1822
+        },
+        {
+          "codigo": "17662",
+          "name": "Samaná",
+          "lat": 5.41308,
+          "lng": -74.992263,
+          "altitud": null
+        },
+        {
+          "codigo": "17665",
+          "name": "San José",
+          "lat": 5.08231,
+          "lng": -75.792063,
+          "altitud": null
+        },
+        {
+          "codigo": "17777",
+          "name": "Supía",
+          "lat": 5.446843,
+          "lng": -75.64966,
+          "altitud": null
+        },
+        {
+          "codigo": "17867",
+          "name": "Victoria",
+          "lat": 5.317437,
+          "lng": -74.911239,
+          "altitud": null
+        },
+        {
+          "codigo": "17873",
+          "name": "Villamaría",
+          "lat": 5.038925,
+          "lng": -75.502487,
+          "altitud": null
+        },
+        {
+          "codigo": "17877",
+          "name": "Viterbo",
+          "lat": 5.062664,
+          "lng": -75.87061,
+          "altitud": null
+        }
+      ]
+    },
+    "Caquetá": {
+      "codigo": "18",
+      "municipios": [
+        {
+          "codigo": "18029",
+          "name": "Albania",
+          "lat": 1.328526,
+          "lng": -75.878375,
+          "altitud": null
+        },
+        {
+          "codigo": "18094",
+          "name": "Belén de los Andaquíes",
+          "lat": 1.415812,
+          "lng": -75.872405,
+          "altitud": null
+        },
+        {
+          "codigo": "18150",
+          "name": "Cartagena del Chairá",
+          "lat": 1.332371,
+          "lng": -74.847867,
+          "altitud": null
+        },
+        {
+          "codigo": "18205",
+          "name": "Curillo",
+          "lat": 1.033473,
+          "lng": -75.919205,
+          "altitud": null
+        },
+        {
+          "codigo": "18247",
+          "name": "El Doncello",
+          "lat": 1.679951,
+          "lng": -75.283631,
+          "altitud": null
+        },
+        {
+          "codigo": "18256",
+          "name": "El Paujíl",
+          "lat": 1.570226,
+          "lng": -75.326093,
+          "altitud": null
+        },
+        {
+          "codigo": "18001",
+          "name": "Florencia",
+          "lat": 1.618196,
+          "lng": -75.609831,
+          "altitud": 242
+        },
+        {
+          "codigo": "18410",
+          "name": "La Montañita",
+          "lat": 1.479173,
+          "lng": -75.436408,
+          "altitud": null
+        },
+        {
+          "codigo": "18460",
+          "name": "Milán",
+          "lat": 1.29021,
+          "lng": -75.506926,
+          "altitud": null
+        },
+        {
+          "codigo": "18479",
+          "name": "Morelia",
+          "lat": 1.486611,
+          "lng": -75.724146,
+          "altitud": null
+        },
+        {
+          "codigo": "18592",
+          "name": "Puerto Rico",
+          "lat": 1.909063,
+          "lng": -75.157604,
+          "altitud": null
+        },
+        {
+          "codigo": "18610",
+          "name": "San José del Fragua",
+          "lat": 1.330266,
+          "lng": -75.973796,
+          "altitud": null
+        },
+        {
+          "codigo": "18753",
+          "name": "San Vicente del Caguán",
+          "lat": 2.119413,
+          "lng": -74.767894,
+          "altitud": null
+        },
+        {
+          "codigo": "18756",
+          "name": "Solano",
+          "lat": 0.699077,
+          "lng": -75.253702,
+          "altitud": null
+        },
+        {
+          "codigo": "18785",
+          "name": "Solita",
+          "lat": 0.87654,
+          "lng": -75.619902,
+          "altitud": null
+        },
+        {
+          "codigo": "18860",
+          "name": "Valparaíso",
+          "lat": 1.194619,
+          "lng": -75.70671,
+          "altitud": null
+        }
+      ]
+    },
+    "Casanare": {
+      "codigo": "85",
+      "municipios": [
+        {
+          "codigo": "85010",
+          "name": "Aguazul",
+          "lat": 5.172641,
+          "lng": -72.546838,
+          "altitud": null
+        },
+        {
+          "codigo": "85015",
+          "name": "Chámeza",
+          "lat": 5.214527,
+          "lng": -72.87016,
+          "altitud": null
+        },
+        {
+          "codigo": "85125",
+          "name": "Hato Corozal",
+          "lat": 6.154099,
+          "lng": -71.764213,
+          "altitud": null
+        },
+        {
+          "codigo": "85136",
+          "name": "La Salina",
+          "lat": 6.127762,
+          "lng": -72.334978,
+          "altitud": null
+        },
+        {
+          "codigo": "85139",
+          "name": "Maní",
+          "lat": 4.81681,
+          "lng": -72.281384,
+          "altitud": null
+        },
+        {
+          "codigo": "85162",
+          "name": "Monterrey",
+          "lat": 4.877017,
+          "lng": -72.894065,
+          "altitud": null
+        },
+        {
+          "codigo": "85225",
+          "name": "Nunchía",
+          "lat": 5.636474,
+          "lng": -72.195323,
+          "altitud": null
+        },
+        {
+          "codigo": "85230",
+          "name": "Orocué",
+          "lat": 4.790258,
+          "lng": -71.338533,
+          "altitud": null
+        },
+        {
+          "codigo": "85250",
+          "name": "Paz de Ariporo",
+          "lat": 5.879827,
+          "lng": -71.890348,
+          "altitud": null
+        },
+        {
+          "codigo": "85263",
+          "name": "Pore",
+          "lat": 5.72773,
+          "lng": -71.99286,
+          "altitud": null
+        },
+        {
+          "codigo": "85279",
+          "name": "Recetor",
+          "lat": 5.229181,
+          "lng": -72.760991,
+          "altitud": null
+        },
+        {
+          "codigo": "85300",
+          "name": "Sabanalarga",
+          "lat": 4.854787,
+          "lng": -73.038696,
+          "altitud": null
+        },
+        {
+          "codigo": "85315",
+          "name": "Sácama",
+          "lat": 6.096738,
+          "lng": -72.250157,
+          "altitud": null
+        },
+        {
+          "codigo": "85325",
+          "name": "San Luis de Palenque",
+          "lat": 5.422397,
+          "lng": -71.732198,
+          "altitud": null
+        },
+        {
+          "codigo": "85400",
+          "name": "Támara",
+          "lat": 5.829543,
+          "lng": -72.16165,
+          "altitud": null
+        },
+        {
+          "codigo": "85410",
+          "name": "Tauramena",
+          "lat": 5.018977,
+          "lng": -72.74662,
+          "altitud": null
+        },
+        {
+          "codigo": "85430",
+          "name": "Trinidad",
+          "lat": 5.412178,
+          "lng": -71.662812,
+          "altitud": null
+        },
+        {
+          "codigo": "85440",
+          "name": "Villanueva",
+          "lat": 4.61035,
+          "lng": -72.927797,
+          "altitud": null
+        },
+        {
+          "codigo": "85001",
+          "name": "Yopal",
+          "lat": 5.327102,
+          "lng": -72.396132,
+          "altitud": 350
+        }
+      ]
+    },
+    "Cauca": {
+      "codigo": "19",
+      "municipios": [
+        {
+          "codigo": "19022",
+          "name": "Almaguer",
+          "lat": 1.913429,
+          "lng": -76.85607,
+          "altitud": null
+        },
+        {
+          "codigo": "19050",
+          "name": "Argelia",
+          "lat": 2.257427,
+          "lng": -77.24905,
+          "altitud": null
+        },
+        {
+          "codigo": "19075",
+          "name": "Balboa",
+          "lat": 2.040998,
+          "lng": -77.215773,
+          "altitud": null
+        },
+        {
+          "codigo": "19100",
+          "name": "Bolívar",
+          "lat": 1.837538,
+          "lng": -76.966215,
+          "altitud": null
+        },
+        {
+          "codigo": "19110",
+          "name": "Buenos Aires",
+          "lat": 3.015382,
+          "lng": -76.642238,
+          "altitud": null
+        },
+        {
+          "codigo": "19130",
+          "name": "Cajibío",
+          "lat": 2.623371,
+          "lng": -76.570682,
+          "altitud": null
+        },
+        {
+          "codigo": "19137",
+          "name": "Caldono",
+          "lat": 2.798059,
+          "lng": -76.484319,
+          "altitud": null
+        },
+        {
+          "codigo": "19142",
+          "name": "Caloto",
+          "lat": 3.034531,
+          "lng": -76.408941,
+          "altitud": null
+        },
+        {
+          "codigo": "19212",
+          "name": "Corinto",
+          "lat": 3.173854,
+          "lng": -76.261866,
+          "altitud": null
+        },
+        {
+          "codigo": "19256",
+          "name": "El Tambo",
+          "lat": 2.451409,
+          "lng": -76.810911,
+          "altitud": null
+        },
+        {
+          "codigo": "19290",
+          "name": "Florencia",
+          "lat": 1.682535,
+          "lng": -77.072547,
+          "altitud": null
+        },
+        {
+          "codigo": "19300",
+          "name": "Guachené",
+          "lat": 3.134153,
+          "lng": -76.392189,
+          "altitud": null
+        },
+        {
+          "codigo": "19318",
+          "name": "Guapi",
+          "lat": 2.571337,
+          "lng": -77.88797,
+          "altitud": null
+        },
+        {
+          "codigo": "19355",
+          "name": "Inzá",
+          "lat": 2.549183,
+          "lng": -76.063503,
+          "altitud": 1800
+        },
+        {
+          "codigo": "19364",
+          "name": "Jambaló",
+          "lat": 2.777834,
+          "lng": -76.323877,
+          "altitud": null
+        },
+        {
+          "codigo": "19392",
+          "name": "La Sierra",
+          "lat": 2.179383,
+          "lng": -76.763278,
+          "altitud": null
+        },
+        {
+          "codigo": "19397",
+          "name": "La Vega",
+          "lat": 2.001803,
+          "lng": -76.778771,
+          "altitud": null
+        },
+        {
+          "codigo": "19418",
+          "name": "López de Micay",
+          "lat": 2.846788,
+          "lng": -77.247803,
+          "altitud": null
+        },
+        {
+          "codigo": "19450",
+          "name": "Mercaderes",
+          "lat": 1.789193,
+          "lng": -77.164319,
+          "altitud": null
+        },
+        {
+          "codigo": "19455",
+          "name": "Miranda",
+          "lat": 3.254651,
+          "lng": -76.228722,
+          "altitud": null
+        },
+        {
+          "codigo": "19473",
+          "name": "Morales",
+          "lat": 2.754684,
+          "lng": -76.629106,
+          "altitud": null
+        },
+        {
+          "codigo": "19513",
+          "name": "Padilla",
+          "lat": 3.220984,
+          "lng": -76.313265,
+          "altitud": null
+        },
+        {
+          "codigo": "19517",
+          "name": "Páez",
+          "lat": 2.645724,
+          "lng": -75.970685,
+          "altitud": null
+        },
+        {
+          "codigo": "19532",
+          "name": "Patía",
+          "lat": 2.115875,
+          "lng": -76.981075,
+          "altitud": null
+        },
+        {
+          "codigo": "19533",
+          "name": "Piamonte",
+          "lat": 1.11754,
+          "lng": -76.327588,
+          "altitud": null
+        },
+        {
+          "codigo": "19548",
+          "name": "Piendamó - Tunía",
+          "lat": 2.64228,
+          "lng": -76.528615,
+          "altitud": null
+        },
+        {
+          "codigo": "19001",
+          "name": "Popayán",
+          "lat": 2.459641,
+          "lng": -76.599377,
+          "altitud": 1737
+        },
+        {
+          "codigo": "19573",
+          "name": "Puerto Tejada",
+          "lat": 3.233254,
+          "lng": -76.417673,
+          "altitud": null
+        },
+        {
+          "codigo": "19585",
+          "name": "Puracé",
+          "lat": 2.341507,
+          "lng": -76.496698,
+          "altitud": null
+        },
+        {
+          "codigo": "19622",
+          "name": "Rosas",
+          "lat": 2.260941,
+          "lng": -76.740336,
+          "altitud": null
+        },
+        {
+          "codigo": "19693",
+          "name": "San Sebastián",
+          "lat": 1.838451,
+          "lng": -76.769467,
+          "altitud": null
+        },
+        {
+          "codigo": "19701",
+          "name": "Santa Rosa",
+          "lat": 1.700916,
+          "lng": -76.573252,
+          "altitud": null
+        },
+        {
+          "codigo": "19698",
+          "name": "Santander de Quilichao",
+          "lat": 3.015008,
+          "lng": -76.485141,
+          "altitud": null
+        },
+        {
+          "codigo": "19743",
+          "name": "Silvia",
+          "lat": 2.611927,
+          "lng": -76.379753,
+          "altitud": 2620
+        },
+        {
+          "codigo": "19760",
+          "name": "Sotará - Paispamba",
+          "lat": 2.253156,
+          "lng": -76.613365,
+          "altitud": null
+        },
+        {
+          "codigo": "19780",
+          "name": "Suárez",
+          "lat": 2.959785,
+          "lng": -76.69357,
+          "altitud": null
+        },
+        {
+          "codigo": "19785",
+          "name": "Sucre",
+          "lat": 2.038237,
+          "lng": -76.926279,
+          "altitud": null
+        },
+        {
+          "codigo": "19807",
+          "name": "Timbío",
+          "lat": 2.349686,
+          "lng": -76.684476,
+          "altitud": null
+        },
+        {
+          "codigo": "19809",
+          "name": "Timbiquí",
+          "lat": 2.777312,
+          "lng": -77.667541,
+          "altitud": null
+        },
+        {
+          "codigo": "19821",
+          "name": "Toribío",
+          "lat": 2.953017,
+          "lng": -76.270284,
+          "altitud": null
+        },
+        {
+          "codigo": "19824",
+          "name": "Totoró",
+          "lat": 2.510252,
+          "lng": -76.403628,
+          "altitud": null
+        },
+        {
+          "codigo": "19845",
+          "name": "Villa Rica",
+          "lat": 3.17762,
+          "lng": -76.458025,
+          "altitud": null
+        }
+      ]
+    },
+    "Cesar": {
+      "codigo": "20",
+      "municipios": [
+        {
+          "codigo": "20011",
+          "name": "Aguachica",
+          "lat": 8.306811,
+          "lng": -73.614027,
+          "altitud": null
+        },
+        {
+          "codigo": "20013",
+          "name": "Agustín Codazzi",
+          "lat": 10.040454,
+          "lng": -73.238389,
+          "altitud": null
+        },
+        {
+          "codigo": "20032",
+          "name": "Astrea",
+          "lat": 9.498062,
+          "lng": -73.975842,
+          "altitud": null
+        },
+        {
+          "codigo": "20045",
+          "name": "Becerril",
+          "lat": 9.704404,
+          "lng": -73.278707,
+          "altitud": null
+        },
+        {
+          "codigo": "20060",
+          "name": "Bosconia",
+          "lat": 9.975098,
+          "lng": -73.888761,
+          "altitud": null
+        },
+        {
+          "codigo": "20175",
+          "name": "Chimichagua",
+          "lat": 9.25875,
+          "lng": -73.813278,
+          "altitud": null
+        },
+        {
+          "codigo": "20178",
+          "name": "Chiriguaná",
+          "lat": 9.361058,
+          "lng": -73.599913,
+          "altitud": null
+        },
+        {
+          "codigo": "20228",
+          "name": "Curumaní",
+          "lat": 9.201716,
+          "lng": -73.540843,
+          "altitud": null
+        },
+        {
+          "codigo": "20238",
+          "name": "El Copey",
+          "lat": 10.149883,
+          "lng": -73.962703,
+          "altitud": null
+        },
+        {
+          "codigo": "20250",
+          "name": "El Paso",
+          "lat": 9.668461,
+          "lng": -73.742012,
+          "altitud": null
+        },
+        {
+          "codigo": "20295",
+          "name": "Gamarra",
+          "lat": 8.324793,
+          "lng": -73.737558,
+          "altitud": null
+        },
+        {
+          "codigo": "20310",
+          "name": "González",
+          "lat": 8.389604,
+          "lng": -73.38004,
+          "altitud": null
+        },
+        {
+          "codigo": "20383",
+          "name": "La Gloria",
+          "lat": 8.619298,
+          "lng": -73.80321,
+          "altitud": null
+        },
+        {
+          "codigo": "20400",
+          "name": "La Jagua de Ibirico",
+          "lat": 9.563752,
+          "lng": -73.334143,
+          "altitud": null
+        },
+        {
+          "codigo": "20621",
+          "name": "La Paz",
+          "lat": 10.387552,
+          "lng": -73.171365,
+          "altitud": null
+        },
+        {
+          "codigo": "20443",
+          "name": "Manaure Balcón del Cesar",
+          "lat": 10.390776,
+          "lng": -73.029472,
+          "altitud": null
+        },
+        {
+          "codigo": "20517",
+          "name": "Pailitas",
+          "lat": 8.959399,
+          "lng": -73.625825,
+          "altitud": null
+        },
+        {
+          "codigo": "20550",
+          "name": "Pelaya",
+          "lat": 8.689451,
+          "lng": -73.666735,
+          "altitud": null
+        },
+        {
+          "codigo": "20570",
+          "name": "Pueblo Bello",
+          "lat": 10.417321,
+          "lng": -73.586211,
+          "altitud": 1059
+        },
+        {
+          "codigo": "20614",
+          "name": "Río de Oro",
+          "lat": 8.292292,
+          "lng": -73.386393,
+          "altitud": null
+        },
+        {
+          "codigo": "20710",
+          "name": "San Alberto",
+          "lat": 7.76111,
+          "lng": -73.393889,
+          "altitud": null
+        },
+        {
+          "codigo": "20750",
+          "name": "San Diego",
+          "lat": 10.333039,
+          "lng": -73.181208,
+          "altitud": null
+        },
+        {
+          "codigo": "20770",
+          "name": "San Martín",
+          "lat": 7.999855,
+          "lng": -73.510914,
+          "altitud": null
+        },
+        {
+          "codigo": "20787",
+          "name": "Tamalameque",
+          "lat": 8.861725,
+          "lng": -73.812172,
+          "altitud": null
+        },
+        {
+          "codigo": "20001",
+          "name": "Valledupar",
+          "lat": 10.460472,
+          "lng": -73.259398,
+          "altitud": 169
+        }
+      ]
+    },
+    "Chocó": {
+      "codigo": "27",
+      "municipios": [
+        {
+          "codigo": "27006",
+          "name": "Acandí",
+          "lat": 8.512178,
+          "lng": -77.279951,
+          "altitud": null
+        },
+        {
+          "codigo": "27025",
+          "name": "Alto Baudó",
+          "lat": 5.516221,
+          "lng": -76.974373,
+          "altitud": null
+        },
+        {
+          "codigo": "27050",
+          "name": "Atrato",
+          "lat": 5.531419,
+          "lng": -76.635674,
+          "altitud": null
+        },
+        {
+          "codigo": "27073",
+          "name": "Bagadó",
+          "lat": 5.409681,
+          "lng": -76.416063,
+          "altitud": null
+        },
+        {
+          "codigo": "27075",
+          "name": "Bahía Solano",
+          "lat": 6.222807,
+          "lng": -77.401359,
+          "altitud": null
+        },
+        {
+          "codigo": "27077",
+          "name": "Bajo Baudó",
+          "lat": 4.954576,
+          "lng": -77.365717,
+          "altitud": null
+        },
+        {
+          "codigo": "27099",
+          "name": "Bojayá",
+          "lat": 6.559708,
+          "lng": -76.886773,
+          "altitud": null
+        },
+        {
+          "codigo": "27150",
+          "name": "Carmen del Darién",
+          "lat": 7.158294,
+          "lng": -76.970798,
+          "altitud": null
+        },
+        {
+          "codigo": "27160",
+          "name": "Cértegui",
+          "lat": 5.371373,
+          "lng": -76.607619,
+          "altitud": null
+        },
+        {
+          "codigo": "27205",
+          "name": "Condoto",
+          "lat": 5.091003,
+          "lng": -76.650683,
+          "altitud": null
+        },
+        {
+          "codigo": "27135",
+          "name": "El Cantón del San Pablo",
+          "lat": 5.335321,
+          "lng": -76.726844,
+          "altitud": null
+        },
+        {
+          "codigo": "27245",
+          "name": "El Carmen de Atrato",
+          "lat": 5.899789,
+          "lng": -76.142112,
+          "altitud": null
+        },
+        {
+          "codigo": "27250",
+          "name": "El Litoral del San Juan",
+          "lat": 4.259564,
+          "lng": -77.363702,
+          "altitud": null
+        },
+        {
+          "codigo": "27361",
+          "name": "Istmina",
+          "lat": 5.153946,
+          "lng": -76.68518,
+          "altitud": null
+        },
+        {
+          "codigo": "27372",
+          "name": "Juradó",
+          "lat": 7.103619,
+          "lng": -77.762751,
+          "altitud": null
+        },
+        {
+          "codigo": "27413",
+          "name": "Lloró",
+          "lat": 5.49789,
+          "lng": -76.545147,
+          "altitud": null
+        },
+        {
+          "codigo": "27425",
+          "name": "Medio Atrato",
+          "lat": 5.994935,
+          "lng": -76.783042,
+          "altitud": null
+        },
+        {
+          "codigo": "27430",
+          "name": "Medio Baudó",
+          "lat": 5.192471,
+          "lng": -76.950891,
+          "altitud": null
+        },
+        {
+          "codigo": "27450",
+          "name": "Medio San Juan",
+          "lat": 5.098291,
+          "lng": -76.694409,
+          "altitud": null
+        },
+        {
+          "codigo": "27491",
+          "name": "Nóvita",
+          "lat": 4.956063,
+          "lng": -76.609467,
+          "altitud": null
+        },
+        {
+          "codigo": "27493",
+          "name": "Nuevo Belén de Bajirá",
+          "lat": 7.3719,
+          "lng": -76.71727,
+          "altitud": null
+        },
+        {
+          "codigo": "27495",
+          "name": "Nuquí",
+          "lat": 5.709812,
+          "lng": -77.265507,
+          "altitud": null
+        },
+        {
+          "codigo": "27001",
+          "name": "Quibdó",
+          "lat": 5.682166,
+          "lng": -76.638144,
+          "altitud": null
+        },
+        {
+          "codigo": "27580",
+          "name": "Río Iró",
+          "lat": 5.1863,
+          "lng": -76.472925,
+          "altitud": null
+        },
+        {
+          "codigo": "27600",
+          "name": "Río Quito",
+          "lat": 5.483667,
+          "lng": -76.740684,
+          "altitud": null
+        },
+        {
+          "codigo": "27615",
+          "name": "Riosucio",
+          "lat": 7.436704,
+          "lng": -77.113156,
+          "altitud": null
+        },
+        {
+          "codigo": "27660",
+          "name": "San José del Palmar",
+          "lat": 4.896954,
+          "lng": -76.234227,
+          "altitud": null
+        },
+        {
+          "codigo": "27745",
+          "name": "Sipí",
+          "lat": 4.65262,
+          "lng": -76.643453,
+          "altitud": null
+        },
+        {
+          "codigo": "27787",
+          "name": "Tadó",
+          "lat": 5.264873,
+          "lng": -76.558571,
+          "altitud": null
+        },
+        {
+          "codigo": "27800",
+          "name": "Unguía",
+          "lat": 8.04406,
+          "lng": -77.092538,
+          "altitud": null
+        },
+        {
+          "codigo": "27810",
+          "name": "Unión Panamericana",
+          "lat": 5.281108,
+          "lng": -76.630143,
+          "altitud": null
+        }
+      ]
+    },
+    "Córdoba": {
+      "codigo": "23",
+      "municipios": [
+        {
+          "codigo": "23068",
+          "name": "Ayapel",
+          "lat": 8.313838,
+          "lng": -75.146048,
+          "altitud": null
+        },
+        {
+          "codigo": "23079",
+          "name": "Buenavista",
+          "lat": 8.221187,
+          "lng": -75.480897,
+          "altitud": null
+        },
+        {
+          "codigo": "23090",
+          "name": "Canalete",
+          "lat": 8.786939,
+          "lng": -76.241476,
+          "altitud": null
+        },
+        {
+          "codigo": "23162",
+          "name": "Cereté",
+          "lat": 8.888532,
+          "lng": -75.796093,
+          "altitud": null
+        },
+        {
+          "codigo": "23168",
+          "name": "Chimá",
+          "lat": 9.149698,
+          "lng": -75.626886,
+          "altitud": null
+        },
+        {
+          "codigo": "23182",
+          "name": "Chinú",
+          "lat": 9.105473,
+          "lng": -75.399633,
+          "altitud": null
+        },
+        {
+          "codigo": "23189",
+          "name": "Ciénaga de Oro",
+          "lat": 8.875794,
+          "lng": -75.620807,
+          "altitud": null
+        },
+        {
+          "codigo": "23300",
+          "name": "Cotorra",
+          "lat": 9.037163,
+          "lng": -75.799216,
+          "altitud": null
+        },
+        {
+          "codigo": "23350",
+          "name": "La Apartada",
+          "lat": 8.050125,
+          "lng": -75.336031,
+          "altitud": null
+        },
+        {
+          "codigo": "23417",
+          "name": "Lorica",
+          "lat": 9.240789,
+          "lng": -75.816084,
+          "altitud": null
+        },
+        {
+          "codigo": "23419",
+          "name": "Los Córdobas",
+          "lat": 8.892098,
+          "lng": -76.35518,
+          "altitud": null
+        },
+        {
+          "codigo": "23464",
+          "name": "Momil",
+          "lat": 9.240707,
+          "lng": -75.67796,
+          "altitud": null
+        },
+        {
+          "codigo": "23466",
+          "name": "Montelíbano",
+          "lat": 7.973777,
+          "lng": -75.416818,
+          "altitud": null
+        },
+        {
+          "codigo": "23001",
+          "name": "Montería",
+          "lat": 8.759789,
+          "lng": -75.873096,
+          "altitud": 18
+        },
+        {
+          "codigo": "23500",
+          "name": "Moñitos",
+          "lat": 9.245223,
+          "lng": -76.1291,
+          "altitud": null
+        },
+        {
+          "codigo": "23555",
+          "name": "Planeta Rica",
+          "lat": 8.4082,
+          "lng": -75.583241,
+          "altitud": null
+        },
+        {
+          "codigo": "23570",
+          "name": "Pueblo Nuevo",
+          "lat": 8.504099,
+          "lng": -75.508035,
+          "altitud": null
+        },
+        {
+          "codigo": "23574",
+          "name": "Puerto Escondido",
+          "lat": 9.005372,
+          "lng": -76.260411,
+          "altitud": null
+        },
+        {
+          "codigo": "23580",
+          "name": "Puerto Libertador",
+          "lat": 7.888859,
+          "lng": -75.671761,
+          "altitud": null
+        },
+        {
+          "codigo": "23586",
+          "name": "Purísima de la Concepción",
+          "lat": 9.239295,
+          "lng": -75.724987,
+          "altitud": null
+        },
+        {
+          "codigo": "23660",
+          "name": "Sahagún",
+          "lat": 8.943048,
+          "lng": -75.445834,
+          "altitud": null
+        },
+        {
+          "codigo": "23670",
+          "name": "San Andrés de Sotavento",
+          "lat": 9.145448,
+          "lng": -75.50879,
+          "altitud": null
+        },
+        {
+          "codigo": "23672",
+          "name": "San Antero",
+          "lat": 9.376434,
+          "lng": -75.76112,
+          "altitud": null
+        },
+        {
+          "codigo": "23675",
+          "name": "San Bernardo del Viento",
+          "lat": 9.35247,
+          "lng": -75.955107,
+          "altitud": null
+        },
+        {
+          "codigo": "23678",
+          "name": "San Carlos",
+          "lat": 8.799282,
+          "lng": -75.698799,
+          "altitud": null
+        },
+        {
+          "codigo": "23682",
+          "name": "San José de Uré",
+          "lat": 7.787303,
+          "lng": -75.533476,
+          "altitud": null
+        },
+        {
+          "codigo": "23686",
+          "name": "San Pelayo",
+          "lat": 8.958436,
+          "lng": -75.835615,
+          "altitud": null
+        },
+        {
+          "codigo": "23807",
+          "name": "Tierralta",
+          "lat": 8.170612,
+          "lng": -76.059797,
+          "altitud": null
+        },
+        {
+          "codigo": "23815",
+          "name": "Tuchín",
+          "lat": 9.186625,
+          "lng": -75.553962,
+          "altitud": null
+        },
+        {
+          "codigo": "23855",
+          "name": "Valencia",
+          "lat": 8.255016,
+          "lng": -76.150756,
+          "altitud": null
+        }
+      ]
+    },
+    "Cundinamarca": {
+      "codigo": "25",
+      "municipios": [
+        {
+          "codigo": "25001",
+          "name": "Agua de Dios",
+          "lat": 4.375309,
+          "lng": -74.669221,
+          "altitud": 336
+        },
+        {
+          "codigo": "25019",
+          "name": "Albán",
+          "lat": 4.878022,
+          "lng": -74.438261,
+          "altitud": null
+        },
+        {
+          "codigo": "25035",
+          "name": "Anapoima",
+          "lat": 4.562737,
+          "lng": -74.528676,
+          "altitud": 710
+        },
+        {
+          "codigo": "25040",
+          "name": "Anolaima",
+          "lat": 4.7617,
+          "lng": -74.46384,
+          "altitud": 1657
+        },
+        {
+          "codigo": "25599",
+          "name": "Apulo",
+          "lat": 4.520304,
+          "lng": -74.593926,
+          "altitud": 420
+        },
+        {
+          "codigo": "25053",
+          "name": "Arbeláez",
+          "lat": 4.272534,
+          "lng": -74.414901,
+          "altitud": null
+        },
+        {
+          "codigo": "25086",
+          "name": "Beltrán",
+          "lat": 4.802832,
+          "lng": -74.741666,
+          "altitud": null
+        },
+        {
+          "codigo": "25095",
+          "name": "Bituima",
+          "lat": 4.872171,
+          "lng": -74.539609,
+          "altitud": null
+        },
+        {
+          "codigo": "25099",
+          "name": "Bojacá",
+          "lat": 4.737205,
+          "lng": -74.344594,
+          "altitud": 2598
+        },
+        {
+          "codigo": "25120",
+          "name": "Cabrera",
+          "lat": 3.985164,
+          "lng": -74.484549,
+          "altitud": null
+        },
+        {
+          "codigo": "25123",
+          "name": "Cachipay",
+          "lat": 4.730957,
+          "lng": -74.435711,
+          "altitud": null
+        },
+        {
+          "codigo": "25126",
+          "name": "Cajicá",
+          "lat": 4.920009,
+          "lng": -74.02298,
+          "altitud": 2558
+        },
+        {
+          "codigo": "25148",
+          "name": "Caparrapí",
+          "lat": 5.34758,
+          "lng": -74.491045,
+          "altitud": null
+        },
+        {
+          "codigo": "25151",
+          "name": "Cáqueza",
+          "lat": 4.404112,
+          "lng": -73.946473,
+          "altitud": 1746
+        },
+        {
+          "codigo": "25154",
+          "name": "Carmen de Carupa",
+          "lat": 5.349119,
+          "lng": -73.901357,
+          "altitud": null
+        },
+        {
+          "codigo": "25168",
+          "name": "Chaguaní",
+          "lat": 4.948916,
+          "lng": -74.593455,
+          "altitud": null
+        },
+        {
+          "codigo": "25175",
+          "name": "Chía",
+          "lat": 4.866508,
+          "lng": -74.05,
+          "altitud": 2564
+        },
+        {
+          "codigo": "25178",
+          "name": "Chipaque",
+          "lat": 4.442671,
+          "lng": -74.044876,
+          "altitud": null
+        },
+        {
+          "codigo": "25181",
+          "name": "Choachí",
+          "lat": 4.527048,
+          "lng": -73.922894,
+          "altitud": 1923
+        },
+        {
+          "codigo": "25183",
+          "name": "Chocontá",
+          "lat": 5.145224,
+          "lng": -73.683533,
+          "altitud": 2655
+        },
+        {
+          "codigo": "25200",
+          "name": "Cogua",
+          "lat": 5.061842,
+          "lng": -73.978497,
+          "altitud": null
+        },
+        {
+          "codigo": "25214",
+          "name": "Cota",
+          "lat": 4.812564,
+          "lng": -74.102569,
+          "altitud": 2566
+        },
+        {
+          "codigo": "25224",
+          "name": "Cucunubá",
+          "lat": 5.249795,
+          "lng": -73.766113,
+          "altitud": null
+        },
+        {
+          "codigo": "25245",
+          "name": "El Colegio",
+          "lat": 4.577951,
+          "lng": -74.442261,
+          "altitud": 990
+        },
+        {
+          "codigo": "25258",
+          "name": "El Peñón",
+          "lat": 5.248747,
+          "lng": -74.290207,
+          "altitud": null
+        },
+        {
+          "codigo": "25260",
+          "name": "El Rosal",
+          "lat": 4.850589,
+          "lng": -74.263103,
+          "altitud": 2685
+        },
+        {
+          "codigo": "25269",
+          "name": "Facatativá",
+          "lat": 4.813353,
+          "lng": -74.350085,
+          "altitud": 2586
+        },
+        {
+          "codigo": "25279",
+          "name": "Fómeque",
+          "lat": 4.485474,
+          "lng": -73.892523,
+          "altitud": 1895
+        },
+        {
+          "codigo": "25281",
+          "name": "Fosca",
+          "lat": 4.339093,
+          "lng": -73.93902,
+          "altitud": null
+        },
+        {
+          "codigo": "25286",
+          "name": "Funza",
+          "lat": 4.710412,
+          "lng": -74.201528,
+          "altitud": 2548
+        },
+        {
+          "codigo": "25288",
+          "name": "Fúquene",
+          "lat": 5.403997,
+          "lng": -73.795855,
+          "altitud": null
+        },
+        {
+          "codigo": "25290",
+          "name": "Fusagasugá",
+          "lat": 4.336723,
+          "lng": -74.37543,
+          "altitud": 1728
+        },
+        {
+          "codigo": "25293",
+          "name": "Gachalá",
+          "lat": 4.693579,
+          "lng": -73.520161,
+          "altitud": null
+        },
+        {
+          "codigo": "25295",
+          "name": "Gachancipá",
+          "lat": 4.990947,
+          "lng": -73.873464,
+          "altitud": 2568
+        },
+        {
+          "codigo": "25297",
+          "name": "Gachetá",
+          "lat": 4.816411,
+          "lng": -73.636377,
+          "altitud": 1745
+        },
+        {
+          "codigo": "25299",
+          "name": "Gama",
+          "lat": 4.763325,
+          "lng": -73.611037,
+          "altitud": null
+        },
+        {
+          "codigo": "25307",
+          "name": "Girardot",
+          "lat": 4.313069,
+          "lng": -74.798201,
+          "altitud": 289
+        },
+        {
+          "codigo": "25312",
+          "name": "Granada",
+          "lat": 4.519763,
+          "lng": -74.350766,
+          "altitud": null
+        },
+        {
+          "codigo": "25317",
+          "name": "Guachetá",
+          "lat": 5.383378,
+          "lng": -73.686972,
+          "altitud": null
+        },
+        {
+          "codigo": "25320",
+          "name": "Guaduas",
+          "lat": 5.072076,
+          "lng": -74.603402,
+          "altitud": 992
+        },
+        {
+          "codigo": "25322",
+          "name": "Guasca",
+          "lat": 4.866719,
+          "lng": -73.877143,
+          "altitud": 2710
+        },
+        {
+          "codigo": "25324",
+          "name": "Guataquí",
+          "lat": 4.517517,
+          "lng": -74.790058,
+          "altitud": null
+        },
+        {
+          "codigo": "25326",
+          "name": "Guatavita",
+          "lat": 4.935211,
+          "lng": -73.83293,
+          "altitud": 2680
+        },
+        {
+          "codigo": "25328",
+          "name": "Guayabal de Síquima",
+          "lat": 4.877968,
+          "lng": -74.467437,
+          "altitud": null
+        },
+        {
+          "codigo": "25335",
+          "name": "Guayabetal",
+          "lat": 4.215306,
+          "lng": -73.815107,
+          "altitud": null
+        },
+        {
+          "codigo": "25339",
+          "name": "Gutiérrez",
+          "lat": 4.254679,
+          "lng": -74.003042,
+          "altitud": null
+        },
+        {
+          "codigo": "25368",
+          "name": "Jerusalén",
+          "lat": 4.562273,
+          "lng": -74.695474,
+          "altitud": null
+        },
+        {
+          "codigo": "25372",
+          "name": "Junín",
+          "lat": 4.79057,
+          "lng": -73.662961,
+          "altitud": null
+        },
+        {
+          "codigo": "25377",
+          "name": "La Calera",
+          "lat": 4.721104,
+          "lng": -73.968161,
+          "altitud": 2718
+        },
+        {
+          "codigo": "25386",
+          "name": "La Mesa",
+          "lat": 4.631028,
+          "lng": -74.461588,
+          "altitud": 1200
+        },
+        {
+          "codigo": "25394",
+          "name": "La Palma",
+          "lat": 5.358816,
+          "lng": -74.391022,
+          "altitud": null
+        },
+        {
+          "codigo": "25398",
+          "name": "La Peña",
+          "lat": 5.198945,
+          "lng": -74.394105,
+          "altitud": null
+        },
+        {
+          "codigo": "25402",
+          "name": "La Vega",
+          "lat": 4.997768,
+          "lng": -74.336885,
+          "altitud": 1230
+        },
+        {
+          "codigo": "25407",
+          "name": "Lenguazaque",
+          "lat": 5.306131,
+          "lng": -73.711512,
+          "altitud": null
+        },
+        {
+          "codigo": "25426",
+          "name": "Machetá",
+          "lat": 5.08007,
+          "lng": -73.608226,
+          "altitud": null
+        },
+        {
+          "codigo": "25430",
+          "name": "Madrid",
+          "lat": 4.732791,
+          "lng": -74.265854,
+          "altitud": 2554
+        },
+        {
+          "codigo": "25436",
+          "name": "Manta",
+          "lat": 5.009008,
+          "lng": -73.540444,
+          "altitud": null
+        },
+        {
+          "codigo": "25438",
+          "name": "Medina",
+          "lat": 4.506298,
+          "lng": -73.348449,
+          "altitud": null
+        },
+        {
+          "codigo": "25473",
+          "name": "Mosquera",
+          "lat": 4.70653,
+          "lng": -74.221154,
+          "altitud": 2516
+        },
+        {
+          "codigo": "25483",
+          "name": "Nariño",
+          "lat": 4.399837,
+          "lng": -74.824732,
+          "altitud": null
+        },
+        {
+          "codigo": "25486",
+          "name": "Nemocón",
+          "lat": 5.068705,
+          "lng": -73.877888,
+          "altitud": 2585
+        },
+        {
+          "codigo": "25488",
+          "name": "Nilo",
+          "lat": 4.305838,
+          "lng": -74.620009,
+          "altitud": null
+        },
+        {
+          "codigo": "25489",
+          "name": "Nimaima",
+          "lat": 5.125992,
+          "lng": -74.38604,
+          "altitud": null
+        },
+        {
+          "codigo": "25491",
+          "name": "Nocaima",
+          "lat": 5.069466,
+          "lng": -74.379093,
+          "altitud": null
+        },
+        {
+          "codigo": "25513",
+          "name": "Pacho",
+          "lat": 5.136907,
+          "lng": -74.156132,
+          "altitud": 1796
+        },
+        {
+          "codigo": "25518",
+          "name": "Paime",
+          "lat": 5.370487,
+          "lng": -74.152213,
+          "altitud": null
+        },
+        {
+          "codigo": "25524",
+          "name": "Pandi",
+          "lat": 4.190393,
+          "lng": -74.486641,
+          "altitud": null
+        },
+        {
+          "codigo": "25530",
+          "name": "Paratebueno",
+          "lat": 4.374832,
+          "lng": -73.212825,
+          "altitud": null
+        },
+        {
+          "codigo": "25535",
+          "name": "Pasca",
+          "lat": 4.308979,
+          "lng": -74.302276,
+          "altitud": null
+        },
+        {
+          "codigo": "25572",
+          "name": "Puerto Salgar",
+          "lat": 5.465413,
+          "lng": -74.653695,
+          "altitud": 177
+        },
+        {
+          "codigo": "25580",
+          "name": "Pulí",
+          "lat": 4.682022,
+          "lng": -74.71438,
+          "altitud": null
+        },
+        {
+          "codigo": "25592",
+          "name": "Quebradanegra",
+          "lat": 5.118076,
+          "lng": -74.48014,
+          "altitud": null
+        },
+        {
+          "codigo": "25594",
+          "name": "Quetame",
+          "lat": 4.329884,
+          "lng": -73.863214,
+          "altitud": null
+        },
+        {
+          "codigo": "25596",
+          "name": "Quipile",
+          "lat": 4.74481,
+          "lng": -74.533705,
+          "altitud": null
+        },
+        {
+          "codigo": "25612",
+          "name": "Ricaurte",
+          "lat": 4.282113,
+          "lng": -74.772861,
+          "altitud": 289
+        },
+        {
+          "codigo": "25645",
+          "name": "San Antonio del Tequendama",
+          "lat": 4.616138,
+          "lng": -74.351443,
+          "altitud": null
+        },
+        {
+          "codigo": "25649",
+          "name": "San Bernardo",
+          "lat": 4.179433,
+          "lng": -74.42296,
+          "altitud": null
+        },
+        {
+          "codigo": "25653",
+          "name": "San Cayetano",
+          "lat": 5.332938,
+          "lng": -74.024754,
+          "altitud": null
+        },
+        {
+          "codigo": "25658",
+          "name": "San Francisco",
+          "lat": 4.972917,
+          "lng": -74.289672,
+          "altitud": null
+        },
+        {
+          "codigo": "25662",
+          "name": "San Juan de Rioseco",
+          "lat": 4.847575,
+          "lng": -74.621919,
+          "altitud": null
+        },
+        {
+          "codigo": "25718",
+          "name": "Sasaima",
+          "lat": 4.962167,
+          "lng": -74.432628,
+          "altitud": 1203
+        },
+        {
+          "codigo": "25736",
+          "name": "Sesquilé",
+          "lat": 5.04476,
+          "lng": -73.796099,
+          "altitud": 2595
+        },
+        {
+          "codigo": "25740",
+          "name": "Sibaté",
+          "lat": 4.492625,
+          "lng": -74.257874,
+          "altitud": 2700
+        },
+        {
+          "codigo": "25743",
+          "name": "Silvania",
+          "lat": 4.381981,
+          "lng": -74.405534,
+          "altitud": 1470
+        },
+        {
+          "codigo": "25745",
+          "name": "Simijaca",
+          "lat": 5.505231,
+          "lng": -73.850703,
+          "altitud": null
+        },
+        {
+          "codigo": "25754",
+          "name": "Soacha",
+          "lat": 4.579268,
+          "lng": -74.215463,
+          "altitud": 2565
+        },
+        {
+          "codigo": "25758",
+          "name": "Sopó",
+          "lat": 4.915395,
+          "lng": -73.943328,
+          "altitud": 2587
+        },
+        {
+          "codigo": "25769",
+          "name": "Subachoque",
+          "lat": 4.929118,
+          "lng": -74.172773,
+          "altitud": 2663
+        },
+        {
+          "codigo": "25772",
+          "name": "Suesca",
+          "lat": 5.103495,
+          "lng": -73.798227,
+          "altitud": 2584
+        },
+        {
+          "codigo": "25777",
+          "name": "Supatá",
+          "lat": 5.06162,
+          "lng": -74.235403,
+          "altitud": null
+        },
+        {
+          "codigo": "25779",
+          "name": "Susa",
+          "lat": 5.455291,
+          "lng": -73.813938,
+          "altitud": null
+        },
+        {
+          "codigo": "25781",
+          "name": "Sutatausa",
+          "lat": 5.247482,
+          "lng": -73.853159,
+          "altitud": null
+        },
+        {
+          "codigo": "25785",
+          "name": "Tabio",
+          "lat": 4.916832,
+          "lng": -74.096461,
+          "altitud": 2569
+        },
+        {
+          "codigo": "25793",
+          "name": "Tausa",
+          "lat": 5.196333,
+          "lng": -73.887813,
+          "altitud": 2931
+        },
+        {
+          "codigo": "25797",
+          "name": "Tena",
+          "lat": 4.655286,
+          "lng": -74.389193,
+          "altitud": 1384
+        },
+        {
+          "codigo": "25799",
+          "name": "Tenjo",
+          "lat": 4.872014,
+          "lng": -74.143724,
+          "altitud": 2587
+        },
+        {
+          "codigo": "25805",
+          "name": "Tibacuy",
+          "lat": 4.348605,
+          "lng": -74.452662,
+          "altitud": null
+        },
+        {
+          "codigo": "25807",
+          "name": "Tibirita",
+          "lat": 5.052278,
+          "lng": -73.504514,
+          "altitud": null
+        },
+        {
+          "codigo": "25815",
+          "name": "Tocaima",
+          "lat": 4.459279,
+          "lng": -74.636296,
+          "altitud": 400
+        },
+        {
+          "codigo": "25817",
+          "name": "Tocancipá",
+          "lat": 4.964641,
+          "lng": -73.91207,
+          "altitud": 2606
+        },
+        {
+          "codigo": "25823",
+          "name": "Topaipí",
+          "lat": 5.336224,
+          "lng": -74.300626,
+          "altitud": null
+        },
+        {
+          "codigo": "25839",
+          "name": "Ubalá",
+          "lat": 4.74762,
+          "lng": -73.531489,
+          "altitud": null
+        },
+        {
+          "codigo": "25841",
+          "name": "Ubaque",
+          "lat": 4.483788,
+          "lng": -73.933477,
+          "altitud": null
+        },
+        {
+          "codigo": "25845",
+          "name": "Une",
+          "lat": 4.40245,
+          "lng": -74.025183,
+          "altitud": 2378
+        },
+        {
+          "codigo": "25851",
+          "name": "Útica",
+          "lat": 5.19055,
+          "lng": -74.483154,
+          "altitud": null
+        },
+        {
+          "codigo": "25506",
+          "name": "Venecia",
+          "lat": 4.089056,
+          "lng": -74.478301,
+          "altitud": null
+        },
+        {
+          "codigo": "25862",
+          "name": "Vergara",
+          "lat": 5.117258,
+          "lng": -74.346163,
+          "altitud": null
+        },
+        {
+          "codigo": "25867",
+          "name": "Vianí",
+          "lat": 4.875208,
+          "lng": -74.56132,
+          "altitud": null
+        },
+        {
+          "codigo": "25843",
+          "name": "Villa de San Diego de Ubaté",
+          "lat": 5.307463,
+          "lng": -73.814367,
+          "altitud": null
+        },
+        {
+          "codigo": "25871",
+          "name": "Villagómez",
+          "lat": 5.273024,
+          "lng": -74.195145,
+          "altitud": null
+        },
+        {
+          "codigo": "25873",
+          "name": "Villapinzón",
+          "lat": 5.216393,
+          "lng": -73.595704,
+          "altitud": 2715
+        },
+        {
+          "codigo": "25875",
+          "name": "Villeta",
+          "lat": 5.012754,
+          "lng": -74.469686,
+          "altitud": 842
+        },
+        {
+          "codigo": "25878",
+          "name": "Viotá",
+          "lat": 4.43935,
+          "lng": -74.523131,
+          "altitud": 567
+        },
+        {
+          "codigo": "25885",
+          "name": "Yacopí",
+          "lat": 5.459272,
+          "lng": -74.33806,
+          "altitud": null
+        },
+        {
+          "codigo": "25898",
+          "name": "Zipacón",
+          "lat": 4.759932,
+          "lng": -74.379566,
+          "altitud": 2550
+        },
+        {
+          "codigo": "25899",
+          "name": "Zipaquirá",
+          "lat": 5.025477,
+          "lng": -73.994444,
+          "altitud": 2650
+        }
+      ]
+    },
+    "Guainía": {
+      "codigo": "94",
+      "municipios": [
+        {
+          "codigo": "94343",
+          "name": "Barrancominas",
+          "lat": 3.494178,
+          "lng": -69.814066,
+          "altitud": null
+        },
+        {
+          "codigo": "94886",
+          "name": "Cacahual",
+          "lat": 3.52617,
+          "lng": -67.413312,
+          "altitud": null
+        },
+        {
+          "codigo": "94001",
+          "name": "Inírida",
+          "lat": 3.866764,
+          "lng": -67.918613,
+          "altitud": null
+        },
+        {
+          "codigo": "94885",
+          "name": "La Guadalupe",
+          "lat": 1.632464,
+          "lng": -66.963692,
+          "altitud": null
+        },
+        {
+          "codigo": "94888",
+          "name": "Morichal",
+          "lat": 2.265132,
+          "lng": -69.919404,
+          "altitud": null
+        },
+        {
+          "codigo": "94887",
+          "name": "Pana Pana",
+          "lat": 1.865668,
+          "lng": -69.0099,
+          "altitud": null
+        },
+        {
+          "codigo": "94884",
+          "name": "Puerto Colombia",
+          "lat": 2.726438,
+          "lng": -67.566774,
+          "altitud": null
+        },
+        {
+          "codigo": "94883",
+          "name": "San Felipe",
+          "lat": 1.912495,
+          "lng": -67.067848,
+          "altitud": null
+        }
+      ]
+    },
+    "Guaviare": {
+      "codigo": "95",
+      "municipios": [
+        {
+          "codigo": "95015",
+          "name": "Calamar",
+          "lat": 1.960982,
+          "lng": -72.655197,
+          "altitud": null
+        },
+        {
+          "codigo": "95025",
+          "name": "El Retorno",
+          "lat": 2.330164,
+          "lng": -72.627304,
+          "altitud": null
+        },
+        {
+          "codigo": "95200",
+          "name": "Miraflores",
+          "lat": 1.337539,
+          "lng": -71.950416,
+          "altitud": null
+        },
+        {
+          "codigo": "95001",
+          "name": "San José del Guaviare",
+          "lat": 2.565932,
+          "lng": -72.639254,
+          "altitud": null
+        }
+      ]
+    },
+    "Huila": {
+      "codigo": "41",
+      "municipios": [
+        {
+          "codigo": "41006",
+          "name": "Acevedo",
+          "lat": 1.805173,
+          "lng": -75.888706,
+          "altitud": null
+        },
+        {
+          "codigo": "41013",
+          "name": "Agrado",
+          "lat": 2.25987,
+          "lng": -75.772022,
+          "altitud": null
+        },
+        {
+          "codigo": "41016",
+          "name": "Aipe",
+          "lat": 3.223996,
+          "lng": -75.239017,
+          "altitud": null
+        },
+        {
+          "codigo": "41020",
+          "name": "Algeciras",
+          "lat": 2.521674,
+          "lng": -75.315389,
+          "altitud": null
+        },
+        {
+          "codigo": "41026",
+          "name": "Altamira",
+          "lat": 2.063841,
+          "lng": -75.788471,
+          "altitud": null
+        },
+        {
+          "codigo": "41078",
+          "name": "Baraya",
+          "lat": 3.152204,
+          "lng": -75.054843,
+          "altitud": null
+        },
+        {
+          "codigo": "41132",
+          "name": "Campoalegre",
+          "lat": 2.686767,
+          "lng": -75.325748,
+          "altitud": null
+        },
+        {
+          "codigo": "41206",
+          "name": "Colombia",
+          "lat": 3.376745,
+          "lng": -74.802815,
+          "altitud": null
+        },
+        {
+          "codigo": "41244",
+          "name": "Elías",
+          "lat": 2.012854,
+          "lng": -75.938301,
+          "altitud": null
+        },
+        {
+          "codigo": "41298",
+          "name": "Garzón",
+          "lat": 2.196493,
+          "lng": -75.627057,
+          "altitud": null
+        },
+        {
+          "codigo": "41306",
+          "name": "Gigante",
+          "lat": 2.384031,
+          "lng": -75.547681,
+          "altitud": null
+        },
+        {
+          "codigo": "41319",
+          "name": "Guadalupe",
+          "lat": 2.02426,
+          "lng": -75.757185,
+          "altitud": null
+        },
+        {
+          "codigo": "41349",
+          "name": "Hobo",
+          "lat": 2.580812,
+          "lng": -75.447697,
+          "altitud": null
+        },
+        {
+          "codigo": "41357",
+          "name": "Íquira",
+          "lat": 2.649359,
+          "lng": -75.634497,
+          "altitud": null
+        },
+        {
+          "codigo": "41359",
+          "name": "Isnos",
+          "lat": 1.929467,
+          "lng": -76.217637,
+          "altitud": null
+        },
+        {
+          "codigo": "41378",
+          "name": "La Argentina",
+          "lat": 2.198496,
+          "lng": -75.979763,
+          "altitud": null
+        },
+        {
+          "codigo": "41396",
+          "name": "La Plata",
+          "lat": 2.389263,
+          "lng": -75.891254,
+          "altitud": null
+        },
+        {
+          "codigo": "41483",
+          "name": "Nátaga",
+          "lat": 2.5451,
+          "lng": -75.808756,
+          "altitud": null
+        },
+        {
+          "codigo": "41001",
+          "name": "Neiva",
+          "lat": 2.935432,
+          "lng": -75.277327,
+          "altitud": 442
+        },
+        {
+          "codigo": "41503",
+          "name": "Oporapa",
+          "lat": 2.025088,
+          "lng": -75.995165,
+          "altitud": null
+        },
+        {
+          "codigo": "41518",
+          "name": "Paicol",
+          "lat": 2.449651,
+          "lng": -75.773158,
+          "altitud": null
+        },
+        {
+          "codigo": "41524",
+          "name": "Palermo",
+          "lat": 2.889649,
+          "lng": -75.435296,
+          "altitud": null
+        },
+        {
+          "codigo": "41530",
+          "name": "Palestina",
+          "lat": 1.723725,
+          "lng": -76.133251,
+          "altitud": null
+        },
+        {
+          "codigo": "41548",
+          "name": "Pital",
+          "lat": 2.266618,
+          "lng": -75.804544,
+          "altitud": null
+        },
+        {
+          "codigo": "41551",
+          "name": "Pitalito",
+          "lat": 1.852631,
+          "lng": -76.049441,
+          "altitud": 1318
+        },
+        {
+          "codigo": "41615",
+          "name": "Rivera",
+          "lat": 2.777586,
+          "lng": -75.258753,
+          "altitud": null
+        },
+        {
+          "codigo": "41660",
+          "name": "Saladoblanco",
+          "lat": 1.9934,
+          "lng": -76.044747,
+          "altitud": null
+        },
+        {
+          "codigo": "41668",
+          "name": "San Agustín",
+          "lat": 1.881081,
+          "lng": -76.27036,
+          "altitud": 1730
+        },
+        {
+          "codigo": "41676",
+          "name": "Santa María",
+          "lat": 2.939603,
+          "lng": -75.586223,
+          "altitud": null
+        },
+        {
+          "codigo": "41770",
+          "name": "Suaza",
+          "lat": 1.976051,
+          "lng": -75.79525,
+          "altitud": null
+        },
+        {
+          "codigo": "41791",
+          "name": "Tarqui",
+          "lat": 2.111325,
+          "lng": -75.823976,
+          "altitud": null
+        },
+        {
+          "codigo": "41799",
+          "name": "Tello",
+          "lat": 3.067538,
+          "lng": -75.138773,
+          "altitud": null
+        },
+        {
+          "codigo": "41801",
+          "name": "Teruel",
+          "lat": 2.740968,
+          "lng": -75.567034,
+          "altitud": null
+        },
+        {
+          "codigo": "41797",
+          "name": "Tesalia",
+          "lat": 2.486364,
+          "lng": -75.730271,
+          "altitud": null
+        },
+        {
+          "codigo": "41807",
+          "name": "Timaná",
+          "lat": 1.974539,
+          "lng": -75.932167,
+          "altitud": null
+        },
+        {
+          "codigo": "41872",
+          "name": "Villavieja",
+          "lat": 3.218822,
+          "lng": -75.217174,
+          "altitud": null
+        },
+        {
+          "codigo": "41885",
+          "name": "Yaguará",
+          "lat": 2.664694,
+          "lng": -75.518023,
+          "altitud": null
+        }
+      ]
+    },
+    "La Guajira": {
+      "codigo": "44",
+      "municipios": [
+        {
+          "codigo": "44035",
+          "name": "Albania",
+          "lat": 11.151628,
+          "lng": -72.61232,
+          "altitud": null
+        },
+        {
+          "codigo": "44078",
+          "name": "Barrancas",
+          "lat": 10.958669,
+          "lng": -72.793639,
+          "altitud": null
+        },
+        {
+          "codigo": "44090",
+          "name": "Dibulla",
+          "lat": 11.27155,
+          "lng": -73.307598,
+          "altitud": null
+        },
+        {
+          "codigo": "44098",
+          "name": "Distracción",
+          "lat": 10.898414,
+          "lng": -72.887405,
+          "altitud": null
+        },
+        {
+          "codigo": "44110",
+          "name": "El Molino",
+          "lat": 10.653505,
+          "lng": -72.92673,
+          "altitud": null
+        },
+        {
+          "codigo": "44279",
+          "name": "Fonseca",
+          "lat": 10.886734,
+          "lng": -72.846319,
+          "altitud": null
+        },
+        {
+          "codigo": "44378",
+          "name": "Hatonuevo",
+          "lat": 11.068864,
+          "lng": -72.75904,
+          "altitud": null
+        },
+        {
+          "codigo": "44420",
+          "name": "La Jagua del Pilar",
+          "lat": 10.511862,
+          "lng": -73.072638,
+          "altitud": null
+        },
+        {
+          "codigo": "44430",
+          "name": "Maicao",
+          "lat": 11.378535,
+          "lng": -72.242738,
+          "altitud": null
+        },
+        {
+          "codigo": "44560",
+          "name": "Manaure",
+          "lat": 11.773767,
+          "lng": -72.438739,
+          "altitud": null
+        },
+        {
+          "codigo": "44001",
+          "name": "Riohacha",
+          "lat": 11.528588,
+          "lng": -72.911795,
+          "altitud": 9
+        },
+        {
+          "codigo": "44650",
+          "name": "San Juan del Cesar",
+          "lat": 10.769546,
+          "lng": -73.000629,
+          "altitud": 196
+        },
+        {
+          "codigo": "44847",
+          "name": "Uribia",
+          "lat": 11.711904,
+          "lng": -72.265906,
+          "altitud": null
+        },
+        {
+          "codigo": "44855",
+          "name": "Urumita",
+          "lat": 10.560169,
+          "lng": -73.012507,
+          "altitud": null
+        },
+        {
+          "codigo": "44874",
+          "name": "Villanueva",
+          "lat": 10.608774,
+          "lng": -72.977583,
+          "altitud": null
+        }
+      ]
+    },
+    "Magdalena": {
+      "codigo": "47",
+      "municipios": [
+        {
+          "codigo": "47030",
+          "name": "Algarrobo",
+          "lat": 10.188059,
+          "lng": -74.061132,
+          "altitud": null
+        },
+        {
+          "codigo": "47053",
+          "name": "Aracataca",
+          "lat": 10.589791,
+          "lng": -74.186702,
+          "altitud": 40
+        },
+        {
+          "codigo": "47058",
+          "name": "Ariguaní",
+          "lat": 9.847047,
+          "lng": -74.236515,
+          "altitud": null
+        },
+        {
+          "codigo": "47161",
+          "name": "Cerro de San Antonio",
+          "lat": 10.325531,
+          "lng": -74.868474,
+          "altitud": null
+        },
+        {
+          "codigo": "47170",
+          "name": "Chivolo",
+          "lat": 10.026631,
+          "lng": -74.622242,
+          "altitud": null
+        },
+        {
+          "codigo": "47189",
+          "name": "Ciénaga",
+          "lat": 11.006654,
+          "lng": -74.241286,
+          "altitud": 3
+        },
+        {
+          "codigo": "47205",
+          "name": "Concordia",
+          "lat": 10.257314,
+          "lng": -74.83303,
+          "altitud": null
+        },
+        {
+          "codigo": "47245",
+          "name": "El Banco",
+          "lat": 9.008503,
+          "lng": -73.97437,
+          "altitud": null
+        },
+        {
+          "codigo": "47258",
+          "name": "El Piñón",
+          "lat": 10.402781,
+          "lng": -74.823094,
+          "altitud": null
+        },
+        {
+          "codigo": "47268",
+          "name": "El Retén",
+          "lat": 10.610488,
+          "lng": -74.268444,
+          "altitud": null
+        },
+        {
+          "codigo": "47288",
+          "name": "Fundación",
+          "lat": 10.514146,
+          "lng": -74.191453,
+          "altitud": null
+        },
+        {
+          "codigo": "47318",
+          "name": "Guamal",
+          "lat": 9.144354,
+          "lng": -74.223689,
+          "altitud": null
+        },
+        {
+          "codigo": "47460",
+          "name": "Nueva Granada",
+          "lat": 9.80186,
+          "lng": -74.391841,
+          "altitud": null
+        },
+        {
+          "codigo": "47541",
+          "name": "Pedraza",
+          "lat": 10.18825,
+          "lng": -74.9154,
+          "altitud": null
+        },
+        {
+          "codigo": "47545",
+          "name": "Pijiño del Carmen",
+          "lat": 9.331922,
+          "lng": -74.459034,
+          "altitud": null
+        },
+        {
+          "codigo": "47551",
+          "name": "Pivijay",
+          "lat": 10.460707,
+          "lng": -74.613312,
+          "altitud": null
+        },
+        {
+          "codigo": "47555",
+          "name": "Plato",
+          "lat": 9.796713,
+          "lng": -74.784549,
+          "altitud": null
+        },
+        {
+          "codigo": "47570",
+          "name": "Puebloviejo",
+          "lat": 10.994766,
+          "lng": -74.28253,
+          "altitud": null
+        },
+        {
+          "codigo": "47605",
+          "name": "Remolino",
+          "lat": 10.701952,
+          "lng": -74.716172,
+          "altitud": null
+        },
+        {
+          "codigo": "47660",
+          "name": "Sabanas de San Ángel",
+          "lat": 10.032536,
+          "lng": -74.213946,
+          "altitud": null
+        },
+        {
+          "codigo": "47675",
+          "name": "Salamina",
+          "lat": 10.491229,
+          "lng": -74.794189,
+          "altitud": null
+        },
+        {
+          "codigo": "47692",
+          "name": "San Sebastián de Buenavista",
+          "lat": 9.241656,
+          "lng": -74.351498,
+          "altitud": null
+        },
+        {
+          "codigo": "47703",
+          "name": "San Zenón",
+          "lat": 9.245061,
+          "lng": -74.498992,
+          "altitud": null
+        },
+        {
+          "codigo": "47707",
+          "name": "Santa Ana",
+          "lat": 9.324294,
+          "lng": -74.566845,
+          "altitud": null
+        },
+        {
+          "codigo": "47720",
+          "name": "Santa Bárbara de Pinto",
+          "lat": 9.432263,
+          "lng": -74.704667,
+          "altitud": null
+        },
+        {
+          "codigo": "47001",
+          "name": "Santa Marta",
+          "lat": 11.204679,
+          "lng": -74.199829,
+          "altitud": 2
+        },
+        {
+          "codigo": "47745",
+          "name": "Sitionuevo",
+          "lat": 10.775285,
+          "lng": -74.720021,
+          "altitud": null
+        },
+        {
+          "codigo": "47798",
+          "name": "Tenerife",
+          "lat": 9.898273,
+          "lng": -74.859783,
+          "altitud": null
+        },
+        {
+          "codigo": "47960",
+          "name": "Zapayán",
+          "lat": 10.168297,
+          "lng": -74.716878,
+          "altitud": null
+        },
+        {
+          "codigo": "47980",
+          "name": "Zona Bananera",
+          "lat": 10.763024,
+          "lng": -74.140091,
+          "altitud": null
+        }
+      ]
+    },
+    "Meta": {
+      "codigo": "50",
+      "municipios": [
+        {
+          "codigo": "50006",
+          "name": "Acacías",
+          "lat": 3.990413,
+          "lng": -73.766034,
+          "altitud": 525
+        },
+        {
+          "codigo": "50110",
+          "name": "Barranca de Upía",
+          "lat": 4.566225,
+          "lng": -72.961083,
+          "altitud": null
+        },
+        {
+          "codigo": "50124",
+          "name": "Cabuyaro",
+          "lat": 4.286705,
+          "lng": -72.791768,
+          "altitud": null
+        },
+        {
+          "codigo": "50150",
+          "name": "Castilla la Nueva",
+          "lat": 3.830005,
+          "lng": -73.687302,
+          "altitud": null
+        },
+        {
+          "codigo": "50223",
+          "name": "Cubarral",
+          "lat": 3.793653,
+          "lng": -73.837999,
+          "altitud": null
+        },
+        {
+          "codigo": "50226",
+          "name": "Cumaral",
+          "lat": 4.270042,
+          "lng": -73.487052,
+          "altitud": null
+        },
+        {
+          "codigo": "50245",
+          "name": "El Calvario",
+          "lat": 4.352665,
+          "lng": -73.713325,
+          "altitud": null
+        },
+        {
+          "codigo": "50251",
+          "name": "El Castillo",
+          "lat": 3.563907,
+          "lng": -73.794225,
+          "altitud": null
+        },
+        {
+          "codigo": "50270",
+          "name": "El Dorado",
+          "lat": 3.739984,
+          "lng": -73.835264,
+          "altitud": null
+        },
+        {
+          "codigo": "50287",
+          "name": "Fuente de Oro",
+          "lat": 3.462875,
+          "lng": -73.618121,
+          "altitud": null
+        },
+        {
+          "codigo": "50313",
+          "name": "Granada",
+          "lat": 3.547147,
+          "lng": -73.705815,
+          "altitud": null
+        },
+        {
+          "codigo": "50318",
+          "name": "Guamal",
+          "lat": 3.879657,
+          "lng": -73.768815,
+          "altitud": null
+        },
+        {
+          "codigo": "50350",
+          "name": "La Macarena",
+          "lat": 2.177143,
+          "lng": -73.78661,
+          "altitud": null
+        },
+        {
+          "codigo": "50400",
+          "name": "Lejanías",
+          "lat": 3.525115,
+          "lng": -74.023514,
+          "altitud": null
+        },
+        {
+          "codigo": "50325",
+          "name": "Mapiripán",
+          "lat": 2.896617,
+          "lng": -72.135509,
+          "altitud": null
+        },
+        {
+          "codigo": "50330",
+          "name": "Mesetas",
+          "lat": 3.382732,
+          "lng": -74.044328,
+          "altitud": null
+        },
+        {
+          "codigo": "50450",
+          "name": "Puerto Concordia",
+          "lat": 2.624006,
+          "lng": -72.760209,
+          "altitud": null
+        },
+        {
+          "codigo": "50568",
+          "name": "Puerto Gaitán",
+          "lat": 4.314905,
+          "lng": -72.087649,
+          "altitud": null
+        },
+        {
+          "codigo": "50577",
+          "name": "Puerto Lleras",
+          "lat": 3.272117,
+          "lng": -73.37385,
+          "altitud": null
+        },
+        {
+          "codigo": "50573",
+          "name": "Puerto López",
+          "lat": 4.09349,
+          "lng": -72.957324,
+          "altitud": null
+        },
+        {
+          "codigo": "50590",
+          "name": "Puerto Rico",
+          "lat": 2.939621,
+          "lng": -73.206314,
+          "altitud": null
+        },
+        {
+          "codigo": "50606",
+          "name": "Restrepo",
+          "lat": 4.259556,
+          "lng": -73.565408,
+          "altitud": null
+        },
+        {
+          "codigo": "50680",
+          "name": "San Carlos de Guaroa",
+          "lat": 3.71065,
+          "lng": -73.242253,
+          "altitud": null
+        },
+        {
+          "codigo": "50683",
+          "name": "San Juan de Arama",
+          "lat": 3.373728,
+          "lng": -73.875832,
+          "altitud": null
+        },
+        {
+          "codigo": "50686",
+          "name": "San Juanito",
+          "lat": 4.458181,
+          "lng": -73.676699,
+          "altitud": null
+        },
+        {
+          "codigo": "50689",
+          "name": "San Martín",
+          "lat": 3.701899,
+          "lng": -73.695812,
+          "altitud": null
+        },
+        {
+          "codigo": "50370",
+          "name": "Uribe",
+          "lat": 3.239634,
+          "lng": -74.351508,
+          "altitud": null
+        },
+        {
+          "codigo": "50001",
+          "name": "Villavicencio",
+          "lat": 4.126369,
+          "lng": -73.622601,
+          "altitud": 467
+        },
+        {
+          "codigo": "50711",
+          "name": "Vistahermosa",
+          "lat": 3.125579,
+          "lng": -73.750966,
+          "altitud": null
+        }
+      ]
+    },
+    "Nariño": {
+      "codigo": "52",
+      "municipios": [
+        {
+          "codigo": "52019",
+          "name": "Albán",
+          "lat": 1.474978,
+          "lng": -77.080712,
+          "altitud": null
+        },
+        {
+          "codigo": "52022",
+          "name": "Aldana",
+          "lat": 0.882381,
+          "lng": -77.700564,
+          "altitud": null
+        },
+        {
+          "codigo": "52036",
+          "name": "Ancuya",
+          "lat": 1.263276,
+          "lng": -77.514512,
+          "altitud": null
+        },
+        {
+          "codigo": "52051",
+          "name": "Arboleda",
+          "lat": 1.503418,
+          "lng": -77.135467,
+          "altitud": null
+        },
+        {
+          "codigo": "52079",
+          "name": "Barbacoas",
+          "lat": 1.671733,
+          "lng": -78.13765,
+          "altitud": null
+        },
+        {
+          "codigo": "52083",
+          "name": "Belén",
+          "lat": 1.595681,
+          "lng": -77.015619,
+          "altitud": null
+        },
+        {
+          "codigo": "52110",
+          "name": "Buesaco",
+          "lat": 1.381453,
+          "lng": -77.156463,
+          "altitud": null
+        },
+        {
+          "codigo": "52240",
+          "name": "Chachagüí",
+          "lat": 1.360545,
+          "lng": -77.281869,
+          "altitud": null
+        },
+        {
+          "codigo": "52203",
+          "name": "Colón",
+          "lat": 1.643878,
+          "lng": -77.019777,
+          "altitud": null
+        },
+        {
+          "codigo": "52207",
+          "name": "Consacá",
+          "lat": 1.207854,
+          "lng": -77.466136,
+          "altitud": null
+        },
+        {
+          "codigo": "52210",
+          "name": "Contadero",
+          "lat": 0.910458,
+          "lng": -77.549409,
+          "altitud": null
+        },
+        {
+          "codigo": "52215",
+          "name": "Córdoba",
+          "lat": 0.854564,
+          "lng": -77.517897,
+          "altitud": null
+        },
+        {
+          "codigo": "52224",
+          "name": "Cuaspud Carlosama",
+          "lat": 0.862978,
+          "lng": -77.728947,
+          "altitud": null
+        },
+        {
+          "codigo": "52227",
+          "name": "Cumbal",
+          "lat": 0.906367,
+          "lng": -77.792505,
+          "altitud": null
+        },
+        {
+          "codigo": "52233",
+          "name": "Cumbitara",
+          "lat": 1.647163,
+          "lng": -77.578616,
+          "altitud": null
+        },
+        {
+          "codigo": "52250",
+          "name": "El Charco",
+          "lat": 2.479688,
+          "lng": -78.110217,
+          "altitud": null
+        },
+        {
+          "codigo": "52254",
+          "name": "El Peñol",
+          "lat": 1.453567,
+          "lng": -77.438522,
+          "altitud": null
+        },
+        {
+          "codigo": "52256",
+          "name": "El Rosario",
+          "lat": 1.745309,
+          "lng": -77.33417,
+          "altitud": null
+        },
+        {
+          "codigo": "52258",
+          "name": "El Tablón de Gómez",
+          "lat": 1.427277,
+          "lng": -77.097101,
+          "altitud": null
+        },
+        {
+          "codigo": "52260",
+          "name": "El Tambo",
+          "lat": 1.407913,
+          "lng": -77.390772,
+          "altitud": null
+        },
+        {
+          "codigo": "52520",
+          "name": "Francisco Pizarro",
+          "lat": 2.040629,
+          "lng": -78.658361,
+          "altitud": null
+        },
+        {
+          "codigo": "52287",
+          "name": "Funes",
+          "lat": 1.001159,
+          "lng": -77.448913,
+          "altitud": null
+        },
+        {
+          "codigo": "52317",
+          "name": "Guachucal",
+          "lat": 0.959744,
+          "lng": -77.731589,
+          "altitud": null
+        },
+        {
+          "codigo": "52320",
+          "name": "Guaitarilla",
+          "lat": 1.129574,
+          "lng": -77.549824,
+          "altitud": null
+        },
+        {
+          "codigo": "52323",
+          "name": "Gualmatán",
+          "lat": 0.919652,
+          "lng": -77.568701,
+          "altitud": null
+        },
+        {
+          "codigo": "52352",
+          "name": "Iles",
+          "lat": 0.96952,
+          "lng": -77.521227,
+          "altitud": null
+        },
+        {
+          "codigo": "52354",
+          "name": "Imués",
+          "lat": 1.05506,
+          "lng": -77.496339,
+          "altitud": null
+        },
+        {
+          "codigo": "52356",
+          "name": "Ipiales",
+          "lat": 0.827732,
+          "lng": -77.646367,
+          "altitud": 2898
+        },
+        {
+          "codigo": "52378",
+          "name": "La Cruz",
+          "lat": 1.601318,
+          "lng": -76.970504,
+          "altitud": null
+        },
+        {
+          "codigo": "52381",
+          "name": "La Florida",
+          "lat": 1.29753,
+          "lng": -77.402882,
+          "altitud": null
+        },
+        {
+          "codigo": "52385",
+          "name": "La Llanada",
+          "lat": 1.472892,
+          "lng": -77.58091,
+          "altitud": null
+        },
+        {
+          "codigo": "52390",
+          "name": "La Tola",
+          "lat": 2.398999,
+          "lng": -78.189725,
+          "altitud": null
+        },
+        {
+          "codigo": "52399",
+          "name": "La Unión",
+          "lat": 1.600219,
+          "lng": -77.131316,
+          "altitud": null
+        },
+        {
+          "codigo": "52405",
+          "name": "Leiva",
+          "lat": 1.934453,
+          "lng": -77.306135,
+          "altitud": null
+        },
+        {
+          "codigo": "52411",
+          "name": "Linares",
+          "lat": 1.350814,
+          "lng": -77.523953,
+          "altitud": null
+        },
+        {
+          "codigo": "52418",
+          "name": "Los Andes",
+          "lat": 1.494587,
+          "lng": -77.521303,
+          "altitud": null
+        },
+        {
+          "codigo": "52427",
+          "name": "Magüí",
+          "lat": 1.765633,
+          "lng": -78.182924,
+          "altitud": null
+        },
+        {
+          "codigo": "52435",
+          "name": "Mallama",
+          "lat": 1.141037,
+          "lng": -77.864549,
+          "altitud": null
+        },
+        {
+          "codigo": "52473",
+          "name": "Mosquera",
+          "lat": 2.507139,
+          "lng": -78.452992,
+          "altitud": null
+        },
+        {
+          "codigo": "52480",
+          "name": "Nariño",
+          "lat": 1.288979,
+          "lng": -77.357972,
+          "altitud": null
+        },
+        {
+          "codigo": "52490",
+          "name": "Olaya Herrera",
+          "lat": 2.347457,
+          "lng": -78.325814,
+          "altitud": null
+        },
+        {
+          "codigo": "52506",
+          "name": "Ospina",
+          "lat": 1.058433,
+          "lng": -77.566082,
+          "altitud": null
+        },
+        {
+          "codigo": "52001",
+          "name": "Pasto",
+          "lat": 1.212352,
+          "lng": -77.278795,
+          "altitud": 2527
+        },
+        {
+          "codigo": "52540",
+          "name": "Policarpa",
+          "lat": 1.627196,
+          "lng": -77.458686,
+          "altitud": null
+        },
+        {
+          "codigo": "52560",
+          "name": "Potosí",
+          "lat": 0.806639,
+          "lng": -77.573003,
+          "altitud": null
+        },
+        {
+          "codigo": "52565",
+          "name": "Providencia",
+          "lat": 1.237814,
+          "lng": -77.596794,
+          "altitud": null
+        },
+        {
+          "codigo": "52573",
+          "name": "Puerres",
+          "lat": 0.885125,
+          "lng": -77.504211,
+          "altitud": null
+        },
+        {
+          "codigo": "52585",
+          "name": "Pupiales",
+          "lat": 0.870442,
+          "lng": -77.636042,
+          "altitud": null
+        },
+        {
+          "codigo": "52612",
+          "name": "Ricaurte",
+          "lat": 1.212492,
+          "lng": -77.995153,
+          "altitud": null
+        },
+        {
+          "codigo": "52621",
+          "name": "Roberto Payán",
+          "lat": 1.697492,
+          "lng": -78.245716,
+          "altitud": null
+        },
+        {
+          "codigo": "52678",
+          "name": "Samaniego",
+          "lat": 1.335438,
+          "lng": -77.594341,
+          "altitud": null
+        },
+        {
+          "codigo": "52835",
+          "name": "San Andrés de Tumaco",
+          "lat": 1.807399,
+          "lng": -78.764073,
+          "altitud": null
+        },
+        {
+          "codigo": "52685",
+          "name": "San Bernardo",
+          "lat": 1.513762,
+          "lng": -77.0475,
+          "altitud": null
+        },
+        {
+          "codigo": "52687",
+          "name": "San Lorenzo",
+          "lat": 1.503362,
+          "lng": -77.21542,
+          "altitud": null
+        },
+        {
+          "codigo": "52693",
+          "name": "San Pablo",
+          "lat": 1.669429,
+          "lng": -77.013984,
+          "altitud": null
+        },
+        {
+          "codigo": "52694",
+          "name": "San Pedro de Cartago",
+          "lat": 1.551572,
+          "lng": -77.11941,
+          "altitud": null
+        },
+        {
+          "codigo": "52683",
+          "name": "Sandoná",
+          "lat": 1.283438,
+          "lng": -77.47313,
+          "altitud": null
+        },
+        {
+          "codigo": "52696",
+          "name": "Santa Bárbara",
+          "lat": 2.449653,
+          "lng": -77.979916,
+          "altitud": null
+        },
+        {
+          "codigo": "52699",
+          "name": "Santacruz",
+          "lat": 1.222589,
+          "lng": -77.677035,
+          "altitud": null
+        },
+        {
+          "codigo": "52720",
+          "name": "Sapuyes",
+          "lat": 1.037536,
+          "lng": -77.62028,
+          "altitud": null
+        },
+        {
+          "codigo": "52786",
+          "name": "Taminango",
+          "lat": 1.570358,
+          "lng": -77.2808,
+          "altitud": null
+        },
+        {
+          "codigo": "52788",
+          "name": "Tangua",
+          "lat": 1.09482,
+          "lng": -77.393735,
+          "altitud": null
+        },
+        {
+          "codigo": "52838",
+          "name": "Túquerres",
+          "lat": 1.085044,
+          "lng": -77.61672,
+          "altitud": 3104
+        },
+        {
+          "codigo": "52885",
+          "name": "Yacuanquer",
+          "lat": 1.115937,
+          "lng": -77.400169,
+          "altitud": null
+        }
+      ]
+    },
+    "Norte de Santander": {
+      "codigo": "54",
+      "municipios": [
+        {
+          "codigo": "54003",
+          "name": "Ábrego",
+          "lat": 8.081616,
+          "lng": -73.221722,
+          "altitud": null
+        },
+        {
+          "codigo": "54051",
+          "name": "Arboledas",
+          "lat": 7.642985,
+          "lng": -72.798952,
+          "altitud": null
+        },
+        {
+          "codigo": "54099",
+          "name": "Bochalema",
+          "lat": 7.612192,
+          "lng": -72.64701,
+          "altitud": null
+        },
+        {
+          "codigo": "54109",
+          "name": "Bucarasica",
+          "lat": 8.041299,
+          "lng": -72.868231,
+          "altitud": null
+        },
+        {
+          "codigo": "54128",
+          "name": "Cáchira",
+          "lat": 7.741248,
+          "lng": -73.048983,
+          "altitud": null
+        },
+        {
+          "codigo": "54125",
+          "name": "Cácota",
+          "lat": 7.268705,
+          "lng": -72.642059,
+          "altitud": null
+        },
+        {
+          "codigo": "54172",
+          "name": "Chinácota",
+          "lat": 7.603112,
+          "lng": -72.601162,
+          "altitud": null
+        },
+        {
+          "codigo": "54174",
+          "name": "Chitagá",
+          "lat": 7.138187,
+          "lng": -72.665468,
+          "altitud": null
+        },
+        {
+          "codigo": "54206",
+          "name": "Convención",
+          "lat": 8.470374,
+          "lng": -73.3372,
+          "altitud": null
+        },
+        {
+          "codigo": "54223",
+          "name": "Cucutilla",
+          "lat": 7.539633,
+          "lng": -72.772816,
+          "altitud": null
+        },
+        {
+          "codigo": "54239",
+          "name": "Durania",
+          "lat": 7.714804,
+          "lng": -72.658491,
+          "altitud": null
+        },
+        {
+          "codigo": "54245",
+          "name": "El Carmen",
+          "lat": 8.510579,
+          "lng": -73.446687,
+          "altitud": null
+        },
+        {
+          "codigo": "54250",
+          "name": "El Tarra",
+          "lat": 8.574281,
+          "lng": -73.09614,
+          "altitud": null
+        },
+        {
+          "codigo": "54261",
+          "name": "El Zulia",
+          "lat": 7.938572,
+          "lng": -72.604717,
+          "altitud": null
+        },
+        {
+          "codigo": "54313",
+          "name": "Gramalote",
+          "lat": 7.916946,
+          "lng": -72.787233,
+          "altitud": null
+        },
+        {
+          "codigo": "54344",
+          "name": "Hacarí",
+          "lat": 8.321506,
+          "lng": -73.145997,
+          "altitud": null
+        },
+        {
+          "codigo": "54347",
+          "name": "Herrán",
+          "lat": 7.506541,
+          "lng": -72.483519,
+          "altitud": null
+        },
+        {
+          "codigo": "54385",
+          "name": "La Esperanza",
+          "lat": 7.639839,
+          "lng": -73.328126,
+          "altitud": null
+        },
+        {
+          "codigo": "54398",
+          "name": "La Playa",
+          "lat": 8.21124,
+          "lng": -73.239986,
+          "altitud": null
+        },
+        {
+          "codigo": "54377",
+          "name": "Labateca",
+          "lat": 7.298414,
+          "lng": -72.495983,
+          "altitud": null
+        },
+        {
+          "codigo": "54405",
+          "name": "Los Patios",
+          "lat": 7.833186,
+          "lng": -72.505612,
+          "altitud": null
+        },
+        {
+          "codigo": "54418",
+          "name": "Lourdes",
+          "lat": 7.945631,
+          "lng": -72.832376,
+          "altitud": null
+        },
+        {
+          "codigo": "54480",
+          "name": "Mutiscua",
+          "lat": 7.300469,
+          "lng": -72.747169,
+          "altitud": null
+        },
+        {
+          "codigo": "54498",
+          "name": "Ocaña",
+          "lat": 8.248574,
+          "lng": -73.35607,
+          "altitud": 1202
+        },
+        {
+          "codigo": "54518",
+          "name": "Pamplona",
+          "lat": 7.372802,
+          "lng": -72.647714,
+          "altitud": 2287
+        },
+        {
+          "codigo": "54520",
+          "name": "Pamplonita",
+          "lat": 7.436745,
+          "lng": -72.639111,
+          "altitud": null
+        },
+        {
+          "codigo": "54553",
+          "name": "Puerto Santander",
+          "lat": 8.359993,
+          "lng": -72.411363,
+          "altitud": null
+        },
+        {
+          "codigo": "54599",
+          "name": "Ragonvalia",
+          "lat": 7.577861,
+          "lng": -72.476708,
+          "altitud": null
+        },
+        {
+          "codigo": "54660",
+          "name": "Salazar",
+          "lat": 7.773683,
+          "lng": -72.813064,
+          "altitud": null
+        },
+        {
+          "codigo": "54670",
+          "name": "San Calixto",
+          "lat": 8.40214,
+          "lng": -73.208622,
+          "altitud": null
+        },
+        {
+          "codigo": "54673",
+          "name": "San Cayetano",
+          "lat": 7.875695,
+          "lng": -72.625459,
+          "altitud": null
+        },
+        {
+          "codigo": "54001",
+          "name": "San José de Cúcuta",
+          "lat": 7.905725,
+          "lng": -72.508178,
+          "altitud": null
+        },
+        {
+          "codigo": "54680",
+          "name": "Santiago",
+          "lat": 7.865856,
+          "lng": -72.716203,
+          "altitud": null
+        },
+        {
+          "codigo": "54720",
+          "name": "Sardinata",
+          "lat": 8.082105,
+          "lng": -72.800577,
+          "altitud": null
+        },
+        {
+          "codigo": "54743",
+          "name": "Silos",
+          "lat": 7.204736,
+          "lng": -72.757128,
+          "altitud": null
+        },
+        {
+          "codigo": "54800",
+          "name": "Teorama",
+          "lat": 8.438134,
+          "lng": -73.28707,
+          "altitud": null
+        },
+        {
+          "codigo": "54810",
+          "name": "Tibú",
+          "lat": 8.639891,
+          "lng": -72.734496,
+          "altitud": null
+        },
+        {
+          "codigo": "54820",
+          "name": "Toledo",
+          "lat": 7.307692,
+          "lng": -72.481915,
+          "altitud": null
+        },
+        {
+          "codigo": "54871",
+          "name": "Villa Caro",
+          "lat": 7.914244,
+          "lng": -72.973601,
+          "altitud": null
+        },
+        {
+          "codigo": "54874",
+          "name": "Villa del Rosario",
+          "lat": 7.847672,
+          "lng": -72.469758,
+          "altitud": null
+        }
+      ]
+    },
+    "Putumayo": {
+      "codigo": "86",
+      "municipios": [
+        {
+          "codigo": "86219",
+          "name": "Colón",
+          "lat": 1.190133,
+          "lng": -76.972566,
+          "altitud": null
+        },
+        {
+          "codigo": "86001",
+          "name": "Mocoa",
+          "lat": 1.151172,
+          "lng": -76.654238,
+          "altitud": 645
+        },
+        {
+          "codigo": "86320",
+          "name": "Orito",
+          "lat": 0.663593,
+          "lng": -76.873276,
+          "altitud": null
+        },
+        {
+          "codigo": "86568",
+          "name": "Puerto Asís",
+          "lat": 0.505627,
+          "lng": -76.496887,
+          "altitud": null
+        },
+        {
+          "codigo": "86569",
+          "name": "Puerto Caicedo",
+          "lat": 0.687784,
+          "lng": -76.606118,
+          "altitud": null
+        },
+        {
+          "codigo": "86571",
+          "name": "Puerto Guzmán",
+          "lat": 0.962854,
+          "lng": -76.407663,
+          "altitud": null
+        },
+        {
+          "codigo": "86573",
+          "name": "Puerto Leguízamo",
+          "lat": -0.192318,
+          "lng": -74.781842,
+          "altitud": null
+        },
+        {
+          "codigo": "86755",
+          "name": "San Francisco",
+          "lat": 1.174194,
+          "lng": -76.879283,
+          "altitud": null
+        },
+        {
+          "codigo": "86757",
+          "name": "San Miguel",
+          "lat": 0.34346,
+          "lng": -76.91217,
+          "altitud": null
+        },
+        {
+          "codigo": "86760",
+          "name": "Santiago",
+          "lat": 1.147076,
+          "lng": -77.002641,
+          "altitud": null
+        },
+        {
+          "codigo": "86749",
+          "name": "Sibundoy",
+          "lat": 1.20026,
+          "lng": -76.917814,
+          "altitud": null
+        },
+        {
+          "codigo": "86865",
+          "name": "Valle del Guamuez",
+          "lat": 0.423506,
+          "lng": -76.906751,
+          "altitud": null
+        },
+        {
+          "codigo": "86885",
+          "name": "Villagarzón",
+          "lat": 1.028821,
+          "lng": -76.61721,
+          "altitud": null
+        }
+      ]
+    },
+    "Quindío": {
+      "codigo": "63",
+      "municipios": [
+        {
+          "codigo": "63001",
+          "name": "Armenia",
+          "lat": 4.53598,
+          "lng": -75.680786,
+          "altitud": 1483
+        },
+        {
+          "codigo": "63111",
+          "name": "Buenavista",
+          "lat": 4.360029,
+          "lng": -75.739572,
+          "altitud": null
+        },
+        {
+          "codigo": "63130",
+          "name": "Calarcá",
+          "lat": 4.520982,
+          "lng": -75.646085,
+          "altitud": 1536
+        },
+        {
+          "codigo": "63190",
+          "name": "Circasia",
+          "lat": 4.617759,
+          "lng": -75.636533,
+          "altitud": null
+        },
+        {
+          "codigo": "63212",
+          "name": "Córdoba",
+          "lat": 4.392485,
+          "lng": -75.687866,
+          "altitud": null
+        },
+        {
+          "codigo": "63272",
+          "name": "Filandia",
+          "lat": 4.674338,
+          "lng": -75.658387,
+          "altitud": 1923
+        },
+        {
+          "codigo": "63302",
+          "name": "Génova",
+          "lat": 4.206641,
+          "lng": -75.790402,
+          "altitud": null
+        },
+        {
+          "codigo": "63401",
+          "name": "La Tebaida",
+          "lat": 4.453755,
+          "lng": -75.786887,
+          "altitud": null
+        },
+        {
+          "codigo": "63470",
+          "name": "Montenegro",
+          "lat": 4.565057,
+          "lng": -75.749827,
+          "altitud": null
+        },
+        {
+          "codigo": "63548",
+          "name": "Pijao",
+          "lat": 4.335036,
+          "lng": -75.703329,
+          "altitud": null
+        },
+        {
+          "codigo": "63594",
+          "name": "Quimbaya",
+          "lat": 4.624387,
+          "lng": -75.765074,
+          "altitud": null
+        },
+        {
+          "codigo": "63690",
+          "name": "Salento",
+          "lat": 4.637157,
+          "lng": -75.570844,
+          "altitud": 1895
+        }
+      ]
+    },
+    "Risaralda": {
+      "codigo": "66",
+      "municipios": [
+        {
+          "codigo": "66045",
+          "name": "Apía",
+          "lat": 5.106526,
+          "lng": -75.942356,
+          "altitud": 1630
+        },
+        {
+          "codigo": "66075",
+          "name": "Balboa",
+          "lat": 4.949096,
+          "lng": -75.958663,
+          "altitud": null
+        },
+        {
+          "codigo": "66088",
+          "name": "Belén de Umbría",
+          "lat": 5.200793,
+          "lng": -75.868334,
+          "altitud": null
+        },
+        {
+          "codigo": "66170",
+          "name": "Dosquebradas",
+          "lat": 4.833131,
+          "lng": -75.675371,
+          "altitud": null
+        },
+        {
+          "codigo": "66318",
+          "name": "Guática",
+          "lat": 5.315367,
+          "lng": -75.799005,
+          "altitud": null
+        },
+        {
+          "codigo": "66383",
+          "name": "La Celia",
+          "lat": 5.002787,
+          "lng": -76.0032,
+          "altitud": null
+        },
+        {
+          "codigo": "66400",
+          "name": "La Virginia",
+          "lat": 4.896624,
+          "lng": -75.880394,
+          "altitud": 909
+        },
+        {
+          "codigo": "66440",
+          "name": "Marsella",
+          "lat": 4.935771,
+          "lng": -75.73879,
+          "altitud": null
+        },
+        {
+          "codigo": "66456",
+          "name": "Mistrató",
+          "lat": 5.297039,
+          "lng": -75.882886,
+          "altitud": null
+        },
+        {
+          "codigo": "66001",
+          "name": "Pereira",
+          "lat": 4.804985,
+          "lng": -75.719711,
+          "altitud": 1411
+        },
+        {
+          "codigo": "66572",
+          "name": "Pueblo Rico",
+          "lat": 5.222043,
+          "lng": -76.030801,
+          "altitud": null
+        },
+        {
+          "codigo": "66594",
+          "name": "Quinchía",
+          "lat": 5.340456,
+          "lng": -75.730431,
+          "altitud": null
+        },
+        {
+          "codigo": "66682",
+          "name": "Santa Rosa de Cabal",
+          "lat": 4.876271,
+          "lng": -75.623268,
+          "altitud": 1735
+        },
+        {
+          "codigo": "66687",
+          "name": "Santuario",
+          "lat": 5.074911,
+          "lng": -75.964628,
+          "altitud": null
+        }
+      ]
+    },
+    "Santander": {
+      "codigo": "68",
+      "municipios": [
+        {
+          "codigo": "68013",
+          "name": "Aguada",
+          "lat": 6.162355,
+          "lng": -73.523132,
+          "altitud": null
+        },
+        {
+          "codigo": "68020",
+          "name": "Albania",
+          "lat": 5.759166,
+          "lng": -73.91336,
+          "altitud": null
+        },
+        {
+          "codigo": "68051",
+          "name": "Aratoca",
+          "lat": 6.694418,
+          "lng": -73.01786,
+          "altitud": null
+        },
+        {
+          "codigo": "68077",
+          "name": "Barbosa",
+          "lat": 5.932531,
+          "lng": -73.615965,
+          "altitud": null
+        },
+        {
+          "codigo": "68079",
+          "name": "Barichara",
+          "lat": 6.634111,
+          "lng": -73.223047,
+          "altitud": null
+        },
+        {
+          "codigo": "68081",
+          "name": "Barrancabermeja",
+          "lat": 7.064857,
+          "lng": -73.849243,
+          "altitud": null
+        },
+        {
+          "codigo": "68092",
+          "name": "Betulia",
+          "lat": 6.899525,
+          "lng": -73.283669,
+          "altitud": null
+        },
+        {
+          "codigo": "68101",
+          "name": "Bolívar",
+          "lat": 5.988953,
+          "lng": -73.771346,
+          "altitud": null
+        },
+        {
+          "codigo": "68001",
+          "name": "Bucaramanga",
+          "lat": 7.11647,
+          "lng": -73.132562,
+          "altitud": 959
+        },
+        {
+          "codigo": "68121",
+          "name": "Cabrera",
+          "lat": 6.592118,
+          "lng": -73.246475,
+          "altitud": null
+        },
+        {
+          "codigo": "68132",
+          "name": "California",
+          "lat": 7.347989,
+          "lng": -72.946491,
+          "altitud": null
+        },
+        {
+          "codigo": "68147",
+          "name": "Capitanejo",
+          "lat": 6.527394,
+          "lng": -72.695427,
+          "altitud": null
+        },
+        {
+          "codigo": "68152",
+          "name": "Carcasí",
+          "lat": 6.629016,
+          "lng": -72.627099,
+          "altitud": null
+        },
+        {
+          "codigo": "68160",
+          "name": "Cepitá",
+          "lat": 6.753518,
+          "lng": -72.973536,
+          "altitud": null
+        },
+        {
+          "codigo": "68162",
+          "name": "Cerrito",
+          "lat": 6.840405,
+          "lng": -72.694851,
+          "altitud": null
+        },
+        {
+          "codigo": "68167",
+          "name": "Charalá",
+          "lat": 6.284339,
+          "lng": -73.146873,
+          "altitud": 1290
+        },
+        {
+          "codigo": "68169",
+          "name": "Charta",
+          "lat": 7.28082,
+          "lng": -72.968798,
+          "altitud": null
+        },
+        {
+          "codigo": "68176",
+          "name": "Chima",
+          "lat": 6.344348,
+          "lng": -73.373656,
+          "altitud": null
+        },
+        {
+          "codigo": "68179",
+          "name": "Chipatá",
+          "lat": 6.062521,
+          "lng": -73.637111,
+          "altitud": null
+        },
+        {
+          "codigo": "68190",
+          "name": "Cimitarra",
+          "lat": 6.320886,
+          "lng": -73.953011,
+          "altitud": null
+        },
+        {
+          "codigo": "68207",
+          "name": "Concepción",
+          "lat": 6.768908,
+          "lng": -72.694567,
+          "altitud": null
+        },
+        {
+          "codigo": "68209",
+          "name": "Confines",
+          "lat": 6.357327,
+          "lng": -73.240554,
+          "altitud": null
+        },
+        {
+          "codigo": "68211",
+          "name": "Contratación",
+          "lat": 6.290561,
+          "lng": -73.474426,
+          "altitud": null
+        },
+        {
+          "codigo": "68217",
+          "name": "Coromoro",
+          "lat": 6.294999,
+          "lng": -73.040816,
+          "altitud": null
+        },
+        {
+          "codigo": "68229",
+          "name": "Curití",
+          "lat": 6.605099,
+          "lng": -73.069383,
+          "altitud": null
+        },
+        {
+          "codigo": "68235",
+          "name": "El Carmen de Chucurí",
+          "lat": 6.700038,
+          "lng": -73.51066,
+          "altitud": null
+        },
+        {
+          "codigo": "68245",
+          "name": "El Guacamayo",
+          "lat": 6.245111,
+          "lng": -73.496908,
+          "altitud": null
+        },
+        {
+          "codigo": "68250",
+          "name": "El Peñón",
+          "lat": 6.05537,
+          "lng": -73.815532,
+          "altitud": null
+        },
+        {
+          "codigo": "68255",
+          "name": "El Playón",
+          "lat": 7.470715,
+          "lng": -73.20287,
+          "altitud": null
+        },
+        {
+          "codigo": "68264",
+          "name": "Encino",
+          "lat": 6.137429,
+          "lng": -73.098749,
+          "altitud": null
+        },
+        {
+          "codigo": "68266",
+          "name": "Enciso",
+          "lat": 6.668034,
+          "lng": -72.699647,
+          "altitud": null
+        },
+        {
+          "codigo": "68271",
+          "name": "Florián",
+          "lat": 5.804659,
+          "lng": -73.97143,
+          "altitud": null
+        },
+        {
+          "codigo": "68276",
+          "name": "Floridablanca",
+          "lat": 7.072329,
+          "lng": -73.099104,
+          "altitud": null
+        },
+        {
+          "codigo": "68296",
+          "name": "Galán",
+          "lat": 6.638423,
+          "lng": -73.287769,
+          "altitud": null
+        },
+        {
+          "codigo": "68298",
+          "name": "Gámbita",
+          "lat": 5.945998,
+          "lng": -73.344185,
+          "altitud": null
+        },
+        {
+          "codigo": "68307",
+          "name": "Girón",
+          "lat": 7.070432,
+          "lng": -73.166832,
+          "altitud": null
+        },
+        {
+          "codigo": "68318",
+          "name": "Guaca",
+          "lat": 6.876563,
+          "lng": -72.856322,
+          "altitud": null
+        },
+        {
+          "codigo": "68320",
+          "name": "Guadalupe",
+          "lat": 6.245847,
+          "lng": -73.419292,
+          "altitud": null
+        },
+        {
+          "codigo": "68322",
+          "name": "Guapotá",
+          "lat": 6.308635,
+          "lng": -73.320732,
+          "altitud": null
+        },
+        {
+          "codigo": "68324",
+          "name": "Guavatá",
+          "lat": 5.954348,
+          "lng": -73.700906,
+          "altitud": null
+        },
+        {
+          "codigo": "68327",
+          "name": "Güepsa",
+          "lat": 6.025013,
+          "lng": -73.575146,
+          "altitud": null
+        },
+        {
+          "codigo": "68344",
+          "name": "Hato",
+          "lat": 6.543957,
+          "lng": -73.308399,
+          "altitud": null
+        },
+        {
+          "codigo": "68368",
+          "name": "Jesús María",
+          "lat": 5.876497,
+          "lng": -73.783396,
+          "altitud": null
+        },
+        {
+          "codigo": "68370",
+          "name": "Jordán",
+          "lat": 6.732727,
+          "lng": -73.096053,
+          "altitud": null
+        },
+        {
+          "codigo": "68377",
+          "name": "La Belleza",
+          "lat": 5.85925,
+          "lng": -73.965494,
+          "altitud": null
+        },
+        {
+          "codigo": "68397",
+          "name": "La Paz",
+          "lat": 6.178509,
+          "lng": -73.58959,
+          "altitud": null
+        },
+        {
+          "codigo": "68385",
+          "name": "Landázuri",
+          "lat": 6.218812,
+          "lng": -73.811359,
+          "altitud": null
+        },
+        {
+          "codigo": "68406",
+          "name": "Lebrija",
+          "lat": 7.113351,
+          "lng": -73.219524,
+          "altitud": null
+        },
+        {
+          "codigo": "68418",
+          "name": "Los Santos",
+          "lat": 6.755203,
+          "lng": -73.102739,
+          "altitud": null
+        },
+        {
+          "codigo": "68425",
+          "name": "Macaravita",
+          "lat": 6.50658,
+          "lng": -72.593105,
+          "altitud": null
+        },
+        {
+          "codigo": "68432",
+          "name": "Málaga",
+          "lat": 6.703081,
+          "lng": -72.732089,
+          "altitud": null
+        },
+        {
+          "codigo": "68444",
+          "name": "Matanza",
+          "lat": 7.323175,
+          "lng": -73.015566,
+          "altitud": null
+        },
+        {
+          "codigo": "68464",
+          "name": "Mogotes",
+          "lat": 6.475246,
+          "lng": -72.969807,
+          "altitud": null
+        },
+        {
+          "codigo": "68468",
+          "name": "Molagavita",
+          "lat": 6.67432,
+          "lng": -72.809175,
+          "altitud": null
+        },
+        {
+          "codigo": "68498",
+          "name": "Ocamonte",
+          "lat": 6.339988,
+          "lng": -73.122563,
+          "altitud": null
+        },
+        {
+          "codigo": "68500",
+          "name": "Oiba",
+          "lat": 6.26521,
+          "lng": -73.299791,
+          "altitud": null
+        },
+        {
+          "codigo": "68502",
+          "name": "Onzaga",
+          "lat": 6.344104,
+          "lng": -72.816766,
+          "altitud": null
+        },
+        {
+          "codigo": "68522",
+          "name": "Palmar",
+          "lat": 6.537789,
+          "lng": -73.29109,
+          "altitud": null
+        },
+        {
+          "codigo": "68524",
+          "name": "Palmas del Socorro",
+          "lat": 6.406139,
+          "lng": -73.287764,
+          "altitud": null
+        },
+        {
+          "codigo": "68533",
+          "name": "Páramo",
+          "lat": 6.416811,
+          "lng": -73.17022,
+          "altitud": null
+        },
+        {
+          "codigo": "68547",
+          "name": "Piedecuesta",
+          "lat": 6.997245,
+          "lng": -73.054795,
+          "altitud": null
+        },
+        {
+          "codigo": "68549",
+          "name": "Pinchote",
+          "lat": 6.531552,
+          "lng": -73.174209,
+          "altitud": null
+        },
+        {
+          "codigo": "68572",
+          "name": "Puente Nacional",
+          "lat": 5.878381,
+          "lng": -73.677567,
+          "altitud": null
+        },
+        {
+          "codigo": "68573",
+          "name": "Puerto Parra",
+          "lat": 6.650785,
+          "lng": -74.056129,
+          "altitud": null
+        },
+        {
+          "codigo": "68575",
+          "name": "Puerto Wilches",
+          "lat": 7.344057,
+          "lng": -73.899909,
+          "altitud": null
+        },
+        {
+          "codigo": "68615",
+          "name": "Rionegro",
+          "lat": 7.265014,
+          "lng": -73.150177,
+          "altitud": null
+        },
+        {
+          "codigo": "68655",
+          "name": "Sabana de Torres",
+          "lat": 7.391919,
+          "lng": -73.49906,
+          "altitud": null
+        },
+        {
+          "codigo": "68669",
+          "name": "San Andrés",
+          "lat": 6.811511,
+          "lng": -72.848864,
+          "altitud": null
+        },
+        {
+          "codigo": "68673",
+          "name": "San Benito",
+          "lat": 6.126656,
+          "lng": -73.50907,
+          "altitud": null
+        },
+        {
+          "codigo": "68679",
+          "name": "San Gil",
+          "lat": 6.551952,
+          "lng": -73.134776,
+          "altitud": 1117
+        },
+        {
+          "codigo": "68682",
+          "name": "San Joaquín",
+          "lat": 6.427548,
+          "lng": -72.867638,
+          "altitud": null
+        },
+        {
+          "codigo": "68684",
+          "name": "San José de Miranda",
+          "lat": 6.658995,
+          "lng": -72.733616,
+          "altitud": null
+        },
+        {
+          "codigo": "68686",
+          "name": "San Miguel",
+          "lat": 6.575315,
+          "lng": -72.644123,
+          "altitud": null
+        },
+        {
+          "codigo": "68689",
+          "name": "San Vicente de Chucurí",
+          "lat": 6.880383,
+          "lng": -73.411024,
+          "altitud": null
+        },
+        {
+          "codigo": "68705",
+          "name": "Santa Bárbara",
+          "lat": 6.990996,
+          "lng": -72.907445,
+          "altitud": null
+        },
+        {
+          "codigo": "68720",
+          "name": "Santa Helena del Opón",
+          "lat": 6.339565,
+          "lng": -73.616716,
+          "altitud": null
+        },
+        {
+          "codigo": "68745",
+          "name": "Simacota",
+          "lat": 6.443469,
+          "lng": -73.337368,
+          "altitud": null
+        },
+        {
+          "codigo": "68755",
+          "name": "Socorro",
+          "lat": 6.46387,
+          "lng": -73.261198,
+          "altitud": null
+        },
+        {
+          "codigo": "68770",
+          "name": "Suaita",
+          "lat": 6.101329,
+          "lng": -73.44165,
+          "altitud": null
+        },
+        {
+          "codigo": "68773",
+          "name": "Sucre",
+          "lat": 5.918743,
+          "lng": -73.790975,
+          "altitud": null
+        },
+        {
+          "codigo": "68780",
+          "name": "Suratá",
+          "lat": 7.36658,
+          "lng": -72.984232,
+          "altitud": null
+        },
+        {
+          "codigo": "68820",
+          "name": "Tona",
+          "lat": 7.201417,
+          "lng": -72.967023,
+          "altitud": null
+        },
+        {
+          "codigo": "68855",
+          "name": "Valle de San José",
+          "lat": 6.448028,
+          "lng": -73.143507,
+          "altitud": null
+        },
+        {
+          "codigo": "68861",
+          "name": "Vélez",
+          "lat": 6.009275,
+          "lng": -73.672447,
+          "altitud": null
+        },
+        {
+          "codigo": "68867",
+          "name": "Vetas",
+          "lat": 7.30981,
+          "lng": -72.871041,
+          "altitud": null
+        },
+        {
+          "codigo": "68872",
+          "name": "Villanueva",
+          "lat": 6.670078,
+          "lng": -73.174307,
+          "altitud": null
+        },
+        {
+          "codigo": "68895",
+          "name": "Zapatoca",
+          "lat": 6.814387,
+          "lng": -73.268034,
+          "altitud": null
+        }
+      ]
+    },
+    "Sucre": {
+      "codigo": "70",
+      "municipios": [
+        {
+          "codigo": "70110",
+          "name": "Buenavista",
+          "lat": 9.319794,
+          "lng": -74.972827,
+          "altitud": null
+        },
+        {
+          "codigo": "70124",
+          "name": "Caimito",
+          "lat": 8.789324,
+          "lng": -75.117141,
+          "altitud": null
+        },
+        {
+          "codigo": "70230",
+          "name": "Chalán",
+          "lat": 9.545352,
+          "lng": -75.312697,
+          "altitud": null
+        },
+        {
+          "codigo": "70204",
+          "name": "Colosó",
+          "lat": 9.494192,
+          "lng": -75.353256,
+          "altitud": null
+        },
+        {
+          "codigo": "70215",
+          "name": "Corozal",
+          "lat": 9.318749,
+          "lng": -75.293048,
+          "altitud": null
+        },
+        {
+          "codigo": "70221",
+          "name": "Coveñas",
+          "lat": 9.402779,
+          "lng": -75.680158,
+          "altitud": null
+        },
+        {
+          "codigo": "70233",
+          "name": "El Roble",
+          "lat": 9.100647,
+          "lng": -75.198378,
+          "altitud": null
+        },
+        {
+          "codigo": "70235",
+          "name": "Galeras",
+          "lat": 9.160379,
+          "lng": -75.04959,
+          "altitud": null
+        },
+        {
+          "codigo": "70265",
+          "name": "Guaranda",
+          "lat": 8.468556,
+          "lng": -74.537749,
+          "altitud": null
+        },
+        {
+          "codigo": "70400",
+          "name": "La Unión",
+          "lat": 8.853975,
+          "lng": -75.276056,
+          "altitud": null
+        },
+        {
+          "codigo": "70418",
+          "name": "Los Palmitos",
+          "lat": 9.380269,
+          "lng": -75.268716,
+          "altitud": null
+        },
+        {
+          "codigo": "70429",
+          "name": "Majagual",
+          "lat": 8.541163,
+          "lng": -74.628077,
+          "altitud": null
+        },
+        {
+          "codigo": "70473",
+          "name": "Morroa",
+          "lat": 9.331395,
+          "lng": -75.305949,
+          "altitud": null
+        },
+        {
+          "codigo": "70508",
+          "name": "Ovejas",
+          "lat": 9.527176,
+          "lng": -75.229037,
+          "altitud": null
+        },
+        {
+          "codigo": "70523",
+          "name": "Palmito",
+          "lat": 9.333157,
+          "lng": -75.541264,
+          "altitud": null
+        },
+        {
+          "codigo": "70670",
+          "name": "Sampués",
+          "lat": 9.183193,
+          "lng": -75.380222,
+          "altitud": null
+        },
+        {
+          "codigo": "70678",
+          "name": "San Benito Abad",
+          "lat": 8.930108,
+          "lng": -75.031089,
+          "altitud": null
+        },
+        {
+          "codigo": "70823",
+          "name": "San José de Toluviejo",
+          "lat": 9.451819,
+          "lng": -75.44085,
+          "altitud": null
+        },
+        {
+          "codigo": "70702",
+          "name": "San Juan de Betulia",
+          "lat": 9.273066,
+          "lng": -75.243565,
+          "altitud": null
+        },
+        {
+          "codigo": "70742",
+          "name": "San Luis de Sincé",
+          "lat": 9.244308,
+          "lng": -75.145999,
+          "altitud": null
+        },
+        {
+          "codigo": "70708",
+          "name": "San Marcos",
+          "lat": 8.661774,
+          "lng": -75.133831,
+          "altitud": null
+        },
+        {
+          "codigo": "70713",
+          "name": "San Onofre",
+          "lat": 9.736955,
+          "lng": -75.522398,
+          "altitud": null
+        },
+        {
+          "codigo": "70717",
+          "name": "San Pedro",
+          "lat": 9.39625,
+          "lng": -75.063647,
+          "altitud": null
+        },
+        {
+          "codigo": "70820",
+          "name": "Santiago de Tolú",
+          "lat": 9.525387,
+          "lng": -75.581112,
+          "altitud": null
+        },
+        {
+          "codigo": "70001",
+          "name": "Sincelejo",
+          "lat": 9.302322,
+          "lng": -75.395445,
+          "altitud": 213
+        },
+        {
+          "codigo": "70771",
+          "name": "Sucre",
+          "lat": 8.811737,
+          "lng": -74.723175,
+          "altitud": null
+        }
+      ]
+    },
+    "Tolima": {
+      "codigo": "73",
+      "municipios": [
+        {
+          "codigo": "73024",
+          "name": "Alpujarra",
+          "lat": 3.391548,
+          "lng": -74.9329,
+          "altitud": null
+        },
+        {
+          "codigo": "73026",
+          "name": "Alvarado",
+          "lat": 4.567356,
+          "lng": -74.953418,
+          "altitud": null
+        },
+        {
+          "codigo": "73030",
+          "name": "Ambalema",
+          "lat": 4.782682,
+          "lng": -74.764429,
+          "altitud": null
+        },
+        {
+          "codigo": "73043",
+          "name": "Anzoátegui",
+          "lat": 4.631756,
+          "lng": -75.093772,
+          "altitud": null
+        },
+        {
+          "codigo": "73055",
+          "name": "Armero",
+          "lat": 5.030744,
+          "lng": -74.884438,
+          "altitud": null
+        },
+        {
+          "codigo": "73067",
+          "name": "Ataco",
+          "lat": 3.590591,
+          "lng": -75.382545,
+          "altitud": null
+        },
+        {
+          "codigo": "73124",
+          "name": "Cajamarca",
+          "lat": 4.438812,
+          "lng": -75.431971,
+          "altitud": null
+        },
+        {
+          "codigo": "73148",
+          "name": "Carmen de Apicalá",
+          "lat": 4.152334,
+          "lng": -74.717633,
+          "altitud": null
+        },
+        {
+          "codigo": "73152",
+          "name": "Casabianca",
+          "lat": 5.078465,
+          "lng": -75.120966,
+          "altitud": null
+        },
+        {
+          "codigo": "73168",
+          "name": "Chaparral",
+          "lat": 3.722918,
+          "lng": -75.480765,
+          "altitud": null
+        },
+        {
+          "codigo": "73200",
+          "name": "Coello",
+          "lat": 4.287276,
+          "lng": -74.898464,
+          "altitud": null
+        },
+        {
+          "codigo": "73217",
+          "name": "Coyaima",
+          "lat": 3.798036,
+          "lng": -75.193862,
+          "altitud": null
+        },
+        {
+          "codigo": "73226",
+          "name": "Cunday",
+          "lat": 4.059259,
+          "lng": -74.692227,
+          "altitud": null
+        },
+        {
+          "codigo": "73236",
+          "name": "Dolores",
+          "lat": 3.539072,
+          "lng": -74.896761,
+          "altitud": null
+        },
+        {
+          "codigo": "73268",
+          "name": "Espinal",
+          "lat": 4.151314,
+          "lng": -74.885446,
+          "altitud": null
+        },
+        {
+          "codigo": "73270",
+          "name": "Falan",
+          "lat": 5.123104,
+          "lng": -74.953007,
+          "altitud": null
+        },
+        {
+          "codigo": "73275",
+          "name": "Flandes",
+          "lat": 4.276373,
+          "lng": -74.818763,
+          "altitud": null
+        },
+        {
+          "codigo": "73283",
+          "name": "Fresno",
+          "lat": 5.153576,
+          "lng": -75.035722,
+          "altitud": null
+        },
+        {
+          "codigo": "73319",
+          "name": "Guamo",
+          "lat": 4.030992,
+          "lng": -74.968135,
+          "altitud": null
+        },
+        {
+          "codigo": "73347",
+          "name": "Herveo",
+          "lat": 5.080228,
+          "lng": -75.177151,
+          "altitud": null
+        },
+        {
+          "codigo": "73349",
+          "name": "Honda",
+          "lat": 5.211816,
+          "lng": -74.75699,
+          "altitud": null
+        },
+        {
+          "codigo": "73001",
+          "name": "Ibagué",
+          "lat": 4.432248,
+          "lng": -75.19425,
+          "altitud": 1285
+        },
+        {
+          "codigo": "73352",
+          "name": "Icononzo",
+          "lat": 4.176487,
+          "lng": -74.531969,
+          "altitud": null
+        },
+        {
+          "codigo": "73408",
+          "name": "Lérida",
+          "lat": 4.862046,
+          "lng": -74.910716,
+          "altitud": null
+        },
+        {
+          "codigo": "73411",
+          "name": "Líbano",
+          "lat": 4.92042,
+          "lng": -75.061959,
+          "altitud": 1565
+        },
+        {
+          "codigo": "73449",
+          "name": "Melgar",
+          "lat": 4.203655,
+          "lng": -74.641317,
+          "altitud": null
+        },
+        {
+          "codigo": "73461",
+          "name": "Murillo",
+          "lat": 4.874341,
+          "lng": -75.171022,
+          "altitud": 2920
+        },
+        {
+          "codigo": "73483",
+          "name": "Natagaima",
+          "lat": 3.624324,
+          "lng": -75.093182,
+          "altitud": null
+        },
+        {
+          "codigo": "73504",
+          "name": "Ortega",
+          "lat": 3.934916,
+          "lng": -75.222601,
+          "altitud": null
+        },
+        {
+          "codigo": "73520",
+          "name": "Palocabildo",
+          "lat": 5.120918,
+          "lng": -75.022167,
+          "altitud": null
+        },
+        {
+          "codigo": "73547",
+          "name": "Piedras",
+          "lat": 4.543951,
+          "lng": -74.878106,
+          "altitud": null
+        },
+        {
+          "codigo": "73555",
+          "name": "Planadas",
+          "lat": 3.197911,
+          "lng": -75.644163,
+          "altitud": null
+        },
+        {
+          "codigo": "73563",
+          "name": "Prado",
+          "lat": 3.750939,
+          "lng": -74.927447,
+          "altitud": null
+        },
+        {
+          "codigo": "73585",
+          "name": "Purificación",
+          "lat": 3.857246,
+          "lng": -74.935555,
+          "altitud": null
+        },
+        {
+          "codigo": "73616",
+          "name": "Rioblanco",
+          "lat": 3.529932,
+          "lng": -75.644069,
+          "altitud": null
+        },
+        {
+          "codigo": "73622",
+          "name": "Roncesvalles",
+          "lat": 4.011567,
+          "lng": -75.605959,
+          "altitud": null
+        },
+        {
+          "codigo": "73624",
+          "name": "Rovira",
+          "lat": 4.239019,
+          "lng": -75.240648,
+          "altitud": null
+        },
+        {
+          "codigo": "73671",
+          "name": "Saldaña",
+          "lat": 3.929815,
+          "lng": -75.016852,
+          "altitud": null
+        },
+        {
+          "codigo": "73675",
+          "name": "San Antonio",
+          "lat": 3.914146,
+          "lng": -75.480074,
+          "altitud": null
+        },
+        {
+          "codigo": "73678",
+          "name": "San Luis",
+          "lat": 4.133721,
+          "lng": -75.095804,
+          "altitud": null
+        },
+        {
+          "codigo": "73443",
+          "name": "San Sebastián de Mariquita",
+          "lat": 5.199708,
+          "lng": -74.889276,
+          "altitud": null
+        },
+        {
+          "codigo": "73686",
+          "name": "Santa Isabel",
+          "lat": 4.713606,
+          "lng": -75.097934,
+          "altitud": null
+        },
+        {
+          "codigo": "73770",
+          "name": "Suárez",
+          "lat": 4.048891,
+          "lng": -74.831885,
+          "altitud": null
+        },
+        {
+          "codigo": "73854",
+          "name": "Valle de San Juan",
+          "lat": 4.197494,
+          "lng": -75.115669,
+          "altitud": null
+        },
+        {
+          "codigo": "73861",
+          "name": "Venadillo",
+          "lat": 4.717878,
+          "lng": -74.929333,
+          "altitud": null
+        },
+        {
+          "codigo": "73870",
+          "name": "Villahermosa",
+          "lat": 5.030452,
+          "lng": -75.117729,
+          "altitud": null
+        },
+        {
+          "codigo": "73873",
+          "name": "Villarrica",
+          "lat": 3.936902,
+          "lng": -74.600285,
+          "altitud": null
+        }
+      ]
+    },
+    "Valle del Cauca": {
+      "codigo": "76",
+      "municipios": [
+        {
+          "codigo": "76020",
+          "name": "Alcalá",
+          "lat": 4.674994,
+          "lng": -75.779792,
+          "altitud": null
+        },
+        {
+          "codigo": "76036",
+          "name": "Andalucía",
+          "lat": 4.171713,
+          "lng": -76.167925,
+          "altitud": null
+        },
+        {
+          "codigo": "76041",
+          "name": "Ansermanuevo",
+          "lat": 4.794984,
+          "lng": -75.992003,
+          "altitud": null
+        },
+        {
+          "codigo": "76054",
+          "name": "Argelia",
+          "lat": 4.726945,
+          "lng": -76.119905,
+          "altitud": null
+        },
+        {
+          "codigo": "76100",
+          "name": "Bolívar",
+          "lat": 4.337846,
+          "lng": -76.183583,
+          "altitud": null
+        },
+        {
+          "codigo": "76109",
+          "name": "Buenaventura",
+          "lat": 3.875708,
+          "lng": -77.01074,
+          "altitud": null
+        },
+        {
+          "codigo": "76113",
+          "name": "Bugalagrande",
+          "lat": 4.208358,
+          "lng": -76.15682,
+          "altitud": null
+        },
+        {
+          "codigo": "76122",
+          "name": "Caicedonia",
+          "lat": 4.334808,
+          "lng": -75.830594,
+          "altitud": null
+        },
+        {
+          "codigo": "76126",
+          "name": "Calima",
+          "lat": 3.933664,
+          "lng": -76.484132,
+          "altitud": null
+        },
+        {
+          "codigo": "76130",
+          "name": "Candelaria",
+          "lat": 3.408354,
+          "lng": -76.346519,
+          "altitud": null
+        },
+        {
+          "codigo": "76147",
+          "name": "Cartago",
+          "lat": 4.742192,
+          "lng": -75.924374,
+          "altitud": null
+        },
+        {
+          "codigo": "76233",
+          "name": "Dagua",
+          "lat": 3.657318,
+          "lng": -76.68886,
+          "altitud": null
+        },
+        {
+          "codigo": "76243",
+          "name": "El Águila",
+          "lat": 4.906062,
+          "lng": -76.042779,
+          "altitud": null
+        },
+        {
+          "codigo": "76246",
+          "name": "El Cairo",
+          "lat": 4.760874,
+          "lng": -76.221611,
+          "altitud": null
+        },
+        {
+          "codigo": "76248",
+          "name": "El Cerrito",
+          "lat": 3.684229,
+          "lng": -76.311972,
+          "altitud": null
+        },
+        {
+          "codigo": "76250",
+          "name": "El Dovio",
+          "lat": 4.510452,
+          "lng": -76.237084,
+          "altitud": null
+        },
+        {
+          "codigo": "76275",
+          "name": "Florida",
+          "lat": 3.324118,
+          "lng": -76.234199,
+          "altitud": null
+        },
+        {
+          "codigo": "76306",
+          "name": "Ginebra",
+          "lat": 3.724181,
+          "lng": -76.268068,
+          "altitud": null
+        },
+        {
+          "codigo": "76318",
+          "name": "Guacarí",
+          "lat": 3.761815,
+          "lng": -76.330911,
+          "altitud": null
+        },
+        {
+          "codigo": "76111",
+          "name": "Guadalajara de Buga",
+          "lat": 3.900736,
+          "lng": -76.298979,
+          "altitud": null
+        },
+        {
+          "codigo": "76364",
+          "name": "Jamundí",
+          "lat": 3.258751,
+          "lng": -76.538472,
+          "altitud": null
+        },
+        {
+          "codigo": "76377",
+          "name": "La Cumbre",
+          "lat": 3.649268,
+          "lng": -76.56805,
+          "altitud": null
+        },
+        {
+          "codigo": "76400",
+          "name": "La Unión",
+          "lat": 4.533869,
+          "lng": -76.099661,
+          "altitud": null
+        },
+        {
+          "codigo": "76403",
+          "name": "La Victoria",
+          "lat": 4.523603,
+          "lng": -76.036529,
+          "altitud": null
+        },
+        {
+          "codigo": "76497",
+          "name": "Obando",
+          "lat": 4.575712,
+          "lng": -75.974709,
+          "altitud": null
+        },
+        {
+          "codigo": "76520",
+          "name": "Palmira",
+          "lat": 3.531544,
+          "lng": -76.298846,
+          "altitud": null
+        },
+        {
+          "codigo": "76563",
+          "name": "Pradera",
+          "lat": 3.419793,
+          "lng": -76.241799,
+          "altitud": null
+        },
+        {
+          "codigo": "76606",
+          "name": "Restrepo",
+          "lat": 3.821351,
+          "lng": -76.523329,
+          "altitud": null
+        },
+        {
+          "codigo": "76616",
+          "name": "Riofrío",
+          "lat": 4.156908,
+          "lng": -76.288313,
+          "altitud": null
+        },
+        {
+          "codigo": "76622",
+          "name": "Roldanillo",
+          "lat": 4.413601,
+          "lng": -76.152277,
+          "altitud": null
+        },
+        {
+          "codigo": "76670",
+          "name": "San Pedro",
+          "lat": 3.995073,
+          "lng": -76.228692,
+          "altitud": null
+        },
+        {
+          "codigo": "76001",
+          "name": "Santiago de Cali",
+          "lat": 3.413686,
+          "lng": -76.52133,
+          "altitud": null
+        },
+        {
+          "codigo": "76736",
+          "name": "Sevilla",
+          "lat": 4.270714,
+          "lng": -75.931629,
+          "altitud": 1612
+        },
+        {
+          "codigo": "76823",
+          "name": "Toro",
+          "lat": 4.608085,
+          "lng": -76.076859,
+          "altitud": null
+        },
+        {
+          "codigo": "76828",
+          "name": "Trujillo",
+          "lat": 4.212037,
+          "lng": -76.318818,
+          "altitud": null
+        },
+        {
+          "codigo": "76834",
+          "name": "Tuluá",
+          "lat": 4.085399,
+          "lng": -76.197731,
+          "altitud": null
+        },
+        {
+          "codigo": "76845",
+          "name": "Ulloa",
+          "lat": 4.703623,
+          "lng": -75.737808,
+          "altitud": null
+        },
+        {
+          "codigo": "76863",
+          "name": "Versalles",
+          "lat": 4.575019,
+          "lng": -76.199203,
+          "altitud": null
+        },
+        {
+          "codigo": "76869",
+          "name": "Vijes",
+          "lat": 3.698686,
+          "lng": -76.441804,
+          "altitud": null
+        },
+        {
+          "codigo": "76890",
+          "name": "Yotoco",
+          "lat": 3.861241,
+          "lng": -76.382698,
+          "altitud": null
+        },
+        {
+          "codigo": "76892",
+          "name": "Yumbo",
+          "lat": 3.540097,
+          "lng": -76.499893,
+          "altitud": null
+        },
+        {
+          "codigo": "76895",
+          "name": "Zarzal",
+          "lat": 4.392658,
+          "lng": -76.070795,
+          "altitud": null
+        }
+      ]
+    },
+    "Vaupés": {
+      "codigo": "97",
+      "municipios": [
+        {
+          "codigo": "97161",
+          "name": "Carurú",
+          "lat": 1.016116,
+          "lng": -71.30221,
+          "altitud": null
+        },
+        {
+          "codigo": "97001",
+          "name": "Mitú",
+          "lat": 1.253151,
+          "lng": -70.232641,
+          "altitud": null
+        },
+        {
+          "codigo": "97511",
+          "name": "Pacoa",
+          "lat": 0.020698,
+          "lng": -71.004339,
+          "altitud": null
+        },
+        {
+          "codigo": "97777",
+          "name": "Papunahua",
+          "lat": 1.908124,
+          "lng": -70.76091,
+          "altitud": null
+        },
+        {
+          "codigo": "97666",
+          "name": "Taraira",
+          "lat": -0.564984,
+          "lng": -69.635497,
+          "altitud": null
+        },
+        {
+          "codigo": "97889",
+          "name": "Yavaraté",
+          "lat": 0.609142,
+          "lng": -69.203337,
+          "altitud": null
+        }
+      ]
+    },
+    "Vichada": {
+      "codigo": "99",
+      "municipios": [
+        {
+          "codigo": "99773",
+          "name": "Cumaribo",
+          "lat": 4.446352,
+          "lng": -69.795533,
+          "altitud": null
+        },
+        {
+          "codigo": "99524",
+          "name": "La Primavera",
+          "lat": 5.486309,
+          "lng": -70.410515,
+          "altitud": null
+        },
+        {
+          "codigo": "99001",
+          "name": "Puerto Carreño",
+          "lat": 6.186636,
+          "lng": -67.487095,
+          "altitud": null
+        },
+        {
+          "codigo": "99624",
+          "name": "Santa Rosalía",
+          "lat": 5.136393,
+          "lng": -70.859499,
+          "altitud": null
+        }
+      ]
+    }
+  }
+}

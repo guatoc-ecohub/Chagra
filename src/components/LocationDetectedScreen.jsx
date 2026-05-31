@@ -598,7 +598,7 @@ export default function LocationDetectedScreen({
                     <option value="">— Selecciona municipio —</option>
                     {getMunicipios(cascadeDpto).map((m) => (
                       <option key={m.name} value={m.name}>
-                        {m.name} · {m.altitud} msnm
+                        {m.name}{m.altitud != null ? ` · ${m.altitud} msnm` : ""}
                       </option>
                     ))}
                   </select>

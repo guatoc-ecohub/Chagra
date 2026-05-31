@@ -89,6 +89,32 @@ describe('ChatBubble — badge de fuente (verificado vs generativo)', () => {
     expect(badge).toHaveTextContent(/Respuesta generativa/i);
   });
 
+  // #339: la burbuja del assistant NUNCA debe quedar en blanco. Si el LLM
+  // devuelve contenido vacío (respuesta degradada, stream sin tokens), se
+  // muestra un fallback visible en español colombiano en lugar de un <p>
+  // vacío. El usuario campesino no debe ver una "respuesta fantasma".
+  test('#339 — assistant con content vacío muestra fallback visible (no burbuja en blanco)', () => {
+    for (const empty of ['', '   ', undefined, null]) {
+      const { unmount } = render(
+        <ChatBubble message={{ role: 'assistant', content: empty, timestamp: Date.now() }} />
+      );
+      expect(
+        screen.getByText(/No recibí respuesta del asistente\. Intenta de nuevo\./i)
+      ).toBeInTheDocument();
+      unmount();
+    }
+  });
+
+  test('#339 — assistant con content presente NO muestra el fallback', () => {
+    render(
+      <ChatBubble
+        message={{ role: 'assistant', content: 'Siembre la gulupa sobre 1700 msnm.', timestamp: Date.now() }}
+      />
+    );
+    expect(screen.getByText(/Siembre la gulupa sobre 1700 msnm\./)).toBeInTheDocument();
+    expect(screen.queryByText(/No recibí respuesta del asistente/i)).not.toBeInTheDocument();
+  });
+
   test('NO renderiza badge si showSourceBadges está OFF', () => {
     storeState.showSourceBadges = false;
     const message = {
