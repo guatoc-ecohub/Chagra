@@ -58,7 +58,7 @@ vi.mock('../../../services/userProfileService', () => ({
     // profile.municipio, con fallback offline a resolver profile.region.
     getProfileMunicipio: vi.fn(() => null),
 }));
-import { getProfileMunicipio } from '../../../services/userProfileService';
+import { getProfile, getProfileMunicipio } from '../../../services/userProfileService';
 
 describe('ClimaStrip — botón "Configurar ubicación" (bug fix Brave 2026-05-28)', () => {
     test('renderiza CTA "Configurar ubicación" cuando no hay municipio', async () => {
