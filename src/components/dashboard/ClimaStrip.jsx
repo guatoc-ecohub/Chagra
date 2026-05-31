@@ -54,20 +54,67 @@ function dayLabel(isoDate, i) {
 }
 
 /**
- * Resuelve { lat, lng } a partir del perfil o, en su defecto, geocodificando
- * el municipio contra el dataset DANE local (offline-friendly).
- * @returns {{ lat: number, lng: number } | null}
+ * Resuelve la altitud (msnm) real de la finca para corregir Open-Meteo por
+ * gradiente térmico. Prioridad:
+ *   1. `finca_altitud` del perfil — la que confirma/detecta LocationDetectedScreen.
+ *   2. `altitud` del perfil (alias de algunos flujos viejos).
+ *   3. La altitud curada del municipio en el dataset DANE (`fallbackAltitud`).
+ * Devuelve un número plausible (msnm) o null. Sin esto, Open-Meteo usa la
+ * elevación de SU grilla (≈ cabecera/valle) y el pronóstico sale más cálido.
+ * @returns {number | null}
  */
-function resolveCoords(profile, municipio) {
+function plausibleMsnm(value) {
+    const n = Number(value);
+    // Rango físico Colombia: nivel del mar a ~5800 m (Cristóbal Colón, 5775 m).
+    return Number.isFinite(n) && n >= -100 && n <= 6000 ? Math.round(n) : null;
+}
+
+/**
+ * Altitud (msnm) del perfil para corregir Open-Meteo por gradiente térmico.
+ * Prioriza `finca_altitud` (la que confirma/detecta LocationDetectedScreen) y
+ * cae a `altitud` (alias de flujos viejos). NO geocodifica: el fallback al
+ * municipio lo decide `resolveGeo` solo cuando hace falta. @returns {number|null}
+ */
+function profileElevation(profile) {
+    return plausibleMsnm(profile?.finca_altitud) ?? plausibleMsnm(profile?.altitud);
+}
+
+/**
+ * Resuelve { lat, lng, elevation } a partir del perfil o, en su defecto,
+ * geocodificando el municipio contra el dataset DANE local (offline-friendly).
+ * La elevación corrige la temperatura de Open-Meteo: prioriza la altitud real
+ * de la finca (perfil) sobre la del municipio (cabecera, más baja). Solo se
+ * geocodifica el municipio si NO hay coords del perfil, o si hay coords pero
+ * el perfil no trae altitud (para aproximar el piso con la curada del DANE) —
+ * así se respeta el contrato "con coords del perfil no geocodifica" cuando el
+ * perfil ya está completo.
+ * @returns {{ lat: number, lng: number, elevation: number | null } | null}
+ */
+function resolveGeo(profile, municipio) {
     const lat = Number(profile?.ubicacion_lat);
     const lng = Number(profile?.ubicacion_lng);
     if (Number.isFinite(lat) && Number.isFinite(lng)) {
-        return { lat, lng };
+        // GPS real de la finca. La altitud sale del perfil; solo si el perfil
+        // NO la trae caemos a la curada del municipio (evita geocodificar de
+        // más cuando el perfil ya está completo).
+        let elevation = profileElevation(profile);
+        if (elevation == null && municipio) {
+            const hit = findMunicipio(municipio.split(',')[0]);
+            elevation = plausibleMsnm(hit?.altitud);
+        }
+        return { lat, lng, elevation };
     }
     if (municipio) {
+        // Sin GPS: geocodificamos el municipio (centroide ≈ cabecera). Igual
+        // pasamos la altitud curada para que el gradiente sea coherente con esa
+        // posición, y la del perfil tiene prioridad si existe.
         const hit = findMunicipio(municipio.split(',')[0]);
         if (hit && Number.isFinite(hit.lat) && Number.isFinite(hit.lng)) {
-            return { lat: hit.lat, lng: hit.lng };
+            return {
+                lat: hit.lat,
+                lng: hit.lng,
+                elevation: profileElevation(profile) ?? plausibleMsnm(hit.altitud),
+            };
         }
     }
     return null;
@@ -97,8 +144,8 @@ export default function ClimaStrip({ onNavigate }) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeFincaSlug, fincas, tick]);
 
-    const coords = useMemo(() => {
-        return resolveCoords(getProfile(), municipio);
+    const geo = useMemo(() => {
+        return resolveGeo(getProfile(), municipio);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [municipio, tick]);
 
@@ -108,18 +155,30 @@ export default function ClimaStrip({ onNavigate }) {
         // pedir Open-Meteo, que necesita lat/lon. Cerramos el loading y dejamos
         // que el render decida: CTA si tampoco hay municipio, strip neutro si
         // hay municipio pero sin match DANE.
-        if (!coords) {
+        if (!geo) {
             Promise.resolve().then(() => { if (alive) setLoading(false); });
             return () => { alive = false; };
         }
+        // Pintado instantáneo desde el cache keyed por coords+elevation si existe.
+        const cached = getCachedClimaSnapshot(geo.lat, geo.lng, geo.elevation);
+        if (cached && alive) setSnapshot(cached);
         // fetchClimaSnapshot nunca throw: devuelve null si offline / flag off /
         // HTTP≥400. Open-Meteo real 7d viene en payload.openmeteo.forecast_7d.
-        fetchClimaSnapshot({ lat: coords.lat, lng: coords.lng })
+        // `elevation` (altitud real de la finca) corrige la temperatura por
+        // gradiente térmico — sin esto el pronóstico sale más cálido (usa la
+        // elevación de la cabecera/valle de la grilla de Open-Meteo).
+        // Solo incluimos `elevation` cuando la conocemos: así, sin altitud, el
+        // request queda { lat, lng } y Open-Meteo usa su grilla (comportamiento
+        // previo intacto); con altitud, corrige la temperatura por gradiente.
+        const climaArgs = geo.elevation != null
+            ? { lat: geo.lat, lng: geo.lng, elevation: geo.elevation }
+            : { lat: geo.lat, lng: geo.lng };
+        fetchClimaSnapshot(climaArgs)
             .then((res) => { if (alive && res) setSnapshot(res); })
             .catch(() => { /* degrade limpio — nunca rompe el dashboard */ })
             .finally(() => { if (alive) setLoading(false); });
         return () => { alive = false; };
-    }, [coords]);
+    }, [geo]);
 
     if (loading) {
         return (
@@ -134,7 +193,7 @@ export default function ClimaStrip({ onNavigate }) {
         );
     }
 
-    if (!coords && !municipio) {
+    if (!geo && !municipio) {
         return (
             <div className="bg-gradient-to-br from-sky-950/70 to-indigo-950/60 backdrop-blur-xl border border-sky-800/40 rounded-2xl p-5">
                 <div className="flex items-center gap-2 mb-2">

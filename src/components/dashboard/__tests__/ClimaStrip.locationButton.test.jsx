@@ -153,21 +153,44 @@ describe('ClimaStrip — pronóstico real Open-Meteo (fix fuente de datos 2026-0
         },
     };
 
-    test('usa coords del perfil (ubicacion_lat/lng) y NO geocodifica', async () => {
+    test('usa coords + altitud del perfil, pasa elevation y NO geocodifica', async () => {
+        // Perfil completo: coords reales de la finca + altitud (2580 msnm). Con
+        // la altitud en el perfil, resolveGeo no necesita geocodificar y reenvía
+        // elevation para que Open-Meteo corrija la temperatura por gradiente.
+        getProfile.mockReturnValue({
+            municipio: 'Choachí',
+            ubicacion_lat: 4.53,
+            ubicacion_lng: -73.92,
+            finca_altitud: '2580',
+        });
+        findMunicipio.mockClear();
+        fetchClimaSnapshot.mockResolvedValueOnce(snapshotConForecast);
+        render(<ClimaStrip onNavigate={vi.fn()} />);
+        await waitFor(() =>
+            expect(fetchClimaSnapshot).toHaveBeenCalledWith({ lat: 4.53, lng: -73.92, elevation: 2580 }),
+        );
+        // Con coords + altitud del perfil NO debe geocodificar el municipio.
+        expect(findMunicipio).not.toHaveBeenCalled();
+        getProfile.mockReturnValue({});
+    });
+
+    test('con coords pero SIN altitud en el perfil, cae a la curada del municipio (DANE)', async () => {
         getProfile.mockReturnValue({
             municipio: 'Choachí',
             ubicacion_lat: 4.53,
             ubicacion_lng: -73.92,
         });
         findMunicipio.mockClear();
+        findMunicipio.mockReturnValueOnce({ name: 'Choachí', lat: 4.52, lng: -73.92, altitud: 1923 });
         fetchClimaSnapshot.mockResolvedValueOnce(snapshotConForecast);
         render(<ClimaStrip onNavigate={vi.fn()} />);
         await waitFor(() =>
-            expect(fetchClimaSnapshot).toHaveBeenCalledWith({ lat: 4.53, lng: -73.92 }),
+            // coords del perfil (no las del municipio) + altitud curada del DANE.
+            expect(fetchClimaSnapshot).toHaveBeenCalledWith({ lat: 4.53, lng: -73.92, elevation: 1923 }),
         );
-        // Con coords del perfil NO debe geocodificar el municipio.
-        expect(findMunicipio).not.toHaveBeenCalled();
+        expect(findMunicipio).toHaveBeenCalled();
         getProfile.mockReturnValue({});
+        findMunicipio.mockReturnValue(null);
     });
 
     test('renderiza temperaturas reales (máx/mín) del forecast', async () => {
@@ -185,13 +208,14 @@ describe('ClimaStrip — pronóstico real Open-Meteo (fix fuente de datos 2026-0
         getProfile.mockReturnValue({});
     });
 
-    test('geocodifica el municipio si el perfil no tiene coords', async () => {
+    test('geocodifica el municipio si el perfil no tiene coords (con altitud curada)', async () => {
         getProfile.mockReturnValue({ municipio: 'Une' });
-        findMunicipio.mockReturnValueOnce({ name: 'Une', lat: 4.40, lng: -73.99 });
+        // Une, Cundinamarca ≈ 1875 msnm en el dataset DANE curado.
+        findMunicipio.mockReturnValueOnce({ name: 'Une', lat: 4.40, lng: -73.99, altitud: 1875 });
         fetchClimaSnapshot.mockResolvedValueOnce(snapshotConForecast);
         render(<ClimaStrip onNavigate={vi.fn()} />);
         await waitFor(() =>
-            expect(fetchClimaSnapshot).toHaveBeenCalledWith({ lat: 4.40, lng: -73.99 }),
+            expect(fetchClimaSnapshot).toHaveBeenCalledWith({ lat: 4.40, lng: -73.99, elevation: 1875 }),
         );
         getProfile.mockReturnValue({});
         findMunicipio.mockReturnValue(null);
