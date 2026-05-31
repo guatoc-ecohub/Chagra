@@ -181,6 +181,20 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
           onDoubleClick={handleBubbleDoubleClick}
           title={!isUser && !isStreaming ? 'Doble click reproduce o silencia esta respuesta' : undefined}
         >
+          {/* Bug 2026-05-31: la foto del compositor del home NO llegaba al chat,
+              solo el texto. Si el mensaje trae `imageUrl` (foto adjuntada en
+              AgentHero → outbox → AgentScreen), la pintamos como miniatura
+              DENTRO de la burbuja de usuario, encima del caption. El object URL
+              lo revoca el AgentScreen al desmontar (no aquí: re-renders no deben
+              invalidar el preview). */}
+          {message.imageUrl && (
+            <img
+              src={message.imageUrl}
+              alt={message.imageAlt || 'Foto enviada al agente'}
+              data-testid="chat-bubble-image"
+              className="mb-2 rounded-xl max-h-56 w-auto object-cover border border-white/15"
+            />
+          )}
           {/* #339: fallback visible si el contenido del assistant llega vacío
               (respuesta degradada del LLM, stream sin tokens, etc.). Nunca
               dejamos la burbuja en blanco — el usuario campesino no debe ver
