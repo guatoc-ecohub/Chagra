@@ -1236,7 +1236,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
   // completo (RAG, sidecar, LLM, TTS, action gate) para UN solo texto.
   // No toca el queue store — eso lo hace handleSubmit antes/después.
   // Tampoco hace re-entry guard porque el queue ya garantiza serialización.
-  const runAgentPipeline = async (text, { suppressUserBubble = false } = {}) => {
+  const runAgentPipeline = async (text, { suppressUserBubble = false, visionContext = null } = {}) => {
     // Bug 2026-05-31: cuando el item viene de la outbox multimodal (foto /
     // adjunto), el caller YA pintó la burbuja de usuario REAL (con su imagen).
     // Si además pintáramos aquí una burbuja con el prompt sintético ("Analicé
@@ -1471,9 +1471,19 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       const guardAltitud =
         (fincaActiva && fincaActiva.altitud) ||
         (() => { try { const p = getProfile(); return (p && p.finca_altitud) || null; } catch (_) { return null; } })();
+      // P0 (prod 2026-05-31): el agente FABRICABA un diagnóstico visual sin foto
+      // real ("Analicé una foto, estado 95/100" + hallazgos de Mapacho del RAG
+      // de tabaco). hadVision marca si ESTE turno trajo una imagen real
+      // (item de foto + analyzeFoliage corrido); sin foto, el guard de visión
+      // reemplaza cualquier afirmación visual por un mensaje honesto que pide la
+      // foto. visionConfidence permite suavizar hallazgos si la visión no fue
+      // concluyente. Para turnos de texto/voz, visionContext es null → hadVision
+      // false → corrige cualquier afirmación visual inventada.
       const guarded = applyOutputGuards(voseoSafe, {
         resolvedEntities,
         fincaAltitud: guardAltitud,
+        hadVision: !!(visionContext && visionContext.hadVision),
+        visionConfidence: (visionContext && visionContext.visionConfidence) ?? null,
       });
       if (guarded.modified) {
         console.debug('[guards] salida corregida', { reasons: guarded.reasons });
@@ -1680,7 +1690,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     await handleSubmit(prompt);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleSubmit = async (text, { fromVoice = false, suppressUserBubble = false } = {}) => {
+  const handleSubmit = async (text, { fromVoice = false, suppressUserBubble = false, visionContext = null } = {}) => {
     if (!text || !text.trim()) return;
     const trimmed = text.trim();
 
@@ -1694,6 +1704,11 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     // primer texto — los items pending que se promuevan después SÍ pintan su
     // propia burbuja (son preguntas distintas del usuario).
     let suppressFirstBubble = suppressUserBubble;
+    // visionContext (P0 visión-sin-foto 2026-05-31): solo el PRIMER texto del
+    // caller lleva el contexto de visión real; los pending promovidos son
+    // preguntas de texto nuevas → sin foto → el guard corrige afirmaciones
+    // visuales fabricadas.
+    let firstVisionContext = visionContext;
 
     const route = selectChatRoute(trimmed);
     const result = useAgentQueueStore.getState().enqueue(trimmed, route);
@@ -1735,10 +1750,15 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       safety += 1;
       let pipelineFailed = false;
       try {
-        await runAgentPipeline(currentText, { suppressUserBubble: suppressFirstBubble });
-        // Solo el primer texto del caller usa la supresión; los promovidos
-        // (pending) son preguntas nuevas y deben pintar su propia burbuja.
+        await runAgentPipeline(currentText, {
+          suppressUserBubble: suppressFirstBubble,
+          visionContext: firstVisionContext,
+        });
+        // Solo el primer texto del caller usa la supresión / el contexto de
+        // visión; los promovidos (pending) son preguntas nuevas: pintan su
+        // propia burbuja y NO arrastran la foto del turno anterior.
         suppressFirstBubble = false;
+        firstVisionContext = null;
       } catch (pipelineErr) {
         // runAgentPipeline ya captura todo internamente; este catch es
         // defensivo (e.g. error fuera del try interno). Marcamos failed
@@ -1910,12 +1930,23 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         // 2) Correr la visión y armar el prompt (degrada a "por descripción"
         //    si analyzeFoliage falla). Reusa processPhotoItem para la parte
         //    pura del prompt (sin re-pintar burbuja: createUrl ya consumido).
-        const { prompt } = await processPhotoItem(item, {
+        const { prompt, finding } = await processPhotoItem(item, {
           analyze: analyzeFoliage,
           createUrl: null,
         });
         // 3) Despachar al pipeline con la burbuja ya pintada (no duplicar).
-        await handleSubmit(prompt, { suppressUserBubble: true });
+        //    visionContext marca que ESTE turno SÍ trajo una foto real: el guard
+        //    de visión NO corrige un diagnóstico visual legítimo. La confianza
+        //    (si analyzeFoliage la expone) permite suavizar hallazgos cuando la
+        //    lectura no fue concluyente.
+        await handleSubmit(prompt, {
+          suppressUserBubble: true,
+          visionContext: {
+            hadVision: true,
+            visionConfidence:
+              finding && typeof finding.confidence === 'number' ? finding.confidence : null,
+          },
+        });
         await outboxMarkAnswered(item.id);
         return true;
       }
