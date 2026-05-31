@@ -45,6 +45,7 @@ import {
   assertIndependentJudge,
   RECOMMENDED_JUDGE_MODEL,
 } from './lib/bench-scorer.mjs';
+import { assertCheckoutCurrent } from './lib/bench-checkout-guard.mjs';
 import { applyOutputGuards } from '../src/services/outputGuards.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -245,6 +246,15 @@ async function judgeOllamaCall(prompt) {
 // ── main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
+  // Guarda ANTI-STALE (PASO 0): aborta si el checkout está atrás de origin/main.
+  // El "10% AH" previo fue artefacto de correr código viejo (sin #1240). Ningún
+  // bench debe volver a medir código que el usuario ya no ve.
+  assertCheckoutCurrent({
+    cwd: ROOT_DIR,
+    autoPull: process.env.BENCH_AUTO_PULL === '1',
+    skip: process.env.BENCH_SKIP_STALE_GUARD === '1',
+  });
+
   // Independencia del juez (verify-before-claim): aborta si juez === generador.
   assertIndependentJudge(JUDGE_MODEL, GEN_MODEL);
 

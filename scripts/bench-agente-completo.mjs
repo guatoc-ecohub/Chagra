@@ -40,6 +40,7 @@ import {
   assertIndependentJudge,
   RECOMMENDED_JUDGE_MODEL,
 } from './lib/bench-scorer.mjs';
+import { assertCheckoutCurrent } from './lib/bench-checkout-guard.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
@@ -743,6 +744,14 @@ async function benchmarkPrompt(promptData, index, total) {
 }
 
 async function main() {
+  // Guarda ANTI-STALE: aborta si el checkout está atrás de origin/main, para que
+  // el bench nunca mida código viejo (pasó 3 veces y contaminó el AH%).
+  assertCheckoutCurrent({
+    cwd: ROOT_DIR,
+    autoPull: process.env.BENCH_AUTO_PULL === '1',
+    skip: process.env.BENCH_SKIP_STALE_GUARD === '1',
+  });
+
   console.log('[bench] Agente Chagra completo — Benchmark LARGO');
   console.log(`[bench] Modelos: ${Object.values(MODELS).join(', ')}`);
   console.log(`[bench] Prompts: ${PROMPTS.length}`);

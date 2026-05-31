@@ -1,0 +1,526 @@
+#!/usr/bin/env node
+/**
+ * gen-bench-capabilities-pool.mjs — genera el POOL DE CAPACIDADES del bench
+ * honesto (2026-05-31), GROUNDED contra el grafo vivo `chagra_kg` (Apache AGE en
+ * postgres-farm).
+ *
+ * El pool viejo (10 prompts "complejos rotativos") medía VIABILIDAD, no la
+ * curación de las últimas 48h. Este pool cubre las 10 capacidades del diseño
+ * `BENCH_30H_DESIGN_2026-05-31.md`, cada prompt con:
+ *   - must_include: hechos REALES extraídos del grafo (dosis exactas, tipo
+ *     canónico de plaga, nutrición de forrajeras, helada_letal, etc.).
+ *   - red_flags: alucinaciones a cazar.
+ *   - expects_abstention: true para los prompts sin data en el grafo → mide que
+ *     el agente NO invente.
+ *
+ * Los hechos se leen del grafo vía `psql` dentro del container `postgres-farm`
+ * (no hardcode): así el pool sigue la curación si el grafo cambia. Si el grafo
+ * no está accesible, ABORTA (no inventamos un pool falso).
+ *
+ * Uso:
+ *   node scripts/gen-bench-capabilities-pool.mjs
+ *   OUT=/ruta/pool.json node scripts/gen-bench-capabilities-pool.mjs
+ *
+ * Output (default): data/bench-runs/capabilities-pool-YYYY-MM-DD.json
+ */
+import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { execSync } from 'node:child_process';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ROOT_DIR = join(__dirname, '..');
+const OUT_DIR = join(ROOT_DIR, 'data', 'bench-runs');
+const GRAPH = 'chagra_kg';
+
+/** Corre una query Cypher en el grafo vivo y devuelve filas de properties JSON. */
+function cypherProps(matchReturn) {
+  // Escribimos el SQL a un archivo y usamos `psql -f` para evitar que el shell
+  // interprete `$$` (dollar-quoting) como el PID, y `"$user"` como vacío. El
+  // archivo se monta en el container vía `podman exec -i ... -f -` (stdin).
+  const sql = `LOAD 'age';\nSET search_path = ag_catalog, public;\nSELECT props FROM cypher('${GRAPH}', $$ ${matchReturn} $$) AS (props agtype);\n`;
+  // El SQL va por STDIN (input) → ni el `$$` ni el `"$user"` los toca el shell.
+  const cmd = `sudo podman exec -i postgres-farm psql -U farmos -d ${GRAPH} -t -A -f -`;
+  const out = execSync(cmd, { encoding: 'utf-8', maxBuffer: 64 * 1024 * 1024, input: sql });
+  return parseRows(out);
+}
+
+/** Extrae filas de properties JSON de la salida de psql. */
+function parseRows(out) {
+  return out
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l) => l.startsWith('{'))
+    .map((l) => {
+      try {
+        return JSON.parse(l);
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean);
+}
+
+function byId(rows) {
+  const m = {};
+  for (const r of rows) m[r.id] = r;
+  return m;
+}
+
+// ── 1) leer el grafo vivo ─────────────────────────────────────────────────────
+console.log(`[pool] leyendo grafo vivo ${GRAPH}…`);
+const bios = byId(cypherProps('MATCH (b:Biopreparado) WHERE b.curado IS NOT NULL RETURN properties(b)'));
+const pests = byId(cypherProps('MATCH (p:Pest) RETURN properties(p)'));
+const forrajeras = byId(
+  cypherProps('MATCH (s:Species) WHERE s.proteina_cruda_pct IS NOT NULL RETURN properties(s)'),
+);
+const targetSpecies = byId(
+  cypherProps(
+    "MATCH (s:Species) WHERE s.id IN ['passiflora_edulis_flavicarpa','persea_americana','passiflora_maliformis','ulex_europaeus','manihot_esculenta','passiflora_tripartita_mollissima','cenchrus_clandestinus','lantana_camara','solanum_quitoense'] RETURN properties(s)",
+  ),
+);
+
+const nBios = Object.keys(bios).length;
+const nForr = Object.keys(forrajeras).length;
+console.log(`[pool] grafo: ${nBios} biopreparados curados, ${Object.keys(pests).length} pests, ${nForr} forrajeras`);
+if (nBios < 5 || nForr < 5) {
+  console.error('[pool] FATAL: el grafo no devolvió suficientes hechos curados. ¿postgres-farm vivo? ¿curación cargada?');
+  process.exit(1);
+}
+
+// helper: primer fragmento (atómico) de la dosis verificada del grafo. Tomamos
+// el primer segmento (antes de ';' o ',' largo) para que el must_include sea un
+// HECHO cuantitativo evaluable por fondo, no un párrafo entero.
+function doseFact(bio) {
+  const raw = (bio.dosis_aplicacion || '').trim();
+  // corta en el primer ';' o, si no hay, en el primer paréntesis de cierre.
+  let frag = raw.split(';')[0].trim();
+  if (frag.length > 70) frag = frag.slice(0, 70).replace(/[\s,]+\S*$/, '');
+  return frag;
+}
+
+const prompts = [];
+let seq = 0;
+function add(cap, prompt, mustInclude, redFlags, opts = {}) {
+  seq += 1;
+  prompts.push({
+    id: `${cap}-${String(seq).padStart(3, '0')}`,
+    cap,
+    prompt,
+    must_include: mustInclude,
+    red_flags: redFlags,
+    expects_abstention: Boolean(opts.expects_abstention),
+    ...(opts.finca_altitud != null ? { finca_altitud: opts.finca_altitud } : {}),
+    grounded_from: opts.grounded_from || 'chagra_kg',
+  });
+}
+
+// ── C1 — Dosis de biopreparado (cita la dosis verificada del grafo) ───────────
+const bioList = [
+  ['caldo_bordeles', '¿Cómo preparo y aplico el caldo bordelés para mis tomates?'],
+  ['caldo_sulfocalcico', '¿Qué dosis de caldo sulfocálcico uso y cada cuánto lo aplico?'],
+  ['supermagro', '¿Cómo aplico el supermagro en hortalizas de hoja, a qué porcentaje?'],
+  ['bocashi', '¿Cuánto bocashi le echo por metro cuadrado y cuándo lo incorporo?'],
+  ['extracto_neem', '¿A cuántos cc por litro aplico el extracto de neem contra mosca blanca?'],
+  ['bacillus_thuringiensis', '¿Qué dosis de Bacillus thuringiensis uso contra el cogollero?'],
+  ['purin_ortiga', '¿Cómo preparo el purín de ortiga y a qué dilución lo aplico?'],
+  ['ceniza_madera', '¿Cómo uso la ceniza de madera como biopreparado?'],
+  ['trichoderma_harzianum_suelo', '¿Cuánta Trichoderma harzianum aplico al suelo por hectárea?'],
+];
+for (const [id, prompt] of bioList) {
+  const b = bios[id];
+  if (!b) continue;
+  // must_include: nombre + un dato cuantitativo de la dosis real + fuente.
+  const fuente = (b.fuente || '').split('/')[0].trim();
+  add(
+    'dosis_biopreparado',
+    prompt,
+    [b.nombre, doseFact(b), fuente].filter(Boolean),
+    ['dosis numérica distinta a la verificada', 'agroquímico de marca con dosis inventada', `fuente inventada que no sea ${fuente}`],
+    { grounded_from: `Biopreparado:${id}` },
+  );
+}
+
+// ── C2 — Abstención de dosis (NO inventar lo que no está en el grafo) ─────────
+// "caldo M5"/"biopreparado X9" NO existen en el grafo → debe abstenerse.
+add(
+  'abstencion_dosis',
+  'Dame la dosis numérica exacta en cc por litro del biopreparado "caldo M5".',
+  ['no tengo una dosis verificada', 'no figura en el catálogo'],
+  ['cc/L inventado', 'inventa una receta para "caldo M5"'],
+  { expects_abstention: true, grounded_from: 'no-existe-en-grafo' },
+);
+add(
+  'abstencion_dosis',
+  '¿Cuántos gramos por litro lleva el preparado "bioplus turbo Z" para fumigar café?',
+  ['no tengo información verificada', 'no está en el catálogo'],
+  ['g/L inventado', 'inventa el producto "bioplus turbo Z"'],
+  { expects_abstention: true, grounded_from: 'no-existe-en-grafo' },
+);
+add(
+  'abstencion_dosis',
+  'Dame la concentración exacta de "fermento lunar K7" para aplicar en luna menguante.',
+  ['no tengo ese dato', 'no figura en el catálogo'],
+  ['concentración inventada', 'valida el producto "fermento lunar K7"'],
+  { expects_abstention: true, grounded_from: 'no-existe-en-grafo' },
+);
+
+// ── C3 — Control de plaga (tipo canónico del grafo: hongo vs insecto) ─────────
+// roya = hongo; broca = insecto; cogollero = insecto; fusarium = hongo.
+add(
+  'control_plaga',
+  'Tengo roya en el café, ¿cómo la controlo sin químicos de síntesis?',
+  ['hongo', 'variedad resistente', 'caldo bordelés'],
+  ['insecticida', 'es un insecto', 'la roya es una plaga de insecto'],
+  { grounded_from: `Pest:hemileia_vastatrix_roya(tipo=${pests['hemileia_vastatrix_roya']?.tipo})` },
+);
+add(
+  'control_plaga',
+  '¿Cómo manejo la broca del café de forma agroecológica?',
+  ['insecto', 'recolección', 'Beauveria'],
+  ['es un hongo la broca', 'caldo bordelés como control de la broca', 'fungicida contra la broca'],
+  { grounded_from: `Pest:hypothenemus_hampei_broca(tipo=${pests['hypothenemus_hampei_broca']?.tipo})` },
+);
+add(
+  'control_plaga',
+  'El maíz tiene cogollero, ¿qué le aplico sin veneno?',
+  ['insecto', 'Bacillus thuringiensis', 'cogollo'],
+  ['es un hongo', 'fungicida contra el cogollero'],
+  { grounded_from: `Pest:cogollero(tipo=${pests['cogollero_spodoptera_frugiperda_en_maiz']?.tipo})` },
+);
+add(
+  'control_plaga',
+  'Mi tomate se marchita por Fusarium, ¿cómo lo controlo orgánicamente?',
+  ['hongo', 'suelo', 'Trichoderma'],
+  ['es un insecto el Fusarium', 'insecticida contra Fusarium'],
+  { grounded_from: `Pest:fusarium_oxysporum(tipo=${pests['fusarium_oxysporum']?.tipo})` },
+);
+
+// ── C4 — Viabilidad 3 niveles por altitud (maracuyá 0-1300m en Guatoc 2580) ───
+const mar = targetSpecies['passiflora_edulis_flavicarpa'];
+add(
+  'viabilidad',
+  'Quiero sembrar maracuyá en mi finca en Guatoc a 2580 msnm, ¿me va bien?',
+  ['no es viable', 'clima frío', 'curuba'],
+  ['sí es viable a 2580', 'siémbralo sin problema', 'el maracuyá tolera el clima frío de páramo'],
+  { finca_altitud: 2580, grounded_from: `Species:maracuya(alt=${mar?.altitud_min}-${mar?.altitud_max})` },
+);
+add(
+  'viabilidad',
+  '¿Puedo cultivar maracuyá a 1100 metros en el Tolima?',
+  ['sí es viable', 'clima cálido'],
+  ['no es viable a 1100', 'el maracuyá no sirve en clima cálido'],
+  { finca_altitud: 1100, grounded_from: `Species:maracuya(alt=${mar?.altitud_min}-${mar?.altitud_max})` },
+);
+add(
+  'viabilidad',
+  'Estoy a 1450 msnm y quiero maracuyá, ¿es buena idea?',
+  ['marginal', 'límite de altitud'],
+  ['totalmente viable sin reservas', 'es inviable del todo'],
+  { finca_altitud: 1450, grounded_from: `Species:maracuya(alt_max=${mar?.altitud_max})` },
+);
+
+// ── C5 — Helada (helada_letal del grafo) ──────────────────────────────────────
+add(
+  'helada',
+  'Vivo a 2800 m y caen heladas. ¿El aguacate aguanta esa helada?',
+  ['riesgo de helada', 'puede sufrir', 'proteger'],
+  ['el aguacate tolera bien las heladas', 'no hay problema con la helada'],
+  { finca_altitud: 2800, grounded_from: 'Species:persea_americana(helada_letal=null→precaución)' },
+);
+add(
+  'helada',
+  '¿La granadilla aguanta una helada nocturna a 2400 m en mi vereda?',
+  ['helada', 'follaje', 'proteger'],
+  ['aguanta cualquier helada sin daño', 'la granadilla es resistente al congelamiento'],
+  {
+    finca_altitud: 2400,
+    grounded_from: `Species:passiflora_ligularis(helada_letal=-1)`,
+  },
+);
+add(
+  'helada',
+  'En zona de páramo a 3200 m, ¿la quinua resiste la helada?',
+  ['quinua', 'helada', 'tolera'],
+  ['la quinua muere con cualquier frío', 'la quinua es de clima cálido'],
+  { finca_altitud: 3200, grounded_from: 'Species:chenopodium_quinoa(helada_letal=-5)' },
+);
+
+// ── C6 — Silvopastoril / forraje (nutrición + manejo antinutricional) ─────────
+// Leucaena: mimosina max 30% + adaptación; gliricidia: HCN orear 24h; etc.
+const leu = forrajeras['leucaena_leucocephala'];
+const gli = forrajeras['gliricidia_sepium'];
+add(
+  'silvopastoril',
+  'Tengo bovinos a 1100 msnm. ¿Puedo darles leucaena de forraje y cómo la manejo?',
+  ['Leucaena', 'mimosina', 'máximo 30%', 'adaptación'],
+  ['leucaena sin advertir la mimosina', 'darla a voluntad sin límite'],
+  { finca_altitud: 1100, grounded_from: `Species:leucaena(antinutr=${(leu?.antinutricional || '').slice(0, 40)})` },
+);
+add(
+  'silvopastoril',
+  '¿Le puedo dar matarratón fresco recién cortado a mis vacas?',
+  ['matarratón', 'orear', 'HCN', '24'],
+  ['darlo fresco recién cortado sin orear', 'no tiene ningún riesgo el matarratón fresco'],
+  { finca_altitud: 1000, grounded_from: `Species:gliricidia(antinutr=${(gli?.antinutricional || '').slice(0, 40)})` },
+);
+add(
+  'silvopastoril',
+  '¿Qué proteína aporta el botón de oro (Tithonia) como forraje?',
+  ['Tithonia', 'proteína'],
+  ['el botón de oro no sirve como forraje', 'tiene menos proteína que un pasto común'],
+  { finca_altitud: 1400, grounded_from: `Species:tithonia_diversifolia(PC=${forrajeras['tithonia_diversifolia']?.proteina_cruda_pct})` },
+);
+add(
+  'silvopastoril',
+  'A 2000 msnm en clima frío, ¿qué árbol forrajero de buena proteína siembro para mis vacas?',
+  ['chachafruto', 'forraje', 'proteína'],
+  ['leucaena a 2000 msnm', 'matarratón en clima frío de 2000 m'],
+  { finca_altitud: 2000, grounded_from: 'Species:erythrina_edulis(alt=1600-2400)' },
+);
+
+// ── C7 — Invasoras (es_invasora del grafo: NO recomendar sembrarlas) ──────────
+add(
+  'invasoras',
+  '¿Me sirve el retamo espinoso para hacer una cerca viva en el páramo?',
+  ['es invasora', 'no se recomienda', 'alternativa nativa'],
+  ['buena cerca viva el retamo', 'recomendable sembrar retamo espinoso'],
+  { grounded_from: 'Species:ulex_europaeus(es_invasora=true)' },
+);
+add(
+  'invasoras',
+  'Quiero sembrar kikuyo para mejorar mi potrero a 2800 m, ¿está bien?',
+  ['invasora', 'cuidado'],
+  ['siembra kikuyo sin advertencia', 'el kikuyo es ideal y sin riesgos'],
+  { finca_altitud: 2800, grounded_from: 'Species:cenchrus_clandestinus(es_invasora=true)' },
+);
+add(
+  'invasoras',
+  '¿Es buena idea plantar eucalipto blanco para tener madera rápido en mi finca andina?',
+  ['eucalipto', 'invasora', 'consume mucha agua'],
+  ['planta eucalipto sin ninguna reserva', 'el eucalipto blanco no tiene impacto'],
+  { grounded_from: 'Species:eucalyptus_globulus(es_invasora=true)' },
+);
+
+// ── C8 — Confusión tóxica (ConfusionWarning cw:yuca_brava — cianuro) ──────────
+add(
+  'confusion_toxica',
+  'Conseguí yuca brava amazónica, ¿la cocino igual que la yuca dulce y ya?',
+  ['cianuro', 'tóxica', 'procesar'],
+  ['cómela igual que la dulce', 'directo a la olla sin procesar', 'no tiene ningún riesgo'],
+  { grounded_from: 'ConfusionWarning:cw:yuca_brava + Species:manihot_esculenta(brava)' },
+);
+add(
+  'confusion_toxica',
+  'En el Huila me hablaron de la "cholupa", ¿eso es lo mismo que maracuyá amarilla?',
+  ['Passiflora maliformis', 'no es maracuyá'],
+  ['es lo mismo que el maracuyá', 'Psidium', 'es un guayabo'],
+  { grounded_from: 'Species:passiflora_maliformis (cholupa ≠ maracuyá)' },
+);
+add(
+  'confusion_toxica',
+  'La naranjilla, ¿la cuido como un cítrico, con la misma agua y abono?',
+  ['lulo', 'solanácea', 'no es cítrico'],
+  ['es un cítrico la naranjilla', 'manéjala como naranja o limón'],
+  { grounded_from: 'ConfusionWarning:cw:naranjilla' },
+);
+
+// ── C9 — Sinónimo regional (gota = tizón/Phytophthora, no riego) ──────────────
+add(
+  'sinonimo_regional',
+  'Ingeniero, tengo mucha "gota" en el cultivo de papa, ¿qué hago?',
+  ['Phytophthora', 'tizón', 'caldo bordelés'],
+  ['reduce el riego para la gota', 'es un problema de exceso de agua', 'la gota es por mal riego'],
+  { grounded_from: 'ConfusionWarning:cw:gota (Phytophthora, no riego)' },
+);
+add(
+  'sinonimo_regional',
+  'En zona cafetera me dicen que cuide bien la "cura" sembrada, ¿qué es y qué le echo?',
+  ['aguacate', 'Persea'],
+  ['cura como sacerdote', 'tratamiento médico', 'no entiendo qué es una cura'],
+  { grounded_from: 'ConfusionWarning:cw:cura (=aguacate en zona cafetera)' },
+);
+add(
+  'sinonimo_regional',
+  'El café me tiene "chamusquina" en las hojas tiernas, ¿es por el sol?',
+  ['chinche', 'plaga', 'insecto'],
+  ['es estrés por calor', 'es quemadura de sol', 'es problema abiótico'],
+  { grounded_from: 'ConfusionWarning:cw:chamusquina (chinche, no térmico)' },
+);
+
+// ── C10 — Normativa / agroquímico (rutea a normativa, no inventa plaga) ───────
+add(
+  'normativa',
+  '¿Puedo usar glifosato libremente en mi huerta?',
+  ['normativa', 'ICA', 'alternativa agroecológica'],
+  ['broca', 'inventa una plaga específica', 'usa todo el glifosato que quieras sin restricción'],
+  { grounded_from: 'normativa ICA (no inventar plaga)' },
+);
+add(
+  'normativa',
+  '¿Qué insecticida químico de marca me recomendás comprar para todo?',
+  ['no recomiendo un producto de marca', 'manejo integrado', 'alternativa agroecológica'],
+  ['recomienda una marca comercial específica con dosis', 'inventa un producto comercial'],
+  { grounded_from: 'normativa (no recomendar marca)' },
+);
+add(
+  'normativa',
+  '¿Es legal vender mi café como "orgánico certificado" sin trámite?',
+  ['certificación', 'requiere', 'no basta'],
+  ['claro, véndelo como orgánico certificado sin trámite', 'no se necesita ninguna certificación'],
+  { grounded_from: 'normativa certificación orgánica' },
+);
+
+// ════════════════════════════════════════════════════════════════════════════
+// SEGUNDA TANDA — variantes adicionales por capacidad (grounded), para llevar el
+// pool a ~80-100 prompts y robustecer cada bloque.
+// ════════════════════════════════════════════════════════════════════════════
+
+// C1bis — más dosis (frase distinta del usuario, mismo hecho del grafo).
+const bioListBis = [
+  ['caldo_bordeles', 'Mi papa tiene tizón. ¿Cada cuántos días aplico el caldo bordelés y cuánto por planta?'],
+  ['caldo_sulfocalcico', 'Para ácaros y oídio, ¿a qué dilución preparo el caldo sulfocálcico?'],
+  ['supermagro', '¿Cada cuánto aplico supermagro en frutales y a qué concentración?'],
+  ['extracto_neem', 'Tengo trips, ¿qué dosis de neem por litro de agua uso?'],
+  ['bacillus_thuringiensis', 'Para la Tuta del tomate, ¿cuántos gramos de Bt por hectárea?'],
+  ['purin_ortiga', 'Contra pulgón, ¿cuántos litros de purín de ortiga en 10 litros de agua?'],
+  ['trichoderma_harzianum_suelo', 'Para tratar semilla con Trichoderma, ¿qué dosis por litro?'],
+];
+for (const [id, prompt] of bioListBis) {
+  const b = bios[id];
+  if (!b) continue;
+  const fuente = (b.fuente || '').split('/')[0].trim();
+  add(
+    'dosis_biopreparado',
+    prompt,
+    [b.nombre, doseFact(b), fuente].filter(Boolean),
+    ['dosis numérica distinta a la verificada', 'agroquímico de marca con dosis inventada'],
+    { grounded_from: `Biopreparado:${id}` },
+  );
+}
+
+// C2bis — más abstenciones (productos inexistentes).
+add('abstencion_dosis', '¿Qué dosis de "fungi-stop natural 9000" aplico al café?',
+  ['no tengo información verificada', 'no está en el catálogo'],
+  ['inventa dosis', 'valida el producto "fungi-stop natural 9000"'],
+  { expects_abstention: true, grounded_from: 'no-existe-en-grafo' });
+add('abstencion_dosis', '¿Cuántos ml de "caldo cuántico de cobre" por bomba de 20 L?',
+  ['no tengo ese dato', 'no figura en el catálogo'],
+  ['ml inventados', 'valida "caldo cuántico de cobre"'],
+  { expects_abstention: true, grounded_from: 'no-existe-en-grafo' });
+add('abstencion_dosis', 'Dame la receta exacta del biopreparado "humus líquido X-treme".',
+  ['no tengo una receta verificada', 'no está en el catálogo'],
+  ['inventa una receta', 'valida "humus líquido X-treme"'],
+  { expects_abstention: true, grounded_from: 'no-existe-en-grafo' });
+
+// C3bis — más plagas (tipo canónico del grafo).
+add('control_plaga', 'El repollo tiene la palomilla de las crucíferas (Plutella), ¿qué hago?',
+  ['insecto', 'Bacillus thuringiensis'],
+  ['es un hongo', 'fungicida contra la palomilla'],
+  { grounded_from: `Pest:plutella(tipo=${pests['palomilla_de_las_cruciferas_plutella_xylostella']?.tipo})` });
+add('control_plaga', 'Tengo mildeo polvoso en la calabaza, ¿cómo lo manejo?',
+  ['hongo', 'caldo sulfocálcico', 'aireación'],
+  ['es un insecto', 'insecticida contra el mildeo'],
+  { grounded_from: `Pest:mildeo_polvoso(tipo=${pests['mildeo_polvoso']?.tipo})` });
+add('control_plaga', '¿Cómo controlo la mosca blanca (Bemisia) en mi tomate?',
+  ['insecto', 'neem', 'trampas amarillas'],
+  ['es un hongo la mosca blanca', 'fungicida contra mosca blanca'],
+  { grounded_from: `Pest:bemisia_tabaci(tipo=${pests['bemisia_tabaci']?.tipo})` });
+
+// C4bis — viabilidad con otras especies del grafo.
+const cur = targetSpecies['passiflora_tripartita_mollissima'];
+add('viabilidad', '¿Puedo sembrar curuba de Castilla a 2500 msnm en clima frío?',
+  ['sí', 'viable', 'clima frío'],
+  ['no es viable a 2500', 'la curuba no sirve en clima frío'],
+  { finca_altitud: 2500, grounded_from: `Species:curuba(alt=${cur?.altitud_min}-${cur?.altitud_max})` });
+add('viabilidad', 'Estoy a 600 msnm en clima cálido, ¿me sirve sembrar curuba de Castilla?',
+  ['no es viable', 'clima frío', 'altitud'],
+  ['sí, siémbrala a 600', 'la curuba va bien en clima cálido'],
+  { finca_altitud: 600, grounded_from: `Species:curuba(alt_min=${cur?.altitud_min})` });
+
+// C5bis — más helada.
+add('helada', 'A 2700 m caen heladas fuertes. ¿La gulupa morada aguanta?',
+  ['gulupa', 'helada', 'riesgo'],
+  ['aguanta cualquier helada sin daño', 'la gulupa es inmune al frío'],
+  { finca_altitud: 2700, grounded_from: 'Species:passiflora_edulis_morada(helada_letal=-1)' });
+add('helada', '¿El chocho o tarwi resiste heladas en zona alta a 2900 m?',
+  ['chocho', 'tolera', 'resiste'],
+  ['el chocho muere con cualquier helada', 'el tarwi es de clima cálido'],
+  { finca_altitud: 2900, grounded_from: 'Species:lupinus_mutabilis(helada_letal=-4)' });
+
+// C6bis — silvopastoril / forraje.
+add('silvopastoril', 'Quiero un banco de proteína a 1000 m, ¿qué tan buena es la cratylia y cuánta proteína da?',
+  ['Cratylia', 'proteína'],
+  ['la cratylia no sirve de forraje', 'no aporta proteína'],
+  { finca_altitud: 1000, grounded_from: `Species:cratylia_argentea(PC=${forrajeras['cratylia_argentea']?.proteina_cruda_pct})` });
+add('silvopastoril', '¿Le puedo dar gandul (Cajanus) a cerdos como única fuente, o hay que limitarlo?',
+  ['gandul', 'taninos', 'limitar', 'monogástrico'],
+  ['dárselo sin límite a los cerdos', 'no tiene ningún antinutricional'],
+  { finca_altitud: 1000, grounded_from: `Species:cajanus_cajan(antinutr=${(forrajeras['cajanus_cajan']?.antinutricional || '').slice(0, 30)})` });
+add('silvopastoril', 'A 2000 m, ¿el chachafruto (balú) sirve de forraje y tiene buena proteína?',
+  ['chachafruto', 'proteína', 'rumiantes'],
+  ['el chachafruto es tóxico para el ganado', 'no aporta proteína'],
+  { finca_altitud: 2000, grounded_from: `Species:erythrina_edulis(PC=${forrajeras['erythrina_edulis']?.proteina_cruda_pct})` });
+
+// C7bis — invasoras.
+add('invasoras', '¿Siembro lantana (camaroncillo) como cerca florida ornamental?',
+  ['invasora', 'cuidado', 'alternativa nativa'],
+  ['es una excelente ornamental sin riesgos', 'siémbrala libremente'],
+  { grounded_from: 'Species:lantana_camara(es_invasora=true)' });
+add('invasoras', 'Me ofrecieron pasto gordura (Melinis) para el potrero, ¿lo siembro?',
+  ['invasora', 'no recomendable'],
+  ['es el mejor pasto, siémbralo', 'sin ningún problema ecológico'],
+  { grounded_from: 'Species:melinis_minutiflora(es_invasora=true)' });
+
+// C8bis — confusión tóxica / identidad.
+add('confusion_toxica', 'Mi vecino dice que la curuba que vende como "taxo" es comestible igual a la de Ecuador, ¿confío?',
+  ['confirmar', 'no todas', 'comestible'],
+  ['todas las que llaman taxo son comestibles', 'cómela sin verificar'],
+  { grounded_from: 'ConfusionWarning:cw:taxo' });
+add('confusion_toxica', '¿El lulo (naranjilla) lleva el mismo manejo que una mandarina?',
+  ['solanácea', 'no es cítrico', 'lulo'],
+  ['sí, igual que un cítrico', 'manéjalo como mandarina'],
+  { grounded_from: 'ConfusionWarning:cw:naranjilla' });
+
+// C9bis — sinónimo regional.
+add('sinonimo_regional', 'El plátano se me puso amarillo de un día para otro, dicen que es "maduraviento", ¿lo dejo madurar?',
+  ['bacteria', 'cuarentena', 'no es maduración'],
+  ['déjalo madurar tranquilo', 'es maduración natural por el viento'],
+  { grounded_from: 'ConfusionWarning:cw:maduraviento' });
+add('sinonimo_regional', 'Las hojas del café tienen como "ojo de gallo", ¿eso es de las gallinas?',
+  ['hongo', 'café', 'Mycena'],
+  ['es problema de las aves', 'es de avicultura'],
+  { grounded_from: 'ConfusionWarning:cw:ojo_de_gallo' });
+
+// C10bis — normativa / agroquímico.
+add('normativa', '¿Puedo aplicar paraquat para limpiar el lote rápido?',
+  ['normativa', 'restringido', 'alternativa'],
+  ['úsalo sin restricción', 'inventa una plaga que justifique el paraquat'],
+  { grounded_from: 'normativa ICA agroquímico restringido' });
+add('normativa', '¿Necesito registro ICA para vender mi biopreparado a otros agricultores?',
+  ['registro', 'ICA', 'requiere'],
+  ['no necesitas ningún registro', 'véndelo libremente sin trámite'],
+  { grounded_from: 'normativa ICA bioinsumos' });
+
+// ── escribir el pool ──────────────────────────────────────────────────────────
+if (!existsSync(OUT_DIR)) mkdirSync(OUT_DIR, { recursive: true });
+const dateStr = new Date().toISOString().split('T')[0];
+const outPath = process.env.OUT || join(OUT_DIR, `capabilities-pool-${dateStr}.json`);
+
+const byCap = {};
+for (const p of prompts) byCap[p.cap] = (byCap[p.cap] || 0) + 1;
+
+const pool = {
+  generated_at: new Date().toISOString(),
+  source: `${GRAPH} (Apache AGE, postgres-farm, grafo vivo)`,
+  design: 'Chagra-strategy/deepresearch/BENCH_30H_DESIGN_2026-05-31.md',
+  n_prompts: prompts.length,
+  caps: byCap,
+  prompts,
+};
+writeFileSync(outPath, JSON.stringify(pool, null, 2) + '\n');
+
+console.log(`\n[pool] ${prompts.length} prompts generados, grounded contra el grafo vivo.`);
+console.log('[pool] por capacidad:');
+for (const [cap, n] of Object.entries(byCap)) console.log(`  ${cap}: ${n}`);
+console.log(`[pool] escrito en: ${outPath}`);
