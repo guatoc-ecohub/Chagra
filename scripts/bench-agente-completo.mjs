@@ -13,21 +13,33 @@
  *
  * Scoring (R3, re-bench post-guards 2026-05-31): keyword-FLEXIBLE por defecto
  * (sinónimos/lemas, ver scripts/lib/bench-scorer.mjs) — antes era match literal
- * que daba falsos 0/10. Con `--judge` añade un LLM-judge (mistral-nemo:12b vía
- * ollama) que evalúa si la respuesta cumple el criterio SUSTANTIVO; degrada a
- * keyword-flexible si el judge no está / falla.
+ * que daba falsos 0/10. Con `--judge` añade un LLM-judge vía ollama que evalúa si
+ * la respuesta cumple el criterio SUSTANTIVO; degrada a keyword-flexible si el
+ * judge no está / falla.
+ *
+ * JUEZ INDEPENDIENTE (R4, 2026-05-31): el juez NO debe ser el generador
+ * (granite3.1-dense:8b) — eso es auto-evaluación y sesga el score. El default
+ * pasa a qwen2.5:14b (familia distinta, estable en Maxwell sm_52). mistral-nemo
+ * queda DESCARTADO por crash en Maxwell. `assertIndependentJudge` aborta si el
+ * juez coincide con el generador a evaluar.
  *
  * Uso:
  *   node scripts/bench-agente-completo.mjs
- *   node scripts/bench-agente-completo.mjs --judge        # + LLM-judge semántico
- *   JUDGE_MODEL=granite3.1-dense:8b node scripts/... --judge
+ *   node scripts/bench-agente-completo.mjs --judge                 # + LLM-judge (qwen2.5:14b)
+ *   node scripts/bench-agente-completo.mjs --judge qwen2.5:14b     # juez explícito
+ *   JUDGE_MODEL=qwen2.5:14b node scripts/... --judge               # equivalente por env
  */
 import { writeFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
 import { execSync } from 'node:child_process';
-import { scoreKeywordsFlexible, scoreWithJudge } from './lib/bench-scorer.mjs';
+import {
+  scoreKeywordsFlexible,
+  scoreWithJudge,
+  assertIndependentJudge,
+  RECOMMENDED_JUDGE_MODEL,
+} from './lib/bench-scorer.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
@@ -39,11 +51,23 @@ const OLLAMA_URL = 'http://localhost:11434/api/chat';
 const OLLAMA_GEN_URL = process.env.OLLAMA_GEN_URL || 'http://localhost:11434/api/generate';
 const TIMEOUT_MS = 180_000; // 3 min timeout por modelo
 
-// R3 — evaluador semántico. `--judge` activa el LLM-judge (mistral-nemo:12b por
-// defecto: índice de benchmarks lo marca como judge 100% NUEVO). Sin la flag, el
-// scoring es keyword-FLEXIBLE (sinónimos/lemas) en vez del match literal previo.
+// R4 — juez INDEPENDIENTE. `--judge [modelo]` activa el LLM-judge. El default ya
+// NO es el generador (granite = auto-eval) ni mistral-nemo (crashea Maxwell):
+// es qwen2.5:14b, de otra familia y estable en sm_52. Precedencia del modelo:
+//   1) argumento posicional tras --judge   (--judge qwen2.5:14b)
+//   2) env JUDGE_MODEL
+//   3) RECOMMENDED_JUDGE_MODEL (qwen2.5:14b)
+// Sin la flag, el scoring es keyword-FLEXIBLE (sinónimos/lemas).
 const USE_JUDGE = process.argv.includes('--judge');
-const JUDGE_MODEL = process.env.JUDGE_MODEL || 'mistral-nemo:12b';
+function parseJudgeArg() {
+  const i = process.argv.indexOf('--judge');
+  if (i >= 0) {
+    const next = process.argv[i + 1];
+    if (next && !next.startsWith('--')) return next;
+  }
+  return null;
+}
+const JUDGE_MODEL = parseJudgeArg() || process.env.JUDGE_MODEL || RECOMMENDED_JUDGE_MODEL;
 const JUDGE_TIMEOUT_MS = 60_000;
 
 const MODELS = {
@@ -549,9 +573,9 @@ function countKeywords(response, keywords) {
 }
 
 /**
- * Caller real del LLM-judge contra ollama (mistral-nemo:12b). Devuelve el texto
- * crudo del modelo; `scoreWithJudge` lo parsea y degrada a keyword-flexible si
- * falla. NO se llama si --judge está apagado.
+ * Caller real del LLM-judge INDEPENDIENTE contra ollama (JUDGE_MODEL, default
+ * qwen2.5:14b). Devuelve el texto crudo del modelo; `scoreWithJudge` lo parsea y
+ * degrada a keyword-flexible si falla. NO se llama si --judge está apagado.
  */
 async function judgeOllamaCall(prompt) {
   const controller = new AbortController();
@@ -598,12 +622,14 @@ async function benchmarkModel(modelKey, modelName, promptData) {
 
     clearTimeout(timer);
 
-    // R3 — evaluación semántica opcional (--judge): el LLM-judge dictamina si la
-    // respuesta cumple el criterio SUSTANTIVO (no literal). Degrada a keyword-
-    // flexible si el judge no está / falla. Sin la flag, no se llama (CERO GPU
-    // extra).
+    // R4 — evaluación semántica opcional (--judge) con juez INDEPENDIENTE: el
+    // LLM-judge dictamina si la respuesta cumple el criterio SUSTANTIVO (no
+    // literal). assertIndependentJudge aborta si el juez es el propio modelo
+    // generador (auto-eval). Degrada a keyword-flexible si el judge no está /
+    // falla. Sin la flag, no se llama (CERO GPU extra).
     let judge = null;
     if (USE_JUDGE) {
+      assertIndependentJudge(JUDGE_MODEL, modelName);
       judge = await scoreWithJudge(
         {
           query: promptData.query,
