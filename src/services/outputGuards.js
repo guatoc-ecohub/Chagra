@@ -806,6 +806,189 @@ export function guardSpeciesSubstitution(responseText, resolvedEntities = null, 
   return { text, modified: true, reason: `sustitución_especie: ${disparadas.join('; ')}` };
 }
 
+// ── GUARD 5b: binomio de compañía/antagonista sustituido ────────────────────
+
+/**
+ * Sub-arrays de una entidad que listan OTRAS especies relacionadas, cada una con
+ * su propio `nombre_comun` + `nombre_cientifico` autoritativo del grounding.
+ * Estas son las que el guard de compañía valida (companions, antagonists,
+ * alternativas, controladores de plaga).
+ */
+const COMPANION_SUBARRAY_KEYS = [
+  'companions',
+  'antagonists',
+  'alternativas_viables',
+  'alternativas',
+  'pest_controllers',
+];
+
+/**
+ * Construye el mapa `nombreComún(normalizado) → Set<binomio canónico>` a partir
+ * de los sub-arrays de compañía/antagonista de TODAS las entidades resueltas.
+ * Cada compañía aporta su binomio autoritativo (puede haber varias compañías
+ * distintas con el mismo nombre común entre cultivos: se acumulan en el Set).
+ * Solo se incluyen entradas con nombre común usable (≥3 chars en su 1er token) y
+ * binomio parseable.
+ *
+ * @param {Array<object>} entities
+ * @returns {Map<string, {display:string, sci:string, bins:Set<string>}>}
+ */
+function _companionBinomialMap(entities) {
+  /** @type {Map<string, {display:string, sci:string, bins:Set<string>}>} */
+  const map = new Map();
+  for (const e of entities) {
+    if (!e || typeof e !== 'object') continue;
+    for (const key of COMPANION_SUBARRAY_KEYS) {
+      const arr = e[key];
+      if (!Array.isArray(arr)) continue;
+      for (const c of arr) {
+        if (!c || typeof c !== 'object') continue;
+        const nombre = (c.nombre_comun || c.nombre || c.name || '').toString();
+        const sci = (c.nombre_cientifico || c.nombre_científico || '').toString();
+        const bin = _binomial(sci);
+        if (!nombre || !bin) continue;
+        const nombreNorm = _stripDiacritics(nombre.split('/')[0]).replace(/\s+/g, ' ').trim();
+        if (!nombreNorm) continue;
+        const firstWord = nombreNorm.split(/\s+/)[0];
+        if (!firstWord || firstWord.length < 3) continue;
+        let entry = map.get(nombreNorm);
+        if (!entry) {
+          entry = { display: nombre.split('/')[0].trim(), sci: sci.trim() || bin, bins: new Set() };
+          map.set(nombreNorm, entry);
+        }
+        entry.bins.add(bin);
+      }
+    }
+  }
+  return map;
+}
+
+/**
+ * Guard 5b — binomio de compañía/antagonista sustituido (TRUTH del catálogo
+ * sobre las especies RELACIONADAS, no el cultivo principal).
+ *
+ * Caso prod (2026-05-31): hablando de antagonistas de la papa, el agente escribió
+ * "Nogal andino (Quercus molinae)". El grounding de la papa trae el antagonist
+ * Nogal andino = Juglans neotropica (CORRECTO). El modelo sustituyó el binomio de
+ * un ANTAGONISTA, no del cultivo principal — por eso `guardSpeciesSubstitution`
+ * (que solo valida el cultivo preguntado) no lo cubre.
+ *
+ * Doctrina: cada companion/antagonist/alternativa del grounding trae su binomio
+ * autoritativo. Si el texto menciona el nombre común de una de esas especies Y le
+ * atribuye un binomio que NO coincide con ninguno de los binomios que el grounding
+ * tiene para ese nombre, se ANEXA una corrección honesta ("el Nogal andino es
+ * Juglans neotropica, no Quercus molinae").
+ *
+ * Anti-falsos-positivos:
+ *  - Solo dispara si el nombre común aparece en el texto CERCA (≤160 chars) de un
+ *    binomio que contradice TODO su grounding (si coincide con cualquiera de sus
+ *    binomios autoritativos, no toca).
+ *  - Tolera autoría/variedad (compara solo "Género epíteto" vía `_binomial`).
+ *  - Ignora binomios "Género preposición" (stopword como epíteto).
+ *  - Idempotente: no re-corrige si la corrección ya está aplicada.
+ *
+ * @param {string} responseText
+ * @param {Array<object>|null} resolvedEntities
+ * @param {number|string|null} _fincaAltitud  (no usado)
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardCompanionBinomial(responseText, resolvedEntities = null, _fincaAltitud = null) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (!Array.isArray(resolvedEntities) || resolvedEntities.length === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const compMap = _companionBinomialMap(resolvedEntities);
+  if (compMap.size === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const norm = _stripDiacritics(responseText);
+
+  // Conjunto de nombres comunes conocidos (normalizados): un nombre común
+  // capitalizado ("Nogal andino", "Aliso andino") matchea SCI_BINOMIAL_RE pero
+  // NO es un binomio científico — hay que excluirlo de los candidatos para no
+  // tomarlo como "binomio foráneo" de sí mismo.
+  const knownCommonNames = new Set(compMap.keys());
+
+  // Índices de TODOS los binomios candidatos del texto (crudo→canónico), con su
+  // posición sobre el texto normalizado para medir cercanía al nombre común.
+  /** @type {Array<{bin:string, idx:number}>} */
+  const textBinomials = [];
+  let m;
+  SCI_BINOMIAL_RE.lastIndex = 0;
+  while ((m = SCI_BINOMIAL_RE.exec(responseText)) !== null) {
+    if (EPITHET_STOPWORDS.has(_stripDiacritics(m[2]))) continue;
+    const bin = _binomial(`${m[1]} ${m[2]}`);
+    if (!bin) continue;
+    // Si el "binomio" es en realidad un nombre común conocido (capitalizado), no
+    // es un binomio científico → no es candidato a sustitución.
+    if (knownCommonNames.has(bin)) continue;
+    // posición sobre el texto normalizado (mismo offset porque _stripDiacritics
+    // preserva longitud salvo diacríticos NFD; usamos indexOf como aproximación).
+    const idxNorm = norm.indexOf(bin);
+    textBinomials.push({ bin, idx: idxNorm >= 0 ? idxNorm : m.index });
+  }
+  if (textBinomials.length === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const correcciones = [];
+  const disparadas = [];
+
+  for (const [nombreNorm, entry] of compMap) {
+    const firstWord = nombreNorm.split(/\s+/)[0];
+    const idxNombre = norm.indexOf(nombreNorm) >= 0 ? norm.indexOf(nombreNorm) : norm.indexOf(firstWord);
+    if (idxNombre < 0) continue; // el nombre común no se menciona en el texto.
+
+    // Si ALGÚN binomio autoritativo de este nombre ya está en el texto cerca, el
+    // companion está bien atribuido → no disparamos por él.
+    const algunoCorrecto = textBinomials.some(
+      (tb) => entry.bins.has(tb.bin) && Math.abs(tb.idx - idxNombre) <= 160,
+    );
+    if (algunoCorrecto) continue;
+
+    // ¿Hay un binomio CERCA del nombre que NO esté en su grounding? Ese es el
+    // culpable (sustitución). Tomamos el más cercano dentro de la ventana.
+    let culprit = null;
+    let bestDist = Infinity;
+    for (const tb of textBinomials) {
+      if (entry.bins.has(tb.bin)) continue; // ese binomio es legítimo (otra especie).
+      const dist = Math.abs(tb.idx - idxNombre);
+      if (dist <= 160 && dist < bestDist) {
+        bestDist = dist;
+        culprit = tb.bin;
+      }
+    }
+    if (!culprit) continue;
+
+    const correctoBin = [...entry.bins][0];
+    // Idempotencia: si ya pusimos la corrección de este companion, no repetir.
+    const yaCorregido = new RegExp(
+      `${firstWord}[^.]*${correctoBin.replace(/ /g, '\\s+')}[^.]*no\\s+${culprit.replace(/ /g, '\\s+')}`,
+      'i',
+    ).test(norm);
+    if (yaCorregido) continue;
+
+    const culpritDisplay = culprit.charAt(0).toUpperCase() + culprit.slice(1);
+    disparadas.push(`${entry.display}: ${culprit}→${correctoBin}`);
+    correcciones.push(
+      `Corrección importante: según el catálogo, el ${entry.display.toLowerCase()} es ${entry.sci}, ` +
+        `no ${culpritDisplay}. Ese binomio corresponde a otra planta distinta.`,
+    );
+  }
+
+  if (correcciones.length === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('companion_binomial');
+  const text = `${correcciones.join('\n\n')}\n\n${responseText.trim()}`;
+  return { text, modified: true, reason: `binomio_compañía: ${disparadas.join('; ')}` };
+}
+
 // ── GUARD 6: diagnóstico visual fabricado SIN foto real ─────────────────────
 
 /**
@@ -988,6 +1171,11 @@ const GUARD_CHAIN = [
   // que la corrección lidere y los demás guards no razonen sobre la especie
   // equivocada. Solo añade una corrección al frente; no altera el resto.
   guardSpeciesSubstitution,
+  // Tras corregir el cultivo principal, validar también los binomios de las
+  // especies RELACIONADAS (companions/antagonists/alternativas) contra su propio
+  // grounding. Caso prod: "Nogal andino (Quercus molinae)" siendo el antagonist
+  // Nogal andino = Juglans neotropica. Solo añade correcciones al frente.
+  guardCompanionBinomial,
   // El de dosis va antes que el agroquímico en detección: el guard agroquímico
   // anexa un bloque que menciona "etiqueta" (cita de fuente), lo que apagaría
   // la suavización de dosis si corriera después. Correr dosis primero evita ese
