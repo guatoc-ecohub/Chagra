@@ -23,7 +23,6 @@ import { alertEngine } from './services/alertEngine';
 // HelpUsoScreen como sección de Ayuda (decisión 2026-05-21, ver
 // comentario abajo donde se removió el render).
 // import FieldFeedback from './components/FieldFeedback';
-import MicFab from './components/MicFab';
 import AgentFab from './components/AgentFab';
 import QuickActionsPanel from './components/QuickActionsPanel';
 import { ScreenShell } from './components/common/ScreenShell';
@@ -84,8 +83,9 @@ const LoadingFallback = () => (
 );
 
 // NAV tiles, vocabulario user-facing post DR-030 QW2 (decisión D3+D4 del DR).
-// Tile "Voz" eliminada: ya está accesible global vía MicFab abajo-izquierda
-// (QW4). Iconos canónicos: Sprout para plantas, NotebookPen para bitácora.
+// Tile "Voz" eliminada: la captura por voz vive dentro del agente / compositor
+// (el FAB global MicFab se removió 2026-05-30 por decisión del operador).
+// Iconos canónicos: Sprout para plantas, NotebookPen para bitácora.
 // Card-sort n>=5 con usuarios 0-contexto colombianos pendiente para
 // validar empíricamente, esta release ships con hipótesis cultural
 // (lenguaje agronómico colombiano) y se itera post-feedback.
@@ -246,9 +246,9 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
       )}
 
       {/* Feedback piloto #5 (Lili 2026-05-18): pb-4 no era suficiente —
-          los FABs flotantes (Mic/FieldFeedback/Agent) tapaban el final
-          del scroll. Cambio a calc seguro con safe-area iOS notch + 120px
-          para que el último widget quede accesible al tap. */}
+          los FABs flotantes (Agent) tapaban el final del scroll. Cambio a
+          calc seguro con safe-area iOS notch + 120px para que el último
+          widget quede accesible al tap. */}
       <main className="flex-1 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+120px)] flex flex-col overflow-y-auto gap-3">
         {/* Bug 2026-05-18 (operator): TelemetryAlerts mostraba errores IoT +
             sync no resueltos como PRIMERA cosa visible post-login. Mal first
@@ -708,7 +708,10 @@ export default function App() {
           tras Lili UX feedback: FAB tapaba contenido + no era discoverable.
           El form sigue siendo el mismo componente, instanciado con prop
           `embedded` desde HelpUsoScreen. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && <MicFab onNavigate={navigate} />}
+      {/* MicFab (FAB de voz flotante abajo-izquierda) REMOVIDO 2026-05-30 por
+          decisión del operador: lo quería fuera. La entrada por voz sigue
+          disponible dentro del agente / compositor; este era solo el FAB
+          global. */}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && <AgentFab onNavigate={navigate} />}
       {currentView === 'dashboard' && <QuickActionsPanel onNavigate={navigate} />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}

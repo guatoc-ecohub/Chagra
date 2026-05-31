@@ -10,7 +10,8 @@ import useFincaActiveStore from '../services/fincaActiveStore';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
 import useAssetStore from '../store/useAssetStore';
 import { FARM_CONFIG } from '../config/defaults';
-import { getProfile } from '../services/userProfileService';
+import { getProfile, getProfileMunicipio } from '../services/userProfileService';
+import { findMunicipio } from '../utils/colombiaLocations';
 
 /**
  * TopBar, header persistente con identidad del operador (DR-030 QW2).
@@ -62,13 +63,33 @@ export default function TopBar({ onNavigate, onLogout }) {
   const [profileTick, setProfileTick] = useState(0);
   const profile = (() => { void profileTick; return getProfile(); })();
   // Ubicación bajo el nombre: finca activa (multi-finca) → perfil (onboarding/
-  // ubicación detectada) → FARM_CONFIG (demo). Altitud real de la finca para que
-  // el campesino vea su piso térmico, no la cabecera.
-  const municipio = activeFinca?.municipio || profile?.municipio || FARM_CONFIG?.MUNICIPIO || null;
+  // ubicación detectada) → FARM_CONFIG (demo).
+  //
+  // BUG FIX 2026-05-30 (operador "no veo Choachí"): antes leía
+  // `profile?.municipio` crudo. Pero el ONBOARDING guarda la ubicación en el
+  // campo `region` (texto libre, ej. "Choachí"), NO en `municipio` —
+  // `municipio` solo lo escribe LocationDetectedScreen al confirmar por el
+  // mapa. Así, el piloto que solo hizo el onboarding tenía `municipio`
+  // undefined → la línea caía a FARM_CONFIG (null en prod) y NO mostraba
+  // Choachí. `getProfileMunicipio()` retrocompatibiliza: prefiere `municipio`
+  // y, si falta, resuelve `region` contra el dataset DANE local (offline).
+  const profileMunicipio = getProfileMunicipio();
+  const municipio = activeFinca?.municipio || profileMunicipio || FARM_CONFIG?.MUNICIPIO || null;
   // Vereda: el dataset DANE no la trae; solo aparece si el perfil/finca la tiene
   // de onboarding manual. Si no, se omite sin romper (municipio + altitud bastan).
   const vereda = activeFinca?.vereda || profile?.vereda || null;
-  const altitud = activeFinca?.altitud || profile?.finca_altitud || profile?.altitud || FARM_CONFIG?.ALTITUD_MSNM || null;
+  // Altitud: prioriza la real de la finca (perfil/finca activa); si el perfil no
+  // la trae (onboarding sin altitud), cae a la altitud curada del municipio en
+  // el dataset DANE — así el chip siempre muestra municipio + altitud aunque la
+  // captura fina de la altitud real la complete el otro flujo (coarse-location).
+  const daneAltitud = municipio ? findMunicipio(String(municipio).split(',')[0])?.altitud : null;
+  const altitud =
+    activeFinca?.altitud ||
+    profile?.finca_altitud ||
+    profile?.altitud ||
+    FARM_CONFIG?.ALTITUD_MSNM ||
+    daneAltitud ||
+    null;
 
   // "Respira" animación del logo Chagra cuando hay actividad de fondo
   // (warm-up del agente IA o sync con FarmOS). Sensación de "agente vivo
@@ -153,8 +174,14 @@ export default function TopBar({ onNavigate, onLogout }) {
             <span className="text-sm font-bold truncate flex-1 text-left">{operatorName}</span>
           </div>
           {(municipio || altitud) && (
-            <div className="flex items-center gap-1 text-[10px] text-slate-400 font-medium leading-none w-full">
-              <MapPin size={10} className="shrink-0 text-slate-500" aria-hidden="true" />
+            // Chip de ubicación VISIBLE (operador 2026-05-30 "no veo Choachí"):
+            // pill teal con municipio + altitud, contraste alto para que se lea
+            // de un vistazo bajo el nombre.
+            <div
+              data-testid="topbar-location-chip"
+              className="flex items-center gap-1 mt-0.5 px-1.5 py-0.5 rounded-md bg-teal-500/15 border border-teal-500/25 text-[11px] text-teal-200 font-semibold leading-none max-w-full"
+            >
+              <MapPin size={11} className="shrink-0 text-teal-400" aria-hidden="true" />
               <span className="truncate">
                 {municipio && <span>{municipio.split(',')[0]}</span>}
                 {vereda && <span>, vereda {vereda}</span>}

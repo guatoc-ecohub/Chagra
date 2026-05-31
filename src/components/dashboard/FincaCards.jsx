@@ -95,13 +95,19 @@ function Card({ section, title, subtitle, value, onClick, badge, variant = 'list
                 aria-label={titleAttr}
                 className={`group relative w-full text-left rounded-2xl bg-gradient-to-br ${style.accent} backdrop-blur-xl border ${style.border} p-4 ring-2 ${style.ring} transition-all active:scale-[0.96] hover:-translate-y-0.5 aspect-square flex flex-col items-center justify-between min-h-[120px]`}
             >
-                {/* Badge / value top-right */}
+                {/* Contador top-right — GRANDE y legible de un vistazo: el
+                    conteo de plantas/zonas es la info más importante de la
+                    card (feedback operador 2026-05-30). Pill con número
+                    text-xl, padding generoso y buen contraste. */}
                 {loading ? (
                     <div className="absolute top-2 right-2">
-                        <Skeleton variant="rect" width={28} height={16} rounded="md" ariaLabel="Cargando contador" />
+                        <Skeleton variant="rect" width={40} height={32} rounded="lg" ariaLabel="Cargando contador" />
                     </div>
                 ) : (value != null || badge != null) && (
-                    <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[11px] font-black bg-black/35 backdrop-blur text-white tabular-nums">
+                    <div
+                        data-testid="finca-card-count"
+                        className="absolute top-2 right-2 min-w-[2rem] px-2.5 py-1 rounded-lg text-lg sm:text-xl font-black leading-none text-center bg-black/55 backdrop-blur ring-1 ring-white/20 text-white tabular-nums shadow-md"
+                    >
                         {value != null ? value : badge}
                     </div>
                 )}
