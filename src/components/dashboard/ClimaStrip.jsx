@@ -1,33 +1,82 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Cloud, CloudRain, Sun, CloudSun, Droplets, Wind, Thermometer, MapPin } from 'lucide-react';
-import { getClimaIdeam } from '../../services/sidecarClient';
+import { fetchClimaSnapshot, getCachedClimaSnapshot } from '../../services/climaService';
+import { findMunicipio } from '../../utils/colombiaLocations';
 import { FARM_CONFIG } from '../../config/defaults';
 import useFincaActiveStore from '../../services/fincaActiveStore';
 import { getProfile } from '../../services/userProfileService';
 
 /**
- * ClimaStrip — pronóstico IDEAM 7 días debajo del agente.
- * Si tiene municipio (finca activa o FARM_CONFIG): pide get_clima_ideam y muestra.
- * Si no: card invitando a configurar ubicación.
+ * ClimaStrip — pronóstico real de 7 días debajo del agente.
+ *
+ * Fuente: Open-Meteo (`openmeteo.forecast_7d` del snapshot del sidecar). Da
+ * pronóstico real por lat/lon: temp máx/mín + precipitación por día, gratis y
+ * sin key. (Antes pedía `get_clima_ideam('monthly_avg')`, que es climatología
+ * histórica y además devolvía vacío porque la ingesta IDEAM nunca se pobló —
+ * el widget se veía sin datos.)
+ *
+ * Coordenadas (necesarias para Open-Meteo):
+ *   1. Perfil del usuario: `ubicacion_lat`/`ubicacion_lng` — los guarda
+ *      LocationDetectedScreen al confirmar la ubicación (mini mapa, #200).
+ *   2. Fallback offline: geocodificar el `municipio` contra el dataset DANE
+ *      local (`findMunicipio`) → lat/lng. Cubre perfiles viejos que solo
+ *      tienen el nombre del municipio (texto) sin haber pasado por el mapa.
+ *
+ * Estados:
+ *   - loading: skeleton.
+ *   - sin coords NI municipio: CTA "Configurar ubicación".
+ *   - con coords pero Open-Meteo no disponible (offline / sidecar caído):
+ *     degrada limpio — muestra el strip con aviso "pronóstico aún cargando",
+ *     nunca rompe el dashboard.
+ *
+ * Nota: el IDEAM sigue alimentando el grounding histórico del agente por otro
+ * lado (agentService); este cambio solo reapunta la FUENTE de ESTE widget.
  */
 
 const DAY_LABELS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
 function pickIcon(precipMm, tempC) {
-    if (precipMm >= 10) return CloudRain;
-    if (precipMm >= 2) return Cloud;
-    if (tempC >= 24) return Sun;
+    if (precipMm != null && precipMm >= 10) return CloudRain;
+    if (precipMm != null && precipMm >= 2) return Cloud;
+    if (tempC != null && tempC >= 28) return Sun;
     return CloudSun;
 }
 
-function formatDay(date) {
-    return DAY_LABELS[date.getDay()];
+function dayLabel(isoDate, i) {
+    if (i === 0) return 'Hoy';
+    try {
+        const d = new Date(isoDate);
+        if (Number.isNaN(d.getTime())) return '–';
+        return DAY_LABELS[d.getDay()];
+    } catch (_) {
+        return '–';
+    }
+}
+
+/**
+ * Resuelve { lat, lng } a partir del perfil o, en su defecto, geocodificando
+ * el municipio contra el dataset DANE local (offline-friendly).
+ * @returns {{ lat: number, lng: number } | null}
+ */
+function resolveCoords(profile, municipio) {
+    const lat = Number(profile?.ubicacion_lat);
+    const lng = Number(profile?.ubicacion_lng);
+    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        return { lat, lng };
+    }
+    if (municipio) {
+        const hit = findMunicipio(municipio.split(',')[0]);
+        if (hit && Number.isFinite(hit.lat) && Number.isFinite(hit.lng)) {
+            return { lat: hit.lat, lng: hit.lng };
+        }
+    }
+    return null;
 }
 
 export default function ClimaStrip({ onNavigate }) {
     const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
     const fincas = useFincaActiveStore((s) => s.fincas);
-    const [data, setData] = useState(null);
+    const [snapshot, setSnapshot] = useState(() => getCachedClimaSnapshot());
     const [loading, setLoading] = useState(true);
     // Bug fix 2026-05-30: el municipio que el usuario confirma en
     // LocationDetectedScreen se guarda en el perfil (userProfileService), NO en
@@ -48,20 +97,29 @@ export default function ClimaStrip({ onNavigate }) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeFincaSlug, fincas, tick]);
 
+    const coords = useMemo(() => {
+        return resolveCoords(getProfile(), municipio);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [municipio, tick]);
+
     useEffect(() => {
         let alive = true;
-        if (!municipio) {
+        // Sin coords (ni del perfil ni geocodificando el municipio) no podemos
+        // pedir Open-Meteo, que necesita lat/lon. Cerramos el loading y dejamos
+        // que el render decida: CTA si tampoco hay municipio, strip neutro si
+        // hay municipio pero sin match DANE.
+        if (!coords) {
             Promise.resolve().then(() => { if (alive) setLoading(false); });
             return () => { alive = false; };
         }
-        const desde = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-            .toISOString().slice(0, 10);
-        getClimaIdeam('monthly_avg', { municipio, metric: 'precipitation', desde })
-            .then((res) => { if (alive) setData(res); })
-            .catch(() => { if (alive) setData(null); })
+        // fetchClimaSnapshot nunca throw: devuelve null si offline / flag off /
+        // HTTP≥400. Open-Meteo real 7d viene en payload.openmeteo.forecast_7d.
+        fetchClimaSnapshot({ lat: coords.lat, lng: coords.lng })
+            .then((res) => { if (alive && res) setSnapshot(res); })
+            .catch(() => { /* degrade limpio — nunca rompe el dashboard */ })
             .finally(() => { if (alive) setLoading(false); });
         return () => { alive = false; };
-    }, [municipio]);
+    }, [coords]);
 
     if (loading) {
         return (
@@ -76,7 +134,7 @@ export default function ClimaStrip({ onNavigate }) {
         );
     }
 
-    if (!municipio) {
+    if (!coords && !municipio) {
         return (
             <div className="bg-gradient-to-br from-sky-950/70 to-indigo-950/60 backdrop-blur-xl border border-sky-800/40 rounded-2xl p-5">
                 <div className="flex items-center gap-2 mb-2">
@@ -84,7 +142,7 @@ export default function ClimaStrip({ onNavigate }) {
                     <h3 className="text-base font-bold text-white">Clima en tu zona</h3>
                 </div>
                 <p className="text-sm text-slate-300 leading-relaxed">
-                    Cuéntame en qué municipio queda tu finca y te traigo el pronóstico real del IDEAM.
+                    Cuéntame en qué municipio queda tu finca y te traigo el pronóstico real de los próximos 7 días.
                 </p>
                 {/* Bug fix 2026-05-28 (Brave laptop): el botón no tenía
                     onClick — operador clickeaba y nada pasaba.
@@ -117,22 +175,27 @@ export default function ClimaStrip({ onNavigate }) {
         );
     }
 
-    // Genera 7 días mock visual desde data o fallback (mientras get_clima_ideam
-    // devuelve formato variable). Si data tiene .days, úsalo. Si no, dibuja 7
-    // tarjetas neutras para que la UI no rompa.
-    const days = (data?.forecast || data?.days || []).slice(0, 7);
+    // Pronóstico real de Open-Meteo. Cada día: { date, temp_max_c, temp_min_c,
+    // precip_mm } (mismo shape que consume NotificationsBell).
+    const openmeteo = snapshot?.openmeteo;
+    const forecast = openmeteo?.available && Array.isArray(openmeteo.forecast_7d)
+        ? openmeteo.forecast_7d
+        : [];
+
     const today = new Date();
     const filled = Array.from({ length: 7 }, (_, i) => {
-        const d = days[i] || {};
-        const date = new Date(today.getTime() + i * 24 * 60 * 60 * 1000);
+        const d = forecast[i] || {};
+        const fallbackDate = new Date(today.getTime() + i * 24 * 60 * 60 * 1000);
         return {
-            label: i === 0 ? 'Hoy' : formatDay(date),
-            tempC: typeof d.temp === 'number' ? d.temp : null,
-            precipMm: typeof d.precip === 'number' ? d.precip : null,
+            label: dayLabel(d.date || fallbackDate, i),
+            tempMaxC: typeof d.temp_max_c === 'number' ? d.temp_max_c : null,
+            tempMinC: typeof d.temp_min_c === 'number' ? d.temp_min_c : null,
+            precipMm: typeof d.precip_mm === 'number' ? d.precip_mm : null,
         };
     });
 
-    const hasReal = filled.some((d) => d.tempC != null);
+    const hasReal = filled.some((d) => d.tempMaxC != null);
+    const headerLabel = (municipio || '').split(',')[0] || 'tu finca';
 
     return (
         <div className="bg-gradient-to-br from-sky-950/70 to-indigo-950/60 backdrop-blur-xl border border-sky-800/40 rounded-2xl p-5">
@@ -140,11 +203,11 @@ export default function ClimaStrip({ onNavigate }) {
                 <div className="flex items-center gap-2 min-w-0">
                     <Cloud size={20} className="text-sky-300 shrink-0" />
                     <h3 className="text-base font-bold text-white truncate">
-                        Clima en {municipio.split(',')[0]}
+                        Clima en {headerLabel}
                     </h3>
                 </div>
                 <span className="text-[10px] text-sky-300/70 font-bold uppercase tracking-wider shrink-0">
-                    IDEAM · 7 días
+                    Open-Meteo · 7 días
                 </span>
             </div>
 
@@ -156,16 +219,19 @@ export default function ClimaStrip({ onNavigate }) {
 
             <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
                 {filled.map((d, i) => {
-                    const Icon = pickIcon(d.precipMm ?? 0, d.tempC ?? 18);
+                    const Icon = pickIcon(d.precipMm, d.tempMaxC);
                     return (
                         <div
                             key={i}
                             className="flex flex-col items-center gap-1 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06]"
                         >
                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{d.label}</span>
-                            <Icon size={22} className={d.precipMm >= 10 ? 'text-sky-400' : d.precipMm >= 2 ? 'text-slate-300' : 'text-amber-300'} />
-                            {d.tempC != null && (
-                                <span className="text-sm font-bold text-white tabular-nums">{Math.round(d.tempC)}°</span>
+                            <Icon size={22} className={(d.precipMm ?? 0) >= 10 ? 'text-sky-400' : (d.precipMm ?? 0) >= 2 ? 'text-slate-300' : 'text-amber-300'} />
+                            {d.tempMaxC != null && (
+                                <span className="text-sm font-bold text-white tabular-nums">{Math.round(d.tempMaxC)}°</span>
+                            )}
+                            {d.tempMinC != null && (
+                                <span className="text-[10px] text-slate-400 tabular-nums">{Math.round(d.tempMinC)}°</span>
                             )}
                         </div>
                     );
@@ -175,7 +241,7 @@ export default function ClimaStrip({ onNavigate }) {
             <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
                 <div className="flex items-center gap-1.5 text-slate-300">
                     <Thermometer size={14} className="text-rose-400" />
-                    <span className="truncate">Temp</span>
+                    <span className="truncate">Máx/Mín</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-slate-300">
                     <Droplets size={14} className="text-sky-400" />

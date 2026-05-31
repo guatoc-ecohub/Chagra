@@ -18,10 +18,22 @@ import '@testing-library/jest-dom';
 import { describe, test, expect, vi } from 'vitest';
 import ClimaStrip from '../ClimaStrip';
 
-// Mock del sidecar para que el componente no intente fetch real.
-vi.mock('../../../services/sidecarClient', () => ({
-    getClimaIdeam: vi.fn(() => Promise.resolve(null)),
+// Mock de climaService para que el componente no haga fetch real al sidecar.
+// Default: sin snapshot (Open-Meteo no disponible). Los tests del pronóstico
+// real lo sobreescriben con `mockResolvedValueOnce`.
+vi.mock('../../../services/climaService', () => ({
+    fetchClimaSnapshot: vi.fn(() => Promise.resolve(null)),
+    getCachedClimaSnapshot: vi.fn(() => null),
 }));
+import { fetchClimaSnapshot } from '../../../services/climaService';
+
+// findMunicipio es real (dataset DANE local) salvo donde un test necesite
+// controlar el match. Mockeamos para tener coords deterministas y evitar
+// acoplar el test a la presencia de un municipio puntual en el dataset.
+vi.mock('../../../utils/colombiaLocations', () => ({
+    findMunicipio: vi.fn(() => null),
+}));
+import { findMunicipio } from '../../../utils/colombiaLocations';
 
 // Mock del store de finca para forzar el branch "sin municipio".
 vi.mock('../../../services/fincaActiveStore', () => {
@@ -93,12 +105,13 @@ describe('ClimaStrip — botón "Configurar ubicación" (bug fix Brave 2026-05-2
  */
 describe('ClimaStrip — municipio desde perfil (bug fix store mismatch 2026-05-30)', () => {
     test('NO muestra "Configurar ubicación" si el perfil tiene municipio', async () => {
-        getProfile.mockReturnValueOnce({ municipio: 'Choachí' });
+        getProfile.mockReturnValue({ municipio: 'Choachí' });
         render(<ClimaStrip onNavigate={vi.fn()} />);
-        // Esperar a que el efecto de carga resuelva (getClimaIdeam mock → null).
+        // Esperar a que el efecto de carga resuelva (fetchClimaSnapshot mock → null).
         await waitFor(() =>
             expect(screen.queryByText('Configurar ubicación')).not.toBeInTheDocument(),
         );
+        getProfile.mockReturnValue({});
     });
 
     test('refresca al recibir el evento "chagra:location-updated"', async () => {
@@ -113,6 +126,86 @@ describe('ClimaStrip — municipio desde perfil (bug fix store mismatch 2026-05-
         await waitFor(() =>
             expect(screen.queryByText('Configurar ubicación')).not.toBeInTheDocument(),
         );
+        getProfile.mockReturnValue({});
+    });
+});
+
+/**
+ * Bug fix 2026-05-30 — el operador reportó que el widget de clima "no funciona"
+ * (no mostraba datos reales). Causa: ClimaStrip pedía `get_clima_ideam('monthly_avg')`,
+ * que es climatología histórica y devolvía VACÍO (la ingesta IDEAM nunca se
+ * pobló). Fix: reapuntar a Open-Meteo (`fetchClimaSnapshot` →
+ * `openmeteo.forecast_7d`), pronóstico real de 7 días por lat/lon.
+ */
+describe('ClimaStrip — pronóstico real Open-Meteo (fix fuente de datos 2026-05-30)', () => {
+    const snapshotConForecast = {
+        openmeteo: {
+            available: true,
+            forecast_7d: [
+                { date: '2026-05-30', temp_max_c: 22.4, temp_min_c: 11.1, precip_mm: 0 },
+                { date: '2026-05-31', temp_max_c: 21.0, temp_min_c: 10.5, precip_mm: 3.2 },
+                { date: '2026-06-01', temp_max_c: 19.8, temp_min_c: 9.9, precip_mm: 14.7 },
+                { date: '2026-06-02', temp_max_c: 23.1, temp_min_c: 12.0, precip_mm: 0.4 },
+                { date: '2026-06-03', temp_max_c: 24.6, temp_min_c: 12.8, precip_mm: 0 },
+                { date: '2026-06-04', temp_max_c: 20.2, temp_min_c: 10.1, precip_mm: 6.5 },
+                { date: '2026-06-05', temp_max_c: 22.0, temp_min_c: 11.3, precip_mm: 1.1 },
+            ],
+        },
+    };
+
+    test('usa coords del perfil (ubicacion_lat/lng) y NO geocodifica', async () => {
+        getProfile.mockReturnValue({
+            municipio: 'Choachí',
+            ubicacion_lat: 4.53,
+            ubicacion_lng: -73.92,
+        });
+        findMunicipio.mockClear();
+        fetchClimaSnapshot.mockResolvedValueOnce(snapshotConForecast);
+        render(<ClimaStrip onNavigate={vi.fn()} />);
+        await waitFor(() =>
+            expect(fetchClimaSnapshot).toHaveBeenCalledWith({ lat: 4.53, lng: -73.92 }),
+        );
+        // Con coords del perfil NO debe geocodificar el municipio.
+        expect(findMunicipio).not.toHaveBeenCalled();
+        getProfile.mockReturnValue({});
+    });
+
+    test('renderiza temperaturas reales (máx/mín) del forecast', async () => {
+        getProfile.mockReturnValue({ municipio: 'Choachí', ubicacion_lat: 4.53, ubicacion_lng: -73.92 });
+        fetchClimaSnapshot.mockResolvedValueOnce(snapshotConForecast);
+        render(<ClimaStrip onNavigate={vi.fn()} />);
+        // Open-Meteo en el header, NO IDEAM.
+        expect(await screen.findByText(/Open-Meteo/i)).toBeInTheDocument();
+        // Temp máxima del día 0 redondeada (22.4 → 22) — hay más de un día a 22°.
+        await waitFor(() => expect(screen.getAllByText('22°').length).toBeGreaterThan(0));
+        // Temp mínima del día 2 redondeada (9.9 → 10).
+        expect(screen.getAllByText('10°').length).toBeGreaterThan(0);
+        // Día con lluvia fuerte (14.7mm el día 2) → ícono de lluvia presente.
+        expect(screen.getByText('25°')).toBeInTheDocument(); // día 4 máx 24.6 → 25
+        getProfile.mockReturnValue({});
+    });
+
+    test('geocodifica el municipio si el perfil no tiene coords', async () => {
+        getProfile.mockReturnValue({ municipio: 'Une' });
+        findMunicipio.mockReturnValueOnce({ name: 'Une', lat: 4.40, lng: -73.99 });
+        fetchClimaSnapshot.mockResolvedValueOnce(snapshotConForecast);
+        render(<ClimaStrip onNavigate={vi.fn()} />);
+        await waitFor(() =>
+            expect(fetchClimaSnapshot).toHaveBeenCalledWith({ lat: 4.40, lng: -73.99 }),
+        );
+        getProfile.mockReturnValue({});
+        findMunicipio.mockReturnValue(null);
+    });
+
+    test('degrada limpio (sin romper) si Open-Meteo no está disponible', async () => {
+        getProfile.mockReturnValue({ municipio: 'Choachí', ubicacion_lat: 4.53, ubicacion_lng: -73.92 });
+        fetchClimaSnapshot.mockResolvedValueOnce({ openmeteo: { available: false, reason: 'offline' } });
+        render(<ClimaStrip onNavigate={vi.fn()} />);
+        // El strip se muestra (header con municipio) con el aviso de carga, sin
+        // mostrar el CTA de configuración ni lanzar excepción.
+        expect(await screen.findByText(/Clima en/i)).toBeInTheDocument();
+        expect(screen.queryByText('Configurar ubicación')).not.toBeInTheDocument();
+        expect(screen.getByText(/pronóstico fino aún se está cargando/i)).toBeInTheDocument();
         getProfile.mockReturnValue({});
     });
 });
