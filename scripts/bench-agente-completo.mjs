@@ -11,14 +11,23 @@
  * Output: data/bench-runs/agente-completo-YYYY-MM-DD.jsonl + summary.md
  * Luego invoca bench-llm-judge.mjs para evaluar calidad.
  *
+ * Scoring (R3, re-bench post-guards 2026-05-31): keyword-FLEXIBLE por defecto
+ * (sinónimos/lemas, ver scripts/lib/bench-scorer.mjs) — antes era match literal
+ * que daba falsos 0/10. Con `--judge` añade un LLM-judge (mistral-nemo:12b vía
+ * ollama) que evalúa si la respuesta cumple el criterio SUSTANTIVO; degrada a
+ * keyword-flexible si el judge no está / falla.
+ *
  * Uso:
  *   node scripts/bench-agente-completo.mjs
+ *   node scripts/bench-agente-completo.mjs --judge        # + LLM-judge semántico
+ *   JUDGE_MODEL=granite3.1-dense:8b node scripts/... --judge
  */
 import { writeFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
 import { execSync } from 'node:child_process';
+import { scoreKeywordsFlexible, scoreWithJudge } from './lib/bench-scorer.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
@@ -27,7 +36,15 @@ const BENCH_RUNS_DIR = join(DATA_DIR, 'bench-runs');
 
 const SIDECAR_URL = process.env.SIDECAR_URL || 'http://localhost:7880';
 const OLLAMA_URL = 'http://localhost:11434/api/chat';
+const OLLAMA_GEN_URL = process.env.OLLAMA_GEN_URL || 'http://localhost:11434/api/generate';
 const TIMEOUT_MS = 180_000; // 3 min timeout por modelo
+
+// R3 — evaluador semántico. `--judge` activa el LLM-judge (mistral-nemo:12b por
+// defecto: índice de benchmarks lo marca como judge 100% NUEVO). Sin la flag, el
+// scoring es keyword-FLEXIBLE (sinónimos/lemas) en vez del match literal previo.
+const USE_JUDGE = process.argv.includes('--judge');
+const JUDGE_MODEL = process.env.JUDGE_MODEL || 'mistral-nemo:12b';
+const JUDGE_TIMEOUT_MS = 60_000;
 
 const MODELS = {
   gemma3_4b: 'gemma3:4b',
@@ -525,9 +542,39 @@ function checkMaxwellError(error) {
   return MAXWELL_ERROR_PATTERNS.some(pattern => errorLower.includes(pattern.toLowerCase()));
 }
 
+// R3 — scoring keyword-FLEXIBLE (sinónimos/lemas) en vez del match literal que
+// daba falsos 0/10 cuando el modelo decía lo correcto con otras palabras.
 function countKeywords(response, keywords) {
-  const lower = response.toLowerCase();
-  return keywords.filter(kw => lower.includes(kw.toLowerCase())).length;
+  return scoreKeywordsFlexible(response, keywords).matched;
+}
+
+/**
+ * Caller real del LLM-judge contra ollama (mistral-nemo:12b). Devuelve el texto
+ * crudo del modelo; `scoreWithJudge` lo parsea y degrada a keyword-flexible si
+ * falla. NO se llama si --judge está apagado.
+ */
+async function judgeOllamaCall(prompt) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), JUDGE_TIMEOUT_MS);
+  try {
+    const res = await fetch(OLLAMA_GEN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: JUDGE_MODEL,
+        prompt,
+        stream: false,
+        options: { temperature: 0.1, num_predict: 120 },
+        keep_alive: '30m',
+      }),
+      signal: controller.signal,
+    });
+    if (!res.ok) throw new Error(`judge HTTP ${res.status}`);
+    const data = await res.json();
+    return data.response || '';
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 async function benchmarkModel(modelKey, modelName, promptData) {
@@ -548,9 +595,25 @@ async function benchmarkModel(modelKey, modelName, promptData) {
     
     // Step 4: Post-validate
     const validationResult = await postValidate(promptData.query, ollamaResult.response);
-    
+
     clearTimeout(timer);
-    
+
+    // R3 — evaluación semántica opcional (--judge): el LLM-judge dictamina si la
+    // respuesta cumple el criterio SUSTANTIVO (no literal). Degrada a keyword-
+    // flexible si el judge no está / falla. Sin la flag, no se llama (CERO GPU
+    // extra).
+    let judge = null;
+    if (USE_JUDGE) {
+      judge = await scoreWithJudge(
+        {
+          query: promptData.query,
+          response: ollamaResult.response,
+          expectedKeywords: promptData.expected_keywords,
+        },
+        { ollamaCall: judgeOllamaCall },
+      );
+    }
+
     return {
       model: modelName,
       latency_resolve_ms: entitiesResult.latency_ms,
@@ -561,6 +624,9 @@ async function benchmarkModel(modelKey, modelName, promptData) {
       tokens_estimated: ollamaResult.tokens_estimated,
       keywords_matched: countKeywords(ollamaResult.response, promptData.expected_keywords),
       keywords_total: promptData.expected_keywords.length,
+      judge_cumple: judge ? judge.cumple : null,
+      judge_score: judge ? judge.score : null,
+      judge_source: judge ? judge.source : null,
       entities_grounded: entitiesResult.entities.length,
       halluc_count: validationResult.detected_count,
       hallucinated: validationResult.hallucinated,

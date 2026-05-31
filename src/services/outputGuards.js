@@ -127,6 +127,46 @@ function _entityName(e) {
   return (e && (e.nombre_comun || e.mentioned)) || 'esa especie';
 }
 
+// ── R2: filtro de entidades-ruido (stopwords NLU) ───────────────────────────
+
+/**
+ * Palabras campesinas/coloquiales comunes que el resolver de entidades a veces
+ * mapea por error a una especie (re-bench 2026-05-31: "aquí"→Pteridium,
+ * "don"→Oenocarpus, "mano", "pasto"). NO son cultivos; si se cuelan en
+ * resolvedEntities, los guards razonan sobre RUIDO y producen falsos positivos.
+ * Se comparan sin diacríticos ni mayúsculas contra el `mentioned` (lo que el
+ * usuario dijo), nunca contra el nombre del catálogo.
+ */
+const NLU_NOISE_MENTIONS = new Set([
+  // deícticos / lugar
+  'aqui', 'aca', 'alla', 'alli', 'ahi', 'ahy',
+  // tratamientos / muletillas campesinas
+  'don', 'dona', 'sumerce', 'su merced', 'vea', 'mano', 'mijo', 'mija', 'mka',
+  'pues', 'bueno', 'oiga', 'oye', 'hombre', 'senor', 'senora',
+  // genéricos vegetales sin especie concreta (solos)
+  'pasto', 'monte', 'hierba', 'yerba', 'mata', 'planta', 'arbol', 'palo',
+]);
+
+/**
+ * filterNoiseEntities — descarta entidades-ruido ANTES de que lleguen a los
+ * guards. Una entidad se considera ruido si su `mentioned` (normalizado) está
+ * en `NLU_NOISE_MENTIONS`. El cotejo es sobre lo que dijo el usuario, no sobre
+ * el nombre del catálogo: "pasto guinea" (mentioned) NO es ruido, "pasto" solo
+ * SÍ. Best-effort: entrada no-array → []. Idempotente y puro.
+ *
+ * @param {Array<object>|null} entities
+ * @returns {Array<object>}
+ */
+export function filterNoiseEntities(entities) {
+  if (!Array.isArray(entities)) return [];
+  return entities.filter((e) => {
+    if (!e || typeof e !== 'object') return false;
+    const mentioned = _stripDiacritics(e.mentioned || '').replace(/\s+/g, ' ').trim();
+    if (!mentioned) return true; // sin mentioned no podemos juzgarlo ruido → conservamos
+    return !NLU_NOISE_MENTIONS.has(mentioned);
+  });
+}
+
 // ── GUARD 1: agroquímico sintético ──────────────────────────────────────────
 
 /**
@@ -395,6 +435,43 @@ function _presentaComoViable(textNorm, nombreNorm) {
 }
 
 /**
+ * R1 — detector DIRECTO de "fomento de siembra", independiente de frases de
+ * viabilidad. El re-bench (2026-05-31) mostró que el detector anterior
+ * (`_presentaComoViable`) se apoyaba en un léxico de viabilidad ("es viable",
+ * "prospera", "recomendable") y se le escapaban respuestas que igual mandaban a
+ * sembrar con otro fraseo (curuba CPX-010, chugua CPX-001). Acá basta con que
+ * el texto INVITE a sembrar/cultivar la especie y NO advierta inviabilidad.
+ *
+ * Esto se usa SOLO cuando el grounding (campo viabilidad o banda de altitud) ya
+ * dictaminó 'inviable' de forma determinística — el texto solo decide si el
+ * modelo la está fomentando, no la viabilidad en sí.
+ */
+function _fomentaSiembra(textNorm, nombreNorm) {
+  // Si el modelo ya advirtió inviabilidad, acertó: no re-disparamos.
+  const yaDiceInviable =
+    /(no\s+es\s+viable|inviable|no\s+(te\s+)?sirve|no\s+prosper|no\s+se\s+da\b|no\s+cuaja|no\s+(la?\s+)?siembres|no\s+es\s+recomendable\s+sembr|no\s+es\s+(adecuad|apropiad)|no\s+es\s+para\s+(tu|esa|esta)|clima\s+(no|demasiado)|altura\s+(no|demasiad)|demasiad[oa]\s+(alt|baj|fri|calient|calid))/.test(
+      textNorm,
+    );
+  if (yaDiceInviable) return false;
+
+  // Verbos / fraseo de fomento de siembra (laxo, coloquial incluido).
+  const fomento =
+    /(siembr|siembr[ae]l|sembrarl|plant[ae]l|plant[ae]\b|plantarl|cultiv|cultivarl|propag|conviene\s+sembr|puedes?\s+(sembr|cultiv|plantar|meter)|buena?\s+para\s+sembr|adecuad[oa]\s+para\s+(tu|esa|esta|el|la|las|los|zona|clima)|apt[oa]\s+para|sirve\s+para\s+tu|priorizar|recomiendo\s+sembr|deberias?\s+sembr|ideal\s+para\s+tu)/.test(
+      textNorm,
+    );
+  if (!fomento) return false;
+
+  // Debe referirse a ESTA especie (nombre o su primer token en el texto).
+  if (nombreNorm && nombreNorm.length >= 3) {
+    const first = nombreNorm.split(/\s+/)[0];
+    if (!textNorm.includes(nombreNorm) && (first.length < 3 || !textNorm.includes(first))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
  * Guard 3 — viabilidad invertida. Si el grounding marca `viabilidad:"inviable"`
  * para una especie a la altitud de la finca y la respuesta la recomienda como
  * viable/buena, CORRIGE ("a tu altura no se da") y lidera con
@@ -442,7 +519,11 @@ export function guardInvertedViability(responseText, resolvedEntities = null, fi
 
     const nombre = _entityName(e);
     const nombreNorm = _stripDiacritics(nombre);
-    if (!_presentaComoViable(norm, nombreNorm)) continue;
+    // R1: dispara si el modelo la presenta como viable (léxico de viabilidad) O
+    // si simplemente la fomenta como cultivo a sembrar (detección directa, sin
+    // depender de frases-gatillo). El veredicto 'inviable' ya es determinístico
+    // (campo o banda de altitud); el texto solo decide si la está promoviendo.
+    if (!_presentaComoViable(norm, nombreNorm) && !_fomentaSiembra(norm, nombreNorm)) continue;
 
     disparadas.push(nombre);
     const alternativas = _altNames(e.alternativas_viables, 3);
@@ -950,6 +1031,9 @@ export function applyOutputGuards(
   if (typeof responseText !== 'string' || responseText.length === 0) {
     return { text: responseText ?? '', modified: false, reasons: [] };
   }
+  // R2: descarta entidades-ruido NLU ("aquí", "don", "pasto") ANTES de los
+  // guards para no razonar sobre palabras campesinas mal resueltas a especie.
+  const entities = filterNoiseEntities(resolvedEntities);
   let text = responseText;
   let modified = false;
   const reasons = [];
@@ -966,7 +1050,7 @@ export function applyOutputGuards(
   }
 
   for (const guard of GUARD_CHAIN) {
-    const res = guard(text, resolvedEntities, fincaAltitud);
+    const res = guard(text, entities, fincaAltitud);
     if (res && res.modified) {
       text = res.text;
       modified = true;

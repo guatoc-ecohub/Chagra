@@ -19,6 +19,7 @@ import {
   guardSpeciesSubstitution,
   guardVisionWithoutPhoto,
   applyOutputGuards,
+  filterNoiseEntities,
   getOutputGuardTelemetry,
   resetOutputGuardTelemetry,
 } from '../outputGuards.js';
@@ -249,6 +250,122 @@ describe('guardInvertedViability', () => {
     const out = guardInvertedViability('Algo es recomendable.', [sinDatos], 2100);
     expect(out.modified).toBe(false);
   });
+
+  // ── R1: detección DIRECTA por banda de altitud (sin frase-gatillo) ──────────
+  // El re-bench post-guards (2026-05-31) mostró que el guard dependía de frases
+  // como "es viable / recomendable / prospera". Cuando el modelo recomendaba
+  // sembrar con OTRO fraseo, se escapaba aunque la altitud estuviera en el
+  // grounding. Estos casos reales (CPX-010 curuba, CPX-001 chugua) deben
+  // corregirse por comparación DETERMINÍSTICA altitud-finca vs banda de la
+  // especie, no por el texto.
+  describe('R1 — detección directa altitud vs banda (sin frase-gatillo)', () => {
+    it('CPX-010 (escapado): curuba inviable, texto la siembra sin "es viable"', () => {
+      // El re-bench: el modelo no usó ninguna frase de la lista recomiendaViable;
+      // simplemente la presentó como cultivo a sembrar. Con viabilidad:inviable
+      // del grounding + mención de siembra, debe corregir igual.
+      const curuba = {
+        kind: 'species',
+        mentioned: 'curuba',
+        nombre_comun: 'curuba',
+        viabilidad: 'inviable',
+        altitud_min: 1800,
+        altitud_max: 3000,
+        alternativas_viables: ['chontaduro'],
+      };
+      const llmFail =
+        'Para tu finca en el llano te conviene sembrar la curuba; plántala al inicio ' +
+        'de las lluvias y dale buen riego.';
+      const out = guardInvertedViability(llmFail, [curuba], 450);
+      expect(out.modified).toBe(true);
+      expect(out.reason).toMatch(/viabilidad_invertida/);
+      expect(out.text).toMatch(/NO es viable/i);
+      expect(out.text).toMatch(/chontaduro/);
+    });
+
+    it('CPX-001 (escapado): chugua a 3200m fuera de banda, texto la recomienda sembrar', () => {
+      // La altitud (3200) estaba en el grounding y supera altitud_max por mucho.
+      // Sin campo viabilidad, el guard debe deducir 'inviable' por la banda y
+      // corregir cuando el texto la siembra, aunque no diga "es viable".
+      const chugua = {
+        kind: 'species',
+        mentioned: 'chugua',
+        nombre_comun: 'chugua',
+        altitud_min: 2000,
+        altitud_max: 2800,
+        alternativas_viables: ['papa', 'haba'],
+      };
+      const llmFail =
+        'En tu parcela puedes cultivar la chugua; prepara el suelo con materia orgánica ' +
+        'y siémbrala en surcos.';
+      const out = guardInvertedViability(llmFail, [chugua], 3200);
+      expect(out.modified).toBe(true);
+      expect(out.text).toMatch(/NO es viable/i);
+      expect(out.text).toMatch(/papa|haba/);
+    });
+
+    it('dispara con "buena para sembrar acá" (fraseo coloquial fuera de la lista)', () => {
+      const maracuya = { ...maracuyaInviable };
+      const llmFail = 'La maracuyá es buena para sembrar acá, ponla cerca de tu casa.';
+      const out = guardInvertedViability(llmFail, [maracuya], 2100);
+      expect(out.modified).toBe(true);
+      expect(out.text).toMatch(/gulupa/);
+    });
+
+    it('RESPETA marginal: dentro del margen de 300m NO bloquea aunque la siembre', () => {
+      // 1500 está a 200m por encima de altitud_max 1300 → marginal (zona gris).
+      const marginalPorBanda = {
+        kind: 'species',
+        mentioned: 'maracuyá',
+        nombre_comun: 'maracuyá',
+        altitud_min: 0,
+        altitud_max: 1300,
+        alternativas_viables: ['gulupa'],
+      };
+      const txt = 'Puedes sembrar la maracuyá con cuidados extra en tu finca.';
+      const out = guardInvertedViability(txt, [marginalPorBanda], 1500);
+      expect(out.modified).toBe(false);
+    });
+
+    it('RESPETA viable: dentro de la banda NO bloquea', () => {
+      const viablePorBanda = {
+        kind: 'species',
+        mentioned: 'maracuyá',
+        nombre_comun: 'maracuyá',
+        altitud_min: 0,
+        altitud_max: 1300,
+      };
+      const txt = 'Siembra la maracuyá, te va a dar buena cosecha.';
+      const out = guardInvertedViability(txt, [viablePorBanda], 800);
+      expect(out.modified).toBe(false);
+    });
+
+    it('NO dispara por banda si el texto NO la recomienda (solo la menciona)', () => {
+      const curuba = {
+        kind: 'species',
+        mentioned: 'curuba',
+        nombre_comun: 'curuba',
+        viabilidad: 'inviable',
+        alternativas_viables: ['chontaduro'],
+      };
+      const txt = 'La curuba es una fruta andina de clima frío. No es para tu zona cálida.';
+      const out = guardInvertedViability(txt, [curuba], 450);
+      expect(out.modified).toBe(false);
+    });
+
+    it('NO dispara si el modelo YA advirtió la inviabilidad (no duplica)', () => {
+      const curuba = {
+        kind: 'species',
+        mentioned: 'curuba',
+        nombre_comun: 'curuba',
+        viabilidad: 'inviable',
+        alternativas_viables: ['chontaduro'],
+      };
+      const ok =
+        'No siembres curuba en el llano: no es viable a esa altura. Mejor el chontaduro.';
+      const out = guardInvertedViability(ok, [curuba], 450);
+      expect(out.modified).toBe(false);
+    });
+  });
 });
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -396,6 +513,86 @@ describe('guardSpeciesSubstitution', () => {
   it('maneja entrada vacía / no-string', () => {
     expect(guardSpeciesSubstitution('', luloResolved).modified).toBe(false);
     expect(guardSpeciesSubstitution(null, luloResolved).text).toBe('');
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────
+// R2 — filtro de entidades-ruido (stopwords NLU)
+// El re-bench post-guards (2026-05-31): el resolver de entidades devolvía
+// palabras campesinas comunes como si fueran especies ("aquí"→Pteridium,
+// "don"→Oenocarpus, "mano", "pasto"). Esas entidades-ruido disparaban los
+// guards sobre RUIDO (3/5 falsos positivos). filterNoiseEntities las descarta
+// ANTES de applyOutputGuards.
+// ──────────────────────────────────────────────────────────────────────────
+describe('filterNoiseEntities', () => {
+  it('descarta "aquí" aunque haya resuelto a una especie (Pteridium)', () => {
+    const entities = [
+      { mentioned: 'aquí', kind: 'species', nombre_comun: 'helecho marranero', nombre_cientifico: 'Pteridium aquilinum' },
+      { mentioned: 'lulo', kind: 'species', nombre_comun: 'Lulo', nombre_cientifico: 'Solanum quitoense' },
+    ];
+    const out = filterNoiseEntities(entities);
+    expect(out).toHaveLength(1);
+    expect(out[0].mentioned).toBe('lulo');
+  });
+
+  it('descarta "don" (Oenocarpus), "doña", "sumercé"', () => {
+    const entities = [
+      { mentioned: 'don', kind: 'species', nombre_comun: 'milpesos', nombre_cientifico: 'Oenocarpus bataua' },
+      { mentioned: 'doña', kind: 'species', nombre_comun: 'algo' },
+      { mentioned: 'sumercé', kind: 'species', nombre_comun: 'algo' },
+    ];
+    expect(filterNoiseEntities(entities)).toHaveLength(0);
+  });
+
+  it('descarta "mano", "vea", "aquí", "allá", "ahí"', () => {
+    const ruido = ['mano', 'vea', 'aquí', 'allá', 'ahí'].map((m) => ({ mentioned: m, kind: 'species' }));
+    expect(filterNoiseEntities(ruido)).toHaveLength(0);
+  });
+
+  it('descarta "pasto" SOLO (genérico) pero NO un pasto con nombre real', () => {
+    const entities = [
+      { mentioned: 'pasto', kind: 'species', nombre_comun: 'pasto' },
+      { mentioned: 'pasto guinea', kind: 'species', nombre_comun: 'pasto guinea', nombre_cientifico: 'Megathyrsus maximus' },
+    ];
+    const out = filterNoiseEntities(entities);
+    expect(out.map((e) => e.mentioned)).toEqual(['pasto guinea']);
+  });
+
+  it('ignora diacríticos y mayúsculas ("Aquí", "AQUÍ", "aqui")', () => {
+    const entities = ['Aquí', 'AQUÍ', 'aqui'].map((m) => ({ mentioned: m, kind: 'species' }));
+    expect(filterNoiseEntities(entities)).toHaveLength(0);
+  });
+
+  it('NO toca especies legítimas (lulo, maíz, café)', () => {
+    const entities = [
+      { mentioned: 'lulo', kind: 'species' },
+      { mentioned: 'maíz', kind: 'species' },
+      { mentioned: 'café', kind: 'species' },
+    ];
+    expect(filterNoiseEntities(entities)).toHaveLength(3);
+  });
+
+  it('maneja entrada no-array sin romper', () => {
+    expect(filterNoiseEntities(null)).toEqual([]);
+    expect(filterNoiseEntities(undefined)).toEqual([]);
+    expect(filterNoiseEntities('x')).toEqual([]);
+  });
+
+  it('en la cadena: "aquí"→Pteridium NO dispara guard de invasora', () => {
+    // Pteridium (helecho marranero) ES invasora; sin el filtro, "aquí" la
+    // arrastraría y el guard advertiría sobre RUIDO. Con el filtro, no dispara.
+    const resolved = [
+      {
+        mentioned: 'aquí',
+        kind: 'species',
+        nombre_comun: 'helecho marranero',
+        es_invasora: true,
+        alternativas_viables: ['aliso'],
+      },
+    ];
+    const txt = 'Aquí puedes sembrar tus cultivos sin problema, es buena tierra.';
+    const out = applyOutputGuards(txt, { resolvedEntities: resolved });
+    expect(out.modified).toBe(false);
   });
 });
 
