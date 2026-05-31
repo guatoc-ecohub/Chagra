@@ -28,6 +28,10 @@ import { streamChatViaSidecar, isAgentStreamingEnabled } from '../../services/st
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
 import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, getClimaIdeam } from '../../services/sidecarClient';
 import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, applyVoseoFilter } from '../../services/agentService';
+// Bug UX 2026-05-30: preservar respuesta parcial ante abort/timeout/cancel.
+// La lógica pura del merge del estado final vive en agentPartialMerge (testeable
+// sin montar el componente).
+import { mergePartialOnInterruption } from '../../services/agentPartialMerge';
 // PoC alertas meteorológicas tiempo real (#316) — el bell + el agente
 // comparten el mismo snapshot via `climaService` (cache 30 min).
 import { getCachedClimaSnapshot, fetchClimaSnapshot } from '../../services/climaService';
@@ -142,6 +146,19 @@ export default function AgentScreen({ onBack, initialContext }) {
   // Bug 2026-05-18: ref al AbortController activo para que botón Cancelar
   // pueda abortar la inferencia LLM en curso desde fuera del callLLM scope.
   const activeControllerRef = useRef(null);
+  // Bug UX 2026-05-30: el texto parcial del stream vive en el state
+  // `streamingContent` (lo setea onToken), pero el catch de runLLM/runAgentPipeline
+  // no puede leerlo sin closure stale. Lo espejamos en un ref para que el catch
+  // recupere lo último acumulado y lo preserve en vez de borrarlo.
+  const streamingContentRef = useRef('');
+  // Distingue la causa del abort para el merge final: 'timeout' (deadline del
+  // LLM / watchdog sin tokens), 'cancel' (operador tocó Cancelar) o 'abort'
+  // (genérico, ej. red caída). Se setea antes de disparar controller.abort().
+  const cancelReasonRef = useRef(null);
+  // Watchdog stall (#sin-token): timer que se RESETEA en cada token. Solo
+  // dispara si pasa STALL_WATCHDOG_MS sin ningún token nuevo (stall real),
+  // independiente del tiempo total de una respuesta lenta-pero-avanzando.
+  const stallTimerRef = useRef(null);
   // 057.4 integration: resolver del Promise pendiente del actionExecutor gate.
   // El callback registrado en setActionGateCallback abre el modal y retorna
   // un Promise; el resolver vive aquí para que los handlers approve/reject/
@@ -350,12 +367,15 @@ export default function AgentScreen({ onBack, initialContext }) {
   const handleCancelLLM = () => {
     if (activeControllerRef.current) {
       console.warn('[Agent] User cancelled LLM inference manually');
+      // Bug UX 2026-05-30: marcamos la razón ANTES de abortar para que el
+      // catch de runAgentPipeline preserve el parcial con el marcador
+      // "cancelado por ti" en vez de borrarlo. NO seteamos streamingContent('')
+      // ni error acá: el flujo del pipeline (catch + finally) se encarga del
+      // merge del estado final y empuja la burbuja con el parcial conservado.
+      cancelReasonRef.current = 'cancel';
       activeControllerRef.current.abort();
     }
     agentSounds.cancel();
-    setState(STATE_IDLE);
-    setStreamingContent('');
-    setError('Cancelado. Toca de nuevo si quieres reintentar.');
     // Task #121: al cancelar manualmente, descartamos también la pregunta
     // pendiente (si la hubiera) — el operador puede re-encolarla, pero
     // si presionó Cancelar es porque quiere cortar la cadena, no que
@@ -744,6 +764,15 @@ ${buildProfileContext(finca)}`;
   // modelos no hagan cold-load entre conversaciones.
   const LLM_TIMEOUT_MS = 60000;
 
+  // Watchdog "sin token" (#sin-token). Distinto del deadline total de arriba:
+  // mide el GAP entre tokens, no el tiempo total. Se RESETEA en cada token, así
+  // una respuesta lenta-pero-avanzando NO se aborta — solo dispara ante un
+  // stall real (el backend dejó de emitir). El comment histórico de runLLM
+  // hablaba de "30s sin token" pero solo existía el deadline total de 60s; esto
+  // implementa el comportamiento que el comment prometía. Backstop de 60s queda
+  // como red de seguridad para streams que avanzan token-a-token eternamente.
+  const STALL_WATCHDOG_MS = 30000;
+
   // Task #121: safety cap del while loop que drena el queue. Con QUEUE_MAX=2
   // (1 processing + 1 pending) jamás debería haber más de 2 iteraciones,
   // pero ponemos 10 como guard defensivo contra cualquier bug futuro que
@@ -991,10 +1020,33 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
 
     const controller = new AbortController();
     activeControllerRef.current = controller;
+    cancelReasonRef.current = null;
+    // Deadline TOTAL (backstop): aborta a los 60s aunque el stream avance.
     const timer = setTimeout(() => {
       console.warn(`[Agent] LLM timeout ${LLM_TIMEOUT_MS}ms — aborting`);
+      cancelReasonRef.current = 'timeout';
       controller.abort();
     }, LLM_TIMEOUT_MS);
+
+    // Watchdog "sin token": se arma acá y se REINICIA en cada token (markToken).
+    // Solo dispara si el backend deja de emitir por STALL_WATCHDOG_MS — stall
+    // real, no respuesta lenta-pero-avanzando.
+    const armStallTimer = () => {
+      stallTimerRef.current = setTimeout(() => {
+        console.warn(`[Agent] LLM stall ${STALL_WATCHDOG_MS}ms sin token — aborting`);
+        cancelReasonRef.current = 'timeout';
+        controller.abort();
+      }, STALL_WATCHDOG_MS);
+    };
+    const markToken = (fullText) => {
+      // Reset del watchdog: llegó un token, el stream está vivo.
+      if (stallTimerRef.current) clearTimeout(stallTimerRef.current);
+      armStallTimer();
+      // Espejo del parcial en ref para que el catch lo preserve sin closure stale.
+      streamingContentRef.current = fullText;
+      setStreamingContent(fullText);
+    };
+    armStallTimer();
 
     try {
       // Routing dual 2026-05-23: queries complejas (plagas regionales,
@@ -1035,7 +1087,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
             num_predict: body.max_tokens,
           },
           keep_alive: body.keep_alive,
-          onToken: (_chunk, full) => setStreamingContent(full),
+          onToken: (_chunk, full) => markToken(full),
           signal: controller.signal,
         });
         console.warn('[Agent] LLM call complete (sidecar stream)', {
@@ -1051,14 +1103,22 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       const result = await streamOpenAI(
         url,
         body,
-        (_chunk, fullText) => setStreamingContent(fullText),
+        (_chunk, fullText) => markToken(fullText),
         { signal: controller.signal },
       );
       console.warn('[Agent] LLM call complete', { responseLen: result?.length || 0 });
       return result;
     } catch (e) {
       if (e.name === 'AbortError') {
-        throw new Error('Tiempo agotado o cancelado. Toca de nuevo.');
+        // Bug UX 2026-05-30: NO aplastamos el parcial acá. Propagamos un error
+        // tipado con la razón de interrupción ('timeout'/'cancel'/'abort') para
+        // que runAgentPipeline corra el merge del estado final y preserve el
+        // texto streamed si lo hubo. cancelReasonRef lo setea handleCancelLLM
+        // (cancel) o el timer/watchdog (timeout); por defecto 'abort' genérico.
+        const interruptErr = new Error('Inferencia interrumpida');
+        interruptErr.interrupted = true;
+        interruptErr.interruptReason = cancelReasonRef.current || 'abort';
+        throw interruptErr;
       }
       const match = e.message.match(/^LLM (\d+)/);
       if (match) {
@@ -1074,6 +1134,10 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       throw new Error('IA no disponible, intenta de nuevo en un momento');
     } finally {
       clearTimeout(timer);
+      if (stallTimerRef.current) {
+        clearTimeout(stallTimerRef.current);
+        stallTimerRef.current = null;
+      }
       activeControllerRef.current = null;
     }
   };
@@ -1374,10 +1438,47 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       }
     } catch (e) {
       console.error('[Agent] Error:', e);
-      setError(e.message || 'No pude conectarme al asistente. Intenta de nuevo.');
+      // Bug UX 2026-05-30: si la inferencia se interrumpió (abort/timeout/cancel)
+      // y ya había texto parcial streamed, NO lo borramos. El merge decide:
+      //   - con parcial  → conservamos el texto + marcador NO destructivo,
+      //     marcamos el mensaje _incomplete con botón Reintentar, sin banner rojo.
+      //   - sin parcial  → mostramos el mensaje de error completo en el banner
+      //     (abort antes del primer token: comportamiento previo correcto).
+      // Errores NO-interrupción (HTTP 5xx, sesión expirada, etc.) caen al banner
+      // como siempre.
+      if (e?.interrupted) {
+        const partial = streamingContentRef.current || '';
+        const merged = mergePartialOnInterruption({
+          partialContent: partial,
+          reason: e.interruptReason,
+        });
+        if (merged.preservePartial) {
+          const incompleteMessage = {
+            role: 'assistant',
+            content: merged.content,
+            timestamp: Date.now(),
+            _incomplete: true,
+            // Reusa el flujo orphan_recovery para que ChatBubble renderice el
+            // botón "Reintentar" (re-envía el prompt original sin re-tipear) y
+            // suprima 👍👎/TTS sobre una respuesta a medias.
+            _orphan_recovery: true,
+            _orphan_prompt: text.trim(),
+          };
+          setMessages((prev) => [...prev, incompleteMessage]);
+          // NO persistimos el parcial+marcador en conversationMemory: el LLM no
+          // debe arrastrar texto cortado como si fuera contexto válido.
+          setError('');
+        } else {
+          setError(merged.error);
+        }
+      } else {
+        setError(e.message || 'No pude conectarme al asistente. Intenta de nuevo.');
+      }
     } finally {
       setState(STATE_IDLE);
       setStreamingContent('');
+      streamingContentRef.current = '';
+      cancelReasonRef.current = null;
     }
   };
 
