@@ -14,6 +14,8 @@ import {
   formatClimateAlert,
   buildClimaContext,
   buildFincaContext,
+  generateViabilityRules,
+  buildViabilityContext,
   pisoTermicoFromAltitud,
   temporadaColombiana,
 } from '../agentService.js';
@@ -644,6 +646,180 @@ describe('agentService — Task #202 Profile Context', () => {
       });
       expect(ctx).toContain('YA TIENE registrado');
       expect(ctx).toContain('Maíz amarillo');
+    });
+  });
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Viabilidad honesta de cultivo (feat/agente-viabilidad-cultivo)
+  // El agente debe decir con honestidad cuándo una especie NO es viable para
+  // la altitud de la finca del usuario y sugerir alternativas SOLO del
+  // grounding/catálogo, nunca inventadas. Degrada con gracia cuando faltan
+  // los rangos de altitud (no afirma viabilidad sin datos).
+  // ────────────────────────────────────────────────────────────────────────
+  describe('generateViabilityRules', () => {
+    const rules = generateViabilityRules();
+
+    it('es una regla estática (string no vacío, costo cero de red)', () => {
+      expect(typeof rules).toBe('string');
+      expect(rules.length).toBeGreaterThan(100);
+    });
+
+    it('declara que las preguntas son por defecto sobre la finca del usuario', () => {
+      expect(rules).toContain('POR DEFECTO');
+      expect(rules.toLowerCase()).toContain('finca');
+    });
+
+    it('exige honestidad cuando la altitud de la finca está fuera del rango de la especie', () => {
+      expect(rules).toContain('altitud_min');
+      expect(rules).toContain('altitud_max');
+      expect(rules).toContain('probabilidad de éxito');
+    });
+
+    it('exige que las alternativas salgan SOLO del catálogo/grounding, nunca inventadas', () => {
+      expect(rules).toContain('NUNCA inventes');
+      expect(rules).toContain('get_cultivos_viables');
+    });
+
+    it('degrada con gracia: sin rango no se afirma viabilidad', () => {
+      expect(rules.toLowerCase()).toContain('no afirmes');
+    });
+
+    it('guía la presentación de datos LOCALES como SUYOS', () => {
+      expect(rules).toContain('En tu finca');
+      expect(rules).toContain('SUYOS');
+    });
+
+    it('cero voseo argentino en la regla', () => {
+      expect(rules).not.toMatch(/\btenés\b/);
+      expect(rules).not.toMatch(/\bpodés\b/);
+      expect(rules).not.toMatch(/\bmirá\b/);
+      expect(rules).not.toMatch(/\bacá\b/);
+      expect(rules).not.toMatch(/\bsembrá\b/);
+      expect(rules).not.toMatch(/\belegí\b/);
+    });
+  });
+
+  describe('buildViabilityContext', () => {
+    it('devuelve string vacío sin entidades resueltas', () => {
+      expect(buildViabilityContext({ fincaAltitud: 2580, resolvedEntities: null })).toBe('');
+      expect(buildViabilityContext({ fincaAltitud: 2580, resolvedEntities: [] })).toBe('');
+      expect(buildViabilityContext({})).toBe('');
+    });
+
+    it('degrada con gracia: sin altitud de finca NO emite veredicto de viabilidad', () => {
+      const ctx = buildViabilityContext({
+        fincaAltitud: null,
+        resolvedEntities: [
+          {
+            mentioned: 'coco', kind: 'species', nombre_comun: 'Coco',
+            nombre_cientifico: 'Cocos nucifera', altitud_min: 0, altitud_max: 1000,
+          },
+        ],
+      });
+      expect(ctx).toBe('');
+    });
+
+    it('degrada con gracia: especie sin rango de altitud NO se evalúa', () => {
+      const ctx = buildViabilityContext({
+        fincaAltitud: 2580,
+        resolvedEntities: [
+          {
+            mentioned: 'coco', kind: 'species', nombre_comun: 'Coco',
+            nombre_cientifico: 'Cocos nucifera', altitud_min: null, altitud_max: null,
+          },
+        ],
+      });
+      expect(ctx).toBe('');
+    });
+
+    it('caso coco en finca a 2580m: marca probabilidad MUY BAJA (fuera de rango)', () => {
+      const ctx = buildViabilityContext({
+        fincaAltitud: 2580,
+        resolvedEntities: [
+          {
+            mentioned: 'palmera de coco', kind: 'species', nombre_comun: 'Coco',
+            nombre_cientifico: 'Cocos nucifera', altitud_min: 0, altitud_max: 1000,
+            piso_termico: 'cálido',
+          },
+        ],
+      });
+      expect(ctx).toContain('Coco');
+      expect(ctx).toContain('MUY BAJA');
+      // Debe exponer el porqué: rango de la especie vs altitud de la finca
+      expect(ctx).toContain('0');
+      expect(ctx).toContain('1000');
+      expect(ctx).toContain('2580');
+      // Debe instruir sugerir alternativas del grounding/tool, no inventar
+      expect(ctx).toContain('get_cultivos_viables');
+    });
+
+    it('caso especie VIABLE: altitud de finca dentro del rango → no la marca inviable', () => {
+      const ctx = buildViabilityContext({
+        fincaAltitud: 2580,
+        resolvedEntities: [
+          {
+            mentioned: 'papa', kind: 'species', nombre_comun: 'Papa',
+            nombre_cientifico: 'Solanum tuberosum', altitud_min: 2000, altitud_max: 3500,
+          },
+        ],
+      });
+      expect(ctx).not.toContain('MUY BAJA');
+    });
+
+    it('marca límite inferior: finca demasiado baja para la especie', () => {
+      const ctx = buildViabilityContext({
+        fincaAltitud: 200,
+        resolvedEntities: [
+          {
+            mentioned: 'papa', kind: 'species', nombre_comun: 'Papa',
+            nombre_cientifico: 'Solanum tuberosum', altitud_min: 2000, altitud_max: 3500,
+          },
+        ],
+      });
+      expect(ctx).toContain('MUY BAJA');
+      expect(ctx).toContain('200');
+    });
+
+    it('ignora plagas/biopreparados (solo evalúa especies sembrables)', () => {
+      const ctx = buildViabilityContext({
+        fincaAltitud: 2580,
+        resolvedEntities: [
+          {
+            mentioned: 'broca', kind: 'pest', nombre_comun: 'Broca',
+            nombre_cientifico: 'Hypothenemus hampei', altitud_min: 0, altitud_max: 1800,
+          },
+        ],
+      });
+      expect(ctx).toBe('');
+    });
+
+    it('cero voseo argentino en la salida', () => {
+      const ctx = buildViabilityContext({
+        fincaAltitud: 2580,
+        resolvedEntities: [
+          {
+            mentioned: 'coco', kind: 'species', nombre_comun: 'Coco',
+            nombre_cientifico: 'Cocos nucifera', altitud_min: 0, altitud_max: 1000,
+          },
+        ],
+      });
+      expect(ctx).not.toMatch(/\btenés\b/);
+      expect(ctx).not.toMatch(/\bpodés\b/);
+      expect(ctx).not.toMatch(/\bmirá\b/);
+      expect(ctx).not.toMatch(/\bacá\b/);
+    });
+
+    it('tolera altitud de finca como string ("2580")', () => {
+      const ctx = buildViabilityContext({
+        fincaAltitud: '2580',
+        resolvedEntities: [
+          {
+            mentioned: 'coco', kind: 'species', nombre_comun: 'Coco',
+            nombre_cientifico: 'Cocos nucifera', altitud_min: 0, altitud_max: 1000,
+          },
+        ],
+      });
+      expect(ctx).toContain('MUY BAJA');
     });
   });
 });

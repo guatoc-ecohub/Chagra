@@ -500,6 +500,112 @@ export function buildClimaContext(snapshot, opts = {}) {
 }
 
 /**
+ * generateViabilityRules — regla ESTÁTICA del system prompt para que el agente:
+ *
+ *   1. VIABILIDAD HONESTA: si el usuario quiere sembrar una especie cuya altitud
+ *      de finca cae FUERA del rango [altitud_min, altitud_max] de esa especie,
+ *      lo dice con honestidad directa pero amable (probabilidad muy baja + el
+ *      porqué) y SUGIERE alternativas viables SOLO del catálogo/grounding o del
+ *      tool get_cultivos_viables — NUNCA inventadas. Si no tiene el rango de la
+ *      especie, NO afirma nada sobre viabilidad (degrada con gracia).
+ *   2. DEFAULT FINCA-CONTEXT: las preguntas son POR DEFECTO sobre la finca del
+ *      usuario sin que él lo tenga que decir (lo habilita buildFincaContext;
+ *      aquí solo se declara como comportamiento por defecto).
+ *   3. PRESENTACIÓN LOCAL "linda" (costo CERO de inteligencia — solo fraseo): al
+ *      citar datos de la finca, que se note que son SUYOS y LOCALES.
+ *
+ * Es una constante de prompt — sin red, sin estado, sin latencia. Se concatena
+ * una sola vez en el system prompt.
+ *
+ * @returns {string}
+ */
+export function generateViabilityRules() {
+  return `REGLA DE VIABILIDAD HONESTA DE CULTIVO:
+Las preguntas del usuario son POR DEFECTO sobre SU finca (su ubicación, altitud, piso térmico, clima y cultivos), aunque no lo diga explícitamente. Asume ese contexto: ya lo tienes en el bloque "=== CONTEXTO AMBIENTAL DE LA FINCA ===".
+
+Si el usuario quiere sembrar una especie y el grounding ("=== ENTIDADES RESUELTAS ===") trae para esa especie su rango de altitud (altitud_min / altitud_max) Y conoces la altitud de la finca, compara:
+- Si la altitud de la finca está FUERA del rango [altitud_min, altitud_max] de la especie, dilo con HONESTIDAD directa pero amable: la probabilidad de éxito es muy baja y POR QUÉ (ej: el coco necesita 0–1000 m / clima cálido, y tu finca está a 2580 m / piso frío). Dile que no vale la pena el esfuerzo y SUGIERE 2–3 alternativas viables para SU altitud / piso térmico.
+- Las alternativas salen SOLO del catálogo / grounding provisto en este mensaje o del tool get_cultivos_viables. NUNCA inventes especies ni inventes que algo es viable.
+- Si NO tienes el rango de altitud de la especie (no vino en el grounding o viene null), NO afirmes NADA sobre viabilidad: sé neutral, no digas que sí ni que no. Mejor pide o consulta el dato antes de prometer éxito.
+
+Tono: honesto sin ser frío. Ejemplo: "Sembrar coco en tu Guatoc (2580 m, piso frío) tiene una probabilidad de éxito muy baja: el coco es de clima cálido (0–1000 m). No vale la pena el esfuerzo. Para tu altura te irían mejor [2–3 alternativas del catálogo]."
+
+REGLA DE PRESENTACIÓN DE DATOS LOCALES (solo fraseo, sin tablas ni formato pesado):
+Cuando cites datos de la finca del usuario, deja claro que son SUYOS y LOCALES, no generalidades: "En tu finca tienes…", "El clima hoy en tu finca…", "Según lo que registraste…", "Para tu altura (2580 m)…". El usuario puede ser campesino o un niño de 11 años: que entienda al instante que hablas de SUS datos reales. Mantén las respuestas concisas, sin enumerar todo el contexto como preámbulo.`;
+}
+
+/**
+ * buildViabilityContext — bloque DETERMINÍSTICO de viabilidad por especie.
+ *
+ * Cruza la altitud de la finca del usuario contra el rango [altitud_min,
+ * altitud_max] de cada especie resuelta por el grounding AGE (este turno). Para
+ * cada especie SEMBRABLE cuya altitud de finca cae FUERA de su rango, emite una
+ * línea autoritativa "probabilidad MUY BAJA" con el porqué (rango especie vs
+ * altitud finca) para que el LLM no la afirme viable por instinto.
+ *
+ * RESTRICCIÓN #1 (innegociable): CERO latencia. Función PURA y SÍNCRONA — NO
+ * hace fetch, NO toca red, NO consulta el grafo. Reutiliza `resolvedEntities`
+ * (ya resueltas por el sidecar este turno) y la altitud de la finca (ya en
+ * profile/store). Otro agente está agregando altitud_min/altitud_max/piso_termico
+ * por especie al grounding; mientras no lleguen, DEGRADA con gracia: si el campo
+ * no viene (o viene null), esa especie NO se evalúa y NO se afirma viabilidad.
+ *
+ * @param {object} args
+ * @param {number|string|null} [args.fincaAltitud] — msnm de la finca activa.
+ * @param {Array<object>|null} [args.resolvedEntities] — entidades AGE del turno.
+ *   Cada una puede traer { kind, nombre_comun, altitud_min, altitud_max, piso_termico }.
+ * @returns {string} bloque compacto, o '' si no hay nada accionable.
+ */
+export function buildViabilityContext({
+  fincaAltitud = null,
+  resolvedEntities = null,
+} = {}) {
+  if (!Array.isArray(resolvedEntities) || resolvedEntities.length === 0) return '';
+
+  const alt = Number(fincaAltitud);
+  // Sin altitud de finca NO se puede juzgar viabilidad — degradar a neutral.
+  if (!Number.isFinite(alt)) return '';
+
+  const fincaPiso = pisoTermicoFromAltitud(alt);
+  const inviables = [];
+
+  for (const e of resolvedEntities) {
+    if (!e || typeof e !== 'object') continue;
+    // Solo especies sembrables. Las plagas/biopreparados no se "siembran".
+    const kind = String(e.kind || '').toLowerCase();
+    if (kind && kind !== 'species' && kind !== 'planta' && kind !== 'especie' && kind !== 'cultivo') {
+      continue;
+    }
+    // Degradar con gracia: sin rango usable NO se afirma viabilidad.
+    // Number(null) === 0, así que hay que descartar null/undefined/'' ANTES
+    // de coaccionar — si no, una especie sin altitud_min se leería como 0 m.
+    if (e.altitud_min == null || e.altitud_min === '') continue;
+    if (e.altitud_max == null || e.altitud_max === '') continue;
+    const min = Number(e.altitud_min);
+    const max = Number(e.altitud_max);
+    if (!Number.isFinite(min) || !Number.isFinite(max)) continue;
+
+    if (alt < min || alt > max) {
+      const nombre = e.nombre_comun || e.mentioned || 'esa especie';
+      const pisoSp = e.piso_termico ? `, piso ${e.piso_termico}` : '';
+      const fincaPisoTxt = fincaPiso ? `, piso ${fincaPiso}` : '';
+      inviables.push(
+        `- ${nombre}: rango de la especie ${min}–${max} msnm${pisoSp}; la finca está a ${alt} msnm${fincaPisoTxt} → probabilidad de éxito MUY BAJA (fuera de rango).`,
+      );
+    }
+  }
+
+  if (inviables.length === 0) return '';
+
+  return `=== VIABILIDAD POR ALTITUD (determinístico, autoritativo — verificado contra el catálogo) ===
+La(s) siguiente(s) especie(s) que el usuario mencionó NO son viables para la altitud de su finca:
+${inviables.join('\n')}
+
+REGLA: si el usuario pregunta por sembrar alguna de estas, sé honesto y amable: dile que la probabilidad de éxito es muy baja y POR QUÉ (rango de la especie vs altitud de su finca), que no vale la pena el esfuerzo, y sugiérele 2–3 alternativas viables para SU altitud. Las alternativas salen SOLO del catálogo / grounding de este mensaje o del tool get_cultivos_viables — NUNCA inventes especies ni inventes viabilidad.
+=== FIN VIABILIDAD POR ALTITUD ===`;
+}
+
+/**
  * Deriva el piso térmico colombiano a partir de la altitud en msnm.
  * Cotas clásicas (Caldas-Lang / IDEAM) usadas en el resto del código.
  *
