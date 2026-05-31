@@ -15,7 +15,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { describe, test, expect, vi } from 'vitest';
+import { describe, test, expect, vi, beforeEach } from 'vitest';
 import ClimaStrip from '../ClimaStrip';
 
 // Mock de climaService para que el componente no haga fetch real al sidecar.
@@ -52,13 +52,42 @@ vi.mock('../../../config/defaults', () => ({
 
 // Mock del perfil. Default {} (sin municipio) → los tests existentes ven el
 // branch "Configurar ubicación". El test del bug fix 2026-05-30 lo sobreescribe.
-vi.mock('../../../services/userProfileService', () => ({
-    getProfile: vi.fn(() => ({})),
+vi.mock('../../../services/userProfileService', () => {
+    const getProfile = vi.fn(() => ({}));
     // ClimaStrip deriva el municipio via getProfileMunicipio (#338): prefiere
-    // profile.municipio, con fallback offline a resolver profile.region.
-    getProfileMunicipio: vi.fn(() => null),
-}));
+    // profile.municipio, con fallback offline a resolver profile.region. El mock
+    // refleja esa semántica real (deriva de getProfile().municipio) para que los
+    // tests solo necesiten fijar getProfile() y no acoplarse a dos mocks; los
+    // tests que quieran probar el fallback de región pueden sobrescribirlo con
+    // mockReturnValue/Once.
+    const getProfileMunicipio = vi.fn(() => getProfile()?.municipio ?? null);
+    return { getProfile, getProfileMunicipio };
+});
 import { getProfile, getProfileMunicipio } from '../../../services/userProfileService';
+
+// Aislamiento entre tests: el mock de fetchClimaSnapshot es de módulo, así que
+// su historial de llamadas y su cola de `mockResolvedValueOnce` se acumulan de
+// un test al siguiente. Sin esto, los asserts `toHaveBeenCalledWith(...)` ven
+// la llamada del render anterior (p.ej. la elevación 2580 del test "coords +
+// altitud" se filtra a los tests que esperan la altitud curada del DANE) y los
+// snapshots `Once` se consumen fuera de orden. Lo restauramos al default
+// (sin snapshot) antes de cada test; cada test fija su propio `Once`.
+beforeEach(() => {
+    fetchClimaSnapshot.mockReset();
+    fetchClimaSnapshot.mockResolvedValue(null);
+    // Mismo problema con findMunicipio: su cola de `mockReturnValueOnce` y su
+    // historial se filtran entre tests (los efectos asíncronos de un render
+    // anterior pueden consumir el `Once` del test actual). Lo restauramos al
+    // default (sin match DANE) antes de cada test.
+    findMunicipio.mockReset();
+    findMunicipio.mockReturnValue(null);
+    // getProfileMunicipio: algunos tests lo fijan con mockReturnValue(...) y eso
+    // reemplaza la implementación para TODOS los tests posteriores. Restauramos
+    // la semántica real (deriva de getProfile().municipio) antes de cada test;
+    // los tests que prueban el fallback de región la sobrescriben localmente.
+    getProfileMunicipio.mockReset();
+    getProfileMunicipio.mockImplementation(() => getProfile()?.municipio ?? null);
+});
 
 describe('ClimaStrip — botón "Configurar ubicación" (bug fix Brave 2026-05-28)', () => {
     test('renderiza CTA "Configurar ubicación" cuando no hay municipio', async () => {
