@@ -1,5 +1,4 @@
 import React from 'react';
-import AltitudeBadge from './AltitudeBadge';
 import SkyBadge from './common/SkyBadge';
 import PestMonitoringWindow from './PestMonitoringWindow';
 
@@ -24,13 +23,9 @@ export default function EnvironmentalCard() {
   return (
     <div className="w-full bg-slate-900/60 border-b border-slate-800">
       <section
-        aria-label="Información ambiental: altitud y efemérides"
+        aria-label="Efemérides del cielo: fase lunar y horas solares"
         className="px-4 py-3 flex flex-wrap items-center gap-3"
       >
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">Altitud</span>
-          <AltitudeBadge />
-        </div>
         <div className="flex items-center gap-2">
           <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">Cielo</span>
           <SkyBadge />
