@@ -45,10 +45,15 @@ import {
  * Persiste orden en localStorage `chagra:dashboard-order:v1`.
  */
 
-const STORAGE_KEY = 'chagra:dashboard-order:v1';
+// v2 (2026-05-30): 'analisis' (AnalisisProactivoIA) pasó de fijo-abajo a
+// sección draggable, por defecto justo debajo de 'clima'. Bump de versión
+// para que usuarios con orden v1 reciban el nuevo default en vez de que se
+// les agregue al final.
+const STORAGE_KEY = 'chagra:dashboard-order:v2';
 
 const DEFAULT_ORDER = [
     'clima',
+    'analisis',
     'plantas',
     'hoy',
     'zonas',
@@ -61,6 +66,7 @@ const DEFAULT_ORDER = [
 
 const SECTION_COMPONENTS = {
     clima: { Component: ClimaStrip, full: true },
+    analisis: { Component: AnalisisProactivoIA, full: true },
     plantas: { Component: PlantasCard },
     zonas: { Component: ZonasCard },
     insumos: { Component: InsumosCard },
@@ -90,7 +96,7 @@ function writeOrder(order) {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(order)); } catch { /* ignore */ }
 }
 
-function SortableSection({ id, onNavigate }) {
+function SortableSection({ id, onNavigate, sensors }) {
     const {
         attributes,
         listeners,
@@ -134,7 +140,9 @@ function SortableSection({ id, onNavigate }) {
                 <GripVertical size={14} aria-hidden="true" />
             </button>
             <div className={full ? 'pl-3' : ''}>
-                <Component onNavigate={onNavigate} variant={full ? 'list' : 'grid'} />
+                {/* `sensors` solo lo consume la sección 'analisis' (AnalisisProactivoIA);
+                    el resto de cards lo ignoran (prop extra inocua). */}
+                <Component onNavigate={onNavigate} variant={full ? 'list' : 'grid'} sensors={sensors} />
             </div>
         </div>
     );
@@ -187,7 +195,7 @@ export default function DashboardLive({ onNavigate }) {
                     <SortableContext items={order} strategy={rectSortingStrategy}>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             {order.map((id) => (
-                                <SortableSection key={id} id={id} onNavigate={onNavigate} />
+                                <SortableSection key={id} id={id} onNavigate={onNavigate} sensors={iotAlerts} />
                             ))}
                         </div>
                     </SortableContext>
@@ -205,14 +213,12 @@ export default function DashboardLive({ onNavigate }) {
                     expandido de solo-sensores a 3 ejes IA. */}
                 <AIStatusFooter sensors={iotAlerts} onNavigate={onNavigate} />
 
-                {/* AnalisisProactivoIA (#331) — Operador 2026-05-29: "extraño
-                    el texto de análisis IA basado en sensores de la versión
-                    vieja". Panel narrativo contextual que teje: piso térmico,
-                    plantas registradas, tareas pendientes, sensores y alertas
-                    activas. Local-only por ahora (templating determinístico
-                    sobre stores); Fase 2 wire al sidecar /agent/proactive
-                    para narrativa LLM real. */}
-                <AnalisisProactivoIA sensors={iotAlerts} onNavigate={onNavigate} />
+                {/* AnalisisProactivoIA (#331) — Operador 2026-05-30: "que el
+                    análisis de IA quede justo debajo del clima y que también
+                    pueda moverse". Pasó de render fijo acá-abajo a sección
+                    DRAGGABLE en SECTION_COMPONENTS, default order = bajo 'clima'
+                    (ver DEFAULT_ORDER + STORAGE_KEY v2). Recibe `sensors` vía
+                    SortableSection. */}
             </div>
         </div>
     );
