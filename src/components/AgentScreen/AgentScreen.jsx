@@ -1483,12 +1483,36 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       // false → corrige cualquier afirmación visual inventada.
       const guardProfileName =
         (() => { try { const p = getProfile(); return (p && p.nombre) || null; } catch (_) { return null; } })();
+      // HARDENING térmico (audit #23): mínima/máxima esperadas del pronóstico ya
+      // cacheado (mismo snapshot que buildFrostHeatContext — NO se re-pide).
+      // Habilita guardThermalViability para advertir helada/golpe de calor sobre
+      // un cultivo recomendado. Degrada con gracia: sin snapshot/forecast → null
+      // → el guard es no-op.
+      const { forecastTempMin, forecastTempMax } = (() => {
+        try {
+          const snap = getCachedClimaSnapshot();
+          const om = snap && typeof snap === 'object' ? snap.openmeteo : null;
+          const fc = om && om.available && Array.isArray(om.forecast_7d) ? om.forecast_7d : null;
+          if (!fc || fc.length === 0) return { forecastTempMin: null, forecastTempMax: null };
+          let min = null;
+          let max = null;
+          for (const d of fc) {
+            if (d && typeof d.temp_min_c === 'number' && (min == null || d.temp_min_c < min)) min = d.temp_min_c;
+            if (d && typeof d.temp_max_c === 'number' && (max == null || d.temp_max_c > max)) max = d.temp_max_c;
+          }
+          return { forecastTempMin: min, forecastTempMax: max };
+        } catch (_) {
+          return { forecastTempMin: null, forecastTempMax: null };
+        }
+      })();
       const guarded = applyOutputGuards(voseoSafe, {
         resolvedEntities,
         fincaAltitud: guardAltitud,
         hadVision: !!(visionContext && visionContext.hadVision),
         visionConfidence: (visionContext && visionContext.visionConfidence) ?? null,
         profileName: guardProfileName,
+        forecastTempMin,
+        forecastTempMax,
       });
       if (guarded.modified) {
         console.debug('[guards] salida corregida', { reasons: guarded.reasons });
