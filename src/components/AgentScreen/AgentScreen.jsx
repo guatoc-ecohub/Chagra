@@ -27,7 +27,7 @@ import { streamChatViaSidecar, isAgentStreamingEnabled } from '../../services/st
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
 import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, postValidate, getClimaIdeam } from '../../services/sidecarClient';
-import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, applyVoseoFilter, stripRoleLeak } from '../../services/agentService';
+import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, generateViabilityRules, applyVoseoFilter, stripRoleLeak } from '../../services/agentService';
 import { getProfile } from '../../services/userProfileService';
 import { regionFromProfile } from '../../services/ensoContext';
 // Bug UX 2026-05-30: preservar respuesta parcial ante abort/timeout/cancel.
@@ -704,6 +704,8 @@ HERRAMIENTAS NORMATIVA SOLO PARA VALIDACIÓN, NUNCA PRESCRIPCIÓN:
 
 Responde en español colombiano (tú/usted, sin voseo argentino). Sé específico y útil cuando tengas certeza; humilde y preguntón cuando no.
 
+${generateViabilityRules()}
+
 ${buildProfileContext(finca)}`;
   }, [plants, fincas, activeFincaSlug, indoorZone]);
 
@@ -1041,8 +1043,9 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       }, {});
       return Object.entries(counts).map(([name, count]) => ({ name, count }));
     })();
+    const fincaProfile = (() => { try { return getProfile(); } catch (_) { return null; } })();
     const fincaContext = `\n\n${buildFincaContext({
-      profile: (() => { try { return getProfile(); } catch (_) { return null; } })(),
+      profile: fincaProfile,
       finca: fincaActivaCtx,
       climaSnapshot,
       groupedCultivos,
@@ -1050,8 +1053,19 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       activeAlerts,
     })}`;
 
+    // VIABILIDAD POR ALTITUD (determinístico, sin red). Cruza la altitud de la
+    // finca contra el rango altitud_min/altitud_max que el grounding AGE trae
+    // por especie (lo agrega el sidecar). Degrada con gracia: si el rango no
+    // viene, no afirma viabilidad. Cero latencia: pura sobre datos ya en mano.
+    const fincaAltitud =
+      (fincaProfile && fincaProfile.finca_altitud) ||
+      (fincaActivaCtx && fincaActivaCtx.altitud) ||
+      null;
+    const viabilidadBlock = buildViabilityContext({ fincaAltitud, resolvedEntities });
+    const viabilidadContext = viabilidadBlock ? `\n\n${viabilidadBlock}` : '';
+
     const messages = [
-      { role: 'system', content: systemPrompt + corpusContext + evidenceContext + resolvedEntitiesBlock + climaContext + fincaContext + queryAnalysisBlock },
+      { role: 'system', content: systemPrompt + corpusContext + evidenceContext + resolvedEntitiesBlock + viabilidadContext + climaContext + fincaContext + queryAnalysisBlock },
       ...(contextMemory ? [{ role: 'user', content: contextMemory }] : []),
       { role: 'user', content: query },
     ];
