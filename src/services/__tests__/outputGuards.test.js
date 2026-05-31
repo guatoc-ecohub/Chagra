@@ -183,6 +183,56 @@ describe('guardSyntheticAgrochemical', () => {
       }
     });
   });
+
+  // ── #17: biopreparados / caldos minerales PERMITIDOS no se bloquean ──
+  // Son agroecológicos (caldo bordelés, sulfocálcico, ceniza, bocashi,
+  // supermagro, biol). Aunque algún nombre/ingrediente colisione con la
+  // denylist o el detector de sufijos, NUNCA deben marcarse como sintéticos.
+  describe('#17 — biopreparados permitidos (allowlist agroecológica)', () => {
+    it('NO bloquea caldo bordelés, sulfocálcico, ceniza, bocashi, supermagro ni biol', () => {
+      const permitidos = [
+        'caldo bordelés',
+        'caldo sulfocálcico',
+        'sulfocálcico',
+        'ceniza',
+        'bocashi',
+        'supermagro',
+        'biol',
+        'biofermento',
+        'lixiviado de lombriz',
+      ];
+      for (const bio of permitidos) {
+        const out = guardSyntheticAgrochemical(`Para el hongo aplica ${bio} foliar como preventivo.`);
+        expect(out.modified, bio).toBe(false);
+      }
+    });
+
+    it('bordelés NO bloqueado, glifosato SÍ bloqueado (criterio del caso)', () => {
+      const bordeles = guardSyntheticAgrochemical(
+        'Para el tizón aplica caldo bordelés (cal + sulfato de cobre) como preventivo.',
+      );
+      expect(bordeles.modified).toBe(false);
+
+      const glifosato = guardSyntheticAgrochemical('Para la maleza aplica glifosato al lote.');
+      expect(glifosato.modified).toBe(true);
+      expect(glifosato.reason).toMatch(/glifosato/i);
+    });
+
+    it('mezcla: aunque mencione un biopreparado permitido, un sintético en la misma frase SÍ dispara', () => {
+      const out = guardSyntheticAgrochemical(
+        'Usa caldo bordelés como preventivo; si no funciona, mancozeb en dosis foliar.',
+      );
+      expect(out.modified).toBe(true);
+      expect(out.reason).toMatch(/mancozeb/i);
+    });
+
+    it('sulfocálcico no dispara por su terminación (colisión con sufijos químicos)', () => {
+      const out = guardSyntheticAgrochemical(
+        'El caldo sulfocálcico controla ácaros y hongos; aplícalo en dosis diluida.',
+      );
+      expect(out.modified).toBe(false);
+    });
+  });
 });
 
 // ──────────────────────────────────────────────────────────────────────────

@@ -335,3 +335,134 @@ describe('ChatBubble — badge de fuente (verificado vs generativo)', () => {
     });
   });
 });
+
+
+describe('ChatBubble — badges anti-alucinación (#18 fuente · #19 auto-corregida · #20 confianza)', () => {
+  let storeState;
+
+  beforeEach(() => {
+    storeState = { showSourceBadges: true };
+    usePrefsStore.mockImplementation((selector) => selector(storeState));
+  });
+
+  const base = (metadata) => ({
+    role: 'assistant',
+    content: 'El caldo bordelés se aplica 1-2 L por planta, foliar.',
+    timestamp: Date.now(),
+    metadata,
+  });
+
+  // ── #18: fuente verificable clickeable ──
+  test('#18 renderiza link a fuente_url con label (CSP-safe: <a href>, sin onclick)', () => {
+    render(
+      <ChatBubble
+        message={base({
+          tool_used: 'get_biopreparados',
+          grounded: true,
+          fuente: 'Agrosavia',
+          fuente_url: 'https://repository.agrosavia.co/doc/download',
+        })}
+      />,
+    );
+    const link = screen.getByTestId('fuente-badge');
+    expect(link).toBeInTheDocument();
+    expect(link.tagName).toBe('A');
+    expect(link).toHaveAttribute('href', 'https://repository.agrosavia.co/doc/download');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', expect.stringContaining('noopener'));
+    expect(link).toHaveTextContent(/Fuente verificable/i);
+    expect(link).toHaveTextContent(/Agrosavia/);
+    // CSP-safe: jamás un handler inline.
+    expect(link).not.toHaveAttribute('onclick');
+  });
+
+  test('#18 sin fuente_url → NO renderiza el badge de fuente', () => {
+    render(<ChatBubble message={base({ tool_used: 'get_species', grounded: true })} />);
+    expect(screen.queryByTestId('fuente-badge')).not.toBeInTheDocument();
+  });
+
+  test('#18 fuente_url no http(s) → NO renderiza link (no inyección)', () => {
+    render(
+      <ChatBubble
+        message={base({ tool_used: 'get_biopreparados', grounded: true, fuente_url: 'javascript:alert(1)' })}
+      />,
+    );
+    expect(screen.queryByTestId('fuente-badge')).not.toBeInTheDocument();
+  });
+
+  // ── #19: auto-corregida ──
+  test('#19 renderiza badge "Respuesta auto-corregida" cuando auto_corrected === true', () => {
+    render(<ChatBubble message={base({ tool_used: null, grounded: false, auto_corrected: true })} />);
+    const badge = screen.getByTestId('auto-corrected-badge');
+    expect(badge).toBeInTheDocument();
+    expect(badge).toHaveTextContent(/auto-corregida/i);
+  });
+
+  test('#19 sin auto_corrected (o false) → NO renderiza el badge', () => {
+    render(<ChatBubble message={base({ tool_used: null, grounded: false, auto_corrected: false })} />);
+    expect(screen.queryByTestId('auto-corrected-badge')).not.toBeInTheDocument();
+    render(<ChatBubble message={base({ tool_used: null, grounded: false })} />);
+    expect(screen.queryByTestId('auto-corrected-badge')).not.toBeInTheDocument();
+  });
+
+  // ── #20: confianza del dato (alta=verde / media=ámbar / baja=gris) ──
+  test('#20 confianza alta → badge verde (emerald)', () => {
+    render(<ChatBubble message={base({ tool_used: 'get_biopreparados', grounded: true, confianza: 'alta' })} />);
+    const badge = screen.getByTestId('confianza-badge');
+    expect(badge).toHaveAttribute('data-confianza', 'alta');
+    expect(badge).toHaveTextContent(/Confianza alta/i);
+    expect(badge.className).toMatch(/emerald/);
+  });
+
+  test('#20 confianza media → badge ámbar (amber)', () => {
+    render(<ChatBubble message={base({ tool_used: 'get_biopreparados', grounded: true, confianza: 'media' })} />);
+    const badge = screen.getByTestId('confianza-badge');
+    expect(badge).toHaveAttribute('data-confianza', 'media');
+    expect(badge.className).toMatch(/amber/);
+  });
+
+  test('#20 confianza baja → badge gris (slate)', () => {
+    render(<ChatBubble message={base({ tool_used: 'get_biopreparados', grounded: true, confianza: 'baja' })} />);
+    const badge = screen.getByTestId('confianza-badge');
+    expect(badge).toHaveAttribute('data-confianza', 'baja');
+    expect(badge.className).toMatch(/slate/);
+  });
+
+  test('#20 sin confianza → NO renderiza el badge', () => {
+    render(<ChatBubble message={base({ tool_used: 'get_species', grounded: true })} />);
+    expect(screen.queryByTestId('confianza-badge')).not.toBeInTheDocument();
+  });
+
+  // ── coexistencia: todos conviven con SourceBadge sin romperse ──
+  test('los nuevos badges conviven con SourceBadge en el mismo turno', () => {
+    render(
+      <ChatBubble
+        message={base({
+          tool_used: 'get_biopreparados',
+          grounded: true,
+          fuente: 'Agrosavia',
+          fuente_url: 'https://agrosavia.co/x',
+          confianza: 'alta',
+          auto_corrected: true,
+        })}
+      />,
+    );
+    expect(screen.getByTestId('source-badge')).toBeInTheDocument();
+    expect(screen.getByTestId('fuente-badge')).toBeInTheDocument();
+    expect(screen.getByTestId('confianza-badge')).toBeInTheDocument();
+    expect(screen.getByTestId('auto-corrected-badge')).toBeInTheDocument();
+  });
+
+  test('con showSourceBadges OFF no se renderiza ninguno de los nuevos badges', () => {
+    storeState = { showSourceBadges: false };
+    usePrefsStore.mockImplementation((selector) => selector(storeState));
+    render(
+      <ChatBubble
+        message={base({ fuente_url: 'https://agrosavia.co/x', confianza: 'alta', auto_corrected: true })}
+      />,
+    );
+    expect(screen.queryByTestId('fuente-badge')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('confianza-badge')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('auto-corrected-badge')).not.toBeInTheDocument();
+  });
+});

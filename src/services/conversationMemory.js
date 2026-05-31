@@ -359,6 +359,91 @@ export function mergePostValidateMetadata(base, pv) {
 }
 
 /**
+ * Normaliza el nivel de confianza curado del grounding a uno de
+ * {alta, media, baja}. Acepta strings con tildes/case ("Alta", "MEDIA"). Tolera
+ * sinónimos comunes del campo (verificada/confirmada → alta; baja/dudosa → baja).
+ * Devuelve null si no es reconocible (el caller omite el badge de confianza).
+ *
+ * @param {unknown} v
+ * @returns {'alta'|'media'|'baja'|null}
+ */
+function _normConfianza(v) {
+  if (v == null) return null;
+  const s = String(v)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .trim();
+  if (!s) return null;
+  if (s === 'alta' || s === 'verificada' || s === 'confirmada' || s === 'high') return 'alta';
+  if (s === 'media' || s === 'medio' || s === 'moderada' || s === 'mid' || s === 'medium') return 'media';
+  if (s === 'baja' || s === 'dudosa' || s === 'tentativa' || s === 'low') return 'baja';
+  return null;
+}
+
+/** Prioridad de niveles de confianza para elegir el "representativo" del turno. */
+const _CONFIANZA_RANK = { alta: 3, media: 2, baja: 1 };
+
+/**
+ * #18 + #20 — extrae de las entidades resueltas (grounding AGE del turno) las
+ * señales que la UX muestra como badges, SIN tocar la respuesta del modelo:
+ *
+ *   - `fuente_url` + `fuente` (label): cuando un biopreparado/dato curado trae
+ *     una fuente verificable (Agrosavia, FAO, etc.) tras el wire #146, se
+ *     surfacéa como badge/link clickeable "Fuente verificable: [label]".
+ *   - `confianza` ∈ {alta,media,baja}: el nivel curado del dato (dosis de
+ *     biopreparado), para que el campesino sepa cuán firme es (verde/ámbar/gris).
+ *
+ * Estrategia: recorre las entidades; prioriza las de kind 'biopreparado' (son
+ * las que traen dosis/fuente curada), pero acepta cualquier entidad con
+ * `fuente_url`. Toma la PRIMERA fuente_url válida (http/https) como
+ * representativa del turno y el nivel de confianza MÁS ALTO presente (si un
+ * biopreparado curado es 'alta', ese lidera el badge). 100% graceful: entrada
+ * no-array o sin campos → objeto vacío (el ChatBubble no renderiza badge).
+ *
+ * Puro y sin efectos. No muta las entidades.
+ *
+ * @param {Array<object>|null|undefined} resolvedEntities
+ * @returns {{fuente_url?: string, fuente?: string, confianza?: 'alta'|'media'|'baja'}}
+ */
+export function extractGroundingBadges(resolvedEntities) {
+  if (!Array.isArray(resolvedEntities) || resolvedEntities.length === 0) return {};
+
+  // Biopreparados primero (traen fuente/dosis curada), luego el resto.
+  const ordered = [...resolvedEntities].sort((a, b) => {
+    const ab = a && a.kind === 'biopreparado' ? 0 : 1;
+    const bb = b && b.kind === 'biopreparado' ? 0 : 1;
+    return ab - bb;
+  });
+
+  const out = {};
+  let bestConfianzaRank = 0;
+
+  for (const e of ordered) {
+    if (!e || typeof e !== 'object') continue;
+
+    // Fuente verificable (#18): primera URL http(s) válida del turno.
+    if (!out.fuente_url) {
+      const url = typeof e.fuente_url === 'string' ? e.fuente_url.trim() : '';
+      if (/^https?:\/\//i.test(url)) {
+        out.fuente_url = url;
+        const label = typeof e.fuente === 'string' ? e.fuente.trim() : '';
+        if (label) out.fuente = label;
+      }
+    }
+
+    // Confianza del dato (#20): nivel más alto presente en el turno.
+    const conf = _normConfianza(e.confianza);
+    if (conf && _CONFIANZA_RANK[conf] > bestConfianzaRank) {
+      bestConfianzaRank = _CONFIANZA_RANK[conf];
+      out.confianza = conf;
+    }
+  }
+
+  return out;
+}
+
+/**
  * A-15 (#248) — extrae los edges del grafo AGE que un turno del agente usó
  * como evidencia, en el shape que el motor E3 (`feedback-to-confidence.mjs`
  * del sidecar) necesita para mapear la señal 👍👎 a aristas reales:
@@ -467,6 +552,7 @@ export default {
   clearMemory,
   computeSourceMetadata,
   mergePostValidateMetadata,
+  extractGroundingBadges,
   extractEdges,
   getLastTurnTimestamp,
   shouldStartNewSession,

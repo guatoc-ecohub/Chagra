@@ -27,6 +27,7 @@ import {
   getContextString,
   computeSourceMetadata,
   mergePostValidateMetadata,
+  extractGroundingBadges,
   extractEdges,
   clearMemory,
   shouldStartNewSession,
@@ -1527,6 +1528,19 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       // match) o fue solo generativo del LLM. ChatBubble lee este metadata
       // para renderizar el badge verde/amber/gris (ver computeSourceMetadata).
       let sourceMetadata = computeSourceMetadata(toolEvidence);
+
+      // #18 + #20: surfacéa en metadata las señales del grounding curado que la
+      // UX muestra como badges — `fuente_url`/`fuente` (fuente verificable
+      // clickeable, Agrosavia/FAO) y `confianza` ∈ {alta,media,baja} de un
+      // biopreparado/dosis (color del badge). Puro y graceful: sin entidades o
+      // sin esos campos → no añade nada. #19: `auto_corrected` marca que los
+      // guards deterministas modificaron la respuesta (badge "auto-corregida").
+      const groundingBadges = extractGroundingBadges(resolvedEntities);
+      sourceMetadata = {
+        ...sourceMetadata,
+        ...groundingBadges,
+        auto_corrected: guarded.modified === true,
+      };
 
       // Capa 2 anti-alucinación — cross-check de contexto (operador 2026-05-30).
       // Tras generar la respuesta, le pedimos al sidecar que correlacione cada
