@@ -39,6 +39,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 // Lazy-loaded route components
 const TelemetryAlerts = lazy(() => import('./components/TelemetryAlerts'));
 const LoginScreen = lazy(() => import('./components/LoginScreen'));
+const OAuthCallback = lazy(() => import('./components/OAuthCallback'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -321,7 +322,7 @@ export default function App() {
   // Solo activos post-login (no en loading ni login para no atrapar shift+?
   // accidental al escribir password).
   const [currentView, setCurrentView] = useState('loading');
-  useGlobalKeyboardShortcuts({ enabled: currentView !== 'loading' && currentView !== 'login' });
+  useGlobalKeyboardShortcuts({ enabled: currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' });
   const [currentViewData, setCurrentViewData] = useState(null);
   const [toast, setToast] = useState(null);
   const [lastLogMessage, setLastLogMessage] = useState('');
@@ -396,6 +397,25 @@ export default function App() {
     const pathname = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
     const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
     const search = new URLSearchParams(window.location.search);
+
+    // Callback OAuth (Authorization Code + PKCE): farmOS redirige a
+    // /callback?code=...&state=... tras /oauth/authorize. Detectamos la ruta
+    // (pathname `callback`/`oauth/callback`, hash `callback`, o presencia de
+    // `code`+`state` en query) y montamos la vista OAuthCallback que hace el
+    // intercambio code→token. Va ANTES de los demás checks: si hay un code en
+    // vuelo no queremos que isAuthenticated() (todavía false) mande a login y
+    // se pierda el code. El redirect_uri DEBE estar registrado en el cliente
+    // OAuth de farmOS para que este flujo complete (paso backend del operador).
+    const isOAuthCallback =
+      pathname === 'callback' ||
+      pathname === 'oauth/callback' ||
+      hash === 'callback' ||
+      (search.get('code') && search.get('state'));
+    if (isOAuthCallback) {
+      Promise.resolve().then(() => navigate('oauth-callback'));
+      return;
+    }
+
     const isOnboardingPiloto =
       pathname === 'onboarding-piloto' ||
       hash === 'onboarding-piloto' ||
@@ -472,7 +492,7 @@ export default function App() {
   // a TODA la app excepto login + loading. Body className toggled según
   // currentView. Estilos en src/index.css clase .app-bg-biodiversidad.
   useEffect(() => {
-    const showBg = currentView !== 'loading' && currentView !== 'login';
+    const showBg = currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback';
     if (showBg) {
       document.body.classList.add('app-bg-biodiversidad');
     } else {
@@ -516,6 +536,18 @@ export default function App() {
         return <LoadingFallback />;
       case 'login':
         return <LoginScreen onLoginSuccess={() => navigate('dashboard')} onSave={showToast} />;
+      case 'oauth-callback':
+        // Puente del flujo Authorization Code + PKCE. Intercambia el code por
+        // token y navega al dashboard; si falla, vuelve al login con toast.
+        return (
+          <OAuthCallback
+            onSuccess={() => navigate('dashboard')}
+            onError={(msg) => {
+              showToast(msg || 'No se pudo iniciar sesión con PKCE.', true);
+              navigate('login');
+            }}
+          />
+        );
       case 'onboarding-piloto':
         return <OnboardingPiloto />;
       case 'onboarding-perfil':
@@ -663,10 +695,10 @@ export default function App() {
           detectamos huella `chagra:had-data-once` en localStorage + IDB
           vacío. NO se muestra en loading/login para no asustar antes de
           que la app pueda confirmar estado. */}
-      {currentView !== 'loading' && currentView !== 'login' && <DataLossBanner />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <DataLossBanner />}
       {/* #315 — banner crítico global: surfacea alertas graves (helada, sensor
           crítico) sin abrir la campana. Imposible de ignorar. */}
-      {currentView !== 'loading' && currentView !== 'login' && <CriticalAlertBanner onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <CriticalAlertBanner onNavigate={navigate} />}
       <Suspense fallback={<LoadingFallback />}>
         {renderView()}
       </Suspense>
@@ -676,11 +708,11 @@ export default function App() {
           tras Lili UX feedback: FAB tapaba contenido + no era discoverable.
           El form sigue siendo el mismo componente, instanciado con prop
           `embedded` desde HelpUsoScreen. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'voz' && currentView !== 'agente' && <MicFab onNavigate={navigate} />}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'voz' && currentView !== 'agente' && <AgentFab onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && <MicFab onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && <AgentFab onNavigate={navigate} />}
       {currentView === 'dashboard' && <QuickActionsPanel onNavigate={navigate} />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
-      {currentView !== 'loading' && currentView !== 'login' && <SyncProgressIndicator />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <SyncProgressIndicator />}
       {toast && (
         <div
           role={toast.isError ? 'alert' : 'status'}
