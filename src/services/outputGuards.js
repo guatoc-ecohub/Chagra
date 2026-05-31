@@ -694,7 +694,11 @@ export function guardInvertedViability(responseText, resolvedEntities = null, fi
 
   const norm = _stripDiacritics(responseText);
   const alt = Number(fincaAltitud);
-  const haveAlt = Number.isFinite(alt);
+  // `Number(null) === 0` (NO NaN): sin esta guarda, una finca sin altitud
+  // configurada se trataba como 0 msnm y la rama de fallback-por-rango marcaba
+  // cultivos de montaña como "inviable a 0 msnm" en FALSO (fuga viva #1240). La
+  // rama autoritativa (`_normViabilidad(e.viabilidad)`) NO depende de esto.
+  const haveAlt = fincaAltitud != null && fincaAltitud !== '' && Number.isFinite(alt);
 
   const correcciones = [];
   const disparadas = [];
