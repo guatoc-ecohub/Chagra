@@ -4,7 +4,7 @@ import { fetchClimaSnapshot, getCachedClimaSnapshot } from '../../services/clima
 import { findMunicipio } from '../../utils/colombiaLocations';
 import { FARM_CONFIG } from '../../config/defaults';
 import useFincaActiveStore from '../../services/fincaActiveStore';
-import { getProfileMunicipio } from '../../services/userProfileService';
+import { getProfile, getProfileMunicipio } from '../../services/userProfileService';
 
 /**
  * ClimaStrip — pronóstico real de 7 días debajo del agente.
