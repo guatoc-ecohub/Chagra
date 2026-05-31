@@ -17,6 +17,8 @@ import PendingTasksWidget from './components/PendingTasksWidget';
 import SyncProgressIndicator from './components/common/SyncProgressIndicator';
 import useOllamaWarmStore from './store/useOllamaWarmStore';
 import useThemeBackgroundStore, { getBackgroundSrc } from './store/useThemeBackgroundStore';
+import useAlertStore from './store/useAlertStore';
+import { alertEngine } from './services/alertEngine';
 // FieldFeedback ya no se monta globalmente en App; vive embebido en
 // HelpUsoScreen como sección de Ayuda (decisión 2026-05-21, ver
 // comentario abajo donde se removió el render).
@@ -420,6 +422,29 @@ export default function App() {
     initCatalog().catch((err) => {
       console.warn('[App] Catálogo no se pudo preload (los componentes lo reintentarán al usarlos):', err);
     });
+  }, []);
+
+  // alertas-reales (2026-05-30): arranca el motor de alertas con CLIMA REAL.
+  // Inicializa los listeners del store (escucha alertTriggered/alertCleared) y
+  // arranca el alertEngine, que consulta el pronóstico Open-Meteo de la finca
+  // (coords del perfil) y deriva alertas reales (helada/calor/lluvia/sequía/
+  // viento) hacia el botón de alertas. Si no hay coords, degrada limpio sin
+  // inventar nada. Los sensores IoT quedan en demo OFF (no hay hardware).
+  // Se arranca una sola vez (singleton + guard de isPolling interno).
+  useEffect(() => {
+    try {
+      useAlertStore.getState().initializeListeners();
+      alertEngine.start().catch((err) => {
+        console.warn('[App] alertEngine no pudo arrancar:', err?.message);
+      });
+    } catch (err) {
+      console.warn('[App] Error inicializando motor de alertas:', err?.message);
+    }
+    return () => {
+      // No detenemos en cleanup de StrictMode doble-mount; el singleton ya
+      // ignora start() duplicado. Solo paramos en unmount real de la app, que
+      // en una SPA no ocurre — dejamos el polling vivo intencionalmente.
+    };
   }, []);
 
   // NN4 fix 2026-05-23: pre-warm del modelo Ollama configurado se dispara al LOGIN

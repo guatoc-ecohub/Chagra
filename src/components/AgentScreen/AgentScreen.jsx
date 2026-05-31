@@ -28,6 +28,8 @@ import { streamChatViaSidecar, isAgentStreamingEnabled } from '../../services/st
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
 import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, getClimaIdeam } from '../../services/sidecarClient';
 import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, applyVoseoFilter, stripRoleLeak } from '../../services/agentService';
+import { getProfile } from '../../services/userProfileService';
+import { regionFromProfile } from '../../services/ensoContext';
 // Bug UX 2026-05-30: preservar respuesta parcial ante abort/timeout/cancel.
 // La lógica pura del merge del estado final vive en agentPartialMerge (testeable
 // sin montar el componente).
@@ -1010,7 +1012,12 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     // devuelve null y buildClimaContext degrada a ''. El refresh real lo hace
     // NotificationsBell + el systemd timer (chagra-clima-refresh.service).
     const climaSnapshot = getCachedClimaSnapshot();
-    const climaContext = climaSnapshot ? `\n\n${buildClimaContext(climaSnapshot)}` : '';
+    // Pasamos la región natural de la finca para que el bloque clima incluya la
+    // LECTURA REGIONAL ENSO (DR-MISSION-2/4), no solo la fase cruda.
+    const ensoRegion = (() => {
+      try { return regionFromProfile(getProfile()); } catch (_) { return null; }
+    })();
+    const climaContext = climaSnapshot ? `\n\n${buildClimaContext(climaSnapshot, { region: ensoRegion })}` : '';
 
     const messages = [
       { role: 'system', content: systemPrompt + corpusContext + evidenceContext + resolvedEntitiesBlock + climaContext + queryAnalysisBlock },

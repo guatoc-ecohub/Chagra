@@ -56,22 +56,41 @@ function readUpdateAvailable() {
     }
 }
 
-// #308 — el motor de alertas (useAlertStore) emite alertas de sensor IoT
-// (severity danger/warning) vía el evento `alertTriggered`. Las mapeamos a la
-// shape `iotAlerts` que ya entiende aggregateNotifications, para que el centro
-// de notificaciones unifique IoT + clima + tareas + sistema en un solo lugar.
-// 'danger' → 'critical' (el sistema de notificaciones usa critical/warning/info)
-// y se inyecta timestamp si falta para pasar el filtro de frescura (<24h).
+// #308 — el motor de alertas (useAlertStore) emite alertas vía `alertTriggered`.
+// Desde alertas-reales (2026-05-30) emite DOS clases:
+//   - CLIMA REAL (source:'forecast'): helada/calor/lluvia/sequía/viento
+//     derivadas del pronóstico Open-Meteo de la finca. Se etiquetan con la
+//     fuente Open-Meteo + autoridad IDEAM/ICA. NO son demo.
+//   - SENSOR DEMO (_demo:true, source:'sensor_demo'): simulado, sin hardware.
+//     Se etiquetan explícitamente "(simulado)" para no engañar.
+// Las mapeamos a la shape `iotAlerts` que ya entiende aggregateNotifications.
+// 'danger' → 'critical'; se inyecta timestamp si falta para pasar el filtro de
+// frescura (<24h).
 function mapSensorAlertsToIot(alerts) {
   if (!Array.isArray(alerts)) return [];
-  return alerts.map((a) => ({
-    id: a.type || a.id,
-    sensor: a.sensor || a.type || 'sensor',
-    title: a.title || a.label || 'Alerta de sensor',
-    message: a.message || a.body || a.detail || '',
-    severity: a.severity === 'danger' ? 'critical' : (a.severity || 'warning'),
-    timestamp: a.timestamp || a.created_at || Date.now(),
-  }));
+  return alerts.map((a) => {
+    const isForecast = a.source === 'forecast';
+    const isDemo = a._demo === true || a.source === 'sensor_demo';
+    let title = a.title || a.label || 'Alerta de sensor';
+    if (isDemo) title = `${title} (simulado)`;
+    let message = a.message || a.body || a.detail || '';
+    // Atribución de fuente en el cuerpo, para auditabilidad (regla Chagra).
+    if (isForecast) {
+      const src = a.source_label || 'Open-Meteo (pronóstico 7d)';
+      const enso = a.enso_context?.note ? ` · ${a.enso_context.note}` : '';
+      message = `${message}${message ? ' ' : ''}— Fuente: ${src} · ${a.authority || 'IDEAM/ICA'}${enso}`;
+    } else if (isDemo) {
+      message = `${message}${message ? ' ' : ''}(dato simulado — sensor IoT aún no instalado)`;
+    }
+    return {
+      id: a.type || a.id,
+      sensor: a.sensor || a.type || (isForecast ? 'clima' : 'sensor'),
+      title,
+      message,
+      severity: a.severity === 'danger' ? 'critical' : (a.severity || 'warning'),
+      timestamp: a.timestamp || a.created_at || Date.now(),
+    };
+  });
 }
 
 export default function NotificationsBell({ onNavigate }) {
