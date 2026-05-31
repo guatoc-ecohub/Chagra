@@ -19,6 +19,12 @@ import {
   buildJudgePrompt,
   parseJudgeVerdict,
   scoreWithJudge,
+  assertIndependentJudge,
+  RECOMMENDED_JUDGE_MODEL,
+  GENERATOR_MODEL,
+  buildAntiHallucPrompt,
+  parseAHVerdict,
+  scoreAntiHalluc,
 } from '../lib/bench-scorer.mjs';
 
 describe('scoreKeywordsFlexible', () => {
@@ -148,5 +154,98 @@ describe('scoreWithJudge (caller de ollama inyectado, sin GPU)', () => {
     );
     expect(out.source).toBe('keywords');
     expect(out.score).toBeCloseTo(0);
+  });
+});
+
+// ── R4: independencia del juez ────────────────────────────────────────────────
+
+describe('assertIndependentJudge (anti auto-evaluación)', () => {
+  it('lanza si el juez es el propio generador', () => {
+    expect(() => assertIndependentJudge(GENERATOR_MODEL, GENERATOR_MODEL)).toThrow(
+      /auto-evaluaci|NO independiente/i,
+    );
+  });
+
+  it('lanza ignorando mayúsculas/espacios', () => {
+    expect(() => assertIndependentJudge('  GRANITE3.1-DENSE:8B ', 'granite3.1-dense:8b')).toThrow();
+  });
+
+  it('no lanza si el juez es de otra familia', () => {
+    expect(() => assertIndependentJudge(RECOMMENDED_JUDGE_MODEL, GENERATOR_MODEL)).not.toThrow();
+    expect(RECOMMENDED_JUDGE_MODEL).not.toBe(GENERATOR_MODEL);
+  });
+
+  it('el juez recomendado por defecto NO es el generador', () => {
+    expect(RECOMMENDED_JUDGE_MODEL.toLowerCase()).not.toBe(GENERATOR_MODEL.toLowerCase());
+  });
+});
+
+// ── R4: juez anti-alucinación (must_include / red_flags) ──────────────────────
+
+describe('buildAntiHallucPrompt', () => {
+  it('incluye pregunta, must_include y red_flags', () => {
+    const p = buildAntiHallucPrompt({
+      query: '¿la chugua aguanta la helada a 3200?',
+      response: 'La chugua es Ullucus tuberosus...',
+      mustInclude: ['Ullucus tuberosus', 'tizón tardío'],
+      redFlags: ['Solanum tuberosum como identidad de chugua', 'cocona'],
+      shouldInclude: ['helada', 'drenaje'],
+    });
+    expect(p).toMatch(/Ullucus tuberosus/);
+    expect(p).toMatch(/Solanum tuberosum/);
+    expect(p).toMatch(/RED FLAG/i);
+    expect(p).toMatch(/"pass"/);
+  });
+});
+
+describe('parseAHVerdict', () => {
+  it('parsea JSON con pass + conteos', () => {
+    const v = parseAHVerdict('eval... {"pass": true, "must_covered": 4, "must_total": 4, "red_flags_hit": 0} fin');
+    expect(v.pass).toBe(true);
+    expect(v.mustCovered).toBe(4);
+    expect(v.mustTotal).toBe(4);
+    expect(v.redFlagsHit).toBe(0);
+  });
+
+  it('parsea FAIL en texto plano', () => {
+    expect(parseAHVerdict('hay alucinación. VEREDICTO: FAIL').pass).toBe(false);
+    expect(parseAHVerdict('todo bien. VEREDICTO: PASS').pass).toBe(true);
+  });
+
+  it('verdict ilegible → null (no inventa)', () => {
+    expect(parseAHVerdict('bla bla')).toBeNull();
+  });
+});
+
+describe('scoreAntiHalluc (caller inyectado, sin GPU)', () => {
+  it('usa el veredicto del juez cuando responde bien', async () => {
+    const fake = async () => '{"pass": true, "must_covered": 4, "must_total": 4, "red_flags_hit": 0}';
+    const out = await scoreAntiHalluc(
+      { query: 'q', response: 'r', mustInclude: ['a', 'b', 'c', 'd'], redFlags: ['x'] },
+      { ollamaCall: fake },
+    );
+    expect(out.pass).toBe(true);
+    expect(out.source).toBe('judge');
+    expect(out.redFlagsHit).toBe(0);
+  });
+
+  it('respuesta vacía → unjudged (no cuenta como PASS ni FAIL)', async () => {
+    const fake = async () => '{"pass": true}';
+    const out = await scoreAntiHalluc(
+      { query: 'q', response: '', mustInclude: ['a'], redFlags: [] },
+      { ollamaCall: fake },
+    );
+    expect(out.source).toBe('unjudged');
+    expect(out.pass).toBeNull();
+  });
+
+  it('juez falla/ilegible → unjudged (NO inventa un PASS silencioso)', async () => {
+    const fail = async () => { throw new Error('crash'); };
+    const out = await scoreAntiHalluc(
+      { query: 'q', response: 'algo', mustInclude: ['a'], redFlags: [] },
+      { ollamaCall: fail },
+    );
+    expect(out.source).toBe('unjudged');
+    expect(out.pass).toBeNull();
   });
 });

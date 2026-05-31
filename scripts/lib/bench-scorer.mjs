@@ -14,14 +14,58 @@
  *   2) LLM-judge opcional (flag --judge del bench): buildJudgePrompt +
  *      parseJudgeVerdict + scoreWithJudge. El caller de ollama se INYECTA, así
  *      el judge es testeable sin GPU y degrada a keyword-flexible si el modelo
- *      no está / falla / responde ilegible. Modelo recomendado: mistral-nemo:12b
- *      (índice de benchmarks: judge 100% NUEVO).
+ *      no está / falla / responde ilegible.
+ *
+ *   3) Anti-alucinación (R4): buildAntiHallucPrompt + parseAHVerdict +
+ *      scoreAntiHalluc, que evalúan contra `must_include` (debe estar) y
+ *      `red_flags` (NO debe estar) — la métrica AH que importa al dominio. Útil
+ *      para los prompts complejos rotativos (must_include / red_flags / binomial).
+ *
+ * INDEPENDENCIA DEL JUEZ (R4, 2026-05-31): el juez NO puede ser el modelo que
+ * generó la respuesta — eso es auto-evaluación y sesga el score (un modelo se
+ * perdona sus propias alucinaciones). El default histórico apuntaba al generador
+ * (granite3.1-dense:8b) / a mistral-nemo:12b (que CRASHEA en Maxwell sm_52 con
+ * 'signal during cgo'). `assertIndependentJudge` rechaza explícitamente usar el
+ * generador como juez. Juez independiente recomendado en Maxwell sin API
+ * Anthropic disponible: `qwen2.5:14b` (corre estable en sm_52, familia distinta
+ * a granite). Ideal cuando hay ANTHROPIC_API_KEY: un Haiku cloud, vía el pipeline
+ * Python `tools/llm-judge/` (Chagra-strategy) — NO hay key en este entorno.
  *
  * Módulo PURO y sin efectos secundarios (no auto-ejecuta nada) → importable por
  * el bench y por el test unitario.
  *
  * @module bench-scorer
  */
+
+/**
+ * Juez independiente recomendado para correr en Maxwell (sm_52) sin acceso a la
+ * API Anthropic. Familia distinta al generador (granite) → no es auto-eval.
+ * mistral-nemo:12b queda DESCARTADO como default por crash en Maxwell.
+ */
+export const RECOMMENDED_JUDGE_MODEL = 'qwen2.5:14b';
+
+/** El generador del bench cuyo uso como juez = auto-evaluación (prohibido). */
+export const GENERATOR_MODEL = 'granite3.1-dense:8b';
+
+/**
+ * assertIndependentJudge — lanza si el modelo juez es el mismo que generó la
+ * respuesta (auto-evaluación). Verify-before-claim: el score solo es creíble si
+ * el juez es independiente del generador.
+ *
+ * @param {string} judgeModel  modelo que evalúa.
+ * @param {string} generatorModel  modelo que generó la respuesta evaluada.
+ * @throws {Error} si juez === generador.
+ */
+export function assertIndependentJudge(judgeModel, generatorModel) {
+  const j = (judgeModel || '').trim().toLowerCase();
+  const g = (generatorModel || '').trim().toLowerCase();
+  if (j && g && j === g) {
+    throw new Error(
+      `Juez NO independiente: '${judgeModel}' es el generador → auto-evaluación. ` +
+        `Usá un juez de otra familia (recomendado: ${RECOMMENDED_JUDGE_MODEL}).`,
+    );
+  }
+}
 
 // ── normalización ───────────────────────────────────────────────────────────
 
@@ -216,7 +260,7 @@ export function parseJudgeVerdict(raw) {
 /**
  * scoreWithJudge — evalúa una respuesta con el LLM-judge, con fallback a
  * keyword-flexible. El caller de ollama se inyecta (`opts.ollamaCall`) para que
- * el bench pase el suyo real (mistral-nemo:12b) y el test pase un fake.
+ * el bench pase el suyo real (juez independiente) y el test pase un fake.
  *
  * @param {{query:string, response:string, expectedKeywords:string[]}} item
  * @param {{ ollamaCall: (prompt:string)=>Promise<string> }} opts
@@ -237,5 +281,138 @@ export async function scoreWithJudge(item, { ollamaCall } = {}) {
     return { cumple: verdict.cumple, score: verdict.score, source: 'judge' };
   } catch (_) {
     return fallback;
+  }
+}
+
+// ── R4: juez anti-alucinación (must_include / red_flags / binomial) ───────────
+
+/**
+ * buildAntiHallucPrompt — prompt para el juez ANTI-ALUCINACIÓN. A diferencia del
+ * judge de cobertura (scoreWithJudge), aquí el eje es la métrica que importa al
+ * dominio: que estén presentes los hechos que DEBEN estar (`mustInclude`) y que
+ * NO aparezca ninguna de las alucinaciones / errores prohibidos (`redFlags`,
+ * p. ej. binomio equivocado, agroquímico inventado con dosis, especie confundida).
+ *
+ * El veredicto es PASS solo si: todos los must_include cubiertos (por fondo, no
+ * literal) Y cero red_flags presentes. El juez devuelve además el detalle para
+ * diagnóstico.
+ *
+ * @param {{query:string, response:string, mustInclude?:string[], redFlags?:string[], shouldInclude?:string[]}} args
+ * @returns {string}
+ */
+export function buildAntiHallucPrompt({
+  query,
+  response,
+  mustInclude = [],
+  redFlags = [],
+  shouldInclude = [],
+}) {
+  const must = (mustInclude || []).map((m) => `- ${m}`).join('\n') || '- (ninguno)';
+  const red = (redFlags || []).map((r) => `- ${r}`).join('\n') || '- (ninguno)';
+  const should = (shouldInclude || []).map((s) => `- ${s}`).join('\n') || '- (ninguno)';
+  return [
+    'Eres un evaluador EXPERTO en agroecología colombiana y un detector estricto',
+    'de alucinaciones. Evalúa la RESPUESTA contra dos listas. Importa el FONDO',
+    '(conceptos correctos), NO la literalidad: un concepto cuenta como presente si',
+    'la respuesta lo dice con sinónimos o lemas distintos.',
+    '',
+    `PREGUNTA: ${query}`,
+    '',
+    'DEBE INCLUIR (hechos que tienen que estar presentes, por fondo):',
+    must,
+    '',
+    'NO DEBE INCLUIR — RED FLAGS (alucinaciones/errores prohibidos; si aparece',
+    'CUALQUIERA, es FAIL): especie/binomio equivocado, agroquímico de marca con',
+    'dosis inventada, confundir una planta con otra, recomendar algo fuera de su',
+    'clima/altitud, validar una premisa falsa del usuario:',
+    red,
+    '',
+    'DESEABLE (suma pero no obliga):',
+    should,
+    '',
+    'Reglas de veredicto:',
+    '- "pass": true SOLO si TODOS los DEBE INCLUIR están cubiertos por fondo Y',
+    '  NINGÚN red flag aparece.',
+    '- Si falta un DEBE INCLUIR, o si aparece un red flag, "pass": false.',
+    '',
+    'Devuelve SOLO un JSON en una línea con esta forma exacta:',
+    '{"pass": true|false, "must_covered": <int>, "must_total": <int>, "red_flags_hit": <int>}',
+    'Si no puedes producir JSON, escribe VEREDICTO: PASS o VEREDICTO: FAIL.',
+  ].join('\n');
+}
+
+/**
+ * parseAHVerdict — interpreta la salida del juez anti-alucinación. Acepta JSON
+ * {"pass":bool, "must_covered":int, "must_total":int, "red_flags_hit":int} o
+ * texto "VEREDICTO: PASS|FAIL". Devuelve null si es ilegible (el caller hace
+ * fallback). NO inventa veredictos.
+ *
+ * @param {string} raw
+ * @returns {{pass:boolean, mustCovered:number, mustTotal:number, redFlagsHit:number}|null}
+ */
+export function parseAHVerdict(raw) {
+  if (typeof raw !== 'string' || raw.length === 0) return null;
+
+  const jsonMatch = raw.match(/\{[^{}]*"pass"[^{}]*\}/i);
+  if (jsonMatch) {
+    try {
+      const obj = JSON.parse(jsonMatch[0]);
+      if (typeof obj.pass === 'boolean') {
+        const num = (v) => (Number.isFinite(Number(v)) ? Number(v) : null);
+        return {
+          pass: obj.pass,
+          mustCovered: num(obj.must_covered),
+          mustTotal: num(obj.must_total),
+          redFlagsHit: num(obj.red_flags_hit),
+        };
+      }
+    } catch (_) {
+      /* sigue a texto plano */
+    }
+  }
+
+  const up = raw.toUpperCase();
+  if (/VEREDICTO\s*:?\s*FAIL/.test(up)) {
+    return { pass: false, mustCovered: null, mustTotal: null, redFlagsHit: null };
+  }
+  if (/VEREDICTO\s*:?\s*PASS/.test(up)) {
+    return { pass: true, mustCovered: null, mustTotal: null, redFlagsHit: null };
+  }
+  return null;
+}
+
+/**
+ * scoreAntiHalluc — evalúa anti-alucinación con el LLM-judge independiente. NO
+ * tiene fallback de keyword porque el eje es la AUSENCIA de red_flags (un
+ * keyword-match no detecta una alucinación). Si el juez no responde / falla,
+ * devuelve `source:'unjudged'` para que el caller lo cuente aparte (no como PASS
+ * ni como FAIL silencioso).
+ *
+ * El caller de ollama se inyecta (`opts.ollamaCall`); el test pasa un fake.
+ *
+ * @param {{query:string, response:string, mustInclude?:string[], redFlags?:string[], shouldInclude?:string[]}} item
+ * @param {{ ollamaCall: (prompt:string)=>Promise<string> }} opts
+ * @returns {Promise<{pass:boolean|null, mustCovered:number|null, mustTotal:number|null, redFlagsHit:number|null, source:'judge'|'unjudged'}>}
+ */
+export async function scoreAntiHalluc(item, { ollamaCall } = {}) {
+  const unjudged = {
+    pass: null,
+    mustCovered: null,
+    mustTotal: Array.isArray(item.mustInclude) ? item.mustInclude.length : null,
+    redFlagsHit: null,
+    source: 'unjudged',
+  };
+  if (typeof ollamaCall !== 'function') return unjudged;
+  if (typeof item.response !== 'string' || item.response.trim().length === 0) {
+    return unjudged;
+  }
+  try {
+    const prompt = buildAntiHallucPrompt(item);
+    const raw = await ollamaCall(prompt);
+    const verdict = parseAHVerdict(raw);
+    if (!verdict) return unjudged;
+    return { ...verdict, source: 'judge' };
+  } catch (_) {
+    return unjudged;
   }
 }
