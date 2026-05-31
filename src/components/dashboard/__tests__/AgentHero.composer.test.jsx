@@ -58,7 +58,7 @@ vi.mock('../../ChagraAgentAvatar', () => ({
   default: ({ state }) => <div data-testid="avatar" data-state={state} />,
 }));
 
-import AgentHero from '../AgentHero';
+import AgentHero, { SEND_TRANSITION_MS } from '../AgentHero';
 
 beforeEach(() => {
   sendMock.mockClear();
@@ -181,6 +181,83 @@ describe('AgentHero — compositor real (no teaser)', () => {
     expect(onNavigate).not.toHaveBeenCalled();
     // El texto sigue en el compositor (no se borró).
     expect(ta.value).toBe('no me pierdas');
+  });
+});
+
+describe('AgentHero — transición de envío premium (bug 2026-05-31)', () => {
+  test('SEND_TRANSITION_MS está en el rango premium pedido (450–600ms)', () => {
+    expect(SEND_TRANSITION_MS).toBeGreaterThanOrEqual(450);
+    expect(SEND_TRANSITION_MS).toBeLessThanOrEqual(600);
+  });
+
+  test('sin reduced-motion: la navegación se difiere SEND_TRANSITION_MS (no instantánea/brusca)', async () => {
+    vi.useFakeTimers();
+    try {
+      // reduced-motion OFF → debe esperar el retardo de la animación.
+      window.matchMedia = vi.fn().mockImplementation((q) => ({
+        matches: false,
+        media: q,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      }));
+      const onNavigate = vi.fn();
+      render(<AgentHero onNavigate={onNavigate} />);
+      const ta = screen.getByLabelText('Escribe tu pregunta al agente');
+      fireEvent.change(ta, { target: { value: '¿qué siembro?' } });
+
+      // El send es async (persiste en outbox) → dejamos resolver el microtask
+      // de sendMock antes de avanzar el timer de navegación.
+      await act(async () => {
+        fireEvent.keyDown(ta, { key: 'Enter', shiftKey: false });
+      });
+
+      // Justo ANTES del umbral: aún NO navegó (transición en curso, se siente).
+      await act(async () => { vi.advanceTimersByTime(SEND_TRANSITION_MS - 1); });
+      expect(onNavigate).not.toHaveBeenCalled();
+
+      // Al cumplirse el retardo: navega.
+      await act(async () => { vi.advanceTimersByTime(1); });
+      expect(onNavigate).toHaveBeenCalledWith('agente');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  test('con reduced-motion: navega de inmediato (sin retardo de animación)', async () => {
+    // matchMedia ya devuelve matches=true para 'reduce' (beforeEach).
+    const onNavigate = vi.fn();
+    render(<AgentHero onNavigate={onNavigate} />);
+    const ta = screen.getByLabelText('Escribe tu pregunta al agente');
+    fireEvent.change(ta, { target: { value: 'directo' } });
+    await act(async () => {
+      fireEvent.keyDown(ta, { key: 'Enter', shiftKey: false });
+    });
+    await waitFor(() => expect(onNavigate).toHaveBeenCalledWith('agente'));
+  });
+
+  test('al enviar, el compositor entra en fase sending (clases shimmer + lift)', async () => {
+    // reduced-motion OFF para que se aplique la clase de animación.
+    window.matchMedia = vi.fn().mockImplementation((q) => ({
+      matches: false,
+      media: q,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }));
+    const { container } = render(<AgentHero onNavigate={vi.fn()} />);
+    const ta = screen.getByLabelText('Escribe tu pregunta al agente');
+    fireEvent.change(ta, { target: { value: 'mira esto' } });
+    await act(async () => {
+      fireEvent.keyDown(ta, { key: 'Enter', shiftKey: false });
+    });
+    await waitFor(() => {
+      expect(container.querySelector('.chagra-composer-shimmer.chagra-composer-sending')).toBeTruthy();
+    });
   });
 });
 

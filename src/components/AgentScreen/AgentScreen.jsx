@@ -17,6 +17,9 @@ import {
 // el diagnóstico foliar multimodal con cache por hash; la foto del home se
 // despacha por aquí al aterrizar.
 import { analyzeFoliage } from '../../services/aiService';
+// Lógica PURA del flujo foto→agente (prompt de visión + texto de burbuja).
+// Extraída para poder testearla sin montar el componente (bug foto 2026-05-31).
+import { processPhotoItem, buildPhotoUserMessage } from '../../services/agentOutboxPhoto';
 import {
   addTurn,
   getFullHistory,
@@ -1233,14 +1236,21 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
   // completo (RAG, sidecar, LLM, TTS, action gate) para UN solo texto.
   // No toca el queue store — eso lo hace handleSubmit antes/después.
   // Tampoco hace re-entry guard porque el queue ya garantiza serialización.
-  const runAgentPipeline = async (text) => {
-    const userMessage = {
-      role: 'user',
-      content: text.trim(),
-      timestamp: Date.now(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
+  const runAgentPipeline = async (text, { suppressUserBubble = false } = {}) => {
+    // Bug 2026-05-31: cuando el item viene de la outbox multimodal (foto /
+    // adjunto), el caller YA pintó la burbuja de usuario REAL (con su imagen).
+    // Si además pintáramos aquí una burbuja con el prompt sintético ("Analicé
+    // una foto…") el usuario vería DOS burbujas y la imagen quedaría huérfana.
+    // suppressUserBubble evita ese duplicado: el LLM recibe `text`, pero la UI
+    // ya tiene la burbuja correcta del caller.
+    if (!suppressUserBubble) {
+      const userMessage = {
+        role: 'user',
+        content: text.trim(),
+        timestamp: Date.now(),
+      };
+      setMessages((prev) => [...prev, userMessage]);
+    }
     setStreamingContent('');
     setState(STATE_THINKING);
     setError('');
@@ -1670,7 +1680,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     await handleSubmit(prompt);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleSubmit = async (text, { fromVoice = false } = {}) => {
+  const handleSubmit = async (text, { fromVoice = false, suppressUserBubble = false } = {}) => {
     if (!text || !text.trim()) return;
     const trimmed = text.trim();
 
@@ -1679,6 +1689,11 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     // feedback. El parámetro `fromVoice` queda como hint semántico para
     // futuras políticas (e.g. voice → priority? hoy no se usa).
     void fromVoice;
+    // suppressUserBubble (bug foto 2026-05-31): el caller de la outbox ya pintó
+    // la burbuja de usuario REAL (con imagen / caption). Solo aplica a ESTE
+    // primer texto — los items pending que se promuevan después SÍ pintan su
+    // propia burbuja (son preguntas distintas del usuario).
+    let suppressFirstBubble = suppressUserBubble;
 
     const route = selectChatRoute(trimmed);
     const result = useAgentQueueStore.getState().enqueue(trimmed, route);
@@ -1696,15 +1711,19 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       // burbuja "pending" para que sienta que el sistema la escuchó. El
       // procesamiento real arrancará cuando termine la actual via
       // promoción en el finally del pipeline.
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'user',
-          content: trimmed,
-          timestamp: Date.now(),
-          _queued: true,
-        },
-      ]);
+      // suppressUserBubble: si el caller (outbox foto/adjunto) ya pintó la
+      // burbuja con su imagen, no la duplicamos aquí.
+      if (!suppressFirstBubble) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'user',
+            content: trimmed,
+            timestamp: Date.now(),
+            _queued: true,
+          },
+        ]);
+      }
       return;
     }
 
@@ -1716,7 +1735,10 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       safety += 1;
       let pipelineFailed = false;
       try {
-        await runAgentPipeline(currentText);
+        await runAgentPipeline(currentText, { suppressUserBubble: suppressFirstBubble });
+        // Solo el primer texto del caller usa la supresión; los promovidos
+        // (pending) son preguntas nuevas y deben pintar su propia burbuja.
+        suppressFirstBubble = false;
       } catch (pipelineErr) {
         // runAgentPipeline ya captura todo internamente; este catch es
         // defensivo (e.g. error fuera del try interno). Marcamos failed
@@ -1811,6 +1833,19 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
   //    la app se cerró a mitad → vuelven a 'queued' y se reintentan (el LLM no
   //    confirmó respuesta, reintentar es correcto). Cero pérdida.
   const outboxDrainingRef = useRef(false);
+  // Object URLs de las fotos del compositor que pintamos en las burbujas
+  // (bug 2026-05-31). Los acumulamos para revocarlos al desmontar y no fugar
+  // memoria. No los revocamos en cada render: la burbuja vive mientras el chat
+  // esté montado.
+  const photoObjectUrlsRef = useRef([]);
+  useEffect(() => {
+    const urls = photoObjectUrlsRef.current;
+    return () => {
+      for (const url of urls) {
+        try { URL.revokeObjectURL(url); } catch { /* noop */ }
+      }
+    };
+  }, []);
 
   /**
    * Procesa UN item ya reclamado (status='processing') según su modalidad y
@@ -1853,38 +1888,34 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       }
 
       if (item.kind === 'photo') {
-        // Burbuja de foto "ya enviada" con el caption del usuario.
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: 'user',
-            content: caption || '📷 Foto enviada para análisis',
-            timestamp: Date.now(),
-            _outboxPhoto: true,
-          },
-        ]);
-        let finding = null;
-        try {
-          finding = item.blob ? await analyzeFoliage(item.blob) : null;
-        } catch (visErr) {
-          console.debug('[Agent] analyzeFoliage falló, sigo con texto:', visErr?.message);
-        }
-        // Construir el prompt que despacha el pipeline normal. Si hubo
-        // diagnóstico de visión, lo inyectamos como contexto para que el LLM
-        // responda conversacionalmente y aterrizado.
-        let prompt;
-        if (finding && (Array.isArray(finding.issues) || finding.treatment_suggestion)) {
-          const issues = Array.isArray(finding.issues) && finding.issues.length > 0
-            ? finding.issues.join(', ')
-            : 'sin problemas evidentes';
-          const treat = finding.treatment_suggestion ? ` Sugerencia preliminar: ${finding.treatment_suggestion}.` : '';
-          prompt = `Analicé una foto de mi planta. Hallazgos del diagnóstico visual: ${issues} (estado ${finding.score ?? 'n/d'}/100).${treat} ${caption || '¿Qué me recomiendas hacer?'}`.trim();
-        } else {
-          prompt = caption
-            ? `Te envié una foto de mi planta. ${caption}`
-            : 'Te envié una foto de mi planta para que me ayudes a identificar qué tiene. No pude obtener un diagnóstico visual automático; guíame por descripción.';
-        }
-        await handleSubmit(prompt);
+        // Bug 2026-05-31: la foto NO llegaba al chat (solo el texto). Causa
+        // raíz doble: (1) la burbuja se pintaba SIN la imagen — el blob se
+        // pasaba a analyzeFoliage y se descartaba, y ChatBubble no sabía pintar
+        // imágenes; (2) handleSubmit→runAgentPipeline pintaba OTRA burbuja con
+        // el prompt sintético → duplicado y la imagen huérfana.
+        //
+        // Fix: processPhotoItem (pure, testeado) corre la visión + arma la
+        // burbuja con `imageUrl`. La pintamos ANTES de mandar el prompt y
+        // pasamos suppressUserBubble:true para no duplicarla.
+        const createUrl = (blob) => {
+          if (typeof URL === 'undefined' || !URL.createObjectURL) return null;
+          const url = URL.createObjectURL(blob);
+          photoObjectUrlsRef.current.push(url);
+          return url;
+        };
+        // 1) Pintar la burbuja con la imagen DE INMEDIATO (antes de la visión)
+        //    para que el usuario vea su foto sin esperar el diagnóstico.
+        const { message } = buildPhotoUserMessage(item, createUrl);
+        setMessages((prev) => [...prev, message]);
+        // 2) Correr la visión y armar el prompt (degrada a "por descripción"
+        //    si analyzeFoliage falla). Reusa processPhotoItem para la parte
+        //    pura del prompt (sin re-pintar burbuja: createUrl ya consumido).
+        const { prompt } = await processPhotoItem(item, {
+          analyze: analyzeFoliage,
+          createUrl: null,
+        });
+        // 3) Despachar al pipeline con la burbuja ya pintada (no duplicar).
+        await handleSubmit(prompt, { suppressUserBubble: true });
         await outboxMarkAnswered(item.id);
         return true;
       }
@@ -1903,7 +1934,9 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       const attachPrompt = caption
         ? caption
         : `Adjunté un archivo (${item.fileName || 'archivo'}). Por ahora no puedo leer archivos directamente; cuéntame qué necesitas y te ayudo.`;
-      await handleSubmit(attachPrompt);
+      // Burbuja del adjunto ya pintada arriba → suppressUserBubble:true para no
+      // duplicarla (mismo bug que la foto, 2026-05-31).
+      await handleSubmit(attachPrompt, { suppressUserBubble: true });
       await outboxMarkAnswered(item.id);
       return true;
     } catch (e) {

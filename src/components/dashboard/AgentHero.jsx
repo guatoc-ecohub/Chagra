@@ -58,6 +58,13 @@ function prefersReducedMotion() {
         : false;
 }
 
+// Duración de la transición premium de envío (shimmer + lift del compositor +
+// avatar 'thinking') antes de montar el AgentScreen. 2026-05-31 el operador
+// reportó que 280ms se sentía brusco/apurado — lo subimos a 520ms con easing
+// suave para que se perciba especial, no atropellado. Bajo reduced-motion el
+// retardo es 0 (navega de inmediato, sin animación). Exportado para tests.
+export const SEND_TRANSITION_MS = 520;
+
 export default function AgentHero({ onNavigate }) {
     const [tipIndex, setTipIndex] = useState(0);
     const [text, setText] = useState('');
@@ -119,9 +126,11 @@ export default function AgentHero({ onNavigate }) {
         if (reduce) {
             go();
         } else {
-            // Retardo corto para que el shimmer del compositor + el avatar
-            // thinking se perciban antes del cambio de pantalla. Suave, digno.
-            window.setTimeout(go, 280);
+            // Retardo para que el shimmer del compositor + el lift + el avatar
+            // thinking se perciban completos antes del cambio de pantalla. A
+            // 520ms con easing suave la transición se siente premium y elegante,
+            // no apurada (operador 2026-05-31).
+            window.setTimeout(go, SEND_TRANSITION_MS);
         }
     };
 
@@ -255,13 +264,15 @@ export default function AgentHero({ onNavigate }) {
                     50% { transform: scale(1.025); }
                 }
                 @keyframes chagra-send-shimmer {
-                    0% { transform: translateX(-120%); opacity: 0; }
-                    40% { opacity: 0.9; }
-                    100% { transform: translateX(120%); opacity: 0; }
+                    0% { transform: translateX(-130%); opacity: 0; }
+                    25% { opacity: 1; }
+                    70% { opacity: 1; }
+                    100% { transform: translateX(130%); opacity: 0; }
                 }
                 @keyframes chagra-send-lift {
-                    0% { transform: translateY(0) scale(1); }
-                    100% { transform: translateY(-10px) scale(0.985); opacity: 0.85; }
+                    0% { transform: translateY(0) scale(1); opacity: 1; }
+                    35% { transform: translateY(-4px) scale(1.012); opacity: 1; }
+                    100% { transform: translateY(-16px) scale(0.978); opacity: 0.82; }
                 }
                 .chagra-hero-halo {
                     position: absolute;
@@ -294,18 +305,25 @@ export default function AgentHero({ onNavigate }) {
                     position: absolute;
                     inset: 0;
                     border-radius: inherit;
+                    /* Brillo más ancho y visible que recorre el compositor de
+                       lado a lado — la sensación de "lanzar" la consulta. */
                     background: linear-gradient(
                         100deg,
-                        transparent 20%,
-                        rgba(163, 230, 53, 0.35) 50%,
-                        transparent 80%
+                        transparent 12%,
+                        rgba(163, 230, 53, 0.55) 50%,
+                        transparent 88%
                     );
-                    animation: chagra-send-shimmer 0.6s ease-out forwards;
+                    /* Más lento (520ms) + easing suave (no ease-out brusco) para
+                       que el barrido se perciba elegante, no un flash. */
+                    animation: chagra-send-shimmer 0.52s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
                     pointer-events: none;
                     overflow: hidden;
                 }
                 .chagra-composer-sending {
-                    animation: chagra-send-lift 0.28s ease-in forwards;
+                    /* Lift suave y un pelín más largo, sincronizado con el
+                       retardo de navegación (SEND_TRANSITION_MS). Easing
+                       cubic-bezier "salida suave" para que se sienta digno. */
+                    animation: chagra-send-lift 0.52s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
                 }
                 @media (prefers-reduced-motion: reduce) {
                     .chagra-hero-halo,

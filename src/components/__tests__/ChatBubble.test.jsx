@@ -230,4 +230,47 @@ describe('ChatBubble — badge de fuente (verificado vs generativo)', () => {
     const badge = screen.getByTestId('source-badge');
     expect(badge).toHaveTextContent(/get_brand_new_tool/);
   });
+
+  // Bug 2026-05-31: la foto del compositor del home no llegaba al chat — solo
+  // el texto. Ahora la burbuja de usuario con `imageUrl` la renderiza.
+  describe('foto en la burbuja (compositor multimodal)', () => {
+    test('Renderiza la imagen cuando el mensaje de usuario trae imageUrl', () => {
+      const message = {
+        role: 'user',
+        content: '📷 Foto enviada para análisis',
+        timestamp: Date.now(),
+        imageUrl: 'blob:http://localhost/abc-123',
+      };
+      render(<ChatBubble message={message} />);
+      const img = screen.getByTestId('chat-bubble-image');
+      expect(img).toBeInTheDocument();
+      expect(img).toHaveAttribute('src', 'blob:http://localhost/abc-123');
+      // alt accesible por defecto.
+      expect(img).toHaveAttribute('alt', expect.stringMatching(/foto/i));
+      // El caption sigue visible bajo la imagen.
+      expect(screen.getByText(/Foto enviada para análisis/i)).toBeInTheDocument();
+    });
+
+    test('Sin imageUrl no renderiza ninguna imagen', () => {
+      const message = {
+        role: 'user',
+        content: '¿Qué le pasa a mi planta?',
+        timestamp: Date.now(),
+      };
+      render(<ChatBubble message={message} />);
+      expect(screen.queryByTestId('chat-bubble-image')).not.toBeInTheDocument();
+    });
+
+    test('imageAlt personalizado se respeta', () => {
+      const message = {
+        role: 'user',
+        content: '',
+        timestamp: Date.now(),
+        imageUrl: 'blob:http://localhost/xyz',
+        imageAlt: 'Hoja de tomate con manchas',
+      };
+      render(<ChatBubble message={message} />);
+      expect(screen.getByTestId('chat-bubble-image')).toHaveAttribute('alt', 'Hoja de tomate con manchas');
+    });
+  });
 });
