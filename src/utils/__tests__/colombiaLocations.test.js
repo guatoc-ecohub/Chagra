@@ -13,6 +13,7 @@ import {
   getDepartamentos,
   getMunicipios,
   findMunicipio,
+  findNearestMunicipio,
 } from '../colombiaLocations';
 
 describe('colombiaLocations — dataset DANE DIVIPOLA (#338)', () => {
@@ -56,5 +57,63 @@ describe('colombiaLocations — dataset DANE DIVIPOLA (#338)', () => {
 
   it('COLOMBIA_LOCATIONS esta congelado (no mutable accidentalmente)', () => {
     expect(Object.isFrozen(COLOMBIA_LOCATIONS)).toBe(true);
+  });
+});
+
+describe('findMunicipio — match offline robusto (#338 + offline-first)', () => {
+  it('prioriza match exacto sobre prefijo que aparece antes en el dataset', () => {
+    // "Olaya" (Antioquia) es exacto; "Olaya Herrera" (Nariño) tambien empieza
+    // por "olaya". Antioquia se itera antes, pero el exacto debe ganar igual.
+    const hit = findMunicipio('Olaya');
+    expect(hit).not.toBeNull();
+    expect(hit.name).toBe('Olaya');
+    expect(hit.departamento).toBe('Antioquia');
+  });
+
+  it('desempata homonimos con la pista de departamento tras la coma', () => {
+    const hit = findMunicipio('Popayán, Cauca');
+    expect(hit).not.toBeNull();
+    expect(hit.departamento).toBe('Cauca');
+  });
+
+  it('es tolerante a mayusculas y ausencia de tildes', () => {
+    const hit = findMunicipio('POPAYAN');
+    expect(hit).not.toBeNull();
+    expect(hit.departamento).toBe('Cauca');
+  });
+
+  it('devuelve null para query vacio o sin match', () => {
+    expect(findMunicipio('')).toBeNull();
+    expect(findMunicipio('Zzqxnoexiste')).toBeNull();
+  });
+});
+
+describe('findNearestMunicipio — reverse-geocode OFFLINE por centroide (#338)', () => {
+  it('resuelve el municipio mas cercano a unas coordenadas conocidas', () => {
+    // Centro de Popayan aprox.
+    const hit = findNearestMunicipio(2.444, -76.614);
+    expect(hit).not.toBeNull();
+    expect(hit.departamento).toBe('Cauca');
+    expect(hit.name).toMatch(/Popay/);
+    expect(hit.distanciaKm).toBeLessThan(15);
+  });
+
+  it('resuelve Bogota a partir de su lat/lng', () => {
+    const hit = findNearestMunicipio(4.711, -74.072);
+    expect(hit).not.toBeNull();
+    // Bogota D.C. es su propio departamento en DIVIPOLA.
+    expect(hit.name).toMatch(/Bogot/);
+  });
+
+  it('expone distanciaKm numerica no negativa', () => {
+    const hit = findNearestMunicipio(4.711, -74.072);
+    expect(typeof hit.distanciaKm).toBe('number');
+    expect(hit.distanciaKm).toBeGreaterThanOrEqual(0);
+  });
+
+  it('devuelve null para coordenadas no numericas', () => {
+    expect(findNearestMunicipio('a', 1)).toBeNull();
+    expect(findNearestMunicipio(NaN, NaN)).toBeNull();
+    expect(findNearestMunicipio(undefined, undefined)).toBeNull();
   });
 });

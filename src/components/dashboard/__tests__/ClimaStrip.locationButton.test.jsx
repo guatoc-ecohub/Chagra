@@ -54,8 +54,11 @@ vi.mock('../../../config/defaults', () => ({
 // branch "Configurar ubicación". El test del bug fix 2026-05-30 lo sobreescribe.
 vi.mock('../../../services/userProfileService', () => ({
     getProfile: vi.fn(() => ({})),
+    // ClimaStrip deriva el municipio via getProfileMunicipio (#338): prefiere
+    // profile.municipio, con fallback offline a resolver profile.region.
+    getProfileMunicipio: vi.fn(() => null),
 }));
-import { getProfile } from '../../../services/userProfileService';
+import { getProfileMunicipio } from '../../../services/userProfileService';
 
 describe('ClimaStrip — botón "Configurar ubicación" (bug fix Brave 2026-05-28)', () => {
     test('renderiza CTA "Configurar ubicación" cuando no hay municipio', async () => {
@@ -101,11 +104,12 @@ describe('ClimaStrip — botón "Configurar ubicación" (bug fix Brave 2026-05-2
  * SEGUÍA apareciendo "como si no lo hubiera hecho". Causa: handleConfirm
  * guardaba el municipio en el perfil (userProfileService) pero ClimaStrip
  * derivaba su municipio SOLO de fincaActiveStore/FARM_CONFIG → nunca veía la
- * confirmación. Fix: ClimaStrip lee también getProfile().municipio.
+ * confirmación. Fix: ClimaStrip lee también getProfileMunicipio() (#338).
  */
 describe('ClimaStrip — municipio desde perfil (bug fix store mismatch 2026-05-30)', () => {
     test('NO muestra "Configurar ubicación" si el perfil tiene municipio', async () => {
         getProfile.mockReturnValue({ municipio: 'Choachí' });
+        getProfileMunicipio.mockReturnValueOnce('Choachí');
         render(<ClimaStrip onNavigate={vi.fn()} />);
         // Esperar a que el efecto de carga resuelva (fetchClimaSnapshot mock → null).
         await waitFor(() =>
@@ -116,17 +120,17 @@ describe('ClimaStrip — municipio desde perfil (bug fix store mismatch 2026-05-
 
     test('refresca al recibir el evento "chagra:location-updated"', async () => {
         // Arranca sin municipio → muestra el CTA.
-        getProfile.mockReturnValue({});
+        getProfileMunicipio.mockReturnValue(null);
         render(<ClimaStrip onNavigate={vi.fn()} />);
         expect(await screen.findByText('Configurar ubicación')).toBeInTheDocument();
         // El usuario confirma ubicación: el perfil ahora tiene municipio y se
         // dispara el evento. El card debe dejar de mostrar el CTA.
-        getProfile.mockReturnValue({ municipio: 'Une' });
+        getProfileMunicipio.mockReturnValue('Une');
         fireEvent(window, new CustomEvent('chagra:location-updated', { detail: { municipio: 'Une' } }));
         await waitFor(() =>
             expect(screen.queryByText('Configurar ubicación')).not.toBeInTheDocument(),
         );
-        getProfile.mockReturnValue({});
+        getProfileMunicipio.mockReturnValue(null);
     });
 });
 

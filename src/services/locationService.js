@@ -3,14 +3,17 @@
  *
  * Toma una coordenada (GPS o municipio escrito) y devuelve un objeto
  * enriquecido para la pantalla "ubicación detectada":
- *   - municipio, departamento (reverse-geocoding OSM Nominatim, online)
- *   - altitud msnm (delegado a altitudeService → Open-Elevation, online)
+ *   - municipio, departamento (reverse-geocoding OSM Nominatim online; con
+ *     FALLBACK OFFLINE al municipio DANE más cercano por centroide — #338)
+ *   - altitud msnm (Open-Elevation online; fallback offline a la altitud
+ *     curada del municipio DANE más cercano)
  *   - piso térmico (derivado de la altitud, offline-safe)
  *   - cultivos recomendados para esa zona (conocimiento agronómico público)
  *
  * DEGRADACIÓN GRACEFUL (offline-first):
- *   - Si no hay red, devuelve lo que pueda derivar localmente (piso térmico
- *     desde altitud cacheada, recomendaciones por zona). NUNCA lanza.
+ *   - Si no hay red, devuelve lo que pueda derivar localmente: municipio +
+ *     departamento por nearest-centroid sobre el dataset DANE embebido, piso
+ *     térmico desde la altitud curada, recomendaciones por zona. NUNCA lanza.
  *
  * SEGURIDAD (repo público — SOP §2):
  *   - Sin hostnames/IPs/tokens internos. Reverse-geocoding va contra el
@@ -23,6 +26,7 @@
  */
 
 import { deriveThermalZoneFromAltitud } from './externalAiPromptBuilder.js';
+import { findNearestMunicipio } from '../utils/colombiaLocations.js';
 
 const NOMINATIM_TIMEOUT_MS = 8000;
 
@@ -209,10 +213,31 @@ export async function resolveUbicacion({ lat, lng, altitud = null }) {
     result.departamento = geo.departamento;
   }
 
+  // Fallback OFFLINE: si la red no resolvio municipio/departamento, usar el
+  // municipio DANE mas cercano por centroide (offline-first). Tambien sirve de
+  // fuente de altitud curada cuando Open-Elevation no esta disponible.
+  let nearest = null;
+  if (!result.municipio || !result.departamento) {
+    nearest = findNearestMunicipio(lat, lng);
+    if (nearest) {
+      result.municipio = result.municipio || nearest.name;
+      result.departamento = result.departamento || nearest.departamento;
+    }
+  }
+
   // Altitud: si no vino dada, intentar Open-Elevation (online).
   if (result.altitud == null) {
     const ele = await fetchElevation(lat, lng);
     if (ele != null) result.altitud = Math.round(ele);
+  }
+
+  // Fallback OFFLINE de altitud: la altitud curada (IGAC/OSM) del municipio DANE
+  // mas cercano, si la hay. Permite precalcular el piso termico sin red.
+  if (result.altitud == null) {
+    if (nearest == null) nearest = findNearestMunicipio(lat, lng);
+    if (nearest && typeof nearest.altitud === 'number') {
+      result.altitud = nearest.altitud;
+    }
   }
 
   // Piso térmico + cultivos (offline-safe a partir de la altitud).

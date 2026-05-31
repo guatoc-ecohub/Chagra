@@ -4,7 +4,7 @@ import { fetchClimaSnapshot, getCachedClimaSnapshot } from '../../services/clima
 import { findMunicipio } from '../../utils/colombiaLocations';
 import { FARM_CONFIG } from '../../config/defaults';
 import useFincaActiveStore from '../../services/fincaActiveStore';
-import { getProfile } from '../../services/userProfileService';
+import { getProfile, getProfileMunicipio } from '../../services/userProfileService';
 
 /**
  * ClimaStrip — pronóstico real de 7 días debajo del agente.
@@ -139,7 +139,9 @@ export default function ClimaStrip({ onNavigate }) {
 
     const municipio = useMemo(() => {
         const activeFinca = fincas.find((f) => f.slug === activeFincaSlug);
-        const profileMunicipio = getProfile()?.municipio || null;
+        // getProfileMunicipio retrocompatibiliza perfiles viejos: si solo tienen
+        // `region` en texto libre, lo resuelve offline contra el dataset DANE.
+        const profileMunicipio = getProfileMunicipio();
         return activeFinca?.municipio || profileMunicipio || FARM_CONFIG?.MUNICIPIO || null;
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeFincaSlug, fincas, tick]);

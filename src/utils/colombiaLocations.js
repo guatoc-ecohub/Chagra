@@ -67,20 +67,92 @@ export function getMunicipios(departamento) {
 }
 
 /**
- * Busca un municipio por nombre (case-insensitive, partial match).
- * Util para auto-fill desde texto libre.
+ * Normaliza un nombre para matching tolerante a tildes/mayusculas.
+ * "Popayan" -> "popayan", "BOGOTA D.C." -> "bogota d.c.". Mismo criterio que
+ * el generador (`scripts/gen-colombia-locations.mjs#normalizeName`).
+ * @param {string} s
+ * @returns {string}
+ */
+function normalize(s) {
+  return String(s ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Busca un municipio por nombre (offline, tolerante a tildes y mayusculas).
+ * Util para auto-fill desde texto libre SIN red. El query puede venir como
+ * "Municipio" o "Municipio, Departamento" — la parte tras la coma desempata
+ * cuando hay homonimos (p. ej. varios "San Vicente").
+ *
+ * Prioridad de match: exacto > prefijo. El exacto se prefiere SIEMPRE sobre un
+ * prefijo (antes "Cali" podia hacer prefix-match con "Calima" segun el orden
+ * del dataset antes de llegar al "Cali" exacto).
+ *
  * @param {string} query
  * @returns {{departamento:string,name:string,lat:number,lng:number,altitud:number|null,codigo:string}|null}
  */
 export function findMunicipio(query) {
   if (!query) return null;
-  const q = query.toLowerCase().trim();
+  const [rawName, rawDpto] = String(query).split(',');
+  const q = normalize(rawName);
+  if (!q) return null;
+  const dptoHint = rawDpto ? normalize(rawDpto) : null;
+
+  let prefixHit = null;
   for (const [dpto, munis] of Object.entries(COLOMBIA_LOCATIONS)) {
+    if (dptoHint && !normalize(dpto).includes(dptoHint)) continue;
     for (const m of munis) {
-      if (m.name.toLowerCase() === q || m.name.toLowerCase().startsWith(q)) {
-        return { departamento: dpto, ...m };
+      const name = normalize(m.name);
+      if (name === q) return { departamento: dpto, ...m };
+      if (!prefixHit && name.startsWith(q)) {
+        prefixHit = { departamento: dpto, ...m };
       }
     }
   }
-  return null;
+  return prefixHit;
+}
+
+/**
+ * Reverse-geocoding OFFLINE: dado un par (lat, lng) devuelve el municipio DANE
+ * mas cercano por distancia a su centroide. Cubre el caso offline-first en que
+ * el GPS si entrega coordenadas pero NO hay red para consultar Nominatim — el
+ * campesino igual ve su municipio + departamento + piso termico.
+ *
+ * Distancia: euclidea sobre lat/lng con la longitud corregida por el coseno de
+ * la latitud (los grados de longitud se acortan acercandose a los polos). Para
+ * distancias intra-Colombia el error vs. la geodesica real es despreciable y
+ * basta para asignar el municipio correcto.
+ *
+ * @param {number} lat
+ * @param {number} lng
+ * @returns {{departamento:string,name:string,lat:number,lng:number,altitud:number|null,codigo:string,distanciaKm:number}|null}
+ */
+export function findNearestMunicipio(lat, lng) {
+  if (typeof lat !== 'number' || typeof lng !== 'number') return null;
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+
+  const cosLat = Math.cos((lat * Math.PI) / 180);
+  let best = null;
+  let bestD2 = Infinity;
+  for (const [dpto, munis] of Object.entries(COLOMBIA_LOCATIONS)) {
+    for (const m of munis) {
+      if (typeof m.lat !== 'number' || typeof m.lng !== 'number') continue;
+      const dLat = m.lat - lat;
+      const dLng = (m.lng - lng) * cosLat;
+      const d2 = dLat * dLat + dLng * dLng;
+      if (d2 < bestD2) {
+        bestD2 = d2;
+        best = { departamento: dpto, ...m };
+      }
+    }
+  }
+  if (!best) return null;
+  // ~111 km por grado. Aproximacion para mostrar que tan lejos cae el centroide
+  // (sanity / debug), no para geofence.
+  const distanciaKm = Math.round(Math.sqrt(bestD2) * 111 * 10) / 10;
+  return { ...best, distanciaKm };
 }
