@@ -17,6 +17,7 @@ import {
   guardInvertedViability,
   guardDoseWithoutSource,
   guardSpeciesSubstitution,
+  guardCompanionBinomial,
   guardVisionWithoutPhoto,
   applyOutputGuards,
   filterNoiseEntities,
@@ -513,6 +514,132 @@ describe('guardSpeciesSubstitution', () => {
   it('maneja entrada vacía / no-string', () => {
     expect(guardSpeciesSubstitution('', luloResolved).modified).toBe(false);
     expect(guardSpeciesSubstitution(null, luloResolved).text).toBe('');
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────
+// GUARD 5b — binomio de compañía/antagonista sustituido
+// Caso prod (2026-05-31): hablando de antagonistas de la papa, el agente escribió
+// "Nogal andino (Quercus molinae)". El grounding de la papa trae el antagonist
+// Nogal andino = Juglans neotropica (CORRECTO). El modelo sustituyó el binomio de
+// un ANTAGONISTA (no del cultivo principal), por eso guardSpeciesSubstitution
+// — que solo valida el cultivo preguntado — no lo cubre. guardCompanionBinomial
+// valida los binomios de companions/antagonists/alternativas contra SU PROPIO
+// grounding autoritativo.
+// ──────────────────────────────────────────────────────────────────────────
+describe('guardCompanionBinomial', () => {
+  const papaResolved = [
+    {
+      mentioned: 'papa',
+      kind: 'species',
+      nombre_comun: 'Papa',
+      nombre_cientifico: 'Solanum tuberosum L.',
+      canonical_id: 'solanum_tuberosum',
+      confidence: 0.96,
+      antagonists: [
+        {
+          canonical_id: 'juglans_neotropica',
+          nombre_comun: 'Nogal andino',
+          nombre_cientifico: 'Juglans neotropica Diels',
+        },
+      ],
+      companions: [
+        {
+          canonical_id: 'tagetes_erecta',
+          nombre_comun: 'Caléndula',
+          nombre_cientifico: 'Tagetes erecta L.',
+        },
+      ],
+    },
+  ];
+
+  it('CASO REAL: corrige "Nogal andino (Quercus molinae)" → Juglans neotropica', () => {
+    const llmFail =
+      'Entre los antagonistas de la papa está el Nogal andino (Quercus molinae), que produce ' +
+      'juglona y inhibe el cultivo. Manténlo lejos de tus surcos.';
+    const out = guardCompanionBinomial(llmFail, papaResolved);
+    expect(out.modified).toBe(true);
+    expect(out.reason).toMatch(/binomio_compa[ñn]/i);
+    // la corrección debe nombrar el binomio correcto y el errado.
+    expect(out.text).toMatch(/Juglans neotropica/);
+    expect(out.text).toMatch(/Quercus molinae/i);
+    expect(out.text).toMatch(/Nogal andino/i);
+  });
+
+  it('NO dispara si el binomio del antagonista SÍ coincide con su grounding', () => {
+    const ok =
+      'Entre los antagonistas de la papa está el Nogal andino (Juglans neotropica), que ' +
+      'produce juglona. Manténlo lejos.';
+    const out = guardCompanionBinomial(ok, papaResolved);
+    expect(out.modified).toBe(false);
+    expect(out.text).toBe(ok);
+  });
+
+  it('tolera autoría/variedad en el binomio mencionado (compara solo Género epíteto)', () => {
+    const ok =
+      'El Nogal andino (Juglans neotropica Diels) es antagonista de la papa por la juglona.';
+    const out = guardCompanionBinomial(ok, papaResolved);
+    expect(out.modified).toBe(false);
+  });
+
+  it('NO dispara si el binomio errado no está CERCA del nombre del companion/antagonista', () => {
+    // El binomio foráneo aparece, pero a más de 160 chars del "Nogal andino":
+    // están en bloques temáticos distintos, no es una atribución del binomio al
+    // nombre común. El guard es conservador con la ventana de cercanía.
+    const txt =
+      'El Nogal andino es un árbol valioso que conviene mantener lejos de la papa por su efecto ' +
+      'alelopático sobre el tubérculo, ya que reduce el rendimiento de las matas cercanas con el ' +
+      'paso de las temporadas de cultivo. ' +
+      'En una sección totalmente aparte del documento, hablando de otros robles del sur del país, ' +
+      'se menciona que el Quercus molinae crece en bosques de niebla a gran altitud.';
+    const out = guardCompanionBinomial(txt, papaResolved);
+    expect(out.modified).toBe(false);
+  });
+
+  it('corrige un companion (no solo antagonist) con binomio errado', () => {
+    const llmFail =
+      'Como compañía planta Caléndula (Calendula officinalis) junto a la papa para repeler plagas.';
+    const out = guardCompanionBinomial(llmFail, papaResolved);
+    expect(out.modified).toBe(true);
+    expect(out.text).toMatch(/Tagetes erecta/);
+  });
+
+  it('NO dispara sin resolvedEntities', () => {
+    const txt = 'El Nogal andino (Quercus molinae) es antagonista de la papa.';
+    expect(guardCompanionBinomial(txt, null).modified).toBe(false);
+    expect(guardCompanionBinomial(txt, []).modified).toBe(false);
+  });
+
+  it('NO dispara si la entidad no trae companions/antagonists con binomio', () => {
+    const sinSubarrays = [
+      {
+        mentioned: 'papa',
+        kind: 'species',
+        nombre_comun: 'Papa',
+        nombre_cientifico: 'Solanum tuberosum L.',
+      },
+    ];
+    const txt = 'El Nogal andino (Quercus molinae) es antagonista de la papa.';
+    expect(guardCompanionBinomial(txt, sinSubarrays).modified).toBe(false);
+  });
+
+  it('idempotente: no re-corrige si la corrección ya está aplicada', () => {
+    const llmFail = 'El Nogal andino (Quercus molinae) es antagonista de la papa.';
+    const once = guardCompanionBinomial(llmFail, papaResolved);
+    const twice = guardCompanionBinomial(once.text, papaResolved);
+    expect(twice.modified).toBe(false);
+  });
+
+  it('telemetría: cuenta el gatillo', () => {
+    const llmFail = 'El Nogal andino (Quercus molinae) antagoniza a la papa.';
+    guardCompanionBinomial(llmFail, papaResolved);
+    const t = getOutputGuardTelemetry();
+    expect(t.companion_binomial).toBe(1);
+  });
+
+  it('maneja entrada vacía / no-string', () => {
+    expect(guardCompanionBinomial('', papaResolved).modified).toBe(false);
+    expect(guardCompanionBinomial(null, papaResolved).text).toBe('');
   });
 });
 
