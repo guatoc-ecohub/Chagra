@@ -465,7 +465,7 @@ export const MapPicker = ({
                     de la barra y desactivar &quot;Block fingerprinting&quot; para este sitio.
                   </span>
                 ) : (
-                  <span>Reintentá a cielo abierto o desactivá filtros de fingerprinting del navegador.</span>
+                  <span>Reintenta a cielo abierto o desactiva los filtros de fingerprinting del navegador.</span>
                 )}
               </div>
             </>

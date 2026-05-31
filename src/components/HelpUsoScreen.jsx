@@ -215,29 +215,29 @@ export default function HelpUsoScreen({ onBackToHome, onNavigate }) {
                 <ol className="list-decimal pl-5 space-y-1 mt-1">
                   <li>
                     Ajustes (la app del engranaje gris) → busca &ldquo;Safari&rdquo;
-                    en la lista de apps → entrá ahí.
+                    en la lista de apps → entra ahí.
                   </li>
                   <li>
-                    Bajá hasta encontrar <strong>&ldquo;Ubicación&rdquo;</strong> y
-                    tocá. Si dice &ldquo;Denegar&rdquo;, cambialo a
+                    Baja hasta encontrar <strong>&ldquo;Ubicación&rdquo;</strong> y
+                    toca. Si dice &ldquo;Denegar&rdquo;, cámbialo a
                     &ldquo;Preguntar&rdquo; o &ldquo;Permitir&rdquo;.
                   </li>
                   <li>
-                    Volvé a Ajustes → &ldquo;Privacidad y seguridad&rdquo; →
-                    &ldquo;Localización&rdquo; → confirmá que la
+                    Vuelve a Ajustes → &ldquo;Privacidad y seguridad&rdquo; →
+                    &ldquo;Localización&rdquo; → confirma que la
                     <strong> localización general esté activada</strong> (al
                     principio de la pantalla).
                   </li>
                   <li>
-                    Volvé a Chagra, recargá la página (cerrá la pestaña en
-                    Safari y volvé a entrar), y aceptá el popup de permiso
+                    Vuelve a Chagra, recarga la página (cierra la pestaña en
+                    Safari y vuelve a entrar), y acepta el popup de permiso
                     cuando aparezca.
                   </li>
                 </ol>
                 <p className="mt-2 text-slate-500 italic">
                   Si instalaste Chagra como app desde &ldquo;Añadir a pantalla
                   de inicio&rdquo;, la primera vez te va a preguntar de nuevo
-                  el permiso — es esperado, aceptá.
+                  el permiso — es esperado, acepta.
                 </p>
               </details>
               <details className="text-xs text-slate-400 leading-relaxed mt-2">

@@ -458,7 +458,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
                   bug "fresa sin plan" cuando entra por entrada libre. */}
               <p className="text-[10px] text-amber-400 mt-2 px-2 leading-snug">
                 Sin coincidencia en catálogo: el plan de alimentación automático no se generará.
-                Probá variantes (ej. &quot;fresa monterrey&quot; o nombre científico).
+                Prueba variantes (ej. &quot;fresa monterrey&quot; o nombre científico).
               </p>
             </div>
           ) : (

@@ -16,17 +16,17 @@ const GeolocationButton = ({ onCoords, label = "Capturar ubicación", icon: _Ico
         if (!error) return null;
 
         let message = "Error al obtener ubicación";
-        let subMessage = "Reintentá con mejor señal cielo abierto.";
+        let subMessage = "Reintenta con mejor señal cielo abierto.";
 
         if (error === 'denied') {
             message = "Permiso denegado";
             const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent);
             subMessage = isIos
                 ? "iOS Safari → Ajustes → Privacidad → Localización → Permitir para chagra.guatoc.co"
-                : "Habilitá el permiso de ubicación en los ajustes de tu navegador.";
+                : "Habilita el permiso de ubicación en los ajustes de tu navegador.";
         } else if (error === 'timeout') {
             message = "Tiempo agotado";
-            subMessage = "El GPS tardó demasiado. Reintentá a cielo abierto.";
+            subMessage = "El GPS tardó demasiado. Reintenta a cielo abierto.";
         } else if (error === 'unsupported') {
             message = "No compatible";
             subMessage = "Tu dispositivo o conexión HTTPS no soporta geolocalización.";

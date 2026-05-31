@@ -7,7 +7,7 @@ const PHASES = [
   { secs: 8, label: 'Analizando la foto…' },
   { secs: 15, label: 'Identificando la especie…' },
   { secs: 22, label: 'Aún procesando, casi listo…' },
-  { secs: 30, label: 'Tomando más de lo normal, esperá un momento…' },
+  { secs: 30, label: 'Tomando más de lo normal, espera un momento…' },
 ];
 
 const EXPECTED_SECS = 25;
