@@ -15,6 +15,8 @@ import {
 import useAssetStore from '../../store/useAssetStore';
 import useLogStore from '../../store/useLogStore';
 import useAlertStore from '../../store/useAlertStore';
+import { getProfile } from '../../services/userProfileService';
+import { getEnsoOutlook, regionFromProfile } from '../../services/ensoContext';
 
 /**
  * AnalisisProactivoIA — panel narrativo IA contextual al final del DashboardLive.
@@ -82,7 +84,7 @@ function summarizeSensors(sensors) {
     };
 }
 
-function buildNarrative({ hora, plantasCount, pendingTasks, sensorSummary, alertsCount, ensoStatus }) {
+function buildNarrative({ hora, plantasCount, pendingTasks, sensorSummary, alertsCount, ensoOutlook }) {
     const lines = [];
     const saludo = hora.saludo;
 
@@ -137,16 +139,11 @@ function buildNarrative({ hora, plantasCount, pendingTasks, sensorSummary, alert
                 ? 'Hay 1 alerta activa — revísala antes de salir al campo.'
                 : `Hay ${alertsCount} alertas activas — revísalas antes de salir al campo.`,
         );
-    } else if (ensoStatus && ensoStatus !== 'neutral') {
-        const ensoLabel = {
-            nina: 'fase La Niña (más lluvias)',
-            nino_debil: 'fase Niño débil (menos lluvias)',
-            nino_moderado: 'fase Niño moderado (sequía moderada)',
-            nino_fuerte: 'fase Niño fuerte (sequía marcada)',
-        }[ensoStatus];
-        if (ensoLabel) {
-            lines.push(`Recuerda que la región está en ${ensoLabel}: ajusta riego y siembras.`);
-        }
+    } else if (ensoOutlook) {
+        // ENSO real desde el feed en vivo + lectura regional (ensoContext).
+        // Cubre tanto fase activa (Niño/Niña) como vigilancia en fase neutral.
+        // Fuente citada para auditabilidad (regla Chagra).
+        lines.push(`${ensoOutlook.titulo}: ${ensoOutlook.detalle} (${ensoOutlook.fuente})`);
     }
 
     return lines.join(' ');
@@ -208,8 +205,21 @@ export default function AnalisisProactivoIA({ sensors = [], climaSnapshot = null
     }, []);
 
     const sensorSummary = useMemo(() => summarizeSensors(sensors), [sensors]);
-    const alertsCount = activeAlerts instanceof Map ? activeAlerts.size : 0;
-    const ensoStatus = climaSnapshot?.enso_status || null;
+    // useAlertStore.activeAlerts es un array (no Map). Soportamos ambos por
+    // robustez para no regresar a 0 silencioso si cambia la forma del store.
+    const alertsCount = Array.isArray(activeAlerts)
+        ? activeAlerts.length
+        : (activeAlerts instanceof Map ? activeAlerts.size : 0);
+    // ENSO: phase del feed en vivo + lectura regional (DR) desde ensoContext.
+    const ensoPhase = climaSnapshot?.enso_status?.phase || null;
+    const ensoProbs = climaSnapshot?.enso_status?.ideam_probabilities
+        || climaSnapshot?.enso_status?.ideam_probabilidades
+        || null;
+    const ensoOutlook = useMemo(() => {
+        if (!ensoPhase) return null;
+        const region = regionFromProfile(getProfile());
+        return getEnsoOutlook({ phase: ensoPhase, region, probabilities: ensoProbs });
+    }, [ensoPhase, ensoProbs]);
     const hora = useMemo(() => getHora(), []);
 
     const narrative = useMemo(
@@ -220,9 +230,9 @@ export default function AnalisisProactivoIA({ sensors = [], climaSnapshot = null
                 pendingTasks,
                 sensorSummary,
                 alertsCount,
-                ensoStatus,
+                ensoOutlook,
             }),
-        [hora, plants.length, pendingTasks, sensorSummary, alertsCount, ensoStatus],
+        [hora, plants.length, pendingTasks, sensorSummary, alertsCount, ensoOutlook],
     );
 
     const agentPrompt = useMemo(

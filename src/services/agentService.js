@@ -20,6 +20,7 @@ import {
 } from './glosarioCaucaService.js';
 import { filterVoseo as _filterVoseo } from './voseoFilter.js';
 import { buildUserProfileBlock } from './userProfileService.js';
+import { buildEnsoAgentLines } from './ensoContext.js';
 
 /**
  * Free 7→10 fix-pack #5: re-exporta los helpers de glosario regional Cauca
@@ -445,9 +446,14 @@ export function formatClimateAlert(bioculturalZone, climateData = null) {
  * sigue funcionando como antes.
  *
  * @param {object | null} snapshot — payload de climaService.getCachedClimaSnapshot
+ * @param {object} [opts]
+ * @param {string|null} [opts.region] — región natural de la finca (ensoContext).
+ *   Si se pasa, se inyecta la LECTURA REGIONAL ENSO (DR-MISSION-2/4): qué
+ *   implica la fase actual para esa región (p. ej. heladas paradójicas en el
+ *   altiplano bajo El Niño seco). Si no, solo se inyecta el bloque base.
  * @returns {string}
  */
-export function buildClimaContext(snapshot) {
+export function buildClimaContext(snapshot, opts = {}) {
   if (!snapshot || typeof snapshot !== 'object') return '';
   const enso = snapshot.enso_status;
   if (!enso || typeof enso !== 'object') return '';
@@ -474,6 +480,18 @@ export function buildClimaContext(snapshot) {
       lines.push(`  ${sev} ${a.tipo}: ${a.mensaje}`);
     }
   }
+  // Lectura regional ENSO (DR-MISSION-2/4) si conocemos la región de la finca.
+  // Complementa la fase cruda con la implicación accionable por región.
+  const ensoRegional = buildEnsoAgentLines({
+    phase: enso.phase || 'neutral',
+    region: opts.region || null,
+    probabilities: enso.ideam_probabilities || enso.ideam_probabilidades || null,
+  });
+  if (ensoRegional) {
+    lines.push('');
+    lines.push(ensoRegional);
+  }
+
   lines.push('');
   lines.push('REGLA: si tu recomendación depende del clima de los próximos días o del fenómeno ENSO, menciónalo CITANDO las fuentes de arriba. Si El Niño / La Niña activo cambia la recomendación de manejo, dilo plano. Si el dato no aplica al cultivo de la pregunta, no lo fuerces.');
   lines.push('=== FIN CLIMA TIEMPO REAL ===');
