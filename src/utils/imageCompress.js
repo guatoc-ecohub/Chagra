@@ -142,7 +142,7 @@ export async function compressImage(blob, opts = {}) {
 
 /** Mensaje canónico para mostrar al usuario cuando compressImage rechaza. */
 export const IMAGE_TOO_LARGE_MESSAGE =
-  'La foto es muy grande, intentá una más liviana';
+  'La foto es muy grande, intenta una más liviana';
 
 // ────────────────────────────────────────────────────────────
 // Helpers internos

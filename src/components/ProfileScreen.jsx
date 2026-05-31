@@ -545,7 +545,7 @@ function MultifincaGpsSection() {
 
       <p className="text-xs text-slate-500 leading-relaxed">
         Finca activa: <strong className="text-slate-300">{activeFincaSlug}</strong>.
-        {' '}Cambiala en el banner GPS o el selector de fincas.
+        {' '}Cámbiala en el banner GPS o el selector de fincas.
       </p>
 
       {/* 062.3 / 062.7: si gpsOverride activo, ofrecer volver a auto-detect */}

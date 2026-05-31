@@ -36,7 +36,7 @@ function getSensorChip(sensors) {
         return {
             Icon: Wifi,
             label: 'Sin sensores',
-            sub: 'Conectá uno',
+            sub: 'Conecta uno',
             color: 'text-slate-400',
             bg: 'bg-slate-800/40',
             border: 'border-slate-700/40',

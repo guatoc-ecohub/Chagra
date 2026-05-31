@@ -44,7 +44,7 @@ vi.mock('../../utils/imageCompress', () => ({
     size: typeof blob?.size === 'number' ? blob.size : 1024,
     originalSize: typeof blob?.size === 'number' ? blob.size : 1024,
   })),
-  IMAGE_TOO_LARGE_MESSAGE: 'La foto es muy grande, intentá una más liviana',
+  IMAGE_TOO_LARGE_MESSAGE: 'La foto es muy grande, intenta una más liviana',
 }));
 
 // Mock hook usePhotoUrl — sin foto, no relevante para el badge.

@@ -129,7 +129,7 @@ export default function GpsFincaBanner({ autoDetectOnMount = true }) {
             Permiso GPS no concedido. Detección automática de finca desactivada.
           </p>
           <p className="text-xs text-slate-400 mt-0.5">
-            Activá permiso en el navegador para que Chagra reconozca dónde estás.
+            Activa el permiso en el navegador para que Chagra reconozca dónde estás.
           </p>
         </div>
         <button

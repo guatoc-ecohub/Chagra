@@ -45,39 +45,39 @@ describe('IosInstallBanner', () => {
   it('muestra el banner en iOS Safari (no standalone, no dismissed)', () => {
     setUserAgent(IOS_UA);
     render(<IosInstallBanner />);
-    expect(screen.getByText(/Instalá Chagra/i)).toBeInTheDocument();
-    expect(screen.getByText(/tocá/i)).toBeInTheDocument();
+    expect(screen.getByText(/Instala Chagra/i)).toBeInTheDocument();
+    expect(screen.getByText(/toca/i)).toBeInTheDocument();
   });
 
   it('NO muestra el banner en Desktop Chrome', () => {
     setUserAgent(DESKTOP_UA);
     render(<IosInstallBanner />);
-    expect(screen.queryByText(/Instalá Chagra/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Instala Chagra/i)).not.toBeInTheDocument();
   });
 
   it('NO muestra el banner en iOS standalone (PWA ya instalada)', () => {
     setUserAgent(IOS_UA);
     setStandalone(true);
     render(<IosInstallBanner />);
-    expect(screen.queryByText(/Instalá Chagra/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Instala Chagra/i)).not.toBeInTheDocument();
   });
 
   it('respeta dismissal previa en localStorage', () => {
     setUserAgent(IOS_UA);
     localStorage.setItem('chagra-ios-install-dismissed', 'true');
     render(<IosInstallBanner />);
-    expect(screen.queryByText(/Instalá Chagra/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Instala Chagra/i)).not.toBeInTheDocument();
   });
 
   it('al dismiss, persiste en localStorage y oculta el banner', () => {
     setUserAgent(IOS_UA);
     render(<IosInstallBanner />);
-    expect(screen.getByText(/Instalá Chagra/i)).toBeInTheDocument();
+    expect(screen.getByText(/Instala Chagra/i)).toBeInTheDocument();
 
     const closeBtn = screen.getByLabelText(/Cerrar/i);
     fireEvent.click(closeBtn);
 
-    expect(screen.queryByText(/Instalá Chagra/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Instala Chagra/i)).not.toBeInTheDocument();
     expect(localStorage.getItem('chagra-ios-install-dismissed')).toBe('true');
   });
 });

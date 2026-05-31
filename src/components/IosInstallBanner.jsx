@@ -31,9 +31,9 @@ const IosInstallBanner = () => {
                 </div>
 
                 <div className="flex-1">
-                    <h3 className="text-white font-bold text-sm">Instalá Chagra</h3>
+                    <h3 className="text-white font-bold text-sm">Instala Chagra</h3>
                     <p className="text-slate-400 text-xs">
-                        Tocá <span className="text-slate-200">Compartir</span> en Safari y luego <span className="text-slate-200">"Añadir a inicio"</span>.
+                        Toca <span className="text-slate-200">Compartir</span> en Safari y luego <span className="text-slate-200">"Añadir a inicio"</span>.
                     </p>
                 </div>
 

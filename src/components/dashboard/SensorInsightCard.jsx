@@ -29,7 +29,7 @@ function getInsight(sensors) {
             icon: Wifi,
             color: 'text-slate-400',
             title: 'Sin sensores conectados',
-            line: 'Conectá un sensor IoT para ver lecturas en tiempo real.',
+            line: 'Conecta un sensor IoT para ver lecturas en tiempo real.',
             cta: 'Configurar',
         };
     }
