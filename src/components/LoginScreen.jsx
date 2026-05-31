@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Sprout } from 'lucide-react';
-import { authenticateUser } from '../services/authService';
+import { authenticateUser, initiateAuthorizationCodeFlow, generateOAuthState } from '../services/authService';
 import { setCurrentOperator } from '../services/operatorIdentityService';
 import { setActiveTenantId } from '../services/tenantContext';
 import { version as APP_VERSION } from '../../package.json';
@@ -18,6 +18,27 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
   // para evitar React #185. 'default' sigue mostrando solo slate + biopunk.
   const selectedBackground = useThemeBackgroundStore((s) => s.selected);
   const loginBgSrc = selectedBackground === 'default' ? null : getBackgroundSrc(selectedBackground);
+
+  // Camino PKCE (Authorization Code + PKCE) — recomendado y futuro único método.
+  // Redirige a farmOS /oauth/authorize; el retorno lo maneja la vista
+  // OAuthCallback (ruta /callback). Coexiste con el password grant de abajo
+  // como fallback hasta que el redirect_uri esté registrado en farmOS y PKCE
+  // esté habilitado en el cliente (pasos backend del operador). Si esos pasos
+  // no están listos, farmOS rechaza el authorize y el operador vuelve acá.
+  const [redirecting, setRedirecting] = useState(false);
+  const handlePkceLogin = async () => {
+    setRedirecting(true);
+    try {
+      const state = generateOAuthState();
+      await initiateAuthorizationCodeFlow(state); // navega fuera de la SPA
+    } catch (err) {
+      setRedirecting(false);
+      onSave(
+        `No se pudo iniciar el login seguro: ${err?.message || 'error desconocido'}. Usa usuario y contraseña.`,
+        true,
+      );
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -124,6 +145,30 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
             del operador aparece como 0 hasta login. */}
         <div className="w-full">
           <WelcomeStatsHero mode="pre-login" />
+        </div>
+
+        {/* Camino principal recomendado: PKCE. Botón que redirige a farmOS
+            /oauth/authorize. El password grant de abajo queda como fallback
+            hasta que el backend habilite PKCE + registre el redirect_uri. */}
+        <button
+          type="button"
+          onClick={handlePkceLogin}
+          disabled={redirecting}
+          className={`w-full mt-2 p-6 rounded-xl text-2xl font-black shadow-xl min-h-[80px] border-b-4 flex justify-center items-center ${
+            redirecting
+              ? 'bg-slate-800 border-slate-950 cursor-wait'
+              : 'bg-muzo active:bg-muzo-glow border-emerald-900 text-slate-950'
+          }`}
+        >
+          {redirecting ? <ChagraGrowLoader size={56} initialProgress={0.4} /> : 'Iniciar sesión'}
+        </button>
+
+        {/* Separador: el formulario usuario/contraseña queda como acceso
+            alternativo (password grant legacy) hasta la fecha de deprecación. */}
+        <div className="w-full flex items-center gap-3 mt-2" aria-hidden="true">
+          <span className="flex-1 h-px bg-slate-700" />
+          <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">o con usuario</span>
+          <span className="flex-1 h-px bg-slate-700" />
         </div>
 
         <form onSubmit={handleLogin} className="w-full flex flex-col gap-6">

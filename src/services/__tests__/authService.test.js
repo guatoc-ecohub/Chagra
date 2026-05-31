@@ -1,6 +1,6 @@
 /* global global */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
     generateCodeVerifier,
     generateCodeChallenge,
@@ -348,6 +348,38 @@ describe('authService — OAuth PKCE flow', () => {
 
             expect(result.success).toBe(false);
             expect(result.error).toContain('Parámetros inválidos');
+        });
+    });
+
+    // Red de seguridad: la fecha de deprecación del password grant se movió a
+    // 2026-09-25. Mientras no pase esa fecha, el password grant DEBE seguir
+    // funcionando como fallback aunque ya estemos después del 2026-06-25
+    // original. Estos tests usan fake timers para fijar "ahora".
+    describe('red de seguridad: deprecación password grant', () => {
+        beforeEach(() => {
+            global.fetch = vi.fn();
+            vi.useFakeTimers();
+        });
+
+        afterEach(() => {
+            vi.useRealTimers();
+        });
+
+        it('password grant SIGUE vivo el 2026-07-01 (después del corte original 06-25)', async () => {
+            vi.setSystemTime(new Date('2026-07-01T12:00:00Z'));
+
+            global.fetch.mockResolvedValue({
+                ok: true,
+                status: 200,
+                headers: { get: (n) => (n === 'content-type' ? 'application/json' : null) },
+                json: async () => ({ access_token: 't', refresh_token: 'r', expires_in: 3600 }),
+            });
+
+            const result = await authenticateUser('u', 'p');
+            // NO debe retornar el error "ha sido removido": el grant sigue activo.
+            expect(result.success).toBe(true);
+            expect(result.error).toBeUndefined();
+            expect(global.fetch).toHaveBeenCalled();
         });
     });
 });
