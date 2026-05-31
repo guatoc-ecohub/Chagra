@@ -31,6 +31,42 @@ import { findNearestMunicipio } from '../utils/colombiaLocations.js';
 const NOMINATIM_TIMEOUT_MS = 8000;
 
 /**
+ * Umbral (en metros) del radio de incertidumbre `position.coords.accuracy`
+ * por encima del cual NO confiamos en la posición para derivar la altitud de
+ * la finca (#coarse-location, 2026-05-30).
+ *
+ * Contexto: `navigator.geolocation` reporta `accuracy` como el radio del
+ * círculo de confianza. GPS real de celular suele dar <50 m; un navegador de
+ * escritorio sin GPS (Brave/Chromium en NixOS) ubica por IP/wifi y da varios
+ * kilómetros — cae en la cabecera municipal o en Bogotá, no en la finca. Si
+ * derivamos la altitud de ESA posición guardamos la altura de la cabecera
+ * (ej. Choachí 1923 msnm) en vez de la finca real (ej. 2580 msnm), lo que
+ * envenena la viabilidad de cultivos y las alertas de helada del agente.
+ *
+ * 5000 m es un umbral conservador: deja pasar GPS de celular y la mayoría de
+ * lecturas wifi urbanas precisas, pero atrapa la geolocalización gruesa por IP.
+ */
+export const COARSE_ACCURACY_THRESHOLD_M = 5000;
+
+/**
+ * ¿La lectura de geolocalización es DEMASIADO gruesa para derivar la altitud
+ * de la finca de forma confiable?
+ *
+ * @param {number|null|undefined} accuracy - radio de incertidumbre en metros
+ *   (`position.coords.accuracy`).
+ * @param {number} [threshold] - umbral en metros (default
+ *   COARSE_ACCURACY_THRESHOLD_M). Parametrizable para tests / ajustes.
+ * @returns {boolean} true si la posición es gruesa (accuracy > threshold).
+ *   Si `accuracy` no es un número finito, devolvemos false (no podemos afirmar
+ *   que es gruesa; el navegador no reportó incertidumbre).
+ */
+export function isCoarseLocation(accuracy, threshold = COARSE_ACCURACY_THRESHOLD_M) {
+  const n = Number(accuracy);
+  if (!Number.isFinite(n)) return false;
+  return n > threshold;
+}
+
+/**
  * Metadatos visuales + cultivos recomendados por piso térmico colombiano.
  * Clasificación IDEAM / Caldas. Conocimiento agronómico público (OSS-safe):
  * los cultivos típicos de cada piso térmico son hechos de extensión rural

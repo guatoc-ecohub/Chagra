@@ -16,11 +16,13 @@ import {
   ChevronDown,
   LocateFixed,
   Move,
+  Pencil,
 } from 'lucide-react';
 import {
   resolveUbicacion,
   forwardGeocode,
   getPisoTermicoInfo,
+  isCoarseLocation,
 } from '../services/locationService';
 import { useFincaActiveStore } from '../services/fincaActiveStore';
 import { saveProfile } from '../services/userProfileService';
@@ -255,6 +257,11 @@ export default function LocationDetectedScreen({
   const [cascadeOpen, setCascadeOpen] = useState(false);
   const [cascadeDpto, setCascadeDpto] = useState('');
   const [geoState, setGeoState] = useState('idle'); // idle | detecting | denied | unavailable
+  // #coarse-location (2026-05-30): altitud editable por el usuario. Si la
+  // ubicación es gruesa (Brave/escritorio sin GPS → cabecera municipal) NO
+  // confiamos en la altitud derivada; el campesino corrige su altura real
+  // (ej. finca a 2580 msnm vs cabecera 1923). Vacío = usar la derivada.
+  const [manualAltitud, setManualAltitud] = useState('');
   const markerRef = useRef(null);
   const setFincaIndoorZone = useFincaActiveStore((s) => s.setIndoorZone);
 
@@ -294,10 +301,14 @@ export default function LocationDetectedScreen({
     setLoading(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const { latitude, longitude, altitude } = pos.coords;
+        const { latitude, longitude, altitude, accuracy } = pos.coords;
+        // #coarse-location: arrastramos `accuracy` (radio de incertidumbre en
+        // metros) para decidir si confiamos en la altitud derivada de ESTA
+        // posición. En Brave/escritorio sin GPS llega en varios km y cae en la
+        // cabecera; ahí NO auto-derivamos como verdad — pedimos corrección.
         resolveUbicacion({ lat: latitude, lng: longitude, altitud: altitude ?? null })
           .then((r) => {
-            setLoc(r);
+            setLoc({ ...r, accuracy: accuracy ?? null });
             setGeoState('idle');
           })
           .catch(() => setGeoState('idle'))
@@ -336,15 +347,20 @@ export default function LocationDetectedScreen({
     setLoading(true);
     try {
       const enriched = await resolveUbicacion({ lat, lng });
+      // #coarse-location: al fijar el pin manualmente la posición pasa a ser
+      // PRECISA por definición del usuario → limpiamos `accuracy` para que el
+      // aviso de "ubicación aproximada" desaparezca y la altitud derivada de
+      // este punto exacto vuelva a ser confiable.
       setLoc((prev) => ({
         ...(prev || {}),
         ...enriched,
         lat,
         lng,
+        accuracy: null,
       }));
     } catch (e) {
       console.warn('[LocationDetected] drag resolve falló:', e);
-      setLoc((prev) => ({ ...(prev || {}), lat, lng }));
+      setLoc((prev) => ({ ...(prev || {}), lat, lng, accuracy: null }));
     } finally {
       setLoading(false);
     }
@@ -441,12 +457,31 @@ export default function LocationDetectedScreen({
     }
   };
 
-  // Piso térmico derivado en vivo (offline-safe) si tenemos altitud.
+  // #coarse-location: ¿la lectura GPS fue gruesa? (Brave/escritorio sin GPS
+  // ubica por IP/wifi → varios km → cabecera municipal). Si lo es, NO tratamos
+  // la altitud derivada como verdad y empujamos al usuario a corregir.
+  const isCoarse = isCoarseLocation(loc?.accuracy);
+
+  // Altitud manual válida (rango físico Colombia: -100 a 6000 msnm). El campo
+  // editable gana SIEMPRE sobre la derivada cuando trae un número plausible.
+  const manualAltitudNum = useMemo(() => {
+    const t = manualAltitud.trim();
+    if (t === '') return null;
+    const n = Number(t);
+    return Number.isFinite(n) && n >= -100 && n <= 6000 ? Math.round(n) : null;
+  }, [manualAltitud]);
+
+  // Altitud efectiva: la manual gana sobre la derivada. Es la que se guarda,
+  // alimenta el piso térmico y la montaña, y va al perfil (viabilidad + helada).
+  const effectiveAltitud = manualAltitudNum != null ? manualAltitudNum : (loc?.altitud ?? null);
+  const altitudSource = manualAltitudNum != null ? 'manual' : 'derived';
+
+  // Piso térmico derivado en vivo (offline-safe) de la altitud EFECTIVA.
   const pisoInfo = useMemo(() => {
+    if (effectiveAltitud != null) return getPisoTermicoInfo(effectiveAltitud);
     if (loc?.pisoTermico) return loc.pisoTermico;
-    if (loc?.altitud != null) return getPisoTermicoInfo(loc.altitud);
     return null;
-  }, [loc]);
+  }, [effectiveAltitud, loc?.pisoTermico]);
 
   const handleConfirm = () => {
     if (!loc) return;
@@ -466,7 +501,16 @@ export default function LocationDetectedScreen({
       region: loc.municipio
         ? [loc.municipio, loc.departamento].filter(Boolean).join(', ')
         : undefined,
-      finca_altitud: loc.altitud != null ? String(loc.altitud) : undefined,
+      // #coarse-location: guardamos la altitud EFECTIVA (manual gana sobre
+      // derivada) y de DÓNDE viene. ClimaStrip / alertEngine / viabilidad del
+      // agente leen `finca_altitud`; `altitud_source: 'manual'` señala que el
+      // usuario la fijó a mano y NO debe sobrescribirse con una lectura gruesa.
+      finca_altitud: effectiveAltitud != null ? String(effectiveAltitud) : undefined,
+      altitud_source: effectiveAltitud != null ? altitudSource : undefined,
+      // Radio de incertidumbre de la última lectura (metros). Útil para
+      // diagnosticar perfiles con altitud sospechosa de cabecera. null si
+      // la ubicación se fijó a mano (pin/búsqueda) y no hubo lectura GPS.
+      ubicacion_accuracy: loc.accuracy != null ? Math.round(loc.accuracy) : undefined,
       piso_termico: pisoInfo?.slug,
     });
     // Avisar a la UI montada (ClimaStrip, dashboard) que la ubicación cambió,
@@ -489,7 +533,14 @@ export default function LocationDetectedScreen({
         /* no-op */
       }
     }
-    if (onConfirm) onConfirm({ ...loc, pisoTermico: pisoInfo });
+    if (onConfirm) {
+      onConfirm({
+        ...loc,
+        altitud: effectiveAltitud,
+        altitud_source: effectiveAltitud != null ? altitudSource : undefined,
+        pisoTermico: pisoInfo,
+      });
+    }
   };
 
   const center = loc
@@ -724,18 +775,78 @@ export default function LocationDetectedScreen({
               </div>
             </div>
 
+            {/* #coarse-location: aviso de ubicación aproximada. En Brave/
+                escritorio sin GPS la posición cae en la cabecera municipal, así
+                que su altitud NO es la de la finca. Empujamos a corregir: mover
+                el pin o escribir la altura real. */}
+            {isCoarse && (
+              <div
+                data-testid="coarse-location-warning"
+                className="rounded-xl bg-amber-950/30 border border-amber-800/40 p-3 text-xs text-amber-200 flex gap-2"
+              >
+                <AlertCircle size={14} className="shrink-0 mt-0.5" />
+                <span>
+                  No pudimos ubicarte con precisión (señal aproximada). La altura
+                  mostrada puede ser la de la cabecera del municipio, no la de tu
+                  finca. Mueve el pin del mapa a tu finca o escribe tu altura en
+                  metros aquí abajo.
+                </span>
+              </div>
+            )}
+
             <div className="flex items-center gap-3 flex-wrap">
               <span className="inline-flex items-center gap-1.5 text-sm text-slate-300">
                 <Mountain size={16} className="text-slate-400" />
-                {loc.altitud != null ? `${loc.altitud} msnm` : 'Altitud no disponible'}
+                {effectiveAltitud != null ? `${effectiveAltitud} msnm` : 'Altitud no disponible'}
               </span>
               <PisoTermicoBadge info={pisoInfo} />
             </div>
 
-            {loc.altitud != null && (
+            {/* #coarse-location: altura editable. (a) corrige perfiles con la
+                altitud de la cabecera ya guardada; (b) el campesino conoce su
+                altura. Si escribe un valor, gana sobre la derivada
+                (altitud_source: 'manual'). Vacío = se usa la derivada. */}
+            <div className="pt-2 border-t border-slate-800">
+              <label
+                htmlFor="altitud-manual"
+                className="block text-xs font-medium text-slate-400 mb-1.5 flex items-center gap-1.5"
+              >
+                <Pencil size={12} className="text-emerald-400" />
+                Tu altura real (msnm)
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  id="altitud-manual"
+                  data-testid="altitud-manual-input"
+                  type="number"
+                  inputMode="numeric"
+                  value={manualAltitud}
+                  onChange={(e) => setManualAltitud(e.target.value)}
+                  placeholder={
+                    loc.altitud != null ? `Detectada: ${loc.altitud}` : 'Ej: 2580'
+                  }
+                  className="w-32 px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/60"
+                />
+                <span className="text-xs text-slate-500">msnm</span>
+                {manualAltitudNum != null && (
+                  <span
+                    data-testid="altitud-source-manual"
+                    className="text-2xs text-emerald-300 bg-emerald-950/40 border border-emerald-800/40 rounded-full px-2 py-0.5"
+                  >
+                    Tu altura
+                  </span>
+                )}
+              </div>
+              <p className="text-2xs text-slate-500 mt-1.5">
+                Si conoces la altura exacta de tu finca, escríbela. Tu valor manda
+                sobre el detectado.
+              </p>
+            </div>
+
+            {effectiveAltitud != null && (
               <div className="pt-2 border-t border-slate-800">
                 <ThermalMountain
-                  altitud={loc.altitud}
+                  altitud={effectiveAltitud}
                   pisoSlug={pisoInfo?.slug}
                 />
               </div>
