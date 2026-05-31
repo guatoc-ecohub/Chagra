@@ -117,6 +117,72 @@ describe('climaService — cache + fetch', () => {
     window.removeEventListener('chagra:clima:updated', handler);
   });
 
+  it('forwards elevation to the sidecar (gradiente térmico)', async () => {
+    vi.resetModules();
+    const mockGetClima = vi.fn().mockResolvedValue({
+      fetched_at: new Date().toISOString(),
+      enso_status: { phase: 'neutral', severity: 'neutral', sources: [] },
+      alertas_locales: [],
+    });
+    vi.doMock('../sidecarClient.js', () => ({ getClimaSnapshot: mockGetClima }));
+    const mod = await import('../climaService.js');
+    await mod.fetchClimaSnapshot({ lat: 4.5288, lng: -73.9236, elevation: 2580 });
+    expect(mockGetClima).toHaveBeenCalledWith({
+      lat: 4.5288,
+      lng: -73.9236,
+      elevation: 2580,
+    });
+  });
+
+  it('keys the cache by elevation — distinta altitud no comparte snapshot', async () => {
+    vi.resetModules();
+    const mockGetClima = vi
+      .fn()
+      .mockResolvedValueOnce({
+        fetched_at: new Date().toISOString(),
+        enso_status: { phase: 'neutral', severity: 'neutral', sources: [] },
+        alertas_locales: [],
+        openmeteo: { available: true, forecast_7d: [{ temp_max_c: 17 }] },
+      })
+      .mockResolvedValueOnce({
+        fetched_at: new Date().toISOString(),
+        enso_status: { phase: 'neutral', severity: 'neutral', sources: [] },
+        alertas_locales: [],
+        openmeteo: { available: true, forecast_7d: [{ temp_max_c: 22 }] },
+      });
+    vi.doMock('../sidecarClient.js', () => ({ getClimaSnapshot: mockGetClima }));
+    const mod = await import('../climaService.js');
+    const a = await mod.fetchClimaSnapshot({ lat: 4.53, lng: -73.92, elevation: 2580 });
+    // Tras el fetch a 2580, la cache (key coords@2580) sirve ese snapshot...
+    const cachedHigh = mod.getCachedClimaSnapshot(4.53, -73.92, 2580);
+    expect(cachedHigh?.openmeteo?.forecast_7d[0].temp_max_c).toBe(17);
+    // ...pero leer las MISMAS coords con OTRA altitud (1900) NO la reusa: la
+    // clave difiere, así que es un miss (devuelve null) y un fetch nuevo.
+    expect(mod.getCachedClimaSnapshot(4.53, -73.92, 1900)).toBeNull();
+    const b = await mod.fetchClimaSnapshot({ lat: 4.53, lng: -73.92, elevation: 1900 });
+    // Mismas coords, distinta altitud → dos fetches (no colisiona la cache).
+    expect(mockGetClima).toHaveBeenCalledTimes(2);
+    expect(a.openmeteo.forecast_7d[0].temp_max_c).toBe(17);
+    expect(b.openmeteo.forecast_7d[0].temp_max_c).toBe(22);
+  });
+
+  it('omits elevation from the sidecar call when not provided', async () => {
+    vi.resetModules();
+    const mockGetClima = vi.fn().mockResolvedValue({
+      fetched_at: new Date().toISOString(),
+      enso_status: { phase: 'neutral', severity: 'neutral', sources: [] },
+      alertas_locales: [],
+    });
+    vi.doMock('../sidecarClient.js', () => ({ getClimaSnapshot: mockGetClima }));
+    const mod = await import('../climaService.js');
+    await mod.fetchClimaSnapshot({ lat: 4.53, lng: -73.92 });
+    expect(mockGetClima).toHaveBeenCalledWith({
+      lat: 4.53,
+      lng: -73.92,
+      elevation: undefined,
+    });
+  });
+
   it('two simultaneous fetches share the in-flight promise', async () => {
     vi.resetModules();
     let resolveFn;

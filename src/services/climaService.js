@@ -45,9 +45,15 @@ const LS_KEY = 'chagra:clima:snapshot-v1';
 let memCache = null; // { ts, key, payload }
 let inFlight = null; // Promise<payload>
 
-function coordKey(lat, lng) {
+function coordKey(lat, lng, elevation) {
     if (typeof lat !== 'number' || typeof lng !== 'number') return 'global';
-    return `${lat.toFixed(2)},${lng.toFixed(2)}`;
+    const base = `${lat.toFixed(2)},${lng.toFixed(2)}`;
+    // La elevación entra en la clave: dos puntos con las mismas coords pero
+    // distinta altitud (perfil corrige la grilla de Open-Meteo) son snapshots
+    // distintos y no deben compartir cache.
+    return typeof elevation === 'number' && Number.isFinite(elevation)
+        ? `${base}@${Math.round(elevation)}`
+        : base;
 }
 
 function readLocalStorage() {
@@ -77,10 +83,11 @@ function writeLocalStorage(entry) {
  *
  * @param {number} [lat]
  * @param {number} [lng]
+ * @param {number} [elevation] msnm reales (entra en la clave de cache)
  * @returns {object | null}
  */
-export function getCachedClimaSnapshot(lat, lng) {
-    const key = coordKey(lat, lng);
+export function getCachedClimaSnapshot(lat, lng, elevation) {
+    const key = coordKey(lat, lng, elevation);
     const now = Date.now();
     if (memCache && memCache.key === key && now - memCache.ts < CACHE_TTL_MS) {
         return memCache.payload;
@@ -100,11 +107,14 @@ export function getCachedClimaSnapshot(lat, lng) {
  * @param {object} [opts]
  * @param {number} [opts.lat]
  * @param {number} [opts.lng]
+ * @param {number} [opts.elevation] msnm reales de la finca → Open-Meteo corrige
+ *   la temperatura por gradiente térmico. Sin esto el pronóstico sale más
+ *   cálido (usa la elevación de la cabecera/valle de la grilla).
  * @param {boolean} [opts.forceRefresh]
  * @returns {Promise<object | null>}
  */
-export async function fetchClimaSnapshot({ lat, lng, forceRefresh = false } = {}) {
-    const key = coordKey(lat, lng);
+export async function fetchClimaSnapshot({ lat, lng, elevation, forceRefresh = false } = {}) {
+    const key = coordKey(lat, lng, elevation);
     const now = Date.now();
 
     if (!forceRefresh && memCache && memCache.key === key && now - memCache.ts < CACHE_TTL_MS) {
@@ -113,7 +123,7 @@ export async function fetchClimaSnapshot({ lat, lng, forceRefresh = false } = {}
     if (inFlight) return inFlight;
 
     inFlight = (async () => {
-        const payload = await getClimaSnapshot({ lat, lng });
+        const payload = await getClimaSnapshot({ lat, lng, elevation });
         if (payload) {
             const entry = { ts: Date.now(), key, payload };
             memCache = entry;

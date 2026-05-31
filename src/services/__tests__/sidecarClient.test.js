@@ -495,3 +495,45 @@ describe('sidecarClient — feature flag on', () => {
     });
   });
 });
+
+describe('sidecarClient — getClimaSnapshot elevation (gradiente térmico)', () => {
+  beforeEach(() => {
+    enableFlag();
+  });
+
+  const okSnap = { fetched_at: 't', enso_status: { phase: 'neutral' } };
+
+  it('incluye elevation en el query string cuando es válida', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(200, okSnap));
+    const { getClimaSnapshot } = await importFresh();
+    await getClimaSnapshot({ lat: 4.5288, lng: -73.9236, elevation: 2580 });
+    const url = fetchMock.mock.calls[0][0];
+    expect(url).toContain('lat=4.5288');
+    expect(url).toContain('lng=-73.9236');
+    expect(url).toContain('elevation=2580');
+  });
+
+  it('omite elevation si no se pasa (Open-Meteo usa su grilla)', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(200, okSnap));
+    const { getClimaSnapshot } = await importFresh();
+    await getClimaSnapshot({ lat: 4.5288, lng: -73.9236 });
+    expect(fetchMock.mock.calls[0][0]).not.toContain('elevation');
+  });
+
+  it('descarta elevation fuera de rango físico (clamp defensivo)', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(200, okSnap));
+    const { getClimaSnapshot } = await importFresh();
+    // 8467 m ≈ una altitud en pies mal interpretada → se descarta.
+    await getClimaSnapshot({ lat: 4.5, lng: -73.9, elevation: 8467 });
+    expect(fetchMock.mock.calls[0][0]).not.toContain('elevation');
+  });
+
+  it('descarta elevation NaN sin romper el request de coords', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(200, okSnap));
+    const { getClimaSnapshot } = await importFresh();
+    await getClimaSnapshot({ lat: 4.5, lng: -73.9, elevation: Number.NaN });
+    const url = fetchMock.mock.calls[0][0];
+    expect(url).toContain('lat=4.5');
+    expect(url).not.toContain('elevation');
+  });
+});

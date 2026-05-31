@@ -489,21 +489,37 @@ export async function getPrecioSipsa(action, args) {
 }
 
 /**
- * GET `${BASE}/clima/snapshot` con lat/lng opcionales (#316).
+ * GET `${BASE}/clima/snapshot` con lat/lng (+ elevation opcional) (#316).
  *
  * Devuelve el snapshot completo: ENSO + 7d forecast + alertas. Si no se pasan
  * coords, el sidecar responde solo el bloque ENSO (NOAA + IDEAM + CIIFEN) y
  * deja `openmeteo: null` + `alertas_locales: []`.
  *
+ * `elevation` (msnm reales de la finca): Open-Meteo corrige la temperatura por
+ * gradiente térmico (lapse rate ~6.5 °C/1000 m) usando la elevación que se le
+ * pase. Si NO se pasa, Open-Meteo usa la elevación de SU grilla, que para un
+ * municipio andino cae cerca de la CABECERA (valle/casco urbano), no de la
+ * finca en ladera alta — y el pronóstico sale varios grados más cálido de lo
+ * real (p. ej. finca a 2580 msnm vs cabecera ~1900 msnm: ~4–5 °C de
+ * diferencia). Pasar la altitud real corrige eso. El sidecar reenvía este
+ * parámetro a Open-Meteo (`?elevation=`).
+ *
  * Reglas: flag off → null. Offline → null. HTTP ≥400 → null. Nunca throw.
  *
- * @param {{ lat?: number, lng?: number }} [opts]
+ * @param {{ lat?: number, lng?: number, elevation?: number }} [opts]
  * @returns {Promise<null | object>}
  */
 export async function getClimaSnapshot(opts = {}) {
   const query = {};
   if (typeof opts.lat === 'number' && Number.isFinite(opts.lat)) query.lat = opts.lat;
   if (typeof opts.lng === 'number' && Number.isFinite(opts.lng)) query.lng = opts.lng;
+  // elevation: solo si es número finito y físicamente plausible (msnm). El
+  // techo de 6000 m cubre el pico más alto de Colombia (Cristóbal Colón,
+  // 5775 m) con margen y descarta basura tipo pies, sensores locos o NaN.
+  if (typeof opts.elevation === 'number' && Number.isFinite(opts.elevation)
+      && opts.elevation >= -100 && opts.elevation <= 6000) {
+    query.elevation = opts.elevation;
+  }
   return getJson('/clima/snapshot', query, TOOL_TIMEOUT_MS);
 }
 

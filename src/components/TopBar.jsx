@@ -10,6 +10,7 @@ import useFincaActiveStore from '../services/fincaActiveStore';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
 import useAssetStore from '../store/useAssetStore';
 import { FARM_CONFIG } from '../config/defaults';
+import { getProfile } from '../services/userProfileService';
 
 /**
  * TopBar, header persistente con identidad del operador (DR-030 QW2).
@@ -53,9 +54,21 @@ export default function TopBar({ onNavigate, onLogout }) {
   const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
   const fincas = useFincaActiveStore((s) => s.fincas);
   const activeFinca = fincas.find((f) => f.slug === activeFincaSlug);
-  const municipio = activeFinca?.municipio || FARM_CONFIG?.MUNICIPIO || null;
-  const vereda = activeFinca?.vereda || null;
-  const altitud = activeFinca?.altitud || FARM_CONFIG?.ALTITUD_MSNM || null;
+  // `tick` fuerza re-lectura del perfil cuando el usuario confirma su ubicación
+  // en LocationDetectedScreen (evento 'chagra:location-updated'), que la guarda
+  // en el PERFIL (userProfileService), no en fincaActiveStore. Sin esto la
+  // línea de ubicación bajo el nombre se quedaría vacía para el piloto que
+  // solo pasó por esa pantalla.
+  const [profileTick, setProfileTick] = useState(0);
+  const profile = (() => { void profileTick; return getProfile(); })();
+  // Ubicación bajo el nombre: finca activa (multi-finca) → perfil (onboarding/
+  // ubicación detectada) → FARM_CONFIG (demo). Altitud real de la finca para que
+  // el campesino vea su piso térmico, no la cabecera.
+  const municipio = activeFinca?.municipio || profile?.municipio || FARM_CONFIG?.MUNICIPIO || null;
+  // Vereda: el dataset DANE no la trae; solo aparece si el perfil/finca la tiene
+  // de onboarding manual. Si no, se omite sin romper (municipio + altitud bastan).
+  const vereda = activeFinca?.vereda || profile?.vereda || null;
+  const altitud = activeFinca?.altitud || profile?.finca_altitud || profile?.altitud || FARM_CONFIG?.ALTITUD_MSNM || null;
 
   // "Respira" animación del logo Chagra cuando hay actividad de fondo
   // (warm-up del agente IA o sync con FarmOS). Sensación de "agente vivo
@@ -77,11 +90,14 @@ export default function TopBar({ onNavigate, onLogout }) {
         setOperatorName(e.detail.value || 'Operador');
       }
     };
+    const onLocationUpdated = () => setProfileTick((t) => t + 1);
     window.addEventListener('storage', onStorage);
     window.addEventListener('chagra:operator-update', onOperatorUpdate);
+    window.addEventListener('chagra:location-updated', onLocationUpdated);
     return () => {
       window.removeEventListener('storage', onStorage);
       window.removeEventListener('chagra:operator-update', onOperatorUpdate);
+      window.removeEventListener('chagra:location-updated', onLocationUpdated);
     };
   }, []);
 
@@ -141,8 +157,8 @@ export default function TopBar({ onNavigate, onLogout }) {
               <MapPin size={10} className="shrink-0 text-slate-500" aria-hidden="true" />
               <span className="truncate">
                 {municipio && <span>{municipio.split(',')[0]}</span>}
-                {vereda && <span> · {vereda}</span>}
-                {altitud && <span> · {altitud}m</span>}
+                {vereda && <span>, vereda {vereda}</span>}
+                {altitud && <span> · {altitud} msnm</span>}
               </span>
             </div>
           )}
