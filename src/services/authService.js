@@ -14,10 +14,26 @@ const CLIENT_ID = import.meta.env.VITE_FARMOS_CLIENT_ID;
 const REDIRECT_URI = `${window.location.origin}/callback`;
 
 /**
- * DEPRECATION NOTICE: Password grant será removido después de 2026-06-25.
- * Usar Authorization Code + PKCE en su lugar.
+ * DEPRECATION NOTICE: Password grant será removido después de esta fecha.
+ *
+ * RED DE SEGURIDAD (2026-05-30): la fecha se MOVIÓ de 2026-06-25 a 2026-09-25.
+ * Motivo: el flujo Authorization Code + PKCE existía escrito pero MUERTO (no
+ * estaba cableado a la UI ni al router). Si la fecha original se cumplía antes
+ * de que PKCE estuviera cableado, probado en staging y con el redirect_uri de
+ * producción registrado en el cliente OAuth de farmOS, TODOS los usuarios
+ * quedaban sin poder loguearse (password grant lanza error y no había
+ * alternativa viva). Verificado empíricamente contra el backend que el cliente
+ * de producción NO tiene PKCE habilitado ni el redirect_uri de producción
+ * registrado, así que el corte NO debe activarse hasta que el operador
+ * complete esos pasos backend. Mover la fecha es el seguro inmediato.
+ *
+ * NO acercar de vuelta esta fecha hasta que se cumpla, en producción:
+ *   1. redirect_uri de la PWA registrado en el cliente OAuth de farmOS.
+ *   2. PKCE habilitado en el cliente (cliente público / pkce on).
+ *   3. VITE_FARMOS_CLIENT_ID seteado en el build prod al cliente correcto.
+ *   4. Flujo probado end-to-end en staging.
  */
-const PASSWORD_GRANT_DEPRECATION_DATE = new Date('2026-06-25');
+const PASSWORD_GRANT_DEPRECATION_DATE = new Date('2026-09-25');
 const PASSWORD_GRANT_DEPRECATED = Date.now() > PASSWORD_GRANT_DEPRECATION_DATE.getTime();
 
 /**
@@ -146,7 +162,8 @@ export const exchangeCodeForToken = async (code, state) => {
 /**
  * Autenticación OAuth2 Password Grant (LEGACY - DEPRECATED).
  *
- * ⚠️ DEPRECATION NOTICE: Este método será removido después de 2026-06-25.
+ * ⚠️ DEPRECATION NOTICE: Este método será removido después de la fecha
+ * PASSWORD_GRANT_DEPRECATION_DATE (movida a 2026-09-25 como red de seguridad).
  * Usar initiateAuthorizationCodeFlow + exchangeCodeForToken en su lugar.
  *
  * @param {string} username
