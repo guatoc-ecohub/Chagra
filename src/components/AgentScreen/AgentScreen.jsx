@@ -28,6 +28,7 @@ import { streamChatViaSidecar, isAgentStreamingEnabled } from '../../services/st
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
 import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, postValidate, getClimaIdeam } from '../../services/sidecarClient';
 import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, stripRoleLeak } from '../../services/agentService';
+import { applyOutputGuards } from '../../services/outputGuards';
 import { getProfile } from '../../services/userProfileService';
 import { regionFromProfile } from '../../services/ensoContext';
 // Bug UX 2026-05-30: preservar respuesta parcial ante abort/timeout/cancel.
@@ -1432,7 +1433,27 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       // cubre el 100% de los casos). Va ANTES del voseo para no analizar
       // basura, y el resultado se persiste/renderea/habla ya saneado.
       const deLeaked = stripRoleLeak(rawResponse);
-      const response = applyVoseoFilter(deLeaked, { formality: 'usted' });
+      const voseoSafe = applyVoseoFilter(deLeaked, { formality: 'usted' });
+      // GUARDAS DETERMINISTAS sobre la SALIDA (bench 10 prompts 2026-05-30: el
+      // modelo TIENE los hechos en el grounding pero razona mal —invierte
+      // viabilidad, INVENTA agroquímicos sintéticos, recomienda invasoras—).
+      // Enforcean los hechos de resolvedEntities (viabilidad / es_invasora /
+      // altitud_min/max + alternativas_viables) + la altitud de la finca sobre
+      // el texto ya generado, ANTES de mostrarlo/persistirlo/hablarlo. PURAS y
+      // SÍNCRONAS: CERO latencia nueva. Telemetría en localStorage
+      // (chagra:output_guard_triggers). Degradan con gracia (sin entities no
+      // hacen nada salvo el guard de agroquímico, que usa denylist propia).
+      const guardAltitud =
+        (fincaActiva && fincaActiva.altitud) ||
+        (() => { try { const p = getProfile(); return (p && p.finca_altitud) || null; } catch (_) { return null; } })();
+      const guarded = applyOutputGuards(voseoSafe, {
+        resolvedEntities,
+        fincaAltitud: guardAltitud,
+      });
+      if (guarded.modified) {
+        console.debug('[guards] salida corregida', { reasons: guarded.reasons });
+      }
+      const response = guarded.text;
       agentSounds.chime();
 
       const { intent } = parseIntent(text);
