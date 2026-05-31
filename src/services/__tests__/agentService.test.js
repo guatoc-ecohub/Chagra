@@ -177,6 +177,29 @@ describe('agentService — Task #202 Profile Context', () => {
       const rules = generateSourceCitationRules();
       expect(rules).toContain('No tengo una fuente confiable');
     });
+
+    // Regresión anti-alucinación (incidente prod 2026-05-30): "tomate de
+    // árbol" → "Solanum lycopersicum var. cerasiforme" (FALSO; lo correcto es
+    // Solanum betaceum). El grounding del sidecar venía muerto y el LLM
+    // inventó el binomio. Endurecemos la regla: solo se cita un binomio si
+    // viene del grounding/catálogo provisto.
+    it('debería incluir regla dura de binomio solo desde el grounding', () => {
+      const rules = generateSourceCitationRules();
+      expect(rules).toContain('REGLA CRÍTICA DE NOMBRES CIENTÍFICOS');
+      expect(rules).toContain('NO inventes el binomio');
+      expect(rules).toContain('grounding/catálogo provisto');
+    });
+
+    it('debería mandar usar SOLO el nombre común cuando no hay binomio en grounding', () => {
+      const rules = generateSourceCitationRules();
+      expect(rules).toContain('usa SOLO el nombre común');
+    });
+
+    it('debería referenciar el incidente tomate de árbol → betaceum como ejemplo', () => {
+      const rules = generateSourceCitationRules();
+      expect(rules).toContain('tomate de árbol');
+      expect(rules).toContain('Solanum betaceum');
+    });
   });
 
   describe('generateUserDataRules', () => {

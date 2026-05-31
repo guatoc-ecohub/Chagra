@@ -483,6 +483,63 @@ test.describe('AgentScreen — sidecar pipeline (flag-dependent)', () => {
     expect(llmSeen).toBe(true);
   });
 
+  test('Caso G2 — tomate de árbol inyecta Solanum betaceum y NUNCA el cherry inventado (incidente prod 2026-05-30)', async ({ page }) => {
+    // Regresión del bug de grounding muerto: el sidecar /resolve-entities
+    // devolvía entities:[] y el LLM inventaba "tomate de árbol = Solanum
+    // lycopersicum var. cerasiforme" (eso es tomate CHERRY). Lo correcto es
+    // Solanum betaceum. Con el grounding arreglado, el sidecar resuelve
+    // betaceum y el pipeline DEBE inyectarlo en el system prompt del LLM.
+    //
+    // Verificación fuerte: interceptamos el body de la request al LLM y
+    // asertamos que el binomio CANÓNICO (Solanum betaceum) viaja en el
+    // grounding, y que el binomio FALSO (cerasiforme) NO está presente.
+    let systemPromptSeen = '';
+    await page.context().route('**/api/ollama/v1/chat/completions', (route) => {
+      try {
+        const body = JSON.parse(route.request().postData() || '{}');
+        const sys = (body.messages || [])
+          .filter((m) => m.role === 'system')
+          .map((m) => m.content)
+          .join('\n');
+        systemPromptSeen = sys;
+      } catch {
+        // body no-parseable: dejamos systemPromptSeen vacío, las aserciones
+        // de abajo fallarán con un mensaje claro.
+      }
+      route.fulfill({
+        status: 200,
+        contentType: 'text/event-stream',
+        body: buildSSEResponse(
+          'El tomate de árbol (Solanum betaceum) se siembra entre 1800 y 2800 msnm.'
+        ),
+      });
+    });
+    await mockSidecar(page, {
+      entities: [
+        {
+          mentioned: 'tomate de arbol',
+          kind: 'species',
+          canonical_id: 'solanum_betaceum',
+          nombre_comun: 'Tomate de árbol / Tamarillo',
+          nombre_cientifico: 'Solanum betaceum Cav.',
+          confidence: 1.0,
+        },
+      ],
+    });
+
+    await gotoAgentScreen(page);
+    await askAgent(page, 'dame consejos para sembrar tomate de árbol');
+
+    // La respuesta correcta (betaceum) llega y se renderiza.
+    await expect(page.getByText(/Solanum betaceum/)).toBeVisible({ timeout: 30_000 });
+
+    // El grounding inyectó el binomio canónico al system prompt…
+    expect(systemPromptSeen).toContain('Solanum betaceum');
+    expect(systemPromptSeen).toContain('solanum_betaceum');
+    // …y JAMÁS el binomio cherry que el LLM alucinó en el incidente.
+    expect(systemPromptSeen).not.toContain('cerasiforme');
+  });
+
   test('Caso H — tool MCP grounded produce badge "Catálogo verificado"', async ({ page }) => {
     // NLU devuelve use_tool=true tool=get_species. Tool result trae
     // matches_count=1 → computeSourceMetadata pone grounded=true →

@@ -287,7 +287,9 @@ Toda información técnica (altitud, siembra, cosecha, manejo, plagas, clima, et
 Si NO tienes una fuente verificable para un dato, di explícitamente:
 "No tengo una fuente confiable para este dato específico. Te recomiendo consultar con [técnico local/agrónomo/IDEAM]."
 
-NUNCA inventes datos ni fuentes. Es preferible decir "no tengo el dato" que fabricar una cita.`;
+NUNCA inventes datos ni fuentes. Es preferible decir "no tengo el dato" que fabricar una cita.
+
+REGLA CRÍTICA DE NOMBRES CIENTÍFICOS (BINOMIO): solo puedes citar un nombre científico (binomio Linneano, p. ej. "Solanum betaceum") si proviene del grounding/catálogo provisto en este mensaje — bloques "=== ENTIDADES RESUELTAS ===" o "=== EVIDENCIA AUTORITATIVA ===". Si la planta/plaga NO aparece en esos bloques, NO inventes el binomio: usa SOLO el nombre común tal cual lo dijo el usuario, sin paréntesis con nombre científico. Inventar un binomio por similitud fonética o "porque suena parecido" es alucinación grave (incidente prod 2026-05-30: "tomate de árbol" respondido como "Solanum lycopersicum var. cerasiforme" —cherry— cuando lo correcto es Solanum betaceum). Ante la duda: nombre común, sin binomio.`;
 }
 
 /**
