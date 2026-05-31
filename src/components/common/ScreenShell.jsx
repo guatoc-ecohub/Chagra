@@ -85,10 +85,10 @@ export const ScreenShell = ({ title, onBack, onHome, icon: Icon, children, actio
                     <NotificationsBell onNavigate={navigateGlobal} />
                 </div>
             </header>
-            {/* Feedback piloto #5 (Lili 2026-05-18): los FABs flotantes (MicFab,
-                FieldFeedback, AgentFab, banners) tapaban los CTAs del final de
-                cada screen. Padding-bottom defensivo que respeta safe-area iOS
-                + alto suficiente para los 3 FABs apilados verticalmente. */}
+            {/* Feedback piloto #5 (Lili 2026-05-18): los FABs flotantes
+                (AgentFab, banners) tapaban los CTAs del final de cada screen.
+                Padding-bottom defensivo que respeta safe-area iOS + alto
+                suficiente para los FABs apilados verticalmente. */}
             {/* BUGFIX 2026-05-28 operador: el main tenía `bg-biopunk-pattern`
                 hardcoded que TAPABA la imagen del catálogo seleccionada desde
                 Perfil (el operador veía la foto solo en dashboard, no en
