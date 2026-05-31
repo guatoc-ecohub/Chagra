@@ -28,6 +28,7 @@ import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
 import { execSync } from 'node:child_process';
 import { scoreKeywordsFlexible, scoreWithJudge } from './lib/bench-scorer.mjs';
+import { applyOutputGuards } from '../src/services/outputGuards.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
@@ -716,7 +717,339 @@ async function benchmarkPrompt(promptData, index, total) {
   return results;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// MODO POOL EXTERNO (--prompts): corre un pool CPX-* (must_include / red_flags +
+// criterio semántico) contra UN modelo (default granite3.1-dense:8b), replicando
+// el pipeline REAL de la PWA: resolve-entities → granite → applyOutputGuards →
+// post-validate → scoring. --guards default ON. --judge usa el LLM-judge
+// semántico (mistral-nemo:12b) como criterio de PASS sustantivo, NO literal.
+// ─────────────────────────────────────────────────────────────────────────────
+
+function parsePoolArgs(argv) {
+  const args = { prompts: null, sample: null, seed: null, model: 'granite3.1-dense:8b', guards: true };
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    if (a === '--prompts') args.prompts = argv[++i];
+    else if (a === '--sample') args.sample = parseInt(argv[++i], 10);
+    else if (a === '--seed') args.seed = parseInt(argv[++i], 10);
+    else if (a === '--model') args.model = argv[++i];
+    else if (a === '--guards') args.guards = true;
+    else if (a === '--no-guards') args.guards = false;
+  }
+  return args;
+}
+
+/** Altitudes regionales conocidas para prompts sin cifra explícita (msnm). */
+const REGION_ALTITUDE_FALLBACK = {
+  'CPX-003': 2400, // Boyacá silvopastoril frío-templado
+  'CPX-006': 2150, // Villa de Leyva, altiplano cundiboyacense
+  'CPX-007': 150, // Montes de María, Caribe seco/cálido
+  'CPX-008': 1500, // Líbano Tolima, zona cafetera
+  'CPX-009': 50, // Chocó, tierra caliente Pacífico
+  'CPX-010': 450, // Villavicencio, llano / tierra caliente
+};
+const DEFAULT_ANDEAN_ALTITUDE = 2200;
+
+/** Extrae la altitud (msnm) del texto del prompt; fallback regional/andino. */
+function extractFincaAltitud(promptText, promptId) {
+  const t = String(promptText || '');
+  const m =
+    t.match(/(\d[\d.]*)\s*(?:metros|msnm)/i) ||
+    t.match(/(?:a|como a)\s+(\d[\d.]*)\b/i) ||
+    t.match(/(\d\.\d{3})\b/);
+  if (m) {
+    const n = Number(m[1].replace(/\./g, ''));
+    if (Number.isFinite(n) && n >= 0 && n <= 6000) return n;
+  }
+  if (REGION_ALTITUDE_FALLBACK[promptId] != null) return REGION_ALTITUDE_FALLBACK[promptId];
+  return DEFAULT_ANDEAN_ALTITUDE;
+}
+
+function _poolNorm(s) {
+  return String(s || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '');
+}
+
+/**
+ * Score LITERAL must_include / red_flags (la métrica vieja, 1/10). Se conserva
+ * SOLO como señal secundaria de la tabla comparativa. El PASS oficial cuando
+ * --judge está activo lo dicta el juez semántico (scorePoolSemantic).
+ */
+function scorePoolLiteral(text, prompt) {
+  const n = _poolNorm(text);
+  const must = Array.isArray(prompt.must_include) ? prompt.must_include : [];
+  const flags = Array.isArray(prompt.red_flags) ? prompt.red_flags : [];
+  const mustHit = must.filter((m) => n.includes(_poolNorm(m)));
+  const mustMiss = must.filter((m) => !n.includes(_poolNorm(m)));
+  const flagHit = flags.filter((f) => n.includes(_poolNorm(f)));
+  return {
+    pass: mustMiss.length === 0 && flagHit.length === 0,
+    must_total: must.length,
+    must_hit: mustHit.length,
+    must_missing: mustMiss,
+    red_flags_fired: flagHit,
+  };
+}
+
+/**
+ * Score SEMÁNTICO (R3): el juez mistral-nemo:12b decide si la respuesta cumple
+ * el criterio SUSTANTIVO del prompt (pass_fail del fixture), evaluando el fondo,
+ * no la literalidad. Se le pasan must_include como guía y red_flags como vetos.
+ * Degrada a keyword-flexible si el juez no está / falla.
+ */
+function buildPoolJudgePrompt(prompt, text) {
+  const must = (prompt.must_include || []).join('; ');
+  const flags = (prompt.red_flags || []).join('; ');
+  const criterio = prompt.pass_fail || '';
+  return [
+    'Eres un evaluador experto en agroecología colombiana. Decide si la RESPUESTA',
+    'cumple SUSTANTIVAMENTE el criterio. Importa el FONDO (conceptos correctos),',
+    'NO la literalidad: cuenta como acierto si dice lo mismo con sinónimos o lemas.',
+    '',
+    `PREGUNTA: ${prompt.prompt || prompt.query}`,
+    '',
+    `CRITERIO DE APROBACIÓN: ${criterio}`,
+    '',
+    `CONCEPTOS QUE DEBE CUBRIR (guía de fondo, no literal): ${must}`,
+    '',
+    `BANDERAS ROJAS — si la respuesta INCURRE en alguna de estas, NO cumple: ${flags}`,
+    '',
+    `RESPUESTA DEL MODELO: ${text}`,
+    '',
+    'Devuelve SOLO un JSON en una línea: {"cumple": true|false, "score": 0.0-1.0}',
+    'donde "cumple"=true sólo si cubre el fondo Y no incurre en ninguna bandera roja.',
+  ].join('\n');
+}
+
+function parsePoolVerdict(raw) {
+  if (typeof raw !== 'string') return null;
+  const jsonMatch = raw.match(/\{[^{}]*"cumple"[^{}]*\}/i);
+  if (jsonMatch) {
+    try {
+      const obj = JSON.parse(jsonMatch[0]);
+      if (typeof obj.cumple === 'boolean') {
+        let score = Number(obj.score);
+        if (!Number.isFinite(score) || score < 0 || score > 1) score = obj.cumple ? 1 : 0;
+        return { cumple: obj.cumple, score };
+      }
+    } catch (_) {
+      /* fall through */
+    }
+  }
+  const up = raw.toUpperCase();
+  if (/NO[_\s]?CUMPLE/.test(up)) return { cumple: false, score: 0 };
+  if (/CUMPLE/.test(up)) return { cumple: true, score: 1 };
+  return null;
+}
+
+async function scorePoolSemantic(prompt, text) {
+  // Fallback keyword-flexible (sinónimos/lemas) usando must_include como conceptos.
+  const kwFlex = scoreKeywordsFlexible(text, prompt.must_include || []);
+  const kwScore = kwFlex.total > 0 ? kwFlex.matched / kwFlex.total : 0;
+  // Veto literal de red_flags incluso en el fallback (un red_flag literal = FAIL).
+  const lit = scorePoolLiteral(text, prompt);
+  const fallback = {
+    cumple: kwScore >= 0.5 && lit.red_flags_fired.length === 0,
+    score: kwScore,
+    source: 'keywords',
+  };
+  if (!USE_JUDGE) return fallback;
+  try {
+    const raw = await judgeOllamaCall(buildPoolJudgePrompt(prompt, text));
+    const verdict = parsePoolVerdict(raw);
+    if (!verdict) return fallback;
+    return { cumple: verdict.cumple, score: verdict.score, source: 'judge' };
+  } catch (_) {
+    return fallback;
+  }
+}
+
+async function runExternalPool(args) {
+  const poolRaw = JSON.parse(readFileSync(args.prompts, 'utf-8'));
+  let pool = Array.isArray(poolRaw) ? poolRaw : poolRaw.prompts || [];
+  const fixtureId = poolRaw.fixture_id || 'external-pool';
+
+  if (args.sample && args.sample < pool.length) {
+    const seed = Number.isFinite(args.seed) ? args.seed : 1;
+    let s = seed >>> 0 || 1;
+    const rng = () => ((s = (s * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
+    const idx = pool.map((_, i) => i).sort(() => rng() - 0.5).slice(0, args.sample);
+    pool = idx.sort((a, b) => a - b).map((i) => pool[i]);
+  }
+
+  console.log('[bench] === MODO POOL EXTERNO ===');
+  console.log(`[bench] Pool: ${args.prompts} (${fixtureId}) — ${pool.length} prompts`);
+  console.log(`[bench] Modelo: ${args.model}`);
+  console.log(`[bench] Guards (applyOutputGuards): ${args.guards ? 'ON' : 'OFF'}`);
+  console.log(`[bench] Scoring PASS: ${USE_JUDGE ? `SEMÁNTICO (judge ${JUDGE_MODEL})` : 'keyword-flexible'} + veto red_flags`);
+  console.log(`[bench] Sidecar: ${SIDECAR_URL} | Ollama: ${OLLAMA_URL}`);
+
+  if (!existsSync(BENCH_RUNS_DIR)) mkdirSync(BENCH_RUNS_DIR, { recursive: true });
+
+  const rows = [];
+  const startTime = performance.now();
+
+  for (let i = 0; i < pool.length; i++) {
+    const p = pool[i];
+    const id = p.id || `P-${i + 1}`;
+    const query = p.prompt || p.query;
+    const fincaAltitud = extractFincaAltitud(query, id);
+    console.log(`\n[bench] ${i + 1}/${pool.length} ${id} (alt=${fincaAltitud}m): ${query.slice(0, 60)}...`);
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+    let row = { id, region: p.region || null, query, finca_altitud: fincaAltitud };
+
+    try {
+      const er = await resolveEntities(query);
+      const entities = er.entities;
+      const systemPrompt = buildEnrichedSystemPrompt(entities);
+      const oll = await callOllama(args.model, systemPrompt, query, controller.signal);
+      const rawText = oll.response;
+
+      let guardedText = rawText;
+      let guardRes = { modified: false, reasons: [] };
+      if (args.guards) {
+        guardRes = applyOutputGuards(rawText, { resolvedEntities: entities, fincaAltitud });
+        guardedText = guardRes.text;
+      }
+
+      const pv = await postValidate(query, guardedText);
+
+      // Score LITERAL (señal vieja, tabla) + SEMÁNTICO (PASS oficial).
+      const litRaw = scorePoolLiteral(rawText, p);
+      const litGuarded = scorePoolLiteral(guardedText, p);
+      const semRaw = await scorePoolSemantic(p, rawText);
+      const semGuarded = await scorePoolSemantic(p, guardedText);
+
+      clearTimeout(timer);
+
+      row = {
+        ...row,
+        entities_grounded: entities.length,
+        entities: entities.map((e) => ({
+          mentioned: e.mentioned,
+          kind: e.kind,
+          nombre_cientifico: e.nombre_cientifico,
+          es_invasora: e.es_invasora,
+          altitud_min: e.altitud_min,
+          altitud_max: e.altitud_max,
+        })),
+        latency_inference_ms: oll.latency_ms,
+        response_raw: rawText,
+        response_guarded: guardedText,
+        guards_modified: guardRes.modified,
+        guards_reasons: guardRes.reasons,
+        post_validate: {
+          validated: pv.validated,
+          hallucinated: pv.hallucinated,
+          detected_count: pv.detected_count,
+          age_available: pv.age_available,
+        },
+        score_literal_raw: litRaw,
+        score_literal_guarded: litGuarded,
+        score_semantic_raw: semRaw,
+        score_semantic_guarded: semGuarded,
+        pass_raw: semRaw.cumple,
+        pass_guarded: semGuarded.cumple,
+        pass_literal_raw: litRaw.pass,
+        pass_literal_guarded: litGuarded.pass,
+        error: null,
+      };
+      console.log(
+        `    SEM raw:${semRaw.cumple ? 'PASS' : 'FAIL'} → guarded:${semGuarded.cumple ? 'PASS' : 'FAIL'} (${semGuarded.source}) ` +
+          `| LIT must ${litGuarded.must_hit}/${litGuarded.must_total} flags ${litGuarded.red_flags_fired.length} ` +
+          `| guards:${guardRes.modified ? guardRes.reasons.join(';') : 'none'} | ${oll.latency_ms.toFixed(0)}ms`,
+      );
+    } catch (err) {
+      clearTimeout(timer);
+      const msg = err.message || String(err);
+      if (checkMaxwellError(msg)) maxwellErrorDetected = true;
+      row = { ...row, error: msg, pass_raw: false, pass_guarded: false };
+      console.log(`    ERROR: ${msg.slice(0, 80)}`);
+    }
+
+    rows.push(row);
+
+    // Vigilancia térmica GPU Maxwell: pausa si > 88°C.
+    try {
+      const tempOut = execSync(
+        'nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null || PATH=$PATH:/run/current-system/sw/bin nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null',
+        { encoding: 'utf-8', shell: '/bin/bash' },
+      ).trim();
+      const temp = parseInt(tempOut, 10);
+      if (Number.isFinite(temp)) {
+        console.log(`    [gpu] ${temp}°C`);
+        if (temp > 88) {
+          console.log(`    [gpu] ⚠️  ${temp}°C > 88 — pausando 60s para enfriar`);
+          await new Promise((r) => setTimeout(r, 60000));
+        }
+      }
+    } catch (_) {
+      /* nvidia-smi no disponible: continuar */
+    }
+
+    if (i < pool.length - 1) await new Promise((r) => setTimeout(r, 2000));
+  }
+
+  const totalMin = (performance.now() - startTime) / 1000 / 60;
+  const passRaw = rows.filter((r) => r.pass_raw).length;
+  const passGuarded = rows.filter((r) => r.pass_guarded).length;
+  const passLiteralRaw = rows.filter((r) => r.pass_literal_raw).length;
+  const passLiteralGuarded = rows.filter((r) => r.pass_literal_guarded).length;
+
+  const dateStr = new Date().toISOString().split('T')[0];
+  const outPath = join(BENCH_RUNS_DIR, `external-pool-${fixtureId}-semantic-${dateStr}.json`);
+  writeFileSync(
+    outPath,
+    JSON.stringify(
+      {
+        fixture_id: fixtureId,
+        model: args.model,
+        guards: args.guards,
+        judge: USE_JUDGE ? JUDGE_MODEL : null,
+        generated_at: new Date().toISOString(),
+        pass_semantic_raw: passRaw,
+        pass_semantic_guarded: passGuarded,
+        pass_literal_raw: passLiteralRaw,
+        pass_literal_guarded: passLiteralGuarded,
+        total: rows.length,
+        rows,
+      },
+      null,
+      2,
+    ),
+  );
+
+  console.log('\n[bench] ===== RESULTADO POOL EXTERNO =====');
+  console.log(`[bench] Modelo: ${args.model} | Guards: ${args.guards ? 'ON' : 'OFF'} | ${totalMin.toFixed(1)}min`);
+  console.log(`[bench] SEMÁNTICO sin guards: ${passRaw}/${rows.length}  | con guards: ${passGuarded}/${rows.length}`);
+  console.log(`[bench] LITERAL   sin guards: ${passLiteralRaw}/${rows.length}  | con guards: ${passLiteralGuarded}/${rows.length}`);
+  console.log('[bench] Tabla:');
+  for (const r of rows) {
+    if (r.error) {
+      console.log(`[bench]   ${r.id}: ERROR ${r.error.slice(0, 40)}`);
+      continue;
+    }
+    const delta = r.pass_raw === r.pass_guarded ? '=' : r.pass_guarded ? '↑' : '↓';
+    console.log(
+      `[bench]   ${r.id}: SEM raw ${r.pass_raw ? 'PASS' : 'FAIL'} → guarded ${r.pass_guarded ? 'PASS' : 'FAIL'} ${delta} ` +
+        `| LIT miss:[${r.score_literal_guarded.must_missing.join(', ')}] flags:[${r.score_literal_guarded.red_flags_fired.join(', ')}] ` +
+        `| guards:${r.guards_modified ? r.guards_reasons.join(';') : 'none'}`,
+    );
+  }
+  console.log(`\n[bench] Raw output: ${outPath}`);
+  if (maxwellErrorDetected) console.log('[bench] ⚠️  Maxwell sm_5.2 error detectado durante el run.');
+  return outPath;
+}
+
 async function main() {
+  const poolArgs = parsePoolArgs(process.argv.slice(2));
+  if (poolArgs.prompts) {
+    return runExternalPool(poolArgs);
+  }
   console.log('[bench] Agente Chagra completo — Benchmark LARGO');
   console.log(`[bench] Modelos: ${Object.values(MODELS).join(', ')}`);
   console.log(`[bench] Prompts: ${PROMPTS.length}`);
