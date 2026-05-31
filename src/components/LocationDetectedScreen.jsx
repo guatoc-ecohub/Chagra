@@ -24,7 +24,7 @@ import {
 } from '../services/locationService';
 import { useFincaActiveStore } from '../services/fincaActiveStore';
 import { saveProfile } from '../services/userProfileService';
-import { getDepartamentos, getMunicipios } from '../utils/colombiaLocations';
+import { getDepartamentos, getMunicipios, findMunicipio } from '../utils/colombiaLocations';
 
 // Fix del marcador por defecto de Leaflet (bundlers no resuelven las URLs
 // relativas del CSS). Mismo patrón que MultiFincaGlobe.
@@ -251,7 +251,7 @@ export default function LocationDetectedScreen({
   const [query, setQuery] = useState(initialMunicipio);
   const [searchError, setSearchError] = useState(null);
   // PR4 (#187) — cascade dropdown offline para cuando Nominatim falla o el
-  // usuario no tiene buena ortografía. 32 dptos × municipios curados.
+  // usuario no tiene buena ortografía. 33 deptos × 1.122 municipios (DANE #338).
   const [cascadeOpen, setCascadeOpen] = useState(false);
   const [cascadeDpto, setCascadeDpto] = useState('');
   const [geoState, setGeoState] = useState('idle'); // idle | detecting | denied | unavailable
@@ -356,20 +356,38 @@ export default function LocationDetectedScreen({
     setLoading(true);
     setSearchError(null);
     try {
-      const hit = await forwardGeocode(q);
+      // 1) OFFLINE-FIRST: resolver contra el dataset DANE embebido (1.122
+      //    municipios). Funciona sin red y trae municipio + departamento +
+      //    altitud curada directamente. Solo si no hay match local caemos a
+      //    Nominatim online.
+      const local = findMunicipio(q);
+      const hit =
+        local != null
+          ? {
+              lat: local.lat,
+              lng: local.lng,
+              municipio: local.name,
+              departamento: local.departamento,
+            }
+          : await forwardGeocode(q);
       if (!hit) {
         setSearchError(
           'No encontramos ese lugar. Revisa la escritura o intenta con "Municipio, Departamento".',
         );
         return;
       }
-      const enriched = await resolveUbicacion({ lat: hit.lat, lng: hit.lng });
-      // Preferir el municipio/departamento del forward-geocode si el
-      // reverse no lo trajo.
+      const enriched = await resolveUbicacion({
+        lat: hit.lat,
+        lng: hit.lng,
+        altitud: local?.altitud ?? null,
+      });
+      // Preferir SIEMPRE el municipio/departamento de la fuente que disparó la
+      // búsqueda (local DANE o forward-geocode) sobre el reverse-geocode, que a
+      // veces devuelve variantes con tildes raras.
       setLoc({
         ...enriched,
-        municipio: enriched.municipio || hit.municipio,
-        departamento: enriched.departamento || hit.departamento,
+        municipio: hit.municipio || enriched.municipio,
+        departamento: hit.departamento || enriched.departamento,
       });
     } catch (e) {
       console.warn('[LocationDetected] búsqueda falló:', e);
@@ -380,7 +398,7 @@ export default function LocationDetectedScreen({
   };
 
   /**
-   * PR4 (#187) — selección de un municipio del cascade hardcoded. No usa
+   * PR4 (#187) — selección de un municipio del cascade DANE. No usa
    * Nominatim, resuelve directo con las coordenadas+altitud que vienen en
    * el dataset. resolveUbicacion sigue corriendo en background para enriquecer
    * con piso térmico + recomendaciones de cultivo, pero si falla la red el

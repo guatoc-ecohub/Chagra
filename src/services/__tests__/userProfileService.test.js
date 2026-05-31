@@ -3,6 +3,7 @@ import {
   PROFILE_QUESTIONS,
   getApplicableQuestions,
   getProfile,
+  getProfileMunicipio,
   saveProfile,
   markProfileDone,
   markProfileSkipped,
@@ -127,5 +128,29 @@ describe('userProfileService (#200)', () => {
       const block = buildUserProfileBlock({ nombre: 'X', nivel_respuestas: 'detallado' });
       expect(block).toMatch(/DETALLADAS/);
     });
+  });
+});
+
+describe('getProfileMunicipio — backfill offline de perfiles viejos (#338)', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('prefiere el campo municipio limpio cuando existe', () => {
+    saveProfile({ municipio: 'Popayán', region: 'otra cosa' });
+    expect(getProfileMunicipio()).toBe('Popayán');
+  });
+
+  it('resuelve municipio desde region (texto libre) en perfiles sin municipio', () => {
+    // Perfil viejo: solo region en texto libre, sin campo municipio.
+    saveProfile({ region: 'Choachí, Cundinamarca' });
+    expect(getProfileMunicipio()).toMatch(/Choach/);
+  });
+
+  it('devuelve null si no hay municipio ni region resoluble', () => {
+    saveProfile({ region: 'Zzqxnoexiste' });
+    expect(getProfileMunicipio()).toBeNull();
+    localStorage.clear();
+    expect(getProfileMunicipio()).toBeNull();
   });
 });

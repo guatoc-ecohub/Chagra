@@ -25,6 +25,8 @@
  * @module userProfileService
  */
 
+import { findMunicipio } from '../utils/colombiaLocations.js';
+
 const PROFILE_PREFIX = 'chagra:profile:';
 const PROFILE_KEY = `${PROFILE_PREFIX}v1`;
 const PROFILE_DONE_KEY = `${PROFILE_PREFIX}done:v1`;
@@ -285,6 +287,28 @@ export function getProfile() {
     console.warn('[userProfile] No se pudo leer el perfil:', e);
     return {};
   }
+}
+
+/**
+ * Municipio "limpio" del usuario para el clima / contexto del agente.
+ *
+ * #338 (consistencia onboarding ↔ finca): los perfiles NUEVOS guardan
+ * `municipio` aparte (lo escribe LocationDetectedScreen al confirmar). Pero los
+ * perfiles VIEJOS — creados antes de ese campo — solo tienen `region` en texto
+ * libre (p. ej. "Choachí, Cundinamarca"). Este helper retrocompatibiliza:
+ * prefiere `municipio`; si falta, intenta resolver `region` contra el dataset
+ * DANE embebido (offline, sin red). Devuelve null si no hay nada resoluble.
+ *
+ * @returns {string|null}
+ */
+export function getProfileMunicipio() {
+  const p = getProfile();
+  if (p.municipio) return p.municipio;
+  if (p.region) {
+    const hit = findMunicipio(p.region);
+    if (hit) return hit.name;
+  }
+  return null;
 }
 
 /**
