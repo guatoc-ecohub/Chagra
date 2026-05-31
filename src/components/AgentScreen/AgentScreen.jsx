@@ -26,7 +26,7 @@ import { streamChatViaSidecar, isAgentStreamingEnabled } from '../../services/st
 // Sidecar agro-mcp (ADR-045 Fase 2 Step B/C). Detrás de feature flag
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
-import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, getClimaIdeam } from '../../services/sidecarClient';
+import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, postValidate, getClimaIdeam } from '../../services/sidecarClient';
 import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, applyVoseoFilter, stripRoleLeak } from '../../services/agentService';
 import { getProfile } from '../../services/userProfileService';
 import { regionFromProfile } from '../../services/ensoContext';
@@ -1371,7 +1371,36 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       // del assistant fue grounded contra el catálogo (tool MCP devolvió
       // match) o fue solo generativo del LLM. ChatBubble lee este metadata
       // para renderizar el badge verde/amber/gris (ver computeSourceMetadata).
-      const sourceMetadata = computeSourceMetadata(toolEvidence);
+      let sourceMetadata = computeSourceMetadata(toolEvidence);
+
+      // Capa 2 anti-alucinación — cross-check de contexto (operador 2026-05-30).
+      // Tras generar la respuesta, le pedimos al sidecar que correlacione cada
+      // binomio Linneano CITADO en el texto con las entidades que la capa 1 ya
+      // resolvió para el turno. Si el LLM citó un nombre científico que SÍ
+      // existe en el catálogo pero NO corresponde a lo que el usuario preguntó
+      // (ej. "Solanum lycopersicum" para 'tomate de árbol' = Solanum betaceum),
+      // lo marcamos como SOSPECHOSO. NO bloquea ni reescribe la respuesta —
+      // solo añade un flag de metadata para un badge no intrusivo ("verifica el
+      // nombre científico"). Solo corre si hubo entidades resueltas (sin ellas
+      // no hay con qué correlacionar). 100% graceful: postValidate devuelve null
+      // ante flag off / offline / timeout / AGE caído → sin advertencia.
+      if (isOnline && isSidecarEnabled() && Array.isArray(resolvedEntities) && resolvedEntities.length > 0) {
+        try {
+          const expected = resolvedEntities
+            .map((e) => e?.nombre_cientifico)
+            .filter((n) => typeof n === 'string' && n.trim().length > 0);
+          if (expected.length > 0) {
+            const pv = await postValidate(response, expected);
+            if (pv && pv.age_available && Array.isArray(pv.suspect) && pv.suspect.length > 0) {
+              sourceMetadata = { ...sourceMetadata, suspect_names: pv.suspect };
+              console.debug('[sidecar] post-validate suspect', { suspect: pv.suspect });
+            }
+          }
+        } catch (pvErr) {
+          // post-validate jamás bloquea el chat — la respuesta ya está lista.
+          console.debug('[sidecar] post-validate fail (sigo sin badge):', pvErr?.message);
+        }
+      }
 
       // A-15 (#248): extraer los edges del grafo AGE que ESTE turno usó como
       // evidencia (café→guamo COMPATIBLE_WITH, plaga→biopreparado CONTROLS,

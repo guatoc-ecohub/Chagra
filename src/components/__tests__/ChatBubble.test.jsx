@@ -89,6 +89,41 @@ describe('ChatBubble — badge de fuente (verificado vs generativo)', () => {
     expect(badge).toHaveTextContent(/Respuesta generativa/i);
   });
 
+  test('Renderiza badge de nombre científico sospechoso cuando metadata.suspect_names tiene datos', () => {
+    const message = {
+      role: 'assistant',
+      content: 'Para el tomate de árbol, Solanum lycopersicum se da en clima frío.',
+      timestamp: Date.now(),
+      metadata: {
+        tool_used: 'get_species',
+        grounded: true,
+        suspect_names: ['Solanum lycopersicum'],
+      },
+    };
+    render(<ChatBubble message={message} />);
+    const badge = screen.getByTestId('suspect-name-badge');
+    expect(badge).toBeInTheDocument();
+    expect(badge).toHaveAttribute('data-source', 'suspect-scientific-name');
+    expect(badge).toHaveTextContent(/nombre científico/i);
+    // El binomio sospechoso va en el title (tooltip), no satura la burbuja.
+    expect(badge).toHaveAttribute('title', expect.stringContaining('Solanum lycopersicum'));
+    // No es voseo: usa "Verifica" (tú/usted colombiano), no "verificá".
+    expect(badge.textContent).not.toMatch(/verificá/i);
+  });
+
+  test('El badge sospechoso NO aparece cuando suspect_names está vacío o ausente', () => {
+    const message = {
+      role: 'assistant',
+      content: 'El tomate de árbol Solanum betaceum se da bien.',
+      timestamp: Date.now(),
+      metadata: { tool_used: 'get_species', grounded: true, suspect_names: [] },
+    };
+    render(<ChatBubble message={message} />);
+    expect(screen.queryByTestId('suspect-name-badge')).not.toBeInTheDocument();
+    // El badge de fuente normal SÍ sigue apareciendo.
+    expect(screen.getByTestId('source-badge')).toBeInTheDocument();
+  });
+
   // #339: la burbuja del assistant NUNCA debe quedar en blanco. Si el LLM
   // devuelve contenido vacío (respuesta degradada, stream sin tokens), se
   // muestra un fallback visible en español colombiano en lugar de un <p>
