@@ -472,11 +472,110 @@ function _fomentaSiembra(textNorm, nombreNorm) {
 }
 
 /**
+ * Divide un texto en oraciones preservando su puntuación final. Heurística
+ * suficiente para español campesino: corta tras `.`, `!`, `?` o salto de línea.
+ * Conserva los delimitadores en cada fragmento.
+ *
+ * @param {string} text
+ * @returns {string[]} oraciones (cada una con su puntuación/espacio final).
+ */
+function _splitSentences(text) {
+  if (typeof text !== 'string' || text.length === 0) return [];
+  // Captura cada oración hasta su signo de cierre (o el fin del texto), con
+  // el espacio/salto que la sigue. El flag `s` no hace falta: `[^.!?\n]`.
+  const matches = text.match(/[^.!?\n]+[.!?\n]*\s*/g);
+  return matches || [text];
+}
+
+/**
+ * REEMPLAZO anti-autocontradicción (fuga viva 2026-05-31). Dado el texto
+ * original del modelo y los nombres (normalizados) de las especies que el
+ * grounding marcó INVIABLE pero el modelo promovió, ELIMINA del texto las
+ * oraciones que presentan esa especie como viable o la fomentan como cultivo.
+ *
+ * Es quirúrgico por oración: solo borra las que (a) mencionan la especie (o su
+ * primer token) Y (b) disparan `_presentaComoViable` o `_fomentaSiembra` para
+ * esa especie. Las oraciones de contexto legítimo (botánica, manejo, frases que
+ * NO la promueven) se conservan. Así la corrección determinística puede liderar
+ * SIN dejar debajo la afirmación opuesta del modelo.
+ *
+ * @param {string} originalText
+ * @param {string[]} nombresNorm — nombres de especies inviables, sin diacríticos.
+ * @returns {string} texto con las oraciones contradictorias removidas (trim).
+ */
+// Fomento ANAFÓRICO: oraciones que mandan a sembrar/plantar/cultivar la
+// especie usando un pronombre objeto ("siémbrala", "plántala", "cultívala",
+// "sembrarla", "ponla") en lugar del nombre. Tras detectar una inviable
+// promovida, estas oraciones de seguimiento también contradicen el veredicto
+// aunque no repitan el nombre. Patrón conservador: verbo de siembra + pronombre
+// femenino/neutro de objeto (-la/-las/-lo/-los) o "ponla/meterla".
+const _ANAPHORIC_PLANTING_RE =
+  /(siembr|sembrar|plant|plantar|cultiv|cultivar|propag|propagar|metel|meterl|pon)[aeiou]*(l[ao]s?)\b/;
+
+/**
+ * REEMPLAZO anti-autocontradicción (fuga viva 2026-05-31). Dado el texto
+ * original del modelo y los nombres (normalizados) de las especies que el
+ * grounding marcó INVIABLE pero el modelo promovió, ELIMINA del texto las
+ * oraciones que presentan esa especie como viable o la fomentan como cultivo.
+ *
+ * Es quirúrgico por oración: borra (a) las que mencionan la especie (o su
+ * primer token) Y disparan promoción para esa especie, y (b) las de fomento
+ * ANAFÓRICO (siémbrala/plántala) que dan seguimiento a la inviable ya nombrada
+ * antes en el texto. Las oraciones de contexto legítimo (botánica, manejo,
+ * frases que NO la promueven) se conservan, para que la corrección
+ * determinística lidere SIN dejar debajo la afirmación opuesta del modelo.
+ *
+ * @param {string} originalText
+ * @param {string[]} nombresNorm — nombres de especies inviables, sin diacríticos.
+ * @returns {string} texto con las oraciones contradictorias removidas (trim).
+ */
+function _stripViabilityPromotion(originalText, nombresNorm) {
+  if (!Array.isArray(nombresNorm) || nombresNorm.length === 0) {
+    return originalText.trim();
+  }
+  const sentences = _splitSentences(originalText);
+  // Una vez que el texto nombró y promovió una inviable, las oraciones de
+  // fomento anafórico que siguen ("siémbrala…") se atribuyen a esa especie.
+  let inviableEnContexto = false;
+  const kept = sentences.filter((sentence) => {
+    const sNorm = _stripDiacritics(sentence);
+    // ¿Alguna especie inviable está promovida EN esta oración (por nombre)?
+    for (const nombreNorm of nombresNorm) {
+      if (!nombreNorm) continue;
+      const first = nombreNorm.split(/\s+/)[0];
+      const mencionada =
+        sNorm.includes(nombreNorm) || (first.length >= 3 && sNorm.includes(first));
+      if (mencionada) {
+        inviableEnContexto = true;
+        if (_presentaComoViable(sNorm, nombreNorm) || _fomentaSiembra(sNorm, nombreNorm)) {
+          return false; // oración contradictoria por nombre → fuera
+        }
+      }
+    }
+    // Fomento anafórico de seguimiento: solo si ya hubo una inviable en el
+    // contexto previo y la oración NO advierte inviabilidad.
+    if (inviableEnContexto && _ANAPHORIC_PLANTING_RE.test(sNorm)) {
+      const advierte =
+        /(no\s+es\s+viable|inviable|no\s+(la?\s+)?siembres|no\s+(te\s+)?sirve|no\s+prosper)/.test(sNorm);
+      if (!advierte) return false;
+    }
+    return true;
+  });
+  return kept.join('').trim();
+}
+
+/**
  * Guard 3 — viabilidad invertida. Si el grounding marca `viabilidad:"inviable"`
  * para una especie a la altitud de la finca y la respuesta la recomienda como
  * viable/buena, CORRIGE ("a tu altura no se da") y lidera con
  * `alternativas_viables`. NO toca "marginal" (eso SÍ es posible con cuidados:
  * doctrina zona-gris).
+ *
+ * REEMPLAZO, no prepend (fix fuga viva 2026-05-31): la corrección lidera Y se
+ * ELIMINAN del texto del modelo las oraciones que promovían la especie
+ * inviable, para no dejar una respuesta autocontradictoria ("NO es viable" +
+ * "sí, siémbrala") en la misma burbuja. El resto del texto (contexto legítimo)
+ * se conserva intacto.
  *
  * @returns {{text:string, modified:boolean, reason:string|null}}
  */
@@ -494,6 +593,7 @@ export function guardInvertedViability(responseText, resolvedEntities = null, fi
 
   const correcciones = [];
   const disparadas = [];
+  const disparadasNorm = [];
 
   for (const e of resolvedEntities) {
     if (!_isSpecies(e)) continue;
@@ -526,6 +626,7 @@ export function guardInvertedViability(responseText, resolvedEntities = null, fi
     if (!_presentaComoViable(norm, nombreNorm) && !_fomentaSiembra(norm, nombreNorm)) continue;
 
     disparadas.push(nombre);
+    disparadasNorm.push(nombreNorm);
     const alternativas = _altNames(e.alternativas_viables, 3);
     const altTxt = alternativas.length
       ? ` Para tu altura te irían mejor estas del catálogo: ${alternativas.join(', ')}.`
@@ -542,8 +643,14 @@ export function guardInvertedViability(responseText, resolvedEntities = null, fi
   }
 
   bumpGuardTelemetry('inverted_viability');
-  // La corrección va PRIMERO (lidera) para no enterrar el veredicto correcto.
-  const text = `${correcciones.join('\n\n')}\n\n${responseText.trim()}`;
+  // REEMPLAZO (no prepend): primero borramos del texto del modelo las oraciones
+  // que promovían la especie inviable — así no queda una respuesta
+  // autocontradictoria ("NO es viable" + "siémbrala") debajo de la corrección.
+  const restoLimpio = _stripViabilityPromotion(responseText, disparadasNorm);
+  // La corrección determinística LIDERA. El resto (contexto legítimo) va después
+  // solo si sobrevivió algo tras quitar las oraciones contradictorias.
+  const correccion = correcciones.join('\n\n');
+  const text = restoLimpio ? `${correccion}\n\n${restoLimpio}` : correccion;
   return { text, modified: true, reason: `viabilidad_invertida: ${disparadas.join(', ')}` };
 }
 

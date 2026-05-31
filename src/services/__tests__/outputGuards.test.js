@@ -175,8 +175,51 @@ describe('guardInvertedViability', () => {
     // ANTES: priorizaba maracuyá. DESPUÉS: corrige + lidera con gulupa.
     expect(out.text).toMatch(/NO es viable/i);
     expect(out.text).toMatch(/gulupa/);
-    // La corrección debe ir ANTES del texto original (liderar).
-    expect(out.text.indexOf('Corrección')).toBeLessThan(out.text.indexOf('es recomendable priorizar'));
+    // La corrección debe LIDERAR.
+    expect(out.text.indexOf('Corrección')).toBe(0);
+    // FUGA ANTI-ALUCINACIÓN (2026-05-31): la frase contradictoria del modelo
+    // NO debe sobrevivir debajo de la corrección. El guard REEMPLAZA el párrafo
+    // contradictorio — no deja "NO es viable" arriba y "es recomendable
+    // priorizar la maracuyá" abajo en la MISMA burbuja (autocontradicción
+    // visible al usuario). El veredicto del modelo invertido se borra.
+    expect(out.text).not.toMatch(/es recomendable priorizar la maracuy/i);
+  });
+
+  it('FUGA: la respuesta final NO contiene a la vez "NO es viable" y un fomento de siembra de la MISMA especie (sin autocontradicción)', () => {
+    // Reproduce la fuga viva: el modelo manda a sembrar la inviable en una
+    // oración y el guard, al solo prepender, dejaba ambas afirmaciones
+    // opuestas en la misma burbuja. La salida corregida debe ser COHERENTE.
+    const llmFail =
+      'En tu finca de Sibundoy a 2100 metros, es recomendable priorizar la maracuyá ' +
+      'porque pagan bien. Puedes sembrarla cerca de la casa para tenerla a mano.';
+    const out = guardInvertedViability(llmFail, [maracuyaInviable], 2100);
+    expect(out.modified).toBe(true);
+    // Veredicto correcto presente.
+    expect(out.text).toMatch(/NO es viable/i);
+    // Ninguna frase de fomento de la maracuyá sobrevive.
+    expect(out.text).not.toMatch(/es recomendable priorizar la maracuy/i);
+    expect(out.text).not.toMatch(/puedes sembrarla/i);
+    // Coherencia: el texto final no debe presentar la maracuyá como sembrable.
+    // (la única mención de "maracuyá" sembrable que sobrevive es la negada).
+    const normalized = out.text.toLowerCase();
+    expect(normalized).not.toMatch(/recomendable priorizar|puedes sembrarla|conviene sembrar/);
+  });
+
+  it('FUGA: preserva oraciones legítimas alrededor del párrafo contradictorio', () => {
+    // El reemplazo debe ser quirúrgico: solo borra lo que afirma viabilidad de
+    // la inviable, conservando contexto útil no contradictorio.
+    const llmFail =
+      'El maracuyá es una passiflora trepadora de fruto ácido. ' +
+      'A 2100 metros es recomendable priorizar la maracuyá porque pagan bien. ' +
+      'En general las passifloras necesitan tutorado.';
+    const out = guardInvertedViability(llmFail, [maracuyaInviable], 2100);
+    expect(out.modified).toBe(true);
+    // La oración contradictoria desaparece.
+    expect(out.text).not.toMatch(/es recomendable priorizar la maracuy/i);
+    // El contexto botánico legítimo se conserva.
+    expect(out.text).toMatch(/passiflora trepadora|necesitan tutorado/i);
+    // Y el veredicto correcto lidera.
+    expect(out.text.indexOf('Corrección')).toBe(0);
   });
 
   it('CPX-009 (bench): corrige "puede prosperar sin problemas" / "se cultiva ampliamente" en Chocó', () => {
@@ -187,6 +230,9 @@ describe('guardInvertedViability', () => {
     expect(out.modified).toBe(true);
     expect(out.text).toMatch(/NO es viable/i);
     expect(out.text).toMatch(/chontaduro|plátano/);
+    // El reemplazo borra la frase contradictoria del modelo.
+    expect(out.text).not.toMatch(/se cultiva ampliamente/i);
+    expect(out.text).not.toMatch(/puede prosperar sin problemas/i);
   });
 
   it('CPX-004 (bench): corrige cocona "podría tener éxito" a 2500m (deja puerta abierta a inviable)', () => {
@@ -201,6 +247,8 @@ describe('guardInvertedViability', () => {
     const out = guardInvertedViability(llmFail, [cocona], 2500);
     expect(out.modified).toBe(true);
     expect(out.text).toMatch(/NO es viable/i);
+    // El fraseo invertido del modelo se reemplaza, no se prepende debajo.
+    expect(out.text).not.toMatch(/podría tener éxito/i);
   });
 
   it('CPX-010 (bench): corrige curuba "adecuada para zonas tropicales como las del llano"', () => {
@@ -215,6 +263,8 @@ describe('guardInvertedViability', () => {
     const out = guardInvertedViability(llmFail, [curuba], 450);
     expect(out.modified).toBe(true);
     expect(out.text).toMatch(/chontaduro/);
+    // La afirmación falsa del modelo ("adecuada para zonas tropicales") se borra.
+    expect(out.text).not.toMatch(/adecuada para zonas tropicales/i);
   });
 
   it('NO toca "marginal" (zona gris — posible con cuidados)', () => {
@@ -281,6 +331,8 @@ describe('guardInvertedViability', () => {
       expect(out.reason).toMatch(/viabilidad_invertida/);
       expect(out.text).toMatch(/NO es viable/i);
       expect(out.text).toMatch(/chontaduro/);
+      // El consejo invertido ("te conviene sembrar la curuba") se reemplaza.
+      expect(out.text).not.toMatch(/te conviene sembrar la curuba/i);
     });
 
     it('CPX-001 (escapado): chugua a 3200m fuera de banda, texto la recomienda sembrar', () => {
@@ -302,6 +354,8 @@ describe('guardInvertedViability', () => {
       expect(out.modified).toBe(true);
       expect(out.text).toMatch(/NO es viable/i);
       expect(out.text).toMatch(/papa|haba/);
+      // La invitación a cultivar la especie inviable se reemplaza.
+      expect(out.text).not.toMatch(/puedes cultivar la chugua/i);
     });
 
     it('dispara con "buena para sembrar acá" (fraseo coloquial fuera de la lista)', () => {
@@ -310,6 +364,8 @@ describe('guardInvertedViability', () => {
       const out = guardInvertedViability(llmFail, [maracuya], 2100);
       expect(out.modified).toBe(true);
       expect(out.text).toMatch(/gulupa/);
+      // El fraseo coloquial invertido se reemplaza, no queda debajo.
+      expect(out.text).not.toMatch(/es buena para sembrar acá/i);
     });
 
     it('RESPETA marginal: dentro del margen de 300m NO bloquea aunque la siembre', () => {

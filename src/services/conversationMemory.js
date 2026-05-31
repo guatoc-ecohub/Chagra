@@ -319,6 +319,46 @@ export function computeSourceMetadata(toolEvidence) {
 }
 
 /**
+ * FIX 2 (2026-05-31) — fusiona el reporte del post-validate (capa 2
+ * anti-alucinación del sidecar) sobre el metadata de fuente del turno, para que
+ * el ChatBubble pueda renderizar los badges de advertencia.
+ *
+ * El sidecar devuelve:
+ *   - `pv.suspect[]`      — binomios que SÍ existen en el catálogo pero NO
+ *     corresponden a la entidad preguntada (nombre real, especie equivocada).
+ *   - `pv.hallucinated[]` — binomios 100% INVENTADOS por el modelo, que NO
+ *     existen en AGE ni en la realidad (ej. "Neolepidopteron daquila").
+ *
+ * ANTES (bug vivo): el PWA solo leía `suspect` → el binomio inventado se
+ * detectaba en el sidecar y se TIRABA en silencio, sin avisar al usuario.
+ * AHORA: ambos se surfacéan como metadata (`suspect_names` / `hallucinated_names`).
+ *
+ * Conservador y puro: si `pv` es null/incompleto, devuelve el `base` sin tocar
+ * (política "no advertir si no se pudo verificar"). Solo añade campos cuando los
+ * arrays traen datos. No muta `base`. Requiere `pv.age_available === true` para
+ * confiar en el veredicto (sin AGE no hay con qué validar binomios).
+ *
+ * @param {object} base — metadata de fuente ya computado (computeSourceMetadata).
+ * @param {null | {hallucinated?: string[], suspect?: string[], age_available?: boolean}} pv
+ * @returns {object} nuevo metadata (copia de base + flags de advertencia).
+ */
+export function mergePostValidateMetadata(base, pv) {
+  const out = { ...(base && typeof base === 'object' ? base : {}) };
+  if (!pv || typeof pv !== 'object' || pv.age_available !== true) return out;
+
+  const suspect = Array.isArray(pv.suspect)
+    ? pv.suspect.filter((s) => typeof s === 'string' && s.trim().length > 0)
+    : [];
+  const hallucinated = Array.isArray(pv.hallucinated)
+    ? pv.hallucinated.filter((s) => typeof s === 'string' && s.trim().length > 0)
+    : [];
+
+  if (suspect.length > 0) out.suspect_names = suspect;
+  if (hallucinated.length > 0) out.hallucinated_names = hallucinated;
+  return out;
+}
+
+/**
  * A-15 (#248) — extrae los edges del grafo AGE que un turno del agente usó
  * como evidencia, en el shape que el motor E3 (`feedback-to-confidence.mjs`
  * del sidecar) necesita para mapear la señal 👍👎 a aristas reales:
@@ -426,6 +466,7 @@ export default {
   getFullHistory,
   clearMemory,
   computeSourceMetadata,
+  mergePostValidateMetadata,
   extractEdges,
   getLastTurnTimestamp,
   shouldStartNewSession,

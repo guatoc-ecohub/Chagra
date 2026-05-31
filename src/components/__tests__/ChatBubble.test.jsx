@@ -124,6 +124,67 @@ describe('ChatBubble — badge de fuente (verificado vs generativo)', () => {
     expect(screen.getByTestId('source-badge')).toBeInTheDocument();
   });
 
+  // FIX 2 (2026-05-31): el post-validate devuelve `hallucinated[]` con binomios
+  // 100% INVENTADOS (no existen en AGE ni en la realidad, ej. "Neolepidopteron
+  // daquila"). Antes el PWA solo consumía `suspect` → el nombre inventado se
+  // detectaba y se TIRABA en silencio. Ahora se surfacéa: badge warning +
+  // tooltip con los nombres no verificados.
+  test('FIX 2 — renderiza badge de nombre científico INVENTADO cuando metadata.hallucinated_names tiene datos', () => {
+    const message = {
+      role: 'assistant',
+      content: 'Para esa plaga, el Neolepidopteron daquila es el principal controlador.',
+      timestamp: Date.now(),
+      metadata: {
+        tool_used: 'get_pest_controllers',
+        grounded: true,
+        hallucinated_names: ['Neolepidopteron daquila'],
+      },
+    };
+    render(<ChatBubble message={message} />);
+    const badge = screen.getByTestId('hallucinated-name-badge');
+    expect(badge).toBeInTheDocument();
+    expect(badge).toHaveAttribute('data-source', 'hallucinated-scientific-name');
+    // Señal clara de "nombre no verificado / inventado".
+    expect(badge).toHaveTextContent(/nombre científico/i);
+    // El binomio inventado va en el tooltip (no satura la burbuja).
+    expect(badge).toHaveAttribute('title', expect.stringContaining('Neolepidopteron daquila'));
+    // Español colombiano, sin voseo argentino.
+    expect(badge.textContent).not.toMatch(/verificá/i);
+    // Cero hype.
+    expect(badge.textContent).not.toMatch(/garantizado|perfecto|100%/i);
+  });
+
+  test('FIX 2 — el badge de inventado tiene prioridad sobre suspect y sobre la fuente (es la señal más fuerte)', () => {
+    const message = {
+      role: 'assistant',
+      content: 'El Neolepidopteron daquila controla la plaga.',
+      timestamp: Date.now(),
+      metadata: {
+        tool_used: 'get_species',
+        grounded: true,
+        suspect_names: ['Solanum lycopersicum'],
+        hallucinated_names: ['Neolepidopteron daquila'],
+      },
+    };
+    render(<ChatBubble message={message} />);
+    // Cuando hay un nombre inventado, ese badge gana (riesgo mayor que suspect).
+    expect(screen.getByTestId('hallucinated-name-badge')).toBeInTheDocument();
+    expect(screen.queryByTestId('suspect-name-badge')).not.toBeInTheDocument();
+  });
+
+  test('FIX 2 — el badge de inventado NO aparece cuando hallucinated_names está vacío o ausente', () => {
+    const message = {
+      role: 'assistant',
+      content: 'El aguacate Hass tiene buenas compañeras.',
+      timestamp: Date.now(),
+      metadata: { tool_used: 'get_companions', grounded: true, hallucinated_names: [] },
+    };
+    render(<ChatBubble message={message} />);
+    expect(screen.queryByTestId('hallucinated-name-badge')).not.toBeInTheDocument();
+    // El badge de fuente normal SÍ sigue apareciendo.
+    expect(screen.getByTestId('source-badge')).toBeInTheDocument();
+  });
+
   // #339: la burbuja del assistant NUNCA debe quedar en blanco. Si el LLM
   // devuelve contenido vacío (respuesta degradada, stream sin tokens), se
   // muestra un fallback visible en español colombiano en lugar de un <p>

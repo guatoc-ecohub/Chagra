@@ -26,6 +26,7 @@ import {
   getFullHistory,
   getContextString,
   computeSourceMetadata,
+  mergePostValidateMetadata,
   extractEdges,
   clearMemory,
   shouldStartNewSession,
@@ -1506,14 +1507,18 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       // Capa 2 anti-alucinación — cross-check de contexto (operador 2026-05-30).
       // Tras generar la respuesta, le pedimos al sidecar que correlacione cada
       // binomio Linneano CITADO en el texto con las entidades que la capa 1 ya
-      // resolvió para el turno. Si el LLM citó un nombre científico que SÍ
-      // existe en el catálogo pero NO corresponde a lo que el usuario preguntó
-      // (ej. "Solanum lycopersicum" para 'tomate de árbol' = Solanum betaceum),
-      // lo marcamos como SOSPECHOSO. NO bloquea ni reescribe la respuesta —
-      // solo añade un flag de metadata para un badge no intrusivo ("verifica el
-      // nombre científico"). Solo corre si hubo entidades resueltas (sin ellas
-      // no hay con qué correlacionar). 100% graceful: postValidate devuelve null
-      // ante flag off / offline / timeout / AGE caído → sin advertencia.
+      // resolvió para el turno. El post-validate devuelve DOS señales:
+      //   - `suspect[]`      → nombre científico que SÍ existe en el catálogo
+      //     pero NO corresponde a lo preguntado (ej. "Solanum lycopersicum" para
+      //     'tomate de árbol' = Solanum betaceum).
+      //   - `hallucinated[]` → binomio 100% INVENTADO por el modelo, que NO
+      //     existe en AGE ni en la realidad (ej. "Neolepidopteron daquila").
+      // FIX 2 (2026-05-31): antes solo consumíamos `suspect` → el binomio
+      // inventado se detectaba y se tiraba en silencio. Ahora `mergePostValidate
+      // Metadata` surfacea AMBOS como flags de metadata para que el ChatBubble
+      // muestre el badge correspondiente. NO bloquea ni reescribe la respuesta.
+      // Solo corre si hubo entidades resueltas. 100% graceful: postValidate
+      // devuelve null ante flag off / offline / timeout / AGE caído → sin badge.
       if (isOnline && isSidecarEnabled() && Array.isArray(resolvedEntities) && resolvedEntities.length > 0) {
         try {
           const expected = resolvedEntities
@@ -1521,9 +1526,12 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
             .filter((n) => typeof n === 'string' && n.trim().length > 0);
           if (expected.length > 0) {
             const pv = await postValidate(response, expected);
-            if (pv && pv.age_available && Array.isArray(pv.suspect) && pv.suspect.length > 0) {
-              sourceMetadata = { ...sourceMetadata, suspect_names: pv.suspect };
-              console.debug('[sidecar] post-validate suspect', { suspect: pv.suspect });
+            sourceMetadata = mergePostValidateMetadata(sourceMetadata, pv);
+            if (sourceMetadata.hallucinated_names || sourceMetadata.suspect_names) {
+              console.debug('[sidecar] post-validate flags', {
+                hallucinated: sourceMetadata.hallucinated_names,
+                suspect: sourceMetadata.suspect_names,
+              });
             }
           }
         } catch (pvErr) {
