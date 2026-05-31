@@ -948,6 +948,81 @@ export function temporadaColombiana(month) {
  * @param {number} [max=8] — cuántas especies listar antes de "y N más".
  * @returns {string} ej. "maíz ×2, café, frijol y 3 más" o '' si vacío.
  */
+/**
+ * Nombres comunes de cultivos/hortalizas/frutas conocidos en Colombia, usados
+ * como heuristica de validacion cuando NO se pasa un catalogo explicito. NO es
+ * el catalogo completo (eso vive en catalogDB, async): es el set minimo para
+ * detectar la basura canonica del asset store. La regla clave es que un nombre
+ * formado por VARIOS de estos tokens distintos ("tomate fresa arandano") NO es
+ * una especie real sino tres cultivos mashed.
+ */
+const KNOWN_CROP_TOKENS = new Set([
+  'tomate', 'fresa', 'arandano', 'mora', 'lulo', 'curuba', 'uchuva', 'cafe',
+  'maiz', 'frijol', 'arveja', 'papa', 'yuca', 'platano', 'banano', 'aguacate',
+  'mango', 'guayaba', 'naranja', 'limon', 'mandarina', 'cebolla', 'ajo',
+  'zanahoria', 'remolacha', 'lechuga', 'espinaca', 'cilantro', 'apio',
+  'calabacin', 'ahuyama', 'pepino', 'pimenton', 'aji', 'cacao', 'cana',
+  'cubio', 'ibia', 'oca', 'quinua', 'amaranto', 'caña', 'arandanos',
+]);
+
+/**
+ * Valida un inventario agrupado contra el catalogo/grounding y lo separa en
+ * cultivos VERIFICADOS (especies reales) y SIN VERIFICAR (datos sospechosos del
+ * asset store, p.ej. la basura canonica "tomate fresa arandano").
+ *
+ * Estrategia:
+ *  - Si se pasa `catalogNames` (nombres reales del catalogo, sincronos en
+ *    memoria), un cultivo es VERIFICADO solo si hace match laxo (substring en
+ *    cualquier direccion, sin tildes) con alguno; lo demas queda sin verificar.
+ *  - Sin catalogNames, aplica una heuristica deterministica: un nombre formado
+ *    por >=3 tokens y compuesto MAYORITARIAMENTE por nombres de cultivos
+ *    DISTINTOS conocidos ("tomate fresa arandano") es un mash de varias especies
+ *    -> sin verificar. Los nombres de 1-2 palabras pasan (no penalizamos
+ *    cultivos legitimos compuestos como "tomate cherry").
+ *
+ * PURA y SINCRONA. CERO latencia. Tolerante a entradas raras.
+ *
+ * @param {Array<{name:string,count:number}>} grouped
+ * @param {{catalogNames?: string[]}} [opts]
+ * @returns {{verificados: Array<{name:string,count:number}>, sinVerificar: Array<{name:string,count:number}>}}
+ */
+export function validateCultivos(grouped, { catalogNames = null } = {}) {
+  if (!Array.isArray(grouped) || grouped.length === 0) {
+    return { verificados: [], sinVerificar: [] };
+  }
+  const items = grouped.filter((g) => g && typeof g.name === 'string' && g.name.trim());
+
+  let catNorm = null;
+  if (Array.isArray(catalogNames) && catalogNames.length > 0) {
+    catNorm = catalogNames
+      .map((n) => _stripDiacritics(n))
+      .filter((n) => n.length >= 3);
+  }
+
+  const verificados = [];
+  const sinVerificar = [];
+
+  for (const g of items) {
+    const norm = _stripDiacritics(g.name);
+
+    let ok;
+    if (catNorm) {
+      // Match laxo por substring en ambas direcciones (tomate <-> tomate cherry).
+      ok = catNorm.some((c) => norm.includes(c) || c.includes(norm));
+    } else {
+      // Heuristica sin catalogo: detectar mash de varias especies distintas.
+      const tokens = norm.split(/\s+/).filter((t) => t.length >= 3);
+      const distinctCrops = new Set(tokens.filter((t) => KNOWN_CROP_TOKENS.has(t)));
+      // >=3 tokens y >=3 cultivos conocidos DISTINTOS => mash inexistente.
+      ok = !(tokens.length >= 3 && distinctCrops.size >= 3);
+    }
+
+    (ok ? verificados : sinVerificar).push({ name: g.name, count: Number(g.count) || 1 });
+  }
+
+  return { verificados, sinVerificar };
+}
+
 function summarizeCultivos(grouped, max = 8) {
   if (!Array.isArray(grouped) || grouped.length === 0) return '';
   const items = grouped
@@ -1032,6 +1107,8 @@ function crossResolvedWithInventory(resolvedEntities, groupedCultivos) {
  * @param {Array<{name:string,count:number}>} [args.groupedCultivos] — inventario agrupado
  * @param {Array<object>|null} [args.resolvedEntities] — entidades AGE del turno
  * @param {Array<object>} [args.activeAlerts] — useAlertStore activeAlerts
+ * @param {string[]|null} [args.catalogNames] — nombres reales del catalogo (sync, opcional);
+ *   si se pasa, valida cultivos contra el catalogo; si no, usa heuristica anti-mash.
  * @param {number} [args.month] — override de mes para tests (1-12)
  * @returns {string} bloque compacto (siempre incluye al menos la temporada).
  */
@@ -1042,6 +1119,7 @@ export function buildFincaContext({
   groupedCultivos = [],
   resolvedEntities = null,
   activeAlerts = [],
+  catalogNames = null,
   month,
 } = {}) {
   const p = profile && typeof profile === 'object' ? profile : {};
@@ -1118,13 +1196,27 @@ export function buildFincaContext({
   }
 
   // ── Finca / inventario (resumen compacto, NO el detalle) ────────────────
-  const cultivos = summarizeCultivos(groupedCultivos);
+  // Bug prod 2026-05-31: un dato basura del asset store ("tomate fresa
+  // arandano" = 3 especies mashed, INEXISTENTE) se inyectaba como cultivo
+  // AUTORITATIVO y el agente hablaba de el con seguridad. validateCultivos
+  // separa lo verificado de lo sospechoso; SOLO inyectamos lo verificado y
+  // dejamos una nota para que el operador limpie el dato.
+  const { verificados, sinVerificar } = validateCultivos(groupedCultivos, { catalogNames });
+  if (sinVerificar.length > 0) {
+    const basura = sinVerificar.map((c) => c.name).join(', ');
+    console.warn(
+      `[agentService] Cultivos SIN VERIFICAR omitidos del contexto (no son especies del catalogo, revisar/limpiar en el asset store): ${basura}`,
+    );
+  }
+  const cultivos = summarizeCultivos(verificados);
   if (cultivos) {
     lines.push(`Cultivos registrados en la finca: ${cultivos}.`);
   }
 
   // ── Cruce grounding × inventario (sin queries nuevas) ───────────────────
-  const tieneRegistrado = crossResolvedWithInventory(resolvedEntities, groupedCultivos);
+  // Solo cruzamos contra lo verificado: nunca afirmamos que el usuario "ya
+  // tiene" un cultivo fantasma.
+  const tieneRegistrado = crossResolvedWithInventory(resolvedEntities, verificados);
   if (tieneRegistrado.length > 0) {
     const nombres = tieneRegistrado.map((t) => t.nombre).join(', ');
     lines.push(

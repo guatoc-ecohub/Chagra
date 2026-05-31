@@ -840,6 +840,64 @@ export function guardVisionWithoutPhoto(responseText, { hadVision = false, visio
 // ── orquestador ─────────────────────────────────────────────────────────────
 
 /**
+ * guardInventedName — remueve un saludo con NOMBRE PROPIO inventado al inicio de
+ * la respuesta cuando ese nombre NO coincide con el del perfil del usuario.
+ *
+ * Bug prod (2026-05-31): el agente saludo al usuario como "Dante" — un nombre
+ * INVENTADO (el usuario es Miguel y su perfil no trae nombre). El modelo alucino
+ * un nombre propio y abrio con el. Este guard detecta el patron de apertura
+ * "Hola <Nombre>," / "Buenas <Nombre>:" / "Hola <Nombre>!" y, si <Nombre> no es
+ * el del perfil, lo elimina dejando el resto de la respuesta intacto.
+ *
+ * Conservador (anti-falso-positivo): solo actua si lo que sigue al saludo es UNA
+ * palabra capitalizada que parece nombre propio (no una palabra comun en
+ * minuscula como "claro"). Si el perfil tiene nombre y coincide, NO toca nada.
+ *
+ * Firma distinta al resto de la cadena (necesita el nombre del perfil): se
+ * invoca aparte en applyOutputGuards, no dentro de GUARD_CHAIN.
+ *
+ * @param {string} responseText
+ * @param {{profileName?: string|null}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+const GREETING_NAME_RE =
+  /^[\s¡!]*(?:hola|buenas|buenos d[ií]as|buenas tardes|buenas noches|qu[eé] m[aá]s|saludos)\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)\s*(?:[,:!.]|$)/i;
+
+export function guardInventedName(responseText, { profileName = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  const m = responseText.match(GREETING_NAME_RE);
+  if (!m) return { text: responseText, modified: false, reason: null };
+
+  const saludoNombre = m[1];
+  // Solo nombres PROPIOS: la palabra tras el saludo debe ir capitalizada. Una
+  // palabra comun en minuscula ("Hola, claro que si") no es un nombre inventado.
+  const firstChar = saludoNombre.charAt(0);
+  if (firstChar !== firstChar.toUpperCase() || firstChar === firstChar.toLowerCase()) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  // Si coincide con el nombre del perfil (sin tildes/caso), es legitimo.
+  const profNorm = _stripDiacritics(profileName || '');
+  const nameNorm = _stripDiacritics(saludoNombre);
+  if (profNorm && nameNorm && (profNorm === nameNorm || profNorm.split(/\s+/).includes(nameNorm))) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Nombre no-grounded: remover SOLO el saludo+nombre+puntuacion inicial y
+  // recapitalizar la primera letra del resto.
+  let rest = responseText.replace(GREETING_NAME_RE, '').replace(/^[\s,:!.¡¿-]+/, '');
+  if (!rest) return { text: responseText, modified: false, reason: null };
+  rest = rest.charAt(0).toUpperCase() + rest.slice(1);
+  bumpGuardTelemetry('inventedName');
+  return {
+    text: rest,
+    modified: true,
+    reason: `nombre propio no-grounded removido del saludo: "${saludoNombre}"`,
+  };
+}
+
+/**
  * Cadena ordenada de guards. El agroquímico va primero (lo más urgente:
  * SAFETY), luego invasoras, viabilidad y por último la suavización de dosis.
  */
@@ -875,11 +933,19 @@ const GUARD_CHAIN = [
  *   que NO hubo foto y corrige cualquier diagnóstico visual fabricado.
  * @param {number|null} [ctx.visionConfidence=null] — confianza de analyzeFoliage
  *   (para suavizar hallazgos detallados cuando la visión no fue concluyente).
+ * @param {string|null} [ctx.profileName] — nombre del usuario (getProfile().nombre)
+ *   para el guard de nombre inventado. Si falta, cualquier saludo con nombre se remueve.
  * @returns {{text:string, modified:boolean, reasons:string[]}}
  */
 export function applyOutputGuards(
   responseText,
-  { resolvedEntities = null, fincaAltitud = null, hadVision = false, visionConfidence = null } = {},
+  {
+    resolvedEntities = null,
+    fincaAltitud = null,
+    hadVision = false,
+    visionConfidence = null,
+    profileName = null,
+  } = {},
 ) {
   if (typeof responseText !== 'string' || responseText.length === 0) {
     return { text: responseText ?? '', modified: false, reasons: [] };
@@ -906,6 +972,13 @@ export function applyOutputGuards(
       modified = true;
       if (res.reason) reasons.push(res.reason);
     }
+  }
+  // Guard de nombre inventado: firma propia (necesita el nombre del perfil).
+  const nameRes = guardInventedName(text, { profileName });
+  if (nameRes && nameRes.modified) {
+    text = nameRes.text;
+    modified = true;
+    if (nameRes.reason) reasons.push(nameRes.reason);
   }
   return { text, modified, reasons };
 }

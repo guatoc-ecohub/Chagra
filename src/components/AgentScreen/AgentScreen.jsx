@@ -20,6 +20,7 @@ import { analyzeFoliage } from '../../services/aiService';
 // Lógica PURA del flujo foto→agente (prompt de visión + texto de burbuja).
 // Extraída para poder testearla sin montar el componente (bug foto 2026-05-31).
 import { processPhotoItem, buildPhotoUserMessage } from '../../services/agentOutboxPhoto';
+import { isAnalyzableImageAttachment, buildAttachmentRejection } from '../../services/agentOutboxAttachment';
 import {
   addTurn,
   getFullHistory,
@@ -1479,11 +1480,14 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       // foto. visionConfidence permite suavizar hallazgos si la visión no fue
       // concluyente. Para turnos de texto/voz, visionContext es null → hadVision
       // false → corrige cualquier afirmación visual inventada.
+      const guardProfileName =
+        (() => { try { const p = getProfile(); return (p && p.nombre) || null; } catch (_) { return null; } })();
       const guarded = applyOutputGuards(voseoSafe, {
         resolvedEntities,
         fincaAltitud: guardAltitud,
         hadVision: !!(visionContext && visionContext.hadVision),
         visionConfidence: (visionContext && visionContext.visionConfidence) ?? null,
+        profileName: guardProfileName,
       });
       if (guarded.modified) {
         console.debug('[guards] salida corregida', { reasons: guarded.reasons });
@@ -1951,8 +1955,9 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         return true;
       }
 
-      // attachment (no-imagen): no hay análisis automático, despachamos el
-      // caption + nota del adjunto.
+      // attachment: SIEMPRE pintamos la burbuja del usuario con su adjunto.
+      // Si NO es imagen analizable, el guard de abajo responde honesto sin
+      // correr el pipeline (no se fabrica diagnostico).
       setMessages((prev) => [
         ...prev,
         {
@@ -1962,6 +1967,24 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
           _outboxAttachment: true,
         },
       ]);
+      // Guard adjunto (bug 2026-05-31, HOJA DE VIDA PDF): si el adjunto NO es
+      // una imagen analizable (PDF, documento, audio...), NO corremos el
+      // pipeline agronomico -el LLM, sin poder leer el archivo, FABRICABA
+      // consejos de finca (alucino 'tomate fresa arandano' + un nombre
+      // inventado)-. Respondemos HONESTO y corto, sin tocar el pipeline. Las
+      // imagenes de verdad si bajan al flujo de vision (el guard
+      // imagen-sin-planta va aparte: branch feat/guard-vision-sin-foto).
+      if (!isAnalyzableImageAttachment(item)) {
+        const rejection = buildAttachmentRejection(item);
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: rejection, timestamp: Date.now() },
+        ]);
+        if (ttsEnabled) { try { speak(rejection, { rate: 0.9, pitch: 1.0 }); } catch (_) { /* noop */ } }
+        await outboxMarkAnswered(item.id, { answeredText: rejection });
+        return true;
+      }
+
       const attachPrompt = caption
         ? caption
         : `Adjunté un archivo (${item.fileName || 'archivo'}). Por ahora no puedo leer archivos directamente; cuéntame qué necesitas y te ayudo.`;
