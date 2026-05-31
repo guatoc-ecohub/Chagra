@@ -228,7 +228,13 @@ async function judgeOllamaCall(prompt) {
  * CONFIG A: granite crudo (sin grounding/guards/validate).
  * CONFIG C: pipeline completo de prod.
  */
-async function runOne(p, config) {
+/**
+ * FASE 1 — genera la respuesta (granite) + guards/post-validate (config C). NO
+ * juzga: así granite queda cargado todo el run y el juez (qwen) se carga UNA vez
+ * en la fase 2. En Maxwell (12GB) granite+qwen no caben juntos → evitar el swap
+ * por-prompt baja el run de ~10h a ~2-3h.
+ */
+async function generatePhase(p, config) {
   let entities = [];
   let systemPrompt = BASE_PROMPT;
 
@@ -260,17 +266,6 @@ async function runOne(p, config) {
     validation = await postValidate(p.prompt, finalText);
   }
 
-  const ah = await scoreAntiHalluc(
-    {
-      query: p.prompt,
-      response: finalText,
-      mustInclude: p.must_include,
-      redFlags: p.red_flags,
-      shouldInclude: p.should_include,
-    },
-    { ollamaCall: judgeOllamaCall },
-  );
-
   return {
     config,
     entities_grounded: entities.length,
@@ -280,13 +275,35 @@ async function runOne(p, config) {
     guards_reasons: guarded.reasons,
     sidecar_halluc_count: validation.detected_count,
     age_available: validation.age_available,
-    ah_pass: ah.pass,
-    ah_source: ah.source,
-    ah_must_covered: ah.mustCovered,
-    ah_must_total: ah.mustTotal ?? (p.must_include ? p.must_include.length : null),
-    ah_red_flags_hit: ah.redFlagsHit,
     latency_gen_ms: gen.latency_ms,
+    // se completan en la fase 2 (juez):
+    ah_pass: null,
+    ah_source: 'pending',
+    ah_must_covered: null,
+    ah_must_total: p.must_include ? p.must_include.length : null,
+    ah_red_flags_hit: null,
   };
+}
+
+/** FASE 2 — juzga (qwen, cargado una sola vez) la respuesta ya generada. */
+async function judgePhase(p, res) {
+  if (!res || res.error) return res;
+  const ah = await scoreAntiHalluc(
+    {
+      query: p.prompt,
+      response: res.final_response,
+      mustInclude: p.must_include,
+      redFlags: p.red_flags,
+      shouldInclude: p.should_include,
+    },
+    { ollamaCall: judgeOllamaCall },
+  );
+  res.ah_pass = ah.pass;
+  res.ah_source = ah.source;
+  res.ah_must_covered = ah.mustCovered;
+  res.ah_must_total = ah.mustTotal ?? res.ah_must_total;
+  res.ah_red_flags_hit = ah.redFlagsHit;
+  return res;
 }
 
 function aggregate(rows, config) {
@@ -332,33 +349,56 @@ async function main() {
 
   if (!existsSync(BENCH_RUNS_DIR)) mkdirSync(BENCH_RUNS_DIR, { recursive: true });
 
-  const rows = [];
-  for (let i = 0; i < prompts.length; i++) {
-    const p = prompts[i];
-    console.log(`\n[${i + 1}/${prompts.length}] ${p.id} (${p.cap}): ${p.prompt.slice(0, 56)}…`);
-    const row = { id: p.id, cap: p.cap, prompt: p.prompt, expects_abstention: !!p.expects_abstention, results: {} };
-    for (const config of CONFIGS) {
+  const ts = new Date().toISOString().replace(/[:.]/g, '-');
+  const jsonlPath = join(BENCH_RUNS_DIR, `capabilities-A-vs-C-${ts}.jsonl`);
+  const summaryPath = join(BENCH_RUNS_DIR, `capabilities-A-vs-C-${ts}.summary.json`);
+
+  const rows = prompts.map((p) => ({
+    id: p.id,
+    cap: p.cap,
+    prompt: p.prompt,
+    expects_abstention: !!p.expects_abstention,
+    results: {},
+  }));
+
+  // ── FASE 1: generación (granite cargado todo el run) ────────────────────────
+  // Orden por config: todas las A, luego todas las C → cero swaps de generador.
+  console.log('\n========== FASE 1: GENERACIÓN (granite) ==========');
+  for (const config of CONFIGS) {
+    for (let i = 0; i < prompts.length; i++) {
+      const p = prompts[i];
       await thermalGuard();
-      const res = await runOne(p, config);
-      row.results[config] = res;
-      const verdict = res.error ? 'ERR' : res.ah_source === 'unjudged' ? 'UNJ' : res.ah_pass ? 'PASS' : 'FAIL';
-      console.log(
-        `    [${config}] ${verdict}  must=${res.ah_must_covered ?? '?'}/${res.ah_must_total ?? '?'} ` +
-          `rf=${res.ah_red_flags_hit ?? '?'} guards=${res.guards_modified ? (res.guards_reasons || []).join(',') : 'none'} ` +
-          `${res.latency_gen_ms ? (res.latency_gen_ms / 1000).toFixed(1) + 's' : ''}`,
-      );
-      await sleep(1500);
+      const res = await generatePhase(p, config);
+      rows[i].results[config] = res;
+      const tag = res.error ? `ERR ${res.error.slice(0, 40)}` : `${(res.latency_gen_ms / 1000).toFixed(1)}s guards=${res.guards_modified ? (res.guards_reasons || []).join(',') : 'none'}`;
+      console.log(`  [gen ${config}] [${i + 1}/${prompts.length}] ${p.id} (${p.cap}) ${tag}`);
+      await sleep(800);
     }
-    rows.push(row);
+  }
+  // Persistir respuestas ANTES de juzgar (si el juez muere, no perdemos la gen).
+  writeFileSync(jsonlPath, rows.map((r) => JSON.stringify(r)).join('\n') + '\n');
+  console.log(`[fase1] respuestas persistidas en ${jsonlPath}`);
+
+  // ── FASE 2: juicio (qwen cargado UNA vez) ───────────────────────────────────
+  console.log('\n========== FASE 2: JUICIO (qwen2.5:14b independiente) ==========');
+  for (const config of CONFIGS) {
+    for (let i = 0; i < prompts.length; i++) {
+      const p = prompts[i];
+      await thermalGuard();
+      const res = await judgePhase(p, rows[i].results[config]);
+      const verdict = !res || res.error ? 'ERR' : res.ah_source === 'unjudged' ? 'UNJ' : res.ah_pass ? 'PASS' : 'FAIL';
+      console.log(
+        `  [judge ${config}] [${i + 1}/${prompts.length}] ${p.id} (${p.cap}) ${verdict} ` +
+          `must=${res?.ah_must_covered ?? '?'}/${res?.ah_must_total ?? '?'} rf=${res?.ah_red_flags_hit ?? '?'}`,
+      );
+      await sleep(600);
+    }
+    // re-persistir tras juzgar cada config.
+    writeFileSync(jsonlPath, rows.map((r) => JSON.stringify(r)).join('\n') + '\n');
   }
 
   const aggA = CONFIGS.includes('A') ? aggregate(rows, 'A') : null;
   const aggC = CONFIGS.includes('C') ? aggregate(rows, 'C') : null;
-
-  const ts = new Date().toISOString().replace(/[:.]/g, '-');
-  const jsonlPath = join(BENCH_RUNS_DIR, `capabilities-A-vs-C-${ts}.jsonl`);
-  const summaryPath = join(BENCH_RUNS_DIR, `capabilities-A-vs-C-${ts}.summary.json`);
-  writeFileSync(jsonlPath, rows.map((r) => JSON.stringify(r)).join('\n') + '\n');
 
   // tabla por capacidad A vs C
   const caps = [...new Set(prompts.map((p) => p.cap))];
