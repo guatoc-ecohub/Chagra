@@ -10,7 +10,10 @@
  * Sigue el patrón de tests/unit/setup.js y usa Vitest.
  */
 import { describe, it, expect } from 'vitest';
-import { guardInvertedViability } from '../../src/services/outputGuards.js';
+import {
+  guardInvertedViability,
+  guardSpeciesSubstitution,
+} from '../../src/services/outputGuards.js';
 
 describe('guardInvertedViability — altitud null (HOTFIX #1240)', () => {
   it('1) altitud null + especie de montaña SIN viabilidad autoritativa → NO dispara', () => {
@@ -78,5 +81,39 @@ describe('guardInvertedViability — altitud null (HOTFIX #1240)', () => {
     // Con altitud válida SÍ menciona los msnm reales.
     expect(res.text).toContain('2580 msnm');
     expect(res.reason).toMatch(/viabilidad_invertida/);
+  });
+});
+
+describe('guardSpeciesSubstitution — prosa española NO es binomio (fix 2026-06-02)', () => {
+  // Caso real prod (query de precio "¿a cómo está la papa?"): el guard tomaba
+  // "Sin embargo", "Estos cultivos", "Marzano debido" como binomios foráneos y
+  // emitía "...es X, no Sin embargo". El gate _looksLikeLatinBinomial lo corta.
+  it('1) "Sin embargo" / "Estos cultivos" NO disparan corrección', () => {
+    const entities = [
+      { kind: 'species', nombre_comun: 'aliso andino', nombre_cientifico: 'Alnus acuminata' },
+    ];
+    const texto =
+      'El aliso andino es un buen árbol de sombra. Sin embargo, necesita suelo húmedo. ' +
+      'Estos cultivos conviven bien con él.';
+    const res = guardSpeciesSubstitution(texto, entities, null);
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe(texto);
+    expect(res.text).not.toContain('Sin embargo. Ese');
+    expect(res.text).not.toContain('no Sin');
+  });
+
+  it('2) binomio foráneo REAL (Passiflora tripartita atribuido al lulo) SÍ corrige', () => {
+    // No-regresión: el caso para el que se diseñó el guard sigue funcionando.
+    const entities = [
+      { kind: 'species', nombre_comun: 'lulo', nombre_cientifico: 'Solanum quitoense' },
+    ];
+    const texto =
+      'El lulo es una fruta andina; su nombre científico es Passiflora tripartita y ' +
+      'se da bien en clima frío.';
+    const res = guardSpeciesSubstitution(texto, entities, null);
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Corrección importante');
+    expect(res.text).toContain('Solanum quitoense');
+    expect(res.reason).toMatch(/sustituci/);
   });
 });

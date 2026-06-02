@@ -1042,7 +1042,63 @@ const EPITHET_STOPWORDS = new Set([
   'de', 'del', 'la', 'el', 'los', 'las', 'un', 'una', 'unos', 'unas',
   'y', 'o', 'u', 'que', 'con', 'sin', 'por', 'para', 'en', 'al', 'a',
   'su', 'sus', 'es', 'son', 'como', 'mas', 'pero', 'este', 'esta', 'ese', 'esa',
+  // Palabras de prosa que aparecían como falso "epíteto" en producción
+  // (2026-06-02, query de precio "¿a cómo está la papa?"): "Sin embargo",
+  // "Estos cultivos", "Marzano debido". El epíteto botánico nunca es un
+  // sustantivo/participio común del español.
+  'embargo', 'cultivos', 'cultivo', 'planta', 'plantas', 'papa', 'papas',
+  'debido', 'mismo', 'misma', 'cuenta', 'ejemplo', 'general', 'caso',
 ]);
+
+/**
+ * Stopwords del español que NO pueden ser GÉNERO de un binomio científico.
+ * El género va capitalizado (inicio de oración, determinante, conector,
+ * fragmento de nombre propio) y `SCI_BINOMIAL_RE` lo captura igual que un
+ * género latino real. El filtro de epíteto solo miraba el SEGUNDO token, así
+ * que "Sin embargo", "Estos cultivos", "La papa", "Marzano debido" pasaban y
+ * los guards 5/5b emitían correcciones absurdas ("...es Alnus acuminata, no
+ * Sin embargo"). Caso real prod 2026-06-02. Comparar en minúsculas sin tildes.
+ */
+const GENUS_STOPWORDS = new Set([
+  // determinantes / artículos / demostrativos
+  'la', 'el', 'los', 'las', 'un', 'una', 'unos', 'unas', 'lo', 'su', 'sus',
+  'mi', 'mis', 'tu', 'tus', 'este', 'esta', 'esto', 'estos', 'estas', 'ese',
+  'esa', 'eso', 'esos', 'esas', 'aquel', 'aquella', 'otro', 'otra', 'otros',
+  'otras', 'cada', 'todo', 'toda', 'todos', 'todas', 'mucho', 'mucha',
+  'muchos', 'muchas', 'algun', 'alguna', 'algunos', 'algunas', 'cualquier',
+  'varios', 'varias',
+  // conjunciones / preposiciones / conectores
+  'sin', 'con', 'por', 'para', 'pero', 'aunque', 'sino', 'mas', 'como',
+  'cuando', 'donde', 'mientras', 'porque', 'pues', 'entonces', 'ademas',
+  'asimismo', 'finalmente', 'recuerda', 'ten', 'segun', 'si', 'no', 'ni',
+  'que', 'quien', 'cual', 'cuales', 'en', 'de', 'del', 'al', 'hasta',
+  'desde', 'sobre', 'entre', 'tras', 'ante', 'bajo',
+  // verbos / adverbios frecuentes en inicio de oración
+  'es', 'son', 'hay', 'esta', 'estan', 'sera', 'puede', 'pueden', 'debe',
+  'deben', 'tiene', 'tienen', 'generalmente', 'normalmente', 'tambien',
+  'solo', 'incluso', 'luego', 'despues', 'ahora', 'aqui', 'alli', 'asi',
+  // fragmentos de nombre común/varietal que se capitalizan
+  'san', 'santa', 'santo', 'marzano',
+]);
+
+/**
+ * ¿El par (género, epíteto) parece un binomio científico latino real y NO
+ * prosa española? Gate compartido por los guards 5 y 5b para no "corregir"
+ * fragmentos de oración. Conservador: ante la duda, rechaza (evita falsos
+ * positivos como "Sin embargo" → solo deja de corregir, nunca alucina).
+ */
+function _looksLikeLatinBinomial(genusRaw, epithetRaw) {
+  const g = _stripDiacritics(genusRaw).toLowerCase();
+  const ep = _stripDiacritics(epithetRaw).toLowerCase();
+  if (GENUS_STOPWORDS.has(g)) return false;
+  if (EPITHET_STOPWORDS.has(ep)) return false;
+  // Los adverbios españoles en -mente jamás son epíteto botánico
+  // ("necesariamente", "generalmente").
+  if (ep.endsWith('mente')) return false;
+  // Epíteto demasiado corto para ser específico latino.
+  if (ep.length < 3) return false;
+  return true;
+}
 
 /**
  * Recolecta TODOS los binomios canónicos que el grounding considera válidos:
@@ -1129,7 +1185,7 @@ export function guardSpeciesSubstitution(responseText, resolvedEntities = null, 
   while ((m = SCI_BINOMIAL_RE.exec(responseText)) !== null) {
     // Descarta "Género preposición" (ej. "Lulo de Castilla" → "Lulo de"): un
     // epíteto botánico nunca es una stopword del español.
-    if (EPITHET_STOPWORDS.has(_stripDiacritics(m[2]))) continue;
+    if (!_looksLikeLatinBinomial(m[1], m[2])) continue;
     const raw = `${m[1]} ${m[2]}`;
     const bin = _binomial(raw);
     if (bin && !grounded.has(bin)) foreign.add(bin);
@@ -1316,7 +1372,7 @@ export function guardCompanionBinomial(responseText, resolvedEntities = null, _f
   let m;
   SCI_BINOMIAL_RE.lastIndex = 0;
   while ((m = SCI_BINOMIAL_RE.exec(responseText)) !== null) {
-    if (EPITHET_STOPWORDS.has(_stripDiacritics(m[2]))) continue;
+    if (!_looksLikeLatinBinomial(m[1], m[2])) continue;
     const bin = _binomial(`${m[1]} ${m[2]}`);
     if (!bin) continue;
     // Si el "binomio" es en realidad un nombre común conocido (capitalizado), no
