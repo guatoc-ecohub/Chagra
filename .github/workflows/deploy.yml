@@ -98,6 +98,20 @@ jobs:
           VITE_HA_ACCESS_TOKEN: ${{ secrets.VITE_HA_ACCESS_TOKEN }}
 
       - if: env.SKIP_DEPLOY != '1'
+        name: Set deploy-time version
+        # Bump de versión movido de pre-commit (lefthook auto-bump-version) a
+        # deploy-time para eliminar colisiones entre PRs paralelos — raíz del
+        # "versión pegada" (label v1.0.32 congelado, no avanzaba pese a deploys).
+        # Versión monotónica 1.0.<commit-count>, única por deploy: el label
+        # v{APP_VERSION} (TopBar/LoginScreen leen package.json baked en build)
+        # siempre avanza. El CACHE_NAME del SW lo bumpea el step post-deploy.
+        run: |
+          COUNT=$(git rev-list --count HEAD)
+          VERSION="1.0.${COUNT}"
+          npm pkg set version="$VERSION"
+          echo "Deploy version set to $VERSION"
+
+      - if: env.SKIP_DEPLOY != '1'
         name: Build
         run: npm run build
         env:
