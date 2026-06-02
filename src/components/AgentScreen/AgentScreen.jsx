@@ -60,6 +60,10 @@ import { planForcedIntent, isStubIntent, isDeepResearchIntent, CHIP_DEFS } from 
 // Deep Research (A6/A7): cliente HTTP del endpoint async de investigación
 // profunda del sidecar. Feature flag VITE_DEEP_RESEARCH_ENABLED (default false).
 import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../../services/deepResearchClient';
+// Tier free|pro (A1): resuelve el tier del usuario logueado contra la allowlist.
+// isPro controla el gate de la UI (chip 🔬); x-chagra-tier se inyecta en el
+// sidecarClient/deepResearchClient vía buildSidecarHeaders (defense-in-depth).
+import { getCurrentTier } from '../../services/tierService';
 import DeepResearchCard from '../DeepResearchCard';
 import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, resolveUserRegion, stripRoleLeak } from '../../services/agentService';
 import { applyOutputGuards, applyTaxonomyGuard } from '../../services/outputGuards';
@@ -2666,6 +2670,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         activeIntent={activeIntent}
         hasAttachment={false}
         disabled={state === STATE_RECORDING}
+        isPro={getCurrentTier() === 'pro'}
       />
 
       {/* Input */}

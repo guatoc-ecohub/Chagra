@@ -12,17 +12,25 @@ import { CHIP_DEFS } from '../../services/chipIntentRouter';
  *   - el chip activo se marca aria-pressed,
  *   - el chip 📷 foto solo aparece/activa si hay imagen adjunta,
  *   - retorna null si falta el handler (defensa contra mounts incompletos).
+ *   - tier gate A1: chip 🔬 Deep Research deshabilitado para free, activo para pro.
  */
 
 describe('ChipsToolbar — barra de chips de modo', () => {
-  test('renderiza los 7 chips de modo', () => {
-    render(<ChipsToolbar onSelectIntent={() => {}} />);
+  test('renderiza los 7 chips de modo (usuario free — deep chip bloqueado)', () => {
+    render(<ChipsToolbar onSelectIntent={() => {}} isPro={false} />);
     const chips = screen.getAllByTestId('mode-chip');
     expect(chips).toHaveLength(7);
     // El emoji + label del primero (siembro) debe estar presente
     expect(screen.getByText('¿Qué siembro?')).toBeInTheDocument();
     expect(screen.getByText('Plaga')).toBeInTheDocument();
+    // Free users ven el chip con sufijo "(Pro)"
+    expect(screen.getByText('Investigación profunda (Pro)')).toBeInTheDocument();
+  });
+
+  test('renderiza el chip 🔬 sin sufijo cuando isPro=true', () => {
+    render(<ChipsToolbar onSelectIntent={() => {}} isPro />);
     expect(screen.getByText('Investigación profunda')).toBeInTheDocument();
+    expect(screen.queryByText('Investigación profunda (Pro)')).not.toBeInTheDocument();
   });
 
   test('clickear un chip llama onSelectIntent con el intent enum', () => {
@@ -79,5 +87,62 @@ describe('ChipsToolbar — barra de chips de modo', () => {
     const { container } = render(<ChipsToolbar onSelectIntent={() => {}} hasAttachment />);
     const VOSEO = /\b(escrib[íi]|tom[áa]|ten[ée]s|quer[ée]s|eleg[íi]|pod[ée]s|sab[ée]s)\b/i;
     expect(container.textContent).not.toMatch(VOSEO);
+  });
+
+  // ──── Tier gate A1 ────────────────────────────────────────────────────────
+
+  test('chip 🔬 está deshabilitado (disabled) para usuario free (isPro=false)', () => {
+    render(<ChipsToolbar onSelectIntent={() => {}} isPro={false} />);
+    const deepChip = screen.getByRole('button', { name: /investigación profunda/i });
+    expect(deepChip).toBeDisabled();
+  });
+
+  test('chip 🔬 está habilitado para usuario pro (isPro=true)', () => {
+    render(<ChipsToolbar onSelectIntent={() => {}} isPro />);
+    const deepChip = screen.getByRole('button', { name: /investigación profunda/i });
+    expect(deepChip).not.toBeDisabled();
+  });
+
+  test('click en chip 🔬 llama onSelectIntent para usuario pro', () => {
+    const onSelectIntent = vi.fn();
+    render(<ChipsToolbar onSelectIntent={onSelectIntent} isPro />);
+    fireEvent.click(screen.getByRole('button', { name: /investigación profunda/i }));
+    expect(onSelectIntent).toHaveBeenCalledWith('deep');
+  });
+
+  test('click en chip 🔬 NO llama onSelectIntent para usuario free', () => {
+    const onSelectIntent = vi.fn();
+    render(<ChipsToolbar onSelectIntent={onSelectIntent} isPro={false} />);
+    // El botón está disabled — fireEvent.click no dispara el handler
+    fireEvent.click(screen.getByRole('button', { name: /investigación profunda/i }));
+    expect(onSelectIntent).not.toHaveBeenCalledWith('deep');
+  });
+
+  test('chip 🔬 tiene data-pro-locked cuando usuario es free', () => {
+    render(<ChipsToolbar onSelectIntent={() => {}} isPro={false} />);
+    const deepChip = screen.getByRole('button', { name: /investigación profunda/i });
+    expect(deepChip).toHaveAttribute('data-pro-locked', 'true');
+  });
+
+  test('chip 🔬 NO tiene data-pro-locked cuando usuario es pro', () => {
+    render(<ChipsToolbar onSelectIntent={() => {}} isPro />);
+    const deepChip = screen.getByRole('button', { name: /investigación profunda/i });
+    expect(deepChip).not.toHaveAttribute('data-pro-locked');
+  });
+
+  test('chip 🔬 tiene title explicativo de función Pro cuando free', () => {
+    render(<ChipsToolbar onSelectIntent={() => {}} isPro={false} />);
+    const deepChip = screen.getByRole('button', { name: /investigación profunda/i });
+    expect(deepChip).toHaveAttribute('title', expect.stringContaining('Pro'));
+  });
+
+  test('chips no-Pro (siembro, plaga, etc.) siguen activos para usuario free', () => {
+    const onSelectIntent = vi.fn();
+    render(<ChipsToolbar onSelectIntent={onSelectIntent} isPro={false} />);
+    fireEvent.click(screen.getByText('¿Qué siembro?'));
+    expect(onSelectIntent).toHaveBeenCalledWith('siembro');
+    onSelectIntent.mockClear();
+    fireEvent.click(screen.getByText('Plaga'));
+    expect(onSelectIntent).toHaveBeenCalledWith('plaga');
   });
 });

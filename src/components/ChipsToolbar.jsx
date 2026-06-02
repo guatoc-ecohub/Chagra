@@ -1,5 +1,5 @@
 import React from 'react';
-import { CHIP_DEFS } from '../services/chipIntentRouter';
+import { CHIP_DEFS, CHIP_INTENTS } from '../services/chipIntentRouter';
 
 /**
  * ChipsToolbar — "caja de herramientas" del agente como CHIPS DE MODO
@@ -20,6 +20,10 @@ import { CHIP_DEFS } from '../services/chipIntentRouter';
  * El chip 📷 foto solo se muestra cuando hay una imagen adjunta lista
  * (`hasAttachment`). Coordina con el flujo de adjuntos del compositor.
  *
+ * Tier gating (A1): el chip 🔬 Investigación profunda (Deep Research) es Pro-only.
+ * Si `isPro` es false, el chip se muestra deshabilitado con copy "función Pro"
+ * para que el usuario free sepa qué existe pero no pueda activarlo.
+ *
  * Props:
  *   - onSelectIntent: callback(intent: string) — el call-site decide qué hacer.
  *                     Recibe el intent enum del chip ('siembro', 'plaga', ...,
@@ -27,12 +31,15 @@ import { CHIP_DEFS } from '../services/chipIntentRouter';
  *   - activeIntent:   string | null — intent del modo activo (resalta el chip).
  *   - hasAttachment:  boolean — si hay imagen adjunta, muestra el chip 📷 foto.
  *   - disabled:       boolean — deshabilita todos los chips (ej. mientras graba).
+ *   - isPro:          boolean — si el usuario actual tiene tier Pro. Los chips
+ *                     Pro-only (🔬) se muestran deshabilitados para free.
  */
 export default function ChipsToolbar({
   onSelectIntent,
   activeIntent = null,
   hasAttachment = false,
   disabled = false,
+  isPro = false,
 }) {
   if (typeof onSelectIntent !== 'function') return null;
 
@@ -47,6 +54,9 @@ export default function ChipsToolbar({
     'bg-slate-700 border-slate-500 text-slate-100 hover:bg-slate-600 hover:border-slate-400';
   const activeChip =
     'bg-emerald-600 border-emerald-300 text-white shadow-md';
+  // Chip Pro bloqueado: apariencia visualmente diferenciada para free users.
+  const proLockedChip =
+    'bg-slate-800 border-slate-700 text-slate-500 cursor-not-allowed';
 
   return (
     <div
@@ -76,20 +86,37 @@ export default function ChipsToolbar({
 
         {CHIP_DEFS.map((def) => {
           const isActive = activeIntent === def.intent;
+          // El chip 🔬 Deep Research es Pro-only. Para usuarios free: deshabilitado
+          // con copy claro "función Pro" y title explicativo. NO se oculta — el
+          // usuario free debe saber que la funcionalidad existe (upsell suave).
+          const isDeepChip = def.intent === CHIP_INTENTS.deep;
+          const isProLocked = isDeepChip && !isPro;
+          const chipDisabled = disabled || isProLocked;
+          const chipClass = isProLocked
+            ? proLockedChip
+            : isActive
+              ? activeChip
+              : inactiveChip;
+          const chipTitle = isProLocked
+            ? 'Función Pro — disponible para usuarios con acceso avanzado'
+            : def.placeholder;
+
           return (
             <button
               key={def.intent}
               type="button"
               data-testid="mode-chip"
               data-intent={def.intent}
-              onClick={() => onSelectIntent(def.intent)}
-              disabled={disabled}
+              data-pro-locked={isProLocked ? 'true' : undefined}
+              onClick={() => !isProLocked && onSelectIntent(def.intent)}
+              disabled={chipDisabled}
               aria-pressed={isActive}
-              title={def.placeholder}
-              className={`${baseChip} ${isActive ? activeChip : inactiveChip}`}
+              aria-label={isProLocked ? `${def.label} — función Pro` : def.label}
+              title={chipTitle}
+              className={`${baseChip} ${chipClass}`}
             >
               <span aria-hidden="true">{def.emoji}</span>
-              <span>{def.label}</span>
+              <span>{isProLocked ? `${def.label} (Pro)` : def.label}</span>
             </button>
           );
         })}

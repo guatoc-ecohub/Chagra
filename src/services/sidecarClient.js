@@ -34,6 +34,8 @@
  * telemetría aún — esto se sumará a una task futura si hace falta).
  */
 
+import { buildSidecarHeaders } from './tierService.js';
+
 const NLU_TIMEOUT_MS = 10000;
 const TOOL_TIMEOUT_MS = 5000;
 
@@ -105,8 +107,10 @@ async function getJson(path, query, timeoutMs) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-  const headers = {};
-  if (token) headers['X-Chagra-Token'] = token;
+  // Incluir x-chagra-tier para que el sidecar aplique gating de features Pro.
+  // buildSidecarHeaders resuelve el tier del usuario logueado (defense-in-depth;
+  // el gating duro es server-side).
+  const headers = buildSidecarHeaders(token);
 
   const t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
   try {
@@ -150,8 +154,8 @@ async function postJson(path, body, timeoutMs) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-  const headers = { 'Content-Type': 'application/json' };
-  if (token) headers['X-Chagra-Token'] = token;
+  // Incluir x-chagra-tier para gating Pro en el sidecar (defense-in-depth).
+  const headers = buildSidecarHeaders(token);
 
   const t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
   try {
