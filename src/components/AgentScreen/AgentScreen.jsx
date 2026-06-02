@@ -48,7 +48,7 @@ import { streamChatViaSidecar, isAgentStreamingEnabled } from '../../services/st
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
 import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, postValidate, getClimaIdeam } from '../../services/sidecarClient';
-import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, stripRoleLeak } from '../../services/agentService';
+import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, resolveUserRegion, stripRoleLeak } from '../../services/agentService';
 import { applyOutputGuards } from '../../services/outputGuards';
 import { getProfile } from '../../services/userProfileService';
 import { regionFromProfile } from '../../services/ensoContext';
@@ -1457,11 +1457,14 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
 
       const rawResponse = await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities);
       // DR-LANG-1: filtro post-process anti-voseo argentino. Es la última
-      // línea de defensa estructural — garantiza que ningún marcador
-      // voseo (vos, tenés, querés, dale, acá con contexto fuerte, etc.)
-      // llegue al usuario campesino colombiano, independientemente de lo
-      // que el modelo decida emitir. Default formality='usted'. La
-      // función es idempotente y O(n) sobre el largo del texto.
+      // línea de defensa estructural — garantiza que el léxico rioplatense
+      // (che, laburar, etc.) NUNCA llegue al usuario campesino colombiano,
+      // independientemente de lo que el modelo decida emitir. La función es
+      // idempotente y O(n) sobre el largo del texto.
+      // C1/C2 (2026-06-02): region-aware. Pasamos la región lingüística del
+      // perfil del usuario para que el voseo AUTÉNTICO se preserve donde es el
+      // registro propio (paisa/pacífico/pastuso) y se aplane donde no (tú en
+      // caribe, usted por defecto). Sin región conocida → default seguro.
       // BUG A fix (fuga de roles, prod 2026-05-30): defensa #2 post-proceso.
       // Trunca cualquier turno falso "Usuario:"/"Asistente:" que el modelo
       // haya inventado (el path de streaming del sidecar NO reenvía las stop
@@ -1469,7 +1472,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       // cubre el 100% de los casos). Va ANTES del voseo para no analizar
       // basura, y el resultado se persiste/renderea/habla ya saneado.
       const deLeaked = stripRoleLeak(rawResponse);
-      const voseoSafe = applyVoseoFilter(deLeaked, { formality: 'usted' });
+      const voseoSafe = applyVoseoFilter(deLeaked, { formality: 'usted', region: resolveUserRegion() });
       // GUARDAS DETERMINISTAS sobre la SALIDA (bench 10 prompts 2026-05-30: el
       // modelo TIENE los hechos en el grounding pero razona mal —invierte
       // viabilidad, INVENTA agroquímicos sintéticos, recomienda invasoras—).
