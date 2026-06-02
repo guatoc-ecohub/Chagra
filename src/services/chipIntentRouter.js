@@ -1,0 +1,238 @@
+/**
+ * chipIntentRouter.js — Router PURO de los CHIPS DE MODO (A3/A4).
+ *
+ * Decisión operador 2026-06-02: la "caja de herramientas" del agente se
+ * expone como chips de modo (estilo Gemini). Al tocar un chip, la intención
+ * queda FORZADA y rutea DIRECTO a la capacidad determinística (un MCP tool
+ * concreto), SALTANDO el NLU planner del sidecar.
+ *
+ * Racional: el NLU es el que misroutea (incidente "papa precio": el planner
+ * mandaba una pregunta de precio al tool de precio cuando el usuario quería
+ * la ficha de la papa, y viceversa). Si el usuario YA declaró su intención
+ * tocando un chip, no hay nada que inferir — vamos directo al tool.
+ *
+ * Este módulo es PURO (sin red, sin React): mapea (intent, texto, opts) a un
+ * "plan forzado" que el AgentScreen ejecuta sin pasar por `planNlu()`. Toda la
+ * lógica de routing vive acá para poder testearla en aislamiento (TDD).
+ *
+ * Enum de intención: { siembro, plaga, biopreparado, clima, precio,
+ *                      calendario, deep }.
+ *
+ * Tools determinísticos (ya existen en el sidecar, ver sidecarClient.ALLOWED_TOOLS):
+ *   - siembro      → get_species          (ficha + viabilidad de la especie)
+ *   - calendario   → get_species          (época de siembra se deriva de la ficha;
+ *                                           NO existe get_calendario_siembra dedicado)
+ *   - plaga        → get_pest_controllers  (controladores agroecológicos de la plaga)
+ *   - biopreparado → get_biopreparados     (recetas de biopreparados)
+ *   - clima        → get_clima_ideam       (IDEAM nacional; requiere municipio)
+ *
+ * Intents STUB (el backend aún NO existe — NO inventamos endpoints):
+ *   - precio → SIPSA/DANE consulta directa no disponible (dataset ZIP federado).
+ *   - deep   → investigación profunda multi-fuente sin pipeline implementado.
+ *   Ambos devuelven un mensaje honesto "aún no disponible" en vez de routear
+ *   a un tool fantasma.
+ *
+ * IMPORTANTE — español colombiano (tú/usted), NUNCA voseo argentino. Todos los
+ * strings visibles al campesino se redactan en neutro colombiano.
+ */
+
+/** Enum de intención de los chips. Las claves == valores (string union). */
+export const CHIP_INTENTS = Object.freeze({
+  siembro: 'siembro',
+  plaga: 'plaga',
+  biopreparado: 'biopreparado',
+  clima: 'clima',
+  precio: 'precio',
+  calendario: 'calendario',
+  deep: 'deep',
+});
+
+/**
+ * Definiciones declarativas de los 7 chips. El orden de este array es el orden
+ * de render en la barra. `placeholder` reemplaza el placeholder del input
+ * cuando el modo está activo, para guiar al campesino sobre qué escribir.
+ *
+ * `kind`:
+ *   - 'tool' → rutea a un tool determinístico (planForcedIntent.tool).
+ *   - 'stub' → backend no implementado; planForcedIntent.stubMessage explica.
+ */
+export const CHIP_DEFS = Object.freeze([
+  {
+    intent: CHIP_INTENTS.siembro,
+    emoji: '🌱',
+    label: '¿Qué siembro?',
+    kind: 'tool',
+    placeholder: 'Escribe la planta o di qué quieres sembrar',
+  },
+  {
+    intent: CHIP_INTENTS.plaga,
+    emoji: '🐛',
+    label: 'Plaga',
+    kind: 'tool',
+    placeholder: 'Escribe la plaga o describe el daño que ves',
+  },
+  {
+    intent: CHIP_INTENTS.biopreparado,
+    emoji: '🧪',
+    label: 'Biopreparado',
+    kind: 'tool',
+    placeholder: 'Escribe para qué plaga o planta quieres el biopreparado',
+  },
+  {
+    intent: CHIP_INTENTS.clima,
+    emoji: '🌦️',
+    label: 'Clima',
+    kind: 'tool',
+    placeholder: 'Pregunta por la lluvia o el clima de tu zona',
+  },
+  {
+    intent: CHIP_INTENTS.precio,
+    emoji: '💰',
+    label: 'Precio',
+    kind: 'stub',
+    placeholder: 'Escribe el producto del que quieres saber el precio',
+    stubMessage:
+      'La consulta de precios todavía no está disponible en Chagra. ' +
+      'Por ahora el precio mayorista lo publica el DANE (SIPSA) como archivo descargable, ' +
+      'sin consulta directa. Si quieres, te oriento a la fuente o a Corabastos.',
+  },
+  {
+    intent: CHIP_INTENTS.calendario,
+    emoji: '📅',
+    label: 'Calendario',
+    kind: 'tool',
+    placeholder: 'Escribe la planta para ver su época de siembra',
+  },
+  {
+    intent: CHIP_INTENTS.deep,
+    emoji: '🔬',
+    label: 'Investigación profunda',
+    kind: 'stub',
+    placeholder: 'Escribe el tema que quieres investigar a fondo',
+    stubMessage:
+      'La investigación profunda multi-fuente todavía no está disponible. ' +
+      'Por ahora puedo responder con el catálogo Chagra y conocimiento agronómico general. ' +
+      'Pregúntame de forma concreta y te ayudo con lo que tengo.',
+  },
+]);
+
+const DEF_BY_INTENT = Object.freeze(
+  CHIP_DEFS.reduce((acc, def) => {
+    acc[def.intent] = def;
+    return acc;
+  }, {}),
+);
+
+/**
+ * ¿Este intent es un STUB (backend no implementado)?
+ * @param {string} intent
+ * @returns {boolean}
+ */
+export function isStubIntent(intent) {
+  const def = DEF_BY_INTENT[intent];
+  return Boolean(def && def.kind === 'stub');
+}
+
+/**
+ * Mapea un chip (intención forzada) + texto del usuario a un plan
+ * determinístico que el AgentScreen ejecuta SIN pasar por el NLU.
+ *
+ * @param {string} intent — uno de CHIP_INTENTS.
+ * @param {string} text — texto crudo del usuario (lo que escribió en el input).
+ * @param {object} [opts]
+ * @param {string|null} [opts.municipio] — municipio de la finca activa (para clima).
+ * @returns {null | {
+ *   intent: string,
+ *   tool: string | null,        // tool determinístico, o null si stub
+ *   args: object | null,        // args del tool (forma específica por tool)
+ *   stub: boolean,              // true → no hay tool real
+ *   stubResult: object | null,  // evidence sintética inyectable (ej. clima no_municipio)
+ *   stubMessage: string | null, // mensaje honesto "aún no disponible" para el usuario
+ *   prompt: string,             // texto del usuario trimmeado (lo que se manda al LLM/burbuja)
+ *   skipNlu: true,              // SIEMPRE true: el chip salta el NLU planner
+ * }}
+ */
+export function planForcedIntent(intent, text, opts = {}) {
+  const def = DEF_BY_INTENT[intent];
+  if (!def) return null;
+  if (typeof text !== 'string') return null;
+  const prompt = text.trim();
+  if (!prompt) return null;
+
+  const base = {
+    intent,
+    tool: null,
+    args: null,
+    stub: false,
+    stubResult: null,
+    stubMessage: null,
+    prompt,
+    skipNlu: true,
+  };
+
+  switch (intent) {
+    case CHIP_INTENTS.siembro:
+    case CHIP_INTENTS.calendario:
+      // Ficha de especie. El calendario/época de siembra se deriva de la ficha
+      // (no hay get_calendario_siembra dedicado en el sidecar). El grounding
+      // trae piso térmico / ciclo y el LLM lo expone como época de siembra.
+      return { ...base, tool: 'get_species', args: { query: prompt } };
+
+    case CHIP_INTENTS.plaga:
+      // Controladores agroecológicos de la plaga (AGE Cypher).
+      return { ...base, tool: 'get_pest_controllers', args: { pest: prompt } };
+
+    case CHIP_INTENTS.biopreparado:
+      // Recetas de biopreparados del catálogo.
+      return { ...base, tool: 'get_biopreparados', args: { query: prompt } };
+
+    case CHIP_INTENTS.clima: {
+      const municipio =
+        typeof opts.municipio === 'string' && opts.municipio.trim()
+          ? opts.municipio.trim()
+          : null;
+      if (!municipio) {
+        // Sin municipio NO llamamos el tool: inyectamos evidence sintética
+        // que obliga al LLM a PEDIR el municipio (NO inventar datos de IDEAM).
+        // Mismo contrato que la heurística de clima existente en AgentScreen.
+        return {
+          ...base,
+          tool: 'get_clima_ideam',
+          args: { action: 'monthly_avg' },
+          stub: true,
+          stubResult: {
+            available: false,
+            reason: 'no_municipio',
+            hint: 'pedirle al usuario su municipio para consultar IDEAM',
+          },
+        };
+      }
+      const desde = isoDaysAgo(30);
+      return {
+        ...base,
+        tool: 'get_clima_ideam',
+        args: { action: 'monthly_avg', municipio, metric: 'precipitation', desde },
+      };
+    }
+
+    case CHIP_INTENTS.precio:
+    case CHIP_INTENTS.deep:
+      // STUB: backend no implementado. NO inventamos endpoint.
+      return { ...base, stub: true, stubMessage: def.stubMessage };
+
+    default:
+      return null;
+  }
+}
+
+/**
+ * Fecha ISO (YYYY-MM-DD) de hace N días. Aislado para testabilidad y para no
+ * acoplar el router a Date.now() en el switch.
+ * @param {number} days
+ * @returns {string}
+ */
+function isoDaysAgo(days) {
+  return new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 10);
+}
