@@ -41,7 +41,7 @@ export const HELP_TIPS = [
   {
     id: 'cemetery-transplant',
     category: 'observacion',
-    text: 'Trasplante al atardecer, con sustrato húmedo, sin romper el cepellón. Riegue abundante el primer día y sombree 3 días para evitar shock de trasplante.',
+    text: 'Trasplante al atardecer, con sustrato húmedo, sin romper el cepellón. Riegue abundante el primer día y sombree 3 días para evitar choque de trasplante.',
     source: 'cemetery_reason:transplant_shock'
   },
   {

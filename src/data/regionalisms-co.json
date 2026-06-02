@@ -4,7 +4,7 @@
     "caribe": {
       "label": "Caribe",
       "departamentos": ["atlantico", "bolivar", "cesar", "cordoba", "guajira", "magdalena", "san_andres", "sucre"],
-      "saludos": ["¡Ajá, parce!", "¡Vé pue!", "Hermano, mira esto."],
+      "saludos": ["¡Ajá, parce!", "¡Erda, primo!", "Hermano, mira esto."],
       "conectores": ["mira que", "fíjate", "viste"],
       "cierres": ["Saludo desde el Caribe.", "Buena pa' la chagra."]
     },
@@ -26,13 +26,13 @@
       "label": "Santandereano",
       "departamentos": ["santander", "norte_de_santander"],
       "saludos": ["¡Quiubo, mano!", "Hermano, mire."],
-      "conectores": ["mano", "hijuemadre"],
+      "conectores": ["mano", "berraco"],
       "cierres": ["Pa'lante."]
     },
     "llanero": {
       "label": "Llanero",
       "departamentos": ["meta", "casanare", "vichada", "arauca", "guainia_amazonico"],
-      "saludos": ["Quibo, ome.", "Mire mocho."],
+      "saludos": ["Quibo, ome.", "Epa, compa."],
       "conectores": ["vale", "ome"],
       "cierres": ["Pa' la sabana."]
     },

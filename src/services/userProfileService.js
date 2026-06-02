@@ -98,7 +98,7 @@ export const PROFILE_QUESTIONS = [
   {
     id: 'finca_hectareas',
     category: 'finca',
-    title: '¿Qué tamaño tiene tu predio?',
+    title: '¿Qué tamaño tiene tu finca?',
     help: 'Aproximado, en hectáreas. Si no lo sabes, sáltalo.',
     type: 'single',
     options: [
