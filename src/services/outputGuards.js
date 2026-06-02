@@ -1836,6 +1836,162 @@ export function guardInventedName(responseText, { profileName = null } = {}) {
   };
 }
 
+// ── GUARD: claims de salud sobre FERMENTOS (DR-FOOD-3, SAFETY-CRITICAL) ───────
+
+/**
+ * Gatillos de INTENCIÓN-FERMENTO (espejo del pre-filtro del sidecar,
+ * fermento-prefilter.ts). El guard SOLO corre si la query/respuesta toca un
+ * fermento — anti-falso-positivo. Lista cerrada, normalizada (minúsculas, sin
+ * tildes). NO incluye términos agroecológicos generales (siembra, plaga,
+ * precio) para no disparar en queries no-fermento. Fuente de verdad:
+ * Chagra-strategy/deepresearch/DR-FOOD-3-CONSOLIDADO-2026-06-02.md §2.
+ */
+const FERMENTO_TERMS = [
+  'fermento',
+  'fermentado',
+  'fermentacion',
+  'masato',
+  'chicha',
+  'guarapo',
+  'champus',
+  'kombucha',
+  'scoby',
+  'kefir',
+  'chapo',
+  'suero costeno',
+  'cuajada',
+  'yogur',
+  'yogurt',
+  'chucrut',
+  'sauerkraut',
+  'hidromiel',
+  'encurtido',
+];
+
+/**
+ * Verbos/sustantivos de CLAIM DE SALUD prohibidos (§3.3 veto de claims). Si la
+ * respuesta atribuye a un fermento una propiedad diagnóstica/curativa/
+ * preventiva/desintoxicante, el guard la redirige a la frase segura del
+ * catálogo. Normalizado (minúsculas, sin tildes).
+ */
+const HEALTH_CLAIM_TERMS = [
+  'cura',
+  'curar',
+  'cura el',
+  'cura la',
+  'sana',
+  'sanar',
+  'previene',
+  'prevenir',
+  'combate',
+  'combatir',
+  'desintoxica',
+  'desintoxicar',
+  'detoxifica',
+  'depura',
+  'depurar',
+  'limpia el higado',
+  'limpia los rinones',
+  'elimina toxinas',
+  'baja el azucar',
+  'baja la presion',
+  'controla la diabetes',
+  'trata el',
+  'trata la',
+  'remedio para',
+  'medicina para',
+  'medicinal',
+  'propiedades medicinales',
+  'fortalece el sistema inmune',
+  'sube las defensas',
+  'antibiotico natural',
+];
+
+/**
+ * ¿La respuesta toca un fermento? (gate de intención). Mira tanto el texto del
+ * LLM como, si se pasó, la pregunta del usuario — basta con que UNO mencione un
+ * fermento. Conservador hacia NO disparar: sin término de fermento → false.
+ *
+ * @param {string} textNorm  respuesta del LLM normalizada.
+ * @param {string} userNorm  pregunta del usuario normalizada (o '').
+ * @returns {boolean}
+ */
+function _touchesFermento(textNorm, userNorm) {
+  for (const t of FERMENTO_TERMS) {
+    if (textNorm.includes(t) || userNorm.includes(t)) return true;
+  }
+  return false;
+}
+
+/**
+ * Frase segura de redirección (§3.3, catálogo canónico del consolidado). El
+ * fermento es un ALIMENTO, no un medicamento; ante síntomas, deriva al puesto
+ * de salud. NO cita un nombre propio: la autoridad es la pauta institucional
+ * (un fermento no es medicamento — marco INVIMA/Res. 810/2021).
+ */
+const FERMENTO_HEALTH_REDIRECT =
+  'Una aclaración importante: un fermento es un alimento, no un medicamento. ' +
+  'No cura, no previene ni desintoxica ninguna enfermedad. Si tiene un malestar ' +
+  'o una enfermedad, visite el puesto de salud de la vereda para diagnóstico y ' +
+  'tratamiento; ningún alimento reemplaza la atención médica.';
+
+/**
+ * guardFermentoHealthClaim — DR-FOOD-3, capa 2 de defensa-en-profundidad
+ * (guard de salida del PWA). SAFETY-CRITICAL · FAIL-SAFE.
+ *
+ * Si la respuesta del LLM atribuye a un FERMENTO un claim de salud
+ * (diagnóstico/curativo/preventivo/desintoxicante), ANEXA la frase segura del
+ * catálogo. NO intenta cirugía de frase (frágil): preserva la parte útil y
+ * añade la corrección al final, dejando claro que el fermento es alimento, no
+ * medicamento. Idempotente: si la corrección ya está, no re-dispara.
+ *
+ * GATING POR INTENCIÓN (anti-falso-positivo): solo corre si la respuesta o la
+ * pregunta tocan un fermento. En una query no-fermento ("la papa baja el
+ * azúcar" sobre precio de mercado) NO se ve afectada — el verbo de salud por sí
+ * solo no dispara.
+ *
+ * Firma propia (necesita userMessage para el gate) → se invoca aparte en
+ * applyOutputGuards, no dentro de GUARD_CHAIN.
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardFermentoHealthClaim(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  const textNorm = _stripDiacritics(responseText);
+  const userNorm = _stripDiacritics(userMessage || '');
+
+  // Gate de intención: sin fermento en juego, no corremos (anti-falso-positivo).
+  if (!_touchesFermento(textNorm, userNorm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Idempotencia: si la frase segura ya está anexada, no re-dispara.
+  if (textNorm.includes(_stripDiacritics('un fermento es un alimento, no un medicamento'))) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // ¿Hay un claim de salud en el texto? Buscamos los términos prohibidos.
+  const hits = [];
+  for (const claim of HEALTH_CLAIM_TERMS) {
+    if (textNorm.includes(claim)) hits.push(claim);
+  }
+  if (hits.length === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('fermentoHealthClaim');
+  const text = `${responseText.trim()}\n\n${FERMENTO_HEALTH_REDIRECT}`;
+  return {
+    text,
+    modified: true,
+    reason: `claim_salud_fermento: ${[...new Set(hits)].slice(0, 4).join(', ')}`,
+  };
+}
+
 /**
  * Set de guards que SOLO tienen sentido cuando la consulta es de SIEMBRA
  * (A12). Si la pregunta del usuario es de PRECIO/MERCADO (o info general sin
@@ -1983,6 +2139,16 @@ export function applyOutputGuards(
     text = nameRes.text;
     modified = true;
     if (nameRes.reason) reasons.push(nameRes.reason);
+  }
+  // Guard de claims de salud sobre fermentos (DR-FOOD-3, SAFETY): firma propia
+  // (necesita userMessage para el gate de intención-fermento). Corre SIEMPRE
+  // (no es guard de siembra) pero solo actúa si la respuesta/pregunta tocan un
+  // fermento. Fail-safe: ante un claim de salud, redirige a la frase segura.
+  const fermRes = guardFermentoHealthClaim(text, { userMessage });
+  if (fermRes && fermRes.modified) {
+    text = fermRes.text;
+    modified = true;
+    if (fermRes.reason) reasons.push(fermRes.reason);
   }
   return { text, modified, reasons };
 }
