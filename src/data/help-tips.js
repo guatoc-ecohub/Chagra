@@ -5,7 +5,7 @@ export const HELP_TIPS = [
   {
     id: 'cemetery-overwatering',
     category: 'riego',
-    text: 'Antes de regar, meta el dedo 3 cm en el sustrato. Si está húmedo, espera. La mayoría de plantas que mueren por riego excesivo se salvan con esta regla.',
+    text: 'Antes de regar, meta el dedo 3 cm en el sustrato. Si está húmedo, espere. La mayoría de plantas que mueren por riego excesivo se salvan con esta regla.',
     source: 'cemetery_reason:overwatering'
   },
   {
@@ -35,7 +35,7 @@ export const HELP_TIPS = [
   {
     id: 'cemetery-light',
     category: 'observacion',
-    text: 'Plantas de sol pleno en sombra se estilan y mueren débiles. Sombra obligatoria en pleno sol queman las hojas. Respete la radiación óptima por especie desde la siembra.',
+    text: 'Las plantas de sol pleno puestas en sombra se ahílan (crecen pálidas y débiles) y se mueren. Las plantas de sombra puestas a pleno sol se queman. Respete la luz que pide cada especie desde la siembra.',
     source: 'cemetery_reason:light'
   },
   {
@@ -89,7 +89,7 @@ export const HELP_TIPS = [
   {
     id: 'lechuga-mulch',
     category: 'sustrato',
-    text: 'Use mulch para estabilizar humedad del sustrato y prevenir enfermedades como tip burn y mildiu velloso.',
+    text: 'Use mulch para estabilizar humedad del sustrato y prevenir enfermedades como quemado de bordes (tip burn) y mildiu velloso.',
     source: 'species_lesson:lechuga'
   },
   {
@@ -119,7 +119,7 @@ export const HELP_TIPS = [
   {
     id: 'fresa-higiene',
     category: 'observacion',
-    text: 'Mantenga rigurosa higiene del microclima edáfico alrededor de sus fresas. Elimina hojas secas y frutos dañados para prevenir enfermedades.',
+    text: 'Mantenga rigurosa higiene del microclima edáfico alrededor de sus fresas. Elimine hojas secas y frutos dañados para prevenir enfermedades.',
     source: 'species_lesson:fresa'
   },
   {

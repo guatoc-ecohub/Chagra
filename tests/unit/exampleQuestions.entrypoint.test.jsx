@@ -157,7 +157,7 @@ const MODEL_ANSWERS = Object.freeze({
   'Receta de biopreparado para tomate':
     'Un biopreparado útil para tomate es el caldo de ceniza: 1 kg de ceniza cernida en 10 L de agua, ' +
     'reposar 24 horas, colar y aplicar foliar cada 8 días. Ayuda contra hongos y aporta potasio.',
-  'Cuándo planto tomates?':
+  '¿Cuándo planto tomates?':
     'El tomate se siembra en almácigo y se trasplanta a los 25-30 días. En clima medio se puede sembrar ' +
     'casi todo el año evitando los picos de lluvia. ¿En qué municipio estás?',
   'Mi planta tiene manchas amarillas':
@@ -280,11 +280,11 @@ describe('Preguntas-ejemplo — guards sanean respuestas MALAS sin blanquear el 
     // bloquea este test (lo dejamos documentado para un fix futuro del filtro).
   });
 
-  test('fuga de rol en respuesta del chip "Cuándo planto tomates" → se trunca, no vacío', () => {
+  test('fuga de rol en respuesta del chip "¿Cuándo planto tomates?" → se trunca, no vacío', () => {
     const malo =
       'El tomate se trasplanta a los 25-30 días.\nUsuario: gracias, y el maíz?\nAsistente: el maíz...';
-    const finalText = runProductionTail(malo, { userMessage: 'Cuándo planto tomates?' });
-    assertHealthyAnswer('Cuándo planto tomates?', finalText);
+    const finalText = runProductionTail(malo, { userMessage: '¿Cuándo planto tomates?' });
+    assertHealthyAnswer('¿Cuándo planto tomates?', finalText);
     expect(finalText).toContain('El tomate se trasplanta');
   });
 

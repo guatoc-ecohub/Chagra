@@ -25,7 +25,7 @@
     "santandereano": {
       "label": "Santandereano",
       "departamentos": ["santander", "norte_de_santander"],
-      "saludos": ["¡Quí whopping, mano!", "Hermano, mire."],
+      "saludos": ["¡Quiubo, mano!", "Hermano, mire."],
       "conectores": ["mano", "hijuemadre"],
       "cierres": ["Pa'lante."]
     },
@@ -39,7 +39,7 @@
     "opita": {
       "label": "Opita / Tolimense",
       "departamentos": ["tolima", "huila"],
-      "saludos": ["Buenas, paisano.", "Quí houve."],
+      "saludos": ["Buenas, paisano.", "Quiubo, paisano."],
       "conectores": ["jue", "ah pues"],
       "cierres": ["Que le rinda."]
     },

@@ -33,7 +33,7 @@ export const QUICK_CHIPS_BAR_QUESTIONS = Object.freeze([
  * { text, icon }; `text` es lo que se envía como pregunta.
  */
 export const SUGGESTED_ACTIONS_CHIPS = Object.freeze([
-  { text: 'Cuándo planto tomates?', icon: '🌱' },
+  { text: '¿Cuándo planto tomates?', icon: '🌱' },
   { text: 'Mi planta tiene manchas amarillas', icon: '🔍' },
   { text: 'Registra que regué las lechugas', icon: '💧' },
   { text: 'Consejos para el invernadero', icon: '🏠' },
