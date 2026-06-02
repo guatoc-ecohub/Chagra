@@ -20,12 +20,12 @@ import useThemeBackgroundStore, {
 describe('useThemeBackgroundStore', () => {
   beforeEach(() => {
     localStorage.clear();
-    // Singleton entre tests: volver a 'default'.
-    useThemeBackgroundStore.getState().setBackground('default');
+    // Singleton entre tests: volver al default universal (Cosecha mística).
+    useThemeBackgroundStore.getState().setBackground('biopunk-4');
   });
 
-  it('estado inicial: selected="default"', () => {
-    expect(useThemeBackgroundStore.getState().selected).toBe('default');
+  it('default universal: selected="biopunk-4" (Cosecha mística, operador 2026-06-02)', () => {
+    expect(useThemeBackgroundStore.getState().selected).toBe('biopunk-4');
   });
 
   it('setBackground cambia el fondo seleccionado', () => {
@@ -70,8 +70,9 @@ describe('useThemeBackgroundStore', () => {
     expect(getBackgroundById('no-existe')).toBe(BACKGROUND_CATALOG[0]);
   });
 
-  it('getBackgroundSrc: default usa la imagen clásica', () => {
+  it('getBackgroundSrc: default cae a Cosecha mística (DEFAULT_BACKGROUND_SRC)', () => {
     expect(getBackgroundSrc('default')).toBe(DEFAULT_BACKGROUND_SRC);
+    expect(DEFAULT_BACKGROUND_SRC).toBe('/fondo-biopunk-4.jpg');
   });
 
   it('getBackgroundSrc: fondo biopunk usa su JPG', () => {

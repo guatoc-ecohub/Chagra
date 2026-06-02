@@ -47,7 +47,7 @@
      * overlay global. */
     background-image:
       linear-gradient(rgba(2, 6, 23, 0.45), rgba(2, 6, 23, 0.62)),
-      var(--app-bg-image, url('/biodiversidad-bg.jpg'));
+      var(--app-bg-image, url('/fondo-biopunk-4.jpg'));
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;

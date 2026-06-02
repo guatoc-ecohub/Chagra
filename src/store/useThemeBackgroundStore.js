@@ -72,8 +72,13 @@ export const BACKGROUND_CATALOG = Object.freeze([
   }),
 ]);
 
-/** Imagen clásica original — fallback estable para 'default'. */
-export const DEFAULT_BACKGROUND_SRC = '/biodiversidad-bg.jpg';
+/**
+ * Fondo por defecto de TODA la app y el login — "Cosecha mística" (biopunk-4).
+ * Decisión operador 2026-06-02: este es el default universal; cualquier usuario
+ * que no haya elegido explícitamente otro fondo (incluido login/incógnito) lo ve.
+ * (Antes era '/biodiversidad-bg.jpg', el "fondo viejo" que el operador descartó.)
+ */
+export const DEFAULT_BACKGROUND_SRC = '/fondo-biopunk-4.jpg';
 
 /** Set congelado de ids válidos para validar entradas externas. */
 const VALID_IDS = Object.freeze(BACKGROUND_CATALOG.map((b) => b.id));
@@ -98,7 +103,9 @@ export function getBackgroundSrc(id) {
 const useThemeBackgroundStore = create(
   persist(
     (set) => ({
-      selected: 'default',
+      // Default universal "Cosecha mística" (operador 2026-06-02). Usuarios
+      // nuevos / incógnito arrancan en biopunk-4; el chip queda resaltado en Perfil.
+      selected: 'biopunk-4',
 
       /**
        * Cambia el fondo seleccionado. Valida contra el catálogo; un id
