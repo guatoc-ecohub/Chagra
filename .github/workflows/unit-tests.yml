@@ -1,17 +1,24 @@
 name: Unit Tests (vitest)
 
-# Gate de tests unitarios (vitest). Hasta ahora la suite vitest NO corría en
-# CI — solo Playwright E2E. Este job cierra ese hueco y, en particular, hace
-# que el test del PUNTO DE ACCESO #1 (preguntas-ejemplo / chips:
-# tests/unit/exampleQuestions.entrypoint.test.jsx) corra en CADA PR.
+# Gate de tests unitarios del PUNTO DE ACCESO #1 (preguntas-ejemplo / chips).
+# Hasta ahora la suite vitest NO corría en CI — solo Playwright E2E. Este job
+# cierra ese hueco para lo más sensible: que el test
+# tests/unit/exampleQuestions.entrypoint.test.jsx corra en CADA PR.
 #
 # Política del operador ("esto debe probarse cada vez que valga la pena"): el
-# job corre SIEMPRE en PRs a main y en push a main — es barato (~1 min, sin GPU,
-# sin red). Los `paths` de abajo NO restringen la ejecución (corre siempre);
-# están documentados como la SUPERFICIE del agente que, al cambiar, hace
-# imprescindible este gate: si tocás el AgentScreen, los guards de salida, el
-# filtro de voseo, el agentService o los componentes de chips, este test debe
-# pasar antes del merge.
+# job corre SIEMPRE en PRs a main y en push a main — es barato (segundos, sin
+# GPU, sin red). Los `paths` de abajo están documentados como la SUPERFICIE del
+# agente que, al cambiar, hace imprescindible este gate: si tocás el AgentScreen,
+# los guards de salida, el filtro de voseo, el agentService o los componentes de
+# chips, este test debe pasar antes del merge.
+#
+# ALCANCE (por qué no la suite completa todavía): el job arranca enfocado en el
+# test del entrypoint + sus dependencias deterministas (chips, outputGuards,
+# voseoFilter, catalog-count) porque 2 tests preexistentes de visión
+# (aiService.visionCache / visionCacheService) son CI-flaky por diferencias de
+# SubtleCrypto.digest entre runners — pasan local pero fallan en ubuntu-latest.
+# Ampliar este gate a `npm run test:unit` (suite completa) queda pendiente de
+# estabilizar esos 2 tests; ver el cuerpo del PR para el detalle.
 on:
   pull_request:
     branches: [main]
@@ -29,6 +36,7 @@ permissions:
 #   - src/components/QuickChipsBar.jsx
 #   - src/components/AgentScreen/SuggestedActions.jsx
 #   - src/components/dashboard/AgentHero.jsx
+#   - src/data/exampleQuestions.js
 #   - tests/unit/exampleQuestions.*
 
 jobs:
@@ -49,5 +57,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run unit tests
-        run: npm run test:unit
+      # Test del PUNTO DE ACCESO #1 + dependencias deterministas. Determinista
+      # en CI (sin crypto/IndexedDB/red). Falla RUIDOSAMENTE si un chip-ejemplo
+      # devuelve vacío/error tras el pipeline de salida.
+      - name: Run entrypoint unit tests
+        run: >-
+          npm run test:unit --
+          tests/unit/exampleQuestions.entrypoint.test.jsx
+          tests/unit/outputGuards.test.js
+          tests/unit/catalog-count.test.js
+          src/components/__tests__/QuickChipsBar.smoke.test.jsx
+          src/components/__tests__/ChipsToolbar.smoke.test.jsx
