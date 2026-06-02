@@ -48,6 +48,11 @@ import { streamChatViaSidecar, isAgentStreamingEnabled } from '../../services/st
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
 import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, postValidate, getClimaIdeam } from '../../services/sidecarClient';
+// CHIPS DE MODO (A3/A4, decisión operador 2026-06-02): el router PURO mapea
+// la intención forzada del chip → tool determinístico, SALTANDO el NLU
+// (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
+// los chips cuyo backend aún no existe (precio/deep).
+import { planForcedIntent, isStubIntent, CHIP_DEFS } from '../../services/chipIntentRouter';
 import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, resolveUserRegion, stripRoleLeak } from '../../services/agentService';
 import { applyOutputGuards } from '../../services/outputGuards';
 import { getProfile } from '../../services/userProfileService';
@@ -69,6 +74,7 @@ import ActionConfirmModal from '../ActionConfirmModal';
 import FeedbackConsentModal from '../FeedbackConsentModal';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import QuickChipsBar from '../QuickChipsBar';
+import ChipsToolbar from '../ChipsToolbar';
 import AgentDemoExample from '../AgentDemoExample';
 import { agentSounds } from '../../services/agentSoundService';
 import usePrefsStore from '../../store/usePrefsStore';
@@ -168,6 +174,12 @@ export default function AgentScreen({ onBack, initialContext }) {
   // informe oficial. El banner es dismissable — al primer submit, o cuando
   // el operador cierra, desaparece. NO se persiste entre mounts.
   const [alertContextBanner, setAlertContextBanner] = useState(null);
+  // CHIPS DE MODO (A4): modo activo seleccionado en la ChipsToolbar. Cuando
+  // hay un modo activo, el siguiente submit fuerza esa intención y rutea
+  // DIRECTO al tool determinístico (saltando el NLU, A3). El placeholder del
+  // input también cambia para guiar al campesino sobre qué escribir. Es un
+  // toggle: tocar el mismo chip lo desactiva (vuelve al routing NLU normal).
+  const [activeIntent, setActiveIntent] = useState(null);
 
   const { durationMs, start: startRecord, stop: stopRecord, reset: resetRecord } = useVoiceRecorder();
   const chatEndRef = useRef(null);
@@ -1247,7 +1259,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
   // completo (RAG, sidecar, LLM, TTS, action gate) para UN solo texto.
   // No toca el queue store — eso lo hace handleSubmit antes/después.
   // Tampoco hace re-entry guard porque el queue ya garantiza serialización.
-  const runAgentPipeline = async (text, { suppressUserBubble = false, visionContext = null } = {}) => {
+  const runAgentPipeline = async (text, { suppressUserBubble = false, visionContext = null, forcedIntent = null } = {}) => {
     // Bug 2026-05-31: cuando el item viene de la outbox multimodal (foto /
     // adjunto), el caller YA pintó la burbuja de usuario REAL (con su imagen).
     // Si además pintáramos aquí una burbuja con el prompt sintético ("Analicé
@@ -1331,7 +1343,56 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
             }
           }
 
-          // PASO 2 — NLU planner + tool call (flow original).
+          // PASO 2 — routing del tool.
+          //
+          // CHIPS DE MODO (A3): si el usuario forzó la intención tocando un
+          // chip, NO consultamos el NLU planner — su misrouting es justo lo
+          // que el chip evita (incidente "papa precio"). `planForcedIntent`
+          // mapea (intent, texto) → tool determinístico + args, y lo llamamos
+          // directo. El municipio sale de la finca activa para el modo clima.
+          // Si no hay chip activo, conservamos el flujo NLU original.
+          if (forcedIntent) {
+            const activeFincaClima = fincas.find((f) => f.slug === activeFincaSlug);
+            const municipioClima =
+              activeFincaClima?.municipio || FARM_CONFIG?.MUNICIPIO || null;
+            const forcedPlan = planForcedIntent(forcedIntent, textForLLM, {
+              municipio: municipioClima,
+            });
+            if (forcedPlan && forcedPlan.tool) {
+              if (forcedPlan.stub && forcedPlan.stubResult) {
+                // Modo clima sin municipio: inyectamos evidence sintética que
+                // obliga al LLM a PEDIR el municipio (NO inventar datos IDEAM).
+                toolEvidence = {
+                  tool: forcedPlan.tool,
+                  args: forcedPlan.args,
+                  result: forcedPlan.stubResult,
+                };
+                console.debug('[sidecar] chip forzado — evidence sintética', {
+                  intent: forcedIntent,
+                  tool: forcedPlan.tool,
+                  reason: forcedPlan.stubResult.reason,
+                });
+              } else {
+                const tTool0 = performance.now();
+                const result = await callTool(forcedPlan.tool, forcedPlan.args);
+                const tTool1 = performance.now();
+                if (result) {
+                  toolEvidence = { tool: forcedPlan.tool, args: forcedPlan.args, result };
+                  console.debug('[sidecar] chip forzado (NLU saltado)', {
+                    intent: forcedIntent,
+                    tool: forcedPlan.tool,
+                    latencyTool: Math.round(tTool1 - tTool0),
+                  });
+                } else {
+                  console.debug('[sidecar] chip forzado tool null', {
+                    intent: forcedIntent,
+                    tool: forcedPlan.tool,
+                  });
+                }
+              }
+            }
+          } else {
+          // PASO 2b — NLU planner + tool call (flow original, sin chip).
           const tNlu0 = performance.now();
           const plan = await planNlu(textForLLM, contextMemory);
           const tNlu1 = performance.now();
@@ -1384,6 +1445,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
               reason: plan.reason || 'no_tool',
             });
           }
+          }
 
           // PASO 3 — detección heurística frontend de intent climática
           // mientras NLU sidecar no se actualiza (TODO en nlu.ts del sidecar).
@@ -1392,8 +1454,10 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
           // grounding macro. Optimista no-estricto: si falla → seguimos sin
           // clima inyectado (graceful degrade — el LLM tira de RAG y dice
           // "no tengo IDEAM" en último caso). Solo se ejecuta si NO hubo
-          // tool ya invocado vía NLU para no inflar contexto.
-          if (!toolEvidence) {
+          // tool ya invocado vía NLU para no inflar contexto. Tampoco corre
+          // bajo chip forzado: el chip ya decidió el tool determinístico (el
+          // modo clima tiene su propia rama), no re-inferimos por keywords.
+          if (!toolEvidence && !forcedIntent) {
             const climaKeywords = /clima|lluvia|llueve|llover|temperatura|sequ[íi]a|fr[íi]o|calor|estaci[óo]n\s+meteorol[óo]gica|ideam|precipitaci[óo]n|pron[óo]stico|reporte\s+(del\s+)?tiempo/i;
             // Bug piloto 2026-05-27: FARM_CONFIG.MUNICIPIO viene de build-time
             // env (VITE_FARM_MUNICIPIO). En prod sin esa env queda null y
@@ -1757,9 +1821,35 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     await handleSubmit(prompt);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleSubmit = async (text, { fromVoice = false, suppressUserBubble = false, visionContext = null } = {}) => {
+  const handleSubmit = async (text, { fromVoice = false, suppressUserBubble = false, visionContext = null, forcedIntent = null } = {}) => {
     if (!text || !text.trim()) return;
     const trimmed = text.trim();
+
+    // CHIPS DE MODO — STUB (A3): precio/deep no tienen backend todavía. NO
+    // routeamos a un tool fantasma ni gastamos una inferencia del LLM:
+    // pintamos la pregunta del usuario + una respuesta honesta "aún no
+    // disponible" y salimos. Esto evita el misrouting del NLU (que mandaba
+    // "papa" al tool de precio inexistente) y es transparente con el campesino.
+    if (forcedIntent && isStubIntent(forcedIntent)) {
+      const stubPlan = planForcedIntent(forcedIntent, trimmed);
+      if (stubPlan && stubPlan.stub && stubPlan.stubMessage) {
+        const userMessage = { role: 'user', content: trimmed, timestamp: Date.now() };
+        const assistantMessage = {
+          role: 'assistant',
+          content: stubPlan.stubMessage,
+          timestamp: Date.now(),
+        };
+        setMessages((prev) => [...prev, userMessage, assistantMessage]);
+        try {
+          await addTurn(operatorId, { role: 'user', content: trimmed });
+          await addTurn(operatorId, { role: 'assistant', content: stubPlan.stubMessage });
+        } catch (e) {
+          console.warn('[Agent] stub addTurn failed (continuo):', e?.message);
+        }
+        setActiveIntent(null);
+        return;
+      }
+    }
 
     // El queue ya serializa. NO replicamos el guard `state !== STATE_IDLE`
     // del flow previo — eso hacía que la 2da pregunta se perdiera sin
@@ -1776,6 +1866,10 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     // preguntas de texto nuevas → sin foto → el guard corrige afirmaciones
     // visuales fabricadas.
     let firstVisionContext = visionContext;
+    // CHIPS DE MODO (A3): la intención forzada del chip aplica SOLO al primer
+    // texto de este submit. Los pending promovidos son preguntas nuevas — sin
+    // chip activo → rutean por el NLU normal.
+    let firstForcedIntent = forcedIntent;
 
     const route = selectChatRoute(trimmed);
     const result = useAgentQueueStore.getState().enqueue(trimmed, route);
@@ -1820,12 +1914,15 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         await runAgentPipeline(currentText, {
           suppressUserBubble: suppressFirstBubble,
           visionContext: firstVisionContext,
+          forcedIntent: firstForcedIntent,
         });
         // Solo el primer texto del caller usa la supresión / el contexto de
-        // visión; los promovidos (pending) son preguntas nuevas: pintan su
-        // propia burbuja y NO arrastran la foto del turno anterior.
+        // visión / la intención forzada del chip; los promovidos (pending) son
+        // preguntas nuevas: pintan su propia burbuja, NO arrastran la foto ni
+        // el modo del turno anterior.
         suppressFirstBubble = false;
         firstVisionContext = null;
+        firstForcedIntent = null;
       } catch (pipelineErr) {
         // runAgentPipeline ya captura todo internamente; este catch es
         // defensivo (e.g. error fuera del try interno). Marcamos failed
@@ -1895,8 +1992,13 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
 
   const handleTextSubmit = (e) => {
     e.preventDefault();
-    handleSubmit(inputText);
+    // CHIPS DE MODO (A3): si hay un modo activo, el submit lleva la intención
+    // forzada → runAgentPipeline salta el NLU y rutea directo al tool.
+    handleSubmit(inputText, { forcedIntent: activeIntent });
     setInputText('');
+    // El modo es de un solo uso por pregunta: tras enviar volvemos al routing
+    // NLU normal para el siguiente turno (igual que Gemini desactiva el chip).
+    setActiveIntent(null);
     // El banner de contexto de alerta es de un solo uso — al primer submit
     // el operador ya está conversando con el agente y el banner queda
     // redundante. Se reabre solo si vuelve a entrar desde la notificación.
@@ -1905,6 +2007,15 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
 
   const handleSuggestion = (text) => {
     handleSubmit(text);
+  };
+
+  // CHIPS DE MODO (A4): toggle del chip. Tocar un chip activa su modo (el
+  // próximo submit fuerza esa intención y salta el NLU); tocar el mismo chip
+  // de nuevo lo desactiva (vuelve al routing NLU normal). El chip 'foto' no
+  // se maneja acá — el flujo de foto vive en el compositor multimodal.
+  const handleChipSelect = (intent) => {
+    if (intent === 'foto') return; // reservado al flujo de adjuntos
+    setActiveIntent((prev) => (prev === intent ? null : intent));
   };
 
   // ── Consumo de la OUTBOX DURABLE del compositor del home ───────────────────
@@ -2088,6 +2199,12 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     drainOutbox();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // CHIPS DE MODO (A4): placeholder guía según el modo activo. Sin modo →
+  // placeholder genérico. Español colombiano (tú/usted), nunca voseo.
+  const activePlaceholder = activeIntent
+    ? (CHIP_DEFS.find((c) => c.intent === activeIntent)?.placeholder || 'Escribe tu pregunta...')
+    : 'Escribe tu pregunta...';
 
   return (
     <div className="h-full flex flex-col bg-slate-950">
@@ -2315,6 +2432,18 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         </div>
       )}
 
+      {/* CHIPS DE MODO (A4/B4): "caja de herramientas" estilo Gemini, fila
+          scrollable JUSTO sobre el input. Persistente durante toda la
+          conversación. Tocar un chip fuerza la intención del próximo submit y
+          rutea directo al tool (saltando el NLU, A3). El chip 📷 foto solo
+          aparece si hay imagen adjunta. */}
+      <ChipsToolbar
+        onSelectIntent={handleChipSelect}
+        activeIntent={activeIntent}
+        hasAttachment={false}
+        disabled={state === STATE_RECORDING}
+      />
+
       {/* Input */}
       <div className="p-4 border-t border-slate-800 bg-slate-900/80 shrink-0">
         <form onSubmit={handleTextSubmit} className="flex items-center gap-2">
@@ -2343,7 +2472,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
                 ? 'Espera — ya hay una en cola'
                 : queueProcessing
                   ? 'Adelanta otra pregunta (cola: 1 más)'
-                  : 'Escribe tu pregunta...'
+                  : activePlaceholder
             }
             disabled={state === STATE_RECORDING || queuePending.length >= 1}
             data-testid="agent-input"

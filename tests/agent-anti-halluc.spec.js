@@ -607,6 +607,117 @@ test.describe('AgentScreen — sidecar pipeline (flag-dependent)', () => {
     await expect(badge.last()).toBeVisible({ timeout: 30_000 });
     await expect(badge.last()).toHaveAttribute('data-source', 'tool-no-match');
   });
+
+  // ──────────────────────────────────────────────────────────────────────
+  // CHIPS DE MODO (A3/A4, decisión operador 2026-06-02) — el chip fuerza la
+  // intención y rutea DIRECTO al tool determinístico, SALTANDO el NLU. Estos
+  // tests prueban el contrato observable: con un chip activo, el front llama
+  // el tool correcto y NUNCA toca el endpoint /nlu del sidecar.
+  // ──────────────────────────────────────────────────────────────────────
+
+  test('Caso L — chip Plaga rutea a get_pest_controllers SIN llamar /nlu', async ({ page }) => {
+    let nluCalled = false;
+    let pestToolCalled = false;
+    // Interceptamos ANTES de mockSidecar para contar los hits (last-added wins
+    // por URL exacta, así que registramos el counter en page.route que gana).
+    await page.context().route('**/api/mcp/agro/nlu', (route) => {
+      nluCalled = true;
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ use_tool: false, tool: null, args: null }),
+      });
+    });
+    await page.context().route('**/api/mcp/agro/tools/get_pest_controllers', (route) => {
+      pestToolCalled = true;
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          found: true,
+          pest: 'broca del café',
+          controllers: [{ id: 'beauveria_bassiana', nombre: 'Beauveria bassiana' }],
+        }),
+      });
+    });
+    await mockSidecar(page);
+    await mockLLM(page, {
+      content: 'Para la broca del café usa Beauveria bassiana, un hongo entomopatógeno.',
+    });
+
+    await gotoAgentScreen(page);
+    // Activar el chip Plaga y enviar.
+    await page.getByRole('button', { name: /Plaga/i }).click();
+    await askAgent(page, 'broca del café');
+
+    await expect(page.getByText(/Beauveria bassiana/)).toBeVisible({ timeout: 30_000 });
+    expect(pestToolCalled).toBe(true);
+    expect(nluCalled).toBe(false); // ← el contrato clave: el chip SALTA el NLU.
+  });
+
+  test('Caso M — chip ¿Qué siembro? rutea a get_species SIN llamar /nlu', async ({ page }) => {
+    let nluCalled = false;
+    let speciesToolCalled = false;
+    await page.context().route('**/api/mcp/agro/nlu', (route) => {
+      nluCalled = true;
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ use_tool: false, tool: null, args: null }),
+      });
+    });
+    await page.context().route('**/api/mcp/agro/tools/get_species', (route) => {
+      speciesToolCalled = true;
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          found: true,
+          matches_count: 1,
+          nombre_cientifico: 'Persea americana Mill.',
+        }),
+      });
+    });
+    await mockSidecar(page);
+    await mockLLM(page, {
+      content: 'El aguacate (Persea americana Mill.) crece bien entre 1000 y 2000 msnm.',
+    });
+
+    await gotoAgentScreen(page);
+    await page.getByRole('button', { name: /Qué siembro/i }).click();
+    await askAgent(page, 'aguacate');
+
+    await expect(page.getByText(/Persea americana/)).toBeVisible({ timeout: 30_000 });
+    expect(speciesToolCalled).toBe(true);
+    expect(nluCalled).toBe(false);
+  });
+
+  test('Caso N — chip Precio responde stub honesto SIN llamar /nlu ni LLM', async ({ page }) => {
+    let nluCalled = false;
+    let llmCalled = false;
+    await page.context().route('**/api/mcp/agro/nlu', (route) => {
+      nluCalled = true;
+      route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
+    });
+    await page.context().route('**/api/ollama/v1/chat/completions', (route) => {
+      llmCalled = true;
+      route.fulfill({
+        status: 200,
+        contentType: 'text/event-stream',
+        body: buildSSEResponse('respuesta del LLM que NO debería aparecer'),
+      });
+    });
+    await mockSidecar(page);
+
+    await gotoAgentScreen(page);
+    await page.getByRole('button', { name: /Precio/i }).click();
+    await askAgent(page, 'papa');
+
+    // El stub responde con un mensaje honesto "no disponible" sin tocar red.
+    await expect(page.getByText(/no está disponible/i)).toBeVisible({ timeout: 15_000 });
+    expect(nluCalled).toBe(false);
+    expect(llmCalled).toBe(false);
+  });
 });
 
 // ============================================================================
