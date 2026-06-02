@@ -14,7 +14,7 @@
  * deja el evaluador listo + esta cobertura unitaria del scorer.
  */
 import { describe, it, expect } from 'vitest';
-import { writeFileSync, rmSync } from 'node:fs';
+import { writeFileSync, rmSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
@@ -289,15 +289,16 @@ describe('readAnthropicKey (sin tocar el entorno/disco real)', () => {
   });
 
   it('cae al archivo gitignored si no hay env', () => {
-    // Escribimos un archivo temporal con un valor NO-secreto (placeholder) para
-    // verificar la lectura + trim. NUNCA usamos una key real.
-    const tmpPath = join(tmpdir(), `chagra-judge-key-test-${process.pid}-${Date.now()}`);
+    // Escribimos un archivo en un directorio temporal ÚNICO (mkdtemp, permisos
+    // 0700) con un valor NO-secreto (placeholder). NUNCA usamos una key real.
+    const dir = mkdtempSync(join(tmpdir(), 'chagra-judge-key-test-'));
+    const tmpPath = join(dir, 'key');
     writeFileSync(tmpPath, '  not-a-real-key-PLACEHOLDER\n', 'utf-8');
     try {
       const key = readAnthropicKey({ env: {}, keyPath: tmpPath });
       expect(key).toBe('not-a-real-key-PLACEHOLDER'); // trim aplicado
     } finally {
-      rmSync(tmpPath, { force: true });
+      rmSync(dir, { recursive: true, force: true });
     }
   });
 
@@ -347,7 +348,7 @@ describe('makeAnthropicJudgeCall (fetch mockeado, sin key real)', () => {
     expect(raw).toBe('{"pass": true, "must_covered": 2, "must_total": 2, "red_flags_hit": 0}');
 
     // contrato del request: endpoint + headers anthropic + modelo Haiku + temp 0
-    expect(captured.url).toMatch(/api\.anthropic\.com\/v1\/messages/);
+    expect(captured.url).toBe('https://api.anthropic.com/v1/messages');
     expect(captured.init.headers['x-api-key']).toBe('sk-test-FAKE');
     expect(captured.init.headers['anthropic-version']).toBeTruthy();
     const body = JSON.parse(captured.init.body);

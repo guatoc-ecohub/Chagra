@@ -43,7 +43,6 @@ import {
   scoreAntiHallucDeterministic,
   assertIndependentJudge,
   selectJudgeProvider,
-  RECOMMENDED_OLLAMA_JUDGE_MODEL,
 } from './lib/bench-scorer.mjs';
 import { assertCheckoutCurrent } from './lib/bench-checkout-guard.mjs';
 import { applyOutputGuards } from '../src/services/outputGuards.js';
