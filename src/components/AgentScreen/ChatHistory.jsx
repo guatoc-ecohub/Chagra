@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import ChatBubble from './ChatBubble';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
+import DeepResearchCard from '../DeepResearchCard';
 
-export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, onConsentNeeded, onRetryOrphan }) {
+export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, onConsentNeeded, onRetryOrphan, onCancelDeepResearch }) {
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -45,16 +46,41 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
 
   return (
     <div className="flex-1 min-h-0 overflow-y-auto p-4 pb-2">
-      {messages.map((msg, idx) => (
-        <ChatBubble
-          key={msg.id || idx}
-          message={msg}
-          isStreaming={false}
-          promptText={msg.role === 'assistant' ? findPromptForResponse(idx) : undefined}
-          onConsentNeeded={onConsentNeeded}
-          onRetryOrphan={onRetryOrphan}
-        />
-      ))}
+      {messages.map((msg, idx) => {
+        // Deep Research (A6/A7): si el mensaje lleva _deepResearch, renderizamos
+        // el card de progreso/informe en lugar de (o junto a) la burbuja.
+        if (msg._deepResearch) {
+          const dr = msg._deepResearch;
+          return (
+            <div key={msg.id || idx} className="mb-3">
+              {/* Burbuja del usuario ya está en el mensaje anterior — el card es
+                  la "respuesta" del asistente: no pintamos burbuja de asistente vacía */}
+              <DeepResearchCard
+                status={dr.status}
+                steps={dr.steps}
+                report={dr.report}
+                citations={dr.citations}
+                query={dr.query}
+                onCancel={
+                  typeof onCancelDeepResearch === 'function' && msg.id
+                    ? () => onCancelDeepResearch(msg.id)
+                    : undefined
+                }
+              />
+            </div>
+          );
+        }
+        return (
+          <ChatBubble
+            key={msg.id || idx}
+            message={msg}
+            isStreaming={false}
+            promptText={msg.role === 'assistant' ? findPromptForResponse(idx) : undefined}
+            onConsentNeeded={onConsentNeeded}
+            onRetryOrphan={onRetryOrphan}
+          />
+        );
+      })}
 
       {/* Placeholder visible mientras llega el primer token (pre-stream).
           Sin esto el chat se ve "muerto" entre el envío del usuario y la

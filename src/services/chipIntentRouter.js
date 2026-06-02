@@ -107,12 +107,8 @@ export const CHIP_DEFS = Object.freeze([
     intent: CHIP_INTENTS.deep,
     emoji: '🔬',
     label: 'Investigación profunda',
-    kind: 'stub',
+    kind: 'deep',
     placeholder: 'Escribe el tema que quieres investigar a fondo',
-    stubMessage:
-      'La investigación profunda multi-fuente todavía no está disponible. ' +
-      'Por ahora puedo responder con el catálogo Chagra y conocimiento agronómico general. ' +
-      'Pregúntame de forma concreta y te ayudo con lo que tengo.',
   },
 ]);
 
@@ -125,12 +121,25 @@ const DEF_BY_INTENT = Object.freeze(
 
 /**
  * ¿Este intent es un STUB (backend no implementado)?
+ * Devuelve false para 'deep' — Deep Research ya tiene backend live.
  * @param {string} intent
  * @returns {boolean}
  */
 export function isStubIntent(intent) {
   const def = DEF_BY_INTENT[intent];
   return Boolean(def && def.kind === 'stub');
+}
+
+/**
+ * ¿Este intent es Deep Research?
+ * Permite al AgentScreen interceptar el flujo ANTES del stub-check y del
+ * pipeline NLU/tool, lanzando el job async de deep research.
+ * @param {string} intent
+ * @returns {boolean}
+ */
+export function isDeepResearchIntent(intent) {
+  const def = DEF_BY_INTENT[intent];
+  return Boolean(def && def.kind === 'deep');
 }
 
 /**
@@ -216,9 +225,15 @@ export function planForcedIntent(intent, text, opts = {}) {
     }
 
     case CHIP_INTENTS.precio:
-    case CHIP_INTENTS.deep:
       // STUB: backend no implementado. NO inventamos endpoint.
       return { ...base, stub: true, stubMessage: def.stubMessage };
+
+    case CHIP_INTENTS.deep:
+      // Deep Research: el backend está live (POST /deep-research → GET /deep-research/:id).
+      // Devolvemos el plan con kind='deep' para que AgentScreen lo intercepte
+      // ANTES del flujo NLU/tool y lance el job async. El caller (AgentScreen)
+      // gestiona el polling y actualiza el card en el historial de chat.
+      return { ...base, deep: true };
 
     default:
       return null;
