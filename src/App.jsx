@@ -16,6 +16,7 @@ import NetworkStatusBar from './components/NetworkStatusBar';
 import PendingTasksWidget from './components/PendingTasksWidget';
 import SyncProgressIndicator from './components/common/SyncProgressIndicator';
 import useOllamaWarmStore from './store/useOllamaWarmStore';
+import { prewarmCorpus } from './services/ragRetriever';
 import useThemeBackgroundStore, { getBackgroundSrc } from './store/useThemeBackgroundStore';
 import useAlertStore from './store/useAlertStore';
 import { alertEngine } from './services/alertEngine';
@@ -485,6 +486,12 @@ export default function App() {
     if (status === 'unknown') {
       startWarmup();
     }
+    // Hotfix prod-down 2026-06-02: pre-cargar el corpus RAG al llegar al
+    // dashboard (fallback al pre-warm de LoginScreen/OAuthCallback, cubre el
+    // refresh-con-sesión-persistida que arranca directo al dashboard sin
+    // re-login). prewarmCorpus es idempotente: si el corpus ya está cacheado o
+    // cargándose, no dispara trabajo extra. Fire-and-forget, no bloqueante.
+    prewarmCorpus();
   }, [currentView]);
 
   // 2026-05-18 (operator request): la imagen de fondo agroecológica de

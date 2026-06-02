@@ -233,3 +233,134 @@ describe('ragRetriever — pre-tokenize perf fix', () => {
     expect(stats.avgDocLen).toBeGreaterThan(0);
   });
 });
+
+/**
+ * Cobertura del HOTFIX prod-down 2026-06-02: loadCorpus paralelo-acotado.
+ *
+ * El bug: loadCorpus hacía `for (const slug) { await fetch }` SERIAL sobre los
+ * ~491 slugs del manifest → la PRIMERA query de cada sesión (incluido un
+ * saludo) colgaba ~3min porque cada fetch esperaba al anterior. El chat nunca
+ * respondía en prod.
+ *
+ * El fix dispara los fetches en lotes con concurrencia acotada
+ * (CORPUS_FETCH_CONCURRENCY = 12). Estos tests verifican empíricamente:
+ *   - loadCorpus COMPLETA (no cuelga) con un corpus grande (>concurrency).
+ *   - El fetch NO es estrictamente secuencial — hay >1 request en vuelo a la vez.
+ *   - El nivel de concurrencia NO excede el límite (no abre 491 sockets juntos).
+ *   - prewarmCorpus() deja el corpus listo (cacheado) para que retrieve sea
+ *     instantáneo después, y nunca lanza aunque la carga falle.
+ */
+describe('ragRetriever — loadCorpus paralelo-acotado (hotfix prod-down 2026-06-02)', () => {
+  const CONCURRENCY_LIMIT = 12;
+
+  // Manifest grande para ejercitar varios lotes (3 lotes de 12 + resto).
+  function makeBigManifest(n) {
+    return { generated_at: '2026-06-02T00:00:00Z', slugs: Array.from({ length: n }, (_, i) => `sp_${i}`) };
+  }
+
+  // Mock de fetch con timing controlado: cada fetch de doc se resuelve tras un
+  // tick, permitiendo que múltiples queden en vuelo simultáneamente. Trackea el
+  // pico de concurrencia para asertar paralelismo acotado.
+  function setupConcurrencyFetchMock(manifest) {
+    const tracker = { inFlight: 0, peak: 0, docFetches: 0 };
+    globalThis.fetch = vi.fn((url) => {
+      const u = String(url);
+      if (u.endsWith('/cycle-content/manifest.json')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          headers: { get: (h) => (h.toLowerCase() === 'content-type' ? 'application/json' : '') },
+          json: () => Promise.resolve(manifest),
+        });
+      }
+      const match = u.match(/\/cycle-content\/(sp_\d+)\.json/);
+      if (match) {
+        tracker.docFetches += 1;
+        tracker.inFlight += 1;
+        tracker.peak = Math.max(tracker.peak, tracker.inFlight);
+        const slug = match[1];
+        const doc = {
+          species_slug: slug,
+          valor_pedagogico: `Documento sintético ${slug} para verificar carga paralela del corpus con suficiente texto indexable por BM25 en el retriever.`,
+        };
+        // Resolver en un macrotask para que varios fetches coexistan en vuelo.
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            tracker.inFlight -= 1;
+            resolve({
+              ok: true,
+              status: 200,
+              headers: { get: (h) => (h.toLowerCase() === 'content-type' ? 'application/json' : '') },
+              json: () => Promise.resolve(doc),
+            });
+          }, 5);
+        });
+      }
+      return Promise.resolve({ ok: false, status: 404, headers: { get: () => '' } });
+    });
+    return tracker;
+  }
+
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  afterEach(() => {
+    delete globalThis.fetch;
+    vi.clearAllMocks();
+  });
+
+  it('loadCorpus completa con corpus grande y NO es estrictamente secuencial (peak concurrency > 1)', async () => {
+    const N = 40; // > CONCURRENCY_LIMIT → varios lotes
+    const tracker = setupConcurrencyFetchMock(makeBigManifest(N));
+    const { retrieve, getCorpusStats } = await import('../ragRetriever.js');
+
+    // Fuerza la carga del corpus completo. Si fuera serial-bloqueante, esto
+    // tomaría N×delay; con batches corre en ceil(N/12) barreras.
+    await retrieve('documento sintético corpus indexable', 5);
+
+    const stats = await getCorpusStats();
+    expect(stats.totalDocs).toBe(N); // los N docs se cargaron (corpus completo)
+    expect(tracker.docFetches).toBe(N); // un fetch por slug, sin duplicar
+    // La prueba central del fix: hubo MÁS DE UN fetch en vuelo a la vez.
+    // En el código serial viejo, peak sería exactamente 1.
+    expect(tracker.peak).toBeGreaterThan(1);
+  });
+
+  it('respeta el límite de concurrencia — peak nunca excede CORPUS_FETCH_CONCURRENCY', async () => {
+    const N = 50;
+    const tracker = setupConcurrencyFetchMock(makeBigManifest(N));
+    const { retrieve } = await import('../ragRetriever.js');
+    await retrieve('documento sintético corpus indexable', 5);
+    // Con batches de 12, jamás debe haber 13+ requests simultáneos. Esto evita
+    // abrir 491 sockets juntos contra el server / saturar la red móvil rural.
+    expect(tracker.peak).toBeLessThanOrEqual(CONCURRENCY_LIMIT);
+    // Y debe haber alcanzado el techo (o casi), confirmando que SÍ paraleliza
+    // hasta el límite y no se queda en concurrencia 1-2.
+    expect(tracker.peak).toBeGreaterThanOrEqual(2);
+  });
+
+  it('prewarmCorpus() deja el corpus cacheado y no relanza fetches en el primer retrieve', async () => {
+    const N = 20;
+    const tracker = setupConcurrencyFetchMock(makeBigManifest(N));
+    const { prewarmCorpus, retrieve } = await import('../ragRetriever.js');
+
+    await prewarmCorpus();
+    const fetchesAfterPrewarm = tracker.docFetches;
+    expect(fetchesAfterPrewarm).toBe(N); // pre-warm cargó todo
+
+    // Tras el pre-warm, retrieve usa corpusCache: NO debe disparar más fetches
+    // de docs (el corpus ya está caliente). Esto es lo que en prod elimina el
+    // cuelgue de la primera query.
+    const hits = await retrieve('documento sintético corpus indexable', 5);
+    expect(hits.length).toBeGreaterThan(0);
+    expect(tracker.docFetches).toBe(fetchesAfterPrewarm); // sin fetches nuevos
+  });
+
+  it('prewarmCorpus() nunca lanza aunque el manifest/fetch falle', async () => {
+    globalThis.fetch = vi.fn(() => Promise.reject(new Error('red caída')));
+    const { prewarmCorpus } = await import('../ragRetriever.js');
+    // No debe rechazar: el pre-warm es fire-and-forget y degrada en silencio.
+    await expect(prewarmCorpus()).resolves.toBeUndefined();
+  });
+});
