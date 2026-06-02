@@ -8,8 +8,8 @@
  * Feature flag: `VITE_DEEP_RESEARCH_ENABLED` (default false).
  * En pre-prod se activa con VITE_DEEP_RESEARCH_ENABLED=true.
  * En prod-free queda off por defecto — Deep Research es pro-only y pesado.
- * Cuando exista el sistema de tier/allowlist se agregará un check de tier
- * aquí (TODO: gating por tier cuando exista).
+ * El gating de tier (free|pro) se aplica en la UI (ChipsToolbar) y en el
+ * header `x-chagra-tier` enviado al sidecar (ver tierService.js A1).
  *
  * Reglas operativas (idénticas al sidecarClient existente):
  *   - Offline-first: si !navigator.onLine → null inmediato.
@@ -25,7 +25,13 @@
  *   donde hay pasos nuevos o el status cambió.
  *
  * Español colombiano (tú/usted), nunca voseo argentino.
+ *
+ * Tier gating (A1): x-chagra-tier se inyecta en todos los requests vía
+ * `buildSidecarHeaders` (tierService). La allowlist Pro vive en tierService.js.
+ * El gating duro es server-side; este header es defense-in-depth cliente.
  */
+
+import { buildSidecarHeaders } from './tierService.js';
 
 const SUBMIT_TIMEOUT_MS = 15000;
 const POLL_TIMEOUT_MS = 10000;
@@ -75,10 +81,9 @@ function getToken() {
 }
 
 function makeHeaders() {
-  const headers = { 'Content-Type': 'application/json' };
-  const token = getToken();
-  if (token) headers['X-Chagra-Token'] = token;
-  return headers;
+  // buildSidecarHeaders agrega Content-Type + X-Chagra-Token + x-chagra-tier.
+  // El tier se resuelve del tenantId activo (defense-in-depth; gating duro es server-side).
+  return buildSidecarHeaders(getToken());
 }
 
 /**
@@ -166,9 +171,9 @@ export async function fetchDeepResearchStatus(jobId, signal) {
     signal.addEventListener('abort', externalAbortListener, { once: true });
   }
 
-  const headers = {};
-  const token = getToken();
-  if (token) headers['X-Chagra-Token'] = token;
+  // Incluir x-chagra-tier en el poll también — el sidecar puede aplicar
+  // rate limits o degradar features Pro según el header.
+  const headers = buildSidecarHeaders(getToken());
 
   try {
     const res = await fetch(url, { method: 'GET', headers, signal: controller.signal });
