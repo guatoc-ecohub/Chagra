@@ -9,201 +9,276 @@ import useThemeBackgroundStore, {
  * BackgroundSelector — selector visual del fondo de biodiversidad.
  *
  * El operador elige entre los fondos curados por la diseñadora (Lili)
- * desde su Perfil. Opciones en grid 2x2 (5 cards).
+ * desde su Perfil. Opciones en grid 2x2 (4 cards biopunk).
  *
  * Persiste vía useThemeBackgroundStore (localStorage `chagra:background:v1`).
  * El cambio aplica de inmediato (App.jsx escribe --app-bg-image en el body)
  * y se preserva el overlay/blur biopunk para legibilidad.
  *
- * UX 2026-06-02: al hacer click/tap en una miniatura se abre una VISTA
- * AMPLIADA (overlay modal) con la imagen completa (object-fit:contain) +
- * borde eléctrico neón que recorre el perímetro — estilo biopunk fina
- * coquetería, referencia visual _icon-lab.html.
+ * UX 2026-06-02 (rediseño aprobado, reemplaza #1261): al hacer click/tap en
+ * una miniatura se abre una VISTA AMPLIADA (overlay modal) con la imagen
+ * COMPLETA (object-fit:contain, sin recorte) sobre fondo oscuro, con un
+ * MICELIO recorriendo el borde del marco — referencia visual aprobada por
+ * el operador (sección "1 · Fondo a pantalla completa + micelio").
  *
- * Borde eléctrico:
- *   1. Pseudo-elemento span con conic-gradient giratorio (spin) +
- *      mask-image inset para que solo se vea el borde → halo rotatorio.
- *   2. SVG <rect> superpuesto con stroke-dashoffset animado (trace) →
- *      corriente eléctrica que recorre el marco. Paleta: --neon #39ffd0 +
- *      --neon2 #7cf6ff, filter glow feGaussianBlur.
- *   Ambas capas puras CSS/SVG, sin JS por frame.
- *   prefers-reduced-motion: borde estático (animation-play-state:paused),
- *   patrón idéntico al resto del proyecto.
+ * El operador RECHAZÓ el borde eléctrico cónico anterior (#1261): el
+ * conic-gradient giratorio + la máscara inset tapaban la imagen. Eliminado.
+ *
+ * Micelio (lenguaje visual de la referencia):
+ *   - `.hypha`  → filamentos estáticos tenues que brotan de las esquinas
+ *                 (stroke --myc2 #34e3a0, opacity .5, glow suave g2).
+ *   - `.ring`   → contorno-madre del marco (rgba(57,255,208,.18)).
+ *   - `.pulse`  → rayo neón que recorre el perímetro vía stroke-dashoffset
+ *                 (#39ffd0 / #7cf6ff con glow g1); dos chispas desfasadas.
+ *   - `.spore`  → esporas que laten (blink).
+ *   Todo CSS/SVG puro (stroke-dashoffset + opacity keyframes), sin JS por
+ *   frame. prefers-reduced-motion: micelio estático (animation:none).
+ *
+ * ADAPTACIÓN a imágenes reales (no fijo 3/4 como el prototipo): el marco
+ * toma el aspect-ratio NATURAL de la imagen cargada (medido una sola vez en
+ * el onLoad, no por frame), así `contain` no deja franjas y el micelio
+ * abraza el borde real de la foto. El SVG usa preserveAspectRatio="none" +
+ * pathLength normalizado → el rayo recorre el perímetro idéntico sea la
+ * foto vertical, horizontal o cuadrada. El marco se acota al viewport.
  *
  * CRÍTICO anti React #185: consumir solo `selected` (string) del store;
  * nunca retornar objetos inline desde selectores de useThemeBackgroundStore.
+ * El aspect-ratio medido vive en useState local (no en el store).
  */
 
-// ─── CSS global para animaciones eléctricas ─────────────────────────────────
-const ELECTRIC_STYLE_ID = 'chagra-electric-border-css';
-const ELECTRIC_CSS = `
+// ─── CSS global del micelio ─────────────────────────────────────────────────
+const MYCELIUM_STYLE_ID = 'chagra-mycelium-border-css';
+const MYCELIUM_CSS = `
   :root {
-    --neon:  #39ffd0;
-    --neon2: #7cf6ff;
+    --myc:   #39ffd0;
+    --myc2:  #34e3a0;
+    --spore: #7cf6ff;
   }
 
-  @keyframes chagra-electric-spin {
-    to { transform: rotate(1turn); }
+  /* el rayo recorre el perímetro: pathLength=1360, dash 60 viaja el contorno */
+  @keyframes chagra-myc-run {
+    from { stroke-dashoffset: 1360; }
+    to   { stroke-dashoffset: 0; }
+  }
+  @keyframes chagra-myc-blink {
+    0%, 100% { opacity: 0; }
+    50%      { opacity: 0.9; }
   }
 
-  @keyframes chagra-electric-trace {
-    from { stroke-dashoffset: var(--chagra-trace-perim, 1400); }
-    to   { stroke-dashoffset: 0; }
+  .chagra-myc-pulse {
+    animation: chagra-myc-run 4.2s linear infinite;
   }
-  @keyframes chagra-electric-trace-b {
-    from { stroke-dashoffset: var(--chagra-trace-perim, 1400); }
-    to   { stroke-dashoffset: 0; }
+  .chagra-myc-pulse.b {
+    animation-delay: -2.1s;
+  }
+  .chagra-myc-spore {
+    animation: chagra-myc-blink 4.2s linear infinite;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .chagra-espin {
-      animation-play-state: paused !important;
-    }
-    .chagra-etrace {
-      animation-play-state: paused !important;
-      stroke-dashoffset: 0 !important;
+    .chagra-myc-pulse,
+    .chagra-myc-spore {
+      animation: none;
     }
   }
 `;
 
-function ensureElectricStyles() {
+function ensureMyceliumStyles() {
   if (typeof document === 'undefined') return;
-  if (document.getElementById(ELECTRIC_STYLE_ID)) return;
+  if (document.getElementById(MYCELIUM_STYLE_ID)) return;
   const s = document.createElement('style');
-  s.id = ELECTRIC_STYLE_ID;
-  s.textContent = ELECTRIC_CSS;
+  s.id = MYCELIUM_STYLE_ID;
+  s.textContent = MYCELIUM_CSS;
   document.head.appendChild(s);
 }
-ensureElectricStyles();
+ensureMyceliumStyles();
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * ElectricBorder — halo cónico + trazo SVG que recorre el borde del padre.
- * El padre debe tener position:relative y un borderRadius conocido.
+ * MyceliumBorder — micelio que recorre el borde del marco SIN taparlo.
  *
- * w/h: dimensiones del viewBox SVG (se escalan via preserveAspectRatio:none).
- * r: border-radius en px para rx/ry del rect y para el mask inset.
+ * El SVG cubre el marco con un pequeño desborde (inset:-10px, overflow
+ * visible) y usa preserveAspectRatio="none" para que el contorno-madre y el
+ * rayo se estiren al aspect-ratio real de la foto. `pathLength="1360"`
+ * normaliza el perímetro: el stroke-dashoffset recorre el contorno idéntico
+ * sea cual sea el tamaño real → adaptable a cualquier aspect-ratio.
+ *
+ * El viewBox se calcula a partir del aspect-ratio del marco para que los
+ * filamentos `.hypha` broten cerca de las esquinas reales; el rect-madre
+ * mantiene un margen interno constante (en unidades del viewBox).
+ *
+ * Capas puramente decorativas (aria-hidden, pointer-events:none) — quedan
+ * DETRÁS de la imagen para no taparla; el desborde del micelio asoma fuera
+ * del marco como un borde orgánico.
  */
-function ElectricBorder({ w = 640, h = 480, r = 12 }) {
-  const perim = Math.round(2 * (w + h) - 4 * r + Math.PI * 2 * r);
+function MyceliumBorder({ ratio = 3 / 4 }) {
+  // viewBox proporcional al marco. Lado mayor fijo a 420 (como la referencia
+  // vertical 320×420); el lado menor se deriva del ratio (w/h). Mantener un
+  // valor grande da resolución de path; preserveAspectRatio="none" lo estira.
+  const BASE = 420;
+  let vbW;
+  let vbH;
+  if (ratio >= 1) {
+    // horizontal o cuadrada → ancho mayor
+    vbW = BASE;
+    vbH = Math.max(120, Math.round(BASE / ratio));
+  } else {
+    // vertical → alto mayor
+    vbH = BASE;
+    vbW = Math.max(120, Math.round(BASE * ratio));
+  }
+
+  const M = 6; // margen interno del contorno-madre (unidades viewBox)
+  const rx = 18;
+  const innerW = vbW - 2 * M;
+  const innerH = vbH - 2 * M;
+
+  // Filamentos hypha brotando de las 4 esquinas + 2 lados, en coords del
+  // viewBox (se estiran con preserveAspectRatio:none, lectura orgánica).
+  const hyphae = [
+    // esquina sup-izq
+    `M${M + 4} ${M} q-6 -10 -16 -8 q5 4 4 12 M${M + 4} ${M} q4 -8 12 -10`,
+    // esquina sup-der
+    `M${vbW - M - 14} ${M + 60} q12 -2 18 6 q-8 0 -10 8 M${vbW - M - 14} ${M + 60} q9 4 10 14`,
+    // esquina inf-der
+    `M${vbW - M - 2} ${vbH - M - 110} q12 4 12 16 q-7 -4 -14 0 M${vbW - M - 2} ${vbH - M - 110} q8 8 4 18`,
+    // borde inferior
+    `M${vbW / 2} ${vbH - M + 2} q2 12 -8 16 q-1 -8 -10 -9 M${vbW / 2} ${vbH - M + 2} q-2 10 6 17`,
+    // borde izquierdo medio
+    `M${M} ${vbH * 0.6} q-12 0 -16 10 q7 -1 11 6 M${M} ${vbH * 0.6} q-10 6 -7 16`,
+    // borde izquierdo superior
+    `M${M} ${vbH * 0.28} q-11 -3 -16 5 q7 1 8 9 M${M} ${vbH * 0.28} q-9 5 -5 14`,
+  ];
 
   return (
-    <>
-      {/* halo cónico que gira — solo se ve como borde gracias al mask inset */}
-      <span
-        aria-hidden="true"
-        className="chagra-espin"
-        style={{
-          position: 'absolute',
-          inset: '-3px',
-          borderRadius: `${r + 3}px`,
-          background: `conic-gradient(
-            from 0deg,
-            transparent 0% 62%,
-            rgba(57,255,208,0.50) 74%,
-            rgba(124,246,255,0.72) 86%,
-            rgba(57,255,208,0.50) 93%,
-            transparent 100%
-          )`,
-          animation: 'chagra-electric-spin 3s linear infinite',
-          zIndex: 1,
-          pointerEvents: 'none',
-          willChange: 'transform',
-        }}
-      />
-      {/* máscara que cubre el interior dejando solo el anillo */}
-      <span
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          inset: '-3px',
-          borderRadius: `${r + 3}px`,
-          background: '#07111a',
-          mask: `inset(3px round ${r}px)`,
-          WebkitMask: `inset(3px round ${r}px)`,
-          zIndex: 2,
-          pointerEvents: 'none',
-        }}
-      />
-      {/* trazo SVG que circula — dos chispas desfasadas */}
-      <svg
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          zIndex: 3,
-          pointerEvents: 'none',
-          overflow: 'visible',
-        }}
-        viewBox={`0 0 ${w} ${h}`}
-        preserveAspectRatio="none"
+    <svg
+      aria-hidden="true"
+      className="chagra-mycelium"
+      style={{
+        position: 'absolute',
+        inset: '-10px',
+        width: 'calc(100% + 20px)',
+        height: 'calc(100% + 20px)',
+        pointerEvents: 'none',
+        overflow: 'visible',
+        zIndex: 1,
+      }}
+      viewBox={`0 0 ${vbW} ${vbH}`}
+      preserveAspectRatio="none"
+    >
+      <defs>
+        <filter id="chagra-myc-g1" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2.4" />
+        </filter>
+        <filter id="chagra-myc-g2" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="1.1" />
+        </filter>
+      </defs>
+
+      {/* filamentos hypha — ramas estáticas tenues */}
+      <g
+        fill="none"
+        stroke="var(--myc2)"
+        strokeWidth="1.1"
+        strokeLinecap="round"
+        opacity="0.5"
+        filter="url(#chagra-myc-g2)"
+        vectorEffect="non-scaling-stroke"
       >
-        <defs>
-          <filter id="chagra-eglow" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="3" result="b" />
-            <feMerge>
-              <feMergeNode in="b" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-        {/* marco base tenue — siempre visible */}
-        <rect
-          x="2" y="2"
-          width={w - 4} height={h - 4}
-          rx={r} ry={r}
-          fill="none"
-          stroke="rgba(57,255,208,0.18)"
-          strokeWidth="1.5"
-        />
-        {/* chispa A — neon principal */}
-        <rect
-          className="chagra-etrace"
-          x="2" y="2"
-          width={w - 4} height={h - 4}
-          rx={r} ry={r}
-          fill="none"
-          stroke="var(--neon)"
-          strokeWidth="2.6"
-          strokeLinecap="round"
-          filter="url(#chagra-eglow)"
-          strokeDasharray={`40 ${perim}`}
-          style={{
-            '--chagra-trace-perim': perim,
-            animation: 'chagra-electric-trace 2.8s linear infinite',
-          }}
-        />
-        {/* chispa B — neon2, desfasada 1.4s */}
-        <rect
-          className="chagra-etrace"
-          x="2" y="2"
-          width={w - 4} height={h - 4}
-          rx={r} ry={r}
-          fill="none"
-          stroke="var(--neon2)"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          filter="url(#chagra-eglow)"
-          strokeDasharray={`24 ${perim}`}
-          style={{
-            '--chagra-trace-perim': perim,
-            animation: 'chagra-electric-trace-b 2.8s linear infinite',
-            animationDelay: '-1.4s',
-          }}
-        />
-      </svg>
-    </>
+        {hyphae.map((d) => (
+          <path key={d} d={d} />
+        ))}
+      </g>
+
+      {/* contorno-madre del marco */}
+      <rect
+        x={M}
+        y={M}
+        width={innerW}
+        height={innerH}
+        rx={rx}
+        fill="none"
+        stroke="rgba(57,255,208,0.18)"
+        strokeWidth="1.6"
+        vectorEffect="non-scaling-stroke"
+      />
+
+      {/* rayo A — neón principal #39ffd0 que recorre el perímetro */}
+      <rect
+        className="chagra-myc-pulse"
+        x={M}
+        y={M}
+        width={innerW}
+        height={innerH}
+        rx={rx}
+        pathLength="1360"
+        fill="none"
+        stroke="var(--myc)"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        filter="url(#chagra-myc-g1)"
+        strokeDasharray="60 1300"
+        vectorEffect="non-scaling-stroke"
+      />
+
+      {/* rayo B — espora #7cf6ff, desfasado */}
+      <rect
+        className="chagra-myc-pulse b"
+        x={M}
+        y={M}
+        width={innerW}
+        height={innerH}
+        rx={rx}
+        pathLength="1360"
+        fill="none"
+        stroke="var(--spore)"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        filter="url(#chagra-myc-g1)"
+        strokeDasharray="30 1330"
+        vectorEffect="non-scaling-stroke"
+      />
+
+      {/* esporas que laten en las esquinas */}
+      <circle
+        className="chagra-myc-spore"
+        cx={M + 4}
+        cy={M}
+        r="2.6"
+        fill="var(--spore)"
+        filter="url(#chagra-myc-g1)"
+        style={{ animationDelay: '-0.3s' }}
+      />
+      <circle
+        className="chagra-myc-spore"
+        cx={vbW - M - 2}
+        cy={vbH - M - 110}
+        r="2.6"
+        fill="var(--spore)"
+        filter="url(#chagra-myc-g1)"
+        style={{ animationDelay: '-2.6s' }}
+      />
+    </svg>
   );
 }
 
 /**
- * BackgroundPreviewModal — overlay con la imagen completa (object-fit:contain)
- * y el borde eléctrico. onConfirm → aplica el fondo. onClose → descarta.
+ * BackgroundPreviewModal — overlay con la imagen COMPLETA (object-fit:contain)
+ * y el micelio en el borde. onConfirm → aplica el fondo. onClose → descarta.
+ *
+ * El marco adopta el aspect-ratio natural de la imagen (medido en onLoad),
+ * de modo que `contain` no deja franjas y el micelio abraza la foto real.
  */
 function BackgroundPreviewModal({ option, onConfirm, onClose }) {
   const src = getBackgroundSrc(option.id);
+  // aspect-ratio (ancho/alto) real de la imagen; arranca en 3/4 (vertical,
+  // como la referencia) y se corrige una sola vez al cargar. NO es per-frame.
+  const [ratio, setRatio] = useState(3 / 4);
+
+  const handleImgLoad = useCallback((e) => {
+    const { naturalWidth: w, naturalHeight: h } = e.currentTarget;
+    if (w > 0 && h > 0) setRatio(w / h);
+  }, []);
 
   useEffect(() => {
     function onKey(e) {
@@ -230,7 +305,7 @@ function BackgroundPreviewModal({ option, onConfirm, onClose }) {
         position: 'fixed',
         inset: 0,
         zIndex: 9999,
-        background: 'rgba(4,7,13,0.88)',
+        background: 'radial-gradient(120% 90% at 50% -10%, #0a1622 0%, #04070d 70%)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -241,33 +316,44 @@ function BackgroundPreviewModal({ option, onConfirm, onClose }) {
       }}
       onClick={onClose}
     >
-      {/* contenedor imagen + borde eléctrico */}
+      {/* marco: toma el aspect-ratio real de la imagen y se acota al viewport */}
       <div
+        className="chagra-bg-frame"
         style={{
           position: 'relative',
+          aspectRatio: ratio,
           maxWidth: 'min(92vw, 640px)',
-          maxHeight: 'min(72vh, 560px)',
-          width: '100%',
-          aspectRatio: '4/3',
-          borderRadius: '12px',
+          maxHeight: 'min(72vh, 620px)',
+          width: 'auto',
+          height: 'auto',
+          // garantiza tamaño visible incluso en jsdom (sin layout): el marco
+          // crece hasta los topes manteniendo el aspect-ratio.
+          minWidth: '40vw',
+          borderRadius: '16px',
           overflow: 'visible',
         }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* micelio DETRÁS de la imagen → asoma por el borde, nunca la tapa */}
+        <MyceliumBorder ratio={ratio} />
+
+        {/* imagen COMPLETA — contain, sin recorte, sobre fondo oscuro */}
         <img
           src={src}
           alt={option.label}
+          onLoad={handleImgLoad}
           style={{
             position: 'absolute',
             inset: 0,
             width: '100%',
             height: '100%',
             objectFit: 'contain',
-            borderRadius: '12px',
+            borderRadius: '16px',
             background: '#04070d',
+            boxShadow: '0 18px 60px -20px #000',
+            zIndex: 2,
           }}
         />
-        <ElectricBorder w={640} h={480} r={12} />
 
         {/* botón cerrar — esquina superior derecha */}
         <button

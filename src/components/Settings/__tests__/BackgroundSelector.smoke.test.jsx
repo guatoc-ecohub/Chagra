@@ -56,7 +56,7 @@ describe('BackgroundSelector smoke', () => {
     );
   });
 
-  it('la vista ampliada muestra la imagen completa (src no vacío)', () => {
+  it('la vista ampliada muestra la imagen COMPLETA (contain, src no vacío)', () => {
     render(<BackgroundSelector />);
     fireEvent.click(screen.getByText('Colibrí tech').closest('button'));
 
@@ -66,6 +66,38 @@ describe('BackgroundSelector smoke', () => {
     expect(previewImg).toBeInTheDocument();
     expect(previewImg.src).toBeTruthy();
     expect(previewImg.src).not.toBe('');
+    // imagen COMPLETA, sin recorte: object-fit:contain (rediseño aprobado,
+    // reemplaza el borde eléctrico cónico que la tapaba — #1261).
+    expect(previewImg.style.objectFit).toBe('contain');
+  });
+
+  it('la vista ampliada dibuja el micelio en el borde (no el borde eléctrico viejo)', () => {
+    render(<BackgroundSelector />);
+    fireEvent.click(screen.getByText('Cosecha mística').closest('button'));
+
+    const dialog = screen.getByRole('dialog');
+    // El micelio aprobado: SVG con contorno-madre + rayos pulse + esporas.
+    const mycelium = dialog.querySelector('svg.chagra-mycelium');
+    expect(mycelium).toBeInTheDocument();
+    // rayo que recorre el perímetro (stroke-dashoffset) + esporas que laten
+    expect(mycelium.querySelectorAll('.chagra-myc-pulse').length).toBeGreaterThanOrEqual(2);
+    expect(mycelium.querySelectorAll('.chagra-myc-spore').length).toBeGreaterThanOrEqual(1);
+    // pathLength normalizado → el rayo recorre el borde idéntico en cualquier
+    // aspect-ratio real (no fijo 3/4 como el prototipo).
+    const pulse = mycelium.querySelector('.chagra-myc-pulse');
+    expect(pulse.getAttribute('pathLength')).toBe('1360');
+
+    // El borde eléctrico cónico rechazado (#1261) NO debe existir.
+    expect(dialog.querySelector('.chagra-espin')).not.toBeInTheDocument();
+    expect(dialog.querySelector('.chagra-etrace')).not.toBeInTheDocument();
+  });
+
+  it('el micelio respeta prefers-reduced-motion (animación apagada por CSS)', () => {
+    // El CSS global del micelio incluye la regla reduce → animation:none.
+    const styleEl = document.getElementById('chagra-mycelium-border-css');
+    expect(styleEl).toBeTruthy();
+    expect(styleEl.textContent).toContain('prefers-reduced-motion: reduce');
+    expect(styleEl.textContent).toMatch(/animation:\s*none/);
   });
 
   it('botón Elegir este fondo aplica el fondo y cierra el modal', () => {
