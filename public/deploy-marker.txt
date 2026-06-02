@@ -1,2 +1,1 @@
-trigger=1779836557
-trigger_1779837288=ok
+deploy 2026-06-02T16:34:32Z — version unstick tras colisión auto-bump paralelo
