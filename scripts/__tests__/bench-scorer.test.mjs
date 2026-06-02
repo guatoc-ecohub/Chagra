@@ -10,6 +10,10 @@
  *   - LLM-judge (buildJudgePrompt / parseJudgeVerdict / scoreWithJudge) con el
  *     caller de ollama INYECTADO → testeable sin GPU.
  *
+ * R6 (2026-06-02): juez claude-cli — shell-out a `claude-code -p` (suscripción
+ * del operador). Los tests del proveedor claude-cli mockean el shell-out vía
+ * `spawnImpl` inyectado; NUNCA invocan claude-code real en CI.
+ *
  * NO re-corre el bench completo (eso carga GPU + lo decide el operador): solo
  * deja el evaluador listo + esta cobertura unitaria del scorer.
  */
@@ -36,6 +40,10 @@ import {
   scoreAntiHallucDeterministic,
   selectJudgeProvider,
   ANTHROPIC_JUDGE_KEY_PATH,
+  buildBatchAHPrompt,
+  parseBatchAHVerdicts,
+  makeClaudeCliJudgeCall,
+  scoreAntiHallucBatch,
 } from '../lib/bench-scorer.mjs';
 
 describe('scoreKeywordsFlexible', () => {
@@ -476,6 +484,263 @@ describe('selectJudgeProvider', () => {
     // ningún valor string del objeto contiene la key
     for (const v of Object.values(sel)) {
       if (typeof v === 'string') expect(v).not.toContain('sk-test-SECRET');
+    }
+  });
+
+  // ── R6: claude-cli AUTO-fallback ────────────────────────────────────────────
+
+  it('JUDGE_PROVIDER=claude-cli sin key → claude-cli con spawnImpl inyectado', () => {
+    const fakeSpawn = async () => '[{"pass":true,"must_covered":1,"must_total":1,"red_flags_hit":0}]';
+    const sel = selectJudgeProvider({
+      env: { JUDGE_PROVIDER: 'claude-cli' },
+      keyPath: '/no/existe',
+      spawnImpl: fakeSpawn,
+    });
+    expect(sel.provider).toBe('claude-cli');
+    expect(typeof sel.judgeCall).toBe('function');
+    expect(sel.deterministic).toBe(false);
+  });
+
+  it('AUTO sin key + claude-code en PATH → degradación graceful a deterministic (no llama claude-code)', () => {
+    // Sin key Y sin forzar claude-cli el AUTO sigue siendo deterministic para no
+    // depender del PATH en tests de CI (claude-code real lanzaría un proceso).
+    const sel = selectJudgeProvider({ env: {}, keyPath: '/no/existe' });
+    expect(sel.provider).toBe('deterministic');
+    expect(sel.deterministic).toBe(true);
+  });
+});
+
+// ── R6: buildBatchAHPrompt ────────────────────────────────────────────────────
+
+describe('buildBatchAHPrompt (prompt batch para claude-cli)', () => {
+  const items = [
+    {
+      id: 'p1',
+      query: '¿Aguanta la chugua helada?',
+      response: 'La chugua (Ullucus tuberosus) tolera heladas leves con buen drenaje.',
+      mustInclude: ['Ullucus tuberosus', 'drenaje'],
+      redFlags: ['Solanum tuberosum'],
+    },
+    {
+      id: 'p2',
+      query: '¿Cuál es la dosis del caldo bordelés?',
+      response: 'Caldo bordelés: 2% sulfato de cobre + cal, aplicar preventivo.',
+      mustInclude: ['sulfato de cobre', 'cal'],
+      redFlags: ['Mancozeb', 'dosis inventada'],
+    },
+  ];
+
+  it('retorna un string con el prompt batch completo', () => {
+    const prompt = buildBatchAHPrompt(items);
+    expect(typeof prompt).toBe('string');
+    expect(prompt.length).toBeGreaterThan(100);
+  });
+
+  it('incluye todos los ids de item en el prompt', () => {
+    const prompt = buildBatchAHPrompt(items);
+    expect(prompt).toMatch(/p1/);
+    expect(prompt).toMatch(/p2/);
+  });
+
+  it('incluye must_include y red_flags de cada item', () => {
+    const prompt = buildBatchAHPrompt(items);
+    expect(prompt).toMatch(/Ullucus tuberosus/);
+    expect(prompt).toMatch(/Solanum tuberosum/);
+    expect(prompt).toMatch(/sulfato de cobre/);
+    expect(prompt).toMatch(/Mancozeb/);
+  });
+
+  it('pide un array JSON como respuesta', () => {
+    const prompt = buildBatchAHPrompt(items);
+    expect(prompt).toMatch(/\[\s*\{/); // formato de array JSON en el prompt
+  });
+
+  it('lista vacía → prompt mínimo sin romper', () => {
+    const prompt = buildBatchAHPrompt([]);
+    expect(typeof prompt).toBe('string');
+    expect(prompt.length).toBeGreaterThan(0);
+  });
+});
+
+// ── R6: parseBatchAHVerdicts ──────────────────────────────────────────────────
+
+describe('parseBatchAHVerdicts (parseo del array JSON de claude-cli)', () => {
+  it('parsea array JSON con varios veredictos', () => {
+    const raw = '[{"id":"p1","pass":true,"must_covered":2,"must_total":2,"red_flags_hit":0},{"id":"p2","pass":false,"must_covered":1,"must_total":2,"red_flags_hit":1}]';
+    const out = parseBatchAHVerdicts(raw);
+    expect(out).toHaveLength(2);
+    expect(out[0].id).toBe('p1');
+    expect(out[0].pass).toBe(true);
+    expect(out[0].mustCovered).toBe(2);
+    expect(out[0].redFlagsHit).toBe(0);
+    expect(out[1].id).toBe('p2');
+    expect(out[1].pass).toBe(false);
+  });
+
+  it('extrae el array JSON aunque haya prosa del modelo antes y después', () => {
+    const raw = 'Aquí está la evaluación solicitada:\n[{"id":"p1","pass":true,"must_covered":1,"must_total":1,"red_flags_hit":0}]\nFin de evaluación.';
+    const out = parseBatchAHVerdicts(raw);
+    expect(out).toHaveLength(1);
+    expect(out[0].pass).toBe(true);
+  });
+
+  it('maneja array con un solo item', () => {
+    const raw = '[{"id":"x","pass":false,"must_covered":0,"must_total":1,"red_flags_hit":2}]';
+    const out = parseBatchAHVerdicts(raw);
+    expect(out[0].mustTotal).toBe(1);
+    expect(out[0].redFlagsHit).toBe(2);
+  });
+
+  it('devuelve null si la salida es ilegible (no inventa)', () => {
+    expect(parseBatchAHVerdicts('bla bla sin JSON')).toBeNull();
+    expect(parseBatchAHVerdicts('')).toBeNull();
+    expect(parseBatchAHVerdicts(null)).toBeNull();
+  });
+
+  it('es tolerante a campos numéricos como string', () => {
+    const raw = '[{"id":"p1","pass":true,"must_covered":"2","must_total":"2","red_flags_hit":"0"}]';
+    const out = parseBatchAHVerdicts(raw);
+    expect(out[0].mustCovered).toBe(2);
+    expect(out[0].mustTotal).toBe(2);
+    expect(out[0].redFlagsHit).toBe(0);
+  });
+});
+
+// ── R6: makeClaudeCliJudgeCall ─────────────────────────────────────────────────
+//
+// CRÍTICO: spawnImpl se inyecta — NUNCA se llama al claude-code real en CI.
+// El proceso real se usa solo post-merge en el rescore manual.
+
+describe('makeClaudeCliJudgeCall (spawnImpl mockeado, sin claude-code real)', () => {
+  const items = [
+    {
+      id: 'p1',
+      query: '¿Aguanta helada?',
+      response: 'Sí, tolera bien la helada con buen drenaje.',
+      mustInclude: ['drenaje'],
+      redFlags: ['aguacate'],
+    },
+    {
+      id: 'p2',
+      query: '¿Qué dosis del caldo?',
+      response: 'Caldo bordelés al 2%.',
+      mustInclude: ['caldo bordelés'],
+      redFlags: ['Mancozeb'],
+    },
+  ];
+
+  it('devuelve array de veredictos con el mismo contrato que scoreAntiHalluc', async () => {
+    const batchResp = '[{"id":"p1","pass":true,"must_covered":1,"must_total":1,"red_flags_hit":0},{"id":"p2","pass":true,"must_covered":1,"must_total":1,"red_flags_hit":0}]';
+    const fakeSpawn = async (_prompt) => batchResp;
+    const judgeCall = makeClaudeCliJudgeCall({ spawnImpl: fakeSpawn });
+    const out = await judgeCall(items);
+    expect(out).toHaveLength(2);
+    expect(out[0].id).toBe('p1');
+    expect(out[0].pass).toBe(true);
+    expect(out[0].source).toBe('judge');
+    expect(out[1].id).toBe('p2');
+    expect(out[1].pass).toBe(true);
+  });
+
+  it('spawnImpl recibe un prompt batch (string largo con todos los items)', async () => {
+    let capturedPrompt = '';
+    const fakeSpawn = async (prompt) => {
+      capturedPrompt = prompt;
+      return '[{"id":"p1","pass":true,"must_covered":1,"must_total":1,"red_flags_hit":0},{"id":"p2","pass":true,"must_covered":1,"must_total":1,"red_flags_hit":0}]';
+    };
+    const judgeCall = makeClaudeCliJudgeCall({ spawnImpl: fakeSpawn });
+    await judgeCall(items);
+    // el prompt batch contiene los dos ids y los campos relevantes
+    expect(capturedPrompt).toMatch(/p1/);
+    expect(capturedPrompt).toMatch(/p2/);
+    expect(capturedPrompt).toMatch(/drenaje/);
+  });
+
+  it('spawnImpl se llama UNA sola vez para todos los items del lote (no en paralelo)', async () => {
+    let callCount = 0;
+    const fakeSpawn = async () => {
+      callCount += 1;
+      return '[{"id":"p1","pass":true,"must_covered":1,"must_total":1,"red_flags_hit":0},{"id":"p2","pass":true,"must_covered":1,"must_total":1,"red_flags_hit":0}]';
+    };
+    const judgeCall = makeClaudeCliJudgeCall({ spawnImpl: fakeSpawn });
+    await judgeCall(items);
+    expect(callCount).toBe(1); // un solo spawn, no 2
+  });
+
+  it('spawnImpl falla → todos los items devuelven unjudged (no inventa)', async () => {
+    const fakeSpawn = async () => { throw new Error('claude-code crash'); };
+    const judgeCall = makeClaudeCliJudgeCall({ spawnImpl: fakeSpawn });
+    const out = await judgeCall(items);
+    expect(out).toHaveLength(2);
+    for (const v of out) {
+      expect(v.pass).toBeNull();
+      expect(v.source).toBe('unjudged');
+    }
+  });
+
+  it('spawnImpl devuelve JSON ilegible → items unjudged (no inventa)', async () => {
+    const fakeSpawn = async () => 'bla bla sin JSON';
+    const judgeCall = makeClaudeCliJudgeCall({ spawnImpl: fakeSpawn });
+    const out = await judgeCall(items);
+    for (const v of out) {
+      expect(v.source).toBe('unjudged');
+    }
+  });
+
+  it('id no encontrado en el batch respuesta → item unjudged (no casa con otro)', async () => {
+    // El batch de spawnImpl responde solo para p1, no para p2
+    const fakeSpawn = async () => '[{"id":"p1","pass":true,"must_covered":1,"must_total":1,"red_flags_hit":0}]';
+    const judgeCall = makeClaudeCliJudgeCall({ spawnImpl: fakeSpawn });
+    const out = await judgeCall(items);
+    const p2 = out.find((v) => v.id === 'p2');
+    expect(p2.source).toBe('unjudged');
+  });
+});
+
+// ── R6: scoreAntiHallucBatch ──────────────────────────────────────────────────
+
+describe('scoreAntiHallucBatch (lote con claude-cli mock)', () => {
+  const items = [
+    {
+      id: 'cap1-p1',
+      query: '¿Aguanta helada la chugua?',
+      response: 'La chugua (Ullucus tuberosus) tolera heladas con buen drenaje.',
+      mustInclude: ['Ullucus tuberosus'],
+      redFlags: ['Solanum tuberosum'],
+    },
+    {
+      id: 'cap2-p1',
+      query: '¿Dosis de caldo bordelés?',
+      response: 'Aplicar 2% sulfato de cobre con cal como preventivo.',
+      mustInclude: ['sulfato de cobre'],
+      redFlags: ['Mancozeb'],
+    },
+  ];
+
+  it('devuelve un veredicto por item con source="judge" cuando el mock funciona', async () => {
+    const fakeSpawn = async () =>
+      '[{"id":"cap1-p1","pass":true,"must_covered":1,"must_total":1,"red_flags_hit":0},{"id":"cap2-p1","pass":false,"must_covered":0,"must_total":1,"red_flags_hit":1}]';
+    const judgeCall = makeClaudeCliJudgeCall({ spawnImpl: fakeSpawn });
+    const out = await scoreAntiHallucBatch(items, { judgeCall });
+    expect(out).toHaveLength(2);
+    expect(out[0].id).toBe('cap1-p1');
+    expect(out[0].pass).toBe(true);
+    expect(out[0].source).toBe('judge');
+    expect(out[1].id).toBe('cap2-p1');
+    expect(out[1].pass).toBe(false);
+  });
+
+  it('lista vacía → resultado vacío sin romper', async () => {
+    const fakeSpawn = async () => '[]';
+    const judgeCall = makeClaudeCliJudgeCall({ spawnImpl: fakeSpawn });
+    const out = await scoreAntiHallucBatch([], { judgeCall });
+    expect(out).toHaveLength(0);
+  });
+
+  it('sin judgeCall → todos unjudged (graceful)', async () => {
+    const out = await scoreAntiHallucBatch(items, {});
+    for (const v of out) {
+      expect(v.source).toBe('unjudged');
     }
   });
 });

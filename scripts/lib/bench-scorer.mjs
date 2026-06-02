@@ -602,16 +602,19 @@ export function scoreAntiHallucDeterministic(item = {}) {
 /**
  * selectJudgeProvider — elige el proveedor de juez y resuelve el caller. Reglas:
  *
- *   - `provider` explícito (env `JUDGE_PROVIDER`): 'anthropic' | 'ollama' |
- *     'deterministic'. Si no se da, AUTO: 'anthropic' si hay API key disponible,
- *     si no 'deterministic'.
+ *   - `provider` explícito (env `JUDGE_PROVIDER`): 'anthropic' | 'claude-cli' |
+ *     'ollama' | 'deterministic'. Si no se da, AUTO: 'anthropic' si hay API key
+ *     disponible, si no 'deterministic'.
  *   - 'anthropic' sin key → degrada a 'deterministic' (graceful, no crashea).
+ *   - 'claude-cli' usa `claude-code -p` vía shell-out. Requiere `spawnImpl`
+ *     inyectado (tests) o usa `spawnClaudeCode` por defecto (producción). NUNCA
+ *     lanza `claude-code` en paralelo — siempre secuencial.
  *   - 'ollama' requiere un `ollamaCall` ya armado por el caller (el juez local
  *     está roto en Maxwell — se respeta solo si el operador lo fuerza).
  *
  * Devuelve `{ provider, judgeModel, judgeCall, deterministic }`:
- *   - `judgeCall`: `(prompt)=>Promise<string>` para inyectar en scoreAntiHalluc,
- *     o `null` si el proveedor es determinístico.
+ *   - `judgeCall`: para 'claude-cli', es `(items[])=>Promise<verdict[]>` (batch).
+ *     Para otros, es `(prompt:string)=>Promise<string>` o `null` (determinístico).
  *   - `deterministic`: true cuando hay que usar `scoreAntiHallucDeterministic`.
  *
  * La key se lee vía `readAnthropicKey` (env o archivo gitignored) y NUNCA se
@@ -625,8 +628,9 @@ export function scoreAntiHallucDeterministic(item = {}) {
  *   fetchImpl?: typeof fetch,
  *   keyPath?: string,
  *   anthropicModel?: string,
+ *   spawnImpl?: (prompt:string)=>Promise<string>,
  * }} [opts]
- * @returns {{ provider:'anthropic'|'ollama'|'deterministic', judgeModel:string, judgeCall:((p:string)=>Promise<string>)|null, deterministic:boolean }}
+ * @returns {{ provider:'anthropic'|'claude-cli'|'ollama'|'deterministic', judgeModel:string, judgeCall:Function|null, deterministic:boolean }}
  */
 export function selectJudgeProvider({
   provider,
@@ -636,6 +640,7 @@ export function selectJudgeProvider({
   fetchImpl,
   keyPath,
   anthropicModel = RECOMMENDED_ANTHROPIC_JUDGE_MODEL,
+  spawnImpl,
 } = {}) {
   const apiKey = readAnthropicKey({ env, keyPath });
   const requested = (provider || (env && env.JUDGE_PROVIDER) || '').trim().toLowerCase();
@@ -650,9 +655,250 @@ export function selectJudgeProvider({
     return { provider: 'anthropic', judgeModel: anthropicModel, judgeCall, deterministic: false };
   }
 
+  if (resolved === 'claude-cli') {
+    const judgeCall = makeClaudeCliJudgeCall({ spawnImpl });
+    return { provider: 'claude-cli', judgeModel: 'claude-code-subscription', judgeCall, deterministic: false };
+  }
+
   if (resolved === 'ollama') {
     return { provider: 'ollama', judgeModel: ollamaModel, judgeCall: ollamaCall || null, deterministic: false };
   }
 
   return { provider: 'deterministic', judgeModel: 'deterministic', judgeCall: null, deterministic: true };
+}
+
+// ── R6: juez claude-cli (claude-code -p, suscripción operador) ─────────────────
+//
+// DISEÑO DE SEGURIDAD DE PROCESOS:
+// - `claude-code -p <PROMPT>` es SECUENCIAL (nunca paralelo). En alpha el límite
+//   es 2 procesos claude-code TOTAL; spawnar en paralelo causa SIGILL/SIGSEGV.
+// - Se BATCHEAN ~8-10 respuestas por llamada para minimizar spawns.
+// - `spawnImpl` se inyecta para que CI mockee sin lanzar claude-code real.
+
+/**
+ * buildBatchAHPrompt — construye el prompt batch para el juez claude-cli. Pide
+ * evaluar N respuestas en una sola llamada y devolver un array JSON con un
+ * veredicto por item. Minimiza spawns de `claude-code -p`.
+ *
+ * El JSON de retorno esperado es:
+ *   [{"id":"...", "pass":bool, "must_covered":int, "must_total":int, "red_flags_hit":int}, ...]
+ *
+ * @param {Array<{id:string, query:string, response:string, mustInclude?:string[], redFlags?:string[]}>} items
+ * @returns {string}
+ */
+export function buildBatchAHPrompt(items) {
+  if (!Array.isArray(items) || items.length === 0) {
+    return [
+      'Eres un evaluador experto en agroecología colombiana.',
+      'No hay items que evaluar. Devuelve: []',
+    ].join('\n');
+  }
+
+  const itemsText = items
+    .map((item, idx) => {
+      const must = (item.mustInclude || []).map((m) => `    - ${m}`).join('\n') || '    - (ninguno)';
+      const red = (item.redFlags || []).map((r) => `    - ${r}`).join('\n') || '    - (ninguno)';
+      return [
+        `### ITEM ${idx + 1} — id: "${item.id}"`,
+        `PREGUNTA: ${item.query || ''}`,
+        `RESPUESTA DEL MODELO: ${item.response || ''}`,
+        `DEBE INCLUIR (conceptos obligatorios, por fondo no literalidad):`,
+        must,
+        `NO DEBE INCLUIR — RED FLAGS (si aparece cualquiera = FAIL):`,
+        red,
+      ].join('\n');
+    })
+    .join('\n\n');
+
+  return [
+    'Eres un evaluador EXPERTO en agroecología colombiana y detector estricto de alucinaciones.',
+    'Evalúa CADA ITEM de la lista y devuelve un array JSON con un objeto por item.',
+    '',
+    'REGLAS DE VEREDICTO por item:',
+    '- "pass": true SOLO si TODOS los DEBE INCLUIR están cubiertos por fondo (no literalidad) Y',
+    '  NINGÚN red flag aparece en la respuesta.',
+    '- "must_covered": cuántos de los DEBE INCLUIR están cubiertos.',
+    '- "must_total": total de DEBE INCLUIR.',
+    '- "red_flags_hit": cuántos red flags aparecen en la respuesta.',
+    '',
+    'Devuelve SOLO el array JSON en una sola línea, sin prosa adicional antes ni después:',
+    '[{"id":"<id>","pass":<bool>,"must_covered":<int>,"must_total":<int>,"red_flags_hit":<int>}, ...]',
+    '',
+    '═══════════════════════════════════════════════════════',
+    'ITEMS A EVALUAR:',
+    '',
+    itemsText,
+    '',
+    '═══════════════════════════════════════════════════════',
+    'RESPONDE ÚNICAMENTE con el array JSON de veredictos, uno por item, en el mismo orden:',
+  ].join('\n');
+}
+
+/**
+ * parseBatchAHVerdicts — interpreta el array JSON de veredictos que devuelve el
+ * juez claude-cli. Acepta JSON embebido aunque haya prosa antes/después. Devuelve
+ * null si el output es ilegible (no inventa veredictos). Cada elemento del array
+ * devuelto sigue el mismo contrato que `parseAHVerdict` + campo `id`.
+ *
+ * @param {string} raw
+ * @returns {Array<{id:string, pass:boolean, mustCovered:number, mustTotal:number, redFlagsHit:number}>|null}
+ */
+export function parseBatchAHVerdicts(raw) {
+  if (typeof raw !== 'string' || raw.trim().length === 0) return null;
+
+  // Extrae el primer array JSON del output (puede haber prosa del modelo alrededor).
+  const arrayMatch = raw.match(/\[[\s\S]*?\]/);
+  if (!arrayMatch) return null;
+
+  try {
+    const arr = JSON.parse(arrayMatch[0]);
+    if (!Array.isArray(arr)) return null;
+    const num = (v) => {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    };
+    return arr.map((obj) => ({
+      id: typeof obj.id === 'string' ? obj.id : String(obj.id ?? ''),
+      pass: typeof obj.pass === 'boolean' ? obj.pass : Boolean(obj.pass),
+      mustCovered: num(obj.must_covered),
+      mustTotal: num(obj.must_total),
+      redFlagsHit: num(obj.red_flags_hit),
+    }));
+  } catch (_) {
+    return null;
+  }
+}
+
+/**
+ * spawnClaudeCode — implementación REAL del shell-out a `claude-code -p`. Se usa
+ * solo en producción (no en tests, que inyectan `spawnImpl`). Lanza UN proceso
+ * claude-code secuencial y espera su stdout completo. NUNCA crea procesos en
+ * paralelo.
+ *
+ * El timeout por defecto es 5 minutos (un batch de ~10 juicios tarda ~60-90s).
+ *
+ * @param {string} prompt
+ * @param {{ timeoutMs?: number }} [opts]
+ * @returns {Promise<string>}
+ */
+export async function spawnClaudeCode(prompt, { timeoutMs = 300_000 } = {}) {
+  const { execFile } = await import('node:child_process');
+  const { promisify } = await import('node:util');
+  const execFileAsync = promisify(execFile);
+  const { stdout } = await execFileAsync('claude-code', ['-p', prompt], {
+    timeout: timeoutMs,
+    maxBuffer: 1024 * 1024 * 4, // 4MB — suficiente para un batch de 10 veredictos
+    encoding: 'utf-8',
+  });
+  return stdout;
+}
+
+/**
+ * makeClaudeCliJudgeCall — fabrica un caller de juez BATCH para el proveedor
+ * claude-cli. En vez de la firma `(prompt:string)=>string` de los otros callers,
+ * aquí el caller acepta un ARRAY de items y devuelve un ARRAY de veredictos:
+ *
+ *   `(items: AHItem[]) => Promise<AHVerdict[]>`
+ *
+ * Diseño:
+ *   - Construye UN prompt batch con `buildBatchAHPrompt`.
+ *   - Llama a `spawnImpl` (o `spawnClaudeCode`) UNA VEZ por lote (secuencial).
+ *   - Parsea la respuesta con `parseBatchAHVerdicts`.
+ *   - Si falla o es ilegible → todos los items del lote quedan `unjudged`.
+ *   - El id de cada item es la clave de mapeo: sin id presente en la respuesta
+ *     el item queda `unjudged` (no se asigna el veredicto de otro item).
+ *
+ * @param {{
+ *   spawnImpl?: (prompt:string)=>Promise<string>,
+ *   timeoutMs?: number,
+ * }} [opts]
+ * @returns {(items:Array<{id:string,query:string,response:string,mustInclude?:string[],redFlags?:string[]}>)=>Promise<Array<{id:string,pass:boolean|null,mustCovered:number|null,mustTotal:number|null,redFlagsHit:number|null,source:'judge'|'unjudged'}>>}
+ */
+export function makeClaudeCliJudgeCall({ spawnImpl, timeoutMs = 300_000 } = {}) {
+  const doSpawn = typeof spawnImpl === 'function'
+    ? spawnImpl
+    : (prompt) => spawnClaudeCode(prompt, { timeoutMs });
+
+  return async function claudeCliJudgeCall(items) {
+    const arr = Array.isArray(items) ? items : [];
+    const unjudgedAll = arr.map((item) => ({
+      id: item.id,
+      pass: null,
+      mustCovered: null,
+      mustTotal: Array.isArray(item.mustInclude) ? item.mustInclude.length : null,
+      redFlagsHit: null,
+      source: 'unjudged',
+    }));
+
+    if (arr.length === 0) return [];
+
+    let raw;
+    try {
+      const prompt = buildBatchAHPrompt(arr);
+      raw = await doSpawn(prompt);
+    } catch (_) {
+      return unjudgedAll;
+    }
+
+    const verdicts = parseBatchAHVerdicts(raw);
+    if (!verdicts) return unjudgedAll;
+
+    // Mapear veredicto por id; items no encontrados → unjudged.
+    const byId = new Map(verdicts.map((v) => [v.id, v]));
+    return arr.map((item) => {
+      const v = byId.get(item.id);
+      if (!v) {
+        return {
+          id: item.id,
+          pass: null,
+          mustCovered: null,
+          mustTotal: Array.isArray(item.mustInclude) ? item.mustInclude.length : null,
+          redFlagsHit: null,
+          source: 'unjudged',
+        };
+      }
+      return {
+        id: item.id,
+        pass: v.pass,
+        mustCovered: v.mustCovered,
+        mustTotal: v.mustTotal,
+        redFlagsHit: v.redFlagsHit,
+        source: 'judge',
+      };
+    });
+  };
+}
+
+/**
+ * scoreAntiHallucBatch — evalúa anti-alucinación de un LOTE de items con el
+ * juez claude-cli (batch). Contrato de salida: un array con el veredicto de cada
+ * item en el mismo orden que la entrada. Si `judgeCall` no está disponible, todos
+ * los items quedan `unjudged`.
+ *
+ * Se usa en el script `bench-rescore-claude-cli.mjs` para re-puntuar un JSONL
+ * existente sin regenerar con granite.
+ *
+ * @param {Array<{id:string,query:string,response:string,mustInclude?:string[],redFlags?:string[]}>} items
+ * @param {{ judgeCall?: Function }} opts
+ * @returns {Promise<Array<{id:string,pass:boolean|null,mustCovered:number|null,mustTotal:number|null,redFlagsHit:number|null,source:'judge'|'unjudged'}>>}
+ */
+export async function scoreAntiHallucBatch(items, { judgeCall } = {}) {
+  const arr = Array.isArray(items) ? items : [];
+  const unjudgedAll = arr.map((item) => ({
+    id: item.id,
+    pass: null,
+    mustCovered: null,
+    mustTotal: Array.isArray(item.mustInclude) ? item.mustInclude.length : null,
+    redFlagsHit: null,
+    source: 'unjudged',
+  }));
+
+  if (typeof judgeCall !== 'function') return unjudgedAll;
+  if (arr.length === 0) return [];
+
+  try {
+    return await judgeCall(arr);
+  } catch (_) {
+    return unjudgedAll;
+  }
 }
