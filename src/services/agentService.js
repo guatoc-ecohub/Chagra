@@ -316,7 +316,7 @@ export const REGIONAL_CLIMATE_ALERTS = {
   },
   'llanos': {
     riesgos: ['sequías marcadas', 'incendios forestales', 'periodos de inundación'],
-    recomendaciones: 'Implementar sistema de防守 contra incendios. Usar cultivos adaptados a periodos de estrés hídrico. Planificar siembras según régimen de lluvias.',
+    recomendaciones: 'Implementar sistema de prevención contra incendios. Usar cultivos adaptados a periodos de estrés hídrico. Planificar siembras según régimen de lluvias.',
     fuentes: ['IDEAM - Alerta de incendios 2024', 'Corporinoquia - Plan de manejo del fuego'],
   },
   'pacifico': {
