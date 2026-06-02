@@ -216,8 +216,31 @@ export async function forwardGeocode(query) {
 }
 
 /**
+ * Fuente de la altitud devuelta por resolveUbicacion.
+ *
+ *   'dado'          — altitud pasada explícitamente por el caller (GPS real,
+ *                     onboarding, valor ya confirmado). Es la más confiable.
+ *   'elevation_api' — proviene de Open-Elevation para el punto exacto (red).
+ *                     Confiable: corresponde a las coordenadas, no a la cabecera.
+ *   'cabecera'      — fallback offline: altitud curada del centroide DANE del
+ *                     municipio más cercano. Corresponde a la CABECERA del
+ *                     municipio, no a la finca real. Puede diferir cientos de
+ *                     metros (ej. Choachí cabecera=1923 vs finca alta=2580).
+ *                     NUNCA debe sobrescribir una altitud ya confirmada.
+ *
+ * @typedef {'dado'|'elevation_api'|'cabecera'} AltitudFuente
+ */
+
+/**
  * Resuelve y enriquece una ubicación a partir de coordenadas y/o altitud
  * conocida. Combina reverse-geocoding + piso térmico + cultivos.
+ *
+ * PRECEDENCIA de altitud (mayor → menor confiabilidad):
+ *   1. `altitud` explícita del caller — GPS de la finca, valor confirmado.
+ *   2. Open-Elevation para el punto exacto — precisa pero requiere red.
+ *   3. Altitud curada del municipio DANE más cercano (cabecera) — fallback
+ *      de último recurso; marcada con `altitud_fuente: 'cabecera'` para que
+ *      los consumidores puedan elegir NO persistirla sobre una buena altitud.
  *
  * @param {Object} params
  * @param {number} params.lat
@@ -227,17 +250,23 @@ export async function forwardGeocode(query) {
  *   lat: number, lng: number,
  *   municipio: string|null, departamento: string|null,
  *   altitud: number|null,
+ *   altitud_fuente: AltitudFuente|null,
  *   pisoTermico: Object|null,
  *   cultivosRecomendados: string[],
  * }>}
  */
 export async function resolveUbicacion({ lat, lng, altitud = null }) {
+  const altitudDada =
+    typeof altitud === 'number' && Number.isFinite(altitud) ? Math.round(altitud) : null;
+
   const result = {
     lat,
     lng,
     municipio: null,
     departamento: null,
-    altitud: typeof altitud === 'number' && Number.isFinite(altitud) ? Math.round(altitud) : null,
+    altitud: altitudDada,
+    /** @type {AltitudFuente|null} */
+    altitud_fuente: altitudDada != null ? 'dado' : null,
     pisoTermico: null,
     cultivosRecomendados: [],
   };
@@ -264,15 +293,23 @@ export async function resolveUbicacion({ lat, lng, altitud = null }) {
   // Altitud: si no vino dada, intentar Open-Elevation (online).
   if (result.altitud == null) {
     const ele = await fetchElevation(lat, lng);
-    if (ele != null) result.altitud = Math.round(ele);
+    if (ele != null) {
+      result.altitud = Math.round(ele);
+      result.altitud_fuente = 'elevation_api';
+    }
   }
 
   // Fallback OFFLINE de altitud: la altitud curada (IGAC/OSM) del municipio DANE
   // mas cercano, si la hay. Permite precalcular el piso termico sin red.
+  //
+  // ADVERTENCIA: es la altitud de la CABECERA, no de la finca. Se marca
+  // 'cabecera' para que handleConfirm (LocationDetectedScreen) NO la persista
+  // si el perfil ya tiene una altitud confirmada del usuario (#1213-regression).
   if (result.altitud == null) {
     if (nearest == null) nearest = findNearestMunicipio(lat, lng);
     if (nearest && typeof nearest.altitud === 'number') {
       result.altitud = nearest.altitud;
+      result.altitud_fuente = 'cabecera';
     }
   }
 

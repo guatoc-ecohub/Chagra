@@ -25,7 +25,7 @@ import {
   isCoarseLocation,
 } from '../services/locationService';
 import { useFincaActiveStore } from '../services/fincaActiveStore';
-import { saveProfile } from '../services/userProfileService';
+import { getProfile, saveProfile, resolveAltitudToSave } from '../services/userProfileService';
 import { getDepartamentos, getMunicipios, findMunicipio } from '../utils/colombiaLocations';
 
 // Fix del marcador por defecto de Leaflet (bundlers no resuelven las URLs
@@ -493,6 +493,20 @@ export default function LocationDetectedScreen({
     // campo: antes solo escribíamos en el perfil y el card leía de
     // fincaActiveStore/FARM_CONFIG → nunca se enteraba de la confirmación y el
     // menú reaparecía "como si no lo hubieras hecho". Ahora el card lo ve.
+    //
+    // Fix regresión #1213: la altitud de la CABECERA (fallback offline DANE)
+    // NUNCA debe sobrescribir una altitud ya confirmada por el usuario.
+    // Lógica de coalesce delegada a resolveAltitudToSave (pura, testeable).
+    const existingProfile = getProfile();
+    const { finca_altitud: altitudToSave, altitud_source: altitudSourceToSave } =
+      resolveAltitudToSave({
+        altitudSource,
+        resolvedAltitudFuente: loc.altitud_fuente ?? null,
+        effectiveAltitud,
+        existingFincaAltitud: existingProfile.finca_altitud,
+        existingAltitudSource: existingProfile.altitud_source,
+      });
+
     saveProfile({
       ubicacion_lat: loc.lat,
       ubicacion_lng: loc.lng,
@@ -501,17 +515,17 @@ export default function LocationDetectedScreen({
       region: loc.municipio
         ? [loc.municipio, loc.departamento].filter(Boolean).join(', ')
         : undefined,
-      // #coarse-location: guardamos la altitud EFECTIVA (manual gana sobre
-      // derivada) y de DÓNDE viene. ClimaStrip / alertEngine / viabilidad del
-      // agente leen `finca_altitud`; `altitud_source: 'manual'` señala que el
-      // usuario la fijó a mano y NO debe sobrescribirse con una lectura gruesa.
-      finca_altitud: effectiveAltitud != null ? String(effectiveAltitud) : undefined,
-      altitud_source: effectiveAltitud != null ? altitudSource : undefined,
+      // #coarse-location / #1213-fix: guardamos la altitud EFECTIVA con coalesce.
+      // `altitud_source: 'manual'` señala que el usuario la fijó a mano.
+      // `altitud_source: 'cabecera'` indica fallback offline — no pisa altitud real.
+      finca_altitud: altitudToSave,
+      altitud_source: altitudSourceToSave,
       // Radio de incertidumbre de la última lectura (metros). Útil para
       // diagnosticar perfiles con altitud sospechosa de cabecera. null si
       // la ubicación se fijó a mano (pin/búsqueda) y no hubo lectura GPS.
       ubicacion_accuracy: loc.accuracy != null ? Math.round(loc.accuracy) : undefined,
-      piso_termico: pisoInfo?.slug,
+      piso_termico:
+        altitudToSave !== undefined ? pisoInfo?.slug : existingProfile.piso_termico,
     });
     // Avisar a la UI montada (ClimaStrip, dashboard) que la ubicación cambió,
     // por si no hay remount completo al navegar. Refresca el pronóstico sin
