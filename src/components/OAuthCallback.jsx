@@ -4,6 +4,7 @@ import { handleOAuthCallback } from '../services/authService';
 import { setCurrentOperator } from '../services/operatorIdentityService';
 import { setActiveTenantId } from '../services/tenantContext';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
+import { prewarmCorpus } from '../services/ragRetriever';
 import ChagraGrowLoader from './ChagraGrowLoader';
 
 /**
@@ -68,6 +69,13 @@ export default function OAuthCallback({ onSuccess, onError }) {
           useOllamaWarmStore.getState().startWarmup();
         } catch (err) {
           console.warn('[OAuthCallback] ollama warm-up dispatch failed:', err);
+        }
+        // Hotfix prod-down 2026-06-02: pre-cargar el corpus RAG en background
+        // junto al warm-up de Ollama (ver LoginScreen). Fire-and-forget.
+        try {
+          prewarmCorpus();
+        } catch (err) {
+          console.warn('[OAuthCallback] corpus pre-warm dispatch failed:', err);
         }
         // Limpiar los params OAuth de la URL para que un refresh no reintente
         // el intercambio con un code ya consumido (one-time use).

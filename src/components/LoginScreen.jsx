@@ -8,6 +8,7 @@ import ChagraGrowLoader from './ChagraGrowLoader';
 import LegalLinks from './LegalLinks';
 import WelcomeStatsHero from './WelcomeStatsHero';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
+import { prewarmCorpus } from '../services/ragRetriever';
 import useThemeBackgroundStore, { getBackgroundSrc } from '../store/useThemeBackgroundStore';
 
 export default function LoginScreen({ onLoginSuccess, onSave }) {
@@ -82,6 +83,16 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
       } catch (err) {
         // No bloquear login si falla (ej. tests sin fetch global).
         console.warn('[LoginScreen] ollama warm-up dispatch failed:', err);
+      }
+      // Hotfix prod-down 2026-06-02: pre-cargar el corpus RAG en background
+      // junto al warm-up de Ollama. Antes, loadCorpus() corría serial al
+      // disparar la PRIMERA query (incluido un saludo) y colgaba ~3min. Pre-
+      // cargándolo acá (fire-and-forget, no bloqueante) el corpus queda
+      // cacheado durante el tiempo humano login→dashboard→agente.
+      try {
+        prewarmCorpus();
+      } catch (err) {
+        console.warn('[LoginScreen] corpus pre-warm dispatch failed:', err);
       }
       setLoading(false);
       onLoginSuccess();
