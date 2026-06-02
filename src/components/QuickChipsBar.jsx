@@ -1,4 +1,8 @@
 import React from 'react';
+// Fuente única de las preguntas-ejemplo (chips). Vive en un módulo de datos
+// compartido para que el test del PUNTO DE ACCESO #1 las cubra sin que el
+// componente exporte constantes (regla react-refresh/only-export-components).
+import { QUICK_CHIPS_BAR_QUESTIONS as DEFAULT_QUICK_QUESTIONS } from '../data/exampleQuestions';
 
 /**
  * QuickChipsBar — tres chips clickables con preguntas frecuentes para que el
@@ -18,12 +22,6 @@ import React from 'react';
  *   - onSelect: callback(query: string) — el call-site decide qué hacer.
  *               Típicamente AgentScreen llama directo a handleSubmit(query).
  */
-
-const DEFAULT_QUICK_QUESTIONS = [
-  '¿Qué siembro este mes?',
-  'Tengo plaga en mis plantas',
-  'Receta de biopreparado para tomate',
-];
 
 export default function QuickChipsBar({ onSelect, questions = DEFAULT_QUICK_QUESTIONS }) {
   if (typeof onSelect !== 'function') return null;

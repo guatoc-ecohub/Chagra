@@ -6,6 +6,7 @@ import { captureAndCompress } from '../../services/photoService';
 import { isAnalyzableImageAttachment } from '../../services/agentOutboxAttachment';
 import useAgentOutboxStore from '../../store/useAgentOutboxStore';
 import { agentSounds } from '../../services/agentSoundService';
+import { AGENT_HERO_CHIPS } from '../../data/exampleQuestions';
 
 // 2026-05-28: el R3F (ChagraAgentAvatarColibri3D) fue retirado del flujo.
 // Operador: "no me gusta nada y desatina con todo lo que ya está".
@@ -47,11 +48,10 @@ const TIPS = [
     'Pregúntame en voz, te entiendo con tu acento.',
 ];
 
-const QUICK_CHIPS = [
-    { icon: '🌱', label: '¿Qué siembro?', prompt: '¿Qué puedo sembrar este mes en mi zona?' },
-    { icon: '🐛', label: 'Plagas', prompt: '¿Cómo controlo plagas sin químicos?' },
-    { icon: '🌧️', label: 'Clima', prompt: 'Dame el reporte del clima de mi zona.' },
-];
+// Fuente única de los chips del home. Importada del módulo de datos compartido
+// para que el test del punto de acceso #1 los cubra sin exportar constantes
+// desde un componente (regla react-refresh/only-export-components).
+const QUICK_CHIPS = AGENT_HERO_CHIPS;
 
 function prefersReducedMotion() {
     return typeof window !== 'undefined' && window.matchMedia
