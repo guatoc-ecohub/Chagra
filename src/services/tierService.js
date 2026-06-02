@@ -56,9 +56,9 @@ export const ANA_USERNAME_PENDIENTE = 'ANA_USERNAME_PENDIENTE';
  */
 export const PRO_USERNAMES = new Set([
   'admin',               // Operador principal (Miguel / Guatoc)
-  // Ana (UNGRD Pasto/Galeras) — reemplazar 'ANA_USERNAME_PENDIENTE' con su username real
-  // cuando el operador lo provea. Ejemplo: 'ana.rodriguez'
-  // ANA_USERNAME_PENDIENTE,
+  'ana maria',           // Ana María (UNGRD Pasto/Galeras) — Pro piloto 2026-06-02.
+                         // Match es case-insensitive (resolveTier lowercasea). Si su
+                         // login exacto en farmOS difiere (ej. 'ana.maria'), ajustar aquí.
 ]);
 
 // ─────────────────────────────────────────────────────────────────────────────
