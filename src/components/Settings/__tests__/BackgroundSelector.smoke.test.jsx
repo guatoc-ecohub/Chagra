@@ -11,7 +11,7 @@ describe('BackgroundSelector smoke', () => {
     useThemeBackgroundStore.getState().setBackground('default');
   });
 
-  it('renderiza las 4 opciones de fondo', () => {
+  it('renderiza las opciones de fondo del catálogo', () => {
     render(<BackgroundSelector />);
     expect(screen.getByText('Clásico')).toBeInTheDocument();
     expect(screen.getByText('Páramo completo')).toBeInTheDocument();
@@ -23,20 +23,6 @@ describe('BackgroundSelector smoke', () => {
     render(<BackgroundSelector />);
     const clasicoBtn = screen.getByText('Clásico').closest('button');
     expect(clasicoBtn).toHaveAttribute('aria-pressed', 'true');
-  });
-
-  it('click en otro fondo cambia la selección y persiste', () => {
-    render(<BackgroundSelector />);
-    const paramoBtn = screen.getByText('Páramo completo').closest('button');
-    fireEvent.click(paramoBtn);
-
-    expect(paramoBtn).toHaveAttribute('aria-pressed', 'true');
-    expect(useThemeBackgroundStore.getState().selected).toBe('biopunk-1');
-    expect(JSON.parse(localStorage.getItem('chagra:background:v1')).state.selected)
-      .toBe('biopunk-1');
-
-    const clasicoBtn = screen.getByText('Clásico').closest('button');
-    expect(clasicoBtn).toHaveAttribute('aria-pressed', 'false');
   });
 
   it('estado del store preselecciona el fondo al montar', () => {
@@ -51,5 +37,65 @@ describe('BackgroundSelector smoke', () => {
     const imgs = document.querySelectorAll('img');
     expect(imgs.length).toBe(BACKGROUND_CATALOG.length);
     imgs.forEach((img) => expect(img).toHaveAttribute('loading', 'lazy'));
+  });
+
+  // ── Vista ampliada (modal de preview) ──────────────────────────────────────
+
+  it('click en miniatura abre la vista ampliada con dialog role', () => {
+    render(<BackgroundSelector />);
+    const paramoBtn = screen.getByText('Páramo completo').closest('button');
+    fireEvent.click(paramoBtn);
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('dialog')).toHaveAttribute(
+      'aria-label',
+      'Vista completa: Páramo completo'
+    );
+  });
+
+  it('la vista ampliada muestra la imagen completa (src no vacío)', () => {
+    render(<BackgroundSelector />);
+    fireEvent.click(screen.getByText('Colibrí tech').closest('button'));
+
+    const dialog = screen.getByRole('dialog');
+    // La imagen principal de la vista ampliada tiene alt = opt.label
+    const previewImg = dialog.querySelector('img[alt="Colibrí tech"]');
+    expect(previewImg).toBeInTheDocument();
+    expect(previewImg.src).toBeTruthy();
+    expect(previewImg.src).not.toBe('');
+  });
+
+  it('botón Elegir este fondo aplica el fondo y cierra el modal', () => {
+    render(<BackgroundSelector />);
+    fireEvent.click(screen.getByText('Páramo completo').closest('button'));
+    fireEvent.click(screen.getByText('Elegir este fondo'));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(useThemeBackgroundStore.getState().selected).toBe('biopunk-1');
+    expect(JSON.parse(localStorage.getItem('chagra:background:v1')).state.selected).toBe('biopunk-1');
+  });
+
+  it('botón cerrar (X) descarta el modal sin cambiar la selección', () => {
+    useThemeBackgroundStore.getState().setBackground('default');
+    render(<BackgroundSelector />);
+    fireEvent.click(screen.getByText('Páramo completo').closest('button'));
+
+    const closeBtn = screen.getByLabelText('Cerrar vista previa');
+    fireEvent.click(closeBtn);
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    // la selección NO cambió
+    expect(useThemeBackgroundStore.getState().selected).toBe('default');
+  });
+
+  it('Escape cierra la vista ampliada sin cambiar la selección', () => {
+    useThemeBackgroundStore.getState().setBackground('default');
+    render(<BackgroundSelector />);
+    fireEvent.click(screen.getByText('Colibrí tech').closest('button'));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(useThemeBackgroundStore.getState().selected).toBe('default');
   });
 });
