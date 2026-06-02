@@ -6,6 +6,7 @@
  */
 
 import { filterVoseo } from './voseoFilter.js';
+import { resolveUserRegion } from './agentService.js';
 
 /**
  * DR-LANG-1: guarda defensiva anti-voseo aplicada a la entrada de los
@@ -13,7 +14,14 @@ import { filterVoseo } from './voseoFilter.js';
  * también es invocado desde ChatBubble (re-speak), AgentFab (replayLast)
  * y posibles surfaces futuras. filterVoseo es idempotente — un doble
  * pase es no-op y mantiene la garantía de que el campesino NUNCA escuche
- * vos/tenés/querés/dale en voz alta.
+ * el léxico rioplatense (che, laburar) en voz alta.
+ *
+ * C1/C2 (2026-06-02): region-aware. La voz también debe respetar el
+ * dialecto del usuario: en regiones voseantes (paisa/pacífico/pastuso) el
+ * voseo es el registro AUTÉNTICO y se PRESERVA en el audio; en el resto se
+ * aplana (tú en caribe, usted por defecto). La región se resuelve del
+ * perfil; sin región conocida → default seguro (comportamiento histórico).
+ * resolveUserRegion es defensivo (no lanza); aun así envolvemos en try.
  *
  * @param {string} text
  * @returns {string}
@@ -21,7 +29,9 @@ import { filterVoseo } from './voseoFilter.js';
 function applyVoseoGuard(text) {
   if (typeof text !== 'string' || text.length === 0) return text;
   try {
-    return filterVoseo(text, { formality: 'usted', telemetry: false });
+    let region = null;
+    try { region = resolveUserRegion(); } catch (_) { region = null; }
+    return filterVoseo(text, { formality: 'usted', telemetry: false, region });
   } catch (_) {
     return text;
   }

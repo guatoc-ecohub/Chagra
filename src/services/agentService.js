@@ -19,7 +19,8 @@ import {
   localizeAgentOutput as _localizeCauca,
 } from './glosarioCaucaService.js';
 import { filterVoseo as _filterVoseo } from './voseoFilter.js';
-import { buildUserProfileBlock } from './userProfileService.js';
+import { buildUserProfileBlock, getProfile } from './userProfileService.js';
+import { findMunicipio } from '../utils/colombiaLocations.js';
 import { buildEnsoAgentLines } from './ensoContext.js';
 
 /**
@@ -53,11 +54,109 @@ export function isFincaInCaucaRegion(finca) {
 }
 
 /**
+ * C2 (2026-06-02): convierte el NOMBRE de un departamento (el que trae el
+ * dataset DANE, p. ej. "Antioquia", "Bogotá, D.C.", "Valle del Cauca") a la
+ * clave-slug que `getRegionFromDepartment` / `regionalisms-co.json` esperan
+ * (p. ej. "antioquia", "bogota_dc", "valle_del_cauca").
+ *
+ * La mayoría de departamentos slugifican directo (tildes fuera + espacios a
+ * guion bajo). Un puñado de nombres oficiales DANE no coinciden 1:1 con el
+ * slug del dataset de regionalismos y se mapean a mano.
+ *
+ * @param {string|null|undefined} name
+ * @returns {string|null} slug del departamento, o null si no hay nombre.
+ */
+export function slugifyDepartamento(name) {
+  if (!name || typeof name !== 'string') return null;
+  const base = name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // quita tildes (diacriticos combinantes)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_') // todo lo no-alfanumérico → "_"
+    .replace(/^_+|_+$/g, ''); // recorta "_" de los bordes
+  if (!base) return null;
+
+  // Casos especiales: nombre oficial DANE ≠ slug de regionalisms-co.json.
+  const SPECIAL = {
+    bogota_d_c: 'bogota_dc',
+    la_guajira: 'guajira',
+    archipielago_de_san_andres_providencia_y_santa_catalina: 'san_andres',
+  };
+  return SPECIAL[base] || base;
+}
+
+/**
+ * C2 (2026-06-02): resuelve la CLAVE de región lingüística del usuario a
+ * partir del perfil del onboarding (#200/#325/#338). Es la señal que el
+ * filtro de voseo region-aware necesita para decidir si PRESERVA el voseo
+ * (regiones voseantes: paisa/pacífico/pastuso) o lo aplana (tú en caribe,
+ * usted en el resto).
+ *
+ * Prioridad de señales (de la más precisa a la más laxa):
+ *   1. `profile.departamento` — campo LIMPIO que LocationDetectedScreen guarda
+ *      al confirmar la ubicación (#338). Nombre DANE → slug → región.
+ *   2. `profile.municipio` — municipio limpio; se resuelve su departamento con
+ *      el dataset DANE embebido (offline).
+ *   3. `profile.region` — texto libre legacy ("Municipio, Departamento"); se
+ *      intenta resolver el municipio contra el dataset DANE.
+ *
+ * Degrada SIEMPRE con gracia: si nada resuelve a una región conocida devuelve
+ * `null`, lo que deja al engine en su comportamiento histórico (aplanar a la
+ * formalidad por defecto). Es PURA respecto a red (solo lee localStorage +
+ * dataset embebido) y nunca lanza.
+ *
+ * @returns {string|null} clave de región (paisa/caribe/cundiboyacense/…) o null.
+ */
+export function resolveUserRegion() {
+  let profile;
+  try {
+    profile = getProfile();
+  } catch (_) {
+    return null;
+  }
+  if (!profile || typeof profile !== 'object') return null;
+
+  // 1) Departamento limpio (la señal más fiable).
+  if (profile.departamento) {
+    const region = getRegionFromDepartment(slugifyDepartamento(profile.departamento));
+    if (region) return region;
+  }
+
+  // 2) Municipio limpio → su departamento vía dataset DANE → región.
+  // 3) Region texto libre legacy → mismo camino.
+  for (const candidate of [profile.municipio, profile.region]) {
+    if (!candidate) continue;
+    try {
+      const hit = findMunicipio(candidate);
+      if (hit && hit.departamento) {
+        const region = getRegionFromDepartment(slugifyDepartamento(hit.departamento));
+        if (region) return region;
+      }
+    } catch (_) {
+      // findMunicipio nunca debería lanzar, pero degradamos por las dudas.
+    }
+  }
+
+  return null;
+}
+
+/**
  * DR-LANG-1 (2026-05-28): aplica el filtro post-process anti-voseo
  * argentino sobre la salida del LLM. Se usa como última etapa antes de
  * exponer el texto al ChatScreen y al TTS, garantizando que ningún
- * marcador voseo llegue al usuario campesino colombiano independientemente
- * de lo que el modelo decida emitir.
+ * marcador voseo argentino llegue al usuario campesino colombiano
+ * independientemente de lo que el modelo decida emitir.
+ *
+ * C1/C2 (2026-06-02): ahora es REGION-AWARE. Si el caller no pasa `region`
+ * en `opts`, se resuelve desde el perfil del usuario con `resolveUserRegion`.
+ * En regiones voseantes (paisa/pacífico/pastuso) el voseo es el registro
+ * AUTÉNTICO del campesino → el engine lo PRESERVA y solo limpia el léxico
+ * rioplatense (che, laburar, etc.). En el resto se aplana (tú en caribe,
+ * usted por defecto). Sin región conocida → comportamiento histórico (aplanar
+ * a `formality`, default usted), seguro y back-compatible.
+ *
+ * Para forzar el comportamiento default ignorando el perfil, el caller puede
+ * pasar `region: null` explícito en `opts`.
  *
  * Default formality='usted' (target campesino piloto Free). El caller
  * puede pasar 'tu' si la región del usuario lo prefiere.
@@ -68,20 +167,27 @@ export function isFincaInCaucaRegion(finca) {
  *
  * Wire en AgentScreen:
  *   const response = await callLLM(...);
- *   const safe = applyVoseoFilter(response);
+ *   const safe = applyVoseoFilter(response, { region: resolveUserRegion() });
  *   // → render(safe), speak(safe), persist(safe)
  *
  * @param {string} text  texto crudo del LLM
  * @param {object} [opts]
  * @param {'tu' | 'usted'} [opts.formality='usted']
+ * @param {string|null} [opts.region]  clave de región; si se omite se resuelve
+ *   del perfil. `null` explícito fuerza el default (no resuelve del perfil).
  * @returns {string}
  */
 export function applyVoseoFilter(text, opts = {}) {
   const { formality = 'usted' } = opts;
+  // Si el caller no especificó `region` (ni siquiera null explícito), la
+  // resolvemos del perfil. `'region' in opts` distingue "no pasado" de
+  // "pasado como null" — este último fuerza el default seguro.
+  const region = 'region' in opts ? opts.region : resolveUserRegion();
   return _filterVoseo(text, {
     formality,
     telemetry: true,
     ...opts,
+    region,
   });
 }
 
