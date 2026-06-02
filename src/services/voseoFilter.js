@@ -337,6 +337,52 @@ function sentenceHasStrongVoseo(sentence, rules) {
 }
 
 /**
+ * Léxico EXCLUSIVAMENTE rioplatense: no existe en el español colombiano de
+ * ninguna región. ESTO es lo que delata "argentino" — NO la conjugación voseo,
+ * que es legítima y auténtica en Antioquia/Eje/Valle/Cauca/Nariño. Por eso se
+ * reemplaza SIEMPRE, incluso en regiones voseantes donde el voseo se preserva.
+ * @type {ReplaceRule[]}
+ */
+const ARGENTINE_LEXICON = [
+  { id: 'lex_che', pattern: wb('che'), tu: 'oiga', usted: 'oiga', preserveCaps: true },
+  { id: 'lex_boludo', pattern: wb('bolud[oa]'), tu: '', usted: '', preserveCaps: false },
+  { id: 'lex_pelotudo', pattern: wb('pelotud[oa]'), tu: '', usted: '', preserveCaps: false },
+  { id: 'lex_pibe', pattern: wb('pib[ea]'), tu: 'muchacho', usted: 'muchacho', preserveCaps: true },
+  { id: 'lex_laburo', pattern: wb('laburo'), tu: 'trabajo', usted: 'trabajo', preserveCaps: true },
+  { id: 'lex_laburar', pattern: wb('labur[aá]r'), tu: 'trabajar', usted: 'trabajar', preserveCaps: true },
+  { id: 'lex_quilombo', pattern: wb('quilombo'), tu: 'desorden', usted: 'desorden', preserveCaps: true },
+  { id: 'lex_chabon', pattern: wb('chab[oó]n'), tu: 'tipo', usted: 'tipo', preserveCaps: true },
+];
+
+/**
+ * Regiones lingüísticas de Colombia (claves de regionalisms-co.json) cuyo
+ * registro AUTÉNTICO es el voseo. Aplanarlo a tú/usted les borra el acento
+ * propio → anti-misión. En estas regiones se PRESERVA la morfología voseo y
+ * solo se limpia el léxico rioplatense.
+ */
+const VOSEO_REGIONS = new Set(['paisa', 'pacifico', 'pastuso']);
+/** Regiones tuteantes (Caribe). */
+const TU_REGIONS = new Set(['caribe']);
+/** Regiones ustedeantes (resto andino + llano + amazonía). */
+const USTED_REGIONS = new Set(['cundiboyacense', 'santandereano', 'opita', 'llanero', 'amazonica']);
+
+/**
+ * Resuelve la política de dialecto desde la región lingüística del usuario.
+ * Sin región (o desconocida) → comportamiento histórico (aplanar a la
+ * `fallbackFormality`, default usted). Es la clave de la retro-compatibilidad.
+ *
+ * @param {string|undefined|null} region  clave de región (paisa/caribe/…)
+ * @param {'tu'|'usted'} fallbackFormality
+ * @returns {{ preserveVoseo: boolean, formality: 'tu'|'usted' }}
+ */
+function resolveDialectPolicy(region, fallbackFormality) {
+  if (region && VOSEO_REGIONS.has(region)) return { preserveVoseo: true, formality: fallbackFormality };
+  if (region && TU_REGIONS.has(region)) return { preserveVoseo: false, formality: 'tu' };
+  if (region && USTED_REGIONS.has(region)) return { preserveVoseo: false, formality: 'usted' };
+  return { preserveVoseo: false, formality: fallbackFormality };
+}
+
+/**
  * Filtro principal. Aplica el sweep determinístico sobre el texto y
  * devuelve la versión normalizada al español colombiano (tú o usted
  * según `options.formality`).
@@ -356,9 +402,17 @@ export function filterVoseo(text, options = {}) {
     telemetry = false,
     includeChilean = false,
     preserveIsolatedAca = true,
+    region = null,
   } = options;
 
-  const rules = includeChilean ? [...VOSEO_RULES, ...CHILEAN_RULES] : VOSEO_RULES;
+  // Región-aware (fix paisa 2026-06-02): en zonas voseantes (paisa/pacífico/
+  // pastuso) el voseo es el registro AUTÉNTICO → se preserva la morfología y
+  // solo se limpia el léxico rioplatense. En Caribe → tú; resto → usted.
+  const policy = resolveDialectPolicy(region, formality);
+  const voseoRules = includeChilean ? [...VOSEO_RULES, ...CHILEAN_RULES] : VOSEO_RULES;
+  // El léxico argentino se limpia SIEMPRE; las reglas de morfología voseo solo
+  // si la región NO es voseante.
+  const rules = policy.preserveVoseo ? ARGENTINE_LEXICON : [...ARGENTINE_LEXICON, ...voseoRules];
 
   const partitions = partitionProtected(text);
 
@@ -379,7 +433,7 @@ export function filterVoseo(text, options = {}) {
           }
           rule.pattern.lastIndex = 0;
           out = out.replace(rule.pattern, (match) => {
-            const target = formality === 'usted' ? rule.usted : rule.tu;
+            const target = policy.formality === 'usted' ? rule.usted : rule.tu;
             const finalText = applyReplacement(match, target, rule.preserveCaps ?? false);
             if (onMatch) {
               try { onMatch(rule.id, match, finalText); } catch (_) { /* swallow */ }
