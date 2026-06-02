@@ -49,6 +49,8 @@ vi.mock('../../services/locationService', async (importOriginal) => {
       // Simula la altitud DERIVADA de la cabecera (Open-Elevation en el
       // centroide del municipio): 1923 msnm. Es la altitud "mala".
       altitud: altitud != null ? Math.round(altitud) : 1923,
+      // Marca la fuente como cabecera para que handleConfirm pueda hacer coalesce.
+      altitud_fuente: altitud != null ? 'dado' : 'cabecera',
       pisoTermico: null,
       cultivosRecomendados: [],
     })),
@@ -57,9 +59,15 @@ vi.mock('../../services/locationService', async (importOriginal) => {
 });
 
 const saveProfile = vi.fn();
-vi.mock('../../services/userProfileService', () => ({
-  saveProfile: (...a) => saveProfile(...a),
-}));
+vi.mock('../../services/userProfileService', async (importOriginal) => {
+  const real = await importOriginal();
+  return {
+    ...real,
+    saveProfile: (...a) => saveProfile(...a),
+    // getProfile devuelve perfil vacío por defecto (sin altitud previa).
+    getProfile: () => ({}),
+  };
+});
 
 vi.mock('../../services/fincaActiveStore', () => {
   const store = { setIndoorZone: vi.fn() };
@@ -141,8 +149,11 @@ describe('LocationDetectedScreen — corrección de ubicación gruesa', () => {
     expect(onConfirm.mock.calls[0][0].altitud_source).toBe('manual');
   });
 
-  test('sin altitud manual, se guarda la derivada con source derived', async () => {
-    mockGeolocation(30); // fina → confiamos en la derivada
+  test('sin altitud manual y fuente cabecera, se guarda con source cabecera', async () => {
+    // GPS preciso (accuracy 30m) pero el mock de resolveUbicacion devuelve
+    // altitud_fuente='cabecera' (simula el fallback offline). Sin altitud previa
+    // en el perfil, la cabecera SÍ se guarda (mejor que nada).
+    mockGeolocation(30);
     render(<LocationDetectedScreen onConfirm={vi.fn()} onBack={vi.fn()} />);
 
     await screen.findByTestId('altitud-manual-input');
@@ -150,7 +161,8 @@ describe('LocationDetectedScreen — corrección de ubicación gruesa', () => {
 
     const saved = saveProfile.mock.calls[0][0];
     expect(saved.finca_altitud).toBe('1923');
-    expect(saved.altitud_source).toBe('derived');
+    // La fuente refleja de dónde vino: 'cabecera' (no 'derived', #1213-fix).
+    expect(saved.altitud_source).toBe('cabecera');
     expect(saved.ubicacion_accuracy).toBe(30);
   });
 

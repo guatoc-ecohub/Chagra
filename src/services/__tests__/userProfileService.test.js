@@ -9,6 +9,7 @@ import {
   markProfileSkipped,
   hasSeenProfileOnboarding,
   buildUserProfileBlock,
+  resolveAltitudToSave,
 } from '../userProfileService.js';
 
 describe('userProfileService (#200)', () => {
@@ -152,5 +153,96 @@ describe('getProfileMunicipio — backfill offline de perfiles viejos (#338)', (
     expect(getProfileMunicipio()).toBeNull();
     localStorage.clear();
     expect(getProfileMunicipio()).toBeNull();
+  });
+});
+
+describe('resolveAltitudToSave — coalesce no-destructivo (#1213-regresion)', () => {
+  it('manual siempre prevalece — sobrescribe incluso una altitud buena existente', () => {
+    const { finca_altitud, altitud_source } = resolveAltitudToSave({
+      altitudSource: 'manual',
+      resolvedAltitudFuente: 'cabecera',
+      effectiveAltitud: 2580,
+      existingFincaAltitud: '1923',
+      existingAltitudSource: 'elevation_api',
+    });
+    expect(finca_altitud).toBe('2580');
+    expect(altitud_source).toBe('manual');
+  });
+
+  it('regresion #1213: cabecera NO pisa altitud real existente (caso Choachi 2580 vs 1923)', () => {
+    // El perfil del operador tiene altitud 2580 (finca vereda alta, fuente no-cabecera).
+    // El backfill de municipio Choachi devuelve altitud_fuente='cabecera' (1923).
+    // El resultado debe preservar 2580 y NO actualizar finca_altitud.
+    const { finca_altitud, altitud_source } = resolveAltitudToSave({
+      altitudSource: 'derived',
+      resolvedAltitudFuente: 'cabecera',
+      effectiveAltitud: 1923, // lo que resolvió el fallback offline
+      existingFincaAltitud: '2580',
+      existingAltitudSource: 'manual', // o 'elevation_api' o 'dado'
+    });
+    expect(finca_altitud).toBeUndefined();
+    expect(altitud_source).toBeUndefined();
+  });
+
+  it('cabecera SÍ persiste cuando el perfil no tiene altitud previa', () => {
+    // Perfil nuevo sin altitud → la cabecera es mejor que nada.
+    const { finca_altitud, altitud_source } = resolveAltitudToSave({
+      altitudSource: 'derived',
+      resolvedAltitudFuente: 'cabecera',
+      effectiveAltitud: 1923,
+      existingFincaAltitud: null,
+      existingAltitudSource: null,
+    });
+    expect(finca_altitud).toBe('1923');
+    expect(altitud_source).toBe('cabecera');
+  });
+
+  it('cabecera SÍ persiste cuando el perfil ya tiene otra cabecera (no pior que antes)', () => {
+    const { finca_altitud, altitud_source } = resolveAltitudToSave({
+      altitudSource: 'derived',
+      resolvedAltitudFuente: 'cabecera',
+      effectiveAltitud: 1923,
+      existingFincaAltitud: '1800',
+      existingAltitudSource: 'cabecera',
+    });
+    // Actualizar cabecera con cabecera está bien (puede haber elegido otro municipio).
+    expect(finca_altitud).toBe('1923');
+    expect(altitud_source).toBe('cabecera');
+  });
+
+  it('elevation_api pisa una cabecera previa (GPS/API > cabecera)', () => {
+    const { finca_altitud, altitud_source } = resolveAltitudToSave({
+      altitudSource: 'derived',
+      resolvedAltitudFuente: 'elevation_api',
+      effectiveAltitud: 2490,
+      existingFincaAltitud: '1923',
+      existingAltitudSource: 'cabecera',
+    });
+    expect(finca_altitud).toBe('2490');
+    expect(altitud_source).toBe('elevation_api');
+  });
+
+  it('dado (GPS real) pisa una cabecera previa', () => {
+    const { finca_altitud, altitud_source } = resolveAltitudToSave({
+      altitudSource: 'derived',
+      resolvedAltitudFuente: 'dado',
+      effectiveAltitud: 2580,
+      existingFincaAltitud: '1923',
+      existingAltitudSource: 'cabecera',
+    });
+    expect(finca_altitud).toBe('2580');
+    expect(altitud_source).toBe('dado');
+  });
+
+  it('sin effectiveAltitud devuelve ambos undefined', () => {
+    const { finca_altitud, altitud_source } = resolveAltitudToSave({
+      altitudSource: 'derived',
+      resolvedAltitudFuente: null,
+      effectiveAltitud: null,
+      existingFincaAltitud: null,
+      existingAltitudSource: null,
+    });
+    expect(finca_altitud).toBeUndefined();
+    expect(altitud_source).toBeUndefined();
   });
 });

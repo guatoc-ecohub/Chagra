@@ -312,6 +312,61 @@ export function getProfileMunicipio() {
 }
 
 /**
+ * Determina qué altitud y fuente guardar en el perfil de forma no destructiva.
+ *
+ * Regla de coalesce (regresion #1213):
+ *   - Si el usuario escribió la altitud a mano ('manual') → siempre prevalece.
+ *   - Si la altitud resuelta viene de GPS real o Open-Elevation ('dado' /
+ *     'elevation_api') → persiste, incluso sobre una previa 'cabecera'.
+ *   - Si la altitud resuelta es SOLO de cabecera DANE ('cabecera') y el perfil
+ *     existente ya tiene una altitud buena (source != 'cabecera') → NO pisar.
+ *     Se devuelve undefined para finca_altitud para que saveProfile no la toque.
+ *
+ * Esta función es pura (sin efectos): facilita pruebas unitarias y evita
+ * duplicar la lógica en LocationDetectedScreen.
+ *
+ * @param {{
+ *   altitudSource: 'manual'|'derived',
+ *   resolvedAltitudFuente: 'dado'|'elevation_api'|'cabecera'|null,
+ *   effectiveAltitud: number|null,
+ *   existingFincaAltitud: string|number|null|undefined,
+ *   existingAltitudSource: string|null|undefined,
+ * }} opts
+ * @returns {{ finca_altitud: string|undefined, altitud_source: string|undefined }}
+ */
+export function resolveAltitudToSave({
+  altitudSource,
+  resolvedAltitudFuente,
+  effectiveAltitud,
+  existingFincaAltitud,
+  existingAltitudSource,
+}) {
+  // ¿Solo tenemos cabecera y no hubo ajuste manual en este flujo?
+  const isCabeceraOnly = altitudSource !== 'manual' && resolvedAltitudFuente === 'cabecera';
+  // ¿El perfil ya tiene una altitud buena (no de cabecera)?
+  const profileHasGoodAltitud =
+    existingFincaAltitud != null &&
+    existingAltitudSource != null &&
+    existingAltitudSource !== 'cabecera';
+
+  if (isCabeceraOnly && profileHasGoodAltitud) {
+    // Conservar la altitud existente; no actualizar.
+    return { finca_altitud: undefined, altitud_source: undefined };
+  }
+
+  const finca_altitud =
+    effectiveAltitud != null ? String(effectiveAltitud) : undefined;
+  const altitud_source =
+    finca_altitud === undefined
+      ? undefined
+      : altitudSource === 'manual'
+        ? 'manual'
+        : resolvedAltitudFuente ?? 'derived';
+
+  return { finca_altitud, altitud_source };
+}
+
+/**
  * Persiste (merge) respuestas parciales o completas del perfil.
  *
  * @param {Object} partial - respuestas a guardar { id: valor }
