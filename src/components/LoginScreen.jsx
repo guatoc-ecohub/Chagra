@@ -15,8 +15,9 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
   const [loading, setLoading] = useState(false);
   // Selector de fondos: en login mostramos el fondo curado como capa de foto.
   // Suscribimos solo el id (string) para evitar React #185. SIEMPRE resolvemos
-  // a una foto (getBackgroundSrc) — incluido 'default', que ahora cae a "Cosecha
-  // mística" (DEFAULT_BACKGROUND_SRC). Así el login nunca muestra el patrón viejo.
+  // a una foto (getBackgroundSrc); el default universal es "Cosecha mística"
+  // (DEFAULT_BACKGROUND_SRC) tras eliminar el fondo "Clásico" (2026-06-02), así
+  // el login nunca muestra el patrón viejo.
   const selectedBackground = useThemeBackgroundStore((s) => s.selected);
   const loginBgSrc = getBackgroundSrc(selectedBackground);
 

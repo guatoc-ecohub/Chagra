@@ -8,21 +8,24 @@ import useThemeBackgroundStore, {
 describe('BackgroundSelector smoke', () => {
   beforeEach(() => {
     localStorage.clear();
-    useThemeBackgroundStore.getState().setBackground('default');
+    // Default universal: "Cosecha mística" (biopunk-4). El fondo "Clásico"
+    // fue eliminado del catálogo (operador 2026-06-02).
+    useThemeBackgroundStore.getState().setBackground('biopunk-4');
   });
 
-  it('renderiza las opciones de fondo del catálogo', () => {
+  it('renderiza las opciones de fondo del catálogo (4 biopunk, sin Clásico)', () => {
     render(<BackgroundSelector />);
-    expect(screen.getByText('Clásico')).toBeInTheDocument();
+    expect(screen.queryByText('Clásico')).not.toBeInTheDocument();
     expect(screen.getByText('Páramo completo')).toBeInTheDocument();
     expect(screen.getByText('Colibrí tech')).toBeInTheDocument();
     expect(screen.getByText('Bosque ilustrado')).toBeInTheDocument();
+    expect(screen.getByText('Cosecha mística')).toBeInTheDocument();
   });
 
-  it('Clásico (default) seleccionado por default', () => {
+  it('Cosecha mística (default universal) seleccionado por default', () => {
     render(<BackgroundSelector />);
-    const clasicoBtn = screen.getByText('Clásico').closest('button');
-    expect(clasicoBtn).toHaveAttribute('aria-pressed', 'true');
+    const misticaBtn = screen.getByText('Cosecha mística').closest('button');
+    expect(misticaBtn).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('estado del store preselecciona el fondo al montar', () => {
@@ -76,7 +79,7 @@ describe('BackgroundSelector smoke', () => {
   });
 
   it('botón cerrar (X) descarta el modal sin cambiar la selección', () => {
-    useThemeBackgroundStore.getState().setBackground('default');
+    useThemeBackgroundStore.getState().setBackground('biopunk-4');
     render(<BackgroundSelector />);
     fireEvent.click(screen.getByText('Páramo completo').closest('button'));
 
@@ -85,17 +88,17 @@ describe('BackgroundSelector smoke', () => {
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     // la selección NO cambió
-    expect(useThemeBackgroundStore.getState().selected).toBe('default');
+    expect(useThemeBackgroundStore.getState().selected).toBe('biopunk-4');
   });
 
   it('Escape cierra la vista ampliada sin cambiar la selección', () => {
-    useThemeBackgroundStore.getState().setBackground('default');
+    useThemeBackgroundStore.getState().setBackground('biopunk-4');
     render(<BackgroundSelector />);
     fireEvent.click(screen.getByText('Colibrí tech').closest('button'));
     expect(screen.getByRole('dialog')).toBeInTheDocument();
 
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(useThemeBackgroundStore.getState().selected).toBe('default');
+    expect(useThemeBackgroundStore.getState().selected).toBe('biopunk-4');
   });
 });

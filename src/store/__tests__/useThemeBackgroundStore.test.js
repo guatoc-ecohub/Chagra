@@ -1,10 +1,11 @@
 /**
- * useThemeBackgroundStore — selector de fondos 2026-05-28.
+ * useThemeBackgroundStore — selector de fondos.
  *
- * Cubre:
- *   - estado inicial 'default'
+ * Cubre (post 2026-06-02, fondo "Clásico" eliminado):
+ *   - default universal selected="biopunk-4" (Cosecha mística)
+ *   - el catálogo contiene SOLO los 4 fondos biopunk (sin 'default'/Clásico)
  *   - setBackground cambia y persiste en localStorage (chagra:background:v1)
- *   - id inválido cae a 'default' (defensivo)
+ *   - id desconocido (y el legado 'default') cae a "biopunk-4" (defensivo)
  *   - helpers puros getBackgroundById / getBackgroundSrc retornan refs
  *     estables del catálogo congelado (anti React #185)
  *   - catálogo congelado (Object.freeze) — no mutable
@@ -12,6 +13,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import useThemeBackgroundStore, {
   BACKGROUND_CATALOG,
+  DEFAULT_BACKGROUND_ID,
   DEFAULT_BACKGROUND_SRC,
   getBackgroundById,
   getBackgroundSrc,
@@ -26,6 +28,7 @@ describe('useThemeBackgroundStore', () => {
 
   it('default universal: selected="biopunk-4" (Cosecha mística, operador 2026-06-02)', () => {
     expect(useThemeBackgroundStore.getState().selected).toBe('biopunk-4');
+    expect(DEFAULT_BACKGROUND_ID).toBe('biopunk-4');
   });
 
   it('setBackground cambia el fondo seleccionado', () => {
@@ -40,21 +43,28 @@ describe('useThemeBackgroundStore', () => {
     expect(JSON.parse(raw).state.selected).toBe('biopunk-2');
   });
 
-  it('id desconocido cae a "default" (defensivo)', () => {
+  it('id desconocido cae al default universal "biopunk-4" (defensivo)', () => {
     useThemeBackgroundStore.getState().setBackground('biopunk-1');
     useThemeBackgroundStore.getState().setBackground('no-existe');
-    expect(useThemeBackgroundStore.getState().selected).toBe('default');
+    expect(useThemeBackgroundStore.getState().selected).toBe('biopunk-4');
   });
 
-  it('catálogo tiene default + biopunk y está congelado', () => {
-    expect(BACKGROUND_CATALOG).toHaveLength(5);
+  it('el legado "default" (Clásico, eliminado) ya no es válido → cae a biopunk-4', () => {
+    useThemeBackgroundStore.getState().setBackground('default');
+    expect(useThemeBackgroundStore.getState().selected).toBe('biopunk-4');
+  });
+
+  it('catálogo: SOLO 4 fondos biopunk (sin Clásico) y congelado', () => {
+    expect(BACKGROUND_CATALOG).toHaveLength(4);
     expect(BACKGROUND_CATALOG.map((b) => b.id)).toEqual([
-      'default',
       'biopunk-1',
       'biopunk-2',
       'biopunk-3',
       'biopunk-4',
     ]);
+    // El fondo "Clásico"/'default' fue eliminado del catálogo.
+    expect(BACKGROUND_CATALOG.some((b) => b.id === 'default')).toBe(false);
+    expect(BACKGROUND_CATALOG.some((b) => b.label === 'Clásico')).toBe(false);
     expect(Object.isFrozen(BACKGROUND_CATALOG)).toBe(true);
     expect(Object.isFrozen(BACKGROUND_CATALOG[0])).toBe(true);
   });
@@ -63,14 +73,18 @@ describe('useThemeBackgroundStore', () => {
     const a = getBackgroundById('biopunk-1');
     const b = getBackgroundById('biopunk-1');
     expect(a).toBe(b); // misma referencia, no objeto nuevo
-    expect(a).toBe(BACKGROUND_CATALOG[1]);
+    expect(a).toBe(BACKGROUND_CATALOG[0]);
   });
 
-  it('getBackgroundById con id inválido retorna la entrada default estable', () => {
-    expect(getBackgroundById('no-existe')).toBe(BACKGROUND_CATALOG[0]);
+  it('getBackgroundById con id inválido retorna la entrada default (Cosecha mística) estable', () => {
+    const entry = getBackgroundById('no-existe');
+    expect(entry.id).toBe('biopunk-4');
+    // Ref estable entre llamadas (no objeto nuevo).
+    expect(getBackgroundById('otro-invalido')).toBe(entry);
   });
 
-  it('getBackgroundSrc: default cae a Cosecha mística (DEFAULT_BACKGROUND_SRC)', () => {
+  it('getBackgroundSrc: id desconocido cae a Cosecha mística (DEFAULT_BACKGROUND_SRC)', () => {
+    expect(getBackgroundSrc('no-existe')).toBe(DEFAULT_BACKGROUND_SRC);
     expect(getBackgroundSrc('default')).toBe(DEFAULT_BACKGROUND_SRC);
     expect(DEFAULT_BACKGROUND_SRC).toBe('/fondo-biopunk-4.jpg');
   });
@@ -79,5 +93,6 @@ describe('useThemeBackgroundStore', () => {
     expect(getBackgroundSrc('biopunk-1')).toBe('/fondo-biopunk-1.jpg');
     expect(getBackgroundSrc('biopunk-2')).toBe('/fondo-biopunk-2.jpg');
     expect(getBackgroundSrc('biopunk-3')).toBe('/fondo-biopunk-3.jpg');
+    expect(getBackgroundSrc('biopunk-4')).toBe('/fondo-biopunk-4.jpg');
   });
 });

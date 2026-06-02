@@ -1,36 +1,56 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { describe, test, expect, vi } from 'vitest';
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 import ChipsToolbar from '../ChipsToolbar';
 import { CHIP_DEFS } from '../../services/chipIntentRouter';
+import * as deepResearchClient from '../../services/deepResearchClient';
 
 /**
  * Smoke tests A4/B4 — la barra de CHIPS DE MODO sobre el input del chat.
- *   - renderiza los 7 chips con su emoji + label,
+ *   - renderiza los chips con su emoji + label,
  *   - clickear un chip llama onSelectIntent con el intent enum,
  *   - el chip activo se marca aria-pressed,
  *   - el chip 📷 foto solo aparece/activa si hay imagen adjunta,
  *   - retorna null si falta el handler (defensa contra mounts incompletos).
- *   - tier gate A1: chip 🔬 Deep Research deshabilitado para free, activo para pro.
+ *
+ * Feature flag Deep Research (VITE_DEEP_RESEARCH_ENABLED):
+ *   - flag OFF (default) → el chip 🔬 NO se renderiza (evita dead-end
+ *     "no disponible en este plan"): quedan 6 chips.
+ *   - flag ON → el chip 🔬 reaparece y queda pro-gated (deshabilitado para
+ *     free, activo para pro) — tier gate A1.
+ *
+ * Estos tests controlan la flag mockeando `isDeepResearchEnabled` para no
+ * depender del entorno de build.
  */
 
-describe('ChipsToolbar — barra de chips de modo', () => {
-  test('renderiza los 7 chips de modo (usuario free — deep chip bloqueado)', () => {
-    render(<ChipsToolbar onSelectIntent={() => {}} isPro={false} />);
-    const chips = screen.getAllByTestId('mode-chip');
-    expect(chips).toHaveLength(7);
-    // El emoji + label del primero (siembro) debe estar presente
-    expect(screen.getByText('¿Qué siembro?')).toBeInTheDocument();
-    expect(screen.getByText('Plaga')).toBeInTheDocument();
-    // Free users ven el chip con sufijo "(Pro)"
-    expect(screen.getByText('Investigación profunda (Pro)')).toBeInTheDocument();
+// Cantidad de chips NO-deep (siembro, plaga, biopreparado, clima, precio, calendario).
+const NON_DEEP_CHIP_COUNT = CHIP_DEFS.filter((d) => d.intent !== 'deep').length;
+
+describe('ChipsToolbar — flag Deep Research OFF (chip 🔬 oculto)', () => {
+  beforeEach(() => {
+    vi.spyOn(deepResearchClient, 'isDeepResearchEnabled').mockReturnValue(false);
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
-  test('renderiza el chip 🔬 sin sufijo cuando isPro=true', () => {
+  test('el chip 🔬 Investigación profunda NO se renderiza con la flag OFF', () => {
+    render(<ChipsToolbar onSelectIntent={() => {}} isPro={false} />);
+    expect(screen.queryByText(/investigación profunda/i)).not.toBeInTheDocument();
+  });
+
+  test('renderiza solo los chips no-deep (6) con la flag OFF', () => {
+    render(<ChipsToolbar onSelectIntent={() => {}} isPro={false} />);
+    const chips = screen.getAllByTestId('mode-chip');
+    expect(chips).toHaveLength(NON_DEEP_CHIP_COUNT);
+    expect(screen.getByText('¿Qué siembro?')).toBeInTheDocument();
+    expect(screen.getByText('Plaga')).toBeInTheDocument();
+  });
+
+  test('el chip 🔬 tampoco aparece para usuario pro con la flag OFF', () => {
     render(<ChipsToolbar onSelectIntent={() => {}} isPro />);
-    expect(screen.getByText('Investigación profunda')).toBeInTheDocument();
-    expect(screen.queryByText('Investigación profunda (Pro)')).not.toBeInTheDocument();
+    expect(screen.queryByText(/investigación profunda/i)).not.toBeInTheDocument();
   });
 
   test('clickear un chip llama onSelectIntent con el intent enum', () => {
@@ -45,14 +65,14 @@ describe('ChipsToolbar — barra de chips de modo', () => {
     render(<ChipsToolbar onSelectIntent={() => {}} activeIntent="clima" />);
     const climaChip = screen.getByRole('button', { name: /clima/i });
     expect(climaChip).toHaveAttribute('aria-pressed', 'true');
-    // Otro chip cualquiera no debe estar pressed
     const siembroChip = screen.getByRole('button', { name: /siembro/i });
     expect(siembroChip).toHaveAttribute('aria-pressed', 'false');
   });
 
-  test('cada chip de modo expone un accessible name no vacío', () => {
+  test('cada chip no-deep expone un accessible name no vacío', () => {
     render(<ChipsToolbar onSelectIntent={() => {}} />);
     for (const def of CHIP_DEFS) {
+      if (def.intent === 'deep') continue;
       const chip = screen.getByRole('button', { name: new RegExp(def.label, 'i') });
       expect(chip).toBeInTheDocument();
     }
@@ -65,12 +85,7 @@ describe('ChipsToolbar — barra de chips de modo', () => {
 
   test('el chip 📷 foto aparece y es clickable cuando hay imagen adjunta', () => {
     const onSelectIntent = vi.fn();
-    render(
-      <ChipsToolbar
-        onSelectIntent={onSelectIntent}
-        hasAttachment
-      />,
-    );
+    render(<ChipsToolbar onSelectIntent={onSelectIntent} hasAttachment />);
     const fotoChip = screen.getByTestId('mode-chip-foto');
     expect(fotoChip).toBeInTheDocument();
     expect(fotoChip).not.toBeDisabled();
@@ -89,53 +104,6 @@ describe('ChipsToolbar — barra de chips de modo', () => {
     expect(container.textContent).not.toMatch(VOSEO);
   });
 
-  // ──── Tier gate A1 ────────────────────────────────────────────────────────
-
-  test('chip 🔬 está deshabilitado (disabled) para usuario free (isPro=false)', () => {
-    render(<ChipsToolbar onSelectIntent={() => {}} isPro={false} />);
-    const deepChip = screen.getByRole('button', { name: /investigación profunda/i });
-    expect(deepChip).toBeDisabled();
-  });
-
-  test('chip 🔬 está habilitado para usuario pro (isPro=true)', () => {
-    render(<ChipsToolbar onSelectIntent={() => {}} isPro />);
-    const deepChip = screen.getByRole('button', { name: /investigación profunda/i });
-    expect(deepChip).not.toBeDisabled();
-  });
-
-  test('click en chip 🔬 llama onSelectIntent para usuario pro', () => {
-    const onSelectIntent = vi.fn();
-    render(<ChipsToolbar onSelectIntent={onSelectIntent} isPro />);
-    fireEvent.click(screen.getByRole('button', { name: /investigación profunda/i }));
-    expect(onSelectIntent).toHaveBeenCalledWith('deep');
-  });
-
-  test('click en chip 🔬 NO llama onSelectIntent para usuario free', () => {
-    const onSelectIntent = vi.fn();
-    render(<ChipsToolbar onSelectIntent={onSelectIntent} isPro={false} />);
-    // El botón está disabled — fireEvent.click no dispara el handler
-    fireEvent.click(screen.getByRole('button', { name: /investigación profunda/i }));
-    expect(onSelectIntent).not.toHaveBeenCalledWith('deep');
-  });
-
-  test('chip 🔬 tiene data-pro-locked cuando usuario es free', () => {
-    render(<ChipsToolbar onSelectIntent={() => {}} isPro={false} />);
-    const deepChip = screen.getByRole('button', { name: /investigación profunda/i });
-    expect(deepChip).toHaveAttribute('data-pro-locked', 'true');
-  });
-
-  test('chip 🔬 NO tiene data-pro-locked cuando usuario es pro', () => {
-    render(<ChipsToolbar onSelectIntent={() => {}} isPro />);
-    const deepChip = screen.getByRole('button', { name: /investigación profunda/i });
-    expect(deepChip).not.toHaveAttribute('data-pro-locked');
-  });
-
-  test('chip 🔬 tiene title explicativo de función Pro cuando free', () => {
-    render(<ChipsToolbar onSelectIntent={() => {}} isPro={false} />);
-    const deepChip = screen.getByRole('button', { name: /investigación profunda/i });
-    expect(deepChip).toHaveAttribute('title', expect.stringContaining('Pro'));
-  });
-
   test('chips no-Pro (siembro, plaga, etc.) siguen activos para usuario free', () => {
     const onSelectIntent = vi.fn();
     render(<ChipsToolbar onSelectIntent={onSelectIntent} isPro={false} />);
@@ -144,5 +112,57 @@ describe('ChipsToolbar — barra de chips de modo', () => {
     onSelectIntent.mockClear();
     fireEvent.click(screen.getByText('Plaga'));
     expect(onSelectIntent).toHaveBeenCalledWith('plaga');
+  });
+});
+
+// ──── Flag Deep Research ON → chip 🔬 visible + tier gate A1 ─────────────────
+describe('ChipsToolbar — flag Deep Research ON (chip 🔬 visible, pro-gated)', () => {
+  beforeEach(() => {
+    vi.spyOn(deepResearchClient, 'isDeepResearchEnabled').mockReturnValue(true);
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test('renderiza los 7 chips (incluido 🔬) con la flag ON', () => {
+    render(<ChipsToolbar onSelectIntent={() => {}} isPro={false} />);
+    expect(screen.getAllByTestId('mode-chip')).toHaveLength(7);
+  });
+
+  test('usuario free ve el chip 🔬 con sufijo "(Pro)" y deshabilitado', () => {
+    render(<ChipsToolbar onSelectIntent={() => {}} isPro={false} />);
+    expect(screen.getByText('Investigación profunda (Pro)')).toBeInTheDocument();
+    const deepChip = screen.getByRole('button', { name: /investigación profunda/i });
+    expect(deepChip).toBeDisabled();
+    expect(deepChip).toHaveAttribute('data-pro-locked', 'true');
+  });
+
+  test('chip 🔬 tiene title explicativo de función Pro cuando free', () => {
+    render(<ChipsToolbar onSelectIntent={() => {}} isPro={false} />);
+    const deepChip = screen.getByRole('button', { name: /investigación profunda/i });
+    expect(deepChip).toHaveAttribute('title', expect.stringContaining('Pro'));
+  });
+
+  test('renderiza el chip 🔬 sin sufijo y habilitado cuando isPro=true', () => {
+    render(<ChipsToolbar onSelectIntent={() => {}} isPro />);
+    expect(screen.getByText('Investigación profunda')).toBeInTheDocument();
+    expect(screen.queryByText('Investigación profunda (Pro)')).not.toBeInTheDocument();
+    const deepChip = screen.getByRole('button', { name: /investigación profunda/i });
+    expect(deepChip).not.toBeDisabled();
+    expect(deepChip).not.toHaveAttribute('data-pro-locked');
+  });
+
+  test('click en chip 🔬 llama onSelectIntent("deep") para usuario pro', () => {
+    const onSelectIntent = vi.fn();
+    render(<ChipsToolbar onSelectIntent={onSelectIntent} isPro />);
+    fireEvent.click(screen.getByRole('button', { name: /investigación profunda/i }));
+    expect(onSelectIntent).toHaveBeenCalledWith('deep');
+  });
+
+  test('click en chip 🔬 NO llama onSelectIntent("deep") para usuario free', () => {
+    const onSelectIntent = vi.fn();
+    render(<ChipsToolbar onSelectIntent={onSelectIntent} isPro={false} />);
+    fireEvent.click(screen.getByRole('button', { name: /investigación profunda/i }));
+    expect(onSelectIntent).not.toHaveBeenCalledWith('deep');
   });
 });

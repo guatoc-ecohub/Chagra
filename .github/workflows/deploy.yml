@@ -42,6 +42,15 @@ jobs:
 
       - if: env.SKIP_DEPLOY != '1'
         uses: actions/checkout@v4
+        # fetch-depth: 0 = clone COMPLETO (no shallow). El default de
+        # actions/checkout@v4 es fetch-depth 1 (shallow), con lo que
+        # `git rev-list --count HEAD` del step "Set deploy-time version"
+        # cuenta SIEMPRE 1 → la versión quedaba pegada en `1.0.1` sin
+        # avanzar pese a cada deploy. Con el historial completo el count
+        # da el número real de commits (~185), produciendo una versión
+        # monotónica `1.0.<count>` única por deploy.
+        with:
+          fetch-depth: 0
 
       - if: env.SKIP_DEPLOY != '1'
         name: Install dependencies

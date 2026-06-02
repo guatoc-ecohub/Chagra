@@ -505,14 +505,12 @@ export default function App() {
   // Perfil. Suscribimos SOLO el id (string) — nunca un objeto inline — para
   // no disparar React #185. Escribimos la variable CSS --app-bg-image en el
   // body (la consume .app-bg-biodiversidad) y precargamos únicamente el
-  // full seleccionado. 'default' limpia la variable → cae al fallback CSS
-  // clásico, sin breaking change.
+  // full seleccionado. Desde 2026-06-02 ya no existe el fondo "Clásico":
+  // CUALQUIER id resuelve vía getBackgroundSrc a una foto biopunk real
+  // (default universal "Cosecha mística"), así que siempre escribimos la
+  // variable y NINGUNA pantalla cae al fondo viejo.
   const selectedBackground = useThemeBackgroundStore((s) => s.selected);
   useEffect(() => {
-    if (selectedBackground === 'default') {
-      document.body.style.removeProperty('--app-bg-image');
-      return;
-    }
     const src = getBackgroundSrc(selectedBackground);
     // Precargar solo el full elegido para que el cambio sea inmediato.
     const img = new Image();
