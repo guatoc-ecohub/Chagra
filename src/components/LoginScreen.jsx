@@ -13,11 +13,12 @@ import useThemeBackgroundStore, { getBackgroundSrc } from '../store/useThemeBack
 export default function LoginScreen({ onLoginSuccess, onSave }) {
   const [creds, setCreds] = useState({ username: '', password: '' });
   const [loading, setLoading] = useState(false);
-  // Selector de fondos: en login mostramos el fondo curado elegido como
-  // capa de foto detrás del patrón biopunk. Suscribimos solo el id (string)
-  // para evitar React #185. 'default' sigue mostrando solo slate + biopunk.
+  // Selector de fondos: en login mostramos el fondo curado como capa de foto.
+  // Suscribimos solo el id (string) para evitar React #185. SIEMPRE resolvemos
+  // a una foto (getBackgroundSrc) — incluido 'default', que ahora cae a "Cosecha
+  // mística" (DEFAULT_BACKGROUND_SRC). Así el login nunca muestra el patrón viejo.
   const selectedBackground = useThemeBackgroundStore((s) => s.selected);
-  const loginBgSrc = selectedBackground === 'default' ? null : getBackgroundSrc(selectedBackground);
+  const loginBgSrc = getBackgroundSrc(selectedBackground);
 
   const handleLogin = async (e) => {
     e.preventDefault();
