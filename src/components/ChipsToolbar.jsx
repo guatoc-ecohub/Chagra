@@ -1,5 +1,6 @@
 import React from 'react';
 import { CHIP_DEFS, CHIP_INTENTS } from '../services/chipIntentRouter';
+import { isDeepResearchEnabled } from '../services/deepResearchClient';
 
 /**
  * ChipsToolbar — "caja de herramientas" del agente como CHIPS DE MODO
@@ -20,9 +21,18 @@ import { CHIP_DEFS, CHIP_INTENTS } from '../services/chipIntentRouter';
  * El chip 📷 foto solo se muestra cuando hay una imagen adjunta lista
  * (`hasAttachment`). Coordina con el flujo de adjuntos del compositor.
  *
- * Tier gating (A1): el chip 🔬 Investigación profunda (Deep Research) es Pro-only.
- * Si `isPro` es false, el chip se muestra deshabilitado con copy "función Pro"
- * para que el usuario free sepa qué existe pero no pueda activarlo.
+ * Feature flag (Deep Research): el chip 🔬 Investigación profunda SOLO se
+ * renderiza cuando `isDeepResearchEnabled()` es true (flag
+ * `VITE_DEEP_RESEARCH_ENABLED`). Con la flag OFF la feature no tiene backend
+ * disponible para ningún plan, así que mostrar el chip era un dead-end:
+ * cualquier pregunta caía en "no disponible en este plan". Mientras la flag
+ * esté OFF el chip se OCULTA por completo; cuando esté live vuelve a aparecer
+ * con el tier gating Pro de abajo.
+ *
+ * Tier gating (A1): cuando la flag está ON, el chip 🔬 Investigación profunda
+ * (Deep Research) es Pro-only. Si `isPro` es false, el chip se muestra
+ * deshabilitado con copy "función Pro" para que el usuario free sepa qué
+ * existe pero no pueda activarlo.
  *
  * Props:
  *   - onSelectIntent: callback(intent: string) — el call-site decide qué hacer.
@@ -42,6 +52,15 @@ export default function ChipsToolbar({
   isPro = false,
 }) {
   if (typeof onSelectIntent !== 'function') return null;
+
+  // Deep Research dead-end fix: si la flag VITE_DEEP_RESEARCH_ENABLED está
+  // OFF la feature no existe para ningún plan, así que ocultamos el chip 🔬
+  // por completo (no solo lo pro-bloqueamos). Con la flag ON el chip vuelve
+  // y queda pro-gated como el resto de la lógica de abajo.
+  const deepEnabled = isDeepResearchEnabled();
+  const visibleChipDefs = deepEnabled
+    ? CHIP_DEFS
+    : CHIP_DEFS.filter((def) => def.intent !== CHIP_INTENTS.deep);
 
   const baseChip =
     'shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border ' +
@@ -84,7 +103,7 @@ export default function ChipsToolbar({
           </button>
         )}
 
-        {CHIP_DEFS.map((def) => {
+        {visibleChipDefs.map((def) => {
           const isActive = activeIntent === def.intent;
           // El chip 🔬 Deep Research es Pro-only. Para usuarios free: deshabilitado
           // con copy claro "función Pro" y title explicativo. NO se oculta — el

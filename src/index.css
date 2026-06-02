@@ -32,9 +32,10 @@
    *
    * Selector de fondos 2026-05-28: la URL de la imagen es ahora la variable
    * CSS `--app-bg-image`, escrita por useThemeBackgroundStore cuando el
-   * operador elige otro fondo curado desde Perfil. El fallback de `var()`
-   * es la imagen clásica original → 'default' = comportamiento idéntico al
-   * anterior aunque el store nunca escriba la variable. El overlay de
+   * operador elige otro fondo curado desde Perfil. Desde 2026-06-02 el fondo
+   * "Clásico" fue eliminado: el fallback de `var()` es "Cosecha mística"
+   * (`/fondo-biopunk-4.jpg`), el default universal — ninguna pantalla cae ya
+   * al fondo viejo aunque el store no haya escrito la variable. El overlay de
    * gradiente (legibilidad) se mantiene intacto encima de cualquier imagen.
    */
   body.app-bg-biodiversidad {
