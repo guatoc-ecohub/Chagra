@@ -27,6 +27,14 @@ dist-ssr
 .env.local
 .claude/
 
+# Secretos del juez Anthropic del bench. La key vive fuera del repo
+# (~/.config/chagra-anthropic-judge-key, chmod 600) y se lee solo en runtime —
+# JAMÁS se commitea. Estos patrones son defensa extra por si alguien deja una
+# copia en el árbol del repo. Ver scripts/lib/bench-scorer.mjs (readAnthropicKey).
+chagra-anthropic-judge-key
+*anthropic*key*
+*.apikey
+
 # Playwright
 /test-results/
 /playwright-report/

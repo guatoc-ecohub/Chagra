@@ -26,10 +26,24 @@
  * perdona sus propias alucinaciones). El default histórico apuntaba al generador
  * (granite3.1-dense:8b) / a mistral-nemo:12b (que CRASHEA en Maxwell sm_52 con
  * 'signal during cgo'). `assertIndependentJudge` rechaza explícitamente usar el
- * generador como juez. Juez independiente recomendado en Maxwell sin API
- * Anthropic disponible: `qwen2.5:14b` (corre estable en sm_52, familia distinta
- * a granite). Ideal cuando hay ANTHROPIC_API_KEY: un Haiku cloud, vía el pipeline
- * Python `tools/llm-judge/` (Chagra-strategy) — NO hay key en este entorno.
+ * generador como juez.
+ *
+ * JUEZ ANTHROPIC (R5, 2026-06-01): NINGÚN juez LLM *local* es confiable en la
+ * Maxwell M6000 (sm_52):
+ *   - `qwen2.5:14b`      → devuelve respuesta VACÍA (no juzga nada).
+ *   - `llama3.1:8b`      → devuelve respuesta VACÍA.
+ *   - `mistral-nemo:12b` → aprueba TODO (rubber-stamp; además crash cgo).
+ * Por eso el juez confiable por defecto pasa a ser **Claude Haiku** vía la API de
+ * Anthropic (`claude-haiku-4-5`: modelo de juez barato y estable). El proveedor
+ * se elige con la env `JUDGE_PROVIDER` (anthropic|ollama|deterministic). Si NO
+ * hay API key disponible, se degrada de forma graceful al scorer DETERMINÍSTICO
+ * (substring de must_include + ausencia de red_flags) — nunca crashea.
+ *
+ * LECTURA SEGURA DE LA KEY (R5): la API key se lee SOLO en runtime, primero de
+ * `process.env.ANTHROPIC_API_KEY` y, si no está, del archivo gitignored
+ * `~/.config/chagra-anthropic-judge-key` (chmod 600). JAMÁS se imprime, loguea ni
+ * se incluye en commits / tests / fixtures. Los tests mockean la llamada HTTP y
+ * NO necesitan key real para pasar.
  *
  * Módulo PURO y sin efectos secundarios (no auto-ejecuta nada) → importable por
  * el bench y por el test unitario.
@@ -37,12 +51,34 @@
  * @module bench-scorer
  */
 
+import { existsSync, readFileSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
+
 /**
- * Juez independiente recomendado para correr en Maxwell (sm_52) sin acceso a la
- * API Anthropic. Familia distinta al generador (granite) → no es auto-eval.
- * mistral-nemo:12b queda DESCARTADO como default por crash en Maxwell.
+ * Modelo Anthropic de juez (barato y confiable). Se usa cuando
+ * `JUDGE_PROVIDER=anthropic` (default si hay API key disponible).
  */
-export const RECOMMENDED_JUDGE_MODEL = 'qwen2.5:14b';
+export const RECOMMENDED_ANTHROPIC_JUDGE_MODEL = 'claude-haiku-4-5';
+
+/**
+ * Juez recomendado por defecto: Claude Haiku vía API de Anthropic. Los jueces
+ * LOCALES están ROTOS en Maxwell (qwen2.5:14b y llama3.1:8b devuelven vacío;
+ * mistral-nemo:12b aprueba todo = rubber-stamp). Cuando no hay API key, el
+ * pipeline degrada al scorer determinístico (ver `selectJudgeProvider`).
+ *
+ * NOTA: este es un *modelo de Anthropic*, no de ollama. Los benches que corren
+ * con `JUDGE_PROVIDER=ollama` deben usar `RECOMMENDED_OLLAMA_JUDGE_MODEL`.
+ */
+export const RECOMMENDED_JUDGE_MODEL = RECOMMENDED_ANTHROPIC_JUDGE_MODEL;
+
+/**
+ * Juez LOCAL (ollama) — DESCARTADO como default en Maxwell sm_52: qwen2.5:14b y
+ * llama3.1:8b devuelven respuesta vacía, mistral-nemo:12b aprueba todo. Se
+ * conserva el identificador solo para quien fuerce `JUDGE_PROVIDER=ollama` en
+ * una GPU compatible (Ampere+); en Maxwell NO produce veredictos creíbles.
+ */
+export const RECOMMENDED_OLLAMA_JUDGE_MODEL = 'qwen2.5:14b';
 
 /** El generador del bench cuyo uso como juez = auto-evaluación (prohibido). */
 export const GENERATOR_MODEL = 'granite3.1-dense:8b';
@@ -415,4 +451,208 @@ export async function scoreAntiHalluc(item, { ollamaCall } = {}) {
   } catch (_) {
     return unjudged;
   }
+}
+
+// ── R5: juez Claude Haiku (Anthropic API) + fallback determinístico ───────────
+
+/**
+ * Ruta del archivo gitignored con la API key del juez Anthropic. chmod 600. El
+ * archivo lo crea el operador; NUNCA lo escribe este módulo ni se commitea.
+ */
+export const ANTHROPIC_JUDGE_KEY_PATH = join(homedir(), '.config', 'chagra-anthropic-judge-key');
+
+/**
+ * readAnthropicKey — lee la API key SOLO en runtime. Orden: (1) env
+ * `ANTHROPIC_API_KEY`, (2) archivo gitignored `~/.config/chagra-anthropic-judge-key`.
+ * Devuelve el string de la key o `null` si no hay ninguna. JAMÁS loguea/imprime
+ * la key. No lanza si el archivo no existe ni si no se puede leer.
+ *
+ * @param {{ env?: Record<string,string|undefined>, keyPath?: string }} [opts]
+ *   `env` y `keyPath` se inyectan en tests para no tocar el entorno/disco real.
+ * @returns {string|null}
+ */
+export function readAnthropicKey({ env = process.env, keyPath = ANTHROPIC_JUDGE_KEY_PATH } = {}) {
+  const fromEnv = (env && env.ANTHROPIC_API_KEY ? String(env.ANTHROPIC_API_KEY) : '').trim();
+  if (fromEnv) return fromEnv;
+  try {
+    if (keyPath && existsSync(keyPath)) {
+      const fromFile = readFileSync(keyPath, 'utf-8').trim();
+      if (fromFile) return fromFile;
+    }
+  } catch (_) {
+    /* archivo ilegible → tratamos como ausencia de key (degrada graceful) */
+  }
+  return null;
+}
+
+/**
+ * extractAnthropicText — saca el texto de la respuesta de la API de Messages de
+ * Anthropic: `{ content: [{ type:'text', text:'...' }, ...] }`. Devuelve string
+ * (posiblemente vacío). Tolerante a formas inesperadas.
+ *
+ * @param {any} data
+ * @returns {string}
+ */
+export function extractAnthropicText(data) {
+  if (!data || !Array.isArray(data.content)) return '';
+  return data.content
+    .filter((b) => b && b.type === 'text' && typeof b.text === 'string')
+    .map((b) => b.text)
+    .join('')
+    .trim();
+}
+
+/**
+ * makeAnthropicJudgeCall — fabrica un caller de juez `(prompt) => Promise<string>`
+ * que llama a la API de Anthropic (Messages) con un modelo Haiku barato y
+ * devuelve el TEXTO del veredicto, con el MISMO contrato que el `ollamaCall`
+ * inyectable. Así enchufa directo en `scoreAntiHalluc` / `scoreWithJudge` sin
+ * cambiarlos.
+ *
+ * La llamada `fetch` se inyecta (`fetchImpl`) para testear sin red ni key real.
+ * Si la llamada falla / responde no-ok, lanza → `scoreAntiHalluc` cuenta el item
+ * como `unjudged` (no inventa un veredicto). La key NUNCA se loguea.
+ *
+ * @param {{
+ *   apiKey: string,
+ *   model?: string,
+ *   fetchImpl?: typeof fetch,
+ *   timeoutMs?: number,
+ *   maxTokens?: number,
+ *   apiUrl?: string,
+ *   anthropicVersion?: string,
+ * }} opts
+ * @returns {(prompt:string)=>Promise<string>}
+ */
+export function makeAnthropicJudgeCall({
+  apiKey,
+  model = RECOMMENDED_ANTHROPIC_JUDGE_MODEL,
+  fetchImpl,
+  timeoutMs = 60_000,
+  maxTokens = 256,
+  apiUrl = 'https://api.anthropic.com/v1/messages',
+  anthropicVersion = '2023-06-01',
+} = {}) {
+  if (!apiKey || typeof apiKey !== 'string') {
+    throw new Error('makeAnthropicJudgeCall: falta apiKey (no se loguea su valor).');
+  }
+  const doFetch = fetchImpl || (typeof fetch === 'function' ? fetch : null);
+  if (typeof doFetch !== 'function') {
+    throw new Error('makeAnthropicJudgeCall: no hay implementación de fetch disponible.');
+  }
+  return async function anthropicJudgeCall(prompt) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await doFetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': anthropicVersion,
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: maxTokens,
+          // temperatura 0 → veredicto determinista (igual que el juez local).
+          temperature: 0,
+          messages: [{ role: 'user', content: prompt }],
+        }),
+        signal: controller.signal,
+      });
+      if (!res.ok) {
+        // No incluimos cuerpo (podría reflejar la key en algún proxy) — solo status.
+        throw new Error(`anthropic judge HTTP ${res.status}`);
+      }
+      const data = await res.json();
+      return extractAnthropicText(data);
+    } finally {
+      clearTimeout(timer);
+    }
+  };
+}
+
+/**
+ * scoreAntiHallucDeterministic — fallback SIN LLM para anti-alucinación. PASS si
+ * TODOS los `mustInclude` aparecen por substring/lema/sinónimo (vía
+ * `scoreKeywordsFlexible`) Y NINGÚN `redFlags` aparece. Es conservador: un
+ * red_flag textual presente = FAIL; un must_include ausente = FAIL. NO detecta
+ * alucinaciones semánticas finas (para eso está el juez Claude), pero da una
+ * señal honesta y reproducible cuando no hay key. NO crashea.
+ *
+ * @param {{response:string, mustInclude?:string[], redFlags?:string[]}} item
+ * @returns {{pass:boolean, mustCovered:number, mustTotal:number, redFlagsHit:number, source:'deterministic'}}
+ */
+export function scoreAntiHallucDeterministic(item = {}) {
+  const must = Array.isArray(item.mustInclude) ? item.mustInclude : [];
+  const red = Array.isArray(item.redFlags) ? item.redFlags : [];
+  const response = typeof item.response === 'string' ? item.response : '';
+
+  const mustFlex = scoreKeywordsFlexible(response, must);
+  const mustCovered = mustFlex.matched;
+  const mustTotal = must.length;
+
+  const redFlex = scoreKeywordsFlexible(response, red);
+  const redFlagsHit = redFlex.matched;
+
+  const pass = mustCovered === mustTotal && redFlagsHit === 0;
+  return { pass, mustCovered, mustTotal, redFlagsHit, source: 'deterministic' };
+}
+
+/**
+ * selectJudgeProvider — elige el proveedor de juez y resuelve el caller. Reglas:
+ *
+ *   - `provider` explícito (env `JUDGE_PROVIDER`): 'anthropic' | 'ollama' |
+ *     'deterministic'. Si no se da, AUTO: 'anthropic' si hay API key disponible,
+ *     si no 'deterministic'.
+ *   - 'anthropic' sin key → degrada a 'deterministic' (graceful, no crashea).
+ *   - 'ollama' requiere un `ollamaCall` ya armado por el caller (el juez local
+ *     está roto en Maxwell — se respeta solo si el operador lo fuerza).
+ *
+ * Devuelve `{ provider, judgeModel, judgeCall, deterministic }`:
+ *   - `judgeCall`: `(prompt)=>Promise<string>` para inyectar en scoreAntiHalluc,
+ *     o `null` si el proveedor es determinístico.
+ *   - `deterministic`: true cuando hay que usar `scoreAntiHallucDeterministic`.
+ *
+ * La key se lee vía `readAnthropicKey` (env o archivo gitignored) y NUNCA se
+ * expone en el objeto devuelto ni se loguea.
+ *
+ * @param {{
+ *   provider?: string,
+ *   env?: Record<string,string|undefined>,
+ *   ollamaCall?: (prompt:string)=>Promise<string>,
+ *   ollamaModel?: string,
+ *   fetchImpl?: typeof fetch,
+ *   keyPath?: string,
+ *   anthropicModel?: string,
+ * }} [opts]
+ * @returns {{ provider:'anthropic'|'ollama'|'deterministic', judgeModel:string, judgeCall:((p:string)=>Promise<string>)|null, deterministic:boolean }}
+ */
+export function selectJudgeProvider({
+  provider,
+  env = process.env,
+  ollamaCall,
+  ollamaModel = RECOMMENDED_OLLAMA_JUDGE_MODEL,
+  fetchImpl,
+  keyPath,
+  anthropicModel = RECOMMENDED_ANTHROPIC_JUDGE_MODEL,
+} = {}) {
+  const apiKey = readAnthropicKey({ env, keyPath });
+  const requested = (provider || (env && env.JUDGE_PROVIDER) || '').trim().toLowerCase();
+  const resolved = requested || (apiKey ? 'anthropic' : 'deterministic');
+
+  if (resolved === 'anthropic') {
+    if (!apiKey) {
+      // Pedido anthropic pero sin key → degradación graceful a determinístico.
+      return { provider: 'deterministic', judgeModel: 'deterministic', judgeCall: null, deterministic: true };
+    }
+    const judgeCall = makeAnthropicJudgeCall({ apiKey, model: anthropicModel, fetchImpl });
+    return { provider: 'anthropic', judgeModel: anthropicModel, judgeCall, deterministic: false };
+  }
+
+  if (resolved === 'ollama') {
+    return { provider: 'ollama', judgeModel: ollamaModel, judgeCall: ollamaCall || null, deterministic: false };
+  }
+
+  return { provider: 'deterministic', judgeModel: 'deterministic', judgeCall: null, deterministic: true };
 }

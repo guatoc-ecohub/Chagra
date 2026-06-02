@@ -38,7 +38,12 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
 import { execSync } from 'node:child_process';
-import { scoreAntiHalluc, assertIndependentJudge, RECOMMENDED_JUDGE_MODEL } from './lib/bench-scorer.mjs';
+import {
+  scoreAntiHalluc,
+  scoreAntiHallucDeterministic,
+  assertIndependentJudge,
+  selectJudgeProvider,
+} from './lib/bench-scorer.mjs';
 import { assertCheckoutCurrent } from './lib/bench-checkout-guard.mjs';
 import { applyOutputGuards } from '../src/services/outputGuards.js';
 
@@ -51,7 +56,10 @@ const GEN_TEMPERATURE = 0.3;
 const GEN_MAX_TOKENS = 768;
 const SEED = Number(process.env.SEED || 42);
 
-const JUDGE_MODEL = process.env.JUDGE_MODEL || RECOMMENDED_JUDGE_MODEL;
+// Juez: Anthropic (Claude Haiku) si hay API key; si no, scorer DETERMINÍSTICO.
+// `JUDGE_PROVIDER=ollama` fuerza el juez local (roto en Maxwell, solo Ampere+).
+const JUDGE = selectJudgeProvider({ ollamaCall: judgeOllamaCall });
+const JUDGE_MODEL = process.env.JUDGE_MODEL || JUDGE.judgeModel;
 const JUDGE_TEMPERATURE = 0;
 const JUDGE_TIMEOUT_MS = 120_000;
 
@@ -333,19 +341,23 @@ async function generatePhase(p, config) {
   };
 }
 
-/** FASE 2 — juzga (qwen, cargado una sola vez) la respuesta ya generada. */
+/**
+ * FASE 2 — juzga la respuesta ya generada. Con proveedor Anthropic/ollama usa el
+ * LLM-judge; sin API key (determinístico) usa `scoreAntiHallucDeterministic` (no
+ * carga ningún modelo).
+ */
 async function judgePhase(p, res) {
   if (!res || res.error) return res;
-  const ah = await scoreAntiHalluc(
-    {
-      query: p.prompt,
-      response: res.final_response,
-      mustInclude: p.must_include,
-      redFlags: p.red_flags,
-      shouldInclude: p.should_include,
-    },
-    { ollamaCall: judgeOllamaCall },
-  );
+  const item = {
+    query: p.prompt,
+    response: res.final_response,
+    mustInclude: p.must_include,
+    redFlags: p.red_flags,
+    shouldInclude: p.should_include,
+  };
+  const ah = JUDGE.deterministic
+    ? scoreAntiHallucDeterministic(item)
+    : await scoreAntiHalluc(item, { ollamaCall: JUDGE.judgeCall });
   res.ah_pass = ah.pass;
   res.ah_source = ah.source;
   res.ah_must_covered = ah.mustCovered;
@@ -379,7 +391,8 @@ async function main() {
     autoPull: process.env.BENCH_AUTO_PULL === '1',
     skip: process.env.BENCH_SKIP_STALE_GUARD === '1',
   });
-  assertIndependentJudge(JUDGE_MODEL, GEN_MODEL);
+  // Independencia solo aplica a un juez LLM (no al scorer determinístico).
+  if (!JUDGE.deterministic) assertIndependentJudge(JUDGE_MODEL, GEN_MODEL);
 
   if (!POOL_FILE || !existsSync(POOL_FILE)) {
     console.error(`FATAL: pool no encontrado. Pasá --pool <archivo>. (recibido: '${POOL_FILE}')`);
@@ -390,7 +403,7 @@ async function main() {
 
   console.log('[bench-cap] bench HONESTO de capacidades — juez independiente + config-prod');
   console.log(`[bench-cap] generador: ${GEN_MODEL} temp=${GEN_TEMPERATURE} seed=${SEED}`);
-  console.log(`[bench-cap] juez:      ${JUDGE_MODEL} (independiente)`);
+  console.log(`[bench-cap] juez:      ${JUDGE_MODEL} (provider=${JUDGE.provider})`);
   console.log(`[bench-cap] pool:      ${prompts.length} prompts (${POOL_FILE.split('/').pop()})`);
   console.log(`[bench-cap] configs:   ${CONFIGS.join(', ')}`);
   console.log(`[bench-cap] GPU temp inicial: ${gpuTemp() ?? 'n/d'}°C`);
@@ -467,7 +480,7 @@ async function main() {
     generated_at: new Date().toISOString(),
     pool: POOL_FILE,
     generator: { model: GEN_MODEL, temperature: GEN_TEMPERATURE, seed: SEED, max_tokens: GEN_MAX_TOKENS },
-    judge: { model: JUDGE_MODEL, independent: true },
+    judge: { model: JUDGE_MODEL, provider: JUDGE.provider, independent: !JUDGE.deterministic },
     configs: CONFIGS,
     n_prompts: prompts.length,
     overall: { A: aggA, C: aggC },
