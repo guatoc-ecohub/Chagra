@@ -58,7 +58,7 @@ import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities,
 // los chips cuyo backend aún no existe (precio/deep).
 import { planForcedIntent, isStubIntent, CHIP_DEFS } from '../../services/chipIntentRouter';
 import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, resolveUserRegion, stripRoleLeak } from '../../services/agentService';
-import { applyOutputGuards } from '../../services/outputGuards';
+import { applyOutputGuards, applyTaxonomyGuard } from '../../services/outputGuards';
 import { getProfile } from '../../services/userProfileService';
 import { regionFromProfile } from '../../services/ensoContext';
 // Bug UX 2026-05-30: preservar respuesta parcial ante abort/timeout/cancel.
@@ -1607,7 +1607,30 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       if (guarded.modified) {
         console.debug('[guards] salida corregida', { reasons: guarded.reasons });
       }
-      const response = guarded.text;
+      // A24 — guard ASYNC anti-alucinación taxonómica: valida binomios Linneanos
+      // del texto contra el catálogo vía `validate_taxonomy`. Solo corrige cuando
+      // el tool confirma explícitamente `valid:false`; ante tool caído / offline /
+      // flag off → no-op (conservador, no rompe respuestas correctas). Corre AQUÍ
+      // (después de applyOutputGuards, antes de postValidate) para que la
+      // corrección quede en la respuesta final que se persiste y se muestra.
+      let response = guarded.text;
+      let taxonomyModified = false;
+      if (isOnline && isSidecarEnabled()) {
+        try {
+          const taxResult = await applyTaxonomyGuard(response, {
+            callTool,
+            resolvedEntities,
+          });
+          if (taxResult.modified) {
+            response = taxResult.text;
+            taxonomyModified = true;
+            console.debug('[guards] taxonomía corregida', { reason: taxResult.reason });
+          }
+        } catch (taxErr) {
+          // Jamás bloquea el chat — la respuesta ya está disponible.
+          console.debug('[guards] taxonomy-guard fail (sigo sin corrección):', taxErr?.message);
+        }
+      }
       agentSounds.chime();
 
       const { intent } = parseIntent(text);
@@ -1628,7 +1651,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       sourceMetadata = {
         ...sourceMetadata,
         ...groundingBadges,
-        auto_corrected: guarded.modified === true,
+        auto_corrected: guarded.modified === true || taxonomyModified === true,
       };
 
       // Capa 2 anti-alucinación — cross-check de contexto (operador 2026-05-30).
