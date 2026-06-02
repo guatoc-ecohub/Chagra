@@ -88,13 +88,11 @@ pre-commit:
       exclude: '\.d\.ts$'
       run: npx eslint {staged_files} --max-warnings=0
 
-    auto-bump-version:
-      # Auto-bumpea package.json version + sw.js CACHE_NAME en patch si
-      # cambian archivos críticos (src/**, public/**) y el dev olvidó
-      # hacerlo manual. Evita conflicts en PRs paralelos (sesión 2026-04-30/05-01
-      # tuvo ~6 conflicts repetidos en estos 2 archivos).
-      # Convención: el dev NO bumpea, el hook sí.
-      run: node scripts/auto-bump-version.mjs
+    # auto-bump-version REMOVIDO 2026-06-02: el bump de versión se movió a
+    # deploy-time (.github/workflows/deploy.yml → step "Set deploy-time version")
+    # para eliminar las colisiones de auto-bump entre PRs paralelos que dejaban
+    # la versión pegada (raíz del "no actualiza" / label v1.0.32 congelado).
+    # El CACHE_NAME del SW lo sigue bumpeando el step post-deploy (per-SHA).
 
     cycle-content-anti-overpromise:
       # Valida /public/cycle-content/<slug>.json contra rangos agroecológicos
