@@ -29,6 +29,10 @@
  *   contexto_cultural: 'Opcional — identidad, política, historia (load-bearing terms)',
  *   en_discusion: { ... }    // Opcional — términos con disputa académica
  *   ver_tambien: ['slug1', 'slug2'],
+ *   tambien_le_dicen: ['variante regional 1', 'variante regional 2'],
+ *                          // Opcional — sinónimos campesinos regionales del término
+ *                          // ("también le dicen…"). Mejora el matching léxico del NLU
+ *                          // con el campesino-target. Curado con sabedores regionales.
  *   fuentes: ['Autor 2007 — Título', 'URL si aplica']
  * }
  */
@@ -162,6 +166,7 @@ export const DICTIONARY = [
     definicion_simple: 'Una planta individual. "Tener una mata de tomate" = tener una planta de tomate.',
     definicion_ampliada: 'Coloquialismo colombiano y latinoamericano para "planta". Usado en Chagra UI por familiaridad cultural. Equivalencia: 1 mata = 1 asset--plant individual en el modelo de datos. Para hortalizas que se manejan en grupo (lechugas en cama, cebollín en hilera), Chagra usa qty=N en lugar de N matas individuales — depende del modo de cultivo de la especie.',
     ver_tambien: ['planta', 'asset'],
+    tambien_le_dicen: ['matica', 'palo de…'],
     fuentes: ['Diccionario de Colombianismos — Instituto Caro y Cuervo'],
   },
 
@@ -220,7 +225,7 @@ export const DICTIONARY = [
     categoria: 'microorganismos',
     emoji: '🍄',
     definicion_simple: 'Hongos amigos que viven pegados a las raíces de las plantas. Las plantas les dan azúcar y los hongos les ayudan a buscar agua y nutrientes lejos. Trabajan en equipo.',
-    definicion_ampliada: 'Micorriza (del griego "myco" hongo + "rhiza" raíz) es la asociación simbiótica entre ciertos hongos del suelo y las raíces de la mayoría de plantas terrestres (~90% de especies vegetales). El hongo extiende sus hifas (filamentos microscópicos) por el suelo formando una red — la "wood wide web" — que le permite a la planta acceder a agua y nutrientes (especialmente fósforo) de zonas mucho mayores a las que sus raíces alcanzarían solas. La planta paga con azúcares producidos en fotosíntesis.\n\nDos tipos principales: arbusculares (AMF, dentro de las células de la raíz) y ectomicorrizas (fuera de las células, en árboles principalmente). Sin micorrizas, muchas plantas crecen débiles. Con micorrizas, son más resistentes a sequía, plagas, y producen mejor.',
+    definicion_ampliada: 'Micorriza (del griego "myco" hongo + "rhiza" raíz) es la asociación simbiótica entre ciertos hongos del suelo y las raíces de la mayoría de plantas terrestres (~90% de especies vegetales). El hongo extiende sus hifas (filamentos microscópicos) por el suelo formando una red — la "red de madera" (wood wide web) — que le permite a la planta acceder a agua y nutrientes (especialmente fósforo) de zonas mucho mayores a las que sus raíces alcanzarían solas. La planta paga con azúcares producidos en fotosíntesis.\n\nDos tipos principales: arbusculares (AMF, dentro de las células de la raíz) y ectomicorrizas (fuera de las células, en árboles principalmente). Sin micorrizas, muchas plantas crecen débiles. Con micorrizas, son más resistentes a sequía, plagas, y producen mejor.',
     contexto_cultural: 'Suzanne Simard documentó cómo árboles de un bosque "se hablan" entre sí a través de redes micorrízicas — se transfieren nutrientes, advierten plagas. La metáfora del "internet del bosque" tiene base científica.',
     en_discusion: {
       summary: 'Inoculación comercial de micorrizas debate eficacia',
@@ -364,6 +369,7 @@ export const DICTIONARY = [
     definicion_simple: 'Tierra negra hecha al descomponer hojas, restos de comida y otros materiales orgánicos durante meses. Alimento para tus plantas.',
     definicion_ampliada: 'Compost es resultado de descomposición aeróbica controlada de residuos orgánicos por microorganismos durante 2-6 meses. Diferencia con bocashi: compost es proceso más largo y completamente mineralizado, bocashi es fermentación parcial más rápida con microbiota viva activa al aplicar.\n\nReceta básica: 30:1 ratio C:N (verdes ricos en N como restos de comida + cafés ricos en C como hojas secas, paja, cartón). Pila aireada, humedad ~60%, volteo periódico. Termofílica primeros 30 días (~60°C, mata patógenos y semillas malezas), después mesofílica.',
     ver_tambien: ['bocashi', 'humus', 'mineralizacion', 'materia-organica'],
+    tambien_le_dicen: ['abonera', 'tierra de hojas', 'mantillo'],
     fuentes: ['Diaz et al. 2007 — Composting science', 'Restrepo Rivera 2007'],
   },
 
@@ -375,6 +381,7 @@ export const DICTIONARY = [
     definicion_simple: 'Capa de hojas, paja, aserrín o cartón que se pone encima de la tierra para que no se seque, no crezcan malezas, y los bichitos del suelo coman.',
     definicion_ampliada: 'Mulch (o mantillo) es cobertura del suelo con material orgánico o inorgánico. Beneficios: retención de humedad (reduce evapotranspiración 30-50%), supresión de malezas (bloquea luz para semillas), regulación térmica (suelo más estable), aporte gradual de materia orgánica al descomponerse, hábitat para microbiota y fauna edáfica.\n\nMateriales agroecológicos: paja de cereales, hojas secas, aserrín curado, cartón, restos de poda triturados, mulch vivo (cobertura de baja altura como tréboles). Espesor recomendado: 5-10 cm.',
     ver_tambien: ['cobertura', 'humus', 'permacultura'],
+    tambien_le_dicen: ['hojarasca', 'cobertura', 'tendido'],
     fuentes: ['Mollison 1988', 'Holzer 2011 — Sepp Holzer\'s Permaculture'],
   },
 
@@ -400,6 +407,7 @@ export const DICTIONARY = [
     definicion_simple: 'Forma de hacer una nueva planta: doblas una rama de la planta madre hasta tocar la tierra, la entierras un poco, y al rato echa raíces. Después se corta y queda una planta nueva.',
     definicion_ampliada: 'Acodo es técnica de propagación vegetativa donde se induce el enraizamiento de un tallo aún unido a la planta madre. Tipos:\n\n- **Acodo aéreo**: bolsita con sustrato húmedo amarrada en una rama madura raspada. Usado en frutales (mango, aguacate, mora, cítricos). Tiempo: 1-3 meses.\n- **Acodo terrestre**: rama doblada al suelo, fijada con piedra, cubierta parcialmente. Usado en vid, mora, parras.\n- **Acodo de cepa** (mound layering): se entierra parte de la planta madre para que cada brote forme raíces. Usado en frutales tradicionales.\n\nVentaja sobre esqueje: la rama sigue alimentada por la madre durante el enraizamiento, mayor tasa de éxito.',
     ver_tambien: ['esqueje', 'estolon', 'injerto', 'propagacion-vegetativa'],
+    tambien_le_dicen: ['mugrón', 'amugronar', 'agobio'],
     fuentes: ['Hartmann et al. 2011', 'Agrosavia — Propagación frutales'],
   },
 
@@ -445,6 +453,7 @@ export const DICTIONARY = [
     definicion_ampliada: 'Semilla criolla (también semilla nativa, ancestral o tradicional) es material genético seleccionado y conservado por familias y comunidades campesinas durante décadas o siglos, con adaptación local fina al suelo, clima, plagas y prácticas culturales de su territorio.\n\nDiferencias críticas con otras semillas:\n- **vs Híbrida F1**: la criolla es polinización abierta — guardas semilla y siembras siguiente ciclo con mismo resultado. La F1 es estéril o segregante — debes comprar nueva cada vez.\n- **vs Transgénica**: la criolla es genéticamente estable, sin modificación de laboratorio. La transgénica tiene patente corporativa (Monsanto/Bayer) y trae restricciones legales.\n- **vs Certificada ICA**: la criolla puede no estar registrada formalmente (por costo y burocracia ICA Resolución 970). Eso la pone en zona gris legal en Colombia.',
     contexto_cultural: 'La defensa de la semilla criolla es **soberanía alimentaria** concreta. Cada vez que un campesino guarda sus semillas, resiste el modelo industrial. Las casas comunitarias de semillas (Lebrija, Tunja, Quibdó, Cali) son archivos genéticos vivos.\n\nLa Resolución 970 ICA (2010) intentó criminalizar el intercambio de semillas no certificadas — protesta nacional la suspendió parcialmente. La lucha sigue.',
     ver_tambien: ['cultivar', 'red-de-semillas-libres', 'soberania-alimentaria'],
+    tambien_le_dicen: ['semilla de la casa', 'semilla nativa', 'pepa'],
     fuentes: ['Grupo Semillas Colombia', 'Documental "9.70" Victoria Solano 2013'],
   },
 
@@ -467,6 +476,7 @@ export const DICTIONARY = [
     definicion_simple: 'Cuando la flor ya polinizada empieza a transformarse en fruto. Es el momento crítico: si cuaja bien, hay cosecha.',
     definicion_ampliada: 'Cuajado es la transición de flor fertilizada a fruto en desarrollo inicial. Inicia con cambios hormonales (incremento de auxinas y giberelinas en el ovario) que detienen senescencia floral y activan crecimiento del fruto. Falla común: aborto de cuajado por estrés (calor extremo, déficit hídrico, deficiencias de boro o calcio, polinización pobre).\n\nEn tomate: cuajado óptimo a 18-24°C nocturnos. >32°C diurnos por más de 4 días puede abortar flores. En frutales perennes (mango, aguacate, café), cuajado es proceso masivo concentrado en pocas semanas que define toda la cosecha del año.',
     ver_tambien: ['antesis', 'polinizacion', 'fenologia', 'fructificacion'],
+    tambien_le_dicen: ['amarre', 'que amarre el fruto', 'prendió'],
     fuentes: ['Bewley et al. 2013', 'Agrosavia — manuales fenológicos'],
   },
 
@@ -489,6 +499,7 @@ export const DICTIONARY = [
      definicion_simple: 'Planta bebé: ya nació de la semilla, ya tiene sus primeras hojitas, pero todavía es muy chiquita y delicada. Necesita cuidado especial.',
      definicion_ampliada: 'Plántula es la fase juvenil de una planta, desde la emergencia post-germinación hasta el establecimiento de hojas verdaderas y sistema radicular funcional. Período crítico: alta vulnerabilidad a damping-off (Pythium, Rhizoctonia), exceso de riego, plagas (hormigas cortadoras, áfidos, babosas), sol directo intenso.\n\nManejo agroecológico de plántulas: almácigo bajo media-sombra con sustrato suelto bien drenado (tierra negra + cascarilla de arroz + compost en proporción 2:1:1), riego con regadera (no manguera presurizada), trasplante cuando tiene 4-6 hojas verdaderas y sistema radicular bien formado.',
      ver_tambien: ['germinacion', 'cotiledon', 'damping-off', 'sustrato'],
+     tambien_le_dicen: ['matica', 'colino', 'chupón'],
      fuentes: ['Hartmann et al. 2011', 'Restrepo Rivera 2007'],
    },
    {
@@ -946,6 +957,7 @@ export const DICTIONARY = [
     definicion_simple: 'Tallo que sale de una planta, se arrastra por el suelo y echa raíces para hacer una nueva planta hija. Las fresas son el ejemplo clásico.',
     definicion_ampliada: 'Estolón es tallo modificado que crece horizontalmente sobre el suelo, con entrenudos largos. En cada nudo, donde toca tierra, desarrolla raíces adventicias y un brote vertical que se convierte en nueva planta hija (clon genético). Es propagación vegetativa eficiente.\n\nEjemplos: fresa (Fragaria), maní (Arachis), maíz en algunas variedades, gramíneas como kikuyo. En el manejo de fresa, los estolones son recurso de propagación gratuito — la plantación se renueva cada 2-3 años con plantines hijos seleccionados de los estolones más vigorosos.',
     ver_tambien: ['esqueje', 'acodo', 'propagacion-vegetativa'],
+    tambien_le_dicen: ['guía', 'hijo', 'hijuelo'],
     fuentes: ['Hartmann et al. 2011 — Plant Propagation: Principles and Practices'],
   },
 
@@ -957,6 +969,7 @@ export const DICTIONARY = [
     definicion_simple: 'Pedazo cortado de una rama o tallo que se siembra en tierra y echa raíces para hacer una nueva planta. Como las matas de la abuela que siempre regala.',
     definicion_ampliada: 'Esqueje (también llamado estaca) es porción vegetativa de una planta — generalmente tallo de 10-25 cm con 2-3 nudos — que se enraíza en sustrato húmedo para producir un nuevo individuo genéticamente idéntico. Tipos:\n\n- **Esqueje herbáceo** (tallos blandos): salvia, romero, menta, geranio\n- **Esqueje semileñoso** (tallos parcialmente lignificados): rosa, mora, vid\n- **Esqueje leñoso** (ramas duras): chachafruto, sauce, álamo\n- **Esqueje de hoja**: violeta africana, sanseviera\n- **Esqueje de raíz**: rábano picante, frambuesa\n\nFavorecedores de enraizamiento: hormona auxina natural (saliva de plátano, agua de sauce) o sintética (IBA, NAA). Sustrato bien drenado, humedad constante sin saturación, sombra parcial inicial.',
     ver_tambien: ['estolon', 'acodo', 'injerto', 'propagacion-vegetativa'],
+    tambien_le_dicen: ['gajo', 'estaca', 'vara'],
     fuentes: ['Hartmann et al. 2011', 'Agrosavia — Manuales propagación frutales'],
   },
 
@@ -979,7 +992,21 @@ export const DICTIONARY = [
     definicion_simple: 'Poner palos o cuerdas para que las plantas que crecen mucho hacia arriba (como el tomate o el frijol) tengan apoyo y no se caigan.',
     definicion_ampliada: 'Tutorado es práctica agronómica de proporcionar soporte estructural a plantas de hábito indeterminado o trepador. Materiales: estacas de madera, varas de bambú/guadua, hilo agrícola atado a alambres horizontales (espaldera), mallas plásticas o redes.\n\nEsencial en: tomate (sin tutorado el peso del fruto rompe ramas), frijol voluble, lulo, granadilla, gulupa, mora, parchita, vid. En milpa el maíz funciona como tutor natural del frijol trepador.\n\nVentajas del tutorado: mejor exposición a luz, ventilación que reduce hongos, frutos limpios sin contacto con suelo, cosecha ergonómica.',
     ver_tambien: ['tomate', 'milpa', 'asociacion'],
+    tambien_le_dicen: ['emparrado', 'enramada', 'espaldera', 'puyón'],
     fuentes: ['Agrosavia 2018 — Manual tomate', 'Restrepo Rivera 2007'],
+  },
+
+  {
+    slug: 'deshierbe',
+    termino: 'Deshierbe',
+    categoria: 'botanica',
+    emoji: '🌾',
+    definicion_simple: 'Quitar las matas que no se sembraron (las "malezas") para que no le roben agua, luz y comida a las plantas que sí queremos.',
+    definicion_ampliada: 'Deshierbe es la labor de controlar las plantas espontáneas (arvenses o "malezas") que compiten con el cultivo por agua, luz, nutrientes y espacio. Métodos:\n\n- **Manual / mecánico**: a mano, con azadón, machete o guadaña. Es el más usado en agricultura familiar y el más sano para el suelo y para quien cultiva.\n- **Plateo**: limpiar solo el círculo de tierra alrededor del tronco de un árbol o mata grande (café, frutales), dejando el resto con cobertura.\n- **Socola**: en zonas de monte, cortar la maleza baja y los arbustos antes de sembrar.\n- **Cobertura / mulch**: prevenir la maleza tapando el suelo con hojarasca o plantas de cobertura, en vez de arrancarla después.\n- **Químico (herbicida)**: rápido pero degrada el suelo, contamina aguas y mata microbiota; la agroecología lo evita.\n\nNota agroecológica: no toda arvense es enemiga — muchas protegen el suelo de la erosión, atraen polinizadores o indican la fertilidad. La idea no es "suelo pelado" sino manejar la competencia. El deshierbe manual oportuno + cobertura suele bastar sin necesidad de químicos.',
+    contexto_cultural: 'En el campo colombiano "ir a la limpia" o "hacer la socola" es jornada de trabajo conocida por toda la familia. El plateo del cafetal es parte del calendario cafetero. Son saberes de manejo, no solo de "quitar yerba".',
+    ver_tambien: ['mulch', 'abono-verde', 'agroecologia', 'monocultivo'],
+    tambien_le_dicen: ['limpia', 'desyerbe', 'socola', 'plateo'],
+    fuentes: ['Restrepo Rivera 2007 — ABC de la agricultura orgánica', 'Agrosavia — Manejo agroecológico de arvenses'],
   },
 
   {
@@ -990,6 +1017,7 @@ export const DICTIONARY = [
     definicion_simple: 'Cuando una semilla despierta y empieza a brotar: sale primero la raíz y después la primera hoja.',
     definicion_ampliada: 'Germinación es el proceso por el cual el embrión dentro de una semilla activa su metabolismo y emerge como plántula. Requiere agua (imbibición), oxígeno, temperatura adecuada (especie-específica) y a veces luz o oscuridad (fotoblastismo).\n\nFases: 1) absorción de agua (la semilla se hincha), 2) activación enzimática (movilización de reservas), 3) emergencia de la radícula (raíz primaria), 4) emergencia del hipocótilo (tallo embrionario) y cotiledones, 5) primera hoja verdadera. Tiempo según especie: 3-5 días lechuga, 7-10 días tomate, 15-25 días aguacate, 30+ días cafés.',
     ver_tambien: ['semilla', 'cotiledon', 'plantula', 'fenologia'],
+    tambien_le_dicen: ['nacer', 'que nazca la semilla', 'brotar', 'pegar'],
     fuentes: ['Bewley et al. 2013 — Seeds: Physiology of Development, Germination and Dormancy'],
   },
 
@@ -1019,6 +1047,7 @@ export const DICTIONARY = [
     definicion_simple: 'Las "alturas" de Colombia que tienen climas distintos: cálido (caliente bajo), templado, frío y páramo (helado arriba). Cada uno tiene sus plantas que se dan mejor.',
     definicion_ampliada: 'Pisos térmicos es la clasificación tradicional colombiana de zonas climáticas según altitud sobre el nivel del mar (msnm), basada en variación predecible de temperatura promedio:\n\n- **Cálido** (0-1200 msnm): >24°C promedio. Cultivos: cacao, plátano, yuca, ñame, ají, frutales tropicales, palma, caña.\n- **Templado** (1200-2200 msnm): 18-24°C. Cultivos: café arábica, granadilla, tomate, frijol, mora, durazno, gulupa, lulo.\n- **Frío** (2200-2800 msnm): 12-18°C. Cultivos: papa, fresa, lechuga, brócoli, repollo, arveja, haba, curuba, uchuva, tomate de árbol.\n- **Páramo** (>2800 msnm): <12°C. Cultivos: papa criolla, papa pastusa, frailejón cultivado, papayuela, mortiño, agraz.\n\nFacilita seleccionar especies adaptadas, anticipar productividad y manejar microclimas. Concepto introducido por Francisco José de Caldas (1801).',
     ver_tambien: ['microclima', 'altitud', 'paramo', 'agroecologia'],
+    tambien_le_dicen: ['tierra caliente', 'tierra templada', 'tierra fría', 'páramo'],
     fuentes: [
       'Caldas 1801 — Memoria sobre la nivelación de las plantas que se cultivan en la vecindad del Ecuador',
       'IDEAM — Atlas climatológico de Colombia',
@@ -1055,7 +1084,7 @@ export const DICTIONARY = [
     termino: 'Phytophthora infestans (tizón tardío)',
     categoria: 'plagas',
     emoji: '🦠',
-    definicion_simple: 'Hongo (oomicete) que mata tomate y papa rapidísimo cuando hace frío y húmedo. Aparecen manchas oscuras en hojas y se extiende en días.',
+    definicion_simple: 'Microorganismo parecido a un hongo (oomicete) que mata tomate y papa rapidísimo cuando hace frío y húmedo. Aparecen manchas oscuras en hojas y se extiende en días.',
     definicion_ampliada: 'Phytophthora infestans es un oomicete (no exactamente "hongo" sino organismo similar) causante del tizón tardío (late blight) en Solanaceae: tomate, papa, principalmente. Históricamente responsable de la Gran Hambruna Irlandesa (1845-1852).\n\nSíntomas: manchas oscuras (marrón-negro) en hojas, expansión rápida con halo amarillo, tallos y frutos también afectados, pelusa blanquecina en envés en alta humedad. Esporula de noche con humedad >95% y temp 10-25°C — perfectos para los Andes colombianos.\n\nManejo agroecológico: ventilación + drenaje, evitar riego foliar nocturno, caldo bordelés preventivo en épocas húmedas, variedades menos susceptibles, rotación de cultivos. Cero biocidas sintéticos ahorran ese ciclo, pero requiere prevención obsesiva.',
     contexto_cultural: 'En Cundinamarca y Boyacá, Phytophthora limita producción de tomate chonto y papa. Es razón por la que en chagras agroecológicas se prefieren variedades resistentes y manejo preventivo sobre fungicidas curativos.',
     ver_tambien: ['fitopatogeno', 'caldo-bordeles', 'tomate', 'papa'],
@@ -1095,7 +1124,21 @@ export const DICTIONARY = [
     definicion_simple: 'Tierra negra y esponjosa que se forma cuando se descomponen las hojas y plantas durante mucho tiempo. Es lo que hace que el suelo de un bosque sea rico.',
     definicion_ampliada: 'Humus es la fracción orgánica estabilizada del suelo, resultado de la descomposición avanzada y mineralización parcial de residuos vegetales y animales por microorganismos. Composición: ácidos húmicos, fúlvicos y huminas — moléculas complejas que retienen agua (hasta 20x su peso), nutrientes, mejoran estructura del suelo (agregación), y son refugio de microbiota.\n\nUn suelo con 5-7% de materia orgánica está vivo y productivo; uno con <2% (típico monocultivo industrial) está agotado. Bocashi, compost y mantillo aportan humus directamente. Los cultivos de cobertura y la rotación con leguminosas también lo construyen lentamente.',
     ver_tambien: ['materia-organica', 'compost', 'bocashi', 'microbiota'],
+    tambien_le_dicen: ['tierra negra', 'tierra de capote'],
     fuentes: ['Stevenson 1994 — Humus Chemistry', 'Lehmann & Kleber 2015 — The contentious nature of soil organic matter (Nature)'],
+  },
+
+  {
+    slug: 'estiercol',
+    termino: 'Estiércol',
+    categoria: 'suelo',
+    emoji: '💩',
+    definicion_simple: 'El "popó" de los animales de la finca (vaca, gallina, cerdo, cabra). Bien curado, es uno de los mejores abonos para la tierra.',
+    definicion_ampliada: 'Estiércol es el excremento de animales usado como abono orgánico desde hace miles de años. Aporta nitrógeno, fósforo, potasio, materia orgánica y microbiota viva al suelo. Cada animal da un estiércol distinto:\n\n- **Boñiga** (vaca): equilibrada, suave, mucha fibra. La más usada en compost.\n- **Gallinaza** (gallina): muy "caliente" (alta en nitrógeno y amoníaco) — quema las raíces si se aplica fresca.\n- **Porquinaza** (cerdo): rica pero con olor fuerte y riesgo de patógenos; exige buen compostaje.\n- **Caprinaza** (cabra) y la del conejo: secas, en pelotitas, fáciles de manejar.\n\nRegla de oro agroecológica: **nunca aplicar estiércol fresco directo a la planta**. Hay que compostarlo o curarlo primero (2-3 meses) para que: 1) se mueran semillas de maleza y patógenos, 2) se estabilice el nitrógeno y no queme, 3) baje el olor. La clave es la relación carbono/nitrógeno (C/N): el estiércol es rico en nitrógeno, así que se mezcla con material seco rico en carbono (paja, hojas secas, aserrín, cascarilla) buscando ~25-30:1 para un compost sano.',
+    contexto_cultural: 'En la finca campesina colombiana el estiércol nunca se bota: la boñiga de la vaca, la gallinaza del corral y la porquinaza cierran el ciclo de nutrientes sin comprar abono de bolsa. Es economía circular ancestral, no moda.',
+    ver_tambien: ['compost', 'bocashi', 'materia-organica', 'humus', 'abono-verde'],
+    tambien_le_dicen: ['boñiga', 'gallinaza', 'porquinaza', 'caprinaza'],
+    fuentes: ['Restrepo Rivera 2007 — Manual de bocashi y abonos orgánicos', 'Agrosavia — Manejo de estiércoles y compostaje'],
   },
 
   // ===========================================================================
