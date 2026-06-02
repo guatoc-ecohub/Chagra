@@ -14,6 +14,9 @@
  * deja el evaluador listo + esta cobertura unitaria del scorer.
  */
 import { describe, it, expect } from 'vitest';
+import { writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import {
   scoreKeywordsFlexible,
   buildJudgePrompt,
@@ -21,10 +24,18 @@ import {
   scoreWithJudge,
   assertIndependentJudge,
   RECOMMENDED_JUDGE_MODEL,
+  RECOMMENDED_ANTHROPIC_JUDGE_MODEL,
+  RECOMMENDED_OLLAMA_JUDGE_MODEL,
   GENERATOR_MODEL,
   buildAntiHallucPrompt,
   parseAHVerdict,
   scoreAntiHalluc,
+  readAnthropicKey,
+  extractAnthropicText,
+  makeAnthropicJudgeCall,
+  scoreAntiHallucDeterministic,
+  selectJudgeProvider,
+  ANTHROPIC_JUDGE_KEY_PATH,
 } from '../lib/bench-scorer.mjs';
 
 describe('scoreKeywordsFlexible', () => {
@@ -247,5 +258,223 @@ describe('scoreAntiHalluc (caller inyectado, sin GPU)', () => {
     );
     expect(out.source).toBe('unjudged');
     expect(out.pass).toBeNull();
+  });
+});
+
+// ── R5: juez Claude Haiku (Anthropic) + fallback determinístico ───────────────
+//
+// NOTA DE SEGURIDAD: ningún test usa una API key real ni llama a la red. La
+// llamada HTTP se mockea (`fetchImpl`) y la lectura de la key se inyecta (`env`
+// / `keyPath`). Estos tests pasan en CI SIN ANTHROPIC_API_KEY.
+
+describe('RECOMMENDED_JUDGE_MODEL ahora es Claude Haiku (local roto en Maxwell)', () => {
+  it('el default es el modelo Anthropic, no un modelo de ollama', () => {
+    expect(RECOMMENDED_JUDGE_MODEL).toBe('claude-haiku-4-5');
+    expect(RECOMMENDED_JUDGE_MODEL).toBe(RECOMMENDED_ANTHROPIC_JUDGE_MODEL);
+  });
+
+  it('conserva el id del juez local solo para uso forzado en GPU compatible', () => {
+    expect(RECOMMENDED_OLLAMA_JUDGE_MODEL).toBe('qwen2.5:14b');
+  });
+
+  it('el juez recomendado sigue siendo independiente del generador', () => {
+    expect(() => assertIndependentJudge(RECOMMENDED_JUDGE_MODEL, GENERATOR_MODEL)).not.toThrow();
+  });
+});
+
+describe('readAnthropicKey (sin tocar el entorno/disco real)', () => {
+  it('lee de ANTHROPIC_API_KEY del env primero', () => {
+    const key = readAnthropicKey({ env: { ANTHROPIC_API_KEY: ' sk-test-env ' }, keyPath: '/no/existe' });
+    expect(key).toBe('sk-test-env'); // trim aplicado
+  });
+
+  it('cae al archivo gitignored si no hay env', () => {
+    // Escribimos un archivo temporal con un valor NO-secreto (placeholder) para
+    // verificar la lectura + trim. NUNCA usamos una key real.
+    const tmpPath = join(tmpdir(), `chagra-judge-key-test-${process.pid}-${Date.now()}`);
+    writeFileSync(tmpPath, '  not-a-real-key-PLACEHOLDER\n', 'utf-8');
+    try {
+      const key = readAnthropicKey({ env: {}, keyPath: tmpPath });
+      expect(key).toBe('not-a-real-key-PLACEHOLDER'); // trim aplicado
+    } finally {
+      rmSync(tmpPath, { force: true });
+    }
+  });
+
+  it('devuelve null si no hay env ni archivo', () => {
+    expect(readAnthropicKey({ env: {}, keyPath: '/ruta/que/no/existe/jamas' })).toBeNull();
+  });
+
+  it('no lanza si el path es inválido (degrada a null)', () => {
+    expect(() => readAnthropicKey({ env: {}, keyPath: '\0invalid' })).not.toThrow();
+  });
+
+  it('expone la ruta esperada del archivo gitignored (~/.config/...)', () => {
+    expect(ANTHROPIC_JUDGE_KEY_PATH).toMatch(/\.config\/chagra-anthropic-judge-key$/);
+  });
+});
+
+describe('extractAnthropicText', () => {
+  it('extrae el texto de content[] de la respuesta de Messages', () => {
+    const data = { content: [{ type: 'text', text: '{"pass": true}' }] };
+    expect(extractAnthropicText(data)).toBe('{"pass": true}');
+  });
+
+  it('concatena múltiples bloques de texto e ignora no-texto', () => {
+    const data = { content: [{ type: 'text', text: 'VEREDICTO: ' }, { type: 'thinking', text: 'x' }, { type: 'text', text: 'PASS' }] };
+    expect(extractAnthropicText(data)).toBe('VEREDICTO: PASS');
+  });
+
+  it('forma inesperada → string vacío (no lanza)', () => {
+    expect(extractAnthropicText(null)).toBe('');
+    expect(extractAnthropicText({})).toBe('');
+    expect(extractAnthropicText({ content: 'x' })).toBe('');
+  });
+});
+
+describe('makeAnthropicJudgeCall (fetch mockeado, sin key real)', () => {
+  it('arma el request a la API de Anthropic y devuelve el texto del veredicto', async () => {
+    let captured = null;
+    const fakeFetch = async (url, init) => {
+      captured = { url, init };
+      return {
+        ok: true,
+        json: async () => ({ content: [{ type: 'text', text: '{"pass": true, "must_covered": 2, "must_total": 2, "red_flags_hit": 0}' }] }),
+      };
+    };
+    const judgeCall = makeAnthropicJudgeCall({ apiKey: 'sk-test-FAKE', fetchImpl: fakeFetch });
+    const raw = await judgeCall('PROMPT DEL JUEZ');
+    expect(raw).toBe('{"pass": true, "must_covered": 2, "must_total": 2, "red_flags_hit": 0}');
+
+    // contrato del request: endpoint + headers anthropic + modelo Haiku + temp 0
+    expect(captured.url).toMatch(/api\.anthropic\.com\/v1\/messages/);
+    expect(captured.init.headers['x-api-key']).toBe('sk-test-FAKE');
+    expect(captured.init.headers['anthropic-version']).toBeTruthy();
+    const body = JSON.parse(captured.init.body);
+    expect(body.model).toBe('claude-haiku-4-5');
+    expect(body.temperature).toBe(0);
+    expect(body.messages[0].content).toBe('PROMPT DEL JUEZ');
+  });
+
+  it('enchufa directo en scoreAntiHalluc como ollamaCall (mismo contrato)', async () => {
+    const fakeFetch = async () => ({
+      ok: true,
+      json: async () => ({ content: [{ type: 'text', text: '{"pass": false, "must_covered": 1, "must_total": 2, "red_flags_hit": 1}' }] }),
+    });
+    const judgeCall = makeAnthropicJudgeCall({ apiKey: 'sk-test-FAKE', fetchImpl: fakeFetch });
+    const out = await scoreAntiHalluc(
+      { query: 'q', response: 'r', mustInclude: ['a', 'b'], redFlags: ['x'] },
+      { ollamaCall: judgeCall },
+    );
+    expect(out.source).toBe('judge');
+    expect(out.pass).toBe(false);
+    expect(out.redFlagsHit).toBe(1);
+  });
+
+  it('HTTP no-ok lanza → scoreAntiHalluc lo cuenta como unjudged (no inventa)', async () => {
+    const fakeFetch = async () => ({ ok: false, status: 429, json: async () => ({}) });
+    const judgeCall = makeAnthropicJudgeCall({ apiKey: 'sk-test-FAKE', fetchImpl: fakeFetch });
+    const out = await scoreAntiHalluc(
+      { query: 'q', response: 'r', mustInclude: ['a'], redFlags: [] },
+      { ollamaCall: judgeCall },
+    );
+    expect(out.source).toBe('unjudged');
+  });
+
+  it('lanza si no hay apiKey (sin exponer su valor)', () => {
+    expect(() => makeAnthropicJudgeCall({ apiKey: '' })).toThrow(/apiKey/);
+  });
+});
+
+describe('scoreAntiHallucDeterministic (fallback sin LLM)', () => {
+  it('PASS: todos los must_include presentes y ningún red_flag', () => {
+    const out = scoreAntiHallucDeterministic({
+      response: 'La chugua es Ullucus tuberosus, resiste heladas con buen drenaje.',
+      mustInclude: ['Ullucus tuberosus', 'drenaje'],
+      redFlags: ['Solanum tuberosum'],
+    });
+    expect(out.pass).toBe(true);
+    expect(out.mustCovered).toBe(2);
+    expect(out.mustTotal).toBe(2);
+    expect(out.redFlagsHit).toBe(0);
+    expect(out.source).toBe('deterministic');
+  });
+
+  it('FAIL: aparece un red_flag', () => {
+    const out = scoreAntiHallucDeterministic({
+      response: 'La chugua en realidad es Solanum tuberosum.',
+      mustInclude: ['Ullucus tuberosus'],
+      redFlags: ['Solanum tuberosum'],
+    });
+    expect(out.pass).toBe(false);
+    expect(out.redFlagsHit).toBe(1);
+  });
+
+  it('FAIL: falta un must_include', () => {
+    const out = scoreAntiHallucDeterministic({
+      response: 'Es una planta andina.',
+      mustInclude: ['Ullucus tuberosus', 'drenaje'],
+      redFlags: [],
+    });
+    expect(out.pass).toBe(false);
+    expect(out.mustCovered).toBeLessThan(out.mustTotal);
+  });
+
+  it('entrada vacía / no-string → no crashea', () => {
+    const out = scoreAntiHallucDeterministic({ response: null, mustInclude: ['a'], redFlags: [] });
+    expect(out.pass).toBe(false);
+    expect(out.source).toBe('deterministic');
+  });
+});
+
+describe('selectJudgeProvider', () => {
+  it('AUTO con key → anthropic + judgeCall listo', () => {
+    const sel = selectJudgeProvider({ env: { ANTHROPIC_API_KEY: 'sk-test-FAKE' }, fetchImpl: async () => ({}) });
+    expect(sel.provider).toBe('anthropic');
+    expect(sel.judgeModel).toBe('claude-haiku-4-5');
+    expect(typeof sel.judgeCall).toBe('function');
+    expect(sel.deterministic).toBe(false);
+  });
+
+  it('AUTO sin key → deterministic (degradación graceful, judgeCall null)', () => {
+    const sel = selectJudgeProvider({ env: {}, keyPath: '/no/existe' });
+    expect(sel.provider).toBe('deterministic');
+    expect(sel.judgeCall).toBeNull();
+    expect(sel.deterministic).toBe(true);
+  });
+
+  it('JUDGE_PROVIDER=anthropic sin key → degrada a deterministic (no crashea)', () => {
+    const sel = selectJudgeProvider({ env: { JUDGE_PROVIDER: 'anthropic' }, keyPath: '/no/existe' });
+    expect(sel.provider).toBe('deterministic');
+    expect(sel.deterministic).toBe(true);
+  });
+
+  it('JUDGE_PROVIDER=ollama → usa el ollamaCall inyectado y el modelo local', () => {
+    const ollamaCall = async () => '{"pass": true}';
+    const sel = selectJudgeProvider({ env: { JUDGE_PROVIDER: 'ollama' }, ollamaCall });
+    expect(sel.provider).toBe('ollama');
+    expect(sel.judgeModel).toBe('qwen2.5:14b');
+    expect(sel.judgeCall).toBe(ollamaCall);
+    expect(sel.deterministic).toBe(false);
+  });
+
+  it('JUDGE_PROVIDER=deterministic → fuerza determinístico aunque haya key', () => {
+    const sel = selectJudgeProvider({ env: { JUDGE_PROVIDER: 'deterministic', ANTHROPIC_API_KEY: 'sk-test-FAKE' } });
+    expect(sel.provider).toBe('deterministic');
+    expect(sel.judgeCall).toBeNull();
+  });
+
+  it('arg provider explícito gana sobre la env', () => {
+    const sel = selectJudgeProvider({ provider: 'deterministic', env: { JUDGE_PROVIDER: 'anthropic', ANTHROPIC_API_KEY: 'sk-test-FAKE' } });
+    expect(sel.provider).toBe('deterministic');
+  });
+
+  it('nunca expone la key en el objeto devuelto', () => {
+    const sel = selectJudgeProvider({ env: { ANTHROPIC_API_KEY: 'sk-test-SECRET' }, fetchImpl: async () => ({}) });
+    expect(JSON.stringify(Object.keys(sel))).not.toMatch(/key|apiKey|secret/i);
+    // ningún valor string del objeto contiene la key
+    for (const v of Object.values(sel)) {
+      if (typeof v === 'string') expect(v).not.toContain('sk-test-SECRET');
+    }
   });
 });

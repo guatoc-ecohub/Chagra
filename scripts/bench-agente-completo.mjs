@@ -38,7 +38,7 @@ import {
   scoreKeywordsFlexible,
   scoreWithJudge,
   assertIndependentJudge,
-  RECOMMENDED_JUDGE_MODEL,
+  RECOMMENDED_OLLAMA_JUDGE_MODEL,
 } from './lib/bench-scorer.mjs';
 import { assertCheckoutCurrent } from './lib/bench-checkout-guard.mjs';
 
@@ -52,12 +52,16 @@ const OLLAMA_URL = 'http://localhost:11434/api/chat';
 const OLLAMA_GEN_URL = process.env.OLLAMA_GEN_URL || 'http://localhost:11434/api/generate';
 const TIMEOUT_MS = 180_000; // 3 min timeout por modelo
 
-// R4 — juez INDEPENDIENTE. `--judge [modelo]` activa el LLM-judge. El default ya
-// NO es el generador (granite = auto-eval) ni mistral-nemo (crashea Maxwell):
-// es qwen2.5:14b, de otra familia y estable en sm_52. Precedencia del modelo:
+// R4 — juez INDEPENDIENTE (COBERTURA de keywords, no anti-alucinación). `--judge
+// [modelo]` activa el LLM-judge LOCAL contra ollama. OJO: los jueces locales
+// están rotos en Maxwell (devuelven vacío / rubber-stamp); el juez confiable es
+// Claude Haiku, cableado en los benches de anti-alucinación
+// (bench-complejos-juez-independiente / bench-capabilities-A-vs-C) vía
+// selectJudgeProvider. Aquí el default sigue siendo el modelo local solo para
+// quien lo fuerce en GPU compatible. Precedencia del modelo:
 //   1) argumento posicional tras --judge   (--judge qwen2.5:14b)
 //   2) env JUDGE_MODEL
-//   3) RECOMMENDED_JUDGE_MODEL (qwen2.5:14b)
+//   3) RECOMMENDED_OLLAMA_JUDGE_MODEL (qwen2.5:14b)
 // Sin la flag, el scoring es keyword-FLEXIBLE (sinónimos/lemas).
 const USE_JUDGE = process.argv.includes('--judge');
 function parseJudgeArg() {
@@ -68,7 +72,7 @@ function parseJudgeArg() {
   }
   return null;
 }
-const JUDGE_MODEL = parseJudgeArg() || process.env.JUDGE_MODEL || RECOMMENDED_JUDGE_MODEL;
+const JUDGE_MODEL = parseJudgeArg() || process.env.JUDGE_MODEL || RECOMMENDED_OLLAMA_JUDGE_MODEL;
 const JUDGE_TIMEOUT_MS = 60_000;
 
 const MODELS = {

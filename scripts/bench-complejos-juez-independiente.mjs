@@ -42,8 +42,9 @@ import { performance } from 'node:perf_hooks';
 import { execSync } from 'node:child_process';
 import {
   scoreAntiHalluc,
+  scoreAntiHallucDeterministic,
   assertIndependentJudge,
-  RECOMMENDED_JUDGE_MODEL,
+  selectJudgeProvider,
 } from './lib/bench-scorer.mjs';
 import { assertCheckoutCurrent } from './lib/bench-checkout-guard.mjs';
 import { applyOutputGuards } from '../src/services/outputGuards.js';
@@ -67,9 +68,18 @@ function parseJudgeArg() {
   }
   return null;
 }
-const JUDGE_MODEL = parseJudgeArg() || process.env.JUDGE_MODEL || RECOMMENDED_JUDGE_MODEL;
+// Juez: por defecto Anthropic (Claude Haiku) si hay API key; si no, scorer
+// DETERMINÍSTICO. Un `--judge <modelo>` o `JUDGE_PROVIDER=ollama` explícito
+// fuerza el juez local de ollama (roto en Maxwell — solo GPU Ampere+).
+const JUDGE_ARG = parseJudgeArg() || process.env.JUDGE_MODEL || null;
+const JUDGE = selectJudgeProvider({
+  provider: JUDGE_ARG ? 'ollama' : undefined,
+  ollamaCall: judgeOllamaCall,
+  ollamaModel: JUDGE_ARG || undefined,
+});
+const JUDGE_MODEL = JUDGE.judgeModel;
 const JUDGE_TEMPERATURE = 0; // determinismo del juez.
-const JUDGE_TIMEOUT_MS = 120_000; // qwen2.5:14b en Maxwell es lento.
+const JUDGE_TIMEOUT_MS = 120_000; // el juez local en Maxwell es lento (si se fuerza).
 
 const SIDECAR_URL = process.env.SIDECAR_URL || 'http://localhost:7880';
 const OLLAMA_CHAT_URL = 'http://localhost:11434/api/chat';
@@ -256,14 +266,15 @@ async function main() {
   });
 
   // Independencia del juez (verify-before-claim): aborta si juez === generador.
-  assertIndependentJudge(JUDGE_MODEL, GEN_MODEL);
+  // Solo aplica a un juez LLM; el scorer determinístico no es un generador.
+  if (!JUDGE.deterministic) assertIndependentJudge(JUDGE_MODEL, GEN_MODEL);
 
   const fixture = JSON.parse(readFileSync(PROMPTS_FILE, 'utf-8'));
   const prompts = fixture.prompts || [];
 
-  console.log('[bench-complejos] re-bench HONESTO — juez independiente + config-prod');
+  console.log('[bench-complejos] re-bench HONESTO — juez confiable + config-prod');
   console.log(`[bench-complejos] generador: ${GEN_MODEL} temp=${GEN_TEMPERATURE} seed=${SEED} max_tokens=${GEN_MAX_TOKENS}`);
-  console.log(`[bench-complejos] juez:      ${JUDGE_MODEL} (independiente, temp=${JUDGE_TEMPERATURE})`);
+  console.log(`[bench-complejos] juez:      ${JUDGE_MODEL} (provider=${JUDGE.provider}, temp=${JUDGE_TEMPERATURE})`);
   console.log(`[bench-complejos] prompts:   ${prompts.length} (${PROMPTS_FILE.split('/').pop()})`);
   console.log(`[bench-complejos] GPU temp inicial: ${gpuTemp() ?? 'n/d'}°C`);
 
@@ -305,17 +316,18 @@ async function main() {
     // 4) post-validate (detector de alucinaciones del sidecar)
     const validation = await postValidate(p.prompt, finalText);
 
-    // 5) juez ANTI-ALUCINACIÓN independiente (must_include / red_flags)
-    const ah = await scoreAntiHalluc(
-      {
-        query: p.prompt,
-        response: finalText,
-        mustInclude: p.must_include,
-        redFlags: p.red_flags,
-        shouldInclude: p.should_include,
-      },
-      { ollamaCall: judgeOllamaCall },
-    );
+    // 5) juez ANTI-ALUCINACIÓN (must_include / red_flags). Anthropic/ollama vía
+    //    LLM-judge; sin API key cae al scorer determinístico (no carga modelo).
+    const ahItem = {
+      query: p.prompt,
+      response: finalText,
+      mustInclude: p.must_include,
+      redFlags: p.red_flags,
+      shouldInclude: p.should_include,
+    };
+    const ah = JUDGE.deterministic
+      ? scoreAntiHallucDeterministic(ahItem)
+      : await scoreAntiHalluc(ahItem, { ollamaCall: JUDGE.judgeCall });
 
     if (ah.source === 'unjudged') unjudged++;
     else if (ah.pass) pass++;
@@ -364,7 +376,7 @@ async function main() {
   const summary = {
     generated_at: new Date().toISOString(),
     generator: { model: GEN_MODEL, temperature: GEN_TEMPERATURE, seed: SEED, max_tokens: GEN_MAX_TOKENS, config: 'PROD (llmRouter chat_complex)' },
-    judge: { model: JUDGE_MODEL, independent: true, temperature: JUDGE_TEMPERATURE },
+    judge: { model: JUDGE_MODEL, provider: JUDGE.provider, independent: !JUDGE.deterministic, temperature: JUDGE_TEMPERATURE },
     fixture: PROMPTS_FILE,
     n_prompts: prompts.length,
     pass,
