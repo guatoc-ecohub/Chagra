@@ -881,6 +881,80 @@ REGLA: jamás recomiendes sembrar una especie marcada arriba. Sé honesto sobre 
 }
 
 /**
+ * buildCuratedFactsContext — inyecta los HECHOS CURADOS del grafo que las demás
+ * capas no emiten, para que el modelo los CITE en vez de inventarlos. Es el
+ * lever de inteligencia probado por bench (2026-05-31): el grounding base solo
+ * pasaba el NOMBRE canónico de la entidad, así que granite improvisaba la dosis
+ * del biopreparado (ej. "caldo bordelés = Tillandsia complanata" en vez de citar
+ * la dosis curada "1-2 L por planta, foliar"). Esta capa cierra ese hueco.
+ *
+ * Emite SOLO lo que las otras capas NO cubren ya (sin duplicar):
+ *   - biopreparado: dosis_aplicacion (dato anti-alucinación CLAVE) + preparacion
+ *     + ingredientes_resumen + target + precauciones + fuente.
+ *   - especie: helada_letal (°C de muerte por frío) — la viabilidad por altitud,
+ *     el riesgo térmico (temp_min/max), companions/antagonists y seguridad de
+ *     invasoras ya los emiten sus propios bloques.
+ *
+ * PURA y SÍNCRONA, CERO latencia: opera sobre los campos que el sidecar
+ * /resolve-entities ya trajo (misma query AGE). Degrada con gracia: si ninguna
+ * entidad trae hechos curados, devuelve '' y no contamina el prompt.
+ *
+ * @param {object} args
+ * @param {Array<object>|null} [args.resolvedEntities] — entidades AGE del turno.
+ *   biopreparado puede traer { dosis_aplicacion, preparacion, ingredientes_resumen,
+ *   target[], precauciones, fuente }; especie puede traer { helada_letal }.
+ * @returns {string} bloque compacto, o '' si no hay nada accionable.
+ */
+export function buildCuratedFactsContext({ resolvedEntities = null } = {}) {
+  if (!Array.isArray(resolvedEntities) || resolvedEntities.length === 0) return '';
+
+  const _str = (v) => (typeof v === 'string' && v.trim() ? v.trim() : null);
+
+  const lineas = [];
+  for (const e of resolvedEntities) {
+    if (!e || typeof e !== 'object') continue;
+    const kind = String(e.kind || '').toLowerCase();
+
+    if (kind === 'biopreparado') {
+      const nombre = e.nombre_comun || e.mentioned || 'ese biopreparado';
+      const dosis = _str(e.dosis_aplicacion);
+      const prep = _str(e.preparacion);
+      const ingredientes = _str(e.ingredientes_resumen);
+      const target = _altNames(e.target, 5);
+      const precauciones = _str(e.precauciones);
+      const fuente = _str(e.fuente);
+      // Sin dosis NI preparación no hay nada anti-alucinación que aportar.
+      if (!dosis && !prep) continue;
+
+      const partes = [];
+      if (dosis) partes.push(`dosis verificada: ${dosis}`);
+      if (ingredientes) partes.push(`ingredientes: ${ingredientes}`);
+      if (prep) partes.push(`preparación: ${prep}`);
+      if (target.length > 0) partes.push(`controla: ${target.join(', ')}`);
+      if (precauciones) partes.push(`precauciones: ${precauciones}`);
+      if (fuente) partes.push(`fuente: ${fuente}`);
+      lineas.push(`- ${nombre} (biopreparado) → ${partes.join('; ')}.`);
+      continue;
+    }
+
+    if (kind === 'species' || kind === 'planta' || kind === 'especie' || kind === 'cultivo' || kind === '') {
+      const helada = e.helada_letal != null && e.helada_letal !== '' ? Number(e.helada_letal) : NaN;
+      if (!Number.isFinite(helada)) continue;
+      const nombre = e.nombre_comun || e.mentioned || 'esa especie';
+      lineas.push(`- ${nombre} (especie) → muere por helada bajo ${helada}°C (dato del catálogo; advierte si la finca puede bajar de ahí).`);
+    }
+  }
+
+  if (lineas.length === 0) return '';
+
+  return `=== HECHOS CURADOS DEL CATÁLOGO (autoritativo, verificado en Apache AGE) ===
+${lineas.join('\n')}
+
+REGLA: si el usuario pregunta por la dosis, preparación o uso de un biopreparado listado arriba, CITA el dato verificado tal cual — JAMÁS inventes una dosis ni una receta. Si el dato no está aquí ni en otro bloque, dilo honestamente en vez de improvisar. Para el umbral de helada, advierte el riesgo solo si es pertinente al clima de la finca.
+=== FIN HECHOS CURADOS ===`;
+}
+
+/**
  * generateAgronomicGuidanceRules — DOCTRINA ESTÁTICA concisa (intelligence-first)
  * que el agente aplica a las 4 dimensiones nuevas (viabilidad 3 niveles, riesgo
  * térmico, asociaciones, diseño de finca) + seguridad de invasoras. Es una

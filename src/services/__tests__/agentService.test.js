@@ -19,6 +19,7 @@ import {
   buildFrostHeatContext,
   buildAssociationContext,
   buildInvasiveSafetyContext,
+  buildCuratedFactsContext,
   generateAgronomicGuidanceRules,
   pisoTermicoFromAltitud,
   temporadaColombiana,
@@ -1059,6 +1060,92 @@ describe('agentService — Task #202 Profile Context', () => {
       });
       expect(ctx).not.toMatch(/\btenés\b/);
       expect(ctx).not.toMatch(/\bsembrá\b/);
+    });
+  });
+
+  describe('buildCuratedFactsContext', () => {
+    it('devuelve vacío sin entidades o sin hechos curados', () => {
+      expect(buildCuratedFactsContext({ resolvedEntities: null })).toBe('');
+      expect(buildCuratedFactsContext({ resolvedEntities: [] })).toBe('');
+      // especie sin helada_letal ni biopreparado con dosis → nada accionable
+      expect(buildCuratedFactsContext({ resolvedEntities: [{ kind: 'species', nombre_comun: 'Papa' }] })).toBe('');
+      // biopreparado sin dosis ni preparación → nada accionable
+      expect(buildCuratedFactsContext({ resolvedEntities: [{ kind: 'biopreparado', nombre_comun: 'Bocashi' }] })).toBe('');
+    });
+
+    it('biopreparado: CITA la dosis verificada del grafo (no la inventa)', () => {
+      const ctx = buildCuratedFactsContext({
+        resolvedEntities: [
+          {
+            kind: 'biopreparado',
+            nombre_comun: 'Caldo bordelés',
+            dosis_aplicacion: '1-2 L por planta, foliar, cada 8-15 días (preventivo)',
+            preparacion: 'Disolver sulfato de cobre y cal apagada por separado, mezclar.',
+            ingredientes_resumen: 'Sulfato de cobre + cal apagada + agua',
+            target: ['Phytophthora infestans', 'mildiu', 'roya'],
+            precauciones: 'No aplicar en floración; tóxico para abejas.',
+            fuente: 'Agrosavia',
+          },
+        ],
+      });
+      expect(ctx).toContain('Caldo bordelés');
+      expect(ctx).toContain('1-2 L por planta');
+      expect(ctx).toContain('sulfato de cobre');
+      expect(ctx).toContain('Phytophthora infestans');
+      expect(ctx).toContain('abejas');
+      expect(ctx).toContain('Agrosavia');
+      // La regla obliga a CITAR el dato, no inventar
+      expect(ctx).toContain('CITA');
+    });
+
+    it('biopreparado: emite solo los campos presentes (degrada con gracia)', () => {
+      const ctx = buildCuratedFactsContext({
+        resolvedEntities: [
+          { kind: 'biopreparado', nombre_comun: 'Bocashi', dosis_aplicacion: '1-2 kg/m2' },
+        ],
+      });
+      expect(ctx).toContain('Bocashi');
+      expect(ctx).toContain('1-2 kg/m2');
+      // sin preparación/target → no aparecen etiquetas vacías
+      expect(ctx).not.toMatch(/preparación:\s*$/im);
+    });
+
+    it('especie: advierte el umbral de helada_letal del grafo', () => {
+      const ctx = buildCuratedFactsContext({
+        resolvedEntities: [
+          { kind: 'species', nombre_comun: 'Aguacate', helada_letal: -2 },
+        ],
+      });
+      expect(ctx).toContain('Aguacate');
+      expect(ctx).toContain('-2');
+      expect(ctx.toLowerCase()).toContain('helada');
+    });
+
+    it('mezcla especie + biopreparado en un solo bloque', () => {
+      const ctx = buildCuratedFactsContext({
+        resolvedEntities: [
+          { kind: 'species', nombre_comun: 'Papa', helada_letal: -1.5 },
+          { kind: 'biopreparado', nombre_comun: 'Extracto de neem', dosis_aplicacion: '1-1,5 cc/L de agua' },
+        ],
+      });
+      expect(ctx).toContain('Papa');
+      expect(ctx).toContain('Extracto de neem');
+      expect(ctx).toContain('1-1,5 cc/L');
+    });
+
+    it('cero voseo argentino', () => {
+      const ctx = buildCuratedFactsContext({
+        resolvedEntities: [
+          { kind: 'biopreparado', nombre_comun: 'Neem', dosis_aplicacion: '1 cc/L' },
+          { kind: 'species', nombre_comun: 'Papa', helada_letal: -1 },
+        ],
+      });
+      expect(ctx).not.toMatch(/\btenés\b/);
+      expect(ctx).not.toMatch(/\bpodés\b/);
+      expect(ctx).not.toMatch(/\bmirá\b/);
+      expect(ctx).not.toMatch(/\bacá\b/);
+      expect(ctx).not.toMatch(/\bsembrá\b/);
+      expect(ctx).not.toMatch(/\bdale\b/);
     });
   });
 

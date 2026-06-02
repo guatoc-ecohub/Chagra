@@ -48,7 +48,7 @@ import { streamChatViaSidecar, isAgentStreamingEnabled } from '../../services/st
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
 import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, postValidate, getClimaIdeam } from '../../services/sidecarClient';
-import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, stripRoleLeak } from '../../services/agentService';
+import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, stripRoleLeak } from '../../services/agentService';
 import { applyOutputGuards } from '../../services/outputGuards';
 import { getProfile } from '../../services/userProfileService';
 import { regionFromProfile } from '../../services/ensoContext';
@@ -1105,8 +1105,16 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     const seguridadBlock = buildInvasiveSafetyContext({ resolvedEntities });
     const seguridadContext = seguridadBlock ? `\n\n${seguridadBlock}` : '';
 
+    // HECHOS CURADOS del grafo que la capa "ENTIDADES RESUELTAS" no emite (solo
+    // pasa el nombre canónico): dosis/preparación verificada de biopreparados +
+    // umbral de helada letal de especies. Es el lever anti-alucinación probado
+    // por bench (2026-05-31): sin esto granite inventa la dosis. Cero red, puro
+    // sobre el grounding ya resuelto. Degrada con gracia si no hay hechos.
+    const curatedFactsBlock = buildCuratedFactsContext({ resolvedEntities });
+    const curatedFactsContext = curatedFactsBlock ? `\n\n${curatedFactsBlock}` : '';
+
     const messages = [
-      { role: 'system', content: systemPrompt + corpusContext + evidenceContext + resolvedEntitiesBlock + seguridadContext + viabilidadContext + frostHeatContext + asociacionContext + climaContext + fincaContext + queryAnalysisBlock },
+      { role: 'system', content: systemPrompt + corpusContext + evidenceContext + resolvedEntitiesBlock + curatedFactsContext + seguridadContext + viabilidadContext + frostHeatContext + asociacionContext + climaContext + fincaContext + queryAnalysisBlock },
       ...(contextMemory ? [{ role: 'user', content: contextMemory }] : []),
       { role: 'user', content: query },
     ];
