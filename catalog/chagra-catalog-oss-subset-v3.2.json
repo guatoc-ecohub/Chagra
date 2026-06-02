@@ -20,7 +20,7 @@
     "alcance_seed": "7 especies migradas desde v3.0. Las DRs por piso térmico poblarán hasta ~400 especies totales (100 × 4 pisos).",
     "advertencia": "Validar con: node scripts/validate-catalog.mjs --seed-mode. Refs a species aún no migradas aparecen como warnings."
   },
-  "schema_version": "3.1",
+  "schema_version": "3.2",
   "seed_version": "0.2.0-oss-subset-v3.2",
   "generated_at": "2026-05-25T23:11:20.222Z",
   "generated_by": "scripts/extract-oss-subset-v32.mjs",
@@ -297,6 +297,10 @@
       ],
       "cultivable": true,
       "conservation_status": "nativo_silvestre",
+      "rol_restauracion": "pionera",
+      "resistencia_fuego": null,
+      "apta_ribera": true,
+      "invasora_combustible": false,
       "cycleMonths": null,
       "habito": "arbol deciduo semicaducifolio, 15-25m altura",
       "altitud_msnm": {
@@ -2408,6 +2412,75 @@
       "cultivar": false
     },
     {
+      "id": "pinus_patula",
+      "_curation_status": "BORRADOR_IA — Fase 1 módulo reforestación/incendios; binomio y datos de fuego/invasión respaldados por MODULO_REFORESTACION_INCENDIOS_2026-06-02 §2.1 + IAvH/Humboldt. Pendiente validación triple-DR (Fase 2).",
+      "_anti_confusion": "NO confundir con eucalipto (Eucalyptus globulus, Myrtaceae) ni con ciprés (Cupressus). Pinus patula es Pinaceae, conífera de acículas largas en grupos de 3.",
+      "nombre_comun": "Pino pátula",
+      "nombre_comunes_regionales": [
+        "pino crespo",
+        "pino llorón",
+        "pino colombiano"
+      ],
+      "nombre_cientifico": "Pinus patula Schiede ex Schltdl. & Cham.",
+      "familia_botanica": "Pinaceae",
+      "category": "especies_invasoras",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "estrato": "emergente",
+      "roles_in_guild": [
+        "invasive"
+      ],
+      "cultivable": false,
+      "conservation_status": "invasor",
+      "rol_restauracion": null,
+      "resistencia_fuego": null,
+      "apta_ribera": false,
+      "invasora_combustible": true,
+      "origen": "México (Sierra Madre Oriental)",
+      "habito": "conífera de hasta 30-40 m, acículas largas (10-25 cm) en fascículos de 3",
+      "altitud_msnm": {
+        "min_absoluto": 1800,
+        "optimo_min": 2200,
+        "optimo_max": 3000,
+        "max_absoluto": 3500
+      },
+      "radiacion": "sol_pleno",
+      "agua": "medio",
+      "drenaje_requerido": "bueno",
+      "impacto_ecologico": "alto",
+      "ecosistemas_afectados": [
+        "bosque_alto_andino",
+        "subparamo",
+        "paramo",
+        "bordes_de_plantacion_forestal",
+        "areas_quemadas"
+      ],
+      "mecanismos_invasion": [
+        "Resinas y aceites esenciales altamente inflamables que amplifican incendios de alta severidad (doc §2.1)",
+        "Acículas impermeables que forman mantillo ácido y suprimen la germinación de especies nativas (doc §2.1)",
+        "Dispersión de semillas aladas por viento desde plantaciones forestales hacia áreas naturales adyacentes",
+        "Regeneración favorecida tras el fuego en algunas condiciones (serotinia parcial)"
+      ],
+      "especies_nativas_sustitutas": [
+        "quercus_humboldtii",
+        "weinmannia_tomentosa",
+        "polylepis_quadrijuga"
+      ],
+      "protocolo_post_remocion": "Tala dirigida + extracción de regeneración natural; restauración activa con nativas altoandinas (roble negro, encenillo, coloradito) al siguiente semestre lluvioso; remoción del mantillo de acículas para liberar el banco de semillas nativo; monitoreo de rebrote/germinación 5 años.",
+      "riesgo_rebrote": "medio",
+      "validation_level": "claude_draft",
+      "source_ids": [
+        "humboldt-invasoras-andes",
+        "bernal-2015-plantas-liquenes-colombia",
+        "powo-kew",
+        "gbif-taxonomic-backbone"
+      ],
+      "valor_pedagogico": "El pino pátula (Pinus patula) es una conífera mexicana introducida masivamente en los Andes colombianos para plantaciones forestales y de papel desde mediados del siglo XX. En piso frío y subpáramo (1.800-3.500 msnm) se comporta como invasora combustible: sus resinas y aceites esenciales son altamente inflamables y amplifican incendios de alta severidad, mientras que sus acículas largas e impermeables forman un mantillo ácido que suprime la germinación de la flora nativa altoandina. Donde reemplaza coberturas naturales reduce la regulación hídrica y la biodiversidad. La alternativa de restauración es el bosque nativo de roble negro (Quercus humboldtii), encenillo (Weinmannia tomentosa) y, en cota alta, coloradito (Polylepis quadrijuga). Manejo: tala dirigida, retiro del mantillo de acículas y revegetación con nativas, con monitoreo de regeneración por al menos cinco años. Fuente principal: repositorio IAvH/Humboldt sobre especies con comportamiento invasor en los Andes; binomio verificado contra POWO/GBIF.",
+      "tracking_mode": null
+    },
+    {
       "id": "psidium_guajava_manzana",
       "nombre_comun": "Guayaba manzana",
       "nombre_cientifico": "Psidium guajava 'Manzana'",
@@ -2596,6 +2669,10 @@
       ],
       "cultivable": false,
       "conservation_status": "nativo_protegido",
+      "rol_restauracion": "climax",
+      "resistencia_fuego": "alta",
+      "apta_ribera": false,
+      "invasora_combustible": false,
       "altitud_msnm": {
         "min_absoluto": 1500,
         "optimo_min": 2400,
@@ -3364,6 +3441,10 @@
       ],
       "cultivable": false,
       "conservation_status": "invasor",
+      "rol_restauracion": null,
+      "resistencia_fuego": null,
+      "apta_ribera": false,
+      "invasora_combustible": true,
       "habito": "arbusto espinoso 1-3m",
       "origen": "Europa occidental (Islas Británicas a Iberia)",
       "clasificacion_uicn": "Entre las 100 peores especies invasoras del mundo (ISSG/UICN)",
@@ -3853,6 +3934,10 @@
       ],
       "cultivable": false,
       "conservation_status": "nativo_silvestre",
+      "rol_restauracion": "secundaria",
+      "resistencia_fuego": "media",
+      "apta_ribera": false,
+      "invasora_combustible": false,
       "altitud_msnm": {
         "min_absoluto": 2000,
         "optimo_min": 2500,
@@ -4920,6 +5005,10 @@
       ],
       "cultivable": false,
       "conservation_status": "nativo_protegido",
+      "rol_restauracion": "climax",
+      "resistencia_fuego": null,
+      "apta_ribera": false,
+      "invasora_combustible": false,
       "altitud_msnm": {
         "min_absoluto": 2800,
         "optimo_min": 3000,
@@ -5381,6 +5470,10 @@
       ],
       "cultivable": true,
       "conservation_status": "nativo_silvestre",
+      "rol_restauracion": null,
+      "resistencia_fuego": "media",
+      "apta_ribera": true,
+      "invasora_combustible": false,
       "altitud_msnm": {
         "min_absoluto": 0,
         "optimo_min": 500,
@@ -8901,6 +8994,10 @@
       ],
       "cultivar": false,
       "conservation_status": "naturalizada",
+      "rol_restauracion": null,
+      "resistencia_fuego": null,
+      "apta_ribera": false,
+      "invasora_combustible": true,
       "altitud_msnm": {
         "min_absoluto": 1400,
         "optimo_min": 2000,
@@ -9086,6 +9183,10 @@
       ],
       "cultivar": false,
       "conservation_status": "invasor",
+      "rol_restauracion": null,
+      "resistencia_fuego": null,
+      "apta_ribera": false,
+      "invasora_combustible": true,
       "altitud_msnm": {
         "min_absoluto": 1800,
         "optimo_min": 2200,
@@ -9865,7 +9966,7 @@
       },
       "source_ids": [
         "powo-kew",
-        "gbif-taxomic-backbone"
+        "gbif-taxonomic-backbone"
       ],
       "valor_pedagogico": "El cardamomo (Elettaria cardamomum) es una hierba perenne de la familia Zingiberaceae, nativa de India, cultivado por sus cápsulas verdes (cardamomo verde). Planta de 1-3 m, hojas lanceoladas, flores blancas/verdosas, cápsulas verdes triangulares con semillas negras aromáticas. Tercera especia más cara del mundo (después de azafrán, vainilla). Sabor: dulce, picante, floral, cítrico (complejo). Usos: repostería india, chai, café árabe, curries. Requiere sombra (30-50%), alta humedad (>70%), suelo bien drenado fértil. Escala pequeña en Colombia (Cundinamarca, Boyacá). Lección: muestra especias de alto valor, cultivo en sombra (agroforestería), y sabor complejo en gastronomía. Fuentes: POWO Kew, GBIF.",
       "validation_level": "claude_draft",

@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://chagra.guatoc.co/schema/catalog/v3.1.json",
-  "title": "Chagra Species Catalog — Schema v3.1",
-  "description": "Schema formal para catálogo agroecológico Chagra. Consolida v3.0 con las 16 ambigüedades resueltas (ver chagra-catalog-seed-v3.0.json §ambiguedades_detectadas_en_schema_v3). Validador: scripts/validate-catalog.mjs",
+  "title": "Chagra Species Catalog — Schema v3.2",
+  "description": "Schema formal para catálogo agroecológico Chagra. Consolida v3.0 con las 16 ambigüedades resueltas (ver chagra-catalog-seed-v3.0.json §ambiguedades_detectadas_en_schema_v3). v3.2 (2026-06-02, Módulo Reforestación+Incendios Fase 1) añade 4 campos OPCIONALES de restauración en species: rol_restauracion (enum pionera|secundaria|climax|nodriza|null), resistencia_fuego (enum alta|media|baja|null), apta_ribera (bool|null), invasora_combustible (bool|null). Validador: scripts/validate-catalog.mjs",
   "type": "object",
   "required": [
     "schema_version",
@@ -175,6 +175,35 @@
             "naturalizada",
             "no_evaluada"
           ]
+        },
+        "rol_restauracion": {
+          "type": ["string", "null"],
+          "enum": [
+            "pionera",
+            "secundaria",
+            "climax",
+            "nodriza",
+            null
+          ],
+          "description": "Módulo Reforestación+Incendios (Fase 1, schema v3.2 — MODULO_REFORESTACION_INCENDIOS_2026-06-02). Rol sucesional de la especie en restauración ecológica: 'pionera' (coloniza áreas degradadas/post-incendio, crecimiento rápido, facilita sucesión), 'secundaria' (etapa intermedia, se establece bajo pioneras), 'climax' (bosque maduro estable, dosel denso), 'nodriza' (nurse plant: protege/facilita el establecimiento de otras especies sin ser necesariamente sucesional). null = sin rol de restauración asignado o no respaldado por fuente. Regla anti-alucinación: solo valor no-null con respaldo de fuente Tier-A o DR citado."
+        },
+        "resistencia_fuego": {
+          "type": ["string", "null"],
+          "enum": [
+            "alta",
+            "media",
+            "baja",
+            null
+          ],
+          "description": "Módulo Reforestación+Incendios (Fase 1, schema v3.2). Aptitud de la especie como cortafuego vivo / baja inflamabilidad foliar: 'alta' (hoja húmeda/suculenta, baja inflamabilidad, útil como cortafuego), 'media', 'baja'. null = sin dato verificado (NO inferir). Regla anti-alucinación (doc §2.3): este campo solo recibe valor no-null con fuente Tier-A verificada. NO es lo mismo que invasora_combustible (especies pirofíticas/inflamables tienen resistencia_fuego=null, no 'baja', porque el campo mide aptitud cortafuego, no la peligrosidad)."
+        },
+        "apta_ribera": {
+          "type": ["boolean", "null"],
+          "description": "Módulo Reforestación+Incendios (Fase 1, schema v3.2). true si la especie es apta para restauración riparia / estabilización de orillas y cauces; false si no lo es; null si no se ha evaluado. Respaldo requerido por fuente o DR."
+        },
+        "invasora_combustible": {
+          "type": ["boolean", "null"],
+          "description": "Módulo Reforestación+Incendios (Fase 1, schema v3.2). true si la especie es invasora con alta carga combustible que amplifica incendios (pirofítica/inflamable), p.ej. Ulex europaeus, Genista monspessulana, Eucalyptus globulus, Melinis minutiflora, Pinus patula; false si no; null si no se ha evaluado. Independiente de category/conservation_status: una especie marcada naturalizada (no 'invasor') puede tener invasora_combustible=true si la fuente lo respalda."
         },
         "cites_appendix": {
           "type": "string",
