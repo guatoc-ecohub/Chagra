@@ -127,6 +127,95 @@ function _entityName(e) {
   return (e && (e.nombre_comun || e.mentioned)) || 'esa especie';
 }
 
+// ── A12: clasificación de INTENCIÓN del usuario (gating de guards) ───────────
+
+/**
+ * Keywords de PRECIO / MERCADO. Bug prod 2026-06-02: "¿a cómo está la papa?"
+ * (consulta de precio) disparó una cascada de guards de SIEMBRA (4× "NO es
+ * viable a 1923 msnm", una por variedad). La pregunta no era de siembra. Estas
+ * keywords (sobre el texto normalizado sin tildes) detectan intención de
+ * precio/mercado para NO correr los guards de siembra sobre ella.
+ */
+const PRICE_INTENT_PATTERNS = [
+  /\ba\s+como\s+(esta|estan|va|van|vale|valen)\b/, // "a cómo está / a cómo van"
+  /\bcuanto\s+(vale|valen|cuesta|cuestan|sale|salen|pagan|esta\s+pagando)\b/,
+  /\bque\s+precio\b/,
+  /\bprecio[s]?\b/,
+  /\bmercado[s]?\b/,
+  /\bplaza\s+de\s+mercado\b/,
+  /\b(donde|a\s+quien)\s+(puedo\s+)?(vendo|vender|comprar|compro)\b/,
+  /\b(vendo|vender|venta|comprar|compra|comprador|comercializ)\w*\b/,
+  /\bcosecha\s+para\s+(vender|venta)\b/,
+  /\bbulto[s]?\s+(de|a)\b/,
+  /\bcarga\s+de\b/,
+];
+
+/**
+ * Verbos / fraseo de SIEMBRA. Si la consulta del usuario los trae, es de
+ * siembra y los guards de siembra SÍ deben correr aunque también mencione
+ * precio (conservador: ante mezcla, protegemos).
+ */
+const PLANTING_INTENT_PATTERNS = [
+  /\bsiembr\w*\b/,
+  /\bsembr\w*\b/,
+  /\bplant\w*\b/,
+  /\bcultiv\w*\b/,
+  /\bpropag\w*\b/,
+  /\bque\s+(cultivo|siembr|planto|cultivar)\b/,
+  /\bque\s+(puedo|debo|deberia)\s+(sembrar|plantar|cultivar)\b/,
+  /\bsemilla[s]?\b/,
+  /\b(me\s+)?(conviene|sirve|recomienda[sn]?)\s+sembrar\b/,
+  /\bviable[s]?\b/,
+  /\bmsnm\b/,
+  /\baltitud\b/,
+  /\ben\s+mi\s+finca\b/,
+];
+
+/**
+ * classifyQueryIntent — heurística simple de intención sobre la pregunta del
+ * usuario (A12). Devuelve:
+ *   - 'siembra'  → hay verbo/fraseo de siembra (los guards de siembra SÍ corren).
+ *   - 'precio'   → precio/mercado SIN verbo de siembra (guards de siembra NO corren).
+ *   - 'unknown'  → no clasificable (conservador: el caller corre los guards).
+ *
+ * Diseño conservador (anti-rotura de la protección anti-alucinación): solo
+ * devuelve 'precio' cuando hay señal de precio/mercado Y NO hay verbo de
+ * siembra. Ante cualquier duda → 'unknown' (los guards corren). La intención de
+ * INFO general (sin verbo de siembra y sin precio) cae en 'unknown', y el caller
+ * decide; el gating de A12 trata 'precio' e 'info' por igual (no-siembra), por lo
+ * que `shouldRunPlantingGuards` colapsa la decisión.
+ *
+ * @param {string|null|undefined} userMessage
+ * @returns {'siembra'|'precio'|'unknown'}
+ */
+export function classifyQueryIntent(userMessage) {
+  if (typeof userMessage !== 'string') return 'unknown';
+  const norm = _stripDiacritics(userMessage);
+  if (!norm) return 'unknown';
+  // La siembra manda: si la pregunta menciona sembrar/cultivar/viabilidad, es de
+  // siembra aunque también hable de precio (conservador).
+  if (PLANTING_INTENT_PATTERNS.some((re) => re.test(norm))) return 'siembra';
+  if (PRICE_INTENT_PATTERNS.some((re) => re.test(norm))) return 'precio';
+  return 'unknown';
+}
+
+/**
+ * shouldRunPlantingGuards — ¿deben correr los guards de SIEMBRA para esta
+ * pregunta? (A12). Conservador: corre SIEMPRE salvo que la intención sea
+ * inequívocamente NO-siembra (precio/mercado o info general sin verbo de
+ * siembra). Sin userMessage → corre (no rompe la protección existente).
+ *
+ * @param {string|null|undefined} userMessage
+ * @returns {boolean}
+ */
+function shouldRunPlantingGuards(userMessage) {
+  // Sin la pregunta no podemos juzgar la intención → corremos (conservador).
+  if (typeof userMessage !== 'string' || !userMessage.trim()) return true;
+  const intent = classifyQueryIntent(userMessage);
+  // Solo NO corremos cuando es claramente de precio. 'unknown' y 'siembra' corren.
+  return intent !== 'precio';
+}
+
 // ── R2: filtro de entidades-ruido (stopwords NLU) ───────────────────────────
 
 /**
@@ -730,6 +819,101 @@ function _stripViabilityPromotion(originalText, nombresNorm) {
   return kept.join('').trim();
 }
 
+// ── A11: de-dup de viabilidad por especie base ──────────────────────────────
+
+/**
+ * Palabras genéricas que, solas, NO sirven como nombre base de especie para
+ * agrupar variedades (evita agrupar por "variedad", "criolla", etc.). El primer
+ * token útil del nombre común suele ser el sustantivo de la especie ("papa",
+ * "cacao", "maiz"). Si el primer token es uno de estos, no agrupa por él.
+ */
+const GENERIC_VARIETY_WORDS = new Set([
+  'variedad', 'variedades', 'tipo', 'tipos', 'clase', 'clases',
+]);
+
+/**
+ * _baseCommonName — extrae el nombre base de una especie a partir de su nombre
+ * común para agrupar variedades (A11). "Papa criolla", "Papa Sabanera", "Papa
+ * Pastusa" → "papa". Toma el primer token significativo del nombre común
+ * normalizado (sin tildes/case, antes de "/"). Devuelve '' si no hay token útil.
+ *
+ * @param {string} nombre
+ * @returns {string}
+ */
+function _baseCommonName(nombre) {
+  const norm = _stripDiacritics((nombre || '').split('/')[0]).replace(/\s+/g, ' ').trim();
+  if (!norm) return '';
+  const first = norm.split(' ')[0];
+  if (!first || first.length < 3 || GENERIC_VARIETY_WORDS.has(first)) return '';
+  return first;
+}
+
+/**
+ * _groupViabilityHits — agrupa las especies inviables por especie BASE (A11) y
+ * produce UN bloque de corrección por base. Detecta variedades de la misma base
+ * por nombre común compartido ("papa") O por binomio base compartido (mismo
+ * "Género epíteto"). Cuando una base agrupa ≥2 variedades, el bloque dice "Las
+ * variedades de <base> no son viables…"; con una sola, mantiene el fraseo
+ * individual ("<Nombre> NO es viable…"). Junta las alternativas de todas las
+ * variedades de la base (dedup, máx 3).
+ *
+ * @param {Array<{nombre:string, nombreNorm:string, baseCommon:string, baseBinomial:string|null, alternativas:string[]}>} hits
+ * @param {string} dondeTxt  " a N msnm" o '' (sin altitud).
+ * @returns {string[]} bloques de corrección (uno por base).
+ */
+function _groupViabilityHits(hits, dondeTxt) {
+  /** @type {Map<string, {key:string, items:typeof hits, names:string[], alts:string[]}>} */
+  const groups = new Map();
+  // Índice binomio→clave para fusionar variedades que comparten binomio base aun
+  // si su primer token de nombre común difiere.
+  const binToKey = new Map();
+
+  for (const h of hits) {
+    // Clave preferida: nombre base común; si no hay, el binomio base; si tampoco,
+    // el nombre normalizado individual (no agrupa).
+    let key = h.baseCommon || h.baseBinomial || h.nombreNorm;
+    // Si su binomio base ya está asociado a un grupo, usar esa clave (fusiona por
+    // binomio compartido aunque el nombre común base difiera).
+    if (h.baseBinomial && binToKey.has(h.baseBinomial)) {
+      key = binToKey.get(h.baseBinomial);
+    }
+    let g = groups.get(key);
+    if (!g) {
+      g = { key, items: [], names: [], alts: [] };
+      groups.set(key, g);
+    }
+    g.items.push(h);
+    if (!g.names.includes(h.nombre)) g.names.push(h.nombre);
+    for (const a of h.alternativas) if (a && !g.alts.includes(a)) g.alts.push(a);
+    if (h.baseBinomial && !binToKey.has(h.baseBinomial)) binToKey.set(h.baseBinomial, key);
+  }
+
+  const bloques = [];
+  for (const g of groups.values()) {
+    const altsTop = g.alts.slice(0, 3);
+    const altTxt = altsTop.length
+      ? ` Para tu altura te irían mejor estas del catálogo: ${altsTop.join(', ')}.`
+      : '';
+    if (g.items.length >= 2) {
+      // Varias variedades de la misma base → un solo bloque.
+      const base = g.key;
+      bloques.push(
+        `Corrección importante: las variedades de ${base} (${g.names.join(', ')}) NO son viables en tu finca` +
+          `${dondeTxt} — su clima/altitud no les sirve, la probabilidad de éxito es muy baja y no vale la pena ` +
+          `el esfuerzo.${altTxt}`,
+      );
+    } else {
+      // Una sola especie → fraseo individual (no-regresión del mensaje previo).
+      const nombre = g.names[0];
+      bloques.push(
+        `Corrección importante: ${nombre} NO es viable en tu finca${dondeTxt} — su clima/altitud no le sirve, ` +
+          `la probabilidad de éxito es muy baja y no vale la pena el esfuerzo.${altTxt}`,
+      );
+    }
+  }
+  return bloques;
+}
+
 /**
  * Guard 3 — viabilidad invertida. Si el grounding marca `viabilidad:"inviable"`
  * para una especie a la altitud de la finca y la respuesta la recomienda como
@@ -761,7 +945,9 @@ export function guardInvertedViability(responseText, resolvedEntities = null, fi
   // rama autoritativa (`_normViabilidad(e.viabilidad)`) NO depende de esto.
   const haveAlt = fincaAltitud != null && fincaAltitud !== '' && Number.isFinite(alt);
 
-  const correcciones = [];
+  // A11: acumulamos las inviables disparadas como datos crudos para luego
+  // agruparlas por especie base (variedades de papa → un bloque).
+  const inviables = [];
   const disparadas = [];
   const disparadasNorm = [];
 
@@ -797,20 +983,26 @@ export function guardInvertedViability(responseText, resolvedEntities = null, fi
 
     disparadas.push(nombre);
     disparadasNorm.push(nombreNorm);
-    const alternativas = _altNames(e.alternativas_viables, 3);
-    const altTxt = alternativas.length
-      ? ` Para tu altura te irían mejor estas del catálogo: ${alternativas.join(', ')}.`
-      : '';
-    const dondeTxt = haveAlt ? ` a ${alt} msnm` : '';
-    correcciones.push(
-      `Corrección importante: ${nombre} NO es viable en tu finca${dondeTxt} — su clima/altitud no le sirve, ` +
-        `la probabilidad de éxito es muy baja y no vale la pena el esfuerzo.${altTxt}`,
-    );
+    // A11: en vez de emitir la corrección ya formateada, acumulamos los datos de
+    // la especie disparada para luego AGRUPAR las variedades de la misma base (4
+    // variedades de papa → un solo bloque, no cuatro). Ver `_groupViabilityHits`.
+    inviables.push({
+      nombre,
+      nombreNorm,
+      baseCommon: _baseCommonName(nombre),
+      baseBinomial: _binomial(e.nombre_cientifico || e.nombre_científico),
+      alternativas: _altNames(e.alternativas_viables, 3),
+    });
   }
 
-  if (correcciones.length === 0) {
+  if (inviables.length === 0) {
     return { text: responseText, modified: false, reason: null };
   }
+
+  // A11: agrupa las inviables por especie base (nombre común compartido o
+  // binomio base compartido) y produce UN bloque por base.
+  const dondeTxt = haveAlt ? ` a ${alt} msnm` : '';
+  const correcciones = _groupViabilityHits(inviables, dondeTxt);
 
   bumpGuardTelemetry('inverted_viability');
   // REEMPLAZO (no prepend): primero borramos del texto del modelo las oraciones
@@ -1149,9 +1341,20 @@ function _groundedBinomials(entities) {
  * CERCA del nombre del cultivo, se ANEXA una corrección honesta liderando con el
  * binomio correcto del catálogo.
  *
+ * A10 (hardening 2026-06-02) — el culprit debe ser un binomio REAL del catálogo,
+ * no un par latino-plausible cualquiera. El guard corrige confusiones entre
+ * especies REALES (lulo→Passiflora tripartita, que existe en el catálogo), no
+ * prosa. Por eso el culpable solo dispara si está en el UNIVERSO de binomios
+ * conocidos del grounding (todas las entidades resueltas + sus
+ * companions/antagonists/alternativas/pest_controllers). Un binomio del texto que
+ * NO está en ese universo es sospechoso de ser prosa/alucinación sin referente
+ * real y NO dispara (conservador). Antes, cualquier "Género epíteto" plausible
+ * (ej. "Quercus inventus" inexistente) disparaba.
+ *
  * Anti-falsos-positivos:
- *  - Solo binomios que NO pertenecen al grounding disparan (companions y plagas
- *    legítimos quedan exentos).
+ *  - El culprit debe ser un binomio REAL del universo del grounding (A10), y
+ *    distinto del binomio correcto del cultivo (companions y plagas legítimos del
+ *    PROPIO cultivo no disparan porque coinciden con su grounding).
  *  - Requiere que el nombre común del cultivo aparezca en el texto (si no, no
  *    podemos atribuir la sustitución a ese cultivo → no dispara).
  *  - Si el binomio correcto del cultivo ya está en el texto, ese cultivo se
@@ -1171,6 +1374,11 @@ export function guardSpeciesSubstitution(responseText, resolvedEntities = null, 
     return { text: responseText, modified: false, reason: null };
   }
 
+  // Universo de binomios REALES conocidos (todas las entidades + sub-arrays).
+  // Sirve de doble función: (1) un binomio del texto que ESTÁ aquí es legítimo
+  // (companion/plaga propia del cultivo) → no es culprit; (2) A10: un culprit
+  // candidato debe ESTAR aquí (binomio real del catálogo), o se descarta por
+  // sospecha de prosa.
   const grounded = _groundedBinomials(resolvedEntities);
   if (grounded.size === 0) {
     return { text: responseText, modified: false, reason: null };
@@ -1178,8 +1386,11 @@ export function guardSpeciesSubstitution(responseText, resolvedEntities = null, 
 
   const norm = _stripDiacritics(responseText);
 
-  // Binomios presentes en el texto pero NO autoritativos del grounding.
-  const foreign = new Set();
+  // A10: binomios presentes en el texto que SÍ son reales (están en el universo
+  // del grounding). Solo estos pueden ser culprit de una sustitución entre
+  // especies reales. Un binomio del texto que no esté aquí es prosa/alucinación y
+  // se ignora.
+  const realInText = new Set();
   let m;
   SCI_BINOMIAL_RE.lastIndex = 0;
   while ((m = SCI_BINOMIAL_RE.exec(responseText)) !== null) {
@@ -1188,9 +1399,9 @@ export function guardSpeciesSubstitution(responseText, resolvedEntities = null, 
     if (!_looksLikeLatinBinomial(m[1], m[2])) continue;
     const raw = `${m[1]} ${m[2]}`;
     const bin = _binomial(raw);
-    if (bin && !grounded.has(bin)) foreign.add(bin);
+    if (bin && grounded.has(bin)) realInText.add(bin);
   }
-  if (foreign.size === 0) {
+  if (realInText.size === 0) {
     return { text: responseText, modified: false, reason: null };
   }
 
@@ -1213,12 +1424,14 @@ export function guardSpeciesSubstitution(responseText, resolvedEntities = null, 
     // Si el binomio correcto ya está en el texto, el cultivo está bien atribuido.
     if (norm.includes(correctBin)) continue;
 
-    // ¿Hay un binomio foráneo CERCA del nombre del cultivo? Tomamos el primer
-    // foráneo que aparezca dentro de una ventana del nombre. Si el cultivo no
-    // está cerca de ningún binomio foráneo, no atribuimos (conservador).
+    // ¿Hay un binomio REAL de OTRA especie CERCA del nombre del cultivo? A10: el
+    // culprit debe ser un binomio real del catálogo (está en `realInText`) y
+    // distinto del binomio correcto del cultivo. Si el cultivo no está cerca de
+    // ninguno, no atribuimos (conservador).
     const idxNombre = norm.indexOf(firstWord);
     let culprit = null;
-    for (const fb of foreign) {
+    for (const fb of realInText) {
+      if (fb === correctBin) continue; // su propio binomio correcto no es culprit.
       const idxBin = norm.indexOf(fb);
       if (idxBin < 0) continue;
       // ventana laxa: el binomio errado y el nombre del cultivo en el mismo
@@ -1357,6 +1570,12 @@ export function guardCompanionBinomial(responseText, resolvedEntities = null, _f
     return { text: responseText, modified: false, reason: null };
   }
 
+  // A10: universo de binomios REALES conocidos del grounding (todas las
+  // entidades + sub-arrays). El culprit de una sustitución de companion debe ser
+  // un binomio real del catálogo, no prosa/alucinación latino-plausible. Un
+  // binomio del texto que NO esté aquí no dispara (conservador).
+  const knownRealBinomials = _groundedBinomials(resolvedEntities);
+
   const norm = _stripDiacritics(responseText);
 
   // Conjunto de nombres comunes conocidos (normalizados): un nombre común
@@ -1402,12 +1621,16 @@ export function guardCompanionBinomial(responseText, resolvedEntities = null, _f
     );
     if (algunoCorrecto) continue;
 
-    // ¿Hay un binomio CERCA del nombre que NO esté en su grounding? Ese es el
-    // culpable (sustitución). Tomamos el más cercano dentro de la ventana.
+    // ¿Hay un binomio REAL de otra especie CERCA del nombre que NO esté en su
+    // grounding? Ese es el culpable (sustitución). A10: el culprit debe estar en
+    // el universo de binomios reales del catálogo (`knownRealBinomials`); un par
+    // latino que no exista en el catálogo es prosa/alucinación y se descarta.
+    // Tomamos el más cercano dentro de la ventana.
     let culprit = null;
     let bestDist = Infinity;
     for (const tb of textBinomials) {
       if (entry.bins.has(tb.bin)) continue; // ese binomio es legítimo (otra especie).
+      if (!knownRealBinomials.has(tb.bin)) continue; // A10: no es del catálogo → prosa.
       const dist = Math.abs(tb.idx - idxNombre);
       if (dist <= 160 && dist < bestDist) {
         bestDist = dist;
@@ -1614,6 +1837,24 @@ export function guardInventedName(responseText, { profileName = null } = {}) {
 }
 
 /**
+ * Set de guards que SOLO tienen sentido cuando la consulta es de SIEMBRA
+ * (A12). Si la pregunta del usuario es de PRECIO/MERCADO (o info general sin
+ * verbo de siembra), estos NO corren: razonan sobre viabilidad/identidad de
+ * cultivo, irrelevante para "¿a cómo está la papa?". Causa raíz del bug prod
+ * 2026-06-02 (cascada de "NO es viable a 1923 msnm" sobre una query de precio).
+ *
+ * Los guards de SAFETY/inofensivos (dosis, agroquímico, visión-sin-foto,
+ * nombre-inventado) corren SIEMPRE: nunca dependen de que sea una consulta de
+ * siembra.
+ */
+const PLANTING_GUARDS = new Set([
+  guardSpeciesSubstitution,
+  guardCompanionBinomial,
+  guardInvasiveSpecies,
+  guardInvertedViability,
+]);
+
+/**
  * Cadena ordenada de guards. El agroquímico va primero (lo más urgente:
  * SAFETY), luego invasoras, viabilidad y por último la suavización de dosis.
  */
@@ -1661,6 +1902,12 @@ const GUARD_CHAIN = [
  *   (riesgo de helada). Sin esto, el guard térmico es no-op.
  * @param {number|null} [ctx.forecastTempMax] — máxima esperada del pronóstico (°C)
  *   para el riesgo de golpe de calor. Mismo origen.
+ * @param {string|null} [ctx.userMessage] — pregunta cruda del usuario (A12). Si
+ *   es claramente de PRECIO/MERCADO (no de siembra), los guards de SIEMBRA
+ *   (viabilidad/térmico/sustitución/companion/invasora) NO corren —razonan sobre
+ *   cultivo y son irrelevantes a "¿a cómo está la papa?". Los de SAFETY (dosis,
+ *   agroquímico, visión-sin-foto, nombre-inventado) corren igual. Sin esto, o
+ *   ante intención ambigua, TODOS corren (conservador, no rompe la protección).
  * @returns {{text:string, modified:boolean, reasons:string[]}}
  */
 export function applyOutputGuards(
@@ -1673,6 +1920,7 @@ export function applyOutputGuards(
     profileName = null,
     forecastTempMin = null,
     forecastTempMax = null,
+    userMessage = null,
   } = {},
 ) {
   if (typeof responseText !== 'string' || responseText.length === 0) {
@@ -1681,6 +1929,10 @@ export function applyOutputGuards(
   // R2: descarta entidades-ruido NLU ("aquí", "don", "pasto") ANTES de los
   // guards para no razonar sobre palabras campesinas mal resueltas a especie.
   const entities = filterNoiseEntities(resolvedEntities);
+  // A12: ¿es una consulta de SIEMBRA? Si es de PRECIO/MERCADO no corremos los
+  // guards de siembra (viabilidad/térmico/sustitución/companion/invasora) — solo
+  // los de SAFETY. Conservador: sin userMessage o ante duda, corren todos.
+  const runPlantingGuards = shouldRunPlantingGuards(userMessage);
   let text = responseText;
   let modified = false;
   const reasons = [];
@@ -1697,6 +1949,10 @@ export function applyOutputGuards(
   }
 
   for (const guard of GUARD_CHAIN) {
+    // A12: salta los guards de SIEMBRA cuando la consulta no es de siembra
+    // (precio/mercado). Los de SAFETY/inofensivos NO están en PLANTING_GUARDS y
+    // corren siempre.
+    if (!runPlantingGuards && PLANTING_GUARDS.has(guard)) continue;
     const res = guard(text, entities, fincaAltitud);
     if (res && res.modified) {
       text = res.text;
@@ -1709,14 +1965,17 @@ export function applyOutputGuards(
   // contra la temp del PRONÓSTICO (ctx). Va después de la cadena (después de
   // viabilidad) y antes de inventedName. Firma propia porque la cadena estándar
   // no transporta la temp del pronóstico. No-op si no hay forecastTemp.
-  const thermalRes = guardThermalViability(text, entities, fincaAltitud, {
-    forecastTempMin,
-    forecastTempMax,
-  });
-  if (thermalRes && thermalRes.modified) {
-    text = thermalRes.text;
-    modified = true;
-    if (thermalRes.reason) reasons.push(thermalRes.reason);
+  // A12: es un guard de SIEMBRA → no corre en consultas de precio/mercado.
+  if (runPlantingGuards) {
+    const thermalRes = guardThermalViability(text, entities, fincaAltitud, {
+      forecastTempMin,
+      forecastTempMax,
+    });
+    if (thermalRes && thermalRes.modified) {
+      text = thermalRes.text;
+      modified = true;
+      if (thermalRes.reason) reasons.push(thermalRes.reason);
+    }
   }
   // Guard de nombre inventado: firma propia (necesita el nombre del perfil).
   const nameRes = guardInventedName(text, { profileName });
