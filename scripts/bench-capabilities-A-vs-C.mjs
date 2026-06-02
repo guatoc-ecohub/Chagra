@@ -154,20 +154,68 @@ const BASE_PROMPT = `Eres un asistente agroecológico experto para Colombia. Res
 
 Si mencionas entidades (especies, plagas, biopreparados), usa los nombres canónicos del catálogo Chagra para evitar alucinaciones. Si NO tienes un dato verificado (por ejemplo una dosis numérica), dilo explícitamente en vez de inventarlo.`;
 
+/** Lista hasta `max` nombres de un array (strings u objetos {nombre_comun}). */
+function _liftNames(arr, max = 5) {
+  if (!Array.isArray(arr)) return [];
+  const out = [];
+  for (const a of arr) {
+    let n = null;
+    if (typeof a === 'string') n = a.trim();
+    else if (a && typeof a === 'object') n = (a.nombre_comun || a.nombre || a.name || '').toString().trim();
+    if (n && !out.includes(n)) out.push(n);
+    if (out.length >= max) break;
+  }
+  return out;
+}
+
+/**
+ * Arma el system prompt enriquecido con los HECHOS CURADOS del grafo que el
+ * sidecar /resolve-entities ya devuelve por entidad — NO solo el nombre. Es el
+ * cambio que mide el LIFT real de la curación: para que granite CITE la dosis
+ * verificada del biopreparado y la helada_letal/altitud de la especie en vez de
+ * inventarlas. Solo emite campos presentes (degrada con gracia).
+ *
+ * Mismo principio que prod (AgentScreen + buildCuratedFactsContext).
+ */
 function buildEnrichedSystemPrompt(entities) {
   if (!entities || entities.length === 0) return BASE_PROMPT;
   const entityContext = entities
     .map((e) => {
-      if (e.kind === 'species') return `- ${e.mentioned} = especie: ${e.nombre_cientifico} (${e.nombre_comun})`;
+      if (e.kind === 'species') {
+        const facts = [];
+        if (e.altitud_min != null && e.altitud_max != null) {
+          facts.push(`altitud ${e.altitud_min}-${e.altitud_max} msnm`);
+        }
+        if (e.helada_letal != null && e.helada_letal !== '') {
+          facts.push(`muere por helada bajo ${Number(e.helada_letal)}°C`);
+        }
+        if (e.viabilidad) {
+          const delta = e.delta_altitud != null ? ` (${e.delta_altitud}m del rango)` : '';
+          facts.push(`viabilidad a la altitud de la finca: ${e.viabilidad}${delta}`);
+        }
+        const tail = facts.length ? ` — ${facts.join('; ')}` : '';
+        return `- ${e.mentioned} = especie: ${e.nombre_cientifico} (${e.nombre_comun})${tail}`;
+      }
       if (e.kind === 'pest') return `- ${e.mentioned} = plaga: ${e.nombre_cientifico || e.nombre_comun}`;
-      if (e.kind === 'biopreparado') return `- ${e.mentioned} = biopreparado: ${e.nombre_comun}`;
+      if (e.kind === 'biopreparado') {
+        const facts = [];
+        if (e.dosis_aplicacion) facts.push(`dosis verificada: ${e.dosis_aplicacion}`);
+        if (e.ingredientes_resumen) facts.push(`ingredientes: ${e.ingredientes_resumen}`);
+        if (e.preparacion) facts.push(`preparación: ${e.preparacion}`);
+        const target = _liftNames(e.target, 5);
+        if (target.length) facts.push(`controla: ${target.join(', ')}`);
+        if (e.precauciones) facts.push(`precauciones: ${e.precauciones}`);
+        if (e.fuente) facts.push(`fuente: ${e.fuente}`);
+        const tail = facts.length ? ` — ${facts.join('; ')}` : '';
+        return `- ${e.mentioned} = biopreparado: ${e.nombre_comun}${tail}`;
+      }
       return null;
     })
     .filter(Boolean)
     .join('\n');
   return `${BASE_PROMPT}
 
-ENTIDADES DEL CATÁLOGO (usa estos nombres canónicos):
+ENTIDADES DEL CATÁLOGO (usa estos nombres canónicos Y CITA los hechos verificados; JAMÁS inventes dosis ni recetas):
 ${entityContext}`;
 }
 
