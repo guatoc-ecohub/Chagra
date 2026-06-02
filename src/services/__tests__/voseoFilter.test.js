@@ -417,3 +417,34 @@ describe('voseoFilter — telemetría onMatch + counters', () => {
     expect(out).toBe('tú puedes');
   });
 });
+
+describe('voseoFilter — region-aware (fix paisa 2026-06-02)', () => {
+  it('paisa/pacífico: PRESERVA el voseo (no aplana morfología)', () => {
+    expect(filterVoseo('Vos podés sembrar el maíz', { region: 'paisa' }))
+      .toBe('Vos podés sembrar el maíz');
+    expect(filterVoseo('Tenés que regar temprano', { region: 'pacifico' }))
+      .toBe('Tenés que regar temprano');
+  });
+
+  it('caribe: aplana voseo → tú', () => {
+    expect(filterVoseo('Vos podés sembrar el maíz', { region: 'caribe' }))
+      .toBe('Tú puedes sembrar el maíz');
+  });
+
+  it('cundiboyacense: aplana voseo → usted', () => {
+    expect(filterVoseo('Vos podés sembrar el maíz', { region: 'cundiboyacense' }))
+      .toBe('Usted puede sembrar el maíz');
+  });
+
+  it('léxico rioplatense se limpia INCLUSO en región voseante', () => {
+    // "che/laburo" son argentinos puros; "tenés" es voseo paisa legítimo.
+    expect(filterVoseo('Che, tenés que ir al laburo', { region: 'paisa' }))
+      .toBe('Oiga, tenés que ir al trabajo');
+  });
+
+  it('back-compat: sin región se comporta como antes (aplana a formality)', () => {
+    expect(filterVoseo('vos podés', { formality: 'tu' })).toBe('tú puedes');
+    expect(filterVoseo('vos podés', { formality: 'usted' })).toBe('usted puede');
+    expect(filterVoseo('vos podés', { region: 'narnia' })).toBe('usted puede');
+  });
+});
