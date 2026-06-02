@@ -21,6 +21,10 @@ import { analyzeFoliage } from '../../services/aiService';
 // Extraída para poder testearla sin montar el componente (bug foto 2026-05-31).
 import { processPhotoItem, buildPhotoUserMessage } from '../../services/agentOutboxPhoto';
 import { isAnalyzableImageAttachment, buildAttachmentRejection } from '../../services/agentOutboxAttachment';
+// B1 (2026-06-02): animación de ENTRADA al agente. El home anima el envío, pero
+// el cambio de pantalla era un corte seco ("casi no se nota"). El contenedor
+// raíz entra con un fade+rise deliberado (~460ms), respetando reduced-motion.
+import { AGENT_ENTRANCE_CSS, agentEntranceClass } from './agentEntrance';
 import {
   addTurn,
   getFullHistory,
@@ -95,6 +99,10 @@ const STATE_RECORDING = 'recording';
 const STATE_THINKING = 'thinking';
 
 export default function AgentScreen({ onBack, initialContext }) {
+  // B1: clase de animación de entrada, resuelta UNA vez al montar (no en cada
+  // re-render — si no, la animación se reiniciaría con cada mensaje). Vacía bajo
+  // prefers-reduced-motion.
+  const entranceClassRef = useRef(agentEntranceClass());
   const operatorId = usePrefsStore((s) => s.operatorId) || 'default-operator';
   // Task #122 (2026-05-23): ttsEnabled global persistido en usePrefsStore.
   // Antes era useState local — al cambiarlo en otra pantalla (header
@@ -2207,7 +2215,10 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     : 'Escribe tu pregunta...';
 
   return (
-    <div className="h-full flex flex-col bg-slate-950">
+    <div className={`h-full flex flex-col bg-slate-950 ${entranceClassRef.current}`}>
+      {/* B1: animación de entrada (fade+rise) para que se perciba el cruce al
+          agente. Respeta prefers-reduced-motion vía @media en el CSS. */}
+      <style>{AGENT_ENTRANCE_CSS}</style>
       {/* Header con avatar colibrí Chagra IA (operator bug #920 no aplicó el avatar al header) */}
       <div className="px-4 py-3 flex items-center gap-3 border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm shrink-0">
         <button

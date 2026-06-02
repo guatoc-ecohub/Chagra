@@ -261,6 +261,69 @@ describe('AgentHero — transición de envío premium (bug 2026-05-31)', () => {
   });
 });
 
+describe('AgentHero — adjuntar SOLO fotos (B2, 2026-06-02)', () => {
+  test('el input de adjuntar acepta solo imágenes (accept="image/*")', () => {
+    const { container } = render(<AgentHero onNavigate={vi.fn()} />);
+    // Dos inputs de archivo: cámara (con capture) y adjuntar (sin capture).
+    // Ambos deben restringir a imágenes — el agente solo "ve" fotos vía visión.
+    const inputs = Array.from(container.querySelectorAll('input[type="file"]'));
+    expect(inputs.length).toBeGreaterThanOrEqual(2);
+    for (const input of inputs) {
+      expect(input.getAttribute('accept')).toBe('image/*');
+    }
+  });
+
+  test('el input de cámara conserva capture="environment" (foto en vivo)', () => {
+    const { container } = render(<AgentHero onNavigate={vi.fn()} />);
+    const cameraInput = container.querySelector('input[capture]');
+    expect(cameraInput).toBeTruthy();
+    expect(cameraInput.getAttribute('accept')).toBe('image/*');
+    expect(cameraInput.getAttribute('capture')).toBe('environment');
+  });
+
+  test('si se cuela un no-imagen (PDF): NO lo deja en staging y avisa claro', async () => {
+    const { container } = render(<AgentHero onNavigate={vi.fn()} />);
+    const file = new File(['%PDF-1.4'], 'hoja-de-vida.pdf', { type: 'application/pdf' });
+    // Usamos el input de adjuntar (sin capture). Aunque tenga accept="image/*",
+    // algunos OS dejan elegir cualquier archivo → el guard de pick lo rechaza.
+    const attachInput = container.querySelector('input[type="file"]:not([capture])');
+    await act(async () => {
+      fireEvent.change(attachInput, { target: { files: [file] } });
+    });
+    // No se crea preview de adjunto.
+    expect(screen.queryByText('Foto lista para enviar')).toBeNull();
+    expect(screen.queryByText('hoja-de-vida.pdf')).toBeNull();
+    // Mensaje claro en castellano colombiano.
+    const alert = await screen.findByRole('alert');
+    expect(alert.textContent).toMatch(/solo puedo ver fotos|solo.*fotos/i);
+    // El botón enviar sigue deshabilitado (no hay adjunto válido ni texto).
+    expect(screen.getByLabelText('Enviar al agente')).toBeDisabled();
+  });
+
+  test('el aviso de no-imagen no usa voseo argentino', async () => {
+    const { container } = render(<AgentHero onNavigate={vi.fn()} />);
+    const file = new File(['x'], 'audio.mp3', { type: 'audio/mpeg' });
+    const attachInput = container.querySelector('input[type="file"]:not([capture])');
+    await act(async () => {
+      fireEvent.change(attachInput, { target: { files: [file] } });
+    });
+    const alert = await screen.findByRole('alert');
+    const t = alert.textContent || '';
+    expect(t).not.toMatch(/mandá|contame|elegí|tenés|podés|querés|enviá|mostrá/i);
+  });
+
+  test('una imagen válida sí queda en staging (el guard no bloquea fotos)', async () => {
+    const { container } = render(<AgentHero onNavigate={vi.fn()} />);
+    const file = new File(['img'], 'planta.jpg', { type: 'image/jpeg' });
+    const attachInput = container.querySelector('input[type="file"]:not([capture])');
+    await act(async () => {
+      fireEvent.change(attachInput, { target: { files: [file] } });
+    });
+    await screen.findByText('Foto lista para enviar');
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+});
+
 describe('AgentHero — voseo (español colombiano)', () => {
   test('los textos visibles usan tú/usted, sin voseo argentino', () => {
     const { container } = render(<AgentHero onNavigate={vi.fn()} />);

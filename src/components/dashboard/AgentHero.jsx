@@ -3,6 +3,7 @@ import { Mic, Square, Camera, Paperclip, ArrowUp, X } from 'lucide-react';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { captureAndCompress } from '../../services/photoService';
+import { isAnalyzableImageAttachment } from '../../services/agentOutboxAttachment';
 import useAgentOutboxStore from '../../store/useAgentOutboxStore';
 import { agentSounds } from '../../services/agentSoundService';
 
@@ -68,9 +69,13 @@ export const SEND_TRANSITION_MS = 520;
 export default function AgentHero({ onNavigate }) {
     const [tipIndex, setTipIndex] = useState(0);
     const [text, setText] = useState('');
-    // Adjunto en staging (foto/archivo) antes de enviar. { blob, mime, fileName,
-    // previewUrl, kind } — kind: 'photo' | 'attachment'.
+    // Adjunto en staging (SIEMPRE una foto) antes de enviar. { blob, mime,
+    // fileName, previewUrl, kind: 'photo' }. B2 (2026-06-02): el agente solo
+    // "ve" imágenes vía visión, así que el compositor solo acepta fotos.
     const [attachment, setAttachment] = useState(null);
+    // Aviso breve cuando el usuario intenta adjuntar algo que no es una imagen
+    // (algunos OS ignoran `accept="image/*"` y dejan elegir cualquier archivo).
+    const [pickError, setPickError] = useState('');
     const [busy, setBusy] = useState(false);
     // Fase de la transición de envío: 'idle' | 'sending'. En 'sending' el
     // compositor hace un shimmer breve y el avatar pasa a 'thinking' antes de
@@ -209,32 +214,37 @@ export default function AgentHero({ onNavigate }) {
     };
 
     // ── Cámara / foto ─────────────────────────────────────────────────────────
+    // B2 (2026-06-02): el agente SOLO "ve" imágenes (vía visión). El botón de
+    // adjuntar y el de cámara usan `accept="image/*"`, pero algunos sistemas
+    // operativos ignoran ese atributo y dejan elegir cualquier archivo. Por eso
+    // validamos también acá: si lo elegido NO es una imagen, NO lo dejamos en
+    // staging y avisamos claro y corto, en castellano colombiano. Reusamos
+    // `isAnalyzableImageAttachment` para clasificar igual que el agente.
     const handlePhotoPick = async (e, kind) => {
         const file = e.target.files && e.target.files[0];
         // Permitir re-seleccionar el mismo archivo después.
         e.target.value = '';
         if (!file) return;
+        const looksLikeImage =
+            (file.type && file.type.startsWith('image/')) ||
+            isAnalyzableImageAttachment({ mime: file.type, fileName: file.name });
+        if (!looksLikeImage) {
+            // No es una foto → rechazo claro, sin staging.
+            setPickError('Por ahora solo puedo ver fotos. Mándame una foto de tu planta o cultivo.');
+            return;
+        }
+        setPickError('');
         setBusy(true);
         try {
-            // Reusa la compresión/normalización HEIC→JPEG de photoService para
-            // imágenes; los adjuntos no-imagen van tal cual.
-            if (file.type.startsWith('image/')) {
-                const { blob, mime } = await captureAndCompress(file);
-                const previewUrl = URL.createObjectURL(blob);
-                setAttachment({ blob, mime, fileName: file.name || 'foto.jpg', previewUrl, kind: 'photo' });
-            } else {
-                setAttachment({
-                    blob: file,
-                    mime: file.type || 'application/octet-stream',
-                    fileName: file.name || 'archivo',
-                    previewUrl: null,
-                    kind: 'attachment',
-                });
-            }
+            // Reusa la compresión/normalización HEIC→JPEG de photoService.
+            const { blob, mime } = await captureAndCompress(file);
+            const previewUrl = URL.createObjectURL(blob);
+            setAttachment({ blob, mime, fileName: file.name || 'foto.jpg', previewUrl, kind: 'photo' });
             // Devolver foco al textarea para que pueda escribir un caption.
             requestAnimationFrame(() => textareaRef.current?.focus());
         } catch (err) {
-            console.error('[AgentHero] no se pudo procesar el archivo:', err);
+            console.error('[AgentHero] no se pudo procesar la foto:', err);
+            setPickError('No pude procesar esa foto. Inténtalo de nuevo con otra imagen.');
         } finally {
             setBusy(false);
         }
@@ -244,6 +254,7 @@ export default function AgentHero({ onNavigate }) {
     const clearAttachment = () => {
         if (attachment?.previewUrl) URL.revokeObjectURL(attachment.previewUrl);
         setAttachment(null);
+        setPickError('');
     };
 
     const canSend = !busy && (text.trim().length > 0 || Boolean(attachment));
@@ -444,12 +455,12 @@ export default function AgentHero({ onNavigate }) {
                         >
                             <Camera size={19} aria-hidden="true" />
                         </button>
-                        {/* Adjuntar archivo */}
+                        {/* Adjuntar foto — B2: solo imágenes (el agente solo ve fotos) */}
                         <button
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
                             disabled={busy || isRecording}
-                            aria-label="Adjuntar archivo"
+                            aria-label="Adjuntar una foto"
                             className="w-9 h-9 rounded-full hover:bg-white/10 active:bg-white/15 flex items-center justify-center text-slate-300 disabled:opacity-40 transition-colors"
                         >
                             <Paperclip size={18} aria-hidden="true" />
@@ -491,7 +502,9 @@ export default function AgentHero({ onNavigate }) {
                         </button>
                     </div>
 
-                    {/* Inputs ocultos: cámara (capture) y archivo genérico */}
+                    {/* Inputs ocultos — AMBOS solo imágenes (B2). La cámara abre
+                        captura en vivo (capture="environment"); el adjuntar abre
+                        la galería de fotos. El agente solo "ve" imágenes. */}
                     <input
                         ref={cameraInputRef}
                         type="file"
@@ -503,14 +516,22 @@ export default function AgentHero({ onNavigate }) {
                     <input
                         ref={fileInputRef}
                         type="file"
+                        accept="image/*"
                         className="hidden"
-                        onChange={(e) => handlePhotoPick(e, 'attachment')}
+                        onChange={(e) => handlePhotoPick(e, 'photo')}
                     />
                 </div>
 
                 {recorderError && (
                     <p className="mt-2 text-xs text-rose-300 px-1" role="alert">
                         No pude acceder al micrófono. Revisa los permisos.
+                    </p>
+                )}
+
+                {/* B2: aviso cuando se intenta adjuntar algo que no es una foto. */}
+                {pickError && (
+                    <p className="mt-2 text-xs text-amber-300 px-1" role="alert">
+                        {pickError}
                     </p>
                 )}
 
