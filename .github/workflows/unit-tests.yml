@@ -1,0 +1,53 @@
+name: Unit Tests (vitest)
+
+# Gate de tests unitarios (vitest). Hasta ahora la suite vitest NO corría en
+# CI — solo Playwright E2E. Este job cierra ese hueco y, en particular, hace
+# que el test del PUNTO DE ACCESO #1 (preguntas-ejemplo / chips:
+# tests/unit/exampleQuestions.entrypoint.test.jsx) corra en CADA PR.
+#
+# Política del operador ("esto debe probarse cada vez que valga la pena"): el
+# job corre SIEMPRE en PRs a main y en push a main — es barato (~1 min, sin GPU,
+# sin red). Los `paths` de abajo NO restringen la ejecución (corre siempre);
+# están documentados como la SUPERFICIE del agente que, al cambiar, hace
+# imprescindible este gate: si tocás el AgentScreen, los guards de salida, el
+# filtro de voseo, el agentService o los componentes de chips, este test debe
+# pasar antes del merge.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# Superficie del agente cubierta por este gate (referencia, no filtro):
+#   - src/components/AgentScreen/**
+#   - src/services/outputGuards.js
+#   - src/services/voseoFilter.js
+#   - src/services/agentService.js
+#   - src/components/QuickChipsBar.jsx
+#   - src/components/AgentScreen/SuggestedActions.jsx
+#   - src/components/dashboard/AgentHero.jsx
+#   - tests/unit/exampleQuestions.*
+
+jobs:
+  unit:
+    name: vitest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm run test:unit

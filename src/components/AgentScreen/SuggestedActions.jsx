@@ -1,11 +1,8 @@
 import React from 'react';
-
-const SUGGESTIONS = [
-  { text: 'Cuándo planto tomates?', icon: '🌱' },
-  { text: 'Mi planta tiene manchas amarillas', icon: '🔍' },
-  { text: 'Registra que regué las lechugas', icon: '💧' },
-  { text: 'Consejos para el invernadero', icon: '🏠' },
-];
+// Fuente única de las preguntas-ejemplo de sugerencia. Importada del módulo
+// de datos compartido para que el test del punto de acceso #1 las cubra sin
+// exportar constantes desde un componente (react-refresh/only-export-components).
+import { SUGGESTED_ACTIONS_CHIPS as SUGGESTIONS } from '../../data/exampleQuestions';
 
 export default function SuggestedActions({ onSelect }) {
   return (
