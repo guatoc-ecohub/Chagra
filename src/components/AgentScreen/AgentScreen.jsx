@@ -65,7 +65,7 @@ import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../
 // sidecarClient/deepResearchClient vía buildSidecarHeaders (defense-in-depth).
 import { getCurrentTier } from '../../services/tierService';
 import DeepResearchCard from '../DeepResearchCard';
-import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, resolveUserRegion, stripRoleLeak } from '../../services/agentService';
+import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildSuggestedEntitiesContext, isLowConfidenceEntity } from '../../services/agentService';
 import { applyOutputGuards, applyTaxonomyGuard } from '../../services/outputGuards';
 import { getProfile } from '../../services/userProfileService';
 import { regionFromProfile } from '../../services/ensoContext';
@@ -1023,7 +1023,7 @@ RESPONDE SOLO a lo que el usuario preguntó usando ÚNICAMENTE los datos verific
     return { isEnum, pestsMentioned, topic };
   };
 
-  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities) => {
+  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null) => {
     const systemPrompt = getSystemPrompt();
     const analysis = analyzeQuery(query);
 
@@ -1152,8 +1152,20 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     const curatedFactsBlock = buildCuratedFactsContext({ resolvedEntities });
     const curatedFactsContext = curatedFactsBlock ? `\n\n${curatedFactsBlock}` : '';
 
+    // P4b — POSIBLES COINCIDENCIAS (baja confianza). Va al FINAL del prompt para
+    // que la regla CASO B (pedir confirmación, no afirmar) domine por recency
+    // sobre cualquier dato de altitud/viabilidad que el modelo quiera afirmar.
+    const suggestedBlock = buildSuggestedEntitiesContext({ suggestedEntities });
+
+    // P1 — gating de PRECIO no-disponible. Es la regla MÁS dominante: va de
+    // ÚLTIMA (recency máxima) para que, en una consulta de precio sin dato, el
+    // decline + orientación DANE/SIPSA/Corabastos gane sobre el bloque de
+    // entidades resueltas / viabilidad / altitud. No-op si la query no es de
+    // precio o el tool de precio sí trajo dato.
+    const priceDeclineBlock = buildPriceDeclineContext({ userMessage: query, toolEvidence });
+
     const messages = [
-      { role: 'system', content: systemPrompt + corpusContext + evidenceContext + resolvedEntitiesBlock + curatedFactsContext + seguridadContext + viabilidadContext + frostHeatContext + asociacionContext + climaContext + fincaContext + queryAnalysisBlock },
+      { role: 'system', content: systemPrompt + corpusContext + evidenceContext + resolvedEntitiesBlock + curatedFactsContext + seguridadContext + viabilidadContext + frostHeatContext + asociacionContext + climaContext + fincaContext + queryAnalysisBlock + suggestedBlock + priceDeclineBlock },
       ...(contextMemory ? [{ role: 'user', content: contextMemory }] : []),
       { role: 'user', content: query },
     ];
@@ -1342,6 +1354,11 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       // delimitado en el system prompt para grounding citable.
       let toolEvidence = null;
       let resolvedEntities = null;
+      // P4 (juez claude-cli 2026-06-02): las entidades de BAJA confianza (<0.7,
+      // p.ej. "culupa"→Gulupa fuzzy a 0.5) NO se descartan más — se separan en
+      // este bucket para presentarlas como SUGERENCIA (CASO B) en vez de
+      // afirmarlas como hecho.
+      let suggestedEntities = null;
       if (isOnline && isSidecarEnabled()) {
         try {
           // PASO 1 — pre-validation AGE (DR taxonómico Tier 1 B, PR #59).
@@ -1357,17 +1374,27 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
           const resolved = await resolveEntities(textForLLM, { fincaAltitud: reAltitud });
           const tRE1 = performance.now();
           if (resolved && Array.isArray(resolved.entities) && resolved.entities.length > 0) {
-            // Solo nos quedamos con confidence >= 0.7 para no contaminar con
-            // matches dudosos (resolve-entities devuelve hasta confidence 0.5).
-            const filtered = resolved.entities.filter((e) => (e.confidence ?? 0) >= 0.7);
-            if (filtered.length > 0) {
-              resolvedEntities = filtered;
-              console.debug('[sidecar] resolve-entities', {
-                count: filtered.length,
-                latencyMs: Math.round(tRE1 - tRE0),
-                entities: filtered.map((e) => `${e.mentioned}→${e.canonical_id}`),
-              });
+            // P4: dos buckets. Las de confianza ALTA (>=0.7, sin flag de baja
+            // confianza) van como ENTIDADES RESUELTAS canónicas y alimentan los
+            // bloques de viabilidad/altitud/companions. Las de baja confianza
+            // (low_confidence/suggested/fuzzy/ambiguous o confidence <0.7) NO se
+            // tiran: van a `suggestedEntities` como POSIBLES COINCIDENCIAS que
+            // gatillan CASO B (pedir confirmación), NUNCA como hecho.
+            const canonical = resolved.entities.filter((e) => !isLowConfidenceEntity(e));
+            const suggested = resolved.entities.filter((e) => isLowConfidenceEntity(e));
+            if (canonical.length > 0) {
+              resolvedEntities = canonical;
             }
+            if (suggested.length > 0) {
+              suggestedEntities = suggested;
+            }
+            console.debug('[sidecar] resolve-entities', {
+              canonical: canonical.length,
+              suggested: suggested.length,
+              latencyMs: Math.round(tRE1 - tRE0),
+              entities: canonical.map((e) => `${e.mentioned}→${e.canonical_id}`),
+              suggestedEntities: suggested.map((e) => `${e.mentioned}→${e.canonical_id}@${e.confidence}`),
+            });
           }
 
           // PASO 2 — routing del tool.
@@ -1546,7 +1573,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         }
       }
 
-      const rawResponse = await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities);
+      const rawResponse = await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities);
       // DR-LANG-1: filtro post-process anti-voseo argentino. Es la última
       // línea de defensa estructural — garantiza que el léxico rioplatense
       // (che, laburar, etc.) NUNCA llegue al usuario campesino colombiano,

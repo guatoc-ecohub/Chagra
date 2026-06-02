@@ -13,6 +13,7 @@
  */
 
 import { getRegionFromDepartment } from './regionalismsService.js';
+import { classifyQueryIntent } from './outputGuards.js';
 import {
   isInCaucaRegion as _isInCaucaRegion,
   normalizeUserInput as _normalizeCauca,
@@ -1409,4 +1410,168 @@ ${lines.join('\n')}
 
 INSTRUCCIÓN: usa este contexto para responder específico a la finca del usuario SIN pedirle que repita dónde está, qué clima tiene o qué siembra. Si menciona una planta/cultivo que ya tiene registrado, tenlo en cuenta. Ajusta siembra, manejo y recomendaciones a su altitud, piso térmico, temporada y clima. NO enumeres estos datos como preámbulo: solo menciona los que la pregunta concreta requiera.
 === FIN CONTEXTO AMBIENTAL ===`;
+}
+
+// ── P1: gating de PRECIO no-disponible (regla DOMINANTE de recency) ─────────
+
+/**
+ * Detecta si una evidencia de tool corresponde a una consulta de PRECIO que NO
+ * está disponible (SIPSA dataset federado como ZIP, no consulta directa). El
+ * sidecar devuelve `{available:false, ...}` para get_precio_sipsa. Acepta tanto
+ * la forma simple ({tool, result}) como el array de tool_chain (D2 #246).
+ *
+ * @param {object|Array<object>|null} toolEvidence
+ * @returns {boolean}
+ */
+function _hasUnavailablePriceEvidence(toolEvidence) {
+  const isPriceMiss = (ev) => {
+    if (!ev || typeof ev !== 'object') return false;
+    const toolName = String(ev.tool || '').toLowerCase();
+    const r = ev.result;
+    if (!r || typeof r !== 'object') return false;
+    const unavailable = r.available === false;
+    // El tool de precio es get_precio_sipsa; aceptamos cualquier variante que
+    // contenga "precio" o "sipsa" por robustez ante renombres futuros.
+    const isPriceTool = toolName.includes('precio') || toolName.includes('sipsa');
+    return isPriceTool && unavailable;
+  };
+  if (Array.isArray(toolEvidence)) return toolEvidence.some(isPriceMiss);
+  return isPriceMiss(toolEvidence);
+}
+
+/**
+ * buildPriceDeclineContext — bloque de instrucción DOMINANTE para el caso P1
+ * (FALLA juez claude-cli 2026-06-02): "¿a cómo está la papa?" rutea bien a
+ * get_precio_sipsa, la evidencia dice no-disponible, pero granite IGNORA la
+ * señal de precio y divaga sobre viabilidad/altitud de las entidades-papa
+ * resueltas (no inventa precio —bien— pero NO declina ni menciona DANE/SIPSA).
+ *
+ * Causa: el bloque de precio (evidenceContext) va al PRINCIPIO del system
+ * message y queda sepultado bajo la cascada de bloques de entidades/viabilidad/
+ * altitud. Este bloque se inyecta al FINAL del prompt (recency) y se declara
+ * de MÁXIMA PRIORIDAD: para una consulta de precio sin dato, declinar el precio
+ * + orientar a DANE/SIPSA/Corabastos GANA sobre cualquier dato de viabilidad.
+ *
+ * Solo emite cuando AMBAS condiciones se cumplen:
+ *   - la query es intent de PRECIO (classifyQueryIntent === 'precio'), y
+ *   - la evidencia de precio dice no-disponible (available:false).
+ * En cualquier otro caso devuelve '' (no-op, no contamina el prompt).
+ *
+ * @param {object} args
+ * @param {string|null|undefined} args.userMessage — la pregunta del usuario.
+ * @param {object|Array<object>|null} args.toolEvidence — evidencia del sidecar.
+ * @returns {string}
+ */
+export function buildPriceDeclineContext({ userMessage = null, toolEvidence = null } = {}) {
+  if (classifyQueryIntent(userMessage) !== 'precio') return '';
+  if (!_hasUnavailablePriceEvidence(toolEvidence)) return '';
+  return `
+
+=== REGLA DE MÁXIMA PRIORIDAD — CONSULTA DE PRECIO SIN DATO DISPONIBLE ===
+El usuario preguntó por un PRECIO / valor de mercado, y la fuente de precios
+(SIPSA del DANE) NO tiene un dato consultable en este momento (el boletín se
+publica como archivo ZIP federado, no como consulta directa).
+
+ESTA REGLA DOMINA SOBRE CUALQUIER OTRO BLOQUE de este prompt (entidades
+resueltas, viabilidad, altitud, asociaciones, clima). Para ESTA respuesta:
+
+1. DECLINA dar un precio. Di con claridad que NO tienes el precio actualizado
+   y que NUNCA inventas precios.
+2. ORIENTA al usuario a la fuente real: el boletín SIPSA/DANE (precios
+   mayoristas) o una consulta directa en la central de abastos más cercana
+   (p. ej. Corabastos en Bogotá, o la plaza/central mayorista de su región).
+3. NO respondas sobre viabilidad, altitud, clima ni asociaciones del cultivo a
+   menos que el usuario lo haya pedido EXPLÍCITAMENTE en este mismo mensaje. La
+   pregunta fue de PRECIO; no la conviertas en una respuesta de siembra.
+4. Puedes ofrecer, en UNA frase, ayudar con otra cosa del cultivo si lo desea.
+
+Ejemplo correcto:
+Usuario: "¿a cómo está la papa?"
+✓ "No tengo el precio actualizado de la papa y no me invento precios. Para un
+   dato confiable consulta el boletín de precios mayoristas SIPSA del DANE, o
+   pregunta directamente en una central de abastos como Corabastos. Si quieres,
+   te ayudo con la siembra o el manejo de la papa."
+=== FIN REGLA DE PRECIO ===`;
+}
+
+// ── P4b: entidades de BAJA confianza como SUGERENCIA (gatilla CASO B) ───────
+
+/**
+ * Umbral de confianza alineado con el sidecar (LOW_CONFIDENCE_THRESHOLD) y con
+ * el filtro histórico del PWA. Entidades con confidence < este valor NO se
+ * presentan como canónicas: se presentan como SUGERENCIA y el prompt obliga a
+ * preguntar (CASO B) en vez de afirmar.
+ */
+export const LOW_CONFIDENCE_THRESHOLD = 0.7;
+
+/**
+ * isLowConfidenceEntity — ¿debe tratarse esta entidad como SUGERENCIA (no como
+ * hecho)? True si el sidecar la marcó `low_confidence`/`suggested`/`fuzzy`/
+ * `ambiguous`, o si su confidence cae por debajo del umbral. Defensivo ante
+ * sidecars viejos que aún no emiten el flag `low_confidence`.
+ *
+ * @param {object} e
+ * @returns {boolean}
+ */
+export function isLowConfidenceEntity(e) {
+  if (!e || typeof e !== 'object') return false;
+  if (e.low_confidence === true || e.suggested === true || e.fuzzy === true || e.ambiguous === true) {
+    return true;
+  }
+  const c = typeof e.confidence === 'number' ? e.confidence : 0;
+  return c < LOW_CONFIDENCE_THRESHOLD;
+}
+
+/**
+ * buildSuggestedEntitiesContext — bloque para el caso P4 (FALLA juez claude-cli
+ * 2026-06-02): "dame la altitud de Culupa" → el sidecar resuelve "culupa"→
+ * Gulupa a confidence ~0.5 (fuzzy). Antes el PWA descartaba ese match (<0.7) y
+ * el modelo afirmaba la altitud de Gulupa como hecho SIN "¿quisiste decir
+ * Gulupa?".
+ *
+ * En vez de descartarlas, las entidades de baja confianza se presentan como
+ * POSIBLES COINCIDENCIAS (no canónicas) y el prompt obliga a CASO B (pedir
+ * confirmación) ANTES de afirmar cualquier dato de ellas. NUNCA se afirma su
+ * altitud / nombre científico / viabilidad como hecho.
+ *
+ * @param {object} args
+ * @param {Array<object>|null} args.suggestedEntities — entidades < umbral.
+ * @returns {string}
+ */
+export function buildSuggestedEntitiesContext({ suggestedEntities = null } = {}) {
+  if (!Array.isArray(suggestedEntities) || suggestedEntities.length === 0) return '';
+  const lineas = [];
+  const seen = new Set();
+  for (const e of suggestedEntities) {
+    if (!e || typeof e !== 'object') continue;
+    const mentioned = (e.mentioned || '').toString().trim();
+    const nombre = (e.nombre_comun || '').toString().trim();
+    if (!nombre) continue;
+    const key = `${mentioned}|${nombre}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const conf = typeof e.confidence === 'number' ? e.confidence.toFixed(2) : '?';
+    lineas.push(
+      `- El usuario escribió "${mentioned || nombre}" — posible coincidencia: ${nombre}${e.nombre_cientifico ? ` (${e.nombre_cientifico})` : ''} [confianza baja: ${conf}, SIN CONFIRMAR]`,
+    );
+  }
+  if (lineas.length === 0) return '';
+  return `
+
+=== POSIBLES COINCIDENCIAS (BAJA CONFIANZA — NO confirmadas, NO son hechos) ===
+El usuario mencionó términos que el catálogo NO resolvió con certeza. Lo de
+abajo son CONJETURAS por similitud (typo o nombre regional), NO equivalencias
+verificadas:
+
+${lineas.join('\n')}
+
+REGLA DE MÁXIMA PRIORIDAD (CASO B obligatorio):
+1. NO afirmes ningún dato (altitud, temperatura, nombre científico, viabilidad,
+   manejo) de estas posibles coincidencias como si fueran un hecho.
+2. PRIMERO pregunta para confirmar, con el formato CASO B: "No estoy seguro de
+   '[lo que escribió]'. ¿Quisiste decir [posible coincidencia]? Si es otra cosa,
+   cuéntame qué planta es y te ayudo." — y DETENTE ahí para esa entidad.
+3. Solo si el usuario confirma podrás responder con los datos de esa especie.
+4. ES PREFERIBLE PREGUNTAR QUE AFIRMAR LA EQUIVOCADA.
+=== FIN POSIBLES COINCIDENCIAS ===`;
 }
