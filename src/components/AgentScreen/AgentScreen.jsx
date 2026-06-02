@@ -56,7 +56,11 @@ import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities,
 // la intención forzada del chip → tool determinístico, SALTANDO el NLU
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
 // los chips cuyo backend aún no existe (precio/deep).
-import { planForcedIntent, isStubIntent, CHIP_DEFS } from '../../services/chipIntentRouter';
+import { planForcedIntent, isStubIntent, isDeepResearchIntent, CHIP_DEFS } from '../../services/chipIntentRouter';
+// Deep Research (A6/A7): cliente HTTP del endpoint async de investigación
+// profunda del sidecar. Feature flag VITE_DEEP_RESEARCH_ENABLED (default false).
+import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../../services/deepResearchClient';
+import DeepResearchCard from '../DeepResearchCard';
 import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, resolveUserRegion, stripRoleLeak } from '../../services/agentService';
 import { applyOutputGuards, applyTaxonomyGuard } from '../../services/outputGuards';
 import { getProfile } from '../../services/userProfileService';
@@ -188,6 +192,10 @@ export default function AgentScreen({ onBack, initialContext }) {
   // input también cambia para guiar al campesino sobre qué escribir. Es un
   // toggle: tocar el mismo chip lo desactiva (vuelve al routing NLU normal).
   const [activeIntent, setActiveIntent] = useState(null);
+  // Deep Research (A6/A7): refs para los AbortControllers de los jobs en vuelo.
+  // Guardamos en un Map (msgId → AbortController) para poder cancelar jobs
+  // individuales. Al desmontar el componente cancelamos todos.
+  const deepResearchControllersRef = useRef(new Map());
 
   const { durationMs, start: startRecord, stop: stopRecord, reset: resetRecord } = useVoiceRecorder();
   const chatEndRef = useRef(null);
@@ -1852,11 +1860,174 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     await handleSubmit(prompt);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Deep Research (A6/A7): cancela el job en vuelo del card identificado por msgId.
+  const handleCancelDeepResearch = useCallback((msgId) => {
+    const ctrl = deepResearchControllersRef.current.get(msgId);
+    if (ctrl) {
+      ctrl.abort();
+      deepResearchControllersRef.current.delete(msgId);
+    }
+    // Marcar el card como cancelado en el historial
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.id === msgId && m._deepResearch
+          ? { ...m, _deepResearch: { ...m._deepResearch, status: 'error' } }
+          : m,
+      ),
+    );
+  }, []);
+
   const handleSubmit = async (text, { fromVoice = false, suppressUserBubble = false, visionContext = null, forcedIntent = null } = {}) => {
     if (!text || !text.trim()) return;
     const trimmed = text.trim();
 
-    // CHIPS DE MODO — STUB (A3): precio/deep no tienen backend todavía. NO
+    // DEEP RESEARCH (A6/A7): chip 🔬 con backend live. Interceptamos ANTES del
+    // stub-check y del pipeline NLU. Lanzamos el job async y ponemos un card
+    // de progreso en el chat que se actualiza vía polling hasta status=done.
+    // Gate: VITE_DEEP_RESEARCH_ENABLED + online. Si la flag está off o no hay
+    // conexión, devuelve el mensaje honesto de no disponibilidad.
+    if (forcedIntent && isDeepResearchIntent(forcedIntent)) {
+      const userMessage = { role: 'user', content: trimmed, timestamp: Date.now() };
+      setMessages((prev) => [...prev, userMessage]);
+      try {
+        await addTurn(operatorId, { role: 'user', content: trimmed });
+      } catch (e) {
+        console.warn('[DeepResearch] addTurn user failed:', e?.message);
+      }
+      setActiveIntent(null);
+
+      // Gate: feature flag + online
+      if (!isDeepResearchEnabled()) {
+        const notAvailMsg = {
+          role: 'assistant',
+          content: '',
+          timestamp: Date.now(),
+          _deepResearch: { status: 'disabled', steps: [], report: '', citations: [], query: trimmed },
+        };
+        setMessages((prev) => [...prev, notAvailMsg]);
+        return;
+      }
+      if (!navigator.onLine) {
+        const offlineMsg = {
+          role: 'assistant',
+          content: '',
+          timestamp: Date.now(),
+          _deepResearch: { status: 'offline', steps: [], report: '', citations: [], query: trimmed },
+        };
+        setMessages((prev) => [...prev, offlineMsg]);
+        return;
+      }
+
+      // Añadir card de progreso con status 'submitting'
+      const drMsgId = `dr-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const progressMsg = {
+        id: drMsgId,
+        role: 'assistant',
+        content: '',
+        timestamp: Date.now(),
+        _deepResearch: { status: 'submitting', steps: [], report: '', citations: [], query: trimmed },
+      };
+      setMessages((prev) => [...prev, progressMsg]);
+
+      // Lanzar el job async — NO esperamos el resultado para no bloquear el UI
+      (async () => {
+        const controller = new AbortController();
+        deepResearchControllersRef.current.set(drMsgId, controller);
+
+        try {
+          const jobResult = await submitDeepResearch(trimmed);
+          if (!jobResult || !jobResult.job_id) {
+            // submit falló
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === drMsgId
+                  ? { ...m, _deepResearch: { ...m._deepResearch, status: 'error' } }
+                  : m,
+              ),
+            );
+            return;
+          }
+
+          // Cambiar a 'running'
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === drMsgId
+                ? { ...m, _deepResearch: { ...m._deepResearch, status: 'running' } }
+                : m,
+            ),
+          );
+
+          // Polling hasta done/error/cancel
+          const finalResult = await pollDeepResearch(
+            jobResult.job_id,
+            (steps, status) => {
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === drMsgId
+                    ? { ...m, _deepResearch: { ...m._deepResearch, steps, status } }
+                    : m,
+                ),
+              );
+            },
+            controller.signal,
+          );
+
+          if (controller.signal.aborted) return;
+
+          if (finalResult) {
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === drMsgId
+                  ? {
+                    ...m,
+                    _deepResearch: {
+                      status: finalResult.status,
+                      steps: finalResult.steps,
+                      report: finalResult.report,
+                      citations: finalResult.citations,
+                      query: trimmed,
+                    },
+                  }
+                  : m,
+              ),
+            );
+            // Persistir el informe en la memoria de conversación
+            if (finalResult.report) {
+              const reportContent = `[Investigación profunda] ${trimmed}\n\n${finalResult.report}`;
+              try {
+                await addTurn(operatorId, { role: 'assistant', content: reportContent });
+              } catch (e) {
+                console.warn('[DeepResearch] addTurn report failed:', e?.message);
+              }
+            }
+          } else {
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === drMsgId
+                  ? { ...m, _deepResearch: { ...m._deepResearch, status: 'error' } }
+                  : m,
+              ),
+            );
+          }
+        } catch (e) {
+          if (!controller.signal.aborted) {
+            console.warn('[DeepResearch] job failed:', e?.message);
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === drMsgId
+                  ? { ...m, _deepResearch: { ...m._deepResearch, status: 'error' } }
+                  : m,
+              ),
+            );
+          }
+        } finally {
+          deepResearchControllersRef.current.delete(drMsgId);
+        }
+      })();
+      return;
+    }
+
+    // CHIPS DE MODO — STUB (A3): precio no tiene backend todavía. NO
     // routeamos a un tool fantasma ni gastamos una inferencia del LLM:
     // pintamos la pregunta del usuario + una respuesta honesta "aún no
     // disponible" y salimos. Esto evita el misrouting del NLU (que mandaba
@@ -2073,6 +2244,17 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       for (const url of urls) {
         try { URL.revokeObjectURL(url); } catch { /* noop */ }
       }
+    };
+  }, []);
+
+  // Deep Research (A6/A7): cancelar todos los jobs en vuelo al desmontar.
+  useEffect(() => {
+    const controllers = deepResearchControllersRef.current;
+    return () => {
+      for (const ctrl of controllers.values()) {
+        try { ctrl.abort(); } catch { /* noop */ }
+      }
+      controllers.clear();
     };
   }, []);
 
@@ -2372,6 +2554,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         isStreaming={state === STATE_THINKING}
         onConsentNeeded={handleFeedbackConsentNeeded}
         onRetryOrphan={handleRetryOrphan}
+        onCancelDeepResearch={handleCancelDeepResearch}
       />
 
       {/* Error */}

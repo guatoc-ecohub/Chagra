@@ -4,6 +4,7 @@ import {
   CHIP_DEFS,
   planForcedIntent,
   isStubIntent,
+  isDeepResearchIntent,
 } from '../chipIntentRouter.js';
 
 /**
@@ -145,22 +146,46 @@ describe('chipIntentRouter — intents STUB (backend no existe aún)', () => {
     expect(plan.skipNlu).toBe(true);
   });
 
-  it('deep → stub claro "aún no disponible" (investigación profunda)', () => {
-    const plan = planForcedIntent('deep', 'sistema agroforestal cacao');
-    expect(plan.intent).toBe('deep');
-    expect(plan.stub).toBe(true);
-    expect(plan.tool).toBeNull();
-    expect(typeof plan.stubMessage).toBe('string');
-    expect(plan.skipNlu).toBe(true);
-  });
-
-  it('isStubIntent reconoce precio y deep como stub', () => {
+  it('isStubIntent reconoce precio como stub y deep como NO stub (backend live)', () => {
     expect(isStubIntent('precio')).toBe(true);
-    expect(isStubIntent('deep')).toBe(true);
+    // Deep Research ya tiene backend live — ya NO es stub
+    expect(isStubIntent('deep')).toBe(false);
     expect(isStubIntent('siembro')).toBe(false);
     expect(isStubIntent('plaga')).toBe(false);
     expect(isStubIntent('clima')).toBe(false);
     expect(isStubIntent('xxx')).toBe(false);
+  });
+});
+
+describe('chipIntentRouter — Deep Research (A6/A7, backend live)', () => {
+  it('deep → plan con deep=true + skipNlu + tool null (el AgentScreen lo intercepta)', () => {
+    const plan = planForcedIntent('deep', 'sistema agroforestal cacao');
+    expect(plan.intent).toBe('deep');
+    expect(plan.deep).toBe(true);
+    expect(plan.stub).toBe(false);
+    expect(plan.tool).toBeNull();
+    expect(plan.stubMessage).toBeNull();
+    expect(plan.skipNlu).toBe(true);
+    expect(plan.prompt).toBe('sistema agroforestal cacao');
+  });
+
+  it('isDeepResearchIntent reconoce solo el intent deep', () => {
+    expect(isDeepResearchIntent('deep')).toBe(true);
+    expect(isDeepResearchIntent('precio')).toBe(false);
+    expect(isDeepResearchIntent('siembro')).toBe(false);
+    expect(isDeepResearchIntent('plaga')).toBe(false);
+    expect(isDeepResearchIntent('clima')).toBe(false);
+    expect(isDeepResearchIntent('xxx')).toBe(false);
+    expect(isDeepResearchIntent(null)).toBe(false);
+    expect(isDeepResearchIntent(undefined)).toBe(false);
+  });
+
+  it('deep chip tiene kind=deep en CHIP_DEFS (no stub)', () => {
+    const deepDef = CHIP_DEFS.find((d) => d.intent === 'deep');
+    expect(deepDef).toBeTruthy();
+    expect(deepDef.kind).toBe('deep');
+    // Ya no tiene stubMessage
+    expect(deepDef.stubMessage).toBeUndefined();
   });
 });
 
