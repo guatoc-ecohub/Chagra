@@ -612,6 +612,11 @@ describe('guardDoseWithoutSource', () => {
 // — eso es CURUBA. El guard corrige con el binomio autoritativo del catálogo.
 // ──────────────────────────────────────────────────────────────────────────
 describe('guardSpeciesSubstitution', () => {
+  // A10 (2026-06-02): el culprit debe ser un binomio REAL del catálogo. La curuba
+  // (Passiflora tripartita) entra al universo del grounding como entidad resuelta
+  // de otra especie → el guard puede confirmar que "Passiflora tripartita" es una
+  // especie real mal atribuida al lulo (no prosa/alucinación). Sin esto, un par
+  // latino que no exista en el catálogo NO dispara (conservador).
   const luloResolved = [
     {
       mentioned: 'lulo',
@@ -620,6 +625,14 @@ describe('guardSpeciesSubstitution', () => {
       nombre_cientifico: 'Solanum quitoense Lam.',
       canonical_id: 'solanum_quitoense',
       confidence: 0.95,
+    },
+    {
+      mentioned: 'curuba',
+      kind: 'species',
+      nombre_comun: 'Curuba',
+      nombre_cientifico: 'Passiflora tripartita var. mollissima (Kunth) Holm-Niels.',
+      canonical_id: 'passiflora_tripartita',
+      confidence: 0.9,
     },
   ];
 
@@ -725,6 +738,12 @@ describe('guardSpeciesSubstitution', () => {
 // grounding autoritativo.
 // ──────────────────────────────────────────────────────────────────────────
 describe('guardCompanionBinomial', () => {
+  // A10 (2026-06-02): el culprit debe ser un binomio REAL del catálogo. Los
+  // binomios que el modelo sustituye en el bench (Quercus molinae, Calendula
+  // officinalis) entran al universo del grounding como especies reales (otros
+  // companions del catálogo), para que el guard confirme que SON reales y solo
+  // están mal atribuidos — no prosa/alucinación. Un binomio que no exista en el
+  // catálogo NO dispara (conservador).
   const papaResolved = [
     {
       mentioned: 'papa',
@@ -739,12 +758,26 @@ describe('guardCompanionBinomial', () => {
           nombre_comun: 'Nogal andino',
           nombre_cientifico: 'Juglans neotropica Diels',
         },
+        // Roble andino real del catálogo: su binomio (Quercus molinae) es el que
+        // el modelo le endilga por error al Nogal andino en el caso del bench.
+        {
+          canonical_id: 'quercus_molinae',
+          nombre_comun: 'Roble andino',
+          nombre_cientifico: 'Quercus molinae',
+        },
       ],
       companions: [
         {
           canonical_id: 'tagetes_erecta',
           nombre_comun: 'Caléndula',
           nombre_cientifico: 'Tagetes erecta L.',
+        },
+        // Caléndula europea real del catálogo: su binomio (Calendula officinalis)
+        // es el que el modelo confunde con la Caléndula=Tagetes erecta.
+        {
+          canonical_id: 'calendula_officinalis',
+          nombre_comun: 'Caléndula europea',
+          nombre_cientifico: 'Calendula officinalis L.',
         },
       ],
     },
@@ -1173,6 +1206,16 @@ describe('applyOutputGuards (cadena)', () => {
         nombre_comun: 'Lulo',
         nombre_cientifico: 'Solanum quitoense Lam.',
         canonical_id: 'solanum_quitoense',
+      },
+      // A10: la curuba (Passiflora tripartita) entra al universo como especie
+      // real del catálogo → el guard confirma que el binomio mal atribuido al
+      // lulo es de una especie real (no prosa) y corrige.
+      {
+        mentioned: 'curuba',
+        kind: 'species',
+        nombre_comun: 'Curuba',
+        nombre_cientifico: 'Passiflora tripartita var. mollissima (Kunth) Holm-Niels.',
+        canonical_id: 'passiflora_tripartita',
       },
     ];
     const llmFail = 'El lulo (Passiflora tripartita var. mollissima) crece en clima frío.';

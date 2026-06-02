@@ -1522,6 +1522,12 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         profileName: guardProfileName,
         forecastTempMin,
         forecastTempMax,
+        // A12 (cierra bug prod 2026-06-02): la pregunta CRUDA del usuario. Si es
+        // de PRECIO/MERCADO ("¿a cómo está la papa?") los guards de SIEMBRA NO
+        // corren —razonan sobre viabilidad de cultivo, irrelevante a un precio—,
+        // evitando la cascada de "NO es viable a N msnm" por cada variedad. Los
+        // guards de SAFETY (agroquímico, dosis, visión, nombre) corren igual.
+        userMessage: text,
       });
       if (guarded.modified) {
         console.debug('[guards] salida corregida', { reasons: guarded.reasons });
