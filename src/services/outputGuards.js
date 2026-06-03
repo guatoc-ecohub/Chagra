@@ -4272,6 +4272,211 @@ export function guardPestIntegratedManagement(responseText, { userMessage = null
   };
 }
 
+// ── GUARD: superficie de ConfusionWarning CRÍTICA del grounding ─────────────
+
+/**
+ * Léxico de RIESGO TÓXICO. Si el `meaning_correct` / `explanation` de una
+ * ConfusionWarning critical menciona alguno de estos términos, la confusión es
+ * de las que pueden ENVENENAR (yuca brava→cianuro, borrachero→escopolamina,
+ * higuerilla→ricina, barbasco→rotenona…). Estas se priorizan: su advertencia se
+ * inyecta SIEMPRE de forma prominente. (Lista determinística, no exhaustiva del
+ * dominio; cubre las moléculas tóxicas que aparecen en las CW del grafo.)
+ */
+const TOXIC_RISK_TERMS = [
+  'cianuro',
+  'cianogenic',
+  'escopolamina',
+  'atropina',
+  'alcaloide',
+  'tropanic',
+  'ricina',
+  'rotenona',
+  'glucosinolat',
+  'oxalato',
+  'saponina',
+  'toxic', // tóxico/tóxica (post _stripDiacritics → "toxic")
+  'venenos',
+  'envenenamiento',
+  'mortal',
+  'letal',
+];
+
+/**
+ * Términos que, presentes en la RESPUESTA del LLM, indican que ya cubrió el
+ * riesgo de la confusión tóxica (anti-falso-positivo: no duplicamos la
+ * advertencia). Incluye la molécula y la consigna de procesamiento.
+ */
+const CONFUSION_COVERED_TERMS = [
+  'cianuro',
+  'escopolamina',
+  'ricina',
+  'rotenona',
+  'toxic', // tóxico/tóxica
+  'venenos',
+  'detoxif',
+  'envenenamiento',
+];
+
+/** Marca/prefijo idempotente del guard de superficie de confusión. */
+const CONFUSION_SAFETY_PREFIX = '⚠️ Ojo de seguridad:';
+
+/**
+ * Extrae el primer término tóxico nombrado en el texto de la CW (para forzarlo
+ * en la advertencia inyectada — p. ej. "cianuro"). Devuelve el término humano
+ * (con su forma habitual), o null si la CW no nombra una molécula conocida.
+ *
+ * @param {string} cwNorm  texto de la CW ya normalizado (sin tildes, lower).
+ * @returns {string|null}
+ */
+function _namedToxin(cwNorm) {
+  if (cwNorm.includes('cianuro') || cwNorm.includes('cianogenic')) return 'cianuro';
+  if (cwNorm.includes('escopolamina')) return 'escopolamina';
+  if (cwNorm.includes('atropina')) return 'atropina';
+  if (cwNorm.includes('ricina')) return 'ricina';
+  if (cwNorm.includes('rotenona')) return 'rotenona';
+  return null;
+}
+
+/**
+ * ¿La CW (meaning_correct + explanation) describe un RIESGO TÓXICO? Sobre texto
+ * ya normalizado.
+ * @param {string} cwNorm
+ * @returns {boolean}
+ */
+function _isToxicConfusion(cwNorm) {
+  return TOXIC_RISK_TERMS.some((t) => cwNorm.includes(t));
+}
+
+/**
+ * ¿La RESPUESTA del LLM ya advierte del riesgo (molécula tóxica o consigna de
+ * detoxificación)? Anti-falso-positivo: si ya lo cubre, no inyectamos.
+ * @param {string} textNorm  respuesta del LLM normalizada.
+ * @returns {boolean}
+ */
+function _responseAlreadyWarns(textNorm) {
+  return CONFUSION_COVERED_TERMS.some((t) => textNorm.includes(t));
+}
+
+/**
+ * Construye la frase de seguridad determinística a partir de la CW. Para una
+ * confusión tóxica garantiza los 3 elementos que pide BORDE-001:
+ *   - la molécula/riesgo (cianuro, escopolamina, …),
+ *   - "no consumir cruda" (la consigna de NO consumo directo),
+ *   - "procesar/detoxificar" (la consigna de procesamiento).
+ *
+ * @param {object} cw  objeto ConfusionWarning del grounding.
+ * @returns {string}
+ */
+function _buildConfusionSafetyLine(cw) {
+  const meaningCorrect = (cw.meaning_correct || '').toString().trim();
+  const explanation = (cw.explanation || '').toString().trim();
+  const cwNorm = _stripDiacritics(`${meaningCorrect} ${explanation}`);
+  const toxin = _namedToxin(cwNorm);
+
+  // Cabeza: el significado correcto (la identidad real) + la explicación del
+  // riesgo, tal como vienen del grafo (autoridad del grounding, no inventamos).
+  const parts = [];
+  if (meaningCorrect) parts.push(meaningCorrect);
+  if (explanation && !meaningCorrect.includes(explanation)) parts.push(explanation);
+  let line = parts.join('. ');
+  if (line && !/[.!?]$/.test(line)) line += '.';
+
+  // Refuerzo determinístico de las 2 consignas de seguridad que el LLM omite:
+  // (1) no consumir cruda/sin procesar, (2) procesar/detoxificar antes.
+  // Garantizamos la molécula explícita aunque la CW la traiga implícita.
+  if (toxin && !_stripDiacritics(line).includes(toxin)) {
+    line += ` Contiene ${toxin}.`;
+  }
+  line +=
+    ' NO se debe consumir cruda ni sin procesar; hay que detoxificarla/procesarla' +
+    ' (rallar, lavar y cocinar bien) antes de cualquier uso. Ante la duda, no la consuma.';
+
+  return `${CONFUSION_SAFETY_PREFIX} ${line}`;
+}
+
+/**
+ * guardSurfaceConfusionWarning — GUARD SAFETY-CRITICAL que SUPERFICIE en la
+ * RESPUESTA la ConfusionWarning CRÍTICA que el resolver de entidades (#172) ya
+ * adjuntó al grounding pero que el LLM no repitió de forma confiable.
+ *
+ * Causa raíz (BORDE-001, 2026-06-03): el grounding de "yuca brava" trae
+ * `confusion_warning:[{severity:'critical', meaning_correct:'Yuca amarga (alta
+ * cianuro) requiere detoxificación …', explanation:'… envenenamiento por
+ * cianuro'}]`, pero granite NO echaba la advertencia tóxica → la respuesta a
+ * "la doy rallada en jugo crudo" salía SIN cianuro / sin "no cruda" / sin
+ * "procesar" (must 0/3). Un campesino que pregunta por yuca brava DEBE oír el
+ * riesgo de cianuro: no podemos depender de que el LLM lo repita.
+ *
+ * Comportamiento:
+ *  - Recorre `resolvedEntities`; por cada `confusion_warning[]` de severity
+ *    `critical` que describa un RIESGO TÓXICO (cianuro/escopolamina/ricina/
+ *    rotenona/…), si la RESPUESTA no lo cubre ya, ANTEPONE una frase de
+ *    seguridad determinística (prefijo "⚠️ Ojo de seguridad: …"). ADITIVO:
+ *    deja el cuerpo del LLM intacto debajo.
+ *  - Prioriza la primera CW tóxica encontrada (una sola línea de seguridad,
+ *    sin saturar). Si hay varias entidades tóxicas, la primera lidera.
+ *
+ * Anti-falso-positivo:
+ *  - Entidad SIN confusion_warning → no dispara.
+ *  - severity NO-critical → no inyecta el prefijo de seguridad (las confusiones
+ *    informativas —lulo==naranjilla— no son safety; se resuelven en el grounding).
+ *  - La respuesta YA menciona el riesgo (cianuro/tóxico/detoxificar) → no duplica.
+ *  - Idempotente: si el prefijo ya está, no re-dispara.
+ *
+ * Determinístico: la línea sale del propio grounding (meaning_correct +
+ * explanation del grafo) + dos consignas fijas de no-consumo/procesamiento. No
+ * inventa hechos; refuerza los que el grafo ya validó.
+ *
+ * Firma propia (necesita las entidades resueltas, no transformadas) → se invoca
+ * aparte en applyOutputGuards, fuera de GUARD_CHAIN.
+ *
+ * @param {string} responseText
+ * @param {Array<object>|null} resolvedEntities  grounding del turno (con CW).
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardSurfaceConfusionWarning(responseText, resolvedEntities = null) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (!Array.isArray(resolvedEntities) || resolvedEntities.length === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  // Idempotencia barata: si nuestro prefijo ya está, no re-disparamos.
+  if (responseText.includes(CONFUSION_SAFETY_PREFIX)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Anti-FP: si la respuesta YA advierte del riesgo tóxico, no duplicamos.
+  const textNorm = _stripDiacritics(responseText);
+  if (_responseAlreadyWarns(textNorm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Busca la PRIMERA ConfusionWarning critical + tóxica del grounding.
+  for (const e of resolvedEntities) {
+    if (!e || typeof e !== 'object') continue;
+    const warnings = Array.isArray(e.confusion_warning) ? e.confusion_warning : [];
+    for (const cw of warnings) {
+      if (!cw || typeof cw !== 'object') continue;
+      if (String(cw.severity || '').toLowerCase() !== 'critical') continue;
+      const cwNorm = _stripDiacritics(`${cw.meaning_correct || ''} ${cw.explanation || ''}`);
+      if (!_isToxicConfusion(cwNorm)) continue;
+
+      bumpGuardTelemetry('confusionWarningSurface');
+      const safetyLine = _buildConfusionSafetyLine(cw);
+      const text = `${safetyLine}\n\n${responseText.trim()}`;
+      const cwId = cw.id || cw.label_ambiguo || e.canonical_id || e.mentioned || 'desconocida';
+      return {
+        text,
+        modified: true,
+        reason: `confusion_warning_critical: ${cwId}`,
+      };
+    }
+  }
+
+  return { text: responseText, modified: false, reason: null };
+}
+
 /**
  * Set de guards que SOLO tienen sentido cuando la consulta es de SIEMBRA
  * (A12). Si la pregunta del usuario es de PRECIO/MERCADO (o info general sin
@@ -4560,6 +4765,21 @@ export function applyOutputGuards(
     text = reforestNativasRes.text;
     modified = true;
     if (reforestNativasRes.reason) reasons.push(reforestNativasRes.reason);
+  }
+  // Guard SAFETY-CRITICAL de superficie de ConfusionWarning (BORDE-001 ·
+  // cianuro/escopolamina/ricina/rotenona): firma propia (necesita las entidades
+  // resueltas SIN transformar, con su `confusion_warning[]`). Corre AL FINAL, tras
+  // todos los demás guards, para que su prefijo "⚠️ Ojo de seguridad:" lidere la
+  // respuesta final (lo PRIMERO que oye el campesino) y no quede sepultado por
+  // anexos posteriores. ADITIVO: deja el cuerpo intacto debajo. Determinístico: la
+  // advertencia tóxica sale del grounding, NO de que el LLM la repita. Usa
+  // `resolvedEntities` crudo (no `entities` filtrado) porque la CW vive en la
+  // entidad tal como la resolvió el sidecar.
+  const cwRes = guardSurfaceConfusionWarning(text, resolvedEntities);
+  if (cwRes && cwRes.modified) {
+    text = cwRes.text;
+    modified = true;
+    if (cwRes.reason) reasons.push(cwRes.reason);
   }
   return { text, modified, reasons };
 }
