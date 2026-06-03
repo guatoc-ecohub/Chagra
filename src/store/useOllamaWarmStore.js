@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { DEFAULT_MODEL } from '../services/llmRouter';
 
 /**
  * useOllamaWarmStore — bus global de estado warm-up del modelo Ollama
@@ -16,6 +17,16 @@ import { create } from 'zustand';
  * primera interacción con el agente (el operador tiene que mirar el
  * dashboard, escoger una tile, abrir el agente — tiempo humano natural).
  *
+ * Fix cold-start (R2, 2026-06-03): el pre-warm calentaba `gemma3:4b` (el
+ * modelo de NLU del sidecar), pero el CHAT real usa `granite3.1-dense:8b`
+ * (ver `llmRouter.ROUTES.chat.model` / `DEFAULT_MODEL`). Resultado: granite
+ * quedaba frío y el primer chat sufría ~46s de cold-start. Ahora calentamos
+ * el modelo de chat real (importado de `DEFAULT_MODEL`, así nunca vuelve a
+ * diverger y respeta el override `VITE_LLM_CHAT_MODEL`) y lo pinneamos con
+ * `keep_alive=-1` (sin expiración por timer; no se descarga entre login y
+ * chat). NOTA: esto ataca el cold-start; el thrash por-turno (el NLU gemma
+ * evicta a granite, R1) es un fix aparte fuera de este scope.
+ *
  * El store es la fuente de verdad sobre si el modelo está caliente o no.
  * AgentScreen suscribe a `status` y muestra un banner pequeño "preparando
  * agente IA" si status !== 'warm'. El banner desaparece automáticamente
@@ -24,7 +35,7 @@ import { create } from 'zustand';
  * Estados:
  *   - 'unknown'  : no se ha intentado pre-warm en esta sesión (post-reload).
  *   - 'warming'  : pre-warm en vuelo. Banner visible si user entra al agente.
- *   - 'warm'     : pre-warm OK. Banner oculto. Modelo cargado por ~30 min.
+ *   - 'warm'     : pre-warm OK. Banner oculto. Modelo pinneado (keep_alive=-1).
  *   - 'failed'   : pre-warm falló (red, timeout, Ollama down). Banner
  *                  igualmente oculto — el primer request del agente caerá
  *                  al cold-start clásico y mostrará su propio progreso.
@@ -54,8 +65,9 @@ const useOllamaWarmStore = create((set, get) => ({
 
   /**
    * Dispara el pre-warm POST a `/api/ollama/api/generate` con prompt
-   * mínimo + keep_alive=30m. Fire-and-forget desde el caller (no await).
-   * El store maneja transiciones de status internamente.
+   * mínimo + keep_alive=-1 (pin permanente) sobre el modelo de CHAT
+   * (`DEFAULT_MODEL`). Fire-and-forget desde el caller (no await). El store
+   * maneja transiciones de status internamente.
    *
    * Idempotente: si ya estamos en 'warming' o 'warm', retorna sin
    * disparar nada. Solo re-dispara desde 'unknown' o 'failed'.
@@ -73,10 +85,15 @@ const useOllamaWarmStore = create((set, get) => ({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma3:4b',
+        // Modelo de CHAT real (granite3.1-dense:8b por defecto, o el override
+        // VITE_LLM_CHAT_MODEL). Antes calentaba gemma3:4b (NLU) → granite
+        // quedaba frío y el primer chat sufría el cold-start de ~46s.
+        model: DEFAULT_MODEL,
         prompt: 'ok',
         stream: false,
-        keep_alive: '30m',
+        // -1 pinnea el modelo sin expiración por timer: no se descarga de GPU
+        // entre el login y la primera interacción con el agente.
+        keep_alive: -1,
         options: { num_predict: 1 },
       }),
       signal: controller.signal,
@@ -85,7 +102,7 @@ const useOllamaWarmStore = create((set, get) => ({
         clearTimeout(timer);
         if (res.ok) {
           set({ status: 'warm', completedAt: Date.now() });
-          console.debug('[useOllamaWarmStore] gemma3:4b warm-up OK');
+          console.debug(`[useOllamaWarmStore] ${DEFAULT_MODEL} warm-up OK (pinned)`);
         } else {
           set({ status: 'failed', completedAt: Date.now() });
           console.debug('[useOllamaWarmStore] warm-up falló: HTTP', res.status);

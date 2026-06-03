@@ -1,7 +1,7 @@
 /**
  * useOllamaWarmStore — NN4 fix 2026-05-23.
  *
- * Cubre el bus global de warm-up del modelo Ollama gemma3:4b:
+ * Cubre el bus global de warm-up del modelo Ollama de CHAT:
  *   - estado inicial 'unknown'
  *   - startWarmup dispara fetch con payload correcto y transiciona
  *     'unknown' → 'warming' → 'warm' al recibir 200 OK
@@ -9,9 +9,16 @@
  *   - idempotencia: llamar startWarmup mientras está 'warming' o 'warm' NO
  *     dispara segunda request
  *   - resetWarmup vuelve al estado inicial limpio
+ *
+ * Fix cold-start (R2, 2026-06-03): el pre-warm DEBE calentar el modelo que
+ * el chat realmente usa (`DEFAULT_MODEL` de llmRouter = ROUTES.chat.model =
+ * granite3.1-dense:8b), NO el NLU (gemma3:4b). Antes calentaba gemma → el
+ * primer chat con granite caía al cold-start de ~46s. Además se pinnea con
+ * keep_alive=-1 (sin expiración por timer) en vez de '30m'.
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import useOllamaWarmStore from '../useOllamaWarmStore';
+import { DEFAULT_MODEL } from '../../services/llmRouter';
 
 describe('useOllamaWarmStore — NN4 pre-warm Ollama al login', () => {
   beforeEach(() => {
@@ -44,12 +51,37 @@ describe('useOllamaWarmStore — NN4 pre-warm Ollama al login', () => {
     expect(opts.headers).toMatchObject({ 'Content-Type': 'application/json' });
     const body = JSON.parse(opts.body);
     expect(body).toMatchObject({
-      model: 'gemma3:4b',
+      model: DEFAULT_MODEL,
       prompt: 'ok',
       stream: false,
-      keep_alive: '30m',
+      keep_alive: -1,
       options: { num_predict: 1 },
     });
+  });
+
+  it('pre-warm apunta al modelo de CHAT (granite), no al NLU (gemma)', () => {
+    fetch.mockResolvedValueOnce({ ok: true, status: 200 });
+    useOllamaWarmStore.getState().startWarmup();
+
+    const [, opts] = fetch.mock.calls[0];
+    const body = JSON.parse(opts.body);
+    // El modelo pre-calentado debe ser exactamente el del chat configurado
+    // en llmRouter (ROUTES.chat.model). Si fueran distintos, granite queda
+    // frío y el primer chat sufre el cold-start de ~46s.
+    expect(body.model).toBe(DEFAULT_MODEL);
+    expect(body.model).toBe('granite3.1-dense:8b');
+    expect(body.model).not.toBe('gemma3:4b');
+  });
+
+  it('pre-warm pinnea el modelo con keep_alive=-1 (sin expiración por timer)', () => {
+    fetch.mockResolvedValueOnce({ ok: true, status: 200 });
+    useOllamaWarmStore.getState().startWarmup();
+
+    const [, opts] = fetch.mock.calls[0];
+    const body = JSON.parse(opts.body);
+    // keep_alive=-1 mantiene el modelo cargado indefinidamente (no expira a
+    // los 30m). Evita que granite se descargue de GPU entre login y chat.
+    expect(body.keep_alive).toBe(-1);
   });
 
   it('transiciona unknown → warming → warm cuando fetch responde 200', async () => {
