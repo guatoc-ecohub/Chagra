@@ -69,7 +69,7 @@ import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../
 import { getCurrentTier } from '../../services/tierService';
 import DeepResearchCard from '../DeepResearchCard';
 import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildSuggestedEntitiesContext, isLowConfidenceEntity } from '../../services/agentService';
-import { applyOutputGuards, applyTaxonomyGuard } from '../../services/outputGuards';
+import { applyOutputGuards, applyTaxonomyGuard, classifyQueryIntent } from '../../services/outputGuards';
 import { getProfile } from '../../services/userProfileService';
 import { regionFromProfile } from '../../services/ensoContext';
 // Bug UX 2026-05-30: preservar respuesta parcial ante abort/timeout/cancel.
@@ -1092,6 +1092,19 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     })();
     const climaContext = climaSnapshot ? `\n\n${buildClimaContext(climaSnapshot, { region: ensoRegion })}` : '';
 
+    // FALLO 2 (E2E prod 2026-06-03): GATE de PRECIO para el contexto de finca.
+    // `classifyQueryIntent` ya clasifica "a cómo está el bulto de papa" como
+    // 'precio', pero la inyección del perfil/altitud/viabilidad de finca ocurría
+    // AGUAS ARRIBA del gate de los output-guards, así que la query de precio igual
+    // recibía el pipeline de viabilidad y filtraba el perfil ("…inviables en tu
+    // finca… a 0 msnm…"). Acá cablamos el clasificador AL INYECTOR: si el intent
+    // es 'precio', NO inyectamos contexto de finca NI corremos viabilidad/térmico
+    // (son irrelevantes a una consulta de mercado y filtran datos de finca). Una
+    // query de siembra real ("¿puedo sembrar papa en mi finca?") clasifica como
+    // 'siembra' y SÍ corre el pipeline (no se rompe). Conservador: cualquier otro
+    // intent ('unknown') sí inyecta (no degrada la inteligencia agronómica).
+    const isPriceQuery = classifyQueryIntent(query) === 'precio';
+
     // CONTEXTO AMBIENTAL DE LA FINCA (#202 mejora inteligencia). Bloque PURO
     // armado de datos YA disponibles localmente o en cache — CERO latencia:
     //   - profile / finca: localStorage + store en memoria (síncronos)
@@ -1111,14 +1124,18 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       return Object.entries(counts).map(([name, count]) => ({ name, count }));
     })();
     const fincaProfile = (() => { try { return getProfile(); } catch (_) { return null; } })();
-    const fincaContext = `\n\n${buildFincaContext({
-      profile: fincaProfile,
-      finca: fincaActivaCtx,
-      climaSnapshot,
-      groupedCultivos,
-      resolvedEntities,
-      activeAlerts,
-    })}`;
+    // GATE de precio: en una consulta de mercado NO inyectamos el perfil/altitud
+    // de finca (evita la fuga "Tu finca a 0 msnm…").
+    const fincaContext = isPriceQuery
+      ? ''
+      : `\n\n${buildFincaContext({
+          profile: fincaProfile,
+          finca: fincaActivaCtx,
+          climaSnapshot,
+          groupedCultivos,
+          resolvedEntities,
+          activeAlerts,
+        })}`;
 
     // VIABILIDAD POR ALTITUD (determinístico, sin red). Cruza la altitud de la
     // finca contra el rango altitud_min/altitud_max que el grounding AGE trae
@@ -1128,14 +1145,21 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       (fincaProfile && fincaProfile.finca_altitud) ||
       (fincaActivaCtx && fincaActivaCtx.altitud) ||
       null;
-    const viabilidadBlock = buildViabilityContext({ fincaAltitud, resolvedEntities });
+    // GATE de precio: la viabilidad por altitud es pipeline de SIEMBRA — no corre
+    // en una consulta de precio (evita la cascada "X es inviable en tu finca").
+    const viabilidadBlock = isPriceQuery
+      ? ''
+      : buildViabilityContext({ fincaAltitud, resolvedEntities });
     const viabilidadContext = viabilidadBlock ? `\n\n${viabilidadBlock}` : '';
 
     // RIESGO TÉRMICO POR CULTIVO (heladas/calor en vivo). Cruza temp_min/temp_max
     // de la especie resuelta × la mínima/máxima del pronóstico ya cacheado (el
     // mismo climaSnapshot — NO se re-pide). Cero latencia. Degrada si no hay
     // temp_min/temp_max o no hay forecast.
-    const frostHeatBlock = buildFrostHeatContext({ resolvedEntities, climaSnapshot });
+    // GATE de precio: también es pipeline de SIEMBRA → no corre en consulta de precio.
+    const frostHeatBlock = isPriceQuery
+      ? ''
+      : buildFrostHeatContext({ resolvedEntities, climaSnapshot });
     const frostHeatContext = frostHeatBlock ? `\n\n${frostHeatBlock}` : '';
 
     // ASOCIACIONES / POLICULTIVO. companions/antagonists del grounding cruzados
