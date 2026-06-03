@@ -13,7 +13,7 @@
  */
 
 import { getRegionFromDepartment } from './regionalismsService.js';
-import { classifyQueryIntent } from './outputGuards.js';
+import { classifyQueryIntent, isStapleViableAtAltitude } from './outputGuards.js';
 import {
   isInCaucaRegion as _isInCaucaRegion,
   normalizeUserInput as _normalizeCauca,
@@ -754,6 +754,14 @@ export function buildViabilityContext({
         nivel = fuera <= marginMsnm ? 'marginal' : 'inviable';
       }
     }
+    // #350 (fix DAÑO prod 2026-06-03): un STAPLE en su piso real (papa/fresa a
+    // 1923 m en Choachí) NUNCA se inyecta como inviable, aunque el grounding lo
+    // herede mal (resolver matcheó la base equivocada). Suprimimos el bloque
+    // INVIABLE del prompt para no desviar al campesino de su cultivo principal.
+    // Fuera de la banda real del staple, el veredicto se respeta.
+    if (nivel === 'inviable' && haveAlt && isStapleViableAtAltitude(nombre, alt)) {
+      continue;
+    }
     if (nivel === 'viable') continue; // el agente recomienda directo
 
     const alternativas = _altNames(e.alternativas_viables, 3);
@@ -1302,9 +1310,19 @@ export function buildFincaContext({
   activeAlerts = [],
   catalogNames = null,
   month,
+  userMessage = null,
 } = {}) {
   const p = profile && typeof profile === 'object' ? profile : {};
   const lines = [];
+
+  // #347 (DAÑO prod 2026-06-03) — fuga de inventario en consulta de PRECIO. Si
+  // la pregunta es de precio/mercado ("¿a cómo el bulto/la arroba de papa?"), NO
+  // inyectamos la ubicación (altitud/municipio/coordenadas) ni el inventario de
+  // la finca: son datos personales irrelevantes para un precio y el modelo los
+  // recitaba sin que se los pidieran ("tu finca a 1923 msnm, Choachí, segunda
+  // temporada seca"). Sin userMessage o ante duda → contexto completo (conserva
+  // el comportamiento existente y la personalización).
+  const isPriceIntent = classifyQueryIntent(userMessage) === 'precio';
 
   // ── Ubicación ───────────────────────────────────────────────────────────
   const municipio = p.municipio || null;
@@ -1324,10 +1342,13 @@ export function buildFincaContext({
   if (Number.isFinite(lat) && Number.isFinite(lng)) {
     ubic.push(`(${lat.toFixed(3)}, ${lng.toFixed(3)})`);
   }
-  if (finca && finca.nombre) {
-    lines.push(`Finca activa: "${finca.nombre}"${ubic.length ? ` — ${ubic.join(', ')}` : ''}.`);
-  } else if (ubic.length) {
-    lines.push(`Ubicación: ${ubic.join(', ')}.`);
+  // #347: en consulta de precio NO recitamos ubicación de la finca (fuga).
+  if (!isPriceIntent) {
+    if (finca && finca.nombre) {
+      lines.push(`Finca activa: "${finca.nombre}"${ubic.length ? ` — ${ubic.join(', ')}` : ''}.`);
+    } else if (ubic.length) {
+      lines.push(`Ubicación: ${ubic.join(', ')}.`);
+    }
   }
 
   // ── Temporada (calendárica, local — sin red) ────────────────────────────
@@ -1390,7 +1411,8 @@ export function buildFincaContext({
     );
   }
   const cultivos = summarizeCultivos(verificados);
-  if (cultivos) {
+  // #347: en consulta de precio tampoco recitamos el inventario de la finca.
+  if (cultivos && !isPriceIntent) {
     lines.push(`Cultivos registrados en la finca: ${cultivos}.`);
   }
 

@@ -1118,6 +1118,8 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       groupedCultivos,
       resolvedEntities,
       activeAlerts,
+      // #347: en consulta de precio NO inyectar ubicación/inventario de la finca.
+      userMessage: query,
     })}`;
 
     // VIABILIDAD POR ALTITUD (determinístico, sin red). Cruza la altitud de la

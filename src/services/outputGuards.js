@@ -148,6 +148,12 @@ const PRICE_INTENT_PATTERNS = [
   /\bcosecha\s+para\s+(vender|venta)\b/,
   /\bbulto[s]?\s+(de|a)\b/,
   /\bcarga\s+de\b/,
+  // #347 (DAÑO prod 2026-06-03) — unidades de COMERCIALIZACIÓN campesina. Una
+  // pregunta por "la arroba/el bulto/la carga de X" es de PRECIO/mercado: no
+  // debe correr los guards de siembra NI inyectar la altitud/municipio de la
+  // finca (fuga de inventario). La siembra sigue ganando si hay verbo de
+  // siembra (PLANTING_INTENT_PATTERNS se evalúa primero en classifyQueryIntent).
+  /\barroba[s]?\b/,
 ];
 
 /**
@@ -301,6 +307,23 @@ const SYNTHETIC_AGROCHEM_TERMS = [
   'glufosinato',
   // producto inventado por el modelo en el bench (CPX-007)
   'pirimex',
+  // #351 (DAÑO prod 2026-06-03) — fertilizantes MINERALES de síntesis. El
+  // transcript real recomendó "NPK 5-10-10" y una receta casera de urea +
+  // fosfato triple + sulfato de potasio. Son fertilizantes de síntesis (contra
+  // la misión agroecológica), no ingredientes activos de plaguicida, pero deben
+  // disparar el mismo redirect a abono orgánico/biopreparado/compost. Las
+  // formas multi-palabra exigen la frase completa (no se confunden con el
+  // nutriente suelto "potasio"/"nitrógeno" en lenguaje natural del campesino).
+  'npk',
+  'urea',
+  'fosfato triple',
+  'fosfato diamonico',
+  'superfosfato triple',
+  'sulfato de potasio',
+  'sulfato de amonio',
+  'nitrato de amonio',
+  'nitrato de potasio',
+  'cloruro de potasio',
 ];
 
 /**
@@ -472,13 +495,24 @@ function _organicRedirect(originalText) {
   const t = _stripDiacritics(originalText);
   const esHongo = /(hongo|tizon|gota|roya|mildeo|mildiu|antracnosis|fungic|enfermedad|mancha)/.test(t);
   const esPlaga = /(plaga|gusano|cogollero|oruga|larva|insecto|pulgon|acaro|trips|mosca|insectic)/.test(t);
+  // #351 — contexto de FERTILIZACIÓN/nutrición (NPK/urea/fosfato/sulfato…): el
+  // redirect debe ofrecer la ruta de abono ORGÁNICO, no solo control de plagas.
+  const esFertilizante =
+    /(npk|urea|fosfato|sulfato\s+de|nitrato\s+de|cloruro\s+de|fertiliz|abon|nutri|aliment|crecimiento|fosforo|potasio|nitrogeno|foliar)/.test(t);
 
   const intro =
-    'Una nota importante: Chagra es agroecológico, no recomendamos agroquímicos sintéticos. ' +
+    'Una nota importante: Chagra es agroecológico, no recomendamos agroquímicos ni fertilizantes sintéticos. ' +
     'Lo que de verdad funciona y cuida tu suelo y tu salud es el manejo orgánico:';
 
   const lineas = [];
-  if (esHongo || (!esHongo && !esPlaga)) {
+  if (esFertilizante) {
+    lineas.push(
+      '- Para nutrir el cultivo (en vez de NPK/urea/fosfato/sulfato de síntesis): compost y bocashi maduros, ' +
+        'humus de lombriz, biol/supermagro como abono foliar, ceniza de leña y cáscaras (potasio), y abonos verdes; ' +
+        'nutren el suelo vivo sin quemar la microbiota ni salinizar.',
+    );
+  }
+  if (esHongo || (!esHongo && !esPlaga && !esFertilizante)) {
     lineas.push(
       '- Para hongos y enfermedades (tizón, roya, gota): caldo bordelés (cal + sulfato de cobre) como preventivo, ' +
         'eliminar focos enfermos, mejorar aireación y drenaje, usar semilla sana y rotar el cultivo.',
@@ -915,11 +949,117 @@ function _groupViabilityHits(hits, dondeTxt) {
 }
 
 /**
+ * #350 — STAPLE-FLOOR: bandas de altitud REALES y AUTORITATIVAS de los cultivos
+ * de pan-coger / staples andinos colombianos. Fuente: rangos agronómicos
+ * consolidados (Agrosavia/ICA, práctica campesina). Cada banda es generosa a
+ * propósito (cubre todas las variedades comunes del cultivo en Colombia).
+ *
+ * PROPÓSITO (fix de DAÑO en producción 2026-06-03, Choachí 1923 msnm): el
+ * sidecar a veces hereda una `viabilidad:'inviable'` ERRÓNEA para un staple —
+ * típicamente porque el resolver matcheó la BASE equivocada (p.ej. "fresa
+ * silvestre andina", de banda alta, en vez de la fresa cultivada) o trajo una
+ * banda estrecha. El guard NO debe propagar esa desinformación: si la finca
+ * está DENTRO de la banda real del staple, el veredicto 'inviable' es casi
+ * seguro un falso-negativo y se SUPRIME (tratamos la especie como neutral/viable
+ * → el guard no corrige). Fuera de la banda real (papa@3600), el veredicto se
+ * respeta: ahí la inviabilidad SÍ es real.
+ *
+ * Conservador por diseño: solo cubre staples inequívocos (papa, fresa, maíz,
+ * fríjol, arveja, etc.); cualquier especie no listada usa la ruta normal
+ * (campo `viabilidad` autoritativo / banda de la entidad). NUNCA marca algo como
+ * inviable que la entidad no marcara; solo PUEDE relajar un 'inviable' dudoso.
+ */
+const STAPLE_ALTITUDE_FLOORS = [
+  // clave normalizada (primer token del nombre común) → [min, max] msnm reales
+  { keys: ['papa'], min: 1800, max: 3400 },          // papa común andina
+  { keys: ['fresa', 'frutilla'], min: 1300, max: 2800 },
+  { keys: ['arveja'], min: 1800, max: 3000 },
+  { keys: ['haba'], min: 2000, max: 3200 },
+  { keys: ['maiz'], min: 0, max: 2800 },
+  { keys: ['frijol', 'frijoles', 'frisol', 'habichuela'], min: 600, max: 2600 },
+  { keys: ['cebolla'], min: 1500, max: 3000 },
+  { keys: ['zanahoria'], min: 1800, max: 3000 },
+  { keys: ['repollo', 'col'], min: 1800, max: 3200 },
+  { keys: ['lechuga'], min: 1500, max: 3000 },
+  { keys: ['tomate'], min: 800, max: 2600 },         // tomate de mesa (no de árbol)
+  { keys: ['trigo'], min: 2200, max: 3200 },
+  { keys: ['cebada'], min: 2200, max: 3400 },
+  // NOTA: los tubérculos altoandinos (chugua/ulluco/oca) NO van aquí a
+  // propósito. Sus bandas varían mucho por variedad y el daño en producción que
+  // motiva este override fue sobre staples TEMPLADOS (papa/fresa) marcados
+  // inviables en su piso medio. Para los altoandinos dejamos que mande la banda
+  // de la entidad del grounding (evita relajar un 'inviable' legítimo por altura).
+];
+
+/**
+ * _stapleFloorBand — devuelve la banda de altitud real del staple cuyo primer
+ * token de nombre común coincide con el de la especie, o null si no es un
+ * staple cubierto. El nombre se normaliza (sin tildes/case) y se compara por
+ * primer token significativo (igual que `_baseCommonName`), de modo que
+ * "Papa criolla", "Papa Sabanera" y "papa" caen en la misma banda.
+ *
+ * @param {string} nombre  nombre común de la especie.
+ * @returns {{min:number, max:number}|null}
+ */
+function _stapleFloorBand(nombre) {
+  const base = _baseCommonName(nombre); // ya normalizado, sin tildes/case
+  if (!base) return null;
+  const first = base.split(/\s+/)[0];
+  if (!first || first.length < 3) return null;
+  for (const entry of STAPLE_ALTITUDE_FLOORS) {
+    if (entry.keys.includes(first)) return { min: entry.min, max: entry.max };
+  }
+  return null;
+}
+
+/**
+ * _isStapleViableAtAltitude — ¿es esta especie un staple cubierto Y la finca
+ * está DENTRO de su banda real? Si sí, un veredicto 'inviable' heredado es muy
+ * probablemente un falso-negativo (#350) y debe SUPRIMIRSE. Requiere altitud de
+ * finca conocida y finita; sin ella no podemos juzgar → false (no relaja nada).
+ *
+ * @param {object} e  entidad de especie del grounding.
+ * @param {number} alt  altitud de la finca (msnm), ya validada como finita.
+ * @returns {boolean}
+ */
+function _isStapleViableAtAltitude(e, alt) {
+  if (!Number.isFinite(alt)) return false;
+  const band = _stapleFloorBand(_entityName(e));
+  if (!band) return false;
+  return alt >= band.min && alt <= band.max;
+}
+
+/**
+ * isStapleViableAtAltitude — versión EXPORTADA del override de staple-floor
+ * (#350), para que `buildViabilityContext` (agentService) suprima el bloque de
+ * prompt "INVIABLE" de un staple en su piso ANTES de que llegue al LLM, igual
+ * que el guard lo hace sobre la salida. Acepta el nombre común directamente (la
+ * forma que tiene a mano agentService) además de altitud.
+ *
+ * @param {string} nombre  nombre común de la especie.
+ * @param {number|string|null} altitud  msnm de la finca.
+ * @returns {boolean}
+ */
+export function isStapleViableAtAltitude(nombre, altitud) {
+  const alt = Number(altitud);
+  if (!Number.isFinite(alt)) return false;
+  const band = _stapleFloorBand(nombre);
+  if (!band) return false;
+  return alt >= band.min && alt <= band.max;
+}
+
+/**
  * Guard 3 — viabilidad invertida. Si el grounding marca `viabilidad:"inviable"`
  * para una especie a la altitud de la finca y la respuesta la recomienda como
  * viable/buena, CORRIGE ("a tu altura no se da") y lidera con
  * `alternativas_viables`. NO toca "marginal" (eso SÍ es posible con cuidados:
  * doctrina zona-gris).
+ *
+ * #350 (fix DAÑO prod 2026-06-03): antes de tratar una especie como 'inviable',
+ * si es un STAPLE cubierto y la finca cae DENTRO de su banda real
+ * (`STAPLE_ALTITUDE_FLOORS`), el veredicto 'inviable' se descarta como
+ * falso-negativo — un staple en su piso JAMÁS se marca inviable ni se desvía a
+ * variedades extranjeras. Fuera de su banda real, la inviabilidad se respeta.
  *
  * REEMPLAZO, no prepend (fix fuga viva 2026-05-31): la corrección lidera Y se
  * ELIMINAN del texto del modelo las oraciones que promovían la especie
@@ -970,6 +1110,16 @@ export function guardInvertedViability(responseText, resolvedEntities = null, fi
         nivel = fuera <= 300 ? 'marginal' : 'inviable';
       }
     }
+    // #350 — STAPLE-FLOOR override: un staple cubierto cuya finca cae DENTRO de
+    // su banda real NUNCA se marca inviable, aunque el grounding así lo herede
+    // (el resolver pudo matchear la base equivocada, p.ej. "fresa silvestre
+    // andina"). Es el fix del daño en prod (Choachí 1923 m: papa/fresa viables).
+    // Solo relaja 'inviable' dudoso; fuera de la banda real el veredicto se
+    // respeta (papa@3600 sigue inviable).
+    if (nivel === 'inviable' && haveAlt && _isStapleViableAtAltitude(e, alt)) {
+      continue;
+    }
+
     // Solo INVIABLE corrige. marginal/viable se respetan (zona gris).
     if (nivel !== 'inviable') continue;
 
@@ -1160,7 +1310,12 @@ const SOURCE_HINT_RE =
  *
  * @returns {{text:string, modified:boolean, reason:string|null}}
  */
-export function guardDoseWithoutSource(responseText, _resolvedEntities = null, _fincaAltitud = null) {
+export function guardDoseWithoutSource(
+  responseText,
+  _resolvedEntities = null,
+  _fincaAltitud = null,
+  { userMessage = null } = {},
+) {
   if (typeof responseText !== 'string' || responseText.length === 0) {
     return { text: responseText ?? '', modified: false, reason: null };
   }
@@ -1173,15 +1328,30 @@ export function guardDoseWithoutSource(responseText, _resolvedEntities = null, _
   if (SOURCE_HINT_RE.test(responseText)) {
     return { text: responseText, modified: false, reason: null };
   }
-  // Evitar duplicar la nota si ya está.
-  if (/confirma la dosis con/i.test(responseText)) {
+  // Evitar duplicar la nota si ya está (cualquiera de las dos variantes).
+  if (/confirma la dosis con|ajusta la receta a tu/i.test(responseText)) {
     return { text: responseText, modified: false, reason: null };
   }
 
   bumpGuardTelemetry('dose_without_source');
-  const nota =
-    'Nota sobre las dosis: confirma la dosis exacta con la etiqueta del producto o con tu técnico agrícola local ' +
-    'antes de aplicar — las cantidades varían según el producto y no conviene guiarse por una cifra sin fuente.';
+  // #8 (DAÑO prod 2026-06-03) — disclaimer mal ubicado. En un biopreparado
+  // CASERO no hay "etiqueta del producto" que consultar; pedirla es absurdo.
+  // Si la respuesta o la pregunta son de preparado casero/biopreparado, usamos
+  // una nota que orienta a la RECETA / fuente campesina (Restrepo, técnico),
+  // no a una etiqueta comercial inexistente.
+  const ctxNorm = _stripDiacritics(`${responseText} ${userMessage || ''}`);
+  const esCasero =
+    /(biopreparado|casero|caldo\s+(bordeles|sulfocalcico|mineral)|sulfocalcic|bocashi|biol\b|supermagro|purin|lixiviad|hecho\s+en\s+(la\s+)?(casa|finca)|en\s+tu\s+finca|prepara(r|s)?\b)/.test(ctxNorm);
+  // Solo casero si NO hay además mención de producto comercial (ante mezcla,
+  // conservador hacia el disclaimer comercial — que sí menciona etiqueta).
+  const esComercial = /(producto\s+comercial|marca\s+comercial|fungicida\s+comercial|insecticida\s+comercial|etiqueta)/.test(ctxNorm);
+
+  const nota = (esCasero && !esComercial)
+    ? 'Nota sobre las cantidades: como es un preparado casero, no hay etiqueta de producto que consultar. ' +
+      'Ajusta la receta a tu volumen y guíate por una fuente confiable de campo (un manual como el de Jairo ' +
+      'Restrepo, tu técnico agrícola local o la receta del catálogo); empieza con poco y observa cómo responde el cultivo.'
+    : 'Nota sobre las dosis: confirma la dosis exacta con la etiqueta del producto o con tu técnico agrícola local ' +
+      'antes de aplicar — las cantidades varían según el producto y no conviene guiarse por una cifra sin fuente.';
   const text = `${responseText.trim()}\n\n${nota}`;
   return { text, modified: true, reason: `dosis_sin_fuente: ${[...new Set(doses)].slice(0, 5).join(', ')}` };
 }
@@ -2323,6 +2493,103 @@ export function guardReforestacionNativasRol(responseText, { userMessage = null 
   return { text, modified: true, reason: 'reforestacion_nativas_rol' };
 }
 
+// ── GUARD DE DOMINIO: off-domain declina (no física/química/mate) ────────────
+
+/**
+ * #352 (DAÑO prod 2026-06-03) — léxico OFF-DOMAIN. Chagra es un asistente
+ * AGROECOLÓGICO; en producción respondió disertaciones completas de física
+ * (relatividad, teoría de cuerdas) y química inorgánica, incluso con un badge de
+ * grounding FALSO ("Catálogo verificado · get_normativa_ica"). Estos términos
+ * (normalizados, sin tildes) señalan una consulta claramente FUERA del dominio
+ * agro. Si la PREGUNTA del usuario los trae y NO hay señal agro, declinamos.
+ *
+ * Conservador: solo dispara sobre la PREGUNTA (no sobre la respuesta), porque la
+ * respuesta agro legítima puede mencionar "química" del suelo de forma válida.
+ */
+const OFF_DOMAIN_TERMS = [
+  // física
+  'teoria de cuerdas', 'teoria de la relatividad', 'relatividad', 'mecanica cuantica',
+  'fisica cuantica', 'agujero negro', 'agujeros negros', 'big bang', 'energia oscura',
+  'materia oscura', 'particula', 'particulas elementales', 'boson', 'higgs', 'leyes de newton',
+  'termodinamica', 'electromagnetismo',
+  // química/matemáticas puras (no agro)
+  'quimica organica e inorganica', 'quimica inorganica', 'tabla periodica',
+  'ecuacion diferencial', 'ecuaciones diferenciales', 'integral definida', 'derivada de',
+  'teorema de pitagoras', 'numeros primos', 'logaritmo',
+  // otros dominios lejanos
+  'codigo penal', 'derecho penal', 'historia universal', 'segunda guerra mundial',
+  'programacion en python', 'lenguaje de programacion', 'inteligencia artificial generativa',
+];
+
+/**
+ * Señales claras de que la consulta SÍ es de agro/finca/cultivo (gate de
+ * seguridad: si están presentes, NO declinamos aunque también aparezca una
+ * palabra como "quimica"). Cubre el caso "química orgánica para mi compost".
+ */
+const AGRO_DOMAIN_HINTS = [
+  'cultiv', 'siembr', 'sembr', 'cosech', 'finca', 'parcela', 'huerta', 'huerto', 'chagra',
+  'planta', 'semilla', 'suelo', 'abono', 'compost', 'biopreparado', 'plaga', 'cultivo',
+  'fertiliz', 'riego', 'germin', 'poda', 'injerto', 'pasto', 'ganado', 'gallina', 'vaca',
+  'cafe', 'platano', 'papa', 'maiz', 'frijol', 'tomate', 'fresa', 'mora', 'aguacate',
+  'agroecolog', 'lombri', 'humus', 'mulch', 'rotacion', 'asociacion de cultivos',
+];
+
+/**
+ * Texto de declinación amable: reconoce el límite de dominio y reconduce a la
+ * finca. NO inventa tool ni grounding. Tono cálido (campesino), tú/usted CO.
+ */
+const OFF_DOMAIN_DECLINE =
+  'Con todo el gusto te ayudaría, pero esa pregunta se sale de lo mío: soy tu ' +
+  'asistente de cultivos y finca agroecológica, no manejo física, química pura ' +
+  'ni esos otros temas. ¿Te ayudo mejor con algo de tu finca —qué sembrar, una ' +
+  'plaga, un biopreparado, el clima o el suelo?';
+
+/**
+ * guardOffDomain — #352. Si la PREGUNTA del usuario es claramente off-domain
+ * (física/química pura/matemáticas/otros) y SIN señal agro, REEMPLAZA la
+ * respuesta del LLM por una declinación amable que reconduce a la finca. Evita
+ * que el agente diserte de relatividad o teoría de cuerdas con badge de
+ * grounding falso. NO corre tool ni grounding (es puro post-proceso de salida).
+ *
+ * Diseño anti-falso-positivo:
+ *  - Solo mira la PREGUNTA (no la respuesta): la respuesta agro válida puede
+ *    mencionar "química del suelo" legítimamente.
+ *  - Gate agro: si la pregunta trae cualquier señal de finca/cultivo, NO
+ *    declina ("química orgánica para mi compost" → pasa).
+ *  - Sin userMessage → no-op (fail-open: deja correr el resto de la cadena).
+ *
+ * Firma propia (necesita userMessage) → se invoca aparte en applyOutputGuards,
+ * fuera de GUARD_CHAIN, y ANTES que los demás (si declinamos, lo demás sobra).
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardOffDomain(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Sin la pregunta no podemos juzgar el dominio → no-op (fail-open).
+  if (typeof userMessage !== 'string' || !userMessage.trim()) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  const qNorm = _stripDiacritics(userMessage);
+  // Gate agro: cualquier señal de finca/cultivo → NO declinamos.
+  if (AGRO_DOMAIN_HINTS.some((h) => qNorm.includes(h))) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  // ¿La pregunta contiene un término off-domain inequívoco?
+  if (!OFF_DOMAIN_TERMS.some((t) => qNorm.includes(t))) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  // Idempotencia: si ya declinamos, no re-disparamos.
+  if (responseText.includes('se sale de lo mío')) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  bumpGuardTelemetry('off_domain');
+  return { text: OFF_DOMAIN_DECLINE, modified: true, reason: 'off_domain' };
+}
+
 /**
  * Set de guards que SOLO tienen sentido cuando la consulta es de SIEMBRA
  * (A12). Si la pregunta del usuario es de PRECIO/MERCADO (o info general sin
@@ -2424,6 +2691,15 @@ export function applyOutputGuards(
   let modified = false;
   const reasons = [];
 
+  // GUARD DE DOMINIO PRIMERO (#352): si la PREGUNTA es claramente off-domain
+  // (física/química pura/mate), REEMPLAZAMOS por una declinación amable y NO
+  // corremos nada más — los demás guards razonarían sobre un texto que ya
+  // descartamos entero. Firma propia (necesita userMessage). No-op sin pregunta.
+  const offDomain = guardOffDomain(text, { userMessage });
+  if (offDomain && offDomain.modified) {
+    return { text: offDomain.text, modified: true, reasons: [offDomain.reason].filter(Boolean) };
+  }
+
   // GUARD de visión PRIMERO: si la respuesta afirma un diagnóstico visual sin
   // foto real en el turno, no tiene sentido correr los demás guards sobre un
   // texto que vamos a reemplazar entero. Firma propia (contexto de visión), por
@@ -2440,7 +2716,10 @@ export function applyOutputGuards(
     // (precio/mercado). Los de SAFETY/inofensivos NO están en PLANTING_GUARDS y
     // corren siempre.
     if (!runPlantingGuards && PLANTING_GUARDS.has(guard)) continue;
-    const res = guard(text, entities, fincaAltitud);
+    // Pasamos userMessage como 4º arg (ctx) a TODA la cadena: los guards que no
+    // lo usan lo ignoran; guardDoseWithoutSource lo necesita para distinguir un
+    // biopreparado CASERO (sin etiqueta) de un producto comercial (#8).
+    const res = guard(text, entities, fincaAltitud, { userMessage });
     if (res && res.modified) {
       text = res.text;
       modified = true;
