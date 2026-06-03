@@ -12,13 +12,26 @@
  *
  * Uso:
  *   node scripts/bench-llm-judge.mjs                  # smoke con datos mock
- *   node scripts/bench-llm-judge.mjs --from data/bench-runs/results.json
+ *   node scripts/bench-llm-judge.mjs --from data/bench-runs/results.jsonl
+ *   node scripts/bench-llm-judge.mjs --from=data/bench-runs/results.jsonl
  *
  * Output: data/bench-judge-scores/{YYYY-MM-DD}.jsonl + summary.md
  *
+ * FIX 2026-06-03 (pipeline-rework): el judge corría sobre MOCK aunque el bench
+ * le pasara el JSONL real, por TRES fallas que este módulo arregla:
+ *   1. `--from <path>` (separado por espacio, como lo invoca bench-agente-completo)
+ *      no se parseaba — solo `--from=path`. Ahora parseFromArg cubre ambos.
+ *   2. auto-discovery solo globeaba `.json`; el bench escribe `.jsonl`. Ahora
+ *      loadBenchData reconoce ambos y prioriza el más reciente.
+ *   3. el JSONL real es per-model anidado (sin ground_truth ni model_response
+ *      plano). normalizeBenchData lo transforma a items evaluables tomando la
+ *      respuesta del modelo objetivo (TARGET_MODEL, default granite) y derivando
+ *      un ground_truth de los expected_keywords cuando no hay uno explícito.
+ *   + Si `--from` apunta a un archivo inexistente, se LANZA (no mock silencioso).
+ *
  * Smoke con 10 prompts vs granite/llama/gemma.
  */
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
@@ -26,12 +39,28 @@ import { performance } from 'node:perf_hooks';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
 const DATA_DIR = join(ROOT_DIR, 'data');
-const BENCH_RUNS_DIR = join(DATA_DIR, 'bench-runs');
-const OUTPUT_DIR = join(DATA_DIR, 'bench-judge-scores');
+const BENCH_RUNS_DIR = process.env.BENCH_OUTPUT_DIR || join(DATA_DIR, 'bench-runs');
+const OUTPUT_DIR = process.env.BENCH_JUDGE_OUTPUT_DIR || join(DATA_DIR, 'bench-judge-scores');
 
 const OLLAMA_URL = 'http://localhost:11434/api/generate';
 const JUDGE_MODEL = process.env.JUDGE_MODEL || 'gemma3:4b';
 const TIMEOUT_MS = 60_000;
+
+// Modelo cuyo turno se evalúa cuando el JSONL es per-model (bench-agente-completo).
+// Default granite3.1-dense:8b = el chat de PROD (llmRouter chat_complex).
+const TARGET_MODEL = process.env.TARGET_MODEL || 'granite3.1-dense:8b';
+
+// Mapa modelKey (clave del objeto per-model en el JSONL) → nombre ollama, para
+// poder seleccionar por nombre real del modelo cuando TARGET_MODEL es un nombre.
+const MODEL_KEY_BY_NAME = {
+  'gemma3:4b': 'gemma3_4b',
+  'granite3.1-dense:8b': 'granite3_1_8b',
+  'ministral-3:latest': 'ministral_3b',
+  'aya:8b': 'aya_8b',
+  'mistral-nemo:12b': 'mistral_nemo_12b',
+  'ministral-3:14b': 'ministral_14b',
+  'qwen3:30b': 'qwen3_30b',
+};
 
 // Prompts mock para el smoke test si no hay datos reales
 const MOCK_BENCH_DATA = {
@@ -162,25 +191,223 @@ IMPORTANTE: Tu respuesta debe ser ÚNICAMENTE un JSON con esta estructura exacta
 
 Sin texto adicional, solo el JSON.`;
 
-function loadBenchData(fromPath) {
-  if (fromPath && existsSync(fromPath)) {
-    const raw = readFileSync(fromPath, 'utf-8');
-    return JSON.parse(raw);
+/**
+ * parseFromArg — extrae el path de `--from`. Acepta DOS formas:
+ *   - `--from <path>` (separado por espacio) → la forma que usa el bench.
+ *   - `--from=<path>` (con igual).
+ * Devuelve null si no hay `--from` o si lo que sigue es otro flag.
+ *
+ * @param {string[]} argv  típicamente process.argv.
+ * @returns {string|null}
+ */
+export function parseFromArg(argv = process.argv) {
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    if (a === '--from') {
+      const next = argv[i + 1];
+      if (next && !next.startsWith('--')) return next;
+      return null;
+    }
+    if (a.startsWith('--from=')) {
+      const v = a.slice('--from='.length);
+      return v.length > 0 ? v : null;
+    }
+  }
+  return null;
+}
+
+/**
+ * derivedGroundTruth — cuando el bench NO trae un ground_truth explícito (el
+ * caso de bench-agente-completo, que solo tiene expected_keywords), arma una
+ * referencia legible para el juez a partir de los conceptos esperados. No es una
+ * verdad canónica perfecta, pero ancla al juez en los conceptos correctos en vez
+ * de dejarlo sin referencia.
+ *
+ * @param {string[]} keywords
+ * @returns {string}
+ */
+function derivedGroundTruth(keywords) {
+  const kw = Array.isArray(keywords) ? keywords.filter(Boolean) : [];
+  if (kw.length === 0) return '';
+  return `Una respuesta correcta debe cubrir, por fondo: ${kw.join(', ')}.`;
+}
+
+/**
+ * pickModelKey — elige la clave per-model del objeto del JSONL para el modelo
+ * objetivo. Acepta un nombre ollama (granite3.1-dense:8b) o ya una clave
+ * (granite3_1_8b). Devuelve la clave si está presente en el item, o null.
+ *
+ * @param {Record<string, any>} item
+ * @param {string} target
+ * @returns {string|null}
+ */
+function pickModelKey(item, target) {
+  const asKey = MODEL_KEY_BY_NAME[target] || target;
+  if (item[asKey] && typeof item[asKey] === 'object') return asKey;
+  // fallback: buscar cualquier sub-objeto cuyo .model coincida con el nombre.
+  for (const [k, v] of Object.entries(item)) {
+    if (v && typeof v === 'object' && v.model === target) return k;
+  }
+  return null;
+}
+
+/**
+ * normalizeBenchData — transforma las líneas del JSONL del bench a un payload
+ * `{ timestamp, model, results: [...] }` con items PLANOS evaluables por el juez
+ * ({ id, query, ground_truth, model_response, ... }).
+ *
+ * Maneja tres formas de entrada por item:
+ *   (a) per-model anidado (bench-agente-completo): toma `item[modelKey].response`
+ *       del modelo objetivo; deriva ground_truth de expected_keywords.
+ *   (b) ya-plano formato judge (model_response o response + ground_truth): pasa.
+ *   (c) modelo objetivo con error → se OMITE (no se evalúa una no-respuesta).
+ *
+ * @param {Array<Record<string,any>>} lines
+ * @param {{ targetModel?: string }} [opts]
+ * @returns {{ timestamp:string, model:string, results:Array, skipped:number }}
+ */
+export function normalizeBenchData(lines, { targetModel = TARGET_MODEL } = {}) {
+  const arr = Array.isArray(lines) ? lines : [];
+  const results = [];
+  let skipped = 0;
+
+  for (const item of arr) {
+    if (!item || typeof item !== 'object') {
+      skipped++;
+      continue;
+    }
+
+    // (b) ya está en formato judge plano.
+    const flatResponse = item.model_response ?? item.response;
+    const isFlat = typeof flatResponse === 'string' && !pickModelKey(item, targetModel);
+    if (isFlat) {
+      results.push({
+        id: item.id ?? item.prompt_id ?? results.length + 1,
+        category: item.category,
+        query: item.query,
+        ground_truth: item.ground_truth ?? derivedGroundTruth(item.expected_keywords),
+        model_response: flatResponse,
+        expected_keywords: item.expected_keywords ?? [],
+        sidecar_halluc_count: item.sidecar_halluc_count ?? item.halluc_count ?? null,
+      });
+      continue;
+    }
+
+    // (a) per-model anidado.
+    const key = pickModelKey(item, targetModel);
+    if (!key) {
+      skipped++;
+      continue;
+    }
+    const m = item[key];
+    if (m.error || typeof m.response !== 'string' || m.response.length === 0) {
+      skipped++;
+      continue;
+    }
+    results.push({
+      id: item.prompt_id ?? item.id ?? results.length + 1,
+      category: item.category,
+      query: item.query,
+      ground_truth: item.ground_truth ?? derivedGroundTruth(item.expected_keywords),
+      model_response: m.response,
+      expected_keywords: item.expected_keywords ?? [],
+      sidecar_halluc_count: m.halluc_count ?? null,
+    });
   }
 
-  // Buscar archivos en data/bench-runs/
+  return {
+    timestamp: new Date().toISOString(),
+    model: targetModel,
+    results,
+    skipped,
+  };
+}
+
+/**
+ * loadBenchData — carga datos de bench y los normaliza a `{ results, ... }`.
+ *
+ * Orden de resolución:
+ *   1. `fromPath` explícito. Si NO existe → LANZA (NO mock silencioso: el bug
+ *      original enmascaraba un path roto evaluando mock).
+ *   2. Si no hay fromPath, auto-discovery en data/bench-runs/ del más reciente
+ *      `.jsonl`/`.json` (por mtime). El bench escribe `.jsonl`.
+ *   3. Si no hay nada → mock (solo el smoke test sin args).
+ *
+ * Soporta JSONL (varias líneas) y JSON (un objeto `{ results: [...] }`).
+ * Marca `usedMock` para que el caller pueda distinguir.
+ *
+ * @param {string|null} fromPath
+ * @returns {{ timestamp:string, model:string, results:Array, usedMock:boolean, skipped?:number, source?:string }}
+ */
+export function loadBenchData(fromPath) {
+  if (fromPath) {
+    if (!existsSync(fromPath)) {
+      throw new Error(
+        `[judge] --from apunta a un archivo inexistente: ${fromPath}. ` +
+          `NO se cae a mock para no enmascarar un path roto.`,
+      );
+    }
+    return { ...parseBenchFile(fromPath), usedMock: false, source: fromPath };
+  }
+
+  // Auto-discovery: el más reciente .jsonl o .json en bench-runs/.
   if (existsSync(BENCH_RUNS_DIR)) {
-    const files = readdirSync(BENCH_RUNS_DIR).filter((f) => f.endsWith('.json'));
-    if (files.length > 0) {
-      const latest = files.sort().reverse()[0];
-      const raw = readFileSync(join(BENCH_RUNS_DIR, latest), 'utf-8');
-      return JSON.parse(raw);
+    const candidates = readdirSync(BENCH_RUNS_DIR)
+      .filter((f) => f.endsWith('.jsonl') || f.endsWith('.json'))
+      .map((f) => {
+        const full = join(BENCH_RUNS_DIR, f);
+        let mtime = 0;
+        try {
+          mtime = statSync(full).mtimeMs;
+        } catch {
+          /* ignore */
+        }
+        return { full, mtime };
+      })
+      .sort((a, b) => b.mtime - a.mtime);
+    if (candidates.length > 0) {
+      const latest = candidates[0].full;
+      return { ...parseBenchFile(latest), usedMock: false, source: latest };
     }
   }
 
-  // Si no hay datos, usar mock
   console.log('[judge] No se encontraron datos de bench, usando mock data (smoke test)');
-  return MOCK_BENCH_DATA;
+  return { ...MOCK_BENCH_DATA, usedMock: true, source: 'mock' };
+}
+
+/**
+ * parseBenchFile — lee un archivo de bench (.jsonl o .json), detecta el formato
+ * y devuelve `{ timestamp, model, results, skipped }` normalizado.
+ *
+ * @param {string} path
+ * @returns {{ timestamp:string, model:string, results:Array, skipped:number }}
+ */
+function parseBenchFile(path) {
+  const raw = readFileSync(path, 'utf-8');
+  const trimmed = raw.trim();
+  if (trimmed.length === 0) return { timestamp: new Date().toISOString(), model: TARGET_MODEL, results: [], skipped: 0 };
+
+  // JSONL: varias líneas, cada una un objeto. Detecta por ≥2 líneas JSON o
+  // por extensión .jsonl.
+  const lines = trimmed.split('\n').filter((l) => l.trim().length > 0);
+  const looksJsonl = path.endsWith('.jsonl') || lines.length > 1;
+
+  if (looksJsonl) {
+    const parsed = lines.map((l) => JSON.parse(l));
+    // Si ya viene en formato judge `{ results: [...] }` por línea, aplanar.
+    if (parsed.length === 1 && Array.isArray(parsed[0].results)) {
+      return normalizeBenchData(parsed[0].results);
+    }
+    return normalizeBenchData(parsed);
+  }
+
+  // JSON: un objeto. Puede ser `{ results: [...] }` (judge) o un único item.
+  const obj = JSON.parse(trimmed);
+  if (Array.isArray(obj.results)) {
+    const norm = normalizeBenchData(obj.results);
+    return { ...norm, timestamp: obj.timestamp ?? norm.timestamp, model: obj.model ?? norm.model };
+  }
+  return normalizeBenchData([obj]);
 }
 
 async function callJudge(prompt, signal) {
@@ -283,12 +510,20 @@ async function main() {
   console.log(`[judge] Modelo juez: ${JUDGE_MODEL}`);
   console.log(`[judge] Directorio output: ${OUTPUT_DIR}`);
 
-  const fromPath = process.argv.find((arg) => arg.startsWith('--from'))?.split('=')[1] || null;
+  const fromPath = parseFromArg(process.argv);
   const benchData = loadBenchData(fromPath);
 
+  console.log(`[judge] Fuente: ${benchData.source || 'N/A'}${benchData.usedMock ? ' (MOCK — smoke test)' : ' (datos REALES)'}`);
+  if (typeof benchData.skipped === 'number' && benchData.skipped > 0) {
+    console.log(`[judge] Items omitidos (modelo objetivo con error/sin respuesta): ${benchData.skipped}`);
+  }
   console.log(`[judge] Datos cargados: ${benchData.results.length} items`);
   console.log(`[judge] Timestamp bench: ${benchData.timestamp}`);
   console.log(`[judge] Modelo evaluado: ${benchData.model || 'N/A'}`);
+
+  if (benchData.results.length === 0) {
+    throw new Error('[judge] 0 items evaluables tras normalizar. Revisá el JSONL de origen / TARGET_MODEL.');
+  }
 
   const results = [];
   const startTime = performance.now();
@@ -395,7 +630,13 @@ ${successful.map((s) => {
   console.log(`[judge]   Summary: ${summaryPath}`);
 }
 
-main().catch((err) => {
-  console.error('[judge] FATAL:', err);
-  process.exit(1);
-});
+// Solo auto-ejecuta cuando se invoca directamente (no al importar en tests).
+const INVOKED_DIRECTLY = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
+if (INVOKED_DIRECTLY) {
+  main().catch((err) => {
+    console.error('[judge] FATAL:', err);
+    process.exit(1);
+  });
+}
+
+export { main };
