@@ -389,7 +389,7 @@ export function generateRegionalToneContext(region) {
     'opita': 'Usa español opita/tolimense: "paisano", "jue", "ah pues". Tono tolima-huila.',
     'pastuso': 'Usa español pastuso: "taita", "guagua", "pues si". Tono nariñense.',
     'pacifico': 'Usa español del Pacífico: "compadre", "hermano de la mar". Tono afrocolombiano.',
-    'santandereano': 'Usa español santandereano: "¿qui whopping?", "mano". Tono canchón.',
+    'santandereano': 'Usa español santandereano: "¡quiubo, mano!", "mano". Tono canchón.',
     'amazonica': 'Usa español suave amazónico. Reconoce diversidad cultural. Evita imitar acentos específicos.',
   };
   
