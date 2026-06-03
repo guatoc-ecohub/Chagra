@@ -5,17 +5,25 @@
  * postgres-farm).
  *
  * El pool viejo (10 prompts "complejos rotativos") medía VIABILIDAD, no la
- * curación de las últimas 48h. Este pool cubre las 10 capacidades del diseño
- * `BENCH_30H_DESIGN_2026-05-31.md`, cada prompt con:
+ * curación reciente. Este pool cubre 12 capacidades (las 10 del diseño
+ * `BENCH_30H_DESIGN_2026-05-31.md` + clima_ext y pisos_termicos, las dimensiones
+ * enriquecidas en las últimas ~80h), cada prompt con:
  *   - must_include: hechos REALES extraídos del grafo (dosis exactas, tipo
- *     canónico de plaga, nutrición de forrajeras, helada_letal, etc.).
+ *     canónico de plaga, nutrición de forrajeras, helada_letal, tolerancia a
+ *     sequía/precipitación/sensibilidad a helada categórica, piso térmico, etc.).
  *   - red_flags: alucinaciones a cazar.
  *   - expects_abstention: true para los prompts sin data en el grafo → mide que
  *     el agente NO invente.
  *
- * Los hechos se leen del grafo vía `psql` dentro del container `postgres-farm`
- * (no hardcode): así el pool sigue la curación si el grafo cambia. Si el grafo
- * no está accesible, ABORTA (no inventamos un pool falso).
+ * Los hechos se leen del grafo vía `psql` por TCP directo al `chagra_kg` que
+ * `postgres-farm` expone en 127.0.0.1:5432 (no hardcode): así el pool sigue la
+ * curación si el grafo cambia. Si el grafo no está accesible, ABORTA (no
+ * inventamos un pool falso).
+ *
+ * Conexión (override por env): PGHOST=127.0.0.1 PGPORT=5432 PGUSER=farmos
+ * PGPASSWORD=changeme PGDATABASE=chagra_kg. El binario psql se autodescubre
+ * (NixOS no lo tiene siempre en PATH): se honra PSQL_BIN si está, si no se busca
+ * en el nix-store / PATH.
  *
  * Uso:
  *   node scripts/gen-bench-capabilities-pool.mjs
@@ -26,22 +34,59 @@
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execSync } from 'node:child_process';
+import { execSync, execFileSync } from 'node:child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
 const OUT_DIR = join(ROOT_DIR, 'data', 'bench-runs');
-const GRAPH = 'chagra_kg';
+const GRAPH = process.env.PGDATABASE || 'chagra_kg';
 
-/** Corre una query Cypher en el grafo vivo y devuelve filas de properties JSON. */
+// ── conexión TCP al grafo (postgres-farm expone chagra_kg en 127.0.0.1:5432) ──
+const PG = {
+  host: process.env.PGHOST || '127.0.0.1',
+  port: process.env.PGPORT || '5432',
+  user: process.env.PGUSER || 'farmos',
+  password: process.env.PGPASSWORD || 'changeme',
+  database: GRAPH,
+};
+
+/** Autodescubre el binario psql (NixOS no siempre lo tiene en PATH). */
+function findPsql() {
+  if (process.env.PSQL_BIN && existsSync(process.env.PSQL_BIN)) return process.env.PSQL_BIN;
+  try {
+    const w = execSync('command -v psql', { encoding: 'utf-8', shell: '/bin/sh' }).trim();
+    if (w) return w;
+  } catch {
+    /* no en PATH */
+  }
+  try {
+    const found = execSync("ls -1 /nix/store/*postgresql*/bin/psql 2>/dev/null | head -1", {
+      encoding: 'utf-8',
+      shell: '/bin/sh',
+    }).trim();
+    if (found && existsSync(found)) return found;
+  } catch {
+    /* sin nix-store */
+  }
+  return 'psql';
+}
+const PSQL_BIN = findPsql();
+
+/** Corre una query Cypher en el grafo vivo (TCP) y devuelve filas de props JSON. */
 function cypherProps(matchReturn) {
-  // Escribimos el SQL a un archivo y usamos `psql -f` para evitar que el shell
-  // interprete `$$` (dollar-quoting) como el PID, y `"$user"` como vacío. El
-  // archivo se monta en el container vía `podman exec -i ... -f -` (stdin).
+  // `$$` (dollar-quoting) y `"$user"` no los toca el shell porque el SQL va por
+  // STDIN a `psql -f -` y los args van por execFileSync (sin shell intermedio).
   const sql = `LOAD 'age';\nSET search_path = ag_catalog, public;\nSELECT props FROM cypher('${GRAPH}', $$ ${matchReturn} $$) AS (props agtype);\n`;
-  // El SQL va por STDIN (input) → ni el `$$` ni el `"$user"` los toca el shell.
-  const cmd = `sudo podman exec -i postgres-farm psql -U farmos -d ${GRAPH} -t -A -f -`;
-  const out = execSync(cmd, { encoding: 'utf-8', maxBuffer: 64 * 1024 * 1024, input: sql });
+  const out = execFileSync(
+    PSQL_BIN,
+    ['-h', PG.host, '-p', PG.port, '-U', PG.user, '-d', PG.database, '-t', '-A', '-f', '-'],
+    {
+      encoding: 'utf-8',
+      maxBuffer: 64 * 1024 * 1024,
+      input: sql,
+      env: { ...process.env, PGPASSWORD: PG.password },
+    },
+  );
   return parseRows(out);
 }
 
@@ -80,11 +125,50 @@ const targetSpecies = byId(
   ),
 );
 
+// Especies con CLIMA EXTENDIDO curado en las últimas ~80h: tolerancia a sequía,
+// sensibilidad a helada (categórica), precipitación anual y meses secos tolerados.
+// Es el bloque que el pool viejo NO medía.
+const climaExt = byId(
+  cypherProps(
+    `MATCH (s:Species) WHERE s.clima_ext_flag IS NOT NULL RETURN {
+       id: s.id, nombre_comun: s.nombre_comun, nombre_cientifico: s.nombre_cientifico,
+       tolerancia_sequia: s.clima_ext_tolerancia_sequia,
+       sensibilidad_helada: s.clima_ext_sensibilidad_helada,
+       precip_min: s.clima_ext_precipitacion_min_mm_anual,
+       precip_max: s.clima_ext_precipitacion_max_mm_anual,
+       meses_secos_tolera: s.clima_ext_meses_secos_tolera,
+       humedad: s.clima_ext_humedad_relativa,
+       altitud_min: s.altitud_min, altitud_max: s.altitud_max
+     }`,
+  ),
+);
+
+// PISOS TÉRMICOS: cada especie crece en pisos concretos (GROWS_IN → PisoTermico).
+// Reunimos los pisos por especie para fundamentar los prompts de piso térmico.
+const pisoEdges = cypherProps(
+  'MATCH (s:Species)-[:GROWS_IN]->(p:PisoTermico) RETURN {id: s.id, piso: p.id}',
+);
+const pisosBySpecies = {};
+for (const e of pisoEdges) {
+  if (!e || !e.id) continue;
+  (pisosBySpecies[e.id] ||= new Set()).add(e.piso);
+}
+const pisosOf = (id) => [...(pisosBySpecies[id] || [])];
+
 const nBios = Object.keys(bios).length;
 const nForr = Object.keys(forrajeras).length;
-console.log(`[pool] grafo: ${nBios} biopreparados curados, ${Object.keys(pests).length} pests, ${nForr} forrajeras`);
+const nClimaExt = Object.keys(climaExt).length;
+const nPisoEdges = pisoEdges.length;
+console.log(
+  `[pool] grafo: ${nBios} biopreparados curados, ${Object.keys(pests).length} pests, ${nForr} forrajeras, ` +
+    `${nClimaExt} especies clima_ext, ${nPisoEdges} aristas GROWS_IN`,
+);
 if (nBios < 5 || nForr < 5) {
   console.error('[pool] FATAL: el grafo no devolvió suficientes hechos curados. ¿postgres-farm vivo? ¿curación cargada?');
+  process.exit(1);
+}
+if (nClimaExt < 5 || nPisoEdges < 50) {
+  console.error('[pool] FATAL: clima_ext / pisos térmicos no cargados en el grafo. Re-sincronizá la curación antes de regenerar el pool.');
   process.exit(1);
 }
 
@@ -502,6 +586,111 @@ add('normativa', '¿Necesito registro ICA para vender mi biopreparado a otros ag
   ['no necesitas ningún registro', 'véndelo libremente sin trámite'],
   { grounded_from: 'normativa ICA bioinsumos' });
 
+// ════════════════════════════════════════════════════════════════════════════
+// C11 — CLIMA EXTENDIDO (curación de las últimas ~80h): tolerancia a sequía,
+// sensibilidad a helada categórica, precipitación anual y meses secos tolerados.
+// Cada must_include sale del HECHO del grafo (no verbatim de fuente). El must
+// incluye el rótulo categórico real (alta/media/baja) → graph-faithful.
+// ════════════════════════════════════════════════════════════════════════════
+const sequiaWord = { alta: 'tolera la sequía', media: 'tolerancia media a la sequía', baja: 'poca tolerancia a la sequía' };
+const heladaWord = { alta: 'muy sensible a la helada', media: 'sensibilidad media a la helada', baja: 'poco sensible a la helada' };
+
+// C11a — tolerancia a sequía: una especie de sequía ALTA y una de sequía BAJA.
+const seqAlta = climaExt['manihot_esculenta']; // yuca brava: sequía alta, 5 meses secos
+if (seqAlta && seqAlta.tolerancia_sequia) {
+  add(
+    'clima_ext',
+    'Tengo un lote que se seca mucho en verano. ¿La yuca brava amazónica aguanta una temporada seca larga?',
+    [seqAlta.nombre_comun, sequiaWord[seqAlta.tolerancia_sequia], `${seqAlta.meses_secos_tolera} meses`],
+    ['no tolera nada de sequía', 'necesita riego permanente la yuca', 'sensibilidad baja a la sequía'],
+    { grounded_from: `Species:manihot_esculenta(sequia=${seqAlta.tolerancia_sequia};meses_secos=${seqAlta.meses_secos_tolera})` },
+  );
+}
+const seqBaja = climaExt['solanum_quitoense']; // lulo: sequía baja
+if (seqBaja && seqBaja.tolerancia_sequia === 'baja') {
+  add(
+    'clima_ext',
+    'En mi vereda hay veranos secos. ¿El lulo aguanta bien la sequía o le falta agua rápido?',
+    [seqBaja.nombre_comun, sequiaWord['baja'], 'humedad'],
+    ['el lulo tolera muy bien la sequía', 'aguanta meses sin agua', 'es resistente a la sequía'],
+    { grounded_from: `Species:solanum_quitoense(sequia=${seqBaja.tolerancia_sequia})` },
+  );
+}
+
+// C11b — precipitación anual: rango mínimo/máximo del grafo (cacao exige lluvia).
+const cacao = climaExt['theobroma_cacao'];
+if (cacao && cacao.precip_min != null) {
+  add(
+    'clima_ext',
+    '¿Cuánta lluvia al año necesita el cacao para producir bien?',
+    [cacao.nombre_comun, String(cacao.precip_min), 'mm'],
+    ['el cacao necesita poca lluvia', 'aguanta climas secos sin problema', `${cacao.precip_min - 600} mm`],
+    { grounded_from: `Species:theobroma_cacao(precip=${cacao.precip_min}-${cacao.precip_max}mm)` },
+  );
+}
+
+// C11c — sensibilidad a helada categórica (café muy sensible; distinto de helada_letal numérica).
+const cafe = climaExt['coffea_arabica'];
+if (cafe && cafe.sensibilidad_helada) {
+  add(
+    'clima_ext',
+    'Mi finca cafetera a veces tiene mañanas muy frías. ¿Qué tan sensible es el café a una helada?',
+    [cafe.nombre_comun || 'café', heladaWord[cafe.sensibilidad_helada], 'proteger'],
+    ['el café aguanta bien las heladas', 'no le pasa nada con la helada', 'poco sensible a la helada'],
+    { grounded_from: `Species:coffea_arabica(sens_helada=${cafe.sensibilidad_helada})` },
+  );
+}
+
+// C11d — meses secos tolerados (plátano tolera 1; yuca 5) → no confundir.
+const platano = climaExt['musa_paradisiaca'];
+if (platano && platano.meses_secos_tolera != null) {
+  add(
+    'clima_ext',
+    '¿Cuántos meses de sequía aguanta el plátano sin riego antes de afectarse?',
+    [platano.nombre_comun, `${platano.meses_secos_tolera}`, 'mes'],
+    ['aguanta medio año sin agua', 'tolera 5 meses secos el plátano', 'es resistente a sequías largas'],
+    { grounded_from: `Species:musa_paradisiaca(meses_secos=${platano.meses_secos_tolera})` },
+  );
+}
+
+// C11e — abstención clima_ext: especie SIN clima_ext curado → no inventar el dato.
+add(
+  'clima_ext',
+  '¿Cuántos milímetros exactos de lluvia al año necesita la "pitahaya amarilla del desierto andino"?',
+  ['no tengo ese dato verificado', 'no figura en el catálogo'],
+  ['mm inventados', 'valida la especie "pitahaya amarilla del desierto andino"'],
+  { expects_abstention: true, grounded_from: 'no-existe-en-grafo (clima_ext)' },
+);
+
+// ════════════════════════════════════════════════════════════════════════════
+// C12 — PISOS TÉRMICOS (GROWS_IN → PisoTermico): qué piso(s) corresponde(n) a la
+// especie. Cada must incluye el/los piso(s) reales del grafo + rechazo del piso
+// equivocado en red_flags.
+// ════════════════════════════════════════════════════════════════════════════
+const pisoCases = [
+  ['coffea_arabica', 'café', 'Estoy en clima templado de montaña media. ¿El café es de mi piso térmico?'],
+  ['manihot_esculenta', 'yuca', '¿La yuca es un cultivo de tierra caliente o de clima frío?'],
+  ['solanum_tuberosum', 'papa', '¿En qué piso térmico va bien la papa parda: cálido, templado, frío o páramo?'],
+  ['theobroma_cacao', 'cacao', '¿Puedo sembrar cacao en clima frío de montaña o solo en tierra caliente?'],
+];
+for (const [id, nombre, prompt] of pisoCases) {
+  const pisos = pisosOf(id);
+  if (!pisos.length) continue;
+  // pisos equivocados = los que NO están en el grafo para esa especie.
+  const allPisos = ['calido', 'templado', 'frio', 'paramo'];
+  const wrong = allPisos.filter((p) => !pisos.includes(p));
+  add(
+    'pisos_termicos',
+    prompt,
+    [nombre, ...pisos],
+    [
+      // afirmar un piso que el grafo NO tiene para la especie es alucinación.
+      ...wrong.slice(0, 2).map((w) => `crece en piso ${w}`),
+    ],
+    { grounded_from: `Species:${id}-[GROWS_IN]->PisoTermico(${pisos.join(',')})` },
+  );
+}
+
 // ── escribir el pool ──────────────────────────────────────────────────────────
 if (!existsSync(OUT_DIR)) mkdirSync(OUT_DIR, { recursive: true });
 const dateStr = new Date().toISOString().split('T')[0];
@@ -512,7 +701,7 @@ for (const p of prompts) byCap[p.cap] = (byCap[p.cap] || 0) + 1;
 
 const pool = {
   generated_at: new Date().toISOString(),
-  source: `${GRAPH} (Apache AGE, postgres-farm, grafo vivo)`,
+  source: `${GRAPH} (Apache AGE, postgres-farm TCP ${PG.host}:${PG.port}, grafo vivo)`,
   design: 'Chagra-strategy/deepresearch/BENCH_30H_DESIGN_2026-05-31.md',
   n_prompts: prompts.length,
   caps: byCap,
