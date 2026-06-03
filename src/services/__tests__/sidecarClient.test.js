@@ -494,6 +494,124 @@ describe('sidecarClient — feature flag on', () => {
       expect(res).toBeNull();
     });
   });
+
+  describe('fermentoPrefilter — capa 1 SAFETY-CRITICAL (#159)', () => {
+    const FERMENTO_HIT = {
+      is_fermento_intent: true,
+      fermento_id: 'fermento-kombucha',
+      veto_total: false,
+      disclaimer_fuerte: true,
+      system_prompt_block:
+        '=== REGLA DE MÁXIMA PRIORIDAD — FERMENTO DE CONSUMO HUMANO ===\n' +
+        'No afirmes propiedades curativas. Disclaimer obligatorio. Cita INVIMA.\n' +
+        '=== FIN REGLA FERMENTO ===',
+      fuente_autoridad: 'INVIMA',
+      reason: 'fermento_intent_resolved',
+    };
+
+    const NO_FERMENTO = {
+      is_fermento_intent: false,
+      fermento_id: null,
+      veto_total: false,
+      disclaimer_fuerte: false,
+      system_prompt_block: '',
+      fuente_autoridad: null,
+      reason: 'no_fermento_intent',
+    };
+
+    it('query de FERMENTO → inyecta el system_prompt_block del sidecar', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, FERMENTO_HIT));
+      const { fermentoPrefilter } = await importFresh();
+      const res = await fermentoPrefilter('cómo hago kombucha casera');
+      expect(res).not.toBeNull();
+      expect(res.is_fermento_intent).toBe(true);
+      expect(res.system_prompt_block).toContain('FERMENTO DE CONSUMO HUMANO');
+      expect(res.disclaimer_fuerte).toBe(true);
+      expect(res.fuente_autoridad).toBe('INVIMA');
+      // POST con user_message a /fermento-prefilter (mismo contrato que /resolve-entities).
+      const [url, opts] = fetchMock.mock.calls[0];
+      expect(url).toBe('/api/mcp/agro/fermento-prefilter');
+      expect(opts.method).toBe('POST');
+      expect(opts.headers['X-Chagra-Token']).toBe('test-token-123');
+      expect(JSON.parse(opts.body)).toEqual({ user_message: 'cómo hago kombucha casera' });
+    });
+
+    it('query NO-fermento → is_fermento_intent false + bloque vacío (no se inyecta nada)', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, NO_FERMENTO));
+      const { fermentoPrefilter } = await importFresh();
+      const res = await fermentoPrefilter('¿a cómo está la papa?');
+      expect(res).not.toBeNull();
+      expect(res.is_fermento_intent).toBe(false);
+      expect(res.system_prompt_block).toBe('');
+      expect(res.veto_total).toBe(false);
+    });
+
+    it('veto_total + disclaimer_fuerte se propagan tal cual (refusal)', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, {
+        ...FERMENTO_HIT,
+        fermento_id: 'fermento-hidromiel',
+        veto_total: true,
+        reason: 'veto_total_menor',
+      }));
+      const { fermentoPrefilter } = await importFresh();
+      const res = await fermentoPrefilter('le puedo dar hidromiel al bebé');
+      expect(res.veto_total).toBe(true);
+      expect(res.disclaimer_fuerte).toBe(true);
+      expect(res.fermento_id).toBe('fermento-hidromiel');
+    });
+
+    it('normaliza un body parcial del sidecar a la forma contractual (defensivo)', async () => {
+      // Sidecar viejo / respuesta incompleta: campos faltantes → defaults seguros.
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, { is_fermento_intent: true, system_prompt_block: 'X' }));
+      const { fermentoPrefilter } = await importFresh();
+      const res = await fermentoPrefilter('cómo fermento yuca amarga');
+      expect(res.is_fermento_intent).toBe(true);
+      expect(res.system_prompt_block).toBe('X');
+      expect(res.fermento_id).toBeNull();
+      expect(res.veto_total).toBe(false);
+      expect(res.disclaimer_fuerte).toBe(false);
+      expect(res.fuente_autoridad).toBeNull();
+      expect(res.reason).toBe('');
+    });
+
+    it('devuelve null sin fetch cuando flag off (degradación graceful)', async () => {
+      disableFlag();
+      const { fermentoPrefilter } = await importFresh();
+      const res = await fermentoPrefilter('cómo hago kombucha');
+      expect(res).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('devuelve null sin fetch cuando offline', async () => {
+      Object.defineProperty(navigator, 'onLine', { configurable: true, value: false });
+      const { fermentoPrefilter } = await importFresh();
+      const res = await fermentoPrefilter('cómo hago kombucha');
+      expect(res).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('devuelve null sin fetch cuando userMessage vacío/no-string', async () => {
+      const { fermentoPrefilter } = await importFresh();
+      expect(await fermentoPrefilter('')).toBeNull();
+      expect(await fermentoPrefilter(null)).toBeNull();
+      expect(await fermentoPrefilter(undefined)).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('5xx → null sin throw (sidecar caído, no rompe el turno)', async () => {
+      fetchMock.mockResolvedValueOnce(jsonResponse(503, { error: 'age down' }));
+      const { fermentoPrefilter } = await importFresh();
+      const res = await fermentoPrefilter('cómo hago kombucha');
+      expect(res).toBeNull();
+    });
+
+    it('fetch throws → null sin throw', async () => {
+      fetchMock.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+      const { fermentoPrefilter } = await importFresh();
+      const res = await fermentoPrefilter('cómo hago kombucha');
+      expect(res).toBeNull();
+    });
+  });
 });
 
 describe('sidecarClient — getClimaSnapshot elevation (gradiente térmico)', () => {

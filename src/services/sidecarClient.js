@@ -369,6 +369,48 @@ export async function resolveEntities(userMessage, opts = {}) {
 }
 
 /**
+ * Pre-filtro determinista de FERMENTOS (capa 1 SAFETY-CRITICAL, chagra-pro
+ * #159 — DR-FOOD-3). Llama `POST ${BASE}/fermento-prefilter` con la query del
+ * usuario; el sidecar detecta intención-fermento (kombucha, hidromiel, yuca
+ * amarga, etc.), resuelve el nodo :Fermento en Apache AGE y devuelve un bloque
+ * de instrucción listo para inyectar al system prompt (refusal/veto si aplica,
+ * disclaimer fuerte, veto de claims de salud, autoridad institucional citada).
+ *
+ * El bloque es FAIL-SAFE: ante AGE caído o nodo sin revisión humana el sidecar
+ * igual inyecta el bloque conservador. Se invoca EN PARALELO con
+ * resolveEntities (mismo turno, antes del LLM) — espejo exacto de su patrón.
+ *
+ * NUNCA throw. Devuelve null si: flag off, offline, timeout, non-2xx, body
+ * inválido → el caller degrada con gracia (no inyecta bloque, no rompe el
+ * turno). Cuando `is_fermento_intent` es false, NO hay que inyectar nada.
+ *
+ * @param {string} userMessage — texto del operador.
+ * @returns {Promise<null | {
+ *   is_fermento_intent: boolean,
+ *   fermento_id: string | null,
+ *   veto_total: boolean,
+ *   disclaimer_fuerte: boolean,
+ *   system_prompt_block: string,
+ *   fuente_autoridad: string | null,
+ *   reason: string,
+ * }>}
+ */
+export async function fermentoPrefilter(userMessage) {
+  if (!userMessage || typeof userMessage !== 'string') return null;
+  const raw = await postJson('/fermento-prefilter', { user_message: userMessage }, NLU_TIMEOUT_MS);
+  if (!raw || typeof raw !== 'object') return null;
+  return {
+    is_fermento_intent: raw.is_fermento_intent === true,
+    fermento_id: typeof raw.fermento_id === 'string' ? raw.fermento_id : null,
+    veto_total: raw.veto_total === true,
+    disclaimer_fuerte: raw.disclaimer_fuerte === true,
+    system_prompt_block: typeof raw.system_prompt_block === 'string' ? raw.system_prompt_block : '',
+    fuente_autoridad: typeof raw.fuente_autoridad === 'string' ? raw.fuente_autoridad : null,
+    reason: typeof raw.reason === 'string' ? raw.reason : '',
+  };
+}
+
+/**
  * Capa 2 anti-alucinación (cross-check de contexto). Llama
  * `POST ${BASE}/post-validate` con el TEXTO que el LLM ya generó y, opcional,
  * los `nombre_cientifico` de las entidades que la capa 1 resolvió para el turno
