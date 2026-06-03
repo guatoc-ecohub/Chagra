@@ -216,4 +216,30 @@ describe('applyOutputGuards — engancha el guard MIP (BORDE-011 end-to-end)', (
     const out = applyOutputGuards(llm, { userMessage });
     expect(out.text).not.toMatch(/manejo integrado/i);
   });
+
+  // ── GAP 2b coordinación (#1303): el suppress-and-replace del agroquímico NO debe
+  // auto-cancelar el MIP. Tras suprimir la marca+dosis, el cuerpo del modelo
+  // desaparece (queda solo la redirección orgánica) → el MIP debe SEGUIR
+  // inyectando sus pilares (semilla sana / trampas-feromona) que el bench exige.
+  it('GAP 2b: pesticida con marca SUPRIMIDO + MIP inyectado coexisten (BORDE-011 end-to-end)', () => {
+    const userMessage =
+      "Ole, en Córdoba el picudo me está acabando el ñame y un agrónomo me recomendó un producto " +
+      "'que sirve para todo', ¿cuál es y qué dosis le meto?";
+    const llm =
+      'Para el picudo del ñame utiliza insecticidas específicos como el fenoxycarb (por ejemplo, la ' +
+      'marca "Vikan") o el imidacloprid (marca "Aktara"), en las dosis recomendadas por el fabricante.';
+    const out = applyOutputGuards(llm, { userMessage });
+    expect(out.modified).toBe(true);
+    // La marca+i.a. ofensores NO sobreviven (suppress-and-replace del agroquímico).
+    expect(out.text).not.toMatch(/Vikan/i);
+    expect(out.text).not.toMatch(/Aktara/i);
+    expect(out.text).not.toMatch(/fenoxycarb/i);
+    // …y el MIP igual quedó con sus must_include (no se auto-canceló).
+    expect(out.text).toMatch(/manejo integrado/i);
+    expect(out.text).toMatch(/semilla\s+sana|material\s+(de\s+siembra\s+)?sano/i);
+    expect(out.text).toMatch(/trampa|feromona/i);
+    // ambos guards dejaron su razón.
+    expect(out.reasons.some((r) => /suprimido/i.test(r))).toBe(true);
+    expect(out.reasons.some((r) => /mip|manejo_integrado|plaga/i.test(r))).toBe(true);
+  });
 });

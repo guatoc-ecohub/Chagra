@@ -233,6 +233,109 @@ describe('guardSyntheticAgrochemical', () => {
       expect(out.modified).toBe(false);
     });
   });
+
+  // ── GAP 2a (#1303 / BORDE-006): acaricidas/insecticidas comunes faltantes ──
+  // El bench BORDE-006 (mosca blanca) quedó a 1 red flag del PASS porque la
+  // denylist NO cubría Abamectina/Spinetoram/Spinosad ni i.a. modernos
+  // (ciantraniliprol, tiametoxam, acetamiprid, fenoxycarb…). Estos NO terminan en
+  // un sufijo de familia clásica capturado por el detector → van a la denylist.
+  describe('GAP 2a — acaricidas/insecticidas comunes (denylist ampliada BORDE-006)', () => {
+    it('detecta abamectina / spinetoram / spinosad (red flag de BORDE-006)', () => {
+      for (const term of ['abamectina', 'spinetoram', 'spinosad']) {
+        const out = guardSyntheticAgrochemical(`Para la mosca blanca aplica ${term} foliar.`);
+        expect(out.modified, term).toBe(true);
+        expect(out.reason, term).toMatch(/agroqu/i);
+      }
+    });
+
+    it('detecta i.a. modernos: ciantraniliprol, imidacloprid, tiametoxam, acetamiprid, fenoxycarb', () => {
+      for (const term of ['ciantraniliprol', 'imidacloprid', 'tiametoxam', 'acetamiprid', 'fenoxycarb']) {
+        const out = guardSyntheticAgrochemical(`Aplica ${term} contra el insecto.`);
+        expect(out.modified, term).toBe(true);
+      }
+    });
+
+    it('CONTROL anti-FP: una mención de NO-USAR un sintético no debe dejarlo pasar como recomendación, pero tampoco romper', () => {
+      // El guard es conservador en SAFETY: ante "no uses abamectina" igual anexa la
+      // ruta orgánica (no afirma que la recomienda). Lo que NO debe pasar es dejar la
+      // dosis/marca legible (ver suppress-and-replace abajo). Aquí solo verificamos
+      // que el contrapeso agroecológico aparece y no se rompe.
+      const out = guardSyntheticAgrochemical('Importante: NO uses abamectina, es tóxica para abejas.');
+      expect(out.text).toMatch(/agroecológico/i);
+    });
+  });
+
+  // ── GAP 2b (#1303 / BORDE-011): suppress-and-replace de marca + dosis ──────
+  // En BORDE-011 el modelo recomendó "fenoxycarb (marca 'Vikan')" / "(marca
+  // 'Aktara')" como control químico. El guard ANTES solo ANEXABA la nota orgánica
+  // dejando la recomendación de marca+dosis legible debajo. AHORA: cuando hay un
+  // PESTICIDA de síntesis junto a una MARCA comercial o una DOSIS de aplicación,
+  // SUPRIME el cuerpo y devuelve SOLO la redirección orgánica.
+  describe('GAP 2b — suppress-and-replace de pesticida sintético con marca/dosis (BORDE-011)', () => {
+    const offending =
+      'Para el picudo del ñame utiliza insecticidas específicos como el fenoxycarb (por ejemplo, la ' +
+      'marca "Vikan") o el imidacloprid (marca "Aktara"). Aplica los productos en las dosis recomendadas ' +
+      'por el fabricante y alterna entre diferentes clases químicas.';
+
+    it('CASO BORDE-011: pesticida + marca → SUPRIME el cuerpo ofensor (no solo anexa)', () => {
+      const out = guardSyntheticAgrochemical(offending);
+      expect(out.modified).toBe(true);
+      expect(out.reason).toMatch(/suprimido/i);
+      // El texto ofensor de marca NO sobrevive.
+      expect(out.text).not.toMatch(/Vikan/i);
+      expect(out.text).not.toMatch(/Aktara/i);
+      expect(out.text).not.toMatch(/fenoxycarb/i);
+      // …y queda la redirección agroecológica.
+      expect(out.text).toMatch(/agroecológico/i);
+    });
+
+    it('pesticida + DOSIS por área también suprime (no solo marca)', () => {
+      const out = guardSyntheticAgrochemical(
+        'Aplica abamectina a razón de 50 g por hectárea cada 8 días sobre el envés de la hoja.',
+      );
+      expect(out.modified).toBe(true);
+      expect(out.reason).toMatch(/suprimido/i);
+      expect(out.text).not.toMatch(/abamectina/i);
+      expect(out.text).toMatch(/agroecológico/i);
+    });
+
+    it('CONTROL anti-FP: una respuesta ORGÁNICA con dosis (jabón potásico) NO se suprime', () => {
+      const ok =
+        'Para la mosca blanca usa jabón potásico a 10 g por litro de agua, aplicado al atardecer mojando ' +
+        'el envés; pon trampas amarillas y asocia con caléndula.';
+      const out = guardSyntheticAgrochemical(ok);
+      expect(out.modified).toBe(false);
+      expect(out.text).toBe(ok);
+    });
+
+    it('CONTROL anti-FP: un pesticida SIN marca ni dosis sigue en modo APPEND (no suprime)', () => {
+      // Mención suelta de glifosato sin dosis ni marca: se conserva el cuerpo y se
+      // anexa el contrapeso (#17), no se suprime.
+      const out = guardSyntheticAgrochemical('Algunos usan glifosato para la maleza, pero no es lo ideal.');
+      expect(out.modified).toBe(true);
+      expect(out.reason).not.toMatch(/suprimido/i);
+      // el cuerpo original sobrevive (append).
+      expect(out.text).toMatch(/Algunos usan glifosato/);
+      expect(out.text).toMatch(/agroecológico/i);
+    });
+
+    it('CONTROL anti-FP: una ADVERTENCIA "NO uses/apliques X" (aun con dosis) NO se suprime (se conserva)', () => {
+      // El texto desaconseja el sintético: conservar la advertencia es útil. Aunque
+      // mencione una dosis, no es una RECOMENDACIÓN → no suprimimos (solo anexamos).
+      const out = guardSyntheticAgrochemical(
+        'NUNCA apliques clorpirifos a 30 cc por bomba de 20 L: es muy tóxico para abejas y abejorros.',
+      );
+      expect(out.modified).toBe(true);
+      expect(out.reason).not.toMatch(/suprimido/i);
+      expect(out.text).toMatch(/NUNCA apliques clorpirifos/);
+      expect(out.text).toMatch(/agroecológico/i);
+    });
+
+    it('CONTROL anti-FP: "no recomiendo abamectina" (sin dosis) tampoco suprime', () => {
+      const out = guardSyntheticAgrochemical('No te recomiendo abamectina; mejor manejo biológico con Encarsia.');
+      expect(out.reason || '').not.toMatch(/suprimido/i);
+    });
+  });
 });
 
 // ──────────────────────────────────────────────────────────────────────────
