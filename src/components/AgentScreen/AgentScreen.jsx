@@ -72,7 +72,14 @@ import DeepResearchCard from '../DeepResearchCard';
 import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildSuggestedEntitiesContext, isLowConfidenceEntity } from '../../services/agentService';
 import { applyOutputGuards, applyTaxonomyGuard, classifyQueryIntent } from '../../services/outputGuards';
 import { getProfile } from '../../services/userProfileService';
-import { regionFromProfile } from '../../services/ensoContext';
+import { regionFromProfile, getEnsoOutlook } from '../../services/ensoContext';
+// SALUDO PROACTIVO (#162 alertas + #298 tareas + #331 análisis): el agente, de
+// entrada, lidera con lo MÁS importante (1-2 pendientes) si los hay, o da una
+// idea contextual (cultivo/clima/temporada) sin inventar alarmas. Lógica pura
+// y testeable extraída a proactiveGreeting; aquí solo la hidratamos desde los
+// stores en vivo y la pintamos en el empty-state del chat.
+import { resolveProactiveGreeting } from '../../services/proactiveGreeting';
+import useLogStore from '../../store/useLogStore';
 // Bug UX 2026-05-30: preservar respuesta parcial ante abort/timeout/cancel.
 // La lógica pura del merge del estado final vive en agentPartialMerge (testeable
 // sin montar el componente).
@@ -194,6 +201,11 @@ export default function AgentScreen({ onBack, initialContext }) {
   // informe oficial. El banner es dismissable — al primer submit, o cuando
   // el operador cierra, desaparece. NO se persiste entre mounts.
   const [alertContextBanner, setAlertContextBanner] = useState(null);
+  // SALUDO PROACTIVO: objeto {hi, state, lead, items, restCount, prompt} que el
+  // empty-state del chat pinta de entrada. Se resuelve UNA vez al montar (lee
+  // alertas + tareas + clima/cultivos) y solo se muestra mientras el chat esté
+  // vacío e idle. null mientras no haya resuelto (fallback al copy estático).
+  const [proactiveGreeting, setProactiveGreeting] = useState(null);
   // CHIPS DE MODO (A4): modo activo seleccionado en la ChipsToolbar. Cuando
   // hay un modo activo, el siguiente submit fuerza esa intención y rutea
   // DIRECTO al tool determinístico (saltando el NLU, A3). El placeholder del
@@ -392,6 +404,49 @@ export default function AgentScreen({ onBack, initialContext }) {
       }
     });
     return () => { alive = false; };
+  }, []);
+
+  // SALUDO PROACTIVO de entrada: resolvemos el saludo dinámico al montar. Lee
+  // alertas activas (alertEngine #162), tareas pendientes (#298 via logStore),
+  // y deriva una idea contextual de cultivos/clima/temporada cuando NO hay nada
+  // urgente. Local-only, una sola vez (NO quema GPU ni red por refresh). Si todo
+  // falla, queda null y el empty-state cae al copy estático.
+  useEffect(() => {
+    let alive = true;
+    const stripPlantNumber = (name) => (name || '').replace(/\s*#\d+\s*$/, '').trim();
+    const grouped = Object.entries(
+      (plants || []).reduce((acc, p) => {
+        const base = stripPlantNumber(p.attributes?.name);
+        if (base) acc[base] = (acc[base] || 0) + 1;
+        return acc;
+      }, {}),
+    ).map(([name, count]) => ({ name, count }));
+    const finca = fincas.find((f) => f.slug === activeFincaSlug);
+    const climaSnapshot = getCachedClimaSnapshot();
+    let ensoOutlook = null;
+    try {
+      const phase = climaSnapshot?.enso_status?.phase;
+      if (phase) {
+        const region = regionFromProfile(getProfile());
+        const probs = climaSnapshot?.enso_status?.ideam_probabilities
+          || climaSnapshot?.enso_status?.ideam_probabilidades
+          || null;
+        ensoOutlook = getEnsoOutlook({ phase, region, probabilities: probs });
+      }
+    } catch (_) { /* sin ENSO no pasa nada — la idea cae a temporada/piso */ }
+    resolveProactiveGreeting({
+      activeAlerts,
+      getPendingTasks: () => useLogStore.getState().getPendingTasks(),
+      cultivos: grouped,
+      altitud: finca?.altitud != null ? Number(finca.altitud) : null,
+      ensoOutlook,
+    }).then((g) => {
+      if (alive) setProactiveGreeting(g);
+    }).catch(() => { /* degrada silencioso al copy estático */ });
+    return () => { alive = false; };
+    // Solo al montar: el saludo es la primera impresión, no debe re-evaluarse en
+    // cada cambio de inventario/alerta mientras el operador ya está leyéndolo.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 2026-05-28: aplicar initialContext de notificación climática.
@@ -2673,6 +2728,8 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         onConsentNeeded={handleFeedbackConsentNeeded}
         onRetryOrphan={handleRetryOrphan}
         onCancelDeepResearch={handleCancelDeepResearch}
+        proactiveGreeting={proactiveGreeting}
+        onGreetingPrompt={(prompt) => prompt && setInputText(prompt)}
       />
 
       {/* Error */}
