@@ -40,6 +40,8 @@
   --t-accent-2: #7a8f4a;    /* salvia (verde) */
   --t-accent-warm: #f5b733; /* ocre flor */
   --t-accent-rgb: 217, 138, 79;
+  --t-bg-rgb: 246, 239, 224; /* rgb de --t-bg (para halos/scrims) */
+  --sombra-flota: 0 4px 12px -6px rgba(74, 58, 38, 0.22);
 }
 
 [data-theme="minimalista"] {
@@ -56,6 +58,8 @@
   --t-accent-2: #2f6e5a;
   --t-accent-warm: #f5b733;
   --t-accent-rgb: 47, 110, 90;
+  --t-bg-rgb: 246, 243, 236; /* rgb de --t-bg (para halos/scrims) */
+  --sombra-flota: 0 4px 12px -6px rgba(31, 36, 33, 0.18);
 }
 
 /* ===========================================================================
@@ -255,4 +259,335 @@
 [data-theme="minimalista"] .bg-gradient-to-br.from-slate-950 {
   background-image: none !important;
   background-color: var(--t-surface) !important;
+}
+
+/* ===========================================================================
+ * 11. SUPERFICIES SLATE CON OPACIDAD QUE FALTABAN (gap 2026-06-03)
+ *     El remap previo cubría /40 /50 /60 y bg-slate-800/70, pero VARIAS
+ *     superficies del agente y los chips usan /80, /30, /20 o /90 — quedaban
+ *     OSCURAS sobre el fondo claro ("pastillas grises feas" en nature/minimal,
+ *     reporte operador). Las llevamos a la superficie del tema.
+ * =========================================================================== */
+
+[data-theme="nature"] .bg-slate-900\/90,
+[data-theme="nature"] .bg-slate-900\/80,
+[data-theme="nature"] .bg-slate-900\/70,
+[data-theme="nature"] .bg-slate-900\/30,
+[data-theme="nature"] .bg-slate-900\/20,
+[data-theme="nature"] .bg-slate-800\/90,
+[data-theme="nature"] .bg-slate-800\/80,
+[data-theme="nature"] .bg-slate-800\/70,
+[data-theme="nature"] .bg-slate-800\/60,
+[data-theme="nature"] .bg-slate-800\/30,
+[data-theme="nature"] .bg-slate-800\/20,
+[data-theme="nature"] .bg-slate-700\/80,
+[data-theme="nature"] .bg-slate-700\/70,
+[data-theme="nature"] .bg-slate-700,
+[data-theme="nature"] .bg-slate-600,
+[data-theme="minimalista"] .bg-slate-900\/90,
+[data-theme="minimalista"] .bg-slate-900\/80,
+[data-theme="minimalista"] .bg-slate-900\/70,
+[data-theme="minimalista"] .bg-slate-900\/30,
+[data-theme="minimalista"] .bg-slate-900\/20,
+[data-theme="minimalista"] .bg-slate-800\/90,
+[data-theme="minimalista"] .bg-slate-800\/80,
+[data-theme="minimalista"] .bg-slate-800\/70,
+[data-theme="minimalista"] .bg-slate-800\/60,
+[data-theme="minimalista"] .bg-slate-800\/30,
+[data-theme="minimalista"] .bg-slate-800\/20,
+[data-theme="minimalista"] .bg-slate-700\/80,
+[data-theme="minimalista"] .bg-slate-700\/70,
+[data-theme="minimalista"] .bg-slate-700,
+[data-theme="minimalista"] .bg-slate-600 {
+  background-color: var(--t-surface) !important;
+}
+
+/* Hover de pastillas/superficies (bg-slate-700/80 hover, etc.): un punto más
+ * cálido que la superficie para que el hover se note sin volverse oscuro. */
+[data-theme="nature"] .hover\:bg-slate-700\/80:hover,
+[data-theme="nature"] .hover\:bg-slate-700\/70:hover,
+[data-theme="nature"] .hover\:bg-slate-700:hover,
+[data-theme="nature"] .hover\:bg-slate-800:hover,
+[data-theme="nature"] .hover\:bg-slate-800\/60:hover,
+[data-theme="nature"] .active\:bg-slate-800:active,
+[data-theme="minimalista"] .hover\:bg-slate-700\/80:hover,
+[data-theme="minimalista"] .hover\:bg-slate-700\/70:hover,
+[data-theme="minimalista"] .hover\:bg-slate-700:hover,
+[data-theme="minimalista"] .hover\:bg-slate-800:hover,
+[data-theme="minimalista"] .hover\:bg-slate-800\/60:hover,
+[data-theme="minimalista"] .active\:bg-slate-800:active {
+  background-color: var(--t-bg-2) !important;
+}
+
+/* ===========================================================================
+ * 12. SUPERFICIES "GLASS" BLANCAS DEL AGENTE (AgentHero / chips)
+ *     AgentHero y los chips de sugerencia NO usan slate-*; usan vidrio claro
+ *     sobre fondo OSCURO (bg-white/[0.06], border-white/10). En bio-punk se ven
+ *     bien (vidrio sobre oscuro), pero en nature/minimalista el fondo es CLARO
+ *     → un velo blanco translúcido sobre crema = invisible/lavado. Les damos
+ *     una superficie sólida del tema + borde del tema. (Reporte operador:
+ *     compositor del home "no presentable" en temas claros.)
+ * =========================================================================== */
+
+[data-theme="nature"] .bg-white\/\[0\.06\],
+[data-theme="nature"] .bg-white\/10,
+[data-theme="nature"] .bg-white\/8,
+[data-theme="nature"] .bg-white\/5,
+[data-theme="minimalista"] .bg-white\/\[0\.06\],
+[data-theme="minimalista"] .bg-white\/10,
+[data-theme="minimalista"] .bg-white\/8,
+[data-theme="minimalista"] .bg-white\/5 {
+  background-color: var(--t-surface) !important;
+}
+
+[data-theme="nature"] .border-white\/10,
+[data-theme="nature"] .border-white\/15,
+[data-theme="nature"] .border-white\/20,
+[data-theme="minimalista"] .border-white\/10,
+[data-theme="minimalista"] .border-white\/15,
+[data-theme="minimalista"] .border-white\/20 {
+  border-color: var(--t-line) !important;
+}
+
+[data-theme="nature"] .hover\:bg-white\/10:hover,
+[data-theme="nature"] .hover\:bg-white\/20:hover,
+[data-theme="nature"] .active\:bg-white\/15:active,
+[data-theme="minimalista"] .hover\:bg-white\/10:hover,
+[data-theme="minimalista"] .hover\:bg-white\/20:hover,
+[data-theme="minimalista"] .active\:bg-white\/15:active {
+  background-color: var(--t-bg-2) !important;
+}
+
+/* Texto sobre las superficies glass (text-slate-100/200/300 ya cubierto en §4,
+ * pero el compositor usa placeholder:text-slate-400 y text-slate-200). El
+ * placeholder y el texto van al texto del tema. */
+[data-theme="nature"] .placeholder\:text-slate-400::placeholder,
+[data-theme="nature"] .placeholder-slate-400::placeholder,
+[data-theme="nature"] .placeholder-slate-500::placeholder,
+[data-theme="minimalista"] .placeholder\:text-slate-400::placeholder,
+[data-theme="minimalista"] .placeholder-slate-400::placeholder,
+[data-theme="minimalista"] .placeholder-slate-500::placeholder {
+  color: var(--t-text-3) !important;
+}
+
+/* ===========================================================================
+ * 13. WelcomeStatsHero "Chagra · impacto" — TONE CARDS + numeritos
+ *     El carrusel de impacto pinta la card con clases bg-{cyan,emerald,lime,
+ *     amber,...}-950/40 y los números con text-{tone}-300/400. NINGUNA es
+ *     slate-* → en temas claros la card quedaba como un BLOQUE OSCURO/GRIS
+ *     flotando sobre crema (el "horrible" #1 del reporte). Las neutralizamos a
+ *     una superficie del tema y viramos los números/acentos al acento del tema.
+ * =========================================================================== */
+
+/* Fondos tonales oscuros de las cards de impacto → superficie suave del tema. */
+[data-theme="nature"] .bg-emerald-950\/40,
+[data-theme="nature"] .bg-cyan-950\/40,
+[data-theme="nature"] .bg-lime-950\/40,
+[data-theme="nature"] .bg-amber-950\/40,
+[data-theme="nature"] .bg-fuchsia-950\/40,
+[data-theme="nature"] .bg-sky-950\/40,
+[data-theme="nature"] .bg-orange-950\/40,
+[data-theme="nature"] .bg-violet-950\/40,
+[data-theme="nature"] .bg-yellow-950\/40,
+[data-theme="minimalista"] .bg-emerald-950\/40,
+[data-theme="minimalista"] .bg-cyan-950\/40,
+[data-theme="minimalista"] .bg-lime-950\/40,
+[data-theme="minimalista"] .bg-amber-950\/40,
+[data-theme="minimalista"] .bg-fuchsia-950\/40,
+[data-theme="minimalista"] .bg-sky-950\/40,
+[data-theme="minimalista"] .bg-orange-950\/40,
+[data-theme="minimalista"] .bg-violet-950\/40,
+[data-theme="minimalista"] .bg-yellow-950\/40 {
+  background-color: var(--t-bg-2) !important;
+}
+
+/* Bordes tonales oscuros → borde del tema. */
+[data-theme="nature"] .border-emerald-800\/60,
+[data-theme="nature"] .border-cyan-800\/60,
+[data-theme="nature"] .border-lime-800\/60,
+[data-theme="nature"] .border-amber-800\/60,
+[data-theme="nature"] .border-fuchsia-800\/60,
+[data-theme="nature"] .border-sky-800\/60,
+[data-theme="nature"] .border-orange-800\/60,
+[data-theme="nature"] .border-violet-800\/60,
+[data-theme="nature"] .border-yellow-800\/60,
+[data-theme="minimalista"] .border-emerald-800\/60,
+[data-theme="minimalista"] .border-cyan-800\/60,
+[data-theme="minimalista"] .border-lime-800\/60,
+[data-theme="minimalista"] .border-amber-800\/60,
+[data-theme="minimalista"] .border-fuchsia-800\/60,
+[data-theme="minimalista"] .border-sky-800\/60,
+[data-theme="minimalista"] .border-orange-800\/60,
+[data-theme="minimalista"] .border-violet-800\/60,
+[data-theme="minimalista"] .border-yellow-800\/60 {
+  border-color: var(--t-line) !important;
+}
+
+/* Números/iconos grandes coloridos del impacto (text-{tone}-300/400) → al
+ * acento del tema, para que destaquen sobre fondo claro en vez de quedar en
+ * un neón ilegible. Incluye los del grid 2x2 (lime/violet/emerald 300). */
+[data-theme="nature"] .text-cyan-300,
+[data-theme="nature"] .text-lime-300,
+[data-theme="nature"] .text-amber-300,
+[data-theme="nature"] .text-fuchsia-300,
+[data-theme="nature"] .text-sky-300,
+[data-theme="nature"] .text-orange-300,
+[data-theme="nature"] .text-violet-300,
+[data-theme="nature"] .text-violet-400,
+[data-theme="nature"] .text-yellow-300,
+[data-theme="nature"] .text-emerald-300,
+[data-theme="nature"] .text-lime-400,
+[data-theme="nature"] .text-cyan-400 {
+  color: var(--t-accent) !important;
+  text-shadow: none !important;
+}
+[data-theme="minimalista"] .text-cyan-300,
+[data-theme="minimalista"] .text-lime-300,
+[data-theme="minimalista"] .text-amber-300,
+[data-theme="minimalista"] .text-fuchsia-300,
+[data-theme="minimalista"] .text-sky-300,
+[data-theme="minimalista"] .text-orange-300,
+[data-theme="minimalista"] .text-violet-300,
+[data-theme="minimalista"] .text-violet-400,
+[data-theme="minimalista"] .text-yellow-300,
+[data-theme="minimalista"] .text-emerald-300,
+[data-theme="minimalista"] .text-lime-400,
+[data-theme="minimalista"] .text-cyan-400 {
+  color: var(--t-accent) !important;
+  text-shadow: none !important;
+}
+
+/* Acentos de "dot" activo del carrusel y barritas (bg-{tone}-500). */
+[data-theme="nature"] .bg-emerald-500,
+[data-theme="nature"] .bg-cyan-500,
+[data-theme="nature"] .bg-lime-500,
+[data-theme="nature"] .bg-amber-500,
+[data-theme="nature"] .bg-fuchsia-500,
+[data-theme="nature"] .bg-sky-500,
+[data-theme="nature"] .bg-orange-500,
+[data-theme="nature"] .bg-violet-500,
+[data-theme="nature"] .bg-yellow-500,
+[data-theme="minimalista"] .bg-emerald-500,
+[data-theme="minimalista"] .bg-cyan-500,
+[data-theme="minimalista"] .bg-lime-500,
+[data-theme="minimalista"] .bg-amber-500,
+[data-theme="minimalista"] .bg-fuchsia-500,
+[data-theme="minimalista"] .bg-sky-500,
+[data-theme="minimalista"] .bg-orange-500,
+[data-theme="minimalista"] .bg-violet-500,
+[data-theme="minimalista"] .bg-yellow-500 {
+  background-color: var(--t-accent) !important;
+}
+
+/* ===========================================================================
+ * 14. GRADIENTES DE ACENTO (botones / texto "Chagra" con bg-clip-text)
+ *     AgentHero pinta "Chagra" con gradiente lime→emerald (clip-text) y el
+ *     botón enviar con bg-gradient lime→emerald. En claro el degradado neón
+ *     desentona. Lo viramos al acento sólido del tema.
+ * =========================================================================== */
+
+[data-theme="nature"] .from-emerald-300.to-lime-300,
+[data-theme="minimalista"] .from-emerald-300.to-lime-300 {
+  /* "Soy Chagra" / "Pregúntale a Chagra" clip-text → acento sólido. */
+  background-image: none !important;
+  -webkit-text-fill-color: var(--t-accent) !important;
+  color: var(--t-accent) !important;
+}
+
+[data-theme="nature"] .from-lime-400.to-emerald-500,
+[data-theme="nature"] .from-lime-400,
+[data-theme="minimalista"] .from-lime-400.to-emerald-500,
+[data-theme="minimalista"] .from-lime-400 {
+  background-image: none !important;
+  background-color: var(--t-accent) !important;
+  color: #fff !important;
+}
+
+/* ===========================================================================
+ * 15. AVATAR / HALO del agente (anillo verde "respirando")
+ *     El AgentHero envuelve al colibrí en un halo CÓNICO lime/emerald/cyan
+ *     (.chagra-hero-halo, color hardcodeado en JSX <style>). En bio-punk es el
+ *     "ser vivo" neón que pidió el operador. En nature/minimalista ese halo
+ *     verde-neón sobre crema choca. Lo viramos a un halo del acento del tema,
+ *     más suave (el colibrí-foto en sí no se puede recolorear, pero el aro sí).
+ * =========================================================================== */
+
+[data-theme="nature"] .chagra-hero-halo,
+[data-theme="minimalista"] .chagra-hero-halo {
+  background: conic-gradient(
+    from 0deg,
+    rgba(var(--t-accent-rgb), 0.42),
+    rgba(var(--t-accent-rgb), 0.18),
+    rgba(var(--t-accent-rgb), 0.42)
+  ) !important;
+  opacity: 0.6 !important;
+}
+
+/* El "agujero" radial interno del halo está pensado para fondo slate-950
+ * (rgba(2,6,23,...)). En claro deja un anillo oscuro feo: lo aclaramos al
+ * fondo del tema para que el halo se difumine contra la crema. */
+[data-theme="nature"] .chagra-hero-halo-inner,
+[data-theme="minimalista"] .chagra-hero-halo-inner {
+  background: radial-gradient(
+    circle,
+    rgba(var(--t-bg-rgb), 0) 50%,
+    rgba(var(--t-bg-rgb), 0.9) 100%
+  ) !important;
+}
+
+/* Sombras/glow verdes hardcodeados de botones (shadow-emerald-500/30,
+ * shadow-rose-500/30) se apagan en claro: en superficie clara un glow de color
+ * se ve como una mancha. */
+[data-theme="nature"] .shadow-emerald-500\/30,
+[data-theme="nature"] .shadow-emerald-500\/20,
+[data-theme="minimalista"] .shadow-emerald-500\/30,
+[data-theme="minimalista"] .shadow-emerald-500\/20 {
+  box-shadow: var(--sombra-flota, 0 4px 12px -6px rgba(31, 36, 33, 0.18)) !important;
+}
+
+/* Avatar SVG/foto: el chip del colibrí en el header del impacto usa
+ * bg-slate-900 + borde emerald; en claro lo suavizamos. */
+[data-theme="nature"] .bg-slate-900.border,
+[data-theme="minimalista"] .bg-slate-900.border {
+  background-color: var(--t-surface) !important;
+}
+
+/* ===========================================================================
+ * 16. BIO-PUNK "COSECHA MÍSTICA" — fondo digital fiel al demo
+ *     El demo bio-punk (oracle-lab demo-agente-biopunk.html) NO usa una foto:
+ *     es un lienzo oscuro #0a0e14 con glow teal central + rejilla de circuito
+ *     tenue (la "cosecha mística"). La PWA, en cambio, traía una FOTO
+ *     (fondo-biopunk-4.jpg). Reporte operador: bio-punk "no se parece EN NADA
+ *     al demo". Aquí reconstruimos el lienzo del demo en CSS puro para el
+ *     estado BASE (bio-punk = sin data-theme), respetando que el usuario pueda
+ *     seguir eligiendo una foto curada (en ese caso --app-bg-image gana).
+ *
+ *     Aplica SOLO cuando NO hay data-theme (bio-punk) Y el usuario no fijó una
+ *     foto propia (--chagra-bg-custom: 0 por defecto; el BackgroundSelector la
+ *     pone a 1 al elegir foto).
+ * =========================================================================== */
+
+:root {
+  /* Lienzo del demo bio-punk. */
+  --bp-bg-0: #0a0e14;
+  --bp-teal-rgb: 25, 201, 154;
+}
+
+/* Lienzo cosecha-mística: gradiente teal profundo + glow inferior-derecho +
+ * rejilla de circuito enmascarada hacia arriba. Idéntico en intención al
+ * .void + .grid del demo. Se aplica al body cuando NO hay foto custom. */
+html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
+  background-color: var(--bp-bg-0) !important;
+  background-image:
+    /* rejilla de circuito tenue (líneas teal al 5%) */
+    linear-gradient(rgba(var(--bp-teal-rgb), 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--bp-teal-rgb), 0.05) 1px, transparent 1px),
+    /* glow ambiental inferior-derecho */
+    radial-gradient(80% 50% at 80% 92%, rgba(var(--bp-teal-rgb), 0.10) 0%, transparent 60%),
+    /* base teal profunda que sube hacia el verde-teal del demo */
+    radial-gradient(120% 80% at 50% 8%, #0e2a2e 0%, #0b1a20 34%, #0a1118 56%, #0a0e14 100%) !important;
+  background-size: 34px 34px, 34px 34px, 100% 100%, 100% 100% !important;
+  background-position: center top, center top, center, center !important;
+  background-repeat: repeat, repeat, no-repeat, no-repeat !important;
+  background-attachment: fixed !important;
 }

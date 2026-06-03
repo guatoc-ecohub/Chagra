@@ -17,7 +17,7 @@ import PendingTasksWidget from './components/PendingTasksWidget';
 import SyncProgressIndicator from './components/common/SyncProgressIndicator';
 import useOllamaWarmStore from './store/useOllamaWarmStore';
 import { prewarmCorpus } from './services/ragRetriever';
-import useThemeBackgroundStore, { getBackgroundSrc } from './store/useThemeBackgroundStore';
+import useThemeBackgroundStore, { getBackgroundSrc, DEFAULT_BACKGROUND_ID } from './store/useThemeBackgroundStore';
 import useAlertStore from './store/useAlertStore';
 import { alertEngine } from './services/alertEngine';
 // FieldFeedback ya no se monta globalmente en App; vive embebido en
@@ -523,6 +523,16 @@ export default function App() {
     const img = new Image();
     img.src = src;
     document.body.style.setProperty('--app-bg-image', `url('${src}')`);
+    // Bio-punk "cosecha mística" (2026-06-03): cuando el operador NO eligió una
+    // foto propia (sigue en el default), bajamos a un lienzo digital CSS fiel al
+    // demo (themes.css §16) en lugar de la foto. Si elige otra foto curada,
+    // marcamos data-custom-bg y la foto vuelve a ganar. El gate solo importa en
+    // bio-punk (sin data-theme); en nature/minimalista el fondo es crema (§2).
+    if (selectedBackground && selectedBackground !== DEFAULT_BACKGROUND_ID) {
+      document.body.setAttribute('data-custom-bg', '1');
+    } else {
+      document.body.removeAttribute('data-custom-bg');
+    }
   }, [selectedBackground]);
 
   const showToast = useCallback((message, isError = false) => {
