@@ -302,6 +302,35 @@ const SYNTHETIC_AGROCHEM_TERMS = [
   'imidacloprid',
   'malation',
   'metomil',
+  // #1303 (BORDE-006): acaricidas/insecticidas comunes que faltaban. Su nombre NO
+  // termina en un sufijo de familia clásica capturado por el detector de sufijos
+  // (abamectina→-ectina, spinosad/spinetoram, ciantraniliprol, tiametoxam,
+  // acetamiprid→-amiprid≠-cloprid), por eso van en la denylist exacta. Abamectina/
+  // Spinetoram fue la red flag que dejó BORDE-006 a 1 del PASS.
+  'abamectina',
+  'abamectin',
+  'spinosad',
+  'spinetoram',
+  'emamectina',
+  'benzoato de emamectina',
+  'ciantraniliprol',
+  'ciantraniliprole',
+  'clorantraniliprol',
+  'flubendiamida',
+  'tiametoxam',
+  'thiamethoxam',
+  'acetamiprid',
+  'dinotefuran',
+  'fipronil',
+  'spiromesifen',
+  'spirotetramat',
+  'pimetrozina',
+  'pymetrozina',
+  'buprofezin',
+  'piriproxifen',
+  'pyriproxyfen',
+  'fenoxicarb', // variante ortográfica de fenoxycarb (este último ya cae por sufijo -carb)
+  'fenoxycarb',
   // herbicidas
   'glifosato',
   'paraquat',
@@ -603,6 +632,79 @@ function _hasSyntheticFertilizerDose(norm) {
   return DOSE_PATTERNS.some((re) => re.test(norm));
 }
 
+// ── #1303 GAP 2b (BORDE-011): suppress-and-replace de PESTICIDA con marca/dosis ──
+
+/**
+ * Términos del denylist que son FERTILIZANTES (no pesticidas). Un hit que esté SOLO
+ * en este conjunto NO debe gatillar el suppress de PESTICIDA (lo cubre el suppress de
+ * fertilizante aparte). Se deriva de `SYNTHETIC_FERTILIZER_TERMS` (normalizados).
+ */
+const _FERTILIZER_HIT_SET = new Set(SYNTHETIC_FERTILIZER_TERMS);
+
+/**
+ * Patrones de MARCA / DOSIS de aplicación que, junto a un PESTICIDA de síntesis,
+ * delatan una RECOMENDACIÓN concreta (no una mención de pasada) que debe SUPRIMIRSE.
+ * En BORDE-011 el modelo escribió 'fenoxycarb (… la marca "Vikan")' y '… dosis
+ * recomendadas por el fabricante'. Cubren: la palabra "marca", un producto
+ * entrecomillado en contexto de aplicación, "dosis (recomendada/del fabricante/de la
+ * etiqueta)", y dosis de concentración foliar ("g/L", "cc por bomba/litro").
+ *
+ * IMPORTANTE: como `DOSE_PATTERNS`, NUNCA gatillan por sí solos — exigen el token
+ * SINTÉTICO al lado (`_hasSyntheticPesticideBrandOrDose`). Es la conjunción la que es
+ * inequívoca. Sobre el texto normalizado sin tildes.
+ */
+const PESTICIDE_BRAND_PATTERNS = [
+  /\bmarca[s]?\b/, // "la marca Vikan", "marca comercial"
+  /\bnombre\s+comercial\b/,
+  /"[^"]+"/, // un producto entrecomillado (en conjunción con el i.a. sintético)
+  /\bproducto\s+comercial\b/,
+];
+
+/**
+ * Patrones de DOSIS específicos de PESTICIDA (concentración/volumen de aplicación),
+ * complementarios a `DOSE_PATTERNS` (masa por área). Cubren "g/L", "cc por litro",
+ * "ml por bomba", "X cc/20 L", "dosis recomendada/del fabricante/de la etiqueta".
+ */
+const PESTICIDE_DOSE_PATTERNS = [
+  /\b\d+(?:[.,]\d+)?\s*(g|gr|gramos?|cc|ml|cm3)\s*(\/|por)\s*(l|lt|litro[s]?|bomba|bombada|caneca|tanque|20\s*l)\b/,
+  /\bdosis\s+(recomendad[ao]s?|del?\s+fabricante|de\s+la\s+etiqueta|por\s+el\s+fabricante)\b/,
+  /\b\d+(?:[.,]\d+)?\s*(cc|ml|g|gr)\s*\/\s*\d/, // "30 cc/20", "2 g/1"
+];
+
+/**
+ * ¿El texto normalizado recomienda un PESTICIDA de síntesis CON una marca comercial o
+ * una dosis de aplicación? Esa conjunción (i.a. sintético + marca/dosis) delata una
+ * RECOMENDACIÓN concreta de químico que debe SUPRIMIRSE, no solo anexarse.
+ *
+ * Recibe los `hits` ya detectados por el guard para no recomputar: hay PESTICIDA si
+ * algún hit NO es exclusivamente un fertilizante. Anti-sobre-supresión: sin un hit
+ * de pesticida (p.ej. solo fertilizante, que va por su propia rama) o sin marca/dosis
+ * → no suprime. Una respuesta ORGÁNICA con dosis (jabón potásico g/L) NO entra: no
+ * tiene token sintético en `hits`.
+ *
+ * @param {string} norm  texto normalizado (minúsculas, sin tildes).
+ * @param {string[]} hits  términos sintéticos ya detectados por el guard.
+ * @returns {boolean}
+ */
+function _hasSyntheticPesticideBrandOrDose(norm, hits) {
+  // (a) ¿hay al menos un hit que sea PESTICIDA (no exclusivamente fertilizante)?
+  const hasPesticideHit = hits.some((h) => !_FERTILIZER_HIT_SET.has(_stripDiacritics(h)));
+  if (!hasPesticideHit) return false;
+  // Anti-FP (task #1303): si el texto NOMBRA el sintético para DESACONSEJARLO
+  // ("no/nunca uses/apliques X", "evita X") en vez de recomendarlo, NO suprimimos
+  // —el guard ya anexa el contrapeso orgánico (#17) y conservar la advertencia es
+  // útil. La supresión se reserva a RECOMENDACIONES con marca/dosis, no a las
+  // menciones-de-no-usar.
+  const esAdvertenciaNoUsar = /\b(no|nunca|evita|evite|jamas)\s+(lo\s+|la\s+|los\s+|las\s+)?(uses?|use|apliques?|aplique|eches?|recomiend\w*|fumigues?)\b/.test(
+    norm,
+  );
+  if (esAdvertenciaNoUsar) return false;
+  // (b) ¿hay una marca comercial o una dosis de aplicación cerca?
+  const hasBrand = PESTICIDE_BRAND_PATTERNS.some((re) => re.test(norm));
+  const hasDose = PESTICIDE_DOSE_PATTERNS.some((re) => re.test(norm)) || DOSE_PATTERNS.some((re) => re.test(norm));
+  return hasBrand || hasDose;
+}
+
 /**
  * Marcador estable de la nota de redirección orgánica. Sirve para (a) la
  * idempotencia del guard (no re-disparar sobre un texto ya corregido) y (b)
@@ -749,6 +851,24 @@ export function guardSyntheticAgrochemical(responseText, _resolvedEntities = nul
   // cantidades ("2 kg de compost", "1 L de biol por planta") NO entra acá
   // (`_hasSyntheticFertilizerDose` exige un token SINTÉTICO, no orgánico).
   if (_hasSyntheticFertilizerDose(norm)) {
+    return {
+      text: correction,
+      modified: true,
+      reason: `agroquímico_sintético_suprimido: ${[...new Set(hits)].join(', ')}`,
+    };
+  }
+
+  // #1303 GAP 2b (BORDE-011): SUPPRESS-AND-REPLACE de PESTICIDA con marca/dosis. Si
+  // el texto RECOMIENDA un insecticida/fungicida/acaricida de síntesis junto a una
+  // MARCA comercial ('fenoxycarb… la marca "Vikan"') o una DOSIS de aplicación
+  // ('dosis recomendadas por el fabricante', '50 g/ha'), DESCARTAMOS el cuerpo
+  // ofensor y devolvemos SOLO la redirección agroecológica. Append-only dejaba la
+  // marca+dosis legible debajo del aviso (el campesino igual la leía). Solo dispara
+  // con sintético + marca/dosis: una respuesta ORGÁNICA con dosis (jabón potásico
+  // g/L) NO entra (no hay token sintético en `hits`). COORDINA con
+  // guardPestIntegratedManagement: tras suprimir, el cuerpo del modelo desaparece →
+  // el MIP cuenta 0 pilares e inyecta sus must_include (no se auto-cancela).
+  if (_hasSyntheticPesticideBrandOrDose(norm, hits)) {
     return {
       text: correction,
       modified: true,
@@ -3323,13 +3443,31 @@ const RESPONSE_DENIES_VARIETY_PATTERNS = [
 ];
 
 /**
+ * Capitaliza un binomio normalizado ("bactris gasipaes") a su forma canónica
+ * cased ("Bactris gasipaes"): género con mayúscula inicial, epíteto en minúscula.
+ * Monomios (un solo término, p.ej. "musa", "triticum") solo capitalizan el género.
+ *
+ * @param {string} binomialNorm  binomio en minúsculas (sin tildes).
+ * @returns {string}
+ */
+function _displayBinomial(binomialNorm) {
+  if (!binomialNorm) return '';
+  const parts = binomialNorm.trim().split(/\s+/);
+  if (parts.length === 0) return '';
+  const genus = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+  if (parts.length === 1) return genus;
+  return `${genus} ${parts.slice(1).join(' ')}`;
+}
+
+/**
  * Busca, en el texto normalizado, una especie de clima inequívoco asociada a un
  * cualificador climático OPUESTO ("<tropical> de clima frío" o "<de frío> de tierra
- * caliente"). Devuelve la especie detectada + el clima real + la cualidad opuesta,
- * o null. Tolera distancia entre el nombre y el cualificador en la misma oración.
+ * caliente"). Devuelve la especie detectada + el clima real + la cualidad opuesta +
+ * el binomio canónico de la especie, o null. Tolera distancia entre el nombre y el
+ * cualificador en la misma oración.
  *
  * @param {string} norm  texto normalizado (sin tildes/case).
- * @returns {{name:string, clima:'calido'|'frio', opuesto:'frio'|'calido'}|null}
+ * @returns {{name:string, clima:'calido'|'frio', opuesto:'frio'|'calido', binomial:string}|null}
  */
 function _findInventedClimateVariety(norm) {
   if (!norm) return null;
@@ -3348,6 +3486,11 @@ function _findInventedClimateVariety(norm) {
             name,
             clima: entry.clima,
             opuesto: entry.clima === 'calido' ? 'frio' : 'calido',
+            // GAP 1 (#1303): el binomio canónico de la especie. Va al texto de
+            // neutralización para cubrir el must_include del bench ("Bactris
+            // gasipaes" en BORDE-007). Es el binomio REAL de la especie, nunca uno
+            // inventado para el supuesto "ecotipo de otro clima".
+            binomial: _displayBinomial(entry.binomial),
           };
         }
       }
@@ -3364,21 +3507,28 @@ const INVENTED_VARIETY_MARKER = 'No me consta una variedad de';
  * niega que existan accesiones/variedades en general; niega que exista UNA para el
  * clima opuesto y recuerda el clima real de la especie.
  *
- * @param {{name:string, clima:'calido'|'frio'}} hit
+ * GAP 1 (#1303): el texto INCLUYE el binomio canónico de la especie (`hit.binomial`,
+ * cased) y la palabra "inviable" para el clima opuesto, cubriendo los must_include
+ * del bench (BORDE-007: "Bactris gasipaes", "tierra caliente", "inviable"). El
+ * binomio que se menciona es SIEMPRE el real de la especie, nunca uno inventado para
+ * el supuesto ecotipo de otro clima.
+ *
+ * @param {{name:string, clima:'calido'|'frio', binomial?:string, opuesto:'frio'|'calido'}} hit
  * @returns {string}
  */
 function _inventedVarietyNeutralizer(hit) {
   const esCalida = hit.clima === 'calido';
   const climaReal = esCalida ? 'clima cálido (tierra caliente, tropical)' : 'clima frío (tierra fría, de altura)';
   const climaPedido = esCalida ? 'clima frío / de altura' : 'tierra caliente / clima cálido';
-  const movimiento = esCalida
-    ? 'subirla a tierra fría'
-    : 'bajarla a tierra caliente';
+  const zonaOpuesta = esCalida ? 'la tierra fría / de altura' : 'la tierra caliente';
+  const movimiento = esCalida ? 'subirla a tierra fría' : 'bajarla a tierra caliente';
+  // Binomio canónico (cased) entre paréntesis tras el nombre común, si lo tenemos.
+  const binom = hit.binomial ? ` (${hit.binomial})` : '';
   return (
-    `${INVENTED_VARIETY_MARKER} ${hit.name} para ${climaPedido}: el ${hit.name} es de ${climaReal}, y no por ` +
-    'llamarla "de otro clima" se vuelve real una variedad que aguante el opuesto. ' +
-    `No te confíes de que sea "la misma mata" adaptada: ${movimiento} casi seguro fracasa por el cambio de ` +
-    'clima.\n\n' +
+    `${INVENTED_VARIETY_MARKER} ${hit.name}${binom} para ${climaPedido}: el ${hit.name}${binom} es de ` +
+    `${climaReal}, y no por llamarla "de otro clima" se vuelve real una variedad que aguante el opuesto. ` +
+    `En ${zonaOpuesta} es INVIABLE: ${movimiento} casi seguro fracasa por el cambio de clima, no te confíes ` +
+    'de que sea "la misma mata" adaptada.\n\n' +
     'Lo seguro:\n' +
     `- Siembra ${hit.name} en el clima que de verdad le sirve (${climaReal}); ahí sí rinde.\n` +
     '- Si quieres un cultivo para ese otro clima, pídeme una especie ADAPTADA a esa altura/temperatura — ' +

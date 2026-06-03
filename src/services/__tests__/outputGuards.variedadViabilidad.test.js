@@ -72,6 +72,37 @@ describe('guardInventedVariety — BORDE-007 (chontaduro de clima frío)', () =>
     // NEUTRALIZA: dice que no consta esa variedad y recuerda el clima real.
     expect(out.text).toMatch(VARIETY_NEUTRALIZER);
     expect(out.text.toLowerCase()).toMatch(/clima\s+c[aá]lido|tierra\s+caliente|tropical/);
+    // GAP 1 (#1303): el reemplazo DEBE incluir el binomio canónico (must_include
+    // "Bactris gasipaes") y la palabra "inviable" (must_include) → cobertura 3/3.
+    expect(out.text).toContain('Bactris gasipaes');
+    expect(out.text.toLowerCase()).toContain('inviable');
+    expect(out.text.toLowerCase()).toContain('tierra caliente');
+  });
+
+  it('GAP 1: el reemplazo cubre los 3 must_include del bench (Bactris gasipaes · tierra caliente · inviable)', () => {
+    const llmFail =
+      'Probablemente sea una accesión de chontaduro más tolerante al frío, resistente hasta 2.600 metros.';
+    const out = guardInventedVariety(llmFail, { userMessage: userBorde007 });
+    expect(out.modified).toBe(true);
+    const low = out.text.toLowerCase();
+    // los 3 must_include del bench BORDE-007.
+    expect(out.text).toContain('Bactris gasipaes'); // binomio canónico exacto (cased)
+    expect(low).toContain('tierra caliente');
+    expect(low).toContain('inviable');
+    // y NO inventa un binomio para el "de clima frío".
+    expect(out.text).not.toMatch(/resistente\s+hasta\s+2\.?600/i);
+  });
+
+  it('GAP 1: una especie de FRÍO inventada como "de tierra caliente" también lleva su binomio', () => {
+    const user = 'Tengo papa de tierra caliente que da en el Magdalena a 200 metros, ¿la siembro?';
+    const llm =
+      'Sí, esa papa de tierra caliente es una variedad adaptada al calor que se da bien a 200 metros, ' +
+      'es la misma papa pero tropicalizada.';
+    const out = guardInventedVariety(llm, { userMessage: user });
+    expect(out.modified).toBe(true);
+    // binomio canónico de la papa + "inviable".
+    expect(out.text).toContain('Solanum tuberosum');
+    expect(out.text.toLowerCase()).toContain('inviable');
   });
 
   it('VARIANTE: detecta el patrón en el propio userMessage aunque la respuesta lo eco', () => {
