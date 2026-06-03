@@ -27,6 +27,7 @@ import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
+import { doseMustInclude } from './lib/bench-pool-facts.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
@@ -39,9 +40,23 @@ function cypherProps(matchReturn) {
   // interprete `$$` (dollar-quoting) como el PID, y `"$user"` como vacío. El
   // archivo se monta en el container vía `podman exec -i ... -f -` (stdin).
   const sql = `LOAD 'age';\nSET search_path = ag_catalog, public;\nSELECT props FROM cypher('${GRAPH}', $$ ${matchReturn} $$) AS (props agtype);\n`;
-  // El SQL va por STDIN (input) → ni el `$$` ni el `"$user"` los toca el shell.
-  const cmd = `sudo podman exec -i postgres-farm psql -U farmos -d ${GRAPH} -t -A -f -`;
-  const out = execSync(cmd, { encoding: 'utf-8', maxBuffer: 64 * 1024 * 1024, input: sql });
+  // Transporte configurable (read-only). Default: `sudo podman exec` (prod).
+  // `PSQL_BIN`/`PG_TCP=1` → conectar por TCP (p. ej. cuando `podman exec` no es
+  // accesible: host sin sudo de container, o sesión sandboxeada). El SQL va por
+  // STDIN → ni el `$$` ni el `"$user"` los toca el shell.
+  let cmd;
+  let env = process.env;
+  if (process.env.PG_TCP === '1' || process.env.PSQL_BIN) {
+    const bin = process.env.PSQL_BIN || 'psql';
+    const host = process.env.PGHOST || '127.0.0.1';
+    const port = process.env.PGPORT || '5432';
+    const user = process.env.PGUSER || 'farmos';
+    cmd = `${bin} -h ${host} -p ${port} -U ${user} -d ${GRAPH} -t -A -f -`;
+    if (process.env.PGPASSWORD) env = { ...process.env };
+  } else {
+    cmd = `sudo podman exec -i postgres-farm psql -U farmos -d ${GRAPH} -t -A -f -`;
+  }
+  const out = execSync(cmd, { encoding: 'utf-8', maxBuffer: 64 * 1024 * 1024, input: sql, env });
   return parseRows(out);
 }
 
@@ -88,16 +103,11 @@ if (nBios < 5 || nForr < 5) {
   process.exit(1);
 }
 
-// helper: primer fragmento (atómico) de la dosis verificada del grafo. Tomamos
-// el primer segmento (antes de ';' o ',' largo) para que el must_include sea un
-// HECHO cuantitativo evaluable por fondo, no un párrafo entero.
-function doseFact(bio) {
-  const raw = (bio.dosis_aplicacion || '').trim();
-  // corta en el primer ';' o, si no hay, en el primer paréntesis de cierre.
-  let frag = raw.split(';')[0].trim();
-  if (frag.length > 70) frag = frag.slice(0, 70).replace(/[\s,]+\S*$/, '');
-  return frag;
-}
+// `doseFact` / `doseMustInclude` viven en ./lib/bench-pool-facts.mjs (puros +
+// testeados). RECALIBRACIÓN 2026-06-03: el `must_include` de dosis ya NO lleva la
+// FUENTE verbatim (FAO/Agrosavia/Restrepo…) ni un párrafo de prosa: lleva la
+// CANTIDAD cuantitativa atómica del grafo ("1%", "1-1,5 cc/L", "2 kg/ha"), que es
+// lo que mide el grounding de dosis. Ver el módulo para el porqué.
 
 const prompts = [];
 let seq = 0;
@@ -130,13 +140,13 @@ const bioList = [
 for (const [id, prompt] of bioList) {
   const b = bios[id];
   if (!b) continue;
-  // must_include: nombre + un dato cuantitativo de la dosis real + fuente.
-  const fuente = (b.fuente || '').split('/')[0].trim();
+  // must_include: nombre canónico + la CANTIDAD cuantitativa del grafo. SIN
+  // fuente verbatim (no mide grounding de dosis, ver bench-pool-facts.mjs).
   add(
     'dosis_biopreparado',
     prompt,
-    [b.nombre, doseFact(b), fuente].filter(Boolean),
-    ['dosis numérica distinta a la verificada', 'agroquímico de marca con dosis inventada', `fuente inventada que no sea ${fuente}`],
+    doseMustInclude(b),
+    ['dosis numérica distinta a la verificada', 'agroquímico de marca con dosis inventada'],
     { grounded_from: `Biopreparado:${id}` },
   );
 }
@@ -389,11 +399,10 @@ const bioListBis = [
 for (const [id, prompt] of bioListBis) {
   const b = bios[id];
   if (!b) continue;
-  const fuente = (b.fuente || '').split('/')[0].trim();
   add(
     'dosis_biopreparado',
     prompt,
-    [b.nombre, doseFact(b), fuente].filter(Boolean),
+    doseMustInclude(b),
     ['dosis numérica distinta a la verificada', 'agroquímico de marca con dosis inventada'],
     { grounded_from: `Biopreparado:${id}` },
   );
