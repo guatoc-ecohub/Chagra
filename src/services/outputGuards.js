@@ -341,6 +341,17 @@ const SYNTHETIC_AGROCHEM_TERMS = [
 const SYNTHETIC_FERTILIZER_PATTERNS = [
   /(^|[^a-z])npk([^a-z]|$)/, // sigla NPK (con o sin formulación al lado)
   /(^|[^a-z])n-p-k([^a-z]|$)/,
+  // #351 (E2E 2026-06-03): SIGLAS de campo de fertilizante mineral. El modelo a
+  // veces nombra el producto solo por la sigla ("aplica DAP", "agrega KCl") sin
+  // el nombre largo (que sí está en SYNTHETIC_AGROCHEM_TERMS). Las normalizamos a
+  // minúsculas con límite de palabra (`[^a-z0-9]`) → "dap"/"map"/"kcl" como token
+  // aislado; "mapa"/"mapeo"/"dapper" NO matchean (carácter alfanumérico al lado).
+  //   dap → fosfato diamónico (diammonium phosphate)
+  //   map → fosfato monoamónico (monoammonium phosphate)
+  //   kcl → cloruro de potasio (muriato de potasio)
+  /(^|[^a-z0-9])dap([^a-z0-9]|$)/,
+  /(^|[^a-z0-9])map([^a-z0-9]|$)/,
+  /(^|[^a-z0-9])kcl([^a-z0-9]|$)/,
   /\btriple\s+(quince|15|catorce|14|diecisiete|17)\b/, // "triple 15"
   /\b\d{1,2}\s*[-–]\s*\d{1,2}\s*[-–]\s*\d{1,2}\b/, // formulación "5-10-10", "15-15-15"
 ];
@@ -2080,9 +2091,46 @@ const FERMENTO_RECIPE_PATTERNS = [
 ];
 
 /**
+ * #1281 (E2E 2026-06-03) — tokens de FERTILIZANTE MINERAL DE SÍNTESIS. Si una
+ * receta de fertilizante (urea + sulfato + fosfato…) contiene de paso un token de
+ * fermento ("biofermento mineral", "deja fermentar la solución", "encurtido"), el
+ * gate de fermento daba FALSO-POSITIVO y anteponía el caveat de inocuidad INVIMA
+ * a una consulta agroquímica. Un fertilizante mineral NUNCA es un alimento
+ * fermentado: si la query/respuesta trae estos tokens, NO es fermento alimentario
+ * (ese caso lo maneja `guardSyntheticAgrochemical`). Sobre el texto normalizado.
+ */
+const SYNTHETIC_FERTILIZER_TOKENS = [
+  /(^|[^a-z])urea([^a-z]|$)/,
+  /(^|[^a-z])sulfato\s+de\s+(potasio|amonio)([^a-z]|$)/,
+  /(^|[^a-z])fosfato\s+(triple|diamonico|monoamonico)([^a-z]|$)/,
+  /(^|[^a-z])nitrato\s+de\s+(amonio|potasio)([^a-z]|$)/,
+  /(^|[^a-z0-9])npk([^a-z0-9]|$)/,
+  /(^|[^a-z0-9])dap([^a-z0-9]|$)/,
+  /(^|[^a-z0-9])map([^a-z0-9]|$)/,
+  /(^|[^a-z0-9])kcl([^a-z0-9]|$)/,
+  /(^|[^a-z])cloruro\s+de\s+potasio([^a-z]|$)/,
+];
+
+/**
+ * ¿La query/respuesta menciona un fertilizante mineral de síntesis? Si sí, NO es
+ * un fermento alimentario (es dominio agroquímico). Sobre el texto normalizado.
+ *
+ * @param {string} combinedNorm  user + texto normalizados, sin diacríticos.
+ * @returns {boolean}
+ */
+function _mentionsSyntheticFertilizer(combinedNorm) {
+  return SYNTHETIC_FERTILIZER_TOKENS.some((re) => re.test(combinedNorm));
+}
+
+/**
  * ¿La query/respuesta pide o da una RECETA de fermento? Gate combinado: debe
  * tocar un fermento (FERMENTO_TERMS) Y traer fraseo de receta/preparación, en la
  * pregunta del usuario O en el texto del LLM. Conservador hacia NO disparar.
+ *
+ * Exclusión #1281: si el texto trae tokens de fertilizante mineral de síntesis
+ * (urea/sulfato/fosfato/nitrato/NPK/DAP/MAP/KCl), NO es un fermento alimentario
+ * aunque mencione "biofermento"/"fermentar"/"encurtido" — es agroquímico y lo
+ * cubre `guardSyntheticAgrochemical`, no este caveat de inocuidad de alimentos.
  *
  * @param {string} textNorm  respuesta del LLM normalizada.
  * @param {string} userNorm  pregunta del usuario normalizada (o '').
@@ -2091,6 +2139,8 @@ const FERMENTO_RECIPE_PATTERNS = [
 function _isFermentoRecipe(textNorm, userNorm) {
   if (!_touchesFermento(textNorm, userNorm)) return false;
   const combined = `${userNorm} ${textNorm}`;
+  // #1281: un fertilizante mineral de síntesis NUNCA es un fermento alimentario.
+  if (_mentionsSyntheticFertilizer(combined)) return false;
   return FERMENTO_RECIPE_PATTERNS.some((re) => re.test(combined));
 }
 
