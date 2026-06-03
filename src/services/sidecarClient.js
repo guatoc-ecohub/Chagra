@@ -18,7 +18,8 @@
  *
  * Reglas operativas:
  * - Offline-first: si `!navigator.onLine` → null inmediato, no fetch.
- * - Timeout corto: NLU 10s, tools 5s (cap defensivo p99 sidecar).
+ * - Timeout NLU/pre-LLM 18s, tools 5s (raíz #349: < server 20s, > p99
+ *   concurrente ~17s bajo contención de GPU — evita ERR_ABORTED sin grounding).
  * - Falla silenciosa: en error/non-200/abort → null + console.debug.
  *   NUNCA throw — el caller espera contract `T | null`.
  * - Auth: header `X-Chagra-Token: ${VITE_CHAGRA_MCP_TOKEN}` siempre.
@@ -36,7 +37,7 @@
 
 import { buildSidecarHeaders } from './tierService.js';
 
-const NLU_TIMEOUT_MS = 10000;
+const NLU_TIMEOUT_MS = 18000;
 const TOOL_TIMEOUT_MS = 5000;
 
 /**
