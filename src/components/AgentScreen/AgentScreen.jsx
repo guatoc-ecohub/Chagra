@@ -48,6 +48,9 @@ import { buildLLMRequest, selectChatRoute } from '../../services/llmRouter';
 // igual que con cualquier otro fallo del LLM. Para forzar fallback al
 // path directo en un sólo turn → desactivar la flag y recargar.
 import { streamChatViaSidecar, isAgentStreamingEnabled } from '../../services/streamChatViaSidecar';
+// FIX prod P0 (2026-06-02): deadline stream-aware (idle-timeout + techo). Un
+// stream que avanza NO se aborta; ver streamDeadline.js.
+import { createStreamDeadline } from '../../services/streamDeadline';
 // Sidecar agro-mcp (ADR-045 Fase 2 Step B/C). Detrás de feature flag
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
@@ -215,9 +218,10 @@ export default function AgentScreen({ onBack, initialContext }) {
   // LLM / watchdog sin tokens), 'cancel' (operador tocó Cancelar) o 'abort'
   // (genérico, ej. red caída). Se setea antes de disparar controller.abort().
   const cancelReasonRef = useRef(null);
-  // Watchdog stall (#sin-token): timer que se RESETEA en cada token. Solo
-  // dispara si pasa STALL_WATCHDOG_MS sin ningún token nuevo (stall real),
-  // independiente del tiempo total de una respuesta lenta-pero-avanzando.
+  // Holder del deadline stream-aware activo (createStreamDeadline). FIX prod
+  // P0 (2026-06-02): combina idle-timeout (reinicia por token → no aborta
+  // streams vivos) + techo absoluto. Reemplaza al watchdog/timer total previo.
+  // Se conserva el nombre del ref por compatibilidad con cleanup paths.
   const stallTimerRef = useRef(null);
   // 057.4 integration: resolver del Promise pendiente del actionExecutor gate.
   // El callback registrado en setActionGateCallback abre el modal y retorna
@@ -827,22 +831,22 @@ ${buildProfileContext(finca)}`;
   // Solución v2 (2026-05-18): AbortController con timeout 30s + ref externo
   // para botón Cancelar + warning visible a los 20s ("Aún pensando…").
   //
-  // 2026-05-19 ajuste timeout 30s→60s: operator perdió respuesta porque
-  // el agente tardaba demasiado (cold-load del modelo + RAG context).
-  // Según bench interno hay outliers post-cold-load altos. 60s los cubre
-  // sin sacrificar UX (el warning a 20s ya le dice al operator que algo
-  // está lento). Pre-condicion: OLLAMA_KEEP_ALIVE=24h en alpha para que
-  // modelos no hagan cold-load entre conversaciones.
-  const LLM_TIMEOUT_MS = 60000;
-
-  // Watchdog "sin token" (#sin-token). Distinto del deadline total de arriba:
-  // mide el GAP entre tokens, no el tiempo total. Se RESETEA en cada token, así
-  // una respuesta lenta-pero-avanzando NO se aborta — solo dispara ante un
-  // stall real (el backend dejó de emitir). El comment histórico de runLLM
-  // hablaba de "30s sin token" pero solo existía el deadline total de 60s; esto
-  // implementa el comportamiento que el comment prometía. Backstop de 60s queda
-  // como red de seguridad para streams que avanzan token-a-token eternamente.
-  const STALL_WATCHDOG_MS = 30000;
+  // FIX prod P0 (2026-06-02): el deadline TOTAL de 60s tumbaba respuestas
+  // largas-pero-vivas. Bajo carga las completions de granite rozan 20-29s y,
+  // sumando cold-load + RAG + tool-chain, una respuesta sana cruzaba los 60s y
+  // moría a mitad de stream. Bench prod 2026-06-02: 4 de 6 prompts murieron por
+  // este abort. La política ahora es STREAM-AWARE (ver streamDeadline.js):
+  //
+  //   - IDLE-timeout (criterio primario): mide el GAP entre tokens y se
+  //     REINICIA con cada token. Un stream que avanza NUNCA se aborta por más
+  //     largo que sea en total; solo un STALL real (backend mudo) dispara.
+  //   - HARD-CEILING: techo absoluto (no reinicia) como backstop extremo para
+  //     no colgar la UI ante un backend que gotea tokens para siempre. NO es
+  //     infinito a propósito.
+  //
+  // El botón "Cancelar" (handleCancelLLM) sigue intacto: cancelación manual del
+  // operador es independiente de estos plazos. Pre-condición operativa:
+  // OLLAMA_KEEP_ALIVE=24h en alpha para minimizar cold-loads.
 
   // Task #121: safety cap del while loop que drena el queue. Con QUEUE_MAX=2
   // (1 processing + 1 pending) jamás debería haber más de 2 iteraciones,
@@ -1186,32 +1190,35 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     const controller = new AbortController();
     activeControllerRef.current = controller;
     cancelReasonRef.current = null;
-    // Deadline TOTAL (backstop): aborta a los 60s aunque el stream avance.
-    const timer = setTimeout(() => {
-      console.warn(`[Agent] LLM timeout ${LLM_TIMEOUT_MS}ms — aborting`);
-      cancelReasonRef.current = 'timeout';
-      controller.abort();
-    }, LLM_TIMEOUT_MS);
 
-    // Watchdog "sin token": se arma acá y se REINICIA en cada token (markToken).
-    // Solo dispara si el backend deja de emitir por STALL_WATCHDOG_MS — stall
-    // real, no respuesta lenta-pero-avanzando.
-    const armStallTimer = () => {
-      stallTimerRef.current = setTimeout(() => {
-        console.warn(`[Agent] LLM stall ${STALL_WATCHDOG_MS}ms sin token — aborting`);
+    // Deadline STREAM-AWARE (FIX prod P0 2026-06-02). Un único controlador que
+    // combina el idle-timeout (reinicia por token → no aborta streams vivos) y
+    // el techo absoluto (backstop extremo). Reemplaza el deadline TOTAL de 60s
+    // que tumbaba respuestas largas-pero-vivas. La lógica pura vive en
+    // streamDeadline.js (testeada con fake timers).
+    const deadline = createStreamDeadline({
+      onTimeout: (reason) => {
+        console.warn(`[Agent] LLM deadline (${reason}) — aborting`);
+        // Ambas razones ('idle'/'ceiling') se reportan como 'timeout' al merge
+        // de estado: para el operador es el mismo caso "se cortó, reintenta".
         cancelReasonRef.current = 'timeout';
         controller.abort();
-      }, STALL_WATCHDOG_MS);
-    };
+      },
+    });
+    // Conservamos el ref histórico (`stallTimerRef`) como holder del deadline
+    // para que handlers externos (unmount/cleanup) puedan detenerlo igual que
+    // antes detenían el watchdog.
+    stallTimerRef.current = deadline;
+
     const markToken = (fullText) => {
-      // Reset del watchdog: llegó un token, el stream está vivo.
-      if (stallTimerRef.current) clearTimeout(stallTimerRef.current);
-      armStallTimer();
+      // Llegó un token: el stream está vivo → reinicia el idle-timer. El techo
+      // absoluto sigue corriendo intacto.
+      deadline.onToken();
       // Espejo del parcial en ref para que el catch lo preserve sin closure stale.
       streamingContentRef.current = fullText;
       setStreamingContent(fullText);
     };
-    armStallTimer();
+    deadline.start();
 
     try {
       // Routing dual 2026-05-23: queries complejas (plagas regionales,
@@ -1298,11 +1305,11 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       }
       throw new Error('IA no disponible, intenta de nuevo en un momento');
     } finally {
-      clearTimeout(timer);
-      if (stallTimerRef.current) {
-        clearTimeout(stallTimerRef.current);
-        stallTimerRef.current = null;
+      // Detiene idle + techo del deadline stream-aware (limpia ambos timers).
+      if (stallTimerRef.current && typeof stallTimerRef.current.stop === 'function') {
+        stallTimerRef.current.stop();
       }
+      stallTimerRef.current = null;
       activeControllerRef.current = null;
     }
   };
