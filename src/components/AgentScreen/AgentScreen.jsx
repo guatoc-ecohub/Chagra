@@ -51,7 +51,7 @@ import { streamChatViaSidecar, isAgentStreamingEnabled } from '../../services/st
 // Sidecar agro-mcp (ADR-045 Fase 2 Step B/C). Detrás de feature flag
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
-import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, postValidate, getClimaIdeam } from '../../services/sidecarClient';
+import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, postValidate, getClimaIdeam } from '../../services/sidecarClient';
 // CHIPS DE MODO (A3/A4, decisión operador 2026-06-02): el router PURO mapea
 // la intención forzada del chip → tool determinístico, SALTANDO el NLU
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
@@ -1023,7 +1023,7 @@ RESPONDE SOLO a lo que el usuario preguntó usando ÚNICAMENTE los datos verific
     return { isEnum, pestsMentioned, topic };
   };
 
-  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null) => {
+  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null, fermentoBlock = '') => {
     const systemPrompt = getSystemPrompt();
     const analysis = analyzeQuery(query);
 
@@ -1164,8 +1164,21 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     // precio o el tool de precio sí trajo dato.
     const priceDeclineBlock = buildPriceDeclineContext({ userMessage: query, toolEvidence });
 
+    // FERMENTOS (capa 1 SAFETY-CRITICAL, chagra-pro #159 — DR-FOOD-3). El
+    // sidecar /fermento-prefilter ya detectó intención-fermento y armó un
+    // bloque conservador (refusal/veto + disclaimer fuerte + veto de claims de
+    // salud + autoridad institucional). Llega pre-formateado desde el sidecar
+    // (system_prompt_block); va de ÚLTIMO (recency máxima, como priceDecline)
+    // porque es la regla de mayor prioridad de seguridad: si la query toca un
+    // fermento de consumo humano, este bloque DOMINA sobre cualquier otro. ''
+    // (no-op) cuando no hubo intención-fermento o el sidecar no respondió
+    // (degradación graceful — no rompe el turno).
+    const fermentoSafetyBlock = (typeof fermentoBlock === 'string' && fermentoBlock.trim())
+      ? `\n\n${fermentoBlock}`
+      : '';
+
     const messages = [
-      { role: 'system', content: systemPrompt + corpusContext + evidenceContext + resolvedEntitiesBlock + curatedFactsContext + seguridadContext + viabilidadContext + frostHeatContext + asociacionContext + climaContext + fincaContext + queryAnalysisBlock + suggestedBlock + priceDeclineBlock },
+      { role: 'system', content: systemPrompt + corpusContext + evidenceContext + resolvedEntitiesBlock + curatedFactsContext + seguridadContext + viabilidadContext + frostHeatContext + asociacionContext + climaContext + fincaContext + queryAnalysisBlock + suggestedBlock + priceDeclineBlock + fermentoSafetyBlock },
       ...(contextMemory ? [{ role: 'user', content: contextMemory }] : []),
       { role: 'user', content: query },
     ];
@@ -1359,6 +1372,11 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       // este bucket para presentarlas como SUGERENCIA (CASO B) en vez de
       // afirmarlas como hecho.
       let suggestedEntities = null;
+      // FERMENTOS (capa 1 SAFETY-CRITICAL, chagra-pro #159 — DR-FOOD-3). Bloque
+      // de instrucción ya formateado por el sidecar (/fermento-prefilter). ''
+      // por default → no-op en el system prompt si no hubo intención-fermento o
+      // el sidecar no respondió (degradación graceful).
+      let fermentoBlock = '';
       if (isOnline && isSidecarEnabled()) {
         try {
           // PASO 1 — pre-validation AGE (DR taxonómico Tier 1 B, PR #59).
@@ -1371,8 +1389,30 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
             return (fincaActiva && fincaActiva.altitud) || null;
           })();
           const tRE0 = performance.now();
-          const resolved = await resolveEntities(textForLLM, { fincaAltitud: reAltitud });
+          // SAFETY-CRITICAL en PARALELO: /fermento-prefilter corre junto a
+          // /resolve-entities (mismo turno, antes del LLM) — CERO latencia
+          // serial añadida. Ambos wrappers son no-throw (devuelven null en
+          // error/timeout), así que Promise.all no puede rechazar por ellos.
+          const [resolved, fermento] = await Promise.all([
+            resolveEntities(textForLLM, { fincaAltitud: reAltitud }),
+            fermentoPrefilter(textForLLM),
+          ]);
           const tRE1 = performance.now();
+          // FERMENTOS: si el sidecar marcó intención-fermento, inyectamos su
+          // bloque conservador (refusal/veto + disclaimer + veto de claims de
+          // salud) al final del system prompt (recency máxima). Si el sidecar
+          // no respondió (null) o no es intención-fermento, fermentoBlock queda
+          // '' → no-op, el turno sigue sin romperse (degradación graceful).
+          if (fermento && fermento.is_fermento_intent && typeof fermento.system_prompt_block === 'string' && fermento.system_prompt_block.trim()) {
+            fermentoBlock = fermento.system_prompt_block;
+            console.debug('[sidecar] fermento-prefilter', {
+              fermentoId: fermento.fermento_id,
+              vetoTotal: fermento.veto_total,
+              disclaimerFuerte: fermento.disclaimer_fuerte,
+              fuenteAutoridad: fermento.fuente_autoridad,
+              reason: fermento.reason,
+            });
+          }
           if (resolved && Array.isArray(resolved.entities) && resolved.entities.length > 0) {
             // P4: dos buckets. Las de confianza ALTA (>=0.7, sin flag de baja
             // confianza) van como ENTIDADES RESUELTAS canónicas y alimentan los
@@ -1573,7 +1613,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         }
       }
 
-      const rawResponse = await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities);
+      const rawResponse = await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock);
       // DR-LANG-1: filtro post-process anti-voseo argentino. Es la última
       // línea de defensa estructural — garantiza que el léxico rioplatense
       // (che, laburar, etc.) NUNCA llegue al usuario campesino colombiano,
