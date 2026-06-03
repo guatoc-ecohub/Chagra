@@ -515,7 +515,18 @@ export function buildSqlScript(seed, opts = {}) {
   }
 
   // 3. Biopreparado nodes.
+  //    Emitimos la dosis verificada + fuente + toxicología para que el grafo
+  //    (y por extensión el sidecar/bench y el agente PWA) puedan GROUNDEAR la
+  //    respuesta de dosis sin alucinar. `dosis_aplicacion` es el alias canónico
+  //    que el bench (`dosis_biopreparado`) y el sidecar leen. `curado` se marca
+  //    true cuando hay dosis_aplicacion + fuente (el bench filtra por
+  //    `b.curado IS NOT NULL`), de modo que solo entran al pool las dosis con
+  //    respaldo.
   for (const bp of biopreparados) {
+    // `dosis_aplicacion` preferido; si no existe, caemos al `dosis` heredado.
+    const dosisAplic = bp.dosis_aplicacion || bp.dosis || null;
+    const fuenteBp = bp.fuente || null;
+    const curado = (dosisAplic && fuenteBp) ? true : null;
     statements.push(wrapCypher(graph, emitNode('Biopreparado', {
       id: nodeId(bp.id),
       nombre: bp.nombre || null,
@@ -524,6 +535,14 @@ export function buildSqlScript(seed, opts = {}) {
       tiempo_elaboracion_dias: bp.tiempo_elaboracion_dias ?? null,
       vida_util_dias: bp.vida_util_dias ?? null,
       uso: truncText(bp.uso, 300),
+      dosis: truncText(bp.dosis, 600),
+      dosis_aplicacion: truncText(dosisAplic, 600),
+      frecuencia: truncText(bp.frecuencia, 400),
+      metodo: truncText(bp.metodo, 200),
+      precaucion_seguridad: truncText(bp.precaucion_seguridad, 800),
+      fuente: truncText(fuenteBp, 400),
+      confianza: bp.confianza || null,
+      curado,
     })));
     // Bp → Source
     for (const sid of (bp.source_ids || [])) {
