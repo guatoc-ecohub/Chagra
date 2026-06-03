@@ -2806,11 +2806,22 @@ export function guardOffDomain(responseText, { userMessage = null } = {}) {
 const SYMPTOM_DIAG_INTENT_PATTERNS = [
   /\bmanch(a|as)\b/,
   /\bhojas?\s+(amarill|seca|negra|cafe|marchit|enroll|con\s+hueco)/,
-  /\bse\s+(esta\s+)?(secando|marchitando|muriendo|pudriendo|amarillando)\b/,
+  // "se está secando", "se me está secando", "se me secan", "se le marchitan":
+  // tolera el pronombre/clítico intermedio (me/le/te/nos) y la conjugación 3ª pl.
+  /\bse\s+(me\s+|le\s+|te\s+|nos\s+)?(esta(n)?\s+)?(secand|marchitand|muriend|pudriend|amarilland|enferman|enrollan|cae|caen|secan|marchitan|mueren|pudren)/,
   /\bqu[eé]\s+(tiene|le\s+pasa|enfermedad)\b/,
-  /\b(plaga|enfermedad|hongo|bicho|gusano)\b/,
+  // Un sustantivo de plaga/enfermedad cuenta como REPORTE DE SÍNTOMA solo cuando
+  // viene enmarcado como problema observado ("tiene un hongo", "le salió plaga",
+  // "tengo gusanos", "hay bicho", "con hongo"), NO en una pregunta de PREVENCIÓN
+  // o general ("cómo evito plagas", "qué plagas hay en el maíz") — esas no son un
+  // diagnóstico a ciegas y no deben suprimir biocontroles legítimos (Bt, etc.).
+  /\b(tiene|tengo|hay|salio|sali[oó]|le\s+salio|con|tiene\s+un[ao]?)\s+(un[ao]?\s+)?(plaga|enfermedad|hongo|bicho|gusano|pulgon|acaro)/,
+  /\b(plaga|enfermedad|hongo|bicho|gusano)s?\s+que\s+(no\s+conozco|no\s+s[eé]\s+qu[eé]|no\s+identifico)/,
   /\bpudric(ion|iones)\b/,
   /\bpuntos?\s+(negro|cafe|amarillo)/,
+  // síntomas vagos adicionales reportados en campo
+  /\bse\s+(esta\s+)?(poniend|volviend)\s+(amarill|negr|cafe|seca)/,
+  /\b(esta|se\s+ve)\s+(triste|mal|enferm|marchit|amarill|deca[ií]d)/,
 ];
 
 /** ¿La pregunta del usuario pide un diagnóstico de síntomas? */
@@ -2821,16 +2832,18 @@ function _isSymptomDiagnosisQuery(userMessage) {
 }
 
 /**
- * Nombres de patógenos/plagas frecuentes (normalizados) — si la respuesta
- * enumera ≥2, está dando un diagnóstico diferencial a ciegas. Lista corta de
- * los más nombrados en tomate/papa/hortalizas. No pretende ser exhaustiva: es
- * un detector de "lista de candidatos de enfermedad".
+ * Nombres de patógenos/plagas frecuentes (normalizados) — su sola presencia
+ * (≥1) en respuesta a un síntoma vago SIN foto ya es un diagnóstico a ciegas
+ * (el system prompt PROHÍBE nombrar un patógeno específico sin evidencia). Lista
+ * de los más nombrados en tomate/papa/hortalizas. No pretende ser exhaustiva —
+ * el detector de binomio latino (`_namesLatinBinomial`) cubre los que falten.
  */
 const PATHOGEN_NAME_TERMS = [
   'tizon tardio', 'tizon temprano', 'tizon', 'gota', 'alternaria', 'phytophthora',
   'fusarium', 'verticillium', 'botrytis', 'antracnosis', 'mildeo', 'mildiu', 'oidio',
   'cercospora', 'septoria', 'roya', 'virus del mosaico', 'mosca blanca', 'minador',
   'acaro', 'trips', 'pulgon', 'nematodo', 'bacteriosis', 'cancro', 'moho',
+  'golovinomyces', 'erysiphe', 'xanthomonas', 'pseudomonas', 'ralstonia',
 ];
 
 /** Fraseo de enumeración de candidatos ("puede ser X o Y", "podría tratarse de"). */
@@ -2838,17 +2851,93 @@ const DIFFERENTIAL_PHRASING_RE =
   /(puede\s+ser|podria\s+(ser|tratarse)|posibles?\s+(causa|enfermedad|patogeno|plaga)|entre\s+las?\s+(causa|enfermedad|posibilidad)|podria\s+deberse|se\s+trata\s+(probablemente\s+)?de)/;
 
 /**
- * guardDiagnosisWithoutPhoto — #348. Cuando la pregunta es de diagnóstico de
- * síntomas, NO hubo foto en el turno, y la respuesta enumera candidatos de
- * enfermedad/plaga (≥2 patógenos nombrados o fraseo diferencial), ANTEPONE una
- * nota pidiendo foto/datos. Así el campesino no trata a ciegas la enfermedad
- * equivocada. NO borra la respuesta del modelo (la lista puede orientar); la
- * encabeza con la petición de evidencia.
+ * #348 (hardening) — palabras españolas que, en MAYÚSCULA inicial (arranque de
+ * oración o conector), colisionan con "Género" de un binomio y producirían
+ * falsos positivos en `_namesLatinBinomial` ("Mientras tanto", "Para saber",
+ * "Una mancha", "Esas hojas"). Normalizadas sin tildes/case. NO son géneros
+ * latinos; si el "Género" candidato está acá, no cuenta como binomio.
+ */
+const BINOMIAL_GENUS_STOPWORDS = new Set([
+  'mientras', 'para', 'una', 'unas', 'unos', 'esas', 'esos', 'esta', 'este', 'estas',
+  'estos', 'eso', 'esto', 'cuando', 'donde', 'como', 'porque', 'aunque', 'tambien',
+  'ademas', 'luego', 'antes', 'despues', 'primero', 'segundo', 'tercero', 'mejor',
+  'revisa', 'aplica', 'mira', 'observa', 'cuenta', 'dime', 'manda', 'envia', 'toca',
+  'ahora', 'entonces', 'pero', 'sino', 'tienes', 'puedes', 'debes', 'nota', 'ojo',
+  'hola', 'bueno', 'vale', 'listo', 'tienen', 'suelen', 'algunas', 'algunos', 'muchas',
+  'muchos', 'todas', 'todos', 'ambas', 'ambos', 'otra', 'otras', 'otro', 'otros',
+  'segun', 'sobre', 'desde', 'hasta', 'entre', 'cada', 'siempre', 'nunca', 'casi',
+]);
+
+/**
+ * #348 (hardening) — ¿la respuesta NOMBRA un binomio latino (Género epíteto)?
+ * Un binomio científico en respuesta a un síntoma vago sin foto es un
+ * diagnóstico específico a ciegas aunque su nombre común no esté en la denylist
+ * (p.ej. "Cladosporium fulvum", "Alternaria solani"). Detector LOCAL no-stateful
+ * (no reusamos `SCI_BINOMIAL_RE` que es `/g` con estado compartido).
  *
- * GATING: requiere intención de diagnóstico en userMessage Y hadVision=false. Si
- * hubo foto, el diagnóstico es legítimo (no toca). Si la respuesta no enumera
- * candidatos (p. ej. ya pide foto, o solo da manejo cultural genérico), no-op.
- * Idempotente.
+ * Anti-falso-positivo (3 capas, para no marcar prosa española capitalizada):
+ *  1. el GÉNERO debe tener ≥4 letras (descarta "Un", "El", "Se", "Ya").
+ *  2. el EPÍTETO debe tener ≥4 letras minúsculas (descarta "Para no", "Una de").
+ *  3. el género (normalizado) NO puede ser una palabra española común de arranque
+ *     de oración/conector (`BINOMIAL_GENUS_STOPWORDS`): "Mientras tanto", "Para
+ *     saber", "Esas hojas" NO cuentan como binomio.
+ *
+ * @param {string} text  texto ORIGINAL (con mayúsculas/tildes, no normalizado).
+ * @returns {boolean}
+ */
+function _namesLatinBinomial(text) {
+  if (typeof text !== 'string' || !text) return false;
+  const re = /\b([A-Z][a-zé]{3,})\s+([a-zé]{4,})\b/g;
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    const genus = _stripDiacritics(m[1]);
+    if (!BINOMIAL_GENUS_STOPWORDS.has(genus)) return true;
+  }
+  return false;
+}
+
+/**
+ * #348 (hardening, prod 2026-06-03 · RUNBOOK S5) — SUPPRESS-AND-REPLACE.
+ *
+ * Antes este guard ANTEPONÍA una nota pero dejaba el binomio latino y la receta
+ * de fungicida legibles debajo (el campesino igual los leía) y solo disparaba con
+ * ≥2 patógenos. Hueco real en prod: "manchas en el tomate" (sin foto) con UN
+ * patógeno confiado ("Es tizón tardío, Phytophthora infestans…") se escapaba, y
+ * cuando disparaba dejaba el latín. La regla del system prompt es categórica:
+ * sin foto NO se nombra un patógeno/binomio. Por eso ahora REEMPLAZAMOS el cuerpo
+ * por un diferencial sin latín + pedido de foto. Mismo patrón que #351b (receta
+ * sintética): cuando el cuerpo es intrínsecamente dañino, append-only no basta.
+ */
+const DIAGNOSIS_NEEDS_EVIDENCE_NOTE =
+  'Para no mandarte a tratar la enfermedad equivocada, necesito ver tu planta antes de ponerle nombre a lo que ' +
+  'tiene. Un síntoma como "manchas" o "se está secando" puede venir de varias causas — falta o exceso de agua, ' +
+  'falta de nutrientes en el suelo, un hongo, una plaga o sol muy fuerte — y sin verla no puedo asegurarte cuál ' +
+  'es.\n\n' +
+  'Ayúdame con esto y te doy un diagnóstico confiable:\n' +
+  '- Mándame una FOTO de la hoja o el fruto afectado (toca el botón de cámara). Si puedes, una de cerca y otra ' +
+  'de toda la planta.\n' +
+  '- ¿Qué planta es exactamente y hace cuánto empezó?\n' +
+  '- ¿De qué color es la mancha, está en el haz (arriba) o el envés (abajo) de la hoja, se siente seca o con ' +
+  'humedad?\n' +
+  '- ¿Empezó por las hojas de abajo o de arriba, y cómo ha estado el clima (lluvia, sol fuerte, friajes)?\n\n' +
+  'Con eso sí te puedo decir con seguridad qué es y cómo manejarlo de forma agroecológica.';
+
+/**
+ * guardDiagnosisWithoutPhoto — #348. Cuando la pregunta reporta un SÍNTOMA VAGO,
+ * NO hubo foto en el turno, y la respuesta nombra un patógeno/binomio específico
+ * (≥1 nombre de patógeno, un binomio latino, o fraseo diferencial enumerando
+ * candidatos), SUPRIME el cuerpo y lo REEMPLAZA por un diferencial en lenguaje
+ * sencillo (sin latín) + pedido de foto/datos. Así el campesino no trata a ciegas
+ * la enfermedad equivocada.
+ *
+ * Dispara aunque la pregunta mencione un CULTIVO genérico ("tomate"): nombrar el
+ * cultivo no hace diagnosticable un síntoma vago — la regla del system prompt
+ * (DIAGNÓSTICO-SIN-EVIDENCIA) prohíbe el patógeno/binomio sin foto igual.
+ *
+ * GATING: requiere intención de diagnóstico de síntoma en userMessage Y
+ * hadVision=false. Si hubo foto, el diagnóstico es legítimo (no toca). Si la
+ * respuesta no nombra patógeno/binomio (ya pide foto o da manejo cultural
+ * genérico sin latín), no-op. Idempotente.
  *
  * Firma propia (necesita userMessage + hadVision) → se invoca aparte en
  * applyOutputGuards, no dentro de GUARD_CHAIN.
@@ -2857,12 +2946,6 @@ const DIFFERENTIAL_PHRASING_RE =
  * @param {{userMessage?: string|null, hadVision?: boolean}} [ctx]
  * @returns {{text:string, modified:boolean, reason:string|null}}
  */
-const DIAGNOSIS_NEEDS_EVIDENCE_NOTE =
-  'Antes de ponerle nombre a lo que tiene tu cultivo necesito verlo: con solo "manchas" puedo equivocarme y ' +
-  'mandarte a tratar la enfermedad que no es. Mándame una foto (toca el botón de cámara) de la hoja o el fruto ' +
-  'afectado, y cuéntame: ¿de qué color son las manchas, son secas o con humedad, empezaron por las hojas de ' +
-  'abajo o de arriba, hace cuánto y con qué clima? Con eso sí te doy un diagnóstico confiable.';
-
 export function guardDiagnosisWithoutPhoto(
   responseText,
   { userMessage = null, hadVision = false } = {},
@@ -2874,25 +2957,31 @@ export function guardDiagnosisWithoutPhoto(
   if (hadVision || !_isSymptomDiagnosisQuery(userMessage)) {
     return { text: responseText, modified: false, reason: null };
   }
-  // Idempotencia: la nota ya está.
-  if (/Antes de ponerle nombre a lo que tiene tu cultivo/i.test(responseText)) {
+  // Idempotencia: el mensaje de reemplazo ya está (no re-suprimir).
+  if (/Para no mandarte a tratar la enfermedad equivocada/i.test(responseText)) {
     return { text: responseText, modified: false, reason: null };
   }
   const norm = _stripDiacritics(responseText);
-  // ¿La respuesta enumera candidatos de enfermedad/plaga? (≥2 patógenos nombrados
-  // o fraseo diferencial). Solo así anteponemos la petición de evidencia: una
-  // respuesta que ya pide la foto o solo da manejo cultural no se toca.
-  const patho = new Set();
+  // ¿La respuesta nombra un patógeno/binomio específico? Basta UNA señal:
+  //   (a) ≥1 nombre de patógeno de la denylist,
+  //   (b) un binomio latino (Género epíteto), o
+  //   (c) fraseo diferencial enumerando candidatos.
+  // Un solo patógeno confiado ("es tizón tardío") es el caso MÁS dañino: manda
+  // a tratar a ciegas con plena seguridad. Una respuesta que solo da manejo
+  // cultural genérico (sin patógeno ni latín) NO entra acá.
+  let nombraPatogeno = false;
   for (const term of PATHOGEN_NAME_TERMS) {
-    if (norm.includes(term)) patho.add(term);
+    if (norm.includes(term)) { nombraPatogeno = true; break; }
   }
-  const enumeraCandidatos = patho.size >= 2 || DIFFERENTIAL_PHRASING_RE.test(norm);
-  if (!enumeraCandidatos) {
+  const especifica =
+    nombraPatogeno || _namesLatinBinomial(responseText) || DIFFERENTIAL_PHRASING_RE.test(norm);
+  if (!especifica) {
     return { text: responseText, modified: false, reason: null };
   }
   bumpGuardTelemetry('diagnosis_without_photo');
-  const text = `${DIAGNOSIS_NEEDS_EVIDENCE_NOTE}\n\n${responseText.trim()}`;
-  return { text, modified: true, reason: 'diagnostico_sin_foto' };
+  // SUPPRESS-AND-REPLACE: descartamos el cuerpo (con su binomio/receta) y
+  // devolvemos SOLO el diferencial sin latín + pedido de foto.
+  return { text: DIAGNOSIS_NEEDS_EVIDENCE_NOTE, modified: true, reason: 'diagnostico_sin_foto' };
 }
 
 // ── GUARD: viabilidad FALSO-NEGATIVO (cultivo viable marcado inviable) ──────
@@ -3255,17 +3344,19 @@ export function applyOutputGuards(
     if (vis.reason) reasons.push(vis.reason);
   }
 
-  // GUARD anti-diagnóstico-a-ciegas (#348): si la pregunta pide diagnóstico de
-  // síntomas ("manchas en el tomate") SIN foto y la respuesta enumera candidatos
-  // de patógeno, ANTEPONE la petición de foto/datos. Va tras el guard de visión
-  // (que cubre el caso distinto de afirmar haber VISTO una foto). Firma propia
-  // (userMessage + hadVision). Solo actúa si el de visión no reemplazó ya el texto.
+  // GUARD anti-diagnóstico-a-ciegas (#348): si la pregunta reporta un síntoma
+  // VAGO ("manchas en el tomate", "se está secando") SIN foto y la respuesta
+  // nombra un patógeno/binomio específico, SUPRIME el cuerpo y lo REEMPLAZA por un
+  // diferencial sin latín + pedido de foto/datos. Va tras el guard de visión (que
+  // cubre el caso distinto de afirmar haber VISTO una foto). Firma propia
+  // (userMessage + hadVision). Solo corre si el de visión no reemplazó ya el texto.
+  // Como REEMPLAZA el texto entero por la petición de evidencia, no tiene sentido
+  // correr los demás guards (no queda cultivo/patógeno/receta que razonar) →
+  // early-return, igual que off-domain y visión-sin-foto.
   if (!(vis && vis.modified)) {
     const dx = guardDiagnosisWithoutPhoto(text, { userMessage, hadVision });
     if (dx && dx.modified) {
-      text = dx.text;
-      modified = true;
-      if (dx.reason) reasons.push(dx.reason);
+      return { text: dx.text, modified: true, reasons: dx.reason ? [dx.reason] : [] };
     }
   }
 

@@ -263,7 +263,7 @@ describe('#347 classifyQueryIntent — unidades de comercialización = precio', 
 // #348 — anti-diagnóstico-sin-foto
 // ──────────────────────────────────────────────────────────────────────────
 describe('#348 guardDiagnosisWithoutPhoto', () => {
-  it('"manchas en el tomate" SIN foto + lista de patógenos → antepone petición de foto/datos', () => {
+  it('"manchas en el tomate" SIN foto + lista de patógenos → SUPRIME el latín y pide foto', () => {
     const llmFail =
       'Las manchas en el tomate pueden ser tizón tardío (Phytophthora infestans), alternaria o ' +
       'septoria. Para el tizón aplica preventivos; para alternaria mejora la aireación.';
@@ -273,11 +273,11 @@ describe('#348 guardDiagnosisWithoutPhoto', () => {
     });
     expect(out.modified).toBe(true);
     expect(out.reason).toMatch(/diagnostico_sin_foto/);
-    // La petición de evidencia ENCABEZA la respuesta.
-    expect(out.text.indexOf('Antes de ponerle nombre')).toBe(0);
     expect(out.text).toMatch(/foto|c[aá]mara/i);
-    // La lista del modelo se conserva debajo (como referencia, no como diagnóstico).
-    expect(out.text).toMatch(/tiz[oó]n tard[ií]o/i);
+    // SUPPRESS-AND-REPLACE: el patógeno/binomio NO sobrevive (cambio vs append).
+    expect(out.text.toLowerCase()).not.toContain('phytophthora');
+    expect(out.text.toLowerCase()).not.toContain('septoria');
+    expect(out.text).not.toMatch(/tiz[oó]n tard[ií]o/i);
   });
 
   it('NO dispara cuando SÍ hubo foto (diagnóstico legítimo)', () => {
@@ -290,7 +290,7 @@ describe('#348 guardDiagnosisWithoutPhoto', () => {
     expect(out.modified).toBe(false);
   });
 
-  it('NO dispara si la respuesta NO enumera candidatos (solo pide foto / manejo cultural)', () => {
+  it('NO dispara si la respuesta NO nombra patógeno/binomio (solo pide foto / manejo cultural)', () => {
     const ok =
       'Para saber qué tiene tu tomate necesito ver una foto de las manchas. Mientras tanto, riega por ' +
       'la base y evita mojar las hojas.';
@@ -310,7 +310,7 @@ describe('#348 guardDiagnosisWithoutPhoto', () => {
     expect(out.modified).toBe(false);
   });
 
-  it('idempotente: no re-antepone la nota dos veces', () => {
+  it('idempotente: no re-suprime sobre su propio reemplazo dos veces', () => {
     const llmFail =
       'Las manchas pueden ser tizón tardío o alternaria. Revisa la aireación del cultivo.';
     const ctx = { userMessage: 'manchas en el tomate', hadVision: false };
