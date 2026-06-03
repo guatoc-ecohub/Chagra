@@ -15,6 +15,7 @@ import {
   guardSpeciesSubstitution,
   guardCompanionBinomial,
   classifyQueryIntent,
+  guardReforestacionNativasRol,
   applyOutputGuards,
 } from '../../src/services/outputGuards.js';
 
@@ -319,5 +320,89 @@ describe('guardInvertedViability — A11: de-dup de variedades de la misma base'
     expect(res.modified).toBe(true);
     const ocurrencias = (res.text.match(/Corrección importante/g) || []).length;
     expect(ocurrencias).toBe(2);
+  });
+});
+
+
+describe('guardReforestacionNativasRol — sugerencia POSITIVA de nativas con rol (DR-RESTAURACION-INCENDIOS)', () => {
+  // Lado positivo del guard de restauración: ante una pregunta genérica de
+  // reforestación/restauración SIN especies concretas, sugiere nativas agrupadas
+  // por rol (pioneras, fijadoras de N, cortafuego, ancla por rebrote).
+  it('query genérica de reforestación → anexa nativas con rol', () => {
+    const userMessage = '¿Qué siembro para reforestar mi finca quemada?';
+    const respuesta = 'Buena idea recuperar el bosque. Prepara el terreno y siembra al inicio de lluvias.';
+    const res = guardReforestacionNativasRol(respuesta, { userMessage });
+    expect(res.modified).toBe(true);
+    expect(res.reason).toBe('reforestacion_nativas_rol');
+    const lower = res.text.toLowerCase();
+    // Roles presentes.
+    expect(lower).toContain('pioner');
+    expect(lower).toContain('fijador');
+    expect(lower).toContain('cortafuego');
+    expect(lower).toContain('rebrote');
+    // Especies clave del consolidado.
+    expect(res.text).toContain('Alnus acuminata');
+    expect(res.text).toContain('Quercus humboldtii');
+    expect(res.text).toContain('Clusia multiflora');
+    // Dato cuantitativo del aliso.
+    expect(res.text).toContain('280');
+    // Conserva el texto original.
+    expect(res.text).toContain('recuperar el bosque');
+  });
+
+  it('query genérica con vocablo campesino ("recuperar el monte") → dispara', () => {
+    const userMessage = 'quiero volver a recuperar el monte que se quemó, qué hago';
+    const res = guardReforestacionNativasRol('Vamos a ayudarte con eso.', { userMessage });
+    expect(res.modified).toBe(true);
+    expect(res.text).toContain('Trichanthera gigantea');
+  });
+
+  it('query AGRÍCOLA normal (no restauración) → NO toca el texto', () => {
+    const userMessage = '¿qué le echo a la papa para el gusano?';
+    const respuesta = 'Para el gusano de la papa usa Bacillus thuringiensis y monitoreo del foco.';
+    const res = guardReforestacionNativasRol(respuesta, { userMessage });
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe(respuesta);
+  });
+
+  it('sin userMessage → no-op (fail-closed)', () => {
+    const res = guardReforestacionNativasRol('Texto cualquiera sobre árboles.', {});
+    expect(res.modified).toBe(false);
+  });
+
+  it('idempotente: no re-dispara si la nota ya está', () => {
+    const userMessage = 'reforestar nacimiento de agua';
+    const res1 = guardReforestacionNativasRol('Recupera el nacimiento.', { userMessage });
+    expect(res1.modified).toBe(true);
+    const res2 = guardReforestacionNativasRol(res1.text, { userMessage });
+    expect(res2.modified).toBe(false);
+    expect(res2.text).toBe(res1.text);
+  });
+
+  it('anti-redundancia: respuesta que YA da nativas con rol → no anexa', () => {
+    const userMessage = '¿cómo restauro el bosque nativo?';
+    const respuesta =
+      'Usa especies pioneras como Alnus acuminata (aliso) que fija nitrógeno, ' +
+      'y de cortafuego Clusia multiflora; el roble (Quercus humboldtii) rebrota tras el fuego.';
+    const res = guardReforestacionNativasRol(respuesta, { userMessage });
+    expect(res.modified).toBe(false);
+    expect(res.text).toBe(respuesta);
+  });
+
+  it('applyOutputGuards: query reforestación genérica → incluye la sugerencia y reason', () => {
+    const userMessage = 'necesito reforestar una ladera erosionada, qué especies nativas uso';
+    const respuesta = 'Empieza por estabilizar el suelo de la ladera.';
+    const out = applyOutputGuards(respuesta, { userMessage });
+    expect(out.modified).toBe(true);
+    expect(out.reasons).toContain('reforestacion_nativas_rol');
+    expect(out.text).toContain('Alnus acuminata');
+  });
+
+  it('applyOutputGuards: query agrícola normal → la sugerencia NO aparece', () => {
+    const userMessage = '¿a cómo está la papa en la plaza?';
+    const respuesta = 'La papa está por el orden de los 80 mil el bulto esta semana.';
+    const out = applyOutputGuards(respuesta, { userMessage });
+    expect(out.reasons).not.toContain('reforestacion_nativas_rol');
+    expect(out.text).not.toContain('🌱 Para restaurar con nativas');
   });
 });

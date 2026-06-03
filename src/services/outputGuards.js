@@ -2191,6 +2191,138 @@ export function guardReforestacionInvasora(responseText, { userMessage = null } 
   return { text, modified: true, reason: `reforestacion_invasora: ${nombres}` };
 }
 
+// ── GUARD: reforestación POSITIVA — sugiere nativas con rol ──────────────────
+
+/**
+ * Catálogo HARDCODEADO de nativas de restauración con su ROL ecológico
+ * (consolidado DR-RESTAURACION-INCENDIOS-2026-06-02 §3 y §6). Lado POSITIVO del
+ * guard de restauración: mientras `guardReforestacionInvasora` ADVIERTE sobre
+ * invasoras-combustibles, este SUGIERE qué sembrar.
+ *
+ * Determinístico a propósito (como la denylist de agroquímicos y la lista de
+ * invasoras): NO depende del grounding del turno — la sugerencia es buena aunque
+ * el resolver de entidades falle. Cada entrada:
+ *   - `rol`: etiqueta del rol funcional en restauración (cómo lo lee el campesino).
+ *   - `especies`: nativas del consolidado para ese rol, con su nombre común.
+ *   - `nota`: dato clave del DR que justifica el rol (cuantitativo si lo hay).
+ *
+ * Roles cubiertos (los 4 pedidos + ancla por rebrote):
+ *   - Pioneras de rápido establecimiento: Alnus acuminata (aliso),
+ *     Trichanthera gigantea (nacedero), Chusquea spp. (chusque).
+ *   - Fijadoras de nitrógeno: Alnus acuminata (~280 kg N/ha/año, Carlson 1985),
+ *     Inga spp. (guamo), Gliricidia sepium (matarratón).
+ *   - Cortafuego / barrera de baja inflamabilidad: Clusia multiflora (gaque),
+ *     Weinmannia tomentosa (encenillo).
+ *   - Ancla por rebrote post-incendio: Quercus humboldtii (roble),
+ *     Polylepis quadrijuga (colorado de páramo).
+ */
+const NATIVAS_RESTAURACION_POR_ROL = [
+  {
+    rol: 'Pioneras de rápido establecimiento (cubren el suelo y rompen el ciclo del fuego)',
+    especies: ['Alnus acuminata (aliso)', 'Trichanthera gigantea (nacedero)', 'Chusquea spp. (chusque)'],
+    nota: 'crecen rápido, estabilizan taludes y dan sombra para que entren las demás',
+  },
+  {
+    rol: 'Fijadoras de nitrógeno (recuperan el suelo quemado o cansado)',
+    especies: ['Alnus acuminata (aliso)', 'Inga spp. (guamo)', 'Gliricidia sepium (matarratón)'],
+    nota: 'el aliso fija ~280 kg de nitrógeno por hectárea al año (Carlson 1985)',
+  },
+  {
+    rol: 'Cortafuego natural (follaje grueso y baja inflamabilidad para frenar el fuego)',
+    especies: ['Clusia multiflora (gaque)', 'Weinmannia tomentosa (encenillo)'],
+    nota: 'el gaque funciona como barrera viva por su hoja gruesa y húmeda',
+  },
+  {
+    rol: 'Ancla por rebrote (aguantan el incendio y rebrotan de raíz/tronco)',
+    especies: ['Quercus humboldtii (roble)', 'Polylepis quadrijuga (colorado de páramo)'],
+    nota: 'el roble rebrota tras el fuego y ancla la recuperación del bosque',
+  },
+];
+
+/** Marca textual idempotente que deja el guard POSITIVO al anexar su nota. */
+const REFORESTACION_NATIVAS_NOTE_MARK = 'nativas con su papel en la restauracion';
+
+/**
+ * Patrones que indican que la respuesta YA está dando recomendaciones concretas
+ * de nativas CON ROL (binomios + vocabulario de rol). Si el modelo ya entregó
+ * una lista útil de nativas con su función, el guard NO necesita anexar su nota
+ * (evita redundancia). Conservador: exige señal CLARA de rol funcional, no la
+ * mera mención de un nombre suelto.
+ *
+ * Se evalúa sobre el texto de respuesta normalizado (sin tildes).
+ */
+const NATIVAS_CON_ROL_PRESENTES_RE =
+  /(alnus\s+acuminata|trichanthera|clusia\s+multiflora|quercus\s+humboldtii|weinmannia|polylepis|gliricidia|inga\s+)/;
+
+/** Vocabulario de ROL funcional ya presente en la respuesta. */
+const ROL_FUNCIONAL_RE =
+  /(pioner|fijador|fija(r|n)?\s+nitrogeno|cortafuego|corta\s+fuego|rebrot|barrera\s+viva|baja\s+inflamab)/;
+
+/**
+ * guardReforestacionNativasRol — GUARD POSITIVO de RESTAURACIÓN (consolidado
+ * DR-RESTAURACION-INCENDIOS-2026-06-02). Complemento del lado negativo
+ * (`guardReforestacionInvasora`, que ADVIERTE sobre invasoras).
+ *
+ * Cuando la pregunta del usuario es de REFORESTACIÓN / RESTAURACIÓN ecológica y
+ * la respuesta del LLM NO está dando ya una recomendación concreta de nativas
+ * con rol, ANEXA una nota determinística que sugiere especies NATIVAS agrupadas
+ * por su ROL ecológico (pioneras, fijadoras de N, cortafuego, ancla por
+ * rebrote), tomadas del consolidado. Lado POSITIVO: dice QUÉ sembrar, no solo
+ * qué evitar.
+ *
+ * GATING POR INTENCIÓN (anti-falso-positivo): solo corre si `userMessage` es de
+ * reforestación/restauración (`_isReforestacionIntent`, compartido con el guard
+ * de invasoras). En una consulta agrícola normal NO actúa. Sin userMessage →
+ * no-op (fail-closed por diseño).
+ *
+ * ANTI-REDUNDANCIA: si la respuesta YA nombra nativas de restauración con
+ * vocabulario de rol funcional (el modelo acertó), el guard NO anexa la nota.
+ * También es idempotente: si su propia marca ya está, no re-dispara, y no pisa
+ * la advertencia del guard de invasoras (se anexan en orden, ambos caben).
+ *
+ * Lista HARDCODEADA (determinístico): no depende del grounding del turno; sugiere
+ * aunque el resolver de entidades falle. Firma propia (necesita userMessage para
+ * el gate) → se invoca aparte en applyOutputGuards, fuera de GUARD_CHAIN.
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardReforestacionNativasRol(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Gate de intención: solo en consultas de reforestación/restauración.
+  if (!_isReforestacionIntent(userMessage)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const textNorm = _stripDiacritics(responseText);
+
+  // Idempotencia: si la nota de nativas-con-rol ya está, no re-dispara.
+  if (textNorm.includes(REFORESTACION_NATIVAS_NOTE_MARK)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Anti-redundancia: si la respuesta YA da nativas concretas CON rol funcional,
+  // el modelo ya cubrió lo positivo — no anexamos para no repetir.
+  if (NATIVAS_CON_ROL_PRESENTES_RE.test(textNorm) && ROL_FUNCIONAL_RE.test(textNorm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('reforestacion_nativas_rol');
+  const bloques = NATIVAS_RESTAURACION_POR_ROL.map(
+    (g) => `- ${g.rol}: ${g.especies.join(', ')} — ${g.nota}.`,
+  );
+  const nota =
+    '🌱 Para restaurar con nativas con su papel en la restauración, una guía rápida por rol:\n' +
+    `${bloques.join('\n')}\n` +
+    'Lo ideal: empezar con pioneras y fijadoras para recuperar el suelo, y de ancla el roble por su ' +
+    'rebrote. Siembra antes del pico seco y dale riego de establecimiento el primer verano.';
+  const text = `${responseText.trim()}\n\n${nota}`;
+  return { text, modified: true, reason: 'reforestacion_nativas_rol' };
+}
+
 /**
  * Set de guards que SOLO tienen sentido cuando la consulta es de SIEMBRA
  * (A12). Si la pregunta del usuario es de PRECIO/MERCADO (o info general sin
@@ -2360,6 +2492,19 @@ export function applyOutputGuards(
     text = reforestRes.text;
     modified = true;
     if (reforestRes.reason) reasons.push(reforestRes.reason);
+  }
+  // Guard POSITIVO de reforestación (DR-RESTAURACION-INCENDIOS): firma propia
+  // (necesita userMessage para el gate de intención-restauración). Complementa al
+  // de invasoras: cuando la pregunta es de reforestación/restauración y la
+  // respuesta no da ya nativas con rol, SUGIERE nativas agrupadas por su papel
+  // (pioneras, fijadoras de N, cortafuego, ancla por rebrote). Va al final para
+  // que su nota quede después de cualquier advertencia de invasora. Determinístico
+  // (lista hardcodeada), no depende del grounding.
+  const reforestNativasRes = guardReforestacionNativasRol(text, { userMessage });
+  if (reforestNativasRes && reforestNativasRes.modified) {
+    text = reforestNativasRes.text;
+    modified = true;
+    if (reforestNativasRes.reason) reasons.push(reforestNativasRes.reason);
   }
   return { text, modified, reasons };
 }
