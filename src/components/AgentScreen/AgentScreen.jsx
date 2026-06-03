@@ -52,6 +52,7 @@ import { streamChatViaSidecar, isAgentStreamingEnabled } from '../../services/st
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
 import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, postValidate, getClimaIdeam } from '../../services/sidecarClient';
+import { decideNluRouting, NLU_OUTCOME } from '../../services/agentNluBestEffort';
 // CHIPS DE MODO (A3/A4, decisión operador 2026-06-02): el router PURO mapea
 // la intención forzada del chip → tool determinístico, SALTANDO el NLU
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
@@ -1487,16 +1488,28 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
             }
           } else {
           // PASO 2b — NLU planner + tool call (flow original, sin chip).
+          //
+          // NLU es BEST-EFFORT (bug prod 2026-06-02): `planNlu` puede devolver
+          // null por timeout (~14s sobre el prefill ~9.5s del planner), 5xx, red
+          // caída o flag/offline. La decisión de routing se centraliza en
+          // `decideNluRouting` (función pura, testeable mockeando el sidecar) con
+          // un invariante duro: `proceedToChat` es SIEMPRE true. Pase lo que pase
+          // con /nlu, el `callLLM` de abajo corre igual con el grounding que ya
+          // tenemos (resolve-entities + system prompt + guardas); el planner solo
+          // AGREGA routing de tools cuando responde a tiempo, nunca bloquea el
+          // turno. El deadline de 60s del chat se arma DENTRO de callLLM, DESPUÉS
+          // de esto → un /nlu lento jamás se come ese presupuesto.
           const tNlu0 = performance.now();
           const plan = await planNlu(textForLLM, contextMemory);
           const tNlu1 = performance.now();
-          // D2 (#246) — modo cadena: si el sidecar devolvió `tool_chain`
-          // (array no vacío), ejecutamos cada paso en orden y usamos el
-          // array de evidences como toolEvidence. El formatter y el
-          // computeSourceMetadata ya soportan arrays.
-          if (plan?.useTool && Array.isArray(plan.toolChain) && plan.toolChain.length > 0) {
+          const nluLatency = Math.round(tNlu1 - tNlu0);
+          const routing = decideNluRouting(plan);
+
+          // D2 (#246) — modo cadena: el planner pidió ejecutar varios tools en
+          // orden. El formatter y computeSourceMetadata ya soportan arrays.
+          if (routing.outcome === NLU_OUTCOME.TOOL_CHAIN) {
             const tTool0 = performance.now();
-            const chainEvidences = await executeToolChain(plan.toolChain);
+            const chainEvidences = await executeToolChain(routing.toolChain);
             const tTool1 = performance.now();
             const useful = chainEvidences.filter((ev) => ev && ev.result != null);
             if (useful.length > 0) {
@@ -1506,37 +1519,48 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
               })();
               console.debug('[sidecar]', {
                 chain: useful.map((e) => e.tool),
-                latencyNlu: Math.round(tNlu1 - tNlu0),
+                latencyNlu: nluLatency,
                 latencyChain: Math.round(tTool1 - tTool0),
                 toolEvidenceBytes: evidenceBytes,
               });
             } else {
               console.debug('[sidecar] tool_chain todos null', {
-                latencyNlu: Math.round(tNlu1 - tNlu0),
+                latencyNlu: nluLatency,
                 latencyChain: Math.round(tTool1 - tTool0),
               });
             }
-          } else if (plan?.useTool && plan.tool && plan.args) {
+          } else if (routing.outcome === NLU_OUTCOME.SINGLE_TOOL) {
             const tTool0 = performance.now();
-            const result = await callTool(plan.tool, plan.args);
+            const result = await callTool(routing.tool, routing.args);
             const tTool1 = performance.now();
             if (result) {
-              toolEvidence = { tool: plan.tool, args: plan.args, result };
+              toolEvidence = { tool: routing.tool, args: routing.args, result };
               const evidenceBytes = (() => {
                 try { return JSON.stringify(result).length; } catch (_) { return 0; }
               })();
               console.debug('[sidecar]', {
-                tool: plan.tool,
-                latencyNlu: Math.round(tNlu1 - tNlu0),
+                tool: routing.tool,
+                latencyNlu: nluLatency,
                 latencyTool: Math.round(tTool1 - tTool0),
                 toolEvidenceBytes: evidenceBytes,
               });
             }
-          } else if (plan) {
+          } else if (routing.degraded) {
+            // NLU null (timeout/5xx/red/flag-off). NO es error del turno: el
+            // planner es opcional. Logueamos EXPLÍCITAMENTE el degrade para que el
+            // operador vea en telemetría que el turno NO murió — cayó a chat
+            // grounded directo. Antes este caso era un fall-through silencioso,
+            // indistinguible de "no_tool", y enmascaraba por qué una query agro
+            // tardaba sin routing.
+            console.debug('[sidecar] NLU null (timeout/fail) — degrado a chat directo', {
+              latencyNlu: nluLatency,
+            });
+          } else {
+            // El planner respondió OK pero decidió no usar tool. Chat directo.
             console.debug('[sidecar]', {
               tool: null,
-              latencyNlu: Math.round(tNlu1 - tNlu0),
-              reason: plan.reason || 'no_tool',
+              latencyNlu: nluLatency,
+              reason: routing.reason || 'no_tool',
             });
           }
           }

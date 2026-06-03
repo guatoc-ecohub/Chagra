@@ -18,7 +18,13 @@
  *
  * Reglas operativas:
  * - Offline-first: si `!navigator.onLine` → null inmediato, no fetch.
- * - Timeout corto: NLU 10s, tools 5s (cap defensivo p99 sidecar).
+ * - Timeout por endpoint: `/nlu` 14s (el planner tiene un prefill conocido de
+ *   ~9.5s en prod — 10s lo abortaba justo en el borde en queries agro
+ *   legítimas, matando el routing de tools; 14s da margen sobre el prefill sin
+ *   colgar el turno: si igual expira, `planNlu` devuelve null y el caller
+ *   degrada a chat grounded directo). El resto de RPCs del sidecar
+ *   (`/resolve-entities`, `/post-validate`) quedan en 10s, y los tools en 5s
+ *   (cap defensivo p99 del sidecar).
  * - Falla silenciosa: en error/non-200/abort → null + console.debug.
  *   NUNCA throw — el caller espera contract `T | null`.
  * - Auth: header `X-Chagra-Token: ${VITE_CHAGRA_MCP_TOKEN}` siempre.
@@ -36,7 +42,21 @@
 
 import { buildSidecarHeaders } from './tierService.js';
 
-const NLU_TIMEOUT_MS = 10000;
+// Timeout del planner NLU (`POST /nlu`). El sidecar tiene un prefill conocido
+// de ~9.5s en prod (system prompt grande del planner). Con 10s, una query agro
+// legítima abortaba justo en el borde → planNlu null → se perdía el routing de
+// tools (y, peor, el operador percibía un stall de 10s antes de que arrancara
+// el chat). 14s deja margen sobre el prefill medido sin volverse un cuelgue: si
+// el planner igual no responde a tiempo, planNlu degrada a null y el AgentScreen
+// sigue a chat grounded directo (NLU es best-effort, su ausencia NO mata el
+// turno). NO subir mucho más: el chat real corre DESPUÉS de esto, así que cada
+// segundo acá es latencia percibida pura. SPEED-6 (comprimir el prompt del
+// planner en el sidecar) baja el prefill en origen — es el fix de raíz; este
+// timeout es la red de seguridad del lado PWA.
+const NLU_TIMEOUT_MS = 14000;
+// Timeout genérico para el resto de RPCs JSON del sidecar (/resolve-entities,
+// /post-validate). Más cortos que el planner: no cargan el prompt grande.
+const SIDECAR_RPC_TIMEOUT_MS = 10000;
 const TOOL_TIMEOUT_MS = 5000;
 
 /**
@@ -362,7 +382,7 @@ export async function resolveEntities(userMessage, opts = {}) {
   const body = { user_message: userMessage };
   const alt = opts && opts.fincaAltitud != null ? Number(opts.fincaAltitud) : NaN;
   if (Number.isFinite(alt)) body.finca_altitud = alt;
-  const raw = await postJson('/resolve-entities', body, NLU_TIMEOUT_MS);
+  const raw = await postJson('/resolve-entities', body, SIDECAR_RPC_TIMEOUT_MS);
   if (!raw || typeof raw !== 'object') return null;
   if (!Array.isArray(raw.entities)) return { entities: [] };
   return { entities: raw.entities };
@@ -397,7 +417,7 @@ export async function resolveEntities(userMessage, opts = {}) {
  */
 export async function fermentoPrefilter(userMessage) {
   if (!userMessage || typeof userMessage !== 'string') return null;
-  const raw = await postJson('/fermento-prefilter', { user_message: userMessage }, NLU_TIMEOUT_MS);
+  const raw = await postJson('/fermento-prefilter', { user_message: userMessage }, SIDECAR_RPC_TIMEOUT_MS);
   if (!raw || typeof raw !== 'object') return null;
   return {
     is_fermento_intent: raw.is_fermento_intent === true,
@@ -438,7 +458,7 @@ export async function postValidate(text, expected) {
     const clean = expected.filter((e) => typeof e === 'string' && e.trim().length > 0);
     if (clean.length > 0) body.expected = clean;
   }
-  const raw = await postJson('/post-validate', body, NLU_TIMEOUT_MS);
+  const raw = await postJson('/post-validate', body, SIDECAR_RPC_TIMEOUT_MS);
   if (!raw || typeof raw !== 'object') return null;
   return {
     hallucinated: Array.isArray(raw.hallucinated) ? raw.hallucinated : [],
@@ -622,4 +642,9 @@ export const __TEST__ = {
   PRECIO_SIPSA_ACTIONS,
   getBaseUrl,
   getToken,
+  // Timeouts expuestos para que los tests verifiquen que `/nlu` usa un budget
+  // mayor (sobre el prefill ~9.5s) que el resto de RPCs del sidecar.
+  NLU_TIMEOUT_MS,
+  SIDECAR_RPC_TIMEOUT_MS,
+  TOOL_TIMEOUT_MS,
 };

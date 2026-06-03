@@ -246,6 +246,72 @@ describe('sidecarClient — feature flag on', () => {
     });
   });
 
+  describe('timeouts por endpoint (robustez NLU best-effort)', () => {
+    // Bug prod 2026-06-02: el planner `/nlu` tiene un prefill conocido de ~9.5s.
+    // Con el timeout viejo de 10s abortaba justo en el borde en queries agro
+    // legítimas, perdiendo el routing de tools y dejando al operador con un
+    // stall de 10s antes del chat. Subimos `/nlu` a 14s (margen sobre el
+    // prefill). El resto de RPCs del sidecar (resolve-entities, post-validate)
+    // y el fermento-prefilter quedan en 10s; los tools en 5s.
+    it('constantes expuestas: /nlu 14s > RPC 10s > tools 5s', async () => {
+      const { __TEST__ } = await importFresh();
+      expect(__TEST__.NLU_TIMEOUT_MS).toBe(14000);
+      expect(__TEST__.SIDECAR_RPC_TIMEOUT_MS).toBe(10000);
+      expect(__TEST__.TOOL_TIMEOUT_MS).toBe(5000);
+      // El planner DEBE tener más budget que el resto de RPCs (sobre el prefill).
+      expect(__TEST__.NLU_TIMEOUT_MS).toBeGreaterThan(__TEST__.SIDECAR_RPC_TIMEOUT_MS);
+    });
+
+    it('planNlu arma el AbortController con 14000ms (sobre el prefill ~9.5s)', async () => {
+      const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, { use_tool: false }));
+      const { planNlu } = await importFresh();
+      await planNlu('contame de la maracuyá');
+      // El primer setTimeout que arma postJson es el del abort del fetch.
+      const abortDelays = setTimeoutSpy.mock.calls.map((c) => c[1]);
+      expect(abortDelays).toContain(14000);
+      expect(abortDelays).not.toContain(10000);
+      setTimeoutSpy.mockRestore();
+    });
+
+    it('resolveEntities arma el AbortController con 10000ms (no hereda el budget del planner)', async () => {
+      const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, { entities: [] }));
+      const { resolveEntities } = await importFresh();
+      await resolveEntities('aguacate');
+      const abortDelays = setTimeoutSpy.mock.calls.map((c) => c[1]);
+      expect(abortDelays).toContain(10000);
+      expect(abortDelays).not.toContain(14000);
+      setTimeoutSpy.mockRestore();
+    });
+
+    it('postValidate arma el AbortController con 10000ms', async () => {
+      const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, {
+        hallucinated: [], validated: [], suspect: [], age_available: true, detected_count: 0,
+      }));
+      const { postValidate } = await importFresh();
+      await postValidate('La gulupa es Passiflora ligularis.', ['Passiflora ligularis']);
+      const abortDelays = setTimeoutSpy.mock.calls.map((c) => c[1]);
+      expect(abortDelays).toContain(10000);
+      expect(abortDelays).not.toContain(14000);
+      setTimeoutSpy.mockRestore();
+    });
+
+    it('planNlu timeout (AbortError tras el budget) → null sin throw (best-effort)', async () => {
+      // Aunque subimos el budget, el contrato sigue siendo T|null: si el planner
+      // NO responde a tiempo, planNlu degrada a null y el caller cae a chat directo.
+      fetchMock.mockImplementationOnce((_url, _opts) => {
+        const err = new Error('aborted');
+        err.name = 'AbortError';
+        return Promise.reject(err);
+      });
+      const { planNlu } = await importFresh();
+      const res = await planNlu('contame de la maracuyá');
+      expect(res).toBeNull();
+    });
+  });
+
   describe('callTool — happy path + whitelist', () => {
     it('200 con ficha species → devuelve el body tal cual', async () => {
       const ficha = {
