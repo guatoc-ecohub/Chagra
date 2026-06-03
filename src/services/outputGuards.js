@@ -146,8 +146,15 @@ const PRICE_INTENT_PATTERNS = [
   /\b(donde|a\s+quien)\s+(puedo\s+)?(vendo|vender|comprar|compro)\b/,
   /\b(vendo|vender|venta|comprar|compra|comprador|comercializ)\w*\b/,
   /\bcosecha\s+para\s+(vender|venta)\b/,
+  // #347 (prod 2026-06-03): unidades de comercialización mayorista. "el bulto/
+  // la arroba/la carga de papa" es una consulta de MERCADO, no de siembra. Sin
+  // estas, "a cómo el bulto de papa" filtraba la altitud/municipio de la finca y
+  // disparaba la cascada de viabilidad por variedad.
   /\bbulto[s]?\s+(de|a)\b/,
+  /\barroba[s]?\s+(de|a)\b/,
+  /\bcarga[s]?\s+(de|a)\b/,
   /\bcarga\s+de\b/,
+  /\b(el|la|los|las|una?|cuantas?)\s+(arroba|bulto|carga)[s]?\b/,
 ];
 
 /**
@@ -301,6 +308,41 @@ const SYNTHETIC_AGROCHEM_TERMS = [
   'glufosinato',
   // producto inventado por el modelo en el bench (CPX-007)
   'pirimex',
+  // FERTILIZANTES de síntesis (#351, prod 2026-06-03 Choachí). El bug: el modelo
+  // recomendó "plan de alimentación" con NPK 5-10-10 y, al preguntar cómo
+  // hacerlo, una receta de mezclar urea + fosfato triple + sulfato de potasio.
+  // Son fertilizantes minerales de síntesis (no biopreparados) → contra la
+  // misión agroecológica. Sus nombres NO terminan en sufijo de familia química
+  // (no los captura el detector de sufijos), por eso van en la denylist exacta.
+  // La sigla 'npk' y las formulaciones N-P-K ("5-10-10") se chequean aparte
+  // (`SYNTHETIC_FERTILIZER_PATTERNS`).
+  'urea',
+  'fosfato triple',
+  'superfosfato triple',
+  'fosfato diamonico',
+  'fosfato diamónico',
+  'fosfato monoamonico',
+  'fosfato monoamónico',
+  'sulfato de potasio',
+  'sulfato de amonio',
+  'nitrato de amonio',
+  'nitrato de potasio',
+  'cloruro de potasio',
+  'muriato de potasio',
+];
+
+/**
+ * #351 — la sigla NPK y las FORMULACIONES de fertilizante mineral ("NPK 5-10-10",
+ * "10-10-10", "triple 15", "15-15-15") delatan un fertilizante de síntesis. Van
+ * aparte de la denylist por palabra: "npk" es una sigla corta y las
+ * formulaciones son tripletes numéricos (no nombres de i.a.). En agro un triplete
+ * N-P-K siempre denota un mineral de síntesis. Sobre el texto normalizado.
+ */
+const SYNTHETIC_FERTILIZER_PATTERNS = [
+  /(^|[^a-z])npk([^a-z]|$)/, // sigla NPK (con o sin formulación al lado)
+  /(^|[^a-z])n-p-k([^a-z]|$)/,
+  /\btriple\s+(quince|15|catorce|14|diecisiete|17)\b/, // "triple 15"
+  /\b\d{1,2}\s*[-–]\s*\d{1,2}\s*[-–]\s*\d{1,2}\b/, // formulación "5-10-10", "15-15-15"
 ];
 
 /**
@@ -472,13 +514,28 @@ function _organicRedirect(originalText) {
   const t = _stripDiacritics(originalText);
   const esHongo = /(hongo|tizon|gota|roya|mildeo|mildiu|antracnosis|fungic|enfermedad|mancha)/.test(t);
   const esPlaga = /(plaga|gusano|cogollero|oruga|larva|insecto|pulgon|acaro|trips|mosca|insectic)/.test(t);
+  // #351 — ¿el contexto es FERTILIZACIÓN/nutrición (no plaga ni enfermedad)? Si
+  // el texto habla de alimentar/abonar/nutrir o nombra un fertilizante mineral,
+  // redirigimos a la ruta de abono orgánico (compost/bocashi/biol), no a un
+  // fungicida/insecticida orgánico.
+  const esFertilizante =
+    /(npk|urea|fosfato|sulfato de potasio|nitrato de amonio|fertiliz|abon|nutricion|alimentacion|alimentar|nutrir|fertirrig|formula\s+\d)/.test(
+      t,
+    );
 
   const intro =
-    'Una nota importante: Chagra es agroecológico, no recomendamos agroquímicos sintéticos. ' +
+    'Una nota importante: Chagra es agroecológico, no recomendamos agroquímicos ni fertilizantes sintéticos. ' +
     'Lo que de verdad funciona y cuida tu suelo y tu salud es el manejo orgánico:';
 
   const lineas = [];
-  if (esHongo || (!esHongo && !esPlaga)) {
+  if (esFertilizante) {
+    lineas.push(
+      '- Para nutrir y abonar el cultivo (en vez de NPK, urea o fosfatos de síntesis): compost bien maduro, ' +
+        'bocashi, humus de lombriz, biol (biofertilizante líquido fermentado) y abonos verdes. Alimentan el suelo ' +
+        'vivo y liberan los nutrientes poco a poco, sin acidificarlo ni salinizarlo.',
+    );
+  }
+  if (esHongo || (!esHongo && !esPlaga && !esFertilizante)) {
     lineas.push(
       '- Para hongos y enfermedades (tizón, roya, gota): caldo bordelés (cal + sulfato de cobre) como preventivo, ' +
         'eliminar focos enfermos, mejorar aireación y drenaje, usar semilla sana y rotar el cultivo.',
@@ -528,6 +585,14 @@ export function guardSyntheticAgrochemical(responseText, _resolvedEntities = nul
     // límite de palabra a ambos lados sobre el texto normalizado.
     const re = new RegExp(`(^|[^a-z0-9])${t.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}([^a-z0-9]|$)`);
     if (re.test(norm)) hits.push(term);
+  }
+
+  // #351: fertilizantes minerales de síntesis por sigla/formulación (NPK,
+  // "5-10-10", "triple 15"). No tienen sufijo de familia química ni palabra de
+  // denylist clásica; este matcher capta la sigla y los tripletes N-P-K.
+  for (const re of SYNTHETIC_FERTILIZER_PATTERNS) {
+    const m = norm.match(re);
+    if (m) hits.push(m[0].trim());
   }
 
   // HARDENING 1 (audit #21): además de la denylist exacta, detecta agroquímicos
@@ -2323,6 +2388,448 @@ export function guardReforestacionNativasRol(responseText, { userMessage = null 
   return { text, modified: true, reason: 'reforestacion_nativas_rol' };
 }
 
+// ── GUARD: dominio (off-domain física/química/matemáticas) ──────────────────
+
+/**
+ * #352 (prod 2026-06-03 Choachí): el agente respondió completo a "teoría de la
+ * relatividad", "teoría de cuerdas", "química orgánica vs inorgánica" — y peor,
+ * con un badge falso "Catálogo verificado · get_normativa_ica" (grounding
+ * irrelevante) y un typo ("toria de cuerdas") lo buscó como PLANTA. Chagra es un
+ * asistente AGROECOLÓGICO: ante una pregunta fuera de dominio (física, química
+ * teórica, matemáticas, historia, etc.) debe DECLINAR amable y redirigir, SIN
+ * tool ni grounding.
+ *
+ * Estos patrones (sobre el texto normalizado) marcan temas inequívocamente
+ * académicos/no-agro. Son CONSERVADORES: cada uno apunta a un concepto que no
+ * tiene lectura agrícola legítima ("teoria de cuerdas", "relatividad",
+ * "ecuacion de segundo grado"). NO incluye términos que también son agro
+ * ("suelo", "agua", "nitrogeno", "ph", "fotosintesis"): esos pueden ser de
+ * cultivo y NO deben declinarse.
+ */
+const OFF_DOMAIN_TOPIC_PATTERNS = [
+  // física teórica
+  /\bteoria\s+de\s+(la\s+)?relatividad\b/,
+  /\brelatividad\s+(general|especial)\b/,
+  /\bteoria\s+de\s+(las?\s+)?cuerdas\b/,
+  /\bmecanica\s+cuantica\b/,
+  /\bfisica\s+cuantica\b/,
+  /\bagujero[s]?\s+negro[s]?\b/,
+  /\bbig\s+bang\b/,
+  /\bley(es)?\s+de\s+newton\b/,
+  /\btermodinamica\b/,
+  // química teórica (no agro: distinguir de "química del suelo")
+  /\bquimica\s+(organica|inorganica)\b/,
+  /\btabla\s+periodica\b/,
+  /\benlace[s]?\s+(covalente|ionico|metalico)\b/,
+  /\bnumero\s+atomico\b/,
+  // matemáticas puras
+  /\bteorema\s+de\s+pitagoras\b/,
+  /\becuacion\s+(de\s+segundo\s+grado|cuadratica|diferencial)\b/,
+  /\bderivada[s]?\s+(de\s+una\s+funcion|e\s+integrales)\b/,
+  /\bintegral(es)?\s+(definida|indefinida)\b/,
+  /\bcalculo\s+(diferencial|integral)\b/,
+  /\blogaritmo[s]?\b/,
+  /\btrigonometr/,
+  // otros dominios académicos claros
+  /\bteoria\s+de\s+la\s+evolucion\b/,
+  /\bguerra\s+(mundial|fria|de\s+los\s+mil\s+dias)\b/,
+];
+
+/**
+ * ¿La pregunta del usuario es de un dominio claramente NO-agroecológico? Sobre
+ * el texto normalizado del userMessage. Sin userMessage → false (no podemos
+ * juzgar el dominio; conservador: dejamos pasar).
+ *
+ * @param {string|null|undefined} userMessage
+ * @returns {boolean}
+ */
+function _isOffDomainQuery(userMessage) {
+  if (typeof userMessage !== 'string' || !userMessage.trim()) return false;
+  const norm = _stripDiacritics(userMessage);
+  return OFF_DOMAIN_TOPIC_PATTERNS.some((re) => re.test(norm));
+}
+
+/**
+ * Mensaje de declinación amable + redirección al dominio agro. NO cita tool ni
+ * grounding (el bug original mostraba un badge "get_normativa_ica" falso). Es un
+ * reemplazo COMPLETO: una respuesta off-domain no tiene parte rescatable.
+ */
+const OFF_DOMAIN_DECLINE_MESSAGE =
+  'Soy tu asistente de cultivos y agroecología, así que de ese tema no soy quien te puede ayudar bien ' +
+  '(hay mejores fuentes para física, química o matemáticas). Lo que sí manejo es tu finca: qué sembrar ' +
+  'según tu altura y clima, plagas y enfermedades, biopreparados y abonos orgánicos, asociaciones de ' +
+  'cultivos y manejo del suelo. ¿Te ayudo con algo de tu cultivo?';
+
+/**
+ * guardOffDomain — #352. Si la PREGUNTA del usuario es de un dominio claramente
+ * no-agro (física/química teórica/matemáticas) y la respuesta del modelo entró a
+ * contestarla, REEMPLAZA la respuesta por una declinación amable que redirige al
+ * dominio agro. No corre tool ni grounding.
+ *
+ * GATING POR INTENCIÓN: solo actúa si el userMessage matchea un tema off-domain.
+ * Una pregunta agro normal ("¿qué siembro a 1923 msnm?") NO se ve afectada. Sin
+ * userMessage → no-op (conservador: no juzgamos el dominio sin la pregunta).
+ *
+ * Idempotente: si la respuesta ya es nuestro mensaje de declinación, no
+ * re-dispara. Firma propia (necesita userMessage) → se invoca aparte en
+ * applyOutputGuards, no dentro de GUARD_CHAIN.
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardOffDomain(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (!_isOffDomainQuery(userMessage)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  // Idempotencia: ya declinamos.
+  if (/asistente de cultivos y agroecolog[ií]a/i.test(responseText)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  bumpGuardTelemetry('off_domain');
+  return { text: OFF_DOMAIN_DECLINE_MESSAGE, modified: true, reason: 'off_domain' };
+}
+
+// ── GUARD: diagnóstico sin foto ni datos (anti-dx-a-ciegas) ─────────────────
+
+/**
+ * #348 (prod 2026-06-03 Choachí): "manchas en el tomate" SIN foto → el agente
+ * enumeró una lista de patógenos posibles (tizón tardío, alternaria, etc.) como
+ * si hubiera diagnosticado. Sin la foto ni datos del síntoma, eso es adivinar y
+ * puede mandar al campesino a tratar la enfermedad equivocada. El guard de
+ * visión-sin-foto (`guardVisionWithoutPhoto`) NO lo cubre: ahí el modelo NO
+ * afirma haber visto una foto, simplemente lista diagnósticos sin base.
+ *
+ * Este guard, complementario, detecta: (a) intención de DIAGNÓSTICO de
+ * síntomas en la pregunta ("manchas/hojas amarillas/se está secando/qué tiene
+ * mi…"), (b) ausencia de foto en el turno (hadVision=false), y (c) que la
+ * respuesta ENUMERA candidatos de enfermedad/plaga (≥2 nombres de patógeno o
+ * fraseo "puede ser X o Y"). En ese caso ANTEPONE una nota pidiendo foto/datos
+ * antes de la lista — no borra la lista (puede ser útil como referencia), pero
+ * deja claro que sin foto/datos no es un diagnóstico.
+ */
+const SYMPTOM_DIAG_INTENT_PATTERNS = [
+  /\bmanch(a|as)\b/,
+  /\bhojas?\s+(amarill|seca|negra|cafe|marchit|enroll|con\s+hueco)/,
+  /\bse\s+(esta\s+)?(secando|marchitando|muriendo|pudriendo|amarillando)\b/,
+  /\bqu[eé]\s+(tiene|le\s+pasa|enfermedad)\b/,
+  /\b(plaga|enfermedad|hongo|bicho|gusano)\b/,
+  /\bpudric(ion|iones)\b/,
+  /\bpuntos?\s+(negro|cafe|amarillo)/,
+];
+
+/** ¿La pregunta del usuario pide un diagnóstico de síntomas? */
+function _isSymptomDiagnosisQuery(userMessage) {
+  if (typeof userMessage !== 'string' || !userMessage.trim()) return false;
+  const norm = _stripDiacritics(userMessage);
+  return SYMPTOM_DIAG_INTENT_PATTERNS.some((re) => re.test(norm));
+}
+
+/**
+ * Nombres de patógenos/plagas frecuentes (normalizados) — si la respuesta
+ * enumera ≥2, está dando un diagnóstico diferencial a ciegas. Lista corta de
+ * los más nombrados en tomate/papa/hortalizas. No pretende ser exhaustiva: es
+ * un detector de "lista de candidatos de enfermedad".
+ */
+const PATHOGEN_NAME_TERMS = [
+  'tizon tardio', 'tizon temprano', 'tizon', 'gota', 'alternaria', 'phytophthora',
+  'fusarium', 'verticillium', 'botrytis', 'antracnosis', 'mildeo', 'mildiu', 'oidio',
+  'cercospora', 'septoria', 'roya', 'virus del mosaico', 'mosca blanca', 'minador',
+  'acaro', 'trips', 'pulgon', 'nematodo', 'bacteriosis', 'cancro', 'moho',
+];
+
+/** Fraseo de enumeración de candidatos ("puede ser X o Y", "podría tratarse de"). */
+const DIFFERENTIAL_PHRASING_RE =
+  /(puede\s+ser|podria\s+(ser|tratarse)|posibles?\s+(causa|enfermedad|patogeno|plaga)|entre\s+las?\s+(causa|enfermedad|posibilidad)|podria\s+deberse|se\s+trata\s+(probablemente\s+)?de)/;
+
+/**
+ * guardDiagnosisWithoutPhoto — #348. Cuando la pregunta es de diagnóstico de
+ * síntomas, NO hubo foto en el turno, y la respuesta enumera candidatos de
+ * enfermedad/plaga (≥2 patógenos nombrados o fraseo diferencial), ANTEPONE una
+ * nota pidiendo foto/datos. Así el campesino no trata a ciegas la enfermedad
+ * equivocada. NO borra la respuesta del modelo (la lista puede orientar); la
+ * encabeza con la petición de evidencia.
+ *
+ * GATING: requiere intención de diagnóstico en userMessage Y hadVision=false. Si
+ * hubo foto, el diagnóstico es legítimo (no toca). Si la respuesta no enumera
+ * candidatos (p. ej. ya pide foto, o solo da manejo cultural genérico), no-op.
+ * Idempotente.
+ *
+ * Firma propia (necesita userMessage + hadVision) → se invoca aparte en
+ * applyOutputGuards, no dentro de GUARD_CHAIN.
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null, hadVision?: boolean}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+const DIAGNOSIS_NEEDS_EVIDENCE_NOTE =
+  'Antes de ponerle nombre a lo que tiene tu cultivo necesito verlo: con solo "manchas" puedo equivocarme y ' +
+  'mandarte a tratar la enfermedad que no es. Mándame una foto (toca el botón de cámara) de la hoja o el fruto ' +
+  'afectado, y cuéntame: ¿de qué color son las manchas, son secas o con humedad, empezaron por las hojas de ' +
+  'abajo o de arriba, hace cuánto y con qué clima? Con eso sí te doy un diagnóstico confiable.';
+
+export function guardDiagnosisWithoutPhoto(
+  responseText,
+  { userMessage = null, hadVision = false } = {},
+) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Solo aplica a consultas de diagnóstico de síntomas SIN foto en el turno.
+  if (hadVision || !_isSymptomDiagnosisQuery(userMessage)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  // Idempotencia: la nota ya está.
+  if (/Antes de ponerle nombre a lo que tiene tu cultivo/i.test(responseText)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  const norm = _stripDiacritics(responseText);
+  // ¿La respuesta enumera candidatos de enfermedad/plaga? (≥2 patógenos nombrados
+  // o fraseo diferencial). Solo así anteponemos la petición de evidencia: una
+  // respuesta que ya pide la foto o solo da manejo cultural no se toca.
+  const patho = new Set();
+  for (const term of PATHOGEN_NAME_TERMS) {
+    if (norm.includes(term)) patho.add(term);
+  }
+  const enumeraCandidatos = patho.size >= 2 || DIFFERENTIAL_PHRASING_RE.test(norm);
+  if (!enumeraCandidatos) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  bumpGuardTelemetry('diagnosis_without_photo');
+  const text = `${DIAGNOSIS_NEEDS_EVIDENCE_NOTE}\n\n${responseText.trim()}`;
+  return { text, modified: true, reason: 'diagnostico_sin_foto' };
+}
+
+// ── GUARD: viabilidad FALSO-NEGATIVO (cultivo viable marcado inviable) ──────
+
+/**
+ * #350 (CRÍTICO, prod 2026-06-03 Choachí): el modelo afirmó que papa y fresa
+ * "NO son viables a 1923 msnm" y desvió al campesino a Daikon/ajo + variedades
+ * extranjeras absurdas ('Kennebec', 'Yukon Gold' a -2°C). FALSO: Choachí (1923 m,
+ * templado) es zona PAPERA clásica; papa y fresa SON viables ahí. Causa probable:
+ * sin grounding (NLU abortó), el LLM comparó contra la banda equivocada (ej.
+ * "fresa silvestre andina") y declaró inviabilidad que NO es autoritativa.
+ *
+ * `guardInvertedViability` solo AÑADE correcciones de inviabilidad autoritativa
+ * (campo `viabilidad:inviable` o banda de altitud del grounding); NO cubre el
+ * caso opuesto — el modelo INVENTANDO inviabilidad de un cultivo que sí se da.
+ *
+ * Este guard usa una tabla AUTORITATIVA de bandas de altitud para los cultivos
+ * andinos de base (papa, fresa, etc., con rangos agronómicos bien establecidos).
+ * Si la respuesta declara INVIABLE un cultivo de esa tabla a una altitud que SÍ
+ * cae en su banda viable, CORRIGE: afirma que sí es viable a esa altura y elimina
+ * la afirmación falsa de inviabilidad. Es deliberadamente CONSERVADOR: solo actúa
+ * sobre cultivos de banda conocida y solo cuando la altitud de la finca está
+ * DENTRO de la banda viable — nunca inventa viabilidad fuera de rango (papa a
+ * 3500 m sí es inviable y se respeta).
+ *
+ * Bandas (msnm) de fuentes agronómicas estándar para Colombia (Agrosavia/ICA;
+ * rangos comerciales conservadores):
+ *   - papa (Solanum tuberosum): 1800–3200 m (zona andina fría/templada-alta).
+ *     A 1923 m está en el borde inferior templado donde sí se cultiva → viable.
+ *     El techo se fija en 3200 m (ceiling comercial conservador): por encima la
+ *     papa entra en zona marginal/fría real, así que a 3500 m NO afirmamos
+ *     viabilidad (una advertencia de inviabilidad ahí puede ser legítima).
+ *   - fresa (Fragaria × ananassa): 1300–2800 m (clima templado a frío).
+ *   - arveja, haba, cebolla, zanahoria, repollo, lechuga: bandas templadas
+ *     amplias que cubren 1900 m.
+ * La banda de papa se fija con borde inferior 1800 m para reconocer las zonas
+ * paperas templadas (Cundinamarca/Boyacá/Nariño) — Choachí entra de lleno.
+ */
+const KNOWN_VIABLE_BANDS = [
+  { base: 'papa', binomial: 'solanum tuberosum', min: 1800, max: 3200 },
+  { base: 'fresa', binomial: 'fragaria', min: 1300, max: 2800 },
+  { base: 'frutilla', binomial: 'fragaria', min: 1300, max: 2800 },
+  { base: 'arveja', binomial: 'pisum sativum', min: 1800, max: 3000 },
+  { base: 'haba', binomial: 'vicia faba', min: 2000, max: 3200 },
+  { base: 'cebolla', binomial: 'allium cepa', min: 1500, max: 2800 },
+  { base: 'zanahoria', binomial: 'daucus carota', min: 1700, max: 3000 },
+  { base: 'repollo', binomial: 'brassica oleracea', min: 1800, max: 3000 },
+  { base: 'lechuga', binomial: 'lactuca sativa', min: 1500, max: 2800 },
+  { base: 'maiz', binomial: 'zea mays', min: 0, max: 2800 },
+];
+
+/**
+ * Busca la banda viable conocida para un nombre de cultivo (común o binomio),
+ * normalizado. Devuelve la entrada o null.
+ *
+ * @param {string} nombreNorm  nombre normalizado (común).
+ * @param {string|null} binomialNorm  binomio normalizado, si lo hay.
+ * @returns {{base:string, binomial:string, min:number, max:number}|null}
+ */
+function _knownViableBand(nombreNorm, binomialNorm) {
+  const firstToken = (nombreNorm || '').split(/\s+/)[0];
+  for (const band of KNOWN_VIABLE_BANDS) {
+    if (firstToken === band.base || (nombreNorm && nombreNorm.includes(band.base))) return band;
+    if (binomialNorm && binomialNorm.includes(band.binomial)) return band;
+  }
+  return null;
+}
+
+/**
+ * ¿La respuesta declara INVIABLE el cultivo `bandBase` (a la altitud de la
+ * finca)? Busca, en alguna oración que mencione el cultivo, fraseo de
+ * inviabilidad ("no es viable", "no se da", "no prospera", "no vale la pena",
+ * "no es recomendable sembrar", "el clima/la altura no le sirve"). Sobre el
+ * texto normalizado.
+ *
+ * @param {string} textNorm
+ * @param {string} bandBase  nombre base del cultivo (p. ej. "papa", "fresa").
+ * @returns {boolean}
+ */
+const FALSE_INVIABILITY_RE =
+  /(no\s+es\s+viable|no\s+(es\s+)?(viable|recomendable)\s+(sembrar|cultivar)|inviable|no\s+se\s+da\b|no\s+prosper|no\s+vale\s+la\s+pena|no\s+es\s+(adecuad|apropiad)|clima\s+no\s+(le\s+)?sirve|altura\s+no\s+(le\s+)?sirve|no\s+(te\s+)?sirve\s+(a\s+)?(esa|tu)\s+altura)/;
+
+function _declaraInviable(textNorm, bandBase) {
+  const sentences = _splitSentences(textNorm);
+  for (const s of sentences) {
+    if (!s.includes(bandBase)) continue;
+    if (FALSE_INVIABILITY_RE.test(s)) return true;
+  }
+  // También: el cultivo y la negación de viabilidad en el texto, aunque en
+  // oraciones contiguas (el split puede separar "La papa..." de "...no es viable").
+  if (textNorm.includes(bandBase) && FALSE_INVIABILITY_RE.test(textNorm)) return true;
+  return false;
+}
+
+/**
+ * Elimina las oraciones que declaran falsamente inviable el cultivo `bandBase`,
+ * para que la corrección no quede sobre una autocontradicción. Quirúrgico por
+ * oración: borra las que mencionan el cultivo Y disparan la negación de
+ * viabilidad. Conserva el resto.
+ */
+function _stripFalseInviability(originalText, bandBases) {
+  const sentences = _splitSentences(originalText);
+  const kept = sentences.filter((sentence) => {
+    const sNorm = _stripDiacritics(sentence);
+    for (const base of bandBases) {
+      if (sNorm.includes(base) && FALSE_INVIABILITY_RE.test(sNorm)) return false;
+    }
+    return true;
+  });
+  return kept.join('').trim();
+}
+
+/**
+ * _bandBasesGroundedInviable — devuelve el Set de bases de cultivo (de
+ * `KNOWN_VIABLE_BANDS`) que el GROUNDING marca autoritativamente inviables a la
+ * altitud de la finca. Veredicto idéntico al de `guardInvertedViability`: 1)
+ * campo `viabilidad:'inviable'`; 2) banda de altitud que excluye la altura (con
+ * el margen de 300 m de zona-gris → fuera de ese margen es inviable). Solo así
+ * `guardFalseInviability` cede al grafo y no afirma viabilidad contra una
+ * inviabilidad REAL resuelta por la AGE.
+ *
+ * @param {Array<object>|null} entities
+ * @param {number} alt  altitud de la finca (msnm), ya validada como finita.
+ * @returns {Set<string>}  bases ("papa", "fresa", …) groundeadas inviables.
+ */
+function _bandBasesGroundedInviable(entities, alt) {
+  const out = new Set();
+  if (!Array.isArray(entities) || entities.length === 0) return out;
+  for (const e of entities) {
+    if (!_isSpecies(e)) continue;
+    const nombreNorm = _stripDiacritics(_entityName(e));
+    const binomialNorm = _binomial(e.nombre_cientifico || e.nombre_científico);
+    const band = _knownViableBand(nombreNorm, binomialNorm);
+    if (!band) continue;
+    // Veredicto autoritativo (mismo que guardInvertedViability).
+    let nivel = _normViabilidad(e.viabilidad);
+    if (!nivel) {
+      const hasMin = e.altitud_min != null && e.altitud_min !== '';
+      const hasMax = e.altitud_max != null && e.altitud_max !== '';
+      const min = hasMin ? Number(e.altitud_min) : NaN;
+      const max = hasMax ? Number(e.altitud_max) : NaN;
+      if (!Number.isFinite(min) || !Number.isFinite(max)) continue;
+      if (alt >= min && alt <= max) nivel = 'viable';
+      else {
+        const fuera = alt < min ? min - alt : alt - max;
+        nivel = fuera <= 300 ? 'marginal' : 'inviable';
+      }
+    }
+    if (nivel === 'inviable') out.add(band.base);
+  }
+  return out;
+}
+
+/**
+ * guardFalseInviability — #350. Detector de FALSO-NEGATIVO de viabilidad. Si la
+ * respuesta declara INVIABLE un cultivo de banda conocida (papa, fresa, …) a una
+ * altitud de finca que SÍ cae en su banda viable, ANTEPONE una corrección
+ * afirmando que el cultivo sí es viable a esa altura y ELIMINA la afirmación
+ * falsa de inviabilidad. Conservador: solo cultivos de `KNOWN_VIABLE_BANDS` y
+ * solo cuando la altitud está dentro de la banda (papa a 3500 m → no corrige;
+ * fuera de banda la inviabilidad puede ser legítima).
+ *
+ * Necesita la altitud de la finca para saber si está dentro de la banda. Sin
+ * altitud → no-op (no podemos afirmar viabilidad sin saber la altura). Encaja en
+ * la firma estándar `(text, entities, altitud)` → puede ir en GUARD_CHAIN, pero
+ * solo debe correr en consultas de SIEMBRA (es un guard de siembra), por eso se
+ * agrega a PLANTING_GUARDS.
+ *
+ * PRECEDENCIA — RED DE SEGURIDAD, NO autoridad sobre el grounding (clave #350):
+ * el bug ocurre cuando NLU abortó y NO hubo grounding (el LLM inventó la
+ * inviabilidad). Si el grounding SÍ trae un veredicto AUTORITATIVO de inviable
+ * para ese mismo cultivo (campo `viabilidad:'inviable'` o banda de altitud que
+ * EXCLUYE la altura de la finca), la AGE manda: NO sobreescribimos su veredicto
+ * con la tabla hardcodeada. La tabla solo afirma viabilidad cuando el grounding
+ * NO contradice — así jamás pisa una inviabilidad real resuelta por el grafo.
+ *
+ * @param {string} responseText
+ * @param {Array<object>|null} resolvedEntities  grounding del turno (para deferir
+ *   a un veredicto autoritativo de inviable si lo hay).
+ * @param {number|string|null} fincaAltitud
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardFalseInviability(responseText, resolvedEntities = null, fincaAltitud = null) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  const alt = Number(fincaAltitud);
+  const haveAlt = fincaAltitud != null && fincaAltitud !== '' && Number.isFinite(alt);
+  if (!haveAlt) return { text: responseText, modified: false, reason: null };
+
+  const norm = _stripDiacritics(responseText);
+  const corregidos = [];
+  const basesDisparadas = [];
+  // Bases de cultivo que el grounding marcó AUTORITATIVAMENTE inviables: la AGE
+  // manda sobre la tabla hardcodeada (no afirmamos viabilidad contra el grafo).
+  const groundedInviable = _bandBasesGroundedInviable(resolvedEntities, alt);
+
+  for (const band of KNOWN_VIABLE_BANDS) {
+    // Solo nos importa cuando la altitud de la finca está DENTRO de la banda
+    // viable: ahí una afirmación de inviabilidad es FALSA. Fuera de banda
+    // (papa a 3500 m) la inviabilidad puede ser legítima → no tocamos.
+    if (alt < band.min || alt > band.max) continue;
+    // Si el grounding tiene un veredicto autoritativo de inviable para este
+    // cultivo, la AGE manda: NO lo corregimos a viable (no es el bug #350, que es
+    // el caso SIN grounding / inviabilidad inventada por el LLM).
+    if (groundedInviable.has(band.base)) continue;
+    if (!norm.includes(band.base)) continue;
+    if (!_declaraInviable(norm, band.base)) continue;
+    if (basesDisparadas.includes(band.base)) continue;
+    basesDisparadas.push(band.base);
+    corregidos.push(band.base);
+  }
+
+  if (corregidos.length === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('false_inviability');
+  const lista = corregidos.join(' y ');
+  const correccion =
+    `Corrección importante: ${lista} SÍ es viable en tu finca a ${alt} msnm — es una altura templada donde ` +
+    `este cultivo se da bien (de hecho es zona de cultivo tradicional). No te desanimes ni cambies de cultivo ` +
+    `por una altura que sí le sirve; si quieres te doy variedades adaptadas a tu zona y el manejo para que ` +
+    `rinda.`;
+  const restoLimpio = _stripFalseInviability(responseText, corregidos);
+  const text = restoLimpio ? `${correccion}\n\n${restoLimpio}` : correccion;
+  return { text, modified: true, reason: `viabilidad_falso_negativo: ${corregidos.join(', ')}` };
+}
+
 /**
  * Set de guards que SOLO tienen sentido cuando la consulta es de SIEMBRA
  * (A12). Si la pregunta del usuario es de PRECIO/MERCADO (o info general sin
@@ -2339,6 +2846,7 @@ const PLANTING_GUARDS = new Set([
   guardCompanionBinomial,
   guardInvasiveSpecies,
   guardInvertedViability,
+  guardFalseInviability,
 ]);
 
 /**
@@ -2365,6 +2873,11 @@ const GUARD_CHAIN = [
   guardSyntheticAgrochemical,
   guardInvasiveSpecies,
   guardInvertedViability,
+  // #350 — FALSO-NEGATIVO de viabilidad: el modelo declaró inviable un cultivo de
+  // banda conocida (papa/fresa) a una altitud que SÍ le sirve. Va DESPUÉS de
+  // invertedViability (que corrige el caso opuesto, inviable autoritativo
+  // promovido como viable). Solo corre en consultas de siembra (PLANTING_GUARDS).
+  guardFalseInviability,
 ];
 
 /**
@@ -2391,10 +2904,13 @@ const GUARD_CHAIN = [
  *   para el riesgo de golpe de calor. Mismo origen.
  * @param {string|null} [ctx.userMessage] — pregunta cruda del usuario (A12). Si
  *   es claramente de PRECIO/MERCADO (no de siembra), los guards de SIEMBRA
- *   (viabilidad/térmico/sustitución/companion/invasora) NO corren —razonan sobre
- *   cultivo y son irrelevantes a "¿a cómo está la papa?". Los de SAFETY (dosis,
- *   agroquímico, visión-sin-foto, nombre-inventado) corren igual. Sin esto, o
- *   ante intención ambigua, TODOS corren (conservador, no rompe la protección).
+ *   (viabilidad/térmico/sustitución/companion/invasora/falso-negativo) NO corren
+ *   —razonan sobre cultivo y son irrelevantes a "¿a cómo está la papa?". Los de
+ *   SAFETY (dosis, agroquímico, visión-sin-foto, nombre-inventado) corren igual.
+ *   Además habilita el guard de DOMINIO (#352, declina off-domain física/química/
+ *   matemáticas) y el anti-diagnóstico-a-ciegas (#348, pide foto/datos ante
+ *   "manchas en el tomate" sin imagen). Sin esto, o ante intención ambigua, los
+ *   guards de siembra corren (conservador, no rompe la protección).
  * @returns {{text:string, modified:boolean, reasons:string[]}}
  */
 export function applyOutputGuards(
@@ -2424,6 +2940,18 @@ export function applyOutputGuards(
   let modified = false;
   const reasons = [];
 
+  // GUARD de DOMINIO el más PRIMERO (#352): si la pregunta es off-domain
+  // (física/química/matemáticas) y el modelo entró a contestarla, REEMPLAZAMOS la
+  // respuesta entera por una declinación amable. No tiene sentido correr ningún
+  // otro guard sobre un texto que se va a reemplazar. Firma propia (necesita
+  // userMessage), por eso va fuera de GUARD_CHAIN. No-op si la query es agro.
+  const offDom = guardOffDomain(text, { userMessage });
+  if (offDom && offDom.modified) {
+    // Respuesta off-domain reemplazada: no corremos más guards sobre la
+    // declinación (no hay cultivo/entidad que razonar).
+    return { text: offDom.text, modified: true, reasons: offDom.reason ? [offDom.reason] : [] };
+  }
+
   // GUARD de visión PRIMERO: si la respuesta afirma un diagnóstico visual sin
   // foto real en el turno, no tiene sentido correr los demás guards sobre un
   // texto que vamos a reemplazar entero. Firma propia (contexto de visión), por
@@ -2433,6 +2961,20 @@ export function applyOutputGuards(
     text = vis.text;
     modified = true;
     if (vis.reason) reasons.push(vis.reason);
+  }
+
+  // GUARD anti-diagnóstico-a-ciegas (#348): si la pregunta pide diagnóstico de
+  // síntomas ("manchas en el tomate") SIN foto y la respuesta enumera candidatos
+  // de patógeno, ANTEPONE la petición de foto/datos. Va tras el guard de visión
+  // (que cubre el caso distinto de afirmar haber VISTO una foto). Firma propia
+  // (userMessage + hadVision). Solo actúa si el de visión no reemplazó ya el texto.
+  if (!(vis && vis.modified)) {
+    const dx = guardDiagnosisWithoutPhoto(text, { userMessage, hadVision });
+    if (dx && dx.modified) {
+      text = dx.text;
+      modified = true;
+      if (dx.reason) reasons.push(dx.reason);
+    }
   }
 
   for (const guard of GUARD_CHAIN) {
