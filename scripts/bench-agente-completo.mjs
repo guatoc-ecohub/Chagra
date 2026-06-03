@@ -45,7 +45,9 @@ import { assertCheckoutCurrent } from './lib/bench-checkout-guard.mjs';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
 const DATA_DIR = join(ROOT_DIR, 'data');
-const BENCH_RUNS_DIR = join(DATA_DIR, 'bench-runs');
+// BENCH_OUTPUT_DIR permite PERSISTIR los resultados FUERA del worktree efímero
+// (p. ej. al repo principal), para que sobrevivan al cleanup del worktree.
+const BENCH_RUNS_DIR = process.env.BENCH_OUTPUT_DIR || join(DATA_DIR, 'bench-runs');
 
 const SIDECAR_URL = process.env.SIDECAR_URL || 'http://localhost:7880';
 const OLLAMA_URL = 'http://localhost:11434/api/chat';
