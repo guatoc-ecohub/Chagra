@@ -3193,6 +3193,270 @@ export function guardFalsePremise(responseText, { userMessage = null } = {}) {
   return { text: FALSE_PREMISE_NEUTRALIZER, modified: true, reason: 'premisa_falsa_complacencia' };
 }
 
+// ── GUARD: VARIEDAD/ECOTIPO INVENTADO (BORDE-007, anti-alucinación) ──────────
+
+/**
+ * BORDE-007 (bench borde-alucinación 2026-06-03): ante una pregunta que afirma una
+ * VARIEDAD/ecotipo de una especie que CONTRADICE su naturaleza climática conocida
+ *   "un primo dice que él tiene 'chontaduro de clima frío' a 2.600, ¿es la misma
+ *    mata y la subo allá?"
+ * grante VALIDA la premisa: inventa una "accesión Pacífico más tolerante al frío,
+ * resistente hasta 2.600 m según el catálogo Chagra". El chontaduro (Bactris
+ * gasipaes) es una palma TROPICAL de tierra caliente; NO existe una variedad de
+ * páramo. NINGÚN guard disparaba ahí (red_flags_hit=3, ah_pass=false).
+ *
+ * El guard cierra ese hueco con cuatro comprobaciones determinísticas:
+ *   (1) en el userMessage O la respuesta hay un patrón "<especie> de clima
+ *       <opuesto>" (especie tropical conocida + "clima frío/páramo/tierra fría", o
+ *       especie de clima frío conocida + "clima caliente/tierra caliente/calor");
+ *   (2) la especie nombrada está en una lista CERRADA de especies con clima de
+ *       referencia INEQUÍVOCO (tropicales de tierra caliente vs cultivos de frío);
+ *   (3) la RESPUESTA VALIDA esa variedad inventada (la presenta como existente:
+ *       "accesión/variedad tolerante", "resistente hasta N m", "es la misma mata,
+ *       súbela", "podría adaptarse"), SIN negarla;
+ *   (4) anti-FP: la respuesta NO está ya negando/neutralizando la variedad, y el
+ *       patrón NO coincide con una VARIEDAD REAL allowlisteada (papa criolla, café
+ *       variedad Castillo, etc.).
+ *
+ * En ese caso SUPRIME-Y-REEMPLAZA por una neutralización honesta: no le consta una
+ * variedad de X para ese clima; X es de clima Y; subirla/bajarla casi seguro
+ * fracasa. Mismo patrón suppress-and-replace que #1295 (guardFalsePremise): el
+ * cuerpo es intrínsecamente engañoso (valida un ecotipo que no existe).
+ *
+ * NUNCA inventa ni valida una variedad climática que contradice la especie.
+ */
+
+/**
+ * Especies de clima INEQUÍVOCO. Lista CERRADA y conservadora: solo especies cuya
+ * franja climática es agronómicamente indiscutible, para no falsear sobre cultivos
+ * de rango amplio. Cada entrada: nombres comunes (normalizados, sin tildes) + el
+ * clima de referencia ('calido' = tierra caliente/tropical, 'frio' = tierra
+ * fría/altura). El binomio ayuda a no confundir homónimos.
+ *
+ *   calido → especie tropical de tierra caliente: una "variedad de clima frío /
+ *            páramo / tierra fría / altura" es inventada.
+ *   frio   → cultivo de clima frío/altura: una "variedad de tierra caliente /
+ *            clima cálido / costa" es inventada.
+ */
+const KNOWN_CLIMATE_SPECIES = [
+  // Tropicales de tierra caliente (calido)
+  { names: ['chontaduro', 'cachipay', 'pejibaye', 'pijuayo'], binomial: 'bactris gasipaes', clima: 'calido' },
+  { names: ['cacao'], binomial: 'theobroma cacao', clima: 'calido' },
+  { names: ['copoazu', 'copoazú'], binomial: 'theobroma grandiflorum', clima: 'calido' },
+  { names: ['platano', 'banano', 'guineo'], binomial: 'musa', clima: 'calido' },
+  { names: ['yuca', 'mandioca'], binomial: 'manihot esculenta', clima: 'calido' },
+  { names: ['pina', 'piña'], binomial: 'ananas comosus', clima: 'calido' },
+  { names: ['mango'], binomial: 'mangifera indica', clima: 'calido' },
+  { names: ['papaya'], binomial: 'carica papaya', clima: 'calido' },
+  { names: ['arroz'], binomial: 'oryza sativa', clima: 'calido' },
+  { names: ['palma de aceite', 'palma africana'], binomial: 'elaeis guineensis', clima: 'calido' },
+  { names: ['maranon', 'marañon', 'maranon'], binomial: 'anacardium occidentale', clima: 'calido' },
+  // Cultivos de clima frío / altura (frio)
+  { names: ['papa'], binomial: 'solanum tuberosum', clima: 'frio' },
+  { names: ['arveja'], binomial: 'pisum sativum', clima: 'frio' },
+  { names: ['haba'], binomial: 'vicia faba', clima: 'frio' },
+  { names: ['cebada'], binomial: 'hordeum vulgare', clima: 'frio' },
+  { names: ['trigo'], binomial: 'triticum', clima: 'frio' },
+  { names: ['curuba'], binomial: 'passiflora tripartita', clima: 'frio' },
+  { names: ['uchuva'], binomial: 'physalis peruviana', clima: 'frio' },
+  { names: ['quinua', 'quinoa'], binomial: 'chenopodium quinoa', clima: 'frio' },
+];
+
+/**
+ * Fraseo que designa CLIMA FRÍO / altura como cualidad de una variedad. Sobre el
+ * texto normalizado.
+ */
+const COLD_CLIMATE_QUALIFIER_RE =
+  /\bde\s+(clima\s+fr[ií]o|tierra\s+fr[ií]a|p[aá]ramo|altura|alta\s+monta[nñ]a|fr[ií]o)\b/;
+/**
+ * Fraseo que designa CLIMA CÁLIDO / tierra caliente como cualidad de una variedad.
+ */
+const WARM_CLIMATE_QUALIFIER_RE =
+  /\bde\s+(clima\s+(c[aá]lido|caliente)|tierra\s+caliente|costa|calor|bajura|tropical)\b/;
+
+/**
+ * VARIEDADES REALES allowlisteadas: combinaciones especie+cualificador que SÍ
+ * existen y NO deben dispararse. Sobre el texto normalizado. Conservador: ante una
+ * variedad reconocida (papa criolla, café Castillo, maíz capio, etc.) el guard no
+ * actúa aunque haya un cualificador climático cerca.
+ */
+const REAL_VARIETY_PATTERNS = [
+  /\bpapa\s+criolla\b/,
+  /\bpapa\s+(pastusa|sabanera|tocana|nevada|diacol|capiro|parda)\b/,
+  /\bcafe\s+(variedad\s+)?(castillo|caturra|colombia|cenicafe|tabi|borbon|tipica|geisha)\b/,
+  /\bvariedad\s+castillo\b/,
+  /\bmaiz\s+(capio|porva|amagacen[oa]|pira|chococito|cariaco)\b/,
+  /\bfrijol\s+(cargamanto|bolo|radical|calima)\b/,
+];
+
+/**
+ * La RESPUESTA VALIDA / da por existente la variedad inventada. Señales de que el
+ * modelo la presenta como real (no la niega): "accesión/variedad/ecotipo tolerante
+ * al frío/calor", "resistente hasta N m", "es la misma mata, súbela/bájala",
+ * "podría adaptarse", "se refiere a una accesión". Sobre el texto normalizado.
+ */
+const RESPONSE_VALIDATES_VARIETY_PATTERNS = [
+  /\b(accesion|variedad|ecotipo|cultivar|clon|linea|seleccion)\s+\w*\s*(mas\s+)?(tolerante|resistente|adaptad[ao])\b/,
+  /\b(mas\s+)?(tolerante|resistente|adaptad[ao])\s+al\s+(fr[ií]o|calor)\b/,
+  /\bresistente\s+hasta\s+\d/,
+  /\bes\s+la\s+misma\s+mata\b/,
+  /\b(s[ií]\s+)?(la\s+)?(puedes?|podrias?)\s+(subir|bajar|sub[ií]rla|baj[aá]rla)\b/,
+  /\bpodr[ií]a\s+(adaptarse|cultivarse|sembrarse|funcionar)\b/,
+  /\b(s[ií],?\s+)?se\s+(puede|da)\s+(subir|cultivar|sembrar)\b.*\b(fr[ií]o|altura|caliente|calor)\b/,
+  /\bopcion\s+viable\b/,
+];
+
+/**
+ * La RESPUESTA YA NIEGA / neutraliza la variedad inventada (acertó). Si dice "no me
+ * consta", "no existe esa variedad", "no hay variedad de páramo/altura", "es una
+ * especie tropical", "casi seguro fracasa por el frío" → no re-disparamos. Anti-FP
+ * central. Sobre el texto normalizado.
+ */
+const RESPONSE_DENIES_VARIETY_PATTERNS = [
+  /\bno\s+me\s+consta\b/,
+  /\bno\s+existe\s+(una?\s+)?(variedad|accesion|ecotipo)\b/,
+  /\bno\s+hay\s+(una?\s+)?(variedad|accesion|ecotipo)\b/,
+  /\bno\s+es\s+(la\s+misma\s+mata|cierto|real)\b/,
+  /\bcasi\s+seguro\s+(fracasa|fracasara|se\s+muere|muere)\b/,
+  /\bno\s+(la?\s+)?subas?\b/,
+  /\bno\s+(la?\s+)?bajes?\b/,
+];
+
+/**
+ * Busca, en el texto normalizado, una especie de clima inequívoco asociada a un
+ * cualificador climático OPUESTO ("<tropical> de clima frío" o "<de frío> de tierra
+ * caliente"). Devuelve la especie detectada + el clima real + la cualidad opuesta,
+ * o null. Tolera distancia entre el nombre y el cualificador en la misma oración.
+ *
+ * @param {string} norm  texto normalizado (sin tildes/case).
+ * @returns {{name:string, clima:'calido'|'frio', opuesto:'frio'|'calido'}|null}
+ */
+function _findInventedClimateVariety(norm) {
+  if (!norm) return null;
+  const sentences = _splitSentences(norm);
+  for (const entry of KNOWN_CLIMATE_SPECIES) {
+    for (const name of entry.names) {
+      const nameNorm = _stripDiacritics(name);
+      if (!nameNorm || !norm.includes(nameNorm)) continue;
+      // El cualificador OPUESTO al clima real de la especie es el delator.
+      const opuestoRe = entry.clima === 'calido' ? COLD_CLIMATE_QUALIFIER_RE : WARM_CLIMATE_QUALIFIER_RE;
+      // Debe aparecer en una oración que también mencione la especie (proximidad).
+      for (const s of sentences) {
+        if (!s.includes(nameNorm)) continue;
+        if (opuestoRe.test(s)) {
+          return {
+            name,
+            clima: entry.clima,
+            opuesto: entry.clima === 'calido' ? 'frio' : 'calido',
+          };
+        }
+      }
+    }
+  }
+  return null;
+}
+
+/** Marcador estable del reemplazo neutralizador de variedad (idempotencia + tests). */
+const INVENTED_VARIETY_MARKER = 'No me consta una variedad de';
+
+/**
+ * Construye la neutralización honesta para una variedad climática inventada. No
+ * niega que existan accesiones/variedades en general; niega que exista UNA para el
+ * clima opuesto y recuerda el clima real de la especie.
+ *
+ * @param {{name:string, clima:'calido'|'frio'}} hit
+ * @returns {string}
+ */
+function _inventedVarietyNeutralizer(hit) {
+  const esCalida = hit.clima === 'calido';
+  const climaReal = esCalida ? 'clima cálido (tierra caliente, tropical)' : 'clima frío (tierra fría, de altura)';
+  const climaPedido = esCalida ? 'clima frío / de altura' : 'tierra caliente / clima cálido';
+  const movimiento = esCalida
+    ? 'subirla a tierra fría'
+    : 'bajarla a tierra caliente';
+  return (
+    `${INVENTED_VARIETY_MARKER} ${hit.name} para ${climaPedido}: el ${hit.name} es de ${climaReal}, y no por ` +
+    'llamarla "de otro clima" se vuelve real una variedad que aguante el opuesto. ' +
+    `No te confíes de que sea "la misma mata" adaptada: ${movimiento} casi seguro fracasa por el cambio de ` +
+    'clima.\n\n' +
+    'Lo seguro:\n' +
+    `- Siembra ${hit.name} en el clima que de verdad le sirve (${climaReal}); ahí sí rinde.\n` +
+    '- Si quieres un cultivo para ese otro clima, pídeme una especie ADAPTADA a esa altura/temperatura — ' +
+    'te paso opciones reales del catálogo en vez de forzar una que no es para allá.\n' +
+    '- Desconfía de "semillas milagrosas" que prometen aguantar un clima que no es el de la especie.'
+  );
+}
+
+/**
+ * guardInventedVariety — BORDE-007. ANTI-VARIEDAD/ECOTIPO INVENTADO.
+ *
+ * Cuando el userMessage o la respuesta afirma una VARIEDAD de una especie de clima
+ * inequívoco que contradice su naturaleza ("<tropical> de clima frío", "<de frío>
+ * de tierra caliente") y la RESPUESTA la VALIDA (la da por existente) sin negarla,
+ * SUPRIME el cuerpo y lo REEMPLAZA por una neutralización honesta.
+ *
+ * GATING (4 capas, anti-falso-positivo):
+ *   1. patrón "<especie de clima inequívoco> de clima opuesto" presente en el
+ *      userMessage o la respuesta (`_findInventedClimateVariety`). Una consulta sin
+ *      ese patrón NO entra.
+ *   2. la especie está en la lista CERRADA `KNOWN_CLIMATE_SPECIES` (implícito en 1).
+ *   3. la respuesta VALIDA la variedad (`RESPONSE_VALIDATES_VARIETY_PATTERNS`) y NO
+ *      la niega (`RESPONSE_DENIES_VARIETY_PATTERNS`).
+ *   4. el texto NO coincide con una VARIEDAD REAL allowlisteada
+ *      (`REAL_VARIETY_PATTERNS`: papa criolla, café Castillo, …).
+ *
+ * Firma propia (necesita userMessage) → se invoca aparte en applyOutputGuards, no
+ * dentro de GUARD_CHAIN. Idempotente. Es un guard de SIEMBRA/identidad (no corre en
+ * consultas de precio/mercado).
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardInventedVariety(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Idempotencia: nuestro reemplazo ya está → no re-suprimir.
+  if (responseText.includes(INVENTED_VARIETY_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const respNorm = _stripDiacritics(responseText);
+  const userNorm = typeof userMessage === 'string' ? _stripDiacritics(userMessage) : '';
+
+  // Capa 4 (corta barato): si hay una VARIEDAD REAL allowlisteada en juego, no
+  // tocamos — aunque haya un cualificador climático cerca (papa criolla a 2700 m).
+  if (REAL_VARIETY_PATTERNS.some((re) => re.test(respNorm) || re.test(userNorm))) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Capa 1+2: ¿hay un patrón "<especie de clima inequívoco> de clima opuesto" en la
+  // pregunta o en la respuesta?
+  const hit = _findInventedClimateVariety(respNorm) || _findInventedClimateVariety(userNorm);
+  if (!hit) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Capa 3a: si la respuesta YA niega/neutraliza la variedad, el modelo acertó.
+  if (RESPONSE_DENIES_VARIETY_PATTERNS.some((re) => re.test(respNorm))) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  // Capa 3b: la respuesta debe VALIDAR la variedad para que haya algo que corregir.
+  if (!RESPONSE_VALIDATES_VARIETY_PATTERNS.some((re) => re.test(respNorm))) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('invented_variety');
+  // SUPPRESS-AND-REPLACE: descartamos la validación de la variedad inventada y
+  // devolvemos SOLO la neutralización honesta.
+  return {
+    text: _inventedVarietyNeutralizer(hit),
+    modified: true,
+    reason: `variedad_inventada: ${hit.name} (clima ${hit.clima} → pedido ${hit.opuesto})`,
+  };
+}
+
 // ── GUARD: viabilidad FALSO-NEGATIVO (cultivo viable marcado inviable) ──────
 
 /**
@@ -3420,6 +3684,200 @@ export function guardFalseInviability(responseText, resolvedEntities = null, fin
   return { text, modified: true, reason: `viabilidad_falso_negativo: ${corregidos.join(', ')}` };
 }
 
+// ── GUARD: viabilidad-altitud al BORDE con RIESGO de helada (BORDE-012) ──────
+
+/**
+ * BORDE-012 (bench borde-alucinación 2026-06-03): para gulupa a 2.100 vs 2.700 m
+ *   "...un vecino jura que arriba en el alto a 2.700 paga mejor por el frío; ¿en
+ *    cuál de las dos alturas la siembro y aguanta helada?"
+ * granite presenta el alto (2.700 m) como "opción viable" apelando a "microclimas
+ * más cálidos", SIN el caveat de RIESGO de helada en el caso LÍMITE. La gulupa
+ * (Passiflora edulis, tropical/subtropical) tiene su techo cómodo cerca de los
+ * ~2.400 m; a 2.700 m está al borde, donde una helada esporádica puede matarla. El
+ * modelo dio un veredicto binario "viable" sin advertir el riesgo (ah_pass=false).
+ *
+ * Este guard NO afirma viabilidad ni inviabilidad (eso es de `guardInvertedViability`
+ * / `guardFalseInviability` #350 — con los que coordina, sin pisarlos): solo INYECTA
+ * el caveat de RIESGO cuando la respuesta YA declaró viable/se da la especie en una
+ * altitud que cae en la FRANJA-BORDE de su rango (cerca del techo, con riesgo de
+ * helada). Es ADITIVO (anexa el caveat, no suprime), análogo al guard térmico #23
+ * pero SIN depender del pronóstico: usa una tabla de techos agronómicos + la
+ * altitud que aparece en la pregunta/respuesta.
+ *
+ * PRECEDENCIA (coordina con #350): solo añade caveat de RIESGO; jamás afirma que la
+ * especie NO se da (no contradice una viabilidad real) ni que SÍ se da (no contradice
+ * una inviabilidad real). Si la altitud está cómoda DENTRO del rango (gulupa a
+ * 2.000 m), o claramente FUERA (donde otro guard ya negaría viabilidad), no toca.
+ */
+
+/**
+ * Tabla de FRANJA-BORDE por especie tropical/subtropical de rango acotado. `optMax`
+ * = techo cómodo (dentro de él NO hay caveat); `limitMax` = techo absoluto del
+ * rango. La franja-borde es [optMax, limitMax]: ahí la especie aún puede darse pero
+ * con RIESGO real (helada esporádica). Por encima de `limitMax` la viabilidad la
+ * juzga otro guard (no este). Rangos agronómicos conservadores para Colombia
+ * (Agrosavia/ICA; subtropicales andinos de exportación).
+ */
+const ALTITUDE_RISK_BANDS = [
+  { names: ['gulupa'], binomial: 'passiflora edulis', optMax: 2400, limitMax: 2800 },
+  { names: ['granadilla'], binomial: 'passiflora ligularis', optMax: 2200, limitMax: 2600 },
+  { names: ['maracuya', 'maracuyá'], binomial: 'passiflora edulis flavicarpa', optMax: 1300, limitMax: 1600 },
+  { names: ['tomate de arbol', 'tomate de árbol'], binomial: 'solanum betaceum', optMax: 2600, limitMax: 2900 },
+  { names: ['lulo'], binomial: 'solanum quitoense', optMax: 2100, limitMax: 2400 },
+  { names: ['aguacate hass', 'hass'], binomial: 'persea americana', optMax: 2200, limitMax: 2500 },
+  { names: ['cafe', 'café'], binomial: 'coffea arabica', optMax: 1900, limitMax: 2100 },
+  { names: ['mora'], binomial: 'rubus glaucus', optMax: 2800, limitMax: 3100 },
+];
+
+/**
+ * Extrae las altitudes (msnm) mencionadas en un texto. Acepta "2700", "2.700",
+ * "2,700", "2700 m", "2700 msnm", "2700 metros". Devuelve números finitos ≥ 800
+ * (debajo de 800 m no es zona de riesgo de helada para estas especies).
+ *
+ * @param {string} text
+ * @returns {number[]}
+ */
+function _extractAltitudes(text) {
+  if (typeof text !== 'string' || !text) return [];
+  const out = [];
+  // Captura grupos de 1-2 dígitos + separadores de millar + opcional unidad.
+  const re = /\b(\d{1,2}[.,]?\d{3}|\d{3,4})\s*(m|msnm|metros|mts)?\b/gi;
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    const raw = m[1].replace(/[.,]/g, '');
+    const n = Number(raw);
+    if (Number.isFinite(n) && n >= 800 && n <= 5000) out.push(n);
+  }
+  return out;
+}
+
+/**
+ * La RESPUESTA declara la especie VIABLE / que se da a la altitud (no la niega).
+ * Señales: "viable", "se da", "se puede cultivar", "opción viable", "podría
+ * cultivarse", "permitan su cultivo". Sobre el texto normalizado.
+ */
+const RESPONSE_DECLARES_VIABLE_RE =
+  /(opcion\s+viable|es\s+viable|se\s+da\b|se\s+puede\s+(cultivar|sembrar|dar)|permit\w*\s+su\s+cultivo|podr[ií]a\s+(cultivar|sembrar|ser\s+viable|dar)|si\s+(se\s+)?(da|puede)|se\s+cultiva)/;
+
+/**
+ * La RESPUESTA DECLARA INVIABLE / niega que se dé la especie a esa altura. Si dice
+ * "no es viable", "no se da", "no aguanta", "es demasiado frío", el modelo NO la
+ * está promoviendo al borde → no hay viabilidad-al-borde que matizar (lo cubre, en
+ * su caso, otro guard). Anti-FP: evita que "(no es )viable" dispare el caveat.
+ * Sobre el texto normalizado.
+ */
+const RESPONSE_DECLARES_INVIABLE_RE =
+  /(no\s+es\s+viable|no\s+(es\s+)?(viable|recomendable)\s+(sembrar|cultivar)|inviable|no\s+se\s+da\b|no\s+prosper|no\s+aguanta|demasiad[oa]\s+(frio|alt|fria)|no\s+(la?\s+)?siembres)/;
+
+/**
+ * La RESPUESTA YA advierte el RIESGO de helada / borde (acertó). Si dice "riesgo de
+ * helada", "está en el límite", "puede afectarla la helada", "no aguanta helada a
+ * esa altura" → no re-inyectamos. Anti-FP central. Sobre el texto normalizado.
+ */
+const RESPONSE_ALREADY_WARNS_HELADA_RE =
+  /(riesgo\s+de\s+helada|en\s+el\s+l[ií]mite|al\s+borde\s+de\s+su\s+rango|la\s+helada\s+(la|lo)\s+(puede|podria)|peligro\s+de\s+helada|una\s+helada\s+(la|lo)\s+(mata|puede|afecta|quema))/;
+
+/** Marca textual del caveat inyectado (idempotencia + tests). */
+const ALTITUDE_RISK_CAVEAT_MARK = /a\s+esa\s+altura\s+hay\s+riesgo\s+de\s+helada/i;
+
+/**
+ * Busca una especie de `ALTITUDE_RISK_BANDS` mencionada en el texto cuya franja-
+ * borde [optMax, limitMax] contenga alguna de las altitudes detectadas. Devuelve
+ * { name, alt } o null.
+ *
+ * @param {string} norm  texto normalizado.
+ * @param {number[]} altitudes  altitudes detectadas (de pregunta + respuesta).
+ * @returns {{name:string, alt:number}|null}
+ */
+function _findBorderlineAltitudeViability(norm, altitudes) {
+  if (!norm || !Array.isArray(altitudes) || altitudes.length === 0) return null;
+  for (const band of ALTITUDE_RISK_BANDS) {
+    for (const name of band.names) {
+      const nameNorm = _stripDiacritics(name);
+      if (!nameNorm || !norm.includes(nameNorm)) continue;
+      // La altitud al BORDE: dentro de (optMax, limitMax]. Igual a optMax o por
+      // debajo = zona cómoda (sin caveat). Por encima de limitMax = lo juzga otro
+      // guard (no afirmamos viabilidad ahí).
+      for (const alt of altitudes) {
+        if (alt > band.optMax && alt <= band.limitMax) {
+          return { name, alt };
+        }
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * guardAltitudeRiskCaveat — BORDE-012. Inyecta el caveat de RIESGO DE HELADA cuando
+ * la respuesta declara viable/se da una especie de rango acotado en una altitud al
+ * BORDE de su rango (franja [optMax, limitMax]).
+ *
+ * GATING (anti-falso-positivo):
+ *   1. hay una especie de `ALTITUDE_RISK_BANDS` en el texto Y una altitud detectada
+ *      (en la pregunta o la respuesta) que cae en su franja-borde
+ *      (`_findBorderlineAltitudeViability`). Altitud cómoda dentro del óptimo → no.
+ *   2. la respuesta DECLARA viable/se da la especie (`RESPONSE_DECLARES_VIABLE_RE`).
+ *      Si la respuesta ya la declara inviable, no hay viabilidad-al-borde que matizar.
+ *   3. la respuesta NO advierte ya el riesgo de helada (`RESPONSE_ALREADY_WARNS_HELADA_RE`).
+ *
+ * ADITIVO (no suprime): anexa el caveat de riesgo al final, conservando el cuerpo
+ * del modelo (la doctrina zona-gris del guard térmico #23: ADVIERTE, no bloquea).
+ * Firma propia (necesita userMessage para leer la altitud de la pregunta) → se
+ * invoca aparte en applyOutputGuards. Idempotente. Guard de SIEMBRA.
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardAltitudeRiskCaveat(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Idempotencia: nuestro caveat ya está → no repetir.
+  if (ALTITUDE_RISK_CAVEAT_MARK.test(responseText)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const norm = _stripDiacritics(responseText);
+  // Capa 3 (corta barato): si la respuesta YA advierte el riesgo de helada, acertó.
+  if (RESPONSE_ALREADY_WARNS_HELADA_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  // Capa 2a: si la respuesta DECLARA INVIABLE el alto (no la promueve), no hay
+  // viabilidad-al-borde que matizar. Va antes que la de viabilidad porque
+  // "(no es )viable" matchea ambas: la negación manda.
+  if (RESPONSE_DECLARES_INVIABLE_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  // Capa 2b: la respuesta debe declarar la especie viable/que se da (si la niega, no
+  // hay viabilidad-al-borde que matizar — eso es de otro guard).
+  if (!RESPONSE_DECLARES_VIABLE_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Capa 1: altitudes mencionadas en la pregunta + la respuesta.
+  const userNorm = typeof userMessage === 'string' ? _stripDiacritics(userMessage) : '';
+  const altitudes = [..._extractAltitudes(userNorm), ..._extractAltitudes(norm)];
+  const hit = _findBorderlineAltitudeViability(norm, altitudes);
+  if (!hit) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('altitude_risk_caveat');
+  const caveat =
+    `Ojo con la altura: a ${hit.alt} msnm la ${hit.name} está en el LÍMITE de su rango — a esa altura hay ` +
+    'riesgo de helada que puede afectarla o matarla, sobre todo en las noches despejadas. No es un "sí" ' +
+    'limpio: si la siembras tan arriba, hazlo solo en un microclima protegido (ladera abrigada, sin heladero) ' +
+    'y con cobertor para las noches frías. Más seguro es sembrarla a una altura cómoda dentro de su rango.';
+  const text = `${responseText.trim()}\n\n${caveat}`;
+  return {
+    text,
+    modified: true,
+    reason: `altitud_riesgo: ${hit.name} @ ${hit.alt}msnm`,
+  };
+}
+
 /**
  * Set de guards que SOLO tienen sentido cuando la consulta es de SIEMBRA
  * (A12). Si la pregunta del usuario es de PRECIO/MERCADO (o info general sin
@@ -3584,6 +4042,21 @@ export function applyOutputGuards(
     }
   }
 
+  // GUARD ANTI-VARIEDAD/ECOTIPO INVENTADO (BORDE-007): si el userMessage o la
+  // respuesta afirma una VARIEDAD climáticamente imposible de una especie de clima
+  // inequívoco ("<tropical> de clima frío", "<de frío> de tierra caliente") y la
+  // respuesta la VALIDA, SUPRIME el cuerpo y lo REEMPLAZA por una neutralización
+  // honesta. Como REEMPLAZA el texto entero (la validación de la variedad inventada
+  // es íntegramente engañosa), no tiene sentido correr los demás guards →
+  // early-return, igual que premisa-falsa / off-domain. Firma propia (userMessage).
+  // Es un guard de SIEMBRA/identidad → solo corre si la consulta no es de precio.
+  if (runPlantingGuards && !(vis && vis.modified)) {
+    const iv = guardInventedVariety(text, { userMessage });
+    if (iv && iv.modified) {
+      return { text: iv.text, modified: true, reasons: iv.reason ? [iv.reason] : [] };
+    }
+  }
+
   for (const guard of GUARD_CHAIN) {
     // A12: salta los guards de SIEMBRA cuando la consulta no es de siembra
     // (precio/mercado). Los de SAFETY/inofensivos NO están en PLANTING_GUARDS y
@@ -3611,6 +4084,19 @@ export function applyOutputGuards(
       text = thermalRes.text;
       modified = true;
       if (thermalRes.reason) reasons.push(thermalRes.reason);
+    }
+    // Guard de viabilidad-altitud al BORDE con RIESGO de helada (BORDE-012): si la
+    // respuesta declara viable/se da una especie de rango acotado (gulupa,
+    // granadilla, lulo…) en una altitud al borde de su rango (cerca del techo) sin
+    // advertir el riesgo, INYECTA el caveat de helada. ADITIVO (no suprime), análogo
+    // al térmico #23 pero sin pronóstico: lee la altitud de la pregunta/respuesta.
+    // Firma propia (userMessage para la altitud). Guard de SIEMBRA. Va tras el
+    // térmico (que requiere pronóstico) como red sin pronóstico al caso límite.
+    const altRiskRes = guardAltitudeRiskCaveat(text, { userMessage });
+    if (altRiskRes && altRiskRes.modified) {
+      text = altRiskRes.text;
+      modified = true;
+      if (altRiskRes.reason) reasons.push(altRiskRes.reason);
     }
   }
   // Guard de nombre inventado: firma propia (necesita el nombre del perfil).
