@@ -1992,6 +1992,123 @@ export function guardFermentoHealthClaim(responseText, { userMessage = null } = 
   };
 }
 
+// ── GUARD: receta de fermento sin caveat de inocuidad (DR-FOOD-3 · #345) ─────
+
+/**
+ * Patrones de INTENCIÓN-RECETA / preparación (sobre el texto normalizado sin
+ * tildes). Si la PREGUNTA del usuario o la RESPUESTA del LLM traen fraseo de
+ * "cómo se prepara / receta / pasos / ingredientes / fermentar X días", es una
+ * receta. Cerrado y conservador hacia NO disparar fuera de recetas.
+ */
+const FERMENTO_RECIPE_PATTERNS = [
+  /\bcomo\s+(se\s+)?(prepar|hac|elabor|hago|preparo|fabric|fermenta?)/,
+  /\b(la\s+)?receta\b/,
+  /\bpaso\s+a\s+paso\b/,
+  /\bpasos\s+(para|de)\b/,
+  /\bingredientes?\b/,
+  /\bmodo\s+de\s+(preparacion|empleo|hacerlo)\b/,
+  /\b(prepar|elabor|fabric)(ar|acion|a|o|amos)\b/,
+  /\bfermenta?\s+(por\s+)?\d/, // "fermenta 7 días"
+  /\bdeja(r|l[ao])?\s+(reposar|fermentar|tapad)/,
+  /\bme\s+ensenas?\s+a\s+(hacer|preparar)\b/,
+  /\bdame\s+(la\s+)?receta\b/,
+];
+
+/**
+ * ¿La query/respuesta pide o da una RECETA de fermento? Gate combinado: debe
+ * tocar un fermento (FERMENTO_TERMS) Y traer fraseo de receta/preparación, en la
+ * pregunta del usuario O en el texto del LLM. Conservador hacia NO disparar.
+ *
+ * @param {string} textNorm  respuesta del LLM normalizada.
+ * @param {string} userNorm  pregunta del usuario normalizada (o '').
+ * @returns {boolean}
+ */
+function _isFermentoRecipe(textNorm, userNorm) {
+  if (!_touchesFermento(textNorm, userNorm)) return false;
+  const combined = `${userNorm} ${textNorm}`;
+  return FERMENTO_RECIPE_PATTERNS.some((re) => re.test(combined));
+}
+
+/**
+ * Marca textual idempotente + frase líder del caveat de inocuidad. NO cita un
+ * nombre propio: la autoridad es SIEMPRE institucional (INVIMA / Res. 810-2021,
+ * FDA/EFSA), nunca una persona. Cubre los ejes del DR-FOOD-3: riesgo por
+ * higiene/agua/temperatura, control de pH/acidez, contaminación, poblaciones que
+ * deben abstenerse y derivación al puesto de salud.
+ *
+ * Fuente de verdad: Chagra-strategy/deepresearch/DR-FOOD-3-CONSOLIDADO §3.2/§4
+ * (disclaimer fuerte + marco INVIMA Res. 2674/2013 · Res. 810/2021).
+ */
+const FERMENTO_RECIPE_CAVEAT =
+  '⚠️ Antes de preparar este fermento, una advertencia de inocuidad que no se ' +
+  'puede saltar: es un alimento fermentado de riesgo y, si falla la higiene, el ' +
+  'agua, la acidez (pH) o la temperatura, se puede contaminar y enfermar a quien ' +
+  'lo tome. Trabaja con utensilios limpios, recipientes de vidrio o acero ' +
+  'inoxidable (nunca cerámica con plomo ni plástico), agua segura y la acidez ' +
+  'correcta. Deben ABSTENERSE las mujeres embarazadas, los niños pequeños, las ' +
+  'personas con defensas bajas (inmunocomprometidas) y quien toma anticoagulantes. ' +
+  'Ante cualquier mal olor, moho o señal de que salió mal, NO lo consuma. Si lo va ' +
+  'a vender, requiere registro/notificación sanitaria ante el INVIMA (Res. ' +
+  '2674/2013) y está prohibido atribuirle propiedades de salud en la etiqueta ' +
+  '(Res. 810/2021). Ante cualquier síntoma, acuda al puesto de salud de la vereda. ' +
+  'Esta pauta sigue el marco institucional de inocuidad (INVIMA · FDA/EFSA), no ' +
+  'una opinión personal.';
+
+/**
+ * guardFermentoRecipeSafety — DR-FOOD-3, capa 2b de defensa-en-profundidad
+ * (guard de salida del PWA). SAFETY-CRITICAL · FAIL-SAFE · #345.
+ *
+ * PROBLEMA (prod 2026-06-03): "cómo preparo kombucha" devolvía la receta CRUDA
+ * sin el caveat de inocuidad/INVIMA. El pre-filtro del sidecar SÍ arma el bloque
+ * `disclaimer_fuerte` (verificado en vivo) y SÍ se inyecta al system prompt, pero
+ * el LLM lo IGNORA bajo carga (patrón "grounding muerto"). El otro guard de
+ * fermentos (`guardFermentoHealthClaim`) NO cubre este caso: una receta limpia no
+ * trae claim de salud, así que pasaba sin contrapeso. Este guard es la red
+ * determinística: si la query/respuesta es una RECETA de fermento, ANTEPONE el
+ * caveat institucional — sin depender del prompt ni del modelo.
+ *
+ * PREPEND (no append): el caveat LIDERA para que el campesino lo lea ANTES de la
+ * receta. La receta del modelo se conserva intacta debajo (no se borra: la
+ * preparación es información útil; solo le anteponemos la seguridad).
+ *
+ * GATING POR INTENCIÓN (anti-falso-positivo, doble): (1) debe tocar un fermento
+ * (FERMENTO_TERMS) Y (2) traer fraseo de receta/preparación. Una receta de sopa,
+ * un biopreparado agroecológico (caldo bordelés), o una consulta de precio NO
+ * disparan. Idempotente: si el caveat ya está, no re-antepone.
+ *
+ * Autoridad SIEMPRE institucional (INVIMA / FDA/EFSA / Res. 810/2021), NUNCA un
+ * nombre propio.
+ *
+ * Firma propia (necesita userMessage para el gate) → se invoca aparte en
+ * applyOutputGuards, no dentro de GUARD_CHAIN.
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardFermentoRecipeSafety(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  const textNorm = _stripDiacritics(responseText);
+  const userNorm = _stripDiacritics(userMessage || '');
+
+  // Gate doble: receta + fermento. Sin ambos, no corremos (anti-falso-positivo).
+  if (!_isFermentoRecipe(textNorm, userNorm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Idempotencia: si el caveat de inocuidad ya está anexado, no re-dispara.
+  if (textNorm.includes(_stripDiacritics('antes de preparar este fermento'))) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('fermentoRecipeSafety');
+  // PREPEND: el caveat lidera; la receta del modelo va intacta debajo.
+  const text = `${FERMENTO_RECIPE_CAVEAT}\n\n${responseText.trim()}`;
+  return { text, modified: true, reason: 'receta_fermento_sin_caveat' };
+}
+
 // ── GUARD: reforestación con especie invasora/combustible ───────────────────
 
 /**
@@ -2480,6 +2597,19 @@ export function applyOutputGuards(
     text = fermRes.text;
     modified = true;
     if (fermRes.reason) reasons.push(fermRes.reason);
+  }
+  // Guard de RECETA de fermento sin caveat de inocuidad (DR-FOOD-3, SAFETY · #345):
+  // firma propia (necesita userMessage para el gate de intención-receta-fermento).
+  // Corre SIEMPRE pero solo actúa si la query/respuesta es una RECETA de fermento.
+  // Red determinística contra el "grounding muerto" del prefilter: ANTEPONE el
+  // caveat institucional (INVIMA/FDA, pH, contaminación, abstención) sin depender
+  // del LLM. Va DESPUÉS del guard de claims de salud (su redirect queda debajo de
+  // la receta; el caveat de inocuidad lidera arriba).
+  const fermRecipeRes = guardFermentoRecipeSafety(text, { userMessage });
+  if (fermRecipeRes && fermRecipeRes.modified) {
+    text = fermRecipeRes.text;
+    modified = true;
+    if (fermRecipeRes.reason) reasons.push(fermRecipeRes.reason);
   }
   // Guard de reforestación con invasora-combustible (DR-RESTAURACION-INCENDIOS,
   // SAFETY ecológica): firma propia (necesita userMessage para el gate de

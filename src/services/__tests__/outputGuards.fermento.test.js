@@ -15,6 +15,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   guardFermentoHealthClaim,
+  guardFermentoRecipeSafety,
   applyOutputGuards,
   getOutputGuardTelemetry,
   resetOutputGuardTelemetry,
@@ -125,3 +126,133 @@ describe('applyOutputGuards — integración guard de fermentos', () => {
     expect(res.text.toLowerCase()).not.toContain(SAFE_PHRASE);
   });
 });
+
+// ──────────────────────────────────────────────────────────────────────────
+// guardFermentoRecipeSafety — DR-FOOD-3, capa 2b · #345
+//
+// Bug prod 2026-06-03: "cómo preparo kombucha" devolvía la receta CRUDA sin el
+// caveat de inocuidad/INVIMA. El prefilter del sidecar SÍ arma el bloque
+// disclaimer_fuerte y SÍ se inyecta al system prompt, pero el LLM lo ignora bajo
+// carga ("grounding muerto"). guardFermentoHealthClaim NO cubre el caso: una
+// receta limpia no trae claim de salud, así que pasaba sin contrapeso. Este
+// guard determinístico antepone el caveat institucional a CUALQUIER receta de
+// fermento, sin depender del LLM.
+// ──────────────────────────────────────────────────────────────────────────
+
+const CAVEAT_MARK = 'antes de preparar este fermento';
+
+describe('guardFermentoRecipeSafety', () => {
+  it('(#345) "cómo preparo kombucha" + receta del LLM → antepone el caveat institucional', () => {
+    const llm =
+      'Para hacer kombucha necesitas té negro, azúcar y un SCOBY. Prepara 1L de té dulce, ' +
+      'añade el SCOBY y deja fermentar 7 a 10 días tapado con una tela. Listo.';
+    const r = guardFermentoRecipeSafety(llm, { userMessage: 'cómo preparo kombucha' });
+    expect(r.modified).toBe(true);
+    // El caveat LIDERA (prepend), para que se lea antes que la receta.
+    expect(r.text.toLowerCase().indexOf(CAVEAT_MARK)).toBeLessThan(
+      r.text.toLowerCase().indexOf('para hacer kombucha'),
+    );
+    // Contenido de inocuidad institucional.
+    expect(r.text.toLowerCase()).toContain('invima');
+    expect(r.text.toLowerCase()).toContain('higiene');
+    expect(r.text.toLowerCase()).toContain('puesto de salud');
+    expect(r.reason).toMatch(/receta_fermento/);
+  });
+
+  it('(#345) autoridad SIEMPRE institucional, NUNCA un nombre de persona', () => {
+    const r = guardFermentoRecipeSafety('Receta de masato: cocina el maíz, agrega panela…', {
+      userMessage: 'receta de masato paso a paso',
+    });
+    expect(r.modified).toBe(true);
+    // Marco institucional presente.
+    expect(r.text.toLowerCase()).toMatch(/invima|res(\.|olución)? ?810|inocuidad/);
+    // Ningún nombre propio del operador / personas (anti-leak).
+    expect(r.text.toLowerCase()).not.toMatch(/miguel|kortux|lili|diego/);
+  });
+
+  it('(#345) menciona poblaciones que deben abstenerse y el riesgo de contaminación/pH', () => {
+    const r = guardFermentoRecipeSafety('Para el chucrut pica el repollo con sal al 2%…', {
+      userMessage: 'cómo hago chucrut en casa',
+    });
+    expect(r.modified).toBe(true);
+    const t = r.text.toLowerCase();
+    expect(t).toMatch(/embarazad|gestant|niñ|defensas|inmun/);
+    expect(t).toMatch(/contamin|higiene|ph/);
+  });
+
+  it('gate por la PREGUNTA: pide receta de fermento aunque el texto del LLM sea escueto', () => {
+    const r = guardFermentoRecipeSafety('Mezcla los ingredientes y deja reposar.', {
+      userMessage: 'dame la receta del guarapo de caña',
+    });
+    expect(r.modified).toBe(true);
+    expect(r.text.toLowerCase()).toContain(CAVEAT_MARK);
+  });
+
+  it('(c) ANTI-FALSO-POSITIVO: fermento mencionado SIN intención de receta NO dispara', () => {
+    const r = guardFermentoRecipeSafety(
+      'El masato es una bebida tradicional del Pacífico colombiano.',
+      { userMessage: 'qué es el masato' },
+    );
+    expect(r.modified).toBe(false);
+    expect(r.text).toContain('El masato es una bebida');
+  });
+
+  it('(c2) ANTI-FALSO-POSITIVO: receta NO-fermento (sopa) intacta', () => {
+    const r = guardFermentoRecipeSafety(
+      'Para el ajiaco: cocina las papas con pollo, mazorca y guascas.',
+      { userMessage: 'cómo preparo ajiaco' },
+    );
+    expect(r.modified).toBe(false);
+    expect(r.text).toContain('ajiaco');
+  });
+
+  it('(c3) ANTI-FALSO-POSITIVO: query de precio NO-fermento intacta', () => {
+    const r = guardFermentoRecipeSafety('La papa está a 80 mil el bulto.', {
+      userMessage: '¿a cómo está la papa?',
+    });
+    expect(r.modified).toBe(false);
+  });
+
+  it('idempotente: no re-antepone el caveat si ya está', () => {
+    const llm =
+      'Para hacer kombucha necesitas té, azúcar y SCOBY; fermenta 7 días.';
+    const r1 = guardFermentoRecipeSafety(llm, { userMessage: 'cómo preparo kombucha' });
+    expect(r1.modified).toBe(true);
+    const r2 = guardFermentoRecipeSafety(r1.text, { userMessage: 'cómo preparo kombucha' });
+    expect(r2.modified).toBe(false);
+  });
+
+  it('texto vacío / no-string → no-op seguro', () => {
+    expect(guardFermentoRecipeSafety('', { userMessage: 'kombucha receta' }).modified).toBe(false);
+    expect(guardFermentoRecipeSafety(null, { userMessage: 'kombucha receta' }).modified).toBe(false);
+  });
+
+  it('cuenta telemetría al disparar', () => {
+    guardFermentoRecipeSafety('Receta de chicha: maíz, panela, fermenta…', {
+      userMessage: 'cómo se hace la chicha',
+    });
+    expect(getOutputGuardTelemetry().fermentoRecipeSafety).toBe(1);
+  });
+});
+
+describe('applyOutputGuards — integración receta de fermento (#345)', () => {
+  it('antepone el caveat de inocuidad a una receta de kombucha en el pipeline completo', () => {
+    const res = applyOutputGuards(
+      'Para hacer kombucha: té negro, azúcar, SCOBY; fermenta 7-10 días tapado.',
+      { userMessage: 'cómo preparo kombucha' },
+    );
+    expect(res.modified).toBe(true);
+    expect(res.text.toLowerCase()).toContain('invima');
+    expect(res.text.toLowerCase()).toContain(CAVEAT_MARK);
+    expect(res.reasons.some((r) => /receta_fermento/.test(r))).toBe(true);
+  });
+
+  it('ANTI-FALSO-POSITIVO: receta agronómica (biopreparado) no dispara el caveat de fermento', () => {
+    const res = applyOutputGuards(
+      'Para el caldo bordelés: disuelve cal y sulfato de cobre, aplica en preventivo.',
+      { userMessage: 'cómo preparo caldo bordelés' },
+    );
+    expect(res.text.toLowerCase()).not.toContain(CAVEAT_MARK);
+  });
+});
+
