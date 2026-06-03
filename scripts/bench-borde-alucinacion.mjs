@@ -247,7 +247,7 @@ async function main() {
       continue;
     }
 
-    const guarded = applyOutputGuards(gen.response, { resolvedEntities: entities, profileName: null });
+    const guarded = applyOutputGuards(gen.response, { resolvedEntities: entities, profileName: null, userMessage: p.prompt });
     const finalText = guarded.text;
     const validation = await postValidate(p.prompt, finalText);
 
