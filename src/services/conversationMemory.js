@@ -12,6 +12,7 @@
  */
 
 import { openDB, STORES } from '../db/dbCore';
+import { institutionalSourceUrl, resolveSourceLink } from './institutionalSources';
 
 const MAX_TURNS = 100;
 const MAX_DAYS = 30;
@@ -422,12 +423,24 @@ export function extractGroundingBadges(resolvedEntities) {
   for (const e of ordered) {
     if (!e || typeof e !== 'object') continue;
 
-    // Fuente verificable (#18): primera URL http(s) válida del turno.
+    // Fuente verificable (#18 + #356): primera fuente linkeable del turno.
+    // Preferimos el deep-link http(s) curado de la entidad (ej. ficha Agrosavia
+    // con species_id). Si no hay deep-link válido pero la entidad cita una
+    // fuente INSTITUCIONAL reconocida (Agrosavia/IDEAM/SIPSA/ICA/Cenicafé…),
+    // linkeamos a la PÁGINA institucional real (#356) — la cita deja de ser
+    // texto muerto. `institutionalSourceUrl` devuelve el deep-link si es válido,
+    // si no la institución, y null si la fuente no es institucional (no inventa).
     if (!out.fuente_url) {
-      const url = typeof e.fuente_url === 'string' ? e.fuente_url.trim() : '';
-      if (/^https?:\/\//i.test(url)) {
+      const label = typeof e.fuente === 'string' ? e.fuente.trim() : '';
+      const deepLink = typeof e.fuente_url === 'string' ? e.fuente_url.trim() : '';
+      const url = institutionalSourceUrl(label, { deepLink });
+      if (url && /^https?:\/\//i.test(url)) {
         out.fuente_url = url;
-        const label = typeof e.fuente === 'string' ? e.fuente.trim() : '';
+        if (label) out.fuente = label;
+      } else if (/^https?:\/\//i.test(deepLink)) {
+        // Deep-link válido aunque la fuente no sea institucional reconocida
+        // (preserva el comportamiento original: cualquier fuente_url http(s)).
+        out.fuente_url = deepLink;
         if (label) out.fuente = label;
       }
     }
@@ -441,6 +454,70 @@ export function extractGroundingBadges(resolvedEntities) {
   }
 
   return out;
+}
+
+/**
+ * Tools cuya institución emisora es fija y conocida (la fuente NO viaja como
+ * entidad del grounding sino que es definitoria del tool). Mapea tool → nombre
+ * de institución, que `institutionalSourceUrl` resuelve a la página real.
+ */
+const _TOOL_INSTITUTION = {
+  get_clima_ideam: 'IDEAM',
+  get_clima_finca: 'IDEAM',
+};
+
+/**
+ * #356 — deriva un link de fuente a partir del toolEvidence (no de una entidad
+ * del grounding). Pensado para respuestas cuya fuente es el TOOL mismo: el clima
+ * viene de `get_clima_ideam` → la cita "Fuente: IDEAM" debe linkear a IDEAM.
+ *
+ * Orden de resolución (primero que aplique):
+ *   1. `result.fuente_url` deep-link http(s) válido → se usa tal cual.
+ *   2. `result.sources` (array) o `result.fuente`/`result.source` (string)
+ *      mapeado a una institución reconocida.
+ *   3. La institución FIJA del tool (`get_clima_ideam` → IDEAM).
+ * Solo cuenta evidencia con datos reales (no `found:false`/`available:false`).
+ *
+ * Acepta un evidence simple o un array (tool_chain): en array, devuelve el PRIMER
+ * link que resuelva. 100% graceful: sin fuente institucional → {} (sin badge).
+ *
+ * @param {object|object[]|null|undefined} toolEvidence
+ * @returns {{ fuente?: string, fuente_url?: string }}
+ */
+export function deriveEvidenceSourceLink(toolEvidence) {
+  if (!toolEvidence) return {};
+
+  if (Array.isArray(toolEvidence)) {
+    for (const ev of toolEvidence) {
+      const link = deriveEvidenceSourceLink(ev);
+      if (link.fuente_url) return link;
+    }
+    return {};
+  }
+
+  const tool = typeof toolEvidence.tool === 'string' ? toolEvidence.tool : '';
+  const result = toolEvidence.result;
+  if (!result || typeof result !== 'object') return {};
+
+  // Miss explícito: el tool corrió pero no hay dato → sin fuente que citar.
+  if (result.found === false || result.available === false) return {};
+  if (typeof result.matches_count === 'number' && result.matches_count === 0) return {};
+
+  // 1+2: deep-link curado o sources institucionales del payload.
+  const deepLink = typeof result.fuente_url === 'string' ? result.fuente_url.trim() : '';
+  const citedSources = Array.isArray(result.sources)
+    ? result.sources
+    : [result.fuente, result.source].filter((s) => typeof s === 'string' && s.trim());
+  const fromPayload = resolveSourceLink(citedSources, { deepLink });
+  if (fromPayload.fuente_url) return fromPayload;
+
+  // 3: institución fija del tool (clima → IDEAM).
+  const inst = _TOOL_INSTITUTION[tool];
+  if (inst) {
+    const url = institutionalSourceUrl(inst);
+    if (url) return { fuente: inst, fuente_url: url };
+  }
+  return {};
 }
 
 /**
@@ -553,6 +630,7 @@ export default {
   computeSourceMetadata,
   mergePostValidateMetadata,
   extractGroundingBadges,
+  deriveEvidenceSourceLink,
   extractEdges,
   getLastTurnTimestamp,
   shouldStartNewSession,
