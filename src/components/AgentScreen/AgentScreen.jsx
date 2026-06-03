@@ -32,6 +32,7 @@ import {
   computeSourceMetadata,
   mergePostValidateMetadata,
   extractGroundingBadges,
+  deriveEvidenceSourceLink,
   extractEdges,
   clearMemory,
   shouldStartNewSession,
@@ -1765,8 +1766,16 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       // sin esos campos → no añade nada. #19: `auto_corrected` marca que los
       // guards deterministas modificaron la respuesta (badge "auto-corregida").
       const groundingBadges = extractGroundingBadges(resolvedEntities);
+      // #356: si el grounding curado no aportó un link de fuente, derivarlo del
+      // TOOL que respondió (p.ej. get_clima_ideam → "Fuente: IDEAM" clickeable a
+      // ideam.gov.co). Las entidades mandan (deep-link de ficha); el tool es el
+      // fallback. Graceful: sin fuente institucional → {} y no se añade badge.
+      const evidenceSourceLink = groundingBadges.fuente_url
+        ? {}
+        : deriveEvidenceSourceLink(toolEvidence);
       sourceMetadata = {
         ...sourceMetadata,
+        ...evidenceSourceLink,
         ...groundingBadges,
         auto_corrected: guarded.modified === true || taxonomyModified === true,
       };
