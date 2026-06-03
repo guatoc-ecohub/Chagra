@@ -13,9 +13,17 @@
  *   - expects_abstention: true para los prompts sin data en el grafo → mide que
  *     el agente NO invente.
  *
- * Los hechos se leen del grafo vía `psql` dentro del container `postgres-farm`
- * (no hardcode): así el pool sigue la curación si el grafo cambia. Si el grafo
- * no está accesible, ABORTA (no inventamos un pool falso).
+ * Los hechos se leen del grafo vía `psql` por TCP `127.0.0.1:5432` (NO
+ * `podman exec` — roto en alpha, passwd del container corrupto, INFRA_FACTS
+ * 2026-06-02). En NixOS se envuelve en `nix-shell -p postgresql`. No hardcode:
+ * así el pool sigue la curación si el grafo cambia. Si el grafo no está
+ * accesible, ABORTA (no inventamos un pool falso).
+ *
+ * must_include GRAPH-FAITHFUL (runbook P1/T1): para dosis_biopreparado se exige
+ * SOLO el nombre canónico + un fragmento de la dosis verificada del grafo. La
+ * FUENTE institucional (Agrosavia/FAO/Restrepo) ya NO es token obligatorio —
+ * era un nombre-propio memorizable que hundía falsamente a config A y no mide
+ * alucinación; va como `source_hint` metadato.
  *
  * Uso:
  *   node scripts/gen-bench-capabilities-pool.mjs
@@ -27,38 +35,41 @@ import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
+import {
+  buildPsqlCommand,
+  psqlOptsFromEnv,
+  buildCypherSql,
+  parsePsqlRows,
+  doseMustInclude,
+  doseRedFlags,
+} from './lib/bench-pool-gen.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
 const OUT_DIR = join(ROOT_DIR, 'data', 'bench-runs');
 const GRAPH = 'chagra_kg';
 
+// Conexión al grafo: TCP 127.0.0.1:5432 (NUNCA `podman exec` — roto en alpha:
+// passwd del container corrupto, INFRA_FACTS 2026-06-02). En NixOS se envuelve en
+// nix-shell. Overrides por env (*_KG, PSQL_WRAPPER, PSQL_BIN) para CI/portabilidad.
+const { cmd: PSQL_CMD, env: PSQL_ENV } = buildPsqlCommand({
+  db: GRAPH,
+  ...psqlOptsFromEnv(process.env),
+});
+
 /** Corre una query Cypher en el grafo vivo y devuelve filas de properties JSON. */
 function cypherProps(matchReturn) {
-  // Escribimos el SQL a un archivo y usamos `psql -f` para evitar que el shell
-  // interprete `$$` (dollar-quoting) como el PID, y `"$user"` como vacío. El
-  // archivo se monta en el container vía `podman exec -i ... -f -` (stdin).
-  const sql = `LOAD 'age';\nSET search_path = ag_catalog, public;\nSELECT props FROM cypher('${GRAPH}', $$ ${matchReturn} $$) AS (props agtype);\n`;
-  // El SQL va por STDIN (input) → ni el `$$` ni el `"$user"` los toca el shell.
-  const cmd = `sudo podman exec -i postgres-farm psql -U farmos -d ${GRAPH} -t -A -f -`;
-  const out = execSync(cmd, { encoding: 'utf-8', maxBuffer: 64 * 1024 * 1024, input: sql });
-  return parseRows(out);
-}
-
-/** Extrae filas de properties JSON de la salida de psql. */
-function parseRows(out) {
-  return out
-    .split('\n')
-    .map((l) => l.trim())
-    .filter((l) => l.startsWith('{'))
-    .map((l) => {
-      try {
-        return JSON.parse(l);
-      } catch {
-        return null;
-      }
-    })
-    .filter(Boolean);
+  // El SQL va por STDIN (`psql -f -`) → ni el `$$` (dollar-quoting de Cypher) ni
+  // el `"$user"` los toca el shell. La password viaja por PGPASSWORD en el env
+  // del hijo (no en la línea de comando, no aparece en `ps`/logs).
+  const sql = buildCypherSql(GRAPH, matchReturn);
+  const out = execSync(PSQL_CMD, {
+    encoding: 'utf-8',
+    maxBuffer: 64 * 1024 * 1024,
+    input: sql,
+    env: { ...process.env, ...PSQL_ENV },
+  });
+  return parsePsqlRows(out);
 }
 
 function byId(rows) {
@@ -88,17 +99,6 @@ if (nBios < 5 || nForr < 5) {
   process.exit(1);
 }
 
-// helper: primer fragmento (atómico) de la dosis verificada del grafo. Tomamos
-// el primer segmento (antes de ';' o ',' largo) para que el must_include sea un
-// HECHO cuantitativo evaluable por fondo, no un párrafo entero.
-function doseFact(bio) {
-  const raw = (bio.dosis_aplicacion || '').trim();
-  // corta en el primer ';' o, si no hay, en el primer paréntesis de cierre.
-  let frag = raw.split(';')[0].trim();
-  if (frag.length > 70) frag = frag.slice(0, 70).replace(/[\s,]+\S*$/, '');
-  return frag;
-}
-
 const prompts = [];
 let seq = 0;
 function add(cap, prompt, mustInclude, redFlags, opts = {}) {
@@ -111,6 +111,8 @@ function add(cap, prompt, mustInclude, redFlags, opts = {}) {
     red_flags: redFlags,
     expects_abstention: Boolean(opts.expects_abstention),
     ...(opts.finca_altitud != null ? { finca_altitud: opts.finca_altitud } : {}),
+    // source_hint: METADATO de trazabilidad (NO token obligatorio del scorer).
+    ...(opts.source_hint ? { source_hint: opts.source_hint } : {}),
     grounded_from: opts.grounded_from || 'chagra_kg',
   });
 }
@@ -130,15 +132,15 @@ const bioList = [
 for (const [id, prompt] of bioList) {
   const b = bios[id];
   if (!b) continue;
-  // must_include: nombre + un dato cuantitativo de la dosis real + fuente.
-  const fuente = (b.fuente || '').split('/')[0].trim();
-  add(
-    'dosis_biopreparado',
-    prompt,
-    [b.nombre, doseFact(b), fuente].filter(Boolean),
-    ['dosis numérica distinta a la verificada', 'agroquímico de marca con dosis inventada', `fuente inventada que no sea ${fuente}`],
-    { grounded_from: `Biopreparado:${id}` },
-  );
+  // must_include GRAPH-FAITHFUL: nombre canónico + fragmento atómico de la dosis
+  // verificada. La FUENTE ya NO es token obligatorio (era un nombre-propio
+  // memorizable que hundía falsamente a config A y no mide alucinación) → va como
+  // source_hint metadato. Ver runbook nocturno 2026-06-02/03 P1/T1.
+  const { must_include, source_hint } = doseMustInclude(b);
+  add('dosis_biopreparado', prompt, must_include, doseRedFlags(), {
+    grounded_from: `Biopreparado:${id}`,
+    source_hint,
+  });
 }
 
 // ── C2 — Abstención de dosis (NO inventar lo que no está en el grafo) ─────────
@@ -389,14 +391,13 @@ const bioListBis = [
 for (const [id, prompt] of bioListBis) {
   const b = bios[id];
   if (!b) continue;
-  const fuente = (b.fuente || '').split('/')[0].trim();
-  add(
-    'dosis_biopreparado',
-    prompt,
-    [b.nombre, doseFact(b), fuente].filter(Boolean),
-    ['dosis numérica distinta a la verificada', 'agroquímico de marca con dosis inventada'],
-    { grounded_from: `Biopreparado:${id}` },
-  );
+  // Mismo criterio graph-faithful que C1: nombre + dosis verificada, fuente como
+  // metadato (no token obligatorio).
+  const { must_include, source_hint } = doseMustInclude(b);
+  add('dosis_biopreparado', prompt, must_include, doseRedFlags(), {
+    grounded_from: `Biopreparado:${id}`,
+    source_hint,
+  });
 }
 
 // C2bis — más abstenciones (productos inexistentes).
