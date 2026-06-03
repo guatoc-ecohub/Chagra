@@ -1309,6 +1309,16 @@ export function buildFincaContext({
   // ── Ubicación ───────────────────────────────────────────────────────────
   const municipio = p.municipio || null;
   const departamento = p.departamento || null;
+  // #357 — vereda: la finca activa manda sobre el perfil (igual que TopBar).
+  // El dataset DANE municipal NO la trae; solo existe si el onboarding manual
+  // o el reverse-geocoding fino (DANE MGN, #338) la resolvió. Cuando existe,
+  // el agente debe localizar la respuesta de clima en "vereda X, Municipio"
+  // en vez de un genérico "tu zona" — el DATO de IDEAM es municipal, pero se
+  // PRESENTA en la vereda específica del usuario.
+  const vereda =
+    (finca && typeof finca.vereda === 'string' && finca.vereda.trim()) ||
+    (typeof p.vereda === 'string' && p.vereda.trim()) ||
+    null;
   const altitud = p.finca_altitud || (finca && finca.altitud) || null;
   const piso =
     (p.piso_termico && String(p.piso_termico).trim()) ||
@@ -1317,7 +1327,14 @@ export function buildFincaContext({
   const lat = Number(p.ubicacion_lat);
   const lng = Number(p.ubicacion_lng);
   const ubic = [];
-  const lugar = [municipio, departamento].filter(Boolean).join(', ');
+  // "vereda El Curí, Choachí, Cundinamarca" — antepone la vereda al municipio
+  // solo si la tenemos y no está ya contenida en el municipio (defensa contra
+  // duplicado "vereda X, ... vereda X").
+  const veredaPrefix =
+    vereda && !(municipio && municipio.toLowerCase().includes(vereda.toLowerCase()))
+      ? `vereda ${vereda}`
+      : null;
+  const lugar = [veredaPrefix, municipio, departamento].filter(Boolean).join(', ');
   if (lugar) ubic.push(lugar);
   if (altitud) ubic.push(`~${altitud} msnm`);
   if (piso) ubic.push(`piso ${piso}`);
@@ -1328,6 +1345,21 @@ export function buildFincaContext({
     lines.push(`Finca activa: "${finca.nombre}"${ubic.length ? ` — ${ubic.join(', ')}` : ''}.`);
   } else if (ubic.length) {
     lines.push(`Ubicación: ${ubic.join(', ')}.`);
+  }
+
+  // #357 — instrucción de LOCALIZACIÓN: cuando reporte clima/pronóstico, que
+  // nombre el lugar específico del usuario (vereda + municipio si la hay; si no,
+  // el municipio) en vez de un genérico "tu zona"/"tu finca". El pronóstico de
+  // IDEAM es municipal, así que el agente NO debe afirmar precisión sub-municipal:
+  // solo PRESENTA el dato municipal localizado a la vereda del usuario.
+  if (vereda && municipio) {
+    lines.push(
+      `LOCALIZACIÓN DE CLIMA: al dar el pronóstico o reporte de clima, nómbralo para "${vereda}, ${municipio}" (la vereda del usuario), no como un genérico "tu zona" ni "tu finca". El dato meteorológico es del municipio de ${municipio} (IDEAM/Open-Meteo); preséntalo localizado a la vereda, sin prometer precisión de finca exacta.`,
+    );
+  } else if (municipio) {
+    lines.push(
+      `LOCALIZACIÓN DE CLIMA: al dar el pronóstico o reporte de clima, nómbralo para ${municipio} (el municipio del usuario), no como un genérico "tu zona".`,
+    );
   }
 
   // ── Temporada (calendárica, local — sin red) ────────────────────────────

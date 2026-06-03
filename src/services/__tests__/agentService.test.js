@@ -652,6 +652,60 @@ describe('agentService — Task #202 Profile Context', () => {
       expect(ctx).toContain('YA TIENE registrado');
       expect(ctx).toContain('Maíz amarillo');
     });
+
+    // ──────────────────────────────────────────────────────────────────────
+    // #357 — CLIMA NOMBRA LA VEREDA. Cuando la finca está geocodeada a una
+    // vereda (reverse-geocoding DANE MGN, #338), la ubicación inyectada al
+    // prompt debe nombrar "vereda X, Municipio" para que el agente localice
+    // la respuesta de clima en la vereda específica, no un genérico "tu zona".
+    // El DATO de IDEAM sigue siendo municipal — solo se PRESENTA localizado.
+    // ──────────────────────────────────────────────────────────────────────
+    describe('#357 — vereda en el contexto de ubicación', () => {
+      it('nombra "vereda X, Municipio" cuando el perfil trae vereda', () => {
+        const ctx = buildFincaContext({
+          profile: { ...choachiProfile, vereda: 'El Curí' },
+          month: 5,
+        });
+        expect(ctx).toContain('vereda El Curí');
+        expect(ctx).toContain('Choachí');
+      });
+
+      it('toma la vereda de la finca activa sobre la del perfil', () => {
+        const ctx = buildFincaContext({
+          profile: { ...choachiProfile, vereda: 'Perfil Vereda' },
+          finca: { nombre: 'La Esperanza', vereda: 'El Curí' },
+          month: 5,
+        });
+        expect(ctx).toContain('vereda El Curí');
+        expect(ctx).not.toContain('Perfil Vereda');
+      });
+
+      it('cae a municipio sin romper cuando NO hay vereda', () => {
+        const ctx = buildFincaContext({ profile: choachiProfile, month: 5 });
+        expect(ctx).toContain('Choachí');
+        expect(ctx).not.toContain('vereda');
+      });
+
+      it('instruye al agente a NOMBRAR la vereda al hablar de clima/pronóstico', () => {
+        const ctx = buildFincaContext({
+          profile: { ...choachiProfile, vereda: 'El Curí' },
+          month: 5,
+        });
+        // El prompt debe pedir explícitamente nombrar el lugar específico
+        // (vereda + municipio) en vez de un genérico "tu zona"/"tu finca".
+        expect(ctx).toMatch(/vereda.*municipio|nombra.*lugar|tu zona/i);
+      });
+
+      it('no duplica la vereda cuando ya viene dentro de region/municipio', () => {
+        // Defensa: si municipio ya incluyera la vereda no debe quedar "vereda El Curí, vereda El Curí".
+        const ctx = buildFincaContext({
+          profile: { ...choachiProfile, vereda: 'El Curí' },
+          month: 5,
+        });
+        const matches = ctx.match(/vereda El Curí/gi) || [];
+        expect(matches.length).toBe(1);
+      });
+    });
   });
 
   // ────────────────────────────────────────────────────────────────────────
