@@ -516,6 +516,102 @@ function _agrochemBySuffix(token) {
  */
 const FAKE_CHEM_CODE_RE = /\b[MIFH]-\d{1,3}\b/g;
 
+// ── #351b (FALLO 1, E2E prod 2026-06-03): suppress-and-replace ───────────────
+
+/**
+ * Subconjunto de la denylist que son FERTILIZANTES minerales de síntesis (no
+ * fungicidas/insecticidas/herbicidas). Solo estos, junto con una DOSIS, gatillan
+ * la SUPRESIÓN del cuerpo (suppress-and-replace). Un fungicida/insecticida sin
+ * dosis sigue en modo append (#17): se le anexa el contrapeso orgánico sin
+ * borrar el texto. La supresión se reserva a la RECETA de fertilizante mineral,
+ * que es la fuga viva de prod (el campesino leía "10 kg de urea… por cada 100 m²").
+ * Normalizados sin diacríticos/case.
+ */
+const SYNTHETIC_FERTILIZER_TERMS = [
+  'urea',
+  'fosfato triple',
+  'superfosfato triple',
+  'fosfato diamonico',
+  'fosfato monoamonico',
+  'sulfato de potasio',
+  'sulfato de amonio',
+  'nitrato de amonio',
+  'nitrato de potasio',
+  'cloruro de potasio',
+  'muriato de potasio',
+  // siglas de campo (TSP = triple super phosphate / fosfato triple)
+  'tsp',
+].map(_stripDiacritics);
+
+/**
+ * Patrones de DOSIS de aplicación. Disparan la SUPRESIÓN solo en combinación con
+ * un fertilizante SINTÉTICO (ver `_hasSyntheticFertilizerDose`). Cubren el fraseo
+ * de campo: "kg/m²", "g/planta", "kg por cada 100 m²", "250 g/planta", "2 bultos
+ * por lote", "50 kg por hectárea", etc. Sobre el texto normalizado sin tildes.
+ *
+ * IMPORTANTE: estos patrones también matchean dosis ORGÁNICAS ("2 kg de
+ * compost") — por eso NUNCA gatillan supresión por sí solos: requieren el token
+ * sintético al lado. Es la conjunción (sintético + dosis) la que es inequívoca.
+ */
+const DOSE_PATTERNS = [
+  // unidad de masa/volumen por unidad de área o planta: "kg/m2", "g/planta", "kg / ha"
+  /\b\d+(?:[.,]\d+)?\s*(kg|g|gr|gramos?|kilos?|cc|ml|l|litros?)\s*\/\s*(m2|m²|planta|mata|ha|hectarea|surco|sitio|hoyo)\b/,
+  // "N kg/g por planta / por mata / por m2 / por cada X m2 / por hectarea / por sitio"
+  /\b\d+(?:[.,]\d+)?\s*(kg|g|gr|gramos?|kilos?|cc|ml|l|litros?)\s+por\s+(cada\s+\d+\s*)?(planta|mata|m2|m²|metro|metros|ha|hectarea|hectareas|surco|sitio|hoyo|lote|arbol|arboles)\b/,
+  // "N bultos/sacos/cargas (de X) por lote / por hectarea / por planta"
+  /\b\d+(?:[.,]\d+)?\s*(bulto[s]?|saco[s]?|carga[s]?|arroba[s]?|costal(?:es)?)\s+(de\s+\S+\s+)?(por|\/|a)\s+/,
+  // dosis genérica de masa "10 kg de <algo>" cuando ya hay sintético en el texto
+  // (el guard exige el sintético aparte; aquí basta el "N kg/g de").
+  /\b\d+(?:[.,]\d+)?\s*(kg|g|gr|gramos?|kilos?)\s+de\b/,
+];
+
+/**
+ * ¿El texto normalizado contiene a la vez (a) un fertilizante SINTÉTICO y (b) un
+ * patrón de DOSIS? Esa conjunción es la que delata una RECETA sintética con
+ * cantidades, que debe SUPRIMIRSE (no concatenar). El NPK formulado / triplete /
+ * siglas DAP·MAP·KCl también cuentan como fertilizante sintético.
+ *
+ * Anti-sobre-supresión: la dosis sola (respuesta orgánica con "2 kg de compost")
+ * NO basta — hace falta el token sintético. Un biopreparado permitido nunca es
+ * sintético (no entra acá).
+ *
+ * @param {string} norm  texto ya normalizado (minúsculas, sin tildes).
+ * @returns {boolean}
+ */
+function _hasSyntheticFertilizerDose(norm) {
+  // (a) ¿hay un fertilizante mineral de síntesis?
+  let hasSynthFert = false;
+  for (const term of SYNTHETIC_FERTILIZER_TERMS) {
+    const re = new RegExp(`(^|[^a-z0-9])${term.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}([^a-z0-9]|$)`);
+    if (re.test(norm)) {
+      hasSynthFert = true;
+      break;
+    }
+  }
+  if (!hasSynthFert) {
+    // NPK / triplete N-P-K / siglas DAP·MAP·KCl también son fertilizante sintético.
+    for (const re of SYNTHETIC_FERTILIZER_PATTERNS) {
+      if (re.test(norm)) {
+        hasSynthFert = true;
+        break;
+      }
+    }
+  }
+  if (!hasSynthFert) return false;
+
+  // (b) ¿hay un patrón de dosis?
+  return DOSE_PATTERNS.some((re) => re.test(norm));
+}
+
+/**
+ * Marcador estable de la nota de redirección orgánica. Sirve para (a) la
+ * idempotencia del guard (no re-disparar sobre un texto ya corregido) y (b)
+ * identificar el bloque en tests/telemetría. Debe coincidir EXACTAMENTE con el
+ * `intro` de `_organicRedirect`.
+ */
+const ORGANIC_REDIRECT_MARKER =
+  'Chagra es agroecológico, no recomendamos agroquímicos ni fertilizantes sintéticos';
+
 /**
  * Texto de corrección honesta que reemplaza una recomendación de sintético.
  * Redirige a la ruta orgánica/biopreparado del catálogo según el tipo de
@@ -535,7 +631,7 @@ function _organicRedirect(originalText) {
     );
 
   const intro =
-    'Una nota importante: Chagra es agroecológico, no recomendamos agroquímicos ni fertilizantes sintéticos. ' +
+    `Una nota importante: ${ORGANIC_REDIRECT_MARKER}. ` +
     'Lo que de verdad funciona y cuida tu suelo y tu salud es el manejo orgánico:';
 
   const lineas = [];
@@ -587,6 +683,15 @@ export function guardSyntheticAgrochemical(responseText, _resolvedEntities = nul
     return { text: responseText ?? '', modified: false, reason: null };
   }
 
+  // Idempotencia: si la corrección orgánica YA está en el texto (append previo o
+  // un suppress-and-replace anterior), no re-disparamos. La nota de redirección
+  // menciona "urea/NPK/fosfatos" de forma EDUCATIVA ("en vez de NPK, urea…"), lo
+  // que de otro modo volvería a marcar el bloque como sintético en un segundo
+  // pase. El marcador es estable (`ORGANIC_REDIRECT_MARKER`).
+  if (responseText.includes(ORGANIC_REDIRECT_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
   const norm = _stripDiacritics(responseText);
   const hits = [];
   for (const term of SYNTHETIC_AGROCHEM_TERMS) {
@@ -634,6 +739,26 @@ export function guardSyntheticAgrochemical(responseText, _resolvedEntities = nul
 
   bumpGuardTelemetry('synthetic_agrochemical');
   const correction = _organicRedirect(responseText);
+
+  // #351b (FALLO 1, E2E prod 2026-06-03): SUPPRESS-AND-REPLACE. Si el texto trae
+  // una RECETA de fertilizante mineral de síntesis CON DOSIS ("10 kg de urea…
+  // por cada 100 m²", "250 g/planta de NPK 10-10-10"), DESCARTAMOS el cuerpo y
+  // devolvemos SOLO el bloque de redirección orgánica. Append-only dejaba la
+  // dosis sintética legible debajo del aviso (el campesino igual la leía). La
+  // supresión SOLO dispara con sintético + dosis: una respuesta orgánica con
+  // cantidades ("2 kg de compost", "1 L de biol por planta") NO entra acá
+  // (`_hasSyntheticFertilizerDose` exige un token SINTÉTICO, no orgánico).
+  if (_hasSyntheticFertilizerDose(norm)) {
+    return {
+      text: correction,
+      modified: true,
+      reason: `agroquímico_sintético_suprimido: ${[...new Set(hits)].join(', ')}`,
+    };
+  }
+
+  // Resto de casos (sintético sin dosis, p.ej. una mención de glifosato o un
+  // fungicida nombrado sin cantidades): se conserva el comportamiento previo
+  // (#17) — se ANEXA el contrapeso orgánico sin borrar el texto.
   const text = `${responseText.trim()}\n\n${correction}`;
   return {
     text,
