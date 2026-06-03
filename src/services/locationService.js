@@ -67,6 +67,34 @@ export function isCoarseLocation(accuracy, threshold = COARSE_ACCURACY_THRESHOLD
 }
 
 /**
+ * ¿La ubicación PERSISTIDA en el perfil es demasiado gruesa para afirmar el
+ * municipio/zona con confianza? (mitad geo de #364, 2026-06-03).
+ *
+ * A diferencia de `isCoarseLocation` (que mira una lectura GPS en vivo), este
+ * predicado mira lo que quedó GUARDADO en el perfil durante el onboarding. El
+ * caso del operador: en Brave los Shields difuminan el GPS y se grabó la
+ * cabecera del municipio grande/caliente (no su vereda) con un radio de
+ * incertidumbre de varios km. El clima/saludo lee esa ubicación guardada y
+ * afirma el municipio equivocado "como si fuera cierto".
+ *
+ * Es coarse ⇔ `ubicacion_accuracy` es un número > umbral Y el usuario NO
+ * corrigió la altitud a mano (`altitud_source !== 'manual'`). Una altitud
+ * manual significa que el usuario YA confirmó su zona → no molestar. Sin
+ * `ubicacion_accuracy` (perfiles fijados por pin/búsqueda, o perfiles viejos)
+ * no podemos afirmar que es gruesa → devolvemos false (no molestamos).
+ *
+ * @param {Object|null|undefined} profile - perfil del usuario (userProfileService).
+ * @param {number} [threshold] - umbral en metros (default COARSE_ACCURACY_THRESHOLD_M).
+ * @returns {boolean}
+ */
+export function isSavedLocationCoarse(profile, threshold = COARSE_ACCURACY_THRESHOLD_M) {
+  if (!profile || typeof profile !== 'object') return false;
+  // El usuario ya fijó su altura real a mano → confirmó su zona, no molestar.
+  if (profile.altitud_source === 'manual') return false;
+  return isCoarseLocation(profile.ubicacion_accuracy, threshold);
+}
+
+/**
  * Metadatos visuales + cultivos recomendados por piso térmico colombiano.
  * Clasificación IDEAM / Caldas. Conocimiento agronómico público (OSS-safe):
  * los cultivos típicos de cada piso térmico son hechos de extensión rural
