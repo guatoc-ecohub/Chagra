@@ -1344,6 +1344,31 @@
         "dosis": {
           "type": "string"
         },
+        "dosis_aplicacion": {
+          "type": "string",
+          "description": "Dosis verificada en formato citable por el agente (grounding anti-alucinacion). Alias canonico que el sidecar/AGE leen como dosis_aplicacion. Cuando aplica, separa la dosis_madre del concentrado vs la dilucion de aplicacion (caso clasico: caldo sulfocalcico, cuya confusion madre/dilucion causaba la debilidad dosis_biopreparado en el bench)."
+        },
+        "frecuencia": {
+          "type": "string",
+          "description": "Cadencia y ventana de aplicacion (cada cuantos dias, etapa, restricciones de hora/temperatura/cosecha)."
+        },
+        "metodo": {
+          "type": "string",
+          "description": "Via de aplicacion: foliar, drench al suelo, incorporado, etc."
+        },
+        "precaucion_seguridad": {
+          "type": "string",
+          "description": "OBLIGATORIO cuando el biopreparado toca metales pesados (Cu en bordeles/visosa), azufre concentrado (sulfocalcico), boro (visosa) u otros biocidas. Incluye toxicologia, EPI requerido, incompatibilidades y nota de uso restringido en certificacion organica si aplica. Tambien riesgo sanitario en tes de estiercol."
+        },
+        "fuente": {
+          "type": "string",
+          "description": "Referencia que respalda la dosis (Restrepo, Agrosavia, SENA, ICA, ficha tecnica). El bench dosis_biopreparado lo cita como hecho obligatorio."
+        },
+        "confianza": {
+          "type": "string",
+          "enum": ["alta", "media", "baja"],
+          "description": "Nivel de confianza en la dosis verificada: alta = receta estandarizada con fuente institucional; media = rango campesino documentado con variacion entre fuentes; baja = gramajes variables/no estandarizados, verificar receta institucional antes de escalar."
+        },
         "target": {
           "type": "array",
           "items": {
