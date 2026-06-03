@@ -1992,6 +1992,205 @@ export function guardFermentoHealthClaim(responseText, { userMessage = null } = 
   };
 }
 
+// ── GUARD: reforestación con especie invasora/combustible ───────────────────
+
+/**
+ * Keywords de intención de REFORESTACIÓN / RESTAURACIÓN ecológica (sobre el
+ * texto normalizado sin tildes). Si la pregunta del usuario las trae, está
+ * pensando en recuperar bosque/ecosistema y NO se le debe recomendar una
+ * especie invasora-combustible sin advertencia. Conservador: cubre el vocablo
+ * campesino ("recuperar el bosque", "sembrar árboles", "volver a tener monte")
+ * además del técnico ("restauración ecológica", "reforestar").
+ */
+const REFORESTACION_INTENT_PATTERNS = [
+  /\breforest\w*\b/, // reforestar, reforestación
+  /\brestaur\w*\b/, // restauración, restaurar (ecológica)
+  /\bregenera\w*\b/, // regeneración natural / regenerar
+  /\brevegeta\w*\b/, // revegetación
+  /\brecuperar\s+(el\s+)?(bosque|monte|suelo|ecosistema|nacimiento|ronda|microcuenca|paramo)\b/,
+  /\bbosque\s+nativo\b/,
+  /\b(arboles|arbol)\s+nativos?\b/,
+  /\bsembrar\s+(arboles|arbol|nativas?|nativos?)\b/,
+  /\b(proteger|cuidar|conservar)\s+(el\s+)?(nacimiento|agua|ronda|microcuenca|fuente)\b/,
+  /\bcorredor\s+biologic\w*\b/,
+  /\bespecies?\s+nativas?\b/,
+];
+
+/**
+ * ¿La pregunta del usuario es de reforestación / restauración? Heurística sobre
+ * el texto normalizado. Sin userMessage → false (gate fail-closed para este
+ * guard: sin saber la intención de restauración no advertimos, para no
+ * contaminar consultas de siembra agrícola normal donde estas especies — p. ej.
+ * leucaena en silvopastoreo — son legítimas).
+ *
+ * @param {string|null|undefined} userMessage
+ * @returns {boolean}
+ */
+function _isReforestacionIntent(userMessage) {
+  if (typeof userMessage !== 'string' || !userMessage.trim()) return false;
+  const norm = _stripDiacritics(userMessage);
+  return REFORESTACION_INTENT_PATTERNS.some((re) => re.test(norm));
+}
+
+/**
+ * Especies marcadas `invasora_combustible=true` en el grafo (consolidado
+ * DR-RESTAURACION-INCENDIOS-2026-06-02 §"Flag invasora_combustible"). Lista
+ * HARDCODEADA a propósito: este es un guard determinístico (como la denylist de
+ * agroquímicos sintéticos), no depende del grounding del turno — debe advertir
+ * incluso si el resolver de entidades falla. Cada entrada trae:
+ *   - `key`: binomio canónico (clave de telemetría/reason).
+ *   - `aliases`: nombres (científico + comunes) a buscar en el texto, sin tildes.
+ *   - `nativas`: alternativas NATIVAS para restauración (del consolidado, S2/S3).
+ *
+ * Cobertura: Leucaena leucocephala, Ulex europaeus (retamo espinoso), Genista
+ * monspessulana (retamo liso), Melinis minutiflora (pasto gordura), Pinus patula
+ * (pino pátula, crítico en páramo), Eucalyptus globulus.
+ */
+const INVASORA_COMBUSTIBLE_SPECIES = [
+  {
+    key: 'Leucaena leucocephala',
+    aliases: ['leucaena leucocephala', 'leucaena'],
+    nativas: ['Alnus acuminata (aliso)', 'Inga spp. (guamo)', 'Trichanthera gigantea (nacedero)'],
+  },
+  {
+    key: 'Ulex europaeus',
+    aliases: ['ulex europaeus', 'ulex', 'retamo espinoso', 'retamo'],
+    nativas: ['Weinmannia tomentosa (encenillo)', 'Clusia multiflora (gaque)', 'Chusquea spp.'],
+  },
+  {
+    key: 'Genista monspessulana',
+    aliases: ['genista monspessulana', 'genista', 'retamo liso'],
+    nativas: ['Weinmannia tomentosa (encenillo)', 'Clusia multiflora (gaque)', 'Chusquea spp.'],
+  },
+  {
+    key: 'Melinis minutiflora',
+    aliases: ['melinis minutiflora', 'melinis', 'pasto gordura'],
+    nativas: [
+      'Alnus acuminata (aliso)',
+      'Inga spp. (guamo)',
+      'gramíneas nativas (Andropogon, Paspalum)',
+    ],
+  },
+  {
+    key: 'Pinus patula',
+    aliases: ['pinus patula', 'pino patula', 'pino'],
+    nativas: [
+      'Quercus humboldtii (roble)',
+      'Polylepis quadrijuga (colorado de páramo)',
+      'Weinmannia tomentosa (encenillo)',
+    ],
+  },
+  {
+    key: 'Eucalyptus globulus',
+    aliases: ['eucalyptus globulus', 'eucalipto'],
+    nativas: [
+      'Quercus humboldtii (roble)',
+      'Alnus acuminata (aliso)',
+      'Weinmannia tomentosa (encenillo)',
+    ],
+  },
+];
+
+/** Marca textual idempotente que deja este guard al anexar su advertencia. */
+const REFORESTACION_NOTE_MARK = 'no se recomienda para restauracion';
+
+/**
+ * ¿El texto menciona la especie invasora por alguno de sus alias, como palabra?
+ * Compara sobre el texto normalizado con límites de palabra laxos para evitar
+ * sub-cadenas accidentales ("pino" dentro de "pinos"/"opino" → el límite lo
+ * resuelve; aun así "pino" es alias deliberadamente conservador para Pinus).
+ *
+ * @param {string} textNorm  respuesta del LLM normalizada (sin tildes).
+ * @param {string[]} aliases  nombres a buscar (ya normalizados).
+ * @returns {string|null} el alias que matcheó, o null.
+ */
+function _mentionsInvasora(textNorm, aliases) {
+  for (const a of aliases) {
+    if (!a) continue;
+    const re = new RegExp(`(^|[^a-z0-9])${a.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}([^a-z0-9]|$)`);
+    if (re.test(textNorm)) return a;
+  }
+  return null;
+}
+
+/**
+ * guardReforestacionInvasora — GUARD fail-safe de RESTAURACIÓN (consolidado
+ * DR-RESTAURACION-INCENDIOS-2026-06-02). SAFETY ecológica.
+ *
+ * Cuando la pregunta del usuario es de REFORESTACIÓN / RESTAURACIÓN ecológica y
+ * la respuesta del LLM menciona una especie marcada `invasora_combustible=true`
+ * (Leucaena, retamo espinoso/Ulex, retamo liso/Genista, pasto gordura/Melinis,
+ * pino pátula/Pinus patula, eucalipto/Eucalyptus globulus), ANEXA una nota de
+ * advertencia: esa especie NO se recomienda para restauración por su riesgo
+ * invasor/combustible, y sugiere nativas del catálogo. NO la borra del texto —
+ * ADVIERTE (el modelo puede haberla nombrado en contexto legítimo: explicar por
+ * qué erradicarla, silvopastoreo controlado, etc.).
+ *
+ * GATING POR INTENCIÓN (anti-falso-positivo): solo corre si `userMessage` es de
+ * reforestación/restauración. En una consulta agrícola normal ("¿siembro
+ * leucaena para sombra del ganado?") NO advierte — leucaena en silvopastoreo
+ * controlado es legítima (consolidado D3). Sin userMessage → no-op (fail-closed
+ * por diseño: no contamina siembra agrícola).
+ *
+ * Lista HARDCODEADA (determinístico, como la denylist de agroquímicos): no
+ * depende del grounding del turno; advierte aunque el resolver falle.
+ *
+ * Idempotente: si la nota ya está, no re-dispara. Firma propia (necesita
+ * userMessage para el gate) → se invoca aparte en applyOutputGuards, fuera de
+ * GUARD_CHAIN.
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardReforestacionInvasora(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Gate de intención: solo en consultas de reforestación/restauración.
+  if (!_isReforestacionIntent(userMessage)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const textNorm = _stripDiacritics(responseText);
+
+  // Idempotencia: si la nota de advertencia ya está, no re-dispara.
+  if (textNorm.includes(REFORESTACION_NOTE_MARK)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const disparadas = [];
+  const nativasSugeridas = [];
+  for (const sp of INVASORA_COMBUSTIBLE_SPECIES) {
+    if (_mentionsInvasora(textNorm, sp.aliases)) {
+      disparadas.push(sp.key);
+      for (const n of sp.nativas) {
+        if (!nativasSugeridas.includes(n)) nativasSugeridas.push(n);
+      }
+    }
+  }
+
+  if (disparadas.length === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('reforestacion_invasora');
+  const nombres = disparadas.join(', ');
+  const altTxt = nativasSugeridas.length
+    ? ` Para restaurar de verdad, mejor usa especies NATIVAS del catálogo: ${nativasSugeridas
+        .slice(0, 4)
+        .join(', ')}.`
+    : '';
+  const advertencia =
+    `⚠️ Aclaración importante de restauración: ${nombres} es una especie INVASORA y ` +
+    `combustible — NO se recomienda para restauración ni reforestación de bosque nativo. ` +
+    `Desplaza la vegetación nativa, acumula necromasa muy inflamable y retroalimenta el ciclo ` +
+    `del fuego (en retamo el incendio incluso activa su banco de semillas). Para restaurar lo ` +
+    `correcto es controlarla, no sembrarla.${altTxt}`;
+  const text = `${responseText.trim()}\n\n${advertencia}`;
+  return { text, modified: true, reason: `reforestacion_invasora: ${nombres}` };
+}
+
 /**
  * Set de guards que SOLO tienen sentido cuando la consulta es de SIEMBRA
  * (A12). Si la pregunta del usuario es de PRECIO/MERCADO (o info general sin
@@ -2149,6 +2348,18 @@ export function applyOutputGuards(
     text = fermRes.text;
     modified = true;
     if (fermRes.reason) reasons.push(fermRes.reason);
+  }
+  // Guard de reforestación con invasora-combustible (DR-RESTAURACION-INCENDIOS,
+  // SAFETY ecológica): firma propia (necesita userMessage para el gate de
+  // intención-restauración). Corre SIEMPRE pero solo actúa si la pregunta es de
+  // reforestación/restauración Y la respuesta nombra una especie invasora-
+  // combustible. Fail-safe: ADVIERTE que no se recomienda para restauración (no
+  // la borra). Determinístico (lista hardcodeada), no depende del grounding.
+  const reforestRes = guardReforestacionInvasora(text, { userMessage });
+  if (reforestRes && reforestRes.modified) {
+    text = reforestRes.text;
+    modified = true;
+    if (reforestRes.reason) reasons.push(reforestRes.reason);
   }
   return { text, modified, reasons };
 }
