@@ -12,7 +12,7 @@
  */
 
 import { openDB, STORES } from '../db/dbCore';
-import { institutionalSourceUrl, resolveSourceLink } from './institutionalSources';
+import { classifySource, resolveSourceLink } from './institutionalSources';
 
 const MAX_TURNS = 100;
 const MAX_DAYS = 30;
@@ -386,6 +386,20 @@ function _normConfianza(v) {
 const _CONFIANZA_RANK = { alta: 3, media: 2, baja: 1 };
 
 /**
+ * Concepto citado por una entidad del grounding, para construir una URL de
+ * búsqueda en una fuente con buscador (Agrosavia/ICA/Cenicafé/FAO/INVIMA).
+ * Prefiere el nombre científico (término más preciso en un repositorio); cae al
+ * nombre común y luego a lo que el usuario mencionó. '' si no hay concepto.
+ */
+function _entityConcept(e) {
+  if (!e || typeof e !== 'object') return '';
+  const cand = [e.nombre_cientifico, e.nombre_comun, e.mentioned].find(
+    (s) => typeof s === 'string' && s.trim().length >= 2,
+  );
+  return cand ? cand.trim() : '';
+}
+
+/**
  * #18 + #20 — extrae de las entidades resueltas (grounding AGE del turno) las
  * señales que la UX muestra como badges, SIN tocar la respuesta del modelo:
  *
@@ -405,7 +419,7 @@ const _CONFIANZA_RANK = { alta: 3, media: 2, baja: 1 };
  * Puro y sin efectos. No muta las entidades.
  *
  * @param {Array<object>|null|undefined} resolvedEntities
- * @returns {{fuente_url?: string, fuente?: string, confianza?: 'alta'|'media'|'baja'}}
+ * @returns {{fuente_url?: string, fuente?: string, fuente_texto?: boolean, confianza?: 'alta'|'media'|'baja'}}
  */
 export function extractGroundingBadges(resolvedEntities) {
   if (!Array.isArray(resolvedEntities) || resolvedEntities.length === 0) return {};
@@ -423,25 +437,31 @@ export function extractGroundingBadges(resolvedEntities) {
   for (const e of ordered) {
     if (!e || typeof e !== 'object') continue;
 
-    // Fuente verificable (#18 + #356): primera fuente linkeable del turno.
-    // Preferimos el deep-link http(s) curado de la entidad (ej. ficha Agrosavia
-    // con species_id). Si no hay deep-link válido pero la entidad cita una
-    // fuente INSTITUCIONAL reconocida (Agrosavia/IDEAM/SIPSA/ICA/Cenicafé…),
-    // linkeamos a la PÁGINA institucional real (#356) — la cita deja de ser
-    // texto muerto. `institutionalSourceUrl` devuelve el deep-link si es válido,
-    // si no la institución, y null si la fuente no es institucional (no inventa).
+    // Fuente verificable (#18 + #356 + refinamiento 2026-06-03): primera fuente
+    // del turno resuelta al MÁXIMO de trazabilidad honesta.
+    //   - deep-link http(s) curado de la entidad (ej. ficha Agrosavia con
+    //     species_id) → link directo, gana sobre todo.
+    //   - institución con buscador (Agrosavia/ICA/Cenicafé/FAO/INVIMA): se
+    //     construye una URL de BÚSQUEDA del concepto citado por la entidad
+    //     (nombre común/científico). NUNCA se linkea a la homepage genérica.
+    //   - institución sin sección/buscador estable (IDEAM/Open-Meteo/DANE) o
+    //     buscador sin concepto → `fuente_texto:true` (la cita va como texto
+    //     plano "Fuente: X", no como link a portada).
+    // Una vez fijada una fuente con LINK no la pisamos; pero un link de un turno
+    // posterior puede mejorar un texto-plano provisional.
     if (!out.fuente_url) {
       const label = typeof e.fuente === 'string' ? e.fuente.trim() : '';
       const deepLink = typeof e.fuente_url === 'string' ? e.fuente_url.trim() : '';
-      const url = institutionalSourceUrl(label, { deepLink });
-      if (url && /^https?:\/\//i.test(url)) {
-        out.fuente_url = url;
-        if (label) out.fuente = label;
-      } else if (/^https?:\/\//i.test(deepLink)) {
-        // Deep-link válido aunque la fuente no sea institucional reconocida
-        // (preserva el comportamiento original: cualquier fuente_url http(s)).
-        out.fuente_url = deepLink;
-        if (label) out.fuente = label;
+      const concept = _entityConcept(e);
+      const r = classifySource(label, { deepLink, concept });
+      if (r.fuente_url) {
+        out.fuente_url = r.fuente_url;
+        if (r.fuente) out.fuente = r.fuente;
+        delete out.fuente_texto;
+      } else if (r.fuente_texto && !out.fuente_texto && !out.fuente) {
+        // Institución reconocida sin recurso puntual: texto plano provisional.
+        out.fuente_texto = true;
+        if (r.fuente) out.fuente = r.fuente;
       }
     }
 
@@ -459,7 +479,7 @@ export function extractGroundingBadges(resolvedEntities) {
 /**
  * Tools cuya institución emisora es fija y conocida (la fuente NO viaja como
  * entidad del grounding sino que es definitoria del tool). Mapea tool → nombre
- * de institución, que `institutionalSourceUrl` resuelve a la página real.
+ * de institución, que `classifySource` resuelve a recurso/sección/texto plano.
  */
 const _TOOL_INSTITUTION = {
   get_clima_ideam: 'IDEAM',
@@ -467,32 +487,37 @@ const _TOOL_INSTITUTION = {
 };
 
 /**
- * #356 — deriva un link de fuente a partir del toolEvidence (no de una entidad
- * del grounding). Pensado para respuestas cuya fuente es el TOOL mismo: el clima
- * viene de `get_clima_ideam` → la cita "Fuente: IDEAM" debe linkear a IDEAM.
+ * #356 (+ refinamiento 2026-06-03) — deriva la fuente a partir del toolEvidence
+ * (no de una entidad del grounding). Pensado para respuestas cuya fuente es el
+ * TOOL mismo: el clima viene de `get_clima_ideam` → la cita "Fuente: IDEAM".
  *
- * Orden de resolución (primero que aplique):
- *   1. `result.fuente_url` deep-link http(s) válido → se usa tal cual.
- *   2. `result.sources` (array) o `result.fuente`/`result.source` (string)
- *      mapeado a una institución reconocida.
- *   3. La institución FIJA del tool (`get_clima_ideam` → IDEAM).
+ * Devuelve la trazabilidad HONESTA máxima disponible:
+ *   1. `result.fuente_url` deep-link http(s) válido → link directo.
+ *   2. `result.sources`/`result.fuente`/`result.source` mapeado a institución,
+ *      construyendo búsqueda del concepto del tool (args.species/name/query) si
+ *      la institución tiene buscador.
+ *   3. La institución FIJA del tool (`get_clima_ideam` → IDEAM). IDEAM no tiene
+ *      sección/buscador estable → `fuente_texto:true` (texto plano, NO homepage).
  * Solo cuenta evidencia con datos reales (no `found:false`/`available:false`).
  *
- * Acepta un evidence simple o un array (tool_chain): en array, devuelve el PRIMER
- * link que resuelva. 100% graceful: sin fuente institucional → {} (sin badge).
+ * Acepta un evidence simple o un array (tool_chain): en array, prefiere el PRIMER
+ * link; si ninguno linkea pero alguno reconoce institución, devuelve texto plano.
+ * 100% graceful: sin fuente institucional → {} (sin badge).
  *
  * @param {object|object[]|null|undefined} toolEvidence
- * @returns {{ fuente?: string, fuente_url?: string }}
+ * @returns {{ fuente?: string, fuente_url?: string, fuente_texto?: boolean }}
  */
 export function deriveEvidenceSourceLink(toolEvidence) {
   if (!toolEvidence) return {};
 
   if (Array.isArray(toolEvidence)) {
+    let plainFallback = null;
     for (const ev of toolEvidence) {
       const link = deriveEvidenceSourceLink(ev);
       if (link.fuente_url) return link;
+      if (link.fuente_texto && !plainFallback) plainFallback = link;
     }
-    return {};
+    return plainFallback || {};
   }
 
   const tool = typeof toolEvidence.tool === 'string' ? toolEvidence.tool : '';
@@ -503,21 +528,46 @@ export function deriveEvidenceSourceLink(toolEvidence) {
   if (result.found === false || result.available === false) return {};
   if (typeof result.matches_count === 'number' && result.matches_count === 0) return {};
 
+  // Concepto citado por el tool (para búsquedas en fuentes con buscador).
+  const concept = _toolConcept(toolEvidence);
+
   // 1+2: deep-link curado o sources institucionales del payload.
   const deepLink = typeof result.fuente_url === 'string' ? result.fuente_url.trim() : '';
   const citedSources = Array.isArray(result.sources)
     ? result.sources
     : [result.fuente, result.source].filter((s) => typeof s === 'string' && s.trim());
-  const fromPayload = resolveSourceLink(citedSources, { deepLink });
-  if (fromPayload.fuente_url) return fromPayload;
+  const fromPayload = resolveSourceLink(citedSources, { deepLink, concept });
+  if (fromPayload.fuente_url || fromPayload.fuente_texto) return fromPayload;
 
-  // 3: institución fija del tool (clima → IDEAM).
+  // 3: institución fija del tool (clima → IDEAM, hoy texto plano).
   const inst = _TOOL_INSTITUTION[tool];
   if (inst) {
-    const url = institutionalSourceUrl(inst);
-    if (url) return { fuente: inst, fuente_url: url };
+    const r = classifySource(inst, { concept });
+    if (r.fuente_url || r.fuente_texto) return r;
   }
   return {};
+}
+
+/**
+ * Concepto que cita un toolEvidence, para una URL de búsqueda en fuentes con
+ * buscador. Lo toma de los args (la especie/cultivo/término consultado) o del
+ * nombre devuelto. '' si no hay un término usable.
+ */
+function _toolConcept(ev) {
+  if (!ev || typeof ev !== 'object') return '';
+  const args = ev.args && typeof ev.args === 'object' ? ev.args : {};
+  const result = ev.result && typeof ev.result === 'object' ? ev.result : {};
+  const cand = [
+    args.species,
+    args.name,
+    args.nombre,
+    args.query,
+    args.q,
+    result.nombre_cientifico,
+    result.nombre_comun,
+    result.species && result.species.name,
+  ].find((s) => typeof s === 'string' && s.trim().length >= 2);
+  return cand ? cand.trim() : '';
 }
 
 /**

@@ -372,33 +372,71 @@ describe('extractGroundingBadges (#18 fuente_url + #20 confianza)', () => {
   });
 
   // ──────────────────────────────────────────────────────────────────────
-  // #356 — FUENTE → LINK. Cuando una entidad cita una fuente INSTITUCIONAL
-  // (Agrosavia, IDEAM, SIPSA, ICA, Cenicafé…) pero NO trae un deep-link, el
-  // badge debe linkear a la PÁGINA institucional real (no quedar como texto
-  // muerto). Si la entidad sí trae un fuente_url http(s), ese deep-link manda.
+  // #356 + refinamiento 2026-06-03 — FUENTE → RECURSO CITADO, NUNCA homepage.
+  // Una fuente con buscador (Agrosavia/ICA/Cenicafé/FAO/INVIMA) linkea a la
+  // BÚSQUEDA del concepto de la entidad. Una fuente sin sección/buscador
+  // (IDEAM/Open-Meteo/DANE) queda como TEXTO PLANO (fuente_texto:true), nunca
+  // un link a la portada. El deep-link http(s) de la entidad siempre gana.
   // ──────────────────────────────────────────────────────────────────────
-  describe('#356 — fuente institucional sin deep-link → link a la institución', () => {
-    test('biopreparado con fuente "Agrosavia" y sin fuente_url → linkea a Agrosavia', () => {
+  describe('#356-refino — link al recurso citado o texto plano, nunca homepage', () => {
+    test('biopreparado "Agrosavia" sin URL → búsqueda del concepto (NO la home del repo)', () => {
       const out = extractGroundingBadges([
         { kind: 'biopreparado', nombre_comun: 'Caldo bordelés', fuente: 'Agrosavia', confianza: 'alta' },
       ]);
       expect(out.fuente).toBe('Agrosavia');
-      expect(out.fuente_url).toContain('agrosavia.co');
+      expect(out.fuente_url).toContain('agrosavia.co/search');
+      expect(out.fuente_url).toContain('query=');
+      expect(out.fuente_texto).toBeUndefined();
       expect(out.confianza).toBe('alta');
     });
 
-    test('species citando ICA sin URL → link a ica.gov.co', () => {
+    test('species citando ICA con nombre → búsqueda en ICA (no su home)', () => {
       const out = extractGroundingBadges([
         { kind: 'species', nombre_comun: 'Aguacate', fuente: 'ICA' },
       ]);
       expect(out.fuente).toBe('ICA');
-      expect(out.fuente_url).toContain('ica.gov.co');
+      expect(out.fuente_url).toContain('ica.gov.co/buscador');
+      expect(out.fuente_url).toContain('Aguacate');
     });
 
-    test('el deep-link http(s) de la entidad gana sobre el mapeo institucional', () => {
+    test('prefiere el nombre CIENTÍFICO como término de búsqueda (más preciso)', () => {
+      const out = extractGroundingBadges([
+        { kind: 'species', nombre_comun: 'Lulo', nombre_cientifico: 'Solanum quitoense', fuente: 'Agrosavia' },
+      ]);
+      expect(out.fuente_url).toContain('Solanum');
+    });
+
+    test('fuente institucional sin sección/buscador (IDEAM) → TEXTO PLANO, sin URL', () => {
+      const out = extractGroundingBadges([
+        { kind: 'species', nombre_comun: 'Maíz', fuente: 'IDEAM' },
+      ]);
+      expect(out.fuente).toBe('IDEAM');
+      expect(out.fuente_texto).toBe(true);
+      expect(out.fuente_url).toBeUndefined();
+    });
+
+    test('fuente con buscador pero entidad SIN concepto → texto plano (no buscador vacío)', () => {
+      const out = extractGroundingBadges([{ kind: 'biopreparado', fuente: 'Cenicafé' }]);
+      expect(out.fuente).toBe('Cenicafé');
+      expect(out.fuente_texto).toBe(true);
+      expect(out.fuente_url).toBeUndefined();
+    });
+
+    test('un LINK de un turno posterior mejora el texto-plano provisional', () => {
+      const out = extractGroundingBadges([
+        { kind: 'species', fuente: 'IDEAM' }, // texto plano
+        { kind: 'biopreparado', nombre_comun: 'Caldo bordelés', fuente: 'Agrosavia' }, // link
+      ]);
+      expect(out.fuente).toBe('Agrosavia');
+      expect(out.fuente_url).toContain('agrosavia.co/search');
+      expect(out.fuente_texto).toBeUndefined();
+    });
+
+    test('el deep-link http(s) de la entidad gana sobre la búsqueda', () => {
       const out = extractGroundingBadges([
         {
           kind: 'biopreparado',
+          nombre_comun: 'Caldo bordelés',
           fuente: 'Agrosavia',
           fuente_url: 'https://repository.agrosavia.co/handle/123/ficha-real',
         },
@@ -406,46 +444,51 @@ describe('extractGroundingBadges (#18 fuente_url + #20 confianza)', () => {
       expect(out.fuente_url).toBe('https://repository.agrosavia.co/handle/123/ficha-real');
     });
 
-    test('fuente NO institucional sin URL → NO inventa link', () => {
+    test('fuente NO institucional sin URL → NO inventa link ni texto', () => {
       const out = extractGroundingBadges([
         { kind: 'species', nombre_comun: 'Lulo', fuente: 'apuntes de un taller' },
       ]);
       expect(out.fuente_url).toBeUndefined();
+      expect(out.fuente_texto).toBeUndefined();
+      expect(out.fuente).toBeUndefined();
     });
 
-    test('fuente_url inseguro pero fuente institucional → cae al link institucional', () => {
+    test('fuente_url inseguro pero fuente institucional con buscador → cae a la búsqueda', () => {
       const out = extractGroundingBadges([
-        { kind: 'biopreparado', fuente: 'IDEAM', fuente_url: 'javascript:alert(1)' },
+        { kind: 'biopreparado', nombre_comun: 'Caldo bordelés', fuente: 'Agrosavia', fuente_url: 'javascript:alert(1)' },
       ]);
-      expect(out.fuente_url).toContain('ideam.gov.co');
-      expect(out.fuente).toBe('IDEAM');
+      expect(out.fuente_url).toContain('agrosavia.co/search');
     });
   });
 });
 
 // ────────────────────────────────────────────────────────────────────────
-// #356 — fuente de un TOOL (no entidad). El clima viene de get_clima_ideam:
-// la institución emisora (IDEAM) no es una entidad del grounding sino el
-// tool mismo. deriveEvidenceSourceLink mapea el tool / sus sources a un link.
+// #356 + refinamiento 2026-06-03 — fuente de un TOOL (no entidad). El clima
+// viene de get_clima_ideam: IDEAM no expone un deep-link al pronóstico, así
+// que la cita se presenta como TEXTO PLANO. Las fuentes con buscador linkean a
+// la búsqueda del concepto del tool. NUNCA se linkea a una homepage.
 // ────────────────────────────────────────────────────────────────────────
-describe('deriveEvidenceSourceLink (#356 — fuente del tool → link)', () => {
-  test('get_clima_ideam → link a IDEAM', () => {
+describe('deriveEvidenceSourceLink (#356-refino — recurso citado o texto plano)', () => {
+  test('get_clima_ideam → TEXTO PLANO "Fuente: IDEAM" (no link a la home)', () => {
     const out = deriveEvidenceSourceLink({
       tool: 'get_clima_ideam',
       args: { municipio: 'Choachí' },
       result: { available: true, monthly_avg: 120 },
     });
     expect(out.fuente).toBe('IDEAM');
-    expect(out.fuente_url).toContain('ideam.gov.co');
+    expect(out.fuente_texto).toBe(true);
+    expect(out.fuente_url).toBeUndefined();
   });
 
-  test('result con sources[] institucionales → primer link reconocido', () => {
+  test('result con sources[] institucional con buscador + concepto en args → búsqueda', () => {
     const out = deriveEvidenceSourceLink({
       tool: 'get_species',
+      args: { name: 'lulo' },
       result: { found: true, sources: ['Agrosavia', 'Wikipedia'] },
     });
     expect(out.fuente).toBe('Agrosavia');
-    expect(out.fuente_url).toContain('agrosavia.co');
+    expect(out.fuente_url).toContain('agrosavia.co/search');
+    expect(out.fuente_url).toContain('lulo');
   });
 
   test('result.fuente_url deep-link válido gana', () => {
@@ -462,11 +505,21 @@ describe('deriveEvidenceSourceLink (#356 — fuente del tool → link)', () => {
     expect(deriveEvidenceSourceLink({ tool: 'get_clima_ideam', result: { found: false } })).toEqual({});
   });
 
-  test('array de evidences (tool_chain) → primer link encontrado', () => {
+  test('array de evidences (tool_chain): un LINK gana sobre un texto-plano', () => {
+    const out = deriveEvidenceSourceLink([
+      { tool: 'get_clima_ideam', result: { available: true } }, // texto plano
+      { tool: 'get_species', args: { name: 'lulo' }, result: { found: true, sources: ['Agrosavia'] } }, // link
+    ]);
+    expect(out.fuente_url).toContain('agrosavia.co');
+  });
+
+  test('array de evidences: si ninguna linkea pero hay institución de texto → texto plano', () => {
     const out = deriveEvidenceSourceLink([
       { tool: 'get_companions', result: { companions: [{ id: 'a' }] } },
       { tool: 'get_clima_ideam', result: { available: true } },
     ]);
-    expect(out.fuente_url).toContain('ideam.gov.co');
+    expect(out.fuente).toBe('IDEAM');
+    expect(out.fuente_texto).toBe(true);
+    expect(out.fuente_url).toBeUndefined();
   });
 });
