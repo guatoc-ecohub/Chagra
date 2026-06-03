@@ -162,6 +162,25 @@ describe('buildProactiveGreeting — SIN pendientes (idea contextual, NO inventa
     expect(g.lead).not.toMatch(ALARM_WORDS);
     expect(g.lead.length).toBeGreaterThan(20);
   });
+
+  // Fix 2026-06-03: el saludo afirmaba la temporada como HECHO ("Como estamos en
+  // segunda temporada seca…") en plena época de lluvias → falso. Ahora la enmarca
+  // como referencia de calendario que SIEMPRE cede al clima real de la finca.
+  it('NO afirma el clima de hoy como hecho — enmarca la temporada como calendario y defiere al clima real', () => {
+    for (const ctx of [
+      { cultivos: [{ name: 'Fresa', count: 8 }], altitud: 2600 }, // rama cultivo
+      { cultivos: [], altitud: 2600 }, // rama piso térmico
+      { cultivos: [], altitud: null }, // rama fallback
+    ]) {
+      const g = buildProactiveGreeting({ activeAlerts: [], pendingTasks: [], date: MORNING, ...ctx });
+      expect(g.state).toBe('idea');
+      // NUNCA debe afirmar la temporada como un parte meteorológico presente.
+      expect(g.lead).not.toMatch(/(como )?estamos en .*temporada/i);
+      // SÍ debe enmarcarla como calendario y deferir explícitamente al clima real.
+      expect(g.lead.toLowerCase()).toContain('el calendario marca');
+      expect(g.lead.toLowerCase()).toContain('clima real');
+    }
+  });
 });
 
 describe('buildProactiveGreeting — saludo según hora', () => {

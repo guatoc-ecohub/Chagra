@@ -189,6 +189,18 @@ function buildPendingLead(items) {
  * @param {Object|null} ctx.ensoOutlook — { titulo, detalle, fuente } de getEnsoOutlook.
  * @param {Date} ctx.date
  */
+/**
+ * Enmarca la temporada bimodal como TENDENCIA de calendario — NUNCA como
+ * afirmación del clima de HOY. `temporadaColombiana` es pura aritmética del mes;
+ * el ENSO y la variabilidad del año la modulan, y el clima real de la finca
+ * manda. (Fix 2026-06-03: el saludo afirmaba "estamos en temporada seca" en
+ * plena época de lluvias — falso. Ahora es una referencia calendárica, no un
+ * parte meteorológico, y siempre cede ante lo que el campesino ve en su finca.)
+ */
+function marcoCalendario(temporada) {
+  return `el calendario marca ${temporada.nombre}, pero el clima real de tu finca manda`;
+}
+
 function buildIdeaLead({ cultivos = [], altitud = null, ensoOutlook = null, date = new Date() }) {
   const temporada = temporadaColombiana(date.getMonth() + 1);
   const piso = pisoTermicoFromAltitud(altitud);
@@ -198,18 +210,18 @@ function buildIdeaLead({ cultivos = [], altitud = null, ensoOutlook = null, date
 
   if (topCultivo && topCultivo.name) {
     const nombre = String(topCultivo.name).replace(/\s*#\d+\s*$/, '').trim();
-    return `Todo tranquilo por ahora. Como estamos en ${temporada.nombre}, es buena semana para revisar tu ${nombre.toLowerCase()} — ${temporada.detalle}. ¿Te armo un plan?`;
+    return `Todo tranquilo por ahora. Buena semana para echarle un ojo a tu ${nombre.toLowerCase()} — ${marcoCalendario(temporada)}. ¿Cómo viene el tiempo por allá? ¿Te armo un plan?`;
   }
 
   if (piso) {
-    return `Todo tranquilo por ahora. Tu finca está en piso térmico ${piso}; en ${temporada.nombre} (${temporada.detalle}) es buen momento para planear qué sembrar. ¿Te muestro especies que van bien en tu zona?`;
+    return `Todo tranquilo por ahora. Tu finca está en piso térmico ${piso} — ${marcoCalendario(temporada)}. Buen momento para planear qué sembrar; ¿te muestro especies que van bien en tu zona?`;
   }
 
   if (ensoOutlook && ensoOutlook.titulo) {
     return `Todo tranquilo por ahora. ${ensoOutlook.titulo}: ${ensoOutlook.detalle} (${ensoOutlook.fuente}). ¿Quieres que ajustemos el calendario a eso?`;
   }
 
-  return `Todo tranquilo por ahora — no hay nada urgente en tu finca. Estamos en ${temporada.nombre}; cuéntame qué tienes sembrado y te doy una mano con el plan.`;
+  return `Todo tranquilo por ahora — no hay nada urgente en tu finca. El calendario marca ${temporada.nombre}, pero el clima real manda; cuéntame qué tienes sembrado y cómo viene el tiempo, y te doy una mano con el plan.`;
 }
 
 /**
