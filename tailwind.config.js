@@ -149,11 +149,15 @@ export default {
             },
         },
     },
-    darkMode: ['class', '[data-theme="dark-sober"]'],
+    // Bio-punk (default) es el modo oscuro base de la app (sin data-theme).
+    // 'class' se mantiene por compatibilidad con utilidades dark: existentes.
+    darkMode: 'class',
     plugins: [
+        // Variantes para condicionar estilos por tema curado (operador 2026-06-03).
+        // bio-punk es el base → no necesita variante; nature/minimalista sí.
         function ({ addVariant }) {
-            addVariant('theme-light', '[data-theme="light"] &');
-            addVariant('theme-dark-sober', '[data-theme="dark-sober"] &');
+            addVariant('theme-nature', '[data-theme="nature"] &');
+            addVariant('theme-minimalista', '[data-theme="minimalista"] &');
         },
     ],
 }
