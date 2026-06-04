@@ -144,7 +144,14 @@
 [data-theme="minimalista"] .text-orange-300,
 [data-theme="minimalista"] .text-violet-300,
 [data-theme="minimalista"] .text-violet-400,
-[data-theme="minimalista"] .text-yellow-300,
+[data-theme="minimalista"] .text-yellow-300 {
+  color: rgb(var(--c-emerald-400)) !important;  /* salvia oscura minimalista (AA) */
+  text-shadow: none !important;
+}
+
+/* Nature: la salvia clara (--c-emerald-400 = 122 143 74) NO contrasta sobre la
+ * crema (≈2.9, medido). Para los NÚMEROS/textos del impacto usamos el verde
+ * profundo del tema (--c-emerald-700 = 70 84 40) que sí pasa AA sobre crema. */
 [data-theme="nature"] .text-cyan-300,
 [data-theme="nature"] .text-lime-300,
 [data-theme="nature"] .text-fuchsia-300,
@@ -153,7 +160,7 @@
 [data-theme="nature"] .text-violet-300,
 [data-theme="nature"] .text-violet-400,
 [data-theme="nature"] .text-yellow-300 {
-  color: rgb(var(--c-emerald-400)) !important;  /* acento del tema (salvia) */
+  color: rgb(var(--c-emerald-700)) !important;  /* verde profundo cálido (AA) */
   text-shadow: none !important;
 }
 
@@ -172,6 +179,87 @@
 [data-theme="nature"] .bg-violet-500,
 [data-theme="nature"] .bg-yellow-500 {
   background-color: rgb(var(--c-emerald-400)) !important;
+}
+
+/* ===========================================================================
+ * 3bis. BLANCO NO THEME-AWARE — la raíz del "repeye" en temas claros.
+ *    `white` NO está en el mapa de CSS-vars de Tailwind (solo slate/emerald/
+ *    amber/surface lo están), así que `text-white` (≈300 usos), `border-white/*`
+ *    y los scrims "glass" `bg-white/<α>` quedaban con su valor literal #fff en
+ *    los temas claros:
+ *      - text-white  → texto BLANCO sobre card crema  = ILEGIBLE (contraste ~1.0,
+ *                      medido empíricamente con la sonda de contraste 2026-06-04).
+ *      - border-white/* → línea blanca invisible sobre crema.
+ *      - bg-white/<α>  → scrim translúcido blanco sobre crema = ningún contraste
+ *                        (el "glass" del compositor/chips del agente desaparece).
+ *    En bio-punk (oscuro) ese blanco ES correcto, por eso solo lo viramos en los
+ *    dos temas claros. text-white → tinta del tema; bordes/scrims → tinta sutil.
+ *    (bg-white SÓLIDO —las cards— se deja: es la superficie clara correcta.)
+ * =========================================================================== */
+
+/* Texto blanco → tinta legible del tema (slate-100 ya es tinta en claro). */
+[data-theme="minimalista"] .text-white,
+[data-theme="nature"] .text-white {
+  color: rgb(var(--c-slate-100)) !important;
+}
+[data-theme="minimalista"] .text-white\/70,
+[data-theme="minimalista"] .text-white\/60,
+[data-theme="nature"] .text-white\/70,
+[data-theme="nature"] .text-white\/60 {
+  color: rgb(var(--c-slate-300)) !important; /* secundario, un punto más suave */
+}
+
+/* EXCEPCIÓN: sobre un BOTÓN/superficie de acento SÓLIDO el blanco sigue siendo
+ * lo correcto (p.ej. el botón "enviar" verde del demo lleva ícono blanco). En
+ * los temas claros esos acentos (emerald/sky/lime/amber 500/400) ya son verdes/
+ * ocres OSCUROS vía la indirección, así que blanco encima contrasta bien. Mayor
+ * especificidad (dos clases) gana sobre la regla genérica de arriba. */
+[data-theme="minimalista"] .bg-emerald-500.text-white,
+[data-theme="minimalista"] .bg-emerald-600.text-white,
+[data-theme="minimalista"] .bg-sky-500.text-white,
+[data-theme="minimalista"] .bg-muzo.text-white,
+[data-theme="nature"] .bg-emerald-500.text-white,
+[data-theme="nature"] .bg-emerald-600.text-white,
+[data-theme="nature"] .bg-sky-500.text-white,
+[data-theme="nature"] .bg-muzo.text-white {
+  color: #fff !important;
+}
+
+/* Texto ÁMBAR claro sobre superficie clara = ilegible. En los temas claros el
+ * mapa de vars hace que amber-100..400 sean ocres CLAROS (pensados para texto
+ * sobre fondo OSCURO en biopunk). Como TEXTO sobre crema no contrastan (nature
+ * text-amber-400 medido ≈1.75). Los viramos al ocre OSCURO del tema
+ * (--c-amber-700) que sí pasa AA. NO tocamos `bg-amber-*` (los botones ocres del
+ * demo conservan su relleno). */
+[data-theme="minimalista"] .text-amber-100,
+[data-theme="minimalista"] .text-amber-200,
+[data-theme="minimalista"] .text-amber-300,
+[data-theme="minimalista"] .text-amber-400,
+[data-theme="minimalista"] .text-amber-500,
+[data-theme="nature"] .text-amber-100,
+[data-theme="nature"] .text-amber-200,
+[data-theme="nature"] .text-amber-300,
+[data-theme="nature"] .text-amber-400,
+[data-theme="nature"] .text-amber-500 {
+  color: rgb(var(--c-amber-700)) !important;
+  text-shadow: none !important;
+}
+
+/* Bordes blancos (sólidos y con opacidad) → línea sutil del tema. */
+[data-theme="minimalista"] .border-white,
+[data-theme="minimalista"] [class*="border-white\/"],
+[data-theme="nature"] .border-white,
+[data-theme="nature"] [class*="border-white\/"] {
+  border-color: rgb(var(--c-surface-border)) !important;
+}
+
+/* Scrims "glass" blancos translúcidos (compositor del home, chips del agente,
+ * superficies elevadas) → un velo del color elevado del tema, así la superficie
+ * se distingue del fondo crema en vez de desaparecer. NO tocamos `bg-white`
+ * SÓLIDO (sin barra de opacidad) que es la card clara correcta. */
+[data-theme="minimalista"] [class*="bg-white\/"],
+[data-theme="nature"] [class*="bg-white\/"] {
+  background-color: rgb(var(--c-surface-raised) / 0.55) !important;
 }
 
 /* ===========================================================================
