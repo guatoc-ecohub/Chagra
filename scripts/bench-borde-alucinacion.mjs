@@ -53,8 +53,14 @@ import { applyOutputGuards } from '../src/services/outputGuards.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
-// BENCH_OUTPUT_DIR persiste FUERA del worktree efímero (al repo principal).
-const BENCH_RUNS_DIR = process.env.BENCH_OUTPUT_DIR || join(ROOT_DIR, 'data', 'bench-runs');
+// Default FUERA del repo/worktree (`_bench-results`): así un agente que corre el
+// bench en su worktree efímero NO pierde el artefacto al borrarse el worktree, y no
+// ensucia el árbol git. Override con BENCH_OUTPUT_DIR. Fallback a data/bench-runs
+// (gitignored) solo si el dir externo no es escribible. (retro worktrees 2026-06-04)
+const BENCH_EXTERNAL_DIR = '/home/kortux/Workspace/_bench-results';
+const BENCH_RUNS_DIR =
+  process.env.BENCH_OUTPUT_DIR ||
+  (existsSync(dirname(BENCH_EXTERNAL_DIR)) ? BENCH_EXTERNAL_DIR : join(ROOT_DIR, 'data', 'bench-runs'));
 
 // ── generador config-PROD (= ROUTES.chat_complex de llmRouter.js) ─────────────
 const GEN_MODEL = process.env.GEN_MODEL || 'granite3.1-dense:8b';
