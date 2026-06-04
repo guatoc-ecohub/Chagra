@@ -2218,10 +2218,18 @@ export function guardSpeciesSubstitution(responseText, resolvedEntities = null, 
     const nombre = (e.nombre_comun || e.mentioned || '').toString();
     if (!nombre) continue;
     // El cultivo debe ser nombrado en el texto para atribuirle una sustitución.
-    // Usamos el primer token del nombre común (ej. "Lulo" de "Lulo / Naranjilla").
-    const nombreNorm = _stripDiacritics(nombre.split('/')[0]);
-    const firstWord = nombreNorm.split(/\s+/)[0];
-    if (!firstWord || firstWord.length < 3 || !norm.includes(firstWord)) continue;
+    // ANCLA: para nombres de UNA palabra usamos el token (ej. "lulo"). Para
+    // nombres MULTI-palabra (ej. "tomate de árbol") exigimos los DOS primeros
+    // tokens contiguos — NO solo el genérico "tomate", que colisiona con
+    // homónimos distintos ("tomate arandano") y disparaba correcciones FALSAS,
+    // atribuyendo el binomio de un cultivo a otro (bug piloto 2026-06-04: el
+    // resolver fuzzy-matcheó "tomate arandano" → cultivares "tomate de árbol" y
+    // el guard "corrigió" Solanum betaceum sobre un texto que no era tomate de árbol).
+    const nombreNorm = _stripDiacritics(nombre.split('/')[0]).trim();
+    const tokens = nombreNorm.split(/\s+/).filter(Boolean);
+    const firstWord = tokens[0];
+    const anchor = tokens.length > 1 ? `${tokens[0]} ${tokens[1]}` : tokens[0];
+    if (!anchor || anchor.length < 3 || !norm.includes(anchor)) continue;
 
     // Si el binomio correcto ya está en el texto, el cultivo está bien atribuido.
     if (norm.includes(correctBin)) continue;
@@ -2230,7 +2238,7 @@ export function guardSpeciesSubstitution(responseText, resolvedEntities = null, 
     // culprit debe ser un binomio real del catálogo (está en `realInText`) y
     // distinto del binomio correcto del cultivo. Si el cultivo no está cerca de
     // ninguno, no atribuimos (conservador).
-    const idxNombre = norm.indexOf(firstWord);
+    const idxNombre = norm.indexOf(anchor);
     let culprit = null;
     for (const fb of realInText) {
       if (fb === correctBin) continue; // su propio binomio correcto no es culprit.
