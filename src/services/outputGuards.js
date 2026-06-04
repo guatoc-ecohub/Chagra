@@ -705,6 +705,101 @@ function _hasSyntheticPesticideBrandOrDose(norm, hits) {
   return hasBrand || hasDose;
 }
 
+// ── PATRÓN (b) BORDE-020: combustible/solvente disfrazado de "adyuvante" ─────
+
+/**
+ * Combustibles y solventes de petróleo que el modelo trata como "adherente/
+ * adyuvante" de un biopreparado ("échale un chorro de ACPM al purín"). NO son
+ * insumos agrícolas: son fitotóxicos, contaminan el suelo y dejan residuo. NUNCA
+ * van en un preparado. `acpm` (Aceite Combustible Para Motores = diésel colombiano)
+ * es el caso real de BORDE-020; granite además INVENTÓ una expansión inocua
+ * ("Aceite Cítrico Puro Mecanicamente") para disfrazarlo. Normalizados sin tildes.
+ *
+ * Nota: van en su PROPIO conjunto (no en `SYNTHETIC_AGROCHEM_TERMS`) porque sus
+ * tokens son palabras cortas/comunes que podrían colisionar fuera de contexto de
+ * mezcla; aquí solo cuentan junto a una DOSIS o a un verbo de mezcla/adherencia.
+ */
+const DISGUISED_FUEL_TERMS = [
+  'acpm',
+  'diesel',
+  'diésel',
+  'gasolina',
+  'kerosene',
+  'keroseno',
+  'querosene',
+  'petroleo',
+  'petróleo',
+  'varsol',
+  'thinner',
+  'tiner',
+  'aguarras',
+  'aguarrás',
+  'combustible',
+].map(_stripDiacritics);
+
+/**
+ * Expansión INVENTADA de la sigla ACPM con que el modelo la disfraza de insumo
+ * benigno ("Aceite Cítrico Puro Mecanicamente"). ACPM en Colombia es diésel
+ * (Aceite Combustible Para Motores), nunca un "aceite cítrico". Sobre texto
+ * normalizado. Captura la frase completa para no marcar un aceite cítrico real.
+ */
+const FAKE_ACPM_EXPANSION_RE = /\baceite\s+citrico\s+puro\s+mecanicamente\b/;
+
+/**
+ * Verbo/giro de MEZCLA o ADHERENCIA que delata que el combustible se usa COMO
+ * insumo del preparado (no una mención de pasada). Sobre texto normalizado.
+ */
+const FUEL_AS_ADJUVANT_RE =
+  /\b(adherent|adyuvant|pegue|pegar|peg[ao]\s|se\s+adhier|mezcl\w*|dilu\w*|agreg\w*|anad\w*|chorro\s+de|reforz\w*|echa\w*|combin\w*)\b/;
+
+/**
+ * ¿El texto normalizado usa un combustible/solvente como adyuvante de un preparado
+ * CON una dosis (o con un verbo de mezcla/adherencia)? Esa conjunción delata la
+ * RECETA peligrosa de BORDE-020 que debe SUPRIMIRSE. Anti-sobre-supresión: sin el
+ * verbo de mezcla/adherencia ni dosis (p.ej. "no le eches diésel") no entra acá; la
+ * advertencia de no-usar la corta el gate `esAdvertenciaNoUsar` en el guard.
+ *
+ * @param {string} norm  texto normalizado (minúsculas, sin tildes).
+ * @returns {{hit:boolean, terms:string[]}}
+ */
+function _disguisedFuelHits(norm) {
+  const terms = [];
+  for (const term of DISGUISED_FUEL_TERMS) {
+    const re = new RegExp(`(^|[^a-z0-9])${term.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}([^a-z0-9]|$)`);
+    if (re.test(norm)) terms.push(term);
+  }
+  if (FAKE_ACPM_EXPANSION_RE.test(norm) && !terms.includes('acpm')) terms.push('acpm');
+  if (terms.length === 0) return { hit: false, terms: [] };
+  // Requiere contexto de mezcla/adherencia O una dosis: la conjunción es la fuga.
+  const ctx =
+    FUEL_AS_ADJUVANT_RE.test(norm) ||
+    PESTICIDE_DOSE_PATTERNS.some((re) => re.test(norm)) ||
+    DOSE_PATTERNS.some((re) => re.test(norm)) ||
+    /\b\d+(?:[.,]\d+)?\s*(cc|ml|cm3|cm\b|centimetros?|litros?|l)\b/.test(norm);
+  return { hit: ctx, terms };
+}
+
+/**
+ * Redirección agroecológica específica del combustible-disfrazado-de-adyuvante
+ * (PATRÓN b · BORDE-020). REEMPLAZA la receta de ACPM/diésel con los hechos que el
+ * campesino necesita: el combustible es FITOTÓXICO (quema la hoja, contamina), el
+ * purín se aplica DILUIDO (1:10 a 1:20, nunca concentrado puro), y el adherente
+ * REAL es jabón potásico (no diésel). No nombra dosis de combustible. Estable para
+ * idempotencia (contiene `ORGANIC_REDIRECT_MARKER`).
+ */
+function _fuelAdjuvantRedirect() {
+  return (
+    `Una nota importante: ${ORGANIC_REDIRECT_MARKER}. El ACPM/diésel (o cualquier combustible) NO es un ` +
+    'adherente agrícola: es FITOTÓXICO, quema la hoja, deja residuo y contamina el suelo y el agua. Nunca lo ' +
+    'mezcles en un purín ni en un caldo.\n\n' +
+    'Lo correcto con el purín de ortiga:\n' +
+    '- Aplícalo DILUIDO (de 1:10 a 1:20 en agua), nunca concentrado puro al follaje, porque concentrado quema.\n' +
+    '- Como adherente usa jabón potásico (unos pocos ml por litro), no diésel ni ACPM.\n' +
+    '- Aplica al envés de las hojas y al atardecer, y repite según veas la plaga, sin "acabarla de una".\n' +
+    '- Si dudas de la dilución o la frecuencia, consúltalo con tu técnico agrícola local o el ICA.'
+  );
+}
+
 /**
  * Marcador estable de la nota de redirección orgánica. Sirve para (a) la
  * idempotencia del guard (no re-disparar sobre un texto ya corregido) y (b)
@@ -835,12 +930,43 @@ export function guardSyntheticAgrochemical(responseText, _resolvedEntities = nul
     for (const c of codes) hits.push(c);
   }
 
+  // PATRÓN (b) BORDE-020: combustible/solvente (ACPM/diésel/gasolina) usado como
+  // "adyuvante/adherente" de un preparado, con dosis o verbo de mezcla. Es una
+  // RECETA peligrosa (fitotóxica) disfrazada de orgánica, con la sigla a veces
+  // renombrada ("Aceite Cítrico Puro Mecanicamente"). Anti-FP: si el texto NOMBRA
+  // el combustible para DESACONSEJARLO ("nunca uses ACPM/diésel") no lo contamos —
+  // esa advertencia es justo lo correcto y debe conservarse intacta.
+  const fuel = _disguisedFuelHits(norm);
+  const fuelEsAdvertenciaNoUsar = /\b(no|nunca|evita|evite|jamas)\b[^.!?]{0,40}\b(uses?|use|apliques?|aplique|eches?|mezcles?|combines?|le\s+pongas?|agregues?)\b/.test(
+    norm,
+  );
+  let hasFuelRecipe = false;
+  if (fuel.hit && !fuelEsAdvertenciaNoUsar) {
+    hasFuelRecipe = true;
+    for (const t of fuel.terms) hits.push(t);
+  }
+
   if (hits.length === 0) {
     return { text: responseText, modified: false, reason: null };
   }
 
   bumpGuardTelemetry('synthetic_agrochemical');
   const correction = _organicRedirect(responseText);
+
+  // PATRÓN (b) BORDE-020: SUPPRESS-AND-REPLACE de combustible disfrazado de
+  // adyuvante. La dosis de ACPM/diésel ("Diluye 50 ml de ACPM en 1 litro de
+  // purín") es íntegramente dañina → DESCARTAMOS el cuerpo y devolvemos una
+  // redirección que NOMBRA por qué (el ACPM/diésel es FITOTÓXICO), corrige la
+  // dilución del purín (concentrado puro quema) y da el adherente REAL (jabón
+  // potásico). Va primero entre las ramas de supresión porque su gate
+  // (`hasFuelRecipe`) ya excluyó las advertencias de no-usar.
+  if (hasFuelRecipe) {
+    return {
+      text: _fuelAdjuvantRedirect(),
+      modified: true,
+      reason: `agroquímico_sintético_suprimido: ${[...new Set(hits)].join(', ')}`,
+    };
+  }
 
   // #351b (FALLO 1, E2E prod 2026-06-03): SUPPRESS-AND-REPLACE. Si el texto trae
   // una RECETA de fertilizante mineral de síntesis CON DOSIS ("10 kg de urea…
@@ -884,6 +1010,361 @@ export function guardSyntheticAgrochemical(responseText, _resolvedEntities = nul
     text,
     modified: true,
     reason: `agroquímico_sintético: ${[...new Set(hits)].join(', ')}`,
+  };
+}
+
+// ── PATRÓN (c) BORDE-014: mezcla de biopreparados INCOMPATIBLES ─────────────
+
+/**
+ * Familias de biopreparados QUÍMICAMENTE INCOMPATIBLES que NO van en el mismo
+ * tanque. El par crítico de BORDE-014: caldo BORDELÉS (sulfato de cobre + cal,
+ * familia 'cobre') vs caldo SULFOCÁLCICO (polisulfuro de calcio, familia
+ * 'polisulfuro'). Mezclados, el polisulfuro reacciona con el cobre → sulfuro de
+ * cobre + H2S/azufre: se anulan y fitotoxican. Se aplican SEPARADOS, con días de
+ * intervalo. Estructura extensible a otros pares incompatibles si surgen.
+ *
+ * Cada familia: nombres comunes (normalizados, sin tildes) que la identifican en
+ * el texto. El emparejamiento incompatible se declara en INCOMPATIBLE_PAIRS.
+ */
+const BIOPREP_FAMILIES = {
+  cobre: ['caldo bordeles', 'bordeles', 'caldo visosa', 'sulfato de cobre', 'oxicloruro de cobre'],
+  polisulfuro: ['caldo sulfocalcico', 'sulfocalcico', 'polisulfuro de calcio', 'polisulfuro'],
+};
+
+/**
+ * Pares de familias incompatibles (no mezclar en el mismo tanque). Para cada par,
+ * el texto de advertencia explica el riesgo químico real (no inventado).
+ */
+const INCOMPATIBLE_PAIRS = [
+  {
+    a: 'cobre',
+    b: 'polisulfuro',
+    nombreA: 'caldo bordelés',
+    nombreB: 'caldo sulfocálcico',
+    riesgo:
+      'el polisulfuro del sulfocálcico reacciona con el cobre del bordelés (forma sulfuro de cobre y ' +
+      'libera azufre/H2S): se anulan los dos y pueden quemar la planta (fitotóxico)',
+  },
+];
+
+/**
+ * Marca idempotente del reemplazo de mezcla incompatible. */
+const INCOMPATIBLE_MIX_MARKER = 'no los mezcles en el mismo tanque';
+
+/**
+ * Verbo/giro de MEZCLA EN EL MISMO RECIPIENTE: "mezclar/combinar/juntar … en el
+ * mismo tanque/bomba", "mitad y mitad", "50% … 50%", una proporción de combinación.
+ * Sobre texto normalizado. Es la INSTRUCCIÓN peligrosa que delata el caso.
+ */
+const SAME_TANK_MIX_RE =
+  /\b(mezcl\w*|combin\w*|junt\w*|une\w*|unir\w*|revuelve\w*|incorpor\w*)\b[^.!?]{0,80}\b(mismo\s+tanque|misma\s+bomba|un\s+tanque|el\s+tanque|la\s+bomba|mismo\s+recipiente|de\s+una)\b|\bmitad\s+y\s+mitad\b|\b50\s*%[^.!?]{0,40}50\s*%|\bproporcion\b[^.!?]{0,60}(combin|mezcl)/;
+
+/**
+ * ¿La respuesta ya NIEGA la mezcla (acertó)? "no los mezcles", "son incompatibles",
+ * "aplícalos por separado", "no se mezclan". Si ya advierte, no re-disparamos.
+ */
+const RESPONSE_DENIES_MIX_RE =
+  /\b(no\s+(los\s+|las\s+|lo\s+)?mezcl\w*|no\s+se\s+mezcl\w*|son\s+incompatible|es\s+incompatible|por\s+separado|separad[ao]s|no\s+(los\s+)?combin\w*|no\s+(los\s+)?junt\w*|nunca\s+(los\s+)?mezcl\w*)\b/;
+
+/**
+ * Detecta qué par incompatible está presente en el texto normalizado. Devuelve el
+ * par (con sus dos familias presentes) o null. Cada familia se considera presente
+ * si alguno de sus nombres comunes aparece.
+ *
+ * @param {string} norm  texto normalizado (sin tildes/case).
+ * @returns {object|null}
+ */
+function _findIncompatiblePair(norm) {
+  const present = (fam) => BIOPREP_FAMILIES[fam].some((name) => norm.includes(_stripDiacritics(name)));
+  for (const pair of INCOMPATIBLE_PAIRS) {
+    if (present(pair.a) && present(pair.b)) return pair;
+  }
+  return null;
+}
+
+/**
+ * Construye la advertencia segura que REEMPLAZA la receta de mezcla incompatible.
+ * Conserva el valor: di qué NO hacer + por qué (riesgo químico real) + qué hacer
+ * (aplicar por separado, con días de intervalo). No inventa proporciones.
+ *
+ * @param {object} pair  entrada de INCOMPATIBLE_PAIRS.
+ * @returns {string}
+ */
+function _incompatibleMixReplacement(pair) {
+  return (
+    `Ojo: ${INCOMPATIBLE_MIX_MARKER}. El ${pair.nombreB} y el ${pair.nombreA} son INCOMPATIBLES ` +
+    `juntos: ${pair.riesgo}. Mezclados NO rinden más — al revés, se inutilizan y pueden quemar el ` +
+    'cultivo.\n\n' +
+    'Lo correcto:\n' +
+    `- Aplícalos POR SEPARADO, dejando varios días de intervalo entre uno y otro (nunca en el mismo tanque).\n` +
+    `- Usa el ${pair.nombreA} como preventivo de hongos en su momento, y el ${pair.nombreB} por aparte cuando ` +
+    'corresponda.\n' +
+    '- Si dudas del intervalo o de cuál usar primero, consúltalo con tu técnico agrícola local o el ICA.'
+  );
+}
+
+/**
+ * guardIncompatibleBiopreparadoMix — PATRÓN (c) BORDE-014 (SAFETY). Cuando la
+ * respuesta INSTRUYE mezclar en el mismo tanque dos biopreparados químicamente
+ * INCOMPATIBLES (caldo bordelés=cobre + caldo sulfocálcico=polisulfuro) —con una
+ * proporción inventada— SUPRIME-Y-REEMPLAZA por la advertencia de incompatibilidad
+ * (no mezclar, por qué, aplicar por separado con intervalo de días).
+ *
+ * Ningún guard previo lo atajaba: ambos caldos están en la allowlist de
+ * biopreparados (no son sintéticos) → guardSyntheticAgrochemical no dispara.
+ *
+ * GATING (anti-falso-positivo):
+ *   1. ambas familias del par incompatible presentes en el texto
+ *      (`_findIncompatiblePair`). Usar SOLO una → no entra.
+ *   2. el texto INSTRUYE la mezcla en el mismo recipiente (`SAME_TANK_MIX_RE`):
+ *      "mezclar … en el mismo tanque", "mitad y mitad", "50% … 50%", proporción de
+ *      combinación. Sin instrucción de mezcla → no entra.
+ *   3. el texto NO está YA negando la mezcla (`RESPONSE_DENIES_MIX_RE`): si dice
+ *      "no los mezcles / son incompatibles / por separado", acertó → no se toca.
+ *
+ * Firma propia (solo el texto). Corre SIEMPRE (es SAFETY, no de siembra).
+ * Idempotente (su reemplazo no re-dispara). SUPPRESS-AND-REPLACE total: la receta
+ * de mezcla es íntegramente peligrosa, así que se reemplaza el cuerpo entero por la
+ * advertencia (como guardFalsePremise / guardInventedVariety).
+ *
+ * @param {string} responseText
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardIncompatibleBiopreparadoMix(responseText) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Idempotencia: nuestro reemplazo ya está → no re-disparar.
+  if (responseText.includes(INCOMPATIBLE_MIX_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  const norm = _stripDiacritics(responseText);
+  // Gate 3 (corta barato): si ya niega la mezcla, acertó → no tocar.
+  if (RESPONSE_DENIES_MIX_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  // Gate 1: ambas familias del par incompatible presentes.
+  const pair = _findIncompatiblePair(norm);
+  if (!pair) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  // Gate 2: el texto INSTRUYE la mezcla en el mismo recipiente.
+  if (!SAME_TANK_MIX_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  bumpGuardTelemetry('incompatible_biopreparado_mix');
+  return {
+    text: _incompatibleMixReplacement(pair),
+    modified: true,
+    reason: `mezcla_incompatible_suprimida: ${pair.a}+${pair.b}`,
+  };
+}
+
+// ── PATRÓN (a) BORDE-013: preparar un TÓXICO para comerlo / envenenar el agua ─
+
+/**
+ * Plantas TÓXICAS denylisteadas que NO son alimento: el modelo a veces da pasos de
+ * cocción/remojo "para volverlas comestibles" (falso) o de envenenar el agua para
+ * pescar. Cada entrada: nombres comunes/científicos (normalizados) que la
+ * identifican + la toxina/razón que va en la advertencia segura. La toxina sale del
+ * hecho botánico real (rotenona, ricina, escopolamina), nunca inventada.
+ */
+const NON_FOOD_TOXIC_PLANTS = [
+  {
+    names: ['barbasco', 'deguelia', 'lonchocarpus', 'deguelina'],
+    toxina: 'rotenona/deguelina',
+    motivo:
+      'el barbasco (Lonchocarpus/Deguelia) es ICTIOTÓXICO por su rotenona/deguelina: NO se vuelve ' +
+      'comestible hirviéndolo y NO es un alimento como la yuca',
+  },
+  {
+    names: ['higuerilla', 'ricino', 'ricinus'],
+    toxina: 'ricina',
+    motivo:
+      'la higuerilla (Ricinus communis) contiene RICINA, un tóxico potente; "orgánico" no la vuelve ' +
+      'inocua sobre un alimento',
+  },
+  {
+    names: ['borrachero', 'floripondio', 'brugmansia', 'datura', 'cacao sabanero'],
+    toxina: 'escopolamina/atropina',
+    motivo:
+      'el borrachero (Brugmansia/Datura) es MUY tóxico por sus alcaloides tropánicos (escopolamina/' +
+      'atropina), potencialmente letal; jamás se prepara para consumo',
+  },
+];
+
+/** Marca idempotente del reemplazo de preparación tóxica / envenenar el agua. */
+const TOXIC_PREP_MARKER = 'no es comestible y no se prepara para comer';
+
+/**
+ * Verbos/giros de PREPARACIÓN-PARA-COMER o CONSUMO del tóxico. Sobre texto
+ * normalizado. Captura el fraseo con que el modelo instruye a cocinar/remojar/
+ * comestibilizar/comer la planta tóxica.
+ */
+const TOXIC_PREP_OFFER_RE =
+  /\b(comestibilidad|comestible|para\s+comer|se\s+come|consum\w*|sancocho|hervir|hierv\w*|cocci?on|cocin\w*|sumerg\w*|remoj\w*|para\s+quitarle\s+lo\s+malo|garantizar\s+su)\b/;
+
+/**
+ * Sub-patrón (BORDE-024 estilo): APLICAR el tóxico SOBRE un alimento de consumo
+ * dejando residuo, validándolo como "orgánico/inocuo". "espolvorea/aplica … sobre
+ * la papa/los granos", "si queda algo … no pasa nada porque es orgánico", "gramos
+ * por arroba" de un tóxico sobre comida. Sobre texto normalizado.
+ */
+const TOXIC_ON_FOOD_RE =
+  /\b(espolvor\w*|aplica\w*|echa\w*|mezcl\w*|polvo\s+de)\b[^.!?]{0,60}\b(sobre|en|a)\b[^.!?]{0,30}\b(papa|papas|grano[s]?|maiz|arroz|frijol\w*|alimento|comida|cosecha|almacen\w*|troja|costal\w*)\b|\b(residuo|queda\s+algo|si\s+queda)\b[^.!?]{0,40}\borganic\w*|\bgramos?\s+(de\s+\w+\s+)?por\s+arroba\b/;
+
+/**
+ * Giro que NIEGA la comestibilidad dentro de la oración (no la ofrece). Si la
+ * oración ya dice "no es comestible / no se come / es tóxico, no lo comas", NO la
+ * tocamos: es la consigna segura. Sobre texto normalizado.
+ */
+const TOXIC_PREP_DENIES_RE =
+  /\b(no\s+es\s+comestible|no\s+se\s+come|no\s+(lo\s+|la\s+)?comas?\b|no\s+(lo\s+|la\s+)?consum\w*|no\s+se\s+vuelve\s+comestible|no\s+apta?\s+para\s+(el\s+)?consumo|jamas\s+se\s+(come|consum)\w*)\b/;
+
+/**
+ * Giro de ENVENENAR EL AGUA para pescar (barbasco): "envenenar el caño/agua",
+ * "veneno", "vierte la mezcla en el caño", "para sacar/atrapar peces". Sobre texto
+ * normalizado.
+ */
+const WATER_POISON_OFFER_RE =
+  /\b(envenen\w*|veneno\b|vierte\s+la\s+mezcla|en\s+el\s+cano|al\s+cano|en\s+el\s+agua\b|en\s+la\s+quebrada|atrapar\s+peces|sacar\s+(el\s+)?pescado|capturar\s+peces|para\s+pescar)\b/;
+
+/**
+ * Giro que ya ADVIERTE contra envenenar el agua (no lo instruye): "no envenenes",
+ * "es dañino", "mata el ecosistema", "está regulado/prohibido". Sobre normalizado.
+ */
+const WATER_POISON_DENIES_RE =
+  /\b(no\s+(lo\s+)?envenen\w*|no\s+(se\s+)?debe\s+(usar\w*\s+para\s+)?envenen\w*|dan(a|in)\w*\s+(el\s+)?(ecosistema|agua|cano|pesc)|mata\s+(todo\s+)?el\s+ecosistema|esta\s+(regulad|prohibid)\w*|es\s+(ilegal|dan(in|os))\w*)\b/;
+
+/**
+ * Mensaje seguro que REEMPLAZA por completo una respuesta que daba pasos para
+ * preparar/comer un tóxico o para envenenar el agua. Conserva el valor: di qué NO
+ * hacer + por qué (la toxina real) + redirige. Si además había envenenamiento de
+ * agua, agrega esa advertencia. No deja la respuesta vacía.
+ *
+ * @param {object} plant  entrada de NON_FOOD_TOXIC_PLANTS detectada.
+ * @param {boolean} hadWaterPoison  ¿también había instrucción de envenenar el agua?
+ * @returns {string}
+ */
+function _toxicPrepReplacement(plant, hadWaterPoison) {
+  let msg =
+    `IMPORTANTE: ${TOXIC_PREP_MARKER}. ${plant.motivo}. No hay tiempo de hervido ni remojo que lo vuelva ` +
+    'comestible; hervirlo no le quita ese tóxico para consumo humano, así que NO lo prepares en sancocho ' +
+    'ni se lo des a nadie. Si lo que buscas es un alimento de raíz/tubérculo, pídeme una especie de verdad ' +
+    'comestible y te paso cómo prepararla.';
+  if (hadWaterPoison) {
+    msg +=
+      '\n\nY sobre envenenar el caño para pescar: no lo hagas. Barbasquear el agua mata todo el ecosistema ' +
+      'acuático (no solo el pez que buscas) y está regulado/prohibido en muchas zonas por ese daño. Pesca con ' +
+      'métodos selectivos (anzuelo, atarraya) en vez de envenenar el agua.';
+  }
+  return msg;
+}
+
+/** Mensaje seguro cuando SOLO hubo instrucción de envenenar el agua (sin prep). */
+const WATER_POISON_ONLY_REPLACEMENT =
+  'IMPORTANTE: no envenenes el caño ni el agua para pescar. Barbasquear el agua mata todo el ecosistema ' +
+  'acuático (no solo el pez que buscas) y está regulado/prohibido en muchas zonas por ese daño. Pesca con ' +
+  `métodos selectivos (anzuelo, atarraya) en vez de envenenar el agua. ${TOXIC_PREP_MARKER}: no uses una ` +
+  'planta tóxica para barbasquear.';
+
+/**
+ * ¿El texto normalizado menciona alguna planta tóxica denylisteada? Devuelve la
+ * entrada de NON_FOOD_TOXIC_PLANTS o null.
+ */
+function _findToxicPlant(textNorm) {
+  for (const plant of NON_FOOD_TOXIC_PLANTS) {
+    if (plant.names.some((n) => textNorm.includes(_stripDiacritics(n)))) return plant;
+  }
+  return null;
+}
+
+/**
+ * guardToxicFoodPreparation — PATRÓN (a) BORDE-013 (SAFETY-CRÍTICO). Sobre el texto
+ * crudo (INDEPENDIENTE del grounding: la ConfusionWarning puede no resolverse a la
+ * planta peligrosa, como pasó con el barbasco mientras la CW era de yuca brava).
+ *
+ * Hace SUPPRESS-AND-REPLACE quirúrgico por oración:
+ *   (1) suprime los pasos de PREPARACIÓN/COCCIÓN/CONSUMO "para volver comestible"
+ *       una planta TÓXICA denylisteada (barbasco/higuerilla/borrachero) y los
+ *       reemplaza por "no es comestible + por qué (la toxina real)".
+ *   (2) suprime las instrucciones de ENVENENAR el caño/agua para pescar y las
+ *       reemplaza por la advertencia de daño ecológico/regulación.
+ * El resto del cuerpo (mención botánica legítima, advertencias) se conserva.
+ *
+ * Anti-falso-positivo (CRÍTICO):
+ *   - solo actúa sobre oraciones que mencionan una planta TÓXICA denylisteada (un
+ *     alimento seguro —yuca dulce, papa, plátano— NUNCA entra).
+ *   - una oración que ya NIEGA la comestibilidad / desaconseja envenenar el agua se
+ *     conserva (es la consigna segura).
+ *   - idempotente por marcadores estables.
+ *
+ * Firma propia (solo el texto). Corre SIEMPRE (SAFETY). NUNCA deja al campesino una
+ * receta para preparar/comer un tóxico ni para envenenar el agua.
+ *
+ * @param {string} responseText
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardToxicFoodPreparation(responseText) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Idempotencia: nuestro mensaje ya está → no re-disparar.
+  if (responseText.includes(TOXIC_PREP_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const textNorm = _stripDiacritics(responseText);
+  // Gate 1: el texto menciona una planta TÓXICA denylisteada. Sin esto, no entra
+  // (un alimento seguro nunca dispara — anti-FP central).
+  const plant = _findToxicPlant(textNorm);
+  if (!plant) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Gate 2: ¿hay al menos una oración que OFREZCA preparar/comer el tóxico, o que
+  // instruya envenenar el agua, SIN negarlo? La detección por oración evita que un
+  // texto que SOLO advierte ("no es comestible, no envenenes el agua") dispare.
+  const sentences = _splitSentences(responseText);
+  let offersPrep = false;
+  let offersWaterPoison = false;
+  for (const sentence of sentences) {
+    const sNorm = _stripDiacritics(sentence);
+    // Oración de preparación/consumo del tóxico: requiere fraseo de prep/comer y NO
+    // estar negándolo. La planta puede nombrarse en ESA oración o en el contexto
+    // (lista de pasos): basta el fraseo de prep en un texto que ya menciona el tóxico.
+    if (
+      (TOXIC_PREP_OFFER_RE.test(sNorm) || TOXIC_ON_FOOD_RE.test(sNorm)) &&
+      !TOXIC_PREP_DENIES_RE.test(sNorm)
+    ) {
+      offersPrep = true;
+    }
+    if (WATER_POISON_OFFER_RE.test(sNorm) && !WATER_POISON_DENIES_RE.test(sNorm)) {
+      offersWaterPoison = true;
+    }
+  }
+
+  if (!offersPrep && !offersWaterPoison) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // SUPPRESS-AND-REPLACE TOTAL: cualquier respuesta que dé pasos para preparar/comer
+  // un tóxico o para envenenar el agua es íntegramente peligrosa (los pasos van en
+  // lista numerada que no repite el nombre de la planta, así que no se puede limpiar
+  // por oración sin dejar fugas). Reemplazamos el cuerpo por la verdad de seguridad,
+  // que conserva el valor (qué NO hacer + por qué + redirección). Mismo patrón que
+  // guardFalsePremise / guardInventedVariety.
+  bumpGuardTelemetry('toxic_food_preparation');
+  const replacement = offersPrep
+    ? _toxicPrepReplacement(plant, offersWaterPoison)
+    : WATER_POISON_ONLY_REPLACEMENT;
+  const reasonParts = [];
+  if (offersPrep) reasonParts.push(`preparacion_toxica_suprimida(${plant.toxina})`);
+  if (offersWaterPoison) reasonParts.push('envenenar_agua_suprimido');
+  return {
+    text: replacement,
+    modified: true,
+    reason: reasonParts.join('; '),
   };
 }
 
@@ -5245,6 +5726,32 @@ export function applyOutputGuards(
     text = reforestNativasRes.text;
     modified = true;
     if (reforestNativasRes.reason) reasons.push(reforestNativasRes.reason);
+  }
+  // Guard SAFETY de MEZCLA DE BIOPREPARADOS INCOMPATIBLES (PATRÓN c · BORDE-014):
+  // firma propia (solo el texto). Corre SIEMPRE (no es de siembra). SUPPRESS-AND-
+  // REPLACE total: si el cuerpo INSTRUYE mezclar en el mismo tanque caldo bordelés
+  // (cobre) + sulfocálcico (polisulfuro) —con una proporción inventada—, descarta la
+  // receta y devuelve la advertencia de incompatibilidad (no mezclar, por qué,
+  // aplicar por separado). Va antes de la marca inventada y de la ConfusionWarning;
+  // como reemplaza todo el cuerpo, lo que sobreviva no contendrá la mezcla peligrosa.
+  const mixRes = guardIncompatibleBiopreparadoMix(text);
+  if (mixRes && mixRes.modified) {
+    text = mixRes.text;
+    modified = true;
+    if (mixRes.reason) reasons.push(mixRes.reason);
+  }
+  // Guard SAFETY-CRÍTICO de PREPARACIÓN/CONSUMO de un TÓXICO o ENVENENAR el agua
+  // (PATRÓN a · BORDE-013): firma propia (solo el texto). Corre SIEMPRE. SUPPRESS-
+  // AND-REPLACE quirúrgico por oración: suprime los pasos de cocción/remojo para
+  // "volver comestible" una planta tóxica denylisteada (barbasco/higuerilla/
+  // borrachero) y las instrucciones de envenenar el caño para pescar, dejando la
+  // verdad de seguridad (no es comestible + por qué + redirección). Va tras la
+  // mezcla incompatible y antes de la marca inventada / ConfusionWarning.
+  const toxPrepRes = guardToxicFoodPreparation(text);
+  if (toxPrepRes && toxPrepRes.modified) {
+    text = toxPrepRes.text;
+    modified = true;
+    if (toxPrepRes.reason) reasons.push(toxPrepRes.reason);
   }
   // Guard SAFETY de MARCA COMERCIAL INVENTADA (#1305): firma propia (solo el
   // texto). Corre SIEMPRE (no es de siembra). SUPPRESS-AND-REPLACE quirúrgico por
