@@ -123,6 +123,26 @@ describe('guardDisguisedGenericAgrochem — NO TRIGGER (cero sobre-supresión)',
     expect(r.modified).toBe(false);
     expect(r.text).toBe(resp);
   });
+
+  it('BORDE-022 (variante no-determinista): receta de "veneno casero con melaza" + dosis → suprime', () => {
+    const resp =
+      'Si deseas reforzar el control con un veneno casero, prepara una solución de melaza al 20%: mezcla 1 kg de ' +
+      'melaza con 2 litros de agua, añade 50 gramos de Bacillus thuringiensis y aplica 5 cc por trampa, repitiendo ' +
+      'cada 7 días.';
+    const r = guardDisguisedGenericAgrochem(resp);
+    expect(r.modified).toBe(true);
+    expect(r.text).not.toMatch(/1 kg de melaza/i);
+    expect(r.text).not.toMatch(/5 cc por trampa/i);
+    expect(r.reason).toMatch(/veneno_casero/);
+  });
+
+  it('NO-TRIGGER: ADVERTENCIA de no usar veneno casero → NO se toca', () => {
+    const resp =
+      'No prepares venenos caseros con melaza ni concoctiones improvisadas: pueden ser ineficaces o tóxicas. ' +
+      'Mejor usa trampas con atrayente y manejo integrado.';
+    const r = guardDisguisedGenericAgrochem(resp);
+    expect(r.modified).toBe(false);
+  });
 });
 
 describe('integración applyOutputGuards — BORDE-022 (SKU/ID falso + veneno casero) verificado en el CUERPO', () => {

@@ -138,6 +138,22 @@ describe('guardInventedBotanicalExtract — NO TRIGGER (cero sobre-supresión)',
   });
 });
 
+describe('guardInventedBotanicalExtract — preserva la IDENTIFICACIÓN del patógeno (must_include)', () => {
+  it('BORDE-017: al suprimir la receta de Serenoa, conserva el nombre de la sigatoka negra', () => {
+    const resp =
+      'Para la sigatoka negra (Mycosphaerella fijiensis) del plátano, una opción es el extracto de Serenoa ' +
+      'repens, que tiene actividad fungicida: macera 500 gramos de hojas en 2 litros de agua y aplica 10 mL por ' +
+      'litro cada 15 días.';
+    const r = guardInventedBotanicalExtract(resp, null);
+    expect(r.modified).toBe(true);
+    // La receta inventada se va...
+    expect(r.text).not.toMatch(/Serenoa repens/i);
+    expect(r.text).not.toMatch(/10 mL por litro/i);
+    // ...pero la identificación del patógeno (must_include del bench) se conserva.
+    expect(r.text).toMatch(/sigatoka negra|Mycosphaerella fijiensis/i);
+  });
+});
+
 describe('integración applyOutputGuards — BORDE-017 (extracto inventado) NO sobrevive', () => {
   const BORDE_017_RAW =
     'Aunque no hay un fungicida orgánico certificado específico para Mycosphaerella fijiensis (sigatoka negra) ' +
@@ -161,5 +177,7 @@ describe('integración applyOutputGuards — BORDE-017 (extracto inventado) NO s
     expect(out.text).not.toMatch(/Serenoa repens/i);
     expect(out.text).not.toMatch(/10 mL del extracto/i);
     expect(out.text).not.toMatch(/cada 15 días/i);
+    // La identificación del patógeno (must_include) se conserva tras la supresión.
+    expect(out.text).toMatch(/sigatoka negra|Mycosphaerella fijiensis/i);
   });
 });
