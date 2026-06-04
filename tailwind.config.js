@@ -9,28 +9,78 @@ export default {
                 '2xs': ['0.6875rem', { lineHeight: '1rem' }],
             },
             colors: {
-                surface: {
-                    DEFAULT: '#020617',
-                    card: '#0f172a',
-                    raised: '#1e293b',
-                    border: '#334155',
+                // -------------------------------------------------------------
+                // Indirección por CSS-var en el ORIGEN (theming P0 2026-06-04).
+                // ----------------------------------------------------------------
+                // En vez de overridear cientos de clases Tailwind una-por-una en
+                // themes.css (frágil: solo cubría ~25 de 726 clases de color → los
+                // temas claros quedaban "Frankenstein"), las escalas que la app
+                // usa para chrome (slate/emerald/amber + acentos custom) se
+                // resuelven contra variables `--c-*` definidas en :root (biopunk
+                // = defaults Tailwind EXACTOS, byte-idénticos) y redefinidas por
+                // `[data-theme="minimalista"|"nature"]` en src/index.css.
+                //
+                // Patrón `rgb(var(--c-X) / <alpha-value>)`: Tailwind inyecta el
+                // alpha en cada variante de opacidad (`/40`, `/60`, …) → las
+                // clases con opacidad también se vuelven theme-aware GRATIS, sin
+                // un override por cada combinación. Las vars guardan el triple RGB
+                // separado por espacio (ej `--c-slate-950: 2 6 23;`).
+                slate: {
+                    50: 'rgb(var(--c-slate-50) / <alpha-value>)',
+                    100: 'rgb(var(--c-slate-100) / <alpha-value>)',
+                    200: 'rgb(var(--c-slate-200) / <alpha-value>)',
+                    300: 'rgb(var(--c-slate-300) / <alpha-value>)',
+                    400: 'rgb(var(--c-slate-400) / <alpha-value>)',
+                    500: 'rgb(var(--c-slate-500) / <alpha-value>)',
+                    600: 'rgb(var(--c-slate-600) / <alpha-value>)',
+                    700: 'rgb(var(--c-slate-700) / <alpha-value>)',
+                    800: 'rgb(var(--c-slate-800) / <alpha-value>)',
+                    900: 'rgb(var(--c-slate-900) / <alpha-value>)',
+                    950: 'rgb(var(--c-slate-950) / <alpha-value>)',
                 },
-                // Bio-Punk palette — Cyberpunk + Biodiversidad colombiana
+                emerald: {
+                    200: 'rgb(var(--c-emerald-200) / <alpha-value>)',
+                    300: 'rgb(var(--c-emerald-300) / <alpha-value>)',
+                    400: 'rgb(var(--c-emerald-400) / <alpha-value>)',
+                    500: 'rgb(var(--c-emerald-500) / <alpha-value>)',
+                    600: 'rgb(var(--c-emerald-600) / <alpha-value>)',
+                    700: 'rgb(var(--c-emerald-700) / <alpha-value>)',
+                    800: 'rgb(var(--c-emerald-800) / <alpha-value>)',
+                    900: 'rgb(var(--c-emerald-900) / <alpha-value>)',
+                },
+                amber: {
+                    200: 'rgb(var(--c-amber-200) / <alpha-value>)',
+                    300: 'rgb(var(--c-amber-300) / <alpha-value>)',
+                    400: 'rgb(var(--c-amber-400) / <alpha-value>)',
+                    500: 'rgb(var(--c-amber-500) / <alpha-value>)',
+                    600: 'rgb(var(--c-amber-600) / <alpha-value>)',
+                    700: 'rgb(var(--c-amber-700) / <alpha-value>)',
+                    900: 'rgb(var(--c-amber-900) / <alpha-value>)',
+                },
+                surface: {
+                    DEFAULT: 'rgb(var(--c-surface) / <alpha-value>)',
+                    card: 'rgb(var(--c-surface-card) / <alpha-value>)',
+                    raised: 'rgb(var(--c-surface-raised) / <alpha-value>)',
+                    border: 'rgb(var(--c-surface-border) / <alpha-value>)',
+                },
+                // Bio-Punk palette — Cyberpunk + Biodiversidad colombiana.
+                // Var-ificada: en biopunk conserva el neón exacto; en temas claros
+                // vira a una versión salvia/apagada (definida en index.css).
                 muzo: {
-                    DEFAULT: '#10b981',  // Esmeralda de Muzo
-                    glow: '#34d399',
+                    DEFAULT: 'rgb(var(--c-muzo) / <alpha-value>)',  // Esmeralda de Muzo
+                    glow: 'rgb(var(--c-muzo-glow) / <alpha-value>)',
                 },
                 morpho: {
-                    DEFAULT: '#06b6d4',  // Mariposa Morpho
-                    glow: '#22d3ee',
+                    DEFAULT: 'rgb(var(--c-morpho) / <alpha-value>)',  // Mariposa Morpho
+                    glow: 'rgb(var(--c-morpho-glow) / <alpha-value>)',
                 },
                 orchid: {
-                    DEFAULT: '#d946ef',  // Orquídea Cattleya
-                    glow: '#e879f9',
+                    DEFAULT: 'rgb(var(--c-orchid) / <alpha-value>)',  // Orquídea Cattleya
+                    glow: 'rgb(var(--c-orchid-glow) / <alpha-value>)',
                 },
                 frog: {
-                    DEFAULT: '#eab308',  // Rana Dorada
-                    glow: '#facc15',
+                    DEFAULT: 'rgb(var(--c-frog) / <alpha-value>)',  // Rana Dorada
+                    glow: 'rgb(var(--c-frog-glow) / <alpha-value>)',
                 },
             },
             boxShadow: {

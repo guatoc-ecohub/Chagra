@@ -2,6 +2,160 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===========================================================================
+ * TOKENS DE COLOR THEME-AWARE (indirección por CSS-var — theming P0 2026-06-04)
+ * ---------------------------------------------------------------------------
+ * tailwind.config.js mapea las escalas slate/emerald/amber y los acentos custom
+ * (surface/muzo/morpho/orchid/frog) a `rgb(var(--c-X) / <alpha-value>)`. Acá
+ * definimos esas variables. El triple RGB va separado por espacios para que
+ * Tailwind pueda inyectar el alpha de las variantes de opacidad (`/40`, `/60`).
+ *
+ *   :root                         → BIOPUNK = valores Tailwind EXACTOS. Es el
+ *                                   estado BASE (sin data-theme) → byte-idéntico
+ *                                   al biopunk previo. NO TOCAR estos valores.
+ *   [data-theme="minimalista"]    → papel claro + tinta + salvia (demo
+ *                                   demo-agente-minimalista.html). Invierte la
+ *                                   rampa slate (950 = bg claro, 50 = tinta).
+ *   [data-theme="nature"]         → crema cálida + café + salvia + ocre (demo
+ *                                   demo-agente.html variante cálida).
+ *
+ * Con esto las ~726 clases de color del PWA (incluidas las de opacidad) se
+ * vuelven theme-aware DE UNA, sin overrides clase-por-clase en themes.css.
+ * =========================================================================== */
+:root {
+  /* slate — escala neutra (chrome oscuro biopunk). Tailwind default exacto. */
+  --c-slate-50: 248 250 252;
+  --c-slate-100: 241 245 249;
+  --c-slate-200: 226 232 240;
+  --c-slate-300: 203 213 225;
+  --c-slate-400: 148 163 184;
+  --c-slate-500: 100 116 139;
+  --c-slate-600: 71 85 105;
+  --c-slate-700: 51 65 85;
+  --c-slate-800: 30 41 59;
+  --c-slate-900: 15 23 42;
+  --c-slate-950: 2 6 23;
+  /* emerald — acento verde primario. Tailwind default exacto. */
+  --c-emerald-200: 167 243 208;
+  --c-emerald-300: 110 231 183;
+  --c-emerald-400: 52 211 153;
+  --c-emerald-500: 16 185 129;
+  --c-emerald-600: 5 150 105;
+  --c-emerald-700: 4 120 87;
+  --c-emerald-800: 6 95 70;
+  --c-emerald-900: 6 78 59;
+  /* amber — acento cálido. Tailwind default exacto. */
+  --c-amber-200: 253 230 138;
+  --c-amber-300: 252 211 77;
+  --c-amber-400: 251 191 36;
+  --c-amber-500: 245 158 11;
+  --c-amber-600: 217 119 6;
+  --c-amber-700: 180 83 9;
+  --c-amber-900: 120 53 15;
+  /* surface — superficies custom (= slate 950/900/800/700 en biopunk). */
+  --c-surface: 2 6 23;
+  --c-surface-card: 15 23 42;
+  --c-surface-raised: 30 41 59;
+  --c-surface-border: 51 65 85;
+  /* acentos bio-punk (neón). */
+  --c-muzo: 16 185 129;
+  --c-muzo-glow: 52 211 153;
+  --c-morpho: 6 182 212;
+  --c-morpho-glow: 34 211 238;
+  --c-orchid: 217 70 239;
+  --c-orchid-glow: 232 121 249;
+  --c-frog: 234 179 8;
+  --c-frog-glow: 250 204 21;
+}
+
+/* MINIMALISTA — papel #f6f3ec, tinta #1f2421, salvia #2f6e5a, línea #e3ddd0.
+ * La rampa slate se INVIERTE: 950 = fondo más claro (papel) … 50 = tinta. */
+[data-theme="minimalista"] {
+  --c-slate-950: 246 243 236;  /* papel / fondo base */
+  --c-slate-900: 255 255 255;  /* card / superficie */
+  --c-slate-800: 237 232 222;  /* raised */
+  --c-slate-700: 227 221 208;  /* línea / borde */
+  --c-slate-600: 209 201 186;  /* borde medio */
+  --c-slate-500: 122 124 117;  /* texto terciario / placeholder */
+  --c-slate-400: 138 142 134;  /* texto secundario */
+  --c-slate-300: 74 80 73;     /* texto fuerte */
+  --c-slate-200: 47 53 48;     /* casi tinta */
+  --c-slate-100: 31 36 33;     /* tinta */
+  --c-slate-50: 20 24 21;      /* tinta más oscura */
+  --c-emerald-200: 230 239 233;
+  --c-emerald-300: 90 140 120;
+  --c-emerald-400: 47 110 90;  /* salvia (acento) */
+  --c-emerald-500: 37 88 72;
+  --c-emerald-600: 29 70 57;
+  --c-emerald-700: 23 56 46;
+  --c-emerald-800: 23 56 46;
+  --c-emerald-900: 230 239 233;
+  --c-amber-200: 235 220 195;
+  --c-amber-300: 200 140 60;
+  --c-amber-400: 176 106 50;   /* ocre cálido (contraste) */
+  --c-amber-500: 150 90 40;
+  --c-amber-600: 150 90 40;
+  --c-amber-700: 120 72 32;
+  --c-amber-900: 235 220 195;
+  --c-surface: 246 243 236;
+  --c-surface-card: 255 255 255;
+  --c-surface-raised: 237 232 222;
+  --c-surface-border: 227 221 208;
+  /* acentos neón → versión salvia/apagada. */
+  --c-muzo: 47 110 90;
+  --c-muzo-glow: 90 140 120;
+  --c-morpho: 47 110 90;
+  --c-morpho-glow: 90 140 120;
+  --c-orchid: 122 124 117;
+  --c-orchid-glow: 138 142 134;
+  --c-frog: 176 106 50;
+  --c-frog-glow: 200 140 60;
+}
+
+/* NATURE — superf #fbf5ea, café #4a3a26, salvia #7a8f4a, ocre #f5b733,
+ * línea #ddc8a6. Rampa slate invertida y entonada cálida. */
+[data-theme="nature"] {
+  --c-slate-950: 251 245 234;  /* crema / fondo base */
+  --c-slate-900: 255 252 245;  /* card / superficie */
+  --c-slate-800: 240 230 210;  /* raised */
+  --c-slate-700: 221 200 166;  /* línea / borde */
+  --c-slate-600: 200 180 150;  /* borde medio */
+  --c-slate-500: 122 100 70;   /* texto terciario / placeholder */
+  --c-slate-400: 140 118 88;   /* texto secundario */
+  --c-slate-300: 90 74 50;     /* texto fuerte */
+  --c-slate-200: 74 58 38;     /* casi café */
+  --c-slate-100: 60 48 32;     /* café texto */
+  --c-slate-50: 45 36 24;      /* café más oscuro */
+  --c-emerald-200: 230 235 210;
+  --c-emerald-300: 156 176 106;
+  --c-emerald-400: 122 143 74;  /* salvia (acento verde) */
+  --c-emerald-500: 104 122 60;
+  --c-emerald-600: 90 106 52;
+  --c-emerald-700: 70 84 40;
+  --c-emerald-800: 70 84 40;
+  --c-emerald-900: 230 235 210;
+  --c-amber-200: 250 220 150;
+  --c-amber-300: 250 200 90;
+  --c-amber-400: 245 183 51;   /* ocre flor (acento cálido) */
+  --c-amber-500: 217 116 42;
+  --c-amber-600: 217 116 42;
+  --c-amber-700: 176 90 32;
+  --c-amber-900: 245 230 200;
+  --c-surface: 251 245 234;
+  --c-surface-card: 255 252 245;
+  --c-surface-raised: 240 230 210;
+  --c-surface-border: 221 200 166;
+  /* acentos neón → salvia/ocre cálidos. */
+  --c-muzo: 122 143 74;
+  --c-muzo-glow: 156 176 106;
+  --c-morpho: 122 143 74;
+  --c-morpho-glow: 156 176 106;
+  --c-orchid: 217 138 79;
+  --c-orchid-glow: 245 183 51;
+  --c-frog: 245 183 51;
+  --c-frog-glow: 250 200 90;
+}
+
 @layer base {
   :root {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -53,6 +207,29 @@
     background-position: center center;
     background-repeat: no-repeat;
     background-attachment: fixed;
+  }
+
+  /* CRÍTICO (theming P0 2026-06-04): en temas claros la foto biopunk OSCURA
+   * (/fondo-biopunk-4.jpg) + su overlay slate-950 se filtraba detrás de la UI
+   * clara → "integra pésimo". En minimalista/nature el fondo es liso tipo papel,
+   * como en los demos. Quitamos foto, overlay y patrón biopunk; el color base
+   * sale del token --c-slate-950 (papel/crema del tema). */
+  [data-theme="minimalista"] body.app-bg-biodiversidad,
+  [data-theme="nature"] body.app-bg-biodiversidad {
+    background-image: none !important;
+    background-color: rgb(var(--c-slate-950)) !important;
+  }
+
+  [data-theme="minimalista"] .bg-biopunk-pattern,
+  [data-theme="nature"] .bg-biopunk-pattern {
+    background-image: none !important;
+  }
+
+  /* Glows/sombras neón (text-shadow + shadow-neon-*) no pegan sobre fondo claro:
+   * se ven como manchas. Los apagamos en los temas claros. */
+  [data-theme="minimalista"] [class*="shadow-neon-"],
+  [data-theme="nature"] [class*="shadow-neon-"] {
+    box-shadow: none !important;
   }
 
   button,
