@@ -152,7 +152,12 @@ export default function useVoiceRecorder() {
         }).catch(() => {});
       };
 
-      rec.start();
+      // timeslice 250ms: fuerza `dataavailable` periódico. Sin él, algunos
+      // navegadores móviles entregan un único chunk al stop() que puede salir
+      // vacío/truncado → webm con header EBML inválido → Whisper HTTP 500
+      // "Failed to load audio: End of file". Con timeslice los chunks se
+      // acumulan y el Blob final siempre tiene contenedor válido.
+      rec.start(250);
       setIsRecording(true);
       startTsRef.current = Date.now();
 

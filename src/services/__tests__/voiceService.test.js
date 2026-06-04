@@ -22,6 +22,11 @@ vi.mock('../syncManager', () => ({
 import { syncManager } from '../syncManager';
 import { transcribe, queueForRetry } from '../voiceService';
 
+// Blob de audio realista (>1024 bytes). transcribe() rechaza blobs diminutos
+// porque una captura fallida en móvil produce un webm vacío/truncado que hace
+// que Whisper responda HTTP 500 "Failed to load audio: End of file".
+const AUDIO_DATA = 'x'.repeat(2048);
+
 describe('voiceService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -42,7 +47,7 @@ describe('voiceService', () => {
       });
       globalThis.fetch = mockFetch;
 
-      const blob = new Blob(['audio data'], { type: 'audio/webm;codecs=opus' });
+      const blob = new Blob([AUDIO_DATA], { type: 'audio/webm;codecs=opus' });
       const result = await transcribe(blob);
 
       expect(result).toBe('Choachí está a mil quinientos metros sobre el nivel del mar');
@@ -56,6 +61,21 @@ describe('voiceService', () => {
       expect(url).toContain('output=json');
     });
 
+    it('rechaza un Blob vacío/diminuto SIN llamar a Whisper (evita el HTTP 500)', async () => {
+      const mockFetch = vi.fn();
+      globalThis.fetch = mockFetch;
+
+      // Captura fallida en móvil: webm vacío (0 bytes) o truncado (header roto).
+      const empty = new Blob([], { type: 'audio/webm;codecs=opus' });
+      const truncated = new Blob(['x'.repeat(40)], { type: 'audio/webm' });
+
+      await expect(transcribe(empty)).rejects.toThrow('No se grabó audio');
+      await expect(transcribe(truncated)).rejects.toThrow('No se grabó audio');
+      await expect(transcribe(null)).rejects.toThrow('No se grabó audio');
+      // Nunca debe golpear el backend con basura.
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
     it('acepta lenguaje customizado via options.language', async () => {
       const mockFetch = vi.fn();
       mockFetch.mockResolvedValueOnce({
@@ -65,7 +85,7 @@ describe('voiceService', () => {
       });
       globalThis.fetch = mockFetch;
 
-      const blob = new Blob(['audio data'], { type: 'audio/webm' });
+      const blob = new Blob([AUDIO_DATA], { type: 'audio/webm' });
       const result = await transcribe(blob, { language: 'qu' });
 
       expect(result).toBe('wakichay tukuy imata');
@@ -85,7 +105,7 @@ describe('voiceService', () => {
       });
       globalThis.fetch = mockFetch;
 
-      const blob = new Blob(['audio data'], { type: 'audio/webm;codecs=opus' });
+      const blob = new Blob([AUDIO_DATA], { type: 'audio/webm;codecs=opus' });
       const result = await transcribe(blob);
 
       expect(result).toBe('Fincas en Guatoc, La Calera, Sopó y Tabio cultivan café Castillo y lulo');
@@ -102,7 +122,7 @@ describe('voiceService', () => {
       });
       globalThis.fetch = mockFetch;
 
-      const blob = new Blob(['audio data'], { type: 'audio/webm;codecs=opus' });
+      const blob = new Blob([AUDIO_DATA], { type: 'audio/webm;codecs=opus' });
       const result = await transcribe(blob);
 
       expect(result).toBe('El café arábica Borbón necesita biopreparados como el Bocashi y el Caldo bordelés');
@@ -117,7 +137,7 @@ describe('voiceService', () => {
       });
       globalThis.fetch = mockFetch;
 
-      const blob = new Blob(['audio data'], { type: 'audio/mp4' });
+      const blob = new Blob([AUDIO_DATA], { type: 'audio/mp4' });
       await transcribe(blob);
 
       const formData = mockFetch.mock.calls[0][1].body;
@@ -135,7 +155,7 @@ describe('voiceService', () => {
       });
       globalThis.fetch = mockFetch;
 
-      const blob = new Blob(['audio data'], { type: 'audio/webm;codecs=opus' });
+      const blob = new Blob([AUDIO_DATA], { type: 'audio/webm;codecs=opus' });
 
       await expect(transcribe(blob)).rejects.toThrow('Whisper 503');
     });
@@ -149,7 +169,7 @@ describe('voiceService', () => {
       });
       globalThis.fetch = mockFetch;
 
-      const blob = new Blob(['audio data'], { type: 'audio/webm;codecs=opus' });
+      const blob = new Blob([AUDIO_DATA], { type: 'audio/webm;codecs=opus' });
 
       await expect(transcribe(blob)).rejects.toThrow('Transcripción vacía');
     });
@@ -163,7 +183,7 @@ describe('voiceService', () => {
       });
       globalThis.fetch = mockFetch;
 
-      const blob = new Blob(['audio data'], { type: 'audio/webm;codecs=opus' });
+      const blob = new Blob([AUDIO_DATA], { type: 'audio/webm;codecs=opus' });
 
       await expect(transcribe(blob)).rejects.toThrow('Transcripción vacía');
     });
@@ -177,7 +197,7 @@ describe('voiceService', () => {
       });
       globalThis.fetch = mockFetch;
 
-      const blob = new Blob(['audio data'], { type: 'audio/webm;codecs=opus' });
+      const blob = new Blob([AUDIO_DATA], { type: 'audio/webm;codecs=opus' });
       const result = await transcribe(blob);
 
       expect(result).toBe('Choachí');
@@ -195,7 +215,7 @@ describe('voiceService', () => {
       });
       globalThis.fetch = mockFetch;
 
-      const blob = new Blob(['audio data'], { type: 'audio/webm;codecs=opus' });
+      const blob = new Blob([AUDIO_DATA], { type: 'audio/webm;codecs=opus' });
 
       // Iniciamos la transcripción
       const transcribePromise = transcribe(blob);
@@ -216,7 +236,7 @@ describe('voiceService', () => {
       mockFetch.mockRejectedValueOnce(new Error('Network error'));
       globalThis.fetch = mockFetch;
 
-      const blob = new Blob(['audio data'], { type: 'audio/webm;codecs=opus' });
+      const blob = new Blob([AUDIO_DATA], { type: 'audio/webm;codecs=opus' });
 
       await expect(transcribe(blob)).rejects.toThrow('Network error');
     });
@@ -226,7 +246,7 @@ describe('voiceService', () => {
     it('delega en syncManager.saveVoiceRecording con status pending', async () => {
       syncManager.saveVoiceRecording.mockResolvedValueOnce(undefined);
 
-      const blob = new Blob(['audio data'], { type: 'audio/webm;codecs=opus' });
+      const blob = new Blob([AUDIO_DATA], { type: 'audio/webm;codecs=opus' });
       await queueForRetry(blob, { reason: 'Whisper 503', durationMs: 4500 });
 
       expect(syncManager.saveVoiceRecording).toHaveBeenCalledTimes(1);
@@ -242,7 +262,7 @@ describe('voiceService', () => {
     it('usa valores default si metadata está incompleta', async () => {
       syncManager.saveVoiceRecording.mockResolvedValueOnce(undefined);
 
-      const blob = new Blob(['audio data'], { type: 'audio/webm;codecs=opus' });
+      const blob = new Blob([AUDIO_DATA], { type: 'audio/webm;codecs=opus' });
       await queueForRetry(blob, {});
 
       expect(syncManager.saveVoiceRecording).toHaveBeenCalledTimes(1);
@@ -257,7 +277,7 @@ describe('voiceService', () => {
     it('propaga errores de syncManager', async () => {
       syncManager.saveVoiceRecording.mockRejectedValueOnce(new Error('DB error'));
 
-      const blob = new Blob(['audio data'], { type: 'audio/webm;codecs=opus' });
+      const blob = new Blob([AUDIO_DATA], { type: 'audio/webm;codecs=opus' });
 
       await expect(queueForRetry(blob)).rejects.toThrow('DB error');
     });
