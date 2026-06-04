@@ -2633,7 +2633,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     : 'Escribe tu pregunta...';
 
   return (
-    <div className={`h-full flex flex-col bg-slate-950 ${entranceClassRef.current}`}>
+    <div className={`h-[100dvh] flex flex-col bg-slate-950 overflow-hidden ${entranceClassRef.current}`}>
       {/* B1: animación de entrada (fade+rise) para que se perciba el cruce al
           agente. Respeta prefers-reduced-motion vía @media en el CSS. */}
       <style>{AGENT_ENTRANCE_CSS}</style>
@@ -2770,6 +2770,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         onCancelDeepResearch={handleCancelDeepResearch}
         proactiveGreeting={proactiveGreeting}
         onGreetingPrompt={(prompt) => prompt && setInputText(prompt)}
+        onBack={onBack}
       />
 
       {/* Error */}
