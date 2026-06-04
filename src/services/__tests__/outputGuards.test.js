@@ -809,6 +809,77 @@ describe('guardSpeciesSubstitution', () => {
     expect(out.modified).toBe(false);
   });
 
+  it('CASO PILOTO 2026-06-04: NO atribuye binomio de "tomate de árbol" a un homónimo ("tomate arandano")', () => {
+    // El resolver fuzzy-matcheó "tomate arandano" → los cultivares "tomate de árbol"
+    // (comparten el token genérico "tomate") y los inyectó al grounding. El guard NO
+    // debe "corregir" que «tomate de árbol es Solanum betaceum, no Solanum lycopersicum»
+    // sobre un texto que habla de OTRO cultivo. Antes disparaba DOS correcciones falsas
+    // (cultivar naranja + morado) porque anclaba solo en "tomate".
+    const resolved = [
+      {
+        mentioned: 'tomate de árbol naranja',
+        kind: 'species',
+        nombre_comun: 'Tomate de árbol naranja',
+        nombre_cientifico: 'Solanum betaceum Cav.',
+        canonical_id: 'solanum_betaceum_naranja',
+        confidence: 0.6,
+      },
+      {
+        mentioned: 'tomate de árbol morado',
+        kind: 'species',
+        nombre_comun: 'Tomate de árbol morado',
+        nombre_cientifico: 'Solanum betaceum Cav.',
+        canonical_id: 'solanum_betaceum_morado',
+        confidence: 0.6,
+      },
+      {
+        mentioned: 'tomate',
+        kind: 'species',
+        nombre_comun: 'Tomate',
+        nombre_cientifico: 'Solanum lycopersicum L.',
+        canonical_id: 'solanum_lycopersicum',
+        confidence: 0.7,
+      },
+    ];
+    const txt =
+      'El tomate arandano (Solanum lycopersicum) es una variedad de tomate cereza. ' +
+      'Prefiere suelos bien drenados y clima templado.';
+    const out = guardSpeciesSubstitution(txt, resolved);
+    expect(out.modified).toBe(false);
+    expect(out.text).toBe(txt);
+    expect(out.text).not.toMatch(/tomate de [aá]rbol[^.]*es Solanum betaceum/i);
+  });
+
+  it('SÍ sigue corrigiendo "tomate de árbol" cuando el TEXTO sí habla de tomate de árbol', () => {
+    // Anti-regresión del fix de ancla: el caso legítimo (el texto menciona el cultivo
+    // multi-palabra real) debe seguir disparando. El modelo le puso un binomio errado
+    // y real del grounding a un cultivo que sí es tomate de árbol.
+    const resolved = [
+      {
+        mentioned: 'tomate de árbol',
+        kind: 'species',
+        nombre_comun: 'Tomate de árbol',
+        nombre_cientifico: 'Solanum betaceum Cav.',
+        canonical_id: 'solanum_betaceum',
+        confidence: 0.9,
+      },
+      {
+        mentioned: 'lulo',
+        kind: 'species',
+        nombre_comun: 'Lulo',
+        nombre_cientifico: 'Solanum quitoense Lam.',
+        canonical_id: 'solanum_quitoense',
+        confidence: 0.9,
+      },
+    ];
+    const txt =
+      'El tomate de árbol (Solanum quitoense) es una fruta andina de clima frío que ' +
+      'se da entre 1800 y 2600 msnm.';
+    const out = guardSpeciesSubstitution(txt, resolved);
+    expect(out.modified).toBe(true);
+    expect(out.text).toMatch(/Solanum betaceum/);
+  });
+
   it('tolera el binomio del catálogo con autoría/variedad (compara solo Género epíteto)', () => {
     // nombre_cientifico del grounding trae "Lam." de autoría; el texto trae el binomio puro.
     const txt = 'El lulo es en realidad Passiflora tripartita, una fruta de clima frío.';
