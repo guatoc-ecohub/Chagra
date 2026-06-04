@@ -48,7 +48,6 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
-import { execFileSync } from 'node:child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -621,13 +620,15 @@ export function readSeedJson(path) {
 }
 
 /**
- * Lee especies crudas desde public/catalog.sqlite. Estrategia robusta:
+ * Lee especies crudas desde public/catalog.sqlite. Estrategia robusta y
+ * portable (sin daemons ni binarios de sistema):
  *   1) better-sqlite3 (lo que usan los demás scripts Node del repo, p.ej.
  *      build-catalog-sqlite.mjs) — preferido en CI donde el binario nativo
  *      coincide con el Node del runner.
  *   2) Si el binario nativo tiene ABI mismatch (NODE_MODULE_VERSION) u otro
- *      fallo de carga, cae a shell-out al binario `sqlite3` (vía nix-shell en
- *      NixOS) que dumpa la columna `data` como JSON.
+ *      fallo de carga, cae a @sqlite.org/sqlite-wasm (wasm puro, también
+ *      dependencia del repo) que deserializa el archivo en memoria. No depende
+ *      de PATH ni del nix-daemon.
  * Cada fila trae el blob JSON completo en `data`.
  */
 export async function readSqlite(path) {
@@ -642,42 +643,44 @@ export async function readSqlite(path) {
     }
   } catch (err) {
     process.stderr.write(
-      `[gen-borde-rotation] better-sqlite3 no disponible (${String(err.message).split('\n')[0]}); cayendo a sqlite3 CLI\n`
+      `[gen-borde-rotation] better-sqlite3 no disponible (${String(err.message).split('\n')[0]}); cayendo a sqlite-wasm\n`
     );
-    return readSqliteViaCli(path);
+    return readSqliteViaWasm(path);
   }
 }
 
 /**
- * Fallback portable: dumpa la columna `data` con el binario `sqlite3`. En NixOS
- * el host no trae sqlite3 en PATH → se intenta vía `nix-shell -p sqlite`.
+ * Fallback portable: deserializa el archivo sqlite con el binding wasm
+ * (@sqlite.org/sqlite-wasm). No requiere binario nativo ni `sqlite3` en PATH.
  */
-export function readSqliteViaCli(path) {
-  const sql = 'SELECT data FROM species;';
-  const runners = [
-    ['sqlite3', [path, sql]],
-    ['nix-shell', ['-p', 'sqlite', '--run', `sqlite3 '${path}' "${sql}"`]],
-  ];
-  let out = null;
-  let lastErr = null;
-  for (const [bin, argv] of runners) {
-    try {
-      out = execFileSync(bin, argv, { encoding: 'utf-8', maxBuffer: 1 << 28 });
-      break;
-    } catch (e) {
-      lastErr = e;
-    }
-  }
-  if (out == null) {
-    throw new Error(
-      `no se pudo leer ${path}: ni better-sqlite3 ni el binario sqlite3 están disponibles (${lastErr ? lastErr.message : 'sin detalle'})`
+export async function readSqliteViaWasm(path) {
+  const init = (await import('@sqlite.org/sqlite-wasm')).default;
+  const sqlite3 = await init();
+  const buf = readFileSync(path);
+  const n = buf.byteLength;
+  const pData = sqlite3.wasm.alloc(n);
+  sqlite3.wasm.heap8u().set(buf, pData);
+  const db = new sqlite3.oo1.DB();
+  try {
+    const rc = sqlite3.capi.sqlite3_deserialize(
+      db.pointer,
+      'main',
+      pData,
+      n,
+      n,
+      sqlite3.capi.SQLITE_DESERIALIZE_FREEONCLOSE |
+        sqlite3.capi.SQLITE_DESERIALIZE_RESIZEABLE
     );
+    if (rc) throw new Error(`sqlite3_deserialize rc=${rc}`);
+    const rows = db.exec({
+      sql: 'SELECT data FROM species',
+      returnValue: 'resultRows',
+      rowMode: 'object',
+    });
+    return rows.map((r) => JSON.parse(r.data));
+  } finally {
+    db.close();
   }
-  return out
-    .split('\n')
-    .map((l) => l.trim())
-    .filter(Boolean)
-    .map((l) => JSON.parse(l));
 }
 
 // ──────────────────────────────────────────────────────────────────────────
