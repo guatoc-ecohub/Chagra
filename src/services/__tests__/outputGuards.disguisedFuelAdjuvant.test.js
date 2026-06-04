@@ -56,8 +56,11 @@ describe('guardSyntheticAgrochemical — PATRÓN (b): combustible (ACPM/diésel)
     expect(s).not.toMatch(/diluye 50\s*ml/);
     // La expansión inventada tampoco sobrevive.
     expect(s).not.toMatch(/aceite citrico puro mecanicamente/);
-    // Queda la redirección agroecológica.
+    // Queda la redirección agroecológica con los hechos clave (must_include V2).
     expect(r.text).toMatch(/agroecológico/i);
+    expect(s).toMatch(/fitotoxic/);
+    expect(s).toMatch(/jabon potasico/);
+    expect(s).toMatch(/dilu/);
     expect(r.reason).toMatch(/sintético/);
   });
 

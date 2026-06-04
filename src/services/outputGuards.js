@@ -780,6 +780,27 @@ function _disguisedFuelHits(norm) {
 }
 
 /**
+ * Redirección agroecológica específica del combustible-disfrazado-de-adyuvante
+ * (PATRÓN b · BORDE-020). REEMPLAZA la receta de ACPM/diésel con los hechos que el
+ * campesino necesita: el combustible es FITOTÓXICO (quema la hoja, contamina), el
+ * purín se aplica DILUIDO (1:10 a 1:20, nunca concentrado puro), y el adherente
+ * REAL es jabón potásico (no diésel). No nombra dosis de combustible. Estable para
+ * idempotencia (contiene `ORGANIC_REDIRECT_MARKER`).
+ */
+function _fuelAdjuvantRedirect() {
+  return (
+    `Una nota importante: ${ORGANIC_REDIRECT_MARKER}. El ACPM/diésel (o cualquier combustible) NO es un ` +
+    'adherente agrícola: es FITOTÓXICO, quema la hoja, deja residuo y contamina el suelo y el agua. Nunca lo ' +
+    'mezcles en un purín ni en un caldo.\n\n' +
+    'Lo correcto con el purín de ortiga:\n' +
+    '- Aplícalo DILUIDO (de 1:10 a 1:20 en agua), nunca concentrado puro al follaje, porque concentrado quema.\n' +
+    '- Como adherente usa jabón potásico (unos pocos ml por litro), no diésel ni ACPM.\n' +
+    '- Aplica al envés de las hojas y al atardecer, y repite según veas la plaga, sin "acabarla de una".\n' +
+    '- Si dudas de la dilución o la frecuencia, consúltalo con tu técnico agrícola local o el ICA.'
+  );
+}
+
+/**
  * Marcador estable de la nota de redirección orgánica. Sirve para (a) la
  * idempotencia del guard (no re-disparar sobre un texto ya corregido) y (b)
  * identificar el bloque en tests/telemetría. Debe coincidir EXACTAMENTE con el
@@ -934,13 +955,14 @@ export function guardSyntheticAgrochemical(responseText, _resolvedEntities = nul
 
   // PATRÓN (b) BORDE-020: SUPPRESS-AND-REPLACE de combustible disfrazado de
   // adyuvante. La dosis de ACPM/diésel ("Diluye 50 ml de ACPM en 1 litro de
-  // purín") es íntegramente dañina → DESCARTAMOS el cuerpo y devolvemos solo la
-  // redirección agroecológica (que ya orienta a jabón potásico como adherente
-  // real y a diluir el purín). Va primero entre las ramas de supresión porque su
-  // gate (`hasFuelRecipe`) ya excluyó las advertencias de no-usar.
+  // purín") es íntegramente dañina → DESCARTAMOS el cuerpo y devolvemos una
+  // redirección que NOMBRA por qué (el ACPM/diésel es FITOTÓXICO), corrige la
+  // dilución del purín (concentrado puro quema) y da el adherente REAL (jabón
+  // potásico). Va primero entre las ramas de supresión porque su gate
+  // (`hasFuelRecipe`) ya excluyó las advertencias de no-usar.
   if (hasFuelRecipe) {
     return {
-      text: correction,
+      text: _fuelAdjuvantRedirect(),
       modified: true,
       reason: `agroquímico_sintético_suprimido: ${[...new Set(hits)].join(', ')}`,
     };
