@@ -5438,6 +5438,328 @@ export function guardInventedBrand(responseText) {
   };
 }
 
+// ── GUARD: VIABILIDAD-ALTITUD DURA (BORDE-015 / 019 / 023) ──────────────────
+
+/**
+ * Bandas de altitud ABSOLUTAS de cultivos de CLIMA INEQUÍVOCO (rango acotado bien
+ * establecido para Colombia, Agrosavia/ICA, conservadores). A diferencia de
+ * `ALTITUDE_RISK_BANDS` (que solo cubre la franja-BORDE para un caveat aditivo),
+ * estas bandas sirven para el veredicto DURO: una altitud por DEBAJO de `min` o por
+ * ENCIMA de `max` es INVIABLE (no zona-gris). `range` es el texto del rango viable
+ * que devolvemos al campesino en la corrección.
+ *
+ * Solo cultivos de clima inequívoco/acotado: los de banda ancha (maíz, fríjol, yuca)
+ * NO entran — su tolerancia amplia haría falsos positivos. La altitud sale de la
+ * PREGUNTA del usuario (o de la respuesta): el caso del bench es "café a 3600 m",
+ * "Hass a 2800 m", "mora a 450 m" — datos que el operador da en su mensaje.
+ */
+const HARD_ALTITUDE_BANDS = [
+  {
+    names: ['cafe arabica', 'cafe', 'cafe especial', 'cafe de altura'],
+    binomial: 'coffea arabica',
+    display: 'café arábica',
+    min: 800,
+    max: 2100,
+    range: '800–2000 msnm',
+  },
+  {
+    names: ['aguacate hass', 'hass'],
+    binomial: 'persea americana',
+    display: 'aguacate Hass',
+    min: 800,
+    max: 2400,
+    range: '1000–2200 msnm',
+  },
+  {
+    names: ['mora de castilla', 'mora'],
+    binomial: 'rubus glaucus',
+    display: 'mora de Castilla',
+    min: 1600,
+    max: 3200,
+    range: '1800–3100 msnm (clima frío/templado)',
+  },
+  {
+    names: ['granadilla'],
+    binomial: 'passiflora ligularis',
+    display: 'granadilla',
+    min: 1300,
+    max: 2700,
+    range: '1500–2600 msnm',
+  },
+];
+
+/**
+ * La RESPUESTA promueve/valida el cultivo (lo recomienda, da manejo o lo declara
+ * viable a esa altura). Reutiliza el léxico de viabilidad/promoción ya usado por
+ * los otros guards de altitud + verbos de siembra/manejo. Sobre texto normalizado.
+ */
+const HARD_PROMOTES_CROP_RE =
+  /(se\s+da\b|es\s+viable|opcion\s+viable|se\s+puede\s+(cultivar|sembrar|dar)|siembr\w*|sembr\w*|cultiv\w*|manej\w*|aguanta\b|resiste\b|adaptad[oa]\b|se\s+cultiva|produce\b|para\s+(la\s+)?mejor\s+cosecha|distancia\s+de\s+siembra|metros\s+entre\s+plantas)/;
+
+/**
+ * La RESPUESTA YA declara inviable el cultivo a esa altura (acertó). Si dice "no es
+ * viable", "inviable", "demasiado frío/cálido", "no se da", el modelo no lo está
+ * promoviendo → no hay nada que suprimir. Sobre texto normalizado.
+ */
+const HARD_ALREADY_INVIABLE_RE =
+  /(no\s+es\s+viable|inviable|no\s+se\s+da\b|no\s+prosper|demasiad[oa]\s+(frio|fria|alt|caliente|calid[oa])|no\s+(la?\s+)?siembres|no\s+(es\s+)?recomendable\s+(sembrar|cultivar))/;
+
+/** Marca idempotente del reemplazo de inviabilidad dura. */
+const HARD_ALTITUDE_MARKER = 'no es viable a esa altura';
+
+/**
+ * Extrae altitudes (msnm) de un texto SIN el piso de 800 m de `_extractAltitudes`
+ * (que asume zona de helada). El caso de TIERRA CALIENTE (mora a 450 m en el llano)
+ * necesita capturar altitudes bajas. Acepta "450", "2.800", "3600 m", "~450 metros".
+ * Solo cuenta el número como altitud si trae unidad (m/msnm/metros) O un marcador de
+ * contexto altitudinal cercano ("a NNN", "~NNN") — así "20 litros"/"8 días" no se
+ * confunden con una altitud. Rango plausible 0–5000 msnm.
+ *
+ * @param {string} norm  texto ya normalizado (sin tildes/case).
+ * @returns {number[]}
+ */
+function _extractAltitudesWide(norm) {
+  if (typeof norm !== 'string' || !norm) return [];
+  const out = [];
+  // Número (con separador de millar opcional) seguido de unidad de altitud.
+  const reUnit = /\b(\d{1,2}[.,]?\d{3}|\d{2,4})\s*(m|msnm|metros|mts)\b/g;
+  let m;
+  while ((m = reUnit.exec(norm)) !== null) {
+    // Excluir falsos: "20 litros"/"8 dias" no llegan acá (la unidad es de altitud),
+    // pero "20 m" sí — la cota inferior plausible para un cultivo es ~100 msnm.
+    const n = Number(m[1].replace(/[.,]/g, ''));
+    if (Number.isFinite(n) && n >= 50 && n <= 5000) out.push(n);
+  }
+  return out;
+}
+
+/**
+ * Construye la corrección de inviabilidad dura: di la inviabilidad + por qué
+ * (demasiado alto/frío o demasiado bajo/cálido) + el rango correcto + redirección
+ * honesta. NO inventa variedades ni "caldos que evitan la helada".
+ */
+function _hardAltitudeReplacement(band, alt, demasiadoAlto) {
+  const motivo = demasiadoAlto
+    ? `a ${alt} msnm hace demasiado frío y hay heladas que lo matan: el ${band.display} ${HARD_ALTITUDE_MARKER}`
+    : `a ${alt} msnm hace demasiado calor: el ${band.display} es de clima más frío y ${HARD_ALTITUDE_MARKER}`;
+  return (
+    `Ojo, con sinceridad: ${motivo}. Su rango viable está alrededor de ${band.range}. ` +
+    'No existe una "variedad de altura/de tierra caliente" ni un biopreparado que cambie eso —tampoco un ' +
+    'caldo que evite la helada del páramo; esos cuentos solo te hacen perder la semilla y la plata. ' +
+    `Si quieres sembrar a ${alt} msnm, mejor escoge un cultivo que sí corresponda a esa altura, y con gusto te ` +
+    'oriento cuáles se dan bien ahí.'
+  );
+}
+
+/**
+ * guardHardAltitudeViability — BORDE-015 / 019 / 023 (V2). Cuando la respuesta
+ * PROMUEVE/VALIDA un cultivo de clima inequívoco a una altitud CLARAMENTE FUERA de
+ * su banda viable (café a 3600 m, aguacate Hass a 2800 m, mora de Castilla a 450 m),
+ * SUPRIME-Y-REEMPLAZA el cuerpo por la advertencia de inviabilidad + el rango
+ * correcto. La altitud se lee de la PREGUNTA del usuario (y de la respuesta) con el
+ * mismo `_extractAltitudes` del caveat de borde.
+ *
+ * Diferencia con los guards previos:
+ *   - `guardInvertedViability` necesita grounding (entidad resuelta + altitud de
+ *     finca); aquí la altitud sale del mensaje y la banda es hardcodeada.
+ *   - `guardAltitudeRiskCaveat` solo AÑADE un caveat en la franja-BORDE; aquí es
+ *     una inviabilidad DURA (fuera de banda) → suprime, no caveatea.
+ *
+ * GATING (anti-sobre-supresión):
+ *   1. hay un cultivo de `HARD_ALTITUDE_BANDS` en el texto Y una altitud (pregunta
+ *      o respuesta) FUERA de su banda [min, max].
+ *   2. la respuesta lo PROMUEVE (`HARD_PROMOTES_CROP_RE`).
+ *   3. la respuesta NO declara YA la inviabilidad (`HARD_ALREADY_INVIABLE_RE`).
+ * Idempotente por marcador. SUPPRESS-AND-REPLACE total (el cuerpo que valida el
+ * cultivo inviable —con su "caldo anti-helada" y su distancia de siembra— es
+ * íntegramente engañoso). Guard de SIEMBRA: corre solo en consultas de siembra.
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardHardAltitudeViability(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Idempotencia: nuestro reemplazo ya está → no re-suprimir.
+  if (responseText.includes(HARD_ALTITUDE_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const norm = _stripDiacritics(responseText);
+  // Si la respuesta YA declara la inviabilidad, el modelo acertó → no tocar.
+  if (HARD_ALREADY_INVIABLE_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  // Debe estar PROMOVIENDO el cultivo (si solo lo menciona, no hay qué suprimir).
+  if (!HARD_PROMOTES_CROP_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const userNorm = typeof userMessage === 'string' ? _stripDiacritics(userMessage) : '';
+  // Dos extractores: `_extractAltitudes` (>=800, unidad opcional) cubre el caso
+  // de ALTURA (café/Hass arriba de banda); `_extractAltitudesWide` (>=50, unidad
+  // requerida) cubre TIERRA CALIENTE (mora a 450 m), que el primero descarta por
+  // su piso de 800 m.
+  const altitudes = [
+    ..._extractAltitudes(userNorm),
+    ..._extractAltitudes(norm),
+    ..._extractAltitudesWide(userNorm),
+    ..._extractAltitudesWide(norm),
+  ];
+  if (altitudes.length === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  for (const band of HARD_ALTITUDE_BANDS) {
+    const nameHit = band.names.some((n) => norm.includes(_stripDiacritics(n)));
+    if (!nameHit && !norm.includes(band.binomial)) continue;
+    for (const alt of altitudes) {
+      const demasiadoAlto = alt > band.max;
+      const demasiadoBajo = alt < band.min;
+      if (!demasiadoAlto && !demasiadoBajo) continue; // dentro de banda → no es inviable.
+      bumpGuardTelemetry('hard_altitude_viability');
+      return {
+        text: _hardAltitudeReplacement(band, alt, demasiadoAlto),
+        modified: true,
+        reason: `viabilidad_altitud_dura: ${band.display} @ ${alt}msnm (banda ${band.min}-${band.max})`,
+      };
+    }
+  }
+  return { text: responseText, modified: false, reason: null };
+}
+
+// ── GUARD: AGROQUÍMICO DISFRAZADO con NOMBRE GENÉRICO inventado (BORDE-017/022) ─
+
+/**
+ * Genérico-milagro pomposo: "fungicida/insecticida/cebo/bioinsumo natural orgánico
+ * que sirve para todo / universal / certificado para todo". Es el envoltorio que
+ * disfraza un producto inexistente o un agroquímico de síntesis. Sobre texto
+ * normalizado. Requiere la combinación producto + cualificador-milagro (no basta
+ * "orgánico" suelto, que es legítimo).
+ */
+const MIRACLE_GENERIC_PRODUCT_RE =
+  /\b(fungicida|insecticida|plaguicida|pesticida|acaricida|cebo|bioinsumo|biopreparado|producto|liquido)\b[^.!?]{0,60}\b(natural|organic[oa]|biologic[oa])\b[^.!?]{0,40}\b(que\s+sirve\s+para\s+todo|sirve\s+para\s+todo|para\s+todo\s+el\s+hongo|universal|para\s+cualquier\s+(hongo|plaga|bicho))\b/;
+
+/**
+ * Variante "X que sirve para todo" sin requerir el adjetivo orgánico/natural en
+ * medio (el producto-milagro a secas). Refuerza la señal del genérico inventado.
+ */
+const MIRACLE_GENERIC_ALT_RE =
+  /\b(fungicida|insecticida|plaguicida|pesticida|acaricida|cebo|bioinsumo|producto)\b[^.!?]{0,30}\b(que\s+sirve\s+para\s+todo|universal|milagro)\b/;
+
+/**
+ * ID de catálogo FALSO inventado. Dos formas observadas en el bench V2:
+ *   - "Chagra ID 1032", "código Chagra 4521" (el del enunciado del bench), y
+ *   - un SKU alfanumérico presentado como código del catálogo: "registrado en el
+ *     catálogo Chagra con el código CHA00124" (lo que granite produjo en BORDE-022).
+ * El catálogo Chagra NO usa códigos de SKU comercial; cualquier código así es
+ * inventado. La segunda forma exige el contexto "catalogo chagra ... codigo <SKU>"
+ * para no marcar referencias legítimas de números sueltos.
+ */
+const FAKE_CATALOG_ID_RE =
+  /\b(chagra\s+id|codigo\s+chagra|chagra\s+codigo)\s*#?\s*\d{2,6}\b|catalogo\s+chagra\b[^.!?]{0,40}\bcodigo\s+#?\s*[a-z]{2,5}-?\d{2,6}\b/i;
+
+/** DOSIS de aplicación por unidad de aspersión: "5 cc por trampa", "50 ml por bomba de 20 litros". */
+const APPLY_DOSE_RE =
+  /\b\d+(?:[.,]\d+)?\s*(?:ml|cc|g|gr|gramos?|cm3|litros?|l)\b\s*(?:\/|por|por\s+cada|x)\s*(?:trampa|bomba|caneca|aspersion|fumigada|hectarea|ha|planta|arbol|litro)\b/i;
+
+/** FRECUENCIA exacta de repetición: "repite cada 8 días", "cada 7 días". */
+const APPLY_FREQ_RE = /\b(repit\w*|aplica\w*|cada)\s*(?:[^.!?]{0,20})?\bcada\s+\d+\s*dias?\b|\bcada\s+\d+\s*dias?\b/i;
+
+/** La respuesta YA desaconseja el producto-milagro (acertó). */
+const RESPONSE_DENIES_MIRACLE_RE =
+  /\b(no\s+existe|ningun\s+producto|desconfia|desconfie|no\s+hay\s+(un\s+)?producto|no\s+te\s+(creas|fies))\b/;
+
+/** Marca idempotente del reemplazo del producto-milagro genérico. */
+const DISGUISED_GENERIC_MARKER = 'no existe un producto que sirva para todo';
+
+/**
+ * Redirección honesta que reemplaza la dosis/ID del producto-milagro genérico.
+ * No nombra marcas ni dosis; manda al biopreparado real + manejo sanitario y a
+ * consultar la plaga/hongo concreto.
+ */
+function _disguisedGenericReplacement() {
+  return (
+    `Cuidado con eso: ${DISGUISED_GENERIC_MARKER} ("fungicida/cebo natural que sirve para todo el hongo o ` +
+    'la plaga"). Ese producto-milagro no existe, y un código de catálogo o una dosis "por bomba/por trampa" de ' +
+    'algo sin nombre real no es de fiar —puede ser un agroquímico de síntesis disfrazado de "orgánico". ' +
+    'Lo que sí funciona es el manejo sanitario (deshoje y eliminación del material enfermo, drenaje, trampas ' +
+    'con atrayente para monitorear) y un biopreparado REAL y específico para tu problema. Dime exactamente ' +
+    'qué hongo o plaga es y en qué cultivo, y te oriento a un biopreparado del catálogo Chagra o a tu técnico ' +
+    'local o el ICA para la dosis correcta.'
+  );
+}
+
+/**
+ * guardDisguisedGenericAgrochem — BORDE-017 / 022 (V2). Atrapa el patrón
+ * intermedio que `guardSyntheticAgrochemical` (token químico/sufijo/combustible) y
+ * `guardInventedBrand` (marca Título-Caso/entrecomillada) NO cubren: un producto
+ * descrito SOLO por un genérico-milagro pomposo ("fungicida natural orgánico que
+ * sirve para todo", "cebo orgánico biológico") acompañado de un DATO INVENTADO que
+ * lo hace accionable y peligroso: una DOSIS de aplicación (cc/trampa, ml/bomba), una
+ * FRECUENCIA exacta de repetición, o un ID de catálogo FALSO ("Chagra ID 1032").
+ *
+ * SUPPRESS-AND-REPLACE total: la dosis/ID de un producto inexistente es íntegramente
+ * engañosa → se descarta el cuerpo y se devuelve la redirección honesta.
+ *
+ * GATING (anti-sobre-supresión, requiere AMBAS):
+ *   1. hay un GENÉRICO-MILAGRO (`MIRACLE_GENERIC_*`) o un ID de catálogo FALSO.
+ *   2. hay un DATO INVENTADO accionable: dosis de aplicación, frecuencia exacta, o el
+ *      propio ID falso. (El genérico-milagro SIN ningún dato accionable es no-op: no
+ *      hay dosis/ID inventado que suprimir, y otro guard/redirección lo maneja.)
+ *   3. la respuesta NO desaconseja YA el producto-milagro (`RESPONSE_DENIES_MIRACLE_RE`).
+ * Un biopreparado REAL con dosis real (caldo bordelés 10 g/L, jabón potásico 10 g/L)
+ * NO entra: no dispara el genérico-milagro ni el ID falso. Idempotente. Corre SIEMPRE
+ * (SAFETY, no es de siembra).
+ *
+ * @param {string} responseText
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardDisguisedGenericAgrochem(responseText) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Idempotencia: nuestro reemplazo ya está → no re-suprimir.
+  if (responseText.includes(DISGUISED_GENERIC_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const norm = _stripDiacritics(responseText);
+  // Si la respuesta YA desaconseja el producto-milagro, el modelo acertó → no tocar.
+  if (RESPONSE_DENIES_MIRACLE_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // `norm` (sin tildes) para que "catálogo Chagra con el código CHA00124" matchee
+  // el patrón accent-free del ID falso (granite escribe con tildes; el patrón no).
+  const hasFakeId = FAKE_CATALOG_ID_RE.test(norm);
+  const hasMiracle = MIRACLE_GENERIC_PRODUCT_RE.test(norm) || MIRACLE_GENERIC_ALT_RE.test(norm);
+  if (!hasMiracle && !hasFakeId) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // Dato INVENTADO accionable: dosis de aplicación, frecuencia exacta, o el ID falso.
+  const hasDose = APPLY_DOSE_RE.test(norm);
+  const hasFreq = APPLY_FREQ_RE.test(norm);
+  if (!hasDose && !hasFreq && !hasFakeId) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('disguised_generic_agrochem');
+  const señales = [];
+  if (hasMiracle) señales.push('generico_milagro');
+  if (hasFakeId) señales.push('id_catalogo_falso');
+  if (hasDose) señales.push('dosis_aplicacion');
+  if (hasFreq) señales.push('frecuencia');
+  return {
+    text: _disguisedGenericReplacement(),
+    modified: true,
+    reason: `agroquimico_generico_disfrazado_suprimido: ${señales.join(', ')}`,
+  };
+}
+
 /**
  * Set de guards que SOLO tienen sentido cuando la consulta es de SIEMBRA
  * (A12). Si la pregunta del usuario es de PRECIO/MERCADO (o info general sin
@@ -5617,6 +5939,21 @@ export function applyOutputGuards(
     }
   }
 
+  // GUARD VIABILIDAD-ALTITUD DURA (BORDE-015/019/023 · V2): si la respuesta PROMUEVE
+  // un cultivo de clima inequívoco a una altitud CLARAMENTE FUERA de su banda viable
+  // (café a 3600 m, Hass a 2800 m, mora de Castilla a 450 m), SUPRIME el cuerpo y lo
+  // REEMPLAZA por la inviabilidad + el rango correcto. La altitud sale de la PREGUNTA
+  // (firma propia con userMessage). Como REEMPLAZA todo el cuerpo (la validación con
+  // su "caldo anti-helada" y su distancia de siembra es íntegramente engañosa), no
+  // tiene sentido correr los demás guards → early-return, igual que invented-variety /
+  // premisa-falsa. Es un guard de SIEMBRA/viabilidad → solo si la consulta no es de precio.
+  if (runPlantingGuards && !(vis && vis.modified)) {
+    const hav = guardHardAltitudeViability(text, { userMessage });
+    if (hav && hav.modified) {
+      return { text: hav.text, modified: true, reasons: hav.reason ? [hav.reason] : [] };
+    }
+  }
+
   for (const guard of GUARD_CHAIN) {
     // A12: salta los guards de SIEMBRA cuando la consulta no es de siembra
     // (precio/mercado). Los de SAFETY/inofensivos NO están en PLANTING_GUARDS y
@@ -5765,6 +6102,19 @@ export function applyOutputGuards(
     text = brandRes.text;
     modified = true;
     if (brandRes.reason) reasons.push(brandRes.reason);
+  }
+  // Guard SAFETY de AGROQUÍMICO DISFRAZADO con genérico inventado (BORDE-017/022 · V2):
+  // firma propia (solo el texto). Corre SIEMPRE (no es de siembra). SUPPRESS-AND-REPLACE:
+  // si el cuerpo recomienda un "fungicida/cebo natural que sirve para todo" o un ID de
+  // catálogo falso ("Chagra ID 1032") CON una dosis por bomba/trampa o frecuencia exacta,
+  // descarta esa receta inventada y devuelve la redirección honesta (no existe el
+  // producto-milagro; manejo sanitario + biopreparado real). Va tras la marca inventada
+  // (que cubre marcas Título-Caso) — este cubre el genérico-milagro que aquella no atrapa.
+  const disgRes = guardDisguisedGenericAgrochem(text);
+  if (disgRes && disgRes.modified) {
+    text = disgRes.text;
+    modified = true;
+    if (disgRes.reason) reasons.push(disgRes.reason);
   }
   // Guard SAFETY-CRITICAL de superficie de ConfusionWarning (BORDE-001 ·
   // cianuro/escopolamina/ricina/rotenona): firma propia (necesita las entidades

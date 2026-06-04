@@ -61,6 +61,12 @@ import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities,
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
 // los chips cuyo backend aún no existe (precio/deep).
 import { planForcedIntent, isStubIntent, isDeepResearchIntent, CHIP_DEFS } from '../../services/chipIntentRouter';
+// #349 — router heurístico de GROUNDING para el path de FALLO del NLU. Cuando
+// `planNlu` devuelve null (timeout/fail del sidecar bajo contención de GPU), el
+// turno NO debe saltarse el grounding: este router PURO deriva el tool obvio
+// (entidad resuelta o keyword → get_species/get_pest_controllers/get_biopreparados)
+// para intentar AL MENOS una consulta al grafo en vez de caer a generativo puro.
+import { planNluFallback } from '../../services/agentNluFallback';
 // Deep Research (A6/A7): cliente HTTP del endpoint async de investigación
 // profunda del sidecar. Feature flag VITE_DEEP_RESEARCH_ENABLED (default false).
 import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../../services/deepResearchClient';
@@ -1625,6 +1631,40 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
               latencyNlu: Math.round(tNlu1 - tNlu0),
               reason: plan.reason || 'no_tool',
             });
+          }
+
+          // #349 — DEGRADE BEST-EFFORT CON GROUNDING. Si el NLU planner MURIÓ
+          // (`plan === null`: timeout/fail del sidecar bajo contención de GPU) y
+          // todavía no hay evidencia de tool, NO degradamos a generativo puro:
+          // derivamos un tool OBVIO (entidad ya resuelta por resolveEntities, o
+          // keyword del mensaje) y lo intentamos. Así el LLM recibe el grounding
+          // rico (ficha/companions/controladores) en vez de solo el binomio
+          // ligero — o, en el peor caso, al menos la ficha de la especie.
+          //
+          // SOLO corre cuando el planner devolvió NULL (murió), NUNCA cuando el
+          // planner decidió deliberadamente "no_tool" (`plan` truthy con useTool
+          // false): esa es una decisión válida (ej. preguntas de inventario) que
+          // no debemos pisar con un tool forzado. callTool ya es no-throw.
+          if (!toolEvidence && !plan) {
+            const fbPlan = planNluFallback(textForLLM, resolvedEntities);
+            if (fbPlan && fbPlan.tool) {
+              const tFb0 = performance.now();
+              const fbResult = await callTool(fbPlan.tool, fbPlan.args);
+              const tFb1 = performance.now();
+              if (fbResult) {
+                toolEvidence = { tool: fbPlan.tool, args: fbPlan.args, result: fbResult };
+                console.debug('[sidecar] NLU muerto — grounding best-effort (#349)', {
+                  tool: fbPlan.tool,
+                  source: fbPlan.source,
+                  latencyTool: Math.round(tFb1 - tFb0),
+                });
+              } else {
+                console.debug('[sidecar] NLU muerto — fallback tool null (#349)', {
+                  tool: fbPlan.tool,
+                  source: fbPlan.source,
+                });
+              }
+            }
           }
           }
 
