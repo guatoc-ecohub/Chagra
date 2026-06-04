@@ -706,6 +706,72 @@ describe('agentService — Task #202 Profile Context', () => {
         expect(matches.length).toBe(1);
       });
     });
+
+    // ──────────────────────────────────────────────────────────────────────
+    // Incidente prod (piloto Choachí): cuando la ÚNICA altitud guardada es la
+    // de la CABECERA municipal (fallback offline DANE, `altitud_source:
+    // 'cabecera'`) — caso en que el GPS se difuminó a la cabecera en el primer
+    // onboarding y no quedó una altitud "buena" que proteger —, el agente la
+    // anclaba como si fuera la finca real (ej. "Choachí, 1923 msnm") y
+    // corrompía piso térmico, ventana de siembra y plagas. Choachí va de ~1.100
+    // a ~3.500 msnm según la vereda: el centroide municipal NO es la finca.
+    // El contexto del agente debe MARCAR esa altitud como incierta (cabecera,
+    // no finca) y pedir confirmar la altitud real, en vez de afirmarla.
+    // ──────────────────────────────────────────────────────────────────────
+    describe('altitud de cabecera (no finca) — no anclar como confirmada', () => {
+      const cabeceraProfile = {
+        municipio: 'Choachí',
+        departamento: 'Cundinamarca',
+        finca_altitud: '1923',
+        altitud_source: 'cabecera',
+        ubicacion_lat: 4.529,
+        ubicacion_lng: -73.923,
+      };
+
+      it('marca la altitud como CABECERA del municipio, no como la de la finca', () => {
+        const ctx = buildFincaContext({ profile: cabeceraProfile, month: 5 });
+        // La altitud sigue presente (es la mejor estimación disponible)…
+        expect(ctx).toContain('1923 msnm');
+        // …pero NO se presenta como dato confirmado de la finca: se rotula
+        // como cabecera/aproximada para que el agente no la afirme.
+        expect(ctx.toLowerCase()).toContain('cabecera');
+      });
+
+      it('instruye al agente a NO afirmar piso térmico/viabilidad sobre la cabecera y a pedir la altitud real', () => {
+        const ctx = buildFincaContext({ profile: cabeceraProfile, month: 5 });
+        expect(ctx).toMatch(/altitud real|confirm/i);
+      });
+
+      it('NO marca cabecera cuando la altitud viene de GPS/elevación (source confiable)', () => {
+        const ctx = buildFincaContext({
+          profile: { ...cabeceraProfile, finca_altitud: '2580', altitud_source: 'elevation_api' },
+          month: 5,
+        });
+        expect(ctx).toContain('2580 msnm');
+        expect(ctx.toLowerCase()).not.toContain('cabecera');
+      });
+
+      it('NO marca cabecera cuando el usuario fijó la altitud a mano (manual)', () => {
+        const ctx = buildFincaContext({
+          profile: { ...cabeceraProfile, finca_altitud: '2580', altitud_source: 'manual' },
+          month: 5,
+        });
+        expect(ctx).toContain('2580 msnm');
+        expect(ctx.toLowerCase()).not.toContain('cabecera');
+      });
+
+      it('la altitud REAL de la finca activa manda sobre la cabecera del perfil', () => {
+        // Si la finca activa trae su propia altitud confirmada, esa es la
+        // verdad: no hay que rotular cabecera aunque el perfil esté contaminado.
+        const ctx = buildFincaContext({
+          profile: cabeceraProfile,
+          finca: { nombre: 'La Esperanza', altitud: 2580 },
+          month: 5,
+        });
+        expect(ctx).toContain('2580 msnm');
+        expect(ctx.toLowerCase()).not.toContain('cabecera');
+      });
+    });
   });
 
   // ────────────────────────────────────────────────────────────────────────
