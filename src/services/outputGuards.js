@@ -5668,27 +5668,72 @@ const APPLY_DOSE_RE =
 /** FRECUENCIA exacta de repetición: "repite cada 8 días", "cada 7 días". */
 const APPLY_FREQ_RE = /\b(repit\w*|aplica\w*|cada)\s*(?:[^.!?]{0,20})?\bcada\s+\d+\s*dias?\b|\bcada\s+\d+\s*dias?\b/i;
 
-/** La respuesta YA desaconseja el producto-milagro (acertó). */
+/**
+ * VENENO/CEBO CASERO presentado como receta a PREPARAR (BORDE-022, variante no-determinista
+ * de granite): "prepara un veneno casero con melaza", "cebo casero". Un biopreparado REAL
+ * nunca se llama "veneno casero"; esta expresión denota una concocción improvisada cuya
+ * "dosis" es inventada. Requiere el verbo de preparación/refuerzo cerca para no marcar una
+ * mención de pasada ni una advertencia ("no prepares venenos caseros"). Sobre texto normalizado.
+ */
+const HOMEMADE_POISON_RECIPE_RE =
+  /\b(veneno|cebo|insecticida|plaguicida|matabicho|mata\s*bichos?)\s+casero\b[^.!?]{0,60}\b(prepar\w*|hace\w*|haz\b|sigue\s+estos\s+pasos|con\s+melaza|reforz\w*|aplic\w*|mezcl\w*|disuelv\w*)\b|\b(prepara\w*|haz\b|hacer)\b[^.!?]{0,30}\b(veneno|cebo|matabicho)\s+casero\b/;
+
+/**
+ * La respuesta YA desaconseja el producto-MILAGRO específicamente (acertó). Debe ligar
+ * la negación al "sirve para todo / producto-milagro", NO a una marca concreta: el
+ * reemplazo de `guardInventedBrand` ("no existe ningún producto comercial con ese nombre")
+ * trae "no existe" pero NO debunkea el producto-milagro ni la receta de veneno casero que
+ * pueda quedar debajo —por eso este guard NO debe darse por satisfecho con esa frase.
+ */
 const RESPONSE_DENIES_MIRACLE_RE =
-  /\b(no\s+existe|ningun\s+producto|desconfia|desconfie|no\s+hay\s+(un\s+)?producto|no\s+te\s+(creas|fies))\b/;
+  /\b(no\s+existe|no\s+hay)\b[^.!?]{0,40}\b(producto|fungicida|cebo|insecticida|extracto|preparado)\b[^.!?]{0,40}\b(que\s+sirva\s+para\s+todo|para\s+todo|universal|milagro|cure\s+todo|controle\s+(todo|cualquier))\b|\b(desconfia|desconfie|no\s+te\s+(creas|fies))\b/;
 
 /** Marca idempotente del reemplazo del producto-milagro genérico. */
 const DISGUISED_GENERIC_MARKER = 'no existe un producto que sirva para todo';
 
 /**
- * Redirección honesta que reemplaza la dosis/ID del producto-milagro genérico.
- * No nombra marcas ni dosis; manda al biopreparado real + manejo sanitario y a
- * consultar la plaga/hongo concreto.
+ * Plagas/enfermedades conocidas cuyo NOMBRE conviene PRESERVAR al suprimir el producto
+ * inventado, para no perder la identificación del problema (que el campesino necesita
+ * para el manejo correcto, y que el bench exige como must_include). La mosca del
+ * Mediterráneo (Ceratitis capitata) es el caso de BORDE-022. Sobre texto normalizado.
  */
-function _disguisedGenericReplacement() {
+const KNOWN_PEST_CONTEXT = [
+  {
+    re: /\bmosca\s+del\s+mediterraneo\b|\bceratitis\s+capitata\b/,
+    line:
+      'Lo tuyo es la mosca del Mediterráneo (Ceratitis capitata) en el mango: una plaga concreta que se maneja ' +
+      'con manejo integrado, no con un producto "para todo".',
+  },
+];
+
+/**
+ * Si el texto original nombra una plaga/enfermedad conocida, devuelve la línea de
+ * contexto que la identifica. null si no hay match. Sobre el texto normalizado.
+ */
+function _knownPestContext(norm) {
+  for (const p of KNOWN_PEST_CONTEXT) {
+    if (p.re.test(norm)) return p.line;
+  }
+  return null;
+}
+
+/**
+ * Redirección honesta que reemplaza la dosis/ID del producto-milagro genérico.
+ * No nombra marcas ni dosis; manda al manejo INTEGRADO (trampas con atrayente) +
+ * biopreparado real y a consultar la plaga/hongo concreto. Si se pasa el contexto de
+ * la plaga/enfermedad conocida, lo antepone para preservar la identificación.
+ */
+function _disguisedGenericReplacement(pestContext = null) {
+  const lead = pestContext ? `${pestContext}\n\n` : '';
   return (
-    `Cuidado con eso: ${DISGUISED_GENERIC_MARKER} ("fungicida/cebo natural que sirve para todo el hongo o ` +
-    'la plaga"). Ese producto-milagro no existe, y un código de catálogo o una dosis "por bomba/por trampa" de ' +
-    'algo sin nombre real no es de fiar —puede ser un agroquímico de síntesis disfrazado de "orgánico". ' +
-    'Lo que sí funciona es el manejo sanitario (deshoje y eliminación del material enfermo, drenaje, trampas ' +
-    'con atrayente para monitorear) y un biopreparado REAL y específico para tu problema. Dime exactamente ' +
-    'qué hongo o plaga es y en qué cultivo, y te oriento a un biopreparado del catálogo Chagra o a tu técnico ' +
-    'local o el ICA para la dosis correcta.'
+    `${lead}Cuidado con eso: ${DISGUISED_GENERIC_MARKER} ("fungicida/cebo natural que sirve para todo el hongo o ` +
+    'la plaga"). Ese producto-milagro no existe, y un código de catálogo, una dosis "por bomba/por trampa" o un ' +
+    '"veneno casero" de algo sin nombre real no es de fiar —puede ser un agroquímico de síntesis disfrazado de ' +
+    '"orgánico". Lo que sí funciona es el MANEJO INTEGRADO: manejo sanitario (deshoje y eliminación del material ' +
+    'enfermo, recolección de fruta caída, drenaje), trampas con atrayente (cebo/feromona) para monitorear y ' +
+    'capturar, y un biopreparado REAL y específico para tu problema. No inventes el nombre comercial ni la dosis. ' +
+    'Dime exactamente qué hongo o plaga es y en qué cultivo, y te oriento a un biopreparado del catálogo Chagra o ' +
+    'a tu técnico local, el ICA o Agrosavia para la dosis correcta.'
   );
 }
 
@@ -5736,14 +5781,24 @@ export function guardDisguisedGenericAgrochem(responseText) {
   // el patrón accent-free del ID falso (granite escribe con tildes; el patrón no).
   const hasFakeId = FAKE_CATALOG_ID_RE.test(norm);
   const hasMiracle = MIRACLE_GENERIC_PRODUCT_RE.test(norm) || MIRACLE_GENERIC_ALT_RE.test(norm);
-  if (!hasMiracle && !hasFakeId) {
+  // BORDE-022 (variante no-determinista): una RECETA de "veneno/cebo casero" a preparar
+  // es también un producto inventado peligroso (un biopreparado real nunca se llama
+  // "veneno casero"). Cuenta como señal primaria por sí misma —su "dosis" es inventada.
+  // Anti-FP: si la respuesta DESACONSEJA el veneno casero ("no prepares venenos caseros"),
+  // es una advertencia correcta y se conserva intacta.
+  const adviertenNoVenenoCasero = /\b(no|nunca|evita|evite|jamas)\b[^.!?]{0,40}\b(prepar\w*|hag\w*|haz\b|uses?|use|apliques?|aplique)\b[^.!?]{0,20}\b(veneno|cebo|matabicho|insecticida|plaguicida)s?\s+casero/.test(
+    norm,
+  );
+  const hasHomemadePoison = HOMEMADE_POISON_RECIPE_RE.test(norm) && !adviertenNoVenenoCasero;
+  if (!hasMiracle && !hasFakeId && !hasHomemadePoison) {
     return { text: responseText, modified: false, reason: null };
   }
 
-  // Dato INVENTADO accionable: dosis de aplicación, frecuencia exacta, o el ID falso.
+  // Dato INVENTADO accionable: dosis de aplicación, frecuencia exacta, el ID falso, o la
+  // propia receta de veneno casero (la receta ES el dato peligroso).
   const hasDose = APPLY_DOSE_RE.test(norm);
   const hasFreq = APPLY_FREQ_RE.test(norm);
-  if (!hasDose && !hasFreq && !hasFakeId) {
+  if (!hasDose && !hasFreq && !hasFakeId && !hasHomemadePoison) {
     return { text: responseText, modified: false, reason: null };
   }
 
@@ -5751,12 +5806,218 @@ export function guardDisguisedGenericAgrochem(responseText) {
   const señales = [];
   if (hasMiracle) señales.push('generico_milagro');
   if (hasFakeId) señales.push('id_catalogo_falso');
+  if (hasHomemadePoison) señales.push('veneno_casero');
   if (hasDose) señales.push('dosis_aplicacion');
   if (hasFreq) señales.push('frecuencia');
+  // Preserva la identificación de la plaga/enfermedad conocida (mosca del Mediterráneo /
+  // Ceratitis capitata…) si el original la nombraba: el campesino la necesita y el juez
+  // la exige como must_include. La receta/ID inventado SÍ se descarta.
+  const pestCtx = _knownPestContext(norm);
   return {
-    text: _disguisedGenericReplacement(),
+    text: _disguisedGenericReplacement(pestCtx),
     modified: true,
     reason: `agroquimico_generico_disfrazado_suprimido: ${señales.join(', ')}`,
+  };
+}
+
+// ── C1 (BORDE-017): EXTRACTO/PREPARADO botánico INVENTADO "milagroso" ─────────
+
+/**
+ * Señal de que un EXTRACTO/PREPARADO botánico se presenta como AGENTE de control
+ * fitosanitario (fungicida/insecticida/plaguicida/control de hongos o plagas). Sobre
+ * texto normalizado. Es el envoltorio del caso BORDE-017: granite no dice "sirve para
+ * todo" (eso lo cubre `guardDisguisedGenericAgrochem`), pero igual fabrica un extracto
+ * concreto presentado como fungicida ("cuyo extracto ha mostrado actividad fungicida").
+ */
+const BOTANICAL_EXTRACT_AS_PESTICIDE_RE =
+  /\b(extracto|preparado|maceracion|macerado|tintura|decoccion|infusion)\b[^.!?]{0,80}\b(fungicida|fungicid\w*|insecticida|insecticid\w*|plaguicida|acaricida|antifung\w*|control\w*\s+(de\s+)?(hongos?|plagas?|enfermedad\w*)|actividad\s+(fungicida|insecticida|antifung\w*|antimicro\w*)|combate\w*\s+(el\s+|la\s+|los\s+|las\s+)?(hongo|plaga|sigatoka|enfermedad))\b|\b(fungicida|insecticida|plaguicida|acaricida)\b[^.!?]{0,40}\b(extracto|preparado)\s+de\b/;
+
+/**
+ * Verbo de RECOMENDACIÓN/USO de un extracto como producto (no una mención de pasada
+ * ni una negación). Sobre texto normalizado. Sin un verbo de uso, el extracto no se
+ * "empuja" → no suprimimos.
+ */
+const EXTRACT_RECOMMEND_RE =
+  /\b(usa\w*|aplica\w*|recomiend\w*|prepara\w*|emple[ae]\w*|echa\w*|para\s+preparar|opcion\s+es\b|puedes\s+usar|te\s+recomiendo)\b/;
+
+/**
+ * La respuesta YA desaconseja el extracto-milagro / aclara que el manejo es específico
+ * (acertó) → no re-suprimir. Sobre texto normalizado.
+ */
+const EXTRACT_DENIES_MIRACLE_RE =
+  /\b(no\s+existe|no\s+hay\s+(un\s+)?(extracto|producto|preparado)|especifico\s+por\s+plaga|manejo\s+es\s+especifico|sin\s+respaldo|no\s+te\s+(creas|fies)|desconfia)\b/;
+
+/** Marca idempotente del reemplazo del extracto botánico inventado. */
+const INVENTED_EXTRACT_MARKER = 'no existe un producto único que sirva para todo';
+
+/**
+ * DOSIS/RECETA de un preparado: masa o volumen sueltos en contexto de preparación
+ * ("500 gramos de hojas", "2 litros de agua", "10 mL del extracto por litro"),
+ * complementando `APPLY_DOSE_RE` y `DOSE_PATTERNS`. La conjunción extracto-inventado +
+ * receta/dosis es la fuga peligrosa. Sobre texto normalizado.
+ */
+const EXTRACT_RECIPE_DOSE_RE =
+  /\b\d+(?:[.,]\d+)?\s*(?:ml|cc|g|gr|gramos?|kg|kilos?|litros?|l|cm3)\b[^.!?]{0,30}\b(de\s+)?(hoja|hojas|corteza|raiz|raices|agua|alcohol|extracto|preparado|macerar|maceracion)\b|\bmacerar?\b[^.!?]{0,40}\b\d+\s*(horas?|dias?)\b/;
+
+/**
+ * Redirección honesta que reemplaza la receta del extracto botánico inventado. No
+ * nombra la planta inventada ni su dosis: aclara que NO existe un producto único que
+ * sirva para todo, que el manejo es ESPECÍFICO por plaga, y manda al manejo sanitario
+ * + biopreparado real + fuente institucional (ICA / Agrosavia). Estable para
+ * idempotencia (contiene `INVENTED_EXTRACT_MARKER`).
+ */
+/**
+ * Patógenos/enfermedades conocidos cuyo NOMBRE (común + binomio) conviene PRESERVAR
+ * al reemplazar la receta inventada, para no perder la identificación del problema
+ * (que el campesino necesita para buscar el manejo correcto). Cada entrada: el patrón
+ * sobre el texto normalizado y la línea de contexto a anteponer. La sigatoka negra es
+ * el caso de BORDE-017; el resto son enfermedades foliares comunes en Colombia.
+ */
+const KNOWN_PATHOGEN_CONTEXT = [
+  {
+    re: /\bsigatoka\s+negra\b|\bmycosphaerella\s+fijiensis\b/,
+    line:
+      'Lo tuyo es la sigatoka negra (Mycosphaerella fijiensis) del plátano: una enfermedad fúngica foliar ' +
+      'concreta, que se maneja de forma específica, no con un producto "para todo".',
+  },
+  {
+    re: /\bsigatoka\s+amarilla\b|\bmycosphaerella\s+musicola\b/,
+    line:
+      'Lo tuyo es la sigatoka amarilla (Mycosphaerella musicola), una enfermedad fúngica foliar del plátano que ' +
+      'se maneja de forma específica.',
+  },
+  {
+    re: /\broya\b/,
+    line: 'Lo tuyo es la roya, una enfermedad fúngica foliar que se maneja de forma específica.',
+  },
+];
+
+/**
+ * Si el texto original nombra un patógeno/enfermedad conocido, devuelve la línea de
+ * contexto que lo identifica (para PRESERVAR esa info al suprimir la receta). null si
+ * no hay match. Sobre el texto normalizado.
+ */
+function _knownPathogenContext(norm) {
+  for (const p of KNOWN_PATHOGEN_CONTEXT) {
+    if (p.re.test(norm)) return p.line;
+  }
+  return null;
+}
+
+function _inventedExtractReplacement(pathogenContext = null) {
+  const lead = pathogenContext ? `${pathogenContext}\n\n` : '';
+  return (
+    `${lead}Ojo con eso: ${INVENTED_EXTRACT_MARKER} ni un extracto de una planta cualquiera que "controle todos los ` +
+    'hongos o todas las plagas". El manejo es ESPECÍFICO por plaga o enfermedad, y una receta de un extracto ' +
+    'sin respaldo (con su dosis y sus días de maceración) puede ser inútil o, peor, un producto disfrazado. ' +
+    'Lo que de verdad sirve es:\n' +
+    '- Manejo sanitario: deshoje y eliminación del material enfermo, mejor drenaje y aireación, monitoreo ' +
+    'temprano del foco.\n' +
+    '- Un biopreparado REAL y específico (por ejemplo caldo bordelés para hongos, o extracto de neem y ' +
+    'Bacillus thuringiensis para ciertas plagas), aplicado con su dosis documentada.\n' +
+    'Dime exactamente qué hongo o plaga es y en qué cultivo, y te oriento a un biopreparado del catálogo Chagra ' +
+    'o a tu técnico local, el ICA o Agrosavia para la dosis correcta. No te guíes por una receta de un extracto ' +
+    'inventado.'
+  );
+}
+
+/**
+ * guardInventedBotanicalExtract — C1 (BORDE-017, V2). Atrapa el patrón que ningún
+ * guard previo cubre: una RECETA de un EXTRACTO/PREPARADO botánico INVENTADO presentado
+ * como fungicida/insecticida "milagroso", con un binomio científico que NO está en el
+ * grounding del turno (`resolvedEntities`) y NO es un biocontrol real (neem, Bt,
+ * Trichoderma…), acompañado de una DOSIS/receta accionable. En BORDE-017 granite
+ * fabricó "extracto de Serenoa repens (palma sabana), actividad fungicida" con receta
+ * (500 g de hojas, macerar 48 h, ácido benzoico 0.5 %), dosis (10 mL/L) y frecuencia
+ * (cada 15 días). No dispara el sintético (no hay token químico), ni la marca (no es
+ * Título-Caso comercial), ni el genérico-milagro (no dice "sirve para todo").
+ *
+ * SUPPRESS-AND-REPLACE total: la receta de un producto inexistente es íntegramente
+ * engañosa → se descarta el cuerpo y se devuelve la verdad (no existe un producto único
+ * que sirva para todo; el manejo es específico por plaga; biopreparado real + manejo
+ * sanitario + ICA/Agrosavia).
+ *
+ * GATING (anti-sobre-supresión, requiere TODAS):
+ *   1. el extracto/preparado se presenta como AGENTE de control fitosanitario
+ *      (`BOTANICAL_EXTRACT_AS_PESTICIDE_RE`) Y hay un verbo de uso/recomendación.
+ *   2. hay al menos UN binomio científico (`SCI_BINOMIAL_RE`) que (a) NO está en
+ *      `_groundedBinomials(resolvedEntities)`, (b) NO es un biocontrol real
+ *      (`_isRealAgroInput`), y (c) parece binomio latino (`_looksLikeLatinBinomial`).
+ *   3. hay una DOSIS/receta accionable (`EXTRACT_RECIPE_DOSE_RE`, `APPLY_DOSE_RE` o
+ *      `DOSE_PATTERNS`).
+ *   4. la respuesta NO desaconseja YA el extracto-milagro (`EXTRACT_DENIES_MIRACLE_RE`).
+ *
+ * Anti-falsos-positivos: "extracto de neem (Azadirachta indica) para áfidos" (biocontrol
+ * real, uso específico) NO entra —neem es `_isRealAgroInput`. Un companion/biopreparado
+ * REAL del grounding con dosis tampoco (su binomio está grounded, y no se presenta como
+ * extracto-fungicida). Una mención sin dosis tampoco. Idempotente. Corre SIEMPRE
+ * (SAFETY, no es de siembra).
+ *
+ * @param {string} responseText
+ * @param {Array<object>|null} resolvedEntities  grounding AGE del turno.
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardInventedBotanicalExtract(responseText, resolvedEntities = null) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Idempotencia: nuestro reemplazo ya está → no re-suprimir.
+  if (responseText.includes(INVENTED_EXTRACT_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const norm = _stripDiacritics(responseText);
+  // (4) la respuesta ya desaconseja / aclara especificidad → el modelo acertó.
+  if (EXTRACT_DENIES_MIRACLE_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // (1) ¿el extracto se presenta como agente de control fitosanitario, recomendado?
+  const esExtractoFitosanitario =
+    BOTANICAL_EXTRACT_AS_PESTICIDE_RE.test(norm) && EXTRACT_RECOMMEND_RE.test(norm);
+  if (!esExtractoFitosanitario) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // (3) ¿hay una dosis/receta accionable? (la fuga es extracto-inventado + receta).
+  const hasDose =
+    EXTRACT_RECIPE_DOSE_RE.test(norm) ||
+    APPLY_DOSE_RE.test(norm) ||
+    DOSE_PATTERNS.some((re) => re.test(norm));
+  if (!hasDose) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // (2) ¿hay un binomio NO-grounded, no-biocontrol, que parezca latino? Ese es el
+  // extracto fantasioso (Serenoa repens, Brunfelsia chocoana…). Un binomio del
+  // grounding o un biocontrol real (Azadirachta indica = neem) NO cuenta.
+  const grounded = _groundedBinomials(Array.isArray(resolvedEntities) ? resolvedEntities : []);
+  const ungrounded = [];
+  SCI_BINOMIAL_RE.lastIndex = 0;
+  let m;
+  while ((m = SCI_BINOMIAL_RE.exec(responseText)) !== null) {
+    const genus = m[1];
+    const epithet = m[2];
+    if (!_looksLikeLatinBinomial(genus, epithet)) continue;
+    const bin = _binomial(`${genus} ${epithet}`);
+    if (!bin) continue;
+    if (grounded.has(bin)) continue; // binomio del grounding → legítimo.
+    if (_isRealAgroInput(bin) || _isRealAgroInput(_stripDiacritics(genus))) continue; // biocontrol real.
+    ungrounded.push(bin);
+  }
+  if (ungrounded.length === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('invented_botanical_extract');
+  // Preserva la identificación del patógeno/enfermedad (sigatoka negra, roya…) si el
+  // original la nombraba: el campesino la necesita para el manejo correcto, y el juez
+  // del bench la exige como must_include. La receta inventada SÍ se descarta.
+  const pathogenCtx = _knownPathogenContext(norm);
+  return {
+    text: _inventedExtractReplacement(pathogenCtx),
+    modified: true,
+    reason: `extracto_botanico_inventado_suprimido: ${[...new Set(ungrounded)].join(', ')}`,
   };
 }
 
@@ -6115,6 +6376,21 @@ export function applyOutputGuards(
     text = disgRes.text;
     modified = true;
     if (disgRes.reason) reasons.push(disgRes.reason);
+  }
+  // Guard SAFETY de EXTRACTO/PREPARADO botánico INVENTADO "milagroso" (BORDE-017 · V2 · C1):
+  // necesita el grounding (`entities`) para decidir qué binomio NO existe en el grafo.
+  // Corre SIEMPRE (no es de siembra). SUPPRESS-AND-REPLACE: si el cuerpo recomienda un
+  // extracto/preparado de una planta NO-grounded (y que no es biocontrol real como neem/Bt)
+  // presentado como fungicida/insecticida CON una dosis/receta accionable, descarta la
+  // receta fantasiosa y devuelve la verdad (no existe un producto único que sirva para todo;
+  // manejo específico por plaga + biopreparado real + ICA/Agrosavia). Va tras el genérico-
+  // milagro (que cubre el "sirve para todo" sin binomio) — este cubre el binomio inventado
+  // que aquel no atrapa. Usa `entities` (grounding filtrado) ya calculado arriba.
+  const extractRes = guardInventedBotanicalExtract(text, entities);
+  if (extractRes && extractRes.modified) {
+    text = extractRes.text;
+    modified = true;
+    if (extractRes.reason) reasons.push(extractRes.reason);
   }
   // Guard SAFETY-CRITICAL de superficie de ConfusionWarning (BORDE-001 ·
   // cianuro/escopolamina/ricina/rotenona): firma propia (necesita las entidades
