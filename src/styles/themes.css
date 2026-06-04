@@ -228,9 +228,11 @@
 /* Texto ÁMBAR claro sobre superficie clara = ilegible. En los temas claros el
  * mapa de vars hace que amber-100..400 sean ocres CLAROS (pensados para texto
  * sobre fondo OSCURO en biopunk). Como TEXTO sobre crema no contrastan (nature
- * text-amber-400 medido ≈1.75). Los viramos al ocre OSCURO del tema
- * (--c-amber-700) que sí pasa AA. NO tocamos `bg-amber-*` (los botones ocres del
- * demo conservan su relleno). */
+ * text-amber-400 medido ≈1.75). Los viramos a un ocre OSCURO explícito
+ * rgb(160,76,20) → AA ≥4.5 sobre el crema cálido de nature (242,233,215). OJO: el
+ * token base --c-amber-700 (176,90,32) daba 4.02, JUSTO por debajo de AA sobre ese
+ * fondo (lo atrapó tests/themes.spec.js). NO tocamos `bg-amber-*` (los botones
+ * ocres del demo conservan su relleno). */
 [data-theme="minimalista"] .text-amber-100,
 [data-theme="minimalista"] .text-amber-200,
 [data-theme="minimalista"] .text-amber-300,
@@ -241,7 +243,7 @@
 [data-theme="nature"] .text-amber-300,
 [data-theme="nature"] .text-amber-400,
 [data-theme="nature"] .text-amber-500 {
-  color: rgb(var(--c-amber-700)) !important;
+  color: rgb(160, 76, 20) !important;
   text-shadow: none !important;
 }
 
