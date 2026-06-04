@@ -220,6 +220,16 @@
     background-color: rgb(var(--c-slate-950)) !important;
   }
 
+  /* Nature (N33 2026-06-04): degradado cálido crema→ocre con "sol" tenue arriba,
+   * paridad con el demo demo-agente.html. Minimalista se queda liso tipo papel. */
+  [data-theme="nature"] body.app-bg-biodiversidad {
+    background-image:
+      radial-gradient(125% 85% at 50% -12%, rgb(245 200 110 / 0.5) 0%, rgb(245 210 140 / 0.18) 38%, transparent 62%),
+      linear-gradient(178deg, rgb(var(--c-slate-950)) 0%, rgb(248 235 205) 62%, rgb(243 224 178) 100%) !important;
+    background-color: rgb(var(--c-slate-950)) !important;
+    background-attachment: fixed !important;
+  }
+
   [data-theme="minimalista"] .bg-biopunk-pattern,
   [data-theme="nature"] .bg-biopunk-pattern {
     background-image: none !important;
