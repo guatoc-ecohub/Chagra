@@ -56,6 +56,16 @@ describe('guardDisguisedGenericAgrochem — TRIGGER (suprime dosis/ID del produc
     expect(r.modified).toBe(true);
     expect(r.text).not.toMatch(/Chagra ID 4521/i);
   });
+
+  it('BORDE-022 (forma real de granite): SKU falso "catálogo Chagra con el código CHA00124" → suprime', () => {
+    // Granite produjo este formato exacto en la corrida del bench V2 (2026-06-04).
+    const resp =
+      'El producto que te recomiendo es un cebo orgánico biológico registrado en el catálogo Chagra con el ' +
+      'código CHA00124. Cuélgalo a 1,5 metros del suelo.';
+    const r = guardDisguisedGenericAgrochem(resp);
+    expect(r.modified).toBe(true);
+    expect(r.text).not.toMatch(/CHA00124/i);
+  });
 });
 
 describe('guardDisguisedGenericAgrochem — NO TRIGGER (cero sobre-supresión)', () => {

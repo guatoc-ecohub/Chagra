@@ -5649,8 +5649,17 @@ const MIRACLE_GENERIC_PRODUCT_RE =
 const MIRACLE_GENERIC_ALT_RE =
   /\b(fungicida|insecticida|plaguicida|pesticida|acaricida|cebo|bioinsumo|producto)\b[^.!?]{0,30}\b(que\s+sirve\s+para\s+todo|universal|milagro)\b/;
 
-/** ID de catálogo FALSO inventado: "Chagra ID 1032", "código Chagra 4521". */
-const FAKE_CATALOG_ID_RE = /\b(chagra\s+id|codigo\s+chagra|chagra\s+codigo)\s*#?\s*\d{2,6}\b/i;
+/**
+ * ID de catálogo FALSO inventado. Dos formas observadas en el bench V2:
+ *   - "Chagra ID 1032", "código Chagra 4521" (el del enunciado del bench), y
+ *   - un SKU alfanumérico presentado como código del catálogo: "registrado en el
+ *     catálogo Chagra con el código CHA00124" (lo que granite produjo en BORDE-022).
+ * El catálogo Chagra NO usa códigos de SKU comercial; cualquier código así es
+ * inventado. La segunda forma exige el contexto "catalogo chagra ... codigo <SKU>"
+ * para no marcar referencias legítimas de números sueltos.
+ */
+const FAKE_CATALOG_ID_RE =
+  /\b(chagra\s+id|codigo\s+chagra|chagra\s+codigo)\s*#?\s*\d{2,6}\b|catalogo\s+chagra\b[^.!?]{0,40}\bcodigo\s+#?\s*[a-z]{2,5}-?\d{2,6}\b/i;
 
 /** DOSIS de aplicación por unidad de aspersión: "5 cc por trampa", "50 ml por bomba de 20 litros". */
 const APPLY_DOSE_RE =
@@ -5723,7 +5732,9 @@ export function guardDisguisedGenericAgrochem(responseText) {
     return { text: responseText, modified: false, reason: null };
   }
 
-  const hasFakeId = FAKE_CATALOG_ID_RE.test(responseText);
+  // `norm` (sin tildes) para que "catálogo Chagra con el código CHA00124" matchee
+  // el patrón accent-free del ID falso (granite escribe con tildes; el patrón no).
+  const hasFakeId = FAKE_CATALOG_ID_RE.test(norm);
   const hasMiracle = MIRACLE_GENERIC_PRODUCT_RE.test(norm) || MIRACLE_GENERIC_ALT_RE.test(norm);
   if (!hasMiracle && !hasFakeId) {
     return { text: responseText, modified: false, reason: null };
