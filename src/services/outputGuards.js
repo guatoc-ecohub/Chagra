@@ -4477,6 +4477,260 @@ export function guardSurfaceConfusionWarning(responseText, resolvedEntities = nu
   return { text: responseText, modified: false, reason: null };
 }
 
+// ── GUARD: marca comercial INVENTADA recomendada en el cuerpo ───────────────
+
+/**
+ * #1305 (SAFETY, prod 2026-06-03 · cuello del bench borde): granite INVENTA
+ * marcas de productos agrícolas inexistentes en el CUERPO de la respuesta y las
+ * recomienda — p.ej. en BORDE-001 cerró con 'complementar … con … el "Chagra Bio
+ * Yuca" o el "Chagra Bio Yuca Plus", que contienen microorganismos benéficos…'.
+ * Esa marca NO existe; recomendar un producto inexistente (con propiedades) es un
+ * riesgo de seguridad y el red_flag residual que tumbaba BORDE-001/003.
+ *
+ * Por qué los guards previos NO lo atrapaban:
+ *   - guardSyntheticAgrochemical dispara por una DENYLIST de i.a. sintéticos
+ *     (glifosato, mancozeb) o por SUFIJO de familia química (-azol, -fos…). Una
+ *     marca inventada como "Chagra Bio Yuca Plus" no tiene ninguno de esos tokens.
+ *   - PESTICIDE_BRAND_PATTERNS (la palabra "marca", un producto entrecomillado)
+ *     SOLO cuentan en CONJUNCIÓN con un hit sintético (`_hasSyntheticPesticideBrandOrDose`
+ *     exige `hasPesticideHit`). Sin i.a. sintético al lado, no hay supresión.
+ *   - guardInventedVariety cubre VARIEDADES climáticamente imposibles de especies
+ *     conocidas, no productos comerciales. guardInventedName es solo el saludo.
+ *   → Una marca comercial entrecomillada y recomendada, sin token sintético,
+ *     pasaba intacta por toda la cadena.
+ *
+ * Este guard, sobre el texto crudo, hace SUPPRESS-AND-REPLACE QUIRÚRGICO por
+ * oración: si una oración RECOMIENDA (complementar/usar/aplicar con) un nombre de
+ * MARCA comercial INVENTADA, esa oración se sustituye por una orientación genérica
+ * agroecológica que NO nombra marca. El resto de la respuesta se conserva.
+ *
+ * Anti-falso-positivo (CRÍTICO — solo marcas comerciales inventadas):
+ *   (a) NO toca binomios/especies (Bactris gasipaes) — `_looksLikeLatinBinomial`.
+ *   (b) NO toca controladores biológicos REALES (Beauveria, Trichoderma, Encarsia,
+ *       Bacillus thuringiensis/Bt, Trichogramma, Metarhizium, neem…) ni
+ *       biopreparados tradicionales reales (caldo bordelés, supermagro, biol…) —
+ *       allowlist `_isRealAgroInput`.
+ *   (c) NO toca menciones de NO-usar ("no uses Roundup", "evita la marca X").
+ *   (d) Exige un candidato a MARCA inequívoco: auto-referencial ("Chagra Bio …"),
+ *       sufijo de producto comercial (Plus/Max/Pro/Super/Premium/Forte/Gold/Total),
+ *       o un nombre Título-Caso entrecomillado que NO sea especie/biocontrol real.
+ *
+ * Firma propia (sobre texto + nada de grounding) → se invoca aparte en
+ * applyOutputGuards, fuera de GUARD_CHAIN. Idempotente (su reemplazo no re-dispara).
+ * Corre SIEMPRE (es SAFETY, no de siembra).
+ */
+
+/**
+ * Sufijos de NOMBRE COMERCIAL (gama/línea de producto) que delatan una marca
+ * fabricada: "X Plus", "X Max", "X Pro", "X Super", "X Forte", "X Premium",
+ * "X Gold", "X Total". Sobre el token tal cual (case-insensible). Un epíteto
+ * botánico latino jamás termina en estos (van en español/inglés comercial).
+ */
+const COMMERCIAL_BRAND_SUFFIXES = new Set([
+  'plus', 'max', 'pro', 'super', 'forte', 'premium', 'gold', 'total', 'extra', 'ultra',
+]);
+
+/**
+ * Controladores biológicos REALES y biopreparados/insumos agroecológicos cuyo
+ * nombre se capitaliza o entrecomilla y NO debe confundirse con una marca
+ * inventada. Géneros de biocontrol comerciales legítimos + entradas comunes.
+ * Normalizado sin diacríticos. Se compara por inclusión de token.
+ */
+const REAL_BIOCONTROL_TERMS = [
+  'beauveria', 'metarhizium', 'trichoderma', 'trichogramma', 'encarsia',
+  'paecilomyces', 'purpureocillium', 'bacillus', 'thuringiensis', 'bt',
+  'lecanicillium', 'verticillium', 'cordyceps', 'isaria', 'pochonia',
+  'baculovirus', 'nomuraea', 'steinernema', 'heterorhabditis',
+  'neem', 'nim', 'azadiractina', 'azadirachta',
+].map(_stripDiacritics);
+
+/**
+ * ¿El nombre candidato (normalizado) corresponde a un insumo agroecológico REAL
+ * (biocontrol o biopreparado tradicional) y por tanto NO es una marca inventada?
+ * Combina la allowlist de biopreparados (caldo bordelés, supermagro, biol…) con
+ * los géneros de biocontrol reales. Best-effort por inclusión de token.
+ *
+ * @param {string} candidateNorm  nombre candidato normalizado, sin diacríticos.
+ * @returns {boolean}
+ */
+function _isRealAgroInput(candidateNorm) {
+  const c = (candidateNorm || '').trim();
+  if (!c) return false;
+  if (_isAllowedBiopreparado(c)) return true;
+  const tokens = c.split(/\s+/);
+  return tokens.some((tok) => REAL_BIOCONTROL_TERMS.some((real) => real === tok || tok.includes(real)));
+}
+
+/**
+ * Verbos/giros de RECOMENDACIÓN de un producto en una oración. Sobre el texto
+ * normalizado. Solo gatillamos la supresión si la oración EMPUJA un producto,
+ * no si lo menciona de pasada o lo desaconseja.
+ */
+const BRAND_RECOMMEND_RE =
+  /\b(recomiend\w*|complement\w*|us[aeá]\w*|apli[cq]\w*|emple[ae]\w*|agreg\w*|añad\w*|anad\w*|combin\w*|product[oa]s?\b|marca[s]?\b|puedes\s+usar|podes\s+usar|te\s+sugiero|sugiero\s+usar|comprar?\b)/;
+
+/**
+ * Negación de uso: "no uses/apliques/recomiendo/compres", "evita", "nunca". Si la
+ * oración DESACONSEJA la marca, NO la suprimimos (es una advertencia útil, no una
+ * recomendación de un producto inventado). Sobre el texto normalizado.
+ */
+const BRAND_NO_USAR_RE =
+  /(\b(no|nunca|jamas)\s+(lo\s+|la\s+|los\s+|las\s+)?(uses?|use|apliques?|aplique|compres?|compre|recomiend\w*|emplees?|emplee|agregues?|combines?)\b|\b(evita|evite|evitar|aleja\w*|huye\w*|cuidado\s+con|desconfia\w*|no\s+recomiend\w*|no\s+conviene|prohibid\w*)\b)/;
+
+/**
+ * Patrón de NOMBRE DE MARCA candidato dentro de comillas (rectas o angulares) o
+ * como secuencia Título-Caso de ≥2 palabras. Capturamos lo entrecomillado y las
+ * secuencias capitalizadas; el gate de marca-vs-especie decide después.
+ *   - "Chagra Bio Yuca Plus", «Súper Yuca Bio»  → entre comillas.
+ *   - Chagra Bio Yuca Plus (sin comillas)        → Título-Caso multi-palabra.
+ */
+const QUOTED_NAME_RE = /[«"“]([^«»"”]{2,60})[»"”]/g;
+const TITLECASE_BRAND_RE =
+  /\b([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+(?:[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+|Bio|Plus|Max|Pro|Super|Forte|Premium|Gold|Total|Extra|Ultra)){1,4})\b/g;
+
+/**
+ * ¿El nombre candidato (string crudo, posiblemente con mayúsculas/comillas) tiene
+ * forma de MARCA COMERCIAL INVENTADA? Devuelve true si:
+ *   - es auto-referencial "Chagra Bio …" (la propia marca del proyecto, jamás un
+ *     producto real), O
+ *   - su último token es un sufijo comercial (Plus/Max/Pro/Super/…), O
+ *   - viene ENTRECOMILLADO en contexto de producto (lo decide el caller).
+ * Y NO es:
+ *   - un binomio científico (`_looksLikeLatinBinomial` sobre sus 2 primeros tokens),
+ *   - un insumo agroecológico real (`_isRealAgroInput`).
+ *
+ * @param {string} raw  nombre candidato crudo (con mayúsculas / sin comillas).
+ * @param {boolean} quoted  ¿venía entrecomillado? (sube la confianza de "marca").
+ * @returns {boolean}
+ */
+function _looksLikeInventedBrand(raw, quoted) {
+  const trimmed = (raw || '').trim();
+  if (trimmed.length < 3) return false;
+  const norm = _stripDiacritics(trimmed);
+  const tokens = trimmed.split(/\s+/);
+  const tokensNorm = norm.split(/\s+/);
+
+  // Anti-FP (b): insumo agroecológico real (biocontrol / biopreparado) → no es marca.
+  if (_isRealAgroInput(norm)) return false;
+  // Anti-FP (a): binomio científico latino → no es marca. Un binomio REAL es
+  // "Genus epiteto" con el GÉNERO en Mayúscula y el EPÍTETO en minúscula (Bactris
+  // gasipaes, Beauveria bassiana). Una marca comercial capitaliza CADA palabra
+  // ("Chagra Bio Yuca", "Insecto Fuera Bio"), así que el segundo token NO va en
+  // minúscula → la guardia de casing distingue marca de binomio antes de confiar
+  // en `_looksLikeLatinBinomial` (que solo mira el léxico, no el casing).
+  const segundoEnMinuscula = /^[a-záéíóúñ]/.test(tokens[1] || '');
+  if (
+    tokens.length >= 2 &&
+    segundoEnMinuscula &&
+    _looksLikeLatinBinomial(tokens[0], tokens[1])
+  ) {
+    return false;
+  }
+
+  // Señal 1 (la más fuerte): auto-referencial "Chagra Bio …".
+  if (tokensNorm[0] === 'chagra' && tokensNorm.includes('bio')) return true;
+
+  // Señal 2: sufijo de gama comercial como ÚLTIMO token ("… Plus/Max/Pro").
+  const lastTok = tokensNorm[tokensNorm.length - 1];
+  if (COMMERCIAL_BRAND_SUFFIXES.has(lastTok) && tokens.length >= 2) return true;
+
+  // Señal 3: nombre entrecomillado de ≥2 palabras Título-Caso en contexto de
+  // producto (lo aporta el caller con `quoted=true`) que no cayó en las
+  // allowlists anteriores. Exigimos ≥2 palabras para no suprimir una sola
+  // palabra entrecomillada (que suele ser un nombre común, no una marca).
+  if (quoted && tokens.length >= 2) {
+    // Debe lucir como marca: al menos un token capitalizado además del primero,
+    // o un token "Bio" (línea de producto). Evita frases entrecomilladas comunes.
+    const capCount = tokens.filter((t) => /^[A-ZÁÉÍÓÚÑ]/.test(t)).length;
+    if (capCount >= 2 || tokensNorm.includes('bio')) return true;
+  }
+  return false;
+}
+
+/** Marca textual idempotente del reemplazo de marca inventada. */
+const INVENTED_BRAND_MARKER = 'no existe ningún producto comercial con ese nombre';
+
+/**
+ * Orientación genérica agroecológica con que se REEMPLAZA la recomendación de una
+ * marca inventada. No nombra marca alguna: redirige a biopreparados y prácticas
+ * reales del catálogo. Una sola frase para encajar limpio donde estaba la oración.
+ */
+const INVENTED_BRAND_REPLACEMENT =
+  `Sobre eso te aclaro que ${INVENTED_BRAND_MARKER}; no me guío por marcas comerciales. ` +
+  'Si quieres reforzar la planta, lo que de verdad sirve son los biopreparados y prácticas ' +
+  'agroecológicas reales (compost o bocashi para nutrir el suelo, biol como biofertilizante, ' +
+  'caldo bordelés o caldo de ceniza para hongos, y control biológico) — pídemelos y te paso ' +
+  'la receta tradicional, sin productos de marca inventados.';
+
+/**
+ * guardInventedBrand — SUPPRESS-AND-REPLACE de marcas comerciales INVENTADAS
+ * recomendadas en el cuerpo. Quirúrgico por oración. Ver doc-block de arriba.
+ *
+ * @param {string} responseText
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardInventedBrand(responseText) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  // Idempotencia: nuestro reemplazo ya está → no re-disparar.
+  if (responseText.includes(INVENTED_BRAND_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const sentences = _splitSentences(responseText);
+  const marcas = [];
+  let changed = false;
+
+  const cleaned = sentences
+    .map((sentence) => {
+      const sNorm = _stripDiacritics(sentence);
+      // Gate 1: la oración debe RECOMENDAR un producto. Sin verbo de recomendación
+      // no suprimimos (mención de pasada / definición no entra).
+      if (!BRAND_RECOMMEND_RE.test(sNorm)) return sentence;
+      // Anti-FP (c): la oración DESACONSEJA usar (no uses/evita) → conservar.
+      if (BRAND_NO_USAR_RE.test(sNorm)) return sentence;
+
+      // Recolecta candidatos a marca: entrecomillados + secuencias Título-Caso.
+      const candidates = [];
+      let m;
+      QUOTED_NAME_RE.lastIndex = 0;
+      while ((m = QUOTED_NAME_RE.exec(sentence)) !== null) {
+        candidates.push({ raw: m[1], quoted: true });
+      }
+      TITLECASE_BRAND_RE.lastIndex = 0;
+      while ((m = TITLECASE_BRAND_RE.exec(sentence)) !== null) {
+        candidates.push({ raw: m[1], quoted: false });
+      }
+
+      const esMarca = candidates.some((c) => _looksLikeInventedBrand(c.raw, c.quoted));
+      if (!esMarca) return sentence;
+
+      // Esta oración recomienda una marca inventada → la sustituimos entera por la
+      // orientación genérica (mantiene el salto/espacio final de la oración).
+      changed = true;
+      for (const c of candidates) {
+        if (_looksLikeInventedBrand(c.raw, c.quoted) && !marcas.includes(c.raw.trim())) {
+          marcas.push(c.raw.trim());
+        }
+      }
+      const trailing = sentence.match(/\s*$/)?.[0] || ' ';
+      return `${INVENTED_BRAND_REPLACEMENT}${trailing}`;
+    })
+    .join('');
+
+  if (!changed) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('invented_brand');
+  return {
+    text: cleaned.trim(),
+    modified: true,
+    reason: `marca_inventada_suprimida: ${marcas.join(', ')}`,
+  };
+}
+
 /**
  * Set de guards que SOLO tienen sentido cuando la consulta es de SIEMBRA
  * (A12). Si la pregunta del usuario es de PRECIO/MERCADO (o info general sin
@@ -4765,6 +5019,19 @@ export function applyOutputGuards(
     text = reforestNativasRes.text;
     modified = true;
     if (reforestNativasRes.reason) reasons.push(reforestNativasRes.reason);
+  }
+  // Guard SAFETY de MARCA COMERCIAL INVENTADA (#1305): firma propia (solo el
+  // texto). Corre SIEMPRE (no es de siembra). SUPPRESS-AND-REPLACE quirúrgico por
+  // oración: si el modelo RECOMENDÓ un producto de marca inventada en el cuerpo
+  // ('… el "Chagra Bio Yuca Plus"…'), sustituye esa oración por orientación
+  // agroecológica genérica sin marca. Va tras los aditivos (MIP/reforestación) y
+  // antes de la superficie de ConfusionWarning, para que el prefijo tóxico de esta
+  // última (si dispara) siga liderando la respuesta.
+  const brandRes = guardInventedBrand(text);
+  if (brandRes && brandRes.modified) {
+    text = brandRes.text;
+    modified = true;
+    if (brandRes.reason) reasons.push(brandRes.reason);
   }
   // Guard SAFETY-CRITICAL de superficie de ConfusionWarning (BORDE-001 ·
   // cianuro/escopolamina/ricina/rotenona): firma propia (necesita las entidades
