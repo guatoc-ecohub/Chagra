@@ -4302,20 +4302,43 @@ const TOXIC_RISK_TERMS = [
 ];
 
 /**
- * Términos que, presentes en la RESPUESTA del LLM, indican que ya cubrió el
- * riesgo de la confusión tóxica (anti-falso-positivo: no duplicamos la
- * advertencia). Incluye la molécula y la consigna de procesamiento.
+ * Términos de PELIGRO (molécula o adjetivo tóxico) que la RESPUESTA del LLM debe
+ * NOMBRAR para que su advertencia cuente como cubierta. Por sí solos NO bastan
+ * (ver `_responseAlreadyWarns`): una mención DÉBIL del tóxico —sin la consigna de
+ * NO consumir crudo/directo— no suprime el prefijo de seguridad.
  */
-const CONFUSION_COVERED_TERMS = [
+const CONFUSION_DANGER_TERMS = [
   'cianuro',
+  'cianogen',
   'escopolamina',
+  'atropina',
   'ricina',
   'rotenona',
   'toxic', // tóxico/tóxica
   'venenos',
-  'detoxif',
   'envenenamiento',
+  'mortal',
+  'letal',
 ];
+
+/**
+ * Patrón de PROHIBICIÓN EXPLÍCITA de consumo crudo/directo. Para que la respuesta
+ * del LLM cuente como advertencia FUERTE no basta con nombrar el tóxico: tiene que
+ * decir explícitamente que NO se consuma cruda/sin procesar (o "nunca", o "no apta
+ * para consumo"). El cuerpo de BORDE-001 nombra "cianuro" + "hervirla antes del
+ * consumo" pero NO prohíbe el consumo crudo (al contrario, ofrece "el jugo crudo")
+ * → NO debe suprimir el prefijo de seguridad.
+ */
+const EXPLICIT_NO_RAW_CONSUMPTION_RE =
+  /\b(no|nunca|jamas|evit\w*)\b[^.!?]{0,40}\b(consum|com[ae]|comer|coma|coman|ingier|inger|dar|das|de[ns]|tom[ae]|tomar|us[ae]|usar)\w*[^.!?]{0,40}\b(crud|sin\s+procesar|sin\s+detoxif|sin\s+cocinar|sin\s+cocer|directa?ment)/;
+
+/**
+ * Patrón alterno de prohibición: "no apta/apto para (el) consumo", "no comestible
+ * (cruda)", "nunca para consumo". Cubre formulaciones donde la negación va pegada
+ * al sustantivo de consumo en vez de al verbo.
+ */
+const NOT_FIT_FOR_CONSUMPTION_RE =
+  /\bno\s+(es\s+)?(apta?|comestible|segur[ao])\b[^.!?]{0,30}\b(consum|comer|crud)|nunca\s+(para|de)\s+consum/;
 
 /** Marca/prefijo idempotente del guard de superficie de confusión. */
 const CONFUSION_SAFETY_PREFIX = '⚠️ Ojo de seguridad:';
@@ -4348,13 +4371,35 @@ function _isToxicConfusion(cwNorm) {
 }
 
 /**
- * ¿La RESPUESTA del LLM ya advierte del riesgo (molécula tóxica o consigna de
- * detoxificación)? Anti-falso-positivo: si ya lo cubre, no inyectamos.
- * @param {string} textNorm  respuesta del LLM normalizada.
+ * ¿La RESPUESTA del LLM ya advierte del riesgo de forma FUERTE y explícita?
+ * Anti-falso-positivo: solo suprimimos el prefijo de seguridad si la respuesta YA
+ * da una advertencia COMPLETA, no una mención débil.
+ *
+ * Hueco de seguridad corregido (BORDE-001, run6-b/c, 2026-06-03): la versión
+ * previa devolvía `true` ante CUALQUIER término cubierto (p. ej. la sola palabra
+ * "cianuro"). En 2/3 corridas granite mencionaba "cianuro" DÉBILMENTE ("…reducir
+ * su contenido en cianuro… sin embargo, si deseas obtener el jugo crudo…") y eso
+ * SUPRIMÍA el prefijo fuerte → el campesino NO oía la advertencia explícita. Para
+ * confusiones TÓXICAS críticas la advertencia debe salir SIEMPRE salvo que el
+ * cuerpo YA sea fuerte y explícito.
+ *
+ * Una advertencia cuenta como FUERTE solo si cumple AMBAS:
+ *   (1) NOMBRA el peligro (molécula tóxica o adjetivo tóxico/venenoso/mortal), Y
+ *   (2) PROHÍBE explícitamente el consumo crudo/directo ("no/nunca consumir
+ *       cruda", "no apta para consumo", etc.).
+ * Una mención que solo nombra el tóxico —o que solo dice "hervir antes de
+ * consumir" sin prohibir el crudo— NO suprime el prefijo: es justo el caso que
+ * tumbaba BORDE-001.
+ *
+ * @param {string} textNorm  respuesta del LLM normalizada (sin tildes, lower).
  * @returns {boolean}
  */
 function _responseAlreadyWarns(textNorm) {
-  return CONFUSION_COVERED_TERMS.some((t) => textNorm.includes(t));
+  const namesDanger = CONFUSION_DANGER_TERMS.some((t) => textNorm.includes(t));
+  if (!namesDanger) return false;
+  const prohibitsRaw =
+    EXPLICIT_NO_RAW_CONSUMPTION_RE.test(textNorm) || NOT_FIT_FOR_CONSUMPTION_RE.test(textNorm);
+  return prohibitsRaw;
 }
 
 /**
@@ -4420,7 +4465,9 @@ function _buildConfusionSafetyLine(cw) {
  *  - Entidad SIN confusion_warning → no dispara.
  *  - severity NO-critical → no inyecta el prefijo de seguridad (las confusiones
  *    informativas —lulo==naranjilla— no son safety; se resuelven en el grounding).
- *  - La respuesta YA menciona el riesgo (cianuro/tóxico/detoxificar) → no duplica.
+ *  - La respuesta YA da una advertencia FUERTE y explícita (nombra el tóxico Y
+ *    prohíbe el consumo crudo/directo) → no duplica. Una mención DÉBIL (solo
+ *    nombra "cianuro" sin prohibir el crudo) NO suprime el prefijo (BORDE-001).
  *  - Idempotente: si el prefijo ya está, no re-dispara.
  *
  * Determinístico: la línea sale del propio grounding (meaning_correct +
