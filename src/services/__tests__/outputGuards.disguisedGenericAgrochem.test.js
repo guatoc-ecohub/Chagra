@@ -20,7 +20,12 @@
  * 10 g/L de jabón potásico) NO se toca; una respuesta sin dosis tampoco.
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { guardDisguisedGenericAgrochem, resetOutputGuardTelemetry, getOutputGuardTelemetry } from '../outputGuards.js';
+import {
+  guardDisguisedGenericAgrochem,
+  applyOutputGuards,
+  resetOutputGuardTelemetry,
+  getOutputGuardTelemetry,
+} from '../outputGuards.js';
 
 beforeEach(() => resetOutputGuardTelemetry());
 
@@ -106,5 +111,40 @@ describe('guardDisguisedGenericAgrochem — NO TRIGGER (cero sobre-supresión)',
     const twice = guardDisguisedGenericAgrochem(once.text);
     expect(twice.modified).toBe(false);
     expect(twice.text).toBe(once.text);
+  });
+
+  it('NO-TRIGGER: número de referencia que NO es código del catálogo Chagra → NO se toca', () => {
+    // "ICA 4521", "registro 1032" sin el contexto "catálogo/código Chagra" son
+    // referencias legítimas (registros del ICA, lotes). No los suprime.
+    const resp =
+      'El caldo bordelés es un preventivo clásico (registro ICA 4521). Aplica 10 g de sulfato de cobre por ' +
+      'litro de agua sobre el follaje.';
+    const r = guardDisguisedGenericAgrochem(resp);
+    expect(r.modified).toBe(false);
+    expect(r.text).toBe(resp);
+  });
+});
+
+describe('integración applyOutputGuards — BORDE-022 (SKU/ID falso + veneno casero) verificado en el CUERPO', () => {
+  // Forma EXACTA que produjo granite en la corrida del bench V2 (2026-06-04):
+  // inventa un SKU "catálogo Chagra con el código CHA00124" + una receta de
+  // "veneno casero con melaza" y un parásito inventado (Septoria musiva) con dosis.
+  const BORDE_022_RAW =
+    'El producto específico que te recomiendo es la "TRAMPA PEGAJOSA CON CEBO ORGÁNICO BIOLOGICO PARA MOSCAS ' +
+    'BLANCAS Y ÁFIDOS", un biopreparado registrado en el catálogo Chagra con el código CHA00124. Este producto ' +
+    'contiene una mezcla de atractivos naturales. Para su uso, cuélgalo a una altura de 1,5 metros del suelo. ' +
+    'Si deseas reforzar el control con un veneno casero, prepara una solución de melaza al 20%: disuelve 200 ' +
+    'gramos de melaza en 800 ml de agua, añade 10 gramos de bordela (Septoria musiva) y 5 cc de jabón neutro. ' +
+    'Aplica sobre las hojas y repite cada 7 a 10 días.';
+
+  it('por el pipeline completo, el SKU falso CHA00124 NO sobrevive en el cuerpo', () => {
+    const out = applyOutputGuards(BORDE_022_RAW, {
+      resolvedEntities: [{ nombre_comun: 'mango', nombre_cientifico: 'Mangifera indica' }],
+      userMessage:
+        'la mosca del Mediterráneo me daña el mango; me ofrecieron un cebo orgánico biológico, dígame el nombre ' +
+        'comercial exacto, cuántos cc por trampa, y cómo preparo un veneno casero con melaza.',
+    });
+    expect(out.modified).toBe(true);
+    expect(out.text).not.toMatch(/CHA00124/i);
   });
 });
