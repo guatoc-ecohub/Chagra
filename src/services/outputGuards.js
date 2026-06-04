@@ -4402,6 +4402,133 @@ function _responseAlreadyWarns(textNorm) {
   return prohibitsRaw;
 }
 
+// ── BORDE-001 (run7-a): limpieza del CUERPO que CONTRADICE el prefijo tóxico ──
+//
+// Hueco de seguridad GRAVE (run7 determinista): el prefijo de seguridad sube
+// correcto ("⚠️ Ojo de seguridad: yuca brava alta cianuro, NO consumir cruda,
+// procesar/detoxificar"), PERO el cuerpo de granite, intacto debajo, igual
+// OFRECE consumo crudo: "El jugo de yuca brava… puede ser consumido crudo" /
+// "si deseas obtener el jugo crudo…". Un campesino que lee el cuerpo toma jugo
+// crudo de yuca brava = envenenamiento por cianuro. El prefijo y el cuerpo se
+// contradicen. Este bloque NEUTRALIZA en el cuerpo las frases que OFRECEN o
+// NORMALIZAN el consumo crudo/directo del alimento tóxico, de modo que el cuerpo
+// NO contradiga el prefijo. SOLO actúa con una ConfusionWarning crítica TÓXICA
+// activa (cianuro/escopolamina/ricina/…) — NO toca consejos de consumo crudo de
+// alimentos SEGUROS (lechuga, zanahoria, lulo…).
+
+/**
+ * Marca idempotente de la nota que reemplaza una oferta de consumo crudo en el
+ * cuerpo. Si ya está, la limpieza no re-actúa sobre esa oración.
+ */
+const RAW_OFFER_REPLACEMENT_MARKER = '[no consumir cruda: procesar/detoxificar antes]';
+
+/**
+ * Nota segura que reemplaza una oración del cuerpo que ofrecía/normalizaba el
+ * consumo crudo del alimento tóxico. Refuerza la consigna del prefijo (procesar
+ * antes), sin contradecirlo. NO inventa hechos: repite la indicación de
+ * detoxificación que ya da el grounding.
+ */
+const RAW_OFFER_SAFE_REPLACEMENT =
+  `Importante: NO se consume crudo ni en jugo crudo — primero hay que procesarlo y ` +
+  `detoxificarlo (rallar, lavar bien y cocinar/hervir) para eliminar el tóxico. ` +
+  `${RAW_OFFER_REPLACEMENT_MARKER}`;
+
+/**
+ * OFERTA / NORMALIZACIÓN de consumo crudo o directo del alimento. Captura el
+ * fraseo con que el modelo invita a comer/tomar/dar la cosa cruda o fresca sin
+ * procesar:
+ *   - "puede ser consumido crudo", "se puede comer cruda", "es comestible crudo"
+ *   - "consúmelo crudo/fresco", "tómalo crudo", "dáselo crudo"
+ *   - "el jugo crudo", "en jugo crudo", "jugo fresco" (oferta de jugo sin procesar)
+ *   - "si deseas (obtener) el jugo crudo", "para tomarlo crudo"
+ * Sobre el texto YA normalizado (sin tildes, minúsculas).
+ */
+const RAW_CONSUMPTION_OFFER_PATTERNS = [
+  // "puede(s)/se puede ser consumido/comido/tomado crudo|cruda|fresco|fresca|directamente"
+  /\b(puede[sn]?|se\s+puede|podras|podemos|es)\b[^.!?]{0,40}\b(consum|com[ae]r?|comid|tomad|consumid|ingier|comestible)\w*[^.!?]{0,30}\b(crud|fresc|directa?ment|sin\s+procesar|sin\s+cocinar|sin\s+cocer)\w*/,
+  // imperativo: "consúmelo/cómela/tómalo/dáselo … crudo/fresco/directamente"
+  /\b(consum[ei]\w*|com[ae]\w*|tom[ae]\w*|dal[eao]\w*|das[ea]l\w*|bebe\w*|prueb[ae]\w*)\b[^.!?]{0,30}\b(crud|fresc|directa?ment)\w*/,
+  // "(el|en|de) jugo crudo|fresco" / "jugo … sin procesar" (oferta de jugo sin detox)
+  /\bjugo\b[^.!?]{0,25}\b(crud|fresc|sin\s+procesar|sin\s+cocinar|sin\s+detoxif)\w*/,
+  /\b(crud|fresc)\w*\b[^.!?]{0,15}\bjugo\b/,
+  // "si deseas/quieres (obtener/tomar/dar) … crudo|fresco" (condicional que normaliza el crudo)
+  /\bsi\s+(desea[sn]?|quiere[sn]?|prefiere[sn]?|gusta[sn]?|va[sn]?\s+a)\b[^.!?]{0,40}\b(crud|fresc|directa?ment)\w*/,
+  // "para (obtener/tomar/dar) … crudo|fresco|el jugo crudo"
+  /\bpara\s+(obtener|tomar|dar|sacar|consumir|extraer)\b[^.!?]{0,30}\b(crud|fresc)\w*/,
+];
+
+/**
+ * PROHIBICIÓN del crudo dentro de la oración (la oración NO ofrece crudo, lo
+ * desaconseja). Si la oración ya dice "no/nunca … crudo" o "no apta para
+ * consumo", NO la tocamos (es justamente la consigna segura). Sobre el texto
+ * normalizado. Reutiliza la semántica de los patrones de prohibición del guard.
+ */
+function _sentenceProhibitsRaw(sentenceNorm) {
+  return (
+    EXPLICIT_NO_RAW_CONSUMPTION_RE.test(sentenceNorm) ||
+    NOT_FIT_FOR_CONSUMPTION_RE.test(sentenceNorm) ||
+    // "no … crudo / cruda" suelto dentro de la oración (negación + crudo cercanos).
+    /\b(no|nunca|jamas|evit\w*)\b[^.!?]{0,40}\bcrud\w*/.test(sentenceNorm) ||
+    /\bcrud\w*\b[^.!?]{0,20}\b(no|nunca|jamas)\b/.test(sentenceNorm)
+  );
+}
+
+/**
+ * ¿La oración (normalizada) OFRECE/normaliza el consumo crudo o directo del
+ * alimento, y NO lo está prohibiendo? Esa es la frase contradictoria a limpiar.
+ *
+ * @param {string} sentenceNorm  oración ya normalizada (sin tildes, lower).
+ * @returns {boolean}
+ */
+function _sentenceOffersRawConsumption(sentenceNorm) {
+  if (!sentenceNorm) return false;
+  // Si la oración ya PROHÍBE el crudo, es la consigna segura → no se toca.
+  if (_sentenceProhibitsRaw(sentenceNorm)) return false;
+  return RAW_CONSUMPTION_OFFER_PATTERNS.some((re) => re.test(sentenceNorm));
+}
+
+/**
+ * _neutralizeRawConsumptionOffer — limpieza QUIRÚRGICA por oración del cuerpo
+ * para que NO contradiga el prefijo de seguridad tóxico. Recorre las oraciones
+ * del texto y, por cada una que OFRECE/normaliza el consumo crudo/directo del
+ * alimento tóxico (sin prohibirlo), la REEMPLAZA por la nota segura
+ * (`RAW_OFFER_SAFE_REPLACEMENT`). El resto del cuerpo (selección, lavado,
+ * picado, conservación…) se conserva intacto.
+ *
+ * SOLO debe llamarse cuando hay una ConfusionWarning crítica TÓXICA activa: el
+ * caller (guardSurfaceConfusionWarning) lo garantiza. Por sí solo NO juzga
+ * toxicidad — confía en el gate del caller para no tocar alimentos seguros.
+ *
+ * @param {string} originalText
+ * @returns {{text:string, changed:boolean, count:number}}
+ */
+function _neutralizeRawConsumptionOffer(originalText) {
+  if (typeof originalText !== 'string' || originalText.length === 0) {
+    return { text: originalText ?? '', changed: false, count: 0 };
+  }
+  // Idempotencia: si nuestra nota ya está, no re-limpiamos.
+  if (originalText.includes(RAW_OFFER_REPLACEMENT_MARKER)) {
+    return { text: originalText, changed: false, count: 0 };
+  }
+  const sentences = _splitSentences(originalText);
+  let count = 0;
+  const rebuilt = sentences.map((sentence) => {
+    const sNorm = _stripDiacritics(sentence);
+    if (!_sentenceOffersRawConsumption(sNorm)) return sentence;
+    count += 1;
+    // Preserva el espacio/salto final de la oración para no pegar el texto.
+    const trailing = sentence.match(/\s*$/)?.[0] || '';
+    // Preserva un encabezado de lista/paso si la oración lo trae ("6. **Consumo**:")
+    // para que el reemplazo no pierda la estructura del cuerpo.
+    const head = sentence.match(/^\s*(?:\d+[.)]\s*)?(?:\*\*[^*]{1,40}\*\*\s*:?\s*)?/)?.[0] || '';
+    return `${head}${RAW_OFFER_SAFE_REPLACEMENT}${trailing}`;
+  });
+  if (count === 0) {
+    return { text: originalText, changed: false, count: 0 };
+  }
+  return { text: rebuilt.join('').trim(), changed: true, count };
+}
+
 /**
  * Construye la frase de seguridad determinística a partir de la CW. Para una
  * confusión tóxica garantiza los 3 elementos que pide BORDE-001:
@@ -4488,19 +4615,21 @@ export function guardSurfaceConfusionWarning(responseText, resolvedEntities = nu
   if (!Array.isArray(resolvedEntities) || resolvedEntities.length === 0) {
     return { text: responseText, modified: false, reason: null };
   }
-  // Idempotencia barata: si nuestro prefijo ya está, no re-disparamos.
-  if (responseText.includes(CONFUSION_SAFETY_PREFIX)) {
+  // Idempotencia barata: si nuestro prefijo ya está Y ya limpiamos el cuerpo, no
+  // re-disparamos. Si el prefijo está pero el cuerpo aún ofrece crudo (p.ej. un
+  // pase previo solo antepuso el prefijo, sin limpiar), seguimos para limpiarlo.
+  const prefixYaPresente = responseText.includes(CONFUSION_SAFETY_PREFIX);
+  if (prefixYaPresente && responseText.includes(RAW_OFFER_REPLACEMENT_MARKER)) {
     return { text: responseText, modified: false, reason: null };
   }
 
-  // Anti-FP: si la respuesta YA advierte del riesgo tóxico, no duplicamos.
   const textNorm = _stripDiacritics(responseText);
-  if (_responseAlreadyWarns(textNorm)) {
-    return { text: responseText, modified: false, reason: null };
-  }
+  const yaAdvierteFuerte = _responseAlreadyWarns(textNorm);
 
   // Busca la PRIMERA ConfusionWarning critical + tóxica del grounding.
-  for (const e of resolvedEntities) {
+  let toxicCw = null;
+  let toxicEntity = null;
+  outer: for (const e of resolvedEntities) {
     if (!e || typeof e !== 'object') continue;
     const warnings = Array.isArray(e.confusion_warning) ? e.confusion_warning : [];
     for (const cw of warnings) {
@@ -4508,20 +4637,70 @@ export function guardSurfaceConfusionWarning(responseText, resolvedEntities = nu
       if (String(cw.severity || '').toLowerCase() !== 'critical') continue;
       const cwNorm = _stripDiacritics(`${cw.meaning_correct || ''} ${cw.explanation || ''}`);
       if (!_isToxicConfusion(cwNorm)) continue;
-
-      bumpGuardTelemetry('confusionWarningSurface');
-      const safetyLine = _buildConfusionSafetyLine(cw);
-      const text = `${safetyLine}\n\n${responseText.trim()}`;
-      const cwId = cw.id || cw.label_ambiguo || e.canonical_id || e.mentioned || 'desconocida';
-      return {
-        text,
-        modified: true,
-        reason: `confusion_warning_critical: ${cwId}`,
-      };
+      toxicCw = cw;
+      toxicEntity = e;
+      break outer;
     }
   }
 
-  return { text: responseText, modified: false, reason: null };
+  // Sin confusión tóxica crítica activa → no tocamos nada (anti-FP central: un
+  // alimento seguro con consejo de consumo crudo —lechuga, lulo— NO entra acá).
+  if (!toxicCw) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  // LIMPIEZA DEL CUERPO (BORDE-001 run7-a, safety-crítico): con la CW tóxica
+  // crítica activa, neutraliza las frases del cuerpo que OFRECEN/normalizan el
+  // consumo crudo/directo del alimento tóxico, para que el cuerpo NO contradiga
+  // el prefijo de seguridad. Esto corre SIEMPRE que haya CW tóxica — incluso si
+  // el cuerpo ya advierte fuerte en otra parte, porque puede contradecirse a sí
+  // mismo (advierte arriba y ofrece crudo abajo: el caso de yuca brava).
+  const cleaned = _neutralizeRawConsumptionOffer(responseText);
+
+  // Anti-FP: si la respuesta YA advierte del riesgo de forma FUERTE y explícita
+  // (nombra el tóxico Y prohíbe el crudo) Y no había ninguna oferta de crudo que
+  // limpiar, no anteponemos el prefijo (no duplicar). Pero si limpiamos una
+  // oferta de crudo, devolvemos el cuerpo corregido aunque no antepongamos prefijo.
+  if (yaAdvierteFuerte && !prefixYaPresente) {
+    if (!cleaned.changed) {
+      return { text: responseText, modified: false, reason: null };
+    }
+    const cwIdW = toxicCw.id || toxicCw.label_ambiguo || toxicEntity.canonical_id || toxicEntity.mentioned || 'desconocida';
+    bumpGuardTelemetry('confusionWarningRawConsumptionStrip');
+    return {
+      text: cleaned.text,
+      modified: true,
+      reason: `confusion_warning_raw_consumption_suprimido: ${cwIdW}`,
+    };
+  }
+
+  // Si el prefijo ya estaba (pase previo) y solo faltaba limpiar el cuerpo:
+  // devolvemos el cuerpo limpio SIN re-anteponer el prefijo.
+  if (prefixYaPresente) {
+    if (!cleaned.changed) {
+      return { text: responseText, modified: false, reason: null };
+    }
+    const cwIdP = toxicCw.id || toxicCw.label_ambiguo || toxicEntity.canonical_id || toxicEntity.mentioned || 'desconocida';
+    bumpGuardTelemetry('confusionWarningRawConsumptionStrip');
+    return {
+      text: cleaned.text,
+      modified: true,
+      reason: `confusion_warning_raw_consumption_suprimido: ${cwIdP}`,
+    };
+  }
+
+  // Caso normal: antepone el prefijo de seguridad determinístico sobre el cuerpo
+  // YA limpio (sin la oferta de crudo). Así el prefijo advierte y el cuerpo no lo
+  // contradice — la respuesta queda coherente.
+  bumpGuardTelemetry('confusionWarningSurface');
+  if (cleaned.changed) bumpGuardTelemetry('confusionWarningRawConsumptionStrip');
+  const safetyLine = _buildConfusionSafetyLine(toxicCw);
+  const text = `${safetyLine}\n\n${cleaned.text.trim()}`;
+  const cwId = toxicCw.id || toxicCw.label_ambiguo || toxicEntity.canonical_id || toxicEntity.mentioned || 'desconocida';
+  const reason = cleaned.changed
+    ? `confusion_warning_critical: ${cwId}; raw_consumption_suprimido`
+    : `confusion_warning_critical: ${cwId}`;
+  return { text, modified: true, reason };
 }
 
 // ── GUARD: marca comercial INVENTADA recomendada en el cuerpo ───────────────
