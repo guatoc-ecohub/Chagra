@@ -105,7 +105,10 @@ describe('themes.css — remapeo de clases NO-var-aware (la raíz del repeye)', 
     for (const sel of ['.text-amber-300', '.text-amber-400']) {
       expect(coveredForBothThemes(sel), `falta override ámbar ${sel}`).toBe(true);
     }
-    expect(themesCss).toMatch(/color:\s*rgb\(var\(--c-amber-700\)/);
+    // El override usa el ocre oscuro EXPLÍCITO rgb(160,76,20) (AA ≥4.5 sobre el
+    // crema de nature). El token --c-amber-700 (176,90,32) daba 4.02 < AA, por eso
+    // NO se usa la var sino el rgb literal — el assert sigue ese hecho del CSS.
+    expect(themesCss).toMatch(/color:\s*rgb\(160,\s*76,\s*20\)/);
   });
 
   it('neutraliza las tarjetas tonales del impacto hero (bloques oscuros)', () => {
