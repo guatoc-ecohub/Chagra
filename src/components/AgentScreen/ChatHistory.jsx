@@ -1,10 +1,29 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import ChatBubble from './ChatBubble';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import DeepResearchCard from '../DeepResearchCard';
 
-export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, onConsentNeeded, onRetryOrphan, onCancelDeepResearch, proactiveGreeting = null, onGreetingPrompt }) {
+// Bug piloto 2026-06-04 (B): "para devolverme tengo que ir hasta el inicio de
+// la conversación sin importar lo larga que sea". El único "Volver" vivía en el
+// header. Umbral en px a partir del cual mostramos un botón "Volver" FLOTANTE
+// dentro del área de chat — así el operador puede salir sin scrollear hasta
+// arriba. 160px ≈ un par de mensajes desplazados: suficiente para saber que ya
+// no estamos viendo el header.
+const FLOATING_BACK_THRESHOLD_PX = 160;
+
+export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, onConsentNeeded, onRetryOrphan, onCancelDeepResearch, proactiveGreeting = null, onGreetingPrompt, onBack }) {
   const bottomRef = useRef(null);
+  const scrollRef = useRef(null);
+  // (B) Botón "Volver" flotante: visible solo cuando el operador se alejó del
+  // inicio (header fuera de vista). Arriba del todo lo ocultamos porque el
+  // header ya ofrece su propio "Volver" y no queremos duplicar affordance.
+  const [showFloatingBack, setShowFloatingBack] = useState(false);
+
+  const handleScroll = useCallback((e) => {
+    const top = e?.target?.scrollTop ?? scrollRef.current?.scrollTop ?? 0;
+    setShowFloatingBack(top > FLOATING_BACK_THRESHOLD_PX);
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -56,7 +75,30 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
   };
 
   return (
-    <div className="flex-1 min-h-0 overflow-y-auto p-4 pb-2">
+    <div className="relative flex-1 min-h-0">
+      {/* (B) Botón "Volver" FLOTANTE: sticky-ish respecto al área de chat,
+          aparece al alejarse del inicio. Resuelve "tengo que ir hasta el
+          inicio para devolverme". La animación de entrada respeta
+          prefers-reduced-motion vía el CSS de abajo. */}
+      {typeof onBack === 'function' && showFloatingBack && (
+        <button
+          type="button"
+          onClick={onBack}
+          data-testid="chat-floating-back"
+          aria-label="Volver"
+          className="chagra-floating-back absolute top-3 left-3 z-20 flex items-center gap-1.5 pl-2 pr-3 py-2 rounded-full bg-slate-900/90 backdrop-blur-sm border border-slate-700 text-amber-300 shadow-lg active:scale-95 hover:bg-slate-800"
+        >
+          <ArrowLeft size={18} className="text-amber-400" />
+          <span className="text-xs font-semibold">Volver</span>
+        </button>
+      )}
+      <style>{FLOATING_BACK_CSS}</style>
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        data-testid="chat-scroll"
+        className="h-full overflow-y-auto p-4 pb-28"
+      >
       {messages.map((msg, idx) => {
         // Deep Research (A6/A7): si el mensaje lleva _deepResearch, renderizamos
         // el card de progreso/informe en lugar de (o junto a) la burbuja.
@@ -123,10 +165,29 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
         />
       )}
 
-      <div ref={bottomRef} />
+        <div ref={bottomRef} />
+      </div>
     </div>
   );
 }
+
+/**
+ * CSS del botón "Volver" flotante. Fade+rise corto al aparecer; neutralizado
+ * bajo prefers-reduced-motion siguiendo el patrón del proyecto (agentEntrance,
+ * BiopunkBackground). Inyectado una vez vía <style> en el área de chat.
+ */
+const FLOATING_BACK_CSS = `
+@keyframes chagra-floating-back-kf {
+  0% { opacity: 0; transform: translateY(-6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.chagra-floating-back {
+  animation: chagra-floating-back-kf 200ms ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .chagra-floating-back { animation: none !important; }
+}
+`;
 
 /**
  * ProactiveGreeting — el saludo de entrada DINÁMICO del agente. Lidera con lo

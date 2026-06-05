@@ -46,8 +46,17 @@ const CHROMIUM_PATH = detectChromiumPath();
 // host aborta con "No usable sandbox!" (SIGABRT) al lanzar. Es el fix
 // canónico de Playwright en GitHub Actions; inofensivo en local (corremos
 // como usuario normal). Sin esto los projects mobile-* crashean al launch.
+// `PLAYWRIGHT_SINGLE_PROCESS=1`: opt-in SOLO para correr local en hosts NixOS
+// donde el chromium del nix-store cuelga el handshake CDP en modo multi-proceso
+// (zygote/sandbox helper). NO se setea en CI (allí el chromium bundled
+// multi-proceso funciona y --single-process degradaría el render).
+const LOCAL_SINGLE_PROCESS = process.env.PLAYWRIGHT_SINGLE_PROCESS === '1' && !process.env.CI;
 const CHROMIUM_LAUNCH = {
-  args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  args: [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    ...(LOCAL_SINGLE_PROCESS ? ['--disable-gpu', '--disable-dev-shm-usage', '--single-process'] : []),
+  ],
   ...(CHROMIUM_PATH ? { executablePath: CHROMIUM_PATH } : {}),
 };
 

@@ -1319,9 +1319,36 @@ export function buildFincaContext({
     (finca && typeof finca.vereda === 'string' && finca.vereda.trim()) ||
     (typeof p.vereda === 'string' && p.vereda.trim()) ||
     null;
-  const altitud = p.finca_altitud || (finca && finca.altitud) || null;
+  // Altitud — PRECEDENCIA por confiabilidad (incidente prod piloto Choachí):
+  //   1. La altitud de la FINCA ACTIVA (registro de finca, confirmada).
+  //   2. La altitud del perfil (`finca_altitud`).
+  // La altitud de la finca activa manda: si existe, es la verdad de SU punto,
+  // aunque el perfil esté contaminado con la cabecera municipal.
+  const fincaAltitud = finca && finca.altitud != null ? finca.altitud : null;
+  const altitud = fincaAltitud != null ? fincaAltitud : p.finca_altitud || null;
+
+  // ¿La altitud que vamos a inyectar es SOLO la de la CABECERA municipal
+  // (fallback offline DANE), sin que GPS/elevación/manual la confirmen?
+  //
+  // Caso del piloto: el navegador difuminó el GPS a la cabecera de Choachí en
+  // el primer onboarding (1923 msnm), no quedó una altitud "buena" que el
+  // coalesce de persistencia (resolveAltitudToSave) pudiera proteger, y se
+  // guardó `altitud_source: 'cabecera'`. Choachí va de ~1.100 a ~3.500 msnm
+  // según la vereda: la cabecera NO es la finca. Si el agente ancla TODO a esa
+  // altitud (piso térmico, ventana de siembra, plagas) corrompe la respuesta.
+  //
+  // Solo es cabecera si: viene del perfil (no de la finca activa, que es
+  // confiable) Y su fuente persistida es 'cabecera'. GPS ('elevation_api'),
+  // explícita ('dado') o manual ('manual') son confiables → no se marca.
+  const altitudIsCabecera =
+    fincaAltitud == null &&
+    altitud != null &&
+    p.altitud_source === 'cabecera';
+
   const piso =
-    (p.piso_termico && String(p.piso_termico).trim()) ||
+    (p.piso_termico && String(p.piso_termico).trim() && !altitudIsCabecera
+      ? String(p.piso_termico).trim()
+      : null) ||
     pisoTermicoFromAltitud(altitud) ||
     null;
   const lat = Number(p.ubicacion_lat);
@@ -1336,8 +1363,16 @@ export function buildFincaContext({
       : null;
   const lugar = [veredaPrefix, municipio, departamento].filter(Boolean).join(', ');
   if (lugar) ubic.push(lugar);
-  if (altitud) ubic.push(`~${altitud} msnm`);
-  if (piso) ubic.push(`piso ${piso}`);
+  if (altitud) {
+    // Altitud de cabecera → rótulo explícito "aproximada (cabecera...)" para
+    // que el modelo NO la presente como dato confirmado de la finca.
+    ubic.push(
+      altitudIsCabecera
+        ? `~${altitud} msnm (aproximada — cabecera municipal, NO la finca)`
+        : `~${altitud} msnm`,
+    );
+  }
+  if (piso) ubic.push(`piso ${piso}${altitudIsCabecera ? ' aproximado' : ''}`);
   if (Number.isFinite(lat) && Number.isFinite(lng)) {
     ubic.push(`(${lat.toFixed(3)}, ${lng.toFixed(3)})`);
   }
@@ -1345,6 +1380,17 @@ export function buildFincaContext({
     lines.push(`Finca activa: "${finca.nombre}"${ubic.length ? ` — ${ubic.join(', ')}` : ''}.`);
   } else if (ubic.length) {
     lines.push(`Ubicación: ${ubic.join(', ')}.`);
+  }
+
+  // Incidente prod piloto Choachí: cuando la altitud es solo la de la cabecera
+  // municipal, el agente debe DECIRLE al usuario que esa altura es aproximada
+  // (la del pueblo, no su finca) y pedirle que confirme la altitud real de su
+  // finca, en vez de anclar piso térmico / ventana de siembra / plagas a un
+  // dato que puede estar cientos de metros equivocado.
+  if (altitudIsCabecera) {
+    lines.push(
+      `ALTITUD APROXIMADA: la altitud de arriba (~${altitud} msnm) es la de la CABECERA del municipio, NO la de la finca del usuario — el GPS no precisó su punto. El municipio abarca varios pisos térmicos según la vereda. NO afirmes piso térmico, ventana de siembra ni viabilidad de cultivos como certezas a partir de esta altitud: trátala como referencia gruesa y, cuando sea relevante, pídele al usuario que confirme la altitud REAL de su finca (o que ajuste su ubicación) para darle recomendaciones precisas.`,
+    );
   }
 
   // #357 — instrucción de LOCALIZACIÓN: cuando reporte clima/pronóstico, que
