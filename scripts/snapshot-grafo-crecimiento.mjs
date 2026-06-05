@@ -50,7 +50,7 @@
  */
 
 import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 // =============================================================================
@@ -371,10 +371,6 @@ export async function main(argv = process.argv.slice(2), env = process.env) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
     throw new Error(`fecha invalida (esperado YYYY-MM-DD): ${date}`);
   }
-  if (!existsSync(JSON_PATH)) {
-    throw new Error(`no existe ${JSON_PATH} — corre gen-data.mjs --write primero`);
-  }
-
   console.error(`[snapshot] leyendo grafo vivo ${GRAPH} por TCP…`);
   const live = snapshotGrafo(env);
 
@@ -401,7 +397,18 @@ export async function main(argv = process.argv.slice(2), env = process.env) {
     );
   }
 
-  const prev = JSON.parse(readFileSync(JSON_PATH, 'utf-8'));
+  // Leer-y-manejar en vez de existsSync()+readFileSync (evita el TOCTOU
+  // js/file-system-race CodeQL HIGH): si el archivo no existe, ENOENT →
+  // mismo mensaje amistoso, sin ventana entre el check y el uso.
+  let prev;
+  try {
+    prev = JSON.parse(readFileSync(JSON_PATH, 'utf-8'));
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      throw new Error(`no existe ${JSON_PATH} — corre gen-data.mjs --write primero`);
+    }
+    throw err;
+  }
   const next = mergeSnapshot(prev, live, date);
   const json = JSON.stringify(next, null, 2);
   const jsonPublic = JSON.stringify(sanitizeForPublic(next), null, 2);
