@@ -4266,6 +4266,53 @@
         "manihot_esculenta",
         "cajanus_cajan"
       ]
+    },
+    {
+      "id": "carludovica_palmata",
+      "nombre_comun": "Palma de iraca (paja toquilla)",
+      "nombre_cientifico": "Carludovica palmata Ruiz & Pav.",
+      "familia_botanica": "Cyclanthaceae",
+      "category": "fibras_no_maderables",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "nativo_silvestre",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 200,
+        "optimo_max": 1500,
+        "max_absoluto": 1800
+      },
+      "temperatura_c": {
+        "helada_letal": -2,
+        "optimo_min": 18,
+        "optimo_max": 26,
+        "max_tolerable": 32
+      },
+      "radiacion": "sombra_parcial",
+      "agua": "medio",
+      "drenaje_requerido": "bueno_a_moderado",
+      "propagation": {
+        "metodo_principal": "semilla",
+        "notas": "Se propaga por semillas o división de hijuelos. Germinación en 2-3 meses."
+      },
+      "source_ids": [
+        "gbif-taxonomic-backbone",
+        "powo-kew",
+        "perez-arbelaez-1947-plantas-utiles"
+      ],
+      "valor_pedagogico": "Carludovica palmata, conocida como palma de iraca o paja toquilla, es una ciclantácea nativa de los bosques húmedos tropicales de Colombia, Ecuador y Perú. En Colombia se distribuye en los departamentos de Nariño, Cauca, Putumayo, Amazonas y Chocó entre 0-1800 msnm en zonas térmicas cálidas y templadas. Su cultivo es tradicional en Sandoná, Nariño, donde las artesanas tejen sus hojas fibrosas para elaborar sombreros de paja toquilla reconocidos nationally por su fineza y durabilidad. La fibra se extrae de las hojas jóvenes antes de que se expandan completamente, se seca al sol y se procesa manualmente. Manejo agroecológico: propagación por semillas en vivero con trasplante a los 6-8 meses, requiere sombra parcial durante establecimiento, suelos húmedos con buen drenaje, cosecha de hojas selectiva (no más del 30% de hojas por planta) para permitir recuperación. Especie no maderable clave para economía campesina andina-amazónica.",
+      "harvest_type": "hoja",
+      "cycleMonths": null,
+      "companions": [],
+      "antagonists": [],
+      "tracking_mode": "aggregate",
+      "validation_level": "claude_draft"
     }
   ],
   "sources": [
