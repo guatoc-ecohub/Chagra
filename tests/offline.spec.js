@@ -248,10 +248,19 @@ test.describe('Offline-first — siembra pendiente y reconexión', () => {
       .poll(() => countPendingTransactions(page), { timeout: 10_000 })
       .toBeGreaterThanOrEqual(1);
 
-    // Reconexión → evento 'online' → NetworkStatusBar entra en SYNCING.
+    // Reconexión → el sync empuja la siembra pendiente y el bar de estado REPORTA
+    // el resultado. OJO con el flake histórico: el bar transitorio "Sincronizando
+    // N registros…" se SUPRIME a propósito durante el sync activo (decisión
+    // 2026-05-18: NetworkStatusBar.refreshStats hace setVisible(false) porque el
+    // rotador del TopBar ya indica el progreso). Asertar /sincronizando/ era doble-
+    // mente frágil: (1) solo capturaba esa ventana suprimida, y (2) NO matchea el
+    // estado terminal SYNCED "N registros sincronizADos" (termina en -ado). La
+    // señal DURABLE es el estado terminal del bar: SYNCED (~4s) o "Error
+    // sincronizando con FarmOS" (ERROR, 8s, red mockeada aborta). /sincroniz/i
+    // cubre ambos de forma estable. Ver feedback-sw-shadows-playwright-route.
     await context.setOffline(false);
     await page.evaluate(() => window.dispatchEvent(new Event('online')));
 
-    await expect(page.getByText(/sincronizando/i)).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText(/sincroniz/i).first()).toBeVisible({ timeout: 15_000 });
   });
 });
