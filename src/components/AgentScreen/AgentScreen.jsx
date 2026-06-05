@@ -78,6 +78,7 @@ import DeepResearchCard from '../DeepResearchCard';
 import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildSuggestedEntitiesContext, isLowConfidenceEntity } from '../../services/agentService';
 import { applyOutputGuards, applyTaxonomyGuard, classifyQueryIntent } from '../../services/outputGuards';
 import { getProfile } from '../../services/userProfileService';
+import { captureExchange } from '../../services/conversationCaptureService';
 import { regionFromProfile, getEnsoOutlook } from '../../services/ensoContext';
 // SALUDO PROACTIVO (#162 alertas + #298 tareas + #331 análisis): el agente, de
 // entrada, lidera con lo MÁS importante (1-2 pendientes) si los hay, o da una
@@ -1740,7 +1741,11 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         }
       }
 
+      // Demo-captura (2026-06-05): marca de inicio para medir la latencia del
+      // turno (solo del callLLM) que se adjunta al evento de captura.
+      const tLLM0 = performance.now();
       const rawResponse = await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock);
+      const turnLatencyMs = Math.round(performance.now() - tLLM0);
       // DR-LANG-1: filtro post-process anti-voseo argentino. Es la última
       // línea de defensa estructural — garantiza que el léxico rioplatense
       // (che, laburar, etc.) NUNCA llegue al usuario campesino colombiano,
@@ -1931,6 +1936,43 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         metadata: sourceMetadata,
       });
       setMessages((prev) => [...prev, assistantMessage]);
+
+      // Demo-captura de conversaciones (entrega usuarios gente-cercana
+      // 2026-06-05). Fire-and-forget, gated por VITE_CAPTURE_CONVERSATIONS
+      // (OFF default). Persiste el turno completo (pregunta + respuesta +
+      // grounding) en el sidecar (/log-conversation → JSONL durable) para
+      // revisar las pruebas al final del día. PURO side-effect best-effort:
+      // jamás bloquea ni cambia el flujo del chat; lo que no esté disponible va
+      // null/[] (el servicio tolera nulls). Lo que SÍ tenemos del turno se pasa.
+      try {
+        const captureProfile = (() => { try { return getProfile(); } catch (_) { return null; } })();
+        captureExchange({
+          userText: text,
+          agentText: response,
+          identity: {
+            user_id: operatorId,
+            user_name: (captureProfile && captureProfile.nombre) || null,
+            finca_slug: (fincaActiva && fincaActiva.slug) || activeFincaSlug || null,
+            finca_nombre: (fincaActiva && fincaActiva.nombre) || null,
+          },
+          meta: {
+            session_id: operatorId,
+            // Índice del turno = nº de mensajes ya en el hilo antes de este
+            // assistant (puede ser null si no hay; el servicio tolera null).
+            turn_index: Array.isArray(messages) ? messages.length : null,
+            nlu_route: (() => { try { return selectChatRoute(textForLLM); } catch (_) { return null; } })(),
+            entities_grounded: Array.isArray(resolvedEntities)
+              ? resolvedEntities.map((e) => (e && (e.id || e.nombre_cientifico || e.nombre)) || null).filter(Boolean)
+              : [],
+            guards_fired: Array.isArray(guarded.reasons) ? guarded.reasons : [],
+            grounded_status: (sourceMetadata && (sourceMetadata.fuente || sourceMetadata.source)) || null,
+            latency_ms: turnLatencyMs,
+            model: (() => { try { return buildLLMRequest(selectChatRoute(textForLLM), messages).body.model; } catch (_) { return null; } })(),
+          },
+        });
+      } catch (_) {
+        // La captura JAMÁS degrada el chat — la respuesta ya está mostrada.
+      }
 
       // Task #122: cachear el último mensaje del agente en el store global
       // para que el doble-click del avatar (cualquier pantalla) pueda re-
