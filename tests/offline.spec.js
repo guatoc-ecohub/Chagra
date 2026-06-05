@@ -208,7 +208,15 @@ test.describe('Offline-first — siembra pendiente y reconexión', () => {
 
     // Cualquier otro tráfico saliente a FarmOS/HA/Ollama se bloquea —
     // el test depende solo de la capa offline, nunca de red externa.
-    await context.route('**/api/**', (route) => route.abort('blockedbyclient'));
+    // El abort se retrasa ~400ms a propósito: al reconectar, mantiene la petición
+    // de sync "en vuelo" lo suficiente para que NetworkStatusBar permanezca en
+    // estado SYNCING y el toast 'sincronizando' se renderice de forma DETERMINISTA.
+    // Con abort instantáneo, SYNCING colapsaba en un solo tick → test flaky
+    // (bloqueaba merges, ECONNREFUSED del SW re-emitiendo; ver feedback-sw-shadows-playwright-route).
+    await context.route('**/api/**', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 400));
+      await route.abort('blockedbyclient');
+    });
   });
 
   test('guarda siembra de 10 fresas offline y reporta sincronización al reconectar', async ({
