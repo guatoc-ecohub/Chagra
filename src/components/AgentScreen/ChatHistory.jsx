@@ -1,10 +1,29 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import ChatBubble from './ChatBubble';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import DeepResearchCard from '../DeepResearchCard';
 
-export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, onConsentNeeded, onRetryOrphan, onCancelDeepResearch }) {
+// Bug piloto 2026-06-04 (B): "para devolverme tengo que ir hasta el inicio de
+// la conversación sin importar lo larga que sea". El único "Volver" vivía en el
+// header. Umbral en px a partir del cual mostramos un botón "Volver" FLOTANTE
+// dentro del área de chat — así el operador puede salir sin scrollear hasta
+// arriba. 160px ≈ un par de mensajes desplazados: suficiente para saber que ya
+// no estamos viendo el header.
+const FLOATING_BACK_THRESHOLD_PX = 160;
+
+export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, onConsentNeeded, onRetryOrphan, onCancelDeepResearch, proactiveGreeting = null, onGreetingPrompt, onBack }) {
   const bottomRef = useRef(null);
+  const scrollRef = useRef(null);
+  // (B) Botón "Volver" flotante: visible solo cuando el operador se alejó del
+  // inicio (header fuera de vista). Arriba del todo lo ocultamos porque el
+  // header ya ofrece su propio "Volver" y no queremos duplicar affordance.
+  const [showFloatingBack, setShowFloatingBack] = useState(false);
+
+  const handleScroll = useCallback((e) => {
+    const top = e?.target?.scrollTop ?? scrollRef.current?.scrollTop ?? 0;
+    setShowFloatingBack(top > FLOATING_BACK_THRESHOLD_PX);
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -14,13 +33,24 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
   // libando en su tamaño más grande de toda la app (size=200). El header
   // ya tiene una versión chiquita (size=40) — acá vive en grande, como
   // primera impresión del agente.
+  //
+  // SALUDO PROACTIVO (#162/#298/#331): si AgentScreen ya resolvió el saludo
+  // dinámico, lideramos con lo clave (1-2 pendientes) o con una idea contextual.
+  // El resto de pendientes vive en la campana/panel — NO los listamos todos
+  // aquí. Si el saludo aún no resolvió, caemos al copy estático de siempre.
   if (messages.length === 0 && !isStreaming) {
     return (
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="text-center">
+      <div className="flex-1 flex flex-col items-center justify-center p-6">
+        <div className="text-center max-w-md">
           <ChagraAgentAvatar state="idle" size={200} className="mx-auto mb-4" />
-          <p className="text-slate-200 text-base mb-2 font-medium">¡Hola! Soy tu asistente agroecológico.</p>
-          <p className="text-slate-500 text-xs">Puedes hablarme o escribirme sobre tus plantas.</p>
+          {proactiveGreeting ? (
+            <ProactiveGreeting greeting={proactiveGreeting} onPrompt={onGreetingPrompt} />
+          ) : (
+            <>
+              <p className="text-slate-200 text-base mb-2 font-medium">¡Hola! Soy tu asistente agroecológico.</p>
+              <p className="text-slate-500 text-xs">Puedes hablarme o escribirme sobre tus plantas.</p>
+            </>
+          )}
         </div>
       </div>
     );
@@ -45,7 +75,30 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
   };
 
   return (
-    <div className="flex-1 min-h-0 overflow-y-auto p-4 pb-2">
+    <div className="relative flex-1 min-h-0">
+      {/* (B) Botón "Volver" FLOTANTE: sticky-ish respecto al área de chat,
+          aparece al alejarse del inicio. Resuelve "tengo que ir hasta el
+          inicio para devolverme". La animación de entrada respeta
+          prefers-reduced-motion vía el CSS de abajo. */}
+      {typeof onBack === 'function' && showFloatingBack && (
+        <button
+          type="button"
+          onClick={onBack}
+          data-testid="chat-floating-back"
+          aria-label="Volver"
+          className="chagra-floating-back absolute top-3 left-3 z-20 flex items-center gap-1.5 pl-2 pr-3 py-2 rounded-full bg-slate-900/90 backdrop-blur-sm border border-slate-700 text-amber-300 shadow-lg active:scale-95 hover:bg-slate-800"
+        >
+          <ArrowLeft size={18} className="text-amber-400" />
+          <span className="text-xs font-semibold">Volver</span>
+        </button>
+      )}
+      <style>{FLOATING_BACK_CSS}</style>
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        data-testid="chat-scroll"
+        className="h-full overflow-y-auto p-4 pb-28"
+      >
       {messages.map((msg, idx) => {
         // Deep Research (A6/A7): si el mensaje lleva _deepResearch, renderizamos
         // el card de progreso/informe en lugar de (o junto a) la burbuja.
@@ -112,7 +165,92 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
         />
       )}
 
-      <div ref={bottomRef} />
+        <div ref={bottomRef} />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * CSS del botón "Volver" flotante. Fade+rise corto al aparecer; neutralizado
+ * bajo prefers-reduced-motion siguiendo el patrón del proyecto (agentEntrance,
+ * BiopunkBackground). Inyectado una vez vía <style> en el área de chat.
+ */
+const FLOATING_BACK_CSS = `
+@keyframes chagra-floating-back-kf {
+  0% { opacity: 0; transform: translateY(-6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.chagra-floating-back {
+  animation: chagra-floating-back-kf 200ms ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .chagra-floating-back { animation: none !important; }
+}
+`;
+
+/**
+ * ProactiveGreeting — el saludo de entrada DINÁMICO del agente. Lidera con lo
+ * clave: si state==='pending' muestra 1-2 pendientes destacados (la alerta/tarea
+ * top) + un hint de cuántos más hay en la campana; si state==='idea' muestra
+ * una idea contextual sin inventar alarmas. CTA siembra el prompt sugerido en
+ * el input (el operador revisa y envía — no auto-submit).
+ */
+function ProactiveGreeting({ greeting, onPrompt }) {
+  if (!greeting) return null;
+  const { hi, state, lead, items = [], restCount = 0, prompt } = greeting;
+  const isPending = state === 'pending';
+  return (
+    <div data-testid="proactive-greeting" data-greeting-state={state}>
+      <p className="text-slate-200 text-base mb-1.5 font-medium">
+        {hi}. Soy <span className="text-emerald-300">Chagra</span>.
+      </p>
+      <p
+        className="text-slate-300 text-sm leading-relaxed mb-3"
+        data-testid="proactive-greeting-lead"
+      >
+        {lead}
+      </p>
+
+      {isPending && items.length > 0 && (
+        <ul className="text-left space-y-1.5 mb-3" data-testid="proactive-greeting-items">
+          {items.map((it, i) => (
+            <li
+              key={i}
+              className={`flex items-start gap-2 px-2.5 py-1.5 rounded-lg border text-xs ${
+                it.kind === 'alert'
+                  ? 'bg-rose-500/10 border-rose-600/30 text-rose-100'
+                  : 'bg-amber-500/10 border-amber-600/30 text-amber-100'
+              }`}
+            >
+              <span aria-hidden className="shrink-0">{it.icon}</span>
+              <span className="flex-1 min-w-0">
+                <span className="font-medium">{it.title}</span>
+                {it.due && <span className="block opacity-80 text-[11px] mt-0.5">{it.due}</span>}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {isPending && restCount > 0 && (
+        <p className="text-[11px] text-slate-500 mb-3" data-testid="proactive-greeting-rest">
+          {restCount === 1
+            ? 'Hay 1 pendiente más en la campana 🔔.'
+            : `Hay ${restCount} pendientes más en la campana 🔔.`}
+        </p>
+      )}
+
+      {prompt && typeof onPrompt === 'function' && (
+        <button
+          type="button"
+          onClick={() => onPrompt(prompt)}
+          data-testid="proactive-greeting-cta"
+          className="text-xs px-3 py-1.5 rounded-full bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-600/30 text-cyan-100 transition-colors active:scale-95"
+        >
+          {prompt}
+        </button>
+      )}
     </div>
   );
 }

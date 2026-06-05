@@ -130,36 +130,62 @@ function SourceBadge({ metadata }) {
 }
 
 /**
- * #18 — FuenteBadge: link clickeable a la fuente verificable del grounding curado
- * (p.ej. una dosis de biopreparado respaldada por Agrosavia / FAO). Aparece solo
- * cuando el turno trae `metadata.fuente_url` (URL http/https). CSP-safe: es un
- * `<a href target="_blank">` nativo (NO onclick inline) — no requiere
- * 'unsafe-inline' ni viola `script-src 'self'`. `rel="noopener noreferrer"`
- * evita fuga de window.opener al sitio externo.
+ * #18 (+ refinamiento 2026-06-03) — FuenteBadge: surfacéa la fuente de un turno
+ * grounded al MÁXIMO de trazabilidad HONESTA disponible. Dos formas:
  *
- * El label es `metadata.fuente` (ej. "Agrosavia"); si no viene, cae a un texto
- * genérico. Wording cero hype: "Fuente verificable".
+ *   1. LINK (`metadata.fuente_url` http/https): la cita lleva al RECURSO citado
+ *      (deep-link de ficha, sección del dato, o búsqueda del concepto). CSP-safe:
+ *      `<a href target="_blank">` nativo (NO onclick inline) — no requiere
+ *      'unsafe-inline'. `rel="noopener noreferrer"` evita fuga de window.opener.
+ *   2. TEXTO PLANO (`metadata.fuente_texto === true`, sin URL válida): la fuente
+ *      es institucional reconocida pero NO hay recurso puntual al que acercar
+ *      (p.ej. IDEAM/Open-Meteo, cuyo portal no permite deep-link al pronóstico
+ *      citado). Mostramos "Fuente: X" como `<span>` — NUNCA un link a la
+ *      homepage genérica (eso sería trazabilidad teatral). Honestidad ante todo.
+ *
+ * Si no hay ni URL ni `fuente_texto`, no renderiza nada (graceful).
  */
 function FuenteBadge({ metadata }) {
   const md = metadata || {};
   const url = typeof md.fuente_url === 'string' ? md.fuente_url.trim() : '';
-  if (!/^https?:\/\//i.test(url)) return null;
   const label = (typeof md.fuente === 'string' && md.fuente.trim()) || 'fuente externa';
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      data-testid="fuente-badge"
-      data-source="verifiable-source"
-      title={`Esta respuesta cita una fuente verificable (${label}). Abre el documento original en una pestaña nueva.`}
-      className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-sky-600/20 text-sky-300 border border-sky-700 hover:bg-sky-600/30 underline-offset-2 hover:underline"
-    >
-      <ShieldCheck size={12} aria-hidden="true" />
-      <span>Fuente verificable: {label}</span>
-      <ExternalLink size={11} aria-hidden="true" />
-    </a>
-  );
+
+  // Forma 1: recurso citado → link clickeable.
+  if (/^https?:\/\//i.test(url)) {
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-testid="fuente-badge"
+        data-source="verifiable-source"
+        title={`Esta respuesta cita una fuente verificable (${label}). Abre el recurso citado en una pestaña nueva.`}
+        className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-sky-600/20 text-sky-300 border border-sky-700 hover:bg-sky-600/30 underline-offset-2 hover:underline"
+      >
+        <ShieldCheck size={12} aria-hidden="true" />
+        <span>Fuente verificable: {label}</span>
+        <ExternalLink size={11} aria-hidden="true" />
+      </a>
+    );
+  }
+
+  // Forma 2: institución reconocida pero sin recurso puntual → texto plano.
+  // NO emitimos <a> (no linkeamos a la homepage): solo citamos honestamente.
+  if (md.fuente_texto === true) {
+    return (
+      <span
+        data-testid="fuente-badge-text"
+        data-source="cited-source-text"
+        title={`Esta respuesta cita a ${label}. La institución no expone un enlace directo al dato citado, por eso se muestra como referencia (sin enlace).`}
+        className="text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1 bg-slate-600/20 text-slate-300 border border-slate-700"
+      >
+        <ShieldCheck size={12} aria-hidden="true" />
+        <span>Fuente: {label}</span>
+      </span>
+    );
+  }
+
+  return null;
 }
 
 /**

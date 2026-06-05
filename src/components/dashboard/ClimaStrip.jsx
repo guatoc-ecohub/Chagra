@@ -1,7 +1,8 @@
-import { useEffect, useState, useMemo } from 'react';
-import { Cloud, CloudRain, Sun, CloudSun, Droplets, Wind, Thermometer, MapPin } from 'lucide-react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
+import { Cloud, CloudRain, Sun, CloudSun, Droplets, Wind, Thermometer, MapPin, AlertCircle, Pencil } from 'lucide-react';
 import { fetchClimaSnapshot, getCachedClimaSnapshot } from '../../services/climaService';
 import { findMunicipio } from '../../utils/colombiaLocations';
+import { isSavedLocationCoarse } from '../../services/locationService';
 import { FARM_CONFIG } from '../../config/defaults';
 import useFincaActiveStore from '../../services/fincaActiveStore';
 import { getProfile, getProfileMunicipio } from '../../services/userProfileService';
@@ -151,6 +152,32 @@ export default function ClimaStrip({ onNavigate }) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [municipio, tick]);
 
+    // mitad geo de #364 (2026-06-03): ¿la ubicación GUARDADA es demasiado
+    // gruesa para afirmar el municipio/zona con confianza? Pasa cuando el
+    // onboarding grabó la cabecera del municipio grande (Brave difuminó el GPS)
+    // y el usuario no corrigió la altura a mano. NO bloquea el pronóstico
+    // (Open-Meteo ya corrige por altitud); solo degrada la CONFIANZA en el
+    // municipio mostrado y empuja a confirmar la ubicación real.
+    const coarse = useMemo(() => {
+        return isSavedLocationCoarse(getProfile());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tick]);
+
+    // Navegación a la pantalla de ubicación (mini-mapa + piso térmico). Reusada
+    // por el CTA "Configurar ubicación" (sin ubicación), el aviso de confianza
+    // gruesa y el botón de re-pin del header. Degrada al evento global
+    // 'chagra:nav' (que App.jsx escucha) si no hay onNavigate — evita el
+    // listener inline-string del feedback CSP-strict.
+    const goToLocation = useCallback(() => {
+        if (typeof onNavigate === 'function') {
+            onNavigate('ubicacion-detectada');
+            return;
+        }
+        try {
+            window.dispatchEvent(new CustomEvent('chagra:nav', { detail: 'ubicacion-detectada' }));
+        } catch (_) { /* noop */ }
+    }, [onNavigate]);
+
     useEffect(() => {
         let alive = true;
         // Sin coords (ni del perfil ni geocodificando el municipio) no podemos
@@ -217,16 +244,7 @@ export default function ClimaStrip({ onNavigate }) {
                     feedback-csp-strict-inline-handlers-bloqueados). */}
                 <button
                     type="button"
-                    onClick={() => {
-                        if (typeof onNavigate === 'function') {
-                            onNavigate('ubicacion-detectada');
-                            return;
-                        }
-                        try {
-                            // App.jsx escucha 'chagra:nav' (string o {view,data})
-                            window.dispatchEvent(new CustomEvent('chagra:nav', { detail: 'ubicacion-detectada' }));
-                        } catch (_) { /* noop */ }
-                    }}
+                    onClick={goToLocation}
                     className="mt-3 px-4 py-2 rounded-xl bg-sky-700/30 hover:bg-sky-600/40 border border-sky-500/40 text-sky-200 text-sm font-bold transition-colors flex items-center gap-2"
                 >
                     <MapPin size={14} aria-hidden="true" />
@@ -264,13 +282,61 @@ export default function ClimaStrip({ onNavigate }) {
                 <div className="flex items-center gap-2 min-w-0">
                     <Cloud size={20} className="text-sky-300 shrink-0" />
                     <h3 className="text-base font-bold text-white truncate">
-                        Clima en {headerLabel}
+                        {coarse ? 'Clima en tu zona' : `Clima en ${headerLabel}`}
                     </h3>
                 </div>
-                <span className="text-[10px] text-sky-300/70 font-bold uppercase tracking-wider shrink-0">
-                    Open-Meteo · 7 días
-                </span>
+                <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-[10px] text-sky-300/70 font-bold uppercase tracking-wider">
+                        Open-Meteo · 7 días
+                    </span>
+                    {/* Re-pin SIEMPRE alcanzable (mitad geo de #364): corregir una
+                        ubicación guardada equivocada sin fricción. Navega al
+                        mini-mapa donde el usuario re-fija su vereda real; al
+                        confirmar, LocationDetectedScreen reescribe el perfil y
+                        dispara 'chagra:location-updated' (este card refresca). */}
+                    <button
+                        type="button"
+                        onClick={goToLocation}
+                        data-testid="clima-repin"
+                        aria-label="Corregir mi ubicación"
+                        title="Corregir mi ubicación"
+                        className="p-1.5 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.08] text-sky-200 transition-colors"
+                    >
+                        <Pencil size={13} aria-hidden="true" />
+                    </button>
+                </div>
             </div>
+
+            {/* mitad geo de #364: aviso de confianza cuando la ubicación GUARDADA
+                es gruesa (Brave/onboarding grabó la cabecera, no la vereda). NO
+                afirmamos el municipio como cierto; empujamos a confirmar la
+                ubicación real en el mini-mapa. El pronóstico igual se muestra
+                (Open-Meteo corrige por altitud) — lo que degradamos es la
+                confianza en el municipio/zona. */}
+            {coarse && (
+                <div
+                    data-testid="clima-coarse-warning"
+                    className="mb-3 rounded-xl bg-amber-950/30 border border-amber-800/40 p-3 text-xs text-amber-200 flex gap-2"
+                >
+                    <AlertCircle size={14} className="shrink-0 mt-0.5" aria-hidden="true" />
+                    <div className="flex-1 min-w-0">
+                        <p className="leading-relaxed">
+                            Confirma tu ubicación para un clima exacto. La que tenemos
+                            guardada es aproximada (puede ser la cabecera del municipio,
+                            no tu finca).
+                        </p>
+                        <button
+                            type="button"
+                            onClick={goToLocation}
+                            data-testid="clima-coarse-cta"
+                            className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-700/30 hover:bg-amber-600/40 border border-amber-500/40 text-amber-100 font-bold transition-colors"
+                        >
+                            <MapPin size={13} aria-hidden="true" />
+                            Confirmar mi ubicación
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {!hasReal && (
                 <p className="text-xs text-slate-400 mb-3 italic">

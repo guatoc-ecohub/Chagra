@@ -32,6 +32,7 @@ import {
   computeSourceMetadata,
   mergePostValidateMetadata,
   extractGroundingBadges,
+  deriveEvidenceSourceLink,
   extractEdges,
   clearMemory,
   shouldStartNewSession,
@@ -60,6 +61,12 @@ import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities,
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
 // los chips cuyo backend aún no existe (precio/deep).
 import { planForcedIntent, isStubIntent, isDeepResearchIntent, CHIP_DEFS } from '../../services/chipIntentRouter';
+// #349 — router heurístico de GROUNDING para el path de FALLO del NLU. Cuando
+// `planNlu` devuelve null (timeout/fail del sidecar bajo contención de GPU), el
+// turno NO debe saltarse el grounding: este router PURO deriva el tool obvio
+// (entidad resuelta o keyword → get_species/get_pest_controllers/get_biopreparados)
+// para intentar AL MENOS una consulta al grafo en vez de caer a generativo puro.
+import { planNluFallback } from '../../services/agentNluFallback';
 // Deep Research (A6/A7): cliente HTTP del endpoint async de investigación
 // profunda del sidecar. Feature flag VITE_DEEP_RESEARCH_ENABLED (default false).
 import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../../services/deepResearchClient';
@@ -71,7 +78,14 @@ import DeepResearchCard from '../DeepResearchCard';
 import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildSuggestedEntitiesContext, isLowConfidenceEntity } from '../../services/agentService';
 import { applyOutputGuards, applyTaxonomyGuard, classifyQueryIntent } from '../../services/outputGuards';
 import { getProfile } from '../../services/userProfileService';
-import { regionFromProfile } from '../../services/ensoContext';
+import { regionFromProfile, getEnsoOutlook } from '../../services/ensoContext';
+// SALUDO PROACTIVO (#162 alertas + #298 tareas + #331 análisis): el agente, de
+// entrada, lidera con lo MÁS importante (1-2 pendientes) si los hay, o da una
+// idea contextual (cultivo/clima/temporada) sin inventar alarmas. Lógica pura
+// y testeable extraída a proactiveGreeting; aquí solo la hidratamos desde los
+// stores en vivo y la pintamos en el empty-state del chat.
+import { resolveProactiveGreeting } from '../../services/proactiveGreeting';
+import useLogStore from '../../store/useLogStore';
 // Bug UX 2026-05-30: preservar respuesta parcial ante abort/timeout/cancel.
 // La lógica pura del merge del estado final vive en agentPartialMerge (testeable
 // sin montar el componente).
@@ -193,6 +207,11 @@ export default function AgentScreen({ onBack, initialContext }) {
   // informe oficial. El banner es dismissable — al primer submit, o cuando
   // el operador cierra, desaparece. NO se persiste entre mounts.
   const [alertContextBanner, setAlertContextBanner] = useState(null);
+  // SALUDO PROACTIVO: objeto {hi, state, lead, items, restCount, prompt} que el
+  // empty-state del chat pinta de entrada. Se resuelve UNA vez al montar (lee
+  // alertas + tareas + clima/cultivos) y solo se muestra mientras el chat esté
+  // vacío e idle. null mientras no haya resuelto (fallback al copy estático).
+  const [proactiveGreeting, setProactiveGreeting] = useState(null);
   // CHIPS DE MODO (A4): modo activo seleccionado en la ChipsToolbar. Cuando
   // hay un modo activo, el siguiente submit fuerza esa intención y rutea
   // DIRECTO al tool determinístico (saltando el NLU, A3). El placeholder del
@@ -391,6 +410,49 @@ export default function AgentScreen({ onBack, initialContext }) {
       }
     });
     return () => { alive = false; };
+  }, []);
+
+  // SALUDO PROACTIVO de entrada: resolvemos el saludo dinámico al montar. Lee
+  // alertas activas (alertEngine #162), tareas pendientes (#298 via logStore),
+  // y deriva una idea contextual de cultivos/clima/temporada cuando NO hay nada
+  // urgente. Local-only, una sola vez (NO quema GPU ni red por refresh). Si todo
+  // falla, queda null y el empty-state cae al copy estático.
+  useEffect(() => {
+    let alive = true;
+    const stripPlantNumber = (name) => (name || '').replace(/\s*#\d+\s*$/, '').trim();
+    const grouped = Object.entries(
+      (plants || []).reduce((acc, p) => {
+        const base = stripPlantNumber(p.attributes?.name);
+        if (base) acc[base] = (acc[base] || 0) + 1;
+        return acc;
+      }, {}),
+    ).map(([name, count]) => ({ name, count }));
+    const finca = fincas.find((f) => f.slug === activeFincaSlug);
+    const climaSnapshot = getCachedClimaSnapshot();
+    let ensoOutlook = null;
+    try {
+      const phase = climaSnapshot?.enso_status?.phase;
+      if (phase) {
+        const region = regionFromProfile(getProfile());
+        const probs = climaSnapshot?.enso_status?.ideam_probabilities
+          || climaSnapshot?.enso_status?.ideam_probabilidades
+          || null;
+        ensoOutlook = getEnsoOutlook({ phase, region, probabilities: probs });
+      }
+    } catch (_) { /* sin ENSO no pasa nada — la idea cae a temporada/piso */ }
+    resolveProactiveGreeting({
+      activeAlerts,
+      getPendingTasks: () => useLogStore.getState().getPendingTasks(),
+      cultivos: grouped,
+      altitud: finca?.altitud != null ? Number(finca.altitud) : null,
+      ensoOutlook,
+    }).then((g) => {
+      if (alive) setProactiveGreeting(g);
+    }).catch(() => { /* degrada silencioso al copy estático */ });
+    return () => { alive = false; };
+    // Solo al montar: el saludo es la primera impresión, no debe re-evaluarse en
+    // cada cambio de inventario/alerta mientras el operador ya está leyéndolo.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 2026-05-28: aplicar initialContext de notificación climática.
@@ -1570,6 +1632,40 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
               reason: plan.reason || 'no_tool',
             });
           }
+
+          // #349 — DEGRADE BEST-EFFORT CON GROUNDING. Si el NLU planner MURIÓ
+          // (`plan === null`: timeout/fail del sidecar bajo contención de GPU) y
+          // todavía no hay evidencia de tool, NO degradamos a generativo puro:
+          // derivamos un tool OBVIO (entidad ya resuelta por resolveEntities, o
+          // keyword del mensaje) y lo intentamos. Así el LLM recibe el grounding
+          // rico (ficha/companions/controladores) en vez de solo el binomio
+          // ligero — o, en el peor caso, al menos la ficha de la especie.
+          //
+          // SOLO corre cuando el planner devolvió NULL (murió), NUNCA cuando el
+          // planner decidió deliberadamente "no_tool" (`plan` truthy con useTool
+          // false): esa es una decisión válida (ej. preguntas de inventario) que
+          // no debemos pisar con un tool forzado. callTool ya es no-throw.
+          if (!toolEvidence && !plan) {
+            const fbPlan = planNluFallback(textForLLM, resolvedEntities);
+            if (fbPlan && fbPlan.tool) {
+              const tFb0 = performance.now();
+              const fbResult = await callTool(fbPlan.tool, fbPlan.args);
+              const tFb1 = performance.now();
+              if (fbResult) {
+                toolEvidence = { tool: fbPlan.tool, args: fbPlan.args, result: fbResult };
+                console.debug('[sidecar] NLU muerto — grounding best-effort (#349)', {
+                  tool: fbPlan.tool,
+                  source: fbPlan.source,
+                  latencyTool: Math.round(tFb1 - tFb0),
+                });
+              } else {
+                console.debug('[sidecar] NLU muerto — fallback tool null (#349)', {
+                  tool: fbPlan.tool,
+                  source: fbPlan.source,
+                });
+              }
+            }
+          }
           }
 
           // PASO 3 — detección heurística frontend de intent climática
@@ -1765,8 +1861,16 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       // sin esos campos → no añade nada. #19: `auto_corrected` marca que los
       // guards deterministas modificaron la respuesta (badge "auto-corregida").
       const groundingBadges = extractGroundingBadges(resolvedEntities);
+      // #356: si el grounding curado no aportó un link de fuente, derivarlo del
+      // TOOL que respondió (p.ej. get_clima_ideam → "Fuente: IDEAM" clickeable a
+      // ideam.gov.co). Las entidades mandan (deep-link de ficha); el tool es el
+      // fallback. Graceful: sin fuente institucional → {} y no se añade badge.
+      const evidenceSourceLink = groundingBadges.fuente_url
+        ? {}
+        : deriveEvidenceSourceLink(toolEvidence);
       sourceMetadata = {
         ...sourceMetadata,
+        ...evidenceSourceLink,
         ...groundingBadges,
         auto_corrected: guarded.modified === true || taxonomyModified === true,
       };
@@ -2529,7 +2633,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
     : 'Escribe tu pregunta...';
 
   return (
-    <div className={`h-full flex flex-col bg-slate-950 ${entranceClassRef.current}`}>
+    <div className={`h-[100dvh] flex flex-col bg-slate-950 overflow-hidden ${entranceClassRef.current}`}>
       {/* B1: animación de entrada (fade+rise) para que se perciba el cruce al
           agente. Respeta prefers-reduced-motion vía @media en el CSS. */}
       <style>{AGENT_ENTRANCE_CSS}</style>
@@ -2664,6 +2768,9 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         onConsentNeeded={handleFeedbackConsentNeeded}
         onRetryOrphan={handleRetryOrphan}
         onCancelDeepResearch={handleCancelDeepResearch}
+        proactiveGreeting={proactiveGreeting}
+        onGreetingPrompt={(prompt) => prompt && setInputText(prompt)}
+        onBack={onBack}
       />
 
       {/* Error */}

@@ -389,7 +389,7 @@ export function generateRegionalToneContext(region) {
     'opita': 'Usa español opita/tolimense: "paisano", "jue", "ah pues". Tono tolima-huila.',
     'pastuso': 'Usa español pastuso: "taita", "guagua", "pues si". Tono nariñense.',
     'pacifico': 'Usa español del Pacífico: "compadre", "hermano de la mar". Tono afrocolombiano.',
-    'santandereano': 'Usa español santandereano: "¿qui whopping?", "mano". Tono canchón.',
+    'santandereano': 'Usa español santandereano: "¡quiubo, mano!", "mano". Tono canchón.',
     'amazonica': 'Usa español suave amazónico. Reconoce diversidad cultural. Evita imitar acentos específicos.',
   };
   
@@ -1309,18 +1309,70 @@ export function buildFincaContext({
   // ── Ubicación ───────────────────────────────────────────────────────────
   const municipio = p.municipio || null;
   const departamento = p.departamento || null;
-  const altitud = p.finca_altitud || (finca && finca.altitud) || null;
+  // #357 — vereda: la finca activa manda sobre el perfil (igual que TopBar).
+  // El dataset DANE municipal NO la trae; solo existe si el onboarding manual
+  // o el reverse-geocoding fino (DANE MGN, #338) la resolvió. Cuando existe,
+  // el agente debe localizar la respuesta de clima en "vereda X, Municipio"
+  // en vez de un genérico "tu zona" — el DATO de IDEAM es municipal, pero se
+  // PRESENTA en la vereda específica del usuario.
+  const vereda =
+    (finca && typeof finca.vereda === 'string' && finca.vereda.trim()) ||
+    (typeof p.vereda === 'string' && p.vereda.trim()) ||
+    null;
+  // Altitud — PRECEDENCIA por confiabilidad (incidente prod piloto Choachí):
+  //   1. La altitud de la FINCA ACTIVA (registro de finca, confirmada).
+  //   2. La altitud del perfil (`finca_altitud`).
+  // La altitud de la finca activa manda: si existe, es la verdad de SU punto,
+  // aunque el perfil esté contaminado con la cabecera municipal.
+  const fincaAltitud = finca && finca.altitud != null ? finca.altitud : null;
+  const altitud = fincaAltitud != null ? fincaAltitud : p.finca_altitud || null;
+
+  // ¿La altitud que vamos a inyectar es SOLO la de la CABECERA municipal
+  // (fallback offline DANE), sin que GPS/elevación/manual la confirmen?
+  //
+  // Caso del piloto: el navegador difuminó el GPS a la cabecera de Choachí en
+  // el primer onboarding (1923 msnm), no quedó una altitud "buena" que el
+  // coalesce de persistencia (resolveAltitudToSave) pudiera proteger, y se
+  // guardó `altitud_source: 'cabecera'`. Choachí va de ~1.100 a ~3.500 msnm
+  // según la vereda: la cabecera NO es la finca. Si el agente ancla TODO a esa
+  // altitud (piso térmico, ventana de siembra, plagas) corrompe la respuesta.
+  //
+  // Solo es cabecera si: viene del perfil (no de la finca activa, que es
+  // confiable) Y su fuente persistida es 'cabecera'. GPS ('elevation_api'),
+  // explícita ('dado') o manual ('manual') son confiables → no se marca.
+  const altitudIsCabecera =
+    fincaAltitud == null &&
+    altitud != null &&
+    p.altitud_source === 'cabecera';
+
   const piso =
-    (p.piso_termico && String(p.piso_termico).trim()) ||
+    (p.piso_termico && String(p.piso_termico).trim() && !altitudIsCabecera
+      ? String(p.piso_termico).trim()
+      : null) ||
     pisoTermicoFromAltitud(altitud) ||
     null;
   const lat = Number(p.ubicacion_lat);
   const lng = Number(p.ubicacion_lng);
   const ubic = [];
-  const lugar = [municipio, departamento].filter(Boolean).join(', ');
+  // "vereda El Curí, Choachí, Cundinamarca" — antepone la vereda al municipio
+  // solo si la tenemos y no está ya contenida en el municipio (defensa contra
+  // duplicado "vereda X, ... vereda X").
+  const veredaPrefix =
+    vereda && !(municipio && municipio.toLowerCase().includes(vereda.toLowerCase()))
+      ? `vereda ${vereda}`
+      : null;
+  const lugar = [veredaPrefix, municipio, departamento].filter(Boolean).join(', ');
   if (lugar) ubic.push(lugar);
-  if (altitud) ubic.push(`~${altitud} msnm`);
-  if (piso) ubic.push(`piso ${piso}`);
+  if (altitud) {
+    // Altitud de cabecera → rótulo explícito "aproximada (cabecera...)" para
+    // que el modelo NO la presente como dato confirmado de la finca.
+    ubic.push(
+      altitudIsCabecera
+        ? `~${altitud} msnm (aproximada — cabecera municipal, NO la finca)`
+        : `~${altitud} msnm`,
+    );
+  }
+  if (piso) ubic.push(`piso ${piso}${altitudIsCabecera ? ' aproximado' : ''}`);
   if (Number.isFinite(lat) && Number.isFinite(lng)) {
     ubic.push(`(${lat.toFixed(3)}, ${lng.toFixed(3)})`);
   }
@@ -1328,6 +1380,32 @@ export function buildFincaContext({
     lines.push(`Finca activa: "${finca.nombre}"${ubic.length ? ` — ${ubic.join(', ')}` : ''}.`);
   } else if (ubic.length) {
     lines.push(`Ubicación: ${ubic.join(', ')}.`);
+  }
+
+  // Incidente prod piloto Choachí: cuando la altitud es solo la de la cabecera
+  // municipal, el agente debe DECIRLE al usuario que esa altura es aproximada
+  // (la del pueblo, no su finca) y pedirle que confirme la altitud real de su
+  // finca, en vez de anclar piso térmico / ventana de siembra / plagas a un
+  // dato que puede estar cientos de metros equivocado.
+  if (altitudIsCabecera) {
+    lines.push(
+      `ALTITUD APROXIMADA: la altitud de arriba (~${altitud} msnm) es la de la CABECERA del municipio, NO la de la finca del usuario — el GPS no precisó su punto. El municipio abarca varios pisos térmicos según la vereda. NO afirmes piso térmico, ventana de siembra ni viabilidad de cultivos como certezas a partir de esta altitud: trátala como referencia gruesa y, cuando sea relevante, pídele al usuario que confirme la altitud REAL de su finca (o que ajuste su ubicación) para darle recomendaciones precisas.`,
+    );
+  }
+
+  // #357 — instrucción de LOCALIZACIÓN: cuando reporte clima/pronóstico, que
+  // nombre el lugar específico del usuario (vereda + municipio si la hay; si no,
+  // el municipio) en vez de un genérico "tu zona"/"tu finca". El pronóstico de
+  // IDEAM es municipal, así que el agente NO debe afirmar precisión sub-municipal:
+  // solo PRESENTA el dato municipal localizado a la vereda del usuario.
+  if (vereda && municipio) {
+    lines.push(
+      `LOCALIZACIÓN DE CLIMA: al dar el pronóstico o reporte de clima, nómbralo para "${vereda}, ${municipio}" (la vereda del usuario), no como un genérico "tu zona" ni "tu finca". El dato meteorológico es del municipio de ${municipio} (IDEAM/Open-Meteo); preséntalo localizado a la vereda, sin prometer precisión de finca exacta.`,
+    );
+  } else if (municipio) {
+    lines.push(
+      `LOCALIZACIÓN DE CLIMA: al dar el pronóstico o reporte de clima, nómbralo para ${municipio} (el municipio del usuario), no como un genérico "tu zona".`,
+    );
   }
 
   // ── Temporada (calendárica, local — sin red) ────────────────────────────

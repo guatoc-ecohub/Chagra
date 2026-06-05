@@ -376,9 +376,10 @@ describe('ChatBubble — badges anti-alucinación (#18 fuente · #19 auto-correg
     expect(link).not.toHaveAttribute('onclick');
   });
 
-  test('#18 sin fuente_url → NO renderiza el badge de fuente', () => {
+  test('#18 sin fuente_url ni fuente_texto → NO renderiza el badge de fuente', () => {
     render(<ChatBubble message={base({ tool_used: 'get_species', grounded: true })} />);
     expect(screen.queryByTestId('fuente-badge')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('fuente-badge-text')).not.toBeInTheDocument();
   });
 
   test('#18 fuente_url no http(s) → NO renderiza link (no inyección)', () => {
@@ -388,6 +389,63 @@ describe('ChatBubble — badges anti-alucinación (#18 fuente · #19 auto-correg
       />,
     );
     expect(screen.queryByTestId('fuente-badge')).not.toBeInTheDocument();
+  });
+
+  // ── refinamiento 2026-06-03: fuente sin recurso puntual → TEXTO PLANO ──
+  test('fuente_texto:true (sin URL) → renderiza "Fuente: X" como TEXTO, NO un <a>', () => {
+    render(
+      <ChatBubble
+        message={base({ tool_used: 'get_clima_ideam', grounded: true, fuente: 'IDEAM', fuente_texto: true })}
+      />,
+    );
+    // No hay link de homepage.
+    expect(screen.queryByTestId('fuente-badge')).not.toBeInTheDocument();
+    // Sí hay una referencia de texto.
+    const text = screen.getByTestId('fuente-badge-text');
+    expect(text).toBeInTheDocument();
+    expect(text.tagName).not.toBe('A'); // <span>, jamás <a>
+    expect(text.querySelector('a')).toBeNull();
+    expect(text).not.toHaveAttribute('href');
+    expect(text).toHaveTextContent(/Fuente:\s*IDEAM/i);
+  });
+
+  test('fuente_texto NUNCA produce un link a la homepage de la institución', () => {
+    render(
+      <ChatBubble
+        message={base({ tool_used: 'get_clima_ideam', grounded: true, fuente: 'IDEAM', fuente_texto: true })}
+      />,
+    );
+    // Aserción central del operador: ningún <a> apunta al HOST institucional.
+    // Comparamos por hostname parseado (no substring de regex) para no caer en
+    // el anti-patrón de regex sin anclar (js/regex/missing-regexp-anchor).
+    const institutionalHosts = ['ideam.gov.co', 'www.ideam.gov.co'];
+    const anchors = document.querySelectorAll('a[href]');
+    for (const a of anchors) {
+      const href = a.getAttribute('href') || '';
+      let host = '';
+      try {
+        host = new URL(href, 'https://chagra.app').hostname;
+      } catch {
+        host = '';
+      }
+      expect(institutionalHosts).not.toContain(host);
+    }
+  });
+
+  test('fuente_url presente gana sobre fuente_texto (link, no texto)', () => {
+    render(
+      <ChatBubble
+        message={base({
+          tool_used: 'get_biopreparados',
+          grounded: true,
+          fuente: 'Agrosavia',
+          fuente_url: 'https://repository.agrosavia.co/search?query=lulo',
+          fuente_texto: true,
+        })}
+      />,
+    );
+    expect(screen.getByTestId('fuente-badge')).toBeInTheDocument();
+    expect(screen.queryByTestId('fuente-badge-text')).not.toBeInTheDocument();
   });
 
   // ── #19: auto-corregida ──

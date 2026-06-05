@@ -1,130 +1,295 @@
-/* src/styles/themes.css */
+/* src/styles/themes.css
+ * ============================================================================
+ * SISTEMA DE TEMAS (skin global de la app) — capa de OVERRIDES NO-COLOR.
+ *
+ * Tres temas curados (operador 2026-06-03/04, demo Bogotá), aplicados app-wide
+ * desde el LOGIN vía `data-theme` en <html> (lo escribe useTheme.js):
+ *
+ *   - bio-punk (DEFAULT)  → estilo BASE. NO lleva data-theme. Lienzo "cosecha
+ *                           mística" (§4). Tokens de color en :root de index.css.
+ *   - minimalista         → papel claro + tinta + salvia (demo
+ *                           demo-agente-minimalista.html).
+ *   - nature              → crema cálida + café + salvia + ocre (demo
+ *                           demo-agente.html).
+ *
+ * ARQUITECTURA (refactor theming P0 2026-06-04):
+ * ----------------------------------------------------------------------------
+ * El grueso del theming ya NO vive acá. Las ~726 clases de color del PWA
+ * (slate/emerald/amber + acentos custom, incluidas las variantes de opacidad
+ * `/40` `/60`) se resuelven contra variables `--c-*` definidas en index.css
+ * (`:root` = biopunk exacto; `[data-theme="…"]` redefine ~30 vars). Esa
+ * indirección por CSS-var en el ORIGEN reemplaza los cientos de overrides
+ * `!important` clase-por-clase que antes vivían acá y solo cubrían ~25/726
+ * clases (de ahí el "Frankenstein" en temas claros).
+ *
+ * Este archivo conserva SOLO lo que la indirección de color NO puede resolver:
+ *   §1. login-bg-photo / patrón biopunk: elementos con foto/imagen propia.
+ *   §2. Halo del agente (AgentHero): gradientes con RGB hardcodeado en el JSX.
+ *   §3. Lienzo "cosecha mística" del fondo biopunk base.
+ * ============================================================================
+ */
 
-/* 1. Root variables for each theme */
+/* ===========================================================================
+ * 0. ACENTOS DEL TEMA (para los pocos overrides que aún los necesitan: §2)
+ *    El color de chrome sale de --c-* (index.css); esto es solo el RGB del
+ *    acento principal de cada tema claro, para tintar el halo del agente.
+ * =========================================================================== */
 
-[data-theme="dark-sober"] {
-  --color-bg-primary: #0a0a0a;
-  --color-bg-secondary: #0f172a;
-  --color-text-primary: #e5e5e5;
-  --color-text-secondary: #a3a3a3;
-  --color-accent: #475569; /* slate-600 — sin neón */
-  --color-border: #1e293b;
-  --color-card: #111827;
+[data-theme="minimalista"] {
+  --t-accent-rgb: 47, 110, 90;   /* salvia */
+  --t-bg-rgb: 246, 243, 236;     /* papel (para el agujero del halo) */
 }
 
-[data-theme="light"] {
-  --color-bg-primary: #ffffff;
-  --color-bg-secondary: #f8fafc;
-  --color-text-primary: #0f172a;
-  --color-text-secondary: #475569;
-  --color-accent: #059669; /* emerald-600 */
-  --color-border: #e2e8f0;
-  --color-card: #f1f5f9;
+[data-theme="nature"] {
+  --t-accent-rgb: 122, 143, 74;  /* salvia cálida */
+  --t-bg-rgb: 251, 245, 234;     /* crema */
 }
 
-/* 2. Global Overrides for Tailwind hardcoded classes */
+/* ===========================================================================
+ * 1. FOTO DE LOGIN Y PATRÓN BIOPUNK
+ *    La capa de foto oscura del login (.login-bg-photo) trae su propio overlay
+ *    slate-950: en temas claros oscurecería la UI. El patrón PCB biopunk
+ *    (.bg-biopunk-pattern) tampoco pega sobre fondo claro. Ambos se ocultan.
+ *    (El fondo principal de la app ya se neutraliza en index.css.)
+ * =========================================================================== */
 
-/* --- BACKGROUNDS --- */
-[data-theme="dark-sober"] .bg-slate-950,
-[data-theme="dark-sober"] .bg-slate-900 {
-  background-color: var(--color-bg-primary) !important;
+[data-theme="nature"] .login-bg-photo,
+[data-theme="minimalista"] .login-bg-photo {
+  display: none !important;
 }
 
-[data-theme="light"] .bg-slate-950,
-[data-theme="light"] .bg-slate-900 {
-  background-color: var(--color-bg-primary) !important;
-}
-
-[data-theme="dark-sober"] .bg-slate-900\/50,
-[data-theme="dark-sober"] .bg-slate-900\/60 {
-  background-color: rgba(10, 10, 10, 0.6) !important;
-}
-
-[data-theme="light"] .bg-slate-900\/50,
-[data-theme="light"] .bg-slate-900\/60 {
-  background-color: rgba(248, 250, 252, 0.6) !important;
-}
-
-[data-theme] .bg-biopunk-pattern {
+[data-theme="nature"] .bg-biopunk-pattern,
+[data-theme="minimalista"] .bg-biopunk-pattern {
   background-image: none !important;
 }
 
-/* --- TEXT COLORS --- */
-[data-theme="dark-sober"] .text-white,
-[data-theme="dark-sober"] .text-slate-100,
-[data-theme="dark-sober"] .text-slate-200 {
-  color: var(--color-text-primary) !important;
+/* ===========================================================================
+ * 2. HALO DEL AGENTE (AgentHero — "ser vivo" neón)
+ *    AgentHero envuelve al colibrí en un halo CÓNICO lime/emerald/cyan y un
+ *    "agujero" radial slate-950, ambos con RGB HARDCODEADO en el <style> del
+ *    JSX → la indirección de color de Tailwind no los alcanza. En bio-punk es
+ *    el neón que pidió el operador; en temas claros choca contra la crema, así
+ *    que lo viramos al acento del tema y aclaramos el agujero al fondo del tema.
+ * =========================================================================== */
+
+[data-theme="nature"] .chagra-hero-halo,
+[data-theme="minimalista"] .chagra-hero-halo {
+  background: conic-gradient(
+    from 0deg,
+    rgba(var(--t-accent-rgb), 0.42),
+    rgba(var(--t-accent-rgb), 0.18),
+    rgba(var(--t-accent-rgb), 0.42)
+  ) !important;
+  opacity: 0.55 !important;
 }
 
-[data-theme="light"] .text-white,
-[data-theme="light"] .text-slate-100,
-[data-theme="light"] .text-slate-200 {
-  color: var(--color-text-primary) !important;
+[data-theme="nature"] .chagra-hero-halo-inner,
+[data-theme="minimalista"] .chagra-hero-halo-inner {
+  background: radial-gradient(
+    circle,
+    rgba(var(--t-bg-rgb), 0) 50%,
+    rgba(var(--t-bg-rgb), 0.9) 100%
+  ) !important;
 }
 
-[data-theme="light"] .text-slate-400,
-[data-theme="light"] .text-slate-500 {
-  color: var(--color-text-secondary) !important;
+/* ===========================================================================
+ * 3. CARDS TONALES DECORATIVAS (WelcomeStatsHero "Chagra · impacto")
+ *    El carrusel de impacto rota un acento por stat: cyan/lime/fuchsia/sky/
+ *    orange/violet/yellow. Esas familias se dejan ESTÁTICAS a propósito (la
+ *    indirección de color cubre slate/emerald/amber, no estas). Sobre fondo
+ *    claro quedaban como BLOQUES OSCUROS con números neón (el demo no tiene ese
+ *    arcoíris: una sola superficie clara + acento del tema). Las colapsamos al
+ *    token del tema SOLO en los temas claros. (amber YA es theme-aware vía la
+ *    indirección → no necesita override.)
+ * =========================================================================== */
+
+[data-theme="minimalista"] .bg-cyan-950\/40,
+[data-theme="minimalista"] .bg-lime-950\/40,
+[data-theme="minimalista"] .bg-fuchsia-950\/40,
+[data-theme="minimalista"] .bg-sky-950\/40,
+[data-theme="minimalista"] .bg-orange-950\/40,
+[data-theme="minimalista"] .bg-violet-950\/40,
+[data-theme="minimalista"] .bg-yellow-950\/40,
+[data-theme="nature"] .bg-cyan-950\/40,
+[data-theme="nature"] .bg-lime-950\/40,
+[data-theme="nature"] .bg-fuchsia-950\/40,
+[data-theme="nature"] .bg-sky-950\/40,
+[data-theme="nature"] .bg-orange-950\/40,
+[data-theme="nature"] .bg-violet-950\/40,
+[data-theme="nature"] .bg-yellow-950\/40 {
+  background-color: rgb(var(--c-surface-raised)) !important;
 }
 
-/* --- ACCENTS & GLOWS --- */
-[data-theme="dark-sober"] .text-muzo-glow {
-  color: var(--color-text-primary) !important;
+[data-theme="minimalista"] .border-cyan-800\/60,
+[data-theme="minimalista"] .border-lime-800\/60,
+[data-theme="minimalista"] .border-fuchsia-800\/60,
+[data-theme="minimalista"] .border-sky-800\/60,
+[data-theme="minimalista"] .border-orange-800\/60,
+[data-theme="minimalista"] .border-violet-800\/60,
+[data-theme="minimalista"] .border-yellow-800\/60,
+[data-theme="nature"] .border-cyan-800\/60,
+[data-theme="nature"] .border-lime-800\/60,
+[data-theme="nature"] .border-fuchsia-800\/60,
+[data-theme="nature"] .border-sky-800\/60,
+[data-theme="nature"] .border-orange-800\/60,
+[data-theme="nature"] .border-violet-800\/60,
+[data-theme="nature"] .border-yellow-800\/60 {
+  border-color: rgb(var(--c-surface-border)) !important;
+}
+
+[data-theme="minimalista"] .text-cyan-300,
+[data-theme="minimalista"] .text-lime-300,
+[data-theme="minimalista"] .text-fuchsia-300,
+[data-theme="minimalista"] .text-sky-300,
+[data-theme="minimalista"] .text-orange-300,
+[data-theme="minimalista"] .text-violet-300,
+[data-theme="minimalista"] .text-violet-400,
+[data-theme="minimalista"] .text-yellow-300 {
+  color: rgb(var(--c-emerald-400)) !important;  /* salvia oscura minimalista (AA) */
   text-shadow: none !important;
 }
 
-[data-theme="light"] .text-muzo-glow {
-  color: var(--color-accent) !important;
+/* Nature: la salvia clara (--c-emerald-400 = 122 143 74) NO contrasta sobre la
+ * crema (≈2.9, medido). Para los NÚMEROS/textos del impacto usamos el verde
+ * profundo del tema (--c-emerald-700 = 70 84 40) que sí pasa AA sobre crema. */
+[data-theme="nature"] .text-cyan-300,
+[data-theme="nature"] .text-lime-300,
+[data-theme="nature"] .text-fuchsia-300,
+[data-theme="nature"] .text-sky-300,
+[data-theme="nature"] .text-orange-300,
+[data-theme="nature"] .text-violet-300,
+[data-theme="nature"] .text-violet-400,
+[data-theme="nature"] .text-yellow-300 {
+  color: rgb(var(--c-emerald-700)) !important;  /* verde profundo cálido (AA) */
   text-shadow: none !important;
 }
 
-[data-theme] .shadow-neon-muzo,
-[data-theme] .shadow-neon-morpho,
-[data-theme] .shadow-neon-orchid,
-[data-theme] .shadow-neon-frog {
-  box-shadow: none !important;
+[data-theme="minimalista"] .bg-cyan-500,
+[data-theme="minimalista"] .bg-lime-500,
+[data-theme="minimalista"] .bg-fuchsia-500,
+[data-theme="minimalista"] .bg-sky-500,
+[data-theme="minimalista"] .bg-orange-500,
+[data-theme="minimalista"] .bg-violet-500,
+[data-theme="minimalista"] .bg-yellow-500,
+[data-theme="nature"] .bg-cyan-500,
+[data-theme="nature"] .bg-lime-500,
+[data-theme="nature"] .bg-fuchsia-500,
+[data-theme="nature"] .bg-sky-500,
+[data-theme="nature"] .bg-orange-500,
+[data-theme="nature"] .bg-violet-500,
+[data-theme="nature"] .bg-yellow-500 {
+  background-color: rgb(var(--c-emerald-400)) !important;
 }
 
-/* --- BORDERS --- */
-[data-theme="dark-sober"] .border-slate-800,
-[data-theme="dark-sober"] .border-slate-700 {
-  border-color: var(--color-border) !important;
+/* ===========================================================================
+ * 3bis. BLANCO NO THEME-AWARE — la raíz del "repeye" en temas claros.
+ *    `white` NO está en el mapa de CSS-vars de Tailwind (solo slate/emerald/
+ *    amber/surface lo están), así que `text-white` (≈300 usos), `border-white/*`
+ *    y los scrims "glass" `bg-white/<α>` quedaban con su valor literal #fff en
+ *    los temas claros:
+ *      - text-white  → texto BLANCO sobre card crema  = ILEGIBLE (contraste ~1.0,
+ *                      medido empíricamente con la sonda de contraste 2026-06-04).
+ *      - border-white/* → línea blanca invisible sobre crema.
+ *      - bg-white/<α>  → scrim translúcido blanco sobre crema = ningún contraste
+ *                        (el "glass" del compositor/chips del agente desaparece).
+ *    En bio-punk (oscuro) ese blanco ES correcto, por eso solo lo viramos en los
+ *    dos temas claros. text-white → tinta del tema; bordes/scrims → tinta sutil.
+ *    (bg-white SÓLIDO —las cards— se deja: es la superficie clara correcta.)
+ * =========================================================================== */
+
+/* Texto blanco → tinta legible del tema (slate-100 ya es tinta en claro). */
+[data-theme="minimalista"] .text-white,
+[data-theme="nature"] .text-white {
+  color: rgb(var(--c-slate-100)) !important;
+}
+[data-theme="minimalista"] .text-white\/70,
+[data-theme="minimalista"] .text-white\/60,
+[data-theme="nature"] .text-white\/70,
+[data-theme="nature"] .text-white\/60 {
+  color: rgb(var(--c-slate-300)) !important; /* secundario, un punto más suave */
 }
 
-[data-theme="light"] .border-slate-800,
-[data-theme="light"] .border-slate-700 {
-  border-color: var(--color-border) !important;
+/* EXCEPCIÓN: sobre un BOTÓN/superficie de acento SÓLIDO el blanco sigue siendo
+ * lo correcto (p.ej. el botón "enviar" verde del demo lleva ícono blanco). En
+ * los temas claros esos acentos (emerald/sky/lime/amber 500/400) ya son verdes/
+ * ocres OSCUROS vía la indirección, así que blanco encima contrasta bien. Mayor
+ * especificidad (dos clases) gana sobre la regla genérica de arriba. */
+[data-theme="minimalista"] .bg-emerald-500.text-white,
+[data-theme="minimalista"] .bg-emerald-600.text-white,
+[data-theme="minimalista"] .bg-sky-500.text-white,
+[data-theme="minimalista"] .bg-muzo.text-white,
+[data-theme="nature"] .bg-emerald-500.text-white,
+[data-theme="nature"] .bg-emerald-600.text-white,
+[data-theme="nature"] .bg-sky-500.text-white,
+[data-theme="nature"] .bg-muzo.text-white {
+  color: #fff !important;
 }
 
-/* --- COMPONENTS SPECIFIC OVERRIDES --- */
-
-/* Input/Select */
-[data-theme="light"] input, 
-[data-theme="light"] select, 
-[data-theme="light"] textarea {
-  background-color: white !important;
-  color: var(--color-text-primary) !important;
-  border-color: var(--color-border) !important;
+/* Texto ÁMBAR claro sobre superficie clara = ilegible. En los temas claros el
+ * mapa de vars hace que amber-100..400 sean ocres CLAROS (pensados para texto
+ * sobre fondo OSCURO en biopunk). Como TEXTO sobre crema no contrastan (nature
+ * text-amber-400 medido ≈1.75). Los viramos a un ocre OSCURO explícito
+ * rgb(160,76,20) → AA ≥4.5 sobre el crema cálido de nature (242,233,215). OJO: el
+ * token base --c-amber-700 (176,90,32) daba 4.02, JUSTO por debajo de AA sobre ese
+ * fondo (lo atrapó tests/themes.spec.js). NO tocamos `bg-amber-*` (los botones
+ * ocres del demo conservan su relleno). */
+[data-theme="minimalista"] .text-amber-100,
+[data-theme="minimalista"] .text-amber-200,
+[data-theme="minimalista"] .text-amber-300,
+[data-theme="minimalista"] .text-amber-400,
+[data-theme="minimalista"] .text-amber-500,
+[data-theme="nature"] .text-amber-100,
+[data-theme="nature"] .text-amber-200,
+[data-theme="nature"] .text-amber-300,
+[data-theme="nature"] .text-amber-400,
+[data-theme="nature"] .text-amber-500 {
+  color: rgb(160, 76, 20) !important;
+  text-shadow: none !important;
 }
 
-/* Action Buttons */
-[data-theme="light"] .bg-slate-800 {
-  background-color: var(--color-bg-secondary) !important;
-  color: var(--color-text-primary) !important;
+/* Bordes blancos (sólidos y con opacidad) → línea sutil del tema. */
+[data-theme="minimalista"] .border-white,
+[data-theme="minimalista"] [class*="border-white\/"],
+[data-theme="nature"] .border-white,
+[data-theme="nature"] [class*="border-white\/"] {
+  border-color: rgb(var(--c-surface-border)) !important;
 }
 
-/* ScreenShell and Header */
-[data-theme="light"] header {
-  background-color: white !important;
-  border-color: var(--color-border) !important;
+/* Scrims "glass" blancos translúcidos (compositor del home, chips del agente,
+ * superficies elevadas) → un velo del color elevado del tema, así la superficie
+ * se distingue del fondo crema en vez de desaparecer. NO tocamos `bg-white`
+ * SÓLIDO (sin barra de opacidad) que es la card clara correcta. */
+[data-theme="minimalista"] [class*="bg-white\/"],
+[data-theme="nature"] [class*="bg-white\/"] {
+  background-color: rgb(var(--c-surface-raised) / 0.55) !important;
 }
 
-/* Dashboard Tiles - Adjusting for Light Theme */
-[data-theme="light"] .bg-slate-900\/60 {
-  background-color: white !important;
-  border-color: var(--color-border) !important;
+/* ===========================================================================
+ * 4. BIO-PUNK "COSECHA MÍSTICA" — lienzo digital fiel al demo
+ *    El demo bio-punk (oracle-lab demo-agente-biopunk.html) NO usa una foto:
+ *    es un lienzo oscuro #0a0e14 con glow teal central + rejilla de circuito
+ *    tenue. Reconstruido en CSS puro para el estado BASE (bio-punk = sin
+ *    data-theme), salvo que el usuario fije una foto curada (--app-bg-image
+ *    gana vía data-custom-bg). NO TOCAR: define la paridad biopunk↔demo.
+ * =========================================================================== */
+
+:root {
+  --bp-bg-0: #0a0e14;
+  --bp-teal-rgb: 25, 201, 154;
 }
 
-[data-theme="light"] .divide-slate-800 > * {
-  border-color: var(--color-border) !important;
+html:not([data-theme]) body.app-bg-biodiversidad:not([data-custom-bg]) {
+  background-color: var(--bp-bg-0) !important;
+  background-image:
+    /* rejilla de circuito tenue (líneas teal al 5%) */
+    linear-gradient(rgba(var(--bp-teal-rgb), 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--bp-teal-rgb), 0.05) 1px, transparent 1px),
+    /* glow ambiental inferior-derecho */
+    radial-gradient(80% 50% at 80% 92%, rgba(var(--bp-teal-rgb), 0.10) 0%, transparent 60%),
+    /* base teal profunda que sube hacia el verde-teal del demo */
+    radial-gradient(120% 80% at 50% 8%, #0e2a2e 0%, #0b1a20 34%, #0a1118 56%, #0a0e14 100%) !important;
+  background-size: 34px 34px, 34px 34px, 100% 100%, 100% 100% !important;
+  background-position: center top, center top, center, center !important;
+  background-repeat: repeat, repeat, no-repeat, no-repeat !important;
+  background-attachment: fixed !important;
 }

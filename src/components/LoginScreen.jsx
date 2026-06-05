@@ -115,7 +115,7 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
       {loginBgSrc && (
         <div
           aria-hidden="true"
-          className="absolute inset-0 pointer-events-none bg-cover bg-center"
+          className="login-bg-photo absolute inset-0 pointer-events-none bg-cover bg-center"
           style={{
             backgroundImage: `linear-gradient(rgba(2,6,23,0.62), rgba(2,6,23,0.86)), url('${loginBgSrc}')`,
           }}
