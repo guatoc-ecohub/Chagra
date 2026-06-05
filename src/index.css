@@ -66,27 +66,49 @@
   --c-orchid-glow: 232 121 249;
   --c-frog: 234 179 8;
   --c-frog-glow: 250 204 21;
+
+  /* ---------------------------------------------------------------------------
+   * TOKENS SEMÁNTICOS DE EFECTOS (FX) — gateados por tema (spec 2026-06-05).
+   * Separan "el efecto bio-punk" (partículas/glow/patrón) del color de chrome.
+   * Causa raíz de los "cruces": el confeti/glow neón corría en TODOS los temas.
+   * Acá biopunk (:root) = todo ON; cada tema claro los pone a 0. Los componentes
+   * leen estos tokens (CSS puro: display/opacity) en vez de asumir fondo oscuro.
+   *
+   *   --fx-particles      1=monta el canvas de partículas, 0=no (claros).
+   *   --fx-glow-opacity    opacidad de halos/glows neón; 0 en claros.
+   *   --fx-bg-pattern      1=patrón PCB bio-punk visible, 0 en claros.
+   *   --scrim-bg           RGB del velo de fondo POR TEMA (no slate-950 fijo).
+   *   --scrim-opacity      opacidad del velo (navy denso en bp, sutil en claros).
+   * ------------------------------------------------------------------------- */
+  --fx-particles: 1;
+  --fx-glow-opacity: 1;     /* presencia plena del lienzo neón en bio-punk */
+  --fx-bg-pattern: 1;
+  --scrim-bg: 2 6 23;       /* navy slate-950 — velo oscuro del demo bio-punk */
+  --scrim-opacity: 0.55;
 }
 
 /* MINIMALISTA — papel #f6f3ec, tinta #1f2421, salvia #2f6e5a, línea #e3ddd0.
  * La rampa slate se INVIERTE: 950 = fondo más claro (papel) … 50 = tinta. */
 [data-theme="minimalista"] {
-  --c-slate-950: 246 243 236;  /* papel / fondo base */
-  --c-slate-900: 255 255 255;  /* card / superficie */
-  --c-slate-800: 237 232 222;  /* raised */
-  --c-slate-700: 227 221 208;  /* línea / borde */
-  --c-slate-600: 209 201 186;  /* borde medio */
-  --c-slate-500: 122 124 117;  /* texto terciario / placeholder */
-  --c-slate-400: 138 142 134;  /* texto secundario */
-  --c-slate-300: 74 80 73;     /* texto fuerte */
+  /* Rampa slate INVERTIDA + entonada a la tinta verdosa del demo
+   * (demo-agente-minimalista.html): papel #f6f3ec, blanco card, tinta #1f2421,
+   * línea #e3ddd0. Valores tomados 1:1 del demo donde existen. */
+  --c-slate-950: 246 243 236;  /* papel / fondo base (#f6f3ec) */
+  --c-slate-900: 255 255 255;  /* card / superficie (--blanco) */
+  --c-slate-800: 240 236 226;  /* raised (--papel-2 #f0ece2) */
+  --c-slate-700: 227 221 208;  /* línea / borde (--linea #e3ddd0) */
+  --c-slate-600: 236 231 218;  /* borde suave (--linea-2 #ece7da) */
+  --c-slate-500: 135 141 134;  /* terciario / placeholder (--tinta-3 #878d86) */
+  --c-slate-400: 110 117 110;  /* secundario (entre tinta-2 y tinta-3, AA) */
+  --c-slate-300: 75 82 76;     /* texto fuerte (--tinta-2 #4b524c) */
   --c-slate-200: 47 53 48;     /* casi tinta */
-  --c-slate-100: 31 36 33;     /* tinta */
+  --c-slate-100: 31 36 33;     /* tinta (--tinta #1f2421) */
   --c-slate-50: 20 24 21;      /* tinta más oscura */
-  --c-emerald-200: 230 239 233;
-  --c-emerald-300: 90 140 120;
-  --c-emerald-400: 47 110 90;  /* salvia (acento) */
-  --c-emerald-500: 37 88 72;
-  --c-emerald-600: 29 70 57;
+  --c-emerald-200: 230 239 233; /* --acento-soft #e6efe9 */
+  --c-emerald-300: 55 110 88;   /* salvia media (AA sobre blanco) */
+  --c-emerald-400: 47 110 90;  /* salvia (acento) #2f6e5a */
+  --c-emerald-500: 37 88 72;   /* --acento-d #255848 */
+  --c-emerald-600: 29 70 57;   /* --acento-deep #1d4639 */
   --c-emerald-700: 23 56 46;
   --c-emerald-800: 23 56 46;
   --c-emerald-900: 230 239 233;
@@ -99,7 +121,7 @@
   --c-amber-900: 235 220 195;
   --c-surface: 246 243 236;
   --c-surface-card: 255 255 255;
-  --c-surface-raised: 237 232 222;
+  --c-surface-raised: 240 236 226;
   --c-surface-border: 227 221 208;
   /* acentos neón → versión salvia/apagada. */
   --c-muzo: 47 110 90;
@@ -110,25 +132,36 @@
   --c-orchid-glow: 138 142 134;
   --c-frog: 176 106 50;
   --c-frog-glow: 200 140 60;
+  /* FX OFF — el demo minimalista es papel liso: una sola micro-animación de
+   * trazo, sin partículas, sin glow neón, sin patrón. Velo de fondo mínimo. */
+  --fx-particles: 0;
+  --fx-glow-opacity: 0;
+  --fx-bg-pattern: 0;
+  --scrim-bg: 246 243 236;  /* velo = el propio papel → no lava nada */
+  --scrim-opacity: 0.10;
 }
 
 /* NATURE — superf #fbf5ea, café #4a3a26, salvia #7a8f4a, ocre #f5b733,
  * línea #ddc8a6. Rampa slate invertida y entonada cálida. */
 [data-theme="nature"] {
-  --c-slate-950: 251 245 234;  /* crema / fondo base */
-  --c-slate-900: 255 252 245;  /* card / superficie */
-  --c-slate-800: 240 230 210;  /* raised */
-  --c-slate-700: 221 200 166;  /* línea / borde */
-  --c-slate-600: 200 180 150;  /* borde medio */
-  --c-slate-500: 122 100 70;   /* texto terciario / placeholder */
-  --c-slate-400: 140 118 88;   /* texto secundario */
-  --c-slate-300: 90 74 50;     /* texto fuerte */
-  --c-slate-200: 74 58 38;     /* casi café */
-  --c-slate-100: 60 48 32;     /* café texto */
+  /* Crema/tabaco terroso del demo demo-agente.html (NO lavanda). Valores 1:1:
+   * crema-1 #f6efe0 fondo, superf #fbf5ea, café #4a3a26 texto, salvia #7a8f4a,
+   * terracota #d98a4f (acento cálido / burbuja usuario), ocre #f5b733,
+   * línea #ddc8a6. El fondo base usa el crema-2/arena más tabaco (spec). */
+  --c-slate-950: 246 239 224;  /* crema-1 / fondo base (#f6efe0) */
+  --c-slate-900: 255 255 255;  /* card / superficie (--blanco del demo) */
+  --c-slate-800: 251 245 234;  /* raised (--superf #fbf5ea) */
+  --c-slate-700: 221 200 166;  /* línea / borde (--linea #ddc8a6) */
+  --c-slate-600: 231 211 182;  /* borde medio cálido (--crema-3 #e7d3b6) */
+  --c-slate-500: 138 115 80;   /* terciario / placeholder (--cafe-3 #8a7350) */
+  --c-slate-400: 107 86 56;    /* secundario (--cafe-2 #6b5638) */
+  --c-slate-300: 90 72 46;     /* texto fuerte (café medio) */
+  --c-slate-200: 74 58 38;     /* café (--cafe #4a3a26) */
+  --c-slate-100: 74 58 38;     /* texto principal = café del demo (#4a3a26) */
   --c-slate-50: 45 36 24;      /* café más oscuro */
   --c-emerald-200: 230 235 210;
-  --c-emerald-300: 156 176 106;
-  --c-emerald-400: 122 143 74;  /* salvia (acento verde) */
+  --c-emerald-300: 110 132 64;  /* salvia media */
+  --c-emerald-400: 122 143 74;  /* salvia (acento verde) #7a8f4a */
   --c-emerald-500: 104 122 60;
   --c-emerald-600: 90 106 52;
   --c-emerald-700: 70 84 40;
@@ -136,24 +169,33 @@
   --c-emerald-900: 230 235 210;
   --c-amber-200: 250 220 150;
   --c-amber-300: 250 200 90;
-  --c-amber-400: 245 183 51;   /* ocre flor (acento cálido) */
-  --c-amber-500: 217 116 42;
+  --c-amber-400: 245 183 51;   /* ocre flor / espeletia (#f5b733) */
+  --c-amber-500: 217 116 42;   /* ocre quemado (--ocre-d #d9742a-ish) */
   --c-amber-600: 217 116 42;
   --c-amber-700: 176 90 32;
   --c-amber-900: 245 230 200;
-  --c-surface: 251 245 234;
-  --c-surface-card: 255 252 245;
-  --c-surface-raised: 240 230 210;
+  --c-surface: 246 239 224;
+  --c-surface-card: 255 255 255;
+  --c-surface-raised: 251 245 234;
   --c-surface-border: 221 200 166;
-  /* acentos neón → salvia/ocre cálidos. */
+  /* acentos: salvia (verde) + terracota/ocre (cálido). El --c-orchid se usa como
+   * acento cálido (burbuja usuario) → terracota #d98a4f del demo. */
   --c-muzo: 122 143 74;
   --c-muzo-glow: 156 176 106;
   --c-morpho: 122 143 74;
   --c-morpho-glow: 156 176 106;
-  --c-orchid: 217 138 79;
+  --c-orchid: 217 138 79;       /* terracota (--acento #d98a4f) */
   --c-orchid-glow: 245 183 51;
   --c-frog: 245 183 51;
   --c-frog-glow: 250 200 90;
+  /* FX OFF — el demo nature es un degradado crema cálido con escena botánica
+   * estática (no confeti/glow neón). El velo de fondo es un crema sutil que NO
+   * lava la imagen. */
+  --fx-particles: 0;
+  --fx-glow-opacity: 0;
+  --fx-bg-pattern: 0;
+  --scrim-bg: 246 239 224;  /* velo = crema del tema → vela suave, no oscurece */
+  --scrim-opacity: 0.12;
 }
 
 @layer base {
@@ -200,8 +242,16 @@
      * detrás del contenido. La legibilidad del texto la garantizan ahora los
      * scrims semi-opacos de cada card/superficie (bg-slate-900/40-60), no este
      * overlay global. */
+    /* Scrim POR TOKEN (spec 2026-06-05): en bio-punk el velo es navy
+     * (--scrim-bg 2 6 23); en temas claros el token vira a crema/papel sutil →
+     * NO lava la foto. El degradado va de scrim·0.8 (arriba) a scrim·1.13
+     * (abajo) sobre --scrim-opacity para conservar el contraste previo
+     * (0.45→0.62 con opacity 0.55) sin hardcodear slate-950. */
     background-image:
-      linear-gradient(rgba(2, 6, 23, 0.45), rgba(2, 6, 23, 0.62)),
+      linear-gradient(
+        rgb(var(--scrim-bg) / calc(var(--scrim-opacity) * 0.82)),
+        rgb(var(--scrim-bg) / calc(var(--scrim-opacity) * 1.13))
+      ),
       var(--app-bg-image, url('/fondo-biopunk-4.jpg'));
     background-size: cover;
     background-position: center center;
@@ -271,5 +321,27 @@
     background-image: url("/biopunk-pattern.svg");
     background-repeat: repeat;
     background-size: 800px 800px;
+    /* Gating por token FX (spec 2026-06-05): el patrón solo es visible cuando el
+     * tema activo declara --fx-bg-pattern:1 (bio-punk). En nature/minimalista el
+     * token es 0 → opacity 0 lo apaga vía CSS puro, sin depender de overrides por
+     * selector. Las reglas `[data-theme] … {background-image:none}` de abajo se
+     * conservan como cinturón-y-tirantes (apagan también la descarga del SVG). */
+    opacity: var(--fx-bg-pattern, 1);
+  }
+
+  /* ---------------------------------------------------------------------------
+   * SCRIM DE FONDO POR TOKEN (spec 2026-06-05).
+   * Reemplaza los `bg-slate-950/55|82` hardcodeados de los wrappers del
+   * dashboard (App.jsx). El velo sale de --scrim-bg/--scrim-opacity → en
+   * bio-punk es navy denso (igual que antes), en temas claros vira a un crema/
+   * papel sutil que deja respirar el fondo sin lavar la foto/imagen.
+   *   .app-scrim         ≈ el viejo /55 (dashboard live sobre foto)
+   *   .app-scrim-strong  ≈ el viejo /82 (dashboard clásico, más velo)
+   * ------------------------------------------------------------------------- */
+  .app-scrim {
+    background-color: rgb(var(--scrim-bg) / var(--scrim-opacity));
+  }
+  .app-scrim-strong {
+    background-color: rgb(var(--scrim-bg) / calc(var(--scrim-opacity) * 1.49));
   }
 }

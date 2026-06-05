@@ -81,6 +81,123 @@ describe('temas claros — indirección CSS-var (index.css)', () => {
   });
 });
 
+/* ===========================================================================
+ * CONTRATO DE EFECTOS (FX) + SCRIM + CONTRASTE AA (spec 2026-06-05)
+ * ---------------------------------------------------------------------------
+ * Lo que IMPIDE que los "cruces" vuelvan: si un tema claro deja un --fx-* en 1
+ * (o sin definir → hereda el 1 de :root = bio-punk), el confeti/glow/patrón
+ * neón sangra sobre la crema. Estos asserts congelan: (a) los tokens FX y scrim
+ * existen en :root, (b) se redefinen en cada tema, (c) los claros los apagan,
+ * (d) el texto principal de cada tema cumple AA (≥4.5) sobre su fondo.
+ * =========================================================================== */
+
+/** Extrae el bloque CSS de un selector de tema (o :root). */
+function themeBlock(selector) {
+  const re =
+    selector === ':root'
+      ? /:root\s*\{([\s\S]*?)\n\}/ // primer :root (mapa --c-* + --fx-*)
+      : new RegExp(`\\[data-theme="${selector}"\\]\\s*\\{([\\s\\S]*?)\\}`);
+  const m = indexCss.match(re);
+  return m ? m[1] : null;
+}
+
+/** Lee el valor escalar de una var (--fx-particles: 0 → "0"). */
+function readScalar(block, varName) {
+  const m = block.match(new RegExp(`${varName}\\s*:\\s*([^;]+);`));
+  return m ? m[1].trim() : null;
+}
+
+/** Lee el triple RGB de una var (--scrim-bg: 2 6 23 → [2,6,23]). */
+function readRgb(block, varName) {
+  const m = block.match(
+    new RegExp(`${varName}\\s*:\\s*([0-9]+)\\s+([0-9]+)\\s+([0-9]+)`)
+  );
+  return m ? [Number(m[1]), Number(m[2]), Number(m[3])] : null;
+}
+
+/** Contraste WCAG entre dos RGB. */
+function contrastRatio(a, b) {
+  const lin = (c) => {
+    const s = c / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  };
+  const lum = ([r, g, b2]) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b2);
+  const l1 = lum(a);
+  const l2 = lum(b);
+  const hi = Math.max(l1, l2);
+  const lo = Math.min(l1, l2);
+  return (hi + 0.05) / (lo + 0.05);
+}
+
+const FX_VARS = ['--fx-particles', '--fx-glow-opacity', '--fx-bg-pattern'];
+const SCRIM_VARS = ['--scrim-bg', '--scrim-opacity'];
+
+describe('contrato de efectos (FX) gateados por tema (index.css)', () => {
+  it('define los --fx-* y --scrim-* en :root (estado base bio-punk)', () => {
+    const root = themeBlock(':root');
+    expect(root, 'no se halló el bloque :root').toBeTruthy();
+    for (const v of [...FX_VARS, ...SCRIM_VARS]) {
+      expect(root.includes(`${v}:`), `falta ${v} en :root`).toBe(true);
+    }
+  });
+
+  it('redefine TODOS los --fx-*/--scrim-* en cada tema (sin tokens huérfanos)', () => {
+    // Si un tema NO redefine un --fx-*, hereda el 1 de :root → FX bio-punk
+    // sangrando sobre el tema claro. El contrato exige redefinición explícita.
+    for (const theme of ['minimalista', 'nature']) {
+      const block = themeBlock(theme);
+      expect(block, `falta bloque [data-theme="${theme}"]`).toBeTruthy();
+      for (const v of [...FX_VARS, ...SCRIM_VARS]) {
+        expect(block.includes(`${v}:`), `${theme} no redefine ${v}`).toBe(true);
+      }
+    }
+  });
+
+  it('los temas CLAROS apagan partículas, patrón y glow (--fx-*: 0)', () => {
+    for (const theme of ['minimalista', 'nature']) {
+      const block = themeBlock(theme);
+      expect(readScalar(block, '--fx-particles'), `${theme} --fx-particles`).toBe('0');
+      expect(readScalar(block, '--fx-bg-pattern'), `${theme} --fx-bg-pattern`).toBe('0');
+      expect(readScalar(block, '--fx-glow-opacity'), `${theme} --fx-glow-opacity`).toBe('0');
+    }
+  });
+
+  it('el scrim de los temas claros es CLARO (velo crema, no navy que lava)', () => {
+    // En claros el --scrim-bg debe ser claro (promedio > 200) → un velo sutil
+    // sobre la imagen, nunca el navy 2 6 23 que oscurecía la foto.
+    for (const theme of ['minimalista', 'nature']) {
+      const block = themeBlock(theme);
+      const rgb = readRgb(block, '--scrim-bg');
+      expect(rgb, `${theme} --scrim-bg ausente`).toBeTruthy();
+      const avg = (rgb[0] + rgb[1] + rgb[2]) / 3;
+      expect(avg, `${theme} --scrim-bg debe ser claro`).toBeGreaterThan(200);
+    }
+  });
+});
+
+describe('contraste AA del texto principal de cada tema (sonda numérica)', () => {
+  // El texto principal (--c-slate-100) sobre el fondo base (--c-slate-950) y
+  // sobre la card (--c-slate-900) debe pasar AA (≥4.5) en CADA tema.
+  const cases = [
+    { theme: ':root', name: 'bio-punk' },
+    { theme: 'minimalista', name: 'minimalista' },
+    { theme: 'nature', name: 'nature' },
+  ];
+  for (const { theme, name } of cases) {
+    it(`${name}: texto principal ≥4.5 sobre fondo y card`, () => {
+      const block = themeBlock(theme);
+      const text = readRgb(block, '--c-slate-100');
+      const bg = readRgb(block, '--c-slate-950');
+      const card = readRgb(block, '--c-slate-900');
+      expect(text, `${name} --c-slate-100`).toBeTruthy();
+      expect(bg, `${name} --c-slate-950`).toBeTruthy();
+      expect(card, `${name} --c-slate-900`).toBeTruthy();
+      expect(contrastRatio(text, bg), `${name} texto/fondo`).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(text, card), `${name} texto/card`).toBeGreaterThanOrEqual(4.5);
+    });
+  }
+});
+
 describe('themes.css — remapeo de clases NO-var-aware (la raíz del repeye)', () => {
   it('vira el TEXTO blanco a tinta del tema (text-white = ilegible sobre crema)', () => {
     expect(coveredForBothThemes('.text-white')).toBe(true);

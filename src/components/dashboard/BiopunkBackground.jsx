@@ -34,6 +34,15 @@ export default function BiopunkBackground({ intense = false }) {
         const reduceMotion = typeof window !== 'undefined' &&
             window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (reduceMotion) return;
+        // Gating por tema (spec 2026-06-05): las partículas son un FX bio-punk.
+        // En nature/minimalista el token --fx-particles vale 0 → NO montamos el
+        // canvas (cero confeti sobre crema) y ahorramos rAF. Las capas estáticas
+        // (glow/patrón/viñeta) las apaga el wrapper .bp-fx-layer vía CSS token.
+        if (typeof window !== 'undefined' &&
+            getComputedStyle(document.documentElement)
+                .getPropertyValue('--fx-particles').trim() === '0') {
+            return;
+        }
 
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
@@ -127,9 +136,15 @@ export default function BiopunkBackground({ intense = false }) {
 
     return (
         <div
-            className="absolute inset-0 pointer-events-none overflow-hidden"
+            className="absolute inset-0 pointer-events-none overflow-hidden bp-fx-layer"
             aria-hidden="true"
             data-biopunk-intense={intense ? 'on' : 'off'}
+            // Gating de FX por tema (spec 2026-06-05): TODO el lienzo neón
+            // (patrón + glow conic + viñeta navy + partículas) se multiplica por
+            // --fx-glow-opacity. En bio-punk = 1 (presencia plena); en nature/
+            // minimalista = 0 → el lienzo desaparece por completo, sin sangrar
+            // efectos oscuros sobre los temas claros. CSS puro, cero JS frágil.
+            style={{ opacity: 'var(--fx-glow-opacity, 1)' }}
         >
             {/* Capa A — biopunk-pattern SVG tiled.
                 BUGFIX 2026-05-28 operador: en modo screen saver (idle) este
