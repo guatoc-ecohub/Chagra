@@ -62,7 +62,35 @@ self.addEventListener('fetch', (event) => {
     return; // browser maneja directamente
   }
 
-  // Static shell: Stale-While-Revalidate (sirve cache rápido, refresca async)
+  // HTML shell (documento navegable: `/`, `/index.html`, o cualquier navegación
+  // SPA): NETWORK-FIRST. Un deploy nuevo SIEMPRE entrega el index.html fresco
+  // (que referencia el bundle vivo); sólo cae al cache si el dispositivo está
+  // OFFLINE. Antes el HTML usaba Stale-While-Revalidate → servía un index.html
+  // cacheado de ANTES del deploy, apuntando a un bundle con hash que ya no
+  // existe → <script> 404 → pantalla en blanco (incidente 2026-06-05). El
+  // Network-First mata toda esa clase de "no carga tras deploy".
+  const isHtmlDoc =
+    event.request.mode === 'navigate' ||
+    url.pathname === '/' ||
+    url.pathname === '/index.html';
+  if (isHtmlDoc && event.request.method === 'GET') {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          if (response.ok) {
+            const respClone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put('/index.html', respClone));
+          }
+          return response;
+        })
+        // Offline: cae al index.html cacheado (shell) para que la SPA arranque.
+        .catch(() => caches.match(event.request).then(c => c || caches.match('/index.html')))
+    );
+    return;
+  }
+
+  // Resto del static shell NO-HTML (manifest, iconos): Stale-While-Revalidate
+  // (no referencian hashes de bundle, así que un cache viejo no rompe nada).
   if (ASSETS_TO_CACHE.some(path => url.pathname === path)) {
     event.respondWith(
       caches.match(event.request).then(cachedResponse => {
