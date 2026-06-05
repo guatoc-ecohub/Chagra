@@ -138,13 +138,14 @@ const DashboardLiveView = React.memo(function DashboardLiveView({ onNavigate, on
   }, [hydrate, syncFromServer]);
 
   return (
-    // bg-slate-950/55 (no sólido) 2026-05-28: el dashboard principal tenía
-    // bg-slate-950 opaco que tapaba al 100% el fondo-foto elegido en el
-    // selector (--app-bg-image en el body, clase .app-bg-biodiversidad).
-    // El operador veía la foto en pantallas con ScreenShell pero NO en la
-    // principal. Scrim semi-opaco deja ver la foto detrás; BiopunkBackground
-    // (capa animada) + contenido z-10 mantienen legibilidad.
-    <div className="relative h-[100dvh] w-full bg-slate-950/55 text-white flex flex-col overflow-hidden">
+    // .app-scrim (scrim por token, spec 2026-06-05): antes bg-slate-950/55
+    // hardcodeado tapaba al 100% el fondo-foto elegido en el selector
+    // (--app-bg-image en el body, clase .app-bg-biodiversidad). El operador veía
+    // la foto en pantallas con ScreenShell pero NO en la principal. El scrim
+    // ahora sale de --scrim-bg/--scrim-opacity → navy en bio-punk, crema sutil en
+    // temas claros (no lava la imagen). BiopunkBackground (capa animada) +
+    // contenido z-10 mantienen legibilidad.
+    <div className="relative h-[100dvh] w-full app-scrim text-white flex flex-col overflow-hidden">
       {/* Capa biopunk viva — sutil siempre, salvaje en idle */}
       <BiopunkBackground intense={idle} />
       {/* Contenido del dashboard, fade-out cuando idle para resaltar fondo */}
@@ -214,12 +215,13 @@ const DashboardView = React.memo(function DashboardView({ onNavigate, onLogout, 
   ], [plantsCount, landsCount, structuresCount, materialsCount]);
 
   return (
-    <div className="h-[100dvh] w-full bg-slate-950/82 text-white flex flex-col overflow-hidden">
+    <div className="h-[100dvh] w-full app-scrim-strong text-white flex flex-col overflow-hidden">
       {/* DR-030 QW2: TopBar persistente con identidad operador + acciones
           globales. Reemplaza el header inline previo. La info ambiental
           (msnm/luna/sol) pasó al EnvironmentalCard colapsable bajo el TopBar.
-          2026-05-18: wrapper translúcido (bg-slate-950/82) para que se vea
-          la imagen de fondo agroecológica aplicada al body en App.jsx. */}
+          2026-05-18: wrapper translúcido (.app-scrim-strong, scrim por token)
+          para que se vea la imagen de fondo agroecológica aplicada al body en
+          App.jsx — navy en bio-punk, velo crema sutil en temas claros. */}
       <TopBar onNavigate={onNavigate} onLogout={onLogout} />
       <HomeRegionalGreeting />
 
