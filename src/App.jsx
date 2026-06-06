@@ -148,14 +148,23 @@ const DashboardLiveView = React.memo(function DashboardLiveView({ onNavigate, on
     <div className="relative h-[100dvh] w-full app-scrim text-white flex flex-col overflow-hidden">
       {/* Capa biopunk viva — sutil siempre, salvaje en idle */}
       <BiopunkBackground intense={idle} />
-      {/* Contenido del dashboard, fade-out cuando idle para resaltar fondo */}
+      {/* Contenido del dashboard, fade-out cuando idle para resaltar fondo.
+          PORTADA INMERSIVA 2026-06-06: el AgentHero ocupa la PRIMERA pantalla
+          completa (≈100dvh). Para no romper esa inmersión, el TopBar pasa de
+          ser un hermano-flex que come alto vertical a un overlay FLOTANTE
+          discreto encima de la escena (sticky→absolute), y el scroller
+          (DashboardLive) ocupa toda la altura. El saludo regional dismissible
+          ya NO va sobre el hero (duplicaba su saludo): baja al flujo bajo el
+          fold, junto a las secciones de finca/clima/análisis. */}
       <div
         className="relative z-10 flex flex-col h-full transition-opacity duration-[1500ms] ease-out"
         style={{ opacity: idle ? 0.18 : 1 }}
       >
-        <TopBar onNavigate={onNavigate} onLogout={onLogout} />
-        <HomeRegionalGreeting />
-        <DashboardLive onNavigate={onNavigate} />
+        {/* TopBar flotante: capa propia por encima del scroller inmersivo. */}
+        <div className="absolute top-0 inset-x-0 z-30 agent-immersive-topbar">
+          <TopBar onNavigate={onNavigate} onLogout={onLogout} />
+        </div>
+        <DashboardLive onNavigate={onNavigate} regionalGreeting={<HomeRegionalGreeting />} />
       </div>
       {/* Hint subliminal cuando idle — "toca para volver" */}
       {idle && (

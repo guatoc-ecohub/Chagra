@@ -7,6 +7,7 @@ import { isAnalyzableImageAttachment } from '../../services/agentOutboxAttachmen
 import useAgentOutboxStore from '../../store/useAgentOutboxStore';
 import { agentSounds } from '../../services/agentSoundService';
 import { AGENT_HERO_CHIPS } from '../../data/exampleQuestions';
+import { useTheme } from '../../hooks/useTheme';
 
 // 2026-05-28: el R3F (ChagraAgentAvatarColibri3D) fue retirado del flujo.
 // Operador: "no me gusta nada y desatina con todo lo que ya está".
@@ -15,19 +16,47 @@ import { AGENT_HERO_CHIPS } from '../../data/exampleQuestions';
 // dashboard simplemente lo monta y se ahorra ~600KB del bundle de three+R3F.
 
 /**
- * AgentHero — protagonista del dashboard. El agente Chagra como ser vivo,
- * grande, respirando, y AHORA con un COMPOSITOR MULTIMODAL REAL como puerta
- * de entrada.
+ * AgentHero — la PORTADA INMERSIVA del agente Chagra, PRIMERA PANTALLA COMPLETA
+ * del home (≈100dvh), portada 1:1 del layout de los demos de diseño del
+ * operador (oracle-lab `demo-agente*.html`).
  *
- * Antes (≤1.0.18) la "caja de entrada" era un <div role=button> falso: al
- * tocarla navegaba al AgentScreen y solo PRE-RELLENABA el texto. No escribía,
- * no grababa, no fotografiaba — era un teaser.
+ * Rediseño 2026-06-06 (quinto intento — los anteriores solo lograban el ESTILO
+ * pero conservaban el layout-widget del dashboard). Ahora se porta el LAYOUT
+ * INMERSIVO vertical completo del demo, no solo los tokens:
  *
- * Ahora es un compositor de verdad:
+ *   ┌─────────────────────────────────────────┐
+ *   │  Tema: ⬡ Nature  ⬡ Bio-punk  ⬡ Minimal   │ ← pills de TEMA (cablean useTheme)
+ *   │                                          │
+ *   │            ☀ (resplandor sol)            │ ← escena ambiente (flex-1, respira)
+ *   │              🐦 avatar GRANDE             │   sol radial + colibrí + polen
+ *   │            · polen flotante ·            │
+ *   │                                          │
+ *   │  Buenos días.                            │ ← saludo grande
+ *   │  Soy Chagra.                             │
+ *   │  Pregúntame sobre tu cultivo…            │
+ *   │  [¿Qué siembro?] [Plagas] [Clima]        │ ← chips
+ *   │  ╭─────────────────────────────────────╮ │
+ *   │  │ Pregúntale a Chagra…                │ │ ← compositor pill ANCLADO abajo
+ *   │  │ 🍃 📎          🎤  ⬆                 │ │
+ *   │  ╰─────────────────────────────────────╯ │
+ *   └─────────────────────────────────────────┘
+ *
+ * Las pills de tema cambian el tema DE VERDAD (useTheme().setTheme): bio-punk
+ * (default, oscuro) / nature (cálido ocre) / minimalista (claro verde). Los
+ * tres acentos (teal / ocre / verde) salen exactos de --t-accent-rgb (themes.css)
+ * y las superficies de --c-* (index.css).
+ *
+ * El toggle "Campesino/Experto" del demo se OMITE: la feature real equivalente
+ * (`nivel_respuestas` simple/detallado) vive en el onboarding/perfil y cambia
+ * el system-prompt del LLM, no es un toggle de pantalla. Meter aquí un toggle
+ * suelto sería UI muerta o duplicaría el ajuste del perfil — se deja donde
+ * pertenece (Perfil → personalización).
+ *
+ * El WIRING multimodal se conserva intacto (era inviolable):
  *  - <textarea> auto-grow (Enter=enviar, Shift+Enter=nueva línea).
  *  - 🎤 micrófono → graba audio (useVoiceRecorder + flujo whisper del agente).
  *  - 📷 cámara/foto → toma o elige foto (photoService + visión en el agente).
- *  - 📎 adjuntar → file picker (imagen/archivo).
+ *  - 📎 adjuntar → file picker (solo imágenes — B2).
  *  - ⬆️ enviar.
  *
  * Al enviar: el item se PERSISTE en la outbox durable (IndexedDB) ANTES de
@@ -36,22 +65,39 @@ import { AGENT_HERO_CHIPS } from '../../data/exampleQuestions';
  * "atrás" o cierra la app a mitad → al volver el item sigue ahí y no se pierde
  * ni se duplica (ver agentOutboxService).
  *
- * El alma del diseño previo se conserva: avatar vivo + halo cónico + headline +
- * tips rotativos. Respeta prefers-reduced-motion para la transición de envío.
+ * Respeta prefers-reduced-motion para la transición de envío y las animaciones
+ * ambientales (sol, polen, colibrí, halo).
  */
 
+// Saludos por hora del día (el demo abre con "Buenos días. Soy Chagra.").
+function greetingForNow() {
+    const h = typeof Date !== 'undefined' ? new Date().getHours() : 9;
+    if (h < 12) return 'Buenos días.';
+    if (h < 19) return 'Buenas tardes.';
+    return 'Buenas noches.';
+}
+
 const TIPS = [
-    'Escribe, habla o muéstrame una foto de tu cultivo.',
-    'Cuéntame qué estás sembrando hoy.',
-    'Tomo foto, escucho, recuerdo lo que me dices.',
-    'Sé del campo colombiano y respeto tu tierra.',
-    'Pregúntame en voz, te entiendo con tu acento.',
+    'Pregúntame sobre tu cultivo, las plagas, el clima o los precios. Hablo claro, como en el campo.',
+    'Escribe, habla o muéstrame una foto de tu planta.',
+    'Tomo foto, escucho y recuerdo lo que me dices.',
+    'Pregúntame en voz: te entiendo con tu acento.',
 ];
 
 // Fuente única de los chips del home. Importada del módulo de datos compartido
 // para que el test del punto de acceso #1 los cubra sin exportar constantes
 // desde un componente (regla react-refresh/only-export-components).
 const QUICK_CHIPS = AGENT_HERO_CHIPS;
+
+// Pills de TEMA visibles en la cabecera de la portada — réplica del switcher
+// de tema del demo (.themebar). Son los 3 temas VISUALES (no `auto`, que no es
+// una estética sino una regla día/noche). Cada uno cablea useTheme().setTheme.
+// El swatch usa los colores característicos del tema (mismos que ThemeSelector).
+const THEME_PILLS = [
+    { id: 'nature', label: 'Nature', swatch: ['#d98a4f', '#7a8f4a'] },
+    { id: 'biopunk', label: 'Bio-punk', swatch: ['#19c79a', '#3be8a6'] },
+    { id: 'minimalista', label: 'Minimal', swatch: ['#2f6e5a', '#878d86'] },
+];
 
 function prefersReducedMotion() {
     return typeof window !== 'undefined' && window.matchMedia
@@ -85,6 +131,10 @@ export default function AgentHero({ onNavigate }) {
     const textareaRef = useRef(null);
     const cameraInputRef = useRef(null);
     const fileInputRef = useRef(null);
+
+    // Sistema de temas REAL de la app (data-theme en <html>, persiste en
+    // localStorage). Las pills de la cabecera lo cablean en vivo.
+    const { theme, setTheme } = useTheme();
 
     const sendToOutbox = useAgentOutboxStore((s) => s.send);
     const {
@@ -259,32 +309,324 @@ export default function AgentHero({ onNavigate }) {
 
     const canSend = !busy && (text.trim().length > 0 || Boolean(attachment));
     const recSeconds = Math.floor((durationMs || 0) / 1000);
+    // El avatar reacciona a la fase: 'thinking' al enviar o mientras graba.
+    const avatarState = phase === 'sending' || isRecording ? 'thinking' : 'idle';
 
     return (
         <section
             aria-label="Agente Chagra"
-            className="relative w-full px-4 pt-6 pb-4"
+            className="agentport agentport-immersive relative w-full flex flex-col"
         >
             <style>{`
-                @keyframes chagra-halo-rotate {
-                    from { transform: rotate(0deg); }
-                    to { transform: rotate(360deg); }
+                /* ============================================================
+                   AgentHero — PORTADA INMERSIVA (port del LAYOUT de los demos
+                   oracle-lab demo-agente*.html). La estructura vertical y la
+                   "escena ambiente que respira" vienen 1:1 del demo:
+                     · cabecera con pills de TEMA           (.themebar)
+                     · escena ambiente (sol + colibrí + polen) detrás
+                     · zona-respiro flex-1 con el avatar grande centrado
+                     · saludo grande + subtítulo            (.greet)
+                     · fila de chips                        (.quickrow)
+                     · compositor pill anclado abajo        (.inputwrap/.bar)
+                   El acento (teal/ocre/verde) y las superficies (panel oscuro/
+                   crema/papel) salen de los tokens theme-aware ya existentes
+                   (--t-accent-rgb en themes.css, --c-* en index.css), así los
+                   3 temas coinciden con su demo respectivo sin parchar a mano.
+                   ============================================================ */
+                .agentport {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, 'Segoe UI', sans-serif;
+                    /* radio de la pill y de las tarjetas — valor del demo. El
+                       minimalista usa 22px (más sobrio); nature/biopunk 26px. */
+                    --ap-r-grande: 26px;
                 }
-                @keyframes chagra-avatar-breathe {
-                    0%, 100% { transform: scale(1); }
-                    50% { transform: scale(1.025); }
+                [data-theme="minimalista"] .agentport { --ap-r-grande: 22px; }
+
+                /* Portada a pantalla completa: ocupa al menos el primer screenful
+                   (≈100dvh menos el alto del TopBar flotante). El resto del
+                   dashboard queda DEBAJO del fold y se llega scrolleando. */
+                .agentport-immersive {
+                    /* primera pantalla completa; el TopBar flota encima (overlay),
+                       así que la portada usa el alto completo del viewport. */
+                    min-height: 100dvh;
+                    padding: 0 16px 14px;
+                    overflow: hidden; /* la escena ambiente no desborda el screenful */
                 }
-                @keyframes chagra-send-shimmer {
-                    0% { transform: translateX(-130%); opacity: 0; }
-                    25% { opacity: 1; }
-                    70% { opacity: 1; }
-                    100% { transform: translateX(130%); opacity: 0; }
+
+                /* ===== ESCENA AMBIENTE (detrás de todo, como en el demo) =====
+                   Sol radial arriba + glow del acento. Theme-aware vía el token
+                   --fx-glow-opacity (1 en biopunk, atenuado en claros) y el
+                   acento del tema. */
+                .agentport-scene {
+                    position: absolute;
+                    inset: 0;
+                    z-index: 0;
+                    overflow: hidden;
+                    pointer-events: none;
                 }
-                @keyframes chagra-send-lift {
-                    0% { transform: translateY(0) scale(1); opacity: 1; }
-                    35% { transform: translateY(-4px) scale(1.012); opacity: 1; }
-                    100% { transform: translateY(-16px) scale(0.978); opacity: 0.82; }
+                .agentport-sun {
+                    position: absolute;
+                    top: 4%;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 280px;
+                    height: 280px;
+                    border-radius: 50%;
+                    background: radial-gradient(
+                        circle,
+                        rgb(var(--t-accent-rgb) / 0.28) 0%,
+                        rgb(var(--t-accent-rgb) / 0.12) 38%,
+                        rgb(var(--t-accent-rgb) / 0) 70%
+                    );
+                    filter: blur(2px);
+                    animation: agentport-sun-glow 9s ease-in-out infinite;
                 }
+                /* En temas claros el "sol" se ve más cálido/amplio (como el
+                   amanecer del demo nature/minimalista). */
+                [data-theme="nature"] .agentport-sun {
+                    background: radial-gradient(
+                        circle,
+                        rgba(255, 226, 160, 0.85) 0%,
+                        rgba(245, 200, 120, 0.45) 36%,
+                        rgba(245, 200, 120, 0) 70%
+                    );
+                }
+                [data-theme="minimalista"] .agentport-sun {
+                    background: radial-gradient(
+                        circle,
+                        rgba(47, 110, 90, 0.18) 0%,
+                        rgba(47, 110, 90, 0.07) 40%,
+                        rgba(47, 110, 90, 0) 72%
+                    );
+                }
+                @keyframes agentport-sun-glow {
+                    0%, 100% { opacity: 0.8; transform: translateX(-50%) scale(1); }
+                    50% { opacity: 1; transform: translateX(-50%) scale(1.06); }
+                }
+                /* Partículas de polen flotando (réplica de .pollen del demo). */
+                .agentport-pollen {
+                    position: absolute;
+                    border-radius: 50%;
+                    background: rgb(var(--t-accent-rgb) / 0.7);
+                    filter: blur(0.4px);
+                    animation: agentport-float-up linear infinite;
+                    will-change: transform, opacity;
+                }
+                [data-theme="nature"] .agentport-pollen { background: rgba(255, 213, 128, 0.8); }
+                @keyframes agentport-float-up {
+                    0% { transform: translateY(20px) translateX(0); opacity: 0; }
+                    12% { opacity: 0.9; }
+                    50% { transform: translateY(-50px) translateX(6px); opacity: 0.55; }
+                    88% { opacity: 0.4; }
+                    100% { transform: translateY(-120px) translateX(-4px); opacity: 0; }
+                }
+
+                /* ===== Cabecera: pills de TEMA (.themebar del demo) =====
+                   El padding-top deja pasar el TopBar flotante (~58px) +
+                   safe-area; así las pills no quedan bajo la identidad operador. */
+                .agentport-themebar {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: calc(86px + env(safe-area-inset-top)) 0 6px;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                    flex: none;
+                }
+                .agentport-themebar::-webkit-scrollbar { display: none; }
+                .agentport-tlbl {
+                    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.14em;
+                    text-transform: uppercase; color: rgb(var(--c-slate-500));
+                    flex: none; padding-right: 2px;
+                }
+                .agentport-tpill {
+                    flex: none; display: inline-flex; align-items: center; gap: 7px;
+                    cursor: pointer;
+                    background: rgb(var(--c-surface-card) / 0.72);
+                    border: 1.5px solid rgb(var(--c-surface-border));
+                    border-radius: 18px;
+                    padding: 6px 12px 6px 9px;
+                    font-size: 0.78rem; font-weight: 700;
+                    color: rgb(var(--c-slate-300));
+                    white-space: nowrap;
+                    transition: border-color 0.3s cubic-bezier(0.22,0.61,0.36,1),
+                                color 0.25s ease, background 0.3s ease, transform 0.14s ease, box-shadow 0.3s ease;
+                    box-shadow: 0 2px 7px -6px rgba(0, 0, 0, 0.6);
+                }
+                .agentport-tpill:active { transform: scale(0.95); }
+                .agentport-tpill.is-active {
+                    color: rgb(var(--c-slate-100));
+                    background: rgb(var(--c-surface-card));
+                    border-color: rgb(var(--t-accent-rgb));
+                    box-shadow: 0 4px 12px -5px rgb(var(--t-accent-rgb) / 0.7);
+                }
+                .agentport-tsw { display: inline-flex; gap: 3px; flex: none; }
+                .agentport-tsw span {
+                    width: 9px; height: 9px; border-radius: 50%;
+                    border: 1px solid rgba(0, 0, 0, 0.18);
+                }
+
+                /* ===== Zona-respiro: escena + avatar grande centrado ===== */
+                .agentport-stage {
+                    position: relative;
+                    z-index: 1;
+                    flex: 1 1 auto;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-height: 160px;
+                    padding: 8px 0;
+                }
+                .agentport-avatar-wrap {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                /* ===== Saludo (.greet del demo) ===== */
+                .agentport-greet {
+                    position: relative;
+                    z-index: 1;
+                    margin-bottom: 12px;
+                    flex: none;
+                    animation: agentport-rise 0.8s cubic-bezier(0.16, 0.84, 0.3, 1) both;
+                }
+                .agentport-hi {
+                    font-size: 1.92rem;
+                    line-height: 1.12;
+                    font-weight: 800;
+                    letter-spacing: -0.02em;
+                    color: rgb(var(--c-slate-100));
+                }
+                [data-theme="minimalista"] .agentport-hi {
+                    font-weight: 700;
+                    letter-spacing: -0.025em;
+                }
+                .agentport-sub {
+                    margin-top: 8px;
+                    font-size: 1rem;
+                    line-height: 1.5;
+                    color: rgb(var(--c-slate-300));
+                    max-width: 34ch;
+                    transition: opacity 0.5s ease;
+                }
+                @keyframes agentport-rise {
+                    from { opacity: 0; transform: translateY(18px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+
+                /* ===== Fila de chips (.quickrow del demo) ===== */
+                .agentport-chiprow {
+                    position: relative;
+                    z-index: 1;
+                    display: flex;
+                    gap: 8px;
+                    overflow-x: auto;
+                    padding: 2px 0 12px;
+                    scrollbar-width: none;
+                    flex: none;
+                }
+                .agentport-chiprow::-webkit-scrollbar { display: none; }
+                .agentport-chip {
+                    flex: none; display: inline-flex; align-items: center; gap: 7px;
+                    background: rgb(var(--c-surface-card));
+                    border: 1px solid rgb(var(--c-surface-border));
+                    border-radius: 18px;
+                    padding: 9px 13px;
+                    font-size: 0.85rem; font-weight: 600;
+                    color: rgb(var(--c-slate-100));
+                    white-space: nowrap; cursor: pointer;
+                    box-shadow: 0 2px 7px -5px rgba(0, 0, 0, 0.4);
+                    transition: transform 0.16s cubic-bezier(0.22, 0.61, 0.36, 1),
+                                box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+                }
+                [data-theme="minimalista"] .agentport-chip { border-radius: 16px; font-weight: 500; }
+                .agentport-chip:hover { border-color: rgb(var(--t-accent-rgb) / 0.45); }
+                .agentport-chip:active { transform: scale(0.94); }
+                .agentport-chip:disabled { opacity: 0.5; cursor: not-allowed; }
+                .agentport-chip-e { font-size: 1.05rem; line-height: 1; }
+
+                /* ===== Compositor pill anclado abajo (.bar del demo) ===== */
+                .agentport-composer {
+                    position: relative;
+                    z-index: 1;
+                    flex: none;
+                }
+                .agentport-bar {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    background: rgb(var(--c-surface-raised));
+                    border: 1px solid rgb(var(--c-surface-border));
+                    border-radius: var(--ap-r-grande);
+                    padding: 7px 8px;
+                    box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.32);
+                    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+                }
+                .agentport-bar.is-recording {
+                    border-color: rgb(244 63 94 / 0.6);
+                }
+                .agentport-bar:focus-within {
+                    border-color: rgb(var(--t-accent-rgb) / 0.55);
+                    box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.32),
+                                0 0 0 3px rgb(var(--t-accent-rgb) / 0.12);
+                }
+
+                /* Botón circular de íconos (.iconbtn del demo). */
+                .agentport-iconbtn {
+                    width: 44px; height: 44px; flex: none;
+                    background: rgb(var(--c-surface-card));
+                    border: 1px solid rgb(var(--c-surface-border));
+                    border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center;
+                    color: rgb(var(--c-slate-400));
+                    cursor: pointer; position: relative;
+                    transition: transform 0.16s cubic-bezier(0.22, 0.61, 0.36, 1),
+                                background 0.25s ease, border-color 0.25s ease, color 0.2s ease;
+                }
+                .agentport-iconbtn:hover { color: rgb(var(--c-slate-100)); border-color: rgb(var(--t-accent-rgb) / 0.5); }
+                .agentport-iconbtn:active { transform: scale(0.9); }
+                .agentport-iconbtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+                /* Botón micrófono mientras graba (acento rosa del estado activo). */
+                .agentport-mic-on {
+                    background: rgb(244 63 94) !important;
+                    border-color: rgb(244 63 94) !important;
+                    color: #fff !important;
+                    box-shadow: 0 4px 14px -4px rgb(244 63 94 / 0.5);
+                }
+
+                /* Botón ENVIAR redondo de acento (.send del demo) — punto focal.
+                   El relleno sólido del acento + color de tinta lo aporta la
+                   clase compartida .agent-send-accent (themes.css), aquí solo la
+                   geometría + glow. */
+                .agentport-send {
+                    width: 42px; height: 42px; flex: none;
+                    border: none; border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center;
+                    cursor: pointer;
+                    transition: transform 0.16s cubic-bezier(0.22, 0.61, 0.36, 1),
+                                box-shadow 0.25s ease, background 0.2s ease;
+                }
+                .agentport-send:not(:disabled) {
+                    box-shadow: 0 4px 14px -4px rgb(var(--t-accent-rgb) / 0.7);
+                }
+                .agentport-send:not(:disabled):active { transform: scale(0.86); }
+                .agentport-send:disabled {
+                    background: rgb(var(--c-slate-700));
+                    color: rgb(var(--c-slate-500));
+                    cursor: not-allowed;
+                }
+
+                /* Hint bar bajo la pill (.hintbar del demo). */
+                .agentport-hint {
+                    text-align: center; font-size: 0.72rem; margin-top: 9px;
+                    color: rgb(var(--c-slate-500));
+                }
+                .agentport-hint b { color: rgb(var(--t-accent-rgb)); font-weight: 700; }
+
+                /* Avatar vivo (grande, centrado en la escena): respira, y el
+                   halo del agente lo conserva themes.css (.chagra-hero-halo). */
                 .chagra-hero-halo {
                     position: absolute;
                     inset: -8px;
@@ -311,115 +653,184 @@ export default function AgentHero({ onNavigate }) {
                 .chagra-hero-avatar-wrap {
                     animation: chagra-avatar-breathe 4s ease-in-out infinite;
                 }
+                @keyframes chagra-halo-rotate {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+                @keyframes chagra-avatar-breathe {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.025); }
+                }
+
+                /* Transición de envío: shimmer + lift (sin cambios de contrato —
+                   los tests buscan estas clases). */
+                @keyframes chagra-send-shimmer {
+                    0% { transform: translateX(-130%); opacity: 0; }
+                    25% { opacity: 1; }
+                    70% { opacity: 1; }
+                    100% { transform: translateX(130%); opacity: 0; }
+                }
+                @keyframes chagra-send-lift {
+                    0% { transform: translateY(0) scale(1); opacity: 1; }
+                    35% { transform: translateY(-4px) scale(1.012); opacity: 1; }
+                    100% { transform: translateY(-16px) scale(0.978); opacity: 0.82; }
+                }
                 .chagra-composer-shimmer::after {
                     content: '';
                     position: absolute;
                     inset: 0;
                     border-radius: inherit;
-                    /* Brillo más ancho y visible que recorre el compositor de
-                       lado a lado — la sensación de "lanzar" la consulta. */
                     background: linear-gradient(
                         100deg,
                         transparent 12%,
-                        rgba(163, 230, 53, 0.55) 50%,
+                        rgb(var(--t-accent-rgb) / 0.55) 50%,
                         transparent 88%
                     );
-                    /* Más lento (520ms) + easing suave (no ease-out brusco) para
-                       que el barrido se perciba elegante, no un flash. */
                     animation: chagra-send-shimmer 0.52s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
                     pointer-events: none;
                     overflow: hidden;
                 }
                 .chagra-composer-sending {
-                    /* Lift suave y un pelín más largo, sincronizado con el
-                       retardo de navegación (SEND_TRANSITION_MS). Easing
-                       cubic-bezier "salida suave" para que se sienta digno. */
                     animation: chagra-send-lift 0.52s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
                 }
                 @media (prefers-reduced-motion: reduce) {
                     .chagra-hero-halo,
-                    .chagra-hero-avatar-wrap { animation: none !important; }
+                    .chagra-hero-avatar-wrap,
+                    .agentport-sun,
+                    .agentport-pollen { animation: none !important; }
+                    .agentport-pollen { opacity: 0.5; }
+                    .agentport-greet { animation: none !important; }
                     .chagra-composer-shimmer::after,
                     .chagra-composer-sending { animation: none !important; }
                 }
             `}</style>
 
-            {/* Avatar vivo + headline. Toda la zona del avatar abre el agente
-                directo (sin escribir) — atajo para quien solo quiere "entrar". */}
-            <button
-                type="button"
-                onClick={launchToAgent}
-                className="relative w-full flex flex-col items-center text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-3xl"
-                aria-label="Abrir agente Chagra"
-            >
-                <div className="relative w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center mb-3">
-                    <div className="chagra-hero-halo" aria-hidden="true" />
-                    <div className="chagra-hero-halo-inner" aria-hidden="true" />
-                    <div className="chagra-hero-avatar-wrap relative">
-                        <ChagraAgentAvatar
-                            state={phase === 'sending' || isRecording ? 'thinking' : 'idle'}
-                            size={140}
-                        />
-                    </div>
-                </div>
+            {/* ===== ESCENA AMBIENTE (sol + polen) — detrás de todo ===== */}
+            <div className="agentport-scene" aria-hidden="true">
+                <div className="agentport-sun" />
+                <span className="agentport-pollen" style={{ left: '24%', bottom: '40%', width: 5, height: 5, animationDuration: '11s' }} />
+                <span className="agentport-pollen" style={{ left: '70%', bottom: '46%', width: 4, height: 4, animationDuration: '13s', animationDelay: '2.5s' }} />
+                <span className="agentport-pollen" style={{ left: '48%', bottom: '54%', width: 6, height: 6, animationDuration: '15s', animationDelay: '5s' }} />
+                <span className="agentport-pollen" style={{ left: '82%', bottom: '50%', width: 4, height: 4, animationDuration: '12s', animationDelay: '1.5s' }} />
+            </div>
 
-                <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-none mb-1.5">
-                    Pregúntale a <span className="chagra-wordmark">Chagra</span>
+            {/* ===== Cabecera: pills de TEMA (cambian el tema de verdad) ===== */}
+            <div className="agentport-themebar" role="group" aria-label="Tema visual de la app">
+                <span className="agentport-tlbl">Tema</span>
+                {THEME_PILLS.map((t) => {
+                    const active = theme === t.id;
+                    return (
+                        <button
+                            key={t.id}
+                            type="button"
+                            onClick={() => setTheme(t.id)}
+                            aria-pressed={active}
+                            className={['agentport-tpill', active ? 'is-active' : ''].join(' ')}
+                        >
+                            <span className="agentport-tsw" aria-hidden="true">
+                                {t.swatch.map((c, i) => (
+                                    <span key={i} style={{ backgroundColor: c }} />
+                                ))}
+                            </span>
+                            {t.label}
+                        </button>
+                    );
+                })}
+            </div>
+
+            {/* ===== Zona-respiro: avatar GRANDE y centrado (abre el agente) ===== */}
+            <div className="agentport-stage">
+                <button
+                    type="button"
+                    onClick={launchToAgent}
+                    aria-label="Abrir agente Chagra"
+                    className="agentport-avatar-wrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--t-accent-rgb))] rounded-full"
+                >
+                    <div className="relative w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center">
+                        <div className="chagra-hero-halo" aria-hidden="true" />
+                        <div className="chagra-hero-halo-inner" aria-hidden="true" />
+                        <div className="chagra-hero-avatar-wrap relative">
+                            <ChagraAgentAvatar state={avatarState} size={128} />
+                        </div>
+                    </div>
+                </button>
+            </div>
+
+            {/* ===== Saludo grande + subtítulo ===== */}
+            <div className="agentport-greet">
+                <h2 className="agentport-hi">
+                    {greetingForNow()}<br />Soy <span className="agentport-chagra chagra-wordmark">Chagra</span>.
                 </h2>
                 <p
                     key={tipIndex}
-                    className="text-sm sm:text-base text-slate-400 font-medium px-2 leading-snug max-w-md transition-opacity duration-700"
+                    className="agentport-sub"
                     style={{ animation: 'fade-in 0.7s ease' }}
                 >
                     {TIPS[tipIndex]}
                 </p>
-            </button>
+            </div>
 
-            {/* COMPOSITOR MULTIMODAL REAL */}
-            <div className="mt-5 w-full max-w-xl mx-auto">
+            {/* ===== Fila de chips (envían directo una consulta de texto) ===== */}
+            <div className="agentport-chiprow">
+                {QUICK_CHIPS.map((chip) => (
+                    <button
+                        key={chip.label}
+                        type="button"
+                        onClick={() => handleChipSend(chip.prompt)}
+                        disabled={busy}
+                        className="agentport-chip"
+                    >
+                        <span aria-hidden="true" className="agentport-chip-e">{chip.icon}</span>
+                        {chip.label}
+                    </button>
+                ))}
+            </div>
+
+            {/* ===== COMPOSITOR MULTIMODAL REAL — la "pill" del demo, anclada ===== */}
+            <div className="agentport-composer">
                 <div
                     className={[
-                        'relative overflow-hidden rounded-2xl bg-white/[0.06] backdrop-blur-xl border transition-colors',
-                        isRecording ? 'border-rose-500/60' : 'border-white/10 focus-within:border-emerald-500/60',
+                        'agentport-bar relative overflow-hidden flex-col !items-stretch',
+                        isRecording ? 'is-recording' : '',
                         phase === 'sending' ? 'chagra-composer-shimmer chagra-composer-sending' : '',
                     ].join(' ')}
                 >
                     {/* Preview del adjunto en staging */}
                     {attachment && (
-                        <div className="flex items-center gap-3 px-3 pt-3">
+                        <div className="flex items-center gap-3 px-2 pt-1.5">
                             {attachment.previewUrl ? (
                                 <img
                                     src={attachment.previewUrl}
                                     alt="Foto adjunta"
-                                    className="w-14 h-14 rounded-lg object-cover border border-white/15"
+                                    className="w-14 h-14 rounded-xl object-cover border border-[rgb(var(--c-surface-border))]"
                                 />
                             ) : (
-                                <div className="w-14 h-14 rounded-lg bg-slate-800 border border-white/15 flex items-center justify-center">
-                                    <Paperclip size={20} className="text-slate-300" aria-hidden="true" />
+                                <div className="w-14 h-14 rounded-xl bg-[rgb(var(--c-surface-card))] border border-[rgb(var(--c-surface-border))] flex items-center justify-center">
+                                    <Paperclip size={20} className="text-[rgb(var(--c-slate-400))]" aria-hidden="true" />
                                 </div>
                             )}
-                            <span className="flex-1 text-xs text-slate-300 truncate">
+                            <span className="flex-1 text-xs text-[rgb(var(--c-slate-300))] truncate">
                                 {attachment.kind === 'photo' ? 'Foto lista para enviar' : attachment.fileName}
                             </span>
                             <button
                                 type="button"
                                 onClick={clearAttachment}
                                 aria-label="Quitar adjunto"
-                                className="shrink-0 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-300"
+                                className="shrink-0 w-7 h-7 rounded-full bg-[rgb(var(--c-surface-card))] border border-[rgb(var(--c-surface-border))] hover:border-[rgb(var(--t-accent-rgb)/0.5)] flex items-center justify-center text-[rgb(var(--c-slate-400))]"
                             >
                                 <X size={14} aria-hidden="true" />
                             </button>
                         </div>
                     )}
 
-                    {/* Estado grabando: barra de nivel + cronómetro */}
+                    {/* Fila 1: texto (o estado grabando) */}
                     {isRecording ? (
-                        <div className="flex items-center gap-3 px-4 py-3.5 min-h-[56px]">
+                        <div className="flex items-center gap-3 px-3 py-3 min-h-[52px]">
                             <span className="relative flex h-3 w-3 shrink-0">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
                                 <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500" />
                             </span>
-                            <span className="flex-1 text-base text-rose-200 font-medium tabular-nums">
+                            <span className="flex-1 text-base text-rose-500 font-medium tabular-nums">
                                 Grabando… {recSeconds}s
                             </span>
                             {/* Mini visualizador del nivel de voz */}
@@ -436,22 +847,22 @@ export default function AgentHero({ onNavigate }) {
                             onChange={(e) => { setText(e.target.value); autoGrow(e.target); }}
                             onKeyDown={handleKeyDown}
                             rows={1}
-                            placeholder={attachment ? 'Añade una nota a tu foto (opcional)…' : 'Escribe tu pregunta al agente…'}
+                            placeholder={attachment ? 'Añade una nota a tu foto (opcional)…' : 'Pregúntale a Chagra…'}
                             aria-label="Escribe tu pregunta al agente"
-                            className="w-full bg-transparent resize-none px-4 py-3.5 text-base text-slate-100 placeholder:text-slate-400 focus:outline-none leading-snug"
+                            className="w-full bg-transparent resize-none px-3 py-3 text-base text-[rgb(var(--c-slate-100))] placeholder:text-[rgb(var(--c-slate-500))] focus:outline-none leading-snug"
                             disabled={busy}
                         />
                     )}
 
-                    {/* Barra de acciones del compositor */}
-                    <div className="flex items-center gap-1.5 px-3 pb-2.5 pt-0.5">
+                    {/* Fila 2: acciones — cámara/adjuntar a la izq · mic/enviar a la der */}
+                    <div className="flex items-center gap-2 px-1 pb-1 pt-0.5">
                         {/* Cámara / foto */}
                         <button
                             type="button"
                             onClick={() => cameraInputRef.current?.click()}
                             disabled={busy || isRecording}
                             aria-label="Tomar o elegir foto"
-                            className="w-9 h-9 rounded-full hover:bg-white/10 active:bg-white/15 flex items-center justify-center text-slate-300 disabled:opacity-40 transition-colors"
+                            className="agentport-iconbtn !w-10 !h-10"
                         >
                             <Camera size={19} aria-hidden="true" />
                         </button>
@@ -461,7 +872,7 @@ export default function AgentHero({ onNavigate }) {
                             onClick={() => fileInputRef.current?.click()}
                             disabled={busy || isRecording}
                             aria-label="Adjuntar una foto"
-                            className="w-9 h-9 rounded-full hover:bg-white/10 active:bg-white/15 flex items-center justify-center text-slate-300 disabled:opacity-40 transition-colors"
+                            className="agentport-iconbtn !w-10 !h-10"
                         >
                             <Paperclip size={18} aria-hidden="true" />
                         </button>
@@ -476,27 +887,20 @@ export default function AgentHero({ onNavigate }) {
                             aria-label={isRecording ? 'Detener y enviar audio' : 'Grabar audio'}
                             aria-pressed={isRecording}
                             className={[
-                                'w-10 h-10 rounded-full flex items-center justify-center transition-all active:scale-95 disabled:opacity-40',
-                                isRecording
-                                    ? 'bg-rose-500 hover:bg-rose-400 text-white shadow-lg shadow-rose-500/30'
-                                    : 'bg-white/10 hover:bg-white/20 text-slate-100',
+                                'agentport-iconbtn !w-11 !h-11',
+                                isRecording ? 'agentport-mic-on' : '',
                             ].join(' ')}
                         >
                             {isRecording ? <Square size={16} strokeWidth={2.5} aria-hidden="true" /> : <Mic size={18} strokeWidth={2.5} aria-hidden="true" />}
                         </button>
 
-                        {/* Enviar */}
+                        {/* Enviar — botón redondo de acento (el .send del demo) */}
                         <button
                             type="button"
                             onClick={handleSendText}
                             disabled={!canSend}
                             aria-label="Enviar al agente"
-                            className={[
-                                'w-10 h-10 rounded-full flex items-center justify-center transition-all active:scale-95',
-                                canSend
-                                    ? 'agent-send-accent shadow-lg'
-                                    : 'bg-white/8 text-slate-500 cursor-not-allowed',
-                            ].join(' ')}
+                            className={['agentport-send', canSend ? 'agent-send-accent' : ''].join(' ')}
                         >
                             <ArrowUp size={18} strokeWidth={2.75} aria-hidden="true" />
                         </button>
@@ -522,34 +926,25 @@ export default function AgentHero({ onNavigate }) {
                     />
                 </div>
 
+                {/* Hint bajo la pill (réplica de .hintbar del demo). */}
+                {!isRecording && !attachment && (
+                    <p className="agentport-hint">
+                        Escribe, toca el <b>🎤</b> para hablar, o el <b>📷</b> para mostrarme una foto
+                    </p>
+                )}
+
                 {recorderError && (
-                    <p className="mt-2 text-xs text-rose-300 px-1" role="alert">
+                    <p className="mt-2 text-xs text-rose-500 px-1" role="alert">
                         No pude acceder al micrófono. Revisa los permisos.
                     </p>
                 )}
 
                 {/* B2: aviso cuando se intenta adjuntar algo que no es una foto. */}
                 {pickError && (
-                    <p className="mt-2 text-xs text-amber-300 px-1" role="alert">
+                    <p className="mt-2 text-xs text-[rgb(160,76,20)] px-1" role="alert">
                         {pickError}
                     </p>
                 )}
-
-                {/* Chips de sugerencia rápida — envían directo (consulta de texto) */}
-                <div className="mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-                    {QUICK_CHIPS.map((chip) => (
-                        <button
-                            key={chip.label}
-                            type="button"
-                            onClick={() => handleChipSend(chip.prompt)}
-                            disabled={busy}
-                            className="shrink-0 px-3.5 py-2 rounded-full bg-white/5 hover:bg-white/10 active:bg-white/15 border border-white/10 text-sm text-slate-200 font-medium transition-all flex items-center gap-2 backdrop-blur-md disabled:opacity-50"
-                        >
-                            <span aria-hidden="true" className="text-base leading-none">{chip.icon}</span>
-                            {chip.label}
-                        </button>
-                    ))}
-                </div>
             </div>
         </section>
     );
