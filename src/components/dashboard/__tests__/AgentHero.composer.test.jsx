@@ -113,7 +113,7 @@ describe('AgentHero — compositor real (no teaser)', () => {
 
   test('botón enviar deshabilitado sin texto ni adjunto', () => {
     render(<AgentHero onNavigate={vi.fn()} />);
-    expect(screen.getByLabelText('Enviar al agente')).toBeDisabled();
+    expect(screen.getByLabelText('Enviar')).toBeDisabled();
   });
 
   test('chip de sugerencia envía su prompt como texto', async () => {
@@ -151,15 +151,15 @@ describe('AgentHero — compositor real (no teaser)', () => {
     const onNavigate = vi.fn();
     const { container } = render(<AgentHero onNavigate={onNavigate} />);
     const file = new File(['img'], 'planta.jpg', { type: 'image/jpeg' });
-    const cameraInput = container.querySelector('input[capture]');
+    const photoInput = container.querySelector('input[type="file"]');
     await act(async () => {
-      fireEvent.change(cameraInput, { target: { files: [file] } });
+      fireEvent.change(photoInput, { target: { files: [file] } });
     });
     // Aparece el preview de "foto lista".
     await screen.findByText('Foto lista para enviar');
     // Enviar (ya habilitado por el adjunto).
     await act(async () => {
-      fireEvent.click(screen.getByLabelText('Enviar al agente'));
+      fireEvent.click(screen.getByLabelText('Enviar'));
     });
     await waitFor(() => {
       expect(sendMock).toHaveBeenCalledWith(
@@ -175,7 +175,7 @@ describe('AgentHero — compositor real (no teaser)', () => {
     const ta = screen.getByLabelText('Escribe tu pregunta al agente');
     fireEvent.change(ta, { target: { value: 'no me pierdas' } });
     await act(async () => {
-      fireEvent.click(screen.getByLabelText('Enviar al agente'));
+      fireEvent.click(screen.getByLabelText('Enviar'));
     });
     await waitFor(() => expect(sendMock).toHaveBeenCalled());
     expect(onNavigate).not.toHaveBeenCalled();
@@ -261,34 +261,36 @@ describe('AgentHero — transición de envío premium (bug 2026-05-31)', () => {
   });
 });
 
-describe('AgentHero — adjuntar SOLO fotos (B2, 2026-06-02)', () => {
-  test('el input de adjuntar acepta solo imágenes (accept="image/*")', () => {
+describe('AgentHero — foto: cámara O galería, solo imágenes (B2, 2026-06-06)', () => {
+  test('el input de foto acepta solo imágenes (accept="image/*")', () => {
     const { container } = render(<AgentHero onNavigate={vi.fn()} />);
-    // Dos inputs de archivo: cámara (con capture) y adjuntar (sin capture).
-    // Ambos deben restringir a imágenes — el agente solo "ve" fotos vía visión.
+    // Operador 2026-06-06: un solo input de foto (se quitó el botón de adjuntar
+    // clip). Sigue restringido a imágenes — el agente solo "ve" fotos vía visión.
     const inputs = Array.from(container.querySelectorAll('input[type="file"]'));
-    expect(inputs.length).toBeGreaterThanOrEqual(2);
+    expect(inputs.length).toBeGreaterThanOrEqual(1);
     for (const input of inputs) {
       expect(input.getAttribute('accept')).toBe('image/*');
     }
   });
 
-  test('el input de cámara conserva capture="environment" (foto en vivo)', () => {
+  test('el input de foto NO fuerza la cámara (sin capture) → permite galería', () => {
+    // Operador 2026-06-06: se quitó capture="environment" para que el usuario
+    // pueda TOMAR foto O ELEGIR de la galería (antes forzaba la cámara).
     const { container } = render(<AgentHero onNavigate={vi.fn()} />);
-    const cameraInput = container.querySelector('input[capture]');
-    expect(cameraInput).toBeTruthy();
-    expect(cameraInput.getAttribute('accept')).toBe('image/*');
-    expect(cameraInput.getAttribute('capture')).toBe('environment');
+    const photoInput = container.querySelector('input[type="file"]');
+    expect(photoInput).toBeTruthy();
+    expect(photoInput.getAttribute('accept')).toBe('image/*');
+    expect(photoInput.hasAttribute('capture')).toBe(false);
   });
 
   test('si se cuela un no-imagen (PDF): NO lo deja en staging y avisa claro', async () => {
     const { container } = render(<AgentHero onNavigate={vi.fn()} />);
     const file = new File(['%PDF-1.4'], 'hoja-de-vida.pdf', { type: 'application/pdf' });
-    // Usamos el input de adjuntar (sin capture). Aunque tenga accept="image/*",
-    // algunos OS dejan elegir cualquier archivo → el guard de pick lo rechaza.
-    const attachInput = container.querySelector('input[type="file"]:not([capture])');
+    // Aunque el input tenga accept="image/*", algunos OS dejan elegir cualquier
+    // archivo desde la galería → el guard de pick lo rechaza.
+    const photoInput = container.querySelector('input[type="file"]');
     await act(async () => {
-      fireEvent.change(attachInput, { target: { files: [file] } });
+      fireEvent.change(photoInput, { target: { files: [file] } });
     });
     // No se crea preview de adjunto.
     expect(screen.queryByText('Foto lista para enviar')).toBeNull();
@@ -297,15 +299,15 @@ describe('AgentHero — adjuntar SOLO fotos (B2, 2026-06-02)', () => {
     const alert = await screen.findByRole('alert');
     expect(alert.textContent).toMatch(/solo puedo ver fotos|solo.*fotos/i);
     // El botón enviar sigue deshabilitado (no hay adjunto válido ni texto).
-    expect(screen.getByLabelText('Enviar al agente')).toBeDisabled();
+    expect(screen.getByLabelText('Enviar')).toBeDisabled();
   });
 
   test('el aviso de no-imagen no usa voseo argentino', async () => {
     const { container } = render(<AgentHero onNavigate={vi.fn()} />);
     const file = new File(['x'], 'audio.mp3', { type: 'audio/mpeg' });
-    const attachInput = container.querySelector('input[type="file"]:not([capture])');
+    const photoInput = container.querySelector('input[type="file"]');
     await act(async () => {
-      fireEvent.change(attachInput, { target: { files: [file] } });
+      fireEvent.change(photoInput, { target: { files: [file] } });
     });
     const alert = await screen.findByRole('alert');
     const t = alert.textContent || '';
@@ -315,12 +317,30 @@ describe('AgentHero — adjuntar SOLO fotos (B2, 2026-06-02)', () => {
   test('una imagen válida sí queda en staging (el guard no bloquea fotos)', async () => {
     const { container } = render(<AgentHero onNavigate={vi.fn()} />);
     const file = new File(['img'], 'planta.jpg', { type: 'image/jpeg' });
-    const attachInput = container.querySelector('input[type="file"]:not([capture])');
+    const photoInput = container.querySelector('input[type="file"]');
     await act(async () => {
-      fireEvent.change(attachInput, { target: { files: [file] } });
+      fireEvent.change(photoInput, { target: { files: [file] } });
     });
     await screen.findByText('Foto lista para enviar');
     expect(screen.queryByRole('alert')).toBeNull();
+  });
+});
+
+describe('AgentHero — colibrí = enviar + botón de perfil (operador 2026-06-06)', () => {
+  test('el botón de enviar lleva el colibrí 2D dentro (no la flecha)', () => {
+    const { container } = render(<AgentHero onNavigate={vi.fn()} />);
+    const sendBtn = screen.getByLabelText('Enviar');
+    // El colibrí va dentro del botón (.send-hummer con su SVG).
+    expect(sendBtn.querySelector('.send-hummer svg')).toBeTruthy();
+    // Ya no hay un input que fuerce cámara.
+    expect(container.querySelector('input[capture]')).toBeNull();
+  });
+
+  test('el botón de perfil navega a la pantalla de Perfil', () => {
+    const onNavigate = vi.fn();
+    render(<AgentHero onNavigate={onNavigate} />);
+    fireEvent.click(screen.getByLabelText('Perfil'));
+    expect(onNavigate).toHaveBeenCalledWith('perfil');
   });
 });
 

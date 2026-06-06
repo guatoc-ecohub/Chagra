@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { CircleUser, ChevronDown, ChevronUp, HelpCircle, LogOut, MapPin } from 'lucide-react';
+import { CircleUser, HelpCircle, LogOut, MapPin } from 'lucide-react';
 import { version as APP_VERSION } from '../../package.json';
-import EnvironmentalCard from './EnvironmentalCard';
 import AltitudeBadge from './AltitudeBadge';
 import OfflineChip from './OfflineChip';
 import ChagraAgentAvatar from './ChagraAgentAvatar';
@@ -46,7 +45,6 @@ import { findMunicipio } from '../utils/colombiaLocations';
  * para destrabar PWA install Safari iOS).
  */
 export default function TopBar({ onNavigate, onLogout }) {
-  const [envOpen, setEnvOpen] = useState(false);
   const [operatorName, setOperatorName] = useState(() =>
     typeof window !== 'undefined'
       ? localStorage.getItem('chagra:operator:name') || 'Mi finca'
@@ -256,22 +254,10 @@ export default function TopBar({ onNavigate, onLogout }) {
         </button>
       </header>
 
-      {/* Toggle de info ambiental (msnm/luna/sol), colapsado por default */}
-      <button
-        type="button"
-        onClick={() => setEnvOpen((v) => !v)}
-        aria-expanded={envOpen}
-        aria-controls="environmental-card"
-        className="w-full px-3 py-1 flex items-center justify-between text-xs text-slate-400 hover:text-slate-200 bg-slate-900/40 border-b border-slate-800/50"
-      >
-        <span className="font-mono">🌙 Ambiente · altitud · efemérides</span>
-        {envOpen ? <ChevronUp size={14} aria-hidden="true" /> : <ChevronDown size={14} aria-hidden="true" />}
-      </button>
-      {envOpen && (
-        <div id="environmental-card">
-          <EnvironmentalCard />
-        </div>
-      )}
+      {/* Letrero "🌙 Ambiente · altitud · efemérides" + EnvironmentalCard
+          colapsable REMOVIDO 2026-06-06 (operador: "no le veo utilidad" en el
+          home del agente). La altitud sigue visible en el chip de ubicación
+          bajo el nombre del operador (arriba) y en la escena del AgentHero. */}
     </>
   );
 }

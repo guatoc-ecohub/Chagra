@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench, Sprout, ChevronRight } from 'lucide-react';
+import { User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench, Sprout, ChevronRight, Bell } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import ThemeSelector from './common/ThemeSelector';
 import AgentAvatarSelector from './Settings/AgentAvatarSelector';
@@ -12,6 +12,7 @@ import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 import useFincaActiveStore from '../services/fincaActiveStore';
 import usePrefsStore from '../store/usePrefsStore';
 import { stop as stopTTS } from '../services/ttsService';
+import { getNotificationStyle, setNotificationStyle } from '../services/userProfileService';
 
 const TTL_OPTIONS = [
   { id: '1d', label: '1 día' },
@@ -101,6 +102,15 @@ export default function ProfileScreen({ onBack, onHome }) {
   useEffect(() => {
     localStorage.setItem('chagra:profile:modo-tecnico:v1', modoTecnico ? '1' : '0');
   }, [modoTecnico]);
+
+  // Estilo de notificación de alertas (operador 2026-06-06): 'demo' (chip
+  // llamativo estilo demo en la portada del agente, POR DEFECTO) o 'actual'
+  // (campanita del TopBar). Persiste en el perfil (userProfileService).
+  const [notifStyle, setNotifStyle] = useState(() => getNotificationStyle());
+  const handleNotifStyle = (style) => {
+    setNotifStyle(style);
+    setNotificationStyle(style);
+  };
 
   useEffect(() => {
     localStorage.setItem('chagra:voice:telemetry:enabled', telemetryEnabled ? '1' : '0');
@@ -293,6 +303,41 @@ export default function ProfileScreen({ onBack, onHome }) {
             <ThemeSelector />
             <BackgroundSelector />
             <AgentAvatarSelector />
+
+            {/* Estilo de notificación de alertas (operador 2026-06-06).
+                'demo' = chip llamativo en la portada del agente (por defecto).
+                'actual' = campanita del encabezado. Persiste en el perfil. */}
+            <div className="space-y-3 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+              <div className="flex items-center gap-2 px-1">
+                <Bell size={18} className="text-emerald-400" />
+                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Avisos de clima</h3>
+              </div>
+              <p className="text-[11px] text-slate-500 leading-snug px-1">
+                Cómo te muestra Chagra una alerta de clima o helada.
+              </p>
+              <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label="Estilo de avisos">
+                {[
+                  { id: 'demo', label: 'Aviso destacado', desc: 'Un cartel grande en la portada' },
+                  { id: 'actual', label: 'Campanita', desc: 'Solo el ícono de la campana' },
+                ].map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={notifStyle === opt.id}
+                    onClick={() => handleNotifStyle(opt.id)}
+                    className={`text-left rounded-2xl p-4 border transition-colors min-h-[64px] ${
+                      notifStyle === opt.id
+                        ? 'bg-emerald-900/30 border-emerald-600/60'
+                        : 'bg-slate-800/40 border-slate-700 hover:bg-slate-800/70'
+                    }`}
+                  >
+                    <p className="text-sm font-bold text-white">{opt.label}</p>
+                    <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">{opt.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 

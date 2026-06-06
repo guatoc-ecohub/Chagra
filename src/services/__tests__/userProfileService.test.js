@@ -10,6 +10,9 @@ import {
   hasSeenProfileOnboarding,
   buildUserProfileBlock,
   resolveAltitudToSave,
+  getNotificationStyle,
+  setNotificationStyle,
+  DEFAULT_NOTIFICATION_STYLE,
 } from '../userProfileService.js';
 
 describe('userProfileService (#200)', () => {
@@ -244,5 +247,31 @@ describe('resolveAltitudToSave — coalesce no-destructivo (#1213-regresion)', (
     });
     expect(finca_altitud).toBeUndefined();
     expect(altitud_source).toBeUndefined();
+  });
+
+  describe('estilo de notificación (operador 2026-06-06)', () => {
+    it('por defecto es "demo" (chip estilo demo)', () => {
+      expect(DEFAULT_NOTIFICATION_STYLE).toBe('demo');
+      expect(getNotificationStyle()).toBe('demo');
+    });
+
+    it('persiste y relee el estilo seleccionado', () => {
+      setNotificationStyle('actual');
+      expect(getNotificationStyle()).toBe('actual');
+      expect(getProfile().estilo_notificacion).toBe('actual');
+      setNotificationStyle('demo');
+      expect(getNotificationStyle()).toBe('demo');
+    });
+
+    it('un valor inválido cae al default sin corromper el perfil', () => {
+      setNotificationStyle('xyz');
+      expect(getNotificationStyle()).toBe('demo');
+      expect(getProfile().estilo_notificacion).toBe('demo');
+    });
+
+    it('un perfil viejo sin el campo devuelve el default', () => {
+      saveProfile({ nombre: 'Lili' });
+      expect(getNotificationStyle()).toBe('demo');
+    });
   });
 });
