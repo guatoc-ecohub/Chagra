@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Muestra de fondos — Chagra (herramienta de decisión, NO prod)</title>
+<style>
+  :root {
+    --teal: #19c79a;
+    --teal-br: #3be8a6;
+    --amber: #f0a060;
+    --muzo: #34d399;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0a0e14;
+    color: #e2e8f0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    padding: 32px 24px 80px;
+    line-height: 1.45;
+  }
+  h1 { font-size: 28px; font-weight: 900; color: var(--teal-br); }
+  h2 {
+    font-size: 22px; font-weight: 800; margin: 48px 0 6px;
+    border-left: 5px solid var(--teal); padding-left: 12px; color: #f1f5f9;
+  }
+  .lead { color: #94a3b8; max-width: 880px; margin-top: 8px; font-size: 15px; }
+  .note {
+    background: #111c22; border: 1px solid #1e3a34; border-radius: 12px;
+    padding: 14px 16px; margin-top: 16px; max-width: 880px; color: #cbd5e1; font-size: 14px;
+  }
+  .note strong { color: var(--teal-br); }
+
+  /* ============ SECCIÓN A — logins ============ */
+  .grid-logins {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 22px;
+    margin-top: 22px;
+  }
+  .login-card {
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid #1e293b;
+    background: #0b1118;
+    box-shadow: 0 8px 28px rgba(0,0,0,.45);
+  }
+  .login-stage {
+    position: relative;
+    height: 420px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 28px 22px;
+    color: #f1f5f9;
+  }
+  .login-logo {
+    width: 64px; height: 64px; border-radius: 999px;
+    background: rgba(52,211,153,.20);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 24px rgba(52,211,153,.45);
+    margin-bottom: 12px;
+  }
+  .login-logo svg { width: 38px; height: 38px; color: #6ee7b7; }
+  .login-title { font-size: 34px; font-weight: 900; color: var(--muzo); letter-spacing: -1px; }
+  .login-ver { font-size: 11px; color: #64748b; font-family: ui-monospace, monospace; margin-bottom: 18px; }
+  .login-field { width: 100%; max-width: 220px; margin-bottom: 12px; }
+  .login-field span { display: block; font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+  .login-field .input {
+    width: 100%; padding: 12px 14px; border-radius: 12px;
+    background: #0f172a; border: 1px solid #334155; color: #cbd5e1; font-size: 15px;
+  }
+  .login-btn {
+    width: 100%; max-width: 220px; margin-top: 6px;
+    padding: 14px; border-radius: 12px; border: none;
+    border-bottom: 4px solid #166534;
+    background: #16a34a; color: #fff; font-size: 17px; font-weight: 900;
+  }
+  .login-label {
+    padding: 12px 16px; background: #0b1118; border-top: 1px solid #1e293b;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .login-label .fname { font-family: ui-monospace, monospace; font-size: 13px; color: #7dd3fc; word-break: break-all; }
+  .login-label .ftag { font-size: 11px; color: #64748b; }
+  .badge-paramo {
+    background: rgba(25,201,154,.16); color: var(--teal-br);
+    border: 1px solid rgba(25,201,154,.4); font-size: 10px; font-weight: 800;
+    padding: 2px 8px; border-radius: 999px; white-space: nowrap;
+  }
+
+  /* ============ SECCIÓN B — biopunk variantes ============ */
+  .grid-bp {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 22px;
+    margin-top: 22px;
+  }
+  .bp-card {
+    border-radius: 18px; overflow: hidden;
+    border: 1px solid #1e293b; background: #0b1118;
+    box-shadow: 0 8px 28px rgba(0,0,0,.45);
+  }
+  .bp-head {
+    padding: 12px 16px; background: #0b1118; border-bottom: 1px solid #1e293b;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .bp-head .v {
+    font-size: 13px; font-weight: 900; letter-spacing: .5px;
+    color: #04231b; background: var(--teal-br);
+    padding: 4px 12px; border-radius: 999px;
+  }
+  .bp-head .vsub { font-size: 12px; color: #94a3b8; }
+
+  .agentport {
+    position: relative;
+    height: 470px;
+    overflow: hidden;
+    background: #0a0e14;
+  }
+  /* fondo-imagen base de la portada biopunk */
+  .agentport-photo {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+  }
+  /* overlay para oscurecer la imagen detrás del grafo (variante "detrás") */
+  .agentport-photo.dim::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(rgba(8,14,20,0.55), rgba(8,14,20,0.82));
+  }
+
+  /* void/grid del grafo (solo variante "detrás" lo usa de forma tenue) */
+  .agentport-void {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(120% 80% at 50% 8%, rgba(14,42,46,.5) 0%, rgba(11,26,32,.4) 34%, rgba(10,17,24,.3) 56%, transparent 100%),
+      radial-gradient(80% 50% at 80% 90%, rgba(25,201,154,.10) 0%, transparent 60%);
+  }
+  .agentport-grid {
+    position: absolute; inset: 0; opacity: .5;
+    background-image:
+      linear-gradient(rgba(25,201,154,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(25,201,154,.05) 1px, transparent 1px);
+    background-size: 34px 34px;
+    -webkit-mask-image: radial-gradient(120% 90% at 50% 10%, #000 30%, transparent 78%);
+            mask-image: radial-gradient(120% 90% at 50% 10%, #000 30%, transparent 78%);
+  }
+
+  /* ====== grafo eléctrico (port fiel de AgentHero.jsx) ====== */
+  .agentport-net { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 3; }
+  .agentport-net .edge {
+    stroke: var(--teal); stroke-width: 1.4; fill: none; opacity: 0;
+    stroke-dasharray: var(--len, 160); stroke-dashoffset: var(--len, 160);
+    animation: ap-wire 5.6s cubic-bezier(.22,.61,.36,1) infinite;
+  }
+  .agentport-net .edge.b { stroke: var(--teal-br); }
+  @keyframes ap-wire {
+    0% { stroke-dashoffset: var(--len, 160); opacity: 0; }
+    18% { opacity: .6; }
+    55% { stroke-dashoffset: 0; opacity: .55; }
+    80% { opacity: .22; }
+    100% { stroke-dashoffset: 0; opacity: 0; }
+  }
+  .agentport-net .node {
+    fill: var(--teal); filter: drop-shadow(0 0 5px rgba(25,201,154,.9));
+    animation: ap-node-pulse 4.2s cubic-bezier(.22,.61,.36,1) infinite;
+  }
+  .agentport-net .node.br { fill: var(--teal-br); }
+  .agentport-net .node.amber { fill: var(--amber); filter: drop-shadow(0 0 5px rgba(240,160,96,.8)); }
+  @keyframes ap-node-pulse { 0%,100% { opacity: .35; r: 2.4; } 50% { opacity: 1; r: 3.4; } }
+  .agentport-net .spark { fill: #cffff2; filter: drop-shadow(0 0 6px #19f0c0); }
+  .agentport-net .spark.s1 { animation: ap-run1 4.4s linear infinite; }
+  .agentport-net .spark.s2 { animation: ap-run2 5.2s linear infinite; animation-delay: 1.1s; }
+  .agentport-net .spark.s3 { animation: ap-run3 6s linear infinite; animation-delay: 2.3s; }
+  @keyframes ap-run1 { 0% { transform: translate(60px,18px); opacity: 0; } 10% { opacity: 1; } 50% { transform: translate(30px,150px); opacity: 1; } 60% { opacity: 0; } 100% { opacity: 0; } }
+  @keyframes ap-run2 { 0% { transform: translate(60px,18px); opacity: 0; } 12% { opacity: 1; } 50% { transform: translate(96px,150px); opacity: 1; } 62% { opacity: 0; } 100% { opacity: 0; } }
+  @keyframes ap-run3 { 0% { transform: translate(330px,40px); opacity: 0; } 12% { opacity: 1; } 55% { transform: translate(250px,260px); opacity: 1; } 65% { opacity: 0; } 100% { opacity: 0; } }
+
+  .agentport-roots { position: absolute; left: 0; right: 0; bottom: 0; height: 42%; z-index: 3; }
+  .agentport-roots svg { position: absolute; bottom: 0; width: 100%; height: 100%; display: block; }
+  .agentport-roots .r {
+    stroke: #13b893; fill: none; stroke-linecap: round; opacity: .5;
+    filter: drop-shadow(0 0 4px rgba(25,201,154,.5));
+  }
+
+  /* contenido de la portada: marca + saludo + colibrí + compositor */
+  .agentport-ui { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; padding: 22px; }
+  .agentport-mark { display: flex; align-items: center; gap: 8px; }
+  .agentport-mark .ico { width: 30px; height: 30px; }
+  .agentport-mark .name { font-size: 18px; font-weight: 900; color: #f1f5f9; }
+  .agentport-mark .name small { display:block; font-size: 11px; font-weight: 500; color: #94a3b8; }
+
+  .agentport-hummer { position: absolute; top: 22%; right: 14%; z-index: 6; animation: ap-fly 18s cubic-bezier(.22,.61,.36,1) infinite; }
+  .agentport-hummer svg { filter: drop-shadow(0 0 8px rgba(25,201,154,.55)); }
+  @keyframes ap-fly {
+    0%,100% { transform: translate(0,0) rotate(-4deg); }
+    25% { transform: translate(-26px,18px) rotate(3deg); }
+    50% { transform: translate(-10px,40px) rotate(-2deg); }
+    75% { transform: translate(18px,16px) rotate(4deg); }
+  }
+
+  .agentport-greet { margin-top: auto; }
+  .agentport-greet .hi { font-size: 26px; font-weight: 900; color: #f8fafc; line-height: 1.15; }
+  .agentport-greet .hi b { color: var(--teal-br); }
+  .agentport-greet .sub { font-size: 14px; color: #cbd5e1; margin-top: 4px; }
+  .agentport-chips { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .agentport-chips span {
+    font-size: 12px; padding: 6px 12px; border-radius: 999px;
+    background: rgba(25,201,154,.12); border: 1px solid rgba(25,201,154,.3); color: #bbf7e6;
+  }
+  .agentport-composer {
+    margin-top: 14px; display: flex; align-items: center; gap: 10px;
+    background: rgba(7,18,22,.72); border: 1px solid rgba(25,201,154,.35);
+    border-radius: 999px; padding: 10px 14px; backdrop-filter: blur(6px);
+  }
+  .agentport-composer .a {
+    width: 30px; height: 30px; border-radius: 999px; flex: none;
+    background: rgba(25,201,154,.18); display: flex; align-items: center; justify-content: center;
+    font-weight: 900; color: var(--teal-br); font-size: 15px;
+  }
+  .agentport-composer .ph { flex: 1; color: #94a3b8; font-size: 14px; }
+  .agentport-composer .ic { color: #6ee7b7; font-size: 16px; }
+
+  footer { margin-top: 56px; color: #64748b; font-size: 13px; max-width: 880px; }
+  footer code { background: #111c22; padding: 2px 6px; border-radius: 6px; color: #7dd3fc; }
+</style>
+</head>
+<body>
+
+  <h1>Muestra de fondos — Chagra</h1>
+  <p class="lead">
+    Herramienta de decisión visual. <strong>NO es producción.</strong> Sirve para que el operador
+    señale (a) cuál de los fondos se ve "páramo completo" para el login, y (b) cómo quiere el biopunk:
+    la imagen <em>reemplazando</em> las figuras geométricas, o la imagen <em>detrás</em> del grafo eléctrico animado.
+  </p>
+
+  <!-- ============================ SECCIÓN A ============================ -->
+  <h2>A) Login con cada uno de los 5 fondos</h2>
+  <p class="lead">
+    Réplica simple del LoginScreen real: overlay oscuro
+    <code style="color:#7dd3fc">linear-gradient(rgba(2,6,23,0.62), rgba(2,6,23,0.86))</code> + el fondo.
+    Mirá cuál se ve montaña / frailejón / niebla.
+  </p>
+  <div class="note">
+    <strong>Pista:</strong> en el código actual, <code style="color:#7dd3fc">fondo-biopunk-1.jpg</code>
+    ya está etiquetado en el catálogo como <strong>"Páramo completo — Oso, cóndor, colibrí, frailejones"</strong>.
+    Confirmá visualmente si calza con lo que buscás.
+  </div>
+
+  <div class="grid-logins" id="grid-logins"></div>
+
+  <!-- ============================ SECCIÓN B ============================ -->
+  <h2>B) Biopunk — 2 variantes (elegí una)</h2>
+  <p class="lead">
+    Portada simplificada del agente (marca "Soy Chagra" + colibrí + compositor). A la izquierda la imagen
+    <strong>REEMPLAZA</strong> las figuras; a la derecha la imagen va <strong>DETRÁS</strong> del grafo
+    eléctrico teal animado (nodos que pulsan + aristas que se "cablean" + chispas de corriente).
+  </p>
+  <div class="note">
+    El fondo usado en ambas variantes es el que elijas como "páramo". Por defecto la muestra usa
+    <code style="color:#7dd3fc" id="bp-fname">fondo-biopunk-1.jpg</code> — cambialo en el código si decidís otro.
+  </div>
+
+  <div class="grid-bp" id="grid-bp"></div>
+
+  <footer>
+    Rutas relativas a <code>public/</code>. Para ver esto: abrir <code>public/demo-fondos.html</code> con
+    <code>file://</code> en un navegador. Rama: <code>chore/muestra-fondos-2026-06-06</code>. No mergear, no desplegar.
+  </footer>
+
+<script>
+  // === ÍCONOS reutilizables ===
+  const sproutSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/></svg>`;
+  const iconBiopunkSVG = `<svg viewBox="0 0 120 120" fill="none" width="100%" height="100%"><circle cx="60" cy="60" r="50" stroke="#19c79a" stroke-width="7"/><line x1="60" y1="24" x2="34" y2="96" stroke="#f0a060" stroke-width="9" stroke-linecap="round"/><line x1="60" y1="24" x2="86" y2="96" stroke="#3be8a6" stroke-width="9" stroke-linecap="round"/></svg>`;
+  // colibrí 2D simple ocre/teal
+  const hummerSVG = `<svg width="92" height="72" viewBox="0 0 92 72" fill="none">
+    <path d="M20 40 C30 26 50 22 64 30 C56 34 44 36 36 44 C30 50 24 50 20 40Z" fill="#cbb992"/>
+    <path d="M44 38 C58 30 74 30 86 22 C78 38 64 46 50 46 C46 46 44 42 44 38Z" fill="#3be8a6" opacity="0.85"/>
+    <path d="M20 40 C12 36 6 30 4 22 C14 24 24 30 32 38 C28 42 24 42 20 40Z" fill="#a98f64"/>
+    <circle cx="36" cy="42" r="4.5" fill="#7d6a45"/>
+    <path d="M36 42 L18 38" stroke="#7d6a45" stroke-width="2.4" stroke-linecap="round"/>
+  </svg>`;
+
+  // === grafo eléctrico (port fiel del demo biopunk de AgentHero) ===
+  const netSVG = `<svg class="agentport-net" viewBox="0 0 412 470" preserveAspectRatio="xMidYMid slice">
+      <path class="edge" style="--len:120;animation-delay:0s" d="M60 70 L150 120"/>
+      <path class="edge b" style="--len:150;animation-delay:.5s" d="M150 120 L96 220"/>
+      <path class="edge" style="--len:170;animation-delay:.9s" d="M150 120 L256 96"/>
+      <path class="edge" style="--len:140;animation-delay:1.3s" d="M256 96 L330 170"/>
+      <path class="edge b" style="--len:160;animation-delay:1.7s" d="M256 96 L210 210"/>
+      <path class="edge" style="--len:150;animation-delay:2.1s" d="M96 220 L210 210"/>
+      <path class="edge" style="--len:170;animation-delay:2.5s" d="M210 210 L330 170"/>
+      <path class="edge b" style="--len:150;animation-delay:2.9s" d="M210 210 L150 320"/>
+      <path class="edge" style="--len:150;animation-delay:3.3s" d="M330 170 L300 290"/>
+      <path class="edge" style="--len:150;animation-delay:3.7s" d="M150 320 L300 290"/>
+      <circle class="node br" cx="60" cy="70" r="3" style="animation-delay:0s"/>
+      <circle class="node" cx="150" cy="120" r="3" style="animation-delay:.4s"/>
+      <circle class="node amber" cx="256" cy="96" r="3" style="animation-delay:.8s"/>
+      <circle class="node" cx="96" cy="220" r="3" style="animation-delay:1.2s"/>
+      <circle class="node br" cx="210" cy="210" r="3" style="animation-delay:1.6s"/>
+      <circle class="node" cx="330" cy="170" r="3" style="animation-delay:2s"/>
+      <circle class="node" cx="150" cy="320" r="3" style="animation-delay:2.4s"/>
+      <circle class="node amber" cx="300" cy="290" r="3" style="animation-delay:2.8s"/>
+      <circle class="spark s1" cx="0" cy="0" r="2.4"/>
+      <circle class="spark s2" cx="0" cy="0" r="2.2"/>
+      <circle class="spark s3" cx="0" cy="0" r="2.4"/>
+    </svg>`;
+  const rootsSVG = `<div class="agentport-roots"><svg viewBox="0 0 412 200" preserveAspectRatio="none">
+      <path class="r" style="stroke-width:3" d="M206 200 C206 150 206 130 206 110"/>
+      <path class="r" style="stroke-width:2.4" d="M206 130 C160 120 120 130 70 100"/>
+      <path class="r" style="stroke-width:2.4" d="M206 130 C252 120 300 132 350 96"/>
+      <path class="r" style="stroke-width:1.8;opacity:.35" d="M206 150 C176 144 150 150 120 130"/>
+      <path class="r" style="stroke-width:1.8;opacity:.35" d="M206 150 C236 144 270 152 300 132"/>
+      <path class="r" style="stroke-width:1.6;opacity:.3" d="M70 100 C50 92 40 86 26 70"/>
+      <path class="r" style="stroke-width:1.6;opacity:.3" d="M350 96 C372 88 384 82 398 66"/>
+    </svg></div>`;
+
+  // === SECCIÓN A: los 5 fondos ===
+  const FONDOS = [
+    { src: './biodiversidad-bg.jpg', label: 'biodiversidad-bg.jpg', tag: 'fondo "Clásico" (eliminado del catálogo)', paramo: false },
+    { src: './fondo-biopunk-1.jpg',  label: 'fondo-biopunk-1.jpg',  tag: 'catálogo: "Páramo completo"', paramo: true },
+    { src: './fondo-biopunk-2.jpg',  label: 'fondo-biopunk-2.jpg',  tag: 'catálogo: "Colibrí tech"', paramo: false },
+    { src: './fondo-biopunk-3.jpg',  label: 'fondo-biopunk-3.jpg',  tag: 'catálogo: "Bosque ilustrado"', paramo: false },
+    { src: './fondo-biopunk-4.jpg',  label: 'fondo-biopunk-4.jpg',  tag: 'catálogo: "Cosecha mística" (default actual)', paramo: false },
+  ];
+
+  const OVERLAY = "linear-gradient(rgba(2,6,23,0.62), rgba(2,6,23,0.86))";
+
+  const gl = document.getElementById('grid-logins');
+  gl.innerHTML = FONDOS.map(f => `
+    <div class="login-card">
+      <div class="login-stage" style="background-image:${OVERLAY}, url('${f.src}')">
+        <div class="login-logo">${sproutSVG}</div>
+        <div class="login-title">Chagra</div>
+        <div class="login-ver">v0.0.0-muestra</div>
+        <div class="login-field"><span>Usuario</span><div class="input">&nbsp;</div></div>
+        <div class="login-field"><span>Contraseña</span><div class="input">&nbsp;</div></div>
+        <button class="login-btn">Entrar</button>
+      </div>
+      <div class="login-label">
+        <div>
+          <div class="fname">${f.label}</div>
+          <div class="ftag">${f.tag}</div>
+        </div>
+        ${f.paramo ? '<span class="badge-paramo">¿PÁRAMO?</span>' : ''}
+      </div>
+    </div>
+  `).join('');
+
+  // === SECCIÓN B: biopunk 2 variantes ===
+  // Fondo usado para la portada biopunk (el "páramo" candidato). Cambiar acá si se decide otro.
+  const BP_BG = './fondo-biopunk-1.jpg';
+  document.getElementById('bp-fname').textContent = BP_BG.replace('./','');
+
+  function portadaUI() {
+    return `
+      <div class="agentport-ui">
+        <div class="agentport-mark">
+          <div class="ico">${iconBiopunkSVG}</div>
+          <div class="name">Chagra<small>tu mano en el campo</small></div>
+        </div>
+        <div class="agentport-hummer">${hummerSVG}</div>
+        <div class="agentport-greet">
+          <div class="hi">Buenos días.<br><b>Soy Chagra.</b></div>
+          <div class="sub">Pregúntame sobre tu cultivo…</div>
+          <div class="agentport-chips"><span>¿Qué siembro?</span><span>Plagas</span><span>Clima</span></div>
+          <div class="agentport-composer">
+            <div class="a">Ⓐ</div>
+            <div class="ph">Pregúntale a Chagra…</div>
+            <div class="ic">📷 📎 🎤 ⬆</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  const gb = document.getElementById('grid-bp');
+  gb.innerHTML = `
+    <div class="bp-card">
+      <div class="bp-head"><span class="v">VARIANTE 1 · REEMPLAZA</span><span class="vsub">imagen como fondo, sin grafo</span></div>
+      <div class="agentport">
+        <div class="agentport-photo" style="background-image:url('${BP_BG}')"></div>
+        ${portadaUI()}
+      </div>
+    </div>
+    <div class="bp-card">
+      <div class="bp-head"><span class="v">VARIANTE 2 · DETRÁS</span><span class="vsub">imagen oscurecida + grafo eléctrico encima</span></div>
+      <div class="agentport">
+        <div class="agentport-photo dim" style="background-image:url('${BP_BG}')"></div>
+        <div class="agentport-void"></div>
+        <div class="agentport-grid"></div>
+        ${netSVG}
+        ${rootsSVG}
+        ${portadaUI()}
+      </div>
+    </div>
+  `;
+</script>
+</body>
+</html>
