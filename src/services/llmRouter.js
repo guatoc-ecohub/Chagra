@@ -92,7 +92,11 @@ export const ROUTES = {
       'granite3.1-dense:8b',
     keep_alive_min: 30,
     temperature: 0.3,
-    max_tokens: 512,
+    // 2026-06-06: 512→768. Fuga real (interacción operador): respuesta de
+    // siembra cortada a media frase ("…riego regular para") porque una lista
+    // de 5 especies con descripción supera 512 tokens. Intelligence-first:
+    // no truncar el consejo agronómico por ahorrar tokens.
+    max_tokens: 768,
     // BUG A fix (2026-05-30): corta turnos falsos "Usuario:"/"Asistente:".
     stop: CHAT_STOP_SEQUENCES,
     url: '/api/ollama/v1/chat/completions',
@@ -122,7 +126,10 @@ export const ROUTES = {
       'granite3.1-dense:8b',
     keep_alive_min: 5,
     temperature: 0.3,
-    max_tokens: 768,
+    // 2026-06-06: 768→1024. Las queries complejas (planes multi-cultivo,
+    // asocios, enumeraciones con descripción) son justo las que más se
+    // truncaban. Intelligence-first sobre latencia.
+    max_tokens: 1024,
     // BUG A fix (2026-05-30): corta turnos falsos "Usuario:"/"Asistente:".
     stop: CHAT_STOP_SEQUENCES,
     url: '/api/ollama/v1/chat/completions',

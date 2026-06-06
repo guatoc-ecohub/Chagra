@@ -25,6 +25,17 @@ describe('ROUTES y getModelFor', () => {
     }
   });
 
+  it('REGRESIÓN truncamiento (2026-06-06): el cap de chat no baja del piso que evita cortar a media frase', () => {
+    // Fuga real (interacción operador): respuesta de siembra cortada en
+    // "…riego regular para" porque una lista de 5 especies con descripción
+    // supera 512 tokens. Piso defensivo: que un futuro tuning de latencia no
+    // reviva el truncamiento. Subir es libre; bajar de esto NO.
+    expect(ROUTES.chat.max_tokens).toBeGreaterThanOrEqual(768);
+    expect(ROUTES.chat_complex.max_tokens).toBeGreaterThanOrEqual(1024);
+    // chat_complex debe dar MÁS techo que chat (queries más estructuradas).
+    expect(ROUTES.chat_complex.max_tokens).toBeGreaterThanOrEqual(ROUTES.chat.max_tokens);
+  });
+
   it('getModelFor devuelve la ruta de una tarea válida', () => {
     const route = getModelFor('chat');
     expect(route).toBe(ROUTES.chat);
