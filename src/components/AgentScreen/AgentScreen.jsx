@@ -76,7 +76,7 @@ import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../
 import { getCurrentTier } from '../../services/tierService';
 import DeepResearchCard from '../DeepResearchCard';
 import { buildProfileContext, normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, generateViabilityRules, generateAgronomicGuidanceRules, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildSuggestedEntitiesContext, isLowConfidenceEntity } from '../../services/agentService';
-import { applyOutputGuards, applyTaxonomyGuard, classifyQueryIntent } from '../../services/outputGuards';
+import { applyOutputGuards, classifyQueryIntent } from '../../services/outputGuards';
 import { getProfile } from '../../services/userProfileService';
 import { regionFromProfile, getEnsoOutlook } from '../../services/ensoContext';
 // SALUDO PROACTIVO (#162 alertas + #298 tareas + #331 análisis): el agente, de
@@ -1820,30 +1820,13 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
       if (guarded.modified) {
         console.debug('[guards] salida corregida', { reasons: guarded.reasons });
       }
-      // A24 — guard ASYNC anti-alucinación taxonómica: valida binomios Linneanos
-      // del texto contra el catálogo vía `validate_taxonomy`. Solo corrige cuando
-      // el tool confirma explícitamente `valid:false`; ante tool caído / offline /
-      // flag off → no-op (conservador, no rompe respuestas correctas). Corre AQUÍ
-      // (después de applyOutputGuards, antes de postValidate) para que la
-      // corrección quede en la respuesta final que se persiste y se muestra.
+      // A24 (guard ASYNC taxonómico) se REMOVIÓ 2026-06-06: estaba muerto en
+      // producción —filtraba por `res.valid===false` pero el tool real
+      // `validate_taxonomy` devuelve `{found,source,canonical_*}` y nunca
+      // `valid`—. La cobertura taxonómica la dan los guards síncronos de
+      // applyOutputGuards (#1332 binomio benéfico + 5/5b sustitución/companion)
+      // y el grounding de resolve-entities. Ver outputGuards.js.
       let response = guarded.text;
-      let taxonomyModified = false;
-      if (isOnline && isSidecarEnabled()) {
-        try {
-          const taxResult = await applyTaxonomyGuard(response, {
-            callTool,
-            resolvedEntities,
-          });
-          if (taxResult.modified) {
-            response = taxResult.text;
-            taxonomyModified = true;
-            console.debug('[guards] taxonomía corregida', { reason: taxResult.reason });
-          }
-        } catch (taxErr) {
-          // Jamás bloquea el chat — la respuesta ya está disponible.
-          console.debug('[guards] taxonomy-guard fail (sigo sin corrección):', taxErr?.message);
-        }
-      }
       agentSounds.chime();
 
       const { intent } = parseIntent(text);
@@ -1872,7 +1855,7 @@ Usa esta referencia para informar tu respuesta, pero RESPONDE SOLO a lo que el u
         ...sourceMetadata,
         ...evidenceSourceLink,
         ...groundingBadges,
-        auto_corrected: guarded.modified === true || taxonomyModified === true,
+        auto_corrected: guarded.modified === true,
       };
 
       // Capa 2 anti-alucinación — cross-check de contexto (operador 2026-05-30).
