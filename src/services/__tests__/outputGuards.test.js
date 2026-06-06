@@ -335,6 +335,20 @@ describe('guardSyntheticAgrochemical', () => {
       const out = guardSyntheticAgrochemical('No te recomiendo abamectina; mejor manejo biológico con Encarsia.');
       expect(out.reason || '').not.toMatch(/suprimido/i);
     });
+
+    it('FUGA prod 2026-06-06: "Control químico: Aplica acetamiprid o imidacloprid" (SIN dosis) → SUPRIME', () => {
+      // Interacción real del operador: el agente recomendó neonicotinoides por
+      // nombre, sin dosis ni marca. La nota anexa NO basta — nombrar el activo en
+      // una recomendación ya es el daño. Debe suprimirse el cuerpo.
+      const out = guardSyntheticAgrochemical(
+        'Para controlar el pulgón:\n2. **Control químico**: Aplica insecticidas específicos para pulgones, como acetamiprid o imidacloprid, siguiendo las instrucciones del fabricante.',
+      );
+      expect(out.modified).toBe(true);
+      expect(out.reason).toMatch(/suprimido/i);
+      expect(out.text).not.toMatch(/imidacloprid/i);
+      expect(out.text).not.toMatch(/acetamiprid/i);
+      expect(out.text).toMatch(/agroecológico/i);
+    });
   });
 });
 

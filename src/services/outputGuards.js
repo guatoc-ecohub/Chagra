@@ -672,6 +672,28 @@ const PESTICIDE_DOSE_PATTERNS = [
 ];
 
 /**
+ * Verbos/giros de RECOMENDACIÓN o APLICACIÓN que, junto a un PESTICIDA sintético
+ * NOMBRADO (hit del denylist), delatan que el modelo lo está RECETANDO — no
+ * mencionándolo de pasada ni desaconsejándolo. Cubren el fraseo real de prod
+ * ("Control químico: Aplica insecticidas específicos... como acetamiprid o
+ * imidacloprid"). Nombrar el activo ya es la fuga: el campesino lee "aplica
+ * imidacloprid" aunque no venga dosis. El gate `esAdvertenciaNoUsar` (arriba) ya
+ * excluye "no/nunca uses/recomiendes X", así que esto NO sobre-suprime
+ * advertencias. Sobre texto normalizado sin tildes.
+ */
+const PESTICIDE_RECOMMEND_PATTERNS = [
+  // "Control químico:" como sección/opción (el fraseo exacto de la fuga prod).
+  /\bcontrol\s+quimic\w*\b/,
+  // "insecticida(s) específico(s)/sistémico(s)/químico(s)/de síntesis" — recomendar la CLASE.
+  /\binsecticidas?\s+(especific\w*|sistemic\w*|quimic\w*|de\s+sintesis)\b/,
+  // IMPERATIVO de aplicación dirigido al usuario (no el descriptivo "algunos usan").
+  // OJO: `recomiend\w*`/`usa\w*` se EXCLUYEN a propósito: "algunos usan glifosato"
+  // y "no te recomiendo abamectina" NO son recomendaciones (falsos positivos).
+  /\b(aplica|aplique|apliquen|fumiga|fumigue|fumiguen|asperja|asperje)\b/,
+  /\bpuedes?\s+(usar|aplicar|fumigar|asperjar)\b/,
+];
+
+/**
  * ¿El texto normalizado recomienda un PESTICIDA de síntesis CON una marca comercial o
  * una dosis de aplicación? Esa conjunción (i.a. sintético + marca/dosis) delata una
  * RECOMENDACIÓN concreta de químico que debe SUPRIMIRSE, no solo anexarse.
@@ -702,7 +724,15 @@ function _hasSyntheticPesticideBrandOrDose(norm, hits) {
   // (b) ¿hay una marca comercial o una dosis de aplicación cerca?
   const hasBrand = PESTICIDE_BRAND_PATTERNS.some((re) => re.test(norm));
   const hasDose = PESTICIDE_DOSE_PATTERNS.some((re) => re.test(norm)) || DOSE_PATTERNS.some((re) => re.test(norm));
-  return hasBrand || hasDose;
+  // (c) FUGA real prod 2026-06-06 (interacción operador: "Control químico: Aplica
+  // insecticidas específicos para pulgones, como acetamiprid o imidacloprid").
+  // NOMBRAR un neonicotinoide/sintético como RECOMENDACIÓN ya es el daño — el
+  // campesino lee "aplica imidacloprid" aunque no haya marca ni dosis, y la nota
+  // anexa NO basta. Si hay un verbo de aplicación/recomendación (y NO es la
+  // advertencia de no-usar, ya descartada arriba) → SUPRIMIR. El gate
+  // `esAdvertenciaNoUsar` + el requisito de hit-pesticida evitan sobre-supresión.
+  const esRecomendacion = PESTICIDE_RECOMMEND_PATTERNS.some((re) => re.test(norm));
+  return hasBrand || hasDose || esRecomendacion;
 }
 
 // ── PATRÓN (b) BORDE-020: combustible/solvente disfrazado de "adyuvante" ─────
