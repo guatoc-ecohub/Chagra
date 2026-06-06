@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Mic, Square, Camera, Paperclip, ArrowUp, X } from 'lucide-react';
-import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { captureAndCompress } from '../../services/photoService';
 import { isAnalyzableImageAttachment } from '../../services/agentOutboxAttachment';
@@ -8,95 +7,206 @@ import useAgentOutboxStore from '../../store/useAgentOutboxStore';
 import { agentSounds } from '../../services/agentSoundService';
 import { AGENT_HERO_CHIPS } from '../../data/exampleQuestions';
 import { useTheme } from '../../hooks/useTheme';
-
-// 2026-05-28: el R3F (ChagraAgentAvatarColibri3D) fue retirado del flujo.
-// Operador: "no me gusta nada y desatina con todo lo que ya está".
-// El wrapper ChagraAgentAvatar ya delega al avatar correcto según la
-// preferencia del usuario (foto-realista / SVG / maíz), así que el
-// dashboard simplemente lo monta y se ahorra ~600KB del bundle de three+R3F.
+import { getProfile, saveProfile } from '../../services/userProfileService';
 
 /**
  * AgentHero — la PORTADA INMERSIVA del agente Chagra, PRIMERA PANTALLA COMPLETA
- * del home (≈100dvh), portada 1:1 del layout de los demos de diseño del
- * operador (oracle-lab `demo-agente*.html`).
+ * del home (≈100dvh). Es el PORT FIEL 1:1 del diseño del operador en oracle-lab
+ * (`demo-agente.html` / `demo-agente-biopunk.html` / `demo-agente-minimalista.html`).
  *
- * Rediseño 2026-06-06 (quinto intento — los anteriores solo lograban el ESTILO
- * pero conservaban el layout-widget del dashboard). Ahora se porta el LAYOUT
- * INMERSIVO vertical completo del demo, no solo los tokens:
+ * ─────────────────────────────────────────────────────────────────────────────
+ * PORT FIEL 2026-06-06 (instrucciones exactas del operador, vía screenshots en
+ * vivo). Reemplaza la portada "aproximada" anterior (avatar 3D + halo conic que
+ * el operador rechazó ~6 veces). Esta versión porta el demo a la letra:
  *
- *   ┌─────────────────────────────────────────┐
- *   │  Tema: ⬡ Nature  ⬡ Bio-punk  ⬡ Minimal   │ ← pills de TEMA (cablean useTheme)
- *   │                                          │
- *   │            ☀ (resplandor sol)            │ ← escena ambiente (flex-1, respira)
- *   │              🐦 avatar GRANDE             │   sol radial + colibrí + polen
- *   │            · polen flotante ·            │
- *   │                                          │
- *   │  Buenos días.                            │ ← saludo grande
- *   │  Soy Chagra.                             │
- *   │  Pregúntame sobre tu cultivo…            │
- *   │  [¿Qué siembro?] [Plagas] [Clima]        │ ← chips
- *   │  ╭─────────────────────────────────────╮ │
- *   │  │ Pregúntale a Chagra…                │ │ ← compositor pill ANCLADO abajo
- *   │  │ 🍃 📎          🎤  ⬆                 │ │
- *   │  ╰─────────────────────────────────────╯ │
- *   └─────────────────────────────────────────┘
+ *   ┌─────────────────────────────────────────────┐
+ *   │  ⬡ Chagra              [🌾 Campesino|🔬 Exp] │ ← marca (ícono del tema +
+ *   │     tu mano en el campo                      │   wordmark) · toggle nivel
+ *   │                                              │
+ *   │            ☀ (sol)         🐦 colibrí 2D     │ ← ESCENA por tema:
+ *   │         ╱╲    ╱╲   ╱╲                         │   nature: sol+montañas+colibrí
+ *   │     ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔  (montañas 3 capas)       │   biopunk: red/grafo eléctrico
+ *   │                                              │   minimal: sobrio + toque verde
+ *   │  Buenos días.                                │ ← saludo (cambia con el toggle:
+ *   │  Soy Chagra.                                 │   campesino "Buenos días" /
+ *   │  Pregúntame sobre tu cultivo…                │   experto "Hola")
+ *   │  [¿Qué siembro?] [Plagas] [Clima]            │ ← chips
+ *   │  ╭───────────────────────────────────────╮  │
+ *   │  │ Pregúntale a Chagra…                  │  │ ← compositor pill anclado
+ *   │  │ Ⓐ            📷 📎      🎤  ⬆          │  │   Ⓐ (izq) abre el menú de
+ *   │  ╰───────────────────────────────────────╯  │   capacidades (bottom-sheet)
+ *   └─────────────────────────────────────────────┘
  *
- * Las pills de tema cambian el tema DE VERDAD (useTheme().setTheme): bio-punk
- * (default, oscuro) / nature (cálido ocre) / minimalista (claro verde). Los
- * tres acentos (teal / ocre / verde) salen exactos de --t-accent-rgb (themes.css)
- * y las superficies de --c-* (index.css).
+ * QUÉ ES FIEL AL DEMO:
+ *   - Escena nature: sol radial + montañas en 3 capas (paths exactos del demo,
+ *     fill #cbb992/#a98f64/#7d6a45) + polen + colibrí 2D (SVG del demo, ocre/teal).
+ *   - Escena biopunk: void + grid de circuito + grafo VIVO (aristas que se
+ *     "cablean", nodos que pulsan, corriente/sparks) + micelio/raíces + esporas
+ *     + colibrí 2D. TODO portado del demo biopunk.
+ *   - Escena minimal: trazo botánico monoline que se dibuja + horizonte fino +
+ *     un toque verde tenue (sobrio, sin montañas ni grafo).
+ *   - El colibrí 2D vuela en los TRES temas.
+ *   - Ícono del tema (THEMES[tema].icon del demo) en la marca y en el botón Ⓐ.
+ *   - Toggle Campesino/Experto cableado al motor REAL `nivel_respuestas`
+ *     (simple/detallado en userProfileService) — mueve el perfil de verdad y
+ *     cambia el saludo, como el demo (COPY.campesino/experto).
+ *   - Botón Ⓐ a la izquierda del compositor abre un bottom-sheet (.sheet del
+ *     demo) con TODAS las capacidades reales de Chagra, cada una con su routing.
  *
- * El toggle "Campesino/Experto" del demo se OMITE: la feature real equivalente
- * (`nivel_respuestas` simple/detallado) vive en el onboarding/perfil y cambia
- * el system-prompt del LLM, no es un toggle de pantalla. Meter aquí un toggle
- * suelto sería UI muerta o duplicaría el ajuste del perfil — se deja donde
- * pertenece (Perfil → personalización).
+ * QUÉ NO SE PORTÓ (y por qué, honesto):
+ *   - El avatar 3D (ChagraAgentAvatar) + halo conic: ELIMINADOS por orden del
+ *     operador ("menos es más"). El protagonista es el colibrí 2D + el sol.
+ *   - Las burbujas de conversación de ejemplo del demo (.thread con respuestas
+ *     groundeadas hardcodeadas): el demo las simula; aquí el chat REAL vive en
+ *     AgentScreen. Tocar Ⓐ→capacidad o escribir/enviar lleva al chat real.
  *
- * El WIRING multimodal se conserva intacto (era inviolable):
- *  - <textarea> auto-grow (Enter=enviar, Shift+Enter=nueva línea).
- *  - 🎤 micrófono → graba audio (useVoiceRecorder + flujo whisper del agente).
- *  - 📷 cámara/foto → toma o elige foto (photoService + visión en el agente).
- *  - 📎 adjuntar → file picker (solo imágenes — B2).
- *  - ⬆️ enviar.
+ * WIRING multimodal conservado intacto (era inviolable):
+ *   - <textarea> auto-grow (Enter=enviar, Shift+Enter=nueva línea).
+ *   - 🎤 micrófono → graba audio (useVoiceRecorder + flujo whisper del agente).
+ *   - 📷 cámara/foto → toma o elige foto (photoService + visión en el agente).
+ *   - 📎 adjuntar → file picker (solo imágenes — B2).
+ *   - ⬆️ enviar. Al enviar: PERSISTE en la outbox durable (IndexedDB) ANTES de
+ *     navegar. Cero pérdida de datos (ver agentOutboxService).
  *
- * Al enviar: el item se PERSISTE en la outbox durable (IndexedDB) ANTES de
- * navegar. El AgentScreen lo consume como burbuja "ya enviada" y arranca a
- * procesar (texto→LLM, audio→transcribe, foto→visión). Si el usuario da
- * "atrás" o cierra la app a mitad → al volver el item sigue ahí y no se pierde
- * ni se duplica (ver agentOutboxService).
- *
- * Respeta prefers-reduced-motion para la transición de envío y las animaciones
- * ambientales (sol, polen, colibrí, halo).
+ * Respeta prefers-reduced-motion para todas las animaciones ambientales (sol,
+ * polen, colibrí, grafo, sparks, trazo) y la transición de envío.
  */
 
-// Saludos por hora del día (el demo abre con "Buenos días. Soy Chagra.").
-function greetingForNow() {
+// ─────────────────────────────────────────────────────────────────────────────
+// ÍCONOS DEL TEMA — los 3 SVG (versión marca) de los demos. El ícono Ⓐ del botón
+// y de la marca cambian con el tema. Tomados 1:1 de THEMES[tema].icon (demo
+// nature) / ICON_BIOPUNK (demo biopunk) / ICON.mark (demo minimalista). `auto`
+// reusa el ícono de su estética base (biopunk).
+const THEME_ICON = {
+    // Nature — manos + frailejón (Espeletia), acento tierra.
+    nature: (
+        <svg viewBox="0 0 120 120" fill="none" width="100%" height="100%" aria-hidden="true">
+            <path d="M18 100 Q38 78 60 88 Q82 78 102 100" stroke="#a8612f" strokeWidth="9" fill="none" strokeLinecap="round" />
+            <line x1="60" y1="88" x2="60" y2="56" stroke="#7a8f4a" strokeWidth="8" strokeLinecap="round" />
+            <path d="M60 64 q-16 -3 -20 -13 q15 -2 20 7 z" fill="#9cb06a" />
+            <path d="M60 64 q16 -3 20 -13 q-15 -2 -20 7 z" fill="#9cb06a" />
+            <g fill="#f5b733">
+                <circle cx="60" cy="36" r="8" /><circle cx="72" cy="36" r="8" /><circle cx="48" cy="36" r="8" />
+                <circle cx="60" cy="25" r="8" /><circle cx="60" cy="47" r="8" />
+            </g>
+            <circle cx="60" cy="36" r="6.5" fill="#d9742a" />
+        </svg>
+    ),
+    // Bio-punk — anillo eléctrico + A (azadón + rama) + travesaño zigzag.
+    biopunk: (
+        <svg viewBox="0 0 120 120" fill="none" width="100%" height="100%" aria-hidden="true">
+            <circle cx="60" cy="60" r="50" stroke="#19c79a" strokeWidth="7" />
+            <line x1="60" y1="24" x2="34" y2="96" stroke="#f0a060" strokeWidth="9" strokeLinecap="round" />
+            <line x1="60" y1="24" x2="86" y2="96" stroke="#3be8a6" strokeWidth="9" strokeLinecap="round" />
+            <path d="M44 66 L52 60 L60 66 L68 60 L76 67" stroke="#19c79a" strokeWidth="7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+    ),
+    // Minimalista — círculo + brote-horqueta monoline, acento verde sobrio.
+    minimalista: (
+        <svg viewBox="0 0 120 120" fill="none" width="100%" height="100%" aria-hidden="true">
+            <circle cx="60" cy="60" r="46" fill="none" stroke="#2b2b2b" strokeWidth="7" />
+            <path d="M60 90 V58 M60 58 L44 40 M60 58 L76 40" fill="none" stroke="#2b2b2b" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="44" cy="40" r="7" fill="#19a585" /><circle cx="76" cy="40" r="7" fill="#19a585" />
+        </svg>
+    ),
+};
+
+// Resuelve el ícono efectivo del tema (con fallback para `auto`/desconocidos).
+// `auto` cae al ícono biopunk (su estética base / default de la app).
+function iconForTheme(theme) {
+    return THEME_ICON[theme] || THEME_ICON.biopunk;
+}
+
+// Saludos por hora del día. En modo "experto" (nivel detallado) el demo abre
+// con "Hola." en vez de "Buenos días." (COPY.experto.greetHi). Replicamos.
+function greetingForNow(nivel) {
+    if (nivel === 'detallado') return 'Hola.';
     const h = typeof Date !== 'undefined' ? new Date().getHours() : 9;
     if (h < 12) return 'Buenos días.';
     if (h < 19) return 'Buenas tardes.';
     return 'Buenas noches.';
 }
 
-const TIPS = [
-    'Pregúntame sobre tu cultivo, las plagas, el clima o los precios. Hablo claro, como en el campo.',
-    'Escribe, habla o muéstrame una foto de tu planta.',
-    'Tomo foto, escucho y recuerdo lo que me dices.',
-    'Pregúntame en voz: te entiendo con tu acento.',
-];
+// Subtítulo bajo el saludo — campesino vs experto, copy del demo
+// (COPY.campesino.greetSub / COPY.experto.greetSub), castellanizado.
+const SUB_CAMPESINO = 'Pregúntame sobre tu cultivo, las plagas, el clima o los precios. Hablo claro, como en el campo.';
+const SUB_EXPERTO = 'Asistente agroecológico con grounding. Cada respuesta cita su fuente; puedes pedirle "cómo lo sé" para ver la herramienta y los parámetros.';
 
-// Fuente única de los chips del home. Importada del módulo de datos compartido
-// para que el test del punto de acceso #1 los cubra sin exportar constantes
-// desde un componente (regla react-refresh/only-export-components).
+// Fuente única de los chips del home (compartida con el test del punto de
+// acceso #1, regla react-refresh/only-export-components).
 const QUICK_CHIPS = AGENT_HERO_CHIPS;
 
-// Pills de TEMA visibles en la cabecera de la portada — réplica del switcher
-// de tema del demo (.themebar). Son los 3 temas VISUALES (no `auto`, que no es
-// una estética sino una regla día/noche). Cada uno cablea useTheme().setTheme.
-// El swatch usa los colores característicos del tema (mismos que ThemeSelector).
-const THEME_PILLS = [
-    { id: 'nature', label: 'Nature', swatch: ['#d98a4f', '#7a8f4a'] },
-    { id: 'biopunk', label: 'Bio-punk', swatch: ['#19c79a', '#3be8a6'] },
-    { id: 'minimalista', label: 'Minimal', swatch: ['#2f6e5a', '#878d86'] },
+/**
+ * CAPACIDADES de Chagra para el menú Ⓐ (bottom-sheet .sheet del demo).
+ *
+ * Son las capacidades REALES de la app — derivadas de los chips del home
+ * (AGENT_HERO_CHIPS), de lo que el agente SÍ sabe hacer (HelpAgentSection) y de
+ * las tools del catálogo. Cada una declara su `route`:
+ *   - kind 'ask'   → envía un prompt por la outbox real → AgentScreen (mismo
+ *                    camino que escribir/enviar). Es lo que el demo simula.
+ *   - kind 'nav'   → navega a una pantalla dedicada existente (voz, activos…).
+ *   - kind 'photo' → abre el selector de foto del compositor (visión del agente).
+ *
+ * El operador pidió incluir explícitamente "agregar planta por voz o foto".
+ * `tool` es la etiqueta técnica (visible en modo experto), igual que el demo.
+ */
+const CAPABILITIES = [
+    {
+        id: 'siembra', icon: '🌱',
+        title: '¿Qué siembro?',
+        desc: 'Qué sembrar según tu clima y tu altura.',
+        tool: 'get_species',
+        route: { kind: 'ask', prompt: '¿Qué puedo sembrar este mes en mi zona?' },
+    },
+    {
+        id: 'plaga', icon: '🐛',
+        title: 'Plaga',
+        desc: 'Controlar una plaga sin veneno.',
+        tool: 'get_pest_controllers',
+        route: { kind: 'ask', prompt: '¿Cómo controlo plagas sin químicos?' },
+    },
+    {
+        id: 'bio', icon: '🧪',
+        title: 'Biopreparado',
+        desc: 'Receta casera para fortalecer tu cultivo.',
+        tool: 'get_biopreparados',
+        route: { kind: 'ask', prompt: '¿Cómo hago un biopreparado para fortalecer mis matas?' },
+    },
+    {
+        id: 'foto', icon: '📷',
+        title: 'Agregar planta por foto',
+        desc: 'Tómale una foto y la identifico y registro.',
+        tool: 'vision_identify',
+        route: { kind: 'photo' },
+    },
+    {
+        id: 'voz', icon: '🎤',
+        title: 'Agregar planta por voz',
+        desc: 'Dime qué sembraste y lo registro en tu finca.',
+        tool: 'voice_capture',
+        route: { kind: 'nav', view: 'voz' },
+    },
+    {
+        id: 'clima', icon: '🌦️',
+        title: 'Clima',
+        desc: 'El clima de tu finca esta semana.',
+        tool: 'get_clima',
+        route: { kind: 'ask', prompt: 'Dame el reporte del clima de mi zona esta semana.' },
+    },
+    {
+        id: 'cal', icon: '📅',
+        title: 'Calendario',
+        desc: 'Cuándo sembrar y cuándo cosechar.',
+        tool: 'get_calendario',
+        route: { kind: 'ask', prompt: '¿Cuándo siembro y cuándo cosecho en mi zona?' },
+    },
+    {
+        id: 'plantas', icon: '🌿',
+        title: 'Mis plantas',
+        desc: 'Ver y manejar lo que tienes en la finca.',
+        tool: 'assets',
+        route: { kind: 'nav', view: 'activos' },
+    },
 ];
 
 function prefersReducedMotion() {
@@ -105,36 +215,38 @@ function prefersReducedMotion() {
         : false;
 }
 
-// Duración de la transición premium de envío (shimmer + lift del compositor +
-// avatar 'thinking') antes de montar el AgentScreen. 2026-05-31 el operador
-// reportó que 280ms se sentía brusco/apurado — lo subimos a 520ms con easing
-// suave para que se perciba especial, no atropellado. Bajo reduced-motion el
-// retardo es 0 (navega de inmediato, sin animación). Exportado para tests.
+// Duración de la transición premium de envío (shimmer + lift del compositor)
+// antes de montar el AgentScreen. 520ms con easing suave (operador 2026-05-31:
+// 280ms se sentía brusco). Bajo reduced-motion el retardo es 0. Exportado para
+// tests.
 export const SEND_TRANSITION_MS = 520;
 
 export default function AgentHero({ onNavigate }) {
-    const [tipIndex, setTipIndex] = useState(0);
     const [text, setText] = useState('');
-    // Adjunto en staging (SIEMPRE una foto) antes de enviar. { blob, mime,
-    // fileName, previewUrl, kind: 'photo' }. B2 (2026-06-02): el agente solo
+    // Adjunto en staging (SIEMPRE una foto). B2 (2026-06-02): el agente solo
     // "ve" imágenes vía visión, así que el compositor solo acepta fotos.
     const [attachment, setAttachment] = useState(null);
-    // Aviso breve cuando el usuario intenta adjuntar algo que no es una imagen
-    // (algunos OS ignoran `accept="image/*"` y dejan elegir cualquier archivo).
     const [pickError, setPickError] = useState('');
     const [busy, setBusy] = useState(false);
-    // Fase de la transición de envío: 'idle' | 'sending'. En 'sending' el
-    // compositor hace un shimmer breve y el avatar pasa a 'thinking' antes de
-    // navegar — sensación de "lanzar" la consulta hacia el chat.
+    // Fase de la transición de envío: 'idle' | 'sending'.
     const [phase, setPhase] = useState('idle');
+    // Menú Ⓐ (bottom-sheet de capacidades). false=cerrado | true=abierto.
+    const [sheetOpen, setSheetOpen] = useState(false);
+    // Nivel de respuestas del perfil (campesino=simple / experto=detallado).
+    // Lo leemos del perfil real al montar; el toggle lo persiste de verdad.
+    const [nivel, setNivel] = useState(() => {
+        const v = getProfile()?.nivel_respuestas;
+        return v === 'detallado' ? 'detallado' : 'simple';
+    });
 
     const textareaRef = useRef(null);
     const cameraInputRef = useRef(null);
     const fileInputRef = useRef(null);
 
     // Sistema de temas REAL de la app (data-theme en <html>, persiste en
-    // localStorage). Las pills de la cabecera lo cablean en vivo.
-    const { theme, setTheme } = useTheme();
+    // localStorage). Aquí solo LEEMOS el tema para pintar el ícono de la marca
+    // y del botón Ⓐ; el switcher completo vive en Perfil → Apariencia.
+    const { theme } = useTheme();
 
     const sendToOutbox = useAgentOutboxStore((s) => s.send);
     const {
@@ -146,13 +258,6 @@ export default function AgentHero({ onNavigate }) {
         reset: resetRecord,
         error: recorderError,
     } = useVoiceRecorder();
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setTipIndex((i) => (i + 1) % TIPS.length);
-        }, 4500);
-        return () => clearInterval(interval);
-    }, []);
 
     // Limpia el ObjectURL del preview al desmontar o cambiar de adjunto.
     useEffect(() => {
@@ -169,11 +274,10 @@ export default function AgentHero({ onNavigate }) {
     };
 
     /**
-     * Navega al agente disparando una transición premium: el avatar pasa a
-     * 'thinking', el compositor hace un shimmer corto de "enviando" y luego
-     * monta el AgentScreen. Respeta reduced-motion (sin retardo de animación).
+     * Navega al agente con una transición premium (shimmer + lift del
+     * compositor). Respeta reduced-motion (sin retardo de animación).
      */
-    const launchToAgent = () => {
+    const launchToAgent = useCallback(() => {
         const reduce = prefersReducedMotion();
         setPhase('sending');
         try { agentSounds.start(); } catch { /* sonido opcional */ }
@@ -181,26 +285,20 @@ export default function AgentHero({ onNavigate }) {
         if (reduce) {
             go();
         } else {
-            // Retardo para que el shimmer del compositor + el lift + el avatar
-            // thinking se perciban completos antes del cambio de pantalla. A
-            // 520ms con easing suave la transición se siente premium y elegante,
-            // no apurada (operador 2026-05-31).
             window.setTimeout(go, SEND_TRANSITION_MS);
         }
-    };
+    }, [onNavigate]);
 
     /**
-     * Persiste la consulta en la outbox DURABLE y navega. El orden es estricto:
+     * Persiste la consulta en la outbox DURABLE y navega. Orden estricto:
      * (1) persistir → (2) navegar. Si la persistencia falla NO navegamos en
-     * silencio: dejamos el texto/adjunto en el compositor para que el usuario
-     * reintente (cero pérdida de datos).
+     * silencio: dejamos el texto/adjunto para reintentar (cero pérdida).
      */
     const send = async (payload) => {
         if (busy) return;
         setBusy(true);
         try {
             await sendToOutbox(payload);
-            // Limpiar el compositor solo tras confirmar persistencia.
             setText('');
             if (attachment?.previewUrl) URL.revokeObjectURL(attachment.previewUrl);
             setAttachment(null);
@@ -208,14 +306,12 @@ export default function AgentHero({ onNavigate }) {
         } catch (err) {
             console.error('[AgentHero] no se pudo guardar la consulta, no navego:', err);
             setBusy(false);
-            // El texto/adjunto permanecen — el usuario puede reintentar.
         }
     };
 
     const handleSendText = () => {
         const trimmed = text.trim();
         if (attachment) {
-            // Foto/archivo + caption opcional → un solo item multimodal.
             send({
                 kind: attachment.kind,
                 text: trimmed,
@@ -241,13 +337,41 @@ export default function AgentHero({ onNavigate }) {
         }
     };
 
-    // ── Micrófono ────────────────────────────────────────────────────────────
+    // ── Toggle Campesino/Experto → mueve nivel_respuestas DE VERDAD ───────────
+    // simple = Campesino · detallado = Experto. Persiste en el perfil (el mismo
+    // campo que lee buildUserProfileBlock para el system-prompt del LLM).
+    const setNivelRespuestas = (next) => {
+        if (next === nivel) return;
+        setNivel(next);
+        try { saveProfile({ nivel_respuestas: next }); } catch { /* perfil opcional */ }
+    };
+
+    // ── Menú Ⓐ (bottom-sheet de capacidades) ─────────────────────────────────
+    const toggleSheet = () => setSheetOpen((o) => !o);
+    const closeSheet = () => setSheetOpen(false);
+
+    // Despacha una capacidad del sheet a su routing real.
+    const pickCapability = (cap) => {
+        closeSheet();
+        const r = cap.route;
+        if (r.kind === 'ask') {
+            handleChipSend(r.prompt);
+        } else if (r.kind === 'nav') {
+            try { agentSounds.start(); } catch { /* opcional */ }
+            onNavigate?.(r.view);
+        } else if (r.kind === 'photo') {
+            // Abre el selector de foto del compositor (visión del agente). El
+            // usuario elige/toma la foto y la envía como item 'photo'.
+            cameraInputRef.current?.click();
+        }
+    };
+
+    // ── Micrófono ─────────────────────────────────────────────────────────────
     const handleMic = async () => {
         if (busy) return;
         if (isRecording) {
             const result = await stopRecord();
             if (result && result.blob) {
-                // El texto escrito (si lo hay) acompaña al audio como contexto.
                 send({
                     kind: 'voice',
                     text: text.trim(),
@@ -263,34 +387,24 @@ export default function AgentHero({ onNavigate }) {
         }
     };
 
-    // ── Cámara / foto ─────────────────────────────────────────────────────────
-    // B2 (2026-06-02): el agente SOLO "ve" imágenes (vía visión). El botón de
-    // adjuntar y el de cámara usan `accept="image/*"`, pero algunos sistemas
-    // operativos ignoran ese atributo y dejan elegir cualquier archivo. Por eso
-    // validamos también acá: si lo elegido NO es una imagen, NO lo dejamos en
-    // staging y avisamos claro y corto, en castellano colombiano. Reusamos
-    // `isAnalyzableImageAttachment` para clasificar igual que el agente.
-    const handlePhotoPick = async (e, kind) => {
+    // ── Cámara / foto ───────────────────────────────────────────────────────────
+    const handlePhotoPick = async (e) => {
         const file = e.target.files && e.target.files[0];
-        // Permitir re-seleccionar el mismo archivo después.
         e.target.value = '';
         if (!file) return;
         const looksLikeImage =
             (file.type && file.type.startsWith('image/')) ||
             isAnalyzableImageAttachment({ mime: file.type, fileName: file.name });
         if (!looksLikeImage) {
-            // No es una foto → rechazo claro, sin staging.
             setPickError('Por ahora solo puedo ver fotos. Mándame una foto de tu planta o cultivo.');
             return;
         }
         setPickError('');
         setBusy(true);
         try {
-            // Reusa la compresión/normalización HEIC→JPEG de photoService.
             const { blob, mime } = await captureAndCompress(file);
             const previewUrl = URL.createObjectURL(blob);
             setAttachment({ blob, mime, fileName: file.name || 'foto.jpg', previewUrl, kind: 'photo' });
-            // Devolver foco al textarea para que pueda escribir un caption.
             requestAnimationFrame(() => textareaRef.current?.focus());
         } catch (err) {
             console.error('[AgentHero] no se pudo procesar la foto:', err);
@@ -298,7 +412,6 @@ export default function AgentHero({ onNavigate }) {
         } finally {
             setBusy(false);
         }
-        void kind;
     };
 
     const clearAttachment = () => {
@@ -309,53 +422,44 @@ export default function AgentHero({ onNavigate }) {
 
     const canSend = !busy && (text.trim().length > 0 || Boolean(attachment));
     const recSeconds = Math.floor((durationMs || 0) / 1000);
-    // El avatar reacciona a la fase: 'thinking' al enviar o mientras graba.
-    const avatarState = phase === 'sending' || isRecording ? 'thinking' : 'idle';
+    const expertoActive = nivel === 'detallado';
 
     return (
         <section
             aria-label="Agente Chagra"
             className="agentport agentport-immersive relative w-full flex flex-col"
+            data-nivel={nivel}
         >
             <style>{`
                 /* ============================================================
-                   AgentHero — PORTADA INMERSIVA (port del LAYOUT de los demos
-                   oracle-lab demo-agente*.html). La estructura vertical y la
-                   "escena ambiente que respira" vienen 1:1 del demo:
-                     · cabecera con pills de TEMA           (.themebar)
-                     · escena ambiente (sol + colibrí + polen) detrás
-                     · zona-respiro flex-1 con el avatar grande centrado
-                     · saludo grande + subtítulo            (.greet)
-                     · fila de chips                        (.quickrow)
-                     · compositor pill anclado abajo        (.inputwrap/.bar)
-                   El acento (teal/ocre/verde) y las superficies (panel oscuro/
-                   crema/papel) salen de los tokens theme-aware ya existentes
-                   (--t-accent-rgb en themes.css, --c-* en index.css), así los
-                   3 temas coinciden con su demo respectivo sin parchar a mano.
+                   AgentHero — PORTADA INMERSIVA · PORT FIEL del demo del
+                   operador (oracle-lab demo-agente*.html). Estructura vertical
+                   1:1 del demo:
+                     · marca (ícono del tema + wordmark) + toggle Campesino/Exp
+                     · ESCENA ambiente por tema (detrás de todo):
+                         nature  → sol + montañas 3 capas + polen + colibrí 2D
+                         biopunk → void + grid + grafo vivo + raíces + colibrí
+                         minimal → trazo monoline + horizonte + toque verde
+                     · saludo grande + subtítulo (cambian con el toggle)
+                     · fila de chips
+                     · compositor pill anclado (Ⓐ izq · cámara/adjuntar · mic/▶)
+                   El acento (teal/ocre/verde) y las superficies salen de los
+                   tokens theme-aware (--t-accent-rgb, --c-*), así los 3 temas
+                   coinciden con su demo sin parchar a mano.
                    ============================================================ */
                 .agentport {
                     font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, 'Segoe UI', sans-serif;
-                    /* radio de la pill y de las tarjetas — valor del demo. El
-                       minimalista usa 22px (más sobrio); nature/biopunk 26px. */
                     --ap-r-grande: 26px;
                 }
                 [data-theme="minimalista"] .agentport { --ap-r-grande: 22px; }
 
-                /* Portada a pantalla completa: ocupa al menos el primer screenful
-                   (≈100dvh menos el alto del TopBar flotante). El resto del
-                   dashboard queda DEBAJO del fold y se llega scrolleando. */
                 .agentport-immersive {
-                    /* primera pantalla completa; el TopBar flota encima (overlay),
-                       así que la portada usa el alto completo del viewport. */
                     min-height: 100dvh;
                     padding: 0 16px 14px;
                     overflow: hidden; /* la escena ambiente no desborda el screenful */
                 }
 
-                /* ===== ESCENA AMBIENTE (detrás de todo, como en el demo) =====
-                   Sol radial arriba + glow del acento. Theme-aware vía el token
-                   --fx-glow-opacity (1 en biopunk, atenuado en claros) y el
-                   acento del tema. */
+                /* ===================== ESCENA AMBIENTE ===================== */
                 .agentport-scene {
                     position: absolute;
                     inset: 0;
@@ -363,69 +467,60 @@ export default function AgentHero({ onNavigate }) {
                     overflow: hidden;
                     pointer-events: none;
                 }
+
+                /* — SOL (nature) — radial cálido en la zona-respiro, respira.
+                   Solo nature. Posicionado bajo la marca, en el aire abierto
+                   de la escena (como el amanecer del demo), no tapado por el
+                   chrome del TopBar/marca. */
                 .agentport-sun {
                     position: absolute;
-                    top: 4%;
+                    top: 15%;
                     left: 50%;
                     transform: translateX(-50%);
-                    width: 280px;
-                    height: 280px;
+                    width: 240px;
+                    height: 240px;
                     border-radius: 50%;
                     background: radial-gradient(
                         circle,
-                        rgb(var(--t-accent-rgb) / 0.28) 0%,
-                        rgb(var(--t-accent-rgb) / 0.12) 38%,
-                        rgb(var(--t-accent-rgb) / 0) 70%
+                        rgba(255, 244, 214, 0.95) 0%,
+                        rgba(255, 230, 168, 0.55) 45%,
+                        rgba(255, 214, 140, 0) 72%
                     );
-                    filter: blur(2px);
+                    filter: blur(0.3px);
                     animation: agentport-sun-glow 9s ease-in-out infinite;
+                    display: none;
                 }
-                /* En temas claros el "sol" se ve más cálido/amplio (como el
-                   amanecer del demo nature/minimalista). */
-                [data-theme="nature"] .agentport-sun {
-                    background: radial-gradient(
-                        circle,
-                        rgba(255, 226, 160, 0.85) 0%,
-                        rgba(245, 200, 120, 0.45) 36%,
-                        rgba(245, 200, 120, 0) 70%
-                    );
-                }
-                [data-theme="minimalista"] .agentport-sun {
-                    background: radial-gradient(
-                        circle,
-                        rgba(47, 110, 90, 0.2) 0%,
-                        rgba(47, 110, 90, 0.08) 42%,
-                        rgba(47, 110, 90, 0) 72%
-                    );
-                    width: 320px;
-                    height: 320px;
-                }
-                /* Minimalista "un toque" (operador 2026-06-06): que no se vea TAN
-                   blanco. Wash sutil del acento verde abajo + hint arriba; el
-                   blanco-papel sigue dominando, solo deja de ser plano. */
-                [data-theme="minimalista"] .agentport-scene::after {
-                    content: '';
-                    position: absolute;
-                    inset: 0;
-                    background:
-                        radial-gradient(125% 62% at 50% 110%, rgba(47, 110, 90, 0.08) 0%, rgba(47, 110, 90, 0) 56%),
-                        linear-gradient(180deg, rgba(47, 110, 90, 0.035) 0%, rgba(47, 110, 90, 0) 34%);
-                    pointer-events: none;
-                }
+                [data-theme="nature"] .agentport-sun { display: block; }
                 @keyframes agentport-sun-glow {
-                    0%, 100% { opacity: 0.8; transform: translateX(-50%) scale(1); }
-                    50% { opacity: 1; transform: translateX(-50%) scale(1.06); }
+                    0%, 100% { opacity: 0.85; transform: translateX(-50%) scale(1); }
+                    50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
                 }
-                /* Partículas de polen flotando (réplica de .pollen del demo). */
+
+                /* — MONTAÑAS 3 capas (nature) — paths exactos del demo. La
+                   banda de silueta se ancla en el tercio inferior de la
+                   zona-respiro (bottom ~30%) para que las cumbres asomen sobre
+                   el saludo, como el horizonte del demo, en vez de quedar
+                   enterradas al fondo de la pantalla detrás del compositor. */
+                .agentport-mtn {
+                    position: absolute;
+                    left: 0; right: 0; bottom: 30%;
+                    height: 230px;
+                    display: none;
+                }
+                [data-theme="nature"] .agentport-mtn { display: block; }
+                .agentport-mtn svg { display: block; width: 100%; height: 100%; }
+
+                /* — POLEN (nature) — partículas flotando. */
                 .agentport-pollen {
                     position: absolute;
                     border-radius: 50%;
-                    background: rgb(var(--t-accent-rgb) / 0.7);
+                    background: rgba(255, 213, 128, 0.8);
                     filter: blur(0.4px);
                     animation: agentport-float-up linear infinite;
                     will-change: transform, opacity;
+                    display: none;
                 }
-                [data-theme="nature"] .agentport-pollen { background: rgba(255, 213, 128, 0.8); }
+                [data-theme="nature"] .agentport-pollen { display: block; }
                 @keyframes agentport-float-up {
                     0% { transform: translateY(20px) translateX(0); opacity: 0; }
                     12% { opacity: 0.9; }
@@ -434,122 +529,230 @@ export default function AgentHero({ onNavigate }) {
                     100% { transform: translateY(-120px) translateX(-4px); opacity: 0; }
                 }
 
-                /* ===== Cabecera: pills de TEMA (.themebar del demo) =====
-                   El padding-top deja pasar el TopBar flotante (~58px) +
-                   safe-area; así las pills no quedan bajo la identidad operador. */
-                .agentport-themebar {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    padding: calc(86px + env(safe-area-inset-top)) 0 6px;
-                    overflow-x: auto;
-                    scrollbar-width: none;
-                    flex: none;
+                /* ===== ESCENA BIO-PUNK: red viva (grafo eléctrico) ===== */
+                /* Toda la red bio-punk solo se ve en bio-punk (default theme,
+                   sin data-theme) — la ocultamos en nature/minimalista. */
+                .agentport-bp { display: block; }
+                [data-theme] .agentport-bp { display: none; }
+                [data-theme="biopunk"] .agentport-bp { display: block; }
+
+                /* base oscura con glow teal central + glow inferior (HYTA) */
+                .agentport-void {
+                    position: absolute; inset: 0;
+                    background:
+                        radial-gradient(120% 80% at 50% 8%, #0e2a2e 0%, #0b1a20 34%, #0a1118 56%, #0a0e14 100%),
+                        radial-gradient(80% 50% at 80% 90%, rgba(25,201,154,.10) 0%, transparent 60%);
                 }
-                .agentport-themebar::-webkit-scrollbar { display: none; }
-                .agentport-tlbl {
-                    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.14em;
-                    text-transform: uppercase; color: rgb(var(--c-slate-500));
-                    flex: none; padding-right: 2px;
+                /* malla / rejilla tenue de "circuito" */
+                .agentport-grid {
+                    position: absolute; inset: 0; opacity: .5;
+                    background-image:
+                        linear-gradient(rgba(25,201,154,.05) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(25,201,154,.05) 1px, transparent 1px);
+                    background-size: 34px 34px;
+                    -webkit-mask-image: radial-gradient(120% 90% at 50% 10%, #000 30%, transparent 78%);
+                            mask-image: radial-gradient(120% 90% at 50% 10%, #000 30%, transparent 78%);
                 }
-                .agentport-tpill {
-                    flex: none; display: inline-flex; align-items: center; gap: 7px;
-                    cursor: pointer;
-                    background: rgb(var(--c-surface-card) / 0.72);
-                    border: 1.5px solid rgb(var(--c-surface-border));
-                    border-radius: 18px;
-                    padding: 6px 12px 6px 9px;
-                    font-size: 0.78rem; font-weight: 700;
-                    color: rgb(var(--c-slate-300));
-                    white-space: nowrap;
-                    transition: border-color 0.3s cubic-bezier(0.22,0.61,0.36,1),
-                                color 0.25s ease, background 0.3s ease, transform 0.14s ease, box-shadow 0.3s ease;
-                    box-shadow: 0 2px 7px -6px rgba(0, 0, 0, 0.6);
+                /* SVG del grafo: aristas que se "cablean" + nodos + corriente */
+                .agentport-net { position: absolute; inset: 0; width: 100%; height: 100%; }
+                .agentport-net .edge {
+                    stroke: #19c79a; stroke-width: 1.4; fill: none; opacity: 0;
+                    stroke-dasharray: var(--len, 160); stroke-dashoffset: var(--len, 160);
+                    animation: agentport-wire 5.6s cubic-bezier(.22,.61,.36,1) infinite;
                 }
-                .agentport-tpill:active { transform: scale(0.95); }
-                .agentport-tpill.is-active {
-                    color: rgb(var(--c-slate-100));
-                    background: rgb(var(--c-surface-card));
-                    border-color: rgb(var(--t-accent-rgb));
-                    box-shadow: 0 4px 12px -5px rgb(var(--t-accent-rgb) / 0.7);
+                .agentport-net .edge.b { stroke: #3be8a6; }
+                @keyframes agentport-wire {
+                    0% { stroke-dashoffset: var(--len, 160); opacity: 0; }
+                    18% { opacity: .6; }
+                    55% { stroke-dashoffset: 0; opacity: .55; }
+                    80% { opacity: .22; }
+                    100% { stroke-dashoffset: 0; opacity: 0; }
                 }
-                .agentport-tsw { display: inline-flex; gap: 3px; flex: none; }
-                .agentport-tsw span {
-                    width: 9px; height: 9px; border-radius: 50%;
-                    border: 1px solid rgba(0, 0, 0, 0.18);
+                .agentport-net .node {
+                    fill: #19c79a; filter: drop-shadow(0 0 5px rgba(25,201,154,.9));
+                    animation: agentport-node-pulse 4.2s cubic-bezier(.22,.61,.36,1) infinite;
+                }
+                .agentport-net .node.br { fill: #3be8a6; }
+                .agentport-net .node.amber { fill: #f0a060; filter: drop-shadow(0 0 5px rgba(240,160,96,.8)); }
+                @keyframes agentport-node-pulse { 0%,100% { opacity: .35; r: 2.4; } 50% { opacity: 1; r: 3.4; } }
+                /* destellos de "corriente" que recorren aristas clave */
+                .agentport-net .spark { fill: #cffff2; filter: drop-shadow(0 0 6px #19f0c0); }
+                .agentport-net .spark.s1 { animation: agentport-run1 4.4s linear infinite; }
+                .agentport-net .spark.s2 { animation: agentport-run2 5.2s linear infinite; animation-delay: 1.1s; }
+                .agentport-net .spark.s3 { animation: agentport-run3 6s linear infinite; animation-delay: 2.3s; }
+                @keyframes agentport-run1 { 0% { transform: translate(60px,18px); opacity: 0; } 10% { opacity: 1; } 50% { transform: translate(30px,150px); opacity: 1; } 60% { opacity: 0; } 100% { opacity: 0; } }
+                @keyframes agentport-run2 { 0% { transform: translate(60px,18px); opacity: 0; } 12% { opacity: 1; } 50% { transform: translate(96px,150px); opacity: 1; } 62% { opacity: 0; } 100% { opacity: 0; } }
+                @keyframes agentport-run3 { 0% { transform: translate(330px,40px); opacity: 0; } 12% { opacity: 1; } 55% { transform: translate(250px,260px); opacity: 1; } 65% { opacity: 0; } 100% { opacity: 0; } }
+                /* esporas/datos que suben */
+                .agentport-spore {
+                    position: absolute; border-radius: 50%; background: rgba(25,240,192,.85);
+                    box-shadow: 0 0 8px 1px rgba(25,201,154,.7);
+                    animation: agentport-float-up-bp linear infinite; will-change: transform, opacity;
+                }
+                @keyframes agentport-float-up-bp {
+                    0% { transform: translateY(20px) translateX(0); opacity: 0; }
+                    12% { opacity: .95; }
+                    50% { transform: translateY(-60px) translateX(7px); opacity: .7; }
+                    88% { opacity: .4; }
+                    100% { transform: translateY(-140px) translateX(-5px); opacity: 0; }
+                }
+                /* raíces / micelio luminoso anclado abajo */
+                .agentport-roots { position: absolute; left: 0; right: 0; bottom: 0; height: 42%; }
+                .agentport-roots svg { position: absolute; bottom: 0; width: 100%; height: 100%; display: block; }
+                .agentport-roots .r {
+                    stroke: #13b893; fill: none; stroke-linecap: round; opacity: .5;
+                    filter: drop-shadow(0 0 4px rgba(25,201,154,.5));
                 }
 
-                /* ===== Zona-respiro: escena + avatar grande centrado ===== */
+                /* ===== ESCENA MINIMALISTA: trazo botánico + horizonte ===== */
+                .agentport-min { display: none; }
+                [data-theme="minimalista"] .agentport-min { display: block; }
+                /* toque verde tenue (sobrio) — sin montañas ni grafo */
+                [data-theme="minimalista"] .agentport-scene::after {
+                    content: '';
+                    position: absolute;
+                    inset: 0;
+                    background: radial-gradient(120% 60% at 50% 0%, rgba(47,110,90,0.07) 0%, transparent 60%);
+                }
+                .agentport-sprig {
+                    position: absolute; top: -8px; right: -14px; width: 180px; height: 180px;
+                    opacity: .5; color: #2f6e5a;
+                }
+                .agentport-sprig svg { width: 100%; height: 100%; display: block; }
+                .agentport-sprig path {
+                    stroke-dasharray: var(--len, 520); stroke-dashoffset: var(--len, 520);
+                    animation: agentport-draw 1.6s cubic-bezier(.16,.84,.3,1) .25s forwards;
+                }
+                @keyframes agentport-draw { to { stroke-dashoffset: 0; } }
+                .agentport-horizon {
+                    position: absolute; left: 0; right: 0; bottom: 96px; height: 1px;
+                    background: linear-gradient(90deg, transparent, #e3ddd0, transparent); opacity: .7;
+                }
+
+                /* ===== COLIBRÍ 2D — vuela en los 3 temas ===== */
+                /* El SVG base es ocre/teal (nature). En bio-punk recibe un glow
+                   neón vía drop-shadow; en minimal queda tenue/sobrio. */
+                .agentport-hummer {
+                    position: absolute; top: 28%; left: 16%; z-index: 2;
+                    animation: agentport-fly 18s cubic-bezier(.22,.61,.36,1) infinite;
+                    transform-origin: center; will-change: transform;
+                }
+                .agentport-hummer svg { display: block; filter: drop-shadow(0 6px 6px rgba(90,60,20,.18)); }
+                /* bio-punk = tema base (sin data-theme): glow neón teal */
+                .agentport-hummer svg { filter: drop-shadow(0 0 8px rgba(25,201,154,.7)) drop-shadow(0 0 16px rgba(25,240,192,.35)); }
+                [data-theme="nature"] .agentport-hummer svg { filter: drop-shadow(0 6px 6px rgba(90,60,20,.18)); }
+                [data-theme="minimalista"] .agentport-hummer { opacity: .85; }
+                [data-theme="minimalista"] .agentport-hummer svg { filter: drop-shadow(0 4px 5px rgba(31,36,33,.14)); }
+                .agentport-hummer .wing {
+                    transform-origin: 18px 26px;
+                    animation: agentport-flap .14s ease-in-out infinite alternate;
+                }
+                @keyframes agentport-flap {
+                    from { transform: rotate(-24deg) scaleY(1); }
+                    to { transform: rotate(18deg) scaleY(.72); }
+                }
+                @keyframes agentport-fly {
+                    0% { transform: translate(0,0) rotate(0deg); }
+                    18% { transform: translate(58px,-28px) rotate(-5deg); }
+                    38% { transform: translate(138px,8px) rotate(3.5deg); }
+                    54% { transform: translate(92px,48px) rotate(7deg); }
+                    74% { transform: translate(22px,20px) rotate(-2.5deg); }
+                    100% { transform: translate(0,0) rotate(0deg); }
+                }
+
+                /* ===================== MARCA + TOGGLE ===================== */
+                .agentport-topbar {
+                    position: relative;
+                    z-index: 2;
+                    display: flex;
+                    align-items: flex-start;
+                    justify-content: space-between;
+                    gap: 8px;
+                    padding: calc(86px + env(safe-area-inset-top)) 0 6px;
+                    flex: none;
+                }
+                .agentport-brand { display: flex; align-items: center; gap: 9px; min-width: 0; }
+                .agentport-mark {
+                    width: 34px; height: 34px; flex: none; display: inline-flex;
+                    filter: drop-shadow(0 2px 3px rgba(0,0,0,.25));
+                }
+                .agentport-mark svg { width: 100%; height: 100%; display: block; }
+                .agentport-name {
+                    font-weight: 800; font-size: 1.1rem; letter-spacing: -.01em;
+                    color: rgb(var(--c-slate-100)); line-height: 1.05;
+                }
+                .agentport-name small {
+                    display: block; font-weight: 600; font-size: .6rem; letter-spacing: .16em;
+                    text-transform: uppercase; color: rgb(var(--t-accent-rgb)); margin-top: -1px;
+                }
+                /* toggle Campesino | Experto (.modeToggle del demo) */
+                .agentport-mode {
+                    display: flex; flex: none;
+                    background: rgb(var(--c-surface-card) / 0.65);
+                    border: 1px solid rgb(var(--c-surface-border));
+                    border-radius: 22px; padding: 3px;
+                    backdrop-filter: blur(6px);
+                    box-shadow: 0 2px 8px -4px rgba(0,0,0,.35);
+                }
+                .agentport-mode button {
+                    border: none; background: transparent; font: inherit; cursor: pointer;
+                    font-size: .72rem; font-weight: 700; padding: 6px 10px; border-radius: 18px;
+                    color: rgb(var(--c-slate-400));
+                    display: flex; align-items: center; gap: 4px; white-space: nowrap;
+                    transition: background .3s cubic-bezier(.22,.61,.36,1), color .3s ease, transform .15s ease;
+                }
+                .agentport-mode button:active { transform: scale(.94); }
+                .agentport-mode button.is-active {
+                    background: rgb(var(--t-accent-rgb)); color: #fff;
+                    box-shadow: 0 3px 8px -3px rgb(var(--t-accent-rgb) / 0.6);
+                }
+                /* en bio-punk el acento es muy claro → tinta oscura legible */
+                [data-theme="biopunk"] .agentport-mode button.is-active { color: #04231b; }
+                .agentport:not([data-theme]) .agentport-mode button.is-active { color: #04231b; }
+
+                /* ===================== ZONA-RESPIRO ===================== */
+                /* Espacio "respiro" donde vive la escena (sol/montañas/grafo/
+                   colibrí). Sin avatar 3D: el protagonista es el colibrí 2D. */
                 .agentport-stage {
                     position: relative;
                     z-index: 1;
                     flex: 1 1 auto;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    min-height: 160px;
-                    padding: 8px 0;
-                }
-                .agentport-avatar-wrap {
-                    position: relative;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
+                    min-height: 180px;
                 }
 
-                /* ===== Saludo (.greet del demo) ===== */
+                /* ===================== SALUDO ===================== */
                 .agentport-greet {
-                    position: relative;
-                    z-index: 1;
-                    margin-bottom: 12px;
-                    flex: none;
+                    position: relative; z-index: 1; margin-bottom: 12px; flex: none;
                     animation: agentport-rise 0.8s cubic-bezier(0.16, 0.84, 0.3, 1) both;
                 }
                 .agentport-hi {
-                    font-size: 1.92rem;
-                    line-height: 1.12;
-                    font-weight: 800;
-                    letter-spacing: -0.02em;
-                    color: rgb(var(--c-slate-100));
+                    font-size: 1.92rem; line-height: 1.12; font-weight: 800;
+                    letter-spacing: -0.02em; color: rgb(var(--c-slate-100));
                 }
-                [data-theme="minimalista"] .agentport-hi {
-                    font-weight: 700;
-                    letter-spacing: -0.025em;
-                }
+                [data-theme="minimalista"] .agentport-hi { font-weight: 700; letter-spacing: -0.025em; }
+                .agentport-hi .chagra-wordmark { color: rgb(var(--t-accent-rgb)); }
                 .agentport-sub {
-                    margin-top: 8px;
-                    font-size: 1rem;
-                    line-height: 1.5;
-                    color: rgb(var(--c-slate-300));
-                    max-width: 34ch;
-                    transition: opacity 0.5s ease;
+                    margin-top: 8px; font-size: 1rem; line-height: 1.5;
+                    color: rgb(var(--c-slate-300)); max-width: 34ch;
+                    transition: opacity 0.4s ease;
                 }
+                [data-nivel="detallado"] .agentport-sub { font-size: 0.92rem; }
                 @keyframes agentport-rise {
                     from { opacity: 0; transform: translateY(18px); }
                     to { opacity: 1; transform: translateY(0); }
                 }
 
-                /* ===== Fila de chips (.quickrow del demo) ===== */
+                /* ===================== CHIPS ===================== */
                 .agentport-chiprow {
-                    position: relative;
-                    z-index: 1;
-                    display: flex;
-                    gap: 8px;
-                    overflow-x: auto;
-                    padding: 2px 0 12px;
-                    scrollbar-width: none;
-                    flex: none;
+                    position: relative; z-index: 1; display: flex; gap: 8px;
+                    overflow-x: auto; padding: 2px 0 12px; scrollbar-width: none; flex: none;
                 }
                 .agentport-chiprow::-webkit-scrollbar { display: none; }
                 .agentport-chip {
                     flex: none; display: inline-flex; align-items: center; gap: 7px;
-                    background: rgb(var(--c-surface-card));
-                    border: 1px solid rgb(var(--c-surface-border));
-                    border-radius: 18px;
-                    padding: 9px 13px;
-                    font-size: 0.85rem; font-weight: 600;
-                    color: rgb(var(--c-slate-100));
-                    white-space: nowrap; cursor: pointer;
+                    background: rgb(var(--c-surface-card)); border: 1px solid rgb(var(--c-surface-border));
+                    border-radius: 18px; padding: 9px 13px; font-size: 0.85rem; font-weight: 600;
+                    color: rgb(var(--c-slate-100)); white-space: nowrap; cursor: pointer;
                     box-shadow: 0 2px 7px -5px rgba(0, 0, 0, 0.4);
                     transition: transform 0.16s cubic-bezier(0.22, 0.61, 0.36, 1),
                                 box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
@@ -560,41 +763,25 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-chip:disabled { opacity: 0.5; cursor: not-allowed; }
                 .agentport-chip-e { font-size: 1.05rem; line-height: 1; }
 
-                /* ===== Compositor pill anclado abajo (.bar del demo) ===== */
-                .agentport-composer {
-                    position: relative;
-                    z-index: 1;
-                    flex: none;
-                }
+                /* ===================== COMPOSITOR ===================== */
+                .agentport-composer { position: relative; z-index: 1; flex: none; }
                 .agentport-bar {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    background: rgb(var(--c-surface-raised));
-                    border: 1px solid rgb(var(--c-surface-border));
-                    border-radius: var(--ap-r-grande);
-                    padding: 7px 8px;
+                    display: flex; align-items: center; gap: 8px;
+                    background: rgb(var(--c-surface-raised)); border: 1px solid rgb(var(--c-surface-border));
+                    border-radius: var(--ap-r-grande); padding: 7px 8px;
                     box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.32);
                     transition: border-color 0.25s ease, box-shadow 0.25s ease;
                 }
-                .agentport-bar.is-recording {
-                    border-color: rgb(244 63 94 / 0.6);
-                }
+                .agentport-bar.is-recording { border-color: rgb(244 63 94 / 0.6); }
                 .agentport-bar:focus-within {
                     border-color: rgb(var(--t-accent-rgb) / 0.55);
-                    box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.32),
-                                0 0 0 3px rgb(var(--t-accent-rgb) / 0.12);
+                    box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.32), 0 0 0 3px rgb(var(--t-accent-rgb) / 0.12);
                 }
-
-                /* Botón circular de íconos (.iconbtn del demo). */
                 .agentport-iconbtn {
                     width: 44px; height: 44px; flex: none;
-                    background: rgb(var(--c-surface-card));
-                    border: 1px solid rgb(var(--c-surface-border));
-                    border-radius: 50%;
-                    display: flex; align-items: center; justify-content: center;
-                    color: rgb(var(--c-slate-400));
-                    cursor: pointer; position: relative;
+                    background: rgb(var(--c-surface-card)); border: 1px solid rgb(var(--c-surface-border));
+                    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+                    color: rgb(var(--c-slate-400)); cursor: pointer; position: relative;
                     transition: transform 0.16s cubic-bezier(0.22, 0.61, 0.36, 1),
                                 background 0.25s ease, border-color 0.25s ease, color 0.2s ease;
                 }
@@ -602,123 +789,106 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-iconbtn:active { transform: scale(0.9); }
                 .agentport-iconbtn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-                /* Botón micrófono mientras graba (acento rosa del estado activo). */
-                .agentport-mic-on {
-                    background: rgb(244 63 94) !important;
-                    border-color: rgb(244 63 94) !important;
-                    color: #fff !important;
-                    box-shadow: 0 4px 14px -4px rgb(244 63 94 / 0.5);
+                /* Botón Ⓐ — herramienta. Ícono del tema dentro; anillo que respira
+                   (pulseRing del demo) y se rellena con el acento al abrir. */
+                .agentport-tool { padding: 7px; }
+                .agentport-tool .agentport-tool-ico { width: 100%; height: 100%; display: inline-flex; }
+                .agentport-tool .agentport-tool-ico svg { width: 100%; height: 100%; display: block; }
+                .agentport-tool:not(.is-open) {
+                    animation: agentport-pulse-ring 3.6s cubic-bezier(.22,.61,.36,1) infinite;
+                }
+                .agentport-tool.is-open {
+                    background: rgb(var(--t-accent-rgb)); border-color: rgb(var(--t-accent-rgb));
+                    animation: none;
+                }
+                /* al abrir, el ícono se vuelve blanco para contrastar con el acento */
+                .agentport-tool.is-open .agentport-tool-ico path,
+                .agentport-tool.is-open .agentport-tool-ico line { stroke: #fff; }
+                .agentport-tool.is-open .agentport-tool-ico circle[fill] { fill: #fff; }
+                @keyframes agentport-pulse-ring {
+                    0% { box-shadow: 0 0 0 0 rgb(var(--t-accent-rgb) / 0.45); }
+                    70% { box-shadow: 0 0 0 12px rgb(var(--t-accent-rgb) / 0); }
+                    100% { box-shadow: 0 0 0 0 rgb(var(--t-accent-rgb) / 0); }
                 }
 
-                /* Botón ENVIAR redondo de acento (.send del demo) — punto focal.
-                   El relleno sólido del acento + color de tinta lo aporta la
-                   clase compartida .agent-send-accent (themes.css), aquí solo la
-                   geometría + glow. */
+                .agentport-mic-on {
+                    background: rgb(244 63 94) !important; border-color: rgb(244 63 94) !important;
+                    color: #fff !important; box-shadow: 0 4px 14px -4px rgb(244 63 94 / 0.5);
+                }
                 .agentport-send {
-                    width: 42px; height: 42px; flex: none;
-                    border: none; border-radius: 50%;
-                    display: flex; align-items: center; justify-content: center;
-                    cursor: pointer;
+                    width: 42px; height: 42px; flex: none; border: none; border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center; cursor: pointer;
                     transition: transform 0.16s cubic-bezier(0.22, 0.61, 0.36, 1),
                                 box-shadow 0.25s ease, background 0.2s ease;
                 }
-                .agentport-send:not(:disabled) {
-                    box-shadow: 0 4px 14px -4px rgb(var(--t-accent-rgb) / 0.7);
-                }
+                .agentport-send:not(:disabled) { box-shadow: 0 4px 14px -4px rgb(var(--t-accent-rgb) / 0.7); }
                 .agentport-send:not(:disabled):active { transform: scale(0.86); }
-                .agentport-send:disabled {
-                    background: rgb(var(--c-slate-700));
-                    color: rgb(var(--c-slate-500));
-                    cursor: not-allowed;
-                }
+                .agentport-send:disabled { background: rgb(var(--c-slate-700)); color: rgb(var(--c-slate-500)); cursor: not-allowed; }
 
-                /* Hint bar bajo la pill (.hintbar del demo). */
-                .agentport-hint {
-                    text-align: center; font-size: 0.72rem; margin-top: 9px;
-                    color: rgb(var(--c-slate-500));
-                }
+                .agentport-hint { text-align: center; font-size: 0.72rem; margin-top: 9px; color: rgb(var(--c-slate-500)); }
                 .agentport-hint b { color: rgb(var(--t-accent-rgb)); font-weight: 700; }
 
-                /* Avatar vivo (grande, centrado en la escena): respira, y el
-                   halo del agente lo conserva themes.css (.chagra-hero-halo). */
-                .chagra-hero-halo {
-                    position: absolute;
-                    inset: -8px;
-                    border-radius: 9999px;
-                    background: conic-gradient(
-                        from 0deg,
-                        rgba(132, 204, 22, 0.45),
-                        rgba(16, 185, 129, 0.35),
-                        rgba(6, 182, 212, 0.4),
-                        rgba(132, 204, 22, 0.45)
-                    );
-                    filter: blur(18px);
-                    animation: chagra-halo-rotate 22s linear infinite;
-                    pointer-events: none;
-                    opacity: 0.85;
+                /* ===================== BOTTOM SHEET (menú Ⓐ) ===================== */
+                .agentport-scrim {
+                    position: fixed; inset: 0; background: rgba(10, 8, 4, 0.5);
+                    backdrop-filter: blur(2px); opacity: 0; pointer-events: none;
+                    transition: opacity 0.42s cubic-bezier(.32,.72,0,1); z-index: 60;
                 }
-                .chagra-hero-halo-inner {
-                    position: absolute;
-                    inset: 6px;
-                    border-radius: 9999px;
-                    background: radial-gradient(circle, rgba(2, 6, 23, 0) 50%, rgba(2, 6, 23, 0.9) 100%);
-                    pointer-events: none;
+                .agentport-scrim.is-open { opacity: 1; pointer-events: auto; }
+                .agentport-sheet {
+                    position: fixed; left: 0; right: 0; bottom: 0; z-index: 61;
+                    max-width: 640px; margin: 0 auto;
+                    background: rgb(var(--c-surface-raised));
+                    border-radius: 26px 26px 0 0;
+                    box-shadow: 0 -16px 40px -16px rgba(0, 0, 0, 0.55);
+                    border-top: 1px solid rgb(var(--c-surface-border));
+                    transform: translateY(110%); transition: transform 0.5s cubic-bezier(.32,.72,0,1);
+                    max-height: 84dvh; display: flex; flex-direction: column; will-change: transform;
                 }
-                .chagra-hero-avatar-wrap {
-                    animation: chagra-avatar-breathe 4s ease-in-out infinite;
+                .agentport-sheet.is-open { transform: translateY(0); }
+                .agentport-grab { width: 42px; height: 5px; background: rgb(var(--c-surface-border)); border-radius: 5px; margin: 10px auto 4px; flex: none; }
+                .agentport-sheet-h { padding: 6px 22px 4px; text-align: center; flex: none; }
+                .agentport-sheet-h .t { font-size: 1.18rem; font-weight: 800; color: rgb(var(--c-slate-100)); letter-spacing: -.01em; }
+                .agentport-sheet-h .s { font-size: .86rem; color: rgb(var(--c-slate-300)); margin-top: 4px; line-height: 1.45; }
+                [data-nivel="detallado"] .agentport-sheet-h .s { font-size: .8rem; }
+                .agentport-caps {
+                    padding: 12px 16px 8px; overflow-y: auto; -webkit-overflow-scrolling: touch;
+                    display: flex; flex-direction: column; gap: 9px; overscroll-behavior: contain;
                 }
-                @keyframes chagra-halo-rotate {
-                    from { transform: rotate(0deg); }
-                    to { transform: rotate(360deg); }
+                .agentport-cap {
+                    display: flex; align-items: flex-start; gap: 13px; width: 100%; font: inherit; text-align: left;
+                    background: rgb(var(--c-surface-card)); border: 1px solid rgb(var(--c-surface-border));
+                    border-radius: 18px; padding: 13px 14px; cursor: pointer;
+                    transition: transform .16s cubic-bezier(.22,.61,.36,1), background .18s ease, box-shadow .2s ease, border-color .2s ease;
+                    box-shadow: 0 3px 10px -7px rgba(0,0,0,.5);
                 }
-                @keyframes chagra-avatar-breathe {
-                    0%, 100% { transform: scale(1); }
-                    50% { transform: scale(1.025); }
+                [data-theme="minimalista"] .agentport-cap { border-radius: 14px; }
+                .agentport-cap:active { transform: scale(.98); }
+                .agentport-cap:hover { border-color: rgb(var(--t-accent-rgb) / 0.45); box-shadow: 0 0 18px -7px rgb(var(--t-accent-rgb) / 0.5); }
+                .agentport-cap:disabled { opacity: .55; cursor: not-allowed; }
+                .agentport-cap .ico {
+                    width: 46px; height: 46px; flex: none; border-radius: 13px;
+                    display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+                    background: rgb(var(--t-accent-rgb) / 0.12); border: 1px solid rgb(var(--t-accent-rgb) / 0.22);
                 }
+                .agentport-cap .txt { flex: 1; min-width: 0; }
+                .agentport-cap .ct { font-weight: 800; font-size: .98rem; color: rgb(var(--c-slate-100)); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+                .agentport-cap .cd { font-size: .86rem; color: rgb(var(--c-slate-300)); line-height: 1.4; margin-top: 2px; }
+                /* etiqueta técnica de la tool: solo experto (nivel detallado) */
+                .agentport-cap .tool-id { display: none; font-size: .66rem; font-weight: 700; color: rgb(var(--t-accent-rgb)); margin-top: 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+                [data-nivel="detallado"] .agentport-cap .tool-id {
+                    display: inline-block; background: rgb(var(--t-accent-rgb) / 0.08);
+                    border: 1px solid rgb(var(--t-accent-rgb) / 0.2); padding: 2px 7px; border-radius: 7px;
+                }
+                .agentport-cap .arrow { align-self: center; color: rgb(var(--t-accent-rgb)); font-size: 1.1rem; flex: none; transition: transform .16s ease; }
+                .agentport-cap:active .arrow { transform: translateX(2px); }
+                .agentport-sheet-foot { padding: 6px 22px calc(18px + env(safe-area-inset-bottom)); text-align: center; font-size: .72rem; color: rgb(var(--c-slate-500)); flex: none; }
+                .agentport-sheet-foot b { color: rgb(var(--t-accent-rgb)); }
 
-                /* ===== Colibrí 2D del demo volando ALREDEDOR del avatar 3D =====
-                   Operador 2026-06-06: mantener el 3D y el 2D; el 2D orbita al
-                   3D. El contenedor rota+traslada (radio 112px) → órbita; el SVG
-                   contra-rota para no quedar de cabeza; el ala aletea. */
-                .agentport-hummer {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    z-index: 4;
-                    pointer-events: none;
-                    transform-origin: 0 0;
-                    animation: agentport-hummer-orbit 15s linear infinite;
-                }
-                .agentport-hummer > svg {
-                    display: block;
-                    margin: -23px 0 0 -31px;
-                    filter: drop-shadow(0 6px 6px rgba(90, 60, 20, 0.18));
-                    transform-origin: center;
-                    animation: agentport-hummer-upright 15s linear infinite;
-                }
-                .agentport-wing {
-                    transform-origin: 18px 26px;
-                    animation: agentport-hummer-flap 0.14s ease-in-out infinite alternate;
-                }
-                @keyframes agentport-hummer-orbit {
-                    from { transform: rotate(0deg) translateX(112px); }
-                    to { transform: rotate(360deg) translateX(112px); }
-                }
-                @keyframes agentport-hummer-upright {
-                    from { transform: rotate(0deg); }
-                    to { transform: rotate(-360deg); }
-                }
-                @keyframes agentport-hummer-flap {
-                    from { transform: rotate(-24deg) scaleY(1); }
-                    to { transform: rotate(18deg) scaleY(0.72); }
-                }
-
-                /* Transición de envío: shimmer + lift (sin cambios de contrato —
-                   los tests buscan estas clases). */
+                /* Transición de envío: shimmer + lift (contrato de tests). */
                 @keyframes chagra-send-shimmer {
                     0% { transform: translateX(-130%); opacity: 0; }
-                    25% { opacity: 1; }
-                    70% { opacity: 1; }
+                    25% { opacity: 1; } 70% { opacity: 1; }
                     100% { transform: translateX(130%); opacity: 0; }
                 }
                 @keyframes chagra-send-lift {
@@ -727,124 +897,182 @@ export default function AgentHero({ onNavigate }) {
                     100% { transform: translateY(-16px) scale(0.978); opacity: 0.82; }
                 }
                 .chagra-composer-shimmer::after {
-                    content: '';
-                    position: absolute;
-                    inset: 0;
-                    border-radius: inherit;
-                    background: linear-gradient(
-                        100deg,
-                        transparent 12%,
-                        rgb(var(--t-accent-rgb) / 0.55) 50%,
-                        transparent 88%
-                    );
+                    content: ''; position: absolute; inset: 0; border-radius: inherit;
+                    background: linear-gradient(100deg, transparent 12%, rgb(var(--t-accent-rgb) / 0.55) 50%, transparent 88%);
                     animation: chagra-send-shimmer 0.52s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-                    pointer-events: none;
-                    overflow: hidden;
+                    pointer-events: none; overflow: hidden;
                 }
-                .chagra-composer-sending {
-                    animation: chagra-send-lift 0.52s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-                }
+                .chagra-composer-sending { animation: chagra-send-lift 0.52s cubic-bezier(0.22, 0.61, 0.36, 1) forwards; }
+
                 @media (prefers-reduced-motion: reduce) {
-                    .chagra-hero-halo,
-                    .chagra-hero-avatar-wrap,
-                    .agentport-sun,
-                    .agentport-pollen,
-                    .agentport-hummer,
-                    .agentport-hummer > svg,
-                    .agentport-wing { animation: none !important; }
-                    /* parqueado arriba-derecha, derecho, sin volar */
-                    .agentport-hummer { transform: rotate(-32deg) translateX(112px); }
-                    .agentport-hummer > svg { transform: rotate(32deg); }
-                    .agentport-pollen { opacity: 0.5; }
+                    .agentport-sun, .agentport-pollen, .agentport-spore,
+                    .agentport-hummer, .agentport-hummer .wing { animation: none !important; }
+                    .agentport-pollen, .agentport-spore { opacity: 0.5; }
+                    .agentport-net .edge { opacity: .4 !important; stroke-dashoffset: 0 !important; animation: none !important; }
+                    .agentport-net .node { opacity: .85 !important; animation: none !important; }
+                    .agentport-net .spark { display: none !important; }
+                    .agentport-sprig path { stroke-dashoffset: 0 !important; animation: none !important; }
+                    .agentport-tool:not(.is-open) { animation: none !important; }
                     .agentport-greet { animation: none !important; }
-                    .chagra-composer-shimmer::after,
-                    .chagra-composer-sending { animation: none !important; }
+                    .chagra-composer-shimmer::after, .chagra-composer-sending { animation: none !important; }
                 }
             `}</style>
 
-            {/* ===== ESCENA AMBIENTE (sol + polen) — detrás de todo ===== */}
+            {/* ===================== ESCENA AMBIENTE (por tema) ===================== */}
             <div className="agentport-scene" aria-hidden="true">
+                {/* — NATURE: sol + montañas 3 capas + polen — */}
                 <div className="agentport-sun" />
-                <span className="agentport-pollen" style={{ left: '24%', bottom: '40%', width: 5, height: 5, animationDuration: '11s' }} />
-                <span className="agentport-pollen" style={{ left: '70%', bottom: '46%', width: 4, height: 4, animationDuration: '13s', animationDelay: '2.5s' }} />
-                <span className="agentport-pollen" style={{ left: '48%', bottom: '54%', width: 6, height: 6, animationDuration: '15s', animationDelay: '5s' }} />
-                <span className="agentport-pollen" style={{ left: '82%', bottom: '50%', width: 4, height: 4, animationDuration: '12s', animationDelay: '1.5s' }} />
-            </div>
+                <div className="agentport-mtn">
+                    <svg viewBox="0 0 412 320" preserveAspectRatio="none" height="320">
+                        {/* capa lejana */}
+                        <path d="M0 220 L70 150 L150 205 L230 120 L320 200 L412 140 L412 320 L0 320 Z" fill="#cbb992" opacity=".55" />
+                        {/* capa media */}
+                        <path d="M0 250 L90 175 L180 245 L270 165 L360 240 L412 200 L412 320 L0 320 Z" fill="#a98f64" opacity=".7" />
+                        {/* capa cercana */}
+                        <path d="M0 290 L110 215 L210 285 L300 220 L412 280 L412 320 L0 320 Z" fill="#7d6a45" />
+                    </svg>
+                </div>
+                <span className="agentport-pollen" style={{ left: '24%', bottom: '22%', width: 5, height: 5, animationDuration: '11s' }} />
+                <span className="agentport-pollen" style={{ left: '70%', bottom: '18%', width: 4, height: 4, animationDuration: '13s', animationDelay: '2.5s' }} />
+                <span className="agentport-pollen" style={{ left: '48%', bottom: '30%', width: 6, height: 6, animationDuration: '15s', animationDelay: '5s' }} />
+                <span className="agentport-pollen" style={{ left: '82%', bottom: '26%', width: 4, height: 4, animationDuration: '12s', animationDelay: '1.5s' }} />
 
-            {/* ===== Cabecera: pills de TEMA (cambian el tema de verdad) ===== */}
-            <div className="agentport-themebar" role="group" aria-label="Tema visual de la app">
-                <span className="agentport-tlbl">Tema</span>
-                {THEME_PILLS.map((t) => {
-                    const active = theme === t.id;
-                    return (
-                        <button
-                            key={t.id}
-                            type="button"
-                            onClick={() => setTheme(t.id)}
-                            aria-pressed={active}
-                            className={['agentport-tpill', active ? 'is-active' : ''].join(' ')}
-                        >
-                            <span className="agentport-tsw" aria-hidden="true">
-                                {t.swatch.map((c, i) => (
-                                    <span key={i} style={{ backgroundColor: c }} />
-                                ))}
-                            </span>
-                            {t.label}
-                        </button>
-                    );
-                })}
-            </div>
+                {/* — BIO-PUNK: void + grid + grafo vivo + raíces + esporas — */}
+                <div className="agentport-bp">
+                    <div className="agentport-void" />
+                    <div className="agentport-grid" />
+                    <svg className="agentport-net" viewBox="0 0 412 470" preserveAspectRatio="xMidYMid slice">
+                        {/* aristas (cada una con su largo para el dibujado progresivo) */}
+                        <path className="edge" style={{ '--len': 120, animationDelay: '0s' }} d="M60 70 L150 120" />
+                        <path className="edge b" style={{ '--len': 150, animationDelay: '.5s' }} d="M150 120 L96 220" />
+                        <path className="edge" style={{ '--len': 170, animationDelay: '.9s' }} d="M150 120 L256 96" />
+                        <path className="edge" style={{ '--len': 140, animationDelay: '1.3s' }} d="M256 96 L330 170" />
+                        <path className="edge b" style={{ '--len': 160, animationDelay: '1.7s' }} d="M256 96 L210 210" />
+                        <path className="edge" style={{ '--len': 150, animationDelay: '2.1s' }} d="M96 220 L210 210" />
+                        <path className="edge" style={{ '--len': 170, animationDelay: '2.5s' }} d="M210 210 L330 170" />
+                        <path className="edge b" style={{ '--len': 150, animationDelay: '2.9s' }} d="M210 210 L150 320" />
+                        <path className="edge" style={{ '--len': 150, animationDelay: '3.3s' }} d="M330 170 L300 290" />
+                        <path className="edge" style={{ '--len': 150, animationDelay: '3.7s' }} d="M150 320 L300 290" />
+                        {/* nodos */}
+                        <circle className="node br" cx="60" cy="70" r="3" style={{ animationDelay: '0s' }} />
+                        <circle className="node" cx="150" cy="120" r="3" style={{ animationDelay: '.4s' }} />
+                        <circle className="node amber" cx="256" cy="96" r="3" style={{ animationDelay: '.8s' }} />
+                        <circle className="node" cx="96" cy="220" r="3" style={{ animationDelay: '1.2s' }} />
+                        <circle className="node br" cx="210" cy="210" r="3" style={{ animationDelay: '1.6s' }} />
+                        <circle className="node" cx="330" cy="170" r="3" style={{ animationDelay: '2s' }} />
+                        <circle className="node" cx="150" cy="320" r="3" style={{ animationDelay: '2.4s' }} />
+                        <circle className="node amber" cx="300" cy="290" r="3" style={{ animationDelay: '2.8s' }} />
+                        {/* corriente recorriendo aristas clave */}
+                        <circle className="spark s1" cx="0" cy="0" r="2.4" />
+                        <circle className="spark s2" cx="0" cy="0" r="2.2" />
+                        <circle className="spark s3" cx="0" cy="0" r="2.4" />
+                    </svg>
+                    <div className="agentport-roots">
+                        <svg viewBox="0 0 412 200" preserveAspectRatio="none">
+                            <path className="r" style={{ strokeWidth: 3 }} d="M206 200 C206 150 206 130 206 110" />
+                            <path className="r" style={{ strokeWidth: 2.4 }} d="M206 130 C160 120 120 130 70 100" />
+                            <path className="r" style={{ strokeWidth: 2.4 }} d="M206 130 C252 120 300 132 350 96" />
+                            <path className="r" style={{ strokeWidth: 1.8, opacity: .35 }} d="M206 150 C176 144 150 150 120 130" />
+                            <path className="r" style={{ strokeWidth: 1.8, opacity: .35 }} d="M206 150 C236 144 270 152 300 132" />
+                            <path className="r" style={{ strokeWidth: 1.6, opacity: .3 }} d="M70 100 C50 92 40 86 26 70" />
+                            <path className="r" style={{ strokeWidth: 1.6, opacity: .3 }} d="M350 96 C372 88 384 82 398 66" />
+                        </svg>
+                    </div>
+                    <span className="agentport-spore" style={{ left: '22%', bottom: '20%', width: 5, height: 5, animationDuration: '11s' }} />
+                    <span className="agentport-spore" style={{ left: '68%', bottom: '16%', width: 4, height: 4, animationDuration: '13s', animationDelay: '2.5s' }} />
+                    <span className="agentport-spore" style={{ left: '46%', bottom: '28%', width: 6, height: 6, animationDuration: '15s', animationDelay: '5s' }} />
+                    <span className="agentport-spore" style={{ left: '82%', bottom: '24%', width: 4, height: 4, animationDuration: '12s', animationDelay: '1.5s' }} />
+                    <span className="agentport-spore" style={{ left: '34%', bottom: '34%', width: 3, height: 3, animationDuration: '14s', animationDelay: '3.5s' }} />
+                </div>
 
-            {/* ===== Zona-respiro: avatar GRANDE y centrado (abre el agente) ===== */}
-            <div className="agentport-stage">
-                {/* Colibrí 2D del demo (.hummer) volando ALREDEDOR del avatar 3D.
-                    Operador 2026-06-06: "no quites el 3d ni el 2d; que el 2d
-                    vuele alrededor del 3d es lo ideal". SVG exacto del demo. */}
-                <span className="agentport-hummer" aria-hidden="true">
+                {/* — MINIMALISTA: trazo botánico monoline + horizonte — */}
+                <div className="agentport-min">
+                    <div className="agentport-sprig">
+                        <svg viewBox="0 0 200 200" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                            <path style={{ '--len': 230 }} d="M168 18 C150 60 132 96 110 128 C96 150 86 168 82 186" />
+                            <path style={{ '--len': 60 }} d="M133 76 C150 70 166 72 178 60" />
+                            <path style={{ '--len': 60 }} d="M118 104 C134 100 150 102 162 90" />
+                            <path style={{ '--len': 60 }} d="M104 132 C120 128 136 130 148 118" />
+                            <path style={{ '--len': 60 }} d="M146 50 C140 36 142 24 152 14" />
+                        </svg>
+                    </div>
+                    <div className="agentport-horizon" />
+                </div>
+
+                {/* — COLIBRÍ 2D — vuela en los 3 temas (SVG del demo nature) — */}
+                <div className="agentport-hummer">
                     <svg width="62" height="46" viewBox="0 0 62 46">
+                        {/* cuerpo */}
                         <ellipse cx="34" cy="28" rx="11" ry="6.5" fill="#2f7d6b" />
                         <ellipse cx="34" cy="27" rx="9" ry="4.2" fill="#3fa489" />
+                        {/* cabeza */}
                         <circle cx="46" cy="24" r="6" fill="#2a6f60" />
                         <circle cx="48.5" cy="22.5" r="1.4" fill="#11332c" />
+                        {/* gorguera roja */}
                         <path d="M44 28 q5 2 8 0 q-3 4 -8 3 z" fill="#d05038" />
+                        {/* pico largo */}
                         <path d="M52 24 L62 19" stroke="#3a2a18" strokeWidth="2" strokeLinecap="round" />
+                        {/* cola */}
                         <path d="M23 28 L8 22 M23 30 L8 32" stroke="#256155" strokeWidth="3" strokeLinecap="round" />
-                        <g className="agentport-wing">
-                            <path d="M30 24 C18 6 6 8 2 16 C12 18 22 24 30 30 Z" fill="#4fb89a" opacity="0.9" />
+                        {/* ala (animada) */}
+                        <g className="wing">
+                            <path d="M30 24 C18 6 6 8 2 16 C12 18 22 24 30 30 Z" fill="#4fb89a" opacity=".9" />
                         </g>
                     </svg>
-                </span>
-                <button
-                    type="button"
-                    onClick={launchToAgent}
-                    aria-label="Abrir agente Chagra"
-                    className="agentport-avatar-wrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--t-accent-rgb))] rounded-full"
-                >
-                    <div className="relative w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center">
-                        <div className="chagra-hero-halo" aria-hidden="true" />
-                        <div className="chagra-hero-halo-inner" aria-hidden="true" />
-                        <div className="chagra-hero-avatar-wrap relative">
-                            <ChagraAgentAvatar state={avatarState} size={128} />
-                        </div>
-                    </div>
-                </button>
+                </div>
             </div>
 
-            {/* ===== Saludo grande + subtítulo ===== */}
+            {/* ===================== MARCA + TOGGLE Campesino/Experto ===================== */}
+            <header className="agentport-topbar">
+                <div className="agentport-brand">
+                    <span className="agentport-mark">{iconForTheme(theme)}</span>
+                    <div className="agentport-name">
+                        Chagra<small>tu mano en el campo</small>
+                    </div>
+                </div>
+
+                <div className="agentport-mode" role="tablist" aria-label="Nivel de respuestas">
+                    <button
+                        type="button"
+                        role="tab"
+                        aria-selected={!expertoActive}
+                        onClick={() => setNivelRespuestas('simple')}
+                        className={!expertoActive ? 'is-active' : ''}
+                    >
+                        🌾 Campesino
+                    </button>
+                    <button
+                        type="button"
+                        role="tab"
+                        aria-selected={expertoActive}
+                        onClick={() => setNivelRespuestas('detallado')}
+                        className={expertoActive ? 'is-active' : ''}
+                    >
+                        🔬 Experto
+                    </button>
+                </div>
+            </header>
+
+            {/* TODO ubicación: a=bajo marca, b=pill bajo saludo, c=TopBar — espera
+                decisión operador (a/b/c). El dato sale del perfil de finca:
+                getProfileMunicipio() (municipio/region DANE) + profile.vereda +
+                profile.finca_altitud (msnm). El TopBar ya muestra municipio/vereda
+                bajo el nombre del operador; aquí queda el placeholder limpio. */}
+
+            {/* ===================== ZONA-RESPIRO (escena vive detrás) ===================== */}
+            <div className="agentport-stage" aria-hidden="true" />
+
+            {/* ===================== SALUDO ===================== */}
             <div className="agentport-greet">
                 <h2 className="agentport-hi">
-                    {greetingForNow()}<br />Soy <span className="agentport-chagra chagra-wordmark">Chagra</span>.
+                    {greetingForNow(nivel)}<br />Soy <span className="chagra-wordmark">Chagra</span>.
                 </h2>
-                <p
-                    key={tipIndex}
-                    className="agentport-sub"
-                    style={{ animation: 'fade-in 0.7s ease' }}
-                >
-                    {TIPS[tipIndex]}
+                <p className="agentport-sub">
+                    {expertoActive ? SUB_EXPERTO : SUB_CAMPESINO}
                 </p>
             </div>
 
-            {/* ===== Fila de chips (envían directo una consulta de texto) ===== */}
+            {/* ===================== CHIPS ===================== */}
             <div className="agentport-chiprow">
                 {QUICK_CHIPS.map((chip) => (
                     <button
@@ -860,7 +1088,7 @@ export default function AgentHero({ onNavigate }) {
                 ))}
             </div>
 
-            {/* ===== COMPOSITOR MULTIMODAL REAL — la "pill" del demo, anclada ===== */}
+            {/* ===================== COMPOSITOR MULTIMODAL ===================== */}
             <div className="agentport-composer">
                 <div
                     className={[
@@ -907,7 +1135,6 @@ export default function AgentHero({ onNavigate }) {
                             <span className="flex-1 text-base text-rose-500 font-medium tabular-nums">
                                 Grabando… {recSeconds}s
                             </span>
-                            {/* Mini visualizador del nivel de voz */}
                             <span
                                 aria-hidden="true"
                                 className="h-6 w-1.5 rounded-full bg-rose-400 origin-bottom transition-transform"
@@ -928,8 +1155,20 @@ export default function AgentHero({ onNavigate }) {
                         />
                     )}
 
-                    {/* Fila 2: acciones — cámara/adjuntar a la izq · mic/enviar a la der */}
+                    {/* Fila 2: Ⓐ a la izquierda · cámara/adjuntar · mic/enviar a la derecha */}
                     <div className="flex items-center gap-2 px-1 pb-1 pt-0.5">
+                        {/* Botón Ⓐ — abre el menú de capacidades (bottom-sheet) */}
+                        <button
+                            type="button"
+                            onClick={toggleSheet}
+                            disabled={isRecording}
+                            aria-label="Ver todo lo que puede hacer Chagra"
+                            aria-expanded={sheetOpen}
+                            className={['agentport-iconbtn agentport-tool !w-11 !h-11', sheetOpen ? 'is-open' : ''].join(' ')}
+                        >
+                            <span className="agentport-tool-ico" aria-hidden="true">{iconForTheme(theme)}</span>
+                        </button>
+
                         {/* Cámara / foto */}
                         <button
                             type="button"
@@ -960,10 +1199,7 @@ export default function AgentHero({ onNavigate }) {
                             disabled={busy}
                             aria-label={isRecording ? 'Detener y enviar audio' : 'Grabar audio'}
                             aria-pressed={isRecording}
-                            className={[
-                                'agentport-iconbtn !w-11 !h-11',
-                                isRecording ? 'agentport-mic-on' : '',
-                            ].join(' ')}
+                            className={['agentport-iconbtn !w-11 !h-11', isRecording ? 'agentport-mic-on' : ''].join(' ')}
                         >
                             {isRecording ? <Square size={16} strokeWidth={2.5} aria-hidden="true" /> : <Mic size={18} strokeWidth={2.5} aria-hidden="true" />}
                         </button>
@@ -980,30 +1216,28 @@ export default function AgentHero({ onNavigate }) {
                         </button>
                     </div>
 
-                    {/* Inputs ocultos — AMBOS solo imágenes (B2). La cámara abre
-                        captura en vivo (capture="environment"); el adjuntar abre
-                        la galería de fotos. El agente solo "ve" imágenes. */}
+                    {/* Inputs ocultos — AMBOS solo imágenes (B2). */}
                     <input
                         ref={cameraInputRef}
                         type="file"
                         accept="image/*"
                         capture="environment"
                         className="hidden"
-                        onChange={(e) => handlePhotoPick(e, 'photo')}
+                        onChange={handlePhotoPick}
                     />
                     <input
                         ref={fileInputRef}
                         type="file"
                         accept="image/*"
                         className="hidden"
-                        onChange={(e) => handlePhotoPick(e, 'photo')}
+                        onChange={handlePhotoPick}
                     />
                 </div>
 
                 {/* Hint bajo la pill (réplica de .hintbar del demo). */}
                 {!isRecording && !attachment && (
                     <p className="agentport-hint">
-                        Escribe, toca el <b>🎤</b> para hablar, o el <b>📷</b> para mostrarme una foto
+                        Toca <b>Ⓐ</b> para ver todo lo que sé hacer, o escríbeme aquí
                     </p>
                 )}
 
@@ -1013,13 +1247,58 @@ export default function AgentHero({ onNavigate }) {
                     </p>
                 )}
 
-                {/* B2: aviso cuando se intenta adjuntar algo que no es una foto. */}
                 {pickError && (
                     <p className="mt-2 text-xs text-[rgb(160,76,20)] px-1" role="alert">
                         {pickError}
                     </p>
                 )}
             </div>
+
+            {/* ===================== SCRIM + BOTTOM SHEET (menú Ⓐ) ===================== */}
+            <div
+                className={['agentport-scrim', sheetOpen ? 'is-open' : ''].join(' ')}
+                onClick={closeSheet}
+                aria-hidden="true"
+            />
+            <section
+                className={['agentport-sheet', sheetOpen ? 'is-open' : ''].join(' ')}
+                role="dialog"
+                aria-modal={sheetOpen}
+                aria-label="Capacidades de Chagra"
+                aria-hidden={!sheetOpen}
+            >
+                <div className="agentport-grab" aria-hidden="true" />
+                <div className="agentport-sheet-h">
+                    <div className="t">¿En qué te ayudo?</div>
+                    <div className="s">
+                        {expertoActive
+                            ? 'Capacidades enrutadas a herramientas. Toca una para empezar.'
+                            : 'Toca una opción y te ayudo. Toda respuesta viene con su fuente.'}
+                    </div>
+                </div>
+                <div className="agentport-caps">
+                    {CAPABILITIES.map((cap) => (
+                        <button
+                            key={cap.id}
+                            type="button"
+                            className="agentport-cap"
+                            onClick={() => pickCapability(cap)}
+                            disabled={busy}
+                        >
+                            <span className="ico" aria-hidden="true">{cap.icon}</span>
+                            <span className="txt">
+                                <span className="ct">{cap.title}</span>
+                                <span className="cd">{cap.desc}</span>
+                                <span className="tool-id">{cap.tool}()</span>
+                            </span>
+                            <span className="arrow" aria-hidden="true">›</span>
+                        </button>
+                    ))}
+                </div>
+                <div className="agentport-sheet-foot">
+                    Chagra responde con información de <b>AGROSAVIA</b>, <b>ICA</b> e <b>IDEAM</b>.
+                </div>
+            </section>
         </section>
     );
 }
