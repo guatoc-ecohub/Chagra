@@ -384,6 +384,39 @@ export function saveProfile(partial = {}) {
   return next;
 }
 
+/**
+ * Estilo de notificación de alertas en la portada del agente (operador
+ * 2026-06-06). Define CÓMO se muestra una alerta clima/helada activa:
+ *   - 'demo':   chip llamativo en la escena (⚠ borde de acento). POR DEFECTO.
+ *   - 'actual': comportamiento clásico (campanita / NotificationsBell).
+ * Se guarda en el perfil (`estilo_notificacion`) como cualquier otra pref.
+ */
+export const NOTIFICATION_STYLES = Object.freeze(['demo', 'actual']);
+export const DEFAULT_NOTIFICATION_STYLE = 'demo';
+
+/**
+ * Lee el estilo de notificación preferido. Si el perfil no lo trae o trae un
+ * valor inválido, devuelve el default ('demo' — chip estilo demo).
+ *
+ * @returns {'demo'|'actual'}
+ */
+export function getNotificationStyle() {
+  const v = getProfile()?.estilo_notificacion;
+  return NOTIFICATION_STYLES.includes(v) ? v : DEFAULT_NOTIFICATION_STYLE;
+}
+
+/**
+ * Persiste el estilo de notificación en el perfil. Ignora valores inválidos
+ * (cae al default) para no corromper el perfil.
+ *
+ * @param {'demo'|'actual'} style
+ * @returns {Object} perfil resultante
+ */
+export function setNotificationStyle(style) {
+  const next = NOTIFICATION_STYLES.includes(style) ? style : DEFAULT_NOTIFICATION_STYLE;
+  return saveProfile({ estilo_notificacion: next });
+}
+
 /** Marca el onboarding de perfil como completado. */
 export function markProfileDone() {
   if (!hasStorage()) return;

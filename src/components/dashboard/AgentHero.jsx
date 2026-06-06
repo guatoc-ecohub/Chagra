@@ -1,13 +1,21 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { Mic, Square, Camera, Paperclip, ArrowUp, X } from 'lucide-react';
+import { Mic, Square, Camera, Settings, X } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { captureAndCompress } from '../../services/photoService';
 import { isAnalyzableImageAttachment } from '../../services/agentOutboxAttachment';
 import useAgentOutboxStore from '../../store/useAgentOutboxStore';
+import useAssetStore from '../../store/useAssetStore';
+import useAlertStore from '../../store/useAlertStore';
 import { agentSounds } from '../../services/agentSoundService';
 import { AGENT_HERO_CHIPS } from '../../data/exampleQuestions';
 import { useTheme } from '../../hooks/useTheme';
-import { getProfile, saveProfile } from '../../services/userProfileService';
+import {
+    getProfile,
+    saveProfile,
+    getProfileMunicipio,
+    getNotificationStyle,
+} from '../../services/userProfileService';
+import { buildCropSuggestions } from '../../data/cropSuggestions';
 
 /**
  * AgentHero — la PORTADA INMERSIVA del agente Chagra, PRIMERA PANTALLA COMPLETA
@@ -115,6 +123,41 @@ const THEME_ICON = {
 // `auto` cae al ícono biopunk (su estética base / default de la app).
 function iconForTheme(theme) {
     return THEME_ICON[theme] || THEME_ICON.biopunk;
+}
+
+// ¿Es de noche? (operador 2026-06-06: sol de día, luna de noche en la escena).
+// Noche = antes de las 6am o desde las 7pm. Puro, fácil de testear vía hora.
+function isNightNow(hour) {
+    const h = Number.isInteger(hour)
+        ? hour
+        : (typeof Date !== 'undefined' ? new Date().getHours() : 9);
+    return h < 6 || h >= 19;
+}
+
+// Colibrí 2D del demo (SVG .hummer). Se usa tanto en la escena ambiente (vuela)
+// como DENTRO del botón de enviar (operador 2026-06-06: "el colibrí es enviar").
+// Se factoriza para que ambos usos compartan exactamente el mismo trazo.
+function HummerSvg({ width = 62, height = 46, flap = true }) {
+    return (
+        <svg width={width} height={height} viewBox="0 0 62 46" aria-hidden="true">
+            {/* cuerpo */}
+            <ellipse cx="34" cy="28" rx="11" ry="6.5" fill="#2f7d6b" />
+            <ellipse cx="34" cy="27" rx="9" ry="4.2" fill="#3fa489" />
+            {/* cabeza */}
+            <circle cx="46" cy="24" r="6" fill="#2a6f60" />
+            <circle cx="48.5" cy="22.5" r="1.4" fill="#11332c" />
+            {/* gorguera roja */}
+            <path d="M44 28 q5 2 8 0 q-3 4 -8 3 z" fill="#d05038" />
+            {/* pico largo */}
+            <path d="M52 24 L62 19" stroke="#3a2a18" strokeWidth="2" strokeLinecap="round" />
+            {/* cola */}
+            <path d="M23 28 L8 22 M23 30 L8 32" stroke="#256155" strokeWidth="3" strokeLinecap="round" />
+            {/* ala (animada solo cuando vuela en la escena) */}
+            <g className={flap ? 'wing' : undefined}>
+                <path d="M30 24 C18 6 6 8 2 16 C12 18 22 24 30 30 Z" fill="#4fb89a" opacity=".9" />
+            </g>
+        </svg>
+    );
 }
 
 // Saludos por hora del día. En modo "experto" (nivel detallado) el demo abre
@@ -241,12 +284,48 @@ export default function AgentHero({ onNavigate }) {
 
     const textareaRef = useRef(null);
     const cameraInputRef = useRef(null);
-    const fileInputRef = useRef(null);
 
     // Sistema de temas REAL de la app (data-theme en <html>, persiste en
     // localStorage). Aquí solo LEEMOS el tema para pintar el ícono de la marca
     // y del botón Ⓐ; el switcher completo vive en Perfil → Apariencia.
     const { theme } = useTheme();
+
+    // ── Escena: sol de día / luna de noche (operador 2026-06-06) ──────────────
+    const night = isNightNow();
+
+    // ── Ubicación real del perfil (arriba-der de la escena) ───────────────────
+    // 📍 Vereda, Municipio · altitud — SIN latitud. Sale del perfil de finca.
+    // Si falta municipio, no se muestra (no inventamos ubicación).
+    const profile = getProfile();
+    const municipio = getProfileMunicipio();
+    const vereda = profile?.vereda || null;
+    const altitud = profile?.finca_altitud || profile?.altitud || null;
+    const locationLabel = municipio
+        ? [vereda ? `${vereda}, ${municipio.split(',')[0]}` : municipio.split(',')[0],
+            altitud ? `${altitud} msnm` : null]
+            .filter(Boolean)
+            .join(' · ')
+        : null;
+
+    // ── Sugerencias contextuales ROTATIVAS basadas en los cultivos reales ─────
+    // Deterministas (cropSuggestions: cultivos del store × mes × piso térmico).
+    // NO llaman al LLM (regla dura del home). Si no hay cultivos → [] y caemos al
+    // subtítulo genérico actual.
+    const plants = useAssetStore((s) => s.plants);
+    const cropSuggestions = buildCropSuggestions(plants, { altitud });
+    const [suggestionIdx, setSuggestionIdx] = useState(0);
+
+    // ── Chip de alerta real (clima/helada) ────────────────────────────────────
+    const activeAlerts = useAlertStore((s) => s.activeAlerts);
+    // Prioriza danger > warning; ignora info (poco accionable en el chip).
+    const topAlert =
+        activeAlerts.find((a) => a.severity === 'danger') ||
+        activeAlerts.find((a) => a.severity === 'warning') ||
+        null;
+    // Preferencia de estilo: 'demo' (chip, default) | 'actual' (campanita del
+    // TopBar). En 'actual' NO pintamos el chip aquí (la campanita ya lo cubre).
+    const notifStyle = getNotificationStyle();
+    const showAlertChip = notifStyle === 'demo' && Boolean(topAlert);
 
     const sendToOutbox = useAgentOutboxStore((s) => s.send);
     const {
@@ -265,6 +344,22 @@ export default function AgentHero({ onNavigate }) {
             if (attachment?.previewUrl) URL.revokeObjectURL(attachment.previewUrl);
         };
     }, [attachment]);
+
+    // Rotación de las sugerencias contextuales cada ~5s (operador 2026-06-06:
+    // "rotan para mostrar info distinta"). Solo si hay >1 sugerencia y el
+    // usuario no pidió reduced-motion. Determinístico en su orden (cropSuggestions).
+    useEffect(() => {
+        if (cropSuggestions.length <= 1 || prefersReducedMotion()) return undefined;
+        const id = window.setInterval(() => {
+            setSuggestionIdx((i) => (i + 1) % cropSuggestions.length);
+        }, 5000);
+        return () => window.clearInterval(id);
+    }, [cropSuggestions.length]);
+
+    // Si la lista de cultivos cambia (sync), evita un índice fuera de rango.
+    useEffect(() => {
+        if (suggestionIdx >= cropSuggestions.length) setSuggestionIdx(0);
+    }, [cropSuggestions.length, suggestionIdx]);
 
     // Auto-grow del textarea: crece hasta ~5 líneas, luego scrollea.
     const autoGrow = (el) => {
@@ -490,10 +585,34 @@ export default function AgentHero({ onNavigate }) {
                     animation: agentport-sun-glow 9s ease-in-out infinite;
                     display: none;
                 }
-                [data-theme="nature"] .agentport-sun { display: block; }
+                [data-theme="nature"] .agentport-scene.is-day .agentport-sun { display: block; }
                 @keyframes agentport-sun-glow {
                     0%, 100% { opacity: 0.85; transform: translateX(-50%) scale(1); }
                     50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+                }
+
+                /* — SOL/LUNA delicados (operador 2026-06-06) — astro pequeño y
+                   sutil, integrado en la escena de CADA tema, según la hora.
+                   Vive arriba en el aire abierto. Día = sol; noche = luna. El sol
+                   radial grande de nature (.agentport-sun) sigue solo en nature
+                   de día; este astro pequeño es universal y delicado. */
+                .agentport-astro {
+                    position: absolute;
+                    top: 11%;
+                    right: 14%;
+                    width: 46px;
+                    height: 46px;
+                    z-index: 1;
+                    opacity: .9;
+                    filter: drop-shadow(0 0 10px rgba(255, 236, 180, .35));
+                    animation: agentport-astro-breathe 8s ease-in-out infinite;
+                }
+                .agentport-astro.is-moon { filter: drop-shadow(0 0 10px rgba(200, 220, 255, .35)); }
+                [data-theme="nature"] .agentport-astro.is-day { display: none; } /* nature ya tiene el sol radial grande de día */
+                .agentport-astro svg { width: 100%; height: 100%; display: block; }
+                @keyframes agentport-astro-breathe {
+                    0%, 100% { opacity: .85; transform: scale(1); }
+                    50% { opacity: 1; transform: scale(1.04); }
                 }
 
                 /* — MONTAÑAS 3 capas (nature) — paths exactos del demo. La
@@ -710,6 +829,65 @@ export default function AgentHero({ onNavigate }) {
                 [data-theme="biopunk"] .agentport-mode button.is-active { color: #04231b; }
                 .agentport:not([data-theme]) .agentport-mode button.is-active { color: #04231b; }
 
+                /* botón de perfil (engranaje) — arriba-derecha, junto al toggle.
+                   Abre la pantalla de Perfil (prefs). Discreto, redondo. */
+                .agentport-profile {
+                    width: 38px; height: 38px; flex: none; border-radius: 50%;
+                    display: inline-flex; align-items: center; justify-content: center;
+                    background: rgb(var(--c-surface-card) / 0.65);
+                    border: 1px solid rgb(var(--c-surface-border));
+                    color: rgb(var(--c-slate-300)); cursor: pointer;
+                    backdrop-filter: blur(6px);
+                    box-shadow: 0 2px 8px -4px rgba(0,0,0,.35);
+                    transition: transform .16s cubic-bezier(.22,.61,.36,1), color .2s ease, border-color .2s ease;
+                }
+                .agentport-profile:hover { color: rgb(var(--c-slate-100)); border-color: rgb(var(--t-accent-rgb) / 0.5); }
+                .agentport-profile:active { transform: scale(.92); }
+                .agentport-headtools { display: flex; align-items: center; gap: 8px; flex: none; }
+
+                /* chip de UBICACIÓN — arriba-derecha de la escena (donde vuela el
+                   colibrí). 📍 Vereda, Municipio · altitud. Delicado, acento suave. */
+                .agentport-loc {
+                    position: absolute; z-index: 2;
+                    top: calc(90px + env(safe-area-inset-top)); right: 14px;
+                    display: inline-flex; align-items: center; gap: 5px; max-width: 64%;
+                    padding: 5px 10px; border-radius: 14px;
+                    background: rgb(var(--c-surface-card) / 0.55);
+                    border: 1px solid rgb(var(--t-accent-rgb) / 0.22);
+                    color: rgb(var(--c-slate-300)); font-size: .72rem; font-weight: 600;
+                    line-height: 1.1; backdrop-filter: blur(6px);
+                    box-shadow: 0 2px 8px -5px rgba(0,0,0,.35);
+                }
+                .agentport-loc .pin { color: rgb(var(--t-accent-rgb)); font-size: .8rem; flex: none; }
+                .agentport-loc .txt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+                /* chip de ALERTA real (clima/helada) — estilo demo: borde de
+                   acento llamativo, ⚠. Vive bajo el saludo, sobre los chips. */
+                .agentport-alert {
+                    position: relative; z-index: 1; display: flex; align-items: center; gap: 9px;
+                    margin: 0 0 12px; padding: 11px 13px; border-radius: 16px;
+                    background: rgb(var(--c-surface-card));
+                    border: 1.5px solid rgb(var(--t-accent-rgb) / 0.65);
+                    box-shadow: 0 0 0 0 rgb(var(--t-accent-rgb) / 0.45);
+                    animation: agentport-alert-pulse 2.6s cubic-bezier(.22,.61,.36,1) infinite;
+                }
+                .agentport-alert.is-danger {
+                    border-color: rgb(244 63 94 / 0.8);
+                    animation-name: agentport-alert-pulse-danger;
+                }
+                .agentport-alert .ico { font-size: 1.2rem; flex: none; line-height: 1; }
+                .agentport-alert .txt { flex: 1; min-width: 0; }
+                .agentport-alert .at { font-weight: 800; font-size: .9rem; color: rgb(var(--c-slate-100)); }
+                .agentport-alert .am { font-size: .8rem; color: rgb(var(--c-slate-300)); line-height: 1.35; margin-top: 1px; }
+                @keyframes agentport-alert-pulse {
+                    0%, 100% { box-shadow: 0 0 0 0 rgb(var(--t-accent-rgb) / 0); }
+                    50% { box-shadow: 0 0 0 4px rgb(var(--t-accent-rgb) / 0.16); }
+                }
+                @keyframes agentport-alert-pulse-danger {
+                    0%, 100% { box-shadow: 0 0 0 0 rgb(244 63 94 / 0); }
+                    50% { box-shadow: 0 0 0 4px rgb(244 63 94 / 0.18); }
+                }
+
                 /* ===================== ZONA-RESPIRO ===================== */
                 /* Espacio "respiro" donde vive la escena (sol/montañas/grafo/
                    colibrí). Sin avatar 3D: el protagonista es el colibrí 2D. */
@@ -815,15 +993,31 @@ export default function AgentHero({ onNavigate }) {
                     background: rgb(244 63 94) !important; border-color: rgb(244 63 94) !important;
                     color: #fff !important; box-shadow: 0 4px 14px -4px rgb(244 63 94 / 0.5);
                 }
+                /* ENVIAR = el colibrí (operador 2026-06-06). Botón redondo de
+                   acento con el colibrí 2D del demo dentro (.send-hummer). Al
+                   tocar → envía (toda la lógica intacta). */
                 .agentport-send {
-                    width: 42px; height: 42px; flex: none; border: none; border-radius: 50%;
+                    width: 46px; height: 46px; flex: none; border: none; border-radius: 50%;
                     display: flex; align-items: center; justify-content: center; cursor: pointer;
+                    overflow: hidden; padding: 0;
                     transition: transform 0.16s cubic-bezier(0.22, 0.61, 0.36, 1),
                                 box-shadow 0.25s ease, background 0.2s ease;
                 }
                 .agentport-send:not(:disabled) { box-shadow: 0 4px 14px -4px rgb(var(--t-accent-rgb) / 0.7); }
                 .agentport-send:not(:disabled):active { transform: scale(0.86); }
-                .agentport-send:disabled { background: rgb(var(--c-slate-700)); color: rgb(var(--c-slate-500)); cursor: not-allowed; }
+                .agentport-send:disabled { background: rgb(var(--c-slate-700)); cursor: not-allowed; }
+                .agentport-send .send-hummer { width: 30px; height: 22px; display: block; }
+                .agentport-send .send-hummer svg { width: 100%; height: 100%; display: block; }
+                /* En el botón de enviar el colibrí va en CREMA/blanco para
+                   contrastar sobre el acento sólido (teal/ocre/verde), pase lo
+                   que pase con el tema. Recoloreamos las piezas del SVG. */
+                .agentport-send .send-hummer svg ellipse,
+                .agentport-send .send-hummer svg circle:not([r="1.4"]):not([r="1"]) { fill: #fffdf5; }
+                .agentport-send .send-hummer svg path[fill] { fill: #fbf6e7; }
+                .agentport-send .send-hummer svg path[stroke] { stroke: #f3ecd6; }
+                .agentport-send .send-hummer svg circle[r="1.4"] { fill: #1a3a32; } /* ojo */
+                .agentport-send:not(:disabled) .send-hummer svg { filter: drop-shadow(0 1px 2px rgba(0,0,0,.35)); }
+                .agentport-send:disabled .send-hummer { opacity: .55; }
 
                 .agentport-hint { text-align: center; font-size: 0.72rem; margin-top: 9px; color: rgb(var(--c-slate-500)); }
                 .agentport-hint b { color: rgb(var(--t-accent-rgb)); font-weight: 700; }
@@ -919,7 +1113,53 @@ export default function AgentHero({ onNavigate }) {
             `}</style>
 
             {/* ===================== ESCENA AMBIENTE (por tema) ===================== */}
-            <div className="agentport-scene" aria-hidden="true">
+            <div
+                className={['agentport-scene', night ? 'is-night' : 'is-day'].join(' ')}
+                aria-hidden="true"
+            >
+                {/* — SOL/LUNA delicado, universal, según hora (operador 2026-06-06) — */}
+                <div className={['agentport-astro', night ? 'is-moon' : 'is-day'].join(' ')}>
+                    {night ? (
+                        <svg viewBox="0 0 64 64" aria-hidden="true">
+                            {/* luna creciente delicada */}
+                            <defs>
+                                <radialGradient id="ap-moon" cx="42%" cy="38%" r="65%">
+                                    <stop offset="0%" stopColor="#fdfbf2" />
+                                    <stop offset="100%" stopColor="#d9e2f2" />
+                                </radialGradient>
+                            </defs>
+                            <path
+                                d="M44 8 a26 26 0 1 0 12 40 a20 20 0 1 1 -12 -40 z"
+                                fill="url(#ap-moon)"
+                            />
+                            <circle cx="28" cy="24" r="2.2" fill="#cfd8ea" opacity=".7" />
+                            <circle cx="22" cy="38" r="1.6" fill="#cfd8ea" opacity=".55" />
+                            <circle cx="33" cy="42" r="1.3" fill="#cfd8ea" opacity=".5" />
+                        </svg>
+                    ) : (
+                        <svg viewBox="0 0 64 64" aria-hidden="true">
+                            {/* sol delicado con rayos finos */}
+                            <defs>
+                                <radialGradient id="ap-sun" cx="50%" cy="50%" r="50%">
+                                    <stop offset="0%" stopColor="#fff3cf" />
+                                    <stop offset="100%" stopColor="#f5b733" />
+                                </radialGradient>
+                            </defs>
+                            <g stroke="#f5b733" strokeWidth="2.4" strokeLinecap="round" opacity=".85">
+                                <line x1="32" y1="4" x2="32" y2="13" />
+                                <line x1="32" y1="51" x2="32" y2="60" />
+                                <line x1="4" y1="32" x2="13" y2="32" />
+                                <line x1="51" y1="32" x2="60" y2="32" />
+                                <line x1="12" y1="12" x2="18" y2="18" />
+                                <line x1="46" y1="46" x2="52" y2="52" />
+                                <line x1="52" y1="12" x2="46" y2="18" />
+                                <line x1="18" y1="46" x2="12" y2="52" />
+                            </g>
+                            <circle cx="32" cy="32" r="13" fill="url(#ap-sun)" />
+                        </svg>
+                    )}
+                </div>
+
                 {/* — NATURE: sol + montañas 3 capas + polen — */}
                 <div className="agentport-sun" />
                 <div className="agentport-mtn">
@@ -1001,28 +1241,14 @@ export default function AgentHero({ onNavigate }) {
 
                 {/* — COLIBRÍ 2D — vuela en los 3 temas (SVG del demo nature) — */}
                 <div className="agentport-hummer">
-                    <svg width="62" height="46" viewBox="0 0 62 46">
-                        {/* cuerpo */}
-                        <ellipse cx="34" cy="28" rx="11" ry="6.5" fill="#2f7d6b" />
-                        <ellipse cx="34" cy="27" rx="9" ry="4.2" fill="#3fa489" />
-                        {/* cabeza */}
-                        <circle cx="46" cy="24" r="6" fill="#2a6f60" />
-                        <circle cx="48.5" cy="22.5" r="1.4" fill="#11332c" />
-                        {/* gorguera roja */}
-                        <path d="M44 28 q5 2 8 0 q-3 4 -8 3 z" fill="#d05038" />
-                        {/* pico largo */}
-                        <path d="M52 24 L62 19" stroke="#3a2a18" strokeWidth="2" strokeLinecap="round" />
-                        {/* cola */}
-                        <path d="M23 28 L8 22 M23 30 L8 32" stroke="#256155" strokeWidth="3" strokeLinecap="round" />
-                        {/* ala (animada) */}
-                        <g className="wing">
-                            <path d="M30 24 C18 6 6 8 2 16 C12 18 22 24 30 30 Z" fill="#4fb89a" opacity=".9" />
-                        </g>
-                    </svg>
+                    <HummerSvg />
                 </div>
             </div>
 
             {/* ===================== MARCA + TOGGLE Campesino/Experto ===================== */}
+            {/* Operador 2026-06-06: arriba-izq = MARCA (ícono del tema + wordmark
+                "Chagra · tu mano en el campo"), NO el colibrí-video. El colibrí
+                sigue volando en la escena de fondo, y ES el botón de enviar. */}
             <header className="agentport-topbar">
                 <div className="agentport-brand">
                     <span className="agentport-mark">{iconForTheme(theme)}</span>
@@ -1031,33 +1257,50 @@ export default function AgentHero({ onNavigate }) {
                     </div>
                 </div>
 
-                <div className="agentport-mode" role="tablist" aria-label="Nivel de respuestas">
+                <div className="agentport-headtools">
+                    <div className="agentport-mode" role="tablist" aria-label="Nivel de respuestas">
+                        <button
+                            type="button"
+                            role="tab"
+                            aria-selected={!expertoActive}
+                            onClick={() => setNivelRespuestas('simple')}
+                            className={!expertoActive ? 'is-active' : ''}
+                        >
+                            🌾 Campesino
+                        </button>
+                        <button
+                            type="button"
+                            role="tab"
+                            aria-selected={expertoActive}
+                            onClick={() => setNivelRespuestas('detallado')}
+                            className={expertoActive ? 'is-active' : ''}
+                        >
+                            🔬 Experto
+                        </button>
+                    </div>
+
+                    {/* Botón de perfil (engranaje) → pantalla de Perfil (prefs). */}
                     <button
                         type="button"
-                        role="tab"
-                        aria-selected={!expertoActive}
-                        onClick={() => setNivelRespuestas('simple')}
-                        className={!expertoActive ? 'is-active' : ''}
+                        className="agentport-profile"
+                        aria-label="Perfil"
+                        title="Perfil y preferencias"
+                        onClick={() => onNavigate?.('perfil')}
                     >
-                        🌾 Campesino
-                    </button>
-                    <button
-                        type="button"
-                        role="tab"
-                        aria-selected={expertoActive}
-                        onClick={() => setNivelRespuestas('detallado')}
-                        className={expertoActive ? 'is-active' : ''}
-                    >
-                        🔬 Experto
+                        <Settings size={18} aria-hidden="true" />
                     </button>
                 </div>
             </header>
 
-            {/* TODO ubicación: a=bajo marca, b=pill bajo saludo, c=TopBar — espera
-                decisión operador (a/b/c). El dato sale del perfil de finca:
-                getProfileMunicipio() (municipio/region DANE) + profile.vereda +
-                profile.finca_altitud (msnm). El TopBar ya muestra municipio/vereda
-                bajo el nombre del operador; aquí queda el placeholder limpio. */}
+            {/* UBICACIÓN — arriba-derecha de la escena (donde vuela el colibrí).
+                📍 Vereda, Municipio · altitud, SIN latitud, del perfil real. Si
+                falta el municipio no se muestra (no inventamos ubicación). */}
+            {locationLabel && (
+                <div className="agentport-loc" aria-label={`Ubicación: ${locationLabel}`}>
+                    <span className="pin" aria-hidden="true">📍</span>
+                    <span className="txt">{locationLabel}</span>
+                </div>
+            )}
 
             {/* ===================== ZONA-RESPIRO (escena vive detrás) ===================== */}
             <div className="agentport-stage" aria-hidden="true" />
@@ -1067,10 +1310,42 @@ export default function AgentHero({ onNavigate }) {
                 <h2 className="agentport-hi">
                     {greetingForNow(nivel)}<br />Soy <span className="chagra-wordmark">Chagra</span>.
                 </h2>
-                <p className="agentport-sub">
-                    {expertoActive ? SUB_EXPERTO : SUB_CAMPESINO}
-                </p>
+                {/* Sugerencia contextual ROTATIVA bajo "Soy Chagra": si el usuario
+                    tiene cultivos registrados, mostramos un consejo agronómico
+                    determinístico (cultivo × mes × piso térmico) que rota cada 5s.
+                    Si no tiene cultivos, cae al subtítulo genérico de siempre. */}
+                {cropSuggestions.length > 0 ? (
+                    <p
+                        className="agentport-sub"
+                        key={suggestionIdx}
+                        aria-live="polite"
+                        data-testid="agentport-suggestion"
+                    >
+                        {cropSuggestions[suggestionIdx % cropSuggestions.length]}
+                    </p>
+                ) : (
+                    <p className="agentport-sub">
+                        {expertoActive ? SUB_EXPERTO : SUB_CAMPESINO}
+                    </p>
+                )}
             </div>
+
+            {/* CHIP DE ALERTA real (clima/helada). Solo si el estilo de
+                notificación es 'demo' (default) y hay una alerta activa. En
+                'actual' la campanita del TopBar la cubre. */}
+            {showAlertChip && (
+                <div
+                    className={['agentport-alert', topAlert.severity === 'danger' ? 'is-danger' : ''].join(' ')}
+                    role="status"
+                    data-testid="agentport-alert"
+                >
+                    <span className="ico" aria-hidden="true">⚠️</span>
+                    <span className="txt">
+                        <span className="at">{topAlert.title}</span>
+                        {topAlert.message && <span className="am">{topAlert.message}</span>}
+                    </span>
+                </div>
+            )}
 
             {/* ===================== CHIPS ===================== */}
             <div className="agentport-chiprow">
@@ -1108,7 +1383,7 @@ export default function AgentHero({ onNavigate }) {
                                 />
                             ) : (
                                 <div className="w-14 h-14 rounded-xl bg-[rgb(var(--c-surface-card))] border border-[rgb(var(--c-surface-border))] flex items-center justify-center">
-                                    <Paperclip size={20} className="text-[rgb(var(--c-slate-400))]" aria-hidden="true" />
+                                    <Camera size={20} className="text-[rgb(var(--c-slate-400))]" aria-hidden="true" />
                                 </div>
                             )}
                             <span className="flex-1 text-xs text-[rgb(var(--c-slate-300))] truncate">
@@ -1169,7 +1444,10 @@ export default function AgentHero({ onNavigate }) {
                             <span className="agentport-tool-ico" aria-hidden="true">{iconForTheme(theme)}</span>
                         </button>
 
-                        {/* Cámara / foto */}
+                        {/* Cámara / foto — toma una foto O elige de la galería.
+                            B2: solo imágenes (el agente solo "ve" fotos). El botón
+                            de adjuntar (clip) se quitó (operador 2026-06-06): la
+                            cámara ya cubre tomar foto y galería. */}
                         <button
                             type="button"
                             onClick={() => cameraInputRef.current?.click()}
@@ -1178,16 +1456,6 @@ export default function AgentHero({ onNavigate }) {
                             className="agentport-iconbtn !w-10 !h-10"
                         >
                             <Camera size={19} aria-hidden="true" />
-                        </button>
-                        {/* Adjuntar foto — B2: solo imágenes (el agente solo ve fotos) */}
-                        <button
-                            type="button"
-                            onClick={() => fileInputRef.current?.click()}
-                            disabled={busy || isRecording}
-                            aria-label="Adjuntar una foto"
-                            className="agentport-iconbtn !w-10 !h-10"
-                        >
-                            <Paperclip size={18} aria-hidden="true" />
                         </button>
 
                         <div className="flex-1" />
@@ -1204,29 +1472,28 @@ export default function AgentHero({ onNavigate }) {
                             {isRecording ? <Square size={16} strokeWidth={2.5} aria-hidden="true" /> : <Mic size={18} strokeWidth={2.5} aria-hidden="true" />}
                         </button>
 
-                        {/* Enviar — botón redondo de acento (el .send del demo) */}
+                        {/* ENVIAR = el colibrí (operador 2026-06-06). Botón redondo
+                            de acento con el colibrí 2D del demo dentro. Toda la
+                            lógica de envío intacta (handleSendText → outbox →
+                            navegar, SEND_TRANSITION_MS, disabled/sending). */}
                         <button
                             type="button"
                             onClick={handleSendText}
                             disabled={!canSend}
-                            aria-label="Enviar al agente"
+                            aria-label="Enviar"
                             className={['agentport-send', canSend ? 'agent-send-accent' : ''].join(' ')}
                         >
-                            <ArrowUp size={18} strokeWidth={2.75} aria-hidden="true" />
+                            <span className="send-hummer" aria-hidden="true">
+                                <HummerSvg flap={false} />
+                            </span>
                         </button>
                     </div>
 
-                    {/* Inputs ocultos — AMBOS solo imágenes (B2). */}
+                    {/* Input oculto de foto — solo imágenes (B2). SIN `capture`:
+                        permite tomar foto O elegir de la galería (operador
+                        2026-06-06). */}
                     <input
                         ref={cameraInputRef}
-                        type="file"
-                        accept="image/*"
-                        capture="environment"
-                        className="hidden"
-                        onChange={handlePhotoPick}
-                    />
-                    <input
-                        ref={fileInputRef}
                         type="file"
                         accept="image/*"
                         className="hidden"

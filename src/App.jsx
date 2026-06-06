@@ -738,7 +738,11 @@ export default function App() {
           decisión del operador: lo quería fuera. La entrada por voz sigue
           disponible dentro del agente / compositor; este era solo el FAB
           global. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && <AgentFab onNavigate={navigate} />}
+      {/* AgentFab (colibrí flotante "respuesta lista") en TODAS las pantallas
+          MENOS el home/dashboard (operador 2026-06-06): en el home el colibrí
+          ya es el botón de ENVIAR del compositor, así que el FAB flotante ahí
+          duplicaría el ave. Sigue en el resto para anunciar "respuesta lista". */}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && <AgentFab onNavigate={navigate} />}
       {currentView === 'dashboard' && <QuickActionsPanel onNavigate={navigate} />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <SyncProgressIndicator />}
