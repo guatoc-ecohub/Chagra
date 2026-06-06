@@ -5,14 +5,11 @@ import OfflineChip from './OfflineChip';
 import NotificationsBell from './NotificationsBell';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
 import useAssetStore from '../store/useAssetStore';
-<<<<<<< HEAD
-=======
 import { FARM_CONFIG } from '../config/defaults';
 import { getProfile, getProfileMunicipio } from '../services/userProfileService';
 import { findMunicipio } from '../utils/colombiaLocations';
 import { useTheme } from '../hooks/useTheme';
 import { iconForTheme } from './dashboard/themeIcon';
->>>>>>> b2605a6 (fix(home): 4 correcciones visuales portada inmersiva v2)
 
 /**
  * TopBar, header persistente con identidad del operador (DR-030 QW2).
@@ -47,9 +44,6 @@ import { iconForTheme } from './dashboard/themeIcon';
  * para destrabar PWA install Safari iOS).
  */
 export default function TopBar({ onNavigate, onLogout }) {
-<<<<<<< HEAD
-  const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
-=======
   const [envOpen, setEnvOpen] = useState(false);
   const [operatorName, setOperatorName] = useState(() =>
     typeof window !== 'undefined'
@@ -95,7 +89,6 @@ export default function TopBar({ onNavigate, onLogout }) {
     FARM_CONFIG?.ALTITUD_MSNM ||
     daneAltitud ||
     null;
->>>>>>> b2605a6 (fix(home): 4 correcciones visuales portada inmersiva v2)
 
   // "Respira" animación del logo Chagra cuando hay actividad de fondo
   // (warm-up del agente IA o sync con FarmOS). Sensación de "agente vivo
