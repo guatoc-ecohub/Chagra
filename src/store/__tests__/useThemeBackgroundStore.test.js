@@ -1,11 +1,11 @@
 /**
  * useThemeBackgroundStore — selector de fondos.
  *
- * Cubre (post 2026-06-02, fondo "Clásico" eliminado):
- *   - default universal selected="biopunk-4" (Cosecha mística)
+ * Cubre (post 2026-06-06, default cambió a Páramo completo):
+ *   - default universal selected="biopunk-1" (Páramo completo)
  *   - el catálogo contiene SOLO los 4 fondos biopunk (sin 'default'/Clásico)
  *   - setBackground cambia y persiste en localStorage (chagra:background:v1)
- *   - id desconocido (y el legado 'default') cae a "biopunk-4" (defensivo)
+ *   - id desconocido (y el legado 'default') cae a "biopunk-1" (defensivo)
  *   - helpers puros getBackgroundById / getBackgroundSrc retornan refs
  *     estables del catálogo congelado (anti React #185)
  *   - catálogo congelado (Object.freeze) — no mutable
@@ -22,18 +22,18 @@ import useThemeBackgroundStore, {
 describe('useThemeBackgroundStore', () => {
   beforeEach(() => {
     localStorage.clear();
-    // Singleton entre tests: volver al default universal (Cosecha mística).
-    useThemeBackgroundStore.getState().setBackground('biopunk-4');
+    // Singleton entre tests: volver al default universal (Páramo completo).
+    useThemeBackgroundStore.getState().setBackground('biopunk-1');
   });
 
-  it('default universal: selected="biopunk-4" (Cosecha mística, operador 2026-06-02)', () => {
-    expect(useThemeBackgroundStore.getState().selected).toBe('biopunk-4');
-    expect(DEFAULT_BACKGROUND_ID).toBe('biopunk-4');
+  it('default universal: selected="biopunk-1" (Páramo completo, operador 2026-06-06)', () => {
+    expect(useThemeBackgroundStore.getState().selected).toBe('biopunk-1');
+    expect(DEFAULT_BACKGROUND_ID).toBe('biopunk-1');
   });
 
   it('setBackground cambia el fondo seleccionado', () => {
-    useThemeBackgroundStore.getState().setBackground('biopunk-1');
-    expect(useThemeBackgroundStore.getState().selected).toBe('biopunk-1');
+    useThemeBackgroundStore.getState().setBackground('biopunk-2');
+    expect(useThemeBackgroundStore.getState().selected).toBe('biopunk-2');
   });
 
   it('setBackground persiste en localStorage chagra:background:v1', () => {
@@ -43,15 +43,15 @@ describe('useThemeBackgroundStore', () => {
     expect(JSON.parse(raw).state.selected).toBe('biopunk-2');
   });
 
-  it('id desconocido cae al default universal "biopunk-4" (defensivo)', () => {
-    useThemeBackgroundStore.getState().setBackground('biopunk-1');
+  it('id desconocido cae al default universal "biopunk-1" (defensivo)', () => {
+    useThemeBackgroundStore.getState().setBackground('biopunk-2');
     useThemeBackgroundStore.getState().setBackground('no-existe');
-    expect(useThemeBackgroundStore.getState().selected).toBe('biopunk-4');
+    expect(useThemeBackgroundStore.getState().selected).toBe('biopunk-1');
   });
 
-  it('el legado "default" (Clásico, eliminado) ya no es válido → cae a biopunk-4', () => {
+  it('el legado "default" (Clásico, eliminado) ya no es válido → cae a biopunk-1', () => {
     useThemeBackgroundStore.getState().setBackground('default');
-    expect(useThemeBackgroundStore.getState().selected).toBe('biopunk-4');
+    expect(useThemeBackgroundStore.getState().selected).toBe('biopunk-1');
   });
 
   it('catálogo: SOLO 4 fondos biopunk (sin Clásico) y congelado', () => {
@@ -76,17 +76,17 @@ describe('useThemeBackgroundStore', () => {
     expect(a).toBe(BACKGROUND_CATALOG[0]);
   });
 
-  it('getBackgroundById con id inválido retorna la entrada default (Cosecha mística) estable', () => {
+  it('getBackgroundById con id inválido retorna la entrada default (Páramo completo) estable', () => {
     const entry = getBackgroundById('no-existe');
-    expect(entry.id).toBe('biopunk-4');
+    expect(entry.id).toBe('biopunk-1');
     // Ref estable entre llamadas (no objeto nuevo).
     expect(getBackgroundById('otro-invalido')).toBe(entry);
   });
 
-  it('getBackgroundSrc: id desconocido cae a Cosecha mística (DEFAULT_BACKGROUND_SRC)', () => {
+  it('getBackgroundSrc: id desconocido cae a Páramo completo (DEFAULT_BACKGROUND_SRC)', () => {
     expect(getBackgroundSrc('no-existe')).toBe(DEFAULT_BACKGROUND_SRC);
     expect(getBackgroundSrc('default')).toBe(DEFAULT_BACKGROUND_SRC);
-    expect(DEFAULT_BACKGROUND_SRC).toBe('/fondo-biopunk-4.jpg');
+    expect(DEFAULT_BACKGROUND_SRC).toBe('/fondo-biopunk-1.jpg');
   });
 
   it('getBackgroundSrc: fondo biopunk usa su JPG', () => {

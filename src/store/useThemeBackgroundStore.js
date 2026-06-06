@@ -65,19 +65,19 @@ export const BACKGROUND_CATALOG = Object.freeze([
 ]);
 
 /**
- * Id del fondo por defecto universal — "Cosecha mística" (biopunk-4).
- * Decisión operador 2026-06-02. Cualquier id desconocido o localStorage
+ * Id del fondo por defecto universal — "Páramo completo" (biopunk-1).
+ * Decisión operador 2026-06-06. Cualquier id desconocido o localStorage
  * legado con el viejo 'default' (Clásico, ya eliminado) resuelve acá.
  */
-export const DEFAULT_BACKGROUND_ID = 'biopunk-4';
+export const DEFAULT_BACKGROUND_ID = 'biopunk-1';
 
 /**
- * Fondo por defecto de TODA la app y el login — "Cosecha mística" (biopunk-4).
- * Decisión operador 2026-06-02: este es el default universal; cualquier usuario
+ * Fondo por defecto de TODA la app y el login — "Páramo completo" (biopunk-1).
+ * Decisión operador 2026-06-06: este es el default universal; cualquier usuario
  * que no haya elegido explícitamente otro fondo (incluido login/incógnito) lo ve.
  * (Antes existía '/biodiversidad-bg.jpg', el "fondo Clásico" que el operador eliminó.)
  */
-export const DEFAULT_BACKGROUND_SRC = '/fondo-biopunk-4.jpg';
+export const DEFAULT_BACKGROUND_SRC = '/fondo-biopunk-1.jpg';
 
 /** Entrada del catálogo del fondo por defecto (ref estable congelada). */
 const DEFAULT_BACKGROUND_ENTRY = Object.freeze(

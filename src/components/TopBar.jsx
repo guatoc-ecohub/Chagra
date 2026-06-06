@@ -1,16 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { CircleUser, HelpCircle, LogOut, MapPin } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { CircleUser, HelpCircle, LogOut } from 'lucide-react';
 import { version as APP_VERSION } from '../../package.json';
-import AltitudeBadge from './AltitudeBadge';
 import OfflineChip from './OfflineChip';
-import ChagraAgentAvatar from './ChagraAgentAvatar';
 import NotificationsBell from './NotificationsBell';
-import useFincaActiveStore from '../services/fincaActiveStore';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
 import useAssetStore from '../store/useAssetStore';
-import { FARM_CONFIG } from '../config/defaults';
-import { getProfile, getProfileMunicipio } from '../services/userProfileService';
-import { findMunicipio } from '../utils/colombiaLocations';
 
 /**
  * TopBar, header persistente con identidad del operador (DR-030 QW2).
@@ -45,49 +39,7 @@ import { findMunicipio } from '../utils/colombiaLocations';
  * para destrabar PWA install Safari iOS).
  */
 export default function TopBar({ onNavigate, onLogout }) {
-  const [operatorName, setOperatorName] = useState(() =>
-    typeof window !== 'undefined'
-      ? localStorage.getItem('chagra:operator:name') || 'Mi finca'
-      : 'Mi finca'
-  );
-  const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
-  const fincas = useFincaActiveStore((s) => s.fincas);
-  const activeFinca = fincas.find((f) => f.slug === activeFincaSlug);
-  // `tick` fuerza re-lectura del perfil cuando el usuario confirma su ubicación
-  // en LocationDetectedScreen (evento 'chagra:location-updated'), que la guarda
-  // en el PERFIL (userProfileService), no en fincaActiveStore. Sin esto la
-  // línea de ubicación bajo el nombre se quedaría vacía para el piloto que
-  // solo pasó por esa pantalla.
-  const [profileTick, setProfileTick] = useState(0);
-  const profile = (() => { void profileTick; return getProfile(); })();
-  // Ubicación bajo el nombre: finca activa (multi-finca) → perfil (onboarding/
-  // ubicación detectada) → FARM_CONFIG (demo).
-  //
-  // BUG FIX 2026-05-30 (operador "no veo Choachí"): antes leía
-  // `profile?.municipio` crudo. Pero el ONBOARDING guarda la ubicación en el
-  // campo `region` (texto libre, ej. "Choachí"), NO en `municipio` —
-  // `municipio` solo lo escribe LocationDetectedScreen al confirmar por el
-  // mapa. Así, el piloto que solo hizo el onboarding tenía `municipio`
-  // undefined → la línea caía a FARM_CONFIG (null en prod) y NO mostraba
-  // Choachí. `getProfileMunicipio()` retrocompatibiliza: prefiere `municipio`
-  // y, si falta, resuelve `region` contra el dataset DANE local (offline).
-  const profileMunicipio = getProfileMunicipio();
-  const municipio = activeFinca?.municipio || profileMunicipio || FARM_CONFIG?.MUNICIPIO || null;
-  // Vereda: el dataset DANE no la trae; solo aparece si el perfil/finca la tiene
-  // de onboarding manual. Si no, se omite sin romper (municipio + altitud bastan).
-  const vereda = activeFinca?.vereda || profile?.vereda || null;
-  // Altitud: prioriza la real de la finca (perfil/finca activa); si el perfil no
-  // la trae (onboarding sin altitud), cae a la altitud curada del municipio en
-  // el dataset DANE — así el chip siempre muestra municipio + altitud aunque la
-  // captura fina de la altitud real la complete el otro flujo (coarse-location).
-  const daneAltitud = municipio ? findMunicipio(String(municipio).split(',')[0])?.altitud : null;
-  const altitud =
-    activeFinca?.altitud ||
-    profile?.finca_altitud ||
-    profile?.altitud ||
-    FARM_CONFIG?.ALTITUD_MSNM ||
-    daneAltitud ||
-    null;
+  const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
 
   // "Respira" animación del logo Chagra cuando hay actividad de fondo
   // (warm-up del agente IA o sync con FarmOS). Sensación de "agente vivo
@@ -96,29 +48,26 @@ export default function TopBar({ onNavigate, onLogout }) {
   const syncProgress = useAssetStore((s) => s.syncProgress);
   const isBreathing = warmupStatus === 'warming' || (syncProgress && !syncProgress.isComplete && !syncProgress.isCancelled);
 
-  // Re-leer si cambia desde otro tab (storage event nativo) O desde el mismo
-  // tab via ProfileScreen (chagra:operator-update CustomEvent).
+  // Cerrar menú del avatar cuando se hace click fuera
   useEffect(() => {
-    const onStorage = (e) => {
-      if (e.key === 'chagra:operator:name') {
-        setOperatorName(e.newValue || 'Operador');
+    if (!avatarMenuOpen) return undefined;
+    function onClickOutside(e) {
+      if (avatarMenuRef.current && !avatarMenuRef.current.contains(e.target)) {
+        setAvatarMenuOpen(false);
       }
-    };
-    const onOperatorUpdate = (e) => {
-      if (e.detail?.key === 'chagra:operator:name') {
-        setOperatorName(e.detail.value || 'Operador');
-      }
-    };
-    const onLocationUpdated = () => setProfileTick((t) => t + 1);
-    window.addEventListener('storage', onStorage);
-    window.addEventListener('chagra:operator-update', onOperatorUpdate);
-    window.addEventListener('chagra:location-updated', onLocationUpdated);
+    }
+    function onKey(e) {
+      if (e.key === 'Escape') setAvatarMenuOpen(false);
+    }
+    document.addEventListener('mousedown', onClickOutside);
+    document.addEventListener('keydown', onKey);
     return () => {
-      window.removeEventListener('storage', onStorage);
-      window.removeEventListener('chagra:operator-update', onOperatorUpdate);
-      window.removeEventListener('chagra:location-updated', onLocationUpdated);
+      document.removeEventListener('mousedown', onClickOutside);
+      document.removeEventListener('keydown', onKey);
     };
-  }, []);
+  }, [avatarMenuOpen]);
+
+  const avatarMenuRef = useRef(null);
 
   return (
     <>
@@ -138,14 +87,17 @@ export default function TopBar({ onNavigate, onLogout }) {
           title={isBreathing ? 'Chagra está pensando…' : 'Volver al inicio'}
           className="font-bold flex items-center gap-2 shrink-0 rounded-lg px-1 py-1 hover:bg-slate-800/60 active:bg-slate-700 transition-colors min-h-[44px]"
         >
+          {/* Colibrí (ChagraAgentAvatar) REMOVIDO del TopBar 2026-06-06 (operador:
+              "sacar el colibrí de arriba-izquierda"). La identidad del tema
+              (ícono del tema + "Chagra · su mano en el campo") la da el brand
+              del AgentHero justo debajo. El colibrí sigue VIVO en la escena del
+              home y ES el botón de enviar. */}
           <span
-            className={isBreathing ? 'chagra-topbar-breathe' : ''}
+            className={['text-base font-bold', isBreathing ? 'chagra-topbar-breathe' : ''].join(' ')}
             style={{ display: 'inline-flex' }}
-            aria-hidden="true"
           >
-            <ChagraAgentAvatar size={32} state={isBreathing ? 'thinking' : 'idle'} />
+            Chagra
           </span>
-          <span className="hidden sm:inline text-base">Chagra</span>
           <span className="hidden md:inline text-[10px] text-slate-500 font-mono font-normal">v{APP_VERSION}</span>
         </button>
         <style>{`
@@ -158,36 +110,6 @@ export default function TopBar({ onNavigate, onLogout }) {
             .chagra-topbar-breathe { animation: none; }
           }
         `}</style>
-
-        {/* Operador + ubicación (tap → perfil). Nombre real grande + ubicación
-            municipio · vereda · msnm en pill pequeño debajo. */}
-        <button
-          type="button"
-          onClick={() => onNavigate('perfil')}
-          aria-label={`Perfil del operador: ${operatorName}`}
-          className="flex flex-col items-start gap-0.5 px-2 py-1 rounded-lg bg-slate-800/40 hover:bg-slate-700/50 active:bg-slate-700 text-slate-200 min-h-[44px] flex-1 min-w-0"
-        >
-          <div className="flex items-center gap-1.5 w-full">
-            <CircleUser size={16} aria-hidden="true" className="shrink-0 text-teal-400" />
-            <span className="text-sm font-bold truncate flex-1 text-left">{operatorName}</span>
-          </div>
-          {(municipio || altitud) && (
-            // Chip de ubicación VISIBLE (operador 2026-05-30 "no veo Choachí"):
-            // pill teal con municipio + altitud, contraste alto para que se lea
-            // de un vistazo bajo el nombre.
-            <div
-              data-testid="topbar-location-chip"
-              className="flex items-center gap-1 mt-0.5 px-1.5 py-0.5 rounded-md bg-teal-500/15 border border-teal-500/25 text-[11px] text-teal-200 font-semibold leading-none max-w-full"
-            >
-              <MapPin size={11} className="shrink-0 text-teal-400" aria-hidden="true" />
-              <span className="truncate">
-                {municipio && <span>{municipio.split(',')[0]}</span>}
-                {vereda && <span>, vereda {vereda}</span>}
-                {altitud && <span> · {altitud} msnm</span>}
-              </span>
-            </div>
-          )}
-        </button>
 
         <OfflineChip />
 
@@ -240,18 +162,53 @@ export default function TopBar({ onNavigate, onLogout }) {
             operator name button es más explícito + el NAV_TILE Perfil del
             dashboard sigue accesible. */}
 
-        {/* Salir: en mobile estrecho muestra sólo icono LogOut (ahorra ~50px
-            de ancho). Desde sm muestra texto "Salir" tradicional. */}
-        <button
-          type="button"
-          onClick={onLogout}
-          aria-label="Cerrar sesión"
-          title="Cerrar sesión"
-          className="text-slate-400 hover:text-white px-2 sm:px-3 min-h-[44px] min-w-[44px] bg-slate-800 rounded text-sm shrink-0 flex items-center justify-center"
-        >
-          <LogOut size={18} aria-hidden="true" className="sm:hidden" />
-          <span className="hidden sm:inline">Salir</span>
-        </button>
+        {/* Avatar/menú de usuario (operador 2026-06-06): reemplaza el botón
+            de salir. Muestra ícono de usuario por defecto; al tocarlo → menú
+            flotante con "Ajustes" (→ perfil) y "Salir" (logout). */}
+        <div className="relative shrink-0" ref={avatarMenuRef}>
+          <button
+            type="button"
+            onClick={() => setAvatarMenuOpen((v) => !v)}
+            aria-label="Menú de usuario"
+            aria-expanded={avatarMenuOpen}
+            className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-slate-800 border-2 border-slate-700 hover:border-teal-500/50 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+          >
+            <CircleUser size={20} aria-hidden="true" />
+          </button>
+
+          {avatarMenuOpen && (
+            <div
+              role="menu"
+              aria-label="Opciones de usuario"
+              className="absolute right-0 top-full mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden"
+            >
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setAvatarMenuOpen(false);
+                  onNavigate('perfil');
+                }}
+                className="w-full px-4 py-3 text-left text-sm text-slate-300 hover:bg-slate-700/50 hover:text-white transition-colors flex items-center gap-3"
+              >
+                <CircleUser size={16} aria-hidden="true" className="shrink-0 text-teal-400" />
+                Ajustes
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setAvatarMenuOpen(false);
+                  onLogout();
+                }}
+                className="w-full px-4 py-3 text-left text-sm text-slate-300 hover:bg-slate-700/50 hover:text-white transition-colors flex items-center gap-3 border-t border-slate-700/50"
+              >
+                <LogOut size={16} aria-hidden="true" className="shrink-0 text-rose-400" />
+                Salir
+              </button>
+            </div>
+          )}
+        </div>
       </header>
 
       {/* Letrero "🌙 Ambiente · altitud · efemérides" + EnvironmentalCard
